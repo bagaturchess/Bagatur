@@ -1,0 +1,249 @@
+package bagaturchess.search.impl.rootsearch.multipv;
+
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.movelist.BaseMoveList;
+import bagaturchess.bitboard.impl.movelist.IMoveList;
+import bagaturchess.search.api.IFinishCallback;
+import bagaturchess.search.api.IRootSearch;
+import bagaturchess.search.api.IRootSearchConfig;
+import bagaturchess.search.api.internal.ISearchInfo;
+import bagaturchess.search.api.internal.ISearchMediator;
+import bagaturchess.search.api.internal.SearchInfoUtils;
+import bagaturchess.search.api.internal.SearchInterruptedException;
+import bagaturchess.search.impl.env.SharedData;
+import bagaturchess.search.impl.info.SearchInfoFactory;
+import bagaturchess.search.impl.utils.SearchMediatorProxy;
+
+
+public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallback {
+	
+	
+	private long startTime = System.currentTimeMillis();
+	
+	private SharedData sharedData;
+	private IRootSearchConfig engineConfiguration;
+	private IRootSearch rootSearch;
+	private IBitBoard bitboard;
+	private int startIteration;
+	private int maxIterations;
+	private boolean useMateDistancePrunning;
+	private IFinishCallback finishCallback;
+	
+	private List<MultiPVEntry> multiPVs_current;
+	
+	private int moves_count;
+	private int cur_PVNumber;
+	private int cur_depth;
+	
+	private ISearchInfo lastinfo;
+	private ISearchInfo bestinfo;
+	
+	private Set<ISearchInfo> infos;
+	
+	
+	public MultiPVMediator(SharedData _sharedData, IRootSearchConfig _engineConfiguration, IRootSearch _rootSearch, IBitBoard _bitboard, ISearchMediator _parentMediator,
+			int _startIteration, int _maxIterations, boolean _useMateDistancePrunning,
+			IFinishCallback _finishCallback) {
+		
+		super(_parentMediator);
+		
+		sharedData = _sharedData;
+		engineConfiguration = _engineConfiguration;
+		rootSearch = _rootSearch;
+		bitboard = _bitboard;
+		startIteration = _startIteration;
+		maxIterations = _maxIterations;
+		useMateDistancePrunning = _useMateDistancePrunning;
+		finishCallback = _finishCallback;
+		multiPVs_current = setupMultiPVs();
+		moves_count = multiPVs_current.size();
+		
+		cur_PVNumber = -1;
+		cur_depth = startIteration;
+		
+		infos = new HashSet<ISearchInfo>();
+	}
+	
+	
+	private List<MultiPVEntry> setupMultiPVs() {
+		IMoveList moves = new BaseMoveList();
+		bitboard.genAllMoves(moves);
+		
+		List<MultiPVEntry> multipvs = new ArrayList<MultiPVEntry>();
+		
+		int cur_move = 0;
+		while ((cur_move = moves.next()) != 0) {
+			MultiPVEntry cur_multipv = new MultiPVEntry(cur_move);
+			multipvs.add(cur_multipv);
+		}
+		return multipvs;
+	}
+	
+	
+	@Override
+	public synchronized void ready() {
+		
+		//dump("READY CALLED");
+		
+		if (cur_PVNumber != -1) { //Not first move of first iteration
+			MultiPVEntry curEntry = getCurrentPVEntry();
+			curEntry.setInfo(lastinfo);
+		}
+		
+		
+		if (cur_PVNumber == moves_count - 1) {
+			
+			//dump("READY CALLED: cur_PVNumber == moves_count - 1");
+			
+			//Get all PVs of this iteration
+			MultiPVEntry[] pvsToSend = orderPVsForSending();
+			
+			bestinfo = pvsToSend[0].getInfo();
+			super.changedMajor(bestinfo);
+			
+			ISearchInfo nodesInfo = combineMinorInfos();
+			
+			//Send best lines
+			for (int i=0; i<pvsToSend.length; i++) {
+				
+				pvsToSend[i].getInfo().setSearchedNodes(nodesInfo.getSearchedNodes());
+				String message = SearchInfoUtils.buildMajorInfoCommand_multipv(i+1, pvsToSend[i].getInfo(),
+						startTime, sharedData.getTPT().getUsage());
+				send(message);
+			}
+			
+			if (cur_depth == maxIterations) {
+				if (finishCallback != null) finishCallback.ready();
+				return;
+			} else if (cur_depth < maxIterations) {
+				cur_depth++;
+				cur_PVNumber = 0;
+			} else {
+				throw new IllegalStateException("cur_depth=" + cur_depth);
+			}
+		} else if (cur_PVNumber < moves_count - 1) {
+			//dump("READY CALLED: cur_PVNumber < moves_count - 1");
+			cur_PVNumber++;
+		} else {
+			throw new IllegalStateException("cur_PVNumber=" + cur_PVNumber);
+		}
+		
+		startNextSearch();
+	}
+	
+	
+	@Override
+	public synchronized void changedMinor(ISearchInfo info) {
+		
+		infos.add(info);
+		
+		ISearchInfo minor = combineMinorInfos();
+		minor.setCurrentMove(getCurrentPVEntry().getMove());
+		minor.setCurrentMoveNumber(cur_PVNumber + 1);
+		
+		minor.setDepth(cur_depth + 1);
+		
+		super.changedMinor(minor);
+	}
+	
+	
+	@Override
+	public synchronized void changedMajor(ISearchInfo info) {
+		
+		infos.add(info);
+		
+		ISearchInfo minor = combineMinorInfos();
+		
+		minor.setPV(info.getPV());
+		minor.setBestMove(info.getBestMove());
+		minor.setEval(info.getEval());
+		
+		minor.setDepth(cur_depth + 1);
+		
+		lastinfo = minor;
+	}
+	
+	
+	private ISearchInfo combineMinorInfos() {
+		
+		ISearchInfo result = SearchInfoFactory.getFactory().createSearchInfo();
+		
+		for (ISearchInfo cur: infos) {
+			result.setSearchedNodes(result.getSearchedNodes() + cur.getSearchedNodes());
+			if (cur.getDepth() > result.getDepth()) {
+				result.setDepth(cur.getDepth());
+			}
+			if (cur.getSelDepth() > result.getSelDepth()) {
+				result.setSelDepth(cur.getSelDepth());
+			}
+		}
+		return result;
+	}
+	
+	
+	@Override
+	public ISearchInfo getLastInfo() {
+		return bestinfo;
+	}
+	
+	
+	private MultiPVEntry getCurrentPVEntry() {
+		int counter = 0;
+		for (MultiPVEntry cur: multiPVs_current) {
+			if  (counter == cur_PVNumber) {
+				return cur;
+			}
+			counter++;
+		}
+		throw new IllegalStateException("counter=" + counter + ", cur_PVNumber=" + cur_PVNumber);
+	}
+	
+	
+	private void startNextSearch() {
+		try {
+			bitboard.makeMoveForward(getCurrentPVEntry().getMove());
+			rootSearch.negamax(bitboard, this, cur_depth, cur_depth, useMateDistancePrunning, this);
+			bitboard.makeMoveBackward(getCurrentPVEntry().getMove());
+		} catch(SearchInterruptedException sie) {
+			//Do Nothing
+		} catch(Throwable t) {
+			this.dump(t);
+		}
+	}
+	
+	
+	private MultiPVEntry[] orderPVsForSending() {
+		
+		Set<MultiPVEntry> multipvs_cur_set = new TreeSet<MultiPVEntry>(); 
+		multipvs_cur_set.addAll(multiPVs_current);
+				
+		MultiPVEntry[] pvsToSend = new MultiPVEntry[Math.min(engineConfiguration.getMultiPVsCount(), multipvs_cur_set.size())];
+		int pvnum = 0;
+		for (MultiPVEntry cur_multipv: multipvs_cur_set) {
+			if (pvnum >= engineConfiguration.getMultiPVsCount()) {
+				break;
+			}
+			pvsToSend[pvnum] = cur_multipv;
+			if (cur_multipv == null) {
+				throw new IllegalStateException("cur_multipv is null");
+			}
+			if (cur_multipv.getInfo() == null) {
+				throw new IllegalStateException("cur_multipv.getInfo() is null");
+			}
+			pvnum++;
+		}
+
+		//Setup the order for the next iteration
+		multiPVs_current = new ArrayList<MultiPVEntry>();
+		multiPVs_current.addAll(multipvs_cur_set);
+		
+		return pvsToSend;
+	}
+}

@@ -1,0 +1,115 @@
+
+
+Parallel MTD(f) search - idea & implementation
+	
+	It is working well and this is proven by the results.
+	The factor with 2 CPU cores is 1.7
+	The factor with 4 CPU cores is X.Y
+	
+	The invented algorithm is based on the original MTD(f) idea, described here - http://people.csail.mit.edu/plaat/mtdf.html.
+	In short, it works by zooming in the minimax value.
+	The difference with the original idea comes from the way in which the zoom is performed (e.g. in parallel, adaptive betas calculation, search threads' re-starts, etc.).
+	
+	The algorithm uses central data structure (CDS), which keeps:
+	1. Depth /*number*/
+		Current search iteration (a.k.a. Depth)
+	2. Lower /*number*/
+	3. Upper /*number*/
+		The bounds to which the minimax value is narrowed in the current iteration.
+			In the beginning of the search (for the given iteration) the bounds are set to -Infinity and +Infinity.
+			Than, during the search, the minimax value is continuously approached by the lower and upper bounds.	
+	4. BetasList /*list of numbers*/
+		The latest 'betas' list
+	This data structure is accessed via critical sections during the parallel search.
+	
+	Parallelism comes from multiple threads, which perform 'null window' searches in parallel.
+	Each thread searches with given 'beta' value. The 'betas' are calculated in a specific and adaptive way, which will be explained later.
+	On some conditions one or more of the threads can be re-started with different 'beta' and/or depth.
+	Re-start happens in the following situations:
+	1. Next iteration is started
+	2. Thread's 'beta' is outside the latest bounds (tracked in the CDS)
+	
+	There is one thread which initiates the search by doing the following:
+	1. CDS.Depth = 1
+	2. CDS.Lower = -Infinity
+	3. CDS.Upper = +Infinity
+	4. CDS.BetasList = call 'betasgen' procedure
+	5  Let TrustWindow 	= 16;
+	6. Notify all threads to start searching in parallel. Let's assume that the count of the threads is N (e.g. = physical CPUs cores' count).
+	 
+	Then all threads begin and here is the procedure, which each searcher thread follows:
+	1 Get depth and next beta from the central data structure - [beta, depth] pair
+	2 Start alpha-beta 'null window' search
+	3 Checks periodically whether the search depth is equal to the depth recorded in the central data structure
+	  and whether the beta is inside the current lower and upper bound recorded in the central data structure.
+	  If not, than stop the search and go to 1
+	4 Else when the search have finished normally, there are 2 interesting cases - update the lower or the upper bound of CDS.
+	  This update could potentially increase the depth of the search.
+	  The updates also trigger a call to 'betasgen' and hence re-generates betas list (tracked in CDS) and parallel search continues with these new values.
+	  Both cases are explained below in more details:
+		4a found new lower bound - returnval is lower bound when returnval >= beta
+				if (returnval > CDS.Lower) {
+					CDS.Lower = returnval
+					if (TrustWindow < CDS.Upper - CDS.Lower) {
+						CDS.Lower = -Infinity
+						CDS.Upper = +Infinity
+						CDS.Depth = CDS.Depth + 1
+					}
+					CDS.BetasList = call 'betasgen' procedure in order to generate the new list of betas
+				} else do nothing
+		4b found new upper bound - returnval is upper bound when returnval <= alpha
+				if (returnval < CDS.Upper) {
+					CDS.Upper = returnval
+					if (TrustWindow < CDS.Upper - CDS.Lower) {
+						CDS.Lower = -Infinity
+						CDS.Upper = +Infinity
+						CDS.Depth = CDS.Depth + 1
+					}
+					CDS.BetasList = call 'betasgen' procedure in order to generate the new list of betas
+				} else do nothing
+	5 Go to 1
+	
+	
+	'betasgen' procedure (the calculation of betas follows this procedure)
+	*
+	* int IE /*initial eval*/ 	= the rough estimation of the minimax value based on the previous iteration or the transposition entry or the static evaluation of the root position
+	* int STEP					= 16
+	* int trend					= 1
+	* 
+	* int size = N * trend * STEP
+	* if size >= upper - lower
+	*   int window = (upper - lower) / (N + 1)
+	*   if window <= 0
+	*     for i=lower + 1; i<=upper; i++
+	*       add_to_beta_list i
+	*   else //window > 0
+	*     for i=1; i<= N; i++
+	*       add_to_beta_list IE + ((trend == UP) ? (+1) : (-1)) * i * window
+	* else //size < upper - lower
+	*   int shift = firstTime ? 1 : 0 /*firstTime is true when lower = -Infinity and upper = +Infinity*/
+	*   for i=1 + shift; i<= N; i++
+	*     add_to_beta_list IE + ((trend == UP) ? (+1) : (-1)) * i * trend * STEP
+	* 
+	
+	/*link to source file*/
+	
+	Trust interval
+	
+	Table with examples
+	
+	
+Self and Advised learning
+
+
+Gaviota Java API
+	Asynchronous algorithm
+		Normally the access to EGTBs takes time and slows down the search.
+		The cache helps to some extend but is not enough to provide an alternative, which doesn't affect the search speed in a negative way.
+		 
+	How to use the API?
+
+
+Measurements search/eval/speed
+	Self play
+	Cuckoo experiments
+

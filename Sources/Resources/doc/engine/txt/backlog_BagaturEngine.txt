@@ -1,0 +1,14 @@
+
+
+This is the Bagatur's to-do list (a.k.a the backlog) of features requested by users (or needed to be implemented, because of technical reasons).
+Feel free to contribute http://sourceforge.net/projects/bagaturchess/develop
+
+10. Implement end-game tables in java (e.g. Nalimov, Gaviota, Scorpio) 
+      b) TODO: Gaviota for win 64, Gaviota: http://sites.google.com/site/gaviotachessengine/Home/endgame-tablebases-1
+20. Create user and programmer documentation
+30. Tuning of Search and Evaluation function
+40. Create a readme file (user guide) in Bulgarian
+50. Check whether Bagatur works and plays during online mode of Arena. If doesn't work then collect issues and work on them.
+60. Clarify the structure of JUnit tests' projects  
+70. Implement JUnit tests for all projects, starting from the bit-board and UCI adapter sub-projects as mostly critical and used.
+80. Make the board initialization inside the parallel root searcher synchronous (performed by the main thread) like in the sequential root searcher. 
