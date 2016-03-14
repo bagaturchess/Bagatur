@@ -19,7 +19,7 @@
 	</target>
 	
 	<target name="compile" description="compile the source">
-		<javac srcdir="${src}" destdir="${temp_dir}"  classpath="${classpath}"/>
+		<javac compiler="javac1.7" srcdir="${src}" destdir="${temp_dir}"  classpath="${classpath}"/>
 	</target>
 	
 	<target name="resources" description="copy resources">
