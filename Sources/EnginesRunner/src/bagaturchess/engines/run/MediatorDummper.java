@@ -130,7 +130,8 @@ public class MediatorDummper implements ISearchMediator {
 		}
 
 		public void markStopped() {
-			throw new UnsupportedOperationException();
+			stopped = true;
+			//throw new UnsupportedOperationException();
 		}
 
 		public void setSecondaryStopper(ISearchStopper secondaryStopper) {

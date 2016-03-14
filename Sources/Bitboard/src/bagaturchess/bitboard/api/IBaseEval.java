@@ -45,4 +45,6 @@ public interface IBaseEval {
 	
 	public int getMaterialRook();
 	public int getMaterialQueen();
+	public int getMaterial(int pieceType);
+	public int getMaterialGain(int move);
 }

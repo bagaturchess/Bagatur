@@ -54,4 +54,9 @@ public class EvaluatorAdapter implements IEvaluator {
 	public int fastEval(int depth, int rootColour) {
 		throw new UnsupportedOperationException("Not implemented");
 	}
+
+	@Override
+	public int getMaterial(int pieceType) {
+		throw new UnsupportedOperationException("Not implemented");
+	}
 }

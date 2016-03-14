@@ -24,7 +24,7 @@
  */
 
 
-For the latest and greatest version of this readme file you can visit the SVN repository and check the UCITracker sub-project:
+For the latest and greatest version of this readme file you can visit the SVN repository and check the LearningAPI sub-project:
 SVN repository https://bagaturchess.svn.sourceforge.net/svnroot/bagaturchess
 
 

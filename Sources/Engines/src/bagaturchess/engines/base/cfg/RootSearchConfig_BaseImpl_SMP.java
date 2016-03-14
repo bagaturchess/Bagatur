@@ -55,7 +55,7 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	
 	@Override
 	public String getSemaphoreFactoryClassName() {
-		return "bagaturchess.bitboard.impl.utils.BinarySemaphoreFactory";
+		return bagaturchess.bitboard.impl.utils.BinarySemaphoreFactory.class.getName();
 	}
 	
 	

@@ -239,7 +239,7 @@ public class SEE implements ISEE {
 	
 	public int seeField(int fieldID) {
 		
-		if (true) throw new IllegalStateException("Check calls to SEE");
+		//if (true) throw new IllegalStateException("Check calls to SEE");
 		
 		int figurePID = bitboard.getFigureID(fieldID);
 		int figureColour = Figures.getFigureColour(figurePID);
@@ -268,7 +268,7 @@ public class SEE implements ISEE {
 	
 	public int seeMove(int pieceColour, int pieceType, int toFiledID) {
 		
-		if (true) throw new IllegalStateException("Check calls to SEE");
+		//if (true) throw new IllegalStateException("Check calls to SEE");
 		
 		int w_state = 0;
 		int b_state = 0;
@@ -480,7 +480,7 @@ public class SEE implements ISEE {
 	
 	private int buildAttacksList(boolean stop, int colour, int toFieldID, long toFieldBitboard) {
 		
-		if (true) throw new IllegalStateException("Check calls to SEE");
+		//if (true) throw new IllegalStateException("Check calls to SEE");
 		
 		int state = 0;
 		
@@ -850,7 +850,7 @@ public class SEE implements ISEE {
 	
 	private void buildAttacksList(int toFieldID, long toFieldBitboard, int[] states) {
 		
-		if (true) throw new IllegalStateException("Check calls to SEE");
+		//if (true) throw new IllegalStateException("Check calls to SEE");
 		
 		//long w_all = bitboard.getFiguresBitboardByColour(Figures.COLOUR_WHITE);
 		//long b_all = bitboard.getFiguresBitboardByColour(Figures.COLOUR_BLACK);

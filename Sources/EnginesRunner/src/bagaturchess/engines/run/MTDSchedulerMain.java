@@ -79,19 +79,11 @@ public class MTDSchedulerMain {
 		
 		IRootSearchConfig cfg = new RootSearchConfig_BaseImpl_SMP(
 				new String[] {
-								//"bagaturchess.search.impl.alg.impl_progressive.SearchMTD11",
 								"bagaturchess.search.impl.alg.impl0.SearchMTD0",
-								//"bagaturchess.search.impl.alg.impl3.SearchAB3",
-								//"bagaturchess.search.impl.alg.impl4.SearchMTD4",
-								//"bagaturchess.search.impl.alg.impl2.SearchMTD2",
+								//"bagaturchess.search.impl.alg.impl5_scratch.SearchMTD_AlphaBeta_pv_nonpv",
 								//"bagaturchess.search.impl.alg.impl5_scratch.SearchMTD_MinMax",
 								//"bagaturchess.search.impl.alg.impl5_scratch.SearchMTD_AlphaBeta",
-								//"bagaturchess.search.impl.alg.impl5_scratch.SearchMTD_AlphaBeta_pv_nonpv",
-								//"bagaturchess.search.impl.alg.impl5_scratch.SearchMTD_AlphaBeta_pv_nonpv1",
-								//"bagaturchess.search.impl.alg.impl6_old_reimpl.SearchMTD6",
-								//"bagaturchess.search.impl.alg.impl6_old_reimpl.SearchMTD6_1",
-								//"bagaturchess.search.impl.alg.impl7_old_reimpl.SearchMTD7",
-								//"bagaturchess.search.impl.alg.impl3_old_reimpl_new.SearchMTD3",
+								//"bagaturchess.search.impl.alg.impl_staticsearch.SearchMTD_Static",
 								
 								//"bagaturchess.engines.searchtune.SearchConfig1_MTD_Impl_LKG",
 								//"bagaturchess.engines.bagatur.v110.SearchConfigImpl",
@@ -102,35 +94,34 @@ public class MTDSchedulerMain {
 								//"bagaturchess.engines.learning.cfg.weights.boardtune.WeightsBoardConfig_LKG",
 								//"bagaturchess.engines.learning.cfg.weights.evaltune.WeightsEvaluationConfig_LKG"
 								
-								//"bagaturchess.engines.learning.cfg.weights.WeightsBoardConfig",
-								//"bagaturchess.engines.learning.cfg.weights.WeightsEvaluationConfig"
-
-								
 								//"bagaturchess.engines.bagatur.progressive.BagaturV12BoardConfig",
 								//"bagaturchess.engines.bagatur.progressive.BagaturV12EvaluationConfig"
 								
+								//"bagaturchess.engines.material.MaterialBoardConfigImpl",
+								//"bagaturchess.engines.material.MaterialEvalConfigImpl"
+								
 								"bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl",
 								"bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2"
+								
+								//"bagaturchess.engines.learning.cfg.weights.WeightsBoardConfig",
+								//"bagaturchess.engines.learning.cfg.weights.WeightsEvaluationConfig"
+								
 								
 								//"bagaturchess.engines.bagatur.v13.DualEvaluationConfg"
 								//"bagaturchess.engines.bagatur.v13_a.EvaluationConfg13"
 								
 								//"bagaturchess.engines.bagatur.v14.BoardConfigImpl",
-								//"bagaturchess.engines.bagatur.v14.EvaluationConfg13"
+								//"bagaturchess.engines.bagatur.v14.EvaluationConfg13"	
 								
-								//"bagaturchess.engines.material.MaterialBoardConfigImpl",
-								//"bagaturchess.engines.material.MaterialEvalConfigImpl"
 								}
 				);
 		
-		
-		//SharedData arg1 = new SharedData(cfg);
+		SharedData arg1 = new SharedData(cfg);
 		//IRootSearch search = new MTDParallelSearch(new Object[] {cfg, arg1});
 		
 		IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, null});
 		
 		SharedData sharedData = search.getSharedData();
-		
 		
 		/*double c = 1.0643;
 		//System.out.println("=" + Math.pow(c, 100));
@@ -147,8 +138,11 @@ public class MTDSchedulerMain {
 		
 		//IBitBoard bitboard  = new Board("8/k7/3p/p2P1p/P2P1P/8/8/K7 w - - 0 1");
 		
-		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
-		IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
+		//IBitBoard bitboard  = new Board("rn1qkb1r/1p2pppp/p6/1NpnB3/Q1Pp2b1/3P1N2/PP2PPPP/R3KB1R b KQkq - 3 9", null, cfg.getBoardConfig());
+		//IBitBoard bitboard  = new Board("rn1qkb1r/1p2pppp/pn5/1Np1B3/Q1Pp2b1/3P1N2/PP2PPPP/R3KB1R w KQkq - 3 9", null, cfg.getBoardConfig());
+		
+		IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
+		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", sharedData.getPawnsCache(), cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board3_Adapter("1r2r1k1/5pp1/p2p4/2q1pNP1/b3P3/nP4Q1/PKP1R1B1/3R4 b - - 1 29", sharedData.getPawnsCache(), cfg.getBoardConfig());

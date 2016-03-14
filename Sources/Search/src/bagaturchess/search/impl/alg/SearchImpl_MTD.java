@@ -26,7 +26,6 @@ package bagaturchess.search.impl.alg;
 import java.util.ArrayList;
 import java.util.List;
 
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.ISearchConfig_MTD;
 import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearchInfo;
@@ -44,7 +43,7 @@ public abstract class SearchImpl_MTD extends SearchImpl {
 	
 	protected static final boolean SEND_PV = true;
 	
-	private List<Integer> betas = new ArrayList<Integer>();
+	protected List<Integer> betas = new ArrayList<Integer>();
 	
 	
 	public SearchImpl_MTD(SearchEnv _env) {

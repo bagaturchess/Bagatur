@@ -6,7 +6,6 @@ import bagaturchess.learning.impl.eval.cfg.IWeightsEvalConfig;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IEvaluatorFactory;
-import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 
 

@@ -56,8 +56,10 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		int[] moves = Utils.copy(_bitboardForSetup.getPlayedMoves());
 		
 		_bitboardForSetup.revert();
-		bitboardForSetup = new Board(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
+		
 		//bitboardForSetup = new Board3_Adapter(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
+		bitboardForSetup = new Board(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
+		
 		for (int i=0; i<movesCount; i++) {
 			_bitboardForSetup.makeMoveForward(moves[i]);
 			bitboardForSetup.makeMoveForward(moves[i]);

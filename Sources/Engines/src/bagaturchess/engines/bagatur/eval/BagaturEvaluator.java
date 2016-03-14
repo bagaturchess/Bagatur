@@ -137,8 +137,15 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 	}
 	
 	
+	@Override
 	public int getMaterialQueen() {
 		return 50 + baseEval.getMaterialQueen();
+	}
+	
+	
+	@Override
+	public int getMaterial(int pieceType) {
+		return baseEval.getMaterial(pieceType);
 	}
 	
 	

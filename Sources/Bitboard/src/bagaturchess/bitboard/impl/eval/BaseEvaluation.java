@@ -497,4 +497,54 @@ public class BaseEvaluation implements MoveListener, IBaseEval {
 	public int getMaterialQueen() {
 		return interpolator.interpolateByFactor(boardConfig.getMaterial_QUEEN_O(), boardConfig.getMaterial_QUEEN_E());
 	}
+
+	@Override
+	public int getMaterial(int pieceType) {
+		switch(pieceType) {
+			case Figures.TYPE_PAWN:
+				return interpolator.interpolateByFactor(boardConfig.getMaterial_PAWN_O(), boardConfig.getMaterial_PAWN_E());
+			case Figures.TYPE_KNIGHT:
+				return interpolator.interpolateByFactor(boardConfig.getMaterial_KNIGHT_O(), boardConfig.getMaterial_KNIGHT_E());
+			case Figures.TYPE_OFFICER:
+				return interpolator.interpolateByFactor(boardConfig.getMaterial_BISHOP_O(), boardConfig.getMaterial_BISHOP_E());
+			case Figures.TYPE_CASTLE:
+				return interpolator.interpolateByFactor(boardConfig.getMaterial_ROOK_O(), boardConfig.getMaterial_ROOK_E());
+			case Figures.TYPE_QUEEN:
+				return interpolator.interpolateByFactor(boardConfig.getMaterial_QUEEN_O(), boardConfig.getMaterial_QUEEN_E());
+			case Figures.TYPE_KING:
+				return interpolator.interpolateByFactor(boardConfig.getMaterial_KING_O(), boardConfig.getMaterial_KING_E());
+			default:
+				throw new IllegalArgumentException(
+						"Figure type " + pieceType + " is undefined!");
+		}
+	}
+	
+	
+	
+	public int getMaterialGain(int move) {
+		
+		if (!MoveInt.isCapture(move) && !MoveInt.isPromotion(move)) {
+			return 0;
+		}
+		
+		int val = 0;
+		
+		if (MoveInt.isCapture(move)) {
+			int capturedPID = MoveInt.getCapturedFigurePID(move);
+			int figureType = Figures.getFigureType(capturedPID);
+			
+			val += getMaterial(figureType);
+		}
+		
+		if (MoveInt.isPromotion(move)) {
+			int promID = MoveInt.getPromotionFigurePID(move);
+			int promType = Figures.getFigureType(promID);
+			
+			val += getMaterial(promType);
+			val -= getMaterial(Figures.TYPE_PAWN);
+		}
+		
+		return val;
+	}
+
 }

@@ -41,6 +41,9 @@ import bagaturchess.search.impl.pv.PVNode;
 public class NullwinSearchTask implements Runnable {
 	
 	
+	private boolean DEBUG = false;
+	
+	
 	private Executor tpool;
 	private SearchersPool searchers;
 	private SearchManager distribution;
@@ -131,7 +134,7 @@ public class NullwinSearchTask implements Runnable {
 			
 			RootSearchMTDImpl rootWin = new RootSearchMTDImpl(bitboard.getColourToMove(), distribution.getBetasGen());
 			
-			mediator.dump(Thread.currentThread().getName() + ":	start search with depth=" + maxdepth + ", beta=" + beta +" and distribution is " + distribution.toString());
+			if (DEBUG) mediator.dump(Thread.currentThread().getName() + ":	start search with depth=" + maxdepth + ", beta=" + beta +" and distribution is " + distribution.toString());
 			
 			distribution.writeUnlock();
 			unlock = false;
@@ -182,21 +185,21 @@ public class NullwinSearchTask implements Runnable {
 					}
 					info.setEval(eval);
 					
-					mediator.dump(Thread.currentThread().getName() + ":	stop search (increaseLowerBound) with eval " + eval);
+					if (DEBUG) mediator.dump(Thread.currentThread().getName() + ":	stop search (increaseLowerBound) with eval " + eval);
 					
 					distribution.increaseLowerBound(eval, info, bitboard);
 					
 				} else {
 					//eval is upper bound
 					//eval < beta <=> eval <= beta - 1 <=> eval <= alpha
-					mediator.dump(Thread.currentThread().getName() + ":	stop search (decreaseUpperBound) with eval " + eval);
+					if (DEBUG) mediator.dump(Thread.currentThread().getName() + ":	stop search (decreaseUpperBound) with eval " + eval);
 					
 					distribution.decreaseUpperBound(eval, bitboard);
 				}
 			} else if (maxdepth > distribution.getCurrentDepth()) {
 				throw new IllegalStateException("maxdepth=" + maxdepth + " distribution.getMaxdepth()=" + distribution.getCurrentDepth());
 			} else {
-				mediator.dump(Thread.currentThread().getName() + ":	stop search -> depth is less");
+				if (DEBUG) mediator.dump(Thread.currentThread().getName() + ":	stop search -> depth is less");
 				//System.out.println("PINKO");
 				//Do nothing
 			}

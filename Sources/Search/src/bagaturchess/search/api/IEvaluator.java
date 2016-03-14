@@ -65,4 +65,6 @@ public interface IEvaluator {
 	public double fullEval(int depth, int alpha, int beta, int rootColour);
 	
 	public int getMaterialQueen();
+	
+	public int getMaterial(int pieceType);
 }

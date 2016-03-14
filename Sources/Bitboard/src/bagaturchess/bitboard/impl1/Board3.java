@@ -64,7 +64,6 @@ import bagaturchess.bitboard.impl1.movegen.QueenMovesGen;
 import bagaturchess.bitboard.impl1.movegen.WhitePawnMovesGen;
 import bagaturchess.bitboard.impl1.plies.Castling;
 import bagaturchess.bitboard.impl1.plies.Enpassanting;
-import bagaturchess.bitboard.impl.plies.checking.Checking;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl.state.PiecesLists;
 import bagaturchess.bitboard.impl.zobrist.ConstantStructure;

@@ -82,8 +82,11 @@ public class SearchersPool {
 			int[] moves = Utils.copy(bitboardForSetup.getPlayedMoves());
 			
 			bitboardForSetup.revert();
-			IBitBoard searcher_bitboard = new Board(bitboardForSetup.toEPD(), boardConfig);
-			//IBitBoard searcher_bitboard = new Board3_Adapter(bitboardForSetup.toEPD(), boardConfig);
+			
+			IBitBoard searcher_bitboard = null;
+			//searcher_bitboard = new Board3_Adapter(bitboardForSetup.toEPD(), boardConfig);
+			searcher_bitboard = new Board(bitboardForSetup.toEPD(), boardConfig);
+			
 			for (int j=0; j<movesCount; j++) {
 				bitboardForSetup.makeMoveForward(moves[j]);
 				searcher_bitboard.makeMoveForward(moves[j]);

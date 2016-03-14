@@ -23,7 +23,6 @@
 package bagaturchess.search.impl.alg.impl3_old_reimpl_new;
 
 
-import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.internal.ISearchMoveListFactory;
 import bagaturchess.search.impl.alg.impl0.SearchMTD0;
 import bagaturchess.search.impl.env.SearchEnv;

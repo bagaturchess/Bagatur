@@ -40,14 +40,14 @@ public class BoardUtils {
 	
 	
 	public static IBitBoard createBoard_WithPawnsCache() {
-		return createBoard_WithPawnsCache("bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory", null);
+		return createBoard_WithPawnsCache("bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory", null, 1000);
 	}
 
 	public static IBitBoard createBoard_WithPawnsCache(IBoardConfig boardConfig) {
-		return createBoard_WithPawnsCache("bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory", boardConfig);
+		return createBoard_WithPawnsCache("bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory", boardConfig, 1000);
 	}
-
-	public static IBitBoard createBoard_WithPawnsCache(String cacheFactoryClassName, IBoardConfig boardConfig) {
+	
+	public static IBitBoard createBoard_WithPawnsCache(String cacheFactoryClassName, IBoardConfig boardConfig, int pawnsCacheSize) {
 		
 		DataObjectFactory<PawnsModelEval> pawnsCacheFactory = null;
 		try {
@@ -58,7 +58,7 @@ public class BoardUtils {
 		}
 		
 		//PawnsEvalCache pawnsCache = new PawnsEvalCache(pawnsCacheFactory, EngineConfigFactory.getDefaultEngineConfiguration().getPawnsCacheSize());
-		PawnsEvalCache pawnsCache = new PawnsEvalCache(pawnsCacheFactory, 10000, false, new BinarySemaphore_Dummy());
+		PawnsEvalCache pawnsCache = new PawnsEvalCache(pawnsCacheFactory, pawnsCacheSize, false, new BinarySemaphore_Dummy());
 		 
 		IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, pawnsCache, boardConfig);
 		if (boardConfig != null) {

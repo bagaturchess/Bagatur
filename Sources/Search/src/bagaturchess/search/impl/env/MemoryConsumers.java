@@ -18,7 +18,6 @@ import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.opening.api.OpeningBookFactory;
 import bagaturchess.search.api.IRootSearchConfig;
-import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.evalcache.EvalCache1;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.tpt.TPTable;
@@ -28,13 +27,23 @@ import bagaturchess.uci.impl.Channel;
 public class MemoryConsumers {
 	
 	
-	private static final int JVMDLL_MEMORY_CONSUMPTION = 20 * 1024 * 1024;
+	private static int JVMDLL_MEMORY_CONSUMPTION = 20 * 1024 * 1024;
 	//private static final int EGTBDLL_MEMORY_CONSUMPTION = 10 * 1024 * 1024;
-	
-	
 	private static int MIN_MEMORY_BUFFER;
 	private static double MEMORY_USAGE_PERCENT; 
 	
+	
+	public static void set_JVMDLL_MEMORY_CONSUMPTION(int val) {
+		JVMDLL_MEMORY_CONSUMPTION = val;	
+	}
+	
+	public static void set_MIN_MEMORY_BUFFER(int val) {
+		MIN_MEMORY_BUFFER = val;	
+	}
+	
+	public static void set_MEMORY_USAGE_PERCENT(double val) {
+		MEMORY_USAGE_PERCENT = val;	
+	}
 	
 	static {
 		if (getJVMBitmode() == 64) {
@@ -194,9 +203,8 @@ public class MemoryConsumers {
 		evalCache = new Vector<IEvalCache>();
 		pawnsCache = new Vector<PawnsEvalCache>();
 		for (int i=0; i<threadsCount; i++) {
-			evalCache.add(new EvalCache(size_ec, false, new BinarySemaphore_Dummy()));
-			//evalCache.add(new EvalCache1(5, size_ec, false, new BinarySemaphore_Dummy()));
-			//evalCache = new EvalCache1(5, size_ec, false);
+			//evalCache.add(new EvalCache(size_ec, false, new BinarySemaphore_Dummy()));
+			evalCache.add(new EvalCache1(5, size_ec, false, new BinarySemaphore_Dummy()));
 			if (size_pc != 0) {
 				DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(pawnsCacheName);
 				pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
@@ -264,8 +272,8 @@ public class MemoryConsumers {
 		
 		System.gc();
 		int memory_before = getUsedMemory();
-		IEvalCache test_ec = new EvalCache(test_size, true, null);
-		//IEvalCache test_ec = new EvalCache1(5, test_size, true, null);
+		//IEvalCache test_ec = new EvalCache(test_size, true, null);
+		IEvalCache test_ec = new EvalCache1(5, test_size, true, null);
 		int size = getEntrySize(availableMemory, engineConfiguration.getEvalCacheUsagePercent(), test_size, memory_before);
 		test_ec.clear();
 		return size;

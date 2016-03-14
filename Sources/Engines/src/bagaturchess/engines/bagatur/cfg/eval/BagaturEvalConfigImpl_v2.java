@@ -154,12 +154,12 @@ public class BagaturEvalConfigImpl_v2 implements IEvalConfig, IBagaturEvalConfig
 	
 	
 	public String getEvaluatorFactoryClassName() {
-		return "bagaturchess.engines.bagatur.eval.BagaturEvaluatorFactory";
+		return bagaturchess.engines.bagatur.eval.BagaturEvaluatorFactory.class.getName();
 	}
 	
 	
 	public String getPawnsCacheFactoryClassName() {
-		return "bagaturchess.engines.bagatur.eval.BagaturPawnsEvalFactory";
+		return bagaturchess.engines.bagatur.eval.BagaturPawnsEvalFactory.class.getName();
 	}
 
 

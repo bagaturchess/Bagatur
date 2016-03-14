@@ -18,7 +18,6 @@ import bagaturchess.bitboard.impl.plies.WhitePawnPlies;
 import bagaturchess.learning.impl.eval.cfg.IWeightsEvalConfig;
 import bagaturchess.learning.impl.filler.SignalFillerConstants;
 import bagaturchess.search.impl.eval.BaseEvaluator;
-import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 
 
@@ -86,7 +85,7 @@ public class WeightsEvaluator extends BaseEvaluator {
     @Override
     protected double phase5_opening() {
             double eval = 0;
-            eval += safeMobilityTraps();
+            //eval += safeMobilityTraps();
             return eval;
     }
     

@@ -160,6 +160,12 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		1500,1500,1500,1500,1500,1500,1500,1500,1500,
 		1500,1500,1500,1500,1500,1500,1500,1500,1500};
 	
+	
+	//public static final int[] STATIC_REDUCTION_MARGIN_PV = new int[]   {0,  50,  100, 200, 400, 800, 1600, 3200};
+	
+	//public static final int[] STATIC_REDUCTION_MARGIN_NONPV = new int[]   {0,  50,  100, 200, 400, 800, 1600, 3200};
+
+	
 	static {
 		/*int val = 0;
 		for (int i=0; i<STATIC_REDUCTION_MARGIN_PV.length; i++) {
@@ -227,7 +233,9 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	
 	protected int getDrawScores() {
-		throw new IllegalStateException("root colour");
+		//TODO:Check
+		//throw new IllegalStateException("root colour");
+		return 0;
 	}
 	
 	protected int getDrawScores(int rootColour) {
@@ -386,6 +394,12 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		
 		int lazy_eval = env.getEval().lazyEval(depth, alpha, beta, rootColour);
 		
+		/*if (Math.abs(lazy_eval) <= getEnv().getBitboard().getMaterialFactor().interpolateByFactor(50, 15)) {
+			if (lazy_eval > 0) {
+				lazy_eval = 0;//-result;
+			}
+		}*/
+		
 		return lazy_eval;
 		//return env.getEval().roughEval(depth, rootColour);//(depth, alpha, beta, rootColour);
 	}
@@ -394,6 +408,12 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	protected int fullEval(int depth, int alpha, int beta, int rootColour) {
 		
 		int full_eval = (int) env.getEval().fullEval(depth, alpha, beta, rootColour);
+		
+		/*if (Math.abs(full_eval) <= getEnv().getBitboard().getMaterialFactor().interpolateByFactor(50, 15)) {
+			if (full_eval > 0) {
+				full_eval = 0;//-result;
+			}
+		}*/
 		
 		return full_eval;
 		//return env.getEval().lazyEval(depth, alpha, beta, rootColour);

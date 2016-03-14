@@ -23,11 +23,11 @@ public class MaterialEvalConfigImpl implements IEvalConfig {
 	
 	
 	public String getEvaluatorFactoryClassName() {
-		return "bagaturchess.engines.material.MaterialEvaluatorFactory1";
+		return bagaturchess.engines.material.MaterialEvaluatorFactory1.class.getName();
 	}
 	
 	
 	public String getPawnsCacheFactoryClassName() {
-		return "bagaturchess.engines.bagatur.eval.BagaturPawnsEvalFactory";
+		return bagaturchess.engines.bagatur.eval.BagaturPawnsEvalFactory.class.getName();
 	}
 }

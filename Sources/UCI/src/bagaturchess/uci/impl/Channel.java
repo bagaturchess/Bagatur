@@ -77,6 +77,16 @@ public class Channel {
 		in = new BufferedReader(new InputStreamReader(System.in));
 	}
 	
+	public static void setPrintStream_SystemOut() {
+		if (dump != null) {
+			dumps.add("Switching logging to 'none'");
+			try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}
+			dump.close();
+		}
+		dump = System.out;
+		dumpInitialLines();
+	}
+	
 	
 	public void setPrintStream_MFiles() throws FileNotFoundException {
 		if (dump != null) {

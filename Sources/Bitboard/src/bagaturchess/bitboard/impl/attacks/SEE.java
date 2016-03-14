@@ -1433,6 +1433,7 @@ public class SEE implements ISEE {
 	}
 	
 	public final int getCost(int figType) {
+		//return bitboard.getBaseEvaluation().getMaterial(figType);
 		return (int) BaseEvalWeights.getFigureMaterialSEE(figType);
 	}
 }

@@ -111,14 +111,15 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	}
 	
 	
-	@Override
-	public IGameStatus getStatus() {
-		//return IGameStatus.NONE;
-		throw new UnsupportedOperationException();
+	public final long getFreeBitboard() {
+		long all = getFiguresBitboardByColour(Constants.COLOUR_WHITE) | getFiguresBitboardByColour(Constants.COLOUR_BLACK);
+		return ~all;
 	}
 	
 	
-	public final long getFreeBitboard() {
+	@Override
+	public IGameStatus getStatus() {
+		//return IGameStatus.NONE;
 		throw new UnsupportedOperationException();
 	}
 	

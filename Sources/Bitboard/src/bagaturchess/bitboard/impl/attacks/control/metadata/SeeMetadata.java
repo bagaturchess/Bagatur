@@ -32,9 +32,11 @@ import bagaturchess.bitboard.impl.eval.BaseEvalWeights;
 
 public class SeeMetadata {
 	
+	private static final int COSTS_MULTIPLIER = 100;
+	
 	//opFigureType, playerToMoveFieldState, opPlayerFieldState 
 	private static int STATES_COUNT = FieldAttacksStateMachine.getInstance().getAllStatesList().length;
-	public static final int[][][] FIELD_SEE = new int[Figures.TYPE_MAX][STATES_COUNT][STATES_COUNT];
+	public static final byte[][][] FIELD_SEE = new byte[Figures.TYPE_MAX][STATES_COUNT][STATES_COUNT];
 	
 	private static final boolean init_field_blocked = false;
 	public static int[][][] FIELD_BLOCKED;
@@ -88,7 +90,13 @@ public class SeeMetadata {
 			
 			for (int mystate=0; mystate<STATES_COUNT; mystate++) {
 				for (int toPlayState=0; toPlayState<STATES_COUNT; toPlayState++) {
-					FIELD_SEE[figType][mystate][toPlayState] = -seeField(figType, mystate, toPlayState);
+					
+					int see = -seeField(figType, mystate, toPlayState);
+					FIELD_SEE[figType][mystate][toPlayState] = (byte) (see / COSTS_MULTIPLIER);
+					
+					if (see < 0 && FIELD_SEE[figType][mystate][toPlayState] > 0) {
+						throw new IllegalStateException();
+					}
 				}
 			}
 			
@@ -118,7 +126,7 @@ public class SeeMetadata {
 		}
 		
 		//value = seeField(myFigType, mystate, opstate);
-		value = FIELD_SEE[myFigType][mystate][toPlayState];
+		value = COSTS_MULTIPLIER * FIELD_SEE[myFigType][mystate][toPlayState];
 		
 		return value;
 	}

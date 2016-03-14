@@ -65,7 +65,8 @@ public class EvalEntry1 implements IEvalEntry {
 		} else if (_level == level) {		
 			
 			if (eval != _eval) {
-				throw new IllegalStateException("eval=" + eval + ", _eval=" + _eval);
+				//throw new IllegalStateException("eval=" + eval + ", _eval=" + _eval);
+				eval = _eval;
 			}
 			
 		} else {

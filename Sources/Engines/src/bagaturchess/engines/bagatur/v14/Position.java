@@ -255,7 +255,7 @@ public class Position implements IPosition {
             this.whiteMove = whiteMove;
         }
     }
-    /** Return index in squares[] vector corresponding to (x,y). */
+    /** Return index in squares[] evals corresponding to (x,y). */
     public final static int getSquare(int x, int y) {
         return y * 8 + x;
     }

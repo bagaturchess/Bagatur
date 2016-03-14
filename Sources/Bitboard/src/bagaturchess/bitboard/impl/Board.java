@@ -1,5 +1,4 @@
-/*
- *  BagaturChess (UCI chess engine and tools)
+/**  BagaturChess (UCI chess engine and tools)
  *  Copyright (C) 2005 Krasimir I. Topchiyski (k_topchiyski@yahoo.com)
  *  
  *  Open Source project location: http://sourceforge.net/projects/bagaturchess/develop
@@ -4945,7 +4944,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 				myKingID, free);
 		
 		if (checksCount <= 0) {
-			throw new IllegalStateException();
+			throw new IllegalStateException("checksCount <= 0");
 		}
 		
 		count += genAllMoves_FiguresWithSameType(0L, false, true, colour, opponentColour,
@@ -5076,7 +5075,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		if (Properties.STATISTICS_MODE) {
 			statistics.hasMoveInCheck.start();
 		}
-
+		
 		boolean result = genKingEscapes(getColourToMove(), null, 1) > 0;
 		
 		if (Properties.STATISTICS_MODE) {
@@ -5964,6 +5963,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 
 	@Override
 	public int[] getMatrix() {
+		//return board;
 		throw new UnsupportedOperationException();
 	}
 }

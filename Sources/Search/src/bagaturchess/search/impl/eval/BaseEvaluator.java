@@ -11,8 +11,6 @@ import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.internal.EvaluatorAdapter;
 import bagaturchess.search.api.internal.ISearch;
-import bagaturchess.search.impl.evalcache.EvalCache;
-import bagaturchess.search.impl.evalcache.EvalEntry;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
 
@@ -20,7 +18,7 @@ import bagaturchess.search.impl.evalcache.IEvalEntry;
 public abstract class BaseEvaluator extends EvaluatorAdapter {
 	
 	
-	protected static final int ENDGAME_FACTOR = 30; 
+	private static final int ENDGAME_FACTOR = 30; 
 	
 	
 	private static final boolean USE_CACHE = true;
@@ -108,8 +106,15 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 	}
 	
 	
+	@Override
 	public int getMaterialQueen() {
 		return 50 + baseEval.getMaterialQueen();
+	}
+	
+	
+	@Override
+	public int getMaterial(int pieceType) {
+		return baseEval.getMaterial(pieceType);
 	}
 	
 	
@@ -255,10 +260,15 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 		int eval_test = (int) returnVal(eval);
 		if (eval_test + INT1 <= alpha || eval_test - INT1 >= beta) {
 			if (USE_LAZY) {
-				if (USE_CACHE && evalCache != null) evalCache.put(hashkey, CACHE_LEVEL_1, (int) eval,
+				if (USE_CACHE && evalCache != null) {
+					evalCache.lock();
+					evalCache.put(hashkey, CACHE_LEVEL_1, (int) eval,
+				
 														(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
 														(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
 													);
+					evalCache.unlock();
+				}
 				return eval_test;
 			}
 		}
@@ -271,10 +281,14 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			eval_test = (int) returnVal(eval);
 			if (eval_test + INT2 <= alpha || eval_test - INT2 >= beta) {
 				if (USE_LAZY) {
-					if (USE_CACHE && evalCache != null) evalCache.put(hashkey, CACHE_LEVEL_2, (int) eval,
+					if (USE_CACHE && evalCache != null) {
+						evalCache.lock();
+						evalCache.put(hashkey, CACHE_LEVEL_2, (int) eval,
 									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
 									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
-					);
+								);
+						evalCache.unlock();
+					}
 					return eval_test;
 				}
 			}
@@ -284,10 +298,14 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			eval_test = (int) returnVal(eval);
 			if (eval_test + INT3 <= alpha || eval_test - INT3 >= beta) {
 				if (USE_LAZY) {
-					if (USE_CACHE && evalCache != null) evalCache.put(hashkey, CACHE_LEVEL_3, (int) eval,
+					if (USE_CACHE && evalCache != null) {
+						evalCache.lock();
+						evalCache.put(hashkey, CACHE_LEVEL_3, (int) eval,
 									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
 									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
-						);
+							);
+						evalCache.unlock();
+					}
 					return eval_test;
 				}
 			}
@@ -297,10 +315,14 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			eval_test = (int) returnVal(eval);
 			if (eval_test + INT4 <= alpha || eval_test - INT4 >= beta) {
 				if (USE_LAZY) {
-					if (USE_CACHE && evalCache != null) evalCache.put(hashkey, CACHE_LEVEL_4, (int) eval,
+					if (USE_CACHE && evalCache != null) {
+						evalCache.lock();
+						evalCache.put(hashkey, CACHE_LEVEL_4, (int) eval,
 									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
 									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
-						);
+							);
+						evalCache.unlock();
+					}
 					return eval_test;
 				}
 			}
@@ -333,10 +355,14 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			eval_test = (int) returnVal(eval);
 			if (eval_test + INT2 <= alpha || eval_test - INT2 >= beta) {
 				if (USE_LAZY) {
-					if (USE_CACHE && evalCache != null) evalCache.put(hashkey, CACHE_LEVEL_1, (int) eval,
+					if (USE_CACHE && evalCache != null) {
+						/*evalCache.lock();
+						evalCache.put(hashkey, CACHE_LEVEL_1, (int) eval,
 									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
 									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
-						);
+							);
+						evalCache.unlock();*/
+					}
 					return eval_test;
 				}
 			}

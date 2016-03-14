@@ -260,7 +260,7 @@ public class RootSearchConfig_BaseImpl implements IRootSearchConfig, IUCIOptions
 
 	@Override
 	public String getSemaphoreFactoryClassName() {
-		return "bagaturchess.bitboard.impl.utils.BinarySemaphoreFactory_Dummy";
+		return bagaturchess.bitboard.impl.utils.BinarySemaphoreFactory_Dummy.class.getName();
 	}
 
 
