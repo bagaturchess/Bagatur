@@ -1,7 +1,7 @@
 <project name="BagaturEngine" basedir="." default="build_distro">
 	
 	
-  <property name="distro_sufix" value=".1.4" />
+  <property name="distro_sufix" value=".1.4_alpha" />
   
   
   <property name="workspace_root" value="../../"/>
@@ -27,7 +27,7 @@
   <property name="engines_dir" value="${workspace_root}/Engines/${svn_path_shift}/Engines" />
   <property name="enginesrunner_dir" value="${workspace_root}/EnginesRunner/${svn_path_shift}/EnginesRunner" /-->
   
-	
+
   <property name="temp_dir" value="${work_dir}/temp" />
   
 	
