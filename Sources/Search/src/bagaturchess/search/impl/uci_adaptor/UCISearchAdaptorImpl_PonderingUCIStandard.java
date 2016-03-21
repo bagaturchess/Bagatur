@@ -28,7 +28,7 @@ import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.search.impl.utils.SearchMediatorProxy;
 import bagaturchess.uci.api.BestMoveSender;
-import bagaturchess.uci.impl.Channel;
+import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.impl.commands.Go;
 
 
@@ -41,7 +41,7 @@ public class UCISearchAdaptorImpl_PonderingUCIStandard extends UCISearchAdaptorI
 	
 	
 	@Override
-	public synchronized void goSearch(Channel channel, BestMoveSender sender, Go go) {
+	public synchronized void goSearch(IChannel channel, BestMoveSender sender, Go go) {
 		
 		if (currentMediator != null) throw new IllegalStateException("mediator is not null");
 		int colourToMove = boardForSetup.getColourToMove();

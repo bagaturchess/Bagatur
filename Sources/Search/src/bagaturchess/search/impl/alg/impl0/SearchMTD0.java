@@ -588,6 +588,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			}
 		}
 		
+		
 		if (depth >= normDepth(maxdepth)) {
 			
 			if (inCheck) {
@@ -601,7 +602,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, staticEval, true, rootColour);	
 			//}
 			
-			//if (node.eval > alpha_org && normDepth(initial_maxdepth) < normDepth(maxdepth) - depth && env.getTactics().silentButDeadly()) {
+			//if (node.eval > alpha_org && env.getTactics().silentButDeadly()) {
 			//	maxdepth = PLY * (depth + 1);
 			//} else {
 				return node.eval;
@@ -884,11 +885,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			mateMove = 0;
 		}*/
 		
-		int cur_move = (tpt_move != 0
-				&& !MoveInt.isCastling(tpt_move)
-				&& !MoveInt.isEnpassant(tpt_move)/*
-				&& env.getBitboard().isPossible(tpt_move)*/) ? tpt_move : list.next();
-		
+		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		if (cur_move != 0) {
 			do {
 				
@@ -1191,7 +1188,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			if (inCheck) {
 				if (legalMoves == 0) {
 					node.bestmove = 0;
-					node.eval = -getMateVal_0(depth);
+					node.eval = -getMateVal(depth);
 					node.leaf = true;
 					node.nullmove = false;
 					return node.eval;
@@ -1361,7 +1358,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			}
 		}
 		
-		
 		if (depth >= normDepth(maxdepth)) {
 			
 			if (inCheck) {
@@ -1372,13 +1368,11 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			//if (staticEval >= beta || staticEval + env.getEval().getMaterialQueen() + 100 < beta - 1) {
 				//return staticEval;
 			//} else {
-				int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta - 1, beta, 0, staticEval, true, rootColour);
+				int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, staticEval, true, rootColour);
 			//}
 			
-			//normDepth(initial_maxdepth) < normDepth(maxdepth) - depth
 			//if (eval > alpha_org && env.getTactics().silentButDeadly()) {
-				//System.out.println("initial_maxdepth=" + initial_maxdepth + ", maxdepth=" + maxdepth);
-				//maxdepth = PLY * (depth + 1);
+			//	maxdepth = PLY * (depth + 1);
 			//} else {
 				return eval;
 			//}
@@ -1643,11 +1637,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		int best_eval = MIN;
 		int best_move = 0;
 		
-		int cur_move = (tpt_move != 0
-				&& !MoveInt.isCastling(tpt_move)
-				&& !MoveInt.isEnpassant(tpt_move)/*
-				&& env.getBitboard().isPossible(tpt_move)*/) ? tpt_move : list.next();
-		
+		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		if (cur_move != 0) {
 			do {
 				
@@ -1866,7 +1856,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		if (best_move == 0) {
 			if (inCheck) {
 				if (legalMoves == 0) {
-					return -getMateVal_0(depth);
+					return -getMateVal(depth);
 				} else {
 					throw new IllegalStateException("hashkey=" + hashkey);
 					//return best_eval;
@@ -1897,7 +1887,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 
 	}
 	
-	public int pv_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int alpha_org, int beta, int matgain, int initialStaticEval, boolean firstTime, int rootColour) {
+	private int pv_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int alpha_org, int beta, int matgain, int initialStaticEval, boolean firstTime, int rootColour) {
 		
 		if (!firstTime) info.setSearchedNodes(info.getSearchedNodes() + 1);	
 		
@@ -2064,22 +2054,16 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		int alpha = alpha_org;
 		
-		
 		if (inCheck) {
 			cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		} else {
-			cur_move = (tpt_move != 0 /*&& MoveInt.isCaptureOrPromotion(tpt_move)*/ && !MoveInt.isEnpassant(tpt_move) && !MoveInt.isCastling(tpt_move)/*&& env.getBitboard().isPossible(tpt_move)*/) ? tpt_move : list.next();
+			cur_move = (tpt_move != 0 && MoveInt.isCaptureOrPromotion(tpt_move)) ? tpt_move : list.next();
+			//cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		}
-		
-		/*if (tpt_move == 0) {
-			cur_move = list.next();
-		} else {
-			if (!MoveInt.isEnpassant(tpt_move) && !MoveInt.isCastling(tpt_move) && env.getBitboard().isPossible(tpt_move)) {
-				cur_move = tpt_move;
-			} else {
-				cur_move = list.next();
-			}
-		}*/
+
+		if (env.getBitboard().getHashKey() == 9168619578754754311L) {
+			int g = 0;
+		}
 		
 		int searchedMoves = 0;
 		if (cur_move != 0) 
@@ -2191,7 +2175,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		return best_eval;
 	}
 	
-	protected int nullwin_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int alpha_org, int beta, int matgain, int initialStaticEval, boolean firstTime, int rootColour) {
+	private int nullwin_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int beta, int matgain, int initialStaticEval, boolean firstTime, int rootColour) {
 		
 		if (!firstTime) info.setSearchedNodes(info.getSearchedNodes() + 1);	
 		
@@ -2206,14 +2190,14 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		
-		int staticEval = firstTime ? initialStaticEval : lazyEval(depth, alpha_org, beta, rootColour);
+		int staticEval = firstTime ? initialStaticEval : lazyEval(depth, beta - 1, beta, rootColour);
 		if (depth >= MAX_DEPTH) {
 			return staticEval;
 		}
 		
 		int colourToMove = env.getBitboard().getColourToMove();
 		
-		if (!firstTime) if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
+		if (!firstTime) if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, beta - 1, beta);
 		
 		if (isDraw()) {
 			return getDrawScores(rootColour);
@@ -2221,7 +2205,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
-		//int alpha_org = alpha_org;
+		int alpha_org = beta - 1;
 	    // Mate distance pruning
 		if (USE_MATE_DISTANCE && !inCheck && depth >= 1) {
 			
@@ -2254,12 +2238,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				return staticEval;
 			}
 			
-			if (!isMateVal(alpha_org)
-					&& staticEval + env.getEval().getMaterialQueen() + 100 < alpha_org) {
+			if (!isMateVal(beta - 1)
+					&& staticEval + env.getEval().getMaterialQueen() + 100 < beta - 1) {
 				return staticEval;
 			}
 			
-			if (staticEval > alpha_org) {
+			if (staticEval > beta - 1) {
 				throw new IllegalStateException();
 			}
 		}
@@ -2297,7 +2281,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						return tpt_lower;
 					}
 				}
-				if (tpt_upper <= alpha_org) {
+				if (tpt_upper <= beta - 1) {
 					if (!SearchUtils.isMateVal(tpt_upper)) {
 						return tpt_upper;
 					}
@@ -2321,23 +2305,13 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		int best_move = 0;
 		int cur_move = 0;
 		
-		int alpha = alpha_org;
+		int alpha = beta - 1;
 		
 		if (inCheck) {
 			cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		} else {
-			cur_move = (tpt_move != 0 /*&& MoveInt.isCaptureOrPromotion(tpt_move)*/ && !MoveInt.isEnpassant(tpt_move) && !MoveInt.isCastling(tpt_move)/*&& env.getBitboard().isPossible(tpt_move)*/) ? tpt_move : list.next();
+			cur_move = (tpt_move != 0 && MoveInt.isCaptureOrPromotion(tpt_move)) ? tpt_move : list.next();
 		}
-		
-		/*if (tpt_move == 0) {
-			cur_move = list.next();
-		} else {
-			if (!MoveInt.isEnpassant(tpt_move) && !MoveInt.isCastling(tpt_move) && env.getBitboard().isPossible(tpt_move)) {
-				cur_move = tpt_move;
-			} else {
-				cur_move = list.next();
-			}
-		}*/
 		
 		int searchedMoves = 0;
 		if (cur_move != 0) 
@@ -2376,7 +2350,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				}
 				legalMoves++;
 				
-				int cur_eval = -nullwin_qsearch(mediator, info, initial_maxdepth, depth + 1, -beta, -alpha, -new_matgain, 0, false, rootColour);
+				int cur_eval = -nullwin_qsearch(mediator, info, initial_maxdepth, depth + 1, -alpha, -new_matgain, 0, false, rootColour);
 				
 				env.getBitboard().makeMoveBackward(cur_move);
 				
@@ -2417,7 +2391,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		if (allowTPTAccess(initial_maxdepth, depth)) {
 			if (STORE_TPT_IN_QSEARCH && best_move != 0) {
 				env.getTPT().lock();
-				env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
+				env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, beta - 1, beta, best_move, (byte)0);
 				env.getTPT().unlock();
 			}
 		}

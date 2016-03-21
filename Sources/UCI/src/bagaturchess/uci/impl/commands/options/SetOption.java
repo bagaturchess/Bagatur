@@ -1,7 +1,8 @@
 package bagaturchess.uci.impl.commands.options;
 
 
-import bagaturchess.uci.impl.Channel;
+import bagaturchess.uci.api.IChannel;
+import bagaturchess.uci.impl.Channel_Console;
 import bagaturchess.uci.impl.Protocol;
 
 
@@ -26,9 +27,12 @@ public class SetOption extends Protocol {
 	private String commandLine;
 	private String name;
 	private Object value;
+
+	private IChannel channel;
 	
 	
-	public SetOption(String _commandLine) {
+	public SetOption(IChannel _channel, String _commandLine) {
+		channel = _channel;
 		commandLine = _commandLine.trim();
 		parse();
 	}
@@ -41,9 +45,9 @@ public class SetOption extends Protocol {
 		String line = commandLine;
 		int valueTextStartIndex = line.indexOf(COMMAND_TO_ENGINE_SETOPTION_VALUE_STR);
 		if (valueTextStartIndex != -1) {
-			int valueStartIndex = line.indexOf(Channel.WHITE_SPACE, valueTextStartIndex + 1);
+			int valueStartIndex = line.indexOf(IChannel.WHITE_SPACE, valueTextStartIndex + 1);
 			if (valueStartIndex == -1) {
-				Channel.dump("Incorrect 'setoption' command (there is no space after 'value' string): " + commandLine);
+				channel.dump("Incorrect 'setoption' command (there is no space after 'value' string): " + commandLine);
 			} else {
 				//int valueEndIndex = line.indexOf(Channel.WHITE_SPACE, valueStartIndex + 1);
 				//if (valueEndIndex == -1) {
@@ -65,16 +69,16 @@ public class SetOption extends Protocol {
 		line = commandLine.substring(0, valueTextStartIndex > 0 ? valueTextStartIndex : commandLine.length());
 		int nameTextStartIndex = line.indexOf(COMMAND_TO_ENGINE_SETOPTION_NAME_STR);
 		if (nameTextStartIndex != -1) {
-			int nameStartIndex = line.indexOf(Channel.WHITE_SPACE, nameTextStartIndex + 1);
+			int nameStartIndex = line.indexOf(IChannel.WHITE_SPACE, nameTextStartIndex + 1);
 			if (nameStartIndex == -1) {
-				Channel.dump("Incorrect 'setoption' command (there is no space after 'name' string): " + commandLine);
+				channel.dump("Incorrect 'setoption' command (there is no space after 'name' string): " + commandLine);
 			} else {
 				int nameEndIndex = line.length();
 				String nameStr = line.substring(nameStartIndex + 1, nameEndIndex).toLowerCase().trim();
 				name = nameStr;
 			}
 		} else {
-			Channel.dump("Incorrect 'setoption' command (there is no 'name' string): " + commandLine);
+			channel.dump("Incorrect 'setoption' command (there is no 'name' string): " + commandLine);
 		}
 	}
 	
@@ -98,7 +102,7 @@ public class SetOption extends Protocol {
 	
 	
 	public static void main(String[] args) {
-		SetOption setoption = new SetOption("setoption name Evaluation [Piece-Square Endgame] value 10 min 0 max 20");
+		SetOption setoption = new SetOption(new Channel_Console(), "setoption name Evaluation [Piece-Square Endgame] value 10 min 0 max 20");
 		System.out.println(setoption);
 	}
 }

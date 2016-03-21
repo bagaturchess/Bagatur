@@ -35,7 +35,7 @@ import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.utils.DEBUGSearch;
-import bagaturchess.uci.impl.Channel;
+import bagaturchess.uci.api.ChannelManager;
 
 
 public class MTDParallelSearch extends RootSearch_BaseImpl {
@@ -49,7 +49,8 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		super(args);
 		
 		executor = Executors.newFixedThreadPool(getRootSearchConfig().getThreadsCount());
-		Channel.dump("Thread pool created with " + getRootSearchConfig().getThreadsCount() + " threads.");
+		
+		ChannelManager.getChannel().dump("Thread pool created with " + getRootSearchConfig().getThreadsCount() + " threads.");
 		
 		searchers = new SearchersPool(getRootSearchConfig().getBoardConfig());
 	}

@@ -26,8 +26,6 @@ package bagaturchess.search.impl.alg;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.egtb.gaviota.GTBProbeOutput;
 import bagaturchess.search.api.IEngineConfig;
 import bagaturchess.search.api.IEvaluator;
@@ -39,9 +37,6 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.api.internal.ISearchMoveListFactory;
 //import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.impl.alg.iter.ListAll;
-import bagaturchess.search.impl.alg.iter.ListCapsProm;
-import bagaturchess.search.impl.alg.iter.ListKingEscapes;
 import bagaturchess.search.impl.alg.iter.SearchMoveListFactory;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
@@ -52,7 +47,7 @@ import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.search.impl.utils.SearchUtils;
-import bagaturchess.uci.impl.Channel;
+import bagaturchess.uci.api.ChannelManager;
 
 
 
@@ -133,9 +128,18 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	public boolean USE_PV_HISTORY = true;
 	
+	/*
+	public static final int[] STATIC_REDUCTION_MARGIN_PV = new int[]   {
+		0,  100,  300, 500, 700, 700, 700, 700, 700,
+	};
+	
+	public static final int[] STATIC_REDUCTION_MARGIN_NONPV = new int[]   {
+		0,  100,  300, 500, 700, 700, 700, 700, 700,
+	};
+	*/
+	
 	
 	public static final int[] STATIC_REDUCTION_MARGIN_PV = new int[]   {0,  100,  300, 500, 700, 700, 900, 900,
-		//{0,  50, 100, 100, 300, 300, 500, 500,
 		900, 1000, 1000, 1000, 1500,1500,1500,1500,
 		1500,1500,1500,1500,1500,1500,1500,1500,1500,
 		1500,1500,1500,1500,1500,1500,1500,1500,1500,
@@ -148,7 +152,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		1500,1500,1500,1500,1500,1500,1500,1500,1500};
 	
 	public static final int[] STATIC_REDUCTION_MARGIN_NONPV = new int[]   {0,  100,  300, 500, 700, 700, 900, 900,
-		//{0,  50, 100, 100, 300, 300, 500, 500,
 		900, 1000, 1000, 1000, 1500,1500,1500,1500,
 		1500,1500,1500,1500,1500,1500,1500,1500,1500,
 		1500,1500,1500,1500,1500,1500,1500,1500,1500,
@@ -255,7 +258,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	protected static SharedData getOrCreateSearchEnv(Object[] args) {
 		if (args[2] == null) {
-			return new SharedData((IEngineConfig)args[1]);
+			return new SharedData(ChannelManager.getChannel(), (IEngineConfig)args[1]);
 		} else {
 			return (SharedData) args[2];
 		}
@@ -374,7 +377,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	}
 	
 	public void newGame() {
-		Channel.dump("ISearch with env: " + this.getEnv());
+		//Channel.dump("ISearch with env: " + this.getEnv());
 		env.clear();
 	}
 	

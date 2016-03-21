@@ -33,6 +33,7 @@ import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.pv.PVHistory;
 import bagaturchess.search.impl.tpt.TPTable;
+import bagaturchess.uci.api.IChannel;
 
 
 public class SharedData {
@@ -46,8 +47,8 @@ public class SharedData {
 	private GTBProbing gtb_probing;
 	
 	
-	public SharedData(IRootSearchConfig _engineConfiguration) {
-		this(_engineConfiguration, new MemoryConsumers(_engineConfiguration, false));
+	public SharedData(IChannel _channel, IRootSearchConfig _engineConfiguration) {
+		this(_engineConfiguration, new MemoryConsumers(_channel, _engineConfiguration, false));
 	}
 	
 	

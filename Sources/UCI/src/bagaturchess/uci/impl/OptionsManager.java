@@ -3,6 +3,7 @@ package bagaturchess.uci.impl;
 
 import java.util.List;
 
+import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.api.IUCIOptionAction;
 import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.impl.commands.options.UCIOption;
@@ -15,12 +16,14 @@ public class OptionsManager {
 	
 	private UCIOptions options;
 	private IUCIOptionsProvider rootProvider;
+	private IChannel communicationChanel;
 	
 	private List<IUCIOptionAction> actions;
 	
 	
-	public OptionsManager(IUCIOptionsProvider _rootProvider, List<IUCIOptionAction> _actions) {
+	public OptionsManager(IChannel _communicationChanel, IUCIOptionsProvider _rootProvider, List<IUCIOptionAction> _actions) {
 		
+		communicationChanel = _communicationChanel;
 		rootProvider = _rootProvider;
 		actions = _actions;
 		
@@ -41,7 +44,7 @@ public class OptionsManager {
 	public void set(SetOption setoption) {
 		UCIOption option = getOptions().getOption(setoption.getName());
 		if (option == null) {
-			Channel.dump("UCIOption '" + setoption.getName() + "' not supported.");
+			communicationChanel.dump("UCIOption '" + setoption.getName() + "' not supported.");
 		} else {
 			
 			Object new_value = setoption.getValue();
@@ -55,8 +58,8 @@ public class OptionsManager {
 				customActions(option);
 				
 			} catch (Exception ex) {
-				Channel.dump("UCIOption NOT set: " + option + ", because: ");
-				Channel.dump(ex);
+				communicationChanel.dump("UCIOption NOT set: " + option + ", because: ");
+				communicationChanel.dump(ex);
 			}
 		}
 	}
@@ -74,9 +77,9 @@ public class OptionsManager {
 	private void setOptionAndLogResult(UCIOption option) {
 		boolean ok = rootProvider.applyOption(option);
 		if (ok) {
-			Channel.dump("UCIOption set successfully: " + option);
+			communicationChanel.dump("UCIOption set successfully: " + option);
 		} else {
-			Channel.dump("UCIOption not found: " + option);
+			communicationChanel.dump("UCIOption not found: " + option);
 		}
 	}
 	

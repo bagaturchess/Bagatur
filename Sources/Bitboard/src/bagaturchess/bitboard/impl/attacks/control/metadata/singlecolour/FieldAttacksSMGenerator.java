@@ -66,7 +66,7 @@ class FieldAttacksSMGenerator {
 		FieldAttacks[] allStatesList = result.allStatesList;
 		int[][][] machine = result.machine = new int[IFieldsAttacks.OP_MAX][Figures.TYPE_MAX][allStatesList.length];
 		
-		System.out.println("Field states count: " + allStatesList.length);
+		//System.out.println("Field states count: " + allStatesList.length);
 		
 		for (int i = allStatesList.length - 1; i >= 0; i--) {
 			

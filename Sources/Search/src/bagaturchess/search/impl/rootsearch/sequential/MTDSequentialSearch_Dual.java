@@ -37,6 +37,7 @@ import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.utils.DEBUGSearch;
+import bagaturchess.uci.api.ChannelManager;
 
 
 public class MTDSequentialSearch_Dual extends RootSearch_BaseImpl {
@@ -82,7 +83,7 @@ public class MTDSequentialSearch_Dual extends RootSearch_BaseImpl {
 					}
 		);
 		
-		SharedData material_sharedData = new SharedData(material_rootSearchConfig);
+		SharedData material_sharedData = new SharedData(ChannelManager.getChannel(), material_rootSearchConfig);
 		
 		searcher_material = (ISearch) ReflectionUtils.createObjectByClassName_ObjectsConstructor(
 				material_rootSearchConfig.getSearchClassName(),

@@ -28,11 +28,13 @@ import java.util.List;
 
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
+import bagaturchess.uci.api.ChannelManager;
+import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.api.IUCIConfig;
 import bagaturchess.uci.api.IUCIOptionAction;
 import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.api.IUCIOptionsRegistry;
-import bagaturchess.uci.impl.Channel;
+import bagaturchess.uci.impl.Channel_Console;
 import bagaturchess.uci.impl.OptionsManager;
 import bagaturchess.uci.impl.StateManager;
 import bagaturchess.uci.impl.UCIOptionAction_RecreateLogging;
@@ -45,7 +47,13 @@ public class Boot {
 	
 	public static void main(String[] args) {
 		
-		Channel communicationChanel = new Channel(); //Single file logging by default?
+		IChannel communicationChanel = new Channel_Console(); //Single file logging by default?
+		ChannelManager.setChannel(communicationChanel);
+		
+		runStateManager(args, communicationChanel);
+	}
+
+	public static void runStateManager(String[] args, IChannel communicationChanel) {
 		
 		try {
 			
@@ -73,9 +81,9 @@ public class Boot {
 			
 			List<IUCIOptionAction> customActions = new ArrayList<IUCIOptionAction>();
 			customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager));
-			customActions.add(new UCIOptionAction_RecreateLogging(manager));
+			customActions.add(new UCIOptionAction_RecreateLogging(ChannelManager.getChannel(), engineBootCfg));
 			
-			OptionsManager optionsManager = new OptionsManager((IUCIOptionsProvider) optionsRegistry, customActions);
+			OptionsManager optionsManager = new OptionsManager(communicationChanel, (IUCIOptionsProvider) optionsRegistry, customActions);
 			manager.setOptionsManager(optionsManager);
 			
 			for (IUCIOptionAction action: customActions) {

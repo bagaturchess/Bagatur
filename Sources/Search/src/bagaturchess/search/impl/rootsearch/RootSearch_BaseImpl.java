@@ -26,14 +26,12 @@ package bagaturchess.search.impl.rootsearch;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Board;
-import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl1.Board3;
-import bagaturchess.bitboard.impl1.Board3_Adapter;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
+import bagaturchess.uci.api.ChannelManager;
 
 
 public abstract class RootSearch_BaseImpl implements IRootSearch {
@@ -46,7 +44,7 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	
 	public RootSearch_BaseImpl(Object[] args) {
 		rootSearchConfig = (IRootSearchConfig) args[0];
-		sharedData = (SharedData) (args[1] == null ? new SharedData(rootSearchConfig) : args[1]);
+		sharedData = (SharedData) (args[1] == null ? new SharedData(ChannelManager.getChannel(), rootSearchConfig) : args[1]);
 	}
 
 	

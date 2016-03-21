@@ -116,7 +116,8 @@ public class SearchKineticEval implements IKineticEval {
 			*/
 			eval = search.pv_search(mediator, rootWin, info, rest * ISearch.PLY, rest * ISearch.PLY, 0, ISearch.MIN, ISearch.MAX, 0, 0, null, false, 0, search.getEnv().getBitboard().getColourToMove(), 0, 0, false, 0, true);
 		} else if (rest == 0) {
-			eval = search.pv_qsearch(mediator, info, 0, depth, ISearch.MIN, ISearch.MAX, 0, 0, false, -19);
+			throw new UnsupportedOperationException("search.pv_qsearch alpha-beta");
+			//eval = search.pv_qsearch(mediator, info, 0, depth, ISearch.MIN, ISearch.MAX, 0, 0, false, -19);
 		} else {
 			eval = (int) search.getEnv().getEval().fullEval(maxdepth, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, -19);
 		}

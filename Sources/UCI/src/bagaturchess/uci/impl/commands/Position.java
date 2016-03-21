@@ -27,7 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import bagaturchess.uci.impl.Channel;
+import bagaturchess.uci.api.IChannel;
+import bagaturchess.uci.impl.Channel_Console;
 import bagaturchess.uci.impl.Protocol;
 
 /**
@@ -44,21 +45,25 @@ public class Position extends Protocol {
 	private String fen;
 	private List<String> moves;
 	
-	public Position(String _commandLine) {
+	private IChannel channel;
+	
+	
+	public Position(IChannel _channel, String _commandLine) {
+		channel = _channel;
 		commandLine =_commandLine;
 		moves = new ArrayList<String>();
 		parse();
 	}
 
 	private void parse() {
-		StringTokenizer st = new StringTokenizer(commandLine, Channel.WHITE_SPACE);
+		StringTokenizer st = new StringTokenizer(commandLine, IChannel.WHITE_SPACE);
 		
 		if (!st.hasMoreTokens()) {
-			Channel.dump("Incorrect 'position' command: " + commandLine);
+			channel.dump("Incorrect 'position' command: " + commandLine);
 		} else {
 			String position = st.nextToken();
 			if (!position.equals(Protocol.COMMAND_TO_ENGINE_POSITION_STR)) {
-				Channel.dump("Incorrect 'position' command: " + commandLine);
+				channel.dump("Incorrect 'position' command: " + commandLine);
 			}
 		}
 		
@@ -71,7 +76,7 @@ public class Position extends Protocol {
 			}
 			
 			String movesStr = commandLine.substring(movesStartIndex + COMMAND_TO_ENGINE_POSITION_MOVES.length()).trim();
-			StringTokenizer stMoves = new StringTokenizer(movesStr, Channel.WHITE_SPACE);
+			StringTokenizer stMoves = new StringTokenizer(movesStr, IChannel.WHITE_SPACE);
 			while(stMoves.hasMoreTokens()) {
 				String move = stMoves.nextToken();
 				moves.add(move);
@@ -80,7 +85,7 @@ public class Position extends Protocol {
 			int fenStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_POSITION_FEN) + COMMAND_TO_ENGINE_POSITION_FEN.length();
 			fen = commandLine.substring(fenStartIndex, commandLine.length()).trim();
 		} else {
-			Channel.dump("Parsing 'position' command (there is no startpos or fen): " + commandLine);
+			channel.dump("Parsing 'position' command (there is no startpos or fen): " + commandLine);
 		}
 		
 		System.out.println(this);
@@ -96,8 +101,8 @@ public class Position extends Protocol {
 	
 	public static void main(String[] args) {
 		try {
-			new Position("position startpos moves e2e4 e7e5");
-			new Position("position fen rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -");
+			new Position(new Channel_Console(), "position startpos moves e2e4 e7e5");
+			new Position(new Channel_Console(), "position fen rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

@@ -3,22 +3,26 @@ package bagaturchess.uci.impl;
 
 import java.io.FileNotFoundException;
 
+import bagaturchess.uci.api.IChannel;
+import bagaturchess.uci.api.IUCIConfig;
 import bagaturchess.uci.api.IUCIOptionAction;
 
 
 public class UCIOptionAction_RecreateLogging implements IUCIOptionAction {
 	
 	
-	private StateManager stateManager;
+	private IUCIConfig engineBootCfg;
+	private IChannel channel;
 	
 	
-	public UCIOptionAction_RecreateLogging(StateManager _stateManager) {
-		stateManager = _stateManager;
+	public UCIOptionAction_RecreateLogging(IChannel _channel, IUCIConfig _engineBootCfg) {
+		channel = _channel;
+		engineBootCfg = _engineBootCfg;
 	}
 	
 	@Override
 	public void execute() throws FileNotFoundException {
-		stateManager.initLogging();
+		channel.initLogging(engineBootCfg);
 	}
 	
 	

@@ -25,7 +25,8 @@ package bagaturchess.uci.impl.commands;
 
 import java.util.StringTokenizer;
 
-import bagaturchess.uci.impl.Channel;
+import bagaturchess.uci.api.IChannel;
+import bagaturchess.uci.impl.Channel_Console;
 import bagaturchess.uci.impl.Protocol;
 
 /**
@@ -89,22 +90,24 @@ public class Go extends Protocol {
 	private boolean infinite = false; //go infinite
 	private int depth = MAX_DEPTH; // Should be big number !!!
 	
+	private IChannel channel;
 	
 	
-	public Go(String _commandLine) {
+	public Go(IChannel _channel, String _commandLine) {
+		channel = _channel;
 		commandLine =_commandLine;
 		parse();
 	}
 	
 	private void parse() {
-		StringTokenizer st = new StringTokenizer(commandLine, Channel.WHITE_SPACE);
+		StringTokenizer st = new StringTokenizer(commandLine, IChannel.WHITE_SPACE);
 		
 		if (!st.hasMoreTokens()) {
-			Channel.dump("Incorrect 'go' command: " + commandLine);
+			channel.dump("Incorrect 'go' command: " + commandLine);
 		} else {
 			String go = st.nextToken();
 			if (!go.equals(Protocol.COMMAND_TO_ENGINE_GO_STR)) {
-				Channel.dump("Incorrect 'go' command: " + commandLine);
+				channel.dump("Incorrect 'go' command: " + commandLine);
 			}
 		}
 		
@@ -121,11 +124,11 @@ public class Go extends Protocol {
 		 */
 		int wtimeStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_GO_WTIME_STR);
 		if (wtimeStartIndex != -1) {
-			int wtimeNumberStartIndex = commandLine.indexOf(Channel.WHITE_SPACE, wtimeStartIndex + 1);
+			int wtimeNumberStartIndex = commandLine.indexOf(IChannel.WHITE_SPACE, wtimeStartIndex + 1);
 			if (wtimeNumberStartIndex == -1) {
-				Channel.dump("Incorrect 'go' command (there is no number after wtime): " + commandLine);
+				channel.dump("Incorrect 'go' command (there is no number after wtime): " + commandLine);
 			} else {
-				int wtimeNumberEndIndex = commandLine.indexOf(Channel.WHITE_SPACE, wtimeNumberStartIndex + 1);
+				int wtimeNumberEndIndex = commandLine.indexOf(IChannel.WHITE_SPACE, wtimeNumberStartIndex + 1);
 				if (wtimeNumberEndIndex == -1) {
 					wtimeNumberEndIndex = commandLine.length();
 				}
@@ -139,11 +142,11 @@ public class Go extends Protocol {
 		 */
 		int btimeStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_GO_BTIME_STR);
 		if (btimeStartIndex != -1) {
-			int btimeNumberStartIndex = commandLine.indexOf(Channel.WHITE_SPACE, btimeStartIndex + 1);
+			int btimeNumberStartIndex = commandLine.indexOf(IChannel.WHITE_SPACE, btimeStartIndex + 1);
 			if (btimeNumberStartIndex == -1) {
-				Channel.dump("Incorrect 'go' command (there is no number after btime): " + commandLine);
+				channel.dump("Incorrect 'go' command (there is no number after btime): " + commandLine);
 			} else {
-				int btimeNumberEndIndex = commandLine.indexOf(Channel.WHITE_SPACE, btimeNumberStartIndex + 1);
+				int btimeNumberEndIndex = commandLine.indexOf(IChannel.WHITE_SPACE, btimeNumberStartIndex + 1);
 				if (btimeNumberEndIndex == -1) {
 					btimeNumberEndIndex = commandLine.length();
 				}
@@ -158,11 +161,11 @@ public class Go extends Protocol {
 		 */
 		int wincStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_GO_WINC_STR);
 		if (wincStartIndex != -1) {
-			int wincNumberStartIndex = commandLine.indexOf(Channel.WHITE_SPACE, wincStartIndex + 1);
+			int wincNumberStartIndex = commandLine.indexOf(IChannel.WHITE_SPACE, wincStartIndex + 1);
 			if (wincNumberStartIndex == -1) {
-				Channel.dump("Incorrect 'go' command (there is no number after winc): " + commandLine);
+				channel.dump("Incorrect 'go' command (there is no number after winc): " + commandLine);
 			} else {
-				int wincNumberEndIndex = commandLine.indexOf(Channel.WHITE_SPACE, wincNumberStartIndex + 1);
+				int wincNumberEndIndex = commandLine.indexOf(IChannel.WHITE_SPACE, wincNumberStartIndex + 1);
 				if (wincNumberEndIndex == -1) {
 					wincNumberEndIndex = commandLine.length();
 				}
@@ -176,11 +179,11 @@ public class Go extends Protocol {
 		 */
 		int bincStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_GO_BINC_STR);
 		if (bincStartIndex != -1) {
-			int bincNumberStartIndex = commandLine.indexOf(Channel.WHITE_SPACE, bincStartIndex + 1);
+			int bincNumberStartIndex = commandLine.indexOf(IChannel.WHITE_SPACE, bincStartIndex + 1);
 			if (bincNumberStartIndex == -1) {
-				Channel.dump("Incorrect 'go' command (there is no number after binc): " + commandLine);
+				channel.dump("Incorrect 'go' command (there is no number after binc): " + commandLine);
 			} else {
-				int bincNumberEndIndex = commandLine.indexOf(Channel.WHITE_SPACE, bincNumberStartIndex + 1);
+				int bincNumberEndIndex = commandLine.indexOf(IChannel.WHITE_SPACE, bincNumberStartIndex + 1);
 				if (bincNumberEndIndex == -1) {
 					bincNumberEndIndex = commandLine.length();
 				}
@@ -194,11 +197,11 @@ public class Go extends Protocol {
 		 */
 		int nodesStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_GO_NODES_STR);
 		if (nodesStartIndex != -1) {
-			int nodesNumberStartIndex = commandLine.indexOf(Channel.WHITE_SPACE, nodesStartIndex + 1);
+			int nodesNumberStartIndex = commandLine.indexOf(IChannel.WHITE_SPACE, nodesStartIndex + 1);
 			if (nodesStartIndex == -1) {
-				Channel.dump("Incorrect 'go' command (there is no number after nodes): " + commandLine);
+				channel.dump("Incorrect 'go' command (there is no number after nodes): " + commandLine);
 			} else {
-				int nodesNumberEndIndex = commandLine.indexOf(Channel.WHITE_SPACE, nodesNumberStartIndex + 1);
+				int nodesNumberEndIndex = commandLine.indexOf(IChannel.WHITE_SPACE, nodesNumberStartIndex + 1);
 				if (nodesNumberEndIndex == -1) {
 					nodesNumberEndIndex = commandLine.length();
 				}
@@ -212,11 +215,11 @@ public class Go extends Protocol {
 		 */
 		int movestogoStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_GO_MOVESTOGO_STR);
 		if (movestogoStartIndex != -1) {
-			int movestogoNumberStartIndex = commandLine.indexOf(Channel.WHITE_SPACE, movestogoStartIndex + 1);
+			int movestogoNumberStartIndex = commandLine.indexOf(IChannel.WHITE_SPACE, movestogoStartIndex + 1);
 			if (movestogoNumberStartIndex == -1) {
-				Channel.dump("Incorrect 'go' command (there is no number after movestogo): " + commandLine);
+				channel.dump("Incorrect 'go' command (there is no number after movestogo): " + commandLine);
 			} else {
-				int movestogoNumberEndIndex = commandLine.indexOf(Channel.WHITE_SPACE, movestogoNumberStartIndex + 1);
+				int movestogoNumberEndIndex = commandLine.indexOf(IChannel.WHITE_SPACE, movestogoNumberStartIndex + 1);
 				if (movestogoNumberEndIndex == -1) {
 					movestogoNumberEndIndex = commandLine.length();
 				}
@@ -230,11 +233,11 @@ public class Go extends Protocol {
 		 */
 		int movetimeStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_GO_MOVETIME_STR);
 		if (movetimeStartIndex != -1) {
-			int movetimeNumberStartIndex = commandLine.indexOf(Channel.WHITE_SPACE, movetimeStartIndex + 1);
+			int movetimeNumberStartIndex = commandLine.indexOf(IChannel.WHITE_SPACE, movetimeStartIndex + 1);
 			if (movetimeNumberStartIndex == -1) {
-				Channel.dump("Incorrect 'go' command (there is no number after movetime): " + commandLine);
+				channel.dump("Incorrect 'go' command (there is no number after movetime): " + commandLine);
 			} else {
-				int movetimeNumberEndIndex = commandLine.indexOf(Channel.WHITE_SPACE, movetimeNumberStartIndex + 1);
+				int movetimeNumberEndIndex = commandLine.indexOf(IChannel.WHITE_SPACE, movetimeNumberStartIndex + 1);
 				if (movetimeNumberEndIndex == -1) {
 					movetimeNumberEndIndex = commandLine.length();
 				}
@@ -250,11 +253,11 @@ public class Go extends Protocol {
 		
 		int depthStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_GO_DEPTH_STR);
 		if (depthStartIndex != -1) {
-			int depthValueStartIndex = commandLine.indexOf(Channel.WHITE_SPACE, depthStartIndex + 1);
+			int depthValueStartIndex = commandLine.indexOf(IChannel.WHITE_SPACE, depthStartIndex + 1);
 			if (depthValueStartIndex == -1) {
-				Channel.dump("Incorrect 'go' command (there is no number after depth): " + commandLine);
+				channel.dump("Incorrect 'go' command (there is no number after depth): " + commandLine);
 			} else {
-				int depthValueEndIndex = commandLine.indexOf(Channel.WHITE_SPACE, depthValueStartIndex + 1);
+				int depthValueEndIndex = commandLine.indexOf(IChannel.WHITE_SPACE, depthValueStartIndex + 1);
 				if (depthValueEndIndex == -1) {
 					depthValueEndIndex = commandLine.length();
 				}
@@ -339,7 +342,7 @@ public class Go extends Protocol {
 	
 	public static void main(String[] args) {
 		//Go go = new Go("go ponder wtime 3600001 btime 3600000 winc 123 binc 456 nodes 12345678 movestogo 12 depth 89");
-		Go go = new Go("go nodes 12345678");
+		Go go = new Go(new Channel_Console(), "go nodes 12345678");
 		System.out.println(go);
 	}
 }

@@ -33,6 +33,7 @@ import bagaturchess.search.impl.env.MemoryConsumers;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
+import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.api.ISearchAdaptorConfig;
 import bagaturchess.uci.api.IUCISearchAdaptor;
 import bagaturchess.uci.impl.commands.Go;
@@ -78,7 +79,7 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		
 		
 		//Should be initialized after the searchers to handle memory in a correct way.
-		sharedData.setMemoryConsumers(new MemoryConsumers(rootSearchCfg, searchAdaptorCfg.isOwnBookEnabled()));
+		sharedData.setMemoryConsumers(new MemoryConsumers(ChannelManager.getChannel(), rootSearchCfg, searchAdaptorCfg.isOwnBookEnabled()));
 		saver = new TimeSaver(sharedData, rootSearchCfg, boardForSetup);
 	}
 	

@@ -1,6 +1,6 @@
 package bagaturchess.uci.impl.commands.options;
 
-import bagaturchess.uci.impl.Channel;
+import bagaturchess.uci.api.IChannel;
 
 public class UCIOption<T> {
 	
@@ -38,7 +38,7 @@ public class UCIOption<T> {
 	
 	
 	public String getDefineCommand() {
-		return name + Channel.WHITE_SPACE + description;
+		return name + IChannel.WHITE_SPACE + description;
 	}
 	
 	

@@ -33,6 +33,7 @@ import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.uci.api.BestMoveSender;
+import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.api.IUCIConfig;
 import bagaturchess.uci.api.IUCISearchAdaptor;
 import bagaturchess.uci.api.UCISearchAdaptorFactory;
@@ -45,7 +46,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	
 	protected IUCIConfig engineBootCfg;
-	private Channel channel;
+	private IChannel channel;
 	private IBitBoard board;
 	
 	private IUCISearchAdaptor searchAdaptor;
@@ -64,7 +65,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	}
 	
 
-	public void setChannel(Channel _channel) {
+	public void setChannel(IChannel _channel) {
 		channel = _channel;
 	}
 	
@@ -73,20 +74,6 @@ public class StateManager extends Protocol implements BestMoveSender {
 		searchAdaptor = null;
 		System.gc();
 		searchAdaptor = UCISearchAdaptorFactory.newUCISearchAdaptor(engineBootCfg, board);
-	}
-	
-	
-	//"single file", "multiple files", "none"
-	public void initLogging() throws FileNotFoundException {
-		if ("single file".equals(engineBootCfg.getUCIAdaptor_LoggingPolicy())) {
-			channel.setPrintStream_1File();
-		} else if ("multiple files".equals(engineBootCfg.getUCIAdaptor_LoggingPolicy())) {
-			channel.setPrintStream_MFiles();
-		} else if ("none".equals(engineBootCfg.getUCIAdaptor_LoggingPolicy())) {
-			channel.setPrintStream_None();
-		} else {
-			throw new IllegalStateException("Wrong logging option: '" + engineBootCfg.getUCIAdaptor_LoggingPolicy() + "'");
-		}
 	}
 	
 	
@@ -193,20 +180,20 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	
 	private void sendEngineID() throws IOException {
-		String id_name = COMMAND_TO_GUI_ID_STR + Channel.WHITE_SPACE;
-		id_name += COMMAND_TO_GUI_ID_NAME_STR + Channel.WHITE_SPACE + "Bagatur " + COMMAND_TO_GUI_ID_VERSION_STR;
+		String id_name = COMMAND_TO_GUI_ID_STR + IChannel.WHITE_SPACE;
+		id_name += COMMAND_TO_GUI_ID_NAME_STR + IChannel.WHITE_SPACE + "Bagatur " + COMMAND_TO_GUI_ID_VERSION_STR;
 		channel.sendCommandToGUI(id_name);
 		
-		String id_author = COMMAND_TO_GUI_ID_STR + Channel.WHITE_SPACE;
-		id_author += COMMAND_TO_GUI_ID_AUTHOR_STR + Channel.WHITE_SPACE + "Krasimir Topchiyski" + ", Bulgaria";
+		String id_author = COMMAND_TO_GUI_ID_STR + IChannel.WHITE_SPACE;
+		id_author += COMMAND_TO_GUI_ID_AUTHOR_STR + IChannel.WHITE_SPACE + "Krasimir Topchiyski" + ", Bulgaria";
 		channel.sendCommandToGUI(id_author);
 	}
 	
 	
 	private void sendOptions() throws IOException {
 		for (int i=0; i<optionsManager.getOptions().getAllOptions().length; i++) {
-			String line = COMMAND_TO_GUI_OPTION_STR + Channel.WHITE_SPACE
-							+ COMMAND_TO_ENGINE_SETOPTION_NAME_STR + Channel.WHITE_SPACE
+			String line = COMMAND_TO_GUI_OPTION_STR + IChannel.WHITE_SPACE
+							+ COMMAND_TO_ENGINE_SETOPTION_NAME_STR + IChannel.WHITE_SPACE
 							+ optionsManager.getOptions().getAllOptions()[i].getDefineCommand();
 			channel.sendCommandToGUI(line);
 		}
@@ -216,7 +203,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	private void setOption(String fromGUILine) throws IOException {
 		
 		channel.sendLogToGUI("Set-option called with line: " + fromGUILine);
-		SetOption setoption = new SetOption(fromGUILine);
+		SetOption setoption = new SetOption(channel, fromGUILine);
 		channel.sendLogToGUI("Set-option parsed: " + setoption);
 		
 		optionsManager.set(setoption);
@@ -243,7 +230,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 		/*
 		 * Setup startup board with FEN or played moves
 		 */
-		Position position = new Position(fromGUILine);
+		Position position = new Position(channel, fromGUILine);
 		
 		if (position.getFen() != null) {
 			
@@ -273,7 +260,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	
 	private void goSearch(String fromGUILine) throws IOException {
-		Go go = new Go(fromGUILine);	
+		Go go = new Go(channel, fromGUILine);	
 		channel.sendLogToGUI(go.toString());
 		searchAdaptor.goSearch(channel, this, go);
 	}
@@ -294,9 +281,9 @@ public class StateManager extends Protocol implements BestMoveSender {
 			
 			board.makeMoveForward(move);
 			
-			String bestMoveCommand = COMMAND_TO_GUI_BESTMOVE_STR + Channel.WHITE_SPACE + MoveInt.moveToStringUCI(move);
+			String bestMoveCommand = COMMAND_TO_GUI_BESTMOVE_STR + IChannel.WHITE_SPACE + MoveInt.moveToStringUCI(move);
 			if (ponder != 0) {
-				bestMoveCommand += Channel.WHITE_SPACE + COMMAND_TO_GUI_BESTMOVE_PONDER_STR + Channel.WHITE_SPACE;
+				bestMoveCommand += IChannel.WHITE_SPACE + COMMAND_TO_GUI_BESTMOVE_PONDER_STR + IChannel.WHITE_SPACE;
 				bestMoveCommand += MoveInt.moveToStringUCI(ponder);
 			}
 			

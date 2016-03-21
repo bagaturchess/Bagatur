@@ -26,13 +26,13 @@ package bagaturchess.search.impl.uci_adaptor;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.uci.api.BestMoveSender;
-import bagaturchess.uci.impl.Channel;
+import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.impl.commands.Go;
 
 
 public class UCISearchMediatorImpl_StandardPondering extends UCISearchMediatorImpl_Base {
 	
-	public UCISearchMediatorImpl_StandardPondering(Channel _channel, Go _go, int _colourToMove, BestMoveSender _sender, TPTable _tpt, ISearchConfig_AB _searchConfig) {
+	public UCISearchMediatorImpl_StandardPondering(IChannel _channel, Go _go, int _colourToMove, BestMoveSender _sender, TPTable _tpt, ISearchConfig_AB _searchConfig) {
 		super(_channel, _go, _colourToMove, _sender, _tpt, _searchConfig);
 		setStoper(new PonderingStopper());
 	}

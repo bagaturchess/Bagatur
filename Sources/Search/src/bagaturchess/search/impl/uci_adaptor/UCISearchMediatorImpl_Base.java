@@ -33,14 +33,14 @@ import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInfoUtils;
 import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.uci.api.BestMoveSender;
-import bagaturchess.uci.impl.Channel;
+import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.impl.commands.Go;
 
 
 public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	
-	private Channel channel;
+	private IChannel channel;
 	private Go goCommand;
 	private int colourToMove;
 	private ISearchStopper stopper;
@@ -56,7 +56,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	private ISearchConfig_MTD searchConfig;
 	
 	
-	public UCISearchMediatorImpl_Base(Channel _channel, Go _go, int _colourToMove, BestMoveSender _sender,
+	public UCISearchMediatorImpl_Base(IChannel _channel, Go _go, int _colourToMove, BestMoveSender _sender,
 			TPTable _tpt, ISearchConfig_AB _searchConfig) {
 		channel = _channel;
 		goCommand = _go;
@@ -89,7 +89,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		return startTime;
 	}
 	
-	protected Channel getChannel() {
+	protected IChannel getChannel() {
 		return channel;
 	}
 	
@@ -195,7 +195,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		try {
 			channel.sendCommandToGUI(messageToGUI);
 		} catch (IOException e) {
-			Channel.dump(e);
+			channel.dump(e);
 		}
 	}
 

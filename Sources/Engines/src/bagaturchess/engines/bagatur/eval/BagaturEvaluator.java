@@ -20,12 +20,9 @@ import bagaturchess.bitboard.impl.plies.KnightPlies;
 import bagaturchess.bitboard.impl.plies.OfficerPlies;
 import bagaturchess.bitboard.impl.plies.WhitePawnPlies;
 import bagaturchess.bitboard.impl.state.PiecesList;
-import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.internal.EvaluatorAdapter;
 import bagaturchess.search.api.internal.ISearch;
-import bagaturchess.search.impl.evalcache.EvalCache;
-import bagaturchess.search.impl.evalcache.EvalEntry;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
 
@@ -137,15 +134,8 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 	}
 	
 	
-	@Override
 	public int getMaterialQueen() {
 		return 50 + baseEval.getMaterialQueen();
-	}
-	
-	
-	@Override
-	public int getMaterial(int pieceType) {
-		return baseEval.getMaterial(pieceType);
 	}
 	
 	
