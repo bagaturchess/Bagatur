@@ -44,6 +44,8 @@ import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch;
 import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
+import bagaturchess.uci.api.ChannelManager;
+import bagaturchess.uci.impl.Channel_Console;
 
 
 public class MTDSchedulerMain {
@@ -116,7 +118,9 @@ public class MTDSchedulerMain {
 								}
 				);
 		
-		SharedData arg1 = new SharedData(cfg);
+		ChannelManager.setChannel(new Channel_Console());
+		
+		SharedData arg1 = new SharedData(ChannelManager.getChannel(), cfg);
 		//IRootSearch search = new MTDParallelSearch(new Object[] {cfg, arg1});
 		
 		IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, null});
@@ -141,10 +145,10 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard  = new Board("rn1qkb1r/1p2pppp/p6/1NpnB3/Q1Pp2b1/3P1N2/PP2PPPP/R3KB1R b KQkq - 3 9", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1qkb1r/1p2pppp/pn5/1Np1B3/Q1Pp2b1/3P1N2/PP2PPPP/R3KB1R w KQkq - 3 9", null, cfg.getBoardConfig());
 		
-		IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
+		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
-		//IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", sharedData.getPawnsCache(), cfg.getBoardConfig());
+		IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", sharedData.getPawnsCache(), cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board3_Adapter("1r2r1k1/5pp1/p2p4/2q1pNP1/b3P3/nP4Q1/PKP1R1B1/3R4 b - - 1 29", sharedData.getPawnsCache(), cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board3_Adapter("3r1rk1/1p2npp1/1qpbpn1p/p2p4/1P1P2P1/P1N1PQ2/1BP2P1P/1B2RRK1 w - - 0 21", sharedData.getPawnsCache(), cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board3_Adapter("4r2k/pp2r1pp/1qp1N3/3P1Q2/8/7P/PPP3P1/5R1K b - - 3 32", sharedData.getPawnsCache(), cfg.getBoardConfig());

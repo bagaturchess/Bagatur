@@ -1573,15 +1573,44 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			
 		}
 		//Razoring:
-	    else if(RAZORING && !inCheck) {
+	    /*else if(RAZORING && !inCheck) {
 	    	if ((rest < 4 && staticEval < beta - 300) ||
 		            (rest < 2 && staticEval < beta - 100)) {
 	    		throw new IllegalStateException();
 		      //int qeval = nullwin_qsearch(stopper, info, initial_maxdepth, depth, beta, 0, );
 		      //if (qeval < beta) return qeval;
 	    	}
-	    }
+	    }*/
 		
+		
+        //Razoring:
+		if(RAZORING && !inCheck) {
+        
+			/*if (
+                    (rest <= 1 && staticEval < beta - 100) ||
+                    (rest <= 2 && staticEval < beta - 300) ||
+                    (rest <= 3 && staticEval < beta - 500)
+                              ) {
+                              
+                          int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, staticEval, true, rootColour);
+                                         if (qeval < beta) {
+                                                        return qeval;
+                                         }
+            }*/
+        
+        
+	        if (rest < STATIC_REDUCTION_MARGIN_NONPV.length) {
+	              
+                  if (staticEval < beta - STATIC_REDUCTION_MARGIN_NONPV[rest]) {
+                     int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, staticEval, true, rootColour);
+                                    if (qeval < beta) {
+                                                   return qeval;
+                                    }
+                  }
+	        }
+        
+		}
+
 		
 		//IID NONPV Node
 		if (IID_NONPV) {

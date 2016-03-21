@@ -1,1 +1,3 @@
 *.class
+Sources/UCIRemote*
+*.zip
