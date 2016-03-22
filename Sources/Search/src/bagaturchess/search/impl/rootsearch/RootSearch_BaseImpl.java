@@ -26,6 +26,7 @@ package bagaturchess.search.impl.rootsearch;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Board;
+import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearch;
@@ -56,7 +57,12 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		_bitboardForSetup.revert();
 		
 		//bitboardForSetup = new Board3_Adapter(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
-		bitboardForSetup = new Board(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
+		//bitboardForSetup = new Board(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
+		
+		bitboardForSetup = BoardUtils.createBoard_WithPawnsCache(_bitboardForSetup.toEPD(),
+				getRootSearchConfig().getEvalConfig().getPawnsCacheFactoryClassName(),
+				getRootSearchConfig().getBoardConfig(),
+				1000);
 		
 		for (int i=0; i<movesCount; i++) {
 			_bitboardForSetup.makeMoveForward(moves[i]);

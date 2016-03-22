@@ -29,6 +29,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Board;
+import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl1.Board3;
 import bagaturchess.bitboard.impl1.Board3_Adapter;
 import bagaturchess.search.api.internal.ISearch;
@@ -85,7 +86,7 @@ public class SearchersPool {
 			
 			IBitBoard searcher_bitboard = null;
 			//searcher_bitboard = new Board3_Adapter(bitboardForSetup.toEPD(), boardConfig);
-			searcher_bitboard = new Board(bitboardForSetup.toEPD(), boardConfig);
+			searcher_bitboard = BoardUtils.createBoard_WithPawnsCache(bitboardForSetup.toEPD(), boardConfig);
 			
 			for (int j=0; j<movesCount; j++) {
 				bitboardForSetup.makeMoveForward(moves[j]);
