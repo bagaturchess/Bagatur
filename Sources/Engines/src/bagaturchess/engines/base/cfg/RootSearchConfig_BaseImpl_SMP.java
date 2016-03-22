@@ -39,7 +39,8 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	
 	
 	private void calcMemoryUsagePercents() {
-		double mem_usage_norm = 1 / (double)(MEM_USAGE_TPT + MEM_USAGE_GTB + getThreadsCount() * (MEM_USAGE_EVALCACHE + MEM_USAGE_PAWNCACHE) );
+		
+		double mem_usage_norm = 1 / (double)(getThreadsCount() * (MEM_USAGE_TPT + MEM_USAGE_GTB + MEM_USAGE_EVALCACHE + MEM_USAGE_PAWNCACHE));
 		
 		SMP_MEM_USAGE_TPT = MEM_USAGE_TPT * mem_usage_norm;
 		SMP_MEM_USAGE_GTB = MEM_USAGE_GTB * mem_usage_norm;

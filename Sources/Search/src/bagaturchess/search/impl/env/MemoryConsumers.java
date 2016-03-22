@@ -48,7 +48,7 @@ public class MemoryConsumers {
 	static {
 		if (getJVMBitmode() == 64) {
 			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT = 0.85;
+			MEMORY_USAGE_PERCENT = 0.79;//Multiple cpus, e.g. 64
 		} else { //32
 			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
 			MEMORY_USAGE_PERCENT =  0.85;
@@ -136,16 +136,15 @@ public class MemoryConsumers {
 		
 		
 		channel.dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
-		channel.dump("Transposition Table usage percent from the free memory: " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
-		channel.dump("Eval Cache usage percent from the free memory: " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
-		channel.dump("Pawns Eval Cache usage percent from the free memory: " + (100 * engineConfiguration.getPawnsCacheUsagePercent()) + "%");
-		channel.dump("Endgame Table Bases Cache usage percent from the free memory: " + (100 * engineConfiguration.getGTBUsagePercent()) + "%");
+		channel.dump("Transposition Table usage percent from the free memory 1 X : " + engineConfiguration.getThreadsCount() * (100 * engineConfiguration.getTPTUsagePercent()) + "%");
+		channel.dump("Endgame Table Bases Cache usage percent from the free memory 1 X : " + engineConfiguration.getThreadsCount() * (100 * engineConfiguration.getGTBUsagePercent()) + "%");
+		channel.dump("Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() + " X : " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
+		channel.dump("Pawns Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() + " X : " + (100 * engineConfiguration.getPawnsCacheUsagePercent()) + "%");
 		
-		int threadsCount = engineConfiguration.getThreadsCount();
-		double percents_sum = engineConfiguration.getTPTUsagePercent()
-							+ engineConfiguration.getGTBUsagePercent()
-							+ threadsCount * engineConfiguration.getEvalCacheUsagePercent()
-							+ threadsCount * engineConfiguration.getPawnsCacheUsagePercent();
+		double percents_sum = engineConfiguration.getThreadsCount() * engineConfiguration.getTPTUsagePercent()
+							+ engineConfiguration.getThreadsCount() * engineConfiguration.getGTBUsagePercent()
+							+ engineConfiguration.getThreadsCount() * engineConfiguration.getEvalCacheUsagePercent()
+							+ engineConfiguration.getThreadsCount() * engineConfiguration.getPawnsCacheUsagePercent();
 		
 		if (percents_sum < 0.9999 || percents_sum > 1.0001) {
 			throw new IllegalStateException("Percents sum is not near to 1. It is " + percents_sum);
@@ -232,7 +231,7 @@ public class MemoryConsumers {
 		System.gc();
 		int memory_before = getUsedMemory();
 		TPTable test_tpt = new TPTable(test_size, true, null);
-		int size = getEntrySize(availableMemory, engineConfiguration.getTPTUsagePercent(), test_size, memory_before);
+		int size = getEntrySize(availableMemory, engineConfiguration.getThreadsCount() * engineConfiguration.getTPTUsagePercent(), test_size, memory_before);
 		test_tpt.clear();
 		return size;
 	}
@@ -247,7 +246,7 @@ public class MemoryConsumers {
 		System.gc();
 		int memory_before = getUsedMemory();
 		GTBCache_IN gtbCache = new GTBCache_IN(test_size, true, null);
-		int size = getEntrySize(availableMemory, (1 * engineConfiguration.getGTBUsagePercent()) / 7, test_size, memory_before);
+		int size = getEntrySize(availableMemory, engineConfiguration.getThreadsCount() * (1 * engineConfiguration.getGTBUsagePercent()) / 7, test_size, memory_before);
 		gtbCache.clear();
 		return size;
 	}
@@ -262,7 +261,7 @@ public class MemoryConsumers {
 		System.gc();
 		int memory_before = getUsedMemory();
 		GTBCache_OUT gtbCache = new GTBCache_OUT(test_size, true, null);
-		int size = getEntrySize(availableMemory, (6 * engineConfiguration.getGTBUsagePercent()) / 7, test_size, memory_before);
+		int size = getEntrySize(availableMemory, engineConfiguration.getThreadsCount() * (6 * engineConfiguration.getGTBUsagePercent()) / 7, test_size, memory_before);
 		gtbCache.clear();
 		return size;
 	}
