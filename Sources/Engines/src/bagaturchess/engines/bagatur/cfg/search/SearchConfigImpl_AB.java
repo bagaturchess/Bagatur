@@ -13,6 +13,11 @@ import bagaturchess.uci.impl.commands.options.UCIOption;
 public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvider {
 	
 	
+	private UCIOption[] options = new UCIOption[] {
+			new UCIOption("Search [Use TPT scores in PV Nodes]", false, "type check default false"),
+	};
+	
+	
 	private static final int MAX_INDEX 				= 200;
 	
 	private IExtensionMode mode 					= IExtensionMode.DYNAMIC;
@@ -20,13 +25,13 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	
 	public int extension_CheckInPV 					= PLY;
 	public int extension_SingleReplyInPV 			= PLY;
-	public int extension_WinCapNonPawnInPV 			= 0;
-	public int extension_WinCapPawnInPV 			= 0;
-	public int extension_RecapturePV 				= 0;
-	public int extension_PasserPushPV 				= 0;
-	public int extension_PromotionPV 				= 0;
-	public int extension_MateThreatPV 				= 0;
-	public int extension_MoveEvalPV 				= 0;
+	public int extension_WinCapNonPawnInPV 			= 1;
+	public int extension_WinCapPawnInPV 			= 1;
+	public int extension_RecapturePV 				= 1;
+	public int extension_PasserPushPV 				= 1;
+	public int extension_PromotionPV 				= 1;
+	public int extension_MateThreatPV 				= 1;
+	public int extension_MoveEvalPV 				= 1;
 	public boolean extension_MateLeafPV				= false;
 	
 	public int extension_CheckInNonPV 				= PLY;
@@ -44,14 +49,14 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	/**
 	 * Reductions
 	 */
-	public int reduction_LMRRootIndex1   			= 0;
-	public int reduction_LMRRootIndex2   			= 0;
+	public int reduction_LMRRootIndex1   			= 1;
+	public int reduction_LMRRootIndex2   			= 1;
 	
-	public int reduction_LMRPVIndex1     			= 0;
-	public int reduction_LMRPVIndex2     			= 0;
+	public int reduction_LMRPVIndex1     			= 1;
+	public int reduction_LMRPVIndex2     			= 1;
 	
 	public int reduction_LMRNonPVIndex1 			= 0;
-	public int reduction_LMRNonPVIndex2 			= 0;
+	public int reduction_LMRNonPVIndex2 			= 1;
 	
 	public boolean reduction_ReduceCapturesInLMR 	 = false;
 	public boolean reduction_ReduceHistoryMovesInLMR = true;
@@ -101,11 +106,6 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	public int orderingWeight_PASSER_PUSH 	 		= 1;
 	public int orderingWeight_KILLER          		= 1;
 	public int orderingWeight_LOSE_CAP        		= -1;
-	
-	
-	private UCIOption[] options = new UCIOption[] {
-			new UCIOption("Search [Use TPT scores in PV Nodes]", other_UseTPTScoresPV, "type check default " + other_UseTPTScoresPV),
-	};
 	
 	
 	public SearchConfigImpl_AB() {
