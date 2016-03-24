@@ -134,7 +134,7 @@ public abstract class SearchImpl_MTD extends SearchImpl {
 		IRootWindow rootWin = new RootWindowImpl();
 		
 		betas.clear();
-		BetaGenerator beta_gen = new BetaGenerator(initial_eval, 1);
+		IBetaGenerator beta_gen = BetaGeneratorFactory.create(initial_eval, 1);
 		beta_gen.increaseLower(initial_lower);
 		beta_gen.decreaseUpper(initial_upper);
 		

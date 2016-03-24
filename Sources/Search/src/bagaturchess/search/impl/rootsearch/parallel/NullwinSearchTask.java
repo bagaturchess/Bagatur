@@ -31,7 +31,7 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
-import bagaturchess.search.impl.alg.BetaGenerator;
+import bagaturchess.search.impl.alg.IBetaGenerator;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
@@ -219,9 +219,9 @@ public class NullwinSearchTask implements Runnable {
 	private static final class RootSearchMTDImpl implements IRootWindow {
 
 		private int colour;
-		private BetaGenerator win;
+		private IBetaGenerator win;
 		
-		RootSearchMTDImpl(int _colour, BetaGenerator _win) {
+		RootSearchMTDImpl(int _colour, IBetaGenerator _win) {
 			colour = _colour;
 			win = _win;
 		}

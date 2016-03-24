@@ -28,7 +28,7 @@ import java.util.List;
 import bagaturchess.search.api.internal.ISearch;
 
 
-public class BetaGenerator {
+public class BetaGenerator implements IBetaGenerator {
 	
 	private static final boolean DUMP = false;
 	
@@ -59,6 +59,10 @@ public class BetaGenerator {
 		lastVal = _initialVal;
 	}
 	
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.alg.IBetaGenerator#decreaseUpper(int)
+	 */
+	@Override
 	public void decreaseUpper(int val) {
 		if (DUMP) System.out.println("decreaseUpper called with " + val);
 		
@@ -77,6 +81,10 @@ public class BetaGenerator {
 		//genBetas();
 	}
 	
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.alg.IBetaGenerator#increaseLower(int)
+	 */
+	@Override
 	public void increaseLower(int val) {
 		if (DUMP) System.out.println("increaseLower called with " + val);
 		
@@ -95,6 +103,10 @@ public class BetaGenerator {
 		//genBetas();
 	}
 	
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.alg.IBetaGenerator#genBetas()
+	 */
+	@Override
 	public List<Integer> genBetas() {
 		
 		if (DUMP) System.out.println(this);
@@ -237,6 +249,10 @@ public class BetaGenerator {
 		return betas;
 	}
 	
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.alg.IBetaGenerator#getLowerBound()
+	 */
+	@Override
 	public int getLowerBound() {
 		return lower_bound;
 	}
@@ -245,6 +261,10 @@ public class BetaGenerator {
 		this.lower_bound = lower_bound;
 	}*/
 
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.alg.IBetaGenerator#getUpperBound()
+	 */
+	@Override
 	public int getUpperBound() {
 		return upper_bound;
 	}
@@ -253,6 +273,9 @@ public class BetaGenerator {
 		this.upper_bound = upper_bound;
 	}*/
 
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.alg.IBetaGenerator#toString()
+	 */
 	@Override
 	public String toString() {
 		String result = "";
