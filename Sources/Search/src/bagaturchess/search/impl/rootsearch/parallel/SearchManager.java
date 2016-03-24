@@ -32,7 +32,9 @@ import java.util.TreeSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import bagaturchess.bitboard.api.IBinarySemaphore;
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearchConfig_SMP;
@@ -41,8 +43,11 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.alg.BetaGenerator;
+import bagaturchess.search.impl.alg.BetaGeneratorFactory;
+import bagaturchess.search.impl.alg.IBetaGenerator;
 import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.env.SharedData;
+import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.tpt.TPTEntry;
@@ -66,7 +71,7 @@ public class SearchManager {
 	private volatile ISearchInfo curIterationLastInfo;
 	//private volatile long nodes;
 	
-	private BetaGenerator betasGen;
+	private IBetaGenerator betasGen;
 	//private volatile SortedSet<Integer> betas;
 	private volatile List<Integer> betas;
 	
@@ -128,10 +133,14 @@ public class SearchManager {
 		TPTEntry entry = sharedData.getTPT().get(hashkey);
 		if (entry != null && entry.getBestMove_lower() != 0) {
 			initialVal = entry.getLowerBound();
+			if (sharedData.getEngineConfiguration().getSearchConfig().isOther_UseTPTInRoot()) {
+				//prevIterationEval = initialVal;
+			}
 		}
 		sharedData.getTPT().unlock();
 		
-		betasGen = new BetaGenerator(initialVal, ((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount());
+		int threadsCount = ((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount();
+		betasGen = BetaGeneratorFactory.create(initialVal, threadsCount);
 		
 		betas = betasGen.genBetas();
 		//System.out.println("initBetas: " + betas);
@@ -247,7 +256,11 @@ public class SearchManager {
 					//info.setSearchedNodes(nodes);
 					mediator.changedMajor(info);
 					
-					testPV(info, bitboardForTesting);
+					try {
+						testPV(info, bitboardForTesting);
+					} catch (Exception e) {
+						mediator.dump(e);
+					}
 				}
 				curIterationLastInfo = null;
 			} else {
@@ -307,6 +320,8 @@ public class SearchManager {
 		
 		//if (!sharedData.getEngineConfiguration().verifyPVAfterSearch()) return;
 		
+		int root_colour = bitboardForTesting.getColourToMove();
+		
 		int sign = 1;
 		
 		int[] moves = info.getPV();
@@ -316,11 +331,17 @@ public class SearchManager {
 			sign *= -1;
 		}
 
-		IEvaluator evaluator = sharedData.getEvaluatorFactory().create(bitboardForTesting, null);
-		int curEval = sign * evaluator.eval(0, ISearch.MIN, ISearch.MAX, true, 0);
+		IEvaluator evaluator = sharedData.getEvaluatorFactory().create(
+				bitboardForTesting,
+				new EvalCache(100, true, new BinarySemaphore_Dummy()),
+				sharedData.getEngineConfiguration().getEvalConfig());
+		
+		int curEval = (int) (sign * evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, root_colour));
 		
 		if (curEval != info.getEval()) {
-			System.out.println("curEval=" + curEval + ",	eval=" + info.getEval());
+			mediator.dump("SearchManager.testPV FAILED > curEval=" + curEval + ",	eval=" + info.getEval());
+		} else {
+			mediator.dump("SearchManager.testPV OK > curEval=" + curEval + ",	eval=" + info.getEval());
 		}
 		
 		for (int i=moves.length - 1; i >= 0; i--) {
@@ -344,7 +365,11 @@ public class SearchManager {
 				//curIterationLastInfo.setSearchedNodes(nodes);
 				mediator.changedMajor(curIterationLastInfo);
 				
-				testPV(curIterationLastInfo, bitboardForTesting);
+				try {
+					testPV(curIterationLastInfo, bitboardForTesting);
+				} catch (Exception e) {
+					mediator.dump(e);
+				}
 			}
 		}
 		
@@ -406,7 +431,7 @@ public class SearchManager {
 		return maxIterations;
 	}
 
-	public BetaGenerator getBetasGen() {
+	public IBetaGenerator getBetasGen() {
 		return betasGen;
 	}
 }
