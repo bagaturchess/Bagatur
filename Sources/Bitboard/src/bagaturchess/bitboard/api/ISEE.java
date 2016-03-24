@@ -27,5 +27,5 @@ public interface ISEE {
 	//public int evalExchange(int move, boolean[] canBeCaptured);
 	public int seeField(int fieldID);
 	public int seeMove(int pieceColour, int pieceType, int toFiledID);
-	public int getCost(int figType);
+	//public int getCost(int figType);
 }
