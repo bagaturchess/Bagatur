@@ -22,6 +22,7 @@
  */
 package bagaturchess.search.impl.alg;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,21 +31,23 @@ import bagaturchess.search.api.internal.ISearch;
 
 public class BetaGenerator1 implements IBetaGenerator {
 	
-	private static final boolean DUMP = false;
+	private static final boolean DUMP = true;
 	
-	private static final int INITIAL_INTERVAL = 1;
-	
+	private static final int TREND_INIT = 0;
 	private static final int TREND_UP   = 1;
 	private static final int TREND_DOWN = -1;
 	
+	private static final int MAX_TREND_MULTIPLIER = 1000000;
+	
 	
 	private int betasCount;
+	private int multiplier;
 	
 	private volatile int lower_bound;
 	private volatile int upper_bound;
 	private int trend;
-	private int trend_multiplier;
 	private int lastVal;
+	
 	
 	public BetaGenerator1(int _initialVal, int _betasCount) {
 		lower_bound = ISearch.MIN;
@@ -52,8 +55,13 @@ public class BetaGenerator1 implements IBetaGenerator {
 		
 		betasCount = _betasCount;
 		trend = TREND_UP;
-		trend_multiplier = 1;
 		lastVal = _initialVal;
+		
+		if (betasCount >= 128) {
+			throw new IllegalStateException("betasCount=" + betasCount);
+		}
+		
+		multiplier = 128 / betasCount;
 	}
 	
 	/* (non-Javadoc)
@@ -98,79 +106,7 @@ public class BetaGenerator1 implements IBetaGenerator {
 		
 		List<Integer> betas = new ArrayList<Integer>();
 		
-		/*if (SearchUtils.isMateVal(lastVal)) {
-			if (DUMP) System.out.println("MATE value");
-			betas.add(lastVal - 1);
-			if (DUMP) System.out.println(betas);
-			return betas;
-		}*/
-		
-		/*if (SearchUtils.isMateVal(lastVal)) {
-			if (DUMP) System.out.println("MATE value");
-			
-			if (lower_bound == lastVal) {
-				int depth = SearchUtils.getMateDepth(lastVal);
-				if (DUMP) System.out.println("(lower) MATE depth " + depth);
-				
-				int new_val = -1;
-				if (depth < 0) {
-					depth = -depth;
-					new_val = -SearchUtils.getMateVal(depth - 1);
-				} else if (depth > 0) {
-					new_val = SearchUtils.getMateVal(depth - 1);
-				} else {
-					throw new IllegalStateException();
-				}
-
-				if (DUMP) System.out.println("MATE new value  " + new_val);
-				betas.add(new_val);
-				if (DUMP) System.out.println(betas);
-				return betas;
-				
-			} else if (upper_bound == lastVal) {
-				int depth = SearchUtils.getMateDepth(lastVal);
-				if (DUMP) System.out.println("(upper) MATE depth " + depth);
-				
-				int new_val = -1;
-				if (depth < 0) {
-					depth = -depth;
-					new_val = -SearchUtils.getMateVal(depth + 1);
-				} else if (depth > 0) {
-					new_val = SearchUtils.getMateVal(depth + 1);
-				} else {
-					throw new IllegalStateException();
-				}
-				
-				if (DUMP) System.out.println("MATE new value  " + new_val);
-				betas.add(new_val);
-				if (DUMP) System.out.println(betas);
-				return betas;
-				
-			} else {
-				//throw new IllegalStateException("lastVal=" + lastVal + ", lower_bound=" + lower_bound + ", upper_bound=" + upper_bound);
-				
-				int depth = SearchUtils.getMateDepth(lastVal);
-				if (DUMP) System.out.println("(upper1) MATE depth " + depth);
-				
-				int new_val = -1;
-				if (depth < 0) {
-					depth = -depth;
-					new_val = -SearchUtils.getMateVal(depth + 1);
-				} else if (depth > 0) {
-					new_val = SearchUtils.getMateVal(depth + 1);
-				} else {
-					throw new IllegalStateException();
-				}
-				
-				if (DUMP) System.out.println("MATE new value  " + new_val);
-				betas.add(new_val);
-				if (DUMP) System.out.println(betas);
-				return betas;
-			}
-		}
-		*/
-		
-		int max_interval = betasCount * trend_multiplier * INITIAL_INTERVAL;
+		int max_interval = betasCount;
 		
 		if (max_interval < 0) {
 			throw new IllegalStateException("max_interval=" + max_interval);
@@ -178,7 +114,7 @@ public class BetaGenerator1 implements IBetaGenerator {
 		
 		if (max_interval >= upper_bound - lower_bound) {
 			
-			if (DUMP) System.out.println("WIN will be used");
+			if (DUMP) System.out.println("WINDOWS will be used");
 			
 			//throw new IllegalStateException("max_interval=" + max_interval + ", win=" + (upper_bound - lower_bound));
 			int win = (upper_bound - lower_bound) / (betasCount + 1);
@@ -214,15 +150,15 @@ public class BetaGenerator1 implements IBetaGenerator {
 			
 			if (trend == TREND_UP) {
 				for (int i=1 + counter_shift; i<= betasCount; i++) {
-					int beta = lastVal + i * trend_multiplier * INITIAL_INTERVAL;
+					int beta = lastVal + 1 + (i - 1) * multiplier;
 					betas.add(beta);
-					if (DUMP) System.out.println("lastVal = " + lastVal + " i=" + i + " trend_multiplier=" + trend_multiplier);
+					if (DUMP) System.out.println("Add beta=" + beta + ", lastVal = " + lastVal + " i=" + i + " trend_multiplier=" + multiplier);
 				}
 			} else {
 				for (int i=1 + counter_shift; i<= betasCount; i++) {
-					int beta = lastVal - i * trend_multiplier * INITIAL_INTERVAL;
+					int beta = lastVal - 1 - (i - 1) * multiplier;
 					betas.add(beta);
-					if (DUMP) System.out.println("lastVal = " + lastVal + " i=" + i + " trend_multiplier=" + trend_multiplier);
+					if (DUMP) System.out.println("Add beta=" + beta + ", lastVal = " + lastVal + " i=" + i + " trend_multiplier=" + multiplier);
 				}
 			}
 		}
@@ -263,29 +199,38 @@ public class BetaGenerator1 implements IBetaGenerator {
 	public String toString() {
 		String result = "";
 		result += "[" + lower_bound + ", " + upper_bound + "]	trend="
-			+ trend + ", trend_multiplier=" + trend_multiplier + ", lastVal=" + lastVal;		
+			+ trend + ", lastVal=" + lastVal;		
 		return result;
 	}
 	
 	public static void main(String[] args) {
-		BetaGenerator1 gen = new BetaGenerator1(500, 4);
+		BetaGenerator1 gen = new BetaGenerator1(0, 4);
+		
 		System.out.println(gen);
-		System.out.println("BETAS init: " + gen.genBetas());
+		System.out.println("BETAS: " + gen.genBetas());
+		
+		//gen.lastVal = 13;
+		//gen.lower_bound = 0;
+		//gen.upper_bound = 13;
+		//gen.trend = -1;
+		//gen.trend_multiplier = 33554432;
+		//Betagen obj: [0, 13]	trend=-1, trend_multiplier=33554432, lastVal=13
 		
 		//gen.decreaseUpper(300);
 		//gen.decreaseUpper(200);
 		//gen.decreaseUpper(231);
-		gen.increaseLower(200);
-		System.out.println("BETAS: " + gen.genBetas());
-		gen.decreaseUpper(300);
+		gen.increaseLower(223);
+		
+		System.out.println(gen);
+		
 		System.out.println("BETAS: " + gen.genBetas());
 		
 		//System.out.println("MAX " + Integer.MAX_VALUE);
 		
-		/*gen.increaseLower(-300);
-		gen.increaseLower(-200);
-		gen.increaseLower(-100);
-		gen.decreaseUpper(0);*/
+		//gen.increaseLower(-300);
+		//gen.increaseLower(-200);
+		//gen.increaseLower(-100);
+		//gen.decreaseUpper(0);
 		
 		/*gen.increaseLower(-300);
 		gen.decreaseUpper(300);

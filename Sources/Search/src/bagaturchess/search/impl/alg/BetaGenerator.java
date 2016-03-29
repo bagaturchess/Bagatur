@@ -32,8 +32,6 @@ public class BetaGenerator implements IBetaGenerator {
 	
 	private static final boolean DUMP = false;
 	
-	private static final int INITIAL_INTERVAL = 16;
-	
 	private static final int TREND_INIT = 0;
 	private static final int TREND_UP   = 1;
 	private static final int TREND_DOWN = -1;
@@ -47,9 +45,10 @@ public class BetaGenerator implements IBetaGenerator {
 	private volatile int upper_bound;
 	private int trend;
 	private int trend_multiplier;
+	private int initial_interval;
 	private int lastVal;
 	
-	public BetaGenerator(int _initialVal, int _betasCount) {
+	public BetaGenerator(int _initialVal, int _betasCount, int _initial_interval) {
 		lower_bound = ISearch.MIN;
 		upper_bound = ISearch.MAX;
 		
@@ -57,6 +56,8 @@ public class BetaGenerator implements IBetaGenerator {
 		trend = TREND_INIT;
 		trend_multiplier = 1;
 		lastVal = _initialVal;
+		
+		initial_interval = _initial_interval;
 	}
 	
 	/* (non-Javadoc)
@@ -187,7 +188,7 @@ public class BetaGenerator implements IBetaGenerator {
 		}
 		*/
 		
-		int max_interval = betasCount * trend_multiplier * INITIAL_INTERVAL;
+		int max_interval = betasCount * trend_multiplier * initial_interval;
 		
 		if (max_interval < 0) {
 			throw new IllegalStateException("max_interval=" + max_interval);
@@ -231,13 +232,13 @@ public class BetaGenerator implements IBetaGenerator {
 			
 			if (trend == TREND_UP) {
 				for (int i=1 + counter_shift; i<= betasCount; i++) {
-					int beta = lastVal + i * trend_multiplier * INITIAL_INTERVAL;
+					int beta = lastVal + i * trend_multiplier * initial_interval;
 					betas.add(beta);
 					if (DUMP) System.out.println("lastVal = " + lastVal + " i=" + i + " trend_multiplier=" + trend_multiplier);
 				}
 			} else {
 				for (int i=1 + counter_shift; i<= betasCount; i++) {
-					int beta = lastVal - i * trend_multiplier * INITIAL_INTERVAL;
+					int beta = lastVal - i * trend_multiplier * initial_interval;
 					betas.add(beta);
 					if (DUMP) System.out.println("lastVal = " + lastVal + " i=" + i + " trend_multiplier=" + trend_multiplier);
 				}
@@ -285,30 +286,18 @@ public class BetaGenerator implements IBetaGenerator {
 	}
 	
 	public static void main(String[] args) {
-		BetaGenerator gen = new BetaGenerator(230, 4);
-		
-		gen.lastVal = 13;
-		gen.lower_bound = 0;
-		gen.upper_bound = 13;
-		gen.trend = -1;
-		gen.trend_multiplier = 33554432;
+		BetaGenerator gen = new BetaGenerator(0, 4, 1);
 		//Betagen obj: [0, 13]	trend=-1, trend_multiplier=33554432, lastVal=13
 		
-		//gen.decreaseUpper(300);
+		gen.decreaseUpper(300);
 		//gen.decreaseUpper(200);
 		//gen.decreaseUpper(231);
-		//gen.increaseLower(223);
+		gen.increaseLower(223);
 		
 		System.out.println(gen);
 		
 		System.out.println("BETAS: " + gen.genBetas());
 		
-		System.out.println("MAX " + Integer.MAX_VALUE);
-		
-		System.out.println("" + (1 * 16 * 33554432));
-		System.out.println("" + (2 * 16 * 33554432));
-		System.out.println("" + (3 * 16 * 33554432));
-		System.out.println("" + (4 * 16 * 33554432));
 		/*gen.increaseLower(-300);
 		gen.increaseLower(-200);
 		gen.increaseLower(-100);

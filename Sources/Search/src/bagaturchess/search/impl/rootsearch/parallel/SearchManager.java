@@ -66,9 +66,9 @@ public class SearchManager {
 	private volatile int currentdepth;
 	//private volatile int lower_bound;
 	//private volatile int upper_bound;
-	private volatile int curIterationEval;
-	private volatile int prevIterationEval;
-	private volatile ISearchInfo curIterationLastInfo;
+	//private volatile int curIterationEval;
+	//private volatile int prevIterationEval;
+	//private volatile ISearchInfo curIterationLastInfo;
 	//private volatile long nodes;
 	
 	private IBetaGenerator betasGen;
@@ -96,8 +96,8 @@ public class SearchManager {
 		
 		//lower_bound = ISearch.MIN;
 		//upper_bound = ISearch.MAX;
-		curIterationEval = ISearch.MIN;
-		prevIterationEval = ISearch.MIN;
+		//curIterationEval = ISearch.MIN;
+		//prevIterationEval = ISearch.MIN;
 		//nodes = 0;
 		
 		betas = new ArrayList<Integer>();
@@ -133,14 +133,15 @@ public class SearchManager {
 		TPTEntry entry = sharedData.getTPT().get(hashkey);
 		if (entry != null && entry.getBestMove_lower() != 0) {
 			initialVal = entry.getLowerBound();
-			if (sharedData.getEngineConfiguration().getSearchConfig().isOther_UseTPTInRoot()) {
+			//if (sharedData.getEngineConfiguration().getSearchConfig().isOther_UseTPTInRoot()) {
 				//prevIterationEval = initialVal;
-			}
+			//}
 		}
 		sharedData.getTPT().unlock();
 		
 		int threadsCount = ((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount();
-		betasGen = BetaGeneratorFactory.create(initialVal, threadsCount);
+		int min_interval = getMinInterval(threadsCount);
+		betasGen = BetaGeneratorFactory.create(initialVal, threadsCount, min_interval);
 		
 		betas = betasGen.genBetas();
 		//System.out.println("initBetas: " + betas);
@@ -162,6 +163,34 @@ public class SearchManager {
 		//System.out.println("initBetas=" + betas + "	initialVal=" + initialVal);
 	}
 	
+	private int getMinInterval(int threadsCount) {
+		/*
+		int[] INTERVALS = new int[] {
+				-1, 1, 1, 1, 1, 1, 1, 1, //0-7
+				32, 32, 32, 32, 32, 32, 32, 32, //8-15
+				32, 32, 32, 32, 32, 32, 32, 32, //16-23
+				32, 32, 32, 32, 32, 32, 32, 32, //24-31
+				16, 16, 16, 16, 16, 16, 16, 16, //32-39
+				16, 16, 16, 16, 16, 16, 16, 16, //40-47
+				 8,  8,  8,  8,  8,  8,  8,  8, //48-55
+				 8,  8,  8,  8,  8,  8,  8,  8, //56-63
+				 4,  4,  4,  4,  4,  4,  4,  4, //64-71
+		};
+		
+		
+		if (threadsCount >= INTERVALS.length) {
+			threadsCount = INTERVALS.length - 1;
+		}
+		
+		int min_interval = INTERVALS[threadsCount];
+		
+		mediator.dump("SearchManager: MIN_INTERVAL is " + min_interval);
+		*/
+		
+		return 1;
+	}
+
+
 	private void updateBetas() {
 		betas = betasGen.genBetas();
 		
@@ -250,7 +279,7 @@ public class SearchManager {
 		
 		if (eval > betasGen.getLowerBound()) {
 			
-			if (eval > prevIterationEval) { // Sent pv
+			//if (eval > prevIterationEval) { // Sent pv
 				sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
 				if (mediator != null) {
 					//info.setSearchedNodes(nodes);
@@ -262,18 +291,18 @@ public class SearchManager {
 						mediator.dump(e);
 					}
 				}
-				curIterationLastInfo = null;
-			} else {
-				if (eval > curIterationEval) {
-					curIterationLastInfo = info;	
-				}
-			}
+				//curIterationLastInfo = null;
+			//} else {
+			//	if (eval > curIterationEval) {
+			//		curIterationLastInfo = info;	
+			//	}
+			//}
 			
-			if (eval <= curIterationEval) {
-				throw new IllegalStateException();
-			}
+			//if (eval <= curIterationEval) {
+			//	throw new IllegalStateException("eval <= curIterationEval");
+			//}
 			
-			curIterationEval = eval;
+			//curIterationEval = eval;
 			betasGen.increaseLower(eval);
 		}
 		
@@ -356,7 +385,11 @@ public class SearchManager {
 		
 		currentdepth++;
 		
-		if (curIterationEval <= prevIterationEval) {
+		//if (curIterationLastInfo != null) {
+		//	throw new IllegalStateException("SearchManager: finishDepth - curIterationLastInfo != null");
+		//}
+		
+		/*if (curIterationEval <= prevIterationEval) {
 			//Sent pv
 			sharedData.getPVs().putPV(hashkey,
 					new PVHistoryEntry(curIterationLastInfo.getPV(), curIterationLastInfo.getDepth(), curIterationLastInfo.getEval()));
@@ -371,11 +404,11 @@ public class SearchManager {
 					mediator.dump(e);
 				}
 			}
-		}
+		}*/
 		
-		prevIterationEval = curIterationEval;
-		curIterationEval = ISearch.MIN;
-		curIterationLastInfo = null;
+		//prevIterationEval = curIterationEval;
+		//curIterationEval = ISearch.MIN;
+		//curIterationLastInfo = null;
 		
 		mediator.startIteration(currentdepth - 1);
 	}

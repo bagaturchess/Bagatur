@@ -14,7 +14,7 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	
 	
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOption("Search [Use TPT scores in PV Nodes]", false, "type check default false"),
+			//new UCIOption("Search [Use TPT scores in PV Nodes]", false, "type check default false"),
 	};
 	
 	
@@ -25,13 +25,13 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	
 	public int extension_CheckInPV 					= PLY;
 	public int extension_SingleReplyInPV 			= PLY;
-	public int extension_WinCapNonPawnInPV 			= 1;
-	public int extension_WinCapPawnInPV 			= 1;
-	public int extension_RecapturePV 				= 1;
-	public int extension_PasserPushPV 				= 1;
-	public int extension_PromotionPV 				= 1;
-	public int extension_MateThreatPV 				= 1;
-	public int extension_MoveEvalPV 				= 1;
+	public int extension_WinCapNonPawnInPV 			= 0;
+	public int extension_WinCapPawnInPV 			= 0;
+	public int extension_RecapturePV 				= 0;
+	public int extension_PasserPushPV 				= 0;
+	public int extension_PromotionPV 				= 0;
+	public int extension_MateThreatPV 				= 0;
+	public int extension_MoveEvalPV 				= 0;
 	public boolean extension_MateLeafPV				= false;
 	
 	public int extension_CheckInNonPV 				= PLY;
@@ -422,8 +422,8 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	public boolean applyOption(UCIOption option) {
 		
 		if ("Search [Use TPT scores in PV Nodes]".equals(option.getName())) {
-			other_UseTPTScoresPV = (Boolean) option.getValue();
-			return true;
+			//other_UseTPTScoresPV = (Boolean) option.getValue();
+			//return true;
 		}
 		
 		return false;

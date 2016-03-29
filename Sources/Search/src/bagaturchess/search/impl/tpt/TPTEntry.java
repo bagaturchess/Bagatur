@@ -138,7 +138,7 @@ public class TPTEntry {
 			
 			if (isExact()) {
 				//System.out.println("PINKO");
-				return;
+				//return;
 			}
 			
 			if (_eval > _alpha && _eval < _beta) {
@@ -194,10 +194,11 @@ public class TPTEntry {
 	}
 	
 	public boolean isExact(int trustWindow) {
-		//return lower >= upper;
-		return Math.abs(lower - upper) <= trustWindow;
+		//return false;
+		return lower >= upper;
+		//return Math.abs(lower - upper) <= trustWindow;
 	}
-
+	
 	public int getLowerBound() {
 		return lower;
 	}

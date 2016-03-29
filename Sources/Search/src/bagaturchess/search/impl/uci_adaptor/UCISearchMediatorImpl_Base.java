@@ -56,8 +56,14 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	private ISearchConfig_MTD searchConfig;
 	
 	
+	private int MTD_TRUST_WINDOW_MIN = 4;
+	private int MTD_TRUST_WINDOW_MAX = 128;
+	private int MTD_TRUST_WINDOW_MULTIPLIER = 2;
+	
+	
 	public UCISearchMediatorImpl_Base(IChannel _channel, Go _go, int _colourToMove, BestMoveSender _sender,
 			TPTable _tpt, ISearchConfig_AB _searchConfig) {
+		
 		channel = _channel;
 		goCommand = _go;
 		colourToMove = _colourToMove;
@@ -124,22 +130,28 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 				
 				int cur_mtdTrustWindow = searchConfig.getMTDTrustWindow();
 				
-				if (lastinfo.getBestMove() == info.getBestMove()) {
-					if (cur_mtdTrustWindow == 0) {
-						cur_mtdTrustWindow = 1;
-					} else {
-						cur_mtdTrustWindow *= 2;
-					}
+				if (cur_mtdTrustWindow < MTD_TRUST_WINDOW_MIN) {
+					cur_mtdTrustWindow = MTD_TRUST_WINDOW_MIN;
 				} else {
-					cur_mtdTrustWindow /= 2;
+				
+					if (lastinfo.getBestMove() == info.getBestMove()) {
+						if (cur_mtdTrustWindow == 0) {
+							//cur_mtdTrustWindow = MTD_TRUST_WINDOW_MIN;
+							throw new IllegalStateException("cur_mtdTrustWindow == 0");
+						} else {
+							cur_mtdTrustWindow *= MTD_TRUST_WINDOW_MULTIPLIER;
+						}
+					} else {
+						cur_mtdTrustWindow /= MTD_TRUST_WINDOW_MULTIPLIER;
+					}
+					
+					if (cur_mtdTrustWindow < 0) {
+						throw new IllegalStateException("cur_mtdTrustWindow=" + cur_mtdTrustWindow);
+					}
 				}
 				
-				if (cur_mtdTrustWindow < 0) {
-					throw new IllegalStateException("cur_mtdTrustWindow=" + cur_mtdTrustWindow);
-				}
-				
-				if (cur_mtdTrustWindow > 32) {
-					cur_mtdTrustWindow = 32;
+				if (cur_mtdTrustWindow > MTD_TRUST_WINDOW_MAX) {
+					cur_mtdTrustWindow = MTD_TRUST_WINDOW_MAX;
 				}
 				
 				searchConfig.setMTDTrustWindow(cur_mtdTrustWindow);
