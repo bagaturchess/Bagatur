@@ -88,4 +88,14 @@ public class SearchMediatorProxy implements ISearchMediator {
 	public void registerInfoObject(ISearchInfo info) {
 		parent.registerInfoObject(info);
 	}
+
+	@Override
+	public int getTrustWindow_BestMove() {
+		return parent.getTrustWindow_BestMove();
+	}
+
+	@Override
+	public int getTrustWindow_AlphaAspiration() {
+		return parent.getTrustWindow_AlphaAspiration();
+	}
 }

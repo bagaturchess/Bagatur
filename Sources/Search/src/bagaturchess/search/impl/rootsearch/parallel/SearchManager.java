@@ -426,7 +426,7 @@ public class SearchManager {
 	}
 	
 	private boolean isLast() {
-		boolean last = betasGen.getLowerBound() + ((ISearchConfig_MTD)sharedData.getEngineConfiguration().getSearchConfig()).getMTDTrustWindow()
+		boolean last = betasGen.getLowerBound() + mediator.getTrustWindow_BestMove()
 						+ (((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount() - 1) >= betasGen.getUpperBound();
 		
 		if (!last) {

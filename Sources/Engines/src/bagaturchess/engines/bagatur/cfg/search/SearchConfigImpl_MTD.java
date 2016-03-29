@@ -20,8 +20,6 @@ public class SearchConfigImpl_MTD extends SearchConfigImpl_AB implements ISearch
 								+ " max " + 100, 1)*/
 	};
 	
-	private int mtdTrustWindow = 0;
-	
 	
 	public SearchConfigImpl_MTD() {
 		
@@ -30,18 +28,6 @@ public class SearchConfigImpl_MTD extends SearchConfigImpl_AB implements ISearch
 	
 	public SearchConfigImpl_MTD(String[] args) {
 		
-	}
-	
-	
-	@Override
-	public void setMTDTrustWindow(int _mtdTrustWindow) {
-		mtdTrustWindow = _mtdTrustWindow;
-	}
-	
-	
-	@Override
-	public int getMTDTrustWindow() {
-		return mtdTrustWindow;
 	}
 	
 	
@@ -67,8 +53,8 @@ public class SearchConfigImpl_MTD extends SearchConfigImpl_AB implements ISearch
 	@Override
 	public boolean applyOption(UCIOption option) {
 		if ("Search [MTD trust window]".equals(option.getName())) {
-			mtdTrustWindow = (int) ((Double) option.getValue()).doubleValue();
-			return true;
+			//mtdTrustWindow = (int) ((Double) option.getValue()).doubleValue();
+			//return true;
 		}
 		
 		return super.applyOption(option);

@@ -84,6 +84,16 @@ public class SearchKineticEval implements IKineticEval {
 			// TODO Auto-generated method stub
 			
 		}
+
+		@Override
+		public int getTrustWindow_BestMove() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getTrustWindow_AlphaAspiration() {
+			throw new UnsupportedOperationException();
+		}
 	};
 	
 	IRootWindow rootWin = new RootWindowImpl();

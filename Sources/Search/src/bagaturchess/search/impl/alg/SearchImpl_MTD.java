@@ -144,7 +144,7 @@ public abstract class SearchImpl_MTD extends SearchImpl {
 		//boolean first_time = true;
 		//int mtdTrustWin = getSearchConfig().getMTDTrustWindow();
 		//System.out.println("getSearchConfig().getMTDTrustWindow()=" + getSearchConfig().getMTDTrustWindow());
-		while (beta_gen.getLowerBound() + getSearchConfig().getMTDTrustWindow() < beta_gen.getUpperBound()) {
+		while (beta_gen.getLowerBound() + mediator.getTrustWindow_BestMove() < beta_gen.getUpperBound()) {
 			
 			beta = beta_gen.genBetas().get(0);
 			

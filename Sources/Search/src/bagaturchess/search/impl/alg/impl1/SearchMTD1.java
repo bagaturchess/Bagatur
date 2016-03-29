@@ -153,7 +153,7 @@ public class SearchMTD1 extends SearchAB1 {
 		
 		
 		//boolean first_time = true;
-		int mtdTrustWin = getSearchConfig().getMTDTrustWindow();
+		int mtdTrustWin = mediator.getTrustWindow_BestMove();
 		while (beta_gen.getLowerBound() + mtdTrustWin < beta_gen.getUpperBound()) {
 			
 			beta = beta_gen.genBetas().get(0);

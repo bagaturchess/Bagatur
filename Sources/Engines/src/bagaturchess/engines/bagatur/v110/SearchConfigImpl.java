@@ -417,17 +417,6 @@ public class SearchConfigImpl implements ISearchConfig_MTD {
 	}
 
 	@Override
-	public void setMTDTrustWindow(int _mtdTrustWindow) {
-		mtdTrustWindow = _mtdTrustWindow;
-	}
-	
-	
-	@Override
-	public int getMTDTrustWindow() {
-		return mtdTrustWindow;
-	}
-
-	@Override
 	public int getTPTUsageDepthCut() {
 		return 0;
 	}

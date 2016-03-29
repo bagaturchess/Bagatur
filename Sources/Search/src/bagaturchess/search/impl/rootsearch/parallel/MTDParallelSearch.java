@@ -77,8 +77,8 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		if (maxIterations > ISearch.MAX_DEPTH) {
 			maxIterations = ISearch.MAX_DEPTH;
 		} else {
-			if (maxIterations < maxIterations + 3) {//Type overflow
-				maxIterations += 3;
+			if (maxIterations < maxIterations + 5) {//Type overflow
+				maxIterations += 5;
 			}
 		}
 		

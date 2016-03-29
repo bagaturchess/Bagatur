@@ -25,8 +25,8 @@ package bagaturchess.search.impl.uci_adaptor;
 
 import java.io.IOException;
 
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.search.api.ISearchConfig_AB;
-import bagaturchess.search.api.ISearchConfig_MTD;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
@@ -53,12 +53,21 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	private String nextMinorLine;
 	private long lastSentMinorInfo_timestamp;
-	private ISearchConfig_MTD searchConfig;
 	
 	
-	private int MTD_TRUST_WINDOW_MIN = 4;
-	private int MTD_TRUST_WINDOW_MAX = 128;
-	private int MTD_TRUST_WINDOW_MULTIPLIER = 2;
+	private int ACCEPTABLE_MOVE_EVAL_PRECISION = 8;
+	
+	private int TRUST_WINDOW_BEST_MOVE_MULTIPLIER = 2;
+	private int TRUST_WINDOW_BEST_MOVE_MIN = ACCEPTABLE_MOVE_EVAL_PRECISION;
+	private int TRUST_WINDOW_BEST_MOVE_MAX = 128;
+	private int trustWindow_BestMove;
+	
+	private int TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 1;
+	private int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 2 * ACCEPTABLE_MOVE_EVAL_PRECISION;
+	private int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = 3333;
+	private int trustWindow_AlphaAspiration;
+	
+	private VarStatistic best_moves_diffs_per_depth;
 	
 	
 	public UCISearchMediatorImpl_Base(IChannel _channel, Go _go, int _colourToMove, BestMoveSender _sender,
@@ -70,12 +79,13 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		sender = _sender;
 		tpt = _tpt;
 		
-		if (_searchConfig instanceof ISearchConfig_MTD) {
-			searchConfig = (ISearchConfig_MTD) _searchConfig;
-			searchConfig.setMTDTrustWindow(0);
-		}
+		trustWindow_BestMove 		= TRUST_WINDOW_BEST_MOVE_MIN;
+		trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MIN;
 		
 		last3infos = new ISearchInfo[3];
+		
+		best_moves_diffs_per_depth = new VarStatistic(false);
+		best_moves_diffs_per_depth.addValue(TRUST_WINDOW_ALPHA_ASPIRATION_MIN, TRUST_WINDOW_ALPHA_ASPIRATION_MIN);
 		
 		startTime = System.currentTimeMillis();
 	}
@@ -125,40 +135,11 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	public void changedMajor(ISearchInfo info) {
 		
-		if (searchConfig != null) {
-			if (lastinfo != null) {
-				
-				int cur_mtdTrustWindow = searchConfig.getMTDTrustWindow();
-				
-				if (cur_mtdTrustWindow < MTD_TRUST_WINDOW_MIN) {
-					cur_mtdTrustWindow = MTD_TRUST_WINDOW_MIN;
-				} else {
-				
-					if (lastinfo.getBestMove() == info.getBestMove()) {
-						if (cur_mtdTrustWindow == 0) {
-							//cur_mtdTrustWindow = MTD_TRUST_WINDOW_MIN;
-							throw new IllegalStateException("cur_mtdTrustWindow == 0");
-						} else {
-							cur_mtdTrustWindow *= MTD_TRUST_WINDOW_MULTIPLIER;
-						}
-					} else {
-						cur_mtdTrustWindow /= MTD_TRUST_WINDOW_MULTIPLIER;
-					}
-					
-					if (cur_mtdTrustWindow < 0) {
-						throw new IllegalStateException("cur_mtdTrustWindow=" + cur_mtdTrustWindow);
-					}
-				}
-				
-				if (cur_mtdTrustWindow > MTD_TRUST_WINDOW_MAX) {
-					cur_mtdTrustWindow = MTD_TRUST_WINDOW_MAX;
-				}
-				
-				searchConfig.setMTDTrustWindow(cur_mtdTrustWindow);
-				
-				channel.dump("MTD Trust window changed to " + searchConfig.getMTDTrustWindow());
-				
-			}
+		if (lastinfo != null) {
+			
+			adjustTrustWindow_BestMove(info);
+			
+			adjustTrustWindow_AlphaAspiration(info);
 		}
 		
 		lastinfo = info;
@@ -167,6 +148,82 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		send(message);
 		
 		stopIfMateIsFound();
+	}
+
+
+	private void adjustTrustWindow_BestMove(ISearchInfo info) {
+		
+		int cur_mtdTrustWindow = trustWindow_BestMove;
+		
+		if (cur_mtdTrustWindow < TRUST_WINDOW_BEST_MOVE_MIN) {
+			cur_mtdTrustWindow = TRUST_WINDOW_BEST_MOVE_MIN;
+		} else {
+			
+			if (lastinfo.getBestMove() == info.getBestMove()) {
+				if (cur_mtdTrustWindow == 0) {
+					//cur_mtdTrustWindow = MTD_TRUST_WINDOW_MIN;
+					throw new IllegalStateException("cur_mtdTrustWindow == 0");
+				} else {
+					cur_mtdTrustWindow *= TRUST_WINDOW_BEST_MOVE_MULTIPLIER;
+				}
+			} else {
+				cur_mtdTrustWindow /= TRUST_WINDOW_BEST_MOVE_MULTIPLIER;
+			}
+			
+			if (cur_mtdTrustWindow < 0) {
+				throw new IllegalStateException("cur_mtdTrustWindow=" + cur_mtdTrustWindow);
+			}
+		}
+		
+		if (cur_mtdTrustWindow > trustWindow_AlphaAspiration) {
+			cur_mtdTrustWindow = trustWindow_AlphaAspiration;
+		}
+		
+		if (cur_mtdTrustWindow > TRUST_WINDOW_BEST_MOVE_MAX) {
+			cur_mtdTrustWindow = TRUST_WINDOW_BEST_MOVE_MAX;
+		}
+		
+		trustWindow_BestMove = cur_mtdTrustWindow;
+		
+		dump("UCISearchMediatorImpl_Base Trust Window Best Move set to " + trustWindow_BestMove);
+	}
+	
+	
+	private void adjustTrustWindow_AlphaAspiration(ISearchInfo info) {
+		
+		int cur_mtdTrustWindow = 0;
+			
+		if (!info.isMateScore()) {
+			
+			int moves_diff = Math.abs(info.getEval() - lastinfo.getEval());
+			if (moves_diff > TRUST_WINDOW_ALPHA_ASPIRATION_MIN) {
+				
+				dump("UCISearchMediatorImpl_Base Trust Window Alpha Aspiration adding moves_diff=" + moves_diff);
+				
+				best_moves_diffs_per_depth.addValue(moves_diff, moves_diff);
+			}
+			
+			cur_mtdTrustWindow = (int) (TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER * (best_moves_diffs_per_depth.getEntropy() + best_moves_diffs_per_depth.getDisperse()));
+			
+		} else {
+			cur_mtdTrustWindow = TRUST_WINDOW_ALPHA_ASPIRATION_MAX;
+		}
+		
+		if (cur_mtdTrustWindow < 0) {
+			throw new IllegalStateException("cur_mtdTrustWindow alpha =" + cur_mtdTrustWindow);
+		}
+		
+		if (cur_mtdTrustWindow < TRUST_WINDOW_ALPHA_ASPIRATION_MIN) {
+			cur_mtdTrustWindow = TRUST_WINDOW_ALPHA_ASPIRATION_MIN;
+		}
+		
+		if (cur_mtdTrustWindow > TRUST_WINDOW_ALPHA_ASPIRATION_MAX) {
+			cur_mtdTrustWindow = TRUST_WINDOW_ALPHA_ASPIRATION_MAX;
+		}
+		
+		trustWindow_AlphaAspiration = cur_mtdTrustWindow;
+		
+		dump("UCISearchMediatorImpl_Base Trust Window Alpha Aspiration set to " + trustWindow_AlphaAspiration);
 	}
 	
 	
@@ -191,6 +248,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	}
 	
 	public void dump(String msg) {
+		//channel.sendLogToGUI(msg);
 		channel.dump(msg);
 	}
 	
@@ -240,5 +298,17 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 				}
 			}
 		}
+	}
+	
+	
+	@Override
+	public int getTrustWindow_BestMove() {
+		return trustWindow_BestMove;
+	}
+	
+	
+	@Override
+	public int getTrustWindow_AlphaAspiration() {
+		return trustWindow_AlphaAspiration;
 	}
 }

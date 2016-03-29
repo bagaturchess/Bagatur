@@ -94,4 +94,16 @@ public class RunAPIMediator implements ISearchMediator {
 	public void startIteration(int iteration) {
 		//Do nothing
 	}
+
+
+	@Override
+	public int getTrustWindow_BestMove() {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public int getTrustWindow_AlphaAspiration() {
+		throw new UnsupportedOperationException();
+	}
 }

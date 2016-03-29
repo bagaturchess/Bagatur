@@ -42,4 +42,7 @@ public interface ISearchMediator {
 	public BestMoveSender getBestMoveSender();
 	
 	public void startIteration(int iteration);
+	
+	public int getTrustWindow_BestMove();
+	public int getTrustWindow_AlphaAspiration();
 }
