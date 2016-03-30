@@ -66,8 +66,8 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	/**
 	 * Static Pruning
 	 */
-	public int pruning_StaticPVIndex 				= 1;
-	public int pruning_StaticNonPVIndex 			= 1;
+	public int pruning_StaticPVIndex 				= 2;
+	public int pruning_StaticNonPVIndex 			= 2;
 	public boolean pruning_NullMove 				= true;
 	public boolean pruning_Razoring 				= false;
 	public boolean prunning_MateDistance 			= true;

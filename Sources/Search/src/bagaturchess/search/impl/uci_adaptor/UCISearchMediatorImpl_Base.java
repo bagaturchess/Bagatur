@@ -55,16 +55,14 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	private long lastSentMinorInfo_timestamp;
 	
 	
-	private int ACCEPTABLE_MOVE_EVAL_PRECISION = 8;
-	
-	private int TRUST_WINDOW_BEST_MOVE_MULTIPLIER = 2;
-	private int TRUST_WINDOW_BEST_MOVE_MIN = ACCEPTABLE_MOVE_EVAL_PRECISION;
-	private int TRUST_WINDOW_BEST_MOVE_MAX = 128;
+	private static int TRUST_WINDOW_BEST_MOVE_MULTIPLIER = 2;
+	private static int TRUST_WINDOW_BEST_MOVE_MIN = 25;
+	private static int TRUST_WINDOW_BEST_MOVE_MAX = 1128;
 	private int trustWindow_BestMove;
 	
-	private int TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 1;
-	private int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 2 * ACCEPTABLE_MOVE_EVAL_PRECISION;
-	private int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = 3333;
+	private static double TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 1;
+	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 0;
+	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = 1128;
 	private int trustWindow_AlphaAspiration;
 	
 	private VarStatistic best_moves_diffs_per_depth;
@@ -175,9 +173,9 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 			}
 		}
 		
-		if (cur_mtdTrustWindow > trustWindow_AlphaAspiration) {
+		/*if (cur_mtdTrustWindow > trustWindow_AlphaAspiration) {
 			cur_mtdTrustWindow = trustWindow_AlphaAspiration;
-		}
+		}*/
 		
 		if (cur_mtdTrustWindow > TRUST_WINDOW_BEST_MOVE_MAX) {
 			cur_mtdTrustWindow = TRUST_WINDOW_BEST_MOVE_MAX;
@@ -196,14 +194,15 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		if (!info.isMateScore()) {
 			
 			int moves_diff = Math.abs(info.getEval() - lastinfo.getEval());
-			if (moves_diff > TRUST_WINDOW_ALPHA_ASPIRATION_MIN) {
+			if (moves_diff > TRUST_WINDOW_ALPHA_ASPIRATION_MIN
+					&& moves_diff > best_moves_diffs_per_depth.getEntropy()) {
 				
 				dump("UCISearchMediatorImpl_Base Trust Window Alpha Aspiration adding moves_diff=" + moves_diff);
 				
 				best_moves_diffs_per_depth.addValue(moves_diff, moves_diff);
 			}
 			
-			cur_mtdTrustWindow = (int) (TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER * (best_moves_diffs_per_depth.getEntropy() + best_moves_diffs_per_depth.getDisperse()));
+			cur_mtdTrustWindow = (int) (TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER * (best_moves_diffs_per_depth.getEntropy() /*+ best_moves_diffs_per_depth.getDisperse()*/));
 			
 		} else {
 			cur_mtdTrustWindow = TRUST_WINDOW_ALPHA_ASPIRATION_MAX;

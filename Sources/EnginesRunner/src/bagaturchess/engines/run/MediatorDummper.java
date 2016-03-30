@@ -175,11 +175,11 @@ public class MediatorDummper implements ISearchMediator {
 
 	@Override
 	public int getTrustWindow_BestMove() {
-		throw new UnsupportedOperationException();
+		return 32;
 	}
 
 	@Override
 	public int getTrustWindow_AlphaAspiration() {
-		throw new UnsupportedOperationException();
+		return 1024;
 	}
 }

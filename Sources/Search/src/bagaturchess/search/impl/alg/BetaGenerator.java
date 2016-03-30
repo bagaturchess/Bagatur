@@ -123,70 +123,6 @@ public class BetaGenerator implements IBetaGenerator {
 			return betas;
 		}*/
 		
-		/*if (SearchUtils.isMateVal(lastVal)) {
-			if (DUMP) System.out.println("MATE value");
-			
-			if (lower_bound == lastVal) {
-				int depth = SearchUtils.getMateDepth(lastVal);
-				if (DUMP) System.out.println("(lower) MATE depth " + depth);
-				
-				int new_val = -1;
-				if (depth < 0) {
-					depth = -depth;
-					new_val = -SearchUtils.getMateVal(depth - 1);
-				} else if (depth > 0) {
-					new_val = SearchUtils.getMateVal(depth - 1);
-				} else {
-					throw new IllegalStateException();
-				}
-
-				if (DUMP) System.out.println("MATE new value  " + new_val);
-				betas.add(new_val);
-				if (DUMP) System.out.println(betas);
-				return betas;
-				
-			} else if (upper_bound == lastVal) {
-				int depth = SearchUtils.getMateDepth(lastVal);
-				if (DUMP) System.out.println("(upper) MATE depth " + depth);
-				
-				int new_val = -1;
-				if (depth < 0) {
-					depth = -depth;
-					new_val = -SearchUtils.getMateVal(depth + 1);
-				} else if (depth > 0) {
-					new_val = SearchUtils.getMateVal(depth + 1);
-				} else {
-					throw new IllegalStateException();
-				}
-				
-				if (DUMP) System.out.println("MATE new value  " + new_val);
-				betas.add(new_val);
-				if (DUMP) System.out.println(betas);
-				return betas;
-				
-			} else {
-				//throw new IllegalStateException("lastVal=" + lastVal + ", lower_bound=" + lower_bound + ", upper_bound=" + upper_bound);
-				
-				int depth = SearchUtils.getMateDepth(lastVal);
-				if (DUMP) System.out.println("(upper1) MATE depth " + depth);
-				
-				int new_val = -1;
-				if (depth < 0) {
-					depth = -depth;
-					new_val = -SearchUtils.getMateVal(depth + 1);
-				} else if (depth > 0) {
-					new_val = SearchUtils.getMateVal(depth + 1);
-				} else {
-					throw new IllegalStateException();
-				}
-				
-				if (DUMP) System.out.println("MATE new value  " + new_val);
-				betas.add(new_val);
-				if (DUMP) System.out.println(betas);
-				return betas;
-			}
-		}
-		*/
 		
 		int max_interval = betasCount * trend_multiplier * initial_interval;
 		
@@ -196,7 +132,7 @@ public class BetaGenerator implements IBetaGenerator {
 		
 		if (max_interval >= upper_bound - lower_bound) {
 			
-			if (DUMP) System.out.println("WIN will be used");
+			if (DUMP) System.out.println("WINDOWS will be used");
 			
 			//throw new IllegalStateException("max_interval=" + max_interval + ", win=" + (upper_bound - lower_bound));
 			int win = (upper_bound - lower_bound) / (betasCount + 1);
