@@ -120,4 +120,10 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 		}		
 		return threads;
 	}
+
+
+	@Override
+	public int getHiddenDepth() {
+		throw new UnsupportedOperationException();
+	}
 }
