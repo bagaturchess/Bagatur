@@ -26,5 +26,5 @@ package bagaturchess.search.api;
 public interface IRootSearchConfig_SMP extends IRootSearchConfig_Single {
 
 	public int getThreadsCount();
-	
+	public int getHiddenDepth();
 }

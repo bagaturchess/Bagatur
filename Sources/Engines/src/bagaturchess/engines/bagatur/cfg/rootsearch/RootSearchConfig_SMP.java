@@ -17,10 +17,12 @@ public class RootSearchConfig_SMP extends RootSearchConfig_BaseImpl implements I
 								"type spin default " + getDefaultThreadsCount()
 											+ " min " + 1
 											+ " max " + 10 * getDefaultThreadsCount(), 1),
+			new UCIOptionSpin("Hidden Depth", 0d, "type spin default 0 min 0 max 10", 1),
 	};
 	
 	
 	private int currentThreadsCount = getDefaultThreadsCount();
+	private int hiddenDepth = 0;
 	
 	
 	public RootSearchConfig_SMP() {
@@ -35,6 +37,12 @@ public class RootSearchConfig_SMP extends RootSearchConfig_BaseImpl implements I
 	@Override
 	public int getThreadsCount() {
 		return currentThreadsCount;
+	}
+	
+	
+	@Override
+	public int getHiddenDepth() {
+		return hiddenDepth;
 	}
 	
 	
@@ -55,6 +63,9 @@ public class RootSearchConfig_SMP extends RootSearchConfig_BaseImpl implements I
 	public boolean applyOption(UCIOption option) {
 		if ("Search SMP [Threads count]".equals(option.getName())) {
 			currentThreadsCount = (int) ((Double) option.getValue()).doubleValue();
+			return true;
+		} else if ("Hidden Depth".equals(option.getName())) {
+			hiddenDepth = (int) ((Double) option.getValue()).doubleValue();
 			return true;
 		}
 		
