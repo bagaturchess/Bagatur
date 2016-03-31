@@ -16,10 +16,12 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 								"type spin default " + getDefaultThreadsCount()
 											+ " min " + 1
 											+ " max " + 10 * getDefaultThreadsCount(), 1),
+			new UCIOptionSpin("Hidden Depth", 0d, "type spin default 0 min 0 max 10", 1),
 	};
 	
 	
 	private int currentThreadsCount = getDefaultThreadsCount();
+	private int hiddenDepth = 0;
 	
 	protected double SMP_MEM_USAGE_TPT;
 	protected double SMP_MEM_USAGE_GTB;
@@ -67,6 +69,12 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	
 	
 	@Override
+	public int getHiddenDepth() {
+		return hiddenDepth;
+	}
+	
+	
+	@Override
 	public double getTPTUsagePercent() {
 		return SMP_MEM_USAGE_TPT;
 	}
@@ -107,6 +115,9 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 			currentThreadsCount = (int) ((Double) option.getValue()).doubleValue();
 			calcMemoryUsagePercents();
 			return true;
+		} else if ("Hidden Depth".equals(option.getName())) {
+			hiddenDepth = (int) ((Double) option.getValue()).doubleValue();
+			return true;
 		}
 		
 		return super.applyOption(option);
@@ -119,11 +130,5 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 			threads = 2;
 		}		
 		return threads;
-	}
-
-
-	@Override
-	public int getHiddenDepth() {
-		throw new UnsupportedOperationException();
 	}
 }
