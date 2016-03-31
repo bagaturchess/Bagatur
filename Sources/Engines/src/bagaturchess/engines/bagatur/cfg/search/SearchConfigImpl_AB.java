@@ -24,7 +24,7 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	private int dynamicExt_UpdateInterval			= 1000;
 	
 	public int extension_CheckInPV 					= PLY;
-	public int extension_SingleReplyInPV 			= PLY;
+	public int extension_SingleReplyInPV 			= 0;
 	public int extension_WinCapNonPawnInPV 			= 0;
 	public int extension_WinCapPawnInPV 			= 0;
 	public int extension_RecapturePV 				= 0;
@@ -35,7 +35,7 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	public boolean extension_MateLeafPV				= false;
 	
 	public int extension_CheckInNonPV 				= PLY;
-	public int extension_SingleReplyInNonPV 		= PLY;
+	public int extension_SingleReplyInNonPV 		= 0;
 	public int extension_WinCapNonPawnInNonPV 		= 0;
 	public int extension_WinCapPawnInNonPV 			= 0;
 	public int extension_RecaptureNonPV 			= 0;
@@ -66,8 +66,8 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	/**
 	 * Static Pruning
 	 */
-	public int pruning_StaticPVIndex 				= 2;
-	public int pruning_StaticNonPVIndex 			= 2;
+	public int pruning_StaticPVIndex 				= 1;
+	public int pruning_StaticNonPVIndex 			= 1;
 	public boolean pruning_NullMove 				= true;
 	public boolean pruning_Razoring 				= false;
 	public boolean prunning_MateDistance 			= true;

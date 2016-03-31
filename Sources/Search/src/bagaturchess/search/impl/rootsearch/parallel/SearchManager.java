@@ -217,10 +217,10 @@ public class SearchManager {
 		//System.out.println("nextBeta: " + betas);
 		
 		if (betas.size() == 0) {
-
+			
 			//TODO: Consider
 			//int beta_fix = betasGen.getLowerBound() + (betasGen.getUpperBound() - betasGen.getLowerBound()) / 2;
-
+			
 			mediator.dump("Search instability with distribution: " + this);
 			
 			/*mediator.dump("THREAD DUMP 1");
@@ -232,7 +232,7 @@ public class SearchManager {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
+			
 			mediator.dump("THREAD DUMP 2");
 			dumpStacks();
 			*/
@@ -304,6 +304,23 @@ public class SearchManager {
 			
 			//curIterationEval = eval;
 			betasGen.increaseLower(eval);
+		} else if (eval == betasGen.getLowerBound()) {
+			
+			mediator.dump("Search instability in increaseLowerBound with distribution: " + this + ". Lower bound moved to " + (eval + 1));
+			
+			sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval() + 1));
+			if (mediator != null) {
+				//info.setSearchedNodes(nodes);
+				mediator.changedMajor(info);
+				
+				try {
+					testPV(info, bitboardForTesting);
+				} catch (Exception e) {
+					mediator.dump(e);
+				}
+			}
+			
+			betasGen.increaseLower(eval + 1);
 		}
 		
 		if (isLast()) {
@@ -327,6 +344,9 @@ public class SearchManager {
 		
 		if (eval < betasGen.getUpperBound()) {
 			betasGen.decreaseUpper(eval);
+		} else if (eval == betasGen.getUpperBound()) {
+			mediator.dump("Search instability in decreaseUpperBound with distribution: " + this + ". Upper bound moved to " + (eval - 1));
+			betasGen.decreaseUpper(eval - 1);
 		}
 		
 		if (isLast()) {
@@ -426,8 +446,10 @@ public class SearchManager {
 	}
 	
 	private boolean isLast() {
-		boolean last = betasGen.getLowerBound() + mediator.getTrustWindow_BestMove() >= betasGen.getUpperBound();
-		
+		//boolean last = betasGen.getLowerBound() + mediator.getTrustWindow_BestMove() >= betasGen.getUpperBound();
+		boolean last = betasGen.getLowerBound() + mediator.getTrustWindow_BestMove()
+				+ (((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount() - 1) >= betasGen.getUpperBound();
+				
 		if (!last) {
 			if (betasGen.getLowerBound() >= ISearch.MAX_MAT_INTERVAL
 					&& SearchUtils.isMateVal(betasGen.getLowerBound())

@@ -50,6 +50,8 @@ public class BetaGenerator2 implements IBetaGenerator {
 	private int initial_interval;
 	private int lastVal;
 	
+	private int aspiration_window = 25; 
+	
 	
 	public BetaGenerator2(int _initialVal, int _betasCount, int _initial_interval) {
 		lower_bound = ISearch.MIN;
@@ -191,39 +193,16 @@ public class BetaGenerator2 implements IBetaGenerator {
 		}
 		*/
 		
-		int max_interval = betasCount * trend_multiplier * initial_interval;
-		
-		if (max_interval < 0) {
-			throw new IllegalStateException("max_interval=" + max_interval);
-		}
-		
-		if (max_interval >= upper_bound - lower_bound) {
+		if (lower_bound != ISearch.MIN && upper_bound != ISearch.MAX) {
 			
 			if (DUMP) System.out.println("WINDOWS will be used");
 			
-			//throw new IllegalStateException("max_interval=" + max_interval + ", win=" + (upper_bound - lower_bound));
-			int win = (upper_bound - lower_bound) / (betasCount + 1);
-			if (win <= 0) {
-				for (int i=lower_bound + 1; i<=upper_bound; i++) {
-					betas.add(i);
-				}
-				//System.out.println("pinko lastVal=" + lastVal);
-				//throw new IllegalStateException("win=" + win + " (upper_bound - lower_bound)=" + (upper_bound - lower_bound) );
-				//win = 1;
-			} else {
-				if (trend == TREND_UP) {
-					for (int i=1; i<= betasCount; i++) {
-						int beta = lastVal + i * win;
-						betas.add(beta);
-					}
-				} else {
-					for (int i=1; i<= betasCount; i++) {
-						int beta = lastVal - i * win;
-						betas.add(beta);
-					}
-				}
+			for (int i=1; i<= betasCount; i++) {
+				betas.add(lower_bound + Math.abs(upper_bound - lower_bound) / 2 + 1);
 			}
+			
 		} else {
+			
 			if (DUMP) System.out.println("INTERVAL will be used");
 			
 			if (firstTime) {
@@ -231,20 +210,18 @@ public class BetaGenerator2 implements IBetaGenerator {
 				if (DUMP) System.out.println("FIRST time");
 				
 				for (int i=1; i<= betasCount; i++) {
-					betas.add(lastVal);
+					betas.add(lastVal + aspiration_window);
 				}
 				
 			} else {
-			
+				
 				if (trend == TREND_UP) {
 					for (int i=1; i<= betasCount; i++) {
-						//int beta = lastVal + i * trend_multiplier * initial_interval;
-						betas.add(lastVal + trend_multiplier);
+						betas.add(lastVal + aspiration_window + trend_multiplier);
 						if (DUMP) System.out.println("lastVal = " + lastVal + " i=" + i + " trend_multiplier=" + trend_multiplier);
 					}
 				} else {
 					for (int i=1; i<= betasCount; i++) {
-						//int beta = lastVal - i * trend_multiplier * initial_interval;
 						betas.add(lastVal - trend_multiplier);
 						if (DUMP) System.out.println("lastVal = " + lastVal + " i=" + i + " trend_multiplier=" + trend_multiplier);
 					}

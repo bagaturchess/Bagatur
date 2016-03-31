@@ -134,6 +134,10 @@ public class BetaGenerator implements IBetaGenerator {
 			
 			if (DUMP) System.out.println("WINDOWS will be used");
 			
+			//info string Search instability with distribution: DISTRIBUTION-> Depth:8, Bounds: [-24 <-> -8], ThreadsCount:2, BETAS: []
+			//info string Betagen obj: [-24, -8]	trend=1, trend_multiplier=1, lastVal=-24
+			//info string The new betas are:[2, 2]
+							
 			//throw new IllegalStateException("max_interval=" + max_interval + ", win=" + (upper_bound - lower_bound));
 			int win = (upper_bound - lower_bound) / (betasCount + 1);
 			if (win <= 0) {
