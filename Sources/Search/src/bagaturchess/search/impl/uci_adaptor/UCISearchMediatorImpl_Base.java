@@ -61,7 +61,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	private int trustWindow_BestMove;
 	
 	private static double TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 1;
-	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 0;
+	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 33;
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = 1128;
 	private int trustWindow_AlphaAspiration;
 	
@@ -86,6 +86,11 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		best_moves_diffs_per_depth.addValue(TRUST_WINDOW_ALPHA_ASPIRATION_MIN, TRUST_WINDOW_ALPHA_ASPIRATION_MIN);
 		
 		startTime = System.currentTimeMillis();
+	}
+	
+	
+	protected TPTable getTPTable() {
+		return tpt;
 	}
 	
 	
@@ -142,7 +147,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		
 		lastinfo = info;
 		
-		String message = SearchInfoUtils.buildMajorInfoCommand(info, getStartTime(), (tpt != null) ? tpt.getUsage() : -1);
+		String message = SearchInfoUtils.buildMajorInfoCommand(info, getStartTime(), (tpt != null) ? tpt.getUsage() : -1, tpt.getCount_UniqueInserts());
 		send(message);
 		
 		stopIfMateIsFound();
@@ -227,7 +232,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	
 	public void changedMinor(ISearchInfo info) {
-		nextMinorLine = SearchInfoUtils.buildMinorInfoCommand(info, getStartTime(), (tpt != null) ? tpt.getUsage() : -1);
+		nextMinorLine = SearchInfoUtils.buildMinorInfoCommand(info, getStartTime(), (tpt != null) ? tpt.getUsage() : -1, tpt.getCount_UniqueInserts());
 		if (nextMinorLine != null) {
 			long timestamp = System.currentTimeMillis();
 			if (timestamp > lastSentMinorInfo_timestamp + 1000 /*Update UI, once per second*/) {

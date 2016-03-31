@@ -33,10 +33,21 @@ import bagaturchess.search.impl.utils.SearchUtils;
 public class TPTable extends LRUMapLongObject<TPTEntry> {
 	
 	
+	private long count_unique_inserts = 0;
+	
+	
 	public TPTable(int _maxSize, boolean fillWithDummyEntries, IBinarySemaphore _semaphore) {
 		super(new TPTEntryFactory(), _maxSize, fillWithDummyEntries, _semaphore);
 	}
 	
+	
+	public long getCount_UniqueInserts() {
+		return count_unique_inserts;
+	}
+	
+	public void clearCount_UniqueInserts() {
+		count_unique_inserts = 0;
+	}
 	
 	/*public void obsoleteAll() {
 		long[] keys = map.getAllKeys();
@@ -102,6 +113,7 @@ public class TPTable extends LRUMapLongObject<TPTEntry> {
 		} else {
 			entry = associateEntry(hashkey);
 			entry.init(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, movenumber);
+			count_unique_inserts++;
 		}
 		
 		return entry;

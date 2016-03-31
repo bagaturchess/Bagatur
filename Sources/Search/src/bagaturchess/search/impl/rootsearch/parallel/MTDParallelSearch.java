@@ -82,6 +82,8 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 			}
 		}
 		
+		getSharedData().getTPT().clearCount_UniqueInserts();
+		
 		//if (DEBUGSearch.DEBUG_MODE) searchers.dumpSearchers(mediator); // Too much logs
 		
 		searchers.newSearch();
