@@ -32,7 +32,7 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	public int extension_PromotionPV 				= 0;
 	public int extension_MateThreatPV 				= 0;
 	public int extension_MoveEvalPV 				= 0;
-	public boolean extension_MateLeafPV				= false;
+	public boolean extension_MateLeafPV 			= false;
 	
 	public int extension_CheckInNonPV 				= PLY;
 	public int extension_SingleReplyInNonPV 		= 0;
@@ -42,7 +42,7 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	public int extension_PasserPushNonPV 			= 0;
 	public int extension_PromotionNonPV 			= 0;
 	public int extension_MateThreatNonPV			= 0;
-	public int extension_MoveEvalNonPV 				= 0;
+	public int extension_MoveEvalNonPV				= 0;
 	public boolean extension_MateLeafNonPV			= false;
 	
 	

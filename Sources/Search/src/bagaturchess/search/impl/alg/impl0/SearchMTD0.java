@@ -227,7 +227,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	}*/
 	
 	
-	protected int new_maxdepth_pv(int colourToMove, int maxdepth, int move, boolean inCheck, boolean singleMove, int see, boolean passerPush, int move_eval,
+	protected int new_maxdepth_pv(int colourToMove, int maxdepth, int rest, int move, boolean inCheck, boolean singleMove, int see, boolean passerPush, int move_eval,
 			int oldMaterialGain, int newMaterialGain, boolean mateThreat) {
 		int extend = 0;
 		
@@ -282,11 +282,18 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			extStat.pv_SingleMove++;
 		}
 		
-		return maxdepth + Math.min(PLY, extend) + (singleMove ? getEnv().getExtensions().getSingleReplyPV(colourToMove).calc(EXT_SINGLE_REPLY_PV) : 0);
+		double depth_delimiter = rest / (double) normDepth(maxdepth);
+		if (depth_delimiter < 0 || depth_delimiter > 1) {
+			throw new IllegalStateException("depth_delimiter=" + depth_delimiter);
+		}
+		
+		//System.out.println("depth_delimiter=" + depth_delimiter);
+		
+		return (int) (maxdepth + Math.min(PLY, extend) + depth_delimiter * ((singleMove ? getEnv().getExtensions().getSingleReplyPV(colourToMove).calc(EXT_SINGLE_REPLY_PV) : 0)));
 		//return maxdepth + Math.min(2 * PLY, extend + (singleMove ? getEnv().getExtensions().getSingleReplyPV().calc(EXT_SINGLE_REPLY_PV) : 0));
 	}
 	
-	protected int new_maxdepth_nullwin(int colourToMove, int maxdepth, int move, boolean inCheck, boolean singleMove, int see,
+	protected int new_maxdepth_nullwin(int colourToMove, int maxdepth, int rest, int move, boolean inCheck, boolean singleMove, int see,
 			boolean mateThreat, boolean passerPush, int move_eval, int oldMaterialGain, int newMaterialGain) {
 		
 		int extend = 0;
@@ -342,7 +349,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			extStat.nonpv_SingleMove++;
 		}
 		
-		return maxdepth + Math.min(PLY, extend) + (singleMove ? getEnv().getExtensions().getSingleReplyNonPV(colourToMove).calc(EXT_SINGLE_REPLY_NONPV) : 0);
+		double depth_delimiter = rest / (double) normDepth(maxdepth);
+		if (depth_delimiter < 0 || depth_delimiter > 1) {
+			throw new IllegalStateException("depth_delimiter=" + depth_delimiter);
+		}
+		
+		return (int) (maxdepth + Math.min(PLY, extend) + depth_delimiter * ( (singleMove ? getEnv().getExtensions().getSingleReplyNonPV(colourToMove).calc(EXT_SINGLE_REPLY_NONPV) : 0)));
 		//return maxdepth + Math.min(2 * PLY, extend + (singleMove ? getEnv().getExtensions().getSingleReplyNonPV().calc(EXT_SINGLE_REPLY_NONPV) : 0));
 	}
 	
@@ -412,9 +424,11 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		return (int) Math.max(1, Math.sqrt(list.size()) / (double)2);
 	}
 	
+	
 	private int getLMR2(ISearchMoveList list) {
 		return (int) Math.max(1, 2 * getLMR1(list));
 	}
+	
 	
 	@Override
 	public int pv_search(ISearchMediator mediator, IRootWindow rootWin,
@@ -733,8 +747,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		
 		if (useStaticPrunning
-				&& !isMateVal(alpha_org)
-				&& !isMateVal(beta)
+				//&& !isMateVal(alpha_org)
+				//&& !isMateVal(beta)
 				//&& rest <= normDepth(maxdepth) / 2
 				
 				) {
@@ -1062,7 +1076,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				
 				int new_maxdepth = maxdepth;
 				if (depth > 0 && !disableExts) {
-					new_maxdepth = new_maxdepth_pv(colourToMove, maxdepth, cur_move, inCheck, singleMove, moveSee, passerPush, move_eval, materialGain, new_materialGain, mateThreat);
+					new_maxdepth = new_maxdepth_pv(colourToMove, maxdepth, rest, cur_move, inCheck, singleMove, moveSee, passerPush, move_eval, materialGain, new_materialGain, mateThreat);
 				}
 				
 				//int barrier_1 = isCapOrProm ? 0 : evals.getTop2Eval(colourToMove, isCapOrProm, true);
@@ -1080,9 +1094,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					int lmrReduction = 0;
 					boolean staticPrunning = false;
 					
-					if (!isMateVal(alpha_org)
-							&& !isMateVal(beta)
-							 && !inCheck
+					if (//!isMateVal(alpha_org)
+							//&& !isMateVal(beta)
+							 !inCheck
 							 && !isCheckMove
 							 //&& !mateThreat
 							 //&& !isCapOrProm
@@ -1144,7 +1158,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					
 					if (isPVNode(cur_eval, best_eval, alpha, beta)) {
 						
-						cur_eval = -pv_search(mediator, rootWin, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha,
+						cur_eval = -pv_search(mediator, rootWin, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -(beta - 1),
 								best_move, prevbest, prevPV, false, -new_evalgain, rootColour,
 								totalLMReduction, -new_materialGain, inNullMove, new_mateMove, useMateDistancePrunning, false, false);
 					}
@@ -1486,8 +1500,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		
 		if (useStaticPrunning
-				&& !isMateVal(alpha_org)
-				&& !isMateVal(beta)
+				//&& !isMateVal(alpha_org)
+				//&& !isMateVal(beta)
 				//&& rest <= normDepth(maxdepth) / 2
 				
 				) {
@@ -1781,7 +1795,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				
 				int new_maxdepth = maxdepth;
 				if (depth > 0 && !disableExts) {
-					new_maxdepth = new_maxdepth_nullwin(colourToMove, maxdepth, cur_move, inCheck, singleMove, moveSee, mateThreat, passerPush, move_eval, materialGain, new_materialGain);
+					new_maxdepth = new_maxdepth_nullwin(colourToMove, maxdepth, rest, cur_move, inCheck, singleMove, moveSee, mateThreat, passerPush, move_eval, materialGain, new_materialGain);
 				}
 				
 				int cur_eval = 0;
@@ -1795,9 +1809,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						int lmrReduction = 0;
 						boolean staticPrunning = false;
 						
-						if (!isMateVal(alpha_org)
-							 && !isMateVal(beta)
-							 && !inCheck
+						if (//!isMateVal(alpha_org)
+							 //&& !isMateVal(beta)
+							 !inCheck
 							 && !isCheckMove
 							 //&& !mateThreat
 							 //&& !isCapOrProm
