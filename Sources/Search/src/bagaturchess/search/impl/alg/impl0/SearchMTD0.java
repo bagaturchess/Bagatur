@@ -282,14 +282,18 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			extStat.pv_SingleMove++;
 		}
 		
-		double depth_delimiter = rest / (double) normDepth(maxdepth);
-		if (depth_delimiter < 0 || depth_delimiter > 1) {
-			throw new IllegalStateException("depth_delimiter=" + depth_delimiter);
+		double depth_delimiter = 1;
+		if (!inCheck && !singleMove) {
+			depth_delimiter = rest / (double) normDepth(maxdepth);
+			if (depth_delimiter < 0 || depth_delimiter > 1) {
+				throw new IllegalStateException("depth_delimiter=" + depth_delimiter);
+			}
 		}
+
 		
 		//System.out.println("depth_delimiter=" + depth_delimiter);
 		
-		return (int) (maxdepth + Math.min(PLY, extend) + depth_delimiter * ((singleMove ? getEnv().getExtensions().getSingleReplyPV(colourToMove).calc(EXT_SINGLE_REPLY_PV) : 0)));
+		return (int) (maxdepth + depth_delimiter * (Math.min(PLY, extend) + (singleMove ? getEnv().getExtensions().getSingleReplyPV(colourToMove).calc(EXT_SINGLE_REPLY_PV) : 0)));
 		//return maxdepth + Math.min(2 * PLY, extend + (singleMove ? getEnv().getExtensions().getSingleReplyPV().calc(EXT_SINGLE_REPLY_PV) : 0));
 	}
 	
@@ -349,12 +353,15 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			extStat.nonpv_SingleMove++;
 		}
 		
-		double depth_delimiter = rest / (double) normDepth(maxdepth);
-		if (depth_delimiter < 0 || depth_delimiter > 1) {
-			throw new IllegalStateException("depth_delimiter=" + depth_delimiter);
+		double depth_delimiter = 1;
+		if (!inCheck && !singleMove) {
+			depth_delimiter = rest / (double) normDepth(maxdepth);
+			if (depth_delimiter < 0 || depth_delimiter > 1) {
+				throw new IllegalStateException("depth_delimiter=" + depth_delimiter);
+			}
 		}
 		
-		return (int) (maxdepth + Math.min(PLY, extend) + depth_delimiter * ( (singleMove ? getEnv().getExtensions().getSingleReplyNonPV(colourToMove).calc(EXT_SINGLE_REPLY_NONPV) : 0)));
+		return (int) (maxdepth + depth_delimiter * (Math.min(PLY, extend) + (singleMove ? getEnv().getExtensions().getSingleReplyNonPV(colourToMove).calc(EXT_SINGLE_REPLY_NONPV) : 0)));
 		//return maxdepth + Math.min(2 * PLY, extend + (singleMove ? getEnv().getExtensions().getSingleReplyNonPV().calc(EXT_SINGLE_REPLY_NONPV) : 0));
 	}
 	
@@ -421,7 +428,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	
 	
 	private int getLMR1(ISearchMoveList list) {
-		return (int) Math.max(1, Math.sqrt(list.size()) / (double)2);
+		return (int) Math.max(1, Math.sqrt(list.size()) / (double) 3);
 	}
 	
 	
@@ -747,10 +754,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		
 		if (useStaticPrunning
-				//&& !isMateVal(alpha_org)
-				//&& !isMateVal(beta)
-				//&& rest <= normDepth(maxdepth) / 2
-				
 				) {
 				
 				if (inCheck) {
@@ -765,34 +768,32 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						node.nullmove = false;
 						
 						node.bestmove = 0;
-						/*env.getTPT().lock();
+						env.getTPT().lock();
 						buff_tpt_depthtracking[0] = 0;
 						extractFromTPT(info, rest, node, true, buff_tpt_depthtracking);
 						env.getTPT().unlock();
-						*/
+						
 						
 						return node.eval;
 					}
 				}
 				
 				
-				//if (rest <= normDepth(maxdepth) / 4){
+				if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
+					
+					staticEval = fullEval(depth, alpha_org, beta, rootColour);
+					
 					if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
-						
-						staticEval = fullEval(depth, alpha_org, beta, rootColour);
-						
-						if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
-			                int qeval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, staticEval, true, rootColour);
-							if (alpha_org > qeval + optimisticPositionEval(mediator, rest) ) {
-								node.bestmove = 0;
-								node.eval = qeval;
-								node.leaf = true;
-								node.nullmove = false;
-								return node.eval;
-							}
+		                int qeval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, staticEval, true, rootColour);
+						if (alpha_org > qeval + optimisticPositionEval(mediator, rest) ) {
+							node.bestmove = 0;
+							node.eval = qeval;
+							node.leaf = true;
+							node.nullmove = false;
+							return node.eval;
 						}
 					}
-				//}
+				}
 		}
 				
 				
@@ -969,7 +970,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		
-		
 		node.bestmove = 0;
 		node.eval = MIN;
 		node.nullmove = false;
@@ -1104,6 +1104,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							 //&& moveSee < 0
 							 //&& !passerPush
 							 //&& maxdepth == new_maxdepth
+							 //&& (REDUCE_HISTORY_MOVES || env.getHistory_all().getGoodMoveScores(cur_move) < 0.5)
 							 //&& (!env.getHistory_all().isGoodMove(cur_move) || REDUCE_HISTORY_MOVES)
 							 //&& !isDangerous
 							 //&& totalLMReduction < maxdepth / 2
@@ -1212,11 +1213,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						}
 					}
 					
-					if (best_eval > alpha) {
-						alpha = best_eval; 
-						//pvNode = true;
-					}
-					
 					if (best_eval >= beta) {
 						
 						if (tpt_move == best_move) {
@@ -1234,6 +1230,11 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						}
 						
 						break;
+					}
+					
+					if (best_eval > alpha) {
+						//alpha = best_eval; 
+						throw new IllegalStateException();
 					}
 				}
 				
@@ -1500,10 +1501,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		
 		if (useStaticPrunning
-				//&& !isMateVal(alpha_org)
-				//&& !isMateVal(beta)
-				//&& rest <= normDepth(maxdepth) / 2
-				
 				) {
 				
 				if (inCheck) {
@@ -1516,19 +1513,17 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					}
 				}
 				
-				//if (rest <= normDepth(maxdepth) / 4){
+				if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
+					
+					staticEval = lazyEval(depth, beta - 1, beta, rootColour);
+					
 					if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
-						
-						staticEval = lazyEval(depth, beta - 1, beta, rootColour);
-						
-						if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
-							int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, staticEval, true, rootColour);
-							if (alpha_org > qeval + optimisticPositionEval(mediator, rest) ) {
-								return qeval;
-							}
+						int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, staticEval, true, rootColour);
+						if (alpha_org > qeval + optimisticPositionEval(mediator, rest) ) {
+							return qeval;
 						}
 					}
-				//}
+				}
 		}
 		
 		
@@ -1900,7 +1895,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						break;
 					}
 					
-					if (best_eval > beta - 1) {
+					if (best_eval > alpha_org) {
 						throw new IllegalStateException(); 
 					}
 				}
@@ -2051,14 +2046,16 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				return node.eval;
 			}
 			
+			
 			if (!isMateVal(alpha_org)
 					&& staticEval + env.getEval().getMaterialQueen() + 100 < alpha_org) {
 				node.eval = staticEval;
 				return node.eval;
 			}
 			
+			
 			if (staticEval > alpha_org) {
-				alpha_org = staticEval;
+				throw new IllegalStateException();
 			}
 		}
 
@@ -2189,20 +2186,17 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				env.getBitboard().makeMoveBackward(cur_move);
 				
 				if (cur_eval > best_eval) {
-				//if ((inCheck && cur_eval > best_eval) || (!inCheck && cur_eval > alpha)) {
+					
 					best_eval = cur_eval;
 					best_move = cur_move;
 					
-					if (best_eval > alpha) {
-						
-						node.bestmove = best_move;
-						node.eval = best_eval;
-						node.leaf = false;
-						if (depth + 1 < MAX_DEPTH) {
-							pvman.store(depth + 1, node, pvman.load(depth + 1), true);
-						}
-						
-						alpha = best_eval;
+					node.bestmove = best_move;
+					node.eval = best_eval;
+					node.leaf = false;
+					node.nullmove = false;
+					
+					if (depth + 1 < MAX_DEPTH) {
+						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
 					}
 					
 					if (best_eval >= beta) {
@@ -2213,6 +2207,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						}
 						
 						break;
+					}
+					
+					if (best_eval > alpha) {
+						throw new IllegalStateException();
 					}
 				}
 			}
@@ -2319,10 +2317,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				return staticEval;
 			}
 			
+			
 			if (!isMateVal(beta - 1)
-					&& staticEval + env.getEval().getMaterialQueen() + 100 < beta - 1) {
+					&& staticEval + env.getEval().getMaterialQueen() + 100 < alpha_org) {
 				return staticEval;
 			}
+			
 			
 			if (staticEval > beta - 1) {
 				throw new IllegalStateException();
@@ -2411,10 +2411,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			
 			int new_matgain = matgain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
 			
-			//int moveSee = env.getBitboard().getSee().evalExchange(cur_move);
+			int moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 			
 			if (inCheck
-					//|| moveSee >= 0
+					|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
 					|| new_matgain >= 0
 					//|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
 					) {
@@ -2436,16 +2436,22 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				env.getBitboard().makeMoveBackward(cur_move);
 				
 				if (cur_eval > best_eval) {
-				//if ((inCheck && cur_eval > best_eval) || (!inCheck && cur_eval > alpha)) {
+					
 					best_eval = cur_eval;
 					best_move = cur_move;
 
 					if (best_eval >= beta) {
+						
+						if (inCheck) {
+							env.getHistory_check().goodMove(cur_move, 1, best_eval > 0 && isMateVal(best_eval));
+						} else {
+						}
+						
 						break;
 					}
 					
 					if (best_eval > alpha) {
-						alpha = best_eval;
+						throw new IllegalStateException();
 					}
 				}
 			}

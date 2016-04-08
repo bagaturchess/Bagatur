@@ -141,6 +141,7 @@ public class SearchManager {
 		
 		int threadsCount = ((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount();
 		int min_interval = getMinInterval(threadsCount);
+		
 		betasGen = BetaGeneratorFactory.create(initialVal, threadsCount, min_interval);
 		
 		betas = betasGen.genBetas();
@@ -187,10 +188,10 @@ public class SearchManager {
 		mediator.dump("SearchManager: MIN_INTERVAL is " + min_interval);
 		*/
 		
-		return 1;
+		return 2;
 	}
-
-
+	
+	
 	private void updateBetas() {
 		betas = betasGen.genBetas();
 		

@@ -56,13 +56,13 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	
 	private static int TRUST_WINDOW_BEST_MOVE_MULTIPLIER = 2;
-	private static int TRUST_WINDOW_BEST_MOVE_MIN = 25;
-	private static int TRUST_WINDOW_BEST_MOVE_MAX = 1128;
+	private static int TRUST_WINDOW_BEST_MOVE_MIN = 1;
+	private static int TRUST_WINDOW_BEST_MOVE_MAX = 64;
 	private int trustWindow_BestMove;
 	
 	private static double TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 1;
-	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 33;
-	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = 1128;
+	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 256;
+	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = 1024;
 	private int trustWindow_AlphaAspiration;
 	
 	private VarStatistic best_moves_diffs_per_depth;

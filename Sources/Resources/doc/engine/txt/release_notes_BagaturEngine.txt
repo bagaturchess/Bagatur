@@ -1,4 +1,6 @@
-
+Version 1.3b (09 April 2016)
+  * Search optimizations
+  * Improved memory management
 
 Version 1.3a (07 December 2012)
   * Endgame Tablebases support - Gaviota EGTB (currently, for win 32 only). Find more details in readme.txt.

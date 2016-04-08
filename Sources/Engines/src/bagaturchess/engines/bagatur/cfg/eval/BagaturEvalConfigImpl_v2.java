@@ -13,22 +13,22 @@ public class BagaturEvalConfigImpl_v2 implements IEvalConfig, IBagaturEvalConfig
 	
 	
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOptionSpin("Evaluation [Piece-Square Opening]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
-			new UCIOptionSpin("Evaluation [Piece-Square Endgame]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
-			new UCIOptionSpin("Evaluation [Cental Space Opening]", 10.0, "type spin default 10 min 0 max 40", 0.3 / 10.0),
-			new UCIOptionSpin("Evaluation [Cental Space Endgame]", 10.0, "type spin default 10 min 0 max 40", 0.15 / 10.0),
+			new UCIOptionSpin("Evaluation [Piece-Square Opening]"	, 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
+			new UCIOptionSpin("Evaluation [Piece-Square Endgame]"	, 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
+			new UCIOptionSpin("Evaluation [Cental Space Opening]"	, 10.0, "type spin default 10 min 0 max 100", 0.3 / 10.0),
+			new UCIOptionSpin("Evaluation [Cental Space Endgame]"	, 10.0, "type spin default 10 min 0 max 100", 0.15 / 10.0),
 			//new UCIOptionSpin("Evaluation [Pawn Material Opening]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
 			//new UCIOptionSpin("Evaluation [Pawn Material Endgame]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
-			new UCIOptionSpin("Evaluation [Pawns Structure Opening]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
-			new UCIOptionSpin("Evaluation [Pawns Structure Endgame]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
-			new UCIOptionSpin("Evaluation [Passed Pawns Opening]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
-			new UCIOptionSpin("Evaluation [Passed Pawns Endgame]", 10.0, "type spin default 10 min 0 max 40", 1.5 / 10.0),
-			new UCIOptionSpin("Evaluation [Mobility Opening]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
-			new UCIOptionSpin("Evaluation [Mobility Endgame]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
-			new UCIOptionSpin("Evaluation [Safe Mobility Opening]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
-			new UCIOptionSpin("Evaluation [Safe Mobility Endgame]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
-			new UCIOptionSpin("Evaluation [King Safety Opening]", 11.0, "type spin default 11 min 0 max 90", 3 / 10.0),
-			new UCIOptionSpin("Evaluation [King Safety Endgame]", 0.0, "type spin default 0 min 0 max 90", 3 / 10.0),
+			new UCIOptionSpin("Evaluation [Pawns Structure Opening]", 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
+			new UCIOptionSpin("Evaluation [Pawns Structure Endgame]", 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
+			new UCIOptionSpin("Evaluation [Passed Pawns Opening]"	, 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
+			new UCIOptionSpin("Evaluation [Passed Pawns Endgame]"	, 10.0, "type spin default 10 min 0 max 100", 1.5 / 10.0),
+			new UCIOptionSpin("Evaluation [Mobility Opening]"		, 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
+			new UCIOptionSpin("Evaluation [Mobility Endgame]"		, 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
+			new UCIOptionSpin("Evaluation [Safe Mobility Opening]"	, 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
+			new UCIOptionSpin("Evaluation [Safe Mobility Endgame]"	, 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
+			new UCIOptionSpin("Evaluation [King Safety Opening]"	, 10.0, "type spin default 10 min 0 max 100", 3 / 10.0),
+			new UCIOptionSpin("Evaluation [King Safety Endgame]"	, 0.0, "type spin default 0 min 0 max 100"	, 3 / 10.0),
 	};
 	
 	

@@ -80,10 +80,16 @@ public class MediatorDummper implements ISearchMediator {
 		int colour = board.getColourToMove();
 		int sign = 1;
 		int[] pv = info.getPV();
+		int last_index = pv.length - 1;
 		for (int i=0; i<pv.length; i++) {
 			int move = pv[i];
-			board.makeMoveForward(move);
-			sign *= -1;
+			if (board.isPossible(move)) {
+				board.makeMoveForward(move);
+				sign *= -1;
+			} else {
+				last_index = i - 1;
+				break;
+			}
 		}
 		
 		//int eval_int = (int) eval.fullEval(10, -1000000, 1000000, colour);
@@ -91,7 +97,7 @@ public class MediatorDummper implements ISearchMediator {
 		//if (DUMP_EVAL) System.out.println("sign: " + sign + ", eval: " + (sign * eval_int));
 		if (DUMP_EVAL) System.out.println(((BagaturEvaluator)eval).dump(colour));
 		
-		for (int i=pv.length - 1; i>=0; i--) {
+		for (int i=last_index; i>=0; i--) {
 			int move = pv[i];
 			board.makeMoveBackward(move);
 		}
