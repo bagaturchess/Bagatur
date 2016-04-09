@@ -94,7 +94,7 @@ public class SharedData {
 	}
 	
 	public TPTable getTPT() {
-		return memoryConsumers.getTPT();
+		return memoryConsumers.getTPT().remove(0);
 	}
 	
 	public GTBProbing getGTBProbing() {
@@ -116,7 +116,7 @@ public class SharedData {
 
 	@Override
 	public String toString() {
-		String msg = "TPT HIT RATE is: " + getTPT().getHitRate();
+		String msg = "";//"TPT HIT RATE is: " + getTPT().getHitRate();
 		return msg;
 	}
 	

@@ -22,6 +22,7 @@
  */
 package bagaturchess.search.impl.alg;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,23 +31,21 @@ import bagaturchess.search.api.internal.ISearch;
 
 public class BetaGenerator implements IBetaGenerator {
 	
+	
 	private static final boolean DUMP = false;
 	
 	private static final int TREND_INIT = 0;
 	private static final int TREND_UP   = 1;
 	private static final int TREND_DOWN = -1;
 	
-	private static final int MAX_TREND_MULTIPLIER = 1000000;
-	
-	
 	private int betasCount;
 	
 	private volatile int lower_bound;
 	private volatile int upper_bound;
-	private int trend;
-	private int trend_multiplier;
+	private volatile int trend;
 	private int initial_interval;
-	private int lastVal;
+	private volatile int lastVal;
+	
 	
 	public BetaGenerator(int _initialVal, int _betasCount, int _initial_interval) {
 		lower_bound = ISearch.MIN;
@@ -54,7 +53,6 @@ public class BetaGenerator implements IBetaGenerator {
 		
 		betasCount = _betasCount;
 		trend = TREND_INIT;
-		trend_multiplier = 1;
 		lastVal = _initialVal;
 		
 		initial_interval = _initial_interval;
@@ -69,15 +67,7 @@ public class BetaGenerator implements IBetaGenerator {
 		
 		if (val < upper_bound) {
 			upper_bound = val;
-			if (trend == TREND_DOWN) {
-				if (trend_multiplier < MAX_TREND_MULTIPLIER) {
-					trend_multiplier *= 2;
-				}
-			} else {
-				trend_multiplier = 1;
-			}
 			trend = TREND_DOWN;
-			lastVal = val;
 		}
 		//genBetas();
 	}
@@ -91,15 +81,7 @@ public class BetaGenerator implements IBetaGenerator {
 		
 		if (val > lower_bound) {
 			lower_bound = val;
-			if (trend == TREND_UP) {
-				if (trend_multiplier < MAX_TREND_MULTIPLIER) {
-					trend_multiplier *= 2;
-				}
-			} else {
-				trend_multiplier = 1;
-			}
 			trend = TREND_UP;
-			lastVal = val;
 		}
 		//genBetas();
 	}
@@ -112,75 +94,55 @@ public class BetaGenerator implements IBetaGenerator {
 		
 		if (DUMP) System.out.println(this);
 		
-		boolean firstTime = lower_bound == ISearch.MIN && upper_bound == ISearch.MAX;
-		
 		List<Integer> betas = new ArrayList<Integer>();
 		
-		/*if (SearchUtils.isMateVal(lastVal)) {
-			if (DUMP) System.out.println("MATE value");
-			betas.add(lastVal - 1);
-			if (DUMP) System.out.println(betas);
-			return betas;
-		}*/
-		
-		
-		int max_interval = betasCount * trend_multiplier * initial_interval;
-		
-		if (max_interval < 0) {
-			throw new IllegalStateException("max_interval=" + max_interval);
-		}
-		
-		if (max_interval >= upper_bound - lower_bound) {
+		if (lower_bound != ISearch.MIN && upper_bound != ISearch.MAX) {
 			
 			if (DUMP) System.out.println("WINDOWS will be used");
 			
-			//info string Search instability with distribution: DISTRIBUTION-> Depth:8, Bounds: [-24 <-> -8], ThreadsCount:2, BETAS: []
-			//info string Betagen obj: [-24, -8]	trend=1, trend_multiplier=1, lastVal=-24
-			//info string The new betas are:[2, 2]
-							
-			//throw new IllegalStateException("max_interval=" + max_interval + ", win=" + (upper_bound - lower_bound));
-			int win = (upper_bound - lower_bound) / (betasCount + 1);
+			int win = Math.abs(upper_bound - lower_bound) / betasCount;
 			if (win <= 0) {
-				for (int i=lower_bound + 1; i<=upper_bound; i++) {
-					betas.add(i);
-				}
-				//System.out.println("pinko lastVal=" + lastVal);
-				//throw new IllegalStateException("win=" + win + " (upper_bound - lower_bound)=" + (upper_bound - lower_bound) );
-				//win = 1;
-			} else {
-				if (trend == TREND_UP) {
-					for (int i=1; i<= betasCount; i++) {
-						int beta = lastVal + i * win;
-						betas.add(beta);
-					}
-				} else {
-					for (int i=1; i<= betasCount; i++) {
-						int beta = lastVal - i * win;
-						betas.add(beta);
-					}
-				}
+				throw new IllegalStateException("win=" + win + " (upper_bound - lower_bound)=" + (upper_bound - lower_bound) );
 			}
+			
+			for (int i=1; i<= betasCount; i++) {
+				betas.add(lower_bound + i * win);
+			}
+			
 		} else {
+			
+			boolean firstTime = lower_bound == ISearch.MIN && upper_bound == ISearch.MAX;
+			
 			if (DUMP) System.out.println("INTERVAL will be used");
 			
-			int counter_shift = 0;
 			if (firstTime) {
-				if (DUMP) System.out.println("FIRST time");
+				
 				betas.add(lastVal);
-				counter_shift = 1;
-			}
-			
-			if (trend == TREND_UP) {
-				for (int i=1 + counter_shift; i<= betasCount; i++) {
-					int beta = lastVal + i * trend_multiplier * initial_interval;
-					betas.add(beta);
-					if (DUMP) System.out.println("lastVal = " + lastVal + " i=" + i + " trend_multiplier=" + trend_multiplier);
+				
+				int start_val = lastVal - (betasCount / 2) * initial_interval;
+				for (int i=1; i<=betasCount; i++) {
+					int beta = start_val + i * initial_interval;
+					if (beta != lastVal) {
+						betas.add(beta);
+					}
+					if (DUMP) System.out.println("start_val = " + start_val + " i=" + i);
 				}
+				
 			} else {
-				for (int i=1 + counter_shift; i<= betasCount; i++) {
-					int beta = lastVal - i * trend_multiplier * initial_interval;
-					betas.add(beta);
-					if (DUMP) System.out.println("lastVal = " + lastVal + " i=" + i + " trend_multiplier=" + trend_multiplier);
+				if (lower_bound != ISearch.MIN) {
+					for (int i=1; i<= betasCount; i++) {
+						int beta = lower_bound + i * initial_interval;
+						betas.add(beta);
+						if (DUMP) System.out.println(" i=" + i);
+					}
+				} else if (upper_bound != ISearch.MAX) {
+					for (int i=1; i<= betasCount; i++) {
+						int beta = upper_bound - i * initial_interval;
+						betas.add(beta);
+						if (DUMP) System.out.println(" i=" + i);
+					}
+				} else {
+					throw new IllegalStateException("Nor upper nor lower bound");
 				}
 			}
 		}
@@ -221,7 +183,7 @@ public class BetaGenerator implements IBetaGenerator {
 	public String toString() {
 		String result = "";
 		result += "[" + lower_bound + ", " + upper_bound + "]	trend="
-			+ trend + ", trend_multiplier=" + trend_multiplier + ", lastVal=" + lastVal;		
+			+ trend + ", lastVal=" + lastVal;		
 		return result;
 	}
 	

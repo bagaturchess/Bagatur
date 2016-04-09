@@ -129,20 +129,24 @@ public class SearchManager {
 		
 		int initialVal = 0;
 		
-		sharedData.getTPT().lock();
-		TPTEntry entry = sharedData.getTPT().get(hashkey);
-		if (entry != null && entry.getBestMove_lower() != 0) {
-			initialVal = entry.getLowerBound();
-			//if (sharedData.getEngineConfiguration().getSearchConfig().isOther_UseTPTInRoot()) {
-				//prevIterationEval = initialVal;
-			//}
+		/*
+		if (sharedData.getTPT() != null) {
+			sharedData.getTPT().lock();
+			TPTEntry entry = sharedData.getTPT().get(hashkey);
+			if (entry != null && entry.getBestMove_lower() != 0) {
+				initialVal = entry.getLowerBound();
+				//if (sharedData.getEngineConfiguration().getSearchConfig().isOther_UseTPTInRoot()) {
+					//prevIterationEval = initialVal;
+				//}
+			}
+			sharedData.getTPT().unlock();
 		}
-		sharedData.getTPT().unlock();
+		*/
 		
 		int threadsCount = ((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount();
 		int min_interval = getMinInterval(threadsCount);
 		
-		betasGen = BetaGeneratorFactory.create(initialVal, threadsCount, min_interval);
+		betasGen = BetaGeneratorFactory.create(betasGen != null ? betasGen.getLowerBound() : 0, threadsCount, min_interval);
 		
 		betas = betasGen.genBetas();
 		//System.out.println("initBetas: " + betas);
@@ -307,7 +311,7 @@ public class SearchManager {
 			betasGen.increaseLower(eval);
 		} else if (eval == betasGen.getLowerBound()) {
 			
-			mediator.dump("Search instability in increaseLowerBound with distribution: " + this + ". Lower bound moved to " + (eval + 1));
+			mediator.dump("Search stability fix in increaseLowerBound with distribution: " + this + ". Lower bound moved to " + (eval + 1));
 			
 			sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval() + 1));
 			if (mediator != null) {
@@ -346,7 +350,7 @@ public class SearchManager {
 		if (eval < betasGen.getUpperBound()) {
 			betasGen.decreaseUpper(eval);
 		} else if (eval == betasGen.getUpperBound()) {
-			mediator.dump("Search instability in decreaseUpperBound with distribution: " + this + ". Upper bound moved to " + (eval - 1));
+			mediator.dump("Search stability fix in decreaseUpperBound with distribution: " + this + ". Upper bound moved to " + (eval - 1));
 			betasGen.decreaseUpper(eval - 1);
 		}
 		

@@ -134,8 +134,11 @@ public class TimeSaver {
 		}
 		
 		ISearchInfo info = SearchInfoFactory.getFactory().createSearchInfo();
-		TPTEntry tptEntry = sharedData.getTPT().get(bitboardForSetup.getHashKey());
 		
+		TPTEntry tptEntry = null;
+		/*if (sharedData.getTPT() != null) {
+			tptEntry = sharedData.getTPT().get(bitboardForSetup.getHashKey());
+		}*/
 		
 		if (tptEntry == null) {
 			return 0;

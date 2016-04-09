@@ -56,12 +56,12 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	
 	private static int TRUST_WINDOW_BEST_MOVE_MULTIPLIER = 2;
-	private static int TRUST_WINDOW_BEST_MOVE_MIN = 1;
+	private static int TRUST_WINDOW_BEST_MOVE_MIN = 8;
 	private static int TRUST_WINDOW_BEST_MOVE_MAX = 64;
 	private int trustWindow_BestMove;
 	
 	private static double TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 1;
-	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 256;
+	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 128;
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = 1024;
 	private int trustWindow_AlphaAspiration;
 	
@@ -88,11 +88,11 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		startTime = System.currentTimeMillis();
 	}
 	
-	
+	/*
 	protected TPTable getTPTable() {
 		return tpt;
 	}
-	
+	*/
 	
 	@Override
 	public void registerInfoObject(ISearchInfo info) {
@@ -147,7 +147,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		
 		lastinfo = info;
 		
-		String message = SearchInfoUtils.buildMajorInfoCommand(info, getStartTime(), (tpt != null) ? tpt.getUsage() : -1, tpt.getCount_UniqueInserts());
+		String message = SearchInfoUtils.buildMajorInfoCommand(info, getStartTime(), (tpt != null) ? tpt.getUsage() : -1, (tpt != null) ? tpt.getCount_UniqueInserts() : -1);
 		send(message);
 		
 		stopIfMateIsFound();
@@ -232,7 +232,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	
 	public void changedMinor(ISearchInfo info) {
-		nextMinorLine = SearchInfoUtils.buildMinorInfoCommand(info, getStartTime(), (tpt != null) ? tpt.getUsage() : -1, tpt.getCount_UniqueInserts());
+		nextMinorLine = SearchInfoUtils.buildMinorInfoCommand(info, getStartTime(), (tpt != null) ? tpt.getUsage() : -1, (tpt != null) ? tpt.getCount_UniqueInserts() : -1);
 		if (nextMinorLine != null) {
 			long timestamp = System.currentTimeMillis();
 			if (timestamp > lastSentMinorInfo_timestamp + 1000 /*Update UI, once per second*/) {

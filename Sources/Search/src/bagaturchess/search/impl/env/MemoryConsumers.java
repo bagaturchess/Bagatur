@@ -63,9 +63,9 @@ public class MemoryConsumers {
 	
 	private IBinarySemaphoreFactory semaphoreFactory;
 	
-	private TPTable tpt;
 	private List<IEvalCache> evalCache;
 	private List<PawnsEvalCache> pawnsCache;
+	private List<TPTable> tpt;
 	private GTBCache_IN gtbCache_in;
 	private GTBCache_OUT gtbCache_out;
 	
@@ -136,7 +136,7 @@ public class MemoryConsumers {
 		
 		
 		channel.dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
-		channel.dump("Transposition Table usage percent from the free memory 1 X : " + engineConfiguration.getThreadsCount() * (100 * engineConfiguration.getTPTUsagePercent()) + "%");
+		channel.dump("Transposition Table usage percent from the free memory " + engineConfiguration.getThreadsCount() + " X : " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
 		channel.dump("Endgame Table Bases Cache usage percent from the free memory 1 X : " + engineConfiguration.getThreadsCount() * (100 * engineConfiguration.getGTBUsagePercent()) + "%");
 		channel.dump("Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() + " X : " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
 		channel.dump("Pawns Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() + " X : " + (100 * engineConfiguration.getPawnsCacheUsagePercent()) + "%");
@@ -200,14 +200,20 @@ public class MemoryConsumers {
 			channel.dump("Endgame Table Bases cache (OUT) size is " + size_gtb_out);
 		}
 		
-		//Create 
-		tpt = new TPTable(size_tpt, false, semaphoreFactory.createSempahore());
+		
+		//Create
 		
 		evalCache = new Vector<IEvalCache>();
 		pawnsCache = new Vector<PawnsEvalCache>();
+		tpt = new Vector<TPTable>();
+		
 		for (int i=0; i<threadsCount; i++) {
+			
 			evalCache.add(new EvalCache(size_ec, false, new BinarySemaphore_Dummy()));
 			//evalCache.add(new EvalCache1(5, size_ec, false, new BinarySemaphore_Dummy()));
+			
+			tpt.add(new TPTable(size_tpt, false, new BinarySemaphore_Dummy()));
+			
 			if (size_pc != 0) {
 				DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(pawnsCacheName);
 				pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
@@ -231,7 +237,7 @@ public class MemoryConsumers {
 		System.gc();
 		int memory_before = getUsedMemory();
 		TPTable test_tpt = new TPTable(test_size, true, null);
-		int size = getEntrySize(availableMemory, engineConfiguration.getThreadsCount() * engineConfiguration.getTPTUsagePercent(), test_size, memory_before);
+		int size = getEntrySize(availableMemory, engineConfiguration.getTPTUsagePercent(), test_size, memory_before);
 		test_tpt.clear();
 		return size;
 	}
@@ -371,7 +377,7 @@ public class MemoryConsumers {
 	}
 
 
-	public TPTable getTPT() {
+	public List<TPTable> getTPT() {
 		return tpt;
 	}
 

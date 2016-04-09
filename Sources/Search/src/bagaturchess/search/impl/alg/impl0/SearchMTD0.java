@@ -428,7 +428,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	
 	
 	private int getLMR1(ISearchMoveList list) {
-		return (int) Math.max(1, Math.sqrt(list.size()) / (double) 3);
+		return (int) Math.max(1, Math.sqrt(list.size()) / (double) 2);
 	}
 	
 	
@@ -2048,7 +2048,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			
 			
 			if (!isMateVal(alpha_org)
-					&& staticEval + env.getEval().getMaterialQueen() + 100 < alpha_org) {
+					&& staticEval + env.getEval().getMaterialQueen() + optimisticPositionEval(mediator, 1) < alpha_org) {
 				node.eval = staticEval;
 				return node.eval;
 			}
@@ -2159,12 +2159,13 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			}
 			
 			
+			//int moveSee = USE_SEE_IN_QSEARCH ? env.getBitboard().getSee().evalExchange(cur_move) : -1;
+			
 			int new_matgain = matgain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
 			
-			int moveSee = USE_SEE_IN_QSEARCH ? env.getBitboard().getSee().evalExchange(cur_move) : 0;
 			
 			if (inCheck
-					|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
+					//|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
 					|| new_matgain >= 0
 					//|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
 					) {
@@ -2199,13 +2200,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
 					}
 					
-					if (best_eval >= beta) {
-						
-						if (inCheck) {
-							env.getHistory_check().goodMove(cur_move, 1, best_eval > 0 && isMateVal(best_eval));
-						} else {
-						}
-						
+					if (best_eval >= beta) {						
 						break;
 					}
 					
@@ -2319,7 +2314,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			
 			
 			if (!isMateVal(beta - 1)
-					&& staticEval + env.getEval().getMaterialQueen() + 100 < alpha_org) {
+					&& staticEval + env.getEval().getMaterialQueen() + optimisticPositionEval(mediator, 1) < alpha_org) {
 				return staticEval;
 			}
 			
@@ -2409,12 +2404,14 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				}
 			}
 			
+			
+			//int moveSee = USE_SEE_IN_QSEARCH ? env.getBitboard().getSee().evalExchange(cur_move) : -1;
+			
 			int new_matgain = matgain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
 			
-			int moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 			
 			if (inCheck
-					|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
+					//|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
 					|| new_matgain >= 0
 					//|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
 					) {
@@ -2441,12 +2438,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					best_move = cur_move;
 
 					if (best_eval >= beta) {
-						
-						if (inCheck) {
-							env.getHistory_check().goodMove(cur_move, 1, best_eval > 0 && isMateVal(best_eval));
-						} else {
-						}
-						
 						break;
 					}
 					

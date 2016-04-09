@@ -101,13 +101,17 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 	
 	protected void goSearch(boolean ponderSearch) {
 		
-		sharedData.getTPT().lock();
-		if (searchAdaptorCfg.isPonderingEnabled()) {
-			sharedData.getTPT().correctAllDepths(1);
-		} else {
-			sharedData.getTPT().correctAllDepths(2);
+		/*
+		if (sharedData.getTPT() != null) {
+			sharedData.getTPT().lock();
+			if (searchAdaptorCfg.isPonderingEnabled()) {
+				sharedData.getTPT().correctAllDepths(1);
+			} else {
+				sharedData.getTPT().correctAllDepths(2);
+			}
+			sharedData.getTPT().unlock();
 		}
-		sharedData.getTPT().unlock();
+		*/
 		
 		/*if (timeController == null || timeController.hasTime(1000)) {
 			System.gc();
@@ -135,10 +139,13 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 			
 			if (!moveSent) {
 				int start_iteration = 1;
+				
 				if (rootSearchCfg.getSearchConfig().isOther_UseTPTInRoot()) {
-					sharedData.getTPT().lock();
-					start_iteration = saver.sentFromTPT(boardForSetup, sharedData, currentMediator, start_iteration);
-					sharedData.getTPT().unlock();
+					/*if (sharedData.getTPT() != null) {
+						sharedData.getTPT().lock();
+						start_iteration = saver.sentFromTPT(boardForSetup, sharedData, currentMediator, start_iteration);
+						sharedData.getTPT().unlock();
+					}*/
 				}
 				currentMediator.dump("Normal search started");
 				searcher.negamax(boardForSetup, currentMediator, start_iteration, currentGoCommand.getDepth(), true);

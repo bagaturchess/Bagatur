@@ -53,6 +53,7 @@ public class SearchEnv {
 	
 	private IEvalCache evalCache;
 	private PawnsEvalCache pawnsCache;
+	private TPTable tpt;
 	
 	private HistoryTable history_check;
 	private HistoryTable history_all;
@@ -93,7 +94,10 @@ public class SearchEnv {
 	}
 	
 	public TPTable getTPT() {
-		return shared.getTPT();
+		if (tpt == null) {
+			tpt = shared.getTPT();
+		}
+		return tpt;
 	}
 	
 	public GTBProbing getGTBProbing() {
@@ -151,6 +155,7 @@ public class SearchEnv {
 		//result += shared.toString();
 		result += "Eval Cache HIT RATE is: " + getEvalCache().getHitRate();
 		result += "; Pawn Cache HIT RATE is: " + getPawnsCache().getHitRate();
+		result += "; Transposition Table HIT RATE is: " + getTPT().getHitRate();
 		
 		return result;
 	}
