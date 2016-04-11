@@ -630,26 +630,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		
-		if (depth >= normDepth(maxdepth)) {
-			
-			if (inCheck) {
-				throw new IllegalStateException();
-			}
-			
-			int staticEval = fullEval(depth, alpha_org, beta, rootColour);
-			//if (staticEval >= beta || staticEval + env.getEval().getMaterialQueen() + 100 < alpha_org) {
-			//	node.eval = staticEval;
-			//} else {
-				node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, staticEval, true, rootColour);	
-			//}
-			
-			//if (node.eval > alpha_org && env.getTactics().silentButDeadly()) {
-			//	maxdepth = PLY * (depth + 1);
-			//} else {
-				return node.eval;
-			//}
-		}
-		
 		//int tpt_move = getTPTMove(hashkey);
 		/*int tpt_depth = 0;
 		int tpt_move = 0;
@@ -746,6 +726,27 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					}
 				}
 			}
+		}
+		
+		
+		if (depth >= normDepth(maxdepth)) {
+			
+			if (inCheck) {
+				throw new IllegalStateException();
+			}
+			
+			int staticEval = fullEval(depth, alpha_org, beta, rootColour);
+			//if (staticEval >= beta || staticEval + env.getEval().getMaterialQueen() + 100 < alpha_org) {
+			//	node.eval = staticEval;
+			//} else {
+				node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, staticEval, true, rootColour);	
+			//}
+			
+			//if (node.eval > alpha_org && env.getTactics().silentButDeadly()) {
+			//	maxdepth = PLY * (depth + 1);
+			//} else {
+				return node.eval;
+			//}
 		}
 		
 		
@@ -1431,26 +1432,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				maxdepth = PLY * (depth + 1);
 			}
 		}
-		
-		if (depth >= normDepth(maxdepth)) {
-			
-			if (inCheck) {
-				throw new IllegalStateException();
-			}
-			
-			int staticEval = lazyEval(depth, beta -1, beta, rootColour);
-			//if (staticEval >= beta || staticEval + env.getEval().getMaterialQueen() + 100 < beta - 1) {
-				//return staticEval;
-			//} else {
-				int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, staticEval, true, rootColour);
-			//}
-			
-			//if (eval > alpha_org && env.getTactics().silentButDeadly()) {
-			//	maxdepth = PLY * (depth + 1);
-			//} else {
-				return eval;
-			//}
-		}
 
 		rest = normDepth(maxdepth) - depth;
 		
@@ -1495,6 +1476,27 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				}
 			}
 		}
+		
+		if (depth >= normDepth(maxdepth)) {
+			
+			if (inCheck) {
+				throw new IllegalStateException();
+			}
+			
+			int staticEval = lazyEval(depth, beta -1, beta, rootColour);
+			//if (staticEval >= beta || staticEval + env.getEval().getMaterialQueen() + 100 < beta - 1) {
+				//return staticEval;
+			//} else {
+				int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, staticEval, true, rootColour);
+			//}
+			
+			//if (eval > alpha_org && env.getTactics().silentButDeadly()) {
+			//	maxdepth = PLY * (depth + 1);
+			//} else {
+				return eval;
+			//}
+		}
+		
 		
 		int staticEval = roughEval(depth, rootColour);
 		//int staticEval = lazyEval(depth, alpha_org, beta, rootColour);

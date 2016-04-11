@@ -1,7 +1,10 @@
-Version 1.3b (09 April 2016)
-  * Search optimizations
+Version 1.4 (15 April 2016)
+  * Search optimizations: Separate transposition table per CPU, more reliable static pruning of positions with too bad material disbalance
+  * Evaluation tunning: Decreased weight of space in opening and of pawn structure in endgame
+  * Updated *.exe files to support Java 7 and Java 8
+  * Default memory increased from 128MB to 512MB. Could be set in the corresponding *.ini files to *exe files (or bat files if you don't use *.exe starters)
   * Improved memory management
-
+  
 Version 1.3a (07 December 2012)
   * Endgame Tablebases support - Gaviota EGTB (currently, for win 32 only). Find more details in readme.txt.
   * New UCI option 'Logging Policy' is introduced - 'single file', 'multiple files' and 'none'

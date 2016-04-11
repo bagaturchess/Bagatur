@@ -192,7 +192,7 @@ public class SearchManager {
 		mediator.dump("SearchManager: MIN_INTERVAL is " + min_interval);
 		*/
 		
-		return 2;
+		return 4;
 	}
 	
 	

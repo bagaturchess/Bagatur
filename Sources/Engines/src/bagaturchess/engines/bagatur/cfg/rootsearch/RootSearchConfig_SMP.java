@@ -15,8 +15,8 @@ public class RootSearchConfig_SMP extends RootSearchConfig_BaseImpl implements I
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionSpin("Search SMP [Threads count]", (double) getDefaultThreadsCount(),
 								"type spin default " + getDefaultThreadsCount()
-											+ " min " + 1
-											+ " max " + 10 * getDefaultThreadsCount(), 1),
+											+ " min 2"
+											+ " max 32", 1),
 			new UCIOptionSpin("Hidden Depth", 0d, "type spin default 0 min 0 max 10", 1),
 	};
 	
@@ -72,12 +72,14 @@ public class RootSearchConfig_SMP extends RootSearchConfig_BaseImpl implements I
 		return super.applyOption(option);
 	}
 	
-		
+	
 	private static final int getDefaultThreadsCount() {
-		int threads = Runtime.getRuntime().availableProcessors();
+		/*int threads = Runtime.getRuntime().availableProcessors();
 		if (threads < 2) {
 			threads = 2;
 		}		
 		return threads;
+		*/
+		return 2;
 	}
 }

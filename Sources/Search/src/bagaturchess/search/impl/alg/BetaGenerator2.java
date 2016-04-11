@@ -50,8 +50,6 @@ public class BetaGenerator2 implements IBetaGenerator {
 	private int initial_interval;
 	private int lastVal;
 	
-	private int aspiration_window = 25; 
-	
 	
 	public BetaGenerator2(int _initialVal, int _betasCount, int _initial_interval) {
 		lower_bound = ISearch.MIN;
@@ -125,8 +123,10 @@ public class BetaGenerator2 implements IBetaGenerator {
 			
 			if (DUMP) System.out.println("WINDOWS will be used");
 			
+			int sign = 1;
 			for (int i=1; i<= betasCount; i++) {
-				betas.add(lower_bound + Math.abs(upper_bound - lower_bound) / 2 + 1);
+				betas.add(lower_bound + Math.abs(upper_bound - lower_bound) / 2 + sign);
+				sign *= -1;
 			}
 			
 		} else {
@@ -137,15 +137,17 @@ public class BetaGenerator2 implements IBetaGenerator {
 				
 				if (DUMP) System.out.println("FIRST time");
 				
+				int sign = 1;
 				for (int i=1; i<= betasCount; i++) {
-					betas.add(lastVal + aspiration_window);
+					betas.add(lastVal + sign);
+					sign *= -1;
 				}
 				
 			} else {
 				
 				if (trend == TREND_UP) {
 					for (int i=1; i<= betasCount; i++) {
-						betas.add(lastVal + aspiration_window + trend_multiplier);
+						betas.add(lastVal + trend_multiplier);
 						if (DUMP) System.out.println("lastVal = " + lastVal + " i=" + i + " trend_multiplier=" + trend_multiplier);
 					}
 				} else {

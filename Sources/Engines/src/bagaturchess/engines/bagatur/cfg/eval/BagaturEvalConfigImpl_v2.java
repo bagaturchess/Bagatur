@@ -15,12 +15,12 @@ public class BagaturEvalConfigImpl_v2 implements IEvalConfig, IBagaturEvalConfig
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionSpin("Evaluation [Piece-Square Opening]"	, 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
 			new UCIOptionSpin("Evaluation [Piece-Square Endgame]"	, 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
-			new UCIOptionSpin("Evaluation [Cental Space Opening]"	, 10.0, "type spin default 10 min 0 max 100", 0.3 / 10.0),
+			new UCIOptionSpin("Evaluation [Cental Space Opening]"	, 10.0, "type spin default 10 min 0 max 100", 0.15 / 10.0),
 			new UCIOptionSpin("Evaluation [Cental Space Endgame]"	, 10.0, "type spin default 10 min 0 max 100", 0.15 / 10.0),
 			//new UCIOptionSpin("Evaluation [Pawn Material Opening]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
 			//new UCIOptionSpin("Evaluation [Pawn Material Endgame]", 10.0, "type spin default 10 min 0 max 40", 1 / 10.0),
 			new UCIOptionSpin("Evaluation [Pawns Structure Opening]", 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
-			new UCIOptionSpin("Evaluation [Pawns Structure Endgame]", 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
+			new UCIOptionSpin("Evaluation [Pawns Structure Endgame]", 10.0, "type spin default 10 min 0 max 100", 0.5 / 10.0),
 			new UCIOptionSpin("Evaluation [Passed Pawns Opening]"	, 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
 			new UCIOptionSpin("Evaluation [Passed Pawns Endgame]"	, 10.0, "type spin default 10 min 0 max 100", 1.5 / 10.0),
 			new UCIOptionSpin("Evaluation [Mobility Opening]"		, 10.0, "type spin default 10 min 0 max 100", 1 / 10.0),
@@ -41,14 +41,14 @@ public class BagaturEvalConfigImpl_v2 implements IEvalConfig, IBagaturEvalConfig
 	private double WEIGHT_MOBILITY_S_O = 1;
 	private double WEIGHT_MOBILITY_S_E = 1;
 	
-	private double WEIGHT_SPACE_O = 0.3;
+	private double WEIGHT_SPACE_O = 0.15;
 	private double WEIGHT_SPACE_E = 0.15;
 	
 	private double WEIGHT_PST_O = 1;
 	private double WEIGHT_PST_E = 1;
 	
 	private double WEIGHT_PAWNS_STANDARD_O = 1;
-	private double WEIGHT_PAWNS_STANDARD_E = 1;
+	private double WEIGHT_PAWNS_STANDARD_E = 0.5;
 	
 	private double WEIGHT_PAWNS_PASSED_O = 1;
 	private double WEIGHT_PAWNS_PASSED_E = 1.5;
