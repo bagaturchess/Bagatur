@@ -14,7 +14,7 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionSpin("Search SMP [Threads count]", (double) getDefaultThreadsCount(),
 								"type spin default " + getDefaultThreadsCount()
-											+ " min 2"
+											+ " min 1"
 											+ " max 32", 1),
 			new UCIOptionSpin("Hidden Depth", 0d, "type spin default 0 min 0 max 10", 1),
 	};
@@ -131,6 +131,6 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 		}
 		return threads;
 		*/
-		return 2;
+		return 1;
 	}
 }

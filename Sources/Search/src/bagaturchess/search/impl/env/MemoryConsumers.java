@@ -48,10 +48,10 @@ public class MemoryConsumers {
 	static {
 		if (getJVMBitmode() == 64) {
 			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT = 0.75;//Multiple cpus, e.g. 64
+			MEMORY_USAGE_PERCENT = 0.71;//Multiple cpus, e.g. 64
 		} else { //32
 			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT =  0.85;
+			MEMORY_USAGE_PERCENT =  0.71;
 		}
 	}
 	

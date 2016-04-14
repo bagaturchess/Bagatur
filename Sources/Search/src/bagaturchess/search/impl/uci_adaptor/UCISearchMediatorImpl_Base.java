@@ -27,11 +27,13 @@ import java.io.IOException;
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.search.api.ISearchConfig_AB;
+import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInfoUtils;
 import bagaturchess.search.impl.tpt.TPTable;
+import bagaturchess.search.impl.utils.SearchUtils;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.impl.commands.Go;
@@ -60,9 +62,8 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	private static int TRUST_WINDOW_BEST_MOVE_MAX = 64;
 	private int trustWindow_BestMove;
 	
-	private static double TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 1;
-	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 128;
-	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = 1024;
+	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 1;
+	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = SearchUtils.getMateVal(1);
 	private int trustWindow_AlphaAspiration;
 	
 	private VarStatistic best_moves_diffs_per_depth;
@@ -194,38 +195,25 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	private void adjustTrustWindow_AlphaAspiration(ISearchInfo info) {
 		
-		int cur_mtdTrustWindow = 0;
-			
 		if (!info.isMateScore()) {
 			
-			int moves_diff = Math.abs(info.getEval() - lastinfo.getEval());
-			if (moves_diff > TRUST_WINDOW_ALPHA_ASPIRATION_MIN
-					&& moves_diff > best_moves_diffs_per_depth.getEntropy()) {
-				
-				dump("UCISearchMediatorImpl_Base Trust Window Alpha Aspiration adding moves_diff=" + moves_diff);
-				
-				best_moves_diffs_per_depth.addValue(moves_diff, moves_diff);
-			}
-			
-			cur_mtdTrustWindow = (int) (TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER * (best_moves_diffs_per_depth.getEntropy() /*+ best_moves_diffs_per_depth.getDisperse()*/));
+			trustWindow_AlphaAspiration += 2 * Math.max(1, Math.abs(info.getEval() - lastinfo.getEval()));
 			
 		} else {
-			cur_mtdTrustWindow = TRUST_WINDOW_ALPHA_ASPIRATION_MAX;
+			trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MAX;
 		}
 		
-		if (cur_mtdTrustWindow < 0) {
-			throw new IllegalStateException("cur_mtdTrustWindow alpha =" + cur_mtdTrustWindow);
+		if (trustWindow_AlphaAspiration < 0) {
+			throw new IllegalStateException("cur_mtdTrustWindow alpha =" + trustWindow_AlphaAspiration);
 		}
 		
-		if (cur_mtdTrustWindow < TRUST_WINDOW_ALPHA_ASPIRATION_MIN) {
-			cur_mtdTrustWindow = TRUST_WINDOW_ALPHA_ASPIRATION_MIN;
+		if (trustWindow_AlphaAspiration < TRUST_WINDOW_ALPHA_ASPIRATION_MIN) {
+			trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MIN;
 		}
 		
-		if (cur_mtdTrustWindow > TRUST_WINDOW_ALPHA_ASPIRATION_MAX) {
-			cur_mtdTrustWindow = TRUST_WINDOW_ALPHA_ASPIRATION_MAX;
+		if (trustWindow_AlphaAspiration > TRUST_WINDOW_ALPHA_ASPIRATION_MAX) {
+			trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MAX;
 		}
-		
-		trustWindow_AlphaAspiration = cur_mtdTrustWindow;
 		
 		dump("UCISearchMediatorImpl_Base Trust Window Alpha Aspiration set to " + trustWindow_AlphaAspiration);
 	}

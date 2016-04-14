@@ -80,6 +80,6 @@ public class RootSearchConfig_SMP extends RootSearchConfig_BaseImpl implements I
 		}		
 		return threads;
 		*/
-		return 2;
+		return 1;
 	}
 }

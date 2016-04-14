@@ -102,7 +102,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		//ISearchMediator parallel_mediator = new ParallelMediator(root_mediator);
 		//root_mediator.dump("parallel_mediator=" + parallel_mediator.getClass().getName());
 		
-		SearchManager distribution = new SearchManager(parallel_mediator, getSharedData(), getBitboardForSetup().getHashKey(),
+		SearchManager distribution = new SearchManager(parallel_mediator, getBitboardForSetup(), getSharedData(), getBitboardForSetup().getHashKey(),
 				startIteration, maxIterations, finishCallback);
 		
 		ISearchStopper mtd_stopper = new MTDStopper(getBitboardForSetup().getColourToMove(), distribution /*, parallel_mediator*/);

@@ -145,6 +145,8 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard  = new Board("rn1qkb1r/1p2pppp/p6/1NpnB3/Q1Pp2b1/3P1N2/PP2PPPP/R3KB1R b KQkq - 3 9", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1qkb1r/1p2pppp/pn5/1Np1B3/Q1Pp2b1/3P1N2/PP2PPPP/R3KB1R w KQkq - 3 9", null, cfg.getBoardConfig());
 		
+		//1r5k/p1p4p/4p3/1rppb1Qq/3P2P1/1P3P2/P1P5/2KR4 w - - 0 25 MATE IN 7, extracted from a game with cuckoo chess
+		
 		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());

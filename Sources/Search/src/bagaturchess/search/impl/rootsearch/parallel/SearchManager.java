@@ -80,7 +80,7 @@ public class SearchManager {
 	private IFinishCallback finishCallback;
 	
 
-	public SearchManager(ISearchMediator _mediator, SharedData _sharedData, long _hashkey,
+	public SearchManager(ISearchMediator _mediator, IBitBoard _bitboardForSetup, SharedData _sharedData, long _hashkey,
 			int _startIteration, int _maxIterations, IFinishCallback _finishCallback) {
 
 		lock = new ReentrantReadWriteLock();
@@ -102,7 +102,7 @@ public class SearchManager {
 		
 		betas = new ArrayList<Integer>();
 		
-		initBetas();
+		initBetas(_bitboardForSetup);
 	}
 	
 	
@@ -125,7 +125,7 @@ public class SearchManager {
 		lock.writeLock().unlock();
 	}
 	
-	private void initBetas() {
+	private void initBetas(IBitBoard bitboardForTesting) {
 		
 		int initialVal = 0;
 		
@@ -146,7 +146,23 @@ public class SearchManager {
 		int threadsCount = ((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount();
 		int min_interval = getMinInterval(threadsCount);
 		
-		betasGen = BetaGeneratorFactory.create(betasGen != null ? betasGen.getLowerBound() : 0, threadsCount, min_interval);
+		if (betasGen != null) {
+			
+			betasGen = BetaGeneratorFactory.create(betasGen.getLowerBound(), threadsCount, min_interval);
+			
+		} else {
+			
+			int root_colour = bitboardForTesting.getColourToMove();
+			IEvaluator evaluator = sharedData.getEvaluatorFactory().create(
+					bitboardForTesting,
+					new EvalCache(100, true, new BinarySemaphore_Dummy()),
+					sharedData.getEngineConfiguration().getEvalConfig());
+			
+			int staticRootEval = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, root_colour);
+			
+			betasGen = BetaGeneratorFactory.create(staticRootEval, threadsCount, min_interval);
+		}
+		
 		
 		betas = betasGen.genBetas();
 		//System.out.println("initBetas: " + betas);
@@ -330,7 +346,7 @@ public class SearchManager {
 		
 		if (isLast()) {
 			finishDepth(bitboardForTesting);
-			initBetas();
+			initBetas(bitboardForTesting);
 			if (currentdepth > maxIterations && finishCallback != null) {
 				finishCallback.ready();
 			}
@@ -356,7 +372,7 @@ public class SearchManager {
 		
 		if (isLast()) {
 			finishDepth(bitboardForTesting);
-			initBetas();
+			initBetas(bitboardForTesting);
 			if (currentdepth > maxIterations && finishCallback != null) {
 				finishCallback.ready();
 			}

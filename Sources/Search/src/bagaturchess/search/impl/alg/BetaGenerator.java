@@ -43,8 +43,11 @@ public class BetaGenerator implements IBetaGenerator {
 	private volatile int lower_bound;
 	private volatile int upper_bound;
 	private volatile int trend;
+	private int trend_multiplier;
 	private int initial_interval;
 	private volatile int lastVal;
+	
+	private static final int MAX_TREND_MULTIPLIER = 1000000;
 	
 	
 	public BetaGenerator(int _initialVal, int _betasCount, int _initial_interval) {
@@ -53,6 +56,7 @@ public class BetaGenerator implements IBetaGenerator {
 		
 		betasCount = _betasCount;
 		trend = TREND_INIT;
+		trend_multiplier = 1;
 		lastVal = _initialVal;
 		
 		initial_interval = _initial_interval;
@@ -66,6 +70,13 @@ public class BetaGenerator implements IBetaGenerator {
 		if (DUMP) System.out.println("decreaseUpper called with " + val);
 		
 		if (val < upper_bound) {
+			if (trend == TREND_DOWN) {
+				if (trend_multiplier < MAX_TREND_MULTIPLIER) {
+					trend_multiplier *= 2;
+				}
+			} else {
+				trend_multiplier = 1;
+			}
 			upper_bound = val;
 			trend = TREND_DOWN;
 		}
@@ -80,6 +91,13 @@ public class BetaGenerator implements IBetaGenerator {
 		if (DUMP) System.out.println("increaseLower called with " + val);
 		
 		if (val > lower_bound) {
+			if (trend == TREND_UP) {
+				if (trend_multiplier < MAX_TREND_MULTIPLIER) {
+					trend_multiplier *= 2;
+				}
+			} else {
+				trend_multiplier = 1;
+			}
 			lower_bound = val;
 			trend = TREND_UP;
 		}
@@ -131,13 +149,13 @@ public class BetaGenerator implements IBetaGenerator {
 			} else {
 				if (lower_bound != ISearch.MIN) {
 					for (int i=1; i<= betasCount; i++) {
-						int beta = lower_bound + i * initial_interval;
+						int beta = lower_bound + i * initial_interval * trend_multiplier;
 						betas.add(beta);
 						if (DUMP) System.out.println(" i=" + i);
 					}
 				} else if (upper_bound != ISearch.MAX) {
 					for (int i=1; i<= betasCount; i++) {
-						int beta = upper_bound - i * initial_interval;
+						int beta = upper_bound - i * initial_interval * trend_multiplier;
 						betas.add(beta);
 						if (DUMP) System.out.println(" i=" + i);
 					}
