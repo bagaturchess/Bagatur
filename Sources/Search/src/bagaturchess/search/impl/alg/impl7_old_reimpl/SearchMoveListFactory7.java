@@ -43,4 +43,11 @@ public class SearchMoveListFactory7 implements ISearchMoveListFactory {
 		orderingStatistics.normalize();		
 	}
 
+
+	@Override
+	public OrderingStatistics getOrderingStatistics() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

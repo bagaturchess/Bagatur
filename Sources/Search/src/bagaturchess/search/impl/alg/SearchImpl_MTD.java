@@ -53,7 +53,7 @@ public abstract class SearchImpl_MTD extends SearchImpl {
 	
 	@Override
 	public void newSearch() {
-		getMoveListFactory().newSearch();
+		env.getMoveListFactory().newSearch();
 		//Do not call super.newSearch(), it is not necessary to reduce the depth of TPT table entries during MTD search.
 	}
 	

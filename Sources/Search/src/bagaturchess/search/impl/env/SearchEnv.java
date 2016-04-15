@@ -33,6 +33,8 @@ import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
+import bagaturchess.search.api.internal.ISearchMoveListFactory;
+import bagaturchess.search.impl.alg.iter.SearchMoveListFactory;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.exts.Extensions;
 import bagaturchess.search.impl.history.HistoryTable;
@@ -58,6 +60,8 @@ public class SearchEnv {
 	private HistoryTable history_check;
 	private HistoryTable history_all;
 	
+	private ISearchMoveListFactory moveListFactory;
+	
 	
 	public SearchEnv(IBitBoard _bitboard, SharedData _shared) {
 		shared = _shared;
@@ -66,6 +70,13 @@ public class SearchEnv {
 		
 		history_check = new HistoryTable(new BinarySemaphore_Dummy());
 		history_all = new HistoryTable(new BinarySemaphore_Dummy());
+		
+		moveListFactory = new SearchMoveListFactory();
+	}
+	
+	
+	public ISearchMoveListFactory getMoveListFactory() {
+		return moveListFactory;
 	}
 	
 	
@@ -156,6 +167,7 @@ public class SearchEnv {
 		result += "Eval Cache HIT RATE is: " + getEvalCache().getHitRate();
 		result += "; Pawn Cache HIT RATE is: " + getPawnsCache().getHitRate();
 		result += "; Transposition Table HIT RATE is: " + getTPT().getHitRate();
+		result += "\r\nMOVE ORDERING STATISTICS\r\n" + getMoveListFactory().getOrderingStatistics().toString();
 		
 		return result;
 	}

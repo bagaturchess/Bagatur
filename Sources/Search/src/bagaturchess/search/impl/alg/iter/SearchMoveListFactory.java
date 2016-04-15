@@ -13,6 +13,11 @@ public class SearchMoveListFactory implements ISearchMoveListFactory {
 	protected OrderingStatistics orderingStatistics = new OrderingStatistics();
 	
 	
+	public OrderingStatistics getOrderingStatistics() {
+		return orderingStatistics;
+	}
+
+
 	public SearchMoveListFactory() {
 	}
 	

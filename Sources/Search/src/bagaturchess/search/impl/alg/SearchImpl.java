@@ -35,9 +35,6 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchMoveList;
-import bagaturchess.search.api.internal.ISearchMoveListFactory;
-//import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.impl.alg.iter.SearchMoveListFactory;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.info.SearchInfoFactory;
@@ -218,17 +215,17 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		pvman = new PVManager(MAX_DEPTH);
 		lists_all = new ISearchMoveList[MAX_DEPTH];
 		for (int i=0; i<lists_all.length; i++) {
-			lists_all[i] = getMoveListFactory().createListAll(env);
+			lists_all[i] = env.getMoveListFactory().createListAll(env);
 		}
 		
 		lists_escapes = new ISearchMoveList[MAX_DEPTH];
 		for (int i=0; i<lists_escapes.length; i++) {
-			lists_escapes[i] = 	getMoveListFactory().createListAll_inCheck(env);
+			lists_escapes[i] = 	env.getMoveListFactory().createListAll_inCheck(env);
 		}
 		
 		lists_capsproms = new ISearchMoveList[MAX_DEPTH];
 		for (int i=0; i<lists_capsproms.length; i++) {
-			lists_capsproms[i] = getMoveListFactory().createListCaptures(env);
+			lists_capsproms[i] = env.getMoveListFactory().createListCaptures(env);
 		}
 		
 		initParams(env.getSearchConfig());
@@ -251,9 +248,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	}
 	
 	
-	protected ISearchMoveListFactory getMoveListFactory() {
-		return new SearchMoveListFactory();
-	}
+
 	
 	
 	protected static SharedData getOrCreateSearchEnv(Object[] args) {
@@ -267,7 +262,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	public void newSearch() {
 		
-		getMoveListFactory().newSearch();
+		env.getMoveListFactory().newSearch();
 		env.getEval().beforeSearch();
 		
 		/*int curPlayedMoves = env.getBitboard().getPlayedMovesCount();

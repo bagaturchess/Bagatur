@@ -68,7 +68,7 @@ public class SearchMTD1 extends SearchAB1 {
 	
 	@Override
 	public void newSearch() {
-		getMoveListFactory().newSearch();
+		env.getMoveListFactory().newSearch();
 		//Do not call super.newSearch(), it is not necessary to reduce the depth of TPT table entries during MTD search.
 	}
 	
