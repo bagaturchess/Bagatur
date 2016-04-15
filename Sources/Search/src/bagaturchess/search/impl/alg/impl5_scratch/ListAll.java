@@ -305,4 +305,10 @@ public class ListAll implements ISearchMoveList {
 	public boolean hasDominantMove() {
 		return false;
 	}
+
+	@Override
+	public void newSearch() {
+		// TODO Auto-generated method stub
+		
+	}
 }

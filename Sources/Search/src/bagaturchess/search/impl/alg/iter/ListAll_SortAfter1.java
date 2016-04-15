@@ -488,4 +488,10 @@ public class ListAll_SortAfter1 implements ISearchMoveList {
 	public boolean hasDominantMove() {
 		return hasDominantMove;
 	}
+
+	@Override
+	public void newSearch() {
+		// TODO Auto-generated method stub
+		
+	}
 }

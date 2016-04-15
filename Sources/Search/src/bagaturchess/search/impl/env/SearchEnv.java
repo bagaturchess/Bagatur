@@ -167,7 +167,7 @@ public class SearchEnv {
 		result += "Eval Cache HIT RATE is: " + getEvalCache().getHitRate();
 		result += "; Pawn Cache HIT RATE is: " + getPawnsCache().getHitRate();
 		result += "; Transposition Table HIT RATE is: " + getTPT().getHitRate();
-		result += "\r\nMOVE ORDERING STATISTICS\r\n" + getMoveListFactory().getOrderingStatistics().toString();
+		result += "\r\nMOVE ORDERING STATISTICS\r\n" + getMoveListFactory().toString();
 		
 		return result;
 	}

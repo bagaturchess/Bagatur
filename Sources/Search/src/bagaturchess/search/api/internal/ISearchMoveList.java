@@ -34,4 +34,5 @@ public interface ISearchMoveList extends IMoveList {
 	public void setPrevBestMove(int move);
 	public void setPrevpvMove(int move);
 	public void setMateMove(int mateMove);
+	public void newSearch();
 }

@@ -526,4 +526,10 @@ public class ListAll_old implements ISearchMoveList {
 	public boolean hasDominantMove() {
 		return hasDominantMove;
 	}
+
+	@Override
+	public void newSearch() {
+		// TODO Auto-generated method stub
+		
+	}
 }

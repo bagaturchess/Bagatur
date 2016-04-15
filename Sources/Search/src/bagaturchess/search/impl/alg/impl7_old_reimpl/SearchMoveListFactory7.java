@@ -3,7 +3,6 @@ package bagaturchess.search.impl.alg.impl7_old_reimpl;
 
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.api.internal.ISearchMoveListFactory;
-import bagaturchess.search.impl.alg.iter.ListKingEscapes;
 import bagaturchess.search.impl.alg.iter.OrderingStatistics;
 import bagaturchess.search.impl.env.SearchEnv;
 
@@ -42,12 +41,4 @@ public class SearchMoveListFactory7 implements ISearchMoveListFactory {
 	public void newSearch() {
 		orderingStatistics.normalize();		
 	}
-
-
-	@Override
-	public OrderingStatistics getOrderingStatistics() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

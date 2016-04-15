@@ -502,4 +502,10 @@ public class ListAll_InCheck implements ISearchMoveList {
 	public boolean hasDominantMove() {
 		return hasDominantMove;
 	}
+
+	@Override
+	public void newSearch() {
+		// TODO Auto-generated method stub
+		
+	}
 }

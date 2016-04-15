@@ -10,12 +10,7 @@ public class SearchMoveListFactory implements ISearchMoveListFactory {
 
 	
 	protected OrderingStatistics[] stats_all;
-	protected OrderingStatistics orderingStatistics = new OrderingStatistics();
-	
-	
-	public OrderingStatistics getOrderingStatistics() {
-		return orderingStatistics;
-	}
+	protected OrderingStatistics rootOrderingStatistics;
 
 
 	public SearchMoveListFactory() {
@@ -24,7 +19,13 @@ public class SearchMoveListFactory implements ISearchMoveListFactory {
 	
 	@Override
 	public ISearchMoveList createListAll(SearchEnv env) {
-		return new ListAll(env, orderingStatistics);
+		
+		OrderingStatistics cur = new OrderingStatistics();
+		
+		if (rootOrderingStatistics == null) {
+			rootOrderingStatistics = cur;
+		}
+		return new ListAll(env, cur);
 	}
 
 
@@ -42,7 +43,16 @@ public class SearchMoveListFactory implements ISearchMoveListFactory {
 	
 	@Override
 	public void newSearch() {
-		orderingStatistics.normalize();
 	}
 
+	@Override
+	public String toString() {
+		String msg = "";
+		
+		if (rootOrderingStatistics != null) {
+			msg += rootOrderingStatistics.toString();
+		}
+		
+		return msg;
+	}
 }

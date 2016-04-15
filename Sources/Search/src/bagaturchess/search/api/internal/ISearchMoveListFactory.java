@@ -1,7 +1,6 @@
 package bagaturchess.search.api.internal;
 
 
-import bagaturchess.search.impl.alg.iter.OrderingStatistics;
 import bagaturchess.search.impl.env.SearchEnv;
 
 
@@ -10,5 +9,4 @@ public interface ISearchMoveListFactory {
 	public ISearchMoveList createListAll_inCheck(SearchEnv env);
 	public ISearchMoveList createListCaptures(SearchEnv env);
 	public void newSearch();
-	public OrderingStatistics getOrderingStatistics();
 }
