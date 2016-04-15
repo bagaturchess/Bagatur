@@ -26,6 +26,27 @@ public class BoardConfigImpl implements IBoardConfig {
 	public static final int MATERIAL_DOUBLE_ROOK_E		= 1080;//1244;
 	 */
 	
+	/*
+	private double MATERIAL_PAWN_O = 79;//99;//198;
+	private double MATERIAL_PAWN_E = 103;//129;//258;
+		
+	private double MATERIAL_KNIGHT_O = 326;//408;//817;
+	private double MATERIAL_KNIGHT_E = 338;//846;
+	
+	private double MATERIAL_BISHOP_O = 334;//836;
+	private double MATERIAL_BISHOP_E = 342;//857;
+	
+	private double MATERIAL_ROOK_O = 508;//1270;
+	private double MATERIAL_ROOK_E = 511;//1278;
+	
+	private double MATERIAL_QUEEN_O = 1008;//2521;
+	private double MATERIAL_QUEEN_E = 1023;//2558;
+	
+	private double MATERIAL_KING_O = 1600;//5000;
+	private double MATERIAL_KING_E = 1600;//5000;
+	*/
+	
+	
 	private double MATERIAL_PAWN_O = 80;//72;
 	private double MATERIAL_PAWN_E = 100;//120;
 		
@@ -43,7 +64,8 @@ public class BoardConfigImpl implements IBoardConfig {
 	
 	private double MATERIAL_KING_O = 1600;
 	private double MATERIAL_KING_E = 1600;
-
+	
+	
 	
 	private double MATERIAL_BARIER_NOPAWNS_O	= Math.max(MATERIAL_KNIGHT_O, MATERIAL_BISHOP_O) + MATERIAL_PAWN_O;
 	private double MATERIAL_BARIER_NOPAWNS_E	= Math.max(MATERIAL_KNIGHT_E, MATERIAL_BISHOP_E) + MATERIAL_PAWN_E;
