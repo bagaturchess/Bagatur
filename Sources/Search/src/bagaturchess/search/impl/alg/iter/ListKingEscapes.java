@@ -149,7 +149,7 @@ public class ListKingEscapes implements ISearchMoveList {
 			ordval += ORD_VAL_SHIFT * ORD_VAL_COUNTER;
 		}
 		
-		ordval += (2 * env.getHistory_check().getScores(move)) / 4;
+		ordval += (env.getHistory_check().getScores(move)) / 2;
 		ordval += (env.getHistory_all().getScores(move) / 4);
 		
 		

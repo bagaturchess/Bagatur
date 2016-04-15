@@ -15,7 +15,7 @@ set JARS_PATH=%BIN_PATH%BagaturBoard.jar;%BIN_PATH%BagaturOpening.jar;%BIN_PATH%
 
 REM Sets the memory (in megabytes) which the WHOLE java process will use.
 REM One significant part of this memory (up to 90%) will be used for Transposition Table.
-set PROCESS_MEMORY=128M
+set PROCESS_MEMORY=256M
 
 set ARGS=bagaturchess.engines.base.cfg.UCIConfig_BaseImpl
 set ARGS=%ARGS% bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove

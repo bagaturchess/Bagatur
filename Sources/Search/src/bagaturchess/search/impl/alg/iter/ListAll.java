@@ -140,6 +140,15 @@ public class ListAll implements ISearchMoveList {
 		hasDominantMove = false;
 	}
 	
+	@Override
+	public String toString() {
+		String msg = "";
+		
+		msg += orderingStatistics.toString();
+		
+		return msg;
+	}
+	
 	private boolean isOk(int move) {
 		return !MoveInt.isCastling(move) && !MoveInt.isEnpassant(move);
 	}
@@ -193,7 +202,7 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 		
-		if (ob_moves != null) {
+		if (ob_moves != null && ob_moves.length >= 3) {
 			for (int i=0; i<ob_moves.length; i++) {
 				reserved_add(ob_moves[i]);
 			}
@@ -500,5 +509,11 @@ public class ListAll implements ISearchMoveList {
 
 	public boolean hasDominantMove() {
 		return hasDominantMove;
+	}
+
+	@Override
+	public void newSearch() {
+		//orderingStatistics.normalize();
+		//orderingStatistics.normalize();
 	}
 }

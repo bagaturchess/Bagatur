@@ -265,15 +265,11 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		env.getMoveListFactory().newSearch();
 		env.getEval().beforeSearch();
 		
-		/*int curPlayedMoves = env.getBitboard().getPlayedMovesCount();
-		int delta = curPlayedMoves - lastPlayedMoves;
-		lastPlayedMoves = curPlayedMoves;
 		
-		if (delta > 0) {
-			env.getTPT().lock();
-			env.getTPT().correctAllDepths(delta);
-			env.getTPT().unlock();
-		}*/
+		for (int i=0; i<lists_all.length; i++) {
+			lists_all[i].newSearch();
+		}
+		
 	}
 	
 	

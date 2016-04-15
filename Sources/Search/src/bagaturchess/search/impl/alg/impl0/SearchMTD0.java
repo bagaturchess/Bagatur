@@ -233,7 +233,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		if (inCheck) {
 			if (EXT_INCHECK_PV < ISearch.PLY) {
-				throw new IllegalStateException();
+				//throw new IllegalStateException("EXT_INCHECK_PV < ISearch.PLY");
 			}
 			extend += EXT_INCHECK_PV;
 			extStat.pv_InCheck++;
@@ -304,7 +304,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		if (inCheck) {
 			if (EXT_INCHECK_PV < ISearch.PLY) {
-				throw new IllegalStateException();
+				//throw new IllegalStateException("EXT_INCHECK_PV < ISearch.PLY");
 			}
 			extend = Math.max(extend, EXT_INCHECK_NONPV);
 			extStat.nonpv_InCheck++;
@@ -732,7 +732,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		if (depth >= normDepth(maxdepth)) {
 			
 			if (inCheck) {
-				throw new IllegalStateException();
+				throw new IllegalStateException("inCheck: depth >= normDepth(maxdepth)");
 			}
 			
 			int staticEval = fullEval(depth, alpha_org, beta, rootColour);
@@ -1097,6 +1097,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					
 					if (//!isMateVal(alpha_org)
 							//&& !isMateVal(beta)
+							//true
 							 !inCheck
 							 && !isCheckMove
 							 //&& !mateThreat
@@ -1808,6 +1809,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						
 						if (//!isMateVal(alpha_org)
 							 //&& !isMateVal(beta)
+							 //true
 							 !inCheck
 							 && !isCheckMove
 							 //&& !mateThreat
@@ -1972,12 +1974,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		if (info.getSelDepth() < depth) {
 			info.setSelDepth(depth);
 		}
-		
-		long hashkey = env.getBitboard().getHashKey();
-		
-		if (hashkey == -3770350413322162370L) {
-			int g = 0;
-		}
 
 		int staticEval = firstTime ? initialStaticEval : fullEval(depth, alpha_org, beta, rootColour);
 		if (depth >= MAX_DEPTH) {
@@ -2042,25 +2038,30 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		      }
 		}
 		
+		
 		if (!inCheck) {
+			
+			//Beta cutoff
 			if (staticEval >= beta) {
 				node.eval = staticEval;
 				return node.eval;
 			}
 			
-			
+			//Alpha cutoff
 			if (!isMateVal(alpha_org)
 					&& staticEval + env.getEval().getMaterialQueen() + optimisticPositionEval(mediator, 1) < alpha_org) {
 				node.eval = staticEval;
 				return node.eval;
 			}
 			
-			
-			if (staticEval > alpha_org) {
-				throw new IllegalStateException();
+			if (!inCheck && staticEval > alpha_org) {
+				throw new IllegalStateException("!inCheck && staticEval > alpha_org");
 			}
 		}
-
+		
+		
+		long hashkey = env.getBitboard().getHashKey();
+		
 		//int tpt_move = getTPTMove(hashkey);
 		boolean tpt_exact = false;
 		boolean tpt_found = false;
@@ -2259,13 +2260,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			info.setSelDepth(depth);
 		}
 		
-		long hashkey = env.getBitboard().getHashKey();
-		
-		if (hashkey == -3770350413322162370L) {
-			int g = 0;
-		}
-		
-		
 		int staticEval = firstTime ? initialStaticEval : lazyEval(depth, beta - 1, beta, rootColour);
 		if (depth >= MAX_DEPTH) {
 			return staticEval;
@@ -2309,23 +2303,28 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		      }
 		}
 		
+		
 		if (!inCheck) {
+			
+			//Beta cutoff
 			if (staticEval >= beta) {
 				return staticEval;
 			}
 			
-			
+			//Alpha cutoff
 			if (!isMateVal(beta - 1)
 					&& staticEval + env.getEval().getMaterialQueen() + optimisticPositionEval(mediator, 1) < alpha_org) {
 				return staticEval;
 			}
 			
-			
-			if (staticEval > beta - 1) {
-				throw new IllegalStateException();
+			if (!inCheck && staticEval > beta - 1) {
+				throw new IllegalStateException("!inCheck && staticEval > beta - 1");
 			}
 		}
-
+		
+		
+		long hashkey = env.getBitboard().getHashKey();
+		
 		//int tpt_move = getTPTMove(hashkey);
 		boolean tpt_found = false;
 		boolean tpt_exact = false;
