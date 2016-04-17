@@ -43,8 +43,9 @@ public class GaviotaTest {
 			System.out.println(board);
 			
 			//Initialize the path to Gaviota EGTB Files as well as the native cache size in megabytes 
-			GTBProbing_NativeWrapper.getInstance().setPath_Sync("C:/EGTB", 16);
+			GTBProbing_NativeWrapper.getInstance().setPath_Sync("C:/DATA/OWN/chess/EGTB", 32);
 			
+			System.out.println("start brobe");
 			
 			GTBProbing probing = new GTBProbing(new GTBCache_OUT(10000, true, new BinarySemaphore_Dummy()), new GTBCache_IN(100));
 

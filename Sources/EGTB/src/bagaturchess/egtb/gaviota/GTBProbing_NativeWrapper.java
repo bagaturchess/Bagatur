@@ -25,9 +25,10 @@ public class GTBProbing_NativeWrapper {
     static {
     	try {
     		INSTANCE = new GTBProbing_NativeWrapper();
-    	} catch(Throwable t) { //java.lang.UnsatisfiedLinkError
+    	} catch(Throwable t) {
+    		//java.lang.UnsatisfiedLinkError
     		//Can't load IA 32-bit .dll on a AMD 64-bit platform
-    		System.out.println("egtbprobe dynamic library could not be loaded (or not found). Message is: " + t.getMessage());
+    		System.out.println("egtbprobe dynamic library could not be loaded (or not found). Error message is :" + t.getMessage());
     		//t.printStackTrace();
     	}
     }
