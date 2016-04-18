@@ -23,7 +23,7 @@
 package bagaturchess.search.impl.rootsearch.parallel;
 
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -41,7 +41,7 @@ import bagaturchess.uci.api.ChannelManager;
 public class MTDParallelSearch extends RootSearch_BaseImpl {
 	
 	
-	private Executor executor;
+	private ExecutorService executor;
 	private SearchersPool searchers;
 	
 	
@@ -122,5 +122,18 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		result += searchers.toString();
 		
 		return result;
+	}
+	
+	
+	@Override
+	public void shutDown() {
+		try {
+			
+			executor.shutdownNow();
+			searchers = null;
+			
+		} catch(Throwable t) {
+			//Do nothing
+		}
 	}
 }

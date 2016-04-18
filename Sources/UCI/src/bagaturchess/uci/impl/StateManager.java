@@ -71,8 +71,14 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	
 	public void recreateSearchAdaptor() throws FileNotFoundException {
-		searchAdaptor = null;
+		
+		if (searchAdaptor != null) {
+			searchAdaptor.stopSearch();
+			searchAdaptor.shutDown();
+		}
+
 		System.gc();
+		
 		searchAdaptor = UCISearchAdaptorFactory.newUCISearchAdaptor(engineBootCfg, board);
 	}
 	

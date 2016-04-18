@@ -39,4 +39,6 @@ public interface IRootSearch {
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int maxIterations, boolean useMateDistancePrunning);
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int startIteration, int maxIterations, boolean useMateDistancePrunning);
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int startIteration, int maxIterations, boolean useMateDistancePrunning, IFinishCallback finishCallback);
+	
+	public void shutDown();
 }

@@ -23,7 +23,7 @@
 package bagaturchess.search.impl.rootsearch.sequential;
 
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -46,7 +46,7 @@ public class MTDSequentialSearch_Dual extends RootSearch_BaseImpl {
 	private static int MATERIAL_MARGIN = 90;
 	
 	
-	private Executor executor;
+	private ExecutorService executor;
 	private ISearch searcher;
 	private ISearch searcher_material;
 	
@@ -181,6 +181,19 @@ public class MTDSequentialSearch_Dual extends RootSearch_BaseImpl {
 			} catch(Throwable t) {
 				mediator.dump(t);
 			}
+		}
+	}
+	
+	@Override
+	public void shutDown() {
+		try {
+			
+			executor.shutdownNow();
+			searcher = null;
+			searcher_material = null;
+			
+		} catch(Throwable t) {
+			//Do nothing
 		}
 	}
 }

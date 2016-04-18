@@ -84,6 +84,36 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 	}
 	
 	
+	@Override
+	public void shutDown() {
+		
+		try {
+			
+			sharedData.clear();
+			
+			if (currentMediator != null) {
+				currentMediator.dump("Shutdown IRootSearch searchers");
+			}
+			
+			if (searcherNormal != null) {
+				searcherNormal.shutDown();
+			}
+			
+			if (searcherNormalMultiPV != null) {
+				searcherNormalMultiPV.shutDown();
+			}
+			
+			if (searcherPonder != null) {
+				searcherPonder.shutDown();
+			}
+			
+		} catch(Exception e) {
+			if (currentMediator != null) {
+				currentMediator.dump(e);
+			}
+		}
+	}
+	
 	protected SharedData getSharedData() {
 		return sharedData;
 	}

@@ -67,4 +67,10 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 		
 		mediator_multipv.ready();
 	}
+	
+	
+	@Override
+	public void shutDown() {
+		//Do nothing
+	}
 }

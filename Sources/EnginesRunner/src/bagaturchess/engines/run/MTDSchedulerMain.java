@@ -150,7 +150,8 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
-		IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
+		//IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
+		IBitBoard bitboard  = new Board("8/7k/7P/6K1/2B5/8/8/8 b - - 19 82", null, cfg.getBoardConfig());//Too big eval of bishop and pawn
 		//IBitBoard bitboard  = new Board3_Adapter("1r2r1k1/5pp1/p2p4/2q1pNP1/b3P3/nP4Q1/PKP1R1B1/3R4 b - - 1 29", sharedData.getPawnsCache(), cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board3_Adapter("3r1rk1/1p2npp1/1qpbpn1p/p2p4/1P1P2P1/P1N1PQ2/1BP2P1P/1B2RRK1 w - - 0 21", sharedData.getPawnsCache(), cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board3_Adapter("4r2k/pp2r1pp/1qp1N3/3P1Q2/8/7P/PPP3P1/5R1K b - - 3 32", sharedData.getPawnsCache(), cfg.getBoardConfig());

@@ -237,6 +237,10 @@ public class MoveInt {
 		return getFigureType(move) == Figures.TYPE_QUEEN;
 	}
 	
+	public static boolean isPawnCapture(int move) {
+		return getCapturedFigureType(move) == Figures.TYPE_PAWN;
+	}
+	
 	public static int getDirType(int move) { 
 		
 		//if (true) return (int) move[4];

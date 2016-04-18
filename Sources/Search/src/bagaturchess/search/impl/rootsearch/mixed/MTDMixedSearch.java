@@ -81,4 +81,16 @@ public class MTDMixedSearch extends RootSearch_BaseImpl {
 			}
 		}
 	}
+	
+	@Override
+	public void shutDown() {
+		try {
+			
+			sequentialSearch.shutDown();
+			parallelSearch.shutDown();
+			
+		} catch(Throwable t) {
+			//Do nothing
+		}
+	}
 }
