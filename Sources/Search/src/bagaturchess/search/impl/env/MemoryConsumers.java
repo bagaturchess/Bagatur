@@ -1,6 +1,7 @@
 package bagaturchess.search.impl.env;
 
 
+import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
@@ -131,7 +132,7 @@ public class MemoryConsumers {
 			//TODO: set percent to 0 and log corresponding message for the sizes
 			//Can't load IA 32-bit .dll on a AMD 64-bit platform
 			//throw new IllegalStateException("egtbprobe dynamic library could not be loaded (or not found)");
-			channel.dump("egtbprobe dynamic library could not be loaded (or not found)");
+			channel.dump(GTBProbing_NativeWrapper.getErrorMessage());
 		}
 		
 		
@@ -221,8 +222,8 @@ public class MemoryConsumers {
 		}
 		
 		if (GTBProbing_NativeWrapper.getInstance() != null) {
-			gtbCache_in = new GTBCache_IN(size_gtb_in, true, new BinarySemaphore());//null;//new GTBCache_IN(1000);
-			gtbCache_out = new GTBCache_OUT(size_gtb_out, true, new BinarySemaphore());
+			gtbCache_in = new GTBCache_IN(size_gtb_in, false, new BinarySemaphore());//null;//new GTBCache_IN(1000);
+			gtbCache_out = new GTBCache_OUT(size_gtb_out, false, new BinarySemaphore());
 		}
 	}
 	

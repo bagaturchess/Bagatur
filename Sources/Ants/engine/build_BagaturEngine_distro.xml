@@ -43,6 +43,14 @@
 	      <include name="BagaturEGTB.jar"/>
 	    </fileset>
 	</copy>
+  	
+	<copy todir="${temp_dir}/bin">
+	    <fileset dir="${resources_dir}/bin/engine/egtb/">
+		  <include name="*.dll"/>
+	      <include name="*.jar"/>
+	    </fileset>
+	</copy>
+	      	
 	<copy tofile="${temp_dir}/dat/w.ob">
 	    <fileset dir="${resources_dir}/bin/engine/ob">
 		  <include name="w.ob"/>
@@ -53,6 +61,14 @@
 		  <include name="b.ob"/>
 	    </fileset>
 	</copy>
+  	
+	<copy todir="${temp_dir}/egtb/">
+	    <fileset dir="${resources_dir}/bin/engine/egtb/">
+		  <include name="*.cp4"/>
+	      <include name="*.txt"/>
+	    </fileset>
+	</copy>
+  	
 	<!--copy tofile="${temp_dir}/egtbprobe.dll">
 	    <fileset dir="${egtb_dir}">
 		  <include name="egtbprobe.dll"/>

@@ -1,5 +1,6 @@
 
 
+
 package bagaturchess.egtb.gaviota;
 
 
@@ -14,6 +15,7 @@ public class GTBProbing_NativeWrapper {
 	
 	
 	private String tb_path = "";
+	
 	private final Object loading_sync = new Object();
 	
     private final EGTBProbing gtb;
@@ -21,25 +23,40 @@ public class GTBProbing_NativeWrapper {
     
     private static GTBProbing_NativeWrapper INSTANCE;
     
-    
-    static {
-    	try {
-    		INSTANCE = new GTBProbing_NativeWrapper();
-    	} catch(Throwable t) {
-    		//java.lang.UnsatisfiedLinkError
-    		//Can't load IA 32-bit .dll on a AMD 64-bit platform
-    		System.out.println("egtbprobe dynamic library could not be loaded (or not found). Error message is :" + t.getMessage());
-    		//t.printStackTrace();
-    	}
-    }
+    private static String error = "No errors";
     
     
     private GTBProbing_NativeWrapper() {
     	gtb = EGTBProbing.getSingleton();
     }
     
+    
     public static GTBProbing_NativeWrapper getInstance() {
+    	
+		if (INSTANCE == null) {
+			synchronized(GTBProbing_NativeWrapper.class) {
+				if (INSTANCE == null) {
+					
+			    	try {
+			    		INSTANCE = new GTBProbing_NativeWrapper();
+			    	} catch(Throwable t) {
+			    		error = "egtbprobe dynamic library could not be loaded (or not found). Error message is :" + t.getMessage();
+			    		//java.lang.UnsatisfiedLinkError
+			    		//Can't load IA 32-bit .dll on a AMD 64-bit platform
+			    		System.out.println(error);
+			    		//t.printStackTrace();
+			    	}
+			    	
+				}
+			}
+		}
+		
         return INSTANCE;
+    }
+    
+    
+    public static String getErrorMessage() {
+    	return error;
     }
     
     

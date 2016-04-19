@@ -1,6 +1,7 @@
 package bagaturchess.engines.base.cfg;
 
 
+import java.io.File;
 import java.util.Arrays;
 
 import bagaturchess.bitboard.api.IBoardConfig;
@@ -24,9 +25,9 @@ public class RootSearchConfig_BaseImpl implements IRootSearchConfig, IUCIOptions
 	protected static final double MEM_USAGE_PAWNCACHE = 0.30;
 	
 	
-	private String DEFAULT_gaviotaTbPath = "C:\\EGTB";
+	private String DEFAULT_gaviotaTbPath = (new File(".")).getAbsolutePath() + File.separatorChar + "egtb";
 	private Double DEFAULT_gaviotaTbCache = new Double(8);
-
+	
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionSpin("MultiPV", 1.0, "type spin default 1 min 1 max 100", 1),
 			new UCIOptionString("GaviotaTbPath", DEFAULT_gaviotaTbPath, "type string default " + DEFAULT_gaviotaTbPath),
