@@ -118,7 +118,7 @@ public class MemoryConsumers {
 			}
 		}
 		
-		channel.dump("Endgame Tablebases ... ");
+		channel.dump("Loading modules for Gaviota Endgame Tablebases support ... ");
 		lastAvailable_in_MB = ((getAvailableMemory() - memoryBuffer) / (1024 * 1024));
 		if (GTBProbing_NativeWrapper.getInstance() != null) {
 			
@@ -127,7 +127,7 @@ public class MemoryConsumers {
 					engineConfiguration.getGaviotaTbCache());
 			
 			//try {Thread.sleep(10000);} catch (InterruptedException e1) {}
-			channel.dump("Endgame Tablebases OK => " + (lastAvailable_in_MB - ((getAvailableMemory() - memoryBuffer) / (1024 * 1024))) + "MB");
+			channel.dump("Modules for Gaviota Endgame Tablebases OK. Will try to load Gaviota Tablebases from => " + engineConfiguration.getGaviotaTbPath());
 		} else {
 			//TODO: set percent to 0 and log corresponding message for the sizes
 			//Can't load IA 32-bit .dll on a AMD 64-bit platform
@@ -222,8 +222,8 @@ public class MemoryConsumers {
 		}
 		
 		if (GTBProbing_NativeWrapper.getInstance() != null) {
-			gtbCache_in = new GTBCache_IN(size_gtb_in, false, new BinarySemaphore());//null;//new GTBCache_IN(1000);
-			gtbCache_out = new GTBCache_OUT(size_gtb_out, false, new BinarySemaphore());
+			gtbCache_in = new GTBCache_IN(size_gtb_in, true, new BinarySemaphore());
+			gtbCache_out = new GTBCache_OUT(size_gtb_out, true, new BinarySemaphore());
 		}
 	}
 	
@@ -248,7 +248,7 @@ public class MemoryConsumers {
 		if (availableMemory_in_MB < 1) {
 			throw new IllegalStateException("Not enough memory for initializing Endgame Table Bases cache (IN). Please increase the -Xmx option of Java VM");
 		}
-		int test_size = availableMemory_in_MB * 1000;
+		int test_size = availableMemory_in_MB * 100;
 		
 		System.gc();
 		int memory_before = getUsedMemory();
@@ -263,7 +263,7 @@ public class MemoryConsumers {
 		if (availableMemory_in_MB < 1) {
 			throw new IllegalStateException("Not enough memory for initializing Endgame Table Bases cache (OUT). Please increase the -Xmx option of Java VM");
 		}
-		int test_size = availableMemory_in_MB * 1000;
+		int test_size = availableMemory_in_MB * 100;
 		
 		System.gc();
 		int memory_before = getUsedMemory();

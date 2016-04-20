@@ -31,8 +31,8 @@ import bagaturchess.search.api.internal.ISearch;
 public class TPTEntry {
 	
 	
-	private static final int MIN_VALUE = ISearch.MIN;
-	private static final int MAX_VALUE = ISearch.MAX;
+	public static final int MIN_VALUE = ISearch.MIN;
+	public static final int MAX_VALUE = ISearch.MAX;
 	
 	public static final int NO_MOVE = 0;
 	

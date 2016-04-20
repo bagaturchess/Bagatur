@@ -45,12 +45,11 @@
 	</copy>
   	
 	<copy todir="${temp_dir}/bin">
-	    <fileset dir="${resources_dir}/bin/engine/egtb/">
-		  <include name="*.dll"/>
-	      <include name="*.jar"/>
+	    <fileset dir="${resources_dir}/bin/engine/egtb/bin/">
+		  <include name="*"/>
 	    </fileset>
 	</copy>
-	      	
+	
 	<copy tofile="${temp_dir}/dat/w.ob">
 	    <fileset dir="${resources_dir}/bin/engine/ob">
 		  <include name="w.ob"/>

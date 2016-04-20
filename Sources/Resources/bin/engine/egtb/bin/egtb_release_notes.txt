@@ -1,0 +1,12 @@
+
+Version 0.4_v3 (17 April 2016)
+  * Support for Windows 64 bits: compiled egtbprobe_64.dll with MinGW
+  * Improvements in readme files
+  
+Version 0.4_v2 (28 February 2013)
+  * Added reference application: http://sourceforge.net/projects/bagaturchess/files/
+  * Added release notes file (this file)
+  * Improvements in readme file
+
+Version 0.4_v1 (3 November 2012)
+  * Initial code base
