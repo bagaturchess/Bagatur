@@ -93,26 +93,31 @@ public class SharedData {
 		return evaluatorFactory;
 	}
 	
-	public TPTable getTPT() {
-		return memoryConsumers.getTPT().remove(0);
-	}
 	
 	public GTBProbing getGTBProbing() {
 		return gtb_probing;
 	}
 	
 	
-	public PawnsEvalCache getPawnsCache() {
+	public TPTable getAndRemoveTPT() {
+		return memoryConsumers.getTPT().remove(0);
+	}
+	
+	
+	public PawnsEvalCache getAndRemovePawnsCache() {
 		return memoryConsumers.getPawnsCache().remove(0);
 	}
 
+	
+	public IEvalCache getAndRemoveEvalCache() {
+		return memoryConsumers.getEvalCache().remove(0);
+	}
+	
+	
 	public PVHistory getPVs() {
 		return pvs_history;
 	}
-
-	public IEvalCache getEvalCache() {
-		return memoryConsumers.getEvalCache().remove(0);
-	}
+	
 
 	@Override
 	public String toString() {

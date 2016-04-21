@@ -23,7 +23,6 @@
 package bagaturchess.search.impl.rootsearch.sequential;
 
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -128,5 +127,11 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		} catch(Throwable t) {
 			//Do nothing
 		}
+	}
+
+
+	@Override
+	public int getTPTUsagePercent() {
+		return searcher.getEnv().getTPTUsagePercent();
 	}
 }

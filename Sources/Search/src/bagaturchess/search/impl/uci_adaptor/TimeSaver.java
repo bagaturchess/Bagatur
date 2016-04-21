@@ -196,7 +196,7 @@ public class TimeSaver {
 		
 		setupBoard(bitboardForSetup);
 		
-		IEvaluator eval = sharedData.getEvaluatorFactory().create(bitboard, sharedData.getEvalCache(), sharedData.getEngineConfiguration().getEvalConfig());
+		IEvaluator eval = sharedData.getEvaluatorFactory().create(bitboard, sharedData.getAndRemoveEvalCache(), sharedData.getEngineConfiguration().getEvalConfig());
 		
 		double best_val = Integer.MIN_VALUE;
 		int best_move = 0;

@@ -23,15 +23,14 @@
 package bagaturchess.search.impl.rootsearch.parallel;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.common.Utils;
-import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.BoardUtils;
-import bagaturchess.bitboard.impl1.Board3;
-import bagaturchess.bitboard.impl1.Board3_Adapter;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.alg.impl0.SearchMTD0;
@@ -46,9 +45,21 @@ public class SearchersPool {
 	private int searchersCount = 0;
 	private IBoardConfig boardConfig;
 	
+	private List<SearchEnv> searchersEnvs = new ArrayList<SearchEnv>();
+	
 	
 	public SearchersPool(IBoardConfig _boardConfig) {
 		boardConfig = _boardConfig;
+	}
+	
+	
+	public int getTPTUsagePercent() {
+		double avgUsagePercent = 0;
+		for (int i=0; i<searchersEnvs.size(); i++) {
+			SearchEnv curEnv = searchersEnvs.get(i);
+			avgUsagePercent += curEnv.getTPTUsagePercent();
+		}
+		return (int) (avgUsagePercent / searchersEnvs.size());
 	}
 	
 	
@@ -75,6 +86,7 @@ public class SearchersPool {
 		searchersCount = threadsCount;
 		
 		pool.clear();
+		searchersEnvs.clear();
 		
 		for (int i=0; i<searchersCount; i++) {
 			//IBitBoard searcher_bitboard = new Board(bitboardForSetup.toEPD(), boardConfig);
@@ -99,6 +111,8 @@ public class SearchersPool {
 			//ISearch searcher = new SearchBagatur(searchEnv);
 			//ISearch searcher = new SearchLazy(searchEnv);
 			releaseSearcher(searcher);
+			
+			searchersEnvs.add(searchEnv);
 		}
 	}
 	

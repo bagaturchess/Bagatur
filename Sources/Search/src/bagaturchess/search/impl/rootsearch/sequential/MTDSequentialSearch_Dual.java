@@ -196,4 +196,11 @@ public class MTDSequentialSearch_Dual extends RootSearch_BaseImpl {
 			//Do nothing
 		}
 	}
+
+
+	@Override
+	public int getTPTUsagePercent() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

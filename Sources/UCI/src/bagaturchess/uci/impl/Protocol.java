@@ -69,7 +69,7 @@ TO_GUI>bestmove g1f3 ponder d8f6
 	public static final String COMMAND_TO_ENGINE_STOP_STR = "stop";
 	public static final String COMMAND_TO_ENGINE_QUIT_STR = "quit";
 	
-	public static final String COMMAND_TO_GUI_ID_VERSION_STR = "1.3b";
+	public static final String COMMAND_TO_GUI_ID_VERSION_STR = "1.4";
 	public static final String COMMAND_TO_GUI_ID_STR = "id";
 	public static final String COMMAND_TO_GUI_ID_NAME_STR = "name";
 	public static final String COMMAND_TO_GUI_ID_AUTHOR_STR = "author";

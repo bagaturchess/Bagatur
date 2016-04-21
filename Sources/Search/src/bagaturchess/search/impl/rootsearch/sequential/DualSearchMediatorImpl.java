@@ -1,7 +1,7 @@
 package bagaturchess.search.impl.rootsearch.sequential;
 
 
-import bagaturchess.search.api.ISearchConfig_AB;
+import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
@@ -16,8 +16,8 @@ public class DualSearchMediatorImpl extends UCISearchMediatorImpl_NormalSearch {
 	
 	public DualSearchMediatorImpl(IChannel _channel, Go _go,
 			ITimeController _timeController, int _colourToMove,
-			BestMoveSender _sender, TPTable _tpt, ISearchConfig_AB _searchConfig) {
-		super(_channel, _go, _timeController, _colourToMove, _sender, _tpt, _searchConfig);
+			BestMoveSender _sender, TPTable _tpt, IRootSearch _rootSearch) {
+		super(_channel, _go, _timeController, _colourToMove, _sender, _rootSearch);
 	}
 	
 	@Override

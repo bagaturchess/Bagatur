@@ -67,10 +67,10 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		rootSearchCfg = (IRootSearchConfig) searchAdaptorCfg.getRootSearchConfig();
 		
 		sharedData = new SharedData(rootSearchCfg, null);
-				
+		
 		searcherNormal = createRootSearcher();
 		searcherNormalMultiPV = new MultiPVRootSearch(rootSearchCfg, searcherNormal);
-		searcherPonder = createRootSearcher();
+		searcherPonder = searcherNormal;//createRootSearcher();
 		
 		//Should be created always in the beginning of the game because later the initial board position (fen) is not available.
 		searcherNormal.newGame(boardForSetup);
@@ -84,6 +84,11 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 	}
 	
 	
+	public IRootSearch getSearcherNormal() {
+		return searcherNormal;
+	}
+
+
 	@Override
 	public void shutDown() {
 		

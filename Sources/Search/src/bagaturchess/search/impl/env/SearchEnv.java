@@ -95,7 +95,7 @@ public class SearchEnv {
 
 	public PawnsEvalCache getPawnsCache() {
 		if (pawnsCache == null) {
-			pawnsCache = shared.getPawnsCache();
+			pawnsCache = shared.getAndRemovePawnsCache();
 		}
 		return pawnsCache;
 	}
@@ -104,9 +104,18 @@ public class SearchEnv {
 		return shared.getPVs();
 	}
 	
+	public int getTPTUsagePercent() {
+		if (tpt == null) {
+			return 0;
+		} else {
+			return tpt.getUsage();
+		}
+	}
+	
+	
 	public TPTable getTPT() {
 		if (tpt == null) {
-			tpt = shared.getTPT();
+			tpt = shared.getAndRemoveTPT();
 		}
 		return tpt;
 	}
@@ -139,7 +148,7 @@ public class SearchEnv {
 
 	public IEvalCache getEvalCache() {
 		if (evalCache == null) {
-			evalCache = shared.getEvalCache();
+			evalCache = shared.getAndRemoveEvalCache();
 		}
 		return evalCache;
 	}

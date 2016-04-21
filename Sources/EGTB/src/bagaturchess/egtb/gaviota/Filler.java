@@ -20,6 +20,8 @@ public class Filler {
 	
 	private int[] tmp_result;
 	
+	private boolean stopped = false;
+	
 	
 	public Filler(GTBCache_OUT _cache_out, GTBCache_IN _cache_in) {
 		
@@ -65,7 +67,7 @@ public class Filler {
 	long dump_timestamp = System.currentTimeMillis();
 	
 	private void fill() {
-		while (true) {
+		while (!stopped) {
 			
 			cache_in.lock();
 			ListNodeObject<GTBProbeInput> head = cache_in.removeHeadEntry();
@@ -103,6 +105,7 @@ public class Filler {
 	
 	
 	public void stop() {
-		if (thread != null) thread.destroy();
+		stopped = true;
+		thread = null;
 	}
 }

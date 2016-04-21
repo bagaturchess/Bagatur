@@ -136,4 +136,10 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 			//Do nothing
 		}
 	}
+
+
+	@Override
+	public int getTPTUsagePercent() {
+		return searchers.getTPTUsagePercent();
+	}
 }

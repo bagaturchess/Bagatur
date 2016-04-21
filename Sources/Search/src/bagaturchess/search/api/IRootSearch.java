@@ -41,4 +41,6 @@ public interface IRootSearch {
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int startIteration, int maxIterations, boolean useMateDistancePrunning, IFinishCallback finishCallback);
 	
 	public void shutDown();
+	
+	public int getTPTUsagePercent();
 }

@@ -23,7 +23,7 @@
 package bagaturchess.search.impl.uci_adaptor;
 
 
-import bagaturchess.search.api.ISearchConfig_AB;
+import bagaturchess.search.api.IRootSearch;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.impl.commands.Go;
@@ -32,8 +32,9 @@ import bagaturchess.uci.impl.commands.Go;
 public class UCISearchMediatorImpl_OpponentPondering extends UCISearchMediatorImpl_Base {
 	
 	
-	public UCISearchMediatorImpl_OpponentPondering(IChannel _channel, Go _go, int _colourToMove, BestMoveSender _sender, ISearchConfig_AB _searchConfig) {
-		super(_channel, _go, _colourToMove, _sender, null, _searchConfig);
+	public UCISearchMediatorImpl_OpponentPondering(IChannel _channel, Go _go,
+			int _colourToMove, BestMoveSender _sender, IRootSearch _rootSearch) {
+		super(_channel, _go, _colourToMove, _sender, _rootSearch);
 		setStoper(new PonderingStopper());
 	}
 	

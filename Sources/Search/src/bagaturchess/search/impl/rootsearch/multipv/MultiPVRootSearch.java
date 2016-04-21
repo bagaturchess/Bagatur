@@ -73,4 +73,10 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 	public void shutDown() {
 		//Do nothing
 	}
+
+
+	@Override
+	public int getTPTUsagePercent() {
+		return rootSearch.getTPTUsagePercent();
+	}
 }
