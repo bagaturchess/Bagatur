@@ -26,13 +26,11 @@ package bagaturchess.search.impl.uci_adaptor;
 import java.io.IOException;
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;
-import bagaturchess.search.api.ISearchConfig_AB;
-import bagaturchess.search.api.internal.ISearch;
+import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInfoUtils;
-import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.search.impl.utils.SearchUtils;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.IChannel;
@@ -47,7 +45,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	private int colourToMove;
 	private ISearchStopper stopper;
 	private BestMoveSender sender;
-	private TPTable tpt;
+	private IRootSearch rootSearch;
 	
 	private ISearchInfo lastinfo;
 	private ISearchInfo[] last3infos;
@@ -70,13 +68,13 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	
 	public UCISearchMediatorImpl_Base(IChannel _channel, Go _go, int _colourToMove, BestMoveSender _sender,
-			TPTable _tpt, ISearchConfig_AB _searchConfig) {
+			IRootSearch _rootSearch) {
 		
 		channel = _channel;
 		goCommand = _go;
 		colourToMove = _colourToMove;
 		sender = _sender;
-		tpt = _tpt;
+		rootSearch = _rootSearch;
 		
 		trustWindow_BestMove 		= TRUST_WINDOW_BEST_MOVE_MIN;
 		trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MIN;
@@ -148,7 +146,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		
 		lastinfo = info;
 		
-		String message = SearchInfoUtils.buildMajorInfoCommand(info, getStartTime(), (tpt != null) ? tpt.getUsage() : -1, (tpt != null) ? tpt.getCount_UniqueInserts() : -1);
+		String message = SearchInfoUtils.buildMajorInfoCommand(info, getStartTime(), rootSearch.getTPTUsagePercent(), 0);
 		send(message);
 		
 		stopIfMateIsFound();
@@ -220,7 +218,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	
 	public void changedMinor(ISearchInfo info) {
-		nextMinorLine = SearchInfoUtils.buildMinorInfoCommand(info, getStartTime(), (tpt != null) ? tpt.getUsage() : -1, (tpt != null) ? tpt.getCount_UniqueInserts() : -1);
+		nextMinorLine = SearchInfoUtils.buildMinorInfoCommand(info, getStartTime(), rootSearch.getTPTUsagePercent(), 0);
 		if (nextMinorLine != null) {
 			long timestamp = System.currentTimeMillis();
 			if (timestamp > lastSentMinorInfo_timestamp + 1000 /*Update UI, once per second*/) {
