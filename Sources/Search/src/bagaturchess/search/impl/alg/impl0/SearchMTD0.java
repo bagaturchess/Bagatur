@@ -58,6 +58,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	int MIN_EVAL_DIFF_PV = 33;
 	int MIN_EVAL_DIFF_NONPV = 33;
 	
+	double LMR_MULTIPLIER = 0.7;
+	
 	
 	public SearchMTD0(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
@@ -494,7 +496,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		int colourToMove = env.getBitboard().getColourToMove();
-		long hashkey = env.getBitboard().getHashKey();
 		
 		if (depth >= MAX_DEPTH) {
 			return fullEval(depth, alpha_org, beta, rootColour);
@@ -644,6 +645,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		env.getTPT().unlock();*/
 		
+		long hashkey = env.getBitboard().getHashKey();
+		
 		rest = normDepth(maxdepth) - depth;
 		
 		boolean tpt_found = false;
@@ -735,23 +738,11 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				throw new IllegalStateException("inCheck: depth >= normDepth(maxdepth)");
 			}
 			
-			int staticEval = fullEval(depth, alpha_org, beta, rootColour);
-			//if (staticEval >= beta || staticEval + env.getEval().getMaterialQueen() + 100 < alpha_org) {
-			//	node.eval = staticEval;
-			//} else {
-				node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, staticEval, true, rootColour);	
-			//}
-			
-			//if (node.eval > alpha_org && env.getTactics().silentButDeadly()) {
-			//	maxdepth = PLY * (depth + 1);
-			//} else {
-				return node.eval;
-			//}
+			//int staticEval = fullEval(depth, alpha_org, beta, rootColour);
+			int staticEval = lazyEval(depth, alpha_org, beta, rootColour);
+			node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, staticEval, true, rootColour);	
+			return node.eval;
 		}
-		
-		
-		int staticEval = roughEval(depth, rootColour);
-		//int staticEval = fullEval(depth, alpha_org, beta, rootColour);
 		
 		
 		if (useStaticPrunning
@@ -779,10 +770,11 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					}
 				}
 				
+				int staticEval = roughEval(depth, rootColour);
 				
 				if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
 					
-					staticEval = fullEval(depth, alpha_org, beta, rootColour);
+					staticEval = lazyEval(depth, alpha_org, beta, rootColour);
 					
 					if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
 		                int qeval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, staticEval, true, rootColour);
@@ -796,7 +788,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					}
 				}
 		}
-				
+		
 				
         int egtb_val = Integer.MIN_VALUE;
         if (env.getGTBProbing() != null
@@ -844,6 +836,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
             }
         }
 
+		
+		int staticEval = roughEval(depth, rootColour);
+		//int staticEval = lazyEval(depth, alpha_org, beta, rootColour);
 		
 		
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
@@ -1140,6 +1135,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							staticPrunning = true;
 						}
 						
+						/*
+						double rate = Math.sqrt(depth) + Math.sqrt(searchedCount);
+						rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
+						lmrReduction = (int) (PLY * rate * LMR_MULTIPLIER);
+						*/
+						
 						if (searchedCount >= getLMR1(list)) {
 							
 							lmrReduction += PLY;
@@ -1348,7 +1349,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		int colourToMove = env.getBitboard().getColourToMove();
-		long hashkey = env.getBitboard().getHashKey();
 		
 		
 		if (depth >= MAX_DEPTH) {
@@ -1458,6 +1458,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			}
 		}
 
+		
+		long hashkey = env.getBitboard().getHashKey();
+		
 		rest = normDepth(maxdepth) - depth;
 		
 		boolean tpt_found = false;
@@ -1502,29 +1505,17 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			}
 		}
 		
+		
 		if (depth >= normDepth(maxdepth)) {
 			
 			if (inCheck) {
 				throw new IllegalStateException();
 			}
 			
-			int staticEval = lazyEval(depth, beta -1, beta, rootColour);
-			//if (staticEval >= beta || staticEval + env.getEval().getMaterialQueen() + 100 < beta - 1) {
-				//return staticEval;
-			//} else {
-				int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, staticEval, true, rootColour);
-			//}
-			
-			//if (eval > alpha_org && env.getTactics().silentButDeadly()) {
-			//	maxdepth = PLY * (depth + 1);
-			//} else {
-				return eval;
-			//}
+			int staticEval = lazyEval(depth, alpha_org, beta, rootColour);
+			int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, staticEval, true, rootColour);
+			return eval;
 		}
-		
-		
-		int staticEval = roughEval(depth, rootColour);
-		//int staticEval = lazyEval(depth, alpha_org, beta, rootColour);
 		
 		
 		if (useStaticPrunning
@@ -1539,6 +1530,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						return tpt_lower;
 					}
 				}
+				
+				int staticEval = roughEval(depth, rootColour);
 				
 				if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
 					
@@ -1593,10 +1586,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
         }
         
 																				
-		//int interval = 500;
-		//int sign = +1;
-		//double null_move_factor = 35;//sign * 2 * (env.getBitboard().getMaterialFactor().interpolateByFactor(0, interval) - (interval/2));
-		//System.out.println(fact);
+		int staticEval = roughEval(depth, rootColour);
+		//int staticEval = lazyEval(depth, alpha_org, beta, rootColour);
 		
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
@@ -1868,6 +1859,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 								staticPrunning = true;
 							}
 							
+							/*
+							double rate = Math.sqrt(depth) + Math.sqrt(searchedCount);
+							rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
+							lmrReduction = (int) (PLY * rate * LMR_MULTIPLIER);
+							*/
+							
 							if (searchedCount >= getLMR1(list)) {
 								
 								lmrReduction += PLY;
@@ -2015,10 +2012,11 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			info.setSelDepth(depth);
 		}
 
-		int staticEval = firstTime ? initialStaticEval : fullEval(depth, alpha_org, beta, rootColour);
+		int staticEval = firstTime ? initialStaticEval : lazyEval(depth, beta - 1, beta, rootColour);
 		if (depth >= MAX_DEPTH) {
 			return staticEval;
 		}
+		
 		
 		int colourToMove = env.getBitboard().getColourToMove();
 		
@@ -2036,6 +2034,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		boolean inCheck = env.getBitboard().isInCheck();
+		
+		/*if (inCheck || staticEval >= beta) {
+			staticEval = fullEval(depth, alpha_org, beta, rootColour);
+		}*/
 		
 	    // Mate distance pruning
 		if (USE_MATE_DISTANCE && !inCheck && depth >= 1) {
@@ -2315,7 +2317,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
+		/*if (inCheck || staticEval >= beta) {
+			staticEval = fullEval(depth, beta - 1, beta, rootColour);
+		}*/
+		
 		int alpha_org = beta - 1;
+		
 	    // Mate distance pruning
 		if (USE_MATE_DISTANCE && !inCheck && depth >= 1) {
 			
