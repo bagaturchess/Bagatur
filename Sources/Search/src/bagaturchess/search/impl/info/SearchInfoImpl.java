@@ -120,14 +120,6 @@ public class SearchInfoImpl implements ISearchInfo {
 		return SearchUtils.isMateVal(eval);
 	}
 
-	public void setMateScore(boolean _isMateScore) {
-		isMateScore = _isMateScore;
-	}
-
-	public void setMateScore(int _mateScore) {
-		mateScore = _mateScore;
-	}
-
 	@Override
 	public boolean isUpperBound() {
 		return isUpperBound;

@@ -50,10 +50,8 @@ public interface ISearchInfo {
 	public void setSearchedNodes(long nodes);
 	
 	public boolean isMateScore();
-	public void setMateScore(boolean isMateScore);
 	
 	public int getMateScore();
-	public void setMateScore(int mateScore);
 	
 	public boolean isUpperBound();
 	public void setUpperBound(boolean isUpperBound);
