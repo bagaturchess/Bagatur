@@ -17,7 +17,7 @@ import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 public class GTBProbing {
 	
 	
-	public static int MAX_PIECES_COUNT = 5;
+	public static int MAX_PIECES_COUNT = 5;//Including both kings
 	
 	
 	private GTBCache_OUT cache_out;
