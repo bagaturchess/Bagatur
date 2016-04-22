@@ -20,10 +20,10 @@ set PROCESS_MEMORY=256M
 set ARGS=bagaturchess.engines.base.cfg.UCIConfig_BaseImpl
 set ARGS=%ARGS% bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove
 set ARGS=%ARGS% bagaturchess.engines.base.cfg.UCISearchAdaptorConfig_BaseImpl
-set ARGS=%ARGS% bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch
-set ARGS=%ARGS% bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl
+set ARGS=%ARGS% bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch
+set ARGS=%ARGS% bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP
 set ARGS=%ARGS% bagaturchess.search.impl.alg.impl0.SearchMTD0
-set ARGS=%ARGS% bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD
+set ARGS=%ARGS% bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD_SMP
 set ARGS=%ARGS% bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl
 set ARGS=%ARGS% bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2
 
