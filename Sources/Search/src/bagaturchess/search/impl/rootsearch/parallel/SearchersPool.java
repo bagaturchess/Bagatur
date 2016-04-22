@@ -63,6 +63,14 @@ public class SearchersPool {
 	}
 	
 	
+	public void decreaseTPTDepths(int reduction) {
+		for (int i=0; i<searchersEnvs.size(); i++) {
+			SearchEnv curEnv = searchersEnvs.get(i);
+			curEnv.getTPT().correctAllDepths(reduction);
+		}
+	}
+	
+	
 	public ISearch getSearcher(IBitBoard bitboardForSetup, SharedData sharedData) {
 		
 		if (searchersCount <= 0) {

@@ -79,4 +79,10 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 	public int getTPTUsagePercent() {
 		return rootSearch.getTPTUsagePercent();
 	}
+	
+	
+	@Override
+	public void decreaseTPTDepths(int reduction) {
+		rootSearch.decreaseTPTDepths(reduction);
+	}
 }

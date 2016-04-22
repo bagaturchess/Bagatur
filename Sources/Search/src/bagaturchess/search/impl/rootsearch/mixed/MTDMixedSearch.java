@@ -100,4 +100,11 @@ public class MTDMixedSearch extends RootSearch_BaseImpl {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+
+	@Override
+	public void decreaseTPTDepths(int reduction) {
+		sequentialSearch.decreaseTPTDepths(reduction);
+		parallelSearch.decreaseTPTDepths(reduction);
+	}
 }

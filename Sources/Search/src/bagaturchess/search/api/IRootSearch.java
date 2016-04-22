@@ -43,4 +43,5 @@ public interface IRootSearch {
 	public void shutDown();
 	
 	public int getTPTUsagePercent();
+	public void decreaseTPTDepths(int reduction);
 }

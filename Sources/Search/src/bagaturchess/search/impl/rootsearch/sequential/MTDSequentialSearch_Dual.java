@@ -203,4 +203,11 @@ public class MTDSequentialSearch_Dual extends RootSearch_BaseImpl {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+
+	@Override
+	public void decreaseTPTDepths(int reduction) {
+		searcher.getEnv().getTPT().correctAllDepths(reduction);
+		searcher_material.getEnv().getTPT().correctAllDepths(reduction);
+	}
 }

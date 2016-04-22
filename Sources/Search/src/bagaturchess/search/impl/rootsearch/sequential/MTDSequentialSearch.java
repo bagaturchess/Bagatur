@@ -134,4 +134,10 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	public int getTPTUsagePercent() {
 		return searcher.getEnv().getTPTUsagePercent();
 	}
+
+
+	@Override
+	public void decreaseTPTDepths(int reduction) {
+		searcher.getEnv().getTPT().correctAllDepths(reduction);
+	}
 }
