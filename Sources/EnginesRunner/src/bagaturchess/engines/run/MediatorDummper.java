@@ -181,11 +181,16 @@ public class MediatorDummper implements ISearchMediator {
 
 	@Override
 	public int getTrustWindow_BestMove() {
-		return 32;
+		return 64;
 	}
 
 	@Override
 	public int getTrustWindow_AlphaAspiration() {
 		return 1024;
+	}
+
+	@Override
+	public int getTrustWindow_MTD_Step() {
+		return 4;
 	}
 }

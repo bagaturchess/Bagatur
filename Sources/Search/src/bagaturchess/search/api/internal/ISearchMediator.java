@@ -45,4 +45,5 @@ public interface ISearchMediator {
 	
 	public int getTrustWindow_BestMove();
 	public int getTrustWindow_AlphaAspiration();
+	public int getTrustWindow_MTD_Step();
 }

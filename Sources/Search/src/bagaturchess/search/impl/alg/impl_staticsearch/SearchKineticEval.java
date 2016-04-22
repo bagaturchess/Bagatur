@@ -94,6 +94,12 @@ public class SearchKineticEval implements IKineticEval {
 		public int getTrustWindow_AlphaAspiration() {
 			throw new UnsupportedOperationException();
 		}
+
+		@Override
+		public int getTrustWindow_MTD_Step() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
 	};
 	
 	IRootWindow rootWin = new RootWindowImpl();

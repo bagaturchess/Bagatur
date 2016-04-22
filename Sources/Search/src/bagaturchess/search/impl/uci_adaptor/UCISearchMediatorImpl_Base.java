@@ -82,7 +82,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		last3infos = new ISearchInfo[3];
 		
 		best_moves_diffs_per_depth = new VarStatistic(false);
-		best_moves_diffs_per_depth.addValue(TRUST_WINDOW_ALPHA_ASPIRATION_MIN, TRUST_WINDOW_ALPHA_ASPIRATION_MIN);
+		best_moves_diffs_per_depth.addValue(1, 1);
 		
 		startTime = System.currentTimeMillis();
 	}
@@ -142,6 +142,12 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 			adjustTrustWindow_BestMove(info);
 			
 			adjustTrustWindow_AlphaAspiration(info);
+			
+			if (!info.isMateScore() && !lastinfo.isMateScore()) {
+				int eval_diff = Math.abs(info.getEval() - lastinfo.getEval());
+				best_moves_diffs_per_depth.addValue(eval_diff, eval_diff);
+			}
+			dump("UCISearchMediatorImpl_Base Trust Window MTD Step set to " + getTrustWindow_MTD_Step());
 		}
 		
 		lastinfo = info;
@@ -193,7 +199,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	private void adjustTrustWindow_AlphaAspiration(ISearchInfo info) {
 		
-		if (!info.isMateScore()) {
+		if (!info.isMateScore() && trustWindow_AlphaAspiration != TRUST_WINDOW_ALPHA_ASPIRATION_MAX) {
 			
 			trustWindow_AlphaAspiration += 2 * Math.max(1, Math.abs(info.getEval() - lastinfo.getEval()));
 			
@@ -300,5 +306,11 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	@Override
 	public int getTrustWindow_AlphaAspiration() {
 		return trustWindow_AlphaAspiration;
+	}
+	
+	
+	@Override
+	public int getTrustWindow_MTD_Step() {
+		return (int) Math.max(1, best_moves_diffs_per_depth.getEntropy());
 	}
 }

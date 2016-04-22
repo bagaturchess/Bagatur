@@ -98,4 +98,9 @@ public class SearchMediatorProxy implements ISearchMediator {
 	public int getTrustWindow_AlphaAspiration() {
 		return parent.getTrustWindow_AlphaAspiration();
 	}
+
+	@Override
+	public int getTrustWindow_MTD_Step() {
+		return parent.getTrustWindow_MTD_Step();
+	}
 }

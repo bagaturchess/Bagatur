@@ -144,7 +144,7 @@ public class SearchManager {
 		*/
 		
 		int threadsCount = ((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount();
-		int min_interval = getMinInterval(threadsCount);
+		int min_interval = mediator.getTrustWindow_MTD_Step();
 		
 		if (betasGen != null) {
 			
@@ -182,33 +182,6 @@ public class SearchManager {
 		}*/
 		
 		//System.out.println("initBetas=" + betas + "	initialVal=" + initialVal);
-	}
-	
-	private int getMinInterval(int threadsCount) {
-		/*
-		int[] INTERVALS = new int[] {
-				-1, 1, 1, 1, 1, 1, 1, 1, //0-7
-				32, 32, 32, 32, 32, 32, 32, 32, //8-15
-				32, 32, 32, 32, 32, 32, 32, 32, //16-23
-				32, 32, 32, 32, 32, 32, 32, 32, //24-31
-				16, 16, 16, 16, 16, 16, 16, 16, //32-39
-				16, 16, 16, 16, 16, 16, 16, 16, //40-47
-				 8,  8,  8,  8,  8,  8,  8,  8, //48-55
-				 8,  8,  8,  8,  8,  8,  8,  8, //56-63
-				 4,  4,  4,  4,  4,  4,  4,  4, //64-71
-		};
-		
-		
-		if (threadsCount >= INTERVALS.length) {
-			threadsCount = INTERVALS.length - 1;
-		}
-		
-		int min_interval = INTERVALS[threadsCount];
-		
-		mediator.dump("SearchManager: MIN_INTERVAL is " + min_interval);
-		*/
-		
-		return 4;
 	}
 	
 	
@@ -357,16 +330,42 @@ public class SearchManager {
 		//writeUnlock();
 	}
 	
-	public void decreaseUpperBound(int eval, IBitBoard bitboardForTesting) {
+	public void decreaseUpperBound(int eval, ISearchInfo info, IBitBoard bitboardForTesting) {
 		//writeLock();
 		
 		//System.out.println("decreaseUpperBound eval=" + eval);
 		//System.out.println("decreaseUpperBound: " + eval);
 		
 		if (eval < betasGen.getUpperBound()) {
+			
+			sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
+			if (mediator != null) {
+				//info.setSearchedNodes(nodes);
+				mediator.changedMajor(info);
+				
+				try {
+					testPV(info, bitboardForTesting);
+				} catch (Exception e) {
+					mediator.dump(e);
+				}
+			}
+			
 			betasGen.decreaseUpper(eval);
 		} else if (eval == betasGen.getUpperBound()) {
 			mediator.dump("Search stability fix in decreaseUpperBound with distribution: " + this + ". Upper bound moved to " + (eval - 1));
+			
+			sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
+			if (mediator != null) {
+				//info.setSearchedNodes(nodes);
+				mediator.changedMajor(info);
+				
+				try {
+					testPV(info, bitboardForTesting);
+				} catch (Exception e) {
+					mediator.dump(e);
+				}
+			}
+			
 			betasGen.decreaseUpper(eval - 1);
 		}
 		

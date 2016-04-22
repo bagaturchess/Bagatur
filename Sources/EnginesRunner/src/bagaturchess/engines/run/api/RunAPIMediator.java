@@ -106,4 +106,10 @@ public class RunAPIMediator implements ISearchMediator {
 	public int getTrustWindow_AlphaAspiration() {
 		throw new UnsupportedOperationException();
 	}
+
+
+	@Override
+	public int getTrustWindow_MTD_Step() {
+		throw new UnsupportedOperationException();
+	}
 }
