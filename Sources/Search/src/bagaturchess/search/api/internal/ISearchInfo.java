@@ -54,4 +54,10 @@ public interface ISearchInfo {
 	
 	public int getMateScore();
 	public void setMateScore(int mateScore);
+	
+	public boolean isUpperBound();
+	public void setUpperBound(boolean isUpperBound);
+	
+	public boolean isLowerBound();
+	public void setLowerBound(boolean isUpperBound);
 }

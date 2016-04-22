@@ -44,6 +44,9 @@ public class SearchInfoImpl implements ISearchInfo {
 	
 	public boolean isMateScore;
 	public int mateScore;
+	public boolean isLowerBound;
+	public boolean isUpperBound;
+	
 	
 	public int getBestMove() {
 		return bestmove;
@@ -117,11 +120,31 @@ public class SearchInfoImpl implements ISearchInfo {
 		return SearchUtils.isMateVal(eval);
 	}
 
-	public void setMateScore(boolean isMateScore) {
-		throw new UnsupportedOperationException("Should be auto detected");
+	public void setMateScore(boolean _isMateScore) {
+		isMateScore = _isMateScore;
 	}
 
-	public void setMateScore(int mateScore) {
-		throw new UnsupportedOperationException("Should be auto detected");
+	public void setMateScore(int _mateScore) {
+		mateScore = _mateScore;
+	}
+
+	@Override
+	public boolean isUpperBound() {
+		return isUpperBound;
+	}
+
+	@Override
+	public void setUpperBound(boolean _isUpperBound) {
+		isUpperBound = _isUpperBound;
+	}
+
+	@Override
+	public boolean isLowerBound() {
+		return isLowerBound;
+	}
+
+	@Override
+	public void setLowerBound(boolean _isLowerBound) {
+		isLowerBound = _isLowerBound;
 	}
 }

@@ -48,6 +48,12 @@ public class SearchInfoUtils {
 			message += " score cp " + eval;
 		}
 		
+		if (info.isLowerBound()) {
+			message += " lowerbound";
+		} else if (info.isUpperBound()) {
+			message += " upperbound";
+		}
+		
 		if (tptusage != -1) message += " hashfull " + (10 * tptusage);
 		
 		String pv = "";

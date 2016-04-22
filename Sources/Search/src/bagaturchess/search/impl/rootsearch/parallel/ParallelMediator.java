@@ -42,6 +42,10 @@ public class ParallelMediator extends SearchMediatorProxy {
 		minor.setPV(info.getPV());
 		minor.setBestMove(info.getBestMove());
 		minor.setEval(info.getEval());
+		minor.setLowerBound(info.isLowerBound());
+		minor.setUpperBound(info.isUpperBound());
+		minor.setMateScore(info.isMateScore());
+		minor.setMateScore(info.getMateScore());
 		
 		super.changedMajor(minor);
 	}

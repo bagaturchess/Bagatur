@@ -184,6 +184,7 @@ public class NullwinSearchTask implements Runnable {
 						info.setBestMove(info.getPV()[0]);
 					}
 					info.setEval(eval);
+					info.setLowerBound(true);
 					
 					if (DEBUG) mediator.dump(Thread.currentThread().getName() + ":	stop search (increaseLowerBound) with eval " + eval);
 					
@@ -192,9 +193,17 @@ public class NullwinSearchTask implements Runnable {
 				} else {
 					//eval is upper bound
 					//eval < beta <=> eval <= beta - 1 <=> eval <= alpha
+					
+					info.setPV(PVNode.convertPV(PVNode.extractPV(searcher.getPvman().load(0))));
+					if (info.getPV().length > 0) {
+						info.setBestMove(info.getPV()[0]);
+					}
+					info.setEval(eval);
+					info.setUpperBound(true);
+					
 					if (DEBUG) mediator.dump(Thread.currentThread().getName() + ":	stop search (decreaseUpperBound) with eval " + eval);
 					
-					distribution.decreaseUpperBound(eval, bitboard);
+					distribution.decreaseUpperBound(eval, info, bitboard);
 				}
 			} else if (maxdepth > distribution.getCurrentDepth()) {
 				throw new IllegalStateException("maxdepth=" + maxdepth + " distribution.getMaxdepth()=" + distribution.getCurrentDepth());
