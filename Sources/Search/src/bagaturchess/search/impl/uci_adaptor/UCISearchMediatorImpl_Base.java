@@ -65,6 +65,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	private int trustWindow_AlphaAspiration;
 	
 	private VarStatistic best_moves_diffs_per_depth;
+	private static int TRUST_WINDOW_MTD_STEP_MIN = 4;
 	
 	
 	public UCISearchMediatorImpl_Base(IChannel _channel, Go _go, int _colourToMove, BestMoveSender _sender,
@@ -311,6 +312,6 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	@Override
 	public int getTrustWindow_MTD_Step() {
-		return (int) Math.max(1, best_moves_diffs_per_depth.getEntropy());
+		return 4;//(int) Math.max(TRUST_WINDOW_MTD_STEP_MIN, best_moves_diffs_per_depth.getEntropy());
 	}
 }

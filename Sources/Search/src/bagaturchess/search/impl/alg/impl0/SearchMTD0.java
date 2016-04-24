@@ -557,11 +557,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		         }
 		      }
 		}
-	    
-		//boolean singleMove = false;
-		//if (inCheck) {
-			//singleMove = env.getBitboard().hasSingleMove();
-		//}
 		
 		
 		int rest = normDepth(maxdepth) - depth;
@@ -790,7 +785,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 				
-        int egtb_val = Integer.MIN_VALUE;
         if (env.getGTBProbing() != null
                 && useMateDistancePrunning //Doesn't make mates without this pruning as the mate distance is not decreased with each ply
                 && depth >= 3
@@ -799,6 +793,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
             ) {
             
             env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result);
+            
+            int egtb_val = Integer.MIN_VALUE;
             
             if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
                 
@@ -988,8 +984,14 @@ public class SearchMTD0 extends SearchImpl_MTD {
                     }
                 }
         }
-
         
+        
+		boolean singleMove = false;
+		if (inCheck) {
+			//singleMove = env.getBitboard().hasSingleMove();
+		}
+		
+		
 		node.bestmove = 0;
 		node.eval = MIN;
 		node.nullmove = false;
@@ -1096,7 +1098,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				
 				int new_maxdepth = maxdepth;
 				if (depth > 0 && !disableExts) {
-					new_maxdepth = new_maxdepth_pv(colourToMove, maxdepth, rest, cur_move, inCheck, list.size() == 1, moveSee, passerPush, move_eval, materialGain, new_materialGain, mateThreat);
+					new_maxdepth = new_maxdepth_pv(colourToMove, maxdepth, rest, cur_move, inCheck, singleMove, moveSee, passerPush, move_eval, materialGain, new_materialGain, mateThreat);
 				}
 				
 				//int barrier_1 = isCapOrProm ? 0 : evals.getTop2Eval(colourToMove, isCapOrProm, true);
@@ -1394,12 +1396,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		         }
 		      }
 		}
-	    
 		
-		//boolean singleMove = false;
-		//if (inCheck) {
-			//singleMove = env.getBitboard().hasSingleMove();
-		//}
 		
 		int rest = normDepth(maxdepth) - depth;
 		
@@ -1547,7 +1544,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		
-        int egtb_val = Integer.MIN_VALUE;
         if (env.getGTBProbing() != null
                 && useMateDistancePrunning //Doesn't make mates without this pruning as the mate distance is not decreased with each ply
                 && depth >= 3
@@ -1556,6 +1552,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
             ) {
             
             env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result);
+            
+            int egtb_val = Integer.MIN_VALUE;
             
             if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
                 
@@ -1753,6 +1751,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
         }
 
         
+		boolean singleMove = false;
+		if (inCheck) {
+			//singleMove = env.getBitboard().hasSingleMove();
+		}
+		
+		
 		ISearchMoveList list = null;
 		
 		if (!inCheck) {
@@ -1824,7 +1828,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				
 				int new_maxdepth = maxdepth;
 				if (depth > 0 && !disableExts) {
-					new_maxdepth = new_maxdepth_nullwin(colourToMove, maxdepth, rest, cur_move, inCheck, list.size() == 1, moveSee, mateThreat, passerPush, move_eval, materialGain, new_materialGain);
+					new_maxdepth = new_maxdepth_nullwin(colourToMove, maxdepth, rest, cur_move, inCheck, singleMove, moveSee, mateThreat, passerPush, move_eval, materialGain, new_materialGain);
 				}
 				
 				int cur_eval = 0;
@@ -2035,9 +2039,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
-		/*if (inCheck || staticEval >= beta) {
+		if (inCheck || staticEval >= beta) {
 			staticEval = fullEval(depth, alpha_org, beta, rootColour);
-		}*/
+		}
 		
 	    // Mate distance pruning
 		if (USE_MATE_DISTANCE && !inCheck && depth >= 1) {
@@ -2317,9 +2321,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
-		/*if (inCheck || staticEval >= beta) {
+		if (inCheck || staticEval >= beta) {
 			staticEval = fullEval(depth, beta - 1, beta, rootColour);
-		}*/
+		}
 		
 		int alpha_org = beta - 1;
 		

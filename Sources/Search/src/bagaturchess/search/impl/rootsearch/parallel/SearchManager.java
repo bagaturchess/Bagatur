@@ -267,57 +267,24 @@ public class SearchManager {
 	}
 	
 	public void increaseLowerBound(int eval, ISearchInfo info, IBitBoard bitboardForTesting) {
-		//writeLock();
-		//System.out.println("increaseLowerBound eval=" + eval + "		" + MoveInt.movesToString(info.getPV()));
-		//System.out.println("increaseLowerBound: " + eval);
 		
-		if (eval > betasGen.getLowerBound()) {
+		boolean sentPV = false;
+		
+		if (eval >= betasGen.getLowerBound()) {
 			
-			//if (eval > prevIterationEval) { // Sent pv
-				sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
-				if (mediator != null) {
-					//info.setSearchedNodes(nodes);
-					mediator.changedMajor(info);
-					
-					try {
-						testPV(info, bitboardForTesting);
-					} catch (Exception e) {
-						mediator.dump(e);
-					}
-				}
-				//curIterationLastInfo = null;
-			//} else {
-			//	if (eval > curIterationEval) {
-			//		curIterationLastInfo = info;	
-			//	}
-			//}
-			
-			//if (eval <= curIterationEval) {
-			//	throw new IllegalStateException("eval <= curIterationEval");
-			//}
-			
-			//curIterationEval = eval;
+			sentPV = true;
+
 			betasGen.increaseLower(eval);
-		} else if (eval == betasGen.getLowerBound()) {
 			
-			mediator.dump("Search stability fix in increaseLowerBound with distribution: " + this + ". Lower bound moved to " + (eval + 1));
-			
-			sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval() + 1));
-			if (mediator != null) {
-				//info.setSearchedNodes(nodes);
-				mediator.changedMajor(info);
-				
-				try {
-					testPV(info, bitboardForTesting);
-				} catch (Exception e) {
-					mediator.dump(e);
-				}
+			if (eval == betasGen.getLowerBound()) {
+				mediator.dump("Search stability fix in increaseLowerBound with distribution: " + this + ". Lower bound moved to " + (eval + 1));
+				betasGen.increaseLower(eval + 1);
 			}
-			
-			betasGen.increaseLower(eval + 1);
 		}
 		
-		if (isLast()) {
+		boolean isLast = isLast();
+		
+		if (isLast) {
 			finishDepth(bitboardForTesting);
 			initBetas(bitboardForTesting);
 			if (currentdepth > maxIterations && finishCallback != null) {
@@ -327,49 +294,47 @@ public class SearchManager {
 			updateBetas();
 		}
 		
-		//writeUnlock();
+		if (sentPV) {
+			
+			if (isLast) {
+				info.setLowerBound(false);
+				info.setUpperBound(false);
+			}
+			
+			sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
+			
+			if (mediator != null) {
+				
+				mediator.changedMajor(info);
+				
+				try {
+					testPV(info, bitboardForTesting);
+				} catch (Exception e) {
+					mediator.dump(e);
+				}
+			}
+		}
 	}
 	
 	public void decreaseUpperBound(int eval, ISearchInfo info, IBitBoard bitboardForTesting) {
-		//writeLock();
 		
-		//System.out.println("decreaseUpperBound eval=" + eval);
-		//System.out.println("decreaseUpperBound: " + eval);
+		boolean sentPV = false;
 		
-		if (eval < betasGen.getUpperBound()) {
+		if (eval <= betasGen.getUpperBound()) {
 			
-			sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
-			if (mediator != null) {
-				//info.setSearchedNodes(nodes);
-				mediator.changedMajor(info);
-				
-				try {
-					testPV(info, bitboardForTesting);
-				} catch (Exception e) {
-					mediator.dump(e);
-				}
-			}
+			sentPV = true;
 			
 			betasGen.decreaseUpper(eval);
-		} else if (eval == betasGen.getUpperBound()) {
-			mediator.dump("Search stability fix in decreaseUpperBound with distribution: " + this + ". Upper bound moved to " + (eval - 1));
 			
-			sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
-			if (mediator != null) {
-				//info.setSearchedNodes(nodes);
-				mediator.changedMajor(info);
-				
-				try {
-					testPV(info, bitboardForTesting);
-				} catch (Exception e) {
-					mediator.dump(e);
-				}
+			if (eval == betasGen.getUpperBound()) {
+				mediator.dump("Search stability fix in decreaseUpperBound with distribution: " + this + ". Upper bound moved to " + (eval - 1));
+				betasGen.decreaseUpper(eval - 1);
 			}
-			
-			betasGen.decreaseUpper(eval - 1);
 		}
 		
-		if (isLast()) {
+		boolean isLast = isLast();
+		
+		if (isLast) {
 			finishDepth(bitboardForTesting);
 			initBetas(bitboardForTesting);
 			if (currentdepth > maxIterations && finishCallback != null) {
@@ -379,7 +344,30 @@ public class SearchManager {
 			updateBetas();
 		}
 		
-		//writeUnlock();
+		if (sentPV) {
+			
+			/*if (isLast) {
+				//info.setLowerBound(false);
+				//info.setUpperBound(false);
+			} else {
+				
+				if (!betasGen.hasLowerBound()) {
+				
+					sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
+					
+					if (mediator != null) {
+							
+						mediator.changedMajor(info);
+						
+						try {
+							testPV(info, bitboardForTesting);
+						} catch (Exception e) {
+							mediator.dump(e);
+						}
+					}
+				}
+			}*/
+		}
 	}
 	
 	
