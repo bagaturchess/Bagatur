@@ -237,5 +237,15 @@ public class BetaGenerator1 implements IBetaGenerator {
 		gen.increaseLower(-200);
 		gen.decreaseUpper(200);*/
 	}
+
+	@Override
+	public boolean hasLowerBound() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean hasUpperBound() {
+		throw new UnsupportedOperationException();
+	}
 	
 }

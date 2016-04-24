@@ -137,20 +137,17 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 	protected void goSearch(boolean ponderSearch) {
 		
 		/*
-		if (sharedData.getTPT() != null) {
-			sharedData.getTPT().lock();
-			if (searchAdaptorCfg.isPonderingEnabled()) {
-				sharedData.getTPT().correctAllDepths(1);
-			} else {
-				sharedData.getTPT().correctAllDepths(2);
-			}
-			sharedData.getTPT().unlock();
+		if (searchAdaptorCfg.isPonderingEnabled()) {
+			getSearcherNormal().decreaseTPTDepths(1);
+		} else {
+			getSearcherNormal().decreaseTPTDepths(2);
 		}
 		*/
 		
 		/*if (timeController == null || timeController.hasTime(1000)) {
 			System.gc();
 		}*/
+		
 		
 		IRootSearch searcher = null;
 		if (ponderSearch) {

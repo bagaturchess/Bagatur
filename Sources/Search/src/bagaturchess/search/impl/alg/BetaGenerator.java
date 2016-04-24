@@ -228,5 +228,15 @@ public class BetaGenerator implements IBetaGenerator {
 		gen.increaseLower(-200);
 		gen.decreaseUpper(200);*/
 	}
+
+	@Override
+	public boolean hasLowerBound() {
+		return lower_bound != ISearch.MIN;
+	}
+
+	@Override
+	public boolean hasUpperBound() {
+		return upper_bound != ISearch.MAX;
+	}
 	
 }

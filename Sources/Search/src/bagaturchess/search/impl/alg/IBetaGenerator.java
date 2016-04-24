@@ -14,6 +14,10 @@ public interface IBetaGenerator {
 
 	public abstract int getUpperBound();
 
+	public abstract boolean hasLowerBound();
+
+	public abstract boolean hasUpperBound();
+	
 	public abstract String toString();
 
 }
