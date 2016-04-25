@@ -33,8 +33,8 @@ public class UCISearchMediatorImpl_OpponentPondering extends UCISearchMediatorIm
 	
 	
 	public UCISearchMediatorImpl_OpponentPondering(IChannel _channel, Go _go,
-			int _colourToMove, BestMoveSender _sender, IRootSearch _rootSearch) {
-		super(_channel, _go, _colourToMove, _sender, _rootSearch);
+			int _colourToMove, BestMoveSender _sender, IRootSearch _rootSearch, boolean isEndlessSearch) {
+		super(_channel, _go, _colourToMove, _sender, _rootSearch, isEndlessSearch);
 		setStoper(new PonderingStopper());
 	}
 	

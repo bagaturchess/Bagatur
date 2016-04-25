@@ -17,7 +17,7 @@ public class DualSearchMediatorImpl extends UCISearchMediatorImpl_NormalSearch {
 	public DualSearchMediatorImpl(IChannel _channel, Go _go,
 			ITimeController _timeController, int _colourToMove,
 			BestMoveSender _sender, TPTable _tpt, IRootSearch _rootSearch) {
-		super(_channel, _go, _timeController, _colourToMove, _sender, _rootSearch);
+		super(_channel, _go, _timeController, _colourToMove, _sender, _rootSearch, false);
 	}
 	
 	@Override

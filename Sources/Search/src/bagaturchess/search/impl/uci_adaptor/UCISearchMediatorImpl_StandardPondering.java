@@ -32,8 +32,8 @@ import bagaturchess.uci.impl.commands.Go;
 public class UCISearchMediatorImpl_StandardPondering extends UCISearchMediatorImpl_Base {
 	
 	public UCISearchMediatorImpl_StandardPondering(IChannel _channel, Go _go,
-			int _colourToMove, BestMoveSender _sender, IRootSearch _rootSearch) {
-		super(_channel, _go, _colourToMove, _sender, _rootSearch);
+			int _colourToMove, BestMoveSender _sender, IRootSearch _rootSearch, boolean isEndlessSearch) {
+		super(_channel, _go, _colourToMove, _sender, _rootSearch, isEndlessSearch);
 		setStoper(new PonderingStopper());
 	}
 }

@@ -23,7 +23,6 @@
 package bagaturchess.search.impl.alg.impl3_old_reimpl_new;
 
 
-import bagaturchess.search.api.internal.ISearchMoveListFactory;
 import bagaturchess.search.impl.alg.impl0.SearchMTD0;
 import bagaturchess.search.impl.env.SearchEnv;
 
@@ -38,12 +37,6 @@ public class SearchMTD3 extends SearchMTD0 {
 	
 	public SearchMTD3(SearchEnv _env) {
 		super(_env);
-	}
-	
-	
-	@Override
-	protected ISearchMoveListFactory getMoveListFactory() {
-		return new SearchMoveListFactory3();
 	}
 	
 	

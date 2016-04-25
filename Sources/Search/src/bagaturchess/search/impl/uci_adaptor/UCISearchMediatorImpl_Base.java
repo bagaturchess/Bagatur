@@ -45,7 +45,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	private int colourToMove;
 	private ISearchStopper stopper;
 	private BestMoveSender sender;
-	private IRootSearch rootSearch;
+	protected IRootSearch rootSearch;
 	
 	private ISearchInfo lastinfo;
 	private ISearchInfo[] last3infos;
@@ -67,15 +67,18 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	private VarStatistic best_moves_diffs_per_depth;
 	private static int TRUST_WINDOW_MTD_STEP_MIN = 4;
 	
+	private boolean isEndlessSearch;
+	
 	
 	public UCISearchMediatorImpl_Base(IChannel _channel, Go _go, int _colourToMove, BestMoveSender _sender,
-			IRootSearch _rootSearch) {
+			IRootSearch _rootSearch, boolean _isEndlessSearch) {
 		
 		channel = _channel;
 		goCommand = _go;
 		colourToMove = _colourToMove;
 		sender = _sender;
 		rootSearch = _rootSearch;
+		isEndlessSearch = _isEndlessSearch;
 		
 		trustWindow_BestMove 		= TRUST_WINDOW_BEST_MOVE_MIN;
 		trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MIN;
@@ -88,21 +91,12 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		startTime = System.currentTimeMillis();
 	}
 	
-	/*
-	protected TPTable getTPTable() {
-		return tpt;
-	}
-	*/
 	
 	@Override
 	public void registerInfoObject(ISearchInfo info) {
 		//throw new IllegalStateException();
 	}
 	
-	
-	protected boolean enabledOptimization_ForMateScores() {
-		return false;
-	}
 	
 	protected long getStartTime() {
 		return startTime;
@@ -269,7 +263,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	private void stopIfMateIsFound() {
 		
-		if (!enabledOptimization_ForMateScores()) {
+		if (isEndlessSearch) {
 			return;
 		}
 		

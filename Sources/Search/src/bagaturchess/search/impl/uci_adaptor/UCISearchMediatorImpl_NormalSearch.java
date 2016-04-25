@@ -38,8 +38,8 @@ public class UCISearchMediatorImpl_NormalSearch extends UCISearchMediatorImpl_Ba
 	
 	
 	public UCISearchMediatorImpl_NormalSearch(IChannel _channel, Go _go, ITimeController _timeController, int _colourToMove,
-			BestMoveSender _sender, IRootSearch _rootSearch) {
-		super(_channel, _go, _colourToMove, _sender, _rootSearch);
+			BestMoveSender _sender, IRootSearch _rootSearch, boolean isEndlessSearch) {
+		super(_channel, _go, _colourToMove, _sender, _rootSearch, isEndlessSearch);
 		timeController = _timeController;
 		_channel.dump(timeController.toString());
 		setStoper(new GlobalStopperImpl(timeController, getBestMoveSender(), _go.getNodes()));
@@ -55,12 +55,6 @@ public class UCISearchMediatorImpl_NormalSearch extends UCISearchMediatorImpl_Ba
 	public void changedMajor(ISearchInfo info) { 
 		timeController.newPVLine(info.getEval(), info.getDepth(), info.getBestMove());
 		super.changedMajor(info);
-	}
-	
-	
-	@Override
-	protected boolean enabledOptimization_ForMateScores() {
-		return true;
 	}
 	
 	
