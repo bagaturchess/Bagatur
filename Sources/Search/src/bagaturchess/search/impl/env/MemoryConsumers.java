@@ -105,35 +105,52 @@ public class MemoryConsumers {
 		seeMetadata = SeeMetadata.getSingleton();
 		channel.dump("SEE Metadata OK => " + (lastAvailable_in_MB - ((getAvailableMemory() - memoryBuffer) / (1024 * 1024))) + "MB");
 		
+		
 		channel.dump("Openning Book enabled: " + ownBookEnabled);
 		if (ownBookEnabled) {
-			lastAvailable_in_MB = ((getAvailableMemory() - memoryBuffer) / (1024 * 1024));
-			channel.dump("Openning Book ... ");
-			try {
-				openingBook = OpeningBookFactory.getBook();
-				channel.dump("Openning Book OK => " + (lastAvailable_in_MB - ((getAvailableMemory() - memoryBuffer) / (1024 * 1024))) + "MB");
-			} catch(Exception e) {
-				channel.dump("Unable to load Openning Book. Error is:");
-				channel.dump(e);
-			}
+			Thread loadOB = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					
+					long lastAvailable_in_MB = ((getAvailableMemory()) / (1024 * 1024));
+					channel.dump("Openning Book ... ");
+					try {
+						openingBook = OpeningBookFactory.getBook();
+						channel.dump("Openning Book OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
+					} catch(Exception e) {
+						channel.dump("Unable to load Openning Book. Error is:");
+						channel.dump(e);
+					}
+				}
+			});
+			loadOB.start();
 		}
 		
-		channel.dump("Loading modules for Gaviota Endgame Tablebases support ... ");
-		lastAvailable_in_MB = ((getAvailableMemory() - memoryBuffer) / (1024 * 1024));
-		if (GTBProbing_NativeWrapper.getInstance() != null) {
+		Thread loadEGTB = new Thread(new Runnable() {
 			
-			GTBProbing_NativeWrapper.getInstance().setPath_Sync(
-					engineConfiguration.getGaviotaTbPath(),
-					engineConfiguration.getGaviotaTbCache());
-			
-			//try {Thread.sleep(10000);} catch (InterruptedException e1) {}
-			channel.dump("Modules for Gaviota Endgame Tablebases OK. Will try to load Gaviota Tablebases from => " + engineConfiguration.getGaviotaTbPath());
-		} else {
-			//TODO: set percent to 0 and log corresponding message for the sizes
-			//Can't load IA 32-bit .dll on a AMD 64-bit platform
-			//throw new IllegalStateException("egtbprobe dynamic library could not be loaded (or not found)");
-			channel.dump(GTBProbing_NativeWrapper.getErrorMessage());
-		}
+			@Override
+			public void run() {
+				
+				channel.dump("Loading modules for Gaviota Endgame Tablebases support ... ");
+				
+				if (GTBProbing_NativeWrapper.getInstance() != null) {
+					
+					GTBProbing_NativeWrapper.getInstance().setPath_Sync(
+							engineConfiguration.getGaviotaTbPath(),
+							engineConfiguration.getGaviotaTbCache());
+					
+					//try {Thread.sleep(10000);} catch (InterruptedException e1) {}
+					channel.dump("Modules for Gaviota Endgame Tablebases OK. Will try to load Gaviota Tablebases from => " + engineConfiguration.getGaviotaTbPath());
+				} else {
+					//TODO: set percent to 0 and log corresponding message for the sizes
+					//Can't load IA 32-bit .dll on a AMD 64-bit platform
+					//throw new IllegalStateException("egtbprobe dynamic library could not be loaded (or not found)");
+					channel.dump(GTBProbing_NativeWrapper.getErrorMessage());
+				}
+			}
+		});
+		loadEGTB.start();
 		
 		
 		channel.dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
@@ -222,8 +239,8 @@ public class MemoryConsumers {
 		}
 		
 		if (GTBProbing_NativeWrapper.getInstance() != null) {
-			gtbCache_in = new GTBCache_IN(size_gtb_in, true, new BinarySemaphore());
-			gtbCache_out = new GTBCache_OUT(size_gtb_out, true, new BinarySemaphore());
+			gtbCache_in = new GTBCache_IN(size_gtb_in, false, new BinarySemaphore());
+			gtbCache_out = new GTBCache_OUT(size_gtb_out, false, new BinarySemaphore());
 		}
 	}
 	

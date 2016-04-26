@@ -64,22 +64,17 @@ public class SearchManager {
 	
 	private volatile int maxIterations;
 	private volatile int currentdepth;
-	//private volatile int lower_bound;
-	//private volatile int upper_bound;
-	//private volatile int curIterationEval;
-	//private volatile int prevIterationEval;
-	//private volatile ISearchInfo curIterationLastInfo;
-	//private volatile long nodes;
 	
 	private IBetaGenerator betasGen;
-	//private volatile SortedSet<Integer> betas;
 	private volatile List<Integer> betas;
 	
 	private ISearchMediator mediator;
 	private SharedData sharedData;
 	private IFinishCallback finishCallback;
 	
+	private volatile ISearchInfo lastInfoLower;
 
+	
 	public SearchManager(ISearchMediator _mediator, IBitBoard _bitboardForSetup, SharedData _sharedData, long _hashkey,
 			int _startIteration, int _maxIterations, IFinishCallback _finishCallback) {
 
@@ -144,11 +139,10 @@ public class SearchManager {
 		*/
 		
 		int threadsCount = ((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount();
-		int min_interval = mediator.getTrustWindow_MTD_Step();
 		
 		if (betasGen != null) {
 			
-			betasGen = BetaGeneratorFactory.create(betasGen.getLowerBound(), threadsCount, min_interval);
+			betasGen = BetaGeneratorFactory.create(betasGen.getLowerBound(), threadsCount, mediator.getTrustWindow_MTD_Step());
 			
 		} else {
 			
@@ -160,7 +154,7 @@ public class SearchManager {
 			
 			int staticRootEval = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, root_colour);
 			
-			betasGen = BetaGeneratorFactory.create(staticRootEval, threadsCount, min_interval);
+			betasGen = BetaGeneratorFactory.create(staticRootEval, threadsCount, mediator.getTrustWindow_MTD_Step());
 		}
 		
 		
@@ -273,12 +267,12 @@ public class SearchManager {
 		if (eval >= betasGen.getLowerBound()) {
 			
 			sentPV = true;
-
-			betasGen.increaseLower(eval);
 			
 			if (eval == betasGen.getLowerBound()) {
-				mediator.dump("Search stability fix in increaseLowerBound with distribution: " + this + ". Lower bound moved to " + (eval + 1));
-				betasGen.increaseLower(eval + 1);
+				betasGen.increaseLower(eval + mediator.getTrustWindow_MTD_Step());
+				mediator.dump("Search stability fix in increaseLowerBound with distribution: " + this + ". Lower bound moved to " + betasGen.getLowerBound());
+			} else {
+				betasGen.increaseLower(eval);
 			}
 		}
 		
@@ -313,6 +307,8 @@ public class SearchManager {
 					mediator.dump(e);
 				}
 			}
+			
+			lastInfoLower = info;
 		}
 	}
 	
@@ -324,11 +320,11 @@ public class SearchManager {
 			
 			sentPV = true;
 			
-			betasGen.decreaseUpper(eval);
-			
 			if (eval == betasGen.getUpperBound()) {
-				mediator.dump("Search stability fix in decreaseUpperBound with distribution: " + this + ". Upper bound moved to " + (eval - 1));
-				betasGen.decreaseUpper(eval - 1);
+				betasGen.decreaseUpper(eval - mediator.getTrustWindow_MTD_Step());
+				mediator.dump("Search stability fix in decreaseUpperBound with distribution: " + this + ". Upper bound moved to " + betasGen.getUpperBound());
+			} else {
+				betasGen.decreaseUpper(eval);
 			}
 		}
 		
@@ -346,17 +342,35 @@ public class SearchManager {
 		
 		if (sentPV) {
 			
-			/*if (isLast) {
-				//info.setLowerBound(false);
-				//info.setUpperBound(false);
+			if (isLast) {
+				
+				if (lastInfoLower != null) {
+					
+					if (mediator != null) {
+						
+						lastInfoLower.setLowerBound(false);
+						lastInfoLower.setUpperBound(false);
+						
+						mediator.changedMajor(lastInfoLower);
+						
+						try {
+							testPV(info, bitboardForTesting);
+						} catch (Exception e) {
+							mediator.dump(e);
+						}
+					}
+					
+					lastInfoLower = null;
+				}
+				
 			} else {
 				
 				if (!betasGen.hasLowerBound()) {
-				
+						
 					sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
 					
 					if (mediator != null) {
-							
+						
 						mediator.changedMajor(info);
 						
 						try {
@@ -366,7 +380,7 @@ public class SearchManager {
 						}
 					}
 				}
-			}*/
+			}
 		}
 	}
 	
