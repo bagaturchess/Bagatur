@@ -9,6 +9,7 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
+import bagaturchess.bitboard.impl.eval.BaseEvalWeights;
 import bagaturchess.bitboard.impl.eval.pawns.model.Pawn;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnStructureConstants;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModel;
@@ -178,6 +179,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		//} else {
 		//	eval_material();
 		//}
+		eval_trading();
 		eval_standard();
 		eval_pawns();
 		evalInfo.eval_Material_o *= WEIGHT_MATERIAL_O;
@@ -312,6 +314,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		
 		
 		eval_material_nopawnsdrawrule();
+		eval_trading();
 		eval_standard();
 		evalInfo.eval_Material_o *= WEIGHT_MATERIAL_O;
 		evalInfo.eval_Material_e *= WEIGHT_MATERIAL_E;
@@ -518,6 +521,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		
 		
 		eval_material_nopawnsdrawrule();
+		eval_trading();
 		eval_standard();
 		eval_pawns();
 		evalInfo.eval_Material_o *= WEIGHT_MATERIAL_O;
@@ -611,6 +615,78 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 	}
 	
 	
+    /** When ahead trade pieces and pawns, don't do it otherwise */
+    private void eval_trading() {
+    	
+    	if (true) {
+    		return;
+    	}
+    	
+    	//Calculates rates difference of both pawns material and total material for the white and black player. The numbers are of type double in [0, 1]
+        double w_material_rate = Math.min(1, bitboard.getMaterialFactor().getWhiteFactor() / (double) (BaseEvalWeights.getMaxMaterialFactor() / (double) 2));
+        double b_material_rate = Math.min(1, bitboard.getMaterialFactor().getBlackFactor() / (double) (BaseEvalWeights.getMaxMaterialFactor() / (double) 2));
+        //double diff_material_rate = w_material_rate - b_material_rate;
+        
+        //double w_pawns_rate = w_pawns.getDataSize() / (double) 8;
+        //double b_pawns_rate = b_pawns.getDataSize() / (double) 8;
+        //double diff_pawns_rate = w_pawns_rate - b_pawns_rate;
+    	
+        
+        /*Openning*/
+        
+        //Calculates material difference of both pawns material and total material for the white and black player. The numbers are real evaluations of type integer.
+        final int w_material_all_o = baseEval.getWhiteMaterialPawns_o() + baseEval.getWhiteMaterialNonPawns_o();
+        final int b_material_all_o = baseEval.getBlackMaterialPawns_o() + baseEval.getBlackMaterialNonPawns_o();
+        //final int w_material_pawns_o = w_material_all_o - baseEval.getWhiteMaterialNonPawns_o();
+        //final int b_material_pawns_o = b_material_all_o - baseEval.getBlackMaterialNonPawns_o();
+        double diff_material_all_o = w_material_all_o - b_material_all_o;
+        //double diff_material_pawns_o = w_material_pawns_o - b_material_pawns_o;
+        
+        
+        //Calculates the trading bonus or penalty
+        int eval_trading_all_o = (int) ( 0.125 * -diff_material_all_o * ( w_material_rate + b_material_rate) );
+        //int eval_trading_pawns_o = (int) ( 0.333 * diff_material_pawns_o * ( w_material_rate + b_material_rate - 2 ) );
+        
+		evalInfo.eval_Material_o += eval_trading_all_o;
+		//evalInfo.eval_Material_o += eval_trading_pawns_o;
+		
+		
+		/*Endgame*/
+		
+		
+        //Calculates material difference of both pawns material and total material for the white and black player. The numbers are real evaluations of type integer.
+        final int w_material_all_e = baseEval.getWhiteMaterialPawns_e() + baseEval.getWhiteMaterialNonPawns_e();
+        final int b_material_all_e = baseEval.getBlackMaterialPawns_e() + baseEval.getBlackMaterialNonPawns_e();
+        //final int w_material_pawns_e = w_material_all_e - baseEval.getWhiteMaterialNonPawns_e();
+        //final int b_material_pawns_e = b_material_all_e - baseEval.getBlackMaterialNonPawns_e();
+        double diff_material_all_e = w_material_all_e - b_material_all_e;
+        //double diff_material_pawns_e = w_material_pawns_e - b_material_pawns_e;
+        
+        
+        //Calculates the trading bonus or penalty
+        int eval_trading_all_e = (int) ( 0.125 * -diff_material_all_e * ( w_material_rate + b_material_rate) );
+        //int eval_trading_pawns_e = (int) ( 0.333 * diff_material_pawns_e * ( w_material_rate + b_material_rate - 2 ) );
+        
+		evalInfo.eval_Material_e += eval_trading_all_e;
+		//evalInfo.eval_Material_e += eval_trading_pawns_e;
+        
+		
+		/*
+        final int wM = pos.getwMtrl();
+        final int bM = pos.getbMtrl();
+        final int wPawn = pos.getwMtrlPawns();
+        final int bPawn = pos.getbMtrlPawns();
+        final int deltaScore = wM - bM;
+
+        int pBonus = 0;
+        pBonus += interpolate((deltaScore > 0) ? wPawn : bPawn, 0, -30 * deltaScore / 100, 6 * pV, 0);
+        pBonus += interpolate((deltaScore > 0) ? bM : wM, 0, 30 * deltaScore / 100, qV + 2 * rV + 2 * bV + 2 * nV, 0);
+
+        return pBonus;
+        */
+    }
+    
+    
 	/*public int eval_material() {
 		
 		int eval_o = 0;
@@ -1711,7 +1787,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 			    
 			    int rank = Fields.DIGITS[fieldID];
 			    int trapped = getTrappedScores(mob_safe, 3);
-			    trapped_all += rank * trapped;
+			    trapped_all += (7 + rank) * trapped;
 			}
 		}
 		
@@ -1728,7 +1804,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 			    
 			    int rank = Fields.DIGITS[fieldID];
 			    int trapped = getTrappedScores(mob_safe, 3);
-			    trapped_all += rank * trapped;
+			    trapped_all += (7 + rank) * trapped;
 			}
 		}
 		
@@ -1745,7 +1821,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 				
 			    int rank = Fields.DIGITS[fieldID];
 			    int trapped = getTrappedScores(mob_safe, 5);
-			    trapped_all += rank * trapped;
+			    trapped_all += (7 + rank) * trapped;
 			}
 		}
 		
@@ -1762,7 +1838,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 				
 			    int rank = Fields.DIGITS[fieldID];
 			    int trapped = getTrappedScores(mob_safe, 9);
-			    trapped_all += rank * trapped;
+			    trapped_all += (7 + rank) * trapped;
 			}
 		}
 		
@@ -1784,7 +1860,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 			    
 			    int rank = 7 - Fields.DIGITS[fieldID];
 			    int trapped = -getTrappedScores(mob_safe, 3);
-			    trapped_all += rank * trapped;
+			    trapped_all += (7 + rank) * trapped;
 			}
 		}
 		
@@ -1801,7 +1877,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 				
 				int rank = 7 - Fields.DIGITS[fieldID];
 			    int trapped = -getTrappedScores(mob_safe, 3);
-			    trapped_all += rank * trapped;
+			    trapped_all += (7 + rank) * trapped;
 			}
 		}
 		
@@ -1818,7 +1894,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 				
 				int rank = 7 - Fields.DIGITS[fieldID];
 			    int trapped = -getTrappedScores(mob_safe, 5);
-			    trapped_all += rank * trapped;
+			    trapped_all += (7 + rank) * trapped;
 			}
 		}
 		
@@ -1836,12 +1912,12 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 				
 				int rank = 7 - Fields.DIGITS[fieldID];
 			    int trapped = -getTrappedScores(mob_safe, 9);
-			    trapped_all += rank * trapped;
+			    trapped_all += (7 + rank) * trapped;
 			}
 		}
 		
 		
-		//trapped_all /= 4;
+		trapped_all /= 4;
 		evalInfo.eval_Trapped_o += trapped_all * TRAPED_O;
 		evalInfo.eval_Trapped_e += trapped_all * TRAPED_E;
 		
@@ -1898,11 +1974,11 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 	
 	private int getTrappedScores(int mob_safe, int piece_weight) {
 		if (mob_safe == 0) { 
-			return 4;// * piece_weight;
+			return 4 * piece_weight;
 		} else if (mob_safe == 1) {
-			return 2;// * piece_weight;
+			return 2 * piece_weight;
 		} else if (mob_safe == 2) {
-			return 1;// * piece_weight;
+			return 1 * piece_weight;
 		} else {
 			return 0;
 		}
