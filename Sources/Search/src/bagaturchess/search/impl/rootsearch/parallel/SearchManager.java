@@ -367,7 +367,7 @@ public class SearchManager {
 				
 				if (!betasGen.hasLowerBound()) {
 						
-					sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
+					//sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
 					
 					if (mediator != null) {
 						
