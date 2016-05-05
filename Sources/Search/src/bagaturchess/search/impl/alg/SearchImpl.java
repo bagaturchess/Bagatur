@@ -692,7 +692,16 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 				
 				info.setSearchedNodes(info.getSearchedNodes() + 1);
 				
-				result.bestmove = useLower ? entry.getBestMove_lower() : entry.getBestMove_upper();
+				if (entry.isExact()) {
+					result.bestmove = entry.getBestMove_lower();
+				} else if (entry.getLowerBound() >= beta) {
+					result.bestmove = entry.getBestMove_lower();
+				} else if (entry.getUpperBound() <= alpha) {
+					result.bestmove = entry.getBestMove_upper();
+				} else {
+					result.bestmove = useLower ? entry.getBestMove_lower() : entry.getBestMove_upper();
+				}
+				
 				/*if (result.bestmove == 0) {
 					result.bestmove = useLower ? entry.getBestMove_upper() : entry.getBestMove_lower();
 					useLower = !useLower;
