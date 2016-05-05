@@ -108,12 +108,12 @@ public class MemoryConsumers {
 		
 		channel.dump("Openning Book enabled: " + ownBookEnabled);
 		if (ownBookEnabled) {
-			Thread loadOB = new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
+			//Thread loadOB = new Thread(new Runnable() {
+			//	
+			//	@Override
+			//	public void run() {
 					
-					long lastAvailable_in_MB = ((getAvailableMemory()) / (1024 * 1024));
+					lastAvailable_in_MB = ((getAvailableMemory()) / (1024 * 1024));
 					channel.dump("Openning Book ... ");
 					try {
 						openingBook = OpeningBookFactory.getBook();
@@ -122,15 +122,15 @@ public class MemoryConsumers {
 						channel.dump("Unable to load Openning Book. Error is:");
 						channel.dump(e);
 					}
-				}
-			});
-			loadOB.start();
+			//	}
+			//});
+			//loadOB.start();
 		}
 		
-		Thread loadEGTB = new Thread(new Runnable() {
+		//Thread loadEGTB = new Thread(new Runnable() {
 			
-			@Override
-			public void run() {
+			//@Override
+			//public void run() {
 				
 				channel.dump("Loading modules for Gaviota Endgame Tablebases support ... ");
 				
@@ -148,9 +148,9 @@ public class MemoryConsumers {
 					//throw new IllegalStateException("egtbprobe dynamic library could not be loaded (or not found)");
 					channel.dump(GTBProbing_NativeWrapper.getErrorMessage());
 				}
-			}
-		});
-		loadEGTB.start();
+		//	}
+		//});
+		//loadEGTB.start();
 		
 		
 		channel.dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
