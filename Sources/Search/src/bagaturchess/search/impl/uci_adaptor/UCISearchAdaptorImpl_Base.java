@@ -136,13 +136,11 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 	
 	protected void goSearch(boolean ponderSearch) {
 		
-		/*
 		if (searchAdaptorCfg.isPonderingEnabled()) {
 			getSearcherNormal().decreaseTPTDepths(1);
 		} else {
 			getSearcherNormal().decreaseTPTDepths(2);
 		}
-		*/
 		
 		/*if (timeController == null || timeController.hasTime(1000)) {
 			System.gc();
