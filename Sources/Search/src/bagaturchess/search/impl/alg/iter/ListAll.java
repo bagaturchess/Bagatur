@@ -33,7 +33,6 @@ import bagaturchess.search.impl.history.HistoryTable;
 import bagaturchess.search.impl.utils.Sorting;
 
 
-
 public class ListAll implements ISearchMoveList {
 	
 	
@@ -98,8 +97,6 @@ public class ListAll implements ISearchMoveList {
 	private int prevPvMove = 0;
 	private int mateMove = 0;
 	
-	private boolean hasDominantMove;
-	
 	private SearchEnv env;
 	
 	private OrderingStatistics orderingStatistics;
@@ -137,7 +134,6 @@ public class ListAll implements ISearchMoveList {
 		prevBestMove = 0;
 		prevPvMove = 0;
 		mateMove = 0;
-		hasDominantMove = false;
 	}
 	
 	@Override
@@ -244,13 +240,11 @@ public class ListAll implements ISearchMoveList {
 		long ordval = 0;
 		
 		if (move == tptMove) {
-			hasDominantMove = true;
 			ordval += ORD_VAL_SHIFT * ORD_VAL_TPT_MOVE * orderingStatistics.getOrdVal_TPT();
 			orderingStatistics.tpt_count++;
 		}
 		
 		if (move == prevPvMove) {
-			hasDominantMove = true;
 			ordval += ORD_VAL_SHIFT * ORD_VAL_PREVPV_MOVE * orderingStatistics.getOrdVal_PREVPV();
 			orderingStatistics.prevpv_count++;
 		}
@@ -260,7 +254,6 @@ public class ListAll implements ISearchMoveList {
 		}
 		
 		if (move == prevBestMove) {
-			hasDominantMove = true;
 			ordval += ORD_VAL_SHIFT * ORD_VAL_PREV_BEST_MOVE * orderingStatistics.getOrdVal_PREVBEST();
 			orderingStatistics.prevbest_count++;
 		}
@@ -270,7 +263,6 @@ public class ListAll implements ISearchMoveList {
 		}
 		
 		if (move == mateMove) {
-			hasDominantMove = true;
 			ordval += ORD_VAL_SHIFT * ORD_VAL_MATE_MOVE * orderingStatistics.getOrdVal_MATEMOVE();
 			orderingStatistics.matemove_count++;
 		}
@@ -278,7 +270,6 @@ public class ListAll implements ISearchMoveList {
 		int[] mateKillers = env.getHistory_all().getMateKillers(env.getBitboard().getColourToMove());
 		for (int i=0; i<mateKillers.length; i++) {
 			if (move == mateKillers[i]) {
-				hasDominantMove = true;
 				ordval += ORD_VAL_SHIFT * ORD_VAL_MATE_KILLER * orderingStatistics.getOrdVal_MATEKILLER();
 				orderingStatistics.matekiller_count++;
 				break;
@@ -288,7 +279,6 @@ public class ListAll implements ISearchMoveList {
 		int[] killers = env.getHistory_all().getNonCaptureKillers(env.getBitboard().getColourToMove());
 		for (int i=0; i<killers.length; i++) {
 			if (move == killers[i]) {
-				hasDominantMove = true;
 				ordval += ORD_VAL_SHIFT * ORD_VAL_KILLER * orderingStatistics.getOrdVal_KILLER();
 				orderingStatistics.killer_count++;
 				break;
@@ -322,15 +312,11 @@ public class ListAll implements ISearchMoveList {
 			int see = 10 * gain - piece;*/
 			
 			int see = env.getBitboard().getSee().evalExchange(move);
-			if (see > 0) {
-				hasDominantMove = true;
-			}
 			
 			if (see > 0) {
 				ordval += ORD_VAL_SHIFT * ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
 				orderingStatistics.wincap_count++;
 			} else if (see == 0) {
-				ordval += ORD_VAL_SHIFT * ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();
 				orderingStatistics.eqcap_count++;
 			} else {
 				ordval += ORD_VAL_SHIFT * ORD_VAL_LOSE_CAP + see;
@@ -359,6 +345,54 @@ public class ListAll implements ISearchMoveList {
 		ordval += ORD_VAL_SHIFT * env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
 		
 		return ordval;
+	}
+	
+	 
+	public boolean isGoodMove(int move) {
+		
+		if (move == tptMove) {
+			return true;
+		}
+		
+		if (move == prevPvMove) {
+			return true;
+		}
+		
+		if (move == prevBestMove) {
+			return true;
+		}
+		
+		if (move == mateMove) {
+			return true;
+		}
+		
+		int[] mateKillers = env.getHistory_all().getMateKillers(env.getBitboard().getColourToMove());
+		for (int i=0; i<mateKillers.length; i++) {
+			if (move == mateKillers[i]) {
+				return true;
+			}
+		}
+		
+		int[] killers = env.getHistory_all().getNonCaptureKillers(env.getBitboard().getColourToMove());
+		for (int i=0; i<killers.length; i++) {
+			if (move == killers[i]) {
+				return true;
+			}
+		}
+		
+		if (env.getHistory_all().getCounterMove(env.getBitboard().getLastMove()) == move) {
+			return true;
+		} else {
+			if (env.getHistory_all().getCounterMove2(env.getBitboard().getLastMove()) == move) {
+				return true;
+			} else {
+				if (env.getHistory_all().getCounterMove3(env.getBitboard().getLastMove()) == move) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 	
 	 
@@ -425,9 +459,6 @@ public class ListAll implements ISearchMoveList {
 		if (MoveInt.isCaptureOrPromotion(bestmove)) {
 			
 			int see = env.getBitboard().getSee().evalExchange(bestmove);
-			if (see > 0) {
-				hasDominantMove = true;
-			}
 			
 			if (see > 0) {
 				orderingStatistics.wincap_best++;
@@ -502,15 +533,11 @@ public class ListAll implements ISearchMoveList {
 	public void setTptMove(int tptMove) {
 		this.tptMove = tptMove;
 	}
-
+	
 	public void setPrevpvMove(int prevpvMove) {
 		this.prevPvMove = prevpvMove;
 	}
-
-	public boolean hasDominantMove() {
-		return hasDominantMove;
-	}
-
+	
 	@Override
 	public void newSearch() {
 		//orderingStatistics.normalize();

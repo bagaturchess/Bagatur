@@ -139,7 +139,6 @@ public class ListKingEscapes implements ISearchMoveList {
 			if (see > 0) {
 				ordval += ORD_VAL_SHIFT * ORD_VAL_WIN_CAP + see;
 			} else if (see == 0) {
-				ordval += ORD_VAL_SHIFT * ORD_VAL_EQ_CAP;
 			} else {
 				ordval += ORD_VAL_SHIFT * ORD_VAL_LOSE_CAP + see;
 			}
