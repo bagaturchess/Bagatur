@@ -317,6 +317,7 @@ public class ListAll implements ISearchMoveList {
 				ordval += ORD_VAL_SHIFT * ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
 				orderingStatistics.wincap_count++;
 			} else if (see == 0) {
+				ordval += ORD_VAL_SHIFT * ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();// + 50;
 				orderingStatistics.eqcap_count++;
 			} else {
 				ordval += ORD_VAL_SHIFT * ORD_VAL_LOSE_CAP + see;
