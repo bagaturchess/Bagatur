@@ -62,8 +62,8 @@ public class BagaturEvaluator extends EvaluatorAdapter {
 		int eval = evaluator.evalPos(pos);
 		
 		evalCache.lock();
-		//evalCache.put(hashkey, (int) eval, false);
-		evalCache.put(hashkey, 1, (int) eval, alpha, beta);
+		evalCache.put(hashkey, (int) eval, false);
+		//evalCache.put(hashkey, 1, (int) eval, alpha, beta);
 		evalCache.unlock();
 		
 		return eval;
@@ -86,8 +86,8 @@ public class BagaturEvaluator extends EvaluatorAdapter {
 		int eval = evaluator.evalPos(pos);
 		
 		evalCache.lock();
-		//evalCache.put(hashkey, (int) eval, false);
-		evalCache.put(hashkey, 1, (int) eval, alpha, beta);
+		evalCache.put(hashkey, (int) eval, false);
+		//evalCache.put(hashkey, 1, (int) eval, alpha, beta);
 		evalCache.unlock();
 		
 		return eval;
