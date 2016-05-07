@@ -23,23 +23,23 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	private IExtensionMode mode 					= IExtensionMode.DYNAMIC;
 	private int dynamicExt_UpdateInterval			= 1000;
 	
-	public int extension_CheckInPV 					= 0;
-	public int extension_SingleReplyInPV 			= 0;
-	public int extension_WinCapNonPawnInPV 			= 0;
-	public int extension_WinCapPawnInPV 			= 0;
-	public int extension_RecapturePV 				= 0;
-	public int extension_PasserPushPV 				= 0;
+	public int extension_CheckInPV 					= (2 * PLY) / 3;
+	public int extension_SingleReplyInPV 			= PLY;
+	public int extension_WinCapNonPawnInPV 			= PLY;
+	public int extension_WinCapPawnInPV 			= PLY;
+	public int extension_RecapturePV 				= PLY;
+	public int extension_PasserPushPV 				= PLY / 2;
 	public int extension_PromotionPV 				= 0;
 	public int extension_MateThreatPV 				= 0;
 	public int extension_MoveEvalPV 				= 0;
 	public boolean extension_MateLeafPV 			= false;
 	
-	public int extension_CheckInNonPV 				= 0;
-	public int extension_SingleReplyInNonPV 		= 0;
-	public int extension_WinCapNonPawnInNonPV 		= 0;
-	public int extension_WinCapPawnInNonPV 			= 0;
-	public int extension_RecaptureNonPV 			= 0;
-	public int extension_PasserPushNonPV 			= 0;
+	public int extension_CheckInNonPV 				= (2 * PLY) / 3;
+	public int extension_SingleReplyInNonPV 		= PLY;
+	public int extension_WinCapNonPawnInNonPV 		= PLY;
+	public int extension_WinCapPawnInNonPV 			= PLY;
+	public int extension_RecaptureNonPV 			= PLY;
+	public int extension_PasserPushNonPV 			= PLY / 2;
 	public int extension_PromotionNonPV 			= 0;
 	public int extension_MateThreatNonPV			= 0;
 	public int extension_MoveEvalNonPV				= 0;
