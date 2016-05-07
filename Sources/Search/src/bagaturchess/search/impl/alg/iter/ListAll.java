@@ -393,6 +393,16 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 
+		if( (env.getHistory_all().getScores(move) / (double) env.getHistory_all().getMaxRate()) >= 0.5 ) {
+			return true;
+		}
+		
+		/*
+		if( env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) >= 0.5 ) {
+			return true;
+		}
+		*/
+		
 		return false;
 	}
 	
