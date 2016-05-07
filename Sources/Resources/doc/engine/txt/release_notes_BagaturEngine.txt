@@ -1,8 +1,10 @@
 
-Version 1.4 (25 April 2016)
-  * 85+ ELO stronger!
+Version 1.4 (11 May 2016)
+  * 100+ ELO stronger!
   * Added Windows 64 support for Gaviota Endgame Tablebases
-  * Search optimizations: New depth reduction function used in LMR reduction, more reliable static pruning, separate transposition table per CPU (preparation for the new parallel search)
+  * Search optimizations: New depth reduction function used in late move reduction, extensions adjustments, more reliable static pruning, separate transposition table per CPU (preparation for the new parallel search)
+  * Evaluation function: support for double bishops, good and bad bishops
+  * Draw probability adjustment for endgames with different colored bishops
   * Updated *.exe files to support Java 7 and Java 8
   * Default memory increased from 128MB to 256MB. Could be set in the corresponding *.ini files to *exe files (or bat files if you don't use *.exe starters)
   * Improved memory management
