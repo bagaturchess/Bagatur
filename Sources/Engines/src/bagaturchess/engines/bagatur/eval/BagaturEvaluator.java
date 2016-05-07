@@ -67,7 +67,10 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 	
 	private IBagaturEvalConfig evalConfig;
 	
-
+	private int MATERIAL_DOUBLE_BISHOP_O = 40;
+	private int MATERIAL_DOUBLE_BISHOP_E = 50;
+	
+	
 	static {
 		/*-10
 		+ Math.max(2 * MATERIAL_ROOK_E, MATERIAL_DOUBLE_ROOK_E)
@@ -585,18 +588,26 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		}*/
 		
 		/**
-		 * Differently coloured bishops
+		 * Differently colored bishops, no other pieces except pawns
 		 */
-		if (w_bishops.getDataSize() == 1 && b_bishops.getDataSize() == 1) {
+		if (w_bishops.getDataSize() == 1
+				&& b_bishops.getDataSize() == 1
+				&& bitboard.getMaterialFactor().getWhiteFactor() == 3
+				&& bitboard.getMaterialFactor().getBlackFactor() == 3) {
+			
 			long w_colour = (evalInfo.bb_w_bishops & Fields.ALL_WHITE_FIELDS) != 0 ?
 					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
 			long b_colour = (evalInfo.bb_b_bishops & Fields.ALL_WHITE_FIELDS) != 0 ?
 					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
-			if (w_colour != b_colour) {	
-				if (eval >= 0) {
-					abs -= Math.min(50, abs / 2);	
-				} else {
-					abs += Math.min(50, abs / 2);
+			if (w_colour != b_colour) {
+				
+				//If one of the sides has advantage of 2-3 pawns, than let it know the game goes to draw
+				if (Math.abs(eval) <= 250) {
+					if (eval > 0) {//White has the advantage
+						abs = abs / 4;
+					} else if (eval < 0) {//Black has the advantage
+						abs = abs / 4;
+					}
 				}
 			}
 		}
@@ -606,7 +617,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		 */
 		int movesBeforeDraw = 100 - bitboard.getDraw50movesRule();
 		double percents = movesBeforeDraw / (double)100;
-		abs = (int) ((abs + percents * abs) / (double)2);
+		abs = (int) (percents * abs);//(int) ((abs + percents * abs) / (double)2);
 		
 		/**
 		 * Return value
@@ -769,7 +780,6 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		int b_eval_pawns_o = baseEval.getBlackMaterialPawns_o();
 		int b_eval_pawns_e = baseEval.getBlackMaterialPawns_e();
 		
-		
 		/*w_eval_pawns_o += MATERIAL_PAWN_O * w_pawns.getDataSize() * evalConfig.get_WEIGHT_MATERIAL_PAWNS_O();
 		w_eval_pawns_e += MATERIAL_PAWN_E * w_pawns.getDataSize() * evalConfig.get_WEIGHT_MATERIAL_PAWNS_E();
 		b_eval_pawns_o += MATERIAL_PAWN_O * b_pawns.getDataSize() * evalConfig.get_WEIGHT_MATERIAL_PAWNS_O();
@@ -831,10 +841,22 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 				}
 			}
 		}
-		       
 		
-		evalInfo.eval_Material_o += (w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o);
-		evalInfo.eval_Material_e += (w_eval_nopawns_e - b_eval_nopawns_e) + (w_eval_pawns_e - b_eval_pawns_e);
+		int w_double_bishops_o = 0;
+		int w_double_bishops_e = 0;
+		int b_double_bishops_o = 0;
+		int b_double_bishops_e = 0;
+		if (w_bishops.getDataSize() >= 2) {
+			w_double_bishops_o += MATERIAL_DOUBLE_BISHOP_O;
+			w_double_bishops_e += MATERIAL_DOUBLE_BISHOP_E;
+		}
+		if (b_bishops.getDataSize() >= 2) {
+			b_double_bishops_o += MATERIAL_DOUBLE_BISHOP_O;
+			b_double_bishops_e += MATERIAL_DOUBLE_BISHOP_E;
+		}
+		
+		evalInfo.eval_Material_o += (w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o) + (w_double_bishops_o - b_double_bishops_o);
+		evalInfo.eval_Material_e += (w_eval_nopawns_e - b_eval_nopawns_e) + (w_eval_pawns_e - b_eval_pawns_e) + (w_double_bishops_e - b_double_bishops_e);
 		
 		return interpolator.interpolateByFactor(evalInfo.eval_Material_o, evalInfo.eval_Material_e);
 
@@ -860,6 +882,35 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		eval_e += patterns;
 		
 		int kingsDistance = Fields.getDistancePoints(w_king.getData()[0], b_king.getData()[0]);
+		
+		//King Opposition
+		if (bitboard.getMaterialFactor().getWhiteFactor() == 0
+				&& bitboard.getMaterialFactor().getBlackFactor() == 0) {
+			
+			if (kingsDistance == 2) {
+				
+				boolean kingsOnSameColourSquares = ((Fields.ALL_WHITE_FIELDS & evalInfo.bb_w_king) != 0 &&  (Fields.ALL_WHITE_FIELDS & evalInfo.bb_b_king) != 0)
+						|| ((Fields.ALL_BLACK_FIELDS & evalInfo.bb_w_king) != 0 &&  (Fields.ALL_BLACK_FIELDS & evalInfo.bb_b_king) != 0);
+				
+				if (kingsOnSameColourSquares) {
+					//The side moved last has the opposition. In this case the side which is not on move.
+					
+					if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+						//Black has the opposition
+						eval_o -= STANDARD_KINGS_OPPOSITION_O;
+						eval_e -= STANDARD_KINGS_OPPOSITION_E;
+					} else {
+						//White has the opposition
+						eval_o += STANDARD_KINGS_OPPOSITION_O;
+						eval_e += STANDARD_KINGS_OPPOSITION_E;
+					}
+				}
+			} else if (kingsDistance > 2 && kingsDistance % 2 == 0) {
+				//TODO: Implement the opposition when the kings have more than 2 square distance
+				//e.g. on the same line (can use Fields.areOnTheSameLine(f1, f2))
+			}
+		}
+		
 		if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
 			eval_o += STANDARD_DIST_KINGS_O[kingsDistance];
 			eval_e += STANDARD_DIST_KINGS_E[kingsDistance];
@@ -1190,7 +1241,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 			    
 			    
 			    // Knight outposts:
-			    if ((SPACE_BLACK & bb_field) != 0) {
+			    if ((Fields.SPACE_BLACK & bb_field) != 0) {
 				    long bb_neighbors = ~PawnStructureConstants.WHITE_FRONT_FULL[fieldID] & PawnStructureConstants.WHITE_PASSED[fieldID];
 				    if ((bb_neighbors & evalInfo.bb_b_pawns) == 0) { // Weak field
 				    	
@@ -1245,7 +1296,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 			    
 			    
 			    // Knight outposts:
-			    if ((SPACE_WHITE & bb_field) != 0) {
+			    if ((Fields.SPACE_WHITE & bb_field) != 0) {
 				    long bb_neighbors = ~PawnStructureConstants.BLACK_FRONT_FULL[fieldID] & PawnStructureConstants.BLACK_PASSED[fieldID];
 				    if ((bb_neighbors & evalInfo.bb_w_pawns) == 0) { // Weak field
 				      
@@ -1301,7 +1352,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 
 			    
 			    // Bishop outposts:
-			    if ((SPACE_BLACK & bb_field) != 0) {
+			    if ((Fields.SPACE_BLACK & bb_field) != 0) {
 				    long bb_neighbors = ~PawnStructureConstants.WHITE_FRONT_FULL[fieldID] & PawnStructureConstants.WHITE_PASSED[fieldID];
 				    if ((bb_neighbors & evalInfo.bb_b_pawns) == 0) { // Weak field
 				      
@@ -1322,6 +1373,21 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 					    eval_e += scores * BISHOP_OUTPOST_E[fieldID];
 				    }
 			    }
+			    
+			    //Bad bishop penalty
+			    int bad_bishop_score = 0;
+			    if ((bb_field & Fields.ALL_WHITE_FIELDS) != 0) { //White bishop
+			    	
+			    	bad_bishop_score += 2 * Utils.countBits_less1s(Fields.ALL_WHITE_FIELDS & Fields.CENTER_2 & (evalInfo.bb_w_pawns | evalInfo.bb_b_pawns));
+			    	bad_bishop_score += Utils.countBits_less1s(Fields.ALL_WHITE_FIELDS & ~Fields.CENTER_2 & evalInfo.bb_w_pawns);
+			    } else { //Black bishop
+			    	
+			    	bad_bishop_score += 2 * Utils.countBits_less1s(Fields.ALL_BLACK_FIELDS & Fields.CENTER_2 & (evalInfo.bb_w_pawns | evalInfo.bb_b_pawns));
+			    	bad_bishop_score += Utils.countBits_less1s(Fields.ALL_BLACK_FIELDS & ~Fields.CENTER_2 & evalInfo.bb_w_pawns);
+			    }
+			    
+	    		eval_o -= bad_bishop_score * 5;
+			    eval_e -= bad_bishop_score * 10;
 			}
 		}
 		
@@ -1356,7 +1422,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 			    
 			    
 			    // Bishop outposts:
-			    if ((SPACE_WHITE & bb_field) != 0) {
+			    if ((Fields.SPACE_WHITE & bb_field) != 0) {
 				    long bb_neighbors = ~PawnStructureConstants.BLACK_FRONT_FULL[fieldID] & PawnStructureConstants.BLACK_PASSED[fieldID];
 				    if ((bb_neighbors & evalInfo.bb_w_pawns) == 0) { // Weak field
 				    	
@@ -1377,6 +1443,21 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 					    eval_e -= scores * BISHOP_OUTPOST_E[HORIZONTAL_SYMMETRY[fieldID]];
 				    }
 			    }
+			    
+			    //Bad bishop penalty
+			    int bad_bishop_score = 0;
+			    if ((bb_field & Fields.ALL_WHITE_FIELDS) != 0) { //White bishop
+			    	
+			    	bad_bishop_score += 2 * Utils.countBits_less1s(Fields.ALL_WHITE_FIELDS & Fields.CENTER_2 & (evalInfo.bb_w_pawns | evalInfo.bb_b_pawns));
+			    	bad_bishop_score += Utils.countBits_less1s(Fields.ALL_WHITE_FIELDS & ~Fields.CENTER_2 & evalInfo.bb_b_pawns);
+			    } else { //Black bishop
+			    	
+			    	bad_bishop_score += 2 * Utils.countBits_less1s(Fields.ALL_BLACK_FIELDS & Fields.CENTER_2 & (evalInfo.bb_w_pawns | evalInfo.bb_b_pawns));
+			    	bad_bishop_score += Utils.countBits_less1s(Fields.ALL_BLACK_FIELDS & ~Fields.CENTER_2 & evalInfo.bb_b_pawns);
+			    }
+			    
+	    		eval_o += bad_bishop_score * 5;
+			    eval_e += bad_bishop_score * 10;
 			}
 		}
 		
@@ -1644,7 +1725,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 			
 			w_spaceWeight *= w_spaceWeight;
 			
-			long w_safe = SPACE_WHITE
+			long w_safe = Fields.SPACE_WHITE
 							& ~evalInfo.bb_w_pawns
 							& ~evalInfo.attackedBy[Constants.PID_B_PAWN]
 							& (evalInfo.attackedByWhite | ~evalInfo.attackedByBlack);
@@ -1668,7 +1749,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 			
 			b_spaceWeight *= b_spaceWeight;
 			
-			long b_safe = SPACE_BLACK
+			long b_safe = Fields.SPACE_BLACK
 							& ~evalInfo.bb_b_pawns
 							& ~evalInfo.attackedBy[Constants.PID_W_PAWN]
 							& (evalInfo.attackedByBlack | ~evalInfo.attackedByWhite);
@@ -1917,7 +1998,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		}
 		
 		
-		trapped_all /= 4;
+		trapped_all /= 2;
 		evalInfo.eval_Trapped_o += trapped_all * TRAPED_O;
 		evalInfo.eval_Trapped_e += trapped_all * TRAPED_E;
 		
