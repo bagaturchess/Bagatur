@@ -72,14 +72,25 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	public void recreateSearchAdaptor() throws FileNotFoundException {
 		
-		if (searchAdaptor != null) {
-			searchAdaptor.stopSearch();
-			searchAdaptor.shutDown();
+		channel.sendLogToGUI("StateManager: Re-creating search adaptor ...");
+		
+		IUCISearchAdaptor lastAdaptor = searchAdaptor;
+		searchAdaptor = null;
+		
+		if (lastAdaptor != null) {
+			channel.sendLogToGUI("StateManager: Stoping old search adaptor ...");
+			lastAdaptor.stopSearch();
+			lastAdaptor.shutDown();
+			channel.sendLogToGUI("StateManager: Old search adaptor stopped.");
 		}
 
+		channel.sendLogToGUI("StateManager: Run gc ...");
 		System.gc();
+		channel.sendLogToGUI("StateManager: GC ok.");
 		
 		searchAdaptor = UCISearchAdaptorFactory.newUCISearchAdaptor(engineBootCfg, board);
+		
+		channel.sendLogToGUI("StateManager: Search adaptor Re-created.");
 	}
 	
 	
@@ -93,10 +104,10 @@ public class StateManager extends Protocol implements BestMoveSender {
 				String fromGUICommand = getFromGUICommand(fromGUILine);
 				int fromGUICommandID = getToEngineCommandID(fromGUICommand);
 				if (fromGUICommandID == Protocol.COMMAND_UNDEFINED) {
-					channel.sendLogToGUI("Command " + fromGUICommand + " UNSUPPORTED");
+					channel.sendLogToGUI("StateManager: Command " + fromGUICommand + " UNSUPPORTED from Bagatur Chess Engine");
 					//Thread.sleep(100);
 				} else {
-					channel.sendLogToGUI("exec command " + fromGUICommandID + " > " + fromGUICommand);
+					channel.sendLogToGUI("StateManager: exec command " + fromGUICommandID + " > " + fromGUICommand);
 					switch (fromGUICommandID) {
 						case COMMAND_TO_ENGINE_UCI:
 							sendEngineID();
@@ -104,6 +115,17 @@ public class StateManager extends Protocol implements BestMoveSender {
 							sendUCIOK();
 							break;
 						case COMMAND_TO_ENGINE_ISREADY:
+							
+							int retries_count = 0;
+							while (searchAdaptor == null) {
+								retries_count++;
+								Thread.currentThread().sleep(1000);
+								channel.sendLogToGUI("StateManager: Waiting loading and than will sent 'readyok' commmand to GUI ... each seccond check if searchAdaptor is ready (not null). retry " + retries_count);
+								if (retries_count > 10) {
+									throw new IllegalStateException("StateManager: search adaptor is still null");
+								}
+							}
+							
 							sendReadyOK();
 							break;
 						case COMMAND_TO_ENGINE_NEWGAME:
@@ -136,7 +158,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 				
 			} catch(Throwable e) {
 				channel.dump(e);
-				channel.sendLogToGUI("Error: " + e.getMessage());
+				channel.sendLogToGUI("StateManager: Error: " + e.getMessage());
 				Thread.sleep(500);
 			}
 		}
@@ -208,9 +230,9 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	private void setOption(String fromGUILine) throws IOException {
 		
-		channel.sendLogToGUI("Set-option called with line: " + fromGUILine);
+		channel.sendLogToGUI("StateManager: Set-option called with line: " + fromGUILine);
 		SetOption setoption = new SetOption(channel, fromGUILine);
-		channel.sendLogToGUI("Set-option parsed: " + setoption);
+		channel.sendLogToGUI("StateManager: Set-option parsed: " + setoption);
 		
 		optionsManager.set(setoption);
 	}
@@ -273,7 +295,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	
 	private void ponderHit(String fromGUILine) throws IOException {
-		channel.sendLogToGUI("Ponder hit -> switching search");
+		channel.sendLogToGUI("StateManager: Ponder hit -> switching search");
 		searchAdaptor.ponderHit();
 	}
 	
@@ -299,7 +321,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 				channel.dump(e);
 			}
 		} else {
-			channel.sendLogToGUI("WARNING: StateManager -> move returned from UCI Search adaptor is '0' and is not sent to the UCI platform");
+			channel.sendLogToGUI("StateManager: WARNING: StateManager -> move returned from UCI Search adaptor is '0' and is not sent to the UCI platform");
 		}
 	}
 	

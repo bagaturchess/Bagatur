@@ -153,9 +153,8 @@ public class MTDSchedulerMain {
 		//r1b2rk1/5ppp/p3q3/2p1PpB1/P3p3/6Q1/1PP3PP/2KR3R w - - 2 22 - Bg5-f6 is the move, material loss for black
 		//r4rk1/pp3ppp/2pq4/3p4/4nPb1/2BBP3/PPP3PP/R3QRK1 w - - 2 15 Bd3xe4 is the correct move +3.00
 		//2r1n2r/1q4k1/2p1pn2/ppR4p/4PNbP/P1BBQ3/1P4P1/R5K1 b - - 1 32 orrect move is Kg7f7, the position is used for testing captures extensions
-		//8/5rk1/5rp1/2P5/PQP5/K2P4/8/8 w - - 0 1 the position is used for testing passer puish extensions
+		//5k2/4r1p1/4r3/8/1Q6/P7/2PP4/1K6 w - - 0 1  the position is used for testing passer puish extensions
 		
-		IBitBoard bitboard  = new Board("8/5rk1/5rp1/2P5/PQP5/K2P4/8/8 w - - 0 1", null, cfg.getBoardConfig());
 		
 		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
