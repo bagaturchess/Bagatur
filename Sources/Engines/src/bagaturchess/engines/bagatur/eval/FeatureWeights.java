@@ -21,16 +21,6 @@ public interface FeatureWeights {
 	public static final int BishopAttackWeight 	= 2;
 	public static final int KnightAttackWeight	 = 2;
 	
-	public static final long SPACE_WHITE = Fields.C2 | Fields.C3 | Fields.C4
-										    | Fields.D2 | Fields.D3 | Fields.D4
-											| Fields.E2 | Fields.E3 | Fields.E4
-											| Fields.F2 | Fields.F3 | Fields.F4;
-	
-	public static final long SPACE_BLACK = Fields.C7 | Fields.C6 | Fields.C5
-											| Fields.D7 | Fields.D6 | Fields.D5
-											| Fields.E7 | Fields.E6 | Fields.E5
-											| Fields.F7 | Fields.F6 | Fields.F5;
-	
 	
 	/**
 	 * Weights
@@ -52,13 +42,16 @@ public interface FeatureWeights {
 	/**
 	 * Standard
 	 */
-	public static final int STANDARD_TEMPO_O			= 0;
-	public static final int STANDARD_TEMPO_E			= 0;
+	public static final int STANDARD_TEMPO_O			= 25;
+	public static final int STANDARD_TEMPO_E			= 35;
 	public static final int STANDARD_CASTLING_O			= 10;
 	public static final int STANDARD_CASTLING_E			= 0;
 	public static final int FIANCHETTO                  = 30;
 	public static final int STANDARD_TRAP_BISHOP		= -120;
 	public static final int STANDARD_BLOCKED_PAWN		= -30;
+	
+	public static final int STANDARD_KINGS_OPPOSITION_O = 0;
+	public static final int STANDARD_KINGS_OPPOSITION_E = 50;
 	
 	public static final int[] STANDARD_DIST_KINGS_O		= new int[] {0, 0, 0, 0, 0, 0, 0, 0};
 	public static final int[] STANDARD_DIST_KINGS_E		= new int[] {0, 0, 0, 0, 0, 0, 0, 0}; //new int[] {0, 0, 15, 2, 9, 1, 3, 0};

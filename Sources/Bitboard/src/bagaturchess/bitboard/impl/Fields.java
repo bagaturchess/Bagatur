@@ -713,6 +713,15 @@ public class Fields extends Bits {
 		return max_delta;
 	}
 	
+	public static boolean areOnTheSameLine(int fieldID1, int fieldID2) {
+		int l1 = Fields.LETTERS[fieldID1];
+		int d1 = Fields.DIGITS[fieldID1];
+		int l2 = Fields.LETTERS[fieldID2];
+		int d2 = Fields.DIGITS[fieldID2];
+		
+		return (l1 == l2) || (d1 == d2);
+	}
+	
 	public static int getDistancePoints_reversed(int fieldID1, int fieldID2) {
 		return 7 - getDistancePoints(fieldID1, fieldID2);
 	}
