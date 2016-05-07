@@ -36,6 +36,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchMoveList;
 
 import bagaturchess.search.impl.alg.SearchImpl_MTD;
+import bagaturchess.search.impl.alg.iter.ListAll;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.exts.ExtStat;
 import bagaturchess.search.impl.pv.PVNode;
@@ -53,8 +54,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	
 	int MIN_EVAL_DIFF_PV = 33;
 	int MIN_EVAL_DIFF_NONPV = 33;
-	
-	double LMR_MULTIPLIER = 0.5;
 	
 	
 	public SearchMTD0(Object[] args) {
@@ -276,12 +275,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		double depth_delimiter = 1;
-		if (!inCheck && !singleMove) {
+		/*if (!inCheck && !singleMove) {
 			depth_delimiter = rest / (double) normDepth(maxdepth);
 			if (depth_delimiter < 0 || depth_delimiter > 1) {
 				throw new IllegalStateException("depth_delimiter=" + depth_delimiter);
 			}
-		}
+		}*/
 
 		
 		//System.out.println("depth_delimiter=" + depth_delimiter);
@@ -347,12 +346,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		double depth_delimiter = 1;
-		if (!inCheck && !singleMove) {
+		/*if (!inCheck && !singleMove) {
 			depth_delimiter = rest / (double) normDepth(maxdepth);
 			if (depth_delimiter < 0 || depth_delimiter > 1) {
 				throw new IllegalStateException("depth_delimiter=" + depth_delimiter);
 			}
-		}
+		}*/
 		
 		return (int) (maxdepth + depth_delimiter * (Math.min(PLY, extend) + (singleMove ? getEnv().getExtensions().getSingleReplyNonPV(colourToMove).calc(EXT_SINGLE_REPLY_NONPV) : 0)));
 		//return maxdepth + Math.min(2 * PLY, extend + (singleMove ? getEnv().getExtensions().getSingleReplyNonPV().calc(EXT_SINGLE_REPLY_NONPV) : 0));
@@ -575,9 +574,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKey());
 					if (entry != null) {
 						new_mateMove = entry.getBestMove_lower();
-						if (new_mateMove == 0) {
-							new_mateMove = entry.getBestMove_upper();
-						}
 					}
 					
 					if (rest == 1) {
@@ -652,7 +648,18 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					tpt_depth = tptEntry.getDepth();
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
-					tpt_move = tptEntry.getBestMove_lower();
+					if (tpt_exact) {
+						tpt_move = tptEntry.getBestMove_lower();
+					} else if (tpt_lower >= beta) {
+						tpt_move = tptEntry.getBestMove_lower();
+					} else if (tpt_upper <= beta - 1) {
+						tpt_move = tptEntry.getBestMove_upper();
+					} else {
+						tpt_move = tptEntry.getBestMove_lower();
+						if (tpt_move == 0) {
+							tpt_move = tptEntry.getBestMove_upper();
+						}
+					}
 				}
 			}
 			env.getTPT().unlock();
@@ -882,7 +889,18 @@ public class SearchMTD0 extends SearchImpl_MTD {
 								tpt_depth = tptEntry.getDepth();
 								tpt_lower = tptEntry.getLowerBound();
 								tpt_upper = tptEntry.getUpperBound();
-								tpt_move = tptEntry.getBestMove_lower();
+								if (tpt_exact) {
+									tpt_move = tptEntry.getBestMove_lower();
+								} else if (tpt_lower >= beta) {
+									tpt_move = tptEntry.getBestMove_lower();
+								} else if (tpt_upper <= beta - 1) {
+									tpt_move = tptEntry.getBestMove_upper();
+								} else {
+									tpt_move = tptEntry.getBestMove_lower();
+									if (tpt_move == 0) {
+										tpt_move = tptEntry.getBestMove_upper();
+									}
+								}
 							}
 						}
 						env.getTPT().unlock();
@@ -898,9 +916,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 									TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKey());
 									if (entry != null) {
 										new_mateMove = entry.getBestMove_lower();
-										if (new_mateMove == 0) {
-											new_mateMove = entry.getBestMove_upper();
-										}
 									}
 									env.getTPT().unlock();
 								}
@@ -933,12 +948,23 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
-					TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKey());
-					if (entry != null) {
-						tpt_lower = entry.getLowerBound();
-						tpt_move = entry.getBestMove_lower();
-						if (tpt_move == 0) {
-							tpt_move = entry.getBestMove_upper();
+					TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
+					if (tptEntry != null) {
+						tpt_exact = tptEntry.isExact();
+						tpt_depth = tptEntry.getDepth();
+						tpt_lower = tptEntry.getLowerBound();
+						tpt_upper = tptEntry.getUpperBound();
+						if (tpt_exact) {
+							tpt_move = tptEntry.getBestMove_lower();
+						} else if (tpt_lower >= beta) {
+							tpt_move = tptEntry.getBestMove_lower();
+						} else if (tpt_upper <= beta - 1) {
+							tpt_move = tptEntry.getBestMove_upper();
+						} else {
+							tpt_move = tptEntry.getBestMove_lower();
+							if (tpt_move == 0) {
+								tpt_move = tptEntry.getBestMove_upper();
+							}
 						}
 					}
 					env.getTPT().unlock();
@@ -1104,6 +1130,11 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					int lmrReduction = 0;
 					boolean staticPrunning = false;
 					
+					boolean isGoodMove = false;
+					if (list instanceof ListAll) {
+						isGoodMove = ((ListAll) list).isGoodMove(cur_move);
+					}
+					
 					if (//!isMateVal(alpha_org)
 							//&& !isMateVal(beta)
 							//true
@@ -1112,7 +1143,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							 //&& !mateThreat
 							 //&& !isCapOrProm
 							 //&& (!isCapOrProm || REDUCE_CAPTURES)
-							 //&& moveSee < 0
+							 && moveSee < 0
 							 //&& !passerPush
 							 //&& maxdepth == new_maxdepth
 							 //&& (REDUCE_HISTORY_MOVES || env.getHistory_all().getGoodMoveScores(cur_move) < 0.5)
@@ -1121,30 +1152,55 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							 //&& totalLMReduction < maxdepth / 2
 							) {
 						
-						if (searchedCount >= 1) {
+						if (searchedCount >= Math.sqrt(rest)) {
+						//if (searchedCount >= 1) {
 							staticPrunning = true;
 						}
 						
 						/*
 						double rate = Math.sqrt(depth) + Math.sqrt(searchedCount);
 						rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
-						lmrReduction = (int) (PLY * rate * LMR_MULTIPLIER);
+						lmrReduction += (int) (PLY * rate * 0.5);
 						*/
 						
-						//if (depth >= Math.sqrt(normDepth(maxdepth))) {
-							double rate = Math.sqrt(depth) + Math.sqrt(searchedCount);
+						/*
+						double rate = Math.sqrt(searchedCount);
+						rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
+						lmrReduction += (int) (PLY * rate * 1);
+						if (searchedCount >= getLMR1(list)) {
+							if (lmrReduction < PLY) {
+								lmrReduction = PLY;
+							}
+						} else {
+							if (lmrReduction > PLY / 2) {
+								lmrReduction = PLY / 2;
+							}
+						}
+						if (lmrReduction >= (rest - 1) * PLY) {
+							lmrReduction = (rest - 1) * PLY;
+						}
+						*/
+						
+						
+						if (!isGoodMove || searchedCount >= getLMR1(list)) {
+							double rate = Math.sqrt(searchedCount);
 							rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
-							lmrReduction += (int) (PLY * rate * LMR_MULTIPLIER);
-						//}
+							if (isGoodMove) {
+								rate /= 2;
+							}
+							lmrReduction += (int) (PLY * rate * 1);
+							if (lmrReduction < PLY) {
+								lmrReduction = PLY;
+							}
+							if (lmrReduction >= (rest - 1) * PLY) {
+								lmrReduction = (rest - 1) * PLY;
+							}
+						}
 						
-						
-						//if (searchedCount >= getLMR1(list)) {
+						/*
+						if (!isGoodMove) {
 							
-							//rate = Math.sqrt(searchedCount);
-							//rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
-							//lmrReduction += (int) (PLY * rate * LMR_MULTIPLIER);
-							
-							/*lmrReduction += PLY;
+							lmrReduction += PLY;
 							
 							if (rest > 2 && searchedCount >= getLMR2(list)) {
 								lmrReduction += PLY;
@@ -1163,8 +1219,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							lmrReduction *= (double)(1 - rate);
 							if (lmrReduction < PLY) {
 								lmrReduction = PLY;
-							}*/
-						//}
+							}
+						}
+						*/
 					}
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
@@ -1419,9 +1476,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKey());
 					if (entry != null) {
 						new_mateMove = entry.getBestMove_lower();
-						if (new_mateMove == 0) {
-							new_mateMove = entry.getBestMove_upper();
-						}
 					}
 					
 					if (rest == 1) {
@@ -1476,7 +1530,18 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					tpt_depth = tptEntry.getDepth();
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
-					tpt_move = tptEntry.getBestMove_lower();
+					if (tpt_exact) {
+						tpt_move = tptEntry.getBestMove_lower();
+					} else if (tpt_lower >= beta) {
+						tpt_move = tptEntry.getBestMove_lower();
+					} else if (tpt_upper <= beta - 1) {
+						tpt_move = tptEntry.getBestMove_upper();
+					} else {
+						tpt_move = tptEntry.getBestMove_lower();
+						if (tpt_move == 0) {
+							tpt_move = tptEntry.getBestMove_upper();
+						}
+					}
 				}
 			}
 			env.getTPT().unlock();
@@ -1642,7 +1707,18 @@ public class SearchMTD0 extends SearchImpl_MTD {
 								tpt_depth = tptEntry.getDepth();
 								tpt_lower = tptEntry.getLowerBound();
 								tpt_upper = tptEntry.getUpperBound();
-								tpt_move = tptEntry.getBestMove_lower();
+								if (tpt_exact) {
+									tpt_move = tptEntry.getBestMove_lower();
+								} else if (tpt_lower >= beta) {
+									tpt_move = tptEntry.getBestMove_lower();
+								} else if (tpt_upper <= beta - 1) {
+									tpt_move = tptEntry.getBestMove_upper();
+								} else {
+									tpt_move = tptEntry.getBestMove_lower();
+									if (tpt_move == 0) {
+										tpt_move = tptEntry.getBestMove_upper();
+									}
+								}
 							}
 						}
 						env.getTPT().unlock();
@@ -1658,9 +1734,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 									TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKey());
 									if (entry != null) {
 										new_mateMove = entry.getBestMove_lower();
-										if (new_mateMove == 0) {
-											new_mateMove = entry.getBestMove_upper();
-										}
 									}
 									env.getTPT().unlock();
 								}
@@ -1718,12 +1791,23 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
-					TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKey());
-					if (entry != null) {
-						tpt_lower = entry.getLowerBound();
-						tpt_move = entry.getBestMove_lower();
-						if (tpt_move == 0) {
-							tpt_move = entry.getBestMove_upper();
+					TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
+					if (tptEntry != null) {
+						tpt_exact = tptEntry.isExact();
+						tpt_depth = tptEntry.getDepth();
+						tpt_lower = tptEntry.getLowerBound();
+						tpt_upper = tptEntry.getUpperBound();
+						if (tpt_exact) {
+							tpt_move = tptEntry.getBestMove_lower();
+						} else if (tpt_lower >= beta) {
+							tpt_move = tptEntry.getBestMove_lower();
+						} else if (tpt_upper <= beta - 1) {
+							tpt_move = tptEntry.getBestMove_upper();
+						} else {
+							tpt_move = tptEntry.getBestMove_lower();
+							if (tpt_move == 0) {
+								tpt_move = tptEntry.getBestMove_upper();
+							}
 						}
 					}
 					env.getTPT().unlock();
@@ -1835,9 +1919,14 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							best_move, prevbest, prevPV, rootColour, totalLMReduction, -new_materialGain,
 							inNullMove, new_mateMove, useMateDistancePrunning, false, true);
 				} else {
-					
+						
 						int lmrReduction = 0;
 						boolean staticPrunning = false;
+						
+						boolean isGoodMove = false;
+						if (list instanceof ListAll) {
+							isGoodMove = ((ListAll) list).isGoodMove(cur_move);
+						}
 						
 						if (//!isMateVal(alpha_org)
 							 //&& !isMateVal(beta)
@@ -1847,7 +1936,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							 //&& !mateThreat
 							 //&& !isCapOrProm
 							 //&& (!isCapOrProm || REDUCE_CAPTURES)
-							 //&& moveSee < 0
+							 && moveSee < 0
 							 //&& !passerPush
 							 //&& maxdepth == new_maxdepth
 							 //&& (REDUCE_HISTORY_MOVES || env.getHistory_all().getGoodMoveScores(cur_move) < 0.5)
@@ -1855,31 +1944,57 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							 //&& !isDangerous
 							 //&& totalLMReduction < maxdepth / 2
 							) {
-						
-							if (searchedCount >= 1) {
+							
+							if (searchedCount >= Math.sqrt(rest)) {
+							//if (searchedCount >= 1) {
 								staticPrunning = true;
 							}
 							
 							/*
 							double rate = Math.sqrt(depth) + Math.sqrt(searchedCount);
 							rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
-							lmrReduction = (int) (PLY * rate * LMR_MULTIPLIER);
+							lmrReduction += (int) (PLY * rate * 0.5);
 							*/
 							
-							//if (depth >= Math.sqrt(normDepth(maxdepth))) {
-								double rate = Math.sqrt(depth) + Math.sqrt(searchedCount);
+							/*
+							double rate = Math.sqrt(searchedCount);
+							rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
+							lmrReduction += (int) (PLY * rate * 1);
+							if (searchedCount >= getLMR1(list)) {
+								if (lmrReduction < PLY) {
+									lmrReduction = PLY;
+								}
+							} else {
+								if (lmrReduction > PLY / 2) {
+									lmrReduction = PLY / 2;
+								}
+							}
+							if (lmrReduction >= (rest - 1) * PLY) {
+								lmrReduction = (rest - 1) * PLY;
+							}
+							*/
+							
+							
+							if (!isGoodMove || searchedCount >= getLMR1(list)) {
+								double rate = Math.sqrt(searchedCount);
 								rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
-								lmrReduction += (int) (PLY * rate * LMR_MULTIPLIER);
-							//}
+								if (isGoodMove) {
+									rate /= 2;
+								}
+								lmrReduction += (int) (PLY * rate * 1);
+								if (lmrReduction < PLY) {
+									lmrReduction = PLY;
+								}
+								if (lmrReduction >= (rest - 1) * PLY) {
+									lmrReduction = (rest - 1) * PLY;
+								}
+							}
 							
 							
-							//if (searchedCount >= getLMR1(list)) {
+							/*
+							if (!isGoodMove) {
 								
-								//rate = Math.sqrt(searchedCount);
-								//rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
-								//lmrReduction += (int) (PLY * rate * LMR_MULTIPLIER);
-								
-								/*lmrReduction += PLY;
+								lmrReduction += PLY;
 								
 								if (rest > 2 && searchedCount >= getLMR2(list)) {
 									lmrReduction += PLY;
@@ -1898,8 +2013,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 								lmrReduction *= (double)(1 - rate);
 								if (lmrReduction < PLY) {
 									lmrReduction = PLY;
-								}*/
-							//}
+								}
+							}
+							*/
 						}
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
@@ -2133,11 +2249,21 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				TPTEntry tptEntry = env.getTPT().get(hashkey);
 				if (tptEntry != null) {
 					tpt_found = true;
-					tpt_move = tptEntry.getBestMove_lower();
-					
 					tpt_exact = tptEntry.isExact();
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
+					if (tpt_exact) {
+						tpt_move = tptEntry.getBestMove_lower();
+					} else if (tpt_lower >= beta) {
+						tpt_move = tptEntry.getBestMove_lower();
+					} else if (tpt_upper <= beta - 1) {
+						tpt_move = tptEntry.getBestMove_upper();
+					} else {
+						tpt_move = tptEntry.getBestMove_lower();
+						if (tpt_move == 0) {
+							tpt_move = tptEntry.getBestMove_upper();
+						}
+					}
 				}
 			}
 			env.getTPT().unlock();
@@ -2150,7 +2276,15 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					node.eval = tpt_lower;
 					node.leaf = true;
 					node.nullmove = false;
-					return tpt_lower;
+					
+					env.getTPT().lock();
+					buff_tpt_depthtracking[0] = 0;
+					extractFromTPT(info, 0, node, true, buff_tpt_depthtracking);
+					env.getTPT().unlock();
+					
+					if (buff_tpt_depthtracking[0] >= 0) {
+						return node.eval;
+					}
 				}
 			} else {
 				if (tpt_lower >= beta) {
@@ -2159,7 +2293,15 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						node.eval = tpt_lower;
 						node.leaf = true;
 						node.nullmove = false;
-						return tpt_lower;
+						
+						env.getTPT().lock();
+						buff_tpt_depthtracking[0] = 0;
+						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking);
+						env.getTPT().unlock();
+						
+						if (buff_tpt_depthtracking[0] >= 0) {
+							return node.eval;
+						}
 					}
 				}
 				if (tpt_upper <= alpha_org) {
@@ -2168,7 +2310,15 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						node.eval = tpt_upper;
 						node.leaf = true;
 						node.nullmove = false;
-						return tpt_upper;
+						
+						env.getTPT().lock();
+						buff_tpt_depthtracking[0] = 0;
+						extractFromTPT(info, 0, node, false, buff_tpt_depthtracking);
+						env.getTPT().unlock();
+						
+						if (buff_tpt_depthtracking[0] >= 0) {
+							return node.eval;
+						}
 					}
 				}
 			}
@@ -2196,8 +2346,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		if (inCheck) {
 			cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		} else {
-			cur_move = (tpt_move != 0 && MoveInt.isCaptureOrPromotion(tpt_move)) ? tpt_move : list.next();
-			//cur_move = (tpt_move != 0) ? tpt_move : list.next();
+			//cur_move = (tpt_move != 0 && MoveInt.isCaptureOrPromotion(tpt_move)) ? tpt_move : list.next();
+			cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		}
 
 		if (env.getBitboard().getHashKey() == 9168619578754754311L) {
@@ -2228,6 +2378,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			if (inCheck
 					//|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
 					|| new_matgain >= 0
+					//|| moveSee > 0
 					//|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
 					) {
 				
@@ -2337,7 +2488,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			staticEval = lazyEval(depth, beta - 1, beta, rootColour);
 			
 			if (staticEval >= beta) {
-				staticEval = fullEval(depth, beta - 1, beta, rootColour);
+				//staticEval = fullEval(depth, beta - 1, beta, rootColour);
 			}
 		}
 		
@@ -2408,7 +2559,18 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					tpt_exact = tptEntry.isExact();
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
-					tpt_move = tptEntry.getBestMove_lower();
+					if (tpt_exact) {
+						tpt_move = tptEntry.getBestMove_lower();
+					} else if (tpt_lower >= beta) {
+						tpt_move = tptEntry.getBestMove_lower();
+					} else if (tpt_upper <= beta - 1) {
+						tpt_move = tptEntry.getBestMove_upper();
+					} else {
+						tpt_move = tptEntry.getBestMove_lower();
+						if (tpt_move == 0) {
+							tpt_move = tptEntry.getBestMove_upper();
+						}
+					}
 				}
 			}
 			env.getTPT().unlock();
@@ -2454,7 +2616,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		if (inCheck) {
 			cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		} else {
-			cur_move = (tpt_move != 0 && MoveInt.isCaptureOrPromotion(tpt_move)) ? tpt_move : list.next();
+			//cur_move = (tpt_move != 0 && MoveInt.isCaptureOrPromotion(tpt_move)) ? tpt_move : list.next();
+			cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		}
 		
 		int searchedMoves = 0;
@@ -2481,6 +2644,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			if (inCheck
 					//|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
 					|| new_matgain >= 0
+					//|| moveSee > 0
 					//|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
 					) {
 				
