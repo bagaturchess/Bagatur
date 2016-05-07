@@ -56,8 +56,10 @@ public class BoardConfigImpl implements IBoardConfig {
 	private double MATERIAL_BISHOP_O = 262;
 	private double MATERIAL_BISHOP_E = 366;
 	
+	private double MATERIAL_ROOK_O = 411;//371
 	private double MATERIAL_ROOK_E = 570; //540 //602
 	
+	private double MATERIAL_QUEEN_O = 875;//775;
 	private double MATERIAL_QUEEN_E = 1230;//1000;
 	
 	private double MATERIAL_KING_O = 1600;
