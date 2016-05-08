@@ -31,6 +31,22 @@ public interface ISearchConfig_AB {
 	
 	public static final int PLY = 16;
 
+	public static final int PLY_01_16 = 1;
+	public static final int PLY_02_16 = 2;
+	public static final int PLY_03_16 = 3;
+	public static final int PLY_04_16 = 4;
+	public static final int PLY_05_16 = 5;
+	public static final int PLY_06_16 = 6;
+	public static final int PLY_07_16 = 7;
+	public static final int PLY_08_16 = 8;
+	public static final int PLY_09_16 = 9;
+	public static final int PLY_10_16 = 10;
+	public static final int PLY_11_16 = 11;
+	public static final int PLY_12_16 = 12;
+	public static final int PLY_13_16 = 13;
+	public static final int PLY_14_16 = 14;
+	public static final int PLY_15_16 = 15;
+	
 	
 	/**
 	 * Extensions for PV and NonPV Nodes
