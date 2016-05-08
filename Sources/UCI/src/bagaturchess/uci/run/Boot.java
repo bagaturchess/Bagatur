@@ -53,7 +53,7 @@ public class Boot {
 		runStateManager(args, communicationChanel);
 	}
 
-	public static void runStateManager(String[] args, IChannel communicationChanel) {
+	public static void runStateManager(String[] args, final IChannel communicationChanel) {
 		
 		try {
 			
@@ -72,29 +72,48 @@ public class Boot {
 				engineBootCfg = (IUCIConfig) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineBootCfg_ClassName);
 			}
 			
-			//Create state manager and apply initial values of options
-			IUCIOptionsRegistry optionsRegistry = new UCIOptionsRegistry();
-			engineBootCfg.registerProviders(optionsRegistry);
-			
-			StateManager manager = new StateManager(engineBootCfg);
+			final StateManager manager = new StateManager(engineBootCfg);
 			manager.setChannel(communicationChanel);
 			
-			List<IUCIOptionAction> customActions = new ArrayList<IUCIOptionAction>();
-			customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager));
-			customActions.add(new UCIOptionAction_RecreateLogging(ChannelManager.getChannel(), engineBootCfg));
-			
-			OptionsManager optionsManager = new OptionsManager(communicationChanel, (IUCIOptionsProvider) optionsRegistry, customActions);
-			manager.setOptionsManager(optionsManager);
-			
-			for (IUCIOptionAction action: customActions) {
-				action.execute();
-			}
+			asyncInitStateManager(manager, communicationChanel, engineBootCfg);
 			
 			manager.communicate();
-			
 			
 		} catch (Throwable t) {
 			if (communicationChanel != null) communicationChanel.dump(t);
 		}
+	}
+	
+
+	private static void asyncInitStateManager(final StateManager manager, final IChannel communicationChanel,
+			final IUCIConfig engineBootCfg) throws Exception {
+		
+		(new Thread(
+				new Runnable() {
+
+					@Override
+					public void run() {
+						try {
+							//Create state manager and apply initial values of options
+							IUCIOptionsRegistry optionsRegistry = new UCIOptionsRegistry();
+							engineBootCfg.registerProviders(optionsRegistry);
+							
+							List<IUCIOptionAction> customActions = new ArrayList<IUCIOptionAction>();
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager));
+							customActions.add(new UCIOptionAction_RecreateLogging(ChannelManager.getChannel(), engineBootCfg));
+							
+							OptionsManager optionsManager = new OptionsManager(communicationChanel, (IUCIOptionsProvider) optionsRegistry, customActions);
+							manager.setOptionsManager(optionsManager);
+							
+							for (IUCIOptionAction action: customActions) {
+								action.execute();
+							}
+						} catch (Exception e) {
+							communicationChanel.dump("Error while initializing StateManager: " + e.getMessage());
+						}
+					}
+				}
+				)
+		).start();
 	}
 }

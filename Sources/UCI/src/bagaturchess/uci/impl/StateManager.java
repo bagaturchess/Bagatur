@@ -115,35 +115,31 @@ public class StateManager extends Protocol implements BestMoveSender {
 							sendUCIOK();
 							break;
 						case COMMAND_TO_ENGINE_ISREADY:
-							
-							int retries_count = 0;
-							while (searchAdaptor == null) {
-								retries_count++;
-								Thread.currentThread().sleep(1000);
-								channel.sendLogToGUI("StateManager: Waiting loading and than will sent 'readyok' commmand to GUI ... each seccond check if searchAdaptor is ready (not null). retry " + retries_count);
-								if (retries_count > 10) {
-									throw new IllegalStateException("StateManager: search adaptor is still null");
-								}
-							}
-							
+							waitAndExecute();
 							sendReadyOK();
 							break;
 						case COMMAND_TO_ENGINE_NEWGAME:
+							waitAndExecute();
 							createNewGame();
 							break;
 						case COMMAND_TO_ENGINE_POSITION:
+							waitAndExecute();
 							setupBoard(fromGUILine);
 							break;
 						case COMMAND_TO_ENGINE_GO:
+							waitAndExecute();
 							goSearch(fromGUILine);
 							break;
 						case COMMAND_TO_ENGINE_PONDERHIT:
+							waitAndExecute();
 							ponderHit(fromGUILine);
 							break;
 						case COMMAND_TO_ENGINE_SETOPTION:
+							waitAndExecute();
 							setOption(fromGUILine);
 							break;
 						case COMMAND_TO_ENGINE_STOP:
+							waitAndExecute();
 							sendBestMove();
 							break;
 						case COMMAND_TO_ENGINE_QUIT:
@@ -153,13 +149,27 @@ public class StateManager extends Protocol implements BestMoveSender {
 							throw new IllegalStateException();
 					}
 				}
-			
+				
 				sendNewline();
 				
 			} catch(Throwable e) {
 				channel.dump(e);
 				channel.sendLogToGUI("StateManager: Error: " + e.getMessage());
 				Thread.sleep(500);
+			}
+		}
+	}
+
+
+	private void waitAndExecute() throws InterruptedException {
+		int max_retries = 20;
+		int retries_count = 0;
+		while (searchAdaptor == null) {
+			retries_count++;
+			Thread.currentThread().sleep(1000);
+			channel.sendLogToGUI("StateManager: Waiting loading and than will sent the command to GUI ... each second will check if searchAdaptor is ready (not null). retry " + retries_count);
+			if (retries_count > max_retries) {
+				throw new IllegalStateException("StateManager: search adaptor is still null after " + max_retries + " retries.");
 			}
 		}
 	}
