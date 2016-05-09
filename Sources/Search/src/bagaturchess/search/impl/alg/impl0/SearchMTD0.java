@@ -744,7 +744,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				}
 			
 				if (tpt_lower > TPTEntry.MIN_VALUE) {
-					if (alpha_org > tpt_lower + optimisticPositionEval(mediator, rest) ) {
+					if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
 						
 						node.eval = tpt_lower;
 						node.leaf = true;
@@ -763,13 +763,13 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				
 				int staticEval = roughEval(depth, rootColour);
 				
-				if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
+				if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
 					
 					staticEval = fullEval(depth, alpha_org, beta, rootColour);
 					
-					if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
+					if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
 		                int qeval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, true, rootColour);
-						if (alpha_org > qeval + optimisticPositionEval(mediator, rest) ) {
+						if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
 							node.bestmove = 0;
 							node.eval = qeval;
 							node.leaf = true;
@@ -981,7 +981,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
                 }
             
                 if (tpt_lower > TPTEntry.MIN_VALUE) {
-                    if (alpha_org > tpt_lower + optimisticPositionEval(mediator, rest) ) {
+                    if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
                         
                         node.eval = tpt_lower;
                         node.leaf = true;
@@ -1586,20 +1586,20 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				}
 			
 				if (tpt_lower > TPTEntry.MIN_VALUE) {
-					if (alpha_org > tpt_lower + optimisticPositionEval(mediator, rest) ) {
+					if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
 						return tpt_lower;
 					}
 				}
 				
 				int staticEval = roughEval(depth, rootColour);
 				
-				if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
+				if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
 					
 					staticEval = fullEval(depth, beta - 1, beta, rootColour);
 					
-					if (alpha_org > staticEval + optimisticPositionEval(mediator, rest)) {
+					if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
 						int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, true, rootColour);
-						if (alpha_org > qeval + optimisticPositionEval(mediator, rest) ) {
+						if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
 							return qeval;
 						}
 					}
@@ -1825,7 +1825,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
                 }
             
                 if (tpt_lower > TPTEntry.MIN_VALUE) {
-                    if (alpha_org > tpt_lower + optimisticPositionEval(mediator, rest) ) {
+                    if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
                         return tpt_lower;
                     }
                 }
@@ -2118,7 +2118,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 
 	}
 	
-	private double optimisticPositionEval(ISearchMediator mediator, int rest) {
+	private double getAlphaTrustWindow(ISearchMediator mediator, int rest) {
 		
 		//int DEPTH1_INTERVAL = 100;
 		//int DEPTH1_INTERVAL = (int) (move_eval_diff.getDisperse());
@@ -2223,7 +2223,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			
 			//Alpha cutoff
 			if (!isMateVal(alpha_org)
-					&& staticEval + env.getEval().getMaterialQueen() + optimisticPositionEval(mediator, 1) < alpha_org) {
+					&& staticEval + env.getEval().getMaterialQueen() + getAlphaTrustWindow(mediator, 1) < alpha_org) {
 				node.eval = staticEval;
 				return node.eval;
 			}
@@ -2531,7 +2531,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			
 			//Alpha cutoff
 			if (!isMateVal(beta - 1)
-					&& staticEval + env.getEval().getMaterialQueen() + optimisticPositionEval(mediator, 1) < alpha_org) {
+					&& staticEval + env.getEval().getMaterialQueen() + getAlphaTrustWindow(mediator, 1) < alpha_org) {
 				return staticEval;
 			}
 			
