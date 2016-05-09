@@ -1001,7 +1001,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
         
         
 		boolean singleMove = false;
-		if (inCheck) {
+		if (inCheck /*|| !hasAtLeastOnePiece*/) {
 			singleMove = env.getBitboard().hasSingleMove();
 		}
 		
@@ -1830,10 +1830,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
                     }
                 }
         }
-
+        
         
 		boolean singleMove = false;
-		if (inCheck) {
+		if (inCheck /*|| !hasAtLeastOnePiece*/) {
 			singleMove = env.getBitboard().hasSingleMove();
 		}
 		

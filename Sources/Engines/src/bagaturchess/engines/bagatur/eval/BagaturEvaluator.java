@@ -602,13 +602,12 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 			if (w_colour != b_colour) {
 				
 				//If one of the sides has advantage of 2-3 pawns, than let it know the game goes to draw
-				if (abs <= 450) {
-					//if (eval > 0) {//White has the advantage
-					//} else if (eval < 0) {//Black has the advantage
-					//}
-					abs = abs / 2;
-				} else if (abs <= 250) {
+				if (abs <= 200) {
 					abs = abs / 4;
+				} else if (abs <= 400) {
+					abs = abs / 2;
+				} else if (abs <= 600) {
+					abs = (2 * abs) / 3;
 				}
 			}
 		}

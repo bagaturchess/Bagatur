@@ -153,12 +153,14 @@ public class MTDSchedulerMain {
 		//r1b2rk1/5ppp/p3q3/2p1PpB1/P3p3/6Q1/1PP3PP/2KR3R w - - 2 22 - Bg5-f6 is the move, material loss for black
 		//r4rk1/pp3ppp/2pq4/3p4/4nPb1/2BBP3/PPP3PP/R3QRK1 w - - 2 15 Bd3xe4 is the correct move +3.00
 		//2r1n2r/1q4k1/2p1pn2/ppR4p/4PNbP/P1BBQ3/1P4P1/R5K1 b - - 1 32 orrect move is Kg7f7, the position is used for testing captures extensions
-		//5k2/4r1p1/4r3/8/1Q6/P7/2PP4/1K6 w - - 0 1  the position is used for testing passer puish extensions
+		//5k2/4r1p1/4r3/8/1Q6/P7/2PP4/1K6 w - - 0 1  the position is used for testing passer push extensions
+		//1r6/4k3/1pbpPb1p/p1p2P2/2Pp3p/3P3P/2P2RP1/R6K b - - 3 39, eval of stockfish is +4, but bagatur doesn't find why
 		
+		//IBitBoard bitboard  = new Board("5k2/4r1p1/4r3/8/1Q6/P7/2PP4/1K6 w - - 0 1", null, cfg.getBoardConfig());
 		
 		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
-		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
+		IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
 		
 		//IBitBoard bitboard  = new Board("8/7k/7P/6K1/2B5/8/8/8 b - - 19 82", null, cfg.getBoardConfig());//Too big eval of bishop and pawn
