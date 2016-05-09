@@ -55,6 +55,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	int MIN_EVAL_DIFF_PV = 33;
 	int MIN_EVAL_DIFF_NONPV = 33;
 	
+	double LMR_REDUCTION_MULTIPLIER = 1;
+	
 	
 	public SearchMTD0(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
@@ -1188,7 +1190,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							if (isGoodMove) {
 								rate /= 2;
 							}
-							lmrReduction += (int) (PLY * rate * 1);
+							lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
 							if (lmrReduction < PLY) {
 								lmrReduction = PLY;
 							}
@@ -1981,7 +1983,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 								if (isGoodMove) {
 									rate /= 2;
 								}
-								lmrReduction += (int) (PLY * rate * 1);
+								lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
 								if (lmrReduction < PLY) {
 									lmrReduction = PLY;
 								}
