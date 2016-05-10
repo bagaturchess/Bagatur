@@ -60,6 +60,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	private static int TRUST_WINDOW_BEST_MOVE_MAX = 64;
 	private int trustWindow_BestMove;
 	
+	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 2;
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 1;
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = SearchUtils.getMateVal(1);
 	private int trustWindow_AlphaAspiration;
@@ -196,7 +197,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		
 		if (!info.isMateScore() && trustWindow_AlphaAspiration != TRUST_WINDOW_ALPHA_ASPIRATION_MAX) {
 			
-			trustWindow_AlphaAspiration += 2 * Math.max(1, Math.abs(info.getEval() - lastinfo.getEval()));
+			trustWindow_AlphaAspiration += TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER * Math.max(1, Math.abs(info.getEval() - lastinfo.getEval()));
 			
 		} else {
 			trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MAX;
