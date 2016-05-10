@@ -2107,7 +2107,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	
 	private int pv_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int alpha_org, int beta, int matgain, boolean firstTime, int rootColour) {
 		
-		if (!firstTime) info.setSearchedNodes(info.getSearchedNodes() + 1);	
+		/*if (!firstTime)*/ info.setSearchedNodes(info.getSearchedNodes() + 1);	
 		
 		if (info.getSelDepth() < depth) {
 			info.setSelDepth(depth);
@@ -2436,7 +2436,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	
 	private int nullwin_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int beta, int matgain, boolean firstTime, int rootColour) {
 		
-		if (!firstTime) info.setSearchedNodes(info.getSearchedNodes() + 1);	
+		/*if (!firstTime)*/ info.setSearchedNodes(info.getSearchedNodes() + 1);	
 		
 		if (info.getSelDepth() < depth) {
 			info.setSelDepth(depth);
