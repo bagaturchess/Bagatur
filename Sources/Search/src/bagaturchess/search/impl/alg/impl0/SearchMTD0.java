@@ -55,7 +55,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	int MIN_EVAL_DIFF_PV = 33;
 	int MIN_EVAL_DIFF_NONPV = 33;
 	
-	double LMR_REDUCTION_MULTIPLIER = 1;
+	double LMR_REDUCTION_MULTIPLIER = 0.777;
 	
 	
 	public SearchMTD0(Object[] args) {
@@ -736,52 +736,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, true, rootColour);	
 			return node.eval;
 		}
-		
-		
-		if (useStaticPrunning
-				) {
 				
-				if (inCheck) {
-					throw new IllegalStateException("In check in useStaticPrunning");
-				}
-			
-				if (tpt_lower > TPTEntry.MIN_VALUE) {
-					if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
-						
-						node.eval = tpt_lower;
-						node.leaf = true;
-						node.nullmove = false;
-						
-						node.bestmove = 0;
-						env.getTPT().lock();
-						buff_tpt_depthtracking[0] = 0;
-						extractFromTPT(info, rest, node, true, buff_tpt_depthtracking);
-						env.getTPT().unlock();
-						
-						
-						return node.eval;
-					}
-				}
-				
-				int staticEval = roughEval(depth, rootColour);
-				
-				if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
-					
-					staticEval = fullEval(depth, alpha_org, beta, rootColour);
-					
-					if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
-		                int qeval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, true, rootColour);
-						if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
-							node.bestmove = 0;
-							node.eval = qeval;
-							node.leaf = true;
-							node.nullmove = false;
-							return node.eval;
-						}
-					}
-				}
-		}
-		
 				
         if (env.getGTBProbing() != null
                 && useMateDistancePrunning //Doesn't make mates without this pruning as the mate distance is not decreased with each ply
@@ -830,6 +785,51 @@ public class SearchMTD0 extends SearchImpl_MTD {
             }
         }
 		
+		
+		if (useStaticPrunning
+				) {
+				
+			if (inCheck) {
+				throw new IllegalStateException("In check in useStaticPrunning");
+			}
+		
+			if (tpt_lower > TPTEntry.MIN_VALUE) {
+				if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
+					
+					node.eval = tpt_lower;
+					node.leaf = true;
+					node.nullmove = false;
+					
+					node.bestmove = 0;
+					env.getTPT().lock();
+					buff_tpt_depthtracking[0] = 0;
+					extractFromTPT(info, rest, node, true, buff_tpt_depthtracking);
+					env.getTPT().unlock();
+					
+					
+					return node.eval;
+				}
+			}
+			
+			int staticEval = roughEval(depth, rootColour);
+			
+			if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
+				
+				staticEval = fullEval(depth, alpha_org, beta, rootColour);
+				
+				if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
+	                int qeval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, true, rootColour);
+					if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
+						node.bestmove = 0;
+						node.eval = qeval;
+						node.leaf = true;
+						node.nullmove = false;
+						return node.eval;
+					}
+				}
+			}
+		}
+
 		
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
@@ -1003,7 +1003,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
         
         
 		boolean singleMove = false;
-		if (inCheck /*|| !hasAtLeastOnePiece*/) {
+		if (inCheck || !hasAtLeastThreePieces) {
 			singleMove = env.getBitboard().hasSingleMove();
 		}
 		
@@ -1154,7 +1154,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							 //&& totalLMReduction < maxdepth / 2
 							) {
 						
-						if (searchedCount >= Math.sqrt(rest)) {
+						if (!isGoodMove && searchedCount >= Math.sqrt(rest)) {
 						//if (searchedCount >= 1) {
 							staticPrunning = true;
 						}
@@ -1580,35 +1580,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		
-		if (useStaticPrunning
-				) {
-				
-				if (inCheck) {
-					throw new IllegalStateException("In check in useStaticPrunning");
-				}
-			
-				if (tpt_lower > TPTEntry.MIN_VALUE) {
-					if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
-						return tpt_lower;
-					}
-				}
-				
-				int staticEval = roughEval(depth, rootColour);
-				
-				if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
-					
-					staticEval = fullEval(depth, beta - 1, beta, rootColour);
-					
-					if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
-						int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, true, rootColour);
-						if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
-							return qeval;
-						}
-					}
-				}
-		}
-		
-		
         if (env.getGTBProbing() != null
                 && useMateDistancePrunning //Doesn't make mates without this pruning as the mate distance is not decreased with each ply
                 && depth >= 3
@@ -1648,6 +1619,35 @@ public class SearchMTD0 extends SearchImpl_MTD {
             }
         }
         
+		
+		if (useStaticPrunning
+				) {
+				
+			if (inCheck) {
+				throw new IllegalStateException("In check in useStaticPrunning");
+			}
+		
+			if (tpt_lower > TPTEntry.MIN_VALUE) {
+				if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
+					return tpt_lower;
+				}
+			}
+			
+			int staticEval = roughEval(depth, rootColour);
+			
+			if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
+				
+				staticEval = fullEval(depth, beta - 1, beta, rootColour);
+				
+				if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
+					int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, true, rootColour);
+					if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
+						return qeval;
+					}
+				}
+			}
+		}
+		
 		
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
@@ -1747,35 +1747,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				}
 			}
 		}
-		
-		
-        //Razoring:
-		if(RAZORING && !inCheck) {
-        
-			/*if (
-                    (rest <= 1 && staticEval < beta - 100) ||
-                    (rest <= 2 && staticEval < beta - 300) ||
-                    (rest <= 3 && staticEval < beta - 500)
-                              ) {
-                              
-                          int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, staticEval, true, rootColour);
-                                         if (qeval < beta) {
-                                                        return qeval;
-                                         }
-            }*/
-        
-        
-	        /*if (rest < STATIC_REDUCTION_MARGIN_NONPV.length) {
-	              
-                  if (staticEval < beta - STATIC_REDUCTION_MARGIN_NONPV[rest]) {
-                     int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, true, rootColour);
-                                    if (qeval < beta) {
-                                                   return qeval;
-                                    }
-                  }
-	        }*/
-        
-		}
 
 		
 		//IID NONPV Node
@@ -1835,7 +1806,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
         
         
 		boolean singleMove = false;
-		if (inCheck /*|| !hasAtLeastOnePiece*/) {
+		if (inCheck || !hasAtLeastThreePieces) {
 			singleMove = env.getBitboard().hasSingleMove();
 		}
 		
@@ -1947,7 +1918,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							 //&& totalLMReduction < maxdepth / 2
 							) {
 							
-							if (searchedCount >= Math.sqrt(rest)) {
+							if (!isGoodMove && searchedCount >= Math.sqrt(rest)) {
 							//if (searchedCount >= 1) {
 								staticPrunning = true;
 							}
