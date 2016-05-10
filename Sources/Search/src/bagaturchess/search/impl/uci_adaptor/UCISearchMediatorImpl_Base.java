@@ -162,7 +162,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 			cur_mtdTrustWindow = TRUST_WINDOW_BEST_MOVE_MIN;
 		} else {
 			
-			if (lastinfo.getBestMove() == info.getBestMove()) {
+			if (info.getBestMove() != 0 && lastinfo.getBestMove() == info.getBestMove()) {
 				if (cur_mtdTrustWindow == 0) {
 					//cur_mtdTrustWindow = MTD_TRUST_WINDOW_MIN;
 					throw new IllegalStateException("cur_mtdTrustWindow == 0");

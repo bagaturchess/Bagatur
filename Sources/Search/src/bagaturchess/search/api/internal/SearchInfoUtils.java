@@ -56,18 +56,20 @@ public class SearchInfoUtils {
 		
 		if (tptusage != -1) message += " hashfull " + (10 * tptusage);
 		
-		String pv = "";
-		if (info.getPV() != null) {
-			for (int j=0; j<info.getPV().length; j++) {
-				pv += MoveInt.moveToStringUCI(info.getPV()[j]);
-				if (j != info.getPV().length - 1) {
-					pv += " ";//", ";
+		if (!info.isUpperBound()) {
+			
+			String pv = "";
+			if (info.getPV() != null) {
+				for (int j=0; j<info.getPV().length; j++) {
+					pv += MoveInt.moveToStringUCI(info.getPV()[j]);
+					if (j != info.getPV().length - 1) {
+						pv += " ";//", ";
+					}
 				}
 			}
+			
+			message += " pv " + pv;
 		}
-		
-		message += " pv " + pv;
-		
 		
 		return message;
 	}

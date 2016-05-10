@@ -71,8 +71,6 @@ public class SearchManager {
 	private ISearchMediator mediator;
 	private SharedData sharedData;
 	private IFinishCallback finishCallback;
-	
-	private volatile ISearchInfo lastInfoLower;
 
 	
 	public SearchManager(ISearchMediator _mediator, IBitBoard _bitboardForSetup, SharedData _sharedData, long _hashkey,
@@ -307,8 +305,6 @@ public class SearchManager {
 					mediator.dump(e);
 				}
 			}
-			
-			lastInfoLower = info;
 		}
 	}
 	
@@ -342,43 +338,14 @@ public class SearchManager {
 		
 		if (sentPV) {
 			
-			if (isLast) {
+			if (mediator != null) {
 				
-				if (lastInfoLower != null) {
-					
-					if (mediator != null) {
-						
-						lastInfoLower.setLowerBound(false);
-						lastInfoLower.setUpperBound(false);
-						
-						mediator.changedMajor(lastInfoLower);
-						
-						try {
-							testPV(info, bitboardForTesting);
-						} catch (Exception e) {
-							mediator.dump(e);
-						}
-					}
-					
-					lastInfoLower = null;
-				}
+				mediator.changedMajor(info);
 				
-			} else {
-				
-				if (!betasGen.hasLowerBound()) {
-						
-					//sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
-					
-					if (mediator != null) {
-						
-						mediator.changedMajor(info);
-						
-						try {
-							testPV(info, bitboardForTesting);
-						} catch (Exception e) {
-							mediator.dump(e);
-						}
-					}
+				try {
+					testPV(info, bitboardForTesting);
+				} catch (Exception e) {
+					mediator.dump(e);
 				}
 			}
 		}
