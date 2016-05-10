@@ -56,7 +56,7 @@ public class SearchInfoUtils {
 		
 		if (tptusage != -1) message += " hashfull " + (10 * tptusage);
 		
-		if (!info.isUpperBound()) {
+		//if (!info.isUpperBound()) {
 			
 			String pv = "";
 			if (info.getPV() != null) {
@@ -69,7 +69,7 @@ public class SearchInfoUtils {
 			}
 			
 			message += " pv " + pv;
-		}
+		//}
 		
 		return message;
 	}

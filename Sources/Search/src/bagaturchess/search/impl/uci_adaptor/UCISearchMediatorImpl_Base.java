@@ -146,7 +146,9 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 			dump("UCISearchMediatorImpl_Base Trust Window MTD Step set to " + getTrustWindow_MTD_Step());
 		}
 		
-		lastinfo = info;
+		if (!info.isUpperBound()) {
+			lastinfo = info;
+		}
 		
 		String message = SearchInfoUtils.buildMajorInfoCommand(info, getStartTime(), rootSearch.getTPTUsagePercent(), 0);
 		send(message);
@@ -163,7 +165,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 			cur_mtdTrustWindow = TRUST_WINDOW_BEST_MOVE_MIN;
 		} else {
 			
-			if (info.getBestMove() != 0 && lastinfo.getBestMove() == info.getBestMove()) {
+			if (info.getBestMove() != 0 && lastinfo != null && lastinfo.getBestMove() == info.getBestMove()) {
 				if (cur_mtdTrustWindow == 0) {
 					//cur_mtdTrustWindow = MTD_TRUST_WINDOW_MIN;
 					throw new IllegalStateException("cur_mtdTrustWindow == 0");
@@ -195,7 +197,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	private void adjustTrustWindow_AlphaAspiration(ISearchInfo info) {
 		
-		if (!info.isMateScore() && trustWindow_AlphaAspiration != TRUST_WINDOW_ALPHA_ASPIRATION_MAX) {
+		if (!info.isMateScore() && lastinfo != null && trustWindow_AlphaAspiration != TRUST_WINDOW_ALPHA_ASPIRATION_MAX) {
 			
 			trustWindow_AlphaAspiration += TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER * Math.max(1, Math.abs(info.getEval() - lastinfo.getEval()));
 			
