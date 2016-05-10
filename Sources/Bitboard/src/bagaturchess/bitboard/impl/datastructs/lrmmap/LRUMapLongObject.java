@@ -81,6 +81,10 @@ public class LRUMapLongObject<T> {
 	
 	private void initBySize(DataObjectFactory<T> _factory, int _maxSize) {
 		
+		if (_maxSize <= 0) {
+			throw new IllegalStateException("Non-positive maxSize=" + maxSize);
+		}
+		
 		factory = _factory;
 		maxSize = _maxSize;
 		curSize = 0;
