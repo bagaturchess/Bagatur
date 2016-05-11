@@ -52,8 +52,10 @@ public class UCISearchMediatorImpl_NormalSearch extends UCISearchMediatorImpl_Ba
 	
 	
 	@Override
-	public void changedMajor(ISearchInfo info) { 
-		timeController.newPVLine(info.getEval(), info.getDepth(), info.getBestMove());
+	public void changedMajor(ISearchInfo info) {
+		if (!info.isUpperBound()) {//To not stress time management with different evals and moves
+			timeController.newPVLine(info.getEval(), info.getDepth(), info.getBestMove());
+		}
 		super.changedMajor(info);
 	}
 	

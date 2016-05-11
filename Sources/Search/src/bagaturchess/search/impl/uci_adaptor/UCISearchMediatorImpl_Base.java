@@ -309,6 +309,6 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	@Override
 	public int getTrustWindow_MTD_Step() {
-		return 4;//(int) Math.max(TRUST_WINDOW_MTD_STEP_MIN, best_moves_diffs_per_depth.getEntropy());
+		return TRUST_WINDOW_MTD_STEP_MIN;//(int) Math.max(TRUST_WINDOW_MTD_STEP_MIN, best_moves_diffs_per_depth.getEntropy());
 	}
 }
