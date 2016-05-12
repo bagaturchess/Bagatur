@@ -56,6 +56,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	int MIN_EVAL_DIFF_NONPV = 33;
 	
 	double LMR_REDUCTION_MULTIPLIER = 0.777;
+	double NULL_MOVE_REDUCTION_MULTIPLIER = 1;
 	
 	
 	public SearchMTD0(Object[] args) {
@@ -808,7 +809,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			
 				//int null_reduction = PLY * (rest >= 6 ? 3 : 2);
 				int null_reduction = PLY * (rest >= 6 ? 4 : 3);
-				null_reduction = Math.max(null_reduction, PLY * (rest / 2));
+				null_reduction = (int) (NULL_MOVE_REDUCTION_MULTIPLIER * Math.max(null_reduction, PLY * (rest / 2)));
 				
 				int null_maxdepth = maxdepth - null_reduction;
 				
@@ -1601,7 +1602,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				
 				//int null_reduction = PLY * (rest >= 6 ? 3 : 2);
 				int null_reduction = PLY * (rest >= 6 ? 4 : 3);
-				null_reduction = Math.max(null_reduction, PLY * (rest / 2));
+				null_reduction = (int) (NULL_MOVE_REDUCTION_MULTIPLIER * Math.max(null_reduction, PLY * (rest / 2)));
 				
 				int null_maxdepth = maxdepth - null_reduction;
 				
