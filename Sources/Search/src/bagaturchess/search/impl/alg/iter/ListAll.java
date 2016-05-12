@@ -89,6 +89,7 @@ public class ListAll implements ISearchMoveList {
 	
 	private int cur;
 	private boolean generated;
+	private boolean resort;
 	private boolean tptTried;
 	private boolean tptPlied;
 	
@@ -126,6 +127,7 @@ public class ListAll implements ISearchMoveList {
 		size = 0;
 		
 		generated = false;
+		resort 	= false;
 		
 		tptTried = false;
 		tptPlied = false;
@@ -159,7 +161,26 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 		
-		if (!generated) {
+		if (resort) {
+			
+			for (int cur = 0; cur < size; cur++) {
+				int move = (int) moves[cur];
+				long ordval = genOrdVal(move);
+				moves[cur] = MoveInt.addOrderingValue(move, ordval);
+			}
+			
+			//Move best move on top
+			for (int cur = 0; cur < size; cur++) {
+				long move = moves[cur];
+				if (move > moves[0]) {
+					moves[cur] = moves[0];
+					moves[0] = move;
+				}
+			}
+			
+			resort = false;
+			
+		} else if (!generated) {
 			genMoves();							
 		}
 		
@@ -557,6 +578,14 @@ public class ListAll implements ISearchMoveList {
 
 	@Override
 	public void reset() {
-		cur = 0;
+		clear();
+		
+		/*cur = 0;
+		
+		resort = true;
+		
+		tptTried = false;
+		tptPlied = false;
+		*/
 	}
 }

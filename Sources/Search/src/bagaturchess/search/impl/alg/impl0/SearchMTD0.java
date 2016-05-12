@@ -887,8 +887,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 
 		
+		boolean reuseIIDMoves = false;
 		//IID PV Node
-		//int iid_eval = MIN;
 		if (IID_PV && depth > 0) {
 			
 			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
@@ -902,6 +902,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						prevNullMove, prevbest, prevprevbest, prevPV, rootColour, totalLMReduction, materialGain, true, mateMove, useMateDistancePrunning, useStaticPrunning, useNullMove);
 				//pv_search(mediator, stopper, info, initial_maxdepth, maxdepth - PLY * reduction, depth, alpha_org, beta,
 				//		 prevbest, prevprevbest, prevPV, prevNullMove);
+				reuseIIDMoves = rest >= 3 && !useNullMove;
 				
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
@@ -972,18 +973,24 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		if (!inCheck) {
 			list = lists_all[depth];
-			list.clear();
+			if (reuseIIDMoves) {
+				list.reset();
+			} else {
+				list.clear();
+			}
+			
 			list.setTptMove(tpt_move);
 			list.setPrevBestMove(prevprevbest);
 			list.setMateMove(mateMove);
 			
-			
 			if (prevPV != null && depth < prevPV.length) {
 				list.setPrevpvMove(prevPV[depth]);
 			}
+			
 		} else {
 			list = lists_escapes[depth];
 			list.clear();
+			
 			list.setTptMove(tpt_move);
 			list.setPrevBestMove(prevprevbest);
 		}
@@ -1679,6 +1686,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 
 		
+		boolean reuseIIDMOves = false;
 		//IID NONPV Node
 		if (IID_NONPV) {
 			
@@ -1691,6 +1699,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta,
 						prevNullMove, prevbest, prevprevbest, prevPV, rootColour, totalLMReduction,
 						materialGain, inNullMove, mateMove, useMateDistancePrunning, useStaticPrunning, useNullMove);
+				
+				reuseIIDMOves = rest >= 3 && !useNullMove;
 				
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
@@ -1745,7 +1755,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		if (!inCheck) {
 			list = lists_all[depth];
-			list.clear();
+			if (reuseIIDMOves) {
+				list.reset();
+			} else {
+				list.clear();
+			}
+			
 			list.setTptMove(tpt_move);
 			list.setPrevBestMove(prevprevbest);
 			list.setMateMove(mateMove);
@@ -1753,9 +1768,11 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			if (prevPV != null && depth < prevPV.length) {
 				list.setPrevpvMove(prevPV[depth]);
 			}
+			
 		} else {
 			list = lists_escapes[depth];
 			list.clear();
+			
 			list.setTptMove(tpt_move);
 			list.setPrevBestMove(prevprevbest);
 		}
