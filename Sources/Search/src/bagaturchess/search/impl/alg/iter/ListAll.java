@@ -183,7 +183,6 @@ public class ListAll implements ISearchMoveList {
 				if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(moves, 1, size);
 			}
 			
-			int SORT_INDEX = reuse_moves ? 100 : 0;
 			if (cur <= SORT_INDEX) {
 				
 				if (cur > 1) {
