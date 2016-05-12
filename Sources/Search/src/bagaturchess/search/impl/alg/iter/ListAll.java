@@ -89,7 +89,7 @@ public class ListAll implements ISearchMoveList {
 	
 	private int cur;
 	private boolean generated;
-	private boolean resort;
+	private boolean revalue;
 	private boolean tptTried;
 	private boolean tptPlied;
 	
@@ -127,7 +127,7 @@ public class ListAll implements ISearchMoveList {
 		size = 0;
 		
 		generated = false;
-		resort 	= false;
+		revalue 	= false;
 		
 		tptTried = false;
 		tptPlied = false;
@@ -161,7 +161,7 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 		
-		if (resort) {
+		if (revalue) {
 			
 			for (int cur = 0; cur < size; cur++) {
 				int move = (int) moves[cur];
@@ -169,28 +169,45 @@ public class ListAll implements ISearchMoveList {
 				moves[cur] = MoveInt.addOrderingValue(move, ordval);
 			}
 			
-			//Move best move on top
-			/*for (int cur = 0; cur < size; cur++) {
-				long move = moves[cur];
-				if (move > moves[0]) {
-					moves[cur] = moves[0];
-					moves[0] = move;
-				}
-			}*/
-			
-			resort = false;
+			revalue = false;
 			
 		} else if (!generated) {
 			genMoves();							
 		}
 		
 		if (cur < size) {
+			
 			if (cur == 1) {
 				if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(moves, 1, size);
 				if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(1, size, moves);
 			}
+			
+			/*int SORT_INDEX = 1;
+			if (cur <= SORT_INDEX) {
+				
+				if (cur > 1) {
+					for (int i = cur; i < size; i++) {
+						int move = (int) moves[i];
+						long ordval = genOrdVal(move);
+						moves[i] = MoveInt.addOrderingValue(move, ordval);
+					}
+				}
+				
+				//Move best move on top
+				for (int i = cur; i < size; i++) {
+					long move = moves[i];
+					if (move > moves[cur]) {
+						moves[i] = moves[cur];
+						moves[cur] = move;
+					}
+				}
+			} else if (cur == SORT_INDEX + 1) {
+				if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(cur, size, moves);
+			}*/
+			
 			int move = (int) moves[cur++];
 			return move;
+			
 		} else {
 			return 0;
 		}
@@ -578,14 +595,14 @@ public class ListAll implements ISearchMoveList {
 
 	@Override
 	public void reset() {
-		//clear();
+		clear();
 		
-		cur = 0;
+		/*cur = 0;
 		
-		resort = true;
+		revalue = true;
 		
 		tptTried = false;
 		tptPlied = false;
-		
+		*/
 	}
 }

@@ -1099,10 +1099,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						isGoodMove = ((ListAll) list).isGoodMove(cur_move);
 					}
 					
-					if (!isCheckMove) {
-						//staticPrunning = true;
-					}
-					
 					if (//!isMateVal(alpha_org)
 							//&& !isMateVal(beta)
 							//true
@@ -1119,11 +1115,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							 //&& !isDangerous
 							 //&& totalLMReduction < maxdepth / 2
 							) {
-						
-						if (!isGoodMove && searchedCount >= Math.sqrt(rest)) {
-						//if (searchedCount >= 1) {
-							staticPrunning = true;
-						}
 						
 						/*
 						double rate = Math.sqrt(depth) + Math.sqrt(searchedCount);
@@ -1151,6 +1142,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						
 						
 						if (!isGoodMove || searchedCount >= getLMR1(list)) {
+							
+							staticPrunning = true;
+							
 							double rate = Math.sqrt(searchedCount);
 							rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
 							if (isGoodMove) {
@@ -1848,10 +1842,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							isGoodMove = ((ListAll) list).isGoodMove(cur_move);
 						}
 						
-						if (!isCheckMove) {
-							//staticPrunning = true;
-						}
-						
 						if (//!isMateVal(alpha_org)
 							 //&& !isMateVal(beta)
 							 //true
@@ -1868,11 +1858,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							 //&& !isDangerous
 							 //&& totalLMReduction < maxdepth / 2
 							) {
-							
-							if (!isGoodMove && searchedCount >= Math.sqrt(rest)) {
-							//if (searchedCount >= 1) {
-								staticPrunning = true;
-							}
 							
 							/*
 							double rate = Math.sqrt(depth) + Math.sqrt(searchedCount);
@@ -1900,6 +1885,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							
 							
 							if (!isGoodMove || searchedCount >= getLMR1(list)) {
+								
+								staticPrunning = true;
+								
 								double rate = Math.sqrt(searchedCount);
 								rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
 								if (isGoodMove) {
