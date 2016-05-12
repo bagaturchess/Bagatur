@@ -170,13 +170,13 @@ public class ListAll implements ISearchMoveList {
 			}
 			
 			//Move best move on top
-			for (int cur = 0; cur < size; cur++) {
+			/*for (int cur = 0; cur < size; cur++) {
 				long move = moves[cur];
 				if (move > moves[0]) {
 					moves[cur] = moves[0];
 					moves[0] = move;
 				}
-			}
+			}*/
 			
 			resort = false;
 			
@@ -578,14 +578,14 @@ public class ListAll implements ISearchMoveList {
 
 	@Override
 	public void reset() {
-		clear();
+		//clear();
 		
-		/*cur = 0;
+		cur = 0;
 		
 		resort = true;
 		
 		tptTried = false;
 		tptPlied = false;
-		*/
+		
 	}
 }
