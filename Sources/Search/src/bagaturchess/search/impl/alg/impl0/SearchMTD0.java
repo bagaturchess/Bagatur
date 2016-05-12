@@ -753,13 +753,13 @@ public class SearchMTD0 extends SearchImpl_MTD {
                 
                 egtb_val = getDrawScores(rootColour);
                 
-                if (egtb_val >= beta) {
+                //if (egtb_val >= beta) {
                     node.bestmove = 0;
                     node.eval = egtb_val;
                     node.leaf = true;
                     node.nullmove = false;
                     return egtb_val;
-                }
+                //}
                 
             } else {
                     
@@ -784,51 +784,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
                     }
             }
         }
-		
-		
-		if (useStaticPrunning
-				) {
-				
-			if (inCheck) {
-				throw new IllegalStateException("In check in useStaticPrunning");
-			}
-		
-			if (tpt_lower > TPTEntry.MIN_VALUE) {
-				if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
-					
-					node.eval = tpt_lower;
-					node.leaf = true;
-					node.nullmove = false;
-					
-					node.bestmove = 0;
-					env.getTPT().lock();
-					buff_tpt_depthtracking[0] = 0;
-					extractFromTPT(info, rest, node, true, buff_tpt_depthtracking);
-					env.getTPT().unlock();
-					
-					
-					return node.eval;
-				}
-			}
-			
-			int staticEval = roughEval(depth, rootColour);
-			
-			if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
-				
-				staticEval = fullEval(depth, alpha_org, beta, rootColour);
-				
-				if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
-	                int qeval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, true, rootColour);
-					if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
-						node.bestmove = 0;
-						node.eval = qeval;
-						node.leaf = true;
-						node.nullmove = false;
-						return node.eval;
-					}
-				}
-			}
-		}
 
 		
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
@@ -1135,6 +1090,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					boolean isGoodMove = false;
 					if (list instanceof ListAll) {
 						isGoodMove = ((ListAll) list).isGoodMove(cur_move);
+					}
+					
+					if (!isCheckMove) {
+						//staticPrunning = true;
 					}
 					
 					if (//!isMateVal(alpha_org)
@@ -1595,9 +1554,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
                 
                 egtb_val = getDrawScores(rootColour);
                 
-                if (egtb_val >= beta) {
+                //if (egtb_val >= beta) {
                     return egtb_val;
-                }
+                //}
                 
             } else {
                 
@@ -1618,35 +1577,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
                 }
             }
         }
-        
-		
-		if (useStaticPrunning
-				) {
-				
-			if (inCheck) {
-				throw new IllegalStateException("In check in useStaticPrunning");
-			}
-		
-			if (tpt_lower > TPTEntry.MIN_VALUE) {
-				if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
-					return tpt_lower;
-				}
-			}
-			
-			int staticEval = roughEval(depth, rootColour);
-			
-			if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
-				
-				staticEval = fullEval(depth, beta - 1, beta, rootColour);
-				
-				if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
-					int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, true, rootColour);
-					if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
-						return qeval;
-					}
-				}
-			}
-		}
 		
 		
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
@@ -1899,6 +1829,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						boolean isGoodMove = false;
 						if (list instanceof ListAll) {
 							isGoodMove = ((ListAll) list).isGoodMove(cur_move);
+						}
+						
+						if (!isCheckMove) {
+							//staticPrunning = true;
 						}
 						
 						if (//!isMateVal(alpha_org)
