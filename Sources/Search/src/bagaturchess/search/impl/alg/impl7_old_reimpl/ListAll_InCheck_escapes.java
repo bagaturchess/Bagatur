@@ -220,4 +220,9 @@ public class ListAll_InCheck_escapes implements ISearchMoveList {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void reset() {
+		cur = 0;
+	}
 }

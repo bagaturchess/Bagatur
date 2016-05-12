@@ -220,4 +220,9 @@ public class ListKingEscapes implements ISearchMoveList {
 	public void setMateMove(int mateMove) {
 		throw new UnsupportedOperationException();
 	}
+	
+	@Override
+	public void reset() {
+		cur = 0;
+	}
 }

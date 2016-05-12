@@ -554,4 +554,9 @@ public class ListAll implements ISearchMoveList {
 		//orderingStatistics.normalize();
 		//orderingStatistics.normalize();
 	}
+
+	@Override
+	public void reset() {
+		cur = 0;
+	}
 }

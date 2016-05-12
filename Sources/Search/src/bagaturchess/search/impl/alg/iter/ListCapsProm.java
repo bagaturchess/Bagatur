@@ -214,4 +214,9 @@ public class ListCapsProm implements ISearchMoveList {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void reset() {
+		cur = 0;
+	}
 }

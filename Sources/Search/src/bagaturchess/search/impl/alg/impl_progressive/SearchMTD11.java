@@ -1712,7 +1712,7 @@ public class SearchMTD11 extends SearchImpl_MTD {
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -(beta - 1), false,
 							best_move, prevbest, prevPV, rootColour, totalLMReduction, -new_materialGain, inNullMove, new_mateMove, useMateDistancePrunning);
 					
-					if (new_maxdepth > maxdepth) {
+					/*if (new_maxdepth > maxdepth) {
 						int score_diff = shallow_eval - cur_eval;
 						int ext_depth = new_maxdepth - maxdepth;
 						if (EXT_SINGLE_REPLY_NONPV > 0 && singleMove) {
@@ -1740,7 +1740,7 @@ public class SearchMTD11 extends SearchImpl_MTD {
 								getEnv().getExtensions().getMoveEval(colourToMove).inc(score_diff, ext_depth);
 							}
 						}
-					}
+					}*/
 				}
 				
 				env.getBitboard().makeMoveBackward(cur_move);

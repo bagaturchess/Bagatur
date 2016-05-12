@@ -508,4 +508,9 @@ public class ListAll_InCheck implements ISearchMoveList {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void reset() {
+		cur = 0;
+	}
 }
