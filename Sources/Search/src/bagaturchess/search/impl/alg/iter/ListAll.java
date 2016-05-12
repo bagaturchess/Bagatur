@@ -102,6 +102,8 @@ public class ListAll implements ISearchMoveList {
 	
 	private OrderingStatistics orderingStatistics;
 	
+	private boolean reuse_moves = true;
+	
 	
 	public ListAll(SearchEnv _env, OrderingStatistics _orderingStatistics) { 
 		env = _env;
@@ -179,10 +181,9 @@ public class ListAll implements ISearchMoveList {
 			
 			if (cur == 1) {
 				if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(moves, 1, size);
-				if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(1, size, moves);
 			}
 			
-			/*int SORT_INDEX = 1;
+			int SORT_INDEX = reuse_moves ? 100 : 0;
 			if (cur <= SORT_INDEX) {
 				
 				if (cur > 1) {
@@ -203,7 +204,7 @@ public class ListAll implements ISearchMoveList {
 				}
 			} else if (cur == SORT_INDEX + 1) {
 				if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(cur, size, moves);
-			}*/
+			}
 			
 			int move = (int) moves[cur++];
 			return move;
@@ -595,14 +596,18 @@ public class ListAll implements ISearchMoveList {
 
 	@Override
 	public void reset() {
-		clear();
 		
-		/*cur = 0;
-		
-		revalue = true;
-		
-		tptTried = false;
-		tptPlied = false;
-		*/
+		if (reuse_moves) {
+			
+			cur = 0;
+			
+			revalue = true;
+			
+			tptTried = false;
+			tptPlied = false;
+			
+		} else {
+			clear();
+		}
 	}
 }
