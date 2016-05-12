@@ -46,17 +46,16 @@ import bagaturchess.search.impl.utils.SearchUtils;
 
 public class SearchMTD0 extends SearchImpl_MTD {
 	
-	//IBitBoard bitboard  = new Board("8/8/p7/P7/4P3/1kp5/4K3/8 w - - 1 82"); //Unstoppable passers problem?
 	
 	public static final ExtStat extStat = new ExtStat();
 	
-	//public MoveEvalStat evals = new MoveEvalStat();
 	
-	int MIN_EVAL_DIFF_PV = 33;
-	int MIN_EVAL_DIFF_NONPV = 33;
+	int MIN_EVAL_DIFF_PV 					= 33;
+	int MIN_EVAL_DIFF_NONPV 				= 33;
 	
-	double LMR_REDUCTION_MULTIPLIER = 0.777;
-	double NULL_MOVE_REDUCTION_MULTIPLIER = 1;
+	double LMR_REDUCTION_MULTIPLIER 		= 0.777;
+	double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1;
+	double IID_DEPTH_MULTIPLIER 			= 1;
 	
 	
 	public SearchMTD0(Object[] args) {
@@ -892,7 +891,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		//int iid_eval = MIN;
 		if (IID_PV && depth > 0) {
 			
-			int reduction = Math.max(2, rest / 2);
+			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
 			
 			if (tpt_depth < iidRest
@@ -1683,7 +1682,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		//IID NONPV Node
 		if (IID_NONPV) {
 			
-			int reduction = Math.max(2, rest / 2);
+			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
 			
 			if (tpt_depth < iidRest
