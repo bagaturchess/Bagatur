@@ -452,10 +452,10 @@ public class ListAll implements ISearchMoveList {
 			return;
 		}
 		
-		count++;
+		/*count++;
 		if (count % 100000 == 0) {
 			System.out.println(orderingStatistics);
-		}
+		}*/
 		
 		genOrdVal(move);
 	}

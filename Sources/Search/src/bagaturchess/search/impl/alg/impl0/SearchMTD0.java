@@ -805,7 +805,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			//int staticEval = lazyEval(depth, alpha_org, beta, rootColour);
 			
 			if (staticEval >= beta + 35) {
-			
+				
 				//int null_reduction = PLY * (rest >= 6 ? 3 : 2);
 				int null_reduction = PLY * (rest >= 6 ? 4 : 3);
 				null_reduction = (int) (NULL_MOVE_REDUCTION_MULTIPLIER * Math.max(null_reduction, PLY * (rest / 2)));
