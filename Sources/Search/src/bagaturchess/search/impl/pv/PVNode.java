@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.bitboard.impl.movegen.MoveInt;
+import bagaturchess.search.api.internal.ISearchMoveList;
 
 
 public class PVNode {
@@ -52,6 +53,10 @@ public class PVNode {
 	
 	public boolean leaf;
 	public boolean nullmove;
+	
+	public long hashkey;
+	public ISearchMoveList moves;
+	
 	
 	public PVNode() {
 		bestmove = 0;
