@@ -102,8 +102,17 @@ public class ListAll implements ISearchMoveList {
 	
 	private OrderingStatistics orderingStatistics;
 	
-	private boolean reuse_moves = true;
+	private boolean reuse_moves = false;
 	
+	private boolean inUse = false;
+	
+	public boolean isInUse() {
+		return inUse;
+	}
+
+	public void setInUse(boolean _inUse) {
+		inUse = _inUse;
+	}
 	
 	public ListAll(SearchEnv _env, OrderingStatistics _orderingStatistics) { 
 		env = _env;
@@ -165,10 +174,22 @@ public class ListAll implements ISearchMoveList {
 		
 		if (revalue) {
 			
-			for (int cur = 0; cur < size; cur++) {
-				int move = (int) moves[cur];
+			for (int i = 0; i < size; i++) {
+				int move = (int) moves[i];
+				
+				if (!env.getBitboard().isPossible(move)) {
+					throw new IllegalStateException();
+				}
+				
 				long ordval = genOrdVal(move);
-				moves[cur] = MoveInt.addOrderingValue(move, ordval);
+				moves[i] = MoveInt.addOrderingValue(move, ordval);
+				
+				//Move best move on top
+				if (moves[i] > moves[0]) {
+					long best_move = moves[i];
+					moves[i] = moves[0];
+					moves[0] = best_move;
+				}
 			}
 			
 			revalue = false;
@@ -179,37 +200,40 @@ public class ListAll implements ISearchMoveList {
 		
 		if (cur < size) {
 			
-			if (cur == 1) {
-				if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(moves, 1, size);
+			int SORT_INDEX = 1;
+			//int SORT_INDEX = 2;
+			//int SORT_INDEX = (int) Math.max(1, Math.sqrt(size) / 2);
+			
+			if (SORT_INDEX <= 0) {
+				throw new IllegalStateException();
 			}
 			
-			int SORT_INDEX = 1;//(int) (reuse_moves ? Math.max(1, Math.sqrt(size)) : 0);
-			if (cur <= SORT_INDEX) {
-				
-				if (cur > 1) {
-					for (int i = cur; i < size; i++) {
-						int move = (int) moves[i];
-						long ordval = genOrdVal(move);
-						moves[i] = MoveInt.addOrderingValue(move, ordval);
-					}
-				}
-				
-				//Move best move on top
-				for (int i = cur; i < size; i++) {
-					long move = moves[i];
-					if (move > moves[cur]) {
-						moves[i] = moves[cur];
-						moves[cur] = move;
-					}
-				}
-			} else if (cur == SORT_INDEX + 1) {
+			if (cur == 0) {
+				//Already sorted in reserved_add
+			} else if (cur == SORT_INDEX) {
+				if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(moves, cur, size);
 				if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(cur, size, moves);
+			} else if (cur < SORT_INDEX) {
+				for (int i = cur; i < size; i++) {
+					int move = (int) moves[i];
+					long ordval = genOrdVal(move);
+					moves[i] = MoveInt.addOrderingValue(move, ordval);
+					
+					//Move best move on top
+					if (moves[i] > moves[cur]) {
+						long best_move = moves[i];
+						moves[i] = moves[cur];
+						moves[cur] = best_move;
+					}
+				}
 			}
 			
 			int move = (int) moves[cur++];
+			
 			return move;
 			
 		} else {
+			
 			return 0;
 		}
 	}
@@ -446,7 +470,7 @@ public class ListAll implements ISearchMoveList {
 	}
 	
 	 
-	static int count = 0;
+	//static int count = 0;
 	public void countStatistics(int move) {
 		if (move == 0) {
 			return;
@@ -540,7 +564,7 @@ public class ListAll implements ISearchMoveList {
 	
 	private void add(long move) {	
 		if (size == 0) {
-			moves[size] = move;
+			moves[0] = move;
 		} else {
 			if (move > moves[0]) {
 				moves[size] = moves[0];

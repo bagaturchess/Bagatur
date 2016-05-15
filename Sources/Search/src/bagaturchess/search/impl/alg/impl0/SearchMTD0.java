@@ -53,7 +53,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	int MIN_EVAL_DIFF_PV 					= 33;
 	int MIN_EVAL_DIFF_NONPV 				= 33;
 	
-	double LMR_REDUCTION_MULTIPLIER 		= 0.777;
+	double LMR_REDUCTION_MULTIPLIER 		= 1;
 	double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1;
 	double IID_DEPTH_MULTIPLIER 			= 1;
 	
@@ -495,12 +495,26 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
 		
+		long hashkey = env.getBitboard().getHashKey();
+		
 		PVNode node = pvman.load(depth);
 		
 		node.bestmove = 0;
 		node.eval = MIN;
 		node.nullmove = false;
 		node.leaf = true;
+		
+		if (node.hashkey != hashkey) {
+			node.hashkey = hashkey;
+			if (node.moves != null) {
+				if (node.moves instanceof ListAll) {
+					((ListAll) node.moves).setInUse(false);
+					node.moves = null;
+				} else {
+					throw new IllegalStateException();
+				}
+			}
+		}
 		
 		if (isDrawPV(depth)) {
 			node.eval = getDrawScores(rootColour);
@@ -629,8 +643,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		env.getTPT().unlock();*/
 		
-		long hashkey = env.getBitboard().getHashKey();
-		
 		rest = normDepth(maxdepth) - depth;
 		
 		boolean tpt_found = false;
@@ -736,8 +748,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, true, rootColour);	
 			return node.eval;
 		}
-				
-				
+		
+		
         if (env.getGTBProbing() != null
                 && useMateDistancePrunning //Doesn't make mates without this pruning as the mate distance is not decreased with each ply
                 && depth >= 3
@@ -785,6 +797,31 @@ public class SearchMTD0 extends SearchImpl_MTD {
             }
         }
 
+        if (useStaticPrunning
+                ) {
+                
+            if (inCheck) {
+                throw new IllegalStateException("In check in useStaticPrunning");
+            }
+        
+            if (tpt_lower > TPTEntry.MIN_VALUE) {
+                if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
+                    
+                    node.eval = tpt_lower;
+                    node.leaf = true;
+                    node.nullmove = false;
+                    
+                    node.bestmove = 0;
+                    env.getTPT().lock();
+                    buff_tpt_depthtracking[0] = 0;
+                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking);
+                    env.getTPT().unlock();
+                    
+                    
+                    return node.eval;
+                }
+            }
+        }
 		
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
@@ -887,7 +924,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 
 		
-		boolean reuseIIDMoves = false;
 		//IID PV Node
 		if (IID_PV && depth > 0) {
 			
@@ -902,7 +938,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						prevNullMove, prevbest, prevprevbest, prevPV, rootColour, totalLMReduction, materialGain, true, mateMove, useMateDistancePrunning, useStaticPrunning, useNullMove);
 				//pv_search(mediator, stopper, info, initial_maxdepth, maxdepth - PLY * reduction, depth, alpha_org, beta,
 				//		 prevbest, prevprevbest, prevPV, prevNullMove);
-				reuseIIDMoves = rest >= 3 && !useNullMove;
 				
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
@@ -934,27 +969,27 @@ public class SearchMTD0 extends SearchImpl_MTD {
         if (useStaticPrunning
                 ) {
                 
-                if (inCheck) {
-                    throw new IllegalStateException("In check in useStaticPrunning");
+            if (inCheck) {
+                throw new IllegalStateException("In check in useStaticPrunning");
+            }
+        
+            if (tpt_lower > TPTEntry.MIN_VALUE) {
+                if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
+                    
+                    node.eval = tpt_lower;
+                    node.leaf = true;
+                    node.nullmove = false;
+                    
+                    node.bestmove = 0;
+                    env.getTPT().lock();
+                    buff_tpt_depthtracking[0] = 0;
+                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking);
+                    env.getTPT().unlock();
+                    
+                    
+                    return node.eval;
                 }
-            
-                if (tpt_lower > TPTEntry.MIN_VALUE) {
-                    if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
-                        
-                        node.eval = tpt_lower;
-                        node.leaf = true;
-                        node.nullmove = false;
-                        
-                        node.bestmove = 0;
-                        env.getTPT().lock();
-                        buff_tpt_depthtracking[0] = 0;
-                        extractFromTPT(info, rest, node, true, buff_tpt_depthtracking);
-                        env.getTPT().unlock();
-                        
-                        
-                        return node.eval;
-                    }
-                }
+            }
         }
         
         
@@ -972,11 +1007,24 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		ISearchMoveList list = null;
 		
 		if (!inCheck) {
-			list = lists_all[depth];
-			if (reuseIIDMoves) {
+			
+			if (node.moves != null) {
+				list = node.moves;
 				list.reset();
 			} else {
+				list = lists_all[depth];
 				list.clear();
+				
+				node.moves = list;
+				
+				if (node.moves != null) {
+					if (node.moves instanceof ListAll) {
+						((ListAll) node.moves).setInUse(true);
+						node.moves = null;
+					} else {
+						throw new IllegalStateException();
+					}
+				}
 			}
 			
 			list.setTptMove(tpt_move);
@@ -1141,7 +1189,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						*/
 						
 						
-						if (!isGoodMove || searchedCount >= getLMR1(list)) {
+						//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
 							staticPrunning = true;
 							
@@ -1157,7 +1205,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							if (lmrReduction >= (rest - 1) * PLY) {
 								lmrReduction = (rest - 1) * PLY;
 							}
-						}
+						//}
 						
 						/*
 						if (!isGoodMove) {
@@ -1377,6 +1425,21 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, beta - 1, beta);
 				
+		long hashkey = env.getBitboard().getHashKey();
+		
+		PVNode node = pvman.load(depth);
+		
+		if (node.hashkey != hashkey) {
+			node.hashkey = hashkey;
+			if (node.moves != null) {
+				if (node.moves instanceof ListAll) {
+					((ListAll) node.moves).setInUse(false);
+					node.moves = null;
+				} else {
+					throw new IllegalStateException();
+				}
+			}
+		}
 		
 		if (isDraw()) {
 			return getDrawScores(rootColour);
@@ -1469,9 +1532,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				maxdepth = PLY * (depth + 1);
 			}
 		}
-
-		
-		long hashkey = env.getBitboard().getHashKey();
 		
 		rest = normDepth(maxdepth) - depth;
 		
@@ -1580,6 +1640,22 @@ public class SearchMTD0 extends SearchImpl_MTD {
         }
 		
 		
+		
+        if (useStaticPrunning
+                ) {
+                
+            if (inCheck) {
+                throw new IllegalStateException("In check in useStaticPrunning");
+            }
+        
+            if (tpt_lower > TPTEntry.MIN_VALUE) {
+                if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
+                    return tpt_lower;
+                }
+            }
+        }
+        
+        
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
 
@@ -1727,15 +1803,15 @@ public class SearchMTD0 extends SearchImpl_MTD {
         if (useStaticPrunning
                 ) {
                 
-                if (inCheck) {
-                    throw new IllegalStateException("In check in useStaticPrunning");
+            if (inCheck) {
+                throw new IllegalStateException("In check in useStaticPrunning");
+            }
+        
+            if (tpt_lower > TPTEntry.MIN_VALUE) {
+                if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
+                    return tpt_lower;
                 }
-            
-                if (tpt_lower > TPTEntry.MIN_VALUE) {
-                    if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
-                        return tpt_lower;
-                    }
-                }
+            }
         }
         
         
@@ -1747,12 +1823,26 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		ISearchMoveList list = null;
 		
+		
 		if (!inCheck) {
-			list = lists_all[depth];
-			if (reuseIIDMOves) {
+			
+			if (node.moves != null) {
+				list = node.moves;
 				list.reset();
 			} else {
+				list = lists_all[depth];
 				list.clear();
+				
+				node.moves = list;
+				
+				if (node.moves != null) {
+					if (node.moves instanceof ListAll) {
+						((ListAll) node.moves).setInUse(true);
+						node.moves = null;
+					} else {
+						throw new IllegalStateException();
+					}
+				}
 			}
 			
 			list.setTptMove(tpt_move);
@@ -1884,7 +1974,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							*/
 							
 							
-							if (!isGoodMove || searchedCount >= getLMR1(list)) {
+							//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 								
 								staticPrunning = true;
 								
@@ -1900,7 +1990,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 								if (lmrReduction >= (rest - 1) * PLY) {
 									lmrReduction = (rest - 1) * PLY;
 								}
-							}
+							//}
 							
 							
 							/*

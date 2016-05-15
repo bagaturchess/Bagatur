@@ -124,6 +124,15 @@ public class Randoms {
 	public static void main(String[] args) {
 		genMembers();
 		
+		/*for (int i=0; i<NUMBERS.length; i++) {
+			for (int j=0; j<NUMBERS.length; j++) {
+				if (i != j && NUMBERS[i] == NUMBERS[j]) {
+					throw new IllegalStateException();
+				}
+			}
+			//System.out.println("ok");
+		}*/
+		
 		/*try {
 			write(numbers, "c:\\temp.txt");
 		} catch (Exception e) {
