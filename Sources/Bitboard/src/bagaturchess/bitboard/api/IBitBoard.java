@@ -114,6 +114,7 @@ public interface IBitBoard extends IBoard {
 	public int getPlayedMovesCount_Total();
 	public int[] getPlayedMoves();
 	public int getLastMove();
+	public int getLastLastMove();
 	
 	
 	public int getStateRepetition(long hashkey);
