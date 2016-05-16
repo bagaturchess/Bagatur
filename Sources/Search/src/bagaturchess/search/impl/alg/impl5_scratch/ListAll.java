@@ -222,7 +222,7 @@ public class ListAll implements ISearchMoveList {
 		}
 		
 		
-		double historyRating = (getHistoryTable().getScores(move) / (double) getHistoryTable().getMaxRate());
+		double historyRating = (getHistoryTable().getScores(move) / (double) getHistoryTable().getMaxRate(move));
 		ordval += 100D * historyRating;
 		
 		return ordval;

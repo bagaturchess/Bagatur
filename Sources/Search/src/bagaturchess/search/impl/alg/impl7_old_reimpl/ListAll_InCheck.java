@@ -345,7 +345,7 @@ public class ListAll_InCheck implements ISearchMoveList {
 			}
 		}
 		
-		ordval += ORD_VAL_SHIFT * (env.getHistory_all().getScores(move) / (double) env.getHistory_all().getMaxRate())
+		ordval += ORD_VAL_SHIFT * (env.getHistory_all().getScores(move) / (double) env.getHistory_all().getMaxRate(move))
 					* orderingStatistics.getOrdVal_HISTORY();
 		
 		ordval += ORD_VAL_SHIFT * env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
@@ -442,7 +442,7 @@ public class ListAll_InCheck implements ISearchMoveList {
 			}
 		}
 		
-		orderingStatistics.history_best += (env.getHistory_all().getScores(bestmove) / (double) env.getHistory_all().getMaxRate());
+		orderingStatistics.history_best += (env.getHistory_all().getScores(bestmove) / (double) env.getHistory_all().getMaxRate(bestmove));
 		orderingStatistics.history_count += 1;
 		
 		orderingStatistics.pst_best += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(bestmove);
