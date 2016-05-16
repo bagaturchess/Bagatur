@@ -1430,6 +1430,12 @@ public abstract class Board3 extends Fields implements IBoard, Cloneable {
 		} else return 0;
 	}
 	
+	public int getLastLastMove() {
+		if (playedMovesCount > 1) {
+			return playedMoves[playedMovesCount - 2];
+		} else return 0;
+	}
+	
 	public final int getColourToMove() {
 		return Figures.OPPONENT_COLOUR[lastMoveColour];
 	}

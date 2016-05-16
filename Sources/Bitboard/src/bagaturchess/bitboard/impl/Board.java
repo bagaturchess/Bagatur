@@ -5449,6 +5449,12 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		} else return 0;
 	}
 	
+	public int getLastLastMove() {
+		if (playedMovesCount > 1) {
+			return playedMoves[playedMovesCount - 2];
+		} else return 0;
+	}
+	
 	public final int getColourToMove() {
 		return Figures.OPPONENT_COLOUR[lastMoveColour];
 	}
