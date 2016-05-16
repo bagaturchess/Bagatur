@@ -1191,7 +1191,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						
 						//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
-							staticPrunning = true;
+							if (searchedCount >= Math.sqrt(rest)) {
+							//if (searchedCount >= 1) {
+								staticPrunning = true;
+							}
 							
 							double rate = Math.sqrt(searchedCount);
 							rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
@@ -1976,8 +1979,11 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							
 							//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 								
-								staticPrunning = true;
-								
+								if (searchedCount >= Math.sqrt(rest)) {
+								//if (searchedCount >= 1) {
+									staticPrunning = true;
+								}
+							
 								double rate = Math.sqrt(searchedCount);
 								rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
 								if (isGoodMove) {
