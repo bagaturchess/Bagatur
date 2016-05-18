@@ -35,13 +35,14 @@ public class HistoryTable {
 	
 	public static final short MAX_SCORES = 1024;
 	
+	private boolean ONE_TABLE = false;
 	
 	private HistoryTable_PerColour history_w;
 	private HistoryTable_PerColour history_b;
 	
 	
-	private Killers nonCaptureKillers;
-	private Killers mateKillers;
+	//private Killers nonCaptureKillers;
+	//private Killers mateKillers;
 	
 	
 	public HistoryTable(IBinarySemaphore _semaphore) {
@@ -52,14 +53,21 @@ public class HistoryTable {
 	
 	private void init() {
 		
-		nonCaptureKillers = new Killers(3);
-		mateKillers = new Killers(10);
+		//nonCaptureKillers = new Killers(10);
+		//mateKillers = new Killers(10);
 		
 		history_w = new HistoryTable_PerColour(new BinarySemaphore_Dummy());
-		history_b = new HistoryTable_PerColour(new BinarySemaphore_Dummy());
+		if (!ONE_TABLE) {
+			history_b = new HistoryTable_PerColour(new BinarySemaphore_Dummy());
+		}
 	}
 	
 	private HistoryTable_PerColour getHistoryTable_PerColour(int colour) {
+		
+		if (ONE_TABLE) {
+			return history_w;
+		}
+		
 		if (colour == Constants.COLOUR_WHITE) {
 			return history_w;
 		} else {
@@ -121,6 +129,7 @@ public class HistoryTable {
 		init();
 	}
 	
+	/*
 	public int[] getNonCaptureKillers(int colour) {
 		int[] result =  nonCaptureKillers.getKillers(colour);
 		return result;
@@ -130,7 +139,7 @@ public class HistoryTable {
 		int[] result =  mateKillers.getKillers(colour);
 		return result;
 	}
-
+	 */
 
 	public int getMaxRate(int move) {
 		return getHistoryTable_PerColour(MoveInt.getColour(move)).getMaxRate();

@@ -34,6 +34,7 @@ import bagaturchess.bitboard.impl1.Board3_Adapter;
 import bagaturchess.engines.bagatur.cfg.rootsearch.RootSearchConfig_SMP;
 import bagaturchess.engines.bagatur.cfg.rootsearch.RootSearchConfig_SingleCore_AB;
 import bagaturchess.engines.bagatur.cfg.rootsearch.RootSearchConfig_SingleCore_MTD;
+import bagaturchess.engines.bagatur.eval.BagaturEvaluator;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP;
 import bagaturchess.search.api.IEvaluator;
@@ -155,8 +156,9 @@ public class MTDSchedulerMain {
 		//2r1n2r/1q4k1/2p1pn2/ppR4p/4PNbP/P1BBQ3/1P4P1/R5K1 b - - 1 32 correct move is Kg7f7, the position is used for testing captures extensions
 		//5k2/4r1p1/4r3/8/1Q6/P7/2PP4/1K6 w - - 0 1  the position is used for testing passer push extensions
 		//1r6/4k3/1pbpPb1p/p1p2P2/2Pp3p/3P3P/2P2RP1/R6K b - - 3 39, evaluation of Stockfish is +4, but Bagatur doesn't find why
+		//8/3k4/8/8/7n/7P/6K1/8 w - - 3 39; pawn vs knight is not with eval 0
 		
-		//IBitBoard bitboard  = new Board("1r6/4k3/1pbpPb1p/p1p2P2/2Pp3p/3P3P/2P2RP1/R6K b - - 3 39", null, cfg.getBoardConfig());
+		//IBitBoard bitboard  = new Board("1r6/4k3/1pbpPb1p/p1p2P2/2Pp3p/3P3P/2P2RP1/R6K b - - 3 39", null/*sharedData.getAndRemovePawnsCache()*/, cfg.getBoardConfig());
 		
 		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
@@ -189,12 +191,14 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard  = new Board("rn2kb1r/p3pppp/1q2b3/1p2P1N1/2pP2n1/1PN5/5PPP/R1BQKB1R b KQkq - 2 10 ", sharedData.getPawnsCache(), cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("B7/8/4n3/p1p1kp2/P2p3p/1PP2P2/3K3P/8 w - - 0 49 ", sharedData.getPawnsCache(), cfg.getBoardConfig());
 		
-		//BoardUtils.playGame(bitboard, "c3xd4, e6xd4, d2-e3, d4xb3, f3-f4, e5-e6, e3-d3, h4-h3, a8-c6, b3-d4, c6-h1, e6-d6, d3-e3, d6-d7, e3-d2, d7-e7, d2-e3, e7-d6");
-		//IEvaluator evaluator = sharedData.getEvaluatorFactory().create(bitboard, search.getSharedData().getEvalCache(), cfg.getEvalConfig());
-		//evaluator.fullEval(-1, -1000000, 1000000, -1);
-		//System.out.println(bitboard);
-		//System.out.println(((BagaturEvaluator)evaluator).dump(bitboard.getColourToMove()));
-		//System.exit(0);
+		/*
+		BoardUtils.playGame(bitboard, "");
+		IEvaluator evaluator = sharedData.getEvaluatorFactory().create(bitboard, search.getSharedData().getAndRemoveEvalCache(), cfg.getEvalConfig());
+		evaluator.fullEval(-1, -1000000, 1000000, Constants.COLOUR_WHITE);
+		System.out.println(bitboard);
+		System.out.println(((BagaturEvaluator)evaluator).dump(bitboard.getColourToMove()));
+		System.exit(0);
+		*/
 		
 		//IBitBoard bitboard  = new Board("1k1rr3/ppp2ppp/4b3/3P4/4P2q/B1P5/P1PQ2PP/1R2R1K1 w - - 3 18"); //kingsafety - black is bad.
 		//IBitBoard bitboard  = new Board("rnb1r3/2k2Npp/p4n2/8/1b6/1Bp1P3/PP3PPP/R1B2RK1 w - - 6 16"); 

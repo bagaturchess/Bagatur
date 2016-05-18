@@ -20,8 +20,6 @@ public class EvalInfo extends Figures {
 	int eval_PST_o;
 	int eval_PST_e;
 
-	int eval_PawnsPattern_o;
-
 	int eval_Space_o;
 	int eval_Space_e;
 	
@@ -139,8 +137,6 @@ public class EvalInfo extends Figures {
 		
 		eval_PST_o = 0;
 		eval_PST_e = 0;
-		
-		eval_PawnsPattern_o = 0;
 		
 		eval_NoQueen_o = 0;
 		eval_NoQueen_e = 0;

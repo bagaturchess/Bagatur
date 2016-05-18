@@ -186,6 +186,7 @@ public class ListStoppers implements IMoveList {
 			ordval += HISTORY_SHIFT * ORD_VAL_PREV_BEST_MOVE;
 		}
 		
+		/*
 		int[] killers = env.getHistory_all().getNonCaptureKillers(env.getBitboard().getColourToMove());
 		for (int i=0; i<killers.length; i++) {
 			if (move == killers[i]) {
@@ -194,6 +195,7 @@ public class ListStoppers implements IMoveList {
 				break;
 			}
 		}
+		*/
 		
 		if (env.getBitboard().isPasserPush(move)) {
 			ordval += HISTORY_SHIFT * ORD_VAL_PASSER_PUSH;

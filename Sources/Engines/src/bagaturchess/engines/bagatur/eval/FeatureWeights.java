@@ -16,26 +16,26 @@ public interface FeatureWeights {
 	public static final long RANK_1TH = Fields.DIGIT_1;
 	
 	// Attack weights for each piece type.
-	public static final int QueenAttackWeight	 = 5;
-	public static final int RookAttackWeight 	= 3;
-	public static final int BishopAttackWeight 	= 2;
-	public static final int KnightAttackWeight	 = 2;
+	public static final int QueenAttackWeight	 		= 5;
+	public static final int RookAttackWeight 			= 3;
+	public static final int BishopAttackWeight 			= 2;
+	public static final int KnightAttackWeight	 		= 2;
 	
 	
 	/**
 	 * Weights
 	 */
-	public static final double WEIGHT_MATERIAL_O 			= 1 * 1.31;
-	public static final double WEIGHT_MATERIAL_E 			= 1 * 1.31;
+	public static final double WEIGHT_MATERIAL_O 		= 1 * 1.31;
+	public static final double WEIGHT_MATERIAL_E 		= 1 * 1.31;
 	
-	public static final double WEIGHT_STANDARD_O 			= 1;
-	public static final double WEIGHT_STANDARD_E 			= 1;
+	public static final double WEIGHT_STANDARD_O 		= 1;
+	public static final double WEIGHT_STANDARD_E 		= 1;
 	
 	
-	public static final double WEIGHT_PAWNS_ROOKQUEEN_O		= 1;
-	public static final double WEIGHT_PAWNS_ROOKQUEEN_E		= 1;
+	public static final double WEIGHT_PAWNS_ROOKQUEEN_O	= 1;
+	public static final double WEIGHT_PAWNS_ROOKQUEEN_E	= 1;
 	
-	public static final double WEIGHT_PP_O	 				= 2;
+	public static final double WEIGHT_PP_O	 			= 2;
 
 	
 	
@@ -90,12 +90,12 @@ public interface FeatureWeights {
 	public static final int PAWNS_KING_OPENED		= -12;
 	public static final int PAWNS_ROOK_OPENED_O		= 22;
 	public static final int PAWNS_ROOK_OPENED_E		= 16;
-	public static final int PAWNS_ROOK_SEMIOPENED_O		= 7;
-	public static final int PAWNS_ROOK_SEMIOPENED_E		= 20;
+	public static final int PAWNS_ROOK_SEMIOPENED_O	= 7;
+	public static final int PAWNS_ROOK_SEMIOPENED_E	= 20;
 	public static final int PAWNS_ROOK_7TH2TH_O		= 3;
 	public static final int PAWNS_ROOK_7TH2TH_E		= 36;
-	public static final int PAWNS_QUEEN_7TH2TH_O		= 0;
-	public static final int PAWNS_QUEEN_7TH2TH_E		= 26;
+	public static final int PAWNS_QUEEN_7TH2TH_O	= 0;
+	public static final int PAWNS_QUEEN_7TH2TH_E	= 26;
 	
 	
 	/**
@@ -125,17 +125,17 @@ public interface FeatureWeights {
 	public static final int[] MOBILITY_ROOK_S_E		= new int[] {-26, -21, -16, -7, -5, 0, 3, 6, 6, 7, 9, 22, 24, 25, 26};
 	public static final int[] MOBILITY_QUEEN_S_O	= new int[] {-12, -10, -8, -5, -2, 0, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12};
 	public static final int[] MOBILITY_QUEEN_S_E	= new int[] {-17, -16, -15, -14, -14, -13, -8, -6, -1, 0, 2, 3, 4, 5, 6, 7, 8, 9, 9, 10, 11, 12, 13, 13, 14, 15, 16, 17};
-	public static final int SPACE_O				= 1;
-	public static final int SPACE_E				= 1;
+	public static final int SPACE_O					= 1;
+	public static final int SPACE_E					= 1;
 	
-	public static final int TRAPED_O			= -1;
-	public static final int TRAPED_E			= -1;
+	public static final int TRAPED_O				= -1;
+	public static final int TRAPED_E				= -1;
 	
 	
-	public static final int[] KNIGHT_OUTPOST_O			= Utils.reverseSpecial(new int[] {
+	public static final int[] KNIGHT_OUTPOST_O		= Utils.reverseSpecial(new int[] {
 			0,   0,   0,   0,   0,   0,   0,   0,   
 			0,   0,   4,   5,   5,   4,   0,   0,   
-			0,   0,   7,   10,   10,   7,   0,   0,   
+			0,   0,   7,   10,  10,  7,   0,   0,   
 			0,   0,   8,   5,   5,   8,   0,   0,   
 			0,   0,   0,   0,   0,   0,   0,   0,   
 			0,   0,   0,   0,   0,   0,   0,   0,   
@@ -143,7 +143,7 @@ public interface FeatureWeights {
 			0,   0,   0,   0,   0,   0,   0,   0,   
 			});
 	
-	public static final int[] KNIGHT_OUTPOST_E			= Utils.reverseSpecial(new int[] {
+	public static final int[] KNIGHT_OUTPOST_E		= Utils.reverseSpecial(new int[] {
 			0,   0,   0,   0,   0,   0,   0,   0,   
 			0,   0,   1,   2,   2,   1,   0,   0,   
 			0,   0,   3,   3,   3,   3,   0,   0,   
@@ -154,7 +154,7 @@ public interface FeatureWeights {
 			0,   0,   0,   0,   0,   0,   0,   0,   
 			});
 
-	public static final int[] BISHOP_OUTPOST_O			= Utils.reverseSpecial(new int[] {
+	public static final int[] BISHOP_OUTPOST_O		= Utils.reverseSpecial(new int[] {
 			0,   0,   0,   0,   0,   0,   0,   0,   
 			0,   0,   1,   0,   0,   1,   0,   0,   
 			0,   0,   3,   3,   3,   3,   0,   0,   
@@ -165,7 +165,7 @@ public interface FeatureWeights {
 			0,   0,   0,   0,   0,   0,   0,   0,   
 			});
 	
-	public static final int[] BISHOP_OUTPOST_E			= Utils.reverseSpecial(new int[] {
+	public static final int[] BISHOP_OUTPOST_E		= Utils.reverseSpecial(new int[] {
 			0,   0,   0,   0,   0,   0,   0,   0,   
 			0,   0,   0,   0,   0,   0,   0,   0,   
 			0,   0,   1,   1,   1,   1,   0,   0,   
