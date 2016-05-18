@@ -191,7 +191,6 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		evalInfo.eval_Standard_e *= WEIGHT_STANDARD_E;
 		evalInfo.eval_PST_o *= evalConfig.get_WEIGHT_PST_O();
 		evalInfo.eval_PST_e *= evalConfig.get_WEIGHT_PST_E();
-		evalInfo.eval_PawnsPattern_o *= WEIGHT_PP_O;
 		evalInfo.eval_PawnsStandard_o *= evalConfig.get_WEIGHT_PAWNS_STANDARD_O();
 		evalInfo.eval_PawnsStandard_e *= evalConfig.get_WEIGHT_PAWNS_STANDARD_E();
 		evalInfo.eval_PawnsPassed_o *= evalConfig.get_WEIGHT_PAWNS_PASSED_O();
@@ -201,7 +200,6 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		eval += interpolator.interpolateByFactor(evalInfo.eval_Material_o +
 												evalInfo.eval_Standard_o +
 												evalInfo.eval_PST_o +
-												evalInfo.eval_PawnsPattern_o +
 												evalInfo.eval_PawnsStandard_o +
 												evalInfo.eval_PawnsPassed_o +
 												evalInfo.eval_PawnsPassedKing_o +
@@ -325,11 +323,9 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		evalInfo.eval_Standard_e *= WEIGHT_STANDARD_E;
 		evalInfo.eval_PST_o *= evalConfig.get_WEIGHT_PST_O();
 		evalInfo.eval_PST_e *= evalConfig.get_WEIGHT_PST_E();
-		evalInfo.eval_PawnsPattern_o *= WEIGHT_PP_O;
 		int eval1 = interpolator.interpolateByFactor(evalInfo.eval_Material_o +
 				evalInfo.eval_Standard_o +
 				evalInfo.eval_PST_o +
-				evalInfo.eval_PawnsPattern_o +
 				evalInfo.eval_NoQueen_o,
 				
 				evalInfo.eval_Material_e +
@@ -533,7 +529,6 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		evalInfo.eval_Standard_e *= WEIGHT_STANDARD_E;
 		evalInfo.eval_PST_o *= evalConfig.get_WEIGHT_PST_O();
 		evalInfo.eval_PST_e *= evalConfig.get_WEIGHT_PST_E();
-		evalInfo.eval_PawnsPattern_o *= WEIGHT_PP_O;
 		evalInfo.eval_PawnsStandard_o *= evalConfig.get_WEIGHT_PAWNS_STANDARD_O();
 		evalInfo.eval_PawnsStandard_e *= evalConfig.get_WEIGHT_PAWNS_STANDARD_E();
 		evalInfo.eval_PawnsPassed_o *= evalConfig.get_WEIGHT_PAWNS_PASSED_O();
@@ -544,7 +539,6 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		eval += interpolator.interpolateByFactor(evalInfo.eval_Material_o +
 												evalInfo.eval_Standard_o +
 												evalInfo.eval_PST_o +
-												evalInfo.eval_PawnsPattern_o +
 												evalInfo.eval_PawnsStandard_o +
 												evalInfo.eval_PawnsPassed_o +
 												evalInfo.eval_PawnsPassedKing_o +
@@ -813,13 +807,13 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 			
 			if (w_eval_nopawns_o > b_eval_nopawns_o) {
 				if (w_eval_nopawns_o < b_eval_nopawns_o + baseEval.getMaterial_BARIER_NOPAWNS_O()) {
-					w_eval_nopawns_o = b_eval_nopawns_o;
+					w_eval_nopawns_o = w_eval_nopawns_o / 2;//b_eval_nopawns_o;
 				}
 			}
 			
 			if (w_eval_nopawns_e > b_eval_nopawns_e) {
 				if (w_eval_nopawns_e < b_eval_nopawns_e + baseEval.getMaterial_BARIER_NOPAWNS_E()) {
-					w_eval_nopawns_e = b_eval_nopawns_e;
+					w_eval_nopawns_e = w_eval_nopawns_e / 2;//b_eval_nopawns_e;
 				}
 			}
 		}
@@ -831,16 +825,17 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 			
 			if (b_eval_nopawns_o > w_eval_nopawns_o) {
 				if (b_eval_nopawns_o < w_eval_nopawns_o + baseEval.getMaterial_BARIER_NOPAWNS_O()) {
-					b_eval_nopawns_o = w_eval_nopawns_o;
+					b_eval_nopawns_o = b_eval_nopawns_o / 2;//w_eval_nopawns_o;
 				}
 			}
 			
 			if (b_eval_nopawns_e > w_eval_nopawns_e) {
 				if (b_eval_nopawns_e < w_eval_nopawns_e + baseEval.getMaterial_BARIER_NOPAWNS_E()) {
-					b_eval_nopawns_e = w_eval_nopawns_e;
+					b_eval_nopawns_e = b_eval_nopawns_e / 2;//w_eval_nopawns_e;
 				}
 			}
 		}
+		
 		
 		int w_double_bishops_o = 0;
 		int w_double_bishops_e = 0;

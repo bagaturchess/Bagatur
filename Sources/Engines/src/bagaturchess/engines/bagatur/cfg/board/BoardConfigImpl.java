@@ -62,9 +62,8 @@ public class BoardConfigImpl implements IBoardConfig {
 	private double MATERIAL_QUEEN_O = 875;//775;
 	private double MATERIAL_QUEEN_E = 1230;//1000;
 	
-	private double MATERIAL_KING_O = 1600;
-	private double MATERIAL_KING_E = 1600;
-	
+	private double MATERIAL_KING_O = 0;
+	private double MATERIAL_KING_E = 0;
 	
 	
 	private double MATERIAL_BARIER_NOPAWNS_O	= Math.max(MATERIAL_KNIGHT_O, MATERIAL_BISHOP_O) + MATERIAL_PAWN_O;
