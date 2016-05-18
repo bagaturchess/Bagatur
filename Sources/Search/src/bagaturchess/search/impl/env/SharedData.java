@@ -82,7 +82,7 @@ public class SharedData {
 		memoryConsumers = _memoryConsumers;
 		
 		if (memoryConsumers != null) {
-			if (GTBProbing_NativeWrapper.getInstance() != null) {
+			if (GTBProbing_NativeWrapper.getInstance() != null && gtb_probing == null) {
 				gtb_probing = new GTBProbing(memoryConsumers.getGTBCache_OUT(), memoryConsumers.getGTBCache_IN());
 			}
 		}

@@ -22,6 +22,16 @@ public class Filler {
 	
 	private boolean stopped = false;
 	
+	/*
+	2016-05-18 12:16:47.525<--1:Exception in thread "Thread-2" java.lang.IllegalStateException: curSize 1, maxSize -106345
+	2016-05-18 12:16:47.541<--1:	at bagaturchess.bitboard.impl.datastructs.list.DoubleLinkedList.addHead(Unknown Source)
+	2016-05-18 12:16:47.556<--1:	at bagaturchess.bitboard.impl.datastructs.lrmmap.LRUMapLongObject.associateEntry(Unknown Source)
+	2016-05-18 12:16:47.556<--1:	at bagaturchess.egtb.gaviota.cache.GTBCache_OUT.put(Unknown Source)
+	2016-05-18 12:16:47.572<--1:	at bagaturchess.egtb.gaviota.Filler.fill(Unknown Source)
+	2016-05-18 12:16:47.572<--1:	at bagaturchess.egtb.gaviota.Filler.access$000(Unknown Source)
+	2016-05-18 12:16:47.572<--1:	at bagaturchess.egtb.gaviota.Filler$1.run(Unknown Source)
+	2016-05-18 12:16:47.588<--1:	at java.lang.Thread.run(Unknown Source)
+	*/
 	
 	public Filler(GTBCache_OUT _cache_out, GTBCache_IN _cache_in) {
 		
