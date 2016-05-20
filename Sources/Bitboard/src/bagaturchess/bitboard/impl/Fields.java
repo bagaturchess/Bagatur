@@ -316,6 +316,17 @@ public class Fields extends Bits {
 			0,   0,   0,   0,   0,   0,   0,   0,
 		});
 	
+	public static int[] CENTER_MANHATTAN_DISTANCE = Utils.reverseSpecial ( new int[]{	
+			  6, 5, 4, 3, 3, 4, 5, 6,
+			  5, 4, 3, 2, 2, 3, 4, 5,
+			  4, 3, 2, 1, 1, 2, 3, 4,
+			  3, 2, 1, 0, 0, 1, 2, 3,
+			  3, 2, 1, 0, 0, 1, 2, 3,
+			  4, 3, 2, 1, 1, 2, 3, 4,
+			  5, 4, 3, 2, 2, 3, 4, 5,
+			  6, 5, 4, 3, 3, 4, 5, 6
+		});
+	
 	public static final long ALL_WHITE_FIELDS = B1 | D1 | F1 | H1
 																						| A2 | C2 | E2 | G2
 																						| B3 | D3 | F3 | H3

@@ -159,6 +159,31 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 			evalCache.unlock();
 		}
 		
+		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
+			
+			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
+			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
+			
+			//Mop-up evaluation
+			//PosEval=4.7*CMD + 1.6*(14 - MD)
+			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
+			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
+				
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
+				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				
+				return 25 * (int) (4.7 * CMD + 1.6 * (14 - MD));
+				
+			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
+				
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
+				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				
+				return 25 * (int) (4.7 * CMD + 1.6 * (14 - MD));
+				
+			}
+		}
+		
 		int eval = 0;
 		
 		evalInfo.clear_short();
@@ -294,6 +319,32 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 				return returnVal(eval);
 			}
 			evalCache.unlock();
+		}
+		
+		
+		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
+			
+			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
+			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
+			
+			//Mop-up evaluation
+			//PosEval=4.7*CMD + 1.6*(14 - MD)
+			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
+			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
+				
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
+				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				
+				return 25 * (int) (4.7 * CMD + 1.6 * (14 - MD));
+				
+			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
+				
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
+				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				
+				return 25 * (int) (4.7 * CMD + 1.6 * (14 - MD));
+				
+			}
 		}
 		
 		
@@ -499,6 +550,32 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 				return returnVal(eval);
 			}
 			evalCache.unlock();
+		}
+		
+		
+		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
+			
+			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
+			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
+			
+			//Mop-up evaluation
+			//PosEval=4.7*CMD + 1.6*(14 - MD)
+			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
+			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
+				
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
+				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				
+				return 25 * (int) (4.7 * CMD + 1.6 * (14 - MD));
+				
+			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
+				
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
+				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				
+				return 25 * (int) (4.7 * CMD + 1.6 * (14 - MD));
+				
+			}
 		}
 		
 		
@@ -799,12 +876,21 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		b_eval_nopawns_o += MATERIAL_QUEEN_O * b_queens.getDataSize();
 		b_eval_nopawns_e += MATERIAL_QUEEN_E * b_queens.getDataSize();*/
 		
-		
 		if (w_pawns.getDataSize() == 0) {
+			
 			if (w_eval_pawns_o != 0 || w_eval_pawns_e != 0) {
 				throw new IllegalStateException();
 			}
 			
+			if (w_eval_nopawns_o < baseEval.getMaterial_BARIER_NOPAWNS_O()) {
+				w_eval_nopawns_o = w_eval_nopawns_o / 2;
+			}
+			
+			if (w_eval_nopawns_e < baseEval.getMaterial_BARIER_NOPAWNS_E()) {
+				w_eval_nopawns_e = w_eval_nopawns_e / 2;
+			}
+			
+			/*
 			if (w_eval_nopawns_o > b_eval_nopawns_o) {
 				if (w_eval_nopawns_o < b_eval_nopawns_o + baseEval.getMaterial_BARIER_NOPAWNS_O()) {
 					w_eval_nopawns_o = w_eval_nopawns_o / 2;//b_eval_nopawns_o;
@@ -816,13 +902,24 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 					w_eval_nopawns_e = w_eval_nopawns_e / 2;//b_eval_nopawns_e;
 				}
 			}
+			*/
 		}
 		
 		if (b_pawns.getDataSize() == 0) {
+			
 			if (b_eval_pawns_o != 0 || b_eval_pawns_e != 0) {
 				throw new IllegalStateException();
 			}
 			
+			if (b_eval_nopawns_o < baseEval.getMaterial_BARIER_NOPAWNS_O()) {
+				b_eval_nopawns_o = b_eval_nopawns_o / 2;
+			}
+			
+			if (b_eval_nopawns_e < baseEval.getMaterial_BARIER_NOPAWNS_E()) {
+				b_eval_nopawns_e = b_eval_nopawns_e / 2;
+			}
+			
+			/*
 			if (b_eval_nopawns_o > w_eval_nopawns_o) {
 				if (b_eval_nopawns_o < w_eval_nopawns_o + baseEval.getMaterial_BARIER_NOPAWNS_O()) {
 					b_eval_nopawns_o = b_eval_nopawns_o / 2;//w_eval_nopawns_o;
@@ -834,6 +931,7 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 					b_eval_nopawns_e = b_eval_nopawns_e / 2;//w_eval_nopawns_e;
 				}
 			}
+			*/
 		}
 		
 		
