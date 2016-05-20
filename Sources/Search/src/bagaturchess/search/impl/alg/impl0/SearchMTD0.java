@@ -62,6 +62,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
 	}
 	
+	
 	public SearchMTD0(SearchEnv _env) {
 		super(_env);
 	}
@@ -504,18 +505,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		node.nullmove = false;
 		node.leaf = true;
 		
-		if (node.hashkey != hashkey) {
-			node.hashkey = hashkey;
-			if (node.moves != null) {
-				if (node.moves instanceof ListAll) {
-					((ListAll) node.moves).setInUse(false);
-					node.moves = null;
-				} else {
-					throw new IllegalStateException();
-				}
-			}
-		}
-		
 		if (isDrawPV(depth)) {
 			node.eval = getDrawScores(rootColour);
 			return node.eval;
@@ -749,53 +738,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			return node.eval;
 		}
 		
-		
-        if (env.getGTBProbing() != null
-                && useMateDistancePrunning //Doesn't make mates without this pruning as the mate distance is not decreased with each ply
-                && depth >= 3
-                && rest >= 2
-                && env.getBitboard().getColourToMove() == rootColour
-            ) {
-            
-            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result);
-            
-            int egtb_val = Integer.MIN_VALUE;
-            
-            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
-                
-                egtb_val = getDrawScores(rootColour);
-                
-                //if (egtb_val >= beta) {
-                    node.bestmove = 0;
-                    node.eval = egtb_val;
-                    node.leaf = true;
-                    node.nullmove = false;
-                    return egtb_val;
-                //}
-                
-            } else {
-                    
-                    int result = extractEGTBMateValue(depth);
-                    
-                    if (result != 0) {//Has mate
-                        
-                        egtb_val = result;
-                        
-                        if (egtb_val >= beta) {
-                            
-                            if (!isMateVal(egtb_val)) {
-                                throw new IllegalStateException("egtb_val=" + egtb_val);
-                            }
-                            
-                            node.bestmove = 0;
-                            node.eval = egtb_val;
-                            node.leaf = true;
-                            node.nullmove = false;
-                            return egtb_val;
-                        }
-                    }
-            }
-        }
 
         if (useStaticPrunning
                 ) {
@@ -821,8 +763,74 @@ public class SearchMTD0 extends SearchImpl_MTD {
                     return node.eval;
                 }
             }
+            
+			int staticEval = roughEval(depth, rootColour);
+			
+			if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
+				
+				staticEval = fullEval(depth, alpha_org, beta, rootColour);
+				
+				if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
+	                int qeval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, 0, true, rootColour);
+					if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
+						node.bestmove = 0;
+						node.eval = qeval;
+						node.leaf = true;
+						node.nullmove = false;
+						return node.eval;
+					}
+				}
+			}
         }
 		
+        
+        if (env.getGTBProbing() != null
+                && useMateDistancePrunning //Doesn't make mates without this pruning as the mate distance is not decreased with each ply
+                && depth >= 3
+                && rest >= 2
+                && env.getBitboard().getColourToMove() == rootColour
+            ) {
+            
+            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result);
+            
+            int egtb_val = Integer.MIN_VALUE;
+            
+            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
+                
+                egtb_val = getDrawScores(rootColour);
+                
+                if (egtb_val >= beta) {
+                    node.bestmove = 0;
+                    node.eval = egtb_val;
+                    node.leaf = true;
+                    node.nullmove = false;
+                    return egtb_val;
+                }
+                
+            } else {
+                    
+                    int result = extractEGTBMateValue(depth);
+                    
+                    if (result != 0) {//Has mate
+                        
+                        egtb_val = result;
+                        
+                        if (egtb_val >= beta) {
+                            
+                            if (!isMateVal(egtb_val)) {
+                                throw new IllegalStateException("egtb_val=" + egtb_val);
+                            }
+                            
+                            node.bestmove = 0;
+                            node.eval = egtb_val;
+                            node.leaf = true;
+                            node.nullmove = false;
+                            return egtb_val;
+                        }
+                    }
+            }
+        }
+        
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
 
@@ -994,7 +1002,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
         
         
 		boolean singleMove = false;
-		if (inCheck || !hasAtLeastThreePieces) {
+		if (inCheck /*|| !hasAtLeastThreePieces*/) {
 			singleMove = env.getBitboard().hasSingleMove();
 		}
 		
@@ -1004,28 +1012,14 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		node.nullmove = false;
 		node.leaf = true;
 		
+		
 		ISearchMoveList list = null;
+		
 		
 		if (!inCheck) {
 			
-			if (node.moves != null) {
-				list = node.moves;
-				list.reset();
-			} else {
-				list = lists_all[depth];
-				list.clear();
-				
-				node.moves = list;
-				
-				if (node.moves != null) {
-					if (node.moves instanceof ListAll) {
-						((ListAll) node.moves).setInUse(true);
-						node.moves = null;
-					} else {
-						throw new IllegalStateException();
-					}
-				}
-			}
+			list = lists_all[depth];
+			list.clear();
 			
 			list.setTptMove(tpt_move);
 			list.setPrevBestMove(prevprevbest);
@@ -1188,13 +1182,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						}
 						*/
 						
+						if (searchedCount >= Math.sqrt(rest)) {
+						//if (searchedCount >= 1) {
+							staticPrunning = true;
+						}
 						
-						//if (!isGoodMove || searchedCount >= getLMR1(list)) {
-							
-							if (searchedCount >= Math.sqrt(rest)) {
-							//if (searchedCount >= 1) {
-								staticPrunning = true;
-							}
+						if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
 							double rate = Math.sqrt(searchedCount);
 							rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
@@ -1208,7 +1201,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							if (lmrReduction >= (rest - 1) * PLY) {
 								lmrReduction = (rest - 1) * PLY;
 							}
-						//}
+						}
 						
 						/*
 						if (!isGoodMove) {
@@ -1430,20 +1423,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				
 		long hashkey = env.getBitboard().getHashKey();
 		
-		PVNode node = pvman.load(depth);
-		
-		if (node.hashkey != hashkey) {
-			node.hashkey = hashkey;
-			if (node.moves != null) {
-				if (node.moves instanceof ListAll) {
-					((ListAll) node.moves).setInUse(false);
-					node.moves = null;
-				} else {
-					throw new IllegalStateException();
-				}
-			}
-		}
-		
 		if (isDraw()) {
 			return getDrawScores(rootColour);
 		}
@@ -1603,6 +1582,35 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		
+        if (useStaticPrunning
+                ) {
+                
+            if (inCheck) {
+                throw new IllegalStateException("In check in useStaticPrunning");
+            }
+        
+            if (tpt_lower > TPTEntry.MIN_VALUE) {
+                if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
+                    return tpt_lower;
+                }
+            }
+            
+			int staticEval = roughEval(depth, rootColour);
+			
+			if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
+				
+				staticEval = fullEval(depth, beta - 1, beta, rootColour);
+				
+				if (alpha_org > staticEval + getAlphaTrustWindow(mediator, rest)) {
+					int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, 0, true, rootColour);
+					if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
+						return qeval;
+					}
+				}
+			}
+        }
+        
+        
         if (env.getGTBProbing() != null
                 && useMateDistancePrunning //Doesn't make mates without this pruning as the mate distance is not decreased with each ply
                 && depth >= 3
@@ -1618,9 +1626,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
                 
                 egtb_val = getDrawScores(rootColour);
                 
-                //if (egtb_val >= beta) {
+                if (egtb_val >= beta) {
                     return egtb_val;
-                //}
+                }
                 
             } else {
                 
@@ -1638,22 +1646,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
                         
                         return egtb_val;
                     }
-                }
-            }
-        }
-		
-		
-		
-        if (useStaticPrunning
-                ) {
-                
-            if (inCheck) {
-                throw new IllegalStateException("In check in useStaticPrunning");
-            }
-        
-            if (tpt_lower > TPTEntry.MIN_VALUE) {
-                if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
-                    return tpt_lower;
                 }
             }
         }
@@ -1819,7 +1811,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
         
         
 		boolean singleMove = false;
-		if (inCheck || !hasAtLeastThreePieces) {
+		if (inCheck /*|| !hasAtLeastThreePieces*/) {
 			singleMove = env.getBitboard().hasSingleMove();
 		}
 		
@@ -1829,24 +1821,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		if (!inCheck) {
 			
-			if (node.moves != null) {
-				list = node.moves;
-				list.reset();
-			} else {
-				list = lists_all[depth];
-				list.clear();
-				
-				node.moves = list;
-				
-				if (node.moves != null) {
-					if (node.moves instanceof ListAll) {
-						((ListAll) node.moves).setInUse(true);
-						node.moves = null;
-					} else {
-						throw new IllegalStateException();
-					}
-				}
-			}
+			list = lists_all[depth];
+			list.clear();
 			
 			list.setTptMove(tpt_move);
 			list.setPrevBestMove(prevprevbest);
@@ -1976,13 +1952,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							}
 							*/
 							
+							if (searchedCount >= Math.sqrt(rest)) {
+							//if (searchedCount >= 1) {
+								staticPrunning = true;
+							}
 							
-							//if (!isGoodMove || searchedCount >= getLMR1(list)) {
-								
-								if (searchedCount >= Math.sqrt(rest)) {
-								//if (searchedCount >= 1) {
-									staticPrunning = true;
-								}
+							if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
 								double rate = Math.sqrt(searchedCount);
 								rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
@@ -1996,7 +1971,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 								if (lmrReduction >= (rest - 1) * PLY) {
 									lmrReduction = (rest - 1) * PLY;
 								}
-							//}
+							}
 							
 							
 							/*

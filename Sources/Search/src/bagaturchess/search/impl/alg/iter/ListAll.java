@@ -207,8 +207,7 @@ public class ListAll implements ISearchMoveList {
 						fastMove = counterMove3;
 					}
 				}
-			}
-			
+			} else 		
 			//Prev best move
 			if (orderingStatistics.getOrdVal_PREVBEST() > orderingStatistics.getOrdVal_COUNTER()
 					&& orderingStatistics.getOrdVal_PREVBEST() > orderingStatistics.getOrdVal_PREVPV()) {
@@ -217,8 +216,7 @@ public class ListAll implements ISearchMoveList {
 					fastMove = prevBestMove;
 				}
 				
-			}
-			
+			} else 			
 			//Prev PV move
 			if (orderingStatistics.getOrdVal_PREVPV() > orderingStatistics.getOrdVal_COUNTER()
 					&& orderingStatistics.getOrdVal_PREVPV() > orderingStatistics.getOrdVal_PREVBEST()) {

@@ -35,7 +35,8 @@ public class HistoryTable {
 	
 	public static final short MAX_SCORES = 1024;
 	
-	private boolean ONE_TABLE = false;
+	
+	private boolean ONE_TABLE = true;
 	
 	private HistoryTable_PerColour history_w;
 	private HistoryTable_PerColour history_b;
