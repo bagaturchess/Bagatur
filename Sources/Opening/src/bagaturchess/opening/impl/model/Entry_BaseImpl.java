@@ -170,7 +170,7 @@ public class Entry_BaseImpl implements IOpeningEntry, Serializable {
 		
 		int all_probs = 0;
 		for (int i=0; i<counts.length; i++) {
-			all_probs += counts[i];//Math.pow(counts[i] , 3);
+			all_probs += Math.pow(counts[i] , 3);
 		}
 		
 		int prob_index = (int) Math.round((all_probs - 1) * Math.random());
@@ -178,7 +178,7 @@ public class Entry_BaseImpl implements IOpeningEntry, Serializable {
 		int index = 0;
 		int cur_probs = 0;
 		for (int i=0; i<counts.length; i++) {
-			cur_probs += counts[i];//Math.pow(counts[i] , 3);
+			cur_probs += Math.pow(counts[i] , 3);
 			if (cur_probs > prob_index) {
 				index = i;
 				break;
