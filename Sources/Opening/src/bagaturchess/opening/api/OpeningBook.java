@@ -29,7 +29,7 @@ import java.io.Serializable;
 public interface OpeningBook extends Serializable {
 	
 	public IOpeningEntry getEntry(long hashkey, int colour);
-	public int[] getAllMoves(long hashkey, int colour);
+	public int[][] getAllMovesAndCounts(long hashkey, int colour);
 	public int get(long hashkey, int colour);
 	
 	public void store(String outFileName);

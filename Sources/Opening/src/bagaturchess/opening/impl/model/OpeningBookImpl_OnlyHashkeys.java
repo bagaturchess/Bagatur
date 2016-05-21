@@ -113,7 +113,7 @@ public class OpeningBookImpl_OnlyHashkeys implements OpeningBook {
 		throw new UnsupportedOperationException();
 	}
 
-	public int[] getAllMoves(long hashkey, int colour) {
+	public int[][] getAllMovesAndCounts(long hashkey, int colour) {
 		throw new UnsupportedOperationException();
 	}
 }

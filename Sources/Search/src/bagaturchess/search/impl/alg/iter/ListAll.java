@@ -25,6 +25,7 @@ package bagaturchess.search.impl.alg.iter;
 
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
+import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.opening.api.OpeningBookFactory;
 import bagaturchess.search.api.internal.ISearchMoveList;
@@ -318,19 +319,31 @@ public class ListAll implements ISearchMoveList {
 			throw new IllegalStateException();
 		}
 		
-		int[] ob_moves = null;
+		boolean gen = true;
+		
 		if (env.getOpeningBook() != null) {
-			ob_moves = env.getOpeningBook().getAllMoves(env.getBitboard().getHashKey(), env.getBitboard().getColourToMove());	
-			if (ob_moves != null && ob_moves.length == 0) {
-				ob_moves = null;
+			
+			IOpeningEntry entry = env.getOpeningBook().getEntry(env.getBitboard().getHashKey(), env.getBitboard().getColourToMove());
+			if (entry != null && entry.getWeight() >= 7) {
+				
+				int[] ob_moves = entry.getMoves();
+				int[] ob_counts = entry.getCounts();
+				
+				for (int i=0; i<ob_moves.length; i++) {
+					//if (ob_counts != null) {
+					//	long move_ord = MoveInt.addOrderingValue(ob_moves[i], ob_counts[i]);
+						add(ob_moves[i]);
+					//} else {
+						//reserved_add(ob_moves[i]);
+					//}
+				}
+				
+				
+				gen = false;
 			}
 		}
 		
-		if (ob_moves != null && ob_moves.length >= 3) {
-			for (int i=0; i<ob_moves.length; i++) {
-				reserved_add(ob_moves[i]);
-			}
-		} else {
+		if (gen) {
 			env.getBitboard().genAllMoves(this);
 		}
 		

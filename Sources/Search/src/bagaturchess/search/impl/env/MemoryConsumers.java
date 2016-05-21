@@ -107,7 +107,7 @@ public class MemoryConsumers {
 		
 		
 		channel.dump("Openning Book enabled: " + ownBookEnabled);
-		if (ownBookEnabled) {
+		//if (ownBookEnabled) {
 			//Thread loadOB = new Thread(new Runnable() {
 			//	
 			//	@Override
@@ -125,7 +125,7 @@ public class MemoryConsumers {
 			//	}
 			//});
 			//loadOB.start();
-		}
+		//}
 		
 		//Thread loadEGTB = new Thread(new Runnable() {
 			

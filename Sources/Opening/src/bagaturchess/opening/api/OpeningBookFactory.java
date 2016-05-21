@@ -167,11 +167,11 @@ public class OpeningBookFactory {
 			}
 		}
 
-		public int[] getAllMoves(long hashkey, int colour) {
+		public int[][] getAllMovesAndCounts(long hashkey, int colour) {
 			if (colour == Figures.COLOUR_WHITE) {
-				return whiteOpening.getAllMoves(hashkey, Figures.COLOUR_WHITE);
+				return whiteOpening.getAllMovesAndCounts(hashkey, Figures.COLOUR_WHITE);
 			} else if (colour == Figures.COLOUR_BLACK) {
-				return blackOpening.getAllMoves(hashkey, Figures.COLOUR_BLACK);
+				return blackOpening.getAllMovesAndCounts(hashkey, Figures.COLOUR_BLACK);
 			} else {
 				throw new IllegalStateException();
 			}

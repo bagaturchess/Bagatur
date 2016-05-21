@@ -90,11 +90,18 @@ public class OpeningBookImpl_FullEntries implements OpeningBook {
 		existing.add(move, result);
 	}
 	
-	public int[] getAllMoves(long hashkey, int colour) {
+	int[][] result;
+	
+	public int[][] getAllMovesAndCounts(long hashkey, int colour) {
 		Entry_BaseImpl moves = entries.get(hashkey);
 		
 		if (moves != null) {
-			return moves.getMoves();
+			if (result == null) {
+				result = new int[2][];
+			}
+			result[0] = moves.getMoves();
+			result[1] = moves.getCounts();
+			return result;
 		}
 		
 		return null;

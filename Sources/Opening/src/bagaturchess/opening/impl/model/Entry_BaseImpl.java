@@ -41,6 +41,7 @@ public class Entry_BaseImpl implements IOpeningEntry, Serializable {
 	
 	private int[] evals;
 	private int[] moves;
+
 	private int[] counts;
 	
 	private int[] probsWin;
@@ -236,5 +237,9 @@ public class Entry_BaseImpl implements IOpeningEntry, Serializable {
 
 	public int[] getMoves() {
 		return moves;
+	}
+	
+	public int[] getCounts() {
+		return counts;
 	}
 }
