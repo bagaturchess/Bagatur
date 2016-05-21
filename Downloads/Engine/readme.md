@@ -1,6 +1,6 @@
 
 Version 1.4 (11 May 2016)
-  * 100+ ELO stronger!
+  * 35+ ELO stronger!
   * Added Windows 64 support for Gaviota Endgame Tablebases
   * Search optimizations: New depth reduction function used in late move reduction, extensions adjustments, more reliable static pruning, separate transposition table per CPU (preparation for the new parallel search)
   * Evaluation function: support for double bishops, good and bad bishops
