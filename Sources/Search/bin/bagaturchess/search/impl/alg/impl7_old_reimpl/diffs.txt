@@ -1,8 +1,0 @@
-1. COMMENTED: singleMove = env.getBitboard().hasSingleMove()
-2. USE_MATE_DISTANCE - added !inCheck and removed code for mate detection - !env.getBitboard().hasMove()
-3. REMOVED env.getTactics().silentButDeadly
-4. Changed KingEscapes iterator to ListAll
-5. King capture check
-6. COMMENTED: || (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
-7. REMOVED: draw check if (best_move == 0) {
-8. COMMENTED: int moveSee = USE_SEE_IN_QSEARCH ? env.getBitboard().getSee().evalExchange(cur_move) : 0;

@@ -1,8 +1,0 @@
-1. COMMENTED: singleMove = env.getBitboard().hasSingleMove()
-2. COMMENTED: || (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH) 
-3. COMMENTED: if (env.getBitboard().isInCheck(colourToMove)) throw new IllegalStateException();
-4. COMMENTED env.getTactics().silentButDeadly
-5. REMOVED hasMove() - added !inCheck and removed code for mate detection - !env.getBitboard().hasMove()
-6. USE_MATE_DISTANCE - added !inCheck and removed code for mate detection - !env.getBitboard().hasMove()
-7. Changed KingEscapes iterator to ListAll
-8. King capture check
