@@ -951,6 +951,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					env.getTPT().lock();
 					TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
 					if (tptEntry != null) {
+						tpt_found = true;
 						tpt_exact = tptEntry.isExact();
 						tpt_depth = tptEntry.getDepth();
 						tpt_lower = tptEntry.getLowerBound();
@@ -1771,6 +1772,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					env.getTPT().lock();
 					TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
 					if (tptEntry != null) {
+						tpt_found = true;
 						tpt_exact = tptEntry.isExact();
 						tpt_depth = tptEntry.getDepth();
 						tpt_lower = tptEntry.getLowerBound();

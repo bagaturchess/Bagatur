@@ -172,14 +172,14 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
 				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
 				
-				return 25 * (int) (4.7 * CMD + 1.6 * (14 - MD));
+				return returnVal(25 * (int) (4.7 * CMD + 1.6 * (14 - MD)));
 				
 			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
 				
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
 				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
 				
-				return 25 * (int) (4.7 * CMD + 1.6 * (14 - MD));
+				return returnVal( - 25 * (int) (4.7 * CMD + 1.6 * (14 - MD)));
 				
 			}
 		}
@@ -335,14 +335,14 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
 				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
 				
-				return 25 * (int) (4.7 * CMD + 1.6 * (14 - MD));
+				return returnVal(25 * (int) (4.7 * CMD + 1.6 * (14 - MD)));
 				
 			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
 				
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
 				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
 				
-				return 25 * (int) (4.7 * CMD + 1.6 * (14 - MD));
+				return returnVal( - 25 * (int) (4.7 * CMD + 1.6 * (14 - MD)));
 				
 			}
 		}
@@ -566,14 +566,14 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
 				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
 				
-				return 25 * (int) (4.7 * CMD + 1.6 * (14 - MD));
+				return returnVal(25 * (int) (4.7 * CMD + 1.6 * (14 - MD)));
 				
 			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
 				
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
 				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
 				
-				return 25 * (int) (4.7 * CMD + 1.6 * (14 - MD));
+				return returnVal( - 25 * (int) (4.7 * CMD + 1.6 * (14 - MD)));
 				
 			}
 		}
