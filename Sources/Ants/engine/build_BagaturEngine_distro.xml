@@ -50,18 +50,18 @@
 	    </fileset>
 	</copy>
 	
-	<copy tofile="${temp_dir}/dat/w.ob">
+	<copy tofile="${temp_dir}/data/w.ob">
 	    <fileset dir="${resources_dir}/bin/engine/ob">
 		  <include name="w.ob"/>
 	    </fileset>
 	</copy>
-	<copy tofile="${temp_dir}/dat/b.ob">
+	<copy tofile="${temp_dir}/data/b.ob">
 	    <fileset dir="${resources_dir}/bin/engine/ob">
 		  <include name="b.ob"/>
 	    </fileset>
 	</copy>
   	
-	<copy todir="${temp_dir}/egtb/">
+	<copy todir="${temp_dir}/data/egtb/">
 	    <fileset dir="${resources_dir}/bin/engine/egtb/">
 		  <include name="*.cp4"/>
 	      <include name="*.txt"/>
@@ -73,12 +73,12 @@
 		  <include name="egtbprobe.dll"/>
 	    </fileset>
 	</copy-->
-	<!--copy tofile="${temp_dir}/dat/w1.ob">
+	<!--copy tofile="${temp_dir}/data/w1.ob">
 	    <fileset dir="${resources_dir}/bin/engine/ob">
 		  <include name="w1.ob"/>
 	    </fileset>
 	</copy>
-	<copy tofile="${temp_dir}/dat/b1.ob">
+	<copy tofile="${temp_dir}/data/b1.ob">
 	    <fileset dir="${resources_dir}/bin/engine/ob">
 		  <include name="b1.ob"/>
 	    </fileset>
@@ -98,12 +98,12 @@
 			<include name="readme_distro_BagaturEngine.txt"/>
 		</fileset>
 	</copy>
-	<copy tofile="${temp_dir}/txt/release_notes.txt" >
+	<copy tofile="${temp_dir}/release_notes.txt" >
 		<fileset dir="${resources_dir}/doc/engine/txt">
 			<include name="release_notes_BagaturEngine.txt"/>
 		</fileset>
 	</copy>
-	<copy tofile="${temp_dir}/txt/todo_list.txt" >
+	<copy tofile="${temp_dir}/todo_list.txt" >
 		<fileset dir="${resources_dir}/doc/engine/txt">
 			<include name="backlog_BagaturEngine.txt"/>
 		</fileset>
@@ -115,22 +115,22 @@
 	</copy>
   	
   	
-	<copy tofile="${temp_dir}/bat/Bagatur_1core.bat" >
+	<copy tofile="${temp_dir}/bin/Bagatur_1core.bat" >
 		<fileset dir="${resources_dir}/bin/engine/bat">
 			<include name="Bagatur_1core.bat"/>
 		</fileset>
 	</copy>
-  	<copy tofile="${temp_dir}/bat/Bagatur_mcore.bat" >
+  	<copy tofile="${temp_dir}/bin/Bagatur_mcore.bat" >
 		<fileset dir="${resources_dir}/bin/engine/bat">
 			<include name="Bagatur_mcore.bat"/>
 		</fileset>
 	</copy>
-  	<copy tofile="${temp_dir}/bat/Bagatur_1core.bmp" >
+  	<copy tofile="${temp_dir}/bin/Bagatur_1core.bmp" >
   		<fileset dir="${resources_dir}/bin/engine/logo">
   			<include name="BagaturEngine.bmp"/>
   		</fileset>
   	</copy>
-  	<copy tofile="${temp_dir}/bat/Bagatur_mcore.bmp" >
+  	<copy tofile="${temp_dir}/bin/Bagatur_mcore.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
 			<include name="BagaturEngine.bmp"/>
 		</fileset>

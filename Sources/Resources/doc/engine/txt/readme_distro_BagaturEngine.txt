@@ -27,7 +27,7 @@ Hints:
      
   2. Endgame Tablebases support is based on Gaviota EGTB (Syzygy and Nalimov are not supported) and currently works on win 32 and win 64.
      In order to make it working:
-     a) Download additional Gaviota tablebases into the ./egtb folder or
+     a) Download additional Gaviota tablebases into the ./data/egtb folder or
 	 b) Set UCI option GaviotaTbPath, to point to the folder where the Gaviota tablebases files are
 	 
   3. On Laptop - for optimal performance make sure that: Laptop is connected to power supply (by either cable or docking station) and power plan is set to 'Maximum Performance'
@@ -41,7 +41,7 @@ Hints:
   5. If for some reason the EXE files do not work as expected, then there are 2 options:
      A) Edit the corresponding INI file. Find the option 'vm.location', remove semicolons (';' symbol) from the beginning of the line, and set the property to point out the wanted jvm.dll.
         jvm.dll could be found in JRE's 'bin/client' or 'bin/server' directory. For example, something like 'C:\jdk1.6.0_07\jre\bin\client\jvm.dll'
-     B) Use the BAT files inside the 'bat' sub-directory: Bagatur_1core.bat and Bagatur_mcore.bat
+     B) Use the BAT files inside the 'bin' sub-directory: Bagatur_1core.bat and Bagatur_mcore.bat
         They can be edited so that the full path to java.exe is valid (it is also enough to add the java.exe to the system path variable)
 
 
