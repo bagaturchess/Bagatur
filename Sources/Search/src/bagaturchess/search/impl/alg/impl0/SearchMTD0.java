@@ -28,7 +28,6 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.egtb.gaviota.GTBProbeOutput;
 import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
@@ -783,53 +782,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			}
         }
 		
-        
-        if (env.getGTBProbing() != null
-                && useMateDistancePrunning //Doesn't make mates without this pruning as the mate distance is not decreased with each ply
-                && depth >= 3
-                && rest >= 2
-                && env.getBitboard().getColourToMove() == rootColour
-            ) {
-            
-            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result);
-            
-            int egtb_val = Integer.MIN_VALUE;
-            
-            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
-                
-                egtb_val = getDrawScores(rootColour);
-                
-                //if (egtb_val >= beta) {
-                    node.bestmove = 0;
-                    node.eval = egtb_val;
-                    node.leaf = true;
-                    node.nullmove = false;
-                    return egtb_val;
-                //}
-                
-            } else {
-                    
-                    int result = extractEGTBMateValue(depth);
-                    
-                    if (result != 0) {//Has mate
-                        
-                        egtb_val = result;
-                        
-                        if (egtb_val >= beta) {
-                            
-                            if (!isMateVal(egtb_val)) {
-                                throw new IllegalStateException("egtb_val=" + egtb_val);
-                            }
-                            
-                            node.bestmove = 0;
-                            node.eval = egtb_val;
-                            node.leaf = true;
-                            node.nullmove = false;
-                            return egtb_val;
-                        }
-                    }
-            }
-        }
         
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
@@ -1609,46 +1561,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					}
 				}
 			}
-        }
-        
-        
-        if (env.getGTBProbing() != null
-                && useMateDistancePrunning //Doesn't make mates without this pruning as the mate distance is not decreased with each ply
-                && depth >= 3
-                && rest >= 2
-                && env.getBitboard().getColourToMove() == rootColour
-            ) {
-            
-            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result);
-            
-            int egtb_val = Integer.MIN_VALUE;
-            
-            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
-                
-                egtb_val = getDrawScores(rootColour);
-                
-                //if (egtb_val >= beta) {
-                    return egtb_val;
-                //}
-                
-            } else {
-                
-                int result = extractEGTBMateValue(depth);
-                
-                if (result != 0) {//Has mate
-                    
-                    egtb_val = result;
-                    
-                    if (egtb_val >= beta) {
-                        
-                        if (!isMateVal(egtb_val)) {
-                            throw new IllegalStateException("egtb_val=" + egtb_val);
-                        }
-                        
-                        return egtb_val;
-                    }
-                }
-            }
         }
         
         

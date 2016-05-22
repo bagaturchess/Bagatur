@@ -26,6 +26,7 @@ package bagaturchess.search.impl.env;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.egtb.gaviota.GTBProbing;
 import bagaturchess.egtb.gaviota.GTBProbing_NativeWrapper;
+import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluatorFactory;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -78,14 +79,7 @@ public class SharedData {
 	
 	
 	public void setMemoryConsumers(MemoryConsumers _memoryConsumers) {
-		
 		memoryConsumers = _memoryConsumers;
-		
-		if (memoryConsumers != null) {
-			if (GTBProbing_NativeWrapper.getInstance() != null && gtb_probing == null) {
-				gtb_probing = new GTBProbing(memoryConsumers.getGTBCache_OUT(), memoryConsumers.getGTBCache_IN());
-			}
-		}
 	}
 	
 	
@@ -95,6 +89,13 @@ public class SharedData {
 	
 	
 	public GTBProbing getGTBProbing() {
+		
+		if (gtb_probing == null) {
+			if (GTBProbing_NativeWrapper.getInstance() != null) {
+				gtb_probing = new GTBProbing();
+			}
+		}
+		
 		return gtb_probing;
 	}
 	
@@ -114,6 +115,11 @@ public class SharedData {
 	}
 	
 	
+	public GTBCache_OUT getAndRemoveGTBCache_OUT() {
+		return memoryConsumers.getGTBCache_OUT().remove(0);
+	}
+	
+	
 	public PVHistory getPVs() {
 		return pvs_history;
 	}
@@ -129,8 +135,6 @@ public class SharedData {
 		//history_check.clear();
 		//history_all.clear();
 		//pvs_history.clear();
-		
-		if (gtb_probing != null) gtb_probing.clear(); 
 		
 		memoryConsumers.clear();
 	}

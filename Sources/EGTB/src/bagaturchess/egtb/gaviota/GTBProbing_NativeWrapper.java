@@ -16,8 +16,6 @@ public class GTBProbing_NativeWrapper {
 	
 	private String tb_path = "";
 	
-	private final Object loading_sync = new Object();
-	
     private final EGTBProbing gtb;
     
     
@@ -60,41 +58,34 @@ public class GTBProbing_NativeWrapper {
     }
     
     
+    /*
     public void setPath_Sync(String tbPath, int memInMegabytes) {
         if (!tb_path.equals(tbPath)) {
-        	synchronized (loading_sync) {
-                tb_path = tbPath;
-               	System.out.print("Loading: " + tb_path + " ... ");
-               	EGTBProbing.getSingleton().init(tb_path, memInMegabytes);
-               	System.out.println("OK");
-			}
+            tb_path = tbPath;
+           	System.out.print("Loading: " + tb_path + " ... ");
+           	EGTBProbing.getSingleton().init(tb_path, memInMegabytes);
+           	System.out.println("OK");
         }
     }
+    */
     
     
-    public void setPath_Sync(String tbPath) {
-    	setPath_Sync(tbPath, 4);
-    }
-    
-    
-    public void setPath_Async(final String tbPath, boolean forceReload) {
-        if (forceReload || !tb_path.equals(tbPath)) {
-        	synchronized (loading_sync) {
-                Thread t = new Thread(new Runnable() {
-                    public void run() {
-                        tb_path = tbPath;
-                        synchronized (loading_sync) {
-                        	System.out.print("Loading: " + tb_path + " ... ");
-                        	EGTBProbing.getSingleton().init(tb_path, 4);
-                        	System.out.println("OK");
-                        }
-                    }
-                });
-                t.setPriority(Thread.MIN_PRIORITY);
-                t.start();
-                
-                try {Thread.sleep(300);} catch (InterruptedException e) {}
-			}
+    public void setPath_Async(final String tbPath, final int memInMegabytes) {
+        
+    	if (!tb_path.equals(tbPath)) {
+  
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    tb_path = tbPath;
+                	System.out.print("Loading: " + tb_path + " ... ");
+                	EGTBProbing.getSingleton().init(tb_path, memInMegabytes);
+                	System.out.println("OK");
+                }
+            });
+            t.setPriority(Thread.MIN_PRIORITY);
+            t.start();
+            
+            try {Thread.sleep(300);} catch (InterruptedException e) {}
         }
     }
     

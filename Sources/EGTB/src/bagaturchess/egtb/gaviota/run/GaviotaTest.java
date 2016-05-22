@@ -5,10 +5,10 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
+import bagaturchess.egtb.gaviota.GTBProbeInput;
 import bagaturchess.egtb.gaviota.GTBProbeOutput;
 import bagaturchess.egtb.gaviota.GTBProbing;
 import bagaturchess.egtb.gaviota.GTBProbing_NativeWrapper;
-import bagaturchess.egtb.gaviota.cache.GTBCache_IN;
 import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 
 
@@ -43,17 +43,20 @@ public class GaviotaTest {
 			System.out.println(board);
 			
 			//Initialize the path to Gaviota EGTB Files as well as the native cache size in megabytes 
-			GTBProbing_NativeWrapper.getInstance().setPath_Sync("C:/DATA/OWN/chess/EGTB", 32);
+			GTBProbing_NativeWrapper.getInstance().setPath_Async("C:/DATA/OWN/chess/EGTB", 4);
 			
 			System.out.println("start brobe");
 			
-			GTBProbing probing = new GTBProbing(new GTBCache_OUT(10000, true, new BinarySemaphore_Dummy()), new GTBCache_IN(100));
+			GTBProbeInput temp_input = new GTBProbeInput();
+			GTBCache_OUT cache_out = new GTBCache_OUT(10000, true, new BinarySemaphore_Dummy());
+			
+			GTBProbing probing = new GTBProbing();
 
 			//Blocking probing, which returns also a move
 			probeMoveHard(probing, board);
 			
 			//Non-blocking probing which returns the game result only
-			probeSoft(probing, board);
+			probeHard(probing, board, temp_input, cache_out);
 				
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -61,19 +64,15 @@ public class GaviotaTest {
 	}
 	
 	
-	private static void probeSoft(GTBProbing probing, IBitBoard board)
+	private static void probeHard(GTBProbing probing, IBitBoard board, GTBProbeInput temp_input, GTBCache_OUT cache_out)
 			throws InterruptedException {
 		
 		int res[] = new int[2];
 		
-		probing.probe(board, res);
+		probing.probe(board, res, temp_input, cache_out);
 		
-		//Wait the in-chache's filler thread to load the entry
-		Thread.sleep(200);
 		
-		probing.probe(board, res);
-		
-		System.out.println("TEST probeSoft: " + new GTBProbeOutput(res));
+		System.out.println("TEST probeHard: " + new GTBProbeOutput(res));
 	}
 	
 	

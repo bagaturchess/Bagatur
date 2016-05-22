@@ -7,10 +7,8 @@ import java.util.List;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl.datastructs.list.ListNodeObject;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
-import bagaturchess.egtb.gaviota.cache.GTBCache_IN;
 import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 
 
@@ -19,29 +17,14 @@ public class GTBProbing {
 	
 	public static int MAX_PIECES_COUNT = 5;//Including both kings
 	
-	
-	private GTBCache_OUT cache_out;
-	private GTBCache_IN cache_in;
-	private Filler filler;
-	
 	private GTBProbeOutput no_result;
 	
 	private IMoveList temp_list = new BaseMoveList();
 	private int[] temp_out = new int[2];
 	
 	
-	public GTBProbing(GTBCache_OUT _cache_out, GTBCache_IN _cache_in) {
-		
-		cache_out = _cache_out;
-		cache_in = _cache_in;
+	public GTBProbing() {
 		no_result = new GTBProbeOutput();
-		
-		createFiller();
-	}
-	
-	
-	private void createFiller() {
-		filler  = new Filler(cache_out, cache_in);
 	}
 	
 	
@@ -121,7 +104,7 @@ public class GTBProbing {
 	}
 	
 	
-	public void probe(IBitBoard board, int[] out) {
+	public void probe(IBitBoard board, int[] out, GTBProbeInput temp_input, GTBCache_OUT cache_out) {
 		
 		
 		//Check pieces count
@@ -152,59 +135,13 @@ public class GTBProbing {
 		} else {
 			out[0] = no_result.result;
 			out[1] = no_result.movesToMate;
+			
+			GTBProbing_NativeWrapper.getInstance().fill(board, temp_input);
+			GTBProbing_NativeWrapper.getInstance().probeHard(temp_input, out);
+			
+			cache_out.put(hashkey, out[0], out[1]);
+
 		}
 		cache_out.unlock();
-		
-		/**
-		 * !!! REMOVE
-		 */
-		/*if (true) {
-			return;
-		}*/
-		
-		
-		if (result == null) {
-	        
-			result = no_result;
-			
-			cache_in.lock();
-			GTBProbeInput input = cache_in.getEntryForFilling(hashkey);
-			//cache_in.unlock();
-			
-			if (input == null) { //Entry is not scheduled for loading
-		
-				/*Lazy initialization
-				if (filler == null) {
-					createFiller();
-				}*/
-				
-				ListNodeObject<GTBProbeInput> node = filler.getFreeEntry();
-				if (node == null) {
-					
-					//cache_in.lock();
-					input = cache_in.reuseEntryForFilling(hashkey);
-					if (input == null) {
-						//System.out.println("cache_in.size: " + cache_in.getCurrentSize());
-					} else {
-						GTBProbing_NativeWrapper.getInstance().fill(board, input);
-					}
-					//cache_in.unlock();
-					
-				} else {
-					GTBProbing_NativeWrapper.getInstance().fill(board, node.getValue());
-					
-					//cache_in.lock();
-					filler.returnFreeEntry(node);
-					//cache_in.unlock();
-				}
-			}
-			
-			cache_in.unlock();
-		}
-	}
-
-
-	public void clear() {
-		if (filler != null) filler.stop();
 	}
 }

@@ -29,6 +29,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.egtb.gaviota.GTBProbing;
+import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -56,6 +57,7 @@ public class SearchEnv {
 	private IEvalCache evalCache;
 	private PawnsEvalCache pawnsCache;
 	private TPTable tpt;
+	private GTBCache_OUT egtb_cache;
 	
 	private HistoryTable history_check;
 	private HistoryTable history_all;
@@ -81,7 +83,6 @@ public class SearchEnv {
 	
 	
 	public OpeningBook getOpeningBook() {
-		//return null;
 		return shared.getOpeningBook();
 	}
 
@@ -120,9 +121,19 @@ public class SearchEnv {
 		return tpt;
 	}
 	
+	
+	public GTBCache_OUT getEGTBCache() {
+		if (egtb_cache == null) {
+			egtb_cache = shared.getAndRemoveGTBCache_OUT();
+		}
+		return egtb_cache;
+	}
+	
+	
 	public GTBProbing getGTBProbing() {
 		return shared.getGTBProbing();
 	}
+	
 	
 	public IBitBoard getBitboard() {
 		if (bitboard.getPawnsCache() != getPawnsCache()) {
