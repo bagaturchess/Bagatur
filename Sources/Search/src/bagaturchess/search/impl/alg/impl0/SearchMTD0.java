@@ -799,13 +799,13 @@ public class SearchMTD0 extends SearchImpl_MTD {
                 
                 egtb_val = getDrawScores(rootColour);
                 
-                if (egtb_val >= beta) {
+                //if (egtb_val >= beta) {
                     node.bestmove = 0;
                     node.eval = egtb_val;
                     node.leaf = true;
                     node.nullmove = false;
                     return egtb_val;
-                }
+                //}
                 
             } else {
                     
@@ -1627,9 +1627,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
                 
                 egtb_val = getDrawScores(rootColour);
                 
-                if (egtb_val >= beta) {
+                //if (egtb_val >= beta) {
                     return egtb_val;
-                }
+                //}
                 
             } else {
                 
