@@ -266,9 +266,9 @@ public class ListAll implements ISearchMoveList {
 		
 		if (cur < size) {
 			
-			int SORT_INDEX = 1;
+			//int SORT_INDEX = 1;
 			//int SORT_INDEX = 2;
-			//int SORT_INDEX = (int) Math.max(1, Math.sqrt(size) / 2);
+			int SORT_INDEX = (int) Math.max(1, Math.sqrt(size) / 2);
 			
 			if (SORT_INDEX <= 0) {
 				throw new IllegalStateException();
@@ -323,6 +323,8 @@ public class ListAll implements ISearchMoveList {
 		
 		if (env.getOpeningBook() != null) {
 			
+			boolean randomOpenning = env.getSearchConfig().isOpenningModeRandom();
+			
 			IOpeningEntry entry = env.getOpeningBook().getEntry(env.getBitboard().getHashKey(), env.getBitboard().getColourToMove());
 			if (entry != null && entry.getWeight() >= 7) {
 				
@@ -330,12 +332,12 @@ public class ListAll implements ISearchMoveList {
 				int[] ob_counts = entry.getCounts();
 				
 				for (int i=0; i<ob_moves.length; i++) {
-					//if (ob_counts != null) {
-					//	long move_ord = MoveInt.addOrderingValue(ob_moves[i], ob_counts[i]);
+					if (randomOpenning) {
 						add(ob_moves[i]);
-					//} else {
-						//reserved_add(ob_moves[i]);
-					//}
+					} else {
+						long move_ord = MoveInt.addOrderingValue(ob_moves[i], ob_counts == null ? 1 : ob_counts[i]);
+						add(move_ord);
+					}
 				}
 				
 				

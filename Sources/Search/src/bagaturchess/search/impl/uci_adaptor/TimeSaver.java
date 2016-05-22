@@ -43,8 +43,9 @@ public class TimeSaver {
 			IOpeningEntry entry = ob.getEntry(bitboardForSetup.getHashKey(), bitboardForSetup.getColourToMove());
 			if (entry != null) {
 				
+				boolean randomOpenning = sharedData.getSearchConfig().isOpenningModeRandom();
 				
-				int move = getOpeningMove_Random(entry);
+				int move = randomOpenning ? entry.getRandomEntry() : entry.getMostPlayedEntry();
 				//int move = getOpeningMove_Evaluation(entry, sharedData, bitboardForSetup, mediator);
 				
 				mediator.dump("TimeSaver: Opening move " + MoveInt.moveToString(move));
@@ -167,17 +168,12 @@ public class TimeSaver {
 		return depth + 1;
 	}
 	
+	
 	private static ISearchInfo createInfo(int move) {
 		ISearchInfo info = SearchInfoFactory.getFactory().createSearchInfo();
 		info.setBestMove(move);
 		info.setPV(new int[] {move});
 		return info;
-	}
-	
-	
-	private int getOpeningMove_Random(IOpeningEntry entry) {
-		int move = entry.getRandomEntry();
-		return move;
 	}
 	
 	

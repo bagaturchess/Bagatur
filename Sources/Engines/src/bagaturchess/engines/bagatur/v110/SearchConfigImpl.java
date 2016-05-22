@@ -420,4 +420,10 @@ public class SearchConfigImpl implements ISearchConfig_MTD {
 	public int getTPTUsageDepthCut() {
 		return 0;
 	}
+
+	@Override
+	public boolean isOpenningModeRandom() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }

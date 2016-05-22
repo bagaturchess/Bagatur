@@ -171,6 +171,28 @@ public class Entry_BaseImpl implements IOpeningEntry, Serializable {
 		
 		int all_probs = 0;
 		for (int i=0; i<counts.length; i++) {
+			all_probs += 1;
+		}
+		
+		int prob_index = (int) Math.round((all_probs - 1) * Math.random());
+		
+		int index = 0;
+		int cur_probs = 0;
+		for (int i=0; i<counts.length; i++) {
+			cur_probs += 1;
+			if (cur_probs > prob_index) {
+				index = i;
+				break;
+			}
+		}
+		
+		return moves[index];
+	}
+	
+	public int getMostPlayedEntry() {
+		
+		int all_probs = 0;
+		for (int i=0; i<counts.length; i++) {
 			all_probs += Math.pow(counts[i] , 3);
 		}
 		

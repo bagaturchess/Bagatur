@@ -48,6 +48,8 @@ public interface ISearchConfig_AB {
 	public static final int PLY_15_16 = 15;
 	
 	
+	public boolean isOpenningModeRandom();
+	
 	/**
 	 * Extensions for PV and NonPV Nodes
 	 */

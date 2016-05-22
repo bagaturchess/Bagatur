@@ -8,17 +8,22 @@ import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.api.IUCIOptionsRegistry;
 import bagaturchess.uci.impl.commands.options.UCIOption;
+import bagaturchess.uci.impl.commands.options.UCIOptionCombo;
 
 
 public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvider {
 	
 	
 	private UCIOption[] options = new UCIOption[] {
-			//new UCIOption("Search [Use TPT scores in PV Nodes]", false, "type check default false"),
+			new UCIOptionCombo("Openning Mode",
+					"most played first",
+					"type combo default " + "most played first" + " var most played first var random"),
 	};
 	
 	
 	private static final int MAX_INDEX 				= 200;
+	
+	private boolean isOpenningModeRandom			= false;
 	
 	private IExtensionMode mode 					= IExtensionMode.DYNAMIC;
 	private int dynamicExt_UpdateInterval			= 1000;
@@ -419,11 +424,20 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	
 	
 	@Override
+	public boolean isOpenningModeRandom(){
+		return isOpenningModeRandom;
+	}
+	
+	
+	@Override
 	public boolean applyOption(UCIOption option) {
 		
 		if ("Search [Use TPT scores in PV Nodes]".equals(option.getName())) {
 			//other_UseTPTScoresPV = (Boolean) option.getValue();
 			//return true;
+		} else if ("Openning Mode".equals(option.getName())) {
+			isOpenningModeRandom = ((String) option.getValue()).equals("random");
+			return true;
 		}
 		
 		return false;

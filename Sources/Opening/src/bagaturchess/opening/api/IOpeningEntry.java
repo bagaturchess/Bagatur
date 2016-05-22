@@ -4,6 +4,8 @@ public interface IOpeningEntry {
 	
 	public int getRandomEntry();
 	
+	public int getMostPlayedEntry();
+	
 	public long getHashkey();
 
 	public int getWeight();
