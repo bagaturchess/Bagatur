@@ -512,7 +512,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		
 		if (env.getGTBProbing() != null
-				&& depth >= 1) {
+				&& depth >= 3) {
             
             env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
             
@@ -1427,7 +1427,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		
 		if (env.getGTBProbing() != null
-				&& depth >= 1) {
+				&& depth >= 3) {
             
             env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
             
@@ -2145,7 +2145,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		
 		if (env.getGTBProbing() != null
-				&& depth >= 1) {
+				&& depth >= 3) {
             
             env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
             
@@ -2508,7 +2508,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		
 		if (env.getGTBProbing() != null
-				&& depth >= 1) {
+				&& depth >= 3) {
             
             env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
             
