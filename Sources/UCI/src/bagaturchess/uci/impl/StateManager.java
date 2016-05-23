@@ -49,7 +49,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	private IChannel channel;
 	private IBitBoard board;
 	
-	private IUCISearchAdaptor searchAdaptor;
+	private volatile IUCISearchAdaptor searchAdaptor;
 	
 	private OptionsManager optionsManager;
 
@@ -249,21 +249,26 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	
 	private void sendUCIOK() throws IOException {
+		channel.sendLogToGUI("StateManager: sendUCIOK called");
 		channel.sendCommandToGUI(COMMAND_TO_GUI_UCIOK_STR);
 	}
 	
 	
 	private void sendReadyOK() throws IOException {
+		channel.sendLogToGUI("StateManager: sendReadyOK called");
 		channel.sendCommandToGUI(COMMAND_TO_GUI_READYOK);
 	}
 	
 	
 	private void createNewGame() {
+		channel.sendLogToGUI("StateManager: createNewGame called");
 		revertGame();
 	}
 	
 	
 	private void setupBoard(String fromGUILine) throws FileNotFoundException {
+		
+		channel.sendLogToGUI("StateManager: setupBoard called with " + fromGUILine);
 		
 		/*
 		 * Setup startup board with FEN or played moves
@@ -298,6 +303,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	
 	private void goSearch(String fromGUILine) throws IOException {
+		channel.sendLogToGUI("StateManager: goSearch called");
 		Go go = new Go(channel, fromGUILine);	
 		channel.sendLogToGUI(go.toString());
 		searchAdaptor.goSearch(channel, this, go);
@@ -312,6 +318,8 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	public void sendBestMove() {
 
+		channel.sendLogToGUI("StateManager: sendBestMove called");
+		
 		int[] moveAndPonder = searchAdaptor.stopSearch();
 		int move = moveAndPonder[0];
 		int ponder = moveAndPonder[1];

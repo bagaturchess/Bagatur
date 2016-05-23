@@ -99,8 +99,8 @@ public class Boot {
 							engineBootCfg.registerProviders(optionsRegistry);
 							
 							List<IUCIOptionAction> customActions = new ArrayList<IUCIOptionAction>();
-							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager));
 							customActions.add(new UCIOptionAction_RecreateLogging(ChannelManager.getChannel(), engineBootCfg));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager));
 							
 							OptionsManager optionsManager = new OptionsManager(communicationChanel, (IUCIOptionsProvider) optionsRegistry, customActions);
 							manager.setOptionsManager(optionsManager);
@@ -109,7 +109,7 @@ public class Boot {
 								action.execute();
 							}
 						} catch (Exception e) {
-							communicationChanel.dump("Error while initializing StateManager: " + e.getMessage());
+							communicationChanel.sendLogToGUI("Error while initializing StateManager: " + e.getMessage());
 						}
 					}
 				}

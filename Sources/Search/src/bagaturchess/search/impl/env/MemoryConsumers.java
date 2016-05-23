@@ -205,6 +205,14 @@ public class MemoryConsumers {
 		if (GTBProbing_NativeWrapper.getInstance() != null) {
 			size_gtb_out = getGTBEntrySize_OUT(availableMemory);
 			channel.sendLogToGUI("Endgame Table Bases cache (OUT) size is " + size_gtb_out);
+			if (size_gtb_out <= 0) {//GC is still not ready with the clean up
+				channel.sendLogToGUI("Endgame Table Bases cache (OUT) size is less than zero. Try again the calculation 1.");
+				size_gtb_out = getGTBEntrySize_OUT(availableMemory);
+				if (size_gtb_out <= 0) {
+					channel.sendLogToGUI("Endgame Table Bases cache (OUT) size is less than zero. Try again the calculation 2.");
+					size_gtb_out = getGTBEntrySize_OUT(availableMemory);
+				}
+			}
 		}
 		
 		
@@ -257,7 +265,7 @@ public class MemoryConsumers {
 		if (availableMemory_in_MB < 1) {
 			throw new IllegalStateException("Not enough memory for initializing Endgame Table Bases cache (OUT). Please increase the -Xmx option of Java VM");
 		}
-		int test_size = availableMemory_in_MB * 100;
+		int test_size = availableMemory_in_MB * 1000;
 		
 		System.gc();
 		int memory_before = getUsedMemory();

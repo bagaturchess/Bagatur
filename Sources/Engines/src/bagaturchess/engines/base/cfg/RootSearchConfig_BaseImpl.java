@@ -20,8 +20,8 @@ public class RootSearchConfig_BaseImpl implements IRootSearchConfig, IUCIOptions
 	
 	
 	protected static final double MEM_USAGE_TPT = 0.35;
-	protected static final double MEM_USAGE_GTB = 0.05; //0.00
-	protected static final double MEM_USAGE_EVALCACHE = 0.30; //0.35
+	protected static final double MEM_USAGE_GTB = 0.10; //0.00
+	protected static final double MEM_USAGE_EVALCACHE = 0.25; //0.35
 	protected static final double MEM_USAGE_PAWNCACHE = 0.30;
 	
 	
