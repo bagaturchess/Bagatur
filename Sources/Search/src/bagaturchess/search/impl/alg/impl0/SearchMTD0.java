@@ -28,6 +28,7 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
+import bagaturchess.egtb.gaviota.GTBProbeOutput;
 import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
@@ -508,6 +509,46 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			node.eval = getDrawScores(rootColour);
 			return node.eval;
 		}
+		
+		
+		if (env.getGTBProbing() != null
+				&& depth >= 1) {
+            
+            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
+            
+            int egtb_val = Integer.MIN_VALUE;
+            
+            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
+                
+                egtb_val = getDrawScores(rootColour);
+                
+                node.eval = egtb_val;
+                return egtb_val;
+                
+            } else {
+                
+                int result = extractEGTBMateValue(depth);
+                
+                if (result != 0) {//Has mate
+                    
+                    egtb_val = result;
+                    
+                    if (!isMateVal(egtb_val)) {
+                        throw new IllegalStateException("egtb_val=" + egtb_val);
+                    }
+                    
+                    //return egtb_val;
+                    
+                    if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
+                    	node.eval = egtb_val;
+                        return egtb_val;
+                    } else if (env.getBitboard().getColourToMove() != rootColour && egtb_val < 0) {
+                    	node.eval = egtb_val;
+                        return egtb_val;
+                    }
+                }
+            }
+        }
 		
 		
 		boolean inCheck = env.getBitboard().isInCheck();
@@ -1385,6 +1426,43 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		
+		if (env.getGTBProbing() != null
+				&& depth >= 1) {
+            
+            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
+            
+            int egtb_val = Integer.MIN_VALUE;
+            
+            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
+                
+                egtb_val = getDrawScores(rootColour);
+                
+                return egtb_val;
+                
+            } else {
+                
+                int result = extractEGTBMateValue(depth);
+                
+                if (result != 0) {//Has mate
+                    
+                    egtb_val = result;
+                    
+                    if (!isMateVal(egtb_val)) {
+                        throw new IllegalStateException("egtb_val=" + egtb_val);
+                    }
+                    
+                    //return egtb_val;
+                    
+                    if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
+                        return egtb_val;
+                    } else if (env.getBitboard().getColourToMove() != rootColour && egtb_val < 0) {
+                        return egtb_val;
+                    }
+                }
+            }
+        }
+		
+		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
 		int alpha_org = beta - 1;
@@ -2065,6 +2143,47 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			return node.eval;
 		}
 		
+		
+		if (env.getGTBProbing() != null
+				&& depth >= 1) {
+            
+            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
+            
+            int egtb_val = Integer.MIN_VALUE;
+            
+            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
+                
+                egtb_val = getDrawScores(rootColour);
+                
+                node.eval = egtb_val;
+                return egtb_val;
+                
+            } else {
+                
+                int result = extractEGTBMateValue(depth);
+                
+                if (result != 0) {//Has mate
+                    
+                    egtb_val = result;
+                    
+                    if (!isMateVal(egtb_val)) {
+                        throw new IllegalStateException("egtb_val=" + egtb_val);
+                    }
+                    
+                    //return egtb_val;
+                    
+                    if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
+                    	node.eval = egtb_val;
+                        return egtb_val;
+                    } else if (env.getBitboard().getColourToMove() != rootColour && egtb_val < 0) {
+                    	node.eval = egtb_val;
+                        return egtb_val;
+                    }
+                }
+            }
+        }
+		
+		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
 		int staticEval = -1;
@@ -2386,6 +2505,44 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		if (isDraw()) {
 			return getDrawScores(rootColour);
 		}
+		
+		
+		if (env.getGTBProbing() != null
+				&& depth >= 1) {
+            
+            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
+            
+            int egtb_val = Integer.MIN_VALUE;
+            
+            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
+                
+                egtb_val = getDrawScores(rootColour);
+                
+                return egtb_val;
+                
+            } else {
+                
+                int result = extractEGTBMateValue(depth);
+                
+                if (result != 0) {//Has mate
+                    
+                    egtb_val = result;
+                    
+                    if (!isMateVal(egtb_val)) {
+                        throw new IllegalStateException("egtb_val=" + egtb_val);
+                    }
+                    
+                    //return egtb_val;
+                    
+                    if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
+                        return egtb_val;
+                    } else if (env.getBitboard().getColourToMove() != rootColour && egtb_val < 0) {
+                        return egtb_val;
+                    }
+                }
+            }
+        }
+		
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
