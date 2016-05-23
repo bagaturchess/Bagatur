@@ -2275,8 +2275,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			if (inCheck
 					//|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
 					|| new_matgain >= 0
-					//|| moveSee > 0
+					//|| cur_move == tpt_move
 					//|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
+					//|| moveSee > 0
 					) {
 				
 				env.getBitboard().makeMoveForward(cur_move);
@@ -2541,8 +2542,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			if (inCheck
 					//|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
 					|| new_matgain >= 0
-					//|| moveSee > 0
+					//|| cur_move == tpt_move
 					//|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
+					//|| moveSee > 0
 					) {
 				
 				env.getBitboard().makeMoveForward(cur_move);
