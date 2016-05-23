@@ -54,7 +54,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	int MIN_EVAL_DIFF_NONPV 				= 33;
 	
 	double LMR_REDUCTION_MULTIPLIER 		= 1 * 1.222 * 1;
-	double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1;
+	double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1 * 0.777 * 1;
 	double IID_DEPTH_MULTIPLIER 			= 1;
 	
 	
@@ -2402,8 +2402,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			if (inCheck
 					//|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
 					|| new_matgain >= 0
-					//|| cur_move == tpt_move
-					//|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
+					|| cur_move == tpt_move
+					|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
 					//|| moveSee > 0
 					) {
 				
@@ -2707,8 +2707,8 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			if (inCheck
 					//|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
 					|| new_matgain >= 0
-					//|| cur_move == tpt_move
-					//|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
+					|| cur_move == tpt_move
+					|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
 					//|| moveSee > 0
 					) {
 				
