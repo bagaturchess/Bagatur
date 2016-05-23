@@ -1,6 +1,13 @@
 
+Version 1.4a (24 May 2016)
+  * 35+ ELO stronger!
+  * New UCI option Openning Mode - 'random' and 'most played first'
+  * Changed logo
+  * Simplified distribution structure
+  * Bugfix: removed bug when in some endgames engine just stop thinking
+  
 Version 1.4 (11 May 2016)
-  * 100+ ELO stronger!
+  * 35+ ELO stronger!
   * Added Windows 64 support for Gaviota Endgame Tablebases
   * Search optimizations: New depth reduction function used in late move reduction, extensions adjustments, more reliable static pruning, separate transposition table per CPU (preparation for the new parallel search)
   * Evaluation function: support for double bishops, good and bad bishops
