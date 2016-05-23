@@ -1094,6 +1094,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						isGoodMove = ((ListAll) list).isGoodMove(cur_move);
 					}
 					
+					if (!isCheckMove) {
+						staticPrunning = true;
+					}
+					
 					if (//!isMateVal(alpha_org)
 							//&& !isMateVal(beta)
 							//true
@@ -1135,10 +1139,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						}
 						*/
 						
-						if (searchedCount >= Math.sqrt(rest)) {
+						//if (searchedCount >= Math.sqrt(rest)) {
 						//if (searchedCount >= 1) {
-							staticPrunning = true;
-						}
+						//	staticPrunning = true;
+						//}
 						
 						if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
@@ -1825,6 +1829,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							isGoodMove = ((ListAll) list).isGoodMove(cur_move);
 						}
 						
+						if (!isCheckMove) {
+							staticPrunning = true;
+						}
+						
 						if (//!isMateVal(alpha_org)
 							 //&& !isMateVal(beta)
 							 //true
@@ -1866,10 +1874,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							}
 							*/
 							
-							if (searchedCount >= Math.sqrt(rest)) {
+							//if (searchedCount >= Math.sqrt(rest)) {
 							//if (searchedCount >= 1) {
-								staticPrunning = true;
-							}
+							//	staticPrunning = true;
+							//}
 							
 							if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
