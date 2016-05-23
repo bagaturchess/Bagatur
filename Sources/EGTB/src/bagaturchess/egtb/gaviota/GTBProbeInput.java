@@ -16,7 +16,12 @@ public class GTBProbeInput {
 	
 	
 	public GTBProbeInput() {
-        whitePieces[0] = EGTBProbing.NATIVE_PID_NONE;
+        clear();
+	}
+
+
+	public void clear() {
+		whitePieces[0] = EGTBProbing.NATIVE_PID_NONE;
     	blackPieces[0] = EGTBProbing.NATIVE_PID_NONE;
 	}
 }
