@@ -52,7 +52,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	private IUCISearchAdaptor searchAdaptor;
 	
 	private OptionsManager optionsManager;
-	
+
 	
 	public StateManager(IUCIConfig _engineBootCfg) {
 		engineBootCfg = _engineBootCfg;
@@ -119,11 +119,11 @@ public class StateManager extends Protocol implements BestMoveSender {
 							sendReadyOK();
 							break;
 						case COMMAND_TO_ENGINE_NEWGAME:
-							waitAndExecute();
+							//waitAndExecute();
 							createNewGame();
 							break;
 						case COMMAND_TO_ENGINE_POSITION:
-							waitAndExecute();
+							//waitAndExecute();
 							setupBoard(fromGUILine);
 							break;
 						case COMMAND_TO_ENGINE_GO:
@@ -135,7 +135,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 							ponderHit(fromGUILine);
 							break;
 						case COMMAND_TO_ENGINE_SETOPTION:
-							waitAndExecute();
+							//waitAndExecute();
 							setOption(fromGUILine);
 							break;
 						case COMMAND_TO_ENGINE_STOP:
