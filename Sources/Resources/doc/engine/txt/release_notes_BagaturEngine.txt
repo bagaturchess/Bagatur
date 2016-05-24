@@ -1,10 +1,9 @@
 
 Version 1.4a (24 May 2016)
-  * 35+ ELO stronger!
+  * Bugfix: removed bug when in some endgames engine just stop thinking
   * New UCI option Openning Mode - 'random' and 'most played first'
   * Changed logo
   * Simplified distribution structure
-  * Bugfix: removed bug when in some endgames engine just stop thinking
   
 Version 1.4 (11 May 2016)
   * 35+ ELO stronger!
