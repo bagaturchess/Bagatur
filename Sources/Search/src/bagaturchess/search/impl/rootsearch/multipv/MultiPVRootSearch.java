@@ -61,7 +61,7 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 		//!!!Do not setup the board of rootSearch. moltyipv mediator will set it up for each move
 		//rootSearch.setupBoard(_bitboardForSetup);
 		
-		MultiPVMediator mediator_multipv = new MultiPVMediator(getSharedData(), getRootSearchConfig(), rootSearch,
+		MultiPVMediator mediator_multipv = new MultiPVMediator(getRootSearchConfig(), rootSearch,
 				getBitboardForSetup(), mediator, startIteration, maxIterations,
 				useMateDistancePrunning, finishCallback);
 		

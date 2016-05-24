@@ -87,8 +87,8 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		if (DEBUGSearch.DEBUG_MODE) mediator.dump("Sequential search started from depth " + 1 + " to depth " + maxIterations);
 		
 		
-		//UCISearchMediatorImpl_Base
-		mediator = (mediator instanceof MultiPVMediator) ? mediator : new Mediator_AlphaAndBestMoveWindow(mediator, this);
+		//mediator should be instance of UCISearchMediatorImpl_Base
+		mediator = (mediator instanceof MultiPVMediator) ? new Mediator_AlphaAndBestMoveWindow(mediator, this) : new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(mediator, this));
 		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup(), getSharedData(), getBitboardForSetup().getHashKey(),
 				startIteration, maxIterations, finishCallback);
 		
@@ -102,14 +102,13 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 			@Override
 			public void run() {
 				try {
-					while (!final_mediator.getStopper().isStopped()) {
+					while (!final_mediator.getStopper().isStopped() && distribution.getCurrentDepth() <= distribution.getMaxIterations()) {
+						
 						Runnable task = new NullwinSearchTask(executor, searcher, distribution, getBitboardForSetup(),
 								final_mediator, getSharedData(), useMateDistancePrunning
 																);
 						task.run();
 					}
-					
-					//finishCallback.ready();
 					
 				} catch(Throwable t) {
 					final_mediator.dump(t);

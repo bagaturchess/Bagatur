@@ -43,6 +43,7 @@ import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
+import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch;
 import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_Base;
@@ -133,6 +134,8 @@ public class MTDSchedulerMain {
 		//IRootSearch search = new MTDParallelSearch(new Object[] {cfg, arg1});
 		
 		IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
+		
+		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
 		SharedData sharedData = search.getSharedData();
 		
@@ -517,7 +520,10 @@ public class MTDSchedulerMain {
 		
 		//ISearchMediator mediator2 = new MediatorDummper(bitboard, eval, 5000000, true);
 		
-		search.negamax(bitboard, mediator1, 1, 100, true);
+		searchMultiPV.newGame(bitboard);
+		searchMultiPV.negamax(bitboard, mediator1, 1, 100, true);
+		//search.negamax(bitboard, mediator1, 1, 100, true);
+		
 		//search.negamax(bitboard, mediator1, 2, 2, true);
 		
 		//ISearchMediator mediator1 = new MediatorDummper(bitboard, eval, 5000000, true);

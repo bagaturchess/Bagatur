@@ -23,21 +23,28 @@
 package bagaturchess.search.impl.rootsearch.parallel;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.IFinishCallback;
+import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig_SMP;
 import bagaturchess.search.api.internal.ISearch;
+import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.sequential.MTDStopper;
 import bagaturchess.search.impl.rootsearch.sequential.NPSCollectorMediator;
+import bagaturchess.search.impl.rootsearch.sequential.NullwinSearchTask;
 import bagaturchess.search.impl.rootsearch.sequential.SearchManager;
 import bagaturchess.search.impl.utils.DEBUGSearch;
+import bagaturchess.search.impl.utils.SearchMediatorProxy;
+import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.ChannelManager;
 
 
@@ -45,7 +52,8 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 	
 	
 	private ExecutorService executor;
-	private SearchersPool searchers;
+	
+	private List<IRootSearch> searchers;
 	
 	
 	public MTDParallelSearch(Object[] args) {
@@ -55,7 +63,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		
 		ChannelManager.getChannel().dump("Thread pool created with " + getRootSearchConfig().getThreadsCount() + " threads.");
 		
-		searchers = new SearchersPool(getRootSearchConfig().getBoardConfig());
+		searchers = new ArrayList<IRootSearch>();
 	}
 	
 	
@@ -69,7 +77,9 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		
 		super.newGame(_bitboardForSetup); 
 		
-		searchers.newGame(getBitboardForSetup(), getSharedData(), getRootSearchConfig().getThreadsCount());
+		for (int i = 0; i < searchers.size(); i++) {
+			searchers.get(i).newGame(getBitboardForSetup());
+		}
 	}
 	
 	
@@ -77,25 +87,17 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator root_mediator, int startIteration, int maxIterations,
 			boolean useMateDistancePrunning, IFinishCallback finishCallback) {
 		
-		if (maxIterations > ISearch.MAX_DEPTH) {
-			maxIterations = ISearch.MAX_DEPTH;
-		} else {
-			if (maxIterations < maxIterations + getRootSearchConfig().getHiddenDepth()) {//Type overflow
-				maxIterations += getRootSearchConfig().getHiddenDepth();
-			}
-		}
-		
-		//if (getSharedData().getTPT() != null) {
-		//	getSharedData().getTPT().clearCount_UniqueInserts();
-		//}
-		
-		//if (DEBUGSearch.DEBUG_MODE) searchers.dumpSearchers(mediator); // Too much logs
-		
-		searchers.newSearch();
 		//searchers.waitSearchersToStop(); //Removed because of pondering. During pondering all threads are busy.
 		setupBoard(_bitboardForSetup);
 		
 		if (DEBUGSearch.DEBUG_MODE) root_mediator.dump("Parallel search started from depth " + startIteration + " to depth " + maxIterations);
+		
+		
+		List<ISearchMediator> mediators = new ArrayList<ISearchMediator>();
+		for (int i = 0; i < searchers.size(); i++) {
+			mediators.add(new BucketMediator(root_mediator));
+		}
+		
 		
 		//root_mediator.dump("root_mediator=" + root_mediator.getClass().getName());
 		
@@ -114,6 +116,64 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		//executor.execute(new NullwinSearchTask(executor, searchers, distribution, getBitboardForSetup(),
 		//										parallel_mediator, getSharedData(), useMateDistancePrunning)
 		//				);
+		
+		/*
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					while (!final_mediator.getStopper().isStopped()) {
+						Runnable task = new NullwinSearchTask(executor, searcher, distribution, getBitboardForSetup(),
+								final_mediator, getSharedData(), useMateDistancePrunning
+																);
+						task.run();
+					}
+					
+					//finishCallback.ready();
+					
+				} catch(Throwable t) {
+					final_mediator.dump(t);
+					final_mediator.dump(t.getMessage());
+				}
+			}
+		});
+		*/
+	}
+	
+	
+	@Override
+	public void shutDown() {
+		try {
+			
+			executor.shutdownNow();
+			
+			for (int i = 0; i < searchers.size(); i++) {
+				searchers.get(i).shutDown();
+			}
+			
+			searchers = null;
+			
+		} catch(Throwable t) {
+			//Do nothing
+		}
+	}
+
+
+	@Override
+	public int getTPTUsagePercent() {
+		int sum = 0;
+		for (int i = 0; i < searchers.size(); i++) {
+			sum += searchers.get(i).getTPTUsagePercent();
+		}
+		return sum / searchers.size();
+	}
+
+
+	@Override
+	public void decreaseTPTDepths(int reduction) {
+		for (int i = 0; i < searchers.size(); i++) {
+			searchers.get(i).decreaseTPTDepths(reduction);
+		}
 	}
 	
 	
@@ -128,27 +188,27 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 	}
 	
 	
-	@Override
-	public void shutDown() {
-		try {
-			
-			executor.shutdownNow();
-			searchers = null;
-			
-		} catch(Throwable t) {
-			//Do nothing
+	private class BucketMediator extends SearchMediatorProxy {
+		
+		
+		List<ISearchInfo> minorInfos;
+		List<ISearchInfo> majorInfos;
+		
+		
+		public BucketMediator(ISearchMediator _parent) {
+			super(_parent);
+			minorInfos = new ArrayList<ISearchInfo>();
+			majorInfos = new ArrayList<ISearchInfo>();
 		}
-	}
-
-
-	@Override
-	public int getTPTUsagePercent() {
-		return searchers.getTPTUsagePercent();
-	}
-
-
-	@Override
-	public void decreaseTPTDepths(int reduction) {
-		searchers.decreaseTPTDepths(reduction);
+		
+		
+		public void changedMajor(ISearchInfo info) {
+			majorInfos.add(info);
+		}
+		
+		
+		public void changedMinor(ISearchInfo info) {
+			minorInfos.add(info);
+		}
 	}
 }

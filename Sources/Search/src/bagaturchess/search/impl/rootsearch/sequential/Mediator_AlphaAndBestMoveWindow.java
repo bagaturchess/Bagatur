@@ -27,11 +27,11 @@ import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.api.internal.SearchInfoUtils;
+import bagaturchess.search.impl.utils.SearchMediatorProxy;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
-public class Mediator_AlphaAndBestMoveWindow extends NPSCollectorMediator {
+public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	
 	
 	private ISearchInfo lastinfo;

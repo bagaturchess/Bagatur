@@ -17,7 +17,6 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInfoUtils;
 import bagaturchess.search.api.internal.SearchInterruptedException;
-import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.utils.SearchMediatorProxy;
 
@@ -27,7 +26,6 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	
 	private long startTime = System.currentTimeMillis();
 	
-	private SharedData sharedData;
 	private IRootSearchConfig engineConfiguration;
 	private IRootSearch rootSearch;
 	private IBitBoard bitboard;
@@ -48,13 +46,12 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	private Set<ISearchInfo> infos;
 	
 	
-	public MultiPVMediator(SharedData _sharedData, IRootSearchConfig _engineConfiguration, IRootSearch _rootSearch, IBitBoard _bitboard, ISearchMediator _parentMediator,
+	public MultiPVMediator(IRootSearchConfig _engineConfiguration, IRootSearch _rootSearch, IBitBoard _bitboard, ISearchMediator _parentMediator,
 			int _startIteration, int _maxIterations, boolean _useMateDistancePrunning,
 			IFinishCallback _finishCallback) {
 		
 		super(_parentMediator);
 		
-		sharedData = _sharedData;
 		engineConfiguration = _engineConfiguration;
 		rootSearch = _rootSearch;
 		bitboard = _bitboard;
