@@ -249,7 +249,7 @@ public class MemoryConsumers {
 		if (availableMemory_in_MB < 1) {
 			throw new IllegalStateException("Not enough memory for initializing Transposition Table. Please increase the -Xmx option of Java VM");
 		}
-		int test_size = availableMemory_in_MB * 250;
+		int test_size = availableMemory_in_MB * 1000;
 		
 		System.gc();
 		int memory_before = getUsedMemory();
@@ -259,13 +259,13 @@ public class MemoryConsumers {
 		return size;
 	}
 	
-
+	
 	private int getGTBEntrySize_OUT(long availableMemory) {
 		int availableMemory_in_MB = (int) (availableMemory / (1024 * 1024));
 		if (availableMemory_in_MB < 1) {
 			throw new IllegalStateException("Not enough memory for initializing Endgame Table Bases cache (OUT). Please increase the -Xmx option of Java VM");
 		}
-		int test_size = availableMemory_in_MB * 250;
+		int test_size = availableMemory_in_MB * 1000;
 		
 		System.gc();
 		int memory_before = getUsedMemory();
@@ -280,7 +280,7 @@ public class MemoryConsumers {
 		if (availableMemory_in_MB < 1) {
 			throw new IllegalStateException("Not enough memory for initializing Eval Cache. Please increase the -Xmx option of Java VM");
 		}
-		int test_size = availableMemory_in_MB * 250;
+		int test_size = availableMemory_in_MB * 1000;
 		
 		System.gc();
 		int memory_before = getUsedMemory();
@@ -296,7 +296,7 @@ public class MemoryConsumers {
 		if (availableMemory_in_MB < 1) {
 			throw new IllegalStateException("Not enough memory for initializing Pawns Eval Cache. Please increase the -Xmx option of Java VM");
 		}
-		int test_size = availableMemory_in_MB * 50;
+		int test_size = availableMemory_in_MB * 100;
 		
 		System.gc();
 		int memory_before = getUsedMemory();
