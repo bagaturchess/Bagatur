@@ -25,13 +25,11 @@ package bagaturchess.search.impl.uci_adaptor;
 
 import java.io.IOException;
 
-import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInfoUtils;
-import bagaturchess.search.impl.utils.SearchUtils;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.impl.commands.Go;
@@ -54,20 +52,6 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	private String nextMinorLine;
 	private long lastSentMinorInfo_timestamp;
 	
-	
-	private static int TRUST_WINDOW_BEST_MOVE_MULTIPLIER = 2;
-	private static int TRUST_WINDOW_BEST_MOVE_MIN = 8;
-	private static int TRUST_WINDOW_BEST_MOVE_MAX = 32;
-	private int trustWindow_BestMove;
-	
-	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 1;
-	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 1;
-	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = SearchUtils.getMateVal(1);
-	private int trustWindow_AlphaAspiration;
-	
-	private VarStatistic best_moves_diffs_per_depth;
-	private static int TRUST_WINDOW_MTD_STEP_MIN = 4;
-	
 	private boolean isEndlessSearch;
 	
 	
@@ -81,13 +65,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		rootSearch = _rootSearch;
 		isEndlessSearch = _isEndlessSearch;
 		
-		trustWindow_BestMove 		= TRUST_WINDOW_BEST_MOVE_MIN;
-		trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MIN;
-		
 		last3infos = new ISearchInfo[3];
-		
-		best_moves_diffs_per_depth = new VarStatistic(false);
-		best_moves_diffs_per_depth.addValue(1, 1);
 		
 		startTime = System.currentTimeMillis();
 	}
@@ -102,6 +80,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	protected long getStartTime() {
 		return startTime;
 	}
+	
 	
 	protected IChannel getChannel() {
 		return channel;
@@ -126,28 +105,15 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		return sender;
 	}
 	
-	void setLastInfo(ISearchInfo info) {
-		lastinfo = info;
+	
+	public void setLastInfo(ISearchInfo info) {
+		throw new IllegalStateException();
 	}
 	
 	
 	public void changedMajor(ISearchInfo info) {
 		
 		if (!info.isUpperBound()) {
-			
-			if (lastinfo != null) {
-				
-				adjustTrustWindow_BestMove(info);
-				
-				adjustTrustWindow_AlphaAspiration(info);
-				
-				if (!info.isMateScore() && !lastinfo.isMateScore()) {
-					int eval_diff = Math.abs(info.getEval() - lastinfo.getEval());
-					best_moves_diffs_per_depth.addValue(eval_diff, eval_diff);
-				}
-				dump("UCISearchMediatorImpl_Base Trust Window MTD Step set to " + getTrustWindow_MTD_Step());
-			}
-		
 			lastinfo = info;
 		}
 		
@@ -155,70 +121,6 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		send(message);
 		
 		stopIfMateIsFound();
-	}
-
-
-	private void adjustTrustWindow_BestMove(ISearchInfo info) {
-		
-		int cur_mtdTrustWindow = trustWindow_BestMove;
-		
-		if (cur_mtdTrustWindow < TRUST_WINDOW_BEST_MOVE_MIN) {
-			cur_mtdTrustWindow = TRUST_WINDOW_BEST_MOVE_MIN;
-		} else {
-			
-			if (lastinfo.getBestMove() == info.getBestMove()) {
-				if (cur_mtdTrustWindow == 0) {
-					//cur_mtdTrustWindow = MTD_TRUST_WINDOW_MIN;
-					throw new IllegalStateException("cur_mtdTrustWindow == 0");
-				} else {
-					cur_mtdTrustWindow *= TRUST_WINDOW_BEST_MOVE_MULTIPLIER;
-				}
-			} else {
-				cur_mtdTrustWindow /= TRUST_WINDOW_BEST_MOVE_MULTIPLIER;
-			}
-			
-			if (cur_mtdTrustWindow < 0) {
-				throw new IllegalStateException("cur_mtdTrustWindow=" + cur_mtdTrustWindow);
-			}
-		}
-		
-		/*if (cur_mtdTrustWindow > trustWindow_AlphaAspiration) {
-			cur_mtdTrustWindow = trustWindow_AlphaAspiration;
-		}*/
-		
-		if (cur_mtdTrustWindow > TRUST_WINDOW_BEST_MOVE_MAX) {
-			cur_mtdTrustWindow = TRUST_WINDOW_BEST_MOVE_MAX;
-		}
-		
-		trustWindow_BestMove = cur_mtdTrustWindow;
-		
-		dump("UCISearchMediatorImpl_Base Trust Window Best Move set to " + trustWindow_BestMove);
-	}
-	
-	
-	private void adjustTrustWindow_AlphaAspiration(ISearchInfo info) {
-		
-		if (!info.isMateScore() && trustWindow_AlphaAspiration != TRUST_WINDOW_ALPHA_ASPIRATION_MAX) {
-			
-			trustWindow_AlphaAspiration += TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER * Math.max(1, Math.abs(info.getEval() - lastinfo.getEval()));
-			
-		} else {
-			trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MAX;
-		}
-		
-		if (trustWindow_AlphaAspiration < 0) {
-			throw new IllegalStateException("cur_mtdTrustWindow alpha =" + trustWindow_AlphaAspiration);
-		}
-		
-		if (trustWindow_AlphaAspiration < TRUST_WINDOW_ALPHA_ASPIRATION_MIN) {
-			trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MIN;
-		}
-		
-		if (trustWindow_AlphaAspiration > TRUST_WINDOW_ALPHA_ASPIRATION_MAX) {
-			trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MAX;
-		}
-		
-		dump("UCISearchMediatorImpl_Base Trust Window Alpha Aspiration set to " + trustWindow_AlphaAspiration);
 	}
 	
 	
@@ -298,18 +200,18 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	@Override
 	public int getTrustWindow_BestMove() {
-		return trustWindow_BestMove;
+		throw new IllegalStateException();
 	}
 	
 	
 	@Override
 	public int getTrustWindow_AlphaAspiration() {
-		return trustWindow_AlphaAspiration;
+		throw new IllegalStateException();
 	}
 	
 	
 	@Override
 	public int getTrustWindow_MTD_Step() {
-		return TRUST_WINDOW_MTD_STEP_MIN;//(int) Math.max(TRUST_WINDOW_MTD_STEP_MIN, best_moves_diffs_per_depth.getEntropy());
+		throw new IllegalStateException();
 	}
 }

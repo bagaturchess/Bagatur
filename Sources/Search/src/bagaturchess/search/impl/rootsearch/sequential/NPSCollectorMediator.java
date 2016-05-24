@@ -2,9 +2,7 @@ package bagaturchess.search.impl.rootsearch.sequential;
 
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 import bagaturchess.search.api.internal.ISearchInfo;

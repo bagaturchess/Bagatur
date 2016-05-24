@@ -33,7 +33,6 @@ import bagaturchess.search.api.IRootSearchConfig_SMP;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.utils.DEBUGSearch;
@@ -71,7 +70,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	
 	
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, final boolean useMateDistancePrunning, IFinishCallback finishCallback) {
+			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback finishCallback) {
 		
 		if (maxIterations > ISearch.MAX_DEPTH) {
 			maxIterations = ISearch.MAX_DEPTH;
@@ -89,7 +88,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		
 		
 		//UCISearchMediatorImpl_Base
-		mediator = (mediator instanceof MultiPVMediator) ? mediator : new NPSCollectorMediator(mediator);
+		mediator = (mediator instanceof MultiPVMediator) ? mediator : new Mediator_AlphaAndBestMoveWindow(mediator, this);
 		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup(), getSharedData(), getBitboardForSetup().getHashKey(),
 				startIteration, maxIterations, finishCallback);
 		
@@ -109,6 +108,9 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 																);
 						task.run();
 					}
+					
+					//finishCallback.ready();
+					
 				} catch(Throwable t) {
 					final_mediator.dump(t);
 					final_mediator.dump(t.getMessage());

@@ -36,7 +36,6 @@ import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.sequential.MTDStopper;
 import bagaturchess.search.impl.rootsearch.sequential.NPSCollectorMediator;
-import bagaturchess.search.impl.rootsearch.sequential.NullwinSearchTask;
 import bagaturchess.search.impl.rootsearch.sequential.SearchManager;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
