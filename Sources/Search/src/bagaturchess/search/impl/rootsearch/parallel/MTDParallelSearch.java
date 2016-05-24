@@ -34,6 +34,10 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
+import bagaturchess.search.impl.rootsearch.sequential.MTDStopper;
+import bagaturchess.search.impl.rootsearch.sequential.NPSCollectorMediator;
+import bagaturchess.search.impl.rootsearch.sequential.NullwinSearchTask;
+import bagaturchess.search.impl.rootsearch.sequential.SearchManager;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
 
@@ -98,7 +102,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		
 		//root_mediator.dump("negamax: startIteration=" + startIteration + ", maxIterations=" + maxIterations);
 		
-		ISearchMediator parallel_mediator = (root_mediator instanceof MultiPVMediator) ? root_mediator : new ParallelMediator(root_mediator);
+		ISearchMediator parallel_mediator = (root_mediator instanceof MultiPVMediator) ? root_mediator : new NPSCollectorMediator(root_mediator);
 		//ISearchMediator parallel_mediator = new ParallelMediator(root_mediator);
 		//root_mediator.dump("parallel_mediator=" + parallel_mediator.getClass().getName());
 		
@@ -108,9 +112,9 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		ISearchStopper mtd_stopper = new MTDStopper(getBitboardForSetup().getColourToMove(), distribution /*, parallel_mediator*/);
 		root_mediator.getStopper().setSecondaryStopper(mtd_stopper);
 		
-		executor.execute(new NullwinSearchTask(executor, searchers, distribution, getBitboardForSetup(),
-												parallel_mediator, getSharedData(), useMateDistancePrunning)
-						);
+		//executor.execute(new NullwinSearchTask(executor, searchers, distribution, getBitboardForSetup(),
+		//										parallel_mediator, getSharedData(), useMateDistancePrunning)
+		//				);
 	}
 	
 	

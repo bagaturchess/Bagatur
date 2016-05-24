@@ -29,10 +29,13 @@ import java.util.concurrent.Executors;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IFinishCallback;
+import bagaturchess.search.api.IRootSearchConfig_SMP;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
+import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
+import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 
 
@@ -46,6 +49,11 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	public MTDSequentialSearch(Object[] args) {
 		super(args);
 		executor = Executors.newFixedThreadPool(1);
+	}
+	
+	
+	public IRootSearchConfig_SMP getRootSearchConfig() {
+		return (IRootSearchConfig_SMP) super.getRootSearchConfig();
 	}
 	
 	
@@ -63,57 +71,50 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	
 	
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, boolean useMateDistancePrunning, IFinishCallback finishCallback) {
+			int startIteration, int maxIterations, final boolean useMateDistancePrunning, IFinishCallback finishCallback) {
 		
 		if (maxIterations > ISearch.MAX_DEPTH) {
 			maxIterations = ISearch.MAX_DEPTH;
+		} else {
+			if (maxIterations < maxIterations + getRootSearchConfig().getHiddenDepth()) {//Type overflow
+				maxIterations += getRootSearchConfig().getHiddenDepth();
+			}
 		}
 		
 		searcher.newSearch();
 		
-		if (DEBUGSearch.DEBUG_MODE) mediator.dump("Sequential search started from depth " + 1 + " to depth " + maxIterations);
-		
 		setupBoard(_bitboardForSetup);
 		
-		executor.execute(
-				new Task(mediator, startIteration, maxIterations,
-						useMateDistancePrunning, finishCallback)
-			);
-	}
-	
-	
-	private class Task implements Runnable {
+		if (DEBUGSearch.DEBUG_MODE) mediator.dump("Sequential search started from depth " + 1 + " to depth " + maxIterations);
 		
 		
-		private ISearchMediator mediator;
-		private int startIteration;
-		private int maxIterations;
-		private boolean useMateDistancePrunning;
-		private IFinishCallback callback;
+		//UCISearchMediatorImpl_Base
+		mediator = (mediator instanceof MultiPVMediator) ? mediator : new NPSCollectorMediator(mediator);
+		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup(), getSharedData(), getBitboardForSetup().getHashKey(),
+				startIteration, maxIterations, finishCallback);
+		
+		final ISearchStopper mtd_stopper = new MTDStopper(getBitboardForSetup().getColourToMove(), distribution);
+		mediator.getStopper().setSecondaryStopper(mtd_stopper);
 		
 		
-		Task(ISearchMediator _mediator, int _startIteration, int _maxIterations,
-				boolean _useMateDistancePrunning, IFinishCallback _callback) {
-			mediator = _mediator;
-			startIteration = _startIteration;
-			maxIterations = _maxIterations;
-			useMateDistancePrunning = _useMateDistancePrunning;
-			callback = _callback;
-		}
+		final ISearchMediator final_mediator = mediator;
 		
-		
-		public void run() {
-			try {
-				
-				searcher.search(mediator, startIteration, maxIterations, useMateDistancePrunning);
-				callback.ready();
-				
-			} catch(SearchInterruptedException sie) {
-				//Do Nothing
-			} catch(Throwable t) {
-				mediator.dump(t);
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					while (!final_mediator.getStopper().isStopped()) {
+						Runnable task = new NullwinSearchTask(executor, searcher, distribution, getBitboardForSetup(),
+								final_mediator, getSharedData(), useMateDistancePrunning
+																);
+						task.run();
+					}
+				} catch(Throwable t) {
+					final_mediator.dump(t);
+					final_mediator.dump(t.getMessage());
+				}
 			}
-		}
+		});
 	}
 
 
