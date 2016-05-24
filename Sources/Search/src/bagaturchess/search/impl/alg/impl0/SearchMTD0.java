@@ -512,6 +512,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		
 		if (env.getGTBProbing() != null
+				&& env.getBitboard().getColourToMove() == rootColour
 				&& depth >= 3) {
             
 			temp_input.clear();
@@ -538,15 +539,18 @@ public class SearchMTD0 extends SearchImpl_MTD {
                         throw new IllegalStateException("egtb_val=" + egtb_val);
                     }
                     
-                    //return egtb_val;
+                    if (egtb_val >= beta) {
+	                    node.eval = egtb_val;
+	                    return egtb_val;
+                    }
                     
-                    if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
+                    /*if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
                     	node.eval = egtb_val;
                         return egtb_val;
                     } else if (env.getBitboard().getColourToMove() != rootColour && egtb_val < 0) {
                     	node.eval = egtb_val;
                         return egtb_val;
-                    }
+                    }*/
                 }
             }
         }
@@ -1428,6 +1432,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		
 		if (env.getGTBProbing() != null
+				&& env.getBitboard().getColourToMove() == rootColour
 				&& depth >= 3) {
             
 			temp_input.clear();
@@ -1453,13 +1458,17 @@ public class SearchMTD0 extends SearchImpl_MTD {
                         throw new IllegalStateException("egtb_val=" + egtb_val);
                     }
                     
-                    //return egtb_val;
+                    if (egtb_val >= beta) {
+	                    return egtb_val;
+                    }
                     
-                    if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
+                    /*if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
+                    	node.eval = egtb_val;
                         return egtb_val;
                     } else if (env.getBitboard().getColourToMove() != rootColour && egtb_val < 0) {
+                    	node.eval = egtb_val;
                         return egtb_val;
-                    }
+                    }*/
                 }
             }
         }
@@ -2147,6 +2156,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		
 		if (env.getGTBProbing() != null
+				&& env.getBitboard().getColourToMove() == rootColour
 				&& depth >= 3) {
             
 			temp_input.clear();
@@ -2173,15 +2183,18 @@ public class SearchMTD0 extends SearchImpl_MTD {
                         throw new IllegalStateException("egtb_val=" + egtb_val);
                     }
                     
-                    //return egtb_val;
+                    if (egtb_val >= beta) {
+	                    node.eval = egtb_val;
+	                    return egtb_val;
+                    }
                     
-                    if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
+                    /*if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
                     	node.eval = egtb_val;
                         return egtb_val;
                     } else if (env.getBitboard().getColourToMove() != rootColour && egtb_val < 0) {
                     	node.eval = egtb_val;
                         return egtb_val;
-                    }
+                    }*/
                 }
             }
         }
@@ -2511,6 +2524,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		
 		if (env.getGTBProbing() != null
+				&& env.getBitboard().getColourToMove() == rootColour
 				&& depth >= 3) {
             
 			temp_input.clear();
@@ -2536,13 +2550,17 @@ public class SearchMTD0 extends SearchImpl_MTD {
                         throw new IllegalStateException("egtb_val=" + egtb_val);
                     }
                     
-                    //return egtb_val;
+                    if (egtb_val >= beta) {
+	                    return egtb_val;
+                    }
                     
-                    if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
+                    /*if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
+                    	node.eval = egtb_val;
                         return egtb_val;
                     } else if (env.getBitboard().getColourToMove() != rootColour && egtb_val < 0) {
+                    	node.eval = egtb_val;
                         return egtb_val;
-                    }
+                    }*/
                 }
             }
         }
