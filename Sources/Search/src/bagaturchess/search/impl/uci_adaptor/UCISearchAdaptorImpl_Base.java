@@ -27,6 +27,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
+import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.MemoryConsumers;
@@ -178,7 +179,17 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 					}*/
 				}
 				currentMediator.dump("Normal search started");
-				searcher.negamax(boardForSetup, currentMediator, start_iteration, currentGoCommand.getDepth(), true);
+				
+				int maxIterations = currentGoCommand.getDepth();
+				if (maxIterations > ISearch.MAX_DEPTH) {
+					maxIterations = ISearch.MAX_DEPTH;
+				} else {
+					if (maxIterations < maxIterations + rootSearchCfg.getHiddenDepth()) {//Type overflow
+						maxIterations += rootSearchCfg.getHiddenDepth();
+					}
+				}
+				
+				searcher.negamax(boardForSetup, currentMediator, start_iteration, maxIterations, true);
 			}
 		} else {
 			currentMediator.dump("Endless search started");

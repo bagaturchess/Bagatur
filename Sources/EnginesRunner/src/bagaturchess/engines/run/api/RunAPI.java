@@ -4,12 +4,9 @@ package bagaturchess.engines.run.api;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl;
-import bagaturchess.search.api.IEvaluator;
+import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
-import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
 
 
@@ -17,7 +14,7 @@ public class RunAPI {
 	
 	
 	public static IRootSearch createEngine() {
-		IRootSearchConfig cfg = new RootSearchConfig_BaseImpl(
+		IRootSearchConfig cfg = new RootSearchConfig_BaseImpl_SMP(
 				new String[] {
 								"bagaturchess.search.impl.alg.impl0.SearchMTD0",
 								"bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD",								

@@ -16,7 +16,7 @@ import bagaturchess.uci.impl.commands.options.UCIOptionSpin;
 import bagaturchess.uci.impl.commands.options.UCIOptionString;
 
 
-public class RootSearchConfig_BaseImpl implements IRootSearchConfig, IUCIOptionsProvider {
+public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IUCIOptionsProvider {
 	
 	
 	protected static final double MEM_USAGE_TPT = 0.35;
@@ -227,6 +227,7 @@ public class RootSearchConfig_BaseImpl implements IRootSearchConfig, IUCIOptions
 		return false;
 	}
 	
+	/*
 	public static void main(String[] args) {
 		try {
 			RootSearchConfig_BaseImpl b = new RootSearchConfig_BaseImpl(new String[] {
@@ -251,7 +252,7 @@ public class RootSearchConfig_BaseImpl implements IRootSearchConfig, IUCIOptions
 			e.printStackTrace();
 		}
 	}
-
+	*/
 
 	@Override
 	public String getBoardFactoryClassName() {

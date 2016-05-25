@@ -73,11 +73,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback finishCallback) {
 		
 		if (maxIterations > ISearch.MAX_DEPTH) {
-			maxIterations = ISearch.MAX_DEPTH;
-		} else {
-			if (maxIterations < maxIterations + getRootSearchConfig().getHiddenDepth()) {//Type overflow
-				maxIterations += getRootSearchConfig().getHiddenDepth();
-			}
+			throw new IllegalStateException("maxIterations=" + maxIterations + " > ISearch.MAX_DEPTH");
 		}
 		
 		searcher.newSearch();
@@ -87,8 +83,11 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		if (DEBUGSearch.DEBUG_MODE) mediator.dump("Sequential search started from depth " + 1 + " to depth " + maxIterations);
 		
 		
-		//mediator should be instance of UCISearchMediatorImpl_Base
-		mediator = (mediator instanceof MultiPVMediator) ? new Mediator_AlphaAndBestMoveWindow(mediator, this) : new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(mediator, this));
+		//Original mediator should be an instance of UCISearchMediatorImpl_Base
+		mediator = (mediator instanceof MultiPVMediator) ?
+				new Mediator_AlphaAndBestMoveWindow(mediator, this) :
+				new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(mediator, this));
+		
 		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup(), getSharedData(), getBitboardForSetup().getHashKey(),
 				startIteration, maxIterations, finishCallback);
 		
@@ -102,7 +101,9 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 			@Override
 			public void run() {
 				try {
-					while (!final_mediator.getStopper().isStopped() && distribution.getCurrentDepth() <= distribution.getMaxIterations()) {
+					while (!final_mediator.getStopper().isStopped() //Condition for normal play
+							&& distribution.getCurrentDepth() <= distribution.getMaxIterations() //Condition for fixed depth or MultiPV search
+							) {
 						
 						Runnable task = new NullwinSearchTask(executor, searcher, distribution, getBitboardForSetup(),
 								final_mediator, getSharedData(), useMateDistancePrunning

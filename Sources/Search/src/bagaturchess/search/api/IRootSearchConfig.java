@@ -45,5 +45,7 @@ public interface IRootSearchConfig {
 	
 	public String getBoardFactoryClassName();
 	public String getSemaphoreFactoryClassName();
+	
 	public int getThreadsCount();
+	public int getHiddenDepth();
 }
