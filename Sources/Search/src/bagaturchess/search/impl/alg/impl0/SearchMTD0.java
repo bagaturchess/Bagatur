@@ -511,6 +511,49 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		
+		boolean inCheck = env.getBitboard().isInCheck();
+		
+	    // Mate distance pruning
+		if (USE_MATE_DISTANCE && !inCheck && useMateDistancePrunning && depth >= 1) {
+			
+		      /*if (inCheck && !env.getBitboard().hasMove()) {
+					node.bestmove = 0;
+					node.eval = -getMateVal(depth);
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
+		      }*/
+		      
+		      // lower bound
+		      int value = -getMateVal(depth+2); // does not work if the current position is mate
+		      if (value > alpha_org) {
+		    	  alpha_org = value;
+		         if (value >= beta) {
+						node.bestmove = 0;
+						node.eval = value;
+						node.leaf = true;
+						node.nullmove = false;
+						return node.eval;
+		         }
+		      }
+		      
+		      // upper bound
+		      
+		      value = getMateVal(depth+1);
+		      
+		      if (value < beta) {
+		         beta = value;
+		         if (value <= alpha_org) {
+						node.bestmove = 0;
+						node.eval = value;
+						node.leaf = true;
+						node.nullmove = false;
+						return node.eval;
+		         }
+		      }
+		}
+		
+		
 		if (env.getGTBProbing() != null
 				&& env.getBitboard().getColourToMove() == rootColour
 				&& depth >= 3) {
@@ -554,49 +597,6 @@ public class SearchMTD0 extends SearchImpl_MTD {
                 }
             }
         }
-		
-		
-		boolean inCheck = env.getBitboard().isInCheck();
-		
-	    // Mate distance pruning
-		if (USE_MATE_DISTANCE && !inCheck && useMateDistancePrunning && depth >= 1) {
-			
-		      /*if (inCheck && !env.getBitboard().hasMove()) {
-					node.bestmove = 0;
-					node.eval = -getMateVal(depth);
-					node.leaf = true;
-					node.nullmove = false;
-					return node.eval;
-		      }*/
-		      
-		      // lower bound
-		      int value = -getMateVal(depth+2); // does not work if the current position is mate
-		      if (value > alpha_org) {
-		    	  alpha_org = value;
-		         if (value >= beta) {
-						node.bestmove = 0;
-						node.eval = value;
-						node.leaf = true;
-						node.nullmove = false;
-						return node.eval;
-		         }
-		      }
-		      
-		      // upper bound
-		      
-		      value = getMateVal(depth+1);
-		      
-		      if (value < beta) {
-		         beta = value;
-		         if (value <= alpha_org) {
-						node.bestmove = 0;
-						node.eval = value;
-						node.leaf = true;
-						node.nullmove = false;
-						return node.eval;
-		         }
-		      }
-		}
 		
 		
 		int rest = normDepth(maxdepth) - depth;
@@ -1429,6 +1429,39 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		if (isDraw()) {
 			return getDrawScores(rootColour);
 		}
+				
+		
+		boolean inCheck = env.getBitboard().isInCheck();
+		
+		int alpha_org = beta - 1;
+		
+	    // Mate distance pruning
+		if (USE_MATE_DISTANCE && !inCheck && useMateDistancePrunning && depth >= 1) {
+		      
+			// lower bound
+		      /*if (inCheck && !env.getBitboard().hasMove()) {
+					return -getMateVal(depth);
+		      }*/
+		      
+		      int value = -getMateVal(depth+2); // does not work if the current position is mate
+
+		      if (value > alpha_org) {
+		         if (value >= beta) {
+					return value;
+		         }
+		      }
+
+		      // upper bound
+
+		      value = getMateVal(depth+1);
+
+		      if (value < beta) {
+		         beta = value;
+		         if (value <= alpha_org) {
+						return value;
+		         }
+		      }
+		}
 		
 		
 		if (env.getGTBProbing() != null
@@ -1472,40 +1505,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
                 }
             }
         }
-		
-		
-		boolean inCheck = env.getBitboard().isInCheck();
-		
-		int alpha_org = beta - 1;
-		
-	    // Mate distance pruning
-		if (USE_MATE_DISTANCE && !inCheck && useMateDistancePrunning && depth >= 1) {
-		      
-			// lower bound
-		      /*if (inCheck && !env.getBitboard().hasMove()) {
-					return -getMateVal(depth);
-		      }*/
-		      
-		      int value = -getMateVal(depth+2); // does not work if the current position is mate
 
-		      if (value > alpha_org) {
-		         if (value >= beta) {
-					return value;
-		         }
-		      }
-
-		      // upper bound
-
-		      value = getMateVal(depth+1);
-
-		      if (value < beta) {
-		         beta = value;
-		         if (value <= alpha_org) {
-						return value;
-		         }
-		      }
-		}
-		
 		
 		int rest = normDepth(maxdepth) - depth;
 		
@@ -2153,52 +2153,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			node.eval = getDrawScores(rootColour);
 			return node.eval;
 		}
-		
-		
-		if (env.getGTBProbing() != null
-				&& env.getBitboard().getColourToMove() == rootColour
-				&& depth >= 3) {
-            
-			temp_input.clear();
-            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
-            
-            int egtb_val = Integer.MIN_VALUE;
-            
-            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
-                
-                egtb_val = getDrawScores(rootColour);
-                
-                node.eval = egtb_val;
-                return egtb_val;
-                
-            } else {
-                
-                int result = extractEGTBMateValue(depth);
-                
-                if (result != 0) {//Has mate
-                    
-                    egtb_val = result;
-                    
-                    if (!isMateVal(egtb_val)) {
-                        throw new IllegalStateException("egtb_val=" + egtb_val);
-                    }
-                    
-                    if (egtb_val >= beta) {
-	                    node.eval = egtb_val;
-	                    return egtb_val;
-                    }
-                    
-                    /*if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
-                    	node.eval = egtb_val;
-                        return egtb_val;
-                    } else if (env.getBitboard().getColourToMove() != rootColour && egtb_val < 0) {
-                    	node.eval = egtb_val;
-                        return egtb_val;
-                    }*/
-                }
-            }
-        }
-		
+				
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
@@ -2252,6 +2207,51 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		      }
 		}
 		
+		
+		if (env.getGTBProbing() != null
+				&& env.getBitboard().getColourToMove() == rootColour
+				&& depth >= 3) {
+            
+			temp_input.clear();
+            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
+            
+            int egtb_val = Integer.MIN_VALUE;
+            
+            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
+                
+                egtb_val = getDrawScores(rootColour);
+                
+                node.eval = egtb_val;
+                return egtb_val;
+                
+            } else {
+                
+                int result = extractEGTBMateValue(depth);
+                
+                if (result != 0) {//Has mate
+                    
+                    egtb_val = result;
+                    
+                    if (!isMateVal(egtb_val)) {
+                        throw new IllegalStateException("egtb_val=" + egtb_val);
+                    }
+                    
+                    if (egtb_val >= beta) {
+	                    node.eval = egtb_val;
+	                    return egtb_val;
+                    }
+                    
+                    /*if (env.getBitboard().getColourToMove() == rootColour && egtb_val > 0) {
+                    	node.eval = egtb_val;
+                        return egtb_val;
+                    } else if (env.getBitboard().getColourToMove() != rootColour && egtb_val < 0) {
+                    	node.eval = egtb_val;
+                        return egtb_val;
+                    }*/
+                }
+            }
+        }
+
 		
 		if (!inCheck) {
 			
@@ -2521,6 +2521,47 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		if (isDraw()) {
 			return getDrawScores(rootColour);
 		}
+				
+		
+		boolean inCheck = env.getBitboard().isInCheck();
+		
+		int staticEval = -1;
+		if (!inCheck) {
+			staticEval = lazyEval(depth, beta - 1, beta, rootColour);
+			
+			if (staticEval >= beta) {
+				//staticEval = fullEval(depth, beta - 1, beta, rootColour);
+			}
+		}
+		
+		int alpha_org = beta - 1;
+		
+	    // Mate distance pruning
+		if (USE_MATE_DISTANCE && !inCheck && depth >= 1) {
+			
+		      /*if (inCheck && !env.getBitboard().hasMove()) {
+					return -getMateVal(depth);
+		      }*/
+			
+		      int value = -getMateVal(depth+2); // does not work if the current position is mate
+
+		      if (value > alpha_org) {
+		         if (value >= beta) {
+					return value;
+		         }
+		      }
+
+		      // upper bound
+
+		      value = getMateVal(depth+1);
+
+		      if (value < beta) {
+		         beta = value;
+		         if (value <= alpha_org) {
+						return value;
+		         }
+		      }
+		}
 		
 		
 		if (env.getGTBProbing() != null
@@ -2564,48 +2605,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
                 }
             }
         }
-		
-		
-		boolean inCheck = env.getBitboard().isInCheck();
-		
-		int staticEval = -1;
-		if (!inCheck) {
-			staticEval = lazyEval(depth, beta - 1, beta, rootColour);
-			
-			if (staticEval >= beta) {
-				//staticEval = fullEval(depth, beta - 1, beta, rootColour);
-			}
-		}
-		
-		int alpha_org = beta - 1;
-		
-	    // Mate distance pruning
-		if (USE_MATE_DISTANCE && !inCheck && depth >= 1) {
-			
-		      /*if (inCheck && !env.getBitboard().hasMove()) {
-					return -getMateVal(depth);
-		      }*/
-			
-		      int value = -getMateVal(depth+2); // does not work if the current position is mate
 
-		      if (value > alpha_org) {
-		         if (value >= beta) {
-					return value;
-		         }
-		      }
-
-		      // upper bound
-
-		      value = getMateVal(depth+1);
-
-		      if (value < beta) {
-		         beta = value;
-		         if (value <= alpha_org) {
-						return value;
-		         }
-		      }
-		}
-		
 		
 		if (!inCheck) {
 			
