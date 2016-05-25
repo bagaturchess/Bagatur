@@ -27,6 +27,8 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 
 
@@ -34,6 +36,16 @@ import bagaturchess.uci.api.IUCIConfig;
 
 
 public class Channel_Console extends Channel_Base {
+	
+	
+	public Channel_Console() {
+		super();
+	}
+	
+	
+	public Channel_Console(InputStream _in, OutputStream _out, PrintStream _dump) {
+		super(_in, _out, _dump);
+	}
 	
 	
 	//"single file", "multiple files", "none"

@@ -75,6 +75,11 @@ public class SearchMediatorProxy implements ISearchMediator {
 		return parent.getStopper();
 	}
 
+	@Override
+	public void setStopper(ISearchStopper stopper) {
+		parent.setStopper(stopper);
+	}
+	
 	public void startIteration(int iteration) {
 		parent.startIteration(iteration);
 	}

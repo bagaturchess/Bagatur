@@ -28,6 +28,7 @@ import bagaturchess.uci.api.BestMoveSender;
 public interface ISearchMediator {
 	
 	public ISearchStopper getStopper();
+	public void setStopper(ISearchStopper stopper);
 	
 	public ISearchInfo getLastInfo();
 	

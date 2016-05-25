@@ -24,33 +24,23 @@ package bagaturchess.search.impl.rootsearch.sequential;
 
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import bagaturchess.bitboard.api.IBinarySemaphore;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IFinishCallback;
-import bagaturchess.search.api.IRootSearchConfig_SMP;
-import bagaturchess.search.api.ISearchConfig_MTD;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.impl.alg.BetaGenerator;
 import bagaturchess.search.impl.alg.BetaGeneratorFactory;
 import bagaturchess.search.impl.alg.IBetaGenerator;
-import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
-import bagaturchess.search.impl.pv.PVManager;
-import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
@@ -136,11 +126,9 @@ public class SearchManager {
 		}
 		*/
 		
-		int threadsCount = ((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount();
-		
 		if (betasGen != null) {
 			
-			betasGen = BetaGeneratorFactory.create(betasGen.getLowerBound(), threadsCount, mediator.getTrustWindow_MTD_Step());
+			betasGen = BetaGeneratorFactory.create(betasGen.getLowerBound(), mediator.getTrustWindow_MTD_Step());
 			
 		} else {
 			
@@ -152,7 +140,7 @@ public class SearchManager {
 			
 			int staticRootEval = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, root_colour);
 			
-			betasGen = BetaGeneratorFactory.create(staticRootEval, threadsCount, mediator.getTrustWindow_MTD_Step());
+			betasGen = BetaGeneratorFactory.create(staticRootEval, mediator.getTrustWindow_MTD_Step());
 		}
 		
 		
@@ -437,7 +425,7 @@ public class SearchManager {
 	private boolean isLast() {
 		//boolean last = betasGen.getLowerBound() + mediator.getTrustWindow_BestMove() >= betasGen.getUpperBound();
 		boolean last = betasGen.getLowerBound() + mediator.getTrustWindow_BestMove()
-				+ (((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount() - 1) >= betasGen.getUpperBound();
+				/*+ (((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount() - 1)*/ >= betasGen.getUpperBound();
 				
 		if (!last) {
 			if (betasGen.getLowerBound() >= ISearch.MAX_MAT_INTERVAL
@@ -466,7 +454,7 @@ public class SearchManager {
 		String result = "";
 		result += "DISTRIBUTION-> Depth:" + currentdepth + ", Bounds: ["
 				+ betasGen.getLowerBound() + " <-> " + betasGen.getUpperBound()
-				+ "], ThreadsCount:" + ((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount() + ", BETAS: " + betas;
+				+ "], BETAS: " + betas;
 		return result;
 	}
 

@@ -23,12 +23,6 @@ public class PonderingStopper implements ISearchStopper {
 	
 	
 	@Override
-	public void setSecondaryStopper(ISearchStopper _secondaryStopper) {
-		secondaryStopper = _secondaryStopper;
-	}
-	
-	
-	@Override
 	public boolean isStopped() {
 		return stopped;
 	}

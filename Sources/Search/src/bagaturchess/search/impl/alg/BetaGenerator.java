@@ -34,9 +34,12 @@ public class BetaGenerator implements IBetaGenerator {
 	
 	private static final boolean DUMP = false;
 	
+	private static final int MAX_TREND_MULTIPLIER = 1000000;
+	
 	private static final int TREND_INIT = 0;
 	private static final int TREND_UP   = 1;
 	private static final int TREND_DOWN = -1;
+	
 	
 	private int betasCount;
 	
@@ -46,8 +49,6 @@ public class BetaGenerator implements IBetaGenerator {
 	private int trend_multiplier;
 	private int initial_interval;
 	private volatile int lastVal;
-	
-	private static final int MAX_TREND_MULTIPLIER = 1000000;
 	
 	
 	public BetaGenerator(int _initialVal, int _betasCount, int _initial_interval) {

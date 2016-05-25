@@ -136,11 +136,13 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	}
 	
 	
+	@Override
 	public ISearchStopper getStopper() {
 		return stopper;
 	}
 	
-	void setStoper(ISearchStopper _stopper) {
+	@Override
+	public void setStopper(ISearchStopper _stopper) {
 		stopper = _stopper;
 	}
 	

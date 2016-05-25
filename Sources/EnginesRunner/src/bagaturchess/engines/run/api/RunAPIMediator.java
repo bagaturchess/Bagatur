@@ -112,4 +112,10 @@ public class RunAPIMediator implements ISearchMediator {
 	public int getTrustWindow_MTD_Step() {
 		throw new UnsupportedOperationException();
 	}
+
+
+	@Override
+	public void setStopper(ISearchStopper _stopper) {
+		stopper = _stopper;
+	}
 }

@@ -23,8 +23,13 @@
 package bagaturchess.uci.run;
 
 
+import java.io.BufferedWriter;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+
+import jdk.nashorn.internal.runtime.Context.ThrowErrorManager;
 
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
@@ -90,7 +95,7 @@ public class Boot {
 		
 		(new Thread(
 				new Runnable() {
-
+					
 					@Override
 					public void run() {
 						try {
@@ -108,8 +113,16 @@ public class Boot {
 							for (IUCIOptionAction action: customActions) {
 								action.execute();
 							}
-						} catch (Exception e) {
-							communicationChanel.sendLogToGUI("Error while initializing StateManager: " + e.getMessage());
+						} catch (Throwable t) {
+							communicationChanel.sendLogToGUI("Error while initializing StateManager: " + t.getMessage());
+							t.printStackTrace(new PrintStream(communicationChanel.getOut_stream()));
+							if (t instanceof InvocationTargetException) {
+								t = ((InvocationTargetException)t).getCause();
+								communicationChanel.sendLogToGUI("Error while initializing StateManager: cause " + t);
+								if (t != null) {
+									communicationChanel.sendLogToGUI("Error while initializing StateManager: cause message " + t.getMessage());
+								}
+							}
 						}
 					}
 				}

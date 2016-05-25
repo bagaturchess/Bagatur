@@ -38,6 +38,7 @@ import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
+import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
@@ -126,12 +127,12 @@ public class MTDSchedulerMain {
 								}
 				);
 		
-		ChannelManager.setChannel(new Channel_Console());
+		ChannelManager.setChannel(new Channel_Console(System.in, System.out, System.out));
 		
 		SharedData arg1 = new SharedData(ChannelManager.getChannel(), cfg);
-		//IRootSearch search = new MTDParallelSearch(new Object[] {cfg, arg1});
+		IRootSearch search = new MTDParallelSearch(new Object[] {cfg, arg1});
 		
-		IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
+		//IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
 		
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
@@ -518,9 +519,9 @@ public class MTDSchedulerMain {
 		
 		//ISearchMediator mediator2 = new MediatorDummper(bitboard, eval, 5000000, true);
 		
-		searchMultiPV.newGame(bitboard);
-		searchMultiPV.negamax(bitboard, mediator1, 1, 100, true);
-		//search.negamax(bitboard, mediator1, 1, 100, true);
+		//searchMultiPV.newGame(bitboard);
+		//searchMultiPV.negamax(bitboard, mediator1, 1, 100, true);
+		search.negamax(bitboard, mediator1, 1, ISearch.MAX_DEPTH, true);
 		
 		//search.negamax(bitboard, mediator1, 2, 2, true);
 		

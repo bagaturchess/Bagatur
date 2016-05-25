@@ -27,7 +27,6 @@ package bagaturchess.search.api.internal;
 public interface ISearchStopper {
 	
 	public void markStopped();
-	public void setSecondaryStopper(ISearchStopper secondaryStopper);
 	
 	public boolean isStopped();
 	

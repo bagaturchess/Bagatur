@@ -30,6 +30,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearchConfig_SMP;
+import bagaturchess.search.api.internal.CompositeStopper;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
@@ -92,7 +93,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 				startIteration, maxIterations, finishCallback);
 		
 		final ISearchStopper mtd_stopper = new MTDStopper(getBitboardForSetup().getColourToMove(), distribution);
-		mediator.getStopper().setSecondaryStopper(mtd_stopper);
+		mediator.setStopper(new CompositeStopper(new ISearchStopper[] {mediator.getStopper(), mtd_stopper} ));
 		
 		
 		final ISearchMediator final_mediator = mediator;
@@ -105,8 +106,8 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 							&& distribution.getCurrentDepth() <= distribution.getMaxIterations() //Condition for fixed depth or MultiPV search
 							) {
 						
-						Runnable task = new NullwinSearchTask(executor, searcher, distribution, getBitboardForSetup(),
-								final_mediator, getSharedData(), useMateDistancePrunning
+						Runnable task = new NullwinSearchTask(searcher, distribution, getBitboardForSetup(),
+								final_mediator, useMateDistancePrunning
 																);
 						task.run();
 					}

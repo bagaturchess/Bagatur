@@ -30,8 +30,6 @@ import bagaturchess.search.api.ISearchConfig_MTD;
 import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
-//import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.impl.alg.BetaGenerator;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;

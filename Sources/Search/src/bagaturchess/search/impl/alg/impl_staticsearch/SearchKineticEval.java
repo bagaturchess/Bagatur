@@ -100,6 +100,12 @@ public class SearchKineticEval implements IKineticEval {
 			// TODO Auto-generated method stub
 			return 0;
 		}
+
+		@Override
+		public void setStopper(ISearchStopper stopper) {
+			// TODO Auto-generated method stub
+			
+		}
 	};
 	
 	IRootWindow rootWin = new RootWindowImpl();

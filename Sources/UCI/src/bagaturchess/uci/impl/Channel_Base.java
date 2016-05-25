@@ -56,6 +56,9 @@ public class Channel_Base implements IChannel {
 	
 	protected BufferedReader in;
 	protected BufferedWriter out;
+
+	private InputStream in_stream;
+	private OutputStream out_stream;
 	
 	
 	public Channel_Base() {
@@ -64,6 +67,9 @@ public class Channel_Base implements IChannel {
 	
 	
 	public Channel_Base(InputStream _in, OutputStream _out, PrintStream _dump) {
+		
+		in_stream = _in;
+		out_stream = _out;
 		
 		in = new BufferedReader(new InputStreamReader(_in));
 		out = new BufferedWriter(new OutputStreamWriter(_out));
@@ -83,6 +89,16 @@ public class Channel_Base implements IChannel {
 	
 	public BufferedWriter getOut() {
 		return out;
+	}
+	
+	
+	public InputStream getIn_stream() {
+		return in_stream;
+	}
+
+
+	public OutputStream getOut_stream() {
+		return out_stream;
 	}
 	
 	

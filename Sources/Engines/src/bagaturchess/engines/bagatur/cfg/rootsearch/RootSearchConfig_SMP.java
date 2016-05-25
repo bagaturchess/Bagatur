@@ -74,12 +74,12 @@ public class RootSearchConfig_SMP extends RootSearchConfig_BaseImpl implements I
 	
 	
 	private static final int getDefaultThreadsCount() {
-		/*int threads = Runtime.getRuntime().availableProcessors();
+		int threads = Runtime.getRuntime().availableProcessors();
 		if (threads < 2) {
 			threads = 2;
 		}		
 		return threads;
-		*/
-		return 1;
+		
+		//return 1;
 	}
 }

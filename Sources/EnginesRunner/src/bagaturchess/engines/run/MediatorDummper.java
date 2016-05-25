@@ -193,4 +193,9 @@ public class MediatorDummper implements ISearchMediator {
 	public int getTrustWindow_MTD_Step() {
 		return 4;
 	}
+
+	@Override
+	public void setStopper(ISearchStopper _stopper) {
+		stopper = _stopper;
+	}
 }

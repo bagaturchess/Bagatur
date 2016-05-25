@@ -76,7 +76,7 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 					int eval_diff = Math.abs(info.getEval() - lastinfo.getEval());
 					best_moves_diffs_per_depth.addValue(eval_diff, eval_diff);
 				}
-				dump("UCISearchMediatorImpl_Base Trust Window MTD Step set to " + getTrustWindow_MTD_Step());
+				//dump("Mediator_AlphaAndBestMoveWindow Trust Window MTD Step set to " + getTrustWindow_MTD_Step());
 			}
 		
 			lastinfo = info;
@@ -121,7 +121,7 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 		
 		trustWindow_BestMove = cur_mtdTrustWindow;
 		
-		dump("UCISearchMediatorImpl_Base Trust Window Best Move set to " + trustWindow_BestMove);
+		//dump("Mediator_AlphaAndBestMoveWindow Trust Window Best Move set to " + trustWindow_BestMove);
 	}
 	
 	
@@ -147,7 +147,7 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 			trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MAX;
 		}
 		
-		dump("UCISearchMediatorImpl_Base Trust Window Alpha Aspiration set to " + trustWindow_AlphaAspiration);
+		//dump("Mediator_AlphaAndBestMoveWindow Trust Window Alpha Aspiration set to " + trustWindow_AlphaAspiration);
 	}
 	
 	

@@ -23,8 +23,6 @@
 package bagaturchess.search.impl.rootsearch.sequential;
 
 
-import java.util.concurrent.Executor;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearch;
@@ -32,11 +30,9 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.alg.IBetaGenerator;
-import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.pv.PVNode;
-import bagaturchess.search.impl.rootsearch.parallel.SearchersPool;
 
 
 public class NullwinSearchTask implements Runnable {
@@ -45,23 +41,19 @@ public class NullwinSearchTask implements Runnable {
 	private boolean DEBUG = false;
 	
 	
-	private Executor tpool;
 	private ISearch searcher;
 	private SearchManager distribution;
 	private IBitBoard bitboard;
 	private ISearchMediator mediator;
-	private SharedData sharedData;
 	private boolean useMateDistancePrunning;
 	
 	
-	public NullwinSearchTask(Executor _tpool, ISearch _searcher, SearchManager _distribution,
-			IBitBoard _bitboard, ISearchMediator _mediator, SharedData _sharedData, boolean _useMateDistancePrunning) {
-		tpool = _tpool;
+	public NullwinSearchTask(ISearch _searcher, SearchManager _distribution,
+			IBitBoard _bitboard, ISearchMediator _mediator, boolean _useMateDistancePrunning) {
 		searcher = _searcher;
 		distribution = _distribution;
 		bitboard = _bitboard;
 		mediator = _mediator;
-		sharedData = _sharedData;
 		useMateDistancePrunning = _useMateDistancePrunning;
 	}
 	
