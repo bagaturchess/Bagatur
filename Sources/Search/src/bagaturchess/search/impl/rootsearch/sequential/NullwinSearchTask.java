@@ -46,15 +46,17 @@ public class NullwinSearchTask implements Runnable {
 	private IBitBoard bitboard;
 	private ISearchMediator mediator;
 	private boolean useMateDistancePrunning;
+	private int[] prevPV;
 	
 	
 	public NullwinSearchTask(ISearch _searcher, SearchManager _distribution,
-			IBitBoard _bitboard, ISearchMediator _mediator, boolean _useMateDistancePrunning) {
+			IBitBoard _bitboard, ISearchMediator _mediator, boolean _useMateDistancePrunning, int[] _prevPV) {
 		searcher = _searcher;
 		distribution = _distribution;
 		bitboard = _bitboard;
 		mediator = _mediator;
 		useMateDistancePrunning = _useMateDistancePrunning;
+		prevPV = _prevPV;
 	}
 	
 	
@@ -117,10 +119,11 @@ public class NullwinSearchTask implements Runnable {
 			
 			//searcher = searchers.getSearcher(bitboard, sharedData);
 			
-			int[] prevPV = null;
-			PVHistoryEntry entry = searcher.getEnv().getPVs().getPV(bitboard.getHashKey());
-			if (entry != null) {
-				prevPV = searcher.getEnv().getPVs().getPV(searcher.getEnv().getBitboard().getHashKey()).getPv();
+			if (prevPV == null) {
+				PVHistoryEntry entry = searcher.getEnv().getPVs().getPV(bitboard.getHashKey());
+				if (entry != null) {
+					prevPV = searcher.getEnv().getPVs().getPV(searcher.getEnv().getBitboard().getHashKey()).getPv();
+				}
 			}
 			
 			RootSearchMTDImpl rootWin = new RootSearchMTDImpl(bitboard.getColourToMove(), distribution.getBetasGen());

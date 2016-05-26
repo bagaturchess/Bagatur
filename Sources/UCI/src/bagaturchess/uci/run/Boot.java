@@ -101,14 +101,17 @@ public class Boot {
 							
 							List<IUCIOptionAction> customActions = new ArrayList<IUCIOptionAction>();
 							customActions.add(new UCIOptionAction_RecreateLogging(ChannelManager.getChannel(), engineBootCfg));
-							//customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager));
 							
 							OptionsManager optionsManager = new OptionsManager(communicationChanel, (IUCIOptionsProvider) optionsRegistry, customActions);
 							manager.setOptionsManager(optionsManager);
 							
-							for (IUCIOptionAction action: customActions) {
+							customActions.get(0).execute(); //Init logging
+							
+							/*for (IUCIOptionAction action: customActions) {
 								action.execute();
-							}
+							}*/
+							
 						} catch (Throwable t) {
 							communicationChanel.sendLogToGUI("Error while initializing StateManager: " + t.getMessage());
 							communicationChanel.dump(t);

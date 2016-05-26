@@ -38,6 +38,7 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
+import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
 import bagaturchess.search.impl.utils.DEBUGSearch;
@@ -96,8 +97,8 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 	
 	
 	@Override
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator root_mediator, int startIteration, int maxIterations,
-			boolean useMateDistancePrunning, IFinishCallback finishCallback) {
+	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator root_mediator, final int startIteration, final int maxIterations,
+			final boolean useMateDistancePrunning, final IFinishCallback finishCallback, final int[] prevPV) {
 		
 		
 		if (stopper != null) {
@@ -112,24 +113,10 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		//searchers.waitSearchersToStop(); //Removed because of pondering. During pondering all threads are busy.
 		setupBoard(_bitboardForSetup);
 		
-		if (DEBUGSearch.DEBUG_MODE) root_mediator.dump("Parallel search started from depth " + startIteration + " to depth " + maxIterations);
+		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("Parallel search started from depth " + startIteration + " to depth " + maxIterations);
 		
 		
-		final List<BucketMediator> mediators = new ArrayList<BucketMediator>();
-		for (int i = 0; i < searchers.size(); i++) {
-			mediators.add(new BucketMediator(root_mediator, new CompositeStopper(new ISearchStopper[] {stopper, root_mediator.getStopper()})));
-		}
-		
-		
-		//Original root_mediator should be an instance of UCISearchMediatorImpl_Base
-		/*root_mediator = (root_mediator instanceof MultiPVMediator) ?
-				new Mediator_AlphaAndBestMoveWindow(root_mediator, this) :
-				new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(root_mediator, this));
-		*/
-		
-		for (int i = 0; i < searchers.size(); i++) {
-			searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), startIteration, maxIterations, useMateDistancePrunning, finishCallback);
-		}
+		root_mediator.setStopper(new CompositeStopper(new ISearchStopper[] {root_mediator.getStopper(), stopper}));
 		
 		
 		final ISearchMediator final_mediator = root_mediator;
@@ -137,14 +124,26 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {
+				
 				try {
+					
+					
+					final List<BucketMediator> mediators = new ArrayList<BucketMediator>();
+					for (int i = 0; i < searchers.size(); i++) {
+						mediators.add(new BucketMediator(final_mediator));
+					}
+					
+					
+					for (int i = 0; i < searchers.size(); i++) {
+						searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), startIteration, maxIterations, useMateDistancePrunning, finishCallback, prevPV);
+					}
 					
 					
 					int CHECK_INTERVAL_MIN = 15;
 					int CHECK_INTERVAL_MAX = 15;
 					int check_interval = CHECK_INTERVAL_MIN;
 					
-					int cur_depth = 1;
+					int cur_depth = startIteration;
 					
 					
 					boolean isReady = false;
@@ -152,29 +151,53 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							|| !isReady //Ready is when all best infos are send, even after the stopper has stopped
 							) {
 							
+							try {
+								final_mediator.getStopper().stopIfNecessary(maxIterations, getBitboardForSetup().getColourToMove(), ISearch.MIN, ISearch.MAX);
+							} catch(SearchInterruptedException sie) {
+								
+							}
+							
+							int countWinners = 0;
 							//Collect major infos by depth
 							//final_mediator.dump("Collect major infos for depth " + cur_depth);
-							List<ISearchInfo> majorInfosByDepth = new ArrayList<ISearchInfo>();
+							List<ISearchInfo> majorInfosForFixDepth = new ArrayList<ISearchInfo>();
 							for (int i_mediator = 0; i_mediator < mediators.size(); i_mediator++) {
+								
 								BucketMediator cur_mediator = mediators.get(i_mediator);
-								for (int i_major = 0; i_major < cur_mediator.majorInfos.size(); i_major++) {								
-									ISearchInfo curMajor = cur_mediator.majorInfos.get(i_major);
-									if (!curMajor.isUpperBound() && curMajor.getDepth() == cur_depth) {
-										majorInfosByDepth.add(curMajor);
+								
+								ISearchInfo cur_mediator_lastinfo = null;
+								for (int i_major = cur_mediator.majorInfos.size() - 1; i_major >= 0; i_major--) {								
+									ISearchInfo curinfo = cur_mediator.majorInfos.get(i_major);
+									if (!curinfo.isUpperBound() && curinfo.getDepth() == cur_depth) {
+										cur_mediator_lastinfo = curinfo;
+										break;
 									}
 								}
+								
+								if (cur_mediator_lastinfo != null) {
+									countWinners++;
+								}
+								
+								majorInfosForFixDepth.add(cur_mediator_lastinfo != null ? cur_mediator_lastinfo : null);
 							}
 							
 							
 							//Select best major by depth
 							//final_mediator.dump("Select best major for depth " + cur_depth);
 							ISearchInfo bestMajor = null;
-							for (int i = 0; i < majorInfosByDepth.size(); i++) {
-								ISearchInfo curMajor = majorInfosByDepth.get(i);
-								if (bestMajor == null) {
-									bestMajor = curMajor;
-								} else if (curMajor.getEval() > bestMajor.getEval()) {
-									bestMajor = curMajor;
+							int bestInfoIndex = -1;
+							for (int i = 0; i < majorInfosForFixDepth.size(); i++) {
+								
+								ISearchInfo curMajor = majorInfosForFixDepth.get(i);
+								
+								if (curMajor != null) { //Searcher i has produced info object
+									if (bestMajor == null) {
+										bestMajor = curMajor;
+										bestInfoIndex = i;
+									} else if (curMajor.getEval() > bestMajor.getEval()) {
+										bestMajor = curMajor;
+										bestInfoIndex = i;
+									}
 								}
 							}
 							
@@ -182,13 +205,56 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							//Send major
 							if (bestMajor != null) {
 								
-								final_mediator.dump("Selected bestMajor = " + bestMajor);
-								
+								if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Selected bestMajor = " + bestMajor);
+								;
 								final_mediator.changedMajor(bestMajor);
 								
-								cur_depth++;
+								//if (mediators.get(bestInfoIndex).completedDepth == cur_depth) {
+									cur_depth++;
+								//}
+								
+								if (cur_depth > maxIterations) {
+									break;
+								}
 								
 								check_interval = CHECK_INTERVAL_MIN;
+								
+								if (bestInfoIndex == -1) {
+									throw new IllegalStateException("bestInfoIndex = -1");
+								}
+								
+								if (countWinners == 1) {
+									
+									if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: countWinners is 1");
+									
+									if (!final_mediator.getStopper().isStopped()) {
+										
+										//Stop and start all searchers except the winner
+										
+										for (int i = 0; i < searchers.size(); i++) {
+											if (i != bestInfoIndex) {
+												if (cur_depth <= maxIterations) {
+													searchers.get(i).stopSearchAndWait();
+												}
+											}
+										}
+										
+										if (cur_depth <= maxIterations) {
+											for (int i = 0; i < searchers.size(); i++) {
+												if (i != bestInfoIndex) {
+													
+														mediators.get(i).clearStopper();
+														//searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations,
+														//		useMateDistancePrunning, finishCallback, bestMajor.getPV());
+														searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth - 1, maxIterations,
+																useMateDistancePrunning, finishCallback, bestMajor.getPV());
+												}
+											}
+										}
+										
+									}
+								}
+								
 								
 							} else {
 								
@@ -196,7 +262,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 									isReady = true;
 								}
 								
-								//final_mediator.dump("bestMajor not found");
+								//ChannelManager.getChannel().dump("MTDParallelSearch: bestMajor not found");
 								
 								//Wait some time and than make check again
 								Thread.sleep(check_interval);
@@ -208,15 +274,26 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							}
 					}
 					
+					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Out of loop");
+					
 					for (int i = 0; i < searchers.size(); i++) {
-						searchers.get(i).stopSearch();
+						searchers.get(i).stopSearchAndWait();
 					}
+					
+					
+					if (stopper == null) {
+						throw new IllegalStateException();
+					}
+					stopper.markStopped();
+					stopper = null;
+					
 					
 					final_mediator.getBestMoveSender().sendBestMove();
 					
+					
 				} catch(Throwable t) {
-					final_mediator.dump(t);
-					final_mediator.dump(t.getMessage());
+					ChannelManager.getChannel().dump(t);
+					ChannelManager.getChannel().dump(t.getMessage());
 				}
 			}
 		});
@@ -286,19 +363,46 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		private BestMoveSender bestmovesender;
 		
 		
-		public BucketMediator(ISearchMediator _parent, ISearchStopper _root_stopper) {
+		public BucketMediator(ISearchMediator _parent) {
 			
 			super(_parent);
 			
 			minorInfos = new ArrayList<ISearchInfo>();
 			majorInfos = new ArrayList<ISearchInfo>();
 			
-			stopper = _root_stopper;
+
 			
 			bestmovesender = new BestMoveSender() {
 				@Override
 				public void sendBestMove() {
 					//Do nothing
+				}
+			};
+			
+			clearStopper();
+		}
+		
+		
+		protected void clearStopper() {
+			stopper = new ISearchStopper() {
+				
+				@Override
+				public void stopIfNecessary(int maxdepth, int colour, double alpha,
+						double beta) throws SearchInterruptedException {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void markStopped() {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public boolean isStopped() {
+					// TODO Auto-generated method stub
+					return false;
 				}
 			};
 		}

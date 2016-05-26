@@ -33,7 +33,7 @@ public class CallbackTest implements IFinishCallback {
 		
 		//ISearchMediator mediator1 = new MediatorDummper(bitboard, evaluator, 5000000, true);
 		
-		search.negamax(bitboard, mediator, depth, depth, true, this);
+		search.negamax(bitboard, mediator, depth, depth, true, this, null);
 
 	}
 }

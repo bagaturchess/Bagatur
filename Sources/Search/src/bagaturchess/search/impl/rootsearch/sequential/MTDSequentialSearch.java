@@ -37,6 +37,7 @@ import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.utils.DEBUGSearch;
+import bagaturchess.uci.api.ChannelManager;
 
 
 public class MTDSequentialSearch extends RootSearch_BaseImpl {
@@ -71,7 +72,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	
 	
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback finishCallback) {
+			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback finishCallback, final int[] prevPV) {
 		
 		
 		if (stopper != null) {
@@ -88,7 +89,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		
 		setupBoard(_bitboardForSetup);
 		
-		if (DEBUGSearch.DEBUG_MODE) mediator.dump("Sequential search started from depth " + 1 + " to depth " + maxIterations);
+		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch started from depth " + startIteration + " to depth " + maxIterations);
 		
 		
 		//Original mediator should be an instance of UCISearchMediatorImpl_Base
@@ -110,21 +111,33 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 			public void run() {
 				try {
 					
+					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch before loop");
+					
 					while (!final_mediator.getStopper().isStopped() //Condition for normal play
 							&& distribution.getCurrentDepth() <= distribution.getMaxIterations() //Condition for fixed depth or MultiPV search
 							) {
 						
 						Runnable task = new NullwinSearchTask(searcher, distribution, getBitboardForSetup(),
-								final_mediator, useMateDistancePrunning
+								final_mediator, useMateDistancePrunning, prevPV
 																);
 						task.run();
 					}
 					
+					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch after loop stopper stopped " + final_mediator.getStopper().isStopped());
+					
+					if (stopper == null) {
+						throw new IllegalStateException();
+					}
+					stopper.markStopped();
+					stopper = null;
+					
+					
 					final_mediator.getBestMoveSender().sendBestMove();
 					
+					
 				} catch(Throwable t) {
-					final_mediator.dump(t);
-					final_mediator.dump(t.getMessage());
+					ChannelManager.getChannel().dump(t);
+					ChannelManager.getChannel().dump(t.getMessage());
 				}
 			}
 		});

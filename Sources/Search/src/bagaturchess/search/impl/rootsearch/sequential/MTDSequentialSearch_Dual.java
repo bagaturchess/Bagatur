@@ -93,7 +93,7 @@ public class MTDSequentialSearch_Dual extends RootSearch_BaseImpl {
 	
 	
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, boolean useMateDistancePrunning, IFinishCallback finishCallback) {
+			int startIteration, int maxIterations, boolean useMateDistancePrunning, IFinishCallback finishCallback, int[] prevPV) {
 		
 		if (maxIterations > ISearch.MAX_DEPTH) {
 			maxIterations = ISearch.MAX_DEPTH;
@@ -215,14 +215,14 @@ public class MTDSequentialSearch_Dual extends RootSearch_BaseImpl {
 	@Override
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator,
 			int startIteration, int maxIterations,
-			boolean useMateDistancePrunning) {
+			boolean useMateDistancePrunning, int[] prevPV) {
 		// TODO Auto-generated method stub
 		
 	}
 
 
 	@Override
-	public void stopSearch() {
+	public void stopSearchAndWait() {
 		throw new UnsupportedOperationException();
 	}
 }

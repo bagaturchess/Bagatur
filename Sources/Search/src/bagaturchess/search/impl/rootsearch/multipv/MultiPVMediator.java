@@ -206,7 +206,7 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	private void startNextSearch() {
 		try {
 			bitboard.makeMoveForward(getCurrentPVEntry().getMove());
-			rootSearch.negamax(bitboard, this, cur_depth, cur_depth, useMateDistancePrunning, this);
+			rootSearch.negamax(bitboard, this, cur_depth, cur_depth, useMateDistancePrunning, this, null);
 			bitboard.makeMoveBackward(getCurrentPVEntry().getMove());
 		} catch(SearchInterruptedException sie) {
 			//Do Nothing

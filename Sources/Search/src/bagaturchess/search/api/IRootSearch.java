@@ -37,12 +37,12 @@ public interface IRootSearch {
 	
 	public void newGame(IBitBoard bitboardForSetup);
 	
-	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, boolean useMateDistancePrunning);
-	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int maxIterations, boolean useMateDistancePrunning);
-	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int startIteration, int maxIterations, boolean useMateDistancePrunning);
-	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int startIteration, int maxIterations, boolean useMateDistancePrunning, IFinishCallback finishCallback);
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, boolean useMateDistancePrunning, int[] prevPV);
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int maxIterations, boolean useMateDistancePrunning, int[] prevPV);
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int startIteration, int maxIterations, boolean useMateDistancePrunning, int[] prevPV);
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int startIteration, int maxIterations, boolean useMateDistancePrunning, IFinishCallback finishCallback, int[] prevPV);
 	
-	public void stopSearch();
+	public void stopSearchAndWait();
 	
 	public void shutDown();
 }

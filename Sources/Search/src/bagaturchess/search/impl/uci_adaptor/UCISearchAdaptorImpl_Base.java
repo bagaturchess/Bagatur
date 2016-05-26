@@ -180,11 +180,11 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 					}
 				}
 				
-				searcher.negamax(boardForSetup, currentMediator, start_iteration, maxIterations, true);
+				searcher.negamax(boardForSetup, currentMediator, start_iteration, maxIterations, true, null);
 			}
 		} else {
 			currentMediator.dump("Endless search started");
-			searcher.negamax(boardForSetup, currentMediator, false);
+			searcher.negamax(boardForSetup, currentMediator, false, null);
 		}
 		
 		/*if (ponderSearch) {
@@ -243,7 +243,7 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		currentGoCommand = null;
 		
 		IRootSearch searcher = getSearcher(isPonderSearch(currentGoCommand));
-		searcher.stopSearch();
+		searcher.stopSearchAndWait();
 		
 		int move = info.getBestMove();
 		int ponder = 0;

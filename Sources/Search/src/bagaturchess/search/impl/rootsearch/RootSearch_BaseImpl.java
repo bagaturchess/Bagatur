@@ -34,6 +34,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.env.SharedData;
+import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
 
 
@@ -44,7 +45,7 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	private SharedData sharedData;
 	private IBitBoard bitboardForSetup;
 	
-	protected ISearchStopper stopper;
+	protected volatile ISearchStopper stopper;
 	
 	
 	public RootSearch_BaseImpl(Object[] args) {
@@ -76,27 +77,27 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	
 	
 	@Override
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, boolean useMateDistancePrunning) {
-		negamax(_bitboardForSetup, mediator, ISearch.MAX_DEPTH, useMateDistancePrunning);
+	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, boolean useMateDistancePrunning, int[] prevPV) {
+		negamax(_bitboardForSetup, mediator, ISearch.MAX_DEPTH, useMateDistancePrunning, prevPV);
 	}
 
 
 	@Override
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, int maxIterations, boolean useMateDistancePrunning) {
-		negamax(_bitboardForSetup, mediator, 1, maxIterations, useMateDistancePrunning);
+	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, int maxIterations, boolean useMateDistancePrunning, int[] prevPV) {
+		negamax(_bitboardForSetup, mediator, 1, maxIterations, useMateDistancePrunning, prevPV);
 	}
 	
 	
 	@Override
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator,
 			int startIteration, int maxIterations,
-			boolean useMateDistancePrunning) {
+			boolean useMateDistancePrunning, int[] prevPV) {
 		negamax(bitboardForSetup, mediator, startIteration, maxIterations,
 				useMateDistancePrunning, new IFinishCallback() {
 					@Override
 					public void ready() {
 					}
-				});
+				}, prevPV);
 	}
 	
 	
@@ -125,12 +126,23 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	}
 	
 	@Override
-	public void stopSearch() {
+	public void stopSearchAndWait() {
 		
 		if (stopper != null) {
 			stopper.markStopped();
-			stopper = null;
 		}
+		
+		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("stopSearchAndWait - enter");
+		
+		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(new Exception("just stack dump"));
+		
+		while (stopper != null) {
+			try {
+				Thread.sleep(15);
+			} catch (InterruptedException e) {}
+		}
+		
+		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("stopSearchAndWait - exit");
 	}
 	
 	@Override

@@ -54,7 +54,7 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 	@Override
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
 			int startIteration, int maxIterations,
-			boolean useMateDistancePrunning, IFinishCallback finishCallback) {
+			boolean useMateDistancePrunning, IFinishCallback finishCallback, int[] prevPV) {
 		
 		setupBoard(_bitboardForSetup);
 		
@@ -88,7 +88,7 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 
 
 	@Override
-	public void stopSearch() {
-		rootSearch.stopSearch();
+	public void stopSearchAndWait() {
+		rootSearch.stopSearchAndWait();
 	}
 }

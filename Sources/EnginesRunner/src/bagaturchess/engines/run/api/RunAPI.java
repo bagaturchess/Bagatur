@@ -37,7 +37,7 @@ public class RunAPI {
 		engine.newGame(bitboard);
 		
 		RunAPIMediator mediator = new RunAPIMediator(status, millis);
-		engine.negamax(bitboard, mediator, 1, max_depth, true);
+		engine.negamax(bitboard, mediator, 1, max_depth, true, null);
 		
 		while (!mediator.getStopper().isStopped() && !((RunAPIBestMoveSender) mediator.getBestMoveSender()).isInterrupted()) {
 			try {

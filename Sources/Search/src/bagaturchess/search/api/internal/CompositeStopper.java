@@ -14,9 +14,10 @@ public class CompositeStopper implements ISearchStopper {
 	
 	@Override
 	public void markStopped() {
-		for (int i = 0; i < stoppers.length; i++) {
-			stoppers[i].markStopped();
-		}
+		//Do Nothing
+		//for (int i = 0; i < stoppers.length; i++) {
+		//	stoppers[i].markStopped();
+		//}
 	}
 	
 

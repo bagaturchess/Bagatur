@@ -57,21 +57,21 @@ public class MTDMixedSearch extends RootSearch_BaseImpl {
 	
 	@Override
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int startIteration, int maxIterations,
-			boolean useMateDistancePrunning, IFinishCallback finishCallback) {
+			boolean useMateDistancePrunning, IFinishCallback finishCallback, int[] prevPV) {
 		if (maxIterations > ISearch.MAX_DEPTH) {
 			maxIterations = ISearch.MAX_DEPTH;
 		}
 		
 		if (maxIterations <= SEQUENTIAL_DEPTH) {
 			
-			sequentialSearch.negamax(bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, finishCallback);
+			sequentialSearch.negamax(bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, finishCallback, prevPV);
 			
 		} else {
 			if (startIteration <= SEQUENTIAL_DEPTH) {
 				
 				IFinishCallback parallelSearchStarter = new FinishCallback_StartParallelSearch(parallelSearch, bitboardForSetup,
 						mediator, SEQUENTIAL_DEPTH + 1, maxIterations, useMateDistancePrunning, finishCallback);
-				sequentialSearch.negamax(bitboardForSetup, mediator, 1, SEQUENTIAL_DEPTH, useMateDistancePrunning, parallelSearchStarter);
+				sequentialSearch.negamax(bitboardForSetup, mediator, 1, SEQUENTIAL_DEPTH, useMateDistancePrunning, parallelSearchStarter, prevPV);
 				
 			} else {
 				

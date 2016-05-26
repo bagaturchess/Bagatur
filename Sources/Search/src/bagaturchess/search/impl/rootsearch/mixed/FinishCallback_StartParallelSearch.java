@@ -32,6 +32,6 @@ public class FinishCallback_StartParallelSearch implements IFinishCallback {
 
 
 	public void ready() {
-		parallelSearch.negamax(bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, finishCallback);
+		parallelSearch.negamax(bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, finishCallback, null);
 	}
 }
