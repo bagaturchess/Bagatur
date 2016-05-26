@@ -85,4 +85,10 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 	public void decreaseTPTDepths(int reduction) {
 		rootSearch.decreaseTPTDepths(reduction);
 	}
+
+
+	@Override
+	public void stopSearch() {
+		rootSearch.stopSearch();
+	}
 }

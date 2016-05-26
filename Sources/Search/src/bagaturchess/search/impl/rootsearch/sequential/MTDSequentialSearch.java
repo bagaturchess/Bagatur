@@ -73,6 +73,13 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
 			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback finishCallback) {
 		
+		
+		if (stopper != null) {
+			throw new IllegalStateException("MTDSequentialSearch started whithout beeing stopped");
+		}
+		stopper = new Stopper();
+		
+		
 		if (maxIterations > ISearch.MAX_DEPTH) {
 			throw new IllegalStateException("maxIterations=" + maxIterations + " > ISearch.MAX_DEPTH");
 		}
@@ -92,8 +99,8 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup(), getSharedData(), getBitboardForSetup().getHashKey(),
 				startIteration, maxIterations, finishCallback);
 		
-		final ISearchStopper mtd_stopper = new MTDStopper(getBitboardForSetup().getColourToMove(), distribution);
-		mediator.setStopper(new CompositeStopper(new ISearchStopper[] {mediator.getStopper(), mtd_stopper} ));
+		//final ISearchStopper stopper = new MTDStopper(getBitboardForSetup().getColourToMove(), distribution);
+		mediator.setStopper(new CompositeStopper(new ISearchStopper[] {mediator.getStopper(), stopper} ));
 		
 		
 		final ISearchMediator final_mediator = mediator;
@@ -102,6 +109,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 			@Override
 			public void run() {
 				try {
+					
 					while (!final_mediator.getStopper().isStopped() //Condition for normal play
 							&& distribution.getCurrentDepth() <= distribution.getMaxIterations() //Condition for fixed depth or MultiPV search
 							) {
@@ -112,6 +120,8 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 						task.run();
 					}
 					
+					final_mediator.getBestMoveSender().sendBestMove();
+					
 				} catch(Throwable t) {
 					final_mediator.dump(t);
 					final_mediator.dump(t.getMessage());
@@ -119,8 +129,8 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 			}
 		});
 	}
-
-
+	
+	
 	@Override
 	public void shutDown() {
 		try {

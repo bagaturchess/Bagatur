@@ -9,7 +9,6 @@ import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.attacks.control.metadata.SeeMetadata;
 import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
-import bagaturchess.bitboard.impl.utils.BinarySemaphore;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.egtb.gaviota.GTBProbing_NativeWrapper;
@@ -20,6 +19,7 @@ import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.tpt.TPTable;
+import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.api.IChannel;
 
 
@@ -76,7 +76,9 @@ public class MemoryConsumers {
 		
 		engineConfiguration = _engineConfiguration;
 		
-		channel.sendLogToGUI("OS arch: " + getJVMBitmode() + " bits");
+		ChannelManager.getChannel().dump("OS arch: " + getJVMBitmode() + " bits");
+		
+		//ChannelManager.getChannel().dump(new Exception());
 		
 		//if (getAvailableMemory() / (1024 * 1024) < 63 - (JVMDLL_MEMORY_CONSUMPTION / (1024 * 1024))) {
 		//	throw new IllegalStateException("Not enough memory. The engine needs from at least 64MB to run. Please increase the -Xmx option of Java VM");
@@ -89,21 +91,21 @@ public class MemoryConsumers {
 			availableMemory = getAvailableMemory() - MIN_MEMORY_BUFFER;
 		}
 		
-		channel.sendLogToGUI("JVM DLL memory consumption: " + (JVMDLL_MEMORY_CONSUMPTION / (1024 * 1024)) + "MB");
+		ChannelManager.getChannel().dump("JVM DLL memory consumption: " + (JVMDLL_MEMORY_CONSUMPTION / (1024 * 1024)) + "MB");
 		
-		channel.sendLogToGUI("Available memory for the java process " + (getAvailableMemory() / (1024 * 1024)) + "MB");
-		channel.sendLogToGUI("Defined memory usage percent " + (MEMORY_USAGE_PERCENT * 100) + "%");
-		channel.sendLogToGUI("Memory the Engine will use " + (availableMemory / (1024 * 1024)) + "MB");
+		ChannelManager.getChannel().dump("Available memory for the java process " + (getAvailableMemory() / (1024 * 1024)) + "MB");
+		ChannelManager.getChannel().dump("Defined memory usage percent " + (MEMORY_USAGE_PERCENT * 100) + "%");
+		ChannelManager.getChannel().dump("Memory the Engine will use " + (availableMemory / (1024 * 1024)) + "MB");
 		
-		channel.sendLogToGUI("Initializing Memory Consumers ...");
+		ChannelManager.getChannel().dump("Initializing Memory Consumers ...");
 		
-		channel.sendLogToGUI("SEE Metadata ... ");
+		ChannelManager.getChannel().dump("SEE Metadata ... ");
 		long lastAvailable_in_MB = ((getAvailableMemory() - memoryBuffer) / (1024 * 1024));
 		seeMetadata = SeeMetadata.getSingleton();
-		channel.sendLogToGUI("SEE Metadata OK => " + (lastAvailable_in_MB - ((getAvailableMemory() - memoryBuffer) / (1024 * 1024))) + "MB");
+		ChannelManager.getChannel().dump("SEE Metadata OK => " + (lastAvailable_in_MB - ((getAvailableMemory() - memoryBuffer) / (1024 * 1024))) + "MB");
 		
 		
-		channel.sendLogToGUI("Openning Book enabled: " + ownBookEnabled);
+		ChannelManager.getChannel().dump("Openning Book enabled: " + ownBookEnabled);
 		//if (ownBookEnabled) {
 			//Thread loadOB = new Thread(new Runnable() {
 			//	
@@ -111,12 +113,12 @@ public class MemoryConsumers {
 			//	public void run() {
 					
 					lastAvailable_in_MB = ((getAvailableMemory()) / (1024 * 1024));
-					channel.sendLogToGUI("Openning Book ... ");
+					ChannelManager.getChannel().dump("Openning Book ... ");
 					try {
 						openingBook = OpeningBookFactory.getBook();
-						channel.sendLogToGUI("Openning Book OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
+						ChannelManager.getChannel().dump("Openning Book OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
 					} catch(Exception e) {
-						channel.sendLogToGUI("Unable to load Openning Book. Error is:");
+						ChannelManager.getChannel().dump("Unable to load Openning Book. Error is:");
 						channel.dump(e);
 					}
 			//	}
@@ -129,7 +131,7 @@ public class MemoryConsumers {
 			//@Override
 			//public void run() {
 				
-				channel.sendLogToGUI("Loading modules for Gaviota Endgame Tablebases support ... ");
+				ChannelManager.getChannel().dump("Loading modules for Gaviota Endgame Tablebases support ... ");
 				
 				if (GTBProbing_NativeWrapper.getInstance() != null) {
 					
@@ -138,23 +140,23 @@ public class MemoryConsumers {
 							engineConfiguration.getGaviotaTbCache());
 					
 					//try {Thread.sleep(10000);} catch (InterruptedException e1) {}
-					channel.sendLogToGUI("Modules for Gaviota Endgame Tablebases OK. Will try to load Gaviota Tablebases from => " + engineConfiguration.getGaviotaTbPath());
+					ChannelManager.getChannel().dump("Modules for Gaviota Endgame Tablebases OK. Will try to load Gaviota Tablebases from => " + engineConfiguration.getGaviotaTbPath());
 				} else {
 					//TODO: set percent to 0 and log corresponding message for the sizes
 					//Can't load IA 32-bit .dll on a AMD 64-bit platform
 					//throw new IllegalStateException("egtbprobe dynamic library could not be loaded (or not found)");
-					channel.sendLogToGUI(GTBProbing_NativeWrapper.getErrorMessage());
+					ChannelManager.getChannel().dump(GTBProbing_NativeWrapper.getErrorMessage());
 				}
 		//	}
 		//});
 		//loadEGTB.start();
 		
 		
-		channel.sendLogToGUI("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
-		channel.sendLogToGUI("Transposition Table usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
-		channel.sendLogToGUI("Endgame Table Bases Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 	+ " X : " + (100 * engineConfiguration.getGTBUsagePercent()) + "%");
-		channel.sendLogToGUI("Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 					+ " X : " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
-		channel.sendLogToGUI("Pawns Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getPawnsCacheUsagePercent()) + "%");
+		ChannelManager.getChannel().dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
+		ChannelManager.getChannel().dump("Transposition Table usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
+		ChannelManager.getChannel().dump("Endgame Table Bases Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 	+ " X : " + (100 * engineConfiguration.getGTBUsagePercent()) + "%");
+		ChannelManager.getChannel().dump("Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 					+ " X : " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
+		ChannelManager.getChannel().dump("Pawns Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getPawnsCacheUsagePercent()) + "%");
 		
 		double percents_sum = engineConfiguration.getThreadsCount() * engineConfiguration.getTPTUsagePercent()
 							+ engineConfiguration.getThreadsCount() * engineConfiguration.getGTBUsagePercent()
@@ -176,7 +178,7 @@ public class MemoryConsumers {
 		initCaches(getAvailableMemory() - memoryBuffer);
 		
 		
-		channel.sendLogToGUI("Memory Consumers are initialized. Final available memory buffer is: " + (memoryBuffer / (1024 * 1024)) + "MB");
+		ChannelManager.getChannel().dump("Memory Consumers are initialized. Final available memory buffer is: " + (memoryBuffer / (1024 * 1024)) + "MB");
 	}
 	
 	
@@ -188,10 +190,10 @@ public class MemoryConsumers {
 		//}
 		
 		int size_tpt = getTPTEntrySize(availableMemory);
-		channel.sendLogToGUI("Transposition Table size is " + size_tpt);
+		ChannelManager.getChannel().dump("Transposition Table size is " + size_tpt);
 		
 		int size_ec = getEvalCacheSize(availableMemory);
-		channel.sendLogToGUI("Eval Cache size is " + size_ec);
+		ChannelManager.getChannel().dump("Eval Cache size is " + size_ec);
 		int size_pc = 0;
 		
 		
@@ -199,17 +201,17 @@ public class MemoryConsumers {
 		if (pawnsCacheName != null) {
 			size_pc = getPawnsEvalCacheSize(availableMemory, pawnsCacheName);
 		}
-		channel.sendLogToGUI("Pawns Eval Cache size is " + size_pc);
+		ChannelManager.getChannel().dump("Pawns Eval Cache size is " + size_pc);
 
 		int size_gtb_out = 0;
 		if (GTBProbing_NativeWrapper.getInstance() != null) {
 			size_gtb_out = getGTBEntrySize_OUT(availableMemory);
-			channel.sendLogToGUI("Endgame Table Bases cache (OUT) size is " + size_gtb_out);
+			ChannelManager.getChannel().dump("Endgame Table Bases cache (OUT) size is " + size_gtb_out);
 			if (size_gtb_out <= 0) {//GC is still not ready with the clean up
-				channel.sendLogToGUI("Endgame Table Bases cache (OUT) size is less than zero. Try again the calculation 1.");
+				ChannelManager.getChannel().dump("Endgame Table Bases cache (OUT) size is less than zero. Try again the calculation 1.");
 				size_gtb_out = getGTBEntrySize_OUT(availableMemory);
 				if (size_gtb_out <= 0) {
-					channel.sendLogToGUI("Endgame Table Bases cache (OUT) size is less than zero. Try again the calculation 2.");
+					ChannelManager.getChannel().dump("Endgame Table Bases cache (OUT) size is less than zero. Try again the calculation 2.");
 					size_gtb_out = getGTBEntrySize_OUT(availableMemory);
 				}
 			}

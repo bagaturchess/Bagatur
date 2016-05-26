@@ -28,10 +28,12 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
 
 
-
 public interface IRootSearch {
 	
 	public SharedData getSharedData();
+	
+	public int getTPTUsagePercent();
+	public void decreaseTPTDepths(int reduction);
 	
 	public void newGame(IBitBoard bitboardForSetup);
 	
@@ -40,8 +42,7 @@ public interface IRootSearch {
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int startIteration, int maxIterations, boolean useMateDistancePrunning);
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int startIteration, int maxIterations, boolean useMateDistancePrunning, IFinishCallback finishCallback);
 	
-	public void shutDown();
+	public void stopSearch();
 	
-	public int getTPTUsagePercent();
-	public void decreaseTPTDepths(int reduction);
+	public void shutDown();
 }

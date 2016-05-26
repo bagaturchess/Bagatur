@@ -210,4 +210,19 @@ public class MTDSequentialSearch_Dual extends RootSearch_BaseImpl {
 		searcher.getEnv().getTPT().correctAllDepths(reduction);
 		searcher_material.getEnv().getTPT().correctAllDepths(reduction);
 	}
+
+
+	@Override
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator,
+			int startIteration, int maxIterations,
+			boolean useMateDistancePrunning) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void stopSearch() {
+		throw new UnsupportedOperationException();
+	}
 }

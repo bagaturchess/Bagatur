@@ -28,6 +28,7 @@ import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 
 
 public class UCISearchAdaptorFactory {
+	
 	public static IUCISearchAdaptor newUCISearchAdaptor(IUCIConfig engineCfg, IBitBoard boardForSetup) {
 		
 		String adaptorName = engineCfg.getUCIAdaptor_ClassName();

@@ -42,7 +42,7 @@ public class UCISearchMediatorImpl_NormalSearch extends UCISearchMediatorImpl_Ba
 		super(_channel, _go, _colourToMove, _sender, _rootSearch, isEndlessSearch);
 		timeController = _timeController;
 		_channel.dump(timeController.toString());
-		setStopper(new GlobalStopperImpl(timeController, getBestMoveSender(), _go.getNodes()));
+		setStopper(new GlobalStopperImpl(timeController, _go.getNodes()));
 	}
 	
 	

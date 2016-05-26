@@ -130,9 +130,9 @@ public class MTDSchedulerMain {
 		ChannelManager.setChannel(new Channel_Console(System.in, System.out, System.out));
 		
 		SharedData arg1 = new SharedData(ChannelManager.getChannel(), cfg);
-		IRootSearch search = new MTDParallelSearch(new Object[] {cfg, arg1});
+		//IRootSearch search = new MTDParallelSearch(new Object[] {cfg, arg1});
 		
-		//IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
+		IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
 		
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		

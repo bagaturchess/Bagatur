@@ -70,9 +70,19 @@ public class StateManager extends Protocol implements BestMoveSender {
 	}
 	
 	
-	public void recreateSearchAdaptor() throws FileNotFoundException {
+	public void createSearchAdaptor() throws FileNotFoundException {
 		
-		channel.sendLogToGUI("StateManager: Re-creating search adaptor ...");
+		channel.sendLogToGUI("StateManager: Creating search adaptor ...");
+		
+		searchAdaptor = UCISearchAdaptorFactory.newUCISearchAdaptor(engineBootCfg, board);
+		
+		channel.sendLogToGUI("StateManager: Search adaptor Created.");
+	}
+	
+	
+	public void destroySearchAdaptor() throws FileNotFoundException {
+		
+		channel.sendLogToGUI("StateManager: Destroing search adaptor ...");
 		
 		IUCISearchAdaptor lastAdaptor = searchAdaptor;
 		searchAdaptor = null;
@@ -82,15 +92,18 @@ public class StateManager extends Protocol implements BestMoveSender {
 			lastAdaptor.stopSearch();
 			lastAdaptor.shutDown();
 			channel.sendLogToGUI("StateManager: Old search adaptor stopped.");
+			
+			channel.sendLogToGUI("StateManager: Run gc ...");
+			System.gc();
+			channel.sendLogToGUI("StateManager: GC ok.");
+			
+			//Wait GC to free up the memory
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {}
 		}
-
-		channel.sendLogToGUI("StateManager: Run gc ...");
-		System.gc();
-		channel.sendLogToGUI("StateManager: GC ok.");
 		
-		searchAdaptor = UCISearchAdaptorFactory.newUCISearchAdaptor(engineBootCfg, board);
-		
-		channel.sendLogToGUI("StateManager: Search adaptor Re-created.");
+		channel.sendLogToGUI("StateManager: Search adaptor Destroyed.");
 	}
 	
 	
@@ -115,7 +128,9 @@ public class StateManager extends Protocol implements BestMoveSender {
 							sendUCIOK();
 							break;
 						case COMMAND_TO_ENGINE_ISREADY:
-							waitAndExecute();
+							if (searchAdaptor == null) {
+								createSearchAdaptor();
+							}
 							sendReadyOK();
 							break;
 						case COMMAND_TO_ENGINE_NEWGAME:
@@ -279,7 +294,8 @@ public class StateManager extends Protocol implements BestMoveSender {
 			
 			board = new Board(position.getFen());
 			
-			recreateSearchAdaptor();
+			destroySearchAdaptor();
+			createSearchAdaptor();
 			
 		} else {
 			

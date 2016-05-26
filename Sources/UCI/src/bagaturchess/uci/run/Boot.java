@@ -23,13 +23,9 @@
 package bagaturchess.uci.run;
 
 
-import java.io.BufferedWriter;
-import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-
-import jdk.nashorn.internal.runtime.Context.ThrowErrorManager;
 
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
@@ -105,7 +101,7 @@ public class Boot {
 							
 							List<IUCIOptionAction> customActions = new ArrayList<IUCIOptionAction>();
 							customActions.add(new UCIOptionAction_RecreateLogging(ChannelManager.getChannel(), engineBootCfg));
-							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager));
+							//customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager));
 							
 							OptionsManager optionsManager = new OptionsManager(communicationChanel, (IUCIOptionsProvider) optionsRegistry, customActions);
 							manager.setOptionsManager(optionsManager);
@@ -115,7 +111,7 @@ public class Boot {
 							}
 						} catch (Throwable t) {
 							communicationChanel.sendLogToGUI("Error while initializing StateManager: " + t.getMessage());
-							t.printStackTrace(new PrintStream(communicationChanel.getOut_stream()));
+							communicationChanel.dump(t);
 							if (t instanceof InvocationTargetException) {
 								t = ((InvocationTargetException)t).getCause();
 								communicationChanel.sendLogToGUI("Error while initializing StateManager: cause " + t);

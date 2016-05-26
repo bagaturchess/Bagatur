@@ -26,15 +26,13 @@ package bagaturchess.search.impl.uci_adaptor;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
-import bagaturchess.uci.api.BestMoveSender;
-
 
 
 public class GlobalStopperImpl implements ISearchStopper {
 	
 	
 	private ITimeController timeController;
-	private BestMoveSender bestMoveSender;
+	//private BestMoveSender bestMoveSender;
 	private volatile long nodes;
 	
 	private ISearchStopper secondaryStopper;
@@ -43,9 +41,9 @@ public class GlobalStopperImpl implements ISearchStopper {
 	//private ISearchMediator dumpper;
 	
 	
-	GlobalStopperImpl(ITimeController _timeController, BestMoveSender _bestMoveSender, long _nodes) {
+	GlobalStopperImpl(ITimeController _timeController, long _nodes) {
 		timeController = _timeController;
-		bestMoveSender = _bestMoveSender;
+		//bestMoveSender = _bestMoveSender;
 		nodes = _nodes;
 		//dumpper = _dumpper;
 		//dumpper.dump("Creation: " + timeController);
@@ -75,7 +73,7 @@ public class GlobalStopperImpl implements ISearchStopper {
 		if (nodes <= 0) {
 			synchronized (this) {
 				markStopped();
-				bestMoveSender.sendBestMove();
+				//bestMoveSender.sendBestMove();
 			}
 			throw new SearchInterruptedException();
 		}
@@ -83,7 +81,7 @@ public class GlobalStopperImpl implements ISearchStopper {
 		if (!timeController.hasTime(0)) {
 			synchronized (this) {
 				markStopped();
-				bestMoveSender.sendBestMove();
+				//bestMoveSender.sendBestMove();
 			}
 			throw new SearchInterruptedException();
 		}

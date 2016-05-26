@@ -148,16 +148,7 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		}*/
 		
 		
-		IRootSearch searcher = null;
-		if (ponderSearch) {
-			searcher = searcherPonder;
-		} else {
-			if (rootSearchCfg.getMultiPVsCount() > 1) {
-				searcher = searcherNormalMultiPV;
-			} else {
-				searcher = searcherNormal;
-			}
-		}
+		IRootSearch searcher = getSearcher(ponderSearch);
 		
 		currentMediator.dump("ROOT SEARCHER: " + searcher);
 		
@@ -200,6 +191,21 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 			System.gc();
 		}*/
 	}
+
+
+	private IRootSearch getSearcher(boolean ponderSearch) {
+		IRootSearch searcher = null;
+		if (ponderSearch) {
+			searcher = searcherPonder;
+		} else {
+			if (rootSearchCfg.getMultiPVsCount() > 1) {
+				searcher = searcherNormalMultiPV;
+			} else {
+				searcher = searcherNormal;
+			}
+		}
+		return searcher;
+	}
 	
 	
 	@Override
@@ -235,6 +241,9 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		currentMediator.getStopper().markStopped();
 		currentMediator = null;
 		currentGoCommand = null;
+		
+		IRootSearch searcher = getSearcher(isPonderSearch(currentGoCommand));
+		searcher.stopSearch();
 		
 		int move = info.getBestMove();
 		int ponder = 0;

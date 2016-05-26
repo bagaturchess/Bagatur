@@ -26,10 +26,13 @@ package bagaturchess.search.impl.rootsearch;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.BoardUtils;
+import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
+import bagaturchess.search.api.internal.ISearchStopper;
+import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.uci.api.ChannelManager;
 
@@ -41,12 +44,14 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	private SharedData sharedData;
 	private IBitBoard bitboardForSetup;
 	
+	protected ISearchStopper stopper;
+	
 	
 	public RootSearch_BaseImpl(Object[] args) {
 		rootSearchConfig = (IRootSearchConfig) args[0];
 		sharedData = (SharedData) (args[1] == null ? new SharedData(ChannelManager.getChannel(), rootSearchConfig) : args[1]);
 	}
-
+	
 	
 	public void newGame(IBitBoard _bitboardForSetup) {
 		
@@ -87,7 +92,11 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 			int startIteration, int maxIterations,
 			boolean useMateDistancePrunning) {
 		negamax(bitboardForSetup, mediator, startIteration, maxIterations,
-				useMateDistancePrunning, new FinishCallback_SendToMediator(mediator));
+				useMateDistancePrunning, new IFinishCallback() {
+					@Override
+					public void ready() {
+					}
+				});
 	}
 	
 	
@@ -116,7 +125,46 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	}
 	
 	@Override
+	public void stopSearch() {
+		
+		if (stopper != null) {
+			stopper.markStopped();
+			stopper = null;
+		}
+	}
+	
+	@Override
 	public String toString() {
 		return sharedData.toString();
+	}
+	
+	
+	protected class Stopper implements ISearchStopper {
+		
+		private boolean stopped;
+		
+		public Stopper() {
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public void markStopped() {
+			stopped = true;
+		}
+
+		@Override
+		public boolean isStopped() {
+			return stopped;
+		}
+
+		@Override
+		public void stopIfNecessary(int maxdepth, int colour, double alpha,
+				double beta) throws SearchInterruptedException {
+			
+			if (stopped) {
+				throw new SearchInterruptedException();
+			}
+		}
+		
 	}
 }

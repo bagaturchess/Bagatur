@@ -18,7 +18,8 @@ public class UCIOptionAction_RecreateSearchAdaptor implements IUCIOptionAction {
 	
 	@Override
 	public void execute() throws FileNotFoundException {
-		stateManager.recreateSearchAdaptor();
+		stateManager.destroySearchAdaptor();
+		stateManager.createSearchAdaptor();
 	}
 	
 	
