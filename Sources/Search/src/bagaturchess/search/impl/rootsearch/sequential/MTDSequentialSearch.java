@@ -73,6 +73,12 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
 			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback finishCallback, final int[] prevPV) {
+		negamax(_bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, finishCallback, prevPV, false);
+	}
+	
+	
+	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
+			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback finishCallback, final int[] prevPV, boolean dont_wrap_mediator) {
 		
 		
 		if (stopper != null) {
@@ -92,10 +98,12 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch started from depth " + startIteration + " to depth " + maxIterations);
 		
 		
-		//Original mediator should be an instance of UCISearchMediatorImpl_Base
-		mediator = (mediator instanceof MultiPVMediator) ?
-				new Mediator_AlphaAndBestMoveWindow(mediator, this) :
-				new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(mediator, this));
+		if (!dont_wrap_mediator) {
+			//Original mediator should be an instance of UCISearchMediatorImpl_Base
+			mediator = (mediator instanceof MultiPVMediator) ?
+					new Mediator_AlphaAndBestMoveWindow(mediator, this) :
+					new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(mediator, this));
+		}
 		
 		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup(), getSharedData(), getBitboardForSetup().getHashKey(),
 				startIteration, maxIterations, finishCallback);
