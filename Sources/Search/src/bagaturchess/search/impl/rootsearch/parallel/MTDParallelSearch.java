@@ -61,7 +61,6 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		
 		super(args);
 		
-		//executor = Executors.newFixedThreadPool(getRootSearchConfig().getThreadsCount());
 		executor = Executors.newFixedThreadPool(1);
 		
 		searchers = new ArrayList<MTDSequentialSearch>();
@@ -112,7 +111,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		if (maxIterations > ISearch.MAX_DEPTH) {
 			throw new IllegalStateException("maxIterations=" + maxIterations + " > ISearch.MAX_DEPTH");
 		}
-		//searchers.waitSearchersToStop(); //Removed because of pondering. During pondering all threads are busy.
+		
 		setupBoard(_bitboardForSetup);
 		
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("Parallel search started from depth " + startIteration + " to depth " + maxIterations);
@@ -131,9 +130,6 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					
 					int cur_depth = startIteration;
 					
-					//new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(mediator, this))
-					
-					//ISearchMediator nodesCounter = new NPSCollectorMediator(final_mediator);
 					
 					final List<ISearchMediator> mediators = new ArrayList<ISearchMediator>();
 					final List<BucketMediator> mediators_bucket = new ArrayList<BucketMediator>();
@@ -145,17 +141,23 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					}
 					
 					
-					for (int i = 0; i < searchers.size(); i++) {
+					boolean[] searchers_started = new boolean[searchers.size()];
+					searchers_started[0] = true;
+					searchers.get(0).negamax(getBitboardForSetup(), mediators.get(0), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, prevPV, true);
+					/*for (int i = 0; i < searchers.size(); i++) {
 						searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, prevPV, true);
-					}
+					}*/
 					
 					
 					int CHECK_INTERVAL_MIN = 15;
 					int CHECK_INTERVAL_MAX = 15;
 					int check_interval = CHECK_INTERVAL_MIN;
 					
-					
+					long start_time = System.currentTimeMillis();
 					ISearchInfo lastSendMajorInfosForFixDepth = null;
+					int lastSendMajorInfosForFixDepth_index = -1;
+					ISearchInfo lastSendMajorInfosForFixDepth_prevIter = null;
+					int lastSendMajorInfosForFixDepth_prevIter_index = -1;
 					
 					boolean isReady = false;
 					while (!final_mediator.getStopper().isStopped() //Condition for normal play
@@ -163,17 +165,28 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							) {
 							
 						
-							try {
-								final_mediator.getStopper().stopIfNecessary(maxIterations, getBitboardForSetup().getColourToMove(), ISearch.MIN, ISearch.MAX);
-							} catch(SearchInterruptedException sie) {
+							//Start more searchers if necessary
+							long time_delta = System.currentTimeMillis() - start_time;
+							long expected_count_workers = time_delta / 1000;
+							for (int i = 0; i < Math.min(searchers.size(), expected_count_workers); i++) {
+								if (!searchers_started[i]){
+									int[] pv = prevPV;
+									if (lastSendMajorInfosForFixDepth != null) {
+										pv = lastSendMajorInfosForFixDepth.getPV();
+									} else if (lastSendMajorInfosForFixDepth_prevIter != null) {
+										pv = lastSendMajorInfosForFixDepth_prevIter.getPV();
+									}
+									searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, pv, true);
+									searchers_started[i] = true;
+								}
 							}
 							
 							
-							boolean mustIncreaseDepth = false;
-							int countWinners = 0;
 							//Collect major infos by depth
-							//final_mediator.dump("Collect major infos for depth " + cur_depth);
-							List<ISearchInfo> majorInfosForFixDepth = new ArrayList<ISearchInfo>();
+							List<ISearchInfo> majorInfosForCurDepth = new ArrayList<ISearchInfo>();
+							
+							boolean hasNextDepthInfo = false;
+							
 							for (int i_mediator = 0; i_mediator < mediators_bucket.size(); i_mediator++) {
 								
 								BucketMediator cur_mediator = mediators_bucket.get(i_mediator);
@@ -187,108 +200,104 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 											cur_mediator.lastSendMajorIndex = i_major;
 											break;
 										} else if (curinfo.getDepth() > cur_depth) {
-											mustIncreaseDepth = true;
+											hasNextDepthInfo = true;
 										}
 									}
 								}
 								
-								if (cur_mediator_lastinfo != null) {
-									countWinners++;
-								}
-								
-								majorInfosForFixDepth.add(cur_mediator_lastinfo != null ? cur_mediator_lastinfo : null);
+								majorInfosForCurDepth.add(cur_mediator_lastinfo != null ? cur_mediator_lastinfo : null);
 							}
 							
 							
-							//Select best major by depth
-							//final_mediator.dump("Select best major for depth " + cur_depth);
-							/*ISearchInfo bestMajor = null;
-							int bestInfoIndex = -1;
-							for (int i = 0; i < majorInfosForFixDepth.size(); i++) {
+							//Send best infos
+							ISearchInfo searchers_restart_info = null;
+							int searchers_restart_info_index = -1;
+							for (int i = 0; i < majorInfosForCurDepth.size(); i++) {
 								
-								ISearchInfo curMajor = majorInfosForFixDepth.get(i);
+								ISearchInfo cur_bestMajor = majorInfosForCurDepth.get(i);
 								
-								if (curMajor != null) { //Searcher i has produced info object
-									if (bestMajor == null) {
-										bestMajor = curMajor;
-										bestInfoIndex = i;
-									} else if (curMajor.getEval() > bestMajor.getEval()) {
-										bestMajor = curMajor;
-										bestInfoIndex = i;
+								if (cur_bestMajor != null) {
+									if (lastSendMajorInfosForFixDepth != null) {
+										if (cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth.getEval()
+											) {
+											final_mediator.changedMajor(cur_bestMajor);
+											lastSendMajorInfosForFixDepth = cur_bestMajor;
+											lastSendMajorInfosForFixDepth_index = i;
+											searchers_restart_info = cur_bestMajor;
+											searchers_restart_info_index = i;
+										}
+									} else {//First info for this depth
+										if (lastSendMajorInfosForFixDepth_prevIter != null) {
+											if (cur_bestMajor.getBestMove() == lastSendMajorInfosForFixDepth_prevIter.getBestMove()
+													|| cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth_prevIter.getEval()
+													|| i == lastSendMajorInfosForFixDepth_prevIter_index
+													) {
+												final_mediator.changedMajor(cur_bestMajor);
+												lastSendMajorInfosForFixDepth = cur_bestMajor;
+												lastSendMajorInfosForFixDepth_index = i;
+												searchers_restart_info = cur_bestMajor;
+												searchers_restart_info_index = i;
+											}
+										} else {
+											final_mediator.changedMajor(cur_bestMajor);
+											lastSendMajorInfosForFixDepth = cur_bestMajor;
+											lastSendMajorInfosForFixDepth_index = i;
+											searchers_restart_info = cur_bestMajor;
+											searchers_restart_info_index = i;
+										}
 									}
 								}
-							}*/
-							
-							
-							if (mustIncreaseDepth /*&& countWinners == 0*/) {
-								cur_depth++;
-								lastSendMajorInfosForFixDepth = null;
 							}
 							
-							if (cur_depth > maxIterations) {
-								break;
+							if (hasNextDepthInfo) {
+								
+								cur_depth++;
+								
+								lastSendMajorInfosForFixDepth_prevIter = lastSendMajorInfosForFixDepth;
+								lastSendMajorInfosForFixDepth_prevIter_index = lastSendMajorInfosForFixDepth_index;
+								lastSendMajorInfosForFixDepth = null;
+								lastSendMajorInfosForFixDepth_index = -1;
+								
+								if (cur_depth > maxIterations) {
+									break;
+								}
 							}
 							
 							
 							//Send major
-							if (countWinners > 0) {
+							if (searchers_restart_info != null) {
 								
-								if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Selected majors for sending");
+								if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: result for next depth found - restart searchers");
 								
-								int winner_bestInfoIndex = -1;
-								for (int i = 0; i < majorInfosForFixDepth.size(); i++) {
+								if (!final_mediator.getStopper().isStopped()) {
 									
-									ISearchInfo cur_bestMajor = majorInfosForFixDepth.get(i);
+									//Stop and start all searchers except the winner
 									
-									if (cur_bestMajor != null) {
-										if (lastSendMajorInfosForFixDepth != null) {
-											if (cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth.getEval()) {
-												final_mediator.changedMajor(cur_bestMajor);
-												winner_bestInfoIndex = i;
-												lastSendMajorInfosForFixDepth = cur_bestMajor;
+									for (int i = 0; i < searchers.size(); i++) {
+										
+										if (searchers_started[i]) {
+											if (i != searchers_restart_info_index) {
+												
+												searchers.get(i).stopSearchAndWait();
 											}
-										} else {
-											final_mediator.changedMajor(cur_bestMajor);
-											winner_bestInfoIndex = i;
-											lastSendMajorInfosForFixDepth = cur_bestMajor;
 										}
 									}
+									
+									for (int i = 0; i < searchers.size(); i++) {
+										
+										if (searchers_started[i]) {
+											if (i != searchers_restart_info_index) {
+													
+												mediators_bucket.get(i).clearStopper();
+												searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations,
+														useMateDistancePrunning, finishCallback, searchers_restart_info.getPV(), true);
+											}
+										}
+									}
+									
 								}
-								
 								
 								check_interval = CHECK_INTERVAL_MIN;
-								
-								
-								if (countWinners == 1) {
-									
-									if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: countWinners is 1");
-									
-									/*if (!final_mediator.getStopper().isStopped()) {
-										
-										//Stop and start all searchers except the winner
-										
-										for (int i = 0; i < searchers.size(); i++) {
-											if (i != winner_bestInfoIndex) {
-												if (cur_depth <= maxIterations) {
-													searchers.get(i).stopSearchAndWait();
-												}
-											}
-										}
-										
-										if (cur_depth <= maxIterations) {
-											for (int i = 0; i < searchers.size(); i++) {
-												if (i != winner_bestInfoIndex) {
-													
-														mediators_bucket.get(i).clearStopper();
-														searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth - 1, maxIterations,
-																useMateDistancePrunning, finishCallback, majorInfosForFixDepth.get(winner_bestInfoIndex).getPV(), true);
-												}
-											}
-										}
-										
-									}*/
-								}
-								
 								
 							} else {
 								
@@ -306,12 +315,19 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 									check_interval = CHECK_INTERVAL_MAX;
 								}
 							}
+							
+							try {
+								final_mediator.getStopper().stopIfNecessary(maxIterations, getBitboardForSetup().getColourToMove(), ISearch.MIN, ISearch.MAX);
+							} catch(SearchInterruptedException sie) {
+							}
 					}
 					
 					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Out of loop");
 					
 					for (int i = 0; i < searchers.size(); i++) {
-						searchers.get(i).stopSearchAndWait();
+						if (searchers_started[i]) {
+							searchers.get(i).stopSearchAndWait();
+						}
 					}
 					
 					
