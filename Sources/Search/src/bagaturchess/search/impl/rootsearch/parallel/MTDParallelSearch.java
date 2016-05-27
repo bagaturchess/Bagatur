@@ -128,6 +128,8 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 				
 				try {
 					
+					boolean RESTART_SEARCHERS = true;
+					
 					int cur_depth = startIteration;
 					
 					
@@ -167,7 +169,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 						
 							//Start more searchers if necessary
 							long time_delta = System.currentTimeMillis() - start_time;
-							long expected_count_workers = time_delta / 1000;
+							long expected_count_workers = time_delta / 500;
 							for (int i = 0; i < Math.min(searchers.size(), expected_count_workers); i++) {
 								if (!searchers_started[i]){
 									int[] pv = prevPV;
@@ -210,6 +212,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							
 							
 							//Send best infos
+							boolean hasNewInfosForSending = false;
 							ISearchInfo searchers_restart_info = null;
 							int searchers_restart_info_index = -1;
 							for (int i = 0; i < majorInfosForCurDepth.size(); i++) {
@@ -218,20 +221,33 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								
 								if (cur_bestMajor != null) {
 									if (lastSendMajorInfosForFixDepth != null) {
-										if (cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth.getEval()
+										if (
+												cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth.getEval()
+												|| cur_bestMajor.getBestMove() == lastSendMajorInfosForFixDepth.getBestMove()
+												
 											) {
+											
+											//Next info for this depth
+											hasNewInfosForSending = true;
 											final_mediator.changedMajor(cur_bestMajor);
 											lastSendMajorInfosForFixDepth = cur_bestMajor;
 											lastSendMajorInfosForFixDepth_index = i;
-											searchers_restart_info = cur_bestMajor;
-											searchers_restart_info_index = i;
+											//searchers_restart_info = cur_bestMajor;
+											//searchers_restart_info_index = i;
 										}
-									} else {//First info for this depth
+									} else {
 										if (lastSendMajorInfosForFixDepth_prevIter != null) {
-											if (cur_bestMajor.getBestMove() == lastSendMajorInfosForFixDepth_prevIter.getBestMove()
+											
+											//First info for this depth
+											if (
+													cur_bestMajor.getBestMove() == lastSendMajorInfosForFixDepth_prevIter.getBestMove()
 													|| cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth_prevIter.getEval()
+													
 													|| i == lastSendMajorInfosForFixDepth_prevIter_index
+													
 													) {
+												
+												hasNewInfosForSending = true;
 												final_mediator.changedMajor(cur_bestMajor);
 												lastSendMajorInfosForFixDepth = cur_bestMajor;
 												lastSendMajorInfosForFixDepth_index = i;
@@ -239,11 +255,15 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 												searchers_restart_info_index = i;
 											}
 										} else {
+											
+											
+											//First time only
+											hasNewInfosForSending = true;
 											final_mediator.changedMajor(cur_bestMajor);
 											lastSendMajorInfosForFixDepth = cur_bestMajor;
 											lastSendMajorInfosForFixDepth_index = i;
-											searchers_restart_info = cur_bestMajor;
-											searchers_restart_info_index = i;
+											//searchers_restart_info = cur_bestMajor;
+											//searchers_restart_info_index = i;
 										}
 									}
 								}
@@ -265,7 +285,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							
 							
 							//Send major
-							if (searchers_restart_info != null) {
+							if (RESTART_SEARCHERS && searchers_restart_info != null) {
 								
 								if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: result for next depth found - restart searchers");
 								
@@ -299,22 +319,29 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								
 								check_interval = CHECK_INTERVAL_MIN;
 								
-							} else {
+							}
+							
+							if (!hasNewInfosForSending) {
 								
-								if (final_mediator.getStopper().isStopped()) {//All infos send and search is stoped: isReady = true;
+								if (final_mediator.getStopper().isStopped()) {
+									
+									//All infos send and search is stoped: isReady = true;
 									isReady = true;
-								}
-								
-								//ChannelManager.getChannel().dump("MTDParallelSearch: bestMajor not found");
-								
-								//Wait some time and than make check again
-								Thread.sleep(check_interval);
-								
-								check_interval = 2 * check_interval;
-								if (check_interval > CHECK_INTERVAL_MAX) {
-									check_interval = CHECK_INTERVAL_MAX;
+									
+								} else {
+									
+									if (!hasNextDepthInfo) {
+										//Wait some time and than make check again
+										Thread.sleep(check_interval);
+										
+										check_interval = 2 * check_interval;
+										if (check_interval > CHECK_INTERVAL_MAX) {
+											check_interval = CHECK_INTERVAL_MAX;
+										}
+									}
 								}
 							}
+							
 							
 							try {
 								final_mediator.getStopper().stopIfNecessary(maxIterations, getBitboardForSetup().getColourToMove(), ISearch.MIN, ISearch.MAX);
