@@ -126,6 +126,20 @@ public class NullwinSearchTask implements Runnable {
 				}
 			}
 			
+			/*
+			if (sharedData.getTPT() != null) {
+				sharedData.getTPT().lock();
+				TPTEntry entry = sharedData.getTPT().get(hashkey);
+				if (entry != null && entry.getBestMove_lower() != 0) {
+					initialVal = entry.getLowerBound();
+					//if (sharedData.getEngineConfiguration().getSearchConfig().isOther_UseTPTInRoot()) {
+						//prevIterationEval = initialVal;
+					//}
+				}
+				sharedData.getTPT().unlock();
+			}
+			*/
+			
 			RootSearchMTDImpl rootWin = new RootSearchMTDImpl(bitboard.getColourToMove(), distribution.getBetasGen());
 			
 			if (DEBUG) mediator.dump(Thread.currentThread().getName() + ":	start search with depth=" + maxdepth + ", beta=" + beta +" and distribution is " + distribution.toString());

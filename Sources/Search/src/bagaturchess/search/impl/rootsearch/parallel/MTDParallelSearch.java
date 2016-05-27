@@ -128,7 +128,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 				
 				try {
 					
-					boolean RESTART_SEARCHERS = true;
+					boolean RESTART_SEARCHERS = false;
 					
 					int cur_depth = startIteration;
 					
@@ -145,7 +145,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					
 					boolean[] searchers_started = new boolean[searchers.size()];
 					searchers_started[0] = true;
-					searchers.get(0).negamax(getBitboardForSetup(), mediators.get(0), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, prevPV, true);
+					searchers.get(0).negamax(getBitboardForSetup(), mediators.get(0), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, prevPV, true, null);
 					/*for (int i = 0; i < searchers.size(); i++) {
 						searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, prevPV, true);
 					}*/
@@ -166,19 +166,22 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							|| !isReady //Ready is when all best infos are send, even after the stopper has stopped
 							) {
 							
-						
+							
 							//Start more searchers if necessary
 							long time_delta = System.currentTimeMillis() - start_time;
 							long expected_count_workers = time_delta / 500;
 							for (int i = 0; i < Math.min(searchers.size(), expected_count_workers); i++) {
 								if (!searchers_started[i]){
 									int[] pv = prevPV;
+									Integer initialValue = null;
 									if (lastSendMajorInfosForFixDepth != null) {
 										pv = lastSendMajorInfosForFixDepth.getPV();
+										initialValue = lastSendMajorInfosForFixDepth.getEval();
 									} else if (lastSendMajorInfosForFixDepth_prevIter != null) {
 										pv = lastSendMajorInfosForFixDepth_prevIter.getPV();
+										initialValue = lastSendMajorInfosForFixDepth_prevIter.getEval();
 									}
-									searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, pv, true);
+									searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, pv, true, initialValue);
 									searchers_started[i] = true;
 								}
 							}
@@ -221,13 +224,15 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								
 								if (cur_bestMajor != null) {
 									if (lastSendMajorInfosForFixDepth != null) {
+										
+										//Next info for this depth
 										if (
+											
 												cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth.getEval()
-												|| cur_bestMajor.getBestMove() == lastSendMajorInfosForFixDepth.getBestMove()
+												//|| cur_bestMajor.getBestMove() == lastSendMajorInfosForFixDepth.getBestMove()
 												
 											) {
 											
-											//Next info for this depth
 											hasNewInfosForSending = true;
 											final_mediator.changedMajor(cur_bestMajor);
 											lastSendMajorInfosForFixDepth = cur_bestMajor;
@@ -240,8 +245,9 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 											
 											//First info for this depth
 											if (
-													cur_bestMajor.getBestMove() == lastSendMajorInfosForFixDepth_prevIter.getBestMove()
-													|| cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth_prevIter.getEval()
+												
+													cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth_prevIter.getEval()
+													|| cur_bestMajor.getBestMove() == lastSendMajorInfosForFixDepth_prevIter.getBestMove()
 													
 													|| i == lastSendMajorInfosForFixDepth_prevIter_index
 													
@@ -310,7 +316,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 													
 												mediators_bucket.get(i).clearStopper();
 												searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations,
-														useMateDistancePrunning, finishCallback, searchers_restart_info.getPV(), true);
+														useMateDistancePrunning, finishCallback, searchers_restart_info.getPV(), true, searchers_restart_info.getEval());
 											}
 										}
 									}

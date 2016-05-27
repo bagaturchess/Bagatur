@@ -73,12 +73,12 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
 			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback finishCallback, final int[] prevPV) {
-		negamax(_bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, finishCallback, prevPV, false);
+		negamax(_bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, finishCallback, prevPV, false, null);
 	}
 	
 	
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback finishCallback, final int[] prevPV, boolean dont_wrap_mediator) {
+			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback finishCallback, final int[] prevPV, boolean dont_wrap_mediator, Integer initialValue) {
 		
 		
 		if (stopper != null) {
@@ -106,7 +106,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		}
 		
 		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup(), getSharedData(), getBitboardForSetup().getHashKey(),
-				startIteration, maxIterations, finishCallback);
+				startIteration, maxIterations, finishCallback, initialValue);
 		
 		//final ISearchStopper stopper = new MTDStopper(getBitboardForSetup().getColourToMove(), distribution);
 		mediator.setStopper(new CompositeStopper(new ISearchStopper[] {mediator.getStopper(), stopper} ));

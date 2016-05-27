@@ -62,9 +62,11 @@ public class SearchManager {
 	private SharedData sharedData;
 	private IFinishCallback finishCallback;
 
+	private Integer initialValue;
+	
 	
 	public SearchManager(ISearchMediator _mediator, IBitBoard _bitboardForSetup, SharedData _sharedData, long _hashkey,
-			int _startIteration, int _maxIterations, IFinishCallback _finishCallback) {
+			int _startIteration, int _maxIterations, IFinishCallback _finishCallback, Integer _initialValue) {
 
 		lock = new ReentrantReadWriteLock();
 		
@@ -84,6 +86,8 @@ public class SearchManager {
 		//nodes = 0;
 		
 		betas = new ArrayList<Integer>();
+		
+		initialValue = _initialValue;
 		
 		initBetas(_bitboardForSetup);
 	}
@@ -110,35 +114,24 @@ public class SearchManager {
 	
 	private void initBetas(IBitBoard bitboardForTesting) {
 		
-		int initialVal = 0;
-		
-		/*
-		if (sharedData.getTPT() != null) {
-			sharedData.getTPT().lock();
-			TPTEntry entry = sharedData.getTPT().get(hashkey);
-			if (entry != null && entry.getBestMove_lower() != 0) {
-				initialVal = entry.getLowerBound();
-				//if (sharedData.getEngineConfiguration().getSearchConfig().isOther_UseTPTInRoot()) {
-					//prevIterationEval = initialVal;
-				//}
-			}
-			sharedData.getTPT().unlock();
-		}
-		*/
-		
 		if (betasGen != null) {
 			
 			betasGen = BetaGeneratorFactory.create(betasGen.getLowerBound(), mediator.getTrustWindow_MTD_Step());
 			
 		} else {
 			
-			int root_colour = bitboardForTesting.getColourToMove();
-			IEvaluator evaluator = sharedData.getEvaluatorFactory().create(
-					bitboardForTesting,
-					new EvalCache(100, true, new BinarySemaphore_Dummy()),
-					sharedData.getEngineConfiguration().getEvalConfig());
-			
-			int staticRootEval = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, root_colour);
+			int staticRootEval = -1;
+			if (initialValue != null) {
+				staticRootEval = initialValue;
+			} else {
+				int root_colour = bitboardForTesting.getColourToMove();
+				IEvaluator evaluator = sharedData.getEvaluatorFactory().create(
+						bitboardForTesting,
+						new EvalCache(100, true, new BinarySemaphore_Dummy()),
+						sharedData.getEngineConfiguration().getEvalConfig());
+				
+				staticRootEval = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, root_colour);
+			}
 			
 			betasGen = BetaGeneratorFactory.create(staticRootEval, mediator.getTrustWindow_MTD_Step());
 		}
