@@ -38,10 +38,10 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	
 	private static int TRUST_WINDOW_BEST_MOVE_MULTIPLIER = 2;
 	private static int TRUST_WINDOW_BEST_MOVE_MIN = 8;
-	private static int TRUST_WINDOW_BEST_MOVE_MAX = 32;
+	private static int TRUST_WINDOW_BEST_MOVE_MAX = 64;
 	private int trustWindow_BestMove;
 	
-	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 1;
+	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 2;
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 1;
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = SearchUtils.getMateVal(1);
 	private int trustWindow_AlphaAspiration;

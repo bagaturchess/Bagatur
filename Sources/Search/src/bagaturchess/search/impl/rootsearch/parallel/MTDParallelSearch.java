@@ -24,9 +24,13 @@ package bagaturchess.search.impl.rootsearch.parallel;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import com.sun.jndi.toolkit.dir.SearchFilter;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
@@ -39,6 +43,7 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
+import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
 import bagaturchess.search.impl.rootsearch.sequential.Mediator_AlphaAndBestMoveWindow;
@@ -156,10 +161,8 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					int check_interval = CHECK_INTERVAL_MIN;
 					
 					long start_time = System.currentTimeMillis();
-					ISearchInfo lastSendMajorInfosForFixDepth = null;
-					int lastSendMajorInfosForFixDepth_index = -1;
-					ISearchInfo lastSendMajorInfosForFixDepth_prevIter = null;
-					int lastSendMajorInfosForFixDepth_prevIter_index = -1;
+					
+					Map<Integer, MoveInfo> movesInfoPerDepth = new HashMap<Integer, MoveInfo>();
 					
 					boolean isReady = false;
 					while (!final_mediator.getStopper().isStopped() //Condition for normal play
@@ -172,16 +175,8 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							long expected_count_workers = time_delta / 500;
 							for (int i = 0; i < Math.min(searchers.size(), expected_count_workers); i++) {
 								if (!searchers_started[i]){
-									int[] pv = prevPV;
-									Integer initialValue = null;
-									if (lastSendMajorInfosForFixDepth != null) {
-										pv = lastSendMajorInfosForFixDepth.getPV();
-										initialValue = lastSendMajorInfosForFixDepth.getEval();
-									} else if (lastSendMajorInfosForFixDepth_prevIter != null) {
-										pv = lastSendMajorInfosForFixDepth_prevIter.getPV();
-										initialValue = lastSendMajorInfosForFixDepth_prevIter.getEval();
-									}
-									searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, pv, true, initialValue);
+									//TODO: Start the search with the best current PV
+									searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, prevPV, true, null);
 									searchers_started[i] = true;
 								}
 							}
@@ -215,7 +210,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							
 							
 							//Send best infos
-							boolean hasSendInfos = false;
+							boolean hasSendInfo = false;
 							ISearchInfo searchers_restart_info = null;
 							int searchers_restart_info_index = -1;
 							for (int i = 0; i < majorInfosForCurDepth.size(); i++) {
@@ -223,55 +218,42 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								ISearchInfo cur_bestMajor = majorInfosForCurDepth.get(i);
 								
 								if (cur_bestMajor != null) {
-									if (lastSendMajorInfosForFixDepth != null) {
-										
-										//Next info for this depth
-										if (
-											
-												cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth.getEval()
-												//|| cur_bestMajor.getBestMove() == lastSendMajorInfosForFixDepth.getBestMove()
-												
-											) {
-											
-											hasSendInfos = true;
-											final_mediator.changedMajor(cur_bestMajor);
-											lastSendMajorInfosForFixDepth = cur_bestMajor;
-											lastSendMajorInfosForFixDepth_index = i;
-											//searchers_restart_info = cur_bestMajor;
-											//searchers_restart_info_index = i;
-										}
+									
+									hasSendInfo = true;
+									
+									MoveInfo moveInfo = movesInfoPerDepth.get(cur_bestMajor.getBestMove());
+									if (moveInfo != null) {
+										moveInfo.addInfo(cur_bestMajor);
 									} else {
-										if (lastSendMajorInfosForFixDepth_prevIter != null) {
-											
-											//First info for this depth
-											if (
-													true
-													//cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth_prevIter.getEval()
-													//|| cur_bestMajor.getBestMove() == lastSendMajorInfosForFixDepth_prevIter.getBestMove()
-													
-													//|| i == lastSendMajorInfosForFixDepth_prevIter_index
-													
-													) {
-												
-												hasSendInfos = true;
-												final_mediator.changedMajor(cur_bestMajor);
-												lastSendMajorInfosForFixDepth = cur_bestMajor;
-												lastSendMajorInfosForFixDepth_index = i;
-												searchers_restart_info = cur_bestMajor;
-												searchers_restart_info_index = i;
-											}
+										moveInfo = new MoveInfo(cur_bestMajor);
+										movesInfoPerDepth.put(cur_bestMajor.getBestMove(), moveInfo);
+									}
+									
+									MoveInfo bestMoveInfo = null;
+									for (Integer move: movesInfoPerDepth.keySet()) {
+										MoveInfo cur_moveInfo = movesInfoPerDepth.get(move);
+										if (bestMoveInfo == null) {
+											bestMoveInfo = cur_moveInfo;
 										} else {
-											
-											
-											//First time only
-											hasSendInfos = true;
-											final_mediator.changedMajor(cur_bestMajor);
-											lastSendMajorInfosForFixDepth = cur_bestMajor;
-											lastSendMajorInfosForFixDepth_index = i;
-											//searchers_restart_info = cur_bestMajor;
-											//searchers_restart_info_index = i;
+											if (cur_moveInfo.getEval() > bestMoveInfo.getEval()) {
+												bestMoveInfo = cur_moveInfo;
+											}
 										}
 									}
+									
+									ISearchInfo info_to_send = SearchInfoFactory.getFactory().createSearchInfo();
+									info_to_send.setDepth(bestMoveInfo.best_info.getDepth());
+									info_to_send.setSelDepth(bestMoveInfo.best_info.getSelDepth());
+									info_to_send.setEval(bestMoveInfo.getEval());
+									info_to_send.setBestMove(bestMoveInfo.best_info.getBestMove());
+									info_to_send.setPV(bestMoveInfo.best_info.getPV());
+									info_to_send.setSearchedNodes(bestMoveInfo.best_info.getSearchedNodes());
+									
+									final_mediator.changedMajor(info_to_send);
+									
+									//TODO: Set search restart info with the best current PV
+									//searchers_restart_info = cur_bestMajor;
+									//searchers_restart_info_index = i;
 								}
 							}
 							
@@ -279,10 +261,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								
 								cur_depth++;
 								
-								lastSendMajorInfosForFixDepth_prevIter = lastSendMajorInfosForFixDepth;
-								lastSendMajorInfosForFixDepth_prevIter_index = lastSendMajorInfosForFixDepth_index;
-								lastSendMajorInfosForFixDepth = null;
-								lastSendMajorInfosForFixDepth_index = -1;
+								movesInfoPerDepth.clear();
 								
 								if (cur_depth > maxIterations) {
 									break;
@@ -313,7 +292,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 										
 										if (searchers_started[i]) {
 											if (i != searchers_restart_info_index) {
-													
+												
 												mediators_bucket.get(i).clearStopper();
 												searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations,
 														useMateDistancePrunning, finishCallback, searchers_restart_info.getPV(), true, searchers_restart_info.getEval());
@@ -327,7 +306,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								
 							}
 							
-							if (!hasSendInfos) {
+							if (!hasSendInfo) {
 								
 								if (final_mediator.getStopper().isStopped()) {
 									
@@ -433,6 +412,35 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 		result += searchers.toString();
 		
 		return result;
+	}
+	
+	
+	private class MoveInfo {
+		
+		int sum;
+		int cnt;
+		int best_eval;
+		ISearchInfo best_info;
+		
+		MoveInfo(ISearchInfo first_info) {
+			sum = first_info.getEval();
+			cnt = 1;
+			best_eval = first_info.getEval();
+			best_info = first_info;
+		}
+		
+		void addInfo(ISearchInfo info) {
+			sum += info.getEval();
+			cnt += 1;
+			if (info.getEval() > best_eval) {
+				best_eval = info.getEval();
+				best_info = info;
+			}
+		}
+		
+		int getEval() {
+			return sum / cnt;
+		}
 	}
 	
 	
