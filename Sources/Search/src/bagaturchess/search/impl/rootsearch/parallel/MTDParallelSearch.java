@@ -215,7 +215,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							
 							
 							//Send best infos
-							boolean hasNewInfosForSending = false;
+							boolean hasSendInfos = false;
 							ISearchInfo searchers_restart_info = null;
 							int searchers_restart_info_index = -1;
 							for (int i = 0; i < majorInfosForCurDepth.size(); i++) {
@@ -233,7 +233,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 												
 											) {
 											
-											hasNewInfosForSending = true;
+											hasSendInfos = true;
 											final_mediator.changedMajor(cur_bestMajor);
 											lastSendMajorInfosForFixDepth = cur_bestMajor;
 											lastSendMajorInfosForFixDepth_index = i;
@@ -245,15 +245,15 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 											
 											//First info for this depth
 											if (
-												
-													cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth_prevIter.getEval()
-													|| cur_bestMajor.getBestMove() == lastSendMajorInfosForFixDepth_prevIter.getBestMove()
+													true
+													//cur_bestMajor.getEval() > lastSendMajorInfosForFixDepth_prevIter.getEval()
+													//|| cur_bestMajor.getBestMove() == lastSendMajorInfosForFixDepth_prevIter.getBestMove()
 													
-													|| i == lastSendMajorInfosForFixDepth_prevIter_index
+													//|| i == lastSendMajorInfosForFixDepth_prevIter_index
 													
 													) {
 												
-												hasNewInfosForSending = true;
+												hasSendInfos = true;
 												final_mediator.changedMajor(cur_bestMajor);
 												lastSendMajorInfosForFixDepth = cur_bestMajor;
 												lastSendMajorInfosForFixDepth_index = i;
@@ -264,7 +264,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 											
 											
 											//First time only
-											hasNewInfosForSending = true;
+											hasSendInfos = true;
 											final_mediator.changedMajor(cur_bestMajor);
 											lastSendMajorInfosForFixDepth = cur_bestMajor;
 											lastSendMajorInfosForFixDepth_index = i;
@@ -327,7 +327,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								
 							}
 							
-							if (!hasNewInfosForSending) {
+							if (!hasSendInfos) {
 								
 								if (final_mediator.getStopper().isStopped()) {
 									
