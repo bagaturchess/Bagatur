@@ -31,7 +31,6 @@ import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl1.Board3_Adapter;
-import bagaturchess.engines.bagatur.cfg.rootsearch.RootSearchConfig_SMP;
 import bagaturchess.engines.bagatur.eval.BagaturEvaluator;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP;

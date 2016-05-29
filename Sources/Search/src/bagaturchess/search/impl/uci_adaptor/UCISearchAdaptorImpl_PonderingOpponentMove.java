@@ -81,6 +81,7 @@ public class UCISearchAdaptorImpl_PonderingOpponentMove extends UCISearchAdaptor
 					info.setBestMove(dummyMoveToPrevenIllegalMoveFromGUI);
 					info.setPV(new int[] {dummyMoveToPrevenIllegalMoveFromGUI});
 					
+					currentMediator.getStopper().markStopped();
 					sender.sendBestMove(); //Will stop the current search
 				} else {
 					if (DEBUGSearch.DEBUG_MODE) throw new IllegalStateException("currentGoCommand.isPonder");

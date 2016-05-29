@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IFinishCallback;
-import bagaturchess.search.api.IRootSearchConfig_SMP;
+import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.CompositeStopper;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
@@ -53,8 +53,8 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	}
 	
 	
-	public IRootSearchConfig_SMP getRootSearchConfig() {
-		return (IRootSearchConfig_SMP) super.getRootSearchConfig();
+	public IRootSearchConfig getRootSearchConfig() {
+		return (IRootSearchConfig) super.getRootSearchConfig();
 	}
 	
 	

@@ -32,6 +32,7 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 			new UCIOptionSpin("MultiPV", 1.0, "type spin default 1 min 1 max 100", 1),
 			new UCIOptionString("GaviotaTbPath", DEFAULT_gaviotaTbPath, "type string default " + DEFAULT_gaviotaTbPath),
 			new UCIOptionSpin("GaviotaTbCache", DEFAULT_gaviotaTbCache, "type spin default " + DEFAULT_gaviotaTbCache + " min 4 max 512", 1),
+			new UCIOptionSpin("Hidden Depth", 0d, "type spin default 0 min 0 max 10", 1),
 	};
 	
 	private String searchImpl_ClassName;
@@ -44,6 +45,8 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	private String gaviotaTbPath = DEFAULT_gaviotaTbPath;
 	private int gaviotaTbCache = DEFAULT_gaviotaTbCache.intValue();
+	
+	private int hiddenDepth = 0;
 	
 	
 	public RootSearchConfig_BaseImpl(String[] args) {
@@ -127,6 +130,12 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 		}
 		
 		return Arrays.copyOfRange(args, param_start_index, param_end_index + 1);
+	}
+	
+	
+	@Override
+	public int getHiddenDepth() {
+		return hiddenDepth;
 	}
 	
 	
@@ -221,6 +230,9 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 			return true;
 		} else if ("GaviotaTbCache".equals(option.getName())) {
 			gaviotaTbCache = (int) ((Double) option.getValue()).doubleValue();
+			return true;
+		} else if ("Hidden Depth".equals(option.getName())) {
+			hiddenDepth = (int) ((Double) option.getValue()).doubleValue();
 			return true;
 		}
 		

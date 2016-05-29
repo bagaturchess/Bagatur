@@ -162,7 +162,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					
 					long start_time = System.currentTimeMillis();
 					
-					Map<Integer, MoveInfo> movesInfoPerDepth = new HashMap<Integer, MoveInfo>();
+					SearchersInfo searchersInfo = new SearchersInfo();
 					
 					boolean isReady = false;
 					while (!final_mediator.getStopper().isStopped() //Condition for normal play
@@ -210,7 +210,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							
 							
 							//Send best infos
-							boolean hasSendInfo = false;
+							boolean hasInfoToSend = false;
 							ISearchInfo searchers_restart_info = null;
 							int searchers_restart_info_index = -1;
 							for (int i = 0; i < majorInfosForCurDepth.size(); i++) {
@@ -219,37 +219,9 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								
 								if (cur_bestMajor != null) {
 									
-									hasSendInfo = true;
+									hasInfoToSend = true;
 									
-									MoveInfo moveInfo = movesInfoPerDepth.get(cur_bestMajor.getBestMove());
-									if (moveInfo != null) {
-										moveInfo.addInfo(cur_bestMajor);
-									} else {
-										moveInfo = new MoveInfo(cur_bestMajor);
-										movesInfoPerDepth.put(cur_bestMajor.getBestMove(), moveInfo);
-									}
-									
-									MoveInfo bestMoveInfo = null;
-									for (Integer move: movesInfoPerDepth.keySet()) {
-										MoveInfo cur_moveInfo = movesInfoPerDepth.get(move);
-										if (bestMoveInfo == null) {
-											bestMoveInfo = cur_moveInfo;
-										} else {
-											if (cur_moveInfo.getEval() > bestMoveInfo.getEval()) {
-												bestMoveInfo = cur_moveInfo;
-											}
-										}
-									}
-									
-									ISearchInfo info_to_send = SearchInfoFactory.getFactory().createSearchInfo();
-									info_to_send.setDepth(bestMoveInfo.best_info.getDepth());
-									info_to_send.setSelDepth(bestMoveInfo.best_info.getSelDepth());
-									info_to_send.setEval(bestMoveInfo.getEval());
-									info_to_send.setBestMove(bestMoveInfo.best_info.getBestMove());
-									info_to_send.setPV(bestMoveInfo.best_info.getPV());
-									info_to_send.setSearchedNodes(bestMoveInfo.best_info.getSearchedNodes());
-									
-									final_mediator.changedMajor(info_to_send);
+									searchersInfo.update(searchers.get(i), cur_bestMajor);
 									
 									//TODO: Set search restart info with the best current PV
 									//searchers_restart_info = cur_bestMajor;
@@ -257,11 +229,16 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								}
 							}
 							
+							
+							if (hasInfoToSend) {
+								ISearchInfo infoToSned = searchersInfo.getInfoToSend(cur_depth);
+								final_mediator.changedMajor(infoToSned);
+							}
+							
+							
 							if (hasNextDepthInfo) {
 								
 								cur_depth++;
-								
-								movesInfoPerDepth.clear();
 								
 								if (cur_depth > maxIterations) {
 									break;
@@ -303,10 +280,9 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								}
 								
 								check_interval = CHECK_INTERVAL_MIN;
-								
 							}
 							
-							if (!hasSendInfo) {
+							if (!hasInfoToSend) {
 								
 								if (final_mediator.getStopper().isStopped()) {
 									
