@@ -176,16 +176,17 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							for (int i = 0; i < Math.min(searchers.size(), expected_count_workers); i++) {
 								if (!searchers_started[i]){
 									//TODO: Start the search with the best current PV
-									searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, prevPV, true, null);
-									searchers_started[i] = true;
+									ISearchInfo cur_best = searchersInfo.getInfoToSend(cur_depth);
+									if (cur_best != null) {
+										searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, cur_best.getPV(), true, cur_best.getEval());
+										searchers_started[i] = true;
+									}
 								}
 							}
 							
 							
 							//Collect major infos by depth
 							List<ISearchInfo> majorInfosForCurDepth = new ArrayList<ISearchInfo>();
-							
-							boolean hasNextDepthInfo = false;
 							
 							for (int i_mediator = 0; i_mediator < mediators_bucket.size(); i_mediator++) {
 								
@@ -194,13 +195,18 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								ISearchInfo cur_mediator_lastinfo = null;
 								for (int i_major = cur_mediator.majorInfos.size() - 1; i_major > cur_mediator.lastSendMajorIndex; i_major--) {								
 									ISearchInfo curinfo = cur_mediator.majorInfos.get(i_major);
+									
 									if (!curinfo.isUpperBound()) {
+										
 										if (curinfo.getDepth() == cur_depth) {
+											
 											cur_mediator_lastinfo = curinfo;
 											cur_mediator.lastSendMajorIndex = i_major;
 											break;
+											
 										} else if (curinfo.getDepth() > cur_depth) {
-											hasNextDepthInfo = true;
+											
+											searchersInfo.update(searchers.get(i_mediator), curinfo);
 										}
 									}
 								}
@@ -236,7 +242,9 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							}
 							
 							
-							if (hasNextDepthInfo) {
+							if (searchersInfo.hasDepthInfo(cur_depth + 1)) {
+								
+								hasInfoToSend = true;
 								
 								cur_depth++;
 								
@@ -291,14 +299,12 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 									
 								} else {
 									
-									if (!hasNextDepthInfo) {
-										//Wait some time and than make check again
-										Thread.sleep(check_interval);
-										
-										check_interval = 2 * check_interval;
-										if (check_interval > CHECK_INTERVAL_MAX) {
-											check_interval = CHECK_INTERVAL_MAX;
-										}
+									//Wait some time and than make check again
+									Thread.sleep(check_interval);
+									
+									check_interval = 2 * check_interval;
+									if (check_interval > CHECK_INTERVAL_MAX) {
+										check_interval = CHECK_INTERVAL_MAX;
 									}
 								}
 							}

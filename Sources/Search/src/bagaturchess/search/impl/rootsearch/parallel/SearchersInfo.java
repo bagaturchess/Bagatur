@@ -9,6 +9,7 @@ import java.util.Map;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.impl.info.SearchInfoFactory;
+import bagaturchess.search.impl.utils.SearchUtils;
 
 
 public class SearchersInfo {
@@ -84,6 +85,34 @@ public class SearchersInfo {
 		info_to_send.setSearchedNodes(totalNodes);
 		
 		return info_to_send;
+	}
+	
+	
+	public boolean hasDepthInfo(int depth) {
+		
+		ISearchInfo prevDepthInfo = getInfoToSend(depth - 1);
+		
+		int countResponded = 0;
+		for (IRootSearch cur_searcher: searchersInfo.keySet()) {
+			
+			SearcherInfo cur_searcher_infos = searchersInfo.get(cur_searcher);
+			ISearchInfo depth_last_info = cur_searcher_infos.getLastSearchInfo(depth);
+			
+			if (depth_last_info != null) {
+				
+				countResponded++;
+				
+				if (prevDepthInfo == null) {
+					return true;
+				}
+				
+				if (depth_last_info.getBestMove() == prevDepthInfo.getBestMove()) {
+					return true;
+				}
+			}
+		}
+		
+		return countResponded > 0 && countResponded == searchersInfo.size();
 	}
 	
 	
@@ -194,6 +223,9 @@ public class SearchersInfo {
 		}
 		
 		int getEval() {
+			if (SearchUtils.isMateVal(best_eval)) {
+				return best_eval;
+			}
 			return sum / cnt;
 		}
 	}
