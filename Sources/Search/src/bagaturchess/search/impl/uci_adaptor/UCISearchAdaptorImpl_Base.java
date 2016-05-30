@@ -34,6 +34,7 @@ import bagaturchess.search.impl.env.MemoryConsumers;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
+import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.api.ISearchAdaptorConfig;
 import bagaturchess.uci.api.IUCISearchAdaptor;
@@ -50,6 +51,7 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 	protected IRootSearchConfig rootSearchCfg;
 	protected IBitBoard boardForSetup;
 	
+	protected BestMoveSender bestMoveSender;
 	protected ITimeController timeController;
 	protected ISearchMediator currentMediator;
 	protected Go currentGoCommand;
@@ -137,7 +139,7 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 	
 	protected void goSearch(boolean ponderSearch) {
 		
-		if (searchAdaptorCfg.isPonderingEnabled()) {
+		if (ponderSearch) {
 			getSearcherNormal().decreaseTPTDepths(1);
 		} else {
 			getSearcherNormal().decreaseTPTDepths(2);
@@ -151,8 +153,11 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		IRootSearch searcher = getSearcher(ponderSearch);
 		
 		currentMediator.dump("ROOT SEARCHER: " + searcher);
+		currentMediator.dump("Ponder: " + ponderSearch);
 		
 		boolean isEndlessSearch = isEndlessSearch(currentGoCommand);
+		
+		currentMediator.dump("IsEndlessSearch: " + isEndlessSearch);
 		
 		if (!isEndlessSearch) {
 			currentMediator.dump("Using TimeSaver ...");
@@ -160,15 +165,9 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 			boolean moveSent = saver.beforeMove(boardForSetup, sharedData, currentMediator, searchAdaptorCfg.isOwnBookEnabled());
 			
 			if (!moveSent) {
+				
 				int start_iteration = 1;
 				
-				if (rootSearchCfg.getSearchConfig().isOther_UseTPTInRoot()) {
-					/*if (sharedData.getTPT() != null) {
-						sharedData.getTPT().lock();
-						start_iteration = saver.sentFromTPT(boardForSetup, sharedData, currentMediator, start_iteration);
-						sharedData.getTPT().unlock();
-					}*/
-				}
 				currentMediator.dump("Normal search started");
 				
 				int maxIterations = currentGoCommand.getDepth();
@@ -193,7 +192,7 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 	}
 
 
-	private IRootSearch getSearcher(boolean ponderSearch) {
+	protected IRootSearch getSearcher(boolean ponderSearch) {
 		IRootSearch searcher = null;
 		if (ponderSearch) {
 			searcher = searcherPonder;
@@ -230,29 +229,35 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 			currentMediator.dump("Info is still null. Return empty move (=0).");
 			
 			currentMediator.getStopper().markStopped();
+			
+			IRootSearch searcher = getSearcher(isPonderSearch(currentGoCommand));
+			searcher.stopSearchAndWait();
+			
 			currentMediator = null;
 			currentGoCommand = null;
 			
 			return new int[] {0, 0}; 
 		}
 		
-		boolean endlessSearch = isEndlessSearch(currentGoCommand);
-		
-		currentMediator.getStopper().markStopped();
-		currentMediator = null;
-		currentGoCommand = null;
-		
-		IRootSearch searcher = getSearcher(isPonderSearch(currentGoCommand));
-		searcher.stopSearchAndWait();
 		
 		int move = info.getBestMove();
 		int ponder = 0;
 		
-		if (searchAdaptorCfg.isPonderingEnabled() && !endlessSearch) {
+		//boolean endlessSearch = isEndlessSearch(currentGoCommand);
+		//if (isPonderSearch(currentGoCommand)) {
 			if (info.getPV().length >= 2) {
 				ponder = info.getPV()[1];
 			}
-		}
+		//}
+			
+		
+		currentMediator.getStopper().markStopped();
+		
+		IRootSearch searcher = getSearcher(isPonderSearch(currentGoCommand));
+		searcher.stopSearchAndWait();
+		
+		currentMediator = null;
+		currentGoCommand = null;
 		
 		return new int[] {move, ponder};
 	}

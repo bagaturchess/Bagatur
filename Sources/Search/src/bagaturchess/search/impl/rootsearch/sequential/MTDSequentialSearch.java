@@ -114,6 +114,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		
 		final ISearchMediator final_mediator = mediator;
 		
+		
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -139,9 +140,11 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 					stopper.markStopped();
 					stopper = null;
 					
-					
 					final_mediator.getBestMoveSender().sendBestMove();
 					
+					//if (finishCallback != null) {
+					//	finishCallback.ready();
+					//}
 					
 				} catch(Throwable t) {
 					ChannelManager.getChannel().dump(t);

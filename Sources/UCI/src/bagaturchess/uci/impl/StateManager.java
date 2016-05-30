@@ -339,7 +339,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 		int[] moveAndPonder = searchAdaptor.stopSearch();
 		int move = moveAndPonder[0];
 		int ponder = moveAndPonder[1];
-		if (move != 0) { 
+		if (move != 0) {
 			
 			board.makeMoveForward(move);
 			
