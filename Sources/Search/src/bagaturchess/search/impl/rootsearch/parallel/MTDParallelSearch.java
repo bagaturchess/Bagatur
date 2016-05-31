@@ -167,7 +167,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					
 					boolean allSearchersReady = false;
 					while (
-							(!stopper.isStopped() //Stopped from outside
+							(!final_mediator.getStopper().isStopped() //Stopped
 									&& !allSearchersReady //Search is done
 							)
 							) {
