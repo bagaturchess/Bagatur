@@ -93,7 +93,7 @@ public class UCISearchAdaptorImpl_PonderingOpponentMove extends UCISearchAdaptor
 					IRootSearch searcher = getSearcher(isPonderSearch(currentGoCommand));
 					searcher.stopSearchAndWait();
 					
-					sender.sendBestMove(); //Will stop the current search
+					sender.sendBestMove();
 				} else {
 					if (DEBUGSearch.DEBUG_MODE) throw new IllegalStateException("currentGoCommand.isPonder");
 				}
