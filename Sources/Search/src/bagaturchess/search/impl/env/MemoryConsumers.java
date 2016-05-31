@@ -31,6 +31,10 @@ public class MemoryConsumers {
 	private static int MIN_MEMORY_BUFFER;
 	private static double MEMORY_USAGE_PERCENT; 
 	
+	private static final int CALCULATION_MAX_MB 				= 333;
+	private static final int CALCULATION_MULTIPLIER_FOR_SIZES_1	= 1000;
+	private static final int CALCULATION_MULTIPLIER_FOR_SIZES_2	= 100;
+	
 	
 	public static void set_JVMDLL_MEMORY_CONSUMPTION(int val) {
 		JVMDLL_MEMORY_CONSUMPTION = val;	
@@ -184,6 +188,8 @@ public class MemoryConsumers {
 	
 	private void initCaches(long availableMemory) {
 		
+		ChannelManager.getChannel().dump("Initializing caches inside " + (int) (availableMemory / (1024 * 1024)) + "MB");
+		
 		//if (availableMemory / (1024 * 1024) < 10) {
 		//	throw new IllegalStateException("Not enough memory. At least 10 MB are necessary for caches (only "
 		//			+ (availableMemory / (1024 * 1024)) + " are available). Please increase the -Xmx option of Java VM");
@@ -251,7 +257,7 @@ public class MemoryConsumers {
 		if (availableMemory_in_MB < 1) {
 			throw new IllegalStateException("Not enough memory for initializing Transposition Table. Please increase the -Xmx option of Java VM");
 		}
-		int test_size = availableMemory_in_MB * 1000;
+		int test_size = Math.min(CALCULATION_MAX_MB, availableMemory_in_MB) * CALCULATION_MULTIPLIER_FOR_SIZES_1;
 		
 		System.gc();
 		int memory_before = getUsedMemory();
@@ -267,7 +273,7 @@ public class MemoryConsumers {
 		if (availableMemory_in_MB < 1) {
 			throw new IllegalStateException("Not enough memory for initializing Endgame Table Bases cache (OUT). Please increase the -Xmx option of Java VM");
 		}
-		int test_size = availableMemory_in_MB * 1000;
+		int test_size = Math.min(CALCULATION_MAX_MB, availableMemory_in_MB) * CALCULATION_MULTIPLIER_FOR_SIZES_1;
 		
 		System.gc();
 		int memory_before = getUsedMemory();
@@ -282,7 +288,7 @@ public class MemoryConsumers {
 		if (availableMemory_in_MB < 1) {
 			throw new IllegalStateException("Not enough memory for initializing Eval Cache. Please increase the -Xmx option of Java VM");
 		}
-		int test_size = availableMemory_in_MB * 1000;
+		int test_size = Math.min(CALCULATION_MAX_MB, availableMemory_in_MB) * CALCULATION_MULTIPLIER_FOR_SIZES_1;
 		
 		System.gc();
 		int memory_before = getUsedMemory();
@@ -298,7 +304,7 @@ public class MemoryConsumers {
 		if (availableMemory_in_MB < 1) {
 			throw new IllegalStateException("Not enough memory for initializing Pawns Eval Cache. Please increase the -Xmx option of Java VM");
 		}
-		int test_size = availableMemory_in_MB * 100;
+		int test_size = Math.min(CALCULATION_MAX_MB, availableMemory_in_MB) * CALCULATION_MULTIPLIER_FOR_SIZES_2;
 		
 		System.gc();
 		int memory_before = getUsedMemory();

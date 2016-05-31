@@ -93,11 +93,7 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 			int startIteration, int maxIterations,
 			boolean useMateDistancePrunning, int[] prevPV) {
 		negamax(bitboardForSetup, mediator, startIteration, maxIterations,
-				useMateDistancePrunning, new IFinishCallback() {
-					@Override
-					public void ready() {
-					}
-				}, prevPV);
+				useMateDistancePrunning, null, prevPV);
 	}
 	
 	
