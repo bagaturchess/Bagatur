@@ -243,12 +243,13 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		int move = info.getBestMove();
 		int ponder = 0;
 		
-		//boolean endlessSearch = isEndlessSearch(currentGoCommand);
-		//if (isPonderSearch(currentGoCommand)) {
+		
+		//Always send ponder move if UCI ponder option is set to true
+		if (searchAdaptorCfg.isPonderingEnabled() ) {
 			if (info.getPV().length >= 2) {
 				ponder = info.getPV()[1];
 			}
-		//}
+		}
 			
 		
 		currentMediator.getStopper().markStopped();

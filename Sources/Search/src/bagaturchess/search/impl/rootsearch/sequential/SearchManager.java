@@ -32,7 +32,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.search.api.IEvaluator;
-import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
@@ -60,13 +59,12 @@ public class SearchManager {
 	
 	private ISearchMediator mediator;
 	private SharedData sharedData;
-	private IFinishCallback finishCallback;
 
 	private Integer initialValue;
 	
 	
 	public SearchManager(ISearchMediator _mediator, IBitBoard _bitboardForSetup, SharedData _sharedData, long _hashkey,
-			int _startIteration, int _maxIterations, IFinishCallback _finishCallback, Integer _initialValue) {
+			int _startIteration, int _maxIterations, Integer _initialValue) {
 
 		lock = new ReentrantReadWriteLock();
 		
@@ -76,8 +74,6 @@ public class SearchManager {
 		maxIterations = _maxIterations;
 		
 		currentdepth = _startIteration;//1;
-		
-		finishCallback = _finishCallback;
 		
 		//lower_bound = ISearch.MIN;
 		//upper_bound = ISearch.MAX;
@@ -260,9 +256,6 @@ public class SearchManager {
 		if (isLast) {
 			finishDepth(bitboardForTesting);
 			initBetas(bitboardForTesting);
-			if (currentdepth > maxIterations && finishCallback != null) {
-				finishCallback.ready();
-			}
 		} else {
 			updateBetas();
 		}
@@ -310,9 +303,6 @@ public class SearchManager {
 		if (isLast) {
 			finishDepth(bitboardForTesting);
 			initBetas(bitboardForTesting);
-			if (currentdepth > maxIterations && finishCallback != null) {
-				finishCallback.ready();
-			}
 		} else {
 			updateBetas();
 		}
@@ -400,7 +390,7 @@ public class SearchManager {
 		//curIterationEval = ISearch.MIN;
 		//curIterationLastInfo = null;
 		
-		mediator.startIteration(currentdepth - 1);
+		mediator.startIteration(currentdepth);
 	}
 	
 	public int getCurrentDepth() {

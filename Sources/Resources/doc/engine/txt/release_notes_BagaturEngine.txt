@@ -1,8 +1,9 @@
 
 Version 1.4b (31 May 2016)
-  * 30+ ELO stronger (measured versus 1.4a)
+  * 28+ ELO stronger (measured versus 1.4a)
   * Search optimizations: adjustments of the depth reduction amount used in late move reduction and null move reduction
   * Default memory increased from 256MB to 1024MB. Could be set in the corresponding *.ini files to *exe files (or bat files if you don't use *.exe starters)
+  * Fixes in UCI communication with Arena UI
 
 Version 1.4a (24 May 2016)
   * Bugfix: removed bug when in some endgames engine just stop thinking

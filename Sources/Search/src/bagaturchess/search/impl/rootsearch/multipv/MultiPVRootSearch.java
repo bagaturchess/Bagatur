@@ -28,6 +28,8 @@ import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchMediator;
+import bagaturchess.search.api.internal.ISearchStopper;
+import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 
 
@@ -35,6 +37,8 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 	
 	
 	private IRootSearch rootSearch;
+	private MultiPVMediator current_mediator_multipv;
+	private ISearchStopper current_stopper;
 	
 	
 	public MultiPVRootSearch(IRootSearchConfig _engineConfiguration, IRootSearch _rootSearch) {
@@ -56,25 +60,31 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 			int startIteration, int maxIterations,
 			boolean useMateDistancePrunning, IFinishCallback finishCallback, int[] prevPV) {
 		
+		if (current_mediator_multipv != null) {
+			throw new IllegalStateException("MultiPV search started without beeing stopped.");
+		}
+		
 		setupBoard(_bitboardForSetup);
 		
 		//!!!Do not setup the board of rootSearch. multiPV mediator will set it up for each move
 		//rootSearch.setupBoard(_bitboardForSetup);
 		
-		MultiPVMediator mediator_multipv = new MultiPVMediator(getRootSearchConfig(), rootSearch,
+		current_mediator_multipv = new MultiPVMediator(getRootSearchConfig(), rootSearch,
 				getBitboardForSetup(), mediator, startIteration - 1, maxIterations - 1, //Should be -1, because it plays each move and than search with depth maxIterations
 				useMateDistancePrunning, finishCallback);
 		
-		mediator_multipv.ready();
+		current_stopper = mediator.getStopper();
+		
+		current_mediator_multipv.ready();
 	}
 	
 	
 	@Override
 	public void shutDown() {
-		//Do nothing
+		rootSearch.shutDown();
 	}
-
-
+	
+	
 	@Override
 	public int getTPTUsagePercent() {
 		return rootSearch.getTPTUsagePercent();
@@ -85,10 +95,19 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 	public void decreaseTPTDepths(int reduction) {
 		rootSearch.decreaseTPTDepths(reduction);
 	}
-
-
+	
+	
 	@Override
 	public void stopSearchAndWait() {
-		rootSearch.stopSearchAndWait();
+		
+		if (current_stopper != null) {
+			
+			current_stopper.markStopped();
+			
+			rootSearch.stopSearchAndWait();
+			
+			current_mediator_multipv = null;
+			current_stopper = null;
+		}
 	}
 }

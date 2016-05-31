@@ -106,7 +106,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		}
 		
 		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup(), getSharedData(), getBitboardForSetup().getHashKey(),
-				startIteration, maxIterations, finishCallback, initialValue);
+				startIteration, maxIterations, initialValue);
 		
 		//final ISearchStopper stopper = new MTDStopper(getBitboardForSetup().getColourToMove(), distribution);
 		mediator.setStopper(new CompositeStopper(new ISearchStopper[] {mediator.getStopper(), stopper} ));
@@ -140,11 +140,13 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 					stopper.markStopped();
 					stopper = null;
 					
-					final_mediator.getBestMoveSender().sendBestMove();
 					
-					//if (finishCallback != null) {
-					//	finishCallback.ready();
-					//}
+					if (finishCallback == null) {//Non multiPV search
+						final_mediator.getBestMoveSender().sendBestMove();
+					} else {
+						//MultiPV search
+						finishCallback.ready();
+					}
 					
 				} catch(Throwable t) {
 					ChannelManager.getChannel().dump(t);

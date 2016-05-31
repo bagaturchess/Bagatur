@@ -15,10 +15,12 @@ import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
+import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInfoUtils;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.utils.SearchMediatorProxy;
+import bagaturchess.uci.api.ChannelManager;
 
 
 public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallback {
@@ -45,12 +47,16 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	
 	private Set<ISearchInfo> infos;
 	
+	private ISearchStopper stopper;
+	
 	
 	public MultiPVMediator(IRootSearchConfig _engineConfiguration, IRootSearch _rootSearch, IBitBoard _bitboard, ISearchMediator _parentMediator,
 			int _startIteration, int _maxIterations, boolean _useMateDistancePrunning,
 			IFinishCallback _finishCallback) {
 		
 		super(_parentMediator);
+		
+		stopper = _parentMediator.getStopper();
 		
 		engineConfiguration = _engineConfiguration;
 		rootSearch = _rootSearch;
@@ -87,9 +93,17 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	@Override
 	public synchronized void ready() {
 		
-		//dump("READY CALLED");
+		if (cur_depth > 1 && stopper.isStopped()) {
+			
+			getBestMoveSender().sendBestMove();
+			
+			return;
+		}
+		
+		//ChannelManager.getChannel().dump("READY CALLED");
 		
 		if (cur_PVNumber != -1) { //Not first move of first iteration
+			
 			MultiPVEntry curEntry = getCurrentPVEntry();
 			curEntry.setInfo(lastinfo);
 		}
@@ -97,7 +111,7 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 		
 		if (cur_PVNumber == moves_count - 1) {
 			
-			//dump("READY CALLED: cur_PVNumber == moves_count - 1");
+			//ChannelManager.getChannel().dump("READY CALLED: cur_PVNumber == moves_count - 1");
 			
 			//Get all PVs of this iteration
 			MultiPVEntry[] pvsToSend = orderPVsForSending();
@@ -126,7 +140,7 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 				throw new IllegalStateException("cur_depth=" + cur_depth);
 			}
 		} else if (cur_PVNumber < moves_count - 1) {
-			//dump("READY CALLED: cur_PVNumber < moves_count - 1");
+			//ChannelManager.getChannel().dump("READY CALLED: cur_PVNumber < moves_count - 1");
 			cur_PVNumber++;
 		} else {
 			throw new IllegalStateException("cur_PVNumber=" + cur_PVNumber);
@@ -205,13 +219,21 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	
 	private void startNextSearch() {
 		try {
+			
+			//rootSearch.stopSearchAndWait();
+			//ChannelManager.getChannel().dump("before search");
+			
+			this.setStopper(stopper);//Revert to original stopper
+			
 			bitboard.makeMoveForward(getCurrentPVEntry().getMove());
-			rootSearch.negamax(bitboard, this, cur_depth, cur_depth, useMateDistancePrunning, this, null);
+			rootSearch.negamax(bitboard, this, 0, cur_depth, useMateDistancePrunning, this, null);
 			bitboard.makeMoveBackward(getCurrentPVEntry().getMove());
+			//ChannelManager.getChannel().dump("after search");
+			
 		} catch(SearchInterruptedException sie) {
 			//Do Nothing
 		} catch(Throwable t) {
-			this.dump(t);
+			ChannelManager.getChannel().dump(t);
 		}
 	}
 	
