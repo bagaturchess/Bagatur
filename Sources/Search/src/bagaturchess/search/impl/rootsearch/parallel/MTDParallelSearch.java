@@ -151,7 +151,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					
 					boolean[] searchers_started = new boolean[searchers.size()];
 					searchers_started[0] = true;
-					searchers.get(0).negamax(getBitboardForSetup(), mediators.get(0), startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, true, null);
+					searchers.get(0).negamax(getBitboardForSetup(), mediators.get(0), cur_depth, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, true, null);
 					/*for (int i = 0; i < searchers.size(); i++) {
 						searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, prevPV, true);
 					}*/
@@ -173,13 +173,13 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							
 							//Start more searchers if necessary
 							long time_delta = System.currentTimeMillis() - start_time;
-							long expected_count_workers = time_delta / 500;
+							long expected_count_workers = time_delta / 100;
 							for (int i = 0; i < Math.min(searchers.size(), expected_count_workers); i++) {
 								if (!searchers_started[i]){
 									//TODO: Start the search with the best current PV
 									ISearchInfo cur_best = searchersInfo.getInfoToSend(cur_depth);
 									if (cur_best != null) {
-										searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, cur_best.getPV(), true, cur_best.getEval());
+										searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, multiPVCallback, cur_best.getPV(), true, cur_best.getEval());
 										searchers_started[i] = true;
 									}
 								}
@@ -325,6 +325,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 						}
 					}
 					
+					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: searchers are stopped");
 					
 					if (stopper == null) {
 						throw new IllegalStateException();
