@@ -165,9 +165,11 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					
 					SearchersInfo searchersInfo = new SearchersInfo();
 					
-					boolean isReady = false;
-					while (!final_mediator.getStopper().isStopped() //Condition for normal play
-							|| !isReady //Ready is when all best infos are send, even after the stopper has stopped
+					boolean allSearchersReady = false;
+					while (
+							(!stopper.isStopped() //Stopped from outside
+									&& !allSearchersReady //Search is done
+							)
 							) {
 							
 							
@@ -238,8 +240,8 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							
 							
 							if (hasInfoToSend) {
-								ISearchInfo infoToSned = searchersInfo.getInfoToSend(cur_depth);
-								final_mediator.changedMajor(infoToSned);
+								ISearchInfo infoToSend = searchersInfo.getInfoToSend(cur_depth);
+								final_mediator.changedMajor(infoToSend);
 							}
 							
 							
@@ -293,31 +295,42 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							
 							if (!hasInfoToSend) {
 								
-								if (final_mediator.getStopper().isStopped()) {
-									
-									//All infos send and search is stoped: isReady = true;
-									isReady = true;
-									
-								} else {
-									
-									//Wait some time and than make check again
-									Thread.sleep(check_interval);
-									
-									check_interval = 2 * check_interval;
-									if (check_interval > CHECK_INTERVAL_MAX) {
-										check_interval = CHECK_INTERVAL_MAX;
-									}
+								//isReady = true;
+								
+								//Wait some time and than make check again
+								Thread.sleep(check_interval);
+								
+								check_interval = 2 * check_interval;
+								if (check_interval > CHECK_INTERVAL_MAX) {
+									check_interval = CHECK_INTERVAL_MAX;
 								}
+							} else {
+								
+								//All infos send: isReady = true;
+								//isReady = false;
 							}
 							
 							
 							try {
-								final_mediator.getStopper().stopIfNecessary(maxIterations, getBitboardForSetup().getColourToMove(), ISearch.MIN, ISearch.MAX);
+								final_mediator.getStopper().stopIfNecessary(cur_depth, getBitboardForSetup().getColourToMove(), ISearch.MIN, ISearch.MAX);
 							} catch(SearchInterruptedException sie) {
 							}
+							
+							boolean hasRunningSearcher = false;
+							for (int i = 0; i < searchers.size(); i++) {
+								if (searchers_started[i]) {
+									if (!searchers.get(i).isStopped()) {
+										hasRunningSearcher = true;
+										break;
+									}
+								}
+							}
+							allSearchersReady = !hasRunningSearcher;
 					}
 					
+					
 					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Out of loop");
+					
 					
 					for (int i = 0; i < searchers.size(); i++) {
 						if (searchers_started[i]) {
@@ -325,7 +338,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 						}
 					}
 					
-					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: searchers are stopped");
+					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Searchers are stopped");
 					
 					if (stopper == null) {
 						throw new IllegalStateException();

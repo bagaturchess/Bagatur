@@ -34,6 +34,7 @@ import bagaturchess.search.api.internal.CompositeStopper;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
+import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
@@ -136,7 +137,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch before loop");
 					
 					while (!final_mediator.getStopper().isStopped() //Condition for normal play
-							&& distribution.getCurrentDepth() <= distribution.getMaxIterations() //Condition for fixed depth or MultiPV search
+							&& distribution.getCurrentDepth() <= distribution.getMaxIterations() //Condition for fixed depth
 							) {
 						
 						Runnable task = new NullwinSearchTask(searcher, distribution, getBitboardForSetup(),
@@ -167,6 +168,11 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 				}
 			}
 		});
+	}
+	
+	
+	public boolean isStopped() {
+		return stopper == null;
 	}
 	
 	
