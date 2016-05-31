@@ -120,8 +120,8 @@ public class NullwinSearchTask implements Runnable {
 			//searcher = searchers.getSearcher(bitboard, sharedData);
 			
 			if (prevPV == null) {
-				PVHistoryEntry entry = searcher.getEnv().getPVs().getPV(bitboard.getHashKey());
-				if (entry != null) {
+				PVHistoryEntry historyEntry = searcher.getEnv().getPVs().getPV(bitboard.getHashKey());
+				if (historyEntry != null) {
 					prevPV = searcher.getEnv().getPVs().getPV(searcher.getEnv().getBitboard().getHashKey()).getPv();
 				}
 			}

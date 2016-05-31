@@ -31,7 +31,7 @@ public class MemoryConsumers {
 	private static int MIN_MEMORY_BUFFER;
 	private static double MEMORY_USAGE_PERCENT; 
 	
-	private static final int CALCULATION_MAX_MB 				= 333;
+	private static final int CALCULATION_MAX_MB 				= 177;
 	private static final int CALCULATION_MULTIPLIER_FOR_SIZES_1	= 1000;
 	private static final int CALCULATION_MULTIPLIER_FOR_SIZES_2	= 100;
 	

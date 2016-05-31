@@ -34,6 +34,7 @@ import bagaturchess.search.api.internal.CompositeStopper;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
+import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.utils.DEBUGSearch;
@@ -72,14 +73,16 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	
 	
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback finishCallback, final int[] prevPV) {
-		negamax(_bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, finishCallback, prevPV, false, null);
+			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback, final int[] prevPV) {
+		negamax(_bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, false, null);
 	}
 	
 	
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback finishCallback, final int[] prevPV, boolean dont_wrap_mediator, Integer initialValue) {
+			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback,
+			int[] prevPV, boolean dont_wrap_mediator, Integer initialValue) {
 		
+		//TODO: store pv in pvhistory
 		
 		if (stopper != null) {
 			throw new IllegalStateException("MTDSequentialSearch started whithout beeing stopped");
@@ -97,6 +100,16 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch started from depth " + startIteration + " to depth " + maxIterations);
 		
+		
+		if (prevPV == null) {
+			PVHistoryEntry historyEntry = searcher.getEnv().getPVs().getPV(getBitboardForSetup().getHashKey());
+			if (historyEntry != null) {
+				prevPV = historyEntry.getPv();
+				initialValue = historyEntry.getEval();
+			}
+		}
+		final int[] final_prevPV = prevPV;
+				
 		
 		if (!dont_wrap_mediator) {
 			//Original mediator should be an instance of UCISearchMediatorImpl_Base
@@ -127,7 +140,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 							) {
 						
 						Runnable task = new NullwinSearchTask(searcher, distribution, getBitboardForSetup(),
-								final_mediator, useMateDistancePrunning, prevPV
+								final_mediator, useMateDistancePrunning, final_prevPV
 																);
 						task.run();
 					}
@@ -141,11 +154,11 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 					stopper = null;
 					
 					
-					if (finishCallback == null) {//Non multiPV search
+					if (multiPVCallback == null) {//Non multiPV search
 						final_mediator.getBestMoveSender().sendBestMove();
 					} else {
 						//MultiPV search
-						finishCallback.ready();
+						multiPVCallback.ready();
 					}
 					
 				} catch(Throwable t) {

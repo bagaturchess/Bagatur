@@ -130,8 +130,8 @@ public class MTDSchedulerMain {
 		
 		SharedData arg1 = new SharedData(ChannelManager.getChannel(), cfg);
 		
-		//IRootSearch search = new MTDParallelSearch(new Object[] {cfg, arg1});
-		IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
+		IRootSearch search = new MTDParallelSearch(new Object[] {cfg, arg1});
+		//IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
 		SharedData sharedData = search.getSharedData();
@@ -526,9 +526,9 @@ public class MTDSchedulerMain {
 		
 		//ISearchMediator mediator2 = new MediatorDummper(bitboard, eval, 5000000, true);
 		
-		searchMultiPV.newGame(bitboard);
-		searchMultiPV.negamax(bitboard, mediator1, 1, 100, true, null);
-		//search.negamax(bitboard, mediator1, 1, ISearch.MAX_DEPTH, true, null);
+		//searchMultiPV.newGame(bitboard);
+		//searchMultiPV.negamax(bitboard, mediator1, 1, 100, true, null);
+		search.negamax(bitboard, mediator1, 1, ISearch.MAX_DEPTH, true, null);
 		
 		//search.negamax(bitboard, mediator1, 2, 2, true);
 		

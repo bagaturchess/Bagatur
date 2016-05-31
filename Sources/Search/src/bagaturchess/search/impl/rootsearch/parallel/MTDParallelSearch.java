@@ -104,8 +104,9 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 	
 	@Override
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator root_mediator, final int startIteration, final int maxIterations,
-			final boolean useMateDistancePrunning, final IFinishCallback finishCallback, final int[] prevPV) {
+			final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback, final int[] prevPV) {
 		
+		//TODO: store pv in pvhistory
 		
 		if (stopper != null) {
 			throw new IllegalStateException("MTDParallelSearch started whithout beeing stopped");
@@ -150,7 +151,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					
 					boolean[] searchers_started = new boolean[searchers.size()];
 					searchers_started[0] = true;
-					searchers.get(0).negamax(getBitboardForSetup(), mediators.get(0), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, prevPV, true, null);
+					searchers.get(0).negamax(getBitboardForSetup(), mediators.get(0), startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, true, null);
 					/*for (int i = 0; i < searchers.size(); i++) {
 						searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, prevPV, true);
 					}*/
@@ -178,7 +179,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 									//TODO: Start the search with the best current PV
 									ISearchInfo cur_best = searchersInfo.getInfoToSend(cur_depth);
 									if (cur_best != null) {
-										searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, cur_best.getPV(), true, cur_best.getEval());
+										searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, cur_best.getPV(), true, cur_best.getEval());
 										searchers_started[i] = true;
 									}
 								}
@@ -280,7 +281,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 												
 												mediators_bucket.get(i).clearStopper();
 												searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations,
-														useMateDistancePrunning, finishCallback, searchers_restart_info.getPV(), true, searchers_restart_info.getEval());
+														useMateDistancePrunning, multiPVCallback, searchers_restart_info.getPV(), true, searchers_restart_info.getEval());
 											}
 										}
 									}
@@ -332,7 +333,12 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					stopper = null;
 					
 					
-					final_mediator.getBestMoveSender().sendBestMove();
+					if (multiPVCallback == null) {//Non multiPV search
+						final_mediator.getBestMoveSender().sendBestMove();
+					} else {
+						//MultiPV search
+						multiPVCallback.ready();
+					}
 					
 					
 				} catch(Throwable t) {
