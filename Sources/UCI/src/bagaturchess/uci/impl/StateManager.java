@@ -158,6 +158,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 							sendBestMove();
 							break;
 						case COMMAND_TO_ENGINE_QUIT:
+							channel.sendLogToGUI("StateManager: System.exit(0)");
 							System.exit(0);
 							break;
 						default:
