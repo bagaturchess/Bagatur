@@ -76,7 +76,7 @@ public class Boot {
 			final StateManager manager = new StateManager(engineBootCfg);
 			manager.setChannel(communicationChanel);
 			
-			asyncInitStateManager(manager, communicationChanel, engineBootCfg);
+			syncInitStateManager(manager, communicationChanel, engineBootCfg);
 			
 			manager.communicate();
 			
@@ -85,15 +85,15 @@ public class Boot {
 		}
 	}
 	
-
-	private static void asyncInitStateManager(final StateManager manager, final IChannel communicationChanel,
+	
+	private static void syncInitStateManager(final StateManager manager, final IChannel communicationChanel,
 			final IUCIConfig engineBootCfg) throws Exception {
 		
-		(new Thread(
-				new Runnable() {
+		//(new Thread(
+		//		new Runnable() {
 					
-					@Override
-					public void run() {
+		//			@Override
+		//			public void run() {
 						try {
 							//Create state manager and apply initial values of options
 							IUCIOptionsRegistry optionsRegistry = new UCIOptionsRegistry();
@@ -123,9 +123,9 @@ public class Boot {
 								}
 							}
 						}
-					}
-				}
-				)
-		).start();
+		//			}
+		//		}
+		//		)
+		//).start();
 	}
 }
