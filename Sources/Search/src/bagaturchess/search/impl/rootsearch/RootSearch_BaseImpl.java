@@ -149,10 +149,9 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	
 	protected class Stopper implements ISearchStopper {
 		
-		private boolean stopped;
+		private volatile boolean stopped;
 		
 		public Stopper() {
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override

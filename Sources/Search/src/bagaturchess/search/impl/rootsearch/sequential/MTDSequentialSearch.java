@@ -34,7 +34,6 @@ import bagaturchess.search.api.internal.CompositeStopper;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
@@ -110,13 +109,13 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 			}
 		}
 		final int[] final_prevPV = prevPV;
-				
+		
 		
 		if (!dont_wrap_mediator) {
 			//Original mediator should be an instance of UCISearchMediatorImpl_Base
 			mediator = (mediator instanceof MultiPVMediator) ?
-					new Mediator_AlphaAndBestMoveWindow(mediator, this) :
-					new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(mediator, this));
+					new Mediator_AlphaAndBestMoveWindow(mediator) :
+					new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(mediator));
 		}
 		
 		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup(), getSharedData(), getBitboardForSetup().getHashKey(),

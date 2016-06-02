@@ -145,13 +145,13 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					for (int i = 0; i < searchers.size(); i++) {
 						BucketMediator cur_bucket = new BucketMediator(final_mediator);
 						mediators_bucket.add(cur_bucket);
-						mediators.add(new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(cur_bucket, MTDParallelSearch.this)));
+						mediators.add(new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(cur_bucket)));
 					}
 					
 					
 					boolean[] searchers_started = new boolean[searchers.size()];
-					searchers_started[0] = true;
 					searchers.get(0).negamax(getBitboardForSetup(), mediators.get(0), cur_depth, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, true, null);
+					searchers_started[0] = true;
 					/*for (int i = 0; i < searchers.size(); i++) {
 						searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), cur_depth, maxIterations, useMateDistancePrunning, finishCallback, prevPV, true);
 					}*/
@@ -172,7 +172,9 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							)
 							) {
 							
-							
+						
+							//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Loop > before start threads");
+						
 							//Start more searchers if necessary
 							long time_delta = System.currentTimeMillis() - start_time;
 							long expected_count_workers = time_delta / 100;
@@ -187,6 +189,8 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								}
 							}
 							
+							
+							//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Loop > before collecting infos");
 							
 							//Collect major infos by depth
 							List<ISearchInfo> majorInfosForCurDepth = new ArrayList<ISearchInfo>();
@@ -217,6 +221,8 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								majorInfosForCurDepth.add(cur_mediator_lastinfo != null ? cur_mediator_lastinfo : null);
 							}
 							
+							
+							//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Loop > before send infos");
 							
 							//Send best infos
 							boolean hasInfoToSend = false;
@@ -310,6 +316,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 								//isReady = false;
 							}
 							
+							//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Loop > before check stopper");
 							
 							try {
 								final_mediator.getStopper().stopIfNecessary(cur_depth, getBitboardForSetup().getColourToMove(), ISearch.MIN, ISearch.MAX);
@@ -329,7 +336,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					}
 					
 					
-					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Out of loop");
+					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Out of loop final_mediator.getStopper().isStopped()=" + final_mediator.getStopper().isStopped());
 					
 					
 					for (int i = 0; i < searchers.size(); i++) {
