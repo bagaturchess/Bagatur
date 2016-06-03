@@ -142,10 +142,13 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 						Runnable task = new NullwinSearchTask(searcher, distribution, getBitboardForSetup(),
 								final_mediator, useMateDistancePrunning, final_prevPV
 																);
+						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch in loop : task.run()");
 						task.run();
 					}
 					
-					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch after loop stopper stopped " + final_mediator.getStopper().isStopped());
+					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch after loop stopped="
+							+ final_mediator.getStopper().isStopped()
+							+ ", distribution.getCurrentDepth()=" + distribution.getCurrentDepth() + ", distribution.getMaxIterations()=" + distribution.getMaxIterations());
 					
 					if (stopper == null) {
 						throw new IllegalStateException();

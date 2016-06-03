@@ -24,22 +24,18 @@ package bagaturchess.search.impl.rootsearch.sequential;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
-import bagaturchess.search.impl.alg.IBetaGenerator;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.pv.PVNode;
+import bagaturchess.search.impl.utils.DEBUGSearch;
 
 
 public class NullwinSearchTask implements Runnable {
-	
-	
-	private boolean DEBUG = false;
-	
+		
 	
 	private ISearch searcher;
 	private SearchManager distribution;
@@ -62,15 +58,15 @@ public class NullwinSearchTask implements Runnable {
 	
 	public void run() {
 		
-		boolean unlock = false;
+		//boolean unlock = false;
 		
 		try {
 			
-			distribution.writeLock();
-			unlock = true;
+			//distribution.writeLock();
+			//unlock = true;
 			
 			
-			if (mediator.getStopper().isStopped()) return;
+			//if (mediator.getStopper().isStopped()) return;
 			
 			//System.out.println(sharedData);
 			
@@ -89,7 +85,8 @@ public class NullwinSearchTask implements Runnable {
 			if (maxdepth > ISearch.MAX_DEPTH) {
 				//distribution.writeUnlock();
 				//Unlocked in the finally block
-				return;
+				//return;
+				throw new IllegalStateException("maxdepth > ISearch.MAX_DEPTH");
 			}
 			
 			//System.out.println("win");
@@ -97,7 +94,8 @@ public class NullwinSearchTask implements Runnable {
 				//distribution.writeUnlock();
 				//Unlocked in the finally block
 				//System.out.println("return");
-				return;
+				//return;
+				throw new IllegalStateException("maxdepth > ISearch.MAX_DEPTH");
 			}
 			
 			int beta = distribution.nextBeta();
@@ -140,12 +138,12 @@ public class NullwinSearchTask implements Runnable {
 			}
 			*/
 			
-			RootSearchMTDImpl rootWin = new RootSearchMTDImpl(bitboard.getColourToMove(), distribution.getBetasGen());
+			//RootSearchMTDImpl rootWin = new RootSearchMTDImpl(bitboard.getColourToMove(), distribution.getBetasGen());
 			
-			if (DEBUG) mediator.dump(Thread.currentThread().getName() + ":	start search with depth=" + maxdepth + ", beta=" + beta +" and distribution is " + distribution.toString());
+			if (DEBUGSearch.DEBUG_MODE) mediator.dump(Thread.currentThread().getName() + ":	start search with depth=" + maxdepth + ", beta=" + beta +" and distribution is " + distribution.toString());
 			
-			distribution.writeUnlock();
-			unlock = false;
+			//distribution.writeUnlock();
+			//unlock = false;
 			
 			
 			//((SearchMTD_PV)searcher).analyze(maxdepth);
@@ -164,18 +162,18 @@ public class NullwinSearchTask implements Runnable {
 			int eval = searcher.nullwin_search(mediator, info, ISearch.PLY * (maxdepth - 0), ISearch.PLY * (maxdepth - 0),
 					0, beta, false, 0, 0, prevPV, searcher.getEnv().getBitboard().getColourToMove(), 0, 0, false, 0, useMateDistancePrunning);
 			if (eval >= beta) {
-				eval = searcher.pv_search(mediator, rootWin, info, ISearch.PLY * maxdepth, ISearch.PLY * maxdepth,
+				eval = searcher.pv_search(mediator, null, info, ISearch.PLY * maxdepth, ISearch.PLY * maxdepth,
 					0, beta - 1, beta, 0, 0, prevPV, false, 0, searcher.getEnv().getBitboard().getColourToMove(), 0, 0, false, 0, useMateDistancePrunning);
 			}
 			
 			
-			distribution.writeLock();
-			unlock = true;
+			//distribution.writeLock();
+			//unlock = true;
 			
 			//distribution.addNodes(info.getSearchedNodes());
 			
 			if (maxdepth != info.getDepth()) {
-				distribution.writeUnlock();
+				//distribution.writeUnlock();
 				throw new IllegalStateException("maxdepth=" + maxdepth + " info.getDepth()=" + info.getDepth());
 			}
 			
@@ -194,7 +192,7 @@ public class NullwinSearchTask implements Runnable {
 					info.setEval(eval);
 					info.setLowerBound(true);
 					
-					if (DEBUG) mediator.dump(Thread.currentThread().getName() + ":	stop search (increaseLowerBound) with eval " + eval);
+					if (DEBUGSearch.DEBUG_MODE) mediator.dump(Thread.currentThread().getName() + ":	stop search (increaseLowerBound) with eval " + eval);
 					
 					distribution.increaseLowerBound(eval, info, bitboard);
 					
@@ -209,14 +207,14 @@ public class NullwinSearchTask implements Runnable {
 					info.setEval(eval);
 					info.setUpperBound(true);
 					
-					if (DEBUG) mediator.dump(Thread.currentThread().getName() + ":	stop search (decreaseUpperBound) with eval " + eval);
+					if (DEBUGSearch.DEBUG_MODE) mediator.dump(Thread.currentThread().getName() + ":	stop search (decreaseUpperBound) with eval " + eval);
 					
 					distribution.decreaseUpperBound(eval, info, bitboard);
 				}
 			} else if (maxdepth > distribution.getCurrentDepth()) {
 				throw new IllegalStateException("maxdepth=" + maxdepth + " distribution.getMaxdepth()=" + distribution.getCurrentDepth());
 			} else {
-				if (DEBUG) mediator.dump(Thread.currentThread().getName() + ":	stop search -> depth is less");
+				if (DEBUGSearch.DEBUG_MODE) mediator.dump(Thread.currentThread().getName() + ":	stop search -> depth is less");
 				//System.out.println("PINKO");
 				//Do nothing
 			}
@@ -229,35 +227,7 @@ public class NullwinSearchTask implements Runnable {
 			}
 		} finally {
 			//if (searcher != null) searchers.releaseSearcher(searcher);
-			if (unlock) distribution.writeUnlock();
+			//if (unlock) distribution.writeUnlock();
 		}
-	}
-	
-	private static final class RootSearchMTDImpl implements IRootWindow {
-
-		private int colour;
-		private IBetaGenerator win;
-		
-		RootSearchMTDImpl(int _colour, IBetaGenerator _win) {
-			colour = _colour;
-			win = _win;
-		}
-		
-		public boolean isInside(int eval, int cur_colour) {
-			
-			int lower = win.getLowerBound();
-			int upper = win.getUpperBound();
-			
-			if (colour != cur_colour) {
-				int lower_tmp = lower;
-				int upper_tmp = upper;
-				
-				lower = -upper_tmp;
-				upper = -lower_tmp;
-			}
-			
-			return eval > lower && eval < upper;
-		}
-		
 	}
 }

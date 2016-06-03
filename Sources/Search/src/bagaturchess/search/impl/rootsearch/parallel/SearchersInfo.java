@@ -9,21 +9,33 @@ import java.util.Map;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.impl.info.SearchInfoFactory;
+import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.search.impl.utils.SearchUtils;
+import bagaturchess.uci.api.ChannelManager;
 
 
 public class SearchersInfo {
 
 	
 	private Map<IRootSearch, SearcherInfo> searchersInfo;
+	private int cur_depth;
+	private ISearchInfo last_send_info;
 	
 	
-	public SearchersInfo() {
+	public SearchersInfo(int startDepth) {
 		searchersInfo = new HashMap<IRootSearch, SearcherInfo>();
+		cur_depth = startDepth;
+	}
+	
+	
+	public int getCurrentDepth() {
+		return cur_depth;
 	}
 	
 	
 	public void update(IRootSearch searcher, ISearchInfo info) {
+		
+		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SearchersInfo: update info=" + info + ", info.getDepth()=" + info.getDepth() + ", info.getPV().length=" + info.getPV().length);
 		
 		SearcherInfo searcherinfo = searchersInfo.get(searcher);
 		if (searcherinfo == null) {
@@ -35,8 +47,81 @@ public class SearchersInfo {
 	}
 	
 	
-	//Rusult can be null
-	public ISearchInfo getInfoToSend(int depth) {
+	//Result can be null
+	public ISearchInfo getDeepestBestInfo() {
+		
+		ISearchInfo deepest_last_info = null;
+		for (IRootSearch cur_searcher: searchersInfo.keySet()) {
+			
+			SearcherInfo cur_searcher_infos = searchersInfo.get(cur_searcher);
+			ISearchInfo cur_deepest_last_info = cur_searcher_infos.getLastSearchInfo(cur_searcher_infos.getMaxDepth());
+			
+			if (cur_deepest_last_info != null) {
+				if (deepest_last_info == null) {
+					deepest_last_info = cur_deepest_last_info;
+				} else {
+					if (cur_deepest_last_info.getDepth() > deepest_last_info.getDepth()) {
+						deepest_last_info = cur_deepest_last_info;
+					} else if (cur_deepest_last_info.getDepth() == deepest_last_info.getDepth()) {
+						if (cur_deepest_last_info.getEval() > deepest_last_info.getEval()) {
+							deepest_last_info = cur_deepest_last_info;
+						}
+					}
+				}
+			}
+		}
+		
+		return deepest_last_info;
+	}
+	
+	
+	public ISearchInfo getNewInfoToSendIfPresented() {
+		
+		if (last_send_info != null && last_send_info.getDepth() == cur_depth) {
+			if (hasDepthInfo(cur_depth + 1)) {
+				cur_depth++;
+			}
+		}
+		
+		ISearchInfo cur_depth_info = getInfoToSend(cur_depth);
+		
+		if (cur_depth_info != null) {
+			if (last_send_info == null) {
+				last_send_info = cur_depth_info;
+				return cur_depth_info;
+			} else {
+				if (cur_depth_info.getDepth() != last_send_info.getDepth()
+						|| cur_depth_info.getBestMove() != last_send_info.getBestMove()
+						|| cur_depth_info.getEval() != last_send_info.getEval()
+						) {
+					last_send_info = cur_depth_info;
+					return cur_depth_info;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	
+	public boolean resetForRestart(IRootSearch searcher) {
+		SearcherInfo searcherinfo = searchersInfo.get(searcher);
+		if (searcherinfo != null) {
+			ISearchInfo lastinfo = searcherinfo.getLastSearchInfo(searcherinfo.getMaxDepth());
+			if (lastinfo != null) {
+				boolean isShallow = hasDepthInfo(lastinfo.getDepth() + 1);
+				if (isShallow) {
+					searchersInfo.remove(searcher);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	//Result can be null
+	private ISearchInfo getInfoToSend(int depth) {
 		
 		
 		long totalNodes = 0;
@@ -83,6 +168,8 @@ public class SearchersInfo {
 		info_to_send.setBestMove(bestMoveInfo.best_info.getBestMove());
 		info_to_send.setPV(bestMoveInfo.best_info.getPV());
 		info_to_send.setSearchedNodes(totalNodes);
+		
+		//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SearchersInfo: getInfoToSend=" + info_to_send + (info_to_send == null ? "" : ", depth=" + info_to_send.getDepth()));
 		
 		return info_to_send;
 	}
@@ -207,18 +294,28 @@ public class SearchersInfo {
 		ISearchInfo best_info;
 		
 		MoveInfo(ISearchInfo first_info) {
+			
 			sum = first_info.getEval();
 			cnt = 1;
 			best_eval = first_info.getEval();
 			best_info = first_info;
+			
+			if (best_info == null) {
+				throw new IllegalStateException("best_info == null");
+			}
 		}
 		
 		void addInfo(ISearchInfo info) {
+			
 			sum += info.getEval();
 			cnt += 1;
 			if (info.getEval() > best_eval) {
 				best_eval = info.getEval();
 				best_info = info;
+			}
+			
+			if (best_info == null) {
+				throw new IllegalStateException("best_info == null");
 			}
 		}
 		

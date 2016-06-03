@@ -333,6 +333,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	}
 	
 	
+	@Override
 	public void sendBestMove() {
 
 		channel.sendLogToGUI("StateManager: sendBestMove called");
@@ -359,6 +360,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 			channel.sendLogToGUI("StateManager: WARNING: StateManager -> move returned from UCI Search adaptor is '0' and is not sent to the UCI platform");
 		}
 	}
+	
 	
 	private void revertGame() {
 		int count = board.getPlayedMovesCount();
