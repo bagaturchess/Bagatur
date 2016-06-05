@@ -88,7 +88,7 @@ public class SearchersInfo {
 			}
 		}
 		
-		ISearchInfo cur_depth_info = getInfoToSend(cur_depth);
+		ISearchInfo cur_depth_info = getAccumulatedInfo(cur_depth);
 		
 		if (cur_depth_info != null) {
 			if (last_send_info == null) {
@@ -110,11 +110,18 @@ public class SearchersInfo {
 	
 	
 	public boolean needRestart(IRootSearch searcher) {
+		
+		if (true) return false;
+		
+		if (last_send_info == null) {
+			return false;
+		}
+		
 		SearcherInfo searcherinfo = searchersInfo.get(searcher);
 		if (searcherinfo != null && searcherinfo.last_restart_depth < cur_depth) {
 			ISearchInfo lastinfo = searcherinfo.getLastSearchInfo(searcherinfo.getMaxDepth());
 			if (lastinfo != null) {
-				boolean isShallow = lastinfo.getDepth() < cur_depth - 1;//last_send_info.getDepth();
+				boolean isShallow = lastinfo.getDepth() < last_send_info.getDepth() - 1;//cur_depth - 1;//last_send_info.getDepth();
 				if (isShallow) {
 					searcherinfo.last_restart_depth = cur_depth;
 					//searchersInfo.remove(searcher);
@@ -127,7 +134,7 @@ public class SearchersInfo {
 	
 	
 	//Result can be null
-	private ISearchInfo getInfoToSend(int depth) {
+	private ISearchInfo getAccumulatedInfo(int depth) {
 		
 		
 		long totalNodes = 0;
@@ -181,27 +188,32 @@ public class SearchersInfo {
 	}
 	
 	
-	public boolean hasDepthInfo(int depth) {
+	private boolean hasDepthInfo(int depth) {
+		
+		if (last_send_info == null) {
+			return false;
+		}
 		
 		int countResponded = 0;
 		for (IRootSearch cur_searcher: searchersInfo.keySet()) {
 			
 			SearcherInfo cur_searcher_infos = searchersInfo.get(cur_searcher);
-			ISearchInfo depth_last_info = cur_searcher_infos.getLastSearchInfo(depth);
 			
-			if (depth_last_info != null) {
+			if (cur_searcher_infos != null) {
 				
-				countResponded++;
+				if (cur_searcher_infos.getLastSearchInfo(depth) != null) {
+					return true;
+				}
 				
-				return true;
+				/*
+				if (cur_searcher_infos.getLastSearchInfo(depth) != null) {
+					countResponded++;
+				}
 				
-				//if (prevDepthInfo == null) {
-				//	return true;
-				//}
-				
-				//if (depth_last_info.getBestMove() == prevDepthInfo.getBestMove()) {
-				//	return true;
-				//}
+				if (cur_searcher_infos.containsBestMove(depth, last_send_info.getBestMove())) {
+					return true;
+				}
+				*/
 			}
 		}
 		
@@ -252,6 +264,16 @@ public class SearchersInfo {
 		}
 		
 		
+		public boolean containsBestMove(int depth, int move) {
+			SearcherDepthInfo searcherDepthInfo = depthsInfo.get(depth);
+			if (searcherDepthInfo == null) {
+				return false;
+			}
+			
+			return searcherDepthInfo.containsBestMove(move);
+		}
+		
+		
 		public int getMaxDepth() {
 			
 			int max_depth = 0;
@@ -288,6 +310,17 @@ public class SearchersInfo {
 				}
 				return infos.get(last_index);
 			}
+			
+			
+			public boolean containsBestMove(int move) {
+				for (int i = 0; i < infos.size(); i++) {
+					if (infos.get(i).getBestMove() == move) {
+						return true;
+					}
+				}
+				return false;
+			}
+			
 		}
 	}
 	
