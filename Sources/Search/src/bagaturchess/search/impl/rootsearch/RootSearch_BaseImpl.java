@@ -129,7 +129,7 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("stopSearchAndWait - enter");
 		
-		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(new Exception("just stack dump"));
+		//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(new Exception("just stack dump"));
 		
 		while (stopper != null) {
 			try {

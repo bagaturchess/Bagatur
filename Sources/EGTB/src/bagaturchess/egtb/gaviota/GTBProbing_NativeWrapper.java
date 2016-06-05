@@ -97,7 +97,7 @@ public class GTBProbing_NativeWrapper {
     }
     
     
-    public final void probeHard(GTBProbeInput input, int[] out) {
+    public synchronized final void probeHard(GTBProbeInput input, int[] out) {
     	
     	
     	//For debug purpose

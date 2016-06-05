@@ -161,10 +161,11 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					SearchersInfo searchersInfo = new SearchersInfo(startIteration);
 					
 					boolean allSearchersReady = false;
+					boolean hasSendAtLest1Info = false;
 					while (
 							(!final_mediator.getStopper().isStopped() //Stopped
 									&& !allSearchersReady //Search is done
-							)
+								) || !hasSendAtLest1Info
 							) {
 							
 						
@@ -190,7 +191,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							//Collect all major infos and put them in searchersInfo
 							for (int i_mediator = 0; i_mediator < mediators_bucket.size(); i_mediator++) {
 								
-								if (searchers_started[i_mediator]) {
+								//if (searchers_started[i_mediator]) {
 									
 									BucketMediator cur_mediator = mediators_bucket.get(i_mediator);
 									
@@ -208,7 +209,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 										
 										cur_mediator.lastSendMajorIndex = i_major;
 										
-										if (!curinfo.isUpperBound()) {
+										//if (!curinfo.isUpperBound()) {
 											searchersInfo.update(searchers.get(i_mediator), curinfo);
 											ISearchInfo toSend = searchersInfo.getNewInfoToSendIfPresented();
 											if (toSend != null) {
@@ -216,12 +217,22 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 															+ toSend);
 												final_mediator.changedMajor(toSend);
 												hasSendInfo = true;
+												hasSendAtLest1Info = true;
 											}
-										}
+										//}
+									}
+								//}
+							}
+							
+							for (int i = 0; i < searchers.size(); i++) {
+								if (searchers_started[i]) {
+									if (searchersInfo.needRestart(searchers.get(i))) {
+										searchers.get(i).stopSearchAndWait();
+										searchers_started[i] = false;
+										if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: restarted searcher " + i);
 									}
 								}
 							}
-							
 							
 							if (!hasSendInfo) {
 								//Wait some time and than make check again

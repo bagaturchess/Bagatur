@@ -357,7 +357,8 @@ public class StateManager extends Protocol implements BestMoveSender {
 				channel.dump(e);
 			}
 		} else {
-			channel.sendLogToGUI("StateManager: WARNING: StateManager -> move returned from UCI Search adaptor is '0' and is not sent to the UCI platform");
+			throw new IllegalStateException("StateManager: ERROR: move returned from UCI Search adaptor is '0' and is not sent to the UCI platform");
+			//channel.sendLogToGUI("StateManager: WARNING: StateManager -> move returned from UCI Search adaptor is '0' and is not sent to the UCI platform");
 		}
 	}
 	

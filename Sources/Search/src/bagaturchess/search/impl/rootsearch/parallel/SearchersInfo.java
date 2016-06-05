@@ -35,6 +35,11 @@ public class SearchersInfo {
 	
 	public void update(IRootSearch searcher, ISearchInfo info) {
 		
+		//Skip infos without PV and best move
+		if (info.getPV() == null || info.getPV().length < 1) {
+			return;
+		}
+		
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SearchersInfo: update info=" + info + ", info.getDepth()=" + info.getDepth() + ", info.getPV().length=" + info.getPV().length);
 		
 		SearcherInfo searcherinfo = searchersInfo.get(searcher);
@@ -104,14 +109,15 @@ public class SearchersInfo {
 	}
 	
 	
-	public boolean resetForRestart(IRootSearch searcher) {
+	public boolean needRestart(IRootSearch searcher) {
 		SearcherInfo searcherinfo = searchersInfo.get(searcher);
-		if (searcherinfo != null) {
+		if (searcherinfo != null && searcherinfo.last_restart_depth < cur_depth) {
 			ISearchInfo lastinfo = searcherinfo.getLastSearchInfo(searcherinfo.getMaxDepth());
 			if (lastinfo != null) {
-				boolean isShallow = hasDepthInfo(lastinfo.getDepth() + 1);
+				boolean isShallow = lastinfo.getDepth() < cur_depth - 1;//last_send_info.getDepth();
 				if (isShallow) {
-					searchersInfo.remove(searcher);
+					searcherinfo.last_restart_depth = cur_depth;
+					//searchersInfo.remove(searcher);
 					return true;
 				}
 			}
@@ -177,8 +183,6 @@ public class SearchersInfo {
 	
 	public boolean hasDepthInfo(int depth) {
 		
-		ISearchInfo prevDepthInfo = getInfoToSend(depth - 1);
-		
 		int countResponded = 0;
 		for (IRootSearch cur_searcher: searchersInfo.keySet()) {
 			
@@ -189,13 +193,15 @@ public class SearchersInfo {
 				
 				countResponded++;
 				
-				if (prevDepthInfo == null) {
-					return true;
-				}
+				return true;
 				
-				if (depth_last_info.getBestMove() == prevDepthInfo.getBestMove()) {
-					return true;
-				}
+				//if (prevDepthInfo == null) {
+				//	return true;
+				//}
+				
+				//if (depth_last_info.getBestMove() == prevDepthInfo.getBestMove()) {
+				//	return true;
+				//}
 			}
 		}
 		
@@ -207,7 +213,7 @@ public class SearchersInfo {
 		
 		
 		private Map<Integer, SearcherDepthInfo> depthsInfo;
-		
+		protected int last_restart_depth;
 		
 		public SearcherInfo() {
 			depthsInfo = new HashMap<Integer, SearchersInfo.SearcherInfo.SearcherDepthInfo>();
