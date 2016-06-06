@@ -29,16 +29,12 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
-import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.alg.BetaGeneratorFactory;
 import bagaturchess.search.impl.alg.IBetaGenerator;
-import bagaturchess.search.impl.env.SharedData;
-import bagaturchess.search.impl.evalcache.EvalCache;
+import bagaturchess.search.impl.pv.PVHistory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.utils.SearchUtils;
 
@@ -58,17 +54,16 @@ public class SearchManager {
 	private volatile List<Integer> betas;
 	
 	private ISearchMediator mediator;
-	private SharedData sharedData;
 
 	private Integer initialValue;
+	private PVHistory pvHistory;
 	
 	
-	public SearchManager(ISearchMediator _mediator, IBitBoard _bitboardForSetup, SharedData _sharedData, long _hashkey,
-			int _startIteration, int _maxIterations, Integer _initialValue) {
+	public SearchManager(ISearchMediator _mediator, long _hashkey,
+			int _startIteration, int _maxIterations, Integer _initialValue, PVHistory _pvHistory) {
 
 		lock = new ReentrantReadWriteLock();
 		
-		sharedData = _sharedData;
 		mediator = _mediator;
 		hashkey = _hashkey;
 		maxIterations = _maxIterations;
@@ -85,7 +80,9 @@ public class SearchManager {
 		
 		initialValue = _initialValue;
 		
-		initBetas(_bitboardForSetup);
+		pvHistory = _pvHistory;
+		
+		initBetas();
 	}
 	
 	
@@ -108,7 +105,7 @@ public class SearchManager {
 		lock.writeLock().unlock();
 	}
 	
-	private void initBetas(IBitBoard bitboardForTesting) {
+	private void initBetas() {
 		
 		if (betasGen != null) {
 			
@@ -120,13 +117,7 @@ public class SearchManager {
 			if (initialValue != null) {
 				staticRootEval = initialValue;
 			} else {
-				int root_colour = bitboardForTesting.getColourToMove();
-				IEvaluator evaluator = sharedData.getEvaluatorFactory().create(
-						bitboardForTesting,
-						new EvalCache(100, true, new BinarySemaphore_Dummy()),
-						sharedData.getEngineConfiguration().getEvalConfig());
-				
-				staticRootEval = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, root_colour);
+				throw new IllegalStateException("initialValue==null");
 			}
 			
 			betasGen = BetaGeneratorFactory.create(staticRootEval, mediator.getTrustWindow_MTD_Step());
@@ -235,7 +226,7 @@ public class SearchManager {
 		}
 	}
 	
-	public void increaseLowerBound(int eval, ISearchInfo info, IBitBoard bitboardForTesting) {
+	public void increaseLowerBound(int eval, ISearchInfo info) {
 		
 		boolean sentPV = false;
 		
@@ -254,8 +245,8 @@ public class SearchManager {
 		boolean isLast = isLast();
 		
 		if (isLast) {
-			finishDepth(bitboardForTesting);
-			initBetas(bitboardForTesting);
+			finishDepth();
+			initBetas();
 		} else {
 			updateBetas();
 		}
@@ -267,22 +258,16 @@ public class SearchManager {
 				info.setUpperBound(false);
 			}
 			
-			sharedData.getPVs().putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
+			pvHistory.putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
 			
 			if (mediator != null) {
 				
 				mediator.changedMajor(info);
-				
-				try {
-					testPV(info, bitboardForTesting);
-				} catch (Exception e) {
-					mediator.dump(e);
-				}
 			}
 		}
 	}
 	
-	public void decreaseUpperBound(int eval, ISearchInfo info, IBitBoard bitboardForTesting) {
+	public void decreaseUpperBound(int eval, ISearchInfo info) {
 		
 		boolean sentPV = false;
 		
@@ -301,8 +286,8 @@ public class SearchManager {
 		boolean isLast = isLast();
 		
 		if (isLast) {
-			finishDepth(bitboardForTesting);
-			initBetas(bitboardForTesting);
+			finishDepth();
+			initBetas();
 		} else {
 			updateBetas();
 		}
@@ -312,54 +297,12 @@ public class SearchManager {
 			if (mediator != null) {
 				
 				mediator.changedMajor(info);
-				
-				try {
-					testPV(info, bitboardForTesting);
-				} catch (Exception e) {
-					mediator.dump(e);
-				}
 			}
 		}
 	}
 	
 	
-	private void testPV(ISearchInfo info, IBitBoard bitboardForTesting) {
-		
-		if (true) return;
-		
-		//if (!sharedData.getEngineConfiguration().verifyPVAfterSearch()) return;
-		
-		int root_colour = bitboardForTesting.getColourToMove();
-		
-		int sign = 1;
-		
-		int[] moves = info.getPV();
-		
-		for (int i=0; i<moves.length; i++) {
-			bitboardForTesting.makeMoveForward(moves[i]);
-			sign *= -1;
-		}
-
-		IEvaluator evaluator = sharedData.getEvaluatorFactory().create(
-				bitboardForTesting,
-				new EvalCache(100, true, new BinarySemaphore_Dummy()),
-				sharedData.getEngineConfiguration().getEvalConfig());
-		
-		int curEval = (int) (sign * evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, root_colour));
-		
-		if (curEval != info.getEval()) {
-			mediator.dump("SearchManager.testPV FAILED > curEval=" + curEval + ",	eval=" + info.getEval());
-		} else {
-			mediator.dump("SearchManager.testPV OK > curEval=" + curEval + ",	eval=" + info.getEval());
-		}
-		
-		for (int i=moves.length - 1; i >= 0; i--) {
-			bitboardForTesting.makeMoveBackward(moves[i]);
-		}
-	}
-	
-	
-	private void finishDepth(IBitBoard bitboardForTesting) {
+	private void finishDepth() {
 		
 		//System.out.println("FINISHING DEPTH " + maxdepth);
 		

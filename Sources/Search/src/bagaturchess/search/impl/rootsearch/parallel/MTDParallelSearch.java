@@ -158,11 +158,11 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					SearchersInfo searchersInfo = new SearchersInfo(startIteration);
 					
 					boolean allSearchersReady = false;
-					boolean hasSendAtLest1Info = false;
+					//boolean hasSendAtLest1Info = false;
 					while (
 							(!final_mediator.getStopper().isStopped() //Stopped
 									&& !allSearchersReady //Search is done
-								) || !hasSendAtLest1Info
+								)// || !hasSendAtLest1Info
 							) {
 							
 						
@@ -184,46 +184,9 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 							}
 							
 							
-							boolean hasSendInfo = false;
-							//Collect all major infos and put them in searchersInfo
-							for (int i_mediator = 0; i_mediator < mediators_bucket.size(); i_mediator++) {
-								
-								//if (searchers_started[i_mediator]) {
-									
-									BucketMediator cur_mediator = mediators_bucket.get(i_mediator);
-									
-									for (int i_major = cur_mediator.lastSendMajorIndex + 1; i_major < cur_mediator.majorInfos.size() ; i_major++) {							
-										
-										ISearchInfo curinfo = cur_mediator.majorInfos.get(i_major);
-										
-										if (curinfo == null) { //Because of multi threaded access to arraylist
-											continue;
-										}
-										
-										if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: select info from mediator (" + i_mediator + ")"
-												+ ", curinfo.getDepth()=" + curinfo.getDepth()
-												+ ", curinfo.getBestMove()=" + curinfo.getBestMove()
-												+ ", curinfo.getPV()=" + curinfo.getPV()
-												+ ", curinfo.isUpperBound()=" + curinfo.isUpperBound()
-												+ (curinfo.getPV() == null ? "" : ", info.getPV().length=" + curinfo.getPV().length)
-												);
-										
-										cur_mediator.lastSendMajorIndex = i_major;
-										
-										//if (!curinfo.isUpperBound()) {
-											searchersInfo.update(searchers.get(i_mediator), curinfo);
-											ISearchInfo toSend = searchersInfo.getNewInfoToSendIfPresented();
-											if (toSend != null) {
-												if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend="
-															+ toSend);
-												final_mediator.changedMajor(toSend);
-												hasSendInfo = true;
-												hasSendAtLest1Info = true;
-											}
-										//}
-									}
-								//}
-							}
+							//Collect all major infos, put them in searchersInfo, and send the best info if available
+							boolean hasSendInfo = collectAndSendInfos(final_mediator,	mediators_bucket, searchersInfo);
+							
 							
 							for (int i = 0; i < searchers.size(); i++) {
 								if (searchers_started[i]) {
@@ -275,6 +238,11 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					
 					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Searchers are stopped");
 					
+					
+					//Send all infos after the searchers are stopped
+					collectAndSendInfos(final_mediator, mediators_bucket, searchersInfo);
+					
+					
 					if (stopper == null) {
 						throw new IllegalStateException();
 					}
@@ -296,6 +264,56 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					ChannelManager.getChannel().dump(t);
 					ChannelManager.getChannel().dump(t.getMessage());
 				}
+			}
+			
+			
+			private boolean collectAndSendInfos(
+					final ISearchMediator final_mediator,
+					final List<BucketMediator> mediators_bucket,
+					SearchersInfo searchersInfo) {
+				
+				boolean hasSendInfo = false;
+				for (int i_mediator = 0; i_mediator < mediators_bucket.size(); i_mediator++) {
+					
+					//if (searchers_started[i_mediator]) {
+						
+						BucketMediator cur_mediator = mediators_bucket.get(i_mediator);
+						
+						for (int i_major = cur_mediator.lastSendMajorIndex + 1; i_major < cur_mediator.majorInfos.size() ; i_major++) {							
+							
+							ISearchInfo curinfo = cur_mediator.majorInfos.get(i_major);
+							
+							if (curinfo == null) { //Because of multi threaded access to arraylist
+								continue;
+							}
+							
+							if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: select info from mediator (" + i_mediator + ")"
+									+ ", curinfo.getDepth()=" + curinfo.getDepth()
+									+ ", curinfo.getBestMove()=" + curinfo.getBestMove()
+									+ ", curinfo.getPV()=" + curinfo.getPV()
+									+ ", curinfo.isUpperBound()=" + curinfo.isUpperBound()
+									+ (curinfo.getPV() == null ? "" : ", info.getPV().length=" + curinfo.getPV().length)
+									);
+							
+							cur_mediator.lastSendMajorIndex = i_major;
+							
+							//if (!curinfo.isUpperBound()) {
+								searchersInfo.update(searchers.get(i_mediator), curinfo);
+								ISearchInfo toSend = searchersInfo.getNewInfoToSendIfPresented();
+								while (toSend != null) {
+									if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend="
+												+ toSend);
+									final_mediator.changedMajor(toSend);
+									hasSendInfo = true;
+									//hasSendAtLest1Info = true;
+									toSend = searchersInfo.getNewInfoToSendIfPresented();
+								}
+							//}
+						}
+					//}
+				}
+				
+				return hasSendInfo;
 			}
 		});
 		

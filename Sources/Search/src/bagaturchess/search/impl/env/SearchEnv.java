@@ -63,6 +63,7 @@ public class SearchEnv {
 	private HistoryTable history_all;
 	
 	private ISearchMoveListFactory moveListFactory;
+	private PVHistory pvs_history;
 	
 	
 	public SearchEnv(IBitBoard _bitboard, SharedData _shared) {
@@ -74,6 +75,8 @@ public class SearchEnv {
 		history_all = new HistoryTable(new BinarySemaphore_Dummy());
 		
 		moveListFactory = new SearchMoveListFactory();
+		
+		pvs_history = new PVHistory();
 	}
 	
 	
@@ -102,7 +105,7 @@ public class SearchEnv {
 	}
 	
 	public PVHistory getPVs() {
-		return shared.getPVs();
+		return pvs_history;
 	}
 	
 	public int getTPTUsagePercent() {

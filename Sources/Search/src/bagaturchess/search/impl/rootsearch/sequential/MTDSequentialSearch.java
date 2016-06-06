@@ -27,13 +27,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
+import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.CompositeStopper;
 import bagaturchess.search.api.internal.ISearch;
+import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
+import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
@@ -110,6 +114,14 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		}
 		final int[] final_prevPV = prevPV;
 		
+		if (initialValue == null) {
+			IEvaluator evaluator = getSharedData().getEvaluatorFactory().create(
+					getBitboardForSetup(),
+					new EvalCache(100, true, new BinarySemaphore_Dummy()),
+					getRootSearchConfig().getEvalConfig());
+			initialValue = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, getBitboardForSetup().getColourToMove());
+		}
+		
 		
 		if (!dont_wrap_mediator) {
 			//Original mediator should be an instance of UCISearchMediatorImpl_Base
@@ -118,8 +130,8 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 					new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(mediator));
 		}
 		
-		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup(), getSharedData(), getBitboardForSetup().getHashKey(),
-				startIteration, maxIterations, initialValue);
+		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup().getHashKey(),
+				startIteration, maxIterations, initialValue, searcher.getEnv().getPVs());
 		
 		//final ISearchStopper stopper = new MTDStopper(getBitboardForSetup().getColourToMove(), distribution);
 		mediator.setStopper(new CompositeStopper(new ISearchStopper[] {mediator.getStopper(), stopper} ));
@@ -200,5 +212,37 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	@Override
 	public void decreaseTPTDepths(int reduction) {
 		searcher.getEnv().getTPT().correctAllDepths(reduction);
+	}
+	
+	
+	private void testPV(ISearchInfo info, IBitBoard bitboardForTesting) {
+		
+		if (true) return;
+		
+		//if (!sharedData.getEngineConfiguration().verifyPVAfterSearch()) return;
+		/*
+		int root_colour = bitboardForTesting.getColourToMove();
+		
+		int sign = 1;
+		
+		int[] moves = info.getPV();
+		
+		for (int i=0; i<moves.length; i++) {
+			bitboardForTesting.makeMoveForward(moves[i]);
+			sign *= -1;
+		}
+		
+		int curEval = (int) (sign * evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, root_colour));
+		
+		if (curEval != info.getEval()) {
+			mediator.dump("SearchManager.testPV FAILED > curEval=" + curEval + ",	eval=" + info.getEval());
+		} else {
+			mediator.dump("SearchManager.testPV OK > curEval=" + curEval + ",	eval=" + info.getEval());
+		}
+		
+		for (int i=moves.length - 1; i >= 0; i--) {
+			bitboardForTesting.makeMoveBackward(moves[i]);
+		}
+		*/
 	}
 }

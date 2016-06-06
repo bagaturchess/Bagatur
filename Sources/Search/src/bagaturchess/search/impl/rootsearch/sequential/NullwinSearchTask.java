@@ -194,7 +194,7 @@ public class NullwinSearchTask implements Runnable {
 					
 					if (DEBUGSearch.DEBUG_MODE) mediator.dump(Thread.currentThread().getName() + ":	stop search (increaseLowerBound) with eval " + eval);
 					
-					distribution.increaseLowerBound(eval, info, bitboard);
+					distribution.increaseLowerBound(eval, info);
 					
 				} else {
 					//eval is upper bound
@@ -209,7 +209,7 @@ public class NullwinSearchTask implements Runnable {
 					
 					if (DEBUGSearch.DEBUG_MODE) mediator.dump(Thread.currentThread().getName() + ":	stop search (decreaseUpperBound) with eval " + eval);
 					
-					distribution.decreaseUpperBound(eval, info, bitboard);
+					distribution.decreaseUpperBound(eval, info);
 				}
 			} else if (maxdepth > distribution.getCurrentDepth()) {
 				throw new IllegalStateException("maxdepth=" + maxdepth + " distribution.getMaxdepth()=" + distribution.getCurrentDepth());

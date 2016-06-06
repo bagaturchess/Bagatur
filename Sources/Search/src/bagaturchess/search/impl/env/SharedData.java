@@ -32,7 +32,6 @@ import bagaturchess.search.api.IEvaluatorFactory;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.impl.evalcache.IEvalCache;
-import bagaturchess.search.impl.pv.PVHistory;
 import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.uci.api.IChannel;
 
@@ -40,7 +39,6 @@ import bagaturchess.uci.api.IChannel;
 public class SharedData {
 	
 	
-	private PVHistory pvs_history;
 	private IEvaluatorFactory evaluatorFactory;
 	private IRootSearchConfig engineConfiguration;
 	private ISearchConfig_AB searchConfig;
@@ -72,9 +70,6 @@ public class SharedData {
 			e.printStackTrace();
 			throw new IllegalStateException(e);
 		}
-		
-		
-		pvs_history = new PVHistory();
 	}
 	
 	
@@ -117,11 +112,6 @@ public class SharedData {
 	
 	public GTBCache_OUT getAndRemoveGTBCache_OUT() {
 		return memoryConsumers.getGTBCache_OUT().remove(0);
-	}
-	
-	
-	public PVHistory getPVs() {
-		return pvs_history;
 	}
 	
 
