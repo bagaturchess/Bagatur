@@ -433,7 +433,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 			
 			majorInfos.add(info);
 			
-			if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: BucketMediator: changedMajor "
+			if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("BucketMediator: changedMajor "
 					+ ", info.getDepth()=" + info.getDepth()
 					+ ", info.getBestMove()=" + info.getBestMove()
 					+ ", info.getPV()=" + info.getPV()

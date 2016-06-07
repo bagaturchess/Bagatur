@@ -36,8 +36,15 @@ public class SearchersInfo {
 	public void update(IRootSearch searcher, ISearchInfo info) {
 		
 		//Skip infos without PV and best move
-		if (info.getPV() == null || info.getPV().length < 1) {
+		if (info.isUpperBound()) {
 			return;
+		}
+		
+		if (info.getPV() == null
+				|| info.getPV().length < 1
+				|| info.getBestMove() == 0
+				) {
+			throw new IllegalStateException();
 		}
 		
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SearchersInfo: update info=" + info + ", info.getDepth()=" + info.getDepth() + ", info.getPV().length=" + info.getPV().length);
@@ -84,7 +91,10 @@ public class SearchersInfo {
 		
 		if (last_send_info != null && last_send_info.getDepth() == cur_depth) {
 			if (hasDepthInfo(cur_depth + 1)) {
+				
 				cur_depth++;
+				
+				if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SearchersInfo: increase depth to " + cur_depth);
 			}
 		}
 		
