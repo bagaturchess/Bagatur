@@ -65,7 +65,7 @@ public class MemoryConsumers {
 	private SeeMetadata seeMetadata;
 	private OpeningBook openingBook;
 	
-	private IBinarySemaphoreFactory semaphoreFactory;
+	//private IBinarySemaphoreFactory semaphoreFactory;
 	
 	private List<IEvalCache> evalCache;
 	private List<PawnsEvalCache> pawnsCache;
@@ -185,13 +185,14 @@ public class MemoryConsumers {
 			throw new IllegalStateException("Percents sum is not near to 1. It is " + percents_sum);
 		}
 		
+		/*
 		try {
 			semaphoreFactory = (IBinarySemaphoreFactory) SharedData.class.getClassLoader().loadClass(engineConfiguration.getSemaphoreFactoryClassName()).newInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new IllegalStateException(e);
 		}
-		
+		*/
 		
 		initCaches(getAvailableMemory() - memoryBuffer);
 		

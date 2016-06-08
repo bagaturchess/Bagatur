@@ -33,12 +33,10 @@ public class GlobalStopperImpl implements ISearchStopper {
 	
 	private ITimeController timeController;
 	//private BestMoveSender bestMoveSender;
-	private volatile long nodes;
+	private long nodes;
 	
 	private ISearchStopper secondaryStopper;
-	private volatile boolean stopped;
-	//private volatile boolean bestMoveSent;
-	//private ISearchMediator dumpper;
+	private boolean stopped;
 	
 	
 	GlobalStopperImpl(ITimeController _timeController, long _nodes) {

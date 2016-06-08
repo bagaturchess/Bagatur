@@ -42,7 +42,7 @@ public class OpeningBookFactory {
 	private static final String whiteOpeningPath = "./data/w.ob";
 	private static final String blackOpeningPath = "./data/b.ob";
 	
-	private static volatile OpeningBook ob;
+	private static OpeningBook ob;
 	
 	
 	public static OpeningBook getBook() {

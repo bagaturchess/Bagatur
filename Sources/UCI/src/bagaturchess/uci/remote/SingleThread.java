@@ -6,8 +6,8 @@ package bagaturchess.uci.remote;
  */
 public class SingleThread extends Thread {
 
-  private volatile boolean mIsStoped;
-  private volatile Runnable mWork;
+  private boolean mIsStoped;
+  private Runnable mWork;
   private ThreadManager mManager;
 
   private Object mSyncWork = new Object(); //Sync object for critical mWork access.

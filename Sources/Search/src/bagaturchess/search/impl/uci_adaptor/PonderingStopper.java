@@ -8,7 +8,7 @@ import bagaturchess.search.api.internal.SearchInterruptedException;
 public class PonderingStopper implements ISearchStopper {
 	
 	
-	private volatile boolean stopped;
+	private boolean stopped;
 	private ISearchStopper secondaryStopper;
 	
 	

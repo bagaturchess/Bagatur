@@ -47,11 +47,11 @@ public class SearchManager {
 	
 	private long hashkey;
 	
-	private volatile int maxIterations;
-	private volatile int currentdepth;
+	private int maxIterations;
+	private int currentdepth;
 	
 	private IBetaGenerator betasGen;
-	private volatile List<Integer> betas;
+	private List<Integer> betas;
 	
 	private ISearchMediator mediator;
 

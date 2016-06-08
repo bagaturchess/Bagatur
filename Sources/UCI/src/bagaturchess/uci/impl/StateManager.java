@@ -49,7 +49,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	private IChannel channel;
 	private IBitBoard board;
 	
-	private volatile IUCISearchAdaptor searchAdaptor;
+	private IUCISearchAdaptor searchAdaptor;
 	
 	private OptionsManager optionsManager;
 

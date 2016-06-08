@@ -43,12 +43,12 @@ public class BetaGenerator implements IBetaGenerator {
 	
 	private int betasCount;
 	
-	private volatile int lower_bound;
-	private volatile int upper_bound;
-	private volatile int trend;
+	private int lower_bound;
+	private int upper_bound;
+	private int trend;
 	private int trend_multiplier;
 	private int initial_interval;
-	private volatile int lastVal;
+	private int lastVal;
 	
 	
 	public BetaGenerator(int _initialVal, int _betasCount, int _initial_interval) {
