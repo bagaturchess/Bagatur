@@ -40,11 +40,13 @@ public class SearchersInfo {
 			return;
 		}
 		
+		//In some rare cases, lowerbound is also without PV and best move (mainly with depth 1)
 		if (info.getPV() == null
 				|| info.getPV().length < 1
 				|| info.getBestMove() == 0
 				) {
-			throw new IllegalStateException();
+			//throw new IllegalStateException();
+			return;
 		}
 		
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SearchersInfo: update info=" + info + ", info.getDepth()=" + info.getDepth() + ", info.getPV().length=" + info.getPV().length);
@@ -237,6 +239,7 @@ public class SearchersInfo {
 		private Map<Integer, SearcherDepthInfo> depthsInfo;
 		protected int last_restart_depth;
 		
+		
 		public SearcherInfo() {
 			depthsInfo = new HashMap<Integer, SearchersInfo.SearcherInfo.SearcherDepthInfo>();
 		}
@@ -274,6 +277,7 @@ public class SearchersInfo {
 		}
 		
 		
+		/*
 		public boolean containsBestMove(int depth, int move) {
 			SearcherDepthInfo searcherDepthInfo = depthsInfo.get(depth);
 			if (searcherDepthInfo == null) {
@@ -282,6 +286,7 @@ public class SearchersInfo {
 			
 			return searcherDepthInfo.containsBestMove(move);
 		}
+		*/
 		
 		
 		public int getMaxDepth() {
@@ -314,6 +319,15 @@ public class SearchersInfo {
 			
 			
 			public ISearchInfo getLastSearchInfo() {
+				/*ISearchInfo result = null;
+				for (int i = infos.size() - 1; i >= 0; i--) {
+					if (!infos.get(i).isUpperBound()) {
+						result = infos.get(i);
+						break;
+					}
+				}
+				return result;
+				*/
 				int last_index = infos.size() - 1;
 				if (last_index < 0) {
 					return null;
@@ -322,25 +336,26 @@ public class SearchersInfo {
 			}
 			
 			
-			public boolean containsBestMove(int move) {
+			/*public boolean containsBestMove(int move) {
 				for (int i = 0; i < infos.size(); i++) {
 					if (infos.get(i).getBestMove() == move) {
 						return true;
 					}
 				}
 				return false;
-			}
-			
+			}*/
 		}
 	}
 	
 	
 	private class MoveInfo {
 		
+		
 		int sum;
 		int cnt;
 		int best_eval;
 		ISearchInfo best_info;
+		
 		
 		MoveInfo(ISearchInfo first_info) {
 			
@@ -353,6 +368,7 @@ public class SearchersInfo {
 				throw new IllegalStateException("best_info == null");
 			}
 		}
+		
 		
 		void addInfo(ISearchInfo info) {
 			
@@ -367,6 +383,7 @@ public class SearchersInfo {
 				throw new IllegalStateException("best_info == null");
 			}
 		}
+		
 		
 		int getEval() {
 			if (SearchUtils.isMateVal(best_eval)) {
