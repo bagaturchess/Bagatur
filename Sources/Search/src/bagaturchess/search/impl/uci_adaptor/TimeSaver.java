@@ -16,7 +16,6 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.tpt.TPTEntry;
-import bagaturchess.search.impl.utils.SearchUtils;
 
 
 public class TimeSaver {
@@ -30,7 +29,7 @@ public class TimeSaver {
 	public TimeSaver(SharedData sharedData, IRootSearchConfig rootSearchCfg, IBitBoard boardForSetup) {
 		ob = sharedData.getOpeningBook();
 		bitboard = new Board(boardForSetup.toEPD(), null, rootSearchCfg.getBoardConfig());
-		egtbProbing = sharedData.getGTBProbing();
+		//egtbProbing = sharedData.getGTBProbing();
 	}
 	
 	

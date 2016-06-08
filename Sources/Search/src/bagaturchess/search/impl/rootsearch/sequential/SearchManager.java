@@ -267,6 +267,7 @@ public class SearchManager {
 		}
 	}
 	
+	
 	public void decreaseUpperBound(int eval, ISearchInfo info) {
 		
 		boolean sentPV = false;

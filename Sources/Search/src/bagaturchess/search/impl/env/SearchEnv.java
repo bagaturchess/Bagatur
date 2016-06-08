@@ -29,6 +29,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.egtb.gaviota.GTBProbing;
+import bagaturchess.egtb.gaviota.GTBProbing_NativeWrapper;
 import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluator;
@@ -64,6 +65,7 @@ public class SearchEnv {
 	
 	private ISearchMoveListFactory moveListFactory;
 	private PVHistory pvs_history;
+	private GTBProbing gtb_probing;
 	
 	
 	public SearchEnv(IBitBoard _bitboard, SharedData _shared) {
@@ -134,7 +136,12 @@ public class SearchEnv {
 	
 	
 	public GTBProbing getGTBProbing() {
-		return shared.getGTBProbing();
+		
+		if (gtb_probing == null) {
+			gtb_probing = shared.getAndRemoveGTBProbing();
+		}
+		
+		return gtb_probing;
 	}
 	
 	

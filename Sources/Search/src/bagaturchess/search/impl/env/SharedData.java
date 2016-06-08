@@ -25,7 +25,6 @@ package bagaturchess.search.impl.env;
 
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.egtb.gaviota.GTBProbing;
-import bagaturchess.egtb.gaviota.GTBProbing_NativeWrapper;
 import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluatorFactory;
@@ -43,7 +42,6 @@ public class SharedData {
 	private IRootSearchConfig engineConfiguration;
 	private ISearchConfig_AB searchConfig;
 	private MemoryConsumers memoryConsumers;
-	private GTBProbing gtb_probing;
 	
 	
 	public SharedData(IChannel _channel, IRootSearchConfig _engineConfiguration) {
@@ -83,18 +81,6 @@ public class SharedData {
 	}
 	
 	
-	public GTBProbing getGTBProbing() {
-		
-		if (gtb_probing == null) {
-			if (GTBProbing_NativeWrapper.getInstance() != null) {
-				gtb_probing = new GTBProbing();
-			}
-		}
-		
-		return gtb_probing;
-	}
-	
-	
 	public TPTable getAndRemoveTPT() {
 		return memoryConsumers.getTPT().remove(0);
 	}
@@ -109,17 +95,21 @@ public class SharedData {
 		return memoryConsumers.getEvalCache().remove(0);
 	}
 	
+	public GTBProbing getAndRemoveGTBProbing() {
+		return memoryConsumers.getGTBProbing().remove(0);
+	}
 	
 	public GTBCache_OUT getAndRemoveGTBCache_OUT() {
 		return memoryConsumers.getGTBCache_OUT().remove(0);
 	}
 	
-
+	
 	@Override
 	public String toString() {
 		String msg = "";//"TPT HIT RATE is: " + getTPT().getHitRate();
 		return msg;
 	}
+	
 	
 	public void clear() {
 		//history_check.clear();

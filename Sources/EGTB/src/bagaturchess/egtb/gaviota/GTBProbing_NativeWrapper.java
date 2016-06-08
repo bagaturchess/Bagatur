@@ -16,10 +16,7 @@ public class GTBProbing_NativeWrapper {
 	
 	private String tb_path = "";
 	
-    private final EGTBProbing gtb;
-    
-    
-    private static GTBProbing_NativeWrapper INSTANCE;
+    private EGTBProbing gtb;
     
     private static String error = "No errors";
     
@@ -27,36 +24,21 @@ public class GTBProbing_NativeWrapper {
     
     
     private GTBProbing_NativeWrapper() {
-    	gtb = EGTBProbing.getSingleton();
+    	try {
+    		gtb = EGTBProbing.createInstance();
+    	} catch(Throwable t) {
+    		hasError = true;
+    		error = "egtbprobe dynamic library could not be loaded (or not found). Error message is :" + t.getMessage();
+    		//java.lang.UnsatisfiedLinkError
+    		//Can't load IA 32-bit .dll on a AMD 64-bit platform
+    		System.out.println(error);
+    		//t.printStackTrace();
+    	}
     }
     
     
-    public static GTBProbing_NativeWrapper getInstance() {
-    	
-    	if (hasError) {
-    		return null;
-    	}
-    	
-		if (INSTANCE == null) {
-			synchronized(GTBProbing_NativeWrapper.class) {
-				if (INSTANCE == null) {
-					
-			    	try {
-			    		INSTANCE = new GTBProbing_NativeWrapper();
-			    	} catch(Throwable t) {
-			    		hasError = true;
-			    		error = "egtbprobe dynamic library could not be loaded (or not found). Error message is :" + t.getMessage();
-			    		//java.lang.UnsatisfiedLinkError
-			    		//Can't load IA 32-bit .dll on a AMD 64-bit platform
-			    		System.out.println(error);
-			    		//t.printStackTrace();
-			    	}
-			    	
-				}
-			}
-		}
-		
-        return INSTANCE;
+    public static boolean hasError() {
+    	return hasError;
     }
     
     
@@ -65,18 +47,42 @@ public class GTBProbing_NativeWrapper {
     }
     
     
-    /*
+    public static GTBProbing_NativeWrapper tryToCreateInstance() {
+    	
+    	if (hasError) {
+    		return null;
+    	}
+    	
+    	GTBProbing_NativeWrapper result = new GTBProbing_NativeWrapper();
+    	if (hasError) {
+    		return null;
+    	}
+    	
+    	return result;
+    }
+    
+    
+    public static GTBProbing_NativeWrapper createInstance() {
+    	
+    	if (hasError) {
+    		throw new IllegalStateException("GTBProbing_NativeWrapper has error but createInstance called: " + error);
+    	}
+    	
+    	return tryToCreateInstance();
+    }
+    
+    
     public void setPath_Sync(String tbPath, int memInMegabytes) {
         if (!tb_path.equals(tbPath)) {
             tb_path = tbPath;
            	System.out.print("Loading: " + tb_path + " ... ");
-           	EGTBProbing.getSingleton().init(tb_path, memInMegabytes);
+           	gtb.init(tb_path, memInMegabytes);
            	System.out.println("OK");
         }
     }
-    */
     
     
+    /*
     public void setPath_Async(final String tbPath, final int memInMegabytes) {
         
     	if (!tb_path.equals(tbPath)) {
@@ -85,7 +91,7 @@ public class GTBProbing_NativeWrapper {
                 public void run() {
                     tb_path = tbPath;
                 	System.out.print("Loading: " + tb_path + " ... ");
-                	EGTBProbing.getSingleton().init(tb_path, memInMegabytes);
+                	gtb.init(tb_path, memInMegabytes);
                 	System.out.println("OK");
                 }
             });
@@ -95,9 +101,10 @@ public class GTBProbing_NativeWrapper {
             try {Thread.sleep(300);} catch (InterruptedException e) {}
         }
     }
+    */
     
     
-    public synchronized final void probeHard(GTBProbeInput input, int[] out) {
+    public final void probeHard(GTBProbeInput input, int[] out) {
     	
     	
     	//For debug purpose

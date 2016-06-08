@@ -11,6 +11,7 @@ import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
+import bagaturchess.egtb.gaviota.GTBProbing;
 import bagaturchess.egtb.gaviota.GTBProbing_NativeWrapper;
 import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 import bagaturchess.opening.api.OpeningBook;
@@ -69,6 +70,7 @@ public class MemoryConsumers {
 	private List<IEvalCache> evalCache;
 	private List<PawnsEvalCache> pawnsCache;
 	private List<TPTable> tpt;
+	private List<GTBProbing> gtbs;
 	private List<GTBCache_OUT> gtbCache_out;
 	
 	private IChannel channel;
@@ -137,11 +139,19 @@ public class MemoryConsumers {
 				
 				ChannelManager.getChannel().dump("Loading modules for Gaviota Endgame Tablebases support ... ");
 				
-				if (GTBProbing_NativeWrapper.getInstance() != null) {
+				gtbs			 = new Vector<GTBProbing>();
+				
+				int threadsCount = engineConfiguration.getThreadsCount();
+				
+				if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
 					
-					GTBProbing_NativeWrapper.getInstance().setPath_Async(
-							engineConfiguration.getGaviotaTbPath(),
-							engineConfiguration.getGaviotaTbCache());
+					for (int i=0; i<threadsCount; i++) {
+						GTBProbing gtb = new GTBProbing();
+						gtb.setPath_Sync(
+								engineConfiguration.getGaviotaTbPath(),
+								engineConfiguration.getGaviotaTbCache());
+						gtbs.add(gtb);
+					}
 					
 					//try {Thread.sleep(10000);} catch (InterruptedException e1) {}
 					ChannelManager.getChannel().dump("Modules for Gaviota Endgame Tablebases OK. Will try to load Gaviota Tablebases from => " + engineConfiguration.getGaviotaTbPath());
@@ -150,6 +160,10 @@ public class MemoryConsumers {
 					//Can't load IA 32-bit .dll on a AMD 64-bit platform
 					//throw new IllegalStateException("egtbprobe dynamic library could not be loaded (or not found)");
 					ChannelManager.getChannel().dump(GTBProbing_NativeWrapper.getErrorMessage());
+					
+					for (int i=0; i<threadsCount; i++) {
+						gtbs.add(null);
+					}
 				}
 		//	}
 		//});
@@ -210,7 +224,7 @@ public class MemoryConsumers {
 		ChannelManager.getChannel().dump("Pawns Eval Cache size is " + size_pc);
 
 		int size_gtb_out = 0;
-		if (GTBProbing_NativeWrapper.getInstance() != null) {
+		if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
 			size_gtb_out = getGTBEntrySize_OUT(availableMemory);
 			ChannelManager.getChannel().dump("Endgame Table Bases cache (OUT) size is " + size_gtb_out);
 			if (size_gtb_out <= 0) {//GC is still not ready with the clean up
@@ -245,8 +259,10 @@ public class MemoryConsumers {
 				pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
 			}
 			
-			if (GTBProbing_NativeWrapper.getInstance() != null) {
+			if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
 				gtbCache_out.add(new GTBCache_OUT(size_gtb_out, false, new BinarySemaphore_Dummy()));
+			} else {
+				gtbCache_out.add(null);
 			}
 		}		
 	}
@@ -403,6 +419,11 @@ public class MemoryConsumers {
 	}
 	
 	
+	public List<GTBProbing> getGTBProbing() {
+		return gtbs;
+	}
+	
+	
 	public List<GTBCache_OUT> getGTBCache_OUT() {
 		return gtbCache_out;
 	}
@@ -414,5 +435,6 @@ public class MemoryConsumers {
 		evalCache.clear();
 		
 		if (gtbCache_out != null) gtbCache_out.clear();
+		if (gtbs != null) gtbs.clear();
 	}
 }

@@ -17,6 +17,7 @@ public class GTBProbing {
 	
 	public static int MAX_PIECES_COUNT = 5;//Including both kings
 	
+	private GTBProbing_NativeWrapper egtb_native_wrapper;
 	private GTBProbeOutput no_result;
 	
 	private IMoveList temp_list = new BaseMoveList();
@@ -25,6 +26,15 @@ public class GTBProbing {
 	
 	public GTBProbing() {
 		no_result = new GTBProbeOutput();
+		egtb_native_wrapper = GTBProbing_NativeWrapper.createInstance();
+		if (egtb_native_wrapper == null) {
+			throw new IllegalStateException(GTBProbing_NativeWrapper.getErrorMessage());
+		}
+	}
+	
+	
+	public void setPath_Sync(String tbPath, int memInMegabytes) {
+		egtb_native_wrapper.setPath_Sync(tbPath, memInMegabytes);
 	}
 	
 	
@@ -57,8 +67,8 @@ public class GTBProbing {
 			
 			board.makeMoveForward(cur_move);
 			GTBProbeInput input = new GTBProbeInput();
-			GTBProbing_NativeWrapper.getInstance().fill(board, input);
-			GTBProbing_NativeWrapper.getInstance().probeHard(input, temp_out);
+			egtb_native_wrapper.fill(board, input);
+			egtb_native_wrapper.probeHard(input, temp_out);
 			//probe(board, temp_out);
 			board.makeMoveBackward(cur_move);
 			
@@ -136,8 +146,8 @@ public class GTBProbing {
 			out[0] = no_result.result;
 			out[1] = no_result.movesToMate;
 			
-			GTBProbing_NativeWrapper.getInstance().fill(board, temp_input);
-			GTBProbing_NativeWrapper.getInstance().probeHard(temp_input, out);
+			egtb_native_wrapper.fill(board, temp_input);
+			egtb_native_wrapper.probeHard(temp_input, out);
 			
 			cache_out.put(hashkey, out[0], out[1]);
 

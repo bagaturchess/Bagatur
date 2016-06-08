@@ -44,7 +44,7 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	private SharedData sharedData;
 	private IBitBoard bitboardForSetup;
 	
-	protected volatile ISearchStopper stopper;
+	protected ISearchStopper stopper;
 	
 	
 	public RootSearch_BaseImpl(Object[] args) {
@@ -148,11 +148,11 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	
 	protected class Stopper implements ISearchStopper {
 		
-		private volatile boolean stopped;
+		private boolean stopped;
 		
 		public Stopper() {
 		}
-
+		
 		@Override
 		public void markStopped() {
 			stopped = true;
