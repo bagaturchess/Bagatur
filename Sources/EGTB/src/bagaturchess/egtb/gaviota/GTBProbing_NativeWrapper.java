@@ -25,7 +25,7 @@ public class GTBProbing_NativeWrapper {
     
     private GTBProbing_NativeWrapper() {
     	try {
-    		gtb = EGTBProbing.createInstance();
+    		gtb = EGTBProbing.getSingleton();
     	} catch(Throwable t) {
     		hasError = true;
     		error = "egtbprobe dynamic library could not be loaded (or not found). Error message is :" + t.getMessage();

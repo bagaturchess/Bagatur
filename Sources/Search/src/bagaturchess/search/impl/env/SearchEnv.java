@@ -29,7 +29,6 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.egtb.gaviota.GTBProbing;
-import bagaturchess.egtb.gaviota.GTBProbing_NativeWrapper;
 import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluator;
@@ -59,13 +58,16 @@ public class SearchEnv {
 	private PawnsEvalCache pawnsCache;
 	private TPTable tpt;
 	private GTBCache_OUT egtb_cache;
+	private GTBProbing gtb_probing;
+	private boolean egtb_cache_get;
+	private boolean gtb_probing_get;
+
 	
 	private HistoryTable history_check;
 	private HistoryTable history_all;
 	
 	private ISearchMoveListFactory moveListFactory;
 	private PVHistory pvs_history;
-	private GTBProbing gtb_probing;
 	
 	
 	public SearchEnv(IBitBoard _bitboard, SharedData _shared) {
@@ -128,8 +130,9 @@ public class SearchEnv {
 	
 	
 	public GTBCache_OUT getEGTBCache() {
-		if (egtb_cache == null) {
+		if (!egtb_cache_get) {
 			egtb_cache = shared.getAndRemoveGTBCache_OUT();
+			egtb_cache_get = true;
 		}
 		return egtb_cache;
 	}
@@ -137,8 +140,9 @@ public class SearchEnv {
 	
 	public GTBProbing getGTBProbing() {
 		
-		if (gtb_probing == null) {
+		if (!gtb_probing_get) {
 			gtb_probing = shared.getAndRemoveGTBProbing();
+			gtb_probing_get = true;
 		}
 		
 		return gtb_probing;
