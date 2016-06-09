@@ -32,6 +32,7 @@ import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.utils.DEBUGSearch;
+import bagaturchess.uci.api.ChannelManager;
 
 
 public class NullwinSearchTask implements Runnable {
@@ -223,7 +224,7 @@ public class NullwinSearchTask implements Runnable {
 			if (t instanceof SearchInterruptedException) {
 				//distribution.addNodes(info.getSearchedNodes());	
 			} else {
-				mediator.dump(t);
+				ChannelManager.getChannel().dump(t);
 			}
 		} finally {
 			//if (searcher != null) searchers.releaseSearcher(searcher);
