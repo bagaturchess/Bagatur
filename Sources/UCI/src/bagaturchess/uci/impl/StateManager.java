@@ -142,7 +142,9 @@ public class StateManager extends Protocol implements BestMoveSender {
 							setupBoard(fromGUILine);
 							break;
 						case COMMAND_TO_ENGINE_GO:
-							waitAndExecute();
+							if (searchAdaptor == null) {
+								createSearchAdaptor();
+							}
 							goSearch(fromGUILine);
 							break;
 						case COMMAND_TO_ENGINE_PONDERHIT:
