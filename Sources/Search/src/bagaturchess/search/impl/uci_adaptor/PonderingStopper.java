@@ -17,7 +17,7 @@ public class PonderingStopper implements ISearchStopper {
 	
 	
 	@Override
-	public synchronized void markStopped() {
+	public void markStopped() {
 		stopped = true;
 	}
 	

@@ -47,12 +47,12 @@ public class GlobalStopperImpl implements ISearchStopper {
 		//dumpper.dump("Creation: " + timeController);
 	}
 	
-	public synchronized void markStopped() {
+	public void markStopped() {
 		stopped = true;
 		//dumpper.dump("Marked stopped");
 	}
 	
-	public synchronized void setSecondaryStopper(ISearchStopper _secondaryStopper) {
+	public void setSecondaryStopper(ISearchStopper _secondaryStopper) {
 		secondaryStopper = _secondaryStopper;
 	}
 	
@@ -69,18 +69,14 @@ public class GlobalStopperImpl implements ISearchStopper {
 		
 		nodes--;
 		if (nodes <= 0) {
-			synchronized (this) {
-				markStopped();
+			markStopped();
 				//bestMoveSender.sendBestMove();
-			}
 			throw new SearchInterruptedException();
 		}
 		
 		if (!timeController.hasTime(0)) {
-			synchronized (this) {
-				markStopped();
+			markStopped();
 				//bestMoveSender.sendBestMove();
-			}
 			throw new SearchInterruptedException();
 		}
 		
@@ -95,7 +91,7 @@ public class GlobalStopperImpl implements ISearchStopper {
 		}
 	}
 	
-	public synchronized boolean isStopped() {
+	public boolean isStopped() {
 		if (stopped) return true; 
 		if (secondaryStopper != null) secondaryStopper.isStopped();
 		return false;

@@ -169,12 +169,6 @@ public class HistoryTable_PerColour {
 		unlock();
 	}
 	
-	/*public synchronized int getCount(int move) {
-		final int fromFieldID = MoveInt.getFromFieldID(move);
-		final int toFieldID = MoveInt.getToFieldID(move);
-
-		return counts[fromFieldID][toFieldID];
-	}*/
 	
 	public int getScores(int move) {
 		
