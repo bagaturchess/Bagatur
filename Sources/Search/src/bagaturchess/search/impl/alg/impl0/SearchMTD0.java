@@ -1140,7 +1140,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						isGoodMove = ((ListAll) list).isGoodMove(cur_move);
 					}
 					
-					if (!isCheckMove) {
+					if (!isCheckMove
+							&& !isMateVal(alpha_org)
+							&& !isMateVal(beta)
+						) {
 						staticPrunning = true;
 					}
 					
@@ -1918,7 +1921,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							isGoodMove = ((ListAll) list).isGoodMove(cur_move);
 						}
 						
-						if (!isCheckMove) {
+						if (!isCheckMove
+								&& !isMateVal(alpha_org)
+								&& !isMateVal(beta)
+								 ) {
 							staticPrunning = true;
 						}
 						
@@ -2263,6 +2269,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			
 			//Alpha cutoff
 			if (!isMateVal(alpha_org)
+					&& !isMateVal(beta)
 					&& staticEval + env.getEval().getMaterialQueen() + getAlphaTrustWindow(mediator, 1) < alpha_org) {
 				node.eval = staticEval;
 				return node.eval;
@@ -2538,11 +2545,11 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 	    // Mate distance pruning
 		if (USE_MATE_DISTANCE && !inCheck && depth >= 1) {
-			
+				
 		      /*if (inCheck && !env.getBitboard().hasMove()) {
 					return -getMateVal(depth);
 		      }*/
-			
+				
 		      int value = -getMateVal(depth+2); // does not work if the current position is mate
 
 		      if (value > alpha_org) {
@@ -2550,9 +2557,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					return value;
 		         }
 		      }
-
+		      
 		      // upper bound
-
+		      
 		      value = getMateVal(depth+1);
 
 		      if (value < beta) {
@@ -2616,6 +2623,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			
 			//Alpha cutoff
 			if (!isMateVal(beta - 1)
+					&& !isMateVal(beta)
 					&& staticEval + env.getEval().getMaterialQueen() + getAlphaTrustWindow(mediator, 1) < alpha_org) {
 				return staticEval;
 			}
