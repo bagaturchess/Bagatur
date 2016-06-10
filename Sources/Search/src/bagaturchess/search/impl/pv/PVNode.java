@@ -63,23 +63,24 @@ public class PVNode {
 		leaf = true;
 	}
 	
-	public static List<Integer> extractPV(PVNode res) {
-		List<Integer> list = new ArrayList<Integer>();
+	
+	private static void extractPV(PVNode res, List<Integer> result) {
 		PVNode cur = res;
 		while(cur != null && (cur.bestmove != 0 || cur.nullmove)) {
-			list.add( cur.nullmove ? 0 : cur.bestmove);
+			result.add( cur.nullmove ? 0 : cur.bestmove);
 			cur = cur.child;
 			if (cur != null && cur.leaf) {
 				break;
 			}
 		}
-		return list;
 	}
 	
-	public static int[] convertPV(List<Integer> list) {
-		int[] result = new int[list.size()];
+	public static int[] convertPV(PVNode line, List<Integer> buff) {
+		extractPV(line, buff);
+		
+		int[] result = new int[buff.size()];
 		for (int i=0; i<result.length; i++) {
-			result[i] = list.get(i);
+			result[i] = buff.get(i);
 		}
 		return result;
 	}

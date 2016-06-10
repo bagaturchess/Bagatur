@@ -23,6 +23,9 @@
 package bagaturchess.search.impl.alg;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
@@ -192,6 +195,8 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	protected int[] buff_tpt_depthtracking = new int[1];
 	
 	protected GTBProbeInput temp_input = new GTBProbeInput();
+	
+	private List<Integer> pv_buffer = new ArrayList<Integer>();
 	
 	
 	static {
@@ -505,61 +510,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	@Override
 	public void search(ISearchMediator mediator, int startIteration,
 			int max_iterations, boolean useMateDistancePrunning) {
-		
-		int start_iteration = USE_TPT_IN_ROOT ? sentFromTPT(mediator, startIteration) : 1;
-		if (start_iteration < startIteration) {
-			start_iteration = startIteration;
-		}
-		if (start_iteration < 1) {
-			start_iteration = 1;
-		}
-		
-		ISearchInfo info_old = SearchInfoFactory.getFactory().createSearchInfo();
-		
-		for (int iteration = start_iteration; iteration <= max_iterations; iteration++) {
-			
-			ISearchInfo info = SearchInfoFactory.getFactory().createSearchInfo();
-			info.setDepth(iteration);
-			info.setSelDepth(iteration);
-			if (info_old != null) {
-				info.setSearchedNodes(info.getSearchedNodes() + info_old.getSearchedNodes());
-			}
-			
-			int eval = 0;
-			if (ASPIRATION_SEARCH && hasExpectedEval()) {
-				int expectedEval = getExpectedEval();
-				int alpha = expectedEval - FIRSTTIME_WINDOW;
-				int beta = expectedEval + FIRSTTIME_WINDOW;
-				eval = root_search(mediator, info, PLY * iteration, 0, alpha, beta, getPrevPV(), env.getBitboard().getColourToMove(), useMateDistancePrunning);
-				if (eval <= alpha || eval >= beta) {
-					eval = root_search(mediator, info, PLY * iteration, 0, MIN, MAX, getPrevPV(), env.getBitboard().getColourToMove(), useMateDistancePrunning);
-				}
-			} else {
-				eval = root_search(mediator, info, PLY * iteration, 0, MIN, MAX, getPrevPV(), env.getBitboard().getColourToMove(), useMateDistancePrunning);
-			}
-			
-			info.setPV(PVNode.convertPV(PVNode.extractPV(pvman.load(0))));
-			info.setBestMove(info.getPV()[0]);
-			info.setEval(eval);
-			
-			/*int pv[] = info.getPV();
-			for (int i=0; i<pv.length; i++) {
-				env.getBitboard().makeMoveForward(pv[i]);
-			}
-
-			for (int i=pv.length - 1; i>=0; i--) {
-				env.getBitboard().makeMoveBackward(pv[i]);
-			}*/
-			
-			storePrevPV(info);
-			if (SEND_SINGLE_BESTMOVE && mediator != null) {
-				mediator.changedMajor(info);
-				if (DEBUGSearch.DEBUG_MODE) testPV(info);
-			}
-			
-			info_old = info;
-		}
-		
+		throw new UnsupportedOperationException();
 	}
 	
 	
@@ -621,7 +572,8 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 			env.getTPT().unlock();
 			
 			node.eval = tptEntry.getLowerBound();
-			int pv[] = PVNode.convertPV(PVNode.extractPV(pvman.load(0)));
+			pv_buffer.clear();
+			int pv[] = PVNode.convertPV(pvman.load(0), pv_buffer);
 			if (pv != null && pv.length > 0) {
 				info.setPV(pv);
 				info.setBestMove(info.getPV()[0]);

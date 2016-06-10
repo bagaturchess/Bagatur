@@ -23,6 +23,9 @@
 package bagaturchess.search.impl.rootsearch.sequential;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
@@ -44,6 +47,8 @@ public class NullwinSearchTask implements Runnable {
 	private ISearchMediator mediator;
 	private boolean useMateDistancePrunning;
 	private int[] prevPV;
+	
+	private List<Integer> pv_buffer = new ArrayList<Integer>();
 	
 	
 	public NullwinSearchTask(ISearch _searcher, SearchManager _distribution,
@@ -183,10 +188,13 @@ public class NullwinSearchTask implements Runnable {
 			 * Critical section for distribution, be careful with the usage of other locking methods inside
 			 */
 			if (maxdepth == distribution.getCurrentDepth()) {
+				
+				pv_buffer.clear();
+				
 				if (eval >= beta) {
 					//eval is lower bound
 					
-					info.setPV(PVNode.convertPV(PVNode.extractPV(searcher.getPvman().load(0))));
+					info.setPV(PVNode.convertPV(searcher.getPvman().load(0), pv_buffer));
 					if (info.getPV().length > 0) {
 						info.setBestMove(info.getPV()[0]);
 					}
@@ -201,7 +209,7 @@ public class NullwinSearchTask implements Runnable {
 					//eval is upper bound
 					//eval < beta <=> eval <= beta - 1 <=> eval <= alpha
 					
-					info.setPV(PVNode.convertPV(PVNode.extractPV(searcher.getPvman().load(0))));
+					info.setPV(PVNode.convertPV(searcher.getPvman().load(0), pv_buffer));
 					if (info.getPV().length > 0) {
 						info.setBestMove(info.getPV()[0]);
 					}
