@@ -4,7 +4,6 @@ package bagaturchess.search.impl.env;
 import java.util.List;
 import java.util.Vector;
 
-import bagaturchess.bitboard.api.IBinarySemaphoreFactory;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.attacks.control.metadata.SeeMetadata;
 import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
@@ -28,7 +27,6 @@ public class MemoryConsumers {
 	
 	
 	private static int JVMDLL_MEMORY_CONSUMPTION = 20 * 1024 * 1024;
-	//private static final int EGTBDLL_MEMORY_CONSUMPTION = 10 * 1024 * 1024;
 	private static int MIN_MEMORY_BUFFER;
 	private static double MEMORY_USAGE_PERCENT; 
 	
@@ -52,10 +50,10 @@ public class MemoryConsumers {
 	static {
 		if (getJVMBitmode() == 64) {
 			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT = 0.71;//Multiple cpus, e.g. 64
+			MEMORY_USAGE_PERCENT = 0.23;
 		} else { //32
 			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT =  0.71;
+			MEMORY_USAGE_PERCENT =  0.23;
 		}
 	}
 	
