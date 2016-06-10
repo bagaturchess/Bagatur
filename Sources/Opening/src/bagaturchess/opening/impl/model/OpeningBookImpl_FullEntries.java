@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import bagaturchess.bitboard.impl.datastructs.HashMapLongObject;
 import bagaturchess.opening.api.OpeningBook;
 
 
@@ -40,7 +41,7 @@ public class OpeningBookImpl_FullEntries implements OpeningBook {
 	private static final long serialVersionUID = 7305402510512589014L;
 	
 	
-	public Map<Long, Entry_BaseImpl> entries;
+	public HashMapLongObject<Entry_BaseImpl> entries;
 	
 	
 	public OpeningBookImpl_FullEntries() {
@@ -49,7 +50,7 @@ public class OpeningBookImpl_FullEntries implements OpeningBook {
 	public int get(long hashkey, int colour) {
 		
 		if (entries == null) {
-			entries = new HashMap<Long, Entry_BaseImpl>();
+			entries = new HashMapLongObject<Entry_BaseImpl>();
 		}
 		
 		Entry_BaseImpl moves = entries.get(hashkey);
@@ -63,7 +64,7 @@ public class OpeningBookImpl_FullEntries implements OpeningBook {
 	public Entry_BaseImpl getEntry(long hashkey, int colour) {
 		
 		if (entries == null) {
-			entries = new HashMap<Long, Entry_BaseImpl>();
+			entries = new HashMapLongObject<Entry_BaseImpl>();
 		}
 		
 		return entries.get(hashkey);
@@ -78,7 +79,7 @@ public class OpeningBookImpl_FullEntries implements OpeningBook {
 
 		
 		if (entries == null) {
-			entries = new HashMap<Long, Entry_BaseImpl>();
+			entries = new HashMapLongObject<Entry_BaseImpl>();
 		}
 		
 		Entry_BaseImpl existing = entries.get(hashkey);
@@ -129,8 +130,8 @@ public class OpeningBookImpl_FullEntries implements OpeningBook {
 	 private void writeObject(ObjectOutputStream stream) throws IOException {
 	    //stream.defaultWriteObject();
 		 stream.writeInt(entries.size());
-		 Collection<Entry_BaseImpl> vals = entries.values();
-		 for (Entry_BaseImpl cur: vals) {
+		 Object[] vals = entries.getAllValues();
+		 for (Object cur: vals) {
 			 stream.writeObject(cur);
 		 }
 	  }
@@ -140,7 +141,7 @@ public class OpeningBookImpl_FullEntries implements OpeningBook {
 	    //stream.defaultReadObject();
 	    
 			 int size = stream.readInt();
-			 entries = new HashMap<Long, Entry_BaseImpl>(size);
+			 entries = new HashMapLongObject<Entry_BaseImpl>();
 			 for (int i=0; i<size; i++) {
 				 Entry_BaseImpl cur = (Entry_BaseImpl) stream.readObject();
 				 entries.put(cur.getHashkey(), cur);
