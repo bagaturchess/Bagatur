@@ -347,10 +347,15 @@ public class StateManager extends Protocol implements BestMoveSender {
 			
 			board.makeMoveForward(move);
 			
-			String bestMoveCommand = COMMAND_TO_GUI_BESTMOVE_STR + IChannel.WHITE_SPACE + MoveInt.moveToStringUCI(move);
+			StringBuilder result = new StringBuilder(8);
+			MoveInt.moveToStringUCI(move, result);
+			
+			String bestMoveCommand = COMMAND_TO_GUI_BESTMOVE_STR + IChannel.WHITE_SPACE + result;
 			if (ponder != 0) {
 				bestMoveCommand += IChannel.WHITE_SPACE + COMMAND_TO_GUI_BESTMOVE_PONDER_STR + IChannel.WHITE_SPACE;
-				bestMoveCommand += MoveInt.moveToStringUCI(ponder);
+				result = new StringBuilder(8);
+				MoveInt.moveToStringUCI(ponder, result);
+				bestMoveCommand += result;
 			}
 			
 			try {

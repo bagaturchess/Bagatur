@@ -396,42 +396,39 @@ public class MoveInt {
 	}
 	
 	public static String movesToStringUCI(int[] pv) {
-		String pvStr = "";
+		StringBuilder result = new StringBuilder(256);
 		
 		for (int i=0; i<pv.length; i++) {
-			pvStr += moveToStringUCI(pv[i]);
+			moveToStringUCI(pv[i], result);
 			if (i != pv.length - 1) {
-				pvStr += ", ";
+				result.append(", ");
 			}
 		}
 		
-		return pvStr;
+		return result.toString();
 	}
 	
-	public static final String moveToStringUCI(int move) {
+	public static final void moveToStringUCI(int move, StringBuilder result) {
 		
 		if (move == -1) {
 			throw new IllegalStateException("move=" + move);
 		}
 		
 		if (move == 0) {
-			return "OOOO";
+			result.append("OOOO");
+			return;
 			//throw new IllegalStateException();
 		}
 		
-		String moveStr = "";
-		
-		moveStr += Fields.ALL_ORDERED_NAMES[Fields.IDX_2_ORDERED_A1H1[getFromFieldID(move)]];
+		result.append(Fields.ALL_ORDERED_NAMES[Fields.IDX_2_ORDERED_A1H1[getFromFieldID(move)]]);
 		if (isCapture(move)) {
 		}
-		moveStr += Fields.ALL_ORDERED_NAMES[Fields.IDX_2_ORDERED_A1H1[getToFieldID(move)]];
+		result.append(Fields.ALL_ORDERED_NAMES[Fields.IDX_2_ORDERED_A1H1[getToFieldID(move)]]);
 		
 		if (isPromotion(move)) {
 			int promotionFigureType = Constants.PIECE_IDENTITY_2_TYPE[getPromotionFigurePID(move)];
-			moveStr += Figures.TYPES_SIGN[promotionFigureType].toLowerCase();
+			result.append(Figures.TYPES_SIGN[promotionFigureType].toLowerCase());
 		}
-		
-		return moveStr;
 	}
 	
 	public static String movesToStringOwn(int[] pv) {

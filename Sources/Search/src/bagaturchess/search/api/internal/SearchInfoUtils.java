@@ -30,48 +30,48 @@ public class SearchInfoUtils {
 			timeInSecs = 1;
 		}
 		
-		String message = "";
-		message += prefix;
-		message += " depth " + info.getDepth();
-		message += " seldepth " + info.getSelDepth();
-		message += " time " + time;
-		message += " nodes " + nodes;
+		StringBuilder message = new StringBuilder(256);
+		
+		message.append(prefix);
+		message.append(" depth " + info.getDepth());
+		message.append(" seldepth " + info.getSelDepth());
+		message.append(" time " + time);
+		message.append(" nodes " + nodes);
 		long nps = nodes / timeInSecs;
 		if (nps > 1) {
-			message += " nps " + nps;
+			message.append(" nps " + nps);
 		}
 		
 		long eval = (int)info.getEval();
 		if (info.isMateScore()) {
-			message += " score mate " + info.getMateScore();
+			message.append(" score mate " + info.getMateScore());
 		} else {
-			message += " score cp " + eval;
+			message.append(" score cp " + eval);
 		}
 		
 		if (info.isLowerBound()) {
-			message += " lowerbound";
+			message.append(" lowerbound");
 		} else if (info.isUpperBound()) {
-			message += " upperbound";
+			message.append(" upperbound");
 		}
 		
-		if (tptusage != -1) message += " hashfull " + (10 * tptusage);
+		if (tptusage != -1) message.append(" hashfull " + (10 * tptusage));
+		
+		message.append(" pv ");
 		
 		//if (!info.isUpperBound()) {
 			
-			String pv = "";
 			if (info.getPV() != null) {
 				for (int j=0; j<info.getPV().length; j++) {
-					pv += MoveInt.moveToStringUCI(info.getPV()[j]);
+					MoveInt.moveToStringUCI(info.getPV()[j], message);
 					if (j != info.getPV().length - 1) {
-						pv += " ";//", ";
+						message.append(" ");//", ";
 					}
 				}
 			}
-			
-			message += " pv " + pv;
 		//}
 		
-		return message;
+		return message.toString();
 	}
 	
 	
@@ -84,21 +84,24 @@ public class SearchInfoUtils {
 		
 		nodes = info.getSearchedNodes();
 		
-		String message = "";
-		message += "info";
-		message += " depth " + info.getDepth();
-		message += " seldepth " + info.getSelDepth();
-		message += " nodes " + info.getSearchedNodes();
+		StringBuilder message = new StringBuilder(256);
+
+		
+		message.append("info");
+		message.append(" depth " + info.getDepth());
+		message.append(" seldepth " + info.getSelDepth());
+		message.append(" nodes " + info.getSearchedNodes());
 		long nps = nodes / timeInSecs;
 		if (nps > 1) {
-			message += " nps " + nps;
+			message.append(" nps " + nps);
 		}
 		if (info.getCurrentMove() != 0) {
-			message += " currmove " + MoveInt.moveToStringUCI(info.getCurrentMove());
-			message += " currmovenumber " + info.getCurrentMoveNumber();
+			message.append(" currmove ");
+			MoveInt.moveToStringUCI(info.getCurrentMove(), message);
+			message.append(" currmovenumber " + info.getCurrentMoveNumber());
 		}
-		if (tptusage != -1) message += " hashfull " + (10 * tptusage);
+		if (tptusage != -1) message.append(" hashfull " + (10 * tptusage));
 		
-		return message;
+		return message.toString();
 	}
 }
