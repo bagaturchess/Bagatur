@@ -145,10 +145,6 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 			getSearcherNormal().decreaseTPTDepths(2);
 		}
 		
-		/*if (timeController == null || timeController.hasTime(1000)) {
-			System.gc();
-		}*/
-		
 		
 		IRootSearch searcher = getSearcher(ponderSearch);
 		
@@ -185,10 +181,6 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 			currentMediator.dump("Endless search started");
 			searcher.negamax(boardForSetup, currentMediator, false, null);
 		}
-		
-		/*if (ponderSearch) {
-			System.gc();
-		}*/
 	}
 
 

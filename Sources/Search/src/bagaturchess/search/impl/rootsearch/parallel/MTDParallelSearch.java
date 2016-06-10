@@ -155,7 +155,7 @@ public class MTDParallelSearch extends RootSearch_BaseImpl {
 					
 					long start_time = System.currentTimeMillis();
 					
-					SearchersInfo searchersInfo = new SearchersInfo(startIteration);
+					SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.5d);
 					
 					boolean allSearchersReady = false;
 					//boolean hasSendAtLest1Info = false;

@@ -20,11 +20,13 @@ public class SearchersInfo {
 	private Map<IRootSearch, SearcherInfo> searchersInfo;
 	private int cur_depth;
 	private ISearchInfo last_send_info;
+	private double nextDepthThreshold;
 	
 	
-	public SearchersInfo(int startDepth) {
+	public SearchersInfo(int startDepth, double _nextDepthThreshold) {
 		searchersInfo = new HashMap<IRootSearch, SearcherInfo>();
 		cur_depth = startDepth;
+		nextDepthThreshold = _nextDepthThreshold;
 	}
 	
 	
@@ -213,15 +215,16 @@ public class SearchersInfo {
 			
 			if (cur_searcher_infos != null) {
 				
-				if (cur_searcher_infos.getLastSearchInfo(depth) != null) {
+				/*if (cur_searcher_infos.getLastSearchInfo(depth) != null) {
 					return true;
-				}
+				}*/
 				
-				/*
+				
 				if (cur_searcher_infos.getLastSearchInfo(depth) != null) {
 					countResponded++;
 				}
 				
+				/*
 				if (cur_searcher_infos.containsBestMove(depth, last_send_info.getBestMove())) {
 					return true;
 				}
@@ -229,7 +232,7 @@ public class SearchersInfo {
 			}
 		}
 		
-		return countResponded > 0 && countResponded == searchersInfo.size();
+		return (countResponded / (double) searchersInfo.size() >= nextDepthThreshold);
 	}
 	
 	
