@@ -30,7 +30,7 @@ public class SearchInfoUtils {
 			timeInSecs = 1;
 		}
 		
-		StringBuilder message = new StringBuilder(256);
+		StringBuilder message = new StringBuilder(128);
 		
 		message.append(prefix);
 		message.append(" depth " + info.getDepth());
@@ -84,7 +84,7 @@ public class SearchInfoUtils {
 		
 		nodes = info.getSearchedNodes();
 		
-		StringBuilder message = new StringBuilder(256);
+		StringBuilder message = new StringBuilder(128);
 
 		
 		message.append("info");
