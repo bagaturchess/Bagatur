@@ -1,4 +1,9 @@
 
+Version 1.4c (15 June 2016)
+  * 15+ ELO stronger (measured versus 1.4b)
+  * Memory optimizations: no java objects creation during search, hence less GC more performance
+  * Renamed *.exe files
+
 Version 1.4b (31 May 2016)
   * 28+ ELO stronger (measured versus 1.4a)
   * Search optimizations: adjustments of the depth reduction amount used in late move reduction and null move reduction
