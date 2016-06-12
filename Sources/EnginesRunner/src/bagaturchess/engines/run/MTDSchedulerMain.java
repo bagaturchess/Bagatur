@@ -511,9 +511,9 @@ public class MTDSchedulerMain {
 		//-Dengine.boot.cfg=bagaturchess.properties.EngineConfigBaseImpl
 		
 		//ISearchMediator mediator1 = new MediatorDummper(bitboard, eval, 5000000, true);
-		IChannel channel = new Channel_Console();
-		final ISearchMediator mediator1 = new UCISearchMediatorImpl_NormalSearch(channel,
-				new Go(channel, "go infinite"),
+		//IChannel channel = new Channel_Console();
+		final ISearchMediator mediator1 = new UCISearchMediatorImpl_NormalSearch(ChannelManager.getChannel(),
+				new Go(ChannelManager.getChannel(), "go infinite"),
 				new TimeController_FixedDepth(),
 				bitboard.getColourToMove(),
 				new BestMoveSender() {
