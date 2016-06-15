@@ -1,7 +1,7 @@
 
 Version 1.4c (15 June 2016)
-  * 15+ ELO stronger (measured versus 1.4b)
-  * Memory optimizations: no java objects creation during search, hence less GC more performance
+  * 25+ ELO stronger (measured versus 1.4b with 150+ games - 1m+1s and 5m+5s time controls)
+  * Memory optimizations: no java objects creation during search, hence less java garbage collection and more engine performance
   * Renamed *.exe files
 
 Version 1.4b (31 May 2016)

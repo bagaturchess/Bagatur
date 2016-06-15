@@ -22,8 +22,8 @@ Have a nice usage ... and feel free to contribute http://sourceforge.net/project
 
 Hints:
   1. Bagatur needs at least 64M of memory to run.
-     By default it runs with 256M of memory.
-     To change it you can edit the corresponding *.ini or *.bat file.
+     By default it runs with 1024M of memory, but uses only 23% of it (10% are for transposition table and the rest of 13% is used for other caches).
+     Because of java specifics, changes in memory could lead to bad performance, anyway if necessary it could be changed by editing the corresponding *.ini or *.bat file.
      
   2. Endgame Tablebases support is based on Gaviota EGTB (Syzygy and Nalimov are not supported) and currently works on win 32 and win 64.
      In order to make it working:
@@ -41,7 +41,7 @@ Hints:
   5. If for some reason the EXE files do not work as expected, then there are 2 options:
      A) Edit the corresponding INI file. Find the option 'vm.location', remove semicolons (';' symbol) from the beginning of the line, and set the property to point out the wanted jvm.dll.
         jvm.dll could be found in JRE's 'bin/client' or 'bin/server' directory. For example, something like 'C:\jdk1.6.0_07\jre\bin\client\jvm.dll'
-     B) Use the BAT files inside the 'bin' sub-directory: Bagatur_1core.bat and Bagatur_mcore.bat
+     B) (Not recommended) Use the BAT files inside the 'bin' sub-directory: Bagatur_1core.bat and Bagatur_mcore.bat
         They can be edited so that the full path to java.exe is valid (it is also enough to add the java.exe to the system path variable)
 
 
@@ -55,13 +55,14 @@ Credits:
   1. My Wife, for supporting me in this dissociable and non-profitable hobby.
   2. Iavor Stoimenov, for the support and helpful discussions about the chess stuffs.
   3. Ivo Simeonov, for all the ideas, support, discussions, tests and contributed source code (initial version of pawn structure evaluation, C++ portings, exe luncher, etc.).
-  4. Olivier Deville, for his great support during ChessWar XVII, http://www.open-aurec.com/chesswar/
-  5. Dusan Stamenkovic, http://www.chessmosaic.com/, for the new Bagatur's Logo.
-  6. All UCI compatible GUIs and UCI protocol itself.
-  7. REBEL, http://www.top-5000.nl/authors/rebel/chess840.htm or http://www.rebel13.nl/, very helpful web page. Unfortunately it appeared after i realized most of the things in the hard way.
-  8. MTD(f), http://plaat.nl/mtdf.html, the parallel search of Bagatur is based on this idea.
-  9. Glaurung, http://www.glaurungchess.com/, nice ideas inside the evaluation function (e.g. king safety)
-  10. Fruit, http://www.fruitchess.com/, legendary program, nice and simple design.
-  11. winrun4j, http://winrun4j.sourceforge.net/, for the windows executables
-  12. CuckooChess, http://chessprogramming.wikispaces.com/CuckooChess, another java chess program - strong and well written
+  4. Graham Banks, for all the CCLR tournaments he organize and broadcast in Internet, as well as for his great support in case of engine issues
+  5. Olivier Deville, for his great support during ChessWar XVII, http://www.open-aurec.com/chesswar/
+  6. Dusan Stamenkovic, http://www.chessmosaic.com/, for the new Bagatur's Logo.
+  7. All UCI compatible GUIs and UCI protocol itself.
+  8. REBEL, http://www.top-5000.nl/authors/rebel/chess840.htm or http://www.rebel13.nl/, very helpful web page. Unfortunately it appeared after i realized most of the things in the hard way.
+  9. MTD(f), http://plaat.nl/mtdf.html, the parallel search of Bagatur is based on this idea.
+  10. Glaurung, http://www.glaurungchess.com/, nice ideas inside the evaluation function (e.g. king safety)
+  11. Fruit, http://www.fruitchess.com/, legendary program, nice and simple design.
+  12. winrun4j, http://winrun4j.sourceforge.net/, for the windows executables
+  13. CuckooChess, http://chessprogramming.wikispaces.com/CuckooChess, another java chess program - strong and well written
   
