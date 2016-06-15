@@ -19,10 +19,14 @@ import bagaturchess.uci.impl.commands.options.UCIOptionString;
 public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IUCIOptionsProvider {
 	
 	
-	protected static final double MEM_USAGE_TPT = 0.50;
+	/*protected static final double MEM_USAGE_TPT = 0.50;
 	protected static final double MEM_USAGE_GTB = 0.07; //0.00
 	protected static final double MEM_USAGE_EVALCACHE = 0.22; //0.35
-	protected static final double MEM_USAGE_PAWNCACHE = 0.21;
+	protected static final double MEM_USAGE_PAWNCACHE = 0.21;*/
+	protected static final double MEM_USAGE_TPT = 0.35;
+	protected static final double MEM_USAGE_GTB = 0.10; //0.00
+	protected static final double MEM_USAGE_EVALCACHE = 0.25; //0.35
+	protected static final double MEM_USAGE_PAWNCACHE = 0.30;
 	
 	
 	private String DEFAULT_gaviotaTbPath = (new File(".")).getAbsolutePath() + File.separatorChar + "data" + File.separatorChar + "egtb";
