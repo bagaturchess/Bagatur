@@ -2724,7 +2724,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			
 			if (MoveInt.isCapture(cur_move)) {
 				if (MoveInt.getCapturedFigureType(cur_move) == Figures.TYPE_KING) {
-					throw new IllegalStateException();
+					throw new IllegalStateException("MoveInt.getCapturedFigureType(cur_move) == Figures.TYPE_KING");
 				}
 			}
 			
@@ -2749,7 +2749,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						env.getBitboard().makeMoveBackward(cur_move);
 						continue;
 					} else {
-						throw new IllegalStateException();	
+						throw new IllegalStateException("env.getBitboard().isInCheck(colourToMove)");	
 					}
 				}
 				legalMoves++;
@@ -2768,7 +2768,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					}
 					
 					if (best_eval > alpha) {
-						throw new IllegalStateException();
+						throw new IllegalStateException("best_eval > alpha");
 					}
 				}
 			}
@@ -2780,7 +2780,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 				if (legalMoves == 0) {
 					return -getMateVal(depth);
 				} else {
-					throw new IllegalStateException();
+					throw new IllegalStateException("best_move == 0 && legalMoves != 0");
 				}
 			} else {
 				//All captures lead to evaluation which is less than the static eval
