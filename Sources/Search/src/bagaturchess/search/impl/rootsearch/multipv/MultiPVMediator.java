@@ -77,7 +77,12 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	
 	private List<MultiPVEntry> setupMultiPVs() {
 		IMoveList moves = new BaseMoveList();
-		bitboard.genAllMoves(moves);
+		
+		if (bitboard.isInCheck()) {
+			bitboard.genKingEscapes(moves);
+		} else {
+			bitboard.genAllMoves(moves);
+		}
 		
 		List<MultiPVEntry> multipvs = new ArrayList<MultiPVEntry>();
 		
