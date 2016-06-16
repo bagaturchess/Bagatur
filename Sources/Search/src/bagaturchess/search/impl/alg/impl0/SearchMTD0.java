@@ -2724,6 +2724,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			
 			if (MoveInt.isCapture(cur_move)) {
 				if (MoveInt.getCapturedFigureType(cur_move) == Figures.TYPE_KING) {
+					throw new IllegalStateException("MoveInt.getCapturedFigureType(cur_move) == Figures.TYPE_KING " + MoveInt.moveToString(cur_move) + env.getBitboard().toString());
 				}
 			}
 			

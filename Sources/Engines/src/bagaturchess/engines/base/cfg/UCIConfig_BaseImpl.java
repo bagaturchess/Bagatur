@@ -17,7 +17,7 @@ public class UCIConfig_BaseImpl implements IUCIConfig {
 	private Object searchAdaptorImpl_ConfigObj;
 	
 	
-	private static final String DEFAULT_loggingPolicy = "single file";
+	private static final String DEFAULT_loggingPolicy = "none";//"single file";
 	
 	private String loggingPolicy = DEFAULT_loggingPolicy;
 	

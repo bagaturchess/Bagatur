@@ -331,7 +331,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	private void ponderHit(String fromGUILine) throws IOException {
 		channel.sendLogToGUI("StateManager: Ponder hit -> switching search");
-		searchAdaptor.ponderHit();
+		if (searchAdaptor != null) searchAdaptor.ponderHit();
 	}
 	
 	
@@ -339,6 +339,11 @@ public class StateManager extends Protocol implements BestMoveSender {
 	public void sendBestMove() {
 
 		channel.sendLogToGUI("StateManager: sendBestMove called");
+		
+		if (searchAdaptor == null) {
+			channel.sendLogToGUI("StateManager: sendBestMove searchAdaptor is null");
+			return;
+		}
 		
 		int[] moveAndPonder = searchAdaptor.stopSearch();
 		int move = moveAndPonder[0];
