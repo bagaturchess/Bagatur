@@ -1,4 +1,21 @@
 
+Version 1.4c (15 June 2016)
+  * 25+ ELO stronger (measured versus 1.4b with 150+ games - 1m+1s and 5m+5s time controls)
+  * Memory optimizations: no java objects creation during search, hence less java garbage collection and more engine performance
+  * Renamed *.exe files
+
+Version 1.4b (31 May 2016)
+  * 28+ ELO stronger (measured versus 1.4a)
+  * Search optimizations: adjustments of the depth reduction amount used in late move reduction and null move reduction
+  * Default memory increased from 256MB to 1024MB. Could be set in the corresponding *.ini files to *exe files (or bat files if you don't use *.exe starters)
+  * Fixes in UCI communication with Arena UI (e.g. start-stop issues, MultiPV under Pondering issues)
+
+Version 1.4a (24 May 2016)
+  * Bugfix: removed bug when in some endgames engine just stop thinking
+  * New UCI option Openning Mode - 'random' and 'most played first'
+  * Changed logo
+  * Simplified distribution structure
+
 Version 1.4 (11 May 2016)
   * 35+ ELO stronger!
   * Added Windows 64 support for Gaviota Endgame Tablebases
