@@ -6,7 +6,7 @@
  */
 package bagaturchess.learning.impl;
 
-import bagaturchess.bitboard.impl.Utils;
+import bagaturchess.bitboard.common.Utils;
 
 
 public class PSTConstants {

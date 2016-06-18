@@ -38,6 +38,13 @@ public class FeatureArray extends Feature {
 		createNewWeights(_omin, _omax, oinitial, _emin, _emax, einitial);
 	}
 	
+	@Override
+	public String toJavaCode() {
+		String o = "public static final double " + getName().replace('.', '_') + "_O	=	";
+		String e = "public static final double " + getName().replace('.', '_') + "_E	=	";
+		
+		return o + "\r\n" + e + "\r\n";
+	}
 	
 	@Override
 	protected void merge(Feature other) {

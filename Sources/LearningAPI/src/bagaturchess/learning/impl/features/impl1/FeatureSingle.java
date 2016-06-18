@@ -31,6 +31,14 @@ public class FeatureSingle extends Feature {
 	
 	
 	@Override
+	public String toJavaCode() {
+		String o = "public static final double " + getName().replace('.', '_') + "_O	=	" + openning + ";";
+		String e = "public static final double " + getName().replace('.', '_') + "_E	=	" + endgame + ";";
+		
+		return o + "\r\n" + e + "\r\n";
+	}
+	
+	@Override
 	protected void merge(Feature other) {
 		super.merge(other);
 		if (other instanceof FeatureSingle) {

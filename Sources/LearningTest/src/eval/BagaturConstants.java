@@ -6,8 +6,7 @@
  */
 package eval;
 
-
-import bagaturchess.bitboard.impl.Utils;
+import bagaturchess.bitboard.common.Utils;
 
 
 public class BagaturConstants {

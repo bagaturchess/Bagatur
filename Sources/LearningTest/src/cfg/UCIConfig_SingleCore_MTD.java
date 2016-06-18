@@ -1,7 +1,7 @@
 package cfg;
 
 
-import bagaturchess.bitboard.impl.Utils;
+import bagaturchess.bitboard.common.Utils;
 import bagaturchess.engines.base.cfg.UCIConfig_BaseImpl;
 
 

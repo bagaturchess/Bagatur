@@ -3,10 +3,10 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Bitboard"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/LearningAPI"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UCITracker"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Search"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Engines"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UCI"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/LearningAPI"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

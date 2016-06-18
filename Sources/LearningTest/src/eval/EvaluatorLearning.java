@@ -21,6 +21,8 @@ import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.EvaluatorAdapter;
 import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.evalcache.EvalEntry;
+import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.evalcache.IEvalEntry;
 
 
 public class EvaluatorLearning extends EvaluatorAdapter implements IFeaturesConstants {
@@ -28,7 +30,7 @@ public class EvaluatorLearning extends EvaluatorAdapter implements IFeaturesCons
 	private boolean useEvalCache = false;
 	
 	private IBitBoard bitboard;
-	private EvalCache evalCache;
+	private IEvalCache evalCache;
 	private Features features;
 	private IFeature[][] features_byComp;
 	private ISignals signals;
@@ -41,11 +43,11 @@ public class EvaluatorLearning extends EvaluatorAdapter implements IFeaturesCons
 	private int[] eval_buff;
 	
 	
-	public EvaluatorLearning(IBitBoard _bitboard, EvalCache _evalCache) {
+	public EvaluatorLearning(IBitBoard _bitboard, IEvalCache _evalCache) {
 		this(_bitboard, _evalCache, new BagaturSignalFiller(_bitboard), null, null);
 	}
 	
-	public EvaluatorLearning(IBitBoard _bitboard, EvalCache _evalCache, ISignalFiller _filler, Features _features, ISignals _signals) {
+	public EvaluatorLearning(IBitBoard _bitboard, IEvalCache _evalCache, ISignalFiller _filler, Features _features, ISignals _signals) {
 		
 		bitboard = _bitboard;
 		evalCache = _evalCache;
@@ -122,7 +124,7 @@ public class EvaluatorLearning extends EvaluatorAdapter implements IFeaturesCons
 		
 		if (useEvalCache) {
 			evalCache.lock();
-			EvalEntry cached = evalCache.get(hashkey);
+			IEvalEntry cached = evalCache.get(hashkey);
 			
 			if (cached != null) {
 				if (!cached.isSketch()) {
@@ -257,7 +259,7 @@ public class EvaluatorLearning extends EvaluatorAdapter implements IFeaturesCons
 		
 		if (useEvalCache) {
 			evalCache.lock();
-			EvalEntry cached = evalCache.get(hashkey);
+			IEvalEntry cached = evalCache.get(hashkey);
 			
 			if (cached != null) {
 				if (!cached.isSketch()) {

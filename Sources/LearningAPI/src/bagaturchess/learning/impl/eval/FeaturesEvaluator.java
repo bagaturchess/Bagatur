@@ -15,13 +15,12 @@ import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.IFeaturesConstants;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
-import bagaturchess.learning.impl.features.Features;
+import bagaturchess.learning.impl.features.impl1.Features;
 import bagaturchess.learning.impl.filler.SignalFiller;
 import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.EvaluatorAdapter;
 import bagaturchess.search.impl.evalcache.EvalCache;
-import bagaturchess.search.impl.evalcache.EvalEntry;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
 

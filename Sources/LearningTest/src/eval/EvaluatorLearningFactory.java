@@ -9,6 +9,7 @@ import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IEvaluatorFactory;
 import bagaturchess.search.impl.evalcache.EvalCache;
+import bagaturchess.search.impl.evalcache.IEvalCache;
 
 
 public class EvaluatorLearningFactory implements IEvaluatorFactory {
@@ -18,7 +19,7 @@ public class EvaluatorLearningFactory implements IEvaluatorFactory {
 	
 	
 	@Override
-	public IEvaluator create(IBitBoard bitboard, EvalCache evalCache, IEvalConfig evalConfig) {
+	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache, IEvalConfig evalConfig) {
 		ISignalFiller filler = new BagaturSignalFiller(bitboard);
 		Features features = createFeatures();
 		ISignals signals = features.createSignals();
@@ -27,7 +28,7 @@ public class EvaluatorLearningFactory implements IEvaluatorFactory {
 
 
 	@Override
-	public IEvaluator create(IBitBoard bitboard, EvalCache evalCache) {
+	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache) {
 		ISignalFiller filler = new BagaturSignalFiller(bitboard);
 		Features features = createFeatures();
 		ISignals signals = features.createSignals();

@@ -1,6 +1,3 @@
-
-
-
 package cfg;
 
 
@@ -9,7 +6,6 @@ import bagaturchess.search.api.ISearchConfig_MTD;
 import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.api.IUCIOptionsRegistry;
 import bagaturchess.uci.impl.commands.options.UCIOption;
-import bagaturchess.uci.impl.commands.options.UCIOptionSpin;
 
 
 public class SearchConfigImpl_MTD extends SearchConfigImpl_AB implements ISearchConfig_MTD, IUCIOptionsProvider {
@@ -27,18 +23,6 @@ public class SearchConfigImpl_MTD extends SearchConfigImpl_AB implements ISearch
 	
 	public SearchConfigImpl_MTD() {
 		
-	}
-	
-	
-	@Override
-	public void setMTDTrustWindow(int _mtdTrustWindow) {
-		mtdTrustWindow = _mtdTrustWindow;
-	}
-	
-	
-	@Override
-	public int getMTDTrustWindow() {
-		return mtdTrustWindow;
 	}
 	
 	
