@@ -1,0 +1,43 @@
+<project name="BagaturUCITracker" default="all" basedir="./">
+	
+	<description>
+        Bagatur UCI Tracker - assembly files
+    </description>
+	
+	<property name="project_name" value="BagaturUCITracker" />
+	<property name="project_root" value="${ucitracker_dir}" />
+	<property name="classpath" value="${work_dir}/BagaturBoard.jar" />
+	
+	<property name="src" location="${project_root}/src" />
+	<property name="classes" location="${work_dir}/assembly" />
+	
+	<target name="clean" description="clean up">
+		<delete dir="${classes}" />
+	</target>
+		
+	<target name="init" description="create output dir">
+		<tstamp />
+		<mkdir dir="${classes}" />
+	</target>
+	
+	<target name="compile" description="compile the source">
+		<javac srcdir="${src}" destdir="${classes}"  classpath="${classpath}"/>
+	</target>
+	
+	<target name="resources" description="copy resources">
+		<copy todir="${classes}" flatten="true">
+	    	<resources>
+				<file file="${project_root}/LICENSE"/>
+				<file file="${project_root}/readme.txt"/>
+			</resources>
+		</copy>
+	</target>
+	
+	<target name="jar" description="generate the jar">
+		<jar jarfile="${work_dir}/${project_name}.jar" basedir="${classes}"/>
+	</target>
+
+	<target name="all" depends="init, compile, resources, jar, clean" description="all">
+	</target>
+</project>
+

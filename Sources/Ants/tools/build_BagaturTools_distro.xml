@@ -1,0 +1,78 @@
+<project name="BagaturTools" basedir="." default="build_distro">
+
+	
+  <property name="distro_sufix" value=".1.1" />
+  
+  
+  <property name="workspace_root" value="../../"/>
+  <property name="ants_dir" value="${workspace_root}/Ants" />
+  <property name="work_dir" value="${workspace_root}/WorkDir" />
+  <property name="bitboard_dir" value="${workspace_root}/Bitboard" />
+  <property name="opening_dir" value="${workspace_root}/Opening" />
+  <property name="openinggen_dir" value="${workspace_root}/OpeningGenerator" />
+  <property name="pgnprocessor_dir" value="${workspace_root}/PGNProcessor" />
+  <property name="resources_dir" value="${workspace_root}/Resources" />
+  <property name="egtb_dir" value="${workspace_root}/EGTB" />
+  <property name="ucitracker_dir" value="${workspace_root}/UCITracker" />
+  <!--property name="workspace_root" value="../../../.."/>
+  <property name="svn_path_shift" value="/trunk/"/>
+  <property name="ants_dir" value="${workspace_root}/Ants/${svn_path_shift}/Ants" />
+  <property name="work_dir" value="${workspace_root}/WorkDir/${svn_path_shift}/WorkDir" />
+  <property name="bitboard_dir" value="${workspace_root}/Bitboard/${svn_path_shift}/Bitboard" />
+  <property name="opening_dir" value="${workspace_root}/Opening/${svn_path_shift}/Opening" />
+  <property name="openinggen_dir" value="${workspace_root}/OpeningGenerator/${svn_path_shift}/OpeningGenerator" />
+  <property name="pgnprocessor_dir" value="${workspace_root}/PGNProcessor/${svn_path_shift}/PGNProcessor" /-->  
+  
+  <property name="temp_dir" value="${work_dir}/temp" />
+  
+  
+  <target name="build_distro" description="Building Distribution">
+    <ant antfile="${ants_dir}/common/build_Board.xml" dir="${bitboard_dir}/src"/>
+    <ant antfile="${ants_dir}/common/build_Opening.xml" dir="${opening_dir}/src"/>
+  	<ant antfile="${ants_dir}/tools/build_PGNProcessor.xml" dir="${pgnprocessor_dir}/src"/>
+  	<ant antfile="${ants_dir}/tools/build_OpeningGenerator.xml" dir="${openinggen_dir}/src"/>
+	<ant antfile="${ants_dir}/common/build_EGTB.xml" dir="${egtb_dir}/src"/>
+  	<ant antfile="${ants_dir}/tools/build_UCITracker.xml" dir="${ucitracker_dir}/src"/>
+  	
+  	<ant antfile="${ants_dir}/tools/build_BagaturTools_src.xml" dir="${ants_dir}/tools"/>
+  	
+	<copy todir="${temp_dir}">
+	    <fileset dir="${work_dir}/">
+	      <include name="BagaturBoard.jar"/>
+	      <include name="BagaturOpening.jar"/>
+	      <include name="BagaturOpeningGenerator.jar"/>
+	      <include name="BagaturPGNProcessor.jar"/>
+	      <include name="BagaturEGTB.jar"/>
+	      <include name="BagaturUCITracker.jar"/>
+	      <include name="src.zip"/>
+		  <include name="w.ob"/>
+		  <include name="b.ob"/>
+	    </fileset>
+      	<fileset dir="${ants_dir}">
+	      <include name="LICENSE"/>
+      	</fileset>
+	</copy>
+	<copy tofile="${temp_dir}/readme.txt" >
+		<fileset dir="${resources_dir}/doc/tools/txt">
+			<include name="readme_distro_BagaturTools.txt"/>
+		</fileset>
+	</copy>
+	<copy tofile="${temp_dir}/release_notes.txt" >
+		<fileset dir="${resources_dir}/doc/tools/txt">
+			<include name="release_notes_BagaturTools.txt"/>
+		</fileset>
+	</copy>
+	
+	<zip zipfile="${work_dir}/BagaturTools${distro_sufix}.zip" basedir="${temp_dir}" />
+  	
+  	<delete dir="${temp_dir}" />
+  	<delete file="${work_dir}/BagaturBoard.jar"/>
+  	<delete file="${work_dir}/BagaturOpening.jar"/>
+  	<delete file="${work_dir}/BagaturOpeningGenerator.jar"/>
+  	<delete file="${work_dir}/BagaturPGNProcessor.jar"/>
+  	<delete file="${work_dir}/BagaturEGTB.jar"/>
+  	<delete file="${work_dir}/BagaturUCITracker.jar"/>
+  	<delete file="${work_dir}/src.zip"/>
+  	
+  </target>
+</project>

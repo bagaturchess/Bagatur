@@ -1,0 +1,98 @@
+<project name="BagaturTools_src" default="all" basedir="./">
+	
+	<description>
+		Bagatur Tools - pack sources
+    </description>
+	
+	<property name="project_name" value="BagaturTools_src" />
+	
+	<target name="clean" description="clean up">
+		<delete dir="${temp_dir}" />
+	</target>
+
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${temp_dir}" />
+	</target>
+	
+	<target name="copy" description="copy source">
+		<copy todir="${temp_dir}">
+		    <fileset dir="${ants_dir}/..">
+		      <include name="Ants/common/**/"/>
+		      <include name="Ants/tools/**/"/>
+			  <include name="Ants/LICENSE"/>
+			  <include name="Ants/readme.txt"/>
+			  <include name="Ants/.classpath"/>
+			  <include name="Ants/.project"/>
+		    </fileset>
+		    <fileset dir="${bitboard_dir}/..">
+		      <include name="Bitboard/src/**/*.java"/>
+		      <include name="Bitboard/LICENSE"/>
+		      <include name="Bitboard/readme.txt"/>
+		      <include name="Bitboard/.classpath"/>
+		      <include name="Bitboard/.project"/>
+		    </fileset>
+			<fileset dir="${opening_dir}/..">
+		      <include name="Opening/src/**/*.java"/>
+		      <include name="Opening/LICENSE"/>
+		      <include name="Opening/readme.txt"/>
+		      <include name="Opening/.classpath"/>
+		      <include name="Opening/.project"/>
+			</fileset>
+			<fileset dir="${openinggen_dir}/..">
+		      <include name="OpeningGenerator/src/**/*.java"/>
+		      <include name="OpeningGenerator/LICENSE"/>
+		      <include name="OpeningGenerator/readme.txt"/>
+		      <include name="OpeningGenerator/.classpath"/>
+		      <include name="OpeningGenerator/.project"/>
+			</fileset>
+			<fileset dir="${pgnprocessor_dir}/..">
+		      <include name="PGNProcessor/src/**/*.java"/>
+		      <include name="PGNProcessor/LICENSE"/>
+		      <include name="PGNProcessor/readme.txt"/>
+		      <include name="PGNProcessor/.classpath"/>
+		      <include name="PGNProcessor/.project"/>
+			</fileset>
+			<fileset dir="${work_dir}/..">
+		      <include name="WorkDir"/>
+		      <include name="WorkDir/LICENSE"/>
+		      <include name="WorkDir/readme.txt"/>
+		      <include name="WorkDir/.classpath"/>
+		      <include name="WorkDir/.project"/>
+			</fileset>
+			<fileset dir="${resources_dir}/..">
+		      <include name="Resources/bin/tools/**/*"/>
+			  <include name="Resources/doc/tools/**/*"/>
+			  <include name="Resources/.classpath"/>
+			  <include name="Resources/.project"/>
+			</fileset>
+			<fileset dir="${egtb_dir}/..">
+			  <include name="EGTB/src/**/*.java"/>
+		      <include name="EGTB/LICENSE"/>
+		      <include name="EGTB/readme.txt"/>
+		      <include name="EGTB/.classpath"/>
+		      <include name="EGTB/.project"/>
+			</fileset>
+			<fileset dir="${ucitracker_dir}/..">
+			  <include name="UCITracker/src/**/*.java"/>
+		      <include name="UCITracker/LICENSE"/>
+		      <include name="UCITracker/readme.txt"/>
+		      <include name="UCITracker/.classpath"/>
+		      <include name="UCITracker/.project"/>
+			</fileset>
+		</copy>
+		<copy tofile="${temp_dir}/readme.txt">
+			<fileset dir="${resources_dir}/doc/tools/txt">
+				<include name="readme_src_BagaturTools.txt"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="zip" description="generate the zip">
+		<zip zipfile="${work_dir}/src.zip" basedir="${temp_dir}" />
+	</target>
+
+	<target name="all" depends="init, copy, zip, clean" description="all">
+	</target>
+</project>
+
