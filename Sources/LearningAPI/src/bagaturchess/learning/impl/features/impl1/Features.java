@@ -29,6 +29,7 @@ import java.util.TreeSet;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.IFeaturesConfiguration;
+import bagaturchess.learning.api.IFeaturesMerger;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.impl.signals.Signals;
 
@@ -136,7 +137,7 @@ public class Features {
 		}*/
 	}
 	
-	public static Features load(String cfgClassName) throws Exception {
+	public static Features load(String cfgClassName, IFeaturesMerger merger) throws Exception {
 		
 		Set<IFeature> result_set = new TreeSet<IFeature>();
 		
@@ -173,7 +174,8 @@ public class Features {
 					throw new UnsupportedOperationException();
 				} else {
 					cur_p_f.merge(cur_m_f);
-					//System.out.println("Merged feature : " + cur_p_f.getName());
+					//merger.merge(cur_p_f, cur_m_f);
+					System.out.println("CHECK MERGER: Merged feature : " + cur_p_f.getName());
 				}
 				
 			} else {

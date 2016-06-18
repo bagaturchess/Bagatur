@@ -23,7 +23,7 @@ public class Signals implements ISignals {
 		for (int i=0; i<featuresArr.length; i++) {
 			signals[i] = featuresArr[i].createNewSignal();
 			if (featuresArr[i].getId() != i) {
-				throw new IllegalStateException();
+				throw new IllegalStateException("i="+i + ", featuresArr[i].getId() =" + featuresArr[i].getId() );
 			}
 		}
 	}

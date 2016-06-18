@@ -38,7 +38,7 @@ public class EvalCache extends LRUMapLongObject<IEvalEntry> implements IEvalCach
 		return result;
 	}
 	
-	public void put(long hashkey, int eval, boolean sketch) {
+	public void put(long hashkey, double eval, boolean sketch) {
 		IEvalEntry entry = super.getAndUpdateLRU(hashkey);
 		if (entry != null) {
 			//Multithreaded access
@@ -50,7 +50,7 @@ public class EvalCache extends LRUMapLongObject<IEvalEntry> implements IEvalCach
 	}
 
 	@Override
-	public void put(long hashkey, int level, int eval, int alpha, int beta) {
+	public void put(long hashkey, int level, double eval, int alpha, int beta) {
 		throw new UnsupportedOperationException();
 	}
 }

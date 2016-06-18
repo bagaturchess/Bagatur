@@ -42,30 +42,30 @@ public class EvalCache1 extends LRUMapLongObject<IEvalEntry> implements IEvalCac
 	}
 	
 	
-	public void put(long hashkey, int _level, int _eval, int _alpha, int _beta) {
+	public void put(long hashkey, int _level, double _eval, int _alpha, int _beta) {
 		
 		if (_eval == ISearch.MAX || _eval == ISearch.MIN) {
 			throw new IllegalStateException("_eval=" + _eval);
 		}
 
 		if (_eval >= ISearch.MAX_MAT_INTERVAL || _eval <= -ISearch.MAX_MAT_INTERVAL) {
-			if (!SearchUtils.isMateVal(_eval)) {
+			if (!SearchUtils.isMateVal((int)_eval)) {
 				throw new IllegalStateException("not mate val _eval=" + _eval);
 			}
 		}
 		
 		EvalEntry1 entry = (EvalEntry1) super.getAndUpdateLRU(hashkey);
 		if (entry != null) {
-			entry.update(_level, _eval, _alpha, _beta);
+			entry.update(_level, (int)_eval, _alpha, _beta);
 		} else {
 			entry = (EvalEntry1) associateEntry(hashkey);
-			entry.init(_level, _eval, _alpha, _beta);
+			entry.init(_level, (int)_eval, _alpha, _beta);
 		}
 	}
 
 
 	@Override
-	public void put(long hashkey, int eval, boolean sketch) {
+	public void put(long hashkey, double eval, boolean sketch) {
 		put(hashkey, 1, eval, ISearch.MIN, ISearch.MAX);
 	}
 }

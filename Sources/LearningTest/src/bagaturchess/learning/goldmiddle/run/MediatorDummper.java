@@ -164,4 +164,29 @@ public class MediatorDummper implements ISearchMediator {
 	public void send(String msg) {
 		System.out.println(msg);
 	}
+
+	@Override
+	public void setStopper(ISearchStopper stopper) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void registerInfoObject(ISearchInfo info) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getTrustWindow_BestMove() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getTrustWindow_AlphaAspiration() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getTrustWindow_MTD_Step() {
+		throw new UnsupportedOperationException();
+	}
 }

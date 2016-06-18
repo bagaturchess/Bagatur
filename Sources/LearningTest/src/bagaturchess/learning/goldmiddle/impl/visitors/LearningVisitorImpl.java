@@ -34,7 +34,7 @@ import bagaturchess.learning.goldmiddle.api.IAdjustableFeature;
 import bagaturchess.learning.goldmiddle.impl.cfg.FeaturesConfigurationBagaturImpl;
 import bagaturchess.learning.goldmiddle.impl.features.FeaturesMerger;
 import bagaturchess.learning.impl.eval.FeaturesEvaluator;
-import bagaturchess.learning.impl.features.Features;
+import bagaturchess.learning.impl.features.impl1.Features;
 import bagaturchess.learning.impl.filler.SignalFiller;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.ucitracker.api.PositionsVisitor;

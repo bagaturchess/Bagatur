@@ -103,7 +103,7 @@ public class FeaturesConfigurationBagaturImpl implements IFeaturesConfiguration,
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_QUEEN_S    , "MOBILITY.QUEEN.S"    , MOVES_ITERATION  ,  0,  2,  1,  0,  2,  1));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOKS_PAIR_H   	    , "ROOKS.PAIR.H"    	, MOVES_ITERATION  ,  0, 50, 10,  0, 50, 10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOKS_PAIR_V   	    , "ROOKS.PAIR.V"    	, MOVES_ITERATION  ,  0, 50, 10,  0, 50, 10 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BK              , "PIN.BK"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
+		/*add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BK              , "PIN.BK"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BQ              , "PIN.BQ"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BR              , "PIN.BR"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BN              , "PIN.BN"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
@@ -129,7 +129,7 @@ public class FeaturesConfigurationBagaturImpl implements IFeaturesConfiguration,
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAP_KNIGHT         , "TRAP.KNIGHT"         , MOVES_ITERATION  ,  -50,  0,  -1,  -50,  0,  -1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAP_BISHOP         , "TRAP.BISHOP"         , MOVES_ITERATION  ,  -50,  0,  -1,  -50,  0,  -1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAP_ROOK           , "TRAP.ROOK"           , MOVES_ITERATION  ,  -50,  0,  -1,  -50,  0,  -1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAP_QUEEN          , "TRAP.QUEEN"          , MOVES_ITERATION  ,  -50,  0,  -1,  -50,  0,  -1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAP_QUEEN          , "TRAP.QUEEN"          , MOVES_ITERATION  ,  -50,  0,  -1,  -50,  0,  -1 ));*/
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED_PIECES       , "HUNGED.PIECE"        , MOVES_ITERATION  ,  -50,  0, -20,  -50,  0, -20 ));
 		
 		

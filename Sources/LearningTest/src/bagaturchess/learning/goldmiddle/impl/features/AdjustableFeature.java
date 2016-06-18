@@ -2,6 +2,7 @@ package bagaturchess.learning.goldmiddle.impl.features;
 
 
 import bagaturchess.learning.goldmiddle.api.IAdjustableFeature;
+import bagaturchess.learning.impl.features.impl1.Feature;
 
 
 abstract class AdjustableFeature extends Feature implements IAdjustableFeature {

@@ -1,6 +1,8 @@
 package bagaturchess.learning.goldmiddle.run;
 
-import bagaturchess.learning.impl.features.Features;
+
+import bagaturchess.learning.impl.features.impl1.Features;
+
 
 public class DumpFeatures {
 

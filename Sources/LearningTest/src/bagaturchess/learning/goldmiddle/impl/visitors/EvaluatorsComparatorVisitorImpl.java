@@ -35,7 +35,7 @@ import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.impl.cfg.FeaturesConfigurationBagaturImpl;
 import bagaturchess.learning.impl.eval.FeaturesEvaluator;
-import bagaturchess.learning.impl.features.Features;
+import bagaturchess.learning.impl.features.impl1.Features;
 import bagaturchess.learning.impl.filler.SignalFiller;
 import bagaturchess.learning.impl.signals.SignalArray;
 import bagaturchess.search.api.IEvaluator;

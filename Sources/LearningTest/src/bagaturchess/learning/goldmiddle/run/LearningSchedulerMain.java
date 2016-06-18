@@ -25,11 +25,11 @@
 package bagaturchess.learning.goldmiddle.run;
 
 
+import cfg.RootSearchConfig_SingleCore_MTD_LEARNING;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.engines.learning.cfg.RootSearchConfig_SingleCore_MTD_LEARNING;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
