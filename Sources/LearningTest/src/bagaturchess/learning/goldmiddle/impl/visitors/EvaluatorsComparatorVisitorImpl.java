@@ -182,7 +182,7 @@ public class EvaluatorsComparatorVisitorImpl implements PositionsVisitor {
 	public void begin(IBitBoard bitboard) {
 		filler = new SignalFiller(bitboard);
 		evaluator1 = new FeaturesEvaluator(bitboard, null, filler, features, signals);
-		evaluator2 = new FastEvaluator(bitboard, null, null);
+		evaluator2 = null;//new FastEvaluator(bitboard, null, null);
 	}
 	
 	

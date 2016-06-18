@@ -185,6 +185,7 @@ public class Engine {
 		
 		String line;
 		while ((line = is.readLine()) != null) {
+			//System.out.println("line: '" + lines);
 			if (line.contains("bestmove")) {
 				for (int i=lines.size() - 1; i >=0; i--) {
 					if (lines.get(i).contains("info depth") && lines.get(i).contains(" pv ")) {

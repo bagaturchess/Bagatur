@@ -18,7 +18,7 @@ public class LearningTraverser {
 			//String filePath = "./Houdini.15a.short.cg";
 			//String filePath = "./Houdini.15a.cg";
 			//String filePath = "./Arasan13.1.cg";
-			String filePath = "Stockfish-211-ja.cg";
+			String filePath = "stockfish 7 x64.cg";
 			
 			PositionsVisitor learning = new LearningVisitorImpl();
 			

@@ -187,7 +187,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		for (int i=0; i < featuresArr.length; i++) {
 			IFeature currFeature = featuresArr[i];
 			((IAdjustableFeature)currFeature).applyChanges();
-			System.out.println(currFeature);
+			//System.out.println(currFeature);
 			((IAdjustableFeature)currFeature).clear();
 		}
 		

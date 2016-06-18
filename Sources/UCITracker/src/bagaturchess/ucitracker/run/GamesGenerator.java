@@ -47,8 +47,8 @@ import bagaturchess.ucitracker.impl.gamemodel.serialization.GameModelWriter;
 
 public class GamesGenerator {
 	
-	private static int SEARCH_DEPTH_MIN = 1;
-	private static int SEARCH_DEPTH_MAX = 10;
+	private static int SEARCH_DEPTH_MIN = 2;
+	private static int SEARCH_DEPTH_MAX = 5;
 	
 	private static int MAX_EVAL_DIFF = 1500;
 	private static int MAX_MOVES = 300;
@@ -95,13 +95,13 @@ public class GamesGenerator {
 					new String [0],
 				"C:\\own\\chess\\ENGINES\\komodo-13b1-ja\\Windows\\");*/
 			
-			Engine engine = new Engine("C:\\own\\chess\\ENGINES\\Deep_Sjeng_ct_2010\\deepsjeng.exe",
+			Engine engine = new Engine("C:\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-7-win\\stockfish-7-win\\Windows\\stockfish 7 x64.exe",
 					new String [0],
-				"C:\\own\\chess\\ENGINES\\Deep_Sjeng_ct_2010\\");
+				"C:\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-7-win\\stockfish-7-win\\Windows\\");
 			
 			
 			
-			control.execute(engine, "./Deep_Sjeng_ct_2010.cg", 1000000, true);
+			control.execute(engine, "./stockfish 7 x64.cg", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

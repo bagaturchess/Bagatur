@@ -35,7 +35,7 @@ public class SingleSignal implements ISignal {
 	
 	
 	@Override
-	public void addStrength(int subid, double subsignal, double opening_part) {
+	public void addStrength(int subid, double _signalStrength, double opening_part) {
 		throw new IllegalStateException();
 	}
 }
