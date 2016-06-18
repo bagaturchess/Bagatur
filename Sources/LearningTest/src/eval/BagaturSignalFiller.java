@@ -1,25 +1,34 @@
 package eval;
 
 
+import eval.v1.IFeaturesConstants;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.common.CastlingType;
-import bagaturchess.bitboard.common.Utils;
+import bagaturchess.bitboard.api.IFieldsAttacks;
+import bagaturchess.bitboard.impl.CastlingType;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
+import bagaturchess.bitboard.impl.Utils;
+import bagaturchess.bitboard.impl.attacks.control.metadata.SeeMetadata;
 import bagaturchess.bitboard.impl.eval.pawns.model.Pawn;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnStructureConstants;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModel;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.plies.BlackPawnPlies;
+import bagaturchess.bitboard.impl.plies.CastlePlies;
+import bagaturchess.bitboard.impl.plies.KingSurrounding;
+import bagaturchess.bitboard.impl.plies.KnightPlies;
+import bagaturchess.bitboard.impl.plies.OfficerPlies;
 import bagaturchess.bitboard.impl.plies.WhitePawnPlies;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
+import bagaturchess.learning.impl.features.impl1.FeatureArray;
 
 
-public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
+public class BagaturSignalFiller extends BagaturConstants implements IFeaturesConstants, ISignalFiller {
+	
 	
 	private static final int[] HORIZONTAL_SYMMETRY = Utils.reverseSpecial ( new int[]{	
 			   0,   1,   2,   3,   4,   5,   6,   7,
@@ -32,7 +41,7 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 			  56,  57,  58,  59,  60,  61,  62,  63,
 
 	});
-
+	
 	
 	private IBitBoard bitboard;
 	
@@ -69,10 +78,17 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 	}
 	
 	
+	private static final int axisSymmetry(int fieldID) {
+		return HORIZONTAL_SYMMETRY[fieldID];
+	}
+	
+	
 	public void fill(ISignals signals) {
 		fillStandardSignals(signals);
 		fillPawnSignals(signals);
 		fillPiecesIterationSignals(signals);
+		fillMovesIterationSignals(signals);
+		//fillFieldsStatesIterationSignals(signals);
 	}
 	
 	
@@ -88,9 +104,11 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 				fillPiecesIterationSignals(signals);
 				return;
 			case IFeatureComplexity.MOVES_ITERATION:
+				fillMovesIterationSignals(signals);
 				//throw new IllegalStateException();
 				return;
 			case IFeatureComplexity.FIELDS_STATES_ITERATION:
+				//fillFieldsStatesIterationSignals(signals);
 				//throw new IllegalStateException();
 				return;
 			default:
@@ -110,11 +128,21 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 		signals.getSignal(FEATURE_ID_MATERIAL_QUEEN).addStrength(w_queens.getDataSize() - b_queens.getDataSize(), openingPart);
 		
 		signals.getSignal(FEATURE_ID_KINGSAFE_CASTLING).addStrength(castling(Figures.COLOUR_WHITE) - castling(Figures.COLOUR_BLACK), openingPart);
+		fianchetto(signals);
 		signals.getSignal(FEATURE_ID_BISHOPS_DOUBLE).addStrength(((w_bishops.getDataSize() >= 2) ? 1 : 0) - ((b_bishops.getDataSize() >= 2) ? 1 : 0), openingPart);
 		
 		movedFGPawns(signals);
-		fianchetto(signals);
 		
+		
+		//Kings Distance
+		int kingFieldID_white = w_king.getData()[0];
+		int kingFieldID_black = b_king.getData()[0];
+		int kingDistance = Fields.getDistancePoints(kingFieldID_white, kingFieldID_black);
+		if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+			signals.getSignal(FEATURE_ID_KINGS_DISTANCE).addStrength(kingDistance, 1, openingPart);
+		} else {
+			signals.getSignal(FEATURE_ID_KINGS_DISTANCE).addStrength(kingDistance, -1, openingPart);
+		}
 	}
 	
 	
@@ -202,10 +230,17 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 		
 		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
+		long bb_w_rooks = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_CASTLE);
+		long bb_b_rooks = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_CASTLE);
+		
 		bitboard.getPawnsCache().lock();
 		
 		PawnsModelEval pawnsModelEval = bitboard.getPawnsStructure();
 		PawnsModel model = pawnsModelEval.getModel();
+		
+		int w_kingID = model.getWKingFieldID();
+		int b_kingID = model.getBKingFieldID();
+
 		
 		Pawn[] w_pawns_m = model.getWPawns();
 		int w_count = model.getWCount();
@@ -239,11 +274,46 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 				if (p.isPassed()) {
 					w_passed++;
 					
-					signals.getSignal(FEATURE_ID_PAWNS_PASSED_RNK).addStrength(p.getRank(), 1, openingPart);
+					int rank = p.getRank();
+					int stoppersCount = Utils.countBits(p.getFront() & ~bitboard.getFreeBitboard());
+					rank = rank - stoppersCount;
+					if (rank <= 0) {
+						rank = 1;
+					}
+					
+					int passer = bitboard.getMaterialFactor().interpolateByFactor(PASSERS_RANK_O[rank], PASSERS_RANK_E[rank]);
+					signals.getSignal(FEATURE_ID_PAWNS_PASSED_RNK).addStrength(passer, openingPart);
+					
+					long front = p.getFront();
+					if ((front & bb_w_rooks) != 0L) {
+						signals.getSignal(FEATURE_ID_ROOK_INFRONT_PASSER).addStrength(1, openingPart);
+					}
+					
+					long behind = p.getVertical() & ~front;
+					if ((behind & bb_w_rooks) != 0L) {
+						signals.getSignal(FEATURE_ID_ROOK_BEHIND_PASSER).addStrength(1, openingPart);
+					}
+					
+			        int frontFieldID = p.getFieldID() + 8;
+			        int frontFrontFieldID = frontFieldID + 8;
+			        if (frontFrontFieldID >= 64) {
+			        	frontFrontFieldID = frontFieldID;
+			        }
+			        
+			        int dist_f = Fields.getDistancePoints(w_kingID, frontFieldID);
+			        signals.getSignal(FEATURE_ID_KING_PASSERS_F).addStrength(rank * PASSERS_KING_CLOSENESS_FRONTFIELD[dist_f], openingPart);
+			        
+			        int dist_ff = Fields.getDistancePoints(w_kingID, frontFrontFieldID);
+			        signals.getSignal(FEATURE_ID_KING_PASSERS_FF).addStrength(rank * PASSERS_KING_CLOSENESS_FRONTFRONTFIELD[dist_ff], openingPart);
+			        
+			        int dist_op_f = Fields.getDistancePoints(b_kingID, frontFieldID);
+			        signals.getSignal(FEATURE_ID_KING_PASSERS_F_OP).addStrength(rank * PASSERS_KING_CLOSENESS_FRONTFIELD_OP[dist_op_f], openingPart);
 				}
 				
 				if (p.isCandidate()) {
-					signals.getSignal(FEATURE_ID_PAWNS_CANDIDATE).addStrength(p.getRank(), 1, openingPart);
+					int rank = p.getRank();
+					int passerCandidate = bitboard.getMaterialFactor().interpolateByFactor(PASSERS_CANDIDATE_RANK_O[rank], PASSERS_CANDIDATE_RANK_E[rank]);
+					signals.getSignal(FEATURE_ID_PAWNS_CANDIDATE).addStrength(passerCandidate, openingPart);
 				}
 				
 				if (p.isDoubled()) {
@@ -294,11 +364,46 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 				if (p.isPassed()) {
 					b_passed++;
 					
-					signals.getSignal(FEATURE_ID_PAWNS_PASSED_RNK).addStrength(p.getRank(), -1, openingPart);
+					int rank = p.getRank();
+					int stoppersCount = Utils.countBits(p.getFront() & ~bitboard.getFreeBitboard());
+					rank = rank - stoppersCount;
+					if (rank <= 0) {
+						rank = 1;
+					}
+					
+					int passer = bitboard.getMaterialFactor().interpolateByFactor(PASSERS_RANK_O[rank], PASSERS_RANK_E[rank]);
+					signals.getSignal(FEATURE_ID_PAWNS_PASSED_RNK).addStrength(-passer, openingPart);
+					
+					long front = p.getFront();
+					if ((front & bb_b_rooks) != 0L) {
+						signals.getSignal(FEATURE_ID_ROOK_INFRONT_PASSER).addStrength(-1, openingPart);
+					}
+					
+					long behind = p.getVertical() & ~front;
+					if ((behind & bb_b_rooks) != 0L) {
+						signals.getSignal(FEATURE_ID_ROOK_BEHIND_PASSER).addStrength(-1, openingPart);
+					}
+					
+			        int frontFieldID = p.getFieldID() - 8;
+			        int frontFrontFieldID = frontFieldID - 8;
+			        if (frontFrontFieldID < 0) {
+			        	frontFrontFieldID = frontFieldID;
+			        }
+			        
+			        int dist_f = Fields.getDistancePoints(b_kingID, frontFieldID);
+			        signals.getSignal(FEATURE_ID_KING_PASSERS_F).addStrength( - rank * PASSERS_KING_CLOSENESS_FRONTFIELD[dist_f], openingPart);
+			        
+			        int dist_ff = Fields.getDistancePoints(b_kingID, frontFrontFieldID);
+			        signals.getSignal(FEATURE_ID_KING_PASSERS_FF).addStrength( - rank * PASSERS_KING_CLOSENESS_FRONTFRONTFIELD[dist_ff], openingPart);
+			        
+			        int dist_op_f = Fields.getDistancePoints(w_kingID, frontFieldID);
+			        signals.getSignal(FEATURE_ID_KING_PASSERS_F_OP).addStrength( - rank * PASSERS_KING_CLOSENESS_FRONTFIELD_OP[dist_op_f], openingPart);
 				}
 				
 				if (p.isCandidate()) {
-					signals.getSignal(FEATURE_ID_PAWNS_CANDIDATE).addStrength(p.getRank(), -1, openingPart);
+					int rank = p.getRank();
+					int passerCandidate = bitboard.getMaterialFactor().interpolateByFactor(PASSERS_CANDIDATE_RANK_O[rank], PASSERS_CANDIDATE_RANK_E[rank]);
+					signals.getSignal(FEATURE_ID_PAWNS_CANDIDATE).addStrength(-passerCandidate, openingPart);
 				}
 				
 				if (p.isDoubled()) {
@@ -333,6 +438,7 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 			}
 		}
 		
+		
 		signals.getSignal(FEATURE_ID_PAWNS_OPENNED).addStrength(model.getWKingOpenedFiles() - model.getBKingOpenedFiles(), openingPart);
 		signals.getSignal(FEATURE_ID_PAWNS_SEMIOP_OWN).addStrength(model.getWKingSemiOwnOpenedFiles() - model.getBKingSemiOwnOpenedFiles(), openingPart);
 		signals.getSignal(FEATURE_ID_PAWNS_SEMIOP_OP).addStrength(model.getWKingSemiOpOpenedFiles() - model.getBKingSemiOpOpenedFiles(), openingPart);
@@ -351,12 +457,12 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 		/**
 		 * Unstoppable passer
 		 */
-		int PAWNS_PASSED_UNSTOPPABLE = 100 + bitboard.getBaseEvaluation().getMaterialRook();
+		//int PAWNS_PASSED_UNSTOPPABLE = 100 + bitboard.getBaseEvaluation().getMaterialRook();
 		int unstoppablePasser = bitboard.getUnstoppablePasser();
 		if (unstoppablePasser > 0) {
-			signals.getSignal(FEATURE_ID_UNSTOPPABLE_PASSER).addStrength(PAWNS_PASSED_UNSTOPPABLE, openingPart);
+			signals.getSignal(FEATURE_ID_UNSTOPPABLE_PASSER).addStrength(1/*PAWNS_PASSED_UNSTOPPABLE*/, openingPart);
 		} else if (unstoppablePasser < 0) {
-			signals.getSignal(FEATURE_ID_UNSTOPPABLE_PASSER).addStrength(-PAWNS_PASSED_UNSTOPPABLE, openingPart);
+			signals.getSignal(FEATURE_ID_UNSTOPPABLE_PASSER).addStrength(-1/*-PAWNS_PASSED_UNSTOPPABLE*/, openingPart);
 		}
 		
 		
@@ -388,7 +494,7 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 	
 	public void fillPiecesIterationSignals(ISignals signals) {
 		
-		double opening_part = bitboard.getMaterialFactor().getOpenningPart();
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
 		long bb_white_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
 		long bb_black_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
@@ -478,7 +584,9 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 					int fieldID = knights_fields[i];
 					long fieldBB = Fields.ALL_A1H1[fieldID];
 					
-					signals.getSignal(FEATURE_ID_PST_KNIGHT).addStrength(fieldID, 1, opening_part);
+					
+					int pst = bitboard.getMaterialFactor().interpolateByFactor(KNIGHT_O[fieldID], KNIGHT_E[fieldID]);
+					signals.getSignal(FEATURE_ID_PST_KNIGHT).addStrength(pst, openingPart);
 					w_tropism_knights += Fields.getTropismPoint(fieldID, kingFieldID_black);
 					w_centred_knights += Fields.getCenteredPoint(fieldID);
 					
@@ -519,7 +627,8 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 					int fieldID = knights_fields[i];
 					long fieldBB = Fields.ALL_A1H1[fieldID];
 					
-					signals.getSignal(FEATURE_ID_PST_KNIGHT).addStrength(axisSymmetry(fieldID), -1, opening_part);
+					int pst = bitboard.getMaterialFactor().interpolateByFactor(KNIGHT_O[axisSymmetry(fieldID)], KNIGHT_E[axisSymmetry(fieldID)]);
+					signals.getSignal(FEATURE_ID_PST_KNIGHT).addStrength(-pst, openingPart);
 					b_tropism_knights += Fields.getTropismPoint(fieldID, kingFieldID_white);
 					b_centred_knights += Fields.getCenteredPoint(fieldID);
 					
@@ -562,14 +671,15 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 					
 					int fieldID = bishops_fields[i];
 					
-					signals.getSignal(FEATURE_ID_PST_BISHOP).addStrength(fieldID, 1, opening_part);
+					int pst = bitboard.getMaterialFactor().interpolateByFactor(BISHOP_O[fieldID], BISHOP_E[fieldID]);
+					signals.getSignal(FEATURE_ID_PST_BISHOP).addStrength(pst, openingPart);
 					w_tropism_bishops += Fields.getTropismPoint(fieldID, kingFieldID_black);
 					w_centred_bishops += Fields.getCenteredPoint(fieldID);
 					
 					if ((Fields.ALL_WHITE_FIELDS & Fields.ALL_A1H1[fieldID]) != 0L) {
-						w_bad_bishops -= w_pawns_on_w_squares;
+						w_bad_bishops += w_pawns_on_w_squares;
 					} else {
-						w_bad_bishops -= w_pawns_on_b_squares;
+						w_bad_bishops += w_pawns_on_b_squares;
 					}
 					
 					w_lettersSum += Fields.LETTERS[fieldID];
@@ -587,14 +697,15 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 					
 					int fieldID = bishops_fields[i];
 					
-					signals.getSignal(FEATURE_ID_PST_BISHOP).addStrength(axisSymmetry(fieldID), -1, opening_part);
+					int pst = bitboard.getMaterialFactor().interpolateByFactor(BISHOP_O[axisSymmetry(fieldID)], BISHOP_E[axisSymmetry(fieldID)]);
+					signals.getSignal(FEATURE_ID_PST_BISHOP).addStrength(-pst, openingPart);
 					b_tropism_bishops += Fields.getTropismPoint(fieldID, kingFieldID_white);
 					b_centred_bishops += Fields.getCenteredPoint(fieldID);
 					
 					if ((Fields.ALL_WHITE_FIELDS & Fields.ALL_A1H1[fieldID]) != 0L) {
-						b_bad_bishops -= b_pawns_on_w_squares;
+						b_bad_bishops += b_pawns_on_w_squares;
 					} else {
-						b_bad_bishops -= b_pawns_on_b_squares;
+						b_bad_bishops += b_pawns_on_b_squares;
 					}
 					
 					b_lettersSum += Fields.LETTERS[fieldID];
@@ -625,7 +736,8 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 						w_rooks_7th++;
 					}
 					
-					signals.getSignal(FEATURE_ID_PST_ROOK).addStrength(fieldID, 1, opening_part);
+					int pst = bitboard.getMaterialFactor().interpolateByFactor(ROOK_O[fieldID], ROOK_E[fieldID]);
+					signals.getSignal(FEATURE_ID_PST_ROOK).addStrength(pst, openingPart);
 					w_tropism_rooks += Fields.getTropismPoint(fieldID, kingFieldID_black);
 					w_centred_rooks += Fields.getCenteredPoint(fieldID);
 					
@@ -655,8 +767,8 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 						b_rooks_2th++;
 					}
 					
-					
-					signals.getSignal(FEATURE_ID_PST_ROOK).addStrength(axisSymmetry(fieldID), -1, opening_part);
+					int pst = bitboard.getMaterialFactor().interpolateByFactor(ROOK_O[axisSymmetry(fieldID)], ROOK_E[axisSymmetry(fieldID)]);
+					signals.getSignal(FEATURE_ID_PST_ROOK).addStrength(-pst, openingPart);
 					b_tropism_rooks += Fields.getTropismPoint(fieldID, kingFieldID_white);
 					b_centred_rooks += Fields.getCenteredPoint(fieldID);
 					
@@ -684,7 +796,8 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 						w_queens_7th++;
 					}
 					
-					signals.getSignal(FEATURE_ID_PST_QUEEN).addStrength(fieldID, 1, opening_part);
+					int pst = bitboard.getMaterialFactor().interpolateByFactor(QUEEN_O[fieldID], QUEEN_E[fieldID]);
+					signals.getSignal(FEATURE_ID_PST_QUEEN).addStrength(pst, openingPart);
 					w_tropism_queens += Fields.getTropismPoint(fieldID, kingFieldID_black);
 					w_centred_queens += Fields.getCenteredPoint(fieldID);
 					
@@ -707,7 +820,8 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 						b_queens_2th++;
 					}
 					
-					signals.getSignal(FEATURE_ID_PST_QUEEN).addStrength(axisSymmetry(fieldID), -1, opening_part);
+					int pst = bitboard.getMaterialFactor().interpolateByFactor(QUEEN_O[axisSymmetry(fieldID)], QUEEN_E[axisSymmetry(fieldID)]);
+					signals.getSignal(FEATURE_ID_PST_QUEEN).addStrength(-pst, openingPart);
 					b_tropism_queens += Fields.getTropismPoint(fieldID, kingFieldID_white);
 					b_centred_queens += Fields.getCenteredPoint(fieldID);
 					
@@ -728,7 +842,8 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 				int[] w_king_fields = w_king.getData();
 				for (int i=0; i<w_king_count; i++) {
 					int fieldID = w_king_fields[i];
-					signals.getSignal(FEATURE_ID_PST_KING).addStrength(fieldID, 1, opening_part);
+					int pst = bitboard.getMaterialFactor().interpolateByFactor(KING_O[fieldID], KING_E[fieldID]);
+					signals.getSignal(FEATURE_ID_PST_KING).addStrength(pst, openingPart);
 					w_centred_king += Fields.getCenteredPoint(fieldID);
 				}
 			}
@@ -737,7 +852,8 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 				int[] b_king_fields = b_king.getData();
 				for (int i=0; i<b_king_count; i++) {
 					int fieldID = b_king_fields[i];
-					signals.getSignal(FEATURE_ID_PST_KING).addStrength(axisSymmetry(fieldID), -1, opening_part);
+					int pst = bitboard.getMaterialFactor().interpolateByFactor(KING_O[axisSymmetry(fieldID)], KING_E[axisSymmetry(fieldID)]);
+					signals.getSignal(FEATURE_ID_PST_KING).addStrength(-pst, openingPart);
 					b_centred_king += Fields.getCenteredPoint(fieldID);
 				}
 			}
@@ -766,7 +882,8 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 					}
 					
 					if (!isPassed) {
-						signals.getSignal(FEATURE_ID_PST_PAWN).addStrength(fieldID, 1, opening_part);
+						int pst = bitboard.getMaterialFactor().interpolateByFactor(PAWN_O[fieldID], PAWN_E[fieldID]);
+						signals.getSignal(FEATURE_ID_PST_PAWN).addStrength(pst, openingPart);
 						w_centred_pawns += Fields.getCenteredPoint(fieldID);
 					}
 				}
@@ -791,7 +908,8 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 					}
 					
 					if (!isPassed) {
-						signals.getSignal(FEATURE_ID_PST_PAWN).addStrength(axisSymmetry(fieldID), -1, opening_part);
+						int pst = bitboard.getMaterialFactor().interpolateByFactor(PAWN_O[axisSymmetry(fieldID)], PAWN_E[axisSymmetry(fieldID)]);
+						signals.getSignal(FEATURE_ID_PST_PAWN).addStrength(-pst, openingPart);
 						b_centred_pawns += Fields.getCenteredPoint(fieldID);
 					}
 				}
@@ -799,26 +917,1821 @@ public class BagaturSignalFiller implements IFeaturesConstants, ISignalFiller {
 		}
 		
 		
-		signals.getSignal(FEATURE_ID_ROOKS_OPENED).addStrength(w_rooks_opened - b_rooks_opened, opening_part);
-		signals.getSignal(FEATURE_ID_ROOKS_SEMIOPENED).addStrength(w_rooks_semiopened - b_rooks_semiopened, opening_part);
+		signals.getSignal(FEATURE_ID_ROOKS_OPENED).addStrength(w_rooks_opened - b_rooks_opened, openingPart);
+		signals.getSignal(FEATURE_ID_ROOKS_SEMIOPENED).addStrength(w_rooks_semiopened - b_rooks_semiopened, openingPart);
 
-		signals.getSignal(FEATURE_ID_BISHOPS_BAD).addStrength(w_bad_bishops - b_bad_bishops, opening_part);
-		signals.getSignal(FEATURE_ID_KNIGHTS_OUTPOST).addStrength(w_knight_outpost - b_knight_outpost, opening_part);
+		signals.getSignal(FEATURE_ID_BISHOPS_BAD).addStrength(w_bad_bishops - b_bad_bishops, openingPart);
+		signals.getSignal(FEATURE_ID_KNIGHTS_OUTPOST).addStrength(w_knight_outpost - b_knight_outpost, openingPart);
 		
-		signals.getSignal(FEATURE_ID_TROPISM_KNIGHT).addStrength(w_tropism_knights - b_tropism_knights, opening_part);
-		signals.getSignal(FEATURE_ID_TROPISM_BISHOP).addStrength(w_tropism_bishops - b_tropism_bishops, opening_part);
-		signals.getSignal(FEATURE_ID_TROPISM_ROOK).addStrength(w_tropism_rooks - b_tropism_rooks, opening_part);
-		signals.getSignal(FEATURE_ID_TROPISM_QUEEN).addStrength(w_tropism_queens - b_tropism_queens, opening_part);		
+		signals.getSignal(FEATURE_ID_TROPISM_KNIGHT).addStrength(w_tropism_knights - b_tropism_knights, openingPart);
+		signals.getSignal(FEATURE_ID_TROPISM_BISHOP).addStrength(w_tropism_bishops - b_tropism_bishops, openingPart);
+		signals.getSignal(FEATURE_ID_TROPISM_ROOK).addStrength(w_tropism_rooks - b_tropism_rooks, openingPart);
+		signals.getSignal(FEATURE_ID_TROPISM_QUEEN).addStrength(w_tropism_queens - b_tropism_queens, openingPart);		
+		
+		signals.getSignal(FEATURE_ID_ROOKS_7TH_2TH).addStrength(w_rooks_7th - b_rooks_2th, openingPart);
+		signals.getSignal(FEATURE_ID_QUEENS_7TH_2TH).addStrength(w_queens_7th - b_queens_2th, openingPart);
 		
 		/*
 		signals.getSignal(FEATURE_ID_PIECES_DISPERSION).setStrength(w_piecesDispersion - b_piecesDispersion);
-		signals.getSignal(FEATURE_ID_ROOKS_7TH_2TH).setStrength(w_rooks_7th - b_rooks_2th);
-		signals.getSignal(FEATURE_ID_QUEENS_7TH_2TH).setStrength(w_queens_7th - b_queens_2th);				
-		 */
+		*/
 		
 	}
 	
-	private static final int axisSymmetry(int fieldID) {
-		return HORIZONTAL_SYMMETRY[fieldID];
+	
+	public void fillMovesIterationSignals(ISignals signals) {
+		
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
+		
+		int kingFieldID_white = w_king.getData()[0];
+		int kingFieldID_black = b_king.getData()[0];
+		
+		int w_mobility_knights_all = 0;
+		int b_mobility_knights_all = 0;
+		int w_mobility_bishops_all = 0;
+		int b_mobility_bishops_all = 0;
+		int w_mobility_rooks_all = 0;
+		int b_mobility_rooks_all = 0;
+		int w_mobility_queens_all = 0;
+		int b_mobility_queens_all = 0;
+		
+		int w_mobility_knights_safe = 0;
+		int b_mobility_knights_safe = 0;
+		int w_mobility_bishops_safe = 0;
+		int b_mobility_bishops_safe = 0;
+		int w_mobility_rooks_safe = 0;
+		int b_mobility_rooks_safe = 0;
+		int w_mobility_queens_safe = 0;
+		int b_mobility_queens_safe = 0;
+		
+		int w_trap_knights = 0;
+		int b_trap_knights = 0;
+		int w_trap_bishops = 0;
+		int b_trap_bishops = 0;
+		int w_trap_rooks = 0;
+		int b_trap_rooks = 0;
+		int w_trap_queens = 0;
+		int b_trap_queens = 0;
+		
+		int w_hangingCount = 0;
+		int b_hangingCount = 0;
+		
+		int w_rooks_paired_h = 0;
+		int b_rooks_paired_h = 0;
+		int w_rooks_paired_v = 0;
+		int b_rooks_paired_v = 0;
+		
+		int w_attacking_pieces_to_black_king_1 = 0;
+		int b_attacking_pieces_to_white_king_1 = 0;
+		int w_attacking_pieces_to_black_king_2 = 0;
+		int b_attacking_pieces_to_white_king_2 = 0;
+		
+		int w_knights_attacks_to_black_king_1 = 0;
+		int b_knights_attacks_to_white_king_1 = 0;
+		int w_bishops_attacks_to_black_king_1 = 0;
+		int b_bishops_attacks_to_white_king_1 = 0;
+		int w_rooks_attacks_to_black_king_1 = 0;
+		int b_rooks_attacks_to_white_king_1 = 0;
+		int w_queens_attacks_to_black_king_1 = 0;
+		int b_queens_attacks_to_white_king_1 = 0;
+		//int w_pawns_attacks_to_black_king_1 = 0;//TODO
+		//int b_pawns_attacks_to_white_king_1 = 0;//TODO
+		
+		int w_knights_attacks_to_black_king_2 = 0;
+		int b_knights_attacks_to_white_king_2 = 0;
+		int w_bishops_attacks_to_black_king_2 = 0;
+		int b_bishops_attacks_to_white_king_2 = 0;
+		int w_rooks_attacks_to_black_king_2 = 0;
+		int b_rooks_attacks_to_white_king_2 = 0;
+		int w_queens_attacks_to_black_king_2 = 0;
+		int b_queens_attacks_to_white_king_2 = 0;
+		//int w_pawns_attacks_to_black_king_2 = 0;//TODO
+		//int b_pawns_attacks_to_white_king_2 = 0;//TODO
+				
+		int pin_bk = 0;
+		int pin_bq = 0;
+		int pin_br = 0;
+		int pin_bn = 0;
+
+		int pin_rk = 0;
+		int pin_rq = 0;
+		int pin_rb = 0;
+		int pin_rn = 0;
+
+		int pin_qk = 0;
+		int pin_qq = 0;
+		int pin_qn = 0;
+		int pin_qr = 0;
+		int pin_qb = 0;
+		
+		int attack_nb = 0;
+		int attack_nr = 0;
+		int attack_nq = 0;
+		
+		int attack_bn = 0;
+		int attack_br = 0;
+		
+		int attack_rb = 0;
+		int attack_rn = 0;
+
+		int attack_qn = 0;
+		int attack_qb = 0;
+		int attack_qr = 0;
+		
+		
+		/**
+		 * Initialize necessary data 
+		 */
+		long bb_white_all = bitboard.getFiguresBitboardByColour(Figures.COLOUR_WHITE);
+		long bb_black_all = bitboard.getFiguresBitboardByColour(Figures.COLOUR_BLACK);
+		//long bb_white_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
+		//long bb_black_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
+		long bb_white_rooks = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_CASTLE);
+		long bb_black_rooks = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_CASTLE);
+		long bb_white_queens = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN);
+		long bb_black_queens = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN);
+		long bb_white_bishops = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER);
+		long bb_black_bishops = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER);
+		long bb_white_knights = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT);
+		long bb_black_knights = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT);
+		long bb_white_king = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KING);
+		long bb_black_king = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KING);
+		long bb_white_QandB = bb_white_queens | bb_white_bishops;
+		long bb_black_QandB = bb_black_queens | bb_black_bishops;
+		long bb_white_QandR = bb_white_queens | bb_white_rooks;
+		long bb_black_QandR = bb_black_queens | bb_black_rooks;
+		long bb_white_MM = bb_white_QandR | bb_white_QandB | bb_white_knights;
+		long bb_black_MM = bb_black_QandR | bb_black_QandB | bb_black_knights;
+		
+		long kingSurrounding_L1_white = KingSurrounding.SURROUND_LEVEL1[kingFieldID_white];
+		long kingSurrounding_L2_white = (~kingSurrounding_L1_white) & KingSurrounding.SURROUND_LEVEL2[kingFieldID_white];
+		long kingSurrounding_L1_black = KingSurrounding.SURROUND_LEVEL1[kingFieldID_black];
+		long kingSurrounding_L2_black = (~kingSurrounding_L1_black) & KingSurrounding.SURROUND_LEVEL2[kingFieldID_black];
+		
+		/**
+		 * Knights iteration
+		 */
+		{
+			int w_knights_count = w_knights.getDataSize();
+			if (w_knights_count > 0) {
+				int[] knights_fields = w_knights.getData();
+				for (int i=0; i<w_knights_count; i++) {
+					
+					int fieldID = knights_fields[i];
+					
+					
+					if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+						int see = bitboard.getSee().seeField(fieldID);
+						if (see < 0) {
+							w_hangingCount++;
+						}
+					}
+					
+					
+					w_mobility_knights_all = 0;
+					
+					w_mobility_knights_safe = 0;
+					
+					final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
+					final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
+					final int[][] fids = KnightPlies.ALL_KNIGHT_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					int opking_attacks_counter_1 = 0;
+					int opking_attacks_counter_2 = 0;
+					final int size = validDirIDs.length;
+					for (int j=0; j<size; j++) {
+						
+						int dirID = validDirIDs[j];
+						long toBitboard = dirs[dirID][0];
+						int toFieldID = fids[dirID][0];
+						
+						if ((toBitboard & kingSurrounding_L1_black) != 0L) {
+							if (opking_attacks_counter_1 == 0) {
+								w_attacking_pieces_to_black_king_1++;
+							}
+							opking_attacks_counter_1++;
+						}
+						if ((toBitboard & kingSurrounding_L2_black) != 0L) {
+							if (opking_attacks_counter_2 == 0) {
+								w_attacking_pieces_to_black_king_2++;
+							}
+							opking_attacks_counter_2++;
+						}
+						
+						
+						if ((toBitboard & bb_white_all) != 0L) {
+							continue;
+						}
+						
+						if ((toBitboard & bb_black_all) != 0L) {
+							if ((toBitboard & bb_black_bishops) != 0L) {
+								attack_nb++;
+							} else if ((toBitboard & bb_black_rooks) != 0L) {
+								attack_nr++;
+							} else if ((toBitboard & bb_black_queens) != 0L) {
+								attack_nq++;
+							}
+						}
+						
+						w_mobility_knights_all++;
+						
+						boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT, toFieldID) >= 0;
+						if (safe) {
+							w_mobility_knights_safe++;
+						}
+					}
+					
+					int mob = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_KNIGHT_O[w_mobility_knights_all], MOBILITY_KNIGHT_E[w_mobility_knights_all]);
+					signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT).addStrength(mob, openingPart);
+					int mob_safe = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_KNIGHT_O[w_mobility_knights_safe], MOBILITY_KNIGHT_E[w_mobility_knights_safe]);
+					signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT_S).addStrength(mob_safe, openingPart);
+					if (w_mobility_knights_safe == 2) {
+						w_trap_knights += 1 * (Fields.getRank_W(fieldID) + 1);
+					} else if (w_mobility_knights_safe == 1) {
+						w_trap_knights += 2 * (Fields.getRank_W(fieldID) + 1);
+					} else if (w_mobility_knights_safe == 0) {
+						w_trap_knights += 4 * (Fields.getRank_W(fieldID) + 1);
+					}
+					
+					w_knights_attacks_to_black_king_1 += KING_SAFETY_KNIGHTS_ATTACKS[opking_attacks_counter_1];
+					w_knights_attacks_to_black_king_2 += KING_SAFETY_KNIGHTS_ATTACKS[opking_attacks_counter_2];
+				}
+			}
+		}
+		
+		{
+			int b_knights_count = b_knights.getDataSize();		
+			if (b_knights_count > 0) {
+				int[] knights_fields = b_knights.getData();
+				for (int i=0; i<b_knights_count; i++) {
+										
+					
+					int fieldID = knights_fields[i];
+					
+					if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+						int see = bitboard.getSee().seeField(fieldID);
+						if (see < 0) {
+							b_hangingCount++;
+						}
+					}
+					
+					
+					b_mobility_knights_all = 0;
+					
+					b_mobility_knights_safe = 0;
+					
+					final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
+					final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
+					final int[][] fids = KnightPlies.ALL_KNIGHT_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					int opking_attacks_counter_1 = 0;
+					int opking_attacks_counter_2 = 0;
+					final int size = validDirIDs.length;
+					for (int j=0; j<size; j++) {
+						
+						int dirID = validDirIDs[j];
+						long toBitboard = dirs[dirID][0];
+						int toFieldID = fids[dirID][0];
+						
+						if ((toBitboard & kingSurrounding_L1_white) != 0L) {
+							if (opking_attacks_counter_1 == 0) {
+								b_attacking_pieces_to_white_king_1++;
+							}
+							opking_attacks_counter_1++;
+						}
+						if ((toBitboard & kingSurrounding_L2_white) != 0L) {
+							if (opking_attacks_counter_2 == 0) {
+								b_attacking_pieces_to_white_king_2++;
+							}
+							opking_attacks_counter_2++;
+						}
+						
+						
+						if ((toBitboard & bb_black_all) != 0L) {
+							continue;
+						}
+						
+						if ((toBitboard & bb_white_all) != 0L) {
+							if ((toBitboard & bb_white_bishops) != 0L) {
+								attack_nb--;
+							} else if ((toBitboard & bb_white_rooks) != 0L) {
+								attack_nr--;
+							} else if ((toBitboard & bb_white_queens) != 0L) {
+								attack_nq--;
+							}
+						}
+						
+						b_mobility_knights_all++;
+						
+						boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT, toFieldID) >= 0;
+						if (safe) {
+							b_mobility_knights_safe++;
+						}
+					}
+					
+					int mob = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_KNIGHT_O[b_mobility_knights_all], MOBILITY_KNIGHT_E[b_mobility_knights_all]);
+					signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT).addStrength(-mob, openingPart);
+					int mob_safe = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_KNIGHT_O[b_mobility_knights_safe], MOBILITY_KNIGHT_E[b_mobility_knights_safe]);
+					signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT_S).addStrength(-mob_safe, openingPart);
+					if (b_mobility_knights_safe == 2) {
+						b_trap_knights += 1 * (Fields.getRank_B(fieldID) + 1);
+					} else if (b_mobility_knights_safe == 1) {
+						b_trap_knights += 2 * (Fields.getRank_B(fieldID) + 1);
+					} else if (b_mobility_knights_safe == 0) {
+						b_trap_knights += 4 * (Fields.getRank_B(fieldID) + 1);
+					}
+					
+					b_knights_attacks_to_white_king_1 += KING_SAFETY_KNIGHTS_ATTACKS[opking_attacks_counter_1];
+					b_knights_attacks_to_white_king_2 += KING_SAFETY_KNIGHTS_ATTACKS[opking_attacks_counter_2];
+				}				
+			}
+		}
+		
+		
+		/**
+		 * Bishops iteration
+		 */
+		{
+			int w_bishops_count = w_bishops.getDataSize();
+			if (w_bishops_count > 0) {
+				int[] bishops_fields = w_bishops.getData();
+				for (int i=0; i<w_bishops_count; i++) {
+										
+					
+					int fieldID = bishops_fields[i];
+					
+					if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+						int see = bitboard.getSee().seeField(fieldID);
+						if (see < 0) {
+							w_hangingCount++;
+						}
+					}
+					
+					w_mobility_bishops_all = 0;
+					
+					w_mobility_bishops_safe = 0;
+					
+					final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
+					final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
+					final int[][] fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					int opking_attacks_counter_1 = 0;
+					int opking_attacks_counter_2 = 0;
+					final int size = validDirIDs.length;
+					for (int dir=0; dir<size; dir++) {
+						int dirID = validDirIDs[dir];
+						long[] dirBitboards = dirs[dirID];
+						
+						boolean pinned = false;
+						boolean hidden = false;
+						for (int seq=0; seq<dirBitboards.length; seq++) {
+							long toBitboard = dirs[dirID][seq];
+							int toFieldID = fids[dirID][seq];
+							
+							if (pinned) {
+								if ((toBitboard & bb_white_all) != 0L) {
+									break;
+								}
+								if ((toBitboard & bb_black_all) != 0L) {
+									if ((toBitboard & bb_black_king) != 0L) {
+										pin_bk++;
+									} else if ((toBitboard & bb_black_queens) != 0L) {
+										pin_bq++;
+									} else if ((toBitboard & bb_black_rooks) != 0L) {
+										pin_br++;
+									} else if ((toBitboard & bb_black_knights) != 0L) {
+										pin_bn++;
+									}
+									break;
+								}
+							} else {
+								if ((toBitboard & kingSurrounding_L1_black) != 0L) {
+									if (opking_attacks_counter_1 == 0) {
+										w_attacking_pieces_to_black_king_1++;
+									}
+									opking_attacks_counter_1++;
+								}
+								if ((toBitboard & kingSurrounding_L2_black) != 0L) {
+									if (opking_attacks_counter_2 == 0) {
+										w_attacking_pieces_to_black_king_2++;
+									}
+									opking_attacks_counter_2++;
+								}
+								
+								
+								if ((toBitboard & bb_white_all) != 0L) {
+									if ((toBitboard & bb_white_QandB) != 0L) {
+										//Bishop can attack over other friendly bishop or queen - continue the iteration
+										hidden = true;
+									} else {
+										break;
+									}
+								}
+	
+								if (!pinned) {
+									if (!hidden) {
+										w_mobility_bishops_all++;
+										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER, toFieldID) >= 0;
+										if (safe) {
+											w_mobility_bishops_safe++;
+										}
+									} else {
+										w_mobility_bishops_all++;
+									}
+								}
+								
+								if ((toBitboard & bb_black_all) != 0L) {
+									if ((toBitboard & bb_black_MM) != 0L) {
+										
+										pinned = true;
+										
+										if ((toBitboard & bb_black_knights) != 0L) {
+											attack_bn++;
+										} else if ((toBitboard & bb_black_rooks) != 0L) {
+											attack_br++;
+										}
+										
+									} else {
+										break;
+									}
+								}
+							}
+						}
+					}
+					
+					int mob = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_BISHOP_O[w_mobility_bishops_all], MOBILITY_BISHOP_E[w_mobility_bishops_all]);
+					signals.getSignal(FEATURE_ID_MOBILITY_BISHOP).addStrength(mob, openingPart);
+					int mob_safe = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_BISHOP_O[w_mobility_bishops_safe], MOBILITY_BISHOP_E[w_mobility_bishops_safe]);
+					signals.getSignal(FEATURE_ID_MOBILITY_BISHOP_S).addStrength(mob_safe, openingPart);
+					if (w_mobility_bishops_safe == 2) {
+						w_trap_bishops += 1 * (Fields.getRank_W(fieldID) + 1);
+					} else if (w_mobility_bishops_safe == 1) {
+						w_trap_bishops += 2 * (Fields.getRank_W(fieldID) + 1);
+					} else if (w_mobility_bishops_safe == 0) {
+						w_trap_bishops += 4 * (Fields.getRank_W(fieldID) + 1);
+					}
+					
+					w_bishops_attacks_to_black_king_1 += KING_SAFETY_BISHOPS_ATTACKS[opking_attacks_counter_1];
+					w_bishops_attacks_to_black_king_2 += KING_SAFETY_BISHOPS_ATTACKS[opking_attacks_counter_2];
+				}
+			}
+		}
+		
+		{
+			int b_bishops_count = b_bishops.getDataSize();
+			if (b_bishops_count > 0) {
+				int[] bishops_fields = b_bishops.getData();
+				for (int i=0; i<b_bishops_count; i++) {
+					
+					
+					int fieldID = bishops_fields[i];
+					
+					if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+						int see = bitboard.getSee().seeField(fieldID);
+						if (see < 0) {
+							b_hangingCount++;
+						}
+					}
+					
+					b_mobility_bishops_all = 0;
+					
+					b_mobility_bishops_safe = 0;
+					
+					final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
+					final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
+					final int[][] fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					int opking_attacks_counter_1 = 0;
+					int opking_attacks_counter_2 = 0;
+					final int size = validDirIDs.length;
+					for (int dir=0; dir<size; dir++) {
+						int dirID = validDirIDs[dir];
+						long[] dirBitboards = dirs[dirID];
+						
+						boolean pinned = false;
+						boolean hidden = false;
+						for (int seq=0; seq<dirBitboards.length; seq++) {
+							long toBitboard = dirs[dirID][seq];
+							int toFieldID = fids[dirID][seq];
+							
+							if (pinned) {
+								if ((toBitboard & bb_black_all) != 0L) {
+									break;
+								}
+								if ((toBitboard & bb_white_all) != 0L) {
+									if ((toBitboard & bb_white_king) != 0L) {
+										pin_bk--;
+									} else if ((toBitboard & bb_white_queens) != 0L) {
+										pin_bq--;
+									} else if ((toBitboard & bb_white_rooks) != 0L) {
+										pin_br--;
+									} else if ((toBitboard & bb_white_knights) != 0L) {
+										pin_bn--;
+									}
+									break;
+								}
+							} else {
+								if ((toBitboard & kingSurrounding_L1_white) != 0L) {
+									if (opking_attacks_counter_1 == 0) {
+										b_attacking_pieces_to_white_king_1++;
+									}
+									opking_attacks_counter_1++;
+								}
+								if ((toBitboard & kingSurrounding_L2_white) != 0L) {
+									if (opking_attacks_counter_2 == 0) {
+										b_attacking_pieces_to_white_king_2++;
+									}
+									opking_attacks_counter_2++;
+								}
+								
+								
+								if ((toBitboard & bb_black_all) != 0L) {
+									if ((toBitboard & bb_black_QandB) != 0L) {
+										//Bishop can attack over other friendly bishop or queen - continue the iteration
+										hidden = true;
+									} else {
+										break;
+									}
+								}
+								
+								if (!pinned) {
+									if (!hidden) {
+										b_mobility_bishops_all++;
+										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER, toFieldID) >= 0;
+										if (safe) {
+											b_mobility_bishops_safe++;
+										}
+									} else {
+										b_mobility_bishops_all++;
+									}
+								}
+								
+								if ((toBitboard & bb_white_all) != 0L) {
+									if ((toBitboard & bb_white_MM) != 0L) {
+										pinned = true;
+										
+										if ((toBitboard & bb_white_knights) != 0L) {
+											attack_bn--;
+										} else if ((toBitboard & bb_white_rooks) != 0L) {
+											attack_br--;
+										}
+										
+									} else {
+										break;
+									}
+								}
+							}
+						}
+					}
+					
+					int mob = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_BISHOP_O[b_mobility_bishops_all], MOBILITY_BISHOP_E[b_mobility_bishops_all]);
+					signals.getSignal(FEATURE_ID_MOBILITY_BISHOP).addStrength(-mob, openingPart);
+					int mob_safe = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_BISHOP_O[b_mobility_bishops_safe], MOBILITY_BISHOP_E[b_mobility_bishops_safe]);
+					signals.getSignal(FEATURE_ID_MOBILITY_BISHOP_S).addStrength(-mob_safe, openingPart);
+					if (b_mobility_bishops_safe == 2) {
+						b_trap_bishops += 1 * (Fields.getRank_B(fieldID) + 1);
+					} else if (b_mobility_bishops_safe == 1) {
+						b_trap_bishops += 2 * (Fields.getRank_B(fieldID) + 1);
+					} else if (b_mobility_bishops_safe == 0) {
+						b_trap_bishops += 4 * (Fields.getRank_B(fieldID) + 1);
+					}
+					
+					b_bishops_attacks_to_white_king_1 += KING_SAFETY_BISHOPS_ATTACKS[opking_attacks_counter_1];
+					b_bishops_attacks_to_white_king_2 += KING_SAFETY_BISHOPS_ATTACKS[opking_attacks_counter_2];
+				}
+			}
+		}
+		
+
+		/**
+		 * Rooks iteration
+		 */
+		{
+			int w_rooks_count = w_rooks.getDataSize();
+			if (w_rooks_count > 0) {
+				int[] rooks_fields = w_rooks.getData();
+				for (int i=0; i<w_rooks_count; i++) {
+					
+					
+					int fieldID = rooks_fields[i];
+					
+					if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+						int see = bitboard.getSee().seeField(fieldID);
+						if (see < 0) {
+							w_hangingCount++;
+						}
+					}
+					
+					w_mobility_rooks_all = 0;
+					
+					w_mobility_rooks_safe = 0;
+					
+					final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
+					final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
+					final int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					int opking_attacks_counter_1 = 0;
+					int opking_attacks_counter_2 = 0;
+					final int size = validDirIDs.length;
+					for (int dir=0; dir<size; dir++) {
+						int dirID = validDirIDs[dir];
+						long[] dirBitboards = dirs[dirID];
+						
+						boolean pinned = false;
+						boolean hidden = false;
+						for (int seq=0; seq<dirBitboards.length; seq++) {
+							long toBitboard = dirs[dirID][seq];
+							int toFieldID = fids[dirID][seq];
+							
+							if (pinned) {
+								if ((toBitboard & bb_white_all) != 0L) {
+									break;
+								}
+								if ((toBitboard & bb_black_all) != 0L) {
+									if ((toBitboard & bb_black_king) != 0L) {
+										pin_rk++;
+									} else if ((toBitboard & bb_black_queens) != 0L) {
+										pin_rq++;
+									} else if ((toBitboard & bb_black_bishops) != 0L) {
+										pin_rb++;
+									} else if ((toBitboard & bb_black_knights) != 0L) {
+										pin_rn++;
+									}
+									break;
+								}
+							} else {
+								if ((toBitboard & kingSurrounding_L1_black) != 0L) {
+									if (opking_attacks_counter_1 == 0) {
+										w_attacking_pieces_to_black_king_1++;
+									}
+									opking_attacks_counter_1++;
+								}
+								if ((toBitboard & kingSurrounding_L2_black) != 0L) {
+									if (opking_attacks_counter_2 == 0) {
+										w_attacking_pieces_to_black_king_2++;
+									}
+									opking_attacks_counter_2++;
+								}
+								
+								
+								if ((toBitboard & bb_white_all) != 0L) {
+									if ((toBitboard & bb_white_QandR) != 0L) {
+										//Rook can attack over other friendly rooks or queens - continue the iteration
+										if ((toBitboard & bb_white_rooks) != 0L) {
+											if (dirID == CastlePlies.UP_DIR || dirID == CastlePlies.DOWN_DIR) {
+												w_rooks_paired_v++;
+											} else {
+												w_rooks_paired_h++;
+											}
+										}
+										hidden = true;
+									} else {
+										break;
+									}
+								}
+	
+								if (!pinned) {
+									if (!hidden) {
+										w_mobility_rooks_all++;
+										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_CASTLE, toFieldID) >= 0;
+										if (safe) {
+											w_mobility_rooks_safe++;
+										}
+									} else {
+										w_mobility_rooks_all++;
+									}
+								}
+								
+								if ((toBitboard & bb_black_all) != 0L) {
+									if ((toBitboard & bb_black_MM) != 0L) {
+										pinned = true;
+										
+										if ((toBitboard & bb_black_bishops) != 0L) {
+											attack_rb++;
+										} else if ((toBitboard & bb_black_knights) != 0L) {
+											attack_rn++;
+										}
+										
+									} else {
+										break;
+									}
+								}
+							}
+						}
+					}
+					
+					int mob = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_ROOK_O[w_mobility_rooks_all], MOBILITY_ROOK_E[w_mobility_rooks_all]);
+					signals.getSignal(FEATURE_ID_MOBILITY_ROOK).addStrength(mob, openingPart);
+					int mob_safe = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_ROOK_O[w_mobility_rooks_safe], MOBILITY_ROOK_E[w_mobility_rooks_safe]);
+					signals.getSignal(FEATURE_ID_MOBILITY_ROOK_S).addStrength(mob_safe, openingPart);
+					if (w_mobility_rooks_safe == 2) {
+						w_trap_rooks += 1 * (Fields.getRank_W(fieldID) + 1);
+					} else if (w_mobility_rooks_safe == 1) {
+						w_trap_rooks += 2 * (Fields.getRank_W(fieldID) + 1);
+					} else if (w_mobility_rooks_safe == 0) {
+						w_trap_rooks += 4 * (Fields.getRank_W(fieldID) + 1);
+					}	
+					
+					w_rooks_attacks_to_black_king_1 += KING_SAFETY_ROOKS_ATTACKS[opking_attacks_counter_1];
+					w_rooks_attacks_to_black_king_2 += KING_SAFETY_ROOKS_ATTACKS[opking_attacks_counter_2];
+				}
+			}
+		}
+		
+		{
+			int b_rooks_count = b_rooks.getDataSize();
+			if (b_rooks_count > 0) {
+				int[] rooks_fields = b_rooks.getData();
+				for (int i=0; i<b_rooks_count; i++) {
+					
+					
+					int fieldID = rooks_fields[i];
+
+					if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+						int see = bitboard.getSee().seeField(fieldID);
+						if (see < 0) {
+							b_hangingCount++;
+						}
+					}
+					
+					b_mobility_rooks_all = 0;
+					
+					b_mobility_rooks_safe = 0;
+					
+					final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
+					final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
+					final int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					int opking_attacks_counter_1 = 0;
+					int opking_attacks_counter_2 = 0;
+					final int size = validDirIDs.length;
+					for (int dir=0; dir<size; dir++) {
+						int dirID = validDirIDs[dir];
+						long[] dirBitboards = dirs[dirID];
+						
+						boolean pinned = false;
+						boolean hidden = false;
+						for (int seq=0; seq<dirBitboards.length; seq++) {
+							long toBitboard = dirs[dirID][seq];
+							int toFieldID = fids[dirID][seq];
+							
+							if (pinned) {
+								if ((toBitboard & bb_black_all) != 0L) {
+									break;
+								}
+								if ((toBitboard & bb_white_all) != 0L) {
+									if ((toBitboard & bb_white_king) != 0L) {
+										pin_rk--;
+									} else if ((toBitboard & bb_white_queens) != 0L) {
+										pin_rq--;
+									} else if ((toBitboard & bb_white_bishops) != 0L) {
+										pin_rb--;
+									} else if ((toBitboard & bb_white_knights) != 0L) {
+										pin_rn--;
+									}
+									break;
+								}
+							} else {
+								if ((toBitboard & kingSurrounding_L1_white) != 0L) {
+									if (opking_attacks_counter_1 == 0) {
+										b_attacking_pieces_to_white_king_1++;
+									}
+									opking_attacks_counter_1++;
+								}
+								if ((toBitboard & kingSurrounding_L2_white) != 0L) {
+									if (opking_attacks_counter_2 == 0) {
+										b_attacking_pieces_to_white_king_2++;
+									}
+									opking_attacks_counter_2++;
+								}
+								
+								
+								if ((toBitboard & bb_black_all) != 0L) {
+									if ((toBitboard & bb_black_QandR) != 0L) {
+										//Rook can attack over other friendly rooks or queens - continue the iteration
+										if ((toBitboard & bb_black_rooks) != 0L) {
+											if (dirID == CastlePlies.UP_DIR || dirID == CastlePlies.DOWN_DIR) {
+												b_rooks_paired_v++;
+											} else {
+												b_rooks_paired_h++;
+											}
+										}
+										hidden = true;
+									} else {
+										break;
+									}
+								}
+	
+								if (!pinned) {
+									if (!hidden) {
+										b_mobility_rooks_all++;
+										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_CASTLE, toFieldID) >= 0;
+										if (safe) {
+											b_mobility_rooks_safe++;
+										}
+									} else {
+										b_mobility_rooks_all++;
+									}
+								}
+								
+								if ((toBitboard & bb_white_all) != 0L) {
+									if ((toBitboard & bb_white_MM) != 0L) {
+										pinned = true;
+										
+										if ((toBitboard & bb_white_bishops) != 0L) {
+											attack_rb--;
+										} else if ((toBitboard & bb_white_knights) != 0L) {
+											attack_rn--;
+										}
+										
+									} else {
+										break;
+									}
+								}
+							}
+						}
+					}
+					
+					int mob = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_ROOK_O[b_mobility_rooks_all], MOBILITY_ROOK_E[b_mobility_rooks_all]);
+					signals.getSignal(FEATURE_ID_MOBILITY_ROOK).addStrength(-mob, openingPart);
+					int mob_safe = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_ROOK_O[b_mobility_rooks_safe], MOBILITY_ROOK_E[b_mobility_rooks_safe]);
+					signals.getSignal(FEATURE_ID_MOBILITY_ROOK_S).addStrength(-mob_safe, openingPart);
+					if (b_mobility_rooks_safe == 2) {
+						b_trap_rooks += 1 * (Fields.getRank_B(fieldID) + 1);
+					} else if (b_mobility_rooks_safe == 1) {
+						b_trap_rooks += 2 * (Fields.getRank_B(fieldID) + 1);
+					} else if (b_mobility_rooks_safe == 0) {
+						b_trap_rooks += 4 * (Fields.getRank_B(fieldID) + 1);
+					}	
+					
+					b_rooks_attacks_to_white_king_1 += KING_SAFETY_ROOKS_ATTACKS[opking_attacks_counter_1];
+					b_rooks_attacks_to_white_king_2 += KING_SAFETY_ROOKS_ATTACKS[opking_attacks_counter_2];
+				}
+			}
+		}
+
+		
+		/**
+		 * Queens iteration
+		 */
+		{
+			int w_queens_count = w_queens.getDataSize();
+			if (w_queens_count > 0) {
+				int[] queens_fields = w_queens.getData();
+				for (int i=0; i<w_queens_count; i++) {
+					
+					
+					int fieldID = queens_fields[i];
+					
+					if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+						int see = bitboard.getSee().seeField(fieldID);
+						if (see < 0) {
+							w_hangingCount++;
+						}
+					}
+					
+					w_mobility_queens_all = 0;
+					
+					w_mobility_queens_safe = 0;
+					
+					int opking_attacks_counter_1 = 0;
+					int opking_attacks_counter_2 = 0;
+					
+					/**
+					 * Move like a rook
+					 */
+					long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
+					int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
+					int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					int size = validDirIDs.length;
+					for (int dir=0; dir<size; dir++) {
+						int dirID = validDirIDs[dir];
+						long[] dirBitboards = dirs[dirID];
+						
+						boolean pinned = false;
+						boolean hidden = false;
+						for (int seq=0; seq<dirBitboards.length; seq++) {
+							long toBitboard = dirs[dirID][seq];
+							int toFieldID = fids[dirID][seq];
+							
+							if (pinned) {
+								if ((toBitboard & bb_white_all) != 0L) {
+									break;
+								}
+								if ((toBitboard & bb_black_all) != 0L) {
+									if ((toBitboard & bb_black_king) != 0L) {
+										pin_qk++;
+									} else if ((toBitboard & bb_black_queens) != 0L) {
+										pin_qq++;
+									} else if ((toBitboard & bb_black_bishops) != 0L) {
+										pin_qb++;
+									} else if ((toBitboard & bb_black_knights) != 0L) {
+										pin_qn++;
+									}
+									break;
+								}
+							} else {
+								if ((toBitboard & kingSurrounding_L1_black) != 0L) {
+									if (opking_attacks_counter_1 == 0) {
+										w_attacking_pieces_to_black_king_1++;
+									}
+									opking_attacks_counter_1++;
+								}
+								if ((toBitboard & kingSurrounding_L2_black) != 0L) {
+									if (opking_attacks_counter_2 == 0) {
+										w_attacking_pieces_to_black_king_2++;
+									}
+									opking_attacks_counter_2++;
+								}
+								
+								
+								if ((toBitboard & bb_white_all) != 0L) {
+									if ((toBitboard & bb_white_QandR) != 0L) {
+										//Queen can attack over other friendly rooks or queens - continue the iteration
+										hidden = true;
+									} else {
+										break;
+									}
+								}
+	
+								if (!pinned) {
+									if (!hidden) {
+										w_mobility_queens_all++;
+										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN, toFieldID) >= 0;
+										if (safe) {
+											w_mobility_queens_safe++;
+										}
+									} else {
+										w_mobility_queens_all++;
+									}
+								}
+								
+								if ((toBitboard & bb_black_all) != 0L) {
+									if ((toBitboard & bb_black_MM) != 0L) {
+										
+										pinned = true;
+										
+										if ((toBitboard & bb_black_knights) != 0L) {
+											attack_qn++;
+										} else if ((toBitboard & bb_black_bishops) != 0L) {
+											attack_qb++;
+										}
+										
+									} else {
+										break;
+									}
+								}
+							}
+						}
+					}
+					
+					
+					/**
+					 * Move like a bishop
+					 */
+					dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
+					validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
+					fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					size = validDirIDs.length;
+					for (int dir=0; dir<size; dir++) {
+						int dirID = validDirIDs[dir];
+						long[] dirBitboards = dirs[dirID];
+						
+						boolean pinned = false;
+						boolean hidden = false;
+						for (int seq=0; seq<dirBitboards.length; seq++) {
+							long toBitboard = dirs[dirID][seq];
+							int toFieldID = fids[dirID][seq];
+							
+							if (pinned) {
+								if ((toBitboard & bb_white_all) != 0L) {
+									break;
+								}
+								if ((toBitboard & bb_black_all) != 0L) {
+									if ((toBitboard & bb_black_king) != 0L) {
+										pin_qk++;
+									} else if ((toBitboard & bb_black_queens) != 0L) {
+										pin_qk++;
+									} else if ((toBitboard & bb_black_rooks) != 0L) {
+										pin_qr++;
+									} else if ((toBitboard & bb_black_knights) != 0L) {
+										pin_qn++;
+									}
+									break;
+								}
+							} else {
+								if ((toBitboard & kingSurrounding_L1_black) != 0L) {
+									if (opking_attacks_counter_1 == 0) {
+										w_attacking_pieces_to_black_king_1++;
+									}
+									opking_attacks_counter_1++;
+								}
+								if ((toBitboard & kingSurrounding_L2_black) != 0L) {
+									if (opking_attacks_counter_2 == 0) {
+										w_attacking_pieces_to_black_king_2++;
+									}
+									opking_attacks_counter_2++;
+								}
+								
+								
+								if ((toBitboard & bb_white_all) != 0L) {
+									if ((toBitboard & bb_white_QandB) != 0L) {
+										//Queen can attack over other friendly bishop or queen - continue the iteration
+										hidden = true;
+									} else {
+										break;
+									}
+								}
+	
+								if (!pinned) {
+									if (!hidden) {
+										w_mobility_queens_all++;
+										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN, toFieldID) >= 0;
+										if (safe) {
+											w_mobility_queens_safe++;
+										}
+									} else {
+										w_mobility_queens_all++;
+									}
+								}
+								
+								if ((toBitboard & bb_black_all) != 0L) {
+									if ((toBitboard & bb_black_MM) != 0L) {
+										pinned = true;
+										
+										if ((toBitboard & bb_black_knights) != 0L) {
+											attack_qn++;
+										} else if ((toBitboard & bb_black_rooks) != 0L) {
+											attack_qr++;
+										}
+										
+									} else {
+										break;
+									}
+								}
+							}
+						}
+					}
+					
+					int mob = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_QUEEN_O[w_mobility_queens_all], MOBILITY_QUEEN_E[w_mobility_queens_all]);
+					signals.getSignal(FEATURE_ID_MOBILITY_QUEEN).addStrength(mob, openingPart);
+					int mob_safe = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_QUEEN_O[w_mobility_queens_safe], MOBILITY_QUEEN_E[w_mobility_queens_safe]);
+					signals.getSignal(FEATURE_ID_MOBILITY_QUEEN_S).addStrength(mob_safe, openingPart);
+					if (w_mobility_queens_safe == 2) {
+						w_trap_queens += 1 * (Fields.getRank_W(fieldID) + 1);
+					} else if (w_mobility_queens_safe == 1) {
+						w_trap_queens += 2 * (Fields.getRank_W(fieldID) + 1);
+					} else if (w_mobility_queens_safe == 0) {
+						w_trap_queens += 4 * (Fields.getRank_W(fieldID) + 1);
+					}	
+					
+					w_queens_attacks_to_black_king_1 += KING_SAFETY_QUEENS_ATTACKS[opking_attacks_counter_1];
+					w_queens_attacks_to_black_king_2 += KING_SAFETY_QUEENS_ATTACKS[opking_attacks_counter_2];
+				}
+			}
+		}
+		
+		{
+			int b_queens_count = b_queens.getDataSize();
+			if (b_queens_count > 0) {
+				int[] queens_fields = b_queens.getData();
+				for (int i=0; i<b_queens_count; i++) {
+					
+					
+					int fieldID = queens_fields[i];
+					
+					if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+						int see = bitboard.getSee().seeField(fieldID);
+						if (see < 0) {
+							b_hangingCount++;
+						}
+					}
+					
+					b_mobility_queens_all = 0;
+					
+					b_mobility_queens_safe = 0;
+					
+					int opking_attacks_counter_1 = 0;
+					int opking_attacks_counter_2 = 0;
+					
+					/**
+					 * Move like a rook
+					 */
+					long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
+					int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
+					int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					int size = validDirIDs.length;
+					for (int dir=0; dir<size; dir++) {
+						int dirID = validDirIDs[dir];
+						long[] dirBitboards = dirs[dirID];
+						
+						boolean pinned = false;
+						boolean hidden = false;
+						for (int seq=0; seq<dirBitboards.length; seq++) {
+							long toBitboard = dirs[dirID][seq];
+							int toFieldID = fids[dirID][seq];
+							
+							if (pinned) {
+								if ((toBitboard & bb_black_all) != 0L) {
+									break;
+								}
+								if ((toBitboard & bb_white_all) != 0L) {
+									if ((toBitboard & bb_white_king) != 0L) {
+										pin_qk--;
+									} else if ((toBitboard & bb_white_queens) != 0L) {
+										pin_qq--;
+									} else if ((toBitboard & bb_white_bishops) != 0L) {
+										pin_qb--;
+									} else if ((toBitboard & bb_white_knights) != 0L) {
+										pin_qn--;
+									}
+									break;
+								}
+							} else {
+								if ((toBitboard & kingSurrounding_L1_white) != 0L) {
+									if (opking_attacks_counter_1 == 0) {
+										b_attacking_pieces_to_white_king_1++;
+									}
+									opking_attacks_counter_1++;
+								}
+								if ((toBitboard & kingSurrounding_L2_white) != 0L) {
+									if (opking_attacks_counter_2 == 0) {
+										b_attacking_pieces_to_white_king_2++;
+									}
+									opking_attacks_counter_2++;
+								}
+								
+								
+								if ((toBitboard & bb_black_all) != 0L) {
+									if ((toBitboard & bb_black_QandR) != 0L) {
+										//Queen can attack over other friendly rooks or queens - continue the iteration
+										hidden = true;
+									} else {
+										break;
+									}
+								}
+	
+								if (!pinned) {
+									if (!hidden) {
+										b_mobility_queens_all++;
+										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN, toFieldID) >= 0;
+										if (safe) {
+											b_mobility_queens_safe++;
+										}
+									} else {
+										b_mobility_queens_all++;
+									}	
+								}
+								
+								if ((toBitboard & bb_white_all) != 0L) {
+									if ((toBitboard & bb_white_MM) != 0L) {
+										
+										pinned = true;
+										
+										if ((toBitboard & bb_white_knights) != 0L) {
+											attack_qn--;
+										} else if ((toBitboard & bb_white_bishops) != 0L) {
+											attack_qb--;
+										}
+										
+									} else {
+										break;
+									}
+								}
+							}
+						}
+					}
+					
+					
+					/**
+					 * Move like a bishop
+					 */
+					dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
+					validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
+					fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					size = validDirIDs.length;
+					for (int dir=0; dir<size; dir++) {
+						int dirID = validDirIDs[dir];
+						long[] dirBitboards = dirs[dirID];
+						
+						boolean pinned = false;
+						boolean hidden = false;
+						for (int seq=0; seq<dirBitboards.length; seq++) {
+							long toBitboard = dirs[dirID][seq];
+							int toFieldID = fids[dirID][seq];
+							
+							if (pinned) {
+								if ((toBitboard & bb_black_all) != 0L) {
+									break;
+								}
+								if ((toBitboard & bb_white_all) != 0L) {
+									if ((toBitboard & bb_white_king) != 0L) {
+										pin_qk--;
+									} else if ((toBitboard & bb_white_queens) != 0L) {
+										pin_qq--;
+									} else if ((toBitboard & bb_white_rooks) != 0L) {
+										pin_qr--;
+									} else if ((toBitboard & bb_white_knights) != 0L) {
+										pin_qn--;
+									}
+									break;
+								}
+							} else {
+								if ((toBitboard & kingSurrounding_L1_white) != 0L) {
+									if (opking_attacks_counter_1 == 0) {
+										b_attacking_pieces_to_white_king_1++;
+									}
+									opking_attacks_counter_1++;
+								}
+								if ((toBitboard & kingSurrounding_L2_white) != 0L) {
+									if (opking_attacks_counter_2 == 0) {
+										b_attacking_pieces_to_white_king_2++;
+									}
+									opking_attacks_counter_2++;
+								}
+								
+								
+								if ((toBitboard & bb_black_all) != 0L) {
+									if ((toBitboard & bb_black_QandB) != 0L) {
+										//Queen can attack over other friendly bishop or queen - continue the iteration
+										hidden = true;
+									} else {
+										break;
+									}
+								}
+	
+								if (!pinned) {
+									if (!hidden) {
+										b_mobility_queens_all++;
+										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN, toFieldID) >= 0;
+										if (safe) {
+											b_mobility_queens_safe++;
+										}
+									} else {
+										b_mobility_queens_all++;
+									}
+								}
+								
+								if ((toBitboard & bb_white_all) != 0L) {
+									if ((toBitboard & bb_white_MM) != 0L) {
+										
+										pinned = true;
+										
+										if ((toBitboard & bb_white_knights) != 0L) {
+											attack_qn--;
+										} else if ((toBitboard & bb_white_rooks) != 0L) {
+											attack_qr--;
+										}
+										
+									} else {
+										break;
+									}
+								}
+							}
+						}
+					}
+					
+					int mob = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_QUEEN_O[b_mobility_queens_all], MOBILITY_QUEEN_E[b_mobility_queens_all]);
+					signals.getSignal(FEATURE_ID_MOBILITY_QUEEN).addStrength(-mob, openingPart);
+					int mob_safe = bitboard.getMaterialFactor().interpolateByFactor(MOBILITY_QUEEN_O[b_mobility_queens_safe], MOBILITY_QUEEN_E[b_mobility_queens_safe]);
+					signals.getSignal(FEATURE_ID_MOBILITY_QUEEN_S).addStrength(-mob_safe, openingPart);
+					if (b_mobility_queens_safe == 2) {
+						b_trap_queens += 1 * (Fields.getRank_B(fieldID) + 1);
+					} else if (b_mobility_queens_safe == 1) {
+						b_trap_queens += 2 * (Fields.getRank_B(fieldID) + 1);
+					} else if (b_mobility_queens_safe == 0) {
+						b_trap_queens += 4 * (Fields.getRank_B(fieldID) + 1);
+					}	
+					
+					b_queens_attacks_to_white_king_1 += KING_SAFETY_QUEENS_ATTACKS[opking_attacks_counter_1];
+					b_queens_attacks_to_white_king_2 += KING_SAFETY_QUEENS_ATTACKS[opking_attacks_counter_2];
+				}
+			}
+		}
+		
+		
+		signals.getSignal(FEATURE_ID_ROOKS_PAIR_H).addStrength(w_rooks_paired_h - b_rooks_paired_h, openingPart);
+		signals.getSignal(FEATURE_ID_ROOKS_PAIR_V).addStrength(w_rooks_paired_v - b_rooks_paired_v, openingPart);
+		
+		int w_attack_to_black_king_1 = Math.max(1, w_knights_attacks_to_black_king_1)
+				* Math.max(1, w_bishops_attacks_to_black_king_1)
+				* Math.max(1, w_rooks_attacks_to_black_king_1)
+				* Math.max(1, w_queens_attacks_to_black_king_1);
+		int b_attack_to_white_king_1 = Math.max(1, b_knights_attacks_to_white_king_1)
+				* Math.max(1, b_bishops_attacks_to_white_king_1)
+				* Math.max(1, b_rooks_attacks_to_white_king_1)
+				* Math.max(1, b_queens_attacks_to_white_king_1);
+		
+		int w_attack_to_black_king_2 = Math.max(1, w_knights_attacks_to_black_king_2)
+				* Math.max(1, w_bishops_attacks_to_black_king_2)
+				* Math.max(1, w_rooks_attacks_to_black_king_2)
+				* Math.max(1, w_queens_attacks_to_black_king_2);
+		int b_attack_to_white_king_2 = Math.max(1, b_knights_attacks_to_white_king_2)
+				* Math.max(1, b_bishops_attacks_to_white_king_2)
+				* Math.max(1, b_rooks_attacks_to_white_king_2)
+				* Math.max(1, b_queens_attacks_to_white_king_2);
+		
+		int kingsafe_l1 = (w_attacking_pieces_to_black_king_1 * w_attack_to_black_king_1 - b_attacking_pieces_to_white_king_1 * b_attack_to_white_king_1) / (4 * 2);
+		signals.getSignal(FEATURE_ID_KINGSAFE_L1).addStrength(kingsafe_l1, openingPart);
+		
+		int kingsafe_l2 = (w_attacking_pieces_to_black_king_2 * w_attack_to_black_king_2 - b_attacking_pieces_to_white_king_2 * b_attack_to_white_king_2) / (8 * 8);
+		signals.getSignal(FEATURE_ID_KINGSAFE_L2).addStrength(kingsafe_l2, openingPart);
+		
+		
+		signals.getSignal(FEATURE_ID_PIN_BK).addStrength(pin_bk, openingPart);
+		signals.getSignal(FEATURE_ID_PIN_BQ).addStrength(pin_bq, openingPart);
+		signals.getSignal(FEATURE_ID_PIN_BR).addStrength(pin_br, openingPart);
+		signals.getSignal(FEATURE_ID_PIN_BN).addStrength(pin_bn, openingPart);
+		signals.getSignal(FEATURE_ID_PIN_RK).addStrength(pin_rk, openingPart);
+		signals.getSignal(FEATURE_ID_PIN_RQ).addStrength(pin_rq, openingPart);
+		signals.getSignal(FEATURE_ID_PIN_RB).addStrength(pin_rb, openingPart);
+		signals.getSignal(FEATURE_ID_PIN_RN).addStrength(pin_rn, openingPart);
+		signals.getSignal(FEATURE_ID_PIN_QK).addStrength(pin_qk, openingPart);
+		signals.getSignal(FEATURE_ID_PIN_QQ).addStrength(pin_qq, openingPart);
+		signals.getSignal(FEATURE_ID_PIN_QN).addStrength(pin_qn, openingPart);
+		signals.getSignal(FEATURE_ID_PIN_QR).addStrength(pin_qr, openingPart);
+		signals.getSignal(FEATURE_ID_PIN_QB).addStrength(pin_qb, openingPart);
+		
+		
+		signals.getSignal(FEATURE_ID_ATTACK_NB).addStrength(attack_nb, openingPart);
+		signals.getSignal(FEATURE_ID_ATTACK_NR).addStrength(attack_nr, openingPart);
+		signals.getSignal(FEATURE_ID_ATTACK_NQ).addStrength(attack_nq, openingPart);
+		signals.getSignal(FEATURE_ID_ATTACK_BN).addStrength(attack_bn, openingPart);
+		signals.getSignal(FEATURE_ID_ATTACK_BR).addStrength(attack_br, openingPart);
+		signals.getSignal(FEATURE_ID_ATTACK_RB).addStrength(attack_rb, openingPart);
+		signals.getSignal(FEATURE_ID_ATTACK_RN).addStrength(attack_rn, openingPart);
+		signals.getSignal(FEATURE_ID_ATTACK_QN).addStrength(attack_qn, openingPart);
+		signals.getSignal(FEATURE_ID_ATTACK_QB).addStrength(attack_qb, openingPart);
+		signals.getSignal(FEATURE_ID_ATTACK_QR).addStrength(attack_qr, openingPart);
+		
+		signals.getSignal(FEATURE_ID_TRAP_KNIGHT).addStrength(w_trap_knights - b_trap_knights, openingPart);
+		signals.getSignal(FEATURE_ID_TRAP_BISHOP).addStrength(w_trap_bishops - b_trap_bishops, openingPart);
+		signals.getSignal(FEATURE_ID_TRAP_ROOK).addStrength(w_trap_rooks - b_trap_rooks, openingPart);
+		signals.getSignal(FEATURE_ID_TRAP_QUEEN).addStrength(w_trap_queens - b_trap_queens, openingPart);
+		
+		/*if (w_hangingCount > 3) {
+			int g = 0;
+		}
+		if (b_hangingCount > 3) {
+			int g = 0;
+		}*/
+		
+		if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+			signals.getSignal(FEATURE_ID_HUNGED_PIECES).addStrength(w_hangingCount, openingPart);
+		} else {
+			signals.getSignal(FEATURE_ID_HUNGED_PIECES).addStrength(-b_hangingCount, openingPart);
+		}
 	}
+	
+	
+	public void fillFieldsStatesIterationSignals(ISignals signals) {
+		
+		
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
+		
+		int w_mobility_knights_safe = 0;
+		int b_mobility_knights_safe = 0;
+		int w_mobility_bishops_safe = 0;
+		int b_mobility_bishops_safe = 0;
+		int w_mobility_rooks_safe = 0;
+		int b_mobility_rooks_safe = 0;
+		int w_mobility_queens_safe = 0;
+		int b_mobility_queens_safe = 0;
+		
+		int w_overprotection_pawns = 0;
+		int b_overprotection_pawns = 0;
+		int w_overprotection_knights = 0;
+		int b_overprotection_knights = 0;
+		int w_overprotection_bishops = 0;
+		int b_overprotection_bishops = 0;
+		int w_overprotection_rooks = 0;
+		int b_overprotection_rooks = 0;
+		int w_overprotection_queens = 0;
+		int b_overprotection_queens = 0;
+		
+		int w_trap_knights = 0;
+		int b_trap_knights = 0;
+		int w_trap_bishops = 0;
+		int b_trap_bishops = 0;
+		int w_trap_rooks = 0;
+		int b_trap_rooks = 0;
+		int w_trap_queens = 0;
+		int b_trap_queens = 0;
+		
+		long bb_white_all = bitboard.getFiguresBitboardByColour(Figures.COLOUR_WHITE);
+		long bb_black_all = bitboard.getFiguresBitboardByColour(Figures.COLOUR_BLACK);
+
+		IFieldsAttacks fa = bitboard.getFieldsAttacks();
+		int[] w_control = fa.getControlArray(Figures.COLOUR_WHITE);
+		int[] b_control = fa.getControlArray(Figures.COLOUR_BLACK);
+		
+		
+		/**
+		 * Knights iteration
+		 */
+		{
+			int w_knights_count = w_knights.getDataSize();
+			if (w_knights_count > 0) {
+				int[] knights_fields = w_knights.getData();
+				for (int i=0; i<w_knights_count; i++) {
+					
+					w_mobility_knights_safe = 0;
+					
+					int fieldID = knights_fields[i];
+					
+					if (w_control[fieldID] > b_control[fieldID]) {
+						w_overprotection_knights++;
+					}
+					
+					final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
+					final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
+					final int[][] fids = KnightPlies.ALL_KNIGHT_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					final int size = validDirIDs.length;
+					for (int j=0; j<size; j++) {
+						
+						int dirID = validDirIDs[j];
+						long toBitboard = dirs[dirID][0];
+						int toFieldID = fids[dirID][0];
+						
+						if ((toBitboard & bb_white_all) != 0L) {
+							continue;
+						}
+						
+						if ((-SeeMetadata.getSingleton().seeMove(Figures.TYPE_KNIGHT, Figures.TYPE_KNIGHT,
+								w_control[toFieldID], b_control[toFieldID])) >= 0) {
+							w_mobility_knights_safe++;
+						}
+					}
+					
+					signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT_S).addStrength(w_mobility_knights_safe, 1, openingPart);
+					
+					if (w_mobility_knights_safe == 2) {
+						w_trap_knights -= 1;
+					} else if (w_mobility_knights_safe == 1) {
+						w_trap_knights -= 2;
+					} else if (w_mobility_knights_safe == 0) {
+						w_trap_knights -= 3;
+					}
+				}
+			}
+		}
+		
+		{
+			int b_knights_count = b_knights.getDataSize();		
+			if (b_knights_count > 0) {
+				int[] knights_fields = b_knights.getData();
+				for (int i=0; i<b_knights_count; i++) {
+					
+					b_mobility_knights_safe = 0;
+					
+					int fieldID = knights_fields[i];
+					
+					if (b_control[fieldID] > w_control[fieldID]) {
+						b_overprotection_knights++;
+					}
+					
+					final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
+					final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
+					final int[][] fids = KnightPlies.ALL_KNIGHT_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					final int size = validDirIDs.length;
+					for (int j=0; j<size; j++) {
+						
+						int dirID = validDirIDs[j];
+						long toBitboard = dirs[dirID][0];
+						int toFieldID = fids[dirID][0];
+						
+						if ((toBitboard & bb_black_all) != 0L) {
+							continue;
+						}
+						
+						if ((-SeeMetadata.getSingleton().seeMove(Figures.TYPE_KNIGHT, Figures.TYPE_KNIGHT,
+								b_control[toFieldID], w_control[toFieldID])) >= 0) {
+							b_mobility_knights_safe++;
+						}
+					}
+					
+					signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT_S).addStrength(b_mobility_knights_safe, -1, openingPart);
+					
+					if (b_mobility_knights_safe == 2) {
+						b_trap_knights -= 1;
+					} else if (b_mobility_knights_safe == 1) {
+						b_trap_knights -= 2;
+					} else if (b_mobility_knights_safe == 0) {
+						b_trap_knights -= 3;
+					}
+				}				
+			}
+		}
+		
+		
+		/**
+		 * Bishops iteration
+		 */
+		{
+			int w_bishops_count = w_bishops.getDataSize();
+			if (w_bishops_count > 0) {
+				int[] bishops_fields = w_bishops.getData();
+				for (int i=0; i<w_bishops_count; i++) {
+					
+					w_mobility_bishops_safe = 0;
+					
+					int fieldID = bishops_fields[i];
+					
+					if (w_control[fieldID] > b_control[fieldID]) {
+						w_overprotection_bishops++;
+					}
+					
+					final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
+					final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
+					final int[][] fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					final int size = validDirIDs.length;
+					for (int dir=0; dir<size; dir++) {
+						int dirID = validDirIDs[dir];
+						long[] dirBitboards = dirs[dirID];
+						
+						for (int seq=0; seq<dirBitboards.length; seq++) {
+							long toBitboard = dirs[dirID][seq];
+							int toFieldID = fids[dirID][seq];
+							
+							if ((toBitboard & bb_white_all) != 0L) {
+								break;
+							}
+
+							boolean safe = (-SeeMetadata.getSingleton().seeMove(Figures.TYPE_OFFICER, Figures.TYPE_OFFICER,
+										w_control[toFieldID], b_control[toFieldID])) >= 0;
+							if (safe) {
+								w_mobility_bishops_safe++;
+							}
+							
+							if ((toBitboard & bb_black_all) != 0L) {
+								break;
+							}
+						}
+					}
+					
+					signals.getSignal(FEATURE_ID_MOBILITY_BISHOP_S).addStrength(w_mobility_bishops_safe, 1, openingPart);
+					
+					if (w_mobility_bishops_safe == 2) {
+						w_trap_bishops -= 1;
+					} else if (w_mobility_bishops_safe == 1) {
+						w_trap_bishops -= 2;
+					} else if (w_mobility_bishops_safe == 0) {
+						w_trap_bishops -= 3;
+					}
+				}
+			}
+		}
+		
+		{
+			int b_bishops_count = b_bishops.getDataSize();
+			if (b_bishops_count > 0) {
+				int[] bishops_fields = b_bishops.getData();
+				for (int i=0; i<b_bishops_count; i++) {
+					
+					b_mobility_bishops_safe = 0;
+					
+					int fieldID = bishops_fields[i];
+					
+					if (b_control[fieldID] > w_control[fieldID]) {
+						b_overprotection_bishops++;
+					}
+					
+					final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
+					final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
+					final int[][] fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					final int size = validDirIDs.length;
+					for (int dir=0; dir<size; dir++) {
+						int dirID = validDirIDs[dir];
+						long[] dirBitboards = dirs[dirID];
+						
+						for (int seq=0; seq<dirBitboards.length; seq++) {
+							
+							long toBitboard = dirs[dirID][seq];
+							int toFieldID = fids[dirID][seq];
+							
+							if ((toBitboard & bb_black_all) != 0L) {
+								break;
+							}
+
+							boolean safe = (-SeeMetadata.getSingleton().seeMove(Figures.TYPE_OFFICER, Figures.TYPE_OFFICER,
+										b_control[toFieldID], w_control[toFieldID])) >= 0;
+							if (safe) {
+								b_mobility_bishops_safe++;
+							}
+							
+							if ((toBitboard & bb_white_all) != 0L) {
+								break;
+							}
+							
+						}
+					}
+					
+					signals.getSignal(FEATURE_ID_MOBILITY_BISHOP_S).addStrength(b_mobility_bishops_safe, -1, openingPart);
+					
+					if (b_mobility_bishops_safe == 2) {
+						b_trap_bishops -= 1;
+					} else if (b_mobility_bishops_safe == 1) {
+						b_trap_bishops -= 2;
+					} else if (b_mobility_bishops_safe == 0) {
+						b_trap_bishops -= 3;
+					}
+				}
+			}
+		}
+
+		
+		/**
+		 * Rooks iteration
+		 */
+		{
+			int w_rooks_count = w_rooks.getDataSize();
+			if (w_rooks_count > 0) {
+				int[] rooks_fields = w_rooks.getData();
+				for (int i=0; i<w_rooks_count; i++) {
+					
+					w_mobility_rooks_safe = 0;
+					
+					int fieldID = rooks_fields[i];
+					
+					if (w_control[fieldID] > b_control[fieldID]) {
+						w_overprotection_rooks++;
+					}
+					
+					final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
+					final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
+					final int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					final int size = validDirIDs.length;
+					for (int dir=0; dir<size; dir++) {
+						int dirID = validDirIDs[dir];
+						long[] dirBitboards = dirs[dirID];
+						
+						for (int seq=0; seq<dirBitboards.length; seq++) {
+							
+							long toBitboard = dirs[dirID][seq];
+							int toFieldID = fids[dirID][seq];
+								
+							if ((toBitboard & bb_white_all) != 0L) {
+								break;
+							}
+								
+							boolean safe = (-SeeMetadata.getSingleton().seeMove(Figures.TYPE_CASTLE, Figures.TYPE_CASTLE,
+										w_control[toFieldID], b_control[toFieldID])) >= 0;
+							if (safe) {
+								w_mobility_rooks_safe++;
+							}
+							
+							if ((toBitboard & bb_black_all) != 0L) {
+								break;
+							}
+						}
+					}
+					
+					signals.getSignal(FEATURE_ID_MOBILITY_ROOK_S).addStrength(w_mobility_rooks_safe, 1, openingPart);
+					
+					if (w_mobility_rooks_safe == 2) {
+						w_trap_rooks -= 1;
+					} else if (w_mobility_rooks_safe == 1) {
+						w_trap_rooks -= 2;
+					} else if (w_mobility_rooks_safe == 0) {
+						w_trap_rooks -= 3;
+					}					
+				}
+			}
+		}
+		
+		{
+			int b_rooks_count = b_rooks.getDataSize();
+			if (b_rooks_count > 0) {
+				int[] rooks_fields = b_rooks.getData();
+				for (int i=0; i<b_rooks_count; i++) {
+					
+					b_mobility_rooks_safe = 0;
+					
+					int fieldID = rooks_fields[i];
+					
+					if (b_control[fieldID] > w_control[fieldID]) {
+						b_overprotection_rooks++;
+					}
+					
+					final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
+					final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
+					final int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+					
+					final int size = validDirIDs.length;
+					for (int dir=0; dir<size; dir++) {
+						int dirID = validDirIDs[dir];
+						long[] dirBitboards = dirs[dirID];
+						
+						for (int seq=0; seq<dirBitboards.length; seq++) {
+							long toBitboard = dirs[dirID][seq];
+							int toFieldID = fids[dirID][seq];
+							
+							if ((toBitboard & bb_black_all) != 0L) {
+								break;
+							}
+
+
+							boolean safe = (-SeeMetadata.getSingleton().seeMove(Figures.TYPE_CASTLE, Figures.TYPE_CASTLE,
+									b_control[toFieldID], w_control[toFieldID])) >= 0;
+							if (safe) {
+								b_mobility_rooks_safe++;
+							}
+							
+							if ((toBitboard & bb_white_all) != 0L) {
+								break;
+							}
+						}
+					}
+					
+					signals.getSignal(FEATURE_ID_MOBILITY_ROOK_S).addStrength(b_mobility_rooks_safe, -1, openingPart);
+					
+					if (b_mobility_rooks_safe == 2) {
+						b_trap_rooks -= 1;
+					} else if (b_mobility_rooks_safe == 1) {
+						b_trap_rooks -= 2;
+					} else if (b_mobility_rooks_safe == 0) {
+						b_trap_rooks -= 3;
+					}
+				}
+			}
+		}
+
+		
+		
+		/**
+		 * field states iteration
+		 */
+		int hangingCount = 0;
+		for (int fieldID=0; fieldID<w_control.length; fieldID++) {
+			
+			/**
+			 * Hunged pieces
+			 */
+			int pieceID = bitboard.getFigureID(fieldID);
+			if (pieceID != Constants.PID_NONE) {
+				int pieceType = Figures.getFigureType(pieceID); 
+				int pieceColour = Figures.getFigureColour(pieceID);
+				
+				if (pieceType != Figures.TYPE_KING && pieceColour == bitboard.getColourToMove()) {
+					
+					int see = -SeeMetadata.getSingleton().seeMove(Figures.TYPE_UNDEFINED, pieceType,
+							pieceColour == Figures.COLOUR_WHITE ? w_control[fieldID] : b_control[fieldID],
+							pieceColour == Figures.COLOUR_WHITE ? b_control[fieldID] : w_control[fieldID]);
+					
+					if (see < 0) {
+						hangingCount++;
+					} else if (see > 0) {
+						throw new IllegalStateException("" + see);
+					}
+				}
+			}
+			
+			/**
+			 * Fields control
+			 */
+			if (w_control[fieldID] >= b_control[fieldID] && b_control[fieldID] > 0) {
+				if (w_control[fieldID] == b_control[fieldID]) {
+					signals.getSignal(FEATURE_ID_PST_CONTROL_EQ).addStrength(fieldID, 1, openingPart);	
+				} else {
+					signals.getSignal(FEATURE_ID_PST_CONTROL_MORE).addStrength(fieldID, 1, openingPart);
+				}
+			} else if (b_control[fieldID] >= w_control[fieldID] && w_control[fieldID] > 0) {
+				if (b_control[fieldID] == w_control[fieldID]) {
+					signals.getSignal(FEATURE_ID_PST_CONTROL_EQ).addStrength(axisSymmetry(fieldID), -1, openingPart);
+				} else {
+					signals.getSignal(FEATURE_ID_PST_CONTROL_MORE).addStrength(axisSymmetry(fieldID), -1, openingPart);
+				}
+			}
+		}
+				
+		/*if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+			signals.getSignal(FEATURE_ID_HUNGED_1_PIECES).setStrength(hangingCount == 1 ? -1 : 0);
+			signals.getSignal(FEATURE_ID_HUNGED_2_PIECES).setStrength(hangingCount == 2 ? -1 : 0);
+			signals.getSignal(FEATURE_ID_HUNGED_3_PIECES).setStrength(hangingCount >= 3 ? -1: 0);
+		} else {
+			signals.getSignal(FEATURE_ID_HUNGED_1_PIECES).setStrength(hangingCount == 1 ? 1 : 0);
+			signals.getSignal(FEATURE_ID_HUNGED_2_PIECES).setStrength(hangingCount == 2 ? 1 : 0);
+			signals.getSignal(FEATURE_ID_HUNGED_3_PIECES).setStrength(hangingCount >= 3 ? 1 : 0);
+		}
+		
+		signals.getSignal(FEATURE_ID_OVERPROT_PAWN).setStrength(w_overprotection_pawns - b_overprotection_pawns);
+		signals.getSignal(FEATURE_ID_OVERPROT_KNIGHT).setStrength(w_overprotection_knights - b_overprotection_knights);
+		signals.getSignal(FEATURE_ID_OVERPROT_BISHOP).setStrength(w_overprotection_bishops - b_overprotection_bishops);
+		signals.getSignal(FEATURE_ID_OVERPROT_ROOK).setStrength(w_overprotection_rooks - b_overprotection_rooks);
+		signals.getSignal(FEATURE_ID_OVERPROT_QUEEN).setStrength(w_overprotection_queens - b_overprotection_queens);
+		
+		signals.getSignal(FEATURE_ID_TRAP_KNIGHT).setStrength(w_trap_knights - b_trap_knights);
+		signals.getSignal(FEATURE_ID_TRAP_BISHOP).setStrength(w_trap_bishops - b_trap_bishops);
+		signals.getSignal(FEATURE_ID_TRAP_ROOK).setStrength(w_trap_rooks - b_trap_rooks);
+		signals.getSignal(FEATURE_ID_TRAP_QUEEN).setStrength(w_trap_queens - b_trap_queens);*/
+	}
+
 }

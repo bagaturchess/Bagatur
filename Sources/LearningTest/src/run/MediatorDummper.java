@@ -31,6 +31,7 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
+import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.uci.api.BestMoveSender;
 
 
@@ -54,32 +55,30 @@ public class MediatorDummper implements ISearchMediator {
 		startTime = System.currentTimeMillis();
 		stopper = new SearchStopperImpl(startTime + time);
 		dump = _dump;
-		
-		
 	}
 	
 	//public void addSearchedNodes(long _nodes) {
 	//	nodes += _nodes;
 	//}
 	
-	public void changedMajor(ISearchInfo info) {
+	public void changedMajor(ISearchInfo curinfo) {
 		
-		lastinfo = info;
+		lastinfo = curinfo;
 		
 		if (dump) System.out.println(
-  			"D: " + info.getDepth() +
-  			"	SD: " + info.getSelDepth() +
+  			"D: " + curinfo.getDepth() +
+  			"	SD: " + curinfo.getSelDepth() +
   			" Time: " + ((System.currentTimeMillis()-startTime)/(double)1000) + " s" +
   			//" Mate: " + info.isMateScore() +
-  			"	Eval: " + (info.isMateScore() ? (info.getMateScore() + "M") : info.getEval() ) +
-  			"	NPS: " + (int)(info.getSearchedNodes()/((System.currentTimeMillis()-startTime)/(double)1000)) +
+  			"	Eval: " + (curinfo.isMateScore() ? (curinfo.getMateScore() + "M") : curinfo.getEval() ) +
+  			"	NPS: " + (int)(curinfo.getSearchedNodes()/((System.currentTimeMillis()-startTime)/(double)1000)) +
   			//" Thread: " + Thread.currentThread().getName() +
-  			"	PV: " + MoveInt.movesToString(info.getPV())
+  			"	PV: " + MoveInt.movesToString(curinfo.getPV())
   		);
 		
 		int colour = board.getColourToMove();
 		int sign = 1;
-		int[] pv = info.getPV();
+		int[] pv = curinfo.getPV();
 		for (int i=0; i<pv.length; i++) {
 			int move = pv[i];
 			board.makeMoveForward(move);
@@ -151,7 +150,7 @@ public class MediatorDummper implements ISearchMediator {
 		return null;
 	}
 	
-	public void changedMinor(ISearchInfo info) {
+	public void changedMinor(ISearchInfo curinfo) {
 	}
 	
 	public void addSearchedNodes(long searchedNodes) {
@@ -164,30 +163,5 @@ public class MediatorDummper implements ISearchMediator {
 	@Override
 	public void send(String msg) {
 		System.out.println(msg);
-	}
-
-	@Override
-	public void setStopper(ISearchStopper stopper) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void registerInfoObject(ISearchInfo info) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getTrustWindow_BestMove() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getTrustWindow_AlphaAspiration() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getTrustWindow_MTD_Step() {
-		throw new UnsupportedOperationException();
 	}
 }

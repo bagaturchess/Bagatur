@@ -31,6 +31,16 @@ public class FeatureSingle extends Feature {
 	
 	
 	@Override
+	protected void merge(Feature other) {
+		super.merge(other);
+		if (other instanceof FeatureSingle) {
+			FeatureSingle other_fs = (FeatureSingle) other;
+			openning.merge(other_fs.openning);
+			endgame.merge(other_fs.endgame);
+		}
+	}
+	
+	@Override
 	public void clear() {
 		openning.clear();
 		endgame.clear();

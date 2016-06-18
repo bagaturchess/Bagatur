@@ -7,6 +7,7 @@
 package eval;
 
 
+import eval.v1.IFeaturesConstants;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
@@ -14,13 +15,12 @@ import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
-import bagaturchess.learning.impl.features.Features;
+import bagaturchess.learning.impl.features.impl1.Features;
 import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.EvaluatorAdapter;
 import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.evalcache.EvalEntry;
-import bagaturchess.search.impl.evalcache.IEvalEntry;
 
 
 public class EvaluatorLearning extends EvaluatorAdapter implements IFeaturesConstants {
@@ -108,6 +108,8 @@ public class EvaluatorLearning extends EvaluatorAdapter implements IFeaturesCons
 		}
 	}
 	
+	
+	@Override
 	public int eval(int depth, int alpha, int beta, boolean pvNode, int rootColour) {
 		
 		
@@ -120,7 +122,7 @@ public class EvaluatorLearning extends EvaluatorAdapter implements IFeaturesCons
 		
 		if (useEvalCache) {
 			evalCache.lock();
-			IEvalEntry cached = evalCache.get(hashkey);
+			EvalEntry cached = evalCache.get(hashkey);
 			
 			if (cached != null) {
 				if (!cached.isSketch()) {
@@ -242,7 +244,13 @@ public class EvaluatorLearning extends EvaluatorAdapter implements IFeaturesCons
 		}
 	}
 	
-	public double fullEval(int rootColour) {
+	
+	/*public double fullEval(int rootColour) {
+		
+	}*/
+	
+	@Override
+	public double fullEval(int depth, int alpha, int beta, int rootColour) {
 
 		int colour = bitboard.getColourToMove();
 		long hashkey = bitboard.getHashKey();

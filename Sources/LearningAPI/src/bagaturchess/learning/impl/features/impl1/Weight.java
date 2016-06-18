@@ -76,6 +76,11 @@ class Weight implements Serializable {
 	}
 	
 	
+	protected void merge(Weight other) {
+		if (other.min_weight != min_weight) min_weight = other.min_weight;
+		if (other.max_weight != max_weight) max_weight = other.max_weight;
+	}
+	
 	
 	public void clear() {
 		varstat = new VarStatistic(false);
@@ -90,9 +95,12 @@ class Weight implements Serializable {
 		
 		double multiplier = (varstat.getTotalDirection() / varstat.getTotalAmount());
 		
-		
 		//Should be added before changing
-		appliedMultipliers.add(multiplier);		
+		appliedMultipliers.add(multiplier);
+		
+		/*while (appliedMultipliers.size() > 23) {
+			appliedMultipliers.remove(0);
+		}*/
 		
 		double all = 0;
 		double dir = 0;
@@ -118,6 +126,7 @@ class Weight implements Serializable {
 			cur_weight -= cur_weight * multiplier;
 		} else {
 			//Initialize
+			//cur_weight = multiplier;
 			if (multiplier > 0) {
 				cur_weight = 1;
 			} else if (multiplier < 0) {

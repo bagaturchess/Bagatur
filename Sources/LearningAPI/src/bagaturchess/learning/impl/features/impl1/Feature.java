@@ -48,10 +48,24 @@ abstract class Feature implements IFeature {
 		if (obj instanceof IFeature) {
 			IFeature f = (IFeature) obj;
 			if (f.getId() == id) {
+				
+				if (!f.getName().equals(getName())) {
+					throw new IllegalStateException("f.getName()=" + f.getName() + ", getName()=" + getName());
+				}
+				if (f.getComplexity() != getComplexity()) {
+					throw new IllegalStateException("f.getComplexity()=" + f.getComplexity() + ", getComplexity()=" + getComplexity());
+				}
+				
 				return true;
 			}
 		}
 		
 		return false;
-	}	
+	}
+	
+	
+	protected void merge(Feature other) {
+		if (other.complexity != complexity) complexity = other.complexity;
+		if (!other.name.equals(name)) name = other.name;
+	}
 }

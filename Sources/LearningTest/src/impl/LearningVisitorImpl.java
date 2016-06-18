@@ -25,7 +25,7 @@ package impl;
 
 import eval.BagaturSignalFiller;
 import eval.EvaluatorLearning;
-import eval.FeaturesConfigurationBagaturImpl;
+import eval.v1.FeaturesConfigurationBagaturImpl;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Figures;
@@ -33,12 +33,16 @@ import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
-import bagaturchess.learning.impl.features.Features;
+import bagaturchess.learning.impl.features.impl1.Features;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
 
 public class LearningVisitorImpl implements PositionsVisitor {
+	
+	
+	boolean PERSISTENT = true;
+	
 	
 	private int iteration = 0;
 	
@@ -57,15 +61,22 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	
 	public LearningVisitorImpl() throws Exception {
 		
-		features = Features.createNewFeatures(FeaturesConfigurationBagaturImpl.class.getName());
+		//features = Features.createNewFeatures(FeaturesConfigurationBagaturImpl.class.getName());
+		//if (PERSISTENT) { 
+			Features features_p = Features.load(FeaturesConfigurationBagaturImpl.class.getName());
+			//if (features_p != null) {
+				features = features_p;
+			//}
+		//}
 		signals = features.createSignals();
 		
 		featuresArr = features.getFeatures();
-		for (int i=0; i < featuresArr.length; i++) {
+		
+		/*for (int i=0; i < featuresArr.length; i++) {
 			IFeature currFeature = featuresArr[i];
 			ISignal currSignal = signals.getSignal(currFeature.getId());
 			System.out.println(currSignal);
-		}
+		}*/
 	}
 	
 	
@@ -126,7 +137,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 			actualWhitePlayerEval += currFeature.eval(currSignal, openingPart);
 		}*/
 		
-		double actualWhitePlayerEval = evaluator.fullEval(0, 0, 0, 0);
+		double actualWhitePlayerEval = evaluator.fullEval(-1, 0, 0, -1);
 		if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
 			actualWhitePlayerEval = -actualWhitePlayerEval;
 		}
@@ -167,6 +178,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	
 	
 	public void end() {
+		
 		//System.out.println("***************************************************************************************************");
 		//System.out.println("End iteration " + iteration + ", Total evaluated positions count is " + counter);
 		System.out.println("Iteration " + iteration + ". Success percent before this iteration: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
@@ -176,5 +188,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 			System.out.println(currFeature);
 			currFeature.clear();
 		}
+		
+		if (PERSISTENT) features.store();
 	}
 }

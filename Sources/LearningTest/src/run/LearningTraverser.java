@@ -17,13 +17,14 @@ public class LearningTraverser {
 		try {
 			
 			//String filePath = "./Houdini.15a.short.cg";
-			String filePath = "./Houdini.15a.cg";
+			//String filePath = "./Houdini.15a.cg";
+			String filePath = "./Arasan13.1.cg";
 			
 			PositionsVisitor learning = new LearningVisitorImpl();
 			
 			while (true) {
-				//PositionsTraverser.traverseAll(filePath, learning);
-				PositionsTraverser.traverseAll(filePath, learning, 300000, new BoardConfigImpl());
+				PositionsTraverser.traverseAll(filePath, learning, 99999999, new BoardConfigImpl());
+				//PositionsTraverser.traverseAll(filePath, learning, 300000, new BoardConfigImpl());
 			}
 			
 		} catch (Exception e) {

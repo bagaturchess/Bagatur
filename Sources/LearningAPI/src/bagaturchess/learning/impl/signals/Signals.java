@@ -4,7 +4,7 @@ package bagaturchess.learning.impl.signals;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignals;
-import bagaturchess.learning.impl.features.Features;
+import bagaturchess.learning.impl.features.impl1.Features;
 
 
 public class Signals implements ISignals {

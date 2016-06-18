@@ -39,6 +39,22 @@ public class FeatureArray extends Feature {
 	}
 	
 	
+	@Override
+	protected void merge(Feature other) {
+		super.merge(other);
+		if (other instanceof FeatureArray) {
+			FeatureArray other_arr = (FeatureArray) other;
+			for (int i=0; i<o_weights.length; i++) {
+				o_weights[i].merge(other_arr.o_weights[i]);
+			}
+			
+			for (int i=0; i<e_weights.length; i++) {
+				e_weights[i].merge(other_arr.e_weights[i]);
+			}
+		}
+	}
+	
+	
 	public void clear() {
 		for (int i=0; i<o_weights.length; i++) {
 			o_weights[i].clear();
