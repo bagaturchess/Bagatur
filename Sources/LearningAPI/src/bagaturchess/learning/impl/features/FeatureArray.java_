@@ -1,0 +1,299 @@
+package bagaturchess.learning.impl.features;
+
+
+import bagaturchess.bitboard.impl.utils.StringUtils;
+import bagaturchess.learning.api.IFeature;
+import bagaturchess.learning.api.ISignal;
+import bagaturchess.learning.impl.signals.SignalArray;
+
+
+
+public class FeatureArray extends Feature {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2173196668581176792L;
+	
+	
+	protected Weight[] o_weights;
+	protected Weight[] e_weights;
+	
+	//private SliderVariableDouble[] all;
+	
+	private boolean norm_adjustment = false;
+	
+	
+	public FeatureArray(int _id, String _name, int _complexity,
+			double[] _omin, double[] _omax, double[] oinitial,
+			double[] _emin, double[] _emax, double[] einitial,
+			boolean _norm_adjustment) {
+		this(_id, _name, _complexity, _omin, _omax, oinitial, _emin, _emax, einitial);
+		norm_adjustment = _norm_adjustment;
+	}
+	
+	public FeatureArray(int _id, String _name, int _complexity,
+			double[] _ovals, double[] evals) {
+		this(_id, _name, _complexity, _ovals, _ovals, _ovals, evals, evals, evals);
+	}
+	
+	public FeatureArray(int _id, String _name, int _complexity,
+			double[] _omin, double[] _omax, double[] oinitial,
+			double[] _emin, double[] _emax, double[] einitial) {
+		super(_id, _name, _complexity);
+		createNewWeights(_omin, _omax, oinitial, _emin, _emax, einitial);
+	}
+	
+	public void clear() {
+		for (int i=0; i<o_weights.length; i++) {
+			o_weights[i].clearStat();
+		}
+		
+		for (int i=0; i<e_weights.length; i++) {
+			e_weights[i].clearStat();
+		}
+	}
+	
+	public void fitBounds(double buffer) {
+		
+		boolean at_least_one_changed = false;
+		for (int i=0; i<o_weights.length; i++) {
+			if (o_weights[i].fitBounds(buffer)) {
+				o_weights[i].clearStat();
+				at_least_one_changed = true;
+			}
+		}
+		
+		for (int i=0; i<e_weights.length; i++) {
+			if (e_weights[i].fitBounds(buffer)) {
+				e_weights[i].clearStat();
+				at_least_one_changed = true;
+			}
+		}
+		
+		//if (at_least_one_changed) {
+		//	for (int i=0; i<e_weights.length; i++) {
+		//		all[i] = new SliderVariableDouble("FeatureSingle");
+		//	}
+		//}
+		
+		if (at_least_one_changed) {
+			//System.out.println("CHANGED: " + this);
+		}
+	}
+	
+	public void sign(ISignal signal, double openningPart) {
+		SignalArray signalpst = (SignalArray)signal;
+		
+		int count = signalpst.getSubsignalsCount();
+		int[] ids = signalpst.getSubIDs();
+		double[] strengths = signalpst.getSubsignals();
+		
+		for(int i=0; i<count; i++) {
+			int id = ids[i];
+			double multiplier = openningPart * Math.signum(o_weights[id].getWeight());
+			multiplier += (1 - openningPart) * Math.signum(e_weights[id].getWeight());
+			multiplier = multiplier / 2;
+			
+			signalpst.addStrength(id, -strengths[i] + (strengths[i] * multiplier));
+		}
+	}
+	
+	public void scale(ISignal signal, double openningPart) {
+		SignalArray signalpst = (SignalArray)signal;
+		
+		int count = signalpst.getSubsignalsCount();
+		int[] ids = signalpst.getSubIDs();
+		double[] strengths = signalpst.getSubsignals();
+		
+		for(int i=0; i<count; i++) {
+			double scaled = strengths[i] * getWeight(ids[i], openningPart);
+			signalpst.addStrength(ids[i], -strengths[i] + scaled);
+		}
+	}
+	
+	public void setTo021() {
+		for (int i=0; i<o_weights.length; i++) {
+			o_weights[i].set(0, 2, 1);
+		}
+		
+		for (int i=0; i<e_weights.length; i++) {
+			e_weights[i].set(0, 2, 1);
+		}
+	}
+	
+	public void setAverageToCurrent() {
+		for (int i=0; i<o_weights.length; i++) {
+			o_weights[i].setAverageToCurrent();
+		}
+		
+		for (int i=0; i<e_weights.length; i++) {
+			e_weights[i].setAverageToCurrent();
+		}
+	}
+	
+	public void multiplyAvarageAndCopyToCurrent(IFeature features) {
+		
+		if (getId() == 52) {
+			int g = 0;
+		}
+		
+		for (int i=0; i<o_weights.length; i++) {
+			o_weights[i].multiplyAvarageAndCopyToCurrent(((FeatureArray)features).o_weights[i]);
+		}
+		for (int i=0; i<e_weights.length; i++) {
+			e_weights[i].multiplyAvarageAndCopyToCurrent(((FeatureArray)features).e_weights[i]);
+		}
+	}
+	
+	public void createNewWeights(double[] _omin, double[] _omax, double[] oinitial,
+			double[] _emin, double[] _emax, double[] einitial) {
+		o_weights = new Weight[_omin.length];
+		for (int i=0; i<o_weights.length; i++) {
+			o_weights[i] = new Weight((int)_omin[i], (int)_omax[i], oinitial[i], norm_adjustment);
+		}
+		
+		e_weights = new Weight[_emin.length];
+		for (int i=0; i<e_weights.length; i++) {
+			e_weights[i] = new Weight((int)_emin[i], (int)_emax[i], einitial[i], norm_adjustment);
+		}
+		
+		//all = new SliderVariableDouble[e_weights.length];
+		//for (int i=0; i<e_weights.length; i++) {
+		//	all[i] = new SliderVariableDouble("FeatureSingle");
+		//}
+	}
+	
+	/*private static final double[] createArray(int size, double number) {
+		double[] result = new double[size];
+		for (int i=0; i<result.length; i++) {
+			result[i] = number;
+		}
+		return result;
+	}*/
+	
+	public void adjust(ISignal signal, double amount, double openningPart) {
+		
+		SignalArray signalpst = (SignalArray)signal;
+		
+		int count = signalpst.getSubsignalsCount();
+		int[] ids = signalpst.getSubIDs();
+		double[] strengths = signalpst.getSubsignals();
+		
+		for(int i=0; i<count; i++) {
+			
+			int id = ids[i];
+			
+			//if (Math.abs(amount) != 0) {
+			//	all[id].update(Math.abs(amount));
+			//}
+			
+			//if (!USE_EXC_EXCLUDE || Math.abs(amount) <= all[id].getPointer()) {
+				//double adjustment = amount * ((strengths[i] / signalpst.getRange(ids[i])) / signalpst.getNormalizedStrength());
+				//double adjustment = amount * strengths[i];
+				double adjustment = amount * (strengths[i] / signalpst.getRange(id));
+				
+				//adjustment *= signal.getNonNullRate(id);
+				
+				if (strengths[i] != 0) {
+					adjust(id, adjustment, openningPart);
+				}
+			//}
+		}
+	}
+	
+	protected void adjust(int fieldID, double amount, double openingPart) {
+		
+		//if (amount == 0) throw new IllegalStateException("amount=" + amount);
+		
+		if (openingPart > 1) {
+			openingPart = 1;
+		}
+		
+		if (openingPart > 1 || openingPart < 0) {
+			throw new IllegalStateException("openingPart=" + openingPart);
+		}
+		
+		if (openingPart != 0) {
+			o_weights[fieldID].adjust(openingPart * amount);
+		}
+		if (1 - openingPart != 0) {
+			e_weights[fieldID].adjust((1 - openingPart) * amount);
+		}
+	}
+	
+	public double eval(ISignal signal, double openningPart) {
+		SignalArray signalpst = (SignalArray)signal;
+		
+		int count = signalpst.getSubsignalsCount();
+		int[] ids = signalpst.getSubIDs();
+		double[] strengths = signalpst.getSubsignals();
+		
+		double result = 0;
+		for(int i=0; i<count; i++) {
+			result += strengths[i] * getWeight(ids[i], openningPart);
+		}
+		
+		return result;
+	}
+	
+	public double eval1Unit(double openningPart) {
+		throw new UnsupportedOperationException();
+	}
+	
+	private double getWeight(int fieldID, double openningPart) {
+		return openningPart * o_weights[fieldID].getWeight()
+				+ (1 - openningPart) * e_weights[fieldID].getWeight();
+		//return openningPart * o_weights[fieldID].getAverage()
+		//		+ (1 - openningPart) * e_weights[fieldID].getAverage();
+	}
+	
+	public ISignal createNewSignal() {
+		//throw new UnsupportedOperationException();
+		//return new SignalArray(o_weights.length);
+		return new SignalArray(o_weights.length, 2 * o_weights.length);
+	}
+	
+	@Override
+	public String toString() {
+		String result = "";
+		result += "FEATURE " + StringUtils.fill(""+getId(),3) + " "
+			+ StringUtils.fill(getName(), 20);// + openning + "    " + endgame + "    "
+			//+ "    " + getSignalstat();
+		
+		result += "\r\n";
+		
+		String matrix = "";
+		//int linecounter = 0;
+		String o_line = "";
+		String e_line = "";
+		for (int fieldID=0; fieldID<o_weights.length; fieldID++) {
+			String o_cur = StringUtils.fill("" + (int)o_weights[fieldID].getWeight() + ", ", 2);
+			o_cur += "  ";
+			o_line += o_cur;
+			
+			String e_cur = StringUtils.fill("" + (int)e_weights[fieldID].getWeight() + ", ", 2);
+			e_cur += "  ";
+			e_line += e_cur;
+		}
+	
+		matrix = o_line + "		" + e_line + "\r\n" + matrix;
+		result += matrix + "\r\n";
+		
+		return result;
+	}
+
+	public double getAverage(double openningPart, int subid) {
+		return openningPart * o_weights[subid].getAverage()
+				+ (1 - openningPart) * e_weights[subid].getAverage();
+	}
+
+	public double getAverage(double openningPart) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void applyChanges() {
+		throw new UnsupportedOperationException();
+	}
+}

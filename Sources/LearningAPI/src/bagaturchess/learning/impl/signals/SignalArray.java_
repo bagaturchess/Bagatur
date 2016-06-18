@@ -1,0 +1,129 @@
+package bagaturchess.learning.impl.signals;
+
+import bagaturchess.bitboard.impl.utils.VarStatistic;
+
+
+
+public class SignalArray extends Signal {
+	
+	//private static int MAX_PARALLEL_COMPONENTS = 64;
+	
+	private int max_id;
+	private int max_parallel_subsignals;
+	private int cur_size;
+	private int[] subIDs;
+	private double[] subSignals;
+	private VarStatistic[] signalstat;
+	
+	
+	//public SignalArray() {
+	//	this(MAX_PARALLEL_COMPONENTS);
+	//}
+	
+	public SignalArray(int _max_id, int _max_parallel_subsignals) {
+		super();
+		
+		max_id = _max_id;
+		max_parallel_subsignals = _max_parallel_subsignals;
+		subIDs = new int[max_parallel_subsignals];
+		subSignals = new double[max_parallel_subsignals];
+		
+		signalstat = new VarStatistic[max_id];
+		for (int i=0; i<signalstat.length; i++) {
+			signalstat[i] = new VarStatistic(false);
+		}
+	}
+	
+	public double getNormalizedStrength() {
+		double result = 0;
+		
+		for (int i=0; i<cur_size; i++) {
+			double signalStrength = subSignals[i];
+			double max = signalstat[i].getMaxVal();
+			
+			if (max == 0) {
+				result += 1;
+			} else {
+				result += Math.abs(signalStrength) / max;
+			}
+		}
+		
+		//result /= cur_size;
+		
+		return result;
+	}
+	
+	public double getRange(int subid) {
+		return Math.max(1, signalstat[subid].getMaxVal());
+	}
+	
+	@Override
+	public void clear() {
+		cur_size = 0;
+		//for (int i=0; i<subSignals.length; i++) {
+		//	subSignals[i] = 0;
+		//}
+	}
+	
+	public double getNonNullRate(int subid) {
+		return signalstat[subid].getCountNonNull() / signalstat[subid].getCount();
+	}
+	
+	@Override
+	public void addStrength(int subid, double subsignal) {
+		if (cur_size >= max_parallel_subsignals) {
+			throw new IllegalStateException("cur_size=" + cur_size + ", max_parallel_subsignals=" + max_parallel_subsignals);
+		}
+		
+		boolean found = false;
+		for (int i=0; i<cur_size; i++) {
+			if (subIDs[i] == subid) {
+				subSignals[i] += subsignal;
+				/*if (subSignals[i] != 0) {
+					signalstat[subid].addValue(subSignals[i], subSignals[i]);
+				}*/
+				found = true;
+				break;
+			}
+		}
+		
+		if (!found) {
+			subIDs[cur_size] = subid;
+			subSignals[cur_size] = subsignal;
+			if (subSignals[cur_size] != 0) {
+				signalstat[subid].addValue(subSignals[cur_size], subSignals[cur_size]);
+			}
+			cur_size++;
+		}
+	}
+	
+	public double getStrengthSum() {
+		double result = 0;
+		for (int i=0; i<cur_size; i++) {
+			result += subSignals[i];
+		}
+		return result;
+	}
+	
+	public int getSubsignalsCount() {
+		return cur_size;
+	}
+	
+	public int[] getSubIDs() {
+		return subIDs;
+	}
+	
+	public double[] getSubsignals() {
+		return subSignals;
+	}
+	
+	@Override
+	public double getStrength() {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void addStrength(int _signalStrength1, int _signalStrength2, double opening_part) {
+		throw new UnsupportedOperationException();
+	}
+}

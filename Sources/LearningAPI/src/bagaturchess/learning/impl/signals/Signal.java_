@@ -1,0 +1,47 @@
+package bagaturchess.learning.impl.signals;
+
+
+import bagaturchess.learning.api.ISignal;
+
+
+public class Signal implements ISignal {
+	
+	private SingleSignal s1 = new SingleSignal();
+	private SingleSignal s2 = new SingleSignal();
+	//private VarStatistic signalstat = new VarStatistic(false);
+	
+	
+	@Override
+	public double getStrength() {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void addStrength(int _signalStrength1, int _signalStrength2, double opening_part) {
+		if (_signalStrength1 != 0 || s1.getOldStrength() != 0) {
+			if (_signalStrength1 != s1.getOldStrength()) {
+				s1.addStrength(_signalStrength1, opening_part);
+				//signalstat.addValue(_signalStrength1 -_signalStrength2, _signalStrength1 - _signalStrength2);
+			}
+		}
+		if (_signalStrength2 != 0 || s2.getOldStrength() != 0) {
+			if (_signalStrength2 != s2.getOldStrength()) {
+				s2.addStrength(_signalStrength2, opening_part);
+				//signalstat.addValue(_signalStrength1 -_signalStrength2, _signalStrength1 - _signalStrength2);
+			}
+		}
+	}
+	
+	@Override
+	public void addStrength(int subid, double subsignal) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void clear() {
+		s1.clear();
+		s2.clear();
+	}
+	
+	
+}
