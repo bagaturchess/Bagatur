@@ -11,6 +11,6 @@ public class RootSearchConfig_SingleCore_MTD_LEARNING extends RootSearchConfig_B
 	}
 	
 	public RootSearchConfig_SingleCore_MTD_LEARNING(String[] args) {
-		super(new String[] {"bagaturchess.search.impl.alg.SearchMTD", SearchConfigImpl_MTD.class.getName(), "cfg.BoardConfigImpl", "cfg.EvaluationConfg"});
+		super(new String[] {"bagaturchess.search.impl.alg.impl0.SearchMTD0", SearchConfigImpl_MTD.class.getName(), "cfg.BoardConfigImpl", "cfg.EvaluationConfg"});
 	}
 }

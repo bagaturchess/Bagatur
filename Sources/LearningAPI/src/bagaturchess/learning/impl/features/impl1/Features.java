@@ -309,4 +309,11 @@ public class Features {
 			System.out.println(fs[i] + ", ");
 		}
 	}
+
+
+	public static void toJavaCode(IFeature[] features) {
+		for (int i = 0; i < features.length; i++) {
+			System.out.println(features[i].toJavaCode());
+		}
+	}
 }

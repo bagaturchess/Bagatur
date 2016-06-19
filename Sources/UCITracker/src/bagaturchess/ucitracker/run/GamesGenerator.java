@@ -48,7 +48,7 @@ import bagaturchess.ucitracker.impl.gamemodel.serialization.GameModelWriter;
 public class GamesGenerator {
 	
 	private static int SEARCH_DEPTH_MIN = 2;
-	private static int SEARCH_DEPTH_MAX = 5;
+	private static int SEARCH_DEPTH_MAX = 10;
 	
 	private static int MAX_EVAL_DIFF = 1500;
 	private static int MAX_MOVES = 300;
