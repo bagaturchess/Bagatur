@@ -35,7 +35,7 @@ public class LRUMapLongObject<T> {
 	
 	
 	private int FACTOR = 1;//2;
-	
+	private int MIN_MAXSIZE = 111;
 	
 	private IBinarySemaphore semaphore;
 	
@@ -81,8 +81,9 @@ public class LRUMapLongObject<T> {
 	
 	private void initBySize(DataObjectFactory<T> _factory, int _maxSize) {
 		
-		if (_maxSize <= 0) {
-			throw new IllegalStateException("Non-positive maxSize=" + maxSize);
+		if (_maxSize < MIN_MAXSIZE) {
+			//throw new IllegalStateException("Negative maxSize=" + maxSize);
+			_maxSize = MIN_MAXSIZE;
 		}
 		
 		factory = _factory;

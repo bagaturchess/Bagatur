@@ -1,6 +1,8 @@
 package bagaturchess.search.impl.env;
 
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Vector;
 
@@ -26,13 +28,18 @@ import bagaturchess.uci.api.IChannel;
 public class MemoryConsumers {
 	
 	
-	private static int JVMDLL_MEMORY_CONSUMPTION = 20 * 1024 * 1024;
+	private static int JVMDLL_MEMORY_CONSUMPTION 						= 20 * 1024 * 1024;
 	private static int MIN_MEMORY_BUFFER;
 	private static double MEMORY_USAGE_PERCENT; 
 	
-	private static final int CALCULATION_MAX_MB 				= 177;
-	private static final int CALCULATION_MULTIPLIER_FOR_SIZES_1	= 1000;
-	private static final int CALCULATION_MULTIPLIER_FOR_SIZES_2	= 100;
+	private static final int SIZE_MIN_ENTRIES_MULTIPLIER				= 111;
+	private static final int SIZE_MIN_ENTRIES_TPT						= 27 * SIZE_MIN_ENTRIES_MULTIPLIER;
+	private static final int SIZE_MIN_ENTRIES_EC						= 21 * SIZE_MIN_ENTRIES_MULTIPLIER;
+	private static final int SIZE_MIN_ENTRIES_PEC						= 1 * SIZE_MIN_ENTRIES_MULTIPLIER;
+	private static final int SIZE_MIN_ENTRIES_GTB						= 9 * SIZE_MIN_ENTRIES_MULTIPLIER;
+	
+	private static InputStream is_w_openning_book;
+	private static InputStream is_b_openning_book;
 	
 	
 	public static void set_JVMDLL_MEMORY_CONSUMPTION(int val) {
@@ -47,6 +54,11 @@ public class MemoryConsumers {
 		MEMORY_USAGE_PERCENT = val;	
 	}
 	
+	public static void set_OpenningBook_Streams(InputStream is_w, InputStream is_b) {
+		is_w_openning_book = is_w;
+		is_b_openning_book = is_b;
+	}
+	
 	static {
 		if (getJVMBitmode() == 64) {
 			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
@@ -54,6 +66,14 @@ public class MemoryConsumers {
 		} else { //32
 			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
 			MEMORY_USAGE_PERCENT =  0.23;
+		}
+		
+		try {
+			is_w_openning_book = new FileInputStream("./data/w.ob");
+			is_b_openning_book = new FileInputStream("./data/b.ob");
+			set_OpenningBook_Streams(is_w_openning_book, is_b_openning_book);
+		} catch(Throwable t) {
+			ChannelManager.getChannel().dump("Unable to load Openning Book. Error while openning file streams: " + t.getMessage());
 		}
 	}
 	
@@ -111,61 +131,52 @@ public class MemoryConsumers {
 		
 		ChannelManager.getChannel().dump("Openning Book enabled: " + ownBookEnabled);
 		//if (ownBookEnabled) {
-			//Thread loadOB = new Thread(new Runnable() {
-			//	
-			//	@Override
-			//	public void run() {
-					
-					lastAvailable_in_MB = ((getAvailableMemory()) / (1024 * 1024));
-					ChannelManager.getChannel().dump("Openning Book ... ");
-					try {
-						openingBook = OpeningBookFactory.getBook();
-						ChannelManager.getChannel().dump("Openning Book OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
-					} catch(Exception e) {
-						ChannelManager.getChannel().dump("Unable to load Openning Book. Error is:");
-						channel.dump(e);
-					}
-			//	}
-			//});
-			//loadOB.start();
+
+			lastAvailable_in_MB = ((getAvailableMemory()) / (1024 * 1024));
+			ChannelManager.getChannel().dump("Openning Book ... ");
+			if (is_w_openning_book == null || is_b_openning_book == null) {
+				ChannelManager.getChannel().dump("No file streams to openning book data");
+			} else {
+				try {
+					openingBook = OpeningBookFactory.getBook(is_w_openning_book, is_b_openning_book);
+					ChannelManager.getChannel().dump("Openning Book OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
+				} catch(Exception e) {
+					ChannelManager.getChannel().dump("Unable to load Openning Book. Error is:");
+					channel.dump(e);
+				}
+			}
+
 		//}
 		
-		//Thread loadEGTB = new Thread(new Runnable() {
+
+		ChannelManager.getChannel().dump("Loading modules for Gaviota Endgame Tablebases support ... ");
+		
+		gtbs			 = new Vector<GTBProbing>();
+		
+		int threadsCount = engineConfiguration.getThreadsCount();
+		
+		if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
 			
-			//@Override
-			//public void run() {
-				
-				ChannelManager.getChannel().dump("Loading modules for Gaviota Endgame Tablebases support ... ");
-				
-				gtbs			 = new Vector<GTBProbing>();
-				
-				int threadsCount = engineConfiguration.getThreadsCount();
-				
-				if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
-					
-					for (int i=0; i<threadsCount; i++) {
-						GTBProbing gtb = new GTBProbing();
-						gtb.setPath_Sync(
-								engineConfiguration.getGaviotaTbPath(),
-								engineConfiguration.getGaviotaTbCache());
-						gtbs.add(gtb);
-					}
-					
-					//try {Thread.sleep(10000);} catch (InterruptedException e1) {}
-					ChannelManager.getChannel().dump("Modules for Gaviota Endgame Tablebases OK. Will try to load Gaviota Tablebases from => " + engineConfiguration.getGaviotaTbPath());
-				} else {
-					//TODO: set percent to 0 and log corresponding message for the sizes
-					//Can't load IA 32-bit .dll on a AMD 64-bit platform
-					//throw new IllegalStateException("egtbprobe dynamic library could not be loaded (or not found)");
-					ChannelManager.getChannel().dump(GTBProbing_NativeWrapper.getErrorMessage());
-					
-					for (int i=0; i<threadsCount; i++) {
-						gtbs.add(null);
-					}
-				}
-		//	}
-		//});
-		//loadEGTB.start();
+			for (int i=0; i<threadsCount; i++) {
+				GTBProbing gtb = new GTBProbing();
+				gtb.setPath_Sync(
+						engineConfiguration.getGaviotaTbPath(),
+						engineConfiguration.getGaviotaTbCache());
+				gtbs.add(gtb);
+			}
+			
+			//try {Thread.sleep(10000);} catch (InterruptedException e1) {}
+			ChannelManager.getChannel().dump("Modules for Gaviota Endgame Tablebases OK. Will try to load Gaviota Tablebases from => " + engineConfiguration.getGaviotaTbPath());
+		} else {
+			//TODO: set percent to 0 and log corresponding message for the sizes
+			//Can't load IA 32-bit .dll on a AMD 64-bit platform
+			//throw new IllegalStateException("egtbprobe dynamic library could not be loaded (or not found)");
+			ChannelManager.getChannel().dump(GTBProbing_NativeWrapper.getErrorMessage());
+			
+			for (int i=0; i<threadsCount; i++) {
+				gtbs.add(null);
+			}
+		}
 		
 		
 		ChannelManager.getChannel().dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
@@ -208,32 +219,19 @@ public class MemoryConsumers {
 		//			+ (availableMemory / (1024 * 1024)) + " are available). Please increase the -Xmx option of Java VM");
 		//}
 		
-		int size_tpt = getTPTEntrySize(availableMemory);
+		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, getTPTEntrySize(availableMemory, SIZE_MIN_ENTRIES_TPT));
 		ChannelManager.getChannel().dump("Transposition Table size is " + size_tpt);
 		
-		int size_ec = getEvalCacheSize(availableMemory);
+		int size_ec = Math.max(SIZE_MIN_ENTRIES_EC, getEvalCacheSize(availableMemory, SIZE_MIN_ENTRIES_EC));
 		ChannelManager.getChannel().dump("Eval Cache size is " + size_ec);
-		int size_pc = 0;
 		
-		
-		String pawnsCacheName = engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName();
-		if (pawnsCacheName != null) {
-			size_pc = getPawnsEvalCacheSize(availableMemory, pawnsCacheName);
-		}
+		int size_pc = Math.max(SIZE_MIN_ENTRIES_PEC, getPawnsEvalCacheSize(availableMemory, engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName(), SIZE_MIN_ENTRIES_PEC));
 		ChannelManager.getChannel().dump("Pawns Eval Cache size is " + size_pc);
 
 		int size_gtb_out = 0;
 		if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
-			size_gtb_out = getGTBEntrySize_OUT(availableMemory);
+			size_gtb_out = Math.max(SIZE_MIN_ENTRIES_GTB, getGTBEntrySize_OUT(availableMemory, SIZE_MIN_ENTRIES_GTB));
 			ChannelManager.getChannel().dump("Endgame Table Bases cache (OUT) size is " + size_gtb_out);
-			if (size_gtb_out <= 0) {//GC is still not ready with the clean up
-				ChannelManager.getChannel().dump("Endgame Table Bases cache (OUT) size is less than zero. Try again the calculation 1.");
-				size_gtb_out = getGTBEntrySize_OUT(availableMemory);
-				if (size_gtb_out <= 0) {
-					ChannelManager.getChannel().dump("Endgame Table Bases cache (OUT) size is less than zero. Try again the calculation 2.");
-					size_gtb_out = getGTBEntrySize_OUT(availableMemory);
-				}
-			}
 		}
 		
 		
@@ -253,11 +251,9 @@ public class MemoryConsumers {
 			
 			tpt.add(new TPTable(size_tpt, false, new BinarySemaphore_Dummy()));
 			
-			if (size_pc != 0) {
-				DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(pawnsCacheName);
-				pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
-			}
-			
+			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName());
+			pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
+		
 			if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
 				gtbCache_out.add(new GTBCache_OUT(size_gtb_out, false, new BinarySemaphore_Dummy()));
 			} else {
@@ -267,12 +263,12 @@ public class MemoryConsumers {
 	}
 	
 	
-	private int getTPTEntrySize(long availableMemory) {
+	private int getTPTEntrySize(long availableMemory, int test_size) {
 		int availableMemory_in_MB = (int) (availableMemory / (1024 * 1024));
 		if (availableMemory_in_MB < 1) {
-			throw new IllegalStateException("Not enough memory for initializing Transposition Table. Please increase the -Xmx option of Java VM");
+			//throw new IllegalStateException("Not enough memory for initializing Transposition Table. Please increase the -Xmx option of Java VM");
+			availableMemory_in_MB = 1;
 		}
-		int test_size = Math.min(CALCULATION_MAX_MB, availableMemory_in_MB) * CALCULATION_MULTIPLIER_FOR_SIZES_1;
 		
 		System.gc();
 		int memory_before = getUsedMemory();
@@ -283,12 +279,12 @@ public class MemoryConsumers {
 	}
 	
 	
-	private int getGTBEntrySize_OUT(long availableMemory) {
+	private int getGTBEntrySize_OUT(long availableMemory, int test_size) {
 		int availableMemory_in_MB = (int) (availableMemory / (1024 * 1024));
 		if (availableMemory_in_MB < 1) {
-			throw new IllegalStateException("Not enough memory for initializing Endgame Table Bases cache (OUT). Please increase the -Xmx option of Java VM");
+			//throw new IllegalStateException("Not enough memory for initializing Endgame Table Bases cache (OUT). Please increase the -Xmx option of Java VM");
+			availableMemory_in_MB = 1;
 		}
-		int test_size = Math.min(CALCULATION_MAX_MB, availableMemory_in_MB) * CALCULATION_MULTIPLIER_FOR_SIZES_1;
 		
 		System.gc();
 		int memory_before = getUsedMemory();
@@ -298,12 +294,12 @@ public class MemoryConsumers {
 		return size;
 	}
 
-	private int getEvalCacheSize(long availableMemory) {
+	private int getEvalCacheSize(long availableMemory, int test_size) {
 		int availableMemory_in_MB = (int) (availableMemory / (1024 * 1024));
 		if (availableMemory_in_MB < 1) {
-			throw new IllegalStateException("Not enough memory for initializing Eval Cache. Please increase the -Xmx option of Java VM");
+			//throw new IllegalStateException("Not enough memory for initializing Eval Cache. Please increase the -Xmx option of Java VM");
+			availableMemory_in_MB = 1;
 		}
-		int test_size = Math.min(CALCULATION_MAX_MB, availableMemory_in_MB) * CALCULATION_MULTIPLIER_FOR_SIZES_1;
 		
 		System.gc();
 		int memory_before = getUsedMemory();
@@ -314,12 +310,12 @@ public class MemoryConsumers {
 		return size;
 	}
 	
-	private int getPawnsEvalCacheSize(long availableMemory, String pawnsCacheName) {
+	private int getPawnsEvalCacheSize(long availableMemory, String pawnsCacheName, int test_size) {
 		int availableMemory_in_MB = (int) (availableMemory / (1024 * 1024));
 		if (availableMemory_in_MB < 1) {
-			throw new IllegalStateException("Not enough memory for initializing Pawns Eval Cache. Please increase the -Xmx option of Java VM");
+			//throw new IllegalStateException("Not enough memory for initializing Pawns Eval Cache. Please increase the -Xmx option of Java VM");
+			availableMemory_in_MB = 1;
 		}
-		int test_size = Math.min(CALCULATION_MAX_MB, availableMemory_in_MB) * CALCULATION_MULTIPLIER_FOR_SIZES_2;
 		
 		System.gc();
 		int memory_before = getUsedMemory();
@@ -329,6 +325,7 @@ public class MemoryConsumers {
 		test_pc.clear();
 		return size;
 	}
+	
 	
 	private int getEntrySize(long availableMemory, double usagePercent, int test_size, int memory_before) {
 		int memory_after = getUsedMemory();

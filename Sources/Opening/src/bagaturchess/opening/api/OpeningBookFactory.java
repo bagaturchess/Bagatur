@@ -39,19 +39,30 @@ public class OpeningBookFactory {
 	private static final int BUFFER_SIZE = 1024 * 1024;
 	
 	
-	private static final String whiteOpeningPath = "./data/w.ob";
-	private static final String blackOpeningPath = "./data/b.ob";
-	
 	private static OpeningBook ob;
 	
 	
-	public static OpeningBook getBook() {
+	/*public static OpeningBook getBook() {
+		
+		try {
+			InputStream is_w = new FileInputStream(whiteOpeningPath);
+			InputStream is_b = new FileInputStream(blackOpeningPath);
+			return getBook(is_w, is_b);
+			
+		} catch (Throwable t) {
+			throw new IllegalStateException("No book");
+		}
+	}
+	*/
+	
+	
+	public static OpeningBook getBook(InputStream is_w, InputStream is_b) {
 		if (ob == null) {
 			synchronized (OpeningBookFactory.class) {
 				if (ob == null) {
 					try {
-						ob = OpeningBookFactory.load();
-					} catch (Exception e) {
+						ob = OpeningBookFactory.load(is_w, is_b);
+					} catch (Throwable t) {
 						throw new IllegalStateException("No book");
 					}
 				}
@@ -79,16 +90,15 @@ public class OpeningBookFactory {
 		return null;
 	}
 	
-	private static OpeningBook load_FileSystem(String inFileName) throws FileNotFoundException, IOException, ClassNotFoundException {
-		InputStream is = new FileInputStream(inFileName);
+	private static OpeningBook load_FileSystem(InputStream is) throws FileNotFoundException, IOException, ClassNotFoundException {
 		ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(is, BUFFER_SIZE));
 		OpeningBook result = (OpeningBook) ois.readObject();
 		return result;
 	}
 	
-	public static OpeningBook load() throws FileNotFoundException, IOException, ClassNotFoundException {
-		OpeningBook white = load_FileSystem(whiteOpeningPath);
-		OpeningBook black = load_FileSystem(blackOpeningPath);
+	public static OpeningBook load(InputStream is_w, InputStream is_b) throws FileNotFoundException, IOException, ClassNotFoundException {
+		OpeningBook white = load_FileSystem(is_w);
+		OpeningBook black = load_FileSystem(is_b);
 		if (white != null && black != null) {
 			return new OpeningBookWithBothPlayersImpl(white, black);
 		} else {
