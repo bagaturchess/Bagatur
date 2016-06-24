@@ -83,7 +83,10 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		
 		//Should be initialized after the searchers to handle memory in a correct way.
 		sharedData.setMemoryConsumers(new MemoryConsumers(ChannelManager.getChannel(), rootSearchCfg, searchAdaptorCfg.isOwnBookEnabled()));
-		saver = new TimeSaver(sharedData, rootSearchCfg, boardForSetup);
+		
+		if (sharedData.getOpeningBook() != null) {
+			saver = new TimeSaver(sharedData.getOpeningBook());	
+		}
 	}
 	
 	
@@ -155,10 +158,10 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		
 		currentMediator.dump("IsEndlessSearch: " + isEndlessSearch);
 		
-		if (!isEndlessSearch) {
+		if (saver != null && !isEndlessSearch) {
 			currentMediator.dump("Using TimeSaver ...");
 			
-			boolean moveSent = saver.beforeMove(boardForSetup, sharedData, currentMediator, searchAdaptorCfg.isOwnBookEnabled());
+			boolean moveSent = saver.beforeMove(boardForSetup, sharedData.getSearchConfig().isOpenningModeRandom(), currentMediator, searchAdaptorCfg.isOwnBookEnabled());
 			
 			if (!moveSent) {
 				

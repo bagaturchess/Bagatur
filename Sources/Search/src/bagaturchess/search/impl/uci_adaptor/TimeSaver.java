@@ -2,15 +2,12 @@ package bagaturchess.search.impl.uci_adaptor;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.egtb.gaviota.GTBProbing;
 import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
-import bagaturchess.search.api.IEvaluator;
-import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
@@ -23,17 +20,17 @@ public class TimeSaver {
 	
 	private GTBProbing egtbProbing;
 	private OpeningBook ob;
-	private IBitBoard bitboard;
+	//private IBitBoard bitboard;
 	
 	
-	public TimeSaver(SharedData sharedData, IRootSearchConfig rootSearchCfg, IBitBoard boardForSetup) {
-		ob = sharedData.getOpeningBook();
-		bitboard = new Board(boardForSetup.toEPD(), null, rootSearchCfg.getBoardConfig());
+	public TimeSaver(OpeningBook _ob /*, IRootSearchConfig rootSearchCfg, IBitBoard boardForSetup*/) {
+		ob = _ob;
+		//bitboard = new Board(boardForSetup.toEPD(), null, rootSearchCfg.getBoardConfig());
 		//egtbProbing = sharedData.getGTBProbing();
 	}
 	
 	
-	public boolean beforeMove(IBitBoard bitboardForSetup, SharedData sharedData, ISearchMediator mediator, boolean useOpening) {
+	public boolean beforeMove(IBitBoard bitboardForSetup, boolean isOpenningModeRandom, ISearchMediator mediator, boolean useOpening) {
 
 		
 		mediator.dump("TimeSaver: useOpening = " + useOpening + ", ob=" + ob);
@@ -42,9 +39,7 @@ public class TimeSaver {
 			IOpeningEntry entry = ob.getEntry(bitboardForSetup.getHashKey(), bitboardForSetup.getColourToMove());
 			if (entry != null) {
 				
-				boolean randomOpenning = sharedData.getSearchConfig().isOpenningModeRandom();
-				
-				int move = randomOpenning ? entry.getRandomEntry() : entry.getMostPlayedEntry();
+				int move = isOpenningModeRandom ? entry.getRandomEntry() : entry.getMostPlayedEntry();
 				//int move = getOpeningMove_Evaluation(entry, sharedData, bitboardForSetup, mediator);
 				
 				mediator.dump("TimeSaver: Opening move " + MoveInt.moveToString(move));
@@ -176,7 +171,7 @@ public class TimeSaver {
 	}
 	
 	
-	protected void setupBoard(IBitBoard _bitboardForSetup) {
+	/*protected void setupBoard(IBitBoard _bitboardForSetup) {
 		bitboard.revert();
 		
 		int movesCount = _bitboardForSetup.getPlayedMovesCount();
@@ -260,4 +255,6 @@ public class TimeSaver {
 		
 		return best_val;
 	}
+	
+	*/
 }

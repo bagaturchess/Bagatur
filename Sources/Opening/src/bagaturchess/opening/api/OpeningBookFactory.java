@@ -42,7 +42,12 @@ public class OpeningBookFactory {
 	private static OpeningBook ob;
 	
 	
-	public static OpeningBook getBook(InputStream is_w, InputStream is_b) {
+	public static OpeningBook getBook() {
+		return ob;
+	}
+	
+	
+	public static OpeningBook initBook(InputStream is_w, InputStream is_b) {
 		if (ob == null) {
 			synchronized (OpeningBookFactory.class) {
 				if (ob == null) {

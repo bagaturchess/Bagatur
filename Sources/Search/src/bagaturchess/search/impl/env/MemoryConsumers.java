@@ -38,9 +38,6 @@ public class MemoryConsumers {
 	private static final int SIZE_MIN_ENTRIES_PEC						= 1 * SIZE_MIN_ENTRIES_MULTIPLIER;
 	private static final int SIZE_MIN_ENTRIES_GTB						= 9 * SIZE_MIN_ENTRIES_MULTIPLIER;
 	
-	private static InputStream is_w_openning_book;
-	private static InputStream is_b_openning_book;
-	
 	
 	public static void set_JVMDLL_MEMORY_CONSUMPTION(int val) {
 		JVMDLL_MEMORY_CONSUMPTION = val;	
@@ -54,10 +51,6 @@ public class MemoryConsumers {
 		MEMORY_USAGE_PERCENT = val;	
 	}
 	
-	public static void set_OpenningBook_Streams(InputStream is_w, InputStream is_b) {
-		is_w_openning_book = is_w;
-		is_b_openning_book = is_b;
-	}
 	
 	static {
 		if (getJVMBitmode() == 64) {
@@ -69,9 +62,11 @@ public class MemoryConsumers {
 		}
 		
 		try {
-			is_w_openning_book = new FileInputStream("./data/w.ob");
-			is_b_openning_book = new FileInputStream("./data/b.ob");
-			set_OpenningBook_Streams(is_w_openning_book, is_b_openning_book);
+			if (OpeningBookFactory.getBook() == null) {
+				InputStream is_w_openning_book = new FileInputStream("./data/w.ob");
+				InputStream is_b_openning_book = new FileInputStream("./data/b.ob");
+				OpeningBookFactory.initBook(is_w_openning_book, is_b_openning_book);				
+			}
 		} catch(Throwable t) {
 			ChannelManager.getChannel().dump("Unable to load Openning Book. Error while openning file streams: " + t.getMessage());
 		}
@@ -134,11 +129,11 @@ public class MemoryConsumers {
 
 			lastAvailable_in_MB = ((getAvailableMemory()) / (1024 * 1024));
 			ChannelManager.getChannel().dump("Openning Book ... ");
-			if (is_w_openning_book == null || is_b_openning_book == null) {
-				ChannelManager.getChannel().dump("No file streams to openning book data");
+			if (OpeningBookFactory.getBook() == null) {
+				ChannelManager.getChannel().dump("No openning book");
 			} else {
 				try {
-					openingBook = OpeningBookFactory.getBook(is_w_openning_book, is_b_openning_book);
+					openingBook = OpeningBookFactory.getBook();
 					ChannelManager.getChannel().dump("Openning Book OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
 				} catch(Exception e) {
 					ChannelManager.getChannel().dump("Unable to load Openning Book. Error is:");
