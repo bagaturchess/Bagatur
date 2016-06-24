@@ -42,20 +42,6 @@ public class OpeningBookFactory {
 	private static OpeningBook ob;
 	
 	
-	/*public static OpeningBook getBook() {
-		
-		try {
-			InputStream is_w = new FileInputStream(whiteOpeningPath);
-			InputStream is_b = new FileInputStream(blackOpeningPath);
-			return getBook(is_w, is_b);
-			
-		} catch (Throwable t) {
-			throw new IllegalStateException("No book");
-		}
-	}
-	*/
-	
-	
 	public static OpeningBook getBook(InputStream is_w, InputStream is_b) {
 		if (ob == null) {
 			synchronized (OpeningBookFactory.class) {

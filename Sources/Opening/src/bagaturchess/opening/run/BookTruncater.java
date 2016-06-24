@@ -27,11 +27,13 @@ public class BookTruncater {
 	public static void main(String args[]) {
 		try {
 			
-			int size = 2;
+			int size = 30;
 			//String input = "./../OpeningGenerator/w.ob";
 			//String output = "./../OpeningGenerator/w2.ob";
-			String input = "./../OpeningGenerator/b.ob";
-			String output = "./../OpeningGenerator/b2.ob";
+			//String input = "./../OpeningGenerator/b.ob";
+			//String output = "./../OpeningGenerator/b2.ob";
+			String input = "./w.ob";
+			String output = "./w30.ob";
 			
 			OpeningBook ob = OpeningBookFactory.load(input);
 			
