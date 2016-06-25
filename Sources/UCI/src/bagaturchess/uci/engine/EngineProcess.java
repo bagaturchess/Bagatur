@@ -20,7 +20,7 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.ucitracker.impl;
+package bagaturchess.uci.engine;
 
 
 import java.io.BufferedReader;
@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Engine {
+public class EngineProcess {
 	
 	
 	private String startCommand;
@@ -44,10 +44,10 @@ public class Engine {
 	private BufferedWriter os;
 	private BufferedReader err;
 	
-	private EngineDummperThread dummper;
+	private EngineProcessDummperThread dummper;
 	
 	
-	public Engine(String _startCommand, String[] _props, String _workDir) {
+	public EngineProcess(String _startCommand, String[] _props, String _workDir) {
 		System.out.println(_startCommand);
 		startCommand = _startCommand;
 		props = _props;
@@ -69,9 +69,9 @@ public class Engine {
 		os = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 		err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 		
-		dummper = new EngineDummperThread("OUT", is);
+		dummper = new EngineProcessDummperThread("OUT", is);
 		dummper.start();
-		(new EngineDummperThread("ERR", err)).start();
+		(new EngineProcessDummperThread("ERR", err)).start();
 	}
 	
 	public void stop() throws IOException {

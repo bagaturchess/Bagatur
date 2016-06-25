@@ -20,38 +20,40 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.ucitracker.impl;
+package bagaturchess.uci.engine;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import bagaturchess.uci.engine.EngineProcess;
 
 
-public class UCIEnginesRunner {
+
+public class UCIEnginesManager {
 
 	
-	private List<Engine> engines;
+	private List<EngineProcess> engines;
 	
 	
-	public UCIEnginesRunner() {
-		engines = new ArrayList<Engine>();
+	public UCIEnginesManager() {
+		engines = new ArrayList<EngineProcess>();
 	}
 	
 	
-	public void addEngine(Engine engine) {
+	public void addEngine(EngineProcess engine) {
 		engines.add(engine);
 	}
 	
 			
 	public void startEngines() throws IOException  {
-		for (Engine engine: engines) {
+		for (EngineProcess engine: engines) {
 			engine.start();
 		}
 	}
 
 	public void stopEngines() throws IOException  {
-		for (Engine engine: engines) {
+		for (EngineProcess engine: engines) {
 			engine.stop();
 		}
 	}
@@ -62,7 +64,7 @@ public class UCIEnginesRunner {
 		disable();
 		
 		int counter = 1;
-		for (Engine engine: engines) {			
+		for (EngineProcess engine: engines) {			
 			if (engine.supportsUCI()) {
 				System.out.println("Engine " + counter + " supports UCI");
 			}
@@ -79,7 +81,7 @@ public class UCIEnginesRunner {
 		disable();
 		
 		int counter = 1;
-		for (Engine engine: engines) {			
+		for (EngineProcess engine: engines) {			
 			if (engine.isReady()) {
 				System.out.println("Engine " + counter + " is ready");
 			}
@@ -95,7 +97,7 @@ public class UCIEnginesRunner {
 		
 		disable();
 		
-		for (Engine engine: engines) {			
+		for (EngineProcess engine: engines) {			
 			engine.newGame();
 		}
 		System.out.println("New game started");
@@ -108,7 +110,7 @@ public class UCIEnginesRunner {
 		
 		disable();
 		
-		for (Engine engine: engines) {			
+		for (EngineProcess engine: engines) {			
 			engine.setupPossition(epd);
 		}
 		//System.out.println("Position set");
@@ -121,7 +123,7 @@ public class UCIEnginesRunner {
 		
 		//disable();
 		
-		for (Engine engine: engines) {			
+		for (EngineProcess engine: engines) {			
 			engine.go(depth);
 		}
 		//System.out.println("Started");
@@ -131,14 +133,14 @@ public class UCIEnginesRunner {
 	
 	
 	public void enable() {
-		for (Engine engine: engines) {			
+		for (EngineProcess engine: engines) {			
 			engine.setDummperMode(true);
 		}
 	}
 	
 	
 	public void disable() {
-		for (Engine engine: engines) {			
+		for (EngineProcess engine: engines) {			
 			engine.setDummperMode(false);
 		}
 	}
@@ -146,7 +148,7 @@ public class UCIEnginesRunner {
 	
 	public List<String> getInfoLines() throws IOException {
 		List<String> lines = new ArrayList<String>();
-		for (Engine engine: engines) {			
+		for (EngineProcess engine: engines) {			
 			lines.add(engine.getInfoLine());
 		}
 		return lines;

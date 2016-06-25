@@ -23,7 +23,7 @@
 package com.bagaturchess.ucitournament.single.schedule;
 
 
-import bagaturchess.ucitracker.impl.Engine;
+import bagaturchess.uci.engine.EngineProcess;
 
 import com.bagaturchess.ucitournament.framework.Pair;
 
@@ -31,5 +31,5 @@ import com.bagaturchess.ucitournament.framework.Pair;
 public interface ITournamentSchedule {
 	public int getRounds();
 	public Pair[] getPairsByRound(int round);
-	public Engine[] getEngines();
+	public EngineProcess[] getEngines();
 }

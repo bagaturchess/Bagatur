@@ -23,12 +23,11 @@
 package com.bagaturchess.ucitournament.single.runner;
 
 
-import bagaturchess.ucitracker.impl.Engine;
+import bagaturchess.uci.engine.EngineProcess;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
-import com.bagaturchess.ucitournament.framework.match.MatchRunner_TimeAndInc;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_TimePerMove;
-import com.bagaturchess.ucitournament.framework.utils.BagaturEngine;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl;
 import com.bagaturchess.ucitournament.single.Tournament;
 import com.bagaturchess.ucitournament.single.schedule.ITournamentSchedule;
 import com.bagaturchess.ucitournament.single.schedule.TournamentSchedule_EvenScores;
@@ -56,12 +55,12 @@ public class TournamentRunner_NEW {
 		//arg.8=bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl
 		//arg.9=bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2
 		
-		BagaturEngine bagatur1 = new BagaturEngine("Bagatur_1.2", programargs_bagatur12);
-		BagaturEngine bagatur2 = new BagaturEngine("Bagatur_MTD1", programargs_bagaturMTD1);
+		EngineProcess_BagaturImpl bagatur1 = new EngineProcess_BagaturImpl("Bagatur_1.2", programargs_bagatur12);
+		EngineProcess_BagaturImpl bagatur2 = new EngineProcess_BagaturImpl("Bagatur_MTD1", programargs_bagaturMTD1);
 		
 		
 		
-		Engine[] engines = new Engine[] {bagatur1, bagatur2};
+		EngineProcess[] engines = new EngineProcess[] {bagatur1, bagatur2};
 		
 		try {
 			

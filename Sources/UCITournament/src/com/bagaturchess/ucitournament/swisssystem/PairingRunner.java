@@ -5,11 +5,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import bagaturchess.ucitracker.impl.Engine;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl;
+import bagaturchess.uci.engine.EngineProcess;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_FixedNodes;
-import com.bagaturchess.ucitournament.framework.utils.BagaturEngine;
 
 
 public class PairingRunner {
@@ -148,8 +148,8 @@ public class PairingRunner {
 			}
 		}*/
 		
-		Engine white = new BagaturEngine(pair.getWhite().getName(), pair.getWhite().getProgramArgs());
-		Engine black = new BagaturEngine(pair.getBlack().getName(), pair.getBlack().getProgramArgs());
+		EngineProcess white = new EngineProcess_BagaturImpl(pair.getWhite().getName(), pair.getWhite().getProgramArgs());
+		EngineProcess black = new EngineProcess_BagaturImpl(pair.getBlack().getName(), pair.getBlack().getProgramArgs());
 		
 		white.start();
 		Thread.sleep(5);

@@ -26,10 +26,10 @@ package com.bagaturchess.ucitournament.rating;
 import java.io.IOException;
 import java.util.Random;
 
-import bagaturchess.ucitracker.impl.Engine;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl;
+import bagaturchess.uci.engine.EngineProcess;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
-import com.bagaturchess.ucitournament.framework.utils.BagaturEngine;
 
 
 public abstract class PlayingStrategy_BaseImpl implements IPlayingStrategy {
@@ -51,8 +51,8 @@ public abstract class PlayingStrategy_BaseImpl implements IPlayingStrategy {
 	
 	void playPair(EngineMetaInf[] pair) throws IOException, InterruptedException {
 
-		Engine white = new BagaturEngine(pair[0].getName(), pair[0].getProgramArgs());
-		Engine black = new BagaturEngine(pair[1].getName(), pair[1].getProgramArgs());
+		EngineProcess white = new EngineProcess_BagaturImpl(pair[0].getName(), pair[0].getProgramArgs());
+		EngineProcess black = new EngineProcess_BagaturImpl(pair[1].getName(), pair[1].getProgramArgs());
 		
 		white.start();
 		Thread.sleep(5);

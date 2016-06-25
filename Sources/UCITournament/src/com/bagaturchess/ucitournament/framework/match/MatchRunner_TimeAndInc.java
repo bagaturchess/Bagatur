@@ -25,7 +25,7 @@ package com.bagaturchess.ucitournament.framework.match;
 import java.io.IOException;
 
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.ucitracker.impl.Engine;
+import bagaturchess.uci.engine.EngineProcess;
 
 
 public class MatchRunner_TimeAndInc extends MatchRunner {
@@ -67,7 +67,7 @@ public class MatchRunner_TimeAndInc extends MatchRunner {
 	}
 	
 	@Override
-	protected void go(Engine engine) throws IOException {
+	protected void go(EngineProcess engine) throws IOException {
 		engine.go_TimeAndInc(cur_wtime_InMilis, cur_btime_InMilis, cur_winc_InMilis, cur_binc_InMilis);
 	}
 	

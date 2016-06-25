@@ -22,37 +22,36 @@
  */
 package com.bagaturchess.ucitournament.framework.utils;
 
-
-import bagaturchess.ucitracker.impl.Engine;
+import bagaturchess.uci.engine.EngineProcess;
 
 
 public class FixedEngines {
 	
-	public static Engine glaurung = new Engine("E:\\own\\Projects\\ARENA\\Arena\\Engines\\glaurung22\\Windows\\glaurung-w32.exe",
+	public static EngineProcess glaurung = new EngineProcess("E:\\own\\Projects\\ARENA\\Arena\\Engines\\glaurung22\\Windows\\glaurung-w32.exe",
 			new String [0],
 			"E:\\own\\Projects\\ARENA\\Arena\\Engines\\glaurung22\\Windows\\");
 	
-	public static Engine rybka = new Engine("E:/own/Projects/ARENA/rybka/Rybka.exe",
+	public static EngineProcess rybka = new EngineProcess("E:/own/Projects/ARENA/rybka/Rybka.exe",
 			new String [0],
 			"E:/own/Projects/ARENA/rybka/");
 	
-	public static Engine aice = new Engine("E:\\own\\Projects\\ARENA\\Engines\\aice0992\\aice.exe",
+	public static EngineProcess aice = new EngineProcess("E:\\own\\Projects\\ARENA\\Engines\\aice0992\\aice.exe",
 			new String [0],
 			"E:\\own\\Projects\\ARENA\\Engines\\aice0992\\");
 	
-	public static Engine mediocre = new Engine("java -Xmx256M -classpath E:\\own\\Projects\\ARENA\\Engines\\MEDIOCRE\\bin Mediocre",
+	public static EngineProcess mediocre = new EngineProcess("java -Xmx256M -classpath E:\\own\\Projects\\ARENA\\Engines\\MEDIOCRE\\bin Mediocre",
 			new String [0], //new String [] {"JAVA_HOME=C:\\jdk1.5.0_12", "Path=C:\\jdk1.5.0_12\\bin"}, 
 			"E:\\own\\Projects\\ARENA\\Engines\\MEDIOCRE");
 	
-	public static Engine fruit21 = new Engine("E:\\own\\Projects\\ARENA\\Engines\\fruit_21\\fruit_21",
+	public static EngineProcess fruit21 = new EngineProcess("E:\\own\\Projects\\ARENA\\Engines\\fruit_21\\fruit_21",
 			new String [0],
 			"E:\\own\\Projects\\ARENA\\Engines\\fruit_21\\");
 	
-	public static Engine Houdini_15a_w32 = new Engine("C:\\own\\chess\\ENGINES\\Houdini_15a\\Houdini_15a_w32.exe",
+	public static EngineProcess Houdini_15a_w32 = new EngineProcess("C:\\own\\chess\\ENGINES\\Houdini_15a\\Houdini_15a_w32.exe",
 			new String [0],
 			"C:\\own\\chess\\ENGINES\\Houdini_15a\\");
 	
-	public static Engine Stockfish_211_32_ja = new Engine("C:\\own\\chess\\ENGINES\\stockfish-211-ja\\Windows\\stockfish-211-32-ja.exe",
+	public static EngineProcess Stockfish_211_32_ja = new EngineProcess("C:\\own\\chess\\ENGINES\\stockfish-211-ja\\Windows\\stockfish-211-32-ja.exe",
 			new String [0],
 			"C:\\own\\chess\\ENGINES\\stockfish-211-ja\\Windows\\");
 	

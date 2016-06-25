@@ -22,28 +22,27 @@
  */
 package com.bagaturchess.ucitournament.framework;
 
-
-import bagaturchess.ucitracker.impl.Engine;
+import bagaturchess.uci.engine.EngineProcess;
 
 
 public class Pair {
 	
 	
-	private Engine whiteEngine;
-	private Engine blackEngine;
+	private EngineProcess whiteEngine;
+	private EngineProcess blackEngine;
 	
 	
-	public Pair(Engine _whiteEngine, Engine _blackEngine) {
+	public Pair(EngineProcess _whiteEngine, EngineProcess _blackEngine) {
 		whiteEngine = _whiteEngine;
 		blackEngine = _blackEngine;
 	}
 	
 	
-	public Engine getBlackEngine() {
+	public EngineProcess getBlackEngine() {
 		return blackEngine;
 	}
 	
-	public Engine getWhiteEngine() {
+	public EngineProcess getWhiteEngine() {
 		return whiteEngine;
 	}
 	

@@ -26,7 +26,7 @@ package com.bagaturchess.ucitournament.single;
 import java.io.IOException;
 import java.util.Date;
 
-import bagaturchess.ucitracker.impl.Engine;
+import bagaturchess.uci.engine.EngineProcess;
 
 import com.bagaturchess.ucitournament.framework.Pair;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
@@ -58,8 +58,8 @@ public class Tournament {
 			Pair[] pairs = schedule.getPairsByRound(round);
 			for (int pair = 0; pair < pairs.length; pair++) {
 				
-				Engine engine1 = pairs[pair].getWhiteEngine();
-				Engine engine2 = pairs[pair].getBlackEngine();
+				EngineProcess engine1 = pairs[pair].getWhiteEngine();
+				EngineProcess engine2 = pairs[pair].getBlackEngine();
 				String engine1Name = engine1.getName();
 				String engine2Name = engine2.getName();
 				

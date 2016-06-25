@@ -20,43 +20,50 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.ucitracker.impl;
+package bagaturchess.uci.engine;
 
 
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.IOException;
 
 
-
-public class UCIEnginesRunnerTest {
+public class EngineProcessDummperThread extends Thread {
 	
+	private volatile boolean enabled = false;
 	
-	public static void main(String[] args) {
-		
-		UCIEnginesRunner runner = new UCIEnginesRunner();
-		
-		try {
-			
-			Engine engine = new Engine("C:\\own\\chess\\ENGINES\\Houdini_15a\\Houdini_15a_w32.exe",
-					new String [0],
-					"C:\\own\\chess\\ENGINES\\Houdini_15a\\");
-			runner.addEngine(engine);
-			
-			runner.startEngines();
-			runner.uciOK();
-			
-			runner.newGame();
-			runner.isReady();
-			
-			runner.setupPosition("fen 7k/5K2/8/8/8/8/8/8 b - - 575 288");
-			
-			runner.go(3);
-			
-			List<String> infos = runner.getInfoLines();
-			System.out.println(infos);
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	private String header;
+	private BufferedReader is;
+	
+	public EngineProcessDummperThread(String _header, BufferedReader _is) {
+		header = _header;
+		is = _is;
 	}
 	
+	public void enabled() {
+		enabled = true;
+	}
+	
+	public void disable() {
+		enabled = false;
+	}
+	
+	public void run() {
+		while (true) {
+			String line = null;
+			try {
+				while (enabled && (line = is.readLine()) != null) {
+					//System.out.println(header + ": '" + line + "'");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				//throw new IllegalStateException(e);
+				return;
+			}
+		}
+	}
 }

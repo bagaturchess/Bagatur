@@ -27,15 +27,11 @@ import java.io.IOException;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
-import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.BoardUtils;
-import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.bitboard.impl.plies.specials.Promotioning;
+import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.impl.commands.info.Info;
-import bagaturchess.ucitracker.impl.Engine;
 
 
 public abstract class MatchRunner {
@@ -49,11 +45,11 @@ public abstract class MatchRunner {
 	
 	public abstract void newGame();
 	protected abstract void beforeGo(int colourToMove);
-	protected abstract void go(Engine engine) throws IOException;
+	protected abstract void go(EngineProcess engine) throws IOException;
 	protected abstract void afterGo(int colourToMove);
 	protected abstract int getRemainingTime(int colourToMove);
 	
-	public int execute(Engine white, Engine black) throws IOException {
+	public int execute(EngineProcess white, EngineProcess black) throws IOException {
 		
 		//white.start();
 		white.supportsUCI();
@@ -68,7 +64,7 @@ public abstract class MatchRunner {
 	}
 	
 	
-	private int playGame(Engine white, Engine black) throws IOException {
+	private int playGame(EngineProcess white, EngineProcess black) throws IOException {
 		
 		int result = 0;
 		
@@ -77,7 +73,7 @@ public abstract class MatchRunner {
 		
 		IBitBoard bitboard  = BoardUtils.createBoard_WithPawnsCache();//new Board();
 		
-		Engine engine = white;
+		EngineProcess engine = white;
 		while (gameIsOk(bitboard)) {
 			
 			//System.out.println("pinko");

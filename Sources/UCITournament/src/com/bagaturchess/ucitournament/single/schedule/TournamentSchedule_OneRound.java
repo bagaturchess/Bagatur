@@ -26,7 +26,7 @@ package com.bagaturchess.ucitournament.single.schedule;
 import java.util.ArrayList;
 import java.util.List;
 
-import bagaturchess.ucitracker.impl.Engine;
+import bagaturchess.uci.engine.EngineProcess;
 
 import com.bagaturchess.ucitournament.framework.Pair;
 
@@ -34,19 +34,19 @@ import com.bagaturchess.ucitournament.framework.Pair;
 public class TournamentSchedule_OneRound implements ITournamentSchedule {
 
 	
-	private Engine[] engines;
+	private EngineProcess[] engines;
 	private Pair[] pairs;
 	
 	
-	public TournamentSchedule_OneRound(Engine[] _engines) {
+	public TournamentSchedule_OneRound(EngineProcess[] _engines) {
 		engines = _engines;
 		
 		List<Pair> all = new ArrayList<Pair>();
 		for (int e1_idx = 0; e1_idx<engines.length - 1; e1_idx++) {
 			for (int e2_idx = e1_idx + 1; e2_idx<engines.length; e2_idx++) {
 				
-				Engine engine1 = engines[e1_idx];
-				Engine engine2 = engines[e2_idx];
+				EngineProcess engine1 = engines[e1_idx];
+				EngineProcess engine2 = engines[e2_idx];
 				Pair pair1 = new Pair(engine1, engine2);
 				Pair pair2 = new Pair(engine2, engine1);
 				all.add(pair1);
@@ -65,7 +65,7 @@ public class TournamentSchedule_OneRound implements ITournamentSchedule {
 		return 1;
 	}
 
-	public Engine[] getEngines() {
+	public EngineProcess[] getEngines() {
 		return engines;
 	}
 

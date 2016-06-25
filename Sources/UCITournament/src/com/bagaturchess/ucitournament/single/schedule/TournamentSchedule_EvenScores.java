@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import bagaturchess.ucitracker.impl.Engine;
+import bagaturchess.uci.engine.EngineProcess;
 
 import com.bagaturchess.ucitournament.framework.Pair;
 
@@ -37,11 +37,11 @@ public class TournamentSchedule_EvenScores implements ITournamentSchedule {
 	
 	
 	private int rounds;
-	private Engine[] engines;
+	private EngineProcess[] engines;
 	private Pair[][] pairs;
 	
 	
-	public TournamentSchedule_EvenScores(Engine[] _engines) {
+	public TournamentSchedule_EvenScores(EngineProcess[] _engines) {
 		
 		engines = _engines;		
 		pairs = new Pair[engines.length][];
@@ -51,8 +51,8 @@ public class TournamentSchedule_EvenScores implements ITournamentSchedule {
 			List<Pair> all = new ArrayList<Pair>();
 			for (int e1_idx = 0; e1_idx<engines.length; e1_idx++) {
 				
-				Engine engine1 = engines[e1_idx];
-				Engine engine2 = engines[(e1_idx + shift) % engines.length];
+				EngineProcess engine1 = engines[e1_idx];
+				EngineProcess engine2 = engines[(e1_idx + shift) % engines.length];
 				
 				Pair pair1 = new Pair(engine1, engine2);
 				Pair pair2 = new Pair(engine2, engine1);
@@ -82,7 +82,7 @@ public class TournamentSchedule_EvenScores implements ITournamentSchedule {
 		return rounds;
 	}
 	
-	public Engine[] getEngines() {
+	public EngineProcess[] getEngines() {
 		return engines;
 	}
 	

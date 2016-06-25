@@ -25,7 +25,7 @@ package com.bagaturchess.ucitournament.framework.match;
 
 import java.io.IOException;
 
-import bagaturchess.ucitracker.impl.Engine;
+import bagaturchess.uci.engine.EngineProcess;
 
 
 public class MatchRunner_FixedNodes extends MatchRunner {
@@ -40,7 +40,7 @@ public class MatchRunner_FixedNodes extends MatchRunner {
 	}
 	
 	@Override
-	protected void go(Engine engine) throws IOException {
+	protected void go(EngineProcess engine) throws IOException {
 		engine.go_FixedNodes(nodes);
 	}
 

@@ -37,8 +37,9 @@ import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
-import bagaturchess.ucitracker.impl.Engine;
-import bagaturchess.ucitracker.impl.UCIEnginesRunner;
+import bagaturchess.uci.engine.EngineProcess;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl;
+import bagaturchess.uci.engine.UCIEnginesManager;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedGame;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedMove;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedPosition;
@@ -55,11 +56,11 @@ public class GamesGenerator {
 	private static int BEST_MOVE_DIFF = 50;
 	
 	
-	private UCIEnginesRunner runner;
+	private UCIEnginesManager runner;
 	
 	
 	public GamesGenerator() {
-		runner = new UCIEnginesRunner();
+		runner = new UCIEnginesManager();
 	}
 	
 	
@@ -95,13 +96,14 @@ public class GamesGenerator {
 					new String [0],
 				"C:\\own\\chess\\ENGINES\\komodo-13b1-ja\\Windows\\");*/
 			
-			Engine engine = new Engine("C:\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-7-win\\stockfish-7-win\\Windows\\stockfish 7 x64.exe",
+			/*EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-7-win\\stockfish-7-win\\Windows\\stockfish 7 x64.exe",
 					new String [0],
 				"C:\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-7-win\\stockfish-7-win\\Windows\\");
+			*/
 			
+			EngineProcess engine = new EngineProcess_BagaturImpl("BagaturEngineClient", "");
 			
-			
-			control.execute(engine, "./stockfish 7 x64.cg", 1000000, true);
+			control.execute(engine, "./bagatur.cg", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -109,7 +111,7 @@ public class GamesGenerator {
 	}
 	
 	
-	private void execute(Engine engine, String toFileName, int gamesCount, boolean appendToFile) throws IOException {
+	private void execute(EngineProcess engine, String toFileName, int gamesCount, boolean appendToFile) throws IOException {
 		
 		runner.addEngine(engine);
 		
