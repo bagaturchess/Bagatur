@@ -43,10 +43,9 @@ import bagaturchess.uci.engine.UCIEnginesManager;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedGame;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedMove;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedPosition;
-import bagaturchess.ucitracker.impl.gamemodel.serialization.GameModelWriter;
 
 
-public class GamesGenerator {
+public class GamesPlayer {
 	
 	
 	private static int SEARCH_DEPTH_MIN = 2;
@@ -60,13 +59,13 @@ public class GamesGenerator {
 	private UCIEnginesManager runner;
 	
 	
-	public GamesGenerator() {
+	public GamesPlayer() {
 		runner = new UCIEnginesManager();
 	}
 	
 	
 	public static void main(String[] args) {
-		GamesGenerator control = new GamesGenerator();
+		GamesPlayer control = new GamesPlayer();
 		try {
 			
 			/*Engine engine = new Engine("C:\\own\\chess\\ENGINES\\Houdini_15a\\Houdini_15a_w32.exe",
@@ -108,6 +107,16 @@ public class GamesGenerator {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+			
+		}  finally {
+			
+			try {
+				
+				control.runner.stopEngines();
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -123,10 +132,11 @@ public class GamesGenerator {
 		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(toFileName, appendToFile), 10 * 1024 * 1024));
 		
 		for (int i=0; i<gamesCount; i++) {
+			
 			EvaluatedGame game = playGame();
-			GameModelWriter.writeEvaluatedGame(game, dos);
-			dos.flush();
+			
 			System.out.println("Game " + (i+1) + " saved in " + toFileName);
+			
 		}
 		
 		dos.close();
@@ -145,6 +155,7 @@ public class GamesGenerator {
 		
 		while (bitboard.getStatus().equals(IGameStatus.NONE)) {
 			
+			
 			Set<EvaluatedMove> movesEvals = evalVariations(bitboard);
 			if (movesEvals.size() == 0) {
 				break;
@@ -152,12 +163,14 @@ public class GamesGenerator {
 			
 			EvaluatedMove best = getBestVariation(bitboard.isInCheck(), movesEvals);
 			
-			//if (bitboard.getPlayedMovesCount() == 20) {
-			//	System.out.println(bitboard);
-			//}
 			
 			//System.out.println(bitboard);
-			//System.out.println("BEST MOVE: " + best);			
+			//System.out.println("BEST MOVE: " + best);
+			if (bitboard.getPlayedMovesCount() == 20) {
+				System.out.println(bitboard);
+			}
+			
+			
 			bitboard.makeMoveForward(best.getMoves()[0]);
 			if (!bitboard.getStatus().equals(IGameStatus.NONE)) {
 				break;
@@ -168,6 +181,7 @@ public class GamesGenerator {
 			if (bitboard.getPlayedMovesCount() > MAX_MOVES) {
 				break;
 			}
+			
 			
 			EvaluatedPosition position = new EvaluatedPosition(bitboard.toEPD(), best.getMoves()[0]);
 			position.setChildren(movesEvals);
@@ -260,6 +274,7 @@ public class GamesGenerator {
 
 				runner.go(depth);
 				
+				//System.out.println("before getInfoLines");
 				infos = runner.getInfoLines();
 				if (infos.size() > 1) {
 					throw new IllegalStateException("Only one engine is supported");

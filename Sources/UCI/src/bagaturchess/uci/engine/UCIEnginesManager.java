@@ -124,7 +124,7 @@ public class UCIEnginesManager {
 		//disable();
 		
 		for (EngineProcess engine: engines) {			
-			engine.go(depth);
+			engine.go_FixedDepth(depth);
 		}
 		//System.out.println("Started");
 		

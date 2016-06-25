@@ -63,16 +63,28 @@ public class EngineProcess {
 	}
 	
 	public void start() throws IOException {
-		//Process process = Runtime.getRuntime().exec(startCommand);
+		
 		process = Runtime.getRuntime().exec(startCommand, props, new File(workDir));
+		
 		is = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		os = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 		err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 		
+		
 		dummper = new EngineProcessDummperThread("OUT", is);
 		dummper.start();
 		(new EngineProcessDummperThread("ERR", err)).start();
+		
+		
+		Thread closeChildThread = new Thread() {
+		    public void run() {
+		    	process.destroy();
+		    }
+		};
+
+		Runtime.getRuntime().addShutdownHook(closeChildThread);
 	}
+	
 	
 	public void stop() throws IOException {
 		if (is != null) {
@@ -185,7 +197,9 @@ public class EngineProcess {
 		
 		String line;
 		while ((line = is.readLine()) != null) {
-			//System.out.println("line: '" + lines);
+			
+			//System.out.println("EngineProcess: getInfoLine (and waiting bestmove to return): '" + line + "'");
+			
 			if (line.contains("bestmove")) {
 				for (int i=lines.size() - 1; i >=0; i--) {
 					if (lines.get(i).contains("info depth") && lines.get(i).contains(" pv ")) {

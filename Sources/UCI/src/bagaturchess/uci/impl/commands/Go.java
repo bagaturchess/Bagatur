@@ -278,7 +278,7 @@ public class Go extends Protocol {
 	}
 	
 	public String toString() {
-		String result = "";
+		String result = "GO COMMAND: ";
 		result += "ponder " + ponder;
 		result += " wtime " + wtime;
 		result += " btime " + btime;

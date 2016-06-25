@@ -120,7 +120,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 					channel.sendLogToGUI("StateManager: Command " + fromGUICommand + " UNSUPPORTED from Bagatur Chess Engine");
 					//Thread.sleep(100);
 				} else {
-					channel.sendLogToGUI("StateManager: exec command " + fromGUICommandID + " > " + fromGUICommand);
+					channel.sendLogToGUI("StateManager: exec command " + fromGUICommandID + " > '" + fromGUILine + "'");
 					switch (fromGUICommandID) {
 						case COMMAND_TO_ENGINE_UCI:
 							sendEngineID();
