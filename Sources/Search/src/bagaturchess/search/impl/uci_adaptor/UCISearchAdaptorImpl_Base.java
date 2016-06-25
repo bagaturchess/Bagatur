@@ -158,16 +158,17 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		
 		currentMediator.dump("IsEndlessSearch: " + isEndlessSearch);
 		
-		if (saver != null && !isEndlessSearch) {
-			currentMediator.dump("Using TimeSaver ...");
+		if (!isEndlessSearch) {
 			
-			boolean moveSent = saver.beforeMove(boardForSetup, sharedData.getSearchConfig().isOpenningModeRandom(), currentMediator, searchAdaptorCfg.isOwnBookEnabled());
+			boolean moveSent = false;
+			if (saver != null) {
+				currentMediator.dump("Using TimeSaver ...");
+				moveSent = saver.beforeMove(boardForSetup, sharedData.getSearchConfig().isOpenningModeRandom(), currentMediator, searchAdaptorCfg.isOwnBookEnabled());
+			}
 			
 			if (!moveSent) {
 				
 				int start_iteration = 1;
-				
-				currentMediator.dump("Normal search started");
 				
 				int maxIterations = currentGoCommand.getDepth();
 				if (maxIterations > ISearch.MAX_DEPTH) {
@@ -177,6 +178,8 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 						maxIterations += rootSearchCfg.getHiddenDepth();
 					}
 				}
+				
+				currentMediator.dump("Normal search started with GO: " + currentGoCommand + ", depth=" + currentGoCommand.getDepth());
 				
 				searcher.negamax(boardForSetup, currentMediator, start_iteration, maxIterations, true, null);
 			}
