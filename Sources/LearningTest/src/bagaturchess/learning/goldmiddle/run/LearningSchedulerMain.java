@@ -30,6 +30,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.engines.bagatur.cfg.time.TimeConfigImpl;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -397,23 +398,30 @@ public class LearningSchedulerMain {
 		//	new bagaturchess.configs.tune.search.exts.extmode_mixed.MixedExts_All16_UpdateIntervalX(new String[]{"10"});
 		//-Dengine.boot.cfg=bagaturchess.properties.EngineConfigBaseImpl
 		
+		Go go = new Go(ChannelManager.getChannel(), "go depth 10");
+		
 		final ISearchMediator mediator1 = new UCISearchMediatorImpl_NormalSearch(ChannelManager.getChannel(),
-				new Go(ChannelManager.getChannel(), "go infinite"),
-				new TimeController_FixedDepth(),
+				
+				go,
+				
+				new TimeConfigImpl(),
+				
 				bitboard.getColourToMove(),
+				
 				new BestMoveSender() {
 					@Override
 					public void sendBestMove() {
 						System.out.println("Best move send");
 					}
 				},
+				
 				search, true);
 		
 		//ISearchMediator mediator2 = new MediatorDummper(bitboard, eval, 5000000, true);
 		
 		//searchMultiPV.newGame(bitboard);
 		//searchMultiPV.negamax(bitboard, mediator1, 1, 100, true, null);
-		search.negamax(bitboard, mediator1, 1, ISearch.MAX_DEPTH, true, null);
+		search.negamax(bitboard, mediator1, go);
 		/*ISearch search = new SearchLazyNew(bitboard);
 		search.search(new MediatorDummper(5000000, true), 50);*/
 		

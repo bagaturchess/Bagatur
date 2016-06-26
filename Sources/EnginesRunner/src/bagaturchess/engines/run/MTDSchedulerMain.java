@@ -31,6 +31,7 @@ import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl1.Board3_Adapter;
+import bagaturchess.engines.bagatur.cfg.time.TimeConfigImpl;
 import bagaturchess.engines.bagatur.eval.BagaturEvaluator;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP;
@@ -43,10 +44,12 @@ import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch;
+import bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProcess;
 import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_Base;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.controllers.TimeController_FixedDepth;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.controllers.TimeController_TimePerMove;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.api.IChannel;
@@ -130,8 +133,9 @@ public class MTDSchedulerMain {
 		
 		SharedData arg1 = new SharedData(ChannelManager.getChannel(), cfg);
 		
-		IRootSearch search = new MTDParallelSearch(new Object[] {cfg, arg1});
+		//IRootSearch search = new MTDParallelSearch(new Object[] {cfg, arg1});
 		//IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
+		IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, arg1});
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
 		SharedData sharedData = search.getSharedData();
@@ -512,23 +516,31 @@ public class MTDSchedulerMain {
 		
 		//ISearchMediator mediator1 = new MediatorDummper(bitboard, eval, 5000000, true);
 		//IChannel channel = new Channel_Console();
+		
+		Go go = new Go(ChannelManager.getChannel(), "go depth 10");
+				
 		final ISearchMediator mediator1 = new UCISearchMediatorImpl_NormalSearch(ChannelManager.getChannel(),
-				new Go(ChannelManager.getChannel(), "go infinite"),
-				new TimeController_FixedDepth(),
+				
+				go,
+				
+				new TimeConfigImpl(),
+				
 				bitboard.getColourToMove(),
+				
 				new BestMoveSender() {
 					@Override
 					public void sendBestMove() {
-						System.out.println("Best move send");
+						System.out.println("MTDSchedulerMain: Best move send");
 					}
 				},
+				
 				search, true);
 		
 		//ISearchMediator mediator2 = new MediatorDummper(bitboard, eval, 5000000, true);
 		
 		//searchMultiPV.newGame(bitboard);
 		//searchMultiPV.negamax(bitboard, mediator1, 1, 100, true, null);
-		search.negamax(bitboard, mediator1, 1, ISearch.MAX_DEPTH, true, null);
+		search.negamax(bitboard, mediator1, go);
 		
 		//search.negamax(bitboard, mediator1, 2, 2, true);
 		

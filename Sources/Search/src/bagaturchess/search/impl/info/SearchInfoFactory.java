@@ -22,42 +22,63 @@
  */
 package bagaturchess.search.impl.info;
 
+
+import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.search.api.internal.ISearchInfo;
+import bagaturchess.uci.impl.commands.info.Info;
 
 
 public final class SearchInfoFactory {
 	
+	
 	private static SearchInfoFactory instance;
-	//private static String className = "game.chess.engine.impl1.bitboards.uci.SearchInfoImpl";
-	//private static Class infoClass;
+	
 	
 	private SearchInfoFactory() {
 	}
-
+	
+	
 	public static final SearchInfoFactory getFactory() {
 		if (instance == null) {
 			instance = new SearchInfoFactory();
-			/*try {
-				infoClass = infoClass = Class.forName(className);
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}*/
 		}
 		return instance;
 	}
 	
+	
 	public ISearchInfo createSearchInfo() {
 		return new SearchInfoImpl();
-		/*try {
-			return (ISearchInfo) infoClass.newInstance();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	}
+	
+	
+	public ISearchInfo createSearchInfo(Info info, IBitBoard board) {
+		
+		SearchInfoImpl result = new SearchInfoImpl();
+		
+		result.setEval(info.getEval());
+		
+		int cur = 0;
+		int[] pv = new int[info.getPv().length];
+		for (String move: info.getPv()) {
+			
+			//System.out.println("pv line move["+ cur + "]=" + move);
+			
+			pv[cur++] = BoardUtils.uciStrToMove(board, move);
+			board.makeMoveForward(pv[cur - 1]);
 		}
 		
-		return null;*/
+		for (int i=pv.length - 1; i>=0; i--) {
+			board.makeMoveBackward(pv[i]);
+		}
+		
+		result.setPV(pv);
+		
+		if (pv.length > 0) {
+			result.setBestMove(pv[0]);
+		}
+		
+		
+		return result;
 	}
 }

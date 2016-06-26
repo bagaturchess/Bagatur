@@ -155,10 +155,12 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		currentMediator.dump("Ponder: " + ponderSearch);
 		
 		boolean isEndlessSearch = isEndlessSearch(currentGoCommand);
-		
 		currentMediator.dump("IsEndlessSearch: " + isEndlessSearch);
 		
-		if (!isEndlessSearch) {
+		currentGoCommand.setPonder(isEndlessSearch);
+		
+		
+		if (!currentGoCommand.isPonder()) {
 			
 			boolean moveSent = false;
 			if (saver != null) {
@@ -168,24 +170,16 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 			
 			if (!moveSent) {
 				
-				int start_iteration = 1;
+				currentMediator.dump("Normal search started with GO: " + currentGoCommand);
 				
-				int maxIterations = currentGoCommand.getDepth();
-				if (maxIterations > ISearch.MAX_DEPTH) {
-					maxIterations = ISearch.MAX_DEPTH;
-				} else {
-					if (maxIterations < maxIterations + rootSearchCfg.getHiddenDepth()) {//Type overflow
-						maxIterations += rootSearchCfg.getHiddenDepth();
-					}
-				}
-				
-				currentMediator.dump("Normal search started with GO: " + currentGoCommand + ", depth=" + currentGoCommand.getDepth());
-				
-				searcher.negamax(boardForSetup, currentMediator, start_iteration, maxIterations, true, null);
+				searcher.negamax(boardForSetup, currentMediator, currentGoCommand);
 			}
+			
 		} else {
-			currentMediator.dump("Endless search started");
-			searcher.negamax(boardForSetup, currentMediator, false, null);
+			
+			currentMediator.dump("Endless search started with GO: " + currentGoCommand);
+			
+			searcher.negamax(boardForSetup, currentMediator, currentGoCommand);
 		}
 	}
 

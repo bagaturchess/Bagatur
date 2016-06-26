@@ -51,7 +51,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	private ExecutorService executor;
 	private ISearch searcher;
 	
-
+	
 	public MTDSequentialSearch(Object[] args) {
 		super(args);
 		executor = Executors.newFixedThreadPool(1);

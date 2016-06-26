@@ -23,6 +23,7 @@
 package bagaturchess.bitboard.impl.movegen;
 
 
+import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
@@ -430,6 +431,24 @@ public class MoveInt {
 			result.append(Figures.TYPES_SIGN[promotionFigureType].toLowerCase());
 		}
 	}
+	
+	
+	public static String getMovesUCI(IBitBoard bitboard) {
+		
+		String result = "";
+		
+		int count = bitboard.getPlayedMovesCount();
+		int[] moves = bitboard.getPlayedMoves();
+		for (int i=0; i<count; i++) {
+			int curMove = moves[i];
+			StringBuilder message = new StringBuilder(32);
+			MoveInt.moveToStringUCI(curMove, message);
+			result += message.toString() + " ";
+		}
+	
+		return result;
+	}
+	
 	
 	public static String movesToStringOwn(int[] pv) {
 		String pvStr = "";

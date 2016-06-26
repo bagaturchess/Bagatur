@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.uci.engine.EngineProcess;
+import bagaturchess.uci.engine.EngineProcess.LineCallBack;
+import bagaturchess.uci.impl.commands.Go;
 
 
 
@@ -52,6 +54,14 @@ public class UCIEnginesManager {
 		}
 	}
 
+	
+	public void destroyEngines() throws IOException  {
+		for (EngineProcess engine: engines) {
+			engine.destroy();
+		}
+	}
+	
+	
 	public void stopEngines() throws IOException  {
 		for (EngineProcess engine: engines) {
 			engine.stop();
@@ -119,7 +129,20 @@ public class UCIEnginesManager {
 	}
 	
 	
-	public void go(int depth) throws IOException {
+	public void go(Go go) throws IOException {
+		
+		//disable();
+		
+		for (EngineProcess engine: engines) {			
+			engine.go(go);
+		}
+		//System.out.println("Started");
+		
+		//enable();
+	}
+	
+	
+	public void go_Depth(int depth) throws IOException {
 		
 		//disable();
 		
@@ -144,7 +167,16 @@ public class UCIEnginesManager {
 			engine.setDummperMode(false);
 		}
 	}
-
+	
+	
+	public List<String> getInfoLines(LineCallBack lineCallBack) throws IOException {
+		List<String> lines = new ArrayList<String>();
+		for (EngineProcess engine: engines) {			
+			lines.add(engine.getInfoLine(lineCallBack));
+		}
+		return lines;
+	}
+	
 	
 	public List<String> getInfoLines() throws IOException {
 		List<String> lines = new ArrayList<String>();

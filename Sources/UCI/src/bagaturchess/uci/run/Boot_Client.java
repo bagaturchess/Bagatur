@@ -25,7 +25,7 @@ public class Boot_Client {
 			
 			try {
 				
-				bagatur.stop();
+				bagatur.destroy();
 				
 			} catch (Exception e) {
 				e.printStackTrace();

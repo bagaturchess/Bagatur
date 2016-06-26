@@ -112,7 +112,7 @@ public class GamesPlayer {
 			
 			try {
 				
-				control.runner.stopEngines();
+				control.runner.destroyEngines();
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -141,7 +141,7 @@ public class GamesPlayer {
 		
 		dos.close();
 		
-		runner.stopEngines();
+		runner.destroyEngines();
 	}
 	
 	
@@ -252,12 +252,12 @@ public class GamesPlayer {
 				bitboard.makeMoveBackward(cur_move);
 			}
 			
-			String allMovesStr = getMovesUCI(bitboard);
+			String allMovesStr = MoveInt.getMovesUCI(bitboard);
 			
 			StringBuilder message = new StringBuilder(32);
 			MoveInt.moveToStringUCI(cur_move, message);
 			String moveStr = message.toString();
-					
+				
 			//System.out.println("startpos moves " + allMovesStr + moveStr);
 			//System.out.println("MOVE " + moveStr);
 			
@@ -272,7 +272,7 @@ public class GamesPlayer {
 				runner.setupPosition("startpos moves " + allMovesStr + moveStr);
 				runner.disable();
 
-				runner.go(depth);
+				runner.go_Depth(depth);
 				
 				//System.out.println("before getInfoLines");
 				infos = runner.getInfoLines();
@@ -310,22 +310,5 @@ public class GamesPlayer {
 		}
 		
 		return evals;
-	}
-	
-	
-	private static String getMovesUCI(IBitBoard bitboard) {
-		
-		String result = "";
-		
-		int count = bitboard.getPlayedMovesCount();
-		int[] moves = bitboard.getPlayedMoves();
-		for (int i=0; i<count; i++) {
-			int curMove = moves[i];
-			StringBuilder message = new StringBuilder(32);
-			MoveInt.moveToStringUCI(curMove, message);
-			result += message.toString() + " ";
-		}
-	
-		return result;
 	}
 }

@@ -26,6 +26,7 @@ package bagaturchess.search.impl.rootsearch;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.BoardUtils;
+import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearch;
@@ -35,6 +36,7 @@ import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
+import bagaturchess.uci.impl.commands.Go;
 
 
 public abstract class RootSearch_BaseImpl implements IRootSearch {
@@ -74,6 +76,31 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		}
 	}
 	
+	
+	@Override
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator,
+			Go goCommand) {
+		negamax(bitboardForSetup, mediator, null, goCommand);
+	}
+
+
+	@Override
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator,
+			IFinishCallback finishCallback, Go goCommand) {
+		
+		int start_iteration = 1;
+		
+		int maxIterations = goCommand.getDepth();
+		if (maxIterations > ISearch.MAX_DEPTH) {
+			maxIterations = ISearch.MAX_DEPTH;
+		} else {
+			if (maxIterations < maxIterations + getRootSearchConfig().getHiddenDepth()) {//Type overflow
+				maxIterations += getRootSearchConfig().getHiddenDepth();
+			}
+		}
+		
+		negamax(bitboardForSetup, mediator, start_iteration, maxIterations, !goCommand.isPonder(), finishCallback, null);
+	}
 	
 	@Override
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, boolean useMateDistancePrunning, int[] prevPV) {

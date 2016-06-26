@@ -85,8 +85,7 @@ public class UCISearchAdaptorImpl_PonderingUCIStandard extends UCISearchAdaptorI
 				}
 			}
 			
-			timeController = TimeControllerFactory.createTimeController(searchAdaptorCfg.getTimeConfig(), boardForSetup.getColourToMove(), go);
-			currentMediator = new UCISearchMediatorImpl_NormalSearch(channel, go, timeController, colourToMove, sender, getSearcher(false), isEndlessSearch(go)); 
+			currentMediator = new UCISearchMediatorImpl_NormalSearch(channel, go, searchAdaptorCfg.getTimeConfig(), colourToMove, sender, getSearcher(false), isEndlessSearch(go)); 
 			currentGoCommand = go;
 			
 			goSearch(false);
@@ -111,8 +110,7 @@ public class UCISearchAdaptorImpl_PonderingUCIStandard extends UCISearchAdaptorI
 		Go go = ponderMediator.getGoCommand();
 		go.setPonder(false);
 		
-		ITimeController timeController = TimeControllerFactory.createTimeController(searchAdaptorCfg.getTimeConfig(), boardForSetup.getColourToMove(), go);
-		UCISearchMediatorImpl_NormalSearch switchedMediator = new UCISearchMediatorImpl_NormalSearch(ponderMediator.getChannel(), go, timeController,
+		UCISearchMediatorImpl_NormalSearch switchedMediator = new UCISearchMediatorImpl_NormalSearch(ponderMediator.getChannel(), go, searchAdaptorCfg.getTimeConfig(),
 				ponderMediator.getColourToMove(), bestMoveSender, getSearcher(false), isEndlessSearch(go));
 		switchedMediator.setLastInfo(ponderMediator.getLastInfo());
 		

@@ -32,6 +32,8 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import bagaturchess.uci.impl.commands.Go;
+
 
 public class EngineProcess {
 	
@@ -48,7 +50,7 @@ public class EngineProcess {
 	
 	
 	public EngineProcess(String _startCommand, String[] _props, String _workDir) {
-		System.out.println(_startCommand);
+		//System.out.println(_startCommand);
 		startCommand = _startCommand;
 		props = _props;
 		workDir = _workDir;
@@ -81,12 +83,12 @@ public class EngineProcess {
 		    	process.destroy();
 		    }
 		};
-
+		
 		Runtime.getRuntime().addShutdownHook(closeChildThread);
 	}
 	
 	
-	public void stop() throws IOException {
+	public void destroy() throws IOException {
 		if (is != null) {
 			try {
 				is.close();
@@ -150,7 +152,20 @@ public class EngineProcess {
 		os.flush();
 	}
 	
-	public void go(int depth) throws IOException {
+	public void stop() throws IOException {
+		os.write("stop");	
+		os.newLine();
+		os.flush();
+	}
+	
+	public void go(Go go) throws IOException {
+		//System.out.println("go depth " + depth);
+		os.write(go.getCommandLine());
+		os.newLine();
+		os.flush();
+	}
+	
+	public void go_Depth(int depth) throws IOException {
 		//System.out.println("go depth " + depth);
 		os.write("go depth " + depth);
 		os.newLine();
@@ -190,19 +205,36 @@ public class EngineProcess {
 		os.newLine();
 		os.flush();
 	}
-
+	
+	
 	public String getInfoLine() throws IOException {
+		
+		return getInfoLine(new LineCallBack() {
+			
+			@Override
+			public void newLine(String line) {
+				
+				//Do Nothing
+				
+				//System.out.println("EngineProcess: getInfoLine (and waiting bestmove to return): '" + line + "'");
+				
+			}
+		});
+	}
+	
+	
+	public String getInfoLine(LineCallBack lineCallBack) throws IOException {
 		
 		List<String> lines = new ArrayList<String>();
 		
 		String line;
 		while ((line = is.readLine()) != null) {
 			
-			//System.out.println("EngineProcess: getInfoLine (and waiting bestmove to return): '" + line + "'");
+			lineCallBack.newLine(line);
 			
 			if (line.contains("bestmove")) {
 				for (int i=lines.size() - 1; i >=0; i--) {
-					if (lines.get(i).contains("info depth") && lines.get(i).contains(" pv ")) {
+					if (lines.get(i).contains("info "/*depth"*/) && lines.get(i).contains(" pv ")) {
 						//System.out.println("PV: '" + lines.get(i) + "'");
 						return lines.get(i);
 					}
@@ -216,7 +248,13 @@ public class EngineProcess {
 		}
 		
 		throw new IllegalStateException();
-	}	
+	}
+	
+	
+	public static interface LineCallBack {
+		public void newLine(String line);
+	}
+	
 	
 	public String getInfoLine1() throws IOException {
 		

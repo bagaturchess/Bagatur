@@ -55,7 +55,7 @@ public class UCIEnginesRunnerTest {
 			
 			runner.setupPosition("fen 7k/5K2/8/8/8/8/8/8 b - - 575 288");
 			
-			runner.go(3);
+			runner.go_Depth(3);
 			
 			System.out.println("before infos");
 			List<String> infos = runner.getInfoLines();
@@ -69,7 +69,7 @@ public class UCIEnginesRunnerTest {
 				
 				System.out.println("stop engines");
 				
-				runner.stopEngines();
+				runner.destroyEngines();
 				
 			} catch (Exception e) {
 				e.printStackTrace();

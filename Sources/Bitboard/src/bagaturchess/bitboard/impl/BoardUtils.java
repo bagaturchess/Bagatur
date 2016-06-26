@@ -85,7 +85,11 @@ public class BoardUtils {
 		int toFieldID = Fields.getFieldID(moveStr.substring(2, 4));
 		
 		IMoveList mlist = new BaseMoveList();
-		bitboard.genAllMoves(mlist);
+		if (bitboard.isInCheck()) {
+			bitboard.genKingEscapes(mlist);
+		} else {
+			bitboard.genAllMoves(mlist);
+		}
 		
 		int cur_move = 0;
 		while ((cur_move = mlist.next()) != 0) {

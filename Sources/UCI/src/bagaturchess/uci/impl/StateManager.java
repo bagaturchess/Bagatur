@@ -298,7 +298,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 			board = new Board(position.getFen());
 			
 			destroySearchAdaptor();
-			createSearchAdaptor();
+			//createSearchAdaptor();
 			
 		} else {
 			
@@ -363,8 +363,14 @@ public class StateManager extends Protocol implements BestMoveSender {
 				bestMoveCommand += result;
 			}
 			
+			channel.sendLogToGUI("StateManager: sendBestMove bestMoveCommand=" + bestMoveCommand);
+			
+			
 			try {
 				channel.sendCommandToGUI(bestMoveCommand);
+				
+				channel.sendLogToGUI("StateManager: bestMoveCommand send");
+				
 			} catch (IOException e) {
 				channel.dump(e);
 			}

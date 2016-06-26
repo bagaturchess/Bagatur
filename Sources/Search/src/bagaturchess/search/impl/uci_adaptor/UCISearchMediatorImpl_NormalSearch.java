@@ -26,8 +26,10 @@ package bagaturchess.search.impl.uci_adaptor;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.IChannel;
+import bagaturchess.uci.api.ITimeConfig;
 import bagaturchess.uci.impl.commands.Go;
 
 
@@ -37,10 +39,10 @@ public class UCISearchMediatorImpl_NormalSearch extends UCISearchMediatorImpl_Ba
 	private ITimeController timeController;
 	
 	
-	public UCISearchMediatorImpl_NormalSearch(IChannel _channel, Go _go, ITimeController _timeController, int _colourToMove,
+	public UCISearchMediatorImpl_NormalSearch(IChannel _channel, Go _go, ITimeConfig timeconfig, int _colourToMove,
 			BestMoveSender _sender, IRootSearch _rootSearch, boolean isEndlessSearch) {
 		super(_channel, _go, _colourToMove, _sender, _rootSearch, isEndlessSearch);
-		timeController = _timeController;
+		timeController = TimeControllerFactory.createTimeController(timeconfig, _colourToMove, _go);
 		_channel.dump(timeController.toString());
 		setStopper(new GlobalStopperImpl(timeController, _go.getNodes()));
 	}

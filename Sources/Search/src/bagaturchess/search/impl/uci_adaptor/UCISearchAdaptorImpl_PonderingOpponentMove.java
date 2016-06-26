@@ -99,8 +99,7 @@ public class UCISearchAdaptorImpl_PonderingOpponentMove extends UCISearchAdaptor
 				}
 			}
 			
-			timeController = TimeControllerFactory.createTimeController(searchAdaptorCfg.getTimeConfig(), boardForSetup.getColourToMove(), go);
-			currentMediator = new UCISearchMediatorImpl_NormalSearch(channel, go, timeController, colourToMove, sender, getSearcher(false), isEndlessSearch(go)); 
+			currentMediator = new UCISearchMediatorImpl_NormalSearch(channel, go, searchAdaptorCfg.getTimeConfig(), colourToMove, sender, getSearcher(false), isEndlessSearch(go)); 
 			currentGoCommand = go;
 			
 			goSearch(false);
@@ -145,8 +144,7 @@ public class UCISearchAdaptorImpl_PonderingOpponentMove extends UCISearchAdaptor
 		Go go = ponderMediator.getGoCommand();
 		go.setPonder(false); //Should be after stopSearch, which is above in the if block
 		
-		timeController = TimeControllerFactory.createTimeController(searchAdaptorCfg.getTimeConfig(), boardForSetup.getColourToMove(), go);
-		currentMediator = new UCISearchMediatorImpl_NormalSearch(ponderMediator.getChannel(), go, timeController, boardForSetup.getColourToMove(),
+		currentMediator = new UCISearchMediatorImpl_NormalSearch(ponderMediator.getChannel(), go, searchAdaptorCfg.getTimeConfig(), boardForSetup.getColourToMove(),
 				bestMoveSender, getSearcher(false), isEndlessSearch(go)); 
 		currentGoCommand = go; //They should be the same anyway
 		

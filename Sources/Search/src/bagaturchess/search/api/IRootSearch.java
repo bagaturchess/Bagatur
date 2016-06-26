@@ -26,6 +26,7 @@ package bagaturchess.search.api;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
+import bagaturchess.uci.impl.commands.Go;
 
 
 public interface IRootSearch {
@@ -36,6 +37,9 @@ public interface IRootSearch {
 	public void decreaseTPTDepths(int reduction);
 	
 	public void newGame(IBitBoard bitboardForSetup);
+	
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, Go go);
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, IFinishCallback finishCallback, Go go);
 	
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, boolean useMateDistancePrunning, int[] prevPV);
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, int maxIterations, boolean useMateDistancePrunning, int[] prevPV);

@@ -131,7 +131,7 @@ public class GamesGenerator {
 		
 		dos.close();
 		
-		runner.stopEngines();
+		runner.destroyEngines();
 	}
 	
 	
@@ -258,7 +258,7 @@ public class GamesGenerator {
 				runner.setupPosition("startpos moves " + allMovesStr + moveStr);
 				runner.disable();
 
-				runner.go(depth);
+				runner.go_Depth(depth);
 				
 				infos = runner.getInfoLines();
 				if (infos.size() > 1) {
