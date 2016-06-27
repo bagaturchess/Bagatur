@@ -52,31 +52,54 @@ public final class SearchInfoFactory {
 	}
 	
 	
+	public ISearchInfo createSearchInfo_Minor(Info info, IBitBoard board) {
+		
+		SearchInfoImpl result = new SearchInfoImpl();
+		
+		result.setDepth(info.getDepth());
+		result.setSelDepth(info.getSelDepth());
+		result.setSearchedNodes(info.getNodes());
+		
+		//result.setCurrentMove(info.getCurrmove());
+		result.setCurrentMoveNumber(info.getCurrmoveNumber());
+		
+		return result;
+	}
+	
+	
 	public ISearchInfo createSearchInfo(Info info, IBitBoard board) {
 		
 		SearchInfoImpl result = new SearchInfoImpl();
 		
-		result.setEval(info.getEval());
 		result.setDepth(info.getDepth());
+		result.setSelDepth(info.getSelDepth());
+		result.setSearchedNodes(info.getNodes());
 		
-		int cur = 0;
-		int[] pv = new int[info.getPv().length];
-		for (String move: info.getPv()) {
+		result.setEval(info.getEval());
+
+		
+		if (info.getPv() != null && info.getPv().length > 0) {
 			
-			//System.out.println("pv line move["+ cur + "]=" + move);
+			int cur = 0;
+			int[] pv = new int[info.getPv().length];
+			for (String move: info.getPv()) {
+				
+				//System.out.println("pv line move["+ cur + "]=" + move);
+				
+				pv[cur++] = BoardUtils.uciStrToMove(board, move.trim());
+				board.makeMoveForward(pv[cur - 1]);
+			}
 			
-			pv[cur++] = BoardUtils.uciStrToMove(board, move.trim());
-			board.makeMoveForward(pv[cur - 1]);
+			for (int i = pv.length - 1; i >= 0; i--) {
+				board.makeMoveBackward(pv[i]);
+			}
+			
+			result.setPV(pv);
 		}
 		
-		for (int i = pv.length - 1; i >= 0; i--) {
-			board.makeMoveBackward(pv[i]);
-		}
 		
-		result.setPV(pv);
-		
-		if (pv.length > 0) {
-			result.setBestMove(pv[0]);
+		if (result.getPV() != null && result.getPV().length > 0) {
+			result.setBestMove(result.getPV()[0]);
 		}
 		
 		

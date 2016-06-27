@@ -53,6 +53,8 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 	
 	private UCIEnginesManager runner;
 	
+	private int hashfull;
+	
 	
 	public SequentialSearch_SeparateProcess(Object[] args) {
 		
@@ -260,6 +262,14 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 									} else {
 										//System.out.println("MINOR: " + line);
 										if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: getInfoLine minor line");
+										
+										Info info = new Info(line);
+										//System.out.println("MAJOR: " + info);
+										
+										hashfull = info.getHashfull() / 10;
+										
+										ISearchInfo searchInfo = SearchInfoFactory.getFactory().createSearchInfo_Minor(info, getBitboardForSetup());
+										final_mediator.changedMinor(searchInfo);
 									}
 								}
 							}
@@ -317,12 +327,13 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 
 	@Override
 	public int getTPTUsagePercent() {
-		return 0;//searcher.getEnv().getTPTUsagePercent();
+		return hashfull;
 	}
 
 
 	@Override
 	public void decreaseTPTDepths(int reduction) {
-		//searcher.getEnv().getTPT().correctAllDepths(reduction);
+		//Do nothing
+		//As UCI doesn't support such options, this have to be implemented "on top" or "in addition" of UCI communication between this object and currently running engine process(es)
 	}
 }
