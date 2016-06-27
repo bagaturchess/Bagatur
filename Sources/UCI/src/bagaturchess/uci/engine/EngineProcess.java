@@ -32,6 +32,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
 
 
@@ -153,6 +154,9 @@ public class EngineProcess {
 	}
 	
 	public void stop() throws IOException {
+		
+		ChannelManager.getChannel().dump("DUMP: EngineProcess.stop() with stack: " + new Exception());
+		
 		os.write("stop");	
 		os.newLine();
 		os.flush();
@@ -209,15 +213,40 @@ public class EngineProcess {
 	
 	public String getInfoLine() throws IOException {
 		
+		
 		return getInfoLine(new LineCallBack() {
+			
+			
+			private List<String> lines = new ArrayList<String>();
+			private String exitLine = null; 
+			
 			
 			@Override
 			public void newLine(String line) {
 				
-				//Do Nothing
-				
 				//System.out.println("EngineProcess: getInfoLine (and waiting bestmove to return): '" + line + "'");
 				
+				if (line.contains("LOG")) {
+					return;
+				}
+				
+				lines.add(line);
+				
+				if (line.contains("bestmove")) {
+					for (int i=lines.size() - 1; i >=0; i--) {
+						if (lines.get(i).contains("info "/*depth"*/) && lines.get(i).contains(" pv ")) {
+							//System.out.println("PV: '" + lines.get(i) + "'");
+							exitLine = lines.get(i);
+						}
+					}
+					throw new IllegalStateException("No pv: " + lines);
+				}
+			}
+			
+			
+			@Override
+			public String exitLine() {
+				return exitLine;
 			}
 		});
 	}
@@ -225,34 +254,21 @@ public class EngineProcess {
 	
 	public String getInfoLine(LineCallBack lineCallBack) throws IOException {
 		
-		List<String> lines = new ArrayList<String>();
-		
 		String line;
 		while ((line = is.readLine()) != null) {
-			
 			lineCallBack.newLine(line);
-			
-			if (line.contains("bestmove")) {
-				for (int i=lines.size() - 1; i >=0; i--) {
-					if (lines.get(i).contains("info "/*depth"*/) && lines.get(i).contains(" pv ")) {
-						//System.out.println("PV: '" + lines.get(i) + "'");
-						return lines.get(i);
-					}
-				}
-				throw new IllegalStateException("No pv: " + lines);
+			if (lineCallBack.exitLine() != null) {
+				return lineCallBack.exitLine();
 			}
-			
-			//System.out.println(line);
-			
-			lines.add(line);
 		}
 		
-		throw new IllegalStateException();
+		throw new IllegalStateException("Out of getInfoLine");
 	}
 	
 	
 	public static interface LineCallBack {
 		public void newLine(String line);
+		public String exitLine();//Returns last expected line, if it is still null than continue 
 	}
 	
 	

@@ -34,6 +34,7 @@ public class Info {
 	private String[] pv;
 	private int eval;
 	private boolean mate;
+	private int depth;
 	
 	
 	public Info(String infoLine) {
@@ -82,6 +83,21 @@ public class Info {
 		} else {
 			throw new IllegalStateException(infoLine);
 		}
+		
+		
+		/**
+		 * Extract scores
+		 */
+		int depthStart = infoLine.indexOf(" depth ");
+		if (depthStart >= 0) {
+			int depthNumberStart = infoLine.indexOf(" ", depthStart + 6);
+			if (depthNumberStart < 0) {
+				throw new IllegalStateException("depthNumberStart=" + depthNumberStart);
+			}
+			int depthNumberEnd = infoLine.indexOf(" ", depthNumberStart + 1);
+			String number = infoLine.substring(depthNumberStart, depthNumberEnd);
+			depth = Integer.parseInt(number);
+		}
 	}
 	
 	public int getEval() {
@@ -94,6 +110,10 @@ public class Info {
 
 	public String[] getPv() {
 		return pv;
+	}
+
+	public int getDepth() {
+		return depth;
 	}
 	
 	@Override

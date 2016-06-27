@@ -63,7 +63,7 @@ public class TournamentRunner {
 			
 			for (int i=0; i<engines.length; i++) {
 				try {
-					engines[i].stop();
+					engines[i].destroy();
 				} catch(Exception e1) {
 					e1.printStackTrace();
 				}

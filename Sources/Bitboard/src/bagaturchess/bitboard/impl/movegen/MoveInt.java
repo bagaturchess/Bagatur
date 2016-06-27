@@ -505,7 +505,7 @@ public class MoveInt {
 		int figureDirType = getDirType(move);
 		
 		if (isPromotion(move)) {
-
+			
 			int promotionFigureType = Constants.PIECE_IDENTITY_2_TYPE[getPromotionFigurePID(move)];
 			if (type == Figures.TYPE_PAWN && isCapture(move)) {
 				dirID += 2;

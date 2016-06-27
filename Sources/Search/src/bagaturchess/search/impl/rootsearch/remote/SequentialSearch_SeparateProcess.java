@@ -23,13 +23,12 @@
 package bagaturchess.search.impl.rootsearch.remote;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.common.Utils;
-import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -168,9 +167,9 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		
 		try {
 			
-			runner.setupPosition("startpos moves " + allMovesStr);
-			
 			runner.disable();
+			
+			runner.setupPosition("startpos moves " + allMovesStr);
 			
 			runner.go(go);
 			
@@ -218,13 +217,37 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 						
 						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: InboundQueueProcessor: before getInfoLines");
 						
-						List<String> infos = runner.getInfoLines(new LineCallBack() {
+						LineCallBack callback = new LineCallBack() {
+							
+							
+							private List<String> lines = new ArrayList<String>();
+							private String exitLine = null; 
+							
 							
 							@Override
 							public void newLine(String line) {
 								
-								if (line.indexOf("info") > 0) {
-									if (line.indexOf(" pv ") > 0) {
+								if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: getInfoLine '" + line + "'");
+								
+								if (line.contains("LOG")) {
+									return;
+								}
+								
+								lines.add(line);
+								
+								if (line.contains("bestmove")) {
+									
+									for (int i=lines.size() - 1; i >=0; i--) {
+										if (lines.get(i).contains("info ") && lines.get(i).contains(" pv ")) {
+											exitLine = lines.get(i);
+											return;
+										}
+									}
+									
+									throw new IllegalStateException("No pv: " + lines);
+									
+								} else if (line.contains("info ")) {
+									if (line.contains(" pv ")) {
 										
 										Info info = new Info(line);
 										//System.out.println("MAJOR: " + info);
@@ -236,14 +259,17 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 									} else {
 										//System.out.println("MINOR: " + line);
 									}
-								} else if (line.indexOf("bestmove") > 0) {
-									
 								}
-								
-								
 							}
 							
-						});
+							
+							@Override
+							public String exitLine() {
+								return exitLine;
+							}	
+						};
+						
+						List<String> infos = runner.getInfoLines(callback);
 						
 						if (infos.size() > 1) {
 							throw new IllegalStateException("Only one engine is supported");

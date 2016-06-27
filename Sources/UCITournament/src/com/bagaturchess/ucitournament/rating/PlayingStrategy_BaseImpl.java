@@ -75,8 +75,8 @@ public abstract class PlayingStrategy_BaseImpl implements IPlayingStrategy {
 		int result2 = match.execute(black, white);
 		workspace.getLog().log(getName() + "->	Result2:	" + result2);
 		
-		white.stop();
-		black.stop();
+		white.destroy();
+		black.destroy();
 		
 		double overall_result = (result1 - result2) / (double)2;
 		

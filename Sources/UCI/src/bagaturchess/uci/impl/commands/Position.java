@@ -88,7 +88,7 @@ public class Position extends Protocol {
 			channel.dump("Parsing 'position' command (there is no startpos or fen): " + commandLine);
 		}
 		
-		System.out.println(this);
+		System.out.println("LOG " + this);
 	}
 	
 	public String toString() {

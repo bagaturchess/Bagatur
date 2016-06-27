@@ -57,6 +57,7 @@ public final class SearchInfoFactory {
 		SearchInfoImpl result = new SearchInfoImpl();
 		
 		result.setEval(info.getEval());
+		result.setDepth(info.getDepth());
 		
 		int cur = 0;
 		int[] pv = new int[info.getPv().length];
@@ -64,11 +65,11 @@ public final class SearchInfoFactory {
 			
 			//System.out.println("pv line move["+ cur + "]=" + move);
 			
-			pv[cur++] = BoardUtils.uciStrToMove(board, move);
+			pv[cur++] = BoardUtils.uciStrToMove(board, move.trim());
 			board.makeMoveForward(pv[cur - 1]);
 		}
 		
-		for (int i=pv.length - 1; i>=0; i--) {
+		for (int i = pv.length - 1; i >= 0; i--) {
 			board.makeMoveBackward(pv[i]);
 		}
 		

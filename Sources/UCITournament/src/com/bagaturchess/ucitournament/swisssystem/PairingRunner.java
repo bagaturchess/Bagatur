@@ -163,8 +163,8 @@ public class PairingRunner {
 		int result = match.execute(white, black);
 		workspace.getLog().log("RESULT: " + result);
 		
-		white.stop();
-		black.stop();
+		white.destroy();
+		black.destroy();
 		
 		return result;
 	}

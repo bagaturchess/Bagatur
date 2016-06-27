@@ -67,7 +67,7 @@ public class TournamentRunner_EXT_CNP {
 			for (int i=0; i<engines.length; i++) {
 				engines[i].start();
 				engines[i].supportsUCI();
-				engines[i].stop();
+				engines[i].destroy();
 			}
 			
 			System.out.println("Engines start check: OK");
@@ -88,7 +88,7 @@ public class TournamentRunner_EXT_CNP {
 			
 			for (int i=0; i<engines.length; i++) {
 				try {
-					engines[i].stop();
+					engines[i].destroy();
 				} catch(Exception e1) {
 					e1.printStackTrace();
 				}

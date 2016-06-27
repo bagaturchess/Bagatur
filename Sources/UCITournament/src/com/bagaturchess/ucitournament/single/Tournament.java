@@ -74,8 +74,8 @@ public class Tournament {
 				tournamentResult.addResult(engine1Name, engine2Name, result);
 				
 				
-				engine1.stop();
-				engine2.stop();
+				engine1.destroy();
+				engine2.destroy();
 			}
 			System.out.println("\r\nRESULT [round " + (round + 1) + "]: " + (new Date()) + "\r\n" + tournamentResult);
 		}
