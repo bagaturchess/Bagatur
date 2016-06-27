@@ -57,10 +57,10 @@ public class SearchInfoUtils {
 		
 		if (tptusage != -1) message.append(" hashfull " + (10 * tptusage));
 		
-		message.append(" pv ");
-		
-		//if (!info.isUpperBound()) {
+		if (!info.isUpperBound()) {
 			
+			message.append(" pv ");
+		
 			if (info.getPV() != null) {
 				for (int j=0; j<info.getPV().length; j++) {
 					MoveInt.moveToStringUCI(info.getPV()[j], message);
@@ -69,7 +69,7 @@ public class SearchInfoUtils {
 					}
 				}
 			}
-		//}
+		}
 		
 		return message.toString();
 	}

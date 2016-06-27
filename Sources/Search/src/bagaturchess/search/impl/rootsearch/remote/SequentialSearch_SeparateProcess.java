@@ -167,11 +167,11 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		
 		try {
 			
-			runner.disable();
-			
 			runner.setupPosition("startpos moves " + allMovesStr);
 			
 			runner.go(go);
+			
+			runner.disable();
 			
 			
 			final ISearchMediator final_mediator = mediator;
@@ -230,6 +230,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 								if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: getInfoLine '" + line + "'");
 								
 								if (line.contains("LOG")) {
+									if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: getInfoLine SKIPED, contains LOG");
 									return;
 								}
 								
@@ -258,6 +259,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 										}
 									} else {
 										//System.out.println("MINOR: " + line);
+										if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: getInfoLine minor line");
 									}
 								}
 							}
