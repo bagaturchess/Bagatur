@@ -33,10 +33,10 @@ public class MemoryConsumers {
 	private static double MEMORY_USAGE_PERCENT; 
 	
 	private static final int SIZE_MIN_ENTRIES_MULTIPLIER				= 111;
-	private static final int SIZE_MIN_ENTRIES_TPT						= 27 * SIZE_MIN_ENTRIES_MULTIPLIER;
-	private static final int SIZE_MIN_ENTRIES_EC						= 21 * SIZE_MIN_ENTRIES_MULTIPLIER;
+	private static final int SIZE_MIN_ENTRIES_TPT						= (int) (25.38 * SIZE_MIN_ENTRIES_MULTIPLIER);
+	private static final int SIZE_MIN_ENTRIES_EC						= (int) (19.72 * SIZE_MIN_ENTRIES_MULTIPLIER);
 	private static final int SIZE_MIN_ENTRIES_PEC						= 1 * SIZE_MIN_ENTRIES_MULTIPLIER;
-	private static final int SIZE_MIN_ENTRIES_GTB						= 9 * SIZE_MIN_ENTRIES_MULTIPLIER;
+	private static final int SIZE_MIN_ENTRIES_GTB						= (int) (7.89 * SIZE_MIN_ENTRIES_MULTIPLIER);
 	
 	
 	public static void set_JVMDLL_MEMORY_CONSUMPTION(int val) {
@@ -119,9 +119,9 @@ public class MemoryConsumers {
 		ChannelManager.getChannel().dump("Initializing Memory Consumers ...");
 		
 		ChannelManager.getChannel().dump("SEE Metadata ... ");
-		long lastAvailable_in_MB = ((getAvailableMemory() - memoryBuffer) / (1024 * 1024));
+		long lastAvailable_in_MB = ((getAvailableMemory()) / (1024 * 1024));
 		seeMetadata = SeeMetadata.getSingleton();
-		ChannelManager.getChannel().dump("SEE Metadata OK => " + (lastAvailable_in_MB - ((getAvailableMemory() - memoryBuffer) / (1024 * 1024))) + "MB");
+		ChannelManager.getChannel().dump("SEE Metadata OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
 		
 		
 		ChannelManager.getChannel().dump("Openning Book enabled: " + ownBookEnabled);
@@ -214,21 +214,26 @@ public class MemoryConsumers {
 		//			+ (availableMemory / (1024 * 1024)) + " are available). Please increase the -Xmx option of Java VM");
 		//}
 		
-		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, getTPTEntrySize(availableMemory, SIZE_MIN_ENTRIES_TPT));
+		int availableMemory_in_MB = (int) (availableMemory / (1024 * 1024));
+		int test_size1 = Math.min(177, availableMemory_in_MB) * 1000;
+		int test_size2 = Math.min(177, availableMemory_in_MB) * 100;
+		
+		
+		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, getTPTEntrySize(availableMemory, 			Math.max(test_size1, SIZE_MIN_ENTRIES_TPT)));
 		ChannelManager.getChannel().dump("Transposition Table size is " + size_tpt);
 		
-		int size_ec = Math.max(SIZE_MIN_ENTRIES_EC, getEvalCacheSize(availableMemory, SIZE_MIN_ENTRIES_EC));
+		int size_ec = Math.max(SIZE_MIN_ENTRIES_EC, getEvalCacheSize(availableMemory,			 	Math.max(test_size1, SIZE_MIN_ENTRIES_EC)));
 		ChannelManager.getChannel().dump("Eval Cache size is " + size_ec);
 		
-		int size_pc = Math.max(SIZE_MIN_ENTRIES_PEC, getPawnsEvalCacheSize(availableMemory, engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName(), SIZE_MIN_ENTRIES_PEC));
+		int size_pc = Math.max(SIZE_MIN_ENTRIES_PEC, getPawnsEvalCacheSize(availableMemory, engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName(),
+																										Math.max(test_size2, SIZE_MIN_ENTRIES_PEC)));
 		ChannelManager.getChannel().dump("Pawns Eval Cache size is " + size_pc);
 
 		int size_gtb_out = 0;
 		if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
-			size_gtb_out = Math.max(SIZE_MIN_ENTRIES_GTB, getGTBEntrySize_OUT(availableMemory, SIZE_MIN_ENTRIES_GTB));
+			size_gtb_out = Math.max(SIZE_MIN_ENTRIES_GTB, getGTBEntrySize_OUT(availableMemory, 	Math.max(test_size1, SIZE_MIN_ENTRIES_GTB)));
 			ChannelManager.getChannel().dump("Endgame Table Bases cache (OUT) size is " + size_gtb_out);
 		}
-		
 		
 		//Create
 		
