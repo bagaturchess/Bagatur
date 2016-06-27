@@ -60,8 +60,11 @@ public final class SearchInfoFactory {
 		result.setSelDepth(info.getSelDepth());
 		result.setSearchedNodes(info.getNodes());
 		
-		//result.setCurrentMove(info.getCurrmove());
-		result.setCurrentMoveNumber(info.getCurrmoveNumber());
+		String currmove = info.getCurrmove();
+		if (currmove != null) {
+			result.setCurrentMove(BoardUtils.parseSingleUCIMove(board, board.getColourToMove(), currmove));
+			result.setCurrentMoveNumber(info.getCurrmoveNumber());
+		}
 		
 		return result;
 	}
@@ -102,6 +105,11 @@ public final class SearchInfoFactory {
 			result.setBestMove(result.getPV()[0]);
 		}
 		
+		String currmove = info.getCurrmove();
+		if (currmove != null) {
+			result.setCurrentMove(BoardUtils.parseSingleUCIMove(board, board.getColourToMove(), currmove));
+			result.setCurrentMoveNumber(info.getCurrmoveNumber());
+		}
 		
 		return result;
 	}
