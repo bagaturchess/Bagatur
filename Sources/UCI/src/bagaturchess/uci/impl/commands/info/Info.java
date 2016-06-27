@@ -95,7 +95,7 @@ public class Info {
 				throw new IllegalStateException("depthNumberStart=" + depthNumberStart);
 			}
 			int depthNumberEnd = infoLine.indexOf(" ", depthNumberStart + 1);
-			String number = infoLine.substring(depthNumberStart, depthNumberEnd);
+			String number = infoLine.substring(depthNumberStart + 1, depthNumberEnd).trim();
 			depth = Integer.parseInt(number);
 		}
 	}
