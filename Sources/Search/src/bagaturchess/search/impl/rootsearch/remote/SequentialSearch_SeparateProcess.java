@@ -23,6 +23,7 @@
 package bagaturchess.search.impl.rootsearch.remote;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -40,6 +41,7 @@ import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.EngineProcess.LineCallBack;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl_DistributionImpl;
 import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 import bagaturchess.uci.engine.UCIEnginesManager;
 import bagaturchess.uci.impl.commands.Go;
@@ -62,12 +64,24 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		
 		executor = Executors.newFixedThreadPool(2);
 		
+		
 		runner = new UCIEnginesManager();
 		
-		EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient",
+		
+		String workdir = new File("./").getAbsolutePath();//"C:/DATA/OWN/chess/software/ARENA/arena_3.5.1/Engines/BagaturEngine_DEV/",
+		
+		/*EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient",
 				"C:/DATA/OWN/chess/GIT_REPO/Bagatur-Chess-Engine-And-Tools/Sources/",
 				"",
+				256);*/
+		
+		ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: Starting Java process of engine in workdir '" + workdir + "'");
+		
+		EngineProcess engine = new EngineProcess_BagaturImpl_DistributionImpl("BagaturEngineClient",
+				workdir + File.separatorChar,
+				"",
 				256);
+		
 		
 		runner.addEngine(engine);
 		
