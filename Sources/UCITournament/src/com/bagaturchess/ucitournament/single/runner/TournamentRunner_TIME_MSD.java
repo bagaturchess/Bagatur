@@ -24,10 +24,10 @@ package com.bagaturchess.ucitournament.single.runner;
 
 
 import bagaturchess.uci.engine.EngineProcess;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_TimeAndInc;
-import bagaturchess.uci.engine.EngineProcess_BagaturImpl;
 import com.bagaturchess.ucitournament.single.Tournament;
 import com.bagaturchess.ucitournament.single.schedule.ITournamentSchedule;
 import com.bagaturchess.ucitournament.single.schedule.TournamentSchedule_EvenScores;
@@ -38,15 +38,15 @@ public class TournamentRunner_TIME_MSD {
 	
 	public static void main(String[] args) {
 		
-		EngineProcess bagatur_NoExts = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.ECFG_NoExts", "");
-		EngineProcess bagatur_Default = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.properties.EngineConfigBaseImpl", "");
+		EngineProcess bagatur_NoExts = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.ECFG_NoExts", "");
+		EngineProcess bagatur_Default = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.properties.EngineConfigBaseImpl", "");
 		
 		
 		//Engine bagatur50 = new BagaturEngine("com.krasimir.topchiyski.chess.configs.tune.time.maxscorediff.ECFG_Time", "50");
-		EngineProcess bagatur100 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.time.maxscorediff.ECFG_Time", "100");
-		EngineProcess bagatur200 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.time.maxscorediff.ECFG_Time", "200");
+		EngineProcess bagatur100 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.time.maxscorediff.ECFG_Time", "100");
+		EngineProcess bagatur200 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.time.maxscorediff.ECFG_Time", "200");
 		//Engine bagatur300 = new BagaturEngine("com.krasimir.topchiyski.chess.configs.tune.time.maxscorediff.ECFG_Time", "300");
-		EngineProcess bagatur400 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.time.maxscorediff.ECFG_Time", "400");
+		EngineProcess bagatur400 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.time.maxscorediff.ECFG_Time", "400");
 		//Engine bagatur500 = new BagaturEngine("com.krasimir.topchiyski.chess.configs.tune.time.maxscorediff.ECFG_Time", "500");
 		
 		EngineProcess[] engines = new EngineProcess[] {bagatur_NoExts, bagatur_Default,

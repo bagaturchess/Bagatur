@@ -40,7 +40,7 @@ import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.EngineProcess.LineCallBack;
-import bagaturchess.uci.engine.EngineProcess_BagaturImpl;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 import bagaturchess.uci.engine.UCIEnginesManager;
 import bagaturchess.uci.impl.commands.Go;
 import bagaturchess.uci.impl.commands.info.Info;
@@ -64,7 +64,10 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		
 		runner = new UCIEnginesManager();
 		
-		EngineProcess engine = new EngineProcess_BagaturImpl("BagaturEngineClient", "");
+		EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient",
+				"C:/DATA/OWN/chess/GIT_REPO/Bagatur-Chess-Engine-And-Tools/Sources/",
+				"",
+				256);
 		
 		runner.addEngine(engine);
 		

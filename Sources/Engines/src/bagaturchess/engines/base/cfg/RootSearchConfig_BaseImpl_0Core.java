@@ -13,6 +13,7 @@ public class RootSearchConfig_BaseImpl_0Core extends RootSearchConfig_BaseImpl i
 		super(args);
 	}
 	
+	
 	@Override
 	public int getThreadsCount() {
 		return 0;

@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import bagaturchess.uci.engine.EngineProcess_BagaturImpl;
 import bagaturchess.uci.engine.EngineProcess;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_FixedNodes;
@@ -148,8 +148,8 @@ public class PairingRunner {
 			}
 		}*/
 		
-		EngineProcess white = new EngineProcess_BagaturImpl(pair.getWhite().getName(), pair.getWhite().getProgramArgs());
-		EngineProcess black = new EngineProcess_BagaturImpl(pair.getBlack().getName(), pair.getBlack().getProgramArgs());
+		EngineProcess white = new EngineProcess_BagaturImpl_WorkspaceImpl(pair.getWhite().getName(), pair.getWhite().getProgramArgs());
+		EngineProcess black = new EngineProcess_BagaturImpl_WorkspaceImpl(pair.getBlack().getName(), pair.getBlack().getProgramArgs());
 		
 		white.start();
 		Thread.sleep(5);

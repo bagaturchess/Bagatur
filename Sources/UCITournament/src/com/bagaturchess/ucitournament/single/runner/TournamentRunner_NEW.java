@@ -24,6 +24,7 @@ package com.bagaturchess.ucitournament.single.runner;
 
 
 import bagaturchess.uci.engine.EngineProcess;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_TimePerMove;
@@ -55,8 +56,8 @@ public class TournamentRunner_NEW {
 		//arg.8=bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl
 		//arg.9=bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2
 		
-		EngineProcess_BagaturImpl bagatur1 = new EngineProcess_BagaturImpl("Bagatur_1.2", programargs_bagatur12);
-		EngineProcess_BagaturImpl bagatur2 = new EngineProcess_BagaturImpl("Bagatur_MTD1", programargs_bagaturMTD1);
+		EngineProcess_BagaturImpl bagatur1 = new EngineProcess_BagaturImpl_WorkspaceImpl("Bagatur_1.2", programargs_bagatur12);
+		EngineProcess_BagaturImpl bagatur2 = new EngineProcess_BagaturImpl_WorkspaceImpl("Bagatur_MTD1", programargs_bagaturMTD1);
 		
 		
 		

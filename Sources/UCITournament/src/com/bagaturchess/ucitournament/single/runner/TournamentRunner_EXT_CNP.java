@@ -24,10 +24,10 @@ package com.bagaturchess.ucitournament.single.runner;
 
 
 import bagaturchess.uci.engine.EngineProcess;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_TimeAndInc;
-import bagaturchess.uci.engine.EngineProcess_BagaturImpl;
 import com.bagaturchess.ucitournament.single.Tournament;
 import com.bagaturchess.ucitournament.single.schedule.ITournamentSchedule;
 import com.bagaturchess.ucitournament.single.schedule.TournamentSchedule_EvenScores;
@@ -38,25 +38,25 @@ public class TournamentRunner_EXT_CNP {
 	
 	public static void main(String[] args) {
 		
-		EngineProcess bagatur = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.ECFG_NoExts", "");
+		EngineProcess bagatur = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.ECFG_NoExts", "");
 		
 		
-		EngineProcess bagatur1 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "1");
-		EngineProcess bagatur2 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "2");
-		EngineProcess bagatur3 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "3");
-		EngineProcess bagatur4 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "4");
-		EngineProcess bagatur5 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "5");
-		EngineProcess bagatur6 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "6");
-		EngineProcess bagatur7 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "7");
-		EngineProcess bagatur8 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "8");
-		EngineProcess bagatur9 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "9");
-		EngineProcess bagatur10 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "10");
-		EngineProcess bagatur11 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "11");
-		EngineProcess bagatur12 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "12");
-		EngineProcess bagatur13 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "13");
-		EngineProcess bagatur14 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "14");
-		EngineProcess bagatur15 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "15");
-		EngineProcess bagatur16 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "16");
+		EngineProcess bagatur1 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "1");
+		EngineProcess bagatur2 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "2");
+		EngineProcess bagatur3 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "3");
+		EngineProcess bagatur4 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "4");
+		EngineProcess bagatur5 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "5");
+		EngineProcess bagatur6 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "6");
+		EngineProcess bagatur7 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "7");
+		EngineProcess bagatur8 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "8");
+		EngineProcess bagatur9 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "9");
+		EngineProcess bagatur10 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "10");
+		EngineProcess bagatur11 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "11");
+		EngineProcess bagatur12 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "12");
+		EngineProcess bagatur13 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "13");
+		EngineProcess bagatur14 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "14");
+		EngineProcess bagatur15 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "15");
+		EngineProcess bagatur16 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.cnp.extmode_none.ECFG_EXTS_CNP", "16");
 		
 		EngineProcess[] engines = new EngineProcess[] {bagatur, bagatur1, bagatur2, bagatur3, bagatur4, bagatur5, bagatur6, bagatur7, bagatur8, bagatur9,
 				bagatur10, bagatur11, bagatur12, bagatur13, bagatur14, bagatur15, bagatur16};

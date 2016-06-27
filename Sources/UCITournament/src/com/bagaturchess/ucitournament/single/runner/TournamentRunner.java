@@ -24,10 +24,10 @@ package com.bagaturchess.ucitournament.single.runner;
 
 
 import bagaturchess.uci.engine.EngineProcess;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_FixedDepth;
-import bagaturchess.uci.engine.EngineProcess_BagaturImpl;
 import com.bagaturchess.ucitournament.single.Tournament;
 import com.bagaturchess.ucitournament.single.schedule.ITournamentSchedule;
 import com.bagaturchess.ucitournament.single.schedule.TournamentSchedule_EvenScores;
@@ -37,8 +37,8 @@ public class TournamentRunner {
 	
 	public static void main(String[] args) {
 		
-		EngineProcess bagatur1 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.sr.ECFG_NoExts", "");
-		EngineProcess bagatur2 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.sr.ECFG_NoExts", "");
+		EngineProcess bagatur1 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.sr.ECFG_NoExts", "");
+		EngineProcess bagatur2 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.sr.ECFG_NoExts", "");
 		
 		//Engine[] engines = new Engine[] {glaurung, rybka, aice, fruit21};
 		EngineProcess[] engines = new EngineProcess[] {bagatur1, bagatur2};

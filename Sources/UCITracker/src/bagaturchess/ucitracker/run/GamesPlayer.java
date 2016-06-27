@@ -38,7 +38,7 @@ import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.uci.engine.EngineProcess;
-import bagaturchess.uci.engine.EngineProcess_BagaturImpl;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 import bagaturchess.uci.engine.UCIEnginesManager;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedGame;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedMove;
@@ -101,7 +101,7 @@ public class GamesPlayer {
 				"C:\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-7-win\\stockfish-7-win\\Windows\\");
 			*/
 			
-			EngineProcess engine = new EngineProcess_BagaturImpl("BagaturEngineClient", "");
+			EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");
 			
 			control.execute(engine, "./bagatur.cg", 1000000, true);
 			

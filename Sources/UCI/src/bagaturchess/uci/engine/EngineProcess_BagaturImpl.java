@@ -23,55 +23,39 @@
 package bagaturchess.uci.engine;
 
 
+import java.io.File;
+
 import bagaturchess.uci.engine.EngineProcess;
 
 
 public class EngineProcess_BagaturImpl extends EngineProcess {
 	
 	
-	private static String JAVA_EXE = "\"C:/Program Files/Java/jdk1.8.0_45/bin/java.exe\"";
-	private static String JAVA_OPTIONS = "-Xmx128M";
-	private static String JAVA_MAIN = "bagaturchess.uci.run.Boot";
-	
-	private static String JAVA_WORK = "C:/DATA/OWN/chess/GIT_REPO/Bagatur-Chess-Engine-And-Tools/Sources/UCI";
-	
-	private static String WORKSPACE = "C:/DATA/OWN/chess/GIT_REPO/Bagatur-Chess-Engine-And-Tools/Sources/";
-	private static String JAVA_CP = "";
-	static {
-		JAVA_CP += WORKSPACE + "Bitboard/bin;";
-		JAVA_CP += WORKSPACE + "Opening/bin;";
-		JAVA_CP += WORKSPACE + "Search/bin;";
-		JAVA_CP += WORKSPACE + "UCI/bin;";
-		JAVA_CP += WORKSPACE + "LearningAPI/bin;";
-		JAVA_CP += WORKSPACE + "Engines/bin;";
-		JAVA_CP += WORKSPACE + "EGTB/bin;";
-	}
-	
-	private static String ARGS = "";
-	static {
-		ARGS += "bagaturchess.engines.base.cfg.UCIConfig_BaseImpl_DEBUG "; 
-		ARGS += "bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove ";
-		ARGS += "bagaturchess.engines.base.cfg.UCISearchAdaptorConfig_BaseImpl ";
-		ARGS += "bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch ";
-		ARGS += "bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core ";
-		ARGS += "bagaturchess.search.impl.alg.impl0.SearchMTD0 ";
-		ARGS += "bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD_SMP ";
-		ARGS += "bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl ";
-		ARGS += "bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2 ";
-	}
-	
+	protected static String MAIN_CLASS = "bagaturchess.uci.run.Boot";
+	protected static String JAVA_OPTIONS = "";
 	
 	private String engineName;
 	
 	
-	public EngineProcess_BagaturImpl(String _engineName, String programArgs) {
-		super(JAVA_EXE + " " + JAVA_OPTIONS +
-				" -cp " + JAVA_CP + " " + JAVA_MAIN + " " + ARGS + programArgs, null, JAVA_WORK);
+	public EngineProcess_BagaturImpl(String _engineName, String commandline, String workdir) {
+		
+		super(commandline, null, workdir);
+		
 		engineName = _engineName;
 	}
 	
+
 	@Override
 	public String getName() {
 		return engineName;
+	}
+	
+	
+	protected static String getJavaPath_javawexe() {
+		String javaHome = System.getProperty("java.home");
+	    File f = new File(javaHome);
+	    f = new File(f, "bin");
+	    f = new File(f, "javaw.exe");
+	    return f.getAbsolutePath();
 	}
 }

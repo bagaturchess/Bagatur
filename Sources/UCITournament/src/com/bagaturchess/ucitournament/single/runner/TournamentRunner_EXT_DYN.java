@@ -24,10 +24,10 @@ package com.bagaturchess.ucitournament.single.runner;
 
 
 import bagaturchess.uci.engine.EngineProcess;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_TimeAndInc;
-import bagaturchess.uci.engine.EngineProcess_BagaturImpl;
 import com.bagaturchess.ucitournament.single.Tournament;
 import com.bagaturchess.ucitournament.single.schedule.ITournamentSchedule;
 import com.bagaturchess.ucitournament.single.schedule.TournamentSchedule_EvenScores;
@@ -38,19 +38,19 @@ public class TournamentRunner_EXT_DYN {
 	
 	public static void main(String[] args) {
 		
-		EngineProcess bagatur_NoExts = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.ECFG_NoExts", "");
-		EngineProcess bagatur_Default = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.properties.EngineConfigBaseImpl", "");
+		EngineProcess bagatur_NoExts = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.ECFG_NoExts", "");
+		EngineProcess bagatur_Default = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.properties.EngineConfigBaseImpl", "");
 		
 		
-		EngineProcess bagatur1 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "1");
-		EngineProcess bagatur10 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "10");
-		EngineProcess bagatur25 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "25");
-		EngineProcess bagatur50 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "50");
-		EngineProcess bagatur100 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "100");
-		EngineProcess bagatur200 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "200");
-		EngineProcess bagatur400 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "400");
-		EngineProcess bagatur1000 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "1000");
-		EngineProcess bagatur10000 = new EngineProcess_BagaturImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "10000");
+		EngineProcess bagatur1 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "1");
+		EngineProcess bagatur10 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "10");
+		EngineProcess bagatur25 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "25");
+		EngineProcess bagatur50 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "50");
+		EngineProcess bagatur100 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "100");
+		EngineProcess bagatur200 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "200");
+		EngineProcess bagatur400 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "400");
+		EngineProcess bagatur1000 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "1000");
+		EngineProcess bagatur10000 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.extmode_mixed.all16.ECFG_DynamicExts", "10000");
 		
 		EngineProcess[] engines = new EngineProcess[] {bagatur_NoExts, bagatur_Default,
 				bagatur1, bagatur10, bagatur25, bagatur50, bagatur100, bagatur200, bagatur400, bagatur1000, bagatur10000};
