@@ -32,6 +32,7 @@ import java.util.concurrent.Executors;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -142,9 +143,11 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		
 		String allMovesStr = MoveInt.getMovesUCI(_bitboardForSetup);
 		
-		runner.setupPosition("fen " + initialFEN + " moves " + allMovesStr);
-		
-		//runner.setupPosition("startpos");
+		if (initialFEN.equals(Constants.INITIAL_BOARD)) {
+			runner.setupPosition("startpos moves " + allMovesStr);	
+		} else {
+			runner.setupPosition("fen " + initialFEN + " moves " + allMovesStr);	
+		}
 	}
 	
 	
@@ -187,15 +190,10 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		setupBoard(bitboardForSetup);
 		
 		
-		String allMovesStr = MoveInt.getMovesUCI(getBitboardForSetup());
-		
-		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: allMovesStr=" + allMovesStr);
-		
-		//StringBuilder message = new StringBuilder(32);
-		//MoveInt.moveToStringUCI(cur_move, message);
-		//String moveStr = message.toString();
-		
 		try {
+			
+			String allMovesStr = MoveInt.getMovesUCI(getBitboardForSetup());
+			if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: allMovesStr=" + allMovesStr);
 			
 			//runner.setupPosition("startpos moves " + allMovesStr);
 			runner.setupPosition("moves " + allMovesStr);
