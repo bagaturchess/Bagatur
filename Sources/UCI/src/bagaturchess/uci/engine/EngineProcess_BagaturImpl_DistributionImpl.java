@@ -22,6 +22,8 @@
  */
 package bagaturchess.uci.engine;
 
+import java.io.File;
+
 
 public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_BagaturImpl {
 	
@@ -48,7 +50,8 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 	public EngineProcess_BagaturImpl_DistributionImpl(String _engineName, String workdir, String programArgs, int memoryInMB) {
 		
 		super(_engineName, "\"" + getJavaPath_javawexe() + "\""
-							+ " " + JAVA_OPTIONS + "-Xmx" + memoryInMB + "M"
+							+ " " + JAVA_OPTIONS + " -Djava.library.path=." + File.separator + "bin" + File.pathSeparator
+							+ "-Xmx" + memoryInMB + "M"
 							+ " -cp " + getClassPath(workdir) + " "
 							+ MAIN_CLASS + " "
 							+ ARGS
@@ -68,7 +71,7 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 		JAVA_CP += workspace + "bin/BagaturEngines.jar;";
 		JAVA_CP += workspace + "bin/BagaturEGTB.jar;";
 		JAVA_CP += workspace + "bin/egtbprobe.jar;";
-		JAVA_CP += workspace + "bin/;";//TODO: this doesn't work/load the DLLs, they have to be added in java.library.path
+		//JAVA_CP += workspace + "bin/;";//TODO: this doesn't work/load the DLLs, they have to be added in java.library.path
 		return JAVA_CP;
 	}
 }
