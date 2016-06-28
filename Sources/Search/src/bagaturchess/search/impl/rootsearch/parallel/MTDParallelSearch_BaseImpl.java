@@ -29,9 +29,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
+import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.IRootSearchConfig_SMP;
 import bagaturchess.search.api.internal.CompositeStopper;
 import bagaturchess.search.api.internal.ISearch;
@@ -73,11 +73,6 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	
 	protected abstract void sequentialSearchers_Negamax(IRootSearch searcher, IBitBoard _bitboardForSetup, ISearchMediator mediator,
 			final IFinishCallback multiPVCallback, Go go, boolean dont_wrap_mediator);
-	
-	
-	public IRootSearchConfig_SMP getRootSearchConfig() {
-		return (IRootSearchConfig_SMP) super.getRootSearchConfig();
-	}
 	
 	
 	@Override
