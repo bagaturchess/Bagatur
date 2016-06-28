@@ -128,10 +128,10 @@ public class StateManager extends Protocol implements BestMoveSender {
 							sendUCIOK();
 							break;
 						case COMMAND_TO_ENGINE_ISREADY:
-							//Commented as after the later call with ucinewgame command, the search adaptor will be re-created anyway
-							/*if (searchAdaptor == null) {
+							//Can be commented as after the later call with ucinewgame command, the search adaptor will be re-created anyway
+							if (searchAdaptor == null) {
 								createSearchAdaptor();
-							}*/
+							}
 							sendReadyOK();
 							break;
 						case COMMAND_TO_ENGINE_NEWGAME:
