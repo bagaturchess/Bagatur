@@ -55,10 +55,10 @@ public class MemoryConsumers {
 	static {
 		if (getJVMBitmode() == 64) {
 			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT = 0.23;
+			MEMORY_USAGE_PERCENT = 0.91;//0.23;
 		} else { //32
 			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT =  0.23;
+			MEMORY_USAGE_PERCENT =  0.91;//0.23;
 		}
 		
 		try {
@@ -173,33 +173,24 @@ public class MemoryConsumers {
 			}
 		}
 		
-		
-		ChannelManager.getChannel().dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
-		ChannelManager.getChannel().dump("Transposition Table usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
-		ChannelManager.getChannel().dump("Endgame Table Bases Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 	+ " X : " + (100 * engineConfiguration.getGTBUsagePercent()) + "%");
-		ChannelManager.getChannel().dump("Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 					+ " X : " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
-		ChannelManager.getChannel().dump("Pawns Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getPawnsCacheUsagePercent()) + "%");
-		
-		double percents_sum = engineConfiguration.getThreadsCount() * engineConfiguration.getTPTUsagePercent()
-							+ engineConfiguration.getThreadsCount() * engineConfiguration.getGTBUsagePercent()
-							+ engineConfiguration.getThreadsCount() * engineConfiguration.getEvalCacheUsagePercent()
-							+ engineConfiguration.getThreadsCount() * engineConfiguration.getPawnsCacheUsagePercent();
-		
-		if (percents_sum < 0.9999 || percents_sum > 1.0001) {
-			throw new IllegalStateException("Percents sum is not near to 1. It is " + percents_sum);
+		if (threadsCount > 0) {
+			ChannelManager.getChannel().dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
+			ChannelManager.getChannel().dump("Transposition Table usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
+			ChannelManager.getChannel().dump("Endgame Table Bases Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 	+ " X : " + (100 * engineConfiguration.getGTBUsagePercent()) + "%");
+			ChannelManager.getChannel().dump("Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 					+ " X : " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
+			ChannelManager.getChannel().dump("Pawns Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getPawnsCacheUsagePercent()) + "%");
+			
+			double percents_sum = engineConfiguration.getThreadsCount() * engineConfiguration.getTPTUsagePercent()
+								+ engineConfiguration.getThreadsCount() * engineConfiguration.getGTBUsagePercent()
+								+ engineConfiguration.getThreadsCount() * engineConfiguration.getEvalCacheUsagePercent()
+								+ engineConfiguration.getThreadsCount() * engineConfiguration.getPawnsCacheUsagePercent();
+			
+			if (percents_sum < 0.9999 || percents_sum > 1.0001) {
+				throw new IllegalStateException("Percents sum is not near to 1. It is " + percents_sum);
+			}
+			
+			initCaches(getAvailableMemory() - memoryBuffer);
 		}
-		
-		/*
-		try {
-			semaphoreFactory = (IBinarySemaphoreFactory) SharedData.class.getClassLoader().loadClass(engineConfiguration.getSemaphoreFactoryClassName()).newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new IllegalStateException(e);
-		}
-		*/
-		
-		initCaches(getAvailableMemory() - memoryBuffer);
-		
 		
 		ChannelManager.getChannel().dump("Memory Consumers are initialized. Final available memory buffer is: " + (memoryBuffer / (1024 * 1024)) + "MB");
 	}

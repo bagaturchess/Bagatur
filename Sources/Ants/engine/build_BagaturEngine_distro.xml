@@ -171,7 +171,7 @@
 	</copy>
   	
   	
-  	<!--copy tofile="${temp_dir}/Bagatur_64_2+_cores.bmp" >
+  	<copy tofile="${temp_dir}/Bagatur_64_2+_cores.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
 			<include name="BagaturEngine.bmp"/>
 		</fileset>
@@ -188,7 +188,7 @@
 	</copy>
 	
 	
-  	<copy tofile="${temp_dir}/Bagatur_64_4+_cores.bmp" >
+  	<!--copy tofile="${temp_dir}/Bagatur_64_4+_cores.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
 			<include name="BagaturEngine.bmp"/>
 		</fileset>
