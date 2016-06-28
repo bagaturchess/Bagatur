@@ -69,6 +69,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	
 	protected abstract List<IRootSearch> sequentialSearchers_Create();
 	
+	protected abstract ISearchMediator sequentialSearchers_WrapMediator(ISearchMediator root_mediator);
+	
 	protected abstract void sequentialSearchers_Negamax(IRootSearch searcher, IBitBoard _bitboardForSetup, ISearchMediator mediator,
 			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback,
 			int[] prevPV, boolean dont_wrap_mediator, Integer initialValue);
@@ -129,7 +131,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					for (int i = 0; i < searchers.size(); i++) {
 						BucketMediator cur_bucket = new BucketMediator(final_mediator);
 						mediators_bucket.add(cur_bucket);
-						mediators.add(new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(cur_bucket)));
+						mediators.add(sequentialSearchers_WrapMediator(cur_bucket));
 					}
 					
 					

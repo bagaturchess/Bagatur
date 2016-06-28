@@ -33,6 +33,7 @@ import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProcess;
+import bagaturchess.search.impl.rootsearch.sequential.Mediator_AlphaAndBestMoveWindow;
 import bagaturchess.uci.api.ChannelManager;
 
 
@@ -64,6 +65,12 @@ public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl 
 		}
 		
 		return searchers;
+	}
+	
+	
+	@Override
+	protected ISearchMediator sequentialSearchers_WrapMediator(ISearchMediator mediator) {
+		return new Mediator_AlphaAndBestMoveWindow(mediator);
 	}
 	
 	
