@@ -43,6 +43,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
+import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ProcessesImpl;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImpl;
 import bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProcess;
 import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
@@ -133,7 +134,8 @@ public class MTDSchedulerMain {
 		
 		SharedData arg1 = new SharedData(ChannelManager.getChannel(), cfg);
 		
-		IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, arg1});
+		IRootSearch search = new MTDParallelSearch_ProcessesImpl(new Object[] {cfg, arg1});
+		//IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, arg1});
 		//IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
 		//IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, arg1});
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
@@ -170,10 +172,10 @@ public class MTDSchedulerMain {
 		
 		//IBitBoard bitboard  = new Board("1r6/4k3/1pbpPb1p/p1p2P2/2Pp3p/3P3P/2P2RP1/R6K b - - 3 39", null/*sharedData.getAndRemovePawnsCache()*/, cfg.getBoardConfig());
 		
-		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
+		IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
-		IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
+		//IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("7k/6r1/8/8/8/8/1Q6/K7 w - -", null, cfg.getBoardConfig()); //Queen and King vs. Rook and King
 		//IBitBoard bitboard  = new Board("k7/1q6/8/8/8/7R/8/6K1 b - - ", null, cfg.getBoardConfig());
 				
@@ -517,7 +519,8 @@ public class MTDSchedulerMain {
 		//ISearchMediator mediator1 = new MediatorDummper(bitboard, eval, 5000000, true);
 		//IChannel channel = new Channel_Console();
 		
-		Go go = new Go(ChannelManager.getChannel(), "go depth 10");
+		//Go go = new Go(ChannelManager.getChannel(), "go depth 10");
+		Go go = new Go(ChannelManager.getChannel(), "go infinite");
 				
 		final ISearchMediator mediator1 = new UCISearchMediatorImpl_NormalSearch(ChannelManager.getChannel(),
 				

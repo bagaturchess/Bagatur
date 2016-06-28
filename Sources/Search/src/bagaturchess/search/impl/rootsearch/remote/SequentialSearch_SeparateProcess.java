@@ -69,18 +69,17 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		
 		
 		String workdir = new File("./").getAbsolutePath();//"C:/DATA/OWN/chess/software/ARENA/arena_3.5.1/Engines/BagaturEngine_DEV/",
-		
-		/*EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient",
-				"C:/DATA/OWN/chess/GIT_REPO/Bagatur-Chess-Engine-And-Tools/Sources/",
-				"",
-				256);*/
-		
 		ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: Starting Java process of engine in workdir '" + workdir + "'");
 		
-		EngineProcess engine = new EngineProcess_BagaturImpl_DistributionImpl("BagaturEngineClient",
-				workdir + File.separatorChar,
+		EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient",
+				"C:/DATA/OWN/chess/GIT_REPO/Bagatur-Chess-Engine-And-Tools/Sources/",
 				"",
 				256);
+		
+		/*EngineProcess engine = new EngineProcess_BagaturImpl_DistributionImpl("BagaturEngineClient",
+				workdir + File.separatorChar,
+				"",
+				256);*/
 		
 		
 		runner.addEngine(engine);
@@ -150,7 +149,8 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
 			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback, final int[] prevPV) {
 
-		throw new IllegalStateException();
+		//throw new IllegalStateException();
+		negamax(_bitboardForSetup, mediator, multiPVCallback, new Go(ChannelManager.getChannel(), "go infinite"));
 	}
 	
 	

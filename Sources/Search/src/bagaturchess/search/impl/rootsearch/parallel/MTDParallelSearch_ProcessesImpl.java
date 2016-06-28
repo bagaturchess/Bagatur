@@ -31,13 +31,9 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
-import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProcess;
-import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
 import bagaturchess.uci.api.ChannelManager;
-import bagaturchess.uci.impl.Channel_Console;
-import bagaturchess.uci.impl.commands.Go;
 
 
 public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl {
@@ -59,7 +55,7 @@ public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl 
 			
 			try {
 				SequentialSearch_SeparateProcess searcher = (SequentialSearch_SeparateProcess)
-						ReflectionUtils.createObjectByClassName_ObjectsConstructor(MTDSequentialSearch.class.getName(), new Object[] {getRootSearchConfig(), getSharedData()});
+						ReflectionUtils.createObjectByClassName_ObjectsConstructor(SequentialSearch_SeparateProcess.class.getName(), new Object[] {getRootSearchConfig(), getSharedData()});
 				
 				searchers.add(searcher);
 			} catch (Throwable t) {
@@ -76,8 +72,6 @@ public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl 
 			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback,
 			int[] prevPV, boolean dont_wrap_mediator, Integer initialValue) {
 		
-		//Go go = new Go(new Channel_Console(), "go nodes 12345678");
-		
-		//((SequentialSearch_SeparateProcess)searcher).negamax(_bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, dont_wrap_mediator, initialValue);
+		((SequentialSearch_SeparateProcess)searcher).negamax(_bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV);
 	}
 }
