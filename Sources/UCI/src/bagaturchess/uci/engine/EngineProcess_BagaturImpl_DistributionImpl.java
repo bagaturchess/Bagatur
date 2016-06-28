@@ -67,6 +67,8 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 		JAVA_CP += workspace + "bin/BagaturLearningAPI.jar;";
 		JAVA_CP += workspace + "bin/BagaturEngines.jar;";
 		JAVA_CP += workspace + "bin/BagaturEGTB.jar;";
+		JAVA_CP += workspace + "bin/egtbprobe.jar;";
+		JAVA_CP += workspace + "bin/;";//TODO: this doesn't work/load the DLLs, they have to be added in java.library.path
 		return JAVA_CP;
 	}
 }
