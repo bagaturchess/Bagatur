@@ -77,8 +77,9 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		
 		//Should be created always in the beginning of the game because later the initial board position (fen) is not available.
 		searcherNormal.newGame(boardForSetup);
-		searcherNormalMultiPV.newGame(boardForSetup);
-		searcherPonder.newGame(boardForSetup);
+		//Commented newGame calls below as they points to searcherNormal
+		//searcherNormalMultiPV.newGame(boardForSetup);
+		//searcherPonder.newGame(boardForSetup);
 		
 		
 		//Should be initialized after the searchers to handle memory in a correct way.

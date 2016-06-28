@@ -128,9 +128,10 @@ public class StateManager extends Protocol implements BestMoveSender {
 							sendUCIOK();
 							break;
 						case COMMAND_TO_ENGINE_ISREADY:
-							if (searchAdaptor == null) {
+							//Commented as after the later call with ucinewgame command, the search adaptor will be re-created anyway
+							/*if (searchAdaptor == null) {
 								createSearchAdaptor();
-							}
+							}*/
 							sendReadyOK();
 							break;
 						case COMMAND_TO_ENGINE_NEWGAME:
@@ -148,16 +149,23 @@ public class StateManager extends Protocol implements BestMoveSender {
 							goSearch(fromGUILine);
 							break;
 						case COMMAND_TO_ENGINE_PONDERHIT:
-							waitAndExecute();
-							ponderHit(fromGUILine);
+							if (searchAdaptor != null) {
+								ponderHit(fromGUILine);
+							} else {
+								channel.sendLogToGUI("StateManager: command ponderhit skiped, because searchadpator is null");
+							}
 							break;
 						case COMMAND_TO_ENGINE_SETOPTION:
 							//waitAndExecute();
 							setOption(fromGUILine);
 							break;
 						case COMMAND_TO_ENGINE_STOP:
-							waitAndExecute();
-							sendBestMove();
+							//waitAndExecute();
+							if (searchAdaptor != null) {
+								sendBestMove();
+							} else {
+								channel.sendLogToGUI("StateManager: command stop skiped, because searchadpator is null");
+							}
 							break;
 						case COMMAND_TO_ENGINE_QUIT:
 							channel.sendLogToGUI("StateManager: System.exit(0)");

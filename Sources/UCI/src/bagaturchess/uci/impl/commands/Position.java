@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import bagaturchess.bitboard.impl.Board;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.impl.Channel_Console;
 import bagaturchess.uci.impl.Protocol;
@@ -67,27 +69,26 @@ public class Position extends Protocol {
 			}
 		}
 		
-		String startpos = st.nextToken();
-		if (startpos.equals(COMMAND_TO_ENGINE_POSITION_START_POS)) {
-			int movesStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_POSITION_MOVES);
-			if (movesStartIndex == -1) {
-				//Initial board
-				return;
-			}
-			
+		String nextword = st.nextToken();
+		if (nextword.equals(COMMAND_TO_ENGINE_POSITION_START_POS)) {
+			//fen = Constants.INITIAL_BOARD;
+		} else if (nextword.equals(COMMAND_TO_ENGINE_POSITION_FEN)) {
+			int fenStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_POSITION_FEN) + COMMAND_TO_ENGINE_POSITION_FEN.length();
+			fen = commandLine.substring(fenStartIndex, commandLine.length()).trim();
+		} else {
+			channel.dump("LOG Parsing 'position' command (there is no startpos or fen): " + commandLine);
+		}
+		
+		int movesStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_POSITION_MOVES);
+		if (movesStartIndex >= 0) {
 			String movesStr = commandLine.substring(movesStartIndex + COMMAND_TO_ENGINE_POSITION_MOVES.length()).trim();
 			StringTokenizer stMoves = new StringTokenizer(movesStr, IChannel.WHITE_SPACE);
 			while(stMoves.hasMoreTokens()) {
 				String move = stMoves.nextToken();
 				moves.add(move);
 			}
-		} else if (startpos.equals(COMMAND_TO_ENGINE_POSITION_FEN)) {
-			int fenStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_POSITION_FEN) + COMMAND_TO_ENGINE_POSITION_FEN.length();
-			fen = commandLine.substring(fenStartIndex, commandLine.length()).trim();
-		} else {
-			channel.dump("Parsing 'position' command (there is no startpos or fen): " + commandLine);
 		}
-		
+				
 		System.out.println("LOG " + this);
 	}
 	
