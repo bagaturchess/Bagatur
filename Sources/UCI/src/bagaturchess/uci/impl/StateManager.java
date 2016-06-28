@@ -333,6 +333,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 		channel.sendLogToGUI("StateManager: goSearch called");
 		Go go = new Go(channel, fromGUILine);	
 		channel.sendLogToGUI(go.toString());
+		
 		searchAdaptor.goSearch(channel, this, go);
 	}
 	

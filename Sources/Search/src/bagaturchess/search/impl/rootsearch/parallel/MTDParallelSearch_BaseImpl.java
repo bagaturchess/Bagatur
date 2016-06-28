@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig_SMP;
@@ -39,12 +40,11 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
-import bagaturchess.search.impl.rootsearch.sequential.Mediator_AlphaAndBestMoveWindow;
-import bagaturchess.search.impl.rootsearch.sequential.NPSCollectorMediator;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.search.impl.utils.SearchMediatorProxy;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.ChannelManager;
+import bagaturchess.uci.impl.commands.Go;
 
 
 public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
@@ -72,8 +72,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	protected abstract ISearchMediator sequentialSearchers_WrapMediator(ISearchMediator root_mediator);
 	
 	protected abstract void sequentialSearchers_Negamax(IRootSearch searcher, IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback,
-			int[] prevPV, boolean dont_wrap_mediator, Integer initialValue);
+			final IFinishCallback multiPVCallback, Go go, boolean dont_wrap_mediator);
 	
 	
 	public IRootSearchConfig_SMP getRootSearchConfig() {
@@ -93,8 +92,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	
 	
 	@Override
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator root_mediator, final int startIteration, final int maxIterations,
-			final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback, final int[] prevPV) {
+	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator root_mediator, final IFinishCallback multiPVCallback, final Go initialgo) {
 		
 		//TODO: store pv in pvhistory
 		
@@ -104,11 +102,17 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		stopper = new Stopper();
 		
 		
-		if (maxIterations > ISearch.MAX_DEPTH) {
-			throw new IllegalStateException("maxIterations=" + maxIterations + " > ISearch.MAX_DEPTH");
-		}
-		
 		setupBoard(_bitboardForSetup);
+		
+		final int startIteration = (initialgo.getStartDepth() == Go.UNDEF_STARTDEPTH) ? 1 : initialgo.getStartDepth();
+		int maxIterations = (initialgo.getDepth() == Go.UNDEF_DEPTH) ? ISearch.MAX_DEPTH : initialgo.getDepth();
+		//Integer initialValue = (initialgo.getBeta() == Go.UNDEF_BETA) ? null : initialgo.getBeta();
+		//int[] prevPV = MoveInt.getPV(initialgo.getPv(), _bitboardForSetup);
+		
+		if (maxIterations > ISearch.MAX_DEPTH) {
+			maxIterations = ISearch.MAX_DEPTH;
+			initialgo.setDepth(maxIterations);
+		}
 		
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("Parallel search started from depth " + startIteration + " to depth " + maxIterations);
 		
@@ -117,6 +121,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		
 		
 		final ISearchMediator final_mediator = root_mediator;
+		
+		//TODO: For processes search - collect last (not all, last only) infos per each searcher and compile NPS metric. For thread searches it is implemented by NPSCollectorMediator
 		
 		executor.execute(new Runnable() {
 			@Override
@@ -140,7 +146,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					//		startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, true, null);
 					//searchers_started[0] = true;
 					for (int i = 0; i < searchers.size(); i++) {
-						sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, true, null);
+						Go curgo = initialgo;
+						sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), multiPVCallback, curgo, true);
 						//searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, true, null);
 						searchers_started[i] = true;
 					}
@@ -173,10 +180,10 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 									//TODO: Start the search with the best current PV
 									ISearchInfo cur_deepest_best = searchersInfo.getDeepestBestInfo();
 									if (cur_deepest_best != null) {
+										Go curgo = initialgo;
+										sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), multiPVCallback, curgo, true);
 										//searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i),
-											//	cur_deepest_best.getDepth(), maxIterations, useMateDistancePrunning, multiPVCallback, cur_deepest_best.getPV(), true, cur_deepest_best.getEval());
-										sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i),
-												cur_deepest_best.getDepth(), maxIterations, useMateDistancePrunning, multiPVCallback, cur_deepest_best.getPV(), true, cur_deepest_best.getEval());
+										//	cur_deepest_best.getDepth(), maxIterations, useMateDistancePrunning, multiPVCallback, cur_deepest_best.getPV(), true, cur_deepest_best.getEval());
 										searchers_started[i] = true;
 									}
 								}

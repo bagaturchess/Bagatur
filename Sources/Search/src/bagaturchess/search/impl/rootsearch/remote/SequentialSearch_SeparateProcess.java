@@ -170,14 +170,6 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 	
 	
 	@Override
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback, final int[] prevPV) {
-		
-		negamax(_bitboardForSetup, mediator, multiPVCallback, new Go(ChannelManager.getChannel(), "go infinite"));
-	}
-	
-	
-	@Override
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, final IFinishCallback multiPVCallback, Go go) {
 			
 		

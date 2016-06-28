@@ -25,6 +25,7 @@ package bagaturchess.search.impl.info;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.BoardUtils;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.uci.impl.commands.info.Info;
 
@@ -79,26 +80,9 @@ public final class SearchInfoFactory {
 		result.setSearchedNodes(info.getNodes());
 		
 		result.setEval(info.getEval());
-
 		
-		if (info.getPv() != null && info.getPv().length > 0) {
-			
-			int cur = 0;
-			int[] pv = new int[info.getPv().length];
-			for (String move: info.getPv()) {
-				
-				//System.out.println("pv line move["+ cur + "]=" + move);
-				
-				pv[cur++] = BoardUtils.uciStrToMove(board, move.trim());
-				board.makeMoveForward(pv[cur - 1]);
-			}
-			
-			for (int i = pv.length - 1; i >= 0; i--) {
-				board.makeMoveBackward(pv[i]);
-			}
-			
-			result.setPV(pv);
-		}
+		
+		result.setPV(MoveInt.getPV(info.getPv(), board));
 		
 		
 		if (result.getPV() != null && result.getPV().length > 0) {

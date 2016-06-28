@@ -25,6 +25,7 @@ package bagaturchess.bitboard.impl.movegen;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Bits;
+import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
@@ -430,6 +431,31 @@ public class MoveInt {
 			int promotionFigureType = Constants.PIECE_IDENTITY_2_TYPE[getPromotionFigurePID(move)];
 			result.append(Figures.TYPES_SIGN[promotionFigureType].toLowerCase());
 		}
+	}
+	
+	
+
+	public static int[] getPV(String[] pv, IBitBoard board) {
+		
+		int[] result = null;
+		
+		if (pv != null && pv.length > 0) {
+			
+			result = new int[pv.length];
+			
+			int cur = 0;
+			for (String move: pv) {
+				result[cur++] = BoardUtils.uciStrToMove(board, move.trim());
+				board.makeMoveForward(result[cur - 1]);
+			}
+			
+			for (int i = pv.length - 1; i >= 0; i--) {
+				board.makeMoveBackward(result[i]);
+			}
+		}
+		
+		
+		return result;
 	}
 	
 	

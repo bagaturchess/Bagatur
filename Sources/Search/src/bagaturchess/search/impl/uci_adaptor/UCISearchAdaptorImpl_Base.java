@@ -27,7 +27,6 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
-import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.MemoryConsumers;

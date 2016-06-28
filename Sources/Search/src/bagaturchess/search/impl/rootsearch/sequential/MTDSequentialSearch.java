@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IEvaluator;
@@ -43,6 +44,7 @@ import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
+import bagaturchess.uci.impl.commands.Go;
 
 
 public class MTDSequentialSearch extends RootSearch_BaseImpl {
@@ -77,14 +79,13 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	
 	
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback, final int[] prevPV) {
-		negamax(_bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, false, null);
+			final IFinishCallback multiPVCallback, final Go go) {
+		negamax(_bitboardForSetup, mediator, multiPVCallback, go, false);
 	}
 	
 	
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback,
-			int[] prevPV, boolean dont_wrap_mediator, Integer initialValue) {
+			final IFinishCallback multiPVCallback, final Go go, boolean dont_wrap_mediator) {
 		
 		//TODO: store pv in pvhistory
 		
@@ -94,13 +95,20 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		stopper = new Stopper();
 		
 		
-		if (maxIterations > ISearch.MAX_DEPTH) {
-			throw new IllegalStateException("maxIterations=" + maxIterations + " > ISearch.MAX_DEPTH");
-		}
-		
 		searcher.newSearch();
 		
 		setupBoard(_bitboardForSetup);
+		
+		
+		int startIteration = (go.getStartDepth() == Go.UNDEF_STARTDEPTH) ? 1 : go.getStartDepth();
+		int maxIterations = (go.getDepth() == Go.UNDEF_DEPTH) ? ISearch.MAX_DEPTH : go.getDepth();
+		Integer initialValue = (go.getBeta() == Go.UNDEF_BETA) ? null : go.getBeta();
+		int[] prevPV = MoveInt.getPV(go.getPv(), _bitboardForSetup);
+		
+		if (maxIterations > ISearch.MAX_DEPTH) {
+			maxIterations = ISearch.MAX_DEPTH;
+			go.setDepth(maxIterations);
+		}
 		
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch started from depth " + startIteration + " to depth " + maxIterations);
 		
@@ -152,7 +160,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 							) {
 						
 						Runnable task = new NullwinSearchTask(searcher, distribution, getBitboardForSetup(),
-								final_mediator, useMateDistancePrunning, final_prevPV
+								final_mediator, !go.isPonder(), final_prevPV
 																);
 						//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch in loop : task.run()");
 						task.run();

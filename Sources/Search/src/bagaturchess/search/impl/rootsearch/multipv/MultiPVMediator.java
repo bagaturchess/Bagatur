@@ -21,6 +21,7 @@ import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.utils.SearchMediatorProxy;
 import bagaturchess.uci.api.ChannelManager;
+import bagaturchess.uci.impl.commands.Go;
 
 
 public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallback {
@@ -33,8 +34,8 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	private IBitBoard bitboard;
 	private int startIteration;
 	private int maxIterations;
-	private boolean useMateDistancePrunning;
 	private IFinishCallback finishCallback;
+	private Go go;
 	
 	private List<MultiPVEntry> multiPVs_current;
 	
@@ -51,8 +52,7 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	
 	
 	public MultiPVMediator(IRootSearchConfig _engineConfiguration, IRootSearch _rootSearch, IBitBoard _bitboard, ISearchMediator _parentMediator,
-			int _startIteration, int _maxIterations, boolean _useMateDistancePrunning,
-			IFinishCallback _finishCallback) {
+			IFinishCallback _finishCallback, Go _go) {
 		
 		super(_parentMediator);
 		
@@ -61,10 +61,10 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 		engineConfiguration = _engineConfiguration;
 		rootSearch = _rootSearch;
 		bitboard = _bitboard;
-		startIteration = _startIteration;
-		maxIterations = _maxIterations;
-		useMateDistancePrunning = _useMateDistancePrunning;
+		startIteration = go.getStartDepth();
+		maxIterations = go.getDepth();
 		finishCallback = _finishCallback;
+		go = _go;
 		multiPVs_current = setupMultiPVs();
 		moves_count = multiPVs_current.size();
 		
@@ -231,7 +231,10 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 			this.setStopper(stopper);//Revert to original stopper
 			
 			bitboard.makeMoveForward(getCurrentPVEntry().getMove());
-			rootSearch.negamax(bitboard, this, 0, cur_depth, useMateDistancePrunning, this, null);
+			//adjust go: set depth to cur_depth variable
+			go.setStartDepth(0);
+			go.setDepth(cur_depth);
+			rootSearch.negamax(bitboard, this, this, go);
 			bitboard.makeMoveBackward(getCurrentPVEntry().getMove());
 			//ChannelManager.getChannel().dump("after search");
 			

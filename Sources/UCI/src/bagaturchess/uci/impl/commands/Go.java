@@ -23,6 +23,8 @@
 package bagaturchess.uci.impl.commands;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import bagaturchess.uci.api.IChannel;
@@ -74,22 +76,33 @@ import bagaturchess.uci.impl.Protocol;
 public class Go extends Protocol {
 	
 
-	private static int MAX_DEPTH = Integer.MAX_VALUE;
-	private static long MAX_TIME = Long.MAX_VALUE;
+	private static int UNDEF_NODES = Integer.MAX_VALUE;
+	public static int UNDEF_DEPTH = Integer.MAX_VALUE;
+	private static long UNDEF_TIME = Long.MAX_VALUE;
+	private static int UNDEF_MOVESTOGO = -1;
+	private static int UNDEF_MOVETIME = -1;
+	public static int UNDEF_STARTDEPTH = Integer.MIN_VALUE;
+	public static int UNDEF_BETA = Integer.MIN_VALUE;
 	
 	//go wtime 3600000 btime 3600000 winc 0 binc 0
 	private String commandLine;
 	private boolean ponder = false;
-	private long wtime = MAX_TIME;
-	private long btime = MAX_TIME;
+	private long wtime = UNDEF_TIME;
+	private long btime = UNDEF_TIME;
 	private long winc = 0;
 	private long binc = 0;
-	private long nodes = Long.MAX_VALUE;
-	private int movestogo = -1; // Should be -1 !!!
-	private long movetime = -1; // Should be -1 !!!
+	private long nodes = UNDEF_NODES;
+	private int movestogo = UNDEF_MOVESTOGO;
+	private long movetime = UNDEF_MOVETIME;
 	private boolean infinite = false; //go infinite
-	private int depth = MAX_DEPTH; // Should be big number !!!
+	private int depth = UNDEF_DEPTH; // Should be big number !!!
 	
+	//CUSTOM FIELDS to UCI protocol used by bagatur searchers
+	private int startdepth = UNDEF_STARTDEPTH; //the initial depth to start the search with.
+	private int beta = UNDEF_BETA; //The beta value to start the search with.
+	private String[] pv; //Should ne the last property! It is the principal variation to start the search with. Might not be moved as the first move on each depth but should be moved after the transposition table move the latest.
+	
+
 	private IChannel channel;
 	
 	
@@ -266,6 +279,50 @@ public class Go extends Protocol {
 			}
 		}
 		
+		int startdepthStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_GO_STARTDEPTH_STR);
+		if (startdepthStartIndex != -1) {
+			int startdepthValueStartIndex = commandLine.indexOf(IChannel.WHITE_SPACE, startdepthStartIndex + 1);
+			if (startdepthValueStartIndex == -1) {
+				channel.dump("Incorrect 'go' command (there is no number after startdepth): " + commandLine);
+			} else {
+				int startdepthValueEndIndex = commandLine.indexOf(IChannel.WHITE_SPACE, startdepthValueStartIndex + 1);
+				if (startdepthValueEndIndex == -1) {
+					startdepthValueEndIndex = commandLine.length();
+				}
+				String movetimeStr = commandLine.substring(startdepthValueStartIndex + 1, startdepthValueEndIndex);
+				startdepth = Integer.parseInt(movetimeStr);
+			}
+		} else {
+			startdepth = 1;
+		}
+		
+		int betaStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_GO_BETA_STR);
+		if (betaStartIndex != -1) {
+			int betaValueStartIndex = commandLine.indexOf(IChannel.WHITE_SPACE, betaStartIndex + 1);
+			if (betaValueStartIndex == -1) {
+				channel.dump("Incorrect 'go' command (there is no number after beta): " + commandLine);
+			} else {
+				int betaValueEndIndex = commandLine.indexOf(IChannel.WHITE_SPACE, betaValueStartIndex + 1);
+				if (betaValueEndIndex == -1) {
+					betaValueEndIndex = commandLine.length();
+				}
+				String movetimeStr = commandLine.substring(betaValueStartIndex + 1, betaValueEndIndex);
+				beta = Integer.parseInt(movetimeStr);
+			}
+		}
+		
+		int pvStart = commandLine.indexOf(" pv ");
+		if (pvStart >= 0) {
+			String pvLine = commandLine.substring(pvStart + 4, commandLine.length());
+			List<String> movesList = new ArrayList<String>();
+			StringTokenizer movesString = new StringTokenizer(pvLine, " ");
+			while (movesString.hasMoreElements()) {
+				String moveStr = movesString.nextToken();
+				movesList.add(moveStr);
+			}
+			pv = movesList.toArray(new String[0]);
+		}
+		
 		//System.out.println(this);
 	}
 	
@@ -278,17 +335,39 @@ public class Go extends Protocol {
 	}
 	
 	public String toString() {
-		String result = "GO COMMAND: ";
-		result += "ponder " + ponder;
+		String result = "go";
+		result += " ponder " + ponder;
 		result += " wtime " + wtime;
 		result += " btime " + btime;
 		result += " winc " + winc;
 		result += " binc " + binc;
-		result += " nodes " + nodes;
-		result += " movestogo " + movestogo;
-		result += " movetime " + movetime;
+		
+		if (nodes != UNDEF_NODES) {
+			result += " nodes " + nodes;
+		}
+		
+		if (movestogo != UNDEF_MOVESTOGO) {
+			result += " movestogo " + movestogo;
+		}
+		if (movetime != UNDEF_MOVETIME) {
+			result += " movetime " + movetime;
+		}
+		
 		result += " infinite " + infinite;
-		result += " depth " + depth;
+		
+		if (depth != UNDEF_DEPTH) {
+			result += " depth " + depth;
+		}
+		if (startdepth != UNDEF_STARTDEPTH) {
+			result += " startdepth " + startdepth;
+		}
+		if (beta != UNDEF_BETA) {
+			result += " beta " + beta;
+		}
+		if (pv != null) {
+			result += " pv " + pv;
+		}
+		
 		return result;
 	}
 	
@@ -317,7 +396,7 @@ public class Go extends Protocol {
 	}
 	
 	public boolean hasNodes() {
-		return nodes != Long.MAX_VALUE; 
+		return nodes != UNDEF_NODES; 
 	}
 	
 	public int getMovestogo() {
@@ -333,11 +412,31 @@ public class Go extends Protocol {
 	}
 	
 	public boolean hasDepth() {
-		return depth != Integer.MAX_VALUE; 
+		return depth != UNDEF_DEPTH; 
 	}
 	
 	public int getDepth() {
 		return depth;
+	}
+	
+	public void setDepth(int _depth) {
+		depth = _depth;
+	}
+	
+	public int getStartDepth() {
+		return startdepth;
+	}
+	
+	public void setStartDepth(int _startdepth) {
+		startdepth = _startdepth;
+	}
+	
+	public int getBeta() {
+		return beta;
+	}
+
+	public String[] getPv() {
+		return pv;
 	}
 	
 	public static void main(String[] args) {

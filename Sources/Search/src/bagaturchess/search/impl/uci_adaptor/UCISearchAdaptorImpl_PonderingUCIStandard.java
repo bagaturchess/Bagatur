@@ -24,8 +24,7 @@ package bagaturchess.search.impl.uci_adaptor;
 
 
 import bagaturchess.search.api.IRootSearch;
-import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
-import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory;
+import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.search.impl.utils.SearchMediatorProxy;
 import bagaturchess.uci.api.BestMoveSender;
@@ -43,6 +42,11 @@ public class UCISearchAdaptorImpl_PonderingUCIStandard extends UCISearchAdaptorI
 	
 	@Override
 	public synchronized void goSearch(IChannel channel, BestMoveSender sender, Go go) {
+		
+		//adjust go: with hidden depth
+		if (go.getDepth() < go.getDepth() + ((IRootSearchConfig) searchAdaptorCfg.getRootSearchConfig()).getHiddenDepth()) {//Type overflow
+			go.setDepth(go.getDepth() + ((IRootSearchConfig) searchAdaptorCfg.getRootSearchConfig()).getHiddenDepth());
+		}
 		
 		if (currentMediator != null) throw new IllegalStateException("mediator is not null");
 		int colourToMove = boardForSetup.getColourToMove();

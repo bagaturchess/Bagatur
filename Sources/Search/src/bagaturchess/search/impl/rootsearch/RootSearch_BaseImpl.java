@@ -26,10 +26,8 @@ package bagaturchess.search.impl.rootsearch;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.BoardUtils;
-import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
-import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
@@ -78,57 +76,10 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	
 	
 	@Override
-	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator,
-			Go goCommand) {
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, Go goCommand) {
 		negamax(bitboardForSetup, mediator, null, goCommand);
 	}
-
-
-	@Override
-	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator,
-			IFinishCallback finishCallback, Go goCommand) {
-		negamax(bitboardForSetup, mediator, finishCallback, goCommand, null);
-	}
-	
-	
-	@Override
-	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator,
-			IFinishCallback finishCallback, Go goCommand, int[] prevPV) {
 		
-		int start_iteration = 1;
-		
-		int maxIterations = goCommand.getDepth();
-		if (maxIterations > ISearch.MAX_DEPTH) {
-			maxIterations = ISearch.MAX_DEPTH;
-		} else {
-			if (maxIterations < maxIterations + getRootSearchConfig().getHiddenDepth()) {//Type overflow
-				maxIterations += getRootSearchConfig().getHiddenDepth();
-			}
-		}
-		
-		negamax(bitboardForSetup, mediator, start_iteration, maxIterations, !goCommand.isPonder(), finishCallback, prevPV);
-	}
-	
-	
-	@Override
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, boolean useMateDistancePrunning, int[] prevPV) {
-		negamax(_bitboardForSetup, mediator, ISearch.MAX_DEPTH, useMateDistancePrunning, prevPV);
-	}
-
-
-	@Override
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, int maxIterations, boolean useMateDistancePrunning, int[] prevPV) {
-		negamax(_bitboardForSetup, mediator, 1, maxIterations, useMateDistancePrunning, prevPV);
-	}
-	
-	
-	@Override
-	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations,
-			boolean useMateDistancePrunning, int[] prevPV) {
-		negamax(bitboardForSetup, mediator, startIteration, maxIterations,
-				useMateDistancePrunning, null, prevPV);
-	}
 	
 	
 	@Override

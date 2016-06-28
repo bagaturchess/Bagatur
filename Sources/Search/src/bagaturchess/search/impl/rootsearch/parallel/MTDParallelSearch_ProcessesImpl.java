@@ -35,6 +35,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProcess;
 import bagaturchess.search.impl.rootsearch.sequential.Mediator_AlphaAndBestMoveWindow;
 import bagaturchess.uci.api.ChannelManager;
+import bagaturchess.uci.impl.commands.Go;
 
 
 public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl {
@@ -76,9 +77,8 @@ public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl 
 	
 	@Override
 	protected void sequentialSearchers_Negamax(IRootSearch searcher, IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback,
-			int[] prevPV, boolean dont_wrap_mediator, Integer initialValue) {
+			final IFinishCallback multiPVCallback, Go go, boolean dont_wrap_mediator) {
 		
-		((SequentialSearch_SeparateProcess)searcher).negamax(_bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV);
+		((SequentialSearch_SeparateProcess)searcher).negamax(_bitboardForSetup, mediator, multiPVCallback, go);
 	}
 }

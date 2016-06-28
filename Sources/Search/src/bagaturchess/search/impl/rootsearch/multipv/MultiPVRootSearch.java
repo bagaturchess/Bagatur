@@ -29,8 +29,8 @@ import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
+import bagaturchess.uci.impl.commands.Go;
 
 
 public class MultiPVRootSearch extends RootSearch_BaseImpl {
@@ -56,9 +56,7 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 
 
 	@Override
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations,
-			boolean useMateDistancePrunning, IFinishCallback finishCallback, int[] prevPV) {
+	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, IFinishCallback finishCallback, Go go) {
 		
 		if (current_mediator_multipv != null) {
 			throw new IllegalStateException("MultiPV search started without beeing stopped.");
@@ -69,9 +67,16 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 		//!!!Do not setup the board of rootSearch. multiPV mediator will set it up for each move
 		//rootSearch.setupBoard(_bitboardForSetup);
 		
+		//adjust go: startIteration - 1, maxIterations - 1, //Should be -1, because it plays each move and than search with depth=maxIterations
+		if (go.getDepth() != Go.UNDEF_DEPTH) {
+			go.setDepth(go.getDepth() - 1);
+		}
+		if (go.getStartDepth() != Go.UNDEF_STARTDEPTH) {
+			go.setStartDepth(go.getStartDepth() - 1);
+		}
 		current_mediator_multipv = new MultiPVMediator(getRootSearchConfig(), rootSearch,
-				getBitboardForSetup(), mediator, startIteration - 1, maxIterations - 1, //Should be -1, because it plays each move and than search with depth maxIterations
-				useMateDistancePrunning, finishCallback);
+				getBitboardForSetup(), mediator,
+				finishCallback, go);
 		
 		current_stopper = mediator.getStopper();
 		

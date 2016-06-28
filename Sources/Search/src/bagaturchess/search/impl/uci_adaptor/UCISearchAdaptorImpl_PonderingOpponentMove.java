@@ -25,6 +25,7 @@ package bagaturchess.search.impl.uci_adaptor;
 
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.search.api.IRootSearch;
+import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.impl.info.SearchInfoImpl;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory;
 import bagaturchess.search.impl.utils.DEBUGSearch;
@@ -47,6 +48,11 @@ public class UCISearchAdaptorImpl_PonderingOpponentMove extends UCISearchAdaptor
 	
 	@Override
 	public synchronized void goSearch(IChannel channel, BestMoveSender sender, Go go) {
+		
+		//adjust go: with hidden depth
+		if (go.getDepth() < go.getDepth() + ((IRootSearchConfig) searchAdaptorCfg.getRootSearchConfig()).getHiddenDepth()) {//Type overflow
+			go.setDepth(go.getDepth() + ((IRootSearchConfig) searchAdaptorCfg.getRootSearchConfig()).getHiddenDepth());
+		}
 		
 		bestMoveSender = sender;
 		
