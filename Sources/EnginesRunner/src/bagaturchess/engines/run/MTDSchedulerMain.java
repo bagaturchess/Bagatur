@@ -28,20 +28,13 @@ package bagaturchess.engines.run;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
-import bagaturchess.bitboard.impl.BoardUtils;
-import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl1.Board3_Adapter;
 import bagaturchess.engines.bagatur.cfg.time.TimeConfigImpl;
-import bagaturchess.engines.bagatur.eval.BagaturEvaluator;
-import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
-import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
-import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ProcessesImpl;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImpl;
@@ -134,10 +127,10 @@ public class MTDSchedulerMain {
 		
 		SharedData arg1 = new SharedData(ChannelManager.getChannel(), cfg);
 		
-		IRootSearch search = new MTDParallelSearch_ProcessesImpl(new Object[] {cfg, arg1});
+		//IRootSearch search = new MTDParallelSearch_ProcessesImpl(new Object[] {cfg, arg1});
 		//IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, arg1});
 		//IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
-		//IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, arg1});
+		IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, arg1});
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
 		SharedData sharedData = search.getSharedData();
@@ -172,10 +165,10 @@ public class MTDSchedulerMain {
 		
 		//IBitBoard bitboard  = new Board("1r6/4k3/1pbpPb1p/p1p2P2/2Pp3p/3P3P/2P2RP1/R6K b - - 3 39", null/*sharedData.getAndRemovePawnsCache()*/, cfg.getBoardConfig());
 		
-		IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
+		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
-		//IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
+		IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("7k/6r1/8/8/8/8/1Q6/K7 w - -", null, cfg.getBoardConfig()); //Queen and King vs. Rook and King
 		//IBitBoard bitboard  = new Board("k7/1q6/8/8/8/7R/8/6K1 b - - ", null, cfg.getBoardConfig());
 				

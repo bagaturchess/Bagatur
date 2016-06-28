@@ -54,7 +54,7 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 							+ ARGS
 							+ programArgs,
 							
-							workdir + "log");
+							workdir);
 	}
 	
 	
