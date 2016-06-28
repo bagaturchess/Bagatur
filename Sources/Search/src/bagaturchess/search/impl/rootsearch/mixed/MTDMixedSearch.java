@@ -28,7 +28,7 @@ import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
-import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch;
+import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImpl;
 import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
 
 
@@ -38,13 +38,13 @@ public class MTDMixedSearch extends RootSearch_BaseImpl {
 	private static final int SEQUENTIAL_DEPTH = 6;
 	
 	private MTDSequentialSearch sequentialSearch;
-	private MTDParallelSearch parallelSearch;
+	private MTDParallelSearch_ThreadsImpl parallelSearch;
 	
 	
 	public MTDMixedSearch(Object[] args) {
 		super(args);
 		sequentialSearch = new MTDSequentialSearch(new Object[] {args[0], getSharedData()});
-		parallelSearch = new MTDParallelSearch(new Object[] {args[0], getSharedData()});
+		parallelSearch = new MTDParallelSearch_ThreadsImpl(new Object[] {args[0], getSharedData()});
 	}
 	
 	

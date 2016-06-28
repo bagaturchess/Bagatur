@@ -128,11 +128,6 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 	}
 	
 	
-	public boolean isStopped() {
-		return stopper == null;
-	}
-	
-	
 	@Override
 	public void shutDown() {
 		try {
@@ -151,19 +146,15 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 	}
 	
 	
+	@Override
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
 			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback, final int[] prevPV) {
-		negamax(_bitboardForSetup, mediator, startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, false, null);
-	}
-	
-	
-	public void negamax(final IBitBoard _bitboardForSetup, ISearchMediator mediator,
-			int startIteration, int maxIterations, final boolean useMateDistancePrunning, final IFinishCallback multiPVCallback,
-			int[] prevPV, boolean dont_wrap_mediator, Integer initialValue) {
+
 		throw new IllegalStateException();
 	}
 	
 	
+	@Override
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, final IFinishCallback multiPVCallback, Go go) {
 			
 		

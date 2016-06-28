@@ -167,6 +167,13 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("stopSearchAndWait - exit");
 	}
 	
+	
+	@Override
+	public boolean isStopped() {
+		return stopper == null;
+	}
+	
+	
 	@Override
 	public String toString() {
 		return sharedData.toString();

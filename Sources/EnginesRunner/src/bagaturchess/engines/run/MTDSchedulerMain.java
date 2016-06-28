@@ -43,7 +43,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
-import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch;
+import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImpl;
 import bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProcess;
 import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_Base;
@@ -133,9 +133,9 @@ public class MTDSchedulerMain {
 		
 		SharedData arg1 = new SharedData(ChannelManager.getChannel(), cfg);
 		
-		//IRootSearch search = new MTDParallelSearch(new Object[] {cfg, arg1});
+		IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, arg1});
 		//IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
-		IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, arg1});
+		//IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, arg1});
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
 		SharedData sharedData = search.getSharedData();

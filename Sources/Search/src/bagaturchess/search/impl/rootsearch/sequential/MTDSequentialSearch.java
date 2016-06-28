@@ -185,11 +185,6 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	}
 	
 	
-	public boolean isStopped() {
-		return stopper == null;
-	}
-	
-	
 	@Override
 	public void shutDown() {
 		try {

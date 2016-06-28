@@ -48,5 +48,7 @@ public interface IRootSearch {
 	
 	public void stopSearchAndWait();
 	
+	public boolean isStopped();
+	
 	public void shutDown();
 }

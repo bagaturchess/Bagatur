@@ -38,7 +38,7 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
-import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch;
+import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImpl;
 import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.controllers.TimeController_FixedDepth;
