@@ -87,6 +87,13 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	@Override
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator,
 			IFinishCallback finishCallback, Go goCommand) {
+		negamax(bitboardForSetup, mediator, finishCallback, goCommand, null);
+	}
+	
+	
+	@Override
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator,
+			IFinishCallback finishCallback, Go goCommand, int[] prevPV) {
 		
 		int start_iteration = 1;
 		
@@ -99,8 +106,9 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 			}
 		}
 		
-		negamax(bitboardForSetup, mediator, start_iteration, maxIterations, !goCommand.isPonder(), finishCallback, null);
+		negamax(bitboardForSetup, mediator, start_iteration, maxIterations, !goCommand.isPonder(), finishCallback, prevPV);
 	}
+	
 	
 	@Override
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, boolean useMateDistancePrunning, int[] prevPV) {
