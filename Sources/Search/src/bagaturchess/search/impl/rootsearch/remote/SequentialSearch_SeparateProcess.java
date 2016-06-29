@@ -205,8 +205,8 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 						
 						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: OutboundQueueProcessor before loop");
 						
-						while (!final_mediator.getStopper().isStopped() //Condition for normal play
-								&& stopper != null && !stopper.isStopped()) {
+						while (//!final_mediator.getStopper().isStopped() //TOTO: Have to be considered
+								stopper != null && !stopper.isStopped()) {
 							
 							Thread.sleep(15);
 						}
@@ -215,10 +215,18 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 								+ final_mediator.getStopper().isStopped());
 						
 						
-						//runner.stopEngines();
-						
-						
-						//runner.enable();
+						if (!isStopped()) {// If the exit already happened in the InboundQueueProcessor below than should not be stopped again
+							
+							runner.stopEngines();
+							//runner.enable();	
+							
+							if (multiPVCallback == null) {//Non multiPV search
+								final_mediator.getBestMoveSender().sendBestMove();
+							} else {
+								//MultiPV search
+								multiPVCallback.ready();
+							}
+						}
 						
 						
 					} catch(Throwable t) {
@@ -309,27 +317,26 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 						if (infos.size() == 0 || infos.get(0) == null) {
 							throw new IllegalStateException("infos.size() == 0 || infos.get(0) == null");
 						}
-						//System.out.println("depth " + depth);
-						
-						//runner.stopEngines();
-						
-						if (stopper == null) {
-							throw new IllegalStateException();
-						}
-						stopper.markStopped();
-						stopper = null;
-						
-						if (multiPVCallback == null) {//Non multiPV search
-							final_mediator.getBestMoveSender().sendBestMove();
-						} else {
-							//MultiPV search
-							multiPVCallback.ready();
-						}
-						
+
 						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: InboundQueueProcessor after loop stopped="
 								+ final_mediator.getStopper().isStopped());
 						
-						//runner.enable();
+						
+						if (!isStopped()) {//Not stopped from the UI. Otherwise the best move is already send from the InboundQueueProcessor above
+							
+							//runner.stopEngines();//Engine has stopped itself already (got out of the getInfoLines blocking call)
+							//runner.enable();
+							
+							stopper.markStopped();
+							stopper = null;
+							
+							if (multiPVCallback == null) {//Non multiPV search
+								final_mediator.getBestMoveSender().sendBestMove();
+							} else {
+								//MultiPV search
+								multiPVCallback.ready();
+							}
+						}
 						
 					} catch(Throwable t) {
 						ChannelManager.getChannel().dump(t);

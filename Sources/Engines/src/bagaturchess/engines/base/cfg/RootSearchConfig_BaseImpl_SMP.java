@@ -15,7 +15,7 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 			new UCIOptionSpin("Search SMP [Threads count]", (double) getDefaultThreadsCount(),
 								"type spin default " + getDefaultThreadsCount()
 											+ " min 1"
-											+ " max 32", 1),
+											+ " max 64", 1),
 	};
 	
 	
@@ -114,13 +114,17 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	
 	
 	private static final int getDefaultThreadsCount() {
-		int threads = Runtime.getRuntime().availableProcessors() / 2;
+		
+		int threads = Runtime.getRuntime().availableProcessors();
+		
+		threads /= 2;//2 logical processors for 1 core in most SMP hardware architectures
+		
 		if (threads < 2) {
 			threads = 2;
 		}
-		if (threads > 8) {
+		/*if (threads > 8) {//Limit for testing
 			threads = 8;
-		}
+		}*/
 		
 		return threads;
 		
