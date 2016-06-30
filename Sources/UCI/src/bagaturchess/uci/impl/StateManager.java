@@ -52,7 +52,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	private IUCISearchAdaptor searchAdaptor;
 	
 	private OptionsManager optionsManager;
-
+	
 	
 	public StateManager(IUCIConfig _engineBootCfg) {
 		engineBootCfg = _engineBootCfg;
@@ -64,7 +64,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 		optionsManager = om;
 	}
 	
-
+	
 	public void setChannel(IChannel _channel) {
 		channel = _channel;
 	}

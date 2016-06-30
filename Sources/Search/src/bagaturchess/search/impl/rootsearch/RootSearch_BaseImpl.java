@@ -53,7 +53,7 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	}
 	
 	
-	public void newGame(IBitBoard _bitboardForSetup) {
+	public void createBoard(IBitBoard _bitboardForSetup) {
 		
 		int movesCount = _bitboardForSetup.getPlayedMovesCount();
 		int[] moves = Utils.copy(_bitboardForSetup.getPlayedMoves());

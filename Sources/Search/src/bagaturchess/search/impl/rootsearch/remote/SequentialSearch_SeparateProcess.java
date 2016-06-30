@@ -109,9 +109,9 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 	
 	
 	@Override
-	public void newGame(IBitBoard _bitboardForSetup) {
+	public void createBoard(IBitBoard _bitboardForSetup) {
 		
-		super.newGame(_bitboardForSetup);
+		super.createBoard(_bitboardForSetup);
 		
 		try {
 			

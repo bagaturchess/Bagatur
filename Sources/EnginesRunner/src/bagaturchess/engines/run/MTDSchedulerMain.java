@@ -444,7 +444,7 @@ public class MTDSchedulerMain {
 		
 
 		//IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, null});
-		search.newGame(bitboard);
+		search.createBoard(bitboard);
 		IEvaluator eval = sharedData.getEvaluatorFactory().create(bitboard, null, sharedData.getEngineConfiguration().getEvalConfig());
 		
 		

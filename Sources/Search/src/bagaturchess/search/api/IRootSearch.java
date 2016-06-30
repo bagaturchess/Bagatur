@@ -36,7 +36,7 @@ public interface IRootSearch {
 	public int getTPTUsagePercent();
 	public void decreaseTPTDepths(int reduction);
 	
-	public void newGame(IBitBoard bitboardForSetup);
+	public void createBoard(IBitBoard bitboardForSetup);
 	
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, Go go);
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, IFinishCallback finishCallback, Go go);

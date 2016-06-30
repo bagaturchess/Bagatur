@@ -48,10 +48,10 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 	
 	
 	@Override
-	public void newGame(IBitBoard _bitboardForSetup) {
-		super.newGame(_bitboardForSetup); //Keep it for multipv mediator
+	public void createBoard(IBitBoard _bitboardForSetup) {
+		super.createBoard(_bitboardForSetup); //Keep it for multipv mediator
 		
-		rootSearch.newGame(_bitboardForSetup);
+		rootSearch.createBoard(_bitboardForSetup);
 	}
 
 

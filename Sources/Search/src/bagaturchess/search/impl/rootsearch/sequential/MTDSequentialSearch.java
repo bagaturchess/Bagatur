@@ -66,9 +66,9 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	
 	
 	@Override
-	public void newGame(IBitBoard _bitboardForSetup) {
+	public void createBoard(IBitBoard _bitboardForSetup) {
 		
-		super.newGame(_bitboardForSetup);
+		super.createBoard(_bitboardForSetup);
 		
 		String searchClassName =  getRootSearchConfig().getSearchClassName();
 		searcher = (ISearch) ReflectionUtils.createObjectByClassName_ObjectsConstructor(

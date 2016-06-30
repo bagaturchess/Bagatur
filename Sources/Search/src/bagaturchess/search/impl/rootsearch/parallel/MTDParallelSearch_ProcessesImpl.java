@@ -24,7 +24,6 @@ package bagaturchess.search.impl.rootsearch.parallel;
 
 
 import java.util.List;
-import java.util.Vector;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -49,13 +48,11 @@ public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl 
 	
 	
 	@Override
-	protected List<IRootSearch> sequentialSearchers_Create() {
+	protected void sequentialSearchers_Create(List<IRootSearch> startedImmediately) {
 		
 		if (getRootSearchConfig().getThreadsCount() < 2) {
 			throw new IllegalStateException("MTDParallelSearch_ProcessesImpl: threads count is less than 2 = " + getRootSearchConfig().getThreadsCount());
 		}
-		
-		final List<IRootSearch> searchers = new Vector<IRootSearch>();
 		
 		for (int i = 0; i < getRootSearchConfig().getThreadsCount(); i++ ) {
 			
@@ -65,44 +62,50 @@ public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl 
 					SequentialSearch_SeparateProcess searcher = (SequentialSearch_SeparateProcess)
 							ReflectionUtils.createObjectByClassName_ObjectsConstructor(SequentialSearch_SeparateProcess.class.getName(), new Object[] {getRootSearchConfig(), getSharedData()});
 					
-					searchers.add(searcher);
+					startedImmediately.add(searcher);
 					
 				} else {//Start the rest in parallel
 					
-					//new Thread(new Runnable() {
+					new Thread(new Runnable() {
 						
 						//@Override
-						//public void run() {
+						public void run() {
 							SequentialSearch_SeparateProcess searcher = (SequentialSearch_SeparateProcess)
 									ReflectionUtils.createObjectByClassName_ObjectsConstructor(SequentialSearch_SeparateProcess.class.getName(), new Object[] {getRootSearchConfig(), getSharedData()});
 							
-							searchers.add(searcher);
-							/*}
+							if (!isTerminated()) {
+								addSearcher(searcher);
+							} else {
+								searcher.shutDown();
+							}
+							
+						}
 					}).start();
-					 		//ERROR (if parallel)
-							//info string Normal search started with GO: go ponder false wtime 359480 btime 354477 winc 5000 binc 5000 infinite false startdepth 1
-							//info string java.lang.NullPointerException
-							//info string 	at bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl.setupBoard(Unknown Source)
-							//info string 	at bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProcess.negamax(Unknown Source)
-							//info string 	at bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ProcessesImpl.sequentialSearchers_Negamax(Unknown Source)
-							//info string 	at bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_BaseImpl$1.run(Unknown Source)
-							//info string 	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
-							//info string 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
-							//info string 	at java.lang.Thread.run(Unknown Source)
-							*/
+					
+			 		//ERROR (if parallel)
+					//info string Normal search started with GO: go ponder false wtime 359480 btime 354477 winc 5000 binc 5000 infinite false startdepth 1
+					//info string java.lang.NullPointerException
+					//info string 	at bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl.setupBoard(Unknown Source)
+					//info string 	at bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProcess.negamax(Unknown Source)
+					//info string 	at bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ProcessesImpl.sequentialSearchers_Negamax(Unknown Source)
+					//info string 	at bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_BaseImpl$1.run(Unknown Source)
+					//info string 	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+					//info string 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+					//info string 	at java.lang.Thread.run(Unknown Source)
+							
 				}
 
 			} catch (Throwable t) {
 				ChannelManager.getChannel().dump(t);
 			}
 		}
-		
-		return searchers;
 	}
 	
 	
 	@Override
 	protected ISearchMediator sequentialSearchers_WrapMediator(ISearchMediator mediator) {
+		
+		//NPSCollectorMediator is not necessary for parallel search. It is used for single sequential searcher only to collect and sum the nodes from each NullWinSearch inside negamax.
 		return new Mediator_AlphaAndBestMoveWindow(mediator);
 	}
 	

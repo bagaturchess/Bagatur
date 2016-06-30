@@ -25,14 +25,13 @@ package bagaturchess.search.impl.rootsearch.parallel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
-import bagaturchess.search.api.IRootSearchConfig;
-import bagaturchess.search.api.IRootSearchConfig_SMP;
 import bagaturchess.search.api.internal.CompositeStopper;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
@@ -54,6 +53,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	
 	private List<IRootSearch> searchers;
 	
+	private Object synch_Board = new Object();
+	
 	
 	public MTDParallelSearch_BaseImpl(Object[] args) {
 		
@@ -61,27 +62,42 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		
 		executor = Executors.newFixedThreadPool(1);
 		
-		searchers = sequentialSearchers_Create();
+		searchers = new Vector<IRootSearch>();
 		
-		ChannelManager.getChannel().dump("MTDParallelSearch_BaseImpl search created with " + getRootSearchConfig().getThreadsCount() + " sequential searchers.");
+		sequentialSearchers_Create(searchers);
+		
+		ChannelManager.getChannel().dump("MTDParallelSearch_BaseImpl created search with " + getRootSearchConfig().getThreadsCount() + " sequential searchers." +
+				" Started sequentialy = " + searchers.size() + " searchers, Starting in parallel = " + (getRootSearchConfig().getThreadsCount() - searchers.size()) + " searchers ...");
 	}
 	
 	
-	protected abstract List<IRootSearch> sequentialSearchers_Create();
+	protected abstract void sequentialSearchers_Create(List<IRootSearch> startedImmediately);
+	
 	
 	protected abstract ISearchMediator sequentialSearchers_WrapMediator(ISearchMediator root_mediator);
+	
 	
 	protected abstract void sequentialSearchers_Negamax(IRootSearch searcher, IBitBoard _bitboardForSetup, ISearchMediator mediator,
 			final IFinishCallback multiPVCallback, Go go, boolean dont_wrap_mediator);
 	
 	
-	@Override
-	public void newGame(IBitBoard _bitboardForSetup) {
+	protected void addSearcher(IRootSearch searcher) {
 		
-		super.newGame(_bitboardForSetup); 
+		synchronized(synch_Board) {
+			searcher.createBoard(getBitboardForSetup());
+		}
+		
+		searchers.add(searcher);
+	}
+	
+	
+	@Override
+	public void createBoard(IBitBoard _bitboardForSetup) {
+		
+		super.createBoard(_bitboardForSetup); 
 		
 		for (int i = 0; i < searchers.size(); i++) {
-			searchers.get(i).newGame(getBitboardForSetup());
+			searchers.get(i).createBoard(getBitboardForSetup());
 		}
 	}
 	
@@ -117,7 +133,6 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		
 		final ISearchMediator final_mediator = root_mediator;
 		
-		//TODO: For processes search - collect last (not all, last only) infos per each searcher and compile NPS metric. For thread searches it is implemented by NPSCollectorMediator
 		
 		executor.execute(new Runnable() {
 			@Override
@@ -142,7 +157,9 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					//searchers_started[0] = true;
 					for (int i = 0; i < searchers.size(); i++) {
 						Go curgo = initialgo;
-						sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), multiPVCallback, curgo, true);
+						synchronized(synch_Board) {
+							sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), multiPVCallback, curgo, true);
+						}
 						//searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, true, null);
 						searchers_started[i] = true;
 					}
@@ -176,7 +193,9 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 									ISearchInfo cur_deepest_best = searchersInfo.getDeepestBestInfo();
 									if (cur_deepest_best != null) {
 										Go curgo = initialgo;
-										sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), multiPVCallback, curgo, true);
+										synchronized(synch_Board) {
+											sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), multiPVCallback, curgo, true);
+										}
 										//searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i),
 										//	cur_deepest_best.getDepth(), maxIterations, useMateDistancePrunning, multiPVCallback, cur_deepest_best.getPV(), true, cur_deepest_best.getEval());
 										searchers_started[i] = true;
@@ -327,6 +346,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 			
 			executor.shutdownNow();
 			
+			executor = null;
+			
 			for (int i = 0; i < searchers.size(); i++) {
 				searchers.get(i).shutDown();
 			}
@@ -338,7 +359,12 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		}
 	}
 
-
+	
+	protected boolean isTerminated() {
+		return executor == null;
+	}
+	
+	
 	@Override
 	public int getTPTUsagePercent() {
 		
