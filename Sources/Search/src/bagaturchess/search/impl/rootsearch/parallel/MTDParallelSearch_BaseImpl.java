@@ -29,7 +29,9 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.CompositeStopper;
@@ -53,14 +55,17 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	
 	private List<IRootSearch> searchers;
 	
-	private Object synch_Board = new Object();
+	private Object synch_Board 					= new Object();
+	
+	private final double TARGET_CPUS_LOAD 		= 50;
+	private final VarStatistic stat_cpus_load 	= new VarStatistic(false);
 	
 	
 	public MTDParallelSearch_BaseImpl(Object[] args) {
 		
 		super(args);
 		
-		executor = Executors.newFixedThreadPool(1);
+		executor = Executors.newFixedThreadPool(2);
 		
 		searchers = new Vector<IRootSearch>();
 		
@@ -134,6 +139,51 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		final ISearchMediator final_mediator = root_mediator;
 		
 		
+		//Searchers balancer - achieves specified CPUs load of the system by starting and stopping searchers
+		executor.execute(new Runnable() {
+			@Override
+			public void run() {
+				
+				try {
+					
+					int check_interval = 33;//33 ms
+					
+					while (
+							(!final_mediator.getStopper().isStopped() //Stopped
+								&& !isStopped())
+							) {
+						
+						//Update statistics
+						int current_cpus_load = 50;//Runtime.getRuntime().
+						stat_cpus_load.addValue(current_cpus_load, current_cpus_load);
+						
+						
+						//Make the calculation and start/stop searchers
+						double expected_load_per_seacrcher = 100d / getRootSearchConfig().getThreadsCount();
+						if (stat_cpus_load.getEntropy() > TARGET_CPUS_LOAD) {
+							//TODO: STOP one searcher
+							
+						} else if (stat_cpus_load.getEntropy() < TARGET_CPUS_LOAD - expected_load_per_seacrcher) {
+							//TODO: START one searcher
+							
+						} else {
+							//Do nothing - there is no need to neighter start nor stop searchers
+						}
+						
+						
+						//Wait some time and than loop again
+						Thread.sleep(check_interval);
+					}
+					
+					
+				} catch(Throwable t) {
+					ChannelManager.getChannel().dump(t);
+					ChannelManager.getChannel().dump(t.getMessage());
+				}
+			}
+		});
+		
+		
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -180,7 +230,6 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 									&& !allSearchersReady //Search is done
 								)// || !hasSendAtLest1Info
 							) {
-							
 						
 							//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Loop > before start threads");
 						
@@ -229,7 +278,13 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							}
 							
 							try {
-								final_mediator.getStopper().stopIfNecessary(searchersInfo.getCurrentDepth(), getBitboardForSetup().getColourToMove(), ISearch.MIN, ISearch.MAX);
+								
+								int colourToMove;
+								synchronized(synch_Board) {
+									colourToMove = getBitboardForSetup().getColourToMove();
+								}
+								
+								final_mediator.getStopper().stopIfNecessary(searchersInfo.getCurrentDepth(), colourToMove, ISearch.MIN, ISearch.MAX);
 							} catch(SearchInterruptedException sie) {
 							}
 							
