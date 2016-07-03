@@ -292,4 +292,10 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	public int getGaviotaTbCache() {
 		return gaviotaTbCache;
 	}
+	
+	
+	@Override
+	public boolean initCaches() {
+		return true;
+	}
 }

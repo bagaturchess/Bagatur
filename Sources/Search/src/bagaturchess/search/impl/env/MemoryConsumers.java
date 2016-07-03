@@ -143,7 +143,7 @@ public class MemoryConsumers {
 
 		//}
 		
-
+		
 		ChannelManager.getChannel().dump("Loading modules for Gaviota Endgame Tablebases support ... ");
 		
 		gtbs			 = new Vector<GTBProbing>();
@@ -173,7 +173,7 @@ public class MemoryConsumers {
 			}
 		}
 		
-		if (threadsCount > 0) {
+		if (engineConfiguration.initCaches()) {
 			ChannelManager.getChannel().dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
 			ChannelManager.getChannel().dump("Transposition Table usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
 			ChannelManager.getChannel().dump("Endgame Table Bases Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 	+ " X : " + (100 * engineConfiguration.getGTBUsagePercent()) + "%");

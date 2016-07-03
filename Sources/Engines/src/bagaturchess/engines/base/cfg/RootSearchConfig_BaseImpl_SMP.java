@@ -130,4 +130,10 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 		
 		//return 1;
 	}
+	
+	
+	@Override
+	public boolean initCaches() {
+		return false;
+	}
 }

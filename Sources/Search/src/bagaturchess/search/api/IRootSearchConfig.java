@@ -31,6 +31,7 @@ public interface IRootSearchConfig {
 	public IBoardConfig getBoardConfig();
 	public IEvalConfig getEvalConfig();
 	
+	public boolean initCaches();
 	public double getTPTUsagePercent();
 	public double getGTBUsagePercent();
 	public double getEvalCacheUsagePercent();
