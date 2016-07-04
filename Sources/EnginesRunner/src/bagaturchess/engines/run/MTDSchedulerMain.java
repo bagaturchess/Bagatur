@@ -42,6 +42,8 @@ import bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProce
 import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_Base;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.controllers.TimeController_FixedDepth;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.controllers.TimeController_TimePerMove;
 import bagaturchess.uci.api.BestMoveSender;
@@ -514,12 +516,14 @@ public class MTDSchedulerMain {
 		
 		//Go go = new Go(ChannelManager.getChannel(), "go depth 10");
 		Go go = new Go(ChannelManager.getChannel(), "go infinite");
-				
+		
+		ITimeController timeController = TimeControllerFactory.createTimeController(new TimeConfigImpl(), bitboard.getColourToMove(), go);
+		
 		final ISearchMediator mediator1 = new UCISearchMediatorImpl_NormalSearch(ChannelManager.getChannel(),
 				
 				go,
 				
-				new TimeConfigImpl(),
+				timeController,
 				
 				bitboard.getColourToMove(),
 				
@@ -536,7 +540,7 @@ public class MTDSchedulerMain {
 		
 		//searchMultiPV.newGame(bitboard);
 		//searchMultiPV.negamax(bitboard, mediator1, 1, 100, true, null);
-		search.negamax(bitboard, mediator1, go);
+		search.negamax(bitboard, mediator1, timeController, go);
 		
 		//search.negamax(bitboard, mediator1, 2, 2, true);
 		

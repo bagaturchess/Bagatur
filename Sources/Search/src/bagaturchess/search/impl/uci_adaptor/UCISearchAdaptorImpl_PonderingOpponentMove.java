@@ -27,6 +27,7 @@ import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.impl.info.SearchInfoImpl;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.BestMoveSender;
@@ -67,7 +68,7 @@ public class UCISearchAdaptorImpl_PonderingOpponentMove extends UCISearchAdaptor
 			revertedMoveForPondering = boardForSetup.getLastMove();
 			boardForSetup.makeMoveBackward(revertedMoveForPondering);
 			
-			timeController = null;
+			//timeController = null;
 			currentMediator = new UCISearchMediatorImpl_OpponentPondering(channel, go, boardForSetup.getColourToMove(), new BestMoveSender() {
 				
 				@Override
@@ -79,7 +80,7 @@ public class UCISearchAdaptorImpl_PonderingOpponentMove extends UCISearchAdaptor
 			
 			currentGoCommand = go;
 			
-			goSearch(true);
+			goSearch(true, null);
 			
 		} else {
 			
@@ -105,10 +106,11 @@ public class UCISearchAdaptorImpl_PonderingOpponentMove extends UCISearchAdaptor
 				}
 			}
 			
-			currentMediator = new UCISearchMediatorImpl_NormalSearch(channel, go, searchAdaptorCfg.getTimeConfig(), colourToMove, sender, getSearcher(false), isEndlessSearch(go)); 
+			ITimeController timeController = TimeControllerFactory.createTimeController(searchAdaptorCfg.getTimeConfig(), colourToMove, go);
+			currentMediator = new UCISearchMediatorImpl_NormalSearch(channel, go, timeController, colourToMove, sender, getSearcher(false), isEndlessSearch(go)); 
 			currentGoCommand = go;
 			
-			goSearch(false);
+			goSearch(false, timeController);
 		}
 	}
 	
@@ -150,10 +152,11 @@ public class UCISearchAdaptorImpl_PonderingOpponentMove extends UCISearchAdaptor
 		Go go = ponderMediator.getGoCommand();
 		go.setPonder(false); //Should be after stopSearch, which is above in the if block
 		
-		currentMediator = new UCISearchMediatorImpl_NormalSearch(ponderMediator.getChannel(), go, searchAdaptorCfg.getTimeConfig(), boardForSetup.getColourToMove(),
+		ITimeController timeController = TimeControllerFactory.createTimeController(searchAdaptorCfg.getTimeConfig(), boardForSetup.getColourToMove(), go);
+		currentMediator = new UCISearchMediatorImpl_NormalSearch(ponderMediator.getChannel(), go, timeController, boardForSetup.getColourToMove(),
 				bestMoveSender, getSearcher(false), isEndlessSearch(go)); 
 		currentGoCommand = go; //They should be the same anyway
 		
-		goSearch(false);
+		goSearch(false, timeController);
 	}
 }

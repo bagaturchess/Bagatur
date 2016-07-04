@@ -33,7 +33,7 @@ public class TimeController_FixedNodes extends TimeController_BaseImpl {
 	
 	
 	@Override
-	public boolean hasTime(int futureShift) {
+	public boolean hasTime() {
 		return true;
 	}
 }

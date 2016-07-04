@@ -49,9 +49,15 @@ public class TimeController_TimePerMove extends TimeController_BaseImpl {
 	
 	
 	@Override
-	public boolean hasTime(int futureShift) {
-		long tillNow = System.currentTimeMillis() + futureShift - getStartTime();
-		return tillNow <= timeToMove;
+	public boolean hasTime() {
+		return getRemainningTime() > 0;
+	}
+	
+	
+	@Override
+	public long getRemainningTime() {
+		long tillNow = System.currentTimeMillis() - getStartTime();
+		return timeToMove - tillNow;
 	}
 	
 	

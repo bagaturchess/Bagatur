@@ -32,6 +32,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.env.SharedData;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
@@ -76,8 +77,8 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	
 	
 	@Override
-	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, Go goCommand) {
-		negamax(bitboardForSetup, mediator, null, goCommand);
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, ITimeController timeController, Go goCommand) {
+		negamax(bitboardForSetup, mediator, timeController, null, goCommand);
 	}
 		
 	

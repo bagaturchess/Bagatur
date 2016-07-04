@@ -51,7 +51,7 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 	protected IBitBoard boardForSetup;
 	
 	protected BestMoveSender bestMoveSender;
-	protected ITimeController timeController;
+	//protected ITimeController timeController;
 	protected ISearchMediator currentMediator;
 	protected Go currentGoCommand;
 
@@ -140,7 +140,7 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 	}
 	
 	
-	protected void goSearch(boolean ponderSearch) {
+	protected void goSearch(boolean ponderSearch, ITimeController timeController) {
 		
 		if (ponderSearch) {
 			getSearcherNormal().decreaseTPTDepths(1);
@@ -172,14 +172,14 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 				
 				currentMediator.dump("Normal search started with GO: " + currentGoCommand);
 				
-				searcher.negamax(boardForSetup, currentMediator, currentGoCommand);
+				searcher.negamax(boardForSetup, currentMediator, timeController, currentGoCommand);
 			}
 			
 		} else {
 			
 			currentMediator.dump("Endless search started with GO: " + currentGoCommand);
 			
-			searcher.negamax(boardForSetup, currentMediator, currentGoCommand);
+			searcher.negamax(boardForSetup, currentMediator, timeController, currentGoCommand);
 		}
 	}
 
@@ -223,7 +223,9 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 			currentMediator.getStopper().markStopped();
 			
 			IRootSearch searcher = getSearcher(isPonderSearch(currentGoCommand));
-			searcher.stopSearchAndWait();
+			if (!searcher.isStopped()) {
+				searcher.stopSearchAndWait();
+			}
 			
 			currentMediator = null;
 			currentGoCommand = null;
@@ -242,12 +244,14 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 				ponder = info.getPV()[1];
 			}
 		}
-			
+		
 		
 		currentMediator.getStopper().markStopped();
 		
 		IRootSearch searcher = getSearcher(isPonderSearch(currentGoCommand));
-		searcher.stopSearchAndWait();
+		if (!searcher.isStopped()) {
+			searcher.stopSearchAndWait();
+		}
 		
 		currentMediator = null;
 		currentGoCommand = null;

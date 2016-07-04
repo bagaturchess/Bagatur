@@ -188,7 +188,9 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 								if (last3infos[0].getDepth() != last3infos[1].getDepth() && last3infos[1].getDepth() != last3infos[2].getDepth()) {
 									getStopper().markStopped();
 									
-									rootSearch.stopSearchAndWait();
+									if (!rootSearch.isStopped()) {
+										rootSearch.stopSearchAndWait();
+									}
 									
 									sender.sendBestMove();
 								}

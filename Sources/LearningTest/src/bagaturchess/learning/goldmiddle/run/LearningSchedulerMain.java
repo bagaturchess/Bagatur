@@ -41,6 +41,8 @@ import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImpl;
 import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.controllers.TimeController_FixedDepth;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.ChannelManager;
@@ -400,11 +402,13 @@ public class LearningSchedulerMain {
 		
 		Go go = new Go(ChannelManager.getChannel(), "go depth 10");
 		
+		ITimeController timeController = TimeControllerFactory.createTimeController(new TimeConfigImpl(), bitboard.getColourToMove(), go);
+
 		final ISearchMediator mediator1 = new UCISearchMediatorImpl_NormalSearch(ChannelManager.getChannel(),
 				
 				go,
 				
-				new TimeConfigImpl(),
+				timeController,
 				
 				bitboard.getColourToMove(),
 				
@@ -421,7 +425,7 @@ public class LearningSchedulerMain {
 		
 		//searchMultiPV.newGame(bitboard);
 		//searchMultiPV.negamax(bitboard, mediator1, 1, 100, true, null);
-		search.negamax(bitboard, mediator1, go);
+		search.negamax(bitboard, mediator1, timeController, go);
 		/*ISearch search = new SearchLazyNew(bitboard);
 		search.search(new MediatorDummper(5000000, true), 50);*/
 		

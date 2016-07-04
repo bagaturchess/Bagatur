@@ -30,6 +30,7 @@ import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.uci.impl.commands.Go;
 
 
@@ -56,7 +57,7 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 
 
 	@Override
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, IFinishCallback finishCallback, Go go) {
+	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, ITimeController timeController, IFinishCallback finishCallback, Go go) {
 		
 		if (current_mediator_multipv != null) {
 			throw new IllegalStateException("MultiPV search started without beeing stopped.");

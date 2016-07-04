@@ -40,6 +40,7 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.engine.EngineProcess;
@@ -170,7 +171,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 	
 	
 	@Override
-	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, final IFinishCallback multiPVCallback, Go go) {
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, ITimeController timeController, final IFinishCallback multiPVCallback, Go go) {
 			
 		
 		if (stopper != null) {
@@ -205,8 +206,8 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 						
 						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: OutboundQueueProcessor before loop");
 						
-						while (//!final_mediator.getStopper().isStopped() //TOTO: Have to be considered
-								stopper != null && !stopper.isStopped()) {
+						while (!final_mediator.getStopper().isStopped() //TODO: Have to be considered
+								&& stopper != null && !stopper.isStopped()) {
 							
 							Thread.sleep(15);
 						}
@@ -215,19 +216,21 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 								+ final_mediator.getStopper().isStopped());
 						
 						
-						if (!isStopped()) {// If the exit already happened in the InboundQueueProcessor below than should not be stopped again
+						synchronized (SequentialSearch_SeparateProcess.this) {
 							
-							runner.stopEngines();
-							//runner.enable();	
-							
-							if (multiPVCallback == null) {//Non multiPV search
-								final_mediator.getBestMoveSender().sendBestMove();
-							} else {
-								//MultiPV search
-								multiPVCallback.ready();
+							if (!isStopped()) {// If the exit already happened in the InboundQueueProcessor below than should not be stopped again
+								
+								runner.stopEngines();
+								//runner.enable();	
+								
+								if (multiPVCallback == null) {//Non multiPV search
+									final_mediator.getBestMoveSender().sendBestMove();
+								} else {
+									//MultiPV search
+									multiPVCallback.ready();
+								}
 							}
 						}
-						
 						
 					} catch(Throwable t) {
 						ChannelManager.getChannel().dump(t);
@@ -322,19 +325,22 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 								+ final_mediator.getStopper().isStopped());
 						
 						
-						if (!isStopped()) {//Not stopped from the UI. Otherwise the best move is already send from the InboundQueueProcessor above
-							
-							//runner.stopEngines();//Engine has stopped itself already (got out of the getInfoLines blocking call)
-							//runner.enable();
-							
-							stopper.markStopped();
-							stopper = null;
-							
-							if (multiPVCallback == null) {//Non multiPV search
-								final_mediator.getBestMoveSender().sendBestMove();
-							} else {
-								//MultiPV search
-								multiPVCallback.ready();
+						synchronized (SequentialSearch_SeparateProcess.this) {
+
+							if (!isStopped()) {//Not stopped from the UI. Otherwise the best move is already send from the InboundQueueProcessor above
+								
+								//runner.stopEngines();//Engine has stopped itself already (got out of the getInfoLines blocking call)
+								//runner.enable();
+								
+								stopper.markStopped();
+								stopper = null;
+								
+								if (multiPVCallback == null) {//Non multiPV search
+									final_mediator.getBestMoveSender().sendBestMove();
+								} else {
+									//MultiPV search
+									multiPVCallback.ready();
+								}
 							}
 						}
 						

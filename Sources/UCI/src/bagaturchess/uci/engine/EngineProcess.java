@@ -79,13 +79,13 @@ public class EngineProcess {
 		(new EngineProcessDummperThread("ERR", err)).start();
 		
 		
-		Thread closeChildThread = new Thread() {
+		Thread closeChildProcess = new Thread() {
 		    public void run() {
 		    	process.destroy();
 		    }
 		};
 		
-		Runtime.getRuntime().addShutdownHook(closeChildThread);
+		Runtime.getRuntime().addShutdownHook(closeChildProcess);
 	}
 	
 	
@@ -155,7 +155,7 @@ public class EngineProcess {
 	
 	public void stop() throws IOException {
 		
-		ChannelManager.getChannel().dump("DUMP: EngineProcess.stop() with stack: " + new Exception());
+		//ChannelManager.getChannel().dump("DUMP: EngineProcess.stop() with stack: " + new Exception());
 		
 		os.write("stop");	
 		os.newLine();

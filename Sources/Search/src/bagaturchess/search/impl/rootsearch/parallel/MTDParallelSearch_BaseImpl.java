@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
@@ -41,6 +42,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.search.impl.utils.SearchMediatorProxy;
 import bagaturchess.uci.api.BestMoveSender;
@@ -82,7 +84,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	protected abstract ISearchMediator sequentialSearchers_WrapMediator(ISearchMediator root_mediator);
 	
 	
-	protected abstract void sequentialSearchers_Negamax(IRootSearch searcher, IBitBoard _bitboardForSetup, ISearchMediator mediator,
+	protected abstract void sequentialSearchers_Negamax(IRootSearch searcher, IBitBoard _bitboardForSetup, ISearchMediator mediator, ITimeController timeController,
 			final IFinishCallback multiPVCallback, Go go, boolean dont_wrap_mediator);
 	
 	
@@ -108,7 +110,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	
 	
 	@Override
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator root_mediator, final IFinishCallback multiPVCallback, final Go initialgo) {
+	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator root_mediator, final ITimeController timeController, final IFinishCallback multiPVCallback, final Go initialgo) {
 		
 		//TODO: store pv in pvhistory
 		
@@ -201,17 +203,18 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					}
 					
 					
-					boolean[] searchers_started = new boolean[searchers.size()];
+					//boolean[] searchers_started = new boolean[getRootSearchConfig().getThreadsCount()];
 					//searchers.get(0).negamax(getBitboardForSetup(), mediators.get(0),
 					//		startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, true, null);
 					//searchers_started[0] = true;
 					for (int i = 0; i < searchers.size(); i++) {
-						Go curgo = initialgo;
-						synchronized(synch_Board) {
-							sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), multiPVCallback, curgo, true);
+						synchronized(synch_Board) {							
+							Go cur_go = initialgo;
+							ITimeController cur_timecontroller = timeController;
+							sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), cur_timecontroller, multiPVCallback, cur_go, true);
 						}
 						//searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, true, null);
-						searchers_started[i] = true;
+						//searchers_started[i] = true;
 					}
 					
 					
@@ -232,22 +235,48 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							) {
 						
 							//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Loop > before start threads");
-						
+							
 							//Start all stopped searchers
 							long time_delta = System.currentTimeMillis() - start_time;
 							long expected_count_workers = time_delta / 1;//100;
 							for (int i = 0; i < Math.min(searchers.size(), expected_count_workers); i++) {
-								if (!searchers_started[i]){
+								if (searchers.get(i).isStopped()){
+									
 									//TODO: Start the search with the best current PV
 									ISearchInfo cur_deepest_best = searchersInfo.getDeepestBestInfo();
 									if (cur_deepest_best != null) {
-										Go curgo = initialgo;
-										synchronized(synch_Board) {
-											sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), multiPVCallback, curgo, true);
+										
+										Go cur_go = initialgo;
+										ITimeController cur_timecontroller = timeController;
+										
+										if (timeController != null) {
+											long remainningTime = timeController.getRemainningTime();
+											if (remainningTime > 0) {
+												
+												StringBuilder pv = new StringBuilder(128);
+												if (cur_deepest_best.getPV() != null) {
+													for (int j=0; j<cur_deepest_best.getPV().length; j++) {
+														MoveInt.moveToStringUCI(cur_deepest_best.getPV()[j], pv);
+														if (j != cur_deepest_best.getPV().length - 1) {
+															pv.append(" ");
+														}
+													}
+												}
+												
+												cur_go = new Go(ChannelManager.getChannel(), "go movetime " + remainningTime
+														//+ " startdepth " + (cur_deepest_best.getDepth() + 1)
+														+ " beta " + cur_deepest_best.getEval()
+														+ " pv " + pv.toString()
+														);
+												//cur_timecontroller = 
+												
+												if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: restarted searcher " + i + " with new go " + cur_go);
+											}
 										}
-										//searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i),
-										//	cur_deepest_best.getDepth(), maxIterations, useMateDistancePrunning, multiPVCallback, cur_deepest_best.getPV(), true, cur_deepest_best.getEval());
-										searchers_started[i] = true;
+										
+										synchronized(synch_Board) {
+											sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), cur_timecontroller, multiPVCallback, cur_go, true);
+										}
 									}
 								}
 							}
@@ -258,10 +287,9 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							
 							
 							for (int i = 0; i < searchers.size(); i++) {
-								if (searchers_started[i]) {
+								if (!searchers.get(i).isStopped()) {
 									if (searchersInfo.needRestart(searchers.get(i))) {
 										searchers.get(i).stopSearchAndWait();
-										searchers_started[i] = false;
 										if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: restarted searcher " + i);
 									}
 								}
@@ -291,11 +319,9 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							
 							boolean hasRunningSearcher = false;
 							for (int i = 0; i < searchers.size(); i++) {
-								if (searchers_started[i]) {
-									if (!searchers.get(i).isStopped()) {
-										hasRunningSearcher = true;
-										break;
-									}
+								if (!searchers.get(i).isStopped()) {
+									hasRunningSearcher = true;
+									break;
 								}
 							}
 							allSearchersReady = !hasRunningSearcher;
@@ -306,7 +332,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					
 					
 					for (int i = 0; i < searchers.size(); i++) {
-						if (searchers_started[i]) {
+						if (!searchers.get(i).isStopped()) {
 							searchers.get(i).stopSearchAndWait();
 						}
 					}

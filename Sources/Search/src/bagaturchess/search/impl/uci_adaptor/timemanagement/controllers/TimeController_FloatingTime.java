@@ -74,14 +74,20 @@ public abstract class TimeController_FloatingTime extends TimeController_Consume
 	
 	
 	@Override
-	public boolean hasTime(int futureShift) {
+	public boolean hasTime() {
+		return getRemainningTime() > 0;
+	}
+	
+	
+	@Override
+	public long getRemainningTime() {
 		
 		if (getTimeoptimization_TerminateSearch()) {
-			return false;
+			return 0;
 		}
 		
-		long tillNow = System.currentTimeMillis() + futureShift - getStartTime();
-		return tillNow < getAvailableTime();
+		long tillNow = System.currentTimeMillis() - getStartTime();
+		return getAvailableTime() - tillNow;
 	}
 	
 	

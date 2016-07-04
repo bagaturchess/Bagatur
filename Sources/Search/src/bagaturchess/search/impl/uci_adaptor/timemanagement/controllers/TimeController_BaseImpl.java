@@ -52,8 +52,14 @@ public abstract class TimeController_BaseImpl implements ITimeController {
 	
 	
 	@Override
-	public boolean hasTime(int futureShift) {
+	public boolean hasTime() {
 		return true;
+	}
+	
+	
+	@Override
+	public long getRemainningTime() {
+		return Long.MAX_VALUE;
 	}
 	
 	

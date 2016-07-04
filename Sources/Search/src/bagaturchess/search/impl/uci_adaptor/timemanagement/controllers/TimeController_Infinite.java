@@ -34,7 +34,7 @@ public class TimeController_Infinite extends TimeController_BaseImpl {
 	
 	
 	@Override
-	public boolean hasTime(int futureShift) {
+	public boolean hasTime() {
 		return true;
 	}
 }

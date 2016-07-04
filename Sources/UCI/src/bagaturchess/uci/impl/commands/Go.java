@@ -264,7 +264,7 @@ public class Go extends Protocol {
 			infinite = true;
 		}
 		
-		int depthStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_GO_DEPTH_STR);
+		int depthStartIndex = commandLine.indexOf(" " + COMMAND_TO_ENGINE_GO_DEPTH_STR);
 		if (depthStartIndex != -1) {
 			int depthValueStartIndex = commandLine.indexOf(IChannel.WHITE_SPACE, depthStartIndex + 1);
 			if (depthValueStartIndex == -1) {
@@ -365,7 +365,13 @@ public class Go extends Protocol {
 			result += " beta " + beta;
 		}
 		if (pv != null) {
-			result += " pv " + pv;
+			result += " pv ";
+			for (int i = 0; i < pv.length; i++) {
+				result += pv[i];
+				if (i != pv.length - 1) {
+					result += " ";
+				}
+			}
 		}
 		
 		return result;

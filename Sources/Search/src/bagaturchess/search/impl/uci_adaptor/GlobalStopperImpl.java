@@ -74,7 +74,7 @@ public class GlobalStopperImpl implements ISearchStopper {
 			throw new SearchInterruptedException();
 		}
 		
-		if (!timeController.hasTime(0)) {
+		if (!timeController.hasTime()) {
 			markStopped();
 				//bestMoveSender.sendBestMove();
 			throw new SearchInterruptedException();

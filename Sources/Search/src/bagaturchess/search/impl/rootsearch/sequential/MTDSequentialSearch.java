@@ -42,6 +42,7 @@ import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
@@ -78,16 +79,15 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 	}
 	
 	
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
+	@Override
+	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, ITimeController timeController,
 			final IFinishCallback multiPVCallback, final Go go) {
-		negamax(_bitboardForSetup, mediator, multiPVCallback, go, false);
+		negamax(_bitboardForSetup, mediator, timeController, multiPVCallback, go, false);
 	}
+
 	
-	
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator,
+	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, ITimeController timeController,
 			final IFinishCallback multiPVCallback, final Go go, boolean dont_wrap_mediator) {
-		
-		//TODO: store pv in pvhistory
 		
 		if (stopper != null) {
 			throw new IllegalStateException("MTDSequentialSearch started whithout beeing stopped");
@@ -119,7 +119,10 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 				prevPV = historyEntry.getPv();
 				initialValue = historyEntry.getEval();
 			}
+		} else {
+			//TODO: store pv in pvhistory with given depth and evaluation
 		}
+		
 		final int[] final_prevPV = prevPV;
 		
 		if (initialValue == null) {

@@ -234,7 +234,7 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 			//adjust go: set depth to cur_depth variable
 			go.setStartDepth(0);
 			go.setDepth(cur_depth);
-			rootSearch.negamax(bitboard, this, this, go);
+			rootSearch.negamax(bitboard, this, null, this, go);
 			bitboard.makeMoveBackward(getCurrentPVEntry().getMove());
 			//ChannelManager.getChannel().dump("after search");
 			
