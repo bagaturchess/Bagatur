@@ -61,6 +61,8 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 	
 	private int hashfull;
 	
+	private final Object sync_stop = new Object();
+	
 	
 	public SequentialSearch_SeparateProcess(Object[] args) {
 		
@@ -216,7 +218,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 								+ final_mediator.getStopper().isStopped());
 						
 						
-						synchronized (SequentialSearch_SeparateProcess.this) {
+						synchronized (sync_stop) {
 							
 							if (!isStopped()) {// If the exit already happened in the InboundQueueProcessor below than should not be stopped again
 								
@@ -325,7 +327,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 								+ final_mediator.getStopper().isStopped());
 						
 						
-						synchronized (SequentialSearch_SeparateProcess.this) {
+						synchronized (sync_stop) {
 
 							if (!isStopped()) {//Not stopped from the UI. Otherwise the best move is already send from the InboundQueueProcessor above
 								

@@ -55,7 +55,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	
 	private ExecutorService executor;
 	
-	private List<IRootSearch> searchers;
+	private List<IRootSearch> searchers_ready;
+	private List<IRootSearch> searchers_notready;
 	
 	private Object synch_Board 					= new Object();
 	
@@ -67,18 +68,17 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		
 		super(args);
 		
-		executor = Executors.newFixedThreadPool(2);
+		executor 				= Executors.newFixedThreadPool(2);
 		
-		searchers = new Vector<IRootSearch>();
+		searchers_ready 		= new Vector<IRootSearch>();
+		searchers_notready 		= new Vector<IRootSearch>();
 		
-		sequentialSearchers_Create(searchers);
+		sequentialSearchers_Create();
 		
-		ChannelManager.getChannel().dump("MTDParallelSearch_BaseImpl created search with " + getRootSearchConfig().getThreadsCount() + " sequential searchers." +
-				" Started sequentialy = " + searchers.size() + " searchers, Starting in parallel = " + (getRootSearchConfig().getThreadsCount() - searchers.size()) + " searchers ...");
 	}
 	
 	
-	protected abstract void sequentialSearchers_Create(List<IRootSearch> startedImmediately);
+	protected abstract void sequentialSearchers_Create();
 	
 	
 	protected abstract ISearchMediator sequentialSearchers_WrapMediator(ISearchMediator root_mediator);
@@ -90,22 +90,36 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	
 	protected void addSearcher(IRootSearch searcher) {
 		
-		synchronized(synch_Board) {
-			searcher.createBoard(getBitboardForSetup());
+		if (getBitboardForSetup() == null) { //createBoard of this root search is not called yet
+			
+			searchers_notready.add(searcher);
+			
+			ChannelManager.getChannel().dump("MTDParallelSearch_BaseImpl addSearcher to searchers_notready. Current size is " + searchers_notready.size());
+			
+		} else {
+			
+			synchronized(synch_Board) {
+				searcher.createBoard(getBitboardForSetup());
+			}
+			
+			searchers_ready.add(searcher);
+			
+			ChannelManager.getChannel().dump("MTDParallelSearch_BaseImpl addSearcher to searchers_ready. Current size is " + searchers_ready.size());
 		}
-		
-		searchers.add(searcher);
 	}
 	
 	
 	@Override
 	public void createBoard(IBitBoard _bitboardForSetup) {
 		
-		super.createBoard(_bitboardForSetup); 
+		super.createBoard(_bitboardForSetup);
 		
-		for (int i = 0; i < searchers.size(); i++) {
-			searchers.get(i).createBoard(getBitboardForSetup());
-		}
+		ChannelManager.getChannel().dump("MTDParallelSearch_BaseImpl createBoard called. Will transfer " + searchers_notready.size() + " searchers from searchers_notready to searchers_ready");
+		
+		for (int i = 0; i < searchers_notready.size(); i++) {
+			IRootSearch searcher = searchers_notready.get(i);
+			addSearcher(searcher);
+		}	
 	}
 	
 	
@@ -193,28 +207,25 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 				try {
 					
 					
+					
 					final List<ISearchMediator> mediators = new ArrayList<ISearchMediator>();
 					final List<BucketMediator> mediators_bucket = new ArrayList<BucketMediator>();
 					
-					for (int i = 0; i < searchers.size(); i++) {
+					//Create all mediators, which will be potentially used by the searchers
+					for (int i = 0; i < getRootSearchConfig().getThreadsCount(); i++) {
 						BucketMediator cur_bucket = new BucketMediator(final_mediator);
 						mediators_bucket.add(cur_bucket);
 						mediators.add(sequentialSearchers_WrapMediator(cur_bucket));
 					}
 					
 					
-					//boolean[] searchers_started = new boolean[getRootSearchConfig().getThreadsCount()];
-					//searchers.get(0).negamax(getBitboardForSetup(), mediators.get(0),
-					//		startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, true, null);
-					//searchers_started[0] = true;
-					for (int i = 0; i < searchers.size(); i++) {
+					//Start searchers initially
+					for (int i = 0; i < searchers_ready.size(); i++) {
 						synchronized(synch_Board) {							
 							Go cur_go = initialgo;
 							ITimeController cur_timecontroller = timeController;
-							sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), cur_timecontroller, multiPVCallback, cur_go, true);
+							sequentialSearchers_Negamax(searchers_ready.get(i), getBitboardForSetup(), mediators.get(i), cur_timecontroller, multiPVCallback, cur_go, true);
 						}
-						//searchers.get(i).negamax(getBitboardForSetup(), mediators.get(i), startIteration, maxIterations, useMateDistancePrunning, multiPVCallback, prevPV, true, null);
-						//searchers_started[i] = true;
 					}
 					
 					
@@ -224,7 +235,9 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					
 					long start_time = System.currentTimeMillis();
 					
-					SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.001d);
+					
+					SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.377d);
+					
 					
 					boolean allSearchersReady = false;
 					//boolean hasSendAtLest1Info = false;
@@ -239,8 +252,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							//Start all stopped searchers
 							long time_delta = System.currentTimeMillis() - start_time;
 							long expected_count_workers = time_delta / 1;//100;
-							for (int i = 0; i < Math.min(searchers.size(), expected_count_workers); i++) {
-								if (searchers.get(i).isStopped()){
+							for (int i = 0; i < Math.min(searchers_ready.size(), expected_count_workers); i++) {
+								if (searchers_ready.get(i).isStopped()){
 									
 									//TODO: Start the search with the best current PV
 									ISearchInfo cur_deepest_best = searchersInfo.getDeepestBestInfo();
@@ -275,7 +288,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 										}
 										
 										synchronized(synch_Board) {
-											sequentialSearchers_Negamax(searchers.get(i), getBitboardForSetup(), mediators.get(i), cur_timecontroller, multiPVCallback, cur_go, true);
+											sequentialSearchers_Negamax(searchers_ready.get(i), getBitboardForSetup(), mediators.get(i), cur_timecontroller, multiPVCallback, cur_go, true);
 										}
 									}
 								}
@@ -286,10 +299,10 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							boolean hasSendInfo = collectAndSendInfos(final_mediator,	mediators_bucket, searchersInfo);
 							
 							
-							for (int i = 0; i < searchers.size(); i++) {
-								if (!searchers.get(i).isStopped()) {
-									if (searchersInfo.needRestart(searchers.get(i))) {
-										searchers.get(i).stopSearchAndWait();
+							for (int i = 0; i < searchers_ready.size(); i++) {
+								if (!searchers_ready.get(i).isStopped()) {
+									if (searchersInfo.needRestart(searchers_ready.get(i))) {
+										searchers_ready.get(i).stopSearchAndWait();
 										if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: restarted searcher " + i);
 									}
 								}
@@ -318,8 +331,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							
 							
 							boolean hasRunningSearcher = false;
-							for (int i = 0; i < searchers.size(); i++) {
-								if (!searchers.get(i).isStopped()) {
+							for (int i = 0; i < searchers_ready.size(); i++) {
+								if (!searchers_ready.get(i).isStopped()) {
 									hasRunningSearcher = true;
 									break;
 								}
@@ -331,9 +344,9 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Out of loop final_mediator.getStopper().isStopped()=" + final_mediator.getStopper().isStopped());
 					
 					
-					for (int i = 0; i < searchers.size(); i++) {
-						if (!searchers.get(i).isStopped()) {
-							searchers.get(i).stopSearchAndWait();
+					for (int i = 0; i < searchers_ready.size(); i++) {
+						if (!searchers_ready.get(i).isStopped()) {
+							searchers_ready.get(i).stopSearchAndWait();
 						}
 					}
 					
@@ -399,7 +412,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							cur_mediator.lastSendMajorIndex = i_major;
 							
 							//if (!curinfo.isUpperBound()) {
-								searchersInfo.update(searchers.get(i_mediator), curinfo);
+								searchersInfo.update(searchers_ready.get(i_mediator), curinfo);
 								ISearchInfo toSend = searchersInfo.getNewInfoToSendIfPresented();
 								while (toSend != null) {
 									if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend="
@@ -429,11 +442,11 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 			
 			executor = null;
 			
-			for (int i = 0; i < searchers.size(); i++) {
-				searchers.get(i).shutDown();
+			for (int i = 0; i < searchers_ready.size(); i++) {
+				searchers_ready.get(i).shutDown();
 			}
 			
-			searchers = null;
+			searchers_ready = null;
 			
 		} catch(Throwable t) {
 			//Do nothing
@@ -449,22 +462,22 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	@Override
 	public int getTPTUsagePercent() {
 		
-		if (searchers.size() == 0) {//Not yet initialized
+		if (searchers_ready.size() == 0) {//Not yet initialized
 			return 0;
 		}
 		
 		int sum = 0;
-		for (int i = 0; i < searchers.size(); i++) {
-			sum += searchers.get(i).getTPTUsagePercent();
+		for (int i = 0; i < searchers_ready.size(); i++) {
+			sum += searchers_ready.get(i).getTPTUsagePercent();
 		}
-		return sum / searchers.size();
+		return sum / searchers_ready.size();
 	}
 
 
 	@Override
 	public void decreaseTPTDepths(int reduction) {
-		for (int i = 0; i < searchers.size(); i++) {
-			searchers.get(i).decreaseTPTDepths(reduction);
+		for (int i = 0; i < searchers_ready.size(); i++) {
+			searchers_ready.get(i).decreaseTPTDepths(reduction);
 		}
 	}
 	
@@ -474,7 +487,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		String result = super.toString();
 		
 		result += "\r\n";
-		result += searchers.toString();
+		result += searchers_ready.toString();
 		
 		return result;
 	}

@@ -173,18 +173,21 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 							+ final_mediator.getStopper().isStopped()
 							+ ", distribution.getCurrentDepth()=" + distribution.getCurrentDepth() + ", distribution.getMaxIterations()=" + distribution.getMaxIterations());
 					
-					if (stopper == null) {
-						throw new IllegalStateException();
-					}
-					stopper.markStopped();
-					stopper = null;
-					
-					
-					if (multiPVCallback == null) {//Non multiPV search
-						final_mediator.getBestMoveSender().sendBestMove();
-					} else {
-						//MultiPV search
-						multiPVCallback.ready();
+					if (!isStopped()) {
+						
+						if (stopper == null) {
+							throw new IllegalStateException();
+						}
+						stopper.markStopped();
+						stopper = null;
+						
+						
+						if (multiPVCallback == null) {//Non multiPV search
+							final_mediator.getBestMoveSender().sendBestMove();
+						} else {
+							//MultiPV search
+							multiPVCallback.ready();
+						}
 					}
 					
 				} catch(Throwable t) {

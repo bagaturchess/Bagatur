@@ -23,9 +23,6 @@
 package bagaturchess.search.impl.rootsearch.parallel;
 
 
-import java.util.List;
-
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IFinishCallback;
@@ -50,7 +47,7 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 	
 	
 	@Override
-	protected void sequentialSearchers_Create(List<IRootSearch> startedImmediately) {
+	protected void sequentialSearchers_Create() {
 		
 		for (int i = 0; i < getRootSearchConfig().getThreadsCount(); i++ ) {
 			
@@ -58,7 +55,8 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 				MTDSequentialSearch searcher = (MTDSequentialSearch)
 						ReflectionUtils.createObjectByClassName_ObjectsConstructor(MTDSequentialSearch.class.getName(), new Object[] {getRootSearchConfig(), getSharedData()});
 				
-				startedImmediately.add(searcher);
+				addSearcher(searcher);
+				
 			} catch (Throwable t) {
 				ChannelManager.getChannel().dump(t);
 			}

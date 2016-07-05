@@ -23,9 +23,6 @@
 package bagaturchess.search.impl.rootsearch.parallel;
 
 
-import java.util.List;
-
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IFinishCallback;
@@ -49,21 +46,27 @@ public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl 
 	
 	
 	@Override
-	protected void sequentialSearchers_Create(List<IRootSearch> startedImmediately) {
+	protected void sequentialSearchers_Create() {
 		
 		if (getRootSearchConfig().getThreadsCount() < 2) {
 			throw new IllegalStateException("MTDParallelSearch_ProcessesImpl: threads count is less than 2 = " + getRootSearchConfig().getThreadsCount());
 		}
 		
+		int count_started_sequentially = 1;
+		
+		ChannelManager.getChannel().dump("MTDParallelSearch_BaseImpl created search with " + getRootSearchConfig().getThreadsCount() + " sequential searchers." +
+				" Started sequentialy = " + count_started_sequentially + " searchers, Starting in parallel = " + (getRootSearchConfig().getThreadsCount() - count_started_sequentially) + " searchers ...");
+
+		
 		for (int i = 0; i < getRootSearchConfig().getThreadsCount(); i++ ) {
 			
 			try {
-				if (i == 0) {//Start first searcher sequentially
+				if (i < count_started_sequentially) {//Start first searcher sequentially
 
 					SequentialSearch_SeparateProcess searcher = (SequentialSearch_SeparateProcess)
 							ReflectionUtils.createObjectByClassName_ObjectsConstructor(SequentialSearch_SeparateProcess.class.getName(), new Object[] {getRootSearchConfig(), getSharedData()});
 					
-					startedImmediately.add(searcher);
+					addSearcher(searcher);
 					
 				} else {//Start the rest in parallel
 					
@@ -82,17 +85,6 @@ public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl 
 							
 						}
 					}).start();
-					
-			 		//ERROR (if parallel)
-					//info string Normal search started with GO: go ponder false wtime 359480 btime 354477 winc 5000 binc 5000 infinite false startdepth 1
-					//info string java.lang.NullPointerException
-					//info string 	at bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl.setupBoard(Unknown Source)
-					//info string 	at bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProcess.negamax(Unknown Source)
-					//info string 	at bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ProcessesImpl.sequentialSearchers_Negamax(Unknown Source)
-					//info string 	at bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_BaseImpl$1.run(Unknown Source)
-					//info string 	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
-					//info string 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
-					//info string 	at java.lang.Thread.run(Unknown Source)
 							
 				}
 
