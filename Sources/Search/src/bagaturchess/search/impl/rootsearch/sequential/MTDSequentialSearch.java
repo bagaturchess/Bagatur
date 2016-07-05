@@ -169,11 +169,13 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 						task.run();
 					}
 					
-					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch after loop stopped="
+					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch after loop final_mediator.getStopper().isStopped()="
 							+ final_mediator.getStopper().isStopped()
 							+ ", distribution.getCurrentDepth()=" + distribution.getCurrentDepth() + ", distribution.getMaxIterations()=" + distribution.getMaxIterations());
 					
 					if (!isStopped()) {
+						
+						ChannelManager.getChannel().dump("MTDSequentialSearch not stopped - stopping searcher ...");
 						
 						if (stopper == null) {
 							throw new IllegalStateException();
@@ -183,6 +185,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 						
 						
 						if (multiPVCallback == null) {//Non multiPV search
+							ChannelManager.getChannel().dump("MTDSequentialSearch calling final_mediator.getBestMoveSender().sendBestMove()");
 							final_mediator.getBestMoveSender().sendBestMove();
 						} else {
 							//MultiPV search

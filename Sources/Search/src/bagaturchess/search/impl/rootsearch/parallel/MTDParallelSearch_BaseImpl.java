@@ -61,6 +61,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	private Object synch_Board 					= new Object();
 	
 	private final double TARGET_CPUS_LOAD 		= 50;
+	private final double MIN_REMAINNING_TIME	= 500;
+	
 	private final VarStatistic stat_cpus_load 	= new VarStatistic(false);
 	
 	
@@ -264,7 +266,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 										
 										if (timeController != null) {
 											long remainningTime = timeController.getRemainningTime();
-											if (remainningTime > 0) {
+											if (remainningTime > MIN_REMAINNING_TIME) {
 												
 												StringBuilder pv = new StringBuilder(128);
 												if (cur_deepest_best.getPV() != null) {
