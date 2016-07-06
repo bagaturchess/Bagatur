@@ -36,10 +36,8 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearchConfig;
-import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
@@ -82,12 +80,12 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		/*EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient",
 				"C:/DATA/OWN/chess/GIT_REPO/Bagatur-Chess-Engine-And-Tools/Sources/",
 				"",
-				256);*/
+				333);*/
 		
 		EngineProcess engine = new EngineProcess_BagaturImpl_DistributionImpl("BagaturEngineClient",
 				workdir + File.separatorChar,
 				"",
-				256);
+				333);
 		
 		
 		runner.addEngine(engine);
@@ -215,11 +213,6 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 							
 							Thread.sleep(15);
 							
-							/*try {
-								int colourToMove = getBitboardForSetup().getColourToMove();
-								final_mediator.getStopper().stopIfNecessary(1, colourToMove, ISearch.MIN, ISearch.MAX);
-							} catch(SearchInterruptedException sie) {
-							}*/
 						}
 						
 						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: OutboundQueueProcessor after loop stopped="
