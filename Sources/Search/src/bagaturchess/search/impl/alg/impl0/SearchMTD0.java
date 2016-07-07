@@ -57,6 +57,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1 * 0.777 * 1;
 	double IID_DEPTH_MULTIPLIER 			= 1;
 	
+	private long lastSentMinorInfo_timestamp;
+	private long lastSentMinorInfo_nodesCount;
+	
 	
 	public SearchMTD0(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
@@ -419,6 +422,9 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		super.newSearch();
 		
+		lastSentMinorInfo_nodesCount = 0;
+		
+		lastSentMinorInfo_timestamp = 0;
 	}
 	
 	
@@ -1060,22 +1066,27 @@ public class SearchMTD0 extends SearchImpl_MTD {
 					continue;
 				}
 				
-				if (mediator != null) {
-					if (depth == 0) {
-						info.setCurrentMove(cur_move);
-						info.setCurrentMoveNumber((searchedCount + 1));
-					}
-					if ((initial_maxdepth / PLY) <= 7) {
-						if (depth == 0) { 
-							mediator.changedMinor(info);
-						}
-					} else {
-						double send_depth = (initial_maxdepth / PLY) / (double) 2;
-						if (depth <= send_depth) { 
-							mediator.changedMinor(info);
-						}
-					}
+				
+				//Build and sent minor info
+				if (depth == 0) {
+					info.setCurrentMove(cur_move);
+					info.setCurrentMoveNumber((searchedCount + 1));
 				}
+				
+				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
+					
+					long timestamp = System.currentTimeMillis();
+					
+					if (timestamp >= lastSentMinorInfo_timestamp + 1000)  {//Send info each second
+					
+						mediator.changedMinor(info);
+						
+						lastSentMinorInfo_timestamp = timestamp;
+					}
+					
+					lastSentMinorInfo_nodesCount = info.getSearchedNodes();
+				}
+				
 				
 				boolean passerPush = isPasserPushPV(cur_move);
 				boolean isCapOrProm = MoveInt.isCaptureOrPromotion(cur_move);
@@ -1762,7 +1773,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		boolean reuseIIDMOves = false;
 		//IID NONPV Node
-		if (IID_NONPV) {
+		if (IID_NONPV && depth > 0) {
 			
 			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
@@ -1862,9 +1873,32 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		if (cur_move != 0) {
 			do {
 				
+				
 				if (searchedCount > 0 && cur_move == tpt_move) {
 					continue;
 				}
+				
+				
+				//Build and sent minor info
+				if (depth == 0) {
+					info.setCurrentMove(cur_move);
+					info.setCurrentMoveNumber((searchedCount + 1));
+				}
+				
+				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
+					
+					long timestamp = System.currentTimeMillis();
+					
+					if (timestamp >= lastSentMinorInfo_timestamp + 1000)  {//Send info each second
+					
+						mediator.changedMinor(info);
+						
+						lastSentMinorInfo_timestamp = timestamp;
+					}
+					
+					lastSentMinorInfo_nodesCount = info.getSearchedNodes();
+				}
+				
 				
 				boolean isCapOrProm = MoveInt.isCaptureOrPromotion(cur_move);
 				int moveSee = -1;

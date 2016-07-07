@@ -280,6 +280,10 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 								} else if (line.contains("info ")) {
 									if (line.contains(" pv ")) {
 										
+										if (line.contains(" upperbound ")) {
+											throw new IllegalStateException("line.contains(upperbound)");
+										}
+										
 										Info info = new Info(line);
 										//System.out.println("MAJOR: " + info);
 										
@@ -287,7 +291,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 										if (searchInfo.getPV() != null && searchInfo.getPV().length > 0) {
 											final_mediator.changedMajor(searchInfo);
 										}
-									} else {
+									} else if (!line.contains(" upperbound ")) {//Not major line
 										//System.out.println("MINOR: " + line);
 										if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: getInfoLine minor line");
 										
@@ -298,6 +302,9 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 										
 										ISearchInfo searchInfo = SearchInfoFactory.getFactory().createSearchInfo_Minor(info, getBitboardForSetup());
 										final_mediator.changedMinor(searchInfo);
+									} else {
+										//Do nothing
+										//upperbound
 									}
 								}
 							}

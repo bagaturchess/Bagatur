@@ -49,9 +49,6 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	private ISearchInfo[] last3infos;
 	private long startTime;
 	
-	private String nextMinorLine;
-	private long lastSentMinorInfo_timestamp;
-	
 	private boolean isEndlessSearch;
 	
 	
@@ -125,14 +122,10 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	
 	public void changedMinor(ISearchInfo info) {
-		nextMinorLine = SearchInfoUtils.buildMinorInfoCommand(info, getStartTime(), rootSearch.getTPTUsagePercent(), 0);
-		if (nextMinorLine != null) {
-			long timestamp = System.currentTimeMillis();
-			if (timestamp > lastSentMinorInfo_timestamp + 1000 /*Update UI, once per second*/) {
-				lastSentMinorInfo_timestamp = timestamp;
-				send(nextMinorLine);
-			}
-		}
+
+		String message = SearchInfoUtils.buildMinorInfoCommand(info, getStartTime(), rootSearch.getTPTUsagePercent(), 0);
+		send(message);
+		
 	}
 	
 	
