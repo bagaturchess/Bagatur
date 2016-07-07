@@ -27,6 +27,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.internal.ISearchInfo;
+import bagaturchess.search.impl.utils.SearchUtils;
 import bagaturchess.uci.impl.commands.info.Info;
 
 
@@ -79,8 +80,17 @@ public final class SearchInfoFactory {
 		result.setSelDepth(info.getSelDepth());
 		result.setSearchedNodes(info.getNodes());
 		
-		result.setEval(info.getEval());
-		
+		if (info.isMate()) {
+			
+			int mateIn = info.getEval();
+			int mateVal = (mateIn > 0 ? 1: -1) * SearchUtils.getMateVal(Math.abs(mateIn));
+			
+			result.setEval(mateVal);
+			
+		} else {
+			
+			result.setEval(info.getEval());
+		}
 		
 		result.setPV(MoveInt.getPV(info.getPv(), board));
 		
