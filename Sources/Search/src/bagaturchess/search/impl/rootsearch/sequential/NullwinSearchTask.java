@@ -167,7 +167,9 @@ public class NullwinSearchTask implements Runnable {
 					bitboard.getColourToMove(), 0, 0, false, 0, useMateDistancePrunning);*/
 			int eval = searcher.nullwin_search(mediator, info, ISearch.PLY * (maxdepth - 0), ISearch.PLY * (maxdepth - 0),
 					0, beta, false, 0, 0, prevPV, searcher.getEnv().getBitboard().getColourToMove(), 0, 0, false, 0, useMateDistancePrunning);
+			
 			if (eval >= beta) {
+			//if (eval >= distribution.getLowerBound() && eval <= distribution.getUpperBound()) {
 				eval = searcher.pv_search(mediator, null, info, ISearch.PLY * maxdepth, ISearch.PLY * maxdepth,
 					0, beta - 1, beta, 0, 0, prevPV, false, 0, searcher.getEnv().getBitboard().getColourToMove(), 0, 0, false, 0, useMateDistancePrunning);
 			}
