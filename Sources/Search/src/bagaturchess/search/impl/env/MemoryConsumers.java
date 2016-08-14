@@ -9,6 +9,7 @@ import java.util.Vector;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.attacks.control.metadata.SeeMetadata;
 import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
+import bagaturchess.bitboard.impl.datastructs.lrmmap.LRUMapLongObject;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
@@ -55,10 +56,10 @@ public class MemoryConsumers {
 	static {
 		if (getJVMBitmode() == 64) {
 			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT = 0.91;//0.23;
+			MEMORY_USAGE_PERCENT = 0.77;//0.23;
 		} else { //32
 			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT =  0.91;//0.23;
+			MEMORY_USAGE_PERCENT =  0.77;//0.23;
 		}
 		
 		try {
@@ -219,7 +220,7 @@ public class MemoryConsumers {
 		int size_pc = Math.max(SIZE_MIN_ENTRIES_PEC, getPawnsEvalCacheSize(availableMemory, engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName(),
 																										Math.max(test_size2, SIZE_MIN_ENTRIES_PEC)));
 		ChannelManager.getChannel().dump("Pawns Eval Cache size is " + size_pc);
-
+		
 		int size_gtb_out = 0;
 		if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
 			size_gtb_out = Math.max(SIZE_MIN_ENTRIES_GTB, getGTBEntrySize_OUT(availableMemory, 	Math.max(test_size1, SIZE_MIN_ENTRIES_GTB)));
@@ -237,10 +238,10 @@ public class MemoryConsumers {
 		int threadsCount = engineConfiguration.getThreadsCount();
 		for (int i=0; i<threadsCount; i++) {
 			
+			tpt.add(new TPTable(size_tpt, false, new BinarySemaphore_Dummy()));
+			
 			evalCache.add(new EvalCache(size_ec, false, new BinarySemaphore_Dummy()));
 			//evalCache.add(new EvalCache1(5, size_ec, false, new BinarySemaphore_Dummy()));
-			
-			tpt.add(new TPTable(size_tpt, false, new BinarySemaphore_Dummy()));
 			
 			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName());
 			pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
@@ -294,7 +295,7 @@ public class MemoryConsumers {
 		
 		System.gc();
 		int memory_before = getUsedMemory();
-		IEvalCache test_ec = new EvalCache(test_size, true, null);
+		LRUMapLongObject test_ec = new EvalCache(test_size, true, null);
 		//IEvalCache test_ec = new EvalCache1(5, test_size, true, null);
 		int size = getEntrySize(availableMemory, engineConfiguration.getEvalCacheUsagePercent(), test_size, memory_before);
 		test_ec.clear();
