@@ -45,6 +45,9 @@ import bagaturchess.uci.impl.commands.options.SetOption;
 public class StateManager extends Protocol implements BestMoveSender {
 	
 	
+	private boolean GC_AFTER_MOVE = true;
+	
+	
 	protected IUCIConfig engineBootCfg;
 	private IChannel channel;
 	private IBitBoard board;
@@ -388,7 +391,10 @@ public class StateManager extends Protocol implements BestMoveSender {
 			//channel.sendLogToGUI("StateManager: WARNING: StateManager -> move returned from UCI Search adaptor is '0' and is not sent to the UCI platform");
 		}
 		
-		//System.gc();
+		
+		if (GC_AFTER_MOVE) {
+			System.gc();
+		}
 	}
 	
 	
