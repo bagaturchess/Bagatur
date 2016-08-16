@@ -29,7 +29,7 @@ import bagaturchess.uci.api.IChannel;
 public class MemoryConsumers {
 	
 	
-	private static int JVMDLL_MEMORY_CONSUMPTION 						= 20 * 1024 * 1024;
+	private static int JVMDLL_MEMORY_CONSUMPTION 						= 27 * 1024 * 1024;
 	private static int MIN_MEMORY_BUFFER;
 	private static double MEMORY_USAGE_PERCENT; 
 	
@@ -55,11 +55,11 @@ public class MemoryConsumers {
 	
 	static {
 		if (getJVMBitmode() == 64) {
-			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT = 0.77;//0.23;
+			MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;
+			MEMORY_USAGE_PERCENT 	= 0.75;//0.23;
 		} else { //32
-			MIN_MEMORY_BUFFER = 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT =  0.77;//0.23;
+			MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;
+			MEMORY_USAGE_PERCENT 	=  0.75;//0.23;
 		}
 		
 		try {
@@ -207,8 +207,8 @@ public class MemoryConsumers {
 		//}
 		
 		int availableMemory_in_MB = (int) (availableMemory / (1024 * 1024));
-		int test_size1 = Math.min(177, availableMemory_in_MB) * 1000;
-		int test_size2 = Math.min(177, availableMemory_in_MB) * 100;
+		int test_size1 = Math.min(256, availableMemory_in_MB) * 1000;
+		int test_size2 = Math.min(256, availableMemory_in_MB) * 100;
 		
 		
 		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, getTPTEntrySize(availableMemory, 			Math.max(test_size1, SIZE_MIN_ENTRIES_TPT)));
@@ -263,6 +263,7 @@ public class MemoryConsumers {
 		}
 		
 		System.gc();
+		
 		int memory_before = getUsedMemory();
 		TPTable test_tpt = new TPTable(test_size, true, null);
 		int size = getEntrySize(availableMemory, engineConfiguration.getTPTUsagePercent(), test_size, memory_before);
@@ -279,6 +280,7 @@ public class MemoryConsumers {
 		}
 		
 		System.gc();
+		
 		int memory_before = getUsedMemory();
 		GTBCache_OUT gtbCache = new GTBCache_OUT(test_size, true, null);
 		int size = getEntrySize(availableMemory, engineConfiguration.getGTBUsagePercent(), test_size, memory_before);
@@ -294,6 +296,7 @@ public class MemoryConsumers {
 		}
 		
 		System.gc();
+		
 		int memory_before = getUsedMemory();
 		LRUMapLongObject test_ec = new EvalCache(test_size, true, null);
 		//IEvalCache test_ec = new EvalCache1(5, test_size, true, null);
@@ -310,6 +313,7 @@ public class MemoryConsumers {
 		}
 		
 		System.gc();
+		
 		int memory_before = getUsedMemory();
 		DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(pawnsCacheName);
 		PawnsEvalCache test_pc = new PawnsEvalCache(pawnsCacheFactory, test_size, true, null);
@@ -330,8 +334,8 @@ public class MemoryConsumers {
 	private int getAvailableMemory() {
 		
 		System.gc();
-		System.gc();
-		System.gc();
+		//System.gc();
+		//System.gc();
 		
 		int max_mem = (int) Runtime.getRuntime().maxMemory();
 		
@@ -348,8 +352,8 @@ public class MemoryConsumers {
 	private static int getUsedMemory() {
 		
 		System.gc();
-		System.gc();
-		System.gc();
+		//System.gc();
+		//System.gc();
 		
 		int total_mem = (int) Runtime.getRuntime().totalMemory();
 		int free_mem = (int) Runtime.getRuntime().freeMemory();

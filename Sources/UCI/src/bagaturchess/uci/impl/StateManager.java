@@ -45,7 +45,9 @@ import bagaturchess.uci.impl.commands.options.SetOption;
 public class StateManager extends Protocol implements BestMoveSender {
 	
 	
-	private boolean GC_AFTER_MOVE = true;
+	//Disabled.
+	//ATTENTION: Should be definitely disabled for openning book moves! (otherwise causes perpetual GC calls)
+	private boolean GC_AFTER_MOVE = false;
 	
 	
 	protected IUCIConfig engineBootCfg;
