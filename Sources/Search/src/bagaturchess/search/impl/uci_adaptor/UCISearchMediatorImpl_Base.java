@@ -164,31 +164,34 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	private void stopIfMateIsFound() {
 		
+		
 		if (isEndlessSearch) {
 			return;
 		}
 		
-		if (stopper != null && stopper instanceof GlobalStopperImpl) {
-			if (!stopper.isStopped()) {
-				last3infos[0] = last3infos[1]; 
-				last3infos[1] = last3infos[2];
-				last3infos[2] = lastinfo;
-				
-				if (last3infos[0] != null && last3infos[1] != null && last3infos[2] != null) {
-					if (last3infos[0].isMateScore() && last3infos[1].isMateScore() && last3infos[2].isMateScore()) {
-						if (last3infos[0].getMateScore() == last3infos[1].getMateScore() && last3infos[1].getMateScore() == last3infos[2].getMateScore()) {
-							//if (last3infos[0].getMateScore() > 0) {
-								if (last3infos[0].getDepth() != last3infos[1].getDepth() && last3infos[1].getDepth() != last3infos[2].getDepth()) {
-									getStopper().markStopped();
-									
-									if (!rootSearch.isStopped()) {
-										rootSearch.stopSearchAndWait();
-									}
-									
-									sender.sendBestMove();
+		
+		if (!stopper.isStopped()) {
+			
+			
+			last3infos[0] = last3infos[1]; 
+			last3infos[1] = last3infos[2];
+			last3infos[2] = lastinfo;
+			
+			
+			if (last3infos[0] != null && last3infos[1] != null && last3infos[2] != null) {
+				if (last3infos[0].isMateScore() && last3infos[1].isMateScore() && last3infos[2].isMateScore()) {
+					if (last3infos[0].getMateScore() == last3infos[1].getMateScore() && last3infos[1].getMateScore() == last3infos[2].getMateScore()) {
+						//if (last3infos[0].getMateScore() > 0) {
+							//if (last3infos[0].getDepth() != last3infos[1].getDepth() && last3infos[1].getDepth() != last3infos[2].getDepth()) {
+								getStopper().markStopped();
+								
+								if (!rootSearch.isStopped()) {
+									rootSearch.stopSearchAndWait();
 								}
+								
+								sender.sendBestMove();
 							//}
-						}
+						//}
 					}
 				}
 			}
