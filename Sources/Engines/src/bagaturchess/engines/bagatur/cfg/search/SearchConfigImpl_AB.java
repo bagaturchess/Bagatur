@@ -17,13 +17,13 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionCombo("Openning Mode",
 					"most played first",
-					"type combo default " + "most played first" + " var most played first var random"),
+					"type combo default " + "most played first" + " var most played first var random intermediate var random full"),
 	};
 	
 	
 	private static final int MAX_INDEX 				= 200;
 	
-	private boolean isOpenningModeRandom			= false;
+	private int openningBook_Mode					= ISearchConfig_AB.OPENNING_BOOK_MODE_POWER2;
 	
 	private IExtensionMode mode 					= IExtensionMode.DYNAMIC;
 	private int dynamicExt_UpdateInterval			= 1000;
@@ -424,8 +424,8 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	
 	
 	@Override
-	public boolean isOpenningModeRandom(){
-		return isOpenningModeRandom;
+	public int getOpenningBook_Mode(){
+		return openningBook_Mode;
 	}
 	
 	
@@ -436,7 +436,20 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 			//other_UseTPTScoresPV = (Boolean) option.getValue();
 			//return true;
 		} else if ("Openning Mode".equals(option.getName())) {
-			isOpenningModeRandom = ((String) option.getValue()).equals("random");
+			
+			if (((String) option.getValue()).equals("most played first")) {
+				openningBook_Mode = ISearchConfig_AB.OPENNING_BOOK_MODE_POWER2;
+				
+			} else if (((String) option.getValue()).equals("random intermediate")) {
+				openningBook_Mode = ISearchConfig_AB.OPENNING_BOOK_MODE_POWER1;
+				
+			} else if (((String) option.getValue()).equals("random full")) {
+				openningBook_Mode = ISearchConfig_AB.OPENNING_BOOK_MODE_POWER0;
+				
+			} else {
+				throw new IllegalStateException("Openning Mode set to illegal value = " + option.getValue());
+			}
+			
 			return true;
 		}
 		

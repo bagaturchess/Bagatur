@@ -165,7 +165,7 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 			boolean moveSent = false;
 			if (saver != null) {
 				currentMediator.dump("Using TimeSaver ...");
-				moveSent = saver.beforeMove(boardForSetup, sharedData.getSearchConfig().isOpenningModeRandom(), currentMediator, searchAdaptorCfg.isOwnBookEnabled());
+				moveSent = saver.beforeMove(boardForSetup, sharedData.getSearchConfig().getOpenningBook_Mode(), currentMediator, searchAdaptorCfg.isOwnBookEnabled());
 			}
 			
 			if (!moveSent) {

@@ -1,12 +1,9 @@
 
-
 package bagaturchess.engines.bagatur.v110;
 
 
 import bagaturchess.search.api.IExtensionMode;
-import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.ISearchConfig_MTD;
-import bagaturchess.search.impl.alg.impl1.ISearchConfig1_MTD;
 
 
 public class SearchConfigImpl implements ISearchConfig_MTD {
@@ -422,8 +419,8 @@ public class SearchConfigImpl implements ISearchConfig_MTD {
 	}
 
 	@Override
-	public boolean isOpenningModeRandom() {
+	public int getOpenningBook_Mode() {
 		// TODO Auto-generated method stub
-		return true;
+		return 0;
 	}
 }

@@ -27,9 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import bagaturchess.bitboard.impl.datastructs.HashMapLongObject;
 import bagaturchess.opening.api.OpeningBook;
@@ -55,7 +52,7 @@ public class OpeningBookImpl_FullEntries implements OpeningBook {
 		
 		Entry_BaseImpl moves = entries.get(hashkey);
 		if (moves != null) {
-			return moves.getRandomEntry();
+			return moves.getRandomEntry(0);
 		}
 		
 		return 0;

@@ -26,11 +26,9 @@ package bagaturchess.search.impl.alg.iter;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.opening.api.IOpeningEntry;
-import bagaturchess.opening.api.OpeningBook;
-import bagaturchess.opening.api.OpeningBookFactory;
+import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.history.HistoryTable;
 import bagaturchess.search.impl.utils.Sorting;
 
 
@@ -323,21 +321,19 @@ public class ListAll implements ISearchMoveList {
 		
 		if (env.getOpeningBook() != null) {
 			
-			boolean randomOpenning = env.getSearchConfig().isOpenningModeRandom();
-			
 			IOpeningEntry entry = env.getOpeningBook().getEntry(env.getBitboard().getHashKey(), env.getBitboard().getColourToMove());
-			if (entry != null && entry.getWeight() >= 7) {
+			if (entry != null && entry.getWeight() >= ISearchConfig_AB.OPENNING_BOOK_MIN_MOVES) {
 				
 				int[] ob_moves = entry.getMoves();
 				int[] ob_counts = entry.getCounts();
 				
 				for (int i=0; i<ob_moves.length; i++) {
-					if (randomOpenning) {
-						add(ob_moves[i]);
-					} else {
+					//if (env.getSearchConfig().getOpenningBook_Mode() != ISearchConfig_AB.OPENNING_BOOK_MODE_POWER2) {
+					//	add(ob_moves[i]);
+					//} else {
 						long move_ord = MoveInt.addOrderingValue(ob_moves[i], ob_counts == null ? 1 : ob_counts[i]);
 						add(move_ord);
-					}
+					//}
 				}
 				
 				

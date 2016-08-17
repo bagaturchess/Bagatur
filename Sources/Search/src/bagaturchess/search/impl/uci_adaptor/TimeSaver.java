@@ -8,6 +8,7 @@ import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.egtb.gaviota.GTBProbing;
 import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
+import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
@@ -30,17 +31,33 @@ public class TimeSaver {
 	}
 	
 	
-	public boolean beforeMove(IBitBoard bitboardForSetup, boolean isOpenningModeRandom, ISearchMediator mediator, boolean useOpening) {
+	public boolean beforeMove(IBitBoard bitboardForSetup, int openningBook_Mode, ISearchMediator mediator, boolean useOpening) {
 
 		
 		mediator.dump("TimeSaver: useOpening = " + useOpening + ", ob=" + ob);
 		//Search in the book
 		if (useOpening && ob != null) {
 			IOpeningEntry entry = ob.getEntry(bitboardForSetup.getHashKey(), bitboardForSetup.getColourToMove());
-			if (entry != null) {
+			if (entry != null && entry.getWeight() >= ISearchConfig_AB.OPENNING_BOOK_MIN_MOVES) {
 				
-				int move = isOpenningModeRandom ? entry.getRandomEntry() : entry.getMostPlayedEntry();
-				//int move = getOpeningMove_Evaluation(entry, sharedData, bitboardForSetup, mediator);
+				int move = 0;
+				switch (openningBook_Mode) {
+				
+					case ISearchConfig_AB.OPENNING_BOOK_MODE_POWER0:
+						move = entry.getRandomEntry(0);
+						break;
+						
+					case ISearchConfig_AB.OPENNING_BOOK_MODE_POWER1:
+						move = entry.getRandomEntry(1);
+						break;
+						
+					case ISearchConfig_AB.OPENNING_BOOK_MODE_POWER2:
+						move = entry.getRandomEntry(2);
+						break;
+						
+					default:
+						throw new IllegalStateException("openningBook_Mode=" + openningBook_Mode);
+				}
 				
 				mediator.dump("TimeSaver: Opening move " + MoveInt.moveToString(move));
 				ISearchInfo info = createInfo(move);

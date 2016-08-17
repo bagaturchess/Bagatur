@@ -1,10 +1,9 @@
 package bagaturchess.opening.api;
 
+
 public interface IOpeningEntry {
 	
-	public int getRandomEntry();
-	
-	public int getMostPlayedEntry();
+	public int getRandomEntry(int power);
 	
 	public long getHashkey();
 

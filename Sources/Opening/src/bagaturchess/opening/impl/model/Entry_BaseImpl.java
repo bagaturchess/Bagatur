@@ -166,34 +166,13 @@ public class Entry_BaseImpl implements IOpeningEntry, Serializable {
 		
 		return result;
 	}
-
-	public int getRandomEntry() {
-		
-		int all_probs = 0;
-		for (int i=0; i<counts.length; i++) {
-			all_probs += counts[i];
-		}
-		
-		int prob_index = (int) Math.round((all_probs - 1) * Math.random());
-		
-		int index = 0;
-		int cur_probs = 0;
-		for (int i=0; i<counts.length; i++) {
-			cur_probs += counts[i];
-			if (cur_probs > prob_index) {
-				index = i;
-				break;
-			}
-		}
-		
-		return moves[index];
-	}
 	
-	public int getMostPlayedEntry() {
+	
+	public int getRandomEntry(int power) {
 		
 		int all_probs = 0;
 		for (int i=0; i<counts.length; i++) {
-			all_probs += Math.pow(counts[i] , 3);
+			all_probs += Math.pow(counts[i] , power);
 		}
 		
 		int prob_index = (int) Math.round((all_probs - 1) * Math.random());
@@ -201,7 +180,7 @@ public class Entry_BaseImpl implements IOpeningEntry, Serializable {
 		int index = 0;
 		int cur_probs = 0;
 		for (int i=0; i<counts.length; i++) {
-			cur_probs += Math.pow(counts[i] , 3);
+			cur_probs += Math.pow(counts[i] , power);
 			if (cur_probs > prob_index) {
 				index = i;
 				break;
