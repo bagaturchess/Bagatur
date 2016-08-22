@@ -328,11 +328,15 @@ public class ListAll implements ISearchMoveList {
 				int[] ob_counts = entry.getCounts();
 				
 				for (int i=0; i<ob_moves.length; i++) {
-					//if (env.getSearchConfig().getOpenningBook_Mode() != ISearchConfig_AB.OPENNING_BOOK_MODE_POWER2) {
-					//	add(ob_moves[i]);
-					//} else {
+					
+					//if (env.getSearchConfig().getOpenningBook_Mode() == ISearchConfig_AB.OPENNING_BOOK_MODE_POWER2) {
+						//Most played first strategy - use ord val
 						long move_ord = MoveInt.addOrderingValue(ob_moves[i], ob_counts == null ? 1 : ob_counts[i]);
 						add(move_ord);
+						
+					//} else {
+					//	//Random move - in addition randomize naturally without using ordval scores
+					//	add(ob_moves[i]);
 					//}
 				}
 				
