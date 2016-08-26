@@ -29,7 +29,7 @@ import bagaturchess.uci.api.IChannel;
 public class MemoryConsumers {
 	
 	
-	private static int JVMDLL_MEMORY_CONSUMPTION 						= 27 * 1024 * 1024;
+	private static int JVMDLL_MEMORY_CONSUMPTION 						= 20 * 1024 * 1024;
 	private static int MIN_MEMORY_BUFFER;
 	private static double MEMORY_USAGE_PERCENT; 
 	
@@ -54,12 +54,24 @@ public class MemoryConsumers {
 	
 	
 	static {
+		
+		/**
+		 * The memory usage percent is very important because of 2 main reason:
+		 * 1. Java VM runs GC (Garbage Collector) for less or more time (including "Stop the world" GC)
+		 *   depending on the amount of used memory from the java process.
+		 * 2. ELO strength is affected from the size of TPT, because of the used search algorithm MTD(f),
+		 *    which visits same positions multiple times.
+		 * The general rule is: the size of TPT should be enough for the engine to think one whole move without being filled on 100%
+		 * In short time controls (fast games like 1/1) the size could be small and in long controls (long games 40/40) should be bigger.
+		 * The selection bellow is somewhere in the middle.
+		 */
+		
 		if (getJVMBitmode() == 64) {
 			MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT 	= 0.75;//0.23;
+			MEMORY_USAGE_PERCENT 	= 0.57;//Optimal somewhere between 0.37 and 0.57;
 		} else { //32
 			MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT 	=  0.75;//0.23;
+			MEMORY_USAGE_PERCENT 	= 0.57;//Optimal somewhere between 0.37 and 0.57;
 		}
 		
 		try {

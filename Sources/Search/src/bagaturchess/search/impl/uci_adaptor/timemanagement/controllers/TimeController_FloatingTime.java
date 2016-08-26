@@ -33,7 +33,7 @@ import bagaturchess.uci.impl.commands.Go;
 public abstract class TimeController_FloatingTime extends TimeController_ConsumedTimeVSRemainingTimeInAccount {
 	
 	
-	private static final long TOTAL_CLOCK_TIME_DEVIDE_FACTOR	= 35;
+	private static final long TOTAL_CLOCK_TIME_DEVIDE_FACTOR	= 35;//With 25 and 45 the engine is weaker.
 	
 	private static final double TIME_BUFFER_PERCENT 			= 0.10;
 	private static final double TIME_BUFFER_GAME_MS				= 5000;
