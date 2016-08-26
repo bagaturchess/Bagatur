@@ -145,7 +145,7 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 				startIteration, maxIterations, initialValue, searcher.getEnv().getPVs());
 		
 		//final ISearchStopper stopper = new MTDStopper(getBitboardForSetup().getColourToMove(), distribution);
-		mediator.setStopper(new CompositeStopper(new ISearchStopper[] {mediator.getStopper(), stopper} ));
+		mediator.setStopper(new CompositeStopper(new ISearchStopper[] {mediator.getStopper(), stopper}, true ));
 		
 		
 		final ISearchMediator final_mediator = mediator;

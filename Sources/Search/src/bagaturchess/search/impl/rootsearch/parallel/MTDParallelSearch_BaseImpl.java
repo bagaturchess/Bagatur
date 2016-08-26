@@ -151,7 +151,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("Parallel search started from depth " + startIteration + " to depth " + maxIterations);
 		
 		
-		root_mediator.setStopper(new CompositeStopper(new ISearchStopper[] {root_mediator.getStopper(), stopper}));
+		root_mediator.setStopper(new CompositeStopper(new ISearchStopper[] {root_mediator.getStopper(), stopper}, false));
 		
 		
 		final ISearchMediator final_mediator = root_mediator;
