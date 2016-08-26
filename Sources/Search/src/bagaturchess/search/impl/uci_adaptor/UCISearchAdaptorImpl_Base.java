@@ -71,11 +71,12 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		sharedData = new SharedData(rootSearchCfg, null);
 		
 		searcherNormal = createRootSearcher();
-		searcherNormalMultiPV = new MultiPVRootSearch(rootSearchCfg, searcherNormal);
 		searcherPonder = searcherNormal;//createRootSearcher();
+		searcherNormalMultiPV = new MultiPVRootSearch(rootSearchCfg, searcherNormal);
 		
 		//Should be created always in the beginning of the game because later the initial board position (fen) is not available.
 		searcherNormal.createBoard(boardForSetup);
+		searcherNormalMultiPV.createBoard(boardForSetup);
 		//Commented newGame calls below as they points to searcherNormal
 		//searcherNormalMultiPV.newGame(boardForSetup);
 		//searcherPonder.newGame(boardForSetup);
