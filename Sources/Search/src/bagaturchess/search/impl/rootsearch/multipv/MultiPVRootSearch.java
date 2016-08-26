@@ -69,19 +69,36 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 		//rootSearch.setupBoard(_bitboardForSetup);
 		
 		//adjust go: startIteration - 1, maxIterations - 1, //Should be -1, because it plays each move and than search with depth=maxIterations
+		int max_depth = Go.UNDEF_DEPTH;
 		if (go.getDepth() != Go.UNDEF_DEPTH) {
-			go.setDepth(go.getDepth() - 1);
+			max_depth = go.getDepth() - 1;
+			go.setDepth(max_depth);
 		}
 		if (go.getStartDepth() != Go.UNDEF_STARTDEPTH) {
 			go.setStartDepth(go.getStartDepth() - 1);
 		}
+				
 		current_mediator_multipv = new MultiPVMediator(getRootSearchConfig(), rootSearch,
 				getBitboardForSetup(), mediator,
-				finishCallback, go);
+				go);
 		
 		current_stopper = mediator.getStopper();
 		
 		current_mediator_multipv.ready();
+		
+		
+		while (!current_stopper.isStopped()
+				&& current_mediator_multipv.getCurrentDepth() <= max_depth
+				) {
+			
+			try {
+				Thread.sleep(15);
+			} catch (InterruptedException e) {}
+		}
+		
+		stopSearchAndWait();
+		
+		mediator.getBestMoveSender().sendBestMove();
 	}
 	
 	

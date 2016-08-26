@@ -34,7 +34,6 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	private IBitBoard bitboard;
 	private int startIteration;
 	private int maxIterations;
-	private IFinishCallback finishCallback;
 	private Go go;
 	
 	private List<MultiPVEntry> multiPVs_current;
@@ -51,8 +50,7 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	private ISearchStopper stopper;
 	
 	
-	public MultiPVMediator(IRootSearchConfig _engineConfiguration, IRootSearch _rootSearch, IBitBoard _bitboard, ISearchMediator _parentMediator,
-			IFinishCallback _finishCallback, Go _go) {
+	public MultiPVMediator(IRootSearchConfig _engineConfiguration, IRootSearch _rootSearch, IBitBoard _bitboard, ISearchMediator _parentMediator, Go _go) {
 		
 		super(_parentMediator);
 		
@@ -61,7 +59,6 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 		engineConfiguration = _engineConfiguration;
 		rootSearch = _rootSearch;
 		bitboard = _bitboard;
-		finishCallback = _finishCallback;
 		go = _go;
 
 		startIteration = go.getStartDepth();
@@ -74,6 +71,11 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 		cur_depth = startIteration;
 		
 		infos = new HashSet<ISearchInfo>();
+	}
+	
+	
+	int getCurrentDepth() {
+		return cur_depth;
 	}
 	
 	
@@ -100,18 +102,7 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	@Override
 	public synchronized void ready() {
 		
-		//throw new IllegalStateException("stopper.isStopped()=" + stopper.isStopped() + ", cur_depth=" + cur_depth + ", maxIterations=" + maxIterations);
-		
-		/*if (cur_depth == maxIterations) {
-			if (!stopper.isStopped()) {
-				stopper.markStopped();
-			}
-		}*/
-		
 		if (cur_depth > 1 && stopper.isStopped()) {
-			
-			getBestMoveSender().sendBestMove();
-			
 			return;
 		}
 		
@@ -146,7 +137,7 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 			}
 			
 			if (cur_depth == maxIterations) {
-				if (finishCallback != null) finishCallback.ready();
+				cur_depth++;//Increase it as the checks outside of this class could determine that the search has to stop if go command has max depth set
 				return;
 			} else if (cur_depth < maxIterations) {
 				cur_depth++;
