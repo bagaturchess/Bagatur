@@ -102,11 +102,11 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 	@Override
 	public synchronized void ready() {
 		
+		//ChannelManager.getChannel().dump("READY CALLED");
+		
 		if (cur_depth > 1 && stopper.isStopped()) {
 			return;
 		}
-		
-		//ChannelManager.getChannel().dump("READY CALLED");
 		
 		if (cur_PVNumber != -1) { //Not first move of first iteration
 			
