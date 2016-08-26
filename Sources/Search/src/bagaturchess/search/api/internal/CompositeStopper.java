@@ -5,19 +5,25 @@ public class CompositeStopper implements ISearchStopper {
 
 	
 	private ISearchStopper[] stoppers;
+	private boolean propagateStop;
 	
 	
-	public CompositeStopper(ISearchStopper[] _stoppers) {
+	public CompositeStopper(ISearchStopper[] _stoppers, boolean _propagateStop) {
 		stoppers = _stoppers;
+		propagateStop = _propagateStop;
 	}
 	
 	
 	@Override
 	public void markStopped() {
-		//Do Nothing
-		//for (int i = 0; i < stoppers.length; i++) {
-		//	stoppers[i].markStopped();
-		//}
+		
+		if (propagateStop) {
+			for (int i = 0; i < stoppers.length; i++) {
+				stoppers[i].markStopped();
+			}	
+		} else {
+			//Do Nothing
+		}
 	}
 	
 
