@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
-import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
