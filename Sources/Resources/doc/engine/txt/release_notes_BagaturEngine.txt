@@ -1,20 +1,21 @@
 
-Version 1.4d (27 August 2016)
+Version 1.4d (31 August 2016)
   * Memory optimizations: increased memory usage percent, hence more entries into the transposition table (now on 40/40 time controls search goes deeper)
   * Fix for endgames without pawns
   * Fix for mate distance prunning
+  * Updated readme files
   
 Version 1.4c (15 June 2016)
   * 25+ ELO stronger (measured versus 1.4b with 150+ games - 1m+1s and 5m+5s time controls)
   * Memory optimizations: no java objects creation during search, hence less java garbage collection and more engine performance
   * Renamed *.exe files
-
+  
 Version 1.4b (31 May 2016)
   * 28+ ELO stronger (measured versus 1.4a)
   * Search optimizations: adjustments of the depth reduction amount used in late move reduction and null move reduction
   * Default memory increased from 256MB to 1024MB. Could be set in the corresponding *.ini files to *exe files (or bat files if you don't use *.exe starters)
   * Fixes in UCI communication with Arena UI (e.g. start-stop issues, MultiPV under Pondering issues)
-
+  
 Version 1.4a (24 May 2016)
   * Bugfix: removed bug when in some endgames engine just stop thinking
   * New UCI option Openning Mode - 'random' and 'most played first'
@@ -36,11 +37,11 @@ Version 1.3a (07 December 2012)
   * Endgame Tablebases support - Gaviota EGTB (currently, for win 32 only). Find more details in readme.txt.
   * New UCI option 'Logging Policy' is introduced - 'single file', 'multiple files' and 'none'
   * SMP version: fixed Operation System dependent issue, which causes the engine to use only one thread in some conditions
-	
+  
 Version 1.3 (05 July 2012)
   * SMP version is finally enabled and now works as expected. Your feedback is welcome, especially if you run it on more than 2 physical CPUs.
   * Fixed new bug which appears in rare cases and cause the engine to exit with error
-	
+  
 Version 1.2g (5 June 2012)
   * 50 ELO stronger! Improved search algorithm (e.g. better tuned null move pruning)
   * Improved SMP version although there is still room for improvement
@@ -51,23 +52,23 @@ Version 1.2f (26 May 2012)
   
 Version 1.2e (12 May 2012)
   * 40 ELO stronger: optimized search - improved move ordering and search parameters
-
+  
 Version 1.2d (9 December 2011)
   * 30 ELO stronger: optimized search - use the data from unsuccessful null move search in order not to reduce the strongest move of opponent
   * bugfix: "loss on time" introduced by version 1.2c
-
+  
 Version 1.2c (4 December 2011)
   * 30 ELO stronger: optimized search by making null move heuristic a bit more aggressive
-
+  
 Version 1.2b (3 November 2011)
   * bugfix: read and use the option set for threads count of SMP version
-
+  
 Version 1.2a (30 October 2011)
   * 50 ELO stronger than version 1.2. Achieved by tuning of search algorithm.
   * Min threads count of SMP version are set to 2. Reported by Olivier Deville during OpenWar 9th Edition test games
   * Default process priority is set to 'normal'
   * Technical: Refactoring of configuration API & Impl code
-
+  
 Version 1.2 (10 September 2011)
   * MultiPV search mode implemented! (a.k.a K-Best Moves search)
   * Improved time-control of 'sudden death' playing mode (reported by Lars Hallerstrom during ChessWar XVII)
@@ -83,7 +84,7 @@ Version 1.1.3 (27 August 2011)
   * Technical: Trust window of MTD search is now adaptive and vary between 0 and 32 centipawn depending on the stability of the best move (bigger stability when one and the same best move appears in more search iterations)
   * Technical: Transposition table's entries (their scores) in PV nodes are used only if the length of the best line is enough (with the expected depth)
   * Technical: Big source code refactoring in regards to the changes of the configuration concept
-
+  
 Version 1.1.2 (23 August 2011)
   * Hot-fix of memory issue. Engine hangs and throws OutOfMemory error after last memory tunings in version 1.1.1. Now it should work fine.
   * Decreased trust window of MTD Search from 8 to 0. Now each iteration needs a bit more researches but on the other hand more transposition table's entries has 'exact' type. 
@@ -101,7 +102,7 @@ Version 1.1.1 (17 August 2011)
   * UCI: Send search information more often to UCI GUI (not only with the best line / principal variation)
   * UCI: Go search with count of 'nodes' implemented
   * UCI: Move immediately if mate is found in 3 sequential search depths
-
+  
 Version 1.1.0 (2 August 2011)
   * Pondering mode implemented! Mate distance pruning disabled during Pondering.
   * Added to-do list in the distribution. Feel free to contribute. :-)
@@ -119,4 +120,4 @@ Version 1.0.1 (22 July 2011)
   
 Version 1.0.0 (27 Feb 2011)
   * Initial code base
- 
+  

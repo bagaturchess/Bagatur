@@ -10,9 +10,9 @@ This distribution is exactly what you want.
 
 Here are the steps necessary to run the engine:
 1. Download an arbitrary UCI user interface. For example the most popular one is Arena - http://www.playwitharena.com/
-2. Install the UCI user interface on your computer
-3. Install Java platform (JDK or JRE) 1.6 or later on your computer
-4. Unpack this distribution somewhere (Arena has a sub-folder called 'engines', you can extract it there)
+2. Install the UCI user interface on your computer.
+3. Ensure that the Java platform (JDK or JRE) 1.6 or later is installed on your computer (it should be the case nowadays).
+4. Unpack this distribution somewhere (Arena has a sub-folder called 'engines', you can extract it there).
 6. Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway). You may use win32 or win64 version depending on your choice.
 7. E2-E4 and enjoy :-)
 
@@ -22,8 +22,8 @@ Have a nice usage ... and feel free to contribute http://sourceforge.net/project
 
 Hints:
   1. Bagatur needs at least 64M of memory to run.
-     By default it runs with 1024M of memory, but uses only 23% of it (10% are for transposition table and the rest of 13% is used for other caches).
-     Because of java specifics, changes in memory could lead to bad performance, anyway if necessary it could be changed by editing the corresponding *.ini or *.bat file.
+     By default it runs with 1024M of memory, but uses only 70% of it (30% are for transposition table and the rest of 40% is used for other caches).
+     Because of java programming language specifics, changes in memory could lead to bad performance, anyway if necessary it could be changed by editing the corresponding *.ini or *.bat file.
      
   2. Endgame Tablebases support is based on Gaviota EGTB (Syzygy and Nalimov are not supported) and currently works on win 32 and win 64.
      In order to make it working:
