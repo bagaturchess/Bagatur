@@ -8,7 +8,6 @@ import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.egtb.gaviota.GTBProbing;
 import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
-import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
