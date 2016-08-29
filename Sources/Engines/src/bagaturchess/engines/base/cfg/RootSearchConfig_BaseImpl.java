@@ -44,8 +44,8 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private String DEFAULT_gaviotaTbPath = (new File(".")).getAbsolutePath() + File.separatorChar + "data" + File.separatorChar + "egtb";
 	private Double DEFAULT_gaviotaTbCache = new Double(8);
 	
-	private String DEFAULT_timeControlOptimization 	= "for long control (e.g. 40/40)";
-	private String timeControlOptimization_1 		= "for short control (e.g. 1/1)";
+	private String DEFAULT_timeControlOptimization 	= "for 40/40";
+	private String timeControlOptimization_1 		= "for 1/1";
 	
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionSpin("MultiPV", 1.0, "type spin default 1 min 1 max 100", 1),
