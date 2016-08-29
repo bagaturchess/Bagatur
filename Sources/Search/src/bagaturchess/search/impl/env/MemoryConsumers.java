@@ -63,15 +63,16 @@ public class MemoryConsumers {
 		 *    which visits same positions multiple times.
 		 * The general rule is: the size of TPT should be enough for the engine to think one whole move without being filled on 100%
 		 * In short time controls (fast games like 1/1) the size could be small and in long controls (long games 40/40) should be bigger.
-		 * The selection bellow is somewhere in the middle.
+		 * The selection bellow is optimized for long games.
 		 */
 		
+		//0.29 for short games (e.g. 1/1), 0.77 for long games (e.g. 40/40)
 		if (getJVMBitmode() == 64) {
 			MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT 	= 0.57;//Optimal somewhere between 0.37 and 0.57;
+			MEMORY_USAGE_PERCENT 	= 0.77;//29
 		} else { //32
 			MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT 	= 0.57;//Optimal somewhere between 0.37 and 0.57;
+			MEMORY_USAGE_PERCENT 	= 0.77;//29
 		}
 		
 		try {
