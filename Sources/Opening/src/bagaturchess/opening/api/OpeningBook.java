@@ -28,6 +28,14 @@ import java.io.Serializable;
 
 public interface OpeningBook extends Serializable {
 	
+	
+	public static final int OPENNING_BOOK_MODE_POWER0 = 1;
+	public static final int OPENNING_BOOK_MODE_POWER1 = 2;
+	public static final int OPENNING_BOOK_MODE_POWER2 = 3;
+	
+	public static final int OPENNING_BOOK_MIN_MOVES	  = 7;
+	
+	
 	public IOpeningEntry getEntry(long hashkey, int colour);
 	public int[][] getAllMovesAndCounts(long hashkey, int colour);
 	public int get(long hashkey, int colour);

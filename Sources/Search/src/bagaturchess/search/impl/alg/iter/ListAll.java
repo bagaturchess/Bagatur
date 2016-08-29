@@ -26,7 +26,7 @@ package bagaturchess.search.impl.alg.iter;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.opening.api.IOpeningEntry;
-import bagaturchess.search.api.ISearchConfig_AB;
+import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.utils.Sorting;
@@ -322,7 +322,7 @@ public class ListAll implements ISearchMoveList {
 		if (env.getOpeningBook() != null) {
 			
 			IOpeningEntry entry = env.getOpeningBook().getEntry(env.getBitboard().getHashKey(), env.getBitboard().getColourToMove());
-			if (entry != null && entry.getWeight() >= ISearchConfig_AB.OPENNING_BOOK_MIN_MOVES) {
+			if (entry != null && entry.getWeight() >= OpeningBook.OPENNING_BOOK_MIN_MOVES) {
 				
 				int[] ob_moves = entry.getMoves();
 				int[] ob_counts = entry.getCounts();

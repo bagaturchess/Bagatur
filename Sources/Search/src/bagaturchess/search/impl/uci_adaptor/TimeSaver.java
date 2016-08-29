@@ -38,20 +38,20 @@ public class TimeSaver {
 		//Search in the book
 		if (useOpening && ob != null) {
 			IOpeningEntry entry = ob.getEntry(bitboardForSetup.getHashKey(), bitboardForSetup.getColourToMove());
-			if (entry != null && entry.getWeight() >= ISearchConfig_AB.OPENNING_BOOK_MIN_MOVES) {
+			if (entry != null && entry.getWeight() >= OpeningBook.OPENNING_BOOK_MIN_MOVES) {
 				
 				int move = 0;
 				switch (openningBook_Mode) {
 				
-					case ISearchConfig_AB.OPENNING_BOOK_MODE_POWER0:
+					case OpeningBook.OPENNING_BOOK_MODE_POWER0:
 						move = entry.getRandomEntry(0);
 						break;
 						
-					case ISearchConfig_AB.OPENNING_BOOK_MODE_POWER1:
+					case OpeningBook.OPENNING_BOOK_MODE_POWER1:
 						move = entry.getRandomEntry(1);
 						break;
 						
-					case ISearchConfig_AB.OPENNING_BOOK_MODE_POWER2:
+					case OpeningBook.OPENNING_BOOK_MODE_POWER2:
 						move = entry.getRandomEntry(2);
 						break;
 						

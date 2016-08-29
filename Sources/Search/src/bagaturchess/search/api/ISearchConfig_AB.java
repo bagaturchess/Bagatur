@@ -47,12 +47,6 @@ public interface ISearchConfig_AB {
 	public static final int PLY_15_16 = 15;
 	
 	
-	public static final int OPENNING_BOOK_MODE_POWER0 = 1;
-	public static final int OPENNING_BOOK_MODE_POWER1 = 2;
-	public static final int OPENNING_BOOK_MODE_POWER2 = 3;
-	
-	public static final int OPENNING_BOOK_MIN_MOVES	  = 7;
-	
 	public int getOpenningBook_Mode();
 	
 	

@@ -3,6 +3,7 @@
 package bagaturchess.engines.bagatur.cfg.search;
 
 
+import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IExtensionMode;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.uci.api.IUCIOptionsProvider;
@@ -23,7 +24,7 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	
 	private static final int MAX_INDEX 				= 200;
 	
-	private int openningBook_Mode					= ISearchConfig_AB.OPENNING_BOOK_MODE_POWER2;
+	private int openningBook_Mode					= OpeningBook.OPENNING_BOOK_MODE_POWER2;
 	
 	private IExtensionMode mode 					= IExtensionMode.DYNAMIC;
 	private int dynamicExt_UpdateInterval			= 1000;
@@ -438,13 +439,13 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 		} else if ("Openning Mode".equals(option.getName())) {
 			
 			if (((String) option.getValue()).equals("most played first")) {
-				openningBook_Mode = ISearchConfig_AB.OPENNING_BOOK_MODE_POWER2;
+				openningBook_Mode = OpeningBook.OPENNING_BOOK_MODE_POWER2;
 				
 			} else if (((String) option.getValue()).equals("random intermediate")) {
-				openningBook_Mode = ISearchConfig_AB.OPENNING_BOOK_MODE_POWER1;
+				openningBook_Mode = OpeningBook.OPENNING_BOOK_MODE_POWER1;
 				
 			} else if (((String) option.getValue()).equals("random full")) {
-				openningBook_Mode = ISearchConfig_AB.OPENNING_BOOK_MODE_POWER0;
+				openningBook_Mode = OpeningBook.OPENNING_BOOK_MODE_POWER0;
 				
 			} else {
 				throw new IllegalStateException("Openning Mode set to illegal value = " + option.getValue());
