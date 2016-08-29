@@ -6,12 +6,14 @@ import java.util.Arrays;
 
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
+import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.api.IUCIOptionsRegistry;
 import bagaturchess.uci.impl.commands.options.UCIOption;
+import bagaturchess.uci.impl.commands.options.UCIOptionCombo;
 import bagaturchess.uci.impl.commands.options.UCIOptionSpin;
 import bagaturchess.uci.impl.commands.options.UCIOptionString;
 
@@ -42,10 +44,16 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private String DEFAULT_gaviotaTbPath = (new File(".")).getAbsolutePath() + File.separatorChar + "data" + File.separatorChar + "egtb";
 	private Double DEFAULT_gaviotaTbCache = new Double(8);
 	
+	private String DEFAULT_timeControlOptimization 	= "for long control (e.g. 40/40)";
+	private String timeControlOptimization_1 		= "for short control (e.g. 1/1)";
+	
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionSpin("MultiPV", 1.0, "type spin default 1 min 1 max 100", 1),
 			new UCIOptionString("GaviotaTbPath", DEFAULT_gaviotaTbPath, "type string default " + DEFAULT_gaviotaTbPath),
 			new UCIOptionSpin("GaviotaTbCache", DEFAULT_gaviotaTbCache, "type spin default " + DEFAULT_gaviotaTbCache + " min 4 max 512", 1),
+			new UCIOptionCombo("Time Control Optimizations",
+					DEFAULT_timeControlOptimization,
+					"type combo default " + DEFAULT_timeControlOptimization + " var " + DEFAULT_timeControlOptimization + " var " + timeControlOptimization_1),
 			new UCIOptionSpin("Hidden Depth", 0d, "type spin default 0 min 0 max 10", 1),
 	};
 	
@@ -61,6 +69,8 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private int gaviotaTbCache = DEFAULT_gaviotaTbCache.intValue();
 	
 	private int hiddenDepth = 0;
+	
+	private int timeControlOptimizationType = TIME_CONTROL_OPTIMIZATION_TYPE_40_40;
 	
 	
 	public RootSearchConfig_BaseImpl(String[] args) {
@@ -239,12 +249,29 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 		if ("MultiPV".equals(option.getName())) {
 			multiPVsCount = (int) ((Double) option.getValue()).doubleValue();
 			return true;
+			
 		} else if ("GaviotaTbPath".equals(option.getName())) {
 			gaviotaTbPath = (String) option.getValue();
 			return true;
+			
 		} else if ("GaviotaTbCache".equals(option.getName())) {
 			gaviotaTbCache = (int) ((Double) option.getValue()).doubleValue();
 			return true;
+			
+		} else if ("Time Control Optimizations".equals(option.getName())) {
+				
+				if (((String) option.getValue()).equals(timeControlOptimization_1)) {
+					timeControlOptimizationType = TIME_CONTROL_OPTIMIZATION_TYPE_1_1;
+					
+				} else if (((String) option.getValue()).equals(DEFAULT_timeControlOptimization)) {
+					timeControlOptimizationType = TIME_CONTROL_OPTIMIZATION_TYPE_40_40;
+					
+				} else {
+					throw new IllegalStateException("Openning Mode set to illegal value = " + option.getValue());
+				}
+				
+				return true;
+				
 		} else if ("Hidden Depth".equals(option.getName())) {
 			hiddenDepth = (int) ((Double) option.getValue()).doubleValue();
 			return true;
@@ -307,5 +334,11 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	@Override
 	public boolean initCaches() {
 		return true;
+	}
+	
+	
+	@Override
+	public int getTimeControlOptimizationType() {
+		return timeControlOptimizationType;
 	}
 }

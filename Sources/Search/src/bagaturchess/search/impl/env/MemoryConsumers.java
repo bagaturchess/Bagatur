@@ -30,8 +30,8 @@ public class MemoryConsumers {
 	
 	
 	private static int JVMDLL_MEMORY_CONSUMPTION 						= 20 * 1024 * 1024;
-	private static int MIN_MEMORY_BUFFER;
-	private static double MEMORY_USAGE_PERCENT; 
+	private static int MIN_MEMORY_BUFFER 								= 0;
+	private static double MEMORY_USAGE_PERCENT 							= 0; 
 	
 	private static final int SIZE_MIN_ENTRIES_MULTIPLIER				= 111;
 	private static final int SIZE_MIN_ENTRIES_TPT						= (int) (25.38 * SIZE_MIN_ENTRIES_MULTIPLIER);
@@ -54,27 +54,6 @@ public class MemoryConsumers {
 	
 	
 	static {
-		
-		/**
-		 * The memory usage percent is very important because of 2 main reason:
-		 * 1. Java VM runs GC (Garbage Collector) for less or more time (including "Stop the world" GC)
-		 *   depending on the amount of used memory from the java process.
-		 * 2. ELO strength is affected from the size of TPT, because of the used search algorithm MTD(f),
-		 *    which visits same positions multiple times.
-		 * The general rule is: the size of TPT should be enough for the engine to think one whole move without being filled on 100%
-		 * In short time controls (fast games like 1/1) the size could be small and in long controls (long games 40/40) should be bigger.
-		 * The selection bellow is optimized for long games.
-		 */
-		
-		//0.29 for short games (e.g. 1/1), 0.77 for long games (e.g. 40/40)
-		if (getJVMBitmode() == 64) {
-			MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT 	= 0.77;//29
-		} else { //32
-			MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;
-			MEMORY_USAGE_PERCENT 	= 0.77;//29
-		}
-		
 		try {
 			if (OpeningBookFactory.getBook() == null) {
 				InputStream is_w_openning_book = new FileInputStream("./data/w.ob");
@@ -110,6 +89,24 @@ public class MemoryConsumers {
 		engineConfiguration = _engineConfiguration;
 		
 		ChannelManager.getChannel().dump("OS arch: " + getJVMBitmode() + " bits");
+		
+		/**
+		 * The memory usage percent is very important because of 2 main reason:
+		 * 1. Java VM runs GC (Garbage Collector) for less or more time (including "Stop the world" GC)
+		 *   depending on the amount of used memory from the java process.
+		 * 2. ELO strength is affected from the size of TPT, because of the used search algorithm MTD(f),
+		 *    which visits same positions multiple times.
+		 * The general rule is: the size of TPT should be enough for the engine to think one whole move without being filled on 100%
+		 * In short time controls (fast games like 1/1) the size could be small and in long controls (long games 40/40) should be bigger.
+		 * The selection bellow is optimized for long games.
+		 */
+		
+		//0.29 for short games (e.g. 1/1), 0.77 for long games (e.g. 40/40)
+		double memoryUsagePercent = (engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.77 : 0.29;
+		
+		if (MIN_MEMORY_BUFFER == 0) MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;//Set only if not set statically
+		if (MEMORY_USAGE_PERCENT == 0) MEMORY_USAGE_PERCENT = memoryUsagePercent;//Set only if not set statically
+		
 		
 		//ChannelManager.getChannel().dump(new Exception());
 		

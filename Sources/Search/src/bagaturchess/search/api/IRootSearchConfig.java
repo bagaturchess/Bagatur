@@ -28,17 +28,13 @@ import bagaturchess.bitboard.api.IBoardConfig;
 
 public interface IRootSearchConfig {
 	
+	
+	public static final int TIME_CONTROL_OPTIMIZATION_TYPE_1_1		= 10;
+	public static final int TIME_CONTROL_OPTIMIZATION_TYPE_40_40 	= 20;
+	
+	
 	public IBoardConfig getBoardConfig();
 	public IEvalConfig getEvalConfig();
-	
-	public boolean initCaches();
-	public double getTPTUsagePercent();
-	public double getGTBUsagePercent();
-	public double getEvalCacheUsagePercent();
-	public double getPawnsCacheUsagePercent();
-	
-	public String getGaviotaTbPath();
-	public int getGaviotaTbCache();//In megabytes
 	
 	public String getSearchClassName();
 	public int getMultiPVsCount();
@@ -49,4 +45,20 @@ public interface IRootSearchConfig {
 	
 	public int getThreadsCount();
 	public int getHiddenDepth();
+	
+	/**
+	 * EGTB Settings
+	 */
+	public String getGaviotaTbPath();
+	public int getGaviotaTbCache();//In megabytes
+	
+	/**
+	 * Memory Settings
+	 */
+	public int getTimeControlOptimizationType();
+	public boolean initCaches();
+	public double getTPTUsagePercent();
+	public double getGTBUsagePercent();
+	public double getEvalCacheUsagePercent();
+	public double getPawnsCacheUsagePercent();
 }
