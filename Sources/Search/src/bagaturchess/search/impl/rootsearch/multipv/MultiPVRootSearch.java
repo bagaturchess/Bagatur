@@ -23,6 +23,9 @@
 package bagaturchess.search.impl.rootsearch.multipv;
 
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
@@ -37,6 +40,7 @@ import bagaturchess.uci.impl.commands.Go;
 public class MultiPVRootSearch extends RootSearch_BaseImpl {
 	
 	
+	private ExecutorService executor;
 	private IRootSearch rootSearch;
 	private MultiPVMediator current_mediator_multipv;
 	private ISearchStopper current_stopper;
@@ -45,6 +49,7 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 	public MultiPVRootSearch(IRootSearchConfig _engineConfiguration, IRootSearch _rootSearch) {
 		super(new Object[] {_engineConfiguration, _rootSearch.getSharedData()});
 		rootSearch = _rootSearch;
+		executor = Executors.newFixedThreadPool(1);
 	}
 	
 	
@@ -57,7 +62,7 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 
 
 	@Override
-	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, ITimeController timeController, IFinishCallback finishCallback, Go go) {
+	public void negamax(IBitBoard _bitboardForSetup, final ISearchMediator mediator, ITimeController timeController, IFinishCallback finishCallback, Go go) {
 		
 		if (current_mediator_multipv != null) {
 			throw new IllegalStateException("MultiPV search started without beeing stopped.");
@@ -72,12 +77,19 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 		int max_depth = Go.UNDEF_DEPTH;
 		if (go.getDepth() != Go.UNDEF_DEPTH) {
 			max_depth = go.getDepth() - 1;
+			if (max_depth <= 0) {//Doesnt'work with 0, because getMateScores(0) throws exception
+				max_depth = 1;
+			}
 			go.setDepth(max_depth);
 		}
 		if (go.getStartDepth() != Go.UNDEF_STARTDEPTH) {
-			go.setStartDepth(go.getStartDepth() - 1);
+			if (go.getStartDepth() <= 0) {//Doesnt'work with 0, because getMateScores(0) throws exception
+				go.setStartDepth(1);
+			} else {
+				go.setStartDepth(go.getStartDepth() - 1);
+			}
 		}
-				
+		
 		current_mediator_multipv = new MultiPVMediator(getRootSearchConfig(), rootSearch,
 				getBitboardForSetup(), mediator,
 				go);
@@ -87,18 +99,26 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 		current_mediator_multipv.ready();
 		
 		
-		while (!current_stopper.isStopped()
-				&& current_mediator_multipv.getCurrentDepth() <= max_depth
-				) {
+		final int final_max_depth = max_depth;
+		
+		executor.execute(new Runnable() {
 			
-			try {
-				Thread.sleep(15);
-			} catch (InterruptedException e) {}
-		}
-		
-		stopSearchAndWait();
-		
-		mediator.getBestMoveSender().sendBestMove();
+			@Override
+			public void run() {
+				while (!current_stopper.isStopped()
+						&& current_mediator_multipv.getCurrentDepth() <= final_max_depth
+						) {
+					
+					try {
+						Thread.sleep(15);
+					} catch (InterruptedException e) {}
+				}
+				
+				stopSearchAndWait();
+				
+				mediator.getBestMoveSender().sendBestMove();
+			}
+		});
 	}
 	
 	
