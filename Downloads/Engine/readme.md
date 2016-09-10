@@ -1,4 +1,9 @@
 
+The program runs under all Operating Systems, which support Java platform:
+- Windows, there are *.exe files for direct run
+- Linux, there are *.bat files for giving idea how to write bash scrip for running
+- Andorid, there is a program called <a href="https://play.google.com/store/apps/details?id=com.chessartforkids&hl=en">Chess Art For Kids</a> with own user interface (GUI) and using Bagatur internally as a chess engine
+
 Version 1.4d (31 August 2016)
   * Memory optimizations: increased memory usage percent, hence more entries into the transposition table (now on 40/40 time controls search goes deeper)
   * Fix for endgames without pawns
