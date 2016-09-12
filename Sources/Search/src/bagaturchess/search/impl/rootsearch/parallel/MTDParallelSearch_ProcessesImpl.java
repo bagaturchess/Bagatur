@@ -62,7 +62,7 @@ public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl 
 			
 			try {
 				if (i < count_started_sequentially) {//Start first searcher sequentially
-
+					
 					SequentialSearch_SeparateProcess searcher = (SequentialSearch_SeparateProcess)
 							ReflectionUtils.createObjectByClassName_ObjectsConstructor(SequentialSearch_SeparateProcess.class.getName(), new Object[] {getRootSearchConfig(), getSharedData()});
 					

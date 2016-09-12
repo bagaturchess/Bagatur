@@ -157,7 +157,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		final ISearchMediator final_mediator = root_mediator;
 		
 		
-		//Searchers balancer - achieves specified CPUs load of the system by starting and stopping searchers
+		//TODO: Searchers balancer - achieves specified CPUs load of the system by starting and stopping searchers
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -226,6 +226,11 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 						synchronized(synch_Board) {							
 							Go cur_go = initialgo;
 							ITimeController cur_timecontroller = timeController;
+							
+							if (!searchers_ready.get(i).isStopped()){
+								throw new IllegalStateException("MTDParallelSearch: attempt to start sequential search, but it is already started");
+							}
+							
 							sequentialSearchers_Negamax(searchers_ready.get(i), getBitboardForSetup(), mediators.get(i), cur_timecontroller, multiPVCallback, cur_go, true);
 						}
 					}
@@ -241,11 +246,11 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.377d);
 					
 					
-					boolean allSearchersReady = false;
+					boolean allSearchersFinished = false;
 					//boolean hasSendAtLest1Info = false;
 					while (
 							(!final_mediator.getStopper().isStopped() //Stopped
-									&& !allSearchersReady //Search is done
+									&& !allSearchersFinished //Search is done
 								)// || !hasSendAtLest1Info
 							) {
 						
@@ -339,7 +344,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 									break;
 								}
 							}
-							allSearchersReady = !hasRunningSearcher;
+							allSearchersFinished = !hasRunningSearcher;
 					}
 					
 					

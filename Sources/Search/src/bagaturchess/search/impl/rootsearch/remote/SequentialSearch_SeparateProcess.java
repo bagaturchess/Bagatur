@@ -74,18 +74,18 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		runner = new UCIEnginesManager();
 		
 		
-		String workdir = new File(".").getAbsolutePath();//"C:/DATA/OWN/chess/software/ARENA/arena_3.5.1/Engines/BagaturEngine_DEV/",
+		String workdir = new File(".").getAbsolutePath();
 		ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: Starting Java process of engine in workdir '" + workdir + "'");
 		
-		/*EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient",
+		/*EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngine_WorkerNode",
 				"C:/DATA/OWN/chess/GIT_REPO/Bagatur-Chess-Engine-And-Tools/Sources/",
 				"",
-				333);*/
+				1024);*/
 		
-		EngineProcess engine = new EngineProcess_BagaturImpl_DistributionImpl("BagaturEngineClient",
+		EngineProcess engine = new EngineProcess_BagaturImpl_DistributionImpl("BagaturEngine_WorkerNode",
 				workdir + File.separatorChar,
 				"",
-				333);
+				1024);
 		
 		
 		runner.addEngine(engine);
@@ -173,11 +173,12 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 	
 	
 	@Override
-	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, ITimeController timeController, final IFinishCallback multiPVCallback, Go go) {
-			
+	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, ITimeController timeController, final IFinishCallback multiPVCallback, Go go) {		
+		
+		//ChannelManager.getChannel().dump(new Exception("JUST STACK"));
 		
 		if (stopper != null) {
-			throw new IllegalStateException("MTDSequentialSearch started whithout beeing stopped");
+			throw new IllegalStateException(Thread.currentThread().getName() + " " + "SequentialSearch_SeparateProcess: started whithout beeing stopped");
 		}
 		stopper = new Stopper();
 		
@@ -188,7 +189,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		try {
 			
 			String allMovesStr = MoveInt.getMovesUCI(getBitboardForSetup());
-			if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: allMovesStr=" + allMovesStr);
+			if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(Thread.currentThread().getName() + " " + "SequentialSearch_SeparateProcess: allMovesStr=" + allMovesStr);
 			
 			//runner.setupPosition("startpos moves " + allMovesStr);
 			runner.setupPosition("moves " + allMovesStr);
@@ -206,7 +207,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 				public void run() {
 					try {
 						
-						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: OutboundQueueProcessor before loop");
+						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(Thread.currentThread().getName() + " " + "SequentialSearch_SeparateProcess: OutboundQueueProcessor before loop");
 						
 						while (!final_mediator.getStopper().isStopped() //If the time is over, than exit from loop and stop engine
 								&& stopper != null && !stopper.isStopped()) {
@@ -215,7 +216,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 							
 						}
 						
-						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: OutboundQueueProcessor after loop stopped="
+						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(Thread.currentThread().getName() + " " + "SequentialSearch_SeparateProcess: OutboundQueueProcessor after loop stopped="
 								+ final_mediator.getStopper().isStopped());
 						
 						
@@ -223,7 +224,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 							
 							if (!isStopped()) {// If the exit already happened in the InboundQueueProcessor below than the engine should not be stopped again
 								
-								ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: OutboundQueueProcessor - stopping engine and exit the queue");
+								ChannelManager.getChannel().dump(Thread.currentThread().getName() + " " + "SequentialSearch_SeparateProcess: OutboundQueueProcessor - stopping engine and exit the queue");
 								
 								runner.stopEngines();
 								//runner.enable();	
@@ -245,7 +246,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 				public void run() {
 					try {
 						
-						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: InboundQueueProcessor: before getInfoLines");
+						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(Thread.currentThread().getName() + " " + "SequentialSearch_SeparateProcess: InboundQueueProcessor: before getInfoLines");
 						
 						LineCallBack callback = new LineCallBack() {
 							
@@ -257,10 +258,10 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 							@Override
 							public void newLine(String line) {
 								
-								if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: getInfoLine '" + line + "'");
+								if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(Thread.currentThread().getName() + " " + "SequentialSearch_SeparateProcess: getInfoLine '" + line + "'");
 								
 								if (line.contains("LOG")) {
-									if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: getInfoLine SKIPED, contains LOG");
+									if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(Thread.currentThread().getName() + " " + "SequentialSearch_SeparateProcess: getInfoLine SKIPED, contains LOG");
 									return;
 								}
 								
@@ -293,7 +294,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 										}
 									} else if (!line.contains(" upperbound ")) {//Not major line
 										//System.out.println("MINOR: " + line);
-										if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: getInfoLine minor line");
+										if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(Thread.currentThread().getName() + " " + "SequentialSearch_SeparateProcess: getInfoLine minor line");
 										
 										Info info = new Info(line);
 										//System.out.println("MAJOR: " + info);
@@ -326,7 +327,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 							throw new IllegalStateException("infos.size() == 0 || infos.get(0) == null");
 						}
 
-						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: InboundQueueProcessor after loop stopped="
+						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(Thread.currentThread().getName() + " " + "SequentialSearch_SeparateProcess: InboundQueueProcessor after loop stopped="
 								+ final_mediator.getStopper().isStopped());
 						
 						
@@ -343,7 +344,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 								stopper = null;
 								
 								if (multiPVCallback == null) {//Non multiPV search
-									ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: InboundQueueProcessor - call final_mediator.getBestMoveSender().sendBestMove()");
+									ChannelManager.getChannel().dump(Thread.currentThread().getName() + " " + "SequentialSearch_SeparateProcess: InboundQueueProcessor - call final_mediator.getBestMoveSender().sendBestMove()");
 									final_mediator.getBestMoveSender().sendBestMove();
 								} else {
 									//MultiPV search
@@ -363,14 +364,14 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			ChannelManager.getChannel().dump(t);
 		}
 	}
-
-
+	
+	
 	@Override
 	public int getTPTUsagePercent() {
 		return hashfull;
 	}
-
-
+	
+	
 	@Override
 	public void decreaseTPTDepths(int reduction) {
 		//Do nothing
