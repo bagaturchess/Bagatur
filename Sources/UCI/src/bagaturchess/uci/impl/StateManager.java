@@ -117,10 +117,21 @@ public class StateManager extends Protocol implements BestMoveSender {
 		sendHello();
 			
 		while (true) {
+			
 			try {
+				
+				//fromGUILine is null if end of the stream is reached
 				String fromGUILine = channel.receiveCommandFromGUI();
+				if (fromGUILine == null) {
+					channel.sendLogToGUI("StateManager: System.exit(0), because the end of stream is reached");
+					Thread.sleep(333);//Wait to write the log
+					System.exit(0);
+					return;
+				}
+				
 				String fromGUICommand = getFromGUICommand(fromGUILine);
 				int fromGUICommandID = getToEngineCommandID(fromGUICommand);
+				
 				if (fromGUICommandID == Protocol.COMMAND_UNDEFINED) {
 					channel.sendLogToGUI("StateManager: Command " + fromGUICommand + " UNSUPPORTED from Bagatur Chess Engine");
 					//Thread.sleep(100);
@@ -173,7 +184,8 @@ public class StateManager extends Protocol implements BestMoveSender {
 							}
 							break;
 						case COMMAND_TO_ENGINE_QUIT:
-							channel.sendLogToGUI("StateManager: System.exit(0)");
+							channel.sendLogToGUI("StateManager: System.exit(0), because of QUIT command");
+							Thread.sleep(333);//Wait to write the log
 							System.exit(0);
 							break;
 						default:
