@@ -93,9 +93,11 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		return rootSearchConfig;
 	}
 	
+	
 	protected IBitBoard getBitboardForSetup() {
 		return bitboardForSetup;
 	}
+	
 	
 	protected void setupBoard(IBitBoard _bitboardForSetup) {
 		bitboardForSetup.revert();
@@ -106,6 +108,7 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 			bitboardForSetup.makeMoveForward(moves[i]);
 		}
 	}
+	
 	
 	@Override
 	public void stopSearchAndWait() {
@@ -151,12 +154,12 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		public void markStopped() {
 			stopped = true;
 		}
-
+		
 		@Override
 		public boolean isStopped() {
 			return stopped;
 		}
-
+		
 		@Override
 		public void stopIfNecessary(int maxdepth, int colour, double alpha,
 				double beta) throws SearchInterruptedException {
@@ -165,6 +168,5 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 				throw new SearchInterruptedException();
 			}
 		}
-		
 	}
 }

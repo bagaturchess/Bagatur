@@ -209,7 +209,6 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 				try {
 					
 					
-					
 					final List<ISearchMediator> mediators = new ArrayList<ISearchMediator>();
 					final List<BucketMediator> mediators_bucket = new ArrayList<BucketMediator>();
 					
