@@ -94,6 +94,10 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		
 		if (getBitboardForSetup() == null) { //createBoard of this root search is not called yet
 			
+			if (searchers_notready.contains(searcher)) {
+				throw new IllegalStateException("MTDParallelSearch: searchers_notready already contains " + searcher);
+			}
+
 			searchers_notready.add(searcher);
 			
 			ChannelManager.getChannel().dump("MTDParallelSearch_BaseImpl addSearcher to searchers_notready. Current size is " + searchers_notready.size());
@@ -102,6 +106,10 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 			
 			synchronized(synch_Board) {
 				searcher.createBoard(getBitboardForSetup());
+			}
+			
+			if (searchers_ready.contains(searcher)) {
+				throw new IllegalStateException("MTDParallelSearch: searchers_ready already contains " + searcher);
 			}
 			
 			searchers_ready.add(searcher);
@@ -121,7 +129,9 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		for (int i = 0; i < searchers_notready.size(); i++) {
 			IRootSearch searcher = searchers_notready.get(i);
 			addSearcher(searcher);
-		}	
+		}
+		
+		searchers_notready.clear();
 	}
 	
 	
@@ -177,11 +187,11 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 						
 						
 						//Make the calculation and start/stop searchers
-						double expected_load_per_seacrcher = 100d / getRootSearchConfig().getThreadsCount();
+						double expected_load_per_searcher = 100d / getRootSearchConfig().getThreadsCount();
 						if (stat_cpus_load.getEntropy() > TARGET_CPUS_LOAD) {
 							//TODO: STOP one searcher
 							
-						} else if (stat_cpus_load.getEntropy() < TARGET_CPUS_LOAD - expected_load_per_seacrcher) {
+						} else if (stat_cpus_load.getEntropy() < TARGET_CPUS_LOAD - expected_load_per_searcher) {
 							//TODO: START one searcher
 							
 						} else {
@@ -219,9 +229,13 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 						mediators.add(sequentialSearchers_WrapMediator(cur_bucket));
 					}
 					
+					ChannelManager.getChannel().dump("MTDParallelSearch: mediators size is " + mediators.size());
 					
 					//Start searchers initially
 					for (int i = 0; i < searchers_ready.size(); i++) {
+						
+						ChannelManager.getChannel().dump("MTDParallelSearch: starting searchers_ready[" + (i + 1) + "/" + searchers_ready.size() + "]");
+						
 						synchronized(synch_Board) {							
 							Go cur_go = initialgo;
 							ITimeController cur_timecontroller = timeController;
@@ -256,7 +270,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Loop > before start threads");
 							
 							//Start all stopped searchers
-							long time_delta = System.currentTimeMillis() - start_time;
+							/*long time_delta = System.currentTimeMillis() - start_time;
 							long expected_count_workers = time_delta / 1;//100;
 							for (int i = 0; i < Math.min(searchers_ready.size(), expected_count_workers); i++) {
 								if (searchers_ready.get(i).isStopped()){
@@ -298,7 +312,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 										}
 									}
 								}
-							}
+							}*/
 							
 							
 							//Collect all major infos, put them in searchersInfo, and send the best info if available

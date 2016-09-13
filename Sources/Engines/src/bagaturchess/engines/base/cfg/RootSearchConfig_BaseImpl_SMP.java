@@ -117,7 +117,7 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 		
 		int threads = Runtime.getRuntime().availableProcessors();
 		
-		threads /= 2;//2 logical processors for 1 core in most SMP hardware architectures
+		threads /= 2;//2 logical processors for 1 core in most hardware architectures
 		
 		if (threads < 2) {
 			threads = 2;
