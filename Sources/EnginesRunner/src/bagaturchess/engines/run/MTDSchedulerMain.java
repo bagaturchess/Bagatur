@@ -29,6 +29,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.engines.bagatur.cfg.time.TimeConfigImpl;
+import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearch;
@@ -84,7 +85,9 @@ public class MTDSchedulerMain {
 								}
 				);*/
 				
-		IRootSearchConfig cfg = new RootSearchConfig_BaseImpl_SMP(
+		IRootSearchConfig cfg = new RootSearchConfig_BaseImpl_1Core(
+								//new RootSearchConfig_BaseImpl_SMP(
+				
 				new String[] {
 								"bagaturchess.search.impl.alg.impl0.SearchMTD0",
 								//"bagaturchess.search.impl.alg.impl5_scratch.SearchMTD_AlphaBeta_pv_nonpv",
@@ -127,16 +130,16 @@ public class MTDSchedulerMain {
 		
 		ChannelManager.setChannel(new Channel_Console(System.in, System.out, System.out));
 		
-		SharedData arg1 = new SharedData(ChannelManager.getChannel(), cfg);
+		SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
 		
-		//IRootSearch search = new MTDParallelSearch_ProcessesImpl(new Object[] {cfg, arg1});
-		//IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, arg1});
-		//IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
-		//IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, arg1});
-		IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, arg1});
+		//IRootSearch search = new MTDParallelSearch_ProcessesImpl(new Object[] {cfg, sharedData});
+		//IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, sharedData});
+		//IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, sharedData});
+		IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, sharedData});
+		
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
-		SharedData sharedData = search.getSharedData();
+		sharedData = search.getSharedData();
 		
 		/*double c = 1.0643;
 		//System.out.println("=" + Math.pow(c, 100));
