@@ -96,6 +96,13 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			
 			runner.uciOK();
 			
+			/**
+			 * TODO: IMPORTANT
+			 * The UCI options of the slave engine should be set as for the master engine.
+			 * Especially the UCI options for Memory Optimizations and Openning Book usage.
+			 * The separate process should not use openning book moves, because they have to be already moved by the master process.
+			 */
+			
 			runner.isReady();
 			
 			runner.disable();
