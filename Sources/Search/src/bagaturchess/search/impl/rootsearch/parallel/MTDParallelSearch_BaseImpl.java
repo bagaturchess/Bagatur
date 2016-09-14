@@ -66,6 +66,14 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	private final VarStatistic stat_cpus_load 	= new VarStatistic(false);
 	
 	
+	/**
+	 * TODO: IMPORTANT
+	 * The UCI options of the slave engine should be set as for the master engine.
+	 * Especially the UCI options for Memory Optimizations and Openning Book usage.
+	 * The separate process should not use openning book moves, because they have to be already moved by the master process.
+	 */
+	
+	
 	public MTDParallelSearch_BaseImpl(Object[] args) {
 		
 		super(args);
@@ -256,8 +264,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					long start_time = System.currentTimeMillis();
 					
 					
-					SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.377d);
-					
+					//SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.377d);
+					SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.001d);
 					
 					boolean allSearchersFinished = false;
 					//boolean hasSendAtLest1Info = false;
