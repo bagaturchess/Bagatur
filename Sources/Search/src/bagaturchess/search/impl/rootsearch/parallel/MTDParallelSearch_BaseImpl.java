@@ -278,7 +278,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: Loop > before start threads");
 							
 							//Start all stopped searchers
-							/*long time_delta = System.currentTimeMillis() - start_time;
+							long time_delta = System.currentTimeMillis() - start_time;
 							long expected_count_workers = time_delta / 1;//100;
 							for (int i = 0; i < Math.min(searchers_ready.size(), expected_count_workers); i++) {
 								if (searchers_ready.get(i).isStopped()){
@@ -290,7 +290,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 										Go cur_go = initialgo;
 										ITimeController cur_timecontroller = timeController;
 										
-										if (timeController != null) {
+										/*if (timeController != null) {
 											long remainningTime = timeController.getRemainningTime();
 											if (remainningTime > MIN_REMAINNING_TIME) {
 												
@@ -317,10 +317,10 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 										
 										synchronized(synch_Board) {
 											sequentialSearchers_Negamax(searchers_ready.get(i), getBitboardForSetup(), mediators.get(i), cur_timecontroller, multiPVCallback, cur_go, true);
-										}
+										}*/
 									}
 								}
-							}*/
+							}
 							
 							
 							//Collect all major infos, put them in searchersInfo, and send the best info if available
