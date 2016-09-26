@@ -5,7 +5,7 @@ import bagaturchess.learning.impl.features.impl1.Features;
 
 
 public class GenerateWeights {
-
+	
 	
 	public static void main(String[] args) {
 		Features f = Features.load();
