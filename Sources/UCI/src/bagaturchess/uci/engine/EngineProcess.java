@@ -239,7 +239,9 @@ public class EngineProcess {
 							exitLine = lines.get(i);
 						}
 					}
-					throw new IllegalStateException("No pv: " + lines);
+					if (exitLine == null) {
+						throw new IllegalStateException("No pv: " + lines);
+					}
 				}
 			}
 			

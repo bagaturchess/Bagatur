@@ -97,14 +97,14 @@ public class GamesGenerator {
 					new String [0],
 				"C:\\own\\chess\\ENGINES\\komodo-13b1-ja\\Windows\\");*/
 			
-			/*EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-7-win\\stockfish-7-win\\Windows\\stockfish 7 x64.exe",
+			EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-7-win\\stockfish-7-win\\Windows\\stockfish 7 x64.exe",
 					new String [0],
 				"C:\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-7-win\\stockfish-7-win\\Windows\\");
-			*/
 			
-			EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");
 			
-			control.execute(engine, "./bagatur.cg", 1000000, true);
+			//EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");
+			
+			control.execute(engine, "./stockfish-7.cg", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
