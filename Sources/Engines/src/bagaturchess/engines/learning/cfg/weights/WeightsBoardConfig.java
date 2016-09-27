@@ -8,16 +8,20 @@ import bagaturchess.learning.impl.filler.SignalFillerConstants;
 public class WeightsBoardConfig implements IBoardConfig {
 	
 	
-    public double MATERIAL_PAWN_O = 88.53199920069409;
-    public double MATERIAL_PAWN_E = 110.02070622910514;
-    public double MATERIAL_KNIGHT_O = 430.49111046321144;
-    public double MATERIAL_KNIGHT_E = 391.9227332285586;
-    public double MATERIAL_BISHOP_O = 443.634581290182;
-    public double MATERIAL_BISHOP_E = 425.5057547760457;
-    public double MATERIAL_ROOK_O = 616.3349023784737;
-    public double MATERIAL_ROOK_E = 685.5644647191372;
-    public double MATERIAL_QUEEN_O = 1341.269951331634;
-    public double MATERIAL_QUEEN_E = 1250.323241281083;
+	public double MATERIAL_PAWN_O	=	64.75080071928197;
+	public double MATERIAL_PAWN_E	=	77.53525162786624;
+
+	public double MATERIAL_KNIGHT_O	=	333.6746827139804;
+	public double MATERIAL_KNIGHT_E	=	317.1892865063512;
+
+	public double MATERIAL_BISHOP_O	=	361.3342555595208;
+	public double MATERIAL_BISHOP_E	=	321.77115331599146;
+
+	public double MATERIAL_ROOK_O	=	448.90806056762875;
+	public double MATERIAL_ROOK_E	=	536.9497924131576;
+
+	public double MATERIAL_QUEEN_O	=	1072.3475721290154;
+	public double MATERIAL_QUEEN_E	=	957.1414302489349;
 	
 	public double MATERIAL_KING_O = 2000;
 	public double MATERIAL_KING_E = 2000;
@@ -25,18 +29,23 @@ public class WeightsBoardConfig implements IBoardConfig {
 	public double MATERIAL_BARIER_NOPAWNS_O	= Math.max(MATERIAL_KNIGHT_O, MATERIAL_BISHOP_O) + MATERIAL_PAWN_O;
 	public double MATERIAL_BARIER_NOPAWNS_E	= Math.max(MATERIAL_KNIGHT_E, MATERIAL_BISHOP_E) + MATERIAL_PAWN_E;
 	
-	public double PST_PAWN_O = 0.5710827986385989;
-	public double PST_PAWN_E = 0.9927040298136856;
-	public double PST_KING_O = 1.4152868740093765;
-    public double PST_KING_E = 1.6886842944327374;
-    public double PST_KNIGHT_O = 1.020352936358533;
-    public double PST_KNIGHT_E = 1.2065438212857906;
-    public double PST_BISHOP_O = 1.1449938687083554;
-    public double PST_BISHOP_E = 1.587546500773107;
-    public double PST_ROOK_O = 1.862971446158503;
-    public double PST_ROOK_E = 0.7278444261035139;
-    public double PST_QUEEN_O = 0.10831914054754384;
-    public double PST_QUEEN_E = 0.8606995592185696;
+	public double PST_PAWN_O	=	0.7161581238840979;
+	public double PST_PAWN_E	=	0.815180822137494;
+
+	public double PST_KING_O	=	1.1697774766425277;
+	public double PST_KING_E	=	1.11975105253063;
+
+	public double PST_KNIGHT_O	=	0.9661744034826641;
+	public double PST_KNIGHT_E	=	1.0048734975653686;
+
+	public double PST_BISHOP_O	=	0.6828676891673773;
+	public double PST_BISHOP_E	=	1.8601681397361356;
+
+	public double PST_ROOK_O	=	0.7370084728426224;
+	public double PST_ROOK_E	=	1.089103585542932;
+
+	public double PST_QUEEN_O	=	0.28913087002821136;
+	public double PST_QUEEN_E	=	1.0911584966785814;
     
 	
 	public WeightsBoardConfig() {

@@ -31,12 +31,19 @@ public class FeaturesConfigurationBagaturImpl implements IFeaturesConfiguration,
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFE_CASTLING   , "KINGSAFE.CASTLING"   , STANDARD        , 0, 50,  10.030, 0, 0,  0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFE_FIANCHETTO , "KINGSAFE.FIANCHETTO" , STANDARD        , 0, 100, 1, 0, 0, 0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_BISHOPS_DOUBLE      , "BISHOPS.DOUBLE"	    , STANDARD        , 0, 100,  39.227, 0, 200,  40.227 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KNIGHTS_DOUBLE      , "KNIGHTS.DOUBLE"	    , STANDARD        , 0, 100,  39.227, 0, 200,  40.227 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOKS_DOUBLE      	, "ROOKS.DOUBLE"	    , STANDARD        , 0, 100,  39.227, 0, 200,  40.227 ));
+		
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFE_F_PAWN     , "KINGSAFE.F"          , STANDARD        , -50, 0, -4.056, 0, 0,  0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFE_G_PAWN     , "KINGSAFE.G"          , STANDARD        , -50, 0, -10.653, 0, 0,  0 ));
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_KINGS_DISTANCE  	    , "KINGS.DISTANCE"      , STANDARD        ,
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGS_DISTANCE  	, "KINGS.DISTANCE"      , STANDARD        , -50, 50, 1, -50, 50,  1 ));
+		/*add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_KINGS_DISTANCE  	    , "KINGS.DISTANCE"      , STANDARD        ,
 				PSTConstants.createArray(8, 0), PSTConstants.createArray(8, 0), new double[] {0,   0,   0,   0,   0,   0,  0, 0},
 				PSTConstants.createArray(8, -128), PSTConstants.createArray(8, 128), new double[] {0,   0,   0,   0,   0,   0,  0, 0}
-		));
+		));*/
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_5PAWNS_ROOKS      	, "ROOKS.5PAWNS"	    , STANDARD        , -50, 50, 1, -50, 50,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_5PAWNS_KNIGHTS     	, "KNIGHTS.5PAWNS"	    , STANDARD        , -50, 50, 1, -50, 50,  1 ));
+		
 		
 		/**
 		 * PAWNS ITERATION
@@ -103,7 +110,7 @@ public class FeaturesConfigurationBagaturImpl implements IFeaturesConfiguration,
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_QUEEN_S    , "MOBILITY.QUEEN.S"    , MOVES_ITERATION  ,  0,  2,  1,  0,  2,  1));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOKS_PAIR_H   	    , "ROOKS.PAIR.H"    	, MOVES_ITERATION  ,  0, 50, 10,  0, 50, 10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOKS_PAIR_V   	    , "ROOKS.PAIR.V"    	, MOVES_ITERATION  ,  0, 50, 10,  0, 50, 10 ));
-		/*add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BK              , "PIN.BK"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BK              , "PIN.BK"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BQ              , "PIN.BQ"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BR              , "PIN.BR"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BN              , "PIN.BN"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
@@ -116,7 +123,12 @@ public class FeaturesConfigurationBagaturImpl implements IFeaturesConfiguration,
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_QN              , "PIN.QN"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_QR              , "PIN.QR"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_QB              , "PIN.QB"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_BN           , "ATTACK.BN"           , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
+		
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_BIGGER_PIECE , "ATTACK.BIGGER"       , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_EQUAL_PIECE  , "ATTACK.EQ"           , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_LOWER_PIECE  , "ATTACK.LOWER"        , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
+		
+		/*add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_BN           , "ATTACK.BN"           , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_BR           , "ATTACK.BR"           , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_NB           , "ATTACK.NB"           , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_NR           , "ATTACK.NR"           , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
@@ -125,12 +137,17 @@ public class FeaturesConfigurationBagaturImpl implements IFeaturesConfiguration,
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_RN           , "ATTACK.RN"           , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_QB           , "ATTACK.QB"           , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_QN           , "ATTACK.QN"           , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_QR           , "ATTACK.QR"           , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAP_KNIGHT         , "TRAP.KNIGHT"         , MOVES_ITERATION  ,  -50,  0,  -1,  -50,  0,  -1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ATTACK_QR           , "ATTACK.QR"           , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));*/
+		
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAP  				, "TRAP"      			, MOVES_ITERATION  ,  -50,  0,  -10,  -50,  0,  -10 ));
+		
+		/*add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAP_KNIGHT         , "TRAP.KNIGHT"         , MOVES_ITERATION  ,  -50,  0,  -1,  -50,  0,  -1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAP_BISHOP         , "TRAP.BISHOP"         , MOVES_ITERATION  ,  -50,  0,  -1,  -50,  0,  -1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAP_ROOK           , "TRAP.ROOK"           , MOVES_ITERATION  ,  -50,  0,  -1,  -50,  0,  -1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAP_QUEEN          , "TRAP.QUEEN"          , MOVES_ITERATION  ,  -50,  0,  -1,  -50,  0,  -1 ));*/
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED_PIECES       , "HUNGED.PIECE"        , MOVES_ITERATION  ,  -50,  0, -20,  -50,  0, -20 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED_PAWNS       	, "HUNGED.PAWS"        	, MOVES_ITERATION  ,  -50,  0, -20,  -50,  0, -20 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED_ALL       	, "HUNGED.ALL"        	, MOVES_ITERATION  ,  -50,  0, -20,  -50,  0, -20 ));
 		
 		
 		/**

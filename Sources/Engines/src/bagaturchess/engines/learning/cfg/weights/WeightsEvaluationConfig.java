@@ -8,150 +8,234 @@ import bagaturchess.learning.impl.eval.cfg.IWeightsEvalConfig;
 
 public class WeightsEvaluationConfig implements IWeightsEvalConfig {	
 	
-    
-    public double KINGSAFE_CASTLING_O = 8.695473272912482;
-    public double KINGSAFE_CASTLING_E = 0.0;
-    public double KINGSAFE_FIANCHETTO_O = 30;
-    public double KINGSAFE_FIANCHETTO_E = 0.0;
-    public double BISHOPS_DOUBLE_O = 38.55304785134276;
-    public double BISHOPS_DOUBLE_E = 58.2527533291309;
-    public double KNIGHTS_DOUBLE_O = -15;
-    public double KNIGHTS_DOUBLE_E = -30;
-    public double ROOKS_DOUBLE_O = -15;
-    public double ROOKS_DOUBLE_E = -30;
-    public double PAWNS5_ROOKS_O = -4;
-    public double PAWNS5_ROOKS_E = -7;
-    public double PAWNS5_KNIGHTS_O = 3.699203461185335;
-    public double PAWNS5_KNIGHTS_E = 7.4901092619848955;
-    public double KINGSAFE_F_O = -20;
-    public double KINGSAFE_F_E = 0.0;
-    public double KINGSAFE_G_O = -20;
-    public double KINGSAFE_G_E = 0.0;
-    public double KINGS_DISTANCE_O = 0;
-    public double KINGS_DISTANCE_E = 3;
-    public double PAWNS_DOUBLED_O = -10;
-    public double PAWNS_DOUBLED_E = -14.29780586088556;
-    public double PAWNS_ISOLATED_O = -14.081104147241549;
-    public double PAWNS_ISOLATED_E = -11.146861253903177;
-    public double PAWNS_BACKWARD_O = -7.375578895582516;
-    public double PAWNS_BACKWARD_E = -7.2179199051395857;
-    public double PAWNS_SUPPORTED_O = 5.609065058083699;
-    public double PAWNS_SUPPORTED_E = 5.3465159357916567;
-    public double PAWNS_CANNOTBS_O = -10.6863498502616525;
-    public double PAWNS_CANNOTBS_E = -10.5308967547913821;
-    public double PAWNS_PASSED_O = 4.680477377823983;
-    public double PAWNS_PASSED_E = 3.4342682149594577;
-    public double PAWNS_PASSED_RNK_O = 1.1424944013732647;
-    public double PAWNS_PASSED_RNK_E = 1.4706529633174854;
-    public double PAWNS_UNSTOPPABLE_PASSER_O = 0.0;
-    public double PAWNS_UNSTOPPABLE_PASSER_E = 550.0;
-    public double PAWNS_CANDIDATE_RNK_O = 1.9256140108109243;
-    public double PAWNS_CANDIDATE_RNK_E = 1.3898951461659623;
-    public double KINGS_PASSERS_F_O = 0.0;
-    public double KINGS_PASSERS_F_E = 1.771641359692092;
-    public double KINGS_PASSERS_FF_O = 0.0;
-    public double KINGS_PASSERS_FF_E = 1.0573809123088491;
-    public double KINGS_PASSERS_F_OP_O = 0.0;
-    public double KINGS_PASSERS_F_OP_E = 1.664989299655242;
-    public double PAWNS_ISLANDS_O = -20;
-    public double PAWNS_ISLANDS_E = -20;
-    public double PAWNS_GARDS_O = 15.095304223518145;
-    public double PAWNS_GARDS_E = 0.0;
-    public double PAWNS_GARDS_REM_O = -6.817067617714686;
-    public double PAWNS_GARDS_REM_E = 0.0;
-    public double PAWNS_STORMS_O = 5.6562511086470018;
-    public double PAWNS_STORMS_E = 0.0;
-    public double PAWNS_STORMS_CLS_O = 2.7528654000457136;
-    public double PAWNS_STORMS_CLS_E = 0.0;
-    public double PAWNS_OPENNED_O = -36.51630475211046;
-    public double PAWNS_OPENNED_E = 0.0;
-    public double PAWNS_SEMIOP_OWN_O = -27.61263467545501;
-    public double PAWNS_SEMIOP_OWN_E = 0.0;
-    public double PAWNS_SEMIOP_OP_O = -11.243766767056155;
-    public double PAWNS_SEMIOP_OP_E = 0.0;
-    public double PAWNS_WEAK_O = -10.56049594965303;
-    public double PAWNS_WEAK_E = -5.11469942441058452;
-    public double SPACE_O = 0.4842269012003156;
-    public double SPACE_E = 1.06495242638572;
-    public double ROOK_INFRONT_PASSER_O = -26.281968971663698;
-    public double ROOK_INFRONT_PASSER_E = -25.7874043073770787;
-    public double ROOK_BEHIND_PASSER_O = 20.16400430403572036;
-    public double ROOK_BEHIND_PASSER_E = 20.370505576804776;
-    public double BISHOPS_BAD_O = -5.47203138436696224;
-    public double BISHOPS_BAD_E = -5.6447870737777084;
-    public double KNIGHT_OUTPOST_O = 16.189159441831243;
-    public double KNIGHT_OUTPOST_E = 21.4890542689350073;
-    public double ROOKS_OPENED_O = 24.64660545935084;
-    public double ROOKS_OPENED_E = 10.9523862741844824;
-    public double ROOKS_SEMIOPENED_O = 16.68542672912037;
-    public double ROOKS_SEMIOPENED_E = 10.0138229289325038;
-    public double TROPISM_KNIGHT_O = 0.59900906859684694;
-    public double TROPISM_KNIGHT_E = 0.0;
-    public double TROPISM_BISHOP_O = 0.4844399390677248;
-    public double TROPISM_BISHOP_E = 0.0;
-    public double TROPISM_ROOK_O = 0.6719263432348239;
-    public double TROPISM_ROOK_E = 0.0;
-    public double TROPISM_QUEEN_O = 0.52101756508375879;
-    public double TROPISM_QUEEN_E = 0.0;
-    public double ROOKS_7TH_2TH_O = 14.098363515907408;
-    public double ROOKS_7TH_2TH_E = 25.959258182976324;
-    public double QUEENS_7TH_2TH_O = 10.3427421276523095;
-    public double QUEENS_7TH_2TH_E = 10.95734336974601;
-    public double KINGSAFETY_L1_O = 50.79324915525265;
-    public double KINGSAFETY_L1_E = 0.0;
-    public double KINGSAFETY_L2_O = 7.139658663877436;
-    public double KINGSAFETY_L2_E = 0.0;
-    public double MOBILITY_KNIGHT_O = 0.799920552085603;
-    public double MOBILITY_KNIGHT_E = 1.4023260453044764;
-    public double MOBILITY_BISHOP_O = 0.7140264083199767;
-    public double MOBILITY_BISHOP_E = 1.1880883496711263;
-    public double MOBILITY_ROOK_O = 0.8519327926189777;
-    public double MOBILITY_ROOK_E = 1.3656293704586049;
-    public double MOBILITY_QUEEN_O = 0.28489031564274016;
-    public double MOBILITY_QUEEN_E = 0.7969717663469346;
-    public double MOBILITY_KNIGHT_S_O = 0.5701417732919651;
-    public double MOBILITY_KNIGHT_S_E = 1.5943119808282296;
-    public double MOBILITY_BISHOP_S_O = 0.5236869290177378;
-    public double MOBILITY_BISHOP_S_E = 0.702074640076866;
-    public double MOBILITY_ROOK_S_O = 0.4436233529865903;
-    public double MOBILITY_ROOK_S_E = 1.6241039419399184;
-    public double MOBILITY_QUEEN_S_O = 0.28976717176007516;
-    public double MOBILITY_QUEEN_S_E = 0.7694076178835493;
-    public double PENETRATION_OP_O = 0.27824204653201886;
-    public double PENETRATION_OP_E = 0.0;
-    public double PENETRATION_OP_S_O = 0.22735909034148527;
-    public double PENETRATION_OP_S_E = 0.0;
-    public double PENETRATION_KING_O = 0.2379869316404612;
-    public double PENETRATION_KING_E = 0.0;
-    public double PENETRATION_KING_S_O = 0.23623177607415432;
-    public double PENETRATION_KING_S_E = 0.0;
-    public double ROOKS_PAIR_H_O = 10.141756627196248;
-    public double ROOKS_PAIR_H_E = 10.7208904465692263;
-    public double ROOKS_PAIR_V_O = 15.20986129053952293;
-    public double ROOKS_PAIR_V_E = 15.49629572742464223;
-    
-    public double TRAP_O 			= 3.3667991106010713;
-    public double TRAP_E 			= 2.4438235169149752;
-    public double PIN_KING_O 		= 40.400084487677882;
-    public double PIN_KING_E 		= 40.763515095856501;
-    public double PIN_BIGGER_O 		= 30.8010112003917484;
-    public double PIN_BIGGER_E	 	= 30.4066615810464205;
-    public double PIN_EQUAL_O 		= 15.94761907883406;
-    public double PIN_EQUAL_E 		= 15.559151201492769;
-    public double PIN_LOWER_O 		= 10.7369572454951826;
-    public double PIN_LOWER_E 		= 10.0522002261614265;
-    public double ATTACK_BIGGER_O	= 40.232728105857094;
-    public double ATTACK_BIGGER_E 	= 40.731304482994883;
-    public double ATTACK_EQUAL_O 	= 30.797031610592222;
-    public double ATTACK_EQUAL_E 	= 30.082858644052445;
-    public double ATTACK_LOWER_O 	= 20.2924847990005928;
-    public double ATTACK_LOWER_E 	= 20.533588111226228;
-    public double HUNGED_PIECE_O 	= 15.035823470670232;
-    public double HUNGED_PIECE_E 	= 15.387603531653903;
-    public double HUNGED_PAWNS_O 	= 7.8950906090115673;
-    public double HUNGED_PAWNS_E	= 7.317972174452671;
-    public double HUNGED_ALL_O 		= 9.336728836626604;
-    public double HUNGED_ALL_E 		= 9.995315715674308;
+	public static final double KINGSAFE_CASTLING_O	=	7.018527092420808;
+	public static final double KINGSAFE_CASTLING_E	=	0.0;
+
+	public static final double KINGSAFE_FIANCHETTO_O	=	3.814482829896902;
+	public static final double KINGSAFE_FIANCHETTO_E	=	0.0;
+
+	public static final double BISHOPS_DOUBLE_O	=	26.410516559087743;
+	public static final double BISHOPS_DOUBLE_E	=	50.36404037381933;
+
+	public static final double KNIGHTS_DOUBLE_O	=	6.141925503528418;
+	public static final double KNIGHTS_DOUBLE_E	=	0.8180726150679087;
+
+	public static final double ROOKS_DOUBLE_O	=	34.239944052586836;
+	public static final double ROOKS_DOUBLE_E	=	12.266938207024184;
+
+	public static final double ROOKS_5PAWNS_O	=	1.1449463441379821;
+	public static final double ROOKS_5PAWNS_E	=	0.7907087802572541;
+
+	public static final double KNIGHTS_5PAWNS_O	=	1.4478340854891338;
+	public static final double KNIGHTS_5PAWNS_E	=	13.649052417250422;
+
+	public static final double KINGSAFE_F_O	=	-4.061304867448334;
+	public static final double KINGSAFE_F_E	=	0.0;
+
+	public static final double KINGSAFE_G_O	=	-8.93723287547486;
+	public static final double KINGSAFE_G_E	=	0.0;
+
+	public static final double KINGS_DISTANCE_O	=	-0.3608269754035846;
+	public static final double KINGS_DISTANCE_E	=	-0.01;
+
+	public static final double PAWNS_DOUBLED_O	=	-0.34616079998012406;
+	public static final double PAWNS_DOUBLED_E	=	-0.7540698924520604;
+
+	public static final double PAWNS_ISOLATED_O	=	-12.410797943382056;
+	public static final double PAWNS_ISOLATED_E	=	-11.808026187675356;
+
+	public static final double PAWNS_BACKWARD_O	=	-4.900460289317495;
+	public static final double PAWNS_BACKWARD_E	=	-2.6560359481999165;
+
+	public static final double PAWNS_SUPPORTED_O	=	3.8831239224473566;
+	public static final double PAWNS_SUPPORTED_E	=	3.955544515227791;
+
+	public static final double PAWNS_CANNOTBS_O	=	-1.615334828235159;
+	public static final double PAWNS_CANNOTBS_E	=	-3.1436933681341754;
+
+	public static final double PAWNS_PASSED_O	=	5.469733813150776;
+	public static final double PAWNS_PASSED_E	=	2.151374727571095;
+
+	public static final double PAWNS_PASSED_RNK_O	=	0.8820059889947125;
+	public static final double PAWNS_PASSED_RNK_E	=	1.0070980141506483;
+
+	public static final double PAWNS_UNSTOPPABLE_PASSER_O	=	0.0;
+	public static final double PAWNS_UNSTOPPABLE_PASSER_E	=	550.0;
+
+	public static final double PAWNS_CANDIDATE_RNK_O	=	0.504583178470483;
+	public static final double PAWNS_CANDIDATE_RNK_E	=	0.9265848751343567;
+
+	public static final double KINGS_PASSERS_F_O	=	0.0;
+	public static final double KINGS_PASSERS_F_E	=	0.6207612376868458;
+
+	public static final double KINGS_PASSERS_FF_O	=	0.0;
+	public static final double KINGS_PASSERS_FF_E	=	0.6138705327132712;
+
+	public static final double KINGS_PASSERS_F_OP_O	=	0.0;
+	public static final double KINGS_PASSERS_F_OP_E	=	1.6111206753705305;
+
+	public static final double PAWNS_ISLANDS_O	=	-1.4429702845313008;
+	public static final double PAWNS_ISLANDS_E	=	-0.8019170966106466;
+
+	public static final double PAWNS_GARDS_O	=	4.8241932201171185;
+	public static final double PAWNS_GARDS_E	=	0.0;
+
+	public static final double PAWNS_GARDS_REM_O	=	-5.112755567981873;
+	public static final double PAWNS_GARDS_REM_E	=	0.0;
+
+	public static final double PAWNS_STORMS_O	=	1.08775419681368;
+	public static final double PAWNS_STORMS_E	=	0.0;
+
+	public static final double PAWNS_STORMS_CLS_O	=	3.2110414498044624;
+	public static final double PAWNS_STORMS_CLS_E	=	0.0;
+
+	public static final double PAWNS_OPENNED_O	=	-41.87840279215143;
+	public static final double PAWNS_OPENNED_E	=	0.0;
+
+	public static final double PAWNS_SEMIOP_OWN_O	=	-25.690451910967116;
+	public static final double PAWNS_SEMIOP_OWN_E	=	0.0;
+
+	public static final double PAWNS_SEMIOP_OP_O	=	-12.068004273774859;
+	public static final double PAWNS_SEMIOP_OP_E	=	0.0;
+
+	public static final double PAWNS_WEAK_O	=	-1.710255536391454;
+	public static final double PAWNS_WEAK_E	=	-0.3283715879321947;
+
+	public static final double SPACE_O	=	0.9952928776229448;
+	public static final double SPACE_E	=	0.6737790769917585;
+
+	public static final double ROOK_INFRONT_PASSER_O	=	-0.08379657618696915;
+	public static final double ROOK_INFRONT_PASSER_E	=	-0.0182706663912822;
+
+	public static final double ROOK_BEHIND_PASSER_O	=	0.12207705647899722;
+	public static final double ROOK_BEHIND_PASSER_E	=	13.138761519858772;
+	
+	
+	public static final double BISHOPS_BAD_O	=	-1.188167722601592;
+	public static final double BISHOPS_BAD_E	=	-1.1720921063387297;
+
+	public static final double KNIGHT_OUTPOST_O	=	9.92070018698378;
+	public static final double KNIGHT_OUTPOST_E	=	0.08281209480610474;
+
+	public static final double ROOKS_OPENED_O	=	24.44190263549624;
+	public static final double ROOKS_OPENED_E	=	0.4332001016930819;
+
+	public static final double ROOKS_SEMIOPENED_O	=	9.0291425869115;
+	public static final double ROOKS_SEMIOPENED_E	=	10.031969611296532;
+
+	public static final double TROPISM_KNIGHT_O	=	0.07612308123602757;
+	public static final double TROPISM_KNIGHT_E	=	0.0;
+
+	public static final double TROPISM_BISHOP_O	=	0.3288706023701906;
+	public static final double TROPISM_BISHOP_E	=	0.0;
+
+	public static final double TROPISM_ROOK_O	=	0.39592106708864805;
+	public static final double TROPISM_ROOK_E	=	0.0;
+
+	public static final double TROPISM_QUEEN_O	=	0.21395911314372187;
+	public static final double TROPISM_QUEEN_E	=	0.0;
+
+	public static final double ROOKS_7TH_2TH_O	=	18.641856548809184;
+	public static final double ROOKS_7TH_2TH_E	=	5.977158997305306;
+
+	public static final double QUEENS_7TH_2TH_O	=	0.9282637364662676;
+	public static final double QUEENS_7TH_2TH_E	=	10.384645339522729;
+
+	public static final double KINGSAFETY_L1_O	=	36.51855013087701;
+	public static final double KINGSAFETY_L1_E	=	0.0;
+
+	public static final double KINGSAFETY_L2_O	=	18.24405623944656;
+	public static final double KINGSAFETY_L2_E	=	0.0;
+
+	public static final double MOBILITY_KNIGHT_O	=	0.23381577951816987;
+	public static final double MOBILITY_KNIGHT_E	=	1.1304451836686797;
+
+	public static final double MOBILITY_BISHOP_O	=	1.23451676645372;
+	public static final double MOBILITY_BISHOP_E	=	0.9416816779081824;
+
+	public static final double MOBILITY_ROOK_O	=	0.7931931668303283;
+	public static final double MOBILITY_ROOK_E	=	1.2452038526965021;
+
+	public static final double MOBILITY_QUEEN_O	=	0.18774489185452473;
+	public static final double MOBILITY_QUEEN_E	=	1.0477815074718118;
+
+	public static final double MOBILITY_KNIGHT_S_O	=	0.40258925894803105;
+	public static final double MOBILITY_KNIGHT_S_E	=	0.7671547885808264;
+
+	public static final double MOBILITY_BISHOP_S_O	=	0.4661369417429389;
+	public static final double MOBILITY_BISHOP_S_E	=	0.2815246069695339;
+
+	public static final double MOBILITY_ROOK_S_O	=	0.37714363269976464;
+	public static final double MOBILITY_ROOK_S_E	=	0.7615013606710039;
+
+	public static final double MOBILITY_QUEEN_S_O	=	0.7092750757091117;
+	public static final double MOBILITY_QUEEN_S_E	=	1.2430047712338932;
+
+	public static final double ROOKS_PAIR_H_O	=	2.9452786833387363;
+	public static final double ROOKS_PAIR_H_E	=	0.39461229046915725;
+
+	public static final double ROOKS_PAIR_V_O	=	2.113548534017563;
+	public static final double ROOKS_PAIR_V_E	=	0.764932699776456;
+
+	public static final double TRAP_O	=	-0.5228546950014155;
+	public static final double TRAP_E	=	-1.1624992926923456;
+
+	public static final double PIN_BK_O	=	10.0;
+	public static final double PIN_BK_E	=	10.0;
+
+	public static final double PIN_BQ_O	=	10.0;
+	public static final double PIN_BQ_E	=	10.0;
+
+	public static final double PIN_BR_O	=	10.0;
+	public static final double PIN_BR_E	=	10.0;
+
+	public static final double PIN_BN_O	=	10.0;
+	public static final double PIN_BN_E	=	10.0;
+
+	public static final double PIN_RK_O	=	36.944311374342135;
+	public static final double PIN_RK_E	=	47.19369328902263;
+
+	public static final double PIN_RQ_O	=	1.3171218132220082;
+	public static final double PIN_RQ_E	=	0.9514498462414637;
+
+	public static final double PIN_RB_O	=	17.417382186356928;
+	public static final double PIN_RB_E	=	0.0;
+
+	public static final double PIN_RN_O	=	0.4539812490720678;
+	public static final double PIN_RN_E	=	2.354795185952967;
+
+	public static final double PIN_QK_O	=	10.0;
+	public static final double PIN_QK_E	=	10.0;
+
+	public static final double PIN_QQ_O	=	10.0;
+	public static final double PIN_QQ_E	=	10.0;
+
+	public static final double PIN_QN_O	=	10.0;
+	public static final double PIN_QN_E	=	10.0;
+
+	public static final double PIN_QR_O	=	10.0;
+	public static final double PIN_QR_E	=	10.0;
+
+	public static final double PIN_QB_O	=	10.0;
+	public static final double PIN_QB_E	=	10.0;
+
+	public static final double ATTACK_BIGGER_O	=	31.957245932505337;
+	public static final double ATTACK_BIGGER_E	=	50.0;
+
+	public static final double ATTACK_EQ_O	=	21.811291758457845;
+	public static final double ATTACK_EQ_E	=	17.335787749036037;
+
+	public static final double ATTACK_LOWER_O	=	0.40746519933435665;
+	public static final double ATTACK_LOWER_E	=	25.14628665177842;
+
+	public static final double HUNGED_PIECE_O	=	0.0;
+	public static final double HUNGED_PIECE_E	=	0.0;
+
+	public static final double HUNGED_PAWS_O	=	0.0;
+	public static final double HUNGED_PAWS_E	=	0.0;
+
+	public static final double HUNGED_ALL_O	=	0.0;
+	public static final double HUNGED_ALL_E	=	0.0;
     
     
 	public WeightsEvaluationConfig() {
@@ -272,7 +356,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPAWNS5_ROOKS_O() {
-        return PAWNS5_ROOKS_O;
+        return ROOKS_5PAWNS_O;
     }
 
     /* (non-Javadoc)
@@ -280,7 +364,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPAWNS5_ROOKS_E() {
-        return PAWNS5_ROOKS_E;
+        return ROOKS_5PAWNS_E;
     }
 
     /* (non-Javadoc)
@@ -288,7 +372,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPAWNS5_KNIGHTS_O() {
-        return PAWNS5_KNIGHTS_O;
+        return KNIGHTS_5PAWNS_O;
     }
 
     /* (non-Javadoc)
@@ -296,7 +380,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPAWNS5_KNIGHTS_E() {
-        return PAWNS5_KNIGHTS_E;
+        return KNIGHTS_5PAWNS_E;
     }
 
     /* (non-Javadoc)
@@ -1057,7 +1141,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPENETRATION_OP_O() {
-        return PENETRATION_OP_O;
+        return 0;//PENETRATION_OP_O;
     }
 
     /* (non-Javadoc)
@@ -1065,7 +1149,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPENETRATION_OP_E() {
-        return PENETRATION_OP_E;
+    	return 0;//return PENETRATION_OP_E;
     }
 
     /* (non-Javadoc)
@@ -1073,7 +1157,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPENETRATION_OP_S_O() {
-        return PENETRATION_OP_S_O;
+    	return 0;//return PENETRATION_OP_S_O;
     }
 
     /* (non-Javadoc)
@@ -1081,7 +1165,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPENETRATION_OP_S_E() {
-        return PENETRATION_OP_S_E;
+    	return 0;//return PENETRATION_OP_S_E;
     }
 
     /* (non-Javadoc)
@@ -1089,7 +1173,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPENETRATION_KING_O() {
-        return PENETRATION_KING_O;
+    	return 0;//return PENETRATION_KING_O;
     }
 
     /* (non-Javadoc)
@@ -1097,7 +1181,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPENETRATION_KING_E() {
-        return PENETRATION_KING_E;
+    	return 0;//return PENETRATION_KING_E;
     }
 
     /* (non-Javadoc)
@@ -1105,7 +1189,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPENETRATION_KING_S_O() {
-        return PENETRATION_KING_S_O;
+    	return 0;//return PENETRATION_KING_S_O;
     }
 
     /* (non-Javadoc)
@@ -1113,7 +1197,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPENETRATION_KING_S_E() {
-        return PENETRATION_KING_S_E;
+    	return 0;//return PENETRATION_KING_S_E;
     }
 
     /* (non-Javadoc)
@@ -1169,7 +1253,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPIN_KING_O() {
-        return PIN_KING_O;
+    	return 0;//return PIN_KING_O;
     }
 
     /* (non-Javadoc)
@@ -1177,7 +1261,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPIN_KING_E() {
-        return PIN_KING_E;
+    	return 0;//return PIN_KING_E;
     }
 
     /* (non-Javadoc)
@@ -1185,7 +1269,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPIN_BIGGER_O() {
-        return PIN_BIGGER_O;
+    	return 0;//return PIN_BIGGER_O;
     }
 
     /* (non-Javadoc)
@@ -1193,7 +1277,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPIN_BIGGER_E() {
-        return PIN_BIGGER_E;
+    	return 0;//return PIN_BIGGER_E;
     }
 
     /* (non-Javadoc)
@@ -1201,7 +1285,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPIN_EQUAL_O() {
-        return PIN_EQUAL_O;
+    	return 0;//return PIN_EQUAL_O;
     }
 
     /* (non-Javadoc)
@@ -1209,7 +1293,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPIN_EQUAL_E() {
-        return PIN_EQUAL_E;
+    	return 0;//return PIN_EQUAL_E;
     }
 
     /* (non-Javadoc)
@@ -1217,7 +1301,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPIN_LOWER_O() {
-        return PIN_LOWER_O;
+        return 0;//return PIN_LOWER_O;
     }
 
     /* (non-Javadoc)
@@ -1225,7 +1309,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getPIN_LOWER_E() {
-        return PIN_LOWER_E;
+    	return 0;//return PIN_LOWER_E;
     }
 
     /* (non-Javadoc)
@@ -1249,7 +1333,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getATTACK_EQUAL_O() {
-        return ATTACK_EQUAL_O;
+        return ATTACK_EQ_O;
     }
 
     /* (non-Javadoc)
@@ -1257,7 +1341,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getATTACK_EQUAL_E() {
-        return ATTACK_EQUAL_E;
+        return ATTACK_EQ_E;
     }
 
     /* (non-Javadoc)
@@ -1297,7 +1381,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getHUNGED_PAWNS_O() {
-        return HUNGED_PAWNS_O;
+        return HUNGED_PAWS_O;
     }
 
     /* (non-Javadoc)
@@ -1305,7 +1389,7 @@ public class WeightsEvaluationConfig implements IWeightsEvalConfig {
 	 */
     @Override
 	public double getHUNGED_PAWNS_E() {
-        return HUNGED_PAWNS_E;
+        return HUNGED_PAWS_E;
     }
 
     /* (non-Javadoc)

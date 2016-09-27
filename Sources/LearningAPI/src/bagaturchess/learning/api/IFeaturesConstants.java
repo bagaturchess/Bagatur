@@ -104,7 +104,7 @@ public interface IFeaturesConstants {
 	public static final int FEATURE_ID_PIN_BIGGER_PIECE    = 4220;
 	public static final int FEATURE_ID_PIN_EQUAL_PIECE     = 4230;
 	public static final int FEATURE_ID_PIN_LOWER_PIECE     = 4240;
-	/*public static final int FEATURE_ID_PIN_BK              = 4170;
+	public static final int FEATURE_ID_PIN_BK              = 4170;
 	public static final int FEATURE_ID_PIN_BQ              = 4180;
 	public static final int FEATURE_ID_PIN_BR              = 4190;
 	public static final int FEATURE_ID_PIN_BN              = 4200;
@@ -116,7 +116,7 @@ public interface IFeaturesConstants {
 	public static final int FEATURE_ID_PIN_QQ              = 4260;
 	public static final int FEATURE_ID_PIN_QN              = 4270;
 	public static final int FEATURE_ID_PIN_QR              = 4280;
-	public static final int FEATURE_ID_PIN_QB              = 4290;*/
+	public static final int FEATURE_ID_PIN_QB              = 4290;
 	
 	public static final int FEATURE_ID_ATTACK_BIGGER_PIECE = 4310;
 	public static final int FEATURE_ID_ATTACK_EQUAL_PIECE  = 4320;

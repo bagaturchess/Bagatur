@@ -2427,10 +2427,11 @@ public class SignalFiller extends SignalFillerConstants implements IFeaturesCons
 		}
 		
 		
-		signals.getSignal(FEATURE_ID_PENETRATION_OP).addStrength(w_penetration_op_area - b_penetration_op_area, openingPart);
+		/*signals.getSignal(FEATURE_ID_PENETRATION_OP).addStrength(w_penetration_op_area - b_penetration_op_area, openingPart);
 		signals.getSignal(FEATURE_ID_PENETRATION_OP_S).addStrength(w_penetration_op_area_safe - b_penetration_op_area_safe, openingPart);
 		signals.getSignal(FEATURE_ID_PENETRATION_KING).addStrength(w_penetration_king_area - b_penetration_king_area, openingPart);
 		signals.getSignal(FEATURE_ID_PENETRATION_KING_S).addStrength(w_penetration_king_area_safe - b_penetration_king_area_safe, openingPart);
+		*/
 	}
 	
 	
