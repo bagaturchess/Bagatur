@@ -186,6 +186,19 @@ public class Utils {
   	return number3 == Bits.NUMBER_0;
   }
   
+  
+  public static double[] reverseSpecial_100_256(double[] arr) {
+	  	
+	  	reverseSpecial(arr);
+	  	
+	  	for (int i = 0; i < arr.length; i++) {
+	  		arr[i] = (int) ((arr[i] * 100d) / 256d);
+	  	}
+	  	
+	  	return arr;
+  }
+  
+  
   public static double[] reverseSpecial(double[] arr) {
 	  	if (arr.length != 64) {
 	  		throw new IllegalStateException();
@@ -202,7 +215,7 @@ public class Utils {
 	  	reverse(arr, 56, 64);
 	  	
 	  	return arr;
-	  }
+  }
   
   public static byte[] reverseSpecial(byte[] arr) {
 	  	if (arr.length != 64) {
