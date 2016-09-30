@@ -5,14 +5,18 @@ import bagaturchess.bitboard.api.IBaseEval;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IMaterialFactor;
 import bagaturchess.bitboard.common.CastlingType;
+import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.eval.BaseEvalWeights;
+import bagaturchess.bitboard.impl.eval.pawns.model.Pawn;
+import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModel;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.plies.CastlePlies;
 import bagaturchess.bitboard.impl.plies.OfficerPlies;
 import bagaturchess.bitboard.impl.state.PiecesList;
+import bagaturchess.engines.bagatur.eval.BagaturPawnsEval;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.internal.EvaluatorAdapter;
 import bagaturchess.search.api.internal.ISearch;
@@ -33,6 +37,12 @@ public class Eval_V15 extends EvaluatorAdapter implements Weights_V15 {
 	private static double INT3 = INT_MIN;
 	private static double INT4 = INT_MIN;
 	private static double INT_DEVIDE_FACTOR = 1;
+	
+	
+	public static final long RANK_7TH = Fields.DIGIT_7;
+	public static final long RANK_8TH = Fields.DIGIT_8;
+	public static final long RANK_2TH = Fields.DIGIT_2;
+	public static final long RANK_1TH = Fields.DIGIT_1;
 	
 	
 	private IBitBoard bitboard;	
@@ -161,7 +171,7 @@ public class Eval_V15 extends EvaluatorAdapter implements Weights_V15 {
 		int eval = 0;
 		
 		
-		evalInfo.clear_short();
+		evalInfo.clear();
 		
 		eval_material_nopawnsdrawrule();
 		eval_trading();
@@ -185,6 +195,14 @@ public class Eval_V15 extends EvaluatorAdapter implements Weights_V15 {
 												evalInfo.eval_PawnsPassedKing_e +
 												evalInfo.eval_PawnsUnstoppable_e);
 		
+		evalInfo.clear();
+		initEvalInfo1();
+		eval_pawns_RooksAndQueens();
+		eval += interpolator.interpolateByFactor(evalInfo.eval_PawnsPassedStoppers_o +
+												evalInfo.eval_PawnsRooksQueens_o,
+												
+												evalInfo.eval_PawnsPassedStoppers_e +
+												evalInfo.eval_PawnsRooksQueens_e);
 		
 		if (USE_CACHE && evalCache != null) {
 			evalCache.lock();
@@ -294,17 +312,47 @@ public class Eval_V15 extends EvaluatorAdapter implements Weights_V15 {
 		}
 		
 		
+		evalInfo.clear();
+		
+		initEvalInfo1();
+		eval_pawns_RooksAndQueens();
+		int eval3 = interpolator.interpolateByFactor(evalInfo.eval_PawnsPassedStoppers_o +
+												evalInfo.eval_PawnsRooksQueens_o,
+												
+												evalInfo.eval_PawnsPassedStoppers_e +
+												evalInfo.eval_PawnsRooksQueens_e);
+		eval += eval3;
+		
+		eval_tmp = returnVal(eval);
+		if (eval_tmp + INT3 <= alpha || eval_tmp - INT3 >= beta) {
+			if (USE_LAZY) {
+				return eval_tmp;
+			}
+		}
+		
+		
 		if (eval >= ISearch.MAX_MAT_INTERVAL || eval <= -ISearch.MAX_MAT_INTERVAL) {
 			throw new IllegalStateException();
 		}
 		
 		
-		double int1 = Math.abs(eval2);
-		
+		double int1 = Math.abs(eval2 + eval3 /* + eval4 + eval5*/);
+		double int2 = Math.abs(eval3 /* + eval4 + eval5*/);
+		//double int3 = Math.abs(eval4 + eval5);
+		//double int4 = Math.abs(eval5);
 		
 		if (int1 > INT1) {
 			INT1 = int1 / INT_DEVIDE_FACTOR;
 		}
+		if (int2 > INT2) {
+			INT2 = int2 / INT_DEVIDE_FACTOR;
+		}
+		/*if (int3 > INT3) {
+			INT3 = int3 / INT_DEVIDE_FACTOR;
+		}
+		if (int4 > INT4) {
+			INT4 = int4 / INT_DEVIDE_FACTOR;
+		}*/
 		
 		if (USE_CACHE && evalCache != null) {
 			evalCache.lock();
@@ -389,6 +437,14 @@ public class Eval_V15 extends EvaluatorAdapter implements Weights_V15 {
 												evalInfo.eval_PawnsPassedKing_e +
 												evalInfo.eval_PawnsUnstoppable_e);
 		
+		evalInfo.clear();
+		initEvalInfo1();
+		eval_pawns_RooksAndQueens();
+		eval += interpolator.interpolateByFactor(evalInfo.eval_PawnsPassedStoppers_o +
+												evalInfo.eval_PawnsRooksQueens_o,
+												
+												evalInfo.eval_PawnsPassedStoppers_e +
+												evalInfo.eval_PawnsRooksQueens_e);
 		
 		return returnVal(eval);
 	}
@@ -875,6 +931,191 @@ public class Eval_V15 extends EvaluatorAdapter implements Weights_V15 {
 		
 		return eval;
 	}
+	
+	
+	private void initEvalInfo1() {
+		evalInfo.bb_all_w_pieces = bitboard.getFiguresBitboardByColour(Figures.COLOUR_WHITE);
+		evalInfo.bb_all_b_pieces = bitboard.getFiguresBitboardByColour(Figures.COLOUR_BLACK);
+		evalInfo.bb_all = evalInfo.bb_all_w_pieces | evalInfo.bb_all_b_pieces;
+		evalInfo.bb_w_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
+		evalInfo.bb_b_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
+		evalInfo.bb_w_bishops = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER);
+		evalInfo.bb_b_bishops = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER);
+		evalInfo.bb_w_knights = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT);
+		evalInfo.bb_b_knights = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT);		
+		evalInfo.bb_w_queens = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN);
+		evalInfo.bb_b_queens = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN);
+		evalInfo.bb_w_rooks = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_CASTLE);
+		evalInfo.bb_b_rooks = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_CASTLE);
+		evalInfo.bb_w_king = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KING);
+		evalInfo.bb_b_king = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KING);
+	}
+	
+	
+	private void eval_pawns_RooksAndQueens() {
+		
+		
+		bitboard.getPawnsCache().lock();
+		PawnsModelEval pawnsModelEval = bitboard.getPawnsStructure();
+		PawnsModel pmodel = pawnsModelEval.getModel();
+		
+		long bb_wpawns_attacks = pmodel.getWattacks();
+		long bb_bpawns_attacks = pmodel.getBattacks();
+		evalInfo.bb_wpawns_attacks = bb_wpawns_attacks;
+		evalInfo.bb_bpawns_attacks = bb_bpawns_attacks;
+		evalInfo.w_kingOpened = pmodel.getWKingOpenedFiles() + pmodel.getWKingSemiOpOpenedFiles() + pmodel.getWKingSemiOwnOpenedFiles();
+		evalInfo.b_kingOpened = pmodel.getBKingOpenedFiles() + pmodel.getBKingSemiOpOpenedFiles() + pmodel.getBKingSemiOwnOpenedFiles();
+		//evalInfo.w_gards = ((BagaturPawnsEval)pawnsModelEval).getWGardsScores();
+		//evalInfo.b_gards = ((BagaturPawnsEval)pawnsModelEval).getBGardsScores();
+		evalInfo.open_files = pmodel.getOpenedFiles();
+		evalInfo.half_open_files_w = pmodel.getWHalfOpenedFiles();
+		evalInfo.half_open_files_b = pmodel.getBHalfOpenedFiles();
+		
+		
+		int w_passed_pawns_count = pmodel.getWPassedCount();
+		if (w_passed_pawns_count > 0) {
+			Pawn[] w_passed_pawns = pmodel.getWPassed();
+			for (int i=0; i<w_passed_pawns_count; i++) {
+				Pawn p = w_passed_pawns[i];
+				long stoppers = p.getFront() & evalInfo.bb_all;
+				if (stoppers != 0) {
+					int stoppersCount = Utils.countBits_less1s(stoppers);
+					evalInfo.eval_PawnsPassedStoppers_o -= (stoppersCount * PAWNS_PASSED_O[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_e -= (stoppersCount * PAWNS_PASSED_E[p.getRank()]) / 4;
+				}
+			}
+		}
+		int b_passed_pawns_count = pmodel.getBPassedCount();
+		if (b_passed_pawns_count > 0) {
+			Pawn[] b_passed_pawns = pmodel.getBPassed();
+			for (int i=0; i<b_passed_pawns_count; i++) {
+				Pawn p = b_passed_pawns[i];
+				long stoppers = p.getFront() & evalInfo.bb_all;
+				if (stoppers != 0) {
+					int stoppersCount = Utils.countBits_less1s(stoppers);
+					evalInfo.eval_PawnsPassedStoppers_o += (stoppersCount * PAWNS_PASSED_O[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_e += (stoppersCount * PAWNS_PASSED_E[p.getRank()]) / 4;
+				}
+			}
+		}
+		bitboard.getPawnsCache().unlock();
+		
+		
+		int rooks_opened = 0;
+		int rooks_semiopened = 0;
+		int rooks_7th2th = 0;
+		
+		int w_rooks_count = w_rooks.getDataSize();
+		if (w_rooks_count > 0) {
+			int[] w_rooks_fields = w_rooks.getData();
+			for (int i=0; i<w_rooks_count; i++) {
+				
+				int fieldID = w_rooks_fields[i];
+				long bb_field = Fields.ALL_A1H1[fieldID];
+				
+				// Open and half-open files:
+				if ((bb_field & evalInfo.open_files) != 0) {
+					rooks_opened++;
+				} else if ((bb_field & evalInfo.half_open_files_w) != 0) {
+					rooks_semiopened++;
+				}
+				
+				// Rook on 7th rank:
+				if ((bb_field & RANK_7TH) != 0L) {
+					//If there are pawns on 7th rank or king on 8th rank
+					if ((evalInfo.bb_b_pawns & RANK_7TH) != 0L || (evalInfo.bb_b_king & RANK_8TH) != 0L) {
+						rooks_7th2th++;
+					}
+				}
+			}
+		}
+		
+		int b_rooks_count = b_rooks.getDataSize();
+		if (b_rooks_count > 0) {
+			int[] b_rooks_fields = b_rooks.getData();
+			for (int i=0; i<b_rooks_count; i++) {
+				
+				int fieldID = b_rooks_fields[i];
+				long bb_field = Fields.ALL_A1H1[fieldID];
+				
+				// Open and half-open files:
+				if ((bb_field & evalInfo.open_files) != 0) {
+					rooks_opened--;
+				} else if ((bb_field & evalInfo.half_open_files_b) != 0) {
+					rooks_semiopened--;
+				}
+				
+				// Rook on 2th rank:
+				if ((bb_field & RANK_2TH) != 0L) {
+					//If there are pawns on 2th rank or king on 1th rank
+					if ((evalInfo.bb_w_pawns & RANK_2TH) != 0L || (evalInfo.bb_w_king & RANK_1TH) != 0L) {
+						rooks_7th2th--;
+					}
+				}
+			}
+		}
+		
+		evalInfo.eval_PawnsRooksQueens_o += rooks_opened * PAWNS_ROOK_OPENED_O;
+		evalInfo.eval_PawnsRooksQueens_e += rooks_opened * PAWNS_ROOK_OPENED_E;
+		
+		evalInfo.eval_PawnsRooksQueens_o += rooks_semiopened * PAWNS_ROOK_SEMIOPENED_O;
+		evalInfo.eval_PawnsRooksQueens_e += rooks_semiopened * PAWNS_ROOK_SEMIOPENED_E;
+		
+		evalInfo.eval_PawnsRooksQueens_o += rooks_7th2th * PAWNS_ROOK_7TH2TH_O;
+		evalInfo.eval_PawnsRooksQueens_e += rooks_7th2th * PAWNS_ROOK_7TH2TH_E;
+		
+		
+		int queens_7th2th = 0;
+		int w_queens_count = w_queens.getDataSize();
+		if (w_queens_count > 0) {
+			int[] w_queens_fields = w_queens.getData();
+			for (int i=0; i<w_queens_count; i++) {
+				
+				int fieldID = w_queens_fields[i];
+				long bb_field = Fields.ALL_A1H1[fieldID];
+				
+				// Queen on 7th rank:
+				if ((bb_field & RANK_7TH) != 0L) {
+					//If there are pawns on 7th rank or king on 8th rank
+					if ((evalInfo.bb_b_pawns & RANK_7TH) != 0L || (evalInfo.bb_b_king & RANK_8TH) != 0L) {
+						queens_7th2th++;
+					}
+				}				
+			}
+		}
+		
+		int b_queens_count = b_queens.getDataSize();
+		if (b_queens_count > 0) {
+			int[] b_queens_fields = b_queens.getData();
+			for (int i=0; i<b_queens_count; i++) {
+				
+				int fieldID = b_queens_fields[i];
+				long bb_field = Fields.ALL_A1H1[fieldID];
+				
+				// Queen on 1th rank:
+				if ((bb_field & RANK_2TH) != 0L) {
+					//If there are pawns on 2th rank or king on 1th rank
+					if ((evalInfo.bb_w_pawns & RANK_2TH) != 0L || (evalInfo.bb_w_king & RANK_1TH) != 0L) {
+						queens_7th2th--;
+					}
+				}
+			}
+		}
+		
+		evalInfo.eval_PawnsRooksQueens_o += queens_7th2th * PAWNS_QUEEN_7TH2TH_O;
+		evalInfo.eval_PawnsRooksQueens_e += queens_7th2th * PAWNS_QUEEN_7TH2TH_E;
+		
+		
+		int kingOpened = 0;
+		if (b_rooks.getDataSize() > 0 || b_queens.getDataSize() > 0) {
+			kingOpened += evalInfo.w_kingOpened;
+		}
+	    if (w_rooks.getDataSize() > 0 || w_queens.getDataSize() > 0) {
+	    	kingOpened -= evalInfo.b_kingOpened;
+	    }
+	    evalInfo.eval_PawnsRooksQueens_o += kingOpened * PAWNS_KING_OPENED_O;
+	}
+	
 	
 	private long bishopAttacks(int fieldID, long blockers) {
 		

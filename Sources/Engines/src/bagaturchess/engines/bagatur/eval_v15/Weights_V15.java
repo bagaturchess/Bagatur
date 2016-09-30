@@ -14,9 +14,9 @@ public interface Weights_V15 {
 	/**
 	 * Standard bonuses and penalties
 	 */
-	public static final int STANDARD_TEMPO_O				= 25;
-	public static final int STANDARD_TEMPO_E				= 35;
-	public static final int STANDARD_CASTLING_O				= 10;
+	public static final int STANDARD_TEMPO_O				= 33;
+	public static final int STANDARD_TEMPO_E				= 33;
+	public static final int STANDARD_CASTLING_O				= 25;
 	public static final int STANDARD_CASTLING_E				= 0;
 	public static final int STANDARD_FIANCHETTO             = 30;
 	public static final int STANDARD_TRAP_BISHOP			= -120;
@@ -29,18 +29,28 @@ public interface Weights_V15 {
 	 * Pawns bonuses and penalties
 	 */
 	public static final int PAWNS_KING_GUARDS				= 10;
-	public static final int[] PAWNS_DOUBLED_O				= new int[] {-12, -11, -6, -3};
-	public static final int[] PAWNS_DOUBLED_E				= new int[] {-19, -17, -16, -13};
-	public static final int[] PAWNS_ISOLATED_O				= new int[] {-3, -6, -11, -12};
-	public static final int[] PAWNS_ISOLATED_E				= new int[] {-13, -16, -17, -19};
-	public static final int[] PAWNS_BACKWARD_O				= new int[] {-1, -3, -5, -6};
-	public static final int[] PAWNS_BACKWARD_E				= new int[] {-6, -8, -9, -10};
-	public static final int[] PAWNS_SUPPORTED_O				= new int[] {1, 3, 5, 6};
-	public static final int[] PAWNS_SUPPORTED_E				= new int[] {6, 8, 9, 10};
-	public static final int[] PAWNS_CANDIDATE_O				= new int[] {0, 1, 2, 5, 9, 18};
-	public static final int[] PAWNS_CANDIDATE_E				= new int[] {0, 2, 7, 11, 26, 72};
-	public static final int[] PAWNS_PASSED_O				= new int[] {0, 11, 11, 11, 26, 40, 65};
-	public static final int[] PAWNS_PASSED_E				= new int[] {0, 7, 7, 25, 63, 134, 186};
-	public static final int[] PAWNS_PASSED_SUPPORTED_O		= new int[] {0, 13, 13, 21, 41, 62, 124};
-	public static final int[] PAWNS_PASSED_SUPPORTED_E		= new int[] {0, 9, 12, 31, 79, 178, 299};
+	public static final int[] PAWNS_DOUBLED_O				= new int[] {-11, -7, -7, -3};
+	public static final int[] PAWNS_DOUBLED_E				= new int[] {-19, -15, -15, -11};
+	public static final int[] PAWNS_ISOLATED_O				= new int[] {-14, -18, -18, -22};
+	public static final int[] PAWNS_ISOLATED_E				= new int[] {-12, -16, -16, -20};
+	public static final int[] PAWNS_BACKWARD_O				= new int[] {-18, -22, -22, -26};
+	public static final int[] PAWNS_BACKWARD_E				= new int[] {-9, -13, -13, -17};
+	public static final int[] PAWNS_SUPPORTED_O				= new int[] {4, 8, 8, 12};
+	public static final int[] PAWNS_SUPPORTED_E				= new int[] {1, 5, 5, 9};
+	public static final int[] PAWNS_CANDIDATE_O				= new int[] {0, 5, 10, 15, 20, 25};
+	public static final int[] PAWNS_CANDIDATE_E				= new int[] {0, 10, 20, 30, 40, 70};
+	public static final int[] PAWNS_PASSED_O				= new int[] {0, 20, 30, 40, 50, 60, 70};
+	public static final int[] PAWNS_PASSED_E				= new int[] {0, 40, 60, 80, 100, 130, 180};
+	public static final int[] PAWNS_PASSED_SUPPORTED_O		= new int[] {0, 40, 50, 60, 70, 80, 90};
+	public static final int[] PAWNS_PASSED_SUPPORTED_E		= new int[] {0, 60, 80, 100, 120, 150, 200};
+	
+	public static final int PAWNS_KING_OPENED_O				= -20;
+	public static final int PAWNS_ROOK_OPENED_O				= 30;
+	public static final int PAWNS_ROOK_OPENED_E				= 30;
+	public static final int PAWNS_ROOK_SEMIOPENED_O			= 20;
+	public static final int PAWNS_ROOK_SEMIOPENED_E			= 20;
+	public static final int PAWNS_ROOK_7TH2TH_O				= 20;
+	public static final int PAWNS_ROOK_7TH2TH_E				= 20;
+	public static final int PAWNS_QUEEN_7TH2TH_O			= 15;
+	public static final int PAWNS_QUEEN_7TH2TH_E			= 15;
 }

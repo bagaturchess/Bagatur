@@ -135,7 +135,7 @@ public class PawnsEval_V15 extends PawnsModelEval implements Weights_V15 {
 				if (p.isCandidate()) {
 					passersEval_o += PAWNS_CANDIDATE_O[rank];
 					passersEval_e += PAWNS_CANDIDATE_E[rank];
-				} else if (p.isPassed() && !p.isDoubled()) {
+				} else if (p.isPassed()) {
 					if (p.isSupported()) {
 						passersEval_o += PAWNS_PASSED_SUPPORTED_O[rank];
 						passersEval_e += PAWNS_PASSED_SUPPORTED_E[rank];
@@ -223,7 +223,7 @@ public class PawnsEval_V15 extends PawnsModelEval implements Weights_V15 {
 				if (p.isCandidate()) {
 					passersEval_o -= PAWNS_CANDIDATE_O[rank];
 					passersEval_e -= PAWNS_CANDIDATE_E[rank];
-				} else if (p.isPassed() && !p.isDoubled()) {
+				} else if (p.isPassed()) {
 					if (p.isSupported()) {
 						passersEval_o -= PAWNS_PASSED_SUPPORTED_O[rank];
 						passersEval_e -= PAWNS_PASSED_SUPPORTED_E[rank];

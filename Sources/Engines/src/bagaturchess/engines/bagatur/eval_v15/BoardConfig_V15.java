@@ -10,7 +10,7 @@ public class BoardConfig_V15 implements IBoardConfig {
 	
 	private double MATERIAL_PAWN_O 		= 73;
 	private double MATERIAL_PAWN_E 		= 97;
-		
+	
 	private double MATERIAL_KNIGHT_O 	= 295;
 	private double MATERIAL_KNIGHT_E 	= 325;
 	
@@ -97,7 +97,7 @@ public class BoardConfig_V15 implements IBoardConfig {
 			 -97,  -82,  -46,  -14,  -14,  -46,  -82,  -97,
 			});
 	
-	public static final double[] BISHOP_O			= Utils.reverseSpecial(new double[] {
+	public static final double[] BISHOP_O			= Utils.reverseSpecial_100_256(new double[] {
 			-45,  -21,  -29,  -39,  -39,  -29,  -21,  -45,
 			-33,    7,   -4,  -12,  -12,   -4,    7,  -33,
 			-27,    6,    2,   -8,   -8,    2,    6,  -27,
@@ -108,7 +108,7 @@ public class BoardConfig_V15 implements IBoardConfig {
 			-54,  -23,  -35,  -44,  -44,  -35,  -23,  -54,
 			});
 	
-	private static final double[] BISHOP_E			= Utils.reverseSpecial(new double[] {
+	private static final double[] BISHOP_E			= Utils.reverseSpecial_100_256(new double[] {
 			-65,  -42,  -46,  -27,  -27,  -46,  -42,  -65,
 			-44,  -21,  -22,   -4,   -4,  -22,  -21,  -44,
 			-35,  -13,  -10,    1,    1,  -10,  -13,  -35,
@@ -119,7 +119,7 @@ public class BoardConfig_V15 implements IBoardConfig {
 			-68,  -40,  -46,  -28,  -28,  -46,  -40,  -68,
 			});
 	
-	private static final double[] ROOK_O			= Utils.reverseSpecial(new double[] {   
+	private static final double[] ROOK_O			= Utils.reverseSpecial_100_256(new double[] {   
 			-23,  -15,  -11,   -5,   -5,  -11,  -15,  -23,
 			-12,    4,    8,   12,   12,    8,    4,  -12,
 			-21,   -7,    0,    2,    2,    0,   -7,  -21,
@@ -130,7 +130,7 @@ public class BoardConfig_V15 implements IBoardConfig {
 			-25,  -16,  -16,   -9,   -9,  -16,  -16,  -25,
 			});
 
-	private static final double[] ROOK_E			= Utils.reverseSpecial(new double[] {
+	private static final double[] ROOK_E			= Utils.reverseSpecial_100_256(new double[] {
 			0,   0,   0,   0,   0,   0,   0,   0,   
 			0,   0,   0,   0,   0,   0,   0,   0,   
 			0,   0,   0,   0,   0,   0,   0,   0,   
@@ -141,7 +141,7 @@ public class BoardConfig_V15 implements IBoardConfig {
 			0,   0,   0,   0,   0,   0,   0,   0,   
 			});
 		  
-	private static final double[] QUEEN_O			= Utils.reverseSpecial(new double[] {   
+	private static final double[] QUEEN_O			= Utils.reverseSpecial_100_256(new double[] {   
 		   -1,   -4,   -1,    0,   0,  -1,  -4,   -1,
 		   -2,    7,    7,    6,   6,   7,   7,   -2,		   
 		   -2,    6,    8,   10,  10,   8,   6,   -2,
@@ -152,7 +152,7 @@ public class BoardConfig_V15 implements IBoardConfig {
 			0,   -3,   -4,   -1,  -1,  -4,  -3,   0,
 			});
 
-	private static final double[] QUEEN_E			= Utils.reverseSpecial(new double[] {
+	private static final double[] QUEEN_E			= Utils.reverseSpecial_100_256(new double[] {
 			-75,   -54,   -44,   -30,  -30,  -44,  -54,  -75,
 			-54,   -30,   -21,    -7,   -7,  -21,  -30,  -54,		
 			-40,   -16,   -11,     3,    3,  -11,  -16,  -40,
