@@ -110,8 +110,10 @@ public class MTDSchedulerMain {
 								//"bagaturchess.engines.material.MaterialBoardConfigImpl",
 								//"bagaturchess.engines.material.MaterialEvalConfigImpl"
 								
-								"bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl",
-								"bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2"
+								//"bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl",
+								//"bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2"
+								bagaturchess.engines.bagatur.eval_v15.BoardConfig_V15.class.getName(),
+								bagaturchess.engines.bagatur.eval_v15.EvalConfig_V15.class.getName()
 								
 								//"bagaturchess.engines.bagatur.v14.EvaluationConfg13"
 								
