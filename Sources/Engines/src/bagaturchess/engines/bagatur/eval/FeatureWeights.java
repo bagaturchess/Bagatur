@@ -112,6 +112,15 @@ public interface FeatureWeights {
 	
 	
 	/**
+	 * Attacks
+	 */
+	public static final int ATTACKS_MINOR_MINOR		= 30;
+	public static final int ATTACKS_MINOR_MAJOR		= 50;
+	public static final int ATTACKS_MAJOR_MINOR		= 30;
+	public static final int ATTACKS_MAJOR_MAJOR		= 40;
+	
+	
+	/**
 	 * Fields states iteration
 	 */
 	public static final int[] KING_SAFETY			= new int[] {0, -1, -2, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -20, -21, -22, -23, -26, -28, -30, -33, -34, -37, -40, -41, -43, -49, -50, -55, -58, -60, -64, -68, -69, -76, -77, -79, -90, -91, -92, -96, -97, -98, -102, -103, -104, -110, -111, -112, -113, -113, -114, -115, -116, -118, -119, -120, -121, -122, -123, -124, -125, -125, -126, -127, -128, -129, -130, -131, -132, -133, -134, -135, -136, -137, -138, -139, -140, -141, -142, -143, -144, -145, -146, -147, -148, -149, -150, -151, -152, -153, -154, -155, -156, -157, -158, -159};
