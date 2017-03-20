@@ -4,12 +4,12 @@
  * To change the template for this generated file go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-package eval;
+package bagaturchess.learning.goldmiddle.impl.cfg.backup1;
 
 import bagaturchess.bitboard.common.Utils;
 
 
-class PSTConstants {
+public class PSTConstants {
 	
 	public static final double[] ZEROS = Utils.reverseSpecial ( new double[]{	
 			   0,   0,   0,   0,   0,   0,   0,   0,
@@ -162,6 +162,29 @@ class PSTConstants {
 			   64,   64,   64,   64,   64,   64,   64,  64,
 			   64,   64,   64,   64,   64,   64,   64,  64,
 	});
+	
+	public static final double[] KING_O_MIN = Utils.reverseSpecial ( new double[]{
+			-128,   -128,   -128,   -128,   -128,   -128,   -128,   -128,   
+			-128,   -128,   -128,   -128,   -128,   -128,   -128,   -128,   
+			-128,   -128,   -128,   -128,   -128,   -128,   -128,   -128,   
+			-128,   -128,   -128,   -128,   -128,   -128,   -128,   -128,   
+			-128,   -128,   -128,   -128,   -128,   -128,   -128,   -128,    
+			-128,   -128,   -128,   -128,   -128,   -128,   -128,   -128,   
+			-128,   -128,   -128,   -128,   -128,   -128,   -128,   -128,   
+			-128,   -128,   -128,   -128,   -128,   -128,   -128,   -128,   
+	});	
+	
+	public static final double[] KING_O_MAX = Utils.reverseSpecial ( new double[]{
+			-128,   -128,   -128,   -128,   -128,   -128,   -128,   -128,   
+			-128,   -128,   -128,   -128,   -128,   -128,   -128,   -128,   
+			-128,   -128,   -128,   -128,   -128,   -128,   -128,   -128,   
+			-128,   -128,   -128,   -128,   -128,   -128,   -128,   -128,   
+			128,   128,   128,   128,   128,   128,   128,   128,    
+			128,   128,   128,   128,   128,   128,   128,   128,  
+			128,   128,   128,   128,   128,   128,   128,   128,  
+			128,   128,   128,   128,   128,   128,   128,   128,
+	});
+	
 	
 	/**
 	 * KNIGHTS

@@ -1,6 +1,8 @@
 package cfg;
 
 
+import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory;
+import bagaturchess.learning.impl.eval.FeaturesEvaluatorFactory;
 import bagaturchess.search.api.IEvalConfig;
 
 
@@ -8,22 +10,22 @@ public class EvaluationConfg implements IEvalConfig {
 
 	@Override
 	public boolean useLazyEval() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean useEvalCache() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public String getEvaluatorFactoryClassName() {
-		return "eval.EvaluatorLearningFactory";
+		return FeaturesEvaluatorFactory.class.getName();
 	}
 
 	@Override
 	public String getPawnsCacheFactoryClassName() {
-		return "bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory";
+		return PawnsModelEvalFactory.class.getName();
 	}
 
 }

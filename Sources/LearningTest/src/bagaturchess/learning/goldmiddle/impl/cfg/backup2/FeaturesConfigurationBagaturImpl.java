@@ -1,4 +1,4 @@
-package eval.v2;
+package bagaturchess.learning.goldmiddle.impl.cfg.backup2;
 
 
 import java.util.Set;
@@ -7,7 +7,7 @@ import java.util.TreeSet;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.IFeaturesConfiguration;
-import bagaturchess.learning.impl.PSTConstants;
+import bagaturchess.learning.goldmiddle.impl.cfg.backup1.PSTConstants;
 import bagaturchess.learning.impl.features.impl1.FeatureArray;
 import bagaturchess.learning.impl.features.impl1.FeaturePST;
 import bagaturchess.learning.impl.features.impl1.FeatureSingle;

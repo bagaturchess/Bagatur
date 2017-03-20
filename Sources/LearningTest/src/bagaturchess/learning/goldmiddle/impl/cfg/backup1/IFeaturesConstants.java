@@ -1,4 +1,4 @@
-package eval.v1;
+package bagaturchess.learning.goldmiddle.impl.cfg.backup1;
 
 public interface IFeaturesConstants {
 	
