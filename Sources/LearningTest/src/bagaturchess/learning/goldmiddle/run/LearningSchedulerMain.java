@@ -25,7 +25,6 @@
 package bagaturchess.learning.goldmiddle.run;
 
 
-import cfg.RootSearchConfig_SingleCore_MTD_LEARNING;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
