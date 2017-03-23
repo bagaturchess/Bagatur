@@ -9,7 +9,6 @@ import java.util.TreeSet;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.IFeaturesConfiguration;
-import bagaturchess.learning.api.IFeaturesConstants;
 import bagaturchess.learning.impl.features.advanced.AdjustableFeatureArray;
 import bagaturchess.learning.impl.features.advanced.AdjustableFeaturePST;
 import bagaturchess.learning.impl.features.advanced.AdjustableFeatureSingle;

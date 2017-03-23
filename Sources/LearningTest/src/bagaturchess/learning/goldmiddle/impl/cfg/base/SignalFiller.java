@@ -21,7 +21,6 @@ import bagaturchess.bitboard.impl.plies.OfficerPlies;
 import bagaturchess.bitboard.impl.plies.WhitePawnPlies;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.learning.api.IFeatureComplexity;
-import bagaturchess.learning.api.IFeaturesConstants;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 

@@ -12,20 +12,17 @@ import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.IFeatureComplexity;
-import bagaturchess.learning.api.IFeaturesConstants;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
-import bagaturchess.learning.goldmiddle.impl.cfg.base.SignalFiller;
 import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.EvaluatorAdapter;
-import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
 
 
-public class FeaturesEvaluator extends EvaluatorAdapter implements IFeaturesConstants {
+public class FeaturesEvaluator extends EvaluatorAdapter {
 	
 	
 	private boolean useEvalCache = false;
