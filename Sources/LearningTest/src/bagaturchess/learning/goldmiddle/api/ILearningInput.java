@@ -17,23 +17,18 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.learning.goldmiddle.impl.cfg.base;
+package bagaturchess.learning.goldmiddle.api;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.learning.api.ISignalFiller;
-import bagaturchess.learning.goldmiddle.api.ILearningInput;
 
 
-public class LearningInputImpl implements ILearningInput {
+public interface ILearningInput {
 	
 	
-	public ISignalFiller createFiller(IBitBoard bitboard) {
-		return new SignalFiller(bitboard);
-	}
+	public ISignalFiller createFiller(IBitBoard bitboard);
 	
 	
-	public String getFeaturesConfigurationClassName() {
-		return FeaturesConfigurationBagaturImpl.class.getName();
-	}
+	public String getFeaturesConfigurationClassName();
 }

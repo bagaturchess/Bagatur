@@ -22,9 +22,10 @@ package bagaturchess.learning.goldmiddle.impl.cfg.stockfish7;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.learning.api.ISignalFiller;
+import bagaturchess.learning.goldmiddle.api.ILearningInput;
 
 
-public class SF7_LearningInputImpl {
+public class SF7_LearningInputImpl implements ILearningInput {
 	
 	
 	public ISignalFiller createFiller(IBitBoard bitboard) {

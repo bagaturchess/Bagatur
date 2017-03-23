@@ -4,8 +4,10 @@ package bagaturchess.learning.goldmiddle.impl.eval;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
+import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.impl.cfg.base.LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.base.SignalFiller;
+import bagaturchess.learning.goldmiddle.impl.cfg.stockfish7.SF7_LearningInputImpl;
 import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
@@ -22,7 +24,7 @@ public class FeaturesEvaluatorFactory implements IEvaluatorFactory {
 	@Override
 	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache, IEvalConfig evalConfig) {
 		
-		LearningInputImpl input = new LearningInputImpl();
+		ILearningInput input = new SF7_LearningInputImpl();
 		ISignalFiller filler = input.createFiller(bitboard);
 		
 		Features features = createFeatures();
@@ -34,7 +36,7 @@ public class FeaturesEvaluatorFactory implements IEvaluatorFactory {
 	@Override
 	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache) {
 		
-		LearningInputImpl input = new LearningInputImpl();
+		ILearningInput input = new SF7_LearningInputImpl();
 		ISignalFiller filler = input.createFiller(bitboard);
 		
 		Features features = createFeatures();
