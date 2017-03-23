@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.base;
+package bagaturchess.learning.goldmiddle.impl.cfg.stockfish7;
 
 
 import java.util.Set;
@@ -15,7 +15,7 @@ import bagaturchess.learning.impl.features.advanced.AdjustableFeatureSingle;
 import bagaturchess.learning.impl.utils.PSTConstants;
 
 
-public class FeaturesConfigurationBagaturImpl implements IFeaturesConfiguration, IFeatureComplexity, FeaturesConstants {
+public class SF7_FeaturesConfigurationBagaturImpl implements IFeaturesConfiguration, IFeatureComplexity, SF7_FeaturesConstants {
 	
 	
 	public IFeature[] getDefinedFeatures() {
