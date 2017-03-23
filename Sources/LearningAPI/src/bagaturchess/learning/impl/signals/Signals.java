@@ -7,7 +7,7 @@ import java.util.Map;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignals;
-import bagaturchess.learning.impl.features.impl1.Features;
+import bagaturchess.learning.impl.features.baseimpl.Features;
 
 
 public class Signals implements ISignals {

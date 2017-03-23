@@ -2,7 +2,7 @@ package bagaturchess.engines.learning.cfg.weights;
 
 
 import bagaturchess.bitboard.api.IBoardConfig;
-import bagaturchess.learning.impl.filler.SignalFillerConstants;
+import bagaturchess.learning.goldmiddle.impl.cfg.SignalFillerConstants;
 
 
 public class WeightsBoardConfig implements IBoardConfig {

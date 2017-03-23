@@ -5,8 +5,8 @@ import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.eval.pawns.model.Pawn;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModel;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
+import bagaturchess.learning.goldmiddle.impl.cfg.SignalFillerConstants;
 import bagaturchess.learning.impl.eval.cfg.Weights;
-import bagaturchess.learning.impl.filler.SignalFillerConstants;
 
 
 public class PawnsEval extends PawnsModelEval implements Weights {

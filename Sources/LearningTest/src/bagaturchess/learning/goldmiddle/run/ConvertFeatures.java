@@ -8,8 +8,8 @@ import java.util.Map;
 
 
 import bagaturchess.learning.api.IFeature;
-import bagaturchess.learning.goldmiddle.impl.cfg.FeaturesConfigurationBagaturImpl;
-import bagaturchess.learning.impl.features.impl1.Features;
+import bagaturchess.learning.goldmiddle.impl.cfg.base.FeaturesConfigurationBagaturImpl;
+import bagaturchess.learning.impl.features.baseimpl.Features;
 
 
 public class ConvertFeatures {

@@ -109,7 +109,7 @@ public class LearningSchedulerMain {
 						
 						"bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl",
 						//"bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2",
-						cfg.EvaluationConfg.class.getName()
+						bagaturchess.learning.goldmiddle.run.cfg.EvaluationConfg.class.getName()
 						
 						//"bagaturchess.engines.learning.cfg.weights.WeightsBoardConfig",
 						//"bagaturchess.engines.learning.cfg.weights.WeightsEvaluationConfig"

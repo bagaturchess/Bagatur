@@ -2,7 +2,7 @@ package bagaturchess.engines.bagatur.v12;
 
 
 import bagaturchess.bitboard.api.IBoardConfig;
-import bagaturchess.learning.impl.filler.SignalFillerConstants;
+import bagaturchess.learning.goldmiddle.impl.cfg.SignalFillerConstants;
 
 
 public class BagaturV12BoardConfig implements IBoardConfig {
