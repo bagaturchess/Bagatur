@@ -1,4 +1,4 @@
-package bagaturchess.engines.bagatur.eval_v15;
+package bagaturchess.engines.bagatur.v15;
 
 
 import bagaturchess.bitboard.api.IBaseEval;
