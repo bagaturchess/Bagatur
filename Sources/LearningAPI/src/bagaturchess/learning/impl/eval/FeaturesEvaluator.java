@@ -81,10 +81,27 @@ public class FeaturesEvaluator extends EvaluatorAdapter implements IFeaturesCons
 		//signals.clear();
 		
 		int colour = bitboard.getColourToMove();
-		//long hashkey = bitboard.getHashKey();
+		long hashkey = bitboard.getHashKey();
 		
-		
-		double eval = 0;
+		if (useEvalCache) {
+			evalCache.lock();
+			IEvalEntry cached = evalCache.get(hashkey);
+			
+			if (cached != null) {
+				if (!cached.isSketch()) {
+					int eval = (int) cached.getEval();
+					evalCache.unlock();
+					if (colour == Figures.COLOUR_WHITE) {
+						return eval;
+					} else {
+						return -eval;
+					}
+				} else {
+					throw new IllegalStateException("cached.isSketch()");
+				}
+			}
+			evalCache.unlock();
+		}
 			
 		IFeature[] featuresByComplexity = features_byComp[IFeatureComplexity.STANDARD];
 		for (int i=0; i<featuresByComplexity.length; i++) {
@@ -100,16 +117,16 @@ public class FeaturesEvaluator extends EvaluatorAdapter implements IFeaturesCons
 			cur_eval += featuresByComplexity[i].eval(signals.getSignal(featuresByComplexity[i].getId()), bitboard.getMaterialFactor().getOpenningPart());
 		}
 		
+		double eval = cur_eval;
 		
 		if (eval > IEvaluator.MAX_EVAL || eval < IEvaluator.MIN_EVAL) {
 			throw new IllegalStateException("eval=" + eval);
 		}
 		
-		int intEval = (int) eval;
 		if (colour == Figures.COLOUR_WHITE) {
-			return intEval;
+			return (int) eval;
 		} else {
-			return -intEval;
+			return - (int) eval;
 		}
 	}
 	
@@ -139,16 +156,7 @@ public class FeaturesEvaluator extends EvaluatorAdapter implements IFeaturesCons
 						return -eval;
 					}
 				} else {
-					int eval = (int) cached.getEval();
-					if (colour != Figures.COLOUR_WHITE) {
-						eval = -eval;
-					}
-					int window = getWindow(1, pvNode);
-					
-					if (eval < alpha - window || eval > beta + window) {
-						evalCache.unlock();
-						return eval;
-					}
+					throw new IllegalStateException("cached.isSketch()");
 				}
 			}
 			evalCache.unlock();
@@ -225,7 +233,7 @@ public class FeaturesEvaluator extends EvaluatorAdapter implements IFeaturesCons
 			throw new IllegalStateException("eval=" + eval);
 		}
 
-		if (useEvalCache) {
+		if (useEvalCache && fullEval) {
 			evalCache.lock();
 			evalCache.put(hashkey, (int) eval, !fullEval);
 			evalCache.unlock();
