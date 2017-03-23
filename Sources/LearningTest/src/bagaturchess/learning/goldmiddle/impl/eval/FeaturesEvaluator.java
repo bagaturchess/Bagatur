@@ -44,9 +44,9 @@ public class FeaturesEvaluator extends EvaluatorAdapter implements IFeaturesCons
 	private int[] eval_buff;
 	
 	
-	public FeaturesEvaluator(IBitBoard _bitboard, EvalCache _evalCache) {
+	/*public FeaturesEvaluator(IBitBoard _bitboard, EvalCache _evalCache) {
 		this(_bitboard, _evalCache, new SignalFiller(_bitboard), null, null);
-	}
+	}*/
 	
 	
 	public FeaturesEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, ISignalFiller _filler, Features _features, ISignals _signals) {

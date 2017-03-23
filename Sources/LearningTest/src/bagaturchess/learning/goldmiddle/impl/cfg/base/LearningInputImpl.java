@@ -1,10 +1,7 @@
-/*
+/**
  *  BagaturChess (UCI chess engine and tools)
  *  Copyright (C) 2005 Krasimir I. Topchiyski (k_topchiyski@yahoo.com)
  *  
- *  Open Source project location: http://sourceforge.net/projects/bagaturchess/develop
- *  SVN repository https://bagaturchess.svn.sourceforge.net/svnroot/bagaturchess
- *
  *  This file is part of BagaturChess program.
  * 
  *  BagaturChess is open software: you can redistribute it and/or modify
@@ -17,17 +14,25 @@
  *  Eclipse Public License for more details.
  *
  *  You should have received a copy of the Eclipse Public License version 1.0
- *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
+ *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.ucitracker.api;
+package bagaturchess.learning.goldmiddle.impl.cfg.base;
+
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.api.IGameStatus;
+import bagaturchess.learning.api.ISignalFiller;
 
 
-public interface PositionsVisitor {
-	public void begin(IBitBoard bitboard) throws Exception;
-	public void end();
-	public void visitPosition(IBitBoard bitboard, IGameStatus status, int whitePlayerEval);
+public class LearningInputImpl {
+	
+	
+	public ISignalFiller createFiller(IBitBoard bitboard) {
+		return new SignalFiller(bitboard);
+	}
+	
+	
+	public String getFeaturesConfigurationClassName() {
+		return FeaturesConfigurationBagaturImpl.class.getName();
+	}
 }

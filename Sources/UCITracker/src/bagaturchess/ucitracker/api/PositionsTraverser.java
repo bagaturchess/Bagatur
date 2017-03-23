@@ -44,7 +44,7 @@ import bagaturchess.ucitracker.impl.gamemodel.serialization.GameModelReader;
 public class PositionsTraverser {
 	
 	
-	public static void traverseAll(String filePath, PositionsVisitor visitor, int maxPositionsCount, IBoardConfig boardConfig, String pawnsCache) throws IOException {
+	public static void traverseAll(String filePath, PositionsVisitor visitor, int maxPositionsCount, IBoardConfig boardConfig, String pawnsCache) throws Exception {
 		DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(filePath), 10 * 1024 * 1024));
 		
 		IBitBoard bitboard = null;
@@ -67,15 +67,15 @@ public class PositionsTraverser {
 		}
 	}
 	
-	public static void traverseAll(String filePath, PositionsVisitor visitor, int maxPositionsCount, IBoardConfig boardConfig) throws IOException {
+	public static void traverseAll(String filePath, PositionsVisitor visitor, int maxPositionsCount, IBoardConfig boardConfig) throws Exception {
 		traverseAll(filePath, visitor, maxPositionsCount, boardConfig, null);
 	}
 	
-	public static void traverseAll(String filePath, PositionsVisitor visitor, int maxPositionsCount) throws IOException {
+	public static void traverseAll(String filePath, PositionsVisitor visitor, int maxPositionsCount) throws Exception {
 		traverseAll(filePath, visitor, maxPositionsCount, null);
 	}
 	
-	public static void traverseAll(String filePath, PositionsVisitor visitor) throws IOException {
+	public static void traverseAll(String filePath, PositionsVisitor visitor) throws Exception {
 		traverseAll(filePath, visitor, Integer.MAX_VALUE);
 	}
 	

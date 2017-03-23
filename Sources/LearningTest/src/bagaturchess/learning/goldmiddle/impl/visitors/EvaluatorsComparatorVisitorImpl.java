@@ -34,6 +34,7 @@ import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.impl.cfg.base.FeaturesConfigurationBagaturImpl;
+import bagaturchess.learning.goldmiddle.impl.cfg.base.LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.base.SignalFiller;
 import bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluator;
 import bagaturchess.learning.impl.features.baseimpl.Features;
@@ -58,24 +59,6 @@ public class EvaluatorsComparatorVisitorImpl implements PositionsVisitor {
 	
 	
 	public EvaluatorsComparatorVisitorImpl() throws Exception {
-		
-		//features = Features.createNewFeatures(FeaturesConfigurationBagaturImpl.class.getName());
-		//if (PERSISTENT) { 
-			Features features_p = Features.load(FeaturesConfigurationBagaturImpl.class.getName(), null);
-			//if (features_p != null) {
-				features = features_p;
-		
-		signals = features.createSignals();
-		
-		featuresArr = features.getFeatures();
-		
-		fs_all = new HashMap<Integer, IFeature>();
-		//fs_ok = new HashMap<Integer, IFeature>();
-		
-		for (int i=0; i < featuresArr.length; i++) {
-			IFeature currFeature = featuresArr[i];
-			fs_all.put(currFeature.getId(), currFeature);
-		}
 	}
 	
 	private int cur_signals_count = 1000;
@@ -179,8 +162,30 @@ public class EvaluatorsComparatorVisitorImpl implements PositionsVisitor {
 	}
 	
 	
-	public void begin(IBitBoard bitboard) {
-		filler = new SignalFiller(bitboard);
+	public void begin(IBitBoard bitboard) throws Exception {
+		
+		LearningInputImpl input = new LearningInputImpl();
+		
+		filler = input.createFiller(bitboard);
+		
+		//features = Features.createNewFeatures(FeaturesConfigurationBagaturImpl.class.getName());
+		//if (PERSISTENT) { 
+			Features features_p = Features.load(input.getFeaturesConfigurationClassName(), null);
+			//if (features_p != null) {
+				features = features_p;
+		
+		signals = features.createSignals();
+		
+		featuresArr = features.getFeatures();
+		
+		fs_all = new HashMap<Integer, IFeature>();
+		//fs_ok = new HashMap<Integer, IFeature>();
+		
+		for (int i=0; i < featuresArr.length; i++) {
+			IFeature currFeature = featuresArr[i];
+			fs_all.put(currFeature.getId(), currFeature);
+		}
+		
 		evaluator1 = new FeaturesEvaluator(bitboard, null, filler, features, signals);
 		evaluator2 = null;//new FastEvaluator(bitboard, null, null);
 	}

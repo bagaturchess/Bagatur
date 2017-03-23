@@ -21,7 +21,7 @@ public class GamesTraverser {
 			String filePath = "./stockfish-7.cg";
 			
 			PositionsTraverser.traverseAll(filePath, new PositionsVisitorImpl());
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		long endTime = System.currentTimeMillis();

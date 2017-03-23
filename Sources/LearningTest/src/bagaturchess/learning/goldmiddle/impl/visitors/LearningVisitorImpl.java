@@ -32,6 +32,7 @@ import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.impl.cfg.base.FeaturesConfigurationBagaturImpl;
+import bagaturchess.learning.goldmiddle.impl.cfg.base.LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.base.SignalFiller;
 import bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluator;
 import bagaturchess.learning.impl.features.advanced.FeaturesMerger;
@@ -62,23 +63,6 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	
 	
 	public LearningVisitorImpl() throws Exception {
-		
-		//features = Features.createNewFeatures(FeaturesConfigurationBagaturImpl.class.getName());
-		//if (PERSISTENT) { 
-			Features features_p = Features.load(FeaturesConfigurationBagaturImpl.class.getName(), new FeaturesMerger());
-			//if (features_p != null) {
-				features = features_p;
-			//}
-		//}
-		signals = features.createSignals();
-		
-		featuresArr = features.getFeatures();
-		
-		/*for (int i=0; i < featuresArr.length; i++) {
-			IFeature currFeature = featuresArr[i];
-			ISignal currSignal = signals.getSignal(currFeature.getId());
-			System.out.println(currSignal);
-		}*/
 	}
 	
 	
@@ -167,14 +151,34 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	}
 	
 	
-	public void begin(IBitBoard bitboard) {
+	public void begin(IBitBoard bitboard) throws Exception {
 		
 		counter = 0;
 		iteration++;
 		sumDiffs1 = 0;
 		sumDiffs2 = 0;
 		
-		filler = new SignalFiller(bitboard);
+		LearningInputImpl input = new LearningInputImpl();
+		
+		filler = input.createFiller(bitboard);
+		
+		//features = Features.createNewFeatures(FeaturesConfigurationBagaturImpl.class.getName());
+		//if (PERSISTENT) { 
+			Features features_p = Features.load(input.getFeaturesConfigurationClassName(), new FeaturesMerger());
+			//if (features_p != null) {
+				features = features_p;
+			//}
+		//}
+		signals = features.createSignals();
+		
+		featuresArr = features.getFeatures();
+		
+		/*for (int i=0; i < featuresArr.length; i++) {
+			IFeature currFeature = featuresArr[i];
+			ISignal currSignal = signals.getSignal(currFeature.getId());
+			System.out.println(currSignal);
+		}*/
+		
 		evaluator = new FeaturesEvaluator(bitboard, null, filler, features, signals);
 	}
 	
