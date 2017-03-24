@@ -63,6 +63,8 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	private double sumDiffs1;
 	private double sumDiffs2;
 	
+	private long startTime;
+	
 	
 	public LearningVisitorImpl() throws Exception {
 	}
@@ -155,6 +157,8 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	
 	public void begin(IBitBoard bitboard) throws Exception {
 		
+		startTime = System.currentTimeMillis();
+		
 		counter = 0;
 		iteration++;
 		sumDiffs1 = 0;
@@ -189,7 +193,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		
 		//System.out.println("***************************************************************************************************");
 		//System.out.println("End iteration " + iteration + ", Total evaluated positions count is " + counter);
-		System.out.println("Iteration " + iteration + ". Success percent before this iteration: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
+		System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success percent before this iteration: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 		for (int i=0; i < featuresArr.length; i++) {
 			IFeature currFeature = featuresArr[i];
 			((IAdjustableFeature)currFeature).applyChanges();

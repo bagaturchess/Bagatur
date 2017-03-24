@@ -125,16 +125,16 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		signals.getSignal(FEATURE_ID_MATERIAL_QUEEN).addStrength(w_queens.getDataSize() - b_queens.getDataSize(), openingPart);
 		
 		signals.getSignal(FEATURE_ID_BISHOPS_DOUBLE).addStrength(((w_bishops.getDataSize() >= 2) ? 1 : 0) - ((b_bishops.getDataSize() >= 2) ? 1 : 0), openingPart);
-		//signals.getSignal(FEATURE_ID_KNIGHTS_DOUBLE).addStrength(((w_knights.getDataSize() >= 2) ? 1 : 0) - ((b_knights.getDataSize() >= 2) ? 1 : 0), openingPart);
-		//signals.getSignal(FEATURE_ID_ROOKS_DOUBLE).addStrength(((w_rooks.getDataSize() >= 2) ? 1 : 0) - ((b_rooks.getDataSize() >= 2) ? 1 : 0), openingPart);
+		signals.getSignal(FEATURE_ID_KNIGHTS_DOUBLE).addStrength(((w_knights.getDataSize() >= 2) ? 1 : 0) - ((b_knights.getDataSize() >= 2) ? 1 : 0), openingPart);
+		signals.getSignal(FEATURE_ID_ROOKS_DOUBLE).addStrength(((w_rooks.getDataSize() >= 2) ? 1 : 0) - ((b_rooks.getDataSize() >= 2) ? 1 : 0), openingPart);
 		
 		signals.getSignal(FEATURE_ID_KINGSAFE_CASTLING).addStrength(castling(Figures.COLOUR_WHITE) - castling(Figures.COLOUR_BLACK), openingPart);
 		fianchetto(signals);
-		//movedFGPawns(signals);
+		movedFGPawns(signals);
 		
 		
 		//Kings Distance
-		/*int kingFieldID_white = w_king.getData()[0];
+		int kingFieldID_white = w_king.getData()[0];
 		int kingFieldID_black = b_king.getData()[0];
 		int kingDistance = Fields.getDistancePoints(kingFieldID_white, kingFieldID_black);
 		int kingsDistanceScores = bitboard.getMaterialFactor().interpolateByFactor(KING_DISTANCE_O[kingDistance], KING_DISTANCE_E[kingDistance]);
@@ -153,11 +153,11 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		
 		signals.getSignal(FEATURE_ID_5PAWNS_ROOKS).addStrength(w_pawns_above5 * w_rooks.getDataSize() - b_pawns_above5 * b_rooks.getDataSize(), openingPart);
 		signals.getSignal(FEATURE_ID_5PAWNS_KNIGHTS).addStrength(w_pawns_above5 * w_knights.getDataSize() - b_pawns_above5 * b_knights.getDataSize(), openingPart);
-		*/
+		
 	}
 	
 	
-	/*private void movedFGPawns(ISignals signals) {
+	private void movedFGPawns(ISignals signals) {
 		
 		long bb_white_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
 		long bb_black_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
@@ -183,7 +183,7 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 
 		signals.getSignal(FEATURE_ID_KINGSAFE_F_PAWN).addStrength(movedFPawn, openingPart);
 		signals.getSignal(FEATURE_ID_KINGSAFE_G_PAWN).addStrength(missingGPawn, openingPart);
-	}*/
+	}
 	
 	
 	private int castling(int colour) {
@@ -466,11 +466,11 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		
 		//int PAWNS_PASSED_UNSTOPPABLE = 100 + bitboard.getBaseEvaluation().getMaterialRook();
 		int unstoppablePasser = bitboard.getUnstoppablePasser();
-		if (unstoppablePasser > 0) {
-			signals.getSignal(FEATURE_ID_UNSTOPPABLE_PASSER).addStrength(1, openingPart);
-		} else if (unstoppablePasser < 0) {
-			signals.getSignal(FEATURE_ID_UNSTOPPABLE_PASSER).addStrength(-1, openingPart);
-		}
+		//if (unstoppablePasser > 0) {
+			signals.getSignal(FEATURE_ID_UNSTOPPABLE_PASSER).addStrength(unstoppablePasser, openingPart);
+		//} else if (unstoppablePasser < 0) {
+		//	signals.getSignal(FEATURE_ID_UNSTOPPABLE_PASSER).addStrength(-unstoppablePasser, openingPart);
+		//}
 		
 		
 		bitboard.getPawnsCache().unlock();
@@ -915,7 +915,6 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 			}
 		}
 		
-		/*
 		
 		signals.getSignal(FEATURE_ID_ROOKS_OPENED).addStrength(w_rooks_opened - b_rooks_opened, openingPart);
 		signals.getSignal(FEATURE_ID_ROOKS_SEMIOPENED).addStrength(w_rooks_semiopened - b_rooks_semiopened, openingPart);
@@ -930,9 +929,6 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		
 		signals.getSignal(FEATURE_ID_ROOKS_7TH_2TH).addStrength(w_rooks_7th - b_rooks_2th, openingPart);
 		signals.getSignal(FEATURE_ID_QUEENS_7TH_2TH).addStrength(w_queens_7th - b_queens_2th, openingPart);
-		
-		 */
-		
 	}
 	
 	
@@ -944,15 +940,6 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		
 		int kingFieldID_white = w_king.getData()[0];
 		int kingFieldID_black = b_king.getData()[0];
-		
-		int w_penetration_op_area = 0;
-		int b_penetration_op_area = 0;
-		int w_penetration_op_area_safe = 0;
-		int b_penetration_op_area_safe = 0;
-		int w_penetration_king_area = 0;
-		int b_penetration_king_area = 0;
-		int w_penetration_king_area_safe = 0;
-		int b_penetration_king_area_safe = 0;
 		
 		int w_mobility_knights_all = 0;
 		int b_mobility_knights_all = 0;
@@ -1030,7 +1017,6 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		int pin_rn = 0;
 
 		int pin_qk = 0;
-		//int pin_qq = 0;
 		int pin_qn = 0;
 		int pin_qr = 0;
 		int pin_qb = 0;
@@ -1181,14 +1167,10 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 						}
 						
 						w_mobility_knights_all++;
-						w_penetration_op_area += Fields.getRank_W(toFieldID);
-						w_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
 						
 						boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT, toFieldID) >= 0;
 						if (safe) {
 							w_mobility_knights_safe++;
-							w_penetration_op_area_safe += Fields.getRank_W(toFieldID);
-							w_penetration_king_area_safe += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
 						}
 					}
 					
@@ -1273,14 +1255,10 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 						}
 						
 						b_mobility_knights_all++;
-						b_penetration_op_area += Fields.getRank_B(toFieldID);
-						b_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
 						
 						boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT, toFieldID) >= 0;
 						if (safe) {
 							b_mobility_knights_safe++;
-							b_penetration_op_area_safe += Fields.getRank_B(toFieldID);
-							b_penetration_king_area_safe += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
 						}
 					}
 					
@@ -1389,14 +1367,10 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER, toFieldID) >= 0;
 										if (safe) {
 											w_mobility_bishops_safe++;
-											w_penetration_op_area_safe += Fields.getRank_W(toFieldID);
-											w_penetration_king_area_safe += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
 										}
 									} else {
 										w_mobility_bishops_all++;
 									}
-									w_penetration_op_area += Fields.getRank_W(toFieldID);
-									w_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
 								}
 								
 								if ((toBitboard & bb_black_all) != 0L) {
@@ -1519,14 +1493,10 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER, toFieldID) >= 0;
 										if (safe) {
 											b_mobility_bishops_safe++;
-											b_penetration_op_area_safe += Fields.getRank_B(toFieldID);
-											b_penetration_king_area_safe += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
 										}
 									} else {
 										b_mobility_bishops_all++;
 									}
-									b_penetration_op_area += Fields.getRank_B(toFieldID);
-									b_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
 								}
 								
 								if ((toBitboard & bb_white_all) != 0L) {
@@ -1659,14 +1629,10 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_CASTLE, toFieldID) >= 0;
 										if (safe) {
 											w_mobility_rooks_safe++;
-											w_penetration_op_area_safe += Fields.getRank_W(toFieldID);
-											w_penetration_king_area_safe += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
 										}
 									} else {
 										w_mobility_rooks_all++;
 									}
-									w_penetration_op_area += Fields.getRank_W(toFieldID);
-									w_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
 								}
 								
 								if ((toBitboard & bb_black_all) != 0L) {
@@ -1795,14 +1761,10 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_CASTLE, toFieldID) >= 0;
 										if (safe) {
 											b_mobility_rooks_safe++;
-											b_penetration_op_area_safe += Fields.getRank_B(toFieldID);
-											b_penetration_king_area_safe += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
 										}
 									} else {
 										b_mobility_rooks_all++;
 									}
-									b_penetration_op_area += Fields.getRank_B(toFieldID);
-									b_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
 								}
 								
 								if ((toBitboard & bb_white_all) != 0L) {
@@ -1932,14 +1894,10 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN, toFieldID) >= 0;
 										if (safe) {
 											w_mobility_queens_safe++;
-											w_penetration_op_area_safe += Fields.getRank_W(toFieldID);
-											w_penetration_king_area_safe += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
 										}
 									} else {
 										w_mobility_queens_all++;
 									}
-									w_penetration_op_area += Fields.getRank_W(toFieldID);
-									w_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
 								}
 								
 								if ((toBitboard & bb_black_all) != 0L) {
@@ -2026,14 +1984,10 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN, toFieldID) >= 0;
 										if (safe) {
 											w_mobility_queens_safe++;
-											w_penetration_op_area_safe += Fields.getRank_W(toFieldID);
-											w_penetration_king_area_safe += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
 										}
 									} else {
 										w_mobility_queens_all++;
 									}
-									w_penetration_op_area += Fields.getRank_W(toFieldID);
-									w_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
 								}
 								
 								if ((toBitboard & bb_black_all) != 0L) {
@@ -2159,14 +2113,10 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN, toFieldID) >= 0;
 										if (safe) {
 											b_mobility_queens_safe++;
-											b_penetration_op_area_safe += Fields.getRank_B(toFieldID);
-											b_penetration_king_area_safe += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
 										}
 									} else {
 										b_mobility_queens_all++;
 									}
-									b_penetration_op_area += Fields.getRank_B(toFieldID);
-									b_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
 								}
 								
 								if ((toBitboard & bb_white_all) != 0L) {
@@ -2253,14 +2203,10 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 										boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN, toFieldID) >= 0;
 										if (safe) {
 											b_mobility_queens_safe++;
-											b_penetration_op_area_safe += Fields.getRank_B(toFieldID);
-											b_penetration_king_area_safe += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
 										}
 									} else {
 										b_mobility_queens_all++;
 									}
-									b_penetration_op_area += Fields.getRank_B(toFieldID);
-									b_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
 								}
 								
 								if ((toBitboard & bb_white_all) != 0L) {
@@ -2301,9 +2247,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		}
 		
 		
-		/*signals.getSignal(FEATURE_ID_ROOKS_PAIR_H).addStrength(w_rooks_paired_h - b_rooks_paired_h, openingPart);
+		signals.getSignal(FEATURE_ID_ROOKS_PAIR_H).addStrength(w_rooks_paired_h - b_rooks_paired_h, openingPart);
 		signals.getSignal(FEATURE_ID_ROOKS_PAIR_V).addStrength(w_rooks_paired_v - b_rooks_paired_v, openingPart);
-		*/
+		
 		
 		int w_attack_to_black_king_1 = Math.max(1, w_knights_attacks_to_black_king_1)
 				* Math.max(1, w_bishops_attacks_to_black_king_1)

@@ -29,9 +29,18 @@ public class SF7_FeaturesConfigurationBagaturImpl implements IFeaturesConfigurat
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_QUEEN      , "MATERIAL.QUEEN"      , STANDARD         , 0, 2000,  1241, 0, 2000,  1023 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFE_CASTLING   , "KINGSAFE.CASTLING"   , STANDARD         , 0, 50,  10.030, 0, 0,  0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFE_FIANCHETTO , "KINGSAFE.FIANCHETTO" , STANDARD         , 0, 100, 1, 0, 0, 0 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_BISHOPS_DOUBLE      , "BISHOPS.DOUBLE"	    , STANDARD         , 0, 100,  39.227, 0, 200,  40.227 ));
 		
-		//75%
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_BISHOPS_DOUBLE      , "BISHOPS.DOUBLE"	    , STANDARD         , 0, 100,  39.227, 0, 200,  40.227 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KNIGHTS_DOUBLE      , "KNIGHTS.DOUBLE"	    , STANDARD        , 0, 100,  39.227, 0, 200,  40.227 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOKS_DOUBLE      	, "ROOKS.DOUBLE"	    , STANDARD        , 0, 100,  39.227, 0, 200,  40.227 ));
+		
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFE_F_PAWN     , "KINGSAFE.F"          , STANDARD        , -50, 0, -4.056, 0, 0,  0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFE_G_PAWN     , "KINGSAFE.G"          , STANDARD        , -50, 0, -10.653, 0, 0,  0 ));
+		
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGS_DISTANCE  	, "KINGS.DISTANCE"      , STANDARD        , -50, 50, 1, -50, 50,  1 ));
+		
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_5PAWNS_ROOKS      	, "ROOKS.5PAWNS"	    , STANDARD        , -50, 50, 1, -50, 50,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_5PAWNS_KNIGHTS     	, "KNIGHTS.5PAWNS"	    , STANDARD        , -50, 50, 1, -50, 50,  1 ));
 		
 		/**
 		 * PAWNS ITERATION
@@ -61,37 +70,37 @@ public class SF7_FeaturesConfigurationBagaturImpl implements IFeaturesConfigurat
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOK_INFRONT_PASSER , "ROOK.INFRONT.PASSER" , PAWNS_STRUCTURE , -50,   0, -1, -50,  0, -1));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOK_BEHIND_PASSER  , "ROOK.BEHIND.PASSER"  , PAWNS_STRUCTURE ,   0,  50, 1, 0,  50, 1));
 		
-		//77.78%
-		
 		/**
 		 * PIECES ITERATION
 		 */
-		
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PST_PAWN			, "PST.PAWN"   		    , PIECES_ITERATION ,  0,  2,  1,  0,  2,  1));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PST_KING			, "PST.KING"   		    , PIECES_ITERATION ,  0,  2,  1,  0,  2,  1));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PST_KNIGHT		    , "PST.KNIGHTS" 		, PIECES_ITERATION ,  0,  2,  1,  0,  2,  1));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PST_BISHOP		    , "PST.BISHOPS"  		, PIECES_ITERATION ,  0,  2,  1,  0,  2,  1));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PST_ROOK			, "PST.ROOKS"		  	, PIECES_ITERATION ,  0,  5,  1,  0,  5,  1));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PST_QUEEN			, "PST.QUEENS"   		, PIECES_ITERATION ,  0,  2,  1,  0,  2,  1));
-
-		//80.83%
 		
-		/*
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_BISHOPS_BAD         , "BISHOPS.BAD"   	    , PIECES_ITERATION , -50, 0, -1, -50, 0, -1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KNIGHTS_OUTPOST     , "KNIGHT.OUTPOST"      , PIECES_ITERATION ,   0, 50, 18.943,   0, 50, 1.002 ));
+		
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOKS_OPENED        , "ROOKS.OPENED"        , PIECES_ITERATION ,  0, 50, 46.048,  0, 50,  0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOKS_SEMIOPENED    , "ROOKS.SEMIOPENED"    , PIECES_ITERATION ,  0, 50, 20.527,  0, 50,  0 ));
+		
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TROPISM_KNIGHT      , "TROPISM.KNIGHT"      , PIECES_ITERATION ,  0, 10, 0.086, 0, 0, 0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TROPISM_BISHOP      , "TROPISM.BISHOP"      , PIECES_ITERATION ,  0, 10, 0.476, 0, 0, 0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TROPISM_ROOK        , "TROPISM.ROOK"        , PIECES_ITERATION ,  0, 10, 0.156, 0, 0, 0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TROPISM_QUEEN       , "TROPISM.QUEEN"       , PIECES_ITERATION ,  0, 10, 0.187, 0, 0, 0 ));
+		
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_QUEENS_7TH_2TH      , "QUEENS.7TH.2TH"      , PIECES_ITERATION ,  0, 50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOKS_7TH_2TH       , "ROOKS.7TH.2TH"       , PIECES_ITERATION ,  0, 50,  10,  0,  50,  10 ));
-		*/
+		
 		
 		/**
 		 * MOVES ITERATION
 		 */
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFE_L1    	    , "KINGSAFETY.L1"   	, MOVES_ITERATION  , 0, 100, 10, 0, 0, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFE_L2    	    , "KINGSAFETY.L2"   	, MOVES_ITERATION  , 0, 100, 10, 0, 0, 0 ));
+		
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_KNIGHT 	, "MOBILITY.KNIGHT" 	, MOVES_ITERATION  ,  0,  2,  1,  0,  2,  1));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_BISHOP 	, "MOBILITY.BISHOP" 	, MOVES_ITERATION  ,  0,  2,  1,  0,  2,  1));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_ROOK   	, "MOBILITY.ROOK"   	, MOVES_ITERATION  ,  0,  2,  1,  0,  2,  1));
@@ -101,16 +110,9 @@ public class SF7_FeaturesConfigurationBagaturImpl implements IFeaturesConfigurat
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_ROOK_S     , "MOBILITY.ROOK.S"     , MOVES_ITERATION  ,  0,  2,  1,  0,  2,  1));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_QUEEN_S    , "MOBILITY.QUEEN.S"    , MOVES_ITERATION  ,  0,  2,  1,  0,  2,  1));
 		
-		//82.55%
-		
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFE_L1    	    , "KINGSAFETY.L1"   	, MOVES_ITERATION  , 0, 100, 10, 0, 0, 0 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFE_L2    	    , "KINGSAFETY.L2"   	, MOVES_ITERATION  , 0, 100, 10, 0, 0, 0 ));
-		
-		//82.61%
-		
-		/*add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOKS_PAIR_H   	    , "ROOKS.PAIR.H"    	, MOVES_ITERATION  ,  0, 50, 10,  0, 50, 10 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOKS_PAIR_H   	    , "ROOKS.PAIR.H"    	, MOVES_ITERATION  ,  0, 50, 10,  0, 50, 10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_ROOKS_PAIR_V   	    , "ROOKS.PAIR.V"    	, MOVES_ITERATION  ,  0, 50, 10,  0, 50, 10 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BK              , "PIN.BK"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
+		/*add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BK              , "PIN.BK"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BQ              , "PIN.BQ"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BR              , "PIN.BR"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PIN_BN              , "PIN.BN"              , MOVES_ITERATION  ,  0,  50,  10,  0,  50,  10 ));
@@ -131,7 +133,7 @@ public class SF7_FeaturesConfigurationBagaturImpl implements IFeaturesConfigurat
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAP  				, "TRAP"      			, MOVES_ITERATION  ,  -50,  0,  -10,  -50,  0,  -10 ));
 		
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED_PIECES       , "HUNGED.PIECE"        , MOVES_ITERATION  ,  -50,  0, -20,  -50,  0, -20 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED_PAWNS       	, "HUNGED.PAWS"        	, MOVES_ITERATION  ,  -50,  0, -20,  -50,  0, -20 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED_PAWNS       	, "HUNGED.PAWNS"       	, MOVES_ITERATION  ,  -50,  0, -20,  -50,  0, -20 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED_ALL       	, "HUNGED.ALL"        	, MOVES_ITERATION  ,  -50,  0, -20,  -50,  0, -20 ));
 		*/
 		

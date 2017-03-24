@@ -98,22 +98,14 @@ public class LearningSchedulerMain {
 						//"bagaturchess.engines.searchtune.SearchConfig1_MTD_Impl_LKG_AllInOne_Test",
 						//"bagaturchess.engines.searchtune.SearchConfig1_MTD_Impl_INITIAL",
 						
-						//"bagaturchess.engines.learning.cfg.weights.boardtune.WeightsBoardConfig_LKG",
-						//"bagaturchess.engines.learning.cfg.weights.evaltune.WeightsEvaluationConfig_LKG"
-						
-						//"bagaturchess.engines.bagatur.progressive.BagaturV12BoardConfig",
-						//"bagaturchess.engines.bagatur.progressive.BagaturV12EvaluationConfig"
-						
 						//"bagaturchess.engines.material.MaterialBoardConfigImpl",
 						//"bagaturchess.engines.material.MaterialEvalConfigImpl"
-						
 						//"bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl",
 						//"bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2",
-						
 						bagaturchess.learning.goldmiddle.impl.cfg.stockfish7.SF7_BoardConfig.class.getName(),
 						bagaturchess.learning.goldmiddle.run.cfg.EvaluationConfg.class.getName()
 						
-						}
+					}
 			);
 		
 		ChannelManager.setChannel(new Channel_Console(System.in, System.out, System.out));

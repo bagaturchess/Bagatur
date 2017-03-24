@@ -15,14 +15,13 @@ public interface SF7_FeaturesConstants {
 	public static final int FEATURE_ID_KINGSAFE_CASTLING   = 1060;
 	public static final int FEATURE_ID_KINGSAFE_FIANCHETTO = 1070;
 	public static final int FEATURE_ID_BISHOPS_DOUBLE      = 1080;
-	
-	//public static final int FEATURE_ID_KNIGHTS_DOUBLE      = 1081;
-	//public static final int FEATURE_ID_ROOKS_DOUBLE        = 1082;
-	//public static final int FEATURE_ID_5PAWNS_ROOKS        = 1085;
-	//public static final int FEATURE_ID_5PAWNS_KNIGHTS      = 1086;
-	//public static final int FEATURE_ID_KINGSAFE_F_PAWN     = 1090;
-	//public static final int FEATURE_ID_KINGSAFE_G_PAWN     = 1100;
-	//public static final int FEATURE_ID_KINGS_DISTANCE	   = 1110;
+	public static final int FEATURE_ID_KNIGHTS_DOUBLE      = 1081;
+	public static final int FEATURE_ID_ROOKS_DOUBLE        = 1082;
+	public static final int FEATURE_ID_5PAWNS_ROOKS        = 1085;
+	public static final int FEATURE_ID_5PAWNS_KNIGHTS      = 1086;
+	public static final int FEATURE_ID_KINGSAFE_F_PAWN     = 1090;
+	public static final int FEATURE_ID_KINGSAFE_G_PAWN     = 1100;
+	public static final int FEATURE_ID_KINGS_DISTANCE	   = 1110;
 	
 	
 	/**
@@ -63,7 +62,7 @@ public interface SF7_FeaturesConstants {
 	public static final int FEATURE_ID_PST_BISHOP  		   = 3040;
 	public static final int FEATURE_ID_PST_ROOK  		   = 3050;
 	public static final int FEATURE_ID_PST_QUEEN  		   = 3060;
-	/*public static final int FEATURE_ID_BISHOPS_BAD		   = 3070;
+	public static final int FEATURE_ID_BISHOPS_BAD		   = 3070;
 	public static final int FEATURE_ID_KNIGHTS_OUTPOST	   = 3080;
 	public static final int FEATURE_ID_ROOKS_OPENED		   = 3090;
 	public static final int FEATURE_ID_ROOKS_SEMIOPENED	   = 3100;
@@ -73,7 +72,7 @@ public interface SF7_FeaturesConstants {
 	public static final int FEATURE_ID_TROPISM_QUEEN  	   = 3140;
 	public static final int FEATURE_ID_ROOKS_7TH_2TH       = 3150;
 	public static final int FEATURE_ID_QUEENS_7TH_2TH      = 3160;
-	*/
+	
 	
 	/**
 	 * MOVES ITERATION
@@ -94,9 +93,10 @@ public interface SF7_FeaturesConstants {
 	public static final int FEATURE_ID_PENETRATION_OP_S	   = 4105;
 	public static final int FEATURE_ID_PENETRATION_KING	   = 4106;
 	public static final int FEATURE_ID_PENETRATION_KING_S  = 4107;
+	*/
 	public static final int FEATURE_ID_ROOKS_PAIR_H        = 4110;
 	public static final int FEATURE_ID_ROOKS_PAIR_V        = 4120;
-	
+	/*
 	public static final int FEATURE_ID_TRAP		           = 4150;
 	
 	public static final int FEATURE_ID_PIN_KING            = 4210;
