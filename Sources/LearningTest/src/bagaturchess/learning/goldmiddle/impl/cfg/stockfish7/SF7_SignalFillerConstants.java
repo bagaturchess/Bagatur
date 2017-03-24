@@ -30,7 +30,7 @@ public class SF7_SignalFillerConstants {
 	//0,   0,   4,   11,   13,   36,   		0,   6,   6,   11,   17,   25,   
 	public static final int[] PASSERS_CANDIDATE_RANK_O   = new int[] {0,   0,   5,   11,   13,   37};
 	public static final int[] PASSERS_CANDIDATE_RANK_E   = new int[] {0,   5,   7,   11,   17,   25};
-
+	
 	
 	public static final int[] PASSERS_KING_CLOSENESS_FRONTFIELD 		= new int[] { 3,    3,    2,   1,  -1,  -2,  -3,  -4};
 	public static final int[] PASSERS_KING_CLOSENESS_FRONTFRONTFIELD 	= new int[] { 4,    3,    2,   1,  -1,  -2,  -3,  -4};
@@ -42,14 +42,14 @@ public class SF7_SignalFillerConstants {
 	public static final int[] KING_SAFETY_QUEENS_ATTACKS  = new int[] {0, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3};
 	public static final int[] KING_SAFETY_PAWNS_ATTACKS   = new int[] {0, 2, 2};
 	
-	public static final int[] MOBILITY_KNIGHT_O   = new int[] {  -8,  -4,  -2,  -1,   0,   2,   4,  6,  8 };
-	public static final int[] MOBILITY_KNIGHT_E   = new int[] {  -8,  -4,  -2,  -1,   0,   2,   4,  6,  8 };
-	public static final int[] MOBILITY_BISHOP_O   = new int[] { -16,  -8,  -4,  -2,  -1,   0,   2,  4,  6,  8,  10,  12,  14,  16};
-	public static final int[] MOBILITY_BISHOP_E   = new int[] { -16,  -8,  -4,  -2,  -1,   0,   2,  4,  6,  8,  10,  12,  14,  16};
-	public static final int[] MOBILITY_ROOK_O     = new int[] { -16,  -8,  -4,  -2,  -1,   0,   2,  4,  6,  8,  10,  12,  14,  15, 16};
-	public static final int[] MOBILITY_ROOK_E     = new int[] { -16,  -8,  -4,  -2,  -1,   0,   2,  4,  6,  8,  10,  12,  14,  15, 16};
-	public static final int[] MOBILITY_QUEEN_O    = new int[] { -64, -32, -16,  -8,  -4,  -2,  -1,   0,   2,   4,   6,   8,  10,   12,   14,   16,   18,   20,   22,   24,   26,   28,   30,   32,   34,   36,   38,   40};
-	public static final int[] MOBILITY_QUEEN_E    = new int[] { -64, -32, -16,  -8,  -4,  -2,  -1,   0,   2,   4,   6,   8,  10,   12,   14,   16,   18,   20,   22,   24,   26,   28,   30,   32,   34,   36,   38,   40};
+	public static final int[] MOBILITY_KNIGHT_O   = new int[] {  -75, -56, -9, -2, 6, 15, 22, 30, 36 };
+	public static final int[] MOBILITY_KNIGHT_E   = new int[] {  -76, -54, -26, -10, 5, 11, 26, 28, 29 };
+	public static final int[] MOBILITY_BISHOP_O   = new int[] { -48, -21, 16, 26, 37, 51, 54, 63, 65, 71, 79, 81, 92, 97 };
+	public static final int[] MOBILITY_BISHOP_E   = new int[] { -58, -19, -2, 12, 22, 42, 54, 58, 63, 70, 74, 86, 90, 94 };
+	public static final int[] MOBILITY_ROOK_O     = new int[] { -56, -25, -11, -5, -4, -1,   8,  14,  21,  23,  31,  32,  43,  49, 59 };
+	public static final int[] MOBILITY_ROOK_E     = new int[] { -78, -18,  26, 55, 70, 81, 109, 120, 128, 143, 154, 160, 165, 168, 169};
+	public static final int[] MOBILITY_QUEEN_O    = new int[] { -40, -25, 2,  4, 14, 24, 25, 40, 43, 47, 54,  56,  60,  70,  72,  73,  75,  77,  85,  94,  99, 108, 112, 113, 118, 119, 123, 128 };
+	public static final int[] MOBILITY_QUEEN_E    = new int[] { -35, -12, 7, 19, 37, 55, 62, 76, 79, 87, 94, 102, 111, 116, 118, 122, 128, 130, 133, 136, 140, 157, 158, 161, 174, 177, 191, 199 };
 	
 	public static final int[] KING_DISTANCE_O   = new int[] {0,   0,   0,   0,   0,    0,    0,   0};
 	public static final int[] KING_DISTANCE_E   = new int[] {0,   0,   16,   8,   4,    2,    1,   0};

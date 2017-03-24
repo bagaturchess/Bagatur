@@ -125,16 +125,16 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		signals.getSignal(FEATURE_ID_MATERIAL_QUEEN).addStrength(w_queens.getDataSize() - b_queens.getDataSize(), openingPart);
 		
 		signals.getSignal(FEATURE_ID_BISHOPS_DOUBLE).addStrength(((w_bishops.getDataSize() >= 2) ? 1 : 0) - ((b_bishops.getDataSize() >= 2) ? 1 : 0), openingPart);
-		signals.getSignal(FEATURE_ID_KNIGHTS_DOUBLE).addStrength(((w_knights.getDataSize() >= 2) ? 1 : 0) - ((b_knights.getDataSize() >= 2) ? 1 : 0), openingPart);
-		signals.getSignal(FEATURE_ID_ROOKS_DOUBLE).addStrength(((w_rooks.getDataSize() >= 2) ? 1 : 0) - ((b_rooks.getDataSize() >= 2) ? 1 : 0), openingPart);
+		//signals.getSignal(FEATURE_ID_KNIGHTS_DOUBLE).addStrength(((w_knights.getDataSize() >= 2) ? 1 : 0) - ((b_knights.getDataSize() >= 2) ? 1 : 0), openingPart);
+		//signals.getSignal(FEATURE_ID_ROOKS_DOUBLE).addStrength(((w_rooks.getDataSize() >= 2) ? 1 : 0) - ((b_rooks.getDataSize() >= 2) ? 1 : 0), openingPart);
 		
 		signals.getSignal(FEATURE_ID_KINGSAFE_CASTLING).addStrength(castling(Figures.COLOUR_WHITE) - castling(Figures.COLOUR_BLACK), openingPart);
 		fianchetto(signals);
-		movedFGPawns(signals);
+		//movedFGPawns(signals);
 		
 		
 		//Kings Distance
-		int kingFieldID_white = w_king.getData()[0];
+		/*int kingFieldID_white = w_king.getData()[0];
 		int kingFieldID_black = b_king.getData()[0];
 		int kingDistance = Fields.getDistancePoints(kingFieldID_white, kingFieldID_black);
 		int kingsDistanceScores = bitboard.getMaterialFactor().interpolateByFactor(KING_DISTANCE_O[kingDistance], KING_DISTANCE_E[kingDistance]);
@@ -153,10 +153,11 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		
 		signals.getSignal(FEATURE_ID_5PAWNS_ROOKS).addStrength(w_pawns_above5 * w_rooks.getDataSize() - b_pawns_above5 * b_rooks.getDataSize(), openingPart);
 		signals.getSignal(FEATURE_ID_5PAWNS_KNIGHTS).addStrength(w_pawns_above5 * w_knights.getDataSize() - b_pawns_above5 * b_knights.getDataSize(), openingPart);
+		*/
 	}
 	
 	
-	private void movedFGPawns(ISignals signals) {
+	/*private void movedFGPawns(ISignals signals) {
 		
 		long bb_white_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
 		long bb_black_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
@@ -182,7 +183,7 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 
 		signals.getSignal(FEATURE_ID_KINGSAFE_F_PAWN).addStrength(movedFPawn, openingPart);
 		signals.getSignal(FEATURE_ID_KINGSAFE_G_PAWN).addStrength(missingGPawn, openingPart);
-	}
+	}*/
 	
 	
 	private int castling(int colour) {
@@ -460,19 +461,20 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		
 		space(model, signals);
 		
-		/**
-		 * Unstoppable passer
-		 */
+		
+		// Unstoppable passer
+		
 		//int PAWNS_PASSED_UNSTOPPABLE = 100 + bitboard.getBaseEvaluation().getMaterialRook();
 		int unstoppablePasser = bitboard.getUnstoppablePasser();
 		if (unstoppablePasser > 0) {
-			signals.getSignal(FEATURE_ID_UNSTOPPABLE_PASSER).addStrength(1/*PAWNS_PASSED_UNSTOPPABLE*/, openingPart);
+			signals.getSignal(FEATURE_ID_UNSTOPPABLE_PASSER).addStrength(1, openingPart);
 		} else if (unstoppablePasser < 0) {
-			signals.getSignal(FEATURE_ID_UNSTOPPABLE_PASSER).addStrength(-1/*-PAWNS_PASSED_UNSTOPPABLE*/, openingPart);
+			signals.getSignal(FEATURE_ID_UNSTOPPABLE_PASSER).addStrength(-1, openingPart);
 		}
 		
 		
 		bitboard.getPawnsCache().unlock();
+		
 	}
 	
 	
@@ -495,6 +497,7 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		int space = w_space - b_space;
 		
 		signals.getSignal(FEATURE_ID_SPACE).addStrength(space, openingPart);
+		
 	}
 	
 	
@@ -578,9 +581,7 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		//int b_piecesDispersion = 0;
 		
 		
-		/**
-		 * Knights iteration
-		 */
+		// Knights iteration
 		{
 			int w_knights_count = w_knights.getDataSize();
 			if (w_knights_count > 0) {
@@ -666,9 +667,7 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 			}
 		}
 		
-		/**
-		 * Bishops iteration
-		 */
+		// Bishops iteration
 		{
 			int w_bishops_count = w_bishops.getDataSize();
 			if (w_bishops_count > 0) {
@@ -722,9 +721,7 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 			}
 		}
 		
-		/**
-		 * Rooks iteration
-		 */
+		// Rooks iteration
 		{
 			int w_rooks_count = w_rooks.getDataSize();
 			if (w_rooks_count > 0) {
@@ -786,9 +783,7 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 			}
 		}
 		
-		/**
-		 * Queens iteration
-		 */
+		// Queens iteration
 		{
 			int w_queens_count = w_queens.getDataSize();
 			if (w_queens_count > 0) {
@@ -839,10 +834,8 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 			}
 		}
 		
-		
-		/**
-		 * Kings iteration
-		 */
+
+		// Kings iteration
 		{
 			int w_king_count = w_king.getDataSize();
 			if (w_king_count > 0) {
@@ -865,10 +858,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 				}
 			}
 		}
-		
-		/**
-		 * Pawns iteration
-		 */
+
+
+		// Pawns iteration
 		{
 			int w_pawns_count = w_pawns.getDataSize();
 			if (w_pawns_count > 0) {
@@ -923,6 +915,7 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 			}
 		}
 		
+		/*
 		
 		signals.getSignal(FEATURE_ID_ROOKS_OPENED).addStrength(w_rooks_opened - b_rooks_opened, openingPart);
 		signals.getSignal(FEATURE_ID_ROOKS_SEMIOPENED).addStrength(w_rooks_semiopened - b_rooks_semiopened, openingPart);
@@ -938,14 +931,14 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		signals.getSignal(FEATURE_ID_ROOKS_7TH_2TH).addStrength(w_rooks_7th - b_rooks_2th, openingPart);
 		signals.getSignal(FEATURE_ID_QUEENS_7TH_2TH).addStrength(w_queens_7th - b_queens_2th, openingPart);
 		
-		/*
-		signals.getSignal(FEATURE_ID_PIECES_DISPERSION).setStrength(w_piecesDispersion - b_piecesDispersion);
-		*/
+		 */
 		
 	}
 	
 	
 	public void fillMovesIterationSignals(ISignals signals) {
+		
+		
 		
 		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
@@ -1057,9 +1050,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		int attack_qr = 0;
 		
 		
-		/**
-		 * Initialize necessary data 
-		 */
+		
+		// Initialize necessary data 
+		 
 		long bb_white_all = bitboard.getFiguresBitboardByColour(Figures.COLOUR_WHITE);
 		long bb_black_all = bitboard.getFiguresBitboardByColour(Figures.COLOUR_BLACK);
 		//long bb_white_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
@@ -1087,9 +1080,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		long kingSurrounding_L2_black = (~kingSurrounding_L1_black) & KingSurrounding.SURROUND_LEVEL2[kingFieldID_black];
 		
 		
-		/**
-		 * Pawns iteration
-		 */
+		
+		// Pawns iteration
+		
 		{
 			int w_pawns_count = w_pawns.getDataSize();
 			if (w_pawns_count > 0) {
@@ -1122,9 +1115,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		}
 		
 		
-		/**
-		 * Knights iteration
-		 */
+		
+		// Knights iteration
+		
 		{
 			int w_knights_count = w_knights.getDataSize();
 			if (w_knights_count > 0) {
@@ -1310,9 +1303,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		}
 		
 		
-		/**
-		 * Bishops iteration
-		 */
+		
+		// Bishops iteration
+		
 		{
 			int w_bishops_count = w_bishops.getDataSize();
 			if (w_bishops_count > 0) {
@@ -1573,9 +1566,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		}
 		
 
-		/**
-		 * Rooks iteration
-		 */
+		
+		// Rooks iteration
+		
 		{
 			int w_rooks_count = w_rooks.getDataSize();
 			if (w_rooks_count > 0) {
@@ -1849,9 +1842,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		}
 
 		
-		/**
-		 * Queens iteration
-		 */
+		
+		// Queens iteration
+		
 		{
 			int w_queens_count = w_queens.getDataSize();
 			if (w_queens_count > 0) {
@@ -1875,9 +1868,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 					int opking_attacks_counter_1 = 0;
 					int opking_attacks_counter_2 = 0;
 					
-					/**
-					 * Move like a rook
-					 */
+					
+					// Move like a rook
+					
 					long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
 					int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
 					int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
@@ -1969,9 +1962,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 					}
 					
 					
-					/**
-					 * Move like a bishop
-					 */
+					
+					// Move like a bishop
+					
 					dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
 					validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
 					fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
@@ -2102,9 +2095,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 					int opking_attacks_counter_1 = 0;
 					int opking_attacks_counter_2 = 0;
 					
-					/**
-					 * Move like a rook
-					 */
+					
+					// Move like a rook
+					
 					long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
 					int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
 					int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
@@ -2196,9 +2189,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 					}
 					
 					
-					/**
-					 * Move like a bishop
-					 */
+					
+					// Move like a bishop
+					
 					dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
 					validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
 					fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
@@ -2308,8 +2301,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		}
 		
 		
-		signals.getSignal(FEATURE_ID_ROOKS_PAIR_H).addStrength(w_rooks_paired_h - b_rooks_paired_h, openingPart);
+		/*signals.getSignal(FEATURE_ID_ROOKS_PAIR_H).addStrength(w_rooks_paired_h - b_rooks_paired_h, openingPart);
 		signals.getSignal(FEATURE_ID_ROOKS_PAIR_V).addStrength(w_rooks_paired_v - b_rooks_paired_v, openingPart);
+		*/
 		
 		int w_attack_to_black_king_1 = Math.max(1, w_knights_attacks_to_black_king_1)
 				* Math.max(1, w_bishops_attacks_to_black_king_1)
@@ -2335,7 +2329,7 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		int kingsafe_l2 = (w_attacking_pieces_to_black_king_2 * w_attack_to_black_king_2 - b_attacking_pieces_to_white_king_2 * b_attack_to_white_king_2) / (8 * 8);
 		signals.getSignal(FEATURE_ID_KINGSAFE_L2).addStrength(kingsafe_l2, openingPart);
 		
-		
+		/*
 		signals.getSignal(FEATURE_ID_PIN_KING).addStrength(pin_bk + pin_rk + pin_qk, openingPart);
 		signals.getSignal(FEATURE_ID_PIN_BIGGER_PIECE).addStrength(pin_bq + pin_br + pin_rq, openingPart);
 		signals.getSignal(FEATURE_ID_PIN_EQUAL_PIECE).addStrength(pin_bn, openingPart);
@@ -2426,17 +2420,13 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		}
 		
 		
-		/*signals.getSignal(FEATURE_ID_PENETRATION_OP).addStrength(w_penetration_op_area - b_penetration_op_area, openingPart);
-		signals.getSignal(FEATURE_ID_PENETRATION_OP_S).addStrength(w_penetration_op_area_safe - b_penetration_op_area_safe, openingPart);
-		signals.getSignal(FEATURE_ID_PENETRATION_KING).addStrength(w_penetration_king_area - b_penetration_king_area, openingPart);
-		signals.getSignal(FEATURE_ID_PENETRATION_KING_S).addStrength(w_penetration_king_area_safe - b_penetration_king_area_safe, openingPart);
 		*/
 	}
 	
 	
 	public void fillFieldsStatesIterationSignals(ISignals signals) {
 		
-		
+		/*
 		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
 		int w_mobility_knights_safe = 0;
@@ -2476,9 +2466,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		int[] b_control = fa.getControlArray(Figures.COLOUR_BLACK);
 		
 		
-		/**
-		 * Knights iteration
-		 */
+		
+		// Knights iteration
+		
 		{
 			int w_knights_count = w_knights.getDataSize();
 			if (w_knights_count > 0) {
@@ -2576,9 +2566,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		}
 		
 		
-		/**
-		 * Bishops iteration
-		 */
+		
+		// Bishops iteration
+		
 		{
 			int w_bishops_count = w_bishops.getDataSize();
 			if (w_bishops_count > 0) {
@@ -2694,9 +2684,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		}
 
 		
-		/**
-		 * Rooks iteration
-		 */
+		
+		// Rooks iteration
+		
 		{
 			int w_rooks_count = w_rooks.getDataSize();
 			if (w_rooks_count > 0) {
@@ -2813,15 +2803,15 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 
 		
 		
-		/**
-		 * field states iteration
-		 */
+		
+		// field states iteration
+		
 		int hangingCount = 0;
 		for (int fieldID=0; fieldID<w_control.length; fieldID++) {
 			
-			/**
-			 * Hunged pieces
-			 */
+			
+			// Hunged pieces
+			
 			int pieceID = bitboard.getFigureID(fieldID);
 			if (pieceID != Constants.PID_NONE) {
 				int pieceType = Figures.getFigureType(pieceID); 
@@ -2841,9 +2831,9 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 				}
 			}
 			
-			/**
-			 * Fields control
-			 */
+			
+			// Fields control
+			
 			if (w_control[fieldID] >= b_control[fieldID] && b_control[fieldID] > 0) {
 				if (w_control[fieldID] == b_control[fieldID]) {
 					signals.getSignal(FEATURE_ID_PST_CONTROL_EQ).addStrength(fieldID, 1, openingPart);	
@@ -2858,27 +2848,8 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 				}
 			}
 		}
-				
-		/*if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-			signals.getSignal(FEATURE_ID_HUNGED_1_PIECES).setStrength(hangingCount == 1 ? -1 : 0);
-			signals.getSignal(FEATURE_ID_HUNGED_2_PIECES).setStrength(hangingCount == 2 ? -1 : 0);
-			signals.getSignal(FEATURE_ID_HUNGED_3_PIECES).setStrength(hangingCount >= 3 ? -1: 0);
-		} else {
-			signals.getSignal(FEATURE_ID_HUNGED_1_PIECES).setStrength(hangingCount == 1 ? 1 : 0);
-			signals.getSignal(FEATURE_ID_HUNGED_2_PIECES).setStrength(hangingCount == 2 ? 1 : 0);
-			signals.getSignal(FEATURE_ID_HUNGED_3_PIECES).setStrength(hangingCount >= 3 ? 1 : 0);
-		}
-		
-		signals.getSignal(FEATURE_ID_OVERPROT_PAWN).setStrength(w_overprotection_pawns - b_overprotection_pawns);
-		signals.getSignal(FEATURE_ID_OVERPROT_KNIGHT).setStrength(w_overprotection_knights - b_overprotection_knights);
-		signals.getSignal(FEATURE_ID_OVERPROT_BISHOP).setStrength(w_overprotection_bishops - b_overprotection_bishops);
-		signals.getSignal(FEATURE_ID_OVERPROT_ROOK).setStrength(w_overprotection_rooks - b_overprotection_rooks);
-		signals.getSignal(FEATURE_ID_OVERPROT_QUEEN).setStrength(w_overprotection_queens - b_overprotection_queens);
-		
-		signals.getSignal(FEATURE_ID_TRAP_KNIGHT).setStrength(w_trap_knights - b_trap_knights);
-		signals.getSignal(FEATURE_ID_TRAP_BISHOP).setStrength(w_trap_bishops - b_trap_bishops);
-		signals.getSignal(FEATURE_ID_TRAP_ROOK).setStrength(w_trap_rooks - b_trap_rooks);
-		signals.getSignal(FEATURE_ID_TRAP_QUEEN).setStrength(w_trap_queens - b_trap_queens);*/
+
+		*/
 	}
 
 }

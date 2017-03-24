@@ -15,13 +15,14 @@ public interface SF7_FeaturesConstants {
 	public static final int FEATURE_ID_KINGSAFE_CASTLING   = 1060;
 	public static final int FEATURE_ID_KINGSAFE_FIANCHETTO = 1070;
 	public static final int FEATURE_ID_BISHOPS_DOUBLE      = 1080;
-	public static final int FEATURE_ID_KNIGHTS_DOUBLE      = 1081;
-	public static final int FEATURE_ID_ROOKS_DOUBLE        = 1082;
-	public static final int FEATURE_ID_5PAWNS_ROOKS        = 1085;
-	public static final int FEATURE_ID_5PAWNS_KNIGHTS      = 1086;
-	public static final int FEATURE_ID_KINGSAFE_F_PAWN     = 1090;
-	public static final int FEATURE_ID_KINGSAFE_G_PAWN     = 1100;
-	public static final int FEATURE_ID_KINGS_DISTANCE	   = 1110;
+	
+	//public static final int FEATURE_ID_KNIGHTS_DOUBLE      = 1081;
+	//public static final int FEATURE_ID_ROOKS_DOUBLE        = 1082;
+	//public static final int FEATURE_ID_5PAWNS_ROOKS        = 1085;
+	//public static final int FEATURE_ID_5PAWNS_KNIGHTS      = 1086;
+	//public static final int FEATURE_ID_KINGSAFE_F_PAWN     = 1090;
+	//public static final int FEATURE_ID_KINGSAFE_G_PAWN     = 1100;
+	//public static final int FEATURE_ID_KINGS_DISTANCE	   = 1110;
 	
 	
 	/**
@@ -62,7 +63,7 @@ public interface SF7_FeaturesConstants {
 	public static final int FEATURE_ID_PST_BISHOP  		   = 3040;
 	public static final int FEATURE_ID_PST_ROOK  		   = 3050;
 	public static final int FEATURE_ID_PST_QUEEN  		   = 3060;
-	public static final int FEATURE_ID_BISHOPS_BAD		   = 3070;
+	/*public static final int FEATURE_ID_BISHOPS_BAD		   = 3070;
 	public static final int FEATURE_ID_KNIGHTS_OUTPOST	   = 3080;
 	public static final int FEATURE_ID_ROOKS_OPENED		   = 3090;
 	public static final int FEATURE_ID_ROOKS_SEMIOPENED	   = 3100;
@@ -72,13 +73,14 @@ public interface SF7_FeaturesConstants {
 	public static final int FEATURE_ID_TROPISM_QUEEN  	   = 3140;
 	public static final int FEATURE_ID_ROOKS_7TH_2TH       = 3150;
 	public static final int FEATURE_ID_QUEENS_7TH_2TH      = 3160;
-	
+	*/
 	
 	/**
 	 * MOVES ITERATION
 	 */
 	public static final int FEATURE_ID_KINGSAFE_L1     	   = 4010;
 	public static final int FEATURE_ID_KINGSAFE_L2     	   = 4020;
+	
 	public static final int FEATURE_ID_MOBILITY_KNIGHT     = 4030;
 	public static final int FEATURE_ID_MOBILITY_BISHOP     = 4040;
 	public static final int FEATURE_ID_MOBILITY_ROOK       = 4050;
@@ -87,7 +89,8 @@ public interface SF7_FeaturesConstants {
 	public static final int FEATURE_ID_MOBILITY_BISHOP_S   = 4080;
 	public static final int FEATURE_ID_MOBILITY_ROOK_S     = 4090;
 	public static final int FEATURE_ID_MOBILITY_QUEEN_S    = 4100;
-	public static final int FEATURE_ID_PENETRATION_OP	   = 4104;
+	
+	/*public static final int FEATURE_ID_PENETRATION_OP	   = 4104;
 	public static final int FEATURE_ID_PENETRATION_OP_S	   = 4105;
 	public static final int FEATURE_ID_PENETRATION_KING	   = 4106;
 	public static final int FEATURE_ID_PENETRATION_KING_S  = 4107;
@@ -95,10 +98,6 @@ public interface SF7_FeaturesConstants {
 	public static final int FEATURE_ID_ROOKS_PAIR_V        = 4120;
 	
 	public static final int FEATURE_ID_TRAP		           = 4150;
-	/*public static final int FEATURE_ID_TRAP_KNIGHT         = 4130;
-	public static final int FEATURE_ID_TRAP_BISHOP         = 4140;
-	public static final int FEATURE_ID_TRAP_ROOK           = 4150;
-	public static final int FEATURE_ID_TRAP_QUEEN          = 4160;*/
 	
 	public static final int FEATURE_ID_PIN_KING            = 4210;
 	public static final int FEATURE_ID_PIN_BIGGER_PIECE    = 4220;
@@ -121,39 +120,17 @@ public interface SF7_FeaturesConstants {
 	public static final int FEATURE_ID_ATTACK_BIGGER_PIECE = 4310;
 	public static final int FEATURE_ID_ATTACK_EQUAL_PIECE  = 4320;
 	public static final int FEATURE_ID_ATTACK_LOWER_PIECE  = 4330;
-	/*public static final int FEATURE_ID_ATTACK_BN           = 4300;
-	public static final int FEATURE_ID_ATTACK_BR           = 4310;
-	public static final int FEATURE_ID_ATTACK_NB           = 4320;
-	public static final int FEATURE_ID_ATTACK_NR           = 4330;
-	public static final int FEATURE_ID_ATTACK_NQ           = 4340;
-	public static final int FEATURE_ID_ATTACK_RB           = 4350;
-	public static final int FEATURE_ID_ATTACK_RN           = 4360;
-	public static final int FEATURE_ID_ATTACK_QN           = 4370;
-	public static final int FEATURE_ID_ATTACK_QB           = 4380;
-	public static final int FEATURE_ID_ATTACK_QR           = 4390;*/
 	
 	public static final int FEATURE_ID_HUNGED_PIECES       = 4400;
 	public static final int FEATURE_ID_HUNGED_PAWNS        = 4410;
 	public static final int FEATURE_ID_HUNGED_ALL          = 4420;
-	/*public static final int FEATURE_ID_HUNGED_PIECES_1     = 4400;
-	public static final int FEATURE_ID_HUNGED_PIECES_2     = 4401;
-	public static final int FEATURE_ID_HUNGED_PIECES_3     = 4402;
-	public static final int FEATURE_ID_HUNGED_PIECES_4     = 4403;
-	public static final int FEATURE_ID_HUNGED_PAWNS_1      = 4410;
-	public static final int FEATURE_ID_HUNGED_PAWNS_2      = 4411;
-	public static final int FEATURE_ID_HUNGED_PAWNS_3      = 4412;
-	public static final int FEATURE_ID_HUNGED_PAWNS_4      = 4413;
-	public static final int FEATURE_ID_HUNGED_ALL_1        = 4420;
-	public static final int FEATURE_ID_HUNGED_ALL_2        = 4421;
-	public static final int FEATURE_ID_HUNGED_ALL_3        = 4422;
-	public static final int FEATURE_ID_HUNGED_ALL_4        = 4423;*/
-	
+	*/
 	
 	/**
 	 * FIELDS STATES ITERATION
 	 */
-	public static final int FEATURE_ID_PST_CONTROL_EQ      = 5010;
-	public static final int FEATURE_ID_PST_CONTROL_MORE    = 5020;
+	//public static final int FEATURE_ID_PST_CONTROL_EQ      = 5010;
+	//public static final int FEATURE_ID_PST_CONTROL_MORE    = 5020;
 	
 	
 	/**

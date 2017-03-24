@@ -1,6 +1,8 @@
 package bagaturchess.learning.goldmiddle.run;
 
 
+import bagaturchess.engines.bagatur.v15.BoardConfig_V15;
+import bagaturchess.learning.goldmiddle.impl.cfg.stockfish7.SF7_BoardConfig;
 import bagaturchess.learning.goldmiddle.impl.visitors.LearningVisitorImpl;
 import bagaturchess.learning.goldmiddle.run.cfg.BoardConfigImpl;
 import bagaturchess.ucitracker.api.PositionsTraverser;
@@ -70,7 +72,7 @@ public class LearningTraverser {
 			PositionsVisitor learning = new LearningVisitorImpl();
 			
 			while (true) {
-				PositionsTraverser.traverseAll(filePath, learning, 999999999, new BoardConfigImpl());
+				PositionsTraverser.traverseAll(filePath, learning, 999999999, new SF7_BoardConfig());
 				//PositionsTraverser.traverseAll(filePath, learning, 300000, new BoardConfigImpl());
 			}
 			
