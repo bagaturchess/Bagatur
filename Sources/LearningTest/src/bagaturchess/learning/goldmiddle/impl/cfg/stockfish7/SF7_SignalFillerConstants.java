@@ -21,16 +21,11 @@ public class SF7_SignalFillerConstants {
 	public static final int[] HUNGED_ALL_O   	= new int[] {0,   -1,   -2,   -3,   -4};
 	public static final int[] HUNGED_ALL_E   	= new int[] {0,   -1,   -2,   -3,   -4};
 	
-	//0,   19,   27,   32,   50,   71,   93,   0,   		0,   11,   27,   47,   75,   140,   205,   0,
-	//0,   4,   22,   47,   78,   120,   173,   0,   		0,   0,   11,   31,   68,   128,   199,   0,   
-	public static final int[] PASSERS_RANK_O   = new int[] {0,   19,   27,   32,   50,    71,    93,   0};
-	public static final int[] PASSERS_RANK_E   = new int[] {0,   11,   27,   47,   75,   140,   205,   0};
+	public static final int[] PASSERS_RANK_O   = new int[] {0,   5,  5, 31, 73, 166, 252,   0};
+	public static final int[] PASSERS_RANK_E   = new int[] {0,   7, 14, 38, 73, 166, 252,   0};
 	
-	//0,   12,   7,   7,   2,   4,   		0,   0,   4,   8,   10,   18,   
-	//0,   0,   4,   11,   13,   36,   		0,   6,   6,   11,   17,   25,   
-	public static final int[] PASSERS_CANDIDATE_RANK_O   = new int[] {0,   0,   5,   11,   13,   37};
-	public static final int[] PASSERS_CANDIDATE_RANK_E   = new int[] {0,   5,   7,   11,   17,   25};
-	
+	public static final int[] PASSERS_CANDIDATE_RANK_O   = new int[] {0,   3,  3, 15, 37, 83};
+	public static final int[] PASSERS_CANDIDATE_RANK_E   = new int[] {0,   5,  7, 19, 37, 83};
 	
 	public static final int[] PASSERS_KING_CLOSENESS_FRONTFIELD 		= new int[] { 3,    3,    2,   1,  -1,  -2,  -3,  -4};
 	public static final int[] PASSERS_KING_CLOSENESS_FRONTFRONTFIELD 	= new int[] { 4,    3,    2,   1,  -1,  -2,  -3,  -4};
