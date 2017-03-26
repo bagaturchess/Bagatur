@@ -34,6 +34,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.BoardUtils;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedGame;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedMove;
@@ -44,12 +45,12 @@ import bagaturchess.ucitracker.impl.gamemodel.serialization.GameModelReader;
 public class PositionsTraverser {
 	
 	
-	public static void traverseAll(String filePath, PositionsVisitor visitor, int maxPositionsCount, IBoardConfig boardConfig, String pawnsCache) throws Exception {
+	public static void traverseAll(String filePath, PositionsVisitor visitor, int maxPositionsCount, IBoardConfig boardConfig, String pawnsCacheFactoryClassName) throws Exception {
 		DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(filePath), 10 * 1024 * 1024));
 		
 		IBitBoard bitboard = null;
-		if (pawnsCache != null) {
-			bitboard = BoardUtils.createBoard_WithPawnsCache(pawnsCache, boardConfig);
+		if (pawnsCacheFactoryClassName != null) {
+			bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, pawnsCacheFactoryClassName, boardConfig, 1000);
 		} else {
 			bitboard = BoardUtils.createBoard_WithPawnsCache(boardConfig);
 		}

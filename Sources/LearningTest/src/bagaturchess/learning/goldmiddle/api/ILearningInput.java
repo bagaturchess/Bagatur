@@ -21,10 +21,14 @@ package bagaturchess.learning.goldmiddle.api;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.learning.api.ISignalFiller;
 
 
 public interface ILearningInput {
+	
+	
+	public IBoardConfig createBoardConfig();
 	
 	
 	public ISignalFiller createFiller(IBitBoard bitboard);
