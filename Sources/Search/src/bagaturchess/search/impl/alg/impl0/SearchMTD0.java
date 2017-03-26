@@ -562,7 +562,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		if (env.getGTBProbing() != null
 				&& env.getBitboard().getColourToMove() == rootColour
-				&& depth >= 3) {
+				&& depth >= 15) {
             
 			temp_input.clear();
             env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
@@ -1480,7 +1480,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		if (env.getGTBProbing() != null
 				&& env.getBitboard().getColourToMove() == rootColour
-				&& depth >= 3) {
+				&& depth >= 15) {
             
 			temp_input.clear();
             env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
@@ -2250,7 +2250,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		if (env.getGTBProbing() != null
 				&& env.getBitboard().getColourToMove() == rootColour
-				&& depth >= 3) {
+				&& depth >= 15) {
             
 			temp_input.clear();
             env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
@@ -2607,7 +2607,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		if (env.getGTBProbing() != null
 				&& env.getBitboard().getColourToMove() == rootColour
-				&& depth >= 3) {
+				&& depth >= 15) {
             
 			temp_input.clear();
             env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
