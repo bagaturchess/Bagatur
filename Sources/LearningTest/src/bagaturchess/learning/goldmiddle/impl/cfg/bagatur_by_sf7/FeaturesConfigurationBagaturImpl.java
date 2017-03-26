@@ -30,7 +30,7 @@ public class FeaturesConfigurationBagaturImpl implements IFeaturesConfiguration,
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_ROOKQUEEN   , "PAWNS_ROOKQUEEN"   , MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY       	  , "MOBILITY"       	, MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_S        , "MOBILITY_S"        , MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFETY        , "KINGSAFETY"        , MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFETY        , "KINGSAFETY"        , MOVES_ITERATION         , 0, 5, 1, 0, 0, 0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_SPACE       	  , "SPACE"       		, MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED       	  , "HUNGED"       		, MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAPPED       	  , "TRAPPED"       	, MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));

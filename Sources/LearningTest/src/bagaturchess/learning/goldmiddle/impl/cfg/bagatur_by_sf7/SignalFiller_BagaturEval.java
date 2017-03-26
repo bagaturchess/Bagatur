@@ -182,42 +182,11 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		
 		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
-		long hashkey = bitboard.getHashKey();
-		
-		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
-			
-			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
-			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
-			
-			//Mop-up evaluation
-			//PosEval=4.7*CMD + 1.6*(14 - MD)
-			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
-			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
-				
-				return;
-				
-			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
-				
-				return;
-				
-			}
-		}
-		
 		evalInfo.clear_short();
 		evalInfo.clear();
 		
 		
-		//if (evalConfig.useRule_NoPawnsDrawByMaterialDiff()) {
-			eval_material_nopawnsdrawrule();
-		//} else {
-		//	eval_material();
-		//}
+		eval_material_nopawnsdrawrule();
 		eval_trading();
 		eval_standard();
 		eval_pawns();
