@@ -2275,9 +2275,16 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		int kingsafe_l2 = (w_attacking_pieces_to_black_king_2 * w_attack_to_black_king_2 - b_attacking_pieces_to_white_king_2 * b_attack_to_white_king_2) / (8 * 8);
 		signals.getSignal(FEATURE_ID_KINGSAFE_L2).addStrength(kingsafe_l2, openingPart);
 		
-		/*
-		signals.getSignal(FEATURE_ID_PIN_KING).addStrength(pin_bk + pin_rk + pin_qk, openingPart);
-		signals.getSignal(FEATURE_ID_PIN_BIGGER_PIECE).addStrength(pin_bq + pin_br + pin_rq, openingPart);
+		
+		signals.getSignal(FEATURE_ID_TRAP).addStrength(
+				(w_trap_knights - b_trap_knights) +
+				(w_trap_bishops - b_trap_bishops) +
+				(w_trap_rooks - b_trap_rooks) +
+				(w_trap_queens - b_trap_queens)
+				, openingPart);
+		
+		
+		signals.getSignal(FEATURE_ID_PIN_BIGGER_PIECE).addStrength(pin_bk + pin_rk + pin_qk + pin_bq + pin_br + pin_rq, openingPart);
 		signals.getSignal(FEATURE_ID_PIN_EQUAL_PIECE).addStrength(pin_bn, openingPart);
 		signals.getSignal(FEATURE_ID_PIN_LOWER_PIECE).addStrength(pin_rb + pin_rn + pin_qn + pin_qr + pin_qb, openingPart);
 		
@@ -2286,13 +2293,6 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 		signals.getSignal(FEATURE_ID_ATTACK_EQUAL_PIECE).addStrength(attack_nb + attack_bn, openingPart);
 		signals.getSignal(FEATURE_ID_ATTACK_LOWER_PIECE).addStrength(attack_rb + attack_rn + attack_qn + attack_qb + attack_qr, openingPart);
 		
-		
-		signals.getSignal(FEATURE_ID_TRAP).addStrength(
-					(w_trap_knights - b_trap_knights) +
-					(w_trap_bishops - b_trap_bishops) +
-					(w_trap_rooks - b_trap_rooks) +
-					(w_trap_queens - b_trap_queens)
-					, openingPart);
 		
 		
 		if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
@@ -2364,393 +2364,18 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 			double hunged_all = bitboard.getMaterialFactor().interpolateByFactor(HUNGED_ALL_O[b_hanging_all], HUNGED_ALL_E[b_hanging_all]);
 			signals.getSignal(FEATURE_ID_HUNGED_ALL).addStrength(-hunged_all, openingPart);
 		}
-		
-		
-		*/
 	}
 	
 	
 	public void fillFieldsStatesIterationSignals(ISignals signals) {
 		
-		/*
 		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
-		int w_mobility_knights_safe = 0;
-		int b_mobility_knights_safe = 0;
-		int w_mobility_bishops_safe = 0;
-		int b_mobility_bishops_safe = 0;
-		int w_mobility_rooks_safe = 0;
-		int b_mobility_rooks_safe = 0;
-		int w_mobility_queens_safe = 0;
-		int b_mobility_queens_safe = 0;
+		// field states iteration
 		
-		int w_overprotection_pawns = 0;
-		int b_overprotection_pawns = 0;
-		int w_overprotection_knights = 0;
-		int b_overprotection_knights = 0;
-		int w_overprotection_bishops = 0;
-		int b_overprotection_bishops = 0;
-		int w_overprotection_rooks = 0;
-		int b_overprotection_rooks = 0;
-		int w_overprotection_queens = 0;
-		int b_overprotection_queens = 0;
-		
-		int w_trap_knights = 0;
-		int b_trap_knights = 0;
-		int w_trap_bishops = 0;
-		int b_trap_bishops = 0;
-		int w_trap_rooks = 0;
-		int b_trap_rooks = 0;
-		int w_trap_queens = 0;
-		int b_trap_queens = 0;
-		
-		long bb_white_all = bitboard.getFiguresBitboardByColour(Figures.COLOUR_WHITE);
-		long bb_black_all = bitboard.getFiguresBitboardByColour(Figures.COLOUR_BLACK);
-
 		IFieldsAttacks fa = bitboard.getFieldsAttacks();
 		int[] w_control = fa.getControlArray(Figures.COLOUR_WHITE);
 		int[] b_control = fa.getControlArray(Figures.COLOUR_BLACK);
-		
-		
-		
-		// Knights iteration
-		
-		{
-			int w_knights_count = w_knights.getDataSize();
-			if (w_knights_count > 0) {
-				int[] knights_fields = w_knights.getData();
-				for (int i=0; i<w_knights_count; i++) {
-					
-					w_mobility_knights_safe = 0;
-					
-					int fieldID = knights_fields[i];
-					
-					if (w_control[fieldID] > b_control[fieldID]) {
-						w_overprotection_knights++;
-					}
-					
-					final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
-					final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
-					final int[][] fids = KnightPlies.ALL_KNIGHT_DIRS_WITH_FIELD_IDS[fieldID];
-					
-					final int size = validDirIDs.length;
-					for (int j=0; j<size; j++) {
-						
-						int dirID = validDirIDs[j];
-						long toBitboard = dirs[dirID][0];
-						int toFieldID = fids[dirID][0];
-						
-						if ((toBitboard & bb_white_all) != 0L) {
-							continue;
-						}
-						
-						if ((-SeeMetadata.getSingleton().seeMove(Figures.TYPE_KNIGHT, Figures.TYPE_KNIGHT,
-								w_control[toFieldID], b_control[toFieldID])) >= 0) {
-							w_mobility_knights_safe++;
-						}
-					}
-					
-					signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT_S).addStrength(w_mobility_knights_safe, 1, openingPart);
-					
-					if (w_mobility_knights_safe == 2) {
-						w_trap_knights -= 1;
-					} else if (w_mobility_knights_safe == 1) {
-						w_trap_knights -= 2;
-					} else if (w_mobility_knights_safe == 0) {
-						w_trap_knights -= 3;
-					}
-				}
-			}
-		}
-		
-		{
-			int b_knights_count = b_knights.getDataSize();		
-			if (b_knights_count > 0) {
-				int[] knights_fields = b_knights.getData();
-				for (int i=0; i<b_knights_count; i++) {
-					
-					b_mobility_knights_safe = 0;
-					
-					int fieldID = knights_fields[i];
-					
-					if (b_control[fieldID] > w_control[fieldID]) {
-						b_overprotection_knights++;
-					}
-					
-					final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
-					final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
-					final int[][] fids = KnightPlies.ALL_KNIGHT_DIRS_WITH_FIELD_IDS[fieldID];
-					
-					final int size = validDirIDs.length;
-					for (int j=0; j<size; j++) {
-						
-						int dirID = validDirIDs[j];
-						long toBitboard = dirs[dirID][0];
-						int toFieldID = fids[dirID][0];
-						
-						if ((toBitboard & bb_black_all) != 0L) {
-							continue;
-						}
-						
-						if ((-SeeMetadata.getSingleton().seeMove(Figures.TYPE_KNIGHT, Figures.TYPE_KNIGHT,
-								b_control[toFieldID], w_control[toFieldID])) >= 0) {
-							b_mobility_knights_safe++;
-						}
-					}
-					
-					signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT_S).addStrength(b_mobility_knights_safe, -1, openingPart);
-					
-					if (b_mobility_knights_safe == 2) {
-						b_trap_knights -= 1;
-					} else if (b_mobility_knights_safe == 1) {
-						b_trap_knights -= 2;
-					} else if (b_mobility_knights_safe == 0) {
-						b_trap_knights -= 3;
-					}
-				}				
-			}
-		}
-		
-		
-		
-		// Bishops iteration
-		
-		{
-			int w_bishops_count = w_bishops.getDataSize();
-			if (w_bishops_count > 0) {
-				int[] bishops_fields = w_bishops.getData();
-				for (int i=0; i<w_bishops_count; i++) {
-					
-					w_mobility_bishops_safe = 0;
-					
-					int fieldID = bishops_fields[i];
-					
-					if (w_control[fieldID] > b_control[fieldID]) {
-						w_overprotection_bishops++;
-					}
-					
-					final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
-					final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
-					final int[][] fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
-					
-					final int size = validDirIDs.length;
-					for (int dir=0; dir<size; dir++) {
-						int dirID = validDirIDs[dir];
-						long[] dirBitboards = dirs[dirID];
-						
-						for (int seq=0; seq<dirBitboards.length; seq++) {
-							long toBitboard = dirs[dirID][seq];
-							int toFieldID = fids[dirID][seq];
-							
-							if ((toBitboard & bb_white_all) != 0L) {
-								break;
-							}
-
-							boolean safe = (-SeeMetadata.getSingleton().seeMove(Figures.TYPE_OFFICER, Figures.TYPE_OFFICER,
-										w_control[toFieldID], b_control[toFieldID])) >= 0;
-							if (safe) {
-								w_mobility_bishops_safe++;
-							}
-							
-							if ((toBitboard & bb_black_all) != 0L) {
-								break;
-							}
-						}
-					}
-					
-					signals.getSignal(FEATURE_ID_MOBILITY_BISHOP_S).addStrength(w_mobility_bishops_safe, 1, openingPart);
-					
-					if (w_mobility_bishops_safe == 2) {
-						w_trap_bishops -= 1;
-					} else if (w_mobility_bishops_safe == 1) {
-						w_trap_bishops -= 2;
-					} else if (w_mobility_bishops_safe == 0) {
-						w_trap_bishops -= 3;
-					}
-				}
-			}
-		}
-		
-		{
-			int b_bishops_count = b_bishops.getDataSize();
-			if (b_bishops_count > 0) {
-				int[] bishops_fields = b_bishops.getData();
-				for (int i=0; i<b_bishops_count; i++) {
-					
-					b_mobility_bishops_safe = 0;
-					
-					int fieldID = bishops_fields[i];
-					
-					if (b_control[fieldID] > w_control[fieldID]) {
-						b_overprotection_bishops++;
-					}
-					
-					final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
-					final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
-					final int[][] fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
-					
-					final int size = validDirIDs.length;
-					for (int dir=0; dir<size; dir++) {
-						int dirID = validDirIDs[dir];
-						long[] dirBitboards = dirs[dirID];
-						
-						for (int seq=0; seq<dirBitboards.length; seq++) {
-							
-							long toBitboard = dirs[dirID][seq];
-							int toFieldID = fids[dirID][seq];
-							
-							if ((toBitboard & bb_black_all) != 0L) {
-								break;
-							}
-
-							boolean safe = (-SeeMetadata.getSingleton().seeMove(Figures.TYPE_OFFICER, Figures.TYPE_OFFICER,
-										b_control[toFieldID], w_control[toFieldID])) >= 0;
-							if (safe) {
-								b_mobility_bishops_safe++;
-							}
-							
-							if ((toBitboard & bb_white_all) != 0L) {
-								break;
-							}
-							
-						}
-					}
-					
-					signals.getSignal(FEATURE_ID_MOBILITY_BISHOP_S).addStrength(b_mobility_bishops_safe, -1, openingPart);
-					
-					if (b_mobility_bishops_safe == 2) {
-						b_trap_bishops -= 1;
-					} else if (b_mobility_bishops_safe == 1) {
-						b_trap_bishops -= 2;
-					} else if (b_mobility_bishops_safe == 0) {
-						b_trap_bishops -= 3;
-					}
-				}
-			}
-		}
-
-		
-		
-		// Rooks iteration
-		
-		{
-			int w_rooks_count = w_rooks.getDataSize();
-			if (w_rooks_count > 0) {
-				int[] rooks_fields = w_rooks.getData();
-				for (int i=0; i<w_rooks_count; i++) {
-					
-					w_mobility_rooks_safe = 0;
-					
-					int fieldID = rooks_fields[i];
-					
-					if (w_control[fieldID] > b_control[fieldID]) {
-						w_overprotection_rooks++;
-					}
-					
-					final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
-					final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
-					final int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
-					
-					final int size = validDirIDs.length;
-					for (int dir=0; dir<size; dir++) {
-						int dirID = validDirIDs[dir];
-						long[] dirBitboards = dirs[dirID];
-						
-						for (int seq=0; seq<dirBitboards.length; seq++) {
-							
-							long toBitboard = dirs[dirID][seq];
-							int toFieldID = fids[dirID][seq];
-								
-							if ((toBitboard & bb_white_all) != 0L) {
-								break;
-							}
-								
-							boolean safe = (-SeeMetadata.getSingleton().seeMove(Figures.TYPE_CASTLE, Figures.TYPE_CASTLE,
-										w_control[toFieldID], b_control[toFieldID])) >= 0;
-							if (safe) {
-								w_mobility_rooks_safe++;
-							}
-							
-							if ((toBitboard & bb_black_all) != 0L) {
-								break;
-							}
-						}
-					}
-					
-					signals.getSignal(FEATURE_ID_MOBILITY_ROOK_S).addStrength(w_mobility_rooks_safe, 1, openingPart);
-					
-					if (w_mobility_rooks_safe == 2) {
-						w_trap_rooks -= 1;
-					} else if (w_mobility_rooks_safe == 1) {
-						w_trap_rooks -= 2;
-					} else if (w_mobility_rooks_safe == 0) {
-						w_trap_rooks -= 3;
-					}					
-				}
-			}
-		}
-		
-		{
-			int b_rooks_count = b_rooks.getDataSize();
-			if (b_rooks_count > 0) {
-				int[] rooks_fields = b_rooks.getData();
-				for (int i=0; i<b_rooks_count; i++) {
-					
-					b_mobility_rooks_safe = 0;
-					
-					int fieldID = rooks_fields[i];
-					
-					if (b_control[fieldID] > w_control[fieldID]) {
-						b_overprotection_rooks++;
-					}
-					
-					final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
-					final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
-					final int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
-					
-					final int size = validDirIDs.length;
-					for (int dir=0; dir<size; dir++) {
-						int dirID = validDirIDs[dir];
-						long[] dirBitboards = dirs[dirID];
-						
-						for (int seq=0; seq<dirBitboards.length; seq++) {
-							long toBitboard = dirs[dirID][seq];
-							int toFieldID = fids[dirID][seq];
-							
-							if ((toBitboard & bb_black_all) != 0L) {
-								break;
-							}
-
-
-							boolean safe = (-SeeMetadata.getSingleton().seeMove(Figures.TYPE_CASTLE, Figures.TYPE_CASTLE,
-									b_control[toFieldID], w_control[toFieldID])) >= 0;
-							if (safe) {
-								b_mobility_rooks_safe++;
-							}
-							
-							if ((toBitboard & bb_white_all) != 0L) {
-								break;
-							}
-						}
-					}
-					
-					signals.getSignal(FEATURE_ID_MOBILITY_ROOK_S).addStrength(b_mobility_rooks_safe, -1, openingPart);
-					
-					if (b_mobility_rooks_safe == 2) {
-						b_trap_rooks -= 1;
-					} else if (b_mobility_rooks_safe == 1) {
-						b_trap_rooks -= 2;
-					} else if (b_mobility_rooks_safe == 0) {
-						b_trap_rooks -= 3;
-					}
-				}
-			}
-		}
-
-		
-		
-		
-		// field states iteration
 		
 		int hangingCount = 0;
 		for (int fieldID=0; fieldID<w_control.length; fieldID++) {
@@ -2794,8 +2419,6 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 				}
 			}
 		}
-
-		*/
 	}
 
 }

@@ -79,7 +79,6 @@ public interface SF7_FeaturesConstants {
 	 */
 	public static final int FEATURE_ID_KINGSAFE_L1     	   = 4010;
 	public static final int FEATURE_ID_KINGSAFE_L2     	   = 4020;
-	
 	public static final int FEATURE_ID_MOBILITY_KNIGHT     = 4030;
 	public static final int FEATURE_ID_MOBILITY_BISHOP     = 4040;
 	public static final int FEATURE_ID_MOBILITY_ROOK       = 4050;
@@ -88,76 +87,24 @@ public interface SF7_FeaturesConstants {
 	public static final int FEATURE_ID_MOBILITY_BISHOP_S   = 4080;
 	public static final int FEATURE_ID_MOBILITY_ROOK_S     = 4090;
 	public static final int FEATURE_ID_MOBILITY_QUEEN_S    = 4100;
-	
-	/*public static final int FEATURE_ID_PENETRATION_OP	   = 4104;
-	public static final int FEATURE_ID_PENETRATION_OP_S	   = 4105;
-	public static final int FEATURE_ID_PENETRATION_KING	   = 4106;
-	public static final int FEATURE_ID_PENETRATION_KING_S  = 4107;
-	*/
 	public static final int FEATURE_ID_ROOKS_PAIR_H        = 4110;
 	public static final int FEATURE_ID_ROOKS_PAIR_V        = 4120;
-	/*
 	public static final int FEATURE_ID_TRAP		           = 4150;
-	
-	public static final int FEATURE_ID_PIN_KING            = 4210;
 	public static final int FEATURE_ID_PIN_BIGGER_PIECE    = 4220;
 	public static final int FEATURE_ID_PIN_EQUAL_PIECE     = 4230;
 	public static final int FEATURE_ID_PIN_LOWER_PIECE     = 4240;
-	public static final int FEATURE_ID_PIN_BK              = 4170;
-	public static final int FEATURE_ID_PIN_BQ              = 4180;
-	public static final int FEATURE_ID_PIN_BR              = 4190;
-	public static final int FEATURE_ID_PIN_BN              = 4200;
-	public static final int FEATURE_ID_PIN_RK              = 4210;
-	public static final int FEATURE_ID_PIN_RQ              = 4220;
-	public static final int FEATURE_ID_PIN_RB              = 4230;
-	public static final int FEATURE_ID_PIN_RN              = 4240;
-	public static final int FEATURE_ID_PIN_QK              = 4250;
-	public static final int FEATURE_ID_PIN_QQ              = 4260;
-	public static final int FEATURE_ID_PIN_QN              = 4270;
-	public static final int FEATURE_ID_PIN_QR              = 4280;
-	public static final int FEATURE_ID_PIN_QB              = 4290;
-	
 	public static final int FEATURE_ID_ATTACK_BIGGER_PIECE = 4310;
 	public static final int FEATURE_ID_ATTACK_EQUAL_PIECE  = 4320;
 	public static final int FEATURE_ID_ATTACK_LOWER_PIECE  = 4330;
-	
 	public static final int FEATURE_ID_HUNGED_PIECES       = 4400;
 	public static final int FEATURE_ID_HUNGED_PAWNS        = 4410;
 	public static final int FEATURE_ID_HUNGED_ALL          = 4420;
-	*/
+	
 	
 	/**
 	 * FIELDS STATES ITERATION
 	 */
-	//public static final int FEATURE_ID_PST_CONTROL_EQ      = 5010;
-	//public static final int FEATURE_ID_PST_CONTROL_MORE    = 5020;
+	public static final int FEATURE_ID_PST_CONTROL_EQ      = 5010;
+	public static final int FEATURE_ID_PST_CONTROL_MORE    = 5020;
 	
-	
-	/**
-	 * Features which could be implemented:
-	 * 
-	 * HIGH PRIORITY
-	 * -  Attacked pieces
-	 * -  Knights outpost
-	 * 
-	 * LOW PRIORITY
-	 * -  Connected bishop and queen
-	 * -  King possition as a function of the pawns structure and/or passed pawns if any (for endgame only)
-	 * -  Fiancheto bishop
-	 * -  Fiancheto like caslting and pawn structure but missing bishop
-	 * -  Drawing with opposite bishops and pawns only (this is not feature, should be implemented in the search alg)
-	 * -  Moved F pawn before and after castling
-	 * -  Missing G pawn before and after castling
-	 * -  Traps - static (patterns like [bishop on h7 & pawn on g6])
-	 * 
-	 * IMPLEMENTED
-	 * -  Pinned pieces (different cases - BNK, BNQ, BNR etc.)
-	 * -  Colour to move - tempo
-	 * -  Traps - dinamic (piece have 0 or 1 safe fields to go)
-	 * -  Queens on 7th
-	 * -  Reinsured pieces
-	 * -  Hanging pieces (by overall count and by type)
-	 * -  Safe attacks
-	 * -  Passer stoppers - pieces which are in front of the passer
-	 */
 }
