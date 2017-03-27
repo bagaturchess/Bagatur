@@ -1,7 +1,7 @@
 package bagaturchess.learning.goldmiddle.run.cfg;
 
 
-import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.BagaturPawnsEvalFactory;
 import bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluatorFactory;
 import bagaturchess.search.api.IEvalConfig;
 
@@ -25,7 +25,8 @@ public class EvaluationConfg implements IEvalConfig {
 
 	@Override
 	public String getPawnsCacheFactoryClassName() {
-		return PawnsModelEvalFactory.class.getName();
+		return BagaturPawnsEvalFactory.class.getName();
+		//return PawnsModelEvalFactory.class.getName();
 	}
 
 }
