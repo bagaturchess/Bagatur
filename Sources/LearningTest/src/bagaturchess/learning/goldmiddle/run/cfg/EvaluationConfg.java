@@ -1,6 +1,7 @@
 package bagaturchess.learning.goldmiddle.run.cfg;
 
 
+import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.BagaturPawnsEvalFactory;
 import bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluatorFactory;
 import bagaturchess.search.api.IEvalConfig;
