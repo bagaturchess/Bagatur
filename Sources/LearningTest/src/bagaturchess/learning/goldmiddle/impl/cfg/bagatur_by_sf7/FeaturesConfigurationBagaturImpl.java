@@ -19,21 +19,21 @@ public class FeaturesConfigurationBagaturImpl implements IFeaturesConfiguration,
 		
 		Set<IFeature> new_featuresSet = new TreeSet<IFeature>();
 		
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL       	  , "MATERIAL"       	, MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_STANDARD       	  , "STANDARD"       	, MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PST		       	  , "PST"       	 	, MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_STANDARD    , "PAWNS_STANDARD"    , MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PASSED      , "PAWNS_PASSED"      , MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PASSED_KING , "PAWNS_PASSED_KING" , MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PSTOPPERS   , "PAWNS_PSTOPPERS"   , MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PSTOPPERS_A , "PAWNS_PSTOPPERS_A" , MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_ROOKQUEEN   , "PAWNS_ROOKQUEEN"   , MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY       	  , "MOBILITY"       	, MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_S        , "MOBILITY_S"        , MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFETY        , "KINGSAFETY"        , MOVES_ITERATION         , 0, 5, 1, 0, 0, 0 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_SPACE       	  , "SPACE"       		, MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED       	  , "HUNGED"       		, MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAPPED       	  , "TRAPPED"       	, MOVES_ITERATION         , 0, 5, 1, 0, 5, 1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL       	  , "MATERIAL"       	, MOVES_ITERATION         , 0, 5, 1.167, 0, 5, 0.801 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_STANDARD       	  , "STANDARD"       	, MOVES_ITERATION         , 0, 5, 0.191, 0, 5, 0.070 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PST		       	  , "PST"       	 	, MOVES_ITERATION         , 0, 5, 1.051, 0, 5, 0.653 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_STANDARD    , "PAWNS_STANDARD"    , MOVES_ITERATION         , 0, 5, 0.704, 0, 5, 0.435 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PASSED      , "PAWNS_PASSED"      , MOVES_ITERATION         , 0, 5, 0.034, 0, 5, 1.711 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PASSED_KING , "PAWNS_PASSED_KING" , MOVES_ITERATION         , 0, 5, 0.000, 0, 5, 2.408 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PSTOPPERS   , "PAWNS_PSTOPPERS"   , MOVES_ITERATION         , 0, 5, 0.083, 0, 5, 0.462 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PSTOPPERS_A , "PAWNS_PSTOPPERS_A" , MOVES_ITERATION         , 0, 5, 0.098, 0, 5, 1.058 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_ROOKQUEEN   , "PAWNS_ROOKQUEEN"   , MOVES_ITERATION         , 0, 5, 0.660, 0, 5, 2.004 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY       	  , "MOBILITY"       	, MOVES_ITERATION         , 0, 5, 0.757, 0, 5, 0.038 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_S        , "MOBILITY_S"        , MOVES_ITERATION         , 0, 5, 1.714, 0, 5, 0.860 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KINGSAFETY        , "KINGSAFETY"        , MOVES_ITERATION         , 0, 5, 3.378, 0, 0, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_SPACE       	  , "SPACE"       		, MOVES_ITERATION         , 0, 5, 0.704, 0, 5, 0.222 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED       	  , "HUNGED"       		, MOVES_ITERATION         , 0, 5, 1.341, 0, 5, 2.180 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAPPED       	  , "TRAPPED"       	, MOVES_ITERATION         , 0, 5, 0.442, 0, 5, 0.605 ));
 		
 		return new_featuresSet.toArray(new IFeature[0]);
 	}
