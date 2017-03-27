@@ -34,11 +34,11 @@ import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
-import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_by_sf7.BagaturBySF7_LearningInputImpl;
+import bagaturchess.learning.goldmiddle.impl.cfg.allfeatures.ALL_LearningInputImpl;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.Bagatur_LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.base.FeaturesConfigurationBagaturImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.base.LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.base.SignalFiller;
-import bagaturchess.learning.goldmiddle.impl.cfg.stockfish7.SF7_LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluator;
 import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.learning.impl.signals.SignalArray;
@@ -167,7 +167,7 @@ public class EvaluatorsComparatorVisitorImpl implements PositionsVisitor {
 	
 	public void begin(IBitBoard bitboard) throws Exception {
 		
-		ILearningInput input = new BagaturBySF7_LearningInputImpl();
+		ILearningInput input = new Bagatur_LearningInputImpl();
 		
 		filler = input.createFiller(bitboard);
 		

@@ -4,13 +4,13 @@
  * To change the template for this generated file go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-package bagaturchess.learning.goldmiddle.impl.cfg.stockfish7;
+package bagaturchess.learning.goldmiddle.impl.cfg.allfeatures;
 
 
 import bagaturchess.bitboard.common.Utils;
 
 
-public class SF7_SignalFillerConstants {
+public class ALL_SignalFillerConstants {
 	
 	public static final int[] HUNGED_PIECES_O   = new int[] {0,   -1,   -2,   -4,   -8};
 	public static final int[] HUNGED_PIECES_E   = new int[] {0,   -1,   -2,   -4,   -8};

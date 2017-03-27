@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.bagatur_by_sf7;
+package bagaturchess.learning.goldmiddle.impl.cfg.bagatur;
 
 
 import java.util.Set;

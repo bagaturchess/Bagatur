@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.stockfish7;
+package bagaturchess.learning.goldmiddle.impl.cfg.allfeatures;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -25,7 +25,7 @@ import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 
 
-public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_FeaturesConstants, ISignalFiller {
+public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_FeaturesConstants, ISignalFiller {
 	
 	
 	private static final int[] HORIZONTAL_SYMMETRY = Utils.reverseSpecial ( new int[]{	
@@ -57,7 +57,7 @@ public class SF7_SignalFiller extends SF7_SignalFillerConstants implements SF7_F
 	private PiecesList b_pawns;
 	
 	
-	public SF7_SignalFiller(IBitBoard _bitboard) {
+	public ALL_SignalFiller(IBitBoard _bitboard) {
 		
 		bitboard = _bitboard;
 		

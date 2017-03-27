@@ -1,11 +1,11 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.stockfish7;
+package bagaturchess.learning.goldmiddle.impl.cfg.allfeatures;
 
 
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.common.Utils;
 
 
-public class SF7_BoardConfig implements IBoardConfig {
+public class ALL_BoardConfig implements IBoardConfig {
 	
 	
 	private double MATERIAL_PAWN_O 		= 73;

@@ -28,6 +28,9 @@ import bagaturchess.learning.api.ISignalFiller;
 public interface ILearningInput {
 	
 	
+	public String getPawnsEvalFactoryClassName();
+	
+	
 	public IBoardConfig createBoardConfig();
 	
 	

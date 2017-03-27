@@ -1,7 +1,7 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.stockfish7;
+package bagaturchess.learning.goldmiddle.impl.cfg.allfeatures;
 
 
-public interface SF7_FeaturesConstants {
+public interface ALL_FeaturesConstants {
 	
 	
 	/**

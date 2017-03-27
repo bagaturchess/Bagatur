@@ -22,12 +22,18 @@ package bagaturchess.learning.goldmiddle.impl.cfg.base;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
+import bagaturchess.engines.bagatur.eval.BagaturPawnsEvalFactory;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.run.cfg.BoardConfigImpl;
 
 
 public class LearningInputImpl implements ILearningInput {
+	
+	
+	public String getPawnsEvalFactoryClassName() {
+		return BagaturPawnsEvalFactory.class.getName();
+	}
 	
 	
 	public IBoardConfig createBoardConfig() {
