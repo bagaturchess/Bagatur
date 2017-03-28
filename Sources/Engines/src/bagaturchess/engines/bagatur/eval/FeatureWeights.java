@@ -34,8 +34,6 @@ public interface FeatureWeights {
 	
 	public static final double WEIGHT_PAWNS_ROOKQUEEN_O	= 1;
 	public static final double WEIGHT_PAWNS_ROOKQUEEN_E	= 1;
-	
-	public static final double WEIGHT_PP_O	 			= 2;
 
 	
 	
