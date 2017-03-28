@@ -1,7 +1,7 @@
 package bagaturchess.learning.goldmiddle.impl.cfg.allfeatures;
 
 
-public interface ALL_FeaturesConstants {
+interface ALL_FeaturesConstants {
 	
 	
 	/**

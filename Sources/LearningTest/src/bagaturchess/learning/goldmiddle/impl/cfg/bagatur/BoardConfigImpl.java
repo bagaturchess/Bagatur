@@ -5,7 +5,7 @@ import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.common.Utils;
 
 
-class BoardConfigImpl implements IBoardConfig {
+public class BoardConfigImpl implements IBoardConfig {
 	
 	/**
 	public static final int MATERIAL_PAWN_O				= 72;

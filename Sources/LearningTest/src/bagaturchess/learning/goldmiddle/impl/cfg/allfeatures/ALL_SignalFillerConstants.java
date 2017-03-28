@@ -10,7 +10,7 @@ package bagaturchess.learning.goldmiddle.impl.cfg.allfeatures;
 import bagaturchess.bitboard.common.Utils;
 
 
-public class ALL_SignalFillerConstants {
+class ALL_SignalFillerConstants {
 	
 	public static final int[] HUNGED_PIECES_O   = new int[] {0,   -1,   -2,   -4,   -8};
 	public static final int[] HUNGED_PIECES_E   = new int[] {0,   -1,   -2,   -4,   -8};
