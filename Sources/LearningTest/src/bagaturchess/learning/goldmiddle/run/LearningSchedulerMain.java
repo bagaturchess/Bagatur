@@ -102,6 +102,7 @@ public class LearningSchedulerMain {
 						//"bagaturchess.engines.material.MaterialEvalConfigImpl"
 						//"bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl",
 						//"bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2",
+						
 						bagaturchess.learning.goldmiddle.impl.cfg.allfeatures.ALL_BoardConfig.class.getName(),
 						//bagaturchess.learning.goldmiddle.run.cfg.EvaluationConfg.class.getName(),
 						bagaturchess.learning.goldmiddle.impl.cfg.allfeatures.EvaluationConfig.class.getName()
@@ -154,8 +155,8 @@ public class LearningSchedulerMain {
 		
 		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
-		IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
-		//IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
+		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
+		IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("7k/6r1/8/8/8/8/1Q6/K7 w - -", null, cfg.getBoardConfig()); //Queen and King vs. Rook and King
 		//IBitBoard bitboard  = new Board("k7/1q6/8/8/8/7R/8/6K1 b - - ", null, cfg.getBoardConfig());
 				
