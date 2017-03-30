@@ -251,8 +251,8 @@ public class MemoryConsumers {
 			
 			tpt.add(new TPTable(size_tpt, false, new BinarySemaphore_Dummy()));
 			
-			//evalCache.add(new EvalCache(size_ec, false, new BinarySemaphore_Dummy()));
-			evalCache.add(new EvalCache1(5, size_ec, false, new BinarySemaphore_Dummy()));
+			evalCache.add(new EvalCache(size_ec, false, new BinarySemaphore_Dummy()));
+			//evalCache.add(new EvalCache1(5, size_ec, false, new BinarySemaphore_Dummy()));
 			
 			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName());
 			pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
@@ -309,8 +309,8 @@ public class MemoryConsumers {
 		System.gc();
 		
 		int memory_before = getUsedMemory();
-		//LRUMapLongObject test_ec = new EvalCache(test_size, true, null);
-		LRUMapLongObject test_ec = new EvalCache1(5, test_size, true, null);
+		LRUMapLongObject test_ec = new EvalCache(test_size, true, null);
+		//LRUMapLongObject test_ec = new EvalCache1(5, test_size, true, null);
 		int size = getEntrySize(availableMemory, engineConfiguration.getEvalCacheUsagePercent(), test_size, memory_before);
 		test_ec.clear();
 		return size;

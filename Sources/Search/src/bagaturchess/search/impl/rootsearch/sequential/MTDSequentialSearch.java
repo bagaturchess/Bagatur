@@ -129,7 +129,8 @@ public class MTDSequentialSearch extends RootSearch_BaseImpl {
 		if (initialValue == null) {
 			IEvaluator evaluator = getSharedData().getEvaluatorFactory().create(
 					getBitboardForSetup(),
-					new EvalCache1(5, 100, true, new BinarySemaphore_Dummy()),
+					new EvalCache(100, true, new BinarySemaphore_Dummy()),
+					//new EvalCache1(5, 100, true, new BinarySemaphore_Dummy()),
 					getRootSearchConfig().getEvalConfig());
 			initialValue = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, getBitboardForSetup().getColourToMove());
 		}
