@@ -165,7 +165,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		sumDiffs1 = 0;
 		sumDiffs2 = 0;
 		
-		ILearningInput input = new Bagatur_LearningInputImpl();
+		ILearningInput input = new ALL_LearningInputImpl();
 		
 		filler = input.createFiller(bitboard);
 		

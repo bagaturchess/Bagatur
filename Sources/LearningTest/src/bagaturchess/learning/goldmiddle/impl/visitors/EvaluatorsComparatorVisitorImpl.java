@@ -167,7 +167,7 @@ public class EvaluatorsComparatorVisitorImpl implements PositionsVisitor {
 	
 	public void begin(IBitBoard bitboard) throws Exception {
 		
-		ILearningInput input = new Bagatur_LearningInputImpl();
+		ILearningInput input = new ALL_LearningInputImpl();
 		
 		filler = input.createFiller(bitboard);
 		

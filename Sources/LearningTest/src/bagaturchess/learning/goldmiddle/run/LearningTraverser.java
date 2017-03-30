@@ -26,7 +26,7 @@ public class LearningTraverser {
 			
 			PositionsVisitor learning = new LearningVisitorImpl();
 			
-			ILearningInput input = new Bagatur_LearningInputImpl();
+			ILearningInput input = new ALL_LearningInputImpl();
 			
 			while (true) {
 				PositionsTraverser.traverseAll(filePath, learning, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());

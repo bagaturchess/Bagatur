@@ -21,6 +21,6 @@ public class WeightsEvaluatorFactory implements IEvaluatorFactory {
 	
 	
 	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache, IEvalConfig evalConfig) {
-		return new WeightsEvaluator(bitboard, evalCache, (IWeightsEvalConfig) evalConfig);
+		return new WeightsEvaluator(bitboard, evalCache, evalConfig);
 	}
 }

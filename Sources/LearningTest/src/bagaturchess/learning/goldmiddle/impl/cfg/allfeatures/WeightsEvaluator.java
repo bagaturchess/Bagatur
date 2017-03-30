@@ -15,23 +15,20 @@ import bagaturchess.bitboard.impl.plies.KingSurrounding;
 import bagaturchess.bitboard.impl.plies.KnightPlies;
 import bagaturchess.bitboard.impl.plies.OfficerPlies;
 import bagaturchess.bitboard.impl.plies.WhitePawnPlies;
+import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 
 
-public class WeightsEvaluator extends BaseEvaluator {
+public class WeightsEvaluator extends BaseEvaluator implements Weights {
     
     
     long RANK_7TH = Fields.DIGIT_7;
     long RANK_2TH = Fields.DIGIT_2;
     
     
-    private IWeightsEvalConfig evalConfig;
-    
-    
-    public WeightsEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IWeightsEvalConfig _evalConfig) {
+    public WeightsEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
             super(_bitboard, _evalCache, _evalConfig);
-            evalConfig = _evalConfig;
     }
     
     
@@ -123,12 +120,12 @@ public class WeightsEvaluator extends BaseEvaluator {
             * Opening features
             */
             int castling = castling(Figures.COLOUR_WHITE) - castling(Figures.COLOUR_BLACK);
-            eval_o += evalConfig.getKINGSAFE_CASTLING_O() * castling;
-            eval_e += evalConfig.getKINGSAFE_CASTLING_E() * castling;
+            eval_o += KINGSAFE_CASTLING_O * castling;
+            eval_e += KINGSAFE_CASTLING_E * castling;
             
             int fianchetto = fianchetto();
-            eval_o += evalConfig.getKINGSAFE_FIANCHETTO_O() * fianchetto;
-            eval_e += evalConfig.getKINGSAFE_FIANCHETTO_E() * fianchetto;
+            eval_o += KINGSAFE_FIANCHETTO_O * fianchetto;
+            eval_e += KINGSAFE_FIANCHETTO_E * fianchetto;
             
             double movedFGPawns = movedFGPawns();
             
@@ -137,16 +134,16 @@ public class WeightsEvaluator extends BaseEvaluator {
             * Mid-game and End-game features
             */
             int double_bishop = ((w_bishops.getDataSize() >= 2) ? 1 : 0) - ((b_bishops.getDataSize() >= 2) ? 1 : 0);
-            eval_o += evalConfig.getBISHOPS_DOUBLE_O() * double_bishop;
-            eval_e += evalConfig.getBISHOPS_DOUBLE_E() * double_bishop;
+            eval_o += BISHOPS_DOUBLE_O * double_bishop;
+            eval_e += BISHOPS_DOUBLE_E * double_bishop;
 
             int double_rooks = ((w_rooks.getDataSize() >= 2) ? 1 : 0) - ((b_rooks.getDataSize() >= 2) ? 1 : 0);
-            eval_o += evalConfig.getROOKS_DOUBLE_O() * double_rooks;
-            eval_e += evalConfig.getROOKS_DOUBLE_E() * double_rooks;
+            eval_o += ROOKS_DOUBLE_O * double_rooks;
+            eval_e += ROOKS_DOUBLE_E * double_rooks;
 
             int double_knights = ((w_knights.getDataSize() >= 2) ? 1 : 0) - ((b_knights.getDataSize() >= 2) ? 1 : 0);
-            eval_o += evalConfig.getKNIGHTS_DOUBLE_O() * double_knights;
-            eval_e += evalConfig.getKNIGHTS_DOUBLE_E() * double_knights;
+            eval_o += KNIGHTS_DOUBLE_O * double_knights;
+            eval_e += KNIGHTS_DOUBLE_E * double_knights;
             
             
             //Kings Distance
@@ -154,11 +151,11 @@ public class WeightsEvaluator extends BaseEvaluator {
             int kingFieldID_black = b_king.getData()[0];
             int kingDistance = Fields.getDistancePoints(kingFieldID_white, kingFieldID_black);
             if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-                    eval_o += ALL_SignalFillerConstants.KING_DISTANCE_O[kingDistance] * evalConfig.getKINGS_DISTANCE_O();
-                    eval_e += ALL_SignalFillerConstants.KING_DISTANCE_E[kingDistance] * evalConfig.getKINGS_DISTANCE_E();
+                    eval_o += ALL_SignalFillerConstants.KING_DISTANCE_O[kingDistance] * KINGS_DISTANCE_O;
+                    eval_e += ALL_SignalFillerConstants.KING_DISTANCE_E[kingDistance] * KINGS_DISTANCE_E;
             } else {
-                    eval_o -= ALL_SignalFillerConstants.KING_DISTANCE_O[kingDistance] * evalConfig.getKINGS_DISTANCE_O();
-                    eval_e -= ALL_SignalFillerConstants.KING_DISTANCE_E[kingDistance] * evalConfig.getKINGS_DISTANCE_E();
+                    eval_o -= ALL_SignalFillerConstants.KING_DISTANCE_O[kingDistance] * KINGS_DISTANCE_O;
+                    eval_e -= ALL_SignalFillerConstants.KING_DISTANCE_E[kingDistance] * KINGS_DISTANCE_E;
             }
             
             //Refers to http://home.comcast.net/~danheisman/Articles/evaluation_of_material_imbalance.htm
@@ -169,12 +166,12 @@ public class WeightsEvaluator extends BaseEvaluator {
             int b_pawns_above5 = b_pawns.getDataSize() - 5;
             
             int pawns5_rooks = w_pawns_above5 * w_rooks.getDataSize() - b_pawns_above5 * b_rooks.getDataSize();
-            eval_o += pawns5_rooks * evalConfig.getPAWNS5_ROOKS_O();
-            eval_e += pawns5_rooks * evalConfig.getPAWNS5_ROOKS_E();
+            eval_o += pawns5_rooks * PAWNS5_ROOKS_O;
+            eval_e += pawns5_rooks * PAWNS5_ROOKS_E;
             
             int pawns5_knights = w_pawns_above5 * w_knights.getDataSize() - b_pawns_above5 * b_knights.getDataSize();
-            eval_o += pawns5_knights * evalConfig.getPAWNS5_KNIGHTS_O();
-            eval_e += pawns5_knights * evalConfig.getPAWNS5_KNIGHTS_E();
+            eval_o += pawns5_knights * PAWNS5_KNIGHTS_O;
+            eval_e += pawns5_knights * PAWNS5_KNIGHTS_E;
             
             
             return movedFGPawns + interpolator.interpolateByFactor(eval_o, eval_e);
@@ -256,10 +253,10 @@ public class WeightsEvaluator extends BaseEvaluator {
             }
             
 
-            double scores_o = movedFPawn * evalConfig.getKINGSAFE_F_O() +
-        missingGPawn * evalConfig.getKINGSAFE_G_O();
-            double scores_e = movedFPawn * evalConfig.getKINGSAFE_F_E() +
-        missingGPawn * evalConfig.getKINGSAFE_G_E();
+            double scores_o = movedFPawn * KINGSAFE_F_O +
+        missingGPawn * KINGSAFE_G_O;
+            double scores_e = movedFPawn * KINGSAFE_F_E +
+        missingGPawn * KINGSAFE_G_E;
             
             return interpolator.interpolateByFactor(scores_o, scores_e);
     }
@@ -382,20 +379,20 @@ public class WeightsEvaluator extends BaseEvaluator {
                                         long bb_neighbors = ~PawnStructureConstants.WHITE_FRONT_FULL[fieldID] & PawnStructureConstants.WHITE_PASSED[fieldID];
                                         if ((bb_neighbors & bb_black_pawns) == 0) { // Weak field
                                              
-                                             eval_o += evalConfig.getKNIGHT_OUTPOST_O();
-                                                    eval_e += evalConfig.getKNIGHT_OUTPOST_E();
+                                             eval_o += KNIGHT_OUTPOST_O;
+                                                    eval_e += KNIGHT_OUTPOST_E;
                                              
                                              if ((BlackPawnPlies.ALL_BLACK_PAWN_ATTACKS_MOVES[fieldID] & bb_white_pawns) != 0) {
                                                      
-                                                     eval_o += evalConfig.getKNIGHT_OUTPOST_O();
-                                                            eval_e += evalConfig.getKNIGHT_OUTPOST_E();
+                                                     eval_o += KNIGHT_OUTPOST_O;
+                                                            eval_e += KNIGHT_OUTPOST_E;
                                                             
                                                      if (b_knights.getDataSize() == 0) {
                                                              long colouredFields = (fieldBB & Fields.ALL_WHITE_FIELDS) != 0 ?
                                                                              Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
                                                              if ((colouredFields & bb_black_bishops) == 0) {
-                                                                     eval_o += evalConfig.getKNIGHT_OUTPOST_O();
-                                                                            eval_e += evalConfig.getKNIGHT_OUTPOST_E();
+                                                                     eval_o += KNIGHT_OUTPOST_O;
+                                                                            eval_e += KNIGHT_OUTPOST_E;
                                                              }
                                                      }
                                              }
@@ -403,8 +400,8 @@ public class WeightsEvaluator extends BaseEvaluator {
                                 }
                                 
                                     int tropism = Fields.getTropismPoint(fieldID, kingFieldID_black);
-                                    eval_o += evalConfig.getTROPISM_KNIGHT_O() * tropism;
-                                    eval_e += evalConfig.getTROPISM_KNIGHT_E() * tropism;
+                                    eval_o += TROPISM_KNIGHT_O * tropism;
+                                    eval_e += TROPISM_KNIGHT_E * tropism;
                             }
                     }
             }
@@ -428,20 +425,20 @@ public class WeightsEvaluator extends BaseEvaluator {
                                         long bb_neighbors = ~PawnStructureConstants.BLACK_FRONT_FULL[fieldID] & PawnStructureConstants.BLACK_PASSED[fieldID];
                                         if ((bb_neighbors & bb_white_pawns) == 0) { // Weak field
                                              
-                                             eval_o -= evalConfig.getKNIGHT_OUTPOST_O();
-                                                    eval_e -= evalConfig.getKNIGHT_OUTPOST_E();
+                                             eval_o -= KNIGHT_OUTPOST_O;
+                                                    eval_e -= KNIGHT_OUTPOST_E;
                                                     
                                              if ((WhitePawnPlies.ALL_WHITE_PAWN_ATTACKS_MOVES[fieldID] & bb_black_pawns) != 0) {
                                                      
-                                                     eval_o -= evalConfig.getKNIGHT_OUTPOST_O();
-                                                            eval_e -= evalConfig.getKNIGHT_OUTPOST_E();
+                                                     eval_o -= KNIGHT_OUTPOST_O;
+                                                            eval_e -= KNIGHT_OUTPOST_E;
                                                             
                                                      if (w_knights.getDataSize() == 0) {
                                                              long colouredFields = (fieldBB & Fields.ALL_WHITE_FIELDS) != 0 ?
                                                                              Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
                                                              if ((colouredFields & bb_white_bishops) == 0) {
-                                                                     eval_o -= evalConfig.getKNIGHT_OUTPOST_O();
-                                                                            eval_e -= evalConfig.getKNIGHT_OUTPOST_E();
+                                                                     eval_o -= KNIGHT_OUTPOST_O;
+                                                                            eval_e -= KNIGHT_OUTPOST_E;
                                                              }
                                                      }
                                              }
@@ -449,8 +446,8 @@ public class WeightsEvaluator extends BaseEvaluator {
                                 }
                                 
                                     int tropism = Fields.getTropismPoint(fieldID, kingFieldID_white);
-                                    eval_o -= evalConfig.getTROPISM_KNIGHT_O() * tropism;
-                                    eval_e -= evalConfig.getTROPISM_KNIGHT_E() * tropism;
+                                    eval_o -= TROPISM_KNIGHT_O * tropism;
+                                    eval_e -= TROPISM_KNIGHT_E * tropism;
                             }
                     }
             }
@@ -472,16 +469,16 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     eval_e += bitboard.getBoardConfig().getWeight_PST_BISHOP_E() * pst;
                                     
                                     if ((Fields.ALL_WHITE_FIELDS & Fields.ALL_A1H1[fieldID]) != 0L) {
-                                            eval_o += w_pawns_on_w_squares * evalConfig.getBISHOPS_BAD_O();
-                                            eval_e += w_pawns_on_w_squares * evalConfig.getBISHOPS_BAD_E();
+                                            eval_o += w_pawns_on_w_squares * BISHOPS_BAD_O;
+                                            eval_e += w_pawns_on_w_squares * BISHOPS_BAD_E;
                                     } else {
-                                            eval_o += w_pawns_on_b_squares * evalConfig.getBISHOPS_BAD_O();
-                                            eval_e += w_pawns_on_b_squares * evalConfig.getBISHOPS_BAD_E();
+                                            eval_o += w_pawns_on_b_squares * BISHOPS_BAD_O;
+                                            eval_e += w_pawns_on_b_squares * BISHOPS_BAD_E;
                                     }
                                     
                                     int tropism = Fields.getTropismPoint(fieldID, kingFieldID_black);
-                                    eval_o += evalConfig.getTROPISM_BISHOP_O() * tropism;
-                                    eval_e += evalConfig.getTROPISM_BISHOP_E() * tropism;
+                                    eval_o += TROPISM_BISHOP_O * tropism;
+                                    eval_e += TROPISM_BISHOP_E * tropism;
                             }
                     }
             }
@@ -499,16 +496,16 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     eval_e -= bitboard.getBoardConfig().getWeight_PST_BISHOP_E() * pst;
                                     
                                     if ((Fields.ALL_WHITE_FIELDS & Fields.ALL_A1H1[fieldID]) != 0L) {
-                                            eval_o -= b_pawns_on_w_squares * evalConfig.getBISHOPS_BAD_O();
-                                            eval_e -= b_pawns_on_w_squares * evalConfig.getBISHOPS_BAD_E();
+                                            eval_o -= b_pawns_on_w_squares * BISHOPS_BAD_O;
+                                            eval_e -= b_pawns_on_w_squares * BISHOPS_BAD_E;
                                     } else {
-                                            eval_o -= b_pawns_on_b_squares * evalConfig.getBISHOPS_BAD_O();
-                                            eval_e -= b_pawns_on_b_squares * evalConfig.getBISHOPS_BAD_E();
+                                            eval_o -= b_pawns_on_b_squares * BISHOPS_BAD_O;
+                                            eval_e -= b_pawns_on_b_squares * BISHOPS_BAD_E;
                                     }
                                     
                                     int tropism = Fields.getTropismPoint(fieldID, kingFieldID_white);
-                                    eval_o -= evalConfig.getTROPISM_BISHOP_O() * tropism;
-                                    eval_e -= evalConfig.getTROPISM_BISHOP_E() * tropism;
+                                    eval_o -= TROPISM_BISHOP_O * tropism;
+                                    eval_e -= TROPISM_BISHOP_E * tropism;
                             }
                     }
             }
@@ -541,20 +538,20 @@ public class WeightsEvaluator extends BaseEvaluator {
                             
                             long fieldBitboard = Fields.ALL_A1H1[fieldID];
                             if ((fieldBitboard & openedFiles_all) != 0L) {
-                                    eval_o += evalConfig.getROOKS_OPENED_O();
-                                    eval_e += evalConfig.getROOKS_OPENED_E();
+                                    eval_o += ROOKS_OPENED_O;
+                                    eval_e += ROOKS_OPENED_E;
                             } else if ((fieldBitboard & openedFiles_white) != 0L) {
-                                    eval_o += evalConfig.getROOKS_SEMIOPENED_O();
-                                    eval_e += evalConfig.getROOKS_SEMIOPENED_E();
+                                    eval_o += ROOKS_SEMIOPENED_O;
+                                    eval_e += ROOKS_SEMIOPENED_E;
                             }
                             if ((fieldBitboard & RANK_7TH) != 0L) {
-                                    eval_o += evalConfig.getROOKS_7TH_2TH_O();
-                                    eval_e += evalConfig.getROOKS_7TH_2TH_E();
+                                    eval_o += ROOKS_7TH_2TH_O;
+                                    eval_e += ROOKS_7TH_2TH_E;
                             }
                             
                             int tropism = Fields.getTropismPoint(fieldID, kingFieldID_black);
-                            eval_o += evalConfig.getTROPISM_ROOK_O() * tropism;
-                            eval_e += evalConfig.getTROPISM_ROOK_E() * tropism;
+                            eval_o += TROPISM_ROOK_O * tropism;
+                            eval_e += TROPISM_ROOK_E * tropism;
                     }
             }
             
@@ -572,20 +569,20 @@ public class WeightsEvaluator extends BaseEvaluator {
                             
                             long fieldBitboard = Fields.ALL_A1H1[fieldID];
                             if ((fieldBitboard & openedFiles_all) != 0L) {
-                                    eval_o -= evalConfig.getROOKS_OPENED_O();
-                                    eval_e -= evalConfig.getROOKS_OPENED_E();
+                                    eval_o -= ROOKS_OPENED_O;
+                                    eval_e -= ROOKS_OPENED_E;
                             } else if ((fieldBitboard & openedFiles_black) != 0L) {
-                                    eval_o -= evalConfig.getROOKS_SEMIOPENED_O();
-                                    eval_e -= evalConfig.getROOKS_SEMIOPENED_E();
+                                    eval_o -= ROOKS_SEMIOPENED_O;
+                                    eval_e -= ROOKS_SEMIOPENED_E;
                             }
                             if ((fieldBitboard & RANK_2TH) != 0L) {
-                                    eval_o -= evalConfig.getROOKS_7TH_2TH_O();
-                                    eval_e -= evalConfig.getROOKS_7TH_2TH_E();
+                                    eval_o -= ROOKS_7TH_2TH_O;
+                                    eval_e -= ROOKS_7TH_2TH_E;
                             }
                             
                             int tropism = Fields.getTropismPoint(fieldID, kingFieldID_white);
-                            eval_o -= evalConfig.getTROPISM_ROOK_O() * tropism;
-                            eval_e -= evalConfig.getTROPISM_ROOK_E() * tropism;
+                            eval_o -= TROPISM_ROOK_O * tropism;
+                            eval_e -= TROPISM_ROOK_E * tropism;
                     }
             }
             
@@ -607,13 +604,13 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     
                                     long fieldBitboard = Fields.ALL_A1H1[fieldID];
                                     if ((fieldBitboard & RANK_7TH) != 0L) {
-                                            eval_o += evalConfig.getQUEENS_7TH_2TH_O();
-                                            eval_e += evalConfig.getQUEENS_7TH_2TH_E();
+                                            eval_o += QUEENS_7TH_2TH_O;
+                                            eval_e += QUEENS_7TH_2TH_E;
                                     }
                                     
                                     int tropism = Fields.getTropismPoint(fieldID, kingFieldID_black);
-                                    eval_o += evalConfig.getTROPISM_QUEEN_O() * tropism;
-                                    eval_e += evalConfig.getTROPISM_QUEEN_E() * tropism;
+                                    eval_o += TROPISM_QUEEN_O * tropism;
+                                    eval_e += TROPISM_QUEEN_E * tropism;
                             }
                     }
             }
@@ -632,13 +629,13 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     
                                     long fieldBitboard = Fields.ALL_A1H1[fieldID];
                                     if ((fieldBitboard & RANK_2TH) != 0L) {
-                                            eval_o -= evalConfig.getQUEENS_7TH_2TH_O();
-                                            eval_e -= evalConfig.getQUEENS_7TH_2TH_E();
+                                            eval_o -= QUEENS_7TH_2TH_O;
+                                            eval_e -= QUEENS_7TH_2TH_E;
                                     }
                                     
                                     int tropism = Fields.getTropismPoint(fieldID, kingFieldID_white);
-                                    eval_o -= evalConfig.getTROPISM_QUEEN_O() * tropism;
-                                    eval_e -= evalConfig.getTROPISM_QUEEN_E() * tropism;
+                                    eval_o -= TROPISM_QUEEN_O * tropism;
+                                    eval_e -= TROPISM_QUEEN_E * tropism;
                             }
                     }
             }
@@ -664,16 +661,16 @@ public class WeightsEvaluator extends BaseEvaluator {
             //int PAWNS_PASSED_UNSTOPPABLE = 100 + baseEval.getMaterialRook();
             int unstoppablePasser = bitboard.getUnstoppablePasser();
             if (unstoppablePasser > 0) {
-                    eval_o += evalConfig.getPAWNS_UNSTOPPABLE_PASSER_O();
-                    eval_e += evalConfig.getPAWNS_UNSTOPPABLE_PASSER_E();
+                    eval_o += PAWNS_UNSTOPPABLE_PASSER_O;
+                    eval_e += PAWNS_UNSTOPPABLE_PASSER_E;
             } else if (unstoppablePasser < 0) {
-                    eval_o -= evalConfig.getPAWNS_UNSTOPPABLE_PASSER_O();
-                    eval_e -= evalConfig.getPAWNS_UNSTOPPABLE_PASSER_E();
+                    eval_o -= PAWNS_UNSTOPPABLE_PASSER_O;
+                    eval_e -= PAWNS_UNSTOPPABLE_PASSER_E;
             }
             
             int space = space(model);
-            eval_o += space * evalConfig.getSPACE_O();
-            eval_e += space * evalConfig.getSPACE_E();
+            eval_o += space * SPACE_O;
+            eval_e += space * SPACE_E;
             
             
             int w_kingID = model.getWKingFieldID();
@@ -695,12 +692,12 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     rank = 1;
                             }
                             
-                            eval_o += evalConfig.getPAWNS_PASSED_O();
-                            eval_e += evalConfig.getPAWNS_PASSED_E();
+                            eval_o += PAWNS_PASSED_O;
+                            eval_e += PAWNS_PASSED_E;
                             
                             int passer = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.PASSERS_RANK_O[rank], ALL_SignalFillerConstants.PASSERS_RANK_E[rank]);
-                            eval_o += evalConfig.getPAWNS_PASSED_RNK_O() * passer;
-                            eval_e += evalConfig.getPAWNS_PASSED_RNK_E() * passer;
+                            eval_o += PAWNS_PASSED_RNK_O * passer;
+                            eval_e += PAWNS_PASSED_RNK_E * passer;
                             
                     int frontFieldID = p.getFieldID() + 8;
                     int frontFrontFieldID = frontFieldID + 8;
@@ -709,28 +706,28 @@ public class WeightsEvaluator extends BaseEvaluator {
                     }
                     
                     int dist_f = rank * ALL_SignalFillerConstants.PASSERS_KING_CLOSENESS_FRONTFIELD[Fields.getDistancePoints(w_kingID, frontFieldID)];
-                    eval_o += evalConfig.getKINGS_PASSERS_F_O() * dist_f;
-                    eval_e += evalConfig.getKINGS_PASSERS_F_E() * dist_f;
+                    eval_o += KINGS_PASSERS_F_O * dist_f;
+                    eval_e += KINGS_PASSERS_F_E * dist_f;
                     
                     int dist_ff = rank * ALL_SignalFillerConstants.PASSERS_KING_CLOSENESS_FRONTFRONTFIELD[Fields.getDistancePoints(w_kingID, frontFrontFieldID)];
-                    eval_o += evalConfig.getKINGS_PASSERS_FF_O() * dist_ff;
-                    eval_e += evalConfig.getKINGS_PASSERS_FF_E() * dist_ff;
+                    eval_o += KINGS_PASSERS_FF_O * dist_ff;
+                    eval_e += KINGS_PASSERS_FF_E * dist_ff;
                     
                     int dist_op_f = rank * ALL_SignalFillerConstants.PASSERS_KING_CLOSENESS_FRONTFIELD_OP[Fields.getDistancePoints(b_kingID, frontFieldID)];
-                    eval_o += evalConfig.getKINGS_PASSERS_F_OP_O() * dist_op_f;
-                    eval_e += evalConfig.getKINGS_PASSERS_F_OP_E() * dist_op_f;
+                    eval_o += KINGS_PASSERS_F_OP_O * dist_op_f;
+                    eval_e += KINGS_PASSERS_F_OP_E * dist_op_f;
                             
                             
                             long front = p.getFront();
                             if ((front & bb_w_rooks) != 0L) {
-                                    eval_o += 1 * evalConfig.getROOK_INFRONT_PASSER_O();
-                                    eval_e += 1 * evalConfig.getROOK_INFRONT_PASSER_E();
+                                    eval_o += 1 * ROOK_INFRONT_PASSER_O;
+                                    eval_e += 1 * ROOK_INFRONT_PASSER_E;
                             }
                             
                             long behind = p.getVertical() & ~front;
                             if ((behind & bb_w_rooks) != 0L) {
-                                    eval_o += 1 * evalConfig.getROOK_BEHIND_PASSER_O();
-                                    eval_e += 1 * evalConfig.getROOK_BEHIND_PASSER_E();
+                                    eval_o += 1 * ROOK_BEHIND_PASSER_O;
+                                    eval_e += 1 * ROOK_BEHIND_PASSER_E;
                             }
                     }
             }
@@ -750,12 +747,12 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     rank = 1;
                             }
                             
-                            eval_o -= evalConfig.getPAWNS_PASSED_O();
-                            eval_e -= evalConfig.getPAWNS_PASSED_E();
+                            eval_o -= PAWNS_PASSED_O;
+                            eval_e -= PAWNS_PASSED_E;
                             
                             int passer = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.PASSERS_RANK_O[rank], ALL_SignalFillerConstants.PASSERS_RANK_E[rank]);
-                            eval_o -= evalConfig.getPAWNS_PASSED_RNK_O() * passer;
-                            eval_e -= evalConfig.getPAWNS_PASSED_RNK_E() * passer;
+                            eval_o -= PAWNS_PASSED_RNK_O * passer;
+                            eval_e -= PAWNS_PASSED_RNK_E * passer;
                             
                     int frontFieldID = p.getFieldID() - 8;
                     int frontFrontFieldID = frontFieldID - 8;
@@ -764,28 +761,28 @@ public class WeightsEvaluator extends BaseEvaluator {
                     }
                     
                     int dist_f = rank * ALL_SignalFillerConstants.PASSERS_KING_CLOSENESS_FRONTFIELD[Fields.getDistancePoints(b_kingID, frontFieldID)];
-                    eval_o -= evalConfig.getKINGS_PASSERS_F_O() * dist_f;
-                    eval_e -= evalConfig.getKINGS_PASSERS_F_E() * dist_f;
+                    eval_o -= KINGS_PASSERS_F_O * dist_f;
+                    eval_e -= KINGS_PASSERS_F_E * dist_f;
                     
                     int dist_ff = rank * ALL_SignalFillerConstants.PASSERS_KING_CLOSENESS_FRONTFRONTFIELD[Fields.getDistancePoints(b_kingID, frontFrontFieldID)];
-                    eval_o -= evalConfig.getKINGS_PASSERS_FF_O() * dist_ff;
-                    eval_e -= evalConfig.getKINGS_PASSERS_FF_E() * dist_ff;
+                    eval_o -= KINGS_PASSERS_FF_O * dist_ff;
+                    eval_e -= KINGS_PASSERS_FF_E * dist_ff;
                     
                     int dist_op_f = rank * ALL_SignalFillerConstants.PASSERS_KING_CLOSENESS_FRONTFIELD_OP[Fields.getDistancePoints(w_kingID, frontFieldID)];
-                    eval_o -= evalConfig.getKINGS_PASSERS_F_OP_O() * dist_op_f;
-                    eval_e -= evalConfig.getKINGS_PASSERS_F_OP_E() * dist_op_f; 
+                    eval_o -= KINGS_PASSERS_F_OP_O * dist_op_f;
+                    eval_e -= KINGS_PASSERS_F_OP_E * dist_op_f; 
                     
                             
                             long front = p.getFront();
                             if ((front & bb_b_rooks) != 0L) {
-                                    eval_o -= 1 * evalConfig.getROOK_INFRONT_PASSER_O();
-                                    eval_e -= 1 * evalConfig.getROOK_INFRONT_PASSER_E();
+                                    eval_o -= 1 * ROOK_INFRONT_PASSER_O;
+                                    eval_e -= 1 * ROOK_INFRONT_PASSER_E;
                             }
                             
                             long behind = p.getVertical() & ~front;
                             if ((behind & bb_b_rooks) != 0L) {
-                                    eval_o -= 1 * evalConfig.getROOK_BEHIND_PASSER_O();
-                                    eval_e -= 1 * evalConfig.getROOK_BEHIND_PASSER_E();
+                                    eval_o -= 1 * ROOK_BEHIND_PASSER_O;
+                                    eval_e -= 1 * ROOK_BEHIND_PASSER_E;
                             }
                     }
             }
@@ -808,9 +805,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     }*/
                                     
                                     int passerCandidate = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.PASSERS_CANDIDATE_RANK_O[rank], ALL_SignalFillerConstants.PASSERS_CANDIDATE_RANK_E[rank]);
-                                    eval_o += evalConfig.getPAWNS_CANDIDATE_RNK_O() *
+                                    eval_o += PAWNS_CANDIDATE_RNK_O *
                         passerCandidate;
-                                    eval_e += evalConfig.getPAWNS_CANDIDATE_RNK_E() *
+                                    eval_e += PAWNS_CANDIDATE_RNK_E *
                         passerCandidate;
                             }
                     }
@@ -833,9 +830,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     }*/
                                     
                                     int passerCandidate = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.PASSERS_CANDIDATE_RANK_O[rank], ALL_SignalFillerConstants.PASSERS_CANDIDATE_RANK_E[rank]);
-                                    eval_o -= evalConfig.getPAWNS_CANDIDATE_RNK_O() *
+                                    eval_o -= PAWNS_CANDIDATE_RNK_O *
                         passerCandidate;
-                                    eval_e -= evalConfig.getPAWNS_CANDIDATE_RNK_E() *
+                                    eval_e -= PAWNS_CANDIDATE_RNK_E *
                         passerCandidate;
                             }
                     }
@@ -1116,9 +1113,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }*/
                                     }
                                     
-                                    eval_o += evalConfig.getMOBILITY_KNIGHT_O() *
+                                    eval_o += MOBILITY_KNIGHT_O *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[w_mobility_knights_all];
-                                    eval_e += evalConfig.getMOBILITY_KNIGHT_E() *
+                                    eval_e += MOBILITY_KNIGHT_E *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[w_mobility_knights_all];
                                     /*eval_o += MOBILITY_KNIGHT_S_O * ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[w_mobility_knights_safe];
                                     eval_e += MOBILITY_KNIGHT_S_E * ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[w_mobility_knights_safe];
@@ -1209,9 +1206,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }*/
                                     }
                                     
-                                    eval_o -= evalConfig.getMOBILITY_KNIGHT_O() *
+                                    eval_o -= MOBILITY_KNIGHT_O *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[b_mobility_knights_all];
-                                    eval_e -= evalConfig.getMOBILITY_KNIGHT_E() *
+                                    eval_e -= MOBILITY_KNIGHT_E *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[b_mobility_knights_all];
                                     /*eval_o -= MOBILITY_KNIGHT_S_O * ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[b_mobility_knights_safe];
                                     eval_e -= MOBILITY_KNIGHT_S_E * ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[b_mobility_knights_safe];
@@ -1344,9 +1341,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o += evalConfig.getMOBILITY_BISHOP_O() *
+                                    eval_o += MOBILITY_BISHOP_O *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_O[w_mobility_bishops_all];
-                                    eval_e += evalConfig.getMOBILITY_BISHOP_E() *
+                                    eval_e += MOBILITY_BISHOP_E *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_E[w_mobility_bishops_all];
                                     /*eval_o += MOBILITY_BISHOP_S_O * ALL_SignalFillerConstants.MOBILITY_BISHOP_O[w_mobility_bishops_safe];
                                     eval_e += MOBILITY_BISHOP_S_E * ALL_SignalFillerConstants.MOBILITY_BISHOP_E[w_mobility_bishops_safe];
@@ -1474,9 +1471,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o -= evalConfig.getMOBILITY_BISHOP_O() *
+                                    eval_o -= MOBILITY_BISHOP_O *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_O[b_mobility_bishops_all];
-                                    eval_e -= evalConfig.getMOBILITY_BISHOP_E() *
+                                    eval_e -= MOBILITY_BISHOP_E *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_E[b_mobility_bishops_all];
                                     /*eval_o -= MOBILITY_BISHOP_S_O * ALL_SignalFillerConstants.MOBILITY_BISHOP_O[b_mobility_bishops_safe];
                                     eval_e -= MOBILITY_BISHOP_S_E * ALL_SignalFillerConstants.MOBILITY_BISHOP_E[b_mobility_bishops_safe];
@@ -1615,9 +1612,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o += evalConfig.getMOBILITY_ROOK_O() *
+                                    eval_o += MOBILITY_ROOK_O *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_O[w_mobility_rooks_all];
-                                    eval_e += evalConfig.getMOBILITY_ROOK_E() *
+                                    eval_e += MOBILITY_ROOK_E *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_E[w_mobility_rooks_all];
                                     /*eval_o += MOBILITY_ROOK_S_O * ALL_SignalFillerConstants.MOBILITY_ROOK_O[w_mobility_rooks_safe];
                                     eval_e += MOBILITY_ROOK_S_E * ALL_SignalFillerConstants.MOBILITY_ROOK_E[w_mobility_rooks_safe];
@@ -1752,9 +1749,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o -= evalConfig.getMOBILITY_ROOK_O() *
+                                    eval_o -= MOBILITY_ROOK_O *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_O[b_mobility_rooks_all];
-                                    eval_e -= evalConfig.getMOBILITY_ROOK_E() *
+                                    eval_e -= MOBILITY_ROOK_E *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_E[b_mobility_rooks_all];
                                     /*eval_o -= MOBILITY_ROOK_S_O * ALL_SignalFillerConstants.MOBILITY_ROOK_O[b_mobility_rooks_safe];
                                     eval_e -= MOBILITY_ROOK_S_E * ALL_SignalFillerConstants.MOBILITY_ROOK_E[b_mobility_rooks_safe];
@@ -1982,9 +1979,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o += evalConfig.getMOBILITY_QUEEN_O() *
+                                    eval_o += MOBILITY_QUEEN_O *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_O[w_mobility_queens_all];
-                                    eval_e += evalConfig.getMOBILITY_QUEEN_E() *
+                                    eval_e += MOBILITY_QUEEN_E *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_E[w_mobility_queens_all];
                                     /*eval_o += MOBILITY_QUEEN_S_O * ALL_SignalFillerConstants.MOBILITY_QUEEN_O[w_mobility_queens_safe];
                                     eval_e += MOBILITY_QUEEN_S_E * ALL_SignalFillerConstants.MOBILITY_QUEEN_E[w_mobility_queens_safe];
@@ -2209,9 +2206,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o -= evalConfig.getMOBILITY_QUEEN_O() *
+                                    eval_o -= MOBILITY_QUEEN_O *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_O[b_mobility_queens_all];
-                                    eval_e -= evalConfig.getMOBILITY_QUEEN_E() *
+                                    eval_e -= MOBILITY_QUEEN_E *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_E[b_mobility_queens_all];
                                     /*eval_o -= MOBILITY_QUEEN_S_O * ALL_SignalFillerConstants.MOBILITY_QUEEN_O[b_mobility_queens_safe];
                                     eval_e -= MOBILITY_QUEEN_S_E * ALL_SignalFillerConstants.MOBILITY_QUEEN_E[b_mobility_queens_safe];
@@ -2232,12 +2229,12 @@ public class WeightsEvaluator extends BaseEvaluator {
             
             
             int rooks_paired_h = (w_rooks_paired_h - b_rooks_paired_h);
-            eval_o += evalConfig.getROOKS_PAIR_H_O() * rooks_paired_h;
-            eval_e += evalConfig.getROOKS_PAIR_H_E() * rooks_paired_h;
+            eval_o += ROOKS_PAIR_H_O * rooks_paired_h;
+            eval_e += ROOKS_PAIR_H_E * rooks_paired_h;
             
             int rooks_paired_v = (w_rooks_paired_v - b_rooks_paired_v);
-            eval_o += evalConfig.getROOKS_PAIR_V_O() * rooks_paired_v;
-            eval_e += evalConfig.getROOKS_PAIR_V_E() * rooks_paired_v;
+            eval_o += ROOKS_PAIR_V_O * rooks_paired_v;
+            eval_e += ROOKS_PAIR_V_E * rooks_paired_v;
             
             
             int w_attack_to_black_king_1 = Math.max(1, w_knights_attacks_to_black_king_1)
@@ -2259,43 +2256,43 @@ public class WeightsEvaluator extends BaseEvaluator {
                             * Math.max(1, b_queens_attacks_to_white_king_2);
             
             int kingsafe_l1 = (w_attacking_pieces_to_black_king_1 * w_attack_to_black_king_1 - b_attacking_pieces_to_white_king_1 * b_attack_to_white_king_1) / (4 * 2);
-            eval_o += evalConfig.getKINGSAFETY_L1_O() * kingsafe_l1;
-            eval_e += evalConfig.getKINGSAFETY_L1_E() * kingsafe_l1;
+            eval_o += KINGSAFETY_L1_O * kingsafe_l1;
+            eval_e += KINGSAFETY_L1_E * kingsafe_l1;
             
             
             int kingsafe_l2 = (w_attacking_pieces_to_black_king_2 * w_attack_to_black_king_2 - b_attacking_pieces_to_white_king_2 * b_attack_to_white_king_2) / (8 * 8);
-            eval_o += evalConfig.getKINGSAFETY_L2_O() * kingsafe_l2;
-            eval_e += evalConfig.getKINGSAFETY_L2_E() * kingsafe_l2;
+            eval_o += KINGSAFETY_L2_O * kingsafe_l2;
+            eval_e += KINGSAFETY_L2_E * kingsafe_l2;
             
             
             int pin_k = pin_bk + pin_rk + pin_qk;
-            eval_o += evalConfig.getPIN_KING_O() * pin_k;
-            eval_e += evalConfig.getPIN_KING_E() * pin_k;
+            eval_o += PIN_KING_O * pin_k;
+            eval_e += PIN_KING_E * pin_k;
             
             int pin_big = pin_bq + pin_br + pin_rq;
-            eval_o += evalConfig.getPIN_BIGGER_O() * pin_big;
-            eval_e += evalConfig.getPIN_BIGGER_E() * pin_big;
+            eval_o += PIN_BIGGER_O * pin_big;
+            eval_e += PIN_BIGGER_E * pin_big;
             
             int pin_eq = pin_bn;
-            eval_o += evalConfig.getPIN_EQUAL_O() * pin_eq;
-            eval_e += evalConfig.getPIN_EQUAL_E() * pin_eq;
+            eval_o += PIN_EQUAL_O * pin_eq;
+            eval_e += PIN_EQUAL_E * pin_eq;
             
             int pin_lower = pin_rb + pin_rn + pin_qn + pin_qr + pin_qb;
-            eval_o += evalConfig.getPIN_LOWER_O() * pin_lower;
-            eval_e += evalConfig.getPIN_LOWER_O() * pin_lower;
+            eval_o += PIN_LOWER_O * pin_lower;
+            eval_e += PIN_LOWER_O * pin_lower;
             
             
             int attack_bigger = attack_nr + attack_nq + attack_br;
-            eval_o += evalConfig.getATTACK_BIGGER_O() * attack_bigger;
-            eval_e += evalConfig.getATTACK_BIGGER_O() * attack_bigger;
+            eval_o += ATTACK_BIGGER_O * attack_bigger;
+            eval_e += ATTACK_BIGGER_O * attack_bigger;
             
             int attack_eq = attack_nb + attack_bn;
-            eval_o += evalConfig.getATTACK_EQUAL_O() * attack_eq;
-            eval_e += evalConfig.getATTACK_EQUAL_E() * attack_eq;
+            eval_o += ATTACK_EQUAL_O * attack_eq;
+            eval_e += ATTACK_EQUAL_E * attack_eq;
             
             int attack_lower = attack_rb + attack_rn + attack_qn + attack_qb + attack_qr;
-            eval_o += evalConfig.getATTACK_LOWER_O() * attack_lower;
-            eval_e += evalConfig.getATTACK_LOWER_E() * attack_lower;
+            eval_o += ATTACK_LOWER_O * attack_lower;
+            eval_e += ATTACK_LOWER_E * attack_lower;
             
             
             
@@ -2344,23 +2341,23 @@ public class WeightsEvaluator extends BaseEvaluator {
                             w_hanging_nonpawn = ALL_SignalFillerConstants.HUNGED_PIECES_O.length - 1;
                     }
                     double hunged_pieces = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_PIECES_O[w_hanging_nonpawn], ALL_SignalFillerConstants.HUNGED_PIECES_E[w_hanging_nonpawn]);
-                    eval_o += evalConfig.getHUNGED_PIECE_O() * hunged_pieces;
-                    eval_e += evalConfig.getHUNGED_PIECE_E() * hunged_pieces;
+                    eval_o += HUNGED_PIECE_O * hunged_pieces;
+                    eval_e += HUNGED_PIECE_E * hunged_pieces;
                     
                     if (w_hanging_pawn >= ALL_SignalFillerConstants.HUNGED_PAWNS_O.length) {
                             w_hanging_pawn = ALL_SignalFillerConstants.HUNGED_PAWNS_O.length - 1;
                     }
                     double hunged_pawns = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_PAWNS_O[w_hanging_pawn], ALL_SignalFillerConstants.HUNGED_PAWNS_E[w_hanging_pawn]);
-                    eval_o += evalConfig.getHUNGED_PAWNS_O() * hunged_pawns;
-                    eval_e += evalConfig.getHUNGED_PAWNS_E() * hunged_pawns;
+                    eval_o += HUNGED_PAWNS_O * hunged_pawns;
+                    eval_e += HUNGED_PAWNS_E * hunged_pawns;
                     
                     int w_hanging_all = w_hanging_nonpawn + w_hanging_pawn;
                     if (w_hanging_all >= ALL_SignalFillerConstants.HUNGED_ALL_O.length) {
                             w_hanging_all = ALL_SignalFillerConstants.HUNGED_ALL_O.length - 1;
                     }
                     double hunged_all = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_ALL_O[w_hanging_all], ALL_SignalFillerConstants.HUNGED_ALL_E[w_hanging_all]);
-                    eval_o += evalConfig.getHUNGED_ALL_O() * hunged_all;
-                    eval_e += evalConfig.getHUNGED_ALL_E() * hunged_all;
+                    eval_o += HUNGED_ALL_O * hunged_all;
+                    eval_e += HUNGED_ALL_E * hunged_all;
                     
             } else {
                     
@@ -2381,34 +2378,34 @@ public class WeightsEvaluator extends BaseEvaluator {
                             b_hanging_nonpawn = ALL_SignalFillerConstants.HUNGED_PIECES_O.length - 1;
                     }
                     double hunged_pieces = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_PIECES_O[b_hanging_nonpawn], ALL_SignalFillerConstants.HUNGED_PIECES_E[b_hanging_nonpawn]);
-                    eval_o -= evalConfig.getHUNGED_PIECE_O() * hunged_pieces;
-                    eval_e -= evalConfig.getHUNGED_PIECE_E() * hunged_pieces;
+                    eval_o -= HUNGED_PIECE_O * hunged_pieces;
+                    eval_e -= HUNGED_PIECE_E * hunged_pieces;
                     
                     if (b_hanging_pawn >= ALL_SignalFillerConstants.HUNGED_PAWNS_O.length) {
                             b_hanging_pawn = ALL_SignalFillerConstants.HUNGED_PAWNS_O.length - 1;
                     }
                     double hunged_pawns = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_PAWNS_O[b_hanging_pawn], ALL_SignalFillerConstants.HUNGED_PAWNS_E[b_hanging_pawn]);
-                    eval_o -= evalConfig.getHUNGED_PAWNS_O() * hunged_pawns;
-                    eval_e -= evalConfig.getHUNGED_PAWNS_E() * hunged_pawns;
+                    eval_o -= HUNGED_PAWNS_O * hunged_pawns;
+                    eval_e -= HUNGED_PAWNS_E * hunged_pawns;
                     
                     int b_hanging_all = b_hanging_nonpawn + b_hanging_pawn;
                     if (b_hanging_all >= ALL_SignalFillerConstants.HUNGED_ALL_O.length) {
                             b_hanging_all = ALL_SignalFillerConstants.HUNGED_ALL_O.length - 1;
                     }
                     double hunged_all = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_ALL_O[b_hanging_all], ALL_SignalFillerConstants.HUNGED_ALL_E[b_hanging_all]);
-                    eval_o -= evalConfig.getHUNGED_ALL_O() * hunged_all;
-                    eval_e -= evalConfig.getHUNGED_ALL_E() * hunged_all;
+                    eval_o -= HUNGED_ALL_O * hunged_all;
+                    eval_e -= HUNGED_ALL_E * hunged_all;
 
             }
             
             
-            eval_o += evalConfig.getPENETRATION_OP_O() *
+            eval_o += PENETRATION_OP_O *
             (w_penetration_op_area - b_penetration_op_area);
-            eval_e += evalConfig.getPENETRATION_OP_E() *
+            eval_e += PENETRATION_OP_E *
             (w_penetration_op_area - b_penetration_op_area);
-            eval_o += evalConfig.getPENETRATION_KING_O() *
+            eval_o += PENETRATION_KING_O *
             (w_penetration_king_area - b_penetration_king_area);
-            eval_e += evalConfig.getPENETRATION_KING_E() *
+            eval_e += PENETRATION_KING_E *
             (w_penetration_king_area - b_penetration_king_area);
             
             
@@ -2629,9 +2626,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     
                                     //eval_o += MOBILITY_KNIGHT_O * ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[w_mobility_knights_all];
                                     //eval_e += MOBILITY_KNIGHT_E * ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[w_mobility_knights_all];
-                                    eval_o += evalConfig.getMOBILITY_KNIGHT_S_O() *
+                                    eval_o += MOBILITY_KNIGHT_S_O *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[w_mobility_knights_safe];
-                                    eval_e += evalConfig.getMOBILITY_KNIGHT_S_E() *
+                                    eval_e += MOBILITY_KNIGHT_S_E *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[w_mobility_knights_safe];
                                                                             
                                     if (w_mobility_knights_safe == 2) {
@@ -2722,9 +2719,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     
                                     //eval_o -= MOBILITY_KNIGHT_O * ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[b_mobility_knights_all];
                                     //eval_e -= MOBILITY_KNIGHT_E * ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[b_mobility_knights_all];
-                                    eval_o -= evalConfig.getMOBILITY_KNIGHT_S_O() *
+                                    eval_o -= MOBILITY_KNIGHT_S_O *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[b_mobility_knights_safe];
-                                    eval_e -= evalConfig.getMOBILITY_KNIGHT_S_E() *
+                                    eval_e -= MOBILITY_KNIGHT_S_E *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[b_mobility_knights_safe];
                                     
                                     if (b_mobility_knights_safe == 2) {
@@ -2857,9 +2854,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     
                                     //eval_o += MOBILITY_BISHOP_O * ALL_SignalFillerConstants.MOBILITY_BISHOP_O[w_mobility_bishops_all];
                                     //eval_e += MOBILITY_BISHOP_E * ALL_SignalFillerConstants.MOBILITY_BISHOP_E[w_mobility_bishops_all];
-                                    eval_o += evalConfig.getMOBILITY_BISHOP_S_O() *
+                                    eval_o += MOBILITY_BISHOP_S_O *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_O[w_mobility_bishops_safe];
-                                    eval_e += evalConfig.getMOBILITY_BISHOP_S_E() *
+                                    eval_e += MOBILITY_BISHOP_S_E *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_E[w_mobility_bishops_safe];
                                     
                                     if (w_mobility_bishops_safe == 2) {
@@ -2989,9 +2986,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     
                                     //eval_o -= MOBILITY_BISHOP_O * ALL_SignalFillerConstants.MOBILITY_BISHOP_O[b_mobility_bishops_all];
                                     //eval_e -= MOBILITY_BISHOP_E * ALL_SignalFillerConstants.MOBILITY_BISHOP_E[b_mobility_bishops_all];
-                                    eval_o -= evalConfig.getMOBILITY_BISHOP_S_O() *
+                                    eval_o -= MOBILITY_BISHOP_S_O *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_O[b_mobility_bishops_safe];
-                                    eval_e -= evalConfig.getMOBILITY_BISHOP_S_E() *
+                                    eval_e -= MOBILITY_BISHOP_S_E *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_E[b_mobility_bishops_safe];
                                     
                                     if (b_mobility_bishops_safe == 2) {
@@ -3133,9 +3130,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     
                                     //eval_o += MOBILITY_ROOK_O * ALL_SignalFillerConstants.MOBILITY_ROOK_O[w_mobility_rooks_all];
                                     //eval_e += MOBILITY_ROOK_E * ALL_SignalFillerConstants.MOBILITY_ROOK_E[w_mobility_rooks_all];
-                                    eval_o += evalConfig.getMOBILITY_ROOK_S_O() *
+                                    eval_o += MOBILITY_ROOK_S_O *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_O[w_mobility_rooks_safe];
-                                    eval_e += evalConfig.getMOBILITY_ROOK_S_E() *
+                                    eval_e += MOBILITY_ROOK_S_E *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_E[w_mobility_rooks_safe];
                                     
                                     if (w_mobility_rooks_safe == 2) {
@@ -3274,9 +3271,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     
                                     //eval_o -= MOBILITY_ROOK_O * ALL_SignalFillerConstants.MOBILITY_ROOK_O[b_mobility_rooks_all];
                                     //eval_e -= MOBILITY_ROOK_E * ALL_SignalFillerConstants.MOBILITY_ROOK_E[b_mobility_rooks_all];
-                                    eval_o -= evalConfig.getMOBILITY_ROOK_S_O() *
+                                    eval_o -= MOBILITY_ROOK_S_O *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_O[b_mobility_rooks_safe];
-                                    eval_e -= evalConfig.getMOBILITY_ROOK_S_E() *
+                                    eval_e -= MOBILITY_ROOK_S_E *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_E[b_mobility_rooks_safe];
                                     
                                     if (b_mobility_rooks_safe == 2) {
@@ -3507,9 +3504,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     
                                     //eval_o += MOBILITY_QUEEN_O * ALL_SignalFillerConstants.MOBILITY_QUEEN_O[w_mobility_queens_all];
                                     //eval_e += MOBILITY_QUEEN_E * ALL_SignalFillerConstants.MOBILITY_QUEEN_E[w_mobility_queens_all];
-                                    eval_o += evalConfig.getMOBILITY_QUEEN_S_O() *
+                                    eval_o += MOBILITY_QUEEN_S_O *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_O[w_mobility_queens_safe];
-                                    eval_e += evalConfig.getMOBILITY_QUEEN_S_E() *
+                                    eval_e += MOBILITY_QUEEN_S_E *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_E[w_mobility_queens_safe];
                                     
                                     if (w_mobility_queens_safe == 2) {
@@ -3736,9 +3733,9 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     
                                     //eval_o -= MOBILITY_QUEEN_O * ALL_SignalFillerConstants.MOBILITY_QUEEN_O[b_mobility_queens_all];
                                     //eval_e -= MOBILITY_QUEEN_E * ALL_SignalFillerConstants.MOBILITY_QUEEN_E[b_mobility_queens_all];
-                                    eval_o -= evalConfig.getMOBILITY_QUEEN_S_O() *
+                                    eval_o -= MOBILITY_QUEEN_S_O *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_O[b_mobility_queens_safe];
-                                    eval_e -= evalConfig.getMOBILITY_QUEEN_S_E() *
+                                    eval_e -= MOBILITY_QUEEN_S_E *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_E[b_mobility_queens_safe];
                                     
                                     if (b_mobility_queens_safe == 2) {
@@ -3868,8 +3865,8 @@ public class WeightsEvaluator extends BaseEvaluator {
                     (w_trap_bishops - b_trap_bishops) +
                     (w_trap_rooks - b_trap_rooks) +
                     (w_trap_queens - b_trap_queens);
-            eval_o += evalConfig.getTRAP_O() * traps;
-            eval_e += evalConfig.getTRAP_E() * traps;
+            eval_o += TRAP_O * traps;
+            eval_e += TRAP_E * traps;
             
             
             /*if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
@@ -3881,13 +3878,13 @@ public class WeightsEvaluator extends BaseEvaluator {
             }*/
 
             
-            eval_o += evalConfig.getPENETRATION_OP_S_O() *
+            eval_o += PENETRATION_OP_S_O *
             (w_penetration_op_area_safe - b_penetration_op_area_safe);
-            eval_e += evalConfig.getPENETRATION_OP_S_E() *
+            eval_e += PENETRATION_OP_S_E *
             (w_penetration_op_area_safe - b_penetration_op_area_safe);
-            eval_o += evalConfig.getPENETRATION_KING_S_O() *
+            eval_o += PENETRATION_KING_S_O *
             (w_penetration_king_area_safe - b_penetration_king_area_safe);
-            eval_e += evalConfig.getPENETRATION_KING_S_E() *
+            eval_e += PENETRATION_KING_S_E *
             (w_penetration_king_area_safe - b_penetration_king_area_safe);
             
 
@@ -4099,13 +4096,13 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o += evalConfig.getMOBILITY_KNIGHT_O() *
+                                    eval_o += MOBILITY_KNIGHT_O *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[w_mobility_knights_all];
-                                    eval_e += evalConfig.getMOBILITY_KNIGHT_E() *
+                                    eval_e += MOBILITY_KNIGHT_E *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[w_mobility_knights_all];
-                                    eval_o += evalConfig.getMOBILITY_KNIGHT_S_O() *
+                                    eval_o += MOBILITY_KNIGHT_S_O *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[w_mobility_knights_safe];
-                                    eval_e += evalConfig.getMOBILITY_KNIGHT_S_E() *
+                                    eval_e += MOBILITY_KNIGHT_S_E *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[w_mobility_knights_safe];
                                                                             
                                     if (w_mobility_knights_safe == 2) {
@@ -4192,13 +4189,13 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o -= evalConfig.getMOBILITY_KNIGHT_O() *
+                                    eval_o -= MOBILITY_KNIGHT_O *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[b_mobility_knights_all];
-                                    eval_e -= evalConfig.getMOBILITY_KNIGHT_E() *
+                                    eval_e -= MOBILITY_KNIGHT_E *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[b_mobility_knights_all];
-                                    eval_o -= evalConfig.getMOBILITY_KNIGHT_S_O() *
+                                    eval_o -= MOBILITY_KNIGHT_S_O *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[b_mobility_knights_safe];
-                                    eval_e -= evalConfig.getMOBILITY_KNIGHT_S_E() *
+                                    eval_e -= MOBILITY_KNIGHT_S_E *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[b_mobility_knights_safe];
                                     
                                     if (b_mobility_knights_safe == 2) {
@@ -4327,13 +4324,13 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o += evalConfig.getMOBILITY_BISHOP_O() *
+                                    eval_o += MOBILITY_BISHOP_O *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_O[w_mobility_bishops_all];
-                                    eval_e += evalConfig.getMOBILITY_BISHOP_E() *
+                                    eval_e += MOBILITY_BISHOP_E *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_E[w_mobility_bishops_all];
-                                    eval_o += evalConfig.getMOBILITY_BISHOP_S_O() *
+                                    eval_o += MOBILITY_BISHOP_S_O *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_O[w_mobility_bishops_safe];
-                                    eval_e += evalConfig.getMOBILITY_BISHOP_S_E() *
+                                    eval_e += MOBILITY_BISHOP_S_E *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_E[w_mobility_bishops_safe];
                                     
                                     if (w_mobility_bishops_safe == 2) {
@@ -4457,13 +4454,13 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o -= evalConfig.getMOBILITY_BISHOP_O() *
+                                    eval_o -= MOBILITY_BISHOP_O *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_O[b_mobility_bishops_all];
-                                    eval_e -= evalConfig.getMOBILITY_BISHOP_E() *
+                                    eval_e -= MOBILITY_BISHOP_E *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_E[b_mobility_bishops_all];
-                                    eval_o -= evalConfig.getMOBILITY_BISHOP_S_O() *
+                                    eval_o -= MOBILITY_BISHOP_S_O *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_O[b_mobility_bishops_safe];
-                                    eval_e -= evalConfig.getMOBILITY_BISHOP_S_E() *
+                                    eval_e -= MOBILITY_BISHOP_S_E *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_E[b_mobility_bishops_safe];
                                     
                                     if (b_mobility_bishops_safe == 2) {
@@ -4598,13 +4595,13 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o += evalConfig.getMOBILITY_ROOK_O() *
+                                    eval_o += MOBILITY_ROOK_O *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_O[w_mobility_rooks_all];
-                                    eval_e += evalConfig.getMOBILITY_ROOK_E() *
+                                    eval_e += MOBILITY_ROOK_E *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_E[w_mobility_rooks_all];
-                                    eval_o += evalConfig.getMOBILITY_ROOK_S_O() *
+                                    eval_o += MOBILITY_ROOK_S_O *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_O[w_mobility_rooks_safe];
-                                    eval_e += evalConfig.getMOBILITY_ROOK_S_E() *
+                                    eval_e += MOBILITY_ROOK_S_E *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_E[w_mobility_rooks_safe];
                                     
                                     if (w_mobility_rooks_safe == 2) {
@@ -4735,13 +4732,13 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o -= evalConfig.getMOBILITY_ROOK_O() *
+                                    eval_o -= MOBILITY_ROOK_O *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_O[b_mobility_rooks_all];
-                                    eval_e -= evalConfig.getMOBILITY_ROOK_E() *
+                                    eval_e -= MOBILITY_ROOK_E *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_E[b_mobility_rooks_all];
-                                    eval_o -= evalConfig.getMOBILITY_ROOK_S_O() *
+                                    eval_o -= MOBILITY_ROOK_S_O *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_O[b_mobility_rooks_safe];
-                                    eval_e -= evalConfig.getMOBILITY_ROOK_S_E() *
+                                    eval_e -= MOBILITY_ROOK_S_E *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_E[b_mobility_rooks_safe];
                                     
                                     if (b_mobility_rooks_safe == 2) {
@@ -4963,13 +4960,13 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o += evalConfig.getMOBILITY_QUEEN_O() *
+                                    eval_o += MOBILITY_QUEEN_O *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_O[w_mobility_queens_all];
-                                    eval_e += evalConfig.getMOBILITY_QUEEN_E() *
+                                    eval_e += MOBILITY_QUEEN_E *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_E[w_mobility_queens_all];
-                                    eval_o += evalConfig.getMOBILITY_QUEEN_S_O() *
+                                    eval_o += MOBILITY_QUEEN_S_O *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_O[w_mobility_queens_safe];
-                                    eval_e += evalConfig.getMOBILITY_QUEEN_S_E() *
+                                    eval_e += MOBILITY_QUEEN_S_E *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_E[w_mobility_queens_safe];
                                     
                                     if (w_mobility_queens_safe == 2) {
@@ -5188,13 +5185,13 @@ public class WeightsEvaluator extends BaseEvaluator {
                                             }
                                     }
                                     
-                                    eval_o -= evalConfig.getMOBILITY_QUEEN_O() *
+                                    eval_o -= MOBILITY_QUEEN_O *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_O[b_mobility_queens_all];
-                                    eval_e -= evalConfig.getMOBILITY_QUEEN_E() *
+                                    eval_e -= MOBILITY_QUEEN_E *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_E[b_mobility_queens_all];
-                                    eval_o -= evalConfig.getMOBILITY_QUEEN_S_O() *
+                                    eval_o -= MOBILITY_QUEEN_S_O *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_O[b_mobility_queens_safe];
-                                    eval_e -= evalConfig.getMOBILITY_QUEEN_S_E() *
+                                    eval_e -= MOBILITY_QUEEN_S_E *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_E[b_mobility_queens_safe];
                                     
                                     if (b_mobility_queens_safe == 2) {
@@ -5213,12 +5210,12 @@ public class WeightsEvaluator extends BaseEvaluator {
             
             
             int rooks_paired_h = (w_rooks_paired_h - b_rooks_paired_h);
-            eval_o += evalConfig.getROOKS_PAIR_H_O() * rooks_paired_h;
-            eval_e += evalConfig.getROOKS_PAIR_H_E() * rooks_paired_h;
+            eval_o += ROOKS_PAIR_H_O * rooks_paired_h;
+            eval_e += ROOKS_PAIR_H_E * rooks_paired_h;
             
             int rooks_paired_v = (w_rooks_paired_v - b_rooks_paired_v);
-            eval_o += evalConfig.getROOKS_PAIR_V_O() * rooks_paired_v;
-            eval_e += evalConfig.getROOKS_PAIR_V_E() * rooks_paired_v;
+            eval_o += ROOKS_PAIR_V_O * rooks_paired_v;
+            eval_e += ROOKS_PAIR_V_E * rooks_paired_v;
             
             
             int w_attack_to_black_king_1 = Math.max(1, w_knights_attacks_to_black_king_1)
@@ -5240,43 +5237,43 @@ public class WeightsEvaluator extends BaseEvaluator {
                             * Math.max(1, b_queens_attacks_to_white_king_2);
             
             int kingsafe_l1 = (w_attacking_pieces_to_black_king_1 * w_attack_to_black_king_1 - b_attacking_pieces_to_white_king_1 * b_attack_to_white_king_1) / (4 * 2);
-            eval_o += evalConfig.getKINGSAFETY_L1_O() * kingsafe_l1;
-            eval_e += evalConfig.getKINGSAFETY_L1_E() * kingsafe_l1;
+            eval_o += KINGSAFETY_L1_O * kingsafe_l1;
+            eval_e += KINGSAFETY_L1_E * kingsafe_l1;
             
             
             int kingsafe_l2 = (w_attacking_pieces_to_black_king_2 * w_attack_to_black_king_2 - b_attacking_pieces_to_white_king_2 * b_attack_to_white_king_2) / (8 * 8);
-            eval_o += evalConfig.getKINGSAFETY_L2_O() * kingsafe_l2;
-            eval_e += evalConfig.getKINGSAFETY_L2_E() * kingsafe_l2;
+            eval_o += KINGSAFETY_L2_O * kingsafe_l2;
+            eval_e += KINGSAFETY_L2_E * kingsafe_l2;
             
             
             int pin_k = pin_bk + pin_rk + pin_qk;
-            eval_o += evalConfig.getPIN_KING_O() * pin_k;
-            eval_e += evalConfig.getPIN_KING_E() * pin_k;
+            eval_o += PIN_KING_O * pin_k;
+            eval_e += PIN_KING_E * pin_k;
             
             int pin_big = pin_bq + pin_br + pin_rq;
-            eval_o += evalConfig.getPIN_BIGGER_O() * pin_big;
-            eval_e += evalConfig.getPIN_BIGGER_E() * pin_big;
+            eval_o += PIN_BIGGER_O * pin_big;
+            eval_e += PIN_BIGGER_E * pin_big;
             
             int pin_eq = pin_bn;
-            eval_o += evalConfig.getPIN_EQUAL_O() * pin_eq;
-            eval_e += evalConfig.getPIN_EQUAL_E() * pin_eq;
+            eval_o += PIN_EQUAL_O * pin_eq;
+            eval_e += PIN_EQUAL_E * pin_eq;
             
             int pin_lower = pin_rb + pin_rn + pin_qn + pin_qr + pin_qb;
-            eval_o += evalConfig.getPIN_LOWER_O() * pin_lower;
-            eval_e += evalConfig.getPIN_LOWER_O() * pin_lower;
+            eval_o += PIN_LOWER_O * pin_lower;
+            eval_e += PIN_LOWER_O * pin_lower;
             
             
             int attack_bigger = attack_nr + attack_nq + attack_br;
-            eval_o += evalConfig.getATTACK_BIGGER_O() * attack_bigger;
-            eval_e += evalConfig.getATTACK_BIGGER_O() * attack_bigger;
+            eval_o += ATTACK_BIGGER_O * attack_bigger;
+            eval_e += ATTACK_BIGGER_O * attack_bigger;
             
             int attack_eq = attack_nb + attack_bn;
-            eval_o += evalConfig.getATTACK_EQUAL_O() * attack_eq;
-            eval_e += evalConfig.getATTACK_EQUAL_E() * attack_eq;
+            eval_o += ATTACK_EQUAL_O * attack_eq;
+            eval_e += ATTACK_EQUAL_E * attack_eq;
             
             int attack_lower = attack_rb + attack_rn + attack_qn + attack_qb + attack_qr;
-            eval_o += evalConfig.getATTACK_LOWER_O() * attack_lower;
-            eval_e += evalConfig.getATTACK_LOWER_E() * attack_lower;
+            eval_o += ATTACK_LOWER_O * attack_lower;
+            eval_e += ATTACK_LOWER_E * attack_lower;
             
 
             
@@ -5284,8 +5281,8 @@ public class WeightsEvaluator extends BaseEvaluator {
                                     (w_trap_bishops - b_trap_bishops) +
                                     (w_trap_rooks - b_trap_rooks) +
                                     (w_trap_queens - b_trap_queens);
-            eval_o += evalConfig.getTRAP_O() * traps;
-            eval_e += evalConfig.getTRAP_E() * traps;
+            eval_o += TRAP_O * traps;
+            eval_e += TRAP_E * traps;
             
             /*if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
                     eval_o += HUNGED_PIECE_O * w_hangingCount;

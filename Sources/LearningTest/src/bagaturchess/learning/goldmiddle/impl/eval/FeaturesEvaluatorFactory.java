@@ -23,7 +23,7 @@ public class FeaturesEvaluatorFactory implements IEvaluatorFactory {
 	@Override
 	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache, IEvalConfig evalConfig) {
 		
-		ILearningInput input = new Bagatur_LearningInputImpl();
+		ILearningInput input = new ALL_LearningInputImpl();
 		ISignalFiller filler = input.createFiller(bitboard);
 		
 		Features features = createFeatures();
@@ -35,7 +35,7 @@ public class FeaturesEvaluatorFactory implements IEvaluatorFactory {
 	@Override
 	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache) {
 		
-		ILearningInput input = new Bagatur_LearningInputImpl();
+		ILearningInput input = new ALL_LearningInputImpl();
 		ISignalFiller filler = input.createFiller(bitboard);
 		
 		Features features = createFeatures();
