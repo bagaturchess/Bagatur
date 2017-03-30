@@ -144,6 +144,32 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 		}
 		
 		
+		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
+			
+			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
+			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
+			
+			//Mop-up evaluation
+			//PosEval=4.7*CMD + 1.6*(14 - MD)
+			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
+			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
+				
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
+				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				
+				return (int) returnVal(20 * (int) (4.7 * CMD + 1.6 * MD));
+				
+			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
+				
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
+				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				
+				return (int) returnVal( - 20 * (int) (4.7 * CMD + 1.6 * MD));
+				
+			}
+		}
+		
+		
 		double eval = 0;
 		
 		eval += phase1();
@@ -249,6 +275,32 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			}
 				
 			evalCache.unlock();
+		}
+		
+		
+		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
+			
+			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
+			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
+			
+			//Mop-up evaluation
+			//PosEval=4.7*CMD + 1.6*(14 - MD)
+			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
+			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
+				
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
+				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				
+				return (int) returnVal(20 * (int) (4.7 * CMD + 1.6 * MD));
+				
+			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
+				
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
+				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				
+				return (int) returnVal( - 20 * (int) (4.7 * CMD + 1.6 * MD));
+				
+			}
 		}
 		
 		
@@ -433,6 +485,33 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			evalCache.unlock();
 		}
 		
+		
+		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
+			
+			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
+			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
+			
+			//Mop-up evaluation
+			//PosEval=4.7*CMD + 1.6*(14 - MD)
+			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
+			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
+				
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
+				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				
+				return (int) returnVal(20 * (int) (4.7 * CMD + 1.6 * MD));
+				
+			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
+				
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
+				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				
+				return (int) returnVal( - 20 * (int) (4.7 * CMD + 1.6 * MD));
+				
+			}
+		}
+		
+		
 		double eval = phase1();
 		
 		return (int) returnVal(eval);
@@ -455,22 +534,33 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 		double abs = Math.abs(eval);
 		
 		/**
-		 * Differently coloured bishops
+		 * No pawns
 		 */
-		if (w_bishops.getDataSize() == 1 && b_bishops.getDataSize() == 1
-				&& bitboard.getMaterialFactor().getTotalFactor() == 6 //Only the bishops
-			) {
+		/*if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
+			abs = abs / 2;
+		}*/
+		
+		/**
+		 * Differently colored bishops, no other pieces except pawns
+		 */
+		if (w_bishops.getDataSize() == 1
+				&& b_bishops.getDataSize() == 1
+				&& bitboard.getMaterialFactor().getWhiteFactor() == 3
+				&& bitboard.getMaterialFactor().getBlackFactor() == 3) {
 			
 			long w_colour = (bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER) & Fields.ALL_WHITE_FIELDS) != 0 ?
 					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
 			long b_colour = (bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER) & Fields.ALL_WHITE_FIELDS) != 0 ?
 					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
-			
 			if (w_colour != b_colour) {
-				if (eval >= 0) {
-					abs -= Math.min(90, abs / 2);	
-				} else {
-					abs += Math.min(90, abs / 2);
+				
+				//If one of the sides has advantage of 2-3 pawns, than let it know the game goes to draw
+				if (abs <= 200) {
+					abs = abs / 4;
+				} else if (abs <= 400) {
+					abs = abs / 2;
+				} else if (abs <= 600) {
+					abs = (2 * abs) / 3;
 				}
 			}
 		}
@@ -480,7 +570,7 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 		 */
 		int movesBeforeDraw = 100 - bitboard.getDraw50movesRule();
 		double percents = movesBeforeDraw / (double)100;
-		abs = ((abs + percents * abs) / (double)2);
+		abs = (int) (percents * abs);//(int) ((abs + percents * abs) / (double)2);
 		
 		/**
 		 * Return value
@@ -501,49 +591,42 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 		int b_eval_pawns_o = baseEval.getBlackMaterialPawns_o();
 		int b_eval_pawns_e = baseEval.getBlackMaterialPawns_e();
 		
-		
 		if (w_pawns.getDataSize() == 0) {
+			
 			if (w_eval_pawns_o != 0 || w_eval_pawns_e != 0) {
 				throw new IllegalStateException();
 			}
 			
-			if (w_eval_nopawns_o > b_eval_nopawns_o) {
-				if (w_eval_nopawns_o < b_eval_nopawns_o + baseEval.getMaterial_BARIER_NOPAWNS_O()) {
-					w_eval_nopawns_o = b_eval_nopawns_o;
-				}
+			if (w_eval_nopawns_o < baseEval.getMaterial_BARIER_NOPAWNS_O()) {
+				w_eval_nopawns_o = w_eval_nopawns_o / 2;
 			}
 			
-			if (w_eval_nopawns_e > b_eval_nopawns_e) {
-				if (w_eval_nopawns_e < b_eval_nopawns_e + baseEval.getMaterial_BARIER_NOPAWNS_E()) {
-					w_eval_nopawns_e = b_eval_nopawns_e;
-				}
+			if (w_eval_nopawns_e < baseEval.getMaterial_BARIER_NOPAWNS_E()) {
+				w_eval_nopawns_e = w_eval_nopawns_e / 2;
 			}
 		}
 		
 		if (b_pawns.getDataSize() == 0) {
+			
 			if (b_eval_pawns_o != 0 || b_eval_pawns_e != 0) {
 				throw new IllegalStateException();
 			}
 			
-			if (b_eval_nopawns_o > w_eval_nopawns_o) {
-				if (b_eval_nopawns_o < w_eval_nopawns_o + baseEval.getMaterial_BARIER_NOPAWNS_O()) {
-					b_eval_nopawns_o = w_eval_nopawns_o;
-				}
+			if (b_eval_nopawns_o < baseEval.getMaterial_BARIER_NOPAWNS_O()) {
+				b_eval_nopawns_o = b_eval_nopawns_o / 2;
 			}
 			
-			if (b_eval_nopawns_e > w_eval_nopawns_e) {
-				if (b_eval_nopawns_e < w_eval_nopawns_e + baseEval.getMaterial_BARIER_NOPAWNS_E()) {
-					b_eval_nopawns_e = w_eval_nopawns_e;
-				}
+			if (b_eval_nopawns_e < baseEval.getMaterial_BARIER_NOPAWNS_E()) {
+				b_eval_nopawns_e = b_eval_nopawns_e / 2;
 			}
 		}
 		
 		return interpolator.interpolateByFactor(
-					(w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o),
-					(w_eval_nopawns_e - b_eval_nopawns_e) + (w_eval_pawns_e - b_eval_pawns_e)
-				);
+				(w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o),
+				(w_eval_nopawns_e - b_eval_nopawns_e) + (w_eval_pawns_e - b_eval_pawns_e));
 
 	}
+
 	
 	protected static final int axisSymmetry(int fieldID) {
 		return HORIZONTAL_SYMMETRY[fieldID];
