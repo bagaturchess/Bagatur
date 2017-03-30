@@ -25,15 +25,15 @@ public interface FeatureWeights {
 	/**
 	 * Weights
 	 */
-	public static final double WEIGHT_MATERIAL_O 		= 1 * 1.31;
-	public static final double WEIGHT_MATERIAL_E 		= 1 * 1.31;
+	public static final double WEIGHT_MATERIAL_O 		= 1.167;
+	public static final double WEIGHT_MATERIAL_E 		= 0.799;
 	
-	public static final double WEIGHT_STANDARD_O 		= 1;
-	public static final double WEIGHT_STANDARD_E 		= 1;
+	public static final double WEIGHT_STANDARD_O 		= 0.183;
+	public static final double WEIGHT_STANDARD_E 		= 0;
 	
 	
-	public static final double WEIGHT_PAWNS_ROOKQUEEN_O	= 1;
-	public static final double WEIGHT_PAWNS_ROOKQUEEN_E	= 1;
+	public static final double WEIGHT_PAWNS_ROOKQUEEN_O	= 0.631;
+	public static final double WEIGHT_PAWNS_ROOKQUEEN_E	= 2.013;
 
 	
 	

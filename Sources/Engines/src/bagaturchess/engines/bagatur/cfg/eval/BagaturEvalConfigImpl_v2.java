@@ -12,44 +12,44 @@ import bagaturchess.uci.impl.commands.options.UCIOptionSpin;
 public class BagaturEvalConfigImpl_v2 implements IEvalConfig, IBagaturEvalConfig, IUCIOptionsProvider {
 	
 	
-	private double WEIGHT_KINGSAFETY_O = 3;
-	private double WEIGHT_KINGSAFETY_E = 0;
+	private double WEIGHT_KINGSAFETY_O 			= 3.379;
+	private double WEIGHT_KINGSAFETY_E 			= 0;
 	
-	private double WEIGHT_MOBILITY_O = 1;
-	private double WEIGHT_MOBILITY_E = 1;
+	private double WEIGHT_MOBILITY_O 			= 0.751;
+	private double WEIGHT_MOBILITY_E 			= 0;
 	
-	private double WEIGHT_MOBILITY_S_O = 1;
-	private double WEIGHT_MOBILITY_S_E = 1;
+	private double WEIGHT_MOBILITY_S_O 			= 1.734;
+	private double WEIGHT_MOBILITY_S_E 			= 0.934;
 	
-	private double WEIGHT_SPACE_O = 0.3;
-	private double WEIGHT_SPACE_E = 0.15;
+	private double WEIGHT_SPACE_O 				= 0.704;
+	private double WEIGHT_SPACE_E 				= 0.179;
 	
-	private double WEIGHT_TRAPPED_O = 1;
-	private double WEIGHT_TRAPPED_E = 0.83;
+	private double WEIGHT_TRAPPED_O 			= 0.403;
+	private double WEIGHT_TRAPPED_E 			= 0.601;
 	
-    private double WEIGHT_HUNGED_O = 2;//2 - 80 for 2 hanging
-    private double WEIGHT_HUNGED_E = 4;//4 - 80 for 2 hanging
+    private double WEIGHT_HUNGED_O 				= 1.328;//2 - 80 for 2 hanging
+    private double WEIGHT_HUNGED_E 				= 2.149;//4 - 160 for 2 hanging
 	
-	private double WEIGHT_PST_O = 1;
-	private double WEIGHT_PST_E = 1;
+	private double WEIGHT_PST_O 				= 1.082;
+	private double WEIGHT_PST_E 				= 0.622;
 	
-	private double WEIGHT_MATERIAL_PAWNS_O = 1;
-	private double WEIGHT_MATERIAL_PAWNS_E = 1;
+	private double WEIGHT_MATERIAL_PAWNS_O 		= 1;
+	private double WEIGHT_MATERIAL_PAWNS_E 		= 1;
 	
-	private double WEIGHT_PAWNS_STANDARD_O = 1;
-	private double WEIGHT_PAWNS_STANDARD_E = 1;
+	private double WEIGHT_PAWNS_STANDARD_O 		= 0.698;
+	private double WEIGHT_PAWNS_STANDARD_E 		= 0.440;
 	
-	private double WEIGHT_PAWNS_PASSED_O = 1;
-	private double WEIGHT_PAWNS_PASSED_E = 1.5;
+	private double WEIGHT_PAWNS_PASSED_O 		= 0;
+	private double WEIGHT_PAWNS_PASSED_E 		= 1.737;
 	
-	private double WEIGHT_PAWNS_PASSED_KING_O = 0;
-	private double WEIGHT_PAWNS_PASSED_KING_E = 0.3;
+	private double WEIGHT_PAWNS_PASSED_KING_O 	= 0;
+	private double WEIGHT_PAWNS_PASSED_KING_E 	= 2.444;
 	
-	private double WEIGHT_PAWNS_PSTOPPERS_O = 0;
-	private double WEIGHT_PAWNS_PSTOPPERS_E = 0.75; 
+	private double WEIGHT_PAWNS_PSTOPPERS_O 	= 0;
+	private double WEIGHT_PAWNS_PSTOPPERS_E 	= 0.418;
 	
-	private double WEIGHT_PAWNS_PSTOPPERS_A_O = 0;
-	private double WEIGHT_PAWNS_PSTOPPERS_A_E = 1.12;
+	private double WEIGHT_PAWNS_PSTOPPERS_A_O 	= 0;
+	private double WEIGHT_PAWNS_PSTOPPERS_A_E 	= 1.357;
 	
 	
 	private UCIOption[] options = new UCIOption[] {
