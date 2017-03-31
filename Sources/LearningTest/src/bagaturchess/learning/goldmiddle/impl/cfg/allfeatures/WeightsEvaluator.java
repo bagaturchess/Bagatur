@@ -673,6 +673,11 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                             eval_o += PAWNS_PASSED_RNK_O * passer;
                             eval_e += PAWNS_PASSED_RNK_E * passer;
                             
+        					if (stoppersCount > 0) {
+                                eval_o += PAWNS_PSTOPPERS_O * (-(stoppersCount * passer) / 4);
+                                eval_e += PAWNS_PSTOPPERS_E * (-(stoppersCount * passer) / 4);
+        					}
+                            
                     int frontFieldID = p.getFieldID() + 8;
                     int frontFrontFieldID = frontFieldID + 8;
                     if (frontFrontFieldID >= 64) {
@@ -727,6 +732,11 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                             int passer = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.PASSERS_RANK_O[rank], ALL_SignalFillerConstants.PASSERS_RANK_E[rank]);
                             eval_o -= PAWNS_PASSED_RNK_O * passer;
                             eval_e -= PAWNS_PASSED_RNK_E * passer;
+                            
+        					if (stoppersCount > 0) {
+                                eval_o += PAWNS_PSTOPPERS_O * (+(stoppersCount * passer) / 4);
+                                eval_e += PAWNS_PSTOPPERS_E * (+(stoppersCount * passer) / 4);
+        					}
                             
                     int frontFieldID = p.getFieldID() - 8;
                     int frontFrontFieldID = frontFieldID - 8;

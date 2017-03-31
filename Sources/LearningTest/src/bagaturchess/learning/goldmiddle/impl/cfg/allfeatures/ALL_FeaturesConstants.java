@@ -35,6 +35,7 @@ interface ALL_FeaturesConstants {
 	public static final int FEATURE_ID_PAWNS_PASSED        = 2060;
 	public static final int FEATURE_ID_PAWNS_PASSED_RNK    = 2070;
 	public static final int FEATURE_ID_UNSTOPPABLE_PASSER  = 2080;
+	public static final int FEATURE_ID_PAWNS_PSTOPPERS	   = 2083;
 	public static final int FEATURE_ID_PAWNS_CANDIDATE     = 2090;
 	public static final int FEATURE_ID_KING_PASSERS_F  	   = 2100;
 	public static final int FEATURE_ID_KING_PASSERS_FF 	   = 2110;
@@ -99,7 +100,7 @@ interface ALL_FeaturesConstants {
 	public static final int FEATURE_ID_HUNGED_PIECES       = 4400;
 	public static final int FEATURE_ID_HUNGED_PAWNS        = 4410;
 	public static final int FEATURE_ID_HUNGED_ALL          = 4420;
-	
+	//public static final int FEATURE_ID_PAWNS_PSTOPPERS_A   = 4425;
 	
 	/**
 	 * FIELDS STATES ITERATION

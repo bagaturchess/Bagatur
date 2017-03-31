@@ -53,6 +53,7 @@ public class ALL_FeaturesConfigurationBagaturImpl implements IFeaturesConfigurat
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PASSED        , "PAWNS.PASSED"        , PAWNS_STRUCTURE ,   0, 50, 10.163,   0, 50,  3.410 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PASSED_RNK    , "PAWNS.PASSED.RNK"    , PAWNS_STRUCTURE ,   0,  2,  0.787,  0,  2,  0.859));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_UNSTOPPABLE_PASSER  , "PAWNS.UNSTOPPABLE.PASSER" , PAWNS_STRUCTURE ,   0, 0,  0,   550, 700,  550 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PSTOPPERS     , "PAWNS_PSTOPPERS"     , PAWNS_STRUCTURE         , 0, 50, 0.083, 0, 50, 0.462 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_CANDIDATE     , "PAWNS.CANDIDATE.RNK" , PAWNS_STRUCTURE ,   0,  5,  0.412,  0,  5,  0.302));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KING_PASSERS_F  	, "KINGS.PASSERS.F"     , PAWNS_STRUCTURE ,   0,   0, 0, 0, 20, 1.340 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KING_PASSERS_FF  	, "KINGS.PASSERS.FF"    , PAWNS_STRUCTURE ,   0,   0, 0, 0, 20, 0.979 ));
@@ -127,6 +128,7 @@ public class ALL_FeaturesConfigurationBagaturImpl implements IFeaturesConfigurat
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED_PAWNS       	, "HUNGED.PAWNS"       	, MOVES_ITERATION  ,  -100,  0, -0.523,  -100,  0, -0.098 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED_ALL       	, "HUNGED.ALL"        	, MOVES_ITERATION  ,  -100,  0, -0.221,  -100,  0, -0.255 ));
 		
+		//add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PSTOPPERS_A   , "PAWNS_PSTOPPERS_A"   , MOVES_ITERATION         , 0, 50, 0.098, 0, 50, 1.058 ));
 		
 		/**
 		 * FIELDS STATES ITERATION

@@ -295,6 +295,10 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 					int passer = bitboard.getMaterialFactor().interpolateByFactor(PASSERS_RANK_O[rank], PASSERS_RANK_E[rank]);
 					signals.getSignal(FEATURE_ID_PAWNS_PASSED_RNK).addStrength(passer, openingPart);
 					
+					if (stoppersCount > 0) {
+						signals.getSignal(FEATURE_ID_PAWNS_PSTOPPERS).addStrength( -(stoppersCount * passer) / 4, openingPart);
+					}
+					
 					long front = p.getFront();
 					if ((front & bb_w_rooks) != 0L) {
 						signals.getSignal(FEATURE_ID_ROOK_INFRONT_PASSER).addStrength(1, openingPart);
@@ -382,6 +386,10 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 					
 					int passer = bitboard.getMaterialFactor().interpolateByFactor(PASSERS_RANK_O[rank], PASSERS_RANK_E[rank]);
 					signals.getSignal(FEATURE_ID_PAWNS_PASSED_RNK).addStrength(-passer, openingPart);
+					
+					if (stoppersCount > 0) {
+						signals.getSignal(FEATURE_ID_PAWNS_PSTOPPERS).addStrength( +(stoppersCount * passer) / 4, openingPart);
+					}
 					
 					long front = p.getFront();
 					if ((front & bb_b_rooks) != 0L) {
