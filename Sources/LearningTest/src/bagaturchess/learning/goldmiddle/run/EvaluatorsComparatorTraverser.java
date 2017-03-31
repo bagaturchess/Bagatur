@@ -1,8 +1,10 @@
 package bagaturchess.learning.goldmiddle.run;
 
 
+import bagaturchess.learning.goldmiddle.api.ILearningInput;
+import bagaturchess.learning.goldmiddle.impl.cfg.allfeatures.ALL_LearningInputImpl;
+import bagaturchess.learning.goldmiddle.impl.cfg.base.BoardConfigImpl;
 import bagaturchess.learning.goldmiddle.impl.visitors.EvaluatorsComparatorVisitorImpl;
-import bagaturchess.learning.goldmiddle.run.cfg.BoardConfigImpl;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
@@ -22,7 +24,9 @@ public class EvaluatorsComparatorTraverser {
 			
 			PositionsVisitor learning = new EvaluatorsComparatorVisitorImpl();
 			
-			PositionsTraverser.traverseAll(filePath, learning, 99999999, new BoardConfigImpl(), "bagaturchess.learning.impl.eval.FastPawnsEvalFactory");
+			ILearningInput input = new ALL_LearningInputImpl();
+			
+			PositionsTraverser.traverseAll(filePath, learning, 99999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
 			//PositionsTraverser.traverseAll(filePath, learning, 300000, new BoardConfigImpl());
 			
 		} catch (Exception e) {

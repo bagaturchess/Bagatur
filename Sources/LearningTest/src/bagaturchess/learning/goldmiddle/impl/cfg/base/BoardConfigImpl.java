@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.run.cfg;
+package bagaturchess.learning.goldmiddle.impl.cfg.base;
 
 
 import bagaturchess.bitboard.api.IBoardConfig;
