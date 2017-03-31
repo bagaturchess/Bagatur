@@ -85,32 +85,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     }
     
     
-    @Override
-    protected double phase2_endgame() {
-            
-            double eval = 0;
-            
-            eval += eval_pawns();
-            
-            return eval;
-    }
-    
-    
-    @Override
-    protected double phase3_endgame() {
-            
-            double eval = 0;
-            
-            eval += eval_standard();
-            
-            //Clear PST scores and calculate them from scratch in eval_pieces
-            eval -= interpolator.interpolateByFactor(baseEval.getPST_o(), baseEval.getPST_e());
-            eval += eval_pieces();
-            
-            return eval;
-    }
-    
-    
     private double eval_standard() {
             
             double eval_o = 0;
@@ -162,17 +136,17 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             //
             //A further refinement would be to raise the knight's value by 1/16 and lower the rook's value by 1/8
             //for each pawn above five of the side being valued, with the opposite adjustment for each pawn short of five.
-            //int w_pawns_above5 = w_pawns.getDataSize() - 5;
-            //int b_pawns_above5 = b_pawns.getDataSize() - 5;
+            int w_pawns_above5 = w_pawns.getDataSize() - 5;
+            int b_pawns_above5 = b_pawns.getDataSize() - 5;
             
-            /*int pawns5_rooks = w_pawns_above5 * w_rooks.getDataSize() - b_pawns_above5 * b_rooks.getDataSize();
-            eval_o += pawns5_rooks * PAWNS5_ROOKS_O;
-            eval_e += pawns5_rooks * PAWNS5_ROOKS_E;
+            int pawns5_rooks = w_pawns_above5 * w_rooks.getDataSize() - b_pawns_above5 * b_rooks.getDataSize();
+            eval_o += pawns5_rooks * ROOKS_5PAWNS_O;
+            eval_e += pawns5_rooks * ROOKS_5PAWNS_E;
             
             int pawns5_knights = w_pawns_above5 * w_knights.getDataSize() - b_pawns_above5 * b_knights.getDataSize();
-            eval_o += pawns5_knights * PAWNS5_KNIGHTS_O;
-            eval_e += pawns5_knights * PAWNS5_KNIGHTS_E;
-            */
+            eval_o += pawns5_knights * KNIGHTS_5PAWNS_O;
+            eval_e += pawns5_knights * KNIGHTS_5PAWNS_E;
+            
             
             return movedFGPawns + interpolator.interpolateByFactor(eval_o, eval_e);
     }
@@ -872,11 +846,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             
             int kingFieldID_white = w_king.getData()[0];
             int kingFieldID_black = b_king.getData()[0];
-            
-            int w_penetration_op_area = 0;
-            int b_penetration_op_area = 0;
-            int w_penetration_king_area = 0;
-            int b_penetration_king_area = 0;
 
             int w_mobility_knights_all = 0;
             int b_mobility_knights_all = 0;
@@ -887,7 +856,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             int w_mobility_queens_all = 0;
             int b_mobility_queens_all = 0;
             
-            /*int w_mobility_knights_safe = 0;
+            int w_mobility_knights_safe = 0;
             int b_mobility_knights_safe = 0;
             int w_mobility_bishops_safe = 0;
             int b_mobility_bishops_safe = 0;
@@ -903,7 +872,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             int w_trap_rooks = 0;
             int b_trap_rooks = 0;
             int w_trap_queens = 0;
-            int b_trap_queens = 0;*/
+            int b_trap_queens = 0;
             
             int w_hanging_nonpawn = 0;
             int b_hanging_nonpawn = 0;
@@ -1060,7 +1029,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     w_mobility_knights_all = 0;
                                     
-                                    //w_mobility_knights_safe = 0;
+                                    w_mobility_knights_safe = 0;
                                     
                                     final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
                                     final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
@@ -1104,20 +1073,18 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             }
                                             
                                             w_mobility_knights_all++;
-                                            w_penetration_op_area += Fields.getRank_W(toFieldID);
-                                            w_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
                                             
-                                            /*boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT, toFieldID) >= 0;
+                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT, toFieldID) >= 0;
                                             if (safe) {
                                                     w_mobility_knights_safe++;
-                                            }*/
+                                            }
                                     }
                                     
                                     eval_o += MOBILITY_KNIGHT_O *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[w_mobility_knights_all];
                                     eval_e += MOBILITY_KNIGHT_E *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[w_mobility_knights_all];
-                                    /*eval_o += MOBILITY_KNIGHT_S_O * ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[w_mobility_knights_safe];
+                                    eval_o += MOBILITY_KNIGHT_S_O * ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[w_mobility_knights_safe];
                                     eval_e += MOBILITY_KNIGHT_S_E * ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[w_mobility_knights_safe];
                                                                             
                                     if (w_mobility_knights_safe == 2) {
@@ -1126,7 +1093,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             w_trap_knights += 2 * (Fields.getRank_W(fieldID) + 1);
                                     } else if (w_mobility_knights_safe == 0) {
                                             w_trap_knights += 4 * (Fields.getRank_W(fieldID) + 1);
-                                    }*/
+                                    }
                                     
                                     w_knights_attacks_to_black_king_1 += ALL_SignalFillerConstants.KING_SAFETY_KNIGHTS_ATTACKS[opking_attacks_counter_1];
                                     w_knights_attacks_to_black_king_2 += ALL_SignalFillerConstants.KING_SAFETY_KNIGHTS_ATTACKS[opking_attacks_counter_2];
@@ -1153,7 +1120,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     b_mobility_knights_all = 0;
                                     
-                                    //b_mobility_knights_safe = 0;
+                                    b_mobility_knights_safe = 0;
                                     
                                     final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
                                     final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
@@ -1197,20 +1164,18 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             }
                                             
                                             b_mobility_knights_all++;
-                                            b_penetration_op_area += Fields.getRank_B(toFieldID);
-                                            b_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
                                             
-                                            /*boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT, toFieldID) >= 0;
+                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT, toFieldID) >= 0;
                                             if (safe) {
                                                     b_mobility_knights_safe++;
-                                            }*/
+                                            }
                                     }
                                     
                                     eval_o -= MOBILITY_KNIGHT_O *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[b_mobility_knights_all];
                                     eval_e -= MOBILITY_KNIGHT_E *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[b_mobility_knights_all];
-                                    /*eval_o -= MOBILITY_KNIGHT_S_O * ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[b_mobility_knights_safe];
+                                    eval_o -= MOBILITY_KNIGHT_S_O * ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[b_mobility_knights_safe];
                                     eval_e -= MOBILITY_KNIGHT_S_E * ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[b_mobility_knights_safe];
                                     
                                     if (b_mobility_knights_safe == 2) {
@@ -1219,7 +1184,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             b_trap_knights += 2 * (Fields.getRank_B(fieldID) + 1);
                                     } else if (b_mobility_knights_safe == 0) {
                                             b_trap_knights += 4 * (Fields.getRank_B(fieldID) + 1);
-                                    }*/
+                                    }
                                     
                                     b_knights_attacks_to_white_king_1 += ALL_SignalFillerConstants.KING_SAFETY_KNIGHTS_ATTACKS[opking_attacks_counter_1];
                                     b_knights_attacks_to_white_king_2 += ALL_SignalFillerConstants.KING_SAFETY_KNIGHTS_ATTACKS[opking_attacks_counter_2];
@@ -1249,7 +1214,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     w_mobility_bishops_all = 0;
                                     
-                                    //w_mobility_bishops_safe = 0;
+                                    w_mobility_bishops_safe = 0;
                                     
                                     final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
                                     final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
@@ -1311,15 +1276,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             w_mobility_bishops_all++;
-                                                                            /*boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER, toFieldID) >= 0;
+                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER, toFieldID) >= 0;
                                                                             if (safe) {
                                                                                     w_mobility_bishops_safe++;
-                                                                            }*/
+                                                                            }
                                                                     } else {
                                                                             w_mobility_bishops_all++;
                                                                     }
-                                                                    w_penetration_op_area += Fields.getRank_W(toFieldID);
-                                                                    w_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
                                                             }
                                                             
                                                             if ((toBitboard & bb_black_all) != 0L) {
@@ -1345,7 +1308,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_O[w_mobility_bishops_all];
                                     eval_e += MOBILITY_BISHOP_E *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_E[w_mobility_bishops_all];
-                                    /*eval_o += MOBILITY_BISHOP_S_O * ALL_SignalFillerConstants.MOBILITY_BISHOP_O[w_mobility_bishops_safe];
+                                    eval_o += MOBILITY_BISHOP_S_O * ALL_SignalFillerConstants.MOBILITY_BISHOP_O[w_mobility_bishops_safe];
                                     eval_e += MOBILITY_BISHOP_S_E * ALL_SignalFillerConstants.MOBILITY_BISHOP_E[w_mobility_bishops_safe];
                                     
                                     if (w_mobility_bishops_safe == 2) {
@@ -1354,7 +1317,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             w_trap_bishops += 2 * (Fields.getRank_W(fieldID) + 1);
                                     } else if (w_mobility_bishops_safe == 0) {
                                             w_trap_bishops += 4 * (Fields.getRank_W(fieldID) + 1);
-                                    }*/
+                                    }
                                     
                                     w_bishops_attacks_to_black_king_1 += ALL_SignalFillerConstants.KING_SAFETY_BISHOPS_ATTACKS[opking_attacks_counter_1];
                                     w_bishops_attacks_to_black_king_2 += ALL_SignalFillerConstants.KING_SAFETY_BISHOPS_ATTACKS[opking_attacks_counter_2];
@@ -1380,7 +1343,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     b_mobility_bishops_all = 0;
                                     
-                                    //b_mobility_bishops_safe = 0;
+                                    b_mobility_bishops_safe = 0;
                                     
                                     final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
                                     final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
@@ -1442,15 +1405,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             b_mobility_bishops_all++;
-                                                                            /*boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER, toFieldID) >= 0;
+                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER, toFieldID) >= 0;
                                                                             if (safe) {
                                                                                     b_mobility_bishops_safe++;
-                                                                            }*/
+                                                                            }
                                                                     } else {
                                                                             b_mobility_bishops_all++;
                                                                     }
-                                                                    b_penetration_op_area += Fields.getRank_B(toFieldID);
-                                                                    b_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
                                                             }
                                                             
                                                             if ((toBitboard & bb_white_all) != 0L) {
@@ -1475,7 +1436,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_O[b_mobility_bishops_all];
                                     eval_e -= MOBILITY_BISHOP_E *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_E[b_mobility_bishops_all];
-                                    /*eval_o -= MOBILITY_BISHOP_S_O * ALL_SignalFillerConstants.MOBILITY_BISHOP_O[b_mobility_bishops_safe];
+                                    eval_o -= MOBILITY_BISHOP_S_O * ALL_SignalFillerConstants.MOBILITY_BISHOP_O[b_mobility_bishops_safe];
                                     eval_e -= MOBILITY_BISHOP_S_E * ALL_SignalFillerConstants.MOBILITY_BISHOP_E[b_mobility_bishops_safe];
                                     
                                     if (b_mobility_bishops_safe == 2) {
@@ -1484,7 +1445,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             b_trap_bishops += 2 * (Fields.getRank_B(fieldID) + 1);
                                     } else if (b_mobility_bishops_safe == 0) {
                                             b_trap_bishops += 4 * (Fields.getRank_B(fieldID) + 1);
-                                    }*/
+                                    }
                                     
                                     b_bishops_attacks_to_white_king_1 += ALL_SignalFillerConstants.KING_SAFETY_BISHOPS_ATTACKS[opking_attacks_counter_1];
                                     b_bishops_attacks_to_white_king_2 += ALL_SignalFillerConstants.KING_SAFETY_BISHOPS_ATTACKS[opking_attacks_counter_2];
@@ -1514,7 +1475,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     w_mobility_rooks_all = 0;
                                     
-                                    //w_mobility_rooks_safe = 0;
+                                    w_mobility_rooks_safe = 0;
                                     
                                     final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
                                     final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
@@ -1583,15 +1544,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             w_mobility_rooks_all++;
-                                                                            /*boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_CASTLE, toFieldID) >= 0;
+                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_CASTLE, toFieldID) >= 0;
                                                                             if (safe) {
                                                                                     w_mobility_rooks_safe++;
-                                                                            }*/
+                                                                            }
                                                                     } else {
                                                                             w_mobility_rooks_all++;
                                                                     }
-                                                                    w_penetration_op_area += Fields.getRank_W(toFieldID);
-                                                                    w_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
                                                             }
                                                             
                                                             if ((toBitboard & bb_black_all) != 0L) {
@@ -1616,7 +1575,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                         ALL_SignalFillerConstants.MOBILITY_ROOK_O[w_mobility_rooks_all];
                                     eval_e += MOBILITY_ROOK_E *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_E[w_mobility_rooks_all];
-                                    /*eval_o += MOBILITY_ROOK_S_O * ALL_SignalFillerConstants.MOBILITY_ROOK_O[w_mobility_rooks_safe];
+                                    eval_o += MOBILITY_ROOK_S_O * ALL_SignalFillerConstants.MOBILITY_ROOK_O[w_mobility_rooks_safe];
                                     eval_e += MOBILITY_ROOK_S_E * ALL_SignalFillerConstants.MOBILITY_ROOK_E[w_mobility_rooks_safe];
                                     
                                     if (w_mobility_rooks_safe == 2) {
@@ -1625,7 +1584,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             w_trap_rooks += 2 * (Fields.getRank_W(fieldID) + 1);
                                     } else if (w_mobility_rooks_safe == 0) {
                                             w_trap_rooks += 4 * (Fields.getRank_W(fieldID) + 1);
-                                    }*/
+                                    }
                                     
                                     w_rooks_attacks_to_black_king_1 += ALL_SignalFillerConstants.KING_SAFETY_ROOKS_ATTACKS[opking_attacks_counter_1];
                                     w_rooks_attacks_to_black_king_2 += ALL_SignalFillerConstants.KING_SAFETY_ROOKS_ATTACKS[opking_attacks_counter_2];
@@ -1651,7 +1610,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     b_mobility_rooks_all = 0;
                                     
-                                    //b_mobility_rooks_safe = 0;
+                                    b_mobility_rooks_safe = 0;
                                     
                                     final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
                                     final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
@@ -1720,15 +1679,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             b_mobility_rooks_all++;
-                                                                            /*boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_CASTLE, toFieldID) >= 0;
+                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_CASTLE, toFieldID) >= 0;
                                                                             if (safe) {
                                                                                     b_mobility_rooks_safe++;
-                                                                            }*/
+                                                                            }
                                                                     } else {
                                                                             b_mobility_rooks_all++;
                                                                     }
-                                                                    b_penetration_op_area += Fields.getRank_B(toFieldID);
-                                                                    b_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
                                                             }
                                                             
                                                             if ((toBitboard & bb_white_all) != 0L) {
@@ -1753,7 +1710,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                         ALL_SignalFillerConstants.MOBILITY_ROOK_O[b_mobility_rooks_all];
                                     eval_e -= MOBILITY_ROOK_E *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_E[b_mobility_rooks_all];
-                                    /*eval_o -= MOBILITY_ROOK_S_O * ALL_SignalFillerConstants.MOBILITY_ROOK_O[b_mobility_rooks_safe];
+                                    eval_o -= MOBILITY_ROOK_S_O * ALL_SignalFillerConstants.MOBILITY_ROOK_O[b_mobility_rooks_safe];
                                     eval_e -= MOBILITY_ROOK_S_E * ALL_SignalFillerConstants.MOBILITY_ROOK_E[b_mobility_rooks_safe];
                                     
                                     if (b_mobility_rooks_safe == 2) {
@@ -1762,7 +1719,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             b_trap_rooks += 2 * (Fields.getRank_B(fieldID) + 1);
                                     } else if (b_mobility_rooks_safe == 0) {
                                             b_trap_rooks += 4 * (Fields.getRank_B(fieldID) + 1);
-                                    }*/
+                                    }
                                     
                                     b_rooks_attacks_to_white_king_1 += ALL_SignalFillerConstants.KING_SAFETY_ROOKS_ATTACKS[opking_attacks_counter_1];
                                     b_rooks_attacks_to_white_king_2 += ALL_SignalFillerConstants.KING_SAFETY_ROOKS_ATTACKS[opking_attacks_counter_2];
@@ -1792,7 +1749,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     w_mobility_queens_all = 0;
                                     
-                                    //w_mobility_queens_safe = 0;
+                                    w_mobility_queens_safe = 0;
                                     
                                     int opking_attacks_counter_1 = 0;
                                     int opking_attacks_counter_2 = 0;
@@ -1858,15 +1815,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             w_mobility_queens_all++;
-                                                                            /*boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN, toFieldID) >= 0;
+                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN, toFieldID) >= 0;
                                                                             if (safe) {
                                                                                     w_mobility_queens_safe++;
-                                                                            }*/
+                                                                            }
                                                                     } else {
                                                                             w_mobility_queens_all++;
                                                                     }
-                                                                    w_penetration_op_area += Fields.getRank_W(toFieldID);
-                                                                    w_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
                                                             }
                                                             
                                                             if ((toBitboard & bb_black_all) != 0L) {
@@ -1950,15 +1905,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             w_mobility_queens_all++;
-                                                                            /*boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN, toFieldID) >= 0;
+                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN, toFieldID) >= 0;
                                                                             if (safe) {
                                                                                     w_mobility_queens_safe++;
-                                                                            }*/
+                                                                            }
                                                                     } else {
                                                                             w_mobility_queens_all++;
                                                                     }
-                                                                    w_penetration_op_area += Fields.getRank_W(toFieldID);
-                                                                    w_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_black, toFieldID);
                                                             }
                                                             
                                                             if ((toBitboard & bb_black_all) != 0L) {
@@ -1983,7 +1936,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_O[w_mobility_queens_all];
                                     eval_e += MOBILITY_QUEEN_E *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_E[w_mobility_queens_all];
-                                    /*eval_o += MOBILITY_QUEEN_S_O * ALL_SignalFillerConstants.MOBILITY_QUEEN_O[w_mobility_queens_safe];
+                                    eval_o += MOBILITY_QUEEN_S_O * ALL_SignalFillerConstants.MOBILITY_QUEEN_O[w_mobility_queens_safe];
                                     eval_e += MOBILITY_QUEEN_S_E * ALL_SignalFillerConstants.MOBILITY_QUEEN_E[w_mobility_queens_safe];
                                     
                                     if (w_mobility_queens_safe == 2) {
@@ -1992,7 +1945,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             w_trap_queens += 2 * (Fields.getRank_W(fieldID) + 1);
                                     } else if (w_mobility_queens_safe == 0) {
                                             w_trap_queens += 4 * (Fields.getRank_W(fieldID) + 1);
-                                    }*/
+                                    }
                                     
                                     w_queens_attacks_to_black_king_1 += ALL_SignalFillerConstants.KING_SAFETY_QUEENS_ATTACKS[opking_attacks_counter_1];
                                     w_queens_attacks_to_black_king_2 += ALL_SignalFillerConstants.KING_SAFETY_QUEENS_ATTACKS[opking_attacks_counter_2];
@@ -2018,7 +1971,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     b_mobility_queens_all = 0;
                                     
-                                    //b_mobility_queens_safe = 0;
+                                    b_mobility_queens_safe = 0;
                                     
                                     int opking_attacks_counter_1 = 0;
                                     int opking_attacks_counter_2 = 0;
@@ -2084,15 +2037,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             b_mobility_queens_all++;
-                                                                            /*boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN, toFieldID) >= 0;
+                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN, toFieldID) >= 0;
                                                                             if (safe) {
                                                                                     b_mobility_queens_safe++;
-                                                                            }*/
+                                                                            }
                                                                     } else {
                                                                             b_mobility_queens_all++;
                                                                     }
-                                                                    b_penetration_op_area += Fields.getRank_B(toFieldID);
-                                                                    b_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
                                                             }
                                                             
                                                             if ((toBitboard & bb_white_all) != 0L) {
@@ -2176,15 +2127,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             b_mobility_queens_all++;
-                                                                            /*boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN, toFieldID) >= 0;
+                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN, toFieldID) >= 0;
                                                                             if (safe) {
                                                                                     b_mobility_queens_safe++;
-                                                                            }*/
+                                                                            }
                                                                     } else {
                                                                             b_mobility_queens_all++;
                                                                     }
-                                                                    b_penetration_op_area += Fields.getRank_B(toFieldID);
-                                                                    b_penetration_king_area += Fields.getDistancePoints_reversed(kingFieldID_white, toFieldID);
                                                             }
                                                             
                                                             if ((toBitboard & bb_white_all) != 0L) {
@@ -2210,7 +2159,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_O[b_mobility_queens_all];
                                     eval_e -= MOBILITY_QUEEN_E *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_E[b_mobility_queens_all];
-                                    /*eval_o -= MOBILITY_QUEEN_S_O * ALL_SignalFillerConstants.MOBILITY_QUEEN_O[b_mobility_queens_safe];
+                                    eval_o -= MOBILITY_QUEEN_S_O * ALL_SignalFillerConstants.MOBILITY_QUEEN_O[b_mobility_queens_safe];
                                     eval_e -= MOBILITY_QUEEN_S_E * ALL_SignalFillerConstants.MOBILITY_QUEEN_E[b_mobility_queens_safe];
                                     
                                     if (b_mobility_queens_safe == 2) {
@@ -2219,7 +2168,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             b_trap_queens += 2 * (Fields.getRank_B(fieldID) + 1);
                                     } else if (b_mobility_queens_safe == 0) {
                                             b_trap_queens += 4 * (Fields.getRank_B(fieldID) + 1);
-                                    }*/     
+                                    }     
                                     
                                     b_queens_attacks_to_white_king_1 += ALL_SignalFillerConstants.KING_SAFETY_QUEENS_ATTACKS[opking_attacks_counter_1];
                                     b_queens_attacks_to_white_king_2 += ALL_SignalFillerConstants.KING_SAFETY_QUEENS_ATTACKS[opking_attacks_counter_2];
@@ -2293,31 +2242,22 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             eval_e += ATTACK_LOWER_E * attack_lower;
             
             
-            
-            /*int trap_knights = w_trap_knights - b_trap_knights;
-            eval_o += TRAP_KNIGHT_O * trap_knights;
-            eval_e += TRAP_KNIGHT_E * trap_knights;
+            int trap_knights = w_trap_knights - b_trap_knights;
+            eval_o += TRAP_O * trap_knights;
+            eval_e += TRAP_E * trap_knights;
             
             int trap_bishop = w_trap_bishops - b_trap_bishops;
-            eval_o += TRAP_BISHOP_O * trap_bishop;
-            eval_e += TRAP_BISHOP_E * trap_bishop;
+            eval_o += TRAP_O * trap_bishop;
+            eval_e += TRAP_E * trap_bishop;
             
             int trap_rook = w_trap_rooks - b_trap_rooks;
-            eval_o += TRAP_ROOK_O * trap_rook;
-            eval_e += TRAP_ROOK_E * trap_rook;
+            eval_o += TRAP_O * trap_rook;
+            eval_e += TRAP_E * trap_rook;
             
             int trap_queen = w_trap_queens - b_trap_queens;
-            eval_o += TRAP_QUEEN_O * trap_queen;
-            eval_e += TRAP_QUEEN_E * trap_queen;*/
+            eval_o += TRAP_O * trap_queen;
+            eval_e += TRAP_E * trap_queen;
             
-            
-            /*if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-                    eval_o += HUNGED_PIECE_O * w_hanging_nonpawn;
-                    eval_e += HUNGED_PIECE_E * w_hanging_nonpawn;
-            } else {
-                    eval_o -= HUNGED_PIECE_O * b_hanging_nonpawn;
-                    eval_e -= HUNGED_PIECE_E * b_hanging_nonpawn;
-            }*/
             
             if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
                     
