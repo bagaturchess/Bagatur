@@ -72,6 +72,9 @@ public interface Weights {
 	public static final double PAWNS_UNSTOPPABLE_PASSER_O	=	0.0;
 	public static final double PAWNS_UNSTOPPABLE_PASSER_E	=	550.0;
 
+	public static final double PAWNS_PSTOPPERS_O	=	0.042068521691595175;
+	public static final double PAWNS_PSTOPPERS_E	=	0.3176293378065275;
+	
 	public static final double PAWNS_CANDIDATE_RNK_O	=	0.35345049485021407;
 	public static final double PAWNS_CANDIDATE_RNK_E	=	0.28498942639061736;
 
