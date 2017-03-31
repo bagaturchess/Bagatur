@@ -18,9 +18,6 @@ import bagaturchess.search.impl.evalcache.IEvalEntry;
 public abstract class BaseEvaluator extends EvaluatorAdapter {
 	
 	
-	private static final int ENDGAME_FACTOR = 30; 
-	
-	
 	private static final boolean USE_CACHE = true;
 	private static final boolean USE_LAZY = true;
 	
@@ -88,10 +85,8 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 	}
 	
 	protected abstract double phase2_opening();
-	protected abstract double phase2_endgame();
 	
 	protected abstract double phase3_opening();
-	protected abstract double phase3_endgame();
 	
 	protected abstract double phase4_opening();
 	
@@ -173,17 +168,10 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 		double eval = 0;
 		
 		eval += phase1();
-		
-		int factor = bitboard.getMaterialFactor().getTotalFactor();
-		if (factor >= ENDGAME_FACTOR) {
-			eval += phase2_opening();
-			eval += phase3_opening();
-			eval += phase4_opening();
-			eval += phase5_opening();
-		} else {
-			eval += phase2_endgame();
-			eval += phase3_endgame();
-		}
+		eval += phase2_opening();
+		eval += phase3_opening();
+		eval += phase4_opening();
+		eval += phase5_opening();
 		
 		if (USE_CACHE && evalCache != null) {
 			evalCache.lock();
@@ -325,129 +313,81 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			}
 		}
 		
-		int factor = bitboard.getMaterialFactor().getTotalFactor();
-		if (factor >= ENDGAME_FACTOR) {
 			
-			double eval2 = phase2_opening();
-			eval += eval2;
-			eval_test = (int) returnVal(eval);
-			if (eval_test + INT2 <= alpha || eval_test - INT2 >= beta) {
-				if (USE_LAZY) {
-					if (USE_CACHE && evalCache != null) {
-						evalCache.lock();
-						evalCache.put(hashkey, CACHE_LEVEL_2, (int) eval,
-									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
-									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
-								);
-						evalCache.unlock();
-					}
-					return eval_test;
-				}
-			}
-			
-			double eval3 = phase3_opening();
-			eval += eval3;
-			eval_test = (int) returnVal(eval);
-			if (eval_test + INT3 <= alpha || eval_test - INT3 >= beta) {
-				if (USE_LAZY) {
-					if (USE_CACHE && evalCache != null) {
-						evalCache.lock();
-						evalCache.put(hashkey, CACHE_LEVEL_3, (int) eval,
-									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
-									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
+		double eval2 = phase2_opening();
+		eval += eval2;
+		eval_test = (int) returnVal(eval);
+		if (eval_test + INT2 <= alpha || eval_test - INT2 >= beta) {
+			if (USE_LAZY) {
+				if (USE_CACHE && evalCache != null) {
+					evalCache.lock();
+					evalCache.put(hashkey, CACHE_LEVEL_2, (int) eval,
+								(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
+								(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
 							);
-						evalCache.unlock();
-					}
-					return eval_test;
+					evalCache.unlock();
 				}
+				return eval_test;
 			}
-			
-			double eval4 = phase4_opening();
-			eval += eval4;
-			eval_test = (int) returnVal(eval);
-			if (eval_test + INT4 <= alpha || eval_test - INT4 >= beta) {
-				if (USE_LAZY) {
-					if (USE_CACHE && evalCache != null) {
-						evalCache.lock();
-						evalCache.put(hashkey, CACHE_LEVEL_4, (int) eval,
-									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
-									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
-							);
-						evalCache.unlock();
-					}
-					return eval_test;
-				}
-			}
-			
-			double eval5 = phase5_opening();
-			eval += eval5;
-			
-			
-			int int1 = (int) Math.abs(eval2 + eval3 + eval4 + eval5);
-			int int2 = (int) Math.abs(eval3 + eval4 + eval5);
-			int int3 = (int) Math.abs(eval4 + eval5);
-			int int4 = (int) Math.abs(eval5);
-			
-			if (int1 > INT1) {
-				INT1 = int1;
-			}
-			if (int2 > INT2) {
-				INT2 = int2;
-			}
-			if (int3 > INT3) {
-				INT3 = int3;
-			}
-			if (int4 > INT4) {
-				INT4 = int4;
-			}
-		} else {
-			
-			double eval2 = phase2_endgame();
-			eval += eval2;
-			eval_test = (int) returnVal(eval);
-			if (eval_test + INT2 <= alpha || eval_test - INT2 >= beta) {
-				if (USE_LAZY) {
-					if (USE_CACHE && evalCache != null) {
-						/*evalCache.lock();
-						evalCache.put(hashkey, CACHE_LEVEL_1, (int) eval,
-									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
-									(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
-							);
-						evalCache.unlock();*/
-					}
-					return eval_test;
-				}
-			}
-			
-			double eval3 = phase3_endgame();
-			eval += eval3;
-			/*if (eval + INT3 <= alpha || eval - INT3 >= beta) {
-				if (USE_LAZY) {
-					evalCache.put(hashkey, CACHE_LEVEL_2, (int) eval, alpha, beta);
-					return (int) returnVal(eval);
-				}
-			}*/
-			
-			
-			int int1 = (int) Math.abs(eval2 + eval3/* + eval4 + eval5*/);
-			int int2 = (int) Math.abs(eval3/* + eval4 + eval5*/);
-			//int int3 = Math.abs(eval4 + eval5);
-			//int int4 = Math.abs(eval5);
-			
-			if (int1 > INT1) {
-				INT1 = int1;
-			}
-			if (int2 > INT2) {
-				INT2 = int2;
-			}
-			/*if (int3 > INT3) {
-				INT3 = int3;
-			}
-			if (int4 > INT4) {
-				INT4 = int4;
-			}*/
 		}
 		
+		double eval3 = phase3_opening();
+		eval += eval3;
+		eval_test = (int) returnVal(eval);
+		if (eval_test + INT3 <= alpha || eval_test - INT3 >= beta) {
+			if (USE_LAZY) {
+				if (USE_CACHE && evalCache != null) {
+					evalCache.lock();
+					evalCache.put(hashkey, CACHE_LEVEL_3, (int) eval,
+								(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
+								(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
+						);
+					evalCache.unlock();
+				}
+				return eval_test;
+			}
+		}
+		
+		double eval4 = phase4_opening();
+		eval += eval4;
+		eval_test = (int) returnVal(eval);
+		if (eval_test + INT4 <= alpha || eval_test - INT4 >= beta) {
+			if (USE_LAZY) {
+				if (USE_CACHE && evalCache != null) {
+					evalCache.lock();
+					evalCache.put(hashkey, CACHE_LEVEL_4, (int) eval,
+								(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
+								(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
+						);
+					evalCache.unlock();
+				}
+				return eval_test;
+			}
+		}
+		
+		double eval5 = phase5_opening();
+		eval += eval5;
+		
+		
+		int int1 = (int) Math.abs(eval2 + eval3 + eval4 + eval5);
+		int int2 = (int) Math.abs(eval3 + eval4 + eval5);
+		int int3 = (int) Math.abs(eval4 + eval5);
+		int int4 = (int) Math.abs(eval5);
+		
+		if (int1 > INT1) {
+			INT1 = int1;
+		}
+		if (int2 > INT2) {
+			INT2 = int2;
+		}
+		if (int3 > INT3) {
+			INT3 = int3;
+		}
+		if (int4 > INT4) {
+			INT4 = int4;
+		}
+			
+			
 		if (eval >= ISearch.MAX_MAT_INTERVAL || eval <= -ISearch.MAX_MAT_INTERVAL) {
 			throw new IllegalStateException();
 		}

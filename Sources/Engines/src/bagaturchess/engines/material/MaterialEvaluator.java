@@ -50,16 +50,4 @@ public class MaterialEvaluator extends BaseEvaluator {
 	protected double phase5_opening() {
 		return 0;
 	}
-	
-	
-	@Override
-	protected double phase2_endgame() {
-		return 0;
-	}
-	
-	
-	@Override
-	protected double phase3_endgame() {
-		return 0;
-	}
 }
