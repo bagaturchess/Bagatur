@@ -80,9 +80,7 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 	}
 	
 	
-	protected double phase1() {
-		return eval_material_nopawnsdrawrule() + interpolator.interpolateByFactor(baseEval.getPST_o(), baseEval.getPST_e());
-	}
+	protected abstract double phase1();
 	
 	protected abstract double phase2_opening();
 	

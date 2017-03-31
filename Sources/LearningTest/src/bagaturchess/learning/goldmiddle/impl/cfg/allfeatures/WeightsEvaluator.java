@@ -44,6 +44,15 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     }
     
     
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase1()
+	 */
+	@Override
+	protected double phase1() {
+		return eval_material_nopawnsdrawrule();// + interpolator.interpolateByFactor(baseEval.getPST_o(), baseEval.getPST_e());
+	}
+	
+	
     @Override
     protected double phase2_opening() {
             
@@ -2350,5 +2359,4 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             return interpolator.interpolateByFactor(eval_o, eval_e);
 
     }
-
 }

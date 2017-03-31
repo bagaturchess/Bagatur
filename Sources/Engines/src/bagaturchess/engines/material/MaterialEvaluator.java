@@ -4,7 +4,6 @@ package bagaturchess.engines.material;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
-import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 
 
@@ -25,6 +24,12 @@ public class MaterialEvaluator extends BaseEvaluator {
 	@Override
 	public int getMaterialQueen() {
 		return 50 + baseEval.getMaterialQueen();
+	}
+	
+	
+	@Override
+	protected double phase1() {
+		return eval_material_nopawnsdrawrule() + interpolator.interpolateByFactor(baseEval.getPST_o(), baseEval.getPST_e());
 	}
 	
 	
