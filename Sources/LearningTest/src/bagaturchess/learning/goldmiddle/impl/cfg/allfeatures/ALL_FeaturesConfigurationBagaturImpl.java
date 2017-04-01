@@ -128,7 +128,7 @@ public class ALL_FeaturesConfigurationBagaturImpl implements IFeaturesConfigurat
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED_PAWNS       	, "HUNGED.PAWNS"       	, MOVES_ITERATION  ,  -100,  0, -0.523,  -100,  0, -0.098 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED_ALL       	, "HUNGED.ALL"        	, MOVES_ITERATION  ,  -100,  0, -0.221,  -100,  0, -0.255 ));
 		
-		//add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PSTOPPERS_A   , "PAWNS_PSTOPPERS_A"   , MOVES_ITERATION         , 0, 50, 0.098, 0, 50, 1.058 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PSTOPPERS_A   , "PAWNS_PSTOPPERS_A"   , MOVES_ITERATION         , 0, 50, 0, 0, 50, 0 ));
 		
 		/**
 		 * FIELDS STATES ITERATION

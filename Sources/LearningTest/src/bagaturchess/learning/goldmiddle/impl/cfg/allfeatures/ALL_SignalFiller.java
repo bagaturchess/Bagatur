@@ -237,6 +237,62 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 	}
 	
 	
+	private long getPassedPawnsFronts_w() {
+		
+		long result = 0;
+		
+		bitboard.getPawnsCache().lock();
+		
+		PawnsModelEval pawnsModelEval = bitboard.getPawnsStructure();
+		PawnsModel model = pawnsModelEval.getModel();
+		
+		Pawn[] w_pawns_m = model.getWPawns();
+		int w_count = model.getWCount();
+		if (w_count > 0) {
+			for (int i=0; i<w_count; i++) {
+				
+				Pawn p = w_pawns_m[i];
+				
+				if (p.isPassed()) {
+					result |= p.getFront();
+				}
+			}
+		}
+		
+		bitboard.getPawnsCache().unlock();
+			
+		return result;
+	}
+	
+	
+	private long getPassedPawnsFronts_b() {
+		
+		long result = 0;
+		
+		bitboard.getPawnsCache().lock();
+		
+		PawnsModelEval pawnsModelEval = bitboard.getPawnsStructure();
+		PawnsModel model = pawnsModelEval.getModel();
+		
+		Pawn[] b_pawns_m = model.getBPawns();
+		int b_count = model.getBCount();
+		if (b_count > 0) {
+			for (int i=0; i<b_count; i++) {
+				
+				Pawn p = b_pawns_m[i];
+				
+				if (p.isPassed()) {
+					result |= p.getFront();
+				}
+			}
+		}
+		
+		bitboard.getPawnsCache().unlock();
+			
+		return result;
+	}
+	
+	
 	public void fillPawnSignals(ISignals signals) {
 		
 		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
@@ -1043,7 +1099,7 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 		int attack_qb = 0;
 		int attack_qr = 0;
 		
-		
+		int passed_pawns_fronts_attacks = 0;
 		
 		// Initialize necessary data 
 		 
@@ -1073,6 +1129,8 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 		long kingSurrounding_L1_black = KingSurrounding.SURROUND_LEVEL1[kingFieldID_black];
 		long kingSurrounding_L2_black = (~kingSurrounding_L1_black) & KingSurrounding.SURROUND_LEVEL2[kingFieldID_black];
 		
+		long passedPawnsFronts_white = getPassedPawnsFronts_w();
+		long passedPawnsFronts_black = getPassedPawnsFronts_b();
 		
 		
 		// Pawns iteration
@@ -1159,6 +1217,12 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 							opking_attacks_counter_2++;
 						}
 						
+						if ((toBitboard & passedPawnsFronts_white) != 0L) {
+							passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+						}
+						if ((toBitboard & passedPawnsFronts_black) != 0L) {
+							passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+						}
 						
 						if ((toBitboard & bb_white_all) != 0L) {
 							continue;
@@ -1247,6 +1311,12 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 							opking_attacks_counter_2++;
 						}
 						
+						if ((toBitboard & passedPawnsFronts_white) != 0L) {
+							passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+						}
+						if ((toBitboard & passedPawnsFronts_black) != 0L) {
+							passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+						}
 						
 						if ((toBitboard & bb_black_all) != 0L) {
 							continue;
@@ -1359,6 +1429,12 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 									opking_attacks_counter_2++;
 								}
 								
+								if ((toBitboard & passedPawnsFronts_white) != 0L) {
+									passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+								}
+								if ((toBitboard & passedPawnsFronts_black) != 0L) {
+									passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+								}
 								
 								if ((toBitboard & bb_white_all) != 0L) {
 									if ((toBitboard & bb_white_QandB) != 0L) {
@@ -1485,6 +1561,12 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 									opking_attacks_counter_2++;
 								}
 								
+								if ((toBitboard & passedPawnsFronts_white) != 0L) {
+									passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+								}
+								if ((toBitboard & passedPawnsFronts_black) != 0L) {
+									passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+								}
 								
 								if ((toBitboard & bb_black_all) != 0L) {
 									if ((toBitboard & bb_black_QandB) != 0L) {
@@ -1614,6 +1696,12 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 									opking_attacks_counter_2++;
 								}
 								
+								if ((toBitboard & passedPawnsFronts_white) != 0L) {
+									passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+								}
+								if ((toBitboard & passedPawnsFronts_black) != 0L) {
+									passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+								}
 								
 								if ((toBitboard & bb_white_all) != 0L) {
 									if ((toBitboard & bb_white_QandR) != 0L) {
@@ -1746,6 +1834,12 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 									opking_attacks_counter_2++;
 								}
 								
+								if ((toBitboard & passedPawnsFronts_white) != 0L) {
+									passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+								}
+								if ((toBitboard & passedPawnsFronts_black) != 0L) {
+									passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+								}
 								
 								if ((toBitboard & bb_black_all) != 0L) {
 									if ((toBitboard & bb_black_QandR) != 0L) {
@@ -1886,6 +1980,12 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 									opking_attacks_counter_2++;
 								}
 								
+								if ((toBitboard & passedPawnsFronts_white) != 0L) {
+									passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+								}
+								if ((toBitboard & passedPawnsFronts_black) != 0L) {
+									passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+								}
 								
 								if ((toBitboard & bb_white_all) != 0L) {
 									if ((toBitboard & bb_white_QandR) != 0L) {
@@ -1976,6 +2076,12 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 									opking_attacks_counter_2++;
 								}
 								
+								if ((toBitboard & passedPawnsFronts_white) != 0L) {
+									passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+								}
+								if ((toBitboard & passedPawnsFronts_black) != 0L) {
+									passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+								}
 								
 								if ((toBitboard & bb_white_all) != 0L) {
 									if ((toBitboard & bb_white_QandB) != 0L) {
@@ -2105,6 +2211,12 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 									opking_attacks_counter_2++;
 								}
 								
+								if ((toBitboard & passedPawnsFronts_white) != 0L) {
+									passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+								}
+								if ((toBitboard & passedPawnsFronts_black) != 0L) {
+									passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+								}
 								
 								if ((toBitboard & bb_black_all) != 0L) {
 									if ((toBitboard & bb_black_QandR) != 0L) {
@@ -2195,6 +2307,12 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 									opking_attacks_counter_2++;
 								}
 								
+								if ((toBitboard & passedPawnsFronts_white) != 0L) {
+									passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+								}
+								if ((toBitboard & passedPawnsFronts_black) != 0L) {
+									passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+								}
 								
 								if ((toBitboard & bb_black_all) != 0L) {
 									if ((toBitboard & bb_black_QandB) != 0L) {
@@ -2372,6 +2490,8 @@ public class ALL_SignalFiller extends ALL_SignalFillerConstants implements ALL_F
 			double hunged_all = bitboard.getMaterialFactor().interpolateByFactor(HUNGED_ALL_O[b_hanging_all], HUNGED_ALL_E[b_hanging_all]);
 			signals.getSignal(FEATURE_ID_HUNGED_ALL).addStrength(-hunged_all, openingPart);
 		}
+		
+		signals.getSignal(FEATURE_ID_PAWNS_PSTOPPERS_A).addStrength(passed_pawns_fronts_attacks, openingPart);
 	}
 	
 	

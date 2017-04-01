@@ -100,7 +100,7 @@ interface ALL_FeaturesConstants {
 	public static final int FEATURE_ID_HUNGED_PIECES       = 4400;
 	public static final int FEATURE_ID_HUNGED_PAWNS        = 4410;
 	public static final int FEATURE_ID_HUNGED_ALL          = 4420;
-	//public static final int FEATURE_ID_PAWNS_PSTOPPERS_A   = 4425;
+	public static final int FEATURE_ID_PAWNS_PSTOPPERS_A   = 4425;
 	
 	/**
 	 * FIELDS STATES ITERATION
