@@ -34,25 +34,25 @@ public class MaterialEvaluator extends BaseEvaluator {
 	
 	
 	@Override
-	protected double phase2_opening() {
+	protected double phase2() {
 		return 0;
 	}
 	
 	
 	@Override
-	protected double phase3_opening() {
+	protected double phase3() {
 		return 0;
 	}
 	
 	
 	@Override
-	protected double phase4_opening() {
+	protected double phase4() {
 		return 0;
 	}
 	
 	
 	@Override
-	protected double phase5_opening() {
+	protected double phase5() {
 		return 0;
 	}
 }

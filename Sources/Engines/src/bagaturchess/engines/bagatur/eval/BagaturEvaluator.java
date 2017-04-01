@@ -138,7 +138,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase2_opening()
 	 */
 	@Override
-	protected double phase2_opening() {
+	protected double phase2() {
 
 		int eval = 0;
 		
@@ -181,7 +181,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase3_opening()
 	 */
 	@Override
-	protected double phase3_opening() {
+	protected double phase3() {
 		
 		int eval = 0;
 		
@@ -201,7 +201,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase4_opening()
 	 */
 	@Override
-	protected double phase4_opening() {
+	protected double phase4() {
 		
 		int eval = 0;
 		
@@ -245,7 +245,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase5_opening()
 	 */
 	@Override
-	protected double phase5_opening() {
+	protected double phase5() {
 		// TODO Auto-generated method stub
 		return 0;
 	}

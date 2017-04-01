@@ -82,13 +82,13 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 	
 	protected abstract double phase1();
 	
-	protected abstract double phase2_opening();
+	protected abstract double phase2();
 	
-	protected abstract double phase3_opening();
+	protected abstract double phase3();
 	
-	protected abstract double phase4_opening();
+	protected abstract double phase4();
 	
-	protected abstract double phase5_opening();
+	protected abstract double phase5();
 	
 	
 	public void beforeSearch() {
@@ -166,10 +166,10 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 		double eval = 0;
 		
 		eval += phase1();
-		eval += phase2_opening();
-		eval += phase3_opening();
-		eval += phase4_opening();
-		eval += phase5_opening();
+		eval += phase2();
+		eval += phase3();
+		eval += phase4();
+		eval += phase5();
 		
 		if (USE_CACHE && evalCache != null) {
 			evalCache.lock();
@@ -312,7 +312,7 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 		}
 		
 			
-		double eval2 = phase2_opening();
+		double eval2 = phase2();
 		eval += eval2;
 		eval_test = (int) returnVal(eval);
 		if (eval_test + INT2 <= alpha || eval_test - INT2 >= beta) {
@@ -329,7 +329,7 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			}
 		}
 		
-		double eval3 = phase3_opening();
+		double eval3 = phase3();
 		eval += eval3;
 		eval_test = (int) returnVal(eval);
 		if (eval_test + INT3 <= alpha || eval_test - INT3 >= beta) {
@@ -346,7 +346,7 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			}
 		}
 		
-		double eval4 = phase4_opening();
+		double eval4 = phase4();
 		eval += eval4;
 		eval_test = (int) returnVal(eval);
 		if (eval_test + INT4 <= alpha || eval_test - INT4 >= beta) {
@@ -363,7 +363,7 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			}
 		}
 		
-		double eval5 = phase5_opening();
+		double eval5 = phase5();
 		eval += eval5;
 		
 		

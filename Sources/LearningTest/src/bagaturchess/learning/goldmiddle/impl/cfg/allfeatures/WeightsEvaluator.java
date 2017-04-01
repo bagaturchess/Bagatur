@@ -54,7 +54,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
 	
 	
     @Override
-    protected double phase2_opening() {
+    protected double phase2() {
             
             double eval = 0;
             
@@ -65,7 +65,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     
     
     @Override
-    protected double phase3_opening() {
+    protected double phase3() {
             double eval = 0;
             
             eval += eval_standard();
@@ -79,7 +79,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     
     
     @Override
-    protected double phase4_opening() {
+    protected double phase4() {
             double eval = 0;
             eval += mobilityKingSafetyPinsAttacks();
             return eval;
@@ -87,7 +87,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     
     
     @Override
-    protected double phase5_opening() {
+    protected double phase5() {
             double eval = 0;
             //eval += safeMobilityTraps();
             return eval;
