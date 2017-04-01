@@ -89,12 +89,12 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     @Override
     protected double phase5() {
             double eval = 0;
-            //eval += safeMobilityTraps();
+            eval += safeMobilityTrapsHanging();
             return eval;
     }
-    
-    
-    private double eval_standard() {
+
+
+	private double eval_standard() {
             
             double eval_o = 0;
             double eval_e = 0;
@@ -2359,4 +2359,739 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             return interpolator.interpolateByFactor(eval_o, eval_e);
 
     }
+    
+    
+	private double safeMobilityTrapsHanging() {
+		
+        double eval_o = 0;
+        double eval_e = 0;
+        
+        int w_mobility_knights_safe = 0;
+        int b_mobility_knights_safe = 0;
+        int w_mobility_bishops_safe = 0;
+        int b_mobility_bishops_safe = 0;
+        int w_mobility_rooks_safe = 0;
+        int b_mobility_rooks_safe = 0;
+        int w_mobility_queens_safe = 0;
+        int b_mobility_queens_safe = 0;
+        
+        int w_trap_knights = 0;
+        int b_trap_knights = 0;
+        int w_trap_bishops = 0;
+        int b_trap_bishops = 0;
+        int w_trap_rooks = 0;
+        int b_trap_rooks = 0;
+        int w_trap_queens = 0;
+        int b_trap_queens = 0;
+        
+        int w_hanging_nonpawn = 0;
+        int b_hanging_nonpawn = 0;
+        int w_hanging_pawn = 0;
+        int b_hanging_pawn = 0;
+                
+        
+        
+        // Initialize necessary data 
+        
+        long bb_white_all = bitboard.getFiguresBitboardByColour(Figures.COLOUR_WHITE);
+        long bb_black_all = bitboard.getFiguresBitboardByColour(Figures.COLOUR_BLACK);
+        
+        
+        
+        // Pawns iteration
+        
+        {
+                int w_pawns_count = w_pawns.getDataSize();
+                if (w_pawns_count > 0) {
+                        int[] pawns_fields = w_pawns.getData();
+                        for (int i=0; i<w_pawns_count; i++) {
+                                int fieldID = pawns_fields[i];
+                                if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+                                        int see = bitboard.getSee().seeField(fieldID);
+                                        if (see < 0) {
+                                                w_hanging_pawn++;
+                                        }
+                                }
+                        }
+                }
+        }
+        {
+                int b_pawns_count = b_pawns.getDataSize();
+                if (b_pawns_count > 0) {
+                        int[] pawns_fields = b_pawns.getData();
+                        for (int i=0; i<b_pawns_count; i++) {
+                                int fieldID = pawns_fields[i];
+                                if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+                                        int see = bitboard.getSee().seeField(fieldID);
+                                        if (see < 0) {
+                                                b_hanging_pawn++;
+                                        }
+                                }
+                        }
+                }
+        }
+        
+        
+        
+        // Knights iteration
+        
+        {
+                int w_knights_count = w_knights.getDataSize();
+                if (w_knights_count > 0) {
+                        int[] knights_fields = w_knights.getData();
+                        for (int i=0; i<w_knights_count; i++) {
+                                
+                                int fieldID = knights_fields[i];
+                                
+                                
+                                if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+                                        int see = bitboard.getSee().seeField(fieldID);
+                                        if (see < 0) {
+                                                w_hanging_nonpawn++;
+                                        }
+                                }
+                                
+                                w_mobility_knights_safe = 0;
+                                
+                                final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
+                                final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
+                                final int[][] fids = KnightPlies.ALL_KNIGHT_DIRS_WITH_FIELD_IDS[fieldID];
+                                
+                                final int size = validDirIDs.length;
+                                for (int j=0; j<size; j++) {
+                                        
+                                        int dirID = validDirIDs[j];
+                                        long toBitboard = dirs[dirID][0];
+                                        int toFieldID = fids[dirID][0];
+                                        
+                                        
+                                        if ((toBitboard & bb_white_all) != 0L) {
+                                                continue;
+                                        }
+                                        
+                                        
+                                        boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT, toFieldID) >= 0;
+                                        if (safe) {
+                                                w_mobility_knights_safe++;
+                                        }
+                                }
+                                
+                                eval_o += MOBILITY_KNIGHT_S_O * ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[w_mobility_knights_safe];
+                                eval_e += MOBILITY_KNIGHT_S_E * ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[w_mobility_knights_safe];
+                                                                        
+                                if (w_mobility_knights_safe == 2) {
+                                        w_trap_knights += 1 * (Fields.getRank_W(fieldID) + 1);
+                                } else if (w_mobility_knights_safe == 1) {
+                                        w_trap_knights += 2 * (Fields.getRank_W(fieldID) + 1);
+                                } else if (w_mobility_knights_safe == 0) {
+                                        w_trap_knights += 4 * (Fields.getRank_W(fieldID) + 1);
+                                }
+                        }
+                }
+        }
+        
+        {
+                int b_knights_count = b_knights.getDataSize();          
+                if (b_knights_count > 0) {
+                        int[] knights_fields = b_knights.getData();
+                        for (int i=0; i<b_knights_count; i++) {
+                                                                        
+                                
+                                int fieldID = knights_fields[i];
+                                
+                                if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+                                        int see = bitboard.getSee().seeField(fieldID);
+                                        if (see < 0) {
+                                                b_hanging_nonpawn++;
+                                        }
+                                }
+                                
+                                b_mobility_knights_safe = 0;
+                                
+                                final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
+                                final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
+                                final int[][] fids = KnightPlies.ALL_KNIGHT_DIRS_WITH_FIELD_IDS[fieldID];
+                                
+                                final int size = validDirIDs.length;
+                                for (int j=0; j<size; j++) {
+                                        
+                                        int dirID = validDirIDs[j];
+                                        long toBitboard = dirs[dirID][0];
+                                        int toFieldID = fids[dirID][0];
+                                        
+                                        
+                                        if ((toBitboard & bb_black_all) != 0L) {
+                                                continue;
+                                        }
+                                        
+                                        
+                                        boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT, toFieldID) >= 0;
+                                        if (safe) {
+                                                b_mobility_knights_safe++;
+                                        }
+                                }
+                                
+                                eval_o -= MOBILITY_KNIGHT_S_O * ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[b_mobility_knights_safe];
+                                eval_e -= MOBILITY_KNIGHT_S_E * ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[b_mobility_knights_safe];
+                                
+                                if (b_mobility_knights_safe == 2) {
+                                        b_trap_knights += 1 * (Fields.getRank_B(fieldID) + 1);
+                                } else if (b_mobility_knights_safe == 1) {
+                                        b_trap_knights += 2 * (Fields.getRank_B(fieldID) + 1);
+                                } else if (b_mobility_knights_safe == 0) {
+                                        b_trap_knights += 4 * (Fields.getRank_B(fieldID) + 1);
+                                }
+                        }                               
+                }
+        }
+        
+        
+        
+        // Bishops iteration
+        
+        {
+                int w_bishops_count = w_bishops.getDataSize();
+                if (w_bishops_count > 0) {
+                        int[] bishops_fields = w_bishops.getData();
+                        for (int i=0; i<w_bishops_count; i++) {
+                                                                        
+                                
+                                int fieldID = bishops_fields[i];
+                                
+                                if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+                                        int see = bitboard.getSee().seeField(fieldID);
+                                        if (see < 0) {
+                                                w_hanging_nonpawn++;
+                                        }
+                                }
+                                
+                                w_mobility_bishops_safe = 0;
+                                
+                                final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
+                                final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
+                                final int[][] fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+                                
+                                final int size = validDirIDs.length;
+                                for (int dir=0; dir<size; dir++) {
+                                        int dirID = validDirIDs[dir];
+                                        long[] dirBitboards = dirs[dirID];
+                                        
+                                        for (int seq=0; seq<dirBitboards.length; seq++) {
+                                                long toBitboard = dirs[dirID][seq];
+                                                int toFieldID = fids[dirID][seq];
+                                                
+                                                
+                                                if ((toBitboard & bb_white_all) != 0L) {
+                                                	break;
+                                                }
+
+                                                boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER, toFieldID) >= 0;
+                                                if (safe) {
+                                                        w_mobility_bishops_safe++;
+                                                }
+                                                
+                                                if ((toBitboard & bb_black_all) != 0L) {
+                                                    break;
+                                                }
+                                        }
+                                }
+                                
+                                eval_o += MOBILITY_BISHOP_S_O * ALL_SignalFillerConstants.MOBILITY_BISHOP_O[w_mobility_bishops_safe];
+                                eval_e += MOBILITY_BISHOP_S_E * ALL_SignalFillerConstants.MOBILITY_BISHOP_E[w_mobility_bishops_safe];
+                                
+                                if (w_mobility_bishops_safe == 2) {
+                                        w_trap_bishops += 1 * (Fields.getRank_W(fieldID) + 1);
+                                } else if (w_mobility_bishops_safe == 1) {
+                                        w_trap_bishops += 2 * (Fields.getRank_W(fieldID) + 1);
+                                } else if (w_mobility_bishops_safe == 0) {
+                                        w_trap_bishops += 4 * (Fields.getRank_W(fieldID) + 1);
+                                }
+                        }
+                }
+        }
+        
+        {
+                int b_bishops_count = b_bishops.getDataSize();
+                if (b_bishops_count > 0) {
+                        int[] bishops_fields = b_bishops.getData();
+                        for (int i=0; i<b_bishops_count; i++) {
+                                
+                                
+                                int fieldID = bishops_fields[i];
+                                
+                                if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+                                        int see = bitboard.getSee().seeField(fieldID);
+                                        if (see < 0) {
+                                                b_hanging_nonpawn++;
+                                        }
+                                }
+                                
+                                b_mobility_bishops_safe = 0;
+                                
+                                final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
+                                final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
+                                final int[][] fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+                                
+                                final int size = validDirIDs.length;
+                                for (int dir=0; dir<size; dir++) {
+                                        int dirID = validDirIDs[dir];
+                                        long[] dirBitboards = dirs[dirID];
+                                        
+                                        for (int seq=0; seq<dirBitboards.length; seq++) {
+                                                long toBitboard = dirs[dirID][seq];
+                                                int toFieldID = fids[dirID][seq];
+                                                
+                                                
+                                                if ((toBitboard & bb_black_all) != 0L) {
+                                                	break;
+                                                }
+                                                
+                                                boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER, toFieldID) >= 0;
+                                                if (safe) {
+                                                        b_mobility_bishops_safe++;
+                                                }
+                                                
+                                                if ((toBitboard & bb_white_all) != 0L) {
+                                                    break;
+                                                }
+                                        }
+                                }
+                                
+                                eval_o -= MOBILITY_BISHOP_S_O * ALL_SignalFillerConstants.MOBILITY_BISHOP_O[b_mobility_bishops_safe];
+                                eval_e -= MOBILITY_BISHOP_S_E * ALL_SignalFillerConstants.MOBILITY_BISHOP_E[b_mobility_bishops_safe];
+                                
+                                if (b_mobility_bishops_safe == 2) {
+                                        b_trap_bishops += 1 * (Fields.getRank_B(fieldID) + 1);
+                                } else if (b_mobility_bishops_safe == 1) {
+                                        b_trap_bishops += 2 * (Fields.getRank_B(fieldID) + 1);
+                                } else if (b_mobility_bishops_safe == 0) {
+                                        b_trap_bishops += 4 * (Fields.getRank_B(fieldID) + 1);
+                                }
+                        }
+                }
+        }
+        
+
+        
+        // Rooks iteration
+        
+        {
+                int w_rooks_count = w_rooks.getDataSize();
+                if (w_rooks_count > 0) {
+                        int[] rooks_fields = w_rooks.getData();
+                        for (int i=0; i<w_rooks_count; i++) {
+                                
+                                
+                                int fieldID = rooks_fields[i];
+                                
+                                if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+                                        int see = bitboard.getSee().seeField(fieldID);
+                                        if (see < 0) {
+                                                w_hanging_nonpawn++;
+                                        }
+                                }
+                                
+                                w_mobility_rooks_safe = 0;
+                                
+                                final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
+                                final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
+                                final int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+                                
+                                final int size = validDirIDs.length;
+                                for (int dir=0; dir<size; dir++) {
+                                        int dirID = validDirIDs[dir];
+                                        long[] dirBitboards = dirs[dirID];
+                                        
+                                        for (int seq=0; seq<dirBitboards.length; seq++) {
+                                                long toBitboard = dirs[dirID][seq];
+                                                int toFieldID = fids[dirID][seq];
+                                                
+                                                
+                                                if ((toBitboard & bb_white_all) != 0L) {
+                                                	break;
+                                                }
+
+                                                boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_CASTLE, toFieldID) >= 0;
+                                                if (safe) {
+                                                        w_mobility_rooks_safe++;
+                                                }
+                                                
+                                                if ((toBitboard & bb_black_all) != 0L) {
+                                                	break;
+                                                }
+                                        }
+                                }
+                                
+                                eval_o += MOBILITY_ROOK_S_O * ALL_SignalFillerConstants.MOBILITY_ROOK_O[w_mobility_rooks_safe];
+                                eval_e += MOBILITY_ROOK_S_E * ALL_SignalFillerConstants.MOBILITY_ROOK_E[w_mobility_rooks_safe];
+                                
+                                if (w_mobility_rooks_safe == 2) {
+                                        w_trap_rooks += 1 * (Fields.getRank_W(fieldID) + 1);
+                                } else if (w_mobility_rooks_safe == 1) {
+                                        w_trap_rooks += 2 * (Fields.getRank_W(fieldID) + 1);
+                                } else if (w_mobility_rooks_safe == 0) {
+                                        w_trap_rooks += 4 * (Fields.getRank_W(fieldID) + 1);
+                                }
+                        }
+                }
+        }
+        
+        {
+                int b_rooks_count = b_rooks.getDataSize();
+                if (b_rooks_count > 0) {
+                        int[] rooks_fields = b_rooks.getData();
+                        for (int i=0; i<b_rooks_count; i++) {
+                                
+                                
+                                int fieldID = rooks_fields[i];
+
+                                if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+                                        int see = bitboard.getSee().seeField(fieldID);
+                                        if (see < 0) {
+                                                b_hanging_nonpawn++;
+                                        }
+                                }
+                                
+                                b_mobility_rooks_safe = 0;
+                                
+                                final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
+                                final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
+                                final int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+                                
+                                final int size = validDirIDs.length;
+                                for (int dir=0; dir<size; dir++) {
+                                        int dirID = validDirIDs[dir];
+                                        long[] dirBitboards = dirs[dirID];
+                                        
+                                        for (int seq=0; seq<dirBitboards.length; seq++) {
+                                                long toBitboard = dirs[dirID][seq];
+                                                int toFieldID = fids[dirID][seq];
+                                                
+                                                
+                                                if ((toBitboard & bb_black_all) != 0L) {
+                                                	break;
+                                                }
+
+                                                boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_CASTLE, toFieldID) >= 0;
+                                                if (safe) {
+                                                        b_mobility_rooks_safe++;
+                                                }
+                                                
+                                                if ((toBitboard & bb_white_all) != 0L) {
+                                                	break;
+                                                }
+                                        }
+                                }
+                                
+                                eval_o -= MOBILITY_ROOK_S_O * ALL_SignalFillerConstants.MOBILITY_ROOK_O[b_mobility_rooks_safe];
+                                eval_e -= MOBILITY_ROOK_S_E * ALL_SignalFillerConstants.MOBILITY_ROOK_E[b_mobility_rooks_safe];
+                                
+                                if (b_mobility_rooks_safe == 2) {
+                                        b_trap_rooks += 1 * (Fields.getRank_B(fieldID) + 1);
+                                } else if (b_mobility_rooks_safe == 1) {
+                                        b_trap_rooks += 2 * (Fields.getRank_B(fieldID) + 1);
+                                } else if (b_mobility_rooks_safe == 0) {
+                                        b_trap_rooks += 4 * (Fields.getRank_B(fieldID) + 1);
+                                }
+                        }
+                }
+        }
+
+        
+        
+        // Queens iteration
+        
+        {
+                int w_queens_count = w_queens.getDataSize();
+                if (w_queens_count > 0) {
+                        int[] queens_fields = w_queens.getData();
+                        for (int i=0; i<w_queens_count; i++) {
+                                
+                                
+                                int fieldID = queens_fields[i];
+                                
+                                if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+                                        int see = bitboard.getSee().seeField(fieldID);
+                                        if (see < 0) {
+                                                w_hanging_nonpawn++;
+                                        }
+                                }
+                                
+                                w_mobility_queens_safe = 0;
+                                
+                                
+                                //Move like a rook
+                                
+                                long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
+                                int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
+                                int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+                                
+                                int size = validDirIDs.length;
+                                for (int dir=0; dir<size; dir++) {
+                                        int dirID = validDirIDs[dir];
+                                        long[] dirBitboards = dirs[dirID];
+                                        
+                                        for (int seq=0; seq<dirBitboards.length; seq++) {
+                                                long toBitboard = dirs[dirID][seq];
+                                                int toFieldID = fids[dirID][seq];
+                                                
+                                                
+                                                if ((toBitboard & bb_white_all) != 0L) {
+                                                	break;
+                                                }
+
+                                                boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN, toFieldID) >= 0;
+                                                if (safe) {
+                                                        w_mobility_queens_safe++;
+                                                }
+                                                
+                                                if ((toBitboard & bb_black_all) != 0L) {
+                                                	break;
+                                                }
+                                        }
+                                }
+                                
+                                
+                                
+                                // Move like a bishop
+                                
+                                dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
+                                validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
+                                fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+                                
+                                size = validDirIDs.length;
+                                for (int dir=0; dir<size; dir++) {
+                                        int dirID = validDirIDs[dir];
+                                        long[] dirBitboards = dirs[dirID];
+                                        
+                                        for (int seq=0; seq<dirBitboards.length; seq++) {
+                                                long toBitboard = dirs[dirID][seq];
+                                                int toFieldID = fids[dirID][seq];
+                                                
+                                                
+                                                if ((toBitboard & bb_white_all) != 0L) {
+                                                	break;
+                                                }
+
+                                                boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN, toFieldID) >= 0;
+                                                if (safe) {
+                                                        w_mobility_queens_safe++;
+                                                }
+                                                
+                                                if ((toBitboard & bb_black_all) != 0L) {
+                                                	break;
+                                                }
+                                        }
+                                }
+                                
+                                eval_o += MOBILITY_QUEEN_S_O * ALL_SignalFillerConstants.MOBILITY_QUEEN_O[w_mobility_queens_safe];
+                                eval_e += MOBILITY_QUEEN_S_E * ALL_SignalFillerConstants.MOBILITY_QUEEN_E[w_mobility_queens_safe];
+                                
+                                if (w_mobility_queens_safe == 2) {
+                                        w_trap_queens += 1 * (Fields.getRank_W(fieldID) + 1);
+                                } else if (w_mobility_queens_safe == 1) {
+                                        w_trap_queens += 2 * (Fields.getRank_W(fieldID) + 1);
+                                } else if (w_mobility_queens_safe == 0) {
+                                        w_trap_queens += 4 * (Fields.getRank_W(fieldID) + 1);
+                                }
+                        }
+                }
+        }
+        
+        {
+                int b_queens_count = b_queens.getDataSize();
+                if (b_queens_count > 0) {
+                        int[] queens_fields = b_queens.getData();
+                        for (int i=0; i<b_queens_count; i++) {
+                                
+                                
+                                int fieldID = queens_fields[i];
+                                
+                                if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+                                        int see = bitboard.getSee().seeField(fieldID);
+                                        if (see < 0) {
+                                                b_hanging_nonpawn++;
+                                        }
+                                }
+                                
+                                b_mobility_queens_safe = 0;
+                                
+                                
+                                // Move like a rook
+                                
+                                long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
+                                int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
+                                int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+                                
+                                int size = validDirIDs.length;
+                                for (int dir=0; dir<size; dir++) {
+                                        int dirID = validDirIDs[dir];
+                                        long[] dirBitboards = dirs[dirID];
+                                        
+                                        for (int seq=0; seq<dirBitboards.length; seq++) {
+                                                long toBitboard = dirs[dirID][seq];
+                                                int toFieldID = fids[dirID][seq];
+                                                
+                                                
+                                                if ((toBitboard & bb_black_all) != 0L) {
+                                                	break;
+                                                }
+
+                                                boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN, toFieldID) >= 0;
+                                                if (safe) {
+                                                        b_mobility_queens_safe++;
+                                                }
+                                                
+                                                if ((toBitboard & bb_white_all) != 0L) {
+                                                	break;
+                                                }
+                                        }
+                                }
+                                
+                                
+                                
+                                // Move like a bishop
+                                
+                                dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
+                                validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
+                                fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+                                
+                                size = validDirIDs.length;
+                                for (int dir=0; dir<size; dir++) {
+                                        int dirID = validDirIDs[dir];
+                                        long[] dirBitboards = dirs[dirID];
+                                        
+                                        for (int seq=0; seq<dirBitboards.length; seq++) {
+                                                long toBitboard = dirs[dirID][seq];
+                                                int toFieldID = fids[dirID][seq];
+                                                
+                                                
+                                                if ((toBitboard & bb_black_all) != 0L) {
+                                                	break;
+                                                }
+
+                                                boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN, toFieldID) >= 0;
+                                                if (safe) {
+                                                        b_mobility_queens_safe++;
+                                                }
+                                                
+                                                if ((toBitboard & bb_white_all) != 0L) {
+                                                	break;
+                                                }
+                                        }
+                                }
+                                
+                                eval_o -= MOBILITY_QUEEN_S_O * ALL_SignalFillerConstants.MOBILITY_QUEEN_O[b_mobility_queens_safe];
+                                eval_e -= MOBILITY_QUEEN_S_E * ALL_SignalFillerConstants.MOBILITY_QUEEN_E[b_mobility_queens_safe];
+                                
+                                if (b_mobility_queens_safe == 2) {
+                                        b_trap_queens += 1 * (Fields.getRank_B(fieldID) + 1);
+                                } else if (b_mobility_queens_safe == 1) {
+                                        b_trap_queens += 2 * (Fields.getRank_B(fieldID) + 1);
+                                } else if (b_mobility_queens_safe == 0) {
+                                        b_trap_queens += 4 * (Fields.getRank_B(fieldID) + 1);
+                                }
+                        }
+                }
+        }
+        
+        
+        int trap_knights = w_trap_knights - b_trap_knights;
+        eval_o += TRAP_O * trap_knights;
+        eval_e += TRAP_E * trap_knights;
+        
+        int trap_bishop = w_trap_bishops - b_trap_bishops;
+        eval_o += TRAP_O * trap_bishop;
+        eval_e += TRAP_E * trap_bishop;
+        
+        int trap_rook = w_trap_rooks - b_trap_rooks;
+        eval_o += TRAP_O * trap_rook;
+        eval_e += TRAP_E * trap_rook;
+        
+        int trap_queen = w_trap_queens - b_trap_queens;
+        eval_o += TRAP_O * trap_queen;
+        eval_e += TRAP_E * trap_queen;
+        
+        
+        if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+                
+                if (b_hanging_nonpawn != 0) {
+                        throw new IllegalStateException("b_hanging_nonpawn=" + b_hanging_nonpawn);
+                }
+                if (w_hanging_nonpawn < 0) {
+                        throw new IllegalStateException("w_hanging_nonpawn=" + w_hanging_nonpawn);
+                }
+                if (b_hanging_pawn != 0) {
+                        throw new IllegalStateException("b_hanging_pawn=" + b_hanging_pawn);
+                }
+                if (w_hanging_pawn < 0) {
+                        throw new IllegalStateException("w_hanging_pawn=" + w_hanging_pawn);
+                }
+                
+                
+                if (w_hanging_nonpawn >= ALL_SignalFillerConstants.HUNGED_PIECES_O.length) {
+                        w_hanging_nonpawn = ALL_SignalFillerConstants.HUNGED_PIECES_O.length - 1;
+                }
+                double hunged_pieces = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_PIECES_O[w_hanging_nonpawn], ALL_SignalFillerConstants.HUNGED_PIECES_E[w_hanging_nonpawn]);
+                eval_o += HUNGED_PIECE_O * hunged_pieces;
+                eval_e += HUNGED_PIECE_E * hunged_pieces;
+                
+                if (w_hanging_pawn >= ALL_SignalFillerConstants.HUNGED_PAWNS_O.length) {
+                        w_hanging_pawn = ALL_SignalFillerConstants.HUNGED_PAWNS_O.length - 1;
+                }
+                double hunged_pawns = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_PAWNS_O[w_hanging_pawn], ALL_SignalFillerConstants.HUNGED_PAWNS_E[w_hanging_pawn]);
+                eval_o += HUNGED_PAWNS_O * hunged_pawns;
+                eval_e += HUNGED_PAWNS_E * hunged_pawns;
+                
+                int w_hanging_all = w_hanging_nonpawn + w_hanging_pawn;
+                if (w_hanging_all >= ALL_SignalFillerConstants.HUNGED_ALL_O.length) {
+                        w_hanging_all = ALL_SignalFillerConstants.HUNGED_ALL_O.length - 1;
+                }
+                double hunged_all = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_ALL_O[w_hanging_all], ALL_SignalFillerConstants.HUNGED_ALL_E[w_hanging_all]);
+                eval_o += HUNGED_ALL_O * hunged_all;
+                eval_e += HUNGED_ALL_E * hunged_all;
+                
+        } else {
+                
+                if (w_hanging_nonpawn != 0) {
+                        throw new IllegalStateException("w_hanging_nonpawn=" + w_hanging_nonpawn);
+                }
+                if (b_hanging_nonpawn < 0) {
+                        throw new IllegalStateException("b_hanging_nonpawn=" + b_hanging_nonpawn);
+                }
+                if (w_hanging_pawn != 0) {
+                        throw new IllegalStateException("w_hanging_pawn=" + w_hanging_pawn);
+                }
+                if (b_hanging_pawn < 0) {
+                        throw new IllegalStateException("b_hanging_pawn=" + b_hanging_pawn);
+                }
+                
+                if (b_hanging_nonpawn >= ALL_SignalFillerConstants.HUNGED_PIECES_O.length) {
+                        b_hanging_nonpawn = ALL_SignalFillerConstants.HUNGED_PIECES_O.length - 1;
+                }
+                double hunged_pieces = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_PIECES_O[b_hanging_nonpawn], ALL_SignalFillerConstants.HUNGED_PIECES_E[b_hanging_nonpawn]);
+                eval_o -= HUNGED_PIECE_O * hunged_pieces;
+                eval_e -= HUNGED_PIECE_E * hunged_pieces;
+                
+                if (b_hanging_pawn >= ALL_SignalFillerConstants.HUNGED_PAWNS_O.length) {
+                        b_hanging_pawn = ALL_SignalFillerConstants.HUNGED_PAWNS_O.length - 1;
+                }
+                double hunged_pawns = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_PAWNS_O[b_hanging_pawn], ALL_SignalFillerConstants.HUNGED_PAWNS_E[b_hanging_pawn]);
+                eval_o -= HUNGED_PAWNS_O * hunged_pawns;
+                eval_e -= HUNGED_PAWNS_E * hunged_pawns;
+                
+                int b_hanging_all = b_hanging_nonpawn + b_hanging_pawn;
+                if (b_hanging_all >= ALL_SignalFillerConstants.HUNGED_ALL_O.length) {
+                        b_hanging_all = ALL_SignalFillerConstants.HUNGED_ALL_O.length - 1;
+                }
+                double hunged_all = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_ALL_O[b_hanging_all], ALL_SignalFillerConstants.HUNGED_ALL_E[b_hanging_all]);
+                eval_o -= HUNGED_ALL_O * hunged_all;
+                eval_e -= HUNGED_ALL_E * hunged_all;
+
+        }
+        
+        
+        return interpolator.interpolateByFactor(eval_o, eval_e);
+
+	}
 }
