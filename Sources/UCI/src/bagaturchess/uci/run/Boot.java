@@ -58,6 +58,8 @@ public class Boot {
 		
 		try {
 			
+			//ChannelManager.setChannel(new Channel_Console(System.in, System.out, System.out));
+			
 			if (args == null || args.length < 1) {
 				throw new IllegalStateException("There is no program parameter which points to the engine configuration class");
 			}
