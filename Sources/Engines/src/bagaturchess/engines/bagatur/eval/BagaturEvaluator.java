@@ -24,11 +24,12 @@ import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.internal.EvaluatorAdapter;
 import bagaturchess.search.api.internal.ISearch;
+import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
 
 
-public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights {
+public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	
 	
 	private static final boolean USE_CACHE = true;
@@ -71,27 +72,9 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 	private int MATERIAL_DOUBLE_BISHOP_E = 50;
 	
 	
-	static {
-		/*-10
-		+ Math.max(2 * MATERIAL_ROOK_E, MATERIAL_DOUBLE_ROOK_E)
-		- Math.max(MATERIAL_DOUBLE_BISHOP_E,
-				Math.max(2 * Math.max(MATERIAL_KNIGHT_E, MATERIAL_BISHOP_E),
-						MATERIAL_DOUBLE_KNIGHT_E
-				)
-		);*/
-		/*System.out.println("" + Math.max(2 * MATERIAL_ROOK_E, MATERIAL_DOUBLE_ROOK_E));
-		System.out.println("" + Math.min(2 * Math.max(MATERIAL_KNIGHT_E, MATERIAL_BISHOP_E),
-				MATERIAL_DOUBLE_KNIGHT_E
-		));
-		System.out.println("" + Math.min(MATERIAL_DOUBLE_BISHOP_E,
-				Math.max(2 * Math.min(MATERIAL_KNIGHT_E, MATERIAL_BISHOP_E),
-						MATERIAL_DOUBLE_KNIGHT_E
-				)));*/
-		
-	}
-	
-	
 	BagaturEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
+		
+		super(_bitboard, _evalCache, _evalConfig);
 		
 		bitboard = _bitboard;
 		
@@ -119,6 +102,155 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 		evalConfig = (IBagaturEvalConfig) _evalConfig;
 	}
 	
+	
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase1()
+	 */
+	@Override
+	protected double phase1() {
+		int eval = 0;
+		
+		evalInfo.clear_short();
+		evalInfo.clear();
+		
+		
+		eval_material_nopawnsdrawrule();
+		eval_trading();
+		eval_standard();
+		evalInfo.eval_Material_o *= WEIGHT_MATERIAL_O;
+		evalInfo.eval_Material_e *= WEIGHT_MATERIAL_E;
+		evalInfo.eval_Standard_o *= WEIGHT_STANDARD_O;
+		evalInfo.eval_Standard_e *= WEIGHT_STANDARD_E;
+		evalInfo.eval_PST_o *= evalConfig.get_WEIGHT_PST_O();
+		evalInfo.eval_PST_e *= evalConfig.get_WEIGHT_PST_E();
+		eval += interpolator.interpolateByFactor(evalInfo.eval_Material_o +
+												evalInfo.eval_Standard_o +
+												evalInfo.eval_PST_o,
+												
+												evalInfo.eval_Material_e +
+												evalInfo.eval_Standard_e +
+												evalInfo.eval_PST_e);
+		return eval;
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase2_opening()
+	 */
+	@Override
+	protected double phase2_opening() {
+
+		int eval = 0;
+		
+		eval_pawns();
+		evalInfo.eval_PawnsStandard_o *= evalConfig.get_WEIGHT_PAWNS_STANDARD_O();
+		evalInfo.eval_PawnsStandard_e *= evalConfig.get_WEIGHT_PAWNS_STANDARD_E();
+		evalInfo.eval_PawnsPassed_o *= evalConfig.get_WEIGHT_PAWNS_PASSED_O();
+		evalInfo.eval_PawnsPassed_e *= evalConfig.get_WEIGHT_PAWNS_PASSED_E();
+		evalInfo.eval_PawnsPassedKing_o *= evalConfig.get_WEIGHT_PAWNS_PASSED_KING_O();
+		evalInfo.eval_PawnsPassedKing_e *= evalConfig.get_WEIGHT_PAWNS_PASSED_KING_E();
+		eval += interpolator.interpolateByFactor(
+												evalInfo.eval_PawnsStandard_o +
+												evalInfo.eval_PawnsPassed_o +
+												evalInfo.eval_PawnsPassedKing_o +
+												evalInfo.eval_PawnsUnstoppable_o,
+												
+												evalInfo.eval_PawnsStandard_e +
+												evalInfo.eval_PawnsPassed_e +
+												evalInfo.eval_PawnsPassedKing_e +
+												evalInfo.eval_PawnsUnstoppable_e);
+		
+		
+		initEvalInfo1();
+		eval_pawns_RooksAndQueens();
+		evalInfo.eval_PawnsPassedStoppers_o *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_O();
+		evalInfo.eval_PawnsPassedStoppers_e *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_E();
+		evalInfo.eval_PawnsRooksQueens_o *= WEIGHT_PAWNS_ROOKQUEEN_O;
+		evalInfo.eval_PawnsRooksQueens_e *= WEIGHT_PAWNS_ROOKQUEEN_E;
+		eval += interpolator.interpolateByFactor(evalInfo.eval_PawnsPassedStoppers_o +
+												evalInfo.eval_PawnsRooksQueens_o,
+												
+												evalInfo.eval_PawnsPassedStoppers_e +
+												evalInfo.eval_PawnsRooksQueens_e);
+			
+		return eval;
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase3_opening()
+	 */
+	@Override
+	protected double phase3_opening() {
+		
+		int eval = 0;
+		
+		initEvalInfo2();
+		eval_mobility();
+		evalInfo.eval_Mobility_o *= evalConfig.get_WEIGHT_MOBILITY_O();
+		evalInfo.eval_Mobility_e *= evalConfig.get_WEIGHT_MOBILITY_E();
+		eval += interpolator.interpolateByFactor(evalInfo.eval_Mobility_o,
+												
+												evalInfo.eval_Mobility_e);
+		
+		return eval;
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase4_opening()
+	 */
+	@Override
+	protected double phase4_opening() {
+		
+		int eval = 0;
+		
+		initEvalInfo3();
+		eval_king_safety();
+		eval_space();
+		eval_hunged();
+		eval_TrapsAndSafeMobility();
+		eval_PassersFrontAttacks();
+		evalInfo.eval_Kingsafety_o *= evalConfig.get_WEIGHT_KINGSAFETY_O();
+		evalInfo.eval_Kingsafety_e *= evalConfig.get_WEIGHT_KINGSAFETY_E();
+		evalInfo.eval_Space_o *= evalConfig.get_WEIGHT_SPACE_O();
+		evalInfo.eval_Space_e *= evalConfig.get_WEIGHT_SPACE_E();
+		evalInfo.eval_Hunged_o *= evalConfig.get_WEIGHT_HUNGED_O();
+		evalInfo.eval_Hunged_e *= evalConfig.get_WEIGHT_HUNGED_E();
+		evalInfo.eval_Trapped_o *= evalConfig.get_WEIGHT_TRAPPED_O();
+		evalInfo.eval_Trapped_e *= evalConfig.get_WEIGHT_TRAPPED_E();
+		evalInfo.eval_Mobility_Safe_o *= evalConfig.get_WEIGHT_MOBILITY_S_O();
+		evalInfo.eval_Mobility_Safe_e *= evalConfig.get_WEIGHT_MOBILITY_S_E();
+		evalInfo.eval_PawnsPassedStoppers_a_o *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_A_O();
+		evalInfo.eval_PawnsPassedStoppers_a_e *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_A_E();
+		eval += interpolator.interpolateByFactor(evalInfo.eval_Kingsafety_o +
+												evalInfo.eval_Space_o +
+												evalInfo.eval_Hunged_o +
+												evalInfo.eval_Trapped_o +
+												evalInfo.eval_Mobility_Safe_o +
+												evalInfo.eval_PawnsPassedStoppers_a_o,
+				
+												evalInfo.eval_Kingsafety_e +
+												evalInfo.eval_Space_e +
+												evalInfo.eval_Hunged_e +
+												evalInfo.eval_Trapped_e +
+												evalInfo.eval_Mobility_Safe_e +
+												evalInfo.eval_PawnsPassedStoppers_a_e);
+		
+		return eval;
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase5_opening()
+	 */
+	@Override
+	protected double phase5_opening() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	
 	public String dump(int rootColour) { 
 		String msg = "";
 		
@@ -140,560 +272,6 @@ public class BagaturEvaluator extends EvaluatorAdapter implements FeatureWeights
 	
 	public int getMaterialQueen() {
 		return 50 + baseEval.getMaterialQueen();
-	}
-	
-	
-	public double fullEval(int depth, int alpha, int beta, int rootColour) {
-		
-		long hashkey = bitboard.getHashKey();
-		
-		if (USE_CACHE && evalCache != null) {
-			evalCache.lock();
-			IEvalEntry cached = evalCache.get(hashkey);
-			
-			if (cached != null) {
-				int eval = (int) cached.getEval();
-				evalCache.unlock();
-				return returnVal(eval);
-			}
-			evalCache.unlock();
-		}
-		
-		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
-			
-			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
-			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
-			
-			//Mop-up evaluation
-			//PosEval=4.7*CMD + 1.6*(14 - MD)
-			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
-			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
-				
-				return returnVal(20 * (int) (4.7 * CMD + 1.6 * MD));
-				
-			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
-				
-				return returnVal( - 20 * (int) (4.7 * CMD + 1.6 * MD));
-				
-			}
-		}
-		
-		int eval = 0;
-		
-		evalInfo.clear_short();
-		evalInfo.clear();
-		
-		if (rootColour == Figures.COLOUR_WHITE) {
-			if (b_queens.getDataSize() == 0) {
-				evalInfo.eval_NoQueen_o += STANDARD_NOQUEEN_O;
-				evalInfo.eval_NoQueen_e += STANDARD_NOQUEEN_E;
-			}
-		} else {
-			if (w_queens.getDataSize() == 0) {
-				evalInfo.eval_NoQueen_o -= STANDARD_NOQUEEN_O;
-				evalInfo.eval_NoQueen_e -= STANDARD_NOQUEEN_E;
-			}
-		}
-		
-		
-		//if (evalConfig.useRule_NoPawnsDrawByMaterialDiff()) {
-			eval_material_nopawnsdrawrule();
-		//} else {
-		//	eval_material();
-		//}
-		eval_trading();
-		eval_standard();
-		eval_pawns();
-		evalInfo.eval_Material_o *= WEIGHT_MATERIAL_O;
-		evalInfo.eval_Material_e *= WEIGHT_MATERIAL_E;
-		evalInfo.eval_Standard_o *= WEIGHT_STANDARD_O;
-		evalInfo.eval_Standard_e *= WEIGHT_STANDARD_E;
-		evalInfo.eval_PST_o *= evalConfig.get_WEIGHT_PST_O();
-		evalInfo.eval_PST_e *= evalConfig.get_WEIGHT_PST_E();
-		evalInfo.eval_PawnsStandard_o *= evalConfig.get_WEIGHT_PAWNS_STANDARD_O();
-		evalInfo.eval_PawnsStandard_e *= evalConfig.get_WEIGHT_PAWNS_STANDARD_E();
-		evalInfo.eval_PawnsPassed_o *= evalConfig.get_WEIGHT_PAWNS_PASSED_O();
-		evalInfo.eval_PawnsPassed_e *= evalConfig.get_WEIGHT_PAWNS_PASSED_E();
-		evalInfo.eval_PawnsPassedKing_o *= evalConfig.get_WEIGHT_PAWNS_PASSED_KING_O();
-		evalInfo.eval_PawnsPassedKing_e *= evalConfig.get_WEIGHT_PAWNS_PASSED_KING_E();
-		eval += interpolator.interpolateByFactor(evalInfo.eval_Material_o +
-												evalInfo.eval_Standard_o +
-												evalInfo.eval_PST_o +
-												evalInfo.eval_PawnsStandard_o +
-												evalInfo.eval_PawnsPassed_o +
-												evalInfo.eval_PawnsPassedKing_o +
-												evalInfo.eval_PawnsUnstoppable_o +
-												evalInfo.eval_NoQueen_o,
-												
-												evalInfo.eval_Material_e +
-												evalInfo.eval_Standard_e +
-												evalInfo.eval_PST_e +
-												evalInfo.eval_PawnsStandard_e +
-												evalInfo.eval_PawnsPassed_e +
-												evalInfo.eval_PawnsPassedKing_e +
-												evalInfo.eval_PawnsUnstoppable_e +
-												evalInfo.eval_NoQueen_e);
-		
-		
-		initEvalInfo1();
-		eval_pawns_RooksAndQueens();
-		evalInfo.eval_PawnsPassedStoppers_o *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_O();
-		evalInfo.eval_PawnsPassedStoppers_e *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_E();
-		evalInfo.eval_PawnsRooksQueens_o *= WEIGHT_PAWNS_ROOKQUEEN_O;
-		evalInfo.eval_PawnsRooksQueens_e *= WEIGHT_PAWNS_ROOKQUEEN_E;
-		eval += interpolator.interpolateByFactor(evalInfo.eval_PawnsPassedStoppers_o +
-												evalInfo.eval_PawnsRooksQueens_o,
-												
-												evalInfo.eval_PawnsPassedStoppers_e +
-												evalInfo.eval_PawnsRooksQueens_e);
-
-		initEvalInfo2();
-		eval_mobility();
-		evalInfo.eval_Mobility_o *= evalConfig.get_WEIGHT_MOBILITY_O();
-		evalInfo.eval_Mobility_e *= evalConfig.get_WEIGHT_MOBILITY_E();
-		eval += interpolator.interpolateByFactor(evalInfo.eval_Mobility_o,
-												
-												evalInfo.eval_Mobility_e);
-		
-		//if (interpolator.getTotalFactor() > 16) {
-			initEvalInfo3();
-			eval_king_safety();
-			eval_space();
-			eval_hunged();
-			eval_TrapsAndSafeMobility();
-			eval_PassersFrontAttacks();
-			evalInfo.eval_Kingsafety_o *= evalConfig.get_WEIGHT_KINGSAFETY_O();
-			evalInfo.eval_Kingsafety_e *= evalConfig.get_WEIGHT_KINGSAFETY_E();
-			evalInfo.eval_Space_o *= evalConfig.get_WEIGHT_SPACE_O();
-			evalInfo.eval_Space_e *= evalConfig.get_WEIGHT_SPACE_E();
-			evalInfo.eval_Hunged_o *= evalConfig.get_WEIGHT_HUNGED_O();
-			evalInfo.eval_Hunged_e *= evalConfig.get_WEIGHT_HUNGED_E();
-			evalInfo.eval_Trapped_o *= evalConfig.get_WEIGHT_TRAPPED_O();
-			evalInfo.eval_Trapped_e *= evalConfig.get_WEIGHT_TRAPPED_E();
-			evalInfo.eval_Mobility_Safe_o *= evalConfig.get_WEIGHT_MOBILITY_S_O();
-			evalInfo.eval_Mobility_Safe_e *= evalConfig.get_WEIGHT_MOBILITY_S_E();
-			evalInfo.eval_PawnsPassedStoppers_a_o *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_A_O();
-			evalInfo.eval_PawnsPassedStoppers_a_e *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_A_E();
-			eval += interpolator.interpolateByFactor(evalInfo.eval_Kingsafety_o +
-													evalInfo.eval_Space_o +
-													evalInfo.eval_Hunged_o +
-													evalInfo.eval_Trapped_o +
-													evalInfo.eval_Mobility_Safe_o +
-													evalInfo.eval_PawnsPassedStoppers_a_o,
-					
-													evalInfo.eval_Kingsafety_e +
-													evalInfo.eval_Space_e +
-													evalInfo.eval_Hunged_e +
-													evalInfo.eval_Trapped_e +
-													evalInfo.eval_Mobility_Safe_e +
-													evalInfo.eval_PawnsPassedStoppers_a_e);
-		//}
-		
-		if (USE_CACHE && evalCache != null) {
-			evalCache.lock();
-			evalCache.put(hashkey, eval, false);
-			evalCache.unlock();
-		}
-		
-		return returnVal(eval);
-	}
-	
-	
-	public int lazyEval(int depth, int alpha, int beta, int rootColour) {
-		
-		long hashkey = bitboard.getHashKey();
-		
-		if (USE_CACHE && evalCache != null) {
-			evalCache.lock();
-			IEvalEntry cached = evalCache.get(hashkey);
-			
-			if (cached != null) {
-				int eval = (int) cached.getEval();
-				evalCache.unlock();
-				return returnVal(eval);
-			}
-			evalCache.unlock();
-		}
-		
-		
-		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
-			
-			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
-			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
-			
-			//Mop-up evaluation
-			//PosEval=4.7*CMD + 1.6*(14 - MD)
-			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
-			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
-				
-				return returnVal(20 * (int) (4.7 * CMD + 1.6 * MD));
-				
-			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
-				
-				return returnVal( - 20 * (int) (4.7 * CMD + 1.6 * MD));
-				
-			}
-		}
-		
-		
-		int eval = 0;
-		
-		evalInfo.clear_short();
-		
-		if (rootColour == Figures.COLOUR_WHITE) {
-			if (b_queens.getDataSize() == 0) {
-				evalInfo.eval_NoQueen_o += STANDARD_NOQUEEN_O;
-				evalInfo.eval_NoQueen_e += STANDARD_NOQUEEN_E;
-			}
-		} else {
-			if (w_queens.getDataSize() == 0) {
-				evalInfo.eval_NoQueen_o -= STANDARD_NOQUEEN_O;
-				evalInfo.eval_NoQueen_e -= STANDARD_NOQUEEN_E;
-			}
-		}
-		
-		
-		eval_material_nopawnsdrawrule();
-		eval_trading();
-		eval_standard();
-		evalInfo.eval_Material_o *= WEIGHT_MATERIAL_O;
-		evalInfo.eval_Material_e *= WEIGHT_MATERIAL_E;
-		evalInfo.eval_Standard_o *= WEIGHT_STANDARD_O;
-		evalInfo.eval_Standard_e *= WEIGHT_STANDARD_E;
-		evalInfo.eval_PST_o *= evalConfig.get_WEIGHT_PST_O();
-		evalInfo.eval_PST_e *= evalConfig.get_WEIGHT_PST_E();
-		int eval1 = interpolator.interpolateByFactor(evalInfo.eval_Material_o +
-				evalInfo.eval_Standard_o +
-				evalInfo.eval_PST_o +
-				evalInfo.eval_NoQueen_o,
-				
-				evalInfo.eval_Material_e +
-				evalInfo.eval_Standard_e +
-				evalInfo.eval_PST_e +
-				evalInfo.eval_NoQueen_e);
-		eval += eval1;
-		
-		//INT1 = INT1_stat.getEntropy() + 2 * INT1_stat.getDisperse();
-		
-		int eval_tmp = returnVal(eval);
-		if (eval_tmp + INT1 <= alpha || eval_tmp - INT1 >= beta) {
-			if (USE_LAZY) {
-				return eval_tmp;
-			}
-		}
-		
-		eval_pawns();
-		evalInfo.eval_PawnsStandard_o *= evalConfig.get_WEIGHT_PAWNS_STANDARD_O();
-		evalInfo.eval_PawnsStandard_e *= evalConfig.get_WEIGHT_PAWNS_STANDARD_E();
-		evalInfo.eval_PawnsPassed_o *= evalConfig.get_WEIGHT_PAWNS_PASSED_O();
-		evalInfo.eval_PawnsPassed_e *= evalConfig.get_WEIGHT_PAWNS_PASSED_E();
-		evalInfo.eval_PawnsPassedKing_o *= evalConfig.get_WEIGHT_PAWNS_PASSED_KING_O();
-		evalInfo.eval_PawnsPassedKing_e *= evalConfig.get_WEIGHT_PAWNS_PASSED_KING_E();
-		int eval2 = interpolator.interpolateByFactor(evalInfo.eval_PawnsStandard_o +
-												evalInfo.eval_PawnsPassed_o +
-												evalInfo.eval_PawnsPassedKing_o +
-												evalInfo.eval_PawnsUnstoppable_o,
-												
-												evalInfo.eval_PawnsStandard_e +
-												evalInfo.eval_PawnsPassed_e +
-												evalInfo.eval_PawnsPassedKing_e +
-												evalInfo.eval_PawnsUnstoppable_e);
-		eval += eval2;
-		
-		//INT2 = INT2_stat.getEntropy() + 2 * INT2_stat.getDisperse();
-		
-		eval_tmp = returnVal(eval);
-		if (eval_tmp + INT2 <= alpha || eval_tmp - INT2 >= beta) {
-			if (USE_LAZY) {
-				return eval_tmp;
-			}
-		}
-		
-		evalInfo.clear();
-		
-		initEvalInfo1();
-		eval_pawns_RooksAndQueens();
-		evalInfo.eval_PawnsPassedStoppers_o *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_O();
-		evalInfo.eval_PawnsPassedStoppers_e *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_E();
-		evalInfo.eval_PawnsRooksQueens_o *= WEIGHT_PAWNS_ROOKQUEEN_O;
-		evalInfo.eval_PawnsRooksQueens_e *= WEIGHT_PAWNS_ROOKQUEEN_E;
-		int eval3 = interpolator.interpolateByFactor(evalInfo.eval_PawnsPassedStoppers_o +
-												evalInfo.eval_PawnsRooksQueens_o,
-												
-												evalInfo.eval_PawnsPassedStoppers_e +
-												evalInfo.eval_PawnsRooksQueens_e);
-		eval += eval3;
-		
-		//INT3 = INT3_stat.getEntropy() + 2 * INT3_stat.getDisperse();
-		
-		eval_tmp = returnVal(eval);
-		if (eval_tmp + INT3 <= alpha || eval_tmp - INT3 >= beta) {
-			if (USE_LAZY) {
-				return eval_tmp;
-			}
-		}
-		
-		initEvalInfo2();
-		eval_mobility();
-		evalInfo.eval_Mobility_o *= evalConfig.get_WEIGHT_MOBILITY_O();
-		evalInfo.eval_Mobility_e *= evalConfig.get_WEIGHT_MOBILITY_E();
-		int eval4 = interpolator.interpolateByFactor(evalInfo.eval_Mobility_o,
-												
-												evalInfo.eval_Mobility_e);
-		eval += eval4;
-		
-		//INT4 = INT4_stat.getEntropy() + 2 * INT4_stat.getDisperse();
-		
-		eval_tmp = returnVal(eval);
-		if (eval_tmp + INT4 <= alpha || eval_tmp - INT4 >= beta) {
-			if (USE_LAZY) {
-				return eval_tmp;
-			}
-		}
-		
-		int eval5 = 0;
-		//if (interpolator.getTotalFactor() > 16) {
-			initEvalInfo3();
-			eval_king_safety();
-			eval_space();
-			eval_hunged();
-			eval_TrapsAndSafeMobility();
-			eval_PassersFrontAttacks();
-			evalInfo.eval_Kingsafety_o *= evalConfig.get_WEIGHT_KINGSAFETY_O();
-			evalInfo.eval_Kingsafety_e *= evalConfig.get_WEIGHT_KINGSAFETY_E();
-			evalInfo.eval_Space_o *= evalConfig.get_WEIGHT_SPACE_O();
-			evalInfo.eval_Space_e *= evalConfig.get_WEIGHT_SPACE_E();
-			evalInfo.eval_Hunged_o *= evalConfig.get_WEIGHT_HUNGED_O();
-			evalInfo.eval_Hunged_e *= evalConfig.get_WEIGHT_HUNGED_E();
-			evalInfo.eval_Trapped_o *= evalConfig.get_WEIGHT_TRAPPED_O();
-			evalInfo.eval_Trapped_e *= evalConfig.get_WEIGHT_TRAPPED_E();
-			evalInfo.eval_Mobility_Safe_o *= evalConfig.get_WEIGHT_MOBILITY_S_O();
-			evalInfo.eval_Mobility_Safe_e *= evalConfig.get_WEIGHT_MOBILITY_S_E();
-			evalInfo.eval_PawnsPassedStoppers_a_o *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_A_O();
-			evalInfo.eval_PawnsPassedStoppers_a_e *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_A_E();
-			eval5 = interpolator.interpolateByFactor(evalInfo.eval_Kingsafety_o +
-													evalInfo.eval_Space_o +
-													evalInfo.eval_Hunged_o +
-													evalInfo.eval_Trapped_o +
-													evalInfo.eval_Mobility_Safe_o +
-													evalInfo.eval_PawnsPassedStoppers_a_o,
-					
-													evalInfo.eval_Kingsafety_e +
-													evalInfo.eval_Space_e +
-													evalInfo.eval_Hunged_e + 
-													evalInfo.eval_Trapped_e +
-													evalInfo.eval_Mobility_Safe_e +
-													evalInfo.eval_PawnsPassedStoppers_a_e);
-			eval += eval5;
-		//}
-		
-		if (eval >= ISearch.MAX_MAT_INTERVAL || eval <= -ISearch.MAX_MAT_INTERVAL) {
-			throw new IllegalStateException();
-		}
-		
-		double int1 = Math.abs(eval2 + eval3 + eval4 + eval5);
-		double int2 = Math.abs(eval3 + eval4 + eval5);
-		double int3 = Math.abs(eval4 + eval5);
-		double int4 = Math.abs(eval5);
-		
-		//INT1_stat.addValue(int1, int1);
-		//INT2_stat.addValue(int2, int2);
-		//INT3_stat.addValue(int3, int3);
-		//INT4_stat.addValue(int4, int4);
-		
-		if (int1 > INT1) {
-			INT1 = int1 / INT_DEVIDE_FACTOR;
-		}
-		if (int2 > INT2) {
-			INT2 = int2 / INT_DEVIDE_FACTOR;
-		}
-		if (int3 > INT3) {
-			INT3 = int3 / INT_DEVIDE_FACTOR;
-		}
-		if (int4 > INT4) {
-			INT4 = int4 / INT_DEVIDE_FACTOR;
-		}
-		
-		if (USE_CACHE && evalCache != null) {
-			evalCache.lock();
-			evalCache.put(hashkey, eval, false);
-			evalCache.unlock();
-		}
-		
-		return returnVal(eval);
-	}
-	
-	
-	public int roughEval(int depth, int rootColour) {
-		
-		long hashkey = bitboard.getHashKey();
-		
-		if (USE_CACHE && evalCache != null) {
-			evalCache.lock();
-			IEvalEntry cached = evalCache.get(hashkey);
-			
-			if (cached != null) {
-				int eval = (int) cached.getEval();
-				evalCache.unlock();
-				return returnVal(eval);
-			}
-			evalCache.unlock();
-		}
-		
-		
-		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
-			
-			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
-			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
-			
-			//Mop-up evaluation
-			//PosEval=4.7*CMD + 1.6*(14 - MD)
-			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
-			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
-				
-				return returnVal(20 * (int) (4.7 * CMD + 1.6 * MD));
-				
-			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
-				
-				return returnVal( - 20 * (int) (4.7 * CMD + 1.6 * MD));
-				
-			}
-		}
-		
-		
-		int eval = 0;
-		
-		evalInfo.clear_short();
-		
-		if (rootColour == Figures.COLOUR_WHITE) {
-			if (b_queens.getDataSize() == 0) {
-				evalInfo.eval_NoQueen_o += STANDARD_NOQUEEN_O;
-				evalInfo.eval_NoQueen_e += STANDARD_NOQUEEN_E;
-			}
-		} else {
-			if (w_queens.getDataSize() == 0) {
-				evalInfo.eval_NoQueen_o -= STANDARD_NOQUEEN_O;
-				evalInfo.eval_NoQueen_e -= STANDARD_NOQUEEN_E;
-			}
-		}
-		
-		
-		eval_material_nopawnsdrawrule();
-		eval_trading();
-		eval_standard();
-		eval_pawns();
-		evalInfo.eval_Material_o *= WEIGHT_MATERIAL_O;
-		evalInfo.eval_Material_e *= WEIGHT_MATERIAL_E;
-		evalInfo.eval_Standard_o *= WEIGHT_STANDARD_O;
-		evalInfo.eval_Standard_e *= WEIGHT_STANDARD_E;
-		evalInfo.eval_PST_o *= evalConfig.get_WEIGHT_PST_O();
-		evalInfo.eval_PST_e *= evalConfig.get_WEIGHT_PST_E();
-		evalInfo.eval_PawnsStandard_o *= evalConfig.get_WEIGHT_PAWNS_STANDARD_O();
-		evalInfo.eval_PawnsStandard_e *= evalConfig.get_WEIGHT_PAWNS_STANDARD_E();
-		evalInfo.eval_PawnsPassed_o *= evalConfig.get_WEIGHT_PAWNS_PASSED_O();
-		evalInfo.eval_PawnsPassed_e *= evalConfig.get_WEIGHT_PAWNS_PASSED_E();
-		evalInfo.eval_PawnsPassedKing_o *= evalConfig.get_WEIGHT_PAWNS_PASSED_KING_O();
-		evalInfo.eval_PawnsPassedKing_e *= evalConfig.get_WEIGHT_PAWNS_PASSED_KING_E();
-		
-		eval += interpolator.interpolateByFactor(evalInfo.eval_Material_o +
-												evalInfo.eval_Standard_o +
-												evalInfo.eval_PST_o +
-												evalInfo.eval_PawnsStandard_o +
-												evalInfo.eval_PawnsPassed_o +
-												evalInfo.eval_PawnsPassedKing_o +
-												evalInfo.eval_PawnsUnstoppable_o +
-												evalInfo.eval_NoQueen_o,
-												
-												evalInfo.eval_Material_e +
-												evalInfo.eval_Standard_e +
-												evalInfo.eval_PST_e +
-												evalInfo.eval_PawnsStandard_e +
-												evalInfo.eval_PawnsPassed_e +
-												evalInfo.eval_PawnsPassedKing_e +
-												evalInfo.eval_PawnsUnstoppable_e +
-												evalInfo.eval_NoQueen_e);
-		
-		
-		return returnVal(eval);
-	}
-	
-	private int returnVal(int eval) {
-		
-		int result = eval;
-		
-		result = drawProbability(result);
-		if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
-			result = -result;
-		}
-		return result;
-	}
-	
-	
-	private int drawProbability(int eval) {
-		
-		int abs = Math.abs(eval);
-		
-		/**
-		 * No pawns
-		 */
-		/*if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
-			abs = abs / 2;
-		}*/
-		
-		/**
-		 * Differently colored bishops, no other pieces except pawns
-		 */
-		if (w_bishops.getDataSize() == 1
-				&& b_bishops.getDataSize() == 1
-				&& bitboard.getMaterialFactor().getWhiteFactor() == 3
-				&& bitboard.getMaterialFactor().getBlackFactor() == 3) {
-			
-			long w_colour = (evalInfo.bb_w_bishops & Fields.ALL_WHITE_FIELDS) != 0 ?
-					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
-			long b_colour = (evalInfo.bb_b_bishops & Fields.ALL_WHITE_FIELDS) != 0 ?
-					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
-			if (w_colour != b_colour) {
-				
-				//If one of the sides has advantage of 2-3 pawns, than let it know the game goes to draw
-				if (abs <= 200) {
-					abs = abs / 4;
-				} else if (abs <= 400) {
-					abs = abs / 2;
-				} else if (abs <= 600) {
-					abs = (2 * abs) / 3;
-				}
-			}
-		}
-		
-		/**
-		 * 50 moves rule
-		 */
-		int movesBeforeDraw = 100 - bitboard.getDraw50movesRule();
-		double percents = movesBeforeDraw / (double)100;
-		abs = (int) (percents * abs);//(int) ((abs + percents * abs) / (double)2);
-		
-		/**
-		 * Return value
-		 */
-		return eval >= 0 ? abs : -abs;
 	}
 	
 	
