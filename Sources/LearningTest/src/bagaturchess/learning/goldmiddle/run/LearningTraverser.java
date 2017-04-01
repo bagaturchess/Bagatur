@@ -2,7 +2,6 @@ package bagaturchess.learning.goldmiddle.run;
 
 
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
-import bagaturchess.learning.goldmiddle.impl.cfg.allfeatures.ALL_BoardConfig;
 import bagaturchess.learning.goldmiddle.impl.cfg.allfeatures.ALL_LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.Bagatur_LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.visitors.LearningVisitorImpl;
