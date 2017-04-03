@@ -49,7 +49,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
 	 */
 	@Override
 	protected double phase1() {
-		return eval_material_nopawnsdrawrule();// + interpolator.interpolateByFactor(baseEval.getPST_o(), baseEval.getPST_e());
+		return eval_material_nopawnsdrawrule();
 	}
 	
 	
@@ -69,9 +69,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             double eval = 0;
             
             eval += eval_standard();
-            
-            //Clear PST scores and calculate them from scratch in eval_pieces
-            eval -= interpolator.interpolateByFactor(baseEval.getPST_o(), baseEval.getPST_e());
             eval += eval_pieces();
             
             return eval;
@@ -874,30 +871,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             int b_mobility_rooks_all = 0;
             int w_mobility_queens_all = 0;
             int b_mobility_queens_all = 0;
-            
-            int w_mobility_knights_safe = 0;
-            int b_mobility_knights_safe = 0;
-            int w_mobility_bishops_safe = 0;
-            int b_mobility_bishops_safe = 0;
-            int w_mobility_rooks_safe = 0;
-            int b_mobility_rooks_safe = 0;
-            int w_mobility_queens_safe = 0;
-            int b_mobility_queens_safe = 0;
-            
-            int w_trap_knights = 0;
-            int b_trap_knights = 0;
-            int w_trap_bishops = 0;
-            int b_trap_bishops = 0;
-            int w_trap_rooks = 0;
-            int b_trap_rooks = 0;
-            int w_trap_queens = 0;
-            int b_trap_queens = 0;
-            
-            int w_hanging_nonpawn = 0;
-            int b_hanging_nonpawn = 0;
-            int w_hanging_pawn = 0;
-            int b_hanging_pawn = 0;
-            
+                        
             int w_rooks_paired_h = 0;
             int b_rooks_paired_h = 0;
             int w_rooks_paired_v = 0;
@@ -992,41 +966,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             
             
             /**
-            * Pawns iteration
-            */
-            {
-                    int w_pawns_count = w_pawns.getDataSize();
-                    if (w_pawns_count > 0) {
-                            int[] pawns_fields = w_pawns.getData();
-                            for (int i=0; i<w_pawns_count; i++) {
-                                    int fieldID = pawns_fields[i];
-                                    if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-                                            int see = bitboard.getSee().seeField(fieldID);
-                                            if (see < 0) {
-                                                    w_hanging_pawn++;
-                                            }
-                                    }
-                            }
-                    }
-            }
-            {
-                    int b_pawns_count = b_pawns.getDataSize();
-                    if (b_pawns_count > 0) {
-                            int[] pawns_fields = b_pawns.getData();
-                            for (int i=0; i<b_pawns_count; i++) {
-                                    int fieldID = pawns_fields[i];
-                                    if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
-                                            int see = bitboard.getSee().seeField(fieldID);
-                                            if (see < 0) {
-                                                    b_hanging_pawn++;
-                                            }
-                                    }
-                            }
-                    }
-            }
-            
-            
-            /**
             * Knights iteration
             */
             {
@@ -1038,17 +977,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     int fieldID = knights_fields[i];
                                     
                                     
-                                    if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-                                            int see = bitboard.getSee().seeField(fieldID);
-                                            if (see < 0) {
-                                                    w_hanging_nonpawn++;
-                                            }
-                                    }
-                                    
-                                    
                                     w_mobility_knights_all = 0;
-                                    
-                                    w_mobility_knights_safe = 0;
                                     
                                     final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
                                     final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
@@ -1061,7 +990,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             
                                             int dirID = validDirIDs[j];
                                             long toBitboard = dirs[dirID][0];
-                                            int toFieldID = fids[dirID][0];
                                             
                                             if ((toBitboard & kingSurrounding_L1_black) != 0L) {
                                                     if (opking_attacks_counter_1 == 0) {
@@ -1092,27 +1020,12 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             }
                                             
                                             w_mobility_knights_all++;
-                                            
-                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT, toFieldID) >= 0;
-                                            if (safe) {
-                                                    w_mobility_knights_safe++;
-                                            }
                                     }
                                     
                                     eval_o += MOBILITY_KNIGHT_O *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[w_mobility_knights_all];
                                     eval_e += MOBILITY_KNIGHT_E *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[w_mobility_knights_all];
-                                    eval_o += MOBILITY_KNIGHT_S_O * ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[w_mobility_knights_safe];
-                                    eval_e += MOBILITY_KNIGHT_S_E * ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[w_mobility_knights_safe];
-                                                                            
-                                    if (w_mobility_knights_safe == 2) {
-                                            w_trap_knights += 1 * (Fields.getRank_W(fieldID) + 1);
-                                    } else if (w_mobility_knights_safe == 1) {
-                                            w_trap_knights += 2 * (Fields.getRank_W(fieldID) + 1);
-                                    } else if (w_mobility_knights_safe == 0) {
-                                            w_trap_knights += 4 * (Fields.getRank_W(fieldID) + 1);
-                                    }
                                     
                                     w_knights_attacks_to_black_king_1 += ALL_SignalFillerConstants.KING_SAFETY_KNIGHTS_ATTACKS[opking_attacks_counter_1];
                                     w_knights_attacks_to_black_king_2 += ALL_SignalFillerConstants.KING_SAFETY_KNIGHTS_ATTACKS[opking_attacks_counter_2];
@@ -1129,17 +1042,8 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     int fieldID = knights_fields[i];
                                     
-                                    if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
-                                            int see = bitboard.getSee().seeField(fieldID);
-                                            if (see < 0) {
-                                                    b_hanging_nonpawn++;
-                                            }
-                                    }
-                                    
                                     
                                     b_mobility_knights_all = 0;
-                                    
-                                    b_mobility_knights_safe = 0;
                                     
                                     final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
                                     final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
@@ -1152,7 +1056,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             
                                             int dirID = validDirIDs[j];
                                             long toBitboard = dirs[dirID][0];
-                                            int toFieldID = fids[dirID][0];
                                             
                                             if ((toBitboard & kingSurrounding_L1_white) != 0L) {
                                                     if (opking_attacks_counter_1 == 0) {
@@ -1183,27 +1086,12 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             }
                                             
                                             b_mobility_knights_all++;
-                                            
-                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT, toFieldID) >= 0;
-                                            if (safe) {
-                                                    b_mobility_knights_safe++;
-                                            }
                                     }
                                     
                                     eval_o -= MOBILITY_KNIGHT_O *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[b_mobility_knights_all];
                                     eval_e -= MOBILITY_KNIGHT_E *
                         ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[b_mobility_knights_all];
-                                    eval_o -= MOBILITY_KNIGHT_S_O * ALL_SignalFillerConstants.MOBILITY_KNIGHT_O[b_mobility_knights_safe];
-                                    eval_e -= MOBILITY_KNIGHT_S_E * ALL_SignalFillerConstants.MOBILITY_KNIGHT_E[b_mobility_knights_safe];
-                                    
-                                    if (b_mobility_knights_safe == 2) {
-                                            b_trap_knights += 1 * (Fields.getRank_B(fieldID) + 1);
-                                    } else if (b_mobility_knights_safe == 1) {
-                                            b_trap_knights += 2 * (Fields.getRank_B(fieldID) + 1);
-                                    } else if (b_mobility_knights_safe == 0) {
-                                            b_trap_knights += 4 * (Fields.getRank_B(fieldID) + 1);
-                                    }
                                     
                                     b_knights_attacks_to_white_king_1 += ALL_SignalFillerConstants.KING_SAFETY_KNIGHTS_ATTACKS[opking_attacks_counter_1];
                                     b_knights_attacks_to_white_king_2 += ALL_SignalFillerConstants.KING_SAFETY_KNIGHTS_ATTACKS[opking_attacks_counter_2];
@@ -1224,16 +1112,8 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     int fieldID = bishops_fields[i];
                                     
-                                    if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-                                            int see = bitboard.getSee().seeField(fieldID);
-                                            if (see < 0) {
-                                                    w_hanging_nonpawn++;
-                                            }
-                                    }
                                     
                                     w_mobility_bishops_all = 0;
-                                    
-                                    w_mobility_bishops_safe = 0;
                                     
                                     final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
                                     final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
@@ -1250,7 +1130,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             boolean hidden = false;
                                             for (int seq=0; seq<dirBitboards.length; seq++) {
                                                     long toBitboard = dirs[dirID][seq];
-                                                    int toFieldID = fids[dirID][seq];
                                                     
                                                     if (pinned) {
                                                             if ((toBitboard & bb_white_all) != 0L) {
@@ -1295,10 +1174,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             w_mobility_bishops_all++;
-                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER, toFieldID) >= 0;
-                                                                            if (safe) {
-                                                                                    w_mobility_bishops_safe++;
-                                                                            }
                                                                     } else {
                                                                             w_mobility_bishops_all++;
                                                                     }
@@ -1327,16 +1202,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_O[w_mobility_bishops_all];
                                     eval_e += MOBILITY_BISHOP_E *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_E[w_mobility_bishops_all];
-                                    eval_o += MOBILITY_BISHOP_S_O * ALL_SignalFillerConstants.MOBILITY_BISHOP_O[w_mobility_bishops_safe];
-                                    eval_e += MOBILITY_BISHOP_S_E * ALL_SignalFillerConstants.MOBILITY_BISHOP_E[w_mobility_bishops_safe];
-                                    
-                                    if (w_mobility_bishops_safe == 2) {
-                                            w_trap_bishops += 1 * (Fields.getRank_W(fieldID) + 1);
-                                    } else if (w_mobility_bishops_safe == 1) {
-                                            w_trap_bishops += 2 * (Fields.getRank_W(fieldID) + 1);
-                                    } else if (w_mobility_bishops_safe == 0) {
-                                            w_trap_bishops += 4 * (Fields.getRank_W(fieldID) + 1);
-                                    }
                                     
                                     w_bishops_attacks_to_black_king_1 += ALL_SignalFillerConstants.KING_SAFETY_BISHOPS_ATTACKS[opking_attacks_counter_1];
                                     w_bishops_attacks_to_black_king_2 += ALL_SignalFillerConstants.KING_SAFETY_BISHOPS_ATTACKS[opking_attacks_counter_2];
@@ -1353,16 +1218,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     int fieldID = bishops_fields[i];
                                     
-                                    if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
-                                            int see = bitboard.getSee().seeField(fieldID);
-                                            if (see < 0) {
-                                                    b_hanging_nonpawn++;
-                                            }
-                                    }
-                                    
                                     b_mobility_bishops_all = 0;
-                                    
-                                    b_mobility_bishops_safe = 0;
                                     
                                     final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
                                     final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
@@ -1379,7 +1235,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             boolean hidden = false;
                                             for (int seq=0; seq<dirBitboards.length; seq++) {
                                                     long toBitboard = dirs[dirID][seq];
-                                                    int toFieldID = fids[dirID][seq];
                                                     
                                                     if (pinned) {
                                                             if ((toBitboard & bb_black_all) != 0L) {
@@ -1424,10 +1279,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             b_mobility_bishops_all++;
-                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER, toFieldID) >= 0;
-                                                                            if (safe) {
-                                                                                    b_mobility_bishops_safe++;
-                                                                            }
                                                                     } else {
                                                                             b_mobility_bishops_all++;
                                                                     }
@@ -1455,16 +1306,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_O[b_mobility_bishops_all];
                                     eval_e -= MOBILITY_BISHOP_E *
                         ALL_SignalFillerConstants.MOBILITY_BISHOP_E[b_mobility_bishops_all];
-                                    eval_o -= MOBILITY_BISHOP_S_O * ALL_SignalFillerConstants.MOBILITY_BISHOP_O[b_mobility_bishops_safe];
-                                    eval_e -= MOBILITY_BISHOP_S_E * ALL_SignalFillerConstants.MOBILITY_BISHOP_E[b_mobility_bishops_safe];
-                                    
-                                    if (b_mobility_bishops_safe == 2) {
-                                            b_trap_bishops += 1 * (Fields.getRank_B(fieldID) + 1);
-                                    } else if (b_mobility_bishops_safe == 1) {
-                                            b_trap_bishops += 2 * (Fields.getRank_B(fieldID) + 1);
-                                    } else if (b_mobility_bishops_safe == 0) {
-                                            b_trap_bishops += 4 * (Fields.getRank_B(fieldID) + 1);
-                                    }
                                     
                                     b_bishops_attacks_to_white_king_1 += ALL_SignalFillerConstants.KING_SAFETY_BISHOPS_ATTACKS[opking_attacks_counter_1];
                                     b_bishops_attacks_to_white_king_2 += ALL_SignalFillerConstants.KING_SAFETY_BISHOPS_ATTACKS[opking_attacks_counter_2];
@@ -1485,16 +1326,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     int fieldID = rooks_fields[i];
                                     
-                                    if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-                                            int see = bitboard.getSee().seeField(fieldID);
-                                            if (see < 0) {
-                                                    w_hanging_nonpawn++;
-                                            }
-                                    }
-                                    
                                     w_mobility_rooks_all = 0;
-                                    
-                                    w_mobility_rooks_safe = 0;
                                     
                                     final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
                                     final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
@@ -1511,7 +1343,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             boolean hidden = false;
                                             for (int seq=0; seq<dirBitboards.length; seq++) {
                                                     long toBitboard = dirs[dirID][seq];
-                                                    int toFieldID = fids[dirID][seq];
                                                     
                                                     if (pinned) {
                                                             if ((toBitboard & bb_white_all) != 0L) {
@@ -1563,10 +1394,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             w_mobility_rooks_all++;
-                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_CASTLE, toFieldID) >= 0;
-                                                                            if (safe) {
-                                                                                    w_mobility_rooks_safe++;
-                                                                            }
                                                                     } else {
                                                                             w_mobility_rooks_all++;
                                                                     }
@@ -1594,16 +1421,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                         ALL_SignalFillerConstants.MOBILITY_ROOK_O[w_mobility_rooks_all];
                                     eval_e += MOBILITY_ROOK_E *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_E[w_mobility_rooks_all];
-                                    eval_o += MOBILITY_ROOK_S_O * ALL_SignalFillerConstants.MOBILITY_ROOK_O[w_mobility_rooks_safe];
-                                    eval_e += MOBILITY_ROOK_S_E * ALL_SignalFillerConstants.MOBILITY_ROOK_E[w_mobility_rooks_safe];
-                                    
-                                    if (w_mobility_rooks_safe == 2) {
-                                            w_trap_rooks += 1 * (Fields.getRank_W(fieldID) + 1);
-                                    } else if (w_mobility_rooks_safe == 1) {
-                                            w_trap_rooks += 2 * (Fields.getRank_W(fieldID) + 1);
-                                    } else if (w_mobility_rooks_safe == 0) {
-                                            w_trap_rooks += 4 * (Fields.getRank_W(fieldID) + 1);
-                                    }
                                     
                                     w_rooks_attacks_to_black_king_1 += ALL_SignalFillerConstants.KING_SAFETY_ROOKS_ATTACKS[opking_attacks_counter_1];
                                     w_rooks_attacks_to_black_king_2 += ALL_SignalFillerConstants.KING_SAFETY_ROOKS_ATTACKS[opking_attacks_counter_2];
@@ -1619,17 +1436,8 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     
                                     int fieldID = rooks_fields[i];
-
-                                    if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
-                                            int see = bitboard.getSee().seeField(fieldID);
-                                            if (see < 0) {
-                                                    b_hanging_nonpawn++;
-                                            }
-                                    }
                                     
                                     b_mobility_rooks_all = 0;
-                                    
-                                    b_mobility_rooks_safe = 0;
                                     
                                     final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
                                     final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
@@ -1646,7 +1454,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             boolean hidden = false;
                                             for (int seq=0; seq<dirBitboards.length; seq++) {
                                                     long toBitboard = dirs[dirID][seq];
-                                                    int toFieldID = fids[dirID][seq];
                                                     
                                                     if (pinned) {
                                                             if ((toBitboard & bb_black_all) != 0L) {
@@ -1698,10 +1505,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             b_mobility_rooks_all++;
-                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_CASTLE, toFieldID) >= 0;
-                                                                            if (safe) {
-                                                                                    b_mobility_rooks_safe++;
-                                                                            }
                                                                     } else {
                                                                             b_mobility_rooks_all++;
                                                                     }
@@ -1729,16 +1532,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                         ALL_SignalFillerConstants.MOBILITY_ROOK_O[b_mobility_rooks_all];
                                     eval_e -= MOBILITY_ROOK_E *
                         ALL_SignalFillerConstants.MOBILITY_ROOK_E[b_mobility_rooks_all];
-                                    eval_o -= MOBILITY_ROOK_S_O * ALL_SignalFillerConstants.MOBILITY_ROOK_O[b_mobility_rooks_safe];
-                                    eval_e -= MOBILITY_ROOK_S_E * ALL_SignalFillerConstants.MOBILITY_ROOK_E[b_mobility_rooks_safe];
-                                    
-                                    if (b_mobility_rooks_safe == 2) {
-                                            b_trap_rooks += 1 * (Fields.getRank_B(fieldID) + 1);
-                                    } else if (b_mobility_rooks_safe == 1) {
-                                            b_trap_rooks += 2 * (Fields.getRank_B(fieldID) + 1);
-                                    } else if (b_mobility_rooks_safe == 0) {
-                                            b_trap_rooks += 4 * (Fields.getRank_B(fieldID) + 1);
-                                    }
                                     
                                     b_rooks_attacks_to_white_king_1 += ALL_SignalFillerConstants.KING_SAFETY_ROOKS_ATTACKS[opking_attacks_counter_1];
                                     b_rooks_attacks_to_white_king_2 += ALL_SignalFillerConstants.KING_SAFETY_ROOKS_ATTACKS[opking_attacks_counter_2];
@@ -1759,16 +1552,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     int fieldID = queens_fields[i];
                                     
-                                    if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-                                            int see = bitboard.getSee().seeField(fieldID);
-                                            if (see < 0) {
-                                                    w_hanging_nonpawn++;
-                                            }
-                                    }
-                                    
                                     w_mobility_queens_all = 0;
-                                    
-                                    w_mobility_queens_safe = 0;
                                     
                                     int opking_attacks_counter_1 = 0;
                                     int opking_attacks_counter_2 = 0;
@@ -1789,7 +1573,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             boolean hidden = false;
                                             for (int seq=0; seq<dirBitboards.length; seq++) {
                                                     long toBitboard = dirs[dirID][seq];
-                                                    int toFieldID = fids[dirID][seq];
                                                     
                                                     if (pinned) {
                                                             if ((toBitboard & bb_white_all) != 0L) {
@@ -1834,10 +1617,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             w_mobility_queens_all++;
-                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN, toFieldID) >= 0;
-                                                                            if (safe) {
-                                                                                    w_mobility_queens_safe++;
-                                                                            }
                                                                     } else {
                                                                             w_mobility_queens_all++;
                                                                     }
@@ -1879,7 +1658,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             boolean hidden = false;
                                             for (int seq=0; seq<dirBitboards.length; seq++) {
                                                     long toBitboard = dirs[dirID][seq];
-                                                    int toFieldID = fids[dirID][seq];
                                                     
                                                     if (pinned) {
                                                             if ((toBitboard & bb_white_all) != 0L) {
@@ -1924,10 +1702,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             w_mobility_queens_all++;
-                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN, toFieldID) >= 0;
-                                                                            if (safe) {
-                                                                                    w_mobility_queens_safe++;
-                                                                            }
                                                                     } else {
                                                                             w_mobility_queens_all++;
                                                                     }
@@ -1955,16 +1729,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_O[w_mobility_queens_all];
                                     eval_e += MOBILITY_QUEEN_E *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_E[w_mobility_queens_all];
-                                    eval_o += MOBILITY_QUEEN_S_O * ALL_SignalFillerConstants.MOBILITY_QUEEN_O[w_mobility_queens_safe];
-                                    eval_e += MOBILITY_QUEEN_S_E * ALL_SignalFillerConstants.MOBILITY_QUEEN_E[w_mobility_queens_safe];
-                                    
-                                    if (w_mobility_queens_safe == 2) {
-                                            w_trap_queens += 1 * (Fields.getRank_W(fieldID) + 1);
-                                    } else if (w_mobility_queens_safe == 1) {
-                                            w_trap_queens += 2 * (Fields.getRank_W(fieldID) + 1);
-                                    } else if (w_mobility_queens_safe == 0) {
-                                            w_trap_queens += 4 * (Fields.getRank_W(fieldID) + 1);
-                                    }
                                     
                                     w_queens_attacks_to_black_king_1 += ALL_SignalFillerConstants.KING_SAFETY_QUEENS_ATTACKS[opking_attacks_counter_1];
                                     w_queens_attacks_to_black_king_2 += ALL_SignalFillerConstants.KING_SAFETY_QUEENS_ATTACKS[opking_attacks_counter_2];
@@ -1981,16 +1745,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     int fieldID = queens_fields[i];
                                     
-                                    if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
-                                            int see = bitboard.getSee().seeField(fieldID);
-                                            if (see < 0) {
-                                                    b_hanging_nonpawn++;
-                                            }
-                                    }
-                                    
                                     b_mobility_queens_all = 0;
-                                    
-                                    b_mobility_queens_safe = 0;
                                     
                                     int opking_attacks_counter_1 = 0;
                                     int opking_attacks_counter_2 = 0;
@@ -2011,7 +1766,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             boolean hidden = false;
                                             for (int seq=0; seq<dirBitboards.length; seq++) {
                                                     long toBitboard = dirs[dirID][seq];
-                                                    int toFieldID = fids[dirID][seq];
                                                     
                                                     if (pinned) {
                                                             if ((toBitboard & bb_black_all) != 0L) {
@@ -2056,10 +1810,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             b_mobility_queens_all++;
-                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN, toFieldID) >= 0;
-                                                                            if (safe) {
-                                                                                    b_mobility_queens_safe++;
-                                                                            }
                                                                     } else {
                                                                             b_mobility_queens_all++;
                                                                     }
@@ -2101,7 +1851,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                             boolean hidden = false;
                                             for (int seq=0; seq<dirBitboards.length; seq++) {
                                                     long toBitboard = dirs[dirID][seq];
-                                                    int toFieldID = fids[dirID][seq];
                                                     
                                                     if (pinned) {
                                                             if ((toBitboard & bb_black_all) != 0L) {
@@ -2146,10 +1895,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                             if (!pinned) {
                                                                     if (!hidden) {
                                                                             b_mobility_queens_all++;
-                                                                            boolean safe = bitboard.getSee().seeMove(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN, toFieldID) >= 0;
-                                                                            if (safe) {
-                                                                                    b_mobility_queens_safe++;
-                                                                            }
                                                                     } else {
                                                                             b_mobility_queens_all++;
                                                                     }
@@ -2178,16 +1923,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_O[b_mobility_queens_all];
                                     eval_e -= MOBILITY_QUEEN_E *
                         ALL_SignalFillerConstants.MOBILITY_QUEEN_E[b_mobility_queens_all];
-                                    eval_o -= MOBILITY_QUEEN_S_O * ALL_SignalFillerConstants.MOBILITY_QUEEN_O[b_mobility_queens_safe];
-                                    eval_e -= MOBILITY_QUEEN_S_E * ALL_SignalFillerConstants.MOBILITY_QUEEN_E[b_mobility_queens_safe];
-                                    
-                                    if (b_mobility_queens_safe == 2) {
-                                            b_trap_queens += 1 * (Fields.getRank_B(fieldID) + 1);
-                                    } else if (b_mobility_queens_safe == 1) {
-                                            b_trap_queens += 2 * (Fields.getRank_B(fieldID) + 1);
-                                    } else if (b_mobility_queens_safe == 0) {
-                                            b_trap_queens += 4 * (Fields.getRank_B(fieldID) + 1);
-                                    }     
                                     
                                     b_queens_attacks_to_white_king_1 += ALL_SignalFillerConstants.KING_SAFETY_QUEENS_ATTACKS[opking_attacks_counter_1];
                                     b_queens_attacks_to_white_king_2 += ALL_SignalFillerConstants.KING_SAFETY_QUEENS_ATTACKS[opking_attacks_counter_2];
@@ -2259,102 +1994,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             int attack_lower = attack_rb + attack_rn + attack_qn + attack_qb + attack_qr;
             eval_o += ATTACK_LOWER_O * attack_lower;
             eval_e += ATTACK_LOWER_E * attack_lower;
-            
-            
-            int trap_knights = w_trap_knights - b_trap_knights;
-            eval_o += TRAP_O * trap_knights;
-            eval_e += TRAP_E * trap_knights;
-            
-            int trap_bishop = w_trap_bishops - b_trap_bishops;
-            eval_o += TRAP_O * trap_bishop;
-            eval_e += TRAP_E * trap_bishop;
-            
-            int trap_rook = w_trap_rooks - b_trap_rooks;
-            eval_o += TRAP_O * trap_rook;
-            eval_e += TRAP_E * trap_rook;
-            
-            int trap_queen = w_trap_queens - b_trap_queens;
-            eval_o += TRAP_O * trap_queen;
-            eval_e += TRAP_E * trap_queen;
-            
-            
-            if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-                    
-                    if (b_hanging_nonpawn != 0) {
-                            throw new IllegalStateException("b_hanging_nonpawn=" + b_hanging_nonpawn);
-                    }
-                    if (w_hanging_nonpawn < 0) {
-                            throw new IllegalStateException("w_hanging_nonpawn=" + w_hanging_nonpawn);
-                    }
-                    if (b_hanging_pawn != 0) {
-                            throw new IllegalStateException("b_hanging_pawn=" + b_hanging_pawn);
-                    }
-                    if (w_hanging_pawn < 0) {
-                            throw new IllegalStateException("w_hanging_pawn=" + w_hanging_pawn);
-                    }
-                    
-                    
-                    if (w_hanging_nonpawn >= ALL_SignalFillerConstants.HUNGED_PIECES_O.length) {
-                            w_hanging_nonpawn = ALL_SignalFillerConstants.HUNGED_PIECES_O.length - 1;
-                    }
-                    double hunged_pieces = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_PIECES_O[w_hanging_nonpawn], ALL_SignalFillerConstants.HUNGED_PIECES_E[w_hanging_nonpawn]);
-                    eval_o += HUNGED_PIECE_O * hunged_pieces;
-                    eval_e += HUNGED_PIECE_E * hunged_pieces;
-                    
-                    if (w_hanging_pawn >= ALL_SignalFillerConstants.HUNGED_PAWNS_O.length) {
-                            w_hanging_pawn = ALL_SignalFillerConstants.HUNGED_PAWNS_O.length - 1;
-                    }
-                    double hunged_pawns = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_PAWNS_O[w_hanging_pawn], ALL_SignalFillerConstants.HUNGED_PAWNS_E[w_hanging_pawn]);
-                    eval_o += HUNGED_PAWNS_O * hunged_pawns;
-                    eval_e += HUNGED_PAWNS_E * hunged_pawns;
-                    
-                    int w_hanging_all = w_hanging_nonpawn + w_hanging_pawn;
-                    if (w_hanging_all >= ALL_SignalFillerConstants.HUNGED_ALL_O.length) {
-                            w_hanging_all = ALL_SignalFillerConstants.HUNGED_ALL_O.length - 1;
-                    }
-                    double hunged_all = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_ALL_O[w_hanging_all], ALL_SignalFillerConstants.HUNGED_ALL_E[w_hanging_all]);
-                    eval_o += HUNGED_ALL_O * hunged_all;
-                    eval_e += HUNGED_ALL_E * hunged_all;
-                    
-            } else {
-                    
-                    if (w_hanging_nonpawn != 0) {
-                            throw new IllegalStateException("w_hanging_nonpawn=" + w_hanging_nonpawn);
-                    }
-                    if (b_hanging_nonpawn < 0) {
-                            throw new IllegalStateException("b_hanging_nonpawn=" + b_hanging_nonpawn);
-                    }
-                    if (w_hanging_pawn != 0) {
-                            throw new IllegalStateException("w_hanging_pawn=" + w_hanging_pawn);
-                    }
-                    if (b_hanging_pawn < 0) {
-                            throw new IllegalStateException("b_hanging_pawn=" + b_hanging_pawn);
-                    }
-                    
-                    if (b_hanging_nonpawn >= ALL_SignalFillerConstants.HUNGED_PIECES_O.length) {
-                            b_hanging_nonpawn = ALL_SignalFillerConstants.HUNGED_PIECES_O.length - 1;
-                    }
-                    double hunged_pieces = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_PIECES_O[b_hanging_nonpawn], ALL_SignalFillerConstants.HUNGED_PIECES_E[b_hanging_nonpawn]);
-                    eval_o -= HUNGED_PIECE_O * hunged_pieces;
-                    eval_e -= HUNGED_PIECE_E * hunged_pieces;
-                    
-                    if (b_hanging_pawn >= ALL_SignalFillerConstants.HUNGED_PAWNS_O.length) {
-                            b_hanging_pawn = ALL_SignalFillerConstants.HUNGED_PAWNS_O.length - 1;
-                    }
-                    double hunged_pawns = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_PAWNS_O[b_hanging_pawn], ALL_SignalFillerConstants.HUNGED_PAWNS_E[b_hanging_pawn]);
-                    eval_o -= HUNGED_PAWNS_O * hunged_pawns;
-                    eval_e -= HUNGED_PAWNS_E * hunged_pawns;
-                    
-                    int b_hanging_all = b_hanging_nonpawn + b_hanging_pawn;
-                    if (b_hanging_all >= ALL_SignalFillerConstants.HUNGED_ALL_O.length) {
-                            b_hanging_all = ALL_SignalFillerConstants.HUNGED_ALL_O.length - 1;
-                    }
-                    double hunged_all = bitboard.getMaterialFactor().interpolateByFactor(ALL_SignalFillerConstants.HUNGED_ALL_O[b_hanging_all], ALL_SignalFillerConstants.HUNGED_ALL_E[b_hanging_all]);
-                    eval_o -= HUNGED_ALL_O * hunged_all;
-                    eval_e -= HUNGED_ALL_E * hunged_all;
-
-            }
-            
+                        
             
             return interpolator.interpolateByFactor(eval_o, eval_e);
 
