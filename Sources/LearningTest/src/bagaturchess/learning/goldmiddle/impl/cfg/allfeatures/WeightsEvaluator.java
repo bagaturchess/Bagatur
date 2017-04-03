@@ -65,44 +65,44 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     @Override
     protected double phase2() {
             
-            double eval = 0;
-            
-            eval += eval_pieces();
-            
-            return eval;
+        double eval = 0;
+        
+        eval += eval_pieces();
+        
+        return eval;
     }
     
     
     @Override
     protected double phase3() {
     	
-            double eval = 0;
-            
-            eval += eval_pawns();
-            
-            return eval;
+        double eval = 0;
+        
+        eval += eval_pawns();
+        
+        return eval;
     }
     
     
     @Override
     protected double phase4() {
     	
-            double eval = 0;
-            
-            eval += mobilityKingSafetyPinsAttacks();
-            
-            return eval;
+        double eval = 0;
+        
+        eval += mobilityKingSafetyPinsAttacks();
+        
+        return eval;
     }
     
     
     @Override
     protected double phase5() {
     	
-            double eval = 0;
-            
-            eval += safeMobilityTrapsHanging();
-            
-            return eval;
+        double eval = 0;
+        
+        eval += safeMobilityTrapsHanging();
+        
+        return eval;
     }
 
 
@@ -686,10 +686,10 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                             
                             int rank = p.getRank();
                             int stoppersCount = Utils.countBits(p.getFront() & ~bitboard.getFreeBitboard());
-                            rank = rank - stoppersCount;
+                            /*rank = rank - stoppersCount;
                             if (rank <= 0) {
                                     rank = 1;
-                            }
+                            }*/
                             
                             eval_o += PAWNS_PASSED_O;
                             eval_e += PAWNS_PASSED_E;
@@ -750,10 +750,10 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                             
                             int rank = p.getRank();
                             int stoppersCount = Utils.countBits(p.getFront() & ~bitboard.getFreeBitboard());
-                            rank = rank - stoppersCount;
+                            /*rank = rank - stoppersCount;
                             if (rank <= 0) {
                                     rank = 1;
-                            }
+                            }*/
                             
                             eval_o -= PAWNS_PASSED_O;
                             eval_e -= PAWNS_PASSED_E;
