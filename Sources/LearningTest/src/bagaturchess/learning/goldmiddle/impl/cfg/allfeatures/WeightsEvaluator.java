@@ -26,6 +26,9 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     long RANK_7TH = Fields.DIGIT_7;
     long RANK_2TH = Fields.DIGIT_2;
     
+    private long passedPawnsFronts_white = 0;
+    private long passedPawnsFronts_black = 0;
+    
     
     public WeightsEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
             super(_bitboard, _evalCache, _evalConfig);
@@ -49,13 +52,30 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
 	 */
 	@Override
 	protected double phase1() {
-		return eval_material_nopawnsdrawrule();
+		
+		double eval = 0;
+		
+		eval += eval_material_nopawnsdrawrule();
+        eval += eval_standard();
+        
+        return eval;
 	}
 	
 	
     @Override
     protected double phase2() {
             
+            double eval = 0;
+            
+            eval += eval_pieces();
+            
+            return eval;
+    }
+    
+    
+    @Override
+    protected double phase3() {
+    	
             double eval = 0;
             
             eval += eval_pawns();
@@ -65,28 +85,23 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     
     
     @Override
-    protected double phase3() {
-            double eval = 0;
-            
-            eval += eval_standard();
-            eval += eval_pieces();
-            
-            return eval;
-    }
-    
-    
-    @Override
     protected double phase4() {
+    	
             double eval = 0;
+            
             eval += mobilityKingSafetyPinsAttacks();
+            
             return eval;
     }
     
     
     @Override
     protected double phase5() {
+    	
             double eval = 0;
+            
             eval += safeMobilityTrapsHanging();
+            
             return eval;
     }
 
@@ -657,6 +672,8 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             int b_kingID = model.getBKingFieldID();
             
             
+            passedPawnsFronts_white = 0;
+            
             int w_passed_count = model.getWPassedCount();
             if (w_passed_count > 0) {
                     
@@ -664,6 +681,8 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                     for (int i=0; i<w_passed_count; i++) {
                             
                             Pawn p = w_passed[i];
+                            
+                            passedPawnsFronts_white |= p.getFront();
                             
                             int rank = p.getRank();
                             int stoppersCount = Utils.countBits(p.getFront() & ~bitboard.getFreeBitboard());
@@ -717,6 +736,8 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                     }
             }
             
+            passedPawnsFronts_black = 0;
+            
             int b_passed_count = model.getBPassedCount();
             if (b_passed_count > 0) {
 
@@ -725,6 +746,8 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                             
                             Pawn p = b_passed[i];
 
+                            passedPawnsFronts_black |= p.getFront();
+                            
                             int rank = p.getRank();
                             int stoppersCount = Utils.countBits(p.getFront() & ~bitboard.getFreeBitboard());
                             rank = rank - stoppersCount;
@@ -934,6 +957,8 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             int attack_qb = 0;
             int attack_qr = 0;
             
+            int passed_pawns_fronts_attacks = 0;
+            
             
             /**
             * Initialize necessary data 
@@ -1004,7 +1029,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                     opking_attacks_counter_2++;
                                             }
                                             
-                                            
+                    						if ((toBitboard & passedPawnsFronts_white) != 0L) {
+                    							passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+                    						}
+                    						if ((toBitboard & passedPawnsFronts_black) != 0L) {
+                    							passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+                    						}
+                    						
                                             if ((toBitboard & bb_white_all) != 0L) {
                                                     continue;
                                             }
@@ -1070,6 +1101,12 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                     opking_attacks_counter_2++;
                                             }
                                             
+                    						if ((toBitboard & passedPawnsFronts_white) != 0L) {
+                    							passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+                    						}
+                    						if ((toBitboard & passedPawnsFronts_black) != 0L) {
+                    							passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+                    						}
                                             
                                             if ((toBitboard & bb_black_all) != 0L) {
                                                     continue;
@@ -1161,7 +1198,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                                     opking_attacks_counter_2++;
                                                             }
                                                             
-                                                            
+                                    						if ((toBitboard & passedPawnsFronts_white) != 0L) {
+                                    							passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+                                    						}
+                                    						if ((toBitboard & passedPawnsFronts_black) != 0L) {
+                                    							passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+                                    						}
+                                    						
                                                             if ((toBitboard & bb_white_all) != 0L) {
                                                                     if ((toBitboard & bb_white_QandB) != 0L) {
                                                                             //Bishop can attack over other friendly bishop or queen - continue the iteration
@@ -1266,6 +1309,12 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                                     opking_attacks_counter_2++;
                                                             }
                                                             
+                                    						if ((toBitboard & passedPawnsFronts_white) != 0L) {
+                                    							passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+                                    						}
+                                    						if ((toBitboard & passedPawnsFronts_black) != 0L) {
+                                    							passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+                                    						}
                                                             
                                                             if ((toBitboard & bb_black_all) != 0L) {
                                                                     if ((toBitboard & bb_black_QandB) != 0L) {
@@ -1374,6 +1423,12 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                                     opking_attacks_counter_2++;
                                                             }
                                                             
+                                    						if ((toBitboard & passedPawnsFronts_white) != 0L) {
+                                    							passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+                                    						}
+                                    						if ((toBitboard & passedPawnsFronts_black) != 0L) {
+                                    							passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+                                    						}
                                                             
                                                             if ((toBitboard & bb_white_all) != 0L) {
                                                                     if ((toBitboard & bb_white_QandR) != 0L) {
@@ -1485,7 +1540,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                                     opking_attacks_counter_2++;
                                                             }
                                                             
-                                                            
+                                    						if ((toBitboard & passedPawnsFronts_white) != 0L) {
+                                    							passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+                                    						}
+                                    						if ((toBitboard & passedPawnsFronts_black) != 0L) {
+                                    							passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+                                    						}
+                                    						
                                                             if ((toBitboard & bb_black_all) != 0L) {
                                                                     if ((toBitboard & bb_black_QandR) != 0L) {
                                                                             //Rook can attack over other friendly rooks or queens - continue the iteration
@@ -1604,6 +1665,12 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                                     opking_attacks_counter_2++;
                                                             }
                                                             
+                                    						if ((toBitboard & passedPawnsFronts_white) != 0L) {
+                                    							passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+                                    						}
+                                    						if ((toBitboard & passedPawnsFronts_black) != 0L) {
+                                    							passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+                                    						}
                                                             
                                                             if ((toBitboard & bb_white_all) != 0L) {
                                                                     if ((toBitboard & bb_white_QandR) != 0L) {
@@ -1689,7 +1756,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                                     opking_attacks_counter_2++;
                                                             }
                                                             
-                                                            
+                                    						if ((toBitboard & passedPawnsFronts_white) != 0L) {
+                                    							passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+                                    						}
+                                    						if ((toBitboard & passedPawnsFronts_black) != 0L) {
+                                    							passed_pawns_fronts_attacks += Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+                                    						}
+                                    						
                                                             if ((toBitboard & bb_white_all) != 0L) {
                                                                     if ((toBitboard & bb_white_QandB) != 0L) {
                                                                             //Queen can attack over other friendly bishop or queen - continue the iteration
@@ -1797,7 +1870,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                                     opking_attacks_counter_2++;
                                                             }
                                                             
-                                                            
+                                    						if ((toBitboard & passedPawnsFronts_white) != 0L) {
+                                    							passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+                                    						}
+                                    						if ((toBitboard & passedPawnsFronts_black) != 0L) {
+                                    							passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+                                    						}
+                                    						
                                                             if ((toBitboard & bb_black_all) != 0L) {
                                                                     if ((toBitboard & bb_black_QandR) != 0L) {
                                                                             //Queen can attack over other friendly rooks or queens - continue the iteration
@@ -1882,7 +1961,13 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                                                     opking_attacks_counter_2++;
                                                             }
                                                             
-                                                            
+                                    						if ((toBitboard & passedPawnsFronts_white) != 0L) {
+                                    							passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_white);
+                                    						}
+                                    						if ((toBitboard & passedPawnsFronts_black) != 0L) {
+                                    							passed_pawns_fronts_attacks -= Utils.countBits_less1s(toBitboard & passedPawnsFronts_black);
+                                    						}
+                                    						
                                                             if ((toBitboard & bb_black_all) != 0L) {
                                                                     if ((toBitboard & bb_black_QandB) != 0L) {
                                                                             //Queen can attack over other friendly bishop or queen - continue the iteration
@@ -1994,7 +2079,11 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             int attack_lower = attack_rb + attack_rn + attack_qn + attack_qb + attack_qr;
             eval_o += ATTACK_LOWER_O * attack_lower;
             eval_e += ATTACK_LOWER_E * attack_lower;
-                        
+            
+            
+            eval_o += PAWNS_PSTOPPERS_A_O * passed_pawns_fronts_attacks;
+            eval_e += PAWNS_PSTOPPERS_A_E * passed_pawns_fronts_attacks;
+            
             
             return interpolator.interpolateByFactor(eval_o, eval_e);
 
