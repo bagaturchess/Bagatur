@@ -49,7 +49,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
 	
     @Override
     protected double phase2() {
-            
+        
         double eval = 0;
         
         eval += eval_pieces();

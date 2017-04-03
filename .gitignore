@@ -1,4 +1,6 @@
 *.class
 Sources/UCIRemote*
 Sources/WorkDir*
+*.cg
+
 
