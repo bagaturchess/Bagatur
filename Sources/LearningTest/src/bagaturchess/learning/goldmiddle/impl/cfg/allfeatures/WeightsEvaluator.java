@@ -23,9 +23,6 @@ import bagaturchess.search.impl.evalcache.IEvalCache;
 public class WeightsEvaluator extends BaseEvaluator implements Weights {
     
     
-    long RANK_7TH = Fields.DIGIT_7;
-    long RANK_2TH = Fields.DIGIT_2;
-    
     private long passedPawnsFronts_white = 0;
     private long passedPawnsFronts_black = 0;
     
@@ -527,7 +524,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     eval_o += ROOKS_SEMIOPENED_O;
                                     eval_e += ROOKS_SEMIOPENED_E;
                             }
-                            if ((fieldBitboard & RANK_7TH) != 0L) {
+                            if ((fieldBitboard & Fields.DIGIT_7) != 0L) {
                                     eval_o += ROOKS_7TH_2TH_O;
                                     eval_e += ROOKS_7TH_2TH_E;
                             }
@@ -558,7 +555,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     eval_o -= ROOKS_SEMIOPENED_O;
                                     eval_e -= ROOKS_SEMIOPENED_E;
                             }
-                            if ((fieldBitboard & RANK_2TH) != 0L) {
+                            if ((fieldBitboard & Fields.DIGIT_2) != 0L) {
                                     eval_o -= ROOKS_7TH_2TH_O;
                                     eval_e -= ROOKS_7TH_2TH_E;
                             }
@@ -586,7 +583,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     eval_e += bitboard.getBoardConfig().getWeight_PST_QUEEN_E() * pst;
                                     
                                     long fieldBitboard = Fields.ALL_A1H1[fieldID];
-                                    if ((fieldBitboard & RANK_7TH) != 0L) {
+                                    if ((fieldBitboard & Fields.DIGIT_7) != 0L) {
                                             eval_o += QUEENS_7TH_2TH_O;
                                             eval_e += QUEENS_7TH_2TH_E;
                                     }
@@ -611,7 +608,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     eval_e -= bitboard.getBoardConfig().getWeight_PST_QUEEN_E() * pst;
                                     
                                     long fieldBitboard = Fields.ALL_A1H1[fieldID];
-                                    if ((fieldBitboard & RANK_2TH) != 0L) {
+                                    if ((fieldBitboard & Fields.DIGIT_2) != 0L) {
                                             eval_o -= QUEENS_7TH_2TH_O;
                                             eval_e -= QUEENS_7TH_2TH_E;
                                     }
