@@ -1006,7 +1006,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
                                     final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
-                                    final int[][] fids = KnightPlies.ALL_KNIGHT_DIRS_WITH_FIELD_IDS[fieldID];
+                                    //final int[][] fids = KnightPlies.ALL_KNIGHT_DIRS_WITH_FIELD_IDS[fieldID];
                                     
                                     int opking_attacks_counter_1 = 0;
                                     int opking_attacks_counter_2 = 0;
@@ -1078,7 +1078,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     final int [] validDirIDs = KnightPlies.ALL_KNIGHT_VALID_DIRS[fieldID];
                                     final long[][] dirs = KnightPlies.ALL_KNIGHT_DIRS_WITH_BITBOARDS[fieldID];
-                                    final int[][] fids = KnightPlies.ALL_KNIGHT_DIRS_WITH_FIELD_IDS[fieldID];
+                                    //final int[][] fids = KnightPlies.ALL_KNIGHT_DIRS_WITH_FIELD_IDS[fieldID];
                                     
                                     int opking_attacks_counter_1 = 0;
                                     int opking_attacks_counter_2 = 0;
@@ -1154,7 +1154,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
                                     final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
-                                    final int[][] fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+                                    //final int[][] fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
                                     
                                     int opking_attacks_counter_1 = 0;
                                     int opking_attacks_counter_2 = 0;
@@ -1265,7 +1265,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     final long[][] dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
                                     final int [] validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
-                                    final int[][] fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+                                    //final int[][] fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
                                     
                                     int opking_attacks_counter_1 = 0;
                                     int opking_attacks_counter_2 = 0;
@@ -1379,7 +1379,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
                                     final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
-                                    final int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+                                    //final int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
                                     
                                     int opking_attacks_counter_1 = 0;
                                     int opking_attacks_counter_2 = 0;
@@ -1496,7 +1496,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     
                                     final long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
                                     final int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
-                                    final int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+                                    //final int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
                                     
                                     int opking_attacks_counter_1 = 0;
                                     int opking_attacks_counter_2 = 0;
@@ -1623,7 +1623,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     */
                                     long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
                                     int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
-                                    int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+                                    //int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
                                     
                                     int size = validDirIDs.length;
                                     for (int dir=0; dir<size; dir++) {
@@ -1714,7 +1714,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     */
                                     dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
                                     validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
-                                    fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+                                    //fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
                                     
                                     size = validDirIDs.length;
                                     for (int dir=0; dir<size; dir++) {
@@ -1828,7 +1828,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     */
                                     long[][] dirs = CastlePlies.ALL_CASTLE_DIRS_WITH_BITBOARDS[fieldID];
                                     int [] validDirIDs = CastlePlies.ALL_CASTLE_VALID_DIRS[fieldID];
-                                    int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
+                                    //int[][] fids = CastlePlies.ALL_CASTLE_DIRS_WITH_FIELD_IDS[fieldID];
                                     
                                     int size = validDirIDs.length;
                                     for (int dir=0; dir<size; dir++) {
@@ -1919,7 +1919,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
                                     */
                                     dirs = OfficerPlies.ALL_OFFICER_DIRS_WITH_BITBOARDS[fieldID];
                                     validDirIDs = OfficerPlies.ALL_OFFICER_VALID_DIRS[fieldID];
-                                    fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
+                                    //fids = OfficerPlies.ALL_OFFICER_DIRS_WITH_FIELD_IDS[fieldID];
                                     
                                     size = validDirIDs.length;
                                     for (int dir=0; dir<size; dir++) {
