@@ -35,18 +35,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     }
     
     
-    @Override
-    public void beforeSearch() {
-            super.beforeSearch();
-    }
-    
-    
-    @Override
-    public int getMaterialQueen() {
-            return 50 + baseEval.getMaterialQueen();
-    }
-    
-    
 	/* (non-Javadoc)
 	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase1()
 	 */
