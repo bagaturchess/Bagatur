@@ -1,7 +1,7 @@
 package bagaturchess.learning.goldmiddle.impl.cfg.allfeatures;
 
 
-public interface Weights {
+public interface Weights_SF7 {
 	public static final double MATERIAL_PAWN_O	=	60.846650684082576;
 	public static final double MATERIAL_PAWN_E	=	81.98633311013695;
 
