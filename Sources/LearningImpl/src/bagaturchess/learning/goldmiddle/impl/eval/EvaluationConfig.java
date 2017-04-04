@@ -1,13 +1,12 @@
-package bagaturchess.learning.goldmiddle.run.cfg;
+package bagaturchess.learning.goldmiddle.impl.eval;
 
 
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.BagaturPawnsEvalFactory;
-import bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluatorFactory;
 import bagaturchess.search.api.IEvalConfig;
 
 
-public class EvaluationConfg implements IEvalConfig {
+public class EvaluationConfig implements IEvalConfig {
 
 	@Override
 	public boolean useLazyEval() {
