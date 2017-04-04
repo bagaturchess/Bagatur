@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package bagaturchess.engines.bagatur.v14;
+package bagaturchess.engines.bagatur.cuckoo;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package bagaturchess.engines.bagatur.v14;
+package bagaturchess.engines.bagatur.cuckoo;
 
 import java.io.IOException;
 import java.io.InputStream;
