@@ -1,4 +1,4 @@
-package bagaturchess.engines.cuckoo;
+package bagaturchess.engines.cuckooadapter;
 
 public interface IPosition {
 

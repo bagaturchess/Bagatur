@@ -16,18 +16,6 @@ public class MaterialEvaluator extends BaseEvaluator {
 	
 	
 	@Override
-	public void beforeSearch() {
-		super.beforeSearch();
-	}
-	
-	
-	@Override
-	public int getMaterialQueen() {
-		return 50 + baseEval.getMaterialQueen();
-	}
-	
-	
-	@Override
 	protected double phase1() {
 		return eval_material_nopawnsdrawrule() + interpolator.interpolateByFactor(baseEval.getPST_o(), baseEval.getPST_e());
 	}

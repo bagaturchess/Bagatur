@@ -13,17 +13,17 @@ public class MaterialEvalConfigImpl implements IEvalConfig {
 	
 	
 	public boolean useEvalCache() {
-		return false;
+		return true;
 	}
 	
 	
 	public boolean useLazyEval() {
-		return false;
+		return true;
 	}
 	
 	
 	public String getEvaluatorFactoryClassName() {
-		return bagaturchess.engines.material.MaterialEvaluatorFactory1.class.getName();
+		return bagaturchess.engines.material.MaterialEvaluatorFactory.class.getName();
 	}
 	
 	

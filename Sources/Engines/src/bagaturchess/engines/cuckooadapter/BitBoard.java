@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package bagaturchess.engines.cuckoo;
+package bagaturchess.engines.cuckooadapter;
 
 public class BitBoard {
 
