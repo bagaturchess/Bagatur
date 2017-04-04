@@ -173,9 +173,9 @@ public class Features {
 				} if (cur_p_f instanceof FeatureSingle && cur_m_f instanceof FeatureArray) {
 					throw new UnsupportedOperationException();
 				} else {
-					cur_p_f.merge(cur_m_f);
-					//merger.merge(cur_p_f, cur_m_f);
-					System.out.println("CHECK MERGER: Merged feature : " + cur_p_f.getName());
+					//cur_p_f.merge(cur_m_f);
+					merger.merge(cur_p_f, cur_m_f);
+					//System.out.println("CHECK MERGER: Merged feature : " + cur_p_f.getName());
 				}
 				
 			} else {
