@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.allfeatures;
+package bagaturchess.learning.goldmiddle.impl.cfg.allfeatures.weights;
 
 
 public interface Weights_GR22 {
