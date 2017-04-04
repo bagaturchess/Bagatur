@@ -1,4 +1,4 @@
-package bagaturchess.engines.bagatur.cuckoo;
+package bagaturchess.engines.cuckoo;
 
 
 import bagaturchess.bitboard.api.IBitBoard;

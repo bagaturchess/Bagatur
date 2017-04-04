@@ -1,4 +1,4 @@
-package bagaturchess.engines.bagatur.cuckoo;
+package bagaturchess.engines.cuckoo;
 
 
 import bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2;
