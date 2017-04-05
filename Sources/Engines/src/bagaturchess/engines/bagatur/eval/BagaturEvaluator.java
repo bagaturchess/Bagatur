@@ -99,7 +99,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		
 		
 		eval_material_nopawnsdrawrule();
-		eval_trading();
 		eval_standard();
 		eval_PST();
 		evalInfo.eval_Material_o *= WEIGHT_MATERIAL_O;
@@ -195,6 +194,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		eval_king_safety();
 		eval_space();
 		eval_hunged();
+		
 		eval_TrapsAndSafeMobility();
 		eval_PassersFrontAttacks();
 		evalInfo.eval_Kingsafety_o *= evalConfig.get_WEIGHT_KINGSAFETY_O();
