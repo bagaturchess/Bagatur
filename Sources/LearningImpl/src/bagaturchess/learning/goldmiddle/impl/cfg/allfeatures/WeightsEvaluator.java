@@ -41,7 +41,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
 		double eval = 0;
 		
 		eval += eval_material_nopawnsdrawrule();
-        eval += eval_standard();
         
         return eval;
 	}
@@ -52,7 +51,9 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
         
         double eval = 0;
         
-        eval += eval_pieces();
+        //eval_pawns is before eval_standard and eval_pieces, because it is faster compared to them
+        //as well as in endgames the pawns evaluation affects more the final evaluation than the evaluation of eval_standard and eval_pieces
+        eval += eval_pawns();
         
         return eval;
     }
@@ -63,7 +64,8 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     	
         double eval = 0;
         
-        eval += eval_pawns();
+        eval += eval_standard();
+        eval += eval_pieces();
         
         return eval;
     }
@@ -85,7 +87,10 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     	
         double eval = 0;
         
-        eval += safeMobilityTrapsHanging();
+        
+        //The huge number of calculations in safeMobilityTrapsHanging method cannot compensate the potential benefits obtained from the evaluation
+        //That is why currently the method is not called
+        //eval += safeMobilityTrapsHanging();
         
         return eval;
     }
