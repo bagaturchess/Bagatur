@@ -154,7 +154,7 @@ public class EvalInfo extends Figures {
 		eval_PawnsUnstoppable_e = 0;
 	}
 	
-	public void clear() {
+	public void clear_rest() {
 				
 		eval_Mobility_o = 0;
 		eval_Mobility_e = 0;

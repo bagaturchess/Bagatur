@@ -187,7 +187,7 @@ public class BagaturEvaluator_PiecesAttacks extends EvaluatorAdapter implements 
 		int eval = 0;
 		
 		evalInfo.clear_short();
-		evalInfo.clear();
+		evalInfo.clear_rest();
 		
 		if (rootColour == Figures.COLOUR_WHITE) {
 			if (b_queens.getDataSize() == 0) {
@@ -421,7 +421,7 @@ public class BagaturEvaluator_PiecesAttacks extends EvaluatorAdapter implements 
 			}
 		}
 		
-		evalInfo.clear();
+		evalInfo.clear_rest();
 		
 		initEvalInfo1();
 		eval_pawns_RooksAndQueens();
