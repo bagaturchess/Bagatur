@@ -1,6 +1,10 @@
 package bagaturchess.learning.goldmiddle.impl.cfg.allfeatures.weights;
 
 
+/*
+ * Weaker with 123 ELO vs Bagatur Eval
+ */
+
 public interface Weights_GR22 {
 	public static final double MATERIAL_PAWN_O	=	78.58396821932342;
 	public static final double MATERIAL_PAWN_E	=	129.92218925051975;
