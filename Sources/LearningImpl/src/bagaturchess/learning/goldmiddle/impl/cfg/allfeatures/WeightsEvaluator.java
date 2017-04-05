@@ -88,7 +88,8 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
         double eval = 0;
         
         
-        //The huge number of calculations in safeMobilityTrapsHanging method cannot compensate the potential benefits obtained from the evaluation
+        //The performance degradation caused by the huge number of calculations in safeMobilityTrapsHanging method
+        //cannot compensate the potential benefits obtained from the evaluation.
         //That is why currently the method is not called
         //eval += safeMobilityTrapsHanging();
         
