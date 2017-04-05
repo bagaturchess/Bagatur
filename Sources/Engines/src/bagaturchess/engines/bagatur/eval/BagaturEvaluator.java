@@ -32,18 +32,6 @@ import bagaturchess.search.impl.evalcache.IEvalEntry;
 public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	
 	
-	private static final boolean USE_CACHE = true;
-	private static final boolean USE_LAZY = true;
-	
-	
-	private static double INT_MIN = 25;
-	private static double INT1 = INT_MIN;
-	private static double INT2 = INT_MIN;
-	private static double INT3 = INT_MIN;
-	private static double INT4 = INT_MIN;
-	private static double INT_DEVIDE_FACTOR = 1;
-	
-	
 	private IBitBoard bitboard;	
 	
 	private PiecesList w_knights;
@@ -61,8 +49,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	
 	private IMaterialFactor interpolator;
 	private IBaseEval baseEval;
-	
-	private IEvalCache evalCache;
 	
 	private EvalInfo evalInfo;
 	
@@ -93,8 +79,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		
 		interpolator = _bitboard.getMaterialFactor();
 		baseEval = _bitboard.getBaseEvaluation();
-		
-		evalCache = _evalCache;
 		
 		evalInfo = new EvalInfo(bitboard);
 
