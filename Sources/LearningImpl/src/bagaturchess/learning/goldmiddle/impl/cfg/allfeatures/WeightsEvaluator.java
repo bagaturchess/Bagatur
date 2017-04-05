@@ -32,9 +32,6 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     }
     
     
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase1()
-	 */
 	@Override
 	protected double phase1() {
 		
