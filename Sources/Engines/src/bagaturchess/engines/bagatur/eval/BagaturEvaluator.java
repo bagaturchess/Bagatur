@@ -101,6 +101,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		eval_material_nopawnsdrawrule();
 		eval_trading();
 		eval_standard();
+		eval_PST();
 		evalInfo.eval_Material_o *= WEIGHT_MATERIAL_O;
 		evalInfo.eval_Material_e *= WEIGHT_MATERIAL_E;
 		evalInfo.eval_Standard_o *= WEIGHT_STANDARD_O;
@@ -144,6 +145,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 												evalInfo.eval_PawnsPassedKing_e +
 												evalInfo.eval_PawnsUnstoppable_e);
 		
+		//TODO: move evalinfo clear method here
 		
 		initEvalInfo1();
 		eval_pawns_RooksAndQueens();
@@ -246,161 +248,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	}
 	
 	
-	public void beforeSearch() {
-		//INT1 = Math.max(INT_MIN, INT1 / 2);
-		//INT2 = Math.max(INT_MIN, INT2 / 2);
-		//INT3 = Math.max(INT_MIN, INT3 / 2);
-		//INT4 = Math.max(INT_MIN, INT4 / 2);
-	}
-	
-	
-	public int getMaterialQueen() {
-		return 50 + baseEval.getMaterialQueen();
-	}
-	
-	
-    /** When ahead trade pieces and pawns, don't do it otherwise */
-    private void eval_trading() {
-    	
-    	if (true) {
-    		return;
-    	}
-    	
-    	//Calculates rates difference of both pawns material and total material for the white and black player. The numbers are of type double in [0, 1]
-        double w_material_rate = Math.min(1, bitboard.getMaterialFactor().getWhiteFactor() / (double) (BaseEvalWeights.getMaxMaterialFactor() / (double) 2));
-        double b_material_rate = Math.min(1, bitboard.getMaterialFactor().getBlackFactor() / (double) (BaseEvalWeights.getMaxMaterialFactor() / (double) 2));
-        //double diff_material_rate = w_material_rate - b_material_rate;
-        
-        //double w_pawns_rate = w_pawns.getDataSize() / (double) 8;
-        //double b_pawns_rate = b_pawns.getDataSize() / (double) 8;
-        //double diff_pawns_rate = w_pawns_rate - b_pawns_rate;
-    	
-        
-        /*Openning*/
-        
-        //Calculates material difference of both pawns material and total material for the white and black player. The numbers are real evaluations of type integer.
-        final int w_material_all_o = baseEval.getWhiteMaterialPawns_o() + baseEval.getWhiteMaterialNonPawns_o();
-        final int b_material_all_o = baseEval.getBlackMaterialPawns_o() + baseEval.getBlackMaterialNonPawns_o();
-        //final int w_material_pawns_o = w_material_all_o - baseEval.getWhiteMaterialNonPawns_o();
-        //final int b_material_pawns_o = b_material_all_o - baseEval.getBlackMaterialNonPawns_o();
-        double diff_material_all_o = w_material_all_o - b_material_all_o;
-        //double diff_material_pawns_o = w_material_pawns_o - b_material_pawns_o;
-        
-        
-        //Calculates the trading bonus or penalty
-        int eval_trading_all_o = (int) ( 0.125 * -diff_material_all_o * ( w_material_rate + b_material_rate) );
-        //int eval_trading_pawns_o = (int) ( 0.333 * diff_material_pawns_o * ( w_material_rate + b_material_rate - 2 ) );
-        
-		evalInfo.eval_Material_o += eval_trading_all_o;
-		//evalInfo.eval_Material_o += eval_trading_pawns_o;
-		
-		
-		/*Endgame*/
-		
-		
-        //Calculates material difference of both pawns material and total material for the white and black player. The numbers are real evaluations of type integer.
-        final int w_material_all_e = baseEval.getWhiteMaterialPawns_e() + baseEval.getWhiteMaterialNonPawns_e();
-        final int b_material_all_e = baseEval.getBlackMaterialPawns_e() + baseEval.getBlackMaterialNonPawns_e();
-        //final int w_material_pawns_e = w_material_all_e - baseEval.getWhiteMaterialNonPawns_e();
-        //final int b_material_pawns_e = b_material_all_e - baseEval.getBlackMaterialNonPawns_e();
-        double diff_material_all_e = w_material_all_e - b_material_all_e;
-        //double diff_material_pawns_e = w_material_pawns_e - b_material_pawns_e;
-        
-        
-        //Calculates the trading bonus or penalty
-        int eval_trading_all_e = (int) ( 0.125 * -diff_material_all_e * ( w_material_rate + b_material_rate) );
-        //int eval_trading_pawns_e = (int) ( 0.333 * diff_material_pawns_e * ( w_material_rate + b_material_rate - 2 ) );
-        
-		evalInfo.eval_Material_e += eval_trading_all_e;
-		//evalInfo.eval_Material_e += eval_trading_pawns_e;
-        
-		
-		/*
-        final int wM = pos.getwMtrl();
-        final int bM = pos.getbMtrl();
-        final int wPawn = pos.getwMtrlPawns();
-        final int bPawn = pos.getbMtrlPawns();
-        final int deltaScore = wM - bM;
-
-        int pBonus = 0;
-        pBonus += interpolate((deltaScore > 0) ? wPawn : bPawn, 0, -30 * deltaScore / 100, 6 * pV, 0);
-        pBonus += interpolate((deltaScore > 0) ? bM : wM, 0, 30 * deltaScore / 100, qV + 2 * rV + 2 * bV + 2 * nV, 0);
-
-        return pBonus;
-        */
-    }
-    
-    
-	/*public int eval_material() {
-		
-		int eval_o = 0;
-		int eval_e = 0;
-		
-		int MATERIAL_KNIGHT_E_W_fixed = MATERIAL_KNIGHT_E;
-		int MATERIAL_BISHOP_E_W_fixed = MATERIAL_BISHOP_E;
-		int MATERIAL_KNIGHT_E_B_fixed = MATERIAL_KNIGHT_E;
-		int MATERIAL_BISHOP_E_B_fixed = MATERIAL_BISHOP_E;
-		if (w_pawns.getDataSize() == 0) {//No white pawns
-			if (w_queens.getDataSize() == 0 && w_rooks.getDataSize() == 0) {
-				if (w_bishops.getDataSize() == 0) {
-					MATERIAL_KNIGHT_E_W_fixed = (int) (evalConfig.get_WEIGHT_MATERIAL_PAWNS_E() * (MATERIAL_PAWN_E / 2));
-				}
-				if (w_knights.getDataSize() == 0 && w_bishops.getDataSize() == 1) {
-					MATERIAL_BISHOP_E_W_fixed = (int) (evalConfig.get_WEIGHT_MATERIAL_PAWNS_E() * (MATERIAL_PAWN_E / 2));
-				}
-			}
-		}
-		if (b_pawns.getDataSize() == 0) {//No black pawns
-			if (b_queens.getDataSize() == 0 && b_rooks.getDataSize() == 0) {
-				if (b_bishops.getDataSize() == 0) {
-					MATERIAL_KNIGHT_E_B_fixed = (int) (evalConfig.get_WEIGHT_MATERIAL_PAWNS_E() * (MATERIAL_PAWN_E / 2));
-				}
-				if (b_knights.getDataSize() == 0 && b_bishops.getDataSize() == 1) {
-					MATERIAL_BISHOP_E_B_fixed =(int) (evalConfig.get_WEIGHT_MATERIAL_PAWNS_E() * (MATERIAL_PAWN_E / 2));
-				}
-			}
-		}
-		
-		int pawns = w_pawns.getDataSize() - b_pawns.getDataSize();
-		eval_o += MATERIAL_PAWN_O * pawns * evalConfig.get_WEIGHT_MATERIAL_PAWNS_O();
-		eval_e += MATERIAL_PAWN_E * pawns * evalConfig.get_WEIGHT_MATERIAL_PAWNS_E();
-		
-		eval_o += MATERIAL_KNIGHT_O * (w_knights.getDataSize() % 2)
-					- MATERIAL_KNIGHT_O * (b_knights.getDataSize() % 2);
-		eval_e += MATERIAL_KNIGHT_E_W_fixed * (w_knights.getDataSize() % 2)
-					- MATERIAL_KNIGHT_E_B_fixed * (b_knights.getDataSize() % 2);
-		
-		eval_o += MATERIAL_BISHOP_O * (w_bishops.getDataSize() % 2)
-					- MATERIAL_BISHOP_O * (b_bishops.getDataSize() % 2);
-		eval_e += MATERIAL_BISHOP_E_W_fixed * (w_bishops.getDataSize() % 2)
-					- MATERIAL_BISHOP_E_B_fixed * (b_bishops.getDataSize() % 2);
-		
-		int rooks = (w_rooks.getDataSize() % 2) - (b_rooks.getDataSize() % 2);
-		eval_o += MATERIAL_ROOK_O * rooks;
-		eval_e += MATERIAL_ROOK_E * rooks;
-		int queens = w_queens.getDataSize() - b_queens.getDataSize();
-		eval_o += MATERIAL_QUEEN_O * queens;
-		eval_e += MATERIAL_QUEEN_E * queens;
-		
-		//TODO: Fix material if there are only two knights
-		int dknights = (w_knights.getDataSize() / 2) - (b_knights.getDataSize() / 2);
-		eval_o += MATERIAL_DOUBLE_KNIGHT_O * dknights;
-		eval_e += MATERIAL_DOUBLE_KNIGHT_E * dknights;
-		int dbishops = (w_bishops.getDataSize() / 2) - (b_bishops.getDataSize() / 2);
-		eval_o += MATERIAL_DOUBLE_BISHOP_O * dbishops;
-		eval_e += MATERIAL_DOUBLE_BISHOP_E * dbishops;
-		int drooks = (w_rooks.getDataSize() / 2) - (b_rooks.getDataSize() / 2);
-		eval_o += MATERIAL_DOUBLE_ROOK_O * drooks;
-		eval_e += MATERIAL_DOUBLE_ROOK_E * drooks;
-		
-		evalInfo.eval_Material_o += eval_o;
-		evalInfo.eval_Material_e += eval_e;
-		
-		return interpolator.interpolateByFactor(eval_o, eval_e);
-
-	}*/
-	
-	
 	public int eval_material_nopawnsdrawrule() {
 		
 		int w_eval_nopawns_o = baseEval.getWhiteMaterialNonPawns_o();
@@ -412,31 +259,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		int w_eval_pawns_e = baseEval.getWhiteMaterialPawns_e();
 		int b_eval_pawns_o = baseEval.getBlackMaterialPawns_o();
 		int b_eval_pawns_e = baseEval.getBlackMaterialPawns_e();
-		
-		/*w_eval_pawns_o += MATERIAL_PAWN_O * w_pawns.getDataSize() * evalConfig.get_WEIGHT_MATERIAL_PAWNS_O();
-		w_eval_pawns_e += MATERIAL_PAWN_E * w_pawns.getDataSize() * evalConfig.get_WEIGHT_MATERIAL_PAWNS_E();
-		b_eval_pawns_o += MATERIAL_PAWN_O * b_pawns.getDataSize() * evalConfig.get_WEIGHT_MATERIAL_PAWNS_O();
-		b_eval_pawns_e += MATERIAL_PAWN_E * b_pawns.getDataSize() * evalConfig.get_WEIGHT_MATERIAL_PAWNS_E();
-		
-		w_eval_nopawns_o += MATERIAL_KNIGHT_O * (w_knights.getDataSize() % 2) + MATERIAL_DOUBLE_KNIGHT_O * (w_knights.getDataSize() / 2);
-		w_eval_nopawns_e += MATERIAL_KNIGHT_E * (w_knights.getDataSize() % 2) + MATERIAL_DOUBLE_KNIGHT_E * (w_knights.getDataSize() / 2);
-		b_eval_nopawns_o += MATERIAL_KNIGHT_O * (b_knights.getDataSize() % 2) + MATERIAL_DOUBLE_KNIGHT_O * (b_knights.getDataSize() / 2);
-		b_eval_nopawns_e += MATERIAL_KNIGHT_E * (b_knights.getDataSize() % 2) + MATERIAL_DOUBLE_KNIGHT_E * (b_knights.getDataSize() / 2);
-		
-		w_eval_nopawns_o += MATERIAL_BISHOP_O * (w_bishops.getDataSize() % 2) + MATERIAL_DOUBLE_BISHOP_O * (w_bishops.getDataSize() / 2);
-		w_eval_nopawns_e += MATERIAL_BISHOP_E * (w_bishops.getDataSize() % 2) + MATERIAL_DOUBLE_BISHOP_E * (w_bishops.getDataSize() / 2);
-		b_eval_nopawns_o += MATERIAL_BISHOP_O * (b_bishops.getDataSize() % 2) + MATERIAL_DOUBLE_BISHOP_O * (b_bishops.getDataSize() / 2);
-		b_eval_nopawns_e += MATERIAL_BISHOP_E * (b_bishops.getDataSize() % 2) + MATERIAL_DOUBLE_BISHOP_E * (b_bishops.getDataSize() / 2);
-		
-		w_eval_nopawns_o += MATERIAL_ROOK_O * (w_rooks.getDataSize() % 2) + MATERIAL_DOUBLE_ROOK_O * (w_rooks.getDataSize() / 2);
-		w_eval_nopawns_e += MATERIAL_ROOK_E * (w_rooks.getDataSize() % 2) + MATERIAL_DOUBLE_ROOK_E * (w_rooks.getDataSize() / 2);
-		b_eval_nopawns_o += MATERIAL_ROOK_O * (b_rooks.getDataSize() % 2) + MATERIAL_DOUBLE_ROOK_O * (b_rooks.getDataSize() / 2);
-		b_eval_nopawns_e += MATERIAL_ROOK_E * (b_rooks.getDataSize() % 2) + MATERIAL_DOUBLE_ROOK_E * (b_rooks.getDataSize() / 2);
-		
-		w_eval_nopawns_o += MATERIAL_QUEEN_O * w_queens.getDataSize();
-		w_eval_nopawns_e += MATERIAL_QUEEN_E * w_queens.getDataSize();
-		b_eval_nopawns_o += MATERIAL_QUEEN_O * b_queens.getDataSize();
-		b_eval_nopawns_e += MATERIAL_QUEEN_E * b_queens.getDataSize();*/
 		
 		if (w_pawns.getDataSize() == 0) {
 			
@@ -451,20 +273,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			if (w_eval_nopawns_e < baseEval.getMaterial_BARIER_NOPAWNS_E()) {
 				w_eval_nopawns_e = w_eval_nopawns_e / 2;
 			}
-			
-			/*
-			if (w_eval_nopawns_o > b_eval_nopawns_o) {
-				if (w_eval_nopawns_o < b_eval_nopawns_o + baseEval.getMaterial_BARIER_NOPAWNS_O()) {
-					w_eval_nopawns_o = w_eval_nopawns_o / 2;//b_eval_nopawns_o;
-				}
-			}
-			
-			if (w_eval_nopawns_e > b_eval_nopawns_e) {
-				if (w_eval_nopawns_e < b_eval_nopawns_e + baseEval.getMaterial_BARIER_NOPAWNS_E()) {
-					w_eval_nopawns_e = w_eval_nopawns_e / 2;//b_eval_nopawns_e;
-				}
-			}
-			*/
 		}
 		
 		if (b_pawns.getDataSize() == 0) {
@@ -480,20 +288,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			if (b_eval_nopawns_e < baseEval.getMaterial_BARIER_NOPAWNS_E()) {
 				b_eval_nopawns_e = b_eval_nopawns_e / 2;
 			}
-			
-			/*
-			if (b_eval_nopawns_o > w_eval_nopawns_o) {
-				if (b_eval_nopawns_o < w_eval_nopawns_o + baseEval.getMaterial_BARIER_NOPAWNS_O()) {
-					b_eval_nopawns_o = b_eval_nopawns_o / 2;//w_eval_nopawns_o;
-				}
-			}
-			
-			if (b_eval_nopawns_e > w_eval_nopawns_e) {
-				if (b_eval_nopawns_e < w_eval_nopawns_e + baseEval.getMaterial_BARIER_NOPAWNS_E()) {
-					b_eval_nopawns_e = b_eval_nopawns_e / 2;//w_eval_nopawns_e;
-				}
-			}
-			*/
 		}
 		
 		
@@ -516,6 +310,13 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		return interpolator.interpolateByFactor(evalInfo.eval_Material_o, evalInfo.eval_Material_e);
 
 	}
+	
+	
+	private void eval_PST() {
+		evalInfo.eval_PST_o += baseEval.getPST_o();
+		evalInfo.eval_PST_e += baseEval.getPST_e();
+	}
+	
 	
 	public void eval_standard() {
 		int eval_o = 0;
@@ -579,10 +380,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			eval_o += STANDARD_DIST_QUEENS_O[queensDistance];
 			eval_e += STANDARD_DIST_QUEENS_E[queensDistance];
 		}
-		
-		
-		evalInfo.eval_PST_o += baseEval.getPST_o();
-		evalInfo.eval_PST_e += baseEval.getPST_e();
 
 		evalInfo.eval_Standard_o += eval_o;
 		evalInfo.eval_Standard_e += eval_e;
