@@ -50,7 +50,6 @@ import bagaturchess.bitboard.impl.attacks.SEE;
 import bagaturchess.bitboard.impl.attacks.control.AttackListener_Mobility;
 import bagaturchess.bitboard.impl.attacks.control.FieldsStateMachine;
 import bagaturchess.bitboard.impl.attacks.fast.FastPlayersAttacks;
-import bagaturchess.bitboard.impl.cfg.BoardConfigImpl;
 import bagaturchess.bitboard.impl.datastructs.StackLongInt;
 import bagaturchess.bitboard.impl.datastructs.numbers.IndexNumberMap;
 import bagaturchess.bitboard.impl.datastructs.numbers.IndexNumberSet;
@@ -89,6 +88,7 @@ import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl.state.PiecesLists;
 import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
 //import bagaturchess.bitboard.datastructs.lrmmap.DataObjectFactory;
+import bagaturchess.bitboard.run.BoardConfigImpl;
 
 
 public class Board extends Fields implements IBitBoard, Cloneable {
