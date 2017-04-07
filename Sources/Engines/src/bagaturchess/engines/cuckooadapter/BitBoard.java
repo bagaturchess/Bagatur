@@ -98,16 +98,16 @@ public class BitBoard {
             int y = getY(sq);
             m = 0;
             for (int y2 = y+1; y2 < 8; y2++) {
-                if (x > 0) m |= 1L << Position.getSquare(x-1, y2);
-                           m |= 1L << Position.getSquare(x  , y2);
-                if (x < 7) m |= 1L << Position.getSquare(x+1, y2);
+                if (x > 0) m |= 1L << getSquare(x-1, y2);
+                           m |= 1L << getSquare(x  , y2);
+                if (x < 7) m |= 1L << getSquare(x+1, y2);
             }
             wPawnBlockerMask[sq] = m;
             m = 0;
             for (int y2 = y-1; y2 >= 0; y2--) {
-                if (x > 0) m |= 1L << Position.getSquare(x-1, y2);
-                           m |= 1L << Position.getSquare(x  , y2);
-                if (x < 7) m |= 1L << Position.getSquare(x+1, y2);
+                if (x > 0) m |= 1L << getSquare(x-1, y2);
+                           m |= 1L << getSquare(x  , y2);
+                if (x < 7) m |= 1L << getSquare(x+1, y2);
             }
             bPawnBlockerMask[sq] = m;
         }
@@ -221,7 +221,7 @@ public class BitBoard {
             if (dy != 0) {
                 y += dy; if ((y < lo) || (y > hi)) break;
             }
-            int sq = Position.getSquare(x, y);
+            int sq = getSquare(x, y);
             mask |= 1L << sq;
             if ((occupied & (1L << sq)) != 0)
                 break;
@@ -305,7 +305,7 @@ public class BitBoard {
                         x += dx; y += dy;
                         if ((x < 0) || (x > 7) || (y < 0) || (y > 7))
                             break;
-                        int sq2 = Position.getSquare(x, y);
+                        int sq2 = getSquare(x, y);
                         squaresBetween[sq1][sq2] = m;
                         m |= 1L << sq2;
                     }
@@ -332,6 +332,12 @@ public class BitBoard {
         0,   7,   0,   0,   0,   0,   0,   0,   8,   0,   0,   0,   0,   0,   0,   9
     };
 
+    
+    /** Return index in squares[] evals corresponding to (x,y). */
+    public final static int getSquare(int x, int y) {
+        return y * 8 + x;
+    }
+    
     static public final int getDirection(int from, int to) {
         int offs = to + (to|7) - from - (from|7) + 0x77;
         return dirTable[offs];
