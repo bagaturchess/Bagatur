@@ -395,12 +395,6 @@ public abstract class Board4 extends Fields implements IBoard, Cloneable {
 		return false;
 	}
 	
-
-	@Override
-	public boolean hasUnstoppablePasser() {
-		return hasUnstoppablePasser(getColourToMove());
-	}
-	
 	
 	private boolean hasUnstoppablePasser(int colourToMove) {
 		

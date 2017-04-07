@@ -26,32 +26,11 @@ package bagaturchess.bitboard.api;
 public interface IBitBoard extends IBoard {
 	
 	
-	public void mark();
-	public void reset();
-	public void revert();
-	
-	public void setPawnsCache(PawnsEvalCache pawnsCache);
-	
 	/**
 	 * Base engine's methods  
 	 */
 	public int genAllMoves_ByFigureID(int fieldID, long excludedToFields, final IInternalMoveList list);
-	public int genAllMoves(final IInternalMoveList list, long excludedToFieldsBoard);
-	public int genKingEscapes(final IInternalMoveList list);
 	
-	public int getCastlingType(int colour);
-	public boolean hasRightsToKingCastle(int colour);
-	public boolean hasRightsToQueenCastle(int colour);
-	
-	public boolean hasMoveInNonCheck();
-	public boolean hasMoveInCheck();
-	public boolean hasSingleMove();
-	
-	public boolean isInCheck();
-	public boolean isInCheck(int colour);
-	public boolean isCheckMove(int move);
-	
-	public boolean isPossible(int move);
 	
 	/**
 	 * Game related methods
@@ -64,8 +43,6 @@ public interface IBitBoard extends IBoard {
 	/**
 	 * Birboards
 	 */
-	public long getFreeBitboard();
-	
 	public boolean getAttacksSupport();
 	public boolean getFieldsStateSupport();
 	public void setAttacksSupport(boolean attacksSupport, boolean fieldsStateSupport);
