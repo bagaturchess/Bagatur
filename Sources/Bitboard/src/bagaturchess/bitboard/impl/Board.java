@@ -1074,7 +1074,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		int pid = MoveInt.getFigurePID(move);
 		int figureColour = MoveInt.getColour(move);
 		int figureType = MoveInt.getFigureType(move);
-		int dirID = MoveInt.getDir(move);
 		int fromFieldID = MoveInt.getFromFieldID(move);
 		int toFieldID = MoveInt.getToFieldID(move);
 		
@@ -1542,11 +1541,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		final int toFieldID = MoveInt.getToFieldID(move);
 		final long fromBoard = Fields.ALL_ORDERED_A1H1[fromFieldID];
 		final long toBoard = Fields.ALL_ORDERED_A1H1[toFieldID];
-
-		
-		long affectedFields = 0L;
-		affectedFields |= fromBoard;
-		affectedFields |= toBoard;
 		
 		
 		//stateManager.decreaseCounter(figureID);
@@ -1647,8 +1641,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 				int capturedFieldID = MoveInt.getEnpassantCapturedFieldID(move);
 				long opponentPawnBitboard = Fields.ALL_ORDERED_A1H1[capturedFieldID];
 				
-				affectedFields |= opponentPawnBitboard;
-				
 				board[capturedFieldID] = capturedPID;
 				
 				capturedTypeBitboard |= opponentPawnBitboard;
@@ -1681,9 +1673,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 			int toCastleFieldID = MoveInt.getCastlingRookToID(move);
 			long fromCastleBoard = Fields.ALL_ORDERED_A1H1[fromCastleFieldID];
 			long toCastleBoard = Fields.ALL_ORDERED_A1H1[toCastleFieldID];
-			
-			affectedFields |= fromCastleBoard;
-			affectedFields |= toCastleBoard;
 			
 			//stateManager.decreaseCounter(castleID);
 			
@@ -3488,7 +3477,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 					}
 					break;
 				case Figures.TYPE_PAWN:
-					BackupInfo curEnpassInfo = backupInfo[playedMovesCount];
 					if (colour == Figures.COLOUR_WHITE) {
 						count += WhitePawnMovesGen.genNonCaptureMoves(excludedToFieldsBoard,  true, pid,
 								fieldID,
@@ -4328,7 +4316,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 			for (int i=0; i<size; i++) {
 				
 				int fieldID = data[i];
-				long figureBitboard = Fields.ALL_ORDERED_A1H1[fieldID];
 				
 				if (colour == Figures.COLOUR_WHITE) {
 					long excludedToFieldsIDs = 0L;
@@ -5501,7 +5488,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		clone.allByColourAndType = Utils.copy(allByColourAndType);
 		clone.board = Utils.copy(board);
 		//clone.stateManager = stateManager.clone();
-		//TODO: clone.hasEnpassant = hasEnpassant;
 		//clone.possibleQueenCastleSideByColour = Utils.copy(possibleQueenCastleSideByColour);
 		//clone.possibleKingCastleSideByColour = Utils.copy(possibleKingCastleSideByColour);
 		clone.lastMoveColour = lastMoveColour;
@@ -5603,9 +5589,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	}
 
 	private String matrixToString() {
-		char[] columnsLetters = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
-		StringBuffer loStringBuffer = new StringBuffer(400);
-		
 		
 		String result = "";
 		
