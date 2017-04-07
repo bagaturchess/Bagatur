@@ -22,7 +22,6 @@
  */
 package bagaturchess.bitboard.tests.pawnstructure;
 
-import junit.framework.TestCase;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.Fields;

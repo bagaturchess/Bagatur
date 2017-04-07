@@ -35,40 +35,40 @@ public class RunAll {
 	static {
 		
 		testcases.add(Passers1.class.getName());
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.passers.Passers2");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.passers.Passers3");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.passers.Passers4");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.passers.Passers5");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.passers.Passers51");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.passers.Passers6");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.passers.Passers7");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.passers.Passers8");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.passers.Passers2");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.passers.Passers3");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.passers.Passers4");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.passers.Passers5");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.passers.Passers51");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.passers.Passers6");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.passers.Passers7");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.passers.Passers8");
 		
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.guards.Guards1");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.guards.Guards2");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.guards.Guards3");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.guards.Guards1");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.guards.Guards2");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.guards.Guards3");
 		
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.storms.Storms1");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.storms.Storms1");
 		
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.doubled.Doubled1");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.doubled.Doubled2");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.doubled.Doubled1");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.doubled.Doubled2");
 		
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.backward.Backward1");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.backward.Backward1");
 		
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.isolated.Isolated1");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.isolated.Isolated1");
 		
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.supported.Supported1");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.supported.Supported1");
 		
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.supported_cannotbe.CannotBeSupported1");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.supported_cannotbe.CannotBeSupported2");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.supported_cannotbe.CannotBeSupported1");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.supported_cannotbe.CannotBeSupported2");
 		
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.islands.Islands1");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.islands.Islands2");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.islands.Islands3");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.islands.Islands1");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.islands.Islands2");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.islands.Islands3");
 		
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.weakfields.Weak1");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.weakfields.Weak2");
-		testcases.add("game.chess.engine.bitboard.eval.pawns.model.tests.weakfields.Weak3");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.weakfields.Weak1");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.weakfields.Weak2");
+		testcases.add("bagaturchess.bitboard.tests.pawnstructure.weakfields.Weak3");
 	}
 	
 	public static void main(String[] args) {
