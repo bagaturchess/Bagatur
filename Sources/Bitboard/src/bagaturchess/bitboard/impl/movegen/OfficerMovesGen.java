@@ -268,7 +268,7 @@ public class OfficerMovesGen extends OfficerChecks {
 		return count;
 	}
 	
-	public static final boolean isPossible(int move,
+	public static final boolean isPossible(final int move,
 			final int[] figuresIDsPerFieldsIDs,
 			final long free) {
 		

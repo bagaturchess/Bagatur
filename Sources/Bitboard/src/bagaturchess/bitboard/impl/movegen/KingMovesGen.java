@@ -44,8 +44,8 @@ public class KingMovesGen extends KingPlies {
 	static final long[][][] dirsBitBoards = ALL_KING_DIRS_WITH_BITBOARDS;
 
 	
-	public static final int genAllMoves(boolean checkAware,
-			Board bitboard,
+	public static final int genAllMoves(final boolean checkAware,
+			final Board bitboard,
 			final long excludedToFieldsIDs,
 			final int figureID, final int figureColour, final int opponentColour,
 			final long fromBitboard,
@@ -54,10 +54,10 @@ public class KingMovesGen extends KingPlies {
 			final long allMineBitboard,
 			final long allOpponentBitboard,
 			final int[] figuresIDsPerFieldsIDs,
-			boolean kingSidePossible,
-			boolean queenSidePossible,
-			long opponentKing,
-			int opponentKingFieldID,
+			final boolean kingSidePossible,
+			final boolean queenSidePossible,
+			final long opponentKing,
+			final int opponentKingFieldID,
 			final IInternalMoveList list,
 			final int maxCount) {
 		
@@ -138,7 +138,7 @@ public class KingMovesGen extends KingPlies {
 		return count;
 	}
 	
-	public static final int genCaptureMoves(Board bitboard,
+	public static final int genCaptureMoves(final Board bitboard,
 			final long excludedToFieldsIDs,
 			final int figureID, final int figureColour, final int opponentColour,
 			final long fromBitboard,
@@ -147,8 +147,8 @@ public class KingMovesGen extends KingPlies {
 			final long allMineBitboard,
 			final long allOpponentBitboard,
 			final int[] figuresIDsPerFieldsIDs,
-			long opponentKing,
-			int opponentKingFieldID,
+			final long opponentKing,
+			final int opponentKingFieldID,
 			final IInternalMoveList list,
 			final int maxCount) {
 		
@@ -197,7 +197,7 @@ public class KingMovesGen extends KingPlies {
 		return count;
 	}
 	
-	public static final int genNonCaptureMoves(Board bitboard,
+	public static final int genNonCaptureMoves(final Board bitboard,
 			final long excludedToFieldsIDs,
 			final int figureID, final int figureColour, final int opponentColour,
 			final long fromBitboard,
@@ -205,10 +205,10 @@ public class KingMovesGen extends KingPlies {
 			final long freeBitboard,
 			final long allMineBitboard,
 			final long allOpponentBitboard,
-			boolean kingSidePossible,
-			boolean queenSidePossible,
-			long opponentKing,
-			int opponentKingFieldID,
+			final boolean kingSidePossible,
+			final boolean queenSidePossible,
+			final long opponentKing,
+			final int opponentKingFieldID,
 			final IInternalMoveList list,
 			final int maxCount) {
 		
@@ -282,9 +282,9 @@ public class KingMovesGen extends KingPlies {
 		return count;
 	}
 	
-	public static final int genCastleSides(int figureColour,
-			boolean kingSidePossible,
-			boolean queenSidePossible,
+	public static final int genCastleSides(final int figureColour,
+			final boolean kingSidePossible,
+			final boolean queenSidePossible,
 			final IInternalMoveList list,
 			final int maxCount) {
 		int count = 0;
@@ -320,13 +320,13 @@ public class KingMovesGen extends KingPlies {
 		return count;
 	}
 	
-	public static final boolean isPossible(Board board, int move,
+	public static final boolean isPossible(final Board board, final int move,
 			final int[] figuresIDsPerFieldsIDs,
-			boolean kingSidePossible,
-			boolean queenSidePossible,
-			long opponentKing,
-			int opponentKingFieldID,
-			long free
+			final boolean kingSidePossible,
+			final boolean queenSidePossible,
+			final long opponentKing,
+			final int opponentKingFieldID,
+			final long free
 			/*final boolean hasEnpassant,
 			final int enpassantColour,
 			final long enpassantPawnBitboard*/) {

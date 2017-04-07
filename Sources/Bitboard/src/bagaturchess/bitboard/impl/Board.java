@@ -2678,7 +2678,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}
 	}
 	
-	public final int genAllMoves(final IInternalMoveList list, boolean checkKeepersAware) {
+	public final int genAllMoves(final IInternalMoveList list, final boolean checkKeepersAware) {
 		return genAllMoves(0L, false, getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
 	}
 	
@@ -2686,11 +2686,11 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return genAllMoves(0L, true, getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
 	}
 	
-	public final int genAllMoves(final IInternalMoveList list, long excludedToFieldsBoard) {
+	public final int genAllMoves(final IInternalMoveList list, final long excludedToFieldsBoard) {
 		return genAllMoves(excludedToFieldsBoard, true, getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
 	}
 	
-	protected final int genAllMoves(long excludedToFieldsBoard, boolean checkKeepersAware, int colour, final IInternalMoveList list, final int maxCount) {
+	protected final int genAllMoves(final long excludedToFieldsBoard, final boolean checkKeepersAware, final int colour, final IInternalMoveList list, final int maxCount) {
 		if (Properties.STATISTICS_MODE) {
 			statistics.allMoves.start();
 		}
@@ -2824,9 +2824,9 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return count;
 	}
 	
-	private final int genAllMoves_FiguresWithSameType(long excludedToFieldsBoard_init,
+	private final int genAllMoves_FiguresWithSameType(final long excludedToFieldsBoard_init,
 			final boolean interuptAtFirstExclusionHit,
-			boolean checkKeepersAware,
+			final boolean checkKeepersAware,
 			final int colour, final int opponentColour, final int type,
 			final IInternalMoveList list, final int maxCount) {
 		
@@ -2875,9 +2875,9 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 				
 	}
 	
-	private final int genAllMoves_ByFigureID(int fieldID, int pid, long excludedToFieldsBoard_init,
-			boolean interuptAtFirstExclusionHit,
-			boolean checkKeepersAware,
+	private final int genAllMoves_ByFigureID(final int fieldID,final int pid, final long excludedToFieldsBoard_init,
+			final boolean interuptAtFirstExclusionHit,
+			final boolean checkKeepersAware,
 			final int colour, final int opponentColour, final int type,
 			final IInternalMoveList list, final int maxCount) {
 		

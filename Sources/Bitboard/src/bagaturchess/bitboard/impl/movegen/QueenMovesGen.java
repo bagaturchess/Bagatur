@@ -145,7 +145,7 @@ public class QueenMovesGen extends QueenUniqueChecks {
 		return count;
 	}
 	
-	public static final boolean isPossible(int move,
+	public static final boolean isPossible(final int move,
 			final int[] figuresIDsPerFieldsIDs,
 			final long free) {
 		
@@ -207,7 +207,7 @@ public class QueenMovesGen extends QueenUniqueChecks {
 		
 		int[] fields =  CHECK_MIDDLE_FIELDS_IDS[fromFieldID][opponentKingFieldID];
 		int[] dirs = CHECK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
-		int[] dirTypes = CHECK_MIDDLE_FIELDS_DIR_TYPES[fromFieldID][opponentKingFieldID];
+		//int[] dirTypes = CHECK_MIDDLE_FIELDS_DIR_TYPES[fromFieldID][opponentKingFieldID];
 		int[] seqs = CHECK_MIDDLE_FIELDS_SEQS[fromFieldID][opponentKingFieldID];
 		long[] fieldBoards =  CHECK_MIDDLE_FIELDS_BITBOARDS[fromFieldID][opponentKingFieldID];
 		long[] path = FIELDS_WHOLE_PATH[fromFieldID][opponentKingFieldID];

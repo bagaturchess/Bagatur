@@ -177,7 +177,7 @@ public class KnightMovesGen extends KnightChecks {
 		return count;
 	}
 	
-	public static final boolean isPossible(int move,
+	public static final boolean isPossible(final int move,
 			final int[] figuresIDsPerFieldsIDs
 			/*final boolean hasEnpassant,
 			final int enpassantColour,

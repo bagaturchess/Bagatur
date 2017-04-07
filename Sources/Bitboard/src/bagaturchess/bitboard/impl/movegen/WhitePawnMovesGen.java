@@ -61,7 +61,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 	static final long[][][] attacksBitboards = ALL_WHITE_PAWN_ATTACKS_DIRS_WITH_BITBOARDS;
 	static final long[][][] nonattacksBitboards = ALL_WHITE_PAWN_NONATTACKS_DIRS_WITH_BITBOARDS;
 
-	public static final int genAllMoves(IBitBoard board,
+	public static final int genAllMoves(final IBitBoard board,
 			final long excludedToFieldsIDs,
 			final boolean interuptAtFirstExclusionHit,
 			final int figureID,
@@ -328,7 +328,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 		return count;
 	}
 
-	public static final int genEnpassantMove(IBitBoard board,
+	public static final int genEnpassantMove(final IBitBoard board,
 			final long excludedToFieldsIDs,
 			final int figureID,
 			final int fromFieldID,
@@ -405,7 +405,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 		return count;
 	}
 	
-	public static final int genCapturePromotionEnpassantMoves(IBitBoard board,
+	public static final int genCapturePromotionEnpassantMoves(final IBitBoard board,
 			final long excludedToFieldsIDs,
 			final boolean interuptAtFirstExclusionHit,
 			final int figureID,
@@ -723,8 +723,8 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 		return count;
 	}
 
-	public static final boolean isPossible(int move,
-			final int[] figuresIDsPerFieldsIDs, long free,
+	public static final boolean isPossible(final int move,
+			final int[] figuresIDsPerFieldsIDs, final long free,
 			final boolean hasEnpassant,
 			final long enpassantPawnBitboard) {
 		
