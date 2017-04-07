@@ -112,21 +112,12 @@ public class MTDSchedulerMain {
 								
 								"bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl",
 								"bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2"
-								//bagaturchess.engines.bagatur.eval_v15.BoardConfig_V15.class.getName(),
-								//bagaturchess.engines.bagatur.eval_v15.EvalConfig_V15.class.getName()
-								
-								//"bagaturchess.engines.bagatur.v14.EvaluationConfg13"
 								
 								//"bagaturchess.engines.learning.cfg.weights.WeightsBoardConfig",
 								//"bagaturchess.engines.learning.cfg.weights.WeightsEvaluationConfig"
-								
-								
-								//"bagaturchess.engines.bagatur.v13.DualEvaluationConfg"
-								//"bagaturchess.engines.bagatur.v13_a.EvaluationConfg13"
-								
-								//"bagaturchess.engines.bagatur.v14.BoardConfigImpl",
-								//"bagaturchess.engines.bagatur.v14.EvaluationConfg13"	
-								
+																
+								//"bagaturchess.engines.cuckooadapter.BoardConfigImpl_Cuckoo",
+								//"bagaturchess.engines.cuckooadapter.EvaluationConfg_Cuckoo"
 								}
 				);
 		
