@@ -87,40 +87,27 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase1()
-	 */
 	@Override
 	protected double phase1() {
 		int eval = 0;
 		
 		evalInfo.clear_short();
-		evalInfo.clear();
-		
 		
 		eval_material_nopawnsdrawrule();
-		eval_standard();
 		eval_PST();
 		evalInfo.eval_Material_o *= WEIGHT_MATERIAL_O;
 		evalInfo.eval_Material_e *= WEIGHT_MATERIAL_E;
-		evalInfo.eval_Standard_o *= WEIGHT_STANDARD_O;
-		evalInfo.eval_Standard_e *= WEIGHT_STANDARD_E;
 		evalInfo.eval_PST_o *= evalConfig.get_WEIGHT_PST_O();
 		evalInfo.eval_PST_e *= evalConfig.get_WEIGHT_PST_E();
 		eval += interpolator.interpolateByFactor(evalInfo.eval_Material_o +
-												evalInfo.eval_Standard_o +
 												evalInfo.eval_PST_o,
 												
 												evalInfo.eval_Material_e +
-												evalInfo.eval_Standard_e +
 												evalInfo.eval_PST_e);
 		return eval;
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase2_opening()
-	 */
 	@Override
 	protected double phase2() {
 
@@ -143,11 +130,27 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 												evalInfo.eval_PawnsPassed_e +
 												evalInfo.eval_PawnsPassedKing_e +
 												evalInfo.eval_PawnsUnstoppable_e);
+			
+		return eval;
+	}
+	
+	
+	@Override
+	protected double phase3() {
 		
-		//TODO: move evalinfo clear method here
+		int eval = 0;
+				
+		evalInfo.clear_rest();
 		
 		initEvalInfo1();
-		eval_pawns_RooksAndQueens();
+		
+		eval_standard();
+		evalInfo.eval_Standard_o *= WEIGHT_STANDARD_O;
+		evalInfo.eval_Standard_e *= WEIGHT_STANDARD_E;
+		eval += interpolator.interpolateByFactor(evalInfo.eval_Standard_o,
+												evalInfo.eval_Standard_e);
+		
+		eval_pawns_PassedStoppers_RooksAndQueens();
 		evalInfo.eval_PawnsPassedStoppers_o *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_O();
 		evalInfo.eval_PawnsPassedStoppers_e *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_E();
 		evalInfo.eval_PawnsRooksQueens_o *= WEIGHT_PAWNS_ROOKQUEEN_O;
@@ -157,16 +160,13 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 												
 												evalInfo.eval_PawnsPassedStoppers_e +
 												evalInfo.eval_PawnsRooksQueens_e);
-			
+		
 		return eval;
 	}
-
 	
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase3_opening()
-	 */
+	
 	@Override
-	protected double phase3() {
+	protected double phase4() {
 		
 		int eval = 0;
 		
@@ -178,62 +178,50 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 												
 												evalInfo.eval_Mobility_e);
 		
-		return eval;
-	}
-
-	
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase4_opening()
-	 */
-	@Override
-	protected double phase4() {
-		
-		int eval = 0;
-		
 		initEvalInfo3();
 		eval_king_safety();
 		eval_space();
 		eval_hunged();
-		
-		eval_TrapsAndSafeMobility();
-		eval_PassersFrontAttacks();
 		evalInfo.eval_Kingsafety_o *= evalConfig.get_WEIGHT_KINGSAFETY_O();
 		evalInfo.eval_Kingsafety_e *= evalConfig.get_WEIGHT_KINGSAFETY_E();
 		evalInfo.eval_Space_o *= evalConfig.get_WEIGHT_SPACE_O();
 		evalInfo.eval_Space_e *= evalConfig.get_WEIGHT_SPACE_E();
 		evalInfo.eval_Hunged_o *= evalConfig.get_WEIGHT_HUNGED_O();
 		evalInfo.eval_Hunged_e *= evalConfig.get_WEIGHT_HUNGED_E();
+		eval += interpolator.interpolateByFactor(evalInfo.eval_Kingsafety_o +
+				evalInfo.eval_Space_o +
+				evalInfo.eval_Hunged_o,
+
+				evalInfo.eval_Kingsafety_e +
+				evalInfo.eval_Space_e +
+				evalInfo.eval_Hunged_e);
+		
+		return eval;
+	}
+	
+	
+	@Override
+	protected double phase5() {
+		
+		int eval = 0;
+		
+		eval_TrapsAndSafeMobility();
+		eval_PassersFrontAttacks();
 		evalInfo.eval_Trapped_o *= evalConfig.get_WEIGHT_TRAPPED_O();
 		evalInfo.eval_Trapped_e *= evalConfig.get_WEIGHT_TRAPPED_E();
 		evalInfo.eval_Mobility_Safe_o *= evalConfig.get_WEIGHT_MOBILITY_S_O();
 		evalInfo.eval_Mobility_Safe_e *= evalConfig.get_WEIGHT_MOBILITY_S_E();
 		evalInfo.eval_PawnsPassedStoppers_a_o *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_A_O();
 		evalInfo.eval_PawnsPassedStoppers_a_e *= evalConfig.get_WEIGHT_PAWNS_PSTOPPERS_A_E();
-		eval += interpolator.interpolateByFactor(evalInfo.eval_Kingsafety_o +
-												evalInfo.eval_Space_o +
-												evalInfo.eval_Hunged_o +
-												evalInfo.eval_Trapped_o +
+		eval += interpolator.interpolateByFactor(evalInfo.eval_Trapped_o +
 												evalInfo.eval_Mobility_Safe_o +
 												evalInfo.eval_PawnsPassedStoppers_a_o,
-				
-												evalInfo.eval_Kingsafety_e +
-												evalInfo.eval_Space_e +
-												evalInfo.eval_Hunged_e +
+												
 												evalInfo.eval_Trapped_e +
 												evalInfo.eval_Mobility_Safe_e +
 												evalInfo.eval_PawnsPassedStoppers_a_e);
 		
 		return eval;
-	}
-	
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase5_opening()
-	 */
-	@Override
-	protected double phase5() {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 	
 	
@@ -445,7 +433,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		
 	}
 	
-	public void eval_pawns_RooksAndQueens() {
+	public void eval_pawns_PassedStoppers_RooksAndQueens() {
 		
 		
 		bitboard.getPawnsCache().lock();
@@ -1229,68 +1217,69 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		int eval_e = 0;
 		
 		
-		long bb_w_hunged = 0;
-		
-		//White pawns
-		long w_hunged_pawns = evalInfo.bb_w_pawns & evalInfo.bb_attackedByBlackOnly;
-		if (w_hunged_pawns != 0) {
-			bb_w_hunged |= w_hunged_pawns;
-		}
-		
-		//White minors
-		long w_hunged_minor = (evalInfo.bb_w_knights | evalInfo.bb_w_bishops) & evalInfo.bb_unsafe_for_w_minors;
-		if (w_hunged_minor != 0) {
-			bb_w_hunged |= w_hunged_minor;
-		}
-		
-		//White rooks
-		long w_hunged_rooks = evalInfo.bb_w_rooks & evalInfo.bb_unsafe_for_w_rooks;
-		if (w_hunged_rooks != 0) {
-			bb_w_hunged |= w_hunged_rooks;
-		}
-		
-		//White queens
-		long w_hunged_queens = evalInfo.bb_w_queens & evalInfo.bb_unsafe_for_w_queens;
-		if (w_hunged_queens != 0) {
-			bb_w_hunged |= w_hunged_queens;
-		}
-		
-		
-		long bb_b_hunged = 0;
-		
-		//Black pawns
-		long b_hunged_pawns = evalInfo.bb_b_pawns & evalInfo.bb_attackedByWhiteOnly;
-		if (b_hunged_pawns != 0) {
-			bb_b_hunged |= b_hunged_pawns;
-		}
-		
-		//Black minors
-		long b_hunged_minor = (evalInfo.bb_b_knights | evalInfo.bb_b_bishops) & evalInfo.bb_unsafe_for_b_minors;
-		if (b_hunged_minor != 0) {
-			bb_b_hunged |= b_hunged_minor;
-		}
-		
-		//Black rooks
-		long b_hunged_rooks = evalInfo.bb_b_rooks & evalInfo.bb_unsafe_for_b_rooks;
-		if (b_hunged_rooks != 0) {
-			bb_b_hunged |= b_hunged_rooks;
-		}
-		
-		//Black queens
-		long b_hunged_queens = evalInfo.bb_b_queens & evalInfo.bb_unsafe_for_b_queens;
-		if (b_hunged_queens != 0) {
-			bb_b_hunged |= b_hunged_queens;
-		}
-		
-		
-		int w_hungedCount = Utils.countBits_less1s(bb_w_hunged);
-		int b_hungedCount = Utils.countBits_less1s(bb_b_hunged);
-		
-		
 		if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+			
+			long bb_w_hunged = 0;
+			
+			//White pawns
+			long w_hunged_pawns = evalInfo.bb_w_pawns & evalInfo.bb_attackedByBlackOnly;
+			if (w_hunged_pawns != 0) {
+				bb_w_hunged |= w_hunged_pawns;
+			}
+			
+			//White minors
+			long w_hunged_minor = (evalInfo.bb_w_knights | evalInfo.bb_w_bishops) & evalInfo.bb_unsafe_for_w_minors;
+			if (w_hunged_minor != 0) {
+				bb_w_hunged |= w_hunged_minor;
+			}
+			
+			//White rooks
+			long w_hunged_rooks = evalInfo.bb_w_rooks & evalInfo.bb_unsafe_for_w_rooks;
+			if (w_hunged_rooks != 0) {
+				bb_w_hunged |= w_hunged_rooks;
+			}
+			
+			//White queens
+			long w_hunged_queens = evalInfo.bb_w_queens & evalInfo.bb_unsafe_for_w_queens;
+			if (w_hunged_queens != 0) {
+				bb_w_hunged |= w_hunged_queens;
+			}
+			
+			int w_hungedCount = Utils.countBits_less1s(bb_w_hunged);
+			
 			eval_o += HUNGED_O[w_hungedCount];
 			eval_e += HUNGED_E[w_hungedCount];
+			
 		} else {
+			
+			long bb_b_hunged = 0;
+			
+			//Black pawns
+			long b_hunged_pawns = evalInfo.bb_b_pawns & evalInfo.bb_attackedByWhiteOnly;
+			if (b_hunged_pawns != 0) {
+				bb_b_hunged |= b_hunged_pawns;
+			}
+			
+			//Black minors
+			long b_hunged_minor = (evalInfo.bb_b_knights | evalInfo.bb_b_bishops) & evalInfo.bb_unsafe_for_b_minors;
+			if (b_hunged_minor != 0) {
+				bb_b_hunged |= b_hunged_minor;
+			}
+			
+			//Black rooks
+			long b_hunged_rooks = evalInfo.bb_b_rooks & evalInfo.bb_unsafe_for_b_rooks;
+			if (b_hunged_rooks != 0) {
+				bb_b_hunged |= b_hunged_rooks;
+			}
+			
+			//Black queens
+			long b_hunged_queens = evalInfo.bb_b_queens & evalInfo.bb_unsafe_for_b_queens;
+			if (b_hunged_queens != 0) {
+				bb_b_hunged |= b_hunged_queens;
+			}
+			
+			int b_hungedCount = Utils.countBits_less1s(bb_b_hunged);
+			
 			eval_o -= HUNGED_O[b_hungedCount];
 			eval_e -= HUNGED_E[b_hungedCount];
 		}
@@ -1536,27 +1525,19 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	private int fianchetto() {
 		int fianchetto = 0;
 		
-		long w_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
-		long b_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
-		long w_bishops = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER);
-		long b_bishops = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER);
-		long w_king = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KING);
-		long b_king = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KING);
-
-		
 		long w_fianchetto_pawns = Fields.G3 | Fields.F2 | Fields.H2;
-		if ((w_king & Fields.G1) != 0) {
-			if ((w_bishops & Fields.G2) != 0) {
-				if ((w_pawns & w_fianchetto_pawns) == w_fianchetto_pawns) {
+		if ((evalInfo.bb_w_king & Fields.G1) != 0) {
+			if ((evalInfo.bb_w_bishops & Fields.G2) != 0) {
+				if ((evalInfo.bb_w_pawns & w_fianchetto_pawns) == w_fianchetto_pawns) {
 					fianchetto++;
 				}
 			}
 		}
 		
 		long b_fianchetto_pawns = Fields.G6 | Fields.F7 | Fields.H7;
-		if ((b_king & Fields.G8) != 0) {
-			if ((b_bishops & Fields.G7) != 0) {
-				if ((b_pawns & b_fianchetto_pawns) == b_fianchetto_pawns) {
+		if ((evalInfo.bb_b_king & Fields.G8) != 0) {
+			if ((evalInfo.bb_b_bishops & Fields.G7) != 0) {
+				if ((evalInfo.bb_b_pawns & b_fianchetto_pawns) == b_fianchetto_pawns) {
 					fianchetto--;
 				}
 			}
@@ -1570,40 +1551,32 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		int minor_trap = 0;
 		int blocked_pawns = 0;
 		
-		long w_bishops = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER);
-		long b_bishops = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER);
-		long w_knights = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT);
-		long b_knights = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT);
-		long w_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
-		long b_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
-		
-		
 		/**
 		 * trapedBishopsA7H7
 		 */
-		if (w_bishops != 0) {
-			if ((w_bishops & Fields.A7) != 0) {
-				if  ((b_pawns & Fields.B6) != 0) {
+		if (evalInfo.bb_w_bishops != 0) {
+			if ((evalInfo.bb_w_bishops & Fields.A7) != 0) {
+				if  ((evalInfo.bb_b_pawns & Fields.B6) != 0) {
 					minor_trap++;
 				}
 			}
 			
-			if ((w_bishops & Fields.H7) != 0) {
-				if  ((b_pawns & Fields.G6) != 0) {
+			if ((evalInfo.bb_w_bishops & Fields.H7) != 0) {
+				if  ((evalInfo.bb_b_pawns & Fields.G6) != 0) {
 					minor_trap++;
 				}
 			}
 		}
 		
-		if (b_bishops != 0) {
-			if ((b_bishops & Fields.A2) != 0) {
-				if  ((w_pawns & Fields.B3) != 0) {
+		if (evalInfo.bb_b_bishops != 0) {
+			if ((evalInfo.bb_b_bishops & Fields.A2) != 0) {
+				if  ((evalInfo.bb_w_pawns & Fields.B3) != 0) {
 					minor_trap--;
 				}
 			}
 			
-			if ((b_bishops & Fields.H2) != 0) {
-				if  ((w_pawns & Fields.G3) != 0) {
+			if ((evalInfo.bb_b_bishops & Fields.H2) != 0) {
+				if  ((evalInfo.bb_w_pawns & Fields.G3) != 0) {
 					minor_trap--;
 				}
 			}
@@ -1613,29 +1586,29 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		/**
 		 * trapedBishopsA6H6
 		 */
-		if (w_bishops != 0) {
-			if ((w_bishops & Fields.A6) != 0) {
-				if  ((b_pawns & Fields.B5) != 0) {
+		if (evalInfo.bb_w_bishops != 0) {
+			if ((evalInfo.bb_w_bishops & Fields.A6) != 0) {
+				if  ((evalInfo.bb_b_pawns & Fields.B5) != 0) {
 					minor_trap++;
 				}
 			}
 			
-			if ((w_bishops & Fields.H6) != 0) {
-				if  ((b_pawns & Fields.G5) != 0) {
+			if ((evalInfo.bb_w_bishops & Fields.H6) != 0) {
+				if  ((evalInfo.bb_b_pawns & Fields.G5) != 0) {
 					minor_trap++;
 				}
 			}
 		}
 		
-		if (b_bishops != 0) {
-			if ((b_bishops & Fields.A3) != 0) {
-				if  ((w_pawns & Fields.B4) != 0) {
+		if (evalInfo.bb_b_bishops != 0) {
+			if ((evalInfo.bb_b_bishops & Fields.A3) != 0) {
+				if  ((evalInfo.bb_w_pawns & Fields.B4) != 0) {
 					minor_trap--;
 				}
 			}
 			
-			if ((b_bishops & Fields.H3) != 0) {
-				if  ((w_pawns & Fields.G4) != 0) {
+			if ((evalInfo.bb_b_bishops & Fields.H3) != 0) {
+				if  ((evalInfo.bb_w_pawns & Fields.G4) != 0) {
 					minor_trap--;
 				}
 			}
@@ -1644,29 +1617,29 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		/**
 		 * trapedKnightsA1H1
 		 */
-		if (w_knights != 0) {
-			if ((w_knights & Fields.A8) != 0) {
-				if  ((b_pawns & Fields.A7) != 0) {
+		if (evalInfo.bb_w_knights != 0) {
+			if ((evalInfo.bb_w_knights & Fields.A8) != 0) {
+				if  ((evalInfo.bb_b_pawns & Fields.A7) != 0) {
 					minor_trap++;
 				}
 			}
 			
-			if ((w_knights & Fields.H8) != 0) {
-				if  ((b_pawns & Fields.H7) != 0) {
+			if ((evalInfo.bb_w_knights & Fields.H8) != 0) {
+				if  ((evalInfo.bb_b_pawns & Fields.H7) != 0) {
 					minor_trap++;
 				}
 			}
 		}
 		
-		if (b_knights != 0) {
-			if ((b_knights & Fields.A1) != 0) {
-				if  ((w_pawns & Fields.A2) != 0) {
+		if (evalInfo.bb_b_knights != 0) {
+			if ((evalInfo.bb_b_knights & Fields.A1) != 0) {
+				if  ((evalInfo.bb_w_pawns & Fields.A2) != 0) {
 					minor_trap--;
 				}
 			}
 			
-			if ((b_knights & Fields.H1) != 0) {
-				if  ((w_pawns & Fields.H2) != 0) {
+			if ((evalInfo.bb_b_knights & Fields.H1) != 0) {
+				if  ((evalInfo.bb_w_pawns & Fields.H2) != 0) {
 					minor_trap--;
 				}
 			}
@@ -1675,26 +1648,26 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		/**
 		 * blockedPawnsOnD2E2
 		 */
-		if ((w_pawns & Fields.E2) != 0) {
-			if  ((w_bishops & Fields.E3) != 0) {
+		if ((evalInfo.bb_w_pawns & Fields.E2) != 0) {
+			if  ((evalInfo.bb_w_bishops & Fields.E3) != 0) {
 				blocked_pawns++;
 			}
 		}
 		
-		if ((w_pawns & Fields.D2) != 0) {
-			if  ((w_bishops & Fields.D3) != 0) {
+		if ((evalInfo.bb_w_pawns & Fields.D2) != 0) {
+			if  ((evalInfo.bb_w_bishops & Fields.D3) != 0) {
 				blocked_pawns++;
 			}
 		}
 		
-		if ((b_pawns & Fields.E7) != 0) {
-			if  ((b_bishops & Fields.E6) != 0) {
+		if ((evalInfo.bb_b_pawns & Fields.E7) != 0) {
+			if  ((evalInfo.bb_b_bishops & Fields.E6) != 0) {
 				blocked_pawns--;
 			}
 		}
 		
-		if ((b_pawns & Fields.D7) != 0) {
-			if  ((b_bishops & Fields.D6) != 0) {
+		if ((evalInfo.bb_b_pawns & Fields.D7) != 0) {
+			if  ((evalInfo.bb_b_bishops & Fields.D6) != 0) {
 				blocked_pawns--;
 			}
 		}
