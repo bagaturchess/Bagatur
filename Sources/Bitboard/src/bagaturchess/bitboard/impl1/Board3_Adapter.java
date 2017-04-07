@@ -11,15 +11,10 @@ import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
-import bagaturchess.bitboard.impl.movelist.BaseMoveList;
-import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.state.PiecesList;
 
 
 public class Board3_Adapter extends Board3 implements IBitBoard {
-	
-	
-	private IMoveList legalMovesChecker = new BaseMoveList(256);
 	
 	
 	public Board3_Adapter(String fenStr, IBoardConfig boardConfig) {
@@ -125,22 +120,6 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	
 
 	@Override
-	public void test(int colour) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean hasMinorOrMajorPieces(int colour) {
-		throw new UnsupportedOperationException();
-	}
-	
-
-	@Override
-	public int getLastCaptrueFieldID() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public IPlayerAttacks getPlayerAttacks(int colour) {
 		throw new UnsupportedOperationException();
 	}
@@ -150,140 +129,21 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public int genMinorMoves(IInternalMoveList list) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int genPromotions(IInternalMoveList list) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int gen2MovesPromotions(IInternalMoveList list) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int genDirectCheckMoves(IInternalMoveList list) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int genHiddenCheckMoves(IInternalMoveList list) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int genAllCheckMoves(IInternalMoveList list) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int genCapturePromotionCheckMoves(IInternalMoveList list) {
-		throw new UnsupportedOperationException();
-	}
 
 	@Override
 	public int genKingEscapes(IInternalMoveList list) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public boolean hasMove() {
-		
-		if (true) throw new UnsupportedOperationException();
-		
-		int colourToMove = getColourToMove();
-		
-		legalMovesChecker.clear();
-		genAllMoves(legalMovesChecker);
-		
-		boolean hasLegalMove = false;
-		int move = 0;
-		while ((move = legalMovesChecker.next()) != 0L) {
-			makeMoveForward(move);
-			if (!isInCheck(colourToMove)) {
-				hasLegalMove = true;
-			}
-			makeMoveBackward(move);
-			if (hasLegalMove) {
-				break;
-			}
-		}
-		
-		return hasLegalMove;
-	}
-
-	@Override
-	public boolean hasCapturePromotionCheck() {
-		throw new UnsupportedOperationException();
-	}
 
 	@Override
 	public boolean hasSingleMove() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean hasPromotions() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean has2MovePromotions() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean hasChecks(int colour) {
 		throw new UnsupportedOperationException();
 	}
 	
 
 	@Override
 	public boolean isCheckMove(int move) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean isDirectCheckMove(int move) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getChecksCount(int colour) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getPlayedMovesCount_Total() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public long getHashKeyAfterMove(int move) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public long getPawnHashKeyAfterMove(int move) {
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public long getFigureBitboardByID(int figureID) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getFieldID(int figureID) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public IMoveIterator iterator(int iteratorFactoryHandler) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -300,11 +160,6 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	@Override
 	public void setAttacksSupport(boolean attacksSupport,
 			boolean fieldsStateSupport) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getGamePhase() {
 		throw new UnsupportedOperationException();
 	}
 

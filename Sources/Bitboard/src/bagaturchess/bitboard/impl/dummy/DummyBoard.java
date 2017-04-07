@@ -697,10 +697,4 @@ public class DummyBoard implements IBitBoard {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public int getLastLastMove() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 }
