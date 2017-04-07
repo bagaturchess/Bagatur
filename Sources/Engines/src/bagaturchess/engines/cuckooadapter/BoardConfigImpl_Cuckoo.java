@@ -5,31 +5,12 @@ import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.common.Utils;
 
 
-public class BoardConfigImpl implements IBoardConfig {
+public class BoardConfigImpl_Cuckoo implements IBoardConfig {
 	
 	private static double[] zeros = new double[64];
-	
-	/**
-	public static final int MATERIAL_PAWN_O				= 72;
-	public static final int MATERIAL_PAWN_E				= 120;
-	public static final int MATERIAL_KNIGHT_O			= 246;
-	public static final int MATERIAL_KNIGHT_E			= 352;
-	public static final int MATERIAL_BISHOP_O			= 262;
-	public static final int MATERIAL_BISHOP_E			= 366;
-	public static final int MATERIAL_ROOK_O				= 371;
-	public static final int MATERIAL_ROOK_E				= 540;//602;
-	public static final int MATERIAL_QUEEN_O			= 771;
-	public static final int MATERIAL_QUEEN_E			= 1000;//1220;
-	public static final int MATERIAL_DOUBLE_KNIGHT_O	= 487;
-	public static final int MATERIAL_DOUBLE_KNIGHT_E	= 719;
-	public static final int MATERIAL_DOUBLE_BISHOP_O	= 528;
-	public static final int MATERIAL_DOUBLE_BISHOP_E	= 797;
-	public static final int MATERIAL_DOUBLE_ROOK_O		= 738;
-	public static final int MATERIAL_DOUBLE_ROOK_E		= 1080;//1244;
-	 */
-	
-	private double MATERIAL_PAWN_O = 92;//72;
-	private double MATERIAL_PAWN_E = 92;//120;
+    
+	private double MATERIAL_PAWN_O = 92;
+	private double MATERIAL_PAWN_E = 92;
 		
 	private double MATERIAL_KNIGHT_O = 385;
 	private double MATERIAL_KNIGHT_E = 385;
@@ -37,14 +18,14 @@ public class BoardConfigImpl implements IBoardConfig {
 	private double MATERIAL_BISHOP_O = 385;
 	private double MATERIAL_BISHOP_E = 385;
 	
-	private double MATERIAL_ROOK_O = 385;
-	private double MATERIAL_ROOK_E = 385; //540 //602
+	private double MATERIAL_ROOK_O = 593;
+	private double MATERIAL_ROOK_E = 593;
 	
-	private double MATERIAL_QUEEN_O = 593;
-	private double MATERIAL_QUEEN_E = 593; //1220
+	private double MATERIAL_QUEEN_O = 1244;
+	private double MATERIAL_QUEEN_E = 1244;
 	
-	private double MATERIAL_KING_O = 1244;
-	private double MATERIAL_KING_E = 1244;
+	private double MATERIAL_KING_O = 9900;
+	private double MATERIAL_KING_E = 9900;
 
 	
 	private double MATERIAL_BARIER_NOPAWNS_O	= Math.max(MATERIAL_KNIGHT_O, MATERIAL_BISHOP_O) + MATERIAL_PAWN_O;

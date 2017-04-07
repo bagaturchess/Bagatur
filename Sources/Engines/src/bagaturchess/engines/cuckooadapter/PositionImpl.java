@@ -226,8 +226,18 @@ public class PositionImpl implements IPosition {
 	
 	@Override
 	public int getwMtrl() {
-		int score = 0;
 		
+		if (board.getBaseEvaluation().getWhiteMaterialNonPawns_o() != board.getBaseEvaluation().getWhiteMaterialNonPawns_e()) {
+			throw new IllegalStateException();
+		}
+		if (board.getBaseEvaluation().getWhiteMaterialPawns_o() != board.getBaseEvaluation().getWhiteMaterialPawns_e()) {
+			throw new IllegalStateException();
+		}
+		
+		return board.getBaseEvaluation().getWhiteMaterialNonPawns_o() + board.getBaseEvaluation().getWhiteMaterialPawns_o();
+				
+		/*
+		int score = 0;
 		score += getwMtrlPawns();
 		score += Evaluate.nV * board.getPiecesLists().getPieces(Constants.PID_W_KNIGHT).getDataSize();
 		score += Evaluate.bV * board.getPiecesLists().getPieces(Constants.PID_W_BISHOP).getDataSize();
@@ -236,21 +246,33 @@ public class PositionImpl implements IPosition {
 		score += Evaluate.kV * board.getPiecesLists().getPieces(Constants.PID_W_KING).getDataSize();
 		
 		return score;
+		*/
 	}
 	
 	
 	@Override
 	public int getbMtrl() {
-		int score = 0;
 		
-		score += getbMtrlPawns();
-		score += Evaluate.nV * board.getPiecesLists().getPieces(Constants.PID_B_KNIGHT).getDataSize();
-		score += Evaluate.bV * board.getPiecesLists().getPieces(Constants.PID_B_BISHOP).getDataSize();
-		score += Evaluate.rV * board.getPiecesLists().getPieces(Constants.PID_B_ROOK).getDataSize();
-		score += Evaluate.qV * board.getPiecesLists().getPieces(Constants.PID_B_QUEEN).getDataSize();
-		score += Evaluate.kV * board.getPiecesLists().getPieces(Constants.PID_B_KING).getDataSize();
+		if (board.getBaseEvaluation().getBlackMaterialNonPawns_o() != board.getBaseEvaluation().getBlackMaterialNonPawns_e()) {
+			throw new IllegalStateException();
+		}
+		if (board.getBaseEvaluation().getBlackMaterialPawns_o() != board.getBaseEvaluation().getBlackMaterialPawns_e()) {
+			throw new IllegalStateException();
+		}
+		
+		return board.getBaseEvaluation().getBlackMaterialNonPawns_o() + board.getBaseEvaluation().getBlackMaterialPawns_o();
+				
+		/*
+		int score = 0;
+		score += getwMtrlPawns();
+		score += Evaluate.nV * board.getPiecesLists().getPieces(Constants.PID_W_KNIGHT).getDataSize();
+		score += Evaluate.bV * board.getPiecesLists().getPieces(Constants.PID_W_BISHOP).getDataSize();
+		score += Evaluate.rV * board.getPiecesLists().getPieces(Constants.PID_W_ROOK).getDataSize();
+		score += Evaluate.qV * board.getPiecesLists().getPieces(Constants.PID_W_QUEEN).getDataSize();
+		score += Evaluate.kV * board.getPiecesLists().getPieces(Constants.PID_W_KING).getDataSize();
 		
 		return score;
+		*/
 	}
 	
 	
