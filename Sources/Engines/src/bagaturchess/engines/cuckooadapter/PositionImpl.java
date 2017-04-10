@@ -1,7 +1,7 @@
 package bagaturchess.engines.cuckooadapter;
 
 
-import bagaturchess.bitboard.api.IBoard;
+import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
@@ -25,11 +25,11 @@ public class PositionImpl implements IPosition {
 	});
 	
 	
-	private IBoard board;
+	private IBitBoard board;
 	private PSTConstants pst;
 	
 	
-	public PositionImpl(IBoard _board) {
+	public PositionImpl(IBitBoard _board) {
 		board = _board;
 		pst = new PSTConstants(board.getBoardConfig());
 	}
