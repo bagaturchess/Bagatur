@@ -26,6 +26,7 @@ package bagaturchess.bitboard.impl1;
 import java.util.Arrays;
 
 import bagaturchess.bitboard.api.IBaseEval;
+import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.api.IInternalMoveList;
@@ -69,7 +70,7 @@ import bagaturchess.bitboard.impl.state.PiecesLists;
 import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
 
 
-public abstract class Board3 extends Fields implements IBoard, Cloneable {
+public abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 	
 	
 	private static final boolean DEBUG = false;

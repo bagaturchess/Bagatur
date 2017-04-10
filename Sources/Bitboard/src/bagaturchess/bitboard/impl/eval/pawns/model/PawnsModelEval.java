@@ -23,7 +23,7 @@
 package bagaturchess.bitboard.impl.eval.pawns.model;
 
 
-import bagaturchess.bitboard.api.IBoard;
+import bagaturchess.bitboard.api.IBitBoard;
 
 
 public class PawnsModelEval {
@@ -36,7 +36,7 @@ public class PawnsModelEval {
 	public PawnsModelEval() {
 	}
 	
-	public void rebuild(IBoard bitboard) {
+	public void rebuild(IBitBoard bitboard) {
 		model.rebuild(bitboard);
 		eval();
 	}

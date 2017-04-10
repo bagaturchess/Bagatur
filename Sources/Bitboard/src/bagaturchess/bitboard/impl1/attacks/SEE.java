@@ -23,7 +23,7 @@
 package bagaturchess.bitboard.impl1.attacks;
 
 
-import bagaturchess.bitboard.api.IBoard;
+import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IFieldsAttacks;
 import bagaturchess.bitboard.api.ISEE;
 import bagaturchess.bitboard.common.Utils;
@@ -37,7 +37,6 @@ import bagaturchess.bitboard.impl.plies.CastlePlies;
 import bagaturchess.bitboard.impl.plies.KingPlies;
 import bagaturchess.bitboard.impl.plies.KnightPlies;
 import bagaturchess.bitboard.impl.plies.OfficerPlies;
-import bagaturchess.bitboard.impl1.Board3;
 import bagaturchess.bitboard.impl1.movegen.MoveInt;
 
 
@@ -45,13 +44,13 @@ public class SEE implements ISEE {
 	
 	
 	private static final boolean STOP_AT_QUEEN_ATTACK = false;
-	private IBoard bitboard;
+	private IBitBoard bitboard;
 
 	private boolean[] canBeCaptured = new boolean[1];
 	private int[] buff = new int[3];
 	
 	
-	public SEE(IBoard _bitboard) {
+	public SEE(IBitBoard _bitboard) {
 		bitboard = _bitboard;
 	}
 	

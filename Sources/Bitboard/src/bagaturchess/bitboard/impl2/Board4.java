@@ -26,6 +26,7 @@ package bagaturchess.bitboard.impl2;
 import java.util.Arrays;
 
 import bagaturchess.bitboard.api.IBaseEval;
+import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.api.IInternalMoveList;
@@ -64,13 +65,12 @@ import bagaturchess.bitboard.impl2.movegen.QueenMovesGen;
 import bagaturchess.bitboard.impl2.movegen.WhitePawnMovesGen;
 import bagaturchess.bitboard.impl1.plies.Castling;
 import bagaturchess.bitboard.impl1.plies.Enpassanting;
-import bagaturchess.bitboard.impl.plies.checking.Checking;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl.state.PiecesLists;
 import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
 
 
-public abstract class Board4 extends Fields implements IBoard, Cloneable {
+public abstract class Board4 extends Fields implements IBitBoard, Cloneable {
 	
 	
 	private static final boolean DEBUG = false;

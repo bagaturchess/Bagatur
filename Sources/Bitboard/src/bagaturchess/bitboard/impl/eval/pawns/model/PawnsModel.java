@@ -23,7 +23,7 @@
 package bagaturchess.bitboard.impl.eval.pawns.model;
 
 
-import bagaturchess.bitboard.api.IBoard;
+import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
@@ -150,7 +150,7 @@ public class PawnsModel extends Fields {
 		bKingFieldID = 0;
 	}
 	
-	public void rebuild(IBoard _bitboard) { 
+	public void rebuild(IBitBoard _bitboard) { 
 		
 		reinit();
 		
