@@ -83,7 +83,7 @@ public class SearchAB2 extends SearchImpl {
 		
 		backtracking[0].null_move = false;
 		
-		return negasearch(mediator, rootWin, info, maxdepth, depth, beta, true, true);
+		return negasearch(mediator, info, maxdepth, depth, beta, true, true);
 	}
 	
 	
@@ -96,11 +96,11 @@ public class SearchAB2 extends SearchImpl {
 
 		backtracking[0].null_move = false;
 		
-		return negasearch(mediator, null, info, maxdepth, depth, beta, true, true);
+		return negasearch(mediator, info, maxdepth, depth, beta, true, true);
 	}
 	
 	
-	private int negasearch(ISearchMediator mediator, IRootWindow rootWin, ISearchInfo info,
+	private int negasearch(ISearchMediator mediator, ISearchInfo info,
 			int maxdepth, int depth, int beta, boolean pv, boolean storeInTPT) {
 		
 		
@@ -261,7 +261,7 @@ public class SearchAB2 extends SearchImpl {
 		//Null move
 		boolean prevIsNullmove = depth > 0 ? backtracking[depth - 1].null_move : false;
 		if (!inCheck
-			&& !pv
+			//&& !pv
 			&& depth > 0
 			&& rest >= 1
 			&& !isMateVal(beta - 1)
@@ -290,7 +290,7 @@ public class SearchAB2 extends SearchImpl {
 					node.leaf = true;
 					backtrackingInfo.null_move = true;
 					env.getBitboard().makeNullMoveForward();
-					int null_eval = -negasearch(mediator, rootWin, info, maxdepth - reduction, depth + 1, -(beta + 1), false, storeInTPT);
+					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -(beta + 1), false, storeInTPT);
 					
 					if (//null_eval < 0 && isMateVal(null_eval)
 							true//backtrackingInfo.eval - null_eval > 0
@@ -392,7 +392,7 @@ public class SearchAB2 extends SearchImpl {
 			
 			if (reduction >= 1) {
 				
-				negasearch(mediator, rootWin, info, maxdepth - reduction, depth, beta, pv, storeInTPT);
+				negasearch(mediator, info, maxdepth - reduction, depth, beta, pv, storeInTPT);
 				
 				env.getTPT().lock();
 				{
@@ -501,10 +501,10 @@ public class SearchAB2 extends SearchImpl {
 					continue;
 				}
 				
-				int moveSee = -1;
-				if (isCapOrProm) {
-					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
-				}
+				//int moveSee = -1;
+				//if (isCapOrProm) {
+				//	moveSee = env.getBitboard().getSee().evalExchange(cur_move);
+				//}
 				
 				//int new_materialGain = materialGain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
 				if  (isCapOrProm) {
@@ -551,13 +551,13 @@ public class SearchAB2 extends SearchImpl {
 				
 				int new_maxdepth = maxdepth + extend;
 				
-				int cur_eval = -negasearch(mediator, rootWin, info, new_maxdepth - reduction, depth + 1, -(beta - 1), false, storeInTPT);
+				int cur_eval = -negasearch(mediator, info, new_maxdepth - reduction, depth + 1, -(beta - 1), false, storeInTPT);
 				if (reduction > 0 && cur_eval >= beta) {
-					cur_eval = -negasearch(mediator, rootWin, info, new_maxdepth, depth + 1, -(beta - 1), false, storeInTPT);
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), false, storeInTPT);
 				}
 				
 				if (pv && cur_eval > best_eval) {
-					cur_eval = -negasearch(mediator, rootWin, info, new_maxdepth, depth + 1, -(beta - 1), pv, storeInTPT);
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), pv, storeInTPT);
 				}
 				
 				env.getBitboard().makeMoveBackward(cur_move);
