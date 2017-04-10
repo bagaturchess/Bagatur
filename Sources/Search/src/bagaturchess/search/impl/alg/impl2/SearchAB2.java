@@ -49,6 +49,9 @@ public class SearchAB2 extends SearchImpl {
 	
 	private BacktrackingInfo[] backtracking = new BacktrackingInfo[MAX_DEPTH + 1];
 	
+	private long lastSentMinorInfo_timestamp;
+	private long lastSentMinorInfo_nodesCount;
+	
 	
 	public SearchAB2(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
@@ -90,7 +93,10 @@ public class SearchAB2 extends SearchImpl {
 			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV,
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
-		throw new IllegalStateException();
+
+		backtracking[0].null_move = false;
+		
+		return negasearch(mediator, null, info, maxdepth, depth, beta, true, true);
 	}
 	
 	
@@ -255,7 +261,7 @@ public class SearchAB2 extends SearchImpl {
 		//Null move
 		boolean prevIsNullmove = depth > 0 ? backtracking[depth - 1].null_move : false;
 		if (!inCheck
-			//&& !pv
+			&& !pv
 			&& depth > 0
 			&& rest >= 1
 			&& !isMateVal(beta - 1)
@@ -448,21 +454,24 @@ public class SearchAB2 extends SearchImpl {
 					continue;
 				}
 				
-				if (mediator != null) {
-					if (depth == 0) {
-						info.setCurrentMove(cur_move);
-						info.setCurrentMoveNumber((searchedCount + 1));
+				//Build and sent minor info
+				if (depth == 0) {
+					info.setCurrentMove(cur_move);
+					info.setCurrentMoveNumber((searchedCount + 1));
+				}
+				
+				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
+					
+					long timestamp = System.currentTimeMillis();
+					
+					if (timestamp >= lastSentMinorInfo_timestamp + 1000)  {//Send info each second
+					
+						mediator.changedMinor(info);
+						
+						lastSentMinorInfo_timestamp = timestamp;
 					}
-					if ((maxdepth / PLY) <= 7) {
-						if (depth == 0) { 
-							mediator.changedMinor(info);
-						}
-					} else {
-						double send_depth = (maxdepth / PLY) / (double) 2;
-						if (depth <= send_depth) { 
-							mediator.changedMinor(info);
-						}
-					}
+					
+					lastSentMinorInfo_nodesCount = info.getSearchedNodes();
 				}
 				
 				
