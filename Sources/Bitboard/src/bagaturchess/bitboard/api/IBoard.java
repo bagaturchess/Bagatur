@@ -11,8 +11,6 @@ public interface IBoard {
 	
 	public PawnsModelEval getPawnsStructure();
 	
-	public int[] getMatrix();
-	
 	public IBoardConfig getBoardConfig();
 	public IPiecesLists getPiecesLists();
 	public int getColourToMove();

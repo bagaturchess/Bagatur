@@ -731,48 +731,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return result;
 	}
 	
-	public final boolean hasMinorOrMajorPieces(int colour) {
-		return allByColour[colour] != (allByColourAndType[colour][Figures.TYPE_KING] | allByColourAndType[colour][Figures.TYPE_PAWN]);
-	}
-	
-	/*public void clearKingMovesCounters() {
-		whiteKingMoves = 0;
-		blackKingMoves = 0;
-	}
-	
-	public int getBlackKingMovesCounts() {
-		return blackKingMoves;
-	}
-	
-	public int getWhiteKingMovesCounts() {
-		return whiteKingMoves;
-	}
-	
-	public void clearQueenMovesCounters() {
-		whiteQueensMoves = 0;
-		blackQueensMoves = 0;
-	}
-	
-	public int getBlackQueensMovesCounts() {
-		return blackQueensMoves;
-	}
-	
-	public int getWhiteQueensMovesCounts() {
-		return whiteQueensMoves;
-	}
-	
-	public final void clearInCheckCounters() {
-		whiteInCheck = 0;
-		blackInCheck = 0;
-	}
-	
-	public final int getBlackInCheckCounts() {
-		return blackInCheck;
-	}
-	
-	public final int getWhiteInCheckCounts() {
-		return whiteInCheck;
-	}*/
 	
 	private final void initAttacksSupport() {
 		if (attacksSupport) {
@@ -938,51 +896,8 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}
 		
 		return isPossible;
-		
-		/*} else {
-			throw new IllegalStateException();
-			int count = genKingEscapes(figureID, colour, movesIsPossibleInCheckBuffer);
-			if (count == 0) {
-				if (Properties.STATISTICS_MODE) {
-					statistics.isPossible.stop(1);
-				}
-				return false;
-			}
-			
-			for (int i=0; i<count; i++) {
-				if (Move.isEquals(move, movesIsPossibleInCheckBuffer[i])) {
-					if (Properties.STATISTICS_MODE) {
-						statistics.isPossible.stop(1);
-					}
-					return true;
-				}
-			}
-			if (Properties.STATISTICS_MODE) {
-				statistics.isPossible.stop(1);
-			}
-			return false;
-		}*/
 	}
 	
-	/*public boolean opensCheck(long[] move) {
-		
-		int colour = getColourToMove();
-		if (Properties.DEBUG_MODE) {
-			if (colour != Move.getColour(move)) {
-				throw new IllegalStateException();
-			}
-		}
-		
-		if (isInCheck(colour)) {
-			makeMoveForward(move);
-			boolean result = isInCheck(colour);
-			makeMoveBackward(move);
-			return result;			
-		} else {
-			return false;
-		}
-		
-	}*/
 	
 	public final void makeMoveForward(final int move) {
 		if (Properties.STATISTICS_MODE) {
@@ -990,30 +905,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}
 		
 		makeMoveForward(move, true);
-		
-		/*int moveColour = Move.getColour(move);
-		int colourToMove = getColourToMove();
-		if (isInCheck(colourToMove)) {
-			if (colourToMove == Figures.COLOUR_WHITE) {
-				whiteInCheck++;
-			} else {
-				blackInCheck++;
-			}
-		}*/
-		
-		/*if (Move.isKing(move) && !Move.isCastleSide(move) && !Move.isCapture(move)) {
-			if (moveColour == Figures.COLOUR_WHITE) {
-				whiteKingMoves++;
-			} else {
-				blackKingMoves++;
-			}
-		} else if (Move.isQueen(move) && !Move.isCapture(move)) {	
-			if (moveColour == Figures.COLOUR_WHITE) {
-				whiteQueensMoves++;
-			} else {
-				blackQueensMoves++;
-			}
-		}*/
 		
 		if (Properties.STATISTICS_MODE) {
 			statistics.forwardMove.stop(1);
@@ -1027,14 +918,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}
 		
 		if (eval != null) eval.move(move);
-		
-		//System.out.println("FW " + playedMovesCount + "-" + (playedMovesCount + 1) + " Before " + Move.moveToString(move) + " = " + hashkey);
-		
-		//System.out.println("Play forward " + Move.moveToString(move) + " hash " + hashkey);
-		
-		/*if (hashkey == -6661964169401238187L) {
-			int g = 0;
-		}*/
 		
 		if (DEBUG) checkConsistency();
 		
@@ -1476,42 +1359,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		if (DEBUG) checkConsistency();
 		
-		/*int moveColour = Move.getColour(move);
-		int oppColour = Figures.OPPONENT_COLOUR[moveColour];
-		if (isInCheck(oppColour)) {
-			if (oppColour == Figures.COLOUR_WHITE) {
-				if (whiteInCheck > 0) {
-					whiteInCheck--;
-				}
-			} else {
-				if (blackInCheck > 0) {
-					blackInCheck--;
-				}
-			}
-		}
-		
-		if (Move.isKing(move) && !Move.isCastleSide(move) && !Move.isCapture(move)) {
-			if (moveColour == Figures.COLOUR_WHITE) {
-				if (whiteKingMoves > 0) {
-					whiteKingMoves--;
-				}
-			} else {
-				if (blackKingMoves > 0) {
-					blackKingMoves--;
-				}
-			}
-		} else if (Move.isQueen(move) && !Move.isCapture(move)) {
-			if (moveColour == Figures.COLOUR_WHITE) {
-				if (whiteQueensMoves > 0) {
-					whiteQueensMoves--;
-				}
-			} else {
-				if (blackQueensMoves > 0) {
-					blackQueensMoves--;
-				}
-			}
-		}*/
-		
 		makeMoveBackward(move, true);
 		
 		if (Properties.STATISTICS_MODE) {
@@ -1767,7 +1614,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		switchLastMoveColour();
 	}
 	
-	public final long getPawnHashKeyAfterMove(final int move) {
+	private final long getPawnHashKeyAfterMove(final int move) {
 		
 		if (true) throw new IllegalStateException("Check whether the pawnskay should be updated with the colour"); 
 		
@@ -1930,7 +1777,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return pawnskey;
 	}
 	
-	public final long getHashKeyAfterMove(final int move) {
+	private final long getHashKeyAfterMove(final int move) {
 		
 		if (true) throw new IllegalStateException("Check whether the pawnskay should be updated with the colour");
 		
@@ -2104,7 +1951,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	}
 	
 	
-	public final void switchLastMoveColour() {
+	private final void switchLastMoveColour() {
 		lastMoveColour = Figures.OPPONENT_COLOUR[lastMoveColour];
 		hashkey ^= ConstantStructure.WHITE_TO_MOVE;
 		pawnskey ^= ConstantStructure.WHITE_TO_MOVE;
@@ -2144,7 +1991,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return getPlayerAttacks_fast(colour);
 	}
 
-	public IPlayerAttacks getPlayerAttacks_fast(int colour) {
+	private IPlayerAttacks getPlayerAttacks_fast(int colour) {
 		
 		if (Properties.DEBUG_MODE) {
 			if (!attacksSupport) {
@@ -2188,26 +2035,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	public IFieldsAttacks getFieldsAttacks() {
 		return fieldAttacksCollector;
 	}
-
-	public int getGamePhase() {
-		
-		//if (true) throw new IllegalStateException(); 
-		
-		int matFactor = materialFactor.getWhiteFactor() + materialFactor.getBlackFactor();
-					//+ pieces.getFiguresStateListener().getBlackFactor();
-			
-		if (matFactor == 0) {
-			return GamePhase.ENDGAME_PAWNS;
-		} else if (matFactor <= 18) {
-			return GamePhase.ENDGAME_LATE;
-		} else if (matFactor <= 32) {
-			return GamePhase.ENDGAME;
-		} else if (matFactor <= 53) {
-			return GamePhase.MIDGAME;
-		} else {
-			return GamePhase.OPENNING;
-		}
-	}
+	
 
 	public SEE getSee() {
 		return see;
@@ -2336,14 +2164,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		if (Properties.STATISTICS_MODE) {
 			statistics.isCheckMove.start();
 		}
-		/*if (move[30] == hashkey //board is equal
-			&& move[31] == move[29] //Move is with the same figure, dir and seq
-			) {
-			//return (move[0] & Move.MASK_CHECK) != NUMBER_0;
-		} else {
-			move[30] = hashkey;
-			move[31] = move[29];
-		}*/
 		
 		int colour = MoveInt.getColour(move);
 		int opponentColour = Figures.OPPONENT_COLOUR[colour];
@@ -2358,46 +2178,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}
 		
 		return isCheck;
-		/*if (Checking.isDirectCheckMove(move, colour, opponentColour, free, opponentKingBitboard, opponentKingFieldID)) {
-			move[0] |= Move.MASK_CHECK;
-			move[0] |= Move.MASK_CHECK_DIRECT;
-			move[0] &= ~Move.MASK_CHECK_HIDDEN;
-			return true;
-		} else if (Checking.isHiddenCheckMove(this, move, colour, opponentColour, free, opponentKingBitboard, opponentKingFieldID)) {
-			move[0] |= Move.MASK_CHECK;
-			move[0] &= ~Move.MASK_CHECK_DIRECT;
-			move[0] |= Move.MASK_CHECK_HIDDEN;
-			return true;
-		} else {
-			move[0] &= ~Move.MASK_CHECK;
-			move[0] &= ~Move.MASK_CHECK_DIRECT;
-			move[0] &= ~Move.MASK_CHECK_HIDDEN;
-			return false;
-		}*/
-		/*if (Checking.isDirectCheckMove(move, colour, opponentColour, free, opponentKingBitboard, opponentKingFieldID)) {
-			if (Checking.isHiddenCheckMove(this, move, colour, opponentColour, free, opponentKingBitboard, opponentKingFieldID)) {
-				move[0] |= Move.MASK_CHECK;
-				move[0] |= Move.MASK_CHECK_DIRECT;
-				move[0] |= Move.MASK_CHECK_HIDDEN;
-			} else {
-				move[0] |= Move.MASK_CHECK;
-				move[0] |= Move.MASK_CHECK_DIRECT;
-				move[0] &= ~Move.MASK_CHECK_HIDDEN;
-			}
-			return true;
-		} else {
-			if (Checking.isHiddenCheckMove(this, move, colour, opponentColour, free, opponentKingBitboard, opponentKingFieldID)) {
-				move[0] |= Move.MASK_CHECK;
-				move[0] &= ~Move.MASK_CHECK_DIRECT;
-				move[0] |= Move.MASK_CHECK_HIDDEN;
-				return true;
-			} else {
-				move[0] &= ~Move.MASK_CHECK;
-				move[0] &= ~Move.MASK_CHECK_DIRECT;
-				move[0] &= ~Move.MASK_CHECK_HIDDEN;
-				return false;
-			}
-		}*/
 	}
 
 	protected final int getKingFieldID(int colour) {
@@ -2416,12 +2196,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 			statistics.isDirectCheckMove.start();
 		}
 		
-		/*if (move[30] == hashkey //board is equal
-			&& move[31] == move[29] //Move is with the same figure, dir and seq
-			) {
-			//return (move[0] & Move.MASK_CHECK_DIRECT) != NUMBER_0;
-		}*/
-		
 		int colour = MoveInt.getColour(move);
 		int opponentColour = Figures.OPPONENT_COLOUR[colour];
 		int opponentKingFieldID = getKingFieldID(opponentColour);
@@ -2429,27 +2203,12 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 
 		boolean isCheck = Checking.isDirectCheckMove(move, colour, free, opponentKingBitboard, opponentKingFieldID);
 		
-		/*if (isCheck) {
-			move[0] |= Move.MASK_CHECK;
-			move[0] |= Move.MASK_CHECK_DIRECT;
-			move[0] &= ~Move.MASK_CHECK_HIDDEN;
-		} else {
-			//move[0] &= ~Move.MASK_CHECK;
-			move[0] &= ~Move.MASK_CHECK_DIRECT;
-			//move[0] &= ~Move.MASK_CHECK_HIDDEN;
-		}*/
-		
 		if (Properties.STATISTICS_MODE) {
 			statistics.isDirectCheckMove.stop(isCheck ? 1 : 0);
 		}
 
 		
 		return isCheck;
-	}
-	
-	public final int getChecksCount(int colour) {
-		
-		throw new IllegalStateException();
 	}
 	
 	private final void fillCheckKeepers_FromOfficerOrQueen(int colour,// int opponentColour,
@@ -2678,7 +2437,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}
 	}
 	
-	public final int genAllMoves(final IInternalMoveList list, final boolean checkKeepersAware) {
+	private final int genAllMoves(final IInternalMoveList list, final boolean checkKeepersAware) {
 		return genAllMoves(0L, false, getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
 	}
 	
@@ -2686,7 +2445,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return genAllMoves(0L, true, getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
 	}
 	
-	public final int genAllMoves(final IInternalMoveList list, final long excludedToFieldsBoard) {
+	private final int genAllMoves(final IInternalMoveList list, final long excludedToFieldsBoard) {
 		return genAllMoves(excludedToFieldsBoard, true, getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
 	}
 	
@@ -2759,57 +2518,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		count += genAllMoves_FiguresWithSameType(excludedToFieldsBoard, true, checkKeepersAware, colour, opponentColour,
 				Figures.TYPE_KING, list, maxCount);
-		if (count >= maxCount) {
-			if (Properties.STATISTICS_MODE) {
-				statistics.allMoves.stop(count);
-			}
-			return count;
-		}
-		
-		if (Properties.STATISTICS_MODE) {
-			statistics.allMoves.stop(count);
-		}
-		
-		return count;
-	}
-
-	public final int genMinorMoves(final IInternalMoveList list) {
-		return genMinorMoves(0L, true, getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
-	}
-	
-	protected final int genMinorMoves(long excludedToFieldsBoard, boolean checkKeepersAware, int colour, final IInternalMoveList list, final int maxCount) {
-		if (Properties.STATISTICS_MODE) {
-			statistics.allMoves.start();
-		}
-		
-		int count = 0;
-		
-		/**
-		 * Check whether the King of colour is alive.
-		 * If the King is death then there is no need to generate moves.
-		 */
-		if (getKingIndexSet(colour).getDataSize() == 0) {
-			if (Properties.STATISTICS_MODE) {
-				statistics.allMoves.stop(0);
-			}
-			return 0;
-		}
-		
-		fillCheckKeepers(colour);
-		
-		int opponentColour = Figures.OPPONENT_COLOUR[colour];
-		
-		count += genAllMoves_FiguresWithSameType(excludedToFieldsBoard, true, checkKeepersAware, colour, opponentColour,
-				Figures.TYPE_KNIGHT, list, maxCount);
-		if (count >= maxCount) {
-			if (Properties.STATISTICS_MODE) {
-				statistics.allMoves.stop(count);
-			}
-			return count;
-		}
-		
-		count += genAllMoves_FiguresWithSameType(excludedToFieldsBoard, true, checkKeepersAware, colour, opponentColour,
-				Figures.TYPE_OFFICER, list, maxCount);
 		if (count >= maxCount) {
 			if (Properties.STATISTICS_MODE) {
 				statistics.allMoves.stop(count);
@@ -3118,7 +2826,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return count;
 	}
 
-	public final int genCaptureMoves_FiguresWithSameType(final int colour, final int opponentColour, final int type,
+	private final int genCaptureMoves_FiguresWithSameType(final int colour, final int opponentColour, final int type,
 			final IInternalMoveList list, final int maxCount) {
 		
 		/**
@@ -3326,10 +3034,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		return false;
 	}
-	
-	public final int genNonCaptureNonPromotionMoves(final IInternalMoveList list) {
-		return genNonCaptureNonPromotionMoves(getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
-	}
 			
 	private final int genNonCaptureNonPromotionMoves(int colour, final IInternalMoveList list, final int maxCount) {
 		int count = 0;
@@ -3531,9 +3235,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return count;
 	}
 	
-	public final int genPromotions(final IInternalMoveList list) {
-		return genPromotions(getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
-	}
 	
 	private final int genPromotions(int colour, final IInternalMoveList list, final int maxCount) {
 		
@@ -3634,9 +3335,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return count;
 	}
 	
-	public final int gen2MovesPromotions(final IInternalMoveList list) {
-		return gen2MovesPromotions(getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
-	}
 	
 	private final int gen2MovesPromotions(int colour, final IInternalMoveList list, final int maxCount) {
 		
@@ -3754,10 +3452,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}
 		
 		return count;
-	}
-	
-	public final int genDirectCheckMoves(final IInternalMoveList list) {
-		return genDirectCheckMoves(getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
 	}
 	
 	private final int genDirectCheckMoves(int colour, final IInternalMoveList list, final int maxCount) {
@@ -4204,10 +3898,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}
 		
 		return count;
-	}
-	
-	public final int genHiddenCheckMoves(final IInternalMoveList list) {
-		return genHiddenCheckMoves(getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
 	}
 	
 	private final int genHiddenCheckMoves(int colour, IInternalMoveList list, final int maxCount) {
@@ -4661,7 +4351,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return count;
 	}
 	
-	public final int getAllSingleFigureMoves(long excludedToFieldsIDs,
+	private final int getAllSingleFigureMoves(long excludedToFieldsIDs,
 			final int colour, final int opponentColour,
 			final int pid, final int figureType,
 			final long fieldBitboard, final int fieldID,
@@ -4813,89 +4503,12 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		return count;
 	}
-	
-	public final int genAllCheckMoves(final IInternalMoveList list) {
-		return genAllCheckMoves(getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
-	}
-	
-	private final int genAllCheckMoves(int colour, final IInternalMoveList list, final int maxCount) {
-		if (Properties.STATISTICS_MODE) {
-			statistics.allCheckMoves.start();
-		}
-		
-		int count = 0;
-		
-		count += genHiddenCheckMoves(colour, list, maxCount);
-		count += genDirectCheckMoves(colour, list, maxCount);
-		count -= removeDuplicates(list, count);
-		
-		if (Properties.STATISTICS_MODE) {
-			statistics.allCheckMoves.stop(count);
-		}
-
-		return count;
-	}
-	
-	public final int genCapturePromotionCheckMoves(final IInternalMoveList list) {
-		return genCapturePromotionCheckMoves(getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
-	}
-	
-	private final int genCapturePromotionCheckMoves(int colour, final IInternalMoveList list, final int maxCount) {
-		
-		if (Properties.STATISTICS_MODE) {
-			statistics.capturePromotionCheckMoves.start();
-		}
-		
-		int count = 0;
-		
-		count += genCapturePromotionMoves(colour, list, maxCount);
-		count += genHiddenCheckMoves(colour, list, maxCount);
-		count += genDirectCheckMoves(colour, list, maxCount);
-		count -= removeDuplicates(list, count);
-
-		if (Properties.STATISTICS_MODE) {
-			statistics.capturePromotionCheckMoves.stop(count);
-		}
-
-		return count;
-	}
-	
-	private final int removeDuplicates(IInternalMoveList list, int count) {
-		int removed = 0;
-		
-		if (count != list.reserved_getCurrentSize()) {
-			throw new IllegalStateException();
-		}
-		
-		//if (true) throw new IllegalStateException();
-		duplicatesRemoverBuffer.clear();
-		
-		int[] moves = list.reserved_getMovesBuffer();
-		for (int i=0; i<count; i++) {
-			int cur = moves[i];
-			int moveIDX = MoveInt.getMoveIndex(cur);
-			if (duplicatesRemoverBuffer.contains(moveIDX)) {
-				if (i < count - 1) {
-					moves[i] = moves[count - 1];
-					moves[count - 1] = cur;
-					count--;
-					list.reserved_removeLast();
-					i--;
-				}
-				removed++;
-			} else {
-				duplicatesRemoverBuffer.add(moveIDX);
-			}
-		}
-		
-		return removed;
-	}
 
 	public final int genKingEscapes(final IInternalMoveList list) {
 		return genKingEscapes(getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
 	}
 	
-	public final int genKingEscapes(int colour, final IInternalMoveList list, final int maxCount) {
+	private final int genKingEscapes(int colour, final IInternalMoveList list, final int maxCount) {
 		
 		if (Properties.STATISTICS_MODE) {
 			statistics.kingEscapes.start();
@@ -5004,60 +4617,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return count;
 	}
 	
-	/*protected int genKingEscapes(int figureID, int colour, final long[][] moves) {
-		
-		if (true) throw new IllegalStateException();
-		
-		int count = 0;
-		
-		if (Properties.DEBUG_MODE) {
-			if (!isInCheck(colour)) {
-				throw new IllegalStateException("Call to genKingEscapes during non-check");
-			}
-		}
-		
-
-		if (getKingIndexSet(colour).getDataSize() != 0) {
-			return 0;
-		}
-
-		fillCheckKeepers(colour);
-		
-		int opponentColour = Figures.OPPONENT_COLOUR[colour];
-		
-		int myKingID = getKingFieldID(colour);
-		int checksCount = CheckingCount.getChecksCount(checkerBuffer, this, colour, opponentColour,
-				Fields.ALL_ORDERED_A1H1[myKingID],
-				myKingID, free);
-		
-		if (checksCount <= 0) {
-			throw new IllegalStateException();
-		}
-		
-		if (figureID == myKingID) {
-			count += genAllMoves_FiguresWithSameType(0L, false, true, colour, opponentColour,
-					Figures.TYPE_KING, moves, count, GlobalConstants.MAX_MOVES_ON_LEVEL);
-		} else {
-			if (checksCount == 1) {
-				long includedToFieldsBoard = checkerBuffer.fieldBitboard;
-				if (checkerBuffer.slider) {
-					includedToFieldsBoard |= checkerBuffer.sliderAttackRayBitboard;
-				}
-				
-				count += genAllMoves_ByFigureID(figureID, ~includedToFieldsBoard,
-						false,
-						true,
-						colour, opponentColour,
-						Figures.FIGURES_TYPES[figureID],
-						moves, count, GlobalConstants.MAX_MOVES_ON_LEVEL);
-			} else if (checksCount > 2) {
-				throw new IllegalStateException("Triple check!");
-			}
-		}
-		
-		return count;
-	}*/
-	
 	public final boolean hasMoveInCheck() {
 		if (Properties.STATISTICS_MODE) {
 			statistics.hasMoveInCheck.start();
@@ -5087,53 +4646,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return result;
 	}
 	
-	public final boolean hasMove() {
-		if (Properties.STATISTICS_MODE) {
-			statistics.hasMove.start();
-		}
-		
-		boolean inCheck = isInCheck();
-		boolean result;
-		if (inCheck) {
-			 result = hasMoveInCheck();
-		} else {
-			result = hasMoveInNonCheck();
-		}
-		
-		if (Properties.STATISTICS_MODE) {
-			statistics.hasMove.stop(result ? 1 : 0);
-		}
-		
-		return result;
-	}
-	
-	public final boolean hasCapturePromotionCheck() {
-		
-		int colour = getColourToMove();
-		
-		if (genCapturePromotionMoves(colour, null, 1) > 0) {
-			return true;
-		}
-		if (genDirectCheckMoves(colour, null, 1) > 0) {
-			return true;
-		}
-		if (genHiddenCheckMoves(colour, null, 1) > 0) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public final boolean hasChecks(int colour) {
-		if (genDirectCheckMoves(colour, null, 1) > 0) {
-			return true;
-		}
-		if (genHiddenCheckMoves(colour, null, 1) > 0) {
-			return true;
-		}
-		
-		return false;
-	}
 	
 	public final boolean hasSingleMove() {
 		int colour = getColourToMove();
@@ -5148,60 +4660,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}
 		
 		return result;
-	}
-	
-	public final boolean has2MovePromotions() {
-		return gen2MovesPromotions(getColourToMove(), null, 1) >= 1;
-	}
-
-	public final boolean hasPromotions() {
-		return genPromotions(getColourToMove(), null, 1) >= 1;
-	}
-	
-	public final IMoveIterator iterator(int factoryHandle) {
-		
-		throw new IllegalStateException();
-		
-		/*int colour = getColourToMove();
-		boolean inCheck = isInCheck(colour);
-		int checkIndex = inCheck ? 0 : 1;
-		
-		MoveIterator iter = iterators[checkIndex][factoryHandle][playedMovesCount];
-		
-		if (iter == null) {
-			iter = iterators[checkIndex][factoryHandle][playedMovesCount]
-			         = moveIteratorFactory[factoryHandle].create(this, inCheck);
-		} else {
-			iter.reset();
-		}
-		
-		return iter;*/
-	}
-	
-	public final void test(int colour) {
-		//testMovesCounting(colour);
-	}
-	
-	public final void testMovesCounting(int colour) {
-		int maxCount = 1;
-		if (genAllMoves(0L, true, colour, null, maxCount) > maxCount) {
-			throw new IllegalStateException();
-		}
-		if (genCapturePromotionMoves(colour, null, maxCount) > maxCount) {
-			throw new IllegalStateException();
-		}
-		if (genNonCaptureNonPromotionMoves(colour, null, maxCount) > maxCount) {
-			throw new IllegalStateException();
-		}
-		if (genPromotions(colour, null, maxCount) > maxCount) {
-			throw new IllegalStateException();
-		}
-		if (genDirectCheckMoves(colour, null, maxCount) > maxCount) {
-			throw new IllegalStateException();
-		}
-		if (genHiddenCheckMoves(colour, null, maxCount) > maxCount) {
-			throw new IllegalStateException();
-		}
 	}
 	
 	
@@ -5369,10 +4827,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	public final IPiecesLists getPiecesLists() {
 		return pieces;
 	}
-	
-	public long getFigureBitboardByID(int figureID) {
-		throw new UnsupportedOperationException();
-	}
 
 	public final long getFiguresBitboardByColour(int colour) {
 		return allByColour[colour];
@@ -5394,14 +4848,9 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return pawnskey;
 	}
 	
-	public int getFieldID(int figureID) {
-		throw new UnsupportedOperationException();
-	}
-	
 	public int getFigureID(int fieldID) {
 		return board[fieldID];
 	}
-	
 	
 	public int getCastlingType(int colour) {
 		return castledByColour[colour];
@@ -5419,9 +4868,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return playedMovesCount;
 	}
 	
-	public int getPlayedMovesCount_Total() {
-		
-		//if (true) throw new IllegalStateException(); 
+	private int getPlayedMovesCount_Total() {
 		
 		return playedMovesCount_initial + getPlayedMovesCount();
 	}
@@ -5433,12 +4880,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	public int getLastMove() {
 		if (playedMovesCount > 0) {
 			return playedMoves[playedMovesCount - 1];
-		} else return 0;
-	}
-	
-	public int getLastLastMove() {
-		if (playedMovesCount > 1) {
-			return playedMoves[playedMovesCount - 2];
 		} else return 0;
 	}
 	
@@ -5459,15 +4900,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	
 	public final long getHashKey() {
 		return hashkey;
-	}
-	
-	public final StackLongInt getPlayedBoardStates() {
-		return playedBoardStates;
-	}
-	
-
-	public BoardStat getStatistics() {
-		return statistics;
 	}
 	
 	public Board clone() {
@@ -5509,7 +4941,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 			result = result && Arrays.equals(other.allByColour, allByColour);
 			result = result && Utils.equals(other.allByColourAndType, allByColourAndType);
 			result = result && Arrays.equals(other.board, board);
-			result = result && checkAliveFiguresData(other);
 			//result = result && other.stateManager.equals(stateManager);
 			//TODO: result = result && other.hasEnpassant == hasEnpassant;
 			//result = result && Arrays.equals(other.possibleQueenCastleSideByColour, possibleQueenCastleSideByColour);
@@ -5523,47 +4954,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return result;
 	}
 	
-	private boolean checkAliveFiguresData(Board other) {
-		//FiguresStateManager otherStateManager = other.stateManager;
-		//boolean result = checkAliveFiguresDataForColour(other, otherStateManager.getAliveFigures(Figures.COLOUR_WHITE), stateManager.getAliveFigures(Figures.COLOUR_WHITE));
-		//result = result && checkAliveFiguresDataForColour(other, otherStateManager.getAliveFigures(Figures.COLOUR_BLACK), stateManager.getAliveFigures(Figures.COLOUR_BLACK));
-		return true;
-	}
-
-	private boolean checkAliveFiguresDataForColour(Board other, PiecesList[] other_alive, PiecesList[] alive) {
-		boolean result = checkAliveFiguresDataForColourAndType(other, other_alive[Figures.TYPE_PAWN], alive[Figures.TYPE_PAWN]);
-		result = result && checkAliveFiguresDataForColourAndType(other, other_alive[Figures.TYPE_KING], alive[Figures.TYPE_KING]);
-		result = result && checkAliveFiguresDataForColourAndType(other, other_alive[Figures.TYPE_KNIGHT], alive[Figures.TYPE_KNIGHT]);
-		result = result && checkAliveFiguresDataForColourAndType(other, other_alive[Figures.TYPE_OFFICER], alive[Figures.TYPE_OFFICER]);
-		result = result && checkAliveFiguresDataForColourAndType(other, other_alive[Figures.TYPE_CASTLE], alive[Figures.TYPE_CASTLE]);
-		result = result && checkAliveFiguresDataForColourAndType(other, other_alive[Figures.TYPE_QUEEN], alive[Figures.TYPE_QUEEN]);
-		return result;
-	}
-	
-	private boolean checkAliveFiguresDataForColourAndType(Board other, PiecesList other_figures, PiecesList figures) {
-		boolean result = true;
-		
-		int size = figures.getDataSize();
-		int[] data = figures.getData();
-		
-		int other_size = other_figures.getDataSize();
-		//int[] other_data = other_figures.getData();
-		
-		if (other_size == size) {
-			for (int i=0; i<size; i++) {
-				//int other_figure = other_data[i];
-				int figure = data[i];
-				if (other.board[figure] != board[figure]) {
-					result = false;
-					break;
-				}
-			}
-		} else {
-			result = false;
-		}
-
-		return result;
-	}
 	
 	public String toString() {
 		String result = "\r\nWhite: " + Bits.toBinaryString(allByColour[Figures.COLOUR_WHITE]) + "\r\n";
@@ -5633,51 +5023,8 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return result;
 	}
 	
-	/*private int[][] createMatrix() {
-		int[][] result = new int[8][8];
-		
-		for (int i=0;i<8;i++) {
-			for (int j=0;j<8;j++) {
-				result[i][j] = Figures.DUMMY_FIGURE_ID; 
-			}
-		}
-		
-		IndexNumberSet[] allWhite = stateManager.getAliveFigures(Figures.COLOUR_WHITE);
-		fillMatrixByFiguresTypeSet(result, allWhite[Figures.TYPE_PAWN]);
-		fillMatrixByFiguresTypeSet(result, allWhite[Figures.TYPE_KNIGHT]);
-		fillMatrixByFiguresTypeSet(result, allWhite[Figures.TYPE_KING]);
-		fillMatrixByFiguresTypeSet(result, allWhite[Figures.TYPE_OFFICER]);
-		fillMatrixByFiguresTypeSet(result, allWhite[Figures.TYPE_CASTLE]);
-		fillMatrixByFiguresTypeSet(result, allWhite[Figures.TYPE_QUEEN]);
-		
-		
-		IndexNumberSet[] allBlack = stateManager.getAliveFigures(Figures.COLOUR_BLACK);
-		fillMatrixByFiguresTypeSet(result, allBlack[Figures.TYPE_PAWN]);
-		fillMatrixByFiguresTypeSet(result, allBlack[Figures.TYPE_KNIGHT]);
-		fillMatrixByFiguresTypeSet(result, allBlack[Figures.TYPE_KING]);
-		fillMatrixByFiguresTypeSet(result, allBlack[Figures.TYPE_OFFICER]);
-		fillMatrixByFiguresTypeSet(result, allBlack[Figures.TYPE_CASTLE]);
-		fillMatrixByFiguresTypeSet(result, allBlack[Figures.TYPE_QUEEN]);
-		
-		return result;
-	}
-
-	private void fillMatrixByFiguresTypeSet(int[][] result, IndexNumberSet figureIDs) {
-		int size = figureIDs.getDataSize();
-		int[] data = figureIDs.getData();
-		for (int i=0; i<size; i++) {
-			int figureID = data[i];
-			if (figureID == Figures.DUMMY_FIGURE_ID) {
-				throw new IllegalStateException();
-			}
-			int fieldID = fieldIDPerFigureID[figureID];
-			int letter = Fields.LETTERS[fieldID];
-			int digit = Fields.DIGITS[fieldID];
-			result[letter][digit] = figureID;
-		}
-	}*/
 	
-	protected void checkConsistency() {
+	private void checkConsistency() {
 		long allWhiteBitboard = NUMBER_0;
 		
 		//IndexNumberSet[] allWhite = stateManager.getAliveFigures(Figures.COLOUR_WHITE);
@@ -5719,7 +5066,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		//checkConsistency_DeathFigures();
 	}
 
-	protected long checkConsistency_AliveFiguresByTypeAndColour(int colour, int type, PiecesList figIDs) {
+	private long checkConsistency_AliveFiguresByTypeAndColour(int colour, int type, PiecesList figIDs) {
 		
 		long typeBitboard = NUMBER_0;
 		
@@ -5759,11 +5106,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}
 		
 		return typeBitboard;
-	}
-
-
-	public BackupInfo[] getBackups() {
-		return backupInfo;
 	}
 	
 	public boolean hasSufficientMaterial() {
@@ -5836,10 +5178,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	
 	public int getDraw50movesRule() {
 		return lastCaptureOrPawnMoveBefore;
-	}
-	
-	public int getLastCaptrueFieldID() {
-		return lastCaptureFieldID;
 	}
 	
 	public final IGameStatus getStatus() {
@@ -5918,16 +5256,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		return IGameStatus.NONE;
 	}
-
-	public int[] getOpeningMoves() {
-		int movesCount = getPlayedMovesCount();
-		int[] moves = getPlayedMoves();
-		int[] o_moves = new int[movesCount];
-		for (int i=0; i<movesCount; i++) {
-			o_moves[i] = moves[i];
-		}
-		return o_moves;
-	}
+	
 
 	@Override
 	public IMaterialFactor getMaterialFactor() {
@@ -5937,22 +5266,10 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	@Override
 	public IMaterialState getMaterialState() {
 		return materialState;
-	}	
-	
-	//@Override
-	public IMobility getMobility() {
-		//return attackListener; it doesn't work correctly
-		return null;
 	}
 
 	@Override
 	public IBoardConfig getBoardConfig() {
 		return boardConfig;
-	}
-
-	@Override
-	public int[] getMatrix() {
-		//return board;
-		throw new UnsupportedOperationException();
 	}
 }

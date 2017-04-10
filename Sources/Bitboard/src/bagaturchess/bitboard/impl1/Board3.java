@@ -1801,8 +1801,7 @@ public abstract class Board3 extends Fields implements IBoard, Cloneable {
 		return true;
 	}
 
-
-	@Override
+	
 	public int[] getMatrix() {
 		return board;
 	}

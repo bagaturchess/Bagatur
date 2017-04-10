@@ -168,7 +168,7 @@ public class SEE implements ISEE {
 				oc_state = bitboard.getFieldsAttacks().getControlArray(oppColour)[toFieldID];
 			} // else {
 				*/
-				int[] matrix = bitboard.getMatrix();
+				int[] matrix = null;//bitboard.getMatrix();
 				
 				//c_state = colour == Figures.COLOUR_WHITE ? buildAttacksList(false, Figures.COLOUR_WHITE, toFieldID, toFieldBitboard) : buildAttacksList(false, Figures.COLOUR_BLACK, toFieldID, toFieldBitboard);
 				//oc_state = oppColour == Figures.COLOUR_WHITE ? buildAttacksList(false, Figures.COLOUR_WHITE, toFieldID, toFieldBitboard) : buildAttacksList(false, Figures.COLOUR_BLACK, toFieldID, toFieldBitboard);

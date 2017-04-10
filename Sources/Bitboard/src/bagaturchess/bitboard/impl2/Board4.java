@@ -1801,10 +1801,4 @@ public abstract class Board4 extends Fields implements IBoard, Cloneable {
 	public boolean hasMoveInNonCheck() {
 		return true;
 	}
-
-
-	@Override
-	public int[] getMatrix() {
-		return board;
-	}
 }
