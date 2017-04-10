@@ -9,7 +9,6 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.eval.BaseEvalWeights;
 import bagaturchess.bitboard.impl.eval.pawns.model.Pawn;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnStructureConstants;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModel;
@@ -22,11 +21,8 @@ import bagaturchess.bitboard.impl.plies.OfficerPlies;
 import bagaturchess.bitboard.impl.plies.WhitePawnPlies;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.search.api.IEvalConfig;
-import bagaturchess.search.api.internal.EvaluatorAdapter;
-import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;
-import bagaturchess.search.impl.evalcache.IEvalEntry;
 
 
 public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
