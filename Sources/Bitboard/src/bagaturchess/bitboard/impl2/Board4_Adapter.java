@@ -162,4 +162,8 @@ public class Board4_Adapter extends Board4 implements IBitBoard {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public int[] getMatrix() {
+		return board;
+	}
 }

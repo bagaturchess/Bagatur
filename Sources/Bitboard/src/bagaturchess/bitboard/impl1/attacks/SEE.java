@@ -37,6 +37,7 @@ import bagaturchess.bitboard.impl.plies.CastlePlies;
 import bagaturchess.bitboard.impl.plies.KingPlies;
 import bagaturchess.bitboard.impl.plies.KnightPlies;
 import bagaturchess.bitboard.impl.plies.OfficerPlies;
+import bagaturchess.bitboard.impl1.Board3;
 import bagaturchess.bitboard.impl1.movegen.MoveInt;
 
 
@@ -168,7 +169,7 @@ public class SEE implements ISEE {
 				oc_state = bitboard.getFieldsAttacks().getControlArray(oppColour)[toFieldID];
 			} // else {
 				*/
-				int[] matrix = null;//bitboard.getMatrix();
+				int[] matrix = bitboard.getMatrix();
 				
 				//c_state = colour == Figures.COLOUR_WHITE ? buildAttacksList(false, Figures.COLOUR_WHITE, toFieldID, toFieldBitboard) : buildAttacksList(false, Figures.COLOUR_BLACK, toFieldID, toFieldBitboard);
 				//oc_state = oppColour == Figures.COLOUR_WHITE ? buildAttacksList(false, Figures.COLOUR_WHITE, toFieldID, toFieldBitboard) : buildAttacksList(false, Figures.COLOUR_BLACK, toFieldID, toFieldBitboard);

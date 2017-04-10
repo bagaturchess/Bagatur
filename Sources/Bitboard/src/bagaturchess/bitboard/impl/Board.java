@@ -5272,4 +5272,9 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	public IBoardConfig getBoardConfig() {
 		return boardConfig;
 	}
+	
+	@Override
+	public int[] getMatrix() {
+		return board;
+	}
 }

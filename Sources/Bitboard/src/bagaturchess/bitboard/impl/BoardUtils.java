@@ -40,7 +40,7 @@ public class BoardUtils {
 	
 	
 	public static IBitBoard createBoard_WithPawnsCache() {
-		return createBoard_WithPawnsCache(Constants.INITIAL_BOARD, "bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory", null, 1000);
+		return createBoard_WithPawnsCache(Constants.INITIAL_BOARD, bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory.class.getName(), null, 1000);
 	}
 
 	public static IBitBoard createBoard_WithPawnsCache(IBoardConfig boardConfig) {
@@ -48,7 +48,7 @@ public class BoardUtils {
 	}
 	
 	public static IBitBoard createBoard_WithPawnsCache(String fen, IBoardConfig boardConfig) {
-		return createBoard_WithPawnsCache(fen, "bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory", boardConfig, 1000);
+		return createBoard_WithPawnsCache(fen, bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory.class.getName(), boardConfig, 1000);
 	}
 	
 	public static IBitBoard createBoard_WithPawnsCache(String fen, String cacheFactoryClassName, IBoardConfig boardConfig, int pawnsCacheSize) {

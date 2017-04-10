@@ -5,6 +5,7 @@ import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 
 public interface IBoard {
 	
+	public int[] getMatrix();
 	
 	public PawnsEvalCache getPawnsCache();
 	public void setPawnsCache(PawnsEvalCache pawnsCache);

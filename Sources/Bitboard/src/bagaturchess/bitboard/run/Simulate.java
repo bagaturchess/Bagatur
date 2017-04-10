@@ -133,8 +133,9 @@ public class Simulate {
 
 			int curCount = lists[depth].reserved_getCurrentSize();
 			
-			Utils.randomize(lists[depth].reserved_getMovesBuffer(), 0, curCount);
+			//Utils.randomize(lists[depth].reserved_getMovesBuffer(), 0, curCount);
 			bubbleSort(0, curCount, lists[depth].reserved_getMovesBuffer());
+			Utils.randomize(lists[depth].reserved_getMovesBuffer(), 0, curCount);
 			
 			int movenumber = (int) Math.min(branching, curCount);
 			
@@ -185,10 +186,7 @@ public class Simulate {
 		
 		//BoardWithAttacks bitBoard = new BoardWithAttacks();
 		//String BOARD = "4k3/P7/8/8/8/8/7p/4K3 w - 0 0";
-		//Board bitBoard = new Board(boardConfig);
 		IBoard bitBoard = new Board(boardConfig);
-		//IBoard bitBoard = new Board1(boardConfig);
-		//IBoard bitBoard = new Board2(boardConfig);
 		//IBoard bitBoard = new Board3_Adapter();
 		//IBoard bitBoard = new Board4_Adapter();
 		//IBoard bitBoard = new DummyBoard();
