@@ -264,7 +264,36 @@ public class Evaluate {
      *         Positive values are good for the side to make the next move.
      */
     final public int evalPos(IPosition pos) {
-        int score = pos.getwMtrl() - pos.getbMtrl();
+    	
+        int score = eval1(pos);
+        score += eval2(pos);
+        score += eval3(pos);
+        
+        score = endGameEval(pos, score);
+
+        if (!pos.isWhiteMove())
+            score = -score;
+        return score;
+
+        // FIXME! Test penalty if side to move has >1 hanging piece
+        
+        // FIXME! Test "tempo value"
+    }
+    
+    
+    final public int evalPos_rough(IPosition pos) {
+    	
+        int score = eval1(pos);
+    	
+    	if (!pos.isWhiteMove())
+            score = -score;
+    	
+        return score;
+    }
+    
+    
+	int eval1(IPosition pos) {
+		int score = pos.getwMtrl() - pos.getbMtrl();
 
         wKingAttacks = bKingAttacks = 0;
         wKingZone = BitBoard.kingAttacks[pos.getKingSq(true)]; wKingZone |= wKingZone << 8;
@@ -280,34 +309,27 @@ public class Evaluate {
 
         score += pieceSquareEval(pos);
         score += pawnBonus(pos);
+        
         score += tradeBonus(pos);
         score += castleBonus(pos);
-
-        score += rookBonus(pos);
-        score += bishopEval(pos, score);
-        score += threatBonus(pos);
-        score += kingSafety(pos);
-        score = endGameEval(pos, score);
-
-        if (!pos.isWhiteMove())
-            score = -score;
-        return score;
-
-        // FIXME! Test penalty if side to move has >1 hanging piece
         
-        // FIXME! Test "tempo value"
-    }
+		return score;
+	}
 
-    final public int evalPos_rough(IPosition pos) {
-    	int score = pos.getwMtrl() - pos.getbMtrl();
-    	
-    	score += pieceSquareEval(pos);
-        score += pawnBonus(pos);
-    	
-    	if (!pos.isWhiteMove())
-            score = -score;
-        return score;
-    }
+	int eval2(IPosition pos) {
+		int score = 0;
+		score += rookBonus(pos);
+        score += bishopEval(pos, score);
+		return score;
+	}
+	
+	int eval3(IPosition pos) {
+		int score = 0;
+		score += threatBonus(pos);
+        score += kingSafety(pos);
+		return score;
+	}
+	
     
     /** Compute white_material - black_material. */
     static final int material(IPosition pos) {
