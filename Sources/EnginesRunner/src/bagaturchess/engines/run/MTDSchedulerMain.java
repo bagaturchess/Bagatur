@@ -90,8 +90,8 @@ public class MTDSchedulerMain {
 								//new RootSearchConfig_BaseImpl_SMP(
 				
 				new String[] {
-								//bagaturchess.search.impl.alg.impl0.SearchMTD0.class.getName(),
-								bagaturchess.search.impl.alg.impl2.SearchAB2.class.getName(),
+								bagaturchess.search.impl.alg.impl0.SearchMTD0.class.getName(),
+								//bagaturchess.search.impl.alg.impl2.SearchAB2.class.getName(),
 								//"bagaturchess.search.impl.alg.impl5_scratch.SearchMTD_MinMax",
 								//"bagaturchess.search.impl.alg.impl5_scratch.SearchMTD_AlphaBeta",
 								//"bagaturchess.search.impl.alg.impl_staticsearch.SearchMTD_Static",
