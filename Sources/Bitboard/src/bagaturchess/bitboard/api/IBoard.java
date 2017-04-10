@@ -19,6 +19,7 @@ public interface IBoard {
 	public int genAllMoves(final IInternalMoveList list);
 	public int genKingEscapes(final IInternalMoveList list);
 	public int genCapturePromotionMoves(final IInternalMoveList list);
+	public int genAllMoves_ByFigureID(int fieldID, long excludedToFields, final IInternalMoveList list);
 	
 	public void makeMoveForward(final int move);
 	public void makeMoveBackward(final int move);
@@ -53,11 +54,6 @@ public interface IBoard {
 	
 	public IBoard clone();
 	
-	public long getFreeBitboard();
-	public long getFiguresBitboardByPID(int pid);
-	public long getFiguresBitboardByColourAndType(int colour, int type);
-	public long getFiguresBitboardByColour(int colour);
-	
 	public boolean isInCheck();
 	public boolean isInCheck(int colour);
 	public boolean hasMoveInCheck();
@@ -71,4 +67,12 @@ public interface IBoard {
 	public int getCastlingType(int colour);
 	public boolean hasRightsToKingCastle(int colour);
 	public boolean hasRightsToQueenCastle(int colour);
+	
+	/**
+	 * Game related methods
+	 */
+	public int getPlayedMovesCount();
+	public int[] getPlayedMoves();
+	public int getLastMove();
+	public IGameStatus getStatus();
 }

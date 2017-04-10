@@ -26,19 +26,11 @@ package bagaturchess.bitboard.api;
 public interface IBitBoard extends IBoard {
 	
 	
-	/**
-	 * Base engine's methods  
-	 */
-	public int genAllMoves_ByFigureID(int fieldID, long excludedToFields, final IInternalMoveList list);
+	public long getFreeBitboard();
+	public long getFiguresBitboardByPID(int pid);
+	public long getFiguresBitboardByColourAndType(int colour, int type);
+	public long getFiguresBitboardByColour(int colour);
 	
-	
-	/**
-	 * Game related methods
-	 */
-	public int getPlayedMovesCount();
-	public int[] getPlayedMoves();
-	public int getLastMove();
-	public IGameStatus getStatus();
 	
 	/**
 	 * Birboards
