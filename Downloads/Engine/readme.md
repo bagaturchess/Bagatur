@@ -10,6 +10,10 @@ The program runs under all Operating Systems, which support Java platform:
 
 # Revision History
 
+Version 1.4e (15 April 2017)
+  * Evaluation function tunning (versus Stockfish7)
+  * Endgame improvements for mate search - use endgame table bases after depth 15
+
 Version 1.4d (31 August 2016)
   * Memory optimizations: increased memory usage percent, hence more entries into the transposition table (now on 40/40 time controls search goes deeper)
   * Fix for endgames without pawns
