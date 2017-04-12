@@ -2,25 +2,10 @@ package bagaturchess.learning.goldmiddle.impl.cfg.bagatur;
 
 
 import bagaturchess.bitboard.common.Utils;
-import bagaturchess.bitboard.impl.Fields;
 
 
 interface FeatureWeights {
 	
-	
-	public static final int[] FILE_SYMMETRY = new int[] {0, 1, 2, 3, 3, 2, 1, 0};
-	
-	public static final long RANK_7TH = Fields.DIGIT_7;
-	public static final long RANK_8TH = Fields.DIGIT_8;
-	public static final long RANK_2TH = Fields.DIGIT_2;
-	public static final long RANK_1TH = Fields.DIGIT_1;
-	
-	// Attack weights for each piece type.
-	public static final int QueenAttackWeight	 		= 5;
-	public static final int RookAttackWeight 			= 3;
-	public static final int BishopAttackWeight 			= 2;
-	public static final int KnightAttackWeight	 		= 2;
-
 	
 	/**
 	 * Standard
@@ -92,15 +77,6 @@ interface FeatureWeights {
 	public static final int[] MOBILITY_ROOK_E		= new int[] {-9, -4, 0, 0, 1, 1, 1, 2, 6, 7, 7, 8, 8, 8, 9};
 	public static final int[] MOBILITY_QUEEN_O		= new int[] {-2, -1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
 	public static final int[] MOBILITY_QUEEN_E		= new int[] {-60, -55, -51, -46, -42, -37, -33, -29, -25, -21, -16, -11, -6, -1, 6, 11, 15, 19, 23, 27, 31, 36, 40, 44, 48, 52, 57, 61};
-	
-	
-	/**
-	 * Attacks
-	 */
-	public static final int ATTACKS_MINOR_MINOR		= 30;
-	public static final int ATTACKS_MINOR_MAJOR		= 50;
-	public static final int ATTACKS_MAJOR_MINOR		= 30;
-	public static final int ATTACKS_MAJOR_MAJOR		= 40;
 	
 	
 	/**

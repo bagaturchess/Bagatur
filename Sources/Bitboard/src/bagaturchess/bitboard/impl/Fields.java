@@ -316,6 +316,8 @@ public class Fields extends Bits {
 			0,   0,   0,   0,   0,   0,   0,   0,
 		});
 	
+	public static final int[] FILE_SYMMETRY = new int[] {0, 1, 2, 3, 3, 2, 1, 0};
+	
 	public static int[] CENTER_MANHATTAN_DISTANCE = Utils.reverseSpecial ( new int[]{	
 			  6, 5, 4, 3, 3, 4, 5, 6,
 			  5, 4, 3, 2, 2, 3, 4, 5,

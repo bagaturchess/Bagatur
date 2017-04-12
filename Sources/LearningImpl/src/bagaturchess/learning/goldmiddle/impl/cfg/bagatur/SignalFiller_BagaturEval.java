@@ -30,6 +30,13 @@ import bagaturchess.search.api.IEvaluator;
 public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeights, ISignalFiller, IEvaluator {
 	
 	
+	// Attack weights for each piece type.
+	public static final int QueenAttackWeight	 		= 5;
+	public static final int RookAttackWeight 			= 3;
+	public static final int BishopAttackWeight 			= 2;
+	public static final int KnightAttackWeight	 		= 2;
+	
+	
 	private IBitBoard bitboard;	
 	
 	private PiecesList w_knights;
@@ -187,7 +194,6 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		
 		
 		eval_material_nopawnsdrawrule();
-		eval_trading();
 		eval_standard();
 		eval_pawns();
 		
@@ -222,198 +228,6 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		signals.getSignal(FEATURE_ID_TRAPPED).addStrength(interpolateInternal(evalInfo.eval_Trapped_o, evalInfo.eval_Trapped_e, openingPart), openingPart);
 		signals.getSignal(FEATURE_ID_PAWNS_PSTOPPERS_A).addStrength(interpolateInternal(evalInfo.eval_PawnsPassedStoppers_a_o, evalInfo.eval_PawnsPassedStoppers_a_e, openingPart), openingPart);
 	}
-	
-	
-	private int drawProbability(int eval) {
-		
-		int abs = Math.abs(eval);
-		
-		/**
-		 * No pawns
-		 */
-		/*if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
-			abs = abs / 2;
-		}*/
-		
-		/**
-		 * Differently colored bishops, no other pieces except pawns
-		 */
-		if (w_bishops.getDataSize() == 1
-				&& b_bishops.getDataSize() == 1
-				&& bitboard.getMaterialFactor().getWhiteFactor() == 3
-				&& bitboard.getMaterialFactor().getBlackFactor() == 3) {
-			
-			long w_colour = (evalInfo.bb_w_bishops & Fields.ALL_WHITE_FIELDS) != 0 ?
-					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
-			long b_colour = (evalInfo.bb_b_bishops & Fields.ALL_WHITE_FIELDS) != 0 ?
-					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
-			if (w_colour != b_colour) {
-				
-				//If one of the sides has advantage of 2-3 pawns, than let it know the game goes to draw
-				if (abs <= 200) {
-					abs = abs / 4;
-				} else if (abs <= 400) {
-					abs = abs / 2;
-				} else if (abs <= 600) {
-					abs = (2 * abs) / 3;
-				}
-			}
-		}
-		
-		/**
-		 * 50 moves rule
-		 */
-		int movesBeforeDraw = 100 - bitboard.getDraw50movesRule();
-		double percents = movesBeforeDraw / (double)100;
-		abs = (int) (percents * abs);//(int) ((abs + percents * abs) / (double)2);
-		
-		/**
-		 * Return value
-		 */
-		return eval >= 0 ? abs : -abs;
-	}
-	
-	
-    /** When ahead trade pieces and pawns, don't do it otherwise */
-    private void eval_trading() {
-    	
-    	if (true) {
-    		return;
-    	}
-    	
-    	//Calculates rates difference of both pawns material and total material for the white and black player. The numbers are of type double in [0, 1]
-        double w_material_rate = Math.min(1, bitboard.getMaterialFactor().getWhiteFactor() / (double) (BaseEvalWeights.getMaxMaterialFactor() / (double) 2));
-        double b_material_rate = Math.min(1, bitboard.getMaterialFactor().getBlackFactor() / (double) (BaseEvalWeights.getMaxMaterialFactor() / (double) 2));
-        //double diff_material_rate = w_material_rate - b_material_rate;
-        
-        //double w_pawns_rate = w_pawns.getDataSize() / (double) 8;
-        //double b_pawns_rate = b_pawns.getDataSize() / (double) 8;
-        //double diff_pawns_rate = w_pawns_rate - b_pawns_rate;
-    	
-        
-        /*Openning*/
-        
-        //Calculates material difference of both pawns material and total material for the white and black player. The numbers are real evaluations of type integer.
-        final int w_material_all_o = baseEval.getWhiteMaterialPawns_o() + baseEval.getWhiteMaterialNonPawns_o();
-        final int b_material_all_o = baseEval.getBlackMaterialPawns_o() + baseEval.getBlackMaterialNonPawns_o();
-        //final int w_material_pawns_o = w_material_all_o - baseEval.getWhiteMaterialNonPawns_o();
-        //final int b_material_pawns_o = b_material_all_o - baseEval.getBlackMaterialNonPawns_o();
-        double diff_material_all_o = w_material_all_o - b_material_all_o;
-        //double diff_material_pawns_o = w_material_pawns_o - b_material_pawns_o;
-        
-        
-        //Calculates the trading bonus or penalty
-        int eval_trading_all_o = (int) ( 0.125 * -diff_material_all_o * ( w_material_rate + b_material_rate) );
-        //int eval_trading_pawns_o = (int) ( 0.333 * diff_material_pawns_o * ( w_material_rate + b_material_rate - 2 ) );
-        
-		evalInfo.eval_Material_o += eval_trading_all_o;
-		//evalInfo.eval_Material_o += eval_trading_pawns_o;
-		
-		
-		/*Endgame*/
-		
-		
-        //Calculates material difference of both pawns material and total material for the white and black player. The numbers are real evaluations of type integer.
-        final int w_material_all_e = baseEval.getWhiteMaterialPawns_e() + baseEval.getWhiteMaterialNonPawns_e();
-        final int b_material_all_e = baseEval.getBlackMaterialPawns_e() + baseEval.getBlackMaterialNonPawns_e();
-        //final int w_material_pawns_e = w_material_all_e - baseEval.getWhiteMaterialNonPawns_e();
-        //final int b_material_pawns_e = b_material_all_e - baseEval.getBlackMaterialNonPawns_e();
-        double diff_material_all_e = w_material_all_e - b_material_all_e;
-        //double diff_material_pawns_e = w_material_pawns_e - b_material_pawns_e;
-        
-        
-        //Calculates the trading bonus or penalty
-        int eval_trading_all_e = (int) ( 0.125 * -diff_material_all_e * ( w_material_rate + b_material_rate) );
-        //int eval_trading_pawns_e = (int) ( 0.333 * diff_material_pawns_e * ( w_material_rate + b_material_rate - 2 ) );
-        
-		evalInfo.eval_Material_e += eval_trading_all_e;
-		//evalInfo.eval_Material_e += eval_trading_pawns_e;
-        
-		
-		/*
-        final int wM = pos.getwMtrl();
-        final int bM = pos.getbMtrl();
-        final int wPawn = pos.getwMtrlPawns();
-        final int bPawn = pos.getbMtrlPawns();
-        final int deltaScore = wM - bM;
-
-        int pBonus = 0;
-        pBonus += interpolate((deltaScore > 0) ? wPawn : bPawn, 0, -30 * deltaScore / 100, 6 * pV, 0);
-        pBonus += interpolate((deltaScore > 0) ? bM : wM, 0, 30 * deltaScore / 100, qV + 2 * rV + 2 * bV + 2 * nV, 0);
-
-        return pBonus;
-        */
-    }
-    
-    
-	/*public int eval_material() {
-		
-		int eval_o = 0;
-		int eval_e = 0;
-		
-		int MATERIAL_KNIGHT_E_W_fixed = MATERIAL_KNIGHT_E;
-		int MATERIAL_BISHOP_E_W_fixed = MATERIAL_BISHOP_E;
-		int MATERIAL_KNIGHT_E_B_fixed = MATERIAL_KNIGHT_E;
-		int MATERIAL_BISHOP_E_B_fixed = MATERIAL_BISHOP_E;
-		if (w_pawns.getDataSize() == 0) {//No white pawns
-			if (w_queens.getDataSize() == 0 && w_rooks.getDataSize() == 0) {
-				if (w_bishops.getDataSize() == 0) {
-					MATERIAL_KNIGHT_E_W_fixed = (int) (evalConfig.get_WEIGHT_MATERIAL_PAWNS_E() * (MATERIAL_PAWN_E / 2));
-				}
-				if (w_knights.getDataSize() == 0 && w_bishops.getDataSize() == 1) {
-					MATERIAL_BISHOP_E_W_fixed = (int) (evalConfig.get_WEIGHT_MATERIAL_PAWNS_E() * (MATERIAL_PAWN_E / 2));
-				}
-			}
-		}
-		if (b_pawns.getDataSize() == 0) {//No black pawns
-			if (b_queens.getDataSize() == 0 && b_rooks.getDataSize() == 0) {
-				if (b_bishops.getDataSize() == 0) {
-					MATERIAL_KNIGHT_E_B_fixed = (int) (evalConfig.get_WEIGHT_MATERIAL_PAWNS_E() * (MATERIAL_PAWN_E / 2));
-				}
-				if (b_knights.getDataSize() == 0 && b_bishops.getDataSize() == 1) {
-					MATERIAL_BISHOP_E_B_fixed =(int) (evalConfig.get_WEIGHT_MATERIAL_PAWNS_E() * (MATERIAL_PAWN_E / 2));
-				}
-			}
-		}
-		
-		int pawns = w_pawns.getDataSize() - b_pawns.getDataSize();
-		eval_o += MATERIAL_PAWN_O * pawns * evalConfig.get_WEIGHT_MATERIAL_PAWNS_O();
-		eval_e += MATERIAL_PAWN_E * pawns * evalConfig.get_WEIGHT_MATERIAL_PAWNS_E();
-		
-		eval_o += MATERIAL_KNIGHT_O * (w_knights.getDataSize() % 2)
-					- MATERIAL_KNIGHT_O * (b_knights.getDataSize() % 2);
-		eval_e += MATERIAL_KNIGHT_E_W_fixed * (w_knights.getDataSize() % 2)
-					- MATERIAL_KNIGHT_E_B_fixed * (b_knights.getDataSize() % 2);
-		
-		eval_o += MATERIAL_BISHOP_O * (w_bishops.getDataSize() % 2)
-					- MATERIAL_BISHOP_O * (b_bishops.getDataSize() % 2);
-		eval_e += MATERIAL_BISHOP_E_W_fixed * (w_bishops.getDataSize() % 2)
-					- MATERIAL_BISHOP_E_B_fixed * (b_bishops.getDataSize() % 2);
-		
-		int rooks = (w_rooks.getDataSize() % 2) - (b_rooks.getDataSize() % 2);
-		eval_o += MATERIAL_ROOK_O * rooks;
-		eval_e += MATERIAL_ROOK_E * rooks;
-		int queens = w_queens.getDataSize() - b_queens.getDataSize();
-		eval_o += MATERIAL_QUEEN_O * queens;
-		eval_e += MATERIAL_QUEEN_E * queens;
-		
-		//TODO: Fix material if there are only two knights
-		int dknights = (w_knights.getDataSize() / 2) - (b_knights.getDataSize() / 2);
-		eval_o += MATERIAL_DOUBLE_KNIGHT_O * dknights;
-		eval_e += MATERIAL_DOUBLE_KNIGHT_E * dknights;
-		int dbishops = (w_bishops.getDataSize() / 2) - (b_bishops.getDataSize() / 2);
-		eval_o += MATERIAL_DOUBLE_BISHOP_O * dbishops;
-		eval_e += MATERIAL_DOUBLE_BISHOP_E * dbishops;
-		int drooks = (w_rooks.getDataSize() / 2) - (b_rooks.getDataSize() / 2);
-		eval_o += MATERIAL_DOUBLE_ROOK_O * drooks;
-		eval_e += MATERIAL_DOUBLE_ROOK_E * drooks;
-		
-		evalInfo.eval_Material_o += eval_o;
-		evalInfo.eval_Material_e += eval_e;
-		
-		return interpolator.interpolateByFactor(eval_o, eval_e);
-
-	}*/
 	
 	
 	public int eval_material_nopawnsdrawrule() {
@@ -731,9 +545,9 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 				}
 				
 				// Rook on 7th rank:
-				if ((bb_field & RANK_7TH) != 0L) {
+				if ((bb_field & Fields.DIGIT_7) != 0L) {
 					//If there are pawns on 7th rank or king on 8th rank
-					if ((evalInfo.bb_b_pawns & RANK_7TH) != 0L || (evalInfo.bb_b_king & RANK_8TH) != 0L) {
+					if ((evalInfo.bb_b_pawns & Fields.DIGIT_7) != 0L || (evalInfo.bb_b_king & Fields.DIGIT_8) != 0L) {
 						rooks_7th2th++;
 					}
 				}
@@ -756,9 +570,9 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 				}
 				
 				// Rook on 2th rank:
-				if ((bb_field & RANK_2TH) != 0L) {
+				if ((bb_field & Fields.DIGIT_2) != 0L) {
 					//If there are pawns on 2th rank or king on 1th rank
-					if ((evalInfo.bb_w_pawns & RANK_2TH) != 0L || (evalInfo.bb_w_king & RANK_1TH) != 0L) {
+					if ((evalInfo.bb_w_pawns & Fields.DIGIT_2) != 0L || (evalInfo.bb_w_king & Fields.DIGIT_1) != 0L) {
 						rooks_7th2th--;
 					}
 				}
@@ -785,9 +599,9 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 				long bb_field = Fields.ALL_A1H1[fieldID];
 				
 				// Queen on 7th rank:
-				if ((bb_field & RANK_7TH) != 0L) {
+				if ((bb_field & Fields.DIGIT_7) != 0L) {
 					//If there are pawns on 7th rank or king on 8th rank
-					if ((evalInfo.bb_b_pawns & RANK_7TH) != 0L || (evalInfo.bb_b_king & RANK_8TH) != 0L) {
+					if ((evalInfo.bb_b_pawns & Fields.DIGIT_7) != 0L || (evalInfo.bb_b_king & Fields.DIGIT_8) != 0L) {
 						queens_7th2th++;
 					}
 				}				
@@ -803,9 +617,9 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 				long bb_field = Fields.ALL_A1H1[fieldID];
 				
 				// Queen on 1th rank:
-				if ((bb_field & RANK_2TH) != 0L) {
+				if ((bb_field & Fields.DIGIT_2) != 0L) {
 					//If there are pawns on 2th rank or king on 1th rank
-					if ((evalInfo.bb_w_pawns & RANK_2TH) != 0L || (evalInfo.bb_w_king & RANK_1TH) != 0L) {
+					if ((evalInfo.bb_w_pawns & Fields.DIGIT_2) != 0L || (evalInfo.bb_w_king & Fields.DIGIT_1) != 0L) {
 						queens_7th2th--;
 					}
 				}
