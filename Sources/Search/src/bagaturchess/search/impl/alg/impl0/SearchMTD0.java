@@ -86,11 +86,13 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		return result;
 	}
 	
+	
 	private boolean isPasserPushNonPV(int cur_move) {
 		//return false;
 		boolean passerPush = env.getBitboard().isPasserPush(cur_move);
 		return passerPush;
 	}
+	
 	
 	private boolean isPasserPushPV(int cur_move) {
 		//return false;
@@ -98,131 +100,10 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		return passerPush;
 	}
 	
-	private boolean isDangerousPV(int cur_move, int initial_maxdepth, int depth) {
-		
-		int totalMaterialFactor = env.getBitboard().getMaterialFactor().getTotalFactor();
-		
-		//if (true) return false; 
-		
-		/**
-		 * King moves in endgame - 4rooks or 2queens 
-		 */
-		int type = MoveInt.getFigureType(cur_move);
-		if (type == Figures.TYPE_KING
-				&& totalMaterialFactor <= 30 //2queens + 4minors
-				&& totalMaterialFactor > 16 //2rooks + 2minors
-				) {
-			if (depth <= initial_maxdepth) {
-				return true;
-			}
-		}
-		
-		/**
-		 * Queen tropism increased
-		 */
-		if (type == Figures.TYPE_QUEEN) {
-			int fromID = MoveInt.getFromFieldID(cur_move);
-			int toID = MoveInt.getToFieldID(cur_move);
-			
-			int fromTropism = -1;
-			int toTropism = -1;
-			
-			int colour = env.getBitboard().getColourToMove();
-			if (colour == Figures.COLOUR_WHITE) {
-				int opKingID = env.getBitboard().getPiecesLists().getPieces(Constants.PID_B_KING).getData()[0];
-				fromTropism = Fields.getDistancePoints_reversed(opKingID, fromID);
-				toTropism = Fields.getDistancePoints_reversed(opKingID, toID);
-			} else {
-				int opKingID = env.getBitboard().getPiecesLists().getPieces(Constants.PID_W_KING).getData()[0];
-				fromTropism = Fields.getDistancePoints_reversed(opKingID, fromID);
-				toTropism = Fields.getDistancePoints_reversed(opKingID, toID);
-			}
-			
-			return toTropism - fromTropism >= 1;// && toTropism >= 3;
-			
-		} else if (type == Figures.TYPE_KNIGHT) {
-			/**
-			 * Knight tropism increas
-			 */
-			int fromID = MoveInt.getFromFieldID(cur_move);
-			int toID = MoveInt.getToFieldID(cur_move);
-			
-			int fromTropism = -1;
-			int toTropism = -1;
-			
-			int colour = env.getBitboard().getColourToMove();
-			if (colour == Figures.COLOUR_WHITE) {
-				if (env.getBitboard().getPiecesLists().getPieces(Constants.PID_W_QUEEN).getDataSize() > 0) {
-					int opKingID = env.getBitboard().getPiecesLists().getPieces(Constants.PID_B_KING).getData()[0];
-					fromTropism = Fields.getDistancePoints_reversed(opKingID, fromID);
-					toTropism = Fields.getDistancePoints_reversed(opKingID, toID);
-				}
-			} else {
-				if (env.getBitboard().getPiecesLists().getPieces(Constants.PID_B_QUEEN).getDataSize() > 0) {
-					int opKingID = env.getBitboard().getPiecesLists().getPieces(Constants.PID_W_KING).getData()[0];
-					fromTropism = Fields.getDistancePoints_reversed(opKingID, fromID);
-					toTropism = Fields.getDistancePoints_reversed(opKingID, toID);
-				}
-			}
-			
-			return toTropism - fromTropism >= 1;//2 && toTropism >= 3;
-		}
-		
-		return false;
-	}
-	
-	private boolean isDangerousNonPV(int cur_move, int initial_maxdepth, int depth) {
-		
-		
-		int totalMaterialFactor = env.getBitboard().getMaterialFactor().getTotalFactor();
-		
-		/**
-		 * King moves in endgame - 4rooks or 2queens 
-		 */
-		int type = MoveInt.getFigureType(cur_move);
-		if (type == Figures.TYPE_KING
-				&& totalMaterialFactor <= 30 //2queens + 4minors
-				&& totalMaterialFactor > 16 //2rooks + 2minors
-				) {
-			if (depth <= initial_maxdepth) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	private boolean isKillerMove(int cur_move) {
-		
-		return false;
-		
-		/*boolean isKiller = false;
-		int[] killers = env.getHistory_all().getNonCaptureKillers(env.getBitboard().getColourToMove());
-		for (int i=0; i<killers.length; i++) {
-			if (cur_move == killers[i]) {
-				isKiller = true;
-				break;
-			}
-		}
-		return isKiller;*/
-	}
 	
 	private int interpolateByMaterialAndColour(int colour, int val_o, int val_e) {
 		return env.getBitboard().getMaterialFactor().interpolateByFactorAndColour(colour, val_o, val_e);
 	}
-	
-	/*private int interpolateByMaterialAndColour(int val_o, int val_e) {
-		return env.getBitboard().getBaseEvaluation().interpolateByFactorAndColour(env.getBitboard().getColourToMove(), val_o, val_e);
-	}
-	
-	private int interpolateByOpponentMaterialAndColour(int val_o, int val_e) {
-		int opColour = Figures.OPPONENT_COLOUR[env.getBitboard().getColourToMove()];
-		return env.getBitboard().getBaseEvaluation().interpolateByFactorAndColour(opColour, val_o, val_e);
-	}
-	
-	private int interpolateByTotalMaterial(int val_o, int val_e) {
-		return env.getBitboard().getBaseEvaluation().interpolateByFactor(val_o, val_e);
-	}*/
 	
 	
 	protected int new_maxdepth_pv(int colourToMove, int maxdepth, int rest, int move, boolean inCheck, boolean singleMove, int see, boolean passerPush, int move_eval,
@@ -937,7 +818,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 
 		
 		//IID PV Node
-		if (IID_PV && depth > 0) {
+		if (IID_PV /*&& depth > 0*/) {
 			
 			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
@@ -1215,6 +1096,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							if (lmrReduction < PLY) {
 								lmrReduction = PLY;
 							}
+							/*if (lmrReduction < 2 * PLY && searchedCount >= getLMR2(list)) {
+								lmrReduction = 2 * PLY;
+							}*/
+							/*if (lmrReduction < 3 * PLY && searchedCount >= 2 * getLMR2(list)) {
+								lmrReduction = 3 * PLY;
+							}*/
 							if (lmrReduction >= (rest - 1) * PLY) {
 								lmrReduction = (rest - 1) * PLY;
 							}
@@ -1256,13 +1143,13 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -(beta - 1), false,
 								best_move, prevbest, prevPV, rootColour, totalLMReduction, -new_materialGain,
-								inNullMove, new_mateMove, useMateDistancePrunning, staticPrunning, true);
+								inNullMove, new_mateMove, useMateDistancePrunning, false, true);
 						
-						if (cur_eval >= beta && staticPrunning) {
+						/*if (cur_eval >= beta && staticPrunning) {
 							cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -(beta - 1), false,
 									best_move, prevbest, prevPV, rootColour, totalLMReduction, -new_materialGain,
 									inNullMove, new_mateMove, useMateDistancePrunning, false, true);
-						}
+						}*/
 					}
 					
 					if (isPVNode(cur_eval, best_eval, alpha, beta)) {
@@ -1584,6 +1471,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		int tpt_upper = MAX;
 		int tpt_move = 0;
 		
+        
 		if (allowTPTAccess(maxdepth, depth)) {
 			env.getTPT().lock();
 			{
@@ -1773,7 +1661,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		
 		boolean reuseIIDMOves = false;
 		//IID NONPV Node
-		if (IID_NONPV && depth > 0) {
+		if (IID_NONPV /*&& depth > 0*/) {
 			
 			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
@@ -2019,6 +1907,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 								if (lmrReduction < PLY) {
 									lmrReduction = PLY;
 								}
+								/*if (lmrReduction < 2 * PLY && searchedCount >= getLMR2(list)) {
+									lmrReduction = 2 * PLY;
+								}*/
+								/*if (lmrReduction < 3 * PLY && searchedCount >= 2 * getLMR2(list)) {
+									lmrReduction = 3 * PLY;
+								}*/
 								if (lmrReduction >= (rest - 1) * PLY) {
 									lmrReduction = (rest - 1) * PLY;
 								}
@@ -2061,13 +1955,13 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							
 							cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -(beta - 1), false,
 									best_move, prevbest, prevPV, rootColour, totalLMReduction, -new_materialGain,
-									inNullMove, new_mateMove, useMateDistancePrunning, staticPrunning, true);
+									inNullMove, new_mateMove, useMateDistancePrunning, false, true);
 							
-							if (cur_eval >= beta && staticPrunning) {
+							/*if (cur_eval >= beta && staticPrunning) {
 								cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -(beta - 1), false,
 										best_move, prevbest, prevPV, rootColour, totalLMReduction, -new_materialGain,
 										inNullMove, new_mateMove, useMateDistancePrunning, false, true);
-							}
+							}*/
 						}
 				}
 						
