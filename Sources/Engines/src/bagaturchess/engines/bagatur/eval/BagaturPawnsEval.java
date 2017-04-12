@@ -118,7 +118,7 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 				
 				int rank = p.getRank();
 				int file = Fields.LETTERS[p.getFieldID()];
-				int file_symmetry = FILE_SYMMETRY[file];
+				int file_symmetry = Fields.FILE_SYMMETRY[file];
 				
 				
 				if (p.isDoubled()) {
@@ -207,7 +207,7 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 				
 				int rank = p.getRank();
 				int file = Fields.LETTERS[p.getFieldID()];
-				int file_symmetry = FILE_SYMMETRY[file];
+				int file_symmetry = Fields.FILE_SYMMETRY[file];
 				
 				if (p.isDoubled()) {
 					standardEval_o -= PAWNS_DOUBLED_O[file_symmetry];

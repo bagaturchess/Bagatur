@@ -50,8 +50,11 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	
 	private IBagaturEvalConfig evalConfig;
 	
-	private int MATERIAL_DOUBLE_BISHOP_O = 40;
-	private int MATERIAL_DOUBLE_BISHOP_E = 50;
+	// Attack weights for each piece type.
+	public static final int QueenAttackWeight	 		= 5;
+	public static final int RookAttackWeight 			= 3;
+	public static final int BishopAttackWeight 			= 2;
+	public static final int KnightAttackWeight	 		= 2;
 	
 	
 	BagaturEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -497,9 +500,9 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				}
 				
 				// Rook on 7th rank:
-				if ((bb_field & RANK_7TH) != 0L) {
+				if ((bb_field & Fields.DIGIT_7) != 0L) {
 					//If there are pawns on 7th rank or king on 8th rank
-					if ((evalInfo.bb_b_pawns & RANK_7TH) != 0L || (evalInfo.bb_b_king & RANK_8TH) != 0L) {
+					if ((evalInfo.bb_b_pawns & Fields.DIGIT_7) != 0L || (evalInfo.bb_b_king & Fields.DIGIT_8) != 0L) {
 						rooks_7th2th++;
 					}
 				}
@@ -522,9 +525,9 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				}
 				
 				// Rook on 2th rank:
-				if ((bb_field & RANK_2TH) != 0L) {
+				if ((bb_field & Fields.DIGIT_2) != 0L) {
 					//If there are pawns on 2th rank or king on 1th rank
-					if ((evalInfo.bb_w_pawns & RANK_2TH) != 0L || (evalInfo.bb_w_king & RANK_1TH) != 0L) {
+					if ((evalInfo.bb_w_pawns & Fields.DIGIT_2) != 0L || (evalInfo.bb_w_king & Fields.DIGIT_1) != 0L) {
 						rooks_7th2th--;
 					}
 				}
@@ -551,9 +554,9 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long bb_field = Fields.ALL_A1H1[fieldID];
 				
 				// Queen on 7th rank:
-				if ((bb_field & RANK_7TH) != 0L) {
+				if ((bb_field & Fields.DIGIT_7) != 0L) {
 					//If there are pawns on 7th rank or king on 8th rank
-					if ((evalInfo.bb_b_pawns & RANK_7TH) != 0L || (evalInfo.bb_b_king & RANK_8TH) != 0L) {
+					if ((evalInfo.bb_b_pawns & Fields.DIGIT_7) != 0L || (evalInfo.bb_b_king & Fields.DIGIT_8) != 0L) {
 						queens_7th2th++;
 					}
 				}				
@@ -569,9 +572,9 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long bb_field = Fields.ALL_A1H1[fieldID];
 				
 				// Queen on 1th rank:
-				if ((bb_field & RANK_2TH) != 0L) {
+				if ((bb_field & Fields.DIGIT_2) != 0L) {
 					//If there are pawns on 2th rank or king on 1th rank
-					if ((evalInfo.bb_w_pawns & RANK_2TH) != 0L || (evalInfo.bb_w_king & RANK_1TH) != 0L) {
+					if ((evalInfo.bb_w_pawns & Fields.DIGIT_2) != 0L || (evalInfo.bb_w_king & Fields.DIGIT_1) != 0L) {
 						queens_7th2th--;
 					}
 				}

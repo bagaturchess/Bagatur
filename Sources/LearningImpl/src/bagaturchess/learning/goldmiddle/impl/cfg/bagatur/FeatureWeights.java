@@ -7,6 +7,9 @@ import bagaturchess.bitboard.common.Utils;
 interface FeatureWeights {
 	
 	
+	public static final int MATERIAL_DOUBLE_BISHOP_O = 40;
+	public static final int MATERIAL_DOUBLE_BISHOP_E = 50;
+	
 	/**
 	 * Standard
 	 */

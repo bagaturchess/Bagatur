@@ -29,13 +29,6 @@ import bagaturchess.search.api.IEvaluator;
 public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeights, ISignalFiller, IEvaluator {
 	
 	
-	// Attack weights for each piece type.
-	public static final int QueenAttackWeight	 		= 5;
-	public static final int RookAttackWeight 			= 3;
-	public static final int BishopAttackWeight 			= 2;
-	public static final int KnightAttackWeight	 		= 2;
-	
-	
 	private IBitBoard bitboard;	
 	
 	private PiecesList w_knights;
@@ -56,10 +49,11 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 	
 	private EvalInfo evalInfo;
 	
-	//private IBagaturEvalConfig evalConfig;
-	
-	private int MATERIAL_DOUBLE_BISHOP_O = 40;
-	private int MATERIAL_DOUBLE_BISHOP_E = 50;
+	// Attack weights for each piece type.
+	public static final int QueenAttackWeight	 		= 5;
+	public static final int RookAttackWeight 			= 3;
+	public static final int BishopAttackWeight 			= 2;
+	public static final int KnightAttackWeight	 		= 2;
 	
 	
 	SignalFiller_BagaturEval(IBitBoard _bitboard) {
