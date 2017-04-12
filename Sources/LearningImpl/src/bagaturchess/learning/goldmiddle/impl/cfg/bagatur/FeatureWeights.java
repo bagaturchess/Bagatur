@@ -46,12 +46,6 @@ interface FeatureWeights {
 	public static final int[] PAWNS_PASSED_E		= new int[] {0, 7, 7, 25, 63, 134, 186};
 	public static final int[] PAWNS_PASSED_SUPPORTED_O	= new int[] {0, 13, 13, 21, 41, 62, 124};
 	public static final int[] PAWNS_PASSED_SUPPORTED_E	= new int[] {0, 9, 12, 31, 79, 178, 299};
-	public static final int[] PAWNS_KING_F_O		= new int[] {0, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6};
-	public static final int[] PAWNS_KING_F_E		= new int[] {2, 4, 4, 4, 5, 5, 9, 9, 9, 9, 9};
-	public static final int[] PAWNS_KING_FF_O		= new int[] {-2, -2, -2, -2, 2, 3, 3, 3, 3, 3, 3};
-	public static final int[] PAWNS_KING_FF_E		= new int[] {-2, -2, -2, -2, 4, 8, 8, 8, 8, 8, 8};
-	public static final int[] PAWNS_KING_OP_F_O		= new int[] {-7, -7, -7, -7, -7, -8, -8, -16, -16, -16, -16};
-	public static final int[] PAWNS_KING_OP_F_E		= new int[] {6, 6, 6, 6, 6, -3, -13, -18, -18, -18, -18};
 	
 	
 	public static final int PAWNS_KING_GUARDS		= 4;
