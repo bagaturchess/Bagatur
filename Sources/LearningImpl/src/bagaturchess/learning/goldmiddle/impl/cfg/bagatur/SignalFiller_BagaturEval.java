@@ -9,7 +9,6 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.eval.BaseEvalWeights;
 import bagaturchess.bitboard.impl.eval.pawns.model.Pawn;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnStructureConstants;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModel;
