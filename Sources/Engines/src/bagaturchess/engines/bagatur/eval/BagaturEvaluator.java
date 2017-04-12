@@ -398,13 +398,13 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		int PAWNS_PASSED_UNSTOPPABLE = 100 + baseEval.getMaterialRook();
 		
 		int unstoppablePasser = bitboard.getUnstoppablePasser();
-		if (unstoppablePasser > 0) {
-			evalInfo.eval_PawnsUnstoppable_o += PAWNS_PASSED_UNSTOPPABLE;
-			evalInfo.eval_PawnsUnstoppable_e += PAWNS_PASSED_UNSTOPPABLE;
-		} else if (unstoppablePasser < 0) {
-			evalInfo.eval_PawnsUnstoppable_o -= PAWNS_PASSED_UNSTOPPABLE;
-			evalInfo.eval_PawnsUnstoppable_e -= PAWNS_PASSED_UNSTOPPABLE;
-		}
+		//if (unstoppablePasser > 0) {
+			evalInfo.eval_PawnsUnstoppable_o += unstoppablePasser * PAWNS_PASSED_UNSTOPPABLE;
+			evalInfo.eval_PawnsUnstoppable_e += unstoppablePasser * PAWNS_PASSED_UNSTOPPABLE;
+		//} else if (unstoppablePasser < 0) {
+		//	evalInfo.eval_PawnsUnstoppable_o -= PAWNS_PASSED_UNSTOPPABLE;
+		//	evalInfo.eval_PawnsUnstoppable_e -= PAWNS_PASSED_UNSTOPPABLE;
+		//}
 		
 		bitboard.getPawnsCache().unlock();
 	}

@@ -546,8 +546,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		int result = 0;
 		
-		//getPawnsCache().lock();
-		
 		PawnsModelEval modelEval = getPawnsStructure();
 		PawnsModel model = modelEval.getModel();
 
@@ -603,10 +601,17 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 			}
 		}
 		
+		if (getColourToMove() == Figures.COLOUR_WHITE) {
+			if (result > 0) {
+				return result;
+			}
+		} else {
+			if (result < 0) {
+				return result;
+			}			
+		}
 		
-		//getPawnsCache().unlock();
-		
-		return result;
+		return 0;
 	}
 	
 	private boolean hasUnstoppablePasser(int colourToMove) {
