@@ -307,17 +307,4 @@ public class EvalInfo extends Figures {
 			return res;
 		}
 	}
-	
-	
-	private int drawProbability(int eval) {
-		
-		int abs = Math.abs(eval);
-		
-		int movesBeforeDraw = 100 - bitboard.getDraw50movesRule();
-		double percents = movesBeforeDraw / (double)100;
-		
-		abs = (int) (percents * abs);
-		
-		return eval >= 0 ? abs : -abs;
-	}
 }
