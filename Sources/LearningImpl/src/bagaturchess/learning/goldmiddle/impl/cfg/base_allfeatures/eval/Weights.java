@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures;
+package bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.eval;
 
 
 public interface Weights {

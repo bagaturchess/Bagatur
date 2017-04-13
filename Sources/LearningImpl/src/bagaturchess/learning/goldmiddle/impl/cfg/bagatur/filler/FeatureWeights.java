@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.bagatur;
+package bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler;
 
 
 import bagaturchess.bitboard.common.Utils;

@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures;
+package bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.eval;
 
 
 import bagaturchess.bitboard.impl.eval.pawns.model.Pawn;

@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures;
+package bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -15,6 +15,7 @@ import bagaturchess.bitboard.impl.plies.KingSurrounding;
 import bagaturchess.bitboard.impl.plies.KnightPlies;
 import bagaturchess.bitboard.impl.plies.OfficerPlies;
 import bagaturchess.bitboard.impl.plies.WhitePawnPlies;
+import bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.filler.ALL_SignalFillerConstants;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;

@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.bagatur;
+package bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval;
 
 
 import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;

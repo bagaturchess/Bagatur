@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.bagatur;
+package bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval;
 
 
 import bagaturchess.bitboard.impl.Fields;
@@ -7,7 +7,7 @@ import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModel;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 
 
-class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
+public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 	
 	
 	private int standardEval_o;

@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures;
+package bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -8,19 +8,17 @@ import bagaturchess.search.api.IEvaluatorFactory;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 
 
-public class WeightsEvaluatorFactory implements IEvaluatorFactory {
+public class BagaturEvaluatorFactory implements IEvaluatorFactory {
 	
-	
-	public WeightsEvaluatorFactory() {
+	public BagaturEvaluatorFactory() {
 	}
-	
 	
 	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache) {
-		return new WeightsEvaluator(bitboard, evalCache, null);
+		return new BagaturEvaluator(bitboard, evalCache, null);
 	}
-	
 	
 	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache, IEvalConfig evalConfig) {
-		return new WeightsEvaluator(bitboard, evalCache, evalConfig);
+		return new BagaturEvaluator(bitboard, evalCache, evalConfig);
 	}
+	
 }

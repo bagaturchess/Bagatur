@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.bagatur;
+package bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,7 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 
-class EvalInfo extends Figures {
+public class EvalInfo extends Figures {
 	
 	//Evals of opening and endgame
 	int eval_Material_o;
@@ -154,7 +154,7 @@ class EvalInfo extends Figures {
 		eval_PawnsUnstoppable_e = 0;
 	}
 	
-	public void clear() {
+	public void clear_rest() {
 				
 		eval_Mobility_o = 0;
 		eval_Mobility_e = 0;

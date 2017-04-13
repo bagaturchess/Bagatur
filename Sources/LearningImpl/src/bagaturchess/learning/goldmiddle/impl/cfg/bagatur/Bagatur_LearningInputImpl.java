@@ -24,13 +24,16 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.BoardConfigImpl;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.FeaturesConfigurationBagaturImpl;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.SignalFiller_BagaturEval;
 
 
 public class Bagatur_LearningInputImpl implements ILearningInput {
 	
 	
 	public String getPawnsEvalFactoryClassName() {
-		return bagaturchess.learning.goldmiddle.impl.cfg.bagatur.BagaturPawnsEvalFactory.class.getName();
+		return bagaturchess.engines.bagatur.eval.BagaturPawnsEvalFactory.class.getName();
 	}
 	
 	public IBoardConfig createBoardConfig() {

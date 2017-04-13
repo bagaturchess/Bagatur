@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.bagatur;
+package bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval;
 
 
 import bagaturchess.bitboard.api.IBaseEval;
@@ -20,13 +20,12 @@ import bagaturchess.bitboard.impl.plies.KnightPlies;
 import bagaturchess.bitboard.impl.plies.OfficerPlies;
 import bagaturchess.bitboard.impl.plies.WhitePawnPlies;
 import bagaturchess.bitboard.impl.state.PiecesList;
-import bagaturchess.learning.api.IFeatureComplexity;
-import bagaturchess.learning.api.ISignalFiller;
-import bagaturchess.learning.api.ISignals;
-import bagaturchess.search.api.IEvaluator;
+import bagaturchess.search.api.IEvalConfig;
+import bagaturchess.search.impl.eval.BaseEvaluator;
+import bagaturchess.search.impl.evalcache.IEvalCache;
 
 
-public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeights, ISignalFiller, IEvaluator {
+public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	
 	
 	private IBitBoard bitboard;	
@@ -55,8 +54,58 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 	public static final int BishopAttackWeight 			= 2;
 	public static final int KnightAttackWeight	 		= 2;
 	
+	/**
+	 * Weights of evaluation clusters, hard coded in this class 
+	 */
+	private double WEIGHT_MATERIAL_O 			= 1.167;
+	private double WEIGHT_MATERIAL_E 			= 0.799;
 	
-	SignalFiller_BagaturEval(IBitBoard _bitboard) {
+	private double WEIGHT_STANDARD_O 			= 0.183;
+	private double WEIGHT_STANDARD_E 			= 0;
+	
+	private double WEIGHT_PAWNS_ROOKQUEEN_O		= 0.631;
+	private double WEIGHT_PAWNS_ROOKQUEEN_E		= 2.013;
+	
+	private double WEIGHT_KINGSAFETY_O 			= 3.379;
+	private double WEIGHT_KINGSAFETY_E 			= 0;
+	
+	private double WEIGHT_MOBILITY_O 			= 0.751;
+	private double WEIGHT_MOBILITY_E 			= 0;
+	
+	private double WEIGHT_MOBILITY_S_O 			= 1.734;
+	private double WEIGHT_MOBILITY_S_E 			= 0.934;
+	
+	private double WEIGHT_SPACE_O 				= 0.704;
+	private double WEIGHT_SPACE_E 				= 0.179;
+	
+	private double WEIGHT_TRAPPED_O 			= 0.403;
+	private double WEIGHT_TRAPPED_E 			= 0.601;
+	
+    private double WEIGHT_HUNGED_O 				= 1.328;
+    private double WEIGHT_HUNGED_E 				= 2.149;
+	
+	private double WEIGHT_PST_O 				= 1.082;
+	private double WEIGHT_PST_E 				= 0.622;
+	
+	private double WEIGHT_PAWNS_STANDARD_O 		= 0.698;
+	private double WEIGHT_PAWNS_STANDARD_E 		= 0.440;
+	
+	private double WEIGHT_PAWNS_PASSED_O 		= 0;
+	private double WEIGHT_PAWNS_PASSED_E 		= 1.737;
+	
+	private double WEIGHT_PAWNS_PASSED_KING_O 	= 0;
+	private double WEIGHT_PAWNS_PASSED_KING_E 	= 2.444;
+	
+	private double WEIGHT_PAWNS_PSTOPPERS_O 	= 0;
+	private double WEIGHT_PAWNS_PSTOPPERS_E 	= 0.418;
+	
+	private double WEIGHT_PAWNS_PSTOPPERS_A_O 	= 0;
+	private double WEIGHT_PAWNS_PSTOPPERS_A_E 	= 1.357;
+
+	
+	BagaturEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
+		
+		super(_bitboard, _evalCache, _evalConfig);
 		
 		bitboard = _bitboard;
 		
@@ -77,78 +126,147 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		baseEval = _bitboard.getBaseEvaluation();
 		
 		evalInfo = new EvalInfo(bitboard);
-
+	}
+	
+	
+	@Override
+	protected double phase1() {
+		int eval = 0;
 		
-		//evalConfig = (IBagaturEvalConfig) _evalConfig;
-	}
-	
-	
-	public void fill(ISignals signals) {
-		fillStandardSignals(signals);
-		fillPawnSignals(signals);
-		fillPiecesIterationSignals(signals);
-		fillMovesIterationSignals(signals);
-	}
-	
-	
-	public void fillByComplexity(int complexity, ISignals signals) {
-		switch(complexity) {
-			case IFeatureComplexity.STANDARD:
-				fillStandardSignals(signals);
-				return;
-			case IFeatureComplexity.PAWNS_STRUCTURE:
-				fillPawnSignals(signals);
-				return;
-			case IFeatureComplexity.PIECES_ITERATION:
-				fillPiecesIterationSignals(signals);
-				return;
-			case IFeatureComplexity.MOVES_ITERATION:
-				fillMovesIterationSignals(signals);
-				return;
-			case IFeatureComplexity.FIELDS_STATES_ITERATION:
-				//throw new UnsupportedOperationException("FIELDS_STATES_ITERATION");
-				return;
-			default:
-				throw new IllegalStateException("complexity=" + complexity);
-		}
-	}
-	
-	
-	/**
-	 * @param signals
-	 */
-	private void fillStandardSignals(ISignals signals) {
-		// TODO Auto-generated method stub
+		evalInfo.clear_short();
 		
+		eval_material_nopawnsdrawrule();
+		eval_PST();
+		evalInfo.eval_Material_o *= WEIGHT_MATERIAL_O;
+		evalInfo.eval_Material_e *= WEIGHT_MATERIAL_E;
+		evalInfo.eval_PST_o *= WEIGHT_PST_O;
+		evalInfo.eval_PST_e *= WEIGHT_PST_E;
+		eval += interpolator.interpolateByFactor(evalInfo.eval_Material_o +
+												evalInfo.eval_PST_o,
+												
+												evalInfo.eval_Material_e +
+												evalInfo.eval_PST_e);
+		return eval;
 	}
+	
+	
+	@Override
+	protected double phase2() {
 
-
-	/**
-	 * @param signals
-	 */
-	private void fillPawnSignals(ISignals signals) {
-		// TODO Auto-generated method stub
+		int eval = 0;
 		
+		eval_pawns();
+		evalInfo.eval_PawnsStandard_o *= WEIGHT_PAWNS_STANDARD_O;
+		evalInfo.eval_PawnsStandard_e *= WEIGHT_PAWNS_STANDARD_E;
+		evalInfo.eval_PawnsPassed_o *= WEIGHT_PAWNS_PASSED_O;
+		evalInfo.eval_PawnsPassed_e *= WEIGHT_PAWNS_PASSED_E;
+		evalInfo.eval_PawnsPassedKing_o *= WEIGHT_PAWNS_PASSED_KING_O;
+		evalInfo.eval_PawnsPassedKing_e *= WEIGHT_PAWNS_PASSED_KING_E;
+		eval += interpolator.interpolateByFactor(
+												evalInfo.eval_PawnsStandard_o +
+												evalInfo.eval_PawnsPassed_o +
+												evalInfo.eval_PawnsPassedKing_o +
+												evalInfo.eval_PawnsUnstoppable_o,
+												
+												evalInfo.eval_PawnsStandard_e +
+												evalInfo.eval_PawnsPassed_e +
+												evalInfo.eval_PawnsPassedKing_e +
+												evalInfo.eval_PawnsUnstoppable_e);
+			
+		return eval;
 	}
-
-
-	/**
-	 * @param signals
-	 */
-	private void fillPiecesIterationSignals(ISignals signals) {
-		// TODO Auto-generated method stub
+	
+	
+	@Override
+	protected double phase3() {
 		
+		int eval = 0;
+				
+		evalInfo.clear_rest();
+		
+		initEvalInfo1();
+		
+		eval_standard();
+		evalInfo.eval_Standard_o *= WEIGHT_STANDARD_O;
+		evalInfo.eval_Standard_e *= WEIGHT_STANDARD_E;
+		eval += interpolator.interpolateByFactor(evalInfo.eval_Standard_o,
+												evalInfo.eval_Standard_e);
+		
+		eval_pawns_PassedStoppers_RooksAndQueens();
+		evalInfo.eval_PawnsPassedStoppers_o *= WEIGHT_PAWNS_PSTOPPERS_O;
+		evalInfo.eval_PawnsPassedStoppers_e *= WEIGHT_PAWNS_PSTOPPERS_E;
+		evalInfo.eval_PawnsRooksQueens_o *= WEIGHT_PAWNS_ROOKQUEEN_O;
+		evalInfo.eval_PawnsRooksQueens_e *= WEIGHT_PAWNS_ROOKQUEEN_E;
+		eval += interpolator.interpolateByFactor(evalInfo.eval_PawnsPassedStoppers_o +
+												evalInfo.eval_PawnsRooksQueens_o,
+												
+												evalInfo.eval_PawnsPassedStoppers_e +
+												evalInfo.eval_PawnsRooksQueens_e);
+		
+		return eval;
 	}
+	
+	
+	@Override
+	protected double phase4() {
+		
+		int eval = 0;
+		
+		initEvalInfo2();
+		eval_mobility();
+		evalInfo.eval_Mobility_o *= WEIGHT_MOBILITY_O;
+		evalInfo.eval_Mobility_e *= WEIGHT_MOBILITY_E;
+		eval += interpolator.interpolateByFactor(evalInfo.eval_Mobility_o,
+												
+												evalInfo.eval_Mobility_e);
+		
+		initEvalInfo3();
+		eval_king_safety();
+		eval_space();
+		eval_hunged();
+		evalInfo.eval_Kingsafety_o *= WEIGHT_KINGSAFETY_O;
+		evalInfo.eval_Kingsafety_e *= WEIGHT_KINGSAFETY_E;
+		evalInfo.eval_Space_o *= WEIGHT_SPACE_O;
+		evalInfo.eval_Space_e *= WEIGHT_SPACE_E;
+		evalInfo.eval_Hunged_o *= WEIGHT_HUNGED_O;
+		evalInfo.eval_Hunged_e *= WEIGHT_HUNGED_E;
+		eval += interpolator.interpolateByFactor(evalInfo.eval_Kingsafety_o +
+				evalInfo.eval_Space_o +
+				evalInfo.eval_Hunged_o,
 
-
-	/**
-	 * @param signals
-	 */
-	private void fillMovesIterationSignals(ISignals signals) {
-		fillAll(signals);
+				evalInfo.eval_Kingsafety_e +
+				evalInfo.eval_Space_e +
+				evalInfo.eval_Hunged_e);
+		
+		return eval;
 	}
-
-
+	
+	
+	@Override
+	protected double phase5() {
+		
+		int eval = 0;
+		
+		eval_TrapsAndSafeMobility();
+		eval_PassersFrontAttacks();
+		evalInfo.eval_Trapped_o *= WEIGHT_TRAPPED_O;
+		evalInfo.eval_Trapped_e *= WEIGHT_TRAPPED_E;
+		evalInfo.eval_Mobility_Safe_o *= WEIGHT_MOBILITY_S_O;
+		evalInfo.eval_Mobility_Safe_e *= WEIGHT_MOBILITY_S_E;
+		evalInfo.eval_PawnsPassedStoppers_a_o *= WEIGHT_PAWNS_PSTOPPERS_A_O;
+		evalInfo.eval_PawnsPassedStoppers_a_e *= WEIGHT_PAWNS_PSTOPPERS_A_E;
+		eval += interpolator.interpolateByFactor(evalInfo.eval_Trapped_o +
+												evalInfo.eval_Mobility_Safe_o +
+												evalInfo.eval_PawnsPassedStoppers_a_o,
+												
+												evalInfo.eval_Trapped_e +
+												evalInfo.eval_Mobility_Safe_e +
+												evalInfo.eval_PawnsPassedStoppers_a_e);
+		
+		return eval;
+	}
+	
+	
 	public String dump(int rootColour) { 
 		String msg = "";
 		
@@ -157,69 +275,6 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		msg += eval;
 		
 		return msg;
-	}
-	
-	
-	public void beforeSearch() {
-		//INT1 = Math.max(INT_MIN, INT1 / 2);
-		//INT2 = Math.max(INT_MIN, INT2 / 2);
-		//INT3 = Math.max(INT_MIN, INT3 / 2);
-		//INT4 = Math.max(INT_MIN, INT4 / 2);
-	}
-	
-	
-	public int getMaterialQueen() {
-		return 50 + baseEval.getMaterialQueen();
-	}
-	
-	private double interpolateInternal(double o, double e, double openningPart) {
-		return (o * openningPart + e * (1 - openningPart));
-	}
-	
-	
-	
-	public void fillAll(ISignals signals) {
-		
-		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
-		
-		evalInfo.clear_short();
-		evalInfo.clear();
-		
-		
-		eval_material_nopawnsdrawrule();
-		eval_standard();
-		eval_pawns();
-		
-		signals.getSignal(FEATURE_ID_MATERIAL).addStrength(interpolateInternal(evalInfo.eval_Material_o, evalInfo.eval_Material_e, openingPart), openingPart);
-		signals.getSignal(FEATURE_ID_STANDARD).addStrength(interpolateInternal(evalInfo.eval_Standard_o, evalInfo.eval_Standard_e, openingPart), openingPart);
-		signals.getSignal(FEATURE_ID_PST).addStrength(interpolateInternal(evalInfo.eval_PST_o, evalInfo.eval_PST_e, openingPart), openingPart);
-		signals.getSignal(FEATURE_ID_PAWNS_STANDARD).addStrength(interpolateInternal(evalInfo.eval_PawnsStandard_o, evalInfo.eval_PawnsStandard_e, openingPart), openingPart);
-		signals.getSignal(FEATURE_ID_PAWNS_PASSED).addStrength(interpolateInternal(evalInfo.eval_PawnsPassed_o, evalInfo.eval_PawnsPassed_e, openingPart), openingPart);
-		signals.getSignal(FEATURE_ID_PAWNS_PASSED_KING).addStrength(interpolateInternal(evalInfo.eval_PawnsPassedKing_o, evalInfo.eval_PawnsPassedKing_e, openingPart), openingPart);
-		
-		
-		initEvalInfo1();
-		eval_pawns_RooksAndQueens();
-		signals.getSignal(FEATURE_ID_PAWNS_PSTOPPERS).addStrength(interpolateInternal(evalInfo.eval_PawnsPassedStoppers_o, evalInfo.eval_PawnsPassedStoppers_e, openingPart), openingPart);
-		signals.getSignal(FEATURE_ID_PAWNS_ROOKQUEEN).addStrength(interpolateInternal(evalInfo.eval_PawnsRooksQueens_o, evalInfo.eval_PawnsRooksQueens_e, openingPart), openingPart);
-		
-
-		initEvalInfo2();
-		eval_mobility();
-		signals.getSignal(FEATURE_ID_MOBILITY).addStrength(interpolateInternal(evalInfo.eval_Mobility_o, evalInfo.eval_Mobility_e, openingPart), openingPart);
-		
-		initEvalInfo3();
-		eval_king_safety();
-		eval_space();
-		eval_hunged();
-		eval_TrapsAndSafeMobility();
-		eval_PassersFrontAttacks();
-		signals.getSignal(FEATURE_ID_MOBILITY_S).addStrength(interpolateInternal(evalInfo.eval_Mobility_Safe_o, evalInfo.eval_Mobility_Safe_e, openingPart), openingPart);
-		signals.getSignal(FEATURE_ID_KINGSAFETY).addStrength(interpolateInternal(evalInfo.eval_Kingsafety_o, evalInfo.eval_Kingsafety_e, openingPart), openingPart);
-		signals.getSignal(FEATURE_ID_SPACE).addStrength(interpolateInternal(evalInfo.eval_Space_o, evalInfo.eval_Space_e, openingPart), openingPart);
-		signals.getSignal(FEATURE_ID_HUNGED).addStrength(interpolateInternal(evalInfo.eval_Hunged_o, evalInfo.eval_Hunged_e, openingPart), openingPart);
-		signals.getSignal(FEATURE_ID_TRAPPED).addStrength(interpolateInternal(evalInfo.eval_Trapped_o, evalInfo.eval_Trapped_e, openingPart), openingPart);
-		signals.getSignal(FEATURE_ID_PAWNS_PSTOPPERS_A).addStrength(interpolateInternal(evalInfo.eval_PawnsPassedStoppers_a_o, evalInfo.eval_PawnsPassedStoppers_a_e, openingPart), openingPart);
 	}
 	
 	
@@ -235,31 +290,6 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		int b_eval_pawns_o = baseEval.getBlackMaterialPawns_o();
 		int b_eval_pawns_e = baseEval.getBlackMaterialPawns_e();
 		
-		/*w_eval_pawns_o += MATERIAL_PAWN_O * w_pawns.getDataSize() * evalConfig.get_WEIGHT_MATERIAL_PAWNS_O();
-		w_eval_pawns_e += MATERIAL_PAWN_E * w_pawns.getDataSize() * evalConfig.get_WEIGHT_MATERIAL_PAWNS_E();
-		b_eval_pawns_o += MATERIAL_PAWN_O * b_pawns.getDataSize() * evalConfig.get_WEIGHT_MATERIAL_PAWNS_O();
-		b_eval_pawns_e += MATERIAL_PAWN_E * b_pawns.getDataSize() * evalConfig.get_WEIGHT_MATERIAL_PAWNS_E();
-		
-		w_eval_nopawns_o += MATERIAL_KNIGHT_O * (w_knights.getDataSize() % 2) + MATERIAL_DOUBLE_KNIGHT_O * (w_knights.getDataSize() / 2);
-		w_eval_nopawns_e += MATERIAL_KNIGHT_E * (w_knights.getDataSize() % 2) + MATERIAL_DOUBLE_KNIGHT_E * (w_knights.getDataSize() / 2);
-		b_eval_nopawns_o += MATERIAL_KNIGHT_O * (b_knights.getDataSize() % 2) + MATERIAL_DOUBLE_KNIGHT_O * (b_knights.getDataSize() / 2);
-		b_eval_nopawns_e += MATERIAL_KNIGHT_E * (b_knights.getDataSize() % 2) + MATERIAL_DOUBLE_KNIGHT_E * (b_knights.getDataSize() / 2);
-		
-		w_eval_nopawns_o += MATERIAL_BISHOP_O * (w_bishops.getDataSize() % 2) + MATERIAL_DOUBLE_BISHOP_O * (w_bishops.getDataSize() / 2);
-		w_eval_nopawns_e += MATERIAL_BISHOP_E * (w_bishops.getDataSize() % 2) + MATERIAL_DOUBLE_BISHOP_E * (w_bishops.getDataSize() / 2);
-		b_eval_nopawns_o += MATERIAL_BISHOP_O * (b_bishops.getDataSize() % 2) + MATERIAL_DOUBLE_BISHOP_O * (b_bishops.getDataSize() / 2);
-		b_eval_nopawns_e += MATERIAL_BISHOP_E * (b_bishops.getDataSize() % 2) + MATERIAL_DOUBLE_BISHOP_E * (b_bishops.getDataSize() / 2);
-		
-		w_eval_nopawns_o += MATERIAL_ROOK_O * (w_rooks.getDataSize() % 2) + MATERIAL_DOUBLE_ROOK_O * (w_rooks.getDataSize() / 2);
-		w_eval_nopawns_e += MATERIAL_ROOK_E * (w_rooks.getDataSize() % 2) + MATERIAL_DOUBLE_ROOK_E * (w_rooks.getDataSize() / 2);
-		b_eval_nopawns_o += MATERIAL_ROOK_O * (b_rooks.getDataSize() % 2) + MATERIAL_DOUBLE_ROOK_O * (b_rooks.getDataSize() / 2);
-		b_eval_nopawns_e += MATERIAL_ROOK_E * (b_rooks.getDataSize() % 2) + MATERIAL_DOUBLE_ROOK_E * (b_rooks.getDataSize() / 2);
-		
-		w_eval_nopawns_o += MATERIAL_QUEEN_O * w_queens.getDataSize();
-		w_eval_nopawns_e += MATERIAL_QUEEN_E * w_queens.getDataSize();
-		b_eval_nopawns_o += MATERIAL_QUEEN_O * b_queens.getDataSize();
-		b_eval_nopawns_e += MATERIAL_QUEEN_E * b_queens.getDataSize();*/
-		
 		if (w_pawns.getDataSize() == 0) {
 			
 			if (w_eval_pawns_o != 0 || w_eval_pawns_e != 0) {
@@ -273,20 +303,6 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 			if (w_eval_nopawns_e < baseEval.getMaterial_BARIER_NOPAWNS_E()) {
 				w_eval_nopawns_e = w_eval_nopawns_e / 2;
 			}
-			
-			/*
-			if (w_eval_nopawns_o > b_eval_nopawns_o) {
-				if (w_eval_nopawns_o < b_eval_nopawns_o + baseEval.getMaterial_BARIER_NOPAWNS_O()) {
-					w_eval_nopawns_o = w_eval_nopawns_o / 2;//b_eval_nopawns_o;
-				}
-			}
-			
-			if (w_eval_nopawns_e > b_eval_nopawns_e) {
-				if (w_eval_nopawns_e < b_eval_nopawns_e + baseEval.getMaterial_BARIER_NOPAWNS_E()) {
-					w_eval_nopawns_e = w_eval_nopawns_e / 2;//b_eval_nopawns_e;
-				}
-			}
-			*/
 		}
 		
 		if (b_pawns.getDataSize() == 0) {
@@ -302,20 +318,6 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 			if (b_eval_nopawns_e < baseEval.getMaterial_BARIER_NOPAWNS_E()) {
 				b_eval_nopawns_e = b_eval_nopawns_e / 2;
 			}
-			
-			/*
-			if (b_eval_nopawns_o > w_eval_nopawns_o) {
-				if (b_eval_nopawns_o < w_eval_nopawns_o + baseEval.getMaterial_BARIER_NOPAWNS_O()) {
-					b_eval_nopawns_o = b_eval_nopawns_o / 2;//w_eval_nopawns_o;
-				}
-			}
-			
-			if (b_eval_nopawns_e > w_eval_nopawns_e) {
-				if (b_eval_nopawns_e < w_eval_nopawns_e + baseEval.getMaterial_BARIER_NOPAWNS_E()) {
-					b_eval_nopawns_e = b_eval_nopawns_e / 2;//w_eval_nopawns_e;
-				}
-			}
-			*/
 		}
 		
 		
@@ -338,6 +340,13 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		return interpolator.interpolateByFactor(evalInfo.eval_Material_o, evalInfo.eval_Material_e);
 
 	}
+	
+	
+	private void eval_PST() {
+		evalInfo.eval_PST_o += baseEval.getPST_o();
+		evalInfo.eval_PST_e += baseEval.getPST_e();
+	}
+	
 	
 	public void eval_standard() {
 		int eval_o = 0;
@@ -401,10 +410,6 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 			eval_o += STANDARD_DIST_QUEENS_O[queensDistance];
 			eval_e += STANDARD_DIST_QUEENS_E[queensDistance];
 		}
-		
-		
-		evalInfo.eval_PST_o += baseEval.getPST_o();
-		evalInfo.eval_PST_e += baseEval.getPST_e();
 
 		evalInfo.eval_Standard_o += eval_o;
 		evalInfo.eval_Standard_e += eval_e;
@@ -470,7 +475,7 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		
 	}
 	
-	public void eval_pawns_RooksAndQueens() {
+	public void eval_pawns_PassedStoppers_RooksAndQueens() {
 		
 		
 		bitboard.getPawnsCache().lock();
@@ -1243,8 +1248,8 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		
 		int space = w_space - b_space;
 		
-		evalInfo.eval_Space_o += space * SPACE_O;
-		evalInfo.eval_Space_e += space * SPACE_E;
+		evalInfo.eval_Space_o += space;
+		evalInfo.eval_Space_e += space;
 	}
 	
 	
@@ -1254,68 +1259,69 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		int eval_e = 0;
 		
 		
-		long bb_w_hunged = 0;
-		
-		//White pawns
-		long w_hunged_pawns = evalInfo.bb_w_pawns & evalInfo.bb_attackedByBlackOnly;
-		if (w_hunged_pawns != 0) {
-			bb_w_hunged |= w_hunged_pawns;
-		}
-		
-		//White minors
-		long w_hunged_minor = (evalInfo.bb_w_knights | evalInfo.bb_w_bishops) & evalInfo.bb_unsafe_for_w_minors;
-		if (w_hunged_minor != 0) {
-			bb_w_hunged |= w_hunged_minor;
-		}
-		
-		//White rooks
-		long w_hunged_rooks = evalInfo.bb_w_rooks & evalInfo.bb_unsafe_for_w_rooks;
-		if (w_hunged_rooks != 0) {
-			bb_w_hunged |= w_hunged_rooks;
-		}
-		
-		//White queens
-		long w_hunged_queens = evalInfo.bb_w_queens & evalInfo.bb_unsafe_for_w_queens;
-		if (w_hunged_queens != 0) {
-			bb_w_hunged |= w_hunged_queens;
-		}
-		
-		
-		long bb_b_hunged = 0;
-		
-		//Black pawns
-		long b_hunged_pawns = evalInfo.bb_b_pawns & evalInfo.bb_attackedByWhiteOnly;
-		if (b_hunged_pawns != 0) {
-			bb_b_hunged |= b_hunged_pawns;
-		}
-		
-		//Black minors
-		long b_hunged_minor = (evalInfo.bb_b_knights | evalInfo.bb_b_bishops) & evalInfo.bb_unsafe_for_b_minors;
-		if (b_hunged_minor != 0) {
-			bb_b_hunged |= b_hunged_minor;
-		}
-		
-		//Black rooks
-		long b_hunged_rooks = evalInfo.bb_b_rooks & evalInfo.bb_unsafe_for_b_rooks;
-		if (b_hunged_rooks != 0) {
-			bb_b_hunged |= b_hunged_rooks;
-		}
-		
-		//Black queens
-		long b_hunged_queens = evalInfo.bb_b_queens & evalInfo.bb_unsafe_for_b_queens;
-		if (b_hunged_queens != 0) {
-			bb_b_hunged |= b_hunged_queens;
-		}
-		
-		
-		int w_hungedCount = Utils.countBits_less1s(bb_w_hunged);
-		int b_hungedCount = Utils.countBits_less1s(bb_b_hunged);
-		
-		
 		if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
+			
+			long bb_w_hunged = 0;
+			
+			//White pawns
+			long w_hunged_pawns = evalInfo.bb_w_pawns & evalInfo.bb_attackedByBlackOnly;
+			if (w_hunged_pawns != 0) {
+				bb_w_hunged |= w_hunged_pawns;
+			}
+			
+			//White minors
+			long w_hunged_minor = (evalInfo.bb_w_knights | evalInfo.bb_w_bishops) & evalInfo.bb_unsafe_for_w_minors;
+			if (w_hunged_minor != 0) {
+				bb_w_hunged |= w_hunged_minor;
+			}
+			
+			//White rooks
+			long w_hunged_rooks = evalInfo.bb_w_rooks & evalInfo.bb_unsafe_for_w_rooks;
+			if (w_hunged_rooks != 0) {
+				bb_w_hunged |= w_hunged_rooks;
+			}
+			
+			//White queens
+			long w_hunged_queens = evalInfo.bb_w_queens & evalInfo.bb_unsafe_for_w_queens;
+			if (w_hunged_queens != 0) {
+				bb_w_hunged |= w_hunged_queens;
+			}
+			
+			int w_hungedCount = Utils.countBits_less1s(bb_w_hunged);
+			
 			eval_o += HUNGED_O[w_hungedCount];
 			eval_e += HUNGED_E[w_hungedCount];
+			
 		} else {
+			
+			long bb_b_hunged = 0;
+			
+			//Black pawns
+			long b_hunged_pawns = evalInfo.bb_b_pawns & evalInfo.bb_attackedByWhiteOnly;
+			if (b_hunged_pawns != 0) {
+				bb_b_hunged |= b_hunged_pawns;
+			}
+			
+			//Black minors
+			long b_hunged_minor = (evalInfo.bb_b_knights | evalInfo.bb_b_bishops) & evalInfo.bb_unsafe_for_b_minors;
+			if (b_hunged_minor != 0) {
+				bb_b_hunged |= b_hunged_minor;
+			}
+			
+			//Black rooks
+			long b_hunged_rooks = evalInfo.bb_b_rooks & evalInfo.bb_unsafe_for_b_rooks;
+			if (b_hunged_rooks != 0) {
+				bb_b_hunged |= b_hunged_rooks;
+			}
+			
+			//Black queens
+			long b_hunged_queens = evalInfo.bb_b_queens & evalInfo.bb_unsafe_for_b_queens;
+			if (b_hunged_queens != 0) {
+				bb_b_hunged |= b_hunged_queens;
+			}
+			
+			int b_hungedCount = Utils.countBits_less1s(bb_b_hunged);
+			
 			eval_o -= HUNGED_O[b_hungedCount];
 			eval_e -= HUNGED_E[b_hungedCount];
 		}
@@ -1476,8 +1482,8 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		
 		
 		trapped_all /= 2;
-		evalInfo.eval_Trapped_o += trapped_all * TRAPED_O;
-		evalInfo.eval_Trapped_e += trapped_all * TRAPED_E;
+		evalInfo.eval_Trapped_o -= trapped_all;
+		evalInfo.eval_Trapped_e -= trapped_all;
 		
 		evalInfo.eval_Mobility_Safe_o += eval_o;
 		evalInfo.eval_Mobility_Safe_e += eval_e;
@@ -1561,27 +1567,19 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 	private int fianchetto() {
 		int fianchetto = 0;
 		
-		long w_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
-		long b_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
-		long w_bishops = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER);
-		long b_bishops = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER);
-		long w_king = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KING);
-		long b_king = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KING);
-
-		
 		long w_fianchetto_pawns = Fields.G3 | Fields.F2 | Fields.H2;
-		if ((w_king & Fields.G1) != 0) {
-			if ((w_bishops & Fields.G2) != 0) {
-				if ((w_pawns & w_fianchetto_pawns) == w_fianchetto_pawns) {
+		if ((evalInfo.bb_w_king & Fields.G1) != 0) {
+			if ((evalInfo.bb_w_bishops & Fields.G2) != 0) {
+				if ((evalInfo.bb_w_pawns & w_fianchetto_pawns) == w_fianchetto_pawns) {
 					fianchetto++;
 				}
 			}
 		}
 		
 		long b_fianchetto_pawns = Fields.G6 | Fields.F7 | Fields.H7;
-		if ((b_king & Fields.G8) != 0) {
-			if ((b_bishops & Fields.G7) != 0) {
-				if ((b_pawns & b_fianchetto_pawns) == b_fianchetto_pawns) {
+		if ((evalInfo.bb_b_king & Fields.G8) != 0) {
+			if ((evalInfo.bb_b_bishops & Fields.G7) != 0) {
+				if ((evalInfo.bb_b_pawns & b_fianchetto_pawns) == b_fianchetto_pawns) {
 					fianchetto--;
 				}
 			}
@@ -1595,40 +1593,32 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		int minor_trap = 0;
 		int blocked_pawns = 0;
 		
-		long w_bishops = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER);
-		long b_bishops = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER);
-		long w_knights = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT);
-		long b_knights = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT);
-		long w_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
-		long b_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
-		
-		
 		/**
 		 * trapedBishopsA7H7
 		 */
-		if (w_bishops != 0) {
-			if ((w_bishops & Fields.A7) != 0) {
-				if  ((b_pawns & Fields.B6) != 0) {
+		if (evalInfo.bb_w_bishops != 0) {
+			if ((evalInfo.bb_w_bishops & Fields.A7) != 0) {
+				if  ((evalInfo.bb_b_pawns & Fields.B6) != 0) {
 					minor_trap++;
 				}
 			}
 			
-			if ((w_bishops & Fields.H7) != 0) {
-				if  ((b_pawns & Fields.G6) != 0) {
+			if ((evalInfo.bb_w_bishops & Fields.H7) != 0) {
+				if  ((evalInfo.bb_b_pawns & Fields.G6) != 0) {
 					minor_trap++;
 				}
 			}
 		}
 		
-		if (b_bishops != 0) {
-			if ((b_bishops & Fields.A2) != 0) {
-				if  ((w_pawns & Fields.B3) != 0) {
+		if (evalInfo.bb_b_bishops != 0) {
+			if ((evalInfo.bb_b_bishops & Fields.A2) != 0) {
+				if  ((evalInfo.bb_w_pawns & Fields.B3) != 0) {
 					minor_trap--;
 				}
 			}
 			
-			if ((b_bishops & Fields.H2) != 0) {
-				if  ((w_pawns & Fields.G3) != 0) {
+			if ((evalInfo.bb_b_bishops & Fields.H2) != 0) {
+				if  ((evalInfo.bb_w_pawns & Fields.G3) != 0) {
 					minor_trap--;
 				}
 			}
@@ -1638,29 +1628,29 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		/**
 		 * trapedBishopsA6H6
 		 */
-		if (w_bishops != 0) {
-			if ((w_bishops & Fields.A6) != 0) {
-				if  ((b_pawns & Fields.B5) != 0) {
+		if (evalInfo.bb_w_bishops != 0) {
+			if ((evalInfo.bb_w_bishops & Fields.A6) != 0) {
+				if  ((evalInfo.bb_b_pawns & Fields.B5) != 0) {
 					minor_trap++;
 				}
 			}
 			
-			if ((w_bishops & Fields.H6) != 0) {
-				if  ((b_pawns & Fields.G5) != 0) {
+			if ((evalInfo.bb_w_bishops & Fields.H6) != 0) {
+				if  ((evalInfo.bb_b_pawns & Fields.G5) != 0) {
 					minor_trap++;
 				}
 			}
 		}
 		
-		if (b_bishops != 0) {
-			if ((b_bishops & Fields.A3) != 0) {
-				if  ((w_pawns & Fields.B4) != 0) {
+		if (evalInfo.bb_b_bishops != 0) {
+			if ((evalInfo.bb_b_bishops & Fields.A3) != 0) {
+				if  ((evalInfo.bb_w_pawns & Fields.B4) != 0) {
 					minor_trap--;
 				}
 			}
 			
-			if ((b_bishops & Fields.H3) != 0) {
-				if  ((w_pawns & Fields.G4) != 0) {
+			if ((evalInfo.bb_b_bishops & Fields.H3) != 0) {
+				if  ((evalInfo.bb_w_pawns & Fields.G4) != 0) {
 					minor_trap--;
 				}
 			}
@@ -1669,29 +1659,29 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		/**
 		 * trapedKnightsA1H1
 		 */
-		if (w_knights != 0) {
-			if ((w_knights & Fields.A8) != 0) {
-				if  ((b_pawns & Fields.A7) != 0) {
+		if (evalInfo.bb_w_knights != 0) {
+			if ((evalInfo.bb_w_knights & Fields.A8) != 0) {
+				if  ((evalInfo.bb_b_pawns & Fields.A7) != 0) {
 					minor_trap++;
 				}
 			}
 			
-			if ((w_knights & Fields.H8) != 0) {
-				if  ((b_pawns & Fields.H7) != 0) {
+			if ((evalInfo.bb_w_knights & Fields.H8) != 0) {
+				if  ((evalInfo.bb_b_pawns & Fields.H7) != 0) {
 					minor_trap++;
 				}
 			}
 		}
 		
-		if (b_knights != 0) {
-			if ((b_knights & Fields.A1) != 0) {
-				if  ((w_pawns & Fields.A2) != 0) {
+		if (evalInfo.bb_b_knights != 0) {
+			if ((evalInfo.bb_b_knights & Fields.A1) != 0) {
+				if  ((evalInfo.bb_w_pawns & Fields.A2) != 0) {
 					minor_trap--;
 				}
 			}
 			
-			if ((b_knights & Fields.H1) != 0) {
-				if  ((w_pawns & Fields.H2) != 0) {
+			if ((evalInfo.bb_b_knights & Fields.H1) != 0) {
+				if  ((evalInfo.bb_w_pawns & Fields.H2) != 0) {
 					minor_trap--;
 				}
 			}
@@ -1700,26 +1690,26 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		/**
 		 * blockedPawnsOnD2E2
 		 */
-		if ((w_pawns & Fields.E2) != 0) {
-			if  ((w_bishops & Fields.E3) != 0) {
+		if ((evalInfo.bb_w_pawns & Fields.E2) != 0) {
+			if  ((evalInfo.bb_w_bishops & Fields.E3) != 0) {
 				blocked_pawns++;
 			}
 		}
 		
-		if ((w_pawns & Fields.D2) != 0) {
-			if  ((w_bishops & Fields.D3) != 0) {
+		if ((evalInfo.bb_w_pawns & Fields.D2) != 0) {
+			if  ((evalInfo.bb_w_bishops & Fields.D3) != 0) {
 				blocked_pawns++;
 			}
 		}
 		
-		if ((b_pawns & Fields.E7) != 0) {
-			if  ((b_bishops & Fields.E6) != 0) {
+		if ((evalInfo.bb_b_pawns & Fields.E7) != 0) {
+			if  ((evalInfo.bb_b_bishops & Fields.E6) != 0) {
 				blocked_pawns--;
 			}
 		}
 		
-		if ((b_pawns & Fields.D7) != 0) {
-			if  ((b_bishops & Fields.D6) != 0) {
+		if ((evalInfo.bb_b_pawns & Fields.D7) != 0) {
+			if  ((evalInfo.bb_b_bishops & Fields.D6) != 0) {
 				blocked_pawns--;
 			}
 		}
@@ -1781,60 +1771,5 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 		}
 		
 		return attacks;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.api.IEvaluator#eval(int, int, int, boolean, int)
-	 */
-	@Override
-	public int eval(int depth, int alpha, int beta, boolean pvNode,
-			int rootColour) {
-		throw new UnsupportedOperationException();
-	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.api.IEvaluator#roughEval(int, int)
-	 */
-	@Override
-	public int roughEval(int depth, int rootColour) {
-		throw new UnsupportedOperationException();
-	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.api.IEvaluator#fastEval(int, int)
-	 */
-	@Override
-	public int fastEval(int depth, int rootColour) {
-		throw new UnsupportedOperationException();
-	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.api.IEvaluator#lazyEval(int, int, int, int)
-	 */
-	@Override
-	public int lazyEval(int depth, int alpha, int beta, int rootColour) {
-		throw new UnsupportedOperationException();
-	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.api.IEvaluator#getMaterial(int)
-	 */
-	@Override
-	public int getMaterial(int pieceType) {
-		throw new UnsupportedOperationException();
-	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.api.IEvaluator#fullEval(int, int, int, int)
-	 */
-	@Override
-	public double fullEval(int depth, int alpha, int beta, int rootColour) {
-		throw new UnsupportedOperationException();
 	}
 }
