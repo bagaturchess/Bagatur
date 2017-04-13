@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl.cfg.base;
+package bagaturchess.learning.goldmiddle.impl.cfg.old0;
 
 
 import java.util.Set;

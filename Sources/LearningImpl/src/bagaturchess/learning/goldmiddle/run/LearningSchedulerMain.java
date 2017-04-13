@@ -103,9 +103,9 @@ public class LearningSchedulerMain {
 						//"bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl",
 						//"bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2",
 						
-						bagaturchess.learning.goldmiddle.impl.cfg.allfeatures.ALL_BoardConfig.class.getName(),
+						bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.ALL_BoardConfig.class.getName(),
 						//bagaturchess.learning.goldmiddle.run.cfg.EvaluationConfg.class.getName(),
-						bagaturchess.learning.goldmiddle.impl.cfg.allfeatures.EvaluationConfig.class.getName()
+						bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.EvaluationConfig.class.getName()
 						
 					}
 			);

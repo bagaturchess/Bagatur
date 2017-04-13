@@ -2,8 +2,8 @@ package bagaturchess.learning.goldmiddle.run;
 
 
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
-import bagaturchess.learning.goldmiddle.impl.cfg.allfeatures.ALL_LearningInputImpl;
-import bagaturchess.learning.goldmiddle.impl.cfg.base.BoardConfigImpl;
+import bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.ALL_LearningInputImpl;
+import bagaturchess.learning.goldmiddle.impl.cfg.old0.BoardConfigImpl;
 import bagaturchess.learning.goldmiddle.impl.visitors.EvaluatorsComparatorVisitorImpl;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 import bagaturchess.ucitracker.api.PositionsVisitor;
