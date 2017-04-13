@@ -1093,15 +1093,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 								rate /= 2;
 							}
 							lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
+							/*if (searchedCount >= getLMR2(list)) {
+								lmrReduction = Math.max(lmrReduction, (rest * PLY) / 2);
+							}*/
 							if (lmrReduction < PLY) {
 								lmrReduction = PLY;
 							}
-							/*if (lmrReduction < 2 * PLY && searchedCount >= getLMR2(list)) {
-								lmrReduction = 2 * PLY;
-							}*/
-							/*if (lmrReduction < 3 * PLY && searchedCount >= 2 * getLMR2(list)) {
-								lmrReduction = 3 * PLY;
-							}*/
 							if (lmrReduction >= (rest - 1) * PLY) {
 								lmrReduction = (rest - 1) * PLY;
 							}
@@ -1904,15 +1901,12 @@ public class SearchMTD0 extends SearchImpl_MTD {
 									rate /= 2;
 								}
 								lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
+								/*if (searchedCount >= getLMR2(list)) {
+									lmrReduction = Math.max(lmrReduction, (rest * PLY) / 2);
+								}*/
 								if (lmrReduction < PLY) {
 									lmrReduction = PLY;
 								}
-								/*if (lmrReduction < 2 * PLY && searchedCount >= getLMR2(list)) {
-									lmrReduction = 2 * PLY;
-								}*/
-								/*if (lmrReduction < 3 * PLY && searchedCount >= 2 * getLMR2(list)) {
-									lmrReduction = 3 * PLY;
-								}*/
 								if (lmrReduction >= (rest - 1) * PLY) {
 									lmrReduction = (rest - 1) * PLY;
 								}
