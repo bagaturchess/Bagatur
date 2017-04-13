@@ -25,8 +25,6 @@ public interface FeatureWeights {
 	
 	public static final int[] STANDARD_DIST_KINGS_O		= new int[] {0, 0, 0, 0, 0, 0, 0, 0};
 	public static final int[] STANDARD_DIST_KINGS_E		= new int[] {0, 0, 0, 0, 0, 0, 0, 0}; //new int[] {0, 0, 15, 2, 9, 1, 3, 0};
-	public static final int[] STANDARD_DIST_QUEENS_O	= new int[] {0, 0, 0, 0, 0, 0, 0, 0};
-	public static final int[] STANDARD_DIST_QUEENS_E	= new int[] {0, 0, 0, 0, 0, 0, 0, 0};
 	
 	/**
 	 * Pawns
