@@ -81,6 +81,11 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	}
 	
 	
+	private static final int axisSymmetry(int fieldID) {
+		return Fields.HORIZONTAL_SYMMETRY[fieldID];
+	}
+	
+	
 	public void fill(ISignals signals) {
 		fillStandardSignals(signals);
 		fillPawnSignals(signals);
@@ -116,8 +121,11 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	 * @param signals
 	 */
 	private void fillStandardSignals(ISignals signals) {
-		// TODO Auto-generated method stub
+		evalInfo.clear_short();
+		evalInfo.clear();
 		
+		eval_material(signals);
+		eval_standard(signals);
 	}
 
 
@@ -125,7 +133,10 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	 * @param signals
 	 */
 	private void fillPawnSignals(ISignals signals) {
-		// TODO Auto-generated method stub
+		eval_pawns(signals);	
+		
+		initEvalInfo1();
+		eval_pawns_RooksAndQueens(signals);		
 		
 	}
 
@@ -143,22 +154,14 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	 * @param signals
 	 */
 	private void fillMovesIterationSignals(ISignals signals) {
-		fillAll(signals);
+
 	}
 	
 	
 	public void fillAll(ISignals signals) {
 		
-		evalInfo.clear_short();
-		evalInfo.clear();
-		
-		eval_material(signals);
-		eval_standard(signals);
-		/*eval_pawns();	
-		
-		initEvalInfo1();
-		eval_pawns_RooksAndQueens();		
 
+		/*
 		initEvalInfo2();
 		eval_mobility();
 		
@@ -246,41 +249,186 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	}
 	
 	
-	public void eval_pawns() {
+	public void eval_pawns(ISignals signals) {
+		
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
 		bitboard.getPawnsCache().lock();
+		
 		PawnsModelEval pawnsModelEval = bitboard.getPawnsStructure();
+		PawnsModel model = pawnsModelEval.getModel();
+
+		int w_kingID = model.getWKingFieldID();
+		int b_kingID = model.getBKingFieldID();
 		
-		evalInfo.eval_PawnsStandard_o += ((BagaturPawnsEval)pawnsModelEval).getStandardEval_o();
-		evalInfo.eval_PawnsStandard_e += ((BagaturPawnsEval)pawnsModelEval).getStandardEval_e();
-		
-		evalInfo.eval_PawnsPassed_o += ((BagaturPawnsEval)pawnsModelEval).getPassersEval_o();
-		evalInfo.eval_PawnsPassed_e += ((BagaturPawnsEval)pawnsModelEval).getPassersEval_e();
-		
-		evalInfo.eval_PawnsPassedKing_o += ((BagaturPawnsEval)pawnsModelEval).getPassersKingEval_o();
-		evalInfo.eval_PawnsPassedKing_e += ((BagaturPawnsEval)pawnsModelEval).getPassersKingEval_e();
-		
-		/*boolean unstoppablePasser = bitboard.hasUnstoppablePasser();
-		if (unstoppablePasser) {
-			if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-				evalInfo.eval_PawnsUnstoppable_o += PAWNS_PASSED_UNSTOPPABLE;
-				evalInfo.eval_PawnsUnstoppable_e += PAWNS_PASSED_UNSTOPPABLE;
-			} else {
-				evalInfo.eval_PawnsUnstoppable_o -= PAWNS_PASSED_UNSTOPPABLE;
-				evalInfo.eval_PawnsUnstoppable_e -= PAWNS_PASSED_UNSTOPPABLE;
+		int w_pawns_count = model.getWCount();
+		if (w_pawns_count > 0) {
+			
+			Pawn[] w_pawns = model.getWPawns();
+			
+			for (int i=0; i<w_pawns_count; i++) {
+				
+				Pawn p = w_pawns[i];
+				
+				if (p.isGuard() && p.getRank() <= 3) {
+					int scores = 0;
+					switch(p.getRank()) {
+						case 1:
+							scores = 4;
+							break;
+						case 2:
+							scores = 2;
+							break;
+						case 3:
+							scores = 1;
+							break;
+						default:
+							throw new IllegalStateException();
+					}
+					signals.getSignal(FEATURE_ID_PAWNS_KING_GUARDS).addStrength(scores, openingPart);
+				}
+				
+				
+				int rank = p.getRank();
+				int file = Fields.LETTERS[p.getFieldID()];
+				int file_symmetry = Fields.FILE_SYMMETRY[file];
+				
+				
+				if (p.isDoubled()) {
+					signals.getSignal(FEATURE_ID_PAWNS_DOUBLED).addStrength(file_symmetry, 1, openingPart);
+				}
+				
+				if (p.isIsolated()) {
+					signals.getSignal(FEATURE_ID_PAWNS_ISOLATED).addStrength(file_symmetry, 1, openingPart);
+				}
+				
+				if (p.isBackward()) {
+					signals.getSignal(FEATURE_ID_PAWNS_BACKWARD).addStrength(file_symmetry, 1, openingPart);
+				}
+				
+				if (p.isSupported() && !p.isPassed()) {
+					signals.getSignal(FEATURE_ID_PAWNS_SUPPORTED).addStrength(file_symmetry, 1, openingPart);
+				}
+				
+				if (p.isCandidate()) {
+					
+					signals.getSignal(FEATURE_ID_PAWNS_CANDIDATE).addStrength(rank, 1, openingPart);
+					
+				} else if (p.isPassed()) {
+					if (p.isSupported()) {
+						
+						signals.getSignal(FEATURE_ID_PAWNS_PASSED_SUPPORTED).addStrength(rank, 1, openingPart);
+						
+					} else {
+
+						signals.getSignal(FEATURE_ID_PAWNS_PASSED).addStrength(rank, 1, openingPart);
+						
+					}
+					
+			        // Adjust bonus based on king proximity:
+			        int frontFieldID = p.getFieldID() + 8;
+			        int frontFrontFieldID = frontFieldID + 8;
+			        if (frontFrontFieldID >= 64) {
+			        	frontFrontFieldID = frontFieldID;
+			        }
+			        
+			        int dist_f = Fields.getDistancePoints_reversed(w_kingID, frontFieldID);
+			        signals.getSignal(FEATURE_ID_PAWNS_KING_F).addStrength(rank * dist_f, 1, openingPart);
+			        
+			        int dist_ff = Fields.getDistancePoints_reversed(w_kingID, frontFrontFieldID);
+			        signals.getSignal(FEATURE_ID_PAWNS_KING_FF).addStrength(rank * dist_ff, 1, openingPart);
+			        
+			        int dist_op_f = Fields.getDistancePoints_reversed(b_kingID, frontFieldID);
+			        signals.getSignal(FEATURE_ID_PAWNS_KING_OP_F).addStrength(rank * dist_op_f, 1, openingPart);
+				}
 			}
-		}*/
+		}
 		
-		int PAWNS_PASSED_UNSTOPPABLE = 100 + baseEval.getMaterialRook();
+		
+		int b_pawns_count = model.getBCount();
+		if (b_pawns_count > 0) {
+			
+			Pawn[] b_pawns = model.getBPawns();
+			
+			for (int i=0; i<b_pawns_count; i++) {
+				
+				Pawn p = b_pawns[i];
+				
+				if (p.isGuard() && p.getRank() <= 3) {
+					int scores = 0;
+					switch(p.getRank()) {
+						case 1:
+							scores = 4;
+							break;
+						case 2:
+							scores = 2;
+							break;
+						case 3:
+							scores = 1;
+							break;
+						default:
+							throw new IllegalStateException();
+					}
+					signals.getSignal(FEATURE_ID_PAWNS_KING_GUARDS).addStrength(-scores, openingPart);
+				}
+				
+				
+				int rank = p.getRank();
+				int file = Fields.LETTERS[p.getFieldID()];
+				int file_symmetry = Fields.FILE_SYMMETRY[file];
+				
+				if (p.isDoubled()) {
+					signals.getSignal(FEATURE_ID_PAWNS_DOUBLED).addStrength(file_symmetry, -1, openingPart);
+				}
+				
+				if (p.isIsolated()) {
+					signals.getSignal(FEATURE_ID_PAWNS_ISOLATED).addStrength(file_symmetry, -1, openingPart);
+				}
+				
+				if (p.isBackward()) {
+					signals.getSignal(FEATURE_ID_PAWNS_BACKWARD).addStrength(file_symmetry, -1, openingPart);
+				}
+				
+				if (p.isSupported() && !p.isPassed()) {
+					signals.getSignal(FEATURE_ID_PAWNS_SUPPORTED).addStrength(file_symmetry, -1, openingPart);
+				}
+				
+				if (p.isCandidate()) {
+					
+					signals.getSignal(FEATURE_ID_PAWNS_CANDIDATE).addStrength(rank, -1, openingPart);
+					
+				} else if (p.isPassed()) {
+					if (p.isSupported()) {
+
+						signals.getSignal(FEATURE_ID_PAWNS_PASSED_SUPPORTED).addStrength(rank, -1, openingPart);
+						
+					} else {
+
+						signals.getSignal(FEATURE_ID_PAWNS_PASSED).addStrength(rank, -1, openingPart);
+						
+					}
+					
+			        // Adjust bonus based on king proximity:
+			        int frontFieldID = p.getFieldID() - 8;
+			        int frontFrontFieldID = frontFieldID - 8;
+			        if (frontFrontFieldID < 0) {
+			        	frontFrontFieldID = frontFieldID;
+			        }
+			        
+			        int dist_f = Fields.getDistancePoints_reversed(b_kingID, frontFieldID);
+			        signals.getSignal(FEATURE_ID_PAWNS_KING_F).addStrength(rank * dist_f, -1, openingPart);
+			        
+			        int dist_ff = Fields.getDistancePoints_reversed(b_kingID, frontFrontFieldID);
+			        signals.getSignal(FEATURE_ID_PAWNS_KING_FF).addStrength(rank * dist_ff, -1, openingPart);
+			        
+			        int dist_op_f = Fields.getDistancePoints_reversed(w_kingID, frontFieldID);
+			        signals.getSignal(FEATURE_ID_PAWNS_KING_OP_F).addStrength(rank * dist_op_f, -1, openingPart);
+			     }
+			}
+		}
 		
 		int unstoppablePasser = bitboard.getUnstoppablePasser();
-		//if (unstoppablePasser > 0) {
-			evalInfo.eval_PawnsUnstoppable_o += unstoppablePasser * PAWNS_PASSED_UNSTOPPABLE;
-			evalInfo.eval_PawnsUnstoppable_e += unstoppablePasser * PAWNS_PASSED_UNSTOPPABLE;
-		//} else if (unstoppablePasser < 0) {
-		//	evalInfo.eval_PawnsUnstoppable_o -= PAWNS_PASSED_UNSTOPPABLE;
-		//	evalInfo.eval_PawnsUnstoppable_e -= PAWNS_PASSED_UNSTOPPABLE;
-		//}
+		signals.getSignal(FEATURE_ID_PASSED_UNSTOPPABLE).addStrength(unstoppablePasser, openingPart);
 		
 		bitboard.getPawnsCache().unlock();
 	}
@@ -304,9 +452,11 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 		evalInfo.bb_b_king = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KING);
 		
 	}
-	/*
-	public void eval_pawns_RooksAndQueens() {
+	
+	
+	public void eval_pawns_RooksAndQueens(ISignals signals) {
 		
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
 		bitboard.getPawnsCache().lock();
 		PawnsModelEval pawnsModelEval = bitboard.getPawnsStructure();
@@ -332,8 +482,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				long stoppers = p.getFront() & evalInfo.bb_all;
 				if (stoppers != 0) {
 					int stoppersCount = Utils.countBits_less1s(stoppers);
-					evalInfo.eval_PawnsPassedStoppers_o -= (stoppersCount * PAWNS_PASSED_O[p.getRank()]) / 4;
-					evalInfo.eval_PawnsPassedStoppers_e -= (stoppersCount * PAWNS_PASSED_E[p.getRank()]) / 4;
+					signals.getSignal(FEATURE_ID_PAWNS_PASSED_STOPPERS).addStrength(stoppersCount * p.getRank(), -1, openingPart);
 				}
 			}
 		}
@@ -345,8 +494,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				long stoppers = p.getFront() & evalInfo.bb_all;
 				if (stoppers != 0) {
 					int stoppersCount = Utils.countBits_less1s(stoppers);
-					evalInfo.eval_PawnsPassedStoppers_o += (stoppersCount * PAWNS_PASSED_O[p.getRank()]) / 4;
-					evalInfo.eval_PawnsPassedStoppers_e += (stoppersCount * PAWNS_PASSED_E[p.getRank()]) / 4;
+					signals.getSignal(FEATURE_ID_PAWNS_PASSED_STOPPERS).addStrength(stoppersCount * p.getRank(), 1, openingPart);
 				}
 			}
 		}
@@ -407,14 +555,10 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			}
 		}
 		
-		evalInfo.eval_PawnsRooksQueens_o += rooks_opened * PAWNS_ROOK_OPENED_O;
-		evalInfo.eval_PawnsRooksQueens_e += rooks_opened * PAWNS_ROOK_OPENED_E;
 		
-		evalInfo.eval_PawnsRooksQueens_o += rooks_semiopened * PAWNS_ROOK_SEMIOPENED_O;
-		evalInfo.eval_PawnsRooksQueens_e += rooks_semiopened * PAWNS_ROOK_SEMIOPENED_E;
-		
-		evalInfo.eval_PawnsRooksQueens_o += rooks_7th2th * PAWNS_ROOK_7TH2TH_O;
-		evalInfo.eval_PawnsRooksQueens_e += rooks_7th2th * PAWNS_ROOK_7TH2TH_E;
+		signals.getSignal(FEATURE_ID_PAWNS_ROOK_OPENED).addStrength(rooks_opened, openingPart);
+		signals.getSignal(FEATURE_ID_PAWNS_ROOK_SEMIOPENED).addStrength(rooks_semiopened, openingPart);
+		signals.getSignal(FEATURE_ID_PAWNS_ROOK_7TH2TH).addStrength(rooks_7th2th, openingPart);
 		
 		
 		int queens_7th2th = 0;
@@ -454,8 +598,8 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			}
 		}
 		
-		evalInfo.eval_PawnsRooksQueens_o += queens_7th2th * PAWNS_QUEEN_7TH2TH_O;
-		evalInfo.eval_PawnsRooksQueens_e += queens_7th2th * PAWNS_QUEEN_7TH2TH_E;
+		
+		signals.getSignal(FEATURE_ID_PAWNS_QUEEN_7TH2TH).addStrength(queens_7th2th, openingPart);
 		
 		
 		int kingOpened = 0;
@@ -465,10 +609,10 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	    if (w_rooks.getDataSize() > 0 || w_queens.getDataSize() > 0) {
 	    	kingOpened -= evalInfo.b_kingOpened;
 	    }
-	    evalInfo.eval_PawnsRooksQueens_o += kingOpened * PAWNS_KING_OPENED;
+	    signals.getSignal(FEATURE_ID_PAWNS_KING_OPENED).addStrength(kingOpened, openingPart);
 	}
 	
-	
+	/*
 	private void initEvalInfo2() {
 		
 		// Initialize king attack bitboards and king attack zones for both sides:

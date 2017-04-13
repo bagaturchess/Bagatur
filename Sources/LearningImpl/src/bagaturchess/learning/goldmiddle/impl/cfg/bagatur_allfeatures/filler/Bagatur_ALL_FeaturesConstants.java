@@ -18,22 +18,22 @@ interface Bagatur_ALL_FeaturesConstants {
 	public static final int FEATURE_ID_STANDARD_KINGS_OPPOSITION 	= 1120;
 	public static final int FEATURE_ID_STANDARD_DIST_KINGS 			= 1130;
 	
-	
-	
-	/*public static final int FEATURE_ID_MATERIAL       		= 1010;
-	public static final int FEATURE_ID_STANDARD       		= 1020;
-	public static final int FEATURE_ID_PST		      		= 1030;
-	public static final int FEATURE_ID_PAWNS_STANDARD 		= 1040;
-	public static final int FEATURE_ID_PAWNS_PASSED   		= 1050;
-	public static final int FEATURE_ID_PAWNS_PASSED_KING 	= 1060;
-	public static final int FEATURE_ID_PAWNS_PSTOPPERS	 	= 1070;
-	public static final int FEATURE_ID_PAWNS_PSTOPPERS_A 	= 1075;
-	public static final int FEATURE_ID_PAWNS_ROOKQUEEN 		= 1080;
-	public static final int FEATURE_ID_MOBILITY			 	= 1090;
-	public static final int FEATURE_ID_MOBILITY_S		 	= 1100;
-	public static final int FEATURE_ID_KINGSAFETY		 	= 1110;
-	public static final int FEATURE_ID_SPACE			 	= 1120;
-	public static final int FEATURE_ID_HUNGED			 	= 1130;
-	public static final int FEATURE_ID_TRAPPED			 	= 1140;
-	*/
+	public static final int FEATURE_ID_PAWNS_KING_GUARDS 			= 1140;
+	public static final int FEATURE_ID_PAWNS_DOUBLED 				= 1150;
+	public static final int FEATURE_ID_PAWNS_ISOLATED 				= 1160;
+	public static final int FEATURE_ID_PAWNS_BACKWARD 				= 1170;
+	public static final int FEATURE_ID_PAWNS_SUPPORTED 				= 1180;
+	public static final int FEATURE_ID_PAWNS_CANDIDATE 				= 1190;
+	public static final int FEATURE_ID_PAWNS_PASSED_SUPPORTED 		= 1200;
+	public static final int FEATURE_ID_PAWNS_PASSED 				= 1210;
+	public static final int FEATURE_ID_PAWNS_KING_F 				= 1220;
+	public static final int FEATURE_ID_PAWNS_KING_FF 				= 1230;
+	public static final int FEATURE_ID_PAWNS_KING_OP_F 				= 1240;
+	public static final int FEATURE_ID_PASSED_UNSTOPPABLE 			= 1250;
+	public static final int FEATURE_ID_PAWNS_PASSED_STOPPERS 		= 1260;
+	public static final int FEATURE_ID_PAWNS_ROOK_OPENED 			= 1270;
+	public static final int FEATURE_ID_PAWNS_ROOK_SEMIOPENED 		= 1280;
+	public static final int FEATURE_ID_PAWNS_ROOK_7TH2TH 			= 1290;
+	public static final int FEATURE_ID_PAWNS_QUEEN_7TH2TH 			= 1300;
+	public static final int FEATURE_ID_PAWNS_KING_OPENED 			= 1310;
 }

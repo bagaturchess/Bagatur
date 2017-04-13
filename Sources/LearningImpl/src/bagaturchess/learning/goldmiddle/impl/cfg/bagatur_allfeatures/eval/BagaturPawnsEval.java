@@ -144,7 +144,7 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 				if (p.isCandidate()) {
 					passersEval_o += PAWNS_CANDIDATE_O[rank];
 					passersEval_e += PAWNS_CANDIDATE_E[rank];
-				} else if (p.isPassed() && !p.isDoubled()) {
+				} else if (p.isPassed()) {
 					if (p.isSupported()) {
 						passersEval_o += PAWNS_PASSED_SUPPORTED_O[rank];
 						passersEval_e += PAWNS_PASSED_SUPPORTED_E[rank];
@@ -161,16 +161,16 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 			        }
 			        
 			        int dist_f = Fields.getDistancePoints_reversed(w_kingID, frontFieldID);
-			        passersKingEval_o += (PAWNS_PASSED_O[rank] * dist_f * 25) / (7 * 100);
-			        passersKingEval_e += (PAWNS_PASSED_E[rank] * dist_f * 38) / (7 * 100);
+			        passersKingEval_o += PAWNS_KING_F_O[rank * dist_f];
+			        passersKingEval_e += PAWNS_KING_F_E[rank * dist_f];
 			        
 			        int dist_ff = Fields.getDistancePoints_reversed(w_kingID, frontFrontFieldID);
-			        passersKingEval_o += (PAWNS_PASSED_O[rank] * dist_ff * 25) / (7 * 100);
-			        passersKingEval_e += (PAWNS_PASSED_E[rank] * dist_ff * 38) / (7 * 100);
+			        passersKingEval_o += PAWNS_KING_FF_O[rank * dist_ff];
+			        passersKingEval_e += PAWNS_KING_FF_E[rank * dist_ff];
 			        
 			        int dist_op_f = Fields.getDistancePoints_reversed(b_kingID, frontFieldID);
-			        passersKingEval_o -= (PAWNS_PASSED_O[rank] * dist_op_f * 0) / (7 * 100);
-			        passersKingEval_e -= (PAWNS_PASSED_E[rank] * dist_op_f * 95) / (7 * 100); //* 160) / (7 * 100);
+			        passersKingEval_o -= PAWNS_KING_OP_F_O[rank * dist_op_f];
+			        passersKingEval_e -= PAWNS_KING_OP_F_E[rank * dist_op_f];
 				}
 			}
 		}
@@ -232,7 +232,7 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 				if (p.isCandidate()) {
 					passersEval_o -= PAWNS_CANDIDATE_O[rank];
 					passersEval_e -= PAWNS_CANDIDATE_E[rank];
-				} else if (p.isPassed() && !p.isDoubled()) {
+				} else if (p.isPassed()) {
 					if (p.isSupported()) {
 						passersEval_o -= PAWNS_PASSED_SUPPORTED_O[rank];
 						passersEval_e -= PAWNS_PASSED_SUPPORTED_E[rank];
@@ -249,16 +249,16 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 			        }
 			        
 			        int dist_f = Fields.getDistancePoints_reversed(b_kingID, frontFieldID);
-			        passersKingEval_o -= (PAWNS_PASSED_O[rank] * dist_f * 25) / (7 * 100);
-			        passersKingEval_e -= (PAWNS_PASSED_E[rank] * dist_f * 38) / (7 * 100);
+			        passersKingEval_o -= PAWNS_KING_F_O[rank * dist_f];
+			        passersKingEval_e -= PAWNS_KING_F_E[rank * dist_f];
 			        
 			        int dist_ff = Fields.getDistancePoints_reversed(b_kingID, frontFrontFieldID);
-			        passersKingEval_o -= (PAWNS_PASSED_O[rank] * dist_ff * 25) / (7 * 100);
-			        passersKingEval_e -= (PAWNS_PASSED_E[rank] * dist_ff * 38) / (7 * 100);
+			        passersKingEval_o -= PAWNS_KING_FF_O[rank * dist_ff];
+			        passersKingEval_e -= PAWNS_KING_FF_E[rank * dist_ff];
 			        
 			        int dist_op_f = Fields.getDistancePoints_reversed(w_kingID, frontFieldID);
-			        passersKingEval_o += (PAWNS_PASSED_O[rank] * dist_op_f * 0) / (7 * 100);
-			        passersKingEval_e += (PAWNS_PASSED_E[rank] * dist_op_f * 95) / (7 * 100); //* 160) / (7 * 100);
+			        passersKingEval_o += PAWNS_KING_OP_F_O[rank * dist_op_f];
+			        passersKingEval_e += PAWNS_KING_OP_F_E[rank * dist_op_f];
 			     }
 			}
 		}

@@ -16,7 +16,7 @@ public interface FeatureWeights {
 	public static final int STANDARD_TEMPO_E			= 35;
 	public static final int STANDARD_CASTLING_O			= 10;
 	public static final int STANDARD_CASTLING_E			= 0;
-	public static final int FIANCHETTO                  = 30;
+	public static final int STANDARD_FIANCHETTO         = 30;
 	public static final int STANDARD_TRAP_BISHOP		= -120;
 	public static final int STANDARD_BLOCKED_PAWN		= -30;
 	
@@ -42,7 +42,15 @@ public interface FeatureWeights {
 	public static final int[] PAWNS_PASSED_O		= new int[] {0, 11, 11, 11, 26, 40, 65};
 	public static final int[] PAWNS_PASSED_E		= new int[] {0, 7, 7, 25, 63, 134, 186};
 	public static final int[] PAWNS_PASSED_SUPPORTED_O	= new int[] {0, 13, 13, 21, 41, 62, 124};
-	public static final int[] PAWNS_PASSED_SUPPORTED_E	= new int[] {0, 9, 12, 31, 79, 178, 299};	
+	public static final int[] PAWNS_PASSED_SUPPORTED_E	= new int[] {0, 9, 12, 31, 79, 178, 299};
+	public static final int[] PAWNS_KING_F_O		= new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50};
+	public static final int[] PAWNS_KING_F_E		= new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50};
+	public static final int[] PAWNS_KING_FF_O		= new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50};
+	public static final int[] PAWNS_KING_FF_E		= new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50};
+	public static final int[] PAWNS_KING_OP_F_O		= new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50};
+	public static final int[] PAWNS_KING_OP_F_E		= new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50};
+	public static final int PASSED_UNSTOPPABLE 		= 	550;
+	public static final int[] PAWNS_PASSED_STOPPERS	= new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50};
 	
 	public static final int PAWNS_KING_GUARDS		= 4;
 	public static final int PAWNS_KING_OPENED		= -12;
