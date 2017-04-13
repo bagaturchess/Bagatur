@@ -3,6 +3,7 @@ package bagaturchess.learning.goldmiddle.run;
 
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.Bagatur_LearningInputImpl;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.Bagatur_ALL_LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.ALL_LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.visitors.LearningVisitorImpl;
 import bagaturchess.ucitracker.api.PositionsTraverser;
@@ -20,12 +21,12 @@ public class LearningTraverser {
 			//String filePath = "./Houdini.15a.short.cg";
 			//String filePath = "./Houdini.15a.cg";
 			//String filePath = "./Arasan13.1.cg";
-			//String filePath = "stockfish-7.cg";
-			String filePath = "glaurung-2.2.cg";
+			String filePath = "stockfish-7.cg";
+			//String filePath = "glaurung-2.2.cg";
 			
 			PositionsVisitor learning = new LearningVisitorImpl();
 			
-			ILearningInput input = new ALL_LearningInputImpl();
+			ILearningInput input = new Bagatur_ALL_LearningInputImpl();
 			
 			while (true) {
 				PositionsTraverser.traverseAll(filePath, learning, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
