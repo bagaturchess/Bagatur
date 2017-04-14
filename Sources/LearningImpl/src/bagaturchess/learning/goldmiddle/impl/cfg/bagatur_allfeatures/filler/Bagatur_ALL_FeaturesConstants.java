@@ -12,6 +12,8 @@ interface Bagatur_ALL_FeaturesConstants {
 	public static final int FEATURE_ID_MATERIAL_QUEEN      			= 1050;
 	public static final int FEATURE_ID_MATERIAL_DOUBLE_BISHOP 		= 1060;
 	
+	public static final int FEATURE_ID_PST					 		= 1065;
+	
 	public static final int FEATURE_ID_STANDARD_TEMPO 				= 1070;
 	public static final int FEATURE_ID_STANDARD_CASTLING 			= 1080;
 	public static final int FEATURE_ID_STANDARD_FIANCHETTO 			= 1090;

@@ -119,6 +119,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 		evalInfo.clear();
 		
 		eval_material(signals);
+		eval_PST(signals);
 		eval_standard(signals);
 	}
 
@@ -180,6 +181,15 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 		
 		signals.getSignal(FEATURE_ID_MATERIAL_DOUBLE_BISHOP).addStrength(((w_bishops.getDataSize() >= 2) ? 1 : 0) - ((b_bishops.getDataSize() >= 2) ? 1 : 0), openingPart);
 	}
+	
+	
+	private void eval_PST(ISignals signals) {
+		
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
+		
+		signals.getSignal(FEATURE_ID_PST).addStrength(interpolateInternal(baseEval.getPST_o(), baseEval.getPST_e(), openingPart), openingPart);
+	}
+	
 	
 	public void eval_standard(ISignals signals) {
 		

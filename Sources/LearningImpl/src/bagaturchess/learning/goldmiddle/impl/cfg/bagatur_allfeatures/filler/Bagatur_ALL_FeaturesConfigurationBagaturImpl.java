@@ -31,6 +31,8 @@ public class Bagatur_ALL_FeaturesConfigurationBagaturImpl implements IFeaturesCo
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_QUEEN      		, "MATERIAL.QUEEN"      		, STANDARD         , 0, 2000,  1072, 0, 2000,  1027 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_DOUBLE_BISHOP  	, "MATERIAL.DOUBLE.BISHOPS"		, STANDARD         , 0, 100,  43, 0, 200,  43 ));
 		
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PST  						, "PST"							, STANDARD         , 0, 100,  0, 0, 100,  0 ));
+		
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_STANDARD_TEMPO				, "STANDARD.TEMPO"   			, STANDARD         , 0, 50,  0, 0, 50,  0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_STANDARD_CASTLING			, "STANDARD.CASTLING"   		, STANDARD         , 0, 50,  22, 0, 0,  0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_STANDARD_FIANCHETTO 		, "STANDARD.FIANCHETTO" 		, STANDARD         , 0, 100, 0, 0, 0, 0 ));

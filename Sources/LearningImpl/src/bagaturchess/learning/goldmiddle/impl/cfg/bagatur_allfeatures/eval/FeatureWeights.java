@@ -7,6 +7,9 @@ public interface FeatureWeights {
 	public static final int MATERIAL_DOUBLE_BISHOPS_O 		= 40;
 	public static final int MATERIAL_DOUBLE_BISHOPS_E 		= 50;
 	
+	public static final int FEATURE_ID_PST_O 				= 1;
+	public static final int FEATURE_ID_PST_E 				= 1;
+	
 	public static final int STANDARD_TEMPO_O				= 25;
 	public static final int STANDARD_TEMPO_E				= 35;
 	public static final int STANDARD_CASTLING_O				= 10;

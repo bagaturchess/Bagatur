@@ -345,8 +345,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	
 	
 	private void eval_PST() {
-		evalInfo.eval_PST_o += baseEval.getPST_o();
-		evalInfo.eval_PST_e += baseEval.getPST_e();
+		evalInfo.eval_PST_o += FEATURE_ID_PST_O * baseEval.getPST_o();
+		evalInfo.eval_PST_e += FEATURE_ID_PST_E * baseEval.getPST_e();
 	}
 	
 	
