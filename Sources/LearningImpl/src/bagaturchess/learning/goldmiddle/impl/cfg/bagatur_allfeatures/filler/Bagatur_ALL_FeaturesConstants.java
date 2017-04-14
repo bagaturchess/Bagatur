@@ -49,4 +49,9 @@ interface Bagatur_ALL_FeaturesConstants {
 	public static final int FEATURE_ID_KNIGHT_OUTPOST 				= 1440;
 	public static final int FEATURE_ID_BISHOP_OUTPOST				= 1450;
 	public static final int FEATURE_ID_BISHOP_BAD					= 1460;
+	
+	public static final int FEATURE_ID_KING_SAFETY 					= 1470;
+	public static final int FEATURE_ID_SPACE 						= 1480;
+	public static final int FEATURE_ID_HUNGED 						= 1490;
+	
 }

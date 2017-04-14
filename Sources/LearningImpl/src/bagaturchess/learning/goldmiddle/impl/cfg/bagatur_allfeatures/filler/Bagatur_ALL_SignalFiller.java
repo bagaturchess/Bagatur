@@ -3,7 +3,6 @@ package bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler;
 
 import bagaturchess.bitboard.api.IBaseEval;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.api.IMaterialFactor;
 import bagaturchess.bitboard.common.CastlingType;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
@@ -81,11 +80,6 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	}
 	
 	
-	private static final int axisSymmetry(int fieldID) {
-		return Fields.HORIZONTAL_SYMMETRY[fieldID];
-	}
-	
-	
 	public void fill(ISignals signals) {
 		fillStandardSignals(signals);
 		fillPawnSignals(signals);
@@ -146,7 +140,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	 * @param signals
 	 */
 	private void fillPiecesIterationSignals(ISignals signals) {
-		
+		//N/A
 	}
 
 
@@ -158,21 +152,13 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 		initEvalInfo2();
 		eval_mobility(signals);
 		
-	}
-	
-	
-	public void fillAll(ISignals signals) {
 		
-
-		
-
-		
-		/*
 		initEvalInfo3();
-		eval_king_safety();
-		eval_space();
-		eval_hunged();
-		eval_TrapsAndSafeMobility();
+		eval_king_safety(signals);
+		eval_space(signals);
+		eval_hunged(signals);
+		
+		/*eval_TrapsAndSafeMobility();
 		eval_PassersFrontAttacks();*/
 	}
 	
@@ -721,7 +707,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    			}
 			    		}
 			    		
-					    signals.getSignal(FEATURE_ID_KNIGHT_OUTPOST).addStrength(interpolateInternal(scores * KNIGHT_OUTPOST_O[mob], scores * KNIGHT_OUTPOST_E[mob], openingPart), openingPart);
+					    signals.getSignal(FEATURE_ID_KNIGHT_OUTPOST).addStrength(interpolateInternal(scores * KNIGHT_OUTPOST_O[fieldID], scores * KNIGHT_OUTPOST_E[fieldID], openingPart), openingPart);
 				    }
 			    }
 			}
@@ -773,9 +759,8 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    				}
 			    			}
 			    		}
-				    		
-			    		eval_o -= scores * KNIGHT_OUTPOST_O[HORIZONTAL_SYMMETRY[fieldID]];
-					    eval_e -= scores * KNIGHT_OUTPOST_E[HORIZONTAL_SYMMETRY[fieldID]];
+				    	
+					    signals.getSignal(FEATURE_ID_KNIGHT_OUTPOST).addStrength(-interpolateInternal(scores * KNIGHT_OUTPOST_O[Fields.HORIZONTAL_SYMMETRY[fieldID]], scores * KNIGHT_OUTPOST_E[Fields.HORIZONTAL_SYMMETRY[fieldID]], openingPart), openingPart);
 				    }
 			    }
 			}
@@ -808,9 +793,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_w_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o += MOBILITY_BISHOP_O[mob];
-			    eval_e += MOBILITY_BISHOP_E[mob];
-
+			    signals.getSignal(FEATURE_ID_MOBILITY_BISHOP).addStrength(interpolateInternal(MOBILITY_BISHOP_O[mob], MOBILITY_BISHOP_E[mob], openingPart), openingPart);
 			    
 			    // Bishop outposts:
 			    if ((Fields.SPACE_BLACK & bb_field) != 0) {
@@ -830,8 +813,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    			}
 			    		}
 			    		
-			    		eval_o += scores * BISHOP_OUTPOST_O[fieldID];
-					    eval_e += scores * BISHOP_OUTPOST_E[fieldID];
+					    signals.getSignal(FEATURE_ID_BISHOP_OUTPOST).addStrength(interpolateInternal(scores * BISHOP_OUTPOST_O[fieldID], scores * BISHOP_OUTPOST_E[fieldID], openingPart), openingPart);
 				    }
 			    }
 			    
@@ -847,8 +829,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    	bad_bishop_score += Utils.countBits_less1s(Fields.ALL_BLACK_FIELDS & ~Fields.CENTER_2 & evalInfo.bb_w_pawns);
 			    }
 			    
-	    		eval_o -= bad_bishop_score * 5;
-			    eval_e -= bad_bishop_score * 10;
+			    signals.getSignal(FEATURE_ID_BISHOP_BAD).addStrength(-interpolateInternal(bad_bishop_score, bad_bishop_score, openingPart), openingPart);
 			}
 		}
 		
@@ -878,9 +859,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_b_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o -= MOBILITY_BISHOP_O[mob];
-			    eval_e -= MOBILITY_BISHOP_E[mob];
-			    
+			    signals.getSignal(FEATURE_ID_MOBILITY_BISHOP).addStrength(-interpolateInternal(MOBILITY_BISHOP_O[mob], MOBILITY_BISHOP_E[mob], openingPart), openingPart);
 			    
 			    // Bishop outposts:
 			    if ((Fields.SPACE_WHITE & bb_field) != 0) {
@@ -900,8 +879,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    			}
 			    		}
 			    		
-			    		eval_o -= scores * BISHOP_OUTPOST_O[HORIZONTAL_SYMMETRY[fieldID]];
-					    eval_e -= scores * BISHOP_OUTPOST_E[HORIZONTAL_SYMMETRY[fieldID]];
+					    signals.getSignal(FEATURE_ID_BISHOP_OUTPOST).addStrength(-interpolateInternal(scores * BISHOP_OUTPOST_O[fieldID], scores * BISHOP_OUTPOST_E[fieldID], openingPart), openingPart);
 				    }
 			    }
 			    
@@ -917,8 +895,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    	bad_bishop_score += Utils.countBits_less1s(Fields.ALL_BLACK_FIELDS & ~Fields.CENTER_2 & evalInfo.bb_b_pawns);
 			    }
 			    
-	    		eval_o += bad_bishop_score;
-			    eval_e += bad_bishop_score;
+			    signals.getSignal(FEATURE_ID_BISHOP_BAD).addStrength(interpolateInternal(bad_bishop_score, bad_bishop_score, openingPart), openingPart);
 			}
 		}
 		
@@ -948,8 +925,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_w_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o += MOBILITY_ROOK_O[mob];
-			    eval_e += MOBILITY_ROOK_E[mob];
+			    signals.getSignal(FEATURE_ID_MOBILITY_ROOK).addStrength(interpolateInternal(MOBILITY_ROOK_O[mob], MOBILITY_ROOK_E[mob], openingPart), openingPart);
 			    
 			    // Penalize rooks which are trapped inside a king which has lost the
 			    // right to castle:
@@ -982,8 +958,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_b_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o -= MOBILITY_ROOK_O[mob];
-			    eval_e -= MOBILITY_ROOK_E[mob];
+			    signals.getSignal(FEATURE_ID_MOBILITY_ROOK).addStrength(-interpolateInternal(MOBILITY_ROOK_O[mob], MOBILITY_ROOK_E[mob], openingPart), openingPart);
 			    
 			    // Penalize rooks which are trapped inside a king which has lost the
 			    // right to castle:
@@ -1019,8 +994,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_w_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o += MOBILITY_QUEEN_O[mob];
-			    eval_e += MOBILITY_QUEEN_E[mob];
+			    signals.getSignal(FEATURE_ID_MOBILITY_QUEEN).addStrength(interpolateInternal(MOBILITY_QUEEN_O[mob], MOBILITY_QUEEN_E[mob], openingPart), openingPart);
 			}
 		}
 		
@@ -1051,16 +1025,12 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_b_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o -= MOBILITY_QUEEN_O[mob];
-			    eval_e -= MOBILITY_QUEEN_E[mob];
+			    signals.getSignal(FEATURE_ID_MOBILITY_QUEEN).addStrength(-interpolateInternal(MOBILITY_QUEEN_O[mob], MOBILITY_QUEEN_E[mob], openingPart), openingPart);
 			}
 		}
-		
-		evalInfo.eval_Mobility_o += eval_o;
-		evalInfo.eval_Mobility_e += eval_e;
 	}
 	
-	/*
+	
 	private void initEvalInfo3() {
 		
 		evalInfo.attackedByWhite = evalInfo.attackedBy[Constants.PID_W_PAWN]
@@ -1090,8 +1060,10 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	}
 	
 	
-	private void eval_king_safety() {
+	private void eval_king_safety(ISignals signals) {
 
+		
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
 		//KING SAFETY
 		
@@ -1130,7 +1102,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	        //	max_attackUnits = attackUnits;
 	        //}
 	        
-	        kingSafety += KING_SAFETY[attackUnits];
+	        signals.getSignal(FEATURE_ID_KING_SAFETY).addStrength(interpolateInternal(KING_SAFETY[attackUnits], KING_SAFETY[attackUnits], openingPart), openingPart);
 	    }
 	    
 	    
@@ -1169,7 +1141,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	        //}
 	        
 	        //evalInfo.eval_Kingsafety += SafetyTable[attackUnits];
-	        kingSafety -= KING_SAFETY[attackUnits];
+	        signals.getSignal(FEATURE_ID_KING_SAFETY).addStrength(-interpolateInternal(KING_SAFETY[attackUnits], KING_SAFETY[attackUnits], openingPart), openingPart);
 	    }
 	    
 	    evalInfo.eval_Kingsafety_o += kingSafety;
@@ -1177,7 +1149,9 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	}
 	
 	
-	private void eval_space() {
+	private void eval_space(ISignals signals) {
+		
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
 		int w_space = 0;
 		
@@ -1227,16 +1201,13 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 		
 		int space = w_space - b_space;
 		
-		evalInfo.eval_Space_o += space * SPACE_O;
-		evalInfo.eval_Space_e += space * SPACE_E;
+		signals.getSignal(FEATURE_ID_SPACE).addStrength(interpolateInternal(space, space, openingPart), openingPart);
 	}
 	
 	
-	private void eval_hunged() {
+	private void eval_hunged(ISignals signals) {
 		
-		int eval_o = 0;
-		int eval_e = 0;
-		
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
 		long bb_w_hunged = 0;
 		
@@ -1297,19 +1268,14 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 		
 		
 		if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-			eval_o += HUNGED_O[w_hungedCount];
-			eval_e += HUNGED_E[w_hungedCount];
+			signals.getSignal(FEATURE_ID_HUNGED).addStrength(interpolateInternal(HUNGED_O[w_hungedCount], HUNGED_E[w_hungedCount], openingPart), openingPart);
 		} else {
-			eval_o -= HUNGED_O[b_hungedCount];
-			eval_e -= HUNGED_E[b_hungedCount];
+			signals.getSignal(FEATURE_ID_HUNGED).addStrength(-interpolateInternal(HUNGED_O[b_hungedCount], HUNGED_E[b_hungedCount], openingPart), openingPart);
 		}
-		
-		evalInfo.eval_Hunged_o += eval_o;
-		evalInfo.eval_Hunged_e += eval_e;
 	}
 	
 	
-	public void eval_TrapsAndSafeMobility() {
+	public void eval_TrapsAndSafeMobility(ISignals signals) {
 		
 		int eval_o = 0;
 		int eval_e = 0;
@@ -1467,7 +1433,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 		evalInfo.eval_Mobility_Safe_e += eval_e;
 	}
 	
-	
+	/*
 	private void eval_PassersFrontAttacks() {
 		
 		int eval_o = 0;
@@ -1512,7 +1478,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 		evalInfo.eval_PawnsPassedStoppers_a_o += eval_o;
 		evalInfo.eval_PawnsPassedStoppers_a_e += eval_e;
 	}
-
+	*/
 	
 	private int getTrappedScores(int mob_safe, int piece_weight) {
 		if (mob_safe == 0) { 
@@ -1525,7 +1491,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			return 0;
 		}
 	}
-	*/
+	
 	
 	private int castling(int colour) {
 		int result = 0;

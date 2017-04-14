@@ -1139,7 +1139,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	        //	max_attackUnits = attackUnits;
 	        //}
 	        
-	        kingSafety += KING_SAFETY[attackUnits];
+	        kingSafety += KING_SAFETY_O * Bagatur_ALL_SignalFillerConstants.KING_SAFETY[attackUnits];
 	    }
 	    
 	    
@@ -1178,7 +1178,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	        //}
 	        
 	        //evalInfo.eval_Kingsafety += SafetyTable[attackUnits];
-	        kingSafety -= KING_SAFETY[attackUnits];
+	        kingSafety -= KING_SAFETY_O * Bagatur_ALL_SignalFillerConstants.KING_SAFETY[attackUnits];
 	    }
 	    
 	    evalInfo.eval_Kingsafety_o += kingSafety;
@@ -1277,8 +1277,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			
 			int w_hungedCount = Utils.countBits_less1s(bb_w_hunged);
 			
-			eval_o += HUNGED_O[w_hungedCount];
-			eval_e += HUNGED_E[w_hungedCount];
+			eval_o += HUNGED_O * Bagatur_ALL_SignalFillerConstants.HUNGED_O[w_hungedCount];
+			eval_e += HUNGED_E * Bagatur_ALL_SignalFillerConstants.HUNGED_E[w_hungedCount];
 			
 		} else {
 			
@@ -1310,8 +1310,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			
 			int b_hungedCount = Utils.countBits_less1s(bb_b_hunged);
 			
-			eval_o -= HUNGED_O[b_hungedCount];
-			eval_e -= HUNGED_E[b_hungedCount];
+			eval_o -= HUNGED_O * Bagatur_ALL_SignalFillerConstants.HUNGED_O[b_hungedCount];
+			eval_e -= HUNGED_E * Bagatur_ALL_SignalFillerConstants.HUNGED_E[b_hungedCount];
 		}
 		
 		evalInfo.eval_Hunged_o += eval_o;

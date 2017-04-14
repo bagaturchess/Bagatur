@@ -83,6 +83,10 @@ public class Bagatur_ALL_FeaturesConfigurationBagaturImpl implements IFeaturesCo
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_BISHOP_OUTPOST 				, "BISHOP.OUTPOST"   			, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_BISHOP_BAD 					, "BISHOP.BAD"   				, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
 		
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KING_SAFETY 				, "KING.SAFETY"   				, MOVES_ITERATION  , 0, 100, 0, 0, 0, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_SPACE 						, "SPACE"   					, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED 						, "HUNGED"   					, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		
 		
 		return new_featuresSet.toArray(new IFeature[0]);
 	}
