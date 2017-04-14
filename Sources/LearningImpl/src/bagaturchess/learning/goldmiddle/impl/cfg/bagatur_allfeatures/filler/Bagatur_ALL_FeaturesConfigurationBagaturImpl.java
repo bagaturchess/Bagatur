@@ -41,61 +41,23 @@ public class Bagatur_ALL_FeaturesConfigurationBagaturImpl implements IFeaturesCo
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_STANDARD_BLOCKED_PAWN 		, "STANDARD.BLOCKED.PAWN" 		, STANDARD         , -100, 0, 0, 0, 0, 0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_STANDARD_KINGS_OPPOSITION 	, "STANDARD.KINGS.OPPOSITION" 	, STANDARD         , 0, 0, 0, 0, 100, 0 ));
 		
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_STANDARD_DIST_KINGS  	    , "STANDARD.DIST.KINGS"    		, STANDARD         ,
-				PSTConstants.createArray(8, 0), PSTConstants.createArray(8, 0), new double[] {0,   0,   0,   0,   0,   0,  0, 0},
-				PSTConstants.createArray(8, -128), PSTConstants.createArray(8, 128), new double[] {0,   0,   0,   0,   0,   0,  0, 0}
-		));
-		
 		
 		/**
 		 * PAWNS ITERATION
 		 */
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_KING_GUARDS 			, "PAWNS.KING.GUARDS"   		, PAWNS_STRUCTURE  , 0, 100, 0, 0, 100, 0 ));
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWNS_DOUBLED  	    		, "PAWNS.DOUBLED"      			, PAWNS_STRUCTURE  ,
-				PSTConstants.createArray(4, -64), PSTConstants.createArray(4, 0), new double[] {0,   0,   0,   0},
-				PSTConstants.createArray(4, -64), PSTConstants.createArray(4, 0), new double[] {0,   0,   0,   0}
-		));
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWNS_ISOLATED  	    		, "PAWNS.ISOLATED"      		, PAWNS_STRUCTURE  ,
-				PSTConstants.createArray(4, -64), PSTConstants.createArray(4, 0), new double[] {0,   0,   0,   0},
-				PSTConstants.createArray(4, -64), PSTConstants.createArray(4, 0), new double[] {0,   0,   0,   0}
-		));
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWNS_BACKWARD  	    		, "PAWNS.BACKWARD"      		, PAWNS_STRUCTURE  ,
-				PSTConstants.createArray(4, -64), PSTConstants.createArray(4, 0), new double[] {0,   0,   0,   0},
-				PSTConstants.createArray(4, -64), PSTConstants.createArray(4, 0), new double[] {0,   0,   0,   0}
-		));
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWNS_SUPPORTED  	    	, "PAWNS.SUPPORTED"      		, PAWNS_STRUCTURE  ,
-				PSTConstants.createArray(4, 0), PSTConstants.createArray(4, 64), new double[] {0,   0,   0,   0},
-				PSTConstants.createArray(4, 0), PSTConstants.createArray(4, 64), new double[] {0,   0,   0,   0}
-		));
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWNS_CANDIDATE  	    	, "PAWNS.CANDIDATE"      		, PAWNS_STRUCTURE  ,
-				PSTConstants.createArray(6, 0), PSTConstants.createArray(6, 256), new double[] {0,   0,   0,   0,   0,   0},
-				PSTConstants.createArray(6, 0), PSTConstants.createArray(6, 256), new double[] {0,   0,   0,   0,   0,   0}
-		));
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWNS_PASSED_SUPPORTED  	    , "PAWNS.PASSED.SUPPORTED"      , PAWNS_STRUCTURE  ,
-				PSTConstants.createArray(7, 0), PSTConstants.createArray(7, 512), new double[] {0,   0,   0,   0,   0,   0,   0},
-				PSTConstants.createArray(7, 0), PSTConstants.createArray(7, 512), new double[] {0,   0,   0,   0,   0,   0,   0}
-		));
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWNS_PASSED			  	    , "PAWNS.PASSED"      			, PAWNS_STRUCTURE  ,
-				PSTConstants.createArray(7, 0), PSTConstants.createArray(7, 512), new double[] {0,   0,   0,   0,   0,   0,   0},
-				PSTConstants.createArray(7, 0), PSTConstants.createArray(7, 512), new double[] {0,   0,   0,   0,   0,   0,   0}
-		));
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWNS_KING_F			  	    , "PAWNS.KING.F"      			, PAWNS_STRUCTURE  ,
-				PSTConstants.createArray(50, 0), PSTConstants.createArray(50, 256), new double[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
-				PSTConstants.createArray(50, 0), PSTConstants.createArray(50, 256), new double[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
-		));
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWNS_KING_FF			  	, "PAWNS.KING.FF"      			, PAWNS_STRUCTURE  ,
-				PSTConstants.createArray(50, 0), PSTConstants.createArray(50, 256), new double[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
-				PSTConstants.createArray(50, 0), PSTConstants.createArray(50, 256), new double[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
-		));
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWNS_KING_OP_F			  	, "PAWNS.KING.OP.F"      		, PAWNS_STRUCTURE  ,
-				PSTConstants.createArray(50, -256), PSTConstants.createArray(50, 0), new double[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
-				PSTConstants.createArray(50, -256), PSTConstants.createArray(50, 0), new double[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
-		));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_KING_GUARDS 			, "PAWNS.KING.GUARDS"   		, PAWNS_STRUCTURE  , 0, 100, 0, 0, 0, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_DOUBLED  	    		, "PAWNS.DOUBLED"      			, PAWNS_STRUCTURE  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_ISOLATED  	    	, "PAWNS.ISOLATED"      		, PAWNS_STRUCTURE  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_BACKWARD  	    	, "PAWNS.BACKWARD"      		, PAWNS_STRUCTURE  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_SUPPORTED  	    	, "PAWNS.SUPPORTED"      		, PAWNS_STRUCTURE  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_CANDIDATE  	    	, "PAWNS.CANDIDATE"      		, PAWNS_STRUCTURE  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PASSED_SUPPORTED  	, "PAWNS.PASSED.SUPPORTED"      , PAWNS_STRUCTURE  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PASSED			  	, "PAWNS.PASSED"      			, PAWNS_STRUCTURE  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_KING_F			  	, "PAWNS.KING.F"      			, PAWNS_STRUCTURE  , 0, 0, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_KING_FF			  	, "PAWNS.KING.FF"      			, PAWNS_STRUCTURE  , 0, 0, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_KING_OP_F			  	, "PAWNS.KING.OP.F"      		, PAWNS_STRUCTURE  , 0, 0, 0, 0, 100, 0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PASSED_UNSTOPPABLE 			, "PASSED.UNSTOPPABLE"   		, PAWNS_STRUCTURE  , 0, 700, 0, 0, 700, 0 ));
-		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWNS_PASSED_STOPPERS		, "PAWNS.PASSED.STOPPERS"      	, PAWNS_STRUCTURE  ,
-				PSTConstants.createArray(50, -256), PSTConstants.createArray(50, 0), new double[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
-				PSTConstants.createArray(50, -256), PSTConstants.createArray(50, 0), new double[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,}
-		));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_PASSED_STOPPERS		, "PAWNS.PASSED.STOPPERS"      	, PAWNS_STRUCTURE  , 0, 0, 0, 0, 100, 0 ));
 		
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_ROOK_OPENED 			, "PAWNS.ROOK.OPENED"   		, PAWNS_STRUCTURE  , 0, 100, 0, 0, 100, 0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_ROOK_SEMIOPENED 		, "PAWNS.ROOK.SEMIOPENED"   	, PAWNS_STRUCTURE  , 0, 100, 0, 0, 100, 0 ));
@@ -103,15 +65,24 @@ public class Bagatur_ALL_FeaturesConfigurationBagaturImpl implements IFeaturesCo
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_QUEEN_7TH2TH 			, "PAWNS.QUEEN.7TH2TH"   		, PAWNS_STRUCTURE  , 0, 100, 0, 0, 100, 0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWNS_KING_OPENED 			, "PAWNS.KING.OPENED"   		, PAWNS_STRUCTURE  , -100, 100, 0, -100, 100, 0 ));
 		
+		
 		/**
 		 * PIECES ITERATION
 		 */
+		//N/A
 		
 		
 		/**
 		 * MOVES ITERATION
 		 */
-				
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_KNIGHT 			, "MOBILITY.KNIGHT"   			, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_BISHOP 			, "MOBILITY.BISHOP"   			, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_ROOK 				, "MOBILITY.ROOK"   			, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_QUEEN 				, "MOBILITY.QUEEN"   			, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KNIGHT_OUTPOST 				, "KNIGHT.OUTPOST"   			, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_BISHOP_OUTPOST 				, "BISHOP.OUTPOST"   			, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_BISHOP_BAD 					, "BISHOP.BAD"   				, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		
 		
 		return new_featuresSet.toArray(new IFeature[0]);
 	}

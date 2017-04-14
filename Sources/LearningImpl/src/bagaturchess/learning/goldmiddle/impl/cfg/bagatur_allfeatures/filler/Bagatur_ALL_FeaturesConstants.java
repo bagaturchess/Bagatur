@@ -3,6 +3,8 @@ package bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler;
 
 interface Bagatur_ALL_FeaturesConstants {
 	
+	
+	//Standard
 	public static final int FEATURE_ID_MATERIAL_PAWN       			= 1010;
 	public static final int FEATURE_ID_MATERIAL_KNIGHT     			= 1020;
 	public static final int FEATURE_ID_MATERIAL_BISHOP     			= 1030;
@@ -16,8 +18,9 @@ interface Bagatur_ALL_FeaturesConstants {
 	public static final int FEATURE_ID_STANDARD_TRAP_BISHOP 		= 1100;
 	public static final int FEATURE_ID_STANDARD_BLOCKED_PAWN 		= 1110;
 	public static final int FEATURE_ID_STANDARD_KINGS_OPPOSITION 	= 1120;
-	public static final int FEATURE_ID_STANDARD_DIST_KINGS 			= 1130;
 	
+	
+	//Pawns
 	public static final int FEATURE_ID_PAWNS_KING_GUARDS 			= 1140;
 	public static final int FEATURE_ID_PAWNS_DOUBLED 				= 1150;
 	public static final int FEATURE_ID_PAWNS_ISOLATED 				= 1160;
@@ -36,4 +39,14 @@ interface Bagatur_ALL_FeaturesConstants {
 	public static final int FEATURE_ID_PAWNS_ROOK_7TH2TH 			= 1290;
 	public static final int FEATURE_ID_PAWNS_QUEEN_7TH2TH 			= 1300;
 	public static final int FEATURE_ID_PAWNS_KING_OPENED 			= 1310;
+	
+	
+	//Moves iteration
+	public static final int FEATURE_ID_MOBILITY_KNIGHT 				= 1400;
+	public static final int FEATURE_ID_MOBILITY_BISHOP 				= 1410;
+	public static final int FEATURE_ID_MOBILITY_ROOK 				= 1420;
+	public static final int FEATURE_ID_MOBILITY_QUEEN 				= 1430;
+	public static final int FEATURE_ID_KNIGHT_OUTPOST 				= 1440;
+	public static final int FEATURE_ID_BISHOP_OUTPOST				= 1450;
+	public static final int FEATURE_ID_BISHOP_BAD					= 1460;
 }
