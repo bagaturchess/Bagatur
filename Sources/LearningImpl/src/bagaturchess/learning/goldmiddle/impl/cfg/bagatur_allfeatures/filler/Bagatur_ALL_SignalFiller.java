@@ -1358,7 +1358,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 			    int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_b_minors);			    
-			    signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT_S).addStrength(interpolateInternal(MOBILITY_KNIGHT_S_O[mob_safe], MOBILITY_KNIGHT_S_E[mob_safe], openingPart), openingPart);
+			    signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT_S).addStrength(-interpolateInternal(MOBILITY_KNIGHT_S_O[mob_safe], MOBILITY_KNIGHT_S_E[mob_safe], openingPart), openingPart);
 			    
 			    int rank = 7 - Fields.DIGITS[fieldID];
 			    int trapped = -getTrappedScores(mob_safe, 3);
