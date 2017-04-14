@@ -40,8 +40,10 @@ public interface FeatureWeights {
 	public static final double PAWNS_KING_FF_E				= 1;
 	public static final double PAWNS_KING_OP_F_O			= 1;
 	public static final double PAWNS_KING_OP_F_E			= 1;
-	public static final int PASSED_UNSTOPPABLE 				= 550;
-	public static final double PAWNS_PASSED_STOPPERS		= 1;
+	public static final int PASSED_UNSTOPPABLE_O			= 0;
+	public static final int PASSED_UNSTOPPABLE_E			= 550;
+	public static final double PAWNS_PASSED_STOPPERS_O		= 0;
+	public static final double PAWNS_PASSED_STOPPERS_E		= 1;
 	
 	public static final int PAWNS_KING_GUARDS_O				= 4;
 	public static final int PAWNS_KING_OPENED_O				= -12;
