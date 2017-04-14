@@ -54,4 +54,10 @@ interface Bagatur_ALL_FeaturesConstants {
 	public static final int FEATURE_ID_SPACE 						= 1480;
 	public static final int FEATURE_ID_HUNGED 						= 1490;
 	
+	public static final int FEATURE_ID_MOBILITY_KNIGHT_S 			= 1500;
+	public static final int FEATURE_ID_MOBILITY_BISHOP_S 			= 1510;
+	public static final int FEATURE_ID_MOBILITY_ROOK_S 				= 1520;
+	public static final int FEATURE_ID_MOBILITY_QUEEN_S 			= 1530;
+	public static final int FEATURE_ID_TRAPED 						= 1540;
+	public static final int FEATURE_ID_PASSERS_FRONT_ATTACKS 		= 1550;
 }

@@ -87,6 +87,12 @@ public class Bagatur_ALL_FeaturesConfigurationBagaturImpl implements IFeaturesCo
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_SPACE 						, "SPACE"   					, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_HUNGED 						, "HUNGED"   					, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
 		
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_KNIGHT_S 			, "MOBILITY.KNIGHT.S"   		, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_BISHOP_S			, "MOBILITY.BISHOP.S"			, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_ROOK_S				, "MOBILITY.ROOK.S"   			, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_QUEEN_S			, "MOBILITY.QUEEN.S"   			, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_TRAPED 						, "TRAPED"   					, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PASSERS_FRONT_ATTACKS		, "PASSERS.FRONT.ATTACKS"		, MOVES_ITERATION  , 0, 100, 0, 0, 100, 0 ));
 		
 		return new_featuresSet.toArray(new IFeature[0]);
 	}

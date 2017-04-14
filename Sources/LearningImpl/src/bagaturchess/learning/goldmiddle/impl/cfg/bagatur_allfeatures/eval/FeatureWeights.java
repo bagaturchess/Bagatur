@@ -72,22 +72,23 @@ public interface FeatureWeights {
 	public static final double BISHOP_BAD_E					= 10;
 	
 	public static final double KING_SAFETY_O				= 1;
-	public static final int SPACE_O							= 1;
-	public static final int SPACE_E							= 1;
+	public static final double SPACE_O						= 1;
+	public static final double SPACE_E						= 1;
 	public static final double HUNGED_O						= 1;
 	public static final double HUNGED_E						= 1;
 	
-	public static final int[] MOBILITY_KNIGHT_S_O	= new int[] {-25, -14, -8, -1, 5, 8, 12, 18, 22};
-	public static final int[] MOBILITY_KNIGHT_S_E	= new int[] {-25, -15, -6, 7, 10, 17, 21, 23, 25};
-	public static final int[] MOBILITY_BISHOP_S_O	= new int[] {-15, -11, -8, -6, -4, -2, 0, 2, 4, 7, 10, 12, 14, 16};
-	public static final int[] MOBILITY_BISHOP_S_E	= new int[] {-14, 0, 2, 7, 7, 8, 8, 11, 13, 13, 14, 15, 15, 15};
-	public static final int[] MOBILITY_ROOK_S_O		= new int[] {-13, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 14, 14};
-	public static final int[] MOBILITY_ROOK_S_E		= new int[] {-26, -21, -16, -7, -5, 0, 3, 6, 6, 7, 9, 22, 24, 25, 26};
-	public static final int[] MOBILITY_QUEEN_S_O	= new int[] {-12, -10, -8, -5, -2, 0, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12};
-	public static final int[] MOBILITY_QUEEN_S_E	= new int[] {-17, -16, -15, -14, -14, -13, -8, -6, -1, 0, 2, 3, 4, 5, 6, 7, 8, 9, 9, 10, 11, 12, 13, 13, 14, 15, 16, 17};
+	public static final double MOBILITY_KNIGHT_S_O			= 1;
+	public static final double MOBILITY_KNIGHT_S_E			= 1;
+	public static final double MOBILITY_BISHOP_S_O			= 1;
+	public static final double MOBILITY_BISHOP_S_E			= 1;
+	public static final double MOBILITY_ROOK_S_O			= 1;
+	public static final double MOBILITY_ROOK_S_E			= 1;
+	public static final double MOBILITY_QUEEN_S_O			= 1;
+	public static final double MOBILITY_QUEEN_S_E			= 1;
 	
-
+	public static final double TRAPED_O						= 1;
+	public static final double TRAPED_E						= 1;
 	
-	public static final int TRAPED_O				= -1;
-	public static final int TRAPED_E				= -1;
+	public static final double PASSERS_FRONT_ATTACKS_O 		= 1;
+	public static final double PASSERS_FRONT_ATTACKS_E 		= 1;
 }

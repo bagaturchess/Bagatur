@@ -158,8 +158,8 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 		eval_space(signals);
 		eval_hunged(signals);
 		
-		/*eval_TrapsAndSafeMobility();
-		eval_PassersFrontAttacks();*/
+		eval_TrapsAndSafeMobility(signals);
+		eval_PassersFrontAttacks(signals);
 	}
 	
 	
@@ -1277,8 +1277,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	
 	public void eval_TrapsAndSafeMobility(ISignals signals) {
 		
-		int eval_o = 0;
-		int eval_e = 0;
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
 		int trapped_all = 0;
 		
@@ -1290,8 +1289,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 			    int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_w_minors);
-			    eval_o += MOBILITY_KNIGHT_S_O[mob_safe];
-			    eval_e += MOBILITY_KNIGHT_S_E[mob_safe];
+			    signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT_S).addStrength(interpolateInternal(MOBILITY_KNIGHT_S_O[mob_safe], MOBILITY_KNIGHT_S_E[mob_safe], openingPart), openingPart);
 			    
 			    int rank = Fields.DIGITS[fieldID];
 			    int trapped = getTrappedScores(mob_safe, 3);
@@ -1307,9 +1305,8 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 				int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_w_minors);
-				eval_o += MOBILITY_BISHOP_S_O[mob_safe];
-				eval_e += MOBILITY_BISHOP_S_E[mob_safe];
-			    
+				signals.getSignal(FEATURE_ID_MOBILITY_BISHOP_S).addStrength(interpolateInternal(MOBILITY_BISHOP_S_O[mob_safe], MOBILITY_BISHOP_S_E[mob_safe], openingPart), openingPart);
+				
 			    int rank = Fields.DIGITS[fieldID];
 			    int trapped = getTrappedScores(mob_safe, 3);
 			    trapped_all += (7 + rank) * trapped;
@@ -1324,8 +1321,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 				int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_w_rooks);
-				eval_o += MOBILITY_ROOK_S_O[mob_safe];
-				eval_e += MOBILITY_ROOK_S_E[mob_safe];
+				signals.getSignal(FEATURE_ID_MOBILITY_ROOK_S).addStrength(interpolateInternal(MOBILITY_ROOK_S_O[mob_safe], MOBILITY_ROOK_S_E[mob_safe], openingPart), openingPart);
 				
 			    int rank = Fields.DIGITS[fieldID];
 			    int trapped = getTrappedScores(mob_safe, 5);
@@ -1341,8 +1337,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 				int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_w_queens);
-				eval_o += MOBILITY_QUEEN_S_O[mob_safe];
-				eval_e += MOBILITY_QUEEN_S_E[mob_safe];
+				signals.getSignal(FEATURE_ID_MOBILITY_QUEEN_S).addStrength(interpolateInternal(MOBILITY_QUEEN_S_O[mob_safe], MOBILITY_QUEEN_S_E[mob_safe], openingPart), openingPart);
 				
 			    int rank = Fields.DIGITS[fieldID];
 			    int trapped = getTrappedScores(mob_safe, 9);
@@ -1363,8 +1358,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 			    int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_b_minors);			    
-			    eval_o -= MOBILITY_KNIGHT_S_O[mob_safe];
-			    eval_e -= MOBILITY_KNIGHT_S_E[mob_safe];
+			    signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT_S).addStrength(interpolateInternal(MOBILITY_KNIGHT_S_O[mob_safe], MOBILITY_KNIGHT_S_E[mob_safe], openingPart), openingPart);
 			    
 			    int rank = 7 - Fields.DIGITS[fieldID];
 			    int trapped = -getTrappedScores(mob_safe, 3);
@@ -1380,8 +1374,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 			    
 				int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_b_minors);
-				eval_o -= MOBILITY_BISHOP_S_O[mob_safe];
-				eval_e -= MOBILITY_BISHOP_S_E[mob_safe];
+				signals.getSignal(FEATURE_ID_MOBILITY_BISHOP_S).addStrength(-interpolateInternal(MOBILITY_BISHOP_S_O[mob_safe], MOBILITY_BISHOP_S_E[mob_safe], openingPart), openingPart);
 				
 				int rank = 7 - Fields.DIGITS[fieldID];
 			    int trapped = -getTrappedScores(mob_safe, 3);
@@ -1397,8 +1390,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 				int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_b_rooks);
-				eval_o -= MOBILITY_ROOK_S_O[mob_safe];
-				eval_e -= MOBILITY_ROOK_S_E[mob_safe];
+				signals.getSignal(FEATURE_ID_MOBILITY_ROOK_S).addStrength(-interpolateInternal(MOBILITY_ROOK_S_O[mob_safe], MOBILITY_ROOK_S_E[mob_safe], openingPart), openingPart);
 				
 				int rank = 7 - Fields.DIGITS[fieldID];
 			    int trapped = -getTrappedScores(mob_safe, 5);
@@ -1414,9 +1406,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 				int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_b_queens);
-				eval_o -= MOBILITY_QUEEN_S_O[mob_safe];
-				eval_e -= MOBILITY_QUEEN_S_E[mob_safe];
-
+				signals.getSignal(FEATURE_ID_MOBILITY_QUEEN_S).addStrength(-interpolateInternal(MOBILITY_QUEEN_S_O[mob_safe], MOBILITY_QUEEN_S_E[mob_safe], openingPart), openingPart);
 				
 				int rank = 7 - Fields.DIGITS[fieldID];
 			    int trapped = -getTrappedScores(mob_safe, 9);
@@ -1426,18 +1416,14 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 		
 		
 		trapped_all /= 2;
-		evalInfo.eval_Trapped_o += trapped_all * TRAPED_O;
-		evalInfo.eval_Trapped_e += trapped_all * TRAPED_E;
 		
-		evalInfo.eval_Mobility_Safe_o += eval_o;
-		evalInfo.eval_Mobility_Safe_e += eval_e;
+		signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT_S).addStrength(interpolateInternal(-trapped_all, -trapped_all, openingPart), openingPart);
 	}
 	
-	/*
-	private void eval_PassersFrontAttacks() {
+	
+	private void eval_PassersFrontAttacks(ISignals signals) {
 		
-		int eval_o = 0;
-		int eval_e = 0;
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
 		bitboard.getPawnsCache().lock();
 		
@@ -1453,8 +1439,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				if (stoppers != 0) {
 					long front = p.getFront();
 					int unsafeFieldsInFront = Utils.countBits_less1s(front & evalInfo.bb_attackedByBlackOnly);
-					eval_o -= (unsafeFieldsInFront * PAWNS_PASSED_O[p.getRank()]) / 8;
-					eval_e -= (unsafeFieldsInFront * PAWNS_PASSED_E[p.getRank()]) / 8;
+					signals.getSignal(FEATURE_ID_PASSERS_FRONT_ATTACKS).addStrength(-interpolateInternal((unsafeFieldsInFront * PAWNS_PASSED_O[p.getRank()]) / 8, (unsafeFieldsInFront * PAWNS_PASSED_E[p.getRank()]) / 8, openingPart), openingPart);
 				}
 			}
 		}
@@ -1467,18 +1452,14 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 				if (stoppers != 0) {
 					long front = p.getFront();
 					int unsafeFieldsInFront = Utils.countBits_less1s(front & evalInfo.bb_attackedByWhiteOnly);
-					eval_o += (unsafeFieldsInFront * PAWNS_PASSED_O[p.getRank()]) / 8;
-					eval_e += (unsafeFieldsInFront * PAWNS_PASSED_E[p.getRank()]) / 8;
+					signals.getSignal(FEATURE_ID_PASSERS_FRONT_ATTACKS).addStrength(interpolateInternal((unsafeFieldsInFront * PAWNS_PASSED_O[p.getRank()]) / 8, (unsafeFieldsInFront * PAWNS_PASSED_E[p.getRank()]) / 8, openingPart), openingPart);
 				}
 			}
 		}
 		
 		bitboard.getPawnsCache().unlock();
-		
-		evalInfo.eval_PawnsPassedStoppers_a_o += eval_o;
-		evalInfo.eval_PawnsPassedStoppers_a_e += eval_e;
 	}
-	*/
+	
 	
 	private int getTrappedScores(int mob_safe, int piece_weight) {
 		if (mob_safe == 0) { 
