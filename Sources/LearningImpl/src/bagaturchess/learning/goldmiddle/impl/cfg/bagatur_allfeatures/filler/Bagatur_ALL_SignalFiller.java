@@ -156,7 +156,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	private void fillMovesIterationSignals(ISignals signals) {
 
 		initEvalInfo2();
-		eval_mobility();
+		eval_mobility(signals);
 		
 	}
 	
@@ -667,7 +667,10 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	}
 	
 	
-	private void eval_mobility() {
+	private void eval_mobility(ISignals signals) {
+		
+		
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
 		
 		//Knights
@@ -697,8 +700,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_w_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o += MOBILITY_KNIGHT_O[mob];
-			    eval_e += MOBILITY_KNIGHT_E[mob];
+				signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT).addStrength(interpolateInternal(MOBILITY_KNIGHT_O[mob], MOBILITY_KNIGHT_E[mob], openingPart), openingPart);
 			    
 			    
 			    // Knight outposts:
@@ -719,8 +721,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    			}
 			    		}
 			    		
-			    		eval_o += scores * KNIGHT_OUTPOST_O[fieldID];
-					    eval_e += scores * KNIGHT_OUTPOST_E[fieldID];
+					    signals.getSignal(FEATURE_ID_KNIGHT_OUTPOST).addStrength(interpolateInternal(scores * KNIGHT_OUTPOST_O[mob], scores * KNIGHT_OUTPOST_E[mob], openingPart), openingPart);
 				    }
 			    }
 			}
@@ -752,8 +753,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_b_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o -= MOBILITY_KNIGHT_O[mob];
-			    eval_e -= MOBILITY_KNIGHT_E[mob];
+			    signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT).addStrength(-interpolateInternal(MOBILITY_KNIGHT_O[mob], MOBILITY_KNIGHT_E[mob], openingPart), openingPart);
 			    
 			    
 			    // Knight outposts:

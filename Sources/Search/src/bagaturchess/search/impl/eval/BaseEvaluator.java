@@ -567,6 +567,6 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 
 	
 	protected static final int axisSymmetry(int fieldID) {
-		return HORIZONTAL_SYMMETRY[fieldID];
+		return Fields.HORIZONTAL_SYMMETRY[fieldID];
 	}
 }
