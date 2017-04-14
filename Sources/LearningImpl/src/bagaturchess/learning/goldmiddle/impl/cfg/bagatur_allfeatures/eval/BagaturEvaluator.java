@@ -419,8 +419,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		evalInfo.eval_PawnsPassedKing_e += ((BagaturPawnsEval)pawnsModelEval).getPassersKingEval_e();
 		
 		int unstoppablePasser = bitboard.getUnstoppablePasser();
-		evalInfo.eval_PawnsUnstoppable_o += unstoppablePasser * PASSED_UNSTOPPABLE;
-		evalInfo.eval_PawnsUnstoppable_e += unstoppablePasser * PASSED_UNSTOPPABLE;
+		evalInfo.eval_PawnsUnstoppable_o += unstoppablePasser * PASSED_UNSTOPPABLE_O;
+		evalInfo.eval_PawnsUnstoppable_e += unstoppablePasser * PASSED_UNSTOPPABLE_E;
 		
 		bitboard.getPawnsCache().unlock();
 	}
@@ -472,8 +472,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long stoppers = p.getFront() & evalInfo.bb_all;
 				if (stoppers != 0) {
 					int stoppersCount = Utils.countBits_less1s(stoppers);
-					evalInfo.eval_PawnsPassedStoppers_o -= PAWNS_PASSED_STOPPERS * (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_O[p.getRank()]) / 4;
-					evalInfo.eval_PawnsPassedStoppers_e -= PAWNS_PASSED_STOPPERS * (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_E[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_o -= PAWNS_PASSED_STOPPERS_O * (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_O[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_e -= PAWNS_PASSED_STOPPERS_E * (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_E[p.getRank()]) / 4;
 				}
 			}
 		}
@@ -485,8 +485,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long stoppers = p.getFront() & evalInfo.bb_all;
 				if (stoppers != 0) {
 					int stoppersCount = Utils.countBits_less1s(stoppers);
-					evalInfo.eval_PawnsPassedStoppers_o += PAWNS_PASSED_STOPPERS * (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_O[p.getRank()]) / 4;
-					evalInfo.eval_PawnsPassedStoppers_e += PAWNS_PASSED_STOPPERS * (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_E[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_o += PAWNS_PASSED_STOPPERS_O * (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_O[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_e += PAWNS_PASSED_STOPPERS_E * (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_E[p.getRank()]) / 4;
 				}
 			}
 		}
