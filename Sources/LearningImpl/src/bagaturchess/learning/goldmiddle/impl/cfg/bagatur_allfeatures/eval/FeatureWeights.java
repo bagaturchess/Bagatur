@@ -4,16 +4,16 @@ package bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval;
 public interface FeatureWeights {
 	
 	
-	public static final int MATERIAL_DOUBLE_BISHOP_O 		= 40;
-	public static final int MATERIAL_DOUBLE_BISHOP_E 		= 50;
+	public static final int MATERIAL_DOUBLE_BISHOPS_O 		= 40;
+	public static final int MATERIAL_DOUBLE_BISHOPS_E 		= 50;
 	
 	public static final int STANDARD_TEMPO_O				= 25;
 	public static final int STANDARD_TEMPO_E				= 35;
 	public static final int STANDARD_CASTLING_O				= 10;
 	public static final int STANDARD_CASTLING_E				= 0;
-	public static final int STANDARD_FIANCHETTO         	= 30;
-	public static final int STANDARD_TRAP_BISHOP			= -120;
-	public static final int STANDARD_BLOCKED_PAWN			= -30;
+	public static final int STANDARD_FIANCHETTO_O         	= 30;
+	public static final int STANDARD_TRAP_BISHOP_O			= -120;
+	public static final int STANDARD_BLOCKED_PAWN_O			= -30;
 	
 	public static final int STANDARD_KINGS_OPPOSITION_O 	= 0;
 	public static final int STANDARD_KINGS_OPPOSITION_E 	= 50;
@@ -43,8 +43,8 @@ public interface FeatureWeights {
 	public static final int PASSED_UNSTOPPABLE 				= 550;
 	public static final double PAWNS_PASSED_STOPPERS		= 1;
 	
-	public static final int PAWNS_KING_GUARDS				= 4;
-	public static final int PAWNS_KING_OPENED				= -12;
+	public static final int PAWNS_KING_GUARDS_O				= 4;
+	public static final int PAWNS_KING_OPENED_O				= -12;
 	public static final int PAWNS_ROOK_OPENED_O				= 22;
 	public static final int PAWNS_ROOK_OPENED_E				= 16;
 	public static final int PAWNS_ROOK_SEMIOPENED_O			= 7;

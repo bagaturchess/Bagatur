@@ -328,12 +328,12 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		int b_double_bishops_o = 0;
 		int b_double_bishops_e = 0;
 		if (w_bishops.getDataSize() >= 2) {
-			w_double_bishops_o += MATERIAL_DOUBLE_BISHOP_O;
-			w_double_bishops_e += MATERIAL_DOUBLE_BISHOP_E;
+			w_double_bishops_o += MATERIAL_DOUBLE_BISHOPS_O;
+			w_double_bishops_e += MATERIAL_DOUBLE_BISHOPS_E;
 		}
 		if (b_bishops.getDataSize() >= 2) {
-			b_double_bishops_o += MATERIAL_DOUBLE_BISHOP_O;
-			b_double_bishops_e += MATERIAL_DOUBLE_BISHOP_E;
+			b_double_bishops_o += MATERIAL_DOUBLE_BISHOPS_O;
+			b_double_bishops_e += MATERIAL_DOUBLE_BISHOPS_E;
 		}
 		
 		evalInfo.eval_Material_o += (w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o) + (w_double_bishops_o - b_double_bishops_o);
@@ -363,7 +363,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		eval_e += STANDARD_CASTLING_E * castling;
 		
 		int fianchetto = fianchetto();
-		eval_o += STANDARD_FIANCHETTO * fianchetto;
+		eval_o += STANDARD_FIANCHETTO_O * fianchetto;
 		
 		int patterns = eval_patterns();
 		eval_o += patterns;
@@ -418,27 +418,9 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		evalInfo.eval_PawnsPassedKing_o += ((BagaturPawnsEval)pawnsModelEval).getPassersKingEval_o();
 		evalInfo.eval_PawnsPassedKing_e += ((BagaturPawnsEval)pawnsModelEval).getPassersKingEval_e();
 		
-		/*boolean unstoppablePasser = bitboard.hasUnstoppablePasser();
-		if (unstoppablePasser) {
-			if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-				evalInfo.eval_PawnsUnstoppable_o += PAWNS_PASSED_UNSTOPPABLE;
-				evalInfo.eval_PawnsUnstoppable_e += PAWNS_PASSED_UNSTOPPABLE;
-			} else {
-				evalInfo.eval_PawnsUnstoppable_o -= PAWNS_PASSED_UNSTOPPABLE;
-				evalInfo.eval_PawnsUnstoppable_e -= PAWNS_PASSED_UNSTOPPABLE;
-			}
-		}*/
-		
-		int PAWNS_PASSED_UNSTOPPABLE = 100 + baseEval.getMaterialRook();
-		
 		int unstoppablePasser = bitboard.getUnstoppablePasser();
-		//if (unstoppablePasser > 0) {
-			evalInfo.eval_PawnsUnstoppable_o += unstoppablePasser * PAWNS_PASSED_UNSTOPPABLE;
-			evalInfo.eval_PawnsUnstoppable_e += unstoppablePasser * PAWNS_PASSED_UNSTOPPABLE;
-		//} else if (unstoppablePasser < 0) {
-		//	evalInfo.eval_PawnsUnstoppable_o -= PAWNS_PASSED_UNSTOPPABLE;
-		//	evalInfo.eval_PawnsUnstoppable_e -= PAWNS_PASSED_UNSTOPPABLE;
-		//}
+		evalInfo.eval_PawnsUnstoppable_o += unstoppablePasser * PASSED_UNSTOPPABLE;
+		evalInfo.eval_PawnsUnstoppable_e += unstoppablePasser * PASSED_UNSTOPPABLE;
 		
 		bitboard.getPawnsCache().unlock();
 	}
@@ -490,8 +472,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long stoppers = p.getFront() & evalInfo.bb_all;
 				if (stoppers != 0) {
 					int stoppersCount = Utils.countBits_less1s(stoppers);
-					evalInfo.eval_PawnsPassedStoppers_o -= (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_O[p.getRank()]) / 4;
-					evalInfo.eval_PawnsPassedStoppers_e -= (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_E[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_o -= PAWNS_PASSED_STOPPERS * (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_O[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_e -= PAWNS_PASSED_STOPPERS * (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_E[p.getRank()]) / 4;
 				}
 			}
 		}
@@ -503,8 +485,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long stoppers = p.getFront() & evalInfo.bb_all;
 				if (stoppers != 0) {
 					int stoppersCount = Utils.countBits_less1s(stoppers);
-					evalInfo.eval_PawnsPassedStoppers_o += (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_O[p.getRank()]) / 4;
-					evalInfo.eval_PawnsPassedStoppers_e += (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_E[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_o += PAWNS_PASSED_STOPPERS * (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_O[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_e += PAWNS_PASSED_STOPPERS * (stoppersCount * Bagatur_ALL_SignalFillerConstants.PAWNS_PASSED_E[p.getRank()]) / 4;
 				}
 			}
 		}
@@ -623,7 +605,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	    if (w_rooks.getDataSize() > 0 || w_queens.getDataSize() > 0) {
 	    	kingOpened -= evalInfo.b_kingOpened;
 	    }
-	    evalInfo.eval_PawnsRooksQueens_o += kingOpened * PAWNS_KING_OPENED;
+	    evalInfo.eval_PawnsRooksQueens_o += kingOpened * PAWNS_KING_OPENED_O;
 	}
 	
 	
@@ -1704,8 +1686,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		
 		int eval = 0;
 		
-		eval += STANDARD_TRAP_BISHOP * minor_trap;
-		eval += STANDARD_BLOCKED_PAWN * blocked_pawns;
+		eval += STANDARD_TRAP_BISHOP_O * minor_trap;
+		eval += STANDARD_BLOCKED_PAWN_O * blocked_pawns;
 		
 		return eval;
 	}

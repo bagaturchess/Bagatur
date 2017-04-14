@@ -113,7 +113,7 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 							throw new IllegalStateException();
 					}
 					w_gardsScores += scores;
-					standardEval_o += PAWNS_KING_GUARDS * scores;
+					standardEval_o += PAWNS_KING_GUARDS_O * scores;
 				}
 				
 				
@@ -202,7 +202,7 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 							throw new IllegalStateException();
 					}
 					b_gardsScores += scores;
-					standardEval_o -= PAWNS_KING_GUARDS * scores;
+					standardEval_o -= PAWNS_KING_GUARDS_O * scores;
 				}
 				
 				
