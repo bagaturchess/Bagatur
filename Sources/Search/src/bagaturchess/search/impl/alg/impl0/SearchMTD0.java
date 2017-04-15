@@ -1085,7 +1085,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 						//	staticPrunning = true;
 						//}
 						
-						if (!isGoodMove || searchedCount >= getLMR1(list)) {
+						//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
 							double rate = Math.sqrt(searchedCount);
 							rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
@@ -1102,7 +1102,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							if (lmrReduction >= (rest - 1) * PLY) {
 								lmrReduction = (rest - 1) * PLY;
 							}
-						}
+						//}
 						
 						/*
 						if (!isGoodMove) {
@@ -1893,7 +1893,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 							//	staticPrunning = true;
 							//}
 							
-							if (!isGoodMove || searchedCount >= getLMR1(list)) {
+							//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
 								double rate = Math.sqrt(searchedCount);
 								rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
@@ -1910,7 +1910,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 								if (lmrReduction >= (rest - 1) * PLY) {
 									lmrReduction = (rest - 1) * PLY;
 								}
-							}
+							//}
 							
 							
 							/*
