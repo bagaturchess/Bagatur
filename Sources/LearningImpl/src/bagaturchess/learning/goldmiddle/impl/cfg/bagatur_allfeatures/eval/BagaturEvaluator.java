@@ -54,56 +54,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	public static final int RookAttackWeight 			= 3;
 	public static final int BishopAttackWeight 			= 2;
 	public static final int KnightAttackWeight	 		= 2;
-	
-	
-	/**
-	 * Weights of evaluation clusters, hard coded in this class 
-	 */
-	private double WEIGHT_MATERIAL_O 			= 1.167;
-	private double WEIGHT_MATERIAL_E 			= 0.799;
-	
-	private double WEIGHT_STANDARD_O 			= 0.183;
-	private double WEIGHT_STANDARD_E 			= 0;
-	
-	private double WEIGHT_PAWNS_ROOKQUEEN_O		= 0.631;
-	private double WEIGHT_PAWNS_ROOKQUEEN_E		= 2.013;
-	
-	private double WEIGHT_KINGSAFETY_O 			= 3.379;
-	private double WEIGHT_KINGSAFETY_E 			= 0;
-	
-	private double WEIGHT_MOBILITY_O 			= 0.751;
-	private double WEIGHT_MOBILITY_E 			= 0;
-	
-	private double WEIGHT_MOBILITY_S_O 			= 1.734;
-	private double WEIGHT_MOBILITY_S_E 			= 0.934;
-	
-	private double WEIGHT_SPACE_O 				= 0.704;
-	private double WEIGHT_SPACE_E 				= 0.179;
-	
-	private double WEIGHT_TRAPPED_O 			= 0.403;
-	private double WEIGHT_TRAPPED_E 			= 0.601;
-	
-    private double WEIGHT_HUNGED_O 				= 1.328;
-    private double WEIGHT_HUNGED_E 				= 2.149;
-	
-	private double WEIGHT_PST_O 				= 1.082;
-	private double WEIGHT_PST_E 				= 0.622;
-	
-	private double WEIGHT_PAWNS_STANDARD_O 		= 0.698;
-	private double WEIGHT_PAWNS_STANDARD_E 		= 0.440;
-	
-	private double WEIGHT_PAWNS_PASSED_O 		= 0;
-	private double WEIGHT_PAWNS_PASSED_E 		= 1.737;
-	
-	private double WEIGHT_PAWNS_PASSED_KING_O 	= 0;
-	private double WEIGHT_PAWNS_PASSED_KING_E 	= 2.444;
-	
-	private double WEIGHT_PAWNS_PSTOPPERS_O 	= 0;
-	private double WEIGHT_PAWNS_PSTOPPERS_E 	= 0.418;
-	
-	private double WEIGHT_PAWNS_PSTOPPERS_A_O 	= 0;
-	private double WEIGHT_PAWNS_PSTOPPERS_A_E 	= 1.357;
-	
+		
 	
 	BagaturEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
 		
@@ -139,10 +90,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		
 		eval_material_nopawnsdrawrule();
 		eval_PST();
-		evalInfo.eval_Material_o *= WEIGHT_MATERIAL_O;
-		evalInfo.eval_Material_e *= WEIGHT_MATERIAL_E;
-		evalInfo.eval_PST_o *= WEIGHT_PST_O;
-		evalInfo.eval_PST_e *= WEIGHT_PST_E;
 		eval += interpolator.interpolateByFactor(evalInfo.eval_Material_o +
 												evalInfo.eval_PST_o,
 												
@@ -158,12 +105,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		int eval = 0;
 		
 		eval_pawns();
-		evalInfo.eval_PawnsStandard_o *= WEIGHT_PAWNS_STANDARD_O;
-		evalInfo.eval_PawnsStandard_e *= WEIGHT_PAWNS_STANDARD_E;
-		evalInfo.eval_PawnsPassed_o *= WEIGHT_PAWNS_PASSED_O;
-		evalInfo.eval_PawnsPassed_e *= WEIGHT_PAWNS_PASSED_E;
-		evalInfo.eval_PawnsPassedKing_o *= WEIGHT_PAWNS_PASSED_KING_O;
-		evalInfo.eval_PawnsPassedKing_e *= WEIGHT_PAWNS_PASSED_KING_E;
 		eval += interpolator.interpolateByFactor(
 												evalInfo.eval_PawnsStandard_o +
 												evalInfo.eval_PawnsPassed_o +
@@ -189,16 +130,10 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		initEvalInfo1();
 		
 		eval_standard();
-		evalInfo.eval_Standard_o *= WEIGHT_STANDARD_O;
-		evalInfo.eval_Standard_e *= WEIGHT_STANDARD_E;
 		eval += interpolator.interpolateByFactor(evalInfo.eval_Standard_o,
 												evalInfo.eval_Standard_e);
 		
 		eval_pawns_PassedStoppers_RooksAndQueens();
-		evalInfo.eval_PawnsPassedStoppers_o *= WEIGHT_PAWNS_PSTOPPERS_O;
-		evalInfo.eval_PawnsPassedStoppers_e *= WEIGHT_PAWNS_PSTOPPERS_E;
-		evalInfo.eval_PawnsRooksQueens_o *= WEIGHT_PAWNS_ROOKQUEEN_O;
-		evalInfo.eval_PawnsRooksQueens_e *= WEIGHT_PAWNS_ROOKQUEEN_E;
 		eval += interpolator.interpolateByFactor(evalInfo.eval_PawnsPassedStoppers_o +
 												evalInfo.eval_PawnsRooksQueens_o,
 												
@@ -216,8 +151,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		
 		initEvalInfo2();
 		eval_mobility();
-		evalInfo.eval_Mobility_o *= WEIGHT_MOBILITY_O;
-		evalInfo.eval_Mobility_e *= WEIGHT_MOBILITY_E;
 		eval += interpolator.interpolateByFactor(evalInfo.eval_Mobility_o,
 												
 												evalInfo.eval_Mobility_e);
@@ -226,12 +159,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		eval_king_safety();
 		eval_space();
 		eval_hunged();
-		evalInfo.eval_Kingsafety_o *= WEIGHT_KINGSAFETY_O;
-		evalInfo.eval_Kingsafety_e *= WEIGHT_KINGSAFETY_E;
-		evalInfo.eval_Space_o *= WEIGHT_SPACE_O;
-		evalInfo.eval_Space_e *= WEIGHT_SPACE_E;
-		evalInfo.eval_Hunged_o *= WEIGHT_HUNGED_O;
-		evalInfo.eval_Hunged_e *= WEIGHT_HUNGED_E;
 		eval += interpolator.interpolateByFactor(evalInfo.eval_Kingsafety_o +
 				evalInfo.eval_Space_o +
 				evalInfo.eval_Hunged_o,
@@ -251,12 +178,6 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		
 		eval_TrapsAndSafeMobility();
 		eval_PassersFrontAttacks();
-		evalInfo.eval_Trapped_o *= WEIGHT_TRAPPED_O;
-		evalInfo.eval_Trapped_e *= WEIGHT_TRAPPED_E;
-		evalInfo.eval_Mobility_Safe_o *= WEIGHT_MOBILITY_S_O;
-		evalInfo.eval_Mobility_Safe_e *= WEIGHT_MOBILITY_S_E;
-		evalInfo.eval_PawnsPassedStoppers_a_o *= WEIGHT_PAWNS_PSTOPPERS_A_O;
-		evalInfo.eval_PawnsPassedStoppers_a_e *= WEIGHT_PAWNS_PSTOPPERS_A_E;
 		eval += interpolator.interpolateByFactor(evalInfo.eval_Trapped_o +
 												evalInfo.eval_Mobility_Safe_o +
 												evalInfo.eval_PawnsPassedStoppers_a_o,
