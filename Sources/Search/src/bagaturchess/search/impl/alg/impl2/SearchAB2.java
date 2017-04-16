@@ -96,7 +96,7 @@ public class SearchAB2 extends SearchImpl {
 
 		backtracking[0].null_move = false;
 		
-		return negasearch(mediator, info, maxdepth, depth, beta, true, true);
+		return negasearch(mediator, info, maxdepth, depth, beta, false, true);
 	}
 	
 	
@@ -261,7 +261,7 @@ public class SearchAB2 extends SearchImpl {
 		//Null move
 		boolean prevIsNullmove = depth > 0 ? backtracking[depth - 1].null_move : false;
 		if (!inCheck
-			//&& !pv
+			&& !pv
 			&& depth > 0
 			&& rest >= 1
 			&& !isMateVal(beta - 1)
@@ -383,8 +383,8 @@ public class SearchAB2 extends SearchImpl {
             }
         }
 		
-        int mate_move = depth > 0 ? backtracking[depth - 1].mate_move : 0;
         
+        //IID
         if (tpt_move == 0) {
 			
 			int reduction = PLY * (rest / 2);
@@ -392,7 +392,7 @@ public class SearchAB2 extends SearchImpl {
 			
 			if (reduction >= 1) {
 				
-				negasearch(mediator, info, maxdepth - reduction, depth, beta, pv, storeInTPT);
+				negasearch(mediator, info, maxdepth - reduction, depth, beta, false, storeInTPT);
 				
 				env.getTPT().lock();
 				{
@@ -429,6 +429,9 @@ public class SearchAB2 extends SearchImpl {
 			list.clear();
 			((ListAll)list).setTptMove(tpt_move);
 			((ListAll)list).setPrevBestMove(depth > 1 ? backtracking[depth - 2].best_move : 0);
+			
+			 int mate_move = depth > 0 ? backtracking[depth - 1].mate_move : 0;
+			
 			((ListAll)list).setMateMove(mate_move);
 		} else {
 			list = lists_escapes[depth];
@@ -527,18 +530,15 @@ public class SearchAB2 extends SearchImpl {
 				//LMR
                 int reduction = 0;
                 if (reductionAllowed) {
-                	
-                	reduction += PLY;
-                	//if (rest >= 2 /*&& searchedCount >= getLMR1(list)*/) {
-                		reduction += PLY;
-                	//}
-                	
-                	//if (rest >= 2) {
-                	//	reduction += searchedCount >= getLMR1(list) ? PLY : 0;
-                	//}
-                	//if (rest >= 3) {
-                	//	reduction += searchedCount >= getLMR2(list) ? PLY : 0;
-                	//}
+                	//reduction = 2 * PLY;
+					double rate = Math.sqrt(searchedCount);
+					reduction = (int) (PLY * rate);
+					if (reduction < PLY) {
+						reduction = PLY;
+					}
+					if (reduction >= (rest - 1) * PLY) {
+						reduction = (rest - 1) * PLY;
+					}
                 }
 				
 				if (env.getBitboard().isInCheck(backtrackingInfo.colour_to_move)) {
@@ -557,7 +557,7 @@ public class SearchAB2 extends SearchImpl {
 				}
 				
 				if (pv && cur_eval > best_eval) {
-					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), pv, storeInTPT);
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), true, storeInTPT);
 				}
 				
 				env.getBitboard().makeMoveBackward(cur_move);
