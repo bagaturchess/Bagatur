@@ -671,7 +671,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 
-        if (useStaticPrunning
+        if (STATIC_PRUNING && useStaticPrunning
                 ) {
                 
             if (inCheck) {
@@ -815,7 +815,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 			}
 			
 		}
-
+		
 		
 		//IID PV Node
 		if (IID_PV /*&& depth > 0*/) {
@@ -860,7 +860,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		
-        if (useStaticPrunning
+        if (STATIC_PRUNING && useStaticPrunning
                 ) {
                 
             if (inCheck) {
@@ -1527,7 +1527,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		
-        if (useStaticPrunning
+        if (STATIC_PRUNING && useStaticPrunning
                 ) {
                 
             if (inCheck) {
@@ -1701,7 +1701,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 		}
 		
 		
-        if (useStaticPrunning
+        if (STATIC_PRUNING && useStaticPrunning
                 ) {
                 
             if (inCheck) {
