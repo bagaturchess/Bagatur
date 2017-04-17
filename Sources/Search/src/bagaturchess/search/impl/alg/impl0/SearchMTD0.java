@@ -56,6 +56,7 @@ public class SearchMTD0 extends SearchImpl_MTD {
 	double LMR_REDUCTION_MULTIPLIER 		= 1 * 1.222 * 1;
 	double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1 * 0.777 * 1;
 	double IID_DEPTH_MULTIPLIER 			= 1;
+	boolean STATIC_PRUNING 					= true;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
