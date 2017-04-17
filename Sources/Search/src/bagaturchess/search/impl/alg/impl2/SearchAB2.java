@@ -83,7 +83,7 @@ public class SearchAB2 extends SearchImpl {
 		
 		backtracking[0].null_move = false;
 		
-		return negasearch(mediator, info, maxdepth, depth, beta, true, true);
+		return negasearch(mediator, info, maxdepth, depth, beta, true);
 	}
 	
 	
@@ -93,15 +93,15 @@ public class SearchAB2 extends SearchImpl {
 			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV,
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
-
+		
 		backtracking[0].null_move = false;
 		
-		return negasearch(mediator, info, maxdepth, depth, beta, false, true);
+		return negasearch(mediator, info, maxdepth, depth, beta, false);
 	}
 	
 	
 	private int negasearch(ISearchMediator mediator, ISearchInfo info,
-			int maxdepth, int depth, int beta, boolean pv, boolean storeInTPT) {
+			int maxdepth, int depth, int beta, boolean pv) {
 		
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
@@ -120,6 +120,7 @@ public class SearchAB2 extends SearchImpl {
 			info.setSelDepth(depth);
 		}
 		
+		//Check for max depth
 		if (depth >= MAX_DEPTH) {
 			return eval(depth, beta);
 		}
@@ -137,6 +138,7 @@ public class SearchAB2 extends SearchImpl {
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
+		//Mate check
 		if (inCheck) {
 			if (!env.getBitboard().hasMoveInCheck()) {
 				
@@ -146,11 +148,19 @@ public class SearchAB2 extends SearchImpl {
 			}
 		}
 		
-		if (isDrawPV(depth)) {
-			node.eval = getDrawScores();
-			
-			return node.eval;
+		//Draw check
+		if (pv) {
+			if (isDrawPV(depth)) {
+				node.eval = getDrawScores();
+				return node.eval;
+			}
+		} else {
+			if (isDraw()) {
+				node.eval = getDrawScores();
+				return node.eval;
+			}
 		}
+
 		
 		int rest = normDepth(maxdepth) - depth;
 		
@@ -241,9 +251,9 @@ public class SearchAB2 extends SearchImpl {
 		
 		//Quiescence search
 		if (rest + normDepth(extend_position) <= 0) {
-			node.eval = qsearch(mediator, info, depth, beta, 100, pv, storeInTPT, true);
+			node.eval = qsearch(mediator, info, depth, beta);
 			
-			if (pv) {
+			if (false && pv) {
 				if (node.eval >= beta && env.getTactics().silentButDeadly()) {
 					extend_position = PLY;
 				} else {
@@ -290,7 +300,7 @@ public class SearchAB2 extends SearchImpl {
 					node.leaf = true;
 					backtrackingInfo.null_move = true;
 					env.getBitboard().makeNullMoveForward();
-					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -(beta + 1), false, storeInTPT);
+					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -(beta + 1), false);
 					
 					if (//null_eval < 0 && isMateVal(null_eval)
 							true//backtrackingInfo.eval - null_eval > 0
@@ -320,44 +330,20 @@ public class SearchAB2 extends SearchImpl {
 		}
 		
 		
-        // Razoring
-        /*if (!inCheck
-        		&& rest <= 4
-        		&& rest >= 2
-        		&& !isMateVal(beta - 1)
-    			&& !isMateVal(beta)
-    			) {
-        	
-			if (backtrackingInfo.eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
-				backtrackingInfo.eval = eval(depth, beta);
-			}
-			
-            final int razorMargin = 255;
-            if (backtrackingInfo.eval < beta - razorMargin) {
-            	int razoring_eval = qsearch(mediator, info, depth, beta - razorMargin, 100, pv, false, true);
-            	
-                if (razoring_eval < beta - razorMargin) {
-                	razoring_eval = negasearch(mediator, rootWin, info, maxdepth - (rest / 2) * PLY, depth, beta - razorMargin, pv, false);
-                	
-                	if (razoring_eval < beta - razorMargin) {
-                		node.eval = razoring_eval;
-						return node.eval;
-                	}
-                }
-            }
-        }*/
-		
 		rest = normDepth(maxdepth) - depth;
 		
+		//Static pruning conditions
         boolean futility_enabled = false;
         int futility_eval = beta - 1;
-        if (rest <= 5
-        	&& !pv
+        /*if (!pv
     		&& extend_position == 0 //e.g. not in check
     		&& !isMateVal(beta - 1)
 			&& !isMateVal(beta)
 			) {
         	
+        	//Static pruning for all depths
+            //int margin = (int) getAlphaTrustWindow(mediator, rest);
+            
             int margin;
             if (rest <= 1) {
                 margin = 61;
@@ -381,10 +367,10 @@ public class SearchAB2 extends SearchImpl {
             if (futility_eval < beta) {
                 futility_enabled = true;
             }
-        }
-		
+        }*/
         
-        //IID
+        
+        //IID - internal iterative deepening
         if (tpt_move == 0) {
 			
 			int reduction = PLY * (rest / 2);
@@ -392,7 +378,7 @@ public class SearchAB2 extends SearchImpl {
 			
 			if (reduction >= 1) {
 				
-				negasearch(mediator, info, maxdepth - reduction, depth, beta, false, storeInTPT);
+				negasearch(mediator, info, maxdepth - reduction, depth, beta, false);
 				
 				env.getTPT().lock();
 				{
@@ -487,6 +473,7 @@ public class SearchAB2 extends SearchImpl {
                 		//&& !pv
 						//&& !(cur_move == tpt_move)
 						//&& !(cur_move == mate_move)
+						&& !inCheck
 						&& searchedCount > 0
 						&& !isPasserPush
 						&& !isCapOrProm
@@ -499,15 +486,17 @@ public class SearchAB2 extends SearchImpl {
 						best_move = cur_move;
 						
 						backtrackingInfo.best_move = best_move;
+						
+						info.setSearchedNodes(info.getSearchedNodes() + 1);	
 					}
 					
 					continue;
 				}
 				
-				//int moveSee = -1;
-				//if (isCapOrProm) {
-				//	moveSee = env.getBitboard().getSee().evalExchange(cur_move);
-				//}
+				int moveSee = -1;
+				if (isCapOrProm) {
+					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
+				}
 				
 				//int new_materialGain = materialGain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
 				if  (isCapOrProm) {
@@ -521,8 +510,8 @@ public class SearchAB2 extends SearchImpl {
 											//&& !(cur_move == tpt_move)
 											//&& !(cur_move == mate_move)
 											&& !isCapOrProm
-											//&& moveSee < 0
-											&& !isPasserPush
+											&& moveSee < 0
+											//&& !isPasserPush
 											&& !isCheckMove;
 				
 				int extend = extend_position;// + (moveSee > 0 ? PLY / 4 : 0);
@@ -551,13 +540,13 @@ public class SearchAB2 extends SearchImpl {
 				
 				int new_maxdepth = maxdepth + extend;
 				
-				int cur_eval = -negasearch(mediator, info, new_maxdepth - reduction, depth + 1, -(beta - 1), false, storeInTPT);
+				int cur_eval = -negasearch(mediator, info, new_maxdepth - reduction, depth + 1, -(beta - 1), false);
 				if (reduction > 0 && cur_eval >= beta) {
-					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), false, storeInTPT);
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), false);
 				}
 				
 				if (pv && cur_eval > best_eval) {
-					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), true, storeInTPT);
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), true);
 				}
 				
 				env.getBitboard().makeMoveBackward(cur_move);
@@ -569,17 +558,14 @@ public class SearchAB2 extends SearchImpl {
 					
 					backtrackingInfo.best_move = best_move;
 					
-					//if (isNonAlphaNode(cur_eval, best_eval, beta - 1, beta)) {
-						
-						node.bestmove = best_move;
-						node.eval = best_eval;
-						node.leaf = false;
-						node.nullmove = false;
-						
-						if (depth + 1 < MAX_DEPTH) {
-							pvman.store(depth + 1, node, pvman.load(depth + 1), true);
-						}
-					//}
+					node.bestmove = best_move;
+					node.eval = best_eval;
+					node.leaf = false;
+					node.nullmove = false;
+					
+					if (depth + 1 < MAX_DEPTH) {
+						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
+					}
 					
 					if (best_eval >= beta) {
 						
@@ -645,64 +631,50 @@ public class SearchAB2 extends SearchImpl {
 			throw new IllegalStateException();
 		}
 		
-		/*if (best_eval < alpha) {
-			best_eval = alpha;
-		}
-		if (best_eval > beta) {
-			best_eval = beta;
-		}*/
 		
-		if (storeInTPT) {
-			env.getTPT().lock();
-			env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, backtrackingInfo.colour_to_move, best_eval, beta - 1, beta, best_move, (byte)0);
-			env.getTPT().unlock();
-		}
+		env.getTPT().lock();
+		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, backtrackingInfo.colour_to_move, best_eval, beta - 1, beta, best_move, (byte)0);
+		env.getTPT().unlock();
 		
 		return best_eval;
 	}
 
 
-	private int qsearch(ISearchMediator mediator, ISearchInfo info, int depth, int beta, int checksCount, boolean pv, boolean storeInTPT, boolean firstQlevel) {
+	private int qsearch(ISearchMediator mediator, ISearchInfo info, int depth, int beta) {
 		
 		
-		if (!firstQlevel) {
-			info.setSearchedNodes(info.getSearchedNodes() + 1);	
-			if (info.getSelDepth() < depth) {
-				info.setSelDepth(depth);
-			}
+		info.setSearchedNodes(info.getSearchedNodes() + 1);	
+		if (info.getSelDepth() < depth) {
+			info.setSelDepth(depth);
 		}
-		
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
-		long hashkey = env.getBitboard().getHashKey();
-		if (backtrackingInfo.hash_key != hashkey) {
-			backtrackingInfo.hash_key = hashkey;
-			backtrackingInfo.colour_to_move = env.getBitboard().getColourToMove();
-			backtrackingInfo.hash_move = 0;
-			backtrackingInfo.null_move = false;//depth > 0 ? backtracking[depth - 1].null_move: false;
-			backtrackingInfo.eval = BacktrackingInfo.EVAL_NOT_CALCULATED;
-			backtrackingInfo.best_move = 0;
-			backtrackingInfo.mate_move = 0;
-			backtrackingInfo.material_exchanged = 0;
-			
-			
-			//Get tpt move
-			int tpt_move = 0;
-			
-			env.getTPT().lock();
-			{
-				TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
-				if (tptEntry != null) {
-					tpt_move = tptEntry.getBestMove_lower();
-					if (tpt_move == 0) {
-						tpt_move = tptEntry.getBestMove_upper();
-					}
+		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
+		backtrackingInfo.colour_to_move = env.getBitboard().getColourToMove();
+		backtrackingInfo.hash_move = 0;
+		backtrackingInfo.null_move = false;//depth > 0 ? backtracking[depth - 1].null_move: false;
+		backtrackingInfo.eval = BacktrackingInfo.EVAL_NOT_CALCULATED;
+		backtrackingInfo.best_move = 0;
+		backtrackingInfo.mate_move = 0;
+		backtrackingInfo.material_exchanged = 0;
+		
+		
+		//Get tpt move
+		int tpt_move = 0;
+		
+		env.getTPT().lock();
+		{
+			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
+			if (tptEntry != null) {
+				tpt_move = tptEntry.getBestMove_lower();
+				if (tpt_move == 0) {
+					tpt_move = tptEntry.getBestMove_upper();
 				}
 			}
-			env.getTPT().unlock();
-			
-			backtrackingInfo.hash_move = tpt_move;
 		}
+		env.getTPT().unlock();
+		
+		backtrackingInfo.hash_move = tpt_move;
 		
 		
 		backtrackingInfo.eval = eval(depth, beta);
@@ -794,12 +766,7 @@ public class SearchAB2 extends SearchImpl {
 		                }
 					}
 				} else {
-					if (checksCount <= 0 || !env.getBitboard().isCheckMove(cur_move)) {
-						continue;
-					} else {
-						//All moves
-						checksCount--;
-					}
+					continue;
 				}
 			}
 			
@@ -810,7 +777,7 @@ public class SearchAB2 extends SearchImpl {
 			}
 			legalMoves++;
 			
-			int cur_eval = -qsearch(mediator, info, depth + 1, -(beta - 1), checksCount, pv, storeInTPT, false);
+			int cur_eval = -qsearch(mediator, info, depth + 1, -(beta - 1));
 			
 			env.getBitboard().makeMoveBackward(cur_move);
 			
@@ -869,19 +836,11 @@ public class SearchAB2 extends SearchImpl {
 			node.nullmove = false;
 		}
 		
-		/*if (best_eval < alpha) {
-			best_eval = alpha;
-		}
-		if (best_eval > beta) {
-			best_eval = beta;
-		}*/
 		
-		if (storeInTPT) {
-			if (best_move != 0) {
-				env.getTPT().lock();
-				env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, beta - 1, beta, best_move, (byte)0);
-				env.getTPT().unlock();
-			}
+		if (best_move != 0) {
+			env.getTPT().lock();
+			env.getTPT().put(backtrackingInfo.hash_key, 0, 0, env.getBitboard().getColourToMove(), best_eval, beta - 1, beta, best_move, (byte)0);
+			env.getTPT().unlock();
 		}
 		
 		return best_eval;
@@ -899,12 +858,8 @@ public class SearchAB2 extends SearchImpl {
 		return passerPush;
 	}
 	
-	private int getLMR1(ISearchMoveList list) {
-		return (int) Math.max(1, Math.sqrt(list.size()) / (double)2);
-	}
-	
-	private int getLMR2(ISearchMoveList list) {
-		return (int) Math.max(1, Math.sqrt(list.size()));
+	private double getAlphaTrustWindow(ISearchMediator mediator, int rest) {
+		return 1 * mediator.getTrustWindow_AlphaAspiration();
 	}
 	
 	protected boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, int alpha, int beta, boolean markup) {
@@ -955,8 +910,6 @@ public class SearchAB2 extends SearchImpl {
 		if (entry != null) {
 			//if (entry.getDepth() >= depth) {
 				
-				info.setSearchedNodes(info.getSearchedNodes() + 1);
-				
 				if (entry.isExact()) {
 					result.bestmove = entry.getBestMove_lower();
 				} else {
@@ -972,17 +925,6 @@ public class SearchAB2 extends SearchImpl {
 						}
 					}
 				}
-
-				
-				//if (result.bestmove == 0) {
-				//	return false;
-				//}
-				
-				//if (result.bestmove != 0 && !env.getBitboard().isPossible(result.bestmove)) {
-					//if (true) throw new IllegalStateException(env.getBitboard() +
-					//		"\r\n Not possible " + MoveInt.moveToString(result.bestmove));
-				//	return false;
-				//}
 				
 				result.leaf = false;
 				
