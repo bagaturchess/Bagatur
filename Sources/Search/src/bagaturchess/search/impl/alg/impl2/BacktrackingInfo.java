@@ -8,7 +8,7 @@ public class BacktrackingInfo {
 	long hash_key;
 	int hash_move;
 	boolean null_move;
-	int eval;
+	int static_eval;
 	int best_move;
 	int mate_move;
 	int material_exchanged;

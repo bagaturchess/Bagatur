@@ -105,7 +105,7 @@ public class SearchAB2 extends SearchImpl {
 		backtrackingInfo.colour_to_move = env.getBitboard().getColourToMove();
 		backtrackingInfo.hash_move = 0;
 		backtrackingInfo.null_move = false;
-		backtrackingInfo.eval = BacktrackingInfo.EVAL_NOT_CALCULATED;
+		backtrackingInfo.static_eval = BacktrackingInfo.EVAL_NOT_CALCULATED;
 		backtrackingInfo.best_move = 0;
 		backtrackingInfo.mate_move = 0;
 		backtrackingInfo.material_exchanged = depth > 0 ? -backtracking[depth - 1].material_exchanged : 0;
@@ -180,7 +180,6 @@ public class SearchAB2 extends SearchImpl {
 					tpt_move = tptEntry.getBestMove_upper();
 				}
 				backtrackingInfo.hash_move = tpt_move;
-				backtrackingInfo.eval = tpt_exact ? tpt_lower : BacktrackingInfo.EVAL_NOT_CALCULATED;
 			}
 		}
 		env.getTPT().unlock();
@@ -276,11 +275,11 @@ public class SearchAB2 extends SearchImpl {
 					
 			if (hasAtLeastOnePiece) {
 				
-				if (backtrackingInfo.eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
-					backtrackingInfo.eval = eval(depth, beta);
+				if (backtrackingInfo.static_eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
+					backtrackingInfo.static_eval = eval(depth, beta);
 				}
 				
-				if (backtrackingInfo.eval >= beta) {
+				if (backtrackingInfo.static_eval >= beta) {
 					
 					int reduction = (rest / 2) * PLY;
 					reduction = Math.max(reduction, PLY);
@@ -350,11 +349,11 @@ public class SearchAB2 extends SearchImpl {
             	throw new IllegalStateException("rest=" + rest);
             }*/
             
-			if (backtrackingInfo.eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
-				backtrackingInfo.eval = eval(depth, beta);
+			if (backtrackingInfo.static_eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
+				backtrackingInfo.static_eval = eval(depth, beta);
 			}
 			
-            futility_eval = backtrackingInfo.eval + margin;
+            futility_eval = backtrackingInfo.static_eval + margin;
             if (futility_eval < beta) {
                 futility_enabled = true;
             }
@@ -482,7 +481,6 @@ public class SearchAB2 extends SearchImpl {
 						best_move = cur_move;
 						
 						backtrackingInfo.best_move = best_move;
-						backtrackingInfo.eval = best_eval;
 						
 						node.bestmove = best_move;
 						node.eval = best_eval;
@@ -645,16 +643,16 @@ public class SearchAB2 extends SearchImpl {
 		backtrackingInfo.colour_to_move = env.getBitboard().getColourToMove();
 		backtrackingInfo.hash_move = 0;
 		backtrackingInfo.null_move = false;
-		backtrackingInfo.eval = BacktrackingInfo.EVAL_NOT_CALCULATED;
+		backtrackingInfo.static_eval = BacktrackingInfo.EVAL_NOT_CALCULATED;
 		backtrackingInfo.best_move = 0;
 		backtrackingInfo.mate_move = 0;
 		backtrackingInfo.material_exchanged = 0;
 		
 		
 		//Check for max depth
-		backtrackingInfo.eval = eval(depth, beta);
+		backtrackingInfo.static_eval = eval(depth, beta);
 		if (depth >= MAX_DEPTH) {
-			return backtrackingInfo.eval;
+			return backtrackingInfo.static_eval;
 		}
 		
 		if (mediator != null && mediator.getStopper() != null)
@@ -733,8 +731,8 @@ public class SearchAB2 extends SearchImpl {
 		boolean inCheck = env.getBitboard().isInCheck();
 		
 		if (!inCheck) {
-			if (backtrackingInfo.eval >= beta) {
-				node.eval = backtrackingInfo.eval;
+			if (backtrackingInfo.static_eval >= beta) {
+				node.eval = backtrackingInfo.static_eval;
 				return node.eval;
 			}
 		}
@@ -788,7 +786,7 @@ public class SearchAB2 extends SearchImpl {
 					if (moveSee >= 0) {
 						//All moves
 					} else {
-		                int optimisticScore = 100 + backtrackingInfo.eval
+		                int optimisticScore = 100 + backtrackingInfo.static_eval
 		                	+ env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
 		                
 		                if (optimisticScore <= beta - 1) { // Delta pruning
@@ -856,12 +854,12 @@ public class SearchAB2 extends SearchImpl {
 			}
 		}
 		
-		if (!inCheck && backtrackingInfo.eval > best_eval) {
+		if (!inCheck && backtrackingInfo.static_eval > best_eval) {
 			best_move = 0;
-			best_eval = backtrackingInfo.eval;
+			best_eval = backtrackingInfo.static_eval;
 			
 			node.leaf = true;
-			node.eval = backtrackingInfo.eval;
+			node.eval = backtrackingInfo.static_eval;
 			node.bestmove = 0;
 			node.nullmove = false;
 		}
