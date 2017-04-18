@@ -373,10 +373,10 @@ public class SearchAB2 extends SearchImpl {
         //IID - internal iterative deepening
         if (tpt_move == 0) {
 			
-			int reduction = PLY * (rest / 2);
+			int reduction = (PLY * rest) / 2;
 			//reduction = Math.max(reduction, PLY);
 			
-			if (reduction >= 1) {
+			if (reduction >= PLY) {
 				
 				negasearch(mediator, info, maxdepth - reduction, depth, beta, false);
 				
