@@ -156,10 +156,9 @@ public class SearchAB2 extends SearchImpl {
 				return node.eval;
 			}
 		}
-
 		
-		int rest = normDepth(maxdepth) - depth;
 		
+		//Get TPT entry
 		boolean tpt_found = false;
 		boolean tpt_exact = false;
 		int tpt_depth = 0;
@@ -167,8 +166,6 @@ public class SearchAB2 extends SearchImpl {
 		int tpt_upper = MAX;
 		int tpt_move = 0;
 		
-		
-		//Get TPT entry
 		env.getTPT().lock();
 		{
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
@@ -187,6 +184,8 @@ public class SearchAB2 extends SearchImpl {
 			}
 		}
 		env.getTPT().unlock();
+		
+		int rest = normDepth(maxdepth) - depth;
 		
 		if (!pv
 				&& tpt_found && tpt_depth >= rest
@@ -226,8 +225,10 @@ public class SearchAB2 extends SearchImpl {
 			}
 		}
 		
+		
 		//Check extension
 		int extend_position = inCheck ? PLY : 0;
+		
 		
 		//Recapture extension
 		if (extend_position == 0) {
@@ -237,9 +238,6 @@ public class SearchAB2 extends SearchImpl {
 				//extend_position = PLY;
 			}
 		}
-		
-		
-		rest = normDepth(maxdepth) - depth;
 		
 		
 		//Quiescence search
@@ -653,19 +651,45 @@ public class SearchAB2 extends SearchImpl {
 		
 		
 		//Get TPT entry
+		boolean tpt_exact = false;
+		int tpt_lower = MIN;
+		int tpt_upper = MAX;
 		int tpt_move = 0;
 		
 		env.getTPT().lock();
 		{
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 			if (tptEntry != null) {
+				tpt_exact = tptEntry.isExact();
+				tpt_lower = tptEntry.getLowerBound();
+				tpt_upper = tptEntry.getUpperBound();
 				tpt_move = tptEntry.getBestMove_lower();
 				if (tpt_move == 0) {
 					tpt_move = tptEntry.getBestMove_upper();
 				}
+				backtrackingInfo.hash_move = tpt_move;
+				backtrackingInfo.eval = tpt_exact ? tpt_lower : 0;
 			}
 		}
 		env.getTPT().unlock();
+		
+		if (tpt_exact) {
+			if (!SearchUtils.isMateVal(tpt_lower)) {				
+				return tpt_lower;
+			}
+		} else {
+			if (tpt_lower >= beta) {
+				if (!SearchUtils.isMateVal(tpt_lower)) {
+					return tpt_lower;
+				}
+			}
+			if (tpt_upper <= beta - 1) {
+				if (!SearchUtils.isMateVal(tpt_upper)) {
+					return tpt_upper;
+				}
+			}
+		}
+
 		
 		backtrackingInfo.hash_move = tpt_move;
 		
