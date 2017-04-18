@@ -129,7 +129,7 @@ public class SearchAB2 extends SearchImpl {
 			mediator.getStopper().stopIfNecessary(normDepth(maxdepth), backtrackingInfo.colour_to_move, beta - 1, beta);
 		
 		
-		//Start iteration
+		//Start search iteration
 		PVNode node = pvman.load(depth);
 		
 		node.bestmove = 0;
@@ -297,7 +297,7 @@ public class SearchAB2 extends SearchImpl {
 					node.leaf = true;
 					backtrackingInfo.null_move = true;
 					env.getBitboard().makeNullMoveForward();
-					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -(beta + 1), false);
+					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -(beta - 1), false);
 					
 					
 					//Get mate move of opponent
@@ -338,7 +338,7 @@ public class SearchAB2 extends SearchImpl {
 			) {
         	
         	//Static pruning for all depths
-            int margin = (int) getAlphaTrustWindow(mediator, rest);
+            int margin = getAlphaTrustWindow(mediator, rest);
             
             /*
             //Classic futility pruning
@@ -646,16 +646,37 @@ public class SearchAB2 extends SearchImpl {
 		if (mediator != null && mediator.getStopper() != null)
 			mediator.getStopper().stopIfNecessary(normDepth(0), backtrackingInfo.colour_to_move, beta - 1, beta);
 		
-		
+		//Start search iteration
 		PVNode node = pvman.load(depth);
 		node.bestmove = 0;
 		node.eval = MIN;
 		node.nullmove = false;
 		node.leaf = true;
 		
-		if (isDrawPV(depth)) {
-			node.eval = getDrawScores();
-			return node.eval;
+		
+		//Draw check
+		if (pv) {
+			if (isDrawPV(depth)) {
+				node.eval = getDrawScores();
+				return node.eval;
+			}
+		} else {
+			if (isDraw()) {
+				node.eval = getDrawScores();
+				return node.eval;
+			}
+		}
+		
+		
+		//Mate check
+		boolean inCheck = env.getBitboard().isInCheck();
+		if (inCheck) {
+			if (!env.getBitboard().hasMoveInCheck()) {
+				
+				node.eval = -getMateVal(depth);
+				
+				return node.eval;
+			}
 		}
 		
 		
@@ -716,9 +737,9 @@ public class SearchAB2 extends SearchImpl {
 		backtrackingInfo.hash_move = tpt_move;
 		
 		
-		boolean inCheck = env.getBitboard().isInCheck();
-		
+		//Static pruning
 		if (!inCheck) {
+			//beta cutoff
 			if (backtrackingInfo.static_eval >= beta) {
 				node.eval = backtrackingInfo.static_eval;
 				return node.eval;
@@ -747,7 +768,6 @@ public class SearchAB2 extends SearchImpl {
 		} else {
 			cur_move = (backtrackingInfo.hash_move != 0 && MoveInt.isCaptureOrPromotion(backtrackingInfo.hash_move))
 							? backtrackingInfo.hash_move : list.next();
-			//cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		}
 		
 		int searchedMoves = 0;
@@ -774,7 +794,7 @@ public class SearchAB2 extends SearchImpl {
 					if (moveSee >= 0) {
 						//All moves
 					} else {
-		                int optimisticScore = 100 + backtrackingInfo.static_eval
+		                int optimisticScore = getAlphaTrustWindow(mediator, 0) + backtrackingInfo.static_eval
 		                	+ env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
 		                
 		                if (optimisticScore <= beta - 1) { // Delta pruning
@@ -788,9 +808,6 @@ public class SearchAB2 extends SearchImpl {
 			
 			env.getBitboard().makeMoveForward(cur_move);
 			
-			if (env.getBitboard().isInCheck(backtrackingInfo.colour_to_move)) {
-				throw new IllegalStateException("! " + env.getBitboard().toString());
-			}
 			legalMoves++;
 			
 			int cur_eval = -qsearch(mediator, info, depth + 1, -(beta - 1), pv);
@@ -803,7 +820,7 @@ public class SearchAB2 extends SearchImpl {
 				
 				backtrackingInfo.best_move = best_move;
 				
-				if (best_eval > beta - 1) {
+				if (best_eval >= beta) {
 					
 					node.bestmove = best_move;
 					node.eval = best_eval;
@@ -811,9 +828,6 @@ public class SearchAB2 extends SearchImpl {
 					if (depth + 1 < MAX_DEPTH) {
 						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
 					}
-				}
-				
-				if (best_eval >= beta) {
 					
 					if (inCheck) {
 						env.getHistory_check().goodMove(cur_move, 1, best_eval > 0 && isMateVal(best_eval));
@@ -826,21 +840,6 @@ public class SearchAB2 extends SearchImpl {
 			
 		} while ((cur_move = list.next()) != 0);
 		
-		if (best_move == 0) {
-			if (inCheck) {
-				if (legalMoves == 0) {
-					node.bestmove = 0;
-					node.eval = -getMateVal(depth);
-					node.leaf = true;
-					node.nullmove = false;
-					return node.eval;
-				} else {
-					throw new IllegalStateException("!!" + env.getBitboard().toString());
-				}
-			} else {
-				//All captures lead to evaluation which is less than the static eval
-			}
-		}
 		
 		if (!inCheck && backtrackingInfo.static_eval > best_eval) {
 			best_move = 0;
@@ -872,12 +871,7 @@ public class SearchAB2 extends SearchImpl {
 	}
 	
 	
-	private boolean isPasserPush(int cur_move) {
-		boolean passerPush = env.getBitboard().isPasserPush(cur_move);
-		return passerPush;
-	}
-	
-	private double getAlphaTrustWindow(ISearchMediator mediator, int rest) {
+	private int getAlphaTrustWindow(ISearchMediator mediator, int rest) {
 		return 1 * mediator.getTrustWindow_AlphaAspiration();
 	}
 }
