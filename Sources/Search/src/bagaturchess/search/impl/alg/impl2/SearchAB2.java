@@ -326,16 +326,16 @@ public class SearchAB2 extends SearchImpl {
 		//Static pruning conditions
         boolean futility_enabled = false;
         int futility_eval = beta - 1;
-        /*if (!pv
+        if (!pv
     		&& extend_position == 0 //e.g. not in check
     		&& !isMateVal(beta - 1)
 			&& !isMateVal(beta)
 			) {
         	
         	//Static pruning for all depths
-            //int margin = (int) getAlphaTrustWindow(mediator, rest);
+            int margin = (int) getAlphaTrustWindow(mediator, rest);
             
-            int margin;
+            /*int margin;
             if (rest <= 1) {
                 margin = 61;
             } else if (rest <= 2) {
@@ -348,7 +348,7 @@ public class SearchAB2 extends SearchImpl {
             	margin = 500;
             } else {
             	throw new IllegalStateException("rest=" + rest);
-            }
+            }*/
             
 			if (backtrackingInfo.eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
 				backtrackingInfo.eval = eval(depth, beta);
@@ -358,7 +358,7 @@ public class SearchAB2 extends SearchImpl {
             if (futility_eval < beta) {
                 futility_enabled = true;
             }
-        }*/
+        }
         
         
         //IID - internal iterative deepening
@@ -455,7 +455,12 @@ public class SearchAB2 extends SearchImpl {
 				
 				
 				boolean isCapOrProm = MoveInt.isCaptureOrPromotion(cur_move);
-				boolean isPasserPush = isPasserPush(cur_move);
+				//boolean isPasserPush = isPasserPush(cur_move);
+				
+				int moveSee = -1;
+				if (isCapOrProm) {
+					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
+				}
 				
 				
 				//Futility pruning
@@ -464,9 +469,10 @@ public class SearchAB2 extends SearchImpl {
 						//&& !(cur_move == tpt_move)
 						//&& !(cur_move == mate_move)
 						&& !inCheck
+						&& moveSee < 0
 						&& searchedCount > 0
-						&& !isPasserPush
-						&& !isCapOrProm
+						//&& !isPasserPush
+						//&& !isCapOrProm
 						&& !env.getBitboard().isCheckMove(cur_move)
 					) {
 					
@@ -476,16 +482,15 @@ public class SearchAB2 extends SearchImpl {
 						best_move = cur_move;
 						
 						backtrackingInfo.best_move = best_move;
+						backtrackingInfo.eval = best_eval;
+						
+						node.bestmove = best_move;
+						node.eval = best_eval;
 						
 						info.setSearchedNodes(info.getSearchedNodes() + 1);	
 					}
 					
 					continue;
-				}
-				
-				int moveSee = -1;
-				if (isCapOrProm) {
-					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 				}
 				
 				//int new_materialGain = materialGain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
@@ -497,11 +502,8 @@ public class SearchAB2 extends SearchImpl {
 				
 				boolean isCheckMove = env.getBitboard().isInCheck();
 				boolean reductionAllowed = !inCheck
-											//&& !(cur_move == tpt_move)
-											//&& !(cur_move == mate_move)
-											&& !isCapOrProm
 											&& moveSee < 0
-											//&& !isPasserPush
+											&& searchedCount > 0
 											&& !isCheckMove;
 				
 				int extend = extend_position;// + (moveSee > 0 ? PLY / 4 : 0);
