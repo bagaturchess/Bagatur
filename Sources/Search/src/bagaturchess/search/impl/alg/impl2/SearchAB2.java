@@ -180,7 +180,7 @@ public class SearchAB2 extends SearchImpl {
 					tpt_move = tptEntry.getBestMove_upper();
 				}
 				backtrackingInfo.hash_move = tpt_move;
-				backtrackingInfo.eval = tpt_exact ? tpt_lower : 0;
+				backtrackingInfo.eval = tpt_exact ? tpt_lower : BacktrackingInfo.EVAL_NOT_CALCULATED;
 			}
 		}
 		env.getTPT().unlock();
@@ -385,7 +385,6 @@ public class SearchAB2 extends SearchImpl {
 							tpt_move = tptEntry.getBestMove_upper();
 						}
 						backtrackingInfo.hash_move = tpt_move;
-						backtrackingInfo.eval = tpt_exact ? tpt_lower : 0;
 					}
 				}
 				env.getTPT().unlock();
@@ -650,6 +649,28 @@ public class SearchAB2 extends SearchImpl {
 		backtrackingInfo.material_exchanged = 0;
 		
 		
+		//Check for max depth
+		backtrackingInfo.eval = eval(depth, beta);
+		if (depth >= MAX_DEPTH) {
+			return backtrackingInfo.eval;
+		}
+		
+		if (mediator != null && mediator.getStopper() != null)
+			mediator.getStopper().stopIfNecessary(normDepth(0), backtrackingInfo.colour_to_move, beta - 1, beta);
+		
+		
+		PVNode node = pvman.load(depth);
+		node.bestmove = 0;
+		node.eval = MIN;
+		node.nullmove = false;
+		node.leaf = true;
+		
+		if (isDrawPV(depth)) {
+			node.eval = getDrawScores();
+			return node.eval;
+		}
+		
+		
 		//Get TPT entry
 		boolean tpt_exact = false;
 		int tpt_lower = MIN;
@@ -667,25 +688,38 @@ public class SearchAB2 extends SearchImpl {
 				if (tpt_move == 0) {
 					tpt_move = tptEntry.getBestMove_upper();
 				}
-				backtrackingInfo.hash_move = tpt_move;
-				backtrackingInfo.eval = tpt_exact ? tpt_lower : 0;
 			}
 		}
 		env.getTPT().unlock();
 		
 		if (tpt_exact) {
-			if (!SearchUtils.isMateVal(tpt_lower)) {				
-				return tpt_lower;
+			if (!SearchUtils.isMateVal(tpt_lower)) {
+				node.bestmove = tpt_move;
+				node.eval = tpt_lower;
+				node.nullmove = false;
+				node.leaf = true;
+				
+				return node.eval;
 			}
 		} else {
 			if (tpt_lower >= beta) {
 				if (!SearchUtils.isMateVal(tpt_lower)) {
-					return tpt_lower;
+					node.bestmove = tpt_move;
+					node.eval = tpt_lower;
+					node.nullmove = false;
+					node.leaf = true;
+					
+					return node.eval;
 				}
 			}
 			if (tpt_upper <= beta - 1) {
 				if (!SearchUtils.isMateVal(tpt_upper)) {
-					return tpt_upper;
+					node.bestmove = tpt_move;
+					node.eval = tpt_upper;
+					node.nullmove = false;
+					node.leaf = true;
+					
+					return node.eval;
 				}
 			}
 		}
@@ -693,29 +727,6 @@ public class SearchAB2 extends SearchImpl {
 		
 		backtrackingInfo.hash_move = tpt_move;
 		
-		
-		backtrackingInfo.eval = eval(depth, beta);
-		if (depth >= MAX_DEPTH) {
-			return backtrackingInfo.eval;
-		}
-		
-		//int colourToMove = env.getBitboard().getColourToMove();
-		
-		
-		if (mediator != null && mediator.getStopper() != null)
-			mediator.getStopper().stopIfNecessary(normDepth(0), backtrackingInfo.colour_to_move, beta - 1, beta);
-		
-		
-		PVNode node = pvman.load(depth);
-		node.bestmove = 0;
-		node.eval = MIN;
-		node.nullmove = false;
-		node.leaf = true;
-		
-		if (isDrawPV(depth)) {
-			node.eval = getDrawScores();
-			return node.eval;
-		}
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
