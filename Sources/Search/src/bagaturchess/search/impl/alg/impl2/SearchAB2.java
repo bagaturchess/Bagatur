@@ -81,8 +81,6 @@ public class SearchAB2 extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		backtracking[0].null_move = false;
-		
 		return negasearch(mediator, info, maxdepth, depth, beta, true);
 	}
 	
@@ -93,8 +91,6 @@ public class SearchAB2 extends SearchImpl {
 			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV,
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
-		
-		backtracking[0].null_move = false;
 		
 		return negasearch(mediator, info, maxdepth, depth, beta, false);
 	}
@@ -171,6 +167,8 @@ public class SearchAB2 extends SearchImpl {
 		int tpt_upper = MAX;
 		int tpt_move = 0;
 		
+		
+		//Get TPT entry
 		env.getTPT().lock();
 		{
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
@@ -190,7 +188,8 @@ public class SearchAB2 extends SearchImpl {
 		}
 		env.getTPT().unlock();
 		
-		if (tpt_found && tpt_depth >= rest
+		if (!pv
+				&& tpt_found && tpt_depth >= rest
 				
 				) {
 			
@@ -201,19 +200,15 @@ public class SearchAB2 extends SearchImpl {
 					node.nullmove = false;
 					node.leaf = true;
 					
-					extractFromTPT(info, rest, node, beta - 1, beta, false);
-					
 					return node.eval;
 				}
-			} else if (!pv) {
+			} else {
 				if (tpt_lower >= beta) {
 					if (!SearchUtils.isMateVal(tpt_lower)) {
 						node.bestmove = tpt_move;
 						node.eval = tpt_lower;
 						node.nullmove = false;
 						node.leaf = true;
-						
-						extractFromTPT(info, rest, node, beta - 1, beta, false);
 						
 						return node.eval;
 					}
@@ -224,8 +219,6 @@ public class SearchAB2 extends SearchImpl {
 						node.eval = tpt_upper;
 						node.nullmove = false;
 						node.leaf = true;
-						
-						extractFromTPT(info, rest, node, beta - 1, beta, false);
 						
 						return node.eval;
 					}
@@ -638,8 +631,8 @@ public class SearchAB2 extends SearchImpl {
 		
 		return best_eval;
 	}
-
-
+	
+	
 	private int qsearch(ISearchMediator mediator, ISearchInfo info, int depth, int beta) {
 		
 		
@@ -659,7 +652,7 @@ public class SearchAB2 extends SearchImpl {
 		backtrackingInfo.material_exchanged = 0;
 		
 		
-		//Get tpt move
+		//Get TPT entry
 		int tpt_move = 0;
 		
 		env.getTPT().lock();
@@ -860,91 +853,5 @@ public class SearchAB2 extends SearchImpl {
 	
 	private double getAlphaTrustWindow(ISearchMediator mediator, int rest) {
 		return 1 * mediator.getTrustWindow_AlphaAspiration();
-	}
-	
-	protected boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, int alpha, int beta, boolean markup) {
-		env.getTPT().lock();
-		boolean res = extractFromTPT(info, depth, result, alpha, beta);
-		env.getTPT().unlock();
-		return res;
-	}
-	
-	private boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, int alpha, int beta) {
-		
-		//if (true) throw new IllegalStateException("Not thread safe"); 
-		
-		if (result == null) {
-			return false;
-			//throw new IllegalStateException();
-		}
-		
-		result.bestmove = 0;
-		result.leaf = true;
-		result.nullmove = false;
-		
-		if (info.getSelDepth() < depth) {
-			info.setSelDepth(depth);
-		}
-		
-		//if (depth <= 0) {
-		//	return false;
-		//}
-		
-		if (isDrawPV(depth)) {
-			result.eval = getDrawScores();
-			//TODO: Consider result.eval = getDrawScores();
-			return true;
-		}
-		
-		boolean draw = false;
-		
-		long hashkey = env.getBitboard().getHashKey();
-		
-		TPTEntry entry = env.getTPT().get(hashkey);
-		
-		if (entry == null) {
-			//throw new IllegalStateException("entry == null");
-			return false;
-		}
-		
-		if (entry != null) {
-			//if (entry.getDepth() >= depth) {
-				
-				if (entry.isExact()) {
-					result.bestmove = entry.getBestMove_lower();
-				} else {
-					if (entry.getLowerBound() >= beta) {
-						result.bestmove = entry.getBestMove_lower();
-					} else if (entry.getUpperBound() <= alpha) {
-						result.bestmove = entry.getBestMove_upper();
-					} else {
-						//throw new IllegalStateException("alpha=" + alpha + ", beta=" + beta + ", entry.getBestMove_lower()=" + entry.getBestMove_lower() + ", entry.getBestMove_upper()=" + entry.getBestMove_upper());
-						result.bestmove = entry.getBestMove_lower();
-						if (result.bestmove == 0) {
-							result.bestmove = entry.getBestMove_upper();
-						}
-					}
-				}
-				
-				result.leaf = false;
-				
-				if (result.bestmove == 0) {
-					env.getBitboard().makeNullMoveForward();
-				} else {
-					env.getBitboard().makeMoveForward(result.bestmove);
-				}
-				
-				draw = extractFromTPT(info, depth - 1, result.child, -beta, -alpha);
-				//TODO: Consider if (draw) result.eval = getDrawScores();
-				
-				if (result.bestmove == 0) {
-					env.getBitboard().makeNullMoveBackward();
-				} else {
-					env.getBitboard().makeMoveBackward(result.bestmove);
-				}
-			//}
-		}
-		
-		return draw;
 	}
 }
