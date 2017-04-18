@@ -108,7 +108,7 @@ public class SearchAB2 extends SearchImpl {
 		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
 		backtrackingInfo.colour_to_move = env.getBitboard().getColourToMove();
 		backtrackingInfo.hash_move = 0;
-		backtrackingInfo.null_move = depth > 0 ? backtracking[depth - 1].null_move: false;
+		backtrackingInfo.null_move = false;
 		backtrackingInfo.eval = BacktrackingInfo.EVAL_NOT_CALCULATED;
 		backtrackingInfo.best_move = 0;
 		backtrackingInfo.mate_move = 0;
@@ -271,12 +271,12 @@ public class SearchAB2 extends SearchImpl {
 		//Null move
 		boolean prevIsNullmove = depth > 0 ? backtracking[depth - 1].null_move : false;
 		if (!inCheck
+			&& !prevIsNullmove
 			&& !pv
 			&& depth > 0
 			&& rest >= 1
 			&& !isMateVal(beta - 1)
 			&& !isMateVal(beta)
-			&& !prevIsNullmove
 			) {
 			
 			boolean hasAtLeastOnePiece = (backtrackingInfo.colour_to_move == Figures.COLOUR_WHITE) ?
@@ -652,7 +652,7 @@ public class SearchAB2 extends SearchImpl {
 		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
 		backtrackingInfo.colour_to_move = env.getBitboard().getColourToMove();
 		backtrackingInfo.hash_move = 0;
-		backtrackingInfo.null_move = false;//depth > 0 ? backtracking[depth - 1].null_move: false;
+		backtrackingInfo.null_move = false;
 		backtrackingInfo.eval = BacktrackingInfo.EVAL_NOT_CALCULATED;
 		backtrackingInfo.best_move = 0;
 		backtrackingInfo.mate_move = 0;
