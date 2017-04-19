@@ -27,18 +27,16 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
-import bagaturchess.search.api.IEngineConfig;
+import bagaturchess.egtb.gaviota.GTBProbeOutput;
 import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchMoveList;
-//import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.alg.iter.ListAll;
 import bagaturchess.search.impl.alg.iter.ListCapsProm;
 import bagaturchess.search.impl.alg.iter.ListKingEscapes;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.utils.SearchUtils;
@@ -51,6 +49,9 @@ public class SearchAB2 extends SearchImpl {
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
+	
+	private static final double LMR_REDUCTION_MULTIPLIER 		= 1;//1 * 1.222 * 1;
+	private static final double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1;//1 * 0.777 * 1;
 	
 	
 	public SearchAB2(Object[] args) {
@@ -81,7 +82,7 @@ public class SearchAB2 extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		return negasearch(mediator, info, maxdepth, depth, beta, true);
+		return negasearch(mediator, info, maxdepth, depth, beta, true, useMateDistancePrunning, rootColour);
 	}
 	
 	
@@ -92,12 +93,12 @@ public class SearchAB2 extends SearchImpl {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		return negasearch(mediator, info, maxdepth, depth, beta, false);
+		return negasearch(mediator, info, maxdepth, depth, beta, false, useMateDistancePrunning, rootColour);
 	}
 	
 	
 	private int negasearch(ISearchMediator mediator, ISearchInfo info,
-			int maxdepth, int depth, int beta, boolean pv) {
+			int maxdepth, int depth, int beta, boolean pv, boolean useMateDistancePrunning, int rootColour) {
 		
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
@@ -161,6 +162,68 @@ public class SearchAB2 extends SearchImpl {
 				return node.eval;
 			}
 		}
+		
+	    //Mate distance pruning
+		if (!inCheck && useMateDistancePrunning && depth >= 1) {
+		      
+		      // lower bound - the site to move is mate on the move after the next move
+		      int value = -getMateVal(depth+2); // does not work if the current position is mate
+		      if (value >= beta) {
+					node.bestmove = 0;
+					node.eval = value;
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
+		      }
+		      
+		      // upper bound - opponent mate in next move
+		      value = getMateVal(depth+1);
+		      if (value < beta) {
+					node.bestmove = 0;
+					node.eval = value;
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
+		      }
+		}
+		
+		
+		//Gaviota endgame tablebases
+		if (env.getGTBProbing() != null
+				&& env.getBitboard().getColourToMove() == rootColour
+				&& depth >= 11) {
+            
+			temp_input.clear();
+            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
+            
+            int egtb_val = Integer.MIN_VALUE;
+            
+            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
+                
+                egtb_val = getDrawScores(rootColour);
+                
+                node.eval = egtb_val;
+                return egtb_val;
+                
+            } else {
+                
+                int result = extractEGTBMateValue(depth);
+                
+                if (result != 0) {//Has mate
+                    
+                    egtb_val = result;
+                    
+                    if (!isMateVal(egtb_val)) {
+                        throw new IllegalStateException("egtb_val=" + egtb_val);
+                    }
+                    
+                    if (egtb_val >= beta) {
+	                    node.eval = egtb_val;
+	                    return egtb_val;
+                    }
+                }
+            }
+        }
 		
 		
 		int rest = normDepth(maxdepth) - depth;
@@ -232,20 +295,22 @@ public class SearchAB2 extends SearchImpl {
 			}
 		}
 		
+		
+		//Extensions
+		int extend_position = 0;
+		
 		//Check extension
-		//Disabled
-		int extend_position = 0;//inCheck ? PLY : 0;
+		//extend_position = inCheck ? PLY : 0;
 		
 		
 		//Recapture extension
-		if (extend_position == 0) {
+		/*if (extend_position == 0) {
 			if (backtrackingInfo.material_exchanged == 0
 					&& MoveInt.isCaptureOrPromotion(env.getBitboard().getLastMove())
 				) {
-				//Disabled
-				//extend_position = PLY;
+				extend_position = PLY;
 			}
-		}
+		}*/
 		
 		
 		//Quiescence search
@@ -290,7 +355,7 @@ public class SearchAB2 extends SearchImpl {
 				
 				if (backtrackingInfo.static_eval >= beta) {
 					
-					int reduction = (PLY * rest) / 2;
+					int reduction = (int) ((NULL_MOVE_REDUCTION_MULTIPLIER * (PLY * rest) / 2));
 					reduction = Math.max(reduction, PLY);
 					
 					node.bestmove = 0;
@@ -299,7 +364,7 @@ public class SearchAB2 extends SearchImpl {
 					node.leaf = true;
 					backtrackingInfo.null_move = true;
 					env.getBitboard().makeNullMoveForward();
-					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -(beta - 1), false);
+					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -(beta - 1), false, useMateDistancePrunning, rootColour);
 					
 					
 					//Get mate move of opponent
@@ -377,7 +442,7 @@ public class SearchAB2 extends SearchImpl {
 			
 			if (reduction >= PLY) {
 				
-				negasearch(mediator, info, maxdepth - reduction, depth, beta, false);
+				negasearch(mediator, info, maxdepth - reduction, depth, beta, false, useMateDistancePrunning, rootColour);
 				
 				env.getTPT().lock();
 				{
@@ -509,7 +574,7 @@ public class SearchAB2 extends SearchImpl {
                 if (reductionAllowed) {
                 	//reduction = 2 * PLY;
 					double rate = Math.sqrt(searchedCount);
-					reduction = (int) (PLY * rate);
+					reduction = (int) (LMR_REDUCTION_MULTIPLIER * PLY * rate);
 					if (reduction < PLY) {
 						reduction = PLY;
 					}
@@ -524,13 +589,13 @@ public class SearchAB2 extends SearchImpl {
 				
 				int new_maxdepth = maxdepth + extend;
 				
-				int cur_eval = -negasearch(mediator, info, new_maxdepth - reduction, depth + 1, -(beta - 1), false);
+				int cur_eval = -negasearch(mediator, info, new_maxdepth - reduction, depth + 1, -(beta - 1), false, useMateDistancePrunning, rootColour);
 				if (reduction > 0 && cur_eval >= beta) {
-					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), false);
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), false, useMateDistancePrunning, rootColour);
 				}
 				
 				if (pv && cur_eval > best_eval) {
-					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), true);
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), true, useMateDistancePrunning, rootColour);
 				}
 				
 				env.getBitboard().makeMoveBackward(cur_move);
