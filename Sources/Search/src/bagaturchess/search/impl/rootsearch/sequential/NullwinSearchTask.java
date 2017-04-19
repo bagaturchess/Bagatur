@@ -39,7 +39,7 @@ import bagaturchess.uci.api.ChannelManager;
 
 
 public class NullwinSearchTask implements Runnable {
-		
+	
 	
 	private ISearch searcher;
 	private SearchManager distribution;
