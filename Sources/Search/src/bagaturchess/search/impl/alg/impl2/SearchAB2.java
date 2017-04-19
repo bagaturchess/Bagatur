@@ -233,7 +233,8 @@ public class SearchAB2 extends SearchImpl {
 		}
 		
 		//Check extension
-		int extend_position = inCheck ? PLY : 0;
+		//Disabled
+		int extend_position = 0;//inCheck ? PLY : 0;
 		
 		
 		//Recapture extension
@@ -241,6 +242,7 @@ public class SearchAB2 extends SearchImpl {
 			if (backtrackingInfo.material_exchanged == 0
 					&& MoveInt.isCaptureOrPromotion(env.getBitboard().getLastMove())
 				) {
+				//Disabled
 				//extend_position = PLY;
 			}
 		}
