@@ -163,6 +163,7 @@ public class SearchAB2 extends SearchImpl {
 			}
 		}
 		
+		
 	    //Mate distance pruning
 		if (!inCheck && useMateDistancePrunning && depth >= 1) {
 		      
