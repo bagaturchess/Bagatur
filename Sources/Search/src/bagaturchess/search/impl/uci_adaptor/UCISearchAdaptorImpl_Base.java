@@ -135,8 +135,6 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		String rootSearchClassName = searchAdaptorCfg.getRootSearchClassName();
 		IRootSearch _searcher = (IRootSearch)
 			ReflectionUtils.createObjectByClassName_ObjectsConstructor(rootSearchClassName, new Object[] {rootSearchCfg, sharedData});
-		//searcherNormal = new MTDSequentialSearch(_engineBootCfg);
-		//searcherNormal = new MTDParallelSearch(_engineBootCfg);
 		return _searcher;
 	}
 	

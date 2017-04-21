@@ -84,6 +84,7 @@ public class Boot {
 			
 		} catch (Throwable t) {
 			if (communicationChanel != null) communicationChanel.dump(t);
+			t.printStackTrace(System.out);
 		}
 	}
 	

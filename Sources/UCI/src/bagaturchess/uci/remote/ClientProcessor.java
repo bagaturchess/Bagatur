@@ -55,7 +55,7 @@ public class ClientProcessor implements Runnable {
 				"bagaturchess.engines.base.cfg.UCISearchAdaptorConfig_BaseImpl",
 				"bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch",
 				"bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP",
-				"bagaturchess.search.impl.alg.impl0.SearchMTD0",
+				"bagaturchess.search.impl.alg.impl1.Search_NegaScout",
 				"bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD_SMP",
 				"bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl",
 				"bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2", };

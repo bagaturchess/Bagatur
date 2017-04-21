@@ -33,9 +33,9 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 		ARGS += "bagaturchess.engines.base.cfg.UCIConfig_BaseImpl_DEBUG "; 
 		ARGS += "bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove ";
 		ARGS += "bagaturchess.engines.base.cfg.UCISearchAdaptorConfig_BaseImpl ";
-		ARGS += "bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch ";
+		ARGS += "bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD ";
 		ARGS += "bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core ";
-		ARGS += "bagaturchess.search.impl.alg.impl0.SearchMTD0 ";
+		ARGS += "bagaturchess.search.impl.alg.impl1.Search_NegaScout ";
 		ARGS += "bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD_SMP ";
 		ARGS += "bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl ";
 		ARGS += "bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2 ";
