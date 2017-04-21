@@ -791,8 +791,8 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 			    			}
 			    		}
 				    		
-			    		eval_o -= scores * KNIGHT_OUTPOST_O[HORIZONTAL_SYMMETRY[fieldID]];
-					    eval_e -= scores * KNIGHT_OUTPOST_E[HORIZONTAL_SYMMETRY[fieldID]];
+			    		eval_o -= scores * KNIGHT_OUTPOST_O[Fields.HORIZONTAL_SYMMETRY[fieldID]];
+					    eval_e -= scores * KNIGHT_OUTPOST_E[Fields.HORIZONTAL_SYMMETRY[fieldID]];
 				    }
 			    }
 			}
@@ -917,8 +917,8 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 			    			}
 			    		}
 			    		
-			    		eval_o -= scores * BISHOP_OUTPOST_O[HORIZONTAL_SYMMETRY[fieldID]];
-					    eval_e -= scores * BISHOP_OUTPOST_E[HORIZONTAL_SYMMETRY[fieldID]];
+			    		eval_o -= scores * BISHOP_OUTPOST_O[Fields.HORIZONTAL_SYMMETRY[fieldID]];
+					    eval_e -= scores * BISHOP_OUTPOST_E[Fields.HORIZONTAL_SYMMETRY[fieldID]];
 				    }
 			    }
 			    

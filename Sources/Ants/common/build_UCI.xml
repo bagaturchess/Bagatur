@@ -1,31 +1,29 @@
-<project name="BagaturUCITracker" default="all" basedir="./">
+<project name="BagaturUCI" default="all" basedir="./">
 	
 	<description>
-        Bagatur UCI Tracker - assembly files
+        Bagatur UCI - assembly files
     </description>
 	
-	<property name="project_name" value="BagaturUCITracker" />
-	<property name="project_root" value="${ucitracker_dir}" />
+	<property name="project_name" value="BagaturUCI" />
+	<property name="project_root" value="${uci_dir}" />
 	<property name="classpath" value="${work_dir}/BagaturBoard.jar" />
-	
 	<property name="src" location="${project_root}/src" />
-	<property name="classes" location="${work_dir}/assembly" />
 	
 	<target name="clean" description="clean up">
-		<delete dir="${classes}" />
+		<delete dir="${temp_dir}" />
 	</target>
-		
+	
 	<target name="init" description="create output dir">
 		<tstamp />
-		<mkdir dir="${classes}" />
+		<mkdir dir="${temp_dir}" />
 	</target>
 	
 	<target name="compile" description="compile the source">
-		<javac srcdir="${src}" destdir="${classes}"  classpath="${classpath}"/>
+		<javac compiler="javac1.6" srcdir="${src}" destdir="${temp_dir}" classpath="${classpath}"/>
 	</target>
 	
 	<target name="resources" description="copy resources">
-		<copy todir="${classes}" flatten="true">
+		<copy todir="${temp_dir}" flatten="true">
 	    	<resources>
 				<file file="${project_root}/LICENSE"/>
 				<file file="${project_root}/readme.txt"/>
@@ -34,7 +32,7 @@
 	</target>
 	
 	<target name="jar" description="generate the jar">
-		<jar jarfile="${work_dir}/${project_name}.jar" basedir="${classes}"/>
+		<jar jarfile="${work_dir}/${project_name}.jar" basedir="${temp_dir}"/>
 	</target>
 
 	<target name="all" depends="init, compile, resources, jar, clean" description="all">

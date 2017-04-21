@@ -13,16 +13,8 @@
   <property name="pgnprocessor_dir" value="${workspace_root}/PGNProcessor" />
   <property name="resources_dir" value="${workspace_root}/Resources" />
   <property name="egtb_dir" value="${workspace_root}/EGTB" />
+  <property name="uci_dir" value="${workspace_root}/UCI" />
   <property name="ucitracker_dir" value="${workspace_root}/UCITracker" />
-  <!--property name="workspace_root" value="../../../.."/>
-  <property name="svn_path_shift" value="/trunk/"/>
-  <property name="ants_dir" value="${workspace_root}/Ants/${svn_path_shift}/Ants" />
-  <property name="work_dir" value="${workspace_root}/WorkDir/${svn_path_shift}/WorkDir" />
-  <property name="bitboard_dir" value="${workspace_root}/Bitboard/${svn_path_shift}/Bitboard" />
-  <property name="opening_dir" value="${workspace_root}/Opening/${svn_path_shift}/Opening" />
-  <property name="openinggen_dir" value="${workspace_root}/OpeningGenerator/${svn_path_shift}/OpeningGenerator" />
-  <property name="pgnprocessor_dir" value="${workspace_root}/PGNProcessor/${svn_path_shift}/PGNProcessor" /-->  
-  
   <property name="temp_dir" value="${work_dir}/temp" />
   
   
@@ -32,7 +24,8 @@
   	<ant antfile="${ants_dir}/tools/build_PGNProcessor.xml" dir="${pgnprocessor_dir}/src"/>
   	<ant antfile="${ants_dir}/tools/build_OpeningGenerator.xml" dir="${openinggen_dir}/src"/>
 	<ant antfile="${ants_dir}/common/build_EGTB.xml" dir="${egtb_dir}/src"/>
-  	<ant antfile="${ants_dir}/tools/build_UCITracker.xml" dir="${ucitracker_dir}/src"/>
+  	<ant antfile="${ants_dir}/common/build_UCI.xml" dir="${uci_dir}/src"/>
+  	<ant antfile="${ants_dir}/common/build_UCITracker.xml" dir="${ucitracker_dir}/src"/>
   	
   	<ant antfile="${ants_dir}/tools/build_BagaturTools_src.xml" dir="${ants_dir}/tools"/>
   	
@@ -43,6 +36,7 @@
 	      <include name="BagaturOpeningGenerator.jar"/>
 	      <include name="BagaturPGNProcessor.jar"/>
 	      <include name="BagaturEGTB.jar"/>
+	      <include name="BagaturUCI.jar"/>
 	      <include name="BagaturUCITracker.jar"/>
 	      <include name="src.zip"/>
 		  <include name="w.ob"/>
@@ -71,6 +65,7 @@
   	<delete file="${work_dir}/BagaturOpeningGenerator.jar"/>
   	<delete file="${work_dir}/BagaturPGNProcessor.jar"/>
   	<delete file="${work_dir}/BagaturEGTB.jar"/>
+  	<delete file="${work_dir}/BagaturUCI.jar"/>
   	<delete file="${work_dir}/BagaturUCITracker.jar"/>
   	<delete file="${work_dir}/src.zip"/>
   	

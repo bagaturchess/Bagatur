@@ -90,6 +90,20 @@
 		      <include name="LearningAPI/.classpath"/>
 		      <include name="LearningAPI/.project"/>
 			</fileset>
+			<fileset dir="${ucitracker_dir}/..">
+			  <include name="UCITracker/src/**/*.java"/>
+		      <include name="UCITracker/LICENSE"/>
+		      <include name="UCITracker/readme.txt"/>
+		      <include name="UCITracker/.classpath"/>
+		      <include name="UCITracker/.project"/>
+			</fileset>
+			<fileset dir="${learningImpl_dir}/..">
+			  <include name="LearningImpl/src/**/*.java"/>
+		      <include name="LearningImpl/LICENSE"/>
+		      <include name="LearningImpl/readme.txt"/>
+		      <include name="LearningImpl/.classpath"/>
+		      <include name="LearningImpl/.project"/>
+			</fileset>
 			<fileset dir="${egtb_dir}/..">
 			  <include name="EGTB/src/**/*.java"/>
 		      <include name="EGTB/LICENSE"/>

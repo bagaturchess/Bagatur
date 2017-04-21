@@ -73,6 +73,13 @@
 		      <include name="EGTB/.classpath"/>
 		      <include name="EGTB/.project"/>
 			</fileset>
+			<fileset dir="${uci_dir}/..">
+		      <include name="UCI/src/**/*.java"/>
+		      <include name="UCI/LICENSE"/>
+		      <include name="UCI/readme.txt"/>
+		      <include name="UCI/.classpath"/>
+		      <include name="UCI/.project"/>
+			</fileset>
 			<fileset dir="${ucitracker_dir}/..">
 			  <include name="UCITracker/src/**/*.java"/>
 		      <include name="UCITracker/LICENSE"/>

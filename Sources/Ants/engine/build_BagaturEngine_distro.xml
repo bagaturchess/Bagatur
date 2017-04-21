@@ -15,6 +15,8 @@
   <property name="enginesrunner_dir" value="${workspace_root}/EnginesRunner" />
   <property name="resources_dir" value="${workspace_root}/Resources" />
   <property name="learningAPI_dir" value="${workspace_root}/LearningAPI" />
+  <property name="ucitracker_dir" value="${workspace_root}/UCITracker" />
+  <property name="learningImpl_dir" value="${workspace_root}/LearningImpl" />
   <property name="egtb_dir" value="${workspace_root}/EGTB" />
 
 
@@ -25,11 +27,12 @@
     <ant antfile="${ants_dir}/common/build_Board.xml" dir="${bitboard_dir}/src"/>
     <ant antfile="${ants_dir}/common/build_Opening.xml" dir="${opening_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_EGTB.xml" dir="${engines_dir}/src"/>
-  	<ant antfile="${ants_dir}/engine/build_UCI.xml" dir="${uci_dir}/src"/>
+  	<ant antfile="${ants_dir}/common/build_UCI.xml" dir="${uci_dir}/src"/>
   	<ant antfile="${ants_dir}/engine/build_Search.xml" dir="${search_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_LearningAPI.xml" dir="${learningAPI_dir}/src"/>
   	<ant antfile="${ants_dir}/engine/build_Engines.xml" dir="${engines_dir}/src"/>
- 	
+  	<ant antfile="${ants_dir}/common/build_UCITracker.xml" dir="${ucitracker_dir}/src"/>
+  	<ant antfile="${ants_dir}/common/build_LearningImpl.xml" dir="${learningImpl_dir}/src"/>
   	<ant antfile="${ants_dir}/engine/build_BagaturEngine_src.xml" dir="${ants_dir}/engine"/>
   	
 	<copy todir="${temp_dir}/bin">
@@ -41,6 +44,7 @@
 	      <include name="BagaturEngines.jar"/>
 	      <include name="BagaturLearningAPI.jar"/>
 	      <include name="BagaturEGTB.jar"/>
+	      <include name="BagaturLearningImpl.jar"/>
 	    </fileset>
 	</copy>
   	
@@ -216,6 +220,8 @@
   	<delete file="${work_dir}/BagaturEngines.jar"/>
   	<delete file="${work_dir}/BagaturLearningAPI.jar"/>
   	<delete file="${work_dir}/BagaturEGTB.jar"/>
+  	<delete file="${work_dir}/BagaturLearningImpl.jar"/>
+  	<delete file="${work_dir}/BagaturUCITracker.jar"/>
   	<delete file="${work_dir}/src.zip"/>
   	
   </target>
