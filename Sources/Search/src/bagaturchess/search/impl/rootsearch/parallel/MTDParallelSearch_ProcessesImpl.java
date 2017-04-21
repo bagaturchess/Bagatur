@@ -29,7 +29,7 @@ import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProcess;
-import bagaturchess.search.impl.rootsearch.sequential.Mediator_AlphaAndBestMoveWindow;
+import bagaturchess.search.impl.rootsearch.sequential.mtd.Mediator_AlphaAndBestMoveWindow;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;

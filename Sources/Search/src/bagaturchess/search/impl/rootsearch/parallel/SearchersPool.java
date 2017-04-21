@@ -33,7 +33,7 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.impl.alg.impl0.SearchMTD0;
+import bagaturchess.search.impl.alg.impl0.Search_PVS_NWS;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
 
@@ -115,7 +115,7 @@ public class SearchersPool {
 			
 			//searcher_bitboard.setAttacksSupport(true, true);
 			SearchEnv searchEnv = new SearchEnv(searcher_bitboard, sharedData);
-			ISearch searcher = new SearchMTD0(searchEnv);
+			ISearch searcher = new Search_PVS_NWS(searchEnv);
 			//ISearch searcher = new SearchBagatur(searchEnv);
 			//ISearch searcher = new SearchLazy(searchEnv);
 			releaseSearcher(searcher);

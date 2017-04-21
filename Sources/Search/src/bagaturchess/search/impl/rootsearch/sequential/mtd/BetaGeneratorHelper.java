@@ -1,4 +1,4 @@
-package bagaturchess.search.impl.alg;
+package bagaturchess.search.impl.rootsearch.sequential.mtd;
 
 
 public class BetaGeneratorHelper {

@@ -20,7 +20,7 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.search.impl.rootsearch.sequential;
+package bagaturchess.search.impl.rootsearch.sequential.mtd;
 
 
 import java.util.ArrayList;
@@ -32,8 +32,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.impl.alg.BetaGeneratorFactory;
-import bagaturchess.search.impl.alg.IBetaGenerator;
 import bagaturchess.search.impl.pv.PVHistory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.utils.SearchUtils;

@@ -28,9 +28,9 @@ import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
-import bagaturchess.search.impl.rootsearch.sequential.Mediator_AlphaAndBestMoveWindow;
+import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
 import bagaturchess.search.impl.rootsearch.sequential.NPSCollectorMediator;
+import bagaturchess.search.impl.rootsearch.sequential.mtd.Mediator_AlphaAndBestMoveWindow;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
@@ -52,8 +52,8 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 		for (int i = 0; i < getRootSearchConfig().getThreadsCount(); i++ ) {
 			
 			try {
-				MTDSequentialSearch searcher = (MTDSequentialSearch)
-						ReflectionUtils.createObjectByClassName_ObjectsConstructor(MTDSequentialSearch.class.getName(), new Object[] {getRootSearchConfig(), getSharedData()});
+				SequentialSearch_MTD searcher = (SequentialSearch_MTD)
+						ReflectionUtils.createObjectByClassName_ObjectsConstructor(SequentialSearch_MTD.class.getName(), new Object[] {getRootSearchConfig(), getSharedData()});
 				
 				addSearcher(searcher);
 				
@@ -74,6 +74,6 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 	protected void sequentialSearchers_Negamax(IRootSearch searcher, IBitBoard _bitboardForSetup, ISearchMediator mediator, ITimeController timeController,
 			final IFinishCallback multiPVCallback, Go go, boolean dont_wrap_mediator) {
 		
-		((MTDSequentialSearch)searcher).negamax(_bitboardForSetup, mediator, timeController, multiPVCallback, go, dont_wrap_mediator);
+		((SequentialSearch_MTD)searcher).negamax(_bitboardForSetup, mediator, timeController, multiPVCallback, go, dont_wrap_mediator);
 	}
 }

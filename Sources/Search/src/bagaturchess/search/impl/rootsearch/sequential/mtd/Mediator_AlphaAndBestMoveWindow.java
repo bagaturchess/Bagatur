@@ -20,7 +20,7 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.search.impl.rootsearch.sequential;
+package bagaturchess.search.impl.rootsearch.sequential.mtd;
 
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;

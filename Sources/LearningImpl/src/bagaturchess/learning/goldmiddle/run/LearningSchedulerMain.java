@@ -39,7 +39,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImpl;
-import bagaturchess.search.impl.rootsearch.sequential.MTDSequentialSearch;
+import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory;
@@ -118,7 +118,7 @@ public class LearningSchedulerMain {
 		//IRootSearch search = new MTDParallelSearch_ProcessesImpl(new Object[] {cfg, sharedData});
 		//IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, sharedData});
 		//IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, sharedData});
-		IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, sharedData});
+		IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
 		
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
