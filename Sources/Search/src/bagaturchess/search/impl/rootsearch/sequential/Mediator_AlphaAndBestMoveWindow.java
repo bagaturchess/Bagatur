@@ -37,7 +37,7 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	
 	private static int TRUST_WINDOW_BEST_MOVE_MULTIPLIER = 2;
 	private static int TRUST_WINDOW_BEST_MOVE_MIN = 8;
-	private static int TRUST_WINDOW_BEST_MOVE_MAX = 64;
+	private static int TRUST_WINDOW_BEST_MOVE_MAX = 32;//With 64 is 21 ELO weaker, than with 32
 	private int trustWindow_BestMove;
 	
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 2;
@@ -77,7 +77,7 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 				}
 				//dump("Mediator_AlphaAndBestMoveWindow Trust Window MTD Step set to " + getTrustWindow_MTD_Step());
 			}
-		
+			
 			lastinfo = info;
 		}
 		
