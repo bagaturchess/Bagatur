@@ -77,6 +77,7 @@ public interface FeatureWeights {
 	public static final double BISHOP_BAD_E					= 10;
 	
 	public static final double KING_SAFETY_O				= 3;
+	public static final double KING_SAFETY_E				= 0;
 	public static final double SPACE_O						= 0.3;
 	public static final double SPACE_E						= 0.15;
 	public static final double HUNGED_O						= 2;

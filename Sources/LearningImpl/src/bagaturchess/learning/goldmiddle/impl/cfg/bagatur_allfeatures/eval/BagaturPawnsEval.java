@@ -17,12 +17,6 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 	private int passersEval_e;
 	private int passersKingEval_o;
 	private int passersKingEval_e;
-	/*private int passersKingEval_of;
-	private int passersKingEval_ef;
-	private int passersKingEval_off;
-	private int passersKingEval_eff;
-	private int passersKingEval_oof;
-	private int passersKingEval_eof;*/
 	private int w_gardsScores;
 	private int b_gardsScores;
 	
@@ -76,12 +70,6 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 		passersEval_e = 0;
 		passersKingEval_o = 0;
 		passersKingEval_e = 0;
-		/*passersKingEval_of = 0;
-		passersKingEval_ef = 0;
-		passersKingEval_off = 0;
-		passersKingEval_eff = 0;
-		passersKingEval_oof = 0;
-		passersKingEval_eof = 0;*/
 		
 		PawnsModel pmodel = getModel();
 		

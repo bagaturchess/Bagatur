@@ -54,7 +54,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	public static final int RookAttackWeight 			= 3;
 	public static final int BishopAttackWeight 			= 2;
 	public static final int KnightAttackWeight	 		= 2;
-		
+	
 	
 	BagaturEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
 		
@@ -319,6 +319,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				//e.g. on the same line (can use Fields.areOnTheSameLine(f1, f2))
 			}
 		}
+		
 
 		evalInfo.eval_Standard_o += eval_o;
 		evalInfo.eval_Standard_e += eval_e;
@@ -1042,7 +1043,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	        //	max_attackUnits = attackUnits;
 	        //}
 	        
-	        kingSafety += KING_SAFETY_O * Bagatur_ALL_SignalFillerConstants.KING_SAFETY[attackUnits];
+	        kingSafety += Bagatur_ALL_SignalFillerConstants.KING_SAFETY[attackUnits];
 	    }
 	    
 	    
@@ -1081,11 +1082,11 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	        //}
 	        
 	        //evalInfo.eval_Kingsafety += SafetyTable[attackUnits];
-	        kingSafety -= KING_SAFETY_O * Bagatur_ALL_SignalFillerConstants.KING_SAFETY[attackUnits];
+	        kingSafety -= Bagatur_ALL_SignalFillerConstants.KING_SAFETY[attackUnits];
 	    }
 	    
-	    evalInfo.eval_Kingsafety_o += kingSafety;
-	    evalInfo.eval_Kingsafety_e += kingSafety;
+	    evalInfo.eval_Kingsafety_o += KING_SAFETY_O * kingSafety;
+	    evalInfo.eval_Kingsafety_e += KING_SAFETY_E * kingSafety;
 	}
 	
 	
