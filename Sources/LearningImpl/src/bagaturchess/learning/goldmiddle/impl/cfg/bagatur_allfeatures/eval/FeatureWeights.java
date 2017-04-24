@@ -60,14 +60,14 @@ public interface FeatureWeights {
 	public static final int PAWNS_QUEEN_7TH2TH_E			= 26;
 	
 	
-	public static final double MOBILITY_KNIGHT_O			= 1;
-	public static final double MOBILITY_KNIGHT_E			= 1;
-	public static final double MOBILITY_BISHOP_O			= 1;
-	public static final double MOBILITY_BISHOP_E			= 1;
-	public static final double MOBILITY_ROOK_O				= 1;
-	public static final double MOBILITY_ROOK_E				= 1;
-	public static final double MOBILITY_QUEEN_O				= 1;
-	public static final double MOBILITY_QUEEN_E				= 1;
+	public static final double MOBILITY_KNIGHT_O			=	1.9174823628170556;
+	public static final double MOBILITY_KNIGHT_E			=	1.0390797703403882;
+	public static final double MOBILITY_BISHOP_O			=	1.5217100516754685;
+	public static final double MOBILITY_BISHOP_E			=	1.0205809226604579;
+	public static final double MOBILITY_ROOK_O				=	1.1685760851266969;
+	public static final double MOBILITY_ROOK_E				=	2.5111606365686217;
+	public static final double MOBILITY_QUEEN_O				=	0.5269853984695055;
+	public static final double MOBILITY_QUEEN_E				=	0.5086489426838672;
 	
 	public static final double KNIGHT_OUTPOST_O				= 1;
 	public static final double KNIGHT_OUTPOST_E				= 1;
@@ -83,14 +83,14 @@ public interface FeatureWeights {
 	public static final double HUNGED_O						= 2;
 	public static final double HUNGED_E						= 4;
 	
-	public static final double MOBILITY_KNIGHT_S_O			= 1;
-	public static final double MOBILITY_KNIGHT_S_E			= 1;
-	public static final double MOBILITY_BISHOP_S_O			= 1;
-	public static final double MOBILITY_BISHOP_S_E			= 1;
-	public static final double MOBILITY_ROOK_S_O			= 1;
-	public static final double MOBILITY_ROOK_S_E			= 1;
-	public static final double MOBILITY_QUEEN_S_O			= 1;
-	public static final double MOBILITY_QUEEN_S_E			= 1;
+	public static final double MOBILITY_KNIGHT_S_O			=	0.6733328670206458;
+	public static final double MOBILITY_KNIGHT_S_E			=	0.9140474918712359;
+	public static final double MOBILITY_BISHOP_S_O			=	1.4863247524029488;
+	public static final double MOBILITY_BISHOP_S_E			=	0.7649825338569627;
+	public static final double MOBILITY_ROOK_S_O			=	1.0384314593650399;
+	public static final double MOBILITY_ROOK_S_E			=	0.33498040762538084;
+	public static final double MOBILITY_QUEEN_S_O			=	4.077723481082999;
+	public static final double MOBILITY_QUEEN_S_E			=	2.8239286707315814;
 	
 	public static final double TRAPED_O						= 1;
 	public static final double TRAPED_E						= 0.83;
