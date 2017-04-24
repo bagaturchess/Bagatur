@@ -37,7 +37,7 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	
 	private static int TRUST_WINDOW_BEST_MOVE_MULTIPLIER = 2;
 	private static int TRUST_WINDOW_BEST_MOVE_MIN = 8;
-	private static int TRUST_WINDOW_BEST_MOVE_MAX = 32;//With 64 is 21 ELO weaker, than with 32
+	private static int TRUST_WINDOW_BEST_MOVE_MAX = 16;//With 32 is 21 ELO stronger, than with 64. With 16 is with 28 ELO stronger than with 64
 	private int trustWindow_BestMove;
 	
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 2;
