@@ -192,7 +192,7 @@ public class Search_NegaScout extends SearchImpl {
 		//Gaviota endgame tablebases
 		if (env.getGTBProbing() != null
 				&& env.getBitboard().getColourToMove() == rootColour
-				&& depth >= 11) {
+				&& depth >= 13) {
             
 			temp_input.clear();
             env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
