@@ -35,9 +35,18 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	
 	private ISearchInfo lastinfo;
 	
+	/**
+	 * Table used for optimization of parameters by test games
+	 * TRUST_WINDOW_BEST_MOVE_MIN, TRUST_WINDOW_BEST_MOVE_MAX, TRUST_WINDOW_MTD_STEP_MIN, ELO
+	 * 							8, 							64,							4, +0 (initial baseline)
+	 * 							8, 							32,							4, +21
+	 * 							8, 							16,							4, +28
+	 * 							8, 							 8,							4, +28
+	 * 							4, 							 4,							4, TODO test
+	 */
 	private static int TRUST_WINDOW_BEST_MOVE_MULTIPLIER = 2;
 	private static int TRUST_WINDOW_BEST_MOVE_MIN = 8;
-	private static int TRUST_WINDOW_BEST_MOVE_MAX = 16;//With 32 is 21 ELO stronger, than with 64. With 16 is with 28 ELO stronger than with 64
+	private static int TRUST_WINDOW_BEST_MOVE_MAX = 16;
 	private int trustWindow_BestMove;
 	
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 2;
