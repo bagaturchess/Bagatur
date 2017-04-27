@@ -10,6 +10,11 @@ The program runs under all Operating Systems, which support Java platform:
 
 # Revision History
 
+Version 1.5 (3 May 2017)
+  * 35+ ELO stronger (measured versus 1.4e)
+  * Search optimizations: adjusted best move window
+  * More tuning of Endgame's mate search - use endgame table bases after depth 13
+  
 Version 1.4e (15 April 2017)
   * Evaluation function tunning (versus Stockfish7)
   * Endgame improvements for mate search - use endgame table bases after depth 15
