@@ -141,6 +141,7 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			
 			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
 			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
+			int material_imbalance = w_eval_nopawns_e - b_eval_nopawns_e;
 			
 			//Mop-up evaluation
 			//PosEval=4.7*CMD + 1.6*(14 - MD)
@@ -150,14 +151,14 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
 				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
 				
-				return (int) returnVal(20 * (int) (4.7 * CMD + 1.6 * MD));
+				return (int) returnVal(material_imbalance + 3 * (int) (4.7 * CMD + 1.6 * MD));
 				
 			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
 				
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
 				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
 				
-				return (int) returnVal( - 20 * (int) (4.7 * CMD + 1.6 * MD));
+				return (int) returnVal(material_imbalance - 3 * (int) (4.7 * CMD + 1.6 * MD));
 				
 			}
 		}
@@ -268,6 +269,7 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			
 			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
 			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
+			int material_imbalance = w_eval_nopawns_e - b_eval_nopawns_e;
 			
 			//Mop-up evaluation
 			//PosEval=4.7*CMD + 1.6*(14 - MD)
@@ -277,14 +279,14 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
 				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
 				
-				return (int) returnVal(20 * (int) (4.7 * CMD + 1.6 * MD));
+				return (int) returnVal(material_imbalance + 3 * (int) (4.7 * CMD + 1.6 * MD));
 				
 			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
 				
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
 				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
 				
-				return (int) returnVal( - 20 * (int) (4.7 * CMD + 1.6 * MD));
+				return (int) returnVal(material_imbalance - 3 * (int) (4.7 * CMD + 1.6 * MD));
 				
 			}
 		}
@@ -428,6 +430,7 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 			
 			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
 			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
+			int material_imbalance = w_eval_nopawns_e - b_eval_nopawns_e;
 			
 			//Mop-up evaluation
 			//PosEval=4.7*CMD + 1.6*(14 - MD)
@@ -437,14 +440,14 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
 				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
 				
-				return (int) returnVal(20 * (int) (4.7 * CMD + 1.6 * MD));
+				return (int) returnVal(material_imbalance + 3 * (int) (4.7 * CMD + 1.6 * MD));
 				
 			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
 				
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
 				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
 				
-				return (int) returnVal( - 20 * (int) (4.7 * CMD + 1.6 * MD));
+				return (int) returnVal(material_imbalance - 3 * (int) (4.7 * CMD + 1.6 * MD));
 				
 			}
 		}
@@ -470,13 +473,6 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 	private double drawProbability(double eval) {
 		
 		double abs = Math.abs(eval);
-		
-		/**
-		 * No pawns
-		 */
-		/*if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
-			abs = abs / 2;
-		}*/
 		
 		/**
 		 * Differently colored bishops, no other pieces except pawns
