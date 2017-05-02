@@ -50,11 +50,23 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	private static int TRUST_WINDOW_BEST_MOVE_MAX = 16;
 	private int trustWindow_BestMove;
 	
+	/**
+	 * Table used for optimization of parameters by test games
+	 * TRUST_WINDOW_ALPHA_ASPIRATION_MIN, ELO
+	 * 							1, 		+0 (initial baseline)
+	 * 							128,	TODO test
+	 */
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 2;
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 1;
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = SearchUtils.getMateVal(1);
 	private int trustWindow_AlphaAspiration;
 	
+	/**
+	 * Table used for optimization of parameters by test games
+	 * TRUST_WINDOW_MTD_STEP_MIN, ELO
+	 * 						4, 		+0 (initial baseline)
+	 * 						8,		TODO test
+	 */
 	private VarStatistic best_moves_diffs_per_depth;
 	private static int TRUST_WINDOW_MTD_STEP_MIN = 4;
 	
