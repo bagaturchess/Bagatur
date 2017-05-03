@@ -65,10 +65,10 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	 * Table used for optimization of parameters by test games
 	 * TRUST_WINDOW_MTD_STEP_MIN, ELO
 	 * 						4, 		+0 (initial baseline)
-	 * 						8,		TODO test
+	 * 						8,		+7
 	 */
 	private VarStatistic best_moves_diffs_per_depth;
-	private static int TRUST_WINDOW_MTD_STEP_MIN = 4;
+	private static int TRUST_WINDOW_MTD_STEP_MIN = 8;
 	
 	
 	public Mediator_AlphaAndBestMoveWindow(ISearchMediator _parent) {
