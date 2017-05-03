@@ -82,7 +82,7 @@ public class Search_NegaScout_WithAlpha extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		return negasearch(mediator, info, maxdepth, depth, beta - 1, beta, true, useMateDistancePrunning, rootColour);
+		return negasearch(mediator, info, maxdepth, depth, alpha, beta, true, useMateDistancePrunning, rootColour);
 	}
 	
 	
