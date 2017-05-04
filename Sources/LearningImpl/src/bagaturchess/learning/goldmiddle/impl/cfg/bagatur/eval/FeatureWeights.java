@@ -4,8 +4,9 @@ package bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval;
 public interface FeatureWeights {
 	
 	/**
-	 * The rest of the weights are inside the config class IBagaturEvalConfig.
-	 * It is located in the Engines project.
+	 * The rest of the weights come from the config class IBagaturEvalConfig.
+	 * and its implementation BagaturEvalConfigImpl_v2.
+	 * They are located in the Engines project.
 	 */
 	
 	public static final double WEIGHT_MATERIAL_O 		= 1.167;
