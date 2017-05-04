@@ -37,8 +37,8 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 		ARGS += "bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core ";
 		ARGS += "bagaturchess.search.impl.alg.impl1.Search_NegaScout ";
 		ARGS += "bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD_SMP ";
-		ARGS += "bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl ";
-		ARGS += "bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2 ";
+		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl ";
+		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig ";
 	}
 	
 	
@@ -71,6 +71,7 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 		JAVA_CP += workspace + "bin/BagaturEngines.jar;";
 		JAVA_CP += workspace + "bin/BagaturEGTB.jar;";
 		JAVA_CP += workspace + "bin/egtbprobe.jar;";
+		JAVA_CP += workspace + "bin/BagaturLearningImpl.jar;";
 		//JAVA_CP += workspace + "bin/;";//TODO: this doesn't work/load the DLLs, they have to be added in java.library.path
 		return JAVA_CP;
 	}

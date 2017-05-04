@@ -35,8 +35,8 @@ public class EngineProcess_BagaturImpl_WorkspaceImpl extends EngineProcess_Bagat
 		ARGS += "bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core ";
 		ARGS += "bagaturchess.search.impl.alg.impl1.Search_NegaScout ";
 		ARGS += "bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD_SMP ";
-		ARGS += "bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl ";
-		ARGS += "bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2 ";
+		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl ";
+		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig ";
 	}
 	
 	
@@ -67,6 +67,7 @@ public class EngineProcess_BagaturImpl_WorkspaceImpl extends EngineProcess_Bagat
 		JAVA_CP += workspace + "LearningAPI/bin;";
 		JAVA_CP += workspace + "Engines/bin;";
 		JAVA_CP += workspace + "EGTB/bin;";
+		JAVA_CP += workspace + "LearningImpl/bin;";
 		return JAVA_CP;
 	}
 }
