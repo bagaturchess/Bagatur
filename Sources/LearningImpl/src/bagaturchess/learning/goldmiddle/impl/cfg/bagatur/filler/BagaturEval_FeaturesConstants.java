@@ -1,7 +1,7 @@
 package bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler;
 
 
-interface FeaturesConstants {
+interface BagaturEval_FeaturesConstants {
 	
 	public static final int FEATURE_ID_MATERIAL       		= 1010;
 	public static final int FEATURE_ID_STANDARD       		= 1020;

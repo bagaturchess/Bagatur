@@ -27,7 +27,7 @@ import bagaturchess.learning.api.ISignals;
 import bagaturchess.search.api.IEvaluator;
 
 
-public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeights, ISignalFiller, IEvaluator {
+public class BagaturEval_SignalFiller implements BagaturEval_FeaturesConstants, BagaturEval_SignalFillerConstants, ISignalFiller, IEvaluator {
 	
 	
 	private IBitBoard bitboard;	
@@ -57,7 +57,7 @@ public class SignalFiller_BagaturEval implements FeaturesConstants, FeatureWeigh
 	public static final int KnightAttackWeight	 		= 2;
 	
 	
-	public SignalFiller_BagaturEval(IBitBoard _bitboard) {
+	public BagaturEval_SignalFiller(IBitBoard _bitboard) {
 		
 		bitboard = _bitboard;
 		

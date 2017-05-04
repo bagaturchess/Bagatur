@@ -5,6 +5,7 @@ import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.eval.pawns.model.Pawn;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModel;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.BagaturEval_SignalFillerConstants;
 
 
 public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
@@ -112,7 +113,7 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 							throw new IllegalStateException();
 					}
 					w_gardsScores += scores;
-					standardEval_o += PAWNS_KING_GUARDS * scores;
+					standardEval_o += BagaturEval_SignalFillerConstants.PAWNS_KING_GUARDS * scores;
 				}
 				
 				
@@ -122,35 +123,35 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 				
 				
 				if (p.isDoubled()) {
-					standardEval_o += PAWNS_DOUBLED_O[file_symmetry];
-					standardEval_e += PAWNS_DOUBLED_E[file_symmetry];
+					standardEval_o += BagaturEval_SignalFillerConstants.PAWNS_DOUBLED_O[file_symmetry];
+					standardEval_e += BagaturEval_SignalFillerConstants.PAWNS_DOUBLED_E[file_symmetry];
 				}
 				
 				if (p.isIsolated()) {
-					standardEval_o += PAWNS_ISOLATED_O[file_symmetry];
-					standardEval_e += PAWNS_ISOLATED_E[file_symmetry];
+					standardEval_o += BagaturEval_SignalFillerConstants.PAWNS_ISOLATED_O[file_symmetry];
+					standardEval_e += BagaturEval_SignalFillerConstants.PAWNS_ISOLATED_E[file_symmetry];
 				}
 				
 				if (p.isBackward()) {
-					standardEval_o += PAWNS_BACKWARD_O[file_symmetry];
-					standardEval_e += PAWNS_BACKWARD_E[file_symmetry];
+					standardEval_o += BagaturEval_SignalFillerConstants.PAWNS_BACKWARD_O[file_symmetry];
+					standardEval_e += BagaturEval_SignalFillerConstants.PAWNS_BACKWARD_E[file_symmetry];
 				}
 				
 				if (p.isSupported() && !p.isPassed()) {
-					standardEval_o += PAWNS_SUPPORTED_O[file_symmetry];
-					standardEval_e += PAWNS_SUPPORTED_E[file_symmetry];
+					standardEval_o += BagaturEval_SignalFillerConstants.PAWNS_SUPPORTED_O[file_symmetry];
+					standardEval_e += BagaturEval_SignalFillerConstants.PAWNS_SUPPORTED_E[file_symmetry];
 				}
 				
 				if (p.isCandidate()) {
-					passersEval_o += PAWNS_CANDIDATE_O[rank];
-					passersEval_e += PAWNS_CANDIDATE_E[rank];
+					passersEval_o += BagaturEval_SignalFillerConstants.PAWNS_CANDIDATE_O[rank];
+					passersEval_e += BagaturEval_SignalFillerConstants.PAWNS_CANDIDATE_E[rank];
 				} else if (p.isPassed() && !p.isDoubled()) {
 					if (p.isSupported()) {
-						passersEval_o += PAWNS_PASSED_SUPPORTED_O[rank];
-						passersEval_e += PAWNS_PASSED_SUPPORTED_E[rank];
+						passersEval_o += BagaturEval_SignalFillerConstants.PAWNS_PASSED_SUPPORTED_O[rank];
+						passersEval_e += BagaturEval_SignalFillerConstants.PAWNS_PASSED_SUPPORTED_E[rank];
 					} else {
-						passersEval_o += PAWNS_PASSED_O[rank];
-						passersEval_e += PAWNS_PASSED_E[rank];
+						passersEval_o += BagaturEval_SignalFillerConstants.PAWNS_PASSED_O[rank];
+						passersEval_e += BagaturEval_SignalFillerConstants.PAWNS_PASSED_E[rank];
 					}
 					
 			        // Adjust bonus based on king proximity:
@@ -161,16 +162,16 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 			        }
 			        
 			        int dist_f = Fields.getDistancePoints_reversed(w_kingID, frontFieldID);
-			        passersKingEval_o += (PAWNS_PASSED_O[rank] * dist_f * 25) / (7 * 100);
-			        passersKingEval_e += (PAWNS_PASSED_E[rank] * dist_f * 38) / (7 * 100);
+			        passersKingEval_o += (BagaturEval_SignalFillerConstants.PAWNS_PASSED_O[rank] * dist_f * 25) / (7 * 100);
+			        passersKingEval_e += (BagaturEval_SignalFillerConstants.PAWNS_PASSED_E[rank] * dist_f * 38) / (7 * 100);
 			        
 			        int dist_ff = Fields.getDistancePoints_reversed(w_kingID, frontFrontFieldID);
-			        passersKingEval_o += (PAWNS_PASSED_O[rank] * dist_ff * 25) / (7 * 100);
-			        passersKingEval_e += (PAWNS_PASSED_E[rank] * dist_ff * 38) / (7 * 100);
+			        passersKingEval_o += (BagaturEval_SignalFillerConstants.PAWNS_PASSED_O[rank] * dist_ff * 25) / (7 * 100);
+			        passersKingEval_e += (BagaturEval_SignalFillerConstants.PAWNS_PASSED_E[rank] * dist_ff * 38) / (7 * 100);
 			        
 			        int dist_op_f = Fields.getDistancePoints_reversed(b_kingID, frontFieldID);
-			        passersKingEval_o -= (PAWNS_PASSED_O[rank] * dist_op_f * 0) / (7 * 100);
-			        passersKingEval_e -= (PAWNS_PASSED_E[rank] * dist_op_f * 95) / (7 * 100); //* 160) / (7 * 100);
+			        passersKingEval_o -= (BagaturEval_SignalFillerConstants.PAWNS_PASSED_O[rank] * dist_op_f * 0) / (7 * 100);
+			        passersKingEval_e -= (BagaturEval_SignalFillerConstants.PAWNS_PASSED_E[rank] * dist_op_f * 95) / (7 * 100); //* 160) / (7 * 100);
 				}
 			}
 		}
@@ -201,7 +202,7 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 							throw new IllegalStateException();
 					}
 					b_gardsScores += scores;
-					standardEval_o -= PAWNS_KING_GUARDS * scores;
+					standardEval_o -= BagaturEval_SignalFillerConstants.PAWNS_KING_GUARDS * scores;
 				}
 				
 				
@@ -210,35 +211,35 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 				int file_symmetry = Fields.FILE_SYMMETRY[file];
 				
 				if (p.isDoubled()) {
-					standardEval_o -= PAWNS_DOUBLED_O[file_symmetry];
-					standardEval_e -= PAWNS_DOUBLED_E[file_symmetry];
+					standardEval_o -= BagaturEval_SignalFillerConstants.PAWNS_DOUBLED_O[file_symmetry];
+					standardEval_e -= BagaturEval_SignalFillerConstants.PAWNS_DOUBLED_E[file_symmetry];
 				}
 				
 				if (p.isIsolated()) {
-					standardEval_o -= PAWNS_ISOLATED_O[file_symmetry];
-					standardEval_e -= PAWNS_ISOLATED_E[file_symmetry];
+					standardEval_o -= BagaturEval_SignalFillerConstants.PAWNS_ISOLATED_O[file_symmetry];
+					standardEval_e -= BagaturEval_SignalFillerConstants.PAWNS_ISOLATED_E[file_symmetry];
 				}
 				
 				if (p.isBackward()) {
-					standardEval_o -= PAWNS_BACKWARD_O[file_symmetry];
-					standardEval_e -= PAWNS_BACKWARD_E[file_symmetry];
+					standardEval_o -= BagaturEval_SignalFillerConstants.PAWNS_BACKWARD_O[file_symmetry];
+					standardEval_e -= BagaturEval_SignalFillerConstants.PAWNS_BACKWARD_E[file_symmetry];
 				}
 				
 				if (p.isSupported() && !p.isPassed()) {
-					standardEval_o -= PAWNS_SUPPORTED_O[file_symmetry];
-					standardEval_e -= PAWNS_SUPPORTED_E[file_symmetry];
+					standardEval_o -= BagaturEval_SignalFillerConstants.PAWNS_SUPPORTED_O[file_symmetry];
+					standardEval_e -= BagaturEval_SignalFillerConstants.PAWNS_SUPPORTED_E[file_symmetry];
 				}
 				
 				if (p.isCandidate()) {
-					passersEval_o -= PAWNS_CANDIDATE_O[rank];
-					passersEval_e -= PAWNS_CANDIDATE_E[rank];
+					passersEval_o -= BagaturEval_SignalFillerConstants.PAWNS_CANDIDATE_O[rank];
+					passersEval_e -= BagaturEval_SignalFillerConstants.PAWNS_CANDIDATE_E[rank];
 				} else if (p.isPassed() && !p.isDoubled()) {
 					if (p.isSupported()) {
-						passersEval_o -= PAWNS_PASSED_SUPPORTED_O[rank];
-						passersEval_e -= PAWNS_PASSED_SUPPORTED_E[rank];
+						passersEval_o -= BagaturEval_SignalFillerConstants.PAWNS_PASSED_SUPPORTED_O[rank];
+						passersEval_e -= BagaturEval_SignalFillerConstants.PAWNS_PASSED_SUPPORTED_E[rank];
 					} else {
-						passersEval_o -= PAWNS_PASSED_O[rank];
-						passersEval_e -= PAWNS_PASSED_E[rank];
+						passersEval_o -= BagaturEval_SignalFillerConstants.PAWNS_PASSED_O[rank];
+						passersEval_e -= BagaturEval_SignalFillerConstants.PAWNS_PASSED_E[rank];
 					}
 					
 			        // Adjust bonus based on king proximity:
@@ -249,16 +250,16 @@ public class BagaturPawnsEval extends PawnsModelEval implements FeatureWeights {
 			        }
 			        
 			        int dist_f = Fields.getDistancePoints_reversed(b_kingID, frontFieldID);
-			        passersKingEval_o -= (PAWNS_PASSED_O[rank] * dist_f * 25) / (7 * 100);
-			        passersKingEval_e -= (PAWNS_PASSED_E[rank] * dist_f * 38) / (7 * 100);
+			        passersKingEval_o -= (BagaturEval_SignalFillerConstants.PAWNS_PASSED_O[rank] * dist_f * 25) / (7 * 100);
+			        passersKingEval_e -= (BagaturEval_SignalFillerConstants.PAWNS_PASSED_E[rank] * dist_f * 38) / (7 * 100);
 			        
 			        int dist_ff = Fields.getDistancePoints_reversed(b_kingID, frontFrontFieldID);
-			        passersKingEval_o -= (PAWNS_PASSED_O[rank] * dist_ff * 25) / (7 * 100);
-			        passersKingEval_e -= (PAWNS_PASSED_E[rank] * dist_ff * 38) / (7 * 100);
+			        passersKingEval_o -= (BagaturEval_SignalFillerConstants.PAWNS_PASSED_O[rank] * dist_ff * 25) / (7 * 100);
+			        passersKingEval_e -= (BagaturEval_SignalFillerConstants.PAWNS_PASSED_E[rank] * dist_ff * 38) / (7 * 100);
 			        
 			        int dist_op_f = Fields.getDistancePoints_reversed(w_kingID, frontFieldID);
-			        passersKingEval_o += (PAWNS_PASSED_O[rank] * dist_op_f * 0) / (7 * 100);
-			        passersKingEval_e += (PAWNS_PASSED_E[rank] * dist_op_f * 95) / (7 * 100); //* 160) / (7 * 100);
+			        passersKingEval_o += (BagaturEval_SignalFillerConstants.PAWNS_PASSED_O[rank] * dist_op_f * 0) / (7 * 100);
+			        passersKingEval_e += (BagaturEval_SignalFillerConstants.PAWNS_PASSED_E[rank] * dist_op_f * 95) / (7 * 100); //* 160) / (7 * 100);
 			     }
 			}
 		}

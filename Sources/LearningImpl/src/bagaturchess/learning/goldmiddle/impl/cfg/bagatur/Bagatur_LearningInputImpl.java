@@ -24,9 +24,9 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
-import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.BoardConfigImpl;
-import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.FeaturesConfigurationBagaturImpl;
-import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.SignalFiller_BagaturEval;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.BagaturEval_BoardConfigImpl;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.BagaturEval_FeaturesConfigurationBagaturImpl;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.BagaturEval_SignalFiller;
 
 
 public class Bagatur_LearningInputImpl implements ILearningInput {
@@ -37,16 +37,16 @@ public class Bagatur_LearningInputImpl implements ILearningInput {
 	}
 	
 	public IBoardConfig createBoardConfig() {
-		return new BoardConfigImpl();
+		return new BagaturEval_BoardConfigImpl();
 	}
 	
 	
 	public ISignalFiller createFiller(IBitBoard bitboard) {
-		return new SignalFiller_BagaturEval(bitboard);
+		return new BagaturEval_SignalFiller(bitboard);
 	}
 	
 	
 	public String getFeaturesConfigurationClassName() {
-		return FeaturesConfigurationBagaturImpl.class.getName();
+		return BagaturEval_FeaturesConfigurationBagaturImpl.class.getName();
 	}
 }

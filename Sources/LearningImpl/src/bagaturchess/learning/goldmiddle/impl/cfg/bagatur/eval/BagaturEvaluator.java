@@ -21,6 +21,7 @@ import bagaturchess.bitboard.impl.plies.OfficerPlies;
 import bagaturchess.bitboard.impl.plies.WhitePawnPlies;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.engines.bagatur.cfg.eval.IBagaturEvalConfig;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.BagaturEval_SignalFillerConstants;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;
@@ -284,12 +285,12 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		int b_double_bishops_o = 0;
 		int b_double_bishops_e = 0;
 		if (w_bishops.getDataSize() >= 2) {
-			w_double_bishops_o += MATERIAL_DOUBLE_BISHOP_O;
-			w_double_bishops_e += MATERIAL_DOUBLE_BISHOP_E;
+			w_double_bishops_o += BagaturEval_SignalFillerConstants.MATERIAL_DOUBLE_BISHOP_O;
+			w_double_bishops_e += BagaturEval_SignalFillerConstants.MATERIAL_DOUBLE_BISHOP_E;
 		}
 		if (b_bishops.getDataSize() >= 2) {
-			b_double_bishops_o += MATERIAL_DOUBLE_BISHOP_O;
-			b_double_bishops_e += MATERIAL_DOUBLE_BISHOP_E;
+			b_double_bishops_o += BagaturEval_SignalFillerConstants.MATERIAL_DOUBLE_BISHOP_O;
+			b_double_bishops_e += BagaturEval_SignalFillerConstants.MATERIAL_DOUBLE_BISHOP_E;
 		}
 		
 		evalInfo.eval_Material_o += (w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o) + (w_double_bishops_o - b_double_bishops_o);
@@ -311,15 +312,15 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		int eval_e = 0;
 		
 		int tempo = (bitboard.getColourToMove() == Figures.COLOUR_WHITE ? 1 : -1);
-		eval_o += STANDARD_TEMPO_O * tempo;
-		eval_e += STANDARD_TEMPO_E * tempo;
+		eval_o += BagaturEval_SignalFillerConstants.STANDARD_TEMPO_O * tempo;
+		eval_e += BagaturEval_SignalFillerConstants.STANDARD_TEMPO_E * tempo;
 		
 		int castling = (castling(Figures.COLOUR_WHITE) - castling(Figures.COLOUR_BLACK));
-		eval_o += STANDARD_CASTLING_O * castling;
-		eval_e += STANDARD_CASTLING_E * castling;
+		eval_o += BagaturEval_SignalFillerConstants.STANDARD_CASTLING_O * castling;
+		eval_e += BagaturEval_SignalFillerConstants.STANDARD_CASTLING_E * castling;
 		
 		int fianchetto = fianchetto();
-		eval_o += FIANCHETTO * fianchetto;
+		eval_o += BagaturEval_SignalFillerConstants.FIANCHETTO * fianchetto;
 		
 		int patterns = eval_patterns();
 		eval_o += patterns;
@@ -341,12 +342,12 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 					
 					if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
 						//Black has the opposition
-						eval_o -= STANDARD_KINGS_OPPOSITION_O;
-						eval_e -= STANDARD_KINGS_OPPOSITION_E;
+						eval_o -= BagaturEval_SignalFillerConstants.STANDARD_KINGS_OPPOSITION_O;
+						eval_e -= BagaturEval_SignalFillerConstants.STANDARD_KINGS_OPPOSITION_E;
 					} else {
 						//White has the opposition
-						eval_o += STANDARD_KINGS_OPPOSITION_O;
-						eval_e += STANDARD_KINGS_OPPOSITION_E;
+						eval_o += BagaturEval_SignalFillerConstants.STANDARD_KINGS_OPPOSITION_O;
+						eval_e += BagaturEval_SignalFillerConstants.STANDARD_KINGS_OPPOSITION_E;
 					}
 				}
 			} else if (kingsDistance > 2 && kingsDistance % 2 == 0) {
@@ -356,17 +357,17 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		}
 		
 		if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
-			eval_o += STANDARD_DIST_KINGS_O[kingsDistance];
-			eval_e += STANDARD_DIST_KINGS_E[kingsDistance];
+			eval_o += BagaturEval_SignalFillerConstants.STANDARD_DIST_KINGS_O[kingsDistance];
+			eval_e += BagaturEval_SignalFillerConstants.STANDARD_DIST_KINGS_E[kingsDistance];
 		} else {
-			eval_o -= STANDARD_DIST_KINGS_O[kingsDistance];
-			eval_e -= STANDARD_DIST_KINGS_E[kingsDistance];
+			eval_o -= BagaturEval_SignalFillerConstants.STANDARD_DIST_KINGS_O[kingsDistance];
+			eval_e -= BagaturEval_SignalFillerConstants.STANDARD_DIST_KINGS_E[kingsDistance];
 		}
 		
 		if (w_queens.getDataSize() == 1 && b_queens.getDataSize() == 1) {
 			int queensDistance = Fields.getDistancePoints(w_queens.getData()[0], b_queens.getData()[0]);
-			eval_o += STANDARD_DIST_QUEENS_O[queensDistance];
-			eval_e += STANDARD_DIST_QUEENS_E[queensDistance];
+			eval_o += BagaturEval_SignalFillerConstants.STANDARD_DIST_QUEENS_O[queensDistance];
+			eval_e += BagaturEval_SignalFillerConstants.STANDARD_DIST_QUEENS_E[queensDistance];
 		}
 
 		evalInfo.eval_Standard_o += eval_o;
@@ -460,8 +461,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long stoppers = p.getFront() & evalInfo.bb_all;
 				if (stoppers != 0) {
 					int stoppersCount = Utils.countBits_less1s(stoppers);
-					evalInfo.eval_PawnsPassedStoppers_o -= (stoppersCount * PAWNS_PASSED_O[p.getRank()]) / 4;
-					evalInfo.eval_PawnsPassedStoppers_e -= (stoppersCount * PAWNS_PASSED_E[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_o -= (stoppersCount * BagaturEval_SignalFillerConstants.PAWNS_PASSED_O[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_e -= (stoppersCount * BagaturEval_SignalFillerConstants.PAWNS_PASSED_E[p.getRank()]) / 4;
 				}
 			}
 		}
@@ -473,8 +474,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long stoppers = p.getFront() & evalInfo.bb_all;
 				if (stoppers != 0) {
 					int stoppersCount = Utils.countBits_less1s(stoppers);
-					evalInfo.eval_PawnsPassedStoppers_o += (stoppersCount * PAWNS_PASSED_O[p.getRank()]) / 4;
-					evalInfo.eval_PawnsPassedStoppers_e += (stoppersCount * PAWNS_PASSED_E[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_o += (stoppersCount * BagaturEval_SignalFillerConstants.PAWNS_PASSED_O[p.getRank()]) / 4;
+					evalInfo.eval_PawnsPassedStoppers_e += (stoppersCount * BagaturEval_SignalFillerConstants.PAWNS_PASSED_E[p.getRank()]) / 4;
 				}
 			}
 		}
@@ -535,14 +536,14 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			}
 		}
 		
-		evalInfo.eval_PawnsRooksQueens_o += rooks_opened * PAWNS_ROOK_OPENED_O;
-		evalInfo.eval_PawnsRooksQueens_e += rooks_opened * PAWNS_ROOK_OPENED_E;
+		evalInfo.eval_PawnsRooksQueens_o += rooks_opened * BagaturEval_SignalFillerConstants.PAWNS_ROOK_OPENED_O;
+		evalInfo.eval_PawnsRooksQueens_e += rooks_opened * BagaturEval_SignalFillerConstants.PAWNS_ROOK_OPENED_E;
 		
-		evalInfo.eval_PawnsRooksQueens_o += rooks_semiopened * PAWNS_ROOK_SEMIOPENED_O;
-		evalInfo.eval_PawnsRooksQueens_e += rooks_semiopened * PAWNS_ROOK_SEMIOPENED_E;
+		evalInfo.eval_PawnsRooksQueens_o += rooks_semiopened * BagaturEval_SignalFillerConstants.PAWNS_ROOK_SEMIOPENED_O;
+		evalInfo.eval_PawnsRooksQueens_e += rooks_semiopened * BagaturEval_SignalFillerConstants.PAWNS_ROOK_SEMIOPENED_E;
 		
-		evalInfo.eval_PawnsRooksQueens_o += rooks_7th2th * PAWNS_ROOK_7TH2TH_O;
-		evalInfo.eval_PawnsRooksQueens_e += rooks_7th2th * PAWNS_ROOK_7TH2TH_E;
+		evalInfo.eval_PawnsRooksQueens_o += rooks_7th2th * BagaturEval_SignalFillerConstants.PAWNS_ROOK_7TH2TH_O;
+		evalInfo.eval_PawnsRooksQueens_e += rooks_7th2th * BagaturEval_SignalFillerConstants.PAWNS_ROOK_7TH2TH_E;
 		
 		
 		int queens_7th2th = 0;
@@ -582,8 +583,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			}
 		}
 		
-		evalInfo.eval_PawnsRooksQueens_o += queens_7th2th * PAWNS_QUEEN_7TH2TH_O;
-		evalInfo.eval_PawnsRooksQueens_e += queens_7th2th * PAWNS_QUEEN_7TH2TH_E;
+		evalInfo.eval_PawnsRooksQueens_o += queens_7th2th * BagaturEval_SignalFillerConstants.PAWNS_QUEEN_7TH2TH_O;
+		evalInfo.eval_PawnsRooksQueens_e += queens_7th2th * BagaturEval_SignalFillerConstants.PAWNS_QUEEN_7TH2TH_E;
 		
 		
 		int kingOpened = 0;
@@ -593,7 +594,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	    if (w_rooks.getDataSize() > 0 || w_queens.getDataSize() > 0) {
 	    	kingOpened -= evalInfo.b_kingOpened;
 	    }
-	    evalInfo.eval_PawnsRooksQueens_o += kingOpened * PAWNS_KING_OPENED;
+	    evalInfo.eval_PawnsRooksQueens_o += kingOpened * BagaturEval_SignalFillerConstants.PAWNS_KING_OPENED;
 	}
 	
 	
@@ -676,8 +677,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_w_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o += MOBILITY_KNIGHT_O[mob];
-			    eval_e += MOBILITY_KNIGHT_E[mob];
+			    eval_o += BagaturEval_SignalFillerConstants.MOBILITY_KNIGHT_O[mob];
+			    eval_e += BagaturEval_SignalFillerConstants.MOBILITY_KNIGHT_E[mob];
 			    
 			    
 			    // Knight outposts:
@@ -698,8 +699,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			    			}
 			    		}
 			    		
-			    		eval_o += scores * KNIGHT_OUTPOST_O[fieldID];
-					    eval_e += scores * KNIGHT_OUTPOST_E[fieldID];
+			    		eval_o += scores * BagaturEval_SignalFillerConstants.KNIGHT_OUTPOST_O[fieldID];
+					    eval_e += scores * BagaturEval_SignalFillerConstants.KNIGHT_OUTPOST_E[fieldID];
 				    }
 			    }
 			}
@@ -731,8 +732,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_b_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o -= MOBILITY_KNIGHT_O[mob];
-			    eval_e -= MOBILITY_KNIGHT_E[mob];
+			    eval_o -= BagaturEval_SignalFillerConstants.MOBILITY_KNIGHT_O[mob];
+			    eval_e -= BagaturEval_SignalFillerConstants.MOBILITY_KNIGHT_E[mob];
 			    
 			    
 			    // Knight outposts:
@@ -753,8 +754,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			    			}
 			    		}
 				    		
-			    		eval_o -= scores * KNIGHT_OUTPOST_O[Fields.HORIZONTAL_SYMMETRY[fieldID]];
-					    eval_e -= scores * KNIGHT_OUTPOST_E[Fields.HORIZONTAL_SYMMETRY[fieldID]];
+			    		eval_o -= scores * BagaturEval_SignalFillerConstants.KNIGHT_OUTPOST_O[Fields.HORIZONTAL_SYMMETRY[fieldID]];
+					    eval_e -= scores * BagaturEval_SignalFillerConstants.KNIGHT_OUTPOST_E[Fields.HORIZONTAL_SYMMETRY[fieldID]];
 				    }
 			    }
 			}
@@ -787,8 +788,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_w_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o += MOBILITY_BISHOP_O[mob];
-			    eval_e += MOBILITY_BISHOP_E[mob];
+			    eval_o += BagaturEval_SignalFillerConstants.MOBILITY_BISHOP_O[mob];
+			    eval_e += BagaturEval_SignalFillerConstants.MOBILITY_BISHOP_E[mob];
 
 			    
 			    // Bishop outposts:
@@ -809,8 +810,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			    			}
 			    		}
 			    		
-			    		eval_o += scores * BISHOP_OUTPOST_O[fieldID];
-					    eval_e += scores * BISHOP_OUTPOST_E[fieldID];
+			    		eval_o += scores * BagaturEval_SignalFillerConstants.BISHOP_OUTPOST_O[fieldID];
+					    eval_e += scores * BagaturEval_SignalFillerConstants.BISHOP_OUTPOST_E[fieldID];
 				    }
 			    }
 			    
@@ -857,8 +858,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_b_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o -= MOBILITY_BISHOP_O[mob];
-			    eval_e -= MOBILITY_BISHOP_E[mob];
+			    eval_o -= BagaturEval_SignalFillerConstants.MOBILITY_BISHOP_O[mob];
+			    eval_e -= BagaturEval_SignalFillerConstants.MOBILITY_BISHOP_E[mob];
 			    
 			    
 			    // Bishop outposts:
@@ -879,8 +880,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			    			}
 			    		}
 			    		
-			    		eval_o -= scores * BISHOP_OUTPOST_O[Fields.HORIZONTAL_SYMMETRY[fieldID]];
-					    eval_e -= scores * BISHOP_OUTPOST_E[Fields.HORIZONTAL_SYMMETRY[fieldID]];
+			    		eval_o -= scores * BagaturEval_SignalFillerConstants.BISHOP_OUTPOST_O[Fields.HORIZONTAL_SYMMETRY[fieldID]];
+					    eval_e -= scores * BagaturEval_SignalFillerConstants.BISHOP_OUTPOST_E[Fields.HORIZONTAL_SYMMETRY[fieldID]];
 				    }
 			    }
 			    
@@ -927,8 +928,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_w_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o += MOBILITY_ROOK_O[mob];
-			    eval_e += MOBILITY_ROOK_E[mob];
+			    eval_o += BagaturEval_SignalFillerConstants.MOBILITY_ROOK_O[mob];
+			    eval_e += BagaturEval_SignalFillerConstants.MOBILITY_ROOK_E[mob];
 			    
 			    // Penalize rooks which are trapped inside a king which has lost the
 			    // right to castle:
@@ -961,8 +962,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_b_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o -= MOBILITY_ROOK_O[mob];
-			    eval_e -= MOBILITY_ROOK_E[mob];
+			    eval_o -= BagaturEval_SignalFillerConstants.MOBILITY_ROOK_O[mob];
+			    eval_e -= BagaturEval_SignalFillerConstants.MOBILITY_ROOK_E[mob];
 			    
 			    // Penalize rooks which are trapped inside a king which has lost the
 			    // right to castle:
@@ -998,8 +999,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_w_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o += MOBILITY_QUEEN_O[mob];
-			    eval_e += MOBILITY_QUEEN_E[mob];
+			    eval_o += BagaturEval_SignalFillerConstants.MOBILITY_QUEEN_O[mob];
+			    eval_e += BagaturEval_SignalFillerConstants.MOBILITY_QUEEN_E[mob];
 			}
 		}
 		
@@ -1030,8 +1031,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			    // Mobility
 			    long attacks = bb_moves & ~evalInfo.bb_all_b_pieces;
 			    int mob = Utils.countBits(attacks);
-			    eval_o -= MOBILITY_QUEEN_O[mob];
-			    eval_e -= MOBILITY_QUEEN_E[mob];
+			    eval_o -= BagaturEval_SignalFillerConstants.MOBILITY_QUEEN_O[mob];
+			    eval_e -= BagaturEval_SignalFillerConstants.MOBILITY_QUEEN_E[mob];
 			}
 		}
 		
@@ -1109,7 +1110,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	        //	max_attackUnits = attackUnits;
 	        //}
 	        
-	        kingSafety += KING_SAFETY[attackUnits];
+	        kingSafety += BagaturEval_SignalFillerConstants.KING_SAFETY[attackUnits];
 	    }
 	    
 	    
@@ -1148,7 +1149,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	        //}
 	        
 	        //evalInfo.eval_Kingsafety += SafetyTable[attackUnits];
-	        kingSafety -= KING_SAFETY[attackUnits];
+	        kingSafety -= BagaturEval_SignalFillerConstants.KING_SAFETY[attackUnits];
 	    }
 	    
 	    evalInfo.eval_Kingsafety_o += kingSafety;
@@ -1206,8 +1207,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		
 		int space = w_space - b_space;
 		
-		evalInfo.eval_Space_o += space * SPACE_O;
-		evalInfo.eval_Space_e += space * SPACE_E;
+		evalInfo.eval_Space_o += space * BagaturEval_SignalFillerConstants.SPACE_O;
+		evalInfo.eval_Space_e += space * BagaturEval_SignalFillerConstants.SPACE_E;
 	}
 	
 	
@@ -1247,8 +1248,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			
 			int w_hungedCount = Utils.countBits_less1s(bb_w_hunged);
 			
-			eval_o += HUNGED_O[w_hungedCount];
-			eval_e += HUNGED_E[w_hungedCount];
+			eval_o += BagaturEval_SignalFillerConstants.HUNGED_O[w_hungedCount];
+			eval_e += BagaturEval_SignalFillerConstants.HUNGED_E[w_hungedCount];
 			
 		} else {
 			
@@ -1280,8 +1281,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			
 			int b_hungedCount = Utils.countBits_less1s(bb_b_hunged);
 			
-			eval_o -= HUNGED_O[b_hungedCount];
-			eval_e -= HUNGED_E[b_hungedCount];
+			eval_o -= BagaturEval_SignalFillerConstants.HUNGED_O[b_hungedCount];
+			eval_e -= BagaturEval_SignalFillerConstants.HUNGED_E[b_hungedCount];
 		}
 		
 		evalInfo.eval_Hunged_o += eval_o;
@@ -1304,8 +1305,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 			    int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_w_minors);
-			    eval_o += MOBILITY_KNIGHT_S_O[mob_safe];
-			    eval_e += MOBILITY_KNIGHT_S_E[mob_safe];
+			    eval_o += BagaturEval_SignalFillerConstants.MOBILITY_KNIGHT_S_O[mob_safe];
+			    eval_e += BagaturEval_SignalFillerConstants.MOBILITY_KNIGHT_S_E[mob_safe];
 			    
 			    int rank = Fields.DIGITS[fieldID];
 			    int trapped = getTrappedScores(mob_safe, 3);
@@ -1321,8 +1322,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 				int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_w_minors);
-				eval_o += MOBILITY_BISHOP_S_O[mob_safe];
-				eval_e += MOBILITY_BISHOP_S_E[mob_safe];
+				eval_o += BagaturEval_SignalFillerConstants.MOBILITY_BISHOP_S_O[mob_safe];
+				eval_e += BagaturEval_SignalFillerConstants.MOBILITY_BISHOP_S_E[mob_safe];
 			    
 			    int rank = Fields.DIGITS[fieldID];
 			    int trapped = getTrappedScores(mob_safe, 3);
@@ -1338,8 +1339,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 				int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_w_rooks);
-				eval_o += MOBILITY_ROOK_S_O[mob_safe];
-				eval_e += MOBILITY_ROOK_S_E[mob_safe];
+				eval_o += BagaturEval_SignalFillerConstants.MOBILITY_ROOK_S_O[mob_safe];
+				eval_e += BagaturEval_SignalFillerConstants.MOBILITY_ROOK_S_E[mob_safe];
 				
 			    int rank = Fields.DIGITS[fieldID];
 			    int trapped = getTrappedScores(mob_safe, 5);
@@ -1355,8 +1356,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 				int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_w_queens);
-				eval_o += MOBILITY_QUEEN_S_O[mob_safe];
-				eval_e += MOBILITY_QUEEN_S_E[mob_safe];
+				eval_o += BagaturEval_SignalFillerConstants.MOBILITY_QUEEN_S_O[mob_safe];
+				eval_e += BagaturEval_SignalFillerConstants.MOBILITY_QUEEN_S_E[mob_safe];
 				
 			    int rank = Fields.DIGITS[fieldID];
 			    int trapped = getTrappedScores(mob_safe, 9);
@@ -1377,8 +1378,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 			    int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_b_minors);			    
-			    eval_o -= MOBILITY_KNIGHT_S_O[mob_safe];
-			    eval_e -= MOBILITY_KNIGHT_S_E[mob_safe];
+			    eval_o -= BagaturEval_SignalFillerConstants.MOBILITY_KNIGHT_S_O[mob_safe];
+			    eval_e -= BagaturEval_SignalFillerConstants.MOBILITY_KNIGHT_S_E[mob_safe];
 			    
 			    int rank = 7 - Fields.DIGITS[fieldID];
 			    int trapped = -getTrappedScores(mob_safe, 3);
@@ -1394,8 +1395,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 			    
 				int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_b_minors);
-				eval_o -= MOBILITY_BISHOP_S_O[mob_safe];
-				eval_e -= MOBILITY_BISHOP_S_E[mob_safe];
+				eval_o -= BagaturEval_SignalFillerConstants.MOBILITY_BISHOP_S_O[mob_safe];
+				eval_e -= BagaturEval_SignalFillerConstants.MOBILITY_BISHOP_S_E[mob_safe];
 				
 				int rank = 7 - Fields.DIGITS[fieldID];
 			    int trapped = -getTrappedScores(mob_safe, 3);
@@ -1411,8 +1412,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 				int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_b_rooks);
-				eval_o -= MOBILITY_ROOK_S_O[mob_safe];
-				eval_e -= MOBILITY_ROOK_S_E[mob_safe];
+				eval_o -= BagaturEval_SignalFillerConstants.MOBILITY_ROOK_S_O[mob_safe];
+				eval_e -= BagaturEval_SignalFillerConstants.MOBILITY_ROOK_S_E[mob_safe];
 				
 				int rank = 7 - Fields.DIGITS[fieldID];
 			    int trapped = -getTrappedScores(mob_safe, 5);
@@ -1428,8 +1429,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				long attacks = evalInfo.attacksByFieldID[fieldID];
 				
 				int mob_safe = Utils.countBits(attacks & ~evalInfo.bb_unsafe_for_b_queens);
-				eval_o -= MOBILITY_QUEEN_S_O[mob_safe];
-				eval_e -= MOBILITY_QUEEN_S_E[mob_safe];
+				eval_o -= BagaturEval_SignalFillerConstants.MOBILITY_QUEEN_S_O[mob_safe];
+				eval_e -= BagaturEval_SignalFillerConstants.MOBILITY_QUEEN_S_E[mob_safe];
 
 				
 				int rank = 7 - Fields.DIGITS[fieldID];
@@ -1440,8 +1441,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		
 		
 		trapped_all /= 2;
-		evalInfo.eval_Trapped_o += trapped_all * TRAPED_O;
-		evalInfo.eval_Trapped_e += trapped_all * TRAPED_E;
+		evalInfo.eval_Trapped_o += trapped_all * BagaturEval_SignalFillerConstants.TRAPED_O;
+		evalInfo.eval_Trapped_e += trapped_all * BagaturEval_SignalFillerConstants.TRAPED_E;
 		
 		evalInfo.eval_Mobility_Safe_o += eval_o;
 		evalInfo.eval_Mobility_Safe_e += eval_e;
@@ -1467,8 +1468,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				if (stoppers != 0) {
 					long front = p.getFront();
 					int unsafeFieldsInFront = Utils.countBits_less1s(front & evalInfo.bb_attackedByBlackOnly);
-					eval_o -= (unsafeFieldsInFront * PAWNS_PASSED_O[p.getRank()]) / 8;
-					eval_e -= (unsafeFieldsInFront * PAWNS_PASSED_E[p.getRank()]) / 8;
+					eval_o -= (unsafeFieldsInFront * BagaturEval_SignalFillerConstants.PAWNS_PASSED_O[p.getRank()]) / 8;
+					eval_e -= (unsafeFieldsInFront * BagaturEval_SignalFillerConstants.PAWNS_PASSED_E[p.getRank()]) / 8;
 				}
 			}
 		}
@@ -1481,8 +1482,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 				if (stoppers != 0) {
 					long front = p.getFront();
 					int unsafeFieldsInFront = Utils.countBits_less1s(front & evalInfo.bb_attackedByWhiteOnly);
-					eval_o += (unsafeFieldsInFront * PAWNS_PASSED_O[p.getRank()]) / 8;
-					eval_e += (unsafeFieldsInFront * PAWNS_PASSED_E[p.getRank()]) / 8;
+					eval_o += (unsafeFieldsInFront * BagaturEval_SignalFillerConstants.PAWNS_PASSED_O[p.getRank()]) / 8;
+					eval_e += (unsafeFieldsInFront * BagaturEval_SignalFillerConstants.PAWNS_PASSED_E[p.getRank()]) / 8;
 				}
 			}
 		}
@@ -1674,8 +1675,8 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		
 		int eval = 0;
 		
-		eval += STANDARD_TRAP_BISHOP * minor_trap;
-		eval += STANDARD_BLOCKED_PAWN * blocked_pawns;
+		eval += BagaturEval_SignalFillerConstants.STANDARD_TRAP_BISHOP * minor_trap;
+		eval += BagaturEval_SignalFillerConstants.STANDARD_BLOCKED_PAWN * blocked_pawns;
 		
 		return eval;
 	}

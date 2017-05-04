@@ -4,15 +4,14 @@ package bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler;
 import bagaturchess.bitboard.common.Utils;
 
 
-interface FeatureWeights {
-	
-	
-	public static final int MATERIAL_DOUBLE_BISHOP_O = 40;
-	public static final int MATERIAL_DOUBLE_BISHOP_E = 50;
+public interface BagaturEval_SignalFillerConstants {
 	
 	/**
 	 * Standard
 	 */
+	public static final int MATERIAL_DOUBLE_BISHOP_O 	= 40;
+	public static final int MATERIAL_DOUBLE_BISHOP_E 	= 50;
+	
 	public static final int STANDARD_TEMPO_O			= 25;
 	public static final int STANDARD_TEMPO_E			= 35;
 	public static final int STANDARD_CASTLING_O			= 10;
