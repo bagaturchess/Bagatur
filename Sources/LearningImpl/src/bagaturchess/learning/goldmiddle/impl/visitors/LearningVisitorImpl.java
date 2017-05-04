@@ -32,6 +32,7 @@ import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
+import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.Bagatur_LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.Bagatur_ALL_LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.ALL_LearningInputImpl;
@@ -166,7 +167,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		sumDiffs1 = 0;
 		sumDiffs2 = 0;
 		
-		ILearningInput input = new Bagatur_ALL_LearningInputImpl();
+		ILearningInput input = LearningInputFactory.createDefaultInput();
 		
 		filler = input.createFiller(bitboard);
 		

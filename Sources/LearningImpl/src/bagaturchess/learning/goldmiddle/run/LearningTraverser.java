@@ -2,6 +2,7 @@ package bagaturchess.learning.goldmiddle.run;
 
 
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
+import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.Bagatur_LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.Bagatur_ALL_LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.ALL_LearningInputImpl;
@@ -26,7 +27,7 @@ public class LearningTraverser {
 			
 			PositionsVisitor learning = new LearningVisitorImpl();
 			
-			ILearningInput input = new Bagatur_ALL_LearningInputImpl();
+			ILearningInput input = LearningInputFactory.createDefaultInput();
 			
 			while (true) {
 				PositionsTraverser.traverseAll(filePath, learning, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());

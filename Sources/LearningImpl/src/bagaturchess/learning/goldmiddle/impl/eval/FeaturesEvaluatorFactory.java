@@ -5,6 +5,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
+import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.Bagatur_LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.Bagatur_ALL_LearningInputImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.ALL_LearningInputImpl;
@@ -24,7 +25,7 @@ public class FeaturesEvaluatorFactory implements IEvaluatorFactory {
 	@Override
 	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache, IEvalConfig evalConfig) {
 		
-		ILearningInput input = new Bagatur_ALL_LearningInputImpl();
+		ILearningInput input = LearningInputFactory.createDefaultInput();
 		ISignalFiller filler = input.createFiller(bitboard);
 		
 		Features features = createFeatures();
@@ -36,7 +37,7 @@ public class FeaturesEvaluatorFactory implements IEvaluatorFactory {
 	@Override
 	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache) {
 		
-		ILearningInput input = new Bagatur_ALL_LearningInputImpl();
+		ILearningInput input = LearningInputFactory.createDefaultInput();
 		ISignalFiller filler = input.createFiller(bitboard);
 		
 		Features features = createFeatures();
