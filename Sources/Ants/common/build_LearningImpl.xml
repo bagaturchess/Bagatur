@@ -1,4 +1,4 @@
-<project name="BagaturLearningAPI" default="all" basedir="./">
+<project name="BagaturLearningImpl" default="all" basedir="./">
 	
 	<description>
         Bagatur LearningAPI - assembly files
@@ -6,7 +6,7 @@
 	
 	<property name="project_name" value="BagaturLearningImpl" />
 	<property name="project_root" value="${learningImpl_dir}" />
-	<property name="classpath" value="${work_dir}/BagaturBoard.jar;${work_dir}/BagaturSearch.jar;${work_dir}/BagaturSearch.jar;${work_dir}/BagaturUCI.jar;${work_dir}/BagaturLearningAPI.jar;${work_dir}/BagaturEngines.jar;${work_dir}/BagaturUCITracker.jar" />
+	<property name="classpath" value="${work_dir}/BagaturBoard.jar;${work_dir}/BagaturSearch.jar;${work_dir}/BagaturSearch.jar;${work_dir}/BagaturUCI.jar;${work_dir}/BagaturLearningAPI.jar;${work_dir}/BagaturUCITracker.jar" />
 	<property name="src" location="${project_root}/src" />
 
 	

@@ -30,9 +30,9 @@
   	<ant antfile="${ants_dir}/common/build_UCI.xml" dir="${uci_dir}/src"/>
   	<ant antfile="${ants_dir}/engine/build_Search.xml" dir="${search_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_LearningAPI.xml" dir="${learningAPI_dir}/src"/>
-  	<ant antfile="${ants_dir}/engine/build_Engines.xml" dir="${engines_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_UCITracker.xml" dir="${ucitracker_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_LearningImpl.xml" dir="${learningImpl_dir}/src"/>
+  	<ant antfile="${ants_dir}/engine/build_Engines.xml" dir="${engines_dir}/src"/>
   	<ant antfile="${ants_dir}/engine/build_BagaturEngine_src.xml" dir="${ants_dir}/engine"/>
   	
 	<copy todir="${temp_dir}/bin">

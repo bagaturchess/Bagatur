@@ -72,6 +72,7 @@ public class Boot {
 			try {
 				engineBootCfg = (IUCIConfig) ReflectionUtils.createObjectByClassName_StringsConstructor(engineBootCfg_ClassName, args);
 			} catch(Exception e) {
+				e.printStackTrace(System.out);
 				engineBootCfg = (IUCIConfig) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineBootCfg_ClassName);
 			}
 			
