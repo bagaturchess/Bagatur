@@ -5,7 +5,7 @@ import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEvalFa
 import bagaturchess.search.api.IEvalConfig;
 
 
-public class EvaluationConfig implements IEvalConfig {
+public class FeaturesEvaluationConfig implements IEvalConfig {
 
 	@Override
 	public boolean useLazyEval() {
