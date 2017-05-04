@@ -1,6 +1,5 @@
 package bagaturchess.engines.bagatur.cfg.eval;
 
-import bagaturchess.engines.bagatur.eval.IBagaturEvalConfig;
 import bagaturchess.search.api.IEvalConfig;
 
 
