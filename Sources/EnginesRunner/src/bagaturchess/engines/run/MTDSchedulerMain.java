@@ -91,8 +91,8 @@ public class MTDSchedulerMain {
 				
 				new String[] {
 								//bagaturchess.search.impl.alg.impl0.Search_PVS_NWS.class.getName(),
-								//bagaturchess.search.impl.alg.impl1.Search_NegaScout.class.getName(),
-								bagaturchess.search.impl.alg.impl1.Search_NegaScout_WithAlpha.class.getName(),
+								bagaturchess.search.impl.alg.impl1.Search_NegaScout.class.getName(),
+								//bagaturchess.search.impl.alg.impl1.Search_NegaScout_WithAlpha.class.getName(),
 								
 								//"bagaturchess.engines.bagatur.v110.SearchConfigImpl",
 								bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD.class.getName(),
@@ -116,6 +116,9 @@ public class MTDSchedulerMain {
 																
 								//bagaturchess.engines.cuckooadapter.BoardConfigImpl_Cuckoo.class.getName(),
 								//bagaturchess.engines.cuckooadapter.EvaluationConfg_Cuckoo.class.getName()
+								
+								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl.class.getName(),
+								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig.class.getName(),
 								}
 				);
 		
