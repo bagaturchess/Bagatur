@@ -22,9 +22,9 @@ package bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
-import bagaturchess.engines.bagatur.eval.BagaturPawnsEvalFactory;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEvalFactory;
 import bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.filler.ALL_BoardConfig;
 import bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.filler.ALL_FeaturesConfigurationBagaturImpl;
 import bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.filler.ALL_SignalFiller;

@@ -23,16 +23,16 @@
 
 package bagaturchess.engines.run;
 
+
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.engines.bagatur.eval.BagaturEvaluator;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturEvaluator;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.uci.api.BestMoveSender;
-
 
 
 public class MediatorDummper implements ISearchMediator {

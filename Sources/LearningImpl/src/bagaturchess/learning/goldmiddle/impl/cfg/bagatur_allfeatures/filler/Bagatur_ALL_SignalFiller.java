@@ -19,10 +19,10 @@ import bagaturchess.bitboard.impl.plies.KnightPlies;
 import bagaturchess.bitboard.impl.plies.OfficerPlies;
 import bagaturchess.bitboard.impl.plies.WhitePawnPlies;
 import bagaturchess.bitboard.impl.state.PiecesList;
-import bagaturchess.engines.bagatur.eval.BagaturPawnsEval;
 import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEval;
 
 
 public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_FeaturesConstants, Bagatur_ALL_SignalFillerConstants {

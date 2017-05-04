@@ -20,7 +20,6 @@ import bagaturchess.bitboard.impl.plies.KnightPlies;
 import bagaturchess.bitboard.impl.plies.OfficerPlies;
 import bagaturchess.bitboard.impl.plies.WhitePawnPlies;
 import bagaturchess.bitboard.impl.state.PiecesList;
-import bagaturchess.engines.bagatur.cfg.eval.IBagaturEvalConfig;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.BagaturEval_SignalFillerConstants;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;

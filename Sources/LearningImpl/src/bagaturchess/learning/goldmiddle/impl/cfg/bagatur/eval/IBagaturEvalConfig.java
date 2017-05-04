@@ -1,4 +1,4 @@
-package bagaturchess.engines.bagatur.cfg.eval;
+package bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval;
 
 import bagaturchess.search.api.IEvalConfig;
 

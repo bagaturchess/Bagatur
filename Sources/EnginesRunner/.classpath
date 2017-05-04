@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Engines"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Search"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UCI"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/LearningImpl"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

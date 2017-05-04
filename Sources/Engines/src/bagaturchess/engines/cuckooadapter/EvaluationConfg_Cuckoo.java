@@ -1,12 +1,11 @@
 package bagaturchess.engines.cuckooadapter;
 
 
-import bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2;
-import bagaturchess.engines.bagatur.cfg.eval.IBagaturEvalConfig;
-import bagaturchess.engines.bagatur.eval.BagaturPawnsEvalFactory;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEvalFactory;
+import bagaturchess.search.api.IEvalConfig;
 
 
-public class EvaluationConfg_Cuckoo extends BagaturEvalConfigImpl_v2 implements IBagaturEvalConfig {
+public class EvaluationConfg_Cuckoo implements IEvalConfig {
 	
 	
 	@Override

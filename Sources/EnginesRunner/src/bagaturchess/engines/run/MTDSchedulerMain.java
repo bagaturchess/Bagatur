@@ -109,7 +109,7 @@ public class MTDSchedulerMain {
 								//bagaturchess.engines.material.MaterialEvalConfigImpl.class.getName()
 								
 								bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl.class.getName(),
-								bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2.class.getName()
+								bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturEvalConfigImpl_v2.class.getName()
 								
 								//"bagaturchess.engines.learning.cfg.weights.WeightsBoardConfig",
 								//"bagaturchess.engines.learning.cfg.weights.WeightsEvaluationConfig"

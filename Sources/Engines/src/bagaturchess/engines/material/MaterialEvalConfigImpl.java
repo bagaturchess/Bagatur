@@ -1,6 +1,7 @@
 package bagaturchess.engines.material;
 
 
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEvalFactory;
 import bagaturchess.search.api.IEvalConfig;
 
 
@@ -28,6 +29,6 @@ public class MaterialEvalConfigImpl implements IEvalConfig {
 	
 	
 	public String getPawnsCacheFactoryClassName() {
-		return bagaturchess.engines.bagatur.eval.BagaturPawnsEvalFactory.class.getName();
+		return BagaturPawnsEvalFactory.class.getName();
 	}
 }
