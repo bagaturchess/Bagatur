@@ -41,6 +41,7 @@ import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ProcessesImpl;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImpl;
 import bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProcess;
+import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_Classic;
 import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_Base;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
@@ -91,8 +92,8 @@ public class MTDSchedulerMain {
 				
 				new String[] {
 								//bagaturchess.search.impl.alg.impl0.Search_PVS_NWS.class.getName(),
-								bagaturchess.search.impl.alg.impl1.Search_NegaScout.class.getName(),
-								//bagaturchess.search.impl.alg.impl1.Search_NegaScout_WithAlpha.class.getName(),
+								//bagaturchess.search.impl.alg.impl1.Search_NegaScout.class.getName(),
+								bagaturchess.search.impl.alg.impl1.Search_NegaScout_WithAlpha.class.getName(),
 								
 								//"bagaturchess.engines.bagatur.v110.SearchConfigImpl",
 								bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD.class.getName(),
@@ -129,7 +130,9 @@ public class MTDSchedulerMain {
 		//IRootSearch search = new MTDParallelSearch_ProcessesImpl(new Object[] {cfg, sharedData});
 		//IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, sharedData});
 		//IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, sharedData});
-		IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
+		//IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
+		IRootSearch search = new SequentialSearch_Classic(new Object[] {cfg, sharedData});
+		
 		
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		

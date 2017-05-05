@@ -23,6 +23,8 @@
 package bagaturchess.search.impl.rootsearch.sequential;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,9 +40,10 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.evalcache.EvalCache1;
+import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
+import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.sequential.mtd.Mediator_AlphaAndBestMoveWindow;
@@ -52,14 +55,14 @@ import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
 
 
-public class SequentialSearch_AB extends RootSearch_BaseImpl {
+public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 	
 	
 	private ExecutorService executor;
 	private ISearch searcher;
 	
 	
-	public SequentialSearch_AB(Object[] args) {
+	public SequentialSearch_Classic(Object[] args) {
 		super(args);
 		executor = Executors.newFixedThreadPool(1);
 	}
@@ -104,15 +107,16 @@ public class SequentialSearch_AB extends RootSearch_BaseImpl {
 		setupBoard(_bitboardForSetup);
 		
 		
-		int startIteration = (go.getStartDepth() == Go.UNDEF_STARTDEPTH) ? 1 : go.getStartDepth();
-		int maxIterations = (go.getDepth() == Go.UNDEF_DEPTH) ? ISearch.MAX_DEPTH : go.getDepth();
+		final int startIteration = (go.getStartDepth() == Go.UNDEF_STARTDEPTH) ? 1 : go.getStartDepth();
+		int maxIterations_tmp = (go.getDepth() == Go.UNDEF_DEPTH) ? ISearch.MAX_DEPTH : go.getDepth();
 		Integer initialValue = (go.getBeta() == Go.UNDEF_BETA) ? null : go.getBeta();
 		int[] prevPV = MoveInt.getPV(go.getPv(), _bitboardForSetup);
 		
-		if (maxIterations > ISearch.MAX_DEPTH) {
-			maxIterations = ISearch.MAX_DEPTH;
-			go.setDepth(maxIterations);
+		if (maxIterations_tmp > ISearch.MAX_DEPTH) {
+			maxIterations_tmp = ISearch.MAX_DEPTH;
+			go.setDepth(maxIterations_tmp);
 		}
+		final int maxIterations = maxIterations_tmp; 
 		
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch started from depth " + startIteration + " to depth " + maxIterations);
 		
@@ -163,15 +167,32 @@ public class SequentialSearch_AB extends RootSearch_BaseImpl {
 					
 					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch before loop");
 					
-					while (!final_mediator.getStopper().isStopped() //Condition for normal play
-							&& distribution.getCurrentDepth() <= distribution.getMaxIterations() //Condition for fixed depth
-							) {
+					for (int maxdepth = startIteration; maxdepth <= maxIterations; maxdepth++) {
 						
-						Runnable task = new NullwinSearchTask(searcher, distribution, getBitboardForSetup(),
-								final_mediator, !go.isPonder(), final_prevPV
-																);
-						//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch in loop : task.run()");
-						task.run();
+						ISearchInfo info = SearchInfoFactory.getFactory().createSearchInfo();
+						final_mediator.registerInfoObject(info);
+						info.setDepth(maxdepth);
+						info.setSelDepth(maxdepth);
+						
+						int eval = searcher.pv_search(final_mediator,
+								null, info,
+								ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
+								ISearch.MIN, ISearch.MAX, 0, 0, final_prevPV,
+								false, 0, searcher.getEnv().getBitboard().getColourToMove(),
+								0, 0, false, 0, !go.isPonder());
+						
+						List<Integer> pv_buffer = new ArrayList<Integer>();
+						info.setPV(PVNode.convertPV(searcher.getPvman().load(0), pv_buffer));
+						if (info.getPV().length > 0) {
+							info.setBestMove(info.getPV()[0]);
+						}
+						info.setEval(eval);
+						
+						final_mediator.changedMajor(info);
+						
+						if (final_mediator.getStopper().isStopped()) {
+							break;
+						}
 					}
 					
 					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch after loop final_mediator.getStopper().isStopped()="
