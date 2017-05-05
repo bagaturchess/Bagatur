@@ -40,6 +40,7 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
+import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.evalcache.EvalCache1;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
@@ -174,21 +175,27 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 						info.setDepth(maxdepth);
 						info.setSelDepth(maxdepth);
 						
-						int eval = searcher.pv_search(final_mediator,
-								null, info,
-								ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
-								ISearch.MIN, ISearch.MAX, 0, 0, final_prevPV,
-								false, 0, searcher.getEnv().getBitboard().getColourToMove(),
-								0, 0, false, 0, !go.isPonder());
-						
-						List<Integer> pv_buffer = new ArrayList<Integer>();
-						info.setPV(PVNode.convertPV(searcher.getPvman().load(0), pv_buffer));
-						if (info.getPV().length > 0) {
-							info.setBestMove(info.getPV()[0]);
+						try {
+							int eval = searcher.pv_search(final_mediator,
+									null, info,
+									ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
+									ISearch.MIN, ISearch.MAX, 0, 0, final_prevPV,
+									false, 0, searcher.getEnv().getBitboard().getColourToMove(),
+									0, 0, false, 0, !go.isPonder());
+							
+							List<Integer> pv_buffer = new ArrayList<Integer>();
+							info.setPV(PVNode.convertPV(searcher.getPvman().load(0), pv_buffer));
+							if (info.getPV().length > 0) {
+								info.setBestMove(info.getPV()[0]);
+							}
+							info.setEval(eval);
+							
+							final_mediator.changedMajor(info);
+							
+						} catch(SearchInterruptedException sie) {
+							//The time is over and the sendBestMove method will be called below
+							break;
 						}
-						info.setEval(eval);
-						
-						final_mediator.changedMajor(info);
 						
 						if (final_mediator.getStopper().isStopped()) {
 							break;
