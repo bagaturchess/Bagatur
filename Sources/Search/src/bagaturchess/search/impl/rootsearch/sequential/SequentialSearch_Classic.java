@@ -143,6 +143,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 			initialValue = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, getBitboardForSetup().getColourToMove());
 		}
 		
+		final int final_initialValue = initialValue;
 		
 		if (!dont_wrap_mediator) {
 			//Original mediator should be an instance of UCISearchMediatorImpl_Base
@@ -168,6 +169,9 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 					
 					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch before loop");
 					
+					int prevEval = final_initialValue;
+					int ASPIRATION_WINDOW = 10;
+					
 					for (int maxdepth = startIteration; maxdepth <= maxIterations; maxdepth++) {
 						
 						ISearchInfo info = SearchInfoFactory.getFactory().createSearchInfo();
@@ -176,12 +180,38 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 						info.setSelDepth(maxdepth);
 						
 						try {
-							int eval = searcher.pv_search(final_mediator,
+							
+							//Search with null window to prepare evaluation score and TPT entries
+							int eval = searcher.nullwin_search(final_mediator, info,
+									ISearch.PLY * maxdepth, ISearch.PLY * maxdepth,	0,
+									prevEval,
+									false, 0, 0, final_prevPV, searcher.getEnv().getBitboard().getColourToMove(), 0, 0, false, 0, !go.isPonder());
+							
+							//Search around evaluation score with aspiration window +- ASPIRATION_WINDOW
+							int window_min = eval - ASPIRATION_WINDOW;
+							int window_max = eval + ASPIRATION_WINDOW;
+							eval = searcher.pv_search(final_mediator,
 									null, info,
 									ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
-									ISearch.MIN, ISearch.MAX, 0, 0, final_prevPV,
+									window_min, window_max,
+									0, 0, final_prevPV,
 									false, 0, searcher.getEnv().getBitboard().getColourToMove(),
 									0, 0, false, 0, !go.isPonder());
+							
+							//If eval is outside the aspiration window, than search with MIN and MAX values
+							if (eval < window_min || eval > window_max) {
+								eval = searcher.pv_search(final_mediator,
+										null, info,
+										ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
+										ISearch.MIN, ISearch.MAX,
+										0, 0, final_prevPV,
+										false, 0, searcher.getEnv().getBitboard().getColourToMove(),
+										0, 0, false, 0, !go.isPonder());
+							}
+							
+							
+							prevEval = eval;
+							
 							
 							List<Integer> pv_buffer = new ArrayList<Integer>();
 							info.setPV(PVNode.convertPV(searcher.getPvman().load(0), pv_buffer));
