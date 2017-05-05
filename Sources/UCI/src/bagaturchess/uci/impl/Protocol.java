@@ -61,7 +61,7 @@ TO_GUI>bestmove g1f3 ponder d8f6
 	public static final String COMMAND_TO_ENGINE_GO_DEPTH_STR = "depth";
 	public static final String COMMAND_TO_ENGINE_GO_STARTDEPTH_STR = "startdepth";//Custom property: The initial depth to start the search with.
 	public static final String COMMAND_TO_ENGINE_GO_BETA_STR = "beta";//Custom property: The beta value to start the search with.
-	public static final String COMMAND_TO_ENGINE_GO_PV_STR = "pv";//Custom property: Should ne the last property! It is the principal variation to start the search with. Might not be moved as the first move on each depth but should be moved after the transposition table move the latest.
+	public static final String COMMAND_TO_ENGINE_GO_PV_STR = "pv";//Custom property: Should be the last property! It is the principal variation to start the search with. Might not be moved as the first move on each depth but should be moved after the transposition table move the latest.
 	
 	public static final String COMMAND_TO_ENGINE_PONDERHIT_STR = "ponderhit";
 	
