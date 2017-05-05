@@ -19,14 +19,14 @@ public interface FeatureWeights {
 	public static final double STANDARD_FIANCHETTO_O	=	21.89654443923605;
 	public static final double STANDARD_FIANCHETTO_E	=	0.0;
 
-	public static final double STANDARD_TRAP_BISHOP_O	=	0.0;
+	public static final double STANDARD_TRAP_BISHOP_O	=	-120;
 	public static final double STANDARD_TRAP_BISHOP_E	=	0.0;
 
 	public static final double STANDARD_BLOCKED_PAWN_O	=	-12.62812427552849;
 	public static final double STANDARD_BLOCKED_PAWN_E	=	0.0;
 
 	public static final double STANDARD_KINGS_OPPOSITION_O	=	0.0;
-	public static final double STANDARD_KINGS_OPPOSITION_E	=	0.0;
+	public static final double STANDARD_KINGS_OPPOSITION_E	=	50;
 
 	public static final double PAWNS_KING_GUARDS_O	=	2.2949734439359717;
 	public static final double PAWNS_KING_GUARDS_E	=	0.0;
@@ -50,7 +50,7 @@ public interface FeatureWeights {
 	public static final double PAWNS_PASSED_SUPPORTED_E	=	0.9053918195106929;
 
 	public static final double PAWNS_PASSED_O	=	2.788889364235212;
-	public static final double PAWNS_PASSED_E	=	0.047927063709156684;
+	public static final double PAWNS_PASSED_E	=	1;
 
 	public static final double PAWNS_KING_F_O	=	0.0;
 	public static final double PAWNS_KING_F_E	=	4.43081150417076;
@@ -59,7 +59,7 @@ public interface FeatureWeights {
 	public static final double PAWNS_KING_FF_E	=	2.4198151737510174;
 
 	public static final double PAWNS_KING_OP_F_O	=	0.0;
-	public static final double PAWNS_KING_OP_F_E	=	0.0;
+	public static final double PAWNS_KING_OP_F_E	=	2;
 
 	public static final double PASSED_UNSTOPPABLE_O	=	0.0;
 	public static final double PASSED_UNSTOPPABLE_E	=	550;
