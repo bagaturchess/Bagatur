@@ -436,7 +436,7 @@ public class Search_NegaScout_WithAlpha extends SearchImpl {
 			}
 			
             futility_eval = backtrackingInfo.static_eval + margin;
-            if (futility_eval < beta) {
+            if (futility_eval < alpha_org) {
                 futility_enabled = true;
             }
         }
@@ -690,7 +690,7 @@ public class Search_NegaScout_WithAlpha extends SearchImpl {
 		
 		
 		env.getTPT().lock();
-		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, backtrackingInfo.colour_to_move, best_eval, beta - 1, beta, best_move, (byte)0);
+		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, backtrackingInfo.colour_to_move, best_eval, alpha_org, beta, best_move, (byte)0);
 		env.getTPT().unlock();
 		
 		return best_eval;
