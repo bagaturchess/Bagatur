@@ -38,7 +38,6 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.evalcache.EvalCache1;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;

@@ -48,7 +48,6 @@ import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.sequential.mtd.Mediator_AlphaAndBestMoveWindow;
-import bagaturchess.search.impl.rootsearch.sequential.mtd.NullwinSearchTask;
 import bagaturchess.search.impl.rootsearch.sequential.mtd.SearchManager;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.utils.DEBUGSearch;
@@ -56,6 +55,10 @@ import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
 
 
+/**
+ * This implementation is 70 ELO scores weaker than SequentialSearch_MTD.
+ * That is why the distribution currently works with SequentialSearch_MTD.
+ */
 public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 	
 	
@@ -287,37 +290,5 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 	@Override
 	public void decreaseTPTDepths(int reduction) {
 		searcher.getEnv().getTPT().correctAllDepths(reduction);
-	}
-	
-	
-	private void testPV(ISearchInfo info, IBitBoard bitboardForTesting) {
-		
-		if (true) return;
-		
-		//if (!sharedData.getEngineConfiguration().verifyPVAfterSearch()) return;
-		/*
-		int root_colour = bitboardForTesting.getColourToMove();
-		
-		int sign = 1;
-		
-		int[] moves = info.getPV();
-		
-		for (int i=0; i<moves.length; i++) {
-			bitboardForTesting.makeMoveForward(moves[i]);
-			sign *= -1;
-		}
-		
-		int curEval = (int) (sign * evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, root_colour));
-		
-		if (curEval != info.getEval()) {
-			mediator.dump("SearchManager.testPV FAILED > curEval=" + curEval + ",	eval=" + info.getEval());
-		} else {
-			mediator.dump("SearchManager.testPV OK > curEval=" + curEval + ",	eval=" + info.getEval());
-		}
-		
-		for (int i=moves.length - 1; i >= 0; i--) {
-			bitboardForTesting.makeMoveBackward(moves[i]);
-		}
-		*/
 	}
 }
