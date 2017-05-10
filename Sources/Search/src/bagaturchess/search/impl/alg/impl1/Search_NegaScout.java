@@ -82,7 +82,7 @@ public class Search_NegaScout extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		return negasearch(mediator, info, maxdepth, depth, beta, true, useMateDistancePrunning, rootColour);
+		return negasearch(mediator, info, maxdepth, depth, alpha, beta, true, useMateDistancePrunning, rootColour);
 	}
 	
 	
@@ -93,12 +93,12 @@ public class Search_NegaScout extends SearchImpl {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		return negasearch(mediator, info, maxdepth, depth, beta, false, useMateDistancePrunning, rootColour);
+		return negasearch(mediator, info, maxdepth, depth, beta - 1, beta, false, useMateDistancePrunning, rootColour);
 	}
 	
 	
 	private int negasearch(ISearchMediator mediator, ISearchInfo info,
-			int maxdepth, int depth, int beta, boolean pv, boolean useMateDistancePrunning, int rootColour) {
+			int maxdepth, int depth, int alpha_org, int beta, boolean pv, boolean useMateDistancePrunning, int rootColour) {
 		
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
@@ -121,13 +121,13 @@ public class Search_NegaScout extends SearchImpl {
 		
 		//Check for max depth
 		if (depth >= MAX_DEPTH) {
-			return eval(depth, beta, pv);
+			return eval(depth, alpha_org, beta, pv);
 		}
 		
 		
 		//Stop search
 		if (mediator != null && mediator.getStopper() != null)
-			mediator.getStopper().stopIfNecessary(normDepth(maxdepth), backtrackingInfo.colour_to_move, beta - 1, beta);
+			mediator.getStopper().stopIfNecessary(normDepth(maxdepth), backtrackingInfo.colour_to_move, alpha_org, beta);
 		
 		
 		//Start search iteration
@@ -169,22 +169,28 @@ public class Search_NegaScout extends SearchImpl {
 		      
 		      // lower bound - the site to move is mate on the move after the next move
 		      int value = -getMateVal(depth+2); // does not work if the current position is mate
-		      if (value >= beta) {
-					node.bestmove = 0;
-					node.eval = value;
-					node.leaf = true;
-					node.nullmove = false;
-					return node.eval;
+		      if (value > alpha_org) {
+		    	  alpha_org = value;
+			      if (value >= beta) {
+						node.bestmove = 0;
+						node.eval = value;
+						node.leaf = true;
+						node.nullmove = false;
+						return node.eval;
+			      }
 		      }
 		      
 		      // upper bound - opponent mate in next move
 		      value = getMateVal(depth+1);
 		      if (value < beta) {
-					node.bestmove = 0;
-					node.eval = value;
-					node.leaf = true;
-					node.nullmove = false;
-					return node.eval;
+			        beta = value;
+			        if (value <= alpha_org) {
+						node.bestmove = 0;
+						node.eval = value;
+						node.leaf = true;
+						node.nullmove = false;
+						return node.eval;
+			        }
 		      }
 		}
 		
@@ -282,7 +288,7 @@ public class Search_NegaScout extends SearchImpl {
 							return node.eval;
 						}
 					}
-					if (tpt_upper <= beta - 1) {
+					if (tpt_upper <= alpha_org) {
 						if (!SearchUtils.isMateVal(tpt_upper)) {
 							node.bestmove = backtrackingInfo.hash_move;
 							node.eval = tpt_upper;
@@ -316,7 +322,7 @@ public class Search_NegaScout extends SearchImpl {
 		
 		//Quiescence search
 		if (rest + normDepth(extend_position) <= 0) {
-			node.eval = qsearch(mediator, info, depth, beta, pv);
+			node.eval = qsearch(mediator, info, depth, alpha_org, beta, pv);
 			
 			if (false && pv) {
 				if (node.eval >= beta && env.getTactics().silentButDeadly()) {
@@ -340,7 +346,7 @@ public class Search_NegaScout extends SearchImpl {
 			&& !pv
 			&& depth > 0
 			&& rest >= 1
-			&& !isMateVal(beta - 1)
+			&& !isMateVal(alpha_org)
 			&& !isMateVal(beta)
 			) {
 			
@@ -351,7 +357,7 @@ public class Search_NegaScout extends SearchImpl {
 			if (hasAtLeastOnePiece) {
 				
 				if (backtrackingInfo.static_eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
-					backtrackingInfo.static_eval = eval(depth, beta, pv);
+					backtrackingInfo.static_eval = eval(depth, alpha_org, beta, pv);
 				}
 				
 				if (backtrackingInfo.static_eval >= beta) {
@@ -365,7 +371,7 @@ public class Search_NegaScout extends SearchImpl {
 					node.leaf = true;
 					backtrackingInfo.null_move = true;
 					env.getBitboard().makeNullMoveForward();
-					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -(beta - 1), false, useMateDistancePrunning, rootColour);
+					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -beta, -(beta - 1), false, useMateDistancePrunning, rootColour);
 					
 					
 					//Get mate move of opponent
@@ -398,10 +404,10 @@ public class Search_NegaScout extends SearchImpl {
 		
 		//Static pruning conditions
         boolean futility_enabled = false;
-        int futility_eval = beta - 1;
+        int futility_eval = alpha_org;
         if (!pv
     		&& extend_position == 0 //e.g. not in check
-    		&& !isMateVal(beta - 1)
+    		&& !isMateVal(alpha_org)
 			&& !isMateVal(beta)
 			) {
         	
@@ -426,11 +432,11 @@ public class Search_NegaScout extends SearchImpl {
             }*/
             
 			if (backtrackingInfo.static_eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
-				backtrackingInfo.static_eval = eval(depth, beta, pv);
+				backtrackingInfo.static_eval = eval(depth, alpha_org, beta, pv);
 			}
 			
             futility_eval = backtrackingInfo.static_eval + margin;
-            if (futility_eval < beta) {
+            if (futility_eval < alpha_org) {
                 futility_enabled = true;
             }
         }
@@ -443,7 +449,7 @@ public class Search_NegaScout extends SearchImpl {
 			
 			if (reduction >= PLY) {
 				
-				negasearch(mediator, info, maxdepth - reduction, depth, beta, false, useMateDistancePrunning, rootColour);
+				negasearch(mediator, info, maxdepth - reduction, depth, alpha_org, beta, false, useMateDistancePrunning, rootColour);
 				
 				env.getTPT().lock();
 				{
@@ -488,6 +494,7 @@ public class Search_NegaScout extends SearchImpl {
 		
 		boolean statisticAdded = false;
 		
+		int alpha_cur = alpha_org;
 		int searchedCount = 0;
 		int legalMoves = 0;
 		int best_eval = MIN;
@@ -590,18 +597,22 @@ public class Search_NegaScout extends SearchImpl {
 				
 				int new_maxdepth = maxdepth + extend;
 				
-				int cur_eval = -negasearch(mediator, info, new_maxdepth - reduction, depth + 1, -(beta - 1), false, useMateDistancePrunning, rootColour);
-				if (reduction > 0 && cur_eval >= beta) {
-					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), false, useMateDistancePrunning, rootColour);
+				int cur_eval = -negasearch(mediator, info, new_maxdepth - reduction, depth + 1, -(alpha_cur + 1), -alpha_cur, false, useMateDistancePrunning, rootColour);
+				if (reduction > 0 && cur_eval >= alpha_cur) {
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(alpha_cur + 1), -alpha_cur, false, useMateDistancePrunning, rootColour);
 				}
 				
 				if (pv && cur_eval > best_eval) {
-					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(beta - 1), true, useMateDistancePrunning, rootColour);
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -beta, -alpha_cur, true, useMateDistancePrunning, rootColour);
 				}
 				
 				env.getBitboard().makeMoveBackward(cur_move);
 				
 				if (cur_eval > best_eval) {
+					
+					if (cur_eval > alpha_cur) {
+						alpha_cur = cur_eval;
+					}
 					
 					best_eval = cur_eval;
 					best_move = cur_move;
@@ -679,14 +690,14 @@ public class Search_NegaScout extends SearchImpl {
 		
 		
 		env.getTPT().lock();
-		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, backtrackingInfo.colour_to_move, best_eval, beta - 1, beta, best_move, (byte)0);
+		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, backtrackingInfo.colour_to_move, best_eval, alpha_org, beta, best_move, (byte)0);
 		env.getTPT().unlock();
 		
 		return best_eval;
 	}
 	
 	
-	private int qsearch(ISearchMediator mediator, ISearchInfo info, int depth, int beta, boolean pv) {
+	private int qsearch(ISearchMediator mediator, ISearchInfo info, int depth, int alpha_org, int beta, boolean pv) {
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);	
@@ -706,13 +717,13 @@ public class Search_NegaScout extends SearchImpl {
 		
 		
 		//Check for max depth
-		backtrackingInfo.static_eval = eval(depth, beta, pv);
+		backtrackingInfo.static_eval = eval(depth, alpha_org, beta, pv);
 		if (depth >= MAX_DEPTH) {
 			return backtrackingInfo.static_eval;
 		}
 		
 		if (mediator != null && mediator.getStopper() != null)
-			mediator.getStopper().stopIfNecessary(normDepth(0), backtrackingInfo.colour_to_move, beta - 1, beta);
+			mediator.getStopper().stopIfNecessary(normDepth(0), backtrackingInfo.colour_to_move, alpha_org, beta);
 		
 		//Start search iteration
 		PVNode node = pvman.load(depth);
@@ -789,7 +800,7 @@ public class Search_NegaScout extends SearchImpl {
 					return node.eval;
 				}
 			}
-			if (tpt_upper <= beta - 1) {
+			if (tpt_upper <= alpha_org) {
 				if (!SearchUtils.isMateVal(tpt_upper)) {
 					node.bestmove = tpt_move;
 					node.eval = tpt_upper;
@@ -826,6 +837,7 @@ public class Search_NegaScout extends SearchImpl {
 			((ListCapsProm)list).setTptMove(backtrackingInfo.hash_move);
 		}
 		
+		int alpha_cur = alpha_org;
 		int legalMoves = 0;
 		int best_eval = MIN;
 		int best_move = 0;
@@ -865,7 +877,7 @@ public class Search_NegaScout extends SearchImpl {
 		                int optimisticScore = getAlphaTrustWindow(mediator, 0) + backtrackingInfo.static_eval
 		                	+ env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
 		                
-		                if (optimisticScore <= beta - 1) { // Delta pruning
+		                if (optimisticScore <= alpha_cur) { // Delta pruning
 		                	continue;
 		                }
 					}
@@ -878,11 +890,16 @@ public class Search_NegaScout extends SearchImpl {
 			
 			legalMoves++;
 			
-			int cur_eval = -qsearch(mediator, info, depth + 1, -(beta - 1), pv);
+			int cur_eval = -qsearch(mediator, info, depth + 1, -beta, -alpha_cur, pv);
 			
 			env.getBitboard().makeMoveBackward(cur_move);
 			
 			if (cur_eval > best_eval) {
+				
+				if (cur_eval > alpha_cur) {
+					alpha_cur = cur_eval;
+				}
+				
 				best_eval = cur_eval;
 				best_move = cur_move;
 				
@@ -922,7 +939,7 @@ public class Search_NegaScout extends SearchImpl {
 		
 		if (best_move != 0) {
 			env.getTPT().lock();
-			env.getTPT().put(backtrackingInfo.hash_key, 0, 0, env.getBitboard().getColourToMove(), best_eval, beta - 1, beta, best_move, (byte)0);
+			env.getTPT().put(backtrackingInfo.hash_key, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
 			env.getTPT().unlock();
 		}
 		
@@ -930,11 +947,11 @@ public class Search_NegaScout extends SearchImpl {
 	}
 	
 	
-	private int eval(int depth, int beta, boolean pv) {
+	private int eval(int depth, int alpha, int beta, boolean pv) {
 		if (pv) {
-			return fullEval(depth, beta - 1, beta, -1);	
+			return fullEval(depth, alpha, beta, -1);	
 		} else {
-			return lazyEval(depth, beta - 1, beta, -1);	
+			return lazyEval(depth, alpha, beta, -1);	
 		}
 	}
 	
