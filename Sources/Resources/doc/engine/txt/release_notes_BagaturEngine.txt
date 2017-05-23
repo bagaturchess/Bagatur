@@ -1,4 +1,8 @@
 
+Version 1.5b (25 May 2017)
+  * Search optimizations: less aggressive late move reduction
+  * Search optimizations: switch ON check extension
+
 Version 1.5a (11 May 2017)
   * Endgames without pawns - adding material imbalance to mock-up evaluation
   * Evaluation function - tuning of all features
