@@ -10,10 +10,14 @@ The program runs under all Operating Systems, which support Java platform:
 
 # Revision History
 
+Version 1.5b (25 May 2017)
+  * Search optimizations: less aggressive late move reduction
+  * Search optimizations: switch ON check extension
+  
 Version 1.5a (11 May 2017)
   * Endgames without pawns - adding material imbalance to mock-up evaluation
   * Evaluation function - tuning of all features
-
+  
 Version 1.5 (3 May 2017)
   * 35+ ELO stronger (measured versus 1.4e)
   * Search optimizations: adjusted best move window
