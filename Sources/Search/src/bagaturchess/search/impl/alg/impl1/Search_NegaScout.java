@@ -127,7 +127,7 @@ public class Search_NegaScout extends SearchImpl {
 		
 		//Stop search
 		if (mediator != null && mediator.getStopper() != null)
-			mediator.getStopper().stopIfNecessary(normDepth(maxdepth), backtrackingInfo.colour_to_move, alpha_org, beta);
+			mediator.getStopper().stopIfNecessary(info.getDepth(), backtrackingInfo.colour_to_move, alpha_org, beta);
 		
 		
 		//Start search iteration
@@ -307,7 +307,7 @@ public class Search_NegaScout extends SearchImpl {
 		int extend_position = 0;
 		
 		//Check extension
-		//extend_position = inCheck ? PLY : 0;
+		extend_position = inCheck ? PLY : 0;
 		
 		
 		//Recapture extension
@@ -531,18 +531,24 @@ public class Search_NegaScout extends SearchImpl {
 				
 				
 				boolean isCapOrProm = MoveInt.isCaptureOrPromotion(cur_move);
+				boolean isPasserPush = env.getBitboard().isPasserPush(cur_move);
 				
 				int moveSee = -1;
 				if (isCapOrProm) {
 					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 				}
 				
+				boolean isGoodMove = false;
+				if (list instanceof ListAll) {
+					isGoodMove = ((ListAll) list).isGoodMove(cur_move);
+				}
 				
 				//Static pruning
 				if (futility_enabled
 						&& !inCheck
 						&& moveSee < 0
 						&& searchedCount > 0
+						&& !isGoodMove
 						&& !env.getBitboard().isCheckMove(cur_move)
 					) {
 					
@@ -570,19 +576,26 @@ public class Search_NegaScout extends SearchImpl {
 				env.getBitboard().makeMoveForward(cur_move);
 				
 				boolean isCheckMove = env.getBitboard().isInCheck();
+				
 				boolean reductionAllowed = !inCheck
+											&& !isCheckMove
 											&& moveSee < 0
 											&& searchedCount > 0
-											&& !isCheckMove;
+											&& !isGoodMove
+											&& !isPasserPush;
 				
 				int extend = extend_position;// + (moveSee > 0 ? PLY / 4 : 0);
 				
 				//LMR
                 int reduction = 0;
                 if (reductionAllowed) {
-                	//reduction = 2 * PLY;
-					double rate = Math.sqrt(searchedCount);
-					reduction = (int) (LMR_REDUCTION_MULTIPLIER * PLY * rate);
+                	
+                	reduction = PLY;
+					
+					if (!isCapOrProm && searchedCount >= 4) {
+						reduction += PLY;
+					}
+					
 					if (reduction < PLY) {
 						reduction = PLY;
 					}
@@ -721,9 +734,6 @@ public class Search_NegaScout extends SearchImpl {
 		if (depth >= MAX_DEPTH) {
 			return backtrackingInfo.static_eval;
 		}
-		
-		if (mediator != null && mediator.getStopper() != null)
-			mediator.getStopper().stopIfNecessary(normDepth(0), backtrackingInfo.colour_to_move, alpha_org, beta);
 		
 		//Start search iteration
 		PVNode node = pvman.load(depth);
