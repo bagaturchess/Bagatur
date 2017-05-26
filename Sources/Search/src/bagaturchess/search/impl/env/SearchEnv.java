@@ -76,7 +76,7 @@ public class SearchEnv {
 		bitboard = _bitboard;
 		tactics = new Tactics(bitboard);
 		
-		//history = new HistoryTable(new BinarySemaphore_Dummy());
+		//history = new HistoryTable_FromTo(new BinarySemaphore_Dummy());
 		history = new HistoryTable_PieceTo();
 		
 		moveListFactory = new SearchMoveListFactory();
