@@ -562,7 +562,7 @@ public class Search_NegaScout extends SearchImpl {
 						node.bestmove = best_move;
 						node.eval = best_eval;
 						
-						info.setSearchedNodes(info.getSearchedNodes() + 1);	
+						//info.setSearchedNodes(info.getSearchedNodes() + 1);	
 					}
 					
 					continue;
