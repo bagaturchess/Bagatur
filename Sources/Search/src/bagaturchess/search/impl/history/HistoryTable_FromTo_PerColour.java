@@ -27,7 +27,7 @@ import bagaturchess.bitboard.api.IBinarySemaphore;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 
 
-public class HistoryTable_PerColour {
+public class HistoryTable_FromTo_PerColour {
 	
 	
 	private static final short MAX_SCORES = 1024;
@@ -49,7 +49,7 @@ public class HistoryTable_PerColour {
 	private double maxRate;
 	
 	
-	public HistoryTable_PerColour(IBinarySemaphore _semaphore) {
+	public HistoryTable_FromTo_PerColour(IBinarySemaphore _semaphore) {
 		init();
 		
 		semaphore = _semaphore;

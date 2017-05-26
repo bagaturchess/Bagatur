@@ -23,7 +23,7 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 
 
-public class HistoryTable1 implements IHistoryTable {
+public class HistoryTable_PieceTo implements IHistoryTable {
 	
 	
 	private int[][] success;
@@ -34,7 +34,7 @@ public class HistoryTable1 implements IHistoryTable {
 	private int[][] counters3;
 	
 	
-	public HistoryTable1() {
+	public HistoryTable_PieceTo() {
 		success 	= new int[Constants.PID_MAX][64];
 		failures 	= new int[Constants.PID_MAX][64];
 		
