@@ -30,6 +30,8 @@ import bagaturchess.bitboard.impl.movegen.MoveInt;
 public class HistoryTable_PerColour {
 	
 	
+	private static final short MAX_SCORES = 1024;
+	
 	private static final boolean DEBUG = false;
 	
 	
@@ -102,7 +104,7 @@ public class HistoryTable_PerColour {
 		lock();
 		counts[fromFieldID][toFieldID]++;
 		
-		if (counts[fromFieldID][toFieldID] >= IHistoryTable.MAX_SCORES) {
+		if (counts[fromFieldID][toFieldID] >= MAX_SCORES) {
 			normalize();
 		}
 		
@@ -159,7 +161,7 @@ public class HistoryTable_PerColour {
 			maxRate = curRate;
 		}
 		
-		if (newVal >= IHistoryTable.MAX_SCORES) {
+		if (newVal >= MAX_SCORES) {
 			normalize();
 		}
 		
@@ -183,14 +185,14 @@ public class HistoryTable_PerColour {
 			unlock();
 			return 0;
 		}
-		int rate = (score * (IHistoryTable.MAX_SCORES - 1)) / count;
+		int rate = (score * (MAX_SCORES - 1)) / count;
 		
 		if (rate > getMaxRate()) {
 			throw new IllegalStateException("rate=" + rate + ", getMaxRate()=" + getMaxRate());
 		}
 		unlock();
 		
-		if (rate > IHistoryTable.MAX_SCORES) {
+		if (rate > MAX_SCORES) {
 			throw new IllegalStateException();
 		}
 		
@@ -273,7 +275,7 @@ public class HistoryTable_PerColour {
 	}
 
 	public int getMaxRate() {
-		int result = (int) (maxRate * IHistoryTable.MAX_SCORES);
+		int result = (int) (maxRate * MAX_SCORES);
 		if (result <= 0) {
 			return 1;
 		}

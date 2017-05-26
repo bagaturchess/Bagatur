@@ -62,9 +62,6 @@ public class ListAll implements ISearchMoveList {
 	private static final int ORD_VAL_LOSE_CAP        =  -2000;*/
 	
 	
-	private static final int ORD_VAL_SHIFT           =  1;//HistoryTable.MAX_SCORES + 200;
-	
-	
 	/* results after EPD with 300
 	TPT        :	3401018	3399999	0.9997003838262544
 	WINCAP     :	12984646	7094787	0.5463981844402998
@@ -387,12 +384,12 @@ public class ListAll implements ISearchMoveList {
 		long ordval = 0;
 		
 		if (move == tptMove) {
-			ordval += ORD_VAL_SHIFT * ORD_VAL_TPT_MOVE * orderingStatistics.getOrdVal_TPT();
+			ordval += ORD_VAL_TPT_MOVE * orderingStatistics.getOrdVal_TPT();
 			orderingStatistics.tpt_count++;
 		}
 		
 		if (move == prevPvMove) {
-			ordval += ORD_VAL_SHIFT * ORD_VAL_PREVPV_MOVE * orderingStatistics.getOrdVal_PREVPV();
+			ordval += ORD_VAL_PREVPV_MOVE * orderingStatistics.getOrdVal_PREVPV();
 			orderingStatistics.prevpv_count++;
 		}
 		
@@ -401,7 +398,7 @@ public class ListAll implements ISearchMoveList {
 		}
 		
 		if (move == prevBestMove) {
-			ordval += ORD_VAL_SHIFT * ORD_VAL_PREV_BEST_MOVE * orderingStatistics.getOrdVal_PREVBEST();
+			ordval += ORD_VAL_PREV_BEST_MOVE * orderingStatistics.getOrdVal_PREVBEST();
 			orderingStatistics.prevbest_count++;
 		}
 		
@@ -410,7 +407,7 @@ public class ListAll implements ISearchMoveList {
 		}
 		
 		if (move == mateMove) {
-			ordval += ORD_VAL_SHIFT * ORD_VAL_MATE_MOVE * orderingStatistics.getOrdVal_MATEMOVE();
+			ordval += ORD_VAL_MATE_MOVE * orderingStatistics.getOrdVal_MATEMOVE();
 			orderingStatistics.matemove_count++;
 		}
 		
@@ -435,12 +432,12 @@ public class ListAll implements ISearchMoveList {
 		*/
 		
 		if (env.getBitboard().isPasserPush(move)) {
-			ordval += ORD_VAL_SHIFT * ORD_VAL_PASSER_PUSH * orderingStatistics.getOrdVal_PASSER();
+			ordval += ORD_VAL_PASSER_PUSH * orderingStatistics.getOrdVal_PASSER();
 			orderingStatistics.passer_count++;
 		}
 		
 		if (MoveInt.isCastling(move)) {
-			ordval += ORD_VAL_SHIFT * ORD_VAL_CASTLING * orderingStatistics.getOrdVal_CASTLING();
+			ordval += ORD_VAL_CASTLING * orderingStatistics.getOrdVal_CASTLING();
 			orderingStatistics.castling_count++;
 		}
 		
@@ -462,36 +459,35 @@ public class ListAll implements ISearchMoveList {
 			int see = env.getBitboard().getSee().evalExchange(move);
 			
 			if (see > 0) {
-				ordval += ORD_VAL_SHIFT * ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
+				ordval += ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
 				orderingStatistics.wincap_count++;
 			} else if (see == 0) {
-				ordval += ORD_VAL_SHIFT * ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();// + 50;
+				ordval += ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();// + 50;
 				orderingStatistics.eqcap_count++;
 			} else {
-				ordval += ORD_VAL_SHIFT * ORD_VAL_LOSE_CAP + see;
+				ordval += ORD_VAL_LOSE_CAP + see;
 				orderingStatistics.losecap_count++;
 			}
 		}
 		
 		if (env.getHistory().getCounterMove1(env.getBitboard().getLastMove()) == move) {
-			ordval += ORD_VAL_SHIFT * ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
+			ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
 			orderingStatistics.counter_count++;
 		} else {
 			if (env.getHistory().getCounterMove2(env.getBitboard().getLastMove()) == move) {
-				ordval += ORD_VAL_SHIFT * ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
+				ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
 				orderingStatistics.counter_count++;
 			} else {
 				if (env.getHistory().getCounterMove3(env.getBitboard().getLastMove()) == move) {
-					ordval += ORD_VAL_SHIFT * ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
+					ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
 					orderingStatistics.counter_count++;
 				}
 			}
 		}
 		
-		ordval += ORD_VAL_SHIFT * env.getHistory().getScores(move)
-					* orderingStatistics.getOrdVal_HISTORY();
+		ordval += env.getHistory().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
 		
-		ordval += ORD_VAL_SHIFT * env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
+		ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
 		
 		return ordval;
 	}
