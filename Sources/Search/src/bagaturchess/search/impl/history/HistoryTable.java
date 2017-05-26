@@ -29,11 +29,9 @@ import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 
 
-public class HistoryTable {
+public class HistoryTable implements IHistoryTable {
 	
 	static final short MIN_VALUE = 0;
-	
-	public static final short MAX_SCORES = 1024;
 	
 	
 	private boolean ONE_TABLE = true;
@@ -76,12 +74,12 @@ public class HistoryTable {
 		}
 	}
 	
-	public void counterMove(int oldmove, int move) {
+	public void addCounterMove(int oldmove, int move) {
 		getHistoryTable_PerColour(MoveInt.getColour(move)).counterMove(oldmove, move);
 	}
 	
 	
-	public int getCounterMove(int oldmove) {
+	public int getCounterMove1(int oldmove) {
 		if (oldmove == 0) {
 			return 0;
 		}
@@ -102,7 +100,7 @@ public class HistoryTable {
 		return getHistoryTable_PerColour(MoveInt.getOpponentColour(oldmove)).getCounterMove3(oldmove);
 	}
 	
-	public void countMove(int move) {
+	public void countFailure(int move) {
 		getHistoryTable_PerColour(MoveInt.getColour(move)).countMove(move);
 	}
 	
@@ -110,21 +108,21 @@ public class HistoryTable {
 		return getHistoryTable_PerColour(MoveInt.getColour(move)).isGoodMove(move);
 	}
 	
-	public double getGoodMoveScores(int move) {
+	public double getScores(int move) {
 		return getHistoryTable_PerColour(MoveInt.getColour(move)).getGoodMoveScores(move);
 	}
 	
 	public void goodMove(int move) {
-		goodMove(move, 1, false);
+		countSuccess(move, 1);
 	}
 	
-	public void goodMove(int move, int point, boolean isMate) {
-		getHistoryTable_PerColour(MoveInt.getColour(move)).goodMove(move, point, isMate);
+	public void countSuccess(int move, int point) {
+		getHistoryTable_PerColour(MoveInt.getColour(move)).goodMove(move, point);
 	}
 	
-	public int getScores(int move) {
+	/*public int getScores(int move) {
 		return getHistoryTable_PerColour(MoveInt.getColour(move)).getScores(move);
-	}
+	}*/
 	
 	public void clear() {
 		init();

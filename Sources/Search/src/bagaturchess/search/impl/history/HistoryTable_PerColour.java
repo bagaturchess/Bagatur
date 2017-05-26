@@ -35,7 +35,7 @@ public class HistoryTable_PerColour {
 	
 	private IBinarySemaphore semaphore;
 	
-	private int level; //Debug info
+	//private int level; //Debug info
 	
 	private short scores[][];
 	private short counts[][];
@@ -102,7 +102,7 @@ public class HistoryTable_PerColour {
 		lock();
 		counts[fromFieldID][toFieldID]++;
 		
-		if (counts[fromFieldID][toFieldID] >= HistoryTable.MAX_SCORES) {
+		if (counts[fromFieldID][toFieldID] >= IHistoryTable.MAX_SCORES) {
 			normalize();
 		}
 		
@@ -135,10 +135,10 @@ public class HistoryTable_PerColour {
 	}
 	
 	public void goodMove(int move) {
-		goodMove(move, 1, false);
+		goodMove(move, 1);
 	}
 	
-	public void goodMove(int move, int point, boolean isMate) {
+	public void goodMove(int move, int point) {
 		
 		final int fromFieldID = MoveInt.getFromFieldID(move);
 		final int toFieldID = MoveInt.getToFieldID(move);
@@ -159,7 +159,7 @@ public class HistoryTable_PerColour {
 			maxRate = curRate;
 		}
 		
-		if (newVal >= HistoryTable.MAX_SCORES) {
+		if (newVal >= IHistoryTable.MAX_SCORES) {
 			normalize();
 		}
 		
@@ -170,7 +170,7 @@ public class HistoryTable_PerColour {
 	}
 	
 	
-	public int getScores(int move) {
+	private int getScores(int move) {
 		
 		final int fromFieldID = MoveInt.getFromFieldID(move);
 		final int toFieldID = MoveInt.getToFieldID(move);
@@ -183,14 +183,14 @@ public class HistoryTable_PerColour {
 			unlock();
 			return 0;
 		}
-		int rate = (score * (HistoryTable.MAX_SCORES - 1)) / count;
+		int rate = (score * (IHistoryTable.MAX_SCORES - 1)) / count;
 		
 		if (rate > getMaxRate()) {
 			throw new IllegalStateException("rate=" + rate + ", getMaxRate()=" + getMaxRate());
 		}
 		unlock();
 		
-		if (rate > HistoryTable.MAX_SCORES) {
+		if (rate > IHistoryTable.MAX_SCORES) {
 			throw new IllegalStateException();
 		}
 		
@@ -226,7 +226,7 @@ public class HistoryTable_PerColour {
 		//System.out.println("Normalize level " + level);
 		
 		if (DEBUG) {
-			System.out.println("Normalize level " + level);
+			System.out.println("Normalize History Table");
 		}
 		
 		//lock();
@@ -273,7 +273,7 @@ public class HistoryTable_PerColour {
 	}
 
 	public int getMaxRate() {
-		int result = (int) (maxRate * HistoryTable.MAX_SCORES);
+		int result = (int) (maxRate * IHistoryTable.MAX_SCORES);
 		if (result <= 0) {
 			return 1;
 		}

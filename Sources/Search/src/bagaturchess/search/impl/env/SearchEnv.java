@@ -39,6 +39,7 @@ import bagaturchess.search.impl.alg.iter.SearchMoveListFactory;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.exts.Extensions;
 import bagaturchess.search.impl.history.HistoryTable;
+import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.pv.PVHistory;
 import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.search.impl.utils.Tactics;
@@ -63,8 +64,7 @@ public class SearchEnv {
 	private boolean gtb_probing_get;
 
 	
-	private HistoryTable history_check;
-	private HistoryTable history_all;
+	private IHistoryTable history;
 	
 	private ISearchMoveListFactory moveListFactory;
 	private PVHistory pvs_history;
@@ -75,8 +75,7 @@ public class SearchEnv {
 		bitboard = _bitboard;
 		tactics = new Tactics(bitboard);
 		
-		history_check = new HistoryTable(new BinarySemaphore_Dummy());
-		history_all = new HistoryTable(new BinarySemaphore_Dummy());
+		history = new HistoryTable(new BinarySemaphore_Dummy());
 		
 		moveListFactory = new SearchMoveListFactory();
 		
@@ -93,12 +92,8 @@ public class SearchEnv {
 		return shared.getOpeningBook();
 	}
 
-	public HistoryTable getHistory_check() {
-		return history_check;
-	}
-
-	public HistoryTable getHistory_all() {
-		return history_all;
+	public IHistoryTable getHistory() {
+		return history;
 	}
 
 	public PawnsEvalCache getPawnsCache() {

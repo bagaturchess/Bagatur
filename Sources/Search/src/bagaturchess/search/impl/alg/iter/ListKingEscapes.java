@@ -27,9 +27,8 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.history.HistoryTable;
+import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.utils.Sorting;
-
 
 
 public class ListKingEscapes implements ISearchMoveList {
@@ -41,7 +40,7 @@ public class ListKingEscapes implements ISearchMoveList {
 	private int ORD_VAL_PREV_BEST_MOVE;
 	private int ORD_VAL_LOSE_CAP;
 	
-	private static final int ORD_VAL_SHIFT           =  HistoryTable.MAX_SCORES + 200;
+	private static final int ORD_VAL_SHIFT           =  IHistoryTable.MAX_SCORES + 200;
 	
 	private long[] escapes; 
 	private int escapes_size; 
@@ -117,8 +116,6 @@ public class ListKingEscapes implements ISearchMoveList {
 	
 	public void reserved_add(int move) {
 		
-		env.getHistory_check().countMove(move);
-		
 		int ordval = 0;
 		
 		if (move == tptMove) {
@@ -145,12 +142,11 @@ public class ListKingEscapes implements ISearchMoveList {
 			}
 		}
 		
-		if (env.getHistory_all().getCounterMove(env.getBitboard().getLastMove()) == move) {
+		if (env.getHistory().getCounterMove1(env.getBitboard().getLastMove()) == move) {
 			ordval += ORD_VAL_SHIFT * ORD_VAL_COUNTER;
 		}
 		
-		ordval += (env.getHistory_check().getScores(move)) / 2;
-		ordval += (env.getHistory_all().getScores(move) / 4);
+		ordval += env.getHistory().getScores(move) * 100;
 		
 		
 		long move_ord = MoveInt.addOrderingValue(move, ordval);

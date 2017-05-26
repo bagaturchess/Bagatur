@@ -602,6 +602,8 @@ public class Search_NegaScout extends SearchImpl {
 					if (reduction >= (rest - 1) * PLY) {
 						reduction = (rest - 1) * PLY;
 					}
+					
+					//reduction *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
                 }
 
                 
@@ -620,6 +622,14 @@ public class Search_NegaScout extends SearchImpl {
 				}
 				
 				env.getBitboard().makeMoveBackward(cur_move);
+				
+				//Add history record for the current move
+				if (cur_eval <= alpha_org) {
+					env.getHistory().countFailure(cur_move);	
+				} else {
+					env.getHistory().countSuccess(cur_move, rest * rest);
+					env.getHistory().addCounterMove(env.getBitboard().getLastMove(), cur_move);
+				}
 				
 				if (cur_eval > best_eval) {
 					
@@ -649,14 +659,7 @@ public class Search_NegaScout extends SearchImpl {
 						list.updateStatistics(best_move);
 						
 						statisticAdded = true;
-						
-						if (inCheck) {
-							env.getHistory_check().goodMove(cur_move, rest * rest, best_eval > 0 && isMateVal(best_eval));
-						} else {
-							env.getHistory_all().goodMove(cur_move, rest * rest, best_eval > 0 && isMateVal(best_eval));
-							env.getHistory_all().counterMove(env.getBitboard().getLastMove(), cur_move);
-						}
-						
+												
 						break;
 					}
 				}
@@ -922,11 +925,6 @@ public class Search_NegaScout extends SearchImpl {
 					node.leaf = false;
 					if (depth + 1 < MAX_DEPTH) {
 						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
-					}
-					
-					if (inCheck) {
-						env.getHistory_check().goodMove(cur_move, 1, best_eval > 0 && isMateVal(best_eval));
-					} else {
 					}
 					
 					break;

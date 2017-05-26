@@ -27,7 +27,7 @@ import bagaturchess.bitboard.impl.eval.BaseEvalWeights;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.history.HistoryTable;
+import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.utils.Sorting;
 
 
@@ -39,7 +39,7 @@ public class ListCapsProm_MVL implements ISearchMoveList {
 	private int ORD_VAL_EQ_CAP;
 	private int ORD_VAL_LOSE_CAP;
 	
-	private static final int ORD_VAL_SHIFT           =  HistoryTable.MAX_SCORES + 200;
+	private static final int ORD_VAL_SHIFT           =  IHistoryTable.MAX_SCORES + 200;
 	
 	private long[] caps; 
 	private int caps_size; 
@@ -153,7 +153,7 @@ public class ListCapsProm_MVL implements ISearchMoveList {
 				}
 			}
 			
-			ordval += env.getHistory_all().getScores(move);
+			ordval += env.getHistory().getScores(move) * 100;
 			
 			long move_ord = (ordval << 32) | move;
 			

@@ -1087,7 +1087,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
 							double rate = Math.sqrt(searchedCount);
-							rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
+							rate *= (1 - env.getHistory().getScores(cur_move));
 							if (isGoodMove) {
 								rate /= 2;
 							}
@@ -1159,6 +1159,13 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				env.getBitboard().makeMoveBackward(cur_move);
 				
+				//Add history record for the current move
+				if (cur_eval <= alpha_org) {
+					env.getHistory().countFailure(cur_move);	
+				} else {
+					env.getHistory().countSuccess(cur_move, rest * rest);
+					env.getHistory().addCounterMove(env.getBitboard().getLastMove(), cur_move);
+				}
 				
 				if (cur_eval > best_eval) {
 					
@@ -1212,14 +1219,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						list.updateStatistics(best_move);
 						
 						statisticAdded = true;
-						
-						if (inCheck) {
-							env.getHistory_check().goodMove(cur_move, rest * rest, best_eval > 0 && isMateVal(best_eval));
-						} else {
-							env.getHistory_all().goodMove(cur_move, rest * rest, best_eval > 0 && isMateVal(best_eval));
-							env.getHistory_all().counterMove(env.getBitboard().getLastMove(), cur_move);
-						}
-						
+												
 						break;
 					}
 					
@@ -1895,7 +1895,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
 								double rate = Math.sqrt(searchedCount);
-								rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
+								rate *= (1 - env.getHistory().getScores(cur_move));
 								if (isGoodMove) {
 									rate /= 2;
 								}
@@ -1961,6 +1961,14 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						
 				env.getBitboard().makeMoveBackward(cur_move);
 				
+				//Add history record for the current move
+				if (cur_eval <= alpha_org) {
+					env.getHistory().countFailure(cur_move);	
+				} else {
+					env.getHistory().countSuccess(cur_move, rest * rest);
+					env.getHistory().addCounterMove(env.getBitboard().getLastMove(), cur_move);
+				}
+				
 				if (cur_eval > best_eval) {
 					
 					best_eval = cur_eval;
@@ -1974,13 +1982,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						list.updateStatistics(best_move);
 						
 						statisticAdded = true;
-						
-						if (inCheck) {
-							env.getHistory_check().goodMove(cur_move, rest * rest, best_eval > 0 && isMateVal(best_eval));
-						} else {
-							env.getHistory_all().goodMove(cur_move, rest * rest, best_eval > 0 && isMateVal(best_eval));
-							env.getHistory_all().counterMove(env.getBitboard().getLastMove(), cur_move);
-						}
 						
 						break;
 					}
