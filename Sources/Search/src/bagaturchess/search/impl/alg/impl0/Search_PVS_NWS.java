@@ -1161,9 +1161,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				//Add history record for the current move
 				if (cur_eval <= alpha_org) {
-					env.getHistory().countFailure(cur_move);	
+					env.getHistory().countFailure(cur_move, rest);	
 				} else {
-					env.getHistory().countSuccess(cur_move, rest * rest);
+					env.getHistory().countSuccess(cur_move, rest);
 					env.getHistory().addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
 				
@@ -1963,9 +1963,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				//Add history record for the current move
 				if (cur_eval <= alpha_org) {
-					env.getHistory().countFailure(cur_move);	
+					env.getHistory().countFailure(cur_move, rest);	
 				} else {
-					env.getHistory().countSuccess(cur_move, rest * rest);
+					env.getHistory().countSuccess(cur_move, rest);
 					env.getHistory().addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
 				

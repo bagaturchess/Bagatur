@@ -39,6 +39,7 @@ import bagaturchess.search.impl.alg.iter.SearchMoveListFactory;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.exts.Extensions;
 import bagaturchess.search.impl.history.HistoryTable;
+import bagaturchess.search.impl.history.HistoryTable1;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.pv.PVHistory;
 import bagaturchess.search.impl.tpt.TPTable;
@@ -75,7 +76,8 @@ public class SearchEnv {
 		bitboard = _bitboard;
 		tactics = new Tactics(bitboard);
 		
-		history = new HistoryTable(new BinarySemaphore_Dummy());
+		//history = new HistoryTable(new BinarySemaphore_Dummy());
+		history = new HistoryTable1();
 		
 		moveListFactory = new SearchMoveListFactory();
 		

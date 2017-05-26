@@ -19,14 +19,46 @@
  */
 package bagaturchess.search.impl.history;
 
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 
 
 public class HistoryTable1 implements IHistoryTable {
 	
 	
+	private int[][] success;
+	private int[][] failures;
+	
+	private int[][] counters1;
+	private int[][] counters2;
+	private int[][] counters3;
+	
+	
 	public HistoryTable1() {
+		success 	= new int[Constants.PID_MAX][64];
+		failures 	= new int[Constants.PID_MAX][64];
 		
+		counters1 	= new int[Constants.PID_MAX][64];
+		counters2 	= new int[Constants.PID_MAX][64];
+		counters3 	= new int[Constants.PID_MAX][64];
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.history.IHistoryTable#newSearch()
+	 */
+	@Override
+	public void newSearch() {
+		for (int i = 0; i < success.length; i++) {
+			for (int j = 0; j < success[i].length; j++) {
+				success[i][j] /= 2;
+			}
+		}
+		for (int i = 0; i < failures.length; i++) {
+			for (int j = 0; j < failures[i].length; j++) {
+				failures[i][j] /= 2;
+			}
+		}
 	}
 	
 	
@@ -34,61 +66,98 @@ public class HistoryTable1 implements IHistoryTable {
 	 * @see bagaturchess.search.impl.history.IHistoryTable#countFailure(int)
 	 */
 	@Override
-	public void countFailure(int move) {
+	public void countFailure(int move, int depth) {
+		
 		int pid = MoveInt.getFigurePID(move);
+		int to = MoveInt.getToFieldID(move);
+		
+		failures[pid][to] += depth * depth;
 	}
-
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.search.impl.history.IHistoryTable#countSuccess(int, int)
 	 */
 	@Override
-	public void countSuccess(int move, int value) {
-		// TODO Auto-generated method stub
-
+	public void countSuccess(int move, int depth) {
+		
+		int pid = MoveInt.getFigurePID(move);
+		int to = MoveInt.getToFieldID(move);
+		
+		success[pid][to] += depth * depth;
 	}
-
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.search.impl.history.IHistoryTable#getScores(int)
 	 */
 	@Override
 	public double getScores(int move) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		int pid = MoveInt.getFigurePID(move);
+		int to = MoveInt.getToFieldID(move);
+		
+		int success_scores 	= success[pid][to];
+		int failures_scores = failures[pid][to];
+		
+		if (success_scores + failures_scores > 0) {
+			return success_scores / (double)(success_scores + failures_scores);
+		} else {
+			return 0;
+		}
 	}
-
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.search.impl.history.IHistoryTable#addCounterMove(int, int)
 	 */
 	@Override
 	public void addCounterMove(int last_move, int counter_move) {
-		// TODO Auto-generated method stub
-
+		
+		int pid = MoveInt.getFigurePID(last_move);
+		int to = MoveInt.getToFieldID(last_move);
+		
+		counters3[pid][to] = counters2[pid][to];
+		counters2[pid][to] = counters1[pid][to];
+		counters1[pid][to] = counter_move;
 	}
-
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.search.impl.history.IHistoryTable#getCounterMove1(int)
 	 */
 	@Override
 	public int getCounterMove1(int last_move) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		int pid = MoveInt.getFigurePID(last_move);
+		int to = MoveInt.getToFieldID(last_move);
+		
+		return counters1[pid][to];
 	}
-
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.search.impl.history.IHistoryTable#getCounterMove2(int)
 	 */
 	@Override
 	public int getCounterMove2(int last_move) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		int pid = MoveInt.getFigurePID(last_move);
+		int to = MoveInt.getToFieldID(last_move);
+		
+		return counters2[pid][to];
 	}
-
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.search.impl.history.IHistoryTable#getCounterMove3(int)
 	 */
 	@Override
 	public int getCounterMove3(int last_move) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		int pid = MoveInt.getFigurePID(last_move);
+		int to = MoveInt.getToFieldID(last_move);
+		
+		return counters3[pid][to];
 	}
 }

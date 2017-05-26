@@ -27,7 +27,6 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.utils.Sorting;
 
 
@@ -37,8 +36,6 @@ public class ListCapsProm_See implements ISearchMoveList {
 	private int ORD_VAL_WIN_CAP;
 	private int ORD_VAL_EQ_CAP;
 	private int ORD_VAL_LOSE_CAP;
-	
-	private static final int ORD_VAL_SHIFT           =  IHistoryTable.MAX_SCORES + 200;
 	
 	private long[] caps; 
 	private int caps_size; 
@@ -122,7 +119,7 @@ public class ListCapsProm_See implements ISearchMoveList {
 				if (tptPlied) {
 					return;
 				}
-				ordval += ORD_VAL_SHIFT * ORD_VAL_TPT_MOVE;
+				ordval += ORD_VAL_TPT_MOVE;
 			}
 			
 			if (MoveInt.isCaptureOrPromotion(move)) {
@@ -130,15 +127,15 @@ public class ListCapsProm_See implements ISearchMoveList {
 				int see = env.getBitboard().getSee().evalExchange(move);
 				
 				if (see > 0) {
-					ordval += ORD_VAL_SHIFT * ORD_VAL_WIN_CAP + see;
+					ordval += ORD_VAL_WIN_CAP + see;
 				} else if (see == 0) {
-					ordval += ORD_VAL_SHIFT * ORD_VAL_EQ_CAP;
+					ordval += ORD_VAL_EQ_CAP;
 				} else {
-					ordval += ORD_VAL_SHIFT * ORD_VAL_LOSE_CAP + see;
+					ordval += ORD_VAL_LOSE_CAP + see;
 				}
 			}
 			
-			ordval += env.getHistory().getScores(move) * 100;
+			ordval += 100 * env.getHistory().getScores(move);
 			
 			long move_ord = (ordval << 32) | move;
 			

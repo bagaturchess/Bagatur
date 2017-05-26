@@ -624,10 +624,10 @@ public class Search_NegaScout extends SearchImpl {
 				env.getBitboard().makeMoveBackward(cur_move);
 				
 				//Add history record for the current move
-				if (cur_eval <= alpha_org) {
-					env.getHistory().countFailure(cur_move);	
+				if (cur_eval <= alpha_cur) {
+					env.getHistory().countFailure(cur_move, rest);	
 				} else {
-					env.getHistory().countSuccess(cur_move, rest * rest);
+					env.getHistory().countSuccess(cur_move, rest);
 					env.getHistory().addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
 				

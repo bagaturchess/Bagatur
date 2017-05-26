@@ -23,12 +23,13 @@ package bagaturchess.search.impl.history;
 public interface IHistoryTable {
 	
 	
-	public static final short MAX_SCORES = 1024;
+	//Cleanup and/or normalization
+	public void newSearch();
 	
 	
 	//Moves history
-	public void countFailure(int move);
-	public void countSuccess(int move, int value);
+	public void countFailure(int move, int depth);
+	public void countSuccess(int move, int depth);
 	public double getScores(int move);//Returns value in [0, 1]. Bigger value means better move.
 	
 	

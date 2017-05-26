@@ -100,7 +100,7 @@ public class HistoryTable implements IHistoryTable {
 		return getHistoryTable_PerColour(MoveInt.getOpponentColour(oldmove)).getCounterMove3(oldmove);
 	}
 	
-	public void countFailure(int move) {
+	public void countFailure(int move, int depth) {
 		getHistoryTable_PerColour(MoveInt.getColour(move)).countMove(move);
 	}
 	
@@ -142,5 +142,13 @@ public class HistoryTable implements IHistoryTable {
 
 	public int getMaxRate(int move) {
 		return getHistoryTable_PerColour(MoveInt.getColour(move)).getMaxRate();
+	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.history.IHistoryTable#newSearch()
+	 */
+	@Override
+	public void newSearch() {
+		//Do nothing
 	}
 }

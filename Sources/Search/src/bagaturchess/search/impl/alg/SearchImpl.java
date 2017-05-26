@@ -270,6 +270,8 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	public void newSearch() {
 		
+		env.getHistory().newSearch();
+		
 		env.getMoveListFactory().newSearch();
 		env.getEval().beforeSearch();
 		

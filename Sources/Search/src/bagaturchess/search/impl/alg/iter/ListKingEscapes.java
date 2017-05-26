@@ -27,7 +27,6 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.utils.Sorting;
 
 
@@ -39,8 +38,6 @@ public class ListKingEscapes implements ISearchMoveList {
 	private int ORD_VAL_COUNTER;
 	private int ORD_VAL_PREV_BEST_MOVE;
 	private int ORD_VAL_LOSE_CAP;
-	
-	private static final int ORD_VAL_SHIFT           =  IHistoryTable.MAX_SCORES + 200;
 	
 	private long[] escapes; 
 	private int escapes_size; 
@@ -122,11 +119,11 @@ public class ListKingEscapes implements ISearchMoveList {
 			if (tptPlied) {
 				return;
 			}
-			ordval += ORD_VAL_SHIFT * ORD_VAL_TPT_MOVE;
+			ordval += ORD_VAL_TPT_MOVE;
 		}
 		
 		if (move == prevBestMove) {
-			ordval += ORD_VAL_SHIFT * ORD_VAL_PREV_BEST_MOVE;
+			ordval += ORD_VAL_PREV_BEST_MOVE;
 		}
 		
 		if (MoveInt.isCaptureOrPromotion(move)) {
@@ -134,19 +131,19 @@ public class ListKingEscapes implements ISearchMoveList {
 			int see = env.getBitboard().getSee().evalExchange(move);
 			
 			if (see > 0) {
-				ordval += ORD_VAL_SHIFT * ORD_VAL_WIN_CAP + see;
+				ordval += ORD_VAL_WIN_CAP + see;
 			} else if (see == 0) {
-				ordval += ORD_VAL_SHIFT * ORD_VAL_EQ_CAP;// + 50;
+				ordval += ORD_VAL_EQ_CAP;// + 50;
 			} else {
-				ordval += ORD_VAL_SHIFT * ORD_VAL_LOSE_CAP + see;
+				ordval += ORD_VAL_LOSE_CAP + see;
 			}
 		}
 		
 		if (env.getHistory().getCounterMove1(env.getBitboard().getLastMove()) == move) {
-			ordval += ORD_VAL_SHIFT * ORD_VAL_COUNTER;
+			ordval += ORD_VAL_COUNTER;
 		}
 		
-		ordval += env.getHistory().getScores(move) * 100;
+		ordval += 100 + env.getHistory().getScores(move);
 		
 		
 		long move_ord = MoveInt.addOrderingValue(move, ordval);
