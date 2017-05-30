@@ -48,7 +48,6 @@ import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.sequential.mtd.Mediator_AlphaAndBestMoveWindow;
-import bagaturchess.search.impl.rootsearch.sequential.mtd.SearchManager;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
@@ -155,9 +154,6 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 					new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(mediator));
 		}
 		
-		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup().getHashKey(),
-				startIteration, maxIterations, initialValue, searcher.getEnv().getPVs());
-		
 		//final ISearchStopper stopper = new MTDStopper(getBitboardForSetup().getColourToMove(), distribution);
 		mediator.setStopper(new CompositeStopper(new ISearchStopper[] {mediator.getStopper(), stopper}, true ));
 		
@@ -234,10 +230,6 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 							break;
 						}
 					}
-					
-					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch after loop final_mediator.getStopper().isStopped()="
-							+ final_mediator.getStopper().isStopped()
-							+ ", distribution.getCurrentDepth()=" + distribution.getCurrentDepth() + ", distribution.getMaxIterations()=" + distribution.getMaxIterations());
 					
 					if (!isStopped()) {
 						
