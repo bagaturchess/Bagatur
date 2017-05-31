@@ -539,9 +539,11 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 
+		/*
 		if( env.getHistory().getScores(move) >= 0.5 ) {
 			return true;
 		}
+		*/
 		
 		/*
 		if( env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) >= 0.5 ) {
