@@ -25,9 +25,8 @@ public class SearchInfoUtils {
 		
 		nodes = info.getSearchedNodes();
 		
-		long timeInSecs = (time / 1000);
-		if (timeInSecs == 0) {
-			timeInSecs = 1;
+		if (time == 0) {
+			time = 1;
 		}
 		
 		StringBuilder message = new StringBuilder(128);
@@ -37,7 +36,7 @@ public class SearchInfoUtils {
 		message.append(" seldepth " + info.getSelDepth());
 		message.append(" time " + time);
 		message.append(" nodes " + nodes);
-		long nps = nodes / timeInSecs;
+		long nps = 1000 * nodes / time;
 		if (nps > 1) {
 			message.append(" nps " + nps);
 		}
