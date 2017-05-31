@@ -105,15 +105,6 @@ public class ListAll implements ISearchMoveList {
 	
 	private boolean reuse_moves = false;
 	
-	private boolean inUse = false;
-	
-	public boolean isInUse() {
-		return inUse;
-	}
-
-	public void setInUse(boolean _inUse) {
-		inUse = _inUse;
-	}
 	
 	public ListAll(SearchEnv _env, OrderingStatistics _orderingStatistics) { 
 		env = _env;
@@ -462,7 +453,7 @@ public class ListAll implements ISearchMoveList {
 				ordval += ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
 				orderingStatistics.wincap_count++;
 			} else if (see == 0) {
-				ordval += ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();// + 50;
+				ordval += ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();
 				orderingStatistics.eqcap_count++;
 			} else {
 				ordval += ORD_VAL_LOSE_CAP + see;
@@ -488,6 +479,7 @@ public class ListAll implements ISearchMoveList {
 		ordval += env.getHistory().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
 		
 		ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
+		
 		
 		return ordval;
 	}
