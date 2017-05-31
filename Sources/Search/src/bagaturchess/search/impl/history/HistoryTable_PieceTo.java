@@ -117,9 +117,14 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 		int pid = MoveInt.getFigurePID(last_move);
 		int to = MoveInt.getToFieldID(last_move);
 		
-		counters3[pid][to] = counters2[pid][to];
-		counters2[pid][to] = counters1[pid][to];
-		counters1[pid][to] = counter_move;
+		if (counter_move != counters1[pid][to]
+				&& counter_move != counters2[pid][to]
+				&& counter_move != counters3[pid][to]
+				) {
+			counters3[pid][to] = counters2[pid][to];
+			counters2[pid][to] = counters1[pid][to];
+			counters1[pid][to] = counter_move;
+		}
 	}
 	
 	
