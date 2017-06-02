@@ -192,7 +192,7 @@ public class OrderingStatistics {
 		msg += "PASSER     :	" + passer_count + "	" + passer_best + "	" + (passer_best / (double) passer_count) + "\r\n";
 		msg += "PREVPV     :	" + prevpv_count + "	" + prevpv_best + "	" + (prevpv_best / (double) prevpv_count) + "\r\n";
 		msg += "CASTLING   :	" + castling_count + "	" + castling_best + "	" + (castling_best / (double) castling_count) + "\r\n";
-		msg += "LOSECAP    :	" + losecap_count + "	" + losecap_best + "	" + ((losecap_count-losecap_best) / (double) losecap_count) + "\r\n";
+		msg += "LOSECAP    :	" + losecap_count + "	" + losecap_best + "	" + ((/*losecap_count-*/losecap_best) / (double) losecap_count) + "\r\n";
 		msg += "HISTORY    :	" + (int)history_count + "	" + (int)history_best + "	" + (history_best / (double) history_count) + "\r\n";
 		msg += "PST        :	" + (int)pst_count + "	" + (int)pst_best + "	" + (pst_best / (double) pst_count) + "\r\n";
 		

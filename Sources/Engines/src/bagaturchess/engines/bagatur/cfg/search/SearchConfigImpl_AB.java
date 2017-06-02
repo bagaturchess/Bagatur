@@ -111,7 +111,7 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	public int orderingWeight_CASTLING 	 	 		= 1;
 	public int orderingWeight_PASSER_PUSH 	 		= 1;
 	public int orderingWeight_KILLER          		= 1;
-	public int orderingWeight_LOSE_CAP        		= -1;
+	public int orderingWeight_LOSE_CAP        		= 1;
 	
 	
 	public SearchConfigImpl_AB() {

@@ -49,9 +49,13 @@ public class ListCapsProm implements ISearchMoveList {
 	
 	private SearchEnv env;
 	
-	public ListCapsProm(SearchEnv _env) { 
+	private OrderingStatistics orderingStatistics;
+	
+	
+	public ListCapsProm(SearchEnv _env, OrderingStatistics _orderingStatistics) { 
 		env = _env;
 		caps = new long[62];
+		orderingStatistics = _orderingStatistics;
 		
 		ORD_VAL_TPT_MOVE        = env.getSearchConfig().getOrderingWeight_TPT_MOVE();
 		ORD_VAL_WIN_CAP         = env.getSearchConfig().getOrderingWeight_WIN_CAP();
@@ -119,7 +123,7 @@ public class ListCapsProm implements ISearchMoveList {
 				if (tptPlied) {
 					return;
 				}
-				ordval += ORD_VAL_TPT_MOVE;
+				ordval += ORD_VAL_TPT_MOVE * orderingStatistics.getOrdVal_TPT();
 			}
 			
 			if (MoveInt.isCaptureOrPromotion(move)) {
@@ -127,15 +131,18 @@ public class ListCapsProm implements ISearchMoveList {
 				int see = env.getBitboard().getSee().evalExchange(move);
 				
 				if (see > 0) {
-					ordval += ORD_VAL_WIN_CAP + see;
+					ordval += ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
 				} else if (see == 0) {
-					ordval += ORD_VAL_EQ_CAP;
+					ordval += ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();
 				} else {
-					ordval += ORD_VAL_LOSE_CAP + see;
+					ordval += ORD_VAL_LOSE_CAP * orderingStatistics.getOrdVal_LOSECAP() + see;
 				}
 			}
 			
-			ordval += 100 * env.getHistory().getScores(move);
+			ordval += env.getHistory().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
+			
+			ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
+			
 			
 			long move_ord = (ordval << 32) | move;
 			
@@ -192,11 +199,11 @@ public class ListCapsProm implements ISearchMoveList {
 		throw new UnsupportedOperationException();
 	}
 	
-	public void updateStatistics(int bestmove) {
+	public void countSuccess(int bestmove) {
 		
 	}
 
-	public void countStatistics(int move) {
+	public void countTotal(int move) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -27,8 +27,8 @@ import bagaturchess.bitboard.impl.movelist.IMoveList;
 
 
 public interface ISearchMoveList extends IMoveList {
-	public void updateStatistics(int bestmove);
-	public void countStatistics(int move);
+	public void countSuccess(int bestmove);
+	public void countTotal(int move);
 	
 	public void setTptMove(int move);
 	public void setPrevBestMove(int move);

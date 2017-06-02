@@ -492,8 +492,6 @@ public class Search_NegaScout extends SearchImpl {
 		}
 		
 		
-		boolean statisticAdded = false;
-		
 		int alpha_cur = alpha_org;
 		int searchedCount = 0;
 		int legalMoves = 0;
@@ -544,28 +542,39 @@ public class Search_NegaScout extends SearchImpl {
 				}
 				
 				//Static pruning
-				if (futility_enabled
+				if (searchedCount > 0
 						&& !inCheck
 						&& moveSee < 0
-						&& searchedCount > 0
 						&& !isGoodMove
 						&& !env.getBitboard().isCheckMove(cur_move)
 					) {
 					
-					if (futility_eval > best_eval) {
+					//Futility prunning on all depths
+					if (futility_enabled) {
+						if (futility_eval > best_eval) {
+							
+							best_eval = futility_eval;
+							best_move = cur_move;
+							
+							backtrackingInfo.best_move = best_move;
+							
+							node.bestmove = best_move;
+							node.eval = best_eval;
+						}
 						
-						best_eval = futility_eval;
-						best_move = cur_move;
-						
-						backtrackingInfo.best_move = best_move;
-						
-						node.bestmove = best_move;
-						node.eval = best_eval;
-						
-						//info.setSearchedNodes(info.getSearchedNodes() + 1);	
+						continue;
 					}
 					
-					continue;
+					//Move history prunning
+					/*if (rest == 1 && env.getHistory().getScores(cur_move) <= 0.04) {
+						continue;
+					} else if (rest == 2 && env.getHistory().getScores(cur_move) <= 0.02) {
+						continue;
+					} else if (rest == 3 && env.getHistory().getScores(cur_move) <= 0.01) {
+						continue;
+					} else if (rest == 4 && env.getHistory().getScores(cur_move) == 0.00) {
+						continue;
+					}*/
 				}
 				
 				//int new_materialGain = materialGain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
@@ -577,23 +586,22 @@ public class Search_NegaScout extends SearchImpl {
 				
 				boolean isCheckMove = env.getBitboard().isInCheck();
 				
-				boolean reductionAllowed = !inCheck
+				boolean reductionAllowed = searchedCount > 0
+											&& !inCheck
 											&& !isCheckMove
-											&& moveSee < 0
-											&& searchedCount > 0
-											&& !isGoodMove
-											&& !isPasserPush;
+											&& moveSee < 0;
 				
 				int extend = extend_position;// + (moveSee > 0 ? PLY / 4 : 0);
 				
 				//LMR
                 int reduction = 0;
                 if (reductionAllowed) {
-                	
-                	reduction = PLY;
 					
-					if (!isCapOrProm && searchedCount >= 4) {
-						reduction += PLY;
+					if (!isCapOrProm && !isPasserPush) {
+						reduction = (int) (PLY * Math.sqrt(searchedCount) * Math.sqrt(rest) / 5.0);
+						reduction *= (1 - env.getHistory().getScores(cur_move));
+					} else {
+	                	reduction = PLY;
 					}
 					
 					if (reduction < PLY) {
@@ -602,8 +610,6 @@ public class Search_NegaScout extends SearchImpl {
 					if (reduction >= (rest - 1) * PLY) {
 						reduction = (rest - 1) * PLY;
 					}
-					
-					//reduction *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
                 }
 
                 
@@ -623,10 +629,12 @@ public class Search_NegaScout extends SearchImpl {
 				
 				env.getBitboard().makeMoveBackward(cur_move);
 				
-				//Add history record for the current move
+				//Add history records for the current move
+				list.countTotal(cur_move);
 				if (cur_eval <= alpha_cur) {
-					env.getHistory().countFailure(cur_move, rest);	
+					env.getHistory().countFailure(cur_move, rest);
 				} else {
+					list.countSuccess(cur_move);//Should be before addCounterMove call
 					env.getHistory().countSuccess(cur_move, rest);
 					env.getHistory().addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
@@ -652,14 +660,6 @@ public class Search_NegaScout extends SearchImpl {
 					}
 					
 					if (best_eval >= beta) {
-						
-						if (backtrackingInfo.hash_move == best_move) {
-							list.countStatistics(best_move);
-						}
-						list.updateStatistics(best_move);
-						
-						statisticAdded = true;
-												
 						break;
 					}
 				}
@@ -667,13 +667,6 @@ public class Search_NegaScout extends SearchImpl {
 				searchedCount++;
 				
 			} while ((cur_move = list.next()) != 0);
-		}
-		
-		if (!statisticAdded) {
-			if (backtrackingInfo.hash_move == best_move) {
-				list.countStatistics(best_move);
-			}
-			list.updateStatistics(best_move);
 		}
 		
 		if (best_move != 0 && (best_eval == MIN || best_eval == MAX)) {

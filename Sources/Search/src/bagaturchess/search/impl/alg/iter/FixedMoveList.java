@@ -90,11 +90,11 @@ public class FixedMoveList implements ISearchMoveList {
 		
 	}
 
-	public void updateStatistics(int bestmove) {
+	public void countSuccess(int bestmove) {
 		throw new UnsupportedOperationException();
 	}
 
-	public void countStatistics(int move) {
+	public void countTotal(int move) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -368,20 +368,27 @@ public class ListAll implements ISearchMoveList {
 		
 		add(move_ord);
 	}
-
-	 
-	 private long genOrdVal(int move) {
+	
+	
+	private static long counter = 0;
+	
+	
+	private long genOrdVal(int move) {
+		
+		counter++;
+		
+		if (counter % 1000000 == 0) {
+			//System.out.println(orderingStatistics);
+		}
 		
 		long ordval = 0;
 		
 		if (move == tptMove) {
 			ordval += ORD_VAL_TPT_MOVE * orderingStatistics.getOrdVal_TPT();
-			orderingStatistics.tpt_count++;
 		}
 		
 		if (move == prevPvMove) {
 			ordval += ORD_VAL_PREVPV_MOVE * orderingStatistics.getOrdVal_PREVPV();
-			orderingStatistics.prevpv_count++;
 		}
 		
 		if (prevBestMove != 0 && MoveInt.getColour(move) != MoveInt.getColour(prevBestMove)) {
@@ -390,7 +397,6 @@ public class ListAll implements ISearchMoveList {
 		
 		if (move == prevBestMove) {
 			ordval += ORD_VAL_PREV_BEST_MOVE * orderingStatistics.getOrdVal_PREVBEST();
-			orderingStatistics.prevbest_count++;
 		}
 		
 		if (mateMove != 0 && MoveInt.getColour(move) != MoveInt.getColour(mateMove)) {
@@ -399,79 +405,37 @@ public class ListAll implements ISearchMoveList {
 		
 		if (move == mateMove) {
 			ordval += ORD_VAL_MATE_MOVE * orderingStatistics.getOrdVal_MATEMOVE();
-			orderingStatistics.matemove_count++;
 		}
-		
-		/*
-		int[] mateKillers = env.getHistory_all().getMateKillers(env.getBitboard().getColourToMove());
-		for (int i=0; i<mateKillers.length; i++) {
-			if (move == mateKillers[i]) {
-				ordval += ORD_VAL_SHIFT * ORD_VAL_MATE_KILLER * orderingStatistics.getOrdVal_MATEKILLER();
-				orderingStatistics.matekiller_count++;
-				break;
-			}
-		}
-		
-		int[] killers = env.getHistory_all().getNonCaptureKillers(env.getBitboard().getColourToMove());
-		for (int i=0; i<killers.length; i++) {
-			if (move == killers[i]) {
-				ordval += ORD_VAL_SHIFT * ORD_VAL_KILLER * orderingStatistics.getOrdVal_KILLER();
-				orderingStatistics.killer_count++;
-				break;
-			}
-		}
-		*/
 		
 		if (env.getBitboard().isPasserPush(move)) {
 			ordval += ORD_VAL_PASSER_PUSH * orderingStatistics.getOrdVal_PASSER();
-			orderingStatistics.passer_count++;
 		}
 		
 		if (MoveInt.isCastling(move)) {
 			ordval += ORD_VAL_CASTLING * orderingStatistics.getOrdVal_CASTLING();
-			orderingStatistics.castling_count++;
 		}
 		
 		if (MoveInt.isCaptureOrPromotion(move)) {
-			
-			/*
-			TODO: Add it to the method wich calculate order val
-			int gain = 0;
-			if (MoveInt.isCapture(move)) {
-				gain += BaseEvalWeights.getFigureMaterialSEE(MoveInt.getCapturedFigureType(move));
-			}
-			if (MoveInt.isPromotion(move)) {
-				gain += BaseEvalWeights.getFigureMaterialSEE(MoveInt.getPromotionFigureType(move));
-			}
-			int piece = BaseEvalWeights.getFigureMaterialSEE(MoveInt.getFigureType(move));
-			
-			int see = 10 * gain - piece;*/
 			
 			int see = env.getBitboard().getSee().evalExchange(move);
 			
 			if (see > 0) {
 				ordval += ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
-				orderingStatistics.wincap_count++;
 			} else if (see == 0) {
 				ordval += ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();
-				orderingStatistics.eqcap_count++;
 			} else {
-				ordval += ORD_VAL_LOSE_CAP + see;
-				orderingStatistics.losecap_count++;
+				ordval += ORD_VAL_LOSE_CAP * orderingStatistics.getOrdVal_LOSECAP() + see;
 			}
 		}
 		
 		if (env.getHistory().getCounterMove1(env.getBitboard().getLastMove()) == move) {
 			ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
-			orderingStatistics.counter_count++;
 		} else {
 			if (env.getHistory().getCounterMove2(env.getBitboard().getLastMove()) == move) {
 				ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
-				orderingStatistics.counter_count++;
 			} else {
 				if (env.getHistory().getCounterMove3(env.getBitboard().getLastMove()) == move) {
 					ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
-					orderingStatistics.counter_count++;
 				}
 			}
 		}
@@ -484,84 +448,61 @@ public class ListAll implements ISearchMoveList {
 		return ordval;
 	}
 	
-	 
-	public boolean isGoodMove(int move) {
+	
+	public void countTotal(int move) {
 		
 		if (move == tptMove) {
-			return true;
+			orderingStatistics.tpt_count++;
 		}
 		
 		if (move == prevPvMove) {
-			return true;
+			orderingStatistics.prevpv_count++;
 		}
 		
 		if (move == prevBestMove) {
-			return true;
+			orderingStatistics.prevbest_count++;
 		}
 		
 		if (move == mateMove) {
-			return true;
+			orderingStatistics.matemove_count++;
+		}
+				
+		if (env.getBitboard().isPasserPush(move)) {
+			orderingStatistics.passer_count++;
 		}
 		
-		/*
-		int[] mateKillers = env.getHistory_all().getMateKillers(env.getBitboard().getColourToMove());
-		for (int i=0; i<mateKillers.length; i++) {
-			if (move == mateKillers[i]) {
-				return true;
-			}
+		if (MoveInt.isCastling(move)) {
+			orderingStatistics.castling_count++;
 		}
 		
-		int[] killers = env.getHistory_all().getNonCaptureKillers(env.getBitboard().getColourToMove());
-		for (int i=0; i<killers.length; i++) {
-			if (move == killers[i]) {
-				return true;
+		if (MoveInt.isCaptureOrPromotion(move)) {
+			
+			int see = env.getBitboard().getSee().evalExchange(move);
+			
+			if (see > 0) {
+				orderingStatistics.wincap_count++;
+			} else if (see == 0) {
+				orderingStatistics.eqcap_count++;
+			} else {
+				orderingStatistics.losecap_count++;
 			}
 		}
-		*/
 		
 		if (env.getHistory().getCounterMove1(env.getBitboard().getLastMove()) == move) {
-			return true;
+			orderingStatistics.counter_count++;
 		} else {
 			if (env.getHistory().getCounterMove2(env.getBitboard().getLastMove()) == move) {
-				return true;
+				orderingStatistics.counter_count++;
 			} else {
 				if (env.getHistory().getCounterMove3(env.getBitboard().getLastMove()) == move) {
-					return true;
+					orderingStatistics.counter_count++;
 				}
 			}
 		}
-
-		/*
-		if( env.getHistory().getScores(move) >= 0.5 ) {
-			return true;
-		}
-		*/
-		
-		/*
-		if( env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) >= 0.5 ) {
-			return true;
-		}
-		*/
-		
-		return false;
 	}
 	
-	 
-	//static int count = 0;
-	public void countStatistics(int move) {
-		if (move == 0) {
-			return;
-		}
-		
-		/*count++;
-		if (count % 100000 == 0) {
-			System.out.println(orderingStatistics);
-		}*/
-		
-		genOrdVal(move);
-	}
 	
-	public void updateStatistics(int bestmove) {
+	public void countSuccess(int bestmove) {
 		if (bestmove == 0) {
 			return;
 		}
@@ -581,24 +522,6 @@ public class ListAll implements ISearchMoveList {
 		if (bestmove == mateMove) {
 			orderingStatistics.matemove_best++;
 		}
-		
-		/*
-		int[] mateKillers = env.getHistory_all().getMateKillers(env.getBitboard().getColourToMove());
-		for (int i=0; i<mateKillers.length; i++) {
-			if (bestmove == mateKillers[i]) {
-				orderingStatistics.matekiller_best++;
-				break;
-			}
-		}
-		
-		int[] killers = env.getHistory_all().getNonCaptureKillers(env.getBitboard().getColourToMove());
-		for (int i=0; i<killers.length; i++) {
-			if (bestmove == killers[i]) {
-				orderingStatistics.killer_best++;
-				break;
-			}
-		}
-		*/
 		
 		if (env.getBitboard().isPasserPush(bestmove)) {
 			orderingStatistics.passer_best++;
@@ -654,6 +577,53 @@ public class ListAll implements ISearchMoveList {
 		size++;
 	}
 	
+	
+	public boolean isGoodMove(int move) {
+		
+		if (move == tptMove) {
+			return true;
+		}
+		
+		if (move == prevPvMove) {
+			return true;
+		}
+		
+		if (move == prevBestMove) {
+			return true;
+		}
+		
+		if (move == mateMove) {
+			return true;
+		}
+		
+		if (env.getHistory().getCounterMove1(env.getBitboard().getLastMove()) == move) {
+			return true;
+		} else {
+			if (env.getHistory().getCounterMove2(env.getBitboard().getLastMove()) == move) {
+				return true;
+			} else {
+				if (env.getHistory().getCounterMove3(env.getBitboard().getLastMove()) == move) {
+					return true;
+				}
+			}
+		}
+
+		/*
+		if( env.getHistory().getScores(move) >= 0.5 ) {
+			return true;
+		}
+		*/
+		
+		/*
+		if( env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) >= 0.5 ) {
+			return true;
+		}
+		*/
+		
+		return false;
+	}
+	
+	
 	/**
 	 * Unsupported operations 
 	 */
@@ -692,8 +662,6 @@ public class ListAll implements ISearchMoveList {
 	
 	@Override
 	public void newSearch() {
-		//orderingStatistics.normalize();
-		//orderingStatistics.normalize();
 	}
 
 	@Override

@@ -275,11 +275,11 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		env.getMoveListFactory().newSearch();
 		env.getEval().beforeSearch();
 		
+		env.getOrderingStatistics().normalize();
 		
 		for (int i=0; i<lists_all.length; i++) {
 			lists_all[i].newSearch();
 		}
-		
 	}
 	
 	

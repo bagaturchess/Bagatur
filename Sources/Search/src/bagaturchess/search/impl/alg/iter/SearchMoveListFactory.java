@@ -8,10 +8,6 @@ import bagaturchess.search.impl.env.SearchEnv;
 
 public class SearchMoveListFactory implements ISearchMoveListFactory {
 
-	
-	protected OrderingStatistics[] stats_all;
-	protected OrderingStatistics rootOrderingStatistics;
-
 
 	public SearchMoveListFactory() {
 	}
@@ -19,40 +15,23 @@ public class SearchMoveListFactory implements ISearchMoveListFactory {
 	
 	@Override
 	public ISearchMoveList createListAll(SearchEnv env) {
-		
-		OrderingStatistics cur = new OrderingStatistics();
-		
-		if (rootOrderingStatistics == null) {
-			rootOrderingStatistics = cur;
-		}
-		return new ListAll(env, cur);
+		return new ListAll(env, env.getOrderingStatistics());
 	}
 
 
 	@Override
 	public ISearchMoveList createListCaptures(SearchEnv env) {
-		return new ListCapsProm(env);
+		return new ListCapsProm(env, env.getOrderingStatistics());
 	}
 
 
 	@Override
 	public ISearchMoveList createListAll_inCheck(SearchEnv env) {
-		return new ListKingEscapes(env);
+		return new ListKingEscapes(env, env.getOrderingStatistics());
 	}
 	
 	
 	@Override
 	public void newSearch() {
-	}
-
-	@Override
-	public String toString() {
-		String msg = "";
-		
-		if (rootOrderingStatistics != null) {
-			msg += rootOrderingStatistics.toString();
-		}
-		
-		return msg;
 	}
 }

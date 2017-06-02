@@ -1214,9 +1214,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					if (best_eval >= beta) {
 						
 						if (tpt_move == best_move) {
-							list.countStatistics(best_move);
+							list.countTotal(best_move);
 						}
-						list.updateStatistics(best_move);
+						list.countSuccess(best_move);
 						
 						statisticAdded = true;
 												
@@ -1235,9 +1235,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		if (!statisticAdded) {
 			if (tpt_move == best_move) {
-				list.countStatistics(best_move);
+				list.countTotal(best_move);
 			}
-			list.updateStatistics(best_move);
+			list.countSuccess(best_move);
 		}
 		
 		if (best_move != 0 && (best_eval == MIN || best_eval == MAX)) {
@@ -1977,9 +1977,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					if (best_eval >= beta) {
 						
 						if (tpt_move == best_move) {
-							list.countStatistics(best_move);
+							list.countTotal(best_move);
 						}
-						list.updateStatistics(best_move);
+						list.countSuccess(best_move);
 						
 						statisticAdded = true;
 						
@@ -1997,9 +1997,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		if (!statisticAdded) {
 			if (tpt_move == best_move) {
-				list.countStatistics(best_move);
+				list.countTotal(best_move);
 			}
-			list.updateStatistics(best_move);
+			list.countSuccess(best_move);
 		}
 		
 		if (best_move != 0 && (best_eval == MIN || best_eval == MAX)) {

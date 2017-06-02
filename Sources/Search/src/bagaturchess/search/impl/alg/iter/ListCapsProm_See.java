@@ -192,11 +192,11 @@ public class ListCapsProm_See implements ISearchMoveList {
 		throw new UnsupportedOperationException();
 	}
 	
-	public void updateStatistics(int bestmove) {
+	public void countSuccess(int bestmove) {
 		
 	}
 
-	public void countStatistics(int move) {
+	public void countTotal(int move) {
 		// TODO Auto-generated method stub
 		
 	}

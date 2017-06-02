@@ -52,9 +52,13 @@ public class ListKingEscapes implements ISearchMoveList {
 	
 	private SearchEnv env;
 	
-	public ListKingEscapes(SearchEnv _env) { 
+	private OrderingStatistics orderingStatistics;
+	
+	
+	public ListKingEscapes(SearchEnv _env, OrderingStatistics _orderingStatistics) { 
 		env = _env;
 		escapes = new long[62];
+		orderingStatistics = _orderingStatistics;
 		
 		ORD_VAL_TPT_MOVE        = env.getSearchConfig().getOrderingWeight_TPT_MOVE();
 		ORD_VAL_WIN_CAP         = env.getSearchConfig().getOrderingWeight_WIN_CAP();
@@ -119,11 +123,11 @@ public class ListKingEscapes implements ISearchMoveList {
 			if (tptPlied) {
 				return;
 			}
-			ordval += ORD_VAL_TPT_MOVE;
+			ordval += ORD_VAL_TPT_MOVE * orderingStatistics.getOrdVal_TPT();
 		}
 		
 		if (move == prevBestMove) {
-			ordval += ORD_VAL_PREV_BEST_MOVE;
+			ordval += ORD_VAL_PREV_BEST_MOVE * orderingStatistics.getOrdVal_PREVBEST();
 		}
 		
 		if (MoveInt.isCaptureOrPromotion(move)) {
@@ -131,19 +135,29 @@ public class ListKingEscapes implements ISearchMoveList {
 			int see = env.getBitboard().getSee().evalExchange(move);
 			
 			if (see > 0) {
-				ordval += ORD_VAL_WIN_CAP + see;
+				ordval += ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
 			} else if (see == 0) {
-				ordval += ORD_VAL_EQ_CAP;// + 50;
+				ordval += ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();
 			} else {
-				ordval += ORD_VAL_LOSE_CAP + see;
+				ordval += ORD_VAL_LOSE_CAP * orderingStatistics.getOrdVal_LOSECAP() + see;
 			}
 		}
 		
 		if (env.getHistory().getCounterMove1(env.getBitboard().getLastMove()) == move) {
-			ordval += ORD_VAL_COUNTER;
+			ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
+		} else {
+			if (env.getHistory().getCounterMove2(env.getBitboard().getLastMove()) == move) {
+				ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
+			} else {
+				if (env.getHistory().getCounterMove3(env.getBitboard().getLastMove()) == move) {
+					ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
+				}
+			}
 		}
 		
-		ordval += 100 + env.getHistory().getScores(move);
+		ordval += env.getHistory().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
+		
+		ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
 		
 		
 		long move_ord = MoveInt.addOrderingValue(move, ordval);
@@ -196,10 +210,10 @@ public class ListKingEscapes implements ISearchMoveList {
 		throw new UnsupportedOperationException();
 	}
 	
-	public void updateStatistics(int bestmove) {
+	public void countSuccess(int bestmove) {
 	}
 
-	public void countStatistics(int move) {
+	public void countTotal(int move) {
 		// TODO Auto-generated method stub
 		
 	}
