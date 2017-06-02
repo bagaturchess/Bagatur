@@ -130,8 +130,8 @@ public class MTDSchedulerMain {
 		//IRootSearch search = new MTDParallelSearch_ProcessesImpl(new Object[] {cfg, sharedData});
 		//IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, sharedData});
 		//IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, sharedData});
-		//IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
-		IRootSearch search = new SequentialSearch_Classic(new Object[] {cfg, sharedData});
+		IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
+		//IRootSearch search = new SequentialSearch_Classic(new Object[] {cfg, sharedData});
 		
 		
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
