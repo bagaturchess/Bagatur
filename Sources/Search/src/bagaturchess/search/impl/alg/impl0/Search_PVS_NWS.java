@@ -922,9 +922,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			list.setPrevBestMove(prevprevbest);
 		}
 		
-		
-		boolean statisticAdded = false;
-		
 		//boolean pvNode = false;
 		int searchedCount = 0;
 		int legalMoves = 0;
@@ -1159,10 +1156,12 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				env.getBitboard().makeMoveBackward(cur_move);
 				
-				//Add history record for the current move
-				if (cur_eval <= alpha_org) {
-					env.getHistory().countFailure(cur_move, rest);	
+				//Add history records for the current move
+				list.countTotal(cur_move);
+				if (cur_eval <= alpha) {
+					env.getHistory().countFailure(cur_move, rest);
 				} else {
+					list.countSuccess(cur_move);//Should be before addCounterMove call
 					env.getHistory().countSuccess(cur_move, rest);
 					env.getHistory().addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
@@ -1211,15 +1210,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						}
 					}
 					
-					if (best_eval >= beta) {
-						
-						if (tpt_move == best_move) {
-							list.countTotal(best_move);
-						}
-						list.countSuccess(best_move);
-						
-						statisticAdded = true;
-												
+					if (best_eval >= beta) {												
 						break;
 					}
 					
@@ -1231,13 +1222,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				searchedCount++;
 			} while ((cur_move = list.next()) != 0);
-		}
-		
-		if (!statisticAdded) {
-			if (tpt_move == best_move) {
-				list.countTotal(best_move);
-			}
-			list.countSuccess(best_move);
 		}
 		
 		if (best_move != 0 && (best_eval == MIN || best_eval == MAX)) {
@@ -1746,8 +1730,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 		
-		boolean statisticAdded = false;
-		
 		int searchedCount = 0;
 		int legalMoves = 0;
 		int best_eval = MIN;
@@ -1961,10 +1943,12 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						
 				env.getBitboard().makeMoveBackward(cur_move);
 				
-				//Add history record for the current move
+				//Add history records for the current move
+				list.countTotal(cur_move);
 				if (cur_eval <= alpha_org) {
-					env.getHistory().countFailure(cur_move, rest);	
+					env.getHistory().countFailure(cur_move, rest);
 				} else {
+					list.countSuccess(cur_move);//Should be before addCounterMove call
 					env.getHistory().countSuccess(cur_move, rest);
 					env.getHistory().addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
@@ -1975,14 +1959,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					best_move = cur_move;
 					
 					if (best_eval >= beta) {
-						
-						if (tpt_move == best_move) {
-							list.countTotal(best_move);
-						}
-						list.countSuccess(best_move);
-						
-						statisticAdded = true;
-						
 						break;
 					}
 					
@@ -1993,13 +1969,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				searchedCount++;
 			} while ((cur_move = list.next()) != 0);
-		}
-		
-		if (!statisticAdded) {
-			if (tpt_move == best_move) {
-				list.countTotal(best_move);
-			}
-			list.countSuccess(best_move);
 		}
 		
 		if (best_move != 0 && (best_eval == MIN || best_eval == MAX)) {
