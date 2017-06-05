@@ -307,7 +307,7 @@ public class Search_NegaScout extends SearchImpl {
 		int extend_position = 0;
 		
 		//Check extension
-		extend_position = inCheck ? PLY : 0;
+		//extend_position = inCheck ? PLY : 0;
 		
 		
 		//Recapture extension
@@ -566,15 +566,17 @@ public class Search_NegaScout extends SearchImpl {
 					}
 					
 					//Move history prunning
-					/*if (rest == 1 && env.getHistory().getScores(cur_move) <= 0.04) {
-						continue;
-					} else if (rest == 2 && env.getHistory().getScores(cur_move) <= 0.02) {
-						continue;
-					} else if (rest == 3 && env.getHistory().getScores(cur_move) <= 0.01) {
-						continue;
-					} else if (rest == 4 && env.getHistory().getScores(cur_move) == 0.00) {
-						continue;
-					}*/
+					if (!pv) { 
+						if (rest == 1 && env.getHistory().getScores(cur_move) <= 0.04) {
+							continue;
+						} else if (rest == 2 && env.getHistory().getScores(cur_move) <= 0.02) {
+							continue;
+						} else if (rest == 3 && env.getHistory().getScores(cur_move) <= 0.01) {
+							continue;
+						} else if (rest == 4 && env.getHistory().getScores(cur_move) == 0.00) {
+							continue;
+						}
+					}
 				}
 				
 				//int new_materialGain = materialGain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
@@ -597,12 +599,13 @@ public class Search_NegaScout extends SearchImpl {
                 int reduction = 0;
                 if (reductionAllowed) {
 					
-					if (!isCapOrProm && !isPasserPush) {
-						reduction = (int) (PLY * Math.sqrt(searchedCount) * Math.sqrt(rest) / 5.0);
+					//if (!isCapOrProm && !isPasserPush) {
+                		//reduction = (int) (PLY * Math.sqrt(searchedCount) * Math.sqrt(rest) / 2.0);
+						reduction = (int) (PLY * Math.sqrt(searchedCount));
 						reduction *= (1 - env.getHistory().getScores(cur_move));
-					} else {
-	                	reduction = PLY;
-					}
+					//} else {
+	                //	reduction = PLY;
+					//}
 					
 					if (reduction < PLY) {
 						reduction = PLY;
