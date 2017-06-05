@@ -108,8 +108,8 @@ public class MTDSchedulerMain {
 								//bagaturchess.engines.material.MaterialBoardConfigImpl.class.getName(),
 								//bagaturchess.engines.material.MaterialEvalConfigImpl.class.getName()
 								
-								bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl.class.getName(),
-								bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturEvalConfigImpl_v2.class.getName()
+								//bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl.class.getName(),
+								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturEvalConfigImpl_v2.class.getName()
 								
 								//"bagaturchess.engines.learning.cfg.weights.WeightsBoardConfig",
 								//"bagaturchess.engines.learning.cfg.weights.WeightsEvaluationConfig"
@@ -117,8 +117,8 @@ public class MTDSchedulerMain {
 								//bagaturchess.engines.cuckooadapter.BoardConfigImpl_Cuckoo.class.getName(),
 								//bagaturchess.engines.cuckooadapter.EvaluationConfg_Cuckoo.class.getName()
 								
-								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl.class.getName(),
-								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig.class.getName(),
+								bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl.class.getName(),
+								bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig.class.getName(),
 								}
 				);
 		
