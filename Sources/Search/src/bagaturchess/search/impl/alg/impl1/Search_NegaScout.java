@@ -599,13 +599,8 @@ public class Search_NegaScout extends SearchImpl {
                 int reduction = 0;
                 if (reductionAllowed) {
 					
-					//if (!isCapOrProm && !isPasserPush) {
-                		//reduction = (int) (PLY * Math.sqrt(searchedCount) * Math.sqrt(rest) / 2.0);
-						reduction = (int) (PLY * Math.sqrt(searchedCount));
-						reduction *= (1 - env.getHistory().getScores(cur_move));
-					//} else {
-	                //	reduction = PLY;
-					//}
+            		reduction = (int) (PLY * Math.sqrt(searchedCount) * Math.sqrt(rest) / 3.0);
+					reduction *= (1 - env.getHistory().getScores(cur_move));
 					
 					if (reduction < PLY) {
 						reduction = PLY;
