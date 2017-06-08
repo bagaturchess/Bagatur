@@ -609,7 +609,7 @@ public class Search_NegaScout extends SearchImpl {
 						reduction = (rest - 1) * PLY;
 					}
                 }
-
+                
                 
 				legalMoves++;
 				
