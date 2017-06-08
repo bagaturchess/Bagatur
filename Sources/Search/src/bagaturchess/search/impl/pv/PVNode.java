@@ -23,39 +23,20 @@
 package bagaturchess.search.impl.pv;
 
 
-import java.util.ArrayList;
 import java.util.List;
-
 import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.search.api.internal.ISearchMoveList;
 
 
 public class PVNode {
 	
-	public static long MASK_INIT = 0L;
-	public static long MASK_NOMOVES = 1L;
-	public static long MASK_REPETITION = 2L; 
-	public static long MASK_DRAW = 4L;
-	public static long MASK_MAXDEPTH = 8L;
-	public static long MASK_TPT = 16L;
-	public static long MASK_NULLMOVE = 32L;
-	public static long MASK_NULLMOVEVER = 64L;
-	public static long MASK_REDUCED = 128L;
-	public static long MASK_PASSED_PAWN = 256L;
-	
-	public long masks;
 	
 	public PVNode parent;
 	public PVNode child;
 	
 	public int eval;
 	public int bestmove;
-	
 	public boolean leaf;
 	public boolean nullmove;
-	
-	public long hashkey;
-	public ISearchMoveList moves;
 	
 	
 	public PVNode() {
@@ -75,7 +56,9 @@ public class PVNode {
 		}
 	}
 	
+	
 	public static int[] convertPV(PVNode line, List<Integer> buff) {
+		
 		extractPV(line, buff);
 		
 		int[] result = new int[buff.size()];
@@ -85,31 +68,7 @@ public class PVNode {
 		return result;
 	}
 	
-	public static boolean checkLine(int length, PVNode node) {
-		
-		if (!valid(node)) {
-			return true;
-		}
-		
-		int counter = 0;
-		
-		while (node != null && !node.leaf) {
-			counter++;
-			node = node.child;
-			if (!valid(node)) {
-				return true;
-			}
-		}
-		if (counter < length) {
-			//throw new IllegalStateException("expected: " + length + ", actual:" + counter);
-			return false;
-		}
-		return true;
-	}
 	
-	public static boolean valid(PVNode node) {
-		return (node.masks == PVNode.MASK_INIT); 
-	}
 	@Override
 	public String toString() {
 		String result = "";
@@ -120,15 +79,6 @@ public class PVNode {
 			cur = cur.child;
 		}
 		
-		return result;
-	}
-	
-	public String propsToString() { 
-		String result = "";
-		result += "nullmove=" + nullmove;
-		result += ", leaf=" + leaf;
-		result += ", bestmove=" + bestmove;
-		result += ", eval=" + eval;
 		return result;
 	}
 }
