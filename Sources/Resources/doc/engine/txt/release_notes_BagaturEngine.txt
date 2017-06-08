@@ -1,4 +1,9 @@
 
+Version 1.5d (15 June 2017)
+  * Search optimizations: added move history pruning
+  * Search optimizations: more aggressive late move reduction
+  * Search optimizations: switch OFF check extension
+  
 Version 1.5c (29 May 2017)
   * Search optimizations: improved moves history table (PieceTo implementation)
   
