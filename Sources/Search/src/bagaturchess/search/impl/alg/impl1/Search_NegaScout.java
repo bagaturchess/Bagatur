@@ -567,13 +567,13 @@ public class Search_NegaScout extends SearchImpl {
 					
 					//Move history prunning
 					if (!pv) { 
-						if (rest == 1 && env.getHistory().getScores(cur_move) <= 0.04) {
+						if (rest == 1 && getHistory(inCheck).getScores(cur_move) <= 0.04) {
 							continue;
-						} else if (rest == 2 && env.getHistory().getScores(cur_move) <= 0.02) {
+						} else if (rest == 2 && getHistory(inCheck).getScores(cur_move) <= 0.02) {
 							continue;
-						} else if (rest == 3 && env.getHistory().getScores(cur_move) <= 0.01) {
+						} else if (rest == 3 && getHistory(inCheck).getScores(cur_move) <= 0.01) {
 							continue;
-						} else if (rest == 4 && env.getHistory().getScores(cur_move) == 0.00) {
+						} else if (rest == 4 && getHistory(inCheck).getScores(cur_move) == 0.00) {
 							continue;
 						}
 					}
@@ -600,7 +600,7 @@ public class Search_NegaScout extends SearchImpl {
                 if (reductionAllowed) {
                 	
             		reduction = (int) (PLY * Math.sqrt(searchedCount + rest));
-					reduction *= (1 - env.getHistory().getScores(cur_move));
+					reduction *= (1 - getHistory(inCheck).getScores(cur_move));
 					
 					if (reduction < PLY) {
 						reduction = PLY;
@@ -630,11 +630,11 @@ public class Search_NegaScout extends SearchImpl {
 				//Add history records for the current move
 				list.countTotal(cur_move);
 				if (cur_eval <= alpha_cur) {
-					env.getHistory().countFailure(cur_move, rest);
+					getHistory(inCheck).countFailure(cur_move, rest);
 				} else {
 					list.countSuccess(cur_move);//Should be before addCounterMove call
-					env.getHistory().countSuccess(cur_move, rest);
-					env.getHistory().addCounterMove(env.getBitboard().getLastMove(), cur_move);
+					getHistory(inCheck).countSuccess(cur_move, rest);
+					getHistory(inCheck).addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
 				
 				if (cur_eval > best_eval) {
