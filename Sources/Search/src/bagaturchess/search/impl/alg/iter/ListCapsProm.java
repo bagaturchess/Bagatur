@@ -139,7 +139,7 @@ public class ListCapsProm implements ISearchMoveList {
 				}
 			}
 			
-			ordval += env.getHistory().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
+			ordval += env.getHistory_All().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
 			
 			ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
 			

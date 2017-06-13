@@ -41,6 +41,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
+import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.pv.PVManager;
@@ -239,6 +240,9 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		initParams(env.getSearchConfig());
 	}
 	
+	protected IHistoryTable getHistory(boolean inCheck) {
+		return inCheck ? env.getHistory_InCheck() : env.getHistory_All();
+	}
 	
 	protected int getDrawScores() {
 		//TODO:Check
@@ -270,7 +274,8 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	public void newSearch() {
 		
-		env.getHistory().newSearch();
+		env.getHistory_All().newSearch();
+		env.getHistory_InCheck().newSearch();
 		
 		env.getMoveListFactory().newSearch();
 		env.getEval().beforeSearch();

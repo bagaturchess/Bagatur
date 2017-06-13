@@ -135,7 +135,7 @@ public class ListCapsProm_See implements ISearchMoveList {
 				}
 			}
 			
-			ordval += 100 * env.getHistory().getScores(move);
+			ordval += 100 * env.getHistory_All().getScores(move);
 			
 			long move_ord = (ordval << 32) | move;
 			

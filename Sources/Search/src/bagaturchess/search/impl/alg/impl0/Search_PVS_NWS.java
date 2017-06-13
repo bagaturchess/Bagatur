@@ -37,6 +37,7 @@ import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.alg.iter.ListAll;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.exts.ExtStat;
+import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.utils.SearchUtils;
@@ -1083,8 +1084,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						
 						//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
-							double rate = Math.sqrt(searchedCount);
-							rate *= (1 - env.getHistory().getScores(cur_move));
+							double rate = Math.sqrt(searchedCount + rest);
+							rate *= (1 - getHistory(inCheck).getScores(cur_move));
 							if (isGoodMove) {
 								rate /= 2;
 							}
@@ -1159,11 +1160,11 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				//Add history records for the current move
 				list.countTotal(cur_move);
 				if (cur_eval <= alpha) {
-					env.getHistory().countFailure(cur_move, rest);
+					getHistory(inCheck).countFailure(cur_move, rest);
 				} else {
 					list.countSuccess(cur_move);//Should be before addCounterMove call
-					env.getHistory().countSuccess(cur_move, rest);
-					env.getHistory().addCounterMove(env.getBitboard().getLastMove(), cur_move);
+					getHistory(inCheck).countSuccess(cur_move, rest);
+					getHistory(inCheck).addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
 				
 				if (cur_eval > best_eval) {
@@ -1876,8 +1877,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							
 							//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
-								double rate = Math.sqrt(searchedCount);
-								rate *= (1 - env.getHistory().getScores(cur_move));
+								double rate = Math.sqrt(searchedCount + rest);
+								rate *= (1 - getHistory(inCheck).getScores(cur_move));
 								if (isGoodMove) {
 									rate /= 2;
 								}
@@ -1946,11 +1947,11 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				//Add history records for the current move
 				list.countTotal(cur_move);
 				if (cur_eval <= alpha_org) {
-					env.getHistory().countFailure(cur_move, rest);
+					getHistory(inCheck).countFailure(cur_move, rest);
 				} else {
 					list.countSuccess(cur_move);//Should be before addCounterMove call
-					env.getHistory().countSuccess(cur_move, rest);
-					env.getHistory().addCounterMove(env.getBitboard().getLastMove(), cur_move);
+					getHistory(inCheck).countSuccess(cur_move, rest);
+					getHistory(inCheck).addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
 				
 				if (cur_eval > best_eval) {

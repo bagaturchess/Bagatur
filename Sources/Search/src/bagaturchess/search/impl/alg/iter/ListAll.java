@@ -176,20 +176,20 @@ public class ListAll implements ISearchMoveList {
 			if (orderingStatistics.getOrdVal_COUNTER() > orderingStatistics.getOrdVal_PREVBEST()
 					&& orderingStatistics.getOrdVal_COUNTER() > orderingStatistics.getOrdVal_PREVPV()) {
 				
-				int counterMove1 = env.getHistory().getCounterMove1(env.getBitboard().getLastMove());
+				int counterMove1 = env.getHistory_All().getCounterMove1(env.getBitboard().getLastMove());
 				if (counterMove1 != 0 && isOk(counterMove1) && env.getBitboard().isPossible(counterMove1)) {
 					fastMove = counterMove1;
 				}
 				
 				if (fastMove == 0) {
-					int counterMove2 = env.getHistory().getCounterMove2(env.getBitboard().getLastMove());
+					int counterMove2 = env.getHistory_All().getCounterMove2(env.getBitboard().getLastMove());
 					if (counterMove2 != 0 && isOk(counterMove2) && env.getBitboard().isPossible(counterMove2)) {
 						fastMove = counterMove2;
 					}
 				}
 				
 				if (fastMove == 0) {
-					int counterMove3 = env.getHistory().getCounterMove3(env.getBitboard().getLastMove());
+					int counterMove3 = env.getHistory_All().getCounterMove3(env.getBitboard().getLastMove());
 					if (counterMove3 != 0 && isOk(counterMove3) && env.getBitboard().isPossible(counterMove3)) {
 						fastMove = counterMove3;
 					}
@@ -428,19 +428,19 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 		
-		if (env.getHistory().getCounterMove1(env.getBitboard().getLastMove()) == move) {
+		if (env.getHistory_All().getCounterMove1(env.getBitboard().getLastMove()) == move) {
 			ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
 		} else {
-			if (env.getHistory().getCounterMove2(env.getBitboard().getLastMove()) == move) {
+			if (env.getHistory_All().getCounterMove2(env.getBitboard().getLastMove()) == move) {
 				ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
 			} else {
-				if (env.getHistory().getCounterMove3(env.getBitboard().getLastMove()) == move) {
+				if (env.getHistory_All().getCounterMove3(env.getBitboard().getLastMove()) == move) {
 					ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
 				}
 			}
 		}
 		
-		ordval += env.getHistory().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
+		ordval += env.getHistory_All().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
 		
 		ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
 		
@@ -488,13 +488,13 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 		
-		if (env.getHistory().getCounterMove1(env.getBitboard().getLastMove()) == move) {
+		if (env.getHistory_All().getCounterMove1(env.getBitboard().getLastMove()) == move) {
 			orderingStatistics.counter_count++;
 		} else {
-			if (env.getHistory().getCounterMove2(env.getBitboard().getLastMove()) == move) {
+			if (env.getHistory_All().getCounterMove2(env.getBitboard().getLastMove()) == move) {
 				orderingStatistics.counter_count++;
 			} else {
-				if (env.getHistory().getCounterMove3(env.getBitboard().getLastMove()) == move) {
+				if (env.getHistory_All().getCounterMove3(env.getBitboard().getLastMove()) == move) {
 					orderingStatistics.counter_count++;
 				}
 			}
@@ -544,19 +544,19 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 		
-		if (env.getHistory().getCounterMove1(env.getBitboard().getLastMove()) == bestmove) {
+		if (env.getHistory_All().getCounterMove1(env.getBitboard().getLastMove()) == bestmove) {
 			orderingStatistics.counter_best++;
 		} else {
-			if (env.getHistory().getCounterMove2(env.getBitboard().getLastMove()) == bestmove) {
+			if (env.getHistory_All().getCounterMove2(env.getBitboard().getLastMove()) == bestmove) {
 				orderingStatistics.counter_best++;
 			} else {
-				if (env.getHistory().getCounterMove3(env.getBitboard().getLastMove()) == bestmove) {
+				if (env.getHistory_All().getCounterMove3(env.getBitboard().getLastMove()) == bestmove) {
 					orderingStatistics.counter_best++;
 				}
 			}
 		}
 		
-		orderingStatistics.history_best += env.getHistory().getScores(bestmove);
+		orderingStatistics.history_best += env.getHistory_All().getScores(bestmove);
 		orderingStatistics.history_count += 1;
 		
 		orderingStatistics.pst_best += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(bestmove);
@@ -596,13 +596,13 @@ public class ListAll implements ISearchMoveList {
 			return true;
 		}
 		
-		if (env.getHistory().getCounterMove1(env.getBitboard().getLastMove()) == move) {
+		if (env.getHistory_All().getCounterMove1(env.getBitboard().getLastMove()) == move) {
 			return true;
 		} else {
-			if (env.getHistory().getCounterMove2(env.getBitboard().getLastMove()) == move) {
+			if (env.getHistory_All().getCounterMove2(env.getBitboard().getLastMove()) == move) {
 				return true;
 			} else {
-				if (env.getHistory().getCounterMove3(env.getBitboard().getLastMove()) == move) {
+				if (env.getHistory_All().getCounterMove3(env.getBitboard().getLastMove()) == move) {
 					return true;
 				}
 			}

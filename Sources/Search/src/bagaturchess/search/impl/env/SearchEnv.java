@@ -66,7 +66,8 @@ public class SearchEnv {
 	private boolean gtb_probing_get;
 
 	
-	private IHistoryTable history;
+	private IHistoryTable history_all;
+	private IHistoryTable history_incheck;
 	
 	private ISearchMoveListFactory moveListFactory;
 	private PVHistory pvs_history;
@@ -80,7 +81,8 @@ public class SearchEnv {
 		tactics = new Tactics(bitboard);
 		
 		//history = new HistoryTable_FromTo(new BinarySemaphore_Dummy());
-		history = new HistoryTable_PieceTo();
+		history_all = new HistoryTable_PieceTo();
+		history_incheck = new HistoryTable_PieceTo();
 		
 		moveListFactory = new SearchMoveListFactory();
 		
@@ -104,10 +106,14 @@ public class SearchEnv {
 		return shared.getOpeningBook();
 	}
 
-	public IHistoryTable getHistory() {
-		return history;
+	public IHistoryTable getHistory_All() {
+		return history_all;
 	}
 
+	public IHistoryTable getHistory_InCheck() {
+		return history_incheck;
+	}
+	
 	public PawnsEvalCache getPawnsCache() {
 		if (pawnsCache == null) {
 			pawnsCache = shared.getAndRemovePawnsCache();

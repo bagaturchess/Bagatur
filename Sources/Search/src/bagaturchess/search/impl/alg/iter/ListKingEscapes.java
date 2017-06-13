@@ -143,19 +143,19 @@ public class ListKingEscapes implements ISearchMoveList {
 			}
 		}
 		
-		if (env.getHistory().getCounterMove1(env.getBitboard().getLastMove()) == move) {
+		if (env.getHistory_InCheck().getCounterMove1(env.getBitboard().getLastMove()) == move) {
 			ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
 		} else {
-			if (env.getHistory().getCounterMove2(env.getBitboard().getLastMove()) == move) {
+			if (env.getHistory_InCheck().getCounterMove2(env.getBitboard().getLastMove()) == move) {
 				ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
 			} else {
-				if (env.getHistory().getCounterMove3(env.getBitboard().getLastMove()) == move) {
+				if (env.getHistory_InCheck().getCounterMove3(env.getBitboard().getLastMove()) == move) {
 					ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
 				}
 			}
 		}
 		
-		ordval += env.getHistory().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
+		ordval += env.getHistory_InCheck().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
 		
 		ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
 		
