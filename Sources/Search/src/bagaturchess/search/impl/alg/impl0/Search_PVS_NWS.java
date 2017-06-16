@@ -1084,7 +1084,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						
 						//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
-							double rate = Math.sqrt(searchedCount + rest);
+							double rate = Math.sqrt(searchedCount);
 							rate *= (1 - getHistory(inCheck).getScores(cur_move));
 							/*if (isGoodMove) {
 								rate /= 2;
@@ -1877,7 +1877,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							
 							//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
-								double rate = Math.sqrt(searchedCount + rest);
+								double rate = Math.sqrt(searchedCount);
 								rate *= (1 - getHistory(inCheck).getScores(cur_move));
 								/*if (isGoodMove) {
 									rate /= 2;
