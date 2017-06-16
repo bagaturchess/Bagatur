@@ -117,7 +117,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 		String message = SearchInfoUtils.buildMajorInfoCommand(info, getStartTime(), rootSearch.getTPTUsagePercent(), 0);
 		send(message);
 		
-		stopIfMateIsFound();
+		//stopIfMateIsFound();
 	}
 	
 	
