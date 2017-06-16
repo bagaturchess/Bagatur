@@ -25,6 +25,7 @@
 package bagaturchess.search.impl.uci_adaptor.timemanagement.controllers;
 
 
+import bagaturchess.search.impl.utils.SearchUtils;
 import bagaturchess.uci.api.ITimeConfig;
 
 
@@ -57,6 +58,10 @@ public abstract class TimeController_MoveEvalInAccount extends TimeController_Ba
 	
 	@Override
 	public void newPVLine(int eval, int depth, int move) {
+		
+		if (SearchUtils.isMateVal(eval)) {
+			return;//Do not use too much time when mate is found
+		}
 		
 		if (lastmove != 0) {
 			
