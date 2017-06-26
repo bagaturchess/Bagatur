@@ -56,6 +56,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 	double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1 * 0.777 * 1;
 	double IID_DEPTH_MULTIPLIER 			= 1;
 	boolean STATIC_PRUNING 					= true;
+	boolean STATIC_PRUNING2 				= true;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -966,22 +967,41 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 				
 				
-				boolean passerPush = isPasserPushPV(cur_move);
 				boolean isCapOrProm = MoveInt.isCaptureOrPromotion(cur_move);
 				int moveSee = -1;
 				if (isCapOrProm) {
 					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 				}
 				int new_materialGain = materialGain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
-				//boolean isDangerous = isDangerousPV(cur_move, normDepth(initial_maxdepth), depth);
-				
-				//boolean isKiller = isKillerMove(cur_move);
+
+				boolean passerPush = isPasserPushPV(cur_move);
 				
 				int eval_b = EXT_MOVE_EVAL_PV > 0 ? fullEval(depth, alpha, beta, rootColour) : 0;
 				
-				/*if (!env.getBitboard().isPossible(cur_move)) {
-					throw new IllegalStateException("cur_move=" + cur_move + ", tpt_move=" + tpt_move);
-				}*/
+				//Static pruning - move count based and move history based
+				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
+
+					if (searchedCount >= 4 && rest <= 8) {
+						
+						if (searchedCount >= 3 + Math.pow(rest, 2)) {
+							continue;
+						}
+						
+						if (rest == 1 && getHistory(inCheck).getScores(cur_move) <= 0.16) {
+							continue;
+						} else if (rest == 2 && getHistory(inCheck).getScores(cur_move) <= 0.08) {
+							continue;
+						} else if (rest == 3 && getHistory(inCheck).getScores(cur_move) <= 0.04) {
+							continue;
+						} else if (rest == 4 && getHistory(inCheck).getScores(cur_move) <= 0.02) {
+							continue;
+						} else if (rest == 5 && getHistory(inCheck).getScores(cur_move) <= 0.01) {
+							continue;
+						} else if (rest == 6 && getHistory(inCheck).getScores(cur_move) == 0.00) {
+							continue;
+						}
+					}
+				}
 				
 				env.getBitboard().makeMoveForward(cur_move);
 				
@@ -1023,11 +1043,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					
 					int lmrReduction = 0;
 					boolean staticPrunning = false;
-					
-					boolean isGoodMove = false;
-					if (list instanceof ListAll) {
-						isGoodMove = ((ListAll) list).isGoodMove(cur_move);
-					}
 					
 					if (!isCheckMove
 							&& !isMateVal(alpha_org)
@@ -1084,7 +1099,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						
 						//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
-							double rate = Math.sqrt(searchedCount);
+							double rate = Math.log(searchedCount) * Math.log(rest) / 2;
+							rate += 2;//for pv nodes
 							rate *= (1 - getHistory(inCheck).getScores(cur_move));
 							/*if (isGoodMove) {
 								rate /= 2;
@@ -1773,12 +1789,35 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 				}
 				int new_materialGain = materialGain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
+				
 				boolean passerPush = isPasserPushNonPV(cur_move);
 				
-				//boolean isDangerous = isDangerousNonPV(cur_move, normDepth(initial_maxdepth), depth);
-				//boolean isKiller = isKillerMove(cur_move);
-				
 				int eval_b = EXT_MOVE_EVAL_NONPV > 0 ? fullEval(depth, beta - 1, beta, rootColour) : 0;
+				
+				//Static pruning - move count based and move history based
+				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
+
+					if (searchedCount >= 4 && rest <= 8) {
+						
+						if (searchedCount >= 3 + Math.pow(rest, 2)) {
+							continue;
+						}
+						
+						if (rest == 1 && getHistory(inCheck).getScores(cur_move) <= 0.16) {
+							continue;
+						} else if (rest == 2 && getHistory(inCheck).getScores(cur_move) <= 0.08) {
+							continue;
+						} else if (rest == 3 && getHistory(inCheck).getScores(cur_move) <= 0.04) {
+							continue;
+						} else if (rest == 4 && getHistory(inCheck).getScores(cur_move) <= 0.02) {
+							continue;
+						} else if (rest == 5 && getHistory(inCheck).getScores(cur_move) <= 0.01) {
+							continue;
+						} else if (rest == 6 && getHistory(inCheck).getScores(cur_move) == 0.00) {
+							continue;
+						}
+					}
+				}
 				
 				env.getBitboard().makeMoveForward(cur_move);
 				
@@ -1816,11 +1855,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						
 						int lmrReduction = 0;
 						boolean staticPrunning = false;
-						
-						boolean isGoodMove = false;
-						if (list instanceof ListAll) {
-							isGoodMove = ((ListAll) list).isGoodMove(cur_move);
-						}
 						
 						if (!isCheckMove
 								&& !isMateVal(alpha_org)
@@ -1877,7 +1911,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							
 							//if (!isGoodMove || searchedCount >= getLMR1(list)) {
 							
-								double rate = Math.sqrt(searchedCount);
+								double rate = Math.log(searchedCount) * Math.log(rest) / 2;
+								rate += 2;//for non pv nodes
 								rate *= (1 - getHistory(inCheck).getScores(cur_move));
 								/*if (isGoodMove) {
 									rate /= 2;
