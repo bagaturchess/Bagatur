@@ -34,10 +34,8 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchMoveList;
 
-import bagaturchess.search.impl.alg.iter.ListAll;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.exts.ExtStat;
-import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.utils.SearchUtils;
