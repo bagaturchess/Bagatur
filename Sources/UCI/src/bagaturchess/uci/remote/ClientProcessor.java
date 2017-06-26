@@ -49,16 +49,17 @@ public class ClientProcessor implements Runnable {
 	
 	@Override
 	public void run() {
+		
 		String[] args = new String[] {
 				"bagaturchess.engines.base.cfg.UCIConfig_BaseImpl",
 				"bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove",
 				"bagaturchess.engines.base.cfg.UCISearchAdaptorConfig_BaseImpl",
-				"bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch",
-				"bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP",
+				"bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD",
+				"bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core",
 				"bagaturchess.search.impl.alg.impl1.Search_NegaScout",
 				"bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD_SMP",
-				"bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl",
-				"bagaturchess.engines.bagatur.cfg.eval.BagaturEvalConfigImpl_v2", };
+				"bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl",
+				"bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig", };
 
 		Boot.runStateManager(args, ChannelManager.getChannel());
 	}
