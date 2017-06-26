@@ -53,7 +53,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 	double LMR_REDUCTION_MULTIPLIER 		= 1 * 1.222 * 1;
 	double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1 * 0.777 * 1;
 	double IID_DEPTH_MULTIPLIER 			= 1;
-	boolean STATIC_PRUNING 					= true;
+	boolean STATIC_PRUNING1					= true;
 	boolean STATIC_PRUNING2 				= true;
 	
 	private long lastSentMinorInfo_timestamp;
@@ -670,7 +670,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 
-        if (STATIC_PRUNING && useStaticPrunning
+        if (STATIC_PRUNING1 && useStaticPrunning
                 ) {
                 
             if (inCheck) {
@@ -859,7 +859,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 		
-        if (STATIC_PRUNING && useStaticPrunning
+        if (STATIC_PRUNING1 && useStaticPrunning
                 ) {
                 
             if (inCheck) {
@@ -1525,7 +1525,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 		
-        if (STATIC_PRUNING && useStaticPrunning
+        if (STATIC_PRUNING1 && useStaticPrunning
                 ) {
                 
             if (inCheck) {
@@ -1696,7 +1696,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 		
-        if (STATIC_PRUNING && useStaticPrunning
+        if (STATIC_PRUNING1 && useStaticPrunning
                 ) {
                 
             if (inCheck) {
