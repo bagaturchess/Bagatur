@@ -565,15 +565,24 @@ public class Search_NegaScout extends SearchImpl {
 						continue;
 					}
 					
-					//Move history prunning
-					if (!pv) { 
-						if (rest == 1 && getHistory(inCheck).getScores(cur_move) <= 0.04) {
+					//Static pruning - move count based and move history based
+					if (searchedCount >= 4 && rest <= 8) {
+						
+						if (searchedCount >= 3 + Math.pow(rest, 2)) {
 							continue;
-						} else if (rest == 2 && getHistory(inCheck).getScores(cur_move) <= 0.02) {
+						}
+						
+						if (rest == 1 && getHistory(inCheck).getScores(cur_move) <= 0.16) {
 							continue;
-						} else if (rest == 3 && getHistory(inCheck).getScores(cur_move) <= 0.01) {
+						} else if (rest == 2 && getHistory(inCheck).getScores(cur_move) <= 0.08) {
 							continue;
-						} else if (rest == 4 && getHistory(inCheck).getScores(cur_move) == 0.00) {
+						} else if (rest == 3 && getHistory(inCheck).getScores(cur_move) <= 0.04) {
+							continue;
+						} else if (rest == 4 && getHistory(inCheck).getScores(cur_move) <= 0.02) {
+							continue;
+						} else if (rest == 5 && getHistory(inCheck).getScores(cur_move) <= 0.01) {
+							continue;
+						} else if (rest == 6 && getHistory(inCheck).getScores(cur_move) == 0.00) {
 							continue;
 						}
 					}
