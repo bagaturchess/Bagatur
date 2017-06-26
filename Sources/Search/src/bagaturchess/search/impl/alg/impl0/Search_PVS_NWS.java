@@ -1652,9 +1652,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 			}
 		}
-
 		
-		boolean reuseIIDMOves = false;
+		
 		//IID NONPV Node
 		if (IID_NONPV /*&& depth > 0*/) {
 			
@@ -1667,8 +1666,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta,
 						prevNullMove, prevbest, prevprevbest, prevPV, rootColour, totalLMReduction,
 						materialGain, inNullMove, mateMove, useMateDistancePrunning, useStaticPrunning, useNullMove);
-				
-				reuseIIDMOves = rest >= 3 && !useNullMove;
 				
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
