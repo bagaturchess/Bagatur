@@ -33,7 +33,7 @@ public class EngineProcess_BagaturImpl_WorkspaceImpl extends EngineProcess_Bagat
 		ARGS += "bagaturchess.engines.base.cfg.UCISearchAdaptorConfig_BaseImpl ";
 		ARGS += "bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD ";
 		ARGS += "bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core ";
-		ARGS += "bagaturchess.search.impl.alg.impl1.Search_NegaScout ";
+		ARGS += "bagaturchess.search.impl.alg.impl0.Search_PVS_NWS ";
 		ARGS += "bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD_SMP ";
 		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl ";
 		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig ";
