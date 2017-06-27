@@ -94,10 +94,7 @@ public class MTDSchedulerMain {
 								bagaturchess.search.impl.alg.impl0.Search_PVS_NWS.class.getName(),
 								//bagaturchess.search.impl.alg.impl1.Search_NegaScout.class.getName(),
 								
-								//"bagaturchess.engines.bagatur.v110.SearchConfigImpl",
 								bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD.class.getName(),
-								//"bagaturchess.engines.searchtune.SearchConfig1_MTD_Impl_LKG_AllInOne_Test",
-								//"bagaturchess.engines.searchtune.SearchConfig1_MTD_Impl_INITIAL",
 								
 								//"bagaturchess.engines.learning.cfg.weights.boardtune.WeightsBoardConfig_LKG",
 								//"bagaturchess.engines.learning.cfg.weights.evaltune.WeightsEvaluationConfig_LKG"
@@ -113,7 +110,7 @@ public class MTDSchedulerMain {
 								
 								//"bagaturchess.engines.learning.cfg.weights.WeightsBoardConfig",
 								//"bagaturchess.engines.learning.cfg.weights.WeightsEvaluationConfig"
-																
+								
 								//bagaturchess.engines.cuckooadapter.BoardConfigImpl_Cuckoo.class.getName(),
 								//bagaturchess.engines.cuckooadapter.EvaluationConfg_Cuckoo.class.getName()
 								
@@ -137,14 +134,6 @@ public class MTDSchedulerMain {
 		
 		sharedData = search.getSharedData();
 		
-		/*double c = 1.0643;
-		//System.out.println("=" + Math.pow(c, 100));
-		
-		for (int i=0; i<100; i++) {
-			
-			System.out.println(i + "=" + Math.pow(c, i));
-		}
-		System.exit(0);*/
 		
 		//IBitBoard bitboard  = new Board("2r1r2k/1q3ppp/p2Rp3/2p1P3/6QB/p3P3/bP3PPP/3R2K1 w - - bm Bf6; id WAC.222");
 		//IBitBoard bitboard  = new Board("2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - bm Qg6");//Fast mate
