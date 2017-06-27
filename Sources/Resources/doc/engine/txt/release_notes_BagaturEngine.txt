@@ -1,6 +1,6 @@
 
-Version 1.5d (15 June 2017)
-  * Search optimizations: added move history pruning
+Version 1.5d (30 June 2017)
+  * Search optimizations: added move history pruning and move count pruning
   * Search optimizations: more aggressive late move reduction
   * Search optimizations: switch OFF check extension
   
