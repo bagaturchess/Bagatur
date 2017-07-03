@@ -50,8 +50,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 	int MIN_EVAL_DIFF_PV 					= 33;
 	int MIN_EVAL_DIFF_NONPV 				= 33;
 	
-	double LMR_REDUCTION_MULTIPLIER 		= 1 * 1.222 * 1;
-	double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1 * 0.777 * 1;
+	double LMR_REDUCTION_MULTIPLIER 		= 1;// * 1.222 * 1;
+	double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1;// * 0.777 * 1;
 	double IID_DEPTH_MULTIPLIER 			= 1;
 	boolean STATIC_PRUNING1					= true;
 	boolean STATIC_PRUNING2 				= true;
@@ -2318,10 +2318,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			//cur_move = (tpt_move != 0 && MoveInt.isCaptureOrPromotion(tpt_move)) ? tpt_move : list.next();
 			cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		}
-
-		if (env.getBitboard().getHashKey() == 9168619578754754311L) {
-			int g = 0;
-		}
+		
 		
 		int searchedMoves = 0;
 		if (cur_move != 0) 
@@ -2634,6 +2631,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			//cur_move = (tpt_move != 0 && MoveInt.isCaptureOrPromotion(tpt_move)) ? tpt_move : list.next();
 			cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		}
+		
 		
 		int searchedMoves = 0;
 		if (cur_move != 0) 
