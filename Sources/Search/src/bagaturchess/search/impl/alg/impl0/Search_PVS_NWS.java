@@ -1066,80 +1066,10 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							 //&& totalLMReduction < maxdepth / 2
 							) {
 						
-						/*
-						double rate = Math.sqrt(depth) + Math.sqrt(searchedCount);
-						rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
-						lmrReduction += (int) (PLY * rate * 0.5);
-						*/
-						
-						/*
-						double rate = Math.sqrt(searchedCount);
-						rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
-						lmrReduction += (int) (PLY * rate * 1);
-						if (searchedCount >= getLMR1(list)) {
-							if (lmrReduction < PLY) {
-								lmrReduction = PLY;
-							}
-						} else {
-							if (lmrReduction > PLY / 2) {
-								lmrReduction = PLY / 2;
-							}
-						}
-						if (lmrReduction >= (rest - 1) * PLY) {
-							lmrReduction = (rest - 1) * PLY;
-						}
-						*/
-						
-						//if (searchedCount >= Math.sqrt(rest)) {
-						//if (searchedCount >= 1) {
-						//	staticPrunning = true;
-						//}
-						
-						//if (!isGoodMove || searchedCount >= getLMR1(list)) {
-							
 							double rate = Math.log(searchedCount) * Math.log(rest) / 2;
 							rate += 2;//for pv nodes
 							rate *= (1 - getHistory(inCheck).getScores(cur_move));
-							/*if (isGoodMove) {
-								rate /= 2;
-							}*/
 							lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
-							/*if (searchedCount >= getLMR2(list)) {
-								lmrReduction = Math.max(lmrReduction, (rest * PLY) / 2);
-							}*/
-							/*if (lmrReduction < PLY) {
-								lmrReduction = PLY;
-							}
-							if (lmrReduction >= (rest - 1) * PLY) {
-								lmrReduction = (rest - 1) * PLY;
-							}*/
-						//}
-						
-						/*
-						if (!isGoodMove) {
-							
-							lmrReduction += PLY;
-							
-							if (rest > 2 && searchedCount >= getLMR2(list)) {
-								lmrReduction += PLY;
-								if (rest > 3 && searchedCount >= 2 * getLMR2(list)) {
-									lmrReduction += PLY;
-									if (rest > 4 && searchedCount >= 4 * getLMR2(list)) {
-										lmrReduction += PLY;
-										if (rest > 5 && searchedCount >= 8 * getLMR2(list)) {
-											lmrReduction += PLY;
-										}
-									}
-								}
-							}
-							
-							double rate = env.getHistory_all().getGoodMoveScores(cur_move);
-							lmrReduction *= (double)(1 - rate);
-							if (lmrReduction < PLY) {
-								lmrReduction = PLY;
-							}
-						}
-						*/
 					}
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
@@ -1875,81 +1805,10 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							 //&& totalLMReduction < maxdepth / 2
 							) {
 							
-							/*
-							double rate = Math.sqrt(depth) + Math.sqrt(searchedCount);
-							rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
-							lmrReduction += (int) (PLY * rate * 0.5);
-							*/
-							
-							/*
-							double rate = Math.sqrt(searchedCount);
-							rate *= (1 - env.getHistory_all().getGoodMoveScores(cur_move));
-							lmrReduction += (int) (PLY * rate * 1);
-							if (searchedCount >= getLMR1(list)) {
-								if (lmrReduction < PLY) {
-									lmrReduction = PLY;
-								}
-							} else {
-								if (lmrReduction > PLY / 2) {
-									lmrReduction = PLY / 2;
-								}
-							}
-							if (lmrReduction >= (rest - 1) * PLY) {
-								lmrReduction = (rest - 1) * PLY;
-							}
-							*/
-							
-							//if (searchedCount >= Math.sqrt(rest)) {
-							//if (searchedCount >= 1) {
-							//	staticPrunning = true;
-							//}
-							
-							//if (!isGoodMove || searchedCount >= getLMR1(list)) {
-							
-								double rate = Math.log(searchedCount) * Math.log(rest) / 2;
-								rate += 2;//for non pv nodes
-								rate *= (1 - getHistory(inCheck).getScores(cur_move));
-								/*if (isGoodMove) {
-									rate /= 2;
-								}*/
-								lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
-								/*if (searchedCount >= getLMR2(list)) {
-									lmrReduction = Math.max(lmrReduction, (rest * PLY) / 2);
-								}*/
-								/*if (lmrReduction < PLY) {
-									lmrReduction = PLY;
-								}
-								if (lmrReduction >= (rest - 1) * PLY) {
-									lmrReduction = (rest - 1) * PLY;
-								}*/
-							//}
-							
-							
-							/*
-							if (!isGoodMove) {
-								
-								lmrReduction += PLY;
-								
-								if (rest > 2 && searchedCount >= getLMR2(list)) {
-									lmrReduction += PLY;
-									if (rest > 3 && searchedCount >= 2 * getLMR2(list)) {
-										lmrReduction += PLY;
-										if (rest > 4 && searchedCount >= 4 * getLMR2(list)) {
-											lmrReduction += PLY;
-											if (rest > 5 && searchedCount >= 8 * getLMR2(list)) {
-												lmrReduction += PLY;
-											}
-										}
-									}
-								}
-								
-								double rate = env.getHistory_all().getGoodMoveScores(cur_move);
-								lmrReduction *= (double)(1 - rate);
-								if (lmrReduction < PLY) {
-									lmrReduction = PLY;
-								}
-							}
-							*/
+							double rate = Math.log(searchedCount) * Math.log(rest) / 2;
+							rate += 2;//for non pv nodes
+							rate *= (1 - getHistory(inCheck).getScores(cur_move));
+							lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
 						}
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
