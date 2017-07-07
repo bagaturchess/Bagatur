@@ -610,13 +610,6 @@ public class Search_NegaScout extends SearchImpl {
                 	
             		reduction = (int) (PLY * Math.sqrt(searchedCount + rest));
 					reduction *= (1 - getHistory(inCheck).getScores(cur_move));
-					
-					if (reduction < PLY) {
-						reduction = PLY;
-					}
-					if (reduction >= (rest - 1) * PLY) {
-						reduction = (rest - 1) * PLY;
-					}
                 }
                 
                 
