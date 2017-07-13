@@ -50,7 +50,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 	int MIN_EVAL_DIFF_PV 					= 33;
 	int MIN_EVAL_DIFF_NONPV 				= 33;
 	
-	double LMR_REDUCTION_MULTIPLIER 		= 0.5;// * 1.222 * 1;
+	double LMR_REDUCTION_MULTIPLIER 		= 1;// * 1.222 * 1;
 	double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1;// * 0.777 * 1;
 	double IID_DEPTH_MULTIPLIER 			= 1;
 	boolean STATIC_PRUNING1					= true;
