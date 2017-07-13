@@ -10,6 +10,12 @@ The program runs under all Operating Systems, which support Java platform:
 
 # Revision History
 
+Version 1.5d (15 July 2017)
+  * Search optimizations: added move history pruning and move count pruning
+  * Search optimizations: tuning of late move reduction
+  * Search optimizations: tuning of null move
+  * Search optimizations: switch OFF check extension
+  
 Version 1.5c (29 May 2017)
   * Search optimizations: improved moves history table (PieceTo implementation)
   
