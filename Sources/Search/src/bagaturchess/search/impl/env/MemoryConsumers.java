@@ -102,8 +102,8 @@ public class MemoryConsumers {
 		 * The selection bellow is optimized for long games.
 		 */
 		
-		//0.29 for short games (e.g. 1/1), 0.77 for long games (e.g. 40/40)
-		double memoryUsagePercent = (engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.77 : 0.29;
+		//0.29 for short games (e.g. 1/1), 0.69 for long games (e.g. 40/40)
+		double memoryUsagePercent = (engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.69 : 0.29;
 		
 		if (MIN_MEMORY_BUFFER == 0) MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;//Set only if not set statically
 		if (MEMORY_USAGE_PERCENT == 0) MEMORY_USAGE_PERCENT = memoryUsagePercent;//Set only if not set statically
@@ -152,7 +152,6 @@ public class MemoryConsumers {
 					channel.dump(e);
 				}
 			}
-
 		//}
 		
 		

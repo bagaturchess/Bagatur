@@ -151,6 +151,9 @@ public class SearchEnv {
 	}
 	
 	
+	/**
+	 * Returns null, because the calls to GTBProbing.probe() cause jvm crashes on some hardwares as well as Java OOM errors
+	 */
 	public GTBProbing getGTBProbing() {
 		
 		if (!gtb_probing_get) {
@@ -158,7 +161,8 @@ public class SearchEnv {
 			gtb_probing_get = true;
 		}
 		
-		return gtb_probing;
+		//return gtb_probing;
+		return null;
 	}
 	
 	

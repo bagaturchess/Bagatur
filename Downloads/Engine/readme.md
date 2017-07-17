@@ -10,6 +10,9 @@ The program runs under all Operating Systems, which support Java platform:
 
 # Revision History
 
+Version 1.5e (20 July 2017)
+  * Endgame Tablebases support - switched OFF, because of engine crash errors (JNI and java OutOfMemory related)
+  
 Version 1.5d (15 July 2017)
   * Search optimizations: added move history pruning and move count pruning
   * Search optimizations: tuning of late move reduction
