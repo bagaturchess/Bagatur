@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import bagaturchess.bitboard.common.Properties;
+
 public class StackLongInt {
   /**
    * Last element in the list.<p>
@@ -340,9 +342,21 @@ public class StackLongInt {
     int index;
     int pos = nextPtr[hash(key) % capacity];
     
+    if (Properties.DEBUG_MODE) {
+  	  if (capacity != keys.length) {
+  		  throw new IllegalStateException("capacity=" + capacity + ", keys.length=" + keys.length);
+  	  }
+    }
+    
     while (pos != LAST) {
       index = pos - capacity;
-
+      
+      if (!Properties.DEBUG_MODE) {
+	      if (index >= capacity) {//Bugfixing for rare cases: In some cases in Chess Art For Kids game, the index is out of range: index==capacity.
+	    	  return NO_VALUE;
+	      }
+      }
+      
       if (keys[index] == key) {
         return elements[index];
       }
@@ -370,16 +384,19 @@ public class StackLongInt {
 	          nextPtr[pos] = nextFree;
 	          nextFree = pos;
 	          count--;
-	          return 0;
 	    	}
 	        return elements[index];
 	      }
-
+	      
 	      prevPos = pos;
 	      pos = nextPtr[pos];
 	    }
-
-	    throw new IllegalStateException("Key " + key + " not found.");
+	    
+	    if (Properties.DEBUG_MODE) {
+		    throw new IllegalStateException("Key " + key + " not found.");
+	    }
+	    
+	    return NO_VALUE;
   }
 
   /**

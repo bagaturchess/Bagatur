@@ -873,7 +873,9 @@ public abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 		final int toFieldID = MoveInt.getToFieldID(move);
 		
 		if (playedBoardStates.dec(hashkey) <= -1) {
-			throw new IllegalStateException("hashkey " + hashkey + " not found. Move " + MoveInt.moveToString(move) + "\r\n" + this);
+			if (Properties.DEBUG_MODE) {
+				throw new IllegalStateException("hashkey " + hashkey + " not found. Move " + MoveInt.moveToString(move) + "\r\n" + this);
+			}
 		}
 		
 		//Update enpassant flag and colour

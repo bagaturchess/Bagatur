@@ -21,6 +21,7 @@
  */
 package bagaturchess.bitboard.impl;
 
+
 import java.util.Arrays;
 
 import bagaturchess.bitboard.api.IAttackListener;
@@ -33,7 +34,6 @@ import bagaturchess.bitboard.api.IInternalMoveList;
 import bagaturchess.bitboard.api.IMaterialFactor;
 import bagaturchess.bitboard.api.IMaterialState;
 import bagaturchess.bitboard.api.IMobility;
-import bagaturchess.bitboard.api.IMoveIterator;
 import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.PawnsEvalCache;
@@ -41,7 +41,6 @@ import bagaturchess.bitboard.common.BackupInfo;
 import bagaturchess.bitboard.common.BoardStat;
 import bagaturchess.bitboard.common.CastlingType;
 import bagaturchess.bitboard.common.Fen;
-import bagaturchess.bitboard.common.GamePhase;
 import bagaturchess.bitboard.common.GlobalConstants;
 import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.common.Properties;
@@ -52,7 +51,6 @@ import bagaturchess.bitboard.impl.attacks.control.FieldsStateMachine;
 import bagaturchess.bitboard.impl.attacks.fast.FastPlayersAttacks;
 import bagaturchess.bitboard.impl.datastructs.StackLongInt;
 import bagaturchess.bitboard.impl.datastructs.numbers.IndexNumberMap;
-import bagaturchess.bitboard.impl.datastructs.numbers.IndexNumberSet;
 import bagaturchess.bitboard.impl.endgame.MaterialState;
 import bagaturchess.bitboard.impl.eval.BaseEvaluation;
 import bagaturchess.bitboard.impl.eval.MaterialFactor;
@@ -87,8 +85,6 @@ import bagaturchess.bitboard.impl.plies.specials.Enpassanting;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl.state.PiecesLists;
 import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
-//import bagaturchess.bitboard.datastructs.lrmmap.DataObjectFactory;
-import bagaturchess.bitboard.run.BoardConfigImpl;
 
 
 public class Board extends Fields implements IBitBoard, Cloneable {
@@ -147,7 +143,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	protected boolean[] inCheckCacheInitialized; 
 	protected Checker checkerBuffer;
 	
-	private IndexNumberSet duplicatesRemoverBuffer = new IndexNumberSet(ConstantStructure.MOVES_INDEXES_MAX);
+	//private IndexNumberSet duplicatesRemoverBuffer = new IndexNumberSet(ConstantStructure.MOVES_INDEXES_MAX);
 	
 	//protected MoveIteratorFactory[] moveIteratorFactory;
 	//protected MoveIterator[][][] iterators;
@@ -315,7 +311,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 			hashkey ^= ConstantStructure.CASTLE_QUEEN_SIDE_BY_COLOUR[Figures.COLOUR_BLACK];
 		}
 		
-		playedBoardStates = new StackLongInt(9631);//9631, 3229
+		playedBoardStates = new StackLongInt(27767);//27767, 9631, 3229, MUST BE PRIME NUMBER
 		playedBoardStates.inc(hashkey);
 		
 		//playedPawnStates = new StackLongInt(9631);
@@ -1398,9 +1394,12 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		//stateManager.decreaseCounter(figureID);
 		
 		if (playedBoardStates.dec(hashkey) <= -1) {
-			throw new IllegalStateException("hashkey " + hashkey + " not found");
+			if (Properties.DEBUG_MODE) {
+				throw new IllegalStateException("hashkey " + hashkey + " not found");
+			}
 		}
-
+		
+		
 		//if (playedPawnStates.dec(pawnskey) <= -1) {
 		//	throw new IllegalStateException("pawnskey " + pawnskey + " not found");
 		//}
@@ -4549,7 +4548,9 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 				myKingID, free);
 		
 		if (checksCount <= 0) {
-			throw new IllegalStateException("checksCount <= 0");
+			if (Properties.DEBUG_MODE) {
+				throw new IllegalStateException("checksCount <= 0");
+			}
 		}
 		
 		count += genAllMoves_FiguresWithSameType(0L, false, true, colour, opponentColour,
@@ -4612,7 +4613,9 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 			}
 
 		} else if (checksCount > 2) {
-			throw new IllegalStateException("Triple check!");
+			if (Properties.DEBUG_MODE) {
+				throw new IllegalStateException("Triple check!");
+			}
 		}
 		
 		if (Properties.STATISTICS_MODE) {
