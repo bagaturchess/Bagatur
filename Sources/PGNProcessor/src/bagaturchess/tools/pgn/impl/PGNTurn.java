@@ -44,13 +44,13 @@ public class PGNTurn {
 		whitePly = _whiteTurnStr;
 		blackPly = _blackTurnStr;
 	}
-
+	
 	public String toString() {
 		return moveNumber + ". " +
 			whitePly +
 			( ( blackPly == null ) ? "" : " " + blackPly );
 	}
-
+	
 	public String getBlackPly() {
 		return blackPly;
 	}

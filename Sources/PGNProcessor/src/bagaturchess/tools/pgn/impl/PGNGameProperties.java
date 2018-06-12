@@ -90,7 +90,17 @@ public class PGNGameProperties {
 		if (propName.equals(PGNConstants.PROPERTY_TAG_OI_OPENING)) { _oi_opening = value; return; }
 		if (propName.equals(PGNConstants.PROPERTY_TAG_OI_SUB_VARIATION)) { _oi_sub_variation = value; return; }
 		if (propName.equals(PGNConstants.PROPERTY_TAG_OI_VARIATION)) { _oi_variation = value; return; }
-		if (propName.equals(PGNConstants.PROPERTY_TAG_PRI_WHITE_ELO)) { _pri_white_elo = new Integer(value); return; }
+		if (propName.equals(PGNConstants.PROPERTY_TAG_PRI_WHITE_ELO)) {
+			if (value.equals("")) value = "0";
+			try {
+				_pri_white_elo = new Integer(value);
+			} catch (java.lang.NumberFormatException nfe) {
+				_pri_white_elo = new Integer(0);
+				System.out.println("White ELO is not a number : " + value);
+				nfe.printStackTrace();
+			}
+			return;
+		}
 		if (propName.equals(PGNConstants.PROPERTY_TAG_PRI_WHITE_NA)) { _pri_white_na = value; return; }
 		if (propName.equals(PGNConstants.PROPERTY_TAG_PRI_WHITE_TITLE)) { _pri_white_title = value; return; }
 		if (propName.equals(PGNConstants.PROPERTY_TAG_PRI_WHITE_TYPE)) { _pri_white_type = value; return; }
@@ -106,7 +116,17 @@ public class PGNGameProperties {
 		if (propName.equals(PGNConstants.PROPERTY_TAG_TDRI_TIME)) { _tdri_time = value; return; }
 		if (propName.equals(PGNConstants.PROPERTY_TAG_TDRI_UTC_DATE)) { _tdri_utc_date = value; return; }
 		if (propName.equals(PGNConstants.PROPERTY_TAG_TDRI_UTC_TIME)) { _tdri_utc_time = value; return; }
-		if (propName.equals(PGNConstants.PROPERTY_TAG_OTHERS_BLACK_ELO)) { _others_black_elo = new Integer(value); return; }
+		if (propName.equals(PGNConstants.PROPERTY_TAG_OTHERS_BLACK_ELO)) {
+			if (value.equals("")) value = "0";
+			try {
+				_others_black_elo = new Integer(value);
+			} catch (java.lang.NumberFormatException nfe) {
+				_others_black_elo = new Integer(0);
+				System.out.println("White ELO is not a number : " + value);
+				nfe.printStackTrace();
+			}
+			return;
+		}
 		if (propName.equals(PGNConstants.PROPERTY_TAG_OTHERS_WHITE_ELO)) { _others_white_elo = new Integer(value); return; }
 		if (propName.equals(PGNConstants.PROPERTY_TAG_UNKNOWN_EVENT_TYPE)) { _str_event_type = value; return; }
 		if (propName.equals(PGNConstants.PROPERTY_TAG_UNKNOWN_EVENT_ROUNDS)) { _str_event_rounds = value; return; }

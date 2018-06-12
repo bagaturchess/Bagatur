@@ -57,14 +57,23 @@ public class PGNGameParseHelper {
 				while (aPGNGameAsStringBuffer.charAt(curKeyEndIndex)
 					> PGNConstants.ASCII_SPECIAL_CHAR_MAX)
 					curKeyEndIndex++;
-
+				
+				int counter = 0;
 				//Get value start and end index
 				curValueStartIndex = curKeyEndIndex;
 				while (aPGNGameAsStringBuffer.charAt(curValueStartIndex)
 					<= PGNConstants.ASCII_SPECIAL_CHAR_MAX
 					|| aPGNGameAsStringBuffer.charAt(curValueStartIndex)
 						== PGNConstants.CHAR_VALUE_PREFIX)
+				{
+					if (aPGNGameAsStringBuffer.charAt(curValueStartIndex) == PGNConstants.CHAR_VALUE_PREFIX) {
+						counter++;
+						if (counter == 2) {//Handle empty strings
+							break;
+						}
+					}
 					curValueStartIndex++;
+				}
 
 				curValueEndIndex = curValueStartIndex;
 				while (aPGNGameAsStringBuffer.charAt(curValueEndIndex)
@@ -101,6 +110,11 @@ public class PGNGameParseHelper {
 
 			if (!(aAscii.length < aEndIndex - aFromIndex)) {
 				for (int i = aFromIndex; i < aEndIndex; i++) {
+					
+					if (i >= aStrBuf.length()) {//End of string reached
+						break;
+					}
+					
 					if (aAscii[i - aFromIndex] != aStrBuf.charAt(i))
 						break;
 

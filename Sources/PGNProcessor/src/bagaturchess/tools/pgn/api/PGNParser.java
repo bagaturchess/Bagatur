@@ -35,6 +35,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
+import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl1.Board3;
 import bagaturchess.tools.pgn.impl.ExcludedGames;
@@ -51,16 +52,10 @@ public class PGNParser {
 	private IBoard bitboard;
 	
 	
-	public PGNParser(PawnsEvalCache pawnsCache) {
-		bitboard = new Board();
-		//bitboard = new Board3();
-		((IBitBoard)bitboard).setPawnsCache(pawnsCache);
-	}
-	
 	public PGNParser() {
-		 bitboard = new Board();
-		 //bitboard = new Board3();
-		 //bitboard.setAttacksSupport(EngineConfig.getSingleton().getFieldsStatesSupport(), EngineConfig.getSingleton().getFieldsStatesSupport());
+		bitboard = BoardUtils.createBoard_WithPawnsCache();
+		//bitboard = new Board3();
+		//bitboard.setAttacksSupport(EngineConfig.getSingleton().getFieldsStatesSupport(), EngineConfig.getSingleton().getFieldsStatesSupport());
 	}
 	
 	public void importPGNGamesInDir(File pgnFileDir, IGameIterator gi) throws Exception {
