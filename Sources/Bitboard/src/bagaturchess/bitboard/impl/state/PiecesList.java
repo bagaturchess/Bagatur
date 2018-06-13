@@ -24,6 +24,7 @@ package bagaturchess.bitboard.impl.state;
 
 
 import bagaturchess.bitboard.api.IBoard;
+import bagaturchess.bitboard.common.Properties;
 import bagaturchess.bitboard.impl.Fields;
 
 
@@ -60,7 +61,7 @@ public class PiecesList {
 		}
 		
 		if (!ok) {
-			throw new IllegalStateException(board + " FROM_TO=" + Fields.getFieldSign(from) + "-" + Fields.getFieldSign(to));
+			if (Properties.DEBUG_MODE) throw new IllegalStateException(board + " FROM_TO=" + Fields.getFieldSign(from) + "-" + Fields.getFieldSign(to));
 		}
   }
    
@@ -83,7 +84,7 @@ public class PiecesList {
 		}
 		
 		if (!found) {
-			throw new IllegalStateException(board + " REMOVING " + aNumber);
+			if (Properties.DEBUG_MODE) throw new IllegalStateException(board + " REMOVING " + aNumber);
 		}
 		
 		return 0;

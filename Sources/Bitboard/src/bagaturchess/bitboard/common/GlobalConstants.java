@@ -25,6 +25,5 @@ package bagaturchess.bitboard.common;
 public class GlobalConstants {
 	//Queen 27, Officers 2 * 13, Castles 2 * 14, Knights 2 * 8, Pawns 8 * 2, King 8
 	public static final int MAX_MOVES_ON_LEVEL = 256;
-	//	27 + 2 * 13 + 2 * 14 + 2 * 8 + 8 * 2 + 1 * 8;
 	public static final int MAX_MOVES_IN_GAME = 2000;
 }

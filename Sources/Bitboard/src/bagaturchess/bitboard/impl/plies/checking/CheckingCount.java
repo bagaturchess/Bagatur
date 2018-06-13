@@ -23,6 +23,7 @@
 package bagaturchess.bitboard.impl.plies.checking;
 
 import bagaturchess.bitboard.api.IPiecesLists;
+import bagaturchess.bitboard.common.Properties;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
@@ -121,7 +122,7 @@ public class CheckingCount extends Fields {
 							buff.sliderAttackRayBitboard = 0L;
 							break;
 						} else if (i == size - 1) {
-							throw new IllegalStateException();
+							if (Properties.DEBUG_MODE) throw new IllegalStateException();
 						}
 					}
 				}
@@ -133,7 +134,7 @@ public class CheckingCount extends Fields {
 		if (opponentKing != NUMBER_0)  {
 			long potentialKingAttacks = KingPlies.ALL_KING_MOVES[kingFieldID];
 			if ((opponentKing & potentialKingAttacks) != NUMBER_0) {
-				throw new IllegalStateException();
+				if (Properties.DEBUG_MODE) throw new IllegalStateException();
 				//result++;
 			}
 		}
@@ -164,7 +165,7 @@ public class CheckingCount extends Fields {
 									buff.sliderAttackRayBitboard = 0L;
 									break;
 								} else if (i == size - 1) {
-									throw new IllegalStateException();
+									if (Properties.DEBUG_MODE) throw new IllegalStateException();
 								}
 							}
 						}
@@ -190,7 +191,7 @@ public class CheckingCount extends Fields {
 									buff.sliderAttackRayBitboard = 0L;
 									break;
 								} else if (i == size - 1) {
-									throw new IllegalStateException();
+									if (Properties.DEBUG_MODE) throw new IllegalStateException();
 								}
 							}
 						}
@@ -218,7 +219,7 @@ public class CheckingCount extends Fields {
 									buff.sliderAttackRayBitboard = 0L;
 									break;
 								} else if (i == size - 1) {
-									throw new IllegalStateException();
+									if (Properties.DEBUG_MODE) throw new IllegalStateException();
 								}
 							}
 						}
@@ -244,7 +245,7 @@ public class CheckingCount extends Fields {
 									buff.sliderAttackRayBitboard = 0L;
 									break;
 								} else if (i == size - 1) {
-									throw new IllegalStateException();
+									if (Properties.DEBUG_MODE) throw new IllegalStateException();
 								}
 							}
 						}
