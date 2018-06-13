@@ -34,14 +34,16 @@ import bagaturchess.bitboard.impl.movelist.IMoveList;
 
 public class PGNUtils implements PGNConstants {
 
-	public static int translatePGNMove(IBoard bitboard, int colour, String pPGNTurn, boolean validateChechAndMate) {
+	public static int translatePGNMove(IBoard bitboard, int colour, String pPGNTurn, boolean validateChechAndMate, PGNGame pgnGame) {
 		int result = 0;
 		
 		int length = pPGNTurn.length();
 		//		if ( length < 2 || length > 7 ) {
 		if (length < 1 || length > 7) {
-			throw new IllegalArgumentException(
+			return -1;
+			/*throw new IllegalArgumentException(
 				"Incorrect size of PGN turn:'" + pPGNTurn + "'.");
+				*/
 		}
 		//((TurnsReferenceIterator) getPossibleTurns()).goBeforeFirst();
 		if (pPGNTurn.startsWith(SAN_CASTLE_QUEEN_SIDE_STR)) {
@@ -49,7 +51,7 @@ public class PGNUtils implements PGNConstants {
 		} else if (pPGNTurn.startsWith(SAN_CASTLE_KING_SIDE_STR)) {
 			result = makeCastleKingSide(bitboard, colour, pPGNTurn);
 		} else { //Turn is not castle side
-			result = makeTurnBySAN(bitboard, colour, pPGNTurn, validateChechAndMate);
+			result = makeTurnBySAN(bitboard, colour, pPGNTurn, validateChechAndMate, pgnGame);
 		}
 		return result;
 	}
@@ -76,7 +78,8 @@ public class PGNUtils implements PGNConstants {
 		}
 		
 		if (!founded) {
-			throw new IllegalStateException();
+			//We trust the implementation and know that the exception was thrown only in illegal pgn games
+			//throw new IllegalStateException();
 		}
 		
 		return turnToMove;
@@ -105,7 +108,8 @@ public class PGNUtils implements PGNConstants {
 		
 		if (!founded) {
 			
-			mlist.clear();
+			//We trust the implementation and know that the exception was thrown only in illegal pgn games
+			/*mlist.clear();
 			bitboard.genAllMoves(mlist);
 			
 			String all_moves = "";
@@ -116,13 +120,14 @@ public class PGNUtils implements PGNConstants {
 			}
 			
 			throw new IllegalStateException(all_moves);
+			*/
 		}
 		
 		return turnToMove;
 	}
 	
 
-	public static int makeTurnBySAN(IBoard bitboard, int colour, String pPGNTurn, boolean validateChechAndMate) {
+	public static int makeTurnBySAN(IBoard bitboard, int colour, String pPGNTurn, boolean validateChechAndMate, PGNGame pgnGame) {
 		int turnToMove = 0;
 		
 		boolean isChess = false;
@@ -198,6 +203,20 @@ public class PGNUtils implements PGNConstants {
 			}
 		}
 
+		
+		if (fromLetter == SAN_FILE_UNDEFINED && fromDigit == SAN_RANK_UNDEFINED
+				&& toLetter == SAN_FILE_UNDEFINED && toDigit == SAN_RANK_UNDEFINED) {
+			/*throw new IllegalArgumentException(
+					" Turn '"
+						+ pPGNTurn
+						+ "' cannot be parsed. "
+						);*/
+			return -1;
+		}
+		if (pPGNTurn.equals("1/2-1/2") || pPGNTurn.equals("1/2") || pPGNTurn.equals("0-1") || pPGNTurn.equals("1-0")) {
+			return -1;
+		}
+		
 		boolean founded = false;
 		
 		IMoveList mlist = new BaseMoveList(150);
@@ -267,7 +286,9 @@ public class PGNUtils implements PGNConstants {
 					+ "' not found!"
 					+ " PlayerColour="
 					+ colour
-					+ "\n"
+					+ "\n\r"
+					+ "GAME_ID: '" + pgnGame.getStringIdentification().trim() + "'"
+					+ "\r\n"
 					+ "GEN MOVES: " + all_moves
 					+ "\r\n"
 					+ " Current game is: "

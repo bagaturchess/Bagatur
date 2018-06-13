@@ -397,6 +397,8 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 						}
 						
 						break;
+					} else {
+						int debug = 0;
 					}
 				}
 			}

@@ -106,6 +106,7 @@ public class PGNParser {
 
 	private void processSingleFile(File pFile, IGameIterator[] gi, boolean ignoreErrors) throws Exception {
 		String lTempFileName = pFile.getName();
+		System.out.println("Processing " + lTempFileName + " ... ");
 		if (lTempFileName.endsWith(PGNConstants.FILE_PGN_SUFFIX)) {
 			//try {
 				InputStream pgnFileIS = new FileInputStream(pFile);
@@ -209,7 +210,10 @@ public class PGNParser {
 			
 			String whitePly = pgnMove.getWhitePly();
 			if (whitePly != null) {
-				int w_move = PGNUtils.translatePGNMove(bitboard, Figures.COLOUR_WHITE, whitePly, false);
+				int w_move = PGNUtils.translatePGNMove(bitboard, Figures.COLOUR_WHITE, whitePly, false, pgnGame);
+				if (w_move == -1){
+					break;//Wrong move
+				}
 				
 				if (pi != null) {
 					if (pi != null) {
@@ -244,7 +248,10 @@ public class PGNParser {
 						int g = 0;
 					}*/
 					
-					int b_move = PGNUtils.translatePGNMove(bitboard, Figures.COLOUR_BLACK, blackPly, false);
+					int b_move = PGNUtils.translatePGNMove(bitboard, Figures.COLOUR_BLACK, blackPly, false, pgnGame);
+					if (b_move == -1){
+						break;//Wrong move
+					}
 					
 					if (pi != null) {
 						if (pi != null) {

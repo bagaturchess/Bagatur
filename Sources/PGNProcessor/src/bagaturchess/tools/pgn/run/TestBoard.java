@@ -19,11 +19,13 @@
  */
 package bagaturchess.tools.pgn.run;
 
+
 import java.io.File;
 
 import bagaturchess.bitboard.api.IBoard;
-import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.tools.pgn.api.IGameIterator;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
+import bagaturchess.bitboard.impl.movelist.BaseMoveList;
+import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.tools.pgn.api.IPlyIterator;
 import bagaturchess.tools.pgn.api.PGNParser;
 import bagaturchess.tools.pgn.impl.PGNGame;
@@ -31,10 +33,15 @@ import bagaturchess.tools.pgn.impl.PGNGame;
 
 public class TestBoard implements IPlyIterator {
 	
-	int totalGamesCount;
+	
+	private int totalGamesCount;
+	private IMoveList movesBuffer = new BaseMoveList();
+	
 	
 	public static void main(String[] args) {
 				
+				//File root = new File("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\PGN\\twic");
+				//File root = new File("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\PGN\\pgnmentor");
 				File root = new File("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\PGN");
 				
 				if (!root.exists()) {
@@ -90,18 +97,38 @@ public class TestBoard implements IPlyIterator {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.tools.pgn.api.IPlyIterator#preMove(int, int, bagaturchess.bitboard.api.IBoard, int)
 	 */
 	@Override
 	public void preMove(int colour, int move, IBoard bitboard, int moveNumber) {
-		// TODO Auto-generated method stub
-		//System.out.println("move");
-		//System.out.println(bitboard.getStatus());
-		bitboard.getStatus();
+		
+		testBoard(bitboard);
+		
+		movesBuffer.clear();
+		if (bitboard.isInCheck()) {
+			bitboard.genKingEscapes(movesBuffer);
+		} else {
+			bitboard.genAllMoves(movesBuffer);
+		}
+		
+		int cur_move = 0;
+		while ((cur_move = movesBuffer.next()) != 0) {
+			bitboard.makeMoveForward(cur_move);
+			testBoard(bitboard);
+			bitboard.makeMoveBackward(cur_move);
+		}
 	}
-
+	
+	
+	private void testBoard(IBoard bitboard) {
+		bitboard.getStatus();
+		bitboard.isInCheck();
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.tools.pgn.api.IPlyIterator#postMove()
 	 */
@@ -109,5 +136,4 @@ public class TestBoard implements IPlyIterator {
 	public void postMove() {
 		// TODO Auto-generated method stub
 	}
-
 }

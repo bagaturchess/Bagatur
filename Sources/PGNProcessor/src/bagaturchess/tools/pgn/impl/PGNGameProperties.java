@@ -97,7 +97,7 @@ public class PGNGameProperties {
 			} catch (java.lang.NumberFormatException nfe) {
 				_pri_white_elo = new Integer(0);
 				System.out.println("White ELO is not a number : " + value);
-				nfe.printStackTrace();
+				//nfe.printStackTrace();
 			}
 			return;
 		}
@@ -122,8 +122,8 @@ public class PGNGameProperties {
 				_others_black_elo = new Integer(value);
 			} catch (java.lang.NumberFormatException nfe) {
 				_others_black_elo = new Integer(0);
-				System.out.println("White ELO is not a number : " + value);
-				nfe.printStackTrace();
+				System.out.println("Black ELO is not a number : " + value);
+				//nfe.printStackTrace();
 			}
 			return;
 		}
@@ -139,7 +139,7 @@ public class PGNGameProperties {
 		if (propName.equals(PGNConstants.PROPERTY_TAG_UNKNOWN_BLACK_TEAM_COUNTRY)) { _black_team_country = value; return; }
 		
 		//throw new IllegalArgumentException("Unknown tag " + propName);
-		System.out.println("INFO: Unknown tag " + propName);
+		//System.out.println("INFO: Unknown tag " + propName);
 	}
 
 	public Object get(String propName) {

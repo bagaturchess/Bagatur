@@ -1330,7 +1330,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		if (Properties.DEBUG_MODE) {
 			if (Properties.DEBUG_MODE_IN_CHECK_AFTER_KING_ESCAPE && inCheck) {
-				if (isInCheck(figureColour)) {
+				if (invalidateCheckKeepers && isInCheck(figureColour)) {
 					throw new IllegalStateException("Wrong king escape");
 				}
 			}
@@ -5191,7 +5191,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	public final IGameStatus getStatus() {
 		
 		if (getStateRepetition() > 3) {
-			throw new IllegalStateException();
+			//throw new IllegalStateException();
 		}
 		
 		int colourToMove = getColourToMove();
