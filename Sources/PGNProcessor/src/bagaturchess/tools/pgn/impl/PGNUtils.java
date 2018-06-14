@@ -34,6 +34,10 @@ import bagaturchess.bitboard.impl.movelist.IMoveList;
 
 public class PGNUtils implements PGNConstants {
 
+	
+	private static IMoveList movesBuffer = new BaseMoveList(150);
+	
+	
 	public static int translatePGNMove(IBoard bitboard, int colour, String pPGNTurn, boolean validateChechAndMate, PGNGame pgnGame) {
 		int result = 0;
 		
@@ -62,11 +66,11 @@ public class PGNUtils implements PGNConstants {
 		
 		boolean founded = false;
 		
-		IMoveList mlist = new BaseMoveList();
-		bitboard.genAllMoves(mlist);
+		movesBuffer.clear();
+		bitboard.genAllMoves(movesBuffer);
 		
 		int cur_move = 0;
-		while ((cur_move = mlist.next()) != 0) {
+		while ((cur_move = movesBuffer.next()) != 0) {
 			if (MoveInt.isCastleKingSide(cur_move)) {
 				if (!founded) {
 					founded = true;
@@ -80,6 +84,7 @@ public class PGNUtils implements PGNConstants {
 		if (!founded) {
 			//We trust the implementation and know that the exception was thrown only in illegal pgn games
 			//throw new IllegalStateException();
+			return -1;
 		}
 		
 		return turnToMove;
@@ -91,11 +96,11 @@ public class PGNUtils implements PGNConstants {
 		
 		boolean founded = false;
 		
-		IMoveList mlist = new BaseMoveList();
-		bitboard.genAllMoves(mlist);
+		movesBuffer.clear();
+		bitboard.genAllMoves(movesBuffer);
 		
 		int cur_move = 0;
-		while ((cur_move = mlist.next()) != 0) {
+		while ((cur_move = movesBuffer.next()) != 0) {
 			if (MoveInt.isCastleQueenSide(cur_move)) {
 				if (!founded) {
 					founded = true;
@@ -121,6 +126,7 @@ public class PGNUtils implements PGNConstants {
 			
 			throw new IllegalStateException(all_moves);
 			*/
+			return -1;
 		}
 		
 		return turnToMove;
@@ -219,11 +225,19 @@ public class PGNUtils implements PGNConstants {
 		
 		boolean founded = false;
 		
-		IMoveList mlist = new BaseMoveList(150);
-		bitboard.genAllMoves(mlist);
+		movesBuffer.clear();
+		if (bitboard.isInCheck()) {
+			bitboard.genKingEscapes(movesBuffer);
+		} else {
+			bitboard.genAllMoves(movesBuffer);
+		}
+		
+		if (movesBuffer.size() == 0) {
+			return -1;
+		}
 		
 		int cur_move = 0;
-		while ((cur_move = mlist.next()) != 0) {
+		while ((cur_move = movesBuffer.next()) != 0) {
 
 			int soldierType = MoveInt.getFigureType(cur_move);
 
@@ -270,12 +284,16 @@ public class PGNUtils implements PGNConstants {
 		
 		if (!founded) {
 			
-			mlist.clear();
-			bitboard.genAllMoves(mlist);
+			movesBuffer.clear();
+			if (bitboard.isInCheck()) {
+				bitboard.genKingEscapes(movesBuffer);
+			} else {
+				bitboard.genAllMoves(movesBuffer);
+			}
 			
 			String all_moves = "";
 			int move = 0;
-			while ((move = mlist.next()) != 0) {
+			while ((move = movesBuffer.next()) != 0) {
 				all_moves += bagaturchess.bitboard.impl1.movegen.MoveInt.moveToString(move);
 				all_moves += ", ";
 			}
@@ -295,6 +313,7 @@ public class PGNUtils implements PGNConstants {
 					+ bitboard ); 
 					//+ getTurnsAsString(game.getCurrentlyPossibleTurns(colour).iterator()) );
 		}
+		
 		return turnToMove;
 	}
 
