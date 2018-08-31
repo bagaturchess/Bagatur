@@ -41,7 +41,7 @@ public class EngineProcess_BagaturImpl_WorkspaceImpl extends EngineProcess_Bagat
 	
 	
 	public EngineProcess_BagaturImpl_WorkspaceImpl(String _engineName, String programArgs) {
-		this(_engineName, "./..", programArgs, 128);	
+		this(_engineName, "./../", programArgs, 128);	
 	}
 	
 	
