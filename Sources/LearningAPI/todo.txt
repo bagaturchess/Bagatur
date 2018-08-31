@@ -1,2 +1,0 @@
-1. feature ids are hardcoded and cannot be non-sequential (should start with 0 and so on)
-2. 

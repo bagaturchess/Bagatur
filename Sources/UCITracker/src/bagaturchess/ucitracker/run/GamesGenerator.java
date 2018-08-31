@@ -38,7 +38,6 @@ import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.uci.engine.EngineProcess;
-import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 import bagaturchess.uci.engine.UCIEnginesManager;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedGame;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedMove;
@@ -97,18 +96,19 @@ public class GamesGenerator {
 					new String [0],
 				"C:\\own\\chess\\ENGINES\\komodo-13b1-ja\\Windows\\");*/
 			
-			/*EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-7-win\\stockfish-7-win\\Windows\\stockfish 7 x64.exe",
+			EngineProcess engine = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-9-win\\Windows\\stockfish_9_x64.exe",
 					new String [0],
-				"C:\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-7-win\\stockfish-7-win\\Windows\\");
-			*/
+				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-9-win\\Windows");
 			
-			EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\Glaurung2.2\\glaurung-w64.exe",
+			
+			/*EngineProcess engine = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\Glaurung2.2\\glaurung-w64.exe",
 					new String [0],
-				"C:\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\Glaurung2.2\\");
+				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\Glaurung2.2\\");
+			*/
 			
 			//EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");
 			
-			control.execute(engine, "./glaurung-2.2.cg", 1000000, true);
+			control.execute(engine, "./stockfish-9.cg", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

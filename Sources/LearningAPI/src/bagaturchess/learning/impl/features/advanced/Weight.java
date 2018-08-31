@@ -1,5 +1,3 @@
-
-
 package bagaturchess.learning.impl.features.advanced;
 
 
@@ -9,7 +7,6 @@ import java.util.List;
 
 import bagaturchess.bitboard.impl.utils.StringUtils;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
-
 
 
 class Weight implements Serializable {

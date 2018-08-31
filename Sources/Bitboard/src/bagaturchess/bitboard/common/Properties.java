@@ -23,10 +23,10 @@
 package bagaturchess.bitboard.common;
 
 public class Properties {
-	public static final boolean STATISTICS_MODE = false;
-	public static final boolean DEBUG_MODE = false;
-	public static final boolean DEBUG_MODE_IS_POSSIBLE_DURING_MOVE = false;
-	public static final boolean DEBUG_MODE_IN_CHECK_AFTER_KING_ESCAPE = false;
+	public static final boolean STATISTICS_MODE 						= false;
+	public static final boolean DEBUG_MODE 								= false;
+	public static final boolean DEBUG_MODE_IS_POSSIBLE_DURING_MOVE 		= false;
+	public static final boolean DEBUG_MODE_IN_CHECK_AFTER_KING_ESCAPE 	= false;
 	
 	public static final int DEBUG_LEVEL1 = 0;
 	public static final int DEBUG_LEVEL2 = 1;

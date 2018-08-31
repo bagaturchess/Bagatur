@@ -37,6 +37,7 @@ public class Bagatur_LearningInputImpl implements ILearningInput {
 		return BagaturPawnsEvalFactory.class.getName();
 	}
 	
+	
 	public IBoardConfig createBoardConfig() {
 		return new BagaturEval_BoardConfigImpl();
 	}
