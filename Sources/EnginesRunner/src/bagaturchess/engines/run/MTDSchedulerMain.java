@@ -116,7 +116,9 @@ public class MTDSchedulerMain {
 								
 								bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl.class.getName(),
 								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig.class.getName(),
-								bagaturchess.deeplearning.impl.eval.allfeatures.EvaluationConfig.class.getName()
+								//bagaturchess.deeplearning.impl.eval.pst.EvaluationConfig.class.getName()
+								//bagaturchess.deeplearning.impl.eval.allfeatures.EvaluationConfig.class.getName()
+								bagaturchess.deeplearning.impl.eval.past_and_allfeatures.EvaluationConfig.class.getName()
 								}
 				);
 		

@@ -1,4 +1,3 @@
-package bagaturchess.deeplearning.api;
 /**
  *  BagaturChess (UCI chess engine and tools)
  *  Copyright (C) 2005 Krasimir I. Topchiyski (k_topchiyski@yahoo.com)
@@ -18,7 +17,9 @@ package bagaturchess.deeplearning.api;
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-import java.util.Arrays;
+package bagaturchess.deeplearning.api;
+
+
 import java.util.Random;
 
 import org.neuroph.core.NeuralNetwork;
@@ -39,32 +40,18 @@ public class NeuralNetworkUtils_PST {
 	
 	
 	public static int getInputsSize() {
-		return 64 * 12 //board matrix
-				+ 1 //colour to move
-				+ 4 //castling
-				+ 1 //repetition
-				+ 1 //50 moves rule
-				+ 1 //Moves count
+		return 2 * 64 * 6 //board matrix
+				//+ 1 //colour to move
+				//+ 4 //castling
+				//+ 1 //repetition
+				//+ 1 //50 moves rule
+				//+ 1 //Moves count
 				;
 	}
 	
 	
 	public static double[] createInputsArray() {
 		return new double[getInputsSize()];
-	}
-	
-	
-	public static void clearInputsArray(double[] inputs) {
-		for (int i=0; i<inputs.length; i++) {
-			inputs[i] = 0;
-		}
-	}
-	
-	
-	public static MultiLayerPerceptron loadNetwork(String fileName) {
-		MultiLayerPerceptron net = (MultiLayerPerceptron) NeuralNetwork.createFromFile(fileName);
-		
-		return net;
 	}
 	
 	
@@ -92,56 +79,72 @@ public class NeuralNetworkUtils_PST {
 	public static void fillInputs(double[] result, IBitBoard board) {
 		
 		int[] boardMatrix = board.getMatrix();
+		double openningPart = board.getMaterialFactor().getOpenningPart();
 		
 		for (int i=0; i<64; i++) {
 			
 			int pieceID = boardMatrix[i];
 			
 			int indexShift = -1;
+			int signal = 0;
 			switch(pieceID) {
 				case Constants.PID_W_PAWN:
 					indexShift = 0;
+					signal = 1;
 					break;
 				case Constants.PID_W_KNIGHT:
 					indexShift = 1;
+					signal = 1;
 					break;
 				case Constants.PID_W_BISHOP:
 					indexShift = 2;
+					signal = 1;
 					break;
 				case Constants.PID_W_ROOK:
 					indexShift = 3;
+					signal = 1;
 					break;
 				case Constants.PID_W_QUEEN:
 					indexShift = 4;
+					signal = 1;
 					break;
 				case Constants.PID_W_KING:
 					indexShift = 5;
+					signal = 1;
 					break;
 				case Constants.PID_B_PAWN:
-					indexShift = 6;
+					indexShift = 0;
+					signal = -1;
 					break;
 				case Constants.PID_B_KNIGHT:
-					indexShift = 7;
+					indexShift = 1;
+					signal = -1;
 					break;
 				case Constants.PID_B_BISHOP:
-					indexShift = 8;
+					indexShift = 2;
+					signal = -1;
 					break;
 				case Constants.PID_B_ROOK:
-					indexShift = 9;
+					indexShift = 3;
+					signal = -1;
 					break;
 				case Constants.PID_B_QUEEN:
-					indexShift = 10;
+					indexShift = 4;
+					signal = -1;
 					break;
 				case Constants.PID_B_KING:
-					indexShift = 11;
+					indexShift = 5;
+					signal = -1;
 					break;
 			}
 			
 			if (indexShift != -1) {//There is a piece
-				result[i * 12 + indexShift] = 1;
+				result[i * 6 + indexShift] = signal * openningPart;
+				result[64 * 6 + i * 6 + indexShift] = signal * (1 - openningPart);
 			}
 		}
 		
+		/*
 		//Set color to move
 		result[768] = board.getColourToMove() == Constants.COLOUR_WHITE ? 1 : 0;
 		
@@ -165,22 +168,13 @@ public class NeuralNetworkUtils_PST {
 			board.genAllMoves(movelist);
 		}
 		result[775] = movelist.size() / (double) 100; //Normalized
+		
+		*/
 	}
 	
 	
 	public static void fillInputs(MultiLayerPerceptron mlp, double[] inputs, IBitBoard board) {
 		fillInputs(inputs, board);
 		mlp.setInput(inputs);
-	}
-	
-	
-	public static void calculate(MultiLayerPerceptron mlp) {
-		mlp.calculate();
-	}
-	
-	
-	public static double getOutput(MultiLayerPerceptron mlp) {
-		double[] networkOutput = mlp.getOutput();
-		return networkOutput[0];
 	}
 }

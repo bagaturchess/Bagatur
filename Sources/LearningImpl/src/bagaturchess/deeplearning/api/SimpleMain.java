@@ -10,7 +10,6 @@ import org.neuroph.core.events.LearningEventListener;
 import org.neuroph.core.learning.LearningRule;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
-import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.random.WeightsRandomizer;
 
@@ -85,7 +84,7 @@ public class SimpleMain implements LearningEventListener {
         myMlPerceptron.save("myMlPerceptron.nnet");
 
         // load saved neural network
-        NeuralNetwork loadedMlPerceptron = NeuralNetwork.createFromFile("myMlPerceptron.nnet");
+        MultiLayerPerceptron loadedMlPerceptron = (MultiLayerPerceptron) NeuralNetwork.createFromFile("myMlPerceptron.nnet");
 
         // test loaded neural network
         System.out.println("Testing loaded neural network");
@@ -104,7 +103,7 @@ public class SimpleMain implements LearningEventListener {
 
      */
 
-    public static void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
+    public static void testNeuralNetwork(MultiLayerPerceptron neuralNet, DataSet testSet) {
 
         for(DataSetRow testSetRow : testSet.getRows()) {
 

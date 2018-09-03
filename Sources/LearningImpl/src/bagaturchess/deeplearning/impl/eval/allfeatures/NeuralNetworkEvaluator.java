@@ -5,6 +5,7 @@ import org.neuroph.core.NeuralNetwork;
 import org.neuroph.nnet.MultiLayerPerceptron;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.deeplearning.api.NeuralNetworkUtils;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils_AllFeatures;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.search.api.IEvalConfig;
@@ -32,18 +33,18 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 		network = (MultiLayerPerceptron) NeuralNetwork.createFromFile("net.bin");
 		
 		filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
-		inputs = filler.getSignals();
+		inputs = new double[NeuralNetworkUtils_AllFeatures.getInputsSize()];
 	}
 	
 	
 	@Override
 	protected double phase1() {
 		
-		NeuralNetworkUtils_AllFeatures.clearInputsArray(inputs);
-		filler.fillSignals();
+		NeuralNetworkUtils.clearInputsArray(inputs);
+		filler.fillSignals(inputs, 0);
 		network.setInput(inputs);
-		NeuralNetworkUtils_AllFeatures.calculate(network);
-		double actualWhitePlayerEval = NeuralNetworkUtils_AllFeatures.getOutput(network);
+		NeuralNetworkUtils.calculate(network);
+		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);
 
 		return actualWhitePlayerEval;
 	}

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.deeplearning.api.NeuralNetworkUtils_AllFeatures;
 import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
@@ -35,7 +34,6 @@ public class Bagatur_ALL_SignalFiller_InArray implements Bagatur_ALL_FeaturesCon
 	
 	private ISignalFiller filler;
 	private ISignals signals;
-	private double[] signals_arr;
 	
 	
 	public Bagatur_ALL_SignalFiller_InArray(IBitBoard board) {
@@ -43,27 +41,18 @@ public class Bagatur_ALL_SignalFiller_InArray implements Bagatur_ALL_FeaturesCon
 		filler = new Bagatur_ALL_SignalFiller(board);
 		
 		signals = new Signals();
+	}
+	
+	
+	public void fillSignals(double[] signals_arr, int startIndex) {
 		
-		signals_arr = new double[NeuralNetworkUtils_AllFeatures.getInputsSize()];
-	}
-	
-	
-	public double[] getSignals() {
-		return signals_arr;
-	}
-	
-	
-	public void fillSignals() {
 		
 		signals.clear();
 		
-		/*for (int i=0; i<signals_arr.length; i++) {
-			signals_arr[i] = 0;
-		}*/
-		
 		filler.fill(signals);
 		
-		int addIndex = 0;
+		
+		int addIndex = startIndex;
 		
 		
 		//OPENNING
@@ -74,7 +63,6 @@ public class Bagatur_ALL_SignalFiller_InArray implements Bagatur_ALL_FeaturesCon
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_MATERIAL_ROOK)).getStrength_o();
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_MATERIAL_QUEEN)).getStrength_o();
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_MATERIAL_DOUBLE_BISHOP)).getStrength_o();
-		
 		
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_PST)).getStrength_o();
 		
@@ -104,7 +92,6 @@ public class Bagatur_ALL_SignalFiller_InArray implements Bagatur_ALL_FeaturesCon
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_PAWNS_ROOK_7TH2TH)).getStrength_o();
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_PAWNS_QUEEN_7TH2TH)).getStrength_o();
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_PAWNS_KING_OPENED)).getStrength_o();
-		
 		
 		//Moves iteration
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT)).getStrength_o();
@@ -136,7 +123,6 @@ public class Bagatur_ALL_SignalFiller_InArray implements Bagatur_ALL_FeaturesCon
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_MATERIAL_QUEEN)).getStrength_e();
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_MATERIAL_DOUBLE_BISHOP)).getStrength_e();
 		
-		
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_PST)).getStrength_e();
 		
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_STANDARD_TEMPO)).getStrength_e();
@@ -165,7 +151,6 @@ public class Bagatur_ALL_SignalFiller_InArray implements Bagatur_ALL_FeaturesCon
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_PAWNS_ROOK_7TH2TH)).getStrength_e();
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_PAWNS_QUEEN_7TH2TH)).getStrength_e();
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_PAWNS_KING_OPENED)).getStrength_e();
-		
 		
 		//Moves iteration
 		signals_arr[addIndex++] = ((Signal)signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT)).getStrength_e();
@@ -237,7 +222,6 @@ public class Bagatur_ALL_SignalFiller_InArray implements Bagatur_ALL_FeaturesCon
 			signals_array[FEATURE_ID_PAWNS_QUEEN_7TH2TH] = new Signal();
 			signals_array[FEATURE_ID_PAWNS_KING_OPENED] = new Signal();
 			
-			
 			//Moves iteration
 			signals_array[FEATURE_ID_MOBILITY_KNIGHT] = new Signal();
 			signals_array[FEATURE_ID_MOBILITY_BISHOP] = new Signal();
@@ -287,7 +271,7 @@ public class Bagatur_ALL_SignalFiller_InArray implements Bagatur_ALL_FeaturesCon
 		private double strength_e;
 		
 		private Signal() {
-			
+			//Do nothing
 		}
 		
 		

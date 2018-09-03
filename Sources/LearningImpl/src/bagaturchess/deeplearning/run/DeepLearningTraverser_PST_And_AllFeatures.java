@@ -2,12 +2,13 @@ package bagaturchess.deeplearning.run;
 
 
 import bagaturchess.deeplearning.impl.visitors.DeepLearningVisitorImpl_PST;
+import bagaturchess.deeplearning.impl.visitors.DeepLearningVisitorImpl_PST_And_AllFeatures;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 
 
-public class DeepLearningTraverser_PST {
+public class DeepLearningTraverser_PST_And_AllFeatures {
 	
 	public static void main(String[] args) {
 		
@@ -21,7 +22,7 @@ public class DeepLearningTraverser_PST {
 			String filePath = "./stockfish-9.cg";
 			//String filePath = "./glaurung-2.2.cg";
 			
-			DeepLearningVisitorImpl_PST learning = new DeepLearningVisitorImpl_PST();
+			DeepLearningVisitorImpl_PST_And_AllFeatures learning = new DeepLearningVisitorImpl_PST_And_AllFeatures();
 			
 			ILearningInput input = LearningInputFactory.createDefaultInput();
 			

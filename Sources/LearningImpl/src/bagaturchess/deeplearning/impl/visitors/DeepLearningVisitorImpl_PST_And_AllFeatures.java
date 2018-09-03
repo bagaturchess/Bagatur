@@ -35,11 +35,12 @@ import org.neuroph.nnet.learning.BackPropagation;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
-import bagaturchess.deeplearning.api.NeuralNetworkUtils_PST;
+import bagaturchess.deeplearning.api.NeuralNetworkUtils_PST_And_AllFeatures;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
 
-public class DeepLearningVisitorImpl_PST implements PositionsVisitor {
+public class DeepLearningVisitorImpl_PST_And_AllFeatures implements PositionsVisitor {
 	
 	
 	private int iteration = 0;
@@ -55,15 +56,16 @@ public class DeepLearningVisitorImpl_PST implements PositionsVisitor {
 	
 	private long startTime;
 	
-	double[] inputs = new double[NeuralNetworkUtils_PST.getInputsSize()];
+	private Bagatur_ALL_SignalFiller_InArray filler;
+	double[] inputs;
 	
 	
-	public DeepLearningVisitorImpl_PST() throws Exception {
+	public DeepLearningVisitorImpl_PST_And_AllFeatures() throws Exception {
 		
 		if ((new File(NET_FILE)).exists() ){
 			network = NeuralNetworkUtils.loadNetwork(NET_FILE);
 		} else {
-			network = NeuralNetworkUtils_PST.buildNetwork();
+			network = NeuralNetworkUtils_PST_And_AllFeatures.buildNetwork();
 		}
 		
         network.getLearningRule().addListener(new LearningEventListener() {
@@ -78,6 +80,8 @@ public class DeepLearningVisitorImpl_PST implements PositionsVisitor {
 		        bp.stopLearning();
 			}
 		});
+        
+        inputs = new double[NeuralNetworkUtils_PST_And_AllFeatures.getInputsSize()];
 	}
 	
 	
@@ -89,7 +93,7 @@ public class DeepLearningVisitorImpl_PST implements PositionsVisitor {
 		}
 		
 		NeuralNetworkUtils.clearInputsArray(inputs);
-		NeuralNetworkUtils_PST.fillInputs(network, inputs, bitboard);
+		NeuralNetworkUtils_PST_And_AllFeatures.fillInputs(network, inputs, bitboard, filler);
 		NeuralNetworkUtils.calculate(network);
 		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);
 		
@@ -101,11 +105,10 @@ public class DeepLearningVisitorImpl_PST implements PositionsVisitor {
 		sumDiffs1 += Math.abs(0 - expectedWhitePlayerEval);
 		sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval);
 		
-		//network.addAdjustment(expectedWhitePlayerEval);
 		
-		DataSet trainingSet = new DataSet(NeuralNetworkUtils_PST.getInputsSize(), 1);
+		DataSet trainingSet = new DataSet(NeuralNetworkUtils_PST_And_AllFeatures.getInputsSize(), 1);
 		NeuralNetworkUtils.clearInputsArray(inputs);
-		NeuralNetworkUtils_PST.fillInputs(inputs, bitboard);
+		NeuralNetworkUtils_PST_And_AllFeatures.fillInputs(network, inputs, bitboard, filler);
         trainingSet.addRow(new DataSetRow(inputs, new double[]{expectedWhitePlayerEval}));
         network.learn(trainingSet);
         
@@ -116,18 +119,13 @@ public class DeepLearningVisitorImpl_PST implements PositionsVisitor {
 			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 			
 			network.save("net.bin");
-			
-			//System.out.println(counter);
-			//for (int i=0; i < featuresArr.length; i++) {
-				//IFeature currFeature = featuresArr[i];
-				//System.out.println(currFeature);
-			//}
-
 		}
 	}
 	
 	
 	public void begin(IBitBoard bitboard) throws Exception {
+		
+		filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
 		
 		startTime = System.currentTimeMillis();
 		

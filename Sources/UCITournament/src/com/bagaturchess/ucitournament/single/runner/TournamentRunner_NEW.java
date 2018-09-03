@@ -27,6 +27,7 @@ import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
+import com.bagaturchess.ucitournament.framework.match.MatchRunner_FixedDepth;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_TimePerMove;
 import bagaturchess.uci.engine.EngineProcess_BagaturImpl;
 import com.bagaturchess.ucitournament.single.Tournament;
@@ -76,8 +77,8 @@ public class TournamentRunner_NEW {
 			//ITournamentSchedule schedule = new ITournamentSchedule_OneRound(engines);
 			ITournamentSchedule schedule = new TournamentSchedule_EvenScores(engines);
 			
-			MatchRunner matchRunner = new MatchRunner_TimePerMove(1 * 100);
-			//MatchRunner matchRunner = new MatchRunner_FixedDepth(3);
+			//MatchRunner matchRunner = new MatchRunner_FixedDepth(1 * 100);
+			MatchRunner matchRunner = new MatchRunner_FixedDepth(8);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(30 * 1000, 30 * 1000, 3 * 1000, 3 * 1000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(1 * 60 * 1000, 1 * 60 * 1000, 3 * 1000, 3 * 1000);
 			

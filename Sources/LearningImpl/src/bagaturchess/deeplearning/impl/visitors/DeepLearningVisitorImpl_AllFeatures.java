@@ -34,6 +34,7 @@ import org.neuroph.nnet.learning.BackPropagation;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
+import bagaturchess.deeplearning.api.NeuralNetworkUtils;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils_AllFeatures;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.ucitracker.api.PositionsVisitor;
@@ -62,7 +63,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	public DeepLearningVisitorImpl_AllFeatures() throws Exception {
 		
 		if ((new File(NET_FILE)).exists() ){
-			network = NeuralNetworkUtils_AllFeatures.loadNetwork(NET_FILE);
+			network = NeuralNetworkUtils.loadNetwork(NET_FILE);
 		} else {
 			network = NeuralNetworkUtils_AllFeatures.buildNetwork();
 		}
@@ -79,6 +80,8 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		        bp.stopLearning();
 			}
 		});
+        
+        inputs = new double[NeuralNetworkUtils_AllFeatures.getInputsSize()];
 	}
 	
 	
@@ -89,11 +92,11 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 			throw new IllegalStateException("status=" + status);
 		}
 		
-		NeuralNetworkUtils_AllFeatures.clearInputsArray(inputs);
-		filler.fillSignals();
+		NeuralNetworkUtils.clearInputsArray(inputs);
+		filler.fillSignals(inputs, 0);
 		network.setInput(inputs);
-		NeuralNetworkUtils_AllFeatures.calculate(network);
-		double actualWhitePlayerEval = NeuralNetworkUtils_AllFeatures.getOutput(network);
+		NeuralNetworkUtils.calculate(network);
+		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);
 		
 		/*if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
 			actualWhitePlayerEval = -actualWhitePlayerEval;
@@ -105,8 +108,8 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		
 		
 		DataSet trainingSet = new DataSet(NeuralNetworkUtils_AllFeatures.getInputsSize(), 1);
-		NeuralNetworkUtils_AllFeatures.clearInputsArray(inputs);
-		filler.fillSignals();
+		NeuralNetworkUtils.clearInputsArray(inputs);
+		filler.fillSignals(inputs, 0);
 		//network.setInput(inputs);
         trainingSet.addRow(new DataSetRow(inputs, new double[]{expectedWhitePlayerEval}));
         network.learn(trainingSet);
@@ -125,7 +128,6 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	public void begin(IBitBoard bitboard) throws Exception {
 		
 		filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
-		inputs = filler.getSignals();
 		
 		startTime = System.currentTimeMillis();
 		
