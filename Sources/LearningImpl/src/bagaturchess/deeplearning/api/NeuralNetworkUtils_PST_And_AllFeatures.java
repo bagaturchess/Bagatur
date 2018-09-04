@@ -50,7 +50,7 @@ public class NeuralNetworkUtils_PST_And_AllFeatures {
 		
 		MultiLayerPerceptron mlp = new MultiLayerPerceptron(TransferFunctionType.LINEAR,
 				getInputsSize(),
-				64,
+				//64,
 				1);
 		mlp.randomizeWeights(new WeightsRandomizer(new Random(777)));
 		
@@ -60,8 +60,8 @@ public class NeuralNetworkUtils_PST_And_AllFeatures {
         //mlp.setLearningRule(new ConvolutionalBackpropagation());
         mlp.setLearningRule(new MomentumBackpropagation());
         
-        //mlp.getLearningRule().setLearningRate(0.00001);
-        mlp.getLearningRule().setLearningRate(0.000001);
+        mlp.getLearningRule().setLearningRate(0.00001);
+        //mlp.getLearningRule().setLearningRate(0.0000001);
         
         return mlp;
 	}

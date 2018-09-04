@@ -81,6 +81,8 @@ public class NeuralNetworkUtils_PST {
 		int[] boardMatrix = board.getMatrix();
 		double openningPart = board.getMaterialFactor().getOpenningPart();
 		
+		int endgameShift = 64 * 6;
+		
 		for (int i=0; i<64; i++) {
 			
 			int pieceID = boardMatrix[i];
@@ -140,7 +142,7 @@ public class NeuralNetworkUtils_PST {
 			
 			if (indexShift != -1) {//There is a piece
 				result[i * 6 + indexShift] = signal * openningPart;
-				result[64 * 6 + i * 6 + indexShift] = signal * (1 - openningPart);
+				result[endgameShift + i * 6 + indexShift] = signal * (1 - openningPart);
 			}
 		}
 		
