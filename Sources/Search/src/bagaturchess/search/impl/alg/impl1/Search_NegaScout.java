@@ -307,7 +307,7 @@ public class Search_NegaScout extends SearchImpl {
 		int extend_position = 0;
 		
 		//Check extension
-		//extend_position = inCheck ? PLY : 0;
+		extend_position = inCheck ? PLY : 0;
 		
 		
 		//Recapture extension
@@ -323,16 +323,7 @@ public class Search_NegaScout extends SearchImpl {
 		//Quiescence search
 		if (rest + normDepth(extend_position) <= 0) {
 			node.eval = qsearch(mediator, info, depth, alpha_org, beta, pv);
-			
-			if (false && pv) {
-				if (node.eval >= beta && env.getTactics().silentButDeadly()) {
-					extend_position = PLY;
-				} else {
-					return node.eval;
-				}
-			}  else {
-				return node.eval;
-			}
+			return node.eval;
 		}
 		
 		
@@ -529,7 +520,7 @@ public class Search_NegaScout extends SearchImpl {
 				
 				
 				boolean isCapOrProm = MoveInt.isCaptureOrPromotion(cur_move);
-				boolean isPasserPush = env.getBitboard().isPasserPush(cur_move);
+				//boolean isPasserPush = env.getBitboard().isPasserPush(cur_move);
 				
 				int moveSee = -1;
 				if (isCapOrProm) {
@@ -542,7 +533,7 @@ public class Search_NegaScout extends SearchImpl {
 				}
 				
 				//Static pruning
-				if (searchedCount > 0
+				if (((searchedCount > 0 && !pv) || (searchedCount > 0 && pv))
 						&& !inCheck
 						&& moveSee < 0
 						&& !isGoodMove
@@ -597,7 +588,7 @@ public class Search_NegaScout extends SearchImpl {
 				
 				boolean isCheckMove = env.getBitboard().isInCheck();
 				
-				boolean reductionAllowed = searchedCount > 0
+				boolean reductionAllowed = ((searchedCount > 0 && !pv) || (searchedCount > 0 && pv))
 											&& !inCheck
 											&& !isCheckMove
 											&& moveSee < 0;
@@ -608,8 +599,13 @@ public class Search_NegaScout extends SearchImpl {
                 int reduction = 0;
                 if (reductionAllowed) {
                 	
-            		reduction = (int) (PLY * Math.sqrt(searchedCount + rest));
-					reduction *= (1 - getHistory(inCheck).getScores(cur_move));
+            		//reduction = (int) (PLY * Math.sqrt(searchedCount + rest));
+					//reduction *= (1 - getHistory(inCheck).getScores(cur_move));
+					
+					double rate = Math.log(searchedCount) * Math.log(rest) / 2;
+					rate += 2;//TODO: for non pv nodes only
+					rate *= (1 - getHistory(inCheck).getScores(cur_move));
+					reduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
                 }
                 
                 
