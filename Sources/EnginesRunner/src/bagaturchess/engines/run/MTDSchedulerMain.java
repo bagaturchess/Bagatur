@@ -37,6 +37,7 @@ import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
+import bagaturchess.search.impl.rootsearch.montecarlo.MonteCarloSearch;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ProcessesImpl;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImpl;
@@ -129,9 +130,9 @@ public class MTDSchedulerMain {
 		//IRootSearch search = new MTDParallelSearch_ProcessesImpl(new Object[] {cfg, sharedData});
 		//IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, sharedData});
 		//IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, sharedData});
-		IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
 		//IRootSearch search = new SequentialSearch_Classic(new Object[] {cfg, sharedData});
-		
+		IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
+		//IRootSearch search = new MonteCarloSearch(new Object[] {cfg, sharedData});
 		
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
