@@ -56,7 +56,11 @@ public class MaterialFactor implements MoveListener, IMaterialFactor, Cloneable 
 	}
 	
 	public double getOpenningPart() {
-		return (blackMaterialFactor + whiteMaterialFactor) / (double) BaseEvalWeights.getMaxMaterialFactor();
+		double openningPart = getTotalFactor() / (double) BaseEvalWeights.getMaxMaterialFactor();
+		if (openningPart > 1) {
+			openningPart = 1;
+		}
+		return openningPart;
 	}
 	
 	public int interpolateByFactor(int val_o, int val_e) {
@@ -71,40 +75,16 @@ public class MaterialFactor implements MoveListener, IMaterialFactor, Cloneable 
 		}
 	}
 	
+	
 	public int interpolateByFactor(double val_o, double val_e) {
 		return interpolateByFactor((int)val_o, (int)val_e);
-	}
-	
-	public int getMaterialGain(int move) {
-		
-		if (!MoveInt.isCapture(move) && !MoveInt.isPromotion(move)) {
-			return 0;
-		}
-		
-		int val = 0;
-		
-		if (MoveInt.isCapture(move)) {
-			int capturedPID = MoveInt.getCapturedFigurePID(move);
-			int figureType = Figures.getFigureType(capturedPID);
-			
-			val += BaseEvalWeights.getFigureMaterialSEE(figureType);
-		}
-		
-		if (MoveInt.isPromotion(move)) {
-			int promID = MoveInt.getPromotionFigurePID(move);
-			int promType = Figures.getFigureType(promID);
-			
-			val += BaseEvalWeights.getFigureMaterialSEE(promType);
-			val -= BaseEvalWeights.getFigureMaterialSEE(Figures.TYPE_PAWN);
-		}
-		
-		return val;
 	}
 
 	
 	public void addPiece_Special(int pid, int fieldID) {
 		throw new UnsupportedOperationException();
 	}
+	
 	
 	public void initially_addPiece(int pid, int fieldID) {
 		added(pid);

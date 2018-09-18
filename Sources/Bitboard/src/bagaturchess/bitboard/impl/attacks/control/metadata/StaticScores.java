@@ -190,13 +190,7 @@ public class StaticScores {
 	}
 	
 	private int calcMaterialScores(int figType) {
-		
-		switch(figType) {
-			case Figures.TYPE_KING:
-				return 225; //TODO: Extract constant globally
-			default:
-				return BaseEvalWeights.getFigureCost(figType);
-		}
+		return BaseEvalWeights.getFigureCost(figType);
 	}
 
 	private int calcSEEScores(int figType, FieldAttacks attacked, FieldAttacks toPlay) {

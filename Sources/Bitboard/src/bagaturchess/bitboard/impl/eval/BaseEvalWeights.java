@@ -22,32 +22,12 @@
  */
 package bagaturchess.bitboard.impl.eval;
 
+
 import bagaturchess.bitboard.impl.Figures;
 
-//import game.chess.engine.impl0.EngineConstants;
 
 public class BaseEvalWeights {
 	
-	/**
-	 *                     A and H pawns are worth about 15% from the others
-	 *                     P (pawn)= 1
-	 *                     BB(bishop pair)= 1/2
-	 *                     R(rook) =  5 
-	 *                     B(bishop) = 3 + 1/4
-	 *                     N(knight) =  3 + 1/4 
-	 *                     Q(queen) =  9 + 3/4
-	 */
-	
-	/**
-	 * However in chessprograms that's not the case. Within a few years you find
-	 * out that the real values already are closer to, here is what they are in
-	 * DIEP :
-   * pawn   = 1.0
-   * knight = 3.625
-   * bishop = 3.675
-   * rook   = 5.8
-   * queen  = 11.75
-	 */
 	
 	private static final int FIGURE_COST_PAWN_OPENING = 100;
 	//private static final int FIGURE_COST_PAWN_ENDGAME = 80;
@@ -79,44 +59,11 @@ public class BaseEvalWeights {
 	private static final int FIGURE_COST_CASTLE_SEE = 500;
 	private static final int FIGURE_COST_QUEEN_SEE = 900;
 	private static final int FIGURE_COST_KING_SEE = 3600;
-	
-	/*private static final long HALF_PAWN = FIGURE_COST_PAWN / 2;
-	private static final long QUARTER_PAWN = HALF_PAWN / 2;
-	private static final long EIGHT_PAWN = QUARTER_PAWN / 2;
-	private static final long SIXTEENTH_PAWN = EIGHT_PAWN / 2;*/
-	
-	public static final int FIGURE_COST_KING = 9 * FIGURE_COST_QUEEN_OPENING + 2
+		
+	private static final int FIGURE_COST_KING = 9 * FIGURE_COST_QUEEN_OPENING + 2
 			* FIGURE_COST_KNIGHT_OPENING + 2 * FIGURE_COST_OFFICER_OPENING + 2
 			* FIGURE_COST_CASTLE_OPENING;
-
-	//private static final int MAX_EVAL_MATERIAL = 2 * FIGURE_COST_KING;
 	
-	/*private static final long MAX_MATERIAL = FIGURE_COST_KING
-										+ 4 * FIGURE_COST_QUEEN
-										+ 2 * FIGURE_COST_CASTLE
-										+ 2 * FIGURE_COST_OFFICER
-										+ 2 * FIGURE_COST_KNIGHT
-										+ 8 * FIGURE_COST_PAWN + 1;*/
-			
-	/*public static int getFigureCost(int type, int factor) {
-		switch(type) {
-			case Figures.TYPE_PAWN:
-				return interpolateByFactor(FIGURE_COST_PAWN_OPENING, FIGURE_COST_PAWN_ENDGAME, factor);
-			case Figures.TYPE_KNIGHT:
-				return interpolateByFactor(FIGURE_COST_KNIGHT_OPENING, FIGURE_COST_KNIGHT_ENDGAME, factor);
-			case Figures.TYPE_OFFICER:
-				return interpolateByFactor(FIGURE_COST_OFFICER_OPENING, FIGURE_COST_OFFICER_ENDGAME, factor);
-			case Figures.TYPE_CASTLE:
-				return interpolateByFactor(FIGURE_COST_CASTLE_OPENING, FIGURE_COST_CASTLE_ENDGAME, factor);
-			case Figures.TYPE_QUEEN:
-				return interpolateByFactor(FIGURE_COST_QUEEN_OPENING, FIGURE_COST_QUEEN_ENDGAME, factor);
-			case Figures.TYPE_KING:
-				return FIGURE_COST_KING;
-			default:
-				throw new IllegalArgumentException(
-						"Figure type " + type + " is undefined!");
-		}
-	}*/
 	
 	public static int getFigureCost(int type) {
 		switch(type) {
@@ -145,9 +92,9 @@ public class BaseEvalWeights {
 		}
 		
 		int o_part = factor;
-		int e_part = FIGURE_FACTOR_MAX - factor;
+		int e_part = getMaxMaterialFactor() - factor;
 		
-		int result = ((val_o * o_part) + (val_e * e_part)) / FIGURE_FACTOR_MAX;
+		int result = ((val_o * o_part) + (val_e * e_part)) / getMaxMaterialFactor();
 			
 		return result; 
 	}
@@ -186,56 +133,29 @@ public class BaseEvalWeights {
 		}
 	}
 	
-	/*private static long getMaxMaterial() {
-		return MAX_MATERIAL;
-	}*/
 	
-	public static int getMaxMaterialFactor() {
-		//if (true) throw new IllegalStateException("Fix my usages"); 
+	public static int getMaxMaterialFactor() { 
 		return FIGURE_FACTOR_MAX;
 	}
+	
 	
 	public static int getFigureMaterialFactor(int type) {
 		switch(type) {
 			case Figures.TYPE_PAWN:
-				return 0;
+				return FIGURE_FACTOR_PAWN;
 			case Figures.TYPE_KNIGHT:
-				return 3;
+				return FIGURE_FACTOR_KNIGHT;
 			case Figures.TYPE_OFFICER:
-				return 3;
+				return FIGURE_FACTOR_OFFICER;
 			case Figures.TYPE_CASTLE:
-				return 5;
+				return FIGURE_FACTOR_CASTLE;
 			case Figures.TYPE_QUEEN:
-				return 9;
+				return FIGURE_FACTOR_QUEEN;
 			case Figures.TYPE_KING:
-				return 0;
+				return FIGURE_FACTOR_KING;
 			default:
 				throw new IllegalArgumentException(
 						"Figure type " + type + " is undefined!");
 		}
-	}
-	
-	/*private static int getFigureSimpleCost(int type) {
-		switch(type) {
-			case Figures.TYPE_PAWN:
-				return 1;
-			case Figures.TYPE_KNIGHT:
-				return 3;
-			case Figures.TYPE_OFFICER:
-				return 3;
-			case Figures.TYPE_CASTLE:
-				return 5;
-			case Figures.TYPE_QUEEN:
-				return 9;
-			case Figures.TYPE_KING:
-				return 50;
-			default:
-				throw new IllegalArgumentException(
-						"Figure type " + type + " is undefined!");
-		}
-	}*/
-	
-	public static void main(String[] args) {
-//		/System.out.println("MAX_EVAL_MATERIAL=" + MAX_EVAL_MATERIAL);
 	}
 }

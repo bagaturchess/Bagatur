@@ -33,12 +33,6 @@ import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
-import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.Bagatur_LearningInputImpl;
-import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.Bagatur_ALL_LearningInputImpl;
-import bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.ALL_LearningInputImpl;
-import bagaturchess.learning.goldmiddle.impl.cfg.old0.FeaturesConfigurationBagaturImpl;
-import bagaturchess.learning.goldmiddle.impl.cfg.old0.LearningInputImpl;
-import bagaturchess.learning.goldmiddle.impl.cfg.old0.SignalFiller;
 import bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluator;
 import bagaturchess.learning.impl.features.advanced.FeaturesMerger;
 import bagaturchess.learning.impl.features.baseimpl.Features;
@@ -130,7 +124,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 			actualWhitePlayerEval += currFeature.eval(currSignal, openingPart);
 		}*/
 		
-		double actualWhitePlayerEval = evaluator.fullEval(-1, 0, 0, -1);
+		double actualWhitePlayerEval = evaluator.fullEval(0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, bitboard.getColourToMove());
 		if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
 			actualWhitePlayerEval = -actualWhitePlayerEval;
 		}
@@ -151,7 +145,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		if ((counter % 1000000) == 0) {
 			//System.out.println(counter);
 			for (int i=0; i < featuresArr.length; i++) {
-				IFeature currFeature = featuresArr[i];
+				//IFeature currFeature = featuresArr[i];
 				//System.out.println(currFeature);
 			}
 		}

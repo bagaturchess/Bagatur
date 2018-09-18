@@ -970,7 +970,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				if (isCapOrProm) {
 					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 				}
-				int new_materialGain = materialGain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
+				int new_materialGain = materialGain + env.getBitboard().getBaseEvaluation().getMaterialGain(cur_move);
 
 				boolean passerPush = isPasserPushPV(cur_move);
 				
@@ -1713,7 +1713,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				if (isCapOrProm) {
 					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 				}
-				int new_materialGain = materialGain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
+				int new_materialGain = materialGain + env.getBitboard().getBaseEvaluation().getMaterialGain(cur_move);
 				
 				boolean passerPush = isPasserPushNonPV(cur_move);
 				
@@ -2197,7 +2197,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			
 			//int moveSee = USE_SEE_IN_QSEARCH ? env.getBitboard().getSee().evalExchange(cur_move) : -1;
 			
-			int new_matgain = matgain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
+			int new_matgain = matgain + env.getBitboard().getBaseEvaluation().getMaterialGain(cur_move);
 			
 			
 			if (inCheck
@@ -2510,7 +2510,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			
 			//int moveSee = USE_SEE_IN_QSEARCH ? env.getBitboard().getSee().evalExchange(cur_move) : -1;
 			
-			int new_matgain = matgain + env.getBitboard().getMaterialFactor().getMaterialGain(cur_move);
+			int new_matgain = matgain + env.getBitboard().getBaseEvaluation().getMaterialGain(cur_move);
 			
 			
 			if (inCheck
