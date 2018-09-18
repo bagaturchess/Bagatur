@@ -413,39 +413,18 @@ public class Search_NegaScout extends SearchImpl {
 		
 		rest = normDepth(maxdepth) - depth;
 		
-		//Static pruning conditions
+		//Static pruning conditions for all depths
         boolean futility_enabled = false;
-        int futility_eval = alpha_org;
         if (!inCheck
     		&& !isMateVal(alpha_org)
 			&& !isMateVal(beta)
 			) {
-        	
-        	//Static pruning for all depths
-            int margin = getAlphaTrustWindow(mediator, rest);
-            
-            /*
-            //Classic futility pruning
-            int margin;
-            if (rest <= 1) {
-                margin = 61;
-            } else if (rest <= 2) {
-                margin = 144;
-            } else if (rest <= 3) {
-                margin = 268;
-            } else if (rest <= 4) {
-                margin = 334;
-            } else if (rest <= 5) {
-            	margin = 500;
-            } else {
-            	throw new IllegalStateException("rest=" + rest);
-            }*/
             
 			if (backtrackingInfo.static_eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
 				backtrackingInfo.static_eval = eval(depth, alpha_org, beta, pv);
 			}
 			
-            futility_eval = backtrackingInfo.static_eval + margin;
+            int futility_eval = backtrackingInfo.static_eval + getAlphaTrustWindow(mediator, rest);;
             if (futility_eval < alpha_org) {
                 futility_enabled = true;
             }
@@ -561,17 +540,6 @@ public class Search_NegaScout extends SearchImpl {
 					
 					//Futility prunning on all depths
 					if (futility_enabled) {
-						/*if (futility_eval > best_eval) {
-							
-							best_eval = futility_eval;
-							best_move = cur_move;
-							
-							backtrackingInfo.best_move = best_move;
-							
-							node.bestmove = best_move;
-							node.eval = best_eval;
-						}*/
-						
 						continue;
 					}
 					
