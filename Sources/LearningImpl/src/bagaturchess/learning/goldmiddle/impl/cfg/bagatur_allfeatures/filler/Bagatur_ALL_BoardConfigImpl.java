@@ -8,20 +8,20 @@ import bagaturchess.bitboard.common.Utils;
 public class Bagatur_ALL_BoardConfigImpl implements IBoardConfig {
 	
 	
-	public static final double MATERIAL_PAWN_O	=	78.45480512573172;
-	public static final double MATERIAL_PAWN_E	=	92.12632098602359;
+	public static final double MATERIAL_PAWN_O	=	89.46246548689935;
+	public static final double MATERIAL_PAWN_E	=	87.16612370538981;
 
-	public static final double MATERIAL_KNIGHT_O	=	316.5706589514874;
-	public static final double MATERIAL_KNIGHT_E	=	266.8941557014653;
+	public static final double MATERIAL_KNIGHT_O	=	339.4039671859721;
+	public static final double MATERIAL_KNIGHT_E	=	285.1567211320134;
 
-	public static final double MATERIAL_BISHOP_O	=	340.7503734031214;
-	public static final double MATERIAL_BISHOP_E	=	291.356800307687;
+	public static final double MATERIAL_BISHOP_O	=	380.960067872987;
+	public static final double MATERIAL_BISHOP_E	=	307.3295273351707;
 
-	public static final double MATERIAL_ROOK_O	=	478.75073472754553;
-	public static final double MATERIAL_ROOK_E	=	527.9069447141043;
+	public static final double MATERIAL_ROOK_O	=	508.6119509673254;
+	public static final double MATERIAL_ROOK_E	=	545.3318668970151;
 
-	public static final double MATERIAL_QUEEN_O	=	1046.5317944835904;
-	public static final double MATERIAL_QUEEN_E	=	985.7115100377412;
+	public static final double MATERIAL_QUEEN_O	=	1121.0022509325988;
+	public static final double MATERIAL_QUEEN_E	=	1005.1297769281579;
 	
 	private double MATERIAL_KING_O = 0;
 	private double MATERIAL_KING_E = 0;
