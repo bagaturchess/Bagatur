@@ -254,8 +254,10 @@ public class Search_NegaScout extends SearchImpl {
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
 					int tpt_move = tptEntry.getBestMove_lower();
+					backtrackingInfo.static_eval = tptEntry.getLowerBound();
 					if (tpt_move == 0) {
 						tpt_move = tptEntry.getBestMove_upper();
+						backtrackingInfo.static_eval = tptEntry.getUpperBound();
 					}
 					backtrackingInfo.hash_move = tpt_move;
 				}
@@ -327,7 +329,7 @@ public class Search_NegaScout extends SearchImpl {
 		int extend_position = 0;
 		
 		//Check extension
-		extend_position = inCheck ? PLY : 0;
+		//extend_position = inCheck ? PLY : 0;
 		
 		
 		//Recapture extension
@@ -368,7 +370,7 @@ public class Search_NegaScout extends SearchImpl {
 			if (hasAtLeastOnePiece) {
 				
 				if (backtrackingInfo.static_eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
-					backtrackingInfo.static_eval = eval(depth, alpha_org, beta, pv);
+					backtrackingInfo.static_eval = qsearch(mediator, info, depth, alpha_org, beta, pv);
 				}
 				
 				if (backtrackingInfo.static_eval >= beta) {
@@ -412,23 +414,6 @@ public class Search_NegaScout extends SearchImpl {
 		
 		
 		rest = normDepth(maxdepth) - depth;
-		
-		//Static pruning conditions for all depths
-        boolean futility_enabled = false;
-        if (!inCheck
-    		&& !isMateVal(alpha_org)
-			&& !isMateVal(beta)
-			) {
-            
-			if (backtrackingInfo.static_eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
-				backtrackingInfo.static_eval = eval(depth, alpha_org, beta, pv);
-			}
-			
-            int futility_eval = backtrackingInfo.static_eval + getAlphaTrustWindow(mediator, rest);;
-            if (futility_eval < alpha_org) {
-                futility_enabled = true;
-            }
-        }
         
         
         //IID - internal iterative deepening
@@ -445,7 +430,9 @@ public class Search_NegaScout extends SearchImpl {
 					TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 					if (tptEntry != null) {
 						int tpt_move = tptEntry.getBestMove_lower();
+						backtrackingInfo.static_eval = tptEntry.getLowerBound();
 						if (tpt_move == 0) {
+							backtrackingInfo.static_eval = tptEntry.getUpperBound();
 							tpt_move = tptEntry.getBestMove_upper();
 						}
 						backtrackingInfo.hash_move = tpt_move;
@@ -453,6 +440,23 @@ public class Search_NegaScout extends SearchImpl {
 				}
 				env.getTPT().unlock();
 			}
+        }
+        
+        
+		//Static pruning conditions for all depths
+        boolean staticPruningEnabled = false;
+        if (!inCheck
+    		&& !isMateVal(alpha_org)
+			&& !isMateVal(beta)
+			) {
+            
+			if (backtrackingInfo.static_eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
+				backtrackingInfo.static_eval = qsearch(mediator, info, depth, alpha_org, beta, pv);
+			}
+			
+            if (alpha_org > backtrackingInfo.static_eval + getAlphaTrustWindow(mediator, rest)) {
+                staticPruningEnabled = true;
+            }
         }
         
         
@@ -538,8 +542,8 @@ public class Search_NegaScout extends SearchImpl {
 						&& !env.getBitboard().isCheckMove(cur_move)
 					) {
 					
-					//Futility prunning on all depths
-					if (futility_enabled) {
+					//Static pruning on all depths
+					if (staticPruningEnabled) {
 						continue;
 					}
 					
@@ -589,7 +593,7 @@ public class Search_NegaScout extends SearchImpl {
 					//reduction *= (1 - getHistory(inCheck).getScores(cur_move));
 					
 					double rate = Math.log(searchedCount) * Math.log(rest) / 2;
-					rate += 2;//TODO: for non pv nodes only
+					rate += 2;
 					rate *= (1 - getHistory(inCheck).getScores(cur_move));
 					reduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
                 }
@@ -748,44 +752,28 @@ public class Search_NegaScout extends SearchImpl {
 		
 		
 		//Get TPT entry
-		boolean tpt_exact = false;
-		int tpt_lower = MIN;
-		int tpt_upper = MAX;
 		int tpt_move = 0;
-		
-		env.getTPT().lock();
 		{
-			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
-			if (tptEntry != null) {
-				tpt_exact = tptEntry.isExact();
-				tpt_lower = tptEntry.getLowerBound();
-				tpt_upper = tptEntry.getUpperBound();
-				tpt_move = tptEntry.getBestMove_lower();
-				if (tpt_move == 0) {
-					tpt_move = tptEntry.getBestMove_upper();
+			boolean tpt_exact = false;
+			int tpt_lower = MIN;
+			int tpt_upper = MAX;
+			
+			env.getTPT().lock();
+			{
+				TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
+				if (tptEntry != null) {
+					tpt_exact = tptEntry.isExact();
+					tpt_lower = tptEntry.getLowerBound();
+					tpt_upper = tptEntry.getUpperBound();
+					tpt_move = tptEntry.getBestMove_lower();
+					if (tpt_move == 0) {
+						tpt_move = tptEntry.getBestMove_upper();
+					}
 				}
 			}
-		}
-		env.getTPT().unlock();
-		
-		if (tpt_exact) {
-			if (!SearchUtils.isMateVal(tpt_lower)) {
-				node.bestmove = tpt_move;
-				node.eval = tpt_lower;
-				node.nullmove = false;
-				node.leaf = true;
-				
-				env.getTPT().lock();
-				buff_tpt_depthtracking[0] = 0;
-				extractFromTPT(info, 0, node, true, buff_tpt_depthtracking);
-				env.getTPT().unlock();
-				
-				if (buff_tpt_depthtracking[0] >= 0) {
-					return node.eval;
-				}
-			}
-		} else {
-			if (tpt_lower >= beta) {
+			env.getTPT().unlock();
+			
+			if (tpt_exact) {
 				if (!SearchUtils.isMateVal(tpt_lower)) {
 					node.bestmove = tpt_move;
 					node.eval = tpt_lower;
@@ -801,26 +789,43 @@ public class Search_NegaScout extends SearchImpl {
 						return node.eval;
 					}
 				}
-			}
-			if (tpt_upper <= alpha_org) {
-				if (!SearchUtils.isMateVal(tpt_upper)) {
-					node.bestmove = tpt_move;
-					node.eval = tpt_upper;
-					node.nullmove = false;
-					node.leaf = true;
-					
-					env.getTPT().lock();
-					buff_tpt_depthtracking[0] = 0;
-					extractFromTPT(info, 0, node, true, buff_tpt_depthtracking);
-					env.getTPT().unlock();
-					
-					if (buff_tpt_depthtracking[0] >= 0) {
-						return node.eval;
+			} else {
+				if (tpt_lower >= beta) {
+					if (!SearchUtils.isMateVal(tpt_lower)) {
+						node.bestmove = tpt_move;
+						node.eval = tpt_lower;
+						node.nullmove = false;
+						node.leaf = true;
+						
+						env.getTPT().lock();
+						buff_tpt_depthtracking[0] = 0;
+						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking);
+						env.getTPT().unlock();
+						
+						if (buff_tpt_depthtracking[0] >= 0) {
+							return node.eval;
+						}
+					}
+				}
+				if (tpt_upper <= alpha_org) {
+					if (!SearchUtils.isMateVal(tpt_upper)) {
+						node.bestmove = tpt_move;
+						node.eval = tpt_upper;
+						node.nullmove = false;
+						node.leaf = true;
+						
+						env.getTPT().lock();
+						buff_tpt_depthtracking[0] = 0;
+						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking);
+						env.getTPT().unlock();
+						
+						if (buff_tpt_depthtracking[0] >= 0) {
+							return node.eval;
+						}
 					}
 				}
 			}
 		}
-
 		
 		backtrackingInfo.hash_move = tpt_move;
 		
@@ -856,17 +861,10 @@ public class Search_NegaScout extends SearchImpl {
 		}
 		
 		int alpha_cur = alpha_org;
-		int legalMoves = 0;
 		int best_eval = MIN;
 		int best_move = 0;
-		int cur_move = 0;
+		int cur_move = (backtrackingInfo.hash_move != 0) ? backtrackingInfo.hash_move : list.next();
 		
-		if (inCheck) {
-			cur_move = (backtrackingInfo.hash_move != 0) ? backtrackingInfo.hash_move : list.next();
-		} else {
-			cur_move = (backtrackingInfo.hash_move != 0 && MoveInt.isCaptureOrPromotion(backtrackingInfo.hash_move))
-							? backtrackingInfo.hash_move : list.next();
-		}
 		
 		int searchedMoves = 0;
 		if (cur_move != 0) 
@@ -883,30 +881,7 @@ public class Search_NegaScout extends SearchImpl {
 				}
 			}
 			
-			int moveSee = env.getBitboard().getSee().evalExchange(cur_move);
-			
-			if (inCheck) {
-				//All moves
-			} else {
-				if (MoveInt.isCaptureOrPromotion(cur_move)) {
-					if (moveSee >= 0) {
-						//All moves
-					} else {
-		                int optimisticScore = getAlphaTrustWindow(mediator, 0) + backtrackingInfo.static_eval
-		                	+ env.getBitboard().getBaseEvaluation().getMaterialGain(cur_move);
-		                
-		                if (optimisticScore <= alpha_cur) { // Delta pruning
-		                	continue;
-		                }
-					}
-				} else {
-					continue;
-				}
-			}
-			
 			env.getBitboard().makeMoveForward(cur_move);
-			
-			legalMoves++;
 			
 			int cur_eval = -qsearch(mediator, info, depth + 1, -beta, -alpha_cur, pv);
 			
