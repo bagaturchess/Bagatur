@@ -24,15 +24,14 @@ package bagaturchess.bitboard.impl.movegen;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.plies.CastlePlies;
-import bagaturchess.bitboard.impl.plies.specials.Castling;
 import bagaturchess.bitboard.impl.plies.specials.Enpassanting;
 import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
+
 
 /**
 *
@@ -63,7 +62,6 @@ import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
 *   	00000000 00000000 00000000 00111111 - to
 *   
 */
-
 public class MoveInt {
 	
 	private static int PROM_FLAG_SHIFT = 27;
