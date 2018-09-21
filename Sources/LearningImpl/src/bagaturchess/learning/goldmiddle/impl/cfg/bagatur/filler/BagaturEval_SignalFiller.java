@@ -169,10 +169,6 @@ public class BagaturEval_SignalFiller implements BagaturEval_FeaturesConstants, 
 	}
 	
 	
-	public int getMaterialQueen() {
-		return 50 + baseEval.getMaterialQueen();
-	}
-	
 	private double interpolateInternal(double o, double e, double openningPart) {
 		return (o * openningPart + e * (1 - openningPart));
 	}
@@ -417,8 +413,6 @@ public class BagaturEval_SignalFiller implements BagaturEval_FeaturesConstants, 
 		bitboard.getPawnsCache().lock();
 		PawnsModelEval pawnsModelEval = bitboard.getPawnsStructure();
 		
-		BagaturPawnsEval f;
-		
 		evalInfo.eval_PawnsStandard_o += ((BagaturPawnsEval)pawnsModelEval).getStandardEval_o();
 		evalInfo.eval_PawnsStandard_e += ((BagaturPawnsEval)pawnsModelEval).getStandardEval_e();
 		
@@ -439,7 +433,7 @@ public class BagaturEval_SignalFiller implements BagaturEval_FeaturesConstants, 
 			}
 		}*/
 		
-		int PAWNS_PASSED_UNSTOPPABLE = 100 + baseEval.getMaterialRook();
+		int PAWNS_PASSED_UNSTOPPABLE = 100 + baseEval.getMaterial(Figures.TYPE_CASTLE);
 		
 		int unstoppablePasser = bitboard.getUnstoppablePasser();
 		//if (unstoppablePasser > 0) {

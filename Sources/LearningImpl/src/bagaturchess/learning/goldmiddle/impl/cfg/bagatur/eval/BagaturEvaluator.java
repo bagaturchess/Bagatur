@@ -399,7 +399,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 			}
 		}*/
 		
-		int PAWNS_PASSED_UNSTOPPABLE = 100 + baseEval.getMaterialRook();
+		int PAWNS_PASSED_UNSTOPPABLE = 100 + baseEval.getMaterial(Figures.TYPE_CASTLE);
 		
 		int unstoppablePasser = bitboard.getUnstoppablePasser();
 		//if (unstoppablePasser > 0) {

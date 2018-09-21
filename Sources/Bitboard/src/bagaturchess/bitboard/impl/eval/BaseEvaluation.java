@@ -487,16 +487,7 @@ public class BaseEvaluation implements MoveListener, IBaseEval {
 	protected void removed(int figurePID) {
 		dec(figurePID);
 	}
-
-	@Override
-	public int getMaterialRook() {
-		return interpolator.interpolateByFactor(boardConfig.getMaterial_ROOK_O(), boardConfig.getMaterial_ROOK_E());
-	}
-
-	@Override
-	public int getMaterialQueen() {
-		return interpolator.interpolateByFactor(boardConfig.getMaterial_QUEEN_O(), boardConfig.getMaterial_QUEEN_E());
-	}
+	
 
 	@Override
 	public int getMaterial(int pieceType) {

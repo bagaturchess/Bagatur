@@ -2051,7 +2051,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			//Alpha cutoff
 			if (!isMateVal(alpha_org)
 					&& !isMateVal(beta)
-					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterialQueen() + getAlphaTrustWindow(mediator, 1) < alpha_org) {
+					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
 				node.eval = staticEval;
 				return node.eval;
 			}
@@ -2391,7 +2391,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			//Alpha cutoff
 			if (!isMateVal(beta - 1)
 					&& !isMateVal(beta)
-					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterialQueen() + getAlphaTrustWindow(mediator, 1) < alpha_org) {
+					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
 				return staticEval;
 			}
 			
