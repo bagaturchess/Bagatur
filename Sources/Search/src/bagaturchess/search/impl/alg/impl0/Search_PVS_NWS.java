@@ -1728,6 +1728,10 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							continue;
 						}
 						
+						/*if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
+							continue;
+						}*/
+						
 						if (rest == 1 && getHistory(inCheck).getScores(cur_move) <= 0.16) {
 							continue;
 						} else if (rest == 2 && getHistory(inCheck).getScores(cur_move) <= 0.08) {
