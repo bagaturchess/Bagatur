@@ -500,25 +500,9 @@ public class Search_NegaScout extends SearchImpl {
 					continue;
 				}
 				
+
 				//Build and sent minor info
-				if (depth == 0) {
-					info.setCurrentMove(cur_move);
-					info.setCurrentMoveNumber((searchedCount + 1));
-				}
-				
-				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
-					
-					long timestamp = System.currentTimeMillis();
-					
-					if (timestamp >= lastSentMinorInfo_timestamp + 1000)  {//Send info each second
-					
-						mediator.changedMinor(info);
-						
-						lastSentMinorInfo_timestamp = timestamp;
-					}
-					
-					lastSentMinorInfo_nodesCount = info.getSearchedNodes();
-				}
+				buildAndSendMinorInfo(mediator, info, depth, searchedCount, cur_move);
 				
 				
 				boolean isCapOrProm = MoveInt.isCaptureOrPromotion(cur_move);
@@ -766,8 +750,10 @@ public class Search_NegaScout extends SearchImpl {
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
 					tpt_move = tptEntry.getBestMove_lower();
+					backtrackingInfo.static_eval = tpt_lower;
 					if (tpt_move == 0) {
 						tpt_move = tptEntry.getBestMove_upper();
+						backtrackingInfo.static_eval = tpt_upper;
 					}
 				}
 			}
@@ -842,7 +828,7 @@ public class Search_NegaScout extends SearchImpl {
 			//Alpha cutoff
 			if (!isMateVal(alpha_org)
 					&& !isMateVal(beta)
-					&& backtrackingInfo.static_eval + env.getEval().getMaterialQueen() + getAlphaTrustWindow(mediator, 1) < alpha_org) {
+					&& backtrackingInfo.static_eval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
 				node.eval = backtrackingInfo.static_eval;
 				return node.eval;
 			}
@@ -945,5 +931,28 @@ public class Search_NegaScout extends SearchImpl {
 	
 	private int getAlphaTrustWindow(ISearchMediator mediator, int rest) {
 		return 1 * mediator.getTrustWindow_AlphaAspiration();
+	}
+	
+	
+	private void buildAndSendMinorInfo(ISearchMediator mediator, ISearchInfo info, int depth, int searchedCount, int cur_move) {
+		
+		if (depth == 0) {
+			info.setCurrentMove(cur_move);
+			info.setCurrentMoveNumber(searchedCount + 1);
+		}
+		
+		if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
+			
+			long timestamp = System.currentTimeMillis();
+			
+			if (timestamp >= lastSentMinorInfo_timestamp + 1000)  {//Send info each second
+			
+				mediator.changedMinor(info);
+				
+				lastSentMinorInfo_timestamp = timestamp;
+			}
+			
+			lastSentMinorInfo_nodesCount = info.getSearchedNodes();
+		}
 	}
 }
