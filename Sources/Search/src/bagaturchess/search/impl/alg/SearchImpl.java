@@ -278,7 +278,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		env.getHistory_InCheck().newSearch();
 		
 		env.getMoveListFactory().newSearch();
-		env.getEval().beforeSearch();
+		//env.getEval().beforeSearch();
 		
 		env.getOrderingStatistics().normalize();
 		

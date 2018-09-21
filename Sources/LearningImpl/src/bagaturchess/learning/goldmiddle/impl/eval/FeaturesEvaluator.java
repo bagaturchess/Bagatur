@@ -22,7 +22,7 @@ import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
 
 
-public class FeaturesEvaluator extends EvaluatorAdapter {
+public class FeaturesEvaluator implements IEvaluator {
 	
 	
 	private boolean useEvalCache = false;
@@ -128,9 +128,11 @@ public class FeaturesEvaluator extends EvaluatorAdapter {
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.api.IEvaluator#lazyEval(int, int, int, int)
+	 */
 	@Override
-	public int eval(int depth, int alpha, int beta, boolean pvNode, int rootColour) {
-		
+	public int lazyEval(int depth, int alpha, int beta, int rootColour) {
 		
 		//if (true) return 0;
 		
@@ -205,7 +207,7 @@ public class FeaturesEvaluator extends EvaluatorAdapter {
 			//Break the cycle if the eval is out of range
 			if (comp < features_byComp.length - 1) {
 				
-				int window = getWindow(comp, pvNode);
+				int window = getWindow(comp, false);
 				
 				if (//eval < alpha - max_eval_byComp_integral_sum[comp + 1] || eval > beta + max_eval_byComp_integral_sum[comp + 1]
 					eval < alpha - window || eval > beta + window) {
@@ -244,20 +246,6 @@ public class FeaturesEvaluator extends EvaluatorAdapter {
 		}
 	}
 	
-	private int getWindow(int comp, boolean pvNode) {
-		if (pvNode) {
-			return (int) max_eval_byComp_statsitics[comp + 1].getMaxVal();
-			//return (int) (max_eval_byComp_statsitics[comp + 1].getEntropy() + 2 * max_eval_byComp_statsitics[comp + 1].getDisperse());
-		} else {
-			//return (int) max_eval_byComp_statsitics[comp + 1].getMaxVal();
-			return (int) (max_eval_byComp_statsitics[comp + 1].getEntropy() + max_eval_byComp_statsitics[comp + 1].getDisperse());
-		}
-	}
-	
-	
-	/*public double fullEval(int rootColour) {
-		
-	}*/
 	
 	@Override
 	public double fullEval(int depth, int alpha, int beta, int rootColour) {
@@ -328,19 +316,17 @@ public class FeaturesEvaluator extends EvaluatorAdapter {
 		}
 	}
 	
-	/*private void dumpBounds() {
-		String result = "";
-		result += "MAX_EVALS: ";
-		for (int i=0; i<max_eval_byComp.length; i++) {
-			result += ", " + max_eval_byComp[i];
+	
+	private int getWindow(int comp, boolean pvNode) {
+		if (pvNode) {
+			return (int) max_eval_byComp_statsitics[comp + 1].getMaxVal();
+			//return (int) (max_eval_byComp_statsitics[comp + 1].getEntropy() + 2 * max_eval_byComp_statsitics[comp + 1].getDisperse());
+		} else {
+			//return (int) max_eval_byComp_statsitics[comp + 1].getMaxVal();
+			return (int) (max_eval_byComp_statsitics[comp + 1].getEntropy() + max_eval_byComp_statsitics[comp + 1].getDisperse());
 		}
-		result += "\r\nMAX_EVALS_STATISTICS: ";
-		for (int i=0; i<max_eval_byComp_statsitics.length - 1; i++) {
-			result += ", " + getWindow(i, false);
-		}
-		
-		System.out.println(result);
-	}*/
+	}
+	
 	
 	public void fillSignal(Signals signals, int rootColour) {
 		

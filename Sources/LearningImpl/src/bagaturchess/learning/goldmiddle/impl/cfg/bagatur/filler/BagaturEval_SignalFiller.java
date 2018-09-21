@@ -1788,16 +1788,6 @@ public class BagaturEval_SignalFiller implements BagaturEval_FeaturesConstants, 
 
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.search.api.IEvaluator#eval(int, int, int, boolean, int)
-	 */
-	@Override
-	public int eval(int depth, int alpha, int beta, boolean pvNode,
-			int rootColour) {
-		throw new UnsupportedOperationException();
-	}
-
-
-	/* (non-Javadoc)
 	 * @see bagaturchess.search.api.IEvaluator#roughEval(int, int)
 	 */
 	@Override
@@ -1807,28 +1797,10 @@ public class BagaturEval_SignalFiller implements BagaturEval_FeaturesConstants, 
 
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.search.api.IEvaluator#fastEval(int, int)
-	 */
-	@Override
-	public int fastEval(int depth, int rootColour) {
-		throw new UnsupportedOperationException();
-	}
-
-
-	/* (non-Javadoc)
 	 * @see bagaturchess.search.api.IEvaluator#lazyEval(int, int, int, int)
 	 */
 	@Override
 	public int lazyEval(int depth, int alpha, int beta, int rootColour) {
-		throw new UnsupportedOperationException();
-	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.api.IEvaluator#getMaterial(int)
-	 */
-	@Override
-	public int getMaterial(int pieceType) {
 		throw new UnsupportedOperationException();
 	}
 

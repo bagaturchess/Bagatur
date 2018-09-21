@@ -9,13 +9,13 @@ import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.search.api.IEvalConfig;
-import bagaturchess.search.api.internal.EvaluatorAdapter;
+import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
 
 
-public abstract class BaseEvaluator extends EvaluatorAdapter {
+public abstract class BaseEvaluator implements IEvaluator {
 	
 	
 	private static final boolean USE_CACHE = true;
@@ -96,18 +96,6 @@ public abstract class BaseEvaluator extends EvaluatorAdapter {
 		INT2 = Math.max(INT_MIN, INT2 / 2);
 		INT3 = Math.max(INT_MIN, INT3 / 2);
 		INT4 = Math.max(INT_MIN, INT4 / 2);
-	}
-	
-	
-	@Override
-	public int getMaterialQueen() {
-		return 50 + baseEval.getMaterialQueen();
-	}
-	
-	
-	@Override
-	public int getMaterial(int pieceType) {
-		return baseEval.getMaterial(pieceType);
 	}
 	
 	
