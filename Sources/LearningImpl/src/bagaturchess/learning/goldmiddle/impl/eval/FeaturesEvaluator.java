@@ -17,7 +17,6 @@ import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.IEvaluator;
-import bagaturchess.search.api.internal.EvaluatorAdapter;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
 
