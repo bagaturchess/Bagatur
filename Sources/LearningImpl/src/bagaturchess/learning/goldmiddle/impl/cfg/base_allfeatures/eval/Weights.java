@@ -2,21 +2,7 @@ package bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.eval;
 
 
 public interface Weights {
-	public static final double MATERIAL_PAWN_O	=	60.846650684082576;
-	public static final double MATERIAL_PAWN_E	=	81.98633311013695;
-
-	public static final double MATERIAL_KNIGHT_O	=	339.2368870350284;
-	public static final double MATERIAL_KNIGHT_E	=	307.46589745375144;
-
-	public static final double MATERIAL_BISHOP_O	=	350.3295960632247;
-	public static final double MATERIAL_BISHOP_E	=	294.2812903320736;
-
-	public static final double MATERIAL_ROOK_O	=	458.3790766305261;
-	public static final double MATERIAL_ROOK_E	=	486.90179420315917;
-
-	public static final double MATERIAL_QUEEN_O	=	1078.9019540039876;
-	public static final double MATERIAL_QUEEN_E	=	812.9810025556329;
-
+	
 	public static final double KINGSAFE_CASTLING_O	=	7.847088550561575;
 	public static final double KINGSAFE_CASTLING_E	=	0.0;
 

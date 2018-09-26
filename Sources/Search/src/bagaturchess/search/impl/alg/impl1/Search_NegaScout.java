@@ -538,19 +538,9 @@ public class Search_NegaScout extends SearchImpl {
 							continue;
 						}
 						
-						if (rest == 1 && getHistory(inCheck).getScores(cur_move) <= 0.16) {
-							continue;
-						} else if (rest == 2 && getHistory(inCheck).getScores(cur_move) <= 0.08) {
-							continue;
-						} else if (rest == 3 && getHistory(inCheck).getScores(cur_move) <= 0.04) {
-							continue;
-						} else if (rest == 4 && getHistory(inCheck).getScores(cur_move) <= 0.02) {
-							continue;
-						} else if (rest == 5 && getHistory(inCheck).getScores(cur_move) <= 0.01) {
-							continue;
-						} else if (rest == 6 && getHistory(inCheck).getScores(cur_move) == 0.00) {
-							continue;
-						}
+						if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
+ 							continue;
+ 						}
 					}
 				}
 				
