@@ -130,56 +130,8 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	public boolean USE_PV_HISTORY = true;
 	
-	/*
-	public static final int[] STATIC_REDUCTION_MARGIN_PV = new int[]   {
-		0,  100,  300, 500, 700, 700, 700, 700, 700,
-	};
+	protected static final int DRAW_SCORE = 0;
 	
-	public static final int[] STATIC_REDUCTION_MARGIN_NONPV = new int[]   {
-		0,  100,  300, 500, 700, 700, 700, 700, 700,
-	};
-	*/
-	
-	
-	public static final int[] STATIC_REDUCTION_MARGIN_PV = new int[]   {0,  100,  300, 500, 700, 700, 900, 900,
-		900, 1000, 1000, 1000, 1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500};
-	
-	public static final int[] STATIC_REDUCTION_MARGIN_NONPV = new int[]   {0,  100,  300, 500, 700, 700, 900, 900,
-		900, 1000, 1000, 1000, 1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500,
-		1500,1500,1500,1500,1500,1500,1500,1500,1500};
-	
-	
-	//public static final int[] STATIC_REDUCTION_MARGIN_PV = new int[]   {0,  50,  100, 200, 400, 800, 1600, 3200};
-	
-	//public static final int[] STATIC_REDUCTION_MARGIN_NONPV = new int[]   {0,  50,  100, 200, 400, 800, 1600, 3200};
-
-	
-	static {
-		/*int val = 0;
-		for (int i=0; i<STATIC_REDUCTION_MARGIN_PV.length; i++) {
-			//System.out.println(val);
-			STATIC_REDUCTION_MARGIN_PV[i] = val;
-			STATIC_REDUCTION_MARGIN_NONPV[i] = val;
-			if (val < 1500) val += 70;
-		}*/
-	}
 	
 	public int FIRSTTIME_WINDOW = 25;
 	public boolean ASPIRATION_SEARCH = false;
@@ -238,53 +190,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		}
 		
 		initParams(env.getSearchConfig());
-	}
-	
-	protected IHistoryTable getHistory(boolean inCheck) {
-		return inCheck ? env.getHistory_InCheck() : env.getHistory_All();
-	}
-	
-	protected int getDrawScores() {
-		//TODO:Check
-		//throw new IllegalStateException("root colour");
-		return 0;
-	}
-	
-	protected int getDrawScores(int rootColour) {
-		//int scores = getEnv().getBitboard().getMaterialFactor().interpolateByFactor(-50, 50);
-		int scores = getEnv().getBitboard().getMaterialFactor().interpolateByFactor(0, 0);
-		if (getEnv().getBitboard().getColourToMove() != rootColour) {
-			scores = -scores;
-		}
-		return scores;
-	}
-	
-	
-
-	
-	
-	protected static SharedData getOrCreateSearchEnv(Object[] args) {
-		if (args[2] == null) {
-			return new SharedData(ChannelManager.getChannel(), (IEngineConfig)args[1]);
-		} else {
-			return (SharedData) args[2];
-		}
-	}
-	
-	
-	public void newSearch() {
-		
-		env.getHistory_All().newSearch();
-		env.getHistory_InCheck().newSearch();
-		
-		env.getMoveListFactory().newSearch();
-		//env.getEval().beforeSearch();
-		
-		env.getOrderingStatistics().normalize();
-		
-		for (int i=0; i<lists_all.length; i++) {
-			lists_all[i].newSearch();
-		}
 	}
 	
 	
@@ -367,6 +272,102 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	public ISearchConfig_AB getSearchConfig() {
 		return searchConfig;
 	}
+	
+	
+	protected IHistoryTable getHistory(boolean inCheck) {
+		return inCheck ? env.getHistory_InCheck() : env.getHistory_All();
+	}
+	
+	
+	protected int getDrawScores(int rootColour) {
+		//int scores = getEnv().getBitboard().getMaterialFactor().interpolateByFactor(-50, 50);
+		int scores = getEnv().getBitboard().getMaterialFactor().interpolateByFactor(DRAW_SCORE, DRAW_SCORE);
+		if (getEnv().getBitboard().getColourToMove() != rootColour) {
+			scores = -scores;
+		}
+		return scores;
+	}
+	
+
+	protected int sentFromTPT(ISearchMediator mediator, int min_depth) {
+		int depth = 0;
+		
+		env.getTPT().lock();
+		ISearchInfo info = SearchInfoFactory.getFactory().createSearchInfo();
+
+		TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
+
+		if (tptEntry != null
+				&& tptEntry.isExact()
+				//&& tptEntry.getBestMove_lower() != 0
+				) {
+
+			PVNode node = pvman.load(0);
+
+			node.bestmove = 0;
+			node.eval = MIN;
+			node.nullmove = false;
+			node.leaf = true;
+			
+			depth = tptEntry.getDepth();
+
+			env.getTPT().lock();
+			buff_tpt_depthtracking[0] = 0;
+			extractFromTPT(info, depth, node, true, buff_tpt_depthtracking, env.getBitboard().getColourToMove());
+			env.getTPT().unlock();
+
+			node.eval = tptEntry.getLowerBound();
+
+			pv_buffer.clear();
+
+			int pv[] = PVNode.convertPV(pvman.load(0), pv_buffer);
+			if (pv != null && pv.length > 0) {
+				info.setPV(pv);
+				info.setBestMove(info.getPV()[0]);
+				info.setEval(node.eval);
+				info.setDepth(depth);
+				
+				depth = Math.min(depth, buff_tpt_depthtracking[0]);
+
+				if (mediator != null && depth >= min_depth) {
+					mediator.changedMajor(info);
+					if (DEBUGSearch.DEBUG_MODE) testPV(info);
+				}
+
+			} else {
+				depth = 0;
+			}
+		}
+		env.getTPT().unlock();
+
+		return depth + 1;
+	}
+	
+	
+	protected static SharedData getOrCreateSearchEnv(Object[] args) {
+		if (args[2] == null) {
+			return new SharedData(ChannelManager.getChannel(), (IEngineConfig)args[1]);
+		} else {
+			return (SharedData) args[2];
+		}
+	}
+	
+	
+	public void newSearch() {
+		
+		env.getHistory_All().newSearch();
+		env.getHistory_InCheck().newSearch();
+		
+		env.getMoveListFactory().newSearch();
+		//env.getEval().beforeSearch();
+		
+		env.getOrderingStatistics().normalize();
+		
+		for (int i=0; i<lists_all.length; i++) {
+			lists_all[i].newSearch();
+		}
+	}
+	
 	
 	public abstract int pv_search(ISearchMediator mediator, IRootWindow rootWin, ISearchInfo info,
 			int initial_maxdepth, int maxdepth, int depth, int alpha, int beta,
@@ -478,21 +479,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		return false;
 	}
 	
-	/*protected int getRootTPTMove(long hashkey) {
-		int tpt_move = 0;
-		
-		
-		env.getTPT().lock();
-		{
-			TPTEntry tptEntry = env.getTPT().get(hashkey);
-			if (tptEntry != null) {
-				tpt_move = tptEntry.getBestMove_lower();
-			}
-		}
-		env.getTPT().unlock();
-		
-		return USE_TPT_MOVE ? tpt_move : 0;
-	}*/
 	
 	protected boolean isPVNode(int cur_eval, int best_eval, int alpha, int beta) {
 		return cur_eval > alpha && cur_eval < beta;
@@ -552,59 +538,10 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		return 0;
 	}
 	
-	protected int sentFromTPT(ISearchMediator mediator, int min_depth) {
-		int depth = 0;
-		
-		env.getTPT().lock();
-		ISearchInfo info = SearchInfoFactory.getFactory().createSearchInfo();
-		TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
-		
-		if (tptEntry != null
-				&& tptEntry.isExact()
-				//&& tptEntry.getBestMove_lower() != 0
-				) {
-			
-			PVNode node = pvman.load(0);
-			
-			node.bestmove = 0;
-			node.eval = MIN;
-			node.nullmove = false;
-			node.leaf = true;
-			
-			depth = tptEntry.getDepth();
-			
-			env.getTPT().lock();
-			buff_tpt_depthtracking[0] = 0;
-			extractFromTPT(info, depth, node, true, buff_tpt_depthtracking);
-			env.getTPT().unlock();
-			
-			node.eval = tptEntry.getLowerBound();
-			pv_buffer.clear();
-			int pv[] = PVNode.convertPV(pvman.load(0), pv_buffer);
-			if (pv != null && pv.length > 0) {
-				info.setPV(pv);
-				info.setBestMove(info.getPV()[0]);
-				info.setEval(node.eval);
-				info.setDepth(depth);
-				
-				depth = Math.min(depth, buff_tpt_depthtracking[0]);
-				
-				if (mediator != null && depth >= min_depth) {
-					mediator.changedMajor(info);
-					if (DEBUGSearch.DEBUG_MODE) testPV(info);
-				}
-			} else {
-				depth = 0;
-			}
-		}
-		env.getTPT().unlock();
-		
-		return depth + 1;
-	}
 	
-	protected boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int[] depthtracking) {
+	protected boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int[] depthtracking, int rootColour) {
 		//env.getTPT().lock();
-		boolean res = extractFromTPT(info, depth, result, useLower, MIN, MAX, depthtracking);
+		boolean res = extractFromTPT(info, depth, result, useLower, MIN, MAX, depthtracking, rootColour);
 		/*//TODO: Consider if (res) {
 			result.eval = DRAW;
 		}*/
@@ -612,7 +549,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		return res;
 	}
 	
-	private boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int alpha, int beta, int[] depthtracking) {
+	private boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int alpha, int beta, int[] depthtracking, int rootColour) {
 		
 		//if (true) throw new IllegalStateException("Not thread safe"); 
 		
@@ -635,7 +572,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		}
 		
 		if (isDrawPV(depth)) {
-			//TODO: Consider result.eval = DRAW;
+			result.eval = getDrawScores(rootColour);
 			return true;
 		}
 		
@@ -687,8 +624,10 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 					env.getBitboard().makeMoveForward(result.bestmove);
 				}
 				
-				draw = extractFromTPT(info, depth - 1, result.child, !useLower, -beta, -alpha, depthtracking);
-				//TODO: Consider if (draw) result.eval = DRAW;
+				draw = extractFromTPT(info, depth - 1, result.child, !useLower, -beta, -alpha, depthtracking, rootColour);
+				if (draw) {
+					result.eval = getDrawScores(rootColour);
+				}
 				
 				if (result.bestmove == 0) {
 					env.getBitboard().makeNullMoveBackward();

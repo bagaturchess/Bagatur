@@ -60,6 +60,11 @@ public abstract class SearchImpl_MTD extends SearchImpl {
 	}
 	
 	
+	public ISearchConfig_MTD getSearchConfig() {
+		return (ISearchConfig_MTD) super.getSearchConfig();
+	}
+	
+	
 	@Override
 	public void search(ISearchMediator mediator, int startIteration, int max_iterations, boolean useMateDistancePrunning) {
 		
@@ -95,10 +100,5 @@ public abstract class SearchImpl_MTD extends SearchImpl {
 			searchedNodesCount = info.getSearchedNodes();			
 			lasteval = eval;//Important line
 		}
-	}
-	
-	
-	public ISearchConfig_MTD getSearchConfig() {
-		return (ISearchConfig_MTD) super.getSearchConfig();
 	}
 }

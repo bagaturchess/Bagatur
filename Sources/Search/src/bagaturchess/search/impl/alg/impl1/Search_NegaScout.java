@@ -141,12 +141,12 @@ public class Search_NegaScout extends SearchImpl {
 		//Draw check
 		if (pv) {
 			if (isDrawPV(depth)) {
-				node.eval = getDrawScores();
+				node.eval = getDrawScores(rootColour);
 				return node.eval;
 			}
 		} else {
 			if (isDraw()) {
-				node.eval = getDrawScores();
+				node.eval = getDrawScores(rootColour);
 				return node.eval;
 			}
 		}
@@ -278,7 +278,7 @@ public class Search_NegaScout extends SearchImpl {
 						
 						env.getTPT().lock();
 						buff_tpt_depthtracking[0] = 0;
-						extractFromTPT(info, rest, node, true, buff_tpt_depthtracking);
+						extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour);
 						env.getTPT().unlock();
 						
 						if (buff_tpt_depthtracking[0] >= rest) {
@@ -295,7 +295,7 @@ public class Search_NegaScout extends SearchImpl {
 							
 							env.getTPT().lock();
 							buff_tpt_depthtracking[0] = 0;
-							extractFromTPT(info, rest, node, true, buff_tpt_depthtracking);
+							extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour);
 							env.getTPT().unlock();
 							
 							if (buff_tpt_depthtracking[0] >= rest) {
@@ -312,7 +312,7 @@ public class Search_NegaScout extends SearchImpl {
 							
 							env.getTPT().lock();
 							buff_tpt_depthtracking[0] = 0;
-							extractFromTPT(info, rest, node, true, buff_tpt_depthtracking);
+							extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour);
 							env.getTPT().unlock();
 							
 							if (buff_tpt_depthtracking[0] >= rest) {
@@ -344,7 +344,7 @@ public class Search_NegaScout extends SearchImpl {
 		
 		//Quiescence search
 		if (rest + normDepth(extend_position) <= 0) {
-			node.eval = qsearch(mediator, info, depth, alpha_org, beta, pv);
+			node.eval = qsearch(mediator, info, depth, alpha_org, beta, pv, rootColour);
 			return node.eval;
 		}
 		
@@ -370,7 +370,7 @@ public class Search_NegaScout extends SearchImpl {
 			if (hasAtLeastOnePiece) {
 				
 				if (backtrackingInfo.static_eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
-					backtrackingInfo.static_eval = qsearch(mediator, info, depth, alpha_org, beta, pv);
+					backtrackingInfo.static_eval = qsearch(mediator, info, depth, alpha_org, beta, pv, rootColour);
 				}
 				
 				if (backtrackingInfo.static_eval >= beta) {
@@ -451,7 +451,7 @@ public class Search_NegaScout extends SearchImpl {
 			) {
             
 			if (backtrackingInfo.static_eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
-				backtrackingInfo.static_eval = qsearch(mediator, info, depth, alpha_org, beta, pv);
+				backtrackingInfo.static_eval = qsearch(mediator, info, depth, alpha_org, beta, pv, rootColour);
 			}
 			
             if (alpha_org > backtrackingInfo.static_eval + getAlphaTrustWindow(mediator, rest)) {
@@ -513,16 +513,17 @@ public class Search_NegaScout extends SearchImpl {
 					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 				}
 				
-				boolean isGoodMove = false;
+				/*boolean isGoodMove = false;
 				if (list instanceof ListAll) {
 					isGoodMove = ((ListAll) list).isGoodMove(cur_move);
-				}
+				}*/
 				
 				//Static pruning
 				if (((searchedCount > 0 && !pv) || (searchedCount > 0 && pv))
 						&& !inCheck
-						&& moveSee < 0
-						&& !isGoodMove
+						&& !isCapOrProm
+						//&& moveSee < 0
+						//&& !isGoodMove
 						&& !env.getBitboard().isCheckMove(cur_move)
 					) {
 					
@@ -555,16 +556,14 @@ public class Search_NegaScout extends SearchImpl {
 				boolean reductionAllowed = ((searchedCount > 0 && !pv) || (searchedCount > 0 && pv))
 											&& !inCheck
 											&& !isCheckMove
-											&& moveSee < 0;
+											&& moveSee < 0
+											;
 				
 				int extend = extend_position;// + (moveSee > 0 ? PLY / 4 : 0);
 				
 				//LMR
                 int reduction = 0;
                 if (reductionAllowed) {
-                	
-            		//reduction = (int) (PLY * Math.sqrt(searchedCount + rest));
-					//reduction *= (1 - getHistory(inCheck).getScores(cur_move));
 					
 					double rate = Math.log(searchedCount) * Math.log(rest) / 2;
 					rate += 2;
@@ -579,7 +578,8 @@ public class Search_NegaScout extends SearchImpl {
 				int new_maxdepth = maxdepth + extend;
 				
 				int cur_eval = -negasearch(mediator, info, new_maxdepth - reduction, depth + 1, -(alpha_cur + 1), -alpha_cur, false, useMateDistancePrunning, rootColour);
-				if (reduction > 0 && cur_eval >= alpha_cur) {
+				if (reduction > 0 && cur_eval >= beta) {
+				//if (reduction > 0 && cur_eval >= alpha_cur) {
 					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(alpha_cur + 1), -alpha_cur, false, useMateDistancePrunning, rootColour);
 				}
 				
@@ -643,7 +643,7 @@ public class Search_NegaScout extends SearchImpl {
 			} else {
 				if (legalMoves == 0) {
 					node.bestmove = 0;
-					node.eval = getDrawScores();
+					node.eval = getDrawScores(rootColour);
 					node.leaf = true;
 					node.nullmove = false;
 					return node.eval;
@@ -666,7 +666,7 @@ public class Search_NegaScout extends SearchImpl {
 	}
 	
 	
-	private int qsearch(ISearchMediator mediator, ISearchInfo info, int depth, int alpha_org, int beta, boolean pv) {
+	private int qsearch(ISearchMediator mediator, ISearchInfo info, int depth, int alpha_org, int beta, boolean pv, int rootColour) {
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);	
@@ -702,12 +702,12 @@ public class Search_NegaScout extends SearchImpl {
 		//Draw check
 		if (pv) {
 			if (isDrawPV(depth)) {
-				node.eval = getDrawScores();
+				node.eval = getDrawScores(rootColour);
 				return node.eval;
 			}
 		} else {
 			if (isDraw()) {
-				node.eval = getDrawScores();
+				node.eval = getDrawScores(rootColour);
 				return node.eval;
 			}
 		}
@@ -758,7 +758,7 @@ public class Search_NegaScout extends SearchImpl {
 					
 					env.getTPT().lock();
 					buff_tpt_depthtracking[0] = 0;
-					extractFromTPT(info, 0, node, true, buff_tpt_depthtracking);
+					extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour);
 					env.getTPT().unlock();
 					
 					if (buff_tpt_depthtracking[0] >= 0) {
@@ -775,7 +775,7 @@ public class Search_NegaScout extends SearchImpl {
 						
 						env.getTPT().lock();
 						buff_tpt_depthtracking[0] = 0;
-						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking);
+						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour);
 						env.getTPT().unlock();
 						
 						if (buff_tpt_depthtracking[0] >= 0) {
@@ -792,7 +792,7 @@ public class Search_NegaScout extends SearchImpl {
 						
 						env.getTPT().lock();
 						buff_tpt_depthtracking[0] = 0;
-						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking);
+						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour);
 						env.getTPT().unlock();
 						
 						if (buff_tpt_depthtracking[0] >= 0) {
@@ -859,7 +859,7 @@ public class Search_NegaScout extends SearchImpl {
 			
 			env.getBitboard().makeMoveForward(cur_move);
 			
-			int cur_eval = -qsearch(mediator, info, depth + 1, -beta, -alpha_cur, pv);
+			int cur_eval = -qsearch(mediator, info, depth + 1, -beta, -alpha_cur, pv, rootColour);
 			
 			env.getBitboard().makeMoveBackward(cur_move);
 			
