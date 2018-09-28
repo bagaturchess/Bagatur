@@ -500,7 +500,7 @@ public class Search_NegaScout extends SearchImpl {
 					continue;
 				}
 				
-
+				
 				//Build and sent minor info
 				buildAndSendMinorInfo(mediator, info, depth, searchedCount, cur_move);
 				
@@ -513,17 +513,10 @@ public class Search_NegaScout extends SearchImpl {
 					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 				}
 				
-				/*boolean isGoodMove = false;
-				if (list instanceof ListAll) {
-					isGoodMove = ((ListAll) list).isGoodMove(cur_move);
-				}*/
-				
 				//Static pruning
 				if (((searchedCount > 0 && !pv) || (searchedCount > 0 && pv))
 						&& !inCheck
 						&& !isCapOrProm
-						//&& moveSee < 0
-						//&& !isGoodMove
 						&& !env.getBitboard().isCheckMove(cur_move)
 					) {
 					
@@ -564,7 +557,6 @@ public class Search_NegaScout extends SearchImpl {
 				//LMR
                 int reduction = 0;
                 if (reductionAllowed) {
-					
 					double rate = Math.log(searchedCount) * Math.log(rest) / 2;
 					rate += 2;
 					rate *= (1 - getHistory(inCheck).getScores(cur_move));
