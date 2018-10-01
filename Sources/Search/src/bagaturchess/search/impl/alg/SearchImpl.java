@@ -572,7 +572,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		}
 		
 		if (isDrawPV(depth)) {
-			result.eval = getDrawScores(rootColour);
+			//result.eval = getDrawScores(rootColour);
 			return true;
 		}
 		
@@ -587,9 +587,9 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		}
 		
 		if (entry != null) {
-			//if (entry.getDepth() >= depth) {
+			if (entry.getDepth() >= depth) {
 				
-				info.setSearchedNodes(info.getSearchedNodes() + 1);
+				//info.setSearchedNodes(info.getSearchedNodes() + 1);
 				
 				if (entry.isExact()) {
 					result.bestmove = entry.getBestMove_lower();
@@ -625,16 +625,16 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 				}
 				
 				draw = extractFromTPT(info, depth - 1, result.child, !useLower, -beta, -alpha, depthtracking, rootColour);
-				if (draw) {
+				/*if (draw) {
 					result.eval = getDrawScores(rootColour);
-				}
+				}*/
 				
 				if (result.bestmove == 0) {
 					env.getBitboard().makeNullMoveBackward();
 				} else {
 					env.getBitboard().makeMoveBackward(result.bestmove);
 				}
-			//}
+			}
 		}
 		
 		return draw;
