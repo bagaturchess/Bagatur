@@ -32,6 +32,7 @@ import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchMoveList;
+import bagaturchess.search.impl.alg.BacktrackingInfo;
 import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.alg.iter.ListAll;
 import bagaturchess.search.impl.alg.iter.ListCapsProm;
@@ -107,7 +108,7 @@ public class Search_NegaScout extends SearchImpl {
 		backtrackingInfo.colour_to_move = env.getBitboard().getColourToMove();
 		backtrackingInfo.hash_move = 0;
 		backtrackingInfo.null_move = false;
-		backtrackingInfo.static_eval = BacktrackingInfo.EVAL_NOT_CALCULATED;
+		backtrackingInfo.static_eval = eval(depth, alpha_org, beta, pv, rootColour);
 		backtrackingInfo.best_move = 0;
 		backtrackingInfo.mate_move = 0;
 		backtrackingInfo.material_exchanged = depth > 0 ? -backtracking[depth - 1].material_exchanged : 0;
@@ -373,11 +374,7 @@ public class Search_NegaScout extends SearchImpl {
 					
 			if (hasAtLeastOnePiece) {
 				
-				if (backtrackingInfo.static_eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
-					backtrackingInfo.static_eval = roughEval(depth, rootColour);//qsearch(mediator, info, depth, alpha_org, beta, pv, rootColour);
-				}
-				
-				if (backtrackingInfo.static_eval >= beta + 35) {
+				if (backtrackingInfo.static_eval >= beta) {
 					
 					int reduction = (int) ((NULL_MOVE_REDUCTION_MULTIPLIER * (PLY * rest) / 2));
 					reduction = Math.max(reduction, PLY);
@@ -450,12 +447,12 @@ public class Search_NegaScout extends SearchImpl {
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 			env.getTPT().unlock();
 			
-	        if (rest >= 8
+	        if (depth > 0
+	        		&& rest >= 4
 	        		&& !disableExts
-	        		&& depth > 0
 	        		&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
 	        		&& tptEntry != null
-	        		&& tptEntry.getDepth() >= rest - 3
+	        		//&& tptEntry.getDepth() >= rest - 3
 	        		) {
 	        	
 		        boolean hasSingleMove = env.getBitboard().hasSingleMove();
@@ -479,7 +476,7 @@ public class Search_NegaScout extends SearchImpl {
 						
 						if (singularEval < singularBeta) {
 							singularExtension = PLY;
-							//System.out.println("singularExtension");
+							//System.out.println("singularExtension hit");
 						}
 					}
 				}
@@ -494,14 +491,7 @@ public class Search_NegaScout extends SearchImpl {
     		&& !isMateVal(alpha_org)
 			&& !isMateVal(beta)
 			) {
-            
-			if (backtrackingInfo.static_eval == BacktrackingInfo.EVAL_NOT_CALCULATED) {
-				backtrackingInfo.static_eval = roughEval(depth, rootColour);
-				if (alpha_org > backtrackingInfo.static_eval + getAlphaTrustWindow(mediator, rest)) {
-					backtrackingInfo.static_eval = eval(depth, alpha_org, beta, pv, rootColour);
-				}
-			}
-			
+            			
             if (alpha_org > backtrackingInfo.static_eval + getAlphaTrustWindow(mediator, rest)) {
                 staticPruningEnabled = true;
             }
