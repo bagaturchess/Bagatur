@@ -37,36 +37,29 @@ public class TPTEntry {
 	public static final int NO_MOVE = 0;
 	
 	
-	//byte sdepth;
 	byte depth;
-	//byte colour;
-	
 	int lower;
 	int upper;
 	int bestmove_lower;
 	int bestmove_upper;
 	
-	//byte movenumber;
-	//boolean exact = false;
-	
-	//boolean obsolete = false;
 	
 	public TPTEntry() {
 		
 	}
+	
 	
 	public TPTEntry(int _smaxdepth, int _sdepth, int _colour,
 			int _eval, int _alpha, int _beta, int _bestmove) {
 		
 		init(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, (byte)0);
 	}
-
+	
+	
 	public String toString() {
 		String result = "";
 		
-		//result += "sdepth=" + sdepth;
 		result += " depth=" + depth;
-		//result += ", colour=" + colour;
 		result += ", lower=" + lower;
 		result += ", upper=" + upper;
 		result += ", bestmove_lower=" + MoveInt.moveToString(bestmove_lower);
@@ -75,24 +68,18 @@ public class TPTEntry {
 		return result;
 	}
 	
+	
 	public void init(int _smaxdepth, int _sdepth, int _colour, 
 			int _eval, int _alpha, int _beta, int _bestmove, byte _movenumber) {
 		
-		//obsolete = false;
-		
-		//sdepth = (byte)_sdepth;
 		depth = (byte) (_smaxdepth - _sdepth);
-		//colour = (byte) _colour;
-		//movenumber = _movenumber;
 		
 		if (_eval > _alpha && _eval < _beta) {
-			//exact = true;
 			lower = _eval;
 			upper = _eval;
 			bestmove_lower = _bestmove;
 			bestmove_upper = _bestmove;
 		} else {
-			//exact = false;
 			if (_eval >= _beta) { //_eval is lower bound
 				lower = _eval;
 				bestmove_lower = _bestmove;
@@ -112,12 +99,6 @@ public class TPTEntry {
 	public void update(int _smaxdepth, int _sdepth, int _colour,
 			int _eval, int _alpha, int _beta, int _bestmove, byte _movenumber) {
 		
-		//if (_colour != colour) {
-		//	throw new IllegalStateException("Different colour. Existing entry with " + colour + " but updated with " + _colour);
-		//}
-		
-		//movenumber = _movenumber;
-		
 		byte _depth = (byte) (_smaxdepth - _sdepth);
 		
 		/*if (true) {
@@ -131,21 +112,8 @@ public class TPTEntry {
 			
 		} else if (_depth == depth) {		
 			
-			//if (isExact() /*&& (_eval > _alpha && _eval < _beta)*/) {
-			//	//throw new IllegalStateException();
-			//	return;
-			//}
-			
-			if (isExact()) {
-				//System.out.println("PINKO");
-				//return;
-			}
-			
 			if (_eval > _alpha && _eval < _beta) {
 				
-				//obsolete = false;
-				
-				//exact = true;
 				lower = _eval;
 				upper = _eval;
 				bestmove_lower = _bestmove;
@@ -156,15 +124,11 @@ public class TPTEntry {
 				if (_eval >= _beta) { // _eval is lower bound
 					if (_eval >/*=*/ lower) {
 						
-						//obsolete = false;
-						
 						lower = _eval;
 						bestmove_lower = _bestmove;
 					}
 				} else if (_eval <= _alpha) { // _eval is upper bound
 					if (_eval </*=*/ upper) {
-						
-						//obsolete = false;
 						
 						upper = _eval;
 						bestmove_upper = _bestmove;
@@ -173,11 +137,6 @@ public class TPTEntry {
 					throw new IllegalStateException();
 				}
 			}
-		} else { //_depth < depth
-			//if (_eval > _alpha && _eval < _beta) {
-				//SHIT
-			//	init(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, _movenumber);
-			//}
 		}
 		
 		if (lower == upper && (lower == MIN_VALUE || lower == MAX_VALUE)) {
@@ -185,52 +144,38 @@ public class TPTEntry {
 		}
 	}
 	
-	//public int getColour() {
-	//	return colour;
-	//}
 	
 	public boolean isExact() {
 		return isExact(0);
 	}
 	
+	
 	public boolean isExact(int trustWindow) {
-		//return false;
 		return lower >= upper;
-		//return Math.abs(lower - upper) <= trustWindow;
 	}
+	
 	
 	public int getLowerBound() {
 		return lower;
 	}
-
+	
+	
 	public int getUpperBound() {
 		return upper;
 	}
 	
+	
 	public int getBestMove_lower() {
 		return bestmove_lower;
 	}
-
+	
+	
 	public int getBestMove_upper() {
-		//if (isExact()) {
-		//	return bestmove_lower;
-		//}
 		return bestmove_upper;
 	}
-
+	
+	
 	public int getDepth() {
 		return depth;
 	}
-
-	/*public boolean isDirty() {
-		throw new IllegalStateException();
-	}
-
-	public void setDirty(boolean dirty) {
-		throw new IllegalStateException();
-	}*/
-
-	//public boolean isObsolete() {
-	//	return obsolete;
-	//}
 }
