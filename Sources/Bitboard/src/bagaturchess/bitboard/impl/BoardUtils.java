@@ -22,6 +22,8 @@
  */
 package bagaturchess.bitboard.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -220,6 +222,32 @@ public class BoardUtils {
 		
 		return move;
 	}
+	
+	
+	public static void playGameUCI(IBitBoard board, String movesSign) {
+		
+		List<String> moves = new ArrayList<String>();
+		
+		StringTokenizer st = new StringTokenizer(movesSign, " ");
+		while(st.hasMoreTokens()) {
+			moves.add(st.nextToken());
+		}
+		
+		int colour = Figures.COLOUR_WHITE;
+		int size = moves.size();
+		for (int i = 0; i < size; i++ ) {
+			
+			String moveSign = moves.get(i);
+			if (!moveSign.equals("...")) {
+				//System.out.println(moveSign);
+				int move = BoardUtils.parseSingleUCIMove(board, colour, moveSign);
+				colour = Figures.OPPONENT_COLOUR[colour];
+				
+				board.makeMoveForward(move);
+			}
+		}
+	}
+	
 	
 	public static int parseSingleUCIMove(IBitBoard board, int colourToMove, String moveSign) {
 		int move = 0;
