@@ -12,4 +12,5 @@ public class BacktrackingInfo {
 	int best_move;
 	int mate_move;
 	int material_exchanged;
+	int excluded_move;
 }

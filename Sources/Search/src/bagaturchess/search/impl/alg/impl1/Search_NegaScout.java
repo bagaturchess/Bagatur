@@ -82,7 +82,7 @@ public class Search_NegaScout extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		return negasearch(mediator, info, maxdepth, depth, alpha, beta, true, useMateDistancePrunning, rootColour, prevPV, false);
+		return negasearch(mediator, info, maxdepth, depth, alpha, beta, true, useMateDistancePrunning, rootColour, prevPV, false, true);
 	}
 	
 	
@@ -93,13 +93,13 @@ public class Search_NegaScout extends SearchImpl {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		return negasearch(mediator, info, maxdepth, depth, beta - 1, beta, false, useMateDistancePrunning, rootColour, prevPV, false);
+		return negasearch(mediator, info, maxdepth, depth, beta - 1, beta, false, useMateDistancePrunning, rootColour, prevPV, false, true);
 	}
 	
 	
 	private int negasearch(ISearchMediator mediator, ISearchInfo info,
 			int maxdepth, int depth, int alpha_org, int beta, boolean pv, boolean useMateDistancePrunning,
-			int rootColour, int[] prevPV, boolean disableExts) {
+			int rootColour, int[] prevPV, boolean disableExts, boolean storeInTPT) {
 		
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
@@ -279,10 +279,10 @@ public class Search_NegaScout extends SearchImpl {
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
 					int tpt_move = tptEntry.getBestMove_lower();
-					backtrackingInfo.static_eval = tptEntry.getLowerBound();
+					//backtrackingInfo.static_eval = tptEntry.getLowerBound();
 					if (tpt_move == 0) {
-						tpt_move = tptEntry.getBestMove_upper();
-						backtrackingInfo.static_eval = tptEntry.getUpperBound();
+						//tpt_move = tptEntry.getBestMove_upper();
+						//backtrackingInfo.static_eval = tpt_upper;
 					}
 					backtrackingInfo.hash_move = tpt_move;
 				}
@@ -389,7 +389,7 @@ public class Search_NegaScout extends SearchImpl {
 					node.leaf = true;
 					backtrackingInfo.null_move = true;
 					env.getBitboard().makeNullMoveForward();
-					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -beta, -(beta - 1), false, useMateDistancePrunning, rootColour, prevPV, disableExts);
+					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -beta, -(beta - 1), false, useMateDistancePrunning, rootColour, prevPV, disableExts, storeInTPT);
 					
 					
 					//Get mate move of opponent
@@ -425,17 +425,17 @@ public class Search_NegaScout extends SearchImpl {
 			
 			if (reduction >= PLY) {
 				
-				negasearch(mediator, info, maxdepth - reduction, depth, alpha_org, beta, false, useMateDistancePrunning, rootColour, prevPV, true);
+				negasearch(mediator, info, maxdepth - reduction, depth, alpha_org, beta, false, useMateDistancePrunning, rootColour, prevPV, true, storeInTPT);
 				
 				env.getTPT().lock();
 				{
 					TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 					if (tptEntry != null) {
 						int tpt_move = tptEntry.getBestMove_lower();
-						backtrackingInfo.static_eval = tptEntry.getLowerBound();
+						//backtrackingInfo.static_eval = tptEntry.getLowerBound();
 						if (tpt_move == 0) {
-							backtrackingInfo.static_eval = tptEntry.getUpperBound();
-							tpt_move = tptEntry.getBestMove_upper();
+							//tpt_move = tptEntry.getBestMove_upper();
+							//backtrackingInfo.static_eval = tptEntry.getUpperBound();
 						}
 						backtrackingInfo.hash_move = tpt_move;
 					}
@@ -445,10 +445,55 @@ public class Search_NegaScout extends SearchImpl {
         }
         
         
+		//Singular move extension
+		int singularExtension = 0;
+		
+		{
+			env.getTPT().lock();
+			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
+			env.getTPT().unlock();
+			
+	        if (rest >= 8
+	        		&& !disableExts
+	        		&& depth > 0
+	        		&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
+	        		&& tptEntry != null
+	        		&& tptEntry.getDepth() >= rest - 3
+	        		) {
+	        	
+		        boolean hasSingleMove = env.getBitboard().hasSingleMove();
+		        
+				if (hasSingleMove) {
+					
+					singularExtension = PLY;
+					
+				} else if (tptEntry.getBestMove_lower() != 0) {
+						
+					int ttValue = tptEntry.getLowerBound();
+					
+					int reduction = (PLY * rest) / 2;
+					if (reduction >= PLY) {
+						
+						int singularBeta = ttValue - 2 * rest;
+						
+						backtrackingInfo.excluded_move = tptEntry.getBestMove_lower();
+						int singularEval = negasearch(mediator, info, maxdepth - reduction, depth, singularBeta - 1, singularBeta, pv, useMateDistancePrunning, rootColour, prevPV, disableExts, false);
+						backtrackingInfo.excluded_move = 0;
+						
+						if (singularEval < singularBeta) {
+							singularExtension = PLY;
+							//System.out.println("singularExtension");
+						}
+					}
+				}
+	        }
+		}
+		
+        
 		//Static pruning conditions for all depths
         boolean staticPruningEnabled = false;
         if (!inCheck
-        	&& rest <= 7
+        	//&& rest <= 7
     		&& !isMateVal(alpha_org)
 			&& !isMateVal(beta)
 			) {
@@ -506,6 +551,10 @@ public class Search_NegaScout extends SearchImpl {
 		if (cur_move != 0) {
 			do {
 				
+				if (cur_move == backtrackingInfo.excluded_move) {
+					continue;
+				}
+				
 				if (searchedCount > 0 && cur_move == backtrackingInfo.hash_move) {
 					continue;
 				}
@@ -529,7 +578,7 @@ public class Search_NegaScout extends SearchImpl {
 					
 					if (!isCapOrProm) {
 						
-						//Static pruning for rest <= 7
+						//Static pruning for all depths
 						if (staticPruningEnabled) {
 							continue;
 						}
@@ -542,12 +591,14 @@ public class Search_NegaScout extends SearchImpl {
 						}
 						
 						//Static pruning - history based
-						if (rest <= 6) {
+						if (rest <= 8) {
 							if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
 	 							continue;
 	 						}
 						}
-					} else if (rest < 8) {
+					}
+					
+					if (rest <= 9) {
 						
 						//Static pruning - move SEE based
 						if (moveSee < -35 * rest * rest) {
@@ -572,7 +623,8 @@ public class Search_NegaScout extends SearchImpl {
 				boolean reductionAllowed = searchedCount > 0
 											&& !inCheck
 											&& !isCheckMove
-											&& !isCapOrProm
+											//&& !isCapOrProm
+											&& moveSee <= 0
 											//&& rest >= 3
 											;
 				
@@ -588,17 +640,21 @@ public class Search_NegaScout extends SearchImpl {
                 
 				legalMoves++;
 				
+				int extension = 0;
+				if (cur_move == backtrackingInfo.hash_move) {
+					extension += singularExtension;
+				}
 				
-				int new_maxdepth = maxdepth;
+				int new_maxdepth = maxdepth + extension;
 				
-				int cur_eval = -negasearch(mediator, info, new_maxdepth - reduction, depth + 1, -(alpha_cur + 1), -alpha_cur, false, useMateDistancePrunning, rootColour, prevPV, disableExts);
+				int cur_eval = -negasearch(mediator, info, new_maxdepth - reduction, depth + 1, -(alpha_cur + 1), -alpha_cur, false, useMateDistancePrunning, rootColour, prevPV, disableExts, storeInTPT);
 				if (reduction > 0 && cur_eval >= beta) {
 				//if (reduction > 0 && cur_eval >= alpha_cur) {
-					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(alpha_cur + 1), -alpha_cur, false, useMateDistancePrunning, rootColour, prevPV, disableExts);
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(alpha_cur + 1), -alpha_cur, false, useMateDistancePrunning, rootColour, prevPV, disableExts, storeInTPT);
 				}
 				
 				if (pv && cur_eval > best_eval) {
-					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -beta, -alpha_cur, true, useMateDistancePrunning, rootColour, prevPV, disableExts);
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -beta, -alpha_cur, true, useMateDistancePrunning, rootColour, prevPV, disableExts, storeInTPT);
 				}
 				
 				env.getBitboard().makeMoveBackward(cur_move);
@@ -671,10 +727,11 @@ public class Search_NegaScout extends SearchImpl {
 			throw new IllegalStateException();
 		}
 		
-		
-		env.getTPT().lock();
-		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, backtrackingInfo.colour_to_move, best_eval, alpha_org, beta, best_move, (byte)0);
-		env.getTPT().unlock();
+		if (storeInTPT) {
+			env.getTPT().lock();
+			env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, backtrackingInfo.colour_to_move, best_eval, alpha_org, beta, best_move, (byte)0);
+			env.getTPT().unlock();
+		}
 		
 		return best_eval;
 	}
@@ -693,14 +750,13 @@ public class Search_NegaScout extends SearchImpl {
 		backtrackingInfo.colour_to_move = env.getBitboard().getColourToMove();
 		backtrackingInfo.hash_move = 0;
 		backtrackingInfo.null_move = false;
-		backtrackingInfo.static_eval = BacktrackingInfo.EVAL_NOT_CALCULATED;
+		backtrackingInfo.static_eval = eval(depth, alpha_org, beta, pv, rootColour);
 		backtrackingInfo.best_move = 0;
 		backtrackingInfo.mate_move = 0;
 		backtrackingInfo.material_exchanged = depth > 0 ? -backtracking[depth - 1].material_exchanged : 0;
 		
 		
 		//Check for max depth
-		backtrackingInfo.static_eval = eval(depth, alpha_org, beta, pv, rootColour);
 		if (depth >= MAX_DEPTH) {
 			return backtrackingInfo.static_eval;
 		}
@@ -754,10 +810,10 @@ public class Search_NegaScout extends SearchImpl {
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
 					tpt_move = tptEntry.getBestMove_lower();
-					backtrackingInfo.static_eval = tpt_lower;
+					//backtrackingInfo.static_eval = tpt_lower;
 					if (tpt_move == 0) {
-						tpt_move = tptEntry.getBestMove_upper();
-						backtrackingInfo.static_eval = tpt_upper;
+						//tpt_move = tptEntry.getBestMove_upper();
+						//backtrackingInfo.static_eval = tpt_upper;
 					}
 				}
 			}
