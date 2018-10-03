@@ -82,7 +82,7 @@ public class Search_NegaScout extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		return negasearch(mediator, info, maxdepth, depth, alpha, beta, true, useMateDistancePrunning, rootColour, prevPV, false, true);
+		return negasearch(mediator, info, maxdepth, depth, alpha, beta, true, useMateDistancePrunning, rootColour, prevPV, false);
 	}
 	
 	
@@ -93,13 +93,13 @@ public class Search_NegaScout extends SearchImpl {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		return negasearch(mediator, info, maxdepth, depth, beta - 1, beta, false, useMateDistancePrunning, rootColour, prevPV, false, true);
+		return negasearch(mediator, info, maxdepth, depth, beta - 1, beta, false, useMateDistancePrunning, rootColour, prevPV, false);
 	}
 	
 	
 	private int negasearch(ISearchMediator mediator, ISearchInfo info,
 			int maxdepth, int depth, int alpha_org, int beta, boolean pv, boolean useMateDistancePrunning,
-			int rootColour, int[] prevPV, boolean disableExts, boolean storeInTPT) {
+			int rootColour, int[] prevPV, boolean disableExts) {
 		
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
@@ -243,6 +243,7 @@ public class Search_NegaScout extends SearchImpl {
 				if (rest < 1) {
 					//Do not allow the leaf node to be in check
 					maxdepth += PLY;
+					disableExts = true;
 				} else {
 					//Check extension
 					//maxdepth += PLY;
@@ -279,10 +280,8 @@ public class Search_NegaScout extends SearchImpl {
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
 					int tpt_move = tptEntry.getBestMove_lower();
-					//backtrackingInfo.static_eval = tptEntry.getLowerBound();
 					if (tpt_move == 0) {
-						//tpt_move = tptEntry.getBestMove_upper();
-						//backtrackingInfo.static_eval = tpt_upper;
+						tpt_move = tptEntry.getBestMove_upper();
 					}
 					backtrackingInfo.hash_move = tpt_move;
 				}
@@ -389,7 +388,7 @@ public class Search_NegaScout extends SearchImpl {
 					node.leaf = true;
 					backtrackingInfo.null_move = true;
 					env.getBitboard().makeNullMoveForward();
-					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -beta, -(beta - 1), false, useMateDistancePrunning, rootColour, prevPV, disableExts, storeInTPT);
+					int null_eval = -negasearch(mediator, info, maxdepth - reduction, depth + 1, -beta, -(beta - 1), false, useMateDistancePrunning, rootColour, prevPV, disableExts);
 					
 					
 					//Get mate move of opponent
@@ -425,17 +424,15 @@ public class Search_NegaScout extends SearchImpl {
 			
 			if (reduction >= PLY) {
 				
-				negasearch(mediator, info, maxdepth - reduction, depth, alpha_org, beta, false, useMateDistancePrunning, rootColour, prevPV, true, storeInTPT);
+				negasearch(mediator, info, maxdepth - reduction, depth, alpha_org, beta, false, useMateDistancePrunning, rootColour, prevPV, true);
 				
 				env.getTPT().lock();
 				{
 					TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 					if (tptEntry != null) {
 						int tpt_move = tptEntry.getBestMove_lower();
-						//backtrackingInfo.static_eval = tptEntry.getLowerBound();
 						if (tpt_move == 0) {
-							//tpt_move = tptEntry.getBestMove_upper();
-							//backtrackingInfo.static_eval = tptEntry.getUpperBound();
+							tpt_move = tptEntry.getBestMove_upper();
 						}
 						backtrackingInfo.hash_move = tpt_move;
 					}
@@ -477,7 +474,7 @@ public class Search_NegaScout extends SearchImpl {
 						int singularBeta = ttValue - 2 * rest;
 						
 						backtrackingInfo.excluded_move = tptEntry.getBestMove_lower();
-						int singularEval = negasearch(mediator, info, maxdepth - reduction, depth, singularBeta - 1, singularBeta, pv, useMateDistancePrunning, rootColour, prevPV, disableExts, false);
+						int singularEval = negasearch(mediator, info, maxdepth - reduction, depth, singularBeta - 1, singularBeta, pv, useMateDistancePrunning, rootColour, prevPV, disableExts);
 						backtrackingInfo.excluded_move = 0;
 						
 						if (singularEval < singularBeta) {
@@ -647,14 +644,14 @@ public class Search_NegaScout extends SearchImpl {
 				
 				int new_maxdepth = maxdepth + extension;
 				
-				int cur_eval = -negasearch(mediator, info, new_maxdepth - reduction, depth + 1, -(alpha_cur + 1), -alpha_cur, false, useMateDistancePrunning, rootColour, prevPV, disableExts, storeInTPT);
+				int cur_eval = -negasearch(mediator, info, new_maxdepth - reduction, depth + 1, -(alpha_cur + 1), -alpha_cur, false, useMateDistancePrunning, rootColour, prevPV, disableExts);
 				if (reduction > 0 && cur_eval >= beta) {
 				//if (reduction > 0 && cur_eval >= alpha_cur) {
-					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(alpha_cur + 1), -alpha_cur, false, useMateDistancePrunning, rootColour, prevPV, disableExts, storeInTPT);
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -(alpha_cur + 1), -alpha_cur, false, useMateDistancePrunning, rootColour, prevPV, disableExts);
 				}
 				
 				if (pv && cur_eval > best_eval) {
-					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -beta, -alpha_cur, true, useMateDistancePrunning, rootColour, prevPV, disableExts, storeInTPT);
+					cur_eval = -negasearch(mediator, info, new_maxdepth, depth + 1, -beta, -alpha_cur, true, useMateDistancePrunning, rootColour, prevPV, disableExts);
 				}
 				
 				env.getBitboard().makeMoveBackward(cur_move);
@@ -727,11 +724,9 @@ public class Search_NegaScout extends SearchImpl {
 			throw new IllegalStateException();
 		}
 		
-		if (storeInTPT) {
-			env.getTPT().lock();
-			env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, backtrackingInfo.colour_to_move, best_eval, alpha_org, beta, best_move, (byte)0);
-			env.getTPT().unlock();
-		}
+		env.getTPT().lock();
+		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, backtrackingInfo.colour_to_move, best_eval, alpha_org, beta, best_move, (byte)0);
+		env.getTPT().unlock();
 		
 		return best_eval;
 	}
@@ -810,10 +805,8 @@ public class Search_NegaScout extends SearchImpl {
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
 					tpt_move = tptEntry.getBestMove_lower();
-					//backtrackingInfo.static_eval = tpt_lower;
 					if (tpt_move == 0) {
-						//tpt_move = tptEntry.getBestMove_upper();
-						//backtrackingInfo.static_eval = tpt_upper;
+						tpt_move = tptEntry.getBestMove_upper();
 					}
 				}
 			}
