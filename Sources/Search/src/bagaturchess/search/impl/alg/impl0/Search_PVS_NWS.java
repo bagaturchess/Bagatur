@@ -985,9 +985,19 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							continue;
 						}
 						
-						if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
- 							continue;
- 						}
+						if (rest == 1 && getHistory(inCheck).getScores(cur_move) <= 0.16) {
+							continue;
+						} else if (rest == 2 && getHistory(inCheck).getScores(cur_move) <= 0.08) {
+							continue;
+						} else if (rest == 3 && getHistory(inCheck).getScores(cur_move) <= 0.04) {
+							continue;
+						} else if (rest == 4 && getHistory(inCheck).getScores(cur_move) <= 0.02) {
+							continue;
+						} else if (rest == 5 && getHistory(inCheck).getScores(cur_move) <= 0.01) {
+							continue;
+						} else if (rest == 6 && getHistory(inCheck).getScores(cur_move) == 0.00) {
+							continue;
+						}
 					}
 				}
 				
@@ -1718,9 +1728,19 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							continue;
 						}
 						
-						if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
- 							continue;
- 						}
+						if (rest == 1 && getHistory(inCheck).getScores(cur_move) <= 0.16) {
+							continue;
+						} else if (rest == 2 && getHistory(inCheck).getScores(cur_move) <= 0.08) {
+							continue;
+						} else if (rest == 3 && getHistory(inCheck).getScores(cur_move) <= 0.04) {
+							continue;
+						} else if (rest == 4 && getHistory(inCheck).getScores(cur_move) <= 0.02) {
+							continue;
+						} else if (rest == 5 && getHistory(inCheck).getScores(cur_move) <= 0.01) {
+							continue;
+						} else if (rest == 6 && getHistory(inCheck).getScores(cur_move) == 0.00) {
+							continue;
+						}
 					}
 				}
 				
@@ -2175,45 +2195,56 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			}
 			
 			
+			//int moveSee = USE_SEE_IN_QSEARCH ? env.getBitboard().getSee().evalExchange(cur_move) : -1;
+			
 			int new_matgain = matgain + env.getBitboard().getBaseEvaluation().getMaterialGain(cur_move);
 			
 			
-			env.getBitboard().makeMoveForward(cur_move);
-			
-			if (env.getBitboard().isInCheck(colourToMove)) {
-				if (allowIllegalMoves()) {
-					env.getBitboard().makeMoveBackward(cur_move);
-					continue;
-				} else {
-					throw new IllegalStateException();	
+			if (inCheck
+					//|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
+					|| new_matgain >= 0
+					|| cur_move == tpt_move
+					|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
+					//|| moveSee > 0
+					) {
+				
+				env.getBitboard().makeMoveForward(cur_move);
+				
+				if (env.getBitboard().isInCheck(colourToMove)) {
+					if (allowIllegalMoves()) {
+						env.getBitboard().makeMoveBackward(cur_move);
+						continue;
+					} else {
+						throw new IllegalStateException();	
+					}
 				}
-			}
-			legalMoves++;
-			
-			int cur_eval = -pv_qsearch(mediator, info, initial_maxdepth, depth + 1, -beta, -alpha, -new_matgain, false, rootColour);
-			
-			env.getBitboard().makeMoveBackward(cur_move);
-			
-			if (cur_eval > best_eval) {
+				legalMoves++;
 				
-				best_eval = cur_eval;
-				best_move = cur_move;
+				int cur_eval = -pv_qsearch(mediator, info, initial_maxdepth, depth + 1, -beta, -alpha, -new_matgain, false, rootColour);
 				
-				node.bestmove = best_move;
-				node.eval = best_eval;
-				node.leaf = false;
-				node.nullmove = false;
+				env.getBitboard().makeMoveBackward(cur_move);
 				
-				if (depth + 1 < MAX_DEPTH) {
-					pvman.store(depth + 1, node, pvman.load(depth + 1), true);
-				}
-				
-				if (best_eval >= beta) {						
-					break;
-				}
-				
-				if (best_eval > alpha) {
-					throw new IllegalStateException();
+				if (cur_eval > best_eval) {
+					
+					best_eval = cur_eval;
+					best_move = cur_move;
+					
+					node.bestmove = best_move;
+					node.eval = best_eval;
+					node.leaf = false;
+					node.nullmove = false;
+					
+					if (depth + 1 < MAX_DEPTH) {
+						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
+					}
+					
+					if (best_eval >= beta) {						
+						break;
+					}
+					
+					if (best_eval > alpha) {
+						throw new IllegalStateException();
+					}
 				}
 			}
 			
@@ -2477,36 +2508,47 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			}
 			
 			
+			//int moveSee = USE_SEE_IN_QSEARCH ? env.getBitboard().getSee().evalExchange(cur_move) : -1;
+			
 			int new_matgain = matgain + env.getBitboard().getBaseEvaluation().getMaterialGain(cur_move);
 			
 			
-			env.getBitboard().makeMoveForward(cur_move);
-			
-			if (env.getBitboard().isInCheck(colourToMove)) {
-				if (allowIllegalMoves()) {
-					env.getBitboard().makeMoveBackward(cur_move);
-					continue;
-				} else {
-					throw new IllegalStateException("env.getBitboard().isInCheck(colourToMove)");	
-				}
-			}
-			legalMoves++;
-			
-			int cur_eval = -nullwin_qsearch(mediator, info, initial_maxdepth, depth + 1, -alpha, -new_matgain, false, rootColour);
-			
-			env.getBitboard().makeMoveBackward(cur_move);
-			
-			if (cur_eval > best_eval) {
+			if (inCheck
+					//|| (moveSee >= 0 && USE_SEE_IN_QSEARCH)
+					|| new_matgain >= 0
+					|| cur_move == tpt_move
+					|| (env.getBitboard().isCheckMove(cur_move) && USE_CHECK_IN_QSEARCH)
+					//|| moveSee > 0
+					) {
 				
-				best_eval = cur_eval;
-				best_move = cur_move;
+				env.getBitboard().makeMoveForward(cur_move);
+				
+				if (env.getBitboard().isInCheck(colourToMove)) {
+					if (allowIllegalMoves()) {
+						env.getBitboard().makeMoveBackward(cur_move);
+						continue;
+					} else {
+						throw new IllegalStateException("env.getBitboard().isInCheck(colourToMove)");	
+					}
+				}
+				legalMoves++;
+				
+				int cur_eval = -nullwin_qsearch(mediator, info, initial_maxdepth, depth + 1, -alpha, -new_matgain, false, rootColour);
+				
+				env.getBitboard().makeMoveBackward(cur_move);
+				
+				if (cur_eval > best_eval) {
+					
+					best_eval = cur_eval;
+					best_move = cur_move;
 
-				if (best_eval >= beta) {
-					break;
-				}
-				
-				if (best_eval > alpha) {
-					throw new IllegalStateException("best_eval > alpha");
+					if (best_eval >= beta) {
+						break;
+					}
+					
+					if (best_eval > alpha) {
+						throw new IllegalStateException("best_eval > alpha");
+					}
 				}
 			}
 			
