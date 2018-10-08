@@ -291,7 +291,7 @@ public class Search_NegaScout extends SearchImpl {
 			
 			
 			if (tpt_found && tpt_depth >= rest
-					
+					&& backtrackingInfo.excluded_move == 0
 					) {
 				
 				if (tpt_exact) {
@@ -448,7 +448,7 @@ public class Search_NegaScout extends SearchImpl {
 			env.getTPT().unlock();
 			
 	        if (depth > 0
-	        		&& rest >= 4
+	        		&& rest >= depth
 	        		&& !disableExts
 	        		&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
 	        		&& tptEntry != null

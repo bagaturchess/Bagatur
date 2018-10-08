@@ -28,7 +28,6 @@ package bagaturchess.engines.run;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
-import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.engines.bagatur.cfg.time.TimeConfigImpl;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP;
@@ -44,15 +43,11 @@ import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImp
 import bagaturchess.search.impl.rootsearch.remote.SequentialSearch_SeparateProcess;
 import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_Classic;
 import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
-import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_Base;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory;
-import bagaturchess.search.impl.uci_adaptor.timemanagement.controllers.TimeController_FixedDepth;
-import bagaturchess.search.impl.uci_adaptor.timemanagement.controllers.TimeController_TimePerMove;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.ChannelManager;
-import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.impl.Channel_Console;
 import bagaturchess.uci.impl.commands.Go;
 
@@ -92,8 +87,8 @@ public class MTDSchedulerMain {
 								//new RootSearchConfig_BaseImpl_SMP(
 				
 				new String[] {
-								bagaturchess.search.impl.alg.impl0.Search_PVS_NWS.class.getName(),
-								//bagaturchess.search.impl.alg.impl1.Search_NegaScout.class.getName(),
+								//bagaturchess.search.impl.alg.impl0.Search_PVS_NWS.class.getName(),
+								bagaturchess.search.impl.alg.impl1.Search_NegaScout.class.getName(),
 								
 								bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD.class.getName(),
 								
@@ -160,7 +155,10 @@ public class MTDSchedulerMain {
 		
 		//IBitBoard bitboard  = new Board("1r6/4k3/1pbpPb1p/p1p2P2/2Pp3p/3P3P/2P2RP1/R6K b - - 3 39", null/*sharedData.getAndRemovePawnsCache()*/, cfg.getBoardConfig());
 		
+		
 		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
+		//BoardUtils.playGameUCI(bitboard, "e2e4 e7e6 d2d4 d7d5 e4e5 c7c5 c2c3 b8c6 g1f3 c8d7 a2a3 g8e7 f1d3 c5d4 c3d4 d8b6 d3c2 e7f5 c2f5 e6f5 e1g1 d7e6 b1c3 h7h6 b2b4 f8e7 c1e3 e8g8 a1c1 a8c8 d1d3 g7g5 c3a4 b6d8 e3d2 f5f4 h2h3 d8d7 b4b5 c6b8 a4c5 e7c5 d4c5 e6f5 d3b3 d5d4 h3h4 f5e4 h4g5 e4f3 b3f3 h6g5 f1e1 a7a6 a3a4 a6b5 a4b5 f8e8 f3d3 d7d5 c1c4 e8e5 e1e5 d5e5 c4d4 c8c5 d4d8 g8g7 d3a3 g7f6 d2b4 b8c6 b5c6 c5c6 d8d7 b7b6");
+		
 		//IBitBoard bitboard = new Board("r4rk1/pp3ppp/2pq4/3p4/4nPb1/2BBP3/PPP3PP/R3QRK1 w - - 2 15", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
@@ -582,6 +580,7 @@ public class MTDSchedulerMain {
 		search.negamax(new Board(bitboard.toEPD()), new MediatorDummper(5000));*/
 	}
 	
+
 	private static PawnsEvalCache createPawnsCache() {
 		/*DataObjectFactory<PawnsModelEval> pawnsCacheFactory = null;
 		try {
