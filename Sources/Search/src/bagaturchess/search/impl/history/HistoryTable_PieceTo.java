@@ -19,6 +19,7 @@
  */
 package bagaturchess.search.impl.history;
 
+
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 
@@ -26,8 +27,8 @@ import bagaturchess.bitboard.impl.movegen.MoveInt;
 public class HistoryTable_PieceTo implements IHistoryTable {
 	
 	
-	private int[][] success;
-	private int[][] failures;
+	private long[][] success;
+	private long[][] failures;
 	
 	private int[][] counters1;
 	private int[][] counters2;
@@ -35,8 +36,8 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	
 	
 	public HistoryTable_PieceTo() {
-		success 	= new int[Constants.PID_MAX][64];
-		failures 	= new int[Constants.PID_MAX][64];
+		success 	= new long[Constants.PID_MAX][64];
+		failures 	= new long[Constants.PID_MAX][64];
 		
 		counters1 	= new int[Constants.PID_MAX][64];
 		counters2 	= new int[Constants.PID_MAX][64];
@@ -68,6 +69,10 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	@Override
 	public void countFailure(int move, int depth) {
 		
+		if (MoveInt.isCaptureOrPromotion(move)) {
+			return;
+		}
+		
 		int pid = MoveInt.getFigurePID(move);
 		int to = MoveInt.getToFieldID(move);
 		
@@ -80,6 +85,10 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	 */
 	@Override
 	public void countSuccess(int move, int depth) {
+		
+		if (MoveInt.isCaptureOrPromotion(move)) {
+			return;
+		}
 		
 		int pid = MoveInt.getFigurePID(move);
 		int to = MoveInt.getToFieldID(move);
@@ -97,8 +106,8 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 		int pid = MoveInt.getFigurePID(move);
 		int to = MoveInt.getToFieldID(move);
 		
-		int success_scores 	= success[pid][to];
-		int failures_scores = failures[pid][to];
+		long success_scores  = success[pid][to];
+		long failures_scores = failures[pid][to];
 		
 		if (success_scores + failures_scores > 0) {
 			return success_scores / (double)(success_scores + failures_scores);
@@ -113,6 +122,10 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	 */
 	@Override
 	public void addCounterMove(int last_move, int counter_move) {
+		
+		if (MoveInt.isCaptureOrPromotion(counter_move)) {
+			return;
+		}
 		
 		int pid = MoveInt.getFigurePID(last_move);
 		int to = MoveInt.getToFieldID(last_move);
