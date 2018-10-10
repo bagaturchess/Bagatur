@@ -107,11 +107,11 @@
 			<include name="release_notes_BagaturEngine.txt"/>
 		</fileset>
 	</copy>
-	<copy tofile="${temp_dir}/todo_list.txt" >
+	<!--copy tofile="${temp_dir}/todo_list.txt" >
 		<fileset dir="${resources_dir}/doc/engine/txt">
 			<include name="backlog_BagaturEngine.txt"/>
 		</fileset>
-	</copy>
+	</copy-->
   	<copy tofile="${temp_dir}/Bagatur.ico" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
 			<include name="Bagatur.ico"/>

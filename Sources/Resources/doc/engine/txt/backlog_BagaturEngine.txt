@@ -5,5 +5,3 @@ Feel free to contribute http://sourceforge.net/projects/bagaturchess/develop
 
 1. Improve the parallel algorithm to scale on many CPU cores
 2. New tuning of Evaluation function based on currently best engines
-3. Support more endgame tables formats (e.g. Syzygy, Nalimov)
-4. Implement JUnit tests for all projects, starting from the bit-board and UCI adapter sub-projects as mostly critical and used. 
