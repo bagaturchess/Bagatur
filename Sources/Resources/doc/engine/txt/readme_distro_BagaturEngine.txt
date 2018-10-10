@@ -49,7 +49,7 @@ Credits:
   I am working on this program for 15 years in my spare time as a hobby.
   In the beginning there were not a lot in the Internet, although, most of the time I purposely avoided heaving look at the
   other open source softwares and articles regarding the search and game theory.
-  Because of that, in many aspects I have re-invented the wheel (for good or bad, it is obvious, if you have a look at the code).
+  Because of that, in many aspects I have re-invented the wheel.
   Anyway, without the ideas, support and help from the following people and web sites, Bagatur would not be as it is now:
   
   1. My Wife, for supporting me in this dissociable and non-profitable hobby.
