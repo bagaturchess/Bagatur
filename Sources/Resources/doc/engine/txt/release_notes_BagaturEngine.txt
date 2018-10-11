@@ -1,4 +1,8 @@
 
+Version 1.5f (10 October 2018)
+  * Singular move extension implemented
+  * Optimizations of quiescence search - it traverses all capture moves without exception
+  
 Version 1.5e (20 July 2017)
   * Endgame Tablebases support - switched OFF, because of engine crash errors (JNI and java OutOfMemory related)
   
