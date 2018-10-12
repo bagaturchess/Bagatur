@@ -100,8 +100,8 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 				alpha_org, beta, prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
 				mateMove, useMateDistancePrunning, false, false);
 	}
-
-
+	
+	
 	@Override
 	public int nullwin_search(ISearchMediator mediator, ISearchInfo info,
 			int initial_maxdepth, int maxdepth, int depth, int beta,
@@ -109,11 +109,9 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		boolean prune = !env.getBitboard().isInCheck();
-		
 		return pv_search(mediator, info, initial_maxdepth, maxdepth, depth,
 				beta - 1, beta, prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
-				mateMove, useMateDistancePrunning, prune, prune);
+				mateMove, useMateDistancePrunning, false, false);
 	}
 	
 	
@@ -404,7 +402,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 9;
 		
 		boolean mateThreat = false;
-		//boolean zungzwang = false;
+		boolean zungzwang = false;
 		if (useNullMove
 				&& !inCheck
 				&& !prevNullMove
@@ -441,7 +439,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 					if (null_val_ver >= beta) {
 						return null_val_ver;
 					} else {
-						//zungzwang = true;
+						zungzwang = true;
 					}
 					
 					if (allowTPTAccess(maxdepth, depth)) {
@@ -495,9 +493,9 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 		
 		
 		//IID PV Node
-		if (true /*&& depth > 0*/) {
+		if (rest >= 2) {
 			
-			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
+			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(1, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
 			
 			if (tpt_depth < iidRest
@@ -505,7 +503,8 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 				) {
 				
 				pv_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, alpha_org, beta,
-						prevNullMove, prevbest, prevprevbest, prevPV, rootColour, mateMove, useMateDistancePrunning, useStaticPrunning, useNullMove);
+						prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
+						mateMove, useMateDistancePrunning, useStaticPrunning, useNullMove);
 				
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
@@ -683,10 +682,11 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 				}
 				
+				
 				//Static pruning - move count based and move history based
 				if (STATIC_PRUNING2
 						&& !inCheck
-						&& searchedCount >= 4 && rest <= 8
+						&& searchedCount >= 4 && rest <= 9
 						&& !env.getBitboard().isCheckMove(cur_move)
 						) {
 					
@@ -720,6 +720,8 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 						//new_maxdepth += PLY;
 					} else if (mateThreat) {
 						//new_maxdepth += PLY;
+					} else if (zungzwang) {
+						new_maxdepth += PLY;
 					}
 				}
 				
@@ -748,8 +750,10 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 							 //&& !mateThreat
 							 //&& !isCapOrProm
 							 && moveSee < 0
+							 && !zungzwang
+							 //&& rest >= 3
 							) {
-						
+							
 							double rate = Math.log(searchedCount) * Math.log(rest) / 2;
 							rate += 2;
 							rate *= (1 - getHistory(inCheck).getScores(cur_move));
@@ -760,13 +764,6 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 							new_maxdepth - lmrReduction, depth + 1, -beta, -(beta - 1), false,
 							best_move, prevbest, prevPV, rootColour,
 							new_mateMove, useMateDistancePrunning, staticPrunning, true);
-					
-					if (cur_eval > beta && lmrReduction > 0) {
-						
-						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -(beta - 1), false,
-								best_move, prevbest, prevPV, rootColour,
-								new_mateMove, useMateDistancePrunning, staticPrunning, true);
-					}
 					
 					if (cur_eval > best_eval) {
 						
@@ -811,8 +808,8 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 					}
 					
 					if (best_eval > alpha) {
-						//alpha = best_eval; 
-						throw new IllegalStateException();
+						alpha = best_eval; 
+						//throw new IllegalStateException();
 					}
 				}
 				
@@ -992,9 +989,9 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 				return node.eval;
 			}
 			
-			if (!inCheck && staticEval > alpha_org) {
+			/*if (!inCheck && staticEval > alpha_org) {
 				throw new IllegalStateException("!inCheck && staticEval > alpha_org");
-			}
+			}*/
 		}
 		
 		
@@ -1155,7 +1152,8 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 				}
 				
 				if (best_eval > alpha) {
-					throw new IllegalStateException();
+					alpha = best_eval;
+					//throw new IllegalStateException();
 				}
 			}
 			
