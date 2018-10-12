@@ -56,7 +56,8 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	private ISearchConfig_AB searchConfig;
 	
-	protected static final int DRAW_SCORE = 0;
+	private static final int DRAW_SCORE_O = -50;
+	private static final int DRAW_SCORE_E = 50;
 	
 	protected ISearchMoveList[] lists_all;
 	protected ISearchMoveList[] lists_escapes;
@@ -121,7 +122,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	protected int getDrawScores(int rootColour) {
 		//int scores = getEnv().getBitboard().getMaterialFactor().interpolateByFactor(-50, 50);
-		int scores = getEnv().getBitboard().getMaterialFactor().interpolateByFactor(DRAW_SCORE, DRAW_SCORE);
+		int scores = getEnv().getBitboard().getMaterialFactor().interpolateByFactor(DRAW_SCORE_O, DRAW_SCORE_E);
 		if (getEnv().getBitboard().getColourToMove() != rootColour) {
 			scores = -scores;
 		}
