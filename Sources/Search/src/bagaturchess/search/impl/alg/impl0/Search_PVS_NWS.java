@@ -100,8 +100,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				alpha_org, beta, prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
 				mateMove, useMateDistancePrunning, false, false);
 	}
-
-
+	
+	
 	@Override
 	public int nullwin_search(ISearchMediator mediator, ISearchInfo info,
 			int initial_maxdepth, int maxdepth, int depth, int beta,
@@ -109,11 +109,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		boolean prunning = false;//!env.getBitboard().isInCheck();
-		
 		return nullwin_search(mediator, info, initial_maxdepth, maxdepth, depth,
 				beta, prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
-				mateMove, useMateDistancePrunning, prunning, prunning);
+				mateMove, useMateDistancePrunning, false, false);
 	}
 	
 	
@@ -405,7 +403,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 9;
 		
 		boolean mateThreat = false;
-		//boolean zungzwang = false;
+		boolean zungzwang = false;
 		if (useNullMove
 				&& !inCheck
 				&& !prevNullMove
@@ -442,7 +440,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					if (null_val_ver >= beta) {
 						return null_val_ver;
 					} else {
-						//zungzwang = true;
+						zungzwang = true;
 					}
 					
 					if (allowTPTAccess(maxdepth, depth)) {
@@ -721,7 +719,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						//new_maxdepth += PLY;
 					} else if (mateThreat) {
 						//new_maxdepth += PLY;
-					}
+					} else if (zungzwang) {
+						new_maxdepth += PLY;
+ 					}
 				}
 				
 				int cur_eval;
@@ -749,6 +749,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							 //&& !mateThreat
 							 //&& !isCapOrProm
 							 && moveSee < 0
+							 && !zungzwang
 							) {
 						
 							double rate = Math.log(searchedCount) * Math.log(rest) / 2;
@@ -1083,7 +1084,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 9;
 			
 		boolean mateThreat = false;
-		//boolean zungzwang = false;
+		boolean zungzwang = false;
 		if (useNullMove
 				&& !inCheck
 				&& !prevNullMove
@@ -1120,7 +1121,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					if (null_val_ver >= beta) {
 						return null_val_ver;
 					} else {
-						//zungzwang = true;
+						zungzwang = true;
 					}
 					
 					if (allowTPTAccess(maxdepth, depth)) {
@@ -1383,7 +1384,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						//new_maxdepth += PLY;
 					} else if (mateThreat) {
 						//new_maxdepth += PLY;
-					}
+					} else if (zungzwang) {
+						new_maxdepth += PLY;
+ 					}
 				}
 				
 				int cur_eval;
@@ -1411,6 +1414,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							 //&& !mateThreat
 							 //&& !isCapOrProm
 							 && moveSee < 0
+							 && !zungzwang
 							) {
 							
 							double rate = Math.log(searchedCount) * Math.log(rest) / 2;
