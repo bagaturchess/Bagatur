@@ -43,7 +43,6 @@ import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.info.SearchInfoFactory;
-import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
@@ -52,92 +51,12 @@ import bagaturchess.search.impl.utils.SearchUtils;
 import bagaturchess.uci.api.ChannelManager;
 
 
-
 public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	
 	private ISearchConfig_AB searchConfig;
 	
-	/**
-	 * Extensions for PV nodes
-	 */
-	public int EXT_INCHECK_PV           = 0;
-	public int EXT_SINGLE_REPLY_PV      = 0;
-	
-	public int EXT_WINCAP_NONPAWN_PV    = 0;
-	public int EXT_WINCAP_PAWN_PV       = 0;
-	public int EXT_RECAPTURE_PV       	= 0;
-	
-	public int EXT_PASSER_PUSH_PV       = 0;
-	public int EXT_PROMOTION_PV         = 0;
-	public int EXT_MOVE_EVAL_PV      	= 0;
-	
-	public boolean EXT_GOODMOVE_PV      = false;
-	
-	/**
-	 * Extensions for NONPV Nodes
-	 */
-	public int EXT_INCHECK_NONPV        = 0;
-	public int EXT_SINGLE_REPLY_NONPV   = 0;
-	public int EXT_MATE_THREAT_PV       = 0;
-	public int EXT_MATE_THREAT_NONPV    = 0;
-	
-	public int EXT_WINCAP_NONPAWN_NONPV = 0;
-	public int EXT_WINCAP_PAWN_NONPV    = 0;
-	public int EXT_RECAPTURE_NONPV      = 0;
-	
-	public int EXT_PASSER_PUSH_NONPV    = 0;
-	public int EXT_PROMOTION_NONPV      = 0;
-	public int EXT_MOVE_EVAL_NONPV     	= 0;
-	
-	/**
-	 * Search parameters
-	 */
-	public boolean SEND_SINGLE_BESTMOVE = false;
-	public boolean STORE_TPT_IN_QSEARCH = false;
-	
-	public int LMR_ROOT_INDEX1 			= 0;
-	public int LMR_ROOT_INDEX2 			= 0;
-	
-	public int STATIC_PRUNING_PV_INDEX 		= 0;
-	public int STATIC_PRUNING_NONPV_INDEX 	= 0;
-	public boolean RAZORING 				= false;
-	public boolean NULL_MOVE 				= false;
-	
-	public boolean IID_PV 					= false;
-	public boolean IID_NONPV 				= false;
-	
-	public int LMR_PV_INDEX1 				= 0;
-	public int LMR_PV_INDEX2 				= 0;
-	public int LMR_NONPV_INDEX1 			= 0;
-	public int LMR_NONPV_INDEX2 			= 0;
-	
-	
-	//public boolean USE_TPT_MOVE 			= true;
-	public boolean USE_TPT_SCORES_PV_QSEARCH = true;
-	public boolean USE_TPT_SCORES 			= true;
-	
-	public boolean USE_MATE_DISTANCE = true;
-	public boolean USE_CHECK_IN_QSEARCH = true;
-	public boolean USE_SEE_IN_QSEARCH = true;
-	
-	public boolean USE_MATE_EXT_PV = false;
-	public boolean USE_MATE_EXT_NONPV = false;
-	
-	public boolean REDUCE_CAPTURES = false;
-	public boolean REDUCE_HISTORY_MOVES = true;
-	public boolean REDUCE_HIGH_EVAL_MOVES = true;
-	
-	public boolean USE_PV_HISTORY = true;
-	
 	protected static final int DRAW_SCORE = 0;
-	
-	
-	public int FIRSTTIME_WINDOW = 25;
-	public boolean ASPIRATION_SEARCH = false;
-	public boolean USE_PV_IN_ALL_ROOTS = false;
-	public boolean USE_TPT_IN_ROOT = true;
-	
 	
 	protected ISearchMoveList[] lists_all;
 	protected ISearchMoveList[] lists_escapes;
@@ -150,13 +69,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	protected GTBProbeInput temp_input = new GTBProbeInput();
 	
 	private List<Integer> pv_buffer = new ArrayList<Integer>();
-	
-	
-	static {
-		if (MAX_MAT_INTERVAL * MAX_DEPTH * ((long)MAX_DEPTH) >= ((long)Integer.MAX_VALUE)) {
-			throw new IllegalStateException();
-		}
-	}
 	
 	
 	public void setup(IBitBoard bitboardForSetup) {
@@ -194,79 +106,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	
 	private void initParams(ISearchConfig_AB cfg) {
-		
 		searchConfig = cfg;
-		
-		/**
-		 * Extensions for PV nodes
-		 */
-		EXT_INCHECK_PV           = cfg.getExtension_CheckInPV();
-		EXT_SINGLE_REPLY_PV      = cfg.getExtension_SingleReplyInPV();
-		EXT_MATE_THREAT_PV          = cfg.getExtension_MateThreatPV();
-		
-		EXT_WINCAP_NONPAWN_PV    = cfg.getExtension_WinCapNonPawnInPV();
-		EXT_WINCAP_PAWN_PV       = cfg.getExtension_WinCapPawnInPV();
-		EXT_RECAPTURE_PV 		= cfg.getExtension_RecapturePV();
-		
-		EXT_PASSER_PUSH_PV       = cfg.getExtension_PasserPushPV();
-		EXT_PROMOTION_PV         = cfg.getExtension_PromotionPV();
-		USE_MATE_EXT_PV          = cfg.isExtension_MateLeafPV();
-		EXT_MOVE_EVAL_PV		= cfg.getExtension_MoveEvalPV();
-		
-		//EXT_GOODMOVE_PV         = cfg.isExtension_MoveEvalPV();
-		
-		/**
-		 * Extensions for NONPV Nodes
-		 */
-		EXT_INCHECK_NONPV        = cfg.getExtension_CheckInNonPV();
-		EXT_SINGLE_REPLY_NONPV   = cfg.getExtension_SingleReplyInNonPV();
-		EXT_MATE_THREAT_NONPV          = cfg.getExtension_MateThreatNonPV();
-		
-		EXT_WINCAP_NONPAWN_NONPV = cfg.getExtension_WinCapNonPawnInNonPV();
-		EXT_WINCAP_PAWN_NONPV    = cfg.getExtension_WinCapPawnInNonPV();
-		EXT_RECAPTURE_NONPV 		= cfg.getExtension_RecaptureNonPV();
-		
-		EXT_PASSER_PUSH_NONPV       = cfg.getExtension_PasserPushNonPV();
-		EXT_PROMOTION_NONPV         = cfg.getExtension_PromotionNonPV();
-		USE_MATE_EXT_NONPV 			= cfg.isExtension_MateLeafNonPV();
-		EXT_MOVE_EVAL_NONPV		= cfg.getExtension_MoveEvalNonPV();
-		
-		/**
-		 * Search parameters
-		 */
-		SEND_SINGLE_BESTMOVE = cfg.isOther_SingleBestmove();
-		STORE_TPT_IN_QSEARCH = cfg.isOther_StoreTPTInQsearch();
-		
-		LMR_ROOT_INDEX1 = cfg.getReduction_LMRRootIndex1();
-		LMR_ROOT_INDEX2 = cfg.getReduction_LMRRootIndex2();
-		
-		REDUCE_CAPTURES = cfg.isReduction_ReduceCapturesInLMR();
-		REDUCE_HISTORY_MOVES = cfg.isReduction_ReduceHistoryMovesInLMR();
-		REDUCE_HIGH_EVAL_MOVES = cfg.isReduction_ReduceHighEvalMovesInLMR();
-		
-		STATIC_PRUNING_PV_INDEX = cfg.getPruning_StaticPVIndex();
-		STATIC_PRUNING_NONPV_INDEX = cfg.getPruning_StaticNonPVIndex();
-		RAZORING = cfg.isPruning_Razoring();
-		NULL_MOVE = cfg.isPruning_NullMove();
-		
-		IID_PV = cfg.isIID_PV();
-		IID_NONPV = cfg.isIID_NonPV();
-		
-		LMR_PV_INDEX1 = cfg.getReduction_LMRPVIndex1();
-		LMR_PV_INDEX2 = cfg.getReduction_LMRPVIndex2();
-		LMR_NONPV_INDEX1 = cfg.getReduction_LMRNonPVIndex1();
-		LMR_NONPV_INDEX2 = cfg.getReduction_LMRNonPVIndex2();
-		
-		//USE_TPT_MOVE = cfg.isOther_UseTPTInRoot();
-		USE_TPT_IN_ROOT = cfg.isOther_UseTPTInRoot();
-		USE_TPT_SCORES_PV_QSEARCH = cfg.isOther_UseTPTScoresQsearchPV();
-		USE_TPT_SCORES = cfg.isOther_UseTPTScoresNonPV();
-		
-		USE_MATE_DISTANCE = cfg.isPrunning_MateDistance();
-		USE_CHECK_IN_QSEARCH = cfg.isOther_UseCheckInQSearch();
-		USE_SEE_IN_QSEARCH = cfg.isOther_UseSeeInQSearch();
-		
-		USE_PV_HISTORY = cfg.isOther_UsePVHistory();
 	}
 	
 	public ISearchConfig_AB getSearchConfig() {
@@ -506,19 +346,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		throw new UnsupportedOperationException();
 	}
 	
-	
-	protected int[] getPrevPV() {
-		PVHistoryEntry pvEntry = USE_PV_HISTORY ? env.getPVs().getPV(env.getBitboard().getHashKey()) : null;
-		int[] prevPV = pvEntry == null ? null : pvEntry.getPv();
-		return prevPV;
-	}
-	
-	protected void storePrevPV(ISearchInfo info) {
-		if (info.getPV() == null) {
-			return;
-		}
-		if (USE_PV_HISTORY) env.getPVs().putPV(env.getBitboard().getHashKey(), new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
-	}
 	
 	protected boolean hasExpectedEval() {
 		env.getTPT().lock();

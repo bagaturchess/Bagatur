@@ -68,7 +68,7 @@ public abstract class SearchImpl_MTD extends SearchImpl {
 	@Override
 	public void search(ISearchMediator mediator, int startIteration, int max_iterations, boolean useMateDistancePrunning) {
 		
-		int start_iteration = USE_TPT_IN_ROOT ? sentFromTPT(mediator, startIteration) : 1;
+		int start_iteration = sentFromTPT(mediator, startIteration);
 		if (start_iteration < startIteration) {
 			start_iteration = startIteration;
 		}

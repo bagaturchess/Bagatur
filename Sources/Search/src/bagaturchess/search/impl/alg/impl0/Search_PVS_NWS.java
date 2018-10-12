@@ -109,11 +109,11 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		boolean prune = !env.getBitboard().isInCheck();
+		boolean prunning = false;//!env.getBitboard().isInCheck();
 		
 		return nullwin_search(mediator, info, initial_maxdepth, maxdepth, depth,
 				beta, prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
-				mateMove, useMateDistancePrunning, prune, prune);
+				mateMove, useMateDistancePrunning, prunning, prunning);
 	}
 	
 	
@@ -162,7 +162,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		boolean inCheck = env.getBitboard().isInCheck();
 		
 	    // Mate distance pruning
-		if (USE_MATE_DISTANCE && !inCheck && useMateDistancePrunning && depth >= 1) {
+		if (!inCheck && useMateDistancePrunning && depth >= 1) {
 		      
 		      // lower bound
 		      int value = -getMateVal(depth+2); // does not work if the current position is mate
@@ -406,8 +406,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		boolean mateThreat = false;
 		//boolean zungzwang = false;
-		if (NULL_MOVE
-				&& useNullMove
+		if (useNullMove
 				&& !inCheck
 				&& !prevNullMove
 				&& hasAtLeastOnePiece
@@ -497,7 +496,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		
 		//IID PV Node
-		if (IID_PV /*&& depth > 0*/) {
+		if (true /*&& depth > 0*/) {
 			
 			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
@@ -726,9 +725,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 				
 				int cur_eval;
-				if (searchedCount == 0 || (USE_PV_IN_ALL_ROOTS && depth == 0)) {
+				if (searchedCount == 0) {
 					
-					cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -(beta - 1), false,
+					cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, false,
 							best_move, prevbest, prevPV, rootColour,
 							new_mateMove, useMateDistancePrunning, false, false);
 				} else {
@@ -763,7 +762,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							best_move, prevbest, prevPV, rootColour,
 							new_mateMove, useMateDistancePrunning, staticPrunning, true);
 					
-					if (cur_eval >= beta && (lmrReduction > 0 || staticPrunning) ) {
+					if (cur_eval >= beta && lmrReduction > 0) {
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -(beta - 1), false,
 								best_move, prevbest, prevPV, rootColour,
@@ -772,7 +771,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					
 					if (isPVNode(cur_eval, best_eval, alpha, beta)) {
 						
-						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -(beta - 1), false,
+						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, false,
 								best_move, prevbest, prevPV, rootColour,
 								new_mateMove, useMateDistancePrunning, false, false);
 					}
@@ -813,8 +812,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					}
 					
 					if (best_eval > alpha) {
-						//alpha = best_eval; 
-						throw new IllegalStateException();
+						alpha = best_eval; 
+						//throw new IllegalStateException();
 					}
 				}
 				
@@ -906,7 +905,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		int alpha_org = beta - 1;
 		
 	    // Mate distance pruning
-		if (USE_MATE_DISTANCE && !inCheck && useMateDistancePrunning && depth >= 1) {
+		if (!inCheck && useMateDistancePrunning && depth >= 1) {
 		      
 			  // lower bound
 		      int value = -getMateVal(depth+2); // does not work if the current position is mate
@@ -1013,8 +1012,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPT().unlock();
 		}
 		
-		if (USE_TPT_SCORES
-				&& tpt_found && tpt_depth >= rest
+		if (tpt_found && tpt_depth >= rest
 				&& backtrackingInfo.excluded_move == 0
 				) {
 			if (tpt_exact) {
@@ -1086,8 +1084,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			
 		boolean mateThreat = false;
 		//boolean zungzwang = false;
-		if (NULL_MOVE
-				&& useNullMove
+		if (useNullMove
 				&& !inCheck
 				&& !prevNullMove
 				&& hasAtLeastOnePiece
@@ -1177,7 +1174,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		
 		//IID NONPV Node
-		if (IID_NONPV /*&& depth > 0*/) {
+		if (true /*&& depth > 0*/) {
 			
 			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
@@ -1390,7 +1387,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 				
 				int cur_eval;
-				if (searchedCount == 0 || (USE_PV_IN_ALL_ROOTS && depth == 0)) {
+				if (searchedCount == 0) {
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -(beta - 1), false,
 							best_move, prevbest, prevPV, rootColour,
@@ -1427,7 +1424,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 								best_move, prevbest, prevPV, rootColour,
 								new_mateMove, useMateDistancePrunning, staticPrunning, true);
 						
-						if (cur_eval >= beta && (lmrReduction > 0 || staticPrunning) ) {
+						if (cur_eval >= beta && lmrReduction > 0) {
 							
 							cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -(beta - 1), false,
 									best_move, prevbest, prevPV, rootColour,
@@ -1546,7 +1543,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 	    // Mate distance pruning
-		if (USE_MATE_DISTANCE && !inCheck && depth >= 1) {
+		if (!inCheck && depth >= 1) {
 		      
 		      // lower bound
 		      int value = -getMateVal(depth+2); // does not work if the current position is mate
@@ -1629,9 +1626,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				return node.eval;
 			}
 			
-			if (!inCheck && staticEval > alpha_org) {
+			/*if (!inCheck && staticEval > alpha_org) {
 				throw new IllegalStateException("!inCheck && staticEval > alpha_org");
-			}
+			}*/
 		}
 		
 		
@@ -1669,7 +1666,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPT().unlock();
 		}
 		
-		if (USE_TPT_SCORES_PV_QSEARCH && tpt_found) {
+		if (tpt_found) {
 			if (tpt_exact) {
 				if (!SearchUtils.isMateVal(tpt_lower)) {
 					node.bestmove = tpt_move;
@@ -1792,7 +1789,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 				
 				if (best_eval > alpha) {
-					throw new IllegalStateException();
+					alpha = best_eval;
+					//throw new IllegalStateException();
 				}
 			}
 			
@@ -1825,7 +1823,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 		if (allowTPTAccess(initial_maxdepth, depth)) {
-			if (STORE_TPT_IN_QSEARCH && best_move != 0) {
+			if (best_move != 0) {
 				env.getTPT().lock();
 				env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
 				env.getTPT().unlock();
@@ -1866,7 +1864,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		int alpha_org = beta - 1;
 		
 	    // Mate distance pruning
-		if (USE_MATE_DISTANCE && !inCheck && depth >= 1) {
+		if (!inCheck && depth >= 1) {
 				
 			  // lower bound
 		      int value = -getMateVal(depth+2); // does not work if the current position is mate
@@ -1976,7 +1974,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPT().unlock();
 		}
 		
-		if (USE_TPT_SCORES && tpt_found) {
+		if (tpt_found) {
 			if (tpt_exact) {
 				if (!SearchUtils.isMateVal(tpt_lower)) {
 					return tpt_lower;
@@ -2077,7 +2075,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 		if (allowTPTAccess(initial_maxdepth, depth)) {
-			if (STORE_TPT_IN_QSEARCH && best_move != 0) {
+			if (best_move != 0) {
 				env.getTPT().lock();
 				env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, beta - 1, beta, best_move, (byte)0);
 				env.getTPT().unlock();

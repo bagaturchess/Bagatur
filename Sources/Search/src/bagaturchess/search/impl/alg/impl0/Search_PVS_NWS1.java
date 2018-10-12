@@ -162,7 +162,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 		boolean inCheck = env.getBitboard().isInCheck();
 		
 	    // Mate distance pruning
-		if (USE_MATE_DISTANCE && !inCheck && useMateDistancePrunning && depth >= 1) {
+		if (!inCheck && useMateDistancePrunning && depth >= 1) {
 		      
 		      // lower bound
 		      int value = -getMateVal(depth+2); // does not work if the current position is mate
@@ -495,7 +495,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 		
 		
 		//IID PV Node
-		if (IID_PV /*&& depth > 0*/) {
+		if (true /*&& depth > 0*/) {
 			
 			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
@@ -909,7 +909,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 		}
 		
 	    // Mate distance pruning
-		if (USE_MATE_DISTANCE && !inCheck && depth >= 1) {
+		if (!inCheck && depth >= 1) {
 		      
 		      // lower bound
 		      int value = -getMateVal(depth+2); // does not work if the current position is mate
@@ -1032,7 +1032,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 			env.getTPT().unlock();
 		}
 		
-		if (USE_TPT_SCORES_PV_QSEARCH && tpt_found) {
+		if (tpt_found) {
 			if (tpt_exact) {
 				if (!SearchUtils.isMateVal(tpt_lower)) {
 					node.bestmove = tpt_move;
@@ -1188,7 +1188,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 		}
 		
 		if (allowTPTAccess(initial_maxdepth, depth)) {
-			if (STORE_TPT_IN_QSEARCH && best_move != 0) {
+			if (best_move != 0) {
 				env.getTPT().lock();
 				env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
 				env.getTPT().unlock();
