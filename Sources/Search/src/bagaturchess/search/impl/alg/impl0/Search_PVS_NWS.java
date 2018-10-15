@@ -96,7 +96,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		return this.pv_search(mediator, info, initial_maxdepth, maxdepth, depth,
+		return pv_search(mediator, info, initial_maxdepth, maxdepth, depth,
 				alpha_org, beta, prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
 				mateMove, useMateDistancePrunning, false, false);
 	}
@@ -109,8 +109,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		return nullwin_search(mediator, info, initial_maxdepth, maxdepth, depth,
-				beta, prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
+		return pv_search(mediator, info, initial_maxdepth, maxdepth, depth,
+				beta - 1, beta, prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
 				mateMove, useMateDistancePrunning, false, false);
 	}
 	
@@ -277,8 +277,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPT().unlock();
 		}
 		
-		if (getSearchConfig().isOther_UseTPTScoresPV() 
-				&& tpt_found && tpt_depth >= rest
+		if (tpt_found && tpt_depth >= rest
 				&& backtrackingInfo.excluded_move == 0
 			) {
 			if (tpt_exact) {
