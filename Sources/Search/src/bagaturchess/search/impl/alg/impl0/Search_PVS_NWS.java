@@ -32,17 +32,14 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchMoveList;
 
+import bagaturchess.search.impl.alg.BacktrackingInfo;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.exts.ExtStat;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
 public class Search_PVS_NWS extends SearchImpl_MTD {
-	
-	
-	public static final ExtStat extStat = new ExtStat();
 	
 	
 	int MIN_EVAL_DIFF_PV 					= 33;
@@ -57,6 +54,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
 	
+	private BacktrackingInfo[] backtracking = new BacktrackingInfo[MAX_DEPTH + 1];
+	
 	
 	public Search_PVS_NWS(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
@@ -65,11 +64,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 	
 	public Search_PVS_NWS(SearchEnv _env) {
 		super(_env);
-	}
-	
-	
-	protected boolean allowIllegalMoves() {
-		return false;
+		for (int i=0; i<backtracking.length; i++) {
+			backtracking[i] = new BacktrackingInfo(); 
+		}
 	}
 	
 	
@@ -125,6 +122,10 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			int maxdepth, int depth, int alpha_org, int beta, boolean prevNullMove, int prevbest, int prevprevbest,
 			int[] prevPV, int rootColour,
 			int mateMove, boolean useMateDistancePrunning, boolean useStaticPrunning, boolean useNullMove) {
+		
+		
+		BacktrackingInfo backtrackingInfo = backtracking[depth];
+		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
 		
 		
 		if (alpha_org >= beta) {
@@ -277,7 +278,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPT().unlock();
 		}
 		
-		if (getSearchConfig().isOther_UseTPTScoresPV() 
+		if (backtrackingInfo.excluded_move == 0
 				&& tpt_found && tpt_depth >= rest
 			) {
 			if (tpt_exact) {
@@ -441,6 +442,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						return null_val_ver;
 					} else {
 						zungzwang = true;
+						//System.out.println("zungzwang hit");
 					}
 					
 					if (allowTPTAccess(maxdepth, depth)) {
@@ -562,10 +564,50 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
         }
         
         
-		/*boolean singleMove = false;
-		if (inCheck) {
-			singleMove = env.getBitboard().hasSingleMove();
-		}*/
+		//Singular move extension
+		int singularExtension = 0;
+		
+		{
+			env.getTPT().lock();
+			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
+			env.getTPT().unlock();
+			
+	        if (depth > 0
+	        		&& rest >= 6//depth
+	        		&& !disableExts
+	        		&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
+	        		&& tptEntry != null
+	        		//&& tptEntry.getDepth() >= rest - 3
+	        		) {
+	        	
+		        boolean hasSingleMove = env.getBitboard().hasSingleMove();
+		        
+				if (hasSingleMove) {
+					
+					singularExtension = PLY;
+					
+				} else if (tptEntry.getBestMove_lower() != 0) {
+						
+					int ttValue = tptEntry.getLowerBound();
+					
+					int reduction = (PLY * rest) / 2;
+					if (reduction >= PLY) {
+						
+						int singularBeta = ttValue - 2 * rest;
+						
+						backtrackingInfo.excluded_move = tptEntry.getBestMove_lower();
+						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, singularBeta,
+								prevNullMove, prevbest, prevprevbest, prevPV, rootColour, mateMove, useMateDistancePrunning, useStaticPrunning, useNullMove);
+						backtrackingInfo.excluded_move = 0;
+						
+						if (singularEval < singularBeta) {
+							singularExtension = PLY;
+							//System.out.println("singularExtension hit");
+						}
+					}
+				}
+	        }
+		}
 		
 		
 		node.bestmove = 0;
@@ -609,6 +651,12 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		if (cur_move != 0) {
 			do {
+				
+				
+				if (cur_move == backtrackingInfo.excluded_move) {
+					continue;
+				}
+				
 				
 				if (searchedCount > 0 && cur_move == tpt_move) {
 					continue;
@@ -661,14 +709,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				env.getBitboard().makeMoveForward(cur_move);
 				
-				if (env.getBitboard().isInCheck(colourToMove)) {
-					if (allowIllegalMoves()) {
-						env.getBitboard().makeMoveBackward(cur_move);
-						continue;
-					} else {
-						throw new IllegalStateException();	
-					}
-				}
+				
 				legalMoves++;
 				
 				
@@ -678,6 +719,11 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				int new_maxdepth = maxdepth;
 				if (depth > 0 && !disableExts) {
 					//Do extensions here
+					if (cur_move == tpt_move) {
+						new_maxdepth += singularExtension;
+					} else if (zungzwang) {
+						new_maxdepth += PLY;
+					}
 				}
 				
 				
@@ -689,7 +735,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							new_mateMove, useMateDistancePrunning, false, false);
 				} else {
 					
-					int lmrReduction = 0;
 					boolean staticPrunning = false;
 					
 					if (!isCheckMove
@@ -699,18 +744,25 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						staticPrunning = true;
 					}
 					
+					int lmrReduction = 0;
 					if (!inCheck
-							 && !isCheckMove
-							 //&& !mateThreat
-							 //&& !isCapOrProm
-							 && moveSee < 0
-							) {
+						 && !isCheckMove
+						 //&& !mateThreat
+						 //&& !isCapOrProm
+						 && moveSee < 0
+						 //&& rest > 3
+						) {
 						
-							double rate = Math.log(searchedCount) * Math.log(rest) / 2;
-							rate += 2;//for pv nodes
-							rate *= (1 - getHistory(inCheck).getScores(cur_move));
-							lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
+						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
+						rate += 2;//for pv nodes
+						rate *= (1 - getHistory(inCheck).getScores(cur_move));
+						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
 					}
+					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
+					if (lmrRest < 0) {
+						lmrRest = 0;
+					}
+					
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
 							new_maxdepth - lmrReduction, depth + 1, -alpha, false,
@@ -814,7 +866,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 		
-		if (allowTPTAccess(maxdepth, depth)) {
+		if (backtrackingInfo.excluded_move == 0 && allowTPTAccess(maxdepth, depth)) {
 			env.getTPT().lock();
 			env.getTPT().put(hashkey, normDepth(maxdepth), depth, colourToMove, best_eval, alpha_org, beta, best_move, (byte)0);
 			env.getTPT().unlock();
@@ -828,6 +880,11 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			int maxdepth, int depth, int beta,
 			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV, int rootColour, int mateMove,
 			boolean useMateDistancePrunning, boolean useStaticPrunning, boolean useNullMove) {
+		
+		
+		BacktrackingInfo backtrackingInfo = backtracking[depth];
+		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
+		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
 		if (info.getSelDepth() < depth) {
@@ -959,7 +1016,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPT().unlock();
 		}
 		
-		if (tpt_found && tpt_depth >= rest) {
+		if (backtrackingInfo.excluded_move == 0
+				&& tpt_found && tpt_depth >= rest) {
 			if (tpt_exact) {
 				if (!SearchUtils.isMateVal(tpt_lower)) {
 					return tpt_lower;
@@ -1021,7 +1079,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
         
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
-
+		
 		boolean hasAtLeastThreePieces = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 9 :
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 9;
 		
@@ -1067,6 +1125,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						return null_val_ver;
 					} else {
 						zungzwang = true;
+						//System.out.println("zungzwang hit");
 					}
 					
 					if (allowTPTAccess(maxdepth, depth)) {
@@ -1176,10 +1235,50 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
         }
         
         
-		/*boolean singleMove = false;
-		if (inCheck) {
-			singleMove = env.getBitboard().hasSingleMove();
-		}*/
+		//Singular move extension
+		int singularExtension = 0;
+		
+		{
+			env.getTPT().lock();
+			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
+			env.getTPT().unlock();
+			
+	        if (depth > 0
+	        		&& rest >= 6//depth
+	        		&& !disableExts
+	        		&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
+	        		&& tptEntry != null
+	        		//&& tptEntry.getDepth() >= rest - 3
+	        		) {
+	        	
+		        boolean hasSingleMove = env.getBitboard().hasSingleMove();
+		        
+				if (hasSingleMove) {
+					
+					singularExtension = PLY;
+					
+				} else if (tptEntry.getBestMove_lower() != 0) {
+						
+					int ttValue = tptEntry.getLowerBound();
+					
+					int reduction = (PLY * rest) / 2;
+					if (reduction >= PLY) {
+						
+						int singularBeta = ttValue - 2 * rest;
+						
+						backtrackingInfo.excluded_move = tptEntry.getBestMove_lower();
+						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, singularBeta,
+								prevNullMove, prevbest, prevprevbest, prevPV, rootColour, mateMove, useMateDistancePrunning, useStaticPrunning, useNullMove);
+						backtrackingInfo.excluded_move = 0;
+						
+						if (singularEval < singularBeta) {
+							singularExtension = PLY;
+							//System.out.println("singularExtension hit");
+						}
+					}
+				}
+	        }
+		}
 		
 		
 		ISearchMoveList list = null;
@@ -1215,6 +1314,11 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		if (cur_move != 0) {
 			do {
+				
+				
+				if (cur_move == backtrackingInfo.excluded_move) {
+					continue;
+				}
 				
 				
 				if (searchedCount > 0 && cur_move == tpt_move) {
@@ -1267,14 +1371,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				env.getBitboard().makeMoveForward(cur_move);
 				
-				if (env.getBitboard().isInCheck(colourToMove)) {
-					if (allowIllegalMoves()) {
-						env.getBitboard().makeMoveBackward(cur_move);
-						continue;
-					} else {
-						throw new IllegalStateException();	
-					}
-				}
+				
 				legalMoves++;
 				
 				
@@ -1284,6 +1381,11 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				int new_maxdepth = maxdepth;
 				if (depth > 0 && !disableExts) {
 					//Do extensions here
+					if (cur_move == tpt_move) {
+						new_maxdepth += singularExtension;
+					} else if (zungzwang) {
+						new_maxdepth += PLY;
+					}
 				}
 				
 				
@@ -1294,41 +1396,47 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							best_move, prevbest, prevPV, rootColour,
 							new_mateMove, useMateDistancePrunning, false, true);
 				} else {
+					
+					boolean staticPrunning = false;
+					
+					if (!isCheckMove
+							&& !isMateVal(alpha_org)
+							&& !isMateVal(beta)
+						) {
+						staticPrunning = true;
+					}
+					
+					int lmrReduction = 0;
+					if (!inCheck
+						 && !isCheckMove
+						 //&& !mateThreat
+						 //&& !isCapOrProm
+						 && moveSee < 0
+						 //&& rest > 3
+						) {
 						
-						int lmrReduction = 0;
-						boolean staticPrunning = false;
+						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
+						rate += 2;//for non pv nodes
+						rate *= (1 - getHistory(inCheck).getScores(cur_move));
+						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
+					}
+					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
+					if (lmrRest < 0) {
+						lmrRest = 0;
+					}
+					
+					
+					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
+							new_maxdepth - lmrReduction, depth + 1, -alpha_org, false,
+							best_move, prevbest, prevPV, rootColour,
+							new_mateMove, useMateDistancePrunning, staticPrunning, true);
+					
+					if (cur_eval >= beta && (lmrReduction > 0 || staticPrunning) ) {
 						
-						if (!isCheckMove
-								&& !isMateVal(alpha_org)
-								&& !isMateVal(beta)
-								 ) {
-							staticPrunning = true;
-						}
-						
-						if (!inCheck
-							 && !isCheckMove
-							 //&& !mateThreat
-							 //&& !isCapOrProm
-							 && moveSee < 0
-							) {
-							
-							double rate = Math.log(searchedCount) * Math.log(rest) / 2;
-							rate += 2;//for non pv nodes
-							rate *= (1 - getHistory(inCheck).getScores(cur_move));
-							lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
-						}
-						
-						cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
-								new_maxdepth - lmrReduction, depth + 1, -alpha_org, false,
+						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, false,
 								best_move, prevbest, prevPV, rootColour,
-								new_mateMove, useMateDistancePrunning, staticPrunning, true);
-						
-						if (cur_eval >= beta && (lmrReduction > 0 || staticPrunning) ) {
-							
-							cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, false,
-									best_move, prevbest, prevPV, rootColour,
-									new_mateMove, useMateDistancePrunning, false, true);
-						}
+								new_mateMove, useMateDistancePrunning, false, true);
+					}
 				}
 						
 						
@@ -1390,7 +1498,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 		
-		if (allowTPTAccess(maxdepth, depth)) {
+		if (backtrackingInfo.excluded_move == 0 && allowTPTAccess(maxdepth, depth)) {
 			env.getTPT().lock();
 			env.getTPT().put(hashkey, normDepth(maxdepth), depth, colourToMove, best_eval, beta - 1, beta, best_move, (byte)0);
 			env.getTPT().unlock();
@@ -1403,7 +1511,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 	
 	private int pv_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int alpha_org, int beta, int rootColour) {
 		
-		/*if (!firstTime)*/ info.setSearchedNodes(info.getSearchedNodes() + 1);	
+		info.setSearchedNodes(info.getSearchedNodes() + 1);	
 		
 		if (info.getSelDepth() < depth) {
 			info.setSelDepth(depth);
@@ -1424,6 +1532,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		node.nullmove = false;
 		node.leaf = true;
 		
+		
 		if (isDrawPV(depth)) {
 			node.eval = getDrawScores(rootColour);
 			return node.eval;
@@ -1431,6 +1540,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 		
 		boolean inCheck = env.getBitboard().isInCheck();
+		
 		
 		int staticEval = -1;
 		if (!inCheck) {
@@ -1441,20 +1551,12 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			}
 		}
 		
+		
 	    // Mate distance pruning
 		if (!inCheck && depth >= 1) {
-
-		      /*if (inCheck && !env.getBitboard().hasMove()) {
-					node.bestmove = 0;
-					node.eval = -getMateVal(depth);
-					node.leaf = true;
-					node.nullmove = false;
-					return node.eval;
-		      }*/
-		      
+				
 		      // lower bound
 		      int value = -getMateVal(depth+2);
-
 		      if (value > alpha_org) {
 		    	  alpha_org = value;
 		         if (value >= beta) {
@@ -1467,9 +1569,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		      }
 
 		      // upper bound
-
 		      value = getMateVal(depth+1);
-
 		      if (value < beta) {
 		         beta = value;
 		         if (value <= alpha_org) {
@@ -1540,7 +1640,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		long hashkey = env.getBitboard().getHashKey();
 		
-		//int tpt_move = getTPTMove(hashkey);
+		
 		boolean tpt_exact = false;
 		boolean tpt_found = false;
 		int tpt_move = 0;
