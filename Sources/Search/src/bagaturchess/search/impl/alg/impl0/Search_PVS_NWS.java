@@ -42,21 +42,19 @@ import bagaturchess.search.impl.utils.SearchUtils;
 public class Search_PVS_NWS extends SearchImpl_MTD {
 	
 	
-	int MIN_EVAL_DIFF_PV 					= 33;
-	int MIN_EVAL_DIFF_NONPV 				= 33;
+	private double LMR_REDUCTION_MULTIPLIER 		= 1;// * 1.222 * 1;
+	private double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1;// * 0.777 * 1;
+	private double IID_DEPTH_MULTIPLIER 			= 1;
+	private boolean STATIC_PRUNING1					= true;
+	private boolean STATIC_PRUNING2 				= true;
 	
-	double LMR_REDUCTION_MULTIPLIER 		= 1;// * 1.222 * 1;
-	double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1;// * 0.777 * 1;
-	double IID_DEPTH_MULTIPLIER 			= 1;
-	boolean STATIC_PRUNING1					= true;
-	boolean STATIC_PRUNING2 				= true;
+	
+	private BacktrackingInfo[] backtracking 		= new BacktrackingInfo[MAX_DEPTH + 1];
+	
+	private static final int EVAL_DIFF_MAX 			= 200;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
-	
-	private BacktrackingInfo[] backtracking = new BacktrackingInfo[MAX_DEPTH + 1];
-	
-	private static final int EVAL_DIFF_MAX = 100;
 	
 	
 	public Search_PVS_NWS(Object[] args) {
@@ -690,11 +688,12 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 				
 				
-				//Static pruning - move count based and move history based
-				if (STATIC_PRUNING2 /*&& evalDiff < 0*/ && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
+				//Static pruning
+				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
 					
 					if (searchedCount >= 4 && rest <= 8) {
 						
+						//Static pruning - move count based
 						if (searchedCount >= 3 + Math.pow(rest, 2)) {
 							continue;
 						}
@@ -703,6 +702,11 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
 	 						continue;
 	 					}
+						
+						//Static pruning - evaluation based
+						if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
+							continue;
+						}
 					}
 				}
 				
@@ -722,6 +726,12 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						new_maxdepth += singularExtension;
 					} else if (zungzwang) {
 						new_maxdepth += PLY;
+					} else {
+						/*if (evalDiff > 0) {
+							new_maxdepth += PLY * (evalDiff / (double)EVAL_DIFF_MAX);	
+						}
+						new_maxdepth += PLY * getHistory(inCheck).getScores(cur_move);
+						*/
 					}
 				}
 				
@@ -1351,11 +1361,12 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 				
 				
-				//Static pruning - move count based and move history based
-				if (STATIC_PRUNING2 /*&& evalDiff < 0*/ && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
-
+				//Static pruning
+				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
+					
 					if (searchedCount >= 4 && rest <= 8) {
 						
+						//Static pruning - move count based
 						if (searchedCount >= 3 + Math.pow(rest, 2)) {
 							continue;
 						}
@@ -1364,6 +1375,11 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
 	 						continue;
 	 					}
+						
+						//Static pruning - evaluation based
+						if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
+							continue;
+						}
 					}
 				}
 				
@@ -1383,6 +1399,12 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						new_maxdepth += singularExtension;
 					} else if (zungzwang) {
 						new_maxdepth += PLY;
+					} else {
+						/*if (evalDiff > 0) {
+							new_maxdepth += PLY * (evalDiff / (double)EVAL_DIFF_MAX);	
+						}
+						new_maxdepth += PLY * getHistory(inCheck).getScores(cur_move);
+						*/
 					}
 				}
 				
