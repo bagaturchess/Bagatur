@@ -28,6 +28,7 @@ package bagaturchess.engines.run;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
+import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.engines.bagatur.cfg.time.TimeConfigImpl;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP;
@@ -87,8 +88,9 @@ public class MTDSchedulerMain {
 								//new RootSearchConfig_BaseImpl_SMP(
 				
 				new String[] {
-								//bagaturchess.search.impl.alg.impl0.Search_PVS_NWS.class.getName(),
-								bagaturchess.search.impl.alg.impl1.Search_NegaScout.class.getName(),
+								bagaturchess.search.impl.alg.impl0.Search_PVS_NWS.class.getName(),
+								//bagaturchess.search.impl.alg.impl0.Search_PVS_NWS1.class.getName(),
+								//bagaturchess.search.impl.alg.impl1.Search_NegaScout.class.getName(),
 								
 								bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD.class.getName(),
 								
@@ -128,14 +130,12 @@ public class MTDSchedulerMain {
 		//IRootSearch search = new SequentialSearch_Classic(new Object[] {cfg, sharedData});
 		IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
 		//IRootSearch search = new MonteCarloSearch(new Object[] {cfg, sharedData});
-		
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
 		sharedData = search.getSharedData();
 		
 		
 		//IBitBoard bitboard  = new Board("2r1r2k/1q3ppp/p2Rp3/2p1P3/6QB/p3P3/bP3PPP/3R2K1 w - - bm Bf6; id WAC.222");
-		//IBitBoard bitboard  = new Board("2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - bm Qg6");//Fast mate
 		//IBitBoard bitboard  = new Board("7k/p6r/1p4Q1/7R/3p4/7P/P5P1/2q2K2 w - -");
 		
 		//IBitBoard bitboard  = new Board("8/k7/3p/p2P1p/P2P1P/8/8/K7 w - - 0 1");
@@ -143,8 +143,6 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard  = new Board("rn1qkb1r/1p2pppp/p6/1NpnB3/Q1Pp2b1/3P1N2/PP2PPPP/R3KB1R b KQkq - 3 9", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1qkb1r/1p2pppp/pn5/1Np1B3/Q1Pp2b1/3P1N2/PP2PPPP/R3KB1R w KQkq - 3 9", null, cfg.getBoardConfig());
 		
-		//1r5k/p1p4p/4p3/1rppb1Qq/3P2P1/1P3P2/P1P5/2KR4 w - - 0 25 MATE IN 7, extracted from a game with cuckoo chess
-		//3r2k1/1p3p1p/pqb2n2/4rN2/2Pp2p1/3B4/PP1Q1PPP/2RR2K1 b - - 3 24 MATE IN 7 - white wins
 		//r1b2rk1/4qppp/p7/2p1PpB1/P3p3/6Q1/1PP3PP/2KR3R b - - 1 21 - f7-f6 is the move, Qe7-e6 is bad move - forced material loss
 		//r1b2rk1/5ppp/p3q3/2p1PpB1/P3p3/6Q1/1PP3PP/2KR3R w - - 2 22 - Bg5-f6 is the move, material loss for black
 		//r4rk1/pp3ppp/2pq4/3p4/4nPb1/2BBP3/PPP3PP/R3QRK1 w - - 2 15 Bd3xe4 is the correct move +3.00
@@ -165,6 +163,12 @@ public class MTDSchedulerMain {
 		IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("7k/6r1/8/8/8/8/1Q6/K7 w - -", null, cfg.getBoardConfig()); //Queen and King vs. Rook and King
 		//IBitBoard bitboard  = new Board("k7/1q6/8/8/8/7R/8/6K1 b - - ", null, cfg.getBoardConfig());
+		//IBitBoard bitboard  = new Board("1r5k/p1p4p/4p3/1rppb1Qq/3P2P1/1P3P2/P1P5/2KR4 w - - 0 25", null, cfg.getBoardConfig());//MATE IN 7, extracted from a game with cuckoo chess
+		//IBitBoard bitboard  = new Board("3r2k1/1p3p1p/pqb2n2/4rN2/2Pp2p1/3B4/PP1Q1PPP/2RR2K1 b - - 3 24", null, cfg.getBoardConfig());//MATE IN 7, white wins
+		//IBitBoard bitboard  = new Board("5rk1/pp4p1/8/3N3p/2P4P/1P4K1/P2r1n2/R3R3 b - - 0 1", null, cfg.getBoardConfig());//Mate in 5, white wins
+		//IBitBoard bitboard  = new Board("2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - bm Qg6", null, cfg.getBoardConfig());//Fast mate in 2 moves
+		
+		//BoardUtils.playGameUCI(bitboard, "g3g6");
 		
 		//IBitBoard bitboard  = new Board("8/7k/7P/6K1/2B5/8/8/8 b - - 19 82", null, cfg.getBoardConfig());//Too big eval of bishop and pawn
 		//IBitBoard bitboard  = new Board3_Adapter("1r2r1k1/5pp1/p2p4/2q1pNP1/b3P3/nP4Q1/PKP1R1B1/3R4 b - - 1 29", sharedData.getPawnsCache(), cfg.getBoardConfig());
