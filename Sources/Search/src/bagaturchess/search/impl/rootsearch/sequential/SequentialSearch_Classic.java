@@ -181,10 +181,11 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 						try {
 							
 							//Search with null window to prepare evaluation score and TPT entries
-							int eval = searcher.nullwin_search(final_mediator, info,
-									ISearch.PLY * maxdepth, ISearch.PLY * maxdepth,	0,
+							/*int eval = searcher.nullwin_search(final_mediator, info,
+									ISearch.PLY * (maxdepth - 1), ISearch.PLY * (maxdepth - 1),	0,
 									prevEval,
-									false, 0, 0, final_prevPV, searcher.getEnv().getBitboard().getColourToMove(), 0, 0, false, 0, !go.isPonder());
+									false, 0, 0, final_prevPV, searcher.getEnv().getBitboard().getColourToMove(),
+									0, 0, false, 0, !go.isPonder());
 							
 							//Search around evaluation score with aspiration window +- ASPIRATION_WINDOW
 							int window_min = eval - ASPIRATION_WINDOW;
@@ -198,15 +199,15 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 									0, 0, false, 0, !go.isPonder());
 							
 							//If eval is outside the aspiration window, than search with MIN and MAX values
-							if (eval < window_min || eval > window_max) {
-								eval = searcher.pv_search(final_mediator,
+							if (eval <= window_min || eval >= window_max) {*/
+								int eval = searcher.pv_search(final_mediator,
 										null, info,
 										ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
 										ISearch.MIN, ISearch.MAX,
 										0, 0, final_prevPV,
 										false, 0, searcher.getEnv().getBitboard().getColourToMove(),
 										0, 0, false, 0, !go.isPonder());
-							}
+							//}
 							
 							
 							prevEval = eval;
