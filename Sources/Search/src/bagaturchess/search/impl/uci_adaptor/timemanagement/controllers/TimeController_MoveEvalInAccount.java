@@ -35,7 +35,7 @@ public abstract class TimeController_MoveEvalInAccount extends TimeController_Ba
 	private double moveevaldiff_cfg_max_usage_percent_of_total_time	= 0.20;
 	private double moveevaldiff_cfg_scores_diff_devider 			= 2;
 	private int moveevaldiff_cfg_scores_penalty_on_diff_moves 		= 25;
-	private int moveevaldiff_cfg_max_scoress_diff 					= 300;
+	private int moveevaldiff_cfg_max_scoress_diff 					= 75;
 	
 	private double moveevaldiff_accumulated_score_diff;
 	private double moveevaldiff_usage_percent_of_total_time;
