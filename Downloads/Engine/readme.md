@@ -10,6 +10,12 @@ The program runs under all Operating Systems, which support Java platform:
 
 # Revision History
 
+Version 1.5f (31 October 2018)
+  * 50 ELO stronger (measured versus 1.5e)
+  * Time management improvements
+  * Singular move extension implemented
+  * Optimizations of quiescence search - it search all capture moves
+  
 Version 1.5e (20 July 2017)
   * Endgame Tablebases support - switched OFF, because of engine crash errors (JNI and java OutOfMemory related)
   
