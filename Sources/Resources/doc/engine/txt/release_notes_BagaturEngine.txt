@@ -1,7 +1,9 @@
 
-Version 1.5f (10 October 2018)
+Version 1.5f (31 October 2018)
+  * 50 ELO stronger (measured versus 1.5e)
+  * Time management improvements
   * Singular move extension implemented
-  * Optimizations of quiescence search - it traverses all capture moves without exception
+  * Optimizations of quiescence search - it search all capture moves
   
 Version 1.5e (20 July 2017)
   * Endgame Tablebases support - switched OFF, because of engine crash errors (JNI and java OutOfMemory related)
