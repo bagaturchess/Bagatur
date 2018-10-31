@@ -102,7 +102,7 @@ public class TimeController_SuddenDeath extends TimeController_FloatingTime {
 		
 		@Override
 		public int getMoveEvallDiff_MaxScoreDiff() {
-			return 75;
+			return 300;
 		}
 		
 		
