@@ -22,6 +22,7 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	private int currentThreadsCount = getDefaultThreadsCount();
 	
 	protected double SMP_MEM_USAGE_TPT;
+	protected double SMP_MEM_USAGE_TPT_QS;
 	protected double SMP_MEM_USAGE_GTB;
 	protected double SMP_MEM_USAGE_EVALCACHE;
 	protected double SMP_MEM_USAGE_PAWNCACHE;
@@ -43,6 +44,7 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 		double mem_usage_norm = 1 / (double)(getThreadsCount() * (MEM_USAGE_TPT + MEM_USAGE_GTB + MEM_USAGE_EVALCACHE + MEM_USAGE_PAWNCACHE));
 		
 		SMP_MEM_USAGE_TPT = MEM_USAGE_TPT * mem_usage_norm;
+		SMP_MEM_USAGE_TPT_QS = MEM_USAGE_TPT_QS * mem_usage_norm;
 		SMP_MEM_USAGE_GTB = MEM_USAGE_GTB * mem_usage_norm;
 		SMP_MEM_USAGE_EVALCACHE = MEM_USAGE_EVALCACHE * mem_usage_norm;
 		SMP_MEM_USAGE_PAWNCACHE = MEM_USAGE_PAWNCACHE * mem_usage_norm;
@@ -71,10 +73,18 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 		return SMP_MEM_USAGE_TPT;
 	}
 	
+	
+	@Override
+	public double getTPTQSUsagePercent() {
+		return SMP_MEM_USAGE_TPT_QS;
+	}
+	
+	
 	@Override
 	public double getGTBUsagePercent() {
 		return SMP_MEM_USAGE_GTB;
 	}
+	
 	
 	@Override
 	public double getEvalCacheUsagePercent() {

@@ -289,7 +289,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 					
 					env.getTPT().lock();
 					buff_tpt_depthtracking[0] = 0;
-					extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour);
+					extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
 					env.getTPT().unlock();
 					
 					if (buff_tpt_depthtracking[0] >= rest) {
@@ -307,7 +307,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 						
 						env.getTPT().lock();
 						buff_tpt_depthtracking[0] = 0;
-						extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour);
+						extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
 						env.getTPT().unlock();
 						
 						if (buff_tpt_depthtracking[0] >= rest) {
@@ -325,7 +325,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 						
 						env.getTPT().lock();
 						buff_tpt_depthtracking[0] = 0;
-						extractFromTPT(info, rest, node, false, buff_tpt_depthtracking, rootColour);
+						extractFromTPT(info, rest, node, false, buff_tpt_depthtracking, rootColour, env.getTPT());
 						env.getTPT().unlock();
 						
 						if (buff_tpt_depthtracking[0] >= rest) {
@@ -365,7 +365,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
                     node.bestmove = 0;
                     env.getTPT().lock();
                     buff_tpt_depthtracking[0] = 0;
-                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour);
+                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
                     env.getTPT().unlock();
                     
                     
@@ -551,7 +551,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
                     node.bestmove = 0;
                     env.getTPT().lock();
                     buff_tpt_depthtracking[0] = 0;
-                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour);
+                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
                     env.getTPT().unlock();
                     
                     
@@ -1039,7 +1039,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 					
 					env.getTPT().lock();
 					buff_tpt_depthtracking[0] = 0;
-					extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour);
+					extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour, env.getTPTQS());
 					env.getTPT().unlock();
 					
 					if (buff_tpt_depthtracking[0] >= 0) {
@@ -1056,7 +1056,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 						
 						env.getTPT().lock();
 						buff_tpt_depthtracking[0] = 0;
-						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour);
+						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour, env.getTPTQS());
 						env.getTPT().unlock();
 						
 						if (buff_tpt_depthtracking[0] >= 0) {
@@ -1073,7 +1073,7 @@ public class Search_PVS_NWS1 extends SearchImpl_MTD {
 						
 						env.getTPT().lock();
 						buff_tpt_depthtracking[0] = 0;
-						extractFromTPT(info, 0, node, false, buff_tpt_depthtracking, rootColour);
+						extractFromTPT(info, 0, node, false, buff_tpt_depthtracking, rootColour, env.getTPTQS());
 						env.getTPT().unlock();
 						
 						if (buff_tpt_depthtracking[0] >= 0) {

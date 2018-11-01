@@ -86,6 +86,11 @@ public class SharedData {
 	}
 	
 	
+	public TPTable getAndRemoveTPTQS() {
+		return memoryConsumers.getTPTQS().remove(0);
+	}
+	
+	
 	public PawnsEvalCache getAndRemovePawnsCache() {
 		return memoryConsumers.getPawnsCache().remove(0);
 	}

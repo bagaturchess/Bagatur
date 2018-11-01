@@ -60,6 +60,7 @@ public class SearchEnv {
 	private IEvalCache evalCache;
 	private PawnsEvalCache pawnsCache;
 	private TPTable tpt;
+	private TPTable tpt_qs;
 	private GTBCache_OUT egtb_cache;
 	private GTBProbing gtb_probing;
 	private boolean egtb_cache_get;
@@ -142,6 +143,14 @@ public class SearchEnv {
 	}
 	
 	
+	public TPTable getTPTQS() {
+		if (tpt_qs == null) {
+			tpt_qs = shared.getAndRemoveTPTQS();
+		}
+		return tpt_qs;
+	}
+	
+	
 	public GTBCache_OUT getEGTBCache() {
 		if (!egtb_cache_get) {
 			egtb_cache = shared.getAndRemoveGTBCache_OUT();
@@ -218,6 +227,7 @@ public class SearchEnv {
 		result += "Eval Cache HIT RATE is: " + getEvalCache().getHitRate();
 		result += "; Pawn Cache HIT RATE is: " + getPawnsCache().getHitRate();
 		result += "; Transposition Table HIT RATE is: " + getTPT().getHitRate();
+		result += "; Transposition Table QSearch HIT RATE is: " + getTPTQS().getHitRate();
 		result += "\r\nMOVE ORDERING STATISTICS\r\n" + getMoveListFactory().toString();
 		
 		return result;

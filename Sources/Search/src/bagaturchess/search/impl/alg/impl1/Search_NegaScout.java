@@ -303,7 +303,7 @@ public class Search_NegaScout extends SearchImpl {
 						
 						env.getTPT().lock();
 						buff_tpt_depthtracking[0] = 0;
-						extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour);
+						extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
 						env.getTPT().unlock();
 						
 						if (buff_tpt_depthtracking[0] >= rest) {
@@ -320,7 +320,7 @@ public class Search_NegaScout extends SearchImpl {
 							
 							env.getTPT().lock();
 							buff_tpt_depthtracking[0] = 0;
-							extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour);
+							extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
 							env.getTPT().unlock();
 							
 							if (buff_tpt_depthtracking[0] >= rest) {
@@ -337,7 +337,7 @@ public class Search_NegaScout extends SearchImpl {
 							
 							env.getTPT().lock();
 							buff_tpt_depthtracking[0] = 0;
-							extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour);
+							extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
 							env.getTPT().unlock();
 							
 							if (buff_tpt_depthtracking[0] >= rest) {
@@ -787,9 +787,9 @@ public class Search_NegaScout extends SearchImpl {
 			int tpt_lower = MIN;
 			int tpt_upper = MAX;
 			
-			env.getTPT().lock();
+			env.getTPTQS().lock();
 			{
-				TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
+				TPTEntry tptEntry = env.getTPTQS().get(backtrackingInfo.hash_key);
 				if (tptEntry != null) {
 					tpt_exact = tptEntry.isExact();
 					tpt_lower = tptEntry.getLowerBound();
@@ -800,7 +800,7 @@ public class Search_NegaScout extends SearchImpl {
 					}
 				}
 			}
-			env.getTPT().unlock();
+			env.getTPTQS().unlock();
 			
 			if (tpt_exact) {
 				if (!SearchUtils.isMateVal(tpt_lower)) {
@@ -809,10 +809,10 @@ public class Search_NegaScout extends SearchImpl {
 					node.nullmove = false;
 					node.leaf = true;
 					
-					env.getTPT().lock();
+					env.getTPTQS().lock();
 					buff_tpt_depthtracking[0] = 0;
-					extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour);
-					env.getTPT().unlock();
+					extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour, env.getTPTQS());
+					env.getTPTQS().unlock();
 					
 					if (buff_tpt_depthtracking[0] >= 0) {
 						return node.eval;
@@ -826,10 +826,10 @@ public class Search_NegaScout extends SearchImpl {
 						node.nullmove = false;
 						node.leaf = true;
 						
-						env.getTPT().lock();
+						env.getTPTQS().lock();
 						buff_tpt_depthtracking[0] = 0;
-						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour);
-						env.getTPT().unlock();
+						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour, env.getTPTQS());
+						env.getTPTQS().unlock();
 						
 						if (buff_tpt_depthtracking[0] >= 0) {
 							return node.eval;
@@ -843,10 +843,10 @@ public class Search_NegaScout extends SearchImpl {
 						node.nullmove = false;
 						node.leaf = true;
 						
-						env.getTPT().lock();
+						env.getTPTQS().lock();
 						buff_tpt_depthtracking[0] = 0;
-						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour);
-						env.getTPT().unlock();
+						extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour, env.getTPTQS());
+						env.getTPTQS().unlock();
 						
 						if (buff_tpt_depthtracking[0] >= 0) {
 							return node.eval;
@@ -954,9 +954,9 @@ public class Search_NegaScout extends SearchImpl {
 		
 		
 		if (best_move != 0) {
-			env.getTPT().lock();
-			env.getTPT().put(backtrackingInfo.hash_key, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
-			env.getTPT().unlock();
+			env.getTPTQS().lock();
+			env.getTPTQS().put(backtrackingInfo.hash_key, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
+			env.getTPTQS().unlock();
 		}
 		
 		return best_eval;

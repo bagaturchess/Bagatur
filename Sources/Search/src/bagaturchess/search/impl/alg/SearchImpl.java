@@ -46,6 +46,7 @@ import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
+import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.search.impl.utils.SearchUtils;
 import bagaturchess.uci.api.ChannelManager;
@@ -154,7 +155,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 
 			env.getTPT().lock();
 			buff_tpt_depthtracking[0] = 0;
-			extractFromTPT(info, depth, node, true, buff_tpt_depthtracking, env.getBitboard().getColourToMove());
+			extractFromTPT(info, depth, node, true, buff_tpt_depthtracking, env.getBitboard().getColourToMove(), env.getTPT());
 			env.getTPT().unlock();
 
 			node.eval = tptEntry.getLowerBound();
@@ -367,9 +368,9 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	}
 	
 	
-	protected boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int[] depthtracking, int rootColour) {
+	protected boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int[] depthtracking, int rootColour, TPTable tpt) {
 		//env.getTPT().lock();
-		boolean res = extractFromTPT(info, depth, result, useLower, MIN, MAX, depthtracking, rootColour);
+		boolean res = extractFromTPT(info, depth, result, useLower, MIN, MAX, depthtracking, rootColour, tpt);
 		/*//TODO: Consider if (res) {
 			result.eval = DRAW;
 		}*/
@@ -377,7 +378,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		return res;
 	}
 	
-	private boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int alpha, int beta, int[] depthtracking, int rootColour) {
+	private boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int alpha, int beta, int[] depthtracking, int rootColour, TPTable tpt) {
 		
 		//if (true) throw new IllegalStateException("Not thread safe"); 
 		
@@ -408,7 +409,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		
 		long hashkey = env.getBitboard().getHashKey();
 		
-		TPTEntry entry = env.getTPT().get(hashkey);
+		TPTEntry entry = tpt.get(hashkey);
 		
 		if (entry == null) {
 			return false;
@@ -452,7 +453,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 					env.getBitboard().makeMoveForward(result.bestmove);
 				}
 				
-				draw = extractFromTPT(info, depth - 1, result.child, !useLower, -beta, -alpha, depthtracking, rootColour);
+				draw = extractFromTPT(info, depth - 1, result.child, !useLower, -beta, -alpha, depthtracking, rootColour, tpt);
 				/*if (draw) {
 					result.eval = getDrawScores(rootColour);
 				}*/

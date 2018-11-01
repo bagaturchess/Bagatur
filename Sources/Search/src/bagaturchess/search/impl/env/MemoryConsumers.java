@@ -77,6 +77,7 @@ public class MemoryConsumers {
 	private List<IEvalCache> evalCache;
 	private List<PawnsEvalCache> pawnsCache;
 	private List<TPTable> tpt;
+	private List<TPTable> tpt_qs;
 	private List<GTBProbing> gtbs;
 	private List<GTBCache_OUT> gtbCache_out;
 	
@@ -187,11 +188,13 @@ public class MemoryConsumers {
 		if (engineConfiguration.initCaches()) {
 			ChannelManager.getChannel().dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
 			ChannelManager.getChannel().dump("Transposition Table usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
+			ChannelManager.getChannel().dump("Transposition Table QSearch usage percent from the free memory " + engineConfiguration.getThreadsCount() 	+ " X : " + (100 * engineConfiguration.getTPTQSUsagePercent()) + "%");
 			ChannelManager.getChannel().dump("Endgame Table Bases Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 	+ " X : " + (100 * engineConfiguration.getGTBUsagePercent()) + "%");
 			ChannelManager.getChannel().dump("Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 					+ " X : " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
 			ChannelManager.getChannel().dump("Pawns Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getPawnsCacheUsagePercent()) + "%");
 			
 			double percents_sum = engineConfiguration.getThreadsCount() * engineConfiguration.getTPTUsagePercent()
+								+ engineConfiguration.getThreadsCount() * engineConfiguration.getTPTQSUsagePercent()
 								+ engineConfiguration.getThreadsCount() * engineConfiguration.getGTBUsagePercent()
 								+ engineConfiguration.getThreadsCount() * engineConfiguration.getEvalCacheUsagePercent()
 								+ engineConfiguration.getThreadsCount() * engineConfiguration.getPawnsCacheUsagePercent();
@@ -224,6 +227,9 @@ public class MemoryConsumers {
 		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, getTPTEntrySize(availableMemory, 			Math.max(test_size1, SIZE_MIN_ENTRIES_TPT)));
 		ChannelManager.getChannel().dump("Transposition Table size is " + size_tpt);
 		
+		int size_tpt_qs = Math.max(SIZE_MIN_ENTRIES_TPT, getTPTQSEntrySize(availableMemory, 			Math.max(test_size1, SIZE_MIN_ENTRIES_TPT)));
+		ChannelManager.getChannel().dump("Transposition Table QSearch size is " + size_tpt_qs);
+		
 		int size_ec = Math.max(SIZE_MIN_ENTRIES_EC, getEvalCacheSize(availableMemory,			 	Math.max(test_size1, SIZE_MIN_ENTRIES_EC)));
 		ChannelManager.getChannel().dump("Eval Cache size is " + size_ec);
 		
@@ -242,6 +248,7 @@ public class MemoryConsumers {
 		evalCache 		= new Vector<IEvalCache>();
 		pawnsCache		= new Vector<PawnsEvalCache>();
 		tpt 			= new Vector<TPTable>();
+		tpt_qs			= new Vector<TPTable>();
 		gtbCache_out 	= new Vector<GTBCache_OUT>();
 		
 		
@@ -249,6 +256,8 @@ public class MemoryConsumers {
 		for (int i=0; i<threadsCount; i++) {
 			
 			tpt.add(new TPTable(size_tpt, false, new BinarySemaphore_Dummy()));
+			
+			tpt_qs.add(new TPTable(size_tpt_qs, false, new BinarySemaphore_Dummy()));
 			
 			//evalCache.add(new EvalCache(size_ec, false, new BinarySemaphore_Dummy()));
 			evalCache.add(new EvalCache1(5, size_ec, false, new BinarySemaphore_Dummy()));
@@ -277,6 +286,23 @@ public class MemoryConsumers {
 		int memory_before = getUsedMemory();
 		TPTable test_tpt = new TPTable(test_size, true, null);
 		int size = getEntrySize(availableMemory, engineConfiguration.getTPTUsagePercent(), test_size, memory_before);
+		test_tpt.clear();
+		return size;
+	}
+	
+	
+	private int getTPTQSEntrySize(long availableMemory, int test_size) {
+		int availableMemory_in_MB = (int) (availableMemory / (1024 * 1024));
+		if (availableMemory_in_MB < 1) {
+			//throw new IllegalStateException("Not enough memory for initializing Transposition Table. Please increase the -Xmx option of Java VM");
+			availableMemory_in_MB = 1;
+		}
+		
+		System.gc();
+		
+		int memory_before = getUsedMemory();
+		TPTable test_tpt = new TPTable(test_size, true, null);
+		int size = getEntrySize(availableMemory, engineConfiguration.getTPTQSUsagePercent(), test_size, memory_before);
 		test_tpt.clear();
 		return size;
 	}
@@ -411,6 +437,11 @@ public class MemoryConsumers {
 	}
 
 
+	public List<TPTable> getTPTQS() {
+		return tpt_qs;
+	}
+	
+	
 	public List<IEvalCache> getEvalCache() {
 		return evalCache;
 	}
