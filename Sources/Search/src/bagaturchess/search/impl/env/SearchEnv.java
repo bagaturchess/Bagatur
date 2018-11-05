@@ -27,7 +27,6 @@ package bagaturchess.search.impl.env;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
-import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.egtb.gaviota.GTBProbing;
 import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 import bagaturchess.opening.api.OpeningBook;
@@ -144,10 +143,14 @@ public class SearchEnv {
 	
 	
 	public TPTable getTPTQS() {
-		if (tpt_qs == null) {
+		/*if (tpt_qs == null) {
 			tpt_qs = shared.getAndRemoveTPTQS();
 		}
-		return tpt_qs;
+		return tpt_qs;*/
+		if (tpt == null) {
+			tpt = shared.getAndRemoveTPT();
+		}
+		return tpt;
 	}
 	
 	

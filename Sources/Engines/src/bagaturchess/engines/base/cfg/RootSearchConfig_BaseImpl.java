@@ -20,8 +20,8 @@ import bagaturchess.uci.impl.commands.options.UCIOptionString;
 public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IUCIOptionsProvider {
 	
 	
-	protected static final double MEM_USAGE_TPT 		= 0.20;
-	protected static final double MEM_USAGE_TPT_QS		= 0.15;
+	protected static final double MEM_USAGE_TPT 		= 0.34;
+	protected static final double MEM_USAGE_TPT_QS		= 0.01;
 	protected static final double MEM_USAGE_EVALCACHE 	= 0.25;
 	protected static final double MEM_USAGE_PAWNCACHE 	= 0.30;
 	protected static final double MEM_USAGE_GTB 		= 0.10;
