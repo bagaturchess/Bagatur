@@ -126,7 +126,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
 		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
-		backtrackingInfo.static_eval = fullEval(depth, alpha_org, beta, rootColour);
+		backtrackingInfo.static_eval = lazyEval(depth, alpha_org, beta, rootColour);
 		
 		
 		if (alpha_org >= beta) {
@@ -727,11 +727,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					} else if (zungzwang) {
 						new_maxdepth += PLY;
 					} else {
-						/*if (evalDiff > 0) {
-							new_maxdepth += PLY * (evalDiff / (double)EVAL_DIFF_MAX);	
-						}
-						new_maxdepth += PLY * getHistory(inCheck).getScores(cur_move);
-						*/
+						//new_maxdepth += Math.min(PLY, PLY * (getHistory(inCheck).getScores(cur_move) + Math.max(0, (evalDiff / (double)EVAL_DIFF_MAX))));						
 					}
 				}
 				
@@ -1400,11 +1396,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					} else if (zungzwang) {
 						new_maxdepth += PLY;
 					} else {
-						/*if (evalDiff > 0) {
-							new_maxdepth += PLY * (evalDiff / (double)EVAL_DIFF_MAX);	
-						}
-						new_maxdepth += PLY * getHistory(inCheck).getScores(cur_move);
-						*/
+						//new_maxdepth += Math.min(PLY, PLY * (getHistory(inCheck).getScores(cur_move) + Math.max(0, (evalDiff / (double)EVAL_DIFF_MAX))));
 					}
 				}
 				
@@ -1539,7 +1531,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 
 		if (depth >= MAX_DEPTH) {
-			return fullEval(depth, beta - 1, beta, rootColour);
+			return lazyEval(depth, alpha_org, beta, rootColour);
 		}
 		
 		
@@ -1558,19 +1550,12 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			node.eval = getDrawScores(rootColour);
 			return node.eval;
 		}
-				
+		
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
 		
-		int staticEval = -1;
-		if (!inCheck) {
-			staticEval = lazyEval(depth, alpha_org, beta, rootColour);
-			
-			if (staticEval >= beta) {
-				staticEval = fullEval(depth, alpha_org, beta, rootColour);
-			}
-		}
+		int staticEval = lazyEval(depth, alpha_org, beta, rootColour);
 		
 		
 	    // Mate distance pruning
@@ -1880,10 +1865,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
-		int staticEval = -1;
-		if (!inCheck) {
-			staticEval = lazyEval(depth, beta - 1, beta, rootColour);
-		}
+		
+		int staticEval = lazyEval(depth, beta - 1, beta, rootColour);
+		
 		
 		int alpha_org = beta - 1;
 		
