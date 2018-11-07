@@ -1,4 +1,7 @@
 
+Version 1.5g (10 November 2018)
+  * Memory management improvements - more memory for the transposition table
+
 Version 1.5f (31 October 2018)
   * 50 ELO stronger (measured versus 1.5e)
   * Time management improvements
