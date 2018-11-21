@@ -126,7 +126,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
 		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
-		backtrackingInfo.static_eval = lazyEval(depth, alpha_org, beta, rootColour);
+		backtrackingInfo.static_eval = fullEval(depth, alpha_org, beta, rootColour);
 		
 		
 		if (alpha_org >= beta) {
@@ -1529,9 +1529,13 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		if (info.getSelDepth() < depth) {
 			info.setSelDepth(depth);
 		}
-
+		
+		
+		int staticEval = fullEval(depth, alpha_org, beta, rootColour);
+		
+		
 		if (depth >= MAX_DEPTH) {
-			return lazyEval(depth, alpha_org, beta, rootColour);
+			return staticEval;
 		}
 		
 		
@@ -1553,9 +1557,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		
 		boolean inCheck = env.getBitboard().isInCheck();
-		
-		
-		int staticEval = lazyEval(depth, alpha_org, beta, rootColour);
 		
 		
 	    // Mate distance pruning
@@ -1850,8 +1851,12 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			info.setSelDepth(depth);
 		}
 		
+		
+		int staticEval = lazyEval(depth, beta - 1, beta, rootColour);
+		
+		
 		if (depth >= MAX_DEPTH) {
-			return lazyEval(depth, beta - 1, beta, rootColour);
+			return staticEval;
 		}
 		
 		int colourToMove = env.getBitboard().getColourToMove();
@@ -1864,9 +1869,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 		
 		boolean inCheck = env.getBitboard().isInCheck();
-		
-		
-		int staticEval = lazyEval(depth, beta - 1, beta, rootColour);
 		
 		
 		int alpha_org = beta - 1;
