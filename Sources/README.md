@@ -49,5 +49,5 @@ How to build a distribution from the sources:
 6. the distribution archive file will be generated in the WorkDir directory
 
 
-Have a nice usage ... and feel free to contribute http://sourceforge.net/projects/bagaturchess/develop
+Have a nice usage ... and feel free to contribute.
 
