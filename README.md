@@ -14,3 +14,6 @@ The source code is writen entirely in Java programming language.
 # ELO Rating
 
 You could find the latest ELO rating of Bagatur engine <a href="http://www.computerchess.org.uk/ccrl/4040/cgi/compare_engines.cgi?family=Bagatur">here</a>.
+
+# About the Author
+You could find more information about Krasimir Topchiyski <a href="https://www.linkedin.com/in/topchiyski/">here</a>.
