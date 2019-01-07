@@ -10,3 +10,7 @@ The program runs under all Operating Systems, which support Java platform:
 # Sources
 
 The source code is writen entirely in Java programming language.
+
+# ELO Rating
+
+You could find the latest ELO rating of Bagatur engine <a href="http://www.computerchess.org.uk/ccrl/4040/cgi/compare_engines.cgi?family=Bagatur">here</a>.
