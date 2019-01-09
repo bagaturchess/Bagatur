@@ -4,7 +4,7 @@
 
 The program runs under all Operating Systems, which support Java platform:
 * **Windows**, there are *.exe files for direct run. Here are the steps necessary to run the engine:
-  * Download an arbitrary UCI user interface. For example the most popular one is Arena - http://www.playwitharena.com/
+  * Download an arbitrary UCI user interface. For example the most popular one is <a href="http://www.playwitharena.com/">Arena</a>.
   * Install the UCI user interface on your computer.
   * Ensure that the Java Runtime Environment (JRE) 1.6 or later is installed on your computer (it should be the case nowadays but if not, have in mind that JRE is required, only JDK doesn't work).
   * Unpack this distribution somewhere (Arena has a sub-folder called 'engines', you can extract it there).
