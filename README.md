@@ -1,4 +1,4 @@
-# Downloads
+# <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree/master/Downloads">Downloads</a>
 
 Bagatur chess engine is one of the strongest java chess engines in the world.
 
@@ -7,7 +7,7 @@ The program runs under all Operating Systems, which support Java platform:
 - Linux, there are *.bat files for giving idea how to write bash scrip for running
 - Android, there is a program called <a href="https://play.google.com/store/apps/details?id=com.chessartforkids&hl=en">Chess Art For Kids</a> with own user interface (GUI) and using Bagatur internally as a chess engine
 
-# Sources
+# <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree/master/Sources">Sources</a>
 
 The source code is writen entirely in Java programming language.
 
