@@ -1,4 +1,4 @@
-# <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree/master/Downloads">Downloads</a>
+# <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree/master/Downloads/Engine">Downloads</a>
 
 Bagatur chess engine is one of the strongest java chess engines in the world.
 
