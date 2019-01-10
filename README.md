@@ -1,4 +1,4 @@
-![alt text](https://github.com/bagaturchess/Bagatur/blob/master/Sources/Resources/bin/engine/logo/bagaturchess9.jpg "Bagatur logo")
+(https://github.com/bagaturchess/Bagatur/blob/master/Sources/Resources/bin/engine/logo/bagaturchess9.jpg "Bagatur logo")
 
 # Overview
 
