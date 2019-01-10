@@ -1,3 +1,5 @@
+![alt text](https://github.com/bagaturchess/Bagatur/blob/master/Sources/Resources/bin/engine/logo/bagaturchess9.jpg "Bagatur logo")
+
 # Overview
 
 Bagatur chess engine is one of the strongest Java chess engines in the world.
