@@ -14,7 +14,7 @@ The <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree
 
 # ELO Rating
 
-The ELO <a href="http://www.computerchess.org.uk/ccrl/4040/cgi/compare_engines.cgi?family=Bagatur">rating</a> is an important metric for a chess engine.
+The <a href="http://www.computerchess.org.uk/ccrl/4040/cgi/compare_engines.cgi?family=Bagatur">ELO rating</a> is an important metric for a chess engine.
 
 # Author
 
