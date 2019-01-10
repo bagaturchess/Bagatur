@@ -16,6 +16,13 @@ The <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree
 
 The <a href="http://www.computerchess.org.uk/ccrl/4040/cgi/compare_engines.cgi?family=Bagatur">ELO rating</a> is an important metric for a chess engine.
 
+# Machine Learning experiments
+
+There are some code examples of experiments with the <a href="http://neuroph.sourceforge.net/">neuroph</a>-2.94 library.
+The starting point is located <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/src/bagaturchess/deeplearning/run">here</a>.
+Although the ELO strength is with 50 ELO less than the version with manually tuned parameters, the results are successful meaning that the neural network's backpropagation algorithm works as expected.
+This makes the experiments a good showcase of <a href="http://neuroph.sourceforge.net/">neuroph</a> library.
+
 # Author
 
 The author of Bagatur engine is <a href="https://www.linkedin.com/in/topchiyski/">Krasimir Topchiyski</a>.
