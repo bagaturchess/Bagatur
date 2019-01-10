@@ -6,10 +6,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Search"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/LearningAPI"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UCI"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/UCITracker"/>
 	<classpathentry kind="lib" path="lib/neuroph-core-2.94.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang3-3.8.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-nop-1.7.6.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/UCITracker"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

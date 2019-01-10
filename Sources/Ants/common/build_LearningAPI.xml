@@ -6,7 +6,7 @@
 	
 	<property name="project_name" value="BagaturLearningAPI" />
 	<property name="project_root" value="${learningAPI_dir}" />
-	<property name="classpath" value="${work_dir}/BagaturBoard.jar;${work_dir}/BagaturSearch.jar;${learningAPI_dir}/lib/neuroph-core-2.94.jar" />
+	<property name="classpath" value="${work_dir}/BagaturBoard.jar;${work_dir}/BagaturSearch.jar" />
 	<property name="src" location="${project_root}/src" />
 
 	
