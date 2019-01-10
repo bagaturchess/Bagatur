@@ -1,14 +1,13 @@
 theme: jekyll-theme-hacker
-url: "http://bagaturchess.github.io/Bagatur/"
+url: "http://bagaturchess.github.io"
 baseurl: "/Bagatur"
-title: Bagatur Chess Engine in Java
-description: The page of Bagatur Chess Engine in Java
+title: Bagatur
+description: Java Chess Engine
 
 # Site Author
 author:
   name             : "Krasimir Topchiyski"
   avatar           : "https://github.com/bagaturchess/Bagatur/blob/master/Sources/Resources/bin/engine/logo/bagaturchess9.jpg"
-  bio              : "A global community of volunteers."
   location         : "Bulgaria"
   email            : "k_topchiyski@yahoo.com"
   facebook         : "Krasimir Topchiyski"
