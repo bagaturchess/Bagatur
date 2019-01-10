@@ -16,7 +16,7 @@ The <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree
 
 The <a href="http://www.computerchess.org.uk/ccrl/4040/cgi/compare_engines.cgi?family=Bagatur">ELO rating</a> is an important metric for a chess engine.
 
-# Machine Learning experiments
+# Artificial Intelligence & Machine Learning
 
 There are some code examples of experiments with the <a href="http://neuroph.sourceforge.net/">neuroph</a>-2.94 library.
 The starting point is located <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/src/bagaturchess/deeplearning/run">here</a>.
