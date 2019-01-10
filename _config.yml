@@ -7,7 +7,7 @@ description: Java Chess Engine
 # Site Author
 author:
   name             : "Krasimir Topchiyski"
-  avatar           : "https://github.com/bagaturchess/Bagatur/blob/master/Sources/Resources/bin/engine/logo/bagaturchess9.jpg"
+  avatar           : "/blob/master/Sources/Resources/bin/engine/logo/bagaturchess9.jpg"
   location         : "Bulgaria"
   email            : "k_topchiyski@yahoo.com"
   facebook         : "Krasimir Topchiyski"
