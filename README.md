@@ -1,12 +1,27 @@
+
+# Overview
+
+Bagatur chess engine is one of the strongest Java chess engines in the world.
+It is also available for Android via <a href="https://play.google.com/store/apps/details?id=com.chessartforkids">Chess Art For Kids</a> game, which has its own user interface (demo <a href="https://www.youtube.com/watch?v=tOrsN8fCr7Q">video1</a>, <a href="https://www.youtube.com/watch?v=e6XDen8vLtc">video2</a>).
+
 # Downloads
 
-Bagatur chess engine is one of the strongest java chess engines in the world.
-
-The program runs under all Operating Systems, which support Java platform:
-- Windows, there are *.exe files for direct run
-- Linux, there are *.bat files for giving idea how to write bash scrip for running
-- Android, there is a program called <a href="https://play.google.com/store/apps/details?id=com.chessartforkids&hl=en">Chess Art For Kids</a> with own user interface (GUI) and using Bagatur internally as a chess engine
+The <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree/master/Downloads/Engine">latest release</a> runs under all Operating Systems, which support Java platform.
 
 # Sources
 
-The source code is writen entirely in Java programming language.
+The <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree/master/Sources">source code</a> is writen entirely in Java programming language.
+
+# ELO Rating
+
+The <a href="http://www.computerchess.org.uk/ccrl/4040/cgi/compare_engines.cgi?family=Bagatur">ELO rating</a> is an important metric for a chess engine.
+
+# Machine Learning
+
+There are some code examples of Artificial Intelligence / Machine Learning experiments with the <a href="http://neuroph.sourceforge.net/">Neuroph</a> 2.94 Java framework.
+The starting point into the source code is located <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/src/bagaturchess/deeplearning/run">here</a>.
+Although the ELO strength of the experimential version is with 50 ELO less than the version with the manually tuned evaluation function's parameters, the results are successful meaning that the neural network's <a href="https://en.wikipedia.org/wiki/Backpropagation">backpropagation</a> algorithm works as expected for <a href="https://en.wikipedia.org/wiki/Multilayer_perceptron">multi layer perceptron</a> neural network. This makes the experiments a good showcase of <a href="http://neuroph.sourceforge.net/">Neuroph</a> Java framework.
+
+# Author
+
+The author of Bagatur engine is <a href="https://www.linkedin.com/in/topchiyski/">Krasimir Topchiyski</a>.
