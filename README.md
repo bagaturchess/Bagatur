@@ -3,7 +3,7 @@
 # Overview
 
 Bagatur chess engine is one of the strongest Java chess engines in the world.
-It is also available for android via <a href="https://play.google.com/store/apps/details?id=com.chessartforkids">Chess Art For Kids</a> game, which has its own user interface (GUI) and is using Bagatur internally as a chess engine.
+It is also available for android via <a href="https://play.google.com/store/apps/details?id=com.chessartforkids">Chess Art For Kids</a> game, which has its own user interface (GUI) and is using Bagatur internally as a chess engine (demo <a href="https://www.youtube.com/watch?v=tOrsN8fCr7Q">video1</a>, <a href="https://www.youtube.com/watch?v=jUO4BDXQFXc">video2</a>).
 
 # Downloads
 
