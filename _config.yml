@@ -27,4 +27,4 @@ plugins:
   - jekyll-gist
   - jekyll-feed
   - jekyll-redirect-from
-  
+  - jekyll-feed
