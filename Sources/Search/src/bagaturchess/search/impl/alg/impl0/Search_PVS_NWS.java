@@ -755,7 +755,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						 //&& !mateThreat
 						 //&& !isCapOrProm
 						 && moveSee < 0
-						 //&& rest > 3
+						 && rest > 3
 						) {
 						
 						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
@@ -1424,7 +1424,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						 //&& !mateThreat
 						 //&& !isCapOrProm
 						 && moveSee < 0
-						 //&& rest > 3
+						 && rest > 3
 						) {
 						
 						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
