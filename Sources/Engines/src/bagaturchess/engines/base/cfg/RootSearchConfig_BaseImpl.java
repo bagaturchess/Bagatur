@@ -27,6 +27,14 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	protected static final double MEM_USAGE_GTB 		= 0.01;
 	
 	/*
+	protected static final double MEM_USAGE_TPT 		= 0.43;
+	protected static final double MEM_USAGE_TPT_QS		= 0.01;
+	protected static final double MEM_USAGE_EVALCACHE 	= 0.25;
+	protected static final double MEM_USAGE_PAWNCACHE 	= 0.30;
+	protected static final double MEM_USAGE_GTB 		= 0.01;
+	*/
+	
+	/*
 	protected static final double MEM_USAGE_TPT 		= 0.55;
 	protected static final double MEM_USAGE_EVALCACHE 	= 0.20;
 	protected static final double MEM_USAGE_PAWNCACHE 	= 0.20;
