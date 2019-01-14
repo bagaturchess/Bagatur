@@ -1,9 +1,4 @@
 
-
-For the latest and greatest version of this readme file you can visit the SVN repository and check the Ants sub-project:
-SVN repository https://bagaturchess.svn.sourceforge.net/svnroot/bagaturchess
-
-
 As a chess player,
 you want to play chess against a computer program (chess engine) which is able to be integrated inside UCI compliant user interfaces (like Arena).
 This distribution is exactly what you want.
@@ -15,10 +10,6 @@ Here are the steps necessary to run the engine:
 4. Unpack this distribution somewhere (Arena has a sub-folder called 'engines', you can extract it there).
 6. Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway). You may use win32 or win64 version depending on your choice.
 7. E2-E4 and enjoy :-)
-
-
-Have a nice usage ... and feel free to contribute http://sourceforge.net/projects/bagaturchess/develop
-
 
 Hints:
   1. Bagatur needs at least 64M of memory to run.
@@ -46,7 +37,7 @@ Hints:
 
 
 Credits:
-  I am working on this program for 15 years in my spare time as a hobby.
+  I am working on this program since 2005 in my spare time as a hobby.
   In the beginning there were not a lot in the Internet, although, most of the time I purposely avoided heaving look at the
   other open source softwares and articles regarding the search and game theory.
   Because of that, in many aspects I have re-invented the wheel.

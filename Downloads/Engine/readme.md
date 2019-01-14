@@ -16,6 +16,11 @@ The program runs under all Operating Systems, which support Java platform:
 
 # Revision History
 
+Version 1.5g (14 January 2019)
+  * 20 ELO stronger (measured versus 1.5f)
+  * Memory management improvements - more memory for the transposition table
+  * Use LMR for remaining depth > 3
+
 Version 1.5f (31 October 2018)
   * 15 ELO stronger (measured versus 1.5e)
   * Time management improvements

@@ -1,9 +1,11 @@
 
-Version 1.5g (10 November 2018)
+Version 1.5g (14 January 2019)
+  * 20 ELO stronger (measured versus 1.5f)
   * Memory management improvements - more memory for the transposition table
+  * Use LMR for remaining depth > 3
 
 Version 1.5f (31 October 2018)
-  * 50 ELO stronger (measured versus 1.5e)
+  * 15 ELO stronger (measured versus 1.5e)
   * Time management improvements
   * Singular move extension implemented
   * Optimizations of quiescence search - it search all capture moves
