@@ -11,3 +11,8 @@ This source distribution is exactly what you want. It is an eclipse workspace wi
 - Import the existing projects into the Eclipse workspace.
 - Run the main class bagaturchess.engines.run.MTDSchedulerMain (it is inside the EnginesRunner sub-project).
 
+# Interesting sources
+
+- Board representation: <a href="https://github.com/bagaturchess/Bagatur/blob/master/Sources/Bitboard/src/bagaturchess/bitboard/impl/Board.java">link</a>
+- Evaluation function: <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/src/bagaturchess/learning/goldmiddle/impl/cfg/bagatur_allfeatures/eval">link</a>
+- Search algorithm: <a href="https://github.com/bagaturchess/Bagatur/blob/master/Sources/Search/src/bagaturchess/search/impl/alg/impl0/Search_PVS_NWS.java">link</a>
