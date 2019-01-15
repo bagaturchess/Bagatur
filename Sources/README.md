@@ -13,6 +13,6 @@ This source distribution is exactly what you want. It is an eclipse workspace wi
 
 # Interesting sources
 
-- Board representation: <a href="https://github.com/bagaturchess/Bagatur/blob/master/Sources/Bitboard/src/bagaturchess/bitboard/impl/Board.java">link</a>
-- Evaluation function: <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/src/bagaturchess/learning/goldmiddle/impl/cfg/bagatur_allfeatures/eval">link</a>
-- Search algorithm: <a href="https://github.com/bagaturchess/Bagatur/blob/master/Sources/Search/src/bagaturchess/search/impl/alg/impl0/Search_PVS_NWS.java">link</a>
+- <a href="https://github.com/bagaturchess/Bagatur/blob/master/Sources/Bitboard/src/bagaturchess/bitboard/impl/Board.java">Board representation</a>
+- <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/src/bagaturchess/learning/goldmiddle/impl/cfg/bagatur_allfeatures/eval">Evaluation function</a>
+- <a href="https://github.com/bagaturchess/Bagatur/blob/master/Sources/Search/src/bagaturchess/search/impl/alg/impl0/Search_PVS_NWS.java">Search algorithm</a>
