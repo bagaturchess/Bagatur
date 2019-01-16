@@ -1,5 +1,5 @@
 
-Version 1.1 (28 February 2013)
+Version 1.1.0 (28 February 2013)
   * Added support for Gaviota endgame table bases in Java (a.k.a. egtb), based on http://sourceforge.net/projects/egtb-in-java
   * Added UCI Tracker tool - capture games of any UCI chess engine and stores them into file for different purposes (e.g. experiment with artificial intelligence algorithms)
   * Improvements in readme files
