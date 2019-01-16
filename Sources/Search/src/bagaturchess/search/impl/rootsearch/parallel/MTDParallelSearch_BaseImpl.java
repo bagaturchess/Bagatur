@@ -324,7 +324,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							
 							
 							//Collect all major infos, put them in searchersInfo, and send the best info if available
-							boolean hasSendInfo = collectAndSendInfos(final_mediator,	mediators_bucket, searchersInfo);
+							boolean hasSendInfo = collectAndSendInfos(final_mediator, mediators_bucket, searchersInfo);
 							
 							
 							for (int i = 0; i < searchers_ready.size(); i++) {
