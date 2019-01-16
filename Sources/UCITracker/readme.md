@@ -15,9 +15,9 @@ or any other similar methods.
 
 # How to run
 
-There are two main classes in the <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/UCITracker/src/bagaturchess/ucitracker/run/GamesGenerator.java">run package</a>:
-1. GamesGenerator - this one, generates and saves the games by given parameters (engine path, output file and games count)
-2. GamesTraverser - traverse all the games saved in a specified file and calls your own implementation of PositionsVisitor interface
+There are two main classes in the run package:
+- <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/UCITracker/src/bagaturchess/ucitracker/run/GamesGenerator.java">GamesGenerator</a> - this one, generates and saves the games by given parameters (engine path, output file and games count)
+- <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/UCITracker/src/bagaturchess/ucitracker/run/GamesTraverser.java">GamesTraverser</a> - traverse all the games saved in a specified file and calls your own implementation of PositionsVisitor interface
 					by calling its visitPosition(IBitBoard bitboard, IGameStatus status, int eval) method.
 
 For the last time I have used this tool to run Houdini_15a_w32.exe engine. For 12 hours (1 night) it generated 10 000 games, which
