@@ -32,23 +32,25 @@ link_type: jurl
 sidebar:
     menu:
         home:
-            title: global.home
+            title: "Home"
             url: /
             icon: home
         categories:
-            title: global.categories
-            url: /all-categories
+            title: "Home"
+            url: /
             icon: bookmark
         tags:
-            title: global.tags
-            url: /all-tags
+            title: "Home"
+            url: /
             icon: tags
             
 plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
-  - jekyll-paginate
   - jekyll-gist
   - jekyll-feed
   - jekyll-redirect-from
-  - jekyll-feed
+  - jekyll-avatar
+  - jemoji
+  - jekyll-mentions
+ 
