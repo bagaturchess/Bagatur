@@ -20,6 +20,30 @@ bing_site_verification   :
 alexa_site_verification  :
 yandex_site_verification :
 
+############# AUTOMATED LINKS #############
+# the links.html script requires you to list your sidebars here. this is if you're using managed links (see jekyllhowto-content-and-formatting.html#automatedlinks)
+sidebars:
+  - generic
+  - jekyllhowto
+
+# determines whether the links.html script uses the jurl or hurl values in the sidebar data file
+link_type: jurl
+
+sidebar:
+    menu:
+        home:
+            title: global.home
+            url: /
+            icon: home
+        categories:
+            title: global.categories
+            url: /all-categories
+            icon: bookmark
+        tags:
+            title: global.tags
+            url: /all-tags
+            icon: tags
+            
 plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
