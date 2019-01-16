@@ -13,12 +13,14 @@ and is available latter by the programming API written in java. One possible usa
 realization of artificial intelligence's techniques for machine learning like 'Temporal difference learning'
 or any other similar methods.
 
+# How to run
+
 There are two main classes in the run package:
 1. GamesGenerator - this one, generates and saves the games by given parameters (engine path, output file and games count)
 2. GamesTraverser - traverse all the games saved in a specified file and calls your own implementation of PositionsVisitor interface
 					by calling its visitPosition(IBitBoard bitboard, IGameStatus status, int eval) method.
 
-For the last time i have used this tool to run Houdini_15a_w32.exe engine. For 12 hours (1 night) it generates 10 000 games which
+For the last time I have used this tool to run Houdini_15a_w32.exe engine. For 12 hours (1 night) it generated 10 000 games, which
 contained more than 30 000 000 positions (+ their evaluations provided by Houdini).
 After that the traverser succeeded to iterate all of them for less then 90 seconds.
 
