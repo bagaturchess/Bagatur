@@ -20,42 +20,6 @@ bing_site_verification   :
 alexa_site_verification  :
 yandex_site_verification :
 
-docs_list_title: ACME Documentation
-docs:
-
-- title: Introduction
-  url: introduction.html
-
-- title: Configuration
-  url: configuration.html
-
-- title: Deployment
-  url: deployment.html
-  
-############# AUTOMATED LINKS #############
-# the links.html script requires you to list your sidebars here. this is if you're using managed links (see jekyllhowto-content-and-formatting.html#automatedlinks)
-sidebars:
-  - generic
-  - jekyllhowto
-
-# determines whether the links.html script uses the jurl or hurl values in the sidebar data file
-link_type: jurl
-
-sidebar:
-    menu:
-        home:
-            title: "Home"
-            url: /
-            icon: home
-        categories:
-            title: "Home"
-            url: /
-            icon: bookmark
-        tags:
-            title: "Home"
-            url: /
-            icon: tags
-            
 plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
@@ -65,4 +29,4 @@ plugins:
   - jekyll-avatar
   - jemoji
   - jekyll-mentions
- 
+  
