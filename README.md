@@ -26,7 +26,7 @@ Although the ELO strength of the experimential version is with 50 ELO less than 
 
 The author of Bagatur engine is <a href="https://www.linkedin.com/in/topchiyski/">Krasimir Topchiyski</a>.
 
-# Documentation
+# Links
 
 - <a href="http://bagaturchess.github.io/Bagatur/Sources/">Sources</a>
 - <a href="http://bagaturchess.github.io/Bagatur/Downloads/Engine/">Downloads</a>
