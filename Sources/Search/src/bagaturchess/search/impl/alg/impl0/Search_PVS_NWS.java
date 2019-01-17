@@ -256,6 +256,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPT().lock();
 			{
 				TPTEntry tptEntry = env.getTPT().get(hashkey);
+				if (tptEntry == null) {
+					tptEntry = env.getTPTQS().get(hashkey);
+				}
 				if (tptEntry != null) {
 					tpt_found = true;
 					tpt_exact = tptEntry.isExact();
@@ -343,6 +346,63 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			
 			if (inCheck) {
 				throw new IllegalStateException("inCheck: depth >= normDepth(maxdepth)");
+			}
+			
+			if (tpt_found) {
+				if (tpt_exact) {
+					if (!SearchUtils.isMateVal(tpt_lower)) {
+						node.bestmove = tpt_move;
+						node.eval = tpt_lower;
+						node.leaf = true;
+						node.nullmove = false;
+						
+						env.getTPT().lock();
+						buff_tpt_depthtracking[0] = 0;
+						extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
+						env.getTPT().unlock();
+						
+						if (buff_tpt_depthtracking[0] >= rest) {
+							return node.eval;
+						}
+					}
+				} else {
+					if (tpt_lower >= beta) {
+						if (!SearchUtils.isMateVal(tpt_lower)) {
+							node.bestmove = tpt_move;
+							node.eval = tpt_lower;
+							node.leaf = true;
+							node.nullmove = false;
+							
+							
+							env.getTPT().lock();
+							buff_tpt_depthtracking[0] = 0;
+							extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
+							env.getTPT().unlock();
+							
+							if (buff_tpt_depthtracking[0] >= rest) {
+								return node.eval;
+							}
+						}
+					}
+					if (tpt_upper <= beta - 1) {
+						if (!SearchUtils.isMateVal(tpt_upper)) {
+							node.bestmove = tpt_move;
+							node.eval = tpt_upper;
+							node.leaf = true;
+							node.nullmove = false;
+							
+							
+							env.getTPT().lock();
+							buff_tpt_depthtracking[0] = 0;
+							extractFromTPT(info, rest, node, false, buff_tpt_depthtracking, rootColour, env.getTPT());
+							env.getTPT().unlock();
+							
+							if (buff_tpt_depthtracking[0] >= rest) {
+								return node.eval;
+							}
+						}
+					}
+				}
 			}
 			
 			node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
@@ -441,6 +501,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						env.getTPT().lock();
 						{
 							TPTEntry tptEntry = env.getTPT().get(hashkey);
+							if (tptEntry == null) {
+								tptEntry = env.getTPTQS().get(hashkey);
+							}
 							if (tptEntry != null) {
 								tpt_found = true;
 								tpt_exact = tptEntry.isExact();
@@ -504,6 +567,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
 					TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
+					if (tptEntry == null) {
+						tptEntry = env.getTPTQS().get(env.getBitboard().getHashKey());
+					}
 					if (tptEntry != null) {
 						tpt_found = true;
 						tpt_exact = tptEntry.isExact();
@@ -562,6 +628,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		{
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
+			if (tptEntry == null) {
+				tptEntry = env.getTPTQS().get(backtrackingInfo.hash_key);
+			}
 			env.getTPT().unlock();
 			
 	        if (depth > 0
@@ -1000,6 +1069,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPT().lock();
 			{
 				TPTEntry tptEntry = env.getTPT().get(hashkey);
+				if (tptEntry == null) {
+					tptEntry = env.getTPTQS().get(hashkey);
+				}
 				if (tptEntry != null) {
 					tpt_found = true;
 					tpt_exact = tptEntry.isExact();
@@ -1048,6 +1120,25 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			
 			if (inCheck) {
 				throw new IllegalStateException();
+			}
+			
+			if (tpt_found) {
+				if (tpt_exact) {
+					if (!SearchUtils.isMateVal(tpt_lower)) {
+						return tpt_lower;
+					}
+				} else {
+					if (tpt_lower >= beta) {
+						if (!SearchUtils.isMateVal(tpt_lower)) {
+							return tpt_lower;
+						}
+					}
+					if (tpt_upper <= beta - 1) {
+						if (!SearchUtils.isMateVal(tpt_upper)) {
+							return tpt_upper;
+						}
+					}
+				}
 			}
 			
 			int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, rootColour);
@@ -1130,6 +1221,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						env.getTPT().lock();
 						{
 							TPTEntry tptEntry = env.getTPT().get(hashkey);
+							if (tptEntry == null) {
+								tptEntry = env.getTPTQS().get(hashkey);
+							}
 							if (tptEntry != null) {
 								tpt_found = true;
 								tpt_exact = tptEntry.isExact();
@@ -1192,6 +1286,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
 					TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
+					if (tptEntry == null) {
+						tptEntry = env.getTPTQS().get(env.getBitboard().getHashKey());
+					}
 					if (tptEntry != null) {
 						tpt_found = true;
 						tpt_exact = tptEntry.isExact();
@@ -1239,6 +1336,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		{
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
+			if (tptEntry == null) {
+				tptEntry = env.getTPTQS().get(backtrackingInfo.hash_key);
+			}
 			env.getTPT().unlock();
 			
 	        if (depth > 0
@@ -1658,6 +1758,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPTQS().lock();
 			{
 				TPTEntry tptEntry = env.getTPTQS().get(hashkey);
+				if (tptEntry == null) {
+					tptEntry = env.getTPT().get(hashkey);
+				}
 				if (tptEntry != null) {
 					tpt_found = true;
 					tpt_exact = tptEntry.isExact();
@@ -1963,6 +2066,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPTQS().lock();
 			{
 				TPTEntry tptEntry = env.getTPTQS().get(hashkey);
+				if (tptEntry == null) {
+					tptEntry = env.getTPT().get(hashkey);
+				}
 				if (tptEntry != null) {
 					tpt_found = true;
 					tpt_exact = tptEntry.isExact();
