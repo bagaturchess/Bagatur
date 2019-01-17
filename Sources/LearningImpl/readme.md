@@ -9,4 +9,4 @@ If you want to run one of the supervised learning <a href="https://github.com/ba
 # Interesting sources
 - <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/src/bagaturchess/deeplearning/run">Main classes</a>, which iterate the training set. They are for three different networks, which have different features.
 - <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/src/bagaturchess/deeplearning/impl/visitors">Position visitors</a>, which iterate the positions and apply the learning with training sets. They also print the current accuracy.
-- <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/src/bagaturchess/deeplearning/api">Utility classes</a>, which creates the Multilayer perceptron and fill the initial input signals.
+- <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/src/bagaturchess/deeplearning/api">Utility classes</a>, which create the Multilayer perceptron and fill the initial input signals.
