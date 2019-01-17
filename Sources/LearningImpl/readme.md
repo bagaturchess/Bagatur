@@ -1,3 +1,3 @@
 # Overview
 
-The LearningImpl project is using Neuroph Java framework in order to apply supervised machine learning and tune Bagatur's evaluation function.
+The LearningImpl project is using Neuroph Java framework in order to apply supervised machine learning and tune Bagatur's evaluation function. If you want to run the supervised learning main class first you have to generate training chess positions with evaluations using the UCITracker project, which saves these positions in a file. For that purpose you need a strong chess engine like Stockfish, Komodo, Houdini or other. Than the UCITracker is used to run self play games of that engine and track down the positions played and their evaluations so the supervised learning can take place.
