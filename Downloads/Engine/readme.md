@@ -16,6 +16,12 @@ The program runs under all Operating Systems, which support Java platform:
 
 # Revision History
 
+Version 1.6 (17 January 2019)
+  * 15 ELO stronger (measured versus 1.5g)
+  * Separate transposition tables for search and qsearch for better memory management
+  * Use both transposition tables when probing position
+  * If presented use transposition table scores before qsearch
+
 Version 1.5g (14 January 2019)
   * 20 ELO stronger (measured versus 1.5f)
   * Memory management improvements - more memory for the transposition table
