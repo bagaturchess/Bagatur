@@ -1,6 +1,6 @@
 # Overview
 
-The LearningImpl project is using Neuroph Java framework in order to apply supervised machine learning and tune the Bagatur's evaluation function. It is using multilayer perceptron (MLP) feedforward artificial neural network.
+The LearningImpl project is using Neuroph Java framework in order to apply supervised machine learning and tune the Bagatur's evaluation function. It is using <a href="https://en.wikipedia.org/wiki/Multilayer_perceptron">Multilayer perceptron (MLP)</a> feedforward artificial neural network.
 
 # How to run
 
