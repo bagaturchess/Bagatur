@@ -10,7 +10,7 @@ The program runs under all Operating Systems, which support Java platform:
   * Unpack this distribution somewhere (Arena has a sub-folder called 'engines', you can extract it there).
   * Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway). You may use win32 or win64 version depending on your choice.
   * E2-E4 and enjoy :-)
-* **Linux**, there are *.bat files for giving idea how to write bash scrip for running
+* **Linux**, in the bin directory there are *.bat files for giving you idea how to write bash scrip for running
 * **Android**, there is a program called <a href="https://play.google.com/store/apps/details?id=com.chessartforkids&hl=en">Chess Art For Kids</a> with own user interface (GUI) and using Bagatur internally as a chess engine
 
 
