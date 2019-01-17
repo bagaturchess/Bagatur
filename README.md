@@ -29,7 +29,7 @@ The author of Bagatur engine is <a href="https://www.linkedin.com/in/topchiyski/
 # Documentation
 
 - <a href="http://bagaturchess.github.io/Bagatur/Sources/">Sources</a>
-- <a href="http://bagaturchess.github.io/Bagatur/Downloads/">Downloads</a>
+- <a href="http://bagaturchess.github.io/Bagatur/Downloads/Engine/">Downloads</a>
 - <a href="http://bagaturchess.github.io/Bagatur/Sources/LearningImpl/">Machine Learning / LearningImpl</a>
 - <a href="http://bagaturchess.github.io/Bagatur/Sources/UCITracker/">Machine Learning / UCITracker</a>
 
