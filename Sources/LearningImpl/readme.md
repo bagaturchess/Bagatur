@@ -15,4 +15,4 @@ For that purpose you need a strong chess engine like Stockfish, Komodo, Houdini 
 
 # Details
 
-TBD
+- <a href="https://github.com/bagaturchess/Bagatur/blob/master/Sources/LearningImpl/src/bagaturchess/deeplearning/impl/visitors/DeepLearningVisitorImpl_PST.java">DeepLearningVisitorImpl_PST.java</a> is optimizing the piece square tables (PST) only. It leads to weaker version but still playing good chess. The filling of network inputs could be found in <a href="https://github.com/bagaturchess/Bagatur/blob/master/Sources/LearningImpl/src/bagaturchess/deeplearning/api/NeuralNetworkUtils_PST.java">NeuralNetworkUtils_PST.java</a>
