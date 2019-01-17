@@ -10,8 +10,8 @@ runs arbitrary chess engines like any other UCI platform (e.g. Arena).
 It is designed to be used in order to track down the PVs (best lines) and evaluations of UCI chess engine
 during random tournaments (self-play). All the information is saved as file on the file system
 and is available latter by the programming API written in java. One possible usage of this tool is for
-realization of artificial intelligence's techniques for machine learning like 'Temporal difference learning'
-or any other similar methods.
+realization of artificial intelligence's techniques for machine learning like <a href="https://en.wikipedia.org/wiki/Temporal_difference_learning">Temporal Difference Learning</a>, 
+or any other similar methods for <a href="https://en.wikipedia.org/wiki/Supervised_learning">Supervised Learning</a>.
 
 # How to run
 
@@ -24,4 +24,4 @@ For the last time I have used this tool to run Houdini_15a_w32.exe engine. For 1
 contained more than 30 000 000 positions (+ their evaluations provided by Houdini).
 After that the traverser succeeded to iterate all of them for less then 90 seconds.
 
-Extremely useful tool for the fans of Artificial Intelligence and Machine Learning!
+Extremely useful tool for the fans of chess, artificial Intelligence and machine Learning!
