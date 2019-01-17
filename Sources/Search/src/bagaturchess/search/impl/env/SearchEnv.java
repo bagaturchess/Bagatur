@@ -143,14 +143,14 @@ public class SearchEnv {
 	
 	
 	public TPTable getTPTQS() {
-		/*if (tpt_qs == null) {
+		if (tpt_qs == null) {
 			tpt_qs = shared.getAndRemoveTPTQS();
 		}
-		return tpt_qs;*/
-		if (tpt == null) {
+		return tpt_qs;
+		/*if (tpt == null) {
 			tpt = shared.getAndRemoveTPT();
 		}
-		return tpt;
+		return tpt;*/
 	}
 	
 	
