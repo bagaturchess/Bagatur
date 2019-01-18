@@ -1,6 +1,6 @@
 # Overview
 
-The **LearningImpl** project is using <a href="http://neuroph.sourceforge.net/">Neuroph</a> Java framework in order to apply supervised machine learning and tune the Bagatur's evaluation function.
+The <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl">LearningImpl</a> project is using <a href="http://neuroph.sourceforge.net/">Neuroph</a> Java framework in order to apply supervised machine learning and tune the Bagatur's evaluation function.
 It is using <a href="https://en.wikipedia.org/wiki/Multilayer_perceptron">Multilayer perceptron (MLP)</a> feedforward artificial neural network. It has one layer with many features as the evaluation function becomes too slow to calculate with more layers and cannot compensate the better quality achieved by more layers.  
 
 # How to run
