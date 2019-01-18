@@ -3,7 +3,7 @@
 
 As a java programmer interested in chess,
 you want to capture games in a binary format of any chess engine, so later you could iterate this games for different purposes.
-This software tool is designed to help you in that direction.
+This software tool is designed to help you in that direction (the <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/UCITracker">source code</a>).
 
 The tool acts as program which understands the UCI protocol and
 runs arbitrary chess engines like any other UCI platform (e.g. Arena).
