@@ -6,7 +6,7 @@ It is also available for Android via <a href="https://play.google.com/store/apps
 
 # Downloads
 
-The <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree/master/Downloads/Engine">latest release</a> runs under all Operating Systems, which support Java platform. It is not a complete chess program and requires a UCI-compatible GUI (e.g. XBoard with PolyGlot, Scid, Cute Chess, eboard, Arena, Sigma Chess, Shredder, Chess Partner or Fritz) in order to be used comfortably. Read the documentation for your GUI of choice for information about how to use Bagatur with it.
+The <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree/master/Downloads/Engine">latest release</a> runs under all Operating Systems, which support Java platform.
 
 # Sources
 
