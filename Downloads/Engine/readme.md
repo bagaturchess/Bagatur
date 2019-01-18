@@ -2,7 +2,7 @@
 
 # Running the Program
 
-The program runs under all Operating Systems, which support Java platform:
+The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engine/">downloads</a> of the program runs under all Operating Systems, which support Java platform:
 * **Windows**, there are *.exe files for direct run. Here are the steps necessary to run the engine:
   * Download an arbitrary UCI user interface. For example the most popular one is <a href="http://www.playwitharena.com/">Arena</a>.
   * Install the UCI user interface on your computer.
