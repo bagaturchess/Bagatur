@@ -17,7 +17,7 @@ public class GamesTraverser {
 			//String filePath = "./DATA/Houdini.15a.cg";
 			//String filePath = "./stockfish-9.cg";
 			//String filePath = "./glaurung-2.2.cg";
-			String filePath = "./texel-107.cg";
+			String filePath = "./stockfish-10.cg";
 			
 			PositionsTraverser.traverseAll(filePath, new PositionsVisitorImpl());
 			
