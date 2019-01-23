@@ -188,16 +188,21 @@ public class Features {
 	}
 	
 	public static Features load() {
+		return load(FEATURES_FILE_NAME);
+	}
+	
+	
+	public static Features load(String fileName) {
 		List<IFeature> result = null;//new TreeSet<IFeature>();
 		//System.out.println("Path=" + (new File(".")).getAbsolutePath());
 		try {
-			File org = new File(FEATURES_FILE_NAME);
+			File org = new File(fileName);
 			if (!org.exists()) {
 				System.out.println("FeaturesPersistency.load: org not found");
-				File backup = new File(FEATURES_FILE_NAME + FEATURES_FILE_NAME_BACKUP_SUFFIX);
+				File backup = new File(fileName + FEATURES_FILE_NAME_BACKUP_SUFFIX);
 				if (!backup.exists()) {
 					System.out.println("FeaturesPersistency.load: backup not found");
-					System.out.println("FILE NOT FOUND: " + FEATURES_FILE_NAME + ", probably it will be created later.");
+					System.out.println("FILE NOT FOUND: " + fileName + ", probably it will be created later.");
 				} else {
 					System.out.print("FeaturesPersistency.load: rename backup to org - ");
 					boolean ok = backup.renameTo(org);
@@ -206,7 +211,7 @@ public class Features {
 			}
 			
 			//System.out.println("FeaturesPersistency.load: reading binary");
-			InputStream is = new FileInputStream(FEATURES_FILE_NAME);
+			InputStream is = new FileInputStream(fileName);
 			ObjectInputStream ois = new ObjectInputStream(is);
 			
 			IFeature cur_f = null;
