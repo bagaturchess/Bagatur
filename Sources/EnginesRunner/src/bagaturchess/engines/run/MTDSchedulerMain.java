@@ -29,6 +29,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.BoardUtils;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.engines.bagatur.cfg.time.TimeConfigImpl;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP;
@@ -112,11 +113,14 @@ public class MTDSchedulerMain {
 								//bagaturchess.engines.cuckooadapter.BoardConfigImpl_Cuckoo.class.getName(),
 								//bagaturchess.engines.cuckooadapter.EvaluationConfg_Cuckoo.class.getName()
 								
-								bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl.class.getName(),
-								bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig.class.getName(),
+								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl.class.getName(),
+								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig.class.getName(),
 								//bagaturchess.deeplearning.impl.eval.pst.EvaluationConfig.class.getName()
 								//bagaturchess.deeplearning.impl.eval.allfeatures.EvaluationConfig.class.getName()
 								//bagaturchess.deeplearning.impl.eval.past_and_allfeatures.EvaluationConfig.class.getName()
+								
+								bagaturchess.engines.chess22kadapter.BoardConfigImpl_Chess22k.class.getName(),
+								bagaturchess.engines.chess22kadapter.EvaluationConfg_Chess22k.class.getName()
 								}
 				);
 		
@@ -154,13 +158,13 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard  = new Board("1r6/4k3/1pbpPb1p/p1p2P2/2Pp3p/3P3P/2P2RP1/R6K b - - 3 39", null/*sharedData.getAndRemovePawnsCache()*/, cfg.getBoardConfig());
 		
 		
-		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
+		IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
 		//BoardUtils.playGameUCI(bitboard, "e2e4 e7e6 d2d4 d7d5 e4e5 c7c5 c2c3 b8c6 g1f3 c8d7 a2a3 g8e7 f1d3 c5d4 c3d4 d8b6 d3c2 e7f5 c2f5 e6f5 e1g1 d7e6 b1c3 h7h6 b2b4 f8e7 c1e3 e8g8 a1c1 a8c8 d1d3 g7g5 c3a4 b6d8 e3d2 f5f4 h2h3 d8d7 b4b5 c6b8 a4c5 e7c5 d4c5 e6f5 d3b3 d5d4 h3h4 f5e4 h4g5 e4f3 b3f3 h6g5 f1e1 a7a6 a3a4 a6b5 a4b5 f8e8 f3d3 d7d5 c1c4 e8e5 e1e5 d5e5 c4d4 c8c5 d4d8 g8g7 d3a3 g7f6 d2b4 b8c6 b5c6 c5c6 d8d7 b7b6");
 		
 		//IBitBoard bitboard = new Board("r4rk1/pp3ppp/2pq4/3p4/4nPb1/2BBP3/PPP3PP/R3QRK1 w - - 2 15", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
-		IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
+		//IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("7k/6r1/8/8/8/8/1Q6/K7 w - -", null, cfg.getBoardConfig()); //Queen and King vs. Rook and King
 		//IBitBoard bitboard  = new Board("k7/1q6/8/8/8/7R/8/6K1 b - - ", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("1r5k/p1p4p/4p3/1rppb1Qq/3P2P1/1P3P2/P1P5/2KR4 w - - 0 25", null, cfg.getBoardConfig());//MATE IN 7, extracted from a game with cuckoo chess
