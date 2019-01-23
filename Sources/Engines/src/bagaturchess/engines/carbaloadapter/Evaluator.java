@@ -34,8 +34,8 @@ public abstract class Evaluator {
 	/**
 	 * Board evaluator
 	 */
-	public abstract int evaluate(IBoard board, AttacksInfo attacksInfo);
-	//public abstract int evaluate2(IBoard board, AttacksInfo attacksInfo);
+	public abstract int evaluate1(IBoard board, AttacksInfo attacksInfo);
+	public abstract int evaluate2(IBoard board, AttacksInfo attacksInfo);
 
 	/**
 	 * Merges two short Opening - Ending values in one int

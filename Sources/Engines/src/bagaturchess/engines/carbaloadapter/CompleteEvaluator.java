@@ -197,7 +197,7 @@ public class CompleteEvaluator extends Evaluator {
 	private long[] mobilitySquares = {0, 0};
 	private long[] kingZone = {0, 0}; // Squares surrounding King
 
-	public int evaluate(IBoard board, AttacksInfo ai) {
+	public int evaluate1(IBoard board, AttacksInfo ai) {
 
 		int whitePawns = BitboardUtils.popCount(board.getPawns() & board.getWhites());
 		int blackPawns = BitboardUtils.popCount(board.getPawns() & board.getBlacks());
@@ -232,6 +232,60 @@ public class CompleteEvaluator extends Evaluator {
 				((board.getBlacks() & board.getBishops() & Square.WHITES) != 0
 						&& (board.getBlacks() & board.getBishops() & Square.BLACKS) != 0 ? BISHOP_PAIR : 0);
 
+		int nonPawnMat = e(nonPawnMaterial[W] + nonPawnMaterial[B]);
+		int gamePhase = nonPawnMat >= NON_PAWN_MATERIAL_MIDGAME_MAX ? GAME_PHASE_MIDGAME :
+				nonPawnMat <= NON_PAWN_MATERIAL_ENDGAME_MIN ? GAME_PHASE_ENDGAME :
+						((nonPawnMat - NON_PAWN_MATERIAL_ENDGAME_MIN) * GAME_PHASE_MIDGAME) / (NON_PAWN_MATERIAL_MIDGAME_MAX - NON_PAWN_MATERIAL_ENDGAME_MIN);
+
+		int oe = (board.getColourToMove() == 0 ? TEMPO : -TEMPO)
+				+ pawnMaterial[W] - pawnMaterial[B]
+				+ nonPawnMaterial[W] - nonPawnMaterial[B];
+
+		// Ponder opening and Endgame value depending of the game phase and the scale factor
+		int value = (gamePhase * o(oe)
+				+ (GAME_PHASE_MIDGAME - gamePhase) * e(oe) * scaleFactor[0] / SCALE_FACTOR_DEFAULT) / GAME_PHASE_MIDGAME;
+
+		assert Math.abs(value) < KNOWN_WIN : "Eval is outside limits";
+		return value;
+	}
+	
+	
+	public int evaluate2(IBoard board, AttacksInfo ai) {
+
+		//int whitePawns = BitboardUtils.popCount(board.getPawns() & board.getWhites());
+		//int blackPawns = BitboardUtils.popCount(board.getPawns() & board.getBlacks());
+		int whiteKnights = BitboardUtils.popCount(board.getKnights() & board.getWhites());
+		int blackKnights = BitboardUtils.popCount(board.getKnights() & board.getBlacks());
+		int whiteBishops = BitboardUtils.popCount(board.getBishops() & board.getWhites());
+		int blackBishops = BitboardUtils.popCount(board.getBishops() & board.getBlacks());
+		//int whiteRooks = BitboardUtils.popCount(board.getRooks() & board.getWhites());
+		//int blackRooks = BitboardUtils.popCount(board.getRooks() & board.getBlacks());
+		//int whiteQueens = BitboardUtils.popCount(board.getQueens() & board.getWhites());
+		//int blackQueens = BitboardUtils.popCount(board.getQueens() & board.getBlacks());
+
+		/*int endgameValue = Endgame.evaluateEndgame(board, scaleFactor, whitePawns, blackPawns, whiteKnights, blackKnights, whiteBishops, blackBishops, whiteRooks, blackRooks, whiteQueens, blackQueens);
+		if (endgameValue != NO_VALUE) {
+			return endgameValue;
+		}*/
+		//scaleFactor[0] = SCALE_FACTOR_DEFAULT;
+		
+		//PHASE 1
+		/*pawnMaterial[W] = whitePawns * PIECE_VALUES_OE[Piece.PAWN];
+		nonPawnMaterial[W] = whiteKnights * PIECE_VALUES_OE[Piece.KNIGHT] +
+				whiteBishops * PIECE_VALUES_OE[Piece.BISHOP] +
+				whiteRooks * PIECE_VALUES_OE[Piece.ROOK] +
+				whiteQueens * PIECE_VALUES_OE[Piece.QUEEN] +
+				((board.getWhites() & board.getBishops() & Square.WHITES) != 0
+						&& (board.getWhites() & board.getBishops() & Square.BLACKS) != 0 ? BISHOP_PAIR : 0);
+		pawnMaterial[B] = blackPawns * PIECE_VALUES_OE[Piece.PAWN];
+		nonPawnMaterial[B] = blackKnights * PIECE_VALUES_OE[Piece.KNIGHT] +
+				blackBishops * PIECE_VALUES_OE[Piece.BISHOP] +
+				blackRooks * PIECE_VALUES_OE[Piece.ROOK] +
+				blackQueens * PIECE_VALUES_OE[Piece.QUEEN] +
+				((board.getBlacks() & board.getBishops() & Square.WHITES) != 0
+						&& (board.getBlacks() & board.getBishops() & Square.BLACKS) != 0 ? BISHOP_PAIR : 0);
+		 */
+		
 		int nonPawnMat = e(nonPawnMaterial[W] + nonPawnMaterial[B]);
 		int gamePhase = nonPawnMat >= NON_PAWN_MATERIAL_MIDGAME_MAX ? GAME_PHASE_MIDGAME :
 				nonPawnMat <= NON_PAWN_MATERIAL_ENDGAME_MIN ? GAME_PHASE_ENDGAME :
@@ -540,10 +594,10 @@ public class CompleteEvaluator extends Evaluator {
 			square <<= 1;
 		}
 
-		int oe = (board.getColourToMove() == 0 ? TEMPO : -TEMPO)
+		int oe = /*(board.getColourToMove() == 0 ? TEMPO : -TEMPO)
 				+ pawnMaterial[W] - pawnMaterial[B]
 				+ nonPawnMaterial[W] - nonPawnMaterial[B]
-				+ pcsq[W] - pcsq[B]
+				+*/ pcsq[W] - pcsq[B]
 				+ space[W] - space[B]
 				+ positional[W] - positional[B]
 				+ attacks[W] - attacks[B]

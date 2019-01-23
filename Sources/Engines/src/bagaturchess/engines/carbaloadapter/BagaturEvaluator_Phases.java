@@ -37,7 +37,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase1() {
-		int eval = evaluator.evaluate(board, ai);
+		int eval = evaluator.evaluate1(board, ai);
 		
 		return eval;
 	}
@@ -48,7 +48,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase2() {
-		int eval = 0;//evaluator.evaluate2(board, ai);
+		int eval = evaluator.evaluate2(board, ai);
 		
 		return eval;
 	}
