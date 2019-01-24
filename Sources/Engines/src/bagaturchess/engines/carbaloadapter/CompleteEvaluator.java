@@ -209,12 +209,14 @@ public class CompleteEvaluator extends Evaluator {
 		int blackRooks = BitboardUtils.popCount(board.getRooks() & board.getBlacks());
 		int whiteQueens = BitboardUtils.popCount(board.getQueens() & board.getWhites());
 		int blackQueens = BitboardUtils.popCount(board.getQueens() & board.getBlacks());
-
-		/*int endgameValue = Endgame.evaluateEndgame(board, scaleFactor, whitePawns, blackPawns, whiteKnights, blackKnights, whiteBishops, blackBishops, whiteRooks, blackRooks, whiteQueens, blackQueens);
+		
+		
+		scaleFactor[0] = SCALE_FACTOR_DEFAULT;
+		int endgameValue = Endgame.evaluateEndgame(board, scaleFactor, whitePawns, blackPawns, whiteKnights, blackKnights, whiteBishops, blackBishops, whiteRooks, blackRooks, whiteQueens, blackQueens);
 		if (endgameValue != NO_VALUE) {
 			return endgameValue;
-		}*/
-		scaleFactor[0] = SCALE_FACTOR_DEFAULT;
+		}
+		
 		
 		//PHASE 1
 		pawnMaterial[W] = whitePawns * PIECE_VALUES_OE[Piece.PAWN];
@@ -252,21 +254,21 @@ public class CompleteEvaluator extends Evaluator {
 	
 	public int evaluate2(IBoard board, AttacksInfo ai) {
 
-		//int whitePawns = BitboardUtils.popCount(board.getPawns() & board.getWhites());
-		//int blackPawns = BitboardUtils.popCount(board.getPawns() & board.getBlacks());
+		int whitePawns = BitboardUtils.popCount(board.getPawns() & board.getWhites());
+		int blackPawns = BitboardUtils.popCount(board.getPawns() & board.getBlacks());
 		int whiteKnights = BitboardUtils.popCount(board.getKnights() & board.getWhites());
 		int blackKnights = BitboardUtils.popCount(board.getKnights() & board.getBlacks());
 		int whiteBishops = BitboardUtils.popCount(board.getBishops() & board.getWhites());
 		int blackBishops = BitboardUtils.popCount(board.getBishops() & board.getBlacks());
-		//int whiteRooks = BitboardUtils.popCount(board.getRooks() & board.getWhites());
-		//int blackRooks = BitboardUtils.popCount(board.getRooks() & board.getBlacks());
-		//int whiteQueens = BitboardUtils.popCount(board.getQueens() & board.getWhites());
-		//int blackQueens = BitboardUtils.popCount(board.getQueens() & board.getBlacks());
-
-		/*int endgameValue = Endgame.evaluateEndgame(board, scaleFactor, whitePawns, blackPawns, whiteKnights, blackKnights, whiteBishops, blackBishops, whiteRooks, blackRooks, whiteQueens, blackQueens);
+		int whiteRooks = BitboardUtils.popCount(board.getRooks() & board.getWhites());
+		int blackRooks = BitboardUtils.popCount(board.getRooks() & board.getBlacks());
+		int whiteQueens = BitboardUtils.popCount(board.getQueens() & board.getWhites());
+		int blackQueens = BitboardUtils.popCount(board.getQueens() & board.getBlacks());
+		
+		int endgameValue = Endgame.evaluateEndgame(board, scaleFactor, whitePawns, blackPawns, whiteKnights, blackKnights, whiteBishops, blackBishops, whiteRooks, blackRooks, whiteQueens, blackQueens);
 		if (endgameValue != NO_VALUE) {
-			return endgameValue;
-		}*/
+			return 0;
+		}
 		//scaleFactor[0] = SCALE_FACTOR_DEFAULT;
 		
 		//PHASE 1
