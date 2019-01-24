@@ -23,11 +23,6 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	}
 	
 	
-	public int getMaterialQueen() {
-		return 1244;
-	}
-	
-	
 	/* (non-Javadoc)
 	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase1()
 	 */
