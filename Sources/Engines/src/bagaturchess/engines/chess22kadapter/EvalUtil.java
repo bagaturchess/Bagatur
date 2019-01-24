@@ -23,57 +23,46 @@ public class EvalUtil {
 			+ 4 * EvalConstants.PHASE[ROOK]
 			+ 2 * EvalConstants.PHASE[QUEEN];
 	
-	
-	public static int getScore(final IChessBoard cb) {
-		return calculateScore(cb);
-	}
 
-	public static int calculateScore(final IChessBoard cb) {
-
-		int score = 0;
-		if (!MaterialUtil.isDrawByMaterial(cb)) {
-			score = taperedEval(cb);
-		}
-
-		// TODO check if material score has one side leading
-
-		/* draw-by-material */
-		if (score > 25) {
-			if (!MaterialUtil.hasMatingMaterial(cb, WHITE)) {
-				score = EvalConstants.SCORE_DRAW;
-			}
-		} else if (score < -25) {
-			if (!MaterialUtil.hasMatingMaterial(cb, BLACK)) {
-				score = EvalConstants.SCORE_DRAW;
-			}
-		}
-
-		score *= ChessConstants.COLOR_FACTOR[cb.getColorToMove()];
-
-		return score;
-	}
-
-	private static int taperedEval(final IChessBoard cb) {
+	public static int getScore1(final IChessBoard cb) {
 		
 		final int pawnScore = getPawnScores(cb);
+		final int materialScore = getImbalances(cb);
+		
+		final int scoreMg = getMgScore(cb.getPSQTScore())
+														+ pawnScore
+														+ materialScore;
+		
+		final int scoreEg = getEgScore(cb.getPSQTScore())
+														+ pawnScore
+														+ materialScore;
+		
+		return cb.interpolateScore(scoreMg, scoreEg);
+	}
+
+	
+	public static int getScore2(final IChessBoard cb) {
+		
+		//final int pawnScore = getPawnScores(cb);
+		//final int materialScore = getImbalances(cb);
+
 		final int mgEgScore = calculateMobilityScoresAndSetAttackBoards(cb)
 				+ PassedPawnEval.calculatePassedPawnScores(cb)
 				+ calculateThreats(cb)
 				+ calculatePawnShieldBonus(cb);
 		
-		final int phaseIndependentScore = calculateOthers(cb) + getImbalances(cb);
-
-		final int scoreMg = getMgScore(mgEgScore + cb.getPSQTScore())
-														+ pawnScore
-														+ KingSafetyEval.calculateKingSafetyScores(cb)
-														+ calculateSpace(cb)
-														+ phaseIndependentScore;
+		final int scoreMg = getMgScore(mgEgScore)
+								+ KingSafetyEval.calculateKingSafetyScores(cb)
+								+ calculateSpace(cb)
+								+ calculateOthers(cb);
 		
-		final int scoreEg = getEgScore(mgEgScore + cb.getPSQTScore()) + pawnScore + phaseIndependentScore;
+		final int scoreEg = getEgScore(mgEgScore)
+								+ calculateOthers(cb);
 		
 		return cb.interpolateScore(scoreMg, scoreEg);
 	}
-
+	
+	
 	public static int score(final int mgScore, final int egScore) {
 		return (mgScore << 16) + egScore;
 	}

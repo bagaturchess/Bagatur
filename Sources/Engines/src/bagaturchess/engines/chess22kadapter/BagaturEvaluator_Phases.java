@@ -28,7 +28,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase1() {
-		int eval = EvalUtil.getScore(board);
+		int eval = EvalUtil.getScore1(board);
 		//int eval = (int)(500 * Math.random() - 250);
 		
 		return eval;
@@ -40,7 +40,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase2() {
-		int eval = 0;
+		int eval = EvalUtil.getScore2(board);
 		
 		return eval;
 	}

@@ -22,6 +22,7 @@ package bagaturchess.engines.chess22kadapter;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
+import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
 
 
@@ -48,6 +49,11 @@ public class ChessBoard implements IChessBoard {
 		evalinfo = new EvalInfo();
 	}
 	
+	private static final long convertBB(long bb) {
+		//return bb;
+		return Bits.reverse(bb);
+	}
+	
 	@Override
 	public EvalInfo getEvalInfo() {
 		return evalinfo;
@@ -66,42 +72,43 @@ public class ChessBoard implements IChessBoard {
 	@Override
 	public long getPieces(int colour, int type) {
 		if (colour == 0) {
-			return board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, type);
+			return convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, type));
 		} else {
-			return board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, type);
+			return convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, type));
 		}
 	}
 	
 	@Override
 	public long getAllPieces() {
-		return board.getFiguresBitboardByColour(Constants.COLOUR_WHITE) | board.getFiguresBitboardByColour(Constants.COLOUR_BLACK);
+		return convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_WHITE) | board.getFiguresBitboardByColour(Constants.COLOUR_BLACK));
 	}
 	
 	@Override
 	public long getFriendlyPieces(int colour) {
 		if (colour == 0) {
-			return board.getFiguresBitboardByColour(Constants.COLOUR_WHITE);
+			return convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_WHITE));
 		} else {
-			return board.getFiguresBitboardByColour(Constants.COLOUR_BLACK);
+			return convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_BLACK));
 		}
 	}
 	
 	@Override
 	public long getEmptySpaces() {
-		return board.getFreeBitboard();
+		return convertBB(board.getFreeBitboard());
 	}
 	
 	private int convertIndex_b2c(int index) {
-		return HORIZONTAL_SYMMETRY[index];
+		return index;//HORIZONTAL_SYMMETRY[index];
 	}
 	
 	private int convertIndex_c2b(int index) {
-		for (int i=0; i<HORIZONTAL_SYMMETRY.length; i++) {
+		/*for (int i=0; i<HORIZONTAL_SYMMETRY.length; i++) {
 			if (HORIZONTAL_SYMMETRY[i] == index) {
 				return i;
 			}
 		}
-		throw new IllegalStateException();
+		throw new IllegalStateException();*/
+		return index;
 	}
 	
 	@Override
@@ -121,17 +128,17 @@ public class ChessBoard implements IChessBoard {
 	
 	@Override
 	public long getPinnedPieces() {
-		return 0;
+		return convertBB(0);
 	}
 	
 	@Override
 	public long getDiscoveredPieces() {
-		return 0;
+		return convertBB(0);
 	}
 	
 	@Override
 	public long getCheckingPieces() {
-		return 0;
+		return convertBB(0);
 	}
 	
 	@Override
