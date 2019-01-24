@@ -42,22 +42,21 @@ public class EvalUtil {
 
 	
 	public static int getScore2(final IChessBoard cb) {
-		
-		//final int pawnScore = getPawnScores(cb);
-		//final int materialScore = getImbalances(cb);
 
 		final int mgEgScore = calculateMobilityScoresAndSetAttackBoards(cb)
 				+ PassedPawnEval.calculatePassedPawnScores(cb)
 				+ calculateThreats(cb)
 				+ calculatePawnShieldBonus(cb);
 		
+		final int othersScore = calculateOthers(cb);
+		
 		final int scoreMg = getMgScore(mgEgScore)
 								+ KingSafetyEval.calculateKingSafetyScores(cb)
 								+ calculateSpace(cb)
-								+ calculateOthers(cb);
+								+ othersScore;
 		
 		final int scoreEg = getEgScore(mgEgScore)
-								+ calculateOthers(cb);
+								+ othersScore;
 		
 		return cb.interpolateScore(scoreMg, scoreEg);
 	}
