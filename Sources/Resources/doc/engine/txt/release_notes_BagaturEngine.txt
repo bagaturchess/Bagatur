@@ -1,5 +1,9 @@
 
-Version 1.6 (17 January 2019)
+Version 1.7 (31 January 2019)
+  * 100 ELO stronger (measured versus 1.6)
+  * Evaluation function based on Chess22k
+ 
+ Version 1.6 (17 January 2019)
   * 15 ELO stronger (measured versus 1.5g)
   * Separate transposition tables for search and qsearch for better memory management
   * Use both transposition tables when probing position
