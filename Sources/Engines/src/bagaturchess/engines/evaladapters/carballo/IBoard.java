@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.engines.evaladapters.carbalo;
+package bagaturchess.engines.evaladapters.carballo;
 
 
 public interface IBoard {

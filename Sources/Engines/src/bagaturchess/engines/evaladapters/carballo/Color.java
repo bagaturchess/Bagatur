@@ -1,4 +1,4 @@
-package bagaturchess.engines.evaladapters.carbalo;
+package bagaturchess.engines.evaladapters.carballo;
 
 public class Color {
 	public static final int W = 0;

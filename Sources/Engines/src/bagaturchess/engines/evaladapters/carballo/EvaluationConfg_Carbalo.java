@@ -1,4 +1,4 @@
-package bagaturchess.engines.evaladapters.carbalo;
+package bagaturchess.engines.evaladapters.carballo;
 
 
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEvalFactory;

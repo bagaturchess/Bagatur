@@ -1,4 +1,4 @@
-package bagaturchess.engines.evaladapters.carbalo;
+package bagaturchess.engines.evaladapters.carballo;
 
 public class Piece {
 	// Ordered by value

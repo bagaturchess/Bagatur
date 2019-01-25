@@ -1,4 +1,4 @@
-package bagaturchess.engines.evaladapters.carbalo;
+package bagaturchess.engines.evaladapters.carballo;
 
 
 public abstract class Evaluator {
