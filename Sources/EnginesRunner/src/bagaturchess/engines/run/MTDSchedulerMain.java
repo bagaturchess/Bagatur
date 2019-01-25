@@ -30,9 +30,9 @@ import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.engines.bagatur.cfg.time.TimeConfigImpl;
-import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core;
-import bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP;
+import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
+import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP;
+import bagaturchess.engines.cfg.base.TimeConfigImpl;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -93,7 +93,7 @@ public class MTDSchedulerMain {
 								//bagaturchess.search.impl.alg.impl0.Search_PVS_NWS1.class.getName(),
 								//bagaturchess.search.impl.alg.impl1.Search_NegaScout.class.getName(),
 								
-								bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD.class.getName(),
+								bagaturchess.engines.cfg.base.SearchConfigImpl_AB.class.getName(),
 								
 								//"bagaturchess.engines.learning.cfg.weights.boardtune.WeightsBoardConfig_LKG",
 								//"bagaturchess.engines.learning.cfg.weights.evaltune.WeightsEvaluationConfig_LKG"
@@ -101,8 +101,8 @@ public class MTDSchedulerMain {
 								//"bagaturchess.engines.bagatur.progressive.BagaturV12BoardConfig",
 								//"bagaturchess.engines.bagatur.progressive.BagaturV12EvaluationConfig"
 								
-								//bagaturchess.engines.material.MaterialBoardConfigImpl.class.getName(),
-								//bagaturchess.engines.material.MaterialEvalConfigImpl.class.getName(),
+								//bagaturchess.engines.cfg.materialonly.MaterialBoardConfigImpl.class.getName(),
+								//bagaturchess.engines.cfg.materialonly.MaterialEvalConfigImpl.class.getName(),
 								
 								//bagaturchess.engines.bagatur.cfg.board.BoardConfigImpl.class.getName(),
 								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturEvalConfigImpl_v2.class.getName()
@@ -113,14 +113,14 @@ public class MTDSchedulerMain {
 								//bagaturchess.engines.cuckooadapter.BoardConfigImpl_Cuckoo.class.getName(),
 								//bagaturchess.engines.cuckooadapter.EvaluationConfg_Cuckoo.class.getName()
 								
-								bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl.class.getName(),
-								bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig.class.getName(),
+								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl.class.getName(),
+								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig.class.getName(),
 								//bagaturchess.deeplearning.impl.eval.pst.EvaluationConfig.class.getName()
 								//bagaturchess.deeplearning.impl.eval.allfeatures.EvaluationConfig.class.getName()
 								//bagaturchess.deeplearning.impl.eval.past_and_allfeatures.EvaluationConfig.class.getName()
 								
-								//bagaturchess.engines.chess22kadapter.BoardConfigImpl_Chess22k.class.getName(),
-								//bagaturchess.engines.chess22kadapter.EvaluationConfg_Chess22k.class.getName()
+								bagaturchess.engines.evaladapters.chess22k.BoardConfigImpl_Chess22k.class.getName(),
+								bagaturchess.engines.evaladapters.chess22k.EvaluationConfg_Chess22k.class.getName()
 								
 								//bagaturchess.engines.carbaloadapter.BoardConfigImpl_Carbalo.class.getName(),
 								//bagaturchess.engines.carbaloadapter.EvaluationConfg_Carbalo.class.getName()
@@ -168,7 +168,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
-		//IBitBoard bitboard  = new Board("3b4/5Rkp/p5p1/2PB4/8/8/5PPP/6K1 b - - 0 33 ", null, cfg.getBoardConfig());
+		//IBitBoard bitboard  = new Board("r1bqk2r/pp1pbppp/2n1pn2/2p5/4P3/5NP1/PPPPQPBP/RNB2RK1 b kq - 6 6  ", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("7k/6r1/8/8/8/8/1Q6/K7 w - -", null, cfg.getBoardConfig()); //Queen and King vs. Rook and King
 		//IBitBoard bitboard  = new Board("k7/1q6/8/8/8/7R/8/6K1 b - - ", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("1r5k/p1p4p/4p3/1rppb1Qq/3P2P1/1P3P2/P1P5/2KR4 w - - 0 25", null, cfg.getBoardConfig());//MATE IN 7, extracted from a game with cuckoo chess

@@ -17,18 +17,18 @@ REM Sets the memory (in megabytes) for the WHOLE java process.
 REM Only one part of this memory (up to 35%) will be used for Transposition Table.
 set PROCESS_MEMORY=1024M
 
-set ARGS=bagaturchess.engines.base.cfg.UCIConfig_BaseImpl
+set ARGS=bagaturchess.engines.cfg.base.UCIConfig_BaseImpl
 set ARGS=%ARGS% bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove
-set ARGS=%ARGS% bagaturchess.engines.base.cfg.UCISearchAdaptorConfig_BaseImpl
+set ARGS=%ARGS% bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl
 REM set ARGS=%ARGS% bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD
 set ARGS=%ARGS% bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ProcessesImpl
-REM set ARGS=%ARGS% bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core
-set ARGS=%ARGS% bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_SMP
+REM set ARGS=%ARGS% bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core
+set ARGS=%ARGS% bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP
 REM set ARGS=%ARGS% bagaturchess.search.impl.alg.impl1.Search_NegaScout
 set ARGS=%ARGS% bagaturchess.search.impl.alg.impl0.Search_PVS_NWS
-set ARGS=%ARGS% bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD_SMP
-set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl
-set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig
+set ARGS=%ARGS% bagaturchess.engines.cfg.base.SearchConfigImpl_AB
+set ARGS=%ARGS% bagaturchess.engines.evaladapters.chess22k.BoardConfigImpl_Chess22k
+set ARGS=%ARGS% bagaturchess.engines.evaladapters.chess22k.EvaluationConfg_Chess22k
 
 echo on
 
