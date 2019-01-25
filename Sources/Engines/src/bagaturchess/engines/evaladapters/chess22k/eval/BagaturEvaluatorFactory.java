@@ -1,4 +1,4 @@
-package bagaturchess.engines.evaladapters.chess22k;
+package bagaturchess.engines.evaladapters.chess22k.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;

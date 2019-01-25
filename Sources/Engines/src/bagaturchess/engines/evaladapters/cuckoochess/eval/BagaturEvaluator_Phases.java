@@ -1,7 +1,9 @@
-package bagaturchess.engines.evaladapters.cuckoochess;
+package bagaturchess.engines.evaladapters.cuckoochess.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.engines.evaladapters.cuckoochess.Evaluate;
+import bagaturchess.engines.evaladapters.cuckoochess.IPosition;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;

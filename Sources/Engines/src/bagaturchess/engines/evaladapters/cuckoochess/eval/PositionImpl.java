@@ -1,4 +1,4 @@
-package bagaturchess.engines.evaladapters.cuckoochess;
+package bagaturchess.engines.evaladapters.cuckoochess.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -8,9 +8,13 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.eval.PSTConstants;
 import bagaturchess.bitboard.impl.state.PiecesList;
+import bagaturchess.engines.evaladapters.cuckoochess.BitBoard;
+import bagaturchess.engines.evaladapters.cuckoochess.Evaluate;
+import bagaturchess.engines.evaladapters.cuckoochess.IPosition;
+import bagaturchess.engines.evaladapters.cuckoochess.Piece;
 
 
-public class PositionImpl implements IPosition {
+class PositionImpl implements IPosition {
 	
 	
 	private static final int[] HORIZONTAL_SYMMETRY = Utils.reverseSpecial ( new int[]{	
@@ -29,7 +33,7 @@ public class PositionImpl implements IPosition {
 	private PSTConstants pst;
 	
 	
-	public PositionImpl(IBitBoard _board) {
+	PositionImpl(IBitBoard _board) {
 		board = _board;
 		pst = new PSTConstants(board.getBoardConfig());
 	}

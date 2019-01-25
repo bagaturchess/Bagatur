@@ -17,16 +17,19 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.engines.evaladapters.chess22k;
+package bagaturchess.engines.evaladapters.chess22k.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.engines.evaladapters.chess22k.ChessConstants;
+import bagaturchess.engines.evaladapters.chess22k.EvalInfo;
+import bagaturchess.engines.evaladapters.chess22k.IChessBoard;
 
 
-public class ChessBoard implements IChessBoard {
+class ChessBoard implements IChessBoard {
 	
 	
 	private IBitBoard board;
@@ -44,7 +47,7 @@ public class ChessBoard implements IChessBoard {
 	});
 	
 	
-	public ChessBoard(IBitBoard _board) {
+	ChessBoard(IBitBoard _board) {
 		board = _board;
 		evalinfo = new EvalInfo();
 	}

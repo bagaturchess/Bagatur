@@ -1,11 +1,12 @@
-package bagaturchess.engines.evaladapters.carballo;
+package bagaturchess.engines.evaladapters.cuckoochess.cfg;
 
 
+import bagaturchess.engines.evaladapters.cuckoochess.eval.BagaturEvaluatorFactory;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEvalFactory;
 import bagaturchess.search.api.IEvalConfig;
 
 
-public class EvaluationConfg_Carbalo implements IEvalConfig {
+public class EvaluationConfg_Cuckoo implements IEvalConfig {
 	
 	
 	@Override

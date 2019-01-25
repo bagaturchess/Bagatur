@@ -27,7 +27,7 @@ import java.io.InputStream;
  * @author petero
  */
 public class Evaluate {
-    static final int pV =   92 + 0;//-200,300,0 Parameters.instance().getIntPar("pV");
+    public static final int pV =   92 + 0;//-200,300,0 Parameters.instance().getIntPar("pV");
     static final int nV =  385 + 0;//-200,300,0 Parameters.instance().getIntPar("nV");
     static final int bV =  385 + 0;//-200,300,0 Parameters.instance().getIntPar("bV");
     static final int rV =  593 + 0;//-200,300,0 Parameters.instance().getIntPar("rV");
@@ -292,7 +292,7 @@ public class Evaluate {
     }
     
     
-	int eval1(IPosition pos) {
+	public int eval1(IPosition pos) {
 		int score = pos.getwMtrl() - pos.getbMtrl();
 
         wKingAttacks = bKingAttacks = 0;
@@ -316,14 +316,14 @@ public class Evaluate {
 		return score;
 	}
 
-	int eval2(IPosition pos) {
+	public int eval2(IPosition pos) {
 		int score = 0;
 		score += rookBonus(pos);
         score += bishopEval(pos, score);
 		return score;
 	}
 	
-	int eval3(IPosition pos) {
+	public int eval3(IPosition pos) {
 		int score = 0;
 		score += threatBonus(pos);
         score += kingSafety(pos);

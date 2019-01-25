@@ -1,11 +1,12 @@
-package bagaturchess.engines.evaladapters.chess22k;
+package bagaturchess.engines.evaladapters.carballo.cfg;
 
 
+import bagaturchess.engines.evaladapters.carballo.eval.BagaturEvaluatorFactory;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEvalFactory;
 import bagaturchess.search.api.IEvalConfig;
 
 
-public class EvaluationConfg_Chess22k implements IEvalConfig {
+public class EvaluationConfg_Carbalo implements IEvalConfig {
 	
 	
 	@Override

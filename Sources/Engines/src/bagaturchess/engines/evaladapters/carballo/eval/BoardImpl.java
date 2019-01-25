@@ -17,21 +17,22 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.engines.evaladapters.carballo;
+package bagaturchess.engines.evaladapters.carballo.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.engines.evaladapters.carballo.IBoard;
 
 
-public class BoardImpl implements IBoard {
+class BoardImpl implements IBoard {
 	
 	
 	private IBitBoard board;
 	
 	
-	public BoardImpl(IBitBoard _board) {
+	BoardImpl(IBitBoard _board) {
 		board = _board;
 	}
 	

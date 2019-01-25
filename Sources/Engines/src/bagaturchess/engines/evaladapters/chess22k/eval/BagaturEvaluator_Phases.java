@@ -1,7 +1,9 @@
-package bagaturchess.engines.evaladapters.chess22k;
+package bagaturchess.engines.evaladapters.chess22k.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.engines.evaladapters.chess22k.EvalUtil;
+import bagaturchess.engines.evaladapters.chess22k.IChessBoard;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;

@@ -1,11 +1,11 @@
-package bagaturchess.engines.evaladapters.carballo;
+package bagaturchess.engines.evaladapters.cuckoochess.cfg;
 
 
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.common.Utils;
 
 
-public class BoardConfigImpl_Carbalo implements IBoardConfig {
+public class BoardConfigImpl_Cuckoo implements IBoardConfig {
 	
 	private static double[] zeros = new double[64];
     

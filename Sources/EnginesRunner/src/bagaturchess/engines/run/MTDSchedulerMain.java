@@ -119,8 +119,8 @@ public class MTDSchedulerMain {
 								//bagaturchess.deeplearning.impl.eval.allfeatures.EvaluationConfig.class.getName()
 								//bagaturchess.deeplearning.impl.eval.past_and_allfeatures.EvaluationConfig.class.getName()
 								
-								bagaturchess.engines.evaladapters.chess22k.BoardConfigImpl_Chess22k.class.getName(),
-								bagaturchess.engines.evaladapters.chess22k.EvaluationConfg_Chess22k.class.getName()
+								bagaturchess.engines.evaladapters.chess22k.cfg.BoardConfigImpl_Chess22k.class.getName(),
+								bagaturchess.engines.evaladapters.chess22k.cfg.EvaluationConfg_Chess22k.class.getName()
 								
 								//bagaturchess.engines.carbaloadapter.BoardConfigImpl_Carbalo.class.getName(),
 								//bagaturchess.engines.carbaloadapter.EvaluationConfg_Carbalo.class.getName()

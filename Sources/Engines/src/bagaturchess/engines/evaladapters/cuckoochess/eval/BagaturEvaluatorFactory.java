@@ -1,4 +1,4 @@
-package bagaturchess.engines.evaladapters.carballo;
+package bagaturchess.engines.evaladapters.cuckoochess.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;

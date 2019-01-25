@@ -365,34 +365,32 @@ public class EvalUtil {
 
 		// knight fork
 		// skip when testing eval values because we break the loop if any fork has been found
-		if (!EngineConstants.TEST_EVAL_VALUES) {
-			long forked;
-			piece = cb.getEvalInfo().attacks[WHITE][NIGHT] & ~blackAttacks & cb.getEmptySpaces();
-			while (piece != 0) {
-				forked = blacks & ~blackPawns & StaticMoves.KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
-				if (Long.bitCount(forked) > 1) {
-					if ((cb.getPieces(BLACK, KING) & forked) == 0) {
-						score += EvalConstants.THREATS[EvalConstants.IX_NIGHT_FORK];
-					} else {
-						score += EvalConstants.THREATS[EvalConstants.IX_NIGHT_FORK_KING];
-					}
-					break;
+		long forked;
+		piece = cb.getEvalInfo().attacks[WHITE][NIGHT] & ~blackAttacks & cb.getEmptySpaces();
+		while (piece != 0) {
+			forked = blacks & ~blackPawns & StaticMoves.KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
+			if (Long.bitCount(forked) > 1) {
+				if ((cb.getPieces(BLACK, KING) & forked) == 0) {
+					score += EvalConstants.THREATS[EvalConstants.IX_NIGHT_FORK];
+				} else {
+					score += EvalConstants.THREATS[EvalConstants.IX_NIGHT_FORK_KING];
 				}
-				piece &= piece - 1;
+				break;
 			}
-			piece = cb.getEvalInfo().attacks[BLACK][NIGHT] & ~whiteAttacks & cb.getEmptySpaces();
-			while (piece != 0) {
-				forked = whites & ~whitePawns & StaticMoves.KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
-				if (Long.bitCount(forked) > 1) {
-					if ((cb.getPieces(WHITE, KING) & forked) == 0) {
-						score -= EvalConstants.THREATS[EvalConstants.IX_NIGHT_FORK];
-					} else {
-						score -= EvalConstants.THREATS[EvalConstants.IX_NIGHT_FORK_KING];
-					}
-					break;
+			piece &= piece - 1;
+		}
+		piece = cb.getEvalInfo().attacks[BLACK][NIGHT] & ~whiteAttacks & cb.getEmptySpaces();
+		while (piece != 0) {
+			forked = whites & ~whitePawns & StaticMoves.KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
+			if (Long.bitCount(forked) > 1) {
+				if ((cb.getPieces(WHITE, KING) & forked) == 0) {
+					score -= EvalConstants.THREATS[EvalConstants.IX_NIGHT_FORK];
+				} else {
+					score -= EvalConstants.THREATS[EvalConstants.IX_NIGHT_FORK_KING];
 				}
-				piece &= piece - 1;
+				break;
 			}
+			piece &= piece - 1;
 		}
 
 		return score;
