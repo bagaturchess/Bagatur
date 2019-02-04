@@ -348,63 +348,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				throw new IllegalStateException("inCheck: depth >= normDepth(maxdepth)");
 			}
 			
-			if (tpt_found) {
-				if (tpt_exact) {
-					if (!SearchUtils.isMateVal(tpt_lower)) {
-						node.bestmove = tpt_move;
-						node.eval = tpt_lower;
-						node.leaf = true;
-						node.nullmove = false;
-						
-						env.getTPT().lock();
-						buff_tpt_depthtracking[0] = 0;
-						extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
-						env.getTPT().unlock();
-						
-						if (buff_tpt_depthtracking[0] >= rest) {
-							return node.eval;
-						}
-					}
-				} else {
-					if (tpt_lower >= beta) {
-						if (!SearchUtils.isMateVal(tpt_lower)) {
-							node.bestmove = tpt_move;
-							node.eval = tpt_lower;
-							node.leaf = true;
-							node.nullmove = false;
-							
-							
-							env.getTPT().lock();
-							buff_tpt_depthtracking[0] = 0;
-							extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
-							env.getTPT().unlock();
-							
-							if (buff_tpt_depthtracking[0] >= rest) {
-								return node.eval;
-							}
-						}
-					}
-					if (tpt_upper <= beta - 1) {
-						if (!SearchUtils.isMateVal(tpt_upper)) {
-							node.bestmove = tpt_move;
-							node.eval = tpt_upper;
-							node.leaf = true;
-							node.nullmove = false;
-							
-							
-							env.getTPT().lock();
-							buff_tpt_depthtracking[0] = 0;
-							extractFromTPT(info, rest, node, false, buff_tpt_depthtracking, rootColour, env.getTPT());
-							env.getTPT().unlock();
-							
-							if (buff_tpt_depthtracking[0] >= rest) {
-								return node.eval;
-							}
-						}
-					}
-				}
-			}
-			
 			node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
 			return node.eval;
 		}
@@ -1119,26 +1062,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		if (depth >= normDepth(maxdepth)) {
 			
 			if (inCheck) {
-				throw new IllegalStateException();
-			}
-			
-			if (tpt_found) {
-				if (tpt_exact) {
-					if (!SearchUtils.isMateVal(tpt_lower)) {
-						return tpt_lower;
-					}
-				} else {
-					if (tpt_lower >= beta) {
-						if (!SearchUtils.isMateVal(tpt_lower)) {
-							return tpt_lower;
-						}
-					}
-					if (tpt_upper <= beta - 1) {
-						if (!SearchUtils.isMateVal(tpt_upper)) {
-							return tpt_upper;
-						}
-					}
-				}
+				throw new IllegalStateException("inCheck: depth >= normDepth(maxdepth)");
 			}
 			
 			int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, rootColour);
