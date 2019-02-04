@@ -27,8 +27,10 @@ REM set ARGS=%ARGS% bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP
 REM set ARGS=%ARGS% bagaturchess.search.impl.alg.impl1.Search_NegaScout
 set ARGS=%ARGS% bagaturchess.search.impl.alg.impl0.Search_PVS_NWS
 set ARGS=%ARGS% bagaturchess.engines.cfg.base.SearchConfigImpl_AB
-set ARGS=%ARGS% bagaturchess.engines.evaladapters.chess22k.cfg.BoardConfigImpl_Chess22k
-set ARGS=%ARGS% bagaturchess.engines.evaladapters.chess22k.cfg.EvaluationConfg_Chess22k
+REM set ARGS=%ARGS% bagaturchess.engines.evaladapters.chess22k.cfg.BoardConfigImpl_Chess22k
+REM set ARGS=%ARGS% bagaturchess.engines.evaladapters.chess22k.cfg.EvaluationConfg_Chess22k
+set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl
+set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig
 
 echo on
 
