@@ -33,6 +33,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchMoveList;
 
 import bagaturchess.search.impl.alg.BacktrackingInfo;
+import bagaturchess.search.impl.alg.iter.ListAll;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
@@ -701,7 +702,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				
 				//Static pruning
-				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
+				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !((ListAll)list).isGoodMove(cur_move) && !env.getBitboard().isCheckMove(cur_move)) {
 					
 					if (searchedCount >= 4 && rest <= 8) {
 						
@@ -754,7 +755,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					
 					boolean staticPrunning = false;
 					
-					if (!isCheckMove
+					if (/*!inCheck
+							&& !((ListAll)list).isGoodMove(cur_move)
+							&&*/ !isCheckMove
 							&& !isMateVal(alpha_org)
 							&& !isMateVal(beta)
 						) {
@@ -771,10 +774,13 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						) {
 						
 						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
-						rate += 2;//for pv nodes
+						rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for pv nodes
 						rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
 						rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
+						/*if (lmrReduction < PLY) {
+							lmrReduction = PLY;
+						}*/
 					}
 					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
 					if (lmrRest < 0) {
@@ -1382,7 +1388,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				
 				//Static pruning
-				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
+				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !((ListAll)list).isGoodMove(cur_move) && !env.getBitboard().isCheckMove(cur_move)) {
 					
 					if (searchedCount >= 4 && rest <= 8) {
 						
@@ -1435,7 +1441,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					
 					boolean staticPrunning = false;
 					
-					if (!isCheckMove
+					if (/*!inCheck
+							&& !((ListAll)list).isGoodMove(cur_move)
+							&&*/ !isCheckMove
 							&& !isMateVal(alpha_org)
 							&& !isMateVal(beta)
 						) {
@@ -1452,10 +1460,13 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						) {
 						
 						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
-						rate += 2;//for non pv nodes
+						rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for non pv nodes
 						rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
 						rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
+						/*if (lmrReduction < PLY) {
+							lmrReduction = PLY;
+						}*/
 					}
 					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
 					if (lmrRest < 0) {
