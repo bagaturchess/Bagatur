@@ -257,9 +257,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPT().lock();
 			{
 				TPTEntry tptEntry = env.getTPT().get(hashkey);
-				if (tptEntry == null) {
-					tptEntry = env.getTPTQS().get(hashkey);
-				}
 				if (tptEntry != null) {
 					tpt_found = true;
 					tpt_exact = tptEntry.isExact();
@@ -445,9 +442,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						env.getTPT().lock();
 						{
 							TPTEntry tptEntry = env.getTPT().get(hashkey);
-							if (tptEntry == null) {
-								tptEntry = env.getTPTQS().get(hashkey);
-							}
 							if (tptEntry != null) {
 								tpt_found = true;
 								tpt_exact = tptEntry.isExact();
@@ -511,9 +505,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
 					TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
-					if (tptEntry == null) {
-						tptEntry = env.getTPTQS().get(env.getBitboard().getHashKey());
-					}
 					if (tptEntry != null) {
 						tpt_found = true;
 						tpt_exact = tptEntry.isExact();
@@ -572,9 +563,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		{
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
-			if (tptEntry == null) {
-				tptEntry = env.getTPTQS().get(backtrackingInfo.hash_key);
-			}
 			env.getTPT().unlock();
 			
 	        if (depth > 0
@@ -1018,9 +1006,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPT().lock();
 			{
 				TPTEntry tptEntry = env.getTPT().get(hashkey);
-				if (tptEntry == null) {
-					tptEntry = env.getTPTQS().get(hashkey);
-				}
 				if (tptEntry != null) {
 					tpt_found = true;
 					tpt_exact = tptEntry.isExact();
@@ -1151,9 +1136,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						env.getTPT().lock();
 						{
 							TPTEntry tptEntry = env.getTPT().get(hashkey);
-							if (tptEntry == null) {
-								tptEntry = env.getTPTQS().get(hashkey);
-							}
 							if (tptEntry != null) {
 								tpt_found = true;
 								tpt_exact = tptEntry.isExact();
@@ -1216,9 +1198,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
 					TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
-					if (tptEntry == null) {
-						tptEntry = env.getTPTQS().get(env.getBitboard().getHashKey());
-					}
 					if (tptEntry != null) {
 						tpt_found = true;
 						tpt_exact = tptEntry.isExact();
@@ -1266,9 +1245,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		{
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
-			if (tptEntry == null) {
-				tptEntry = env.getTPTQS().get(backtrackingInfo.hash_key);
-			}
 			env.getTPT().unlock();
 			
 	        if (depth > 0
@@ -1693,9 +1669,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPTQS().lock();
 			{
 				TPTEntry tptEntry = env.getTPTQS().get(hashkey);
-				if (tptEntry == null) {
-					tptEntry = env.getTPT().get(hashkey);
-				}
 				if (tptEntry != null) {
 					tpt_found = true;
 					tpt_exact = tptEntry.isExact();
@@ -2001,9 +1974,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			env.getTPTQS().lock();
 			{
 				TPTEntry tptEntry = env.getTPTQS().get(hashkey);
-				if (tptEntry == null) {
-					tptEntry = env.getTPT().get(hashkey);
-				}
 				if (tptEntry != null) {
 					tpt_found = true;
 					tpt_exact = tptEntry.isExact();
