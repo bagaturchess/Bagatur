@@ -6,7 +6,7 @@ This distribution is exactly what you want.
 Here are the steps necessary to run the engine:
 1. Download an arbitrary UCI user interface. For example the most popular one is Arena - http://www.playwitharena.com/
 2. Install the UCI user interface on your computer.
-3. Ensure that the Java Runtime Environment (JRE) 1.6 or later is installed on your computer (it should be the case nowadays but if not, have in mind that JRE is required, only JDK doesn't work).
+3. Ensure that the Java Runtime Environment (JRE) 1.6 or later is installed on your computer (it should be the case nowadays but if not, have in mind that JRE is required, only JDK doesn't work). It could be downloaded from java.com.
 4. Unpack this distribution somewhere (Arena has a sub-folder called 'engines', you can extract it there).
 6. Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway). You may use win32 or win64 version depending on your choice.
 7. E2-E4 and enjoy :-)
