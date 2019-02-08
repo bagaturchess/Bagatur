@@ -1,24 +1,23 @@
 
-Version 1.7 (31 January 2019)
-  * 100 ELO stronger (measured versus 1.6)
-  * Evaluation function based on Chess22k
+Version 1.6a (11 February 2019)
+  * Revert memory management experiments introduced with versions 1.5g and 1.6
+  * More deeper internal iterative deepening search
+  * Late move reduction is now adjusted with move's history scores
  
  Version 1.6 (17 January 2019)
-  * 15 ELO stronger (measured versus 1.5g)
   * Separate transposition tables for search and qsearch for better memory management
   * Use both transposition tables when probing position
   * If presented use transposition table scores before qsearch
   
 Version 1.5g (14 January 2019)
-  * 20 ELO stronger (measured versus 1.5f)
   * Memory management improvements - more memory for the transposition table
-  * Use LMR for remaining depth > 3
+  * Use Late move reduction for remaining depth > 3
 
 Version 1.5f (31 October 2018)
   * 15 ELO stronger (measured versus 1.5e)
   * Time management improvements
   * Singular move extension implemented
-  * Optimizations of quiescence search - it search all capture moves
+  * Optimizations of quiescence search - it searches all capture moves
   
 Version 1.5e (20 July 2017)
   * Endgame Tablebases support - switched OFF, because of engine crash errors (JNI and java OutOfMemory related)

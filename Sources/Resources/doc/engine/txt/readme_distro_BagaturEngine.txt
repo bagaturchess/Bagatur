@@ -23,13 +23,7 @@ Hints:
 	 
   3. On Laptop - for optimal performance make sure that: Laptop is connected to power supply (by either cable or docking station) and power plan is set to 'Maximum Performance'
    
-  4. You may tune the Evaluation Function.
-     In general, the UCI user interfaces has a functionality to change the options supported by the Engine.
-     Even more, you may save the different configurations as different engines and to fight them with each other in order to prove that your tuning makes it better.
-     All this UCI options are implemented: King Safety, Mobility, Safe Mobility, Cental Space, Piece-Square, Pawns Structure, Passed Pawns.  
-     For example, in Arena you can open the UCI options panel in that way: 1) Engines/Manage 2) select engine 3) click on the UCI tab 4) press 'CTRL-1' and/or 'CTRL-2' 
-     
-  5. If for some reason the EXE files do not work as expected, then there are 2 options:
+  4. If for some reason the EXE files do not work as expected, then there are 2 options:
      A) Edit the corresponding INI file. Find the option 'vm.location', remove semicolons (';' symbol) from the beginning of the line, and set the property to point out the wanted jvm.dll.
         jvm.dll could be found in JRE's 'bin/client' or 'bin/server' directory. For example, something like 'C:\jdk1.6.0_07\jre\bin\client\jvm.dll'
      B) (Not recommended) Use the BAT files inside the 'bin' sub-directory: Bagatur_1core.bat and Bagatur_mcore.bat
@@ -37,11 +31,7 @@ Hints:
 
 
 Credits:
-  I am working on this program since 2005 in my spare time as a hobby.
-  In the beginning there were not a lot in the Internet, although, most of the time I purposely avoided heaving look at the
-  other open source softwares and articles regarding the search and game theory.
-  Because of that, in many aspects I have re-invented the wheel.
-  Anyway, without the ideas, support and help from the following people and web sites, Bagatur would not be as it is now:
+  Without the ideas, support and help from the following people and web sites, Bagatur would not be as it is now:
   
   1. My Wife, for supporting me in this dissociable and non-profitable hobby.
   2. Iavor Stoimenov, for the support and helpful discussions about the chess stuffs.
@@ -50,10 +40,11 @@ Credits:
   5. Olivier Deville, for his great support during ChessWar XVII, http://www.open-aurec.com/chesswar/
   6. Dusan Stamenkovic, http://www.chessmosaic.com/, for the new Bagatur's Logo.
   7. All UCI compatible GUIs and UCI protocol itself.
-  8. REBEL, http://www.top-5000.nl/authors/rebel/chess840.htm or http://www.rebel13.nl/, very helpful web page. Unfortunately it appeared after i realized most of the things in the hard way.
+  8. REBEL, http://www.rebel13.nl/, very helpful web page.
   9. MTD(f), http://plaat.nl/mtdf.html, the parallel search of Bagatur is based on this idea.
-  10. Glaurung, http://www.glaurungchess.com/, nice ideas inside the evaluation function (e.g. king safety)
+  10. Glaurung chess engine, nice ideas inside the evaluation function (e.g. king safety)
   11. Fruit, http://www.fruitchess.com/, legendary program, nice and simple design.
   12. winrun4j, http://winrun4j.sourceforge.net/, for the windows executables
-  13. CuckooChess, http://chessprogramming.wikispaces.com/CuckooChess, another java chess program - strong and well written
+  13. CuckooChess, another java chess engine - strong and well written
+  14. Chess22k, another java chess engine - strong, well written and has an excellent evaluation function
   

@@ -17,15 +17,13 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 # Revision History
 
 Version 1.6 (17 January 2019)
-  * 15 ELO stronger (measured versus 1.5g)
   * Separate transposition tables for search and qsearch for better memory management
   * Use both transposition tables when probing position
   * If presented use transposition table scores before qsearch
-
+  
 Version 1.5g (14 January 2019)
-  * 20 ELO stronger (measured versus 1.5f)
   * Memory management improvements - more memory for the transposition table
-  * Use LMR for remaining depth > 3
+  * Use Late move reduction for remaining depth > 3
 
 Version 1.5f (31 October 2018)
   * 15 ELO stronger (measured versus 1.5e)
