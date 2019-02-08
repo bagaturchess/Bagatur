@@ -754,16 +754,20 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					
 					int lmrReduction = 0;
 					if (!inCheck
-						 && !isCheckMove
+						 /*&& !isCheckMove
 						 //&& !mateThreat
 						 //&& !isCapOrProm
 						 && moveSee < 0
-						 && rest > 3
+						 && rest > 3*/
 						) {
 						
+						double historyScores = getHistory(inCheck).getScores(cur_move) / 0.25;
+						if (historyScores > 1) {
+							historyScores = 1;
+						}
 						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
 						rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for pv nodes
-						rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
+						rate *= (1 - historyScores);//In [0, 1]
 						rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
 						/*if (lmrReduction < PLY) {
@@ -1428,16 +1432,20 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					
 					int lmrReduction = 0;
 					if (!inCheck
-						 && !isCheckMove
+						 /*&& !isCheckMove
 						 //&& !mateThreat
 						 //&& !isCapOrProm
 						 && moveSee < 0
-						 && rest > 3
+						 && rest > 3*/
 						) {
 						
+						double historyScores = getHistory(inCheck).getScores(cur_move) / 0.25;
+						if (historyScores > 1) {
+							historyScores = 1;
+						}
 						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
 						rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for non pv nodes
-						rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
+						rate *= (1 - historyScores);//In [0, 1]
 						rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
 						/*if (lmrReduction < PLY) {
