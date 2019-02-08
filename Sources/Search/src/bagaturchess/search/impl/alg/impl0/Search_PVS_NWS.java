@@ -761,10 +761,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						 && rest > 3*/
 						) {
 						
-						double historyScores = getHistory(inCheck).getScores(cur_move) / 0.25;
-						if (historyScores > 1) {
-							historyScores = 1;
-						}
+						double historyScores = Math.min(1, getHistory(inCheck).getScores(cur_move) / 0.25);
 						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
 						rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for pv nodes
 						rate *= (1 - historyScores);//In [0, 1]
@@ -1439,10 +1436,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						 && rest > 3*/
 						) {
 						
-						double historyScores = getHistory(inCheck).getScores(cur_move) / 0.25;
-						if (historyScores > 1) {
-							historyScores = 1;
-						}
+						double historyScores = Math.min(1, getHistory(inCheck).getScores(cur_move) / 0.25);
 						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
 						rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for non pv nodes
 						rate *= (1 - historyScores);//In [0, 1]
