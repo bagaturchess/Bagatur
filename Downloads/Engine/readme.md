@@ -16,6 +16,11 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 # Revision History
 
+Version 1.6a (11 February 2019)
+  * Revert memory management experiments introduced with versions 1.5g and 1.6
+  * More deeper internal iterative deepening search
+  * Late move reduction is now adjusted with move's history scores
+  
 Version 1.6 (17 January 2019)
   * Separate transposition tables for search and qsearch for better memory management
   * Use both transposition tables when probing position
