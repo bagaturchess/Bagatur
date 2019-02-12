@@ -1,9 +1,7 @@
 package bagaturchess.engines.evaladapters.chess22k;
 
 
-import static bagaturchess.engines.evaladapters.chess22k.ChessConstants.BISHOP;
 import static bagaturchess.engines.evaladapters.chess22k.ChessConstants.BLACK;
-import static bagaturchess.engines.evaladapters.chess22k.ChessConstants.NIGHT;
 import static bagaturchess.engines.evaladapters.chess22k.ChessConstants.ROOK;
 import static bagaturchess.engines.evaladapters.chess22k.ChessConstants.WHITE;
 
