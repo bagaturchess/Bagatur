@@ -740,9 +740,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					
 					boolean staticPrunning = false;
 					
-					if (/*!inCheck
+					if (!inCheck
 							&& !((ListAll)list).isGoodMove(cur_move)
-							&&*/ !isCheckMove
+							&& !isCheckMove
 							&& !isMateVal(alpha_org)
 							&& !isMateVal(beta)
 						) {
@@ -752,15 +752,15 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					int lmrReduction = 0;
 					if (!inCheck
 						 && !isCheckMove
-						 /*//&& !mateThreat
-						 //&& !isCapOrProm
+						 && !mateThreat
+						 && !isCapOrProm
 						 && moveSee < 0
-						 && rest > 3*/
+						 && rest > 3
 						) {
 						
 						double historyScores = Math.min(1, getHistory(inCheck).getScores(cur_move) / 0.25);
 						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
-						rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for pv nodes
+						//rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for pv nodes
 						rate *= (1 - historyScores);//In [0, 1]
 						rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
@@ -768,11 +768,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							lmrReduction = PLY;
 						}*/
 					}
-					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
-					if (lmrRest < 0) {
-						lmrRest = 0;
-					}
-					
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
 							new_maxdepth - lmrReduction, depth + 1, -alpha, false,
@@ -1424,10 +1419,10 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					int lmrReduction = 0;
 					if (!inCheck
 						 && !isCheckMove
-						 /*//&& !mateThreat
+						 //&& !mateThreat
 						 //&& !isCapOrProm
 						 && moveSee < 0
-						 && rest > 3*/
+						 //&& rest > 3
 						) {
 						
 						double historyScores = Math.min(1, getHistory(inCheck).getScores(cur_move) / 0.25);
@@ -1440,11 +1435,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							lmrReduction = PLY;
 						}*/
 					}
-					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
-					if (lmrRest < 0) {
-						lmrRest = 0;
-					}
-					
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
 							new_maxdepth - lmrReduction, depth + 1, -alpha_org, false,
