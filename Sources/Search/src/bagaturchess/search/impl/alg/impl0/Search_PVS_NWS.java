@@ -267,7 +267,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						tpt_move = tptEntry.getBestMove_lower();
 					} else if (tpt_lower >= beta) {
 						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= beta - 1) {
+					} else if (tpt_upper <= alpha_org) {
 						tpt_move = tptEntry.getBestMove_upper();
 					} else {
 						tpt_move = tptEntry.getBestMove_lower();
@@ -318,7 +318,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						}
 					}
 				}
-				if (tpt_upper <= beta - 1) {
+				if (tpt_upper <= alpha_org) {
 					if (!SearchUtils.isMateVal(tpt_upper)) {
 						node.bestmove = tpt_move;
 						node.eval = tpt_upper;
@@ -415,7 +415,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						tpt_move = tptEntry.getBestMove_lower();
 					} else if (tpt_lower >= beta) {
 						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= beta - 1) {
+					} else if (tpt_upper <= alpha_org) {
 						tpt_move = tptEntry.getBestMove_upper();
 					} else {
 						tpt_move = tptEntry.getBestMove_lower();
@@ -881,7 +881,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						tpt_move = tptEntry.getBestMove_lower();
 					} else if (tpt_lower >= beta) {
 						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= beta - 1) {
+					} else if (tpt_upper <= alpha_org) {
 						tpt_move = tptEntry.getBestMove_upper();
 					} else {
 						tpt_move = tptEntry.getBestMove_lower();
@@ -906,7 +906,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						return tpt_lower;
 					}
 				}
-				if (tpt_upper <= beta - 1) {
+				if (tpt_upper <= alpha_org) {
 					if (!SearchUtils.isMateVal(tpt_upper)) {
 						return tpt_upper;
 					}
@@ -1011,7 +1011,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 									tpt_move = tptEntry.getBestMove_lower();
 								} else if (tpt_lower >= beta) {
 									tpt_move = tptEntry.getBestMove_lower();
-								} else if (tpt_upper <= beta - 1) {
+								} else if (tpt_upper <= alpha_org) {
 									tpt_move = tptEntry.getBestMove_upper();
 								} else {
 									tpt_move = tptEntry.getBestMove_lower();
@@ -1072,7 +1072,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						tpt_move = tptEntry.getBestMove_lower();
 					} else if (tpt_lower >= beta) {
 						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= beta - 1) {
+					} else if (tpt_upper <= alpha_org) {
 						tpt_move = tptEntry.getBestMove_upper();
 					} else {
 						tpt_move = tptEntry.getBestMove_lower();
@@ -1536,7 +1536,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						tpt_move = tptEntry.getBestMove_lower();
 					} else if (tpt_lower >= beta) {
 						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= beta - 1) {
+					} else if (tpt_upper <= alpha_org) {
 						tpt_move = tptEntry.getBestMove_upper();
 					} else {
 						tpt_move = tptEntry.getBestMove_lower();
@@ -1841,7 +1841,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						tpt_move = tptEntry.getBestMove_lower();
 					} else if (tpt_lower >= beta) {
 						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= beta - 1) {
+					} else if (tpt_upper <= alpha_org) {
 						tpt_move = tptEntry.getBestMove_upper();
 					} else {
 						tpt_move = tptEntry.getBestMove_lower();
@@ -1865,7 +1865,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						return tpt_lower;
 					}
 				}
-				if (tpt_upper <= beta - 1) {
+				if (tpt_upper <= alpha_org) {
 					if (!SearchUtils.isMateVal(tpt_upper)) {
 						return tpt_upper;
 					}
