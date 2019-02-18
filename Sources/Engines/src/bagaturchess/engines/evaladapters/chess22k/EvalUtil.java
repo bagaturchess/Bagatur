@@ -44,14 +44,14 @@ public class EvalUtil {
 	public static int getScore2(final IChessBoard cb) {
 
 		final int mgEgScore = calculateMobilityScoresAndSetAttackBoards(cb)
-				+ PassedPawnEval.calculatePassedPawnScores(cb)
+				+ calculatePassedPawnScores(cb)
 				+ calculateThreats(cb)
 				+ calculatePawnShieldBonus(cb);
 		
 		final int othersScore = calculateOthers(cb);
 		
 		final int scoreMg = getMgScore(mgEgScore)
-								+ KingSafetyEval.calculateKingSafetyScores(cb)
+								+ calculateKingSafetyScores(cb)
 								+ calculateSpace(cb)
 								+ othersScore;
 		
@@ -855,4 +855,313 @@ public class EvalUtil {
 				+ (Long.bitCount(cb.getPieces(WHITE, QUEEN)) - Long.bitCount(cb.getPieces(BLACK, QUEEN))) * EvalConstants.MATERIAL[QUEEN];
 	}
 
+	
+	public static int calculateKingSafetyScores(final IChessBoard cb) {
+
+		int score = 0;
+
+		for (int kingColor = WHITE; kingColor <= BLACK; kingColor++) {
+			final int enemyColor = 1 - kingColor;
+
+			if ((cb.getPieces(enemyColor, QUEEN) | cb.getPieces(enemyColor, ROOK)) == 0) {
+				continue;
+			}
+
+			int counter = EvalConstants.KS_RANK[(7 * kingColor) + ChessConstants.COLOR_FACTOR[kingColor] * cb.getKingIndex(kingColor) / 8];
+
+			counter += EvalConstants.KS_NO_FRIENDS[Long.bitCount(cb.getKingArea(kingColor) & ~cb.getFriendlyPieces(kingColor))];
+			counter += openFiles(cb, kingColor, cb.getPieces(kingColor, PAWN));
+
+			// king can move?
+			if ((cb.getEvalInfo().attacks[kingColor][KING] & ~cb.getFriendlyPieces(kingColor)) == 0) {
+				counter++;
+			}
+			counter += EvalConstants.KS_ATTACKS[Long.bitCount(cb.getKingArea(kingColor) & cb.getEvalInfo().attacksAll[enemyColor])];
+			counter += checks(cb, kingColor);
+
+			counter += EvalConstants.KS_DOUBLE_ATTACKS[Long
+					.bitCount(StaticMoves.KING_MOVES[cb.getKingIndex(kingColor)] & cb.getEvalInfo().doubleAttacks[enemyColor] & ~cb.getEvalInfo().attacks[kingColor][PAWN])];
+
+			if ((cb.getCheckingPieces() & cb.getFriendlyPieces(enemyColor)) != 0) {
+				counter++;
+			}
+
+			// bonus for stm
+			counter += 1 - cb.getColorToMove() ^ enemyColor;
+
+			// bonus if there are discovered checks possible
+			counter += Long.bitCount(cb.getDiscoveredPieces() & cb.getFriendlyPieces(enemyColor)) * 2;
+
+			// pinned at first rank
+			if ((cb.getPinnedPieces() & Bitboard.RANK_FIRST[kingColor]) != 0) {
+				counter++;
+			}
+
+			if (cb.getPieces(enemyColor, QUEEN) == 0) {
+				counter /= 2;
+			} else if (Long.bitCount(cb.getPieces(enemyColor, QUEEN)) == 1) {
+				// bonus for small king-queen distance
+				if ((cb.getEvalInfo().attacksAll[kingColor] & cb.getPieces(enemyColor, QUEEN)) == 0) {
+					counter += EvalConstants.KS_QUEEN_TROPISM[Util.getDistance(cb.getKingIndex(kingColor),
+							Long.numberOfTrailingZeros(cb.getPieces(enemyColor, QUEEN)))];
+				}
+			}
+
+			counter += EvalConstants.KS_ATTACK_PATTERN[cb.getEvalInfo().kingAttackersFlag[enemyColor]];
+			score += ChessConstants.COLOR_FACTOR[enemyColor] * EvalConstants.KS_SCORES[Math.min(counter, EvalConstants.KS_SCORES.length - 1)];
+		}
+
+		return score;
+	}
+
+	private static int openFiles(final IChessBoard cb, final int kingColor, final long pawns) {
+
+		if (cb.getPieces(1 - kingColor, QUEEN) == 0) {
+			return 0;
+		}
+		if (Long.bitCount(cb.getPieces(1 - kingColor, ROOK)) < 2) {
+			return 0;
+		}
+
+		if ((Bitboard.RANK_FIRST[kingColor] & cb.getPieces(kingColor, KING)) != 0) {
+			if ((Bitboard.KING_SIDE & cb.getPieces(kingColor, KING)) != 0) {
+				if ((Bitboard.FILE_G & pawns) == 0 || (Bitboard.FILE_H & pawns) == 0) {
+					return EvalConstants.KS_OTHER[2];
+				}
+			} else if ((Bitboard.QUEEN_SIDE & cb.getPieces(kingColor, KING)) != 0) {
+				if ((Bitboard.FILE_A & pawns) == 0 || (Bitboard.FILE_B & pawns) == 0) {
+					return EvalConstants.KS_OTHER[2];
+				}
+			}
+		}
+		return 0;
+	}
+
+	private static int checks(final IChessBoard cb, final int kingColor) {
+		final int enemyColor = 1 - kingColor;
+		final int kingIndex = cb.getKingIndex(kingColor);
+		final long possibleSquares = ~cb.getFriendlyPieces(enemyColor)
+				& (~StaticMoves.KING_MOVES[kingIndex] | StaticMoves.KING_MOVES[kingIndex] & cb.getEvalInfo().doubleAttacks[enemyColor] & ~cb.getEvalInfo().doubleAttacks[kingColor]);
+
+		int counter = checkNight(cb, kingColor, StaticMoves.KNIGHT_MOVES[kingIndex] & possibleSquares & cb.getEvalInfo().attacks[enemyColor][NIGHT]);
+
+		long moves;
+		long queenMoves = 0;
+		if ((cb.getPieces(enemyColor, QUEEN) | cb.getPieces(enemyColor, BISHOP)) != 0) {
+			moves = MagicUtil.getBishopMoves(kingIndex, cb.getAllPieces() ^ cb.getPieces(kingColor, QUEEN)) & possibleSquares;
+			queenMoves = moves;
+			counter += checkBishop(cb, kingColor, moves & cb.getEvalInfo().attacks[enemyColor][BISHOP]);
+		}
+		if ((cb.getPieces(enemyColor, QUEEN) | cb.getPieces(enemyColor, ROOK)) != 0) {
+			moves = MagicUtil.getRookMoves(kingIndex, cb.getAllPieces() ^ cb.getPieces(kingColor, QUEEN)) & possibleSquares;
+			queenMoves |= moves;
+			counter += checkRook(cb, kingColor, moves & cb.getEvalInfo().attacks[enemyColor][ROOK]);
+		}
+
+		if (Long.bitCount(cb.getPieces(enemyColor, QUEEN)) == 1) {
+			counter += safeCheckQueen(cb, kingColor, queenMoves & ~cb.getEvalInfo().attacksAll[kingColor] & cb.getEvalInfo().attacks[enemyColor][QUEEN]);
+			counter += safeCheckQueenTouch(cb, kingColor);
+		}
+
+		return counter;
+	}
+
+	private static int safeCheckQueenTouch(final IChessBoard cb, final int kingColor) {
+		if ((cb.getEvalInfo().kingAttackersFlag[1 - kingColor] & SchroderUtil.FLAG_QUEEN) == 0) {
+			return 0;
+		}
+		final int enemyColor = 1 - kingColor;
+		if ((StaticMoves.KING_MOVES[cb.getKingIndex(kingColor)] & ~cb.getFriendlyPieces(enemyColor) & cb.getEvalInfo().attacks[enemyColor][QUEEN] & ~cb.getEvalInfo().doubleAttacks[kingColor]
+				& cb.getEvalInfo().doubleAttacks[enemyColor]) != 0) {
+			return EvalConstants.KS_OTHER[0];
+		}
+		return 0;
+	}
+
+	private static int safeCheckQueen(final IChessBoard cb, final int kingColor, final long safeQueenMoves) {
+		if (safeQueenMoves != 0) {
+			return EvalConstants.KS_CHECK_QUEEN[Long.bitCount(cb.getFriendlyPieces(kingColor))];
+		}
+
+		return 0;
+	}
+
+	private static int checkRook(final IChessBoard cb, final int kingColor, final long rookMoves) {
+		if (rookMoves == 0) {
+			return 0;
+		}
+
+		int counter = 0;
+		if ((rookMoves & ~cb.getEvalInfo().attacksAll[kingColor]) != 0) {
+			counter += EvalConstants.KS_CHECK[ROOK];
+
+			// last rank?
+			if (kingBlockedAtLastRank(kingColor, cb, StaticMoves.KING_MOVES[cb.getKingIndex(kingColor)] & cb.getEmptySpaces() & ~cb.getEvalInfo().attacksAll[1 - kingColor])) {
+				counter += EvalConstants.KS_OTHER[1];
+			}
+
+		} else {
+			counter += EvalConstants.KS_UCHECK[ROOK];
+		}
+
+		return counter;
+	}
+
+	private static int checkBishop(final IChessBoard cb, final int kingColor, final long bishopMoves) {
+		if (bishopMoves != 0) {
+			if ((bishopMoves & ~cb.getEvalInfo().attacksAll[kingColor]) != 0) {
+				return EvalConstants.KS_CHECK[BISHOP];
+			} else {
+				return EvalConstants.KS_UCHECK[BISHOP];
+			}
+		}
+		return 0;
+	}
+
+	private static int checkNight(final IChessBoard cb, final int kingColor, final long nightMoves) {
+		if (nightMoves != 0) {
+			if ((nightMoves & ~cb.getEvalInfo().attacksAll[kingColor]) != 0) {
+				return EvalConstants.KS_CHECK[NIGHT];
+			} else {
+				return EvalConstants.KS_UCHECK[NIGHT];
+			}
+		}
+		return 0;
+	}
+
+	private static boolean kingBlockedAtLastRank(final int kingColor, final IChessBoard cb, final long safeKingMoves) {
+		return (Bitboard.RANKS[7 * kingColor] & cb.getPieces(kingColor, KING)) != 0 && (safeKingMoves & Bitboard.RANKS[7 * kingColor]) == safeKingMoves;
+	}
+	
+	public static int calculatePassedPawnScores(final IChessBoard cb) {
+
+		int score = 0;
+
+		int whitePromotionDistance = Util.SHORT_MAX;
+		int blackPromotionDistance = Util.SHORT_MAX;
+
+		// white passed pawns
+		long passedPawns = cb.getEvalInfo().passedPawnsAndOutposts & cb.getPieces(WHITE, ChessConstants.PAWN);
+		while (passedPawns != 0) {
+			final int index = 63 - Long.numberOfLeadingZeros(passedPawns);
+
+			score += getPassedPawnScore(cb, index, WHITE);
+
+			if (whitePromotionDistance == Util.SHORT_MAX) {
+				whitePromotionDistance = getWhitePromotionDistance(cb, index);
+			}
+
+			// skip all passed pawns at same file
+			passedPawns &= ~Bitboard.FILES[index & 7];
+		}
+
+		// black passed pawns
+		passedPawns = cb.getEvalInfo().passedPawnsAndOutposts & cb.getPieces(BLACK, ChessConstants.PAWN);
+		while (passedPawns != 0) {
+			final int index = Long.numberOfTrailingZeros(passedPawns);
+
+			score -= getPassedPawnScore(cb, index, BLACK);
+
+			if (blackPromotionDistance == Util.SHORT_MAX) {
+				blackPromotionDistance = getBlackPromotionDistance(cb, index);
+			}
+
+			// skip all passed pawns at same file
+			passedPawns &= ~Bitboard.FILES[index & 7];
+		}
+
+		if (whitePromotionDistance < blackPromotionDistance - 1) {
+			score += 350;
+		} else if (whitePromotionDistance > blackPromotionDistance + 1) {
+			score -= 350;
+		}
+
+		return score;
+	}
+
+	private static int getPassedPawnScore(final IChessBoard cb, final int index, final int color) {
+
+		final int nextIndex = index + ChessConstants.COLOR_FACTOR_8[color];
+		final long square = Util.POWER_LOOKUP[index];
+		final long maskNextSquare = Util.POWER_LOOKUP[nextIndex];
+		final long maskPreviousSquare = Util.POWER_LOOKUP[index - ChessConstants.COLOR_FACTOR_8[color]];
+		final long maskFile = Bitboard.FILES[index & 7];
+		final int enemyColor = 1 - color;
+		float multiplier = 1;
+
+		// is piece blocked?
+		if ((cb.getAllPieces() & maskNextSquare) != 0) {
+			multiplier *= EvalConstants.PASSED_MULTIPLIERS[0];
+		}
+
+		// is next squared attacked?
+		if ((cb.getEvalInfo().attacksAll[enemyColor] & maskNextSquare) == 0) {
+
+			// complete path free of enemy attacks?
+			if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & cb.getEvalInfo().attacksAll[enemyColor]) == 0) {
+				multiplier *= EvalConstants.PASSED_MULTIPLIERS[7];
+			} else {
+				multiplier *= EvalConstants.PASSED_MULTIPLIERS[1];
+			}
+		}
+
+		// is next squared defended?
+		if ((cb.getEvalInfo().attacksAll[color] & maskNextSquare) != 0) {
+			multiplier *= EvalConstants.PASSED_MULTIPLIERS[3];
+		}
+
+		// is enemy king in front?
+		if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & cb.getPieces(enemyColor, ChessConstants.KING)) != 0) {
+			multiplier *= EvalConstants.PASSED_MULTIPLIERS[2];
+		}
+
+		// under attack?
+		if (cb.getColorToMove() != color && (cb.getEvalInfo().attacksAll[enemyColor] & square) != 0) {
+			multiplier *= EvalConstants.PASSED_MULTIPLIERS[4];
+		}
+
+		// defended by rook from behind?
+		if ((maskFile & cb.getPieces(color, ROOK)) != 0 && (cb.getEvalInfo().attacks[color][ROOK] & square) != 0 && (cb.getEvalInfo().attacks[color][ROOK] & maskPreviousSquare) != 0) {
+			multiplier *= EvalConstants.PASSED_MULTIPLIERS[5];
+		}
+
+		// attacked by rook from behind?
+		else if ((maskFile & cb.getPieces(enemyColor, ROOK)) != 0 && (cb.getEvalInfo().attacks[enemyColor][ROOK] & square) != 0
+				&& (cb.getEvalInfo().attacks[enemyColor][ROOK] & maskPreviousSquare) != 0) {
+			multiplier *= EvalConstants.PASSED_MULTIPLIERS[6];
+		}
+
+		// king tropism
+		multiplier *= EvalConstants.PASSED_KING_MULTI[Util.getDistance(cb.getKingIndex(color), index)];
+		multiplier *= EvalConstants.PASSED_KING_MULTI[8 - Util.getDistance(cb.getKingIndex(enemyColor), index)];
+
+		final int scoreIndex = (7 * color) + ChessConstants.COLOR_FACTOR[color] * index / 8;
+		return EvalUtil.score((int) (EvalConstants.PASSED_SCORE_MG[scoreIndex] * multiplier), (int) (EvalConstants.PASSED_SCORE_EG[scoreIndex] * multiplier));
+	}
+
+	private static int getBlackPromotionDistance(final IChessBoard cb, final int index) {
+		// check if it cannot be stopped
+		int promotionDistance = index >>> 3;
+		if (promotionDistance == 1 && cb.getColorToMove() == BLACK) {
+			if ((Util.POWER_LOOKUP[index - 8] & (cb.getEvalInfo().attacksAll[WHITE] | cb.getAllPieces())) == 0) {
+				if ((Util.POWER_LOOKUP[index] & cb.getEvalInfo().attacksAll[WHITE]) == 0) {
+					return 1;
+				}
+			}
+		}
+		return Util.SHORT_MAX;
+	}
+
+	private static int getWhitePromotionDistance(final IChessBoard cb, final int index) {
+		// check if it cannot be stopped
+		int promotionDistance = 7 - index / 8;
+		if (promotionDistance == 1 && cb.getColorToMove() == WHITE) {
+			if ((Util.POWER_LOOKUP[index + 8] & (cb.getEvalInfo().attacksAll[BLACK] | cb.getAllPieces())) == 0) {
+				if ((Util.POWER_LOOKUP[index] & cb.getEvalInfo().attacksAll[BLACK]) == 0) {
+					return 1;
+				}
+			}
+		}
+		return Util.SHORT_MAX;
+	}
 }
