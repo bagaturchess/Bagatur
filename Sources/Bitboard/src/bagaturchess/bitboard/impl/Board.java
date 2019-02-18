@@ -5103,7 +5103,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 			
 			long figBitboard = Fields.ALL_ORDERED_A1H1[fieldID];
 			if (fieldID != get67IDByBitboard(figBitboard)) {
-				throw new IllegalStateException("fieldID=" + fieldID + " figBitboard=" + figBitboard);
+				throw new IllegalStateException("fieldID=" + fieldID + " get67IDByBitboard(figBitboard)=" + get67IDByBitboard(figBitboard));
 			}
 			
 			typeBitboard |= figBitboard;

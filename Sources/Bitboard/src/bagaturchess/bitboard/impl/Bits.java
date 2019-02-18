@@ -34,6 +34,7 @@ public class Bits {
 	
 	private static final int MAX_INT = 2147483647;
 	
+	//reverse(
 	public static final long BIT_0 = 1L << 63;
 	public static final long BIT_1 = 1L << 62;
 	public static final long BIT_2 = 1L << 61;

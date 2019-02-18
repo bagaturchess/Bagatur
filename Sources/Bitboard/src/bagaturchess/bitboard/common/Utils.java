@@ -140,34 +140,6 @@ public class Utils {
       return ((int)(val) + (int)(val >>> 32)) & 0xff;
   }
   
-  public static final int firstSetBit(long number) {
-  	int result = 0;
-  	for (int i=0; i<Bits.ALL_BITS.length; i++) {
-  		if ((Bits.ALL_BITS[i] & number) != 0L) {
-  			result = 63 - i;
-  			break;
-  		}
-  	}
-  	if (result < 0 || result >= 64) {
-  		throw new IllegalStateException();
-  	}
-  	return result;
-  }
-  
-  public static final int lastSetBit(long number) {
-  	int result = 0;
-  	for (int i=Bits.ALL_BITS.length - 1; i>=0; i--) {
-  		if ((Bits.ALL_BITS[i] & number) != 0L) {
-  			result = 63 - i;
-  			break;
-  		}
-  	}
-  	if (result < 0 || result >= 64) {
-  		throw new IllegalStateException();
-  	}
-  	return result;
-  }
-  
   public static final boolean has1BitSet(long number) {
   	final long number1 = (number - 1) & number;
 	return number1 == Bits.NUMBER_0; 
