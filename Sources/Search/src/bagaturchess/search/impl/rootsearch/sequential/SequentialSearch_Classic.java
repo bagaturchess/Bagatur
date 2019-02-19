@@ -203,12 +203,20 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 								int eval = searcher.pv_search(final_mediator,
 										null, info,
 										ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
-										ISearch.MIN, ISearch.MAX,
+										prevEval - 15, prevEval + 15,
 										0, 0, final_prevPV,
 										false, 0, searcher.getEnv().getBitboard().getColourToMove(),
 										0, 0, false, 0, !go.isPonder());
 							//}
-							
+								if (eval <= prevEval - 15 || eval >= prevEval + 15) {
+									eval = searcher.pv_search(final_mediator,
+											null, info,
+											ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
+											ISearch.MIN, ISearch.MAX,
+											0, 0, final_prevPV,
+											false, 0, searcher.getEnv().getBitboard().getColourToMove(),
+											0, 0, false, 0, !go.isPonder());
+								}
 							
 							prevEval = eval;
 							
