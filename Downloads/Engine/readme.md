@@ -16,6 +16,9 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 # Revision History
 
+Version 1.6b (21 February 2019)
+  * Late move reduction is now decreased for PV nodes (+30 ELO)
+
 Version 1.6a (11 February 2019)
   * Revert memory management experiments introduced with versions 1.5g and 1.6
   * More deeper internal iterative deepening search
