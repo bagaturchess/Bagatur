@@ -182,11 +182,9 @@ public class Simulate {
 	
 	public static void main(String[] args) {
 		
-		IBoardConfig boardConfig = new BoardConfigImpl();
-		
 		//BoardWithAttacks bitBoard = new BoardWithAttacks();
 		//String BOARD = "4k3/P7/8/8/8/8/7p/4K3 w - 0 0";
-		IBoard bitBoard = new Board(boardConfig);
+		IBoard bitBoard = new Board();
 		//IBoard bitBoard = new Board3_Adapter();
 		//IBoard bitBoard = new Board4_Adapter();
 		//IBoard bitBoard = new DummyBoard();
@@ -235,5 +233,9 @@ public class Simulate {
 		}
 		
 		//check(from, to, moves);
+	}
+	
+	static class SearchInfo {
+		public long nodes;
 	}
 }
