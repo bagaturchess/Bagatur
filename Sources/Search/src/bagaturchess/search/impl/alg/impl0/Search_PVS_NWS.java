@@ -401,8 +401,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		boolean zungzwang = false;
 		if (useNullMove
 				&& !inCheck
-				&& !prevNullMove
+				//&& !prevNullMove
 				&& hasAtLeastOnePiece
+				//&& rest >= 3
 				) {
 						
 			if (backtrackingInfo.static_eval >= beta) {
@@ -799,7 +800,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				//Add history records for the current move
 				list.countTotal(cur_move);
-				if (cur_eval <= alpha) {
+				if (cur_eval < beta) {
 					getHistory(inCheck).countFailure(cur_move, rest);
 				} else {
 					list.countSuccess(cur_move);//Should be before addCounterMove call
@@ -1093,8 +1094,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		boolean zungzwang = false;
 		if (useNullMove
 				&& !inCheck
-				&& !prevNullMove
+				//&& !prevNullMove
 				&& hasAtLeastOnePiece
+				//&& rest >= 3
 				) {
 						
 			if (backtrackingInfo.static_eval >= beta) {
@@ -1464,7 +1466,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				//Add history records for the current move
 				list.countTotal(cur_move);
-				if (cur_eval <= alpha_org) {
+				if (cur_eval < beta) {
 					getHistory(inCheck).countFailure(cur_move, rest);
 				} else {
 					list.countSuccess(cur_move);//Should be before addCounterMove call
@@ -1632,24 +1634,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
                 }
             }
         }
-
-		
-		if (!inCheck) {
-			
-			//Beta cutoff
-			if (staticEval >= beta) {
-				node.eval = staticEval;
-				return node.eval;
-			}
-			
-			//Alpha cutoff
-			if (!isMateVal(alpha_org)
-					&& !isMateVal(beta)
-					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
-				node.eval = staticEval;
-				return node.eval;
-			}
-		}
 		
 		
 		long hashkey = env.getBitboard().getHashKey();
@@ -1739,6 +1723,24 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						}
 					}
 				}
+			}
+		}
+		
+		
+		if (!inCheck) {
+			
+			//Beta cutoff
+			if (staticEval >= beta) {
+				node.eval = staticEval;
+				return node.eval;
+			}
+			
+			//Alpha cutoff
+			if (!isMateVal(alpha_org)
+					&& !isMateVal(beta)
+					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
+				node.eval = staticEval;
+				return node.eval;
 			}
 		}
 		
@@ -1935,26 +1937,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
                 }
             }
         }
-
-		
-		if (!inCheck) {
-			
-			//Beta cutoff
-			if (staticEval >= beta) {
-				return staticEval;
-			}
-			
-			//Alpha cutoff
-			if (!isMateVal(beta - 1)
-					&& !isMateVal(beta)
-					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
-				return staticEval;
-			}
-			
-			if (!inCheck && staticEval > beta - 1) {
-				throw new IllegalStateException("!inCheck && staticEval > beta - 1");
-			}
-		}
 		
 		
 		long hashkey = env.getBitboard().getHashKey();
@@ -2010,6 +1992,27 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 			}
 		}
+		
+		
+		if (!inCheck) {
+			
+			//Beta cutoff
+			if (staticEval >= beta) {
+				return staticEval;
+			}
+			
+			//Alpha cutoff
+			if (!isMateVal(beta - 1)
+					&& !isMateVal(beta)
+					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
+				return staticEval;
+			}
+			
+			if (!inCheck && staticEval > beta - 1) {
+				throw new IllegalStateException("!inCheck && staticEval > beta - 1");
+			}
+		}
+		
 		
 		ISearchMoveList list = null;
 		if (inCheck) { 
