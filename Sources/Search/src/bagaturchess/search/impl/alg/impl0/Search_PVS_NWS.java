@@ -350,144 +350,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			return node.eval;
 		}
 		
-
-        if (STATIC_PRUNING1 && useStaticPrunning
-                ) {
-                
-            if (inCheck) {
-                throw new IllegalStateException("In check in useStaticPrunning");
-            }
-        
-            if (tpt_lower > TPTEntry.MIN_VALUE) {
-                if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
-                    
-                    node.eval = tpt_lower;
-                    node.leaf = true;
-                    node.nullmove = false;
-                    
-                    node.bestmove = 0;
-                    env.getTPT().lock();
-                    buff_tpt_depthtracking[0] = 0;
-                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
-                    env.getTPT().unlock();
-                    
-                    
-                    return node.eval;
-                }
-            }
-            
-			
-			if (alpha_org > backtrackingInfo.static_eval + getAlphaTrustWindow(mediator, rest)) {
-                int qeval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour);
-				if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
-					node.bestmove = 0;
-					node.eval = qeval;
-					node.leaf = true;
-					node.nullmove = false;
-					return node.eval;
-				}
-			}
-        }
-		
-        
-		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
-			env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
-
-		boolean hasAtLeastThreePieces = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 9 :
-			env.getBitboard().getMaterialFactor().getBlackFactor() >= 9;
-		
-		int new_mateMove = 0;
-		boolean mateThreat = false;
-		boolean zungzwang = false;
-		if (useNullMove
-				&& !inCheck
-				//&& !prevNullMove
-				&& hasAtLeastOnePiece
-				//&& rest >= 3
-				) {
-			
-			if (backtrackingInfo.static_eval >= beta) {
-				
-				//int null_reduction = PLY * (rest >= 6 ? 3 : 2);
-				int null_reduction = PLY * (rest >= 6 ? 4 : 3);
-				null_reduction = (int) (NULL_MOVE_REDUCTION_MULTIPLIER * Math.max(null_reduction, PLY * (rest / 2)));
-				
-				int null_maxdepth = maxdepth - null_reduction;
-				
-				env.getBitboard().makeNullMoveForward();
-				int null_val = -nullwin_search(mediator, info,
-						initial_maxdepth, null_maxdepth,
-						depth + 1, -(beta - 1), true, prevprevbest, prevbest, prevPV, rootColour,
-						0, useMateDistancePrunning, useStaticPrunning, useNullMove);
-				
-				if (null_val >= beta) {
-					
-					env.getBitboard().makeNullMoveBackward();
-					
-					if (hasAtLeastThreePieces) {
-						return null_val;
-					}
-					
-					int null_val_ver = nullwin_search(mediator, info, initial_maxdepth, null_maxdepth, depth,
-							beta, prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
-							mateMove, useMateDistancePrunning, useStaticPrunning, useNullMove);
-					
-					if (null_val_ver >= beta) {
-						return null_val_ver;
-					} else {
-						zungzwang = true;
-						//System.out.println("zungzwang hit");
-					}
-					
-					if (allowTPTAccess(maxdepth, depth)) {
-						env.getTPT().lock();
-						{
-							TPTEntry tptEntry = env.getTPT().get(hashkey);
-							if (tptEntry != null) {
-								tpt_found = true;
-								tpt_exact = tptEntry.isExact();
-								tpt_depth = tptEntry.getDepth();
-								tpt_lower = tptEntry.getLowerBound();
-								tpt_upper = tptEntry.getUpperBound();
-								if (tpt_exact) {
-									tpt_move = tptEntry.getBestMove_lower();
-								} else if (tpt_lower >= beta) {
-									tpt_move = tptEntry.getBestMove_lower();
-								} else if (tpt_upper <= alpha_org) {
-									tpt_move = tptEntry.getBestMove_upper();
-								} else {
-									tpt_move = tptEntry.getBestMove_lower();
-									if (tpt_move == 0) {
-										tpt_move = tptEntry.getBestMove_upper();
-									}
-								}
-							}
-						}
-						env.getTPT().unlock();
-					}
-				} else {
-					if (backtrackingInfo.static_eval > alpha_org) { //PV node candidate
-						if (null_val <= alpha_org) { //but bad thing appears
-							if (null_val < 0 && isMateVal(null_val)) {//and the bad thing is mate
-								mateThreat = true;
-								
-								if (allowTPTAccess(maxdepth, depth)) {
-									env.getTPT().lock();
-									TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKey());
-									if (entry != null) {
-										new_mateMove = entry.getBestMove_lower();
-									}
-									env.getTPT().unlock();
-								}
-							}
-						}
-					}
-					
-					env.getBitboard().makeNullMoveBackward();
-				}
-			}
-		}
-		
 		
 		//IID PV Node
 		if (rest >= 6
@@ -526,33 +388,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				env.getTPT().unlock();
 			}
 		}
-		
-		
-        if (STATIC_PRUNING1 && useStaticPrunning
-                ) {
-                
-            if (inCheck) {
-                throw new IllegalStateException("In check in useStaticPrunning");
-            }
-        
-            if (tpt_lower > TPTEntry.MIN_VALUE) {
-                if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
-                    
-                    node.eval = tpt_lower;
-                    node.leaf = true;
-                    node.nullmove = false;
-                    
-                    node.bestmove = 0;
-                    env.getTPT().lock();
-                    buff_tpt_depthtracking[0] = 0;
-                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
-                    env.getTPT().unlock();
-                    
-                    
-                    return node.eval;
-                }
-            }
-        }
         
         
 		//Singular move extension
@@ -723,8 +558,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					//Do extensions here
 					if (cur_move == tpt_move) {
 						new_maxdepth += singularExtension;
-					} else if (zungzwang) {
-						new_maxdepth += PLY;
 					} else {
 						//new_maxdepth += Math.min(PLY, PLY * (getHistory(inCheck).getScores(cur_move) + Math.max(0, (evalDiff / (double)EVAL_DIFF_MAX))));						
 					}
@@ -736,7 +569,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					
 					cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, false,
 							best_move, prevbest, prevPV, rootColour,
-							new_mateMove, useMateDistancePrunning, false, false);
+							0, useMateDistancePrunning, false, false);
 				} else {
 					
 					boolean staticPrunning = false;
@@ -753,7 +586,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					int lmrReduction = 0;
 					if (!inCheck
 						 && !isCheckMove
-						 && !mateThreat
 						 && !isCapOrProm
 						 && moveSee < 0
 						 && rest > 3
@@ -778,20 +610,20 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
 							new_maxdepth - lmrReduction, depth + 1, -alpha, false,
 							best_move, prevbest, prevPV, rootColour,
-							new_mateMove, useMateDistancePrunning, staticPrunning, true);
+							0, useMateDistancePrunning, staticPrunning, true);
 					
 					if (cur_eval > alpha && (lmrReduction > 0 || staticPrunning) ) {
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha, false,
 								best_move, prevbest, prevPV, rootColour,
-								new_mateMove, useMateDistancePrunning, false, true);
+								0, useMateDistancePrunning, false, true);
 					}
 					
 					if (cur_eval > best_eval) {
 						
 						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, false,
 								best_move, prevbest, prevPV, rootColour,
-								new_mateMove, useMateDistancePrunning, false, false);
+								0, useMateDistancePrunning, false, false);
 					}
 				}
 				
