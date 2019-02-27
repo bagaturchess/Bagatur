@@ -522,28 +522,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 				
 				
-				//Static pruning
-				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !((ListAll)list).isGoodMove(cur_move) && !env.getBitboard().isCheckMove(cur_move)) {
-					
-					if (searchedCount >= 4 && rest <= 8) {
-						
-						//Static pruning - move count based
-						if (searchedCount >= 3 + Math.pow(rest, 2)) {
-							continue;
-						}
-						
-						//Static pruning - history based
-						if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
-	 						continue;
-	 					}
-						
-						//Static pruning - evaluation based
-						if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
-							continue;
-						}
-					}
-				}
-				
 				env.getBitboard().makeMoveForward(cur_move);
 				
 				
