@@ -322,33 +322,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	}
 	
 	
-	protected boolean isPVNode(int cur_eval, int best_eval, int alpha, int beta) {
-		return cur_eval > alpha && cur_eval < beta;
-	}
-	
-	protected boolean isNonAlphaNode(int cur_eval, int best_eval, int alpha, int beta) {
-		return cur_eval > alpha;
-	}
-	
-	@Override
-	public void search(ISearchMediator mediator) {
-		search(mediator, MAX_DEPTH, true);
-	}
-	
-	
-	@Override
-	public void search(ISearchMediator mediator, int max_iterations, boolean useMateDistancePrunning) {
-		search(mediator, 1, max_iterations, useMateDistancePrunning);
-	}
-	
-	
-	@Override
-	public void search(ISearchMediator mediator, int startIteration,
-			int max_iterations, boolean useMateDistancePrunning) {
-		throw new UnsupportedOperationException();
-	}
-	
-	
 	protected boolean hasExpectedEval() {
 		env.getTPT().lock();
 		TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());

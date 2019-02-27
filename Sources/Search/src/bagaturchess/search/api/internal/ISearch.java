@@ -46,12 +46,6 @@ public interface ISearch {
 	public SearchEnv getEnv();
 	public PVManager getPvman();
 	
-	public void search(ISearchMediator mediator);
-	
-	public void search(ISearchMediator mediator, int max_iterations, boolean useMateDistancePrunning);
-	
-	public void search(ISearchMediator mediator, int startIteration, int max_iterations, boolean useMateDistancePrunning);
-	
 	public int pv_search(ISearchMediator mediator, IRootWindow rootWin, ISearchInfo info,
 			int initial_maxdepth, int maxdepth, int depth, int alpha_org, int beta,
 			int prevbest, int prevprevbest, int[] prevPV, boolean prevNullMove, int evalGain, int rootColour,

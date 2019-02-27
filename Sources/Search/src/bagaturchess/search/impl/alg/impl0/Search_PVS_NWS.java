@@ -787,7 +787,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 								new_mateMove, useMateDistancePrunning, false, true);
 					}
 					
-					if (isPVNode(cur_eval, best_eval, alpha, beta)) {
+					if (cur_eval > best_eval) {
 						
 						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, false,
 								best_move, prevbest, prevPV, rootColour,
@@ -813,16 +813,14 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					best_eval = cur_eval;
 					best_move = cur_move;
 					
-					if (isNonAlphaNode(cur_eval, best_eval, alpha, beta)) {
 						
-						node.bestmove = best_move;
-						node.eval = best_eval;
-						node.leaf = false;
-						node.nullmove = false;
-						
-						if (depth + 1 < MAX_DEPTH) {
-							pvman.store(depth + 1, node, pvman.load(depth + 1), true);
-						}
+					node.bestmove = best_move;
+					node.eval = best_eval;
+					node.leaf = false;
+					node.nullmove = false;
+					
+					if (depth + 1 < MAX_DEPTH) {
+						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
 					}
 					
 					if (best_eval >= beta) {												
