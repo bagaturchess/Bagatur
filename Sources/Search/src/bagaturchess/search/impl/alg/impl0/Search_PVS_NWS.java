@@ -780,7 +780,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							best_move, prevbest, prevPV, rootColour,
 							new_mateMove, useMateDistancePrunning, staticPrunning, true);
 					
-					if (cur_eval >= beta && (lmrReduction > 0 || staticPrunning) ) {
+					if (cur_eval > alpha && (lmrReduction > 0 || staticPrunning) ) {
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha, false,
 								best_move, prevbest, prevPV, rootColour,
@@ -813,7 +813,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					best_eval = cur_eval;
 					best_move = cur_move;
 					
-						
+					
 					node.bestmove = best_move;
 					node.eval = best_eval;
 					node.leaf = false;
@@ -1451,7 +1451,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							best_move, prevbest, prevPV, rootColour,
 							new_mateMove, useMateDistancePrunning, staticPrunning, true);
 					
-					if (cur_eval >= beta && (lmrReduction > 0 || staticPrunning) ) {
+					if (cur_eval > alpha_org && (lmrReduction > 0 || staticPrunning) ) {
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, false,
 								best_move, prevbest, prevPV, rootColour,
