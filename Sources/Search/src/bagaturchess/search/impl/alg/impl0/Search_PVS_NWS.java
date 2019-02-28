@@ -542,67 +542,58 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 				
 				
-				int cur_eval;
-				if (searchedCount == 0) {
+				boolean staticPrunning = false;
+				
+				if (!inCheck
+						&& !((ListAll)list).isGoodMove(cur_move)
+						&& !isCheckMove
+						&& !isMateVal(alpha_org)
+						&& !isMateVal(beta)
+					) {
+					staticPrunning = true;
+				}
+				
+				int lmrReduction = 0;
+				if (!inCheck
+					 && !isCheckMove
+					 && !isCapOrProm
+					 && moveSee < 0
+					 && rest > 3
+					) {
+					
+					double historyScores = Math.min(1, getHistory(inCheck).getScores(cur_move) / 0.25);
+					double rate = Math.max(1, Math.log(searchedCount)) * Math.log(rest) / 2;
+					//rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for pv nodes
+					rate *= (1 - historyScores);//In [0, 1]
+					rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
+					lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
+					/*if (lmrReduction < PLY) {
+						lmrReduction = PLY;
+					}*/
+				}
+				int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
+				if (lmrRest < 0) {
+					lmrRest = 0;
+				}
+				
+				
+				int cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
+						new_maxdepth - lmrReduction, depth + 1, -alpha, false,
+						best_move, prevbest, prevPV, rootColour,
+						0, useMateDistancePrunning, staticPrunning, true);
+				
+				if (cur_eval > alpha && (lmrReduction > 0 || staticPrunning) ) {
+					
+					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha, false,
+							best_move, prevbest, prevPV, rootColour,
+							0, useMateDistancePrunning, false, true);
+				}
+				
+				if (cur_eval > best_eval) {
 					
 					cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, false,
 							best_move, prevbest, prevPV, rootColour,
 							0, useMateDistancePrunning, false, false);
-				} else {
-					
-					boolean staticPrunning = false;
-					
-					if (!inCheck
-							&& !((ListAll)list).isGoodMove(cur_move)
-							&& !isCheckMove
-							&& !isMateVal(alpha_org)
-							&& !isMateVal(beta)
-						) {
-						staticPrunning = true;
-					}
-					
-					int lmrReduction = 0;
-					if (!inCheck
-						 && !isCheckMove
-						 && !isCapOrProm
-						 && moveSee < 0
-						 && rest > 3
-						) {
-						
-						double historyScores = Math.min(1, getHistory(inCheck).getScores(cur_move) / 0.25);
-						double rate = Math.max(1, Math.log(searchedCount)) * Math.log(rest) / 2;
-						//rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for pv nodes
-						rate *= (1 - historyScores);//In [0, 1]
-						rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
-						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
-						/*if (lmrReduction < PLY) {
-							lmrReduction = PLY;
-						}*/
-					}
-					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
-					if (lmrRest < 0) {
-						lmrRest = 0;
-					}
-					
-					
-					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
-							new_maxdepth - lmrReduction, depth + 1, -alpha, false,
-							best_move, prevbest, prevPV, rootColour,
-							0, useMateDistancePrunning, staticPrunning, true);
-					
-					if (cur_eval > alpha && (lmrReduction > 0 || staticPrunning) ) {
-						
-						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha, false,
-								best_move, prevbest, prevPV, rootColour,
-								0, useMateDistancePrunning, false, true);
-					}
-					
-					if (cur_eval > best_eval) {
-						
-						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, false,
-								best_move, prevbest, prevPV, rootColour,
-								0, useMateDistancePrunning, false, false);
-					}
 				}
 				
 				
