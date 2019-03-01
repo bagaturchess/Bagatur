@@ -562,7 +562,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					) {
 					
 					double historyScores = Math.min(1, getHistory(inCheck).getScores(cur_move) / 0.25);
-					double rate = Math.max(1, Math.log(searchedCount)) * Math.log(rest) / 2;
+					double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / (double) 2);
 					//rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for pv nodes
 					rate *= (1 - historyScores);//In [0, 1]
 					rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
@@ -1234,7 +1234,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						) {
 						
 						double historyScores = Math.min(1, getHistory(inCheck).getScores(cur_move) / 0.25);
-						double rate = Math.max(1, Math.log(searchedCount)) * Math.log(rest) / 2;						
+						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / (double) 2);						
 						rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for non pv nodes
 						rate *= (1 - historyScores);//In [0, 1]
 						rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
