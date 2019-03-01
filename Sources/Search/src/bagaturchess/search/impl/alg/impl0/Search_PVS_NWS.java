@@ -53,6 +53,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 	private BacktrackingInfo[] backtracking 		= new BacktrackingInfo[MAX_DEPTH + 1];
 	
 	private static final int EVAL_DIFF_MAX 			= 200;
+	private static final double HISTORY_MAX 		= 0.25;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -561,7 +562,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					 && rest > 3
 					) {
 					
-					double historyScores = Math.min(1, getHistory(inCheck).getScores(cur_move) / 0.25);
+					double historyScores = Math.min(1, getHistory(inCheck).getScores(cur_move) / HISTORY_MAX);
 					double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / (double) 2);
 					//rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for pv nodes
 					rate *= (1 - historyScores);//In [0, 1]
@@ -1233,7 +1234,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						 //&& rest > 3
 						) {
 						
-						double historyScores = Math.min(1, getHistory(inCheck).getScores(cur_move) / 0.25);
+						double historyScores = Math.min(1, getHistory(inCheck).getScores(cur_move) / HISTORY_MAX);
 						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / (double) 2);						
 						rate += ((ListAll)list).isGoodMove(cur_move) ? 1 : 2;//for non pv nodes
 						rate *= (1 - historyScores);//In [0, 1]
