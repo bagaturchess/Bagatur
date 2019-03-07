@@ -13,7 +13,7 @@ import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.api.IUCIOptionsRegistry;
 import bagaturchess.uci.impl.commands.options.UCIOption;
 import bagaturchess.uci.impl.commands.options.UCIOptionCombo;
-import bagaturchess.uci.impl.commands.options.UCIOptionSpin;
+import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Double;
 import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Integer;
 import bagaturchess.uci.impl.commands.options.UCIOptionString;
 

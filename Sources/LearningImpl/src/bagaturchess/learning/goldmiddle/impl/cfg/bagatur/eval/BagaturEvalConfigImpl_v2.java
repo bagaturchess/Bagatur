@@ -5,7 +5,7 @@ import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.api.IUCIOptionsRegistry;
 import bagaturchess.uci.impl.commands.options.UCIOption;
-import bagaturchess.uci.impl.commands.options.UCIOptionSpin;
+import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Double;
 
 
 public class BagaturEvalConfigImpl_v2 implements IEvalConfig, IBagaturEvalConfig, IUCIOptionsProvider {
@@ -52,32 +52,32 @@ public class BagaturEvalConfigImpl_v2 implements IEvalConfig, IBagaturEvalConfig
 	
 	
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOptionSpin("Evaluation [King Safety Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_KINGSAFETY_O / 10.0),
+			new UCIOptionSpin_Double("Evaluation [King Safety Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_KINGSAFETY_O / 10.0),
 			//new UCIOptionSpin("Evaluation [King Safety Endgame]"			,  0.0, "type spin default 0 min 0 max 100"	, WEIGHT_KINGSAFETY_E / 10.0),
-			new UCIOptionSpin("Evaluation [Mobility Opening]"				, 10.0, "type spin default 10 min 0 max 100", WEIGHT_MOBILITY_O / 10.0),
-			new UCIOptionSpin("Evaluation [Mobility Endgame]"				, 10.0, "type spin default 10 min 0 max 100", WEIGHT_MOBILITY_E / 10.0),
-			new UCIOptionSpin("Evaluation [Safe Mobility Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_MOBILITY_S_O / 10.0),
-			new UCIOptionSpin("Evaluation [Safe Mobility Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_MOBILITY_S_E / 10.0),
-			new UCIOptionSpin("Evaluation [Cental Space Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_SPACE_O / 10.0),
-			new UCIOptionSpin("Evaluation [Cental Space Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_SPACE_E / 10.0),
-			new UCIOptionSpin("Evaluation [Trapped Piece Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_TRAPPED_O / 10.0),
-			new UCIOptionSpin("Evaluation [Trapped Piece Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_TRAPPED_E / 10.0),
-			new UCIOptionSpin("Evaluation [Hunged Piece Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_HUNGED_O / 10.0),
-			new UCIOptionSpin("Evaluation [Hunged Piece Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_HUNGED_E / 10.0),
-			new UCIOptionSpin("Evaluation [Piece-Square Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PST_O / 10.0),
-			new UCIOptionSpin("Evaluation [Piece-Square Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PST_E / 10.0),
-			new UCIOptionSpin("Evaluation [Pawn Material Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_MATERIAL_PAWNS_O / 10.0),
-			new UCIOptionSpin("Evaluation [Pawn Material Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_MATERIAL_PAWNS_E / 10.0),
-			new UCIOptionSpin("Evaluation [Pawns Structure Opening]"		, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_STANDARD_O / 10.0),
-			new UCIOptionSpin("Evaluation [Pawns Structure Endgame]"		, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_STANDARD_E / 10.0),
-			new UCIOptionSpin("Evaluation [Passed Pawns Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PASSED_O / 10.0),
-			new UCIOptionSpin("Evaluation [Passed Pawns Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PASSED_E / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Mobility Opening]"				, 10.0, "type spin default 10 min 0 max 100", WEIGHT_MOBILITY_O / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Mobility Endgame]"				, 10.0, "type spin default 10 min 0 max 100", WEIGHT_MOBILITY_E / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Safe Mobility Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_MOBILITY_S_O / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Safe Mobility Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_MOBILITY_S_E / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Cental Space Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_SPACE_O / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Cental Space Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_SPACE_E / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Trapped Piece Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_TRAPPED_O / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Trapped Piece Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_TRAPPED_E / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Hunged Piece Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_HUNGED_O / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Hunged Piece Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_HUNGED_E / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Piece-Square Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PST_O / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Piece-Square Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PST_E / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Pawn Material Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_MATERIAL_PAWNS_O / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Pawn Material Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_MATERIAL_PAWNS_E / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Pawns Structure Opening]"		, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_STANDARD_O / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Pawns Structure Endgame]"		, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_STANDARD_E / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Passed Pawns Opening]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PASSED_O / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Passed Pawns Endgame]"			, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PASSED_E / 10.0),
 			//new UCIOptionSpin("Evaluation [Passed King Distance Opening]"	,  0.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PASSED_KING_O / 10.0),
-			new UCIOptionSpin("Evaluation [Passed King Distance Endgame]"	, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PASSED_KING_E / 10.0),
-			new UCIOptionSpin("Evaluation [Passed Stoppers Opening]"		,  0.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PSTOPPERS_O / 10.0),
-			new UCIOptionSpin("Evaluation [Passed Stoppers Endgame]"		, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PSTOPPERS_E / 10.0),
-			new UCIOptionSpin("Evaluation [Passed Stoppers Attack Opening]"	,  0.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PSTOPPERS_A_O / 10.0),
-			new UCIOptionSpin("Evaluation [Passed Stoppers Attack Endgame]"	, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PSTOPPERS_A_E / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Passed King Distance Endgame]"	, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PASSED_KING_E / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Passed Stoppers Opening]"		,  0.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PSTOPPERS_O / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Passed Stoppers Endgame]"		, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PSTOPPERS_E / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Passed Stoppers Attack Opening]"	,  0.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PSTOPPERS_A_O / 10.0),
+			new UCIOptionSpin_Double("Evaluation [Passed Stoppers Attack Endgame]"	, 10.0, "type spin default 10 min 0 max 100", WEIGHT_PAWNS_PSTOPPERS_A_E / 10.0),
 	};
 	
 	

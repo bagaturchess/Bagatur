@@ -5,17 +5,18 @@ import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl;
 import bagaturchess.search.api.IRootSearchConfig_SMP;
 import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.impl.commands.options.UCIOption;
-import bagaturchess.uci.impl.commands.options.UCIOptionSpin;
+import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Double;
+import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Integer;
 
 
 public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl implements IRootSearchConfig_SMP, IUCIOptionsProvider {
 	
 	
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOptionSpin("Search SMP [Threads count]", (double) getDefaultThreadsCount(),
+			new UCIOptionSpin_Integer("Search SMP [Threads count]", getDefaultThreadsCount(),
 								"type spin default " + getDefaultThreadsCount()
 											+ " min 1"
-											+ " max 64", 1),
+											+ " max 64"),
 	};
 	
 	
