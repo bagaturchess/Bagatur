@@ -762,10 +762,11 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						 //&& rest > 3
 						) {
 						
-						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
-						rate += 2;//for pv nodes
+						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2);
+						rate += isCapOrProm ? -1 : 0;//for pv nodes
+						//rate += evalDiff <= 0 ? 1 : 0;
 						rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
-						rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
+						//rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
 					}
 					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
@@ -1432,10 +1433,11 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						 //&& rest > 3
 						) {
 						
-						double rate = Math.log(searchedCount) * Math.log(rest) / 2;
-						rate += 2;//for non pv nodes
+						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2);
+						rate += isCapOrProm ? 0 : 1;//for non pv nodes
+						rate += evalDiff <= 0 ? 1 : 0;
 						rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
-						rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
+						//rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
 					}
 					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
