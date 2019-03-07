@@ -262,7 +262,7 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	@Override
 	public boolean applyOption(UCIOption option) {
 		if ("MultiPV".equals(option.getName())) {
-			multiPVsCount = (int) ((Double) option.getValue()).doubleValue();
+			multiPVsCount = (int) option.getValue();
 			return true;
 			
 		} else if ("GaviotaTbPath".equals(option.getName())) {
@@ -270,7 +270,7 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 			return true;
 			
 		} else if ("GaviotaTbCache".equals(option.getName())) {
-			gaviotaTbCache = (int) ((Double) option.getValue()).doubleValue();
+			gaviotaTbCache = (int) option.getValue();
 			return true;
 			
 		} else if ("Time Control Optimizations".equals(option.getName())) {
@@ -288,7 +288,7 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 				return true;
 				
 		} else if ("Hidden Depth".equals(option.getName())) {
-			hiddenDepth = (int) ((Double) option.getValue()).doubleValue();
+			hiddenDepth = (int) option.getValue();
 			return true;
 		}
 		
