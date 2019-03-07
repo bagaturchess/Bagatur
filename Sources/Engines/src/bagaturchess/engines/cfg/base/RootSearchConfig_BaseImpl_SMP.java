@@ -115,7 +115,7 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	@Override
 	public boolean applyOption(UCIOption option) {
 		if ("Threads".equals(option.getName())) {
-			currentThreadsCount = (int) option.getValue();
+			currentThreadsCount = (Integer) option.getValue();
 			calcMemoryUsagePercents();
 			return true;
 		}
