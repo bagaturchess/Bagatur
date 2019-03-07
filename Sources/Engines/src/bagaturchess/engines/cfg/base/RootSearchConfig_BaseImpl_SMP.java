@@ -13,7 +13,7 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	
 	
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOptionSpin_Integer("Search SMP [Threads count]", getDefaultThreadsCount(),
+			new UCIOptionSpin_Integer("Threads", getDefaultThreadsCount(),
 								"type spin default " + getDefaultThreadsCount()
 											+ " min 1"
 											+ " max 64"),
@@ -114,7 +114,7 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	
 	@Override
 	public boolean applyOption(UCIOption option) {
-		if ("Search SMP [Threads count]".equals(option.getName())) {
+		if ("Threads".equals(option.getName())) {
 			currentThreadsCount = (int) option.getValue();
 			calcMemoryUsagePercents();
 			return true;
