@@ -86,6 +86,18 @@ public class UCIEnginesManager {
 	}
 	
 	
+	public void setOptions(List<String> setoptions) throws IOException {
+		
+		disable();
+		
+		for (EngineProcess engine: engines) {			
+			engine.setOptions(setoptions);
+		}
+		
+		enable();
+	}
+	
+	
 	public void isReady() throws IOException {
 		
 		disable();
@@ -184,11 +196,5 @@ public class UCIEnginesManager {
 			lines.add(engine.getInfoLine());
 		}
 		return lines;
-	}
-	
-	public void setOptions(List<String> setoptions) throws IOException {
-		for (EngineProcess engine: engines) {			
-			engine.setOptions(setoptions);
-		}
 	}
 }

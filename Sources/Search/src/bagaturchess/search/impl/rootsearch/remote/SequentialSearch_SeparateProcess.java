@@ -105,7 +105,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			 * The separate process should not use openning book moves, because they have to be already moved by the master process.
 			 */
 			List<String> options = new ArrayList<String>();
-			options.add("setoption name Logging Policy value single file");
+			options.add("setoption name Logging Policy value multiple files");
 			options.add("setoption name OwnBook value false");
 			options.add("setoption name Time Control Optimizations value for 1/1");
 			//options.add("setoption name Openning Mode value random intermediate");
@@ -123,7 +123,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			*/
 			
 			ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: setoptions: " + options);
-			//runner.setOptions(options);
+			runner.setOptions(options);
 			
 			ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: isReady");
 			runner.isReady();

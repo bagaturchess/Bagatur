@@ -28,13 +28,13 @@ public class EngineProcess_BagaturImpl_WorkspaceImpl extends EngineProcess_Bagat
 	
 	private static String ARGS = "";
 	static {
-		ARGS += "bagaturchess.engines.base.cfg.UCIConfig_BaseImpl_DEBUG "; 
+		ARGS += "bagaturchess.engines.cfg.base.UCIConfig_BaseImpl "; 
 		ARGS += "bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove ";
-		ARGS += "bagaturchess.engines.base.cfg.UCISearchAdaptorConfig_BaseImpl ";
+		ARGS += "bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl ";
 		ARGS += "bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD ";
-		ARGS += "bagaturchess.engines.base.cfg.RootSearchConfig_BaseImpl_1Core ";
+		ARGS += "bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core ";
 		ARGS += "bagaturchess.search.impl.alg.impl0.Search_PVS_NWS ";
-		ARGS += "bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD_SMP ";
+		ARGS += "bagaturchess.engines.cfg.base.SearchConfigImpl_AB ";
 		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl ";
 		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig ";
 	}
