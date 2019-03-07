@@ -92,8 +92,10 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		
 		try {
 			
+			ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: startEngines");
 			runner.startEngines();
 			
+			ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: uciOK");
 			runner.uciOK();
 			
 			/**
@@ -102,7 +104,28 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			 * Especially the UCI options for Memory Optimizations and Openning Book usage.
 			 * The separate process should not use openning book moves, because they have to be already moved by the master process.
 			 */
+			List<String> options = new ArrayList<String>();
+			options.add("setoption name Logging Policy value single file");
+			options.add("setoption name OwnBook value false");
+			options.add("setoption name Time Control Optimizations value for 1/1");
+			//options.add("setoption name Openning Mode value random intermediate");
 			
+			/*315 <Bagatur1.5f(1): option name Logging Policy type combo default none var single file var multiple files var none
+			316 <Bagatur1.5f(1): option name OwnBook type check default true
+			316 <Bagatur1.5f(1): option name Ponder type check default true
+			316 <Bagatur1.5f(1): option name UCI_AnalyseMode type check default false
+			317 <Bagatur1.5f(1): option name MultiPV type spin default 1 min 1 max 100
+			317 <Bagatur1.5f(1): option name GaviotaTbPath type string default C:\DATA\BagaturEngine.1.5f\.\data\egtb
+			318 <Bagatur1.5f(1): option name GaviotaTbCache type spin default 8.0 min 4 max 512
+			319 <Bagatur1.5f(1): option name Time Control Optimizations type combo default for 40/40 var for 40/40 var for 1/1
+			320 <Bagatur1.5f(1): option name Hidden Depth type spin default 0 min 0 max 10
+			320 <Bagatur1.5f(1): option name Openning Mode type combo default most played first var most played first var random intermediate var random full
+			*/
+			
+			ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: setoptions: " + options);
+			//runner.setOptions(options);
+			
+			ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: isReady");
 			runner.isReady();
 			
 			runner.disable();

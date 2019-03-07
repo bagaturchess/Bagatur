@@ -32,7 +32,6 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
 
 
@@ -146,6 +145,20 @@ public class EngineProcess {
 		
 		return false;
 	}
+	
+	public void setOptions(List<String> setoptions) throws IOException {
+		
+		for(String setoption: setoptions) {
+			os.write(setoption);
+			os.newLine();
+			os.flush();
+			
+			/*String line;
+			while ((line = is.readLine()) != null) {
+			}*/
+		}
+	}
+	
 	
 	public void setupPossition(String position) throws IOException {
 		os.write("position " + position);	

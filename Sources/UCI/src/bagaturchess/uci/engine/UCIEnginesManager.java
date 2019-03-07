@@ -185,4 +185,10 @@ public class UCIEnginesManager {
 		}
 		return lines;
 	}
+	
+	public void setOptions(List<String> setoptions) throws IOException {
+		for (EngineProcess engine: engines) {			
+			engine.setOptions(setoptions);
+		}
+	}
 }
