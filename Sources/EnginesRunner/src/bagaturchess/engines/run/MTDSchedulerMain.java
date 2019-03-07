@@ -32,6 +32,7 @@ import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP;
+import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP_Threads;
 import bagaturchess.engines.cfg.base.TimeConfigImpl;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearch;
@@ -86,7 +87,7 @@ public class MTDSchedulerMain {
 				);*/
 				
 		IRootSearchConfig cfg = new RootSearchConfig_BaseImpl_1Core(
-								//new RootSearchConfig_BaseImpl_SMP(
+								//new RootSearchConfig_BaseImpl_SMP_Threads(
 				
 				new String[] {
 								bagaturchess.search.impl.alg.impl0.Search_PVS_NWS.class.getName(),
@@ -135,10 +136,10 @@ public class MTDSchedulerMain {
 		SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
 		
 		//IRootSearch search = new MTDParallelSearch_ProcessesImpl(new Object[] {cfg, sharedData});
-		//IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, sharedData});
+		IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, sharedData});
 		//IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, sharedData});
 		//IRootSearch search = new SequentialSearch_Classic(new Object[] {cfg, sharedData});
-		IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
+		//IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
 		//IRootSearch search = new MonteCarloSearch(new Object[] {cfg, sharedData});
 		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		

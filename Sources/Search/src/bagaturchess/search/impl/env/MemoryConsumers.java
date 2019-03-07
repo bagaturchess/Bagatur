@@ -199,7 +199,7 @@ public class MemoryConsumers {
 								+ engineConfiguration.getThreadsCount() * engineConfiguration.getEvalCacheUsagePercent()
 								+ engineConfiguration.getThreadsCount() * engineConfiguration.getPawnsCacheUsagePercent();
 			
-			if (percents_sum < 0.9999 || percents_sum > 1.0001) {
+			if (percents_sum < 0.95 || percents_sum > 1.05) {
 				throw new IllegalStateException("Percents sum is not near to 1. It is " + percents_sum);
 			}
 			

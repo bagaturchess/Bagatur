@@ -1,0 +1,150 @@
+package bagaturchess.engines.cfg.base;
+
+
+import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl;
+import bagaturchess.search.api.IRootSearchConfig_SMP;
+import bagaturchess.uci.api.IUCIOptionsProvider;
+import bagaturchess.uci.impl.commands.options.UCIOption;
+import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Double;
+import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Integer;
+
+
+public class RootSearchConfig_BaseImpl_SMP_Threads extends RootSearchConfig_BaseImpl implements IRootSearchConfig_SMP, IUCIOptionsProvider {
+	
+	
+	private UCIOption[] options = new UCIOption[] {
+			new UCIOptionSpin_Integer("Threads", getDefaultThreadsCount(),
+								"type spin default " + getDefaultThreadsCount()
+											+ " min 1"
+											+ " max 64"),
+	};
+	
+	
+	private int currentThreadsCount = getDefaultThreadsCount();
+	
+	protected double SMP_MEM_USAGE_TPT;
+	protected double SMP_MEM_USAGE_TPT_QS;
+	protected double SMP_MEM_USAGE_GTB;
+	protected double SMP_MEM_USAGE_EVALCACHE;
+	protected double SMP_MEM_USAGE_PAWNCACHE;
+	
+	
+	/*public RootSearchConfig_BaseImpl_SMP() {
+		this(new String[0]);
+	}*/
+	
+	public RootSearchConfig_BaseImpl_SMP_Threads(String[] args) {
+		super(args);
+		
+		calcMemoryUsagePercents();
+	}
+	
+	
+	private void calcMemoryUsagePercents() {
+		
+		double mem_usage_norm = 1 / (double)(getThreadsCount() * (MEM_USAGE_TPT + MEM_USAGE_GTB + MEM_USAGE_EVALCACHE + MEM_USAGE_PAWNCACHE));
+		
+		SMP_MEM_USAGE_TPT = MEM_USAGE_TPT * mem_usage_norm;
+		SMP_MEM_USAGE_TPT_QS = MEM_USAGE_TPT_QS * mem_usage_norm;
+		SMP_MEM_USAGE_GTB = MEM_USAGE_GTB * mem_usage_norm;
+		SMP_MEM_USAGE_EVALCACHE = MEM_USAGE_EVALCACHE * mem_usage_norm;
+		SMP_MEM_USAGE_PAWNCACHE = MEM_USAGE_PAWNCACHE * mem_usage_norm;
+		
+		
+		//System.out.println("SMP_MEM_USAGE_TPT=" + SMP_MEM_USAGE_TPT);
+		//System.out.println("SMP_MEM_USAGE_EVALCACHE=" + SMP_MEM_USAGE_EVALCACHE);
+		//System.out.println("SMP_MEM_USAGE_PAWNCACHE=" + SMP_MEM_USAGE_PAWNCACHE);
+	}
+	
+	
+	@Override
+	public String getSemaphoreFactoryClassName() {
+		return bagaturchess.bitboard.impl.utils.BinarySemaphoreFactory.class.getName();
+	}
+	
+	
+	@Override
+	public int getThreadsCount() {
+		return currentThreadsCount;
+	}
+	
+	
+	@Override
+	public double getTPTUsagePercent() {
+		return SMP_MEM_USAGE_TPT;
+	}
+	
+	
+	@Override
+	public double getTPTQSUsagePercent() {
+		return SMP_MEM_USAGE_TPT_QS;
+	}
+	
+	
+	@Override
+	public double getGTBUsagePercent() {
+		return SMP_MEM_USAGE_GTB;
+	}
+	
+	
+	@Override
+	public double getEvalCacheUsagePercent() {
+		return SMP_MEM_USAGE_EVALCACHE;
+	}
+	
+	
+	@Override
+	public double getPawnsCacheUsagePercent() {
+		return SMP_MEM_USAGE_PAWNCACHE;
+	}
+	
+	
+	@Override
+	public UCIOption[] getSupportedOptions() {
+		UCIOption[] parentOptions = super.getSupportedOptions();
+		
+		UCIOption[] result = new UCIOption[parentOptions.length + options.length];
+		
+		System.arraycopy(options, 0, result, 0, options.length);
+		System.arraycopy(parentOptions, 0, result, options.length, parentOptions.length);
+		
+		return result;
+	}
+	
+	
+	@Override
+	public boolean applyOption(UCIOption option) {
+		if ("Threads".equals(option.getName())) {
+			currentThreadsCount = (int) option.getValue();
+			calcMemoryUsagePercents();
+			return true;
+		}
+		
+		return super.applyOption(option);
+	}
+	
+	
+	private static final int getDefaultThreadsCount() {
+		
+		int threads = Runtime.getRuntime().availableProcessors();
+		
+		threads /= 2;//2 logical processors for 1 core in most hardware architectures
+		
+		if (threads < 2) {
+			threads = 2;
+		}
+		/*if (threads > 8) {//Limit for testing
+			threads = 8;
+		}*/
+		
+		return threads;
+		
+		//return 1;
+	}
+	
+	
+	@Override
+	public boolean initCaches() {
+		return true;
+	}
+}
