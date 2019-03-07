@@ -1,5 +1,6 @@
 package bagaturchess.uci.impl.commands.options;
 
+
 public class UCIOptionSpin extends UCIOption<Double> {
 	
 	

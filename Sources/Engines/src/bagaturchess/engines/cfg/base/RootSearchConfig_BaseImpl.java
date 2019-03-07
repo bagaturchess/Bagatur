@@ -14,6 +14,7 @@ import bagaturchess.uci.api.IUCIOptionsRegistry;
 import bagaturchess.uci.impl.commands.options.UCIOption;
 import bagaturchess.uci.impl.commands.options.UCIOptionCombo;
 import bagaturchess.uci.impl.commands.options.UCIOptionSpin;
+import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Integer;
 import bagaturchess.uci.impl.commands.options.UCIOptionString;
 
 
@@ -50,19 +51,19 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	
 	private String DEFAULT_gaviotaTbPath = (new File(".")).getAbsolutePath() + File.separatorChar + "data" + File.separatorChar + "egtb";
-	private Double DEFAULT_gaviotaTbCache = new Double(8);
+	private Integer DEFAULT_gaviotaTbCache = new Integer(8);
 	
 	private String DEFAULT_timeControlOptimization 	= "for 40/40";
 	private String timeControlOptimization_1 		= "for 1/1";
 	
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOptionSpin("MultiPV", 1.0, "type spin default 1 min 1 max 100", 1),
+			new UCIOptionSpin_Integer("MultiPV", 1, "type spin default 1 min 1 max 100"),
 			new UCIOptionString("GaviotaTbPath", DEFAULT_gaviotaTbPath, "type string default " + DEFAULT_gaviotaTbPath),
-			new UCIOptionSpin("GaviotaTbCache", DEFAULT_gaviotaTbCache, "type spin default " + DEFAULT_gaviotaTbCache + " min 4 max 512", 1),
+			new UCIOptionSpin_Integer("GaviotaTbCache", DEFAULT_gaviotaTbCache, "type spin default " + DEFAULT_gaviotaTbCache + " min 4 max 512"),
 			new UCIOptionCombo("Time Control Optimizations",
 					DEFAULT_timeControlOptimization,
 					"type combo default " + DEFAULT_timeControlOptimization + " var " + DEFAULT_timeControlOptimization + " var " + timeControlOptimization_1),
-			new UCIOptionSpin("Hidden Depth", 0d, "type spin default 0 min 0 max 10", 1),
+			new UCIOptionSpin_Integer("Hidden Depth", 0, "type spin default 0 min 0 max 10"),
 	};
 	
 	private String searchImpl_ClassName;
