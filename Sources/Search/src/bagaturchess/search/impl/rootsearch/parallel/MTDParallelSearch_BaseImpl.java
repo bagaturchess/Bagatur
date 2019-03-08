@@ -264,8 +264,9 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					long start_time = System.currentTimeMillis();
 					
 					
+					//SearchersInfo searchersInfo = new SearchersInfo(startIteration, 1d); // All threads have to finish the depth
 					//SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.377d);
-					SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.001d);
+					SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.001d); // Only one thread is enough to finish the depth
 					
 					boolean allSearchersFinished = false;
 					//boolean hasSendAtLest1Info = false;
