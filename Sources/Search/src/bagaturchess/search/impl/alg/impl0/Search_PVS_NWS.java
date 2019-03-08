@@ -780,7 +780,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							best_move, prevbest, prevPV, rootColour,
 							new_mateMove, useMateDistancePrunning, staticPrunning, true);
 					
-					if (cur_eval >= beta && (lmrReduction > 0 || staticPrunning) ) {
+					if (cur_eval > alpha && (lmrReduction > 0 || staticPrunning) ) {
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha, false,
 								best_move, prevbest, prevPV, rootColour,
@@ -800,7 +800,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				//Add history records for the current move
 				list.countTotal(cur_move);
-				if (cur_eval <= alpha) {
+				if (cur_eval < beta) {
 					getHistory(inCheck).countFailure(cur_move, rest);
 				} else {
 					list.countSuccess(cur_move);//Should be before addCounterMove call
@@ -1451,7 +1451,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							best_move, prevbest, prevPV, rootColour,
 							new_mateMove, useMateDistancePrunning, staticPrunning, true);
 					
-					if (cur_eval >= beta && (lmrReduction > 0 || staticPrunning) ) {
+					if (cur_eval > alpha_org && (lmrReduction > 0 || staticPrunning) ) {
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, false,
 								best_move, prevbest, prevPV, rootColour,
@@ -1464,7 +1464,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 				//Add history records for the current move
 				list.countTotal(cur_move);
-				if (cur_eval <= alpha_org) {
+				if (cur_eval < beta) {
 					getHistory(inCheck).countFailure(cur_move, rest);
 				} else {
 					list.countSuccess(cur_move);//Should be before addCounterMove call
