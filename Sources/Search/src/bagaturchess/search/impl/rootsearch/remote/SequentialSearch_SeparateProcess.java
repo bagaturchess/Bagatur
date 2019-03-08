@@ -98,16 +98,17 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: uciOK");
 			runner.uciOK();
 			
-			/**
-			 * TODO: IMPORTANT
-			 * The UCI options of the slave engine should be set as for the master engine.
-			 * Especially the UCI options for Memory Optimizations and Openning Book usage.
-			 * The separate process should not use openning book moves, because they have to be already moved by the master process.
-			 */
 			List<String> options = new ArrayList<String>();
 			options.add("setoption name Logging Policy value multiple files");
-			options.add("setoption name OwnBook value false");
-			options.add("setoption name Time Control Optimizations value for 1/1");
+			options.add("setoption name OwnBook value false");//The separate process should not use openning book moves, because they have to be already moved by the master process.
+			options.add("setoption name Ponder value false");
+			//The UCI options of the slave engine should be set as for the master engine, especially the UCI option for Memory Optimizations.
+			if (getRootSearchConfig().getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_1_1) {
+				options.add("setoption name Time Control Optimizations value for 1/1");
+			} else if (getRootSearchConfig().getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) { 
+				options.add("setoption name Time Control Optimizations value for 40/40");
+			}
+			
 			//options.add("setoption name Openning Mode value random intermediate");
 			
 			/*315 <Bagatur1.5f(1): option name Logging Policy type combo default none var single file var multiple files var none
@@ -116,7 +117,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			316 <Bagatur1.5f(1): option name UCI_AnalyseMode type check default false
 			317 <Bagatur1.5f(1): option name MultiPV type spin default 1 min 1 max 100
 			317 <Bagatur1.5f(1): option name GaviotaTbPath type string default C:\DATA\BagaturEngine.1.5f\.\data\egtb
-			318 <Bagatur1.5f(1): option name GaviotaTbCache type spin default 8.0 min 4 max 512
+			318 <Bagatur1.5f(1): option name GaviotaTbCache type spin default 8 min 4 max 512
 			319 <Bagatur1.5f(1): option name Time Control Optimizations type combo default for 40/40 var for 40/40 var for 1/1
 			320 <Bagatur1.5f(1): option name Hidden Depth type spin default 0 min 0 max 10
 			320 <Bagatur1.5f(1): option name Openning Mode type combo default most played first var most played first var random intermediate var random full
