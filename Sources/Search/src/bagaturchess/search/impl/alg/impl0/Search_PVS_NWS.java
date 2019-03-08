@@ -266,7 +266,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						tpt_move = tptEntry.getBestMove_lower();
 					} else if (tpt_lower >= beta) {
 						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= beta - 1) {
+					} else if (tpt_upper <= alpha_org) {
 						tpt_move = tptEntry.getBestMove_upper();
 					} else {
 						tpt_move = tptEntry.getBestMove_lower();
@@ -317,7 +317,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						}
 					}
 				}
-				if (tpt_upper <= beta - 1) {
+				if (tpt_upper <= alpha_org) {
 					if (!SearchUtils.isMateVal(tpt_upper)) {
 						node.bestmove = tpt_move;
 						node.eval = tpt_upper;
@@ -451,7 +451,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 									tpt_move = tptEntry.getBestMove_lower();
 								} else if (tpt_lower >= beta) {
 									tpt_move = tptEntry.getBestMove_lower();
-								} else if (tpt_upper <= beta - 1) {
+								} else if (tpt_upper <= alpha_org) {
 									tpt_move = tptEntry.getBestMove_upper();
 								} else {
 									tpt_move = tptEntry.getBestMove_lower();
@@ -514,7 +514,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							tpt_move = tptEntry.getBestMove_lower();
 						} else if (tpt_lower >= beta) {
 							tpt_move = tptEntry.getBestMove_lower();
-						} else if (tpt_upper <= beta - 1) {
+						} else if (tpt_upper <= alpha_org) {
 							tpt_move = tptEntry.getBestMove_upper();
 						} else {
 							tpt_move = tptEntry.getBestMove_lower();
@@ -1012,7 +1012,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						tpt_move = tptEntry.getBestMove_lower();
 					} else if (tpt_lower >= beta) {
 						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= beta - 1) {
+					} else if (tpt_upper <= alpha_org) {
 						tpt_move = tptEntry.getBestMove_upper();
 					} else {
 						tpt_move = tptEntry.getBestMove_lower();
@@ -1037,7 +1037,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						return tpt_lower;
 					}
 				}
-				if (tpt_upper <= beta - 1) {
+				if (tpt_upper <= alpha_org) {
 					if (!SearchUtils.isMateVal(tpt_upper)) {
 						return tpt_upper;
 					}
@@ -1142,7 +1142,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 									tpt_move = tptEntry.getBestMove_lower();
 								} else if (tpt_lower >= beta) {
 									tpt_move = tptEntry.getBestMove_lower();
-								} else if (tpt_upper <= beta - 1) {
+								} else if (tpt_upper <= alpha_org) {
 									tpt_move = tptEntry.getBestMove_upper();
 								} else {
 									tpt_move = tptEntry.getBestMove_lower();
@@ -1204,7 +1204,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 							tpt_move = tptEntry.getBestMove_lower();
 						} else if (tpt_lower >= beta) {
 							tpt_move = tptEntry.getBestMove_lower();
-						} else if (tpt_upper <= beta - 1) {
+						} else if (tpt_upper <= alpha_org) {
 							tpt_move = tptEntry.getBestMove_upper();
 						} else {
 							tpt_move = tptEntry.getBestMove_lower();
@@ -1520,7 +1520,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		if (backtrackingInfo.excluded_move == 0 && allowTPTAccess(maxdepth, depth)) {
 			env.getTPT().lock();
-			env.getTPT().put(hashkey, normDepth(maxdepth), depth, colourToMove, best_eval, beta - 1, beta, best_move, (byte)0);
+			env.getTPT().put(hashkey, normDepth(maxdepth), depth, colourToMove, best_eval, alpha_org, beta, best_move, (byte)0);
 			env.getTPT().unlock();
 		}
 		
@@ -1680,7 +1680,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						tpt_move = tptEntry.getBestMove_lower();
 					} else if (tpt_lower >= beta) {
 						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= beta - 1) {
+					} else if (tpt_upper <= alpha_org) {
 						tpt_move = tptEntry.getBestMove_upper();
 					} else {
 						tpt_move = tptEntry.getBestMove_lower();
@@ -1951,14 +1951,14 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			}
 			
 			//Alpha cutoff
-			if (!isMateVal(beta - 1)
+			if (!isMateVal(alpha_org)
 					&& !isMateVal(beta)
 					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
 				return staticEval;
 			}
 			
-			if (!inCheck && staticEval > beta - 1) {
-				throw new IllegalStateException("!inCheck && staticEval > beta - 1");
+			if (!inCheck && staticEval > alpha_org) {
+				throw new IllegalStateException("!inCheck && staticEval > alpha - 1");
 			}
 		}
 		
@@ -1985,7 +1985,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						tpt_move = tptEntry.getBestMove_lower();
 					} else if (tpt_lower >= beta) {
 						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= beta - 1) {
+					} else if (tpt_upper <= alpha_org) {
 						tpt_move = tptEntry.getBestMove_upper();
 					} else {
 						tpt_move = tptEntry.getBestMove_lower();
@@ -2009,7 +2009,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						return tpt_lower;
 					}
 				}
-				if (tpt_upper <= beta - 1) {
+				if (tpt_upper <= alpha_org) {
 					if (!SearchUtils.isMateVal(tpt_upper)) {
 						return tpt_upper;
 					}
@@ -2097,7 +2097,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		if (allowTPTAccess(initial_maxdepth, depth)) {
 			if (best_move != 0) {
 				env.getTPT().lock();
-				env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, beta - 1, beta, best_move, (byte)0);
+				env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
 				env.getTPT().unlock();
 			}
 		}
