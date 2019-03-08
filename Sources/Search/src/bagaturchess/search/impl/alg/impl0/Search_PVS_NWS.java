@@ -889,10 +889,11 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV, int rootColour, int mateMove,
 			boolean useMateDistancePrunning, boolean useStaticPrunning, boolean useNullMove) {
 		
+		int alpha_org = beta - 1;
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
 		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
-		backtrackingInfo.static_eval = lazyEval(depth, beta - 1, beta, rootColour);
+		backtrackingInfo.static_eval = lazyEval(depth, alpha_org, beta, rootColour);
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
@@ -907,7 +908,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			return backtrackingInfo.static_eval;
 		}
 		
-		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, beta - 1, beta);
+		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
 				
 		long hashkey = env.getBitboard().getHashKey();
 		
@@ -917,8 +918,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				
 		
 		boolean inCheck = env.getBitboard().isInCheck();
-		
-		int alpha_org = beta - 1;
 		
 	    // Mate distance pruning
 		if (!inCheck && useMateDistancePrunning && depth >= 1) {
@@ -1538,7 +1537,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 
 		if (depth >= MAX_DEPTH) {
-			return fullEval(depth, beta - 1, beta, rootColour);
+			return fullEval(depth, alpha_org, beta, rootColour);
 		}
 		
 		
@@ -1864,13 +1863,15 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 			info.setSelDepth(depth);
 		}
 		
+		int alpha_org = beta - 1;
+		
 		if (depth >= MAX_DEPTH) {
-			return lazyEval(depth, beta - 1, beta, rootColour);
+			return lazyEval(depth, alpha_org, beta, rootColour);
 		}
 		
 		int colourToMove = env.getBitboard().getColourToMove();
 		
-		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, beta - 1, beta);
+		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
 		
 		if (isDraw()) {
 			return getDrawScores(rootColour);
@@ -1881,10 +1882,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		int staticEval = -1;
 		if (!inCheck) {
-			staticEval = lazyEval(depth, beta - 1, beta, rootColour);
+			staticEval = lazyEval(depth, alpha_org, beta, rootColour);
 		}
-		
-		int alpha_org = beta - 1;
 		
 	    // Mate distance pruning
 		if (!inCheck && depth >= 1) {
@@ -2033,7 +2032,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		int best_move = 0;
 		int cur_move = 0;
 		
-		int alpha = beta - 1;
+		int alpha = alpha_org;
 		
 		if (inCheck) {
 			cur_move = (tpt_move != 0) ? tpt_move : list.next();
