@@ -26,20 +26,6 @@ package bagaturchess.uci.engine;
 public class EngineProcess_BagaturImpl_WorkspaceImpl extends EngineProcess_BagaturImpl {
 	
 	
-	private static String ARGS = "";
-	static {
-		ARGS += "bagaturchess.engines.cfg.base.UCIConfig_BaseImpl "; 
-		ARGS += "bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove ";
-		ARGS += "bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl ";
-		ARGS += "bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD ";
-		ARGS += "bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core ";
-		ARGS += "bagaturchess.search.impl.alg.impl0.Search_PVS_NWS ";
-		ARGS += "bagaturchess.engines.cfg.base.SearchConfigImpl_AB ";
-		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl ";
-		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig ";
-	}
-	
-	
 	public EngineProcess_BagaturImpl_WorkspaceImpl(String _engineName, String programArgs) {
 		this(_engineName, "./../", programArgs, 128);	
 	}
@@ -49,7 +35,7 @@ public class EngineProcess_BagaturImpl_WorkspaceImpl extends EngineProcess_Bagat
 		
 		super(_engineName, "\"" + getJavaPath_javawexe() + "\""
 							+ " " + JAVA_OPTIONS + "-Xmx" + memoryInMB + "M"
-							+ " -cp " + getClassPath(workspace) + " "
+							+ " -cp \"" + getClassPath(workspace) + "\" "
 							+ MAIN_CLASS + " "
 							+ ARGS
 							+ programArgs,

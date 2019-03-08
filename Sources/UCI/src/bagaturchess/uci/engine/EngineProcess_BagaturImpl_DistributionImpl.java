@@ -22,24 +22,8 @@
  */
 package bagaturchess.uci.engine;
 
-import java.io.File;
-
 
 public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_BagaturImpl {
-	
-	
-	private static String ARGS = "";
-	static {
-		ARGS += "bagaturchess.engines.cfg.base.UCIConfig_BaseImpl "; 
-		ARGS += "bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove ";
-		ARGS += "bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl ";
-		ARGS += "bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD ";
-		ARGS += "bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core ";
-		ARGS += "bagaturchess.search.impl.alg.impl0.Search_PVS_NWS ";
-		ARGS += "bagaturchess.engines.cfg.base.SearchConfigImpl_AB ";
-		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl ";
-		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig ";
-	}
 	
 	
 	public EngineProcess_BagaturImpl_DistributionImpl(String _engineName, String programArgs) {
@@ -50,9 +34,9 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 	public EngineProcess_BagaturImpl_DistributionImpl(String _engineName, String workdir, String programArgs, int memoryInMB) {
 		
 		super(_engineName, "\"" + getJavaPath_javawexe() + "\""
-							+ " " + JAVA_OPTIONS + " -Djava.library.path=." + File.separator + "bin" + File.pathSeparator
+							+ " " + JAVA_OPTIONS + " -Djava.library.path=." + java.io.File.separator + "bin" + java.io.File.pathSeparator
 							+ " -Xmx" + memoryInMB + "M"
-							+ " -cp " + getClassPath(workdir) + " "
+							+ " -cp \"" + getClassPath(workdir) + "\" "
 							+ MAIN_CLASS + " "
 							+ ARGS
 							+ programArgs,
