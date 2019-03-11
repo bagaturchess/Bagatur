@@ -12,15 +12,15 @@ import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Integer;
 public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl implements IRootSearchConfig_SMP, IUCIOptionsProvider {
 	
 	
+	private int currentThreadsCount = getDefaultThreadsCount();
+	
+	
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOptionSpin_Integer("Threads", getDefaultThreadsCount(),
-								"type spin default " + getDefaultThreadsCount()
+			new UCIOptionSpin_Integer("SMP Threads", currentThreadsCount,
+					"type spin default " + currentThreadsCount
 											+ " min 1"
 											+ " max 64"),
 	};
-	
-	
-	private int currentThreadsCount = getDefaultThreadsCount();
 	
 	
 	public RootSearchConfig_BaseImpl_SMP(String[] args) {
@@ -85,7 +85,7 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	
 	@Override
 	public boolean applyOption(UCIOption option) {
-		if ("Threads".equals(option.getName())) {
+		if ("SMP Threads".equals(option.getName())) {
 			currentThreadsCount = (Integer) option.getValue();
 			return true;
 		}
@@ -99,9 +99,10 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 		int threads = Runtime.getRuntime().availableProcessors();
 		
 		threads /= 2;//2 logical processors for 1 core in most hardware architectures
+		threads--;//One thread for the OS
 		
-		if (threads < 2) {
-			threads = 2;
+		if (threads < 1) {
+			threads = 1;
 		}
 		/*if (threads > 8) {//Limit for testing
 			threads = 8;

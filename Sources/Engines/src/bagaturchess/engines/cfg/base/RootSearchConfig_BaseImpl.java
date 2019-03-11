@@ -57,13 +57,13 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private String timeControlOptimization_1 		= "for 1/1";
 	
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOptionSpin_Integer("MultiPV", 1, "type spin default 1 min 1 max 100"),
-			new UCIOptionString("GaviotaTbPath", DEFAULT_gaviotaTbPath, "type string default " + DEFAULT_gaviotaTbPath),
-			new UCIOptionSpin_Integer("GaviotaTbCache", DEFAULT_gaviotaTbCache, "type spin default " + DEFAULT_gaviotaTbCache + " min 4 max 512"),
+			new UCIOptionSpin_Integer("MultiPV", new Integer(1), "type spin default 1 min 1 max 100"),
+			//new UCIOptionString("GaviotaTbPath", DEFAULT_gaviotaTbPath, "type string default " + DEFAULT_gaviotaTbPath),
+			//new UCIOptionSpin_Integer("GaviotaTbCache", DEFAULT_gaviotaTbCache, "type spin default " + DEFAULT_gaviotaTbCache + " min 4 max 512"),
 			new UCIOptionCombo("Time Control Optimizations",
 					DEFAULT_timeControlOptimization,
 					"type combo default " + DEFAULT_timeControlOptimization + " var " + DEFAULT_timeControlOptimization + " var " + timeControlOptimization_1),
-			new UCIOptionSpin_Integer("Hidden Depth", 0, "type spin default 0 min 0 max 10"),
+			//new UCIOptionSpin_Integer("Hidden Depth", 0, "type spin default 0 min 0 max 10"),
 	};
 	
 	private String searchImpl_ClassName;

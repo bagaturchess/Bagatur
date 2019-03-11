@@ -48,7 +48,7 @@ public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl 
 	@Override
 	protected void sequentialSearchers_Create() {
 		
-		if (getRootSearchConfig().getThreadsCount() < 2) {
+		if (getRootSearchConfig().getThreadsCount() < 1) {
 			throw new IllegalStateException("MTDParallelSearch_ProcessesImpl: threads count is less than 2 = " + getRootSearchConfig().getThreadsCount());
 		}
 		

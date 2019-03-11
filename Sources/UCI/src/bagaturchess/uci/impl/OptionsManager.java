@@ -99,9 +99,9 @@ public class OptionsManager {
 		}
 		
 		try {
-			//try to parse double
-			Double val = Double.parseDouble((String) new_value);
-			option.setValue(val.doubleValue());
+			//try to parse integer
+			Integer val = Integer.parseInt((String) new_value);
+			option.setValue(val);
 			
 		} catch(IllegalArgumentException iae1) {
 			
