@@ -245,7 +245,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 						ChannelManager.getChannel().dump("MTDParallelSearch: starting searchers_ready[" + (i + 1) + "/" + searchers_ready.size() + "]");
 						
 						synchronized(synch_Board) {							
-							Go cur_go = initialgo;
+							Go cur_go = new Go(ChannelManager.getChannel(), "go infinite");//initialgo;
 							ITimeController cur_timecontroller = timeController;
 							
 							if (!searchers_ready.get(i).isStopped()){
@@ -268,6 +268,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					//SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.377d);
 					SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.001d); // Only one thread is enough to finish the depth
 					
+					ISearchInfo lastSendInfo = null;
+					
 					boolean allSearchersFinished = false;
 					//boolean hasSendAtLest1Info = false;
 					while (
@@ -288,8 +290,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 									ISearchInfo cur_deepest_best = searchersInfo.getDeepestBestInfo();
 									if (cur_deepest_best != null) {
 										
-										Go cur_go = initialgo;
-										ITimeController cur_timecontroller = timeController;
+										//Go cur_go = initialgo;
+										//ITimeController cur_timecontroller = timeController;
 										
 										/*if (timeController != null) {
 											long remainningTime = timeController.getRemainningTime();
@@ -325,19 +327,19 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							
 							
 							//Collect all major infos, put them in searchersInfo, and send the best info if available
-							boolean hasSendInfo = collectAndSendInfos(final_mediator, mediators_bucket, searchersInfo);
+							lastSendInfo = collectAndSendInfos(final_mediator, mediators_bucket, searchersInfo, lastSendInfo);
 							
 							
-							for (int i = 0; i < searchers_ready.size(); i++) {
+							/*for (int i = 0; i < searchers_ready.size(); i++) {
 								if (!searchers_ready.get(i).isStopped()) {
 									if (searchersInfo.needRestart(searchers_ready.get(i))) {
 										searchers_ready.get(i).stopSearchAndWait();
 										if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: restarted searcher " + i);
 									}
 								}
-							}
+							}*/
 							
-							if (!hasSendInfo) {
+							if (lastSendInfo == null) {
 								//Wait some time and than make check again
 								Thread.sleep(check_interval);
 								
@@ -383,7 +385,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					
 					
 					//Send all infos after the searchers are stopped
-					collectAndSendInfos(final_mediator, mediators_bucket, searchersInfo);
+					lastSendInfo = collectAndSendInfos(final_mediator, mediators_bucket, searchersInfo, lastSendInfo);
 					
 					
 					if (stopper == null) {
@@ -410,12 +412,11 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 			}
 			
 			
-			private boolean collectAndSendInfos(
+			private ISearchInfo collectAndSendInfos(
 					final ISearchMediator final_mediator,
 					final List<BucketMediator> mediators_bucket,
-					SearchersInfo searchersInfo) {
+					SearchersInfo searchersInfo, ISearchInfo lastSendInfo) {
 				
-				boolean hasSendInfo = false;
 				for (int i_mediator = 0; i_mediator < mediators_bucket.size(); i_mediator++) {
 					
 					//if (searchers_started[i_mediator]) {
@@ -443,20 +444,34 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							//if (!curinfo.isUpperBound()) {
 								searchersInfo.update(searchers_ready.get(i_mediator), curinfo);
 								ISearchInfo toSend = searchersInfo.getNewInfoToSendIfPresented();
-								while (toSend != null) {
-									if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend="
-												+ toSend);
-									final_mediator.changedMajor(toSend);
-									hasSendInfo = true;
-									//hasSendAtLest1Info = true;
-									toSend = searchersInfo.getNewInfoToSendIfPresented();
+								
+								if (toSend != null) {
+									if (lastSendInfo != null) {
+										if (toSend.getDepth() > lastSendInfo.getDepth()) {
+											if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend=" + toSend);
+											final_mediator.changedMajor(toSend);
+											lastSendInfo = toSend;
+										} else if (toSend.getDepth() == lastSendInfo.getDepth()) {
+											if (toSend.getEval() > lastSendInfo.getEval()) {
+												if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend=" + toSend);
+												final_mediator.changedMajor(toSend);
+												lastSendInfo = toSend;
+											}
+										} else {
+											//Do nothing
+										}
+									} else {									
+										if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend=" + toSend);
+										final_mediator.changedMajor(toSend);
+										lastSendInfo = toSend;
+									}
 								}
 							//}
 						}
 					//}
 				}
 				
-				return hasSendInfo;
+				return lastSendInfo;
 			}
 		});
 		

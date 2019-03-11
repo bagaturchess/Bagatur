@@ -232,7 +232,8 @@ public class SearchersInfo {
 			}
 		}
 		
-		return (countResponded / (double) searchersInfo.size() >= nextDepthThreshold);
+		return countResponded >= 1;
+		//return (countResponded / (double) searchersInfo.size() >= nextDepthThreshold);
 	}
 	
 	
@@ -392,7 +393,7 @@ public class SearchersInfo {
 			if (SearchUtils.isMateVal(best_eval)) {
 				return best_eval;
 			}
-			return sum / cnt;
+			return best_eval;//sum / cnt;
 		}
 	}
 }
