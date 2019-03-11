@@ -22,38 +22,9 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	
 	private int currentThreadsCount = getDefaultThreadsCount();
 	
-	protected double SMP_MEM_USAGE_TPT;
-	protected double SMP_MEM_USAGE_TPT_QS;
-	protected double SMP_MEM_USAGE_GTB;
-	protected double SMP_MEM_USAGE_EVALCACHE;
-	protected double SMP_MEM_USAGE_PAWNCACHE;
-	
-	
-	/*public RootSearchConfig_BaseImpl_SMP() {
-		this(new String[0]);
-	}*/
 	
 	public RootSearchConfig_BaseImpl_SMP(String[] args) {
 		super(args);
-		
-		calcMemoryUsagePercents();
-	}
-	
-	
-	private void calcMemoryUsagePercents() {
-		
-		double mem_usage_norm = 1 / (double)(getThreadsCount() * (MEM_USAGE_TPT + MEM_USAGE_GTB + MEM_USAGE_EVALCACHE + MEM_USAGE_PAWNCACHE));
-		
-		SMP_MEM_USAGE_TPT = MEM_USAGE_TPT * mem_usage_norm;
-		SMP_MEM_USAGE_TPT_QS = MEM_USAGE_TPT_QS * mem_usage_norm;
-		SMP_MEM_USAGE_GTB = MEM_USAGE_GTB * mem_usage_norm;
-		SMP_MEM_USAGE_EVALCACHE = MEM_USAGE_EVALCACHE * mem_usage_norm;
-		SMP_MEM_USAGE_PAWNCACHE = MEM_USAGE_PAWNCACHE * mem_usage_norm;
-		
-		
-		//System.out.println("SMP_MEM_USAGE_TPT=" + SMP_MEM_USAGE_TPT);
-		//System.out.println("SMP_MEM_USAGE_EVALCACHE=" + SMP_MEM_USAGE_EVALCACHE);
-		//System.out.println("SMP_MEM_USAGE_PAWNCACHE=" + SMP_MEM_USAGE_PAWNCACHE);
 	}
 	
 	
@@ -71,31 +42,31 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	
 	@Override
 	public double getTPTUsagePercent() {
-		return SMP_MEM_USAGE_TPT;
+		throw new UnsupportedOperationException();
 	}
 	
 	
 	@Override
 	public double getTPTQSUsagePercent() {
-		return SMP_MEM_USAGE_TPT_QS;
+		throw new UnsupportedOperationException();
 	}
 	
 	
 	@Override
 	public double getGTBUsagePercent() {
-		return SMP_MEM_USAGE_GTB;
+		throw new UnsupportedOperationException();
 	}
 	
 	
 	@Override
 	public double getEvalCacheUsagePercent() {
-		return SMP_MEM_USAGE_EVALCACHE;
+		throw new UnsupportedOperationException();
 	}
 	
 	
 	@Override
 	public double getPawnsCacheUsagePercent() {
-		return SMP_MEM_USAGE_PAWNCACHE;
+		throw new UnsupportedOperationException();
 	}
 	
 	
@@ -116,7 +87,6 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	public boolean applyOption(UCIOption option) {
 		if ("Threads".equals(option.getName())) {
 			currentThreadsCount = (Integer) option.getValue();
-			calcMemoryUsagePercents();
 			return true;
 		}
 		
