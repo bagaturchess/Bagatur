@@ -393,7 +393,7 @@ public class SearchersInfo {
 			if (SearchUtils.isMateVal(best_eval)) {
 				return best_eval;
 			}
-			return best_eval;//sum / cnt;
+			return sum / cnt;
 		}
 	}
 }
