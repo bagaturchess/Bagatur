@@ -36,15 +36,24 @@ public class EngineProcess_BagaturImpl extends EngineProcess {
 	
 	protected static String ARGS = "";
 	static {
-		ARGS += "bagaturchess.engines.cfg.base.UCIConfig_BaseImpl "; 
-		ARGS += "bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove ";
-		ARGS += "bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl ";
-		ARGS += "bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD ";
-		ARGS += "bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core ";
-		ARGS += "bagaturchess.search.impl.alg.impl0.Search_PVS_NWS ";
-		ARGS += "bagaturchess.engines.cfg.base.SearchConfigImpl_AB ";
-		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl ";
-		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig ";
+		ARGS += "bagaturchess.engines.cfg.base.UCIConfig_BaseImpl";
+		ARGS += " ";
+		ARGS += "bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove";
+		ARGS += " ";
+		ARGS += "bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl";
+		ARGS += " ";
+		ARGS += "bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD";
+		ARGS += " ";
+		ARGS += "bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core";
+		ARGS += " ";
+		ARGS += "bagaturchess.search.impl.alg.impl0.Search_PVS_NWS";
+		ARGS += " ";
+		ARGS += "bagaturchess.engines.cfg.base.SearchConfigImpl_AB";
+		ARGS += " ";
+		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl";
+		ARGS += " ";
+		ARGS += "bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig";
+		ARGS += " ";
 	}
 	
 	
