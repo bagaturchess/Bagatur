@@ -51,7 +51,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 	
 	private BacktrackingInfo[] backtracking 		= new BacktrackingInfo[MAX_DEPTH + 1];
 	
-	private static final int EVAL_DIFF_MAX 			= 200;
+	private static final double EVAL_DIFF_MAX 		= 100;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -608,7 +608,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		node.leaf = true;
 		
 		
-		int evalDiff = depth >= 2 ? backtrackingInfo.static_eval - backtracking[depth - 2].static_eval : 0;
+		double evalDiff = depth >= 2 ? backtrackingInfo.static_eval - backtracking[depth - 2].static_eval : 0;
 		if (evalDiff > EVAL_DIFF_MAX) evalDiff = EVAL_DIFF_MAX;
 		if (evalDiff < -EVAL_DIFF_MAX) evalDiff = -EVAL_DIFF_MAX;
 		
@@ -766,7 +766,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						rate += isCapOrProm ? -1 : 0;//for pv nodes
 						//rate += evalDiff <= 0 ? 1 : 0;
 						rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
-						//rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
+						rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
 					}
 					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
@@ -1280,7 +1280,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 		
-		int evalDiff = depth >= 2 ? backtrackingInfo.static_eval - backtracking[depth - 2].static_eval : 0;
+		double evalDiff = depth >= 2 ? backtrackingInfo.static_eval - backtracking[depth - 2].static_eval : 0;
 		if (evalDiff > EVAL_DIFF_MAX) evalDiff = EVAL_DIFF_MAX;
 		if (evalDiff < -EVAL_DIFF_MAX) evalDiff = -EVAL_DIFF_MAX;
 		
@@ -1434,9 +1434,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 						
 						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2);
 						rate += isCapOrProm ? 0 : 1;//for non pv nodes
-						rate += evalDiff <= 0 ? 1 : 0;
+						//rate += evalDiff <= 0 ? 1 : 0;
 						rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
-						//rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
+						rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
 					}
 					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
