@@ -51,7 +51,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 	
 	private BacktrackingInfo[] backtracking 		= new BacktrackingInfo[MAX_DEPTH + 1];
 	
-	private static final double EVAL_DIFF_MAX 		= 100;
+	private static final double EVAL_DIFF_MAX 		= 50;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
