@@ -77,14 +77,14 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		/*EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngine_WorkerNode",
 				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\GIT_REPO\\Bagatur-Chess-Engine-And-Tools\\Sources\\",
 				"",
-				1024);*/
+				getRootSearchConfig().getThreadMemory_InMegabytes());*/
 		
 		String workdir = new File(".").getAbsolutePath();
-		ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: Starting Java process of engine in workdir '" + workdir + "'");
+		ChannelManager.getChannel().dump("SequentialSearch_SeparateProcess: Starting Java process of engine in workdir '" + workdir + "'" + " with " + getRootSearchConfig().getThreadMemory_InMegabytes() + "MB of memory" );
 		EngineProcess engine = new EngineProcess_BagaturImpl_DistributionImpl("BagaturEngine_WorkerNode",
 				workdir + File.separatorChar,
 				"",
-				1024);
+				getRootSearchConfig().getThreadMemory_InMegabytes());
 		
 		
 		runner.addEngine(engine);
@@ -198,6 +198,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			
 		} catch(Throwable t) {
 			//Do nothing
+			//t.printStackTrace();
 		}
 	}
 	

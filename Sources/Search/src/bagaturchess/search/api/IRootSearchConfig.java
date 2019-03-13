@@ -43,8 +43,10 @@ public interface IRootSearchConfig {
 	public String getBoardFactoryClassName();
 	public String getSemaphoreFactoryClassName();
 	
-	public int getThreadsCount();
 	public int getHiddenDepth();
+	
+	public int getThreadsCount();
+	public int getThreadMemory_InMegabytes();
 	
 	/**
 	 * EGTB Settings

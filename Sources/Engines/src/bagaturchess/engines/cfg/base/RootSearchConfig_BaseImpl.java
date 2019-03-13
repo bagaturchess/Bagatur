@@ -177,6 +177,10 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 		return 1;
 	}
 	
+	@Override
+	public int getThreadMemory_InMegabytes() {
+		throw new IllegalStateException();
+	}
 	
 	@Override
 	public String getSearchClassName() {

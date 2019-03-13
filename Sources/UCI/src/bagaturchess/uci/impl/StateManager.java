@@ -40,6 +40,7 @@ import bagaturchess.uci.api.UCISearchAdaptorFactory;
 import bagaturchess.uci.impl.commands.Go;
 import bagaturchess.uci.impl.commands.Position;
 import bagaturchess.uci.impl.commands.options.SetOption;
+import bagaturchess.uci.impl.commands.options.actions.OptionsManager;
 
 
 public class StateManager extends Protocol implements BestMoveSender {

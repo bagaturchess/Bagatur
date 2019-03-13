@@ -13,6 +13,7 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	
 	
 	private int currentThreadsCount = getDefaultThreadsCount();
+	private int currentThreadMemory = 1024;
 	
 	
 	private UCIOption[] options = new UCIOption[] {
@@ -20,6 +21,10 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 					"type spin default " + currentThreadsCount
 											+ " min 1"
 											+ " max 64"),
+			new UCIOptionSpin_Integer("Thread Memory (MB)", currentThreadMemory,
+					"type spin default " + currentThreadMemory
+											+ " min 64"
+											+ " max 1024")
 	};
 	
 	
@@ -88,6 +93,9 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 		if ("SMP Threads".equals(option.getName())) {
 			currentThreadsCount = (Integer) option.getValue();
 			return true;
+		} else if ("Thread Memory (MB)".equals(option.getName())) {
+			currentThreadMemory = (Integer) option.getValue();
+			return true;
 		}
 		
 		return super.applyOption(option);
@@ -111,6 +119,12 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 		return threads;
 		
 		//return 1;
+	}
+	
+	
+	@Override
+	public int getThreadMemory_InMegabytes() {
+		return currentThreadMemory;
 	}
 	
 	
