@@ -339,7 +339,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 								}
 							}*/
 							
-							if (lastSendInfo == null) {
+							//if (lastSendInfo == null) {
 								//Wait some time and than make check again
 								Thread.sleep(check_interval);
 								
@@ -347,7 +347,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 								if (check_interval > CHECK_INTERVAL_MAX) {
 									check_interval = CHECK_INTERVAL_MAX;
 								}
-							}
+							//}
 							
 							try {
 								
