@@ -76,11 +76,11 @@ public class UCIEnginesManager {
 		int counter = 1;
 		for (EngineProcess engine: engines) {			
 			if (engine.supportsUCI()) {
-				System.out.println("Engine " + counter + " supports UCI");
+				//System.out.println("Engine " + counter + " supports UCI");
 			}
 			counter++;
 		}
-		System.out.println("All Engines started");
+		//System.out.println("All Engines started");
 		
 		enable();
 	}
@@ -105,11 +105,11 @@ public class UCIEnginesManager {
 		int counter = 1;
 		for (EngineProcess engine: engines) {			
 			if (engine.isReady()) {
-				System.out.println("Engine " + counter + " is ready");
+				//System.out.println("Engine " + counter + " is ready");
 			}
 			counter++;
 		}
-		System.out.println("All Engines are ready");
+		//System.out.println("All Engines are ready");
 		
 		enable();
 	}
@@ -122,7 +122,7 @@ public class UCIEnginesManager {
 		for (EngineProcess engine: engines) {			
 			engine.newGame();
 		}
-		System.out.println("New game started");
+		//System.out.println("New game started");
 		
 		enable();
 	}

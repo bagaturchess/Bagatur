@@ -75,9 +75,9 @@ public class GTBProbing_NativeWrapper {
     public void setPath_Sync(String tbPath, int memInMegabytes) {
         if (!tb_path.equals(tbPath)) {
             tb_path = tbPath;
-           	System.out.print("Loading: " + tb_path + " ... ");
+           	//System.out.print("Loading: " + tb_path + " ... ");
            	gtb.init(tb_path, memInMegabytes);
-           	System.out.println("OK");
+           	//System.out.println("OK");
         }
     }
     
