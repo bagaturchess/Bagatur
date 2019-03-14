@@ -103,9 +103,7 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 			
 			sharedData.clear();
 			
-			if (currentMediator != null) {
-				currentMediator.dump("Shutdown IRootSearch searchers");
-			}
+			ChannelManager.getChannel().sendLogToGUI("UCISearchAdaptorImpl_Base: shutdown IRootSearch searchers ...");
 			
 			if (searcherNormal != null) {
 				searcherNormal.shutDown();
@@ -119,7 +117,10 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 				searcherPonder.shutDown();
 			}
 			
+			ChannelManager.getChannel().sendLogToGUI("UCISearchAdaptorImpl_Base: shutdown OK");
+			
 		} catch(Throwable t) {
+			ChannelManager.getChannel().sendLogToGUI("UCISearchAdaptorImpl_Base: shutdown EXCEPTION t=" + t.getMessage());
 			ChannelManager.getChannel().dump(t);
 		}
 	}
