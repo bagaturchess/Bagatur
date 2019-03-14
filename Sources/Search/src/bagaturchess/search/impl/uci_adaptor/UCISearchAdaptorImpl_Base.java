@@ -119,10 +119,8 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 				searcherPonder.shutDown();
 			}
 			
-		} catch(Exception e) {
-			if (currentMediator != null) {
-				currentMediator.dump(e);
-			}
+		} catch(Throwable t) {
+			ChannelManager.getChannel().dump(t);
 		}
 	}
 	

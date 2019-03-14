@@ -106,8 +106,8 @@ public class Boot {
 							
 							List<IUCIOptionAction> customActions = new ArrayList<IUCIOptionAction>();
 							customActions.add(new UCIOptionAction_RecreateLogging(ChannelManager.getChannel(), engineBootCfg));
-							//customActions.add(new UCIOptionAction_RecreateSearchAdaptor_ThreadsCount(manager));
-							//customActions.add(new UCIOptionAction_RecreateSearchAdaptor_ThreadMemory(manager));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor_ThreadsCount(manager));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor_ThreadMemory(manager));
 							
 							OptionsManager optionsManager = new OptionsManager(communicationChanel, (IUCIOptionsProvider) optionsRegistry, customActions);
 							manager.setOptionsManager(optionsManager);

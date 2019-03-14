@@ -463,10 +463,10 @@ public class MemoryConsumers {
 	
 	
 	public void clear() {
-		tpt.clear();
-		pawnsCache.clear();
-		evalCache.clear();
-		
+		if (tpt != null) tpt.clear();
+		if (tpt_qs != null) tpt_qs.clear();
+		if (pawnsCache != null) pawnsCache.clear();
+		if (evalCache != null) evalCache.clear();
 		if (gtbCache_out != null) gtbCache_out.clear();
 		if (gtbs != null) gtbs.clear();
 	}
