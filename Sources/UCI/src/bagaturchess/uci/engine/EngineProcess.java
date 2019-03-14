@@ -89,27 +89,14 @@ public class EngineProcess {
 	
 	
 	public void destroy() throws IOException {
-		if (is != null) {
-			try {
-				is.close();
-			} catch (IOException e) {}
-		}
 		
-		if (os != null) {
-			try {
-				os.close();
-			} catch (IOException e) {}
-		}
-		
-		if (err != null) {
-			try {
-				err.close();
-			} catch (IOException e) {}
-		}
+		//ChannelManager.getChannel().sendLogToGUI("EngineProcess: destroy ...");
 		
 		if (process != null) {
 			process.destroy();
 		}
+		
+		//ChannelManager.getChannel().sendLogToGUI("EngineProcess: destroy OK");
 		
 		dummper.interrupt();
 	}
