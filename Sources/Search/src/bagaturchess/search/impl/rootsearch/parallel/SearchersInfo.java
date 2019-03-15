@@ -232,8 +232,8 @@ public class SearchersInfo {
 			}
 		}
 		
-		return countResponded >= 1;
-		//return (countResponded / (double) searchersInfo.size() >= nextDepthThreshold);
+		//return countResponded >= 1;
+		return (countResponded / (double) searchersInfo.size() >= nextDepthThreshold);
 	}
 	
 	
