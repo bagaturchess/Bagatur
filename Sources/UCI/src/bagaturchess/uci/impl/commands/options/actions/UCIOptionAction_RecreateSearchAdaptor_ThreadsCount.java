@@ -19,8 +19,9 @@ public class UCIOptionAction_RecreateSearchAdaptor_ThreadsCount implements IUCIO
 	
 	@Override
 	public void execute() throws FileNotFoundException {
-		stateManager.destroySearchAdaptor();
-		stateManager.createSearchAdaptor();
+		if (stateManager.destroySearchAdaptor()) {
+			stateManager.createSearchAdaptor();
+		}
 	}
 	
 	

@@ -86,7 +86,9 @@ public class StateManager extends Protocol implements BestMoveSender {
 	}
 	
 	
-	public void destroySearchAdaptor() throws FileNotFoundException {
+	public boolean destroySearchAdaptor() throws FileNotFoundException {
+		
+		boolean destroyed = false;
 		
 		channel.sendLogToGUI("StateManager: Destroing search adaptor ...");
 		
@@ -107,9 +109,13 @@ public class StateManager extends Protocol implements BestMoveSender {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {}
+			
+			destroyed = true;
 		}
 		
 		channel.sendLogToGUI("StateManager: Search adaptor Destroyed.");
+		
+		return destroyed;
 	}
 	
 	
