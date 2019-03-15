@@ -16,10 +16,7 @@ Hints:
      By default it runs with 1024M of memory, but uses only 70% of it (30% are for transposition table and the rest of 40% is used for other caches).
      Because of java programming language specifics, changes in memory could lead to bad performance, anyway if necessary it could be changed by editing the corresponding *.ini or *.bat file.
      
-  2. Endgame Tablebases support is based on Gaviota EGTB (Syzygy and Nalimov are not supported) and currently works on win 32 and win 64.
-     In order to make it working:
-     a) Download additional Gaviota tablebases into the ./data/egtb folder or
-	 b) Set UCI option GaviotaTbPath, to point to the folder where the Gaviota tablebases files are
+  2. Endgame Tablebases are not supported.
 	 
   3. On Laptop - for optimal performance make sure that: Laptop is connected to power supply (by either cable or docking station) and power plan is set to 'Maximum Performance'
    

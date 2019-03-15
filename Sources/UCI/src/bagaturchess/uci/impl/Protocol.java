@@ -22,23 +22,16 @@
  */
 package bagaturchess.uci.impl;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class Protocol {
-	/**
-FROM_GUI>uci
-TO_GUI>id name Pinko author Krasimir Topchiyski
-TO_GUI>uciok
-FROM_GUI>isready
-TO_GUI>readyok
-FROM_GUI>ucinewgame
-FROM_GUI>isready
-TO_GUI>readyok
-FROM_GUI>position startpos moves d2d4
-FROM_GUI>go wtime 300000 btime 300000 winc 0 binc 0
-TO_GUI>bestmove g1f3 ponder d8f6
-	 */
+	
+	
+	public static final String COMMAND_TO_GUI_ID_VERSION_STR = "1.6c";
+	
 	public static final String COMMAND_TO_ENGINE_UCI_STR = "uci";
 	public static final String COMMAND_TO_ENGINE_ISREADY_STR = "isready";
 	public static final String COMMAND_TO_ENGINE_NEWGAME_STR = "ucinewgame";
@@ -72,7 +65,6 @@ TO_GUI>bestmove g1f3 ponder d8f6
 	public static final String COMMAND_TO_ENGINE_STOP_STR = "stop";
 	public static final String COMMAND_TO_ENGINE_QUIT_STR = "quit";
 	
-	public static final String COMMAND_TO_GUI_ID_VERSION_STR = "1.6b";
 	public static final String COMMAND_TO_GUI_ID_STR = "id";
 	public static final String COMMAND_TO_GUI_ID_NAME_STR = "name";
 	public static final String COMMAND_TO_GUI_ID_AUTHOR_STR = "author";
