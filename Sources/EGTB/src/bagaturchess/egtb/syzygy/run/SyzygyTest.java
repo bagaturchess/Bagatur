@@ -5,7 +5,7 @@ import com.winkelhagen.chess.syzygy.SyzygyBridge;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Board;
-import bagaturchess.egtb.syzygy.Syzygy;
+import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 
 
@@ -28,17 +28,18 @@ public class SyzygyTest {
 			
 			System.out.println(board);
 			
-			System.out.println("start brobe");
+			System.out.println("start probe");
 			
-			SyzygyBridge.load("C:/Users/i027638/OneDrive - SAP SE/DATA/OWN/chess/EGTB/syzygy");
+			SyzygyTBProbing.getSingleton().loadNativeLibrary();
+			SyzygyTBProbing.getSingleton().load("C:/Users/i027638/OneDrive - SAP SE/DATA/OWN/chess/EGTB/syzygy");
 			
-			boolean available = Syzygy.isAvailable(3);
+			boolean available = SyzygyTBProbing.getSingleton().isAvailable(3);
 			System.out.println(available);
 			
-			int result1 = Syzygy.probeWDL(board);
+			int result1 = SyzygyTBProbing.getSingleton().probeWDL(board);
 			System.out.println(result1);
 			
-			int result2 = Syzygy.probeDTZ(board);
+			int result2 = SyzygyTBProbing.getSingleton().probeDTZ(board);
 			int dtz = (result2 & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
 			int wdl = (result2 & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
 			System.out.println(dtz);

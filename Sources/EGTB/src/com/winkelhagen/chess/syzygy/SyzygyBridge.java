@@ -31,15 +31,13 @@ public class SyzygyBridge {
 
     private static final String FILE_SCHEME = "file";
 
-    /*
-     * just loading the SyzygyBridge class will trigger loading the JSyzygy library via JNI.
-     */
-    static {
+
+	public static boolean loadNativeLibrary() {
         try {
             String libName = System.mapLibraryName("JSyzygy");
             Path jarfile = Paths.get(SyzygyBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             File libFile = jarfile.getParent().resolve(libName).toFile();
-            System.out.println("Looking for " + libName + " at location " + libName + " " + libFile);
+            System.out.println("Looking for " + libName + " at location " + libFile);
             if (libFile.exists()) {
                 System.load(libFile.getAbsolutePath());
                 System.out.println("Loaded " + libName);
@@ -56,12 +54,16 @@ public class SyzygyBridge {
                     System.out.println("Loaded " + libName + " located in the java library path");
                 }
             }
+            
             libLoaded = true;
+            
         } catch (URISyntaxException | UnsatisfiedLinkError | RuntimeException e) {
-        	System.out.println("unable to load JSyzygy library " + e);
+        	System.out.println("Unable to load JSyzygy library " + e);
         }
+        
+        return libLoaded;
     }
-
+	 
     /**
      *
      * @return true iff the JSyzygy JNI library is loaded.
@@ -85,7 +87,7 @@ public class SyzygyBridge {
      * @return the supported size of the loaded tablebases
      */
     public static synchronized int load(String path){
-        System.out.println("loading syzygy tablebases from " + path);
+        System.out.println("Loading syzygy tablebases from " + path);
         if (tbLargest>0){
         	System.out.println("Syzygy tablebases are already loaded");
             return tbLargest;
@@ -94,8 +96,10 @@ public class SyzygyBridge {
 
         if (result) {
             tbLargest = getTBLargest();
+            System.out.println("Syzygy tablebases loaded");
         } else {
             tbLargest = -1;
+            System.out.println("Syzygy tablebases NOT loaded");
         }
 
         return tbLargest;
@@ -151,5 +155,6 @@ public class SyzygyBridge {
     private static native int getTBLargest();
     private static native int probeWDL(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int ep, boolean turn); //NOSONAR
     private static native int probeDTZ(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn); //NOSONAR
-
+    
+    
 }

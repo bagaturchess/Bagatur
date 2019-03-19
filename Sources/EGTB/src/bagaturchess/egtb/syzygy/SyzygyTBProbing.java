@@ -1,6 +1,6 @@
 /**
  * FrankWalter - a java chess engine
- * Copyright © 2019 Laurens Winkelhagen (ljgw@users.noreply.github.com)
+ * Copyright 2019 Laurens Winkelhagen (ljgw@users.noreply.github.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package bagaturchess.egtb.syzygy;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
 
 import com.winkelhagen.chess.syzygy.SyzygyBridge;
@@ -28,38 +27,49 @@ import com.winkelhagen.chess.syzygy.SyzygyBridge;
 /**
  * converter class to fit the FrankWalter board representation on the SyzygyBridge
  */
-public class Syzygy {
+public class SyzygyTBProbing {
 	
-    private Syzygy(){}
+	
+	private static SyzygyTBProbing instance;
+	
+	
+    private SyzygyTBProbing() {
+    	
+    }
+    
+    
+	public void loadNativeLibrary() {
+		SyzygyBridge.loadNativeLibrary();
+	}
+	
+	
+    public static final SyzygyTBProbing getSingleton() {
+    	if (instance == null) {
+    		instance = new SyzygyTBProbing();
+    	}
+    	return instance;
+    }
+    
+    public final void load(String path) {
+    	SyzygyBridge.load(path);
+    }
     
     /**
      * wrapper for {@link com.winkelhagen.chess.syzygy.SyzygyBridge#isAvailable(int)}
      * @param piecesLeft the number of pieces left on the board
      * @return true iff there is a Syzygy result to be expected, given the number of pieces currently on the board
      */
-    public static boolean isAvailable(int piecesLeft){
+    public boolean isAvailable(int piecesLeft){
         return SyzygyBridge.isAvailable(piecesLeft);
     }
-
-    public static int search(IBitBoard board, int depth) {
-        
-    	if (Syzygy.isAvailable(board.getMaterialState().getPiecesCount())){
-            int result = Syzygy.probeWDL(board);
-            if (result!=-1){
-                //statistics.tbhits++;
-                return Syzygy.getWDLScore(result, depth);
-            }
-        }
-        
-        return 0;
-    }
+    
     
     /**
      * probes the Syzygy TableBases for a WinDrawLoss result
      * @param board the FrankWalter board representation
      * @return a WDL result (see {@link #getWDLScore(int, int)})
      */
-    public static int probeWDL(IBitBoard board){
+    public int probeWDL(IBitBoard board){
         if (board.hasRightsToKingCastle(Constants.COLOUR_WHITE) || board.hasRightsToQueenCastle(Constants.COLOUR_WHITE)
         		|| board.hasRightsToKingCastle(Constants.COLOUR_BLACK) || board.hasRightsToQueenCastle(Constants.COLOUR_BLACK)){
             return -1;
@@ -85,7 +95,7 @@ public class Syzygy {
      * @param board the FrankWalter board representation
      * @return a WDL result (see {@link #toXBoardScore(int)} and {@link #toMove(int)})
      */
-    public static int probeDTZ(IBitBoard board){
+    public int probeDTZ(IBitBoard board){
         if (board.hasRightsToKingCastle(Constants.COLOUR_WHITE) || board.hasRightsToQueenCastle(Constants.COLOUR_WHITE)
         		|| board.hasRightsToKingCastle(Constants.COLOUR_BLACK) || board.hasRightsToQueenCastle(Constants.COLOUR_BLACK)){
             return -1;
@@ -106,14 +116,14 @@ public class Syzygy {
     }
 
 
-    public static int toMove(int result){
+    public int toMove(int result){
         int from = (result & SyzygyConstants.TB_RESULT_FROM_MASK) >> SyzygyConstants.TB_RESULT_FROM_SHIFT;
         int to = (result & SyzygyConstants.TB_RESULT_TO_MASK) >> SyzygyConstants.TB_RESULT_TO_SHIFT;
         int promotes = (result & SyzygyConstants.TB_RESULT_PROMOTES_MASK) >> SyzygyConstants.TB_RESULT_PROMOTES_SHIFT;
         return getMove(from, to, promotes);
     }
 
-    public static int getMove(int fromSquare, int toSquare, int promotes) {
+    public int getMove(int fromSquare, int toSquare, int promotes) {
         return fromSquare | (toSquare <<6) | (promotes << 12);
     }
     
@@ -124,7 +134,7 @@ public class Syzygy {
      * @return the score to be displayed by xboard
      * todo: fix: this returns DTZero, not DTMate.
      */
-    public static int toXBoardScore(int result){
+    public int toXBoardScore(int result){
         int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
         int dtzFull = (dtz+1)/2;
         int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
@@ -150,20 +160,20 @@ public class Syzygy {
      * @param depth the depth of the current search
      * @return the score associated with this position
      */
-    public static int getWDLScore(int wdl, int depth) {
+    public int getWDLScore(int wdl, int depth) {
         switch (wdl){
             case SyzygyConstants.TB_LOSS:
                 return -28000 + depth;
             case SyzygyConstants.TB_BLESSED_LOSS:
-                return -27000 + depth;
+                return 0;//-27000 + depth;
             case SyzygyConstants.TB_DRAW:
                 return 0;
             case SyzygyConstants.TB_CURSED_WIN:
-                return 27000 - depth;
+                return 0;//27000 - depth;
             case SyzygyConstants.TB_WIN:
                 return 28000 - depth;
             default:
-                return 0;
+                throw new IllegalStateException("wdl=" + wdl);
         }
     }
     
