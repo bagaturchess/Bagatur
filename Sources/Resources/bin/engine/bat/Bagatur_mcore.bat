@@ -5,7 +5,7 @@ cd ..
 
 echo off
 
-REM Sets path to binaries
+REM Sets path to libraries
 set BIN_PATH=./bin/
 
 
