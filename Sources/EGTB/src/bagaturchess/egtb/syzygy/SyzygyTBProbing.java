@@ -38,14 +38,17 @@ public class SyzygyTBProbing {
     }
     
     
-	public void loadNativeLibrary() {
-		SyzygyBridge.loadNativeLibrary();
+	public boolean loadNativeLibrary() {
+		return SyzygyBridge.loadNativeLibrary();
 	}
 	
 	
     public static final SyzygyTBProbing getSingleton() {
     	if (instance == null) {
     		instance = new SyzygyTBProbing();
+    		if (!instance.loadNativeLibrary()) {
+    			instance = null;
+    		}
     	}
     	return instance;
     }

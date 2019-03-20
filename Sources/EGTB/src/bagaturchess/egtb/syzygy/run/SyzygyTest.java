@@ -20,10 +20,10 @@ public class SyzygyTest {
 			//Initialization of the board representation by given FEN
 			
 			//IBitBoard board  = new Board("3k4/8/8/8/8/8/3P4/3K4 w - -", null, null);//White win
-			//IBitBoard board  = new Board("4k3/3r1p2/8/8/8/8/8/4KQ2 w - - 0 1", null, null);//White win
+			IBitBoard board  = new Board("4k3/3r1p2/8/8/8/8/8/4KQ2 w - - 0 1", null, null);//White win
 			
 			//IBitBoard board  = new Board("8/8/8/8/8/7k/5Kp1/8 w - - 0 1", null, null);//Draw
-			IBitBoard board  = new Board("8/8/8/8/8/7k/5Kp1/8 b - - 0 1", null, null);//Black win
+			//IBitBoard board  = new Board("8/8/8/8/8/7k/5Kp1/8 b - - 0 1", null, null);//Black win
 			
 			
 			System.out.println(board);
@@ -44,6 +44,8 @@ public class SyzygyTest {
 			int wdl = (result2 & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
 			System.out.println(dtz);
 			System.out.println(wdl);
+			System.out.println(SyzygyTBProbing.getSingleton().toMove(result2));
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();

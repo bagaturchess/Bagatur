@@ -33,7 +33,9 @@ public class SyzygyBridge {
 
 
 	public static boolean loadNativeLibrary() {
+		
         try {
+        	
             String libName = System.mapLibraryName("JSyzygy");
             Path jarfile = Paths.get(SyzygyBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             File libFile = jarfile.getParent().resolve(libName).toFile();
@@ -57,8 +59,8 @@ public class SyzygyBridge {
             
             libLoaded = true;
             
-        } catch (URISyntaxException | UnsatisfiedLinkError | RuntimeException e) {
-        	System.out.println("Unable to load JSyzygy library " + e);
+        } catch (Throwable t) {
+        	System.out.println("Unable to load JSyzygy library " + t);
         }
         
         return libLoaded;
