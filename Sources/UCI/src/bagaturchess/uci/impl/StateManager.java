@@ -59,6 +59,8 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	private OptionsManager optionsManager;
 	
+	private String lastFEN;
+	
 	
 	public StateManager(IUCIConfig _engineBootCfg) {
 		engineBootCfg = _engineBootCfg;
@@ -327,27 +329,38 @@ public class StateManager extends Protocol implements BestMoveSender {
 		
 		if (position.getFen() != null) {
 			
-			board = new Board(position.getFen());
-			
-			destroySearchAdaptor();
-			//createSearchAdaptor();
+			if (lastFEN == null || !lastFEN.equals(position.getFen())) {
+				
+				board = new Board(position.getFen());
+				destroySearchAdaptor();
+				//createSearchAdaptor();
+				
+				lastFEN = position.getFen();
+			}
 			
 		} else {
 			
-			revertGame();
-			
-			int colour = Figures.COLOUR_WHITE;
-			List<String> moves = position.getMoves();
-			int size = moves.size();
-			for (int i = 0; i < size; i++ ) {
+			if (lastFEN != null) {
+				board = new Board();
+				destroySearchAdaptor();
 				
-				String moveSign = moves.get(i);
-				if (!moveSign.equals("...")) {
-					int move = BoardUtils.parseSingleUCIMove(board, colour, moveSign);
-					colour = Figures.OPPONENT_COLOUR[colour];
-					
-					board.makeMoveForward(move);
-				}
+				lastFEN = null;	
+			}
+			
+			revertGame();
+		}
+		
+		playMoves(position);
+	}
+
+
+	private void playMoves(Position position) {
+		List<String> moves = position.getMoves();
+		for (int i = 0; i < moves.size(); i++ ) {
+			String moveSign = moves.get(i);
+			if (!moveSign.equals("...")) {
+				int move = BoardUtils.parseSingleUCIMove(board, moveSign);
+				board.makeMoveForward(move);
 			}
 		}
 	}

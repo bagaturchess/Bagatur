@@ -233,15 +233,15 @@ public class BoardUtils {
 			moves.add(st.nextToken());
 		}
 		
-		int colour = Figures.COLOUR_WHITE;
+		//int colour = Figures.COLOUR_WHITE;
 		int size = moves.size();
 		for (int i = 0; i < size; i++ ) {
 			
 			String moveSign = moves.get(i);
 			if (!moveSign.equals("...")) {
 				//System.out.println(moveSign);
-				int move = BoardUtils.parseSingleUCIMove(board, colour, moveSign);
-				colour = Figures.OPPONENT_COLOUR[colour];
+				int move = BoardUtils.parseSingleUCIMove(board, moveSign);
+				//colour = Figures.OPPONENT_COLOUR[colour];
 				
 				board.makeMoveForward(move);
 			}
@@ -249,7 +249,7 @@ public class BoardUtils {
 	}
 	
 	
-	public static int parseSingleUCIMove(IBitBoard board, int colourToMove, String moveSign) {
+	public static int parseSingleUCIMove(IBitBoard board, String moveSign) {
 		int move = 0;
 		
 		IInternalMoveList moves_list = new BaseMoveList();
