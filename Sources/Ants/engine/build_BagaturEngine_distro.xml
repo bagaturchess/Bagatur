@@ -67,8 +67,8 @@
   	
 	<copy todir="${temp_dir}/data/egtb/">
 	    <fileset dir="${resources_dir}/bin/engine/egtb/">
-		  <include name="*.cp4"/>
-	      <include name="*.txt"/>
+		  <include name="*.rtbw"/>
+	      <include name="*.rtbz"/>
 	    </fileset>
 	</copy>
   	
