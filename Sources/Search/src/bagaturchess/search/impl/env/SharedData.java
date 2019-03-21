@@ -26,6 +26,7 @@ package bagaturchess.search.impl.env;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.egtb.gaviota.GTBProbing;
 import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
+import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluatorFactory;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -100,8 +101,8 @@ public class SharedData {
 		return memoryConsumers.getEvalCache().remove(0);
 	}
 	
-	public GTBProbing getAndRemoveGTBProbing() {
-		return memoryConsumers.getGTBProbing().remove(0);
+	public SyzygyTBProbing getAndRemoveTBProbing() {
+		return memoryConsumers.getTBProbing().remove(0);
 	}
 	
 	public GTBCache_OUT getAndRemoveGTBCache_OUT() {

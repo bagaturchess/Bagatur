@@ -51,8 +51,7 @@ public interface IRootSearchConfig {
 	/**
 	 * EGTB Settings
 	 */
-	public String getGaviotaTbPath();
-	public int getGaviotaTbCache();//In megabytes
+	public String getTbPath();
 	
 	/**
 	 * Memory Settings

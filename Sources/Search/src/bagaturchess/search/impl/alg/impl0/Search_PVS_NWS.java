@@ -27,6 +27,8 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.egtb.gaviota.GTBProbeOutput;
+import bagaturchess.egtb.syzygy.SyzygyConstants;
+import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
@@ -163,6 +165,24 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
+		if (inCheck) {
+			if (!env.getBitboard().hasMoveInCheck()) {
+				node.bestmove = 0;
+				node.eval = -getMateVal(depth);
+				node.leaf = true;
+				node.nullmove = false;
+				return node.eval;
+			}
+		} else {
+			if (!env.getBitboard().hasMoveInNonCheck()) {
+				node.bestmove = 0;
+				node.eval = getDrawScores(rootColour);
+				node.leaf = true;
+				node.nullmove = false;
+				return node.eval;
+			}
+		}
+		
 	    // Mate distance pruning
 		if (!inCheck && useMateDistancePrunning && depth >= 1) {
 		      
@@ -193,41 +213,40 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		      }
 		}
 		
-		
-		if (env.getGTBProbing() != null
-				&& env.getBitboard().getColourToMove() == rootColour
-				&& depth >= 15) {
-            
-			temp_input.clear();
-            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
-            
-            int egtb_val = Integer.MIN_VALUE;
-            
-            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
-                
-                egtb_val = getDrawScores(rootColour);
-                
-                node.eval = egtb_val;
-                return egtb_val;
-                
-            } else {
-                
-                int result = extractEGTBMateValue(depth);
-                
-                if (result != 0) {//Has mate
-                    
-                    egtb_val = result;
-                    
-                    if (!isMateVal(egtb_val)) {
-                        throw new IllegalStateException("egtb_val=" + egtb_val);
-                    }
-                    
-                    if (egtb_val >= beta) {
-	                    node.eval = egtb_val;
-	                    return egtb_val;
-                    }
-                }
-            }
+    	
+		if (depth > 1
+    			&& SyzygyTBProbing.getSingleton() != null
+    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
+    			&& env.getBitboard().getColourToMove() == rootColour
+    			){
+			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+			if (result != -1) {
+				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
+				int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+				int egtbscore =  SyzygyTBProbing.getSingleton().getWDLScore(wdl, depth);
+				if (egtbscore > 0) {
+					int distanceToDraw = 100 - env.getBitboard().getDraw50movesRule();
+					if (distanceToDraw > dtz) {
+						node.bestmove = 0;
+						node.eval = 10 * (distanceToDraw - dtz);
+						node.leaf = true;
+						node.nullmove = false;
+						return node.eval;
+					} else {
+						node.bestmove = 0;
+						node.eval = getDrawScores(rootColour);
+						node.leaf = true;
+						node.nullmove = false;
+						return node.eval;
+					}
+				} else if (egtbscore == 0) {
+					node.bestmove = 0;
+					node.eval = getDrawScores(rootColour);
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
+				}
+			}
         }
 		
 		
@@ -337,8 +356,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 			}
 		}
-		
-		
+    	
+    	
 		if (depth >= normDepth(maxdepth)) {
 			
 			if (inCheck) {
@@ -918,6 +937,16 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
+		if (inCheck) {
+			if (!env.getBitboard().hasMoveInCheck()) {
+				return -getMateVal(depth);
+			}
+		} else {
+			if (!env.getBitboard().hasMoveInNonCheck()) {
+				return getDrawScores(rootColour);
+			}
+		}
+		
 	    // Mate distance pruning
 		if (!inCheck && useMateDistancePrunning && depth >= 1) {
 		      
@@ -938,40 +967,29 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		         }
 		      }
 		}
-		
-		
-		if (env.getGTBProbing() != null
-				&& env.getBitboard().getColourToMove() == rootColour
-				&& depth >= 15) {
-            
-			temp_input.clear();
-            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
-            
-            int egtb_val = Integer.MIN_VALUE;
-            
-            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
-                
-                egtb_val = getDrawScores(rootColour);
-                
-                return egtb_val;
-                
-            } else {
-                
-                int result = extractEGTBMateValue(depth);
-                
-                if (result != 0) {//Has mate
-                    
-                    egtb_val = result;
-                    
-                    if (!isMateVal(egtb_val)) {
-                        throw new IllegalStateException("egtb_val=" + egtb_val);
-                    }
-                    
-                    if (egtb_val >= beta) {
-	                    return egtb_val;
-                    }
-                }
-            }
+    	
+    	
+		if (depth > 1
+    			&& SyzygyTBProbing.getSingleton() != null
+    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
+    			&& env.getBitboard().getColourToMove() == rootColour
+    			){
+			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+			if (result != -1) {
+				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
+				int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+				int egtbscore =  SyzygyTBProbing.getSingleton().getWDLScore(wdl, depth);
+				if (egtbscore > 0) {
+					int distanceToDraw = 100 - env.getBitboard().getDraw50movesRule();
+					if (distanceToDraw > dtz) {
+						return 10 * (distanceToDraw - dtz);
+					} else {
+						return getDrawScores(rootColour);
+					}
+				} else if (egtbscore == 0) {
+					return getDrawScores(rootColour);
+				}
+			}
         }
 
 		
@@ -1042,7 +1060,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 			}
 		}
-		
+    	
 		
 		if (depth >= normDepth(maxdepth)) {
 			
@@ -1600,43 +1618,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 		
-		if (env.getGTBProbing() != null
-				&& env.getBitboard().getColourToMove() == rootColour
-				&& depth >= 15) {
-            
-			temp_input.clear();
-            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
-            
-            int egtb_val = Integer.MIN_VALUE;
-            
-            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
-                
-                egtb_val = getDrawScores(rootColour);
-                
-                node.eval = egtb_val;
-                return egtb_val;
-                
-            } else {
-                
-                int result = extractEGTBMateValue(depth);
-                
-                if (result != 0) {//Has mate
-                    
-                    egtb_val = result;
-                    
-                    if (!isMateVal(egtb_val)) {
-                        throw new IllegalStateException("egtb_val=" + egtb_val);
-                    }
-                    
-                    if (egtb_val >= beta) {
-	                    node.eval = egtb_val;
-	                    return egtb_val;
-                    }
-                }
-            }
-        }
-		
-		
 		long hashkey = env.getBitboard().getHashKey();
 		
 		
@@ -1744,8 +1725,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				return node.eval;
 			}
 		}
-		
-		
+    	
+    	
 		ISearchMoveList list = null;
 		if (inCheck) { 
 			list = lists_escapes[depth];
@@ -1905,41 +1886,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		}
 		
 		
-		if (env.getGTBProbing() != null
-				&& env.getBitboard().getColourToMove() == rootColour
-				&& depth >= 15) {
-            
-			temp_input.clear();
-            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
-            
-            int egtb_val = Integer.MIN_VALUE;
-            
-            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
-                
-                egtb_val = getDrawScores(rootColour);
-                
-                return egtb_val;
-                
-            } else {
-                
-                int result = extractEGTBMateValue(depth);
-                
-                if (result != 0) {//Has mate
-                    
-                    egtb_val = result;
-                    
-                    if (!isMateVal(egtb_val)) {
-                        throw new IllegalStateException("egtb_val=" + egtb_val);
-                    }
-                    
-                    if (egtb_val >= beta) {
-	                    return egtb_val;
-                    }
-                }
-            }
-		}
-		
-		
 		long hashkey = env.getBitboard().getHashKey();
 		
 		
@@ -2013,8 +1959,8 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				throw new IllegalStateException("!inCheck && staticEval > alpha - 1");
 			}
 		}
-		
-		
+    	
+    	
 		ISearchMoveList list = null;
 		if (inCheck) { 
 			list = lists_escapes[depth];

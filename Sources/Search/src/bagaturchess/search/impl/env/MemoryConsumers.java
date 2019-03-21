@@ -16,6 +16,7 @@ import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.egtb.gaviota.GTBProbing;
 import bagaturchess.egtb.gaviota.GTBProbing_NativeWrapper;
 import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
+import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.opening.api.OpeningBookFactory;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -78,7 +79,7 @@ public class MemoryConsumers {
 	private List<PawnsEvalCache> pawnsCache;
 	private List<TPTable> tpt;
 	private List<TPTable> tpt_qs;
-	private List<GTBProbing> gtbs;
+	private List<SyzygyTBProbing> gtbs;
 	private List<GTBCache_OUT> gtbCache_out;
 	
 	private IChannel channel;
@@ -156,34 +157,34 @@ public class MemoryConsumers {
 		//}
 		
 		
-		ChannelManager.getChannel().dump("Loading modules for Gaviota Endgame Tablebases support ... ");
+		ChannelManager.getChannel().dump("Loading modules for Endgame Tablebases support ... ");
 		
-		gtbs			 = new Vector<GTBProbing>();
+		gtbs			 = new Vector<SyzygyTBProbing>();
 		
 		int threadsCount = engineConfiguration.getThreadsCount();
 		
-		if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
+		if (SyzygyTBProbing.getSingleton() != null) {
+			
+			//SyzygyTBProbing.getSingleton().load("C:/Users/i027638/OneDrive - SAP SE/DATA/OWN/chess/EGTB/syzygy");
+			SyzygyTBProbing.getSingleton().load(engineConfiguration.getTbPath());
 			
 			for (int i=0; i<threadsCount; i++) {
-				GTBProbing gtb = new GTBProbing();
-				gtb.setPath_Sync(
-						engineConfiguration.getGaviotaTbPath(),
-						engineConfiguration.getGaviotaTbCache());
-				gtbs.add(gtb);
+				gtbs.add(SyzygyTBProbing.getSingleton());
 			}
 			
 			//try {Thread.sleep(10000);} catch (InterruptedException e1) {}
-			ChannelManager.getChannel().dump("Modules for Gaviota Endgame Tablebases OK. Will try to load Gaviota Tablebases from => " + engineConfiguration.getGaviotaTbPath());
+			ChannelManager.getChannel().dump("Modules for Endgame Tablebases OK. Will try to load Tablebases from => " + engineConfiguration.getTbPath());
 		} else {
 			//TODO: set percent to 0 and log corresponding message for the sizes
 			//Can't load IA 32-bit .dll on a AMD 64-bit platform
 			//throw new IllegalStateException("egtbprobe dynamic library could not be loaded (or not found)");
-			ChannelManager.getChannel().dump(GTBProbing_NativeWrapper.getErrorMessage());
+			//ChannelManager.getChannel().dump(GTBProbing_NativeWrapper.getErrorMessage());
 			
 			for (int i=0; i<threadsCount; i++) {
 				gtbs.add(null);
 			}
 		}
+		
 		
 		if (engineConfiguration.initCaches()) {
 			ChannelManager.getChannel().dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
@@ -452,7 +453,7 @@ public class MemoryConsumers {
 	}
 	
 	
-	public List<GTBProbing> getGTBProbing() {
+	public List<SyzygyTBProbing> getTBProbing() {
 		return gtbs;
 	}
 	

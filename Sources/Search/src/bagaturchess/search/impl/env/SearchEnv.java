@@ -29,6 +29,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.egtb.gaviota.GTBProbing;
 import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
+import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -61,7 +62,7 @@ public class SearchEnv {
 	private TPTable tpt;
 	private TPTable tpt_qs;
 	private GTBCache_OUT egtb_cache;
-	private GTBProbing gtb_probing;
+	private SyzygyTBProbing gtb_probing;
 	private boolean egtb_cache_get;
 	private boolean gtb_probing_get;
 
@@ -166,10 +167,10 @@ public class SearchEnv {
 	/**
 	 * Returns null, because the calls to GTBProbing.probe() cause jvm crashes on some hardwares as well as Java OOM errors
 	 */
-	public GTBProbing getGTBProbing() {
+	public SyzygyTBProbing getGTBProbing() {
 		
 		if (!gtb_probing_get) {
-			gtb_probing = shared.getAndRemoveGTBProbing();
+			gtb_probing = shared.getAndRemoveTBProbing();
 			gtb_probing_get = true;
 		}
 		

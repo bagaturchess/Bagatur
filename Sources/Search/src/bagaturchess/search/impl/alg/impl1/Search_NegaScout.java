@@ -197,44 +197,6 @@ public class Search_NegaScout extends SearchImpl {
 		}
 		
 		
-		//Gaviota endgame tablebases
-		if (env.getGTBProbing() != null
-				&& env.getBitboard().getColourToMove() == rootColour
-				&& depth >= 13) {
-            
-			temp_input.clear();
-            env.getGTBProbing().probe(env.getBitboard(), gtb_probe_result, temp_input, env.getEGTBCache());
-            
-            int egtb_val = Integer.MIN_VALUE;
-            
-            if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
-                
-                egtb_val = getDrawScores(rootColour);
-                
-                node.eval = egtb_val;
-                return egtb_val;
-                
-            } else {
-                
-                int result = extractEGTBMateValue(depth);
-                
-                if (result != 0) {//Has mate
-                    
-                    egtb_val = result;
-                    
-                    if (!isMateVal(egtb_val)) {
-                        throw new IllegalStateException("egtb_val=" + egtb_val);
-                    }
-                    
-                    if (egtb_val >= beta) {
-	                    node.eval = egtb_val;
-	                    return egtb_val;
-                    }
-                }
-            }
-        }
-		
-		
 		int rest = normDepth(maxdepth) - depth;
 		
 		

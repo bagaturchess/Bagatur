@@ -50,15 +50,14 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	*/
 	
 	
-	private String DEFAULT_gaviotaTbPath = (new File(".")).getAbsolutePath() + File.separatorChar + "data" + File.separatorChar + "egtb";
-	private Integer DEFAULT_gaviotaTbCache = new Integer(8);
+	private String DEFAULT_TbPath = (new File(".")).getAbsolutePath() + File.separatorChar + "data" + File.separatorChar + "egtb";
 	
 	private String DEFAULT_timeControlOptimization 	= "for 40/40";
 	private String timeControlOptimization_1 		= "for 1/1";
 	
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionSpin_Integer("MultiPV", new Integer(1), "type spin default 1 min 1 max 100"),
-			//new UCIOptionString("GaviotaTbPath", DEFAULT_gaviotaTbPath, "type string default " + DEFAULT_gaviotaTbPath),
+			new UCIOptionString("SyzygyPath", DEFAULT_TbPath, "type string default " + DEFAULT_TbPath),
 			//new UCIOptionSpin_Integer("GaviotaTbCache", DEFAULT_gaviotaTbCache, "type spin default " + DEFAULT_gaviotaTbCache + " min 4 max 512"),
 			new UCIOptionCombo("Time Control Optimizations",
 					DEFAULT_timeControlOptimization,
@@ -74,8 +73,7 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	private int multiPVsCount = 1;
 	
-	private String gaviotaTbPath = DEFAULT_gaviotaTbPath;
-	private int gaviotaTbCache = DEFAULT_gaviotaTbCache.intValue();
+	private String TbPath = DEFAULT_TbPath;
 	
 	private int hiddenDepth = 0;
 	
@@ -269,12 +267,8 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 			multiPVsCount = (Integer) option.getValue();
 			return true;
 			
-		} else if ("GaviotaTbPath".equals(option.getName())) {
-			gaviotaTbPath = (String) option.getValue();
-			return true;
-			
-		} else if ("GaviotaTbCache".equals(option.getName())) {
-			gaviotaTbCache = (Integer) option.getValue();
+		} else if ("SyzygyPath".equals(option.getName())) {
+			TbPath = (String) option.getValue();
 			return true;
 			
 		} else if ("Time Control Optimizations".equals(option.getName())) {
@@ -339,14 +333,8 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 
 
 	@Override
-	public String getGaviotaTbPath() {
-		return gaviotaTbPath;
-	}
-
-
-	@Override
-	public int getGaviotaTbCache() {
-		return gaviotaTbCache;
+	public String getTbPath() {
+		return TbPath;
 	}
 	
 	
