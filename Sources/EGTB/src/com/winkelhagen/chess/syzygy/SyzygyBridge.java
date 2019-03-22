@@ -42,7 +42,7 @@ public class SyzygyBridge {
             System.out.println("Looking for " + libName + " at location " + libFile);
             if (libFile.exists()) {
                 System.load(libFile.getAbsolutePath());
-                System.out.println("Loaded " + libName);
+                System.out.println(libName + " is now loaded");
             } else {
                 URL classpathLibUrl = SyzygyBridge.class.getClassLoader().getResource(libName);
                 System.out.println("Looking for " + libName + " at location " + classpathLibUrl);

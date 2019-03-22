@@ -28,24 +28,24 @@ public class SyzygyTest {
 			
 			System.out.println(board);
 			
-			System.out.println("start probe");
+			System.out.println("start probing");
 			
-			SyzygyTBProbing.getSingleton().loadNativeLibrary();
-			SyzygyTBProbing.getSingleton().load("C:/Users/i027638/OneDrive - SAP SE/DATA/OWN/chess/EGTB/syzygy");
-			
-			boolean available = SyzygyTBProbing.getSingleton().isAvailable(3);
-			System.out.println(available);
-			
-			int result1 = SyzygyTBProbing.getSingleton().probeWDL(board);
-			System.out.println(result1);
-			
-			int result2 = SyzygyTBProbing.getSingleton().probeDTZ(board);
-			int dtz = (result2 & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
-			int wdl = (result2 & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
-			System.out.println(dtz);
-			System.out.println(wdl);
-			System.out.println(SyzygyTBProbing.getSingleton().toMove(result2));
-			
+			if (SyzygyTBProbing.getSingleton() != null) {
+				SyzygyTBProbing.getSingleton().load("C:/Users/i027638/OneDrive - SAP SE/DATA/OWN/chess/EGTB/syzygy");
+				
+				//boolean available = SyzygyTBProbing.getSingleton().isAvailable(3);
+				//System.out.println(available);
+				
+				//int result1 = SyzygyTBProbing.getSingleton().probeWDL(board);
+				//System.out.println(result1);
+				
+				int result2 = SyzygyTBProbing.getSingleton().probeDTZ(board);
+				int dtz = (result2 & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
+				int wdl = (result2 & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+				System.out.println(dtz);
+				System.out.println(wdl);
+				//System.out.println(SyzygyTBProbing.getSingleton().toMove(result2));
+			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
