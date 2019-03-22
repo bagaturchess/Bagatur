@@ -39,8 +39,7 @@ import bagaturchess.uci.impl.Channel_Console;
 import bagaturchess.uci.impl.StateManager;
 import bagaturchess.uci.impl.commands.options.actions.OptionsManager;
 import bagaturchess.uci.impl.commands.options.actions.UCIOptionAction_RecreateLogging;
-import bagaturchess.uci.impl.commands.options.actions.UCIOptionAction_RecreateSearchAdaptor_ThreadMemory;
-import bagaturchess.uci.impl.commands.options.actions.UCIOptionAction_RecreateSearchAdaptor_ThreadsCount;
+import bagaturchess.uci.impl.commands.options.actions.UCIOptionAction_RecreateSearchAdaptor;
 import bagaturchess.uci.impl.commands.options.actions.UCIOptionsRegistry;
 
 
@@ -106,8 +105,9 @@ public class Boot {
 							
 							List<IUCIOptionAction> customActions = new ArrayList<IUCIOptionAction>();
 							customActions.add(new UCIOptionAction_RecreateLogging(ChannelManager.getChannel(), engineBootCfg));
-							customActions.add(new UCIOptionAction_RecreateSearchAdaptor_ThreadsCount(manager));
-							customActions.add(new UCIOptionAction_RecreateSearchAdaptor_ThreadMemory(manager));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "SMP Threads"));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "Thread Memory (MB)"));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "SyzygyPath"));
 							
 							OptionsManager optionsManager = new OptionsManager(communicationChanel, (IUCIOptionsProvider) optionsRegistry, customActions);
 							manager.setOptionsManager(optionsManager);

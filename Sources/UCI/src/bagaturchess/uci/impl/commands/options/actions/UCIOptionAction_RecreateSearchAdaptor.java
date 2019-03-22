@@ -7,14 +7,15 @@ import bagaturchess.uci.api.IUCIOptionAction;
 import bagaturchess.uci.impl.StateManager;
 
 
-public class UCIOptionAction_RecreateSearchAdaptor_ThreadMemory implements IUCIOptionAction {
+public class UCIOptionAction_RecreateSearchAdaptor implements IUCIOptionAction {
 	
 	
 	private StateManager stateManager;
+	private String optionName;
 	
-	
-	public UCIOptionAction_RecreateSearchAdaptor_ThreadMemory(StateManager _stateManager) {
+	public UCIOptionAction_RecreateSearchAdaptor(StateManager _stateManager, String _optionName) {
 		stateManager = _stateManager;
+		optionName = _optionName;
 	}
 	
 	@Override
@@ -27,6 +28,6 @@ public class UCIOptionAction_RecreateSearchAdaptor_ThreadMemory implements IUCIO
 	
 	@Override
 	public String getOptionName() {
-		return "Thread Memory (MB)";
+		return optionName;
 	}
 }
