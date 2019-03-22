@@ -165,23 +165,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
-		if (inCheck) {
-			if (!env.getBitboard().hasMoveInCheck()) {
-				node.bestmove = 0;
-				node.eval = -getMateVal(depth);
-				node.leaf = true;
-				node.nullmove = false;
-				return node.eval;
-			}
-		} else {
-			if (!env.getBitboard().hasMoveInNonCheck()) {
-				node.bestmove = 0;
-				node.eval = getDrawScores(rootColour);
-				node.leaf = true;
-				node.nullmove = false;
-				return node.eval;
-			}
-		}
 		
 	    // Mate distance pruning
 		if (!inCheck && useMateDistancePrunning && depth >= 1) {
@@ -213,12 +196,35 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		      }
 		}
 		
-    	
+		
+		int rest = normDepth(maxdepth) - depth;
+		
+		
 		if (depth > 1
+    	    	&& depth <= rest
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
     			&& env.getBitboard().getColourToMove() == rootColour
     			){
+			
+			if (inCheck) {
+				if (!env.getBitboard().hasMoveInCheck()) {
+					node.bestmove = 0;
+					node.eval = -getMateVal(depth);
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
+				}
+			} else {
+				if (!env.getBitboard().hasMoveInNonCheck()) {
+					node.bestmove = 0;
+					node.eval = getDrawScores(rootColour);
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
+				}
+			}
+			
 			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
 			if (result != -1) {
 				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
@@ -248,9 +254,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 				}
 			}
         }
-		
-		
-		int rest = normDepth(maxdepth) - depth;
 		
 		
 		boolean disableExts = false;
@@ -937,15 +940,6 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
-		if (inCheck) {
-			if (!env.getBitboard().hasMoveInCheck()) {
-				return -getMateVal(depth);
-			}
-		} else {
-			if (!env.getBitboard().hasMoveInNonCheck()) {
-				return getDrawScores(rootColour);
-			}
-		}
 		
 	    // Mate distance pruning
 		if (!inCheck && useMateDistancePrunning && depth >= 1) {
@@ -968,12 +962,27 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		      }
 		}
     	
+		
+		int rest = normDepth(maxdepth) - depth;
+		
     	
 		if (depth > 1
+    			&& depth <= rest
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
     			&& env.getBitboard().getColourToMove() == rootColour
     			){
+			
+			if (inCheck) {
+				if (!env.getBitboard().hasMoveInCheck()) {
+					return -getMateVal(depth);
+				}
+			} else {
+				if (!env.getBitboard().hasMoveInNonCheck()) {
+					return getDrawScores(rootColour);
+				}
+			}
+			
 			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
 			if (result != -1) {
 				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
@@ -990,10 +999,7 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 					return getDrawScores(rootColour);
 				}
 			}
-        }
-
-		
-		int rest = normDepth(maxdepth) - depth;
+		}
 		
 		
 		boolean disableExts = false;
