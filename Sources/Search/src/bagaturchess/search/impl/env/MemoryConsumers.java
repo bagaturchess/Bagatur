@@ -238,11 +238,11 @@ public class MemoryConsumers {
 																										Math.max(test_size2, SIZE_MIN_ENTRIES_PEC)));
 		ChannelManager.getChannel().dump("Pawns Eval Cache size is " + size_pc);
 		
-		int size_gtb_out = 0;
+		/*int size_gtb_out = 0;
 		if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
 			size_gtb_out = Math.max(SIZE_MIN_ENTRIES_GTB, getGTBEntrySize_OUT(availableMemory, 	Math.max(test_size1, SIZE_MIN_ENTRIES_GTB)));
 			ChannelManager.getChannel().dump("Endgame Table Bases cache (OUT) size is " + size_gtb_out);
-		}
+		}*/
 		
 		//Create
 		
@@ -266,11 +266,11 @@ public class MemoryConsumers {
 			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName());
 			pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
 		
-			if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
-				gtbCache_out.add(new GTBCache_OUT(size_gtb_out, false, new BinarySemaphore_Dummy()));
-			} else {
+			//if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
+			//	gtbCache_out.add(new GTBCache_OUT(size_gtb_out, false, new BinarySemaphore_Dummy()));
+			//} else {
 				gtbCache_out.add(null);
-			}
+			//}
 		}		
 	}
 	

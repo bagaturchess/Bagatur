@@ -58,7 +58,6 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionSpin_Integer("MultiPV", new Integer(1), "type spin default 1 min 1 max 100"),
 			new UCIOptionString("SyzygyPath", DEFAULT_TbPath, "type string default " + DEFAULT_TbPath),
-			//new UCIOptionSpin_Integer("GaviotaTbCache", DEFAULT_gaviotaTbCache, "type spin default " + DEFAULT_gaviotaTbCache + " min 4 max 512"),
 			new UCIOptionCombo("Time Control Optimizations",
 					DEFAULT_timeControlOptimization,
 					"type combo default " + DEFAULT_timeControlOptimization + " var " + DEFAULT_timeControlOptimization + " var " + timeControlOptimization_1),

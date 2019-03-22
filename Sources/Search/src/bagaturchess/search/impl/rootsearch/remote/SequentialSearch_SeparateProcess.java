@@ -107,6 +107,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			} else if (getRootSearchConfig().getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) { 
 				options.add("setoption name Time Control Optimizations value for 40/40");
 			}
+			options.add("setoption name SyzygyPath value tbd");
 			
 			//options.add("setoption name Openning Mode value random intermediate");
 			

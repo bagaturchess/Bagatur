@@ -30,11 +30,12 @@ import com.winkelhagen.chess.syzygy.SyzygyBridge;
 public class SyzygyTBProbing {
 	
 	
+	private static boolean loadingInitiated;
 	private static SyzygyTBProbing instance;
 	
 	
     private SyzygyTBProbing() {
-    	
+    	loadingInitiated = false;
     }
     
     
@@ -44,11 +45,12 @@ public class SyzygyTBProbing {
 	
 	
     public static final SyzygyTBProbing getSingleton() {
-    	if (instance == null) {
+    	if (instance == null && !loadingInitiated) {
     		instance = new SyzygyTBProbing();
     		if (!instance.loadNativeLibrary()) {
     			instance = null;
     		}
+    		loadingInitiated = true;
     	}
     	return instance;
     }
