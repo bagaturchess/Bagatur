@@ -21,6 +21,12 @@ public class ChessConstants {
 	public static final int WHITE = 0;
 	public static final int BLACK = 1;
 
+	public static final int FLAG_PAWN = 1 << (PAWN - 1);
+	public static final int FLAG_NIGHT = 1 << (NIGHT - 1);
+	public static final int FLAG_BISHOP = 1 << (BISHOP - 1);
+	public static final int FLAG_ROOK = 1 << (ROOK - 1);
+	public static final int FLAG_QUEEN = 1 << (QUEEN - 1);
+	
 	public static final int SCORE_NOT_RUNNING = 7777;
 
 	public static final int[] COLOR_FACTOR = { 1, -1 };

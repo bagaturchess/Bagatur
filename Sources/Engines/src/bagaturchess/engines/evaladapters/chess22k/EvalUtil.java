@@ -724,7 +724,7 @@ public class EvalUtil {
 		// white pawns
 		cb.getEvalInfo().attacks[WHITE][PAWN] = Bitboard.getWhitePawnAttacks(cb.getPieces(WHITE, PAWN) & ~cb.getPinnedPieces());
 		if ((cb.getEvalInfo().attacks[WHITE][PAWN] & cb.getKingArea(BLACK)) != 0) {
-			cb.getEvalInfo().kingAttackersFlag[WHITE] = SchroderUtil.FLAG_PAWN;
+			cb.getEvalInfo().kingAttackersFlag[WHITE] = ChessConstants.FLAG_PAWN;
 		}
 		long pinned = cb.getPieces(WHITE, PAWN) & cb.getPinnedPieces();
 		while (pinned != 0) {
@@ -736,7 +736,7 @@ public class EvalUtil {
 		// black pawns
 		cb.getEvalInfo().attacks[BLACK][PAWN] = Bitboard.getBlackPawnAttacks(cb.getPieces(BLACK, PAWN) & ~cb.getPinnedPieces());
 		if ((cb.getEvalInfo().attacks[BLACK][PAWN] & cb.getKingArea(WHITE)) != 0) {
-			cb.getEvalInfo().kingAttackersFlag[BLACK] = SchroderUtil.FLAG_PAWN;
+			cb.getEvalInfo().kingAttackersFlag[BLACK] = ChessConstants.FLAG_PAWN;
 		}
 		pinned = cb.getPieces(BLACK, PAWN) & cb.getPinnedPieces();
 		while (pinned != 0) {
@@ -759,7 +759,7 @@ public class EvalUtil {
 			while (piece != 0) {
 				moves = StaticMoves.KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 				if ((moves & kingArea) != 0) {
-					cb.getEvalInfo().kingAttackersFlag[color] |= SchroderUtil.FLAG_NIGHT;
+					cb.getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_NIGHT;
 				}
 				cb.getEvalInfo().doubleAttacks[color] |= cb.getEvalInfo().attacksAll[color] & moves;
 				cb.getEvalInfo().attacksAll[color] |= moves;
@@ -773,7 +773,7 @@ public class EvalUtil {
 			while (piece != 0) {
 				moves = MagicUtil.getBishopMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces() ^ cb.getPieces(color, QUEEN));
 				if ((moves & kingArea) != 0) {
-					cb.getEvalInfo().kingAttackersFlag[color] |= SchroderUtil.FLAG_BISHOP;
+					cb.getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_BISHOP;
 				}
 				cb.getEvalInfo().doubleAttacks[color] |= cb.getEvalInfo().attacksAll[color] & moves;
 				cb.getEvalInfo().attacksAll[color] |= moves;
@@ -787,7 +787,7 @@ public class EvalUtil {
 			while (piece != 0) {
 				moves = MagicUtil.getRookMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces() ^ cb.getPieces(color, ROOK) ^ cb.getPieces(color, QUEEN));
 				if ((moves & kingArea) != 0) {
-					cb.getEvalInfo().kingAttackersFlag[color] |= SchroderUtil.FLAG_ROOK;
+					cb.getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_ROOK;
 				}
 				cb.getEvalInfo().doubleAttacks[color] |= cb.getEvalInfo().attacksAll[color] & moves;
 				cb.getEvalInfo().attacksAll[color] |= moves;
@@ -801,7 +801,7 @@ public class EvalUtil {
 			while (piece != 0) {
 				moves = MagicUtil.getQueenMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces());
 				if ((moves & kingArea) != 0) {
-					cb.getEvalInfo().kingAttackersFlag[color] |= SchroderUtil.FLAG_QUEEN;
+					cb.getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_QUEEN;
 				}
 				cb.getEvalInfo().doubleAttacks[color] |= cb.getEvalInfo().attacksAll[color] & moves;
 				cb.getEvalInfo().attacksAll[color] |= moves;
@@ -967,7 +967,7 @@ public class EvalUtil {
 	}
 
 	private static int safeCheckQueenTouch(final IChessBoard cb, final int kingColor) {
-		if ((cb.getEvalInfo().kingAttackersFlag[1 - kingColor] & SchroderUtil.FLAG_QUEEN) == 0) {
+		if ((cb.getEvalInfo().kingAttackersFlag[1 - kingColor] & ChessConstants.FLAG_QUEEN) == 0) {
 			return 0;
 		}
 		final int enemyColor = 1 - kingColor;
