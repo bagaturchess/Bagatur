@@ -183,15 +183,15 @@ public class Bitboard {
 	public static final long BLACK_SPACE_ZONE = (RANK_7 | RANK_6 | RANK_5) & (FILE_C | FILE_D | FILE_E | FILE_F);
 
 	public static long getWhitePawnAttacks(final long pawns) {
-		return pawns << 9 & Bitboard.NOT_FILE_H | pawns << 7 & Bitboard.NOT_FILE_A;
+		return pawns << 9 & NOT_FILE_H | pawns << 7 & NOT_FILE_A;
 	}
 
 	public static long getBlackPawnAttacks(final long pawns) {
-		return pawns >>> 9 & Bitboard.NOT_FILE_A | pawns >>> 7 & Bitboard.NOT_FILE_H;
+		return pawns >>> 9 & NOT_FILE_A | pawns >>> 7 & NOT_FILE_H;
 	}
 
 	public static long getPawnNeighbours(final long pawns) {
-		return pawns << 1 & Bitboard.NOT_FILE_H | pawns >>> 1 & Bitboard.NOT_FILE_A;
+		return pawns << 1 & NOT_FILE_H | pawns >>> 1 & NOT_FILE_A;
 	}
 
 	/**
