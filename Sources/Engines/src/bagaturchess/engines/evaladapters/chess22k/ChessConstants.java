@@ -169,15 +169,15 @@ public class ChessConstants {
 		//
 		for (int i = 0; i < 64; i++) {
 			// NEXT
-			KING_AREA[WHITE][i] |= StaticMoves.KING_MOVES[i] | Evaluator_BaseImpl.POWER_LOOKUP[i];
-			KING_AREA[BLACK][i] |= StaticMoves.KING_MOVES[i] | Evaluator_BaseImpl.POWER_LOOKUP[i];
+			KING_AREA[WHITE][i] |= Evaluator_BaseImpl.KING_MOVES[i] | Evaluator_BaseImpl.POWER_LOOKUP[i];
+			KING_AREA[BLACK][i] |= Evaluator_BaseImpl.KING_MOVES[i] | Evaluator_BaseImpl.POWER_LOOKUP[i];
 
 			if (i > 15) {
-				KING_AREA[BLACK][i] |= StaticMoves.KING_MOVES[i] >>> 8;
+				KING_AREA[BLACK][i] |= Evaluator_BaseImpl.KING_MOVES[i] >>> 8;
 			}
 
 			if (i < 48) {
-				KING_AREA[WHITE][i] |= StaticMoves.KING_MOVES[i] << 8;
+				KING_AREA[WHITE][i] |= Evaluator_BaseImpl.KING_MOVES[i] << 8;
 			}
 		}
 

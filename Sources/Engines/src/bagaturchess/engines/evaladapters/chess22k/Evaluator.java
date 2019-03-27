@@ -169,7 +169,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 			// backward pawns
 			else if ((getBlackAdjacentMask(index + 8) & cb.getPieces(WHITE, PAWN)) == 0) {
-				if ((StaticMoves.PAWN_ATTACKS[WHITE][index + 8] & cb.getPieces(BLACK, PAWN)) != 0) {
+				if ((PAWN_ATTACKS[WHITE][index + 8] & cb.getPieces(BLACK, PAWN)) != 0) {
 					if ((FILES[index & 7] & cb.getPieces(BLACK, PAWN)) == 0) {
 						score -= EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_BACKWARD];
 					}
@@ -177,7 +177,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			}
 
 			// pawn defending 2 pawns
-			if (Long.bitCount(StaticMoves.PAWN_ATTACKS[WHITE][index] & cb.getPieces(WHITE, PAWN)) == 2) {
+			if (Long.bitCount(PAWN_ATTACKS[WHITE][index] & cb.getPieces(WHITE, PAWN)) == 2) {
 				score -= EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_INVERSE];
 			}
 
@@ -209,7 +209,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 			// backward pawns
 			else if ((getWhiteAdjacentMask(index - 8) & cb.getPieces(BLACK, PAWN)) == 0) {
-				if ((StaticMoves.PAWN_ATTACKS[BLACK][index - 8] & cb.getPieces(WHITE, PAWN)) != 0) {
+				if ((PAWN_ATTACKS[BLACK][index - 8] & cb.getPieces(WHITE, PAWN)) != 0) {
 					if ((FILES[index & 7] & cb.getPieces(WHITE, PAWN)) == 0) {
 						score += EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_BACKWARD];
 					}
@@ -217,7 +217,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			}
 
 			// pawn defending 2 pawns
-			if (Long.bitCount(StaticMoves.PAWN_ATTACKS[BLACK][index] & cb.getPieces(BLACK, PAWN)) == 2) {
+			if (Long.bitCount(PAWN_ATTACKS[BLACK][index] & cb.getPieces(BLACK, PAWN)) == 2) {
 				score += EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_INVERSE];
 			}
 
@@ -368,7 +368,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		long forked;
 		piece = cb.getEvalInfo().attacks[WHITE][NIGHT] & ~blackAttacks & cb.getEmptySpaces();
 		while (piece != 0) {
-			forked = blacks & ~blackPawns & StaticMoves.KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
+			forked = blacks & ~blackPawns & KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 			if (Long.bitCount(forked) > 1) {
 				if ((cb.getPieces(BLACK, KING) & forked) == 0) {
 					score += EvalConstants.THREATS[EvalConstants.IX_NIGHT_FORK];
@@ -381,7 +381,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 		piece = cb.getEvalInfo().attacks[BLACK][NIGHT] & ~whiteAttacks & cb.getEmptySpaces();
 		while (piece != 0) {
-			forked = whites & ~whitePawns & StaticMoves.KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
+			forked = whites & ~whitePawns & KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 			if (Long.bitCount(forked) > 1) {
 				if ((cb.getPieces(WHITE, KING) & forked) == 0) {
 					score -= EvalConstants.THREATS[EvalConstants.IX_NIGHT_FORK];
@@ -728,7 +728,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 		long pinned = cb.getPieces(WHITE, PAWN) & cb.getPinnedPieces();
 		while (pinned != 0) {
-			cb.getEvalInfo().attacks[WHITE][PAWN] |= StaticMoves.PAWN_ATTACKS[WHITE][Long.numberOfTrailingZeros(pinned)]
+			cb.getEvalInfo().attacks[WHITE][PAWN] |= PAWN_ATTACKS[WHITE][Long.numberOfTrailingZeros(pinned)]
 					& ChessConstants.PINNED_MOVEMENT[Long.numberOfTrailingZeros(pinned)][cb.getKingIndex(WHITE)];
 			pinned &= pinned - 1;
 		}
@@ -740,7 +740,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 		pinned = cb.getPieces(BLACK, PAWN) & cb.getPinnedPieces();
 		while (pinned != 0) {
-			cb.getEvalInfo().attacks[BLACK][PAWN] |= StaticMoves.PAWN_ATTACKS[BLACK][Long.numberOfTrailingZeros(pinned)]
+			cb.getEvalInfo().attacks[BLACK][PAWN] |= PAWN_ATTACKS[BLACK][Long.numberOfTrailingZeros(pinned)]
 					& ChessConstants.PINNED_MOVEMENT[Long.numberOfTrailingZeros(pinned)][cb.getKingIndex(BLACK)];
 			pinned &= pinned - 1;
 		}
@@ -757,7 +757,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			// knights
 			long piece = cb.getPieces(color, NIGHT) & ~cb.getPinnedPieces();
 			while (piece != 0) {
-				moves = StaticMoves.KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
+				moves = KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 				if ((moves & kingArea) != 0) {
 					cb.getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_NIGHT;
 				}
@@ -816,14 +816,14 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 		// TODO king-attacks with or without enemy attacks?
 		// WHITE king
-		moves = StaticMoves.KING_MOVES[cb.getKingIndex(WHITE)] & ~StaticMoves.KING_MOVES[cb.getKingIndex(BLACK)];
+		moves = KING_MOVES[cb.getKingIndex(WHITE)] & ~KING_MOVES[cb.getKingIndex(BLACK)];
 		cb.getEvalInfo().attacks[WHITE][KING] = moves;
 		cb.getEvalInfo().doubleAttacks[WHITE] |= cb.getEvalInfo().attacksAll[WHITE] & moves;
 		cb.getEvalInfo().attacksAll[WHITE] |= moves;
 		score += EvalConstants.MOBILITY_KING[Long.bitCount(moves & ~cb.getFriendlyPieces(WHITE) & ~cb.getEvalInfo().attacksAll[BLACK])];
 
 		// BLACK king
-		moves = StaticMoves.KING_MOVES[cb.getKingIndex(BLACK)] & ~StaticMoves.KING_MOVES[cb.getKingIndex(WHITE)];
+		moves = KING_MOVES[cb.getKingIndex(BLACK)] & ~KING_MOVES[cb.getKingIndex(WHITE)];
 		cb.getEvalInfo().attacks[BLACK][KING] = moves;
 		cb.getEvalInfo().doubleAttacks[BLACK] |= cb.getEvalInfo().attacksAll[BLACK] & moves;
 		cb.getEvalInfo().attacksAll[BLACK] |= moves;
@@ -880,7 +880,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			counter += checks(cb, kingColor);
 
 			counter += EvalConstants.KS_DOUBLE_ATTACKS[Long
-					.bitCount(StaticMoves.KING_MOVES[cb.getKingIndex(kingColor)] & cb.getEvalInfo().doubleAttacks[enemyColor] & ~cb.getEvalInfo().attacks[kingColor][PAWN])];
+					.bitCount(KING_MOVES[cb.getKingIndex(kingColor)] & cb.getEvalInfo().doubleAttacks[enemyColor] & ~cb.getEvalInfo().attacks[kingColor][PAWN])];
 
 			if ((cb.getCheckingPieces() & cb.getFriendlyPieces(enemyColor)) != 0) {
 				counter++;
@@ -941,9 +941,9 @@ public class Evaluator extends Evaluator_BaseImpl {
 		final int enemyColor = 1 - kingColor;
 		final int kingIndex = cb.getKingIndex(kingColor);
 		final long possibleSquares = ~cb.getFriendlyPieces(enemyColor)
-				& (~StaticMoves.KING_MOVES[kingIndex] | StaticMoves.KING_MOVES[kingIndex] & cb.getEvalInfo().doubleAttacks[enemyColor] & ~cb.getEvalInfo().doubleAttacks[kingColor]);
+				& (~KING_MOVES[kingIndex] | KING_MOVES[kingIndex] & cb.getEvalInfo().doubleAttacks[enemyColor] & ~cb.getEvalInfo().doubleAttacks[kingColor]);
 
-		int counter = checkNight(cb, kingColor, StaticMoves.KNIGHT_MOVES[kingIndex] & possibleSquares & cb.getEvalInfo().attacks[enemyColor][NIGHT]);
+		int counter = checkNight(cb, kingColor, KNIGHT_MOVES[kingIndex] & possibleSquares & cb.getEvalInfo().attacks[enemyColor][NIGHT]);
 
 		long moves;
 		long queenMoves = 0;
@@ -971,7 +971,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			return 0;
 		}
 		final int enemyColor = 1 - kingColor;
-		if ((StaticMoves.KING_MOVES[cb.getKingIndex(kingColor)] & ~cb.getFriendlyPieces(enemyColor) & cb.getEvalInfo().attacks[enemyColor][QUEEN] & ~cb.getEvalInfo().doubleAttacks[kingColor]
+		if ((KING_MOVES[cb.getKingIndex(kingColor)] & ~cb.getFriendlyPieces(enemyColor) & cb.getEvalInfo().attacks[enemyColor][QUEEN] & ~cb.getEvalInfo().doubleAttacks[kingColor]
 				& cb.getEvalInfo().doubleAttacks[enemyColor]) != 0) {
 			return EvalConstants.KS_OTHER[0];
 		}
@@ -996,7 +996,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			counter += EvalConstants.KS_CHECK[ROOK];
 
 			// last rank?
-			if (kingBlockedAtLastRank(kingColor, cb, StaticMoves.KING_MOVES[cb.getKingIndex(kingColor)] & cb.getEmptySpaces() & ~cb.getEvalInfo().attacksAll[1 - kingColor])) {
+			if (kingBlockedAtLastRank(kingColor, cb, KING_MOVES[cb.getKingIndex(kingColor)] & cb.getEmptySpaces() & ~cb.getEvalInfo().attacksAll[1 - kingColor])) {
 				counter += EvalConstants.KS_OTHER[1];
 			}
 
