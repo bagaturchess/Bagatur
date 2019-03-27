@@ -294,24 +294,24 @@ public class EvalConstants {
 	}
 	
 	public static final long[] ROOK_PRISON = { 
-			0, Bitboard.A8, Bitboard.A8_B8, Bitboard.A8B8C8, 0, Bitboard.G8_H8, Bitboard.H8, 0, 
+			0, Evaluator_BaseImpl.A8, Evaluator_BaseImpl.A8_B8, Evaluator_BaseImpl.A8B8C8, 0, Evaluator_BaseImpl.G8_H8, Evaluator_BaseImpl.H8, 0, 
 			0, 0, 0, 0, 0, 0, 0, 0, 
 			0, 0, 0, 0, 0, 0, 0, 0, 
 			0, 0, 0, 0, 0, 0, 0, 0, 
 			0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 
 			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, Bitboard.A1, Bitboard.A1_B1, Bitboard.A1B1C1, 0, Bitboard.G1_H1, Bitboard.H1, 0 
+			0, Evaluator_BaseImpl.A1, Evaluator_BaseImpl.A1_B1, Evaluator_BaseImpl.A1B1C1, 0, Evaluator_BaseImpl.G1_H1, Evaluator_BaseImpl.H1, 0 
 	};
 	
 	public static final long[] BISHOP_PRISON = { 
 			0, 0, 0, 0, 0, 0, 0, 0, //8
-			Bitboard.B6_C7, 0, 0, 0, 0, 0, 0, Bitboard.G6_F7, //7
+			Evaluator_BaseImpl.B6_C7, 0, 0, 0, 0, 0, 0, Evaluator_BaseImpl.G6_F7, //7
 			0, 0, 0, 0, 0, 0, 0, 0, //6
 			0, 0, 0, 0, 0, 0, 0, 0, //5
 			0, 0, 0, 0, 0, 0, 0, 0, //4
 			0, 0, 0, 0, 0, 0, 0, 0, //3
-			Bitboard.B3_C2, 0, 0, 0, 0, 0, 0, Bitboard.G3_F2, //2
+			Evaluator_BaseImpl.B3_C2, 0, 0, 0, 0, 0, 0, Evaluator_BaseImpl.G3_F2, //2
 			0, 0, 0, 0, 0, 0, 0, 0  //1
 		 // A  B  C  D  E  F  G  H
 	};
@@ -347,7 +347,7 @@ public class EvalConstants {
 
 	private static void initMgEg(int[] array, int[] arrayMg, int[] arrayEg) {
 		for(int i = 0; i < array.length; i++) {
-			array[i] = EvalUtil.score(arrayMg[i], arrayEg[i]);
+			array[i] = Evaluator.score(arrayMg[i], arrayEg[i]);
 		}
 	}
 	

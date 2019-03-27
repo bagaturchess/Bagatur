@@ -2,7 +2,7 @@ package bagaturchess.engines.evaladapters.chess22k.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.engines.evaladapters.chess22k.EvalUtil;
+import bagaturchess.engines.evaladapters.chess22k.Evaluator;
 import bagaturchess.engines.evaladapters.chess22k.IChessBoard;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
@@ -30,7 +30,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase1() {
-		int eval = EvalUtil.getScore1(board);
+		int eval = Evaluator.getScore1(board);
 		//int eval = (int)(500 * Math.random() - 250);
 		
 		return eval;
@@ -42,7 +42,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase2() {
-		int eval = EvalUtil.getScore2(board);
+		int eval = Evaluator.getScore2(board);
 		
 		return eval;
 	}
