@@ -369,8 +369,8 @@ public class EvalConstants {
 		
 		// fix white arrays
 		for (int piece = ChessConstants.PAWN; piece <= ChessConstants.KING; piece++){
-			Util.reverse(PSQT_MG[piece][ChessConstants.WHITE]);
-			Util.reverse(PSQT_EG[piece][ChessConstants.WHITE]);
+			Evaluator_BaseImpl.reverse(PSQT_MG[piece][ChessConstants.WHITE]);
+			Evaluator_BaseImpl.reverse(PSQT_EG[piece][ChessConstants.WHITE]);
 		}
 
 		// create black arrays
@@ -381,8 +381,8 @@ public class EvalConstants {
 			}
 		}
 		
-		Util.reverse(ROOK_PRISON);
-		Util.reverse(BISHOP_PRISON);
+		Evaluator_BaseImpl.reverse(ROOK_PRISON);
+		Evaluator_BaseImpl.reverse(BISHOP_PRISON);
 		
 		initMgEg();
 	}

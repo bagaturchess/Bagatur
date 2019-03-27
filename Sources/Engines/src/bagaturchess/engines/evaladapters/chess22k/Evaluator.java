@@ -902,7 +902,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			} else if (Long.bitCount(cb.getPieces(enemyColor, QUEEN)) == 1) {
 				// bonus for small king-queen distance
 				if ((cb.getEvalInfo().attacksAll[kingColor] & cb.getPieces(enemyColor, QUEEN)) == 0) {
-					counter += EvalConstants.KS_QUEEN_TROPISM[Util.getDistance(cb.getKingIndex(kingColor),
+					counter += EvalConstants.KS_QUEEN_TROPISM[getDistance(cb.getKingIndex(kingColor),
 							Long.numberOfTrailingZeros(cb.getPieces(enemyColor, QUEEN)))];
 				}
 			}
@@ -1037,8 +1037,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 		int score = 0;
 
-		int whitePromotionDistance = Util.SHORT_MAX;
-		int blackPromotionDistance = Util.SHORT_MAX;
+		int whitePromotionDistance = SHORT_MAX;
+		int blackPromotionDistance = SHORT_MAX;
 
 		// white passed pawns
 		long passedPawns = cb.getEvalInfo().passedPawnsAndOutposts & cb.getPieces(WHITE, ChessConstants.PAWN);
@@ -1047,7 +1047,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 			score += getPassedPawnScore(cb, index, WHITE);
 
-			if (whitePromotionDistance == Util.SHORT_MAX) {
+			if (whitePromotionDistance == SHORT_MAX) {
 				whitePromotionDistance = getWhitePromotionDistance(cb, index);
 			}
 
@@ -1062,7 +1062,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 			score -= getPassedPawnScore(cb, index, BLACK);
 
-			if (blackPromotionDistance == Util.SHORT_MAX) {
+			if (blackPromotionDistance == SHORT_MAX) {
 				blackPromotionDistance = getBlackPromotionDistance(cb, index);
 			}
 
@@ -1082,9 +1082,9 @@ public class Evaluator extends Evaluator_BaseImpl {
 	private static int getPassedPawnScore(final IChessBoard cb, final int index, final int color) {
 
 		final int nextIndex = index + ChessConstants.COLOR_FACTOR_8[color];
-		final long square = Util.POWER_LOOKUP[index];
-		final long maskNextSquare = Util.POWER_LOOKUP[nextIndex];
-		final long maskPreviousSquare = Util.POWER_LOOKUP[index - ChessConstants.COLOR_FACTOR_8[color]];
+		final long square = POWER_LOOKUP[index];
+		final long maskNextSquare = POWER_LOOKUP[nextIndex];
+		final long maskPreviousSquare = POWER_LOOKUP[index - ChessConstants.COLOR_FACTOR_8[color]];
 		final long maskFile = FILES[index & 7];
 		final int enemyColor = 1 - color;
 		float multiplier = 1;
@@ -1132,8 +1132,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 
 		// king tropism
-		multiplier *= EvalConstants.PASSED_KING_MULTI[Util.getDistance(cb.getKingIndex(color), index)];
-		multiplier *= EvalConstants.PASSED_KING_MULTI[8 - Util.getDistance(cb.getKingIndex(enemyColor), index)];
+		multiplier *= EvalConstants.PASSED_KING_MULTI[getDistance(cb.getKingIndex(color), index)];
+		multiplier *= EvalConstants.PASSED_KING_MULTI[8 - getDistance(cb.getKingIndex(enemyColor), index)];
 
 		final int scoreIndex = (7 * color) + ChessConstants.COLOR_FACTOR[color] * index / 8;
 		return Evaluator.score((int) (EvalConstants.PASSED_SCORE_MG[scoreIndex] * multiplier), (int) (EvalConstants.PASSED_SCORE_EG[scoreIndex] * multiplier));
@@ -1143,25 +1143,25 @@ public class Evaluator extends Evaluator_BaseImpl {
 		// check if it cannot be stopped
 		int promotionDistance = index >>> 3;
 		if (promotionDistance == 1 && cb.getColorToMove() == BLACK) {
-			if ((Util.POWER_LOOKUP[index - 8] & (cb.getEvalInfo().attacksAll[WHITE] | cb.getAllPieces())) == 0) {
-				if ((Util.POWER_LOOKUP[index] & cb.getEvalInfo().attacksAll[WHITE]) == 0) {
+			if ((POWER_LOOKUP[index - 8] & (cb.getEvalInfo().attacksAll[WHITE] | cb.getAllPieces())) == 0) {
+				if ((POWER_LOOKUP[index] & cb.getEvalInfo().attacksAll[WHITE]) == 0) {
 					return 1;
 				}
 			}
 		}
-		return Util.SHORT_MAX;
+		return SHORT_MAX;
 	}
 
 	private static int getWhitePromotionDistance(final IChessBoard cb, final int index) {
 		// check if it cannot be stopped
 		int promotionDistance = 7 - index / 8;
 		if (promotionDistance == 1 && cb.getColorToMove() == WHITE) {
-			if ((Util.POWER_LOOKUP[index + 8] & (cb.getEvalInfo().attacksAll[BLACK] | cb.getAllPieces())) == 0) {
-				if ((Util.POWER_LOOKUP[index] & cb.getEvalInfo().attacksAll[BLACK]) == 0) {
+			if ((POWER_LOOKUP[index + 8] & (cb.getEvalInfo().attacksAll[BLACK] | cb.getAllPieces())) == 0) {
+				if ((POWER_LOOKUP[index] & cb.getEvalInfo().attacksAll[BLACK]) == 0) {
 					return 1;
 				}
 			}
 		}
-		return Util.SHORT_MAX;
+		return SHORT_MAX;
 	}
 }

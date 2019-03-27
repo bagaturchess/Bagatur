@@ -17,16 +17,16 @@ public class StaticMoves {
 			for (int newPosition = 0; newPosition < 64; newPosition++) {
 				// attacks
 				if (newPosition == currentPosition + 7 && newPosition % 8 != 7) {
-					PAWN_ATTACKS[WHITE][currentPosition] |= Util.POWER_LOOKUP[newPosition];
+					PAWN_ATTACKS[WHITE][currentPosition] |= Evaluator_BaseImpl.POWER_LOOKUP[newPosition];
 				}
 				if (newPosition == currentPosition + 9 && newPosition % 8 != 0 ) {
-					PAWN_ATTACKS[WHITE][currentPosition] |= Util.POWER_LOOKUP[newPosition];
+					PAWN_ATTACKS[WHITE][currentPosition] |= Evaluator_BaseImpl.POWER_LOOKUP[newPosition];
 				}
 				if (newPosition == currentPosition - 7 && newPosition % 8 != 0) {
-					PAWN_ATTACKS[BLACK][currentPosition] |= Util.POWER_LOOKUP[newPosition];
+					PAWN_ATTACKS[BLACK][currentPosition] |= Evaluator_BaseImpl.POWER_LOOKUP[newPosition];
 				}
 				if (newPosition == currentPosition - 9 && newPosition % 8 != 7) {
-					PAWN_ATTACKS[BLACK][currentPosition] |= Util.POWER_LOOKUP[newPosition];
+					PAWN_ATTACKS[BLACK][currentPosition] |= Evaluator_BaseImpl.POWER_LOOKUP[newPosition];
 				}
 			}
 		}
@@ -39,7 +39,7 @@ public class StaticMoves {
 			for (int newPosition = 0; newPosition < 64; newPosition++) {
 				// check if newPosition is a correct move
 				if (isKnightMove(currentPosition, newPosition)) {
-					KNIGHT_MOVES[currentPosition] |= Util.POWER_LOOKUP[newPosition];
+					KNIGHT_MOVES[currentPosition] |= Evaluator_BaseImpl.POWER_LOOKUP[newPosition];
 				}
 			}
 		}
@@ -51,7 +51,7 @@ public class StaticMoves {
 			for (int newPosition = 0; newPosition < 64; newPosition++) {
 				// check if newPosition is a correct move
 				if (isKingMove(currentPosition, newPosition)) {
-					KING_MOVES[currentPosition] |= Util.POWER_LOOKUP[newPosition];
+					KING_MOVES[currentPosition] |= Evaluator_BaseImpl.POWER_LOOKUP[newPosition];
 				}
 			}
 		}

@@ -49,7 +49,7 @@ public class ChessConstants {
 				if (from / 8 == to / 8) {
 					i = to - 1;
 					while (i > from) {
-						IN_BETWEEN[from][to] |= Util.POWER_LOOKUP[i];
+						IN_BETWEEN[from][to] |= Evaluator_BaseImpl.POWER_LOOKUP[i];
 						i--;
 					}
 				}
@@ -58,7 +58,7 @@ public class ChessConstants {
 				if (from % 8 == to % 8) {
 					i = to - 8;
 					while (i > from) {
-						IN_BETWEEN[from][to] |= Util.POWER_LOOKUP[i];
+						IN_BETWEEN[from][to] |= Evaluator_BaseImpl.POWER_LOOKUP[i];
 						i -= 8;
 					}
 				}
@@ -84,7 +84,7 @@ public class ChessConstants {
 				if ((to - from) % 9 == 0 && to % 8 > from % 8) {
 					i = to - 9;
 					while (i > from) {
-						IN_BETWEEN[from][to] |= Util.POWER_LOOKUP[i];
+						IN_BETWEEN[from][to] |= Evaluator_BaseImpl.POWER_LOOKUP[i];
 						i -= 9;
 					}
 				}
@@ -93,7 +93,7 @@ public class ChessConstants {
 				if ((to - from) % 7 == 0 && to % 8 < from % 8) {
 					i = to - 7;
 					while (i > from) {
-						IN_BETWEEN[from][to] |= Util.POWER_LOOKUP[i];
+						IN_BETWEEN[from][to] |= Evaluator_BaseImpl.POWER_LOOKUP[i];
 						i -= 7;
 					}
 				}
@@ -151,7 +151,7 @@ public class ChessConstants {
 								break;
 							}
 						}
-						PINNED_MOVEMENT[pinnedPieceIndex][kingIndex] |= Util.POWER_LOOKUP[xray];
+						PINNED_MOVEMENT[pinnedPieceIndex][kingIndex] |= Evaluator_BaseImpl.POWER_LOOKUP[xray];
 						xray += correctDirection;
 					}
 				}
@@ -169,8 +169,8 @@ public class ChessConstants {
 		//
 		for (int i = 0; i < 64; i++) {
 			// NEXT
-			KING_AREA[WHITE][i] |= StaticMoves.KING_MOVES[i] | Util.POWER_LOOKUP[i];
-			KING_AREA[BLACK][i] |= StaticMoves.KING_MOVES[i] | Util.POWER_LOOKUP[i];
+			KING_AREA[WHITE][i] |= StaticMoves.KING_MOVES[i] | Evaluator_BaseImpl.POWER_LOOKUP[i];
+			KING_AREA[BLACK][i] |= StaticMoves.KING_MOVES[i] | Evaluator_BaseImpl.POWER_LOOKUP[i];
 
 			if (i > 15) {
 				KING_AREA[BLACK][i] |= StaticMoves.KING_MOVES[i] >>> 8;
