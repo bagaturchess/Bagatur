@@ -26,8 +26,6 @@ public class ChessConstants {
 	public static final int FLAG_BISHOP = 1 << (BISHOP - 1);
 	public static final int FLAG_ROOK = 1 << (ROOK - 1);
 	public static final int FLAG_QUEEN = 1 << (QUEEN - 1);
-	
-	public static final int SCORE_NOT_RUNNING = 7777;
 
 	public static final int[] COLOR_FACTOR = { 1, -1 };
 	public static final int[] COLOR_FACTOR_8 = { 8, -8 };
