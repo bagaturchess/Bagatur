@@ -29,11 +29,11 @@ public class EvalUtil {
 		final int pawnScore = getPawnScores(cb);
 		final int materialScore = getImbalances(cb);
 		
-		final int scoreMg = getMgScore(cb.getPSQTScore())
+		final int scoreMg = cb.getPSQTScore()
 														+ pawnScore
 														+ materialScore;
 		
-		final int scoreEg = getEgScore(cb.getPSQTScore())
+		final int scoreEg = cb.getPSQTScore()
 														+ pawnScore
 														+ materialScore;
 		
