@@ -771,7 +771,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			// bishops
 			piece = cb.getPieces(color, BISHOP);
 			while (piece != 0) {
-				moves = MagicUtil.getBishopMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces() ^ cb.getPieces(color, QUEEN));
+				moves = getBishopMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces() ^ cb.getPieces(color, QUEEN));
 				if ((moves & kingArea) != 0) {
 					cb.getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_BISHOP;
 				}
@@ -785,7 +785,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			// rooks
 			piece = cb.getPieces(color, ROOK);
 			while (piece != 0) {
-				moves = MagicUtil.getRookMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces() ^ cb.getPieces(color, ROOK) ^ cb.getPieces(color, QUEEN));
+				moves = getRookMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces() ^ cb.getPieces(color, ROOK) ^ cb.getPieces(color, QUEEN));
 				if ((moves & kingArea) != 0) {
 					cb.getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_ROOK;
 				}
@@ -799,7 +799,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			// queens
 			piece = cb.getPieces(color, QUEEN);
 			while (piece != 0) {
-				moves = MagicUtil.getQueenMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces());
+				moves = getQueenMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces());
 				if ((moves & kingArea) != 0) {
 					cb.getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_QUEEN;
 				}
@@ -948,12 +948,12 @@ public class Evaluator extends Evaluator_BaseImpl {
 		long moves;
 		long queenMoves = 0;
 		if ((cb.getPieces(enemyColor, QUEEN) | cb.getPieces(enemyColor, BISHOP)) != 0) {
-			moves = MagicUtil.getBishopMoves(kingIndex, cb.getAllPieces() ^ cb.getPieces(kingColor, QUEEN)) & possibleSquares;
+			moves = getBishopMoves(kingIndex, cb.getAllPieces() ^ cb.getPieces(kingColor, QUEEN)) & possibleSquares;
 			queenMoves = moves;
 			counter += checkBishop(cb, kingColor, moves & cb.getEvalInfo().attacks[enemyColor][BISHOP]);
 		}
 		if ((cb.getPieces(enemyColor, QUEEN) | cb.getPieces(enemyColor, ROOK)) != 0) {
-			moves = MagicUtil.getRookMoves(kingIndex, cb.getAllPieces() ^ cb.getPieces(kingColor, QUEEN)) & possibleSquares;
+			moves = getRookMoves(kingIndex, cb.getAllPieces() ^ cb.getPieces(kingColor, QUEEN)) & possibleSquares;
 			queenMoves |= moves;
 			counter += checkRook(cb, kingColor, moves & cb.getEvalInfo().attacks[enemyColor][ROOK]);
 		}
