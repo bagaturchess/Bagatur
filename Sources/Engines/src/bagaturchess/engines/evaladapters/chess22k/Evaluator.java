@@ -11,7 +11,7 @@ import static bagaturchess.engines.evaladapters.chess22k.ChessConstants.ROOK;
 import static bagaturchess.engines.evaladapters.chess22k.ChessConstants.WHITE;
 
 
-public class Evaluator extends Evaluator_BaseImpl {
+public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	
 	
 	//START EvalConstants
@@ -352,7 +352,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 	private static void initMgEg(int[] array, int[] arrayMg, int[] arrayEg) {
 		for(int i = 0; i < array.length; i++) {
-			array[i] = Evaluator.score(arrayMg[i], arrayEg[i]);
+			array[i] = score(arrayMg[i], arrayEg[i]);
 		}
 	}
 	
@@ -433,21 +433,25 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 	
 	public static int getScore2(final IChessBoard cb) {
-
-		final int mgEgScore = calculateMobilityScoresAndSetAttackBoards(cb)
-				+ calculatePassedPawnScores(cb)
-				+ calculateThreats(cb)
-				+ calculatePawnShieldBonus(cb);
+		
+		int mgEgScore = calculateMobilityScoresAndSetAttackBoards(cb);
+		
+		calculatePassedPawnScores(cb);
+		
+		mgEgScore += calculateThreats(cb);
+		mgEgScore += calculatePawnShieldBonus(cb);
 		
 		final int othersScore = calculateOthers(cb);
 		
 		final int scoreMg = getMgScore(mgEgScore)
 								+ calculateKingSafetyScores(cb)
 								+ calculateSpace(cb)
-								+ othersScore;
+								+ othersScore
+								+ getEvalInfo().eval_o;
 		
 		final int scoreEg = getEgScore(mgEgScore)
-								+ othersScore;
+								+ othersScore
+								+ getEvalInfo().eval_e;
 		
 		return cb.interpolateScore(scoreMg, scoreEg);
 	}
@@ -456,15 +460,15 @@ public class Evaluator extends Evaluator_BaseImpl {
 	public static int score(final int mgScore, final int egScore) {
 		return (mgScore << 16) + egScore;
 	}
-
+	
 	public static int getMgScore(final int score) {
 		return (score + 0x8000) >> 16;
 	}
-
+	
 	public static int getEgScore(final int score) {
 		return (short) (score & 0xffff);
 	}
-
+	
 	public static int calculateSpace(final IChessBoard cb) {
 
 		int score = 0;
@@ -1424,9 +1428,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		return (RANKS[7 * kingColor] & cb.getPieces(kingColor, KING)) != 0 && (safeKingMoves & RANKS[7 * kingColor]) == safeKingMoves;
 	}
 	
-	public static int calculatePassedPawnScores(final IChessBoard cb) {
-
-		int score = 0;
+	public static void calculatePassedPawnScores(final IChessBoard cb) {
 
 		int whitePromotionDistance = SHORT_MAX;
 		int blackPromotionDistance = SHORT_MAX;
@@ -1436,7 +1438,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		while (passedPawns != 0) {
 			final int index = 63 - Long.numberOfLeadingZeros(passedPawns);
 
-			score += getPassedPawnScore(cb, index, WHITE);
+			getPassedPawnScore(cb, index, WHITE);
 
 			if (whitePromotionDistance == SHORT_MAX) {
 				whitePromotionDistance = getWhitePromotionDistance(cb, index);
@@ -1451,7 +1453,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		while (passedPawns != 0) {
 			final int index = Long.numberOfTrailingZeros(passedPawns);
 
-			score -= getPassedPawnScore(cb, index, BLACK);
+			getPassedPawnScore(cb, index, BLACK);
 
 			if (blackPromotionDistance == SHORT_MAX) {
 				blackPromotionDistance = getBlackPromotionDistance(cb, index);
@@ -1460,17 +1462,17 @@ public class Evaluator extends Evaluator_BaseImpl {
 			// skip all passed pawns at same file
 			passedPawns &= ~FILES[index & 7];
 		}
-
+		
 		if (whitePromotionDistance < blackPromotionDistance - 1) {
-			score += 350;
+			getEvalInfo().eval_o += PASSED_UNSTOPPABLE_O;
+			getEvalInfo().eval_e += PASSED_UNSTOPPABLE_E;
 		} else if (whitePromotionDistance > blackPromotionDistance + 1) {
-			score -= 350;
+			getEvalInfo().eval_o -= PASSED_UNSTOPPABLE_O;
+			getEvalInfo().eval_e -= PASSED_UNSTOPPABLE_E;
 		}
-
-		return score;
 	}
 
-	private static int getPassedPawnScore(final IChessBoard cb, final int index, final int color) {
+	private static void getPassedPawnScore(final IChessBoard cb, final int index, final int color) {
 
 		final int nextIndex = index + ChessConstants.COLOR_FACTOR_8[color];
 		final long square = POWER_LOOKUP[index];
@@ -1527,7 +1529,14 @@ public class Evaluator extends Evaluator_BaseImpl {
 		multiplier *= PASSED_KING_MULTI[8 - getDistance(cb.getKingIndex(enemyColor), index)];
 
 		final int scoreIndex = (7 * color) + ChessConstants.COLOR_FACTOR[color] * index / 8;
-		return Evaluator.score((int) (PASSED_SCORE_MG[scoreIndex] * multiplier), (int) (PASSED_SCORE_EG[scoreIndex] * multiplier));
+		
+		if (color == WHITE) {
+			getEvalInfo().eval_o += PASSED_PAWNS_O * PASSED_SCORE_MG[scoreIndex] * multiplier;
+			getEvalInfo().eval_e += PASSED_PAWNS_E * PASSED_SCORE_EG[scoreIndex] * multiplier;
+		} else {
+			getEvalInfo().eval_o -= PASSED_PAWNS_O * PASSED_SCORE_MG[scoreIndex] * multiplier;
+			getEvalInfo().eval_e -= PASSED_PAWNS_E * PASSED_SCORE_EG[scoreIndex] * multiplier;	
+		}
 	}
 
 	private static int getBlackPromotionDistance(final IChessBoard cb, final int index) {
@@ -1567,8 +1576,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 		public long passedPawnsAndOutposts;
 		
-		public long eval_o;
-		public long eval_e;
+		public int eval_o;
+		public int eval_e;
 		
 		public void clearEvalAttacks() {
 			kingAttackersFlag[WHITE] = 0;
