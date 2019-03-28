@@ -464,14 +464,14 @@ public class Evaluator_BaseImpl {
 
 		long[][] occupancyVariations = new long[64][];
 		for (int index = 0; index < 64; index++) {
-			int variationCount = (int) Evaluator_BaseImpl.POWER_LOOKUP[Long.bitCount(movementMasks[index])];
+			int variationCount = (int) POWER_LOOKUP[Long.bitCount(movementMasks[index])];
 			occupancyVariations[index] = new long[variationCount];
 
 			for (int variationIndex = 1; variationIndex < variationCount; variationIndex++) {
 				long currentMask = movementMasks[index];
 
 				for (int i = 0; i < 32 - Integer.numberOfLeadingZeros(variationIndex); i++) {
-					if ((Evaluator_BaseImpl.POWER_LOOKUP[i] & variationIndex) != 0) {
+					if ((POWER_LOOKUP[i] & variationIndex) != 0) {
 						occupancyVariations[index][variationIndex] |= Long.lowestOneBit(currentMask);
 					}
 					currentMask &= currentMask - 1;
@@ -487,19 +487,19 @@ public class Evaluator_BaseImpl {
 
 			// up
 			for (int j = index + 8; j < 64 - 8; j += 8) {
-				rookMovementMasks[index] |= Evaluator_BaseImpl.POWER_LOOKUP[j];
+				rookMovementMasks[index] |= POWER_LOOKUP[j];
 			}
 			// down
 			for (int j = index - 8; j >= 0 + 8; j -= 8) {
-				rookMovementMasks[index] |= Evaluator_BaseImpl.POWER_LOOKUP[j];
+				rookMovementMasks[index] |= POWER_LOOKUP[j];
 			}
 			// left
 			for (int j = index + 1; j % 8 != 0 && j % 8 != 7; j++) {
-				rookMovementMasks[index] |= Evaluator_BaseImpl.POWER_LOOKUP[j];
+				rookMovementMasks[index] |= POWER_LOOKUP[j];
 			}
 			// right
 			for (int j = index - 1; j % 8 != 7 && j % 8 != 0 && j > 0; j--) {
-				rookMovementMasks[index] |= Evaluator_BaseImpl.POWER_LOOKUP[j];
+				rookMovementMasks[index] |= POWER_LOOKUP[j];
 			}
 		}
 	}
@@ -509,19 +509,19 @@ public class Evaluator_BaseImpl {
 
 			// up-right
 			for (int j = index + 7; j < 64 - 7 && j % 8 != 7 && j % 8 != 0; j += 7) {
-				bishopMovementMasks[index] |= Evaluator_BaseImpl.POWER_LOOKUP[j];
+				bishopMovementMasks[index] |= POWER_LOOKUP[j];
 			}
 			// up-left
 			for (int j = index + 9; j < 64 - 9 && j % 8 != 7 && j % 8 != 0; j += 9) {
-				bishopMovementMasks[index] |= Evaluator_BaseImpl.POWER_LOOKUP[j];
+				bishopMovementMasks[index] |= POWER_LOOKUP[j];
 			}
 			// down-right
 			for (int j = index - 9; j >= 0 + 9 && j % 8 != 7 && j % 8 != 0; j -= 9) {
-				bishopMovementMasks[index] |= Evaluator_BaseImpl.POWER_LOOKUP[j];
+				bishopMovementMasks[index] |= POWER_LOOKUP[j];
 			}
 			// down-left
 			for (int j = index - 7; j >= 0 + 7 && j % 8 != 7 && j % 8 != 0; j -= 7) {
-				bishopMovementMasks[index] |= Evaluator_BaseImpl.POWER_LOOKUP[j];
+				bishopMovementMasks[index] |= POWER_LOOKUP[j];
 			}
 		}
 	}
@@ -534,26 +534,26 @@ public class Evaluator_BaseImpl {
 				int magicIndex = (int) ((rookOccupancyVariations[index][variationIndex] * rookMagicNumbers[index]) >>> rookShifts[index]);
 
 				for (int j = index + 8; j < 64; j += 8) {
-					validMoves |= Evaluator_BaseImpl.POWER_LOOKUP[j];
-					if ((rookOccupancyVariations[index][variationIndex] & Evaluator_BaseImpl.POWER_LOOKUP[j]) != 0) {
+					validMoves |= POWER_LOOKUP[j];
+					if ((rookOccupancyVariations[index][variationIndex] & POWER_LOOKUP[j]) != 0) {
 						break;
 					}
 				}
 				for (int j = index - 8; j >= 0; j -= 8) {
-					validMoves |= Evaluator_BaseImpl.POWER_LOOKUP[j];
-					if ((rookOccupancyVariations[index][variationIndex] & Evaluator_BaseImpl.POWER_LOOKUP[j]) != 0) {
+					validMoves |= POWER_LOOKUP[j];
+					if ((rookOccupancyVariations[index][variationIndex] & POWER_LOOKUP[j]) != 0) {
 						break;
 					}
 				}
 				for (int j = index + 1; j % 8 != 0; j++) {
-					validMoves |= Evaluator_BaseImpl.POWER_LOOKUP[j];
-					if ((rookOccupancyVariations[index][variationIndex] & Evaluator_BaseImpl.POWER_LOOKUP[j]) != 0) {
+					validMoves |= POWER_LOOKUP[j];
+					if ((rookOccupancyVariations[index][variationIndex] & POWER_LOOKUP[j]) != 0) {
 						break;
 					}
 				}
 				for (int j = index - 1; j % 8 != 7 && j >= 0; j--) {
-					validMoves |= Evaluator_BaseImpl.POWER_LOOKUP[j];
-					if ((rookOccupancyVariations[index][variationIndex] & Evaluator_BaseImpl.POWER_LOOKUP[j]) != 0) {
+					validMoves |= POWER_LOOKUP[j];
+					if ((rookOccupancyVariations[index][variationIndex] & POWER_LOOKUP[j]) != 0) {
 						break;
 					}
 				}
@@ -572,29 +572,29 @@ public class Evaluator_BaseImpl {
 
 				// up-right
 				for (int j = index + 7; j % 8 != 7 && j < 64; j += 7) {
-					validMoves |= Evaluator_BaseImpl.POWER_LOOKUP[j];
-					if ((bishopOccupancyVariations[index][variationIndex] & Evaluator_BaseImpl.POWER_LOOKUP[j]) != 0) {
+					validMoves |= POWER_LOOKUP[j];
+					if ((bishopOccupancyVariations[index][variationIndex] & POWER_LOOKUP[j]) != 0) {
 						break;
 					}
 				}
 				// up-left
 				for (int j = index + 9; j % 8 != 0 && j < 64; j += 9) {
-					validMoves |= Evaluator_BaseImpl.POWER_LOOKUP[j];
-					if ((bishopOccupancyVariations[index][variationIndex] & Evaluator_BaseImpl.POWER_LOOKUP[j]) != 0) {
+					validMoves |= POWER_LOOKUP[j];
+					if ((bishopOccupancyVariations[index][variationIndex] & POWER_LOOKUP[j]) != 0) {
 						break;
 					}
 				}
 				// down-right
 				for (int j = index - 9; j % 8 != 7 && j >= 0; j -= 9) {
-					validMoves |= Evaluator_BaseImpl.POWER_LOOKUP[j];
-					if ((bishopOccupancyVariations[index][variationIndex] & Evaluator_BaseImpl.POWER_LOOKUP[j]) != 0) {
+					validMoves |= POWER_LOOKUP[j];
+					if ((bishopOccupancyVariations[index][variationIndex] & POWER_LOOKUP[j]) != 0) {
 						break;
 					}
 				}
 				// down-left
 				for (int j = index - 7; j % 8 != 0 && j >= 0; j -= 7) {
-					validMoves |= Evaluator_BaseImpl.POWER_LOOKUP[j];
-					if ((bishopOccupancyVariations[index][variationIndex] & Evaluator_BaseImpl.POWER_LOOKUP[j]) != 0) {
+					validMoves |= POWER_LOOKUP[j];
+					if ((bishopOccupancyVariations[index][variationIndex] & POWER_LOOKUP[j]) != 0) {
 						break;
 					}
 				}
