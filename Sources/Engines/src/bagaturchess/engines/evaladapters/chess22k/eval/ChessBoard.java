@@ -25,7 +25,6 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.engines.evaladapters.chess22k.ChessConstants;
-import bagaturchess.engines.evaladapters.chess22k.EvalInfo;
 import bagaturchess.engines.evaladapters.chess22k.IChessBoard;
 
 
@@ -33,7 +32,7 @@ class ChessBoard implements IChessBoard {
 	
 	
 	private IBitBoard board;
-	private EvalInfo evalinfo;
+	
 	
 	private static final int[] HORIZONTAL_SYMMETRY = Utils.reverseSpecial( new int[] {	
 			   0,   1,   2,   3,   4,   5,   6,   7,
@@ -49,17 +48,11 @@ class ChessBoard implements IChessBoard {
 	
 	ChessBoard(IBitBoard _board) {
 		board = _board;
-		evalinfo = new EvalInfo();
 	}
 	
 	private static final long convertBB(long bb) {
 		//return bb;
 		return Bits.reverse(bb);
-	}
-	
-	@Override
-	public EvalInfo getEvalInfo() {
-		return evalinfo;
 	}
 	
 	@Override

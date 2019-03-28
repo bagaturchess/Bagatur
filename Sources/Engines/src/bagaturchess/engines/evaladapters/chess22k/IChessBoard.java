@@ -38,8 +38,6 @@ public interface IChessBoard {
 	public long getDiscoveredPieces();
 	public long getCheckingPieces();
 	
-	public EvalInfo getEvalInfo();
-	
 	public int getPieceType(int index);
 	
 	public int interpolateScore(int scoreMg, int scoreEg);

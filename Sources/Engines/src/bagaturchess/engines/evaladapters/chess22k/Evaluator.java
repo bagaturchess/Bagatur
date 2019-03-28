@@ -404,8 +404,18 @@ public class Evaluator extends Evaluator_BaseImpl {
 			+ 4 * PHASE[ROOK]
 			+ 2 * PHASE[QUEEN];
 	
-
+	
+	private static EvalInfo evalinfo = new EvalInfo();
+	
+	
+	private static EvalInfo getEvalInfo() {
+		return evalinfo;
+	}
+	
+	
 	public static int getScore1(final IChessBoard cb) {
+		
+		getEvalInfo().clearEvals();
 		
 		final int pawnScore = getPawnScores(cb);
 		final int materialScore = getImbalances(cb);
@@ -468,11 +478,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 		long space = cb.getPieces(WHITE, PAWN) >>> 8;
 		space |= space >>> 8 | space >>> 16;
 		score += SPACE[Long.bitCount(cb.getFriendlyPieces(WHITE))]
-				* Long.bitCount(space & ~cb.getPieces(WHITE, PAWN) & ~cb.getEvalInfo().attacks[BLACK][PAWN] & FILE_CDEF);
+				* Long.bitCount(space & ~cb.getPieces(WHITE, PAWN) & ~getEvalInfo().attacks[BLACK][PAWN] & FILE_CDEF);
 		space = cb.getPieces(BLACK, PAWN) << 8;
 		space |= space << 8 | space << 16;
 		score -= SPACE[Long.bitCount(cb.getFriendlyPieces(BLACK))]
-				* Long.bitCount(space & ~cb.getPieces(BLACK, PAWN) & ~cb.getEvalInfo().attacks[WHITE][PAWN] & FILE_CDEF);
+				* Long.bitCount(space & ~cb.getPieces(BLACK, PAWN) & ~getEvalInfo().attacks[WHITE][PAWN] & FILE_CDEF);
 
 		return score;
 	}
@@ -520,18 +530,18 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 
 		// set outposts
-		cb.getEvalInfo().passedPawnsAndOutposts = 0;
+		getEvalInfo().passedPawnsAndOutposts = 0;
 		pawns = getWhitePawnAttacks(cb.getPieces(WHITE, PAWN)) & ~cb.getPieces(WHITE, PAWN) & ~cb.getPieces(BLACK, PAWN);
 		while (pawns != 0) {
 			if ((getWhiteAdjacentMask(Long.numberOfTrailingZeros(pawns)) & cb.getPieces(BLACK, PAWN)) == 0) {
-				cb.getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
+				getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
 			}
 			pawns &= pawns - 1;
 		}
 		pawns = getBlackPawnAttacks(cb.getPieces(BLACK, PAWN)) & ~cb.getPieces(WHITE, PAWN) & ~cb.getPieces(BLACK, PAWN);
 		while (pawns != 0) {
 			if ((getBlackAdjacentMask(Long.numberOfTrailingZeros(pawns)) & cb.getPieces(WHITE, PAWN)) == 0) {
-				cb.getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
+				getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
 			}
 			pawns &= pawns - 1;
 		}
@@ -564,7 +574,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 			// set passed pawns
 			if ((getWhitePassedPawnMask(index) & cb.getPieces(BLACK, PAWN)) == 0) {
-				cb.getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
+				getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
 			}
 
 			// candidate passed pawns (no pawns in front, more friendly pawns behind and adjacent than enemy pawns)
@@ -604,7 +614,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 			// set passed pawns
 			if ((getBlackPassedPawnMask(index) & cb.getPieces(WHITE, PAWN)) == 0) {
-				cb.getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
+				getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
 			}
 
 			// candidate passers
@@ -671,31 +681,31 @@ public class Evaluator extends Evaluator_BaseImpl {
 		int score = 0;
 		final long whitePawns = cb.getPieces(WHITE, PAWN);
 		final long blackPawns = cb.getPieces(BLACK, PAWN);
-		final long whiteMinorAttacks = cb.getEvalInfo().attacks[WHITE][NIGHT] | cb.getEvalInfo().attacks[WHITE][BISHOP];
-		final long blackMinorAttacks = cb.getEvalInfo().attacks[BLACK][NIGHT] | cb.getEvalInfo().attacks[BLACK][BISHOP];
-		final long whitePawnAttacks = cb.getEvalInfo().attacks[WHITE][PAWN];
-		final long blackPawnAttacks = cb.getEvalInfo().attacks[BLACK][PAWN];
-		final long whiteAttacks = cb.getEvalInfo().attacksAll[WHITE];
-		final long blackAttacks = cb.getEvalInfo().attacksAll[BLACK];
+		final long whiteMinorAttacks = getEvalInfo().attacks[WHITE][NIGHT] | getEvalInfo().attacks[WHITE][BISHOP];
+		final long blackMinorAttacks = getEvalInfo().attacks[BLACK][NIGHT] | getEvalInfo().attacks[BLACK][BISHOP];
+		final long whitePawnAttacks = getEvalInfo().attacks[WHITE][PAWN];
+		final long blackPawnAttacks = getEvalInfo().attacks[BLACK][PAWN];
+		final long whiteAttacks = getEvalInfo().attacksAll[WHITE];
+		final long blackAttacks = getEvalInfo().attacksAll[BLACK];
 		final long whites = cb.getFriendlyPieces(WHITE);
 		final long blacks = cb.getFriendlyPieces(BLACK);
 
 		// double attacked pieces
-		long piece = cb.getEvalInfo().doubleAttacks[WHITE] & blacks;
+		long piece = getEvalInfo().doubleAttacks[WHITE] & blacks;
 		while (piece != 0) {
 			score += DOUBLE_ATTACKED[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
 			piece &= piece - 1;
 		}
-		piece = cb.getEvalInfo().doubleAttacks[BLACK] & whites;
+		piece = getEvalInfo().doubleAttacks[BLACK] & whites;
 		while (piece != 0) {
 			score -= DOUBLE_ATTACKED[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
 			piece &= piece - 1;
 		}
 
 		// unused outposts
-		score += Long.bitCount(cb.getEvalInfo().passedPawnsAndOutposts & cb.getEmptySpaces() & whiteMinorAttacks & whitePawnAttacks)
+		score += Long.bitCount(getEvalInfo().passedPawnsAndOutposts & cb.getEmptySpaces() & whiteMinorAttacks & whitePawnAttacks)
 				* THREATS[IX_UNUSED_OUTPOST];
-		score -= Long.bitCount(cb.getEvalInfo().passedPawnsAndOutposts & cb.getEmptySpaces() & blackMinorAttacks & blackPawnAttacks)
+		score -= Long.bitCount(getEvalInfo().passedPawnsAndOutposts & cb.getEmptySpaces() & blackMinorAttacks & blackPawnAttacks)
 				* THREATS[IX_UNUSED_OUTPOST];
 
 		// pawn push threat
@@ -728,14 +738,14 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 		if (cb.getPieces(BLACK, QUEEN) != 0) {
 			// queen under attack by rook
-			score += Long.bitCount(cb.getEvalInfo().attacks[WHITE][ROOK] & cb.getPieces(BLACK, QUEEN)) * THREATS[IX_QUEEN_ATTACKED];
+			score += Long.bitCount(getEvalInfo().attacks[WHITE][ROOK] & cb.getPieces(BLACK, QUEEN)) * THREATS[IX_QUEEN_ATTACKED];
 			// queen under attack by minors
 			score += Long.bitCount(whiteMinorAttacks & cb.getPieces(BLACK, QUEEN)) * THREATS[IX_QUEEN_ATTACKED_MINOR];
 		}
 
 		if (cb.getPieces(WHITE, QUEEN) != 0) {
 			// queen under attack by rook
-			score -= Long.bitCount(cb.getEvalInfo().attacks[BLACK][ROOK] & cb.getPieces(WHITE, QUEEN)) * THREATS[IX_QUEEN_ATTACKED];
+			score -= Long.bitCount(getEvalInfo().attacks[BLACK][ROOK] & cb.getPieces(WHITE, QUEEN)) * THREATS[IX_QUEEN_ATTACKED];
 			// queen under attack by minors
 			score -= Long.bitCount(blackMinorAttacks & cb.getPieces(WHITE, QUEEN)) * THREATS[IX_QUEEN_ATTACKED_MINOR];
 		}
@@ -747,7 +757,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		// knight fork
 		// skip when testing eval values because we break the loop if any fork has been found
 		long forked;
-		piece = cb.getEvalInfo().attacks[WHITE][NIGHT] & ~blackAttacks & cb.getEmptySpaces();
+		piece = getEvalInfo().attacks[WHITE][NIGHT] & ~blackAttacks & cb.getEmptySpaces();
 		while (piece != 0) {
 			forked = blacks & ~blackPawns & KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 			if (Long.bitCount(forked) > 1) {
@@ -760,7 +770,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			}
 			piece &= piece - 1;
 		}
-		piece = cb.getEvalInfo().attacks[BLACK][NIGHT] & ~whiteAttacks & cb.getEmptySpaces();
+		piece = getEvalInfo().attacks[BLACK][NIGHT] & ~whiteAttacks & cb.getEmptySpaces();
 		while (piece != 0) {
 			forked = whites & ~whitePawns & KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 			if (Long.bitCount(forked) > 1) {
@@ -783,10 +793,10 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 		final long whitePawns = cb.getPieces(WHITE, PAWN);
 		final long blackPawns = cb.getPieces(BLACK, PAWN);
-		final long whitePawnAttacks = cb.getEvalInfo().attacks[WHITE][PAWN];
-		final long blackPawnAttacks = cb.getEvalInfo().attacks[BLACK][PAWN];
-		final long whiteAttacks = cb.getEvalInfo().attacksAll[WHITE];
-		final long blackAttacks = cb.getEvalInfo().attacksAll[BLACK];
+		final long whitePawnAttacks = getEvalInfo().attacks[WHITE][PAWN];
+		final long blackPawnAttacks = getEvalInfo().attacks[BLACK][PAWN];
+		final long whiteAttacks = getEvalInfo().attacksAll[WHITE];
+		final long blackAttacks = getEvalInfo().attacksAll[BLACK];
 		final long whites = cb.getFriendlyPieces(WHITE);
 		final long blacks = cb.getFriendlyPieces(BLACK);
 
@@ -794,12 +804,12 @@ public class Evaluator extends Evaluator_BaseImpl {
 		score += ChessConstants.COLOR_FACTOR[cb.getColorToMove()] * SIDE_TO_MOVE_BONUS;
 
 		// piece attacked and only defended by a rook or queen
-		piece = whites & blackAttacks & whiteAttacks & ~(whitePawnAttacks | cb.getEvalInfo().attacks[WHITE][NIGHT] | cb.getEvalInfo().attacks[WHITE][BISHOP]);
+		piece = whites & blackAttacks & whiteAttacks & ~(whitePawnAttacks | getEvalInfo().attacks[WHITE][NIGHT] | getEvalInfo().attacks[WHITE][BISHOP]);
 		while (piece != 0) {
 			score -= ONLY_MAJOR_DEFENDERS[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
 			piece &= piece - 1;
 		}
-		piece = blacks & whiteAttacks & blackAttacks & ~(blackPawnAttacks | cb.getEvalInfo().attacks[BLACK][NIGHT] | cb.getEvalInfo().attacks[BLACK][BISHOP]);
+		piece = blacks & whiteAttacks & blackAttacks & ~(blackPawnAttacks | getEvalInfo().attacks[BLACK][NIGHT] | getEvalInfo().attacks[BLACK][BISHOP]);
 		while (piece != 0) {
 			score += ONLY_MAJOR_DEFENDERS[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
 			piece &= piece - 1;
@@ -928,7 +938,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		if (cb.getPieces(WHITE, BISHOP) != 0) {
 
 			// bishop outpost: protected by a pawn, cannot be attacked by enemy pawns
-			piece = cb.getPieces(WHITE, BISHOP) & cb.getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
+			piece = cb.getPieces(WHITE, BISHOP) & getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
 			while (piece != 0) {
 				score += BISHOP_OUTPOST[Long.numberOfTrailingZeros(piece) >>> 3];
 				piece &= piece - 1;
@@ -948,14 +958,14 @@ public class Evaluator extends Evaluator_BaseImpl {
 				score -= BISHOP_PAWN[Long.bitCount(whitePawns & WHITE_SQUARES)];
 
 				// bonus for attacking center squares
-				score += Long.bitCount(cb.getEvalInfo().attacks[WHITE][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
+				score += Long.bitCount(getEvalInfo().attacks[WHITE][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
 			}
 			if ((cb.getPieces(WHITE, BISHOP) & BLACK_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
 				score -= BISHOP_PAWN[Long.bitCount(whitePawns & BLACK_SQUARES)];
 
 				// bonus for attacking center squares
-				score += Long.bitCount(cb.getEvalInfo().attacks[WHITE][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
+				score += Long.bitCount(getEvalInfo().attacks[WHITE][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
 			}
 
 		}
@@ -964,7 +974,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		if (cb.getPieces(BLACK, BISHOP) != 0) {
 
 			// bishop outpost: protected by a pawn, cannot be attacked by enemy pawns
-			piece = cb.getPieces(BLACK, BISHOP) & cb.getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
+			piece = cb.getPieces(BLACK, BISHOP) & getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
 			while (piece != 0) {
 				score -= BISHOP_OUTPOST[7 - Long.numberOfTrailingZeros(piece) / 8];
 				piece &= piece - 1;
@@ -984,14 +994,14 @@ public class Evaluator extends Evaluator_BaseImpl {
 				score += BISHOP_PAWN[Long.bitCount(blackPawns & WHITE_SQUARES)];
 
 				// bonus for attacking center squares
-				score -= Long.bitCount(cb.getEvalInfo().attacks[BLACK][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
+				score -= Long.bitCount(getEvalInfo().attacks[BLACK][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
 			}
 			if ((cb.getPieces(BLACK, BISHOP) & BLACK_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
 				score += BISHOP_PAWN[Long.bitCount(blackPawns & BLACK_SQUARES)];
 
 				// bonus for attacking center squares
-				score -= Long.bitCount(cb.getEvalInfo().attacks[BLACK][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
+				score -= Long.bitCount(getEvalInfo().attacks[BLACK][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
 			}
 		}
 
@@ -1008,12 +1018,12 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 
 		// knight outpost: protected by a pawn, cannot be attacked by enemy pawns
-		piece = cb.getPieces(WHITE, NIGHT) & cb.getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
+		piece = cb.getPieces(WHITE, NIGHT) & getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
 		while (piece != 0) {
 			score += KNIGHT_OUTPOST[Long.numberOfTrailingZeros(piece) >>> 3];
 			piece &= piece - 1;
 		}
-		piece = cb.getPieces(BLACK, NIGHT) & cb.getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
+		piece = cb.getPieces(BLACK, NIGHT) & getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
 		while (piece != 0) {
 			score -= KNIGHT_OUTPOST[7 - Long.numberOfTrailingZeros(piece) / 8];
 			piece &= piece - 1;
@@ -1071,7 +1081,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		int file;
 
 		int whiteScore = 0;
-		long piece = cb.getPieces(WHITE, PAWN) & cb.getKingArea(WHITE) & ~cb.getEvalInfo().attacks[BLACK][PAWN];
+		long piece = cb.getPieces(WHITE, PAWN) & cb.getKingArea(WHITE) & ~getEvalInfo().attacks[BLACK][PAWN];
 		while (piece != 0) {
 			file = Long.numberOfTrailingZeros(piece) & 7;
 			whiteScore += SHIELD_BONUS[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3];
@@ -1082,7 +1092,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 
 		int blackScore = 0;
-		piece = cb.getPieces(BLACK, PAWN) & cb.getKingArea(BLACK) & ~cb.getEvalInfo().attacks[WHITE][PAWN];
+		piece = cb.getPieces(BLACK, PAWN) & cb.getKingArea(BLACK) & ~getEvalInfo().attacks[WHITE][PAWN];
 		while (piece != 0) {
 			file = (63 - Long.numberOfLeadingZeros(piece)) & 7;
 			blackScore += SHIELD_BONUS[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8];
@@ -1098,34 +1108,34 @@ public class Evaluator extends Evaluator_BaseImpl {
 	public static int calculateMobilityScoresAndSetAttackBoards(final IChessBoard cb) {
 
 		// clear values
-		cb.getEvalInfo().clearEvalAttacks();
+		getEvalInfo().clearEvalAttacks();
 
 		long moves;
 
 		// white pawns
-		cb.getEvalInfo().attacks[WHITE][PAWN] = getWhitePawnAttacks(cb.getPieces(WHITE, PAWN) & ~cb.getPinnedPieces());
-		if ((cb.getEvalInfo().attacks[WHITE][PAWN] & cb.getKingArea(BLACK)) != 0) {
-			cb.getEvalInfo().kingAttackersFlag[WHITE] = ChessConstants.FLAG_PAWN;
+		getEvalInfo().attacks[WHITE][PAWN] = getWhitePawnAttacks(cb.getPieces(WHITE, PAWN) & ~cb.getPinnedPieces());
+		if ((getEvalInfo().attacks[WHITE][PAWN] & cb.getKingArea(BLACK)) != 0) {
+			getEvalInfo().kingAttackersFlag[WHITE] = ChessConstants.FLAG_PAWN;
 		}
 		long pinned = cb.getPieces(WHITE, PAWN) & cb.getPinnedPieces();
 		while (pinned != 0) {
-			cb.getEvalInfo().attacks[WHITE][PAWN] |= PAWN_ATTACKS[WHITE][Long.numberOfTrailingZeros(pinned)]
+			getEvalInfo().attacks[WHITE][PAWN] |= PAWN_ATTACKS[WHITE][Long.numberOfTrailingZeros(pinned)]
 					& ChessConstants.PINNED_MOVEMENT[Long.numberOfTrailingZeros(pinned)][cb.getKingIndex(WHITE)];
 			pinned &= pinned - 1;
 		}
-		cb.getEvalInfo().attacksAll[WHITE] = cb.getEvalInfo().attacks[WHITE][PAWN];
+		getEvalInfo().attacksAll[WHITE] = getEvalInfo().attacks[WHITE][PAWN];
 		// black pawns
-		cb.getEvalInfo().attacks[BLACK][PAWN] = getBlackPawnAttacks(cb.getPieces(BLACK, PAWN) & ~cb.getPinnedPieces());
-		if ((cb.getEvalInfo().attacks[BLACK][PAWN] & cb.getKingArea(WHITE)) != 0) {
-			cb.getEvalInfo().kingAttackersFlag[BLACK] = ChessConstants.FLAG_PAWN;
+		getEvalInfo().attacks[BLACK][PAWN] = getBlackPawnAttacks(cb.getPieces(BLACK, PAWN) & ~cb.getPinnedPieces());
+		if ((getEvalInfo().attacks[BLACK][PAWN] & cb.getKingArea(WHITE)) != 0) {
+			getEvalInfo().kingAttackersFlag[BLACK] = ChessConstants.FLAG_PAWN;
 		}
 		pinned = cb.getPieces(BLACK, PAWN) & cb.getPinnedPieces();
 		while (pinned != 0) {
-			cb.getEvalInfo().attacks[BLACK][PAWN] |= PAWN_ATTACKS[BLACK][Long.numberOfTrailingZeros(pinned)]
+			getEvalInfo().attacks[BLACK][PAWN] |= PAWN_ATTACKS[BLACK][Long.numberOfTrailingZeros(pinned)]
 					& ChessConstants.PINNED_MOVEMENT[Long.numberOfTrailingZeros(pinned)][cb.getKingIndex(BLACK)];
 			pinned &= pinned - 1;
 		}
-		cb.getEvalInfo().attacksAll[BLACK] = cb.getEvalInfo().attacks[BLACK][PAWN];
+		getEvalInfo().attacksAll[BLACK] = getEvalInfo().attacks[BLACK][PAWN];
 
 		int score = 0;
 		for (int color = WHITE; color <= BLACK; color++) {
@@ -1133,18 +1143,18 @@ public class Evaluator extends Evaluator_BaseImpl {
 			int tempScore = 0;
 
 			final long kingArea = cb.getKingArea(1 - color);
-			final long safeMoves = ~cb.getFriendlyPieces(color) & ~cb.getEvalInfo().attacks[1 - color][PAWN];
+			final long safeMoves = ~cb.getFriendlyPieces(color) & ~getEvalInfo().attacks[1 - color][PAWN];
 
 			// knights
 			long piece = cb.getPieces(color, NIGHT) & ~cb.getPinnedPieces();
 			while (piece != 0) {
 				moves = KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 				if ((moves & kingArea) != 0) {
-					cb.getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_NIGHT;
+					getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_NIGHT;
 				}
-				cb.getEvalInfo().doubleAttacks[color] |= cb.getEvalInfo().attacksAll[color] & moves;
-				cb.getEvalInfo().attacksAll[color] |= moves;
-				cb.getEvalInfo().attacks[color][NIGHT] |= moves;
+				getEvalInfo().doubleAttacks[color] |= getEvalInfo().attacksAll[color] & moves;
+				getEvalInfo().attacksAll[color] |= moves;
+				getEvalInfo().attacks[color][NIGHT] |= moves;
 				tempScore += MOBILITY_KNIGHT[Long.bitCount(moves & safeMoves)];
 				piece &= piece - 1;
 			}
@@ -1154,11 +1164,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 			while (piece != 0) {
 				moves = getBishopMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces() ^ cb.getPieces(color, QUEEN));
 				if ((moves & kingArea) != 0) {
-					cb.getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_BISHOP;
+					getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_BISHOP;
 				}
-				cb.getEvalInfo().doubleAttacks[color] |= cb.getEvalInfo().attacksAll[color] & moves;
-				cb.getEvalInfo().attacksAll[color] |= moves;
-				cb.getEvalInfo().attacks[color][BISHOP] |= moves;
+				getEvalInfo().doubleAttacks[color] |= getEvalInfo().attacksAll[color] & moves;
+				getEvalInfo().attacksAll[color] |= moves;
+				getEvalInfo().attacks[color][BISHOP] |= moves;
 				tempScore += MOBILITY_BISHOP[Long.bitCount(moves & safeMoves)];
 				piece &= piece - 1;
 			}
@@ -1168,11 +1178,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 			while (piece != 0) {
 				moves = getRookMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces() ^ cb.getPieces(color, ROOK) ^ cb.getPieces(color, QUEEN));
 				if ((moves & kingArea) != 0) {
-					cb.getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_ROOK;
+					getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_ROOK;
 				}
-				cb.getEvalInfo().doubleAttacks[color] |= cb.getEvalInfo().attacksAll[color] & moves;
-				cb.getEvalInfo().attacksAll[color] |= moves;
-				cb.getEvalInfo().attacks[color][ROOK] |= moves;
+				getEvalInfo().doubleAttacks[color] |= getEvalInfo().attacksAll[color] & moves;
+				getEvalInfo().attacksAll[color] |= moves;
+				getEvalInfo().attacks[color][ROOK] |= moves;
 				tempScore += MOBILITY_ROOK[Long.bitCount(moves & safeMoves)];
 				piece &= piece - 1;
 			}
@@ -1182,11 +1192,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 			while (piece != 0) {
 				moves = getQueenMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces());
 				if ((moves & kingArea) != 0) {
-					cb.getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_QUEEN;
+					getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_QUEEN;
 				}
-				cb.getEvalInfo().doubleAttacks[color] |= cb.getEvalInfo().attacksAll[color] & moves;
-				cb.getEvalInfo().attacksAll[color] |= moves;
-				cb.getEvalInfo().attacks[color][QUEEN] |= moves;
+				getEvalInfo().doubleAttacks[color] |= getEvalInfo().attacksAll[color] & moves;
+				getEvalInfo().attacksAll[color] |= moves;
+				getEvalInfo().attacks[color][QUEEN] |= moves;
 				tempScore += MOBILITY_QUEEN[Long.bitCount(moves & safeMoves)];
 				piece &= piece - 1;
 			}
@@ -1198,17 +1208,17 @@ public class Evaluator extends Evaluator_BaseImpl {
 		// TODO king-attacks with or without enemy attacks?
 		// WHITE king
 		moves = KING_MOVES[cb.getKingIndex(WHITE)] & ~KING_MOVES[cb.getKingIndex(BLACK)];
-		cb.getEvalInfo().attacks[WHITE][KING] = moves;
-		cb.getEvalInfo().doubleAttacks[WHITE] |= cb.getEvalInfo().attacksAll[WHITE] & moves;
-		cb.getEvalInfo().attacksAll[WHITE] |= moves;
-		score += MOBILITY_KING[Long.bitCount(moves & ~cb.getFriendlyPieces(WHITE) & ~cb.getEvalInfo().attacksAll[BLACK])];
+		getEvalInfo().attacks[WHITE][KING] = moves;
+		getEvalInfo().doubleAttacks[WHITE] |= getEvalInfo().attacksAll[WHITE] & moves;
+		getEvalInfo().attacksAll[WHITE] |= moves;
+		score += MOBILITY_KING[Long.bitCount(moves & ~cb.getFriendlyPieces(WHITE) & ~getEvalInfo().attacksAll[BLACK])];
 
 		// BLACK king
 		moves = KING_MOVES[cb.getKingIndex(BLACK)] & ~KING_MOVES[cb.getKingIndex(WHITE)];
-		cb.getEvalInfo().attacks[BLACK][KING] = moves;
-		cb.getEvalInfo().doubleAttacks[BLACK] |= cb.getEvalInfo().attacksAll[BLACK] & moves;
-		cb.getEvalInfo().attacksAll[BLACK] |= moves;
-		score -= MOBILITY_KING[Long.bitCount(moves & ~cb.getFriendlyPieces(BLACK) & ~cb.getEvalInfo().attacksAll[WHITE])];
+		getEvalInfo().attacks[BLACK][KING] = moves;
+		getEvalInfo().doubleAttacks[BLACK] |= getEvalInfo().attacksAll[BLACK] & moves;
+		getEvalInfo().attacksAll[BLACK] |= moves;
+		score -= MOBILITY_KING[Long.bitCount(moves & ~cb.getFriendlyPieces(BLACK) & ~getEvalInfo().attacksAll[WHITE])];
 
 		return score;
 	}
@@ -1254,14 +1264,14 @@ public class Evaluator extends Evaluator_BaseImpl {
 			counter += openFiles(cb, kingColor, cb.getPieces(kingColor, PAWN));
 
 			// king can move?
-			if ((cb.getEvalInfo().attacks[kingColor][KING] & ~cb.getFriendlyPieces(kingColor)) == 0) {
+			if ((getEvalInfo().attacks[kingColor][KING] & ~cb.getFriendlyPieces(kingColor)) == 0) {
 				counter++;
 			}
-			counter += KS_ATTACKS[Long.bitCount(cb.getKingArea(kingColor) & cb.getEvalInfo().attacksAll[enemyColor])];
+			counter += KS_ATTACKS[Long.bitCount(cb.getKingArea(kingColor) & getEvalInfo().attacksAll[enemyColor])];
 			counter += checks(cb, kingColor);
 
 			counter += KS_DOUBLE_ATTACKS[Long
-					.bitCount(KING_MOVES[cb.getKingIndex(kingColor)] & cb.getEvalInfo().doubleAttacks[enemyColor] & ~cb.getEvalInfo().attacks[kingColor][PAWN])];
+					.bitCount(KING_MOVES[cb.getKingIndex(kingColor)] & getEvalInfo().doubleAttacks[enemyColor] & ~getEvalInfo().attacks[kingColor][PAWN])];
 
 			if ((cb.getCheckingPieces() & cb.getFriendlyPieces(enemyColor)) != 0) {
 				counter++;
@@ -1282,13 +1292,13 @@ public class Evaluator extends Evaluator_BaseImpl {
 				counter /= 2;
 			} else if (Long.bitCount(cb.getPieces(enemyColor, QUEEN)) == 1) {
 				// bonus for small king-queen distance
-				if ((cb.getEvalInfo().attacksAll[kingColor] & cb.getPieces(enemyColor, QUEEN)) == 0) {
+				if ((getEvalInfo().attacksAll[kingColor] & cb.getPieces(enemyColor, QUEEN)) == 0) {
 					counter += KS_QUEEN_TROPISM[getDistance(cb.getKingIndex(kingColor),
 							Long.numberOfTrailingZeros(cb.getPieces(enemyColor, QUEEN)))];
 				}
 			}
 
-			counter += KS_ATTACK_PATTERN[cb.getEvalInfo().kingAttackersFlag[enemyColor]];
+			counter += KS_ATTACK_PATTERN[getEvalInfo().kingAttackersFlag[enemyColor]];
 			score += ChessConstants.COLOR_FACTOR[enemyColor] * KS_SCORES[Math.min(counter, KS_SCORES.length - 1)];
 		}
 
@@ -1322,25 +1332,25 @@ public class Evaluator extends Evaluator_BaseImpl {
 		final int enemyColor = 1 - kingColor;
 		final int kingIndex = cb.getKingIndex(kingColor);
 		final long possibleSquares = ~cb.getFriendlyPieces(enemyColor)
-				& (~KING_MOVES[kingIndex] | KING_MOVES[kingIndex] & cb.getEvalInfo().doubleAttacks[enemyColor] & ~cb.getEvalInfo().doubleAttacks[kingColor]);
+				& (~KING_MOVES[kingIndex] | KING_MOVES[kingIndex] & getEvalInfo().doubleAttacks[enemyColor] & ~getEvalInfo().doubleAttacks[kingColor]);
 
-		int counter = checkNight(cb, kingColor, KNIGHT_MOVES[kingIndex] & possibleSquares & cb.getEvalInfo().attacks[enemyColor][NIGHT]);
+		int counter = checkNight(cb, kingColor, KNIGHT_MOVES[kingIndex] & possibleSquares & getEvalInfo().attacks[enemyColor][NIGHT]);
 
 		long moves;
 		long queenMoves = 0;
 		if ((cb.getPieces(enemyColor, QUEEN) | cb.getPieces(enemyColor, BISHOP)) != 0) {
 			moves = getBishopMoves(kingIndex, cb.getAllPieces() ^ cb.getPieces(kingColor, QUEEN)) & possibleSquares;
 			queenMoves = moves;
-			counter += checkBishop(cb, kingColor, moves & cb.getEvalInfo().attacks[enemyColor][BISHOP]);
+			counter += checkBishop(cb, kingColor, moves & getEvalInfo().attacks[enemyColor][BISHOP]);
 		}
 		if ((cb.getPieces(enemyColor, QUEEN) | cb.getPieces(enemyColor, ROOK)) != 0) {
 			moves = getRookMoves(kingIndex, cb.getAllPieces() ^ cb.getPieces(kingColor, QUEEN)) & possibleSquares;
 			queenMoves |= moves;
-			counter += checkRook(cb, kingColor, moves & cb.getEvalInfo().attacks[enemyColor][ROOK]);
+			counter += checkRook(cb, kingColor, moves & getEvalInfo().attacks[enemyColor][ROOK]);
 		}
 
 		if (Long.bitCount(cb.getPieces(enemyColor, QUEEN)) == 1) {
-			counter += safeCheckQueen(cb, kingColor, queenMoves & ~cb.getEvalInfo().attacksAll[kingColor] & cb.getEvalInfo().attacks[enemyColor][QUEEN]);
+			counter += safeCheckQueen(cb, kingColor, queenMoves & ~getEvalInfo().attacksAll[kingColor] & getEvalInfo().attacks[enemyColor][QUEEN]);
 			counter += safeCheckQueenTouch(cb, kingColor);
 		}
 
@@ -1348,12 +1358,12 @@ public class Evaluator extends Evaluator_BaseImpl {
 	}
 
 	private static int safeCheckQueenTouch(final IChessBoard cb, final int kingColor) {
-		if ((cb.getEvalInfo().kingAttackersFlag[1 - kingColor] & ChessConstants.FLAG_QUEEN) == 0) {
+		if ((getEvalInfo().kingAttackersFlag[1 - kingColor] & ChessConstants.FLAG_QUEEN) == 0) {
 			return 0;
 		}
 		final int enemyColor = 1 - kingColor;
-		if ((KING_MOVES[cb.getKingIndex(kingColor)] & ~cb.getFriendlyPieces(enemyColor) & cb.getEvalInfo().attacks[enemyColor][QUEEN] & ~cb.getEvalInfo().doubleAttacks[kingColor]
-				& cb.getEvalInfo().doubleAttacks[enemyColor]) != 0) {
+		if ((KING_MOVES[cb.getKingIndex(kingColor)] & ~cb.getFriendlyPieces(enemyColor) & getEvalInfo().attacks[enemyColor][QUEEN] & ~getEvalInfo().doubleAttacks[kingColor]
+				& getEvalInfo().doubleAttacks[enemyColor]) != 0) {
 			return KS_OTHER[0];
 		}
 		return 0;
@@ -1373,11 +1383,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 
 		int counter = 0;
-		if ((rookMoves & ~cb.getEvalInfo().attacksAll[kingColor]) != 0) {
+		if ((rookMoves & ~getEvalInfo().attacksAll[kingColor]) != 0) {
 			counter += KS_CHECK[ROOK];
 
 			// last rank?
-			if (kingBlockedAtLastRank(kingColor, cb, KING_MOVES[cb.getKingIndex(kingColor)] & cb.getEmptySpaces() & ~cb.getEvalInfo().attacksAll[1 - kingColor])) {
+			if (kingBlockedAtLastRank(kingColor, cb, KING_MOVES[cb.getKingIndex(kingColor)] & cb.getEmptySpaces() & ~getEvalInfo().attacksAll[1 - kingColor])) {
 				counter += KS_OTHER[1];
 			}
 
@@ -1390,7 +1400,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 	private static int checkBishop(final IChessBoard cb, final int kingColor, final long bishopMoves) {
 		if (bishopMoves != 0) {
-			if ((bishopMoves & ~cb.getEvalInfo().attacksAll[kingColor]) != 0) {
+			if ((bishopMoves & ~getEvalInfo().attacksAll[kingColor]) != 0) {
 				return KS_CHECK[BISHOP];
 			} else {
 				return KS_UCHECK[BISHOP];
@@ -1401,7 +1411,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 	private static int checkNight(final IChessBoard cb, final int kingColor, final long nightMoves) {
 		if (nightMoves != 0) {
-			if ((nightMoves & ~cb.getEvalInfo().attacksAll[kingColor]) != 0) {
+			if ((nightMoves & ~getEvalInfo().attacksAll[kingColor]) != 0) {
 				return KS_CHECK[NIGHT];
 			} else {
 				return KS_UCHECK[NIGHT];
@@ -1422,7 +1432,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		int blackPromotionDistance = SHORT_MAX;
 
 		// white passed pawns
-		long passedPawns = cb.getEvalInfo().passedPawnsAndOutposts & cb.getPieces(WHITE, ChessConstants.PAWN);
+		long passedPawns = getEvalInfo().passedPawnsAndOutposts & cb.getPieces(WHITE, ChessConstants.PAWN);
 		while (passedPawns != 0) {
 			final int index = 63 - Long.numberOfLeadingZeros(passedPawns);
 
@@ -1437,7 +1447,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 
 		// black passed pawns
-		passedPawns = cb.getEvalInfo().passedPawnsAndOutposts & cb.getPieces(BLACK, ChessConstants.PAWN);
+		passedPawns = getEvalInfo().passedPawnsAndOutposts & cb.getPieces(BLACK, ChessConstants.PAWN);
 		while (passedPawns != 0) {
 			final int index = Long.numberOfTrailingZeros(passedPawns);
 
@@ -1476,10 +1486,10 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 
 		// is next squared attacked?
-		if ((cb.getEvalInfo().attacksAll[enemyColor] & maskNextSquare) == 0) {
+		if ((getEvalInfo().attacksAll[enemyColor] & maskNextSquare) == 0) {
 
 			// complete path free of enemy attacks?
-			if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & cb.getEvalInfo().attacksAll[enemyColor]) == 0) {
+			if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & getEvalInfo().attacksAll[enemyColor]) == 0) {
 				multiplier *= PASSED_MULTIPLIERS[7];
 			} else {
 				multiplier *= PASSED_MULTIPLIERS[1];
@@ -1487,7 +1497,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 
 		// is next squared defended?
-		if ((cb.getEvalInfo().attacksAll[color] & maskNextSquare) != 0) {
+		if ((getEvalInfo().attacksAll[color] & maskNextSquare) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[3];
 		}
 
@@ -1497,18 +1507,18 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 
 		// under attack?
-		if (cb.getColorToMove() != color && (cb.getEvalInfo().attacksAll[enemyColor] & square) != 0) {
+		if (cb.getColorToMove() != color && (getEvalInfo().attacksAll[enemyColor] & square) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[4];
 		}
 
 		// defended by rook from behind?
-		if ((maskFile & cb.getPieces(color, ROOK)) != 0 && (cb.getEvalInfo().attacks[color][ROOK] & square) != 0 && (cb.getEvalInfo().attacks[color][ROOK] & maskPreviousSquare) != 0) {
+		if ((maskFile & cb.getPieces(color, ROOK)) != 0 && (getEvalInfo().attacks[color][ROOK] & square) != 0 && (getEvalInfo().attacks[color][ROOK] & maskPreviousSquare) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[5];
 		}
 
 		// attacked by rook from behind?
-		else if ((maskFile & cb.getPieces(enemyColor, ROOK)) != 0 && (cb.getEvalInfo().attacks[enemyColor][ROOK] & square) != 0
-				&& (cb.getEvalInfo().attacks[enemyColor][ROOK] & maskPreviousSquare) != 0) {
+		else if ((maskFile & cb.getPieces(enemyColor, ROOK)) != 0 && (getEvalInfo().attacks[enemyColor][ROOK] & square) != 0
+				&& (getEvalInfo().attacks[enemyColor][ROOK] & maskPreviousSquare) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[6];
 		}
 
@@ -1524,8 +1534,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 		// check if it cannot be stopped
 		int promotionDistance = index >>> 3;
 		if (promotionDistance == 1 && cb.getColorToMove() == BLACK) {
-			if ((POWER_LOOKUP[index - 8] & (cb.getEvalInfo().attacksAll[WHITE] | cb.getAllPieces())) == 0) {
-				if ((POWER_LOOKUP[index] & cb.getEvalInfo().attacksAll[WHITE]) == 0) {
+			if ((POWER_LOOKUP[index - 8] & (getEvalInfo().attacksAll[WHITE] | cb.getAllPieces())) == 0) {
+				if ((POWER_LOOKUP[index] & getEvalInfo().attacksAll[WHITE]) == 0) {
 					return 1;
 				}
 			}
@@ -1537,12 +1547,48 @@ public class Evaluator extends Evaluator_BaseImpl {
 		// check if it cannot be stopped
 		int promotionDistance = 7 - index / 8;
 		if (promotionDistance == 1 && cb.getColorToMove() == WHITE) {
-			if ((POWER_LOOKUP[index + 8] & (cb.getEvalInfo().attacksAll[BLACK] | cb.getAllPieces())) == 0) {
-				if ((POWER_LOOKUP[index] & cb.getEvalInfo().attacksAll[BLACK]) == 0) {
+			if ((POWER_LOOKUP[index + 8] & (getEvalInfo().attacksAll[BLACK] | cb.getAllPieces())) == 0) {
+				if ((POWER_LOOKUP[index] & getEvalInfo().attacksAll[BLACK]) == 0) {
 					return 1;
 				}
 			}
 		}
 		return SHORT_MAX;
+	}
+	
+	
+	private static class EvalInfo {
+
+		// attack boards
+		public final long[][] attacks = new long[2][7];
+		public final long[] attacksAll = new long[2];
+		public final long[] doubleAttacks = new long[2];
+		public final int[] kingAttackersFlag = new int[2];
+
+		public long passedPawnsAndOutposts;
+		
+		public long eval_o;
+		public long eval_e;
+		
+		public void clearEvalAttacks() {
+			kingAttackersFlag[WHITE] = 0;
+			kingAttackersFlag[BLACK] = 0;
+			attacks[WHITE][NIGHT] = 0;
+			attacks[BLACK][NIGHT] = 0;
+			attacks[WHITE][BISHOP] = 0;
+			attacks[BLACK][BISHOP] = 0;
+			attacks[WHITE][ROOK] = 0;
+			attacks[BLACK][ROOK] = 0;
+			attacks[WHITE][QUEEN] = 0;
+			attacks[BLACK][QUEEN] = 0;
+			doubleAttacks[WHITE] = 0;
+			doubleAttacks[BLACK] = 0;
+		}
+		
+		
+		public void clearEvals() {
+			eval_o = 0;
+			eval_e = 0;
+		}
 	}
 }
