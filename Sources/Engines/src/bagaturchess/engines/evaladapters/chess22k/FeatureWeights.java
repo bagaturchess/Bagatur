@@ -23,9 +23,51 @@ package bagaturchess.engines.evaladapters.chess22k;
 public interface FeatureWeights {
 	
 	
-	public static final double PASSED_UNSTOPPABLE_O		= 350;
-	public static final double PASSED_UNSTOPPABLE_E		= 350;
+	//Pawns
+	public static final double PASSED_UNSTOPPABLE_O				= 350;
+	public static final double PASSED_UNSTOPPABLE_E				= 350;
+	public static final double PASSED_PAWNS_O					= 1;
+	public static final double PASSED_PAWNS_E					= 1;
+	public static final double PAWN_SHIELD_O					= 1;
+	public static final double PAWN_SHIELD_E					= 1;
 	
-	public static final double PASSED_PAWNS_O			= 1;
-	public static final double PASSED_PAWNS_E			= 1;
+	//Mobility
+	public static final double MOBILITY_KNIGHT_O				= 1;
+	public static final double MOBILITY_KNIGHT_E				= 1;
+	public static final double MOBILITY_BISHOP_O				= 1;
+	public static final double MOBILITY_BISHOP_E				= 1;
+	public static final double MOBILITY_ROOK_O					= 1;
+	public static final double MOBILITY_ROOK_E					= 1;
+	public static final double MOBILITY_QUEEN_O					= 1;
+	public static final double MOBILITY_QUEEN_E					= 1;
+	public static final double MOBILITY_KING_O					= 1;
+	public static final double MOBILITY_KING_E					= 1;
+
+	//Threats
+	public static final double THREAT_DOUBLE_ATTACKED_O 		= 1;
+	public static final double THREAT_DOUBLE_ATTACKED_E 		= 1;
+	public static final double THREAT_UNUSED_OUTPOST_O 			= 1;
+	public static final double THREAT_UNUSED_OUTPOST_E 			= 1;
+	public static final double THREAT_PAWN_PUSH_O				= 1;
+	public static final double THREAT_PAWN_PUSH_E				= 1;
+	public static final double THREAT_PAWN_ATTACKS_O 			= 1;
+	public static final double THREAT_PAWN_ATTACKS_E 			= 1;
+	public static final double THREAT_MULTIPLE_PAWN_ATTACKS_O 	= 1;
+	public static final double THREAT_MULTIPLE_PAWN_ATTACKS_E 	= 1;
+	public static final double THREAT_MAJOR_ATTACKED_O 			= 1;
+	public static final double THREAT_MAJOR_ATTACKED_E 			= 1;
+	public static final double THREAT_PAWN_ATTACKED_O 			= 1;
+	public static final double THREAT_PAWN_ATTACKED_E 			= 1;
+	public static final double THREAT_QUEEN_ATTACKED_ROOK_O		= 1;
+	public static final double THREAT_QUEEN_ATTACKED_ROOK_E		= 1;
+	public static final double THREAT_QUEEN_ATTACKED_MINOR_O 	= 1;
+	public static final double THREAT_QUEEN_ATTACKED_MINOR_E 	= 1;
+	public static final double THREAT_ROOK_ATTACKED_O 			= 1;
+	public static final double THREAT_ROOK_ATTACKED_E 			= 1;
+	public static final double THREAT_NIGHT_FORK_O 				= 1;
+	public static final double THREAT_NIGHT_FORK_E 				= 1;
+	public static final double THREAT_NIGHT_FORK_KING_O 		= 1;
+	public static final double THREAT_NIGHT_FORK_KING_E 		= 1;
+	
+	
 }

@@ -7,8 +7,7 @@ import bagaturchess.bitboard.common.Utils;
 
 public class BoardConfigImpl_Chess22k implements IBoardConfig {
 	
-	private static double[] zeros = new double[64];
-    
+	
 	private double MATERIAL_PAWN_O = 92;
 	private double MATERIAL_PAWN_E = 92;
 		
