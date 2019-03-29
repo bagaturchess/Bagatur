@@ -29,8 +29,8 @@ set ARGS=%ARGS% bagaturchess.search.impl.alg.impl0.Search_PVS_NWS
 set ARGS=%ARGS% bagaturchess.engines.cfg.base.SearchConfigImpl_AB
 REM set ARGS=%ARGS% bagaturchess.engines.evaladapters.chess22k.cfg.BoardConfigImpl_Chess22k
 REM set ARGS=%ARGS% bagaturchess.engines.evaladapters.chess22k.cfg.EvaluationConfg_Chess22k
-set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl
-set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig
+set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl1.cfg.BoardConfigImpl_V17
+set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl1.cfg.EvaluationConfig_V17
 
 echo on
 

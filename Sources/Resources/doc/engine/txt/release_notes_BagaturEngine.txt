@@ -1,7 +1,7 @@
 
-Version 1.7 (25 March 2019)
-  * Support for Syzygy tablebases, based on the work of ljgw https://github.com/ljgw/syzygy-bridge
-  * New evaluation function, based on the work of sandermvdb https://github.com/sandermvdb/chess22k
+Version 1.7 (29 March 2019)
+  * Support for Syzygy tablebases, based on the java porting done by ljgw https://github.com/ljgw/syzygy-bridge
+  * New evaluation function
 
 Version 1.6c (15 March 2019)
   * Parallel search: now improved with several bug fixes

@@ -7,8 +7,7 @@ import bagaturchess.bitboard.common.Utils;
 
 public class BoardConfigImpl_V17 implements IBoardConfig {
 	
-	private static double[] zeros = new double[64];
-    
+	
 	private double MATERIAL_PAWN_O = 92;
 	private double MATERIAL_PAWN_E = 92;
 		
@@ -26,7 +25,7 @@ public class BoardConfigImpl_V17 implements IBoardConfig {
 	
 	private double MATERIAL_KING_O = 9900;
 	private double MATERIAL_KING_E = 9900;
-
+	
 	
 	private double MATERIAL_BARIER_NOPAWNS_O	= Math.max(MATERIAL_KNIGHT_O, MATERIAL_BISHOP_O) + MATERIAL_PAWN_O;
 	private double MATERIAL_BARIER_NOPAWNS_E	= Math.max(MATERIAL_KNIGHT_E, MATERIAL_BISHOP_E) + MATERIAL_PAWN_E;

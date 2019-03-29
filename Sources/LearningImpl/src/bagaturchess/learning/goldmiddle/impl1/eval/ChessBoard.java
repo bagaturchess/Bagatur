@@ -24,7 +24,9 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.learning.goldmiddle.impl1.ChessConstants;
 import bagaturchess.learning.goldmiddle.impl1.Evaluator;
+import bagaturchess.learning.goldmiddle.impl1.Evaluator_BaseImpl;
 import bagaturchess.learning.goldmiddle.impl1.IChessBoard;
 
 
@@ -118,7 +120,7 @@ class ChessBoard implements IChessBoard {
 	@Override
 	public long getKingArea(int colour) {
 		int index = getKingIndex(colour);
-		return Evaluator.KING_AREA[colour][index];
+		return ChessConstants.KING_AREA[colour][index];
 	}
 	
 	@Override
@@ -142,34 +144,34 @@ class ChessBoard implements IChessBoard {
 		int pid = board.getMatrix()[convertIndex_c2b(index)];
 		
 		if (pid == Constants.PID_NONE) {
-			return Evaluator.EMPTY;
+			return ChessConstants.EMPTY;
 		}
 		
 		switch(pid) {
 			case Constants.PID_W_PAWN:
-				return Evaluator.PAWN;
+				return ChessConstants.PAWN;
 			case Constants.PID_B_PAWN:
-				return Evaluator.PAWN;
+				return ChessConstants.PAWN;
 			case Constants.PID_W_KNIGHT:
-				return Evaluator.NIGHT;
+				return ChessConstants.NIGHT;
 			case Constants.PID_B_KNIGHT:
-				return Evaluator.NIGHT;
+				return ChessConstants.NIGHT;
 			case Constants.PID_W_KING:
-				return Evaluator.KING;
+				return ChessConstants.KING;
 			case Constants.PID_B_KING:
-				return Evaluator.KING;
+				return ChessConstants.KING;
 			case Constants.PID_W_BISHOP:
-				return Evaluator.BISHOP;
+				return ChessConstants.BISHOP;
 			case Constants.PID_B_BISHOP:
-				return Evaluator.BISHOP;
+				return ChessConstants.BISHOP;
 			case Constants.PID_W_ROOK:
-				return Evaluator.ROOK;
+				return ChessConstants.ROOK;
 			case Constants.PID_B_ROOK:
-				return Evaluator.ROOK;
+				return ChessConstants.ROOK;
 			case Constants.PID_W_QUEEN:
-				return Evaluator.QUEEN;
+				return ChessConstants.QUEEN;
 			case Constants.PID_B_QUEEN:
-				return Evaluator.QUEEN;
+				return ChessConstants.QUEEN;
 			default:
 				throw new IllegalStateException("pid=" + pid);
 		}

@@ -16,6 +16,10 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 # Revision History
 
+Version 1.7 (29 March 2019)
+  * Support for Syzygy tablebases, based on the java porting done by ljgw https://github.com/ljgw/syzygy-bridge
+  * New evaluation function
+
 Version 1.6c (15 March 2019)
   * Parallel search: now improved with several bug fixes
   * Parallel search: UCI option implemented for Thread Memory (MB)
