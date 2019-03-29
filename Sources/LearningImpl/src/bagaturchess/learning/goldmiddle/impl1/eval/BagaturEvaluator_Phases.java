@@ -13,6 +13,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	
 	
 	private IChessBoard board;
+	private Evaluator evaluator;
 	
 	
 	public BagaturEvaluator_Phases(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -22,6 +23,8 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		bitboard = _bitboard;
 		
 		board = new ChessBoard(bitboard);
+		
+		evaluator = new Evaluator(board);
 	}
 	
 	
@@ -30,7 +33,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase1() {
-		int eval = Evaluator.getScore1(board);
+		int eval = evaluator.getScore1();
 		//int eval = (int)(500 * Math.random() - 250);
 		
 		return eval;
@@ -42,7 +45,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase2() {
-		int eval = Evaluator.getScore2(board);
+		int eval = evaluator.getScore2();
 		
 		return eval;
 	}

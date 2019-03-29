@@ -24,7 +24,8 @@ public interface IChessBoard {
 	
 	public int getColorToMove();
 	
-	public int getPSQTScore();
+	public int getPSQTScore_o();
+	public int getPSQTScore_e();
 	
 	public int getKingIndex(int colour);
 	public long getKingArea(int colour);

@@ -62,8 +62,13 @@ class ChessBoard implements IChessBoard {
 	}
 	
 	@Override
-	public int getPSQTScore() {
-		return board.getMaterialFactor().interpolateByFactor(board.getBaseEvaluation().getPST_o(), board.getBaseEvaluation().getPST_e());
+	public int getPSQTScore_o() {
+		return board.getBaseEvaluation().getPST_o();
+	}
+
+	@Override
+	public int getPSQTScore_e() {
+		return board.getBaseEvaluation().getPST_e();
 	}
 	
 	@Override
