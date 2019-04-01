@@ -50,7 +50,7 @@ public class Bagatur_V17_FeaturesConfigurationImpl implements IFeaturesConfigura
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_INVERSE						, "PAWN.INVERSE"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_PASSED							, "PAWN.PASSED"							, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_PASSED_CANDIDATE				, "PAWN.PASSED.CANDIDATE"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_PASSED_UNSTOPPABLE				, "PASSED.UNSTOPPABLE"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_PASSED_UNSTOPPABLE				, "PAWN.PASSED.UNSTOPPABLE"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_SHIELD							, "PAWN.SHIELD"							, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		
 		
@@ -88,11 +88,11 @@ public class Bagatur_V17_FeaturesConfigurationImpl implements IFeaturesConfigura
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_FILE_OPEN				, "OTHERS.ROOK.FILE.OPEN"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED	, "OTHERS.ROOK.FILE.SEMI.OPEN.ISOLATED"	, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN			, "OTHERS.ROOK.FILE.SEMI.OPEN"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_OUTPOST				, "OTHERS.BISHOP.OPUTPOST"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_OUTPOST				, "OTHERS.BISHOP.OUTPOST"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_PRISON				, "OTHERS.BISHOP.PRISON"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_PAWNS					, "OTHERS.BISHOP.PAWNS"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK			, "OTHERS.BISHOP.CENTER.ATTACK"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_PAWN_BLOCKAGE				, "THERS.PAWN.BLOCKAGE"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_PAWN_BLOCKAGE				, "OTHERS.PAWN.BLOCKAGE"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_KNIGHT_OUTPOST				, "OTHERS.KNIGHT.OUTPOST"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_IN_CHECK						, "OTHERS.IN.CHECK"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		
