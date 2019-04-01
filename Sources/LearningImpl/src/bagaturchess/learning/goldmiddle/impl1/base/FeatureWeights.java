@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.learning.goldmiddle.impl1;
+package bagaturchess.learning.goldmiddle.impl1.base;
 
 
 public interface FeatureWeights {
@@ -55,8 +55,8 @@ public interface FeatureWeights {
 	public static final double PAWN_PASSED_E							= 1;
 	public static final double PAWN_PASSED_CANDIDATE_O 					= 1;
 	public static final double PAWN_PASSED_CANDIDATE_E 					= 1;
-	public static final double PAWN_PASSED_UNSTOPPABLE_O				= 350;
-	public static final double PAWN_PASSED_UNSTOPPABLE_E				= 350;
+	public static final double PAWN_PASSED_UNSTOPPABLE_O				= 1;
+	public static final double PAWN_PASSED_UNSTOPPABLE_E				= 1;
 	public static final double PAWN_SHIELD_O							= 1;
 	public static final double PAWN_SHIELD_E							= 1;
 	

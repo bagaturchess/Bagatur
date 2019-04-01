@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.learning.goldmiddle.impl1;
+package bagaturchess.learning.goldmiddle.impl1.base;
 
 import bagaturchess.bitboard.api.IBitBoard;
 

@@ -17,10 +17,10 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.learning.goldmiddle.impl1;
+package bagaturchess.learning.goldmiddle.impl1.base;
 
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.BLACK;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.WHITE;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.BLACK;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.WHITE;
 
 
 public class Evaluator_BaseImpl {

@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl1;
+package bagaturchess.learning.goldmiddle.impl1.base;
 
 
 public class ChessConstants {

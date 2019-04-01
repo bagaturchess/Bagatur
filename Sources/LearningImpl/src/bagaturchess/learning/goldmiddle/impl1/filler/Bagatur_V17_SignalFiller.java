@@ -20,22 +20,23 @@
 package bagaturchess.learning.goldmiddle.impl1.filler;
 
 
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.BISHOP;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.BLACK;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.KING;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.NIGHT;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.PAWN;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.QUEEN;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.ROOK;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.WHITE;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.BISHOP;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.BLACK;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.KING;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.NIGHT;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.PAWN;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.QUEEN;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.ROOK;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.WHITE;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.state.PiecesList;
+import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
-import bagaturchess.learning.goldmiddle.impl1.ChessBoard;
-import bagaturchess.learning.goldmiddle.impl1.ChessConstants;
-import bagaturchess.learning.goldmiddle.impl1.Evaluator;
+import bagaturchess.learning.goldmiddle.impl1.base.ChessBoard;
+import bagaturchess.learning.goldmiddle.impl1.base.ChessConstants;
+import bagaturchess.learning.goldmiddle.impl1.base.Evaluator;
 
 
 public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller, Bagatur_V17_FeaturesConstants {
@@ -73,11 +74,15 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 	@Override
 	public void fill(ISignals signals) {
 		
+		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
+		
 		getEvalInfo().clearEvals1();
 		
 		fillMaterialScore(signals);
 		fillImbalances(signals);
 		fillPawnScores(signals);
+		
+		signals.getSignal(FEATURE_ID_PIECE_SQUARE_TABLE).addStrength(interpolateInternal(cb.getPSQTScore_o(), cb.getPSQTScore_e(), openingPart), openingPart);
 		
 		getEvalInfo().clearEvals2();
 		getEvalInfo().clearEvalAttacks();
@@ -94,7 +99,30 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 	
 	@Override
 	public void fillByComplexity(int complexity, ISignals signals) {
-		throw new UnsupportedOperationException("fillByComplexity");
+		switch(complexity) {
+			case IFeatureComplexity.STANDARD:
+				fill(signals);
+				return;
+			case IFeatureComplexity.PAWNS_STRUCTURE:
+				//fillPawnSignals(signals);
+				return;
+			case IFeatureComplexity.PIECES_ITERATION:
+				//fillPiecesIterationSignals(signals);
+				return;
+			case IFeatureComplexity.MOVES_ITERATION:
+				//fillMovesIterationSignals(signals);
+				return;
+			case IFeatureComplexity.FIELDS_STATES_ITERATION:
+				//throw new UnsupportedOperationException("FIELDS_STATES_ITERATION");
+				return;
+			default:
+				throw new IllegalStateException("complexity=" + complexity);
+		}
+	}
+	
+	
+	private double interpolateInternal(double o, double e, double openningPart) {
+		return (o * openningPart + e * (1 - openningPart));
 	}
 	
 	
@@ -136,7 +164,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		
 		// double bishop bonus
 		if (Long.bitCount(cb.getPieces(WHITE, BISHOP)) == 2) {
-			signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_BISHOP_DOUBLE).addStrength(IMBALANCE_SCORES[IX_BISHOP_DOUBLE], openingPart);		
+			signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_BISHOP_DOUBLE).addStrength(IMBALANCE_SCORES[IX_BISHOP_DOUBLE], openingPart);
 		}
 		if (Long.bitCount(cb.getPieces(BLACK, BISHOP)) == 2) {
 			signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_BISHOP_DOUBLE).addStrength(-IMBALANCE_SCORES[IX_BISHOP_DOUBLE], openingPart);
@@ -146,24 +174,20 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		// queen and nights
 		if (cb.getPieces(WHITE, QUEEN) != 0) {
 			value = Long.bitCount(cb.getPieces(WHITE, NIGHT)) * IMBALANCE_SCORES[IX_QUEEN_NIGHT];
-			getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O * value;
-			getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E * value;
+			signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_QUEEN_KNIGHTS).addStrength(value, openingPart);
 		}
 		if (cb.getPieces(BLACK, QUEEN) != 0) {
 			value = Long.bitCount(cb.getPieces(BLACK, NIGHT)) * IMBALANCE_SCORES[IX_QUEEN_NIGHT];
-			getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O * value;
-			getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E * value;
+			signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_QUEEN_KNIGHTS).addStrength(-value, openingPart);
 		}
 		
 		
 		// rook pair
-		if (Long.bitCount(cb.getPieces(WHITE, ROOK)) > 1) {
-			getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_ROOK_PAIR_O * IMBALANCE_SCORES[IX_ROOK_PAIR];
-			getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_ROOK_PAIR_E * IMBALANCE_SCORES[IX_ROOK_PAIR];
+		if (Long.bitCount(cb.getPieces(WHITE, ROOK)) > 1) {			
+			signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAIR).addStrength(IMBALANCE_SCORES[IX_ROOK_PAIR], openingPart);
 		}
 		if (Long.bitCount(cb.getPieces(BLACK, ROOK)) > 1) {
-			getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_ROOK_PAIR_O * IMBALANCE_SCORES[IX_ROOK_PAIR];
-			getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_ROOK_PAIR_E * IMBALANCE_SCORES[IX_ROOK_PAIR];
+			signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAIR).addStrength(-IMBALANCE_SCORES[IX_ROOK_PAIR], openingPart);
 		}
 	}
 	
@@ -171,15 +195,16 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 	private void fillPawnScores(ISignals signals) {
 		
 		
+		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
+		
+		
 		// penalty for doubled pawns
 		for (int i = 0; i < 8; i++) {
 			if (Long.bitCount(cb.getPieces(WHITE, PAWN) & FILES[i]) > 1) {
-				getEvalInfo().eval_o_part1 -= PAWN_DOUBLE_O * PAWN_SCORES[IX_PAWN_DOUBLE];
-				getEvalInfo().eval_e_part1 -= PAWN_DOUBLE_E * PAWN_SCORES[IX_PAWN_DOUBLE];
+				signals.getSignal(FEATURE_ID_PAWN_DOUBLE).addStrength(-PAWN_SCORES[IX_PAWN_DOUBLE], openingPart);
 			}
 			if (Long.bitCount(cb.getPieces(BLACK, PAWN) & FILES[i]) > 1) {
-				getEvalInfo().eval_o_part1 += PAWN_DOUBLE_O * PAWN_SCORES[IX_PAWN_DOUBLE];
-				getEvalInfo().eval_e_part1 += PAWN_DOUBLE_E * PAWN_SCORES[IX_PAWN_DOUBLE];
+				signals.getSignal(FEATURE_ID_PAWN_DOUBLE).addStrength(PAWN_SCORES[IX_PAWN_DOUBLE], openingPart);
 			}
 		}
 		
@@ -187,14 +212,12 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		// bonus for connected pawns
 		long pawns = getWhitePawnAttacks(cb.getPieces(WHITE, PAWN)) & cb.getPieces(WHITE, PAWN);
 		while (pawns != 0) {
-			getEvalInfo().eval_o_part1 += PAWN_CONNECTED_O * PAWN_CONNECTED[Long.numberOfTrailingZeros(pawns) / 8];
-			getEvalInfo().eval_e_part1 += PAWN_CONNECTED_E * PAWN_CONNECTED[Long.numberOfTrailingZeros(pawns) / 8];
+			signals.getSignal(FEATURE_ID_PAWN_CONNECTED).addStrength(PAWN_CONNECTED[Long.numberOfTrailingZeros(pawns) / 8], openingPart);
 			pawns &= pawns - 1;
 		}
 		pawns = getBlackPawnAttacks(cb.getPieces(BLACK, PAWN)) & cb.getPieces(BLACK, PAWN);
 		while (pawns != 0) {
-			getEvalInfo().eval_o_part1 -= PAWN_CONNECTED_O * PAWN_CONNECTED[7 - Long.numberOfTrailingZeros(pawns) / 8];
-			getEvalInfo().eval_e_part1 -= PAWN_CONNECTED_E * PAWN_CONNECTED[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			signals.getSignal(FEATURE_ID_PAWN_CONNECTED).addStrength(-PAWN_CONNECTED[7 - Long.numberOfTrailingZeros(pawns) / 8], openingPart);
 			pawns &= pawns - 1;
 		}
 		
@@ -202,14 +225,12 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		// bonus for neighbour pawns
 		pawns = getPawnNeighbours(cb.getPieces(WHITE, PAWN)) & cb.getPieces(WHITE, PAWN);
 		while (pawns != 0) {
-			getEvalInfo().eval_o_part1 += PAWN_NEIGHBOUR_O * PAWN_NEIGHBOUR[Long.numberOfTrailingZeros(pawns) / 8];
-			getEvalInfo().eval_e_part1 += PAWN_NEIGHBOUR_E * PAWN_NEIGHBOUR[Long.numberOfTrailingZeros(pawns) / 8];
+			signals.getSignal(FEATURE_ID_PAWN_NEIGHBOUR).addStrength(PAWN_NEIGHBOUR[Long.numberOfTrailingZeros(pawns) / 8], openingPart);
 			pawns &= pawns - 1;
 		}
 		pawns = getPawnNeighbours(cb.getPieces(BLACK, PAWN)) & cb.getPieces(BLACK, PAWN);
 		while (pawns != 0) {
-			getEvalInfo().eval_o_part1 -= PAWN_NEIGHBOUR_O * PAWN_NEIGHBOUR[7 - Long.numberOfTrailingZeros(pawns) / 8];
-			getEvalInfo().eval_e_part1 -= PAWN_NEIGHBOUR_E * PAWN_NEIGHBOUR[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			signals.getSignal(FEATURE_ID_PAWN_NEIGHBOUR).addStrength(-PAWN_NEIGHBOUR[7 - Long.numberOfTrailingZeros(pawns) / 8], openingPart);
 			pawns &= pawns - 1;
 		}
 		
@@ -241,8 +262,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			
 			// isolated pawns
 			if ((FILES_ADJACENT[index & 7] & cb.getPieces(WHITE, PAWN)) == 0) {
-				getEvalInfo().eval_o_part1 -= PAWN_ISOLATED_O * PAWN_SCORES[IX_PAWN_ISOLATED];
-				getEvalInfo().eval_e_part1 -= PAWN_ISOLATED_E * PAWN_SCORES[IX_PAWN_ISOLATED];
+				signals.getSignal(FEATURE_ID_PAWN_ISOLATED).addStrength(-PAWN_SCORES[IX_PAWN_ISOLATED], openingPart);
 			}
 			
 			
@@ -250,8 +270,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			else if ((getBlackAdjacentMask(index + 8) & cb.getPieces(WHITE, PAWN)) == 0) {
 				if ((PAWN_ATTACKS[WHITE][index + 8] & cb.getPieces(BLACK, PAWN)) != 0) {
 					if ((FILES[index & 7] & cb.getPieces(BLACK, PAWN)) == 0) {
-						getEvalInfo().eval_o_part1 -= PAWN_BACKWARD_O * PAWN_SCORES[IX_PAWN_BACKWARD];
-						getEvalInfo().eval_e_part1 -= PAWN_BACKWARD_E * PAWN_SCORES[IX_PAWN_BACKWARD];
+						signals.getSignal(FEATURE_ID_PAWN_BACKWARD).addStrength(-PAWN_SCORES[IX_PAWN_BACKWARD], openingPart);
 					}
 				}
 			}
@@ -259,8 +278,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			
 			// pawn defending 2 pawns
 			if (Long.bitCount(PAWN_ATTACKS[WHITE][index] & cb.getPieces(WHITE, PAWN)) == 2) {
-				getEvalInfo().eval_o_part1 -= PAWN_INVERSE_O * PAWN_SCORES[IX_PAWN_INVERSE];
-				getEvalInfo().eval_e_part1 -= PAWN_INVERSE_E * PAWN_SCORES[IX_PAWN_INVERSE];
+				signals.getSignal(FEATURE_ID_PAWN_INVERSE).addStrength(-PAWN_SCORES[IX_PAWN_INVERSE], openingPart);
 			}
 			
 			
@@ -274,8 +292,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			else if (63 - Long.numberOfLeadingZeros((cb.getPieces(WHITE, PAWN) | cb.getPieces(BLACK, PAWN)) & FILES[index & 7]) == index) {
 				if (Long.bitCount(cb.getPieces(WHITE, PAWN) & getBlackPassedPawnMask(index + 8)) >= Long
 						.bitCount(cb.getPieces(BLACK, PAWN) & getWhitePassedPawnMask(index))) {
-					getEvalInfo().eval_o_part1 += PAWN_PASSED_CANDIDATE_O * PASSED_CANDIDATE[index / 8];
-					getEvalInfo().eval_e_part1 += PAWN_PASSED_CANDIDATE_E * PASSED_CANDIDATE[index / 8];
+					signals.getSignal(FEATURE_ID_PAWN_PASSED_CANDIDATE).addStrength(PASSED_CANDIDATE[index / 8], openingPart);
 				}
 			}
 
@@ -291,8 +308,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			
 			// isolated pawns
 			if ((FILES_ADJACENT[index & 7] & cb.getPieces(BLACK, PAWN)) == 0) {
-				getEvalInfo().eval_o_part1 += PAWN_ISOLATED_O * PAWN_SCORES[IX_PAWN_ISOLATED];
-				getEvalInfo().eval_e_part1 += PAWN_ISOLATED_E * PAWN_SCORES[IX_PAWN_ISOLATED];
+				signals.getSignal(FEATURE_ID_PAWN_ISOLATED).addStrength(PAWN_SCORES[IX_PAWN_ISOLATED], openingPart);
 			}
 			
 			
@@ -300,8 +316,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			else if ((getWhiteAdjacentMask(index - 8) & cb.getPieces(BLACK, PAWN)) == 0) {
 				if ((PAWN_ATTACKS[BLACK][index - 8] & cb.getPieces(WHITE, PAWN)) != 0) {
 					if ((FILES[index & 7] & cb.getPieces(WHITE, PAWN)) == 0) {
-						getEvalInfo().eval_o_part1 += PAWN_BACKWARD_O * PAWN_SCORES[IX_PAWN_BACKWARD];
-						getEvalInfo().eval_e_part1 += PAWN_BACKWARD_E * PAWN_SCORES[IX_PAWN_BACKWARD];
+						signals.getSignal(FEATURE_ID_PAWN_BACKWARD).addStrength(PAWN_SCORES[IX_PAWN_BACKWARD], openingPart);
 					}
 				}
 			}
@@ -309,8 +324,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			
 			// pawn defending 2 pawns
 			if (Long.bitCount(PAWN_ATTACKS[BLACK][index] & cb.getPieces(BLACK, PAWN)) == 2) {
-				getEvalInfo().eval_o_part1 += PAWN_INVERSE_O * PAWN_SCORES[IX_PAWN_INVERSE];
-				getEvalInfo().eval_e_part1 += PAWN_INVERSE_E * PAWN_SCORES[IX_PAWN_INVERSE];
+				signals.getSignal(FEATURE_ID_PAWN_INVERSE).addStrength(PAWN_SCORES[IX_PAWN_INVERSE], openingPart);
 			}
 			
 			
@@ -324,8 +338,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			else if (Long.numberOfTrailingZeros((cb.getPieces(WHITE, PAWN) | cb.getPieces(BLACK, PAWN)) & FILES[index & 7]) == index) {
 				if (Long.bitCount(cb.getPieces(BLACK, PAWN) & getWhitePassedPawnMask(index - 8)) >= Long
 						.bitCount(cb.getPieces(WHITE, PAWN) & getBlackPassedPawnMask(index))) {
-					getEvalInfo().eval_o_part1 -= PAWN_PASSED_CANDIDATE_O * PASSED_CANDIDATE[7 - index / 8];
-					getEvalInfo().eval_e_part1 -= PAWN_PASSED_CANDIDATE_E * PASSED_CANDIDATE[7 - index / 8];
+					signals.getSignal(FEATURE_ID_PAWN_PASSED_CANDIDATE).addStrength(-PASSED_CANDIDATE[7 - index / 8], openingPart);
 				}
 			}
 			
@@ -336,6 +349,10 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 	
 	public void fillMobilityScoresAndSetAttackBoards(ISignals signals) {
 
+		
+		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
+		
+		
 		long moves;
 
 		// white pawns
@@ -383,11 +400,9 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 				getEvalInfo().attacks[color][NIGHT] |= moves;
 				int index = Long.bitCount(moves & safeMoves);
 				if (color == WHITE) {
-					getEvalInfo().eval_o_part2 += MOBILITY_KNIGHT_O * MOBILITY_KNIGHT_MG[index];	
-					getEvalInfo().eval_e_part2 += MOBILITY_KNIGHT_E * MOBILITY_KNIGHT_EG[index];
+					signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT).addStrength(interpolateInternal(MOBILITY_KNIGHT_MG[index], MOBILITY_KNIGHT_EG[index], openingPart), openingPart);
 				} else {
-					getEvalInfo().eval_o_part2 -= MOBILITY_KNIGHT_O * MOBILITY_KNIGHT_MG[index];	
-					getEvalInfo().eval_e_part2 -= MOBILITY_KNIGHT_E * MOBILITY_KNIGHT_EG[index];
+					signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT).addStrength(-interpolateInternal(MOBILITY_KNIGHT_MG[index], MOBILITY_KNIGHT_EG[index], openingPart), openingPart);
 				}
 				piece &= piece - 1;
 			}
@@ -404,11 +419,9 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 				getEvalInfo().attacks[color][BISHOP] |= moves;
 				int index = Long.bitCount(moves & safeMoves);
 				if (color == WHITE) {
-					getEvalInfo().eval_o_part2 += MOBILITY_BISHOP_O * MOBILITY_BISHOP_MG[index];	
-					getEvalInfo().eval_e_part2 += MOBILITY_BISHOP_E * MOBILITY_BISHOP_EG[index];
+					signals.getSignal(FEATURE_ID_MOBILITY_BISHOP).addStrength(interpolateInternal(MOBILITY_BISHOP_MG[index], MOBILITY_BISHOP_EG[index], openingPart), openingPart);
 				} else {
-					getEvalInfo().eval_o_part2 -= MOBILITY_BISHOP_O * MOBILITY_BISHOP_MG[index];	
-					getEvalInfo().eval_e_part2 -= MOBILITY_BISHOP_E * MOBILITY_BISHOP_EG[index];
+					signals.getSignal(FEATURE_ID_MOBILITY_BISHOP).addStrength(-interpolateInternal(MOBILITY_BISHOP_MG[index], MOBILITY_BISHOP_EG[index], openingPart), openingPart);
 				}
 				piece &= piece - 1;
 			}
@@ -425,11 +438,9 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 				getEvalInfo().attacks[color][ROOK] |= moves;
 				int index = Long.bitCount(moves & safeMoves);
 				if (color == WHITE) {
-					getEvalInfo().eval_o_part2 += MOBILITY_ROOK_O * MOBILITY_ROOK_MG[index];	
-					getEvalInfo().eval_e_part2 += MOBILITY_ROOK_E * MOBILITY_ROOK_EG[index];
+					signals.getSignal(FEATURE_ID_MOBILITY_ROOK).addStrength(interpolateInternal(MOBILITY_ROOK_MG[index], MOBILITY_ROOK_EG[index], openingPart), openingPart);
 				} else {
-					getEvalInfo().eval_o_part2 -= MOBILITY_ROOK_O * MOBILITY_ROOK_MG[index];	
-					getEvalInfo().eval_e_part2 -= MOBILITY_ROOK_E * MOBILITY_ROOK_EG[index];
+					signals.getSignal(FEATURE_ID_MOBILITY_ROOK).addStrength(-interpolateInternal(MOBILITY_ROOK_MG[index], MOBILITY_ROOK_EG[index], openingPart), openingPart);
 				}
 				piece &= piece - 1;
 			}
@@ -446,11 +457,9 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 				getEvalInfo().attacks[color][QUEEN] |= moves;
 				int index = Long.bitCount(moves & safeMoves);
 				if (color == WHITE) {
-					getEvalInfo().eval_o_part2 += MOBILITY_QUEEN_O * MOBILITY_QUEEN_MG[index];	
-					getEvalInfo().eval_e_part2 += MOBILITY_QUEEN_E * MOBILITY_QUEEN_EG[index];
+					signals.getSignal(FEATURE_ID_MOBILITY_QUEEN).addStrength(interpolateInternal(MOBILITY_QUEEN_MG[index], MOBILITY_QUEEN_EG[index], openingPart), openingPart);
 				} else {
-					getEvalInfo().eval_o_part2 -= MOBILITY_QUEEN_O * MOBILITY_QUEEN_MG[index];	
-					getEvalInfo().eval_e_part2 -= MOBILITY_QUEEN_E * MOBILITY_QUEEN_EG[index];
+					signals.getSignal(FEATURE_ID_MOBILITY_QUEEN).addStrength(-interpolateInternal(MOBILITY_QUEEN_MG[index], MOBILITY_QUEEN_EG[index], openingPart), openingPart);
 				}
 				piece &= piece - 1;
 			}
@@ -463,8 +472,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		getEvalInfo().doubleAttacks[WHITE] |= getEvalInfo().attacksAll[WHITE] & moves;
 		getEvalInfo().attacksAll[WHITE] |= moves;
 		int index = Long.bitCount(moves & ~cb.getFriendlyPieces(WHITE) & ~getEvalInfo().attacksAll[BLACK]);
-		getEvalInfo().eval_o_part2 += MOBILITY_KING_O * MOBILITY_KING_MG[index];	
-		getEvalInfo().eval_e_part2 += MOBILITY_KING_E * MOBILITY_KING_EG[index];
+		signals.getSignal(FEATURE_ID_MOBILITY_KING).addStrength(interpolateInternal(MOBILITY_KING_MG[index], MOBILITY_KING_EG[index], openingPart), openingPart);
 		
 		// BLACK king
 		moves = KING_MOVES[cb.getKingIndex(BLACK)] & ~KING_MOVES[cb.getKingIndex(WHITE)];
@@ -472,13 +480,16 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		getEvalInfo().doubleAttacks[BLACK] |= getEvalInfo().attacksAll[BLACK] & moves;
 		getEvalInfo().attacksAll[BLACK] |= moves;
 		index = Long.bitCount(moves & ~cb.getFriendlyPieces(BLACK) & ~getEvalInfo().attacksAll[WHITE]);
-		getEvalInfo().eval_o_part2 -= MOBILITY_KING_O * MOBILITY_KING_MG[index];	
-		getEvalInfo().eval_e_part2 -= MOBILITY_KING_E * MOBILITY_KING_EG[index];
+		signals.getSignal(FEATURE_ID_MOBILITY_KING).addStrength(-interpolateInternal(MOBILITY_KING_MG[index], MOBILITY_KING_EG[index], openingPart), openingPart);
 	}
 
 	
 	public void fillPassedPawnScores(ISignals signals) {
-
+		
+		
+		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
+		
+		
 		int whitePromotionDistance = SHORT_MAX;
 		int blackPromotionDistance = SHORT_MAX;
 
@@ -487,7 +498,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		while (passedPawns != 0) {
 			final int index = 63 - Long.numberOfLeadingZeros(passedPawns);
 
-			getPassedPawnScore(index, WHITE);
+			fillPassedPawnScore(index, WHITE, signals);
 
 			if (whitePromotionDistance == SHORT_MAX) {
 				whitePromotionDistance = getWhitePromotionDistance(index);
@@ -502,7 +513,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		while (passedPawns != 0) {
 			final int index = Long.numberOfTrailingZeros(passedPawns);
 
-			getPassedPawnScore(index, BLACK);
+			fillPassedPawnScore(index, BLACK, signals);
 
 			if (blackPromotionDistance == SHORT_MAX) {
 				blackPromotionDistance = getBlackPromotionDistance(index);
@@ -513,16 +524,87 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		}
 		
 		if (whitePromotionDistance < blackPromotionDistance - 1) {
-			getEvalInfo().eval_o_part2 += PAWN_PASSED_UNSTOPPABLE_O;
-			getEvalInfo().eval_e_part2 += PAWN_PASSED_UNSTOPPABLE_E;
+			signals.getSignal(FEATURE_ID_PAWN_PASSED_UNSTOPPABLE).addStrength(PASSED_UNSTOPPABLE, openingPart);
 		} else if (whitePromotionDistance > blackPromotionDistance + 1) {
-			getEvalInfo().eval_o_part2 -= PAWN_PASSED_UNSTOPPABLE_O;
-			getEvalInfo().eval_e_part2 -= PAWN_PASSED_UNSTOPPABLE_E;
+			signals.getSignal(FEATURE_ID_PAWN_PASSED_UNSTOPPABLE).addStrength(-PASSED_UNSTOPPABLE, openingPart);
+		}
+	}
+	
+	
+	protected void fillPassedPawnScore(final int index, final int color, ISignals signals) {
+
+		
+		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
+		
+		
+		final int nextIndex = index + ChessConstants.COLOR_FACTOR_8[color];
+		final long square = POWER_LOOKUP[index];
+		final long maskNextSquare = POWER_LOOKUP[nextIndex];
+		final long maskPreviousSquare = POWER_LOOKUP[index - ChessConstants.COLOR_FACTOR_8[color]];
+		final long maskFile = FILES[index & 7];
+		final int enemyColor = 1 - color;
+		float multiplier = 1;
+
+		// is piece blocked?
+		if ((cb.getAllPieces() & maskNextSquare) != 0) {
+			multiplier *= PASSED_MULTIPLIERS[0];
+		}
+
+		// is next squared attacked?
+		if ((getEvalInfo().attacksAll[enemyColor] & maskNextSquare) == 0) {
+
+			// complete path free of enemy attacks?
+			if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & getEvalInfo().attacksAll[enemyColor]) == 0) {
+				multiplier *= PASSED_MULTIPLIERS[7];
+			} else {
+				multiplier *= PASSED_MULTIPLIERS[1];
+			}
+		}
+
+		// is next squared defended?
+		if ((getEvalInfo().attacksAll[color] & maskNextSquare) != 0) {
+			multiplier *= PASSED_MULTIPLIERS[3];
+		}
+
+		// is enemy king in front?
+		if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & cb.getPieces(enemyColor, ChessConstants.KING)) != 0) {
+			multiplier *= PASSED_MULTIPLIERS[2];
+		}
+
+		// under attack?
+		if (cb.getColorToMove() != color && (getEvalInfo().attacksAll[enemyColor] & square) != 0) {
+			multiplier *= PASSED_MULTIPLIERS[4];
+		}
+
+		// defended by rook from behind?
+		if ((maskFile & cb.getPieces(color, ROOK)) != 0 && (getEvalInfo().attacks[color][ROOK] & square) != 0 && (getEvalInfo().attacks[color][ROOK] & maskPreviousSquare) != 0) {
+			multiplier *= PASSED_MULTIPLIERS[5];
+		}
+
+		// attacked by rook from behind?
+		else if ((maskFile & cb.getPieces(enemyColor, ROOK)) != 0 && (getEvalInfo().attacks[enemyColor][ROOK] & square) != 0
+				&& (getEvalInfo().attacks[enemyColor][ROOK] & maskPreviousSquare) != 0) {
+			multiplier *= PASSED_MULTIPLIERS[6];
+		}
+
+		// king tropism
+		multiplier *= PASSED_KING_MULTI[getDistance(cb.getKingIndex(color), index)];
+		multiplier *= PASSED_KING_MULTI[8 - getDistance(cb.getKingIndex(enemyColor), index)];
+
+		final int scoreIndex = (7 * color) + ChessConstants.COLOR_FACTOR[color] * index / 8;
+		
+		if (color == WHITE) {			
+			signals.getSignal(FEATURE_ID_PAWN_PASSED).addStrength(interpolateInternal(PASSED_SCORE_MG[scoreIndex] * multiplier, PASSED_SCORE_EG[scoreIndex] * multiplier, openingPart), openingPart);
+		} else {
+			signals.getSignal(FEATURE_ID_PAWN_PASSED).addStrength(-interpolateInternal(PASSED_SCORE_MG[scoreIndex] * multiplier, PASSED_SCORE_EG[scoreIndex] * multiplier, openingPart), openingPart);
 		}
 	}
 	
 	
 	public void fillThreats(ISignals signals) {
+		
+		
+		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
 		
 		
 		final long whitePawns = cb.getPieces(WHITE, PAWN);

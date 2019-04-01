@@ -1,14 +1,14 @@
-package bagaturchess.learning.goldmiddle.impl1;
+package bagaturchess.learning.goldmiddle.impl1.base;
 
 
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.BISHOP;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.BLACK;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.KING;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.NIGHT;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.PAWN;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.QUEEN;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.ROOK;
-import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.WHITE;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.BISHOP;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.BLACK;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.KING;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.NIGHT;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.PAWN;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.QUEEN;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.ROOK;
+import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.WHITE;
 import bagaturchess.bitboard.api.IBaseEval;
 
 
@@ -18,6 +18,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	//START EvalConstants
 	public static final int SIDE_TO_MOVE_BONUS = 16; //cannot be tuned //TODO lower in endgame
 	public static final int IN_CHECK = 20;
+	public static final int PASSED_UNSTOPPABLE = 350;
 	
 	// other
 	public static final int[] OTHER_SCORES = {-8, 12, 18, 8, 18, 12, 150, 12, 56};
@@ -692,11 +693,11 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		}
 		
 		if (whitePromotionDistance < blackPromotionDistance - 1) {
-			getEvalInfo().eval_o_part2 += PAWN_PASSED_UNSTOPPABLE_O;
-			getEvalInfo().eval_e_part2 += PAWN_PASSED_UNSTOPPABLE_E;
+			getEvalInfo().eval_o_part2 += PAWN_PASSED_UNSTOPPABLE_O * PASSED_UNSTOPPABLE;
+			getEvalInfo().eval_e_part2 += PAWN_PASSED_UNSTOPPABLE_E * PASSED_UNSTOPPABLE;
 		} else if (whitePromotionDistance > blackPromotionDistance + 1) {
-			getEvalInfo().eval_o_part2 -= PAWN_PASSED_UNSTOPPABLE_O;
-			getEvalInfo().eval_e_part2 -= PAWN_PASSED_UNSTOPPABLE_E;
+			getEvalInfo().eval_o_part2 -= PAWN_PASSED_UNSTOPPABLE_O * PASSED_UNSTOPPABLE;
+			getEvalInfo().eval_e_part2 -= PAWN_PASSED_UNSTOPPABLE_E * PASSED_UNSTOPPABLE;
 		}
 	}
 	
@@ -1457,6 +1458,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 
 	protected void getPassedPawnScore(final int index, final int color) {
 
+		
 		final int nextIndex = index + ChessConstants.COLOR_FACTOR_8[color];
 		final long square = POWER_LOOKUP[index];
 		final long maskNextSquare = POWER_LOOKUP[nextIndex];
@@ -1513,7 +1515,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 
 		final int scoreIndex = (7 * color) + ChessConstants.COLOR_FACTOR[color] * index / 8;
 		
-		if (color == WHITE) {
+		if (color == WHITE) {			
 			getEvalInfo().eval_o_part2 += PAWN_PASSED_O * PASSED_SCORE_MG[scoreIndex] * multiplier;
 			getEvalInfo().eval_e_part2 += PAWN_PASSED_E * PASSED_SCORE_EG[scoreIndex] * multiplier;
 		} else {
