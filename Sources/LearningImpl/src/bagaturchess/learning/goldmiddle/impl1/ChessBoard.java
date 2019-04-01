@@ -17,20 +17,16 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.learning.goldmiddle.impl1.eval;
+package bagaturchess.learning.goldmiddle.impl1;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.learning.goldmiddle.impl1.ChessConstants;
-import bagaturchess.learning.goldmiddle.impl1.Evaluator;
-import bagaturchess.learning.goldmiddle.impl1.Evaluator_BaseImpl;
-import bagaturchess.learning.goldmiddle.impl1.IChessBoard;
 
 
-class ChessBoard implements IChessBoard {
+public class ChessBoard implements IChessBoard {
 	
 	
 	private IBitBoard board;
@@ -47,7 +43,7 @@ class ChessBoard implements IChessBoard {
 	});
 	
 	
-	ChessBoard(IBitBoard _board) {
+	public ChessBoard(IBitBoard _board) {
 		board = _board;
 	}
 	

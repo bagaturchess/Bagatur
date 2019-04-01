@@ -2,6 +2,7 @@ package bagaturchess.learning.goldmiddle.impl1.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.learning.goldmiddle.impl1.ChessBoard;
 import bagaturchess.learning.goldmiddle.impl1.Evaluator;
 import bagaturchess.learning.goldmiddle.impl1.IChessBoard;
 import bagaturchess.search.api.IEvalConfig;

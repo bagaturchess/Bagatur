@@ -1,4 +1,23 @@
-package bagaturchess.learning.goldmiddle.impl1;
+/**
+ *  BagaturChess (UCI chess engine and tools)
+ *  Copyright (C) 2005 Krasimir I. Topchiyski (k_topchiyski@yahoo.com)
+ *  
+ *  This file is part of BagaturChess program.
+ * 
+ *  BagaturChess is open software: you can redistribute it and/or modify
+ *  it under the terms of the Eclipse Public License version 1.0 as published by
+ *  the Eclipse Foundation.
+ *
+ *  BagaturChess is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Eclipse Public License for more details.
+ *
+ *  You should have received a copy of the Eclipse Public License version 1.0
+ *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
+ *
+ */
+package bagaturchess.learning.goldmiddle.impl1.filler;
 
 
 import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.BISHOP;
@@ -9,268 +28,147 @@ import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.PAWN;
 import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.QUEEN;
 import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.ROOK;
 import static bagaturchess.learning.goldmiddle.impl1.ChessConstants.WHITE;
-import bagaturchess.bitboard.api.IBaseEval;
+import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl.state.PiecesList;
+import bagaturchess.learning.api.ISignalFiller;
+import bagaturchess.learning.api.ISignals;
+import bagaturchess.learning.goldmiddle.impl1.ChessBoard;
+import bagaturchess.learning.goldmiddle.impl1.ChessConstants;
+import bagaturchess.learning.goldmiddle.impl1.Evaluator;
 
 
-public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
+public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller, Bagatur_V17_FeaturesConstants {
 	
 	
-	//START EvalConstants
-	public static final int SIDE_TO_MOVE_BONUS = 16; //cannot be tuned //TODO lower in endgame
-	public static final int IN_CHECK = 20;
+	private PiecesList w_knights;
+	private PiecesList b_knights;
+	private PiecesList w_bishops;
+	private PiecesList b_bishops;
+	private PiecesList w_rooks;
+	private PiecesList b_rooks;
+	private PiecesList w_queens;
+	private PiecesList b_queens;
+	private PiecesList w_pawns;
+	private PiecesList b_pawns;
 	
-	// other
-	public static final int[] OTHER_SCORES = {-8, 12, 18, 8, 18, 12, 150, 12, 56};
-	public static final int IX_ROOK_FILE_SEMI_OPEN	 		= 0;
-	public static final int IX_ROOK_FILE_SEMI_OPEN_ISOLATED = 1;
-	public static final int IX_ROOK_FILE_OPEN 				= 2;
-	public static final int IX_ROOK_7TH_RANK 				= 3;
-	public static final int IX_ROOK_BATTERY 				= 4;
-	public static final int IX_BISHOP_LONG 					= 5;
-	public static final int IX_BISHOP_PRISON 				= 6;
-	public static final int IX_SPACE 						= 7;
-	public static final int IX_DRAWISH 						= 8;
 	
-	// threats
-	public static final int[] THREATS_MG = {38, 68, 100, 16, 56, 144, 66, 52, 8, 16, -6};
-	public static final int[] THREATS_EG = {36, 10, -38, 16, 40, 156, 6, -12, 20, 4, 6};
-	//public static final int[] THREATS = new int[THREATS_MG.length];
-	public static final int IX_MULTIPLE_PAWN_ATTACKS 		= 0;
-	public static final int IX_PAWN_ATTACKS 				= 1;
-	public static final int IX_QUEEN_ATTACKED 				= 2;
-	public static final int IX_PAWN_PUSH_THREAT 			= 3;
-	public static final int IX_NIGHT_FORK 					= 4;
-	public static final int IX_NIGHT_FORK_KING 				= 5;
-	public static final int IX_ROOK_ATTACKED 				= 6;
-	public static final int IX_QUEEN_ATTACKED_MINOR			= 7;
-	public static final int IX_MAJOR_ATTACKED				= 8;
-	public static final int IX_UNUSED_OUTPOST				= 9;
-	public static final int IX_PAWN_ATTACKED 				= 10;
-	
-	// pawn
-	public static final int[] PAWN_SCORES = {6, 10, 12, 6};
-	public static final int IX_PAWN_DOUBLE 					= 0;
-	public static final int IX_PAWN_ISOLATED 				= 1;
-	public static final int IX_PAWN_BACKWARD 				= 2;
-	public static final int IX_PAWN_INVERSE					= 3;
-	
-	// imbalance
-	public static final int[] IMBALANCE_SCORES = {32, 54, 16};
-	public static final int IX_ROOK_PAIR		 			= 0;
-	public static final int IX_BISHOP_DOUBLE 				= 1;
-	public static final int IX_QUEEN_NIGHT 					= 2;
-	
-	public static final int[] PHASE 					= {0, 0, 6, 6, 13, 28};
-	
-	public static final int[] MATERIAL 					= {0, 100, 396, 416, 706, 1302, 3000};
-	public static final int[] PINNED 					= {0, -2, 14, 42, 72, 88};
-	public static final int[] PINNED_ATTACKED			= {0, 28, 128, 274, 330, 210};
-	public static final int[] DISCOVERED		 		= {0, -14, 128, 110, 180, 0, 28};
-	public static final int[] KNIGHT_OUTPOST			= {0, 0, 10, 26, 24, 36, 8, 38};
-	public static final int[] BISHOP_OUTPOST			= {0, 0, 22, 22, 20, 22, 52, 50};
-	public static final int[] DOUBLE_ATTACKED 			= {0, 16, 34, 64, -4, -6, 0};
-	public static final int[] HANGING 					= {0, 16, 6, 0, -10, -18, 48}; //qsearch could set the other in check
-	public static final int[] HANGING_2 				= {0, 38, 90, 94, 52, -230};
-	public static final int[] ROOK_TRAPPED 				= {64, 62, 28};
-	public static final int[] ONLY_MAJOR_DEFENDERS 		= {0, 6, 14, 24, 4, 10, 0};
-	public static final int[] NIGHT_PAWN				= {68, -14, -2, 2, 8, 12, 20, 30, 36};
-	public static final int[] ROOK_PAWN					= {48, -4, -4, -4, -4, 0, 0, 0, 0};
-	public static final int[] BISHOP_PAWN 				= {-20, -8, -6, 0, 6, 12, 22, 32, 46};
-	public static final int[] SPACE 					= {0, 0, 0, 0, 0, -6, -6, -8, -7, -4, -4, -2, 0, -1, 0, 3, 7};
-	
-	public static final int[] PAWN_BLOCKAGE 			= {0, 0, -10, 2, 6, 28, 66, 196};
-	public static final int[] PAWN_CONNECTED			= {0, 0, 12, 14, 20, 58, 122};
-	public static final int[] PAWN_NEIGHBOUR	 		= {0, 0, 4, 10, 26, 88, 326};
-	
-	public static final int[][] SHIELD_BONUS_MG			= {	{0, 18, 14, 4, -24, -38, -270},
-															{0, 52, 36, 6, -44, 114, -250},
-															{0, 52, 4, 4, 46, 152, 16},
-															{0, 16, 4, 6, -16, 106, 2}};
-	public static final int[][] SHIELD_BONUS_EG			= {	{0, -48, -18, -16, 8, -30, -28},
-															{0, -16, -26, -10, 42, 6, 20},
-															{0, 0, 8, 0, 28, 24, 38},
-															{0, -22, -14, 0, 38, 10, 60}};
-	//public static final int[][] SHIELD_BONUS 			= new int[4][7];
-
-	public static final int[] PASSED_SCORE_MG			= {0, -4, -2, 0, 18, 22, -6};
-	public static final int[] PASSED_SCORE_EG			= {0, 18, 18, 38, 62, 136, 262};
-	
-	public static final int[] PASSED_CANDIDATE			= {0, 2, 2, 8, 14, 40};
-	
-	public static final float[] PASSED_KING_MULTI 		= {0, 1.4f, 1.3f, 1.1f, 1.1f, 1.0f, 0.8f, 0.8f};														
-	public static final float[] PASSED_MULTIPLIERS	= {
-			0.5f,	// blocked
-			1.2f,	// next square attacked
-			0.4f,	// enemy king in front
-			1.2f,	// next square defended
-			0.7f,	// attacked
-			1.6f,	// defended by rook from behind
-			0.6f,	// attacked by rook from behind
-			1.7f	// no enemy attacks in front
-	};	
-	
-	//concept borrowed from Ed Schroder
-	public static final int[] KS_SCORES = { //TODO negative values? //TODO first values are not used
-			0, 0, 0, 0, -140, -150, -120, -90, -40, 40, 70, 
-			80, 100, 110, 130, 160, 200, 230, 290, 330, 400, 
-			480, 550, 630, 660, 700, 790, 860, 920, 1200 };
-	public static final int[] KS_QUEEN_TROPISM 		= {0, 0, 1, 1, 1, 1, 0, 0};	// index 0 and 1 are never evaluated	
-	public static final int[] KS_RANK 				= {0, 0, 1, 1, 0, 0, 0, 0};
-	public static final int[] KS_CHECK				= {0, 0, 3, 2, 3};
-	public static final int[] KS_UCHECK				= {0, 0, 1, 1, 1};
-	public static final int[] KS_CHECK_QUEEN 		= {0, 0, 0, 0, 2, 3, 4, 4, 4, 4, 3, 3, 3, 2, 1, 1, 0};
-	public static final int[] KS_NO_FRIENDS 		= {6, 4, 0, 5, 5, 5, 6, 6, 7, 8, 9, 9};
-	public static final int[] KS_ATTACKS 			= {0, 3, 3, 3, 3, 3, 4, 4, 5, 6, 6, 2, 9};
-	public static final int[] KS_DOUBLE_ATTACKS 	= {0, 1, 3, 5, 2, -8, 0, 0, 0};
-	public static final int[] KS_ATTACK_PATTERN		= {	
-		 //                                                 Q  Q  Q  Q  Q  Q  Q  Q  Q  Q  Q  Q  Q  Q  Q  Q  
-		 // 	                    R  R  R  R  R  R  R  R                          R  R  R  R  R  R  R  R  
-		 //             B  B  B  B              B  B  B  B              B  B  B  B              B  B  B  B  
-		 //       N  N        N  N        N  N        N  N        N  N        N  N        N  N        N  N  
-		 //    P     P     P     P     P     P     P     P     P     P     P     P     P     P     P     P
-			4, 1, 2, 2, 2, 1, 2, 2, 1, 0, 1, 1, 1, 1, 1, 2, 2, 1, 2, 2, 2, 2, 3, 3, 1, 2, 3, 3, 3, 3, 4, 4
-	};
-	
-	public static final int[] KS_OTHER	= {		
-			3,		// queen-touch check
-			4,		// king at blocked first rank check
-			1		// open file
-	};		
+	public Bagatur_V17_SignalFiller(IBitBoard board) {
 		
-	public static final int[] MOBILITY_KNIGHT_MG	= {-34, -16, -6, 0, 12, 16, 26, 28, 56};
-	public static final int[] MOBILITY_KNIGHT_EG	= {-98, -34, -12, 0, 4, 12, 12, 14, 4};
-	public static final int[] MOBILITY_BISHOP_MG	= {-16, 2, 16, 24, 28, 36, 38, 40, 36, 42, 58, 82, 28, 120};
-	public static final int[] MOBILITY_BISHOP_EG	= {-36, -8, 6, 18, 28, 28, 36, 38, 42, 40, 32, 34, 54, 32};
-	public static final int[] MOBILITY_ROOK_MG 		= {-34, -24, -18, -14, -12, -4, 0, 8, 16, 26, 30, 40, 52, 68, 66};
-	public static final int[] MOBILITY_ROOK_EG 		= {-38, -12, 0, 8, 18, 24, 28, 28, 34, 34, 38, 40, 40, 42, 46};
-	public static final int[] MOBILITY_QUEEN_MG		= {-12, -14, -10, -14, -8, -6, -8, -8, -6, -4, -2, -2, -4, 2, 0, 0, 2, 16, 8, 22, 32, 66, 48, 156, 172, 236, 68, 336};
-	public static final int[] MOBILITY_QUEEN_EG 	= {-28, -82, -102, -82, -76, -54, -40, -24, -10, -2, 8, 24, 30, 32, 38, 54, 60, 46, 70, 72, 66, 66, 52, 18, -8, -32, 64, -94};
-	public static final int[] MOBILITY_KING_MG		= {-10, -12, -8, 0, 10, 26, 36, 70, 122};
-	public static final int[] MOBILITY_KING_EG		= {-38, -2, 8, 8, 2, -12, -12, -26, -60};
-	/*public static final int[] MOBILITY_KNIGHT		= new int[MOBILITY_KNIGHT_MG.length];
-	public static final int[] MOBILITY_BISHOP		= new int[MOBILITY_BISHOP_MG.length];
-	public static final int[] MOBILITY_ROOK			= new int[MOBILITY_ROOK_MG.length];
-	public static final int[] MOBILITY_QUEEN		= new int[MOBILITY_QUEEN_MG.length];
-	public static final int[] MOBILITY_KING			= new int[MOBILITY_KING_MG.length];
-	*/
-	
-	
-	public static final long[] ROOK_PRISON = { 
-			0, A8, A8_B8, A8B8C8, 0, G8_H8, H8, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, A1, A1_B1, A1B1C1, 0, G1_H1, H1, 0 
-	};
-	
-	public static final long[] BISHOP_PRISON = { 
-			0, 0, 0, 0, 0, 0, 0, 0, //8
-			B6_C7, 0, 0, 0, 0, 0, 0, G6_F7, //7
-			0, 0, 0, 0, 0, 0, 0, 0, //6
-			0, 0, 0, 0, 0, 0, 0, 0, //5
-			0, 0, 0, 0, 0, 0, 0, 0, //4
-			0, 0, 0, 0, 0, 0, 0, 0, //3
-			B3_C2, 0, 0, 0, 0, 0, 0, G3_F2, //2
-			0, 0, 0, 0, 0, 0, 0, 0  //1
-		 // A  B  C  D  E  F  G  H
-	};
-	
-	public static final int[] PROMOTION_SCORE = {
-			0,
-			0,
-			MATERIAL[NIGHT] 	- MATERIAL[PAWN],
-			MATERIAL[BISHOP] - MATERIAL[PAWN],
-			MATERIAL[ROOK] 	- MATERIAL[PAWN],
-			MATERIAL[QUEEN] 	- MATERIAL[PAWN],
-	};
-	
-	
-	public static final int[] MIRRORED_LEFT_RIGHT = new int[64];
-	static {
-		for (int i = 0; i < 64; i++) {
-			MIRRORED_LEFT_RIGHT[i] = (i / 8) * 8 + 7 - (i & 7);
-		}
-	}
-
-	public static final int[] MIRRORED_UP_DOWN = new int[64];
-	static {
-		for (int i = 0; i < 64; i++) {
-			MIRRORED_UP_DOWN[i] = (7 - i / 8) * 8 + (i & 7);
-		}
-	}
-	
-	static {
-		reverse(ROOK_PRISON);
-		reverse(BISHOP_PRISON);
-	}
-	//END EvalConstants
-	
-	
-	public static final int MG = 0;
-	public static final int EG = 1;
-
-	public static final int PHASE_TOTAL =
-			
-			4 * PHASE[NIGHT]
-			+ 4 * PHASE[BISHOP]
-			+ 4 * PHASE[ROOK]
-			+ 2 * PHASE[QUEEN];
-	
-	
-	private EvalInfo evalinfo;
-	protected IChessBoard cb;
-	private IBaseEval baseEval;
-	
-	
-	public Evaluator(IChessBoard _board) {
-		cb = _board;
-		baseEval = cb.getBoard().getBaseEvaluation();
-		evalinfo = new EvalInfo();
-	}
-
-
-	protected EvalInfo getEvalInfo() {
-		return evalinfo;
+		super(new ChessBoard(board));
+		
+		w_knights = cb.getBoard().getPiecesLists().getPieces(Constants.PID_W_KNIGHT);
+		b_knights = cb.getBoard().getPiecesLists().getPieces(Constants.PID_B_KNIGHT);
+		w_bishops = cb.getBoard().getPiecesLists().getPieces(Constants.PID_W_BISHOP);
+		b_bishops = cb.getBoard().getPiecesLists().getPieces(Constants.PID_B_BISHOP);
+		w_rooks = cb.getBoard().getPiecesLists().getPieces(Constants.PID_W_ROOK);
+		b_rooks = cb.getBoard().getPiecesLists().getPieces(Constants.PID_B_ROOK);
+		w_queens = cb.getBoard().getPiecesLists().getPieces(Constants.PID_W_QUEEN);
+		b_queens = cb.getBoard().getPiecesLists().getPieces(Constants.PID_B_QUEEN);
+		w_pawns = cb.getBoard().getPiecesLists().getPieces(Constants.PID_W_PAWN);
+		b_pawns = cb.getBoard().getPiecesLists().getPieces(Constants.PID_B_PAWN);
 	}
 	
 	
-	public int getScore1() {
+	@Override
+	public void fill(ISignals signals) {
 		
 		getEvalInfo().clearEvals1();
 		
-		calculatePawnScores();
-		calculateMaterialScore();
-		calculateImbalances();
+		fillMaterialScore(signals);
+		fillImbalances(signals);
+		fillPawnScores(signals);
 		
-		int psqt_o = (int) (PIECE_SQUARE_TABLE_O * cb.getPSQTScore_o());
-		int psqt_e = (int) (PIECE_SQUARE_TABLE_E * cb.getPSQTScore_e());
-		
-		return cb.getBoard().getMaterialFactor().interpolateByFactor(psqt_o + getEvalInfo().eval_o_part1, psqt_e + getEvalInfo().eval_e_part1);
-	}
-	
-	
-	public int getScore2() {
-		
-		// clear values
 		getEvalInfo().clearEvals2();
 		getEvalInfo().clearEvalAttacks();
 		
-		calculateMobilityScoresAndSetAttackBoards();
-		calculatePassedPawnScores();
-		calculateThreats();
-		calculatePawnShieldBonus();
-		calculateOthers();
-		calculateKingSafetyScores();
-		calculateSpace();
-		
-		return cb.getBoard().getMaterialFactor().interpolateByFactor(getEvalInfo().eval_o_part2, getEvalInfo().eval_e_part2);
+		fillMobilityScoresAndSetAttackBoards(signals);
+		fillPassedPawnScores(signals);
+		fillThreats(signals);
+		fillPawnShieldBonus(signals);
+		fillOthers(signals);
+		fillKingSafetyScores(signals);
+		fillSpace(signals);
 	}
 	
-
-	private void calculatePawnScores() {
+	
+	@Override
+	public void fillByComplexity(int complexity, ISignals signals) {
+		throw new UnsupportedOperationException("fillByComplexity");
+	}
+	
+	
+	public void fillMaterialScore(ISignals signals) {
+		
+		
+		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
+		
+		
+		signals.getSignal(FEATURE_ID_MATERIAL_PAWN).addStrength(w_pawns.getDataSize() - b_pawns.getDataSize(), openingPart);
+		signals.getSignal(FEATURE_ID_MATERIAL_KNIGHT).addStrength(w_knights.getDataSize() - b_knights.getDataSize(), openingPart);
+		signals.getSignal(FEATURE_ID_MATERIAL_BISHOP).addStrength(w_bishops.getDataSize() - b_bishops.getDataSize(), openingPart);
+		signals.getSignal(FEATURE_ID_MATERIAL_ROOK).addStrength(w_rooks.getDataSize() - b_rooks.getDataSize(), openingPart);
+		signals.getSignal(FEATURE_ID_MATERIAL_QUEEN).addStrength(w_queens.getDataSize() - b_queens.getDataSize(), openingPart);
+	}
+	
+	
+	private void fillImbalances(ISignals signals) {
+		
+		
+		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
+		
+		
+		// knight bonus if there are a lot of pawns
+		int value = Long.bitCount(cb.getPieces(WHITE, NIGHT)) * NIGHT_PAWN[Long.bitCount(cb.getPieces(WHITE, PAWN))];
+		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_NIGHT_PAWNS).addStrength(value, openingPart);
+		
+		value = Long.bitCount(cb.getPieces(BLACK, NIGHT)) * NIGHT_PAWN[Long.bitCount(cb.getPieces(BLACK, PAWN))];
+		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_NIGHT_PAWNS).addStrength(-value, openingPart);
+		
+		
+		// rook bonus if there are no pawns
+		value = Long.bitCount(cb.getPieces(WHITE, ROOK)) * ROOK_PAWN[Long.bitCount(cb.getPieces(WHITE, PAWN))];
+		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAWNS).addStrength(value, openingPart);
+		
+		value = Long.bitCount(cb.getPieces(BLACK, ROOK)) * ROOK_PAWN[Long.bitCount(cb.getPieces(BLACK, PAWN))];
+		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAWNS).addStrength(-value, openingPart);
+		
+		
+		// double bishop bonus
+		if (Long.bitCount(cb.getPieces(WHITE, BISHOP)) == 2) {
+			signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_BISHOP_DOUBLE).addStrength(IMBALANCE_SCORES[IX_BISHOP_DOUBLE], openingPart);		
+		}
+		if (Long.bitCount(cb.getPieces(BLACK, BISHOP)) == 2) {
+			signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_BISHOP_DOUBLE).addStrength(-IMBALANCE_SCORES[IX_BISHOP_DOUBLE], openingPart);
+		}
+		
+		
+		// queen and nights
+		if (cb.getPieces(WHITE, QUEEN) != 0) {
+			value = Long.bitCount(cb.getPieces(WHITE, NIGHT)) * IMBALANCE_SCORES[IX_QUEEN_NIGHT];
+			getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O * value;
+			getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E * value;
+		}
+		if (cb.getPieces(BLACK, QUEEN) != 0) {
+			value = Long.bitCount(cb.getPieces(BLACK, NIGHT)) * IMBALANCE_SCORES[IX_QUEEN_NIGHT];
+			getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O * value;
+			getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E * value;
+		}
+		
+		
+		// rook pair
+		if (Long.bitCount(cb.getPieces(WHITE, ROOK)) > 1) {
+			getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_ROOK_PAIR_O * IMBALANCE_SCORES[IX_ROOK_PAIR];
+			getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_ROOK_PAIR_E * IMBALANCE_SCORES[IX_ROOK_PAIR];
+		}
+		if (Long.bitCount(cb.getPieces(BLACK, ROOK)) > 1) {
+			getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_ROOK_PAIR_O * IMBALANCE_SCORES[IX_ROOK_PAIR];
+			getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_ROOK_PAIR_E * IMBALANCE_SCORES[IX_ROOK_PAIR];
+		}
+	}
+	
+	
+	private void fillPawnScores(ISignals signals) {
 		
 		
 		// penalty for doubled pawns
@@ -435,85 +333,8 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		}
 	}
 	
-
-	public void calculateMaterialScore() {
-		
-		
-		int w_eval_nopawns_o = baseEval.getWhiteMaterialNonPawns_o();
-		int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
-		int b_eval_nopawns_o = baseEval.getBlackMaterialNonPawns_o();
-		int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
-		
-		int w_eval_pawns_o = baseEval.getWhiteMaterialPawns_o();
-		int w_eval_pawns_e = baseEval.getWhiteMaterialPawns_e();
-		int b_eval_pawns_o = baseEval.getBlackMaterialPawns_o();
-		int b_eval_pawns_e = baseEval.getBlackMaterialPawns_e();
-
-		getEvalInfo().eval_o_part1 += (w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o);
-		getEvalInfo().eval_e_part1 += (w_eval_nopawns_e - b_eval_nopawns_e) + (w_eval_pawns_e - b_eval_pawns_e);
-	}
 	
-	
-	private void calculateImbalances() {
-		
-		
-		// knight bonus if there are a lot of pawns
-		int value = Long.bitCount(cb.getPieces(WHITE, NIGHT)) * NIGHT_PAWN[Long.bitCount(cb.getPieces(WHITE, PAWN))];
-		getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_NIGHT_PAWNS_O * value;
-		getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_NIGHT_PAWNS_E * value;
-		
-		value = Long.bitCount(cb.getPieces(BLACK, NIGHT)) * NIGHT_PAWN[Long.bitCount(cb.getPieces(BLACK, PAWN))];
-		getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_NIGHT_PAWNS_O * value;
-		getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_NIGHT_PAWNS_E * value;
-		
-		
-		// rook bonus if there are no pawns
-		value = Long.bitCount(cb.getPieces(WHITE, ROOK)) * ROOK_PAWN[Long.bitCount(cb.getPieces(WHITE, PAWN))];
-		getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_ROOK_PAWNS_O * value;
-		getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_ROOK_PAWNS_E * value;
-		
-		value = Long.bitCount(cb.getPieces(BLACK, ROOK)) * ROOK_PAWN[Long.bitCount(cb.getPieces(BLACK, PAWN))];
-		getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_ROOK_PAWNS_O * value;
-		getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_ROOK_PAWNS_E * value;
-		
-		
-		// double bishop bonus
-		if (Long.bitCount(cb.getPieces(WHITE, BISHOP)) == 2) {
-			getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_BISHOP_DOUBLE_O * IMBALANCE_SCORES[IX_BISHOP_DOUBLE];
-			getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_BISHOP_DOUBLE_E * IMBALANCE_SCORES[IX_BISHOP_DOUBLE];
-		}
-		if (Long.bitCount(cb.getPieces(BLACK, BISHOP)) == 2) {
-			getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_BISHOP_DOUBLE_O * IMBALANCE_SCORES[IX_BISHOP_DOUBLE];
-			getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_BISHOP_DOUBLE_E * IMBALANCE_SCORES[IX_BISHOP_DOUBLE];
-		}
-		
-		
-		// queen and nights
-		if (cb.getPieces(WHITE, QUEEN) != 0) {
-			value = Long.bitCount(cb.getPieces(WHITE, NIGHT)) * IMBALANCE_SCORES[IX_QUEEN_NIGHT];
-			getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O * value;
-			getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E * value;
-		}
-		if (cb.getPieces(BLACK, QUEEN) != 0) {
-			value = Long.bitCount(cb.getPieces(BLACK, NIGHT)) * IMBALANCE_SCORES[IX_QUEEN_NIGHT];
-			getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O * value;
-			getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E * value;
-		}
-		
-		
-		// rook pair
-		if (Long.bitCount(cb.getPieces(WHITE, ROOK)) > 1) {
-			getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_ROOK_PAIR_O * IMBALANCE_SCORES[IX_ROOK_PAIR];
-			getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_ROOK_PAIR_E * IMBALANCE_SCORES[IX_ROOK_PAIR];
-		}
-		if (Long.bitCount(cb.getPieces(BLACK, ROOK)) > 1) {
-			getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_ROOK_PAIR_O * IMBALANCE_SCORES[IX_ROOK_PAIR];
-			getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_ROOK_PAIR_E * IMBALANCE_SCORES[IX_ROOK_PAIR];
-		}
-	}
-	
-	
-	public void calculateMobilityScoresAndSetAttackBoards() {
+	public void fillMobilityScoresAndSetAttackBoards(ISignals signals) {
 
 		long moves;
 
@@ -656,7 +477,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	}
 
 	
-	public void calculatePassedPawnScores() {
+	public void fillPassedPawnScores(ISignals signals) {
 
 		int whitePromotionDistance = SHORT_MAX;
 		int blackPromotionDistance = SHORT_MAX;
@@ -701,7 +522,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	}
 	
 	
-	public void calculateThreats() {
+	public void fillThreats(ISignals signals) {
 		
 		
 		final long whitePawns = cb.getPieces(WHITE, PAWN);
@@ -869,7 +690,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	}
 	
 	
-	public void calculatePawnShieldBonus() {
+	public void fillPawnShieldBonus(ISignals signals) {
 
 		int file;
 
@@ -906,7 +727,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	}
 	
 	
-	public void calculateOthers() {
+	public void fillOthers(ISignals signals) {
 		
 		
 		long piece;
@@ -1253,7 +1074,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	}
 	
 	
-	public void calculateKingSafetyScores() {
+	public void fillKingSafetyScores(ISignals signals) {
 
 		for (int kingColor = WHITE; kingColor <= BLACK; kingColor++) {
 			final int enemyColor = 1 - kingColor;
@@ -1311,7 +1132,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	}
 	
 	
-	public void calculateSpace() {
+	public void fillSpace(ISignals signals) {
 
 		int score = 0;
 
@@ -1332,263 +1153,5 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 
 		getEvalInfo().eval_o_part2 += SPACE_O * score;
 		getEvalInfo().eval_e_part2 += SPACE_E * score;
-	}
-	
-	
-	protected int openFiles(final int kingColor, final long pawns) {
-
-		if (cb.getPieces(1 - kingColor, QUEEN) == 0) {
-			return 0;
-		}
-		if (Long.bitCount(cb.getPieces(1 - kingColor, ROOK)) < 2) {
-			return 0;
-		}
-
-		if ((RANK_FIRST[kingColor] & cb.getPieces(kingColor, KING)) != 0) {
-			if ((KING_SIDE & cb.getPieces(kingColor, KING)) != 0) {
-				if ((FILE_G & pawns) == 0 || (FILE_H & pawns) == 0) {
-					return KS_OTHER[2];
-				}
-			} else if ((QUEEN_SIDE & cb.getPieces(kingColor, KING)) != 0) {
-				if ((FILE_A & pawns) == 0 || (FILE_B & pawns) == 0) {
-					return KS_OTHER[2];
-				}
-			}
-		}
-		return 0;
-	}
-
-	protected int checks(final int kingColor) {
-		final int enemyColor = 1 - kingColor;
-		final int kingIndex = cb.getKingIndex(kingColor);
-		final long possibleSquares = ~cb.getFriendlyPieces(enemyColor)
-				& (~KING_MOVES[kingIndex] | KING_MOVES[kingIndex] & getEvalInfo().doubleAttacks[enemyColor] & ~getEvalInfo().doubleAttacks[kingColor]);
-
-		int counter = checkNight(kingColor, KNIGHT_MOVES[kingIndex] & possibleSquares & getEvalInfo().attacks[enemyColor][NIGHT]);
-
-		long moves;
-		long queenMoves = 0;
-		if ((cb.getPieces(enemyColor, QUEEN) | cb.getPieces(enemyColor, BISHOP)) != 0) {
-			moves = getBishopMoves(kingIndex, cb.getAllPieces() ^ cb.getPieces(kingColor, QUEEN)) & possibleSquares;
-			queenMoves = moves;
-			counter += checkBishop(kingColor, moves & getEvalInfo().attacks[enemyColor][BISHOP]);
-		}
-		if ((cb.getPieces(enemyColor, QUEEN) | cb.getPieces(enemyColor, ROOK)) != 0) {
-			moves = getRookMoves(kingIndex, cb.getAllPieces() ^ cb.getPieces(kingColor, QUEEN)) & possibleSquares;
-			queenMoves |= moves;
-			counter += checkRook(kingColor, moves & getEvalInfo().attacks[enemyColor][ROOK]);
-		}
-
-		if (Long.bitCount(cb.getPieces(enemyColor, QUEEN)) == 1) {
-			counter += safeCheckQueen(kingColor, queenMoves & ~getEvalInfo().attacksAll[kingColor] & getEvalInfo().attacks[enemyColor][QUEEN]);
-			counter += safeCheckQueenTouch(kingColor);
-		}
-
-		return counter;
-	}
-
-	private int safeCheckQueenTouch(final int kingColor) {
-		if ((getEvalInfo().kingAttackersFlag[1 - kingColor] & ChessConstants.FLAG_QUEEN) == 0) {
-			return 0;
-		}
-		final int enemyColor = 1 - kingColor;
-		if ((KING_MOVES[cb.getKingIndex(kingColor)] & ~cb.getFriendlyPieces(enemyColor) & getEvalInfo().attacks[enemyColor][QUEEN] & ~getEvalInfo().doubleAttacks[kingColor]
-				& getEvalInfo().doubleAttacks[enemyColor]) != 0) {
-			return KS_OTHER[0];
-		}
-		return 0;
-	}
-
-	private int safeCheckQueen(final int kingColor, final long safeQueenMoves) {
-		if (safeQueenMoves != 0) {
-			return KS_CHECK_QUEEN[Long.bitCount(cb.getFriendlyPieces(kingColor))];
-		}
-
-		return 0;
-	}
-
-	private int checkRook(final int kingColor, final long rookMoves) {
-		if (rookMoves == 0) {
-			return 0;
-		}
-
-		int counter = 0;
-		if ((rookMoves & ~getEvalInfo().attacksAll[kingColor]) != 0) {
-			counter += KS_CHECK[ROOK];
-
-			// last rank?
-			if (kingBlockedAtLastRank(kingColor, KING_MOVES[cb.getKingIndex(kingColor)] & cb.getEmptySpaces() & ~getEvalInfo().attacksAll[1 - kingColor])) {
-				counter += KS_OTHER[1];
-			}
-
-		} else {
-			counter += KS_UCHECK[ROOK];
-		}
-
-		return counter;
-	}
-
-	private int checkBishop(final int kingColor, final long bishopMoves) {
-		if (bishopMoves != 0) {
-			if ((bishopMoves & ~getEvalInfo().attacksAll[kingColor]) != 0) {
-				return KS_CHECK[BISHOP];
-			} else {
-				return KS_UCHECK[BISHOP];
-			}
-		}
-		return 0;
-	}
-
-	private int checkNight(final int kingColor, final long nightMoves) {
-		if (nightMoves != 0) {
-			if ((nightMoves & ~getEvalInfo().attacksAll[kingColor]) != 0) {
-				return KS_CHECK[NIGHT];
-			} else {
-				return KS_UCHECK[NIGHT];
-			}
-		}
-		return 0;
-	}
-
-	private boolean kingBlockedAtLastRank(final int kingColor, final long safeKingMoves) {
-		return (RANKS[7 * kingColor] & cb.getPieces(kingColor, KING)) != 0 && (safeKingMoves & RANKS[7 * kingColor]) == safeKingMoves;
-	}
-	
-
-	protected void getPassedPawnScore(final int index, final int color) {
-
-		final int nextIndex = index + ChessConstants.COLOR_FACTOR_8[color];
-		final long square = POWER_LOOKUP[index];
-		final long maskNextSquare = POWER_LOOKUP[nextIndex];
-		final long maskPreviousSquare = POWER_LOOKUP[index - ChessConstants.COLOR_FACTOR_8[color]];
-		final long maskFile = FILES[index & 7];
-		final int enemyColor = 1 - color;
-		float multiplier = 1;
-
-		// is piece blocked?
-		if ((cb.getAllPieces() & maskNextSquare) != 0) {
-			multiplier *= PASSED_MULTIPLIERS[0];
-		}
-
-		// is next squared attacked?
-		if ((getEvalInfo().attacksAll[enemyColor] & maskNextSquare) == 0) {
-
-			// complete path free of enemy attacks?
-			if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & getEvalInfo().attacksAll[enemyColor]) == 0) {
-				multiplier *= PASSED_MULTIPLIERS[7];
-			} else {
-				multiplier *= PASSED_MULTIPLIERS[1];
-			}
-		}
-
-		// is next squared defended?
-		if ((getEvalInfo().attacksAll[color] & maskNextSquare) != 0) {
-			multiplier *= PASSED_MULTIPLIERS[3];
-		}
-
-		// is enemy king in front?
-		if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & cb.getPieces(enemyColor, ChessConstants.KING)) != 0) {
-			multiplier *= PASSED_MULTIPLIERS[2];
-		}
-
-		// under attack?
-		if (cb.getColorToMove() != color && (getEvalInfo().attacksAll[enemyColor] & square) != 0) {
-			multiplier *= PASSED_MULTIPLIERS[4];
-		}
-
-		// defended by rook from behind?
-		if ((maskFile & cb.getPieces(color, ROOK)) != 0 && (getEvalInfo().attacks[color][ROOK] & square) != 0 && (getEvalInfo().attacks[color][ROOK] & maskPreviousSquare) != 0) {
-			multiplier *= PASSED_MULTIPLIERS[5];
-		}
-
-		// attacked by rook from behind?
-		else if ((maskFile & cb.getPieces(enemyColor, ROOK)) != 0 && (getEvalInfo().attacks[enemyColor][ROOK] & square) != 0
-				&& (getEvalInfo().attacks[enemyColor][ROOK] & maskPreviousSquare) != 0) {
-			multiplier *= PASSED_MULTIPLIERS[6];
-		}
-
-		// king tropism
-		multiplier *= PASSED_KING_MULTI[getDistance(cb.getKingIndex(color), index)];
-		multiplier *= PASSED_KING_MULTI[8 - getDistance(cb.getKingIndex(enemyColor), index)];
-
-		final int scoreIndex = (7 * color) + ChessConstants.COLOR_FACTOR[color] * index / 8;
-		
-		if (color == WHITE) {
-			getEvalInfo().eval_o_part2 += PAWN_PASSED_O * PASSED_SCORE_MG[scoreIndex] * multiplier;
-			getEvalInfo().eval_e_part2 += PAWN_PASSED_E * PASSED_SCORE_EG[scoreIndex] * multiplier;
-		} else {
-			getEvalInfo().eval_o_part2 -= PAWN_PASSED_O * PASSED_SCORE_MG[scoreIndex] * multiplier;
-			getEvalInfo().eval_e_part2 -= PAWN_PASSED_E * PASSED_SCORE_EG[scoreIndex] * multiplier;	
-		}
-	}
-
-	protected int getBlackPromotionDistance(final int index) {
-		// check if it cannot be stopped
-		int promotionDistance = index >>> 3;
-		if (promotionDistance == 1 && cb.getColorToMove() == BLACK) {
-			if ((POWER_LOOKUP[index - 8] & (getEvalInfo().attacksAll[WHITE] | cb.getAllPieces())) == 0) {
-				if ((POWER_LOOKUP[index] & getEvalInfo().attacksAll[WHITE]) == 0) {
-					return 1;
-				}
-			}
-		}
-		return SHORT_MAX;
-	}
-
-	protected int getWhitePromotionDistance(final int index) {
-		// check if it cannot be stopped
-		int promotionDistance = 7 - index / 8;
-		if (promotionDistance == 1 && cb.getColorToMove() == WHITE) {
-			if ((POWER_LOOKUP[index + 8] & (getEvalInfo().attacksAll[BLACK] | cb.getAllPieces())) == 0) {
-				if ((POWER_LOOKUP[index] & getEvalInfo().attacksAll[BLACK]) == 0) {
-					return 1;
-				}
-			}
-		}
-		return SHORT_MAX;
-	}
-	
-	
-	protected static class EvalInfo {
-
-		// attack boards
-		public final long[][] attacks = new long[2][7];
-		public final long[] attacksAll = new long[2];
-		public final long[] doubleAttacks = new long[2];
-		public final int[] kingAttackersFlag = new int[2];
-
-		public long passedPawnsAndOutposts;
-		
-		public int eval_o_part1;
-		public int eval_e_part1;
-		public int eval_o_part2;
-		public int eval_e_part2;
-		
-		public void clearEvalAttacks() {
-			kingAttackersFlag[WHITE] = 0;
-			kingAttackersFlag[BLACK] = 0;
-			attacks[WHITE][NIGHT] = 0;
-			attacks[BLACK][NIGHT] = 0;
-			attacks[WHITE][BISHOP] = 0;
-			attacks[BLACK][BISHOP] = 0;
-			attacks[WHITE][ROOK] = 0;
-			attacks[BLACK][ROOK] = 0;
-			attacks[WHITE][QUEEN] = 0;
-			attacks[BLACK][QUEEN] = 0;
-			doubleAttacks[WHITE] = 0;
-			doubleAttacks[BLACK] = 0;
-		}
-		
-		
-		public void clearEvals1() {
-			eval_o_part1 = 0;
-			eval_e_part1 = 0;
-		}
-		
-		
-		public void clearEvals2() {
-			eval_o_part2 = 0;
-			eval_e_part2 = 0;
-		}
 	}
 }
