@@ -182,8 +182,9 @@ class ChessBoard implements IChessBoard {
 		}
 	}
 	
+	
 	@Override
-	public int interpolateScore(int scoreMg, int scoreEg) {
-		return board.getMaterialFactor().interpolateByFactor(scoreMg, scoreEg);
+	public IBitBoard getBoard() {
+		return board;
 	}
 }

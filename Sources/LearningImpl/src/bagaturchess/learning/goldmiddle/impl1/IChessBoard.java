@@ -19,6 +19,8 @@
  */
 package bagaturchess.learning.goldmiddle.impl1;
 
+import bagaturchess.bitboard.api.IBitBoard;
+
 
 public interface IChessBoard {
 	
@@ -41,5 +43,5 @@ public interface IChessBoard {
 	
 	public int getPieceType(int index);
 	
-	public int interpolateScore(int scoreMg, int scoreEg);
+	public IBitBoard getBoard();
 }

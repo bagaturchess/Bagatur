@@ -8,23 +8,23 @@ import bagaturchess.bitboard.common.Utils;
 public class BoardConfigImpl_V17 implements IBoardConfig {
 	
 	
-	private double MATERIAL_PAWN_O = 92;
-	private double MATERIAL_PAWN_E = 92;
+	private double MATERIAL_PAWN_O = 100;
+	private double MATERIAL_PAWN_E = 100;
 		
-	private double MATERIAL_KNIGHT_O = 385;
-	private double MATERIAL_KNIGHT_E = 385;
+	private double MATERIAL_KNIGHT_O = 396;
+	private double MATERIAL_KNIGHT_E = 396;
 	
-	private double MATERIAL_BISHOP_O = 385;
-	private double MATERIAL_BISHOP_E = 385;
+	private double MATERIAL_BISHOP_O = 416;
+	private double MATERIAL_BISHOP_E = 416;
 	
-	private double MATERIAL_ROOK_O = 593;
-	private double MATERIAL_ROOK_E = 593;
+	private double MATERIAL_ROOK_O = 706;
+	private double MATERIAL_ROOK_E = 706;
 	
-	private double MATERIAL_QUEEN_O = 1244;
-	private double MATERIAL_QUEEN_E = 1244;
+	private double MATERIAL_QUEEN_O = 1302;
+	private double MATERIAL_QUEEN_E = 1302;
 	
-	private double MATERIAL_KING_O = 9900;
-	private double MATERIAL_KING_E = 9900;
+	private double MATERIAL_KING_O = 3000;
+	private double MATERIAL_KING_E = 3000;
 	
 	
 	private double MATERIAL_BARIER_NOPAWNS_O	= Math.max(MATERIAL_KNIGHT_O, MATERIAL_BISHOP_O) + MATERIAL_PAWN_O;
