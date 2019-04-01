@@ -624,117 +624,97 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		while (piece != 0) {
 			int index = cb.getPieceType(Long.numberOfTrailingZeros(piece));
 			int value = DOUBLE_ATTACKED[index];
-			getEvalInfo().eval_o_part2 += THREAT_DOUBLE_ATTACKED_O * value;
-			getEvalInfo().eval_e_part2 += THREAT_DOUBLE_ATTACKED_E * value;
+			signals.getSignal(FEATURE_ID_THREAT_DOUBLE_ATTACKED).addStrength(value, openingPart);
 			piece &= piece - 1;
 		}
 		piece = getEvalInfo().doubleAttacks[BLACK] & whites;
 		while (piece != 0) {
 			int index = cb.getPieceType(Long.numberOfTrailingZeros(piece));
 			int value = DOUBLE_ATTACKED[index];
-			getEvalInfo().eval_o_part2 -= THREAT_DOUBLE_ATTACKED_O * value;
-			getEvalInfo().eval_e_part2 -= THREAT_DOUBLE_ATTACKED_E * value;
+			signals.getSignal(FEATURE_ID_THREAT_DOUBLE_ATTACKED).addStrength(-value, openingPart);
 			piece &= piece - 1;
 		}
 		
 		
 		// unused outposts
 		int count = Long.bitCount(getEvalInfo().passedPawnsAndOutposts & cb.getEmptySpaces() & whiteMinorAttacks & whitePawnAttacks);
-		getEvalInfo().eval_o_part2 += THREAT_UNUSED_OUTPOST_O * count * THREATS_MG[IX_UNUSED_OUTPOST];
-		getEvalInfo().eval_e_part2 += THREAT_UNUSED_OUTPOST_E * count * THREATS_EG[IX_UNUSED_OUTPOST];
+		signals.getSignal(FEATURE_ID_THREAT_UNUSED_OUTPOST).addStrength(interpolateInternal(count * THREATS_MG[IX_UNUSED_OUTPOST], count * THREATS_EG[IX_UNUSED_OUTPOST], openingPart), openingPart);
 		
 		count = Long.bitCount(getEvalInfo().passedPawnsAndOutposts & cb.getEmptySpaces() & blackMinorAttacks & blackPawnAttacks);
-		getEvalInfo().eval_o_part2 -= THREAT_UNUSED_OUTPOST_O * count * THREATS_MG[IX_UNUSED_OUTPOST];
-		getEvalInfo().eval_e_part2 -= THREAT_UNUSED_OUTPOST_E * count * THREATS_EG[IX_UNUSED_OUTPOST];
+		signals.getSignal(FEATURE_ID_THREAT_UNUSED_OUTPOST).addStrength(-interpolateInternal(count * THREATS_MG[IX_UNUSED_OUTPOST], count * THREATS_EG[IX_UNUSED_OUTPOST], openingPart), openingPart);
 		
 		
 		// pawn push threat
 		piece = (whitePawns << 8) & cb.getEmptySpaces() & ~blackAttacks;
 		count = Long.bitCount(getWhitePawnAttacks(piece) & blacks);
-		getEvalInfo().eval_o_part2 += THREAT_PAWN_PUSH_O * count * THREATS_MG[IX_PAWN_PUSH_THREAT];
-		getEvalInfo().eval_e_part2 += THREAT_PAWN_PUSH_E * count * THREATS_EG[IX_PAWN_PUSH_THREAT];
-		 
+		signals.getSignal(FEATURE_ID_THREAT_PAWN_PUSH).addStrength(interpolateInternal(count * THREATS_MG[IX_PAWN_PUSH_THREAT], count * THREATS_EG[IX_PAWN_PUSH_THREAT], openingPart), openingPart);
+		
 		piece = (blackPawns >>> 8) & cb.getEmptySpaces() & ~whiteAttacks;
 		count = Long.bitCount(getBlackPawnAttacks(piece) & whites);
-		getEvalInfo().eval_o_part2 -= THREAT_PAWN_PUSH_O * count * THREATS_MG[IX_PAWN_PUSH_THREAT];
-		getEvalInfo().eval_e_part2 -= THREAT_PAWN_PUSH_E * count * THREATS_EG[IX_PAWN_PUSH_THREAT];
+		signals.getSignal(FEATURE_ID_THREAT_PAWN_PUSH).addStrength(-interpolateInternal(count * THREATS_MG[IX_PAWN_PUSH_THREAT], count * THREATS_EG[IX_PAWN_PUSH_THREAT], openingPart), openingPart);
 		
 		
 		// piece is attacked by a pawn
 		count = Long.bitCount(whitePawnAttacks & blacks & ~blackPawns);
-		getEvalInfo().eval_o_part2 += THREAT_PAWN_ATTACKS_O * count * THREATS_MG[IX_PAWN_ATTACKS];
-		getEvalInfo().eval_e_part2 += THREAT_PAWN_ATTACKS_E * count * THREATS_EG[IX_PAWN_ATTACKS];
+		signals.getSignal(FEATURE_ID_THREAT_PAWN_ATTACKS).addStrength(interpolateInternal(count * THREATS_MG[IX_PAWN_ATTACKS], count * THREATS_EG[IX_PAWN_ATTACKS], openingPart), openingPart);
 		
 		count = Long.bitCount(blackPawnAttacks & whites & ~whitePawns);
-		getEvalInfo().eval_o_part2 -= THREAT_PAWN_ATTACKS_O * count * THREATS_MG[IX_PAWN_ATTACKS];
-		getEvalInfo().eval_e_part2 -= THREAT_PAWN_ATTACKS_E * count * THREATS_EG[IX_PAWN_ATTACKS];
+		signals.getSignal(FEATURE_ID_THREAT_PAWN_ATTACKS).addStrength(-interpolateInternal(count * THREATS_MG[IX_PAWN_ATTACKS], count * THREATS_EG[IX_PAWN_ATTACKS], openingPart), openingPart);
 		
 		
 		// multiple pawn attacks possible
 		if (Long.bitCount(whitePawnAttacks & blacks) > 1) {
-			getEvalInfo().eval_o_part2 += THREAT_MULTIPLE_PAWN_ATTACKS_O * count * THREATS_MG[IX_MULTIPLE_PAWN_ATTACKS];
-			getEvalInfo().eval_e_part2 += THREAT_MULTIPLE_PAWN_ATTACKS_E * count * THREATS_EG[IX_MULTIPLE_PAWN_ATTACKS];
+			signals.getSignal(FEATURE_ID_THREAT_MULTIPLE_PAWN_ATTACKS).addStrength(interpolateInternal(THREATS_MG[IX_MULTIPLE_PAWN_ATTACKS], THREATS_EG[IX_MULTIPLE_PAWN_ATTACKS], openingPart), openingPart);
 		}
 		if (Long.bitCount(blackPawnAttacks & whites) > 1) {
-			getEvalInfo().eval_o_part2 -= THREAT_MULTIPLE_PAWN_ATTACKS_O * count * THREATS_MG[IX_MULTIPLE_PAWN_ATTACKS];
-			getEvalInfo().eval_e_part2 -= THREAT_MULTIPLE_PAWN_ATTACKS_E * count * THREATS_EG[IX_MULTIPLE_PAWN_ATTACKS];
+			signals.getSignal(FEATURE_ID_THREAT_MULTIPLE_PAWN_ATTACKS).addStrength(-interpolateInternal(THREATS_MG[IX_MULTIPLE_PAWN_ATTACKS], THREATS_EG[IX_MULTIPLE_PAWN_ATTACKS], openingPart), openingPart);
 		}
 		
 		
 		// minors under attack and not defended by a pawn
 		count = Long.bitCount(whiteAttacks & (cb.getPieces(BLACK, NIGHT) | cb.getPieces(BLACK, BISHOP) & ~blackAttacks));
-		getEvalInfo().eval_o_part2 += THREAT_MAJOR_ATTACKED_O * count * THREATS_MG[IX_MAJOR_ATTACKED];
-		getEvalInfo().eval_e_part2 += THREAT_MAJOR_ATTACKED_E * count * THREATS_EG[IX_MAJOR_ATTACKED];
+		signals.getSignal(FEATURE_ID_THREAT_MAJOR_ATTACKED).addStrength(interpolateInternal(count * THREATS_MG[IX_MAJOR_ATTACKED], count * THREATS_EG[IX_MAJOR_ATTACKED], openingPart), openingPart);
 		
 		count = Long.bitCount(blackAttacks & (cb.getPieces(WHITE, NIGHT) | cb.getPieces(WHITE, BISHOP) & ~whiteAttacks));
-		getEvalInfo().eval_o_part2 -= THREAT_MAJOR_ATTACKED_O * count * THREATS_MG[IX_MAJOR_ATTACKED];
-		getEvalInfo().eval_e_part2 -= THREAT_MAJOR_ATTACKED_E * count * THREATS_EG[IX_MAJOR_ATTACKED];
+		signals.getSignal(FEATURE_ID_THREAT_MAJOR_ATTACKED).addStrength(-interpolateInternal(count * THREATS_MG[IX_MAJOR_ATTACKED], count * THREATS_EG[IX_MAJOR_ATTACKED], openingPart), openingPart);
 		
 		
 		// pawn attacked
 		count = Long.bitCount(whiteAttacks & blackPawns);
-		getEvalInfo().eval_o_part2 += THREAT_PAWN_ATTACKED_O * count * THREATS_MG[IX_PAWN_ATTACKED];
-		getEvalInfo().eval_e_part2 += THREAT_PAWN_ATTACKED_E * count * THREATS_EG[IX_PAWN_ATTACKED];
+		signals.getSignal(FEATURE_ID_THREAT_PAWN_ATTACKED).addStrength(interpolateInternal(count * THREATS_MG[IX_PAWN_ATTACKED], count * THREATS_EG[IX_PAWN_ATTACKED], openingPart), openingPart);
 		
 		count = Long.bitCount(blackAttacks & whitePawns);
-		getEvalInfo().eval_o_part2 -= THREAT_PAWN_ATTACKED_O * count * THREATS_MG[IX_PAWN_ATTACKED];
-		getEvalInfo().eval_e_part2 -= THREAT_PAWN_ATTACKED_E * count * THREATS_EG[IX_PAWN_ATTACKED];
+		signals.getSignal(FEATURE_ID_THREAT_PAWN_ATTACKED).addStrength(-interpolateInternal(count * THREATS_MG[IX_PAWN_ATTACKED], count * THREATS_EG[IX_PAWN_ATTACKED], openingPart), openingPart);
 		
 		
 		if (cb.getPieces(BLACK, QUEEN) != 0) {
 			// queen under attack by rook
 			count = Long.bitCount(getEvalInfo().attacks[WHITE][ROOK] & cb.getPieces(BLACK, QUEEN));
-			getEvalInfo().eval_o_part2 += THREAT_QUEEN_ATTACKED_ROOK_O * count * THREATS_MG[IX_QUEEN_ATTACKED];
-			getEvalInfo().eval_e_part2 += THREAT_QUEEN_ATTACKED_ROOK_E * count * THREATS_EG[IX_QUEEN_ATTACKED];
+			signals.getSignal(FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK).addStrength(interpolateInternal(count * THREATS_MG[IX_QUEEN_ATTACKED], count * THREATS_EG[IX_QUEEN_ATTACKED], openingPart), openingPart);
 			
 			// queen under attack by minors
 			count = Long.bitCount(whiteMinorAttacks & cb.getPieces(BLACK, QUEEN));
-			getEvalInfo().eval_o_part2 += THREAT_QUEEN_ATTACKED_MINOR_O * count * THREATS_MG[IX_QUEEN_ATTACKED_MINOR];
-			getEvalInfo().eval_e_part2 += THREAT_QUEEN_ATTACKED_MINOR_E * count * THREATS_EG[IX_QUEEN_ATTACKED_MINOR];
+			signals.getSignal(FEATURE_ID_THREAT_QUEEN_ATTACKED_MINOR).addStrength(interpolateInternal(count * THREATS_MG[IX_QUEEN_ATTACKED_MINOR], count * THREATS_EG[IX_QUEEN_ATTACKED_MINOR], openingPart), openingPart);
 		}
 
 		if (cb.getPieces(WHITE, QUEEN) != 0) {
 			// queen under attack by rook
 			count = Long.bitCount(getEvalInfo().attacks[BLACK][ROOK] & cb.getPieces(WHITE, QUEEN));
-			getEvalInfo().eval_o_part2 -= THREAT_QUEEN_ATTACKED_ROOK_O * count * THREATS_MG[IX_QUEEN_ATTACKED];
-			getEvalInfo().eval_e_part2 -= THREAT_QUEEN_ATTACKED_ROOK_E * count * THREATS_EG[IX_QUEEN_ATTACKED];
+			signals.getSignal(FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK).addStrength(-interpolateInternal(count * THREATS_MG[IX_QUEEN_ATTACKED], count * THREATS_EG[IX_QUEEN_ATTACKED], openingPart), openingPart);
 			
 			// queen under attack by minors
 			count = Long.bitCount(blackMinorAttacks & cb.getPieces(WHITE, QUEEN));
-			getEvalInfo().eval_o_part2 -= THREAT_QUEEN_ATTACKED_MINOR_O * count * THREATS_MG[IX_QUEEN_ATTACKED_MINOR];
-			getEvalInfo().eval_e_part2 -= THREAT_QUEEN_ATTACKED_MINOR_E * count * THREATS_EG[IX_QUEEN_ATTACKED_MINOR];
+			signals.getSignal(FEATURE_ID_THREAT_QUEEN_ATTACKED_MINOR).addStrength(-interpolateInternal(count * THREATS_MG[IX_QUEEN_ATTACKED_MINOR], count * THREATS_EG[IX_QUEEN_ATTACKED_MINOR], openingPart), openingPart);
 		}
 		
 		
 		// rook under attack by minors
 		count = Long.bitCount(whiteMinorAttacks & cb.getPieces(BLACK, ROOK));
-		getEvalInfo().eval_o_part2 += THREAT_ROOK_ATTACKED_O * count * THREATS_MG[IX_ROOK_ATTACKED];
-		getEvalInfo().eval_e_part2 += THREAT_ROOK_ATTACKED_E * count * THREATS_EG[IX_ROOK_ATTACKED];
+		signals.getSignal(FEATURE_ID_THREAT_ROOK_ATTACKED).addStrength(interpolateInternal(count * THREATS_MG[IX_ROOK_ATTACKED], count * THREATS_EG[IX_ROOK_ATTACKED], openingPart), openingPart);
 		
 		count = Long.bitCount(blackMinorAttacks & cb.getPieces(WHITE, ROOK));
-		getEvalInfo().eval_o_part2 -= THREAT_ROOK_ATTACKED_O * count * THREATS_MG[IX_ROOK_ATTACKED];
-		getEvalInfo().eval_e_part2 -= THREAT_ROOK_ATTACKED_E * count * THREATS_EG[IX_ROOK_ATTACKED];
-
+		signals.getSignal(FEATURE_ID_THREAT_ROOK_ATTACKED).addStrength(-interpolateInternal(count * THREATS_MG[IX_ROOK_ATTACKED], count * THREATS_EG[IX_ROOK_ATTACKED], openingPart), openingPart);
+		
 
 		// knight fork
 		// skip when testing eval values because we break the loop if any fork has been found
@@ -744,11 +724,9 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			forked = blacks & ~blackPawns & KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 			if (Long.bitCount(forked) > 1) {
 				if ((cb.getPieces(BLACK, KING) & forked) == 0) {
-					getEvalInfo().eval_o_part2 += THREAT_NIGHT_FORK_O * count * THREATS_MG[IX_NIGHT_FORK];
-					getEvalInfo().eval_e_part2 += THREAT_NIGHT_FORK_E * count * THREATS_EG[IX_NIGHT_FORK];
+					signals.getSignal(FEATURE_ID_THREAT_NIGHT_FORK).addStrength(interpolateInternal(THREATS_MG[IX_NIGHT_FORK], THREATS_EG[IX_NIGHT_FORK], openingPart), openingPart);
 				} else {
-					getEvalInfo().eval_o_part2 += THREAT_NIGHT_FORK_KING_O * count * THREATS_MG[IX_NIGHT_FORK_KING];
-					getEvalInfo().eval_e_part2 += THREAT_NIGHT_FORK_KING_E * count * THREATS_EG[IX_NIGHT_FORK_KING];
+					signals.getSignal(FEATURE_ID_THREAT_NIGHT_FORK_KING).addStrength(interpolateInternal(THREATS_MG[IX_NIGHT_FORK_KING], THREATS_EG[IX_NIGHT_FORK_KING], openingPart), openingPart);
 				}
 				break;
 			}
@@ -759,11 +737,9 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			forked = whites & ~whitePawns & KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 			if (Long.bitCount(forked) > 1) {
 				if ((cb.getPieces(WHITE, KING) & forked) == 0) {
-					getEvalInfo().eval_o_part2 -= THREAT_NIGHT_FORK_O * count * THREATS_MG[IX_NIGHT_FORK];
-					getEvalInfo().eval_e_part2 -= THREAT_NIGHT_FORK_E * count * THREATS_EG[IX_NIGHT_FORK];
+					signals.getSignal(FEATURE_ID_THREAT_NIGHT_FORK).addStrength(-interpolateInternal(THREATS_MG[IX_NIGHT_FORK], THREATS_EG[IX_NIGHT_FORK], openingPart), openingPart);
 				} else {
-					getEvalInfo().eval_o_part2 -= THREAT_NIGHT_FORK_KING_O * count * THREATS_MG[IX_NIGHT_FORK_KING];
-					getEvalInfo().eval_e_part2 -= THREAT_NIGHT_FORK_KING_E * count * THREATS_EG[IX_NIGHT_FORK_KING];
+					signals.getSignal(FEATURE_ID_THREAT_NIGHT_FORK_KING).addStrength(-interpolateInternal(THREATS_MG[IX_NIGHT_FORK_KING], THREATS_EG[IX_NIGHT_FORK_KING], openingPart), openingPart);
 				}
 				break;
 			}
@@ -774,6 +750,10 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 	
 	public void fillPawnShieldBonus(ISignals signals) {
 
+		
+		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
+		
+		
 		int file;
 
 		int whiteScore_o = 0;
@@ -804,12 +784,14 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			whiteScore_e /= 2;
 		}
 		
-		getEvalInfo().eval_o_part2 += PAWN_SHIELD_O * (whiteScore_o - blackScore_o);	
-		getEvalInfo().eval_e_part2 += PAWN_SHIELD_E * (whiteScore_e - blackScore_e);
+		signals.getSignal(FEATURE_ID_PAWN_SHIELD).addStrength(interpolateInternal((whiteScore_o - blackScore_o), (whiteScore_e - blackScore_e), openingPart), openingPart);
 	}
 	
 	
 	public void fillOthers(ISignals signals) {
+		
+		
+		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
 		
 		
 		long piece;
@@ -826,11 +808,9 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		
 		// bonus for side to move
 		if (cb.getColorToMove() == WHITE) {
-			getEvalInfo().eval_o_part2 += OTHERS_SIDE_TO_MOVE_O * SIDE_TO_MOVE_BONUS;
-			getEvalInfo().eval_e_part2 += OTHERS_SIDE_TO_MOVE_E * SIDE_TO_MOVE_BONUS;
+			signals.getSignal(FEATURE_ID_OTHERS_SIDE_TO_MOVE).addStrength(SIDE_TO_MOVE_BONUS, openingPart);
 		} else {
-			getEvalInfo().eval_o_part2 -= OTHERS_SIDE_TO_MOVE_O * SIDE_TO_MOVE_BONUS;
-			getEvalInfo().eval_e_part2 -= OTHERS_SIDE_TO_MOVE_E * SIDE_TO_MOVE_BONUS;
+			signals.getSignal(FEATURE_ID_OTHERS_SIDE_TO_MOVE).addStrength(-SIDE_TO_MOVE_BONUS, openingPart);
 		}
 		
 		
@@ -841,16 +821,15 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		piece = whites & blackAttacks & whiteAttacks & ~(whitePawnAttacks | getEvalInfo().attacks[WHITE][NIGHT] | getEvalInfo().attacks[WHITE][BISHOP]);
 		while (piece != 0) {
 			value = ONLY_MAJOR_DEFENDERS[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
-			getEvalInfo().eval_o_part2 -= OTHERS_ONLY_MAJOR_DEFENDERS_O * value;
-			getEvalInfo().eval_e_part2 -= OTHERS_ONLY_MAJOR_DEFENDERS_E * value;
+			signals.getSignal(FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS).addStrength(-value, openingPart);
 			
 			piece &= piece - 1;
 		}
+		
 		piece = blacks & whiteAttacks & blackAttacks & ~(blackPawnAttacks | getEvalInfo().attacks[BLACK][NIGHT] | getEvalInfo().attacks[BLACK][BISHOP]);
 		while (piece != 0) {
 			value = ONLY_MAJOR_DEFENDERS[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
-			getEvalInfo().eval_o_part2 += OTHERS_ONLY_MAJOR_DEFENDERS_O * value;
-			getEvalInfo().eval_e_part2 += OTHERS_ONLY_MAJOR_DEFENDERS_E * value;
+			signals.getSignal(FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS).addStrength(value, openingPart);
 			
 			piece &= piece - 1;
 		}
@@ -867,12 +846,10 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 					piece &= piece - 1;
 				}
 
-				getEvalInfo().eval_o_part2 += OTHERS_HANGING_2_O * HANGING_2[hangingIndex];
-				getEvalInfo().eval_e_part2 += OTHERS_HANGING_2_E * HANGING_2[hangingIndex];
+				signals.getSignal(FEATURE_ID_OTHERS_HANGING_2).addStrength(HANGING_2[hangingIndex], openingPart);
 				
 			} else {
-				getEvalInfo().eval_o_part2 += OTHERS_HANGING_O * HANGING[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
-				getEvalInfo().eval_e_part2 += OTHERS_HANGING_E * HANGING[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
+				signals.getSignal(FEATURE_ID_OTHERS_HANGING).addStrength(HANGING[cb.getPieceType(Long.numberOfTrailingZeros(piece))], openingPart);
 			}
 		}
 		piece = blackAttacks & whites & ~whiteAttacks;
@@ -884,11 +861,10 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 					piece &= piece - 1;
 				}
 
-				getEvalInfo().eval_o_part2 -= OTHERS_HANGING_2_O * HANGING_2[hangingIndex];
-				getEvalInfo().eval_e_part2 -= OTHERS_HANGING_2_E * HANGING_2[hangingIndex];
+				signals.getSignal(FEATURE_ID_OTHERS_HANGING_2).addStrength(-HANGING_2[hangingIndex], openingPart);
+				
 			} else {
-				getEvalInfo().eval_o_part2 -= OTHERS_HANGING_O * HANGING[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
-				getEvalInfo().eval_e_part2 -= OTHERS_HANGING_E * HANGING[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
+				signals.getSignal(FEATURE_ID_OTHERS_HANGING).addStrength(-HANGING[cb.getPieceType(Long.numberOfTrailingZeros(piece))], openingPart);
 			}
 		}
 		
@@ -901,16 +877,14 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			// rook battery (same file)
 			if (Long.bitCount(piece) == 2) {
 				if ((Long.numberOfTrailingZeros(piece) & 7) == (63 - Long.numberOfLeadingZeros(piece) & 7)) {
-					getEvalInfo().eval_o_part2 += OTHERS_ROOK_BATTERY_O * OTHER_SCORES[IX_ROOK_BATTERY];
-					getEvalInfo().eval_e_part2 += OTHERS_ROOK_BATTERY_E * OTHER_SCORES[IX_ROOK_BATTERY];
+					signals.getSignal(FEATURE_ID_OTHERS_ROOK_BATTERY).addStrength(OTHER_SCORES[IX_ROOK_BATTERY], openingPart);
 				}
 			}
 
 			// rook on 7th, king on 8th
 			if (cb.getKingIndex(BLACK) >= 56) {
 				value = Long.bitCount(piece & RANK_7) * OTHER_SCORES[IX_ROOK_7TH_RANK];
-				getEvalInfo().eval_o_part2 += OTHERS_ROOK_7TH_RANK_O * value;
-				getEvalInfo().eval_e_part2 += OTHERS_ROOK_7TH_RANK_E * value;
+				signals.getSignal(FEATURE_ID_OTHERS_ROOK_7TH_RANK).addStrength(value, openingPart);
 			}
 
 			// prison
@@ -918,8 +892,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			if (trapped != 0) {
 				for (int i = 8; i <= 24; i += 8) {
 					if ((trapped << i & whitePawns) != 0) {
-						getEvalInfo().eval_o_part2 -= OTHERS_ROOK_TRAPPED_O * ROOK_TRAPPED[(i / 8) - 1];
-						getEvalInfo().eval_e_part2 -= OTHERS_ROOK_TRAPPED_E * ROOK_TRAPPED[(i / 8) - 1];
+						signals.getSignal(FEATURE_ID_OTHERS_ROOK_TRAPPED).addStrength(-ROOK_TRAPPED[(i / 8) - 1], openingPart);
 						break;
 					}
 				}
@@ -930,18 +903,15 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 				if ((whitePawns & FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 					if ((blackPawns & FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 						
-						getEvalInfo().eval_o_part2 += OTHERS_ROOK_FILE_OPEN_O * OTHER_SCORES[IX_ROOK_FILE_OPEN];
-						getEvalInfo().eval_e_part2 += OTHERS_ROOK_FILE_OPEN_E * OTHER_SCORES[IX_ROOK_FILE_OPEN];
+						signals.getSignal(FEATURE_ID_OTHERS_ROOK_FILE_OPEN).addStrength(OTHER_SCORES[IX_ROOK_FILE_OPEN], openingPart);
 						
 					} else if ((blackPawns & blackPawnAttacks & FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 						
-						getEvalInfo().eval_o_part2 += OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_O * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
-						getEvalInfo().eval_e_part2 += OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_E * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
+						signals.getSignal(FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED).addStrength(OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED], openingPart);
 						
 					} else {
 						
-						getEvalInfo().eval_o_part2 += OTHERS_ROOK_FILE_SEMI_OPEN_O * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN];
-						getEvalInfo().eval_e_part2 += OTHERS_ROOK_FILE_SEMI_OPEN_E * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN];
+						signals.getSignal(FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN).addStrength(OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN], openingPart);
 					}
 				}
 
@@ -958,16 +928,14 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			// rook battery (same file)
 			if (Long.bitCount(piece) == 2) {
 				if ((Long.numberOfTrailingZeros(piece) & 7) == (63 - Long.numberOfLeadingZeros(piece) & 7)) {
-					getEvalInfo().eval_o_part2 -= OTHERS_ROOK_BATTERY_O * OTHER_SCORES[IX_ROOK_BATTERY];
-					getEvalInfo().eval_e_part2 -= OTHERS_ROOK_BATTERY_E * OTHER_SCORES[IX_ROOK_BATTERY];
+					signals.getSignal(FEATURE_ID_OTHERS_ROOK_BATTERY).addStrength(-OTHER_SCORES[IX_ROOK_BATTERY], openingPart);
 				}
 			}
 
 			// rook on 2nd, king on 1st
 			if (cb.getKingIndex(WHITE) <= 7) {
 				value = Long.bitCount(piece & RANK_2) * OTHER_SCORES[IX_ROOK_7TH_RANK];
-				getEvalInfo().eval_o_part2 -= OTHERS_ROOK_7TH_RANK_O * value;
-				getEvalInfo().eval_e_part2 -= OTHERS_ROOK_7TH_RANK_E * value;
+				signals.getSignal(FEATURE_ID_OTHERS_ROOK_7TH_RANK).addStrength(-value, openingPart);
 			}
 
 			// prison
@@ -975,8 +943,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			if (trapped != 0) {
 				for (int i = 8; i <= 24; i += 8) {
 					if ((trapped >>> i & blackPawns) != 0) {
-						getEvalInfo().eval_o_part2 += OTHERS_ROOK_TRAPPED_O * ROOK_TRAPPED[(i / 8) - 1];
-						getEvalInfo().eval_e_part2 += OTHERS_ROOK_TRAPPED_E * ROOK_TRAPPED[(i / 8) - 1];
+						signals.getSignal(FEATURE_ID_OTHERS_ROOK_TRAPPED).addStrength(ROOK_TRAPPED[(i / 8) - 1], openingPart);
 						break;
 					}
 				}
@@ -988,18 +955,15 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 				if ((blackPawns & FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 					if ((whitePawns & FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 						
-						getEvalInfo().eval_o_part2 -= OTHERS_ROOK_FILE_OPEN_O * OTHER_SCORES[IX_ROOK_FILE_OPEN];
-						getEvalInfo().eval_e_part2 -= OTHERS_ROOK_FILE_OPEN_E * OTHER_SCORES[IX_ROOK_FILE_OPEN];
+						signals.getSignal(FEATURE_ID_OTHERS_ROOK_FILE_OPEN).addStrength(-OTHER_SCORES[IX_ROOK_FILE_OPEN], openingPart);
 						
 					} else if ((whitePawns & whitePawnAttacks & FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 						
-						getEvalInfo().eval_o_part2 -= OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_O * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
-						getEvalInfo().eval_e_part2 -= OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_E * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
+						signals.getSignal(FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED).addStrength(-OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED], openingPart);
 						
 					} else {
 						
-						getEvalInfo().eval_o_part2 -= OTHERS_ROOK_FILE_SEMI_OPEN_O * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN];
-						getEvalInfo().eval_e_part2 -= OTHERS_ROOK_FILE_SEMI_OPEN_E * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN];
+						signals.getSignal(FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN).addStrength(-OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN], openingPart);
 					}
 				}
 				piece &= piece - 1;
@@ -1015,8 +979,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			piece = cb.getPieces(WHITE, BISHOP) & getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
 			while (piece != 0) {
 				value = BISHOP_OUTPOST[Long.numberOfTrailingZeros(piece) >>> 3];
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_OUTPOST_O * value;
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_OUTPOST_E * value;
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_OUTPOST).addStrength(value, openingPart);
 				
 				piece &= piece - 1;
 			}
@@ -1025,8 +988,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			piece = cb.getPieces(WHITE, BISHOP);
 			while (piece != 0) {
 				if (Long.bitCount((BISHOP_PRISON[Long.numberOfTrailingZeros(piece)]) & blackPawns) == 2) {
-					getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_PRISON_O * OTHER_SCORES[IX_BISHOP_PRISON];
-					getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_PRISON_E * OTHER_SCORES[IX_BISHOP_PRISON];
+					signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PRISON).addStrength(-OTHER_SCORES[IX_BISHOP_PRISON], openingPart);
 				}
 				piece &= piece - 1;
 			}
@@ -1034,24 +996,20 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			if ((cb.getPieces(WHITE, BISHOP) & WHITE_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
 				value = BISHOP_PAWN[Long.bitCount(whitePawns & WHITE_SQUARES)];
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_PAWNS_O * value;
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_PAWNS_E * value;
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(-value, openingPart);
 				
 				// bonus for attacking center squares
 				value = Long.bitCount(getEvalInfo().attacks[WHITE][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_CENTER_ATTACK_O * value;
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_CENTER_ATTACK_E * value;
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK).addStrength(value, openingPart);
 			}
 			if ((cb.getPieces(WHITE, BISHOP) & BLACK_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
 				value = BISHOP_PAWN[Long.bitCount(whitePawns & BLACK_SQUARES)];
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_PAWNS_O * value;
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_PAWNS_E * value;
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(-value, openingPart);
 				
 				// bonus for attacking center squares 
 				value = Long.bitCount(getEvalInfo().attacks[WHITE][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_CENTER_ATTACK_O * value;
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_CENTER_ATTACK_E * value;
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK).addStrength(value, openingPart);
 			}
 
 		}
@@ -1064,8 +1022,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			piece = cb.getPieces(BLACK, BISHOP) & getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
 			while (piece != 0) { 
 				value = BISHOP_OUTPOST[7 - Long.numberOfTrailingZeros(piece) / 8];
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_OUTPOST_O * value;
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_OUTPOST_E * value;
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_OUTPOST).addStrength(-value, openingPart);
 				
 				piece &= piece - 1;
 			}
@@ -1074,8 +1031,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			piece = cb.getPieces(BLACK, BISHOP);
 			while (piece != 0) {
 				if (Long.bitCount((BISHOP_PRISON[Long.numberOfTrailingZeros(piece)]) & whitePawns) == 2) {
-					getEvalInfo().eval_o_part2 += OTHERS_BISHOP_PRISON_O * OTHER_SCORES[IX_BISHOP_PRISON];
-					getEvalInfo().eval_e_part2 += OTHERS_BISHOP_PRISON_E * OTHER_SCORES[IX_BISHOP_PRISON];
+					signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PRISON).addStrength(OTHER_SCORES[IX_BISHOP_PRISON], openingPart);
 				}
 				piece &= piece - 1;
 			}
@@ -1083,24 +1039,20 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			if ((cb.getPieces(BLACK, BISHOP) & WHITE_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
 				value = BISHOP_PAWN[Long.bitCount(blackPawns & WHITE_SQUARES)];
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_PAWNS_O * value;
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_PAWNS_E * value;
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(value, openingPart);
 				
 				// bonus for attacking center squares 
 				value = Long.bitCount(getEvalInfo().attacks[BLACK][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_CENTER_ATTACK_O * value;
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_CENTER_ATTACK_E * value;
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK).addStrength(-value, openingPart);
 			}
 			if ((cb.getPieces(BLACK, BISHOP) & BLACK_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
 				value = BISHOP_PAWN[Long.bitCount(blackPawns & BLACK_SQUARES)];
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_PAWNS_O * value;
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_PAWNS_E * value;
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(value, openingPart);
 				
 				// bonus for attacking center squares
 				value = Long.bitCount(getEvalInfo().attacks[BLACK][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_CENTER_ATTACK_O * value;
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_CENTER_ATTACK_E * value;
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK).addStrength(-value, openingPart);
 			}
 		}
 		
@@ -1109,16 +1061,14 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		piece = (whitePawns << 8) & whites;
 		while (piece != 0) {
 			value = PAWN_BLOCKAGE[Long.numberOfTrailingZeros(piece) >>> 3];
-			getEvalInfo().eval_o_part2 += OTHERS_PAWN_BLOCKAGE_O * value;
-			getEvalInfo().eval_e_part2 += OTHERS_PAWN_BLOCKAGE_E * value;
+			signals.getSignal(FEATURE_ID_OTHERS_PAWN_BLOCKAGE).addStrength(value, openingPart);
 			
 			piece &= piece - 1;
 		}
 		piece = (blackPawns >>> 8) & blacks;
 		while (piece != 0) {
 			value = PAWN_BLOCKAGE[7 - Long.numberOfTrailingZeros(piece) / 8];
-			getEvalInfo().eval_o_part2 -= OTHERS_PAWN_BLOCKAGE_O * value;
-			getEvalInfo().eval_e_part2 -= OTHERS_PAWN_BLOCKAGE_E * value;
+			signals.getSignal(FEATURE_ID_OTHERS_PAWN_BLOCKAGE).addStrength(-value, openingPart);
 			
 			piece &= piece - 1;
 		}
@@ -1128,16 +1078,14 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		piece = cb.getPieces(WHITE, NIGHT) & getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
 		while (piece != 0) {
 			value = KNIGHT_OUTPOST[Long.numberOfTrailingZeros(piece) >>> 3];
-			getEvalInfo().eval_o_part2 += OTHERS_KNIGHT_OUTPOST_O * value;
-			getEvalInfo().eval_e_part2 += OTHERS_KNIGHT_OUTPOST_E * value;
+			signals.getSignal(FEATURE_ID_OTHERS_KNIGHT_OUTPOST).addStrength(value, openingPart);
 			
 			piece &= piece - 1;
 		}
 		piece = cb.getPieces(BLACK, NIGHT) & getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
 		while (piece != 0) {
 			value = KNIGHT_OUTPOST[7 - Long.numberOfTrailingZeros(piece) / 8];
-			getEvalInfo().eval_o_part2 -= OTHERS_KNIGHT_OUTPOST_O * value;
-			getEvalInfo().eval_e_part2 -= OTHERS_KNIGHT_OUTPOST_E * value;
+			signals.getSignal(FEATURE_ID_OTHERS_KNIGHT_OUTPOST).addStrength(-value, openingPart);
 			
 			piece &= piece - 1;
 		}
@@ -1146,11 +1094,9 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		// quiescence search could leave one side in check
 		if (cb.getBoard().isInCheck()) {
 			if (cb.getColorToMove() == WHITE) {
-				getEvalInfo().eval_o_part2 -= OTHERS_IN_CHECK_O * IN_CHECK;
-				getEvalInfo().eval_e_part2 -= OTHERS_IN_CHECK_E * IN_CHECK;
+				signals.getSignal(FEATURE_ID_OTHERS_IN_CHECK).addStrength(-IN_CHECK, openingPart);
 			} else {
-				getEvalInfo().eval_o_part2 += OTHERS_IN_CHECK_O * IN_CHECK;
-				getEvalInfo().eval_e_part2 += OTHERS_IN_CHECK_E * IN_CHECK;
+				signals.getSignal(FEATURE_ID_OTHERS_IN_CHECK).addStrength(IN_CHECK, openingPart);
 			}
 		}
 	}
@@ -1158,6 +1104,10 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 	
 	public void fillKingSafetyScores(ISignals signals) {
 
+		
+		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
+		
+		
 		for (int kingColor = WHITE; kingColor <= BLACK; kingColor++) {
 			final int enemyColor = 1 - kingColor;
 
@@ -1208,14 +1158,17 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			counter += KS_ATTACK_PATTERN[getEvalInfo().kingAttackersFlag[enemyColor]];
 
 			int value = ChessConstants.COLOR_FACTOR[enemyColor] * KS_SCORES[Math.min(counter, KS_SCORES.length - 1)];
-			getEvalInfo().eval_o_part2 += KING_SAFETY_O * value;	
-			getEvalInfo().eval_e_part2 += KING_SAFETY_E * value;
+			signals.getSignal(FEATURE_ID_KING_SAFETY).addStrength(value, openingPart);
 		}
 	}
 	
 	
 	public void fillSpace(ISignals signals) {
 
+		
+		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
+		
+		
 		int score = 0;
 
 		score += OTHER_SCORES[IX_SPACE]
@@ -1233,7 +1186,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		score -= SPACE[Long.bitCount(cb.getFriendlyPieces(BLACK))]
 				* Long.bitCount(space & ~cb.getPieces(BLACK, PAWN) & ~getEvalInfo().attacks[WHITE][PAWN] & FILE_CDEF);
 
-		getEvalInfo().eval_o_part2 += SPACE_O * score;
-		getEvalInfo().eval_e_part2 += SPACE_E * score;
+		
+		signals.getSignal(FEATURE_ID_SPACE).addStrength(score, openingPart);
 	}
 }

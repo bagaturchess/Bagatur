@@ -550,12 +550,12 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		
 		// multiple pawn attacks possible
 		if (Long.bitCount(whitePawnAttacks & blacks) > 1) {
-			getEvalInfo().eval_o += THREAT_MULTIPLE_PAWN_ATTACKS_O * count * THREATS_MG[IX_MULTIPLE_PAWN_ATTACKS];
-			getEvalInfo().eval_e += THREAT_MULTIPLE_PAWN_ATTACKS_E * count * THREATS_EG[IX_MULTIPLE_PAWN_ATTACKS];
+			getEvalInfo().eval_o += THREAT_MULTIPLE_PAWN_ATTACKS_O * THREATS_MG[IX_MULTIPLE_PAWN_ATTACKS];
+			getEvalInfo().eval_e += THREAT_MULTIPLE_PAWN_ATTACKS_E * THREATS_EG[IX_MULTIPLE_PAWN_ATTACKS];
 		}
 		if (Long.bitCount(blackPawnAttacks & whites) > 1) {
-			getEvalInfo().eval_o -= THREAT_MULTIPLE_PAWN_ATTACKS_O * count * THREATS_MG[IX_MULTIPLE_PAWN_ATTACKS];
-			getEvalInfo().eval_e -= THREAT_MULTIPLE_PAWN_ATTACKS_E * count * THREATS_EG[IX_MULTIPLE_PAWN_ATTACKS];
+			getEvalInfo().eval_o -= THREAT_MULTIPLE_PAWN_ATTACKS_O * THREATS_MG[IX_MULTIPLE_PAWN_ATTACKS];
+			getEvalInfo().eval_e -= THREAT_MULTIPLE_PAWN_ATTACKS_E * THREATS_EG[IX_MULTIPLE_PAWN_ATTACKS];
 		}
 		
 		
@@ -622,11 +622,11 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			forked = blacks & ~blackPawns & KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 			if (Long.bitCount(forked) > 1) {
 				if ((cb.getPieces(BLACK, KING) & forked) == 0) {
-					getEvalInfo().eval_o += THREAT_NIGHT_FORK_O * count * THREATS_MG[IX_NIGHT_FORK];
-					getEvalInfo().eval_e += THREAT_NIGHT_FORK_E * count * THREATS_EG[IX_NIGHT_FORK];
+					getEvalInfo().eval_o += THREAT_NIGHT_FORK_O * THREATS_MG[IX_NIGHT_FORK];
+					getEvalInfo().eval_e += THREAT_NIGHT_FORK_E * THREATS_EG[IX_NIGHT_FORK];
 				} else {
-					getEvalInfo().eval_o += THREAT_NIGHT_FORK_KING_O * count * THREATS_MG[IX_NIGHT_FORK_KING];
-					getEvalInfo().eval_e += THREAT_NIGHT_FORK_KING_E * count * THREATS_EG[IX_NIGHT_FORK_KING];
+					getEvalInfo().eval_o += THREAT_NIGHT_FORK_KING_O * THREATS_MG[IX_NIGHT_FORK_KING];
+					getEvalInfo().eval_e += THREAT_NIGHT_FORK_KING_E * THREATS_EG[IX_NIGHT_FORK_KING];
 				}
 				break;
 			}
@@ -637,11 +637,11 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			forked = whites & ~whitePawns & KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 			if (Long.bitCount(forked) > 1) {
 				if ((cb.getPieces(WHITE, KING) & forked) == 0) {
-					getEvalInfo().eval_o -= THREAT_NIGHT_FORK_O * count * THREATS_MG[IX_NIGHT_FORK];
-					getEvalInfo().eval_e -= THREAT_NIGHT_FORK_E * count * THREATS_EG[IX_NIGHT_FORK];
+					getEvalInfo().eval_o -= THREAT_NIGHT_FORK_O * THREATS_MG[IX_NIGHT_FORK];
+					getEvalInfo().eval_e -= THREAT_NIGHT_FORK_E * THREATS_EG[IX_NIGHT_FORK];
 				} else {
-					getEvalInfo().eval_o -= THREAT_NIGHT_FORK_KING_O * count * THREATS_MG[IX_NIGHT_FORK_KING];
-					getEvalInfo().eval_e -= THREAT_NIGHT_FORK_KING_E * count * THREATS_EG[IX_NIGHT_FORK_KING];
+					getEvalInfo().eval_o -= THREAT_NIGHT_FORK_KING_O * THREATS_MG[IX_NIGHT_FORK_KING];
+					getEvalInfo().eval_e -= THREAT_NIGHT_FORK_KING_E * THREATS_EG[IX_NIGHT_FORK_KING];
 				}
 				break;
 			}

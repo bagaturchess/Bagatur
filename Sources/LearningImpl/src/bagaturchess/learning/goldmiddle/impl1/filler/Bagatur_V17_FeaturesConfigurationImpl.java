@@ -62,6 +62,46 @@ public class Bagatur_V17_FeaturesConfigurationImpl implements IFeaturesConfigura
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MOBILITY_KING						, "MOBILITY.KING"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		
 		
+		//Threats
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_DOUBLE_ATTACKED				, "THREAT.DOUBLE.ATTACKED"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_UNUSED_OUTPOST				, "THREAT.UNUSED.OUTPOST"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_PAWN_PUSH					, "THREAT.PAWN.PUSH"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_PAWN_ATTACKS					, "THREAT.PAWN.ATTACKS"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_MULTIPLE_PAWN_ATTACKS		, "THREAT.MULTIPLE.PAWN.ATTACKS"		, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_MAJOR_ATTACKED				, "THREAT.MAJOR.ATTACKED"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_PAWN_ATTACKED				, "THREAT.PAWN.ATTACKED"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK			, "THREAT.QUEEN.ATTACKED.ROOK"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_QUEEN_ATTACKED_MINOR			, "THREAT.QUEEN.ATTACKED.MINOR"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_ROOK_ATTACKED				, "THREAT.ROOK.ATTACKED"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_NIGHT_FORK					, "THREAT.NIGHT.FORK"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_NIGHT_FORK_KING				, "THREAT.NIGHT.FORK.KING"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		
+		
+		//Others
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_SIDE_TO_MOVE					, "OTHERS.SIDE.TO.MOVE"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS			, "OTHERS.ONLY.MAJOR.DEFENDERS"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_HANGING						, "OTHERS.HANGING"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_HANGING_2					, "OTHERS.HANGING.2"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_BATTERY					, "OTHERS.ROOK.BATTERY"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_7TH_RANK				, "OTHERS.ROOK.7TH.RANK"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_TRAPPED					, "OTHERS.ROOK.TRAPPED"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_FILE_OPEN				, "OTHERS.ROOK.FILE.OPEN"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED	, "OTHERS.ROOK.FILE.SEMI.OPEN.ISOLATED"	, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN			, "OTHERS.ROOK.FILE.SEMI.OPEN"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_OUTPOST				, "OTHERS.BISHOP.OPUTPOST"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_PRISON				, "OTHERS.BISHOP.PRISON"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_PAWNS					, "OTHERS.BISHOP.PAWNS"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK			, "OTHERS.BISHOP.CENTER.ATTACK"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_PAWN_BLOCKAGE				, "THERS.PAWN.BLOCKAGE"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_KNIGHT_OUTPOST				, "OTHERS.KNIGHT.OUTPOST"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_IN_CHECK						, "OTHERS.IN.CHECK"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		
+		
+		//King safety and space
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KING_SAFETY							, "KING.SAFETY"							, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_SPACE								, "SPACE"								, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		
+		
 		return new_featuresSet.toArray(new IFeature[0]);
 	}
 	

@@ -66,18 +66,41 @@ public interface Bagatur_V17_FeaturesConstants {
 	
 	
 	//Threats
-	public static final double THREAT_DOUBLE_ATTACKED_O 				= 1;
-	public static final double THREAT_UNUSED_OUTPOST_O 					= 1;
-	public static final double THREAT_PAWN_PUSH_O						= 1;
-	public static final double THREAT_PAWN_ATTACKS_O 					= 1;
-	public static final double THREAT_MULTIPLE_PAWN_ATTACKS_O 			= 1;
-	public static final double THREAT_MAJOR_ATTACKED_O 					= 1;
-	public static final double THREAT_PAWN_ATTACKED_O 					= 1;
-	public static final double THREAT_QUEEN_ATTACKED_ROOK_O				= 1;
-	public static final double THREAT_QUEEN_ATTACKED_MINOR_O 			= 1;
-	public static final double THREAT_ROOK_ATTACKED_O 					= 1;
-	public static final double THREAT_NIGHT_FORK_O 						= 1;
-	public static final double THREAT_NIGHT_FORK_KING_O 				= 1;
+	public static final int FEATURE_ID_THREAT_DOUBLE_ATTACKED 				= 1280;
+	public static final int FEATURE_ID_THREAT_UNUSED_OUTPOST				= 1290;
+	public static final int FEATURE_ID_THREAT_PAWN_PUSH						= 1300;
+	public static final int FEATURE_ID_THREAT_PAWN_ATTACKS 					= 1310;
+	public static final int FEATURE_ID_THREAT_MULTIPLE_PAWN_ATTACKS 		= 1320;
+	public static final int FEATURE_ID_THREAT_MAJOR_ATTACKED 				= 1330;
+	public static final int FEATURE_ID_THREAT_PAWN_ATTACKED 				= 1340;
+	public static final int FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK			= 1350;
+	public static final int FEATURE_ID_THREAT_QUEEN_ATTACKED_MINOR 			= 1360;
+	public static final int FEATURE_ID_THREAT_ROOK_ATTACKED 				= 1370;
+	public static final int FEATURE_ID_THREAT_NIGHT_FORK 					= 1380;
+	public static final int FEATURE_ID_THREAT_NIGHT_FORK_KING 				= 1390;
 	
 	
+	//Others
+	public static final int FEATURE_ID_OTHERS_SIDE_TO_MOVE	 				= 1400;
+	public static final int FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS			= 1410;
+	public static final int FEATURE_ID_OTHERS_HANGING 						= 1420;
+	public static final int FEATURE_ID_OTHERS_HANGING_2 					= 1430;
+	public static final int FEATURE_ID_OTHERS_ROOK_BATTERY 					= 1440;
+	public static final int FEATURE_ID_OTHERS_ROOK_7TH_RANK 				= 1450;
+	public static final int FEATURE_ID_OTHERS_ROOK_TRAPPED 					= 1460;
+	public static final int FEATURE_ID_OTHERS_ROOK_FILE_OPEN 				= 1470;
+	public static final int FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED	= 1480;
+	public static final int FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN 			= 1490;
+	public static final int FEATURE_ID_OTHERS_BISHOP_OUTPOST 				= 1500;
+	public static final int FEATURE_ID_OTHERS_BISHOP_PRISON					= 1510;
+	public static final int FEATURE_ID_OTHERS_BISHOP_PAWNS 					= 1520;
+	public static final int FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK 			= 1530;
+	public static final int FEATURE_ID_OTHERS_PAWN_BLOCKAGE 				= 1540;
+	public static final int FEATURE_ID_OTHERS_KNIGHT_OUTPOST 				= 1550;
+	public static final int FEATURE_ID_OTHERS_IN_CHECK 						= 1560;
+	
+	
+	//King safety and space
+	public static final int FEATURE_ID_KING_SAFETY 							= 1570;
+	public static final int FEATURE_ID_SPACE 								= 1580;
 }
