@@ -165,13 +165,14 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard  = new Board("1r6/4k3/1pbpPb1p/p1p2P2/2Pp3p/3P3P/2P2RP1/R6K b - - 3 39", null/*sharedData.getAndRemovePawnsCache()*/, cfg.getBoardConfig());
 		
 		
-		IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
+		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
 		//IBitBoard bitboard = new Board("4r3/4rk2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB draw
 		//IBitBoard bitboard = new Board("4r3/5k2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB white win
 		//IBitBoard bitboard = new Board("4k3/3r1p2/8/8/8/8/8/4KQ2 w - - 0 1", null, cfg.getBoardConfig());//EGTB white win
 		//IBitBoard bitboard = new Board("4k3/8/8/4KR2/8/8/8/8 w - - 0 1", null, cfg.getBoardConfig());//Mate in 2 with e5d6
 		//IBitBoard bitboard = new Board("4k3/8/8/5R2/4K3/8/8/8 w - - 0 1", null, cfg.getBoardConfig());//Mate in 16 with e4d5
 		//IBitBoard bitboard = new Board("3rk3/8/8/8/4K3/4Q3/8/8 w - - 0 1", null, cfg.getBoardConfig());//Mate in 34 with e3c5
+		IBitBoard bitboard = new Board("Qb2r1k1/1p1q2pp/2p5/4p2n/1PPPPpb1/2B2N2/4NPP1/R5K1 b - - 0 28", null, cfg.getBoardConfig());//g4f3 is the correct move
 		
 		//IBitBoard bitboard = new Board("3k4/4r3/3K4/1Q6/8/8/8/8 b - - 15 8", null, cfg.getBoardConfig());//Bug: doesn't see mate in 4
 		//IBitBoard bitboard = new Board("3k4/4r3/2K5/6Q1/8/8/8/8 b - - 15 8", null, cfg.getBoardConfig());//Bug: doesn't see mate in 2
