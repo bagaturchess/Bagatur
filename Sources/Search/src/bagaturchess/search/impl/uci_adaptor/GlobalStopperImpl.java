@@ -58,7 +58,7 @@ public class GlobalStopperImpl implements ISearchStopper {
 	
 	public void stopIfNecessary(int maxdepth, int colour, double alpha, double beta) throws SearchInterruptedException {
 		
-		if (maxdepth <= 1) {
+		if (maxdepth <= 3) {
 			return;
 		}
 		

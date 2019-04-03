@@ -257,12 +257,12 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		
 		boolean disableExts = false;
-		if (inCheck && rest < 1) {
+		/*if (inCheck && rest < 1) {
 			if (depth >= normDepth(maxdepth)) {
 				maxdepth = PLY * (depth + 1);
 				disableExts = true;
 			}
-		}
+		}*/
 		
 		
 		rest = normDepth(maxdepth) - depth;
@@ -363,9 +363,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
     	
 		if (depth >= normDepth(maxdepth)) {
 			
-			if (inCheck) {
+			/*if (inCheck) {
 				throw new IllegalStateException("inCheck: depth >= normDepth(maxdepth)");
-			}
+			}*/
 			
 			node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
 			return node.eval;
@@ -1003,12 +1003,12 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		
 		boolean disableExts = false;
-		if (inCheck && rest < 1) {
+		/*if (inCheck && rest < 1) {
 			if (depth >= normDepth(maxdepth)) {
 				maxdepth = PLY * (depth + 1);
 				disableExts = true;
 			}
-		}
+		}*/
 		
 		rest = normDepth(maxdepth) - depth;
 		
@@ -1070,9 +1070,9 @@ public class Search_PVS_NWS extends SearchImpl_MTD {
 		
 		if (depth >= normDepth(maxdepth)) {
 			
-			if (inCheck) {
+			/*if (inCheck) {
 				throw new IllegalStateException();
-			}
+			}*/
 			
 			int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, rootColour);
 			return eval;
