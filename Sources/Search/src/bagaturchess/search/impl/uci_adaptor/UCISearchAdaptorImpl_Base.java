@@ -140,11 +140,11 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 	
 	protected void goSearch(boolean ponderSearch, ITimeController timeController) {
 		
-		if (ponderSearch) {
+		/*if (ponderSearch) {
 			getSearcherNormal().decreaseTPTDepths(1);
 		} else {
 			getSearcherNormal().decreaseTPTDepths(2);
-		}
+		}*/
 		
 		
 		IRootSearch searcher = getSearcher(ponderSearch);
