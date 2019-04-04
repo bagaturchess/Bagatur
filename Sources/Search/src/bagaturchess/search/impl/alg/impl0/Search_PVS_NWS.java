@@ -26,7 +26,6 @@ package bagaturchess.search.impl.alg.impl0;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.egtb.gaviota.GTBProbeOutput;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.internal.IRootWindow;
@@ -35,13 +34,14 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchMoveList;
 
 import bagaturchess.search.impl.alg.BacktrackingInfo;
+import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
-public class Search_PVS_NWS extends SearchImpl_MTD {
+public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private double LMR_REDUCTION_MULTIPLIER 		= 1;// * 1.222 * 1;
