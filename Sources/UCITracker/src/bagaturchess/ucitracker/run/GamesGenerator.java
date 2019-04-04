@@ -54,6 +54,7 @@ public class GamesGenerator {
 	private static int MAX_EVAL_DIFF = 1500;
 	private static int MAX_MOVES = 300;
 	private static int BEST_MOVE_DIFF = 50;
+	private static int MIN_PIECES = 7;
 	
 	
 	private UCIEnginesManager runner;
@@ -179,6 +180,9 @@ public class GamesGenerator {
 				break;
 			}
 			if (bitboard.getPlayedMovesCount() > MAX_MOVES) {
+				break;
+			}
+			if (bitboard.getMaterialState().getPiecesCount() <= MIN_PIECES) {
 				break;
 			}
 			
