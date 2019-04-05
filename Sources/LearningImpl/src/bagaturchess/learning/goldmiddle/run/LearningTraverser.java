@@ -3,7 +3,7 @@ package bagaturchess.learning.goldmiddle.run;
 
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
-import bagaturchess.learning.goldmiddle.impl.visitors.LearningVisitorImpl;
+import bagaturchess.learning.goldmiddle.visitors.LearningVisitorImpl;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 

@@ -20,7 +20,7 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.learning.goldmiddle.impl.visitors;
+package bagaturchess.learning.goldmiddle.visitors;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
