@@ -7,21 +7,20 @@ import bagaturchess.bitboard.common.Utils;
 
 public class BoardConfigImpl_V17 implements IBoardConfig {
 	
-	
-	private double MATERIAL_PAWN_O = 100;
-	private double MATERIAL_PAWN_E = 100;
-		
-	private double MATERIAL_KNIGHT_O = 396;
-	private double MATERIAL_KNIGHT_E = 396;
-	
-	private double MATERIAL_BISHOP_O = 416;
-	private double MATERIAL_BISHOP_E = 416;
-	
-	private double MATERIAL_ROOK_O = 706;
-	private double MATERIAL_ROOK_E = 706;
-	
-	private double MATERIAL_QUEEN_O = 1302;
-	private double MATERIAL_QUEEN_E = 1302;
+	public static final double MATERIAL_PAWN_O	=	90.75453695100212;
+	public static final double MATERIAL_PAWN_E	=	90.67116352641833;
+
+	public static final double MATERIAL_KNIGHT_O	=	370.8384773663843;
+	public static final double MATERIAL_KNIGHT_E	=	363.0122453993054;
+
+	public static final double MATERIAL_BISHOP_O	=	395.03079538583233;
+	public static final double MATERIAL_BISHOP_E	=	378.57732510903935;
+
+	public static final double MATERIAL_ROOK_O	=	587.855990499003;
+	public static final double MATERIAL_ROOK_E	=	598.3646940421942;
+
+	public static final double MATERIAL_QUEEN_O	=	1185.8308266170138;
+	public static final double MATERIAL_QUEEN_E	=	1162.6770750031644;
 	
 	private double MATERIAL_KING_O = 3000;
 	private double MATERIAL_KING_E = 3000;
