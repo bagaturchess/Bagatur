@@ -25,6 +25,7 @@ public class LearningInputFactory {
 	
 	public static ILearningInput createDefaultInput() {
 		
+		//return new bagaturchess.learning.goldmiddle.impl2.Bagatur_V17_LearningInputImpl();
 		return new bagaturchess.learning.goldmiddle.impl1.Bagatur_V17_LearningInputImpl();
 		//return new bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.Bagatur_ALL_LearningInputImpl();
 		//return new bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.ALL_LearningInputImpl();

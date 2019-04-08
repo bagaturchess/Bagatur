@@ -292,7 +292,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			else if (63 - Long.numberOfLeadingZeros((cb.getPieces(WHITE, PAWN) | cb.getPieces(BLACK, PAWN)) & FILES[index & 7]) == index) {
 				if (Long.bitCount(cb.getPieces(WHITE, PAWN) & getBlackPassedPawnMask(index + 8)) >= Long
 						.bitCount(cb.getPieces(BLACK, PAWN) & getWhitePassedPawnMask(index))) {
-					signals.getSignal(FEATURE_ID_PAWN_PASSED_CANDIDATE).addStrength(PASSED_CANDIDATE[index / 8], openingPart);
+					signals.getSignal(FEATURE_ID_PAWN_PASSED_CANDIDATE).addStrength(interpolateInternal(PASSED_CANDIDATE_MG[index / 8], PASSED_CANDIDATE_EG[index / 8], openingPart), openingPart);
 				}
 			}
 
@@ -338,7 +338,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			else if (Long.numberOfTrailingZeros((cb.getPieces(WHITE, PAWN) | cb.getPieces(BLACK, PAWN)) & FILES[index & 7]) == index) {
 				if (Long.bitCount(cb.getPieces(BLACK, PAWN) & getWhitePassedPawnMask(index - 8)) >= Long
 						.bitCount(cb.getPieces(WHITE, PAWN) & getBlackPassedPawnMask(index))) {
-					signals.getSignal(FEATURE_ID_PAWN_PASSED_CANDIDATE).addStrength(-PASSED_CANDIDATE[7 - index / 8], openingPart);
+					signals.getSignal(FEATURE_ID_PAWN_PASSED_CANDIDATE).addStrength(-interpolateInternal(PASSED_CANDIDATE_MG[7 - index / 8], PASSED_CANDIDATE_EG[7 - index / 8], openingPart), openingPart);
 				}
 			}
 			
@@ -846,10 +846,12 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 					piece &= piece - 1;
 				}
 
-				signals.getSignal(FEATURE_ID_OTHERS_HANGING_2).addStrength(HANGING_2[hangingIndex], openingPart);
+				
+				signals.getSignal(FEATURE_ID_OTHERS_HANGING_2).addStrength(interpolateInternal(HANGING_2_MG[hangingIndex], HANGING_2_EG[hangingIndex], openingPart), openingPart);
 				
 			} else {
-				signals.getSignal(FEATURE_ID_OTHERS_HANGING).addStrength(HANGING[cb.getPieceType(Long.numberOfTrailingZeros(piece))], openingPart);
+				
+				signals.getSignal(FEATURE_ID_OTHERS_HANGING).addStrength(interpolateInternal(HANGING_MG[cb.getPieceType(Long.numberOfTrailingZeros(piece))], HANGING_EG[cb.getPieceType(Long.numberOfTrailingZeros(piece))], openingPart), openingPart);
 			}
 		}
 		piece = blackAttacks & whites & ~whiteAttacks;
@@ -861,10 +863,11 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 					piece &= piece - 1;
 				}
 
-				signals.getSignal(FEATURE_ID_OTHERS_HANGING_2).addStrength(-HANGING_2[hangingIndex], openingPart);
+				signals.getSignal(FEATURE_ID_OTHERS_HANGING_2).addStrength(-interpolateInternal(HANGING_2_MG[hangingIndex], HANGING_2_EG[hangingIndex], openingPart), openingPart);
 				
 			} else {
-				signals.getSignal(FEATURE_ID_OTHERS_HANGING).addStrength(-HANGING[cb.getPieceType(Long.numberOfTrailingZeros(piece))], openingPart);
+				
+				signals.getSignal(FEATURE_ID_OTHERS_HANGING).addStrength(-interpolateInternal(HANGING_MG[cb.getPieceType(Long.numberOfTrailingZeros(piece))], HANGING_EG[cb.getPieceType(Long.numberOfTrailingZeros(piece))], openingPart), openingPart);
 			}
 		}
 		
