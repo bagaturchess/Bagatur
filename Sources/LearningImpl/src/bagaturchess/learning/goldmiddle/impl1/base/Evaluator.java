@@ -63,7 +63,6 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	
 	public static final int[] PHASE 					= {0, 0, 6, 6, 13, 28};
 	
-	public static final int[] MATERIAL 					= {0, 100, 396, 416, 706, 1302, 3000};
 	public static final int[] PINNED 					= {0, -2, 14, 42, 72, 88};
 	public static final int[] PINNED_ATTACKED			= {0, 28, 128, 274, 330, 210};
 	public static final int[] DISCOVERED		 		= {0, -14, 128, 110, 180, 0, 28};
@@ -137,17 +136,17 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			4,		// king at blocked first rank check
 			1		// open file
 	};		
-		
-	public static final int[] MOBILITY_KNIGHT_MG	= {-34, -16, -6, 0, 12, 16, 26, 28, 56};
-	public static final int[] MOBILITY_KNIGHT_EG	= {-98, -34, -12, 0, 4, 12, 12, 14, 4};
-	public static final int[] MOBILITY_BISHOP_MG	= {-16, 2, 16, 24, 28, 36, 38, 40, 36, 42, 58, 82, 28, 120};
-	public static final int[] MOBILITY_BISHOP_EG	= {-36, -8, 6, 18, 28, 28, 36, 38, 42, 40, 32, 34, 54, 32};
-	public static final int[] MOBILITY_ROOK_MG 		= {-34, -24, -18, -14, -12, -4, 0, 8, 16, 26, 30, 40, 52, 68, 66};
-	public static final int[] MOBILITY_ROOK_EG 		= {-38, -12, 0, 8, 18, 24, 28, 28, 34, 34, 38, 40, 40, 42, 46};
-	public static final int[] MOBILITY_QUEEN_MG		= {-12, -14, -10, -14, -8, -6, -8, -8, -6, -4, -2, -2, -4, 2, 0, 0, 2, 16, 8, 22, 32, 66, 48, 156, 172, 236, 68, 336};
-	public static final int[] MOBILITY_QUEEN_EG 	= {-28, -82, -102, -82, -76, -54, -40, -24, -10, -2, 8, 24, 30, 32, 38, 54, 60, 46, 70, 72, 66, 66, 52, 18, -8, -32, 64, -94};
-	public static final int[] MOBILITY_KING_MG		= {-10, -12, -8, 0, 10, 26, 36, 70, 122};
-	public static final int[] MOBILITY_KING_EG		= {-38, -2, 8, 8, 2, -12, -12, -26, -60};
+	
+	public static final int[] MOBILITY_KNIGHT_MG	= {-35, -27, -11, -2, 4, 12, 23, 35, 40};
+	public static final int[] MOBILITY_KNIGHT_EG	= {-45, -27, -16, -12, 1, 3, 5, 7, 9,};
+	public static final int[] MOBILITY_BISHOP_MG	= {-32,   -13,   -1,   1,   6,   13,   17,   21,   23,   25,   27,   31,   35,   39,};
+	public static final int[] MOBILITY_BISHOP_EG	= {-20,   -17,   -10,  -5,   -2,   1,   3,   5,   10,   15,   20,  25,   30,   35,};
+	public static final int[] MOBILITY_ROOK_MG 		= {-25,   -12,   -5,   0,   1,   3,   5,   7,   9,   11,   15,   25,   35,   45,   90,};
+	public static final int[] MOBILITY_ROOK_EG 		= {-99,   -62,   -37,  -25,  -15,   -6,   1,   1,   2,   7,   10,   13,   15,   17,   19,};
+	public static final int[] MOBILITY_QUEEN_MG		= {-47,   -26,   -20,   -20,   -15,   -6,   1,   1,   5,   11,   16,   20,   23,   29,   31,   35,   39,   42,   46,   50,   55,   60,   65,   70,   75,  80,   85,   90,};
+	public static final int[] MOBILITY_QUEEN_EG 	= {-47,   -26,   -20,   -20,   -15,   -6,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,   11,   12,   13,   14,   15,   16,   17,   18,   19,   20,   21,   22,};
+	public static final int[] MOBILITY_KING_MG		= {-11,   -6,   1,   4,   10,   27,   47,   66,   89,};
+	public static final int[] MOBILITY_KING_EG		= {-8,   -6,   -4,   -2,   1,   2,   4,   6,   8,};
 	/*public static final int[] MOBILITY_KNIGHT		= new int[MOBILITY_KNIGHT_MG.length];
 	public static final int[] MOBILITY_BISHOP		= new int[MOBILITY_BISHOP_MG.length];
 	public static final int[] MOBILITY_ROOK			= new int[MOBILITY_ROOK_MG.length];
@@ -177,15 +176,6 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			B3_C2, 0, 0, 0, 0, 0, 0, G3_F2, //2
 			0, 0, 0, 0, 0, 0, 0, 0  //1
 		 // A  B  C  D  E  F  G  H
-	};
-	
-	public static final int[] PROMOTION_SCORE = {
-			0,
-			0,
-			MATERIAL[NIGHT] 	- MATERIAL[PAWN],
-			MATERIAL[BISHOP] - MATERIAL[PAWN],
-			MATERIAL[ROOK] 	- MATERIAL[PAWN],
-			MATERIAL[QUEEN] 	- MATERIAL[PAWN],
 	};
 	
 	

@@ -141,7 +141,7 @@ public class MTDSchedulerMain {
 		//IRootSearch search = new SequentialSearch_Classic(new Object[] {cfg, sharedData});
 		IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
 		//IRootSearch search = new MonteCarloSearch(new Object[] {cfg, sharedData});
-		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
+		//IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
 		sharedData = search.getSharedData();
 		
@@ -466,7 +466,7 @@ public class MTDSchedulerMain {
 
 		//IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, null});
 		search.createBoard(bitboard);
-		IEvaluator eval = sharedData.getEvaluatorFactory().create(bitboard, null, sharedData.getEngineConfiguration().getEvalConfig());
+		//IEvaluator eval = sharedData.getEvaluatorFactory().create(bitboard, null, sharedData.getEngineConfiguration().getEvalConfig());
 		
 		
 		//BoardUtils.playGame(bitboard, "d2-d4, g8-f6, c2-c3, g7-g6, c1-f4, f8-g7, b1-d2, d7-d5, d1-a4, b8-c6, g1-f3, e8-g8, e2-e3, f6-h5, f4-e5, c6-e5, d4-e5, d8-d7, a4-b3");
@@ -605,19 +605,6 @@ public class MTDSchedulerMain {
 		bitboard.makeMoveForward(move);
 		
 		search.negamax(new Board(bitboard.toEPD()), new MediatorDummper(5000));*/
-	}
-	
-
-	private static PawnsEvalCache createPawnsCache() {
-		/*DataObjectFactory<PawnsModelEval> pawnsCacheFactory = null;
-		try {
-			pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) SharedData.class.getClassLoader().loadClass(EngineConfigFactory.getSingleton().getPawnsCacheFactoryClassName()).newInstance();
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	
-		return new PawnsEvalCache(pawnsCacheFactory, EngineConfigFactory.getSingleton().getPawnsCacheSize());*/
-		return null;
 	}
 	
 	/*public static void test() {
