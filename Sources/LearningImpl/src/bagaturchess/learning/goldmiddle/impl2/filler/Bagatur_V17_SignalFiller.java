@@ -224,12 +224,12 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		// bonus for connected pawns
 		long pawns = getWhitePawnAttacks(cb.getPieces(WHITE, PAWN)) & cb.getPieces(WHITE, PAWN);
 		while (pawns != 0) {
-			signals.getSignal(FEATURE_ID_PAWN_CONNECTED).addStrength(PAWN_CONNECTED[Long.numberOfTrailingZeros(pawns) / 8], openingPart);
+			signals.getSignal(FEATURE_ID_PAWN_CONNECTED).addStrength(Long.numberOfTrailingZeros(pawns) / 8, 1, openingPart);
 			pawns &= pawns - 1;
 		}
 		pawns = getBlackPawnAttacks(cb.getPieces(BLACK, PAWN)) & cb.getPieces(BLACK, PAWN);
 		while (pawns != 0) {
-			signals.getSignal(FEATURE_ID_PAWN_CONNECTED).addStrength(-PAWN_CONNECTED[7 - Long.numberOfTrailingZeros(pawns) / 8], openingPart);
+			signals.getSignal(FEATURE_ID_PAWN_CONNECTED).addStrength(7 - Long.numberOfTrailingZeros(pawns) / 8, -1, openingPart);
 			pawns &= pawns - 1;
 		}
 		
@@ -237,12 +237,12 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		// bonus for neighbour pawns
 		pawns = getPawnNeighbours(cb.getPieces(WHITE, PAWN)) & cb.getPieces(WHITE, PAWN);
 		while (pawns != 0) {
-			signals.getSignal(FEATURE_ID_PAWN_NEIGHBOUR).addStrength(PAWN_NEIGHBOUR[Long.numberOfTrailingZeros(pawns) / 8], openingPart);
+			signals.getSignal(FEATURE_ID_PAWN_NEIGHBOUR).addStrength(Long.numberOfTrailingZeros(pawns) / 8, 1, openingPart);
 			pawns &= pawns - 1;
 		}
 		pawns = getPawnNeighbours(cb.getPieces(BLACK, PAWN)) & cb.getPieces(BLACK, PAWN);
 		while (pawns != 0) {
-			signals.getSignal(FEATURE_ID_PAWN_NEIGHBOUR).addStrength(-PAWN_NEIGHBOUR[7 - Long.numberOfTrailingZeros(pawns) / 8], openingPart);
+			signals.getSignal(FEATURE_ID_PAWN_NEIGHBOUR).addStrength(7 - Long.numberOfTrailingZeros(pawns) / 8, -1, openingPart);
 			pawns &= pawns - 1;
 		}
 		
@@ -636,15 +636,13 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		long piece = getEvalInfo().doubleAttacks[WHITE] & blacks;
 		while (piece != 0) {
 			int index = cb.getPieceType(Long.numberOfTrailingZeros(piece));
-			int value = DOUBLE_ATTACKED[index];
-			signals.getSignal(FEATURE_ID_THREAT_DOUBLE_ATTACKED).addStrength(value, openingPart);
+			signals.getSignal(FEATURE_ID_THREAT_DOUBLE_ATTACKED).addStrength(index, 1, openingPart);
 			piece &= piece - 1;
 		}
 		piece = getEvalInfo().doubleAttacks[BLACK] & whites;
 		while (piece != 0) {
 			int index = cb.getPieceType(Long.numberOfTrailingZeros(piece));
-			int value = DOUBLE_ATTACKED[index];
-			signals.getSignal(FEATURE_ID_THREAT_DOUBLE_ATTACKED).addStrength(-value, openingPart);
+			signals.getSignal(FEATURE_ID_THREAT_DOUBLE_ATTACKED).addStrength(index, -1, openingPart);
 			piece &= piece - 1;
 		}
 		
@@ -833,16 +831,14 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		// piece attacked and only defended by a rook or queen
 		piece = whites & blackAttacks & whiteAttacks & ~(whitePawnAttacks | getEvalInfo().attacks[WHITE][NIGHT] | getEvalInfo().attacks[WHITE][BISHOP]);
 		while (piece != 0) {
-			value = ONLY_MAJOR_DEFENDERS[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
-			signals.getSignal(FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS).addStrength(-value, openingPart);
+			signals.getSignal(FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS).addStrength(cb.getPieceType(Long.numberOfTrailingZeros(piece)), -1, openingPart);
 			
 			piece &= piece - 1;
 		}
 		
 		piece = blacks & whiteAttacks & blackAttacks & ~(blackPawnAttacks | getEvalInfo().attacks[BLACK][NIGHT] | getEvalInfo().attacks[BLACK][BISHOP]);
 		while (piece != 0) {
-			value = ONLY_MAJOR_DEFENDERS[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
-			signals.getSignal(FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS).addStrength(value, openingPart);
+			signals.getSignal(FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS).addStrength(cb.getPieceType(Long.numberOfTrailingZeros(piece)), 1, openingPart);
 			
 			piece &= piece - 1;
 		}
@@ -991,8 +987,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			// bishop outpost: protected by a pawn, cannot be attacked by enemy pawns
 			piece = cb.getPieces(WHITE, BISHOP) & getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
 			while (piece != 0) {
-				value = BISHOP_OUTPOST[Long.numberOfTrailingZeros(piece) >>> 3];
-				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_OUTPOST).addStrength(value, openingPart);
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_OUTPOST).addStrength(Long.numberOfTrailingZeros(piece) >>> 3, 1, openingPart);
 				
 				piece &= piece - 1;
 			}
@@ -1034,8 +1029,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			// bishop outpost: protected by a pawn, cannot be attacked by enemy pawns
 			piece = cb.getPieces(BLACK, BISHOP) & getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
 			while (piece != 0) { 
-				value = BISHOP_OUTPOST[7 - Long.numberOfTrailingZeros(piece) / 8];
-				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_OUTPOST).addStrength(-value, openingPart);
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_OUTPOST).addStrength(7 - Long.numberOfTrailingZeros(piece) / 8, -1, openingPart);
 				
 				piece &= piece - 1;
 			}
@@ -1073,15 +1067,13 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		// pieces supporting our pawns
 		piece = (whitePawns << 8) & whites;
 		while (piece != 0) {
-			value = PAWN_BLOCKAGE[Long.numberOfTrailingZeros(piece) >>> 3];
-			signals.getSignal(FEATURE_ID_OTHERS_PAWN_BLOCKAGE).addStrength(value, openingPart);
+			signals.getSignal(FEATURE_ID_OTHERS_PAWN_BLOCKAGE).addStrength(Long.numberOfTrailingZeros(piece) >>> 3, 1, openingPart);
 			
 			piece &= piece - 1;
 		}
 		piece = (blackPawns >>> 8) & blacks;
 		while (piece != 0) {
-			value = PAWN_BLOCKAGE[7 - Long.numberOfTrailingZeros(piece) / 8];
-			signals.getSignal(FEATURE_ID_OTHERS_PAWN_BLOCKAGE).addStrength(-value, openingPart);
+			signals.getSignal(FEATURE_ID_OTHERS_PAWN_BLOCKAGE).addStrength(7 - Long.numberOfTrailingZeros(piece) / 8, -1, openingPart);
 			
 			piece &= piece - 1;
 		}
@@ -1090,15 +1082,13 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		// knight outpost: protected by a pawn, cannot be attacked by enemy pawns
 		piece = cb.getPieces(WHITE, NIGHT) & getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
 		while (piece != 0) {
-			value = KNIGHT_OUTPOST[Long.numberOfTrailingZeros(piece) >>> 3];
-			signals.getSignal(FEATURE_ID_OTHERS_KNIGHT_OUTPOST).addStrength(value, openingPart);
+			signals.getSignal(FEATURE_ID_OTHERS_KNIGHT_OUTPOST).addStrength(Long.numberOfTrailingZeros(piece) >>> 3, 1, openingPart);
 			
 			piece &= piece - 1;
 		}
 		piece = cb.getPieces(BLACK, NIGHT) & getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
 		while (piece != 0) {
-			value = KNIGHT_OUTPOST[7 - Long.numberOfTrailingZeros(piece) / 8];
-			signals.getSignal(FEATURE_ID_OTHERS_KNIGHT_OUTPOST).addStrength(-value, openingPart);
+			signals.getSignal(FEATURE_ID_OTHERS_KNIGHT_OUTPOST).addStrength(7 - Long.numberOfTrailingZeros(piece) / 8, -1, openingPart);
 			
 			piece &= piece - 1;
 		}

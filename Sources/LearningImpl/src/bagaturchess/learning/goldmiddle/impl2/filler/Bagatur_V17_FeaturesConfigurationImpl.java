@@ -46,8 +46,14 @@ public class Bagatur_V17_FeaturesConfigurationImpl implements IFeaturesConfigura
 		
 		//Pawns
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_DOUBLE							, "PAWN.DOUBLE"							, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_CONNECTED						, "PAWN.CONNECTED"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_NEIGHBOUR						, "PAWN.NEIGHBOUR"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWN_CONNECTED 						, "PAWN.CONNECTED" 						, STANDARD,
+				PSTConstants.createArray(7, 0), PSTConstants.createArray(7, 256), PSTConstants.createArray(7, 0),
+				PSTConstants.createArray(7, 0), PSTConstants.createArray(7, 256), PSTConstants.createArray(7, 0)
+		));
+		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_PAWN_NEIGHBOUR 						, "PAWN.NEIGHBOUR" 						, STANDARD,
+				PSTConstants.createArray(7, 0), PSTConstants.createArray(7, 256), PSTConstants.createArray(7, 0),
+				PSTConstants.createArray(7, 0), PSTConstants.createArray(7, 256), PSTConstants.createArray(7, 0)
+		));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_ISOLATED						, "PAWN.ISOLATED"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_BACKWARD						, "PAWN.BACKWARD"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_INVERSE						, "PAWN.INVERSE"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
@@ -87,7 +93,10 @@ public class Bagatur_V17_FeaturesConfigurationImpl implements IFeaturesConfigura
 		
 		
 		//Threats
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_DOUBLE_ATTACKED				, "THREAT.DOUBLE.ATTACKED"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_THREAT_DOUBLE_ATTACKED 				, "THREAT.DOUBLE.ATTACKED" 				, STANDARD,
+				PSTConstants.createArray(7, -128), PSTConstants.createArray(7, 128), PSTConstants.createArray(7, 0),
+				PSTConstants.createArray(7, -128), PSTConstants.createArray(7, 128), PSTConstants.createArray(7, 0)
+		));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_UNUSED_OUTPOST				, "THREAT.UNUSED.OUTPOST"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_PAWN_PUSH					, "THREAT.PAWN.PUSH"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_PAWN_ATTACKS					, "THREAT.PAWN.ATTACKS"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
@@ -103,7 +112,10 @@ public class Bagatur_V17_FeaturesConfigurationImpl implements IFeaturesConfigura
 		
 		//Others
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_SIDE_TO_MOVE					, "OTHERS.SIDE.TO.MOVE"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS			, "OTHERS.ONLY.MAJOR.DEFENDERS"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS 			, "OTHERS.ONLY.MAJOR.DEFENDERS" 		, STANDARD,
+				PSTConstants.createArray(7, -256), PSTConstants.createArray(7, 512), PSTConstants.createArray(7, 0),
+				PSTConstants.createArray(7, -256), PSTConstants.createArray(7, 512), PSTConstants.createArray(7, 0)
+		));
 		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_OTHERS_HANGING 						, "OTHERS.HANGING" 						, STANDARD,
 				PSTConstants.createArray(7, 0), PSTConstants.createArray(7, 256), PSTConstants.createArray(7, 0),
 				PSTConstants.createArray(7, 0), PSTConstants.createArray(7, 256), PSTConstants.createArray(7, 0)
@@ -118,12 +130,21 @@ public class Bagatur_V17_FeaturesConfigurationImpl implements IFeaturesConfigura
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_FILE_OPEN				, "OTHERS.ROOK.FILE.OPEN"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED	, "OTHERS.ROOK.FILE.SEMI.OPEN.ISOLATED"	, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN			, "OTHERS.ROOK.FILE.SEMI.OPEN"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_OUTPOST				, "OTHERS.BISHOP.OUTPOST"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_OTHERS_BISHOP_OUTPOST 				, "OTHERS.BISHOP.OUTPOST" 				, STANDARD,
+				PSTConstants.createArray(8, -1024), PSTConstants.createArray(8, 1024), PSTConstants.createArray(8, 0),
+				PSTConstants.createArray(8, -1024), PSTConstants.createArray(8, 1024), PSTConstants.createArray(8, 0)
+		));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_PRISON				, "OTHERS.BISHOP.PRISON"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_PAWNS					, "OTHERS.BISHOP.PAWNS"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK			, "OTHERS.BISHOP.CENTER.ATTACK"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_PAWN_BLOCKAGE				, "OTHERS.PAWN.BLOCKAGE"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_KNIGHT_OUTPOST				, "OTHERS.KNIGHT.OUTPOST"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_OTHERS_PAWN_BLOCKAGE 				, "OTHERS.PAWN.BLOCKAGE" 				, STANDARD,
+				PSTConstants.createArray(8, -1024), PSTConstants.createArray(8, 1024), PSTConstants.createArray(8, 0),
+				PSTConstants.createArray(8, -1024), PSTConstants.createArray(8, 1024), PSTConstants.createArray(8, 0)
+		));
+		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_OTHERS_KNIGHT_OUTPOST 				, "OTHERS.KNIGHT.OUTPOST" 				, STANDARD,
+				PSTConstants.createArray(8, -1024), PSTConstants.createArray(8, 1024), PSTConstants.createArray(8, 0),
+				PSTConstants.createArray(8, -1024), PSTConstants.createArray(8, 1024), PSTConstants.createArray(8, 0)
+		));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_IN_CHECK						, "OTHERS.IN.CHECK"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		
 		

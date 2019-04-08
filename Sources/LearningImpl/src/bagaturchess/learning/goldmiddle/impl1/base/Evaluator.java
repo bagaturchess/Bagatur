@@ -61,28 +61,30 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	public static final int IX_BISHOP_DOUBLE 				= 1;
 	public static final int IX_QUEEN_NIGHT 					= 2;
 	
-	public static final int[] PHASE 					= {0, 0, 6, 6, 13, 28};
-	
-	public static final int[] PINNED 					= {0, -2, 14, 42, 72, 88};
-	public static final int[] PINNED_ATTACKED			= {0, 28, 128, 274, 330, 210};
-	public static final int[] DISCOVERED		 		= {0, -14, 128, 110, 180, 0, 28};
-	public static final int[] KNIGHT_OUTPOST			= {0, 0, 10, 26, 24, 36, 8, 38};
-	public static final int[] BISHOP_OUTPOST			= {0, 0, 22, 22, 20, 22, 52, 50};
-	public static final int[] DOUBLE_ATTACKED 			= {0, 16, 34, 64, -4, -6, 0};
-	public static final int[] HANGING_MG				= {0,   59,   60,   57,   49,   46,   0};
-	public static final int[] HANGING_EG				= {0,   22,   27,   22,   32,   42,   0};
-	public static final int[] HANGING_2_MG				= {0,   90,   72,   52,   0,   0};
-	public static final int[] HANGING_2_EG				= {0,   50,   32,   63,   95,   124};
+	public static final int[] KNIGHT_OUTPOST_MG			= {0,   0,   0,   48,   34,   75,   85,   94};
+	public static final int[] KNIGHT_OUTPOST_EG			= {1,   1,   1,   1,   1,   1,   1,   1};
+	public static final int[] BISHOP_OUTPOST_MG			= {1, 1, 1, 1, 1, 1, 1, 1};
+	public static final int[] BISHOP_OUTPOST_EG			= {1, 1, 1, 1, 1, 1, 1, 1};
+	public static final int[] DOUBLE_ATTACKED_MG		= {0,   7,   35,   54,   36,   58,   0};
+	public static final int[] DOUBLE_ATTACKED_EG		= {0,   19,   5,   7,   16,   1,   0};
+	public static final int[] HANGING_MG				= {0,   61,   61,   56,   50,   51,   0};
+	public static final int[] HANGING_EG				= {0,   21,   21,   20,   32,   72,   0};
+	public static final int[] HANGING_2_MG				= {0,   92,   75,   57,   0,   0};
+	public static final int[] HANGING_2_EG				= {0,   48,   27,   57,   106,   124};
 	public static final int[] ROOK_TRAPPED 				= {64, 62, 28};
-	public static final int[] ONLY_MAJOR_DEFENDERS 		= {0, 6, 14, 24, 4, 10, 0};
+	public static final int[] ONLY_MAJOR_DEFENDERS_MG	= {0,   8,   11,   15,   3,   0,   0};
+	public static final int[] ONLY_MAJOR_DEFENDERS_EG	= {0,   0,   1,   28,   11,   301,   0};
 	public static final int[] NIGHT_PAWN				= {68, -14, -2, 2, 8, 12, 20, 30, 36};
 	public static final int[] ROOK_PAWN					= {48, -4, -4, -4, -4, 0, 0, 0, 0};
 	public static final int[] BISHOP_PAWN 				= {-20, -8, -6, 0, 6, 12, 22, 32, 46};
 	public static final int[] SPACE 					= {0, 0, 0, 0, 0, -6, -6, -8, -7, -4, -4, -2, 0, -1, 0, 3, 7};
 	
-	public static final int[] PAWN_BLOCKAGE 			= {0, 0, -10, 2, 6, 28, 66, 196};
-	public static final int[] PAWN_CONNECTED			= {0, 0, 12, 14, 20, 58, 122};
-	public static final int[] PAWN_NEIGHBOUR	 		= {0, 0, 4, 10, 26, 88, 326};
+	public static final int[] PAWN_BLOCKAGE_MG 			= {1,   1,   1,   1,   1,   1,   1,   1};
+	public static final int[] PAWN_BLOCKAGE_EG 			= {1,   1,   1,   1,   1,   1,   1,   1};
+	public static final int[] PAWN_CONNECTED_MG			= {0,   0,   12,   11,   14,   33,   123};
+	public static final int[] PAWN_CONNECTED_EG			= {0,   0,   1,   1,   20,   52,   123};
+	public static final int[] PAWN_NEIGHBOUR_MG	 		= {0,   0,   0,   6,   39,   110,   187};
+	public static final int[] PAWN_NEIGHBOUR_EG	 		= {0,   0,   7,   8,   13,   32,   112};
 	
 	public static final int[][] SHIELD_BONUS_MG			= {	{0, 18, 14, 4, -24, -38, -270},
 															{0, 52, 36, 6, -44, 114, -250},
@@ -92,13 +94,12 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 															{0, -16, -26, -10, 42, 6, 20},
 															{0, 0, 8, 0, 28, 24, 38},
 															{0, -22, -14, 0, 38, 10, 60}};
-	//public static final int[][] SHIELD_BONUS 			= new int[4][7];
 
 	public static final int[] PASSED_SCORE_MG			= {0,   5,   10,   15,   20,   45,   56};
 	public static final int[] PASSED_SCORE_EG			= {0,   10,   15,   22,   35,   75,   211};
 	
-	public static final int[] PASSED_CANDIDATE_MG		= {0,   7,   8,   9,   10,   11};
-	public static final int[] PASSED_CANDIDATE_EG		= {0,   6,   10,   12,   15,   20};
+	public static final int[] PASSED_CANDIDATE_MG		= {0,   3,   5,   7,   10,   14};
+	public static final int[] PASSED_CANDIDATE_EG		= {0,   5,   10,   15,   20,   29};
 	
 	public static final float[] PASSED_KING_MULTI 		= {0, 1.4f, 1.3f, 1.1f, 1.1f, 1.0f, 0.8f, 0.8f};														
 	public static final float[] PASSED_MULTIPLIERS	= {
@@ -140,16 +141,16 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			1		// open file
 	};		
 	
-	public static final int[] MOBILITY_KNIGHT_MG	= {-35, -27, -11, -2, 4, 12, 23, 35, 40};
-	public static final int[] MOBILITY_KNIGHT_EG	= {-45, -27, -16, -12, 1, 3, 5, 7, 9,};
-	public static final int[] MOBILITY_BISHOP_MG	= {-32,   -13,   -1,   1,   6,   13,   17,   21,   23,   25,   27,   31,   35,   39,};
-	public static final int[] MOBILITY_BISHOP_EG	= {-20,   -17,   -10,  -5,   -2,   1,   3,   5,   10,   15,   20,  25,   30,   35,};
-	public static final int[] MOBILITY_ROOK_MG 		= {-25,   -12,   -5,   0,   1,   3,   5,   7,   9,   11,   15,   25,   35,   45,   90,};
-	public static final int[] MOBILITY_ROOK_EG 		= {-99,   -62,   -37,  -25,  -15,   -6,   1,   1,   2,   7,   10,   13,   15,   17,   19,};
+	public static final int[] MOBILITY_KNIGHT_MG	= {-24,   -28,   -11,   -1,   11,   19,   30,   32,   38};
+	public static final int[] MOBILITY_KNIGHT_EG	= {-46,   -28,   -19,   -14,   0,   5,   5,   5,   5};
+	public static final int[] MOBILITY_BISHOP_MG	= {-29,   0,   0,   2,   17,   26,   29,   36,   37,   43,   47,   56,   72,   80};
+	public static final int[] MOBILITY_BISHOP_EG	= {-30,   -27,   0,   0,   0,   0,   2,   3,   4,   5,   6,   10,   17,   37};
+	public static final int[] MOBILITY_ROOK_MG 		= {-28,   0,   1,   1,   0,   0,   13,   21,   24,   24,   32,   34,   60,   70,   118};
+	public static final int[] MOBILITY_ROOK_EG 		= {-91,   -55,   -34,   0,   0,   0,   1,   2,   3,   13,   15,   16,   17,  18,   20};
 	public static final int[] MOBILITY_QUEEN_MG		= {-47,   -26,   -20,   -20,   -15,   -6,   1,   1,   5,   11,   16,   20,   23,   29,   31,   35,   39,   42,   46,   50,   55,   60,   65,   70,   75,  80,   85,   90,};
 	public static final int[] MOBILITY_QUEEN_EG 	= {-47,   -26,   -20,   -20,   -15,   -6,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,   11,   12,   13,   14,   15,   16,   17,   18,   19,   20,   21,   22,};
-	public static final int[] MOBILITY_KING_MG		= {-11,   -6,   1,   4,   10,   27,   47,   66,   89,};
-	public static final int[] MOBILITY_KING_EG		= {-8,   -6,   -4,   -2,   1,   2,   4,   6,   8,};
+	public static final int[] MOBILITY_KING_MG		= {-5,   -4,   0,   3,   8,   19,   35,   49,   80};
+	public static final int[] MOBILITY_KING_EG		= {-1,   -1,   -1,   -1,   1,   1,   1,   1,   1};
 	
 	
 	public static final long[] ROOK_PRISON = { 
@@ -199,14 +200,6 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	
 	public static final int MG = 0;
 	public static final int EG = 1;
-
-	public static final int PHASE_TOTAL =
-			
-			4 * PHASE[NIGHT]
-			+ 4 * PHASE[BISHOP]
-			+ 4 * PHASE[ROOK]
-			+ 2 * PHASE[QUEEN];
-	
 	
 	private EvalInfo evalinfo;
 	protected IChessBoard cb;
@@ -277,14 +270,14 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		// bonus for connected pawns
 		long pawns = getWhitePawnAttacks(cb.getPieces(WHITE, PAWN)) & cb.getPieces(WHITE, PAWN);
 		while (pawns != 0) {
-			getEvalInfo().eval_o_part1 += PAWN_CONNECTED_O * PAWN_CONNECTED[Long.numberOfTrailingZeros(pawns) / 8];
-			getEvalInfo().eval_e_part1 += PAWN_CONNECTED_E * PAWN_CONNECTED[Long.numberOfTrailingZeros(pawns) / 8];
+			getEvalInfo().eval_o_part1 += PAWN_CONNECTED_O * PAWN_CONNECTED_MG[Long.numberOfTrailingZeros(pawns) / 8];
+			getEvalInfo().eval_e_part1 += PAWN_CONNECTED_E * PAWN_CONNECTED_EG[Long.numberOfTrailingZeros(pawns) / 8];
 			pawns &= pawns - 1;
 		}
 		pawns = getBlackPawnAttacks(cb.getPieces(BLACK, PAWN)) & cb.getPieces(BLACK, PAWN);
 		while (pawns != 0) {
-			getEvalInfo().eval_o_part1 -= PAWN_CONNECTED_O * PAWN_CONNECTED[7 - Long.numberOfTrailingZeros(pawns) / 8];
-			getEvalInfo().eval_e_part1 -= PAWN_CONNECTED_E * PAWN_CONNECTED[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			getEvalInfo().eval_o_part1 -= PAWN_CONNECTED_O * PAWN_CONNECTED_MG[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			getEvalInfo().eval_e_part1 -= PAWN_CONNECTED_E * PAWN_CONNECTED_EG[7 - Long.numberOfTrailingZeros(pawns) / 8];
 			pawns &= pawns - 1;
 		}
 		
@@ -292,14 +285,14 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		// bonus for neighbour pawns
 		pawns = getPawnNeighbours(cb.getPieces(WHITE, PAWN)) & cb.getPieces(WHITE, PAWN);
 		while (pawns != 0) {
-			getEvalInfo().eval_o_part1 += PAWN_NEIGHBOUR_O * PAWN_NEIGHBOUR[Long.numberOfTrailingZeros(pawns) / 8];
-			getEvalInfo().eval_e_part1 += PAWN_NEIGHBOUR_E * PAWN_NEIGHBOUR[Long.numberOfTrailingZeros(pawns) / 8];
+			getEvalInfo().eval_o_part1 += PAWN_NEIGHBOUR_O * PAWN_NEIGHBOUR_MG[Long.numberOfTrailingZeros(pawns) / 8];
+			getEvalInfo().eval_e_part1 += PAWN_NEIGHBOUR_E * PAWN_NEIGHBOUR_EG[Long.numberOfTrailingZeros(pawns) / 8];
 			pawns &= pawns - 1;
 		}
 		pawns = getPawnNeighbours(cb.getPieces(BLACK, PAWN)) & cb.getPieces(BLACK, PAWN);
 		while (pawns != 0) {
-			getEvalInfo().eval_o_part1 -= PAWN_NEIGHBOUR_O * PAWN_NEIGHBOUR[7 - Long.numberOfTrailingZeros(pawns) / 8];
-			getEvalInfo().eval_e_part1 -= PAWN_NEIGHBOUR_E * PAWN_NEIGHBOUR[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			getEvalInfo().eval_o_part1 -= PAWN_NEIGHBOUR_O * PAWN_NEIGHBOUR_MG[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			getEvalInfo().eval_e_part1 -= PAWN_NEIGHBOUR_E * PAWN_NEIGHBOUR_EG[7 - Long.numberOfTrailingZeros(pawns) / 8];
 			pawns &= pawns - 1;
 		}
 		
@@ -708,17 +701,15 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		long piece = getEvalInfo().doubleAttacks[WHITE] & blacks;
 		while (piece != 0) {
 			int index = cb.getPieceType(Long.numberOfTrailingZeros(piece));
-			int value = DOUBLE_ATTACKED[index];
-			getEvalInfo().eval_o_part2 += THREAT_DOUBLE_ATTACKED_O * value;
-			getEvalInfo().eval_e_part2 += THREAT_DOUBLE_ATTACKED_E * value;
+			getEvalInfo().eval_o_part2 += THREAT_DOUBLE_ATTACKED_O * DOUBLE_ATTACKED_MG[index];
+			getEvalInfo().eval_e_part2 += THREAT_DOUBLE_ATTACKED_E * DOUBLE_ATTACKED_EG[index];
 			piece &= piece - 1;
 		}
 		piece = getEvalInfo().doubleAttacks[BLACK] & whites;
 		while (piece != 0) {
 			int index = cb.getPieceType(Long.numberOfTrailingZeros(piece));
-			int value = DOUBLE_ATTACKED[index];
-			getEvalInfo().eval_o_part2 -= THREAT_DOUBLE_ATTACKED_O * value;
-			getEvalInfo().eval_e_part2 -= THREAT_DOUBLE_ATTACKED_E * value;
+			getEvalInfo().eval_o_part2 -= THREAT_DOUBLE_ATTACKED_O * DOUBLE_ATTACKED_MG[index];
+			getEvalInfo().eval_e_part2 -= THREAT_DOUBLE_ATTACKED_E * DOUBLE_ATTACKED_EG[index];
 			piece &= piece - 1;
 		}
 		
@@ -925,17 +916,15 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		// piece attacked and only defended by a rook or queen
 		piece = whites & blackAttacks & whiteAttacks & ~(whitePawnAttacks | getEvalInfo().attacks[WHITE][NIGHT] | getEvalInfo().attacks[WHITE][BISHOP]);
 		while (piece != 0) {
-			value = ONLY_MAJOR_DEFENDERS[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
-			getEvalInfo().eval_o_part2 -= OTHERS_ONLY_MAJOR_DEFENDERS_O * value;
-			getEvalInfo().eval_e_part2 -= OTHERS_ONLY_MAJOR_DEFENDERS_E * value;
+			getEvalInfo().eval_o_part2 -= OTHERS_ONLY_MAJOR_DEFENDERS_O * ONLY_MAJOR_DEFENDERS_MG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
+			getEvalInfo().eval_e_part2 -= OTHERS_ONLY_MAJOR_DEFENDERS_E * ONLY_MAJOR_DEFENDERS_EG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
 			
 			piece &= piece - 1;
 		}
 		piece = blacks & whiteAttacks & blackAttacks & ~(blackPawnAttacks | getEvalInfo().attacks[BLACK][NIGHT] | getEvalInfo().attacks[BLACK][BISHOP]);
 		while (piece != 0) {
-			value = ONLY_MAJOR_DEFENDERS[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
-			getEvalInfo().eval_o_part2 += OTHERS_ONLY_MAJOR_DEFENDERS_O * value;
-			getEvalInfo().eval_e_part2 += OTHERS_ONLY_MAJOR_DEFENDERS_E * value;
+			getEvalInfo().eval_o_part2 += OTHERS_ONLY_MAJOR_DEFENDERS_O * ONLY_MAJOR_DEFENDERS_MG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
+			getEvalInfo().eval_e_part2 += OTHERS_ONLY_MAJOR_DEFENDERS_E * ONLY_MAJOR_DEFENDERS_EG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
 			
 			piece &= piece - 1;
 		}
@@ -1099,9 +1088,8 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			// bishop outpost: protected by a pawn, cannot be attacked by enemy pawns
 			piece = cb.getPieces(WHITE, BISHOP) & getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
 			while (piece != 0) {
-				value = BISHOP_OUTPOST[Long.numberOfTrailingZeros(piece) >>> 3];
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_OUTPOST_O * value;
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_OUTPOST_E * value;
+				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_OUTPOST_O * BISHOP_OUTPOST_MG[Long.numberOfTrailingZeros(piece) >>> 3];
+				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_OUTPOST_E * BISHOP_OUTPOST_EG[Long.numberOfTrailingZeros(piece) >>> 3];
 				
 				piece &= piece - 1;
 			}
@@ -1148,9 +1136,8 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			// bishop outpost: protected by a pawn, cannot be attacked by enemy pawns
 			piece = cb.getPieces(BLACK, BISHOP) & getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
 			while (piece != 0) { 
-				value = BISHOP_OUTPOST[7 - Long.numberOfTrailingZeros(piece) / 8];
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_OUTPOST_O * value;
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_OUTPOST_E * value;
+				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_OUTPOST_O * BISHOP_OUTPOST_MG[7 - Long.numberOfTrailingZeros(piece) / 8];
+				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_OUTPOST_E * BISHOP_OUTPOST_EG[7 - Long.numberOfTrailingZeros(piece) / 8];
 				
 				piece &= piece - 1;
 			}
@@ -1193,17 +1180,15 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		// pieces supporting our pawns
 		piece = (whitePawns << 8) & whites;
 		while (piece != 0) {
-			value = PAWN_BLOCKAGE[Long.numberOfTrailingZeros(piece) >>> 3];
-			getEvalInfo().eval_o_part2 += OTHERS_PAWN_BLOCKAGE_O * value;
-			getEvalInfo().eval_e_part2 += OTHERS_PAWN_BLOCKAGE_E * value;
+			getEvalInfo().eval_o_part2 += OTHERS_PAWN_BLOCKAGE_O * PAWN_BLOCKAGE_MG[Long.numberOfTrailingZeros(piece) >>> 3];
+			getEvalInfo().eval_e_part2 += OTHERS_PAWN_BLOCKAGE_E * PAWN_BLOCKAGE_EG[Long.numberOfTrailingZeros(piece) >>> 3];
 			
 			piece &= piece - 1;
 		}
 		piece = (blackPawns >>> 8) & blacks;
 		while (piece != 0) {
-			value = PAWN_BLOCKAGE[7 - Long.numberOfTrailingZeros(piece) / 8];
-			getEvalInfo().eval_o_part2 -= OTHERS_PAWN_BLOCKAGE_O * value;
-			getEvalInfo().eval_e_part2 -= OTHERS_PAWN_BLOCKAGE_E * value;
+			getEvalInfo().eval_o_part2 -= OTHERS_PAWN_BLOCKAGE_O * PAWN_BLOCKAGE_MG[7 - Long.numberOfTrailingZeros(piece) / 8];
+			getEvalInfo().eval_e_part2 -= OTHERS_PAWN_BLOCKAGE_E * PAWN_BLOCKAGE_EG[7 - Long.numberOfTrailingZeros(piece) / 8];
 			
 			piece &= piece - 1;
 		}
@@ -1212,17 +1197,15 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		// knight outpost: protected by a pawn, cannot be attacked by enemy pawns
 		piece = cb.getPieces(WHITE, NIGHT) & getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
 		while (piece != 0) {
-			value = KNIGHT_OUTPOST[Long.numberOfTrailingZeros(piece) >>> 3];
-			getEvalInfo().eval_o_part2 += OTHERS_KNIGHT_OUTPOST_O * value;
-			getEvalInfo().eval_e_part2 += OTHERS_KNIGHT_OUTPOST_E * value;
+			getEvalInfo().eval_o_part2 += OTHERS_KNIGHT_OUTPOST_O * KNIGHT_OUTPOST_MG[Long.numberOfTrailingZeros(piece) >>> 3];
+			getEvalInfo().eval_e_part2 += OTHERS_KNIGHT_OUTPOST_E * KNIGHT_OUTPOST_EG[Long.numberOfTrailingZeros(piece) >>> 3];
 			
 			piece &= piece - 1;
 		}
 		piece = cb.getPieces(BLACK, NIGHT) & getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
 		while (piece != 0) {
-			value = KNIGHT_OUTPOST[7 - Long.numberOfTrailingZeros(piece) / 8];
-			getEvalInfo().eval_o_part2 -= OTHERS_KNIGHT_OUTPOST_O * value;
-			getEvalInfo().eval_e_part2 -= OTHERS_KNIGHT_OUTPOST_E * value;
+			getEvalInfo().eval_o_part2 -= OTHERS_KNIGHT_OUTPOST_O * KNIGHT_OUTPOST_MG[7 - Long.numberOfTrailingZeros(piece) / 8];
+			getEvalInfo().eval_e_part2 -= OTHERS_KNIGHT_OUTPOST_E * KNIGHT_OUTPOST_EG[7 - Long.numberOfTrailingZeros(piece) / 8];
 			
 			piece &= piece - 1;
 		}
