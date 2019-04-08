@@ -159,19 +159,19 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		
 		
 		// knight bonus if there are a lot of pawns
-		int value = Long.bitCount(cb.getPieces(WHITE, NIGHT)) * NIGHT_PAWN[Long.bitCount(cb.getPieces(WHITE, PAWN))];
-		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_NIGHT_PAWNS).addStrength(value, openingPart);
+		int value = Long.bitCount(cb.getPieces(WHITE, NIGHT));
+		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_NIGHT_PAWNS).addStrength(Long.bitCount(cb.getPieces(WHITE, PAWN)), value, openingPart);
 		
-		value = Long.bitCount(cb.getPieces(BLACK, NIGHT)) * NIGHT_PAWN[Long.bitCount(cb.getPieces(BLACK, PAWN))];
-		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_NIGHT_PAWNS).addStrength(-value, openingPart);
+		value = Long.bitCount(cb.getPieces(BLACK, NIGHT));
+		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_NIGHT_PAWNS).addStrength(Long.bitCount(cb.getPieces(BLACK, PAWN)), -value, openingPart);
 		
 		
 		// rook bonus if there are no pawns
-		value = Long.bitCount(cb.getPieces(WHITE, ROOK)) * ROOK_PAWN[Long.bitCount(cb.getPieces(WHITE, PAWN))];
-		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAWNS).addStrength(value, openingPart);
+		value = Long.bitCount(cb.getPieces(WHITE, ROOK));
+		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAWNS).addStrength(Long.bitCount(cb.getPieces(WHITE, PAWN)), value, openingPart);
 		
-		value = Long.bitCount(cb.getPieces(BLACK, ROOK)) * ROOK_PAWN[Long.bitCount(cb.getPieces(BLACK, PAWN))];
-		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAWNS).addStrength(-value, openingPart);
+		value = Long.bitCount(cb.getPieces(BLACK, ROOK));
+		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAWNS).addStrength(Long.bitCount(cb.getPieces(BLACK, PAWN)), -value, openingPart);
 		
 		
 		// double bishop bonus
@@ -1003,8 +1003,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 
 			if ((cb.getPieces(WHITE, BISHOP) & WHITE_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
-				value = BISHOP_PAWN[Long.bitCount(whitePawns & WHITE_SQUARES)];
-				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(-value, openingPart);
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(Long.bitCount(whitePawns & WHITE_SQUARES), -1, openingPart);
 				
 				// bonus for attacking center squares
 				value = Long.bitCount(getEvalInfo().attacks[WHITE][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
@@ -1012,8 +1011,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			}
 			if ((cb.getPieces(WHITE, BISHOP) & BLACK_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
-				value = BISHOP_PAWN[Long.bitCount(whitePawns & BLACK_SQUARES)];
-				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(-value, openingPart);
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(Long.bitCount(whitePawns & BLACK_SQUARES), -1, openingPart);
 				
 				// bonus for attacking center squares 
 				value = Long.bitCount(getEvalInfo().attacks[WHITE][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
@@ -1045,8 +1043,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 
 			if ((cb.getPieces(BLACK, BISHOP) & WHITE_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
-				value = BISHOP_PAWN[Long.bitCount(blackPawns & WHITE_SQUARES)];
-				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(value, openingPart);
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(Long.bitCount(blackPawns & WHITE_SQUARES), 1, openingPart);
 				
 				// bonus for attacking center squares 
 				value = Long.bitCount(getEvalInfo().attacks[BLACK][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
@@ -1054,8 +1051,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			}
 			if ((cb.getPieces(BLACK, BISHOP) & BLACK_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
-				value = BISHOP_PAWN[Long.bitCount(blackPawns & BLACK_SQUARES)];
-				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(value, openingPart);
+				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(Long.bitCount(blackPawns & BLACK_SQUARES), 1, openingPart);
 				
 				// bonus for attacking center squares
 				value = Long.bitCount(getEvalInfo().attacks[BLACK][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];

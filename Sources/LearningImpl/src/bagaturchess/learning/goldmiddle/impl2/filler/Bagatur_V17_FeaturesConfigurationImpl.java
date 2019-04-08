@@ -33,8 +33,14 @@ public class Bagatur_V17_FeaturesConfigurationImpl implements IFeaturesConfigura
 		
 		
 		//Imbalance
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_IMBALANCE_NIGHT_PAWNS		, "MATERIAL.IMBALANCE.NIGHT.PAWNS"		, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAWNS		, "MATERIAL.IMBALANCE.ROOK.PAWNS"		, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_MATERIAL_IMBALANCE_NIGHT_PAWNS 		, "MATERIAL.IMBALANCE.NIGHT.PAWNS" 		, STANDARD,
+				PSTConstants.createArray(9, -256), PSTConstants.createArray(9, 256), PSTConstants.createArray(9, 0),
+				PSTConstants.createArray(9, -256), PSTConstants.createArray(9, 256), PSTConstants.createArray(9, 0)
+		));
+		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAWNS 		, "MATERIAL.IMBALANCE.ROOK.PAWNS" 		, STANDARD,
+				PSTConstants.createArray(9, -256), PSTConstants.createArray(9, 256), PSTConstants.createArray(9, 0),
+				PSTConstants.createArray(9, -256), PSTConstants.createArray(9, 256), PSTConstants.createArray(9, 0)
+		));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_IMBALANCE_BISHOP_DOUBLE	, "MATERIAL.IMBALANCE.BISHOP.DOUBLE"	, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_IMBALANCE_QUEEN_KNIGHTS	, "MATERIAL.IMBALANCE.QUEEN.KNIGHTS"	, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAIR		, "MATERIAL.IMBALANCE.ROOK.PAIR"		, STANDARD         , 0, 100,  1, 0, 100,  1 ));
@@ -135,7 +141,10 @@ public class Bagatur_V17_FeaturesConfigurationImpl implements IFeaturesConfigura
 				PSTConstants.createArray(8, -1024), PSTConstants.createArray(8, 1024), PSTConstants.createArray(8, 0)
 		));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_PRISON				, "OTHERS.BISHOP.PRISON"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_PAWNS					, "OTHERS.BISHOP.PAWNS"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_OTHERS_BISHOP_PAWNS 					, "OTHERS.BISHOP.PAWNS" 				, STANDARD,
+				PSTConstants.createArray(9, -1024), PSTConstants.createArray(9, 1024), PSTConstants.createArray(9, 0),
+				PSTConstants.createArray(9, -1024), PSTConstants.createArray(9, 1024), PSTConstants.createArray(9, 0)
+		));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK			, "OTHERS.BISHOP.CENTER.ATTACK"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureArray(FEATURE_ID_OTHERS_PAWN_BLOCKAGE 				, "OTHERS.PAWN.BLOCKAGE" 				, STANDARD,
 				PSTConstants.createArray(8, -1024), PSTConstants.createArray(8, 1024), PSTConstants.createArray(8, 0),

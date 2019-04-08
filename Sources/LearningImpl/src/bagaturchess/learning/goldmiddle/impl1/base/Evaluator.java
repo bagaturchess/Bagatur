@@ -61,10 +61,10 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	public static final int IX_BISHOP_DOUBLE 				= 1;
 	public static final int IX_QUEEN_NIGHT 					= 2;
 	
-	public static final int[] KNIGHT_OUTPOST_MG			= {0,   0,   0,   48,   34,   75,   85,   94};
-	public static final int[] KNIGHT_OUTPOST_EG			= {1,   1,   1,   1,   1,   1,   1,   1};
-	public static final int[] BISHOP_OUTPOST_MG			= {1, 1, 1, 1, 1, 1, 1, 1};
-	public static final int[] BISHOP_OUTPOST_EG			= {1, 1, 1, 1, 1, 1, 1, 1};
+	public static final int[] KNIGHT_OUTPOST_MG			= {0,   0,   0,   34,   48,   75,   85,   111};
+	public static final int[] KNIGHT_OUTPOST_EG			= {0,   0,   0,   2,   3,   5,   13,   20};
+	public static final int[] BISHOP_OUTPOST_MG			= {1, 	1, 	1, 	1, 	1, 	1, 	1, 	1};
+	public static final int[] BISHOP_OUTPOST_EG			= {0,   0,   0,   1,   2,   4,   8,   16};
 	public static final int[] DOUBLE_ATTACKED_MG		= {0,   7,   35,   54,   36,   58,   0};
 	public static final int[] DOUBLE_ATTACKED_EG		= {0,   19,   5,   7,   16,   1,   0};
 	public static final int[] HANGING_MG				= {0,   61,   61,   56,   50,   51,   0};
@@ -74,9 +74,12 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	public static final int[] ROOK_TRAPPED 				= {64, 62, 28};
 	public static final int[] ONLY_MAJOR_DEFENDERS_MG	= {0,   8,   11,   15,   3,   0,   0};
 	public static final int[] ONLY_MAJOR_DEFENDERS_EG	= {0,   0,   1,   28,   11,   301,   0};
-	public static final int[] NIGHT_PAWN				= {68, -14, -2, 2, 8, 12, 20, 30, 36};
-	public static final int[] ROOK_PAWN					= {48, -4, -4, -4, -4, 0, 0, 0, 0};
-	public static final int[] BISHOP_PAWN 				= {-20, -8, -6, 0, 6, 12, 22, 32, 46};
+	public static final int[] BISHOP_PAWN_MG			= {-20,   -15,   -10,   -5,   0,   5,   10,   15,   20};
+	public static final int[] BISHOP_PAWN_EG			= {1, 	1, 	1, 	1, 	1, 	1, 	1, 	1, 	1};
+	public static final int[] NIGHT_PAWN_MG				= {1,   1,   1,   1,   1,   1,   1,   1,   1};
+	public static final int[] NIGHT_PAWN_EG				= {-35,   -27,   -18,   0,   10,   20,   30,   40,   50};
+	public static final int[] ROOK_PAWN_MG				= {1, 	1, 	1, 	1, 	1, 	1, 	1, 	1, 	1};
+	public static final int[] ROOK_PAWN_EG				= {-40,   -32,   -27,   0,   21,   26,   34,   40,   45};
 	public static final int[] SPACE 					= {0, 0, 0, 0, 0, -6, -6, -8, -7, -4, -4, -2, 0, -1, 0, 3, 7};
 	
 	public static final int[] PAWN_BLOCKAGE_MG 			= {1,   1,   1,   1,   1,   1,   1,   1};
@@ -439,23 +442,23 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		
 		
 		// knight bonus if there are a lot of pawns
-		int value = Long.bitCount(cb.getPieces(WHITE, NIGHT)) * NIGHT_PAWN[Long.bitCount(cb.getPieces(WHITE, PAWN))];
-		getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_NIGHT_PAWNS_O * value;
-		getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_NIGHT_PAWNS_E * value;
+		int value = Long.bitCount(cb.getPieces(WHITE, NIGHT));
+		getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_NIGHT_PAWNS_O * value * NIGHT_PAWN_MG[Long.bitCount(cb.getPieces(WHITE, PAWN))];
+		getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_NIGHT_PAWNS_E * value * NIGHT_PAWN_EG[Long.bitCount(cb.getPieces(WHITE, PAWN))];
 		
-		value = Long.bitCount(cb.getPieces(BLACK, NIGHT)) * NIGHT_PAWN[Long.bitCount(cb.getPieces(BLACK, PAWN))];
-		getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_NIGHT_PAWNS_O * value;
-		getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_NIGHT_PAWNS_E * value;
+		value = Long.bitCount(cb.getPieces(BLACK, NIGHT));
+		getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_NIGHT_PAWNS_O * value * NIGHT_PAWN_MG[Long.bitCount(cb.getPieces(BLACK, PAWN))];
+		getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_NIGHT_PAWNS_E * value * NIGHT_PAWN_EG[Long.bitCount(cb.getPieces(BLACK, PAWN))];
 		
 		
 		// rook bonus if there are no pawns
-		value = Long.bitCount(cb.getPieces(WHITE, ROOK)) * ROOK_PAWN[Long.bitCount(cb.getPieces(WHITE, PAWN))];
-		getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_ROOK_PAWNS_O * value;
-		getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_ROOK_PAWNS_E * value;
+		value = Long.bitCount(cb.getPieces(WHITE, ROOK));
+		getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_ROOK_PAWNS_O * value * ROOK_PAWN_MG[Long.bitCount(cb.getPieces(WHITE, PAWN))];
+		getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_ROOK_PAWNS_E * value * ROOK_PAWN_EG[Long.bitCount(cb.getPieces(WHITE, PAWN))];
 		
-		value = Long.bitCount(cb.getPieces(BLACK, ROOK)) * ROOK_PAWN[Long.bitCount(cb.getPieces(BLACK, PAWN))];
-		getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_ROOK_PAWNS_O * value;
-		getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_ROOK_PAWNS_E * value;
+		value = Long.bitCount(cb.getPieces(BLACK, ROOK));
+		getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_ROOK_PAWNS_O * value * ROOK_PAWN_MG[Long.bitCount(cb.getPieces(BLACK, PAWN))];
+		getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_ROOK_PAWNS_E * value * ROOK_PAWN_EG[Long.bitCount(cb.getPieces(BLACK, PAWN))];
 		
 		
 		// double bishop bonus
@@ -1106,9 +1109,8 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 
 			if ((cb.getPieces(WHITE, BISHOP) & WHITE_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
-				value = BISHOP_PAWN[Long.bitCount(whitePawns & WHITE_SQUARES)];
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_PAWNS_O * value;
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_PAWNS_E * value;
+				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_PAWNS_O * BISHOP_PAWN_MG[Long.bitCount(whitePawns & WHITE_SQUARES)];
+				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_PAWNS_E * BISHOP_PAWN_EG[Long.bitCount(whitePawns & WHITE_SQUARES)];
 				
 				// bonus for attacking center squares
 				value = Long.bitCount(getEvalInfo().attacks[WHITE][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
@@ -1117,9 +1119,8 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			}
 			if ((cb.getPieces(WHITE, BISHOP) & BLACK_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
-				value = BISHOP_PAWN[Long.bitCount(whitePawns & BLACK_SQUARES)];
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_PAWNS_O * value;
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_PAWNS_E * value;
+				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_PAWNS_O * BISHOP_PAWN_MG[Long.bitCount(whitePawns & BLACK_SQUARES)];
+				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_PAWNS_E * BISHOP_PAWN_EG[Long.bitCount(whitePawns & BLACK_SQUARES)];
 				
 				// bonus for attacking center squares 
 				value = Long.bitCount(getEvalInfo().attacks[WHITE][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
@@ -1154,9 +1155,8 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 
 			if ((cb.getPieces(BLACK, BISHOP) & WHITE_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
-				value = BISHOP_PAWN[Long.bitCount(blackPawns & WHITE_SQUARES)];
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_PAWNS_O * value;
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_PAWNS_E * value;
+				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_PAWNS_O * BISHOP_PAWN_MG[Long.bitCount(blackPawns & WHITE_SQUARES)];
+				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_PAWNS_E * BISHOP_PAWN_EG[Long.bitCount(blackPawns & WHITE_SQUARES)];
 				
 				// bonus for attacking center squares 
 				value = Long.bitCount(getEvalInfo().attacks[BLACK][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
@@ -1165,9 +1165,8 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			}
 			if ((cb.getPieces(BLACK, BISHOP) & BLACK_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
-				value = BISHOP_PAWN[Long.bitCount(blackPawns & BLACK_SQUARES)];
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_PAWNS_O * value;
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_PAWNS_E * value;
+				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_PAWNS_O * BISHOP_PAWN_MG[Long.bitCount(blackPawns & BLACK_SQUARES)];
+				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_PAWNS_E * BISHOP_PAWN_EG[Long.bitCount(blackPawns & BLACK_SQUARES)];
 				
 				// bonus for attacking center squares
 				value = Long.bitCount(getEvalInfo().attacks[BLACK][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
