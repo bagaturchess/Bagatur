@@ -35,13 +35,12 @@ import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.ISearchMoveListFactory;
-import bagaturchess.search.impl.alg.iter.OrderingStatistics;
-import bagaturchess.search.impl.alg.iter.SearchMoveListFactory;
 import bagaturchess.search.impl.evalcache.IEvalCache;
-import bagaturchess.search.impl.exts.Extensions;
 import bagaturchess.search.impl.history.HistoryTable_FromTo;
 import bagaturchess.search.impl.history.HistoryTable_PieceTo;
 import bagaturchess.search.impl.history.IHistoryTable;
+import bagaturchess.search.impl.movelists.OrderingStatistics;
+import bagaturchess.search.impl.movelists.SearchMoveListFactory;
 import bagaturchess.search.impl.pv.PVHistory;
 import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.search.impl.utils.Tactics;
@@ -55,7 +54,6 @@ public class SearchEnv {
 	private IBitBoard bitboard;
 	private IEvaluator eval;
 	private Tactics tactics;
-	private Extensions extensions;
 	
 	private IEvalCache evalCache;
 	private PawnsEvalCache pawnsCache;
@@ -206,13 +204,6 @@ public class SearchEnv {
 			evalCache = shared.getAndRemoveEvalCache();
 		}
 		return evalCache;
-	}
-
-	public Extensions getExtensions() {
-		if (extensions == null) {
-			extensions = new Extensions(getSearchConfig().getExtensionMode(), getSearchConfig().getDynamicExtUpdateInterval());
-		}
-		return extensions;
 	}
 	
 	public IRootSearchConfig getEngineConfiguration() {
