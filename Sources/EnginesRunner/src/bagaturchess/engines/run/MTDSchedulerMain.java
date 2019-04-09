@@ -90,9 +90,9 @@ public class MTDSchedulerMain {
 								//new RootSearchConfig_BaseImpl_SMP_Threads(
 				
 				new String[] {
-								bagaturchess.search.impl.alg.impl0.Search_PVS_NWS.class.getName(),
-								//bagaturchess.search.impl.alg.impl0.Search_PVS_NWS1.class.getName(),
+								//bagaturchess.search.impl.alg.impl0.Search_PVS_NWS.class.getName(),
 								//bagaturchess.search.impl.alg.impl1.Search_NegaScout.class.getName(),
+								bagaturchess.search.impl.alg.impl2.Search_NegaScout.class.getName(),
 								
 								bagaturchess.engines.cfg.base.SearchConfigImpl_AB.class.getName(),
 								
@@ -172,7 +172,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = new Board("4k3/8/8/4KR2/8/8/8/8 w - - 0 1", null, cfg.getBoardConfig());//Mate in 2 with e5d6
 		//IBitBoard bitboard = new Board("4k3/8/8/5R2/4K3/8/8/8 w - - 0 1", null, cfg.getBoardConfig());//Mate in 16 with e4d5
 		//IBitBoard bitboard = new Board("3rk3/8/8/8/4K3/4Q3/8/8 w - - 0 1", null, cfg.getBoardConfig());//Mate in 34 with e3c5
-		IBitBoard bitboard = new Board("Qb2r1k1/1p1q2pp/2p5/4p2n/1PPPPpb1/2B2N2/4NPP1/R5K1 b - - 0 28", null, cfg.getBoardConfig());//g4f3 is the correct move
+		//IBitBoard bitboard = new Board("Qb2r1k1/1p1q2pp/2p5/4p2n/1PPPPpb1/2B2N2/4NPP1/R5K1 b - - 0 28", null, cfg.getBoardConfig());//g4f3 is the correct move
 		
 		//IBitBoard bitboard = new Board("3k4/4r3/3K4/1Q6/8/8/8/8 b - - 15 8", null, cfg.getBoardConfig());//Bug: doesn't see mate in 4
 		//IBitBoard bitboard = new Board("3k4/4r3/2K5/6Q1/8/8/8/8 b - - 15 8", null, cfg.getBoardConfig());//Bug: doesn't see mate in 2
@@ -182,7 +182,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = new Board("r4rk1/pp3ppp/2pq4/3p4/4nPb1/2BBP3/PPP3PP/R3QRK1 w - - 2 15", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
-		//IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
+		IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("r1bqk2r/pp1pbppp/2n1pn2/2p5/4P3/5NP1/PPPPQPBP/RNB2RK1 b kq - 6 6  ", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("7k/6r1/8/8/8/8/1Q6/K7 w - -", null, cfg.getBoardConfig()); //Queen and King vs. Rook and King
 		//IBitBoard bitboard  = new Board("k7/1q6/8/8/8/7R/8/6K1 b - - ", null, cfg.getBoardConfig());
