@@ -74,12 +74,13 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	public static final int[] ROOK_TRAPPED 				= {64, 62, 28};
 	public static final int[] ONLY_MAJOR_DEFENDERS_MG	= {0,   8,   11,   15,   3,   0,   0};
 	public static final int[] ONLY_MAJOR_DEFENDERS_EG	= {0,   0,   1,   28,   11,   301,   0};
-	public static final int[] BISHOP_PAWN_MG			= {-20,   -15,   -10,   -5,   0,   5,   10,   15,   20};
-	public static final int[] BISHOP_PAWN_EG			= {1, 	1, 	1, 	1, 	1, 	1, 	1, 	1, 	1};
-	public static final int[] NIGHT_PAWN_MG				= {1,   1,   1,   1,   1,   1,   1,   1,   1};
-	public static final int[] NIGHT_PAWN_EG				= {-35,   -27,   -18,   0,   10,   20,   30,   40,   50};
-	public static final int[] ROOK_PAWN_MG				= {1, 	1, 	1, 	1, 	1, 	1, 	1, 	1, 	1};
-	public static final int[] ROOK_PAWN_EG				= {-40,   -32,   -27,   0,   21,   26,   34,   40,   45};
+	public static final int[] BISHOP_PAWN_MG			= {20,   15,   10,   5,   0,   -5,   -10,   -15,   -20};
+	public static final int[] BISHOP_PAWN_EG			= {20,   15,   10,   5,   0,   -5,   -10,   -15,   -20};
+	public static final int[] NIGHT_PAWN_MG				= {-20,   -15,   -10,   -5,   0,   5,   10,   15,   20};
+	public static final int[] NIGHT_PAWN_EG				= {-20,   -15,   -10,   -5,   0,   5,   10,   15,   20};
+	public static final int[] ROOK_PAWN_MG				= {20,   15,   10,   5,   0,   -5,   -10,   -15,   -20};
+	public static final int[] ROOK_PAWN_EG				= {20,   15,   10,   5,   0,   -5,   -10,   -15,   -20};
+	
 	public static final int[] SPACE 					= {0, 0, 0, 0, 0, -6, -6, -8, -7, -4, -4, -2, 0, -1, 0, 3, 7};
 	
 	public static final int[] PAWN_BLOCKAGE_MG 			= {1,   1,   1,   1,   1,   1,   1,   1};
