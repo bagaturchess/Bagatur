@@ -136,6 +136,13 @@ public class Search_NegaScout extends SearchImpl {
 				
 				return node.eval;
 			}
+		} else {
+			if (!env.getBitboard().hasMoveInNonCheck()) {
+				
+				node.eval = 0;
+				
+				return node.eval;
+			}
 		}
 		
 		
@@ -288,7 +295,7 @@ public class Search_NegaScout extends SearchImpl {
 		
 		
 		int eval = MIN;
-		if (!isPv && !env.getBitboard().isInCheck()) {
+		if (!isPv && !env.getBitboard().isInCheck() && ply > 0) {
 
 			eval = (int) env.getEval().fullEval(ply, alpha, beta, -1);
 
@@ -500,11 +507,7 @@ public class Search_NegaScout extends SearchImpl {
 
 		/* checkmate or stalemate */
 		if (movesPerformed == 0) {
-			if (!env.getBitboard().isInCheck()) {
-				return 0;
-			} else {
-				return getMateVal(ply);
-			}
+			throw new IllegalStateException("movesPerformed == 0");
 		}
 
 		if (bestMove == 0 || bestScore == MIN || bestScore == MAX) {
