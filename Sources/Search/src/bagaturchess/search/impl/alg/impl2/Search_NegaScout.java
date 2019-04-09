@@ -132,7 +132,7 @@ public class Search_NegaScout extends SearchImpl {
 		if (inCheck) {
 			if (!env.getBitboard().hasMoveInCheck()) {
 				
-				node.eval = -getMateVal(depth);
+				node.eval = -getMateVal(ply);
 				
 				return node.eval;
 			}
@@ -463,7 +463,7 @@ public class Search_NegaScout extends SearchImpl {
 				getHistory(env.getBitboard().isInCheck()).addCounterMove(env.getBitboard().getLastMove(), move);
 			}
 			
-			if (score > bestScore) {
+			if (score > bestScore || movesPerformed == 1) {
 				
 				bestScore = score;
 				bestMove = move;
