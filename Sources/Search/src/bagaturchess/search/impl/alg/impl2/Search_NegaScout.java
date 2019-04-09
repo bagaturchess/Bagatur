@@ -346,7 +346,7 @@ public class Search_NegaScout extends SearchImpl {
 		
 		if (ttMove == 0) {
 			/* IID */
-			if (depth > 5 && isPv) {
+			if (depth > 5 /*&& isPv*/) {
 				// no iid in pawn-endgame because the extension could cause an endless loop
 				calculateBestMove(mediator, info, ply, depth - 1 - 1, alpha, beta, 0);
 				//TODO ttValue = TTUtil.getTTValue(cb.zobristKey);
@@ -369,7 +369,7 @@ public class Search_NegaScout extends SearchImpl {
 		
 		final boolean wasInCheck = env.getBitboard().isInCheck();
 
-		final int parentMove = ply == 0 ? 0 : env.getBitboard().getLastMove();
+		//final int parentMove = ply == 0 ? 0 : env.getBitboard().getLastMove();
 		int bestMove = 0;
 		int bestScore = MIN - 1;
 		int counterMove = 0;
@@ -425,18 +425,18 @@ public class Search_NegaScout extends SearchImpl {
 			env.getBitboard().makeMoveForward(move);
 			
 			score = alpha + 1; // initial is above alpha
-
+			
 			int reduction = 1;
 			if (depth > 2 && movesPerformed > 1 && !MoveInt.isCaptureOrPromotion(move)) {
 
 				reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
 				reduction += 2;
-				if (env.getHistory_All().getScores(move) > 0.4) {
+				/*if (env.getHistory_All().getScores(move) > 0.4) {
 					reduction -= 1;
-				}
-				if (move == killer1Move || move == counterMove) {
+				}*/
+				/*if (move == killer1Move || move == counterMove) {
 					reduction -= 1;
-				}
+				}*/
 				if (!isPv) {
 					reduction += 1;
 				}
@@ -457,9 +457,9 @@ public class Search_NegaScout extends SearchImpl {
 			if (score > alpha) {
 				score = -calculateBestMove(mediator, info, ply + 1, depth - 1, -beta, -alpha, 0);
 			}
-				
+			
 			env.getBitboard().makeMoveBackward(move);
-
+			
 			//Add history records for the current move
 			list.countTotal(move);
 			if (score <= alphaOrig) {
@@ -470,7 +470,7 @@ public class Search_NegaScout extends SearchImpl {
 				getHistory(env.getBitboard().isInCheck()).addCounterMove(env.getBitboard().getLastMove(), move);
 			}
 			
-			if (score > bestScore || movesPerformed == 1) {
+			if (score > bestScore) {
 				
 				bestScore = score;
 				bestMove = move;
@@ -483,29 +483,14 @@ public class Search_NegaScout extends SearchImpl {
 				if (ply + 1 < MAX_DEPTH) {
 					pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 				}
-				
-				//TODO
-				/*if (ply == 0) {
-					PV.set(bestMove, alphaOrig, beta, bestScore, cb);
-				}*/
 
 				alpha = Math.max(alpha, score);
 				if (alpha >= beta) {
-
-					/* killer and history */
-					//TODO
-					/*if (MoveUtil.isQuiet(move) && cb.checkingPieces == 0) {
-						moveGen.addCounterMove(cb.colorToMove, parentMove, move);
-						moveGen.addKillerMove(move, ply);
-						moveGen.addHHValue(cb.colorToMove, move, depth);
-					}*/
-					
 					break;
 				}
 			}
 		}
-
-		/* checkmate or stalemate */
+		
 		if (movesPerformed == 0) {
 			throw new IllegalStateException("movesPerformed == 0");
 		}
@@ -513,17 +498,6 @@ public class Search_NegaScout extends SearchImpl {
 		if (bestMove == 0 || bestScore == MIN || bestScore == MAX) {
 			throw new IllegalStateException();
 		}
-
-		// set tt-flag
-		//TODO
-		/*int flag = TTUtil.FLAG_EXACT;
-		if (bestScore >= beta) {
-			flag = TTUtil.FLAG_LOWER;
-		} else if (bestScore <= alphaOrig) {
-			flag = TTUtil.FLAG_UPPER;
-		}
-		TTUtil.addValue(cb.zobristKey, bestScore, ply, depth, flag, bestMove);
-		*/
 		
 		env.getTPT().lock();
 		env.getTPT().put(env.getBitboard().getHashKey(), depth, 0, env.getBitboard().getColourToMove(), bestScore, alphaOrig, beta, bestMove, (byte)0);
