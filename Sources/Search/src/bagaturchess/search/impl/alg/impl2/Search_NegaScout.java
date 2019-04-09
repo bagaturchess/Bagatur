@@ -46,6 +46,22 @@ import bagaturchess.search.impl.utils.SearchUtils;
 public class Search_NegaScout extends SearchImpl {
 	
 	
+	// Margins shamelessly stolen from Laser
+	private static final int[] STATIC_NULLMOVE_MARGIN = { 0, 60, 130, 210, 300, 400, 510 };
+	private static final int[] RAZORING_MARGIN = { 0, 240, 280, 300 };
+	private static final int[] FUTILITY_MARGIN = { 0, 80, 170, 270, 380, 500, 630 };
+	private static final int[][] LMR_TABLE = new int[64][64];
+	static {
+		// Ethereal LMR formula with depth and number of performed moves
+		for (int depth = 1; depth < 64; depth++) {
+			for (int moveNumber = 1; moveNumber < 64; moveNumber++) {
+				LMR_TABLE[depth][moveNumber] = (int) (0.5f + Math.log(depth) * Math.log(moveNumber * 1.2f) / 2.5f);
+			}
+		}
+	}
+	private static final int FUTILITY_MARGIN_QSEARCH = 200;
+	
+	
 	public Search_NegaScout(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
 	}
@@ -75,25 +91,6 @@ public class Search_NegaScout extends SearchImpl {
 		return calculateBestMove(mediator, info, depth, maxdepth / PLY, beta - 1, beta, 0);
 	}
 	
-	// Margins shamelessly stolen from Laser
-	private static final int[] STATIC_NULLMOVE_MARGIN = { 0, 60, 130, 210, 300, 400, 510 };
-	private static final int[] RAZORING_MARGIN = { 0, 240, 280, 300 };
-	private static final int[] FUTILITY_MARGIN = { 0, 80, 170, 270, 380, 500, 630 };
-	private static final int[][] LMR_TABLE = new int[64][64];
-	static {
-		// Ethereal LMR formula with depth and number of performed moves
-		for (int depth = 1; depth < 64; depth++) {
-			for (int moveNumber = 1; moveNumber < 64; moveNumber++) {
-				LMR_TABLE[depth][moveNumber] = (int) (0.5f + Math.log(depth) * Math.log(moveNumber * 1.2f) / 2.5f);
-			}
-		}
-	}
-
-	public static AtomicInteger nrOfActiveThreads = new AtomicInteger(0);
-	public static boolean isRunning = false;
-
-	private static final int FUTILITY_MARGIN_QSEARCH = 200;
-	
 	
 	public int calculateBestMove(ISearchMediator mediator, ISearchInfo info, final int ply, int depth, int alpha, int beta, final int nullMoveCounter) {
 		
@@ -116,12 +113,12 @@ public class Search_NegaScout extends SearchImpl {
 		//Draw check
 		if (isPv) {
 			if (isDrawPV(depth)) {
-				node.eval = 0;//getDrawScores(rootColour);
+				node.eval = 0;//TODO getDrawScores(rootColour);
 				return node.eval;
 			}
 		} else {
 			if (isDraw()) {
-				node.eval = 0;//getDrawScores(rootColour);
+				node.eval = 0;//TODO getDrawScores(rootColour);
 				return node.eval;
 			}
 		}
@@ -139,7 +136,7 @@ public class Search_NegaScout extends SearchImpl {
 		} else {
 			if (!env.getBitboard().hasMoveInNonCheck()) {
 				
-				node.eval = 0;
+				node.eval = 0;//TODO getDrawScores(rootColour);
 				
 				return node.eval;
 			}
@@ -148,53 +145,21 @@ public class Search_NegaScout extends SearchImpl {
 		
 		// get extensions
 		depth += extensions(env.getBitboard(), ply);
-
+		
+		
 		/* mate-distance pruning */
-		//TODO
-		/*if (true) {
-			alpha = Math.max(alpha, Util.SHORT_MIN + ply);
-			beta = Math.min(beta, Util.SHORT_MAX - ply - 1);
+		/*TODO
+		if (ply > 0) {
+			alpha = Math.max(alpha, MIN + ply);
+			beta = Math.min(beta, MAX - ply - 1);
 			if (alpha >= beta) {
 				return alpha;
 			}
 		}*/
-
+		
+		
 		/* transposition-table */
-		//TODO
-		//long ttValue = 0;//TTUtil.getTTValue(cb.zobristKey);
-		int score = 0;//TTUtil.getScore(ttValue, ply);
-		/*if (ttValue != 0) {
-			if (!EngineConstants.TEST_TT_VALUES) {
-
-				if (TTUtil.getDepth(ttValue) >= depth) {
-					switch (TTUtil.getFlag(ttValue)) {
-					case TTUtil.FLAG_EXACT:
-						if (ply == 0 && threadNumber == 0) {
-							PV.set(TTUtil.getMove(ttValue), alpha, beta, score, cb);
-						}
-						return score;
-					case TTUtil.FLAG_LOWER:
-						if (score >= beta) {
-							if (ply == 0 && threadNumber == 0) {
-								PV.set(TTUtil.getMove(ttValue), alpha, beta, score, cb);
-							}
-							return score;
-						}
-						break;
-					case TTUtil.FLAG_UPPER:
-						if (score <= alpha) {
-							if (ply == 0 && threadNumber == 0) {
-								PV.set(TTUtil.getMove(ttValue), alpha, beta, score, cb);
-							}
-							return score;
-						}
-					}
-				}
-			}
-		}*/
-
 		int ttMove = 0;
-		//long ttValue = 0;
 		//Get TPT entry
 		{
 			boolean tpt_found = false;
@@ -281,7 +246,6 @@ public class Search_NegaScout extends SearchImpl {
 		}
 		
 		
-		// TODO JITWatch unpredictable branch
 		if (depth == 0) {
 			return calculateBestMove(info, env.getBitboard(), alpha, beta, ply);
 		}
@@ -293,21 +257,17 @@ public class Search_NegaScout extends SearchImpl {
 			info.setSelDepth(ply);
 		}
 		
-		
+		int score;
 		int eval = MIN;
 		if (!isPv && !env.getBitboard().isInCheck() && ply > 0) {
 
 			eval = (int) env.getEval().fullEval(ply, alpha, beta, -1);
 
 			/* use tt value as eval */
-			//TODO
-			/*if (EngineConstants.USE_TT_SCORE_AS_EVAL && ttValue != 0) {
-				if (TTUtil.getFlag(ttValue) == TTUtil.FLAG_EXACT || TTUtil.getFlag(ttValue) == TTUtil.FLAG_UPPER && score < eval
-						|| TTUtil.getFlag(ttValue) == TTUtil.FLAG_LOWER && score > eval) {
-					eval = score;
-				}
-			}*/
-
+			if (ttMove != 0 && node.eval != 0) {
+				eval = node.eval;
+			}
+			
 			/* static null move pruning */
 			if (depth < STATIC_NULLMOVE_MARGIN.length) {
 				if (eval - STATIC_NULLMOVE_MARGIN[depth] >= beta) {
@@ -332,7 +292,6 @@ public class Search_NegaScout extends SearchImpl {
 						env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
 				if (nullMoveCounter < 2 && eval >= beta && hasAtLeastOnePiece) {
 					env.getBitboard().makeNullMoveForward();
-					// TODO less reduction if stm (other side) has only 1 major piece
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 					score = depth - reduction <= 0 ? -calculateBestMove(info, env.getBitboard(), -beta, -beta + 1, ply + 1)
 							: -calculateBestMove(mediator, info, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1);
@@ -346,10 +305,8 @@ public class Search_NegaScout extends SearchImpl {
 		
 		if (ttMove == 0) {
 			/* IID */
-			if (depth > 5 /*&& isPv*/) {
-				// no iid in pawn-endgame because the extension could cause an endless loop
+			if (depth > 5 && isPv) {
 				calculateBestMove(mediator, info, ply, depth - 1 - 1, alpha, beta, 0);
-				//TODO ttValue = TTUtil.getTTValue(cb.zobristKey);
 				
 				env.getTPT().lock();
 				{
@@ -372,9 +329,6 @@ public class Search_NegaScout extends SearchImpl {
 		//final int parentMove = ply == 0 ? 0 : env.getBitboard().getLastMove();
 		int bestMove = 0;
 		int bestScore = MIN - 1;
-		int counterMove = 0;
-		int killer1Move = 0;
-		int killer2Move = 0;
 		int movesPerformed = 0;
 
 		ISearchMoveList list = null;
@@ -506,17 +460,6 @@ public class Search_NegaScout extends SearchImpl {
 		return bestScore;
 	}
 
-	private static int extensions(final IBitBoard cb, final int ply) {
-		/* check-extension */
-		// TODO extend discovered checks?
-		// TODO extend checks with SEE > 0?
-		// TODO extend when mate-threat?
-		if (cb.isInCheck()) {
-			return 1;
-		}
-		return 0;
-	}
-
 
 	public int calculateBestMove(ISearchInfo info, final IBitBoard cb, int alpha, final int beta, final int ply) {
 		
@@ -541,6 +484,7 @@ public class Search_NegaScout extends SearchImpl {
 		if (!cb.isInCheck()) {
 			eval = (int) env.getEval().fullEval(0, alpha, beta, -1);
 			if (eval >= beta) {
+				node.eval = eval;
 				return eval;
 			}
 			alpha = Math.max(alpha, eval);
@@ -607,13 +551,24 @@ public class Search_NegaScout extends SearchImpl {
 		
 		/* checkmate or stalemate */
 		if (env.getBitboard().isInCheck() && movesPerformed == 0) {
-			return getMateVal(ply);
+			node.eval = getMateVal(ply);
+			return node.eval;
 		}
 		
 		if (alpha == MIN || alpha == MAX) {
 			throw new IllegalStateException();
 		}
 		
-		return alpha;
+		node.eval = alpha;
+		return node.eval;
+	}
+	
+	
+	private static int extensions(final IBitBoard cb, final int ply) {
+		/* check-extension */
+		if (cb.isInCheck()) {
+			return 1;
+		}
+		return 0;
 	}
 }
