@@ -20,10 +20,8 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.search.impl.alg.impl2;
+package bagaturchess.search.impl.alg.impl3;
 
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
@@ -78,7 +76,7 @@ public class Search_NegaScout extends SearchImpl {
 			boolean prevNullMove, int evalGain, int rootColour,
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
-		return calculateBestMove(mediator, info, depth, maxdepth / PLY, alpha, beta, 0);
+		return calculateBestMove(mediator, info, depth, maxdepth / PLY, alpha, beta, 0, true);
 	}
 	
 	
@@ -88,14 +86,14 @@ public class Search_NegaScout extends SearchImpl {
 			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV,
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
-		return calculateBestMove(mediator, info, depth, maxdepth / PLY, beta - 1, beta, 0);
+		return calculateBestMove(mediator, info, depth, maxdepth / PLY, beta - 1, beta, 0, false);
 	}
 	
 	
-	public int calculateBestMove(ISearchMediator mediator, ISearchInfo info, final int ply, int depth, int alpha, int beta, final int nullMoveCounter) {
+	public int calculateBestMove(ISearchMediator mediator, ISearchInfo info, final int ply, int depth, int alpha, int beta, final int nullMoveCounter, final boolean isPv) {
 		
 		final int alphaOrig = alpha;
-		final boolean isPv = beta - alpha != 1;
+		//final boolean isPv = beta - alpha != 1;
 		
 		//Stop search
 		if (mediator != null && mediator.getStopper() != null)
@@ -259,7 +257,7 @@ public class Search_NegaScout extends SearchImpl {
 		
 		int score;
 		int eval = MIN;
-		if (!isPv && !env.getBitboard().isInCheck() && ply > 0) {
+		if (!isPv && !env.getBitboard().isInCheck()) {
 
 			eval = (int) env.getEval().fullEval(ply, alpha, beta, -1);
 
@@ -294,7 +292,7 @@ public class Search_NegaScout extends SearchImpl {
 					env.getBitboard().makeNullMoveForward();
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 					score = depth - reduction <= 0 ? -calculateBestMove(info, env.getBitboard(), -beta, -beta + 1, ply + 1)
-							: -calculateBestMove(mediator, info, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1);
+							: -calculateBestMove(mediator, info, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1, false);
 					env.getBitboard().makeNullMoveBackward();
 					if (score >= beta) {
 						return score;
@@ -306,7 +304,7 @@ public class Search_NegaScout extends SearchImpl {
 		if (ttMove == 0) {
 			/* IID */
 			if (depth > 5 && isPv) {
-				calculateBestMove(mediator, info, ply, depth - 1 - 1, alpha, beta, 0);
+				calculateBestMove(mediator, info, ply, depth - 1 - 1, alpha, beta, 0, false);
 				
 				env.getTPT().lock();
 				{
@@ -384,10 +382,13 @@ public class Search_NegaScout extends SearchImpl {
 			if (depth > 2 && movesPerformed > 1 && !MoveInt.isCaptureOrPromotion(move)) {
 
 				reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
-				//reduction += 2;
-				if (env.getHistory_All().getScores(move) > 0.4) {
+				reduction += 2;
+				/*if (env.getHistory_All().getScores(move) > 0.4) {
 					reduction -= 1;
-				}
+				}*/
+				/*if (move == killer1Move || move == counterMove) {
+					reduction -= 1;
+				}*/
 				if (!isPv) {
 					reduction += 1;
 				}
@@ -396,17 +397,17 @@ public class Search_NegaScout extends SearchImpl {
 
 			/* LMR */
 			if (reduction != 1) {
-				score = -calculateBestMove(mediator, info, ply + 1, depth - reduction, -alpha - 1, -alpha, 0);
+				score = -calculateBestMove(mediator, info, ply + 1, depth - reduction, -alpha - 1, -alpha, 0, false);
 			}
 
 			/* PVS */
 			if (score > alpha && movesPerformed > 1) {
-				score = -calculateBestMove(mediator, info, ply + 1, depth - 1, -alpha - 1, -alpha, 0);
+				score = -calculateBestMove(mediator, info, ply + 1, depth - 1, -alpha - 1, -alpha, 0, false);
 			}
 
 			/* normal bounds */
 			if (score > alpha) {
-				score = -calculateBestMove(mediator, info, ply + 1, depth - 1, -beta, -alpha, 0);
+				score = -calculateBestMove(mediator, info, ply + 1, depth - 1, -beta, -alpha, 0, isPv);
 			}
 			
 			env.getBitboard().makeMoveBackward(move);
