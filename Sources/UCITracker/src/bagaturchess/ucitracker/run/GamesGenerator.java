@@ -54,7 +54,7 @@ public class GamesGenerator {
 	private static int MAX_EVAL_DIFF = 1500;
 	private static int MAX_MOVES = 300;
 	private static int BEST_MOVE_DIFF = 50;
-	private static int MIN_PIECES = 7;
+	private static int MIN_PIECES = 8;
 	
 	
 	private UCIEnginesManager runner;
@@ -111,14 +111,17 @@ public class GamesGenerator {
 					new String [0],
 					"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\texel107");*/
 			
-			EngineProcess engine = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-10-win\\Windows\\stockfish_10_x64.exe",
+			/*EngineProcess engine = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-10-win\\Windows\\stockfish_10_x64.exe",
 					new String [0],
-					"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-10-win\\Windows");
+					"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-10-win\\Windows");*/
 	
+			EngineProcess engine = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Komodo9\\Windows\\komodo-9.02-64bit.exe",
+					new String [0],
+					"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Komodo9\\Windows\\");
 			
 			//EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");
 			
-			control.execute(engine, "./stockfish-10.cg", 1000000, true);
+			control.execute(engine, "./komodo-9.cg", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -182,7 +185,7 @@ public class GamesGenerator {
 			if (bitboard.getPlayedMovesCount() > MAX_MOVES) {
 				break;
 			}
-			if (bitboard.getMaterialState().getPiecesCount() <= MIN_PIECES) {
+			if (bitboard.getMaterialState().getPiecesCount() < MIN_PIECES) {
 				break;
 			}
 			
