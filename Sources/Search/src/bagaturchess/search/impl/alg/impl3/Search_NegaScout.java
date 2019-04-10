@@ -122,9 +122,9 @@ public class Search_NegaScout extends SearchImpl {
 		}
 		
 		
-		//Mate check
+		//Mate and stalemate check
 		boolean inCheck = env.getBitboard().isInCheck();
-		if (inCheck) {
+		/*if (inCheck) {
 			if (!env.getBitboard().hasMoveInCheck()) {
 				
 				node.eval = -getMateVal(ply);
@@ -138,7 +138,7 @@ public class Search_NegaScout extends SearchImpl {
 				
 				return node.eval;
 			}
-		}
+		}*/
 		
 		
 		// get extensions
@@ -257,7 +257,7 @@ public class Search_NegaScout extends SearchImpl {
 		
 		int score;
 		int eval = MIN;
-		if (!isPv && !env.getBitboard().isInCheck()) {
+		if (!isPv && !inCheck) {
 
 			eval = (int) env.getEval().fullEval(ply, alpha, beta, -1);
 
@@ -322,7 +322,7 @@ public class Search_NegaScout extends SearchImpl {
 			}
 		}
 		
-		final boolean wasInCheck = env.getBitboard().isInCheck();
+		final boolean wasInCheck = inCheck;
 
 		//final int parentMove = ply == 0 ? 0 : env.getBitboard().getLastMove();
 		int bestMove = 0;
@@ -330,7 +330,7 @@ public class Search_NegaScout extends SearchImpl {
 		int movesPerformed = 0;
 
 		ISearchMoveList list = null;
-		if (env.getBitboard().isInCheck()) { 
+		if (inCheck) { 
 			list = lists_escapes[ply];
 			list.clear();
 			((ListKingEscapes)list).setTptMove(ttMove);
@@ -415,11 +415,11 @@ public class Search_NegaScout extends SearchImpl {
 			//Add history records for the current move
 			list.countTotal(move);
 			if (score <= alphaOrig) {
-				getHistory(env.getBitboard().isInCheck()).countFailure(move, depth);
+				getHistory(inCheck).countFailure(move, depth);
 			} else {
 				list.countSuccess(move);//Should be before addCounterMove call
-				getHistory(env.getBitboard().isInCheck()).countSuccess(move, depth);
-				getHistory(env.getBitboard().isInCheck()).addCounterMove(env.getBitboard().getLastMove(), move);
+				getHistory(inCheck).countSuccess(move, depth);
+				getHistory(inCheck).addCounterMove(env.getBitboard().getLastMove(), move);
 			}
 			
 			if (score > bestScore) {
@@ -443,10 +443,31 @@ public class Search_NegaScout extends SearchImpl {
 			}
 		}
 		
-		if (movesPerformed == 0) {
-			throw new IllegalStateException("movesPerformed == 0");
+		
+		if (bestMove == 0) {
+			if (inCheck) {
+				if (movesPerformed == 0) {
+					node.bestmove = 0;
+					node.eval = -getMateVal(depth);
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
+				} else {
+					throw new IllegalStateException();
+				}
+			} else {
+				if (movesPerformed == 0) {
+					node.bestmove = 0;
+					node.eval = 0;//TODO getDrawScores(rootColour);
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
+				} else {
+					throw new IllegalStateException();
+				}
+			}
 		}
-
+		
 		if (bestMove == 0 || bestScore == MIN || bestScore == MAX) {
 			throw new IllegalStateException();
 		}
@@ -557,7 +578,7 @@ public class Search_NegaScout extends SearchImpl {
 			throw new IllegalStateException();
 		}
 		
-		node.eval = alpha;
+		node.eval = eval;
 		return node.eval;
 	}
 	
