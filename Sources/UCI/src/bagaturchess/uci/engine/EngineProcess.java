@@ -38,6 +38,7 @@ import bagaturchess.uci.impl.commands.Go;
 public class EngineProcess {
 	
 	
+	private String engineName;
 	private String startCommand;
 	private String[] props;
 	private String workDir;
@@ -54,7 +55,25 @@ public class EngineProcess {
 		startCommand = _startCommand;
 		props = _props;
 		workDir = _workDir;
+		
+		int idx = Math.max(startCommand.lastIndexOf('/'), startCommand.lastIndexOf('\\'));
+		if (idx < 0) {
+			idx = 0;
+		}
+		engineName = startCommand.substring(idx + 1);
 	}
+	
+	public EngineProcess(String _engineName, String _startCommand, String[] _props, String _workDir) {
+		engineName = _engineName;
+		startCommand = _startCommand;
+		props = _props;
+		workDir = _workDir;
+	}
+	
+	public String getName() {
+		return engineName;
+	}
+	
 	
 	public void setDummperMode(boolean enabled) {
 		if (enabled) {
@@ -323,13 +342,5 @@ public class EngineProcess {
 		}
 		
 		//throw new IllegalStateException("getInfoLine blocked");
-	}
-
-	public String getName() {
-		int idx = Math.max(startCommand.lastIndexOf('/'), startCommand.lastIndexOf('\\'));
-		if (idx < 0) {
-			idx = 0;
-		}
-		return startCommand.substring(idx + 1);
 	}
 }
