@@ -90,10 +90,10 @@ public class MTDSchedulerMain {
 								//new RootSearchConfig_BaseImpl_SMP_Threads(
 				
 				new String[] {
-								//bagaturchess.search.impl.alg.impl0.Search_PVS_NWS.class.getName(),
+								bagaturchess.search.impl.alg.impl0.Search_PVS_NWS.class.getName(),
 								//bagaturchess.search.impl.alg.impl1.Search_NegaScout.class.getName(),
 								//bagaturchess.search.impl.alg.impl2.Search_NegaScout.class.getName(),
-								bagaturchess.search.impl.alg.impl3.Search_NegaScout.class.getName(),
+								//bagaturchess.search.impl.alg.impl3.Search_NegaScout.class.getName(),
 								
 								bagaturchess.engines.cfg.base.SearchConfigImpl_AB.class.getName(),
 								

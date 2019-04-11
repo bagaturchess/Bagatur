@@ -24,6 +24,7 @@ package bagaturchess.search.impl.alg.impl0;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
@@ -49,6 +50,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private double IID_DEPTH_MULTIPLIER 			= 1;
 	private boolean STATIC_PRUNING1					= true;
 	private boolean STATIC_PRUNING2 				= true;
+	private static final int[] STATIC_NULLMOVE_MARGIN = { 0, 60, 130, 210, 300, 400, 510 };
+	private static final int[] RAZORING_MARGIN = { 0, 240, 280, 300 };
 	
 	
 	private BacktrackingInfo[] backtracking 		= new BacktrackingInfo[MAX_DEPTH + 1];
@@ -409,7 +412,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
         }
-		
+        
         
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
@@ -1081,11 +1084,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		
         if (STATIC_PRUNING1 && useStaticPrunning
                 ) {
-                
+            
             if (inCheck) {
                 throw new IllegalStateException("In check in useStaticPrunning");
             }
-        
+            
             if (tpt_lower > TPTEntry.MIN_VALUE) {
                 if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
                     return tpt_lower;
@@ -1101,6 +1104,27 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
         }
         
+        if (!inCheck && useStaticPrunning) {
+        	
+        	
+			//Static null move pruning
+			if (rest < STATIC_NULLMOVE_MARGIN.length) {
+				if (backtrackingInfo.static_eval - STATIC_NULLMOVE_MARGIN[rest] >= beta) {
+					return backtrackingInfo.static_eval;
+				}
+			}
+			
+			
+			//Razoring
+			if (rest < RAZORING_MARGIN.length && Math.abs(alpha_org) < MAX_MAT_INTERVAL) {
+				if (backtrackingInfo.static_eval + RAZORING_MARGIN[rest] < alpha_org) {
+					int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, alpha_org - RAZORING_MARGIN[rest] + 1, rootColour);
+					if (qeval + RAZORING_MARGIN[rest] <= alpha_org) {
+						return qeval;
+					}
+				}
+			}
+        }
         
 		boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
@@ -1767,7 +1791,27 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			searchedMoves++;
 			
+			
+			if (!inCheck) {
 				
+				//Skip under promotions
+				if (MoveInt.isPromotion(cur_move)) {
+					if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
+						continue;
+					}
+				} else if (MoveInt.isCapture(cur_move) && staticEval + 200 + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
+					//Futility pruning
+					continue;
+				}
+	
+				//Skip bad captures
+				int moveSee = env.getBitboard().getSee().evalExchange(cur_move);
+				if (moveSee <= 0) {
+					continue;
+				}
+			}
+			
+			
 			env.getBitboard().makeMoveForward(cur_move);
 			
 			
@@ -2000,6 +2044,26 @@ public class Search_PVS_NWS extends SearchImpl {
 				continue;
 			}
 			searchedMoves++;
+			
+			
+			if (!inCheck) {
+				
+				//Skip under promotions
+				if (MoveInt.isPromotion(cur_move)) {
+					if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
+						continue;
+					}
+				} else if (MoveInt.isCapture(cur_move) && staticEval + 200 + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
+					//Futility pruning
+					continue;
+				}
+	
+				//Skip bad captures
+				int moveSee = env.getBitboard().getSee().evalExchange(cur_move);
+				if (moveSee <= 0) {
+					continue;
+				}
+			}
 			
 			
 			env.getBitboard().makeMoveForward(cur_move);
