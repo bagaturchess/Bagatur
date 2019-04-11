@@ -45,18 +45,18 @@ import bagaturchess.search.impl.utils.SearchUtils;
 public class Search_PVS_NWS extends SearchImpl {
 	
 	
-	private double LMR_REDUCTION_MULTIPLIER 		= 1;// * 1.222 * 1;
-	private double NULL_MOVE_REDUCTION_MULTIPLIER 	= 1;// * 0.777 * 1;
-	private double IID_DEPTH_MULTIPLIER 			= 1;
-	private boolean STATIC_PRUNING1					= true;
-	private boolean STATIC_PRUNING2 				= true;
-	private static final int[] STATIC_NULLMOVE_MARGIN = { 0, 60, 130, 210, 300, 400, 510 };
-	private static final int[] RAZORING_MARGIN = { 0, 240, 280, 300 };
+	private double LMR_REDUCTION_MULTIPLIER 			= 1;
+	private double NULL_MOVE_REDUCTION_MULTIPLIER 		= 1;
+	private double IID_DEPTH_MULTIPLIER 				= 1;
+	private boolean STATIC_PRUNING1						= true;
+	private boolean STATIC_PRUNING2 					= true;
+	private static final int[] MARGIN_STATIC_NULLMOVE 	= { 0, 60, 130, 210, 300, 400, 510 };
+	private static final int[] MARGIN_RAZORING 			= { 0, 240, 280, 320 };
 	
 	
-	private BacktrackingInfo[] backtracking 		= new BacktrackingInfo[MAX_DEPTH + 1];
+	private BacktrackingInfo[] backtracking 			= new BacktrackingInfo[MAX_DEPTH + 1];
 	
-	private static final double EVAL_DIFF_MAX 		= 50;
+	private static final double EVAL_DIFF_MAX 			= 50;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -1108,18 +1108,18 @@ public class Search_PVS_NWS extends SearchImpl {
         	
         	
 			//Static null move pruning
-			if (rest < STATIC_NULLMOVE_MARGIN.length) {
-				if (backtrackingInfo.static_eval - STATIC_NULLMOVE_MARGIN[rest] >= beta) {
+			if (rest < MARGIN_STATIC_NULLMOVE.length) {
+				if (backtrackingInfo.static_eval - MARGIN_STATIC_NULLMOVE[rest] >= beta) {
 					return backtrackingInfo.static_eval;
 				}
 			}
 			
 			
 			//Razoring
-			if (rest < RAZORING_MARGIN.length && Math.abs(alpha_org) < MAX_MAT_INTERVAL) {
-				if (backtrackingInfo.static_eval + RAZORING_MARGIN[rest] < alpha_org) {
-					int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, alpha_org - RAZORING_MARGIN[rest] + 1, rootColour);
-					if (qeval + RAZORING_MARGIN[rest] <= alpha_org) {
+			if (rest < MARGIN_RAZORING.length && Math.abs(alpha_org) < MAX_MAT_INTERVAL) {
+				if (backtrackingInfo.static_eval + MARGIN_RAZORING[rest] < alpha_org) {
+					int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, alpha_org - MARGIN_RAZORING[rest] + 1, rootColour);
+					if (qeval + MARGIN_RAZORING[rest] <= alpha_org) {
 						return qeval;
 					}
 				}
