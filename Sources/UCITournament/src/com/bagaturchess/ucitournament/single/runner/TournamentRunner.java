@@ -28,30 +28,35 @@ import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_FixedDepth;
+import com.bagaturchess.ucitournament.framework.match.MatchRunner_TimePerMove;
 import com.bagaturchess.ucitournament.single.Tournament;
 import com.bagaturchess.ucitournament.single.schedule.ITournamentSchedule;
+import com.bagaturchess.ucitournament.single.schedule.TournamentSchedule_2Engines;
 import com.bagaturchess.ucitournament.single.schedule.TournamentSchedule_EvenScores;
+import com.bagaturchess.ucitournament.single.schedule.TournamentSchedule_OneRound;
 
 
 public class TournamentRunner {
 	
 	public static void main(String[] args) {
+				
+		EngineProcess engine1 = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.6c\\Bagatur_64_1_core.exe",
+				new String [0],
+				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.6c\\");
+
+		EngineProcess engine2 = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\Bagatur_1.7.exe",
+				new String [0],
+				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\");
 		
-		EngineProcess bagatur1 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.sr.ECFG_NoExts", "");
-		EngineProcess bagatur2 = new EngineProcess_BagaturImpl_WorkspaceImpl("com.krasimir.topchiyski.chess.configs.tune.exts.sr.ECFG_NoExts", "");
-		
-		//Engine[] engines = new Engine[] {glaurung, rybka, aice, fruit21};
-		EngineProcess[] engines = new EngineProcess[] {bagatur1, bagatur2};
-		//Engine[] engines = new Engine[] {bagatur, aice};
-		//Engine[] engines = new Engine[] {glaurung, rybka, aice};
+		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
 		
 		try {
 			
-			//ITournamentSchedule schedule = new ITournamentSchedule_OneRound(engines);
-			ITournamentSchedule schedule = new TournamentSchedule_EvenScores(engines);
+			ITournamentSchedule schedule = new TournamentSchedule_2Engines(engines, 50);
+			//ITournamentSchedule schedule = new TournamentSchedule_EvenScores(engines);
 			
-			//MatchRunner matchRunner = new MatchRunner_TimePerMove(1 * 1000);
-			MatchRunner matchRunner = new MatchRunner_FixedDepth(3);
+			MatchRunner matchRunner = new MatchRunner_TimePerMove(1 * 500);
+			//MatchRunner matchRunner = new MatchRunner_FixedDepth(3);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(60 * 1000, 60 * 1000, 1 * 1000, 1 * 1000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(6 * 1000, 6 * 1000, 2 * 100, 2 * 100);
 			

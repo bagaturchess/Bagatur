@@ -68,11 +68,11 @@ public class Tournament {
 				engine1.start();
 				engine2.start();
 				
-				System.out.print("Playing " + pairs[pair] + " ... ");
+				System.out.print("Playing pair " + pair + "/" +pairs.length + " " + pairs[pair] + " ... ");
 				int result = matchRunner.execute(engine1, engine2);
 				System.out.println(" finished. Result is " + result);
 				tournamentResult.addResult(engine1Name, engine2Name, result);
-				
+				System.out.println(tournamentResult);
 				
 				engine1.destroy();
 				engine2.destroy();
