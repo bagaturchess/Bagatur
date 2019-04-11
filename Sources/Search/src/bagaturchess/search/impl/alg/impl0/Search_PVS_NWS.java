@@ -1889,7 +1889,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private int nullwin_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int beta, int rootColour) {
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);	
-		
 		if (info.getSelDepth() < depth) {
 			info.setSelDepth(depth);
 		}
