@@ -43,13 +43,13 @@ public class TournamentRunner {
 	
 	public static void main(String[] args) {
 				
-		EngineProcess engine1 = new EngineProcess("Bagatur 1.6c", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.6c\\Bagatur_1.6c.exe",
+		EngineProcess engine1 = new EngineProcess("Bagatur DEV Komodo", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_KomodoStyle\\Bagatur_64_1_core.exe",
 				new String [0],
-				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.6c\\");
+				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_KomodoStyle\\");
 
-		EngineProcess engine2 = new EngineProcess("Bagatur 1.7", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\Bagatur_1.7.exe",
+		EngineProcess engine2 = new EngineProcess("Bagatur DEV Stockfish", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_StockfishStyle\\Bagatur_64_1_core.exe",
 				new String [0],
-				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\");
+				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_StockfishStyle\\");
 		
 		
 		/*EngineProcess engine2 = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Komodo9\\Windows\\komodo-9.02-64bit.exe",
@@ -61,6 +61,7 @@ public class TournamentRunner {
 		
 		
 		List<String> options = new ArrayList<String>();
+		options.add("setoption name Logging Policy value multiple files");
 		options.add("setoption name OwnBook value true");
 		options.add("setoption name Ponder value false");
 		options.add("setoption name Openning Mode value random intermediate");
@@ -81,7 +82,7 @@ public class TournamentRunner {
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(60 * 1000, 60 * 1000, 1 * 1000, 1 * 1000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(6 * 1000, 6 * 1000, 2 * 100, 2 * 100);
 			
-			Tournament tournament = new Tournament(schedule, matchRunner);
+			Tournament tournament = new Tournament(schedule, matchRunner, false);
 			
 			tournament.start();
 			

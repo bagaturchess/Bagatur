@@ -36,13 +36,15 @@ import com.bagaturchess.ucitournament.single.schedule.ITournamentSchedule;
 public class Tournament {
 	
 	
+	private boolean startStopEngines;
 	private ITournamentSchedule schedule;
 	private MatchRunner matchRunner;
 	
 	
-	public Tournament(ITournamentSchedule _schedule, MatchRunner _matchRunner) {
+	public Tournament(ITournamentSchedule _schedule, MatchRunner _matchRunner, boolean _startStopEngines) {
 		schedule = _schedule;
 		matchRunner = _matchRunner;
+		startStopEngines = _startStopEngines;
 	}
 	
 	
@@ -65,17 +67,21 @@ public class Tournament {
 				
 				matchRunner.newGame();
 				
-				engine1.start();
-				engine2.start();
+				if (startStopEngines) {
+					engine1.start();
+					engine2.start();
+				}
 				
-				System.out.print("Playing pair " + pair + "/" +pairs.length + " " + pairs[pair] + " ... ");
+				System.out.print("Playing pair " + (pair + 1) + "/" +pairs.length + " " + pairs[pair] + " ... ");
 				int result = matchRunner.execute(engine1, engine2);
 				System.out.println(" finished. Result is " + result);
 				tournamentResult.addResult(engine1Name, engine2Name, result);
 				System.out.println(tournamentResult);
 				
-				engine1.destroy();
-				engine2.destroy();
+				if (startStopEngines) {
+					engine1.destroy();
+					engine2.destroy();
+				}
 			}
 			System.out.println("\r\nRESULT [round " + (round + 1) + "]: " + (new Date()) + "\r\n" + tournamentResult);
 		}

@@ -66,7 +66,7 @@ public class TournamentResult {
 		for (String name: map.keySet()) {
 			Integer scoresObj = map.get(name);
 			int scores = scoresObj == null ? 0 : scoresObj;
-			result += name + "			" + scores + "\r\n";
+			result += name + "	" + scores + "\r\n";
 		}
 		
 		return result;
