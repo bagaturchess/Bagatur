@@ -138,10 +138,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			throw new IllegalStateException("alpha=" + alpha_org + ", beta=" + beta);
 		}
 		
-		info.setSearchedNodes(info.getSearchedNodes() + 1);
-		if (info.getSelDepth() < depth) {
-			info.setSelDepth(depth);
-		}
 		
 		int colourToMove = env.getBitboard().getColourToMove();
 		
@@ -372,6 +368,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
 			return node.eval;
+		}
+		
+		
+		info.setSearchedNodes(info.getSearchedNodes() + 1);
+		if (info.getSelDepth() < depth) {
+			info.setSelDepth(depth);
 		}
 		
 
@@ -920,11 +922,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		backtrackingInfo.static_eval = lazyEval(depth, alpha_org, beta, rootColour);
 		
 		
-		info.setSearchedNodes(info.getSearchedNodes() + 1);
-		if (info.getSelDepth() < depth) {
-			info.setSelDepth(depth);
-		}
-		
 		int colourToMove = env.getBitboard().getColourToMove();
 		
 		
@@ -1079,6 +1076,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, rootColour);
 			return eval;
+		}
+		
+		
+		info.setSearchedNodes(info.getSearchedNodes() + 1);
+		if (info.getSelDepth() < depth) {
+			info.setSelDepth(depth);
 		}
 		
 		
@@ -1577,7 +1580,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private int pv_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int alpha_org, int beta, int rootColour) {
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);	
-		
 		if (info.getSelDepth() < depth) {
 			info.setSelDepth(depth);
 		}
