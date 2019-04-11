@@ -47,7 +47,7 @@ public class TournamentSchedule_2Engines implements ITournamentSchedule {
 		engines = _engines;
 		
 		List<Pair> all = new ArrayList<Pair>();
-		for (int round = 0; round < rounds; round++) {
+		for (int round = 0; round < rounds / 2; round++) {
 			EngineProcess engine1 = engines[0];
 			EngineProcess engine2 = engines[1];
 			Pair pair1 = new Pair(engine1, engine2);

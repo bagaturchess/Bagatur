@@ -31,6 +31,7 @@ import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_FixedDepth;
+import com.bagaturchess.ucitournament.framework.match.MatchRunner_TimeAndInc;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_TimePerMove;
 import com.bagaturchess.ucitournament.single.Tournament;
 import com.bagaturchess.ucitournament.single.schedule.ITournamentSchedule;
@@ -41,15 +42,17 @@ import com.bagaturchess.ucitournament.single.schedule.TournamentSchedule_OneRoun
 
 public class TournamentRunner {
 	
+	
 	public static void main(String[] args) {
-				
-		EngineProcess engine1 = new EngineProcess("Bagatur DEV Komodo", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_KomodoStyle\\Bagatur_64_1_core.exe",
+		
+		
+		EngineProcess engine1 = new EngineProcess("Bagatur DEV", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_DEV\\Bagatur_64_1_core.exe",
 				new String [0],
-				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_KomodoStyle\\");
-
-		EngineProcess engine2 = new EngineProcess("Bagatur DEV Stockfish", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_StockfishStyle\\Bagatur_64_1_core.exe",
+				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_DEV\\");
+		
+		EngineProcess engine2 = new EngineProcess("Bagatur 1.7", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\Bagatur_64_1_core.exe",
 				new String [0],
-				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_StockfishStyle\\");
+				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\");
 		
 		
 		/*EngineProcess engine2 = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Komodo9\\Windows\\komodo-9.02-64bit.exe",
@@ -57,37 +60,40 @@ public class TournamentRunner {
 				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Komodo9\\Windows\\");
 		 */
 		
+		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
 		
-		
-		List<String> options = new ArrayList<String>();
-		options.add("setoption name Logging Policy value multiple files");
-		options.add("setoption name OwnBook value true");
-		options.add("setoption name Ponder value false");
-		options.add("setoption name Openning Mode value random intermediate");
-		options.add("setoption name Time Control Optimizations value for 1/1");
-		options.add("setoption name SyzygyPath value tbd");
 		
 		try {
 			engine1.start();
 			engine2.start();
+			
+			List<String> options = new ArrayList<String>();
+			//options.add("setoption name Logging Policy value multiple files");
+			options.add("setoption name Ponder value false");
+			options.add("setoption name OwnBook value true");
+			options.add("setoption name Openning Mode value random intermediate");
+			options.add("setoption name Time Control Optimizations value for 1/1");
+			options.add("setoption name SyzygyPath value tbd");
+			
 			engine1.setOptions(options);
 			engine2.setOptions(options);
 			
-			ITournamentSchedule schedule = new TournamentSchedule_2Engines(engines, 50);
+			ITournamentSchedule schedule = new TournamentSchedule_2Engines(engines, 200);
 			//ITournamentSchedule schedule = new TournamentSchedule_EvenScores(engines);
 			
-			MatchRunner matchRunner = new MatchRunner_TimePerMove(1 * 500);
-			//MatchRunner matchRunner = new MatchRunner_FixedDepth(5);
+			MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
+			//MatchRunner matchRunner = new MatchRunner_FixedDepth(3);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(60 * 1000, 60 * 1000, 1 * 1000, 1 * 1000);
-			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(6 * 1000, 6 * 1000, 2 * 100, 2 * 100);
+			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 250, 250);
 			
 			Tournament tournament = new Tournament(schedule, matchRunner, false);
 			
 			tournament.start();
 			
 		} catch (Exception e) {
-			
+			e.printStackTrace();
+		} finally {
 			for (int i=0; i<engines.length; i++) {
 				try {
 					engines[i].destroy();
@@ -96,9 +102,7 @@ public class TournamentRunner {
 				}
 			}
 			
-			e.printStackTrace();
-			
-			System.exit(-1);
+			System.exit(0);
 		}
 	}
 }
