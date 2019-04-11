@@ -23,6 +23,9 @@
 package com.bagaturchess.ucitournament.single.runner;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 
@@ -40,7 +43,7 @@ public class TournamentRunner {
 	
 	public static void main(String[] args) {
 				
-		EngineProcess engine1 = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.6c\\Bagatur_64_1_core.exe",
+		EngineProcess engine1 = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.6c\\Bagatur_1.6c.exe",
 				new String [0],
 				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.6c\\");
 
@@ -50,13 +53,24 @@ public class TournamentRunner {
 		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
 		
+		
+		List<String> options = new ArrayList<String>();
+		options.add("setoption name Ponder value false");
+		options.add("setoption name Openning Mode value random intermediate");
+		options.add("setoption name Time Control Optimizations value for 1/1");
+		options.add("setoption name SyzygyPath value tbd");
+		
 		try {
+			engine1.start();
+			engine2.start();
+			engine1.setOptions(options);
+			engine2.setOptions(options);
 			
 			ITournamentSchedule schedule = new TournamentSchedule_2Engines(engines, 50);
 			//ITournamentSchedule schedule = new TournamentSchedule_EvenScores(engines);
 			
-			MatchRunner matchRunner = new MatchRunner_TimePerMove(1 * 500);
-			//MatchRunner matchRunner = new MatchRunner_FixedDepth(3);
+			//MatchRunner matchRunner = new MatchRunner_TimePerMove(1 * 500);
+			MatchRunner matchRunner = new MatchRunner_FixedDepth(5);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(60 * 1000, 60 * 1000, 1 * 1000, 1 * 1000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(6 * 1000, 6 * 1000, 2 * 100, 2 * 100);
 			
