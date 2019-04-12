@@ -34,6 +34,7 @@ import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.pv.PVNode;
+import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
 
@@ -196,7 +197,9 @@ public class NullwinSearchTask implements Runnable {
 				if (eval >= beta) {
 					//eval is lower bound
 					
-					info.setPV(PVNode.convertPV(searcher.getPvman().load(0), pv_buffer));
+					int[] pv = getPVfromTPT();
+					pv = pv.length > 0 ? pv : PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
+					info.setPV(pv);
 					if (info.getPV().length > 0) {
 						info.setBestMove(info.getPV()[0]);
 					}
@@ -211,7 +214,9 @@ public class NullwinSearchTask implements Runnable {
 					//eval is upper bound
 					//eval < beta <=> eval <= beta - 1 <=> eval <= alpha
 					
-					info.setPV(PVNode.convertPV(searcher.getPvman().load(0), pv_buffer));
+					int[] pv = getPVfromTPT();
+					pv = pv.length > 0 ? pv : PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
+					info.setPV(pv);
 					if (info.getPV().length > 0) {
 						info.setBestMove(info.getPV()[0]);
 					}
@@ -240,5 +245,39 @@ public class NullwinSearchTask implements Runnable {
 			//if (searcher != null) searchers.releaseSearcher(searcher);
 			//if (unlock) distribution.writeUnlock();
 		}
+	}
+	
+	
+	private int[] getPVfromTPT() {
+		
+		List<Integer> moves = new ArrayList<Integer>();
+		
+		TPTEntry entry = null;
+		while ((entry = searcher.getEnv().getTPT().get(bitboard.getHashKey())) != null) {
+			
+			int move = entry.getBestMove_lower();
+			if (move == 0) {
+				move = entry.getBestMove_upper();
+			}
+			
+			bitboard.makeMoveForward(move);
+			
+			moves.add(move);
+			
+			if (bitboard.getStateRepetition() >= 3) {
+				break;
+			}
+		}
+		
+		for (int i = moves.size() - 1; i >= 0; i--) {
+			bitboard.makeMoveBackward(moves.get(i));
+		}
+		
+		int[] result = new int[moves.size()];
+		for (int i=0; i<moves.size(); i++) {
+			result[i] = moves.get(i);
+		}
+		
+		return result;
 	}
 }
