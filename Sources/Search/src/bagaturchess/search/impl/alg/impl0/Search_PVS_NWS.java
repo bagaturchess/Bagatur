@@ -52,6 +52,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private boolean STATIC_PRUNING2 					= true;
 	private static final int[] MARGIN_STATIC_NULLMOVE 	= { 0, 60, 130, 210, 300, 400, 510 };
 	private static final int[] MARGIN_RAZORING 			= { 0, 240, 280, 320 };
+	private static final int MARGIN_FUTILITY_QSEARCH 	= 200;
 	
 	
 	private BacktrackingInfo[] backtracking 			= new BacktrackingInfo[MAX_DEPTH + 1];
@@ -1801,7 +1802,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
 						continue;
 					}
-				} else if (MoveInt.isCapture(cur_move) && staticEval + 200 + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
+				} else if (MoveInt.isCapture(cur_move) && staticEval + MARGIN_FUTILITY_QSEARCH + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
 					//Futility pruning
 					continue;
 				}
