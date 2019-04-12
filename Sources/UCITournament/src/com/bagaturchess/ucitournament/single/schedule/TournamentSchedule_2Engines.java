@@ -54,6 +54,7 @@ public class TournamentSchedule_2Engines implements ITournamentSchedule {
 			Pair pair2 = new Pair(engine2, engine1);
 			all.add(pair1);
 			all.add(pair2);
+			//System.out.println(round);
 		}
 		pairs = all.toArray(new Pair[0]);
 	}
@@ -71,7 +72,7 @@ public class TournamentSchedule_2Engines implements ITournamentSchedule {
 		return engines;
 	}
 
-	public String toString() {
+	/*public String toString() {
 		String msg = "";
 		
 		for (int i=0; i<pairs.length; i++) {
@@ -79,5 +80,5 @@ public class TournamentSchedule_2Engines implements ITournamentSchedule {
 		}
 		
 		return msg;
-	}
+	}*/
 }
