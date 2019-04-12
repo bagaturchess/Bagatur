@@ -2055,7 +2055,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
 						continue;
 					}
-				} else if (MoveInt.isCapture(cur_move) && staticEval + 200 + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
+				} else if (MoveInt.isCapture(cur_move) && staticEval + MARGIN_FUTILITY_QSEARCH + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
 					//Futility pruning
 					continue;
 				}
