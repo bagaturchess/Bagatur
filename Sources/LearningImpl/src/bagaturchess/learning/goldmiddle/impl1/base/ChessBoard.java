@@ -24,6 +24,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl.Fields;
 
 
 public class ChessBoard implements IChessBoard {
@@ -112,9 +113,15 @@ public class ChessBoard implements IChessBoard {
 	@Override
 	public int getKingIndex(int colour) {
 		if (colour == 0) {
-			return convertIndex_b2c(board.getPiecesLists().getPieces(Constants.PID_W_KING).getData()[0]);
+			long king = board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING);
+			int kingIndex = Fields.get67IDByBitboard(king);
+			//return convertIndex_b2c(board.getPiecesLists().getPieces(Constants.PID_W_KING).getData()[0]);
+			return convertIndex_b2c(kingIndex);
 		} else {
-			return convertIndex_b2c(board.getPiecesLists().getPieces(Constants.PID_B_KING).getData()[0]);
+			long king = board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING);
+			int kingIndex = Fields.get67IDByBitboard(king);
+			//return convertIndex_b2c(board.getPiecesLists().getPieces(Constants.PID_B_KING).getData()[0]);
+			return convertIndex_b2c(kingIndex);
 		}
 	}
 	

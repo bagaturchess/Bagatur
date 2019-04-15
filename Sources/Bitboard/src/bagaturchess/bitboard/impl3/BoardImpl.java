@@ -32,6 +32,7 @@ import static bagaturchess.bitboard.impl3.internal.ChessConstants.BISHOP;
 import static bagaturchess.bitboard.impl3.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl3.internal.ChessConstants.QUEEN;
 import static bagaturchess.bitboard.impl3.internal.ChessConstants.KING;
+import static bagaturchess.bitboard.impl3.internal.ChessConstants.EMPTY;
 
 
 public class BoardImpl implements IBitBoard {
@@ -78,14 +79,50 @@ public class BoardImpl implements IBitBoard {
 		moveGen.generateMoves(board);
 		while (moveGen.hasNext()) {
 			final int move = moveGen.next();
-			list.reserved_add(convertMove_toBagatur(move));
-			count++;
+			if (board.isLegal(move)) {
+				list.reserved_add(convertMove_toBagatur(move));
+				count++;
+			}
 		}
 		moveGen.endPly();
 		
-		//System.out.println(count);
+		return count;
+	}
+	
+	
+	@Override
+	public int genCapturePromotionMoves(IInternalMoveList list) {
+		int count = 0;
+		moveGen.startPly();
+		moveGen.generateAttacks(board);
+		while (moveGen.hasNext()) {
+			final int move = moveGen.next();
+			if (board.isLegal(move)) {
+				list.reserved_add(convertMove_toBagatur(move));
+				count++;
+			}
+		}
+		moveGen.endPly();
 		
 		return count;
+	}
+	
+	
+	@Override
+	public int genKingEscapes(IInternalMoveList list) {
+		return genAllMoves(list);
+	}
+	
+	
+	@Override
+	public void makeNullMoveForward() {
+		board.doNullMove();
+	}
+
+	
+	@Override
+	public void makeNullMoveBackward() {
+		board.undoNullMove();
 	}
 	
 	
@@ -102,14 +139,26 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	private int convertMove_toBagatur(int move) {
-		int fromIndex = MoveUtil.getFromIndex(move);
-		int toIndex = MoveUtil.getFromIndex(move);
 		
-		//MoveInt.createNonCapture(pid, fromIndex, toIndex);
+		int fromIndex = MoveUtil.getFromIndex(move);
+		int toIndex = MoveUtil.getToIndex(move);
+		int piece = board.pieceIndexes[fromIndex];
+		int capturedPiece = board.pieceIndexes[toIndex];
+		boolean isCapture = capturedPiece != EMPTY;
+		
+		if (isCapture) {
+			//return MoveInt.createCapture(pid, fromIndex, toIndex, cap_pid);
+		} else {
+			//return MoveInt.createNonCapture(pid, fromIndex, toIndex);
+		}
 		
 		return move;
 	}
 	
+	
+	private int getPID() {
+		return 0;
+	}
 	
 	private int convertMove_fromBagatur(int move) {
 		int fromIndex = MoveUtil.getFromIndex(move);
@@ -147,48 +196,45 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public IMaterialFactor getMaterialFactor() {
+		
 		return new IMaterialFactor() {
 			
-			@Override
-			public int interpolateByFactorAndColour(int colour, int val_o, int val_e) {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-			
-			@Override
-			public int interpolateByFactor(double val_o, double val_e) {
-				// TODO Auto-generated method stub
-				return 0;
-			}
 			
 			@Override
 			public int interpolateByFactor(int val_o, int val_e) {
-				// TODO Auto-generated method stub
-				return 0;
+				return (int) ((val_o + val_e) / 2);
+			}
+			
+			
+			@Override
+			public int interpolateByFactor(double val_o, double val_e) {
+				return (int) ((val_o + val_e) / 2);
+			}
+			
+			
+			@Override
+			public int interpolateByFactorAndColour(int colour, int val_o, int val_e) {
+				throw new UnsupportedOperationException();
 			}
 			
 			@Override
 			public int getWhiteFactor() {
-				// TODO Auto-generated method stub
-				return 0;
+				throw new UnsupportedOperationException();
 			}
 			
 			@Override
 			public int getTotalFactor() {
-				// TODO Auto-generated method stub
-				return 0;
+				throw new UnsupportedOperationException();
 			}
 			
 			@Override
 			public double getOpenningPart() {
-				// TODO Auto-generated method stub
-				return 0;
+				throw new UnsupportedOperationException();
 			}
 			
 			@Override
 			public int getBlackFactor() {
-				// TODO Auto-generated method stub
-				return 0;
+				throw new UnsupportedOperationException();
 			}
 		};
 	}
@@ -225,7 +271,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getDraw50movesRule() {
-		return 100;//TODO
+		return 50;//TODO
 	}
 	
 	
@@ -271,17 +317,30 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
+	@Override
+	public int[] getMatrix() {
+		return board.pieceIndexes;
+	}
+	
+	
+	@Override
+	public boolean isPossible(int move) {
+		return true;//TODO
+	}
+	
+	
+	
+	
 	/**
 	 * NOT IMPLEMENTED METHODS
 	 */
 	
 	
 	@Override
-	public int[] getMatrix() {
+	public IMaterialState getMaterialState() {
 		throw new UnsupportedOperationException();
 	}
 	
-
 	@Override
 	public PawnsModelEval getPawnsStructure() {
 		throw new UnsupportedOperationException();
@@ -293,28 +352,8 @@ public class BoardImpl implements IBitBoard {
 	}
 
 	@Override
-	public int genKingEscapes(IInternalMoveList list) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int genCapturePromotionMoves(IInternalMoveList list) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public int genAllMoves_ByFigureID(int fieldID, long excludedToFields,
 			IInternalMoveList list) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void makeNullMoveForward() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void makeNullMoveBackward() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -344,11 +383,6 @@ public class BoardImpl implements IBitBoard {
 	}
 
 	@Override
-	public IMaterialState getMaterialState() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public int getUnstoppablePasser() {
 		throw new UnsupportedOperationException();
 	}
@@ -371,11 +405,6 @@ public class BoardImpl implements IBitBoard {
 
 	@Override
 	public boolean isCheckMove(int move) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean isPossible(int move) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -444,7 +473,7 @@ public class BoardImpl implements IBitBoard {
 	public IFieldsAttacks getFieldsAttacks() {
 		throw new UnsupportedOperationException();
 	}
- 
+	
 	
 	public IBoard clone() {
 		return null;
@@ -463,30 +492,23 @@ public class BoardImpl implements IBitBoard {
 			dummy.add(2);
 			dummy.add(3);
 			dummy.add(4);
-			dummy.add(5);
-			dummy.add(6);
-			dummy.add(7);
-			dummy.add(8);
 		}
 		
 		@Override
 		public void rem(int pid, int fieldID) {
-			// TODO Auto-generated method stub
-			
+			throw new UnsupportedOperationException();
 		}
 		
 		
 		@Override
 		public void add(int pid, int fieldID) {
-			// TODO Auto-generated method stub
-			
+			throw new UnsupportedOperationException();
 		}
 		
 		
 		@Override
 		public void move(int pid, int fromFieldID, int toFieldID) {
-			// TODO Auto-generated method stub
-			
+			throw new UnsupportedOperationException();
 		}
 		
 		

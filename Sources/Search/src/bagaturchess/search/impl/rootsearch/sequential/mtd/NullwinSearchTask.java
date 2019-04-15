@@ -197,8 +197,8 @@ public class NullwinSearchTask implements Runnable {
 				if (eval >= beta) {
 					//eval is lower bound
 					
-					int[] pv = getPVfromTPT();
-					pv = pv.length > 0 ? pv : PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
+					//int[] pv = getPVfromTPT();
+					int[] pv = PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
 					info.setPV(pv);
 					if (info.getPV().length > 0) {
 						info.setBestMove(info.getPV()[0]);
@@ -214,8 +214,8 @@ public class NullwinSearchTask implements Runnable {
 					//eval is upper bound
 					//eval < beta <=> eval <= beta - 1 <=> eval <= alpha
 					
-					int[] pv = getPVfromTPT();
-					pv = pv.length > 0 ? pv : PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
+					//int[] pv = getPVfromTPT();
+					int[] pv = PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
 					info.setPV(pv);
 					if (info.getPV().length > 0) {
 						info.setBestMove(info.getPV()[0]);

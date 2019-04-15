@@ -37,6 +37,7 @@ import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl1.Board3;
 import bagaturchess.bitboard.impl1.Board3_Adapter;
 import bagaturchess.bitboard.impl2.Board4_Adapter;
+import bagaturchess.bitboard.impl3.BoardImpl;
 
 /**
 After the 1st ply (White's move) -- 20 possible positions 
@@ -92,9 +93,6 @@ public class Simulate {
 		for (int i=0;i<lists.length;i++) {
 			lists[i] = new BaseMoveList();
 		}
-
-		
-		IBoard clone = (IBoard) bitBoard.clone();
 		
 		System.out.println("Before: " + bitBoard);
 			
@@ -107,11 +105,12 @@ public class Simulate {
 	  	System.out.printf("Gen moves: " + info.nodes
 				+ ", Time " + (end-start) + "ms, Moves per second %f", (info.nodes/((end-start)/(double)1000)));
 	  	
-	  	if (clone.equals(bitBoard)) {
+		IBoard clone = (IBoard) bitBoard.clone();
+	  	/*if (clone.equals(bitBoard)) {
 	  		System.out.println("\r\nOK");
 	  	} else {
 	  		System.out.println("\r\nERROR");
-	  	}
+	  	}*/
 	}
 	
 	
@@ -122,9 +121,9 @@ public class Simulate {
 		
 		if (board.isInCheck()) return;
 		
-		if (board.isInCheck(Constants.COLOUR_OP[board.getColourToMove()])) {
+		/*if (board.isInCheck(Constants.COLOUR_OP[board.getColourToMove()])) {
 			//King will be captured
-		}
+		}*/
 		
 		if (depth != 0) {
 		
@@ -184,10 +183,11 @@ public class Simulate {
 		
 		//BoardWithAttacks bitBoard = new BoardWithAttacks();
 		//String BOARD = "4k3/P7/8/8/8/8/7p/4K3 w - 0 0";
-		IBoard bitBoard = new Board();
+		//IBoard bitBoard = new Board();
 		//IBoard bitBoard = new Board3_Adapter();
 		//IBoard bitBoard = new Board4_Adapter();
 		//IBoard bitBoard = new DummyBoard();
+		IBoard bitBoard = new BoardImpl();
 		//bitBoard.setAttacksSupport(false, false);
 		
 		SearchInfo info = new SearchInfo();

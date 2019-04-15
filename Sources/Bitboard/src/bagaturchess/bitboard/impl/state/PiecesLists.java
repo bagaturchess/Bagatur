@@ -34,10 +34,10 @@ import bagaturchess.bitboard.impl.Figures;
  *
  */
 public class PiecesLists extends Figures implements IPiecesLists {
-
+	
 	private PiecesList[] pieces;
 	private IBoard board;
-
+	
 	public PiecesLists(IBoard _board) {
 		
 		board = _board;
