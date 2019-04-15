@@ -44,27 +44,44 @@ import com.bagaturchess.ucitournament.single.schedule.TournamentSchedule_OneRoun
 public class TournamentRunner {
 	
 	
-	private static final EngineProcess engine_workspace = new EngineProcess_BagaturImpl_WorkspaceImpl("Bagatur WS", "");
+	private static final EngineProcess bagatur_workspace 	= new EngineProcess_BagaturImpl_WorkspaceImpl("Bagatur WS", "");
 	
-	private static final EngineProcess engine_dev 		= new EngineProcess("Bagatur DEV1", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_DEV\\Bagatur_64_1_core.exe",
+	private static final EngineProcess bagatur_dev 			= new EngineProcess("Bagatur DEV1", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_DEV\\Bagatur_64_1_core.exe",
 															new String [0],
 															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_DEV\\");
 	
-	private static final EngineProcess engine_17 		= new EngineProcess("Bagatur 1.7", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\Bagatur_64_1_core.exe",
+	private static final EngineProcess bagatur_17 			= new EngineProcess("Bagatur 1.7", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\Bagatur_64_1_core.exe",
 															new String [0],
 															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\");
 
+	private static final EngineProcess bagatur_16c 			= new EngineProcess("Bagatur 1.6c", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.6c\\Bagatur_64_1_core.exe",
+															new String [0],
+															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.6c\\");
+
 	
-	private static final EngineProcess komodo 			=  new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Komodo9\\Windows\\komodo-9.02-64bit.exe",
+	private static final EngineProcess komodo 				=  new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Komodo9\\Windows\\komodo-9.02-64bit.exe",
 															new String [0],
 															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Komodo9\\Windows\\");
+
+	private static final EngineProcess chess22k 			=  new EngineProcess("Chess22k.1.12", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\Chess22k\\run.bat",
+															new String [0],
+															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\Chess22k\\");
+	
+	private static final EngineProcess stockfish10 			= new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-10-win\\Windows\\stockfish_10_x64.exe",
+															new String [0],
+															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-10-win\\Windows");
+
+
+	private static final EngineProcess houdini15a 			= new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Houdini_15a\\Houdini_15a_x64.exe",
+															new String [0],
+															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Houdini_15a\\");
 
 	
 	public static void main(String[] args) {
 		
 		
-		EngineProcess engine1 = engine_workspace;
-		EngineProcess engine2 = engine_17;
+		EngineProcess engine1 = bagatur_16c;
+		EngineProcess engine2 = bagatur_17;
 		
 		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
@@ -88,8 +105,8 @@ public class TournamentRunner {
 			ITournamentSchedule schedule = new TournamentSchedule_2Engines(engines, 100000);
 			//ITournamentSchedule schedule = new TournamentSchedule_EvenScores(engines);
 			
-			MatchRunner matchRunner = new MatchRunner_TimePerMove(500);
-			//MatchRunner matchRunner = new MatchRunner_FixedDepth(5);
+			//MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
+			MatchRunner matchRunner = new MatchRunner_FixedDepth(3);
 			//MatchRunner matchRunner = new MatchRunner_FixedNodes(5000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(60 * 1000, 60 * 1000, 1 * 1000, 1 * 1000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 250, 250);
