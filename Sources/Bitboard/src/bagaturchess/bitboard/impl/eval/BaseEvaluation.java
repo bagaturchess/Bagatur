@@ -25,6 +25,7 @@ package bagaturchess.bitboard.impl.eval;
 
 import bagaturchess.bitboard.api.IBaseEval;
 import bagaturchess.bitboard.api.IBoardConfig;
+import bagaturchess.bitboard.api.IMaterialFactor;
 import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Figures;
@@ -63,10 +64,10 @@ public class BaseEvaluation implements MoveListener, IBaseEval {
 	
 	private IBoardConfig boardConfig;
 	private PSTConstants pst;
-	private MaterialFactor interpolator;
+	private IMaterialFactor interpolator;
 	
 	
-	public BaseEvaluation(IBoardConfig _boardConfig, MaterialFactor _interpolator) {
+	public BaseEvaluation(IBoardConfig _boardConfig, IMaterialFactor _interpolator) {
 		boardConfig = _boardConfig;
 		interpolator = _interpolator;
 		pst = new PSTConstants(boardConfig);
