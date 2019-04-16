@@ -17,16 +17,6 @@ public class ChessBoardUtil {
 	public static final int PHASE_TOTAL = 4 * EvalConstants.PHASE[NIGHT] + 4 * EvalConstants.PHASE[BISHOP] + 4 * EvalConstants.PHASE[ROOK]
 			+ 2 * EvalConstants.PHASE[QUEEN];
 	
-	public static ChessBoard getNewCB() {
-		return getNewCB(ChessConstants.FEN_START);
-	}
-
-	public static ChessBoard getNewCB(String fen) {
-		ChessBoard cb = ChessBoard.getInstance();
-		setFenValues(fen, cb);
-		init(cb);
-		return cb;
-	}
 
 	public static void setFenValues(String fen, ChessBoard cb) {
 		cb.moveCounter = 0;

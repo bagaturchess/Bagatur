@@ -52,6 +52,7 @@ public class BoardImpl implements IBitBoard {
 	private IMaterialFactor materialFactor;
 	
 	private IMoveList singleMoveList = new BaseMoveList(256);
+	private PawnsEvalCache pawnsEvalCache;
 	
 	
 	public BoardImpl() {
@@ -61,9 +62,7 @@ public class BoardImpl implements IBitBoard {
 	
 	public BoardImpl(String fen) {
 		
-		ChessBoard.initInstances(1);
-		
-		board = ChessBoard.getInstance();
+		board = new ChessBoard();
 		ChessBoardUtil.setFenValues(fen, board);
 		ChessBoardUtil.init(board);
 		
@@ -161,33 +160,10 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	private int convertMove_toBagatur(int move) {
-		
-		int fromIndex = MoveUtil.getFromIndex(move);
-		int toIndex = MoveUtil.getToIndex(move);
-		int piece = board.pieceIndexes[fromIndex];
-		int capturedPiece = board.pieceIndexes[toIndex];
-		boolean isCapture = capturedPiece != EMPTY;
-		
-		if (isCapture) {
-			//return MoveInt.createCapture(pid, fromIndex, toIndex, cap_pid);
-		} else {
-			//return MoveInt.createNonCapture(pid, fromIndex, toIndex);
-		}
-		
 		return move;
 	}
 	
-	
-	private int getPID() {
-		return 0;
-	}
-	
 	private int convertMove_fromBagatur(int move) {
-		int fromIndex = MoveUtil.getFromIndex(move);
-		int toIndex = MoveUtil.getFromIndex(move);
-		
-		//MoveInt.createNonCapture(pid, fromIndex, toIndex);
-		
 		return move;
 	}
 	
@@ -275,19 +251,19 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public PawnsEvalCache getPawnsCache() {
-		return null;
+		return pawnsEvalCache;
 	}
 	
 	
 	@Override
-	public void setPawnsCache(PawnsEvalCache pawnsCache) {
-		//Do nothing
+	public void setPawnsCache(PawnsEvalCache _pawnsEvalCache) {
+		pawnsEvalCache = _pawnsEvalCache;
 	}
 	
 	
 	@Override
 	public int getStateRepetition() {
-		return board.isRepetition(0) ? 3 : 1;//TODO
+		return board.isRepetition(0) ? 2 : 0;//TODO
 	}
 	
 	
@@ -342,6 +318,11 @@ public class BoardImpl implements IBitBoard {
 	public boolean hasSingleMove() {
 		singleMoveList.clear();
 		return genAllMoves(singleMoveList) == 1;
+	}
+	
+	
+	public IBoard clone() {
+		return null;
 	}
 	
 	
@@ -480,11 +461,6 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
-	public IBoard clone() {
-		return null;
-	}
-	
-	
 	private static final class PiecesListsImpl implements IPiecesLists {
 		
 		
@@ -493,10 +469,10 @@ public class BoardImpl implements IBitBoard {
 		
 		PiecesListsImpl(IBitBoard board) {
 			dummy = new PiecesList(board, 8);
-			dummy.add(1);
+			/*dummy.add(1);
 			dummy.add(2);
 			dummy.add(3);
-			dummy.add(4);
+			dummy.add(4);*/
 		}
 		
 		@Override

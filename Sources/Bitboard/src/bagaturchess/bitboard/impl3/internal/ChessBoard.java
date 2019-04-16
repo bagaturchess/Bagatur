@@ -13,29 +13,8 @@ import static bagaturchess.bitboard.impl3.internal.ChessConstants.WHITE;
 
 public final class ChessBoard {
 
-	private ChessBoard() {
+	public ChessBoard() {
 
-	}
-
-	private static ChessBoard[] instances;
-
-	public static ChessBoard getInstance() {
-		return instances[0];
-	}
-
-	public static ChessBoard getInstance(int instanceNumber) {
-		return instances[instanceNumber];
-	}
-
-	public static ChessBoard getTestInstance() {
-		return instances[1];
-	}
-
-	public static void initInstances(int numberOfInstances) {
-		instances = new ChessBoard[numberOfInstances];
-		for (int i = 0; i < numberOfInstances; i++) {
-			instances[i] = new ChessBoard();
-		}
 	}
 	
 
