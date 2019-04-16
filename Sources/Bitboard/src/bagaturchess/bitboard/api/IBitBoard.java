@@ -36,7 +36,7 @@ public interface IBitBoard extends IBoard {
 	
 	
 	/**
-	 * Birboards
+	 * Bitboards
 	 */
 	public boolean getAttacksSupport();
 	public boolean getFieldsStateSupport();

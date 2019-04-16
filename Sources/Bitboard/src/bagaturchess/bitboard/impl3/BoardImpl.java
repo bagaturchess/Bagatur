@@ -18,6 +18,8 @@ import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.eval.BaseEvaluation;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
+import bagaturchess.bitboard.impl.movelist.BaseMoveList;
+import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl1.movegen.MoveInt;
 import bagaturchess.bitboard.impl3.internal.Assert;
@@ -48,6 +50,8 @@ public class BoardImpl implements IBitBoard {
 	private PiecesListsImpl dummyPiecesLists;
 	private IMaterialState materialState;
 	private IMaterialFactor materialFactor;
+	
+	private IMoveList singleMoveList = new BaseMoveList(256);
 	
 	
 	public BoardImpl() {
@@ -259,7 +263,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getDraw50movesRule() {
-		return 50;//TODO
+		return 0;//TODO
 	}
 	
 	
@@ -301,7 +305,11 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getLastMove() {
-		return 0;
+		if (board.moveCounter == 0) {
+			return 0;
+		} else {
+			return board.moves[board.moveCounter - 1];
+		}
 	}
 	
 	
@@ -313,7 +321,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean isPossible(int move) {
-		return true;//TODO
+		return board.isLegal(move);
 	}
 	
 	
@@ -332,7 +340,8 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean hasSingleMove() {
-		return genAllMoves(null) == 1;
+		singleMoveList.clear();
+		return genAllMoves(singleMoveList) == 1;
 	}
 	
 	
@@ -531,7 +540,7 @@ public class BoardImpl implements IBitBoard {
 
 		@Override
 		public int[] getPIDsCounts() {
-			return null;
+			throw new UnsupportedOperationException();
 		}
 	}
 	

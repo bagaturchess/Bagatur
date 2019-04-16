@@ -71,16 +71,28 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		
 		if (IBitBoard.IMPL3) {
 			bitboardForSetup = new BoardImpl(_bitboardForSetup.toEPD());
+			
+			String uciMoves = MoveInt.movesToStringUCI(moves, movesCount);
+			StringTokenizer st = new StringTokenizer(uciMoves, " ");
+			while (st.hasMoreTokens()) {
+				String move = st.nextToken();
+				bitboardForSetup.makeMoveForward(move);
+			}
+			
+			for (int i=0; i<movesCount; i++) {
+				_bitboardForSetup.makeMoveForward(moves[i]);
+			}
+			
 		} else {
 			bitboardForSetup = BoardUtils.createBoard_WithPawnsCache(_bitboardForSetup.toEPD(),
 					getRootSearchConfig().getEvalConfig().getPawnsCacheFactoryClassName(),
 					getRootSearchConfig().getBoardConfig(),
 					10000);
-		}
-		
-		for (int i=0; i<movesCount; i++) {
-			_bitboardForSetup.makeMoveForward(moves[i]);
-			bitboardForSetup.makeMoveForward(moves[i]);
+			
+			for (int i=0; i<movesCount; i++) {
+				_bitboardForSetup.makeMoveForward(moves[i]);
+				bitboardForSetup.makeMoveForward(moves[i]);
+			}
 		}
 	}
 	
@@ -118,7 +130,6 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 			StringTokenizer st = new StringTokenizer(uciMoves, " ");
 			while (st.hasMoreTokens()) {
 				String move = st.nextToken();
-				ChannelManager.getChannel().dump("MOVE=" + move);
 				bitboardForSetup.makeMoveForward(move);
 			}
 		} else {
