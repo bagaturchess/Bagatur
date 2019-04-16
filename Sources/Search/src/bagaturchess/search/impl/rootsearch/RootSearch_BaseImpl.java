@@ -23,10 +23,14 @@
 package bagaturchess.search.impl.rootsearch;
 
 
+import java.util.StringTokenizer;
+
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.BoardUtils;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl3.BoardImpl;
+import bagaturchess.bitboard.impl3.internal.MoveWrapper;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchMediator;
@@ -104,9 +108,18 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	
 	protected void setupBoard(IBitBoard _bitboardForSetup) {
 		bitboardForSetup.revert();
-		
 		int movesCount = _bitboardForSetup.getPlayedMovesCount();
 		int[] moves = _bitboardForSetup.getPlayedMoves();
+		
+		
+		/*String uciMoves = MoveInt.movesToStringUCI(moves, movesCount);
+		StringTokenizer st = new StringTokenizer(uciMoves, " ");
+		while (st.hasMoreTokens()) {
+			String move = st.nextToken();
+			ChannelManager.getChannel().dump("MOVE=" + move);
+			bitboardForSetup.makeMoveForward(move);
+		}*/
+		
 		for (int i=0; i<movesCount; i++) {
 			bitboardForSetup.makeMoveForward(moves[i]);
 		}

@@ -32,6 +32,7 @@ import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
+import bagaturchess.bitboard.impl3.internal.MoveWrapper;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.api.IUCIConfig;
@@ -395,10 +396,20 @@ public class StateManager extends Protocol implements BestMoveSender {
 		int move = moveAndPonder[0];
 		int ponder = moveAndPonder[1];
 		if (move != 0) {
-			
+
 			board.makeMoveForward(move);
+			/*try {
+				board.makeMoveForward((new MoveWrapper(move)).toString());
+			} catch(Throwable t) {
+				
+				channel.dump(t);
+				channel.dump("move is " + move + " " + board);
+				
+				throw t;
+			}*/
 			
 			StringBuilder result = new StringBuilder(8);
+			//MoveInt.moveToStringUCI_experiment(move, result);
 			MoveInt.moveToStringUCI(move, result);
 			
 			String bestMoveCommand = COMMAND_TO_GUI_BESTMOVE_STR + IChannel.WHITE_SPACE + result;

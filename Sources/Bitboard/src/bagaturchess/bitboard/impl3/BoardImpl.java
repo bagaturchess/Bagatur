@@ -20,8 +20,10 @@ import bagaturchess.bitboard.impl.eval.BaseEvaluation;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl1.movegen.MoveInt;
+import bagaturchess.bitboard.impl3.internal.Assert;
 import bagaturchess.bitboard.impl3.internal.ChessBoard;
 import bagaturchess.bitboard.impl3.internal.ChessBoardUtil;
+import bagaturchess.bitboard.impl3.internal.EngineConstants;
 import bagaturchess.bitboard.impl3.internal.MoveGenerator;
 import bagaturchess.bitboard.impl3.internal.MoveUtil;
 import bagaturchess.bitboard.impl3.internal.MoveWrapper;
@@ -87,18 +89,13 @@ public class BoardImpl implements IBitBoard {
 		moveGen.startPly();
 		
 		moveGen.generateAttacks(board);
-		while (moveGen.hasNext()) {
-			final int move = moveGen.next();
-			if (board.isLegal(move)) {
-				list.reserved_add(convertMove_toBagatur(move));
-				count++;
-			}
-		}
 		
 		moveGen.generateMoves(board);
+		
 		while (moveGen.hasNext()) {
 			final int move = moveGen.next();
-			if (board.isLegal(move)) {
+			final int attackedPieceIndex = 0;//MoveUtil.getAttackedPieceIndex(move);
+			if (board.isLegal(move) && attackedPieceIndex != KING) {
 				list.reserved_add(convertMove_toBagatur(move));
 				count++;
 			}
@@ -117,7 +114,8 @@ public class BoardImpl implements IBitBoard {
 		moveGen.generateAttacks(board);
 		while (moveGen.hasNext()) {
 			final int move = moveGen.next();
-			if (board.isLegal(move)) {
+			final int attackedPieceIndex = 0;//MoveUtil.getAttackedPieceIndex(move);
+			if (board.isLegal(move) && attackedPieceIndex != KING) {
 				list.reserved_add(convertMove_toBagatur(move));
 				count++;
 			}
@@ -192,7 +190,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public void revert() {
-		for (int i = board.moveCounter; i > 0; i--) {
+		for (int i = board.moveCounter - 1; i >= 0; i--) {
 			if (board.moves[i] == 0) {
 				board.undoNullMove();
 			} else {
@@ -205,12 +203,14 @@ public class BoardImpl implements IBitBoard {
 	@Override
 	public long getHashKey() {
 		return board.zobristKey;
+		//return (long) (Math.random() * Long.MAX_VALUE);
 	}
 
 	
 	@Override
 	public long getPawnsHashKey() {
 		return board.pawnZobristKey;
+		//return (long) (Math.random() * Long.MAX_VALUE);
 	}
 	
 	
@@ -330,6 +330,12 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
+	@Override
+	public boolean hasSingleMove() {
+		return genAllMoves(null) == 1;
+	}
+	
+	
 	
 	
 	/**
@@ -400,11 +406,6 @@ public class BoardImpl implements IBitBoard {
 
 	@Override
 	public boolean isCheckMove(int move) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean hasSingleMove() {
 		throw new UnsupportedOperationException();
 	}
 
