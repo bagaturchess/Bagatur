@@ -433,9 +433,8 @@ public class MoveInt {
 	}
 	
 	
-	public static final void moveToStringUCI_experiment(int move, StringBuilder result) {
+	public static final void moveToStringUCI_boardimpl3(int move, StringBuilder result) {
 		result.append(new MoveWrapper(move));
-		if (true) return;
 	}
 	
 

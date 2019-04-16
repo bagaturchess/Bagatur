@@ -420,8 +420,26 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		}
 	}
 	
-
+	
 	public void calculateMaterialScore() {
+		int eval_o = (Long.bitCount(cb.getPieces(WHITE, PAWN)) - Long.bitCount(cb.getPieces(BLACK, PAWN))) * 94
+				+ (Long.bitCount(cb.getPieces(WHITE, NIGHT)) - Long.bitCount(cb.getPieces(BLACK, NIGHT))) * 403
+				+ (Long.bitCount(cb.getPieces(WHITE, BISHOP)) - Long.bitCount(cb.getPieces(BLACK, BISHOP))) * 414
+				+ (Long.bitCount(cb.getPieces(WHITE, ROOK)) - Long.bitCount(cb.getPieces(BLACK, ROOK))) * 590
+				+ (Long.bitCount(cb.getPieces(WHITE, QUEEN)) - Long.bitCount(cb.getPieces(BLACK, QUEEN))) * 1179;
+		
+		int eval_e = (Long.bitCount(cb.getPieces(WHITE, PAWN)) - Long.bitCount(cb.getPieces(BLACK, PAWN))) * 90
+				+ (Long.bitCount(cb.getPieces(WHITE, NIGHT)) - Long.bitCount(cb.getPieces(BLACK, NIGHT))) * 370
+				+ (Long.bitCount(cb.getPieces(WHITE, BISHOP)) - Long.bitCount(cb.getPieces(BLACK, BISHOP))) * 400
+				+ (Long.bitCount(cb.getPieces(WHITE, ROOK)) - Long.bitCount(cb.getPieces(BLACK, ROOK))) * 623
+				+ (Long.bitCount(cb.getPieces(WHITE, QUEEN)) - Long.bitCount(cb.getPieces(BLACK, QUEEN))) * 1174;
+
+		getEvalInfo().eval_o_part1 += eval_o;
+		getEvalInfo().eval_e_part1 += eval_e;
+	}
+	
+
+	/*public void calculateMaterialScore() {
 		
 		
 		int w_eval_nopawns_o = baseEval.getWhiteMaterialNonPawns_o();
@@ -436,7 +454,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 
 		getEvalInfo().eval_o_part1 += (w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o);
 		getEvalInfo().eval_e_part1 += (w_eval_nopawns_e - b_eval_nopawns_e) + (w_eval_pawns_e - b_eval_pawns_e);
-	}
+	}*/
 	
 	
 	private void calculateImbalances() {

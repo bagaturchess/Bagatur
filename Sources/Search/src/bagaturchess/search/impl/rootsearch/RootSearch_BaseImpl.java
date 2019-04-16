@@ -69,12 +69,14 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		//bitboardForSetup = new Board3_Adapter(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
 		//bitboardForSetup = new Board(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
 		
-		bitboardForSetup = BoardUtils.createBoard_WithPawnsCache(_bitboardForSetup.toEPD(),
-				getRootSearchConfig().getEvalConfig().getPawnsCacheFactoryClassName(),
-				getRootSearchConfig().getBoardConfig(),
-				10000);
-		//bitboardForSetup = new BoardImpl(_bitboardForSetup.toEPD());
-		
+		if (IBitBoard.IMPL3) {
+			bitboardForSetup = new BoardImpl(_bitboardForSetup.toEPD());
+		} else {
+			bitboardForSetup = BoardUtils.createBoard_WithPawnsCache(_bitboardForSetup.toEPD(),
+					getRootSearchConfig().getEvalConfig().getPawnsCacheFactoryClassName(),
+					getRootSearchConfig().getBoardConfig(),
+					10000);
+		}
 		
 		for (int i=0; i<movesCount; i++) {
 			_bitboardForSetup.makeMoveForward(moves[i]);
@@ -111,17 +113,18 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		int movesCount = _bitboardForSetup.getPlayedMovesCount();
 		int[] moves = _bitboardForSetup.getPlayedMoves();
 		
-		
-		/*String uciMoves = MoveInt.movesToStringUCI(moves, movesCount);
-		StringTokenizer st = new StringTokenizer(uciMoves, " ");
-		while (st.hasMoreTokens()) {
-			String move = st.nextToken();
-			ChannelManager.getChannel().dump("MOVE=" + move);
-			bitboardForSetup.makeMoveForward(move);
-		}*/
-		
-		for (int i=0; i<movesCount; i++) {
-			bitboardForSetup.makeMoveForward(moves[i]);
+		if (IBitBoard.IMPL3) {
+			String uciMoves = MoveInt.movesToStringUCI(moves, movesCount);
+			StringTokenizer st = new StringTokenizer(uciMoves, " ");
+			while (st.hasMoreTokens()) {
+				String move = st.nextToken();
+				ChannelManager.getChannel().dump("MOVE=" + move);
+				bitboardForSetup.makeMoveForward(move);
+			}
+		} else {
+			for (int i=0; i<movesCount; i++) {
+				bitboardForSetup.makeMoveForward(moves[i]);
+			}
 		}
 	}
 	

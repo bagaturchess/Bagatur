@@ -711,13 +711,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean isCapOrProm = MoveInt.isCaptureOrPromotion(cur_move);
 				int moveSee = -1;
-				if (isCapOrProm) {
+				if (isCapOrProm && !IBitBoard.IMPL3) {
 					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 				}
 				
 				
 				//Static pruning
-				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
+				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && (IBitBoard.IMPL3 || !env.getBitboard().isCheckMove(cur_move))) {
 					
 					if (searchedCount >= 4 && rest <= 8) {
 						
@@ -1404,13 +1404,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean isCapOrProm = MoveInt.isCaptureOrPromotion(cur_move);
 				int moveSee = -1;
-				if (isCapOrProm) {
+				if (isCapOrProm && !IBitBoard.IMPL3) {
 					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
 				}
 				
 				
 				//Static pruning
-				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
+				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && (IBitBoard.IMPL3 || !env.getBitboard().isCheckMove(cur_move))) {
 					
 					if (searchedCount >= 4 && rest <= 8) {
 						
@@ -1507,8 +1507,8 @@ public class Search_PVS_NWS extends SearchImpl {
 								new_mateMove, useMateDistancePrunning, false, true);
 					}
 				}
-						
-						
+				
+				
 				env.getBitboard().makeMoveBackward(cur_move);
 				
 				//Add history records for the current move
@@ -1752,6 +1752,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			//Alpha cutoff
 			if (!isMateVal(alpha_org)
+					&& !IBitBoard.IMPL3
 					&& !isMateVal(beta)
 					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
 				node.eval = staticEval;
@@ -1795,7 +1796,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			searchedMoves++;
 			
 			
-			if (!inCheck) {
+			if (!inCheck && !IBitBoard.IMPL3) {
 				
 				//Skip under promotions
 				if (MoveInt.isPromotion(cur_move)) {
@@ -2002,6 +2003,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			//Alpha cutoff
 			if (!isMateVal(alpha_org)
+			 		&& !IBitBoard.IMPL3
 					&& !isMateVal(beta)
 					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
 				return staticEval;
@@ -2048,7 +2050,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			searchedMoves++;
 			
 			
-			if (!inCheck) {
+			if (!inCheck && !IBitBoard.IMPL3) {
 				
 				//Skip under promotions
 				if (MoveInt.isPromotion(cur_move)) {

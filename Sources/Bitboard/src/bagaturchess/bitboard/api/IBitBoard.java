@@ -26,6 +26,9 @@ package bagaturchess.bitboard.api;
 public interface IBitBoard extends IBoard {
 	
 	
+	public static final boolean IMPL3 = false;
+	
+	
 	public long getFreeBitboard();
 	public long getFiguresBitboardByPID(int pid);
 	public long getFiguresBitboardByColourAndType(int colour, int type);

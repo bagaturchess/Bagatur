@@ -1,5 +1,6 @@
 package bagaturchess.search.api.internal;
 
+import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 
 public class SearchInfoUtils {
@@ -62,8 +63,11 @@ public class SearchInfoUtils {
 			
 			if (info.getPV() != null) {
 				for (int j=0; j<info.getPV().length; j++) {
-					MoveInt.moveToStringUCI(info.getPV()[j], message);
-					//MoveInt.moveToStringUCI_experiment(info.getPV()[j], message);
+					if (IBitBoard.IMPL3) {
+						MoveInt.moveToStringUCI_boardimpl3(info.getPV()[j], message);	
+					} else {
+						MoveInt.moveToStringUCI(info.getPV()[j], message);
+					}
 					if (j != info.getPV().length - 1) {
 						message.append(" ");//", ";
 					}
@@ -97,7 +101,12 @@ public class SearchInfoUtils {
 		}
 		if (info.getCurrentMove() != 0) {
 			message.append(" currmove ");
-			MoveInt.moveToStringUCI(info.getCurrentMove(), message);
+			if (IBitBoard.IMPL3) {
+				MoveInt.moveToStringUCI_boardimpl3(info.getCurrentMove(), message);	
+			} else {
+				MoveInt.moveToStringUCI(info.getCurrentMove(), message);
+			}
+			
 			message.append(" currmovenumber " + info.getCurrentMoveNumber());
 		}
 		if (tptusage != -1) message.append(" hashfull " + (10 * tptusage));
