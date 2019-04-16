@@ -396,13 +396,13 @@ public class MoveInt {
 		return moveStr;
 	}
 	
-	public static String movesToStringUCI(int[] pv) {
+	public static String movesToStringUCI(int[] pv, int size) {
 		StringBuilder result = new StringBuilder(256);
 		
-		for (int i=0; i<pv.length; i++) {
+		for (int i=0; i<size; i++) {
 			moveToStringUCI(pv[i], result);
 			if (i != pv.length - 1) {
-				result.append(", ");
+				result.append(" ");
 			}
 		}
 		

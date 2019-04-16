@@ -696,4 +696,13 @@ public class DummyBoard implements IBitBoard {
 	public int[] getMatrix() {
 		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#makeMoveForward(java.lang.String)
+	 */
+	@Override
+	public void makeMoveForward(String ucimove) {
+		// TODO Auto-generated method stub
+		
+	}
 }

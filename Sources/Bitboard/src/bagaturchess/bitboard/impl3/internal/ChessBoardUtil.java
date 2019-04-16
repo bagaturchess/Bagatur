@@ -212,7 +212,7 @@ public class ChessBoardUtil {
 		target.pinnedPieces = source.pinnedPieces;
 		target.discoveredPieces = source.discoveredPieces;
 		target.moveCounter = source.moveCounter;
-		target.moveCount = source.moveCount;
+		//target.moveCount = source.moveCount;
 
 		// small arrays
 		target.kingArea[WHITE] = source.kingArea[WHITE];

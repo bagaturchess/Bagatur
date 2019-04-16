@@ -59,10 +59,10 @@ public class SearchInfoUtils {
 		if (!info.isUpperBound()) {
 			
 			message.append(" pv ");
-		
+			
 			if (info.getPV() != null) {
 				for (int j=0; j<info.getPV().length; j++) {
-					MoveInt.moveToStringUCI(info.getPV()[j], message);
+					MoveInt.moveToStringUCI_experiment(info.getPV()[j], message);
 					if (j != info.getPV().length - 1) {
 						message.append(" ");//", ";
 					}

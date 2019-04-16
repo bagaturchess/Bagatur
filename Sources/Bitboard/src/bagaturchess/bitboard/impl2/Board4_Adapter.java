@@ -166,4 +166,14 @@ public class Board4_Adapter extends Board4 implements IBitBoard {
 	public int[] getMatrix() {
 		return board;
 	}
+
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#makeMoveForward(java.lang.String)
+	 */
+	@Override
+	public void makeMoveForward(String ucimove) {
+		// TODO Auto-generated method stub
+		
+	}
 }

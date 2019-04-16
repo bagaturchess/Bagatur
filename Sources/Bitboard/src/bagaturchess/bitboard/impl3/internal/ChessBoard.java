@@ -55,8 +55,6 @@ public final class ChessBoard {
 	public long zobristKey, pawnZobristKey;
 	public long checkingPieces, pinnedPieces, discoveredPieces;
 
-	public long moveCount;
-
 	/** which piece is on which square */
 	public final int[] pieceIndexes = new int[64];
 	public final int[] kingIndex = new int[2];
@@ -78,6 +76,9 @@ public final class ChessBoard {
 
 	public long passedPawnsAndOutposts;
 
+	public int[] moves = new int[1024];
+	
+	
 	@Override
 	public String toString() {
 		return ChessBoardUtil.toString(this);
@@ -100,13 +101,14 @@ public final class ChessBoard {
 		return (discoveredPieces & (1L << fromIndex)) != 0;
 	}
 
-	private void pushHistoryValues() {
+	private void pushHistoryValues(int move) {
 		castlingHistory[moveCounter] = castlingRights;
 		epIndexHistory[moveCounter] = epIndex;
 		zobristKeyHistory[moveCounter] = zobristKey;
 		pinnedPiecesHistory[moveCounter] = pinnedPieces;
 		discoveredPiecesHistory[moveCounter] = discoveredPieces;
 		checkingPiecesHistory[moveCounter] = checkingPieces;
+		moves[moveCounter] = move;
 		moveCounter++;
 	}
 
@@ -121,7 +123,7 @@ public final class ChessBoard {
 	}
 
 	public void doNullMove() {
-		pushHistoryValues();
+		pushHistoryValues(0);
 
 		zobristKey ^= Zobrist.sideToMove;
 		if (epIndex != 0) {
@@ -138,8 +140,6 @@ public final class ChessBoard {
 
 	public void doMove(int move) {
 
-		moveCount++;
-
 		final int fromIndex = MoveUtil.getFromIndex(move);
 		int toIndex = MoveUtil.getToIndex(move);
 		long toMask = 1L << toIndex;
@@ -152,7 +152,7 @@ public final class ChessBoard {
 			Assert.isTrue(attackedPieceIndex == 0 || (Util.POWER_LOOKUP[toIndex] & friendlyPieces[colorToMove]) == 0);
 		}
 
-		pushHistoryValues();
+		pushHistoryValues(move);
 
 		zobristKey ^= Zobrist.piece[fromIndex][colorToMove][sourcePieceIndex] ^ Zobrist.piece[toIndex][colorToMove][sourcePieceIndex] ^ Zobrist.sideToMove;
 		if (epIndex != 0) {

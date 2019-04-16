@@ -287,7 +287,7 @@ public class BoardUtils {
 		}
 		
 		if (move == 0) {
-			throw new IllegalStateException("moveSign");
+			throw new IllegalStateException("moveSign=" + moveSign + "\r\n" + board);
 		}
 		
 		return move;

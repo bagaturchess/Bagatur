@@ -169,4 +169,14 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 		throw new UnsupportedOperationException();
 	}
 
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#makeMoveForward(java.lang.String)
+	 */
+	@Override
+	public void makeMoveForward(String ucimove) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

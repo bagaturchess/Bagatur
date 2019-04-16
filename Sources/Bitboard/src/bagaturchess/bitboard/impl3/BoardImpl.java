@@ -24,6 +24,7 @@ import bagaturchess.bitboard.impl3.internal.ChessBoard;
 import bagaturchess.bitboard.impl3.internal.ChessBoardUtil;
 import bagaturchess.bitboard.impl3.internal.MoveGenerator;
 import bagaturchess.bitboard.impl3.internal.MoveUtil;
+import bagaturchess.bitboard.impl3.internal.MoveWrapper;
 
 import static bagaturchess.bitboard.impl3.internal.ChessConstants.WHITE;
 import static bagaturchess.bitboard.impl3.internal.ChessConstants.BLACK;
@@ -191,8 +192,13 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public void revert() {
-		board.moveCounter = 0;
-		board.moveCount = 0;
+		for (int i = board.moveCounter; i > 0; i--) {
+			if (board.moves[i] == 0) {
+				board.undoNullMove();
+			} else {
+				board.undoMove(board.moves[i]);
+			}
+		}
 	}
 	
 	
@@ -314,6 +320,13 @@ public class BoardImpl implements IBitBoard {
 	@Override
 	public IMaterialState getMaterialState() {
 		return materialState;
+	}
+	
+	
+	@Override
+	public void makeMoveForward(String ucimove) {
+		MoveWrapper mw = new MoveWrapper(ucimove, board);
+		board.doMove(mw.move);
 	}
 	
 	

@@ -22,6 +22,7 @@ public interface IBoard {
 	public int genAllMoves_ByFigureID(int fieldID, long excludedToFields, final IInternalMoveList list);
 	
 	public void makeMoveForward(final int move);
+	public void makeMoveForward(final String ucimove);
 	public void makeMoveBackward(final int move);
 	
 	public void makeNullMoveForward();
