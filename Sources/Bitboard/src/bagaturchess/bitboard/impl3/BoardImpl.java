@@ -42,7 +42,10 @@ public class BoardImpl implements IBitBoard {
 	private ChessBoard board;
 	private MoveGenerator moveGen;
 	
-	private PiecesListsImpl dummyPiecesLists = new PiecesListsImpl(this);
+	private PiecesListsImpl dummyPiecesLists;
+	private IMaterialState materialState;
+	private IMaterialFactor materialFactor;
+	
 	
 	public BoardImpl() {
 		this(Constants.INITIAL_BOARD);
@@ -58,6 +61,10 @@ public class BoardImpl implements IBitBoard {
 		ChessBoardUtil.init(board);
 		
 		moveGen = new MoveGenerator();
+		
+		dummyPiecesLists = new PiecesListsImpl(this);
+		materialState = new MaterialStateImpl(board);
+		materialFactor = new MaterialFactorImpl();
 	}
 	
 	
@@ -209,47 +216,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public IMaterialFactor getMaterialFactor() {
-		
-		return new IMaterialFactor() {
-			
-			
-			@Override
-			public int interpolateByFactor(int val_o, int val_e) {
-				return (int) ((val_o + val_e) / 2);
-			}
-			
-			
-			@Override
-			public int interpolateByFactor(double val_o, double val_e) {
-				return (int) ((val_o + val_e) / 2);
-			}
-			
-			
-			@Override
-			public int interpolateByFactorAndColour(int colour, int val_o, int val_e) {
-				throw new UnsupportedOperationException();
-			}
-			
-			@Override
-			public int getWhiteFactor() {
-				throw new UnsupportedOperationException();
-			}
-			
-			@Override
-			public int getTotalFactor() {
-				throw new UnsupportedOperationException();
-			}
-			
-			@Override
-			public double getOpenningPart() {
-				throw new UnsupportedOperationException();
-			}
-			
-			@Override
-			public int getBlackFactor() {
-				throw new UnsupportedOperationException();
-			}
-		};
+		return materialFactor;
 	}
 	
 	
@@ -344,17 +311,17 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
+	@Override
+	public IMaterialState getMaterialState() {
+		return materialState;
+	}
+	
+	
 	
 	
 	/**
 	 * NOT IMPLEMENTED METHODS
 	 */
-	
-	
-	@Override
-	public IMaterialState getMaterialState() {
-		throw new UnsupportedOperationException();
-	}
 	
 	@Override
 	public PawnsModelEval getPawnsStructure() {
@@ -530,6 +497,71 @@ public class BoardImpl implements IBitBoard {
 		@Override
 		public PiecesList getPieces(int pid) {
 			return dummy;
+		}
+	}
+	
+	private static final class MaterialStateImpl implements IMaterialState {
+		
+		
+		private ChessBoard board;
+		
+		
+		MaterialStateImpl(ChessBoard _board) {
+			board = _board;
+		}
+		
+		@Override
+		public int getPiecesCount() {
+			return Bits.bitCount(board.allPieces);
+		}
+
+		@Override
+		public int[] getPIDsCounts() {
+			return null;
+		}
+	}
+	
+	
+	private static final class MaterialFactorImpl implements IMaterialFactor {
+		
+		
+		@Override
+		public int interpolateByFactor(int val_o, int val_e) {
+			return (int) ((val_o + val_e) / 2);
+		}
+		
+		
+		@Override
+		public int interpolateByFactor(double val_o, double val_e) {
+			return (int) ((val_o + val_e) / 2);
+		}
+		
+		
+		@Override
+		public int getWhiteFactor() {
+			return 10;
+		}
+		
+		
+		@Override
+		public int getBlackFactor() {
+			return 10;
+		}
+		
+		
+		@Override
+		public int interpolateByFactorAndColour(int colour, int val_o, int val_e) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public int getTotalFactor() {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public double getOpenningPart() {
+			throw new UnsupportedOperationException();
 		}
 	}
 }

@@ -411,9 +411,6 @@ public class MoveInt {
 	
 	public static final void moveToStringUCI(int move, StringBuilder result) {
 		
-		//result.append(new MoveWrapper(move));
-		//if (true) return;
-		
 		if (move == -1) {
 			throw new IllegalStateException("move=" + move);
 		}
@@ -435,6 +432,11 @@ public class MoveInt {
 		}
 	}
 	
+	
+	public static final void moveToStringUCI_experiment(int move, StringBuilder result) {
+		result.append(new MoveWrapper(move));
+		if (true) return;
+	}
 	
 
 	public static int[] getPV(String[] pv, IBitBoard board) {
