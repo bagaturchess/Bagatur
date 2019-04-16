@@ -14,6 +14,7 @@ import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.ISEE;
 import bagaturchess.bitboard.api.PawnsEvalCache;
+import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.eval.BaseEvaluation;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
@@ -76,6 +77,16 @@ public class BoardImpl implements IBitBoard {
 	public int genAllMoves(IInternalMoveList list) {
 		int count = 0;
 		moveGen.startPly();
+		
+		moveGen.generateAttacks(board);
+		while (moveGen.hasNext()) {
+			final int move = moveGen.next();
+			if (board.isLegal(move)) {
+				list.reserved_add(convertMove_toBagatur(move));
+				count++;
+			}
+		}
+		
 		moveGen.generateMoves(board);
 		while (moveGen.hasNext()) {
 			final int move = moveGen.next();
@@ -84,6 +95,7 @@ public class BoardImpl implements IBitBoard {
 				count++;
 			}
 		}
+		
 		moveGen.endPly();
 		
 		return count;
@@ -130,7 +142,7 @@ public class BoardImpl implements IBitBoard {
 	public void makeMoveForward(int move) {
 		board.doMove(convertMove_fromBagatur(move));
 	}
-
+	
 	
 	@Override
 	public void makeMoveBackward(int move) {
@@ -172,7 +184,8 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public void revert() {
-		//Do nothing
+		board.moveCounter = 0;
+		board.moveCount = 0;
 	}
 	
 	
@@ -248,7 +261,8 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public long getFiguresBitboardByColourAndType(int colour, int type) {
-		return board.pieces[colour == Constants.COLOUR_WHITE ? WHITE : BLACK][type];
+		return Bits.reverse(board.pieces[colour == Constants.COLOUR_WHITE ? WHITE : BLACK][type]);
+		//return board.pieces[colour == Constants.COLOUR_WHITE ? WHITE : BLACK][type];
 	}
 	
 	
@@ -265,7 +279,8 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public long getFreeBitboard() {
-		return ~board.allPieces;
+		return Bits.reverse(~board.allPieces);
+		//return ~board.allPieces;
 	}
 	
 	
@@ -295,7 +310,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getStateRepetition() {
-		return 1;//TODO
+		return board.isRepetition(0) ? 3 : 1;//TODO
 	}
 	
 	

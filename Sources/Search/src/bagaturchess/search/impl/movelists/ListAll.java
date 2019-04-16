@@ -391,17 +391,17 @@ public class ListAll implements ISearchMoveList {
 			ordval += ORD_VAL_PREVPV_MOVE * orderingStatistics.getOrdVal_PREVPV();
 		}
 		
-		if (prevBestMove != 0 && MoveInt.getColour(move) != MoveInt.getColour(prevBestMove)) {
+		/*if (prevBestMove != 0 && MoveInt.getColour(move) != MoveInt.getColour(prevBestMove)) {
 			throw new IllegalStateException();
-		}
+		}*/
 		
 		if (move == prevBestMove) {
 			ordval += ORD_VAL_PREV_BEST_MOVE * orderingStatistics.getOrdVal_PREVBEST();
 		}
 		
-		if (mateMove != 0 && MoveInt.getColour(move) != MoveInt.getColour(mateMove)) {
+		/*if (mateMove != 0 && MoveInt.getColour(move) != MoveInt.getColour(mateMove)) {
 			throw new IllegalStateException();
-		}
+		}*/
 		
 		if (move == mateMove) {
 			ordval += ORD_VAL_MATE_MOVE * orderingStatistics.getOrdVal_MATEMOVE();
@@ -442,7 +442,7 @@ public class ListAll implements ISearchMoveList {
 		
 		ordval += env.getHistory_All().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
 		
-		ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
+		//ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
 		
 		
 		return ordval;
@@ -559,7 +559,7 @@ public class ListAll implements ISearchMoveList {
 		orderingStatistics.history_best += env.getHistory_All().getScores(bestmove);
 		orderingStatistics.history_count += 1;
 		
-		orderingStatistics.pst_best += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(bestmove);
+		//orderingStatistics.pst_best += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(bestmove);
 		orderingStatistics.pst_count += 1;
 	}
 	

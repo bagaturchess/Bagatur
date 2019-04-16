@@ -111,7 +111,7 @@ public class ListCapsProm implements ISearchMoveList {
 	}
 	
 	public void reserved_add(int move) {
-		if (MoveInt.isCaptureOrPromotion(move)) {
+		//if (MoveInt.isCaptureOrPromotion(move)) {
 			
 			if (!env.getSearchConfig().sortMoveLists()) {
 				add(move);
@@ -141,16 +141,16 @@ public class ListCapsProm implements ISearchMoveList {
 			
 			ordval += env.getHistory_All().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
 			
-			ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
+			//ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
 			
 			
 			long move_ord = (ordval << 32) | move;
 			
 			add(move_ord);
 			
-		} else {
-			throw new IllegalStateException();
-		}
+		//} else {
+		//	throw new IllegalStateException();
+		//}
 	}
 
 	private void add(long move) {

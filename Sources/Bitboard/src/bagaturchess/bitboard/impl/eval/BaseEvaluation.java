@@ -97,45 +97,6 @@ public class BaseEvaluation implements MoveListener, IBaseEval {
 	}
 	
 	
-	/*public int getPSTMoveScores(int move) {
-		double o_scores = pst.getMoveScores_o(move);
-		double e_scores = pst.getMoveScores_e(move);
-		return interpolator.interpolateByFactor(o_scores, e_scores);
-	}*/
-	
-	
-	public double getPSTMoveGoodPercent(int move) {
-		int min = interpolator.interpolateByFactor(pst.getMoveMinScores_o(move), pst.getMoveMinScores_e(move));
-		int max = interpolator.interpolateByFactor(pst.getMoveMaxScores_o(move), pst.getMoveMaxScores_e(move));
-		int score = interpolator.interpolateByFactor(pst.getMoveScores_o(move), pst.getMoveScores_e(move));
-		
-		/*if (score > max - min) {
-			throw new IllegalStateException();
-		}*/
-		
-		double b = max - min;
-		
-		if (b == 0) { 
-			return 0;
-		}
-		
-		double result = Math.abs(score) / b;
-		if (result > 1) { //because of rounding double to int
-			result = 1;
-		}
-		
-		if (result < 0) { //For sure
-			result = 0;
-		}
-		
-		/*if (result < 0 || result > 1) {
-			throw new IllegalStateException();	
-		}*/
-		
-		return result;
-	}
-	
-	
 	public int getMaterial_o() {
 		return getWhiteMaterialPawns_o() + getWhiteMaterialNonPawns_o() - getBlackMaterialPawns_o() - getBlackMaterialNonPawns_o();
 	}

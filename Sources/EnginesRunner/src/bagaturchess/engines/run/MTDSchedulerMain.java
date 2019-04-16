@@ -166,7 +166,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard  = new Board("1r6/4k3/1pbpPb1p/p1p2P2/2Pp3p/3P3P/2P2RP1/R6K b - - 3 39", null/*sharedData.getAndRemovePawnsCache()*/, cfg.getBoardConfig());
 		
 		
-		IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
+		//IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
 		//IBitBoard bitboard = new Board("4r3/4rk2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB draw
 		//IBitBoard bitboard = new Board("4r3/5k2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB white win
 		//IBitBoard bitboard = new Board("4k3/3r1p2/8/8/8/8/8/4KQ2 w - - 0 1", null, cfg.getBoardConfig());//EGTB white win
@@ -183,7 +183,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = new Board("r4rk1/pp3ppp/2pq4/3p4/4nPb1/2BBP3/PPP3PP/R3QRK1 w - - 2 15", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
-		//IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
+		IBitBoard bitboard  = new Board("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("r1bqk2r/pp1pbppp/2n1pn2/2p5/4P3/5NP1/PPPPQPBP/RNB2RK1 b kq - 6 6  ", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("7k/6r1/8/8/8/8/1Q6/K7 w - -", null, cfg.getBoardConfig()); //Queen and King vs. Rook and King
 		//IBitBoard bitboard  = new Board("k7/1q6/8/8/8/7R/8/6K1 b - - ", null, cfg.getBoardConfig());
@@ -192,7 +192,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard  = new Board("5rk1/pp4p1/8/3N3p/2P4P/1P4K1/P2r1n2/R3R3 b - - 0 1", null, cfg.getBoardConfig());//Mate in 5, white wins
 		//IBitBoard bitboard  = new Board("2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - bm Qg6", null, cfg.getBoardConfig());//Fast mate in 2 moves
 		
-		//BoardUtils.playGameUCI(bitboard, "g3g6");
+		//BoardUtils.playGameUCI(bitboard, "d7d6 f8a8 e6c8 a8a1 e3c1 f6e6 c8g8 g7f6 g8g5");
 		
 		//IBitBoard bitboard  = new Board("8/7k/7P/6K1/2B5/8/8/8 b - - 19 82", null, cfg.getBoardConfig());//Too big eval of bishop and pawn
 		//IBitBoard bitboard  = new Board3_Adapter("1r2r1k1/5pp1/p2p4/2q1pNP1/b3P3/nP4Q1/PKP1R1B1/3R4 b - - 1 29", sharedData.getPawnsCache(), cfg.getBoardConfig());
@@ -462,7 +462,7 @@ public class MTDSchedulerMain {
 		
 		//D: 8	SD: 18 Time: 4.427 s	Eval: -545	NPS: 85689	PV: Bf1-d3, Ne4xd2, Ke1xd2, Nc6-d4, e3xd4, Bb4xc3, b2xc3, e5xd4, Nf3xd4
 		//D: 8	SD: 18 Time: 4.827 s	Eval: -319	NPS: 89718	PV: a3xb4, Qa5xa1, Qd2-d1, Qa1xd1, Ke1xd1, f7-f5, Nc3xe4, f5xe4, Nf3-g5, Nc6xb4, Bg3xe5
-		
+		System.out.println(bitboard);
 		
 
 		//IRootSearch search = new MTDSequentialSearch(new Object[] {cfg, null});
@@ -493,7 +493,6 @@ public class MTDSchedulerMain {
 		
 		//bitboard.setPawnsCache(createPawnsCache());
 		
-		System.out.println(bitboard);
 		//System.exit(0);
 		
 		//System.out.println(System.getenv());

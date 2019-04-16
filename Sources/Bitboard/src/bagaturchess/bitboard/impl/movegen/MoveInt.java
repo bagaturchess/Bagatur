@@ -31,6 +31,7 @@ import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.plies.CastlePlies;
 import bagaturchess.bitboard.impl.plies.specials.Enpassanting;
 import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
+import bagaturchess.bitboard.impl3.internal.MoveWrapper;
 
 
 /**
@@ -409,6 +410,9 @@ public class MoveInt {
 	}
 	
 	public static final void moveToStringUCI(int move, StringBuilder result) {
+		
+		//result.append(new MoveWrapper(move));
+		//if (true) return;
 		
 		if (move == -1) {
 			throw new IllegalStateException("move=" + move);

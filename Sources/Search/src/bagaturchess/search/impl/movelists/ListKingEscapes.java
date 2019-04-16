@@ -157,7 +157,7 @@ public class ListKingEscapes implements ISearchMoveList {
 		
 		ordval += env.getHistory_InCheck().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
 		
-		ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
+		//ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
 		
 		
 		long move_ord = MoveInt.addOrderingValue(move, ordval);
