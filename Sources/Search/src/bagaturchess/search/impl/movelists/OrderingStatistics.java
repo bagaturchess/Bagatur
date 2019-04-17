@@ -25,7 +25,7 @@ package bagaturchess.search.impl.movelists;
 
 public class OrderingStatistics {
 	
-	public static final int MAX_VAL = 1000;
+	public static final int MAX_VAL = 10000;
 	private static final int NORM = 2;
 	
 	public long tpt_count;
