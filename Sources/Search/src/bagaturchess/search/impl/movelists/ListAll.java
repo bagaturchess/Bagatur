@@ -424,7 +424,7 @@ public class ListAll implements ISearchMoveList {
 			} else if (see == 0) {
 				ordval += ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();
 			} else {
-				ordval += ORD_VAL_LOSE_CAP * orderingStatistics.getOrdVal_LOSECAP() + see;
+				ordval += ORD_VAL_LOSE_CAP * orderingStatistics.getOrdVal_LOSECAP() /*+ see*/;
 			}
 		}
 		
