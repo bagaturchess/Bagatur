@@ -81,15 +81,15 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		
 		double openingPart = cb.getBoard().getMaterialFactor().getOpenningPart();
 		
-		getEvalInfo().clearEvals1();
+		evalinfo.clearEvals1();
 		
 		fillMaterialScore(signals);
 		fillImbalances(signals);
 		fillPawnScores(signals);
 		fillPST(signals);
 		
-		getEvalInfo().clearEvals2();
-		getEvalInfo().clearEvalAttacks();
+		evalinfo.clearEvals2();
+		evalinfo.clearEvalAttacks();
 		
 		fillMobilityScoresAndSetAttackBoards(signals);
 		fillPassedPawnScores(signals);
@@ -248,18 +248,18 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		
 		
 		// set outposts
-		getEvalInfo().passedPawnsAndOutposts = 0;
+		evalinfo.passedPawnsAndOutposts = 0;
 		pawns = getWhitePawnAttacks(cb.getPieces(WHITE, PAWN)) & ~cb.getPieces(WHITE, PAWN) & ~cb.getPieces(BLACK, PAWN);
 		while (pawns != 0) {
 			if ((getWhiteAdjacentMask(Long.numberOfTrailingZeros(pawns)) & cb.getPieces(BLACK, PAWN)) == 0) {
-				getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
+				evalinfo.passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
 			}
 			pawns &= pawns - 1;
 		}
 		pawns = getBlackPawnAttacks(cb.getPieces(BLACK, PAWN)) & ~cb.getPieces(WHITE, PAWN) & ~cb.getPieces(BLACK, PAWN);
 		while (pawns != 0) {
 			if ((getBlackAdjacentMask(Long.numberOfTrailingZeros(pawns)) & cb.getPieces(WHITE, PAWN)) == 0) {
-				getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
+				evalinfo.passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
 			}
 			pawns &= pawns - 1;
 		}
@@ -296,7 +296,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			
 			// set passed pawns
 			if ((getWhitePassedPawnMask(index) & cb.getPieces(BLACK, PAWN)) == 0) {
-				getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
+				evalinfo.passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
 			}
 			
 			
@@ -342,7 +342,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			
 			// set passed pawns
 			if ((getBlackPassedPawnMask(index) & cb.getPieces(WHITE, PAWN)) == 0) {
-				getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
+				evalinfo.passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
 			}
 			
 			
@@ -368,29 +368,29 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		long moves;
 
 		// white pawns
-		getEvalInfo().attacks[WHITE][PAWN] = getWhitePawnAttacks(cb.getPieces(WHITE, PAWN) & ~cb.getPinnedPieces());
-		if ((getEvalInfo().attacks[WHITE][PAWN] & cb.getKingArea(BLACK)) != 0) {
-			getEvalInfo().kingAttackersFlag[WHITE] = ChessConstants.FLAG_PAWN;
+		evalinfo.attacks[WHITE][PAWN] = getWhitePawnAttacks(cb.getPieces(WHITE, PAWN) & ~cb.getPinnedPieces());
+		if ((evalinfo.attacks[WHITE][PAWN] & cb.getKingArea(BLACK)) != 0) {
+			evalinfo.kingAttackersFlag[WHITE] = ChessConstants.FLAG_PAWN;
 		}
 		long pinned = cb.getPieces(WHITE, PAWN) & cb.getPinnedPieces();
 		while (pinned != 0) {
-			getEvalInfo().attacks[WHITE][PAWN] |= PAWN_ATTACKS[WHITE][Long.numberOfTrailingZeros(pinned)]
+			evalinfo.attacks[WHITE][PAWN] |= PAWN_ATTACKS[WHITE][Long.numberOfTrailingZeros(pinned)]
 					& ChessConstants.PINNED_MOVEMENT[Long.numberOfTrailingZeros(pinned)][cb.getKingIndex(WHITE)];
 			pinned &= pinned - 1;
 		}
-		getEvalInfo().attacksAll[WHITE] = getEvalInfo().attacks[WHITE][PAWN];
+		evalinfo.attacksAll[WHITE] = evalinfo.attacks[WHITE][PAWN];
 		// black pawns
-		getEvalInfo().attacks[BLACK][PAWN] = getBlackPawnAttacks(cb.getPieces(BLACK, PAWN) & ~cb.getPinnedPieces());
-		if ((getEvalInfo().attacks[BLACK][PAWN] & cb.getKingArea(WHITE)) != 0) {
-			getEvalInfo().kingAttackersFlag[BLACK] = ChessConstants.FLAG_PAWN;
+		evalinfo.attacks[BLACK][PAWN] = getBlackPawnAttacks(cb.getPieces(BLACK, PAWN) & ~cb.getPinnedPieces());
+		if ((evalinfo.attacks[BLACK][PAWN] & cb.getKingArea(WHITE)) != 0) {
+			evalinfo.kingAttackersFlag[BLACK] = ChessConstants.FLAG_PAWN;
 		}
 		pinned = cb.getPieces(BLACK, PAWN) & cb.getPinnedPieces();
 		while (pinned != 0) {
-			getEvalInfo().attacks[BLACK][PAWN] |= PAWN_ATTACKS[BLACK][Long.numberOfTrailingZeros(pinned)]
+			evalinfo.attacks[BLACK][PAWN] |= PAWN_ATTACKS[BLACK][Long.numberOfTrailingZeros(pinned)]
 					& ChessConstants.PINNED_MOVEMENT[Long.numberOfTrailingZeros(pinned)][cb.getKingIndex(BLACK)];
 			pinned &= pinned - 1;
 		}
-		getEvalInfo().attacksAll[BLACK] = getEvalInfo().attacks[BLACK][PAWN];
+		evalinfo.attacksAll[BLACK] = evalinfo.attacks[BLACK][PAWN];
 
 		//int score = 0;
 		for (int color = WHITE; color <= BLACK; color++) {
@@ -398,18 +398,18 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			//int tempScore = 0;
 
 			final long kingArea = cb.getKingArea(1 - color);
-			final long safeMoves = ~cb.getFriendlyPieces(color) & ~getEvalInfo().attacks[1 - color][PAWN];
+			final long safeMoves = ~cb.getFriendlyPieces(color) & ~evalinfo.attacks[1 - color][PAWN];
 
 			// knights
 			long piece = cb.getPieces(color, NIGHT) & ~cb.getPinnedPieces();
 			while (piece != 0) {
 				moves = KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 				if ((moves & kingArea) != 0) {
-					getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_NIGHT;
+					evalinfo.kingAttackersFlag[color] |= ChessConstants.FLAG_NIGHT;
 				}
-				getEvalInfo().doubleAttacks[color] |= getEvalInfo().attacksAll[color] & moves;
-				getEvalInfo().attacksAll[color] |= moves;
-				getEvalInfo().attacks[color][NIGHT] |= moves;
+				evalinfo.doubleAttacks[color] |= evalinfo.attacksAll[color] & moves;
+				evalinfo.attacksAll[color] |= moves;
+				evalinfo.attacks[color][NIGHT] |= moves;
 				int index = Long.bitCount(moves & safeMoves);
 				if (color == WHITE) {
 					signals.getSignal(FEATURE_ID_MOBILITY_KNIGHT).addStrength(index, 1, openingPart);
@@ -424,11 +424,11 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			while (piece != 0) {
 				moves = getBishopMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces() ^ cb.getPieces(color, QUEEN));
 				if ((moves & kingArea) != 0) {
-					getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_BISHOP;
+					evalinfo.kingAttackersFlag[color] |= ChessConstants.FLAG_BISHOP;
 				}
-				getEvalInfo().doubleAttacks[color] |= getEvalInfo().attacksAll[color] & moves;
-				getEvalInfo().attacksAll[color] |= moves;
-				getEvalInfo().attacks[color][BISHOP] |= moves;
+				evalinfo.doubleAttacks[color] |= evalinfo.attacksAll[color] & moves;
+				evalinfo.attacksAll[color] |= moves;
+				evalinfo.attacks[color][BISHOP] |= moves;
 				int index = Long.bitCount(moves & safeMoves);
 				if (color == WHITE) {
 					signals.getSignal(FEATURE_ID_MOBILITY_BISHOP).addStrength(index, 1, openingPart);
@@ -443,11 +443,11 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			while (piece != 0) {
 				moves = getRookMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces() ^ cb.getPieces(color, ROOK) ^ cb.getPieces(color, QUEEN));
 				if ((moves & kingArea) != 0) {
-					getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_ROOK;
+					evalinfo.kingAttackersFlag[color] |= ChessConstants.FLAG_ROOK;
 				}
-				getEvalInfo().doubleAttacks[color] |= getEvalInfo().attacksAll[color] & moves;
-				getEvalInfo().attacksAll[color] |= moves;
-				getEvalInfo().attacks[color][ROOK] |= moves;
+				evalinfo.doubleAttacks[color] |= evalinfo.attacksAll[color] & moves;
+				evalinfo.attacksAll[color] |= moves;
+				evalinfo.attacks[color][ROOK] |= moves;
 				int index = Long.bitCount(moves & safeMoves);
 				if (color == WHITE) {
 					signals.getSignal(FEATURE_ID_MOBILITY_ROOK).addStrength(index, 1, openingPart);
@@ -462,11 +462,11 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			while (piece != 0) {
 				moves = getQueenMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces());
 				if ((moves & kingArea) != 0) {
-					getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_QUEEN;
+					evalinfo.kingAttackersFlag[color] |= ChessConstants.FLAG_QUEEN;
 				}
-				getEvalInfo().doubleAttacks[color] |= getEvalInfo().attacksAll[color] & moves;
-				getEvalInfo().attacksAll[color] |= moves;
-				getEvalInfo().attacks[color][QUEEN] |= moves;
+				evalinfo.doubleAttacks[color] |= evalinfo.attacksAll[color] & moves;
+				evalinfo.attacksAll[color] |= moves;
+				evalinfo.attacks[color][QUEEN] |= moves;
 				int index = Long.bitCount(moves & safeMoves);
 				if (color == WHITE) {
 					signals.getSignal(FEATURE_ID_MOBILITY_QUEEN).addStrength(index, 1, openingPart);
@@ -480,18 +480,18 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		// TODO king-attacks with or without enemy attacks?
 		// WHITE king
 		moves = KING_MOVES[cb.getKingIndex(WHITE)] & ~KING_MOVES[cb.getKingIndex(BLACK)];
-		getEvalInfo().attacks[WHITE][KING] = moves;
-		getEvalInfo().doubleAttacks[WHITE] |= getEvalInfo().attacksAll[WHITE] & moves;
-		getEvalInfo().attacksAll[WHITE] |= moves;
-		int index = Long.bitCount(moves & ~cb.getFriendlyPieces(WHITE) & ~getEvalInfo().attacksAll[BLACK]);
+		evalinfo.attacks[WHITE][KING] = moves;
+		evalinfo.doubleAttacks[WHITE] |= evalinfo.attacksAll[WHITE] & moves;
+		evalinfo.attacksAll[WHITE] |= moves;
+		int index = Long.bitCount(moves & ~cb.getFriendlyPieces(WHITE) & ~evalinfo.attacksAll[BLACK]);
 		signals.getSignal(FEATURE_ID_MOBILITY_KING).addStrength(index, 1, openingPart);
 		
 		// BLACK king
 		moves = KING_MOVES[cb.getKingIndex(BLACK)] & ~KING_MOVES[cb.getKingIndex(WHITE)];
-		getEvalInfo().attacks[BLACK][KING] = moves;
-		getEvalInfo().doubleAttacks[BLACK] |= getEvalInfo().attacksAll[BLACK] & moves;
-		getEvalInfo().attacksAll[BLACK] |= moves;
-		index = Long.bitCount(moves & ~cb.getFriendlyPieces(BLACK) & ~getEvalInfo().attacksAll[WHITE]);
+		evalinfo.attacks[BLACK][KING] = moves;
+		evalinfo.doubleAttacks[BLACK] |= evalinfo.attacksAll[BLACK] & moves;
+		evalinfo.attacksAll[BLACK] |= moves;
+		index = Long.bitCount(moves & ~cb.getFriendlyPieces(BLACK) & ~evalinfo.attacksAll[WHITE]);
 		signals.getSignal(FEATURE_ID_MOBILITY_KING).addStrength(index, -1, openingPart);
 	}
 
@@ -506,7 +506,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		int blackPromotionDistance = SHORT_MAX;
 
 		// white passed pawns
-		long passedPawns = getEvalInfo().passedPawnsAndOutposts & cb.getPieces(WHITE, ChessConstants.PAWN);
+		long passedPawns = evalinfo.passedPawnsAndOutposts & cb.getPieces(WHITE, ChessConstants.PAWN);
 		while (passedPawns != 0) {
 			final int index = 63 - Long.numberOfLeadingZeros(passedPawns);
 
@@ -521,7 +521,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		}
 
 		// black passed pawns
-		passedPawns = getEvalInfo().passedPawnsAndOutposts & cb.getPieces(BLACK, ChessConstants.PAWN);
+		passedPawns = evalinfo.passedPawnsAndOutposts & cb.getPieces(BLACK, ChessConstants.PAWN);
 		while (passedPawns != 0) {
 			final int index = Long.numberOfTrailingZeros(passedPawns);
 
@@ -563,10 +563,10 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		}
 
 		// is next squared attacked?
-		if ((getEvalInfo().attacksAll[enemyColor] & maskNextSquare) == 0) {
+		if ((evalinfo.attacksAll[enemyColor] & maskNextSquare) == 0) {
 
 			// complete path free of enemy attacks?
-			if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & getEvalInfo().attacksAll[enemyColor]) == 0) {
+			if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & evalinfo.attacksAll[enemyColor]) == 0) {
 				multiplier *= PASSED_MULTIPLIERS[7];
 			} else {
 				multiplier *= PASSED_MULTIPLIERS[1];
@@ -574,7 +574,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		}
 
 		// is next squared defended?
-		if ((getEvalInfo().attacksAll[color] & maskNextSquare) != 0) {
+		if ((evalinfo.attacksAll[color] & maskNextSquare) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[3];
 		}
 
@@ -584,18 +584,18 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		}
 
 		// under attack?
-		if (cb.getColorToMove() != color && (getEvalInfo().attacksAll[enemyColor] & square) != 0) {
+		if (cb.getColorToMove() != color && (evalinfo.attacksAll[enemyColor] & square) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[4];
 		}
 
 		// defended by rook from behind?
-		if ((maskFile & cb.getPieces(color, ROOK)) != 0 && (getEvalInfo().attacks[color][ROOK] & square) != 0 && (getEvalInfo().attacks[color][ROOK] & maskPreviousSquare) != 0) {
+		if ((maskFile & cb.getPieces(color, ROOK)) != 0 && (evalinfo.attacks[color][ROOK] & square) != 0 && (evalinfo.attacks[color][ROOK] & maskPreviousSquare) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[5];
 		}
 
 		// attacked by rook from behind?
-		else if ((maskFile & cb.getPieces(enemyColor, ROOK)) != 0 && (getEvalInfo().attacks[enemyColor][ROOK] & square) != 0
-				&& (getEvalInfo().attacks[enemyColor][ROOK] & maskPreviousSquare) != 0) {
+		else if ((maskFile & cb.getPieces(enemyColor, ROOK)) != 0 && (evalinfo.attacks[enemyColor][ROOK] & square) != 0
+				&& (evalinfo.attacks[enemyColor][ROOK] & maskPreviousSquare) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[6];
 		}
 
@@ -622,24 +622,24 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		
 		final long whitePawns = cb.getPieces(WHITE, PAWN);
 		final long blackPawns = cb.getPieces(BLACK, PAWN);
-		final long whiteMinorAttacks = getEvalInfo().attacks[WHITE][NIGHT] | getEvalInfo().attacks[WHITE][BISHOP];
-		final long blackMinorAttacks = getEvalInfo().attacks[BLACK][NIGHT] | getEvalInfo().attacks[BLACK][BISHOP];
-		final long whitePawnAttacks = getEvalInfo().attacks[WHITE][PAWN];
-		final long blackPawnAttacks = getEvalInfo().attacks[BLACK][PAWN];
-		final long whiteAttacks = getEvalInfo().attacksAll[WHITE];
-		final long blackAttacks = getEvalInfo().attacksAll[BLACK];
+		final long whiteMinorAttacks = evalinfo.attacks[WHITE][NIGHT] | evalinfo.attacks[WHITE][BISHOP];
+		final long blackMinorAttacks = evalinfo.attacks[BLACK][NIGHT] | evalinfo.attacks[BLACK][BISHOP];
+		final long whitePawnAttacks = evalinfo.attacks[WHITE][PAWN];
+		final long blackPawnAttacks = evalinfo.attacks[BLACK][PAWN];
+		final long whiteAttacks = evalinfo.attacksAll[WHITE];
+		final long blackAttacks = evalinfo.attacksAll[BLACK];
 		final long whites = cb.getFriendlyPieces(WHITE);
 		final long blacks = cb.getFriendlyPieces(BLACK);
 
 		
 		// double attacked pieces
-		long piece = getEvalInfo().doubleAttacks[WHITE] & blacks;
+		long piece = evalinfo.doubleAttacks[WHITE] & blacks;
 		while (piece != 0) {
 			int index = cb.getPieceType(Long.numberOfTrailingZeros(piece));
 			signals.getSignal(FEATURE_ID_THREAT_DOUBLE_ATTACKED).addStrength(index, 1, openingPart);
 			piece &= piece - 1;
 		}
-		piece = getEvalInfo().doubleAttacks[BLACK] & whites;
+		piece = evalinfo.doubleAttacks[BLACK] & whites;
 		while (piece != 0) {
 			int index = cb.getPieceType(Long.numberOfTrailingZeros(piece));
 			signals.getSignal(FEATURE_ID_THREAT_DOUBLE_ATTACKED).addStrength(index, -1, openingPart);
@@ -648,10 +648,10 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		
 		
 		// unused outposts
-		int count = Long.bitCount(getEvalInfo().passedPawnsAndOutposts & cb.getEmptySpaces() & whiteMinorAttacks & whitePawnAttacks);
+		int count = Long.bitCount(evalinfo.passedPawnsAndOutposts & cb.getEmptySpaces() & whiteMinorAttacks & whitePawnAttacks);
 		signals.getSignal(FEATURE_ID_THREAT_UNUSED_OUTPOST).addStrength(interpolateInternal(count * THREATS_MG[IX_UNUSED_OUTPOST], count * THREATS_EG[IX_UNUSED_OUTPOST], openingPart), openingPart);
 		
-		count = Long.bitCount(getEvalInfo().passedPawnsAndOutposts & cb.getEmptySpaces() & blackMinorAttacks & blackPawnAttacks);
+		count = Long.bitCount(evalinfo.passedPawnsAndOutposts & cb.getEmptySpaces() & blackMinorAttacks & blackPawnAttacks);
 		signals.getSignal(FEATURE_ID_THREAT_UNUSED_OUTPOST).addStrength(-interpolateInternal(count * THREATS_MG[IX_UNUSED_OUTPOST], count * THREATS_EG[IX_UNUSED_OUTPOST], openingPart), openingPart);
 		
 		
@@ -700,7 +700,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		
 		if (cb.getPieces(BLACK, QUEEN) != 0) {
 			// queen under attack by rook
-			count = Long.bitCount(getEvalInfo().attacks[WHITE][ROOK] & cb.getPieces(BLACK, QUEEN));
+			count = Long.bitCount(evalinfo.attacks[WHITE][ROOK] & cb.getPieces(BLACK, QUEEN));
 			signals.getSignal(FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK).addStrength(interpolateInternal(count * THREATS_MG[IX_QUEEN_ATTACKED], count * THREATS_EG[IX_QUEEN_ATTACKED], openingPart), openingPart);
 			
 			// queen under attack by minors
@@ -710,7 +710,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 
 		if (cb.getPieces(WHITE, QUEEN) != 0) {
 			// queen under attack by rook
-			count = Long.bitCount(getEvalInfo().attacks[BLACK][ROOK] & cb.getPieces(WHITE, QUEEN));
+			count = Long.bitCount(evalinfo.attacks[BLACK][ROOK] & cb.getPieces(WHITE, QUEEN));
 			signals.getSignal(FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK).addStrength(-interpolateInternal(count * THREATS_MG[IX_QUEEN_ATTACKED], count * THREATS_EG[IX_QUEEN_ATTACKED], openingPart), openingPart);
 			
 			// queen under attack by minors
@@ -730,7 +730,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		// knight fork
 		// skip when testing eval values because we break the loop if any fork has been found
 		long forked;
-		piece = getEvalInfo().attacks[WHITE][NIGHT] & ~blackAttacks & cb.getEmptySpaces();
+		piece = evalinfo.attacks[WHITE][NIGHT] & ~blackAttacks & cb.getEmptySpaces();
 		while (piece != 0) {
 			forked = blacks & ~blackPawns & KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 			if (Long.bitCount(forked) > 1) {
@@ -743,7 +743,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			}
 			piece &= piece - 1;
 		}
-		piece = getEvalInfo().attacks[BLACK][NIGHT] & ~whiteAttacks & cb.getEmptySpaces();
+		piece = evalinfo.attacks[BLACK][NIGHT] & ~whiteAttacks & cb.getEmptySpaces();
 		while (piece != 0) {
 			forked = whites & ~whitePawns & KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 			if (Long.bitCount(forked) > 1) {
@@ -769,7 +769,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 
 		int whiteScore_o = 0;
 		int whiteScore_e = 0;
-		long piece = cb.getPieces(WHITE, PAWN) & cb.getKingArea(WHITE) & ~getEvalInfo().attacks[BLACK][PAWN];
+		long piece = cb.getPieces(WHITE, PAWN) & cb.getKingArea(WHITE) & ~evalinfo.attacks[BLACK][PAWN];
 		while (piece != 0) {
 			file = Long.numberOfTrailingZeros(piece) & 7;
 			whiteScore_o += SHIELD_BONUS_MG[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3];
@@ -783,7 +783,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 
 		int blackScore_o = 0;
 		int blackScore_e = 0;
-		piece = cb.getPieces(BLACK, PAWN) & cb.getKingArea(BLACK) & ~getEvalInfo().attacks[WHITE][PAWN];
+		piece = cb.getPieces(BLACK, PAWN) & cb.getKingArea(BLACK) & ~evalinfo.attacks[WHITE][PAWN];
 		while (piece != 0) {
 			file = (63 - Long.numberOfLeadingZeros(piece)) & 7;
 			blackScore_o += SHIELD_BONUS_MG[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8];
@@ -809,10 +809,10 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 
 		final long whitePawns = cb.getPieces(WHITE, PAWN);
 		final long blackPawns = cb.getPieces(BLACK, PAWN);
-		final long whitePawnAttacks = getEvalInfo().attacks[WHITE][PAWN];
-		final long blackPawnAttacks = getEvalInfo().attacks[BLACK][PAWN];
-		final long whiteAttacks = getEvalInfo().attacksAll[WHITE];
-		final long blackAttacks = getEvalInfo().attacksAll[BLACK];
+		final long whitePawnAttacks = evalinfo.attacks[WHITE][PAWN];
+		final long blackPawnAttacks = evalinfo.attacks[BLACK][PAWN];
+		final long whiteAttacks = evalinfo.attacksAll[WHITE];
+		final long blackAttacks = evalinfo.attacksAll[BLACK];
 		final long whites = cb.getFriendlyPieces(WHITE);
 		final long blacks = cb.getFriendlyPieces(BLACK);
 		
@@ -829,14 +829,14 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		
 		
 		// piece attacked and only defended by a rook or queen
-		piece = whites & blackAttacks & whiteAttacks & ~(whitePawnAttacks | getEvalInfo().attacks[WHITE][NIGHT] | getEvalInfo().attacks[WHITE][BISHOP]);
+		piece = whites & blackAttacks & whiteAttacks & ~(whitePawnAttacks | evalinfo.attacks[WHITE][NIGHT] | evalinfo.attacks[WHITE][BISHOP]);
 		while (piece != 0) {
 			signals.getSignal(FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS).addStrength(cb.getPieceType(Long.numberOfTrailingZeros(piece)), -1, openingPart);
 			
 			piece &= piece - 1;
 		}
 		
-		piece = blacks & whiteAttacks & blackAttacks & ~(blackPawnAttacks | getEvalInfo().attacks[BLACK][NIGHT] | getEvalInfo().attacks[BLACK][BISHOP]);
+		piece = blacks & whiteAttacks & blackAttacks & ~(blackPawnAttacks | evalinfo.attacks[BLACK][NIGHT] | evalinfo.attacks[BLACK][BISHOP]);
 		while (piece != 0) {
 			signals.getSignal(FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS).addStrength(cb.getPieceType(Long.numberOfTrailingZeros(piece)), 1, openingPart);
 			
@@ -985,7 +985,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		if (cb.getPieces(WHITE, BISHOP) != 0) {
 
 			// bishop outpost: protected by a pawn, cannot be attacked by enemy pawns
-			piece = cb.getPieces(WHITE, BISHOP) & getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
+			piece = cb.getPieces(WHITE, BISHOP) & evalinfo.passedPawnsAndOutposts & whitePawnAttacks;
 			while (piece != 0) {
 				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_OUTPOST).addStrength(Long.numberOfTrailingZeros(piece) >>> 3, 1, openingPart);
 				
@@ -1006,7 +1006,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(Long.bitCount(whitePawns & WHITE_SQUARES), -1, openingPart);
 				
 				// bonus for attacking center squares
-				value = Long.bitCount(getEvalInfo().attacks[WHITE][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
+				value = Long.bitCount(evalinfo.attacks[WHITE][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
 				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK).addStrength(value, openingPart);
 			}
 			if ((cb.getPieces(WHITE, BISHOP) & BLACK_SQUARES) != 0) {
@@ -1014,7 +1014,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(Long.bitCount(whitePawns & BLACK_SQUARES), -1, openingPart);
 				
 				// bonus for attacking center squares 
-				value = Long.bitCount(getEvalInfo().attacks[WHITE][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
+				value = Long.bitCount(evalinfo.attacks[WHITE][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
 				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK).addStrength(value, openingPart);
 			}
 
@@ -1025,7 +1025,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		if (cb.getPieces(BLACK, BISHOP) != 0) {
 
 			// bishop outpost: protected by a pawn, cannot be attacked by enemy pawns
-			piece = cb.getPieces(BLACK, BISHOP) & getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
+			piece = cb.getPieces(BLACK, BISHOP) & evalinfo.passedPawnsAndOutposts & blackPawnAttacks;
 			while (piece != 0) { 
 				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_OUTPOST).addStrength(7 - Long.numberOfTrailingZeros(piece) / 8, -1, openingPart);
 				
@@ -1046,7 +1046,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(Long.bitCount(blackPawns & WHITE_SQUARES), 1, openingPart);
 				
 				// bonus for attacking center squares 
-				value = Long.bitCount(getEvalInfo().attacks[BLACK][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
+				value = Long.bitCount(evalinfo.attacks[BLACK][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
 				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK).addStrength(-value, openingPart);
 			}
 			if ((cb.getPieces(BLACK, BISHOP) & BLACK_SQUARES) != 0) {
@@ -1054,7 +1054,7 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_PAWNS).addStrength(Long.bitCount(blackPawns & BLACK_SQUARES), 1, openingPart);
 				
 				// bonus for attacking center squares
-				value = Long.bitCount(getEvalInfo().attacks[BLACK][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
+				value = Long.bitCount(evalinfo.attacks[BLACK][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
 				signals.getSignal(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK).addStrength(-value, openingPart);
 			}
 		}
@@ -1076,13 +1076,13 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		
 		
 		// knight outpost: protected by a pawn, cannot be attacked by enemy pawns
-		piece = cb.getPieces(WHITE, NIGHT) & getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
+		piece = cb.getPieces(WHITE, NIGHT) & evalinfo.passedPawnsAndOutposts & whitePawnAttacks;
 		while (piece != 0) {
 			signals.getSignal(FEATURE_ID_OTHERS_KNIGHT_OUTPOST).addStrength(Long.numberOfTrailingZeros(piece) >>> 3, 1, openingPart);
 			
 			piece &= piece - 1;
 		}
-		piece = cb.getPieces(BLACK, NIGHT) & getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
+		piece = cb.getPieces(BLACK, NIGHT) & evalinfo.passedPawnsAndOutposts & blackPawnAttacks;
 		while (piece != 0) {
 			signals.getSignal(FEATURE_ID_OTHERS_KNIGHT_OUTPOST).addStrength(7 - Long.numberOfTrailingZeros(piece) / 8, -1, openingPart);
 			
@@ -1120,14 +1120,14 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 			counter += openFiles(kingColor, cb.getPieces(kingColor, PAWN));
 
 			// king can move?
-			if ((getEvalInfo().attacks[kingColor][KING] & ~cb.getFriendlyPieces(kingColor)) == 0) {
+			if ((evalinfo.attacks[kingColor][KING] & ~cb.getFriendlyPieces(kingColor)) == 0) {
 				counter++;
 			}
-			counter += KS_ATTACKS[Long.bitCount(cb.getKingArea(kingColor) & getEvalInfo().attacksAll[enemyColor])];
+			counter += KS_ATTACKS[Long.bitCount(cb.getKingArea(kingColor) & evalinfo.attacksAll[enemyColor])];
 			counter += checks(kingColor);
 
 			counter += KS_DOUBLE_ATTACKS[Long
-					.bitCount(KING_MOVES[cb.getKingIndex(kingColor)] & getEvalInfo().doubleAttacks[enemyColor] & ~getEvalInfo().attacks[kingColor][PAWN])];
+					.bitCount(KING_MOVES[cb.getKingIndex(kingColor)] & evalinfo.doubleAttacks[enemyColor] & ~evalinfo.attacks[kingColor][PAWN])];
 
 			if ((cb.getCheckingPieces() & cb.getFriendlyPieces(enemyColor)) != 0) {
 				counter++;
@@ -1148,13 +1148,13 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 				counter /= 2;
 			} else if (Long.bitCount(cb.getPieces(enemyColor, QUEEN)) == 1) {
 				// bonus for small king-queen distance
-				if ((getEvalInfo().attacksAll[kingColor] & cb.getPieces(enemyColor, QUEEN)) == 0) {
+				if ((evalinfo.attacksAll[kingColor] & cb.getPieces(enemyColor, QUEEN)) == 0) {
 					counter += KS_QUEEN_TROPISM[getDistance(cb.getKingIndex(kingColor),
 							Long.numberOfTrailingZeros(cb.getPieces(enemyColor, QUEEN)))];
 				}
 			}
 
-			counter += KS_ATTACK_PATTERN[getEvalInfo().kingAttackersFlag[enemyColor]];
+			counter += KS_ATTACK_PATTERN[evalinfo.kingAttackersFlag[enemyColor]];
 
 			int value = ChessConstants.COLOR_FACTOR[enemyColor] * KS_SCORES[Math.min(counter, KS_SCORES.length - 1)];
 			signals.getSignal(FEATURE_ID_KING_SAFETY).addStrength(value, openingPart);
@@ -1179,11 +1179,11 @@ public class Bagatur_V17_SignalFiller extends Evaluator implements ISignalFiller
 		long space = cb.getPieces(WHITE, PAWN) >>> 8;
 		space |= space >>> 8 | space >>> 16;
 		score += SPACE[Long.bitCount(cb.getFriendlyPieces(WHITE))]
-				* Long.bitCount(space & ~cb.getPieces(WHITE, PAWN) & ~getEvalInfo().attacks[BLACK][PAWN] & FILE_CDEF);
+				* Long.bitCount(space & ~cb.getPieces(WHITE, PAWN) & ~evalinfo.attacks[BLACK][PAWN] & FILE_CDEF);
 		space = cb.getPieces(BLACK, PAWN) << 8;
 		space |= space << 8 | space << 16;
 		score -= SPACE[Long.bitCount(cb.getFriendlyPieces(BLACK))]
-				* Long.bitCount(space & ~cb.getPieces(BLACK, PAWN) & ~getEvalInfo().attacks[WHITE][PAWN] & FILE_CDEF);
+				* Long.bitCount(space & ~cb.getPieces(BLACK, PAWN) & ~evalinfo.attacks[WHITE][PAWN] & FILE_CDEF);
 
 		
 		signals.getSignal(FEATURE_ID_SPACE).addStrength(score, openingPart);

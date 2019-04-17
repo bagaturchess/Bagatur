@@ -205,9 +205,9 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	public static final int MG = 0;
 	public static final int EG = 1;
 	
-	private EvalInfo evalinfo;
-	protected IChessBoard cb;
-	private IBaseEval baseEval;
+	protected final IChessBoard cb;
+	private final IBaseEval baseEval;
+	protected final EvalInfo evalinfo;
 	
 	
 	public Evaluator(IChessBoard _board) {
@@ -215,16 +215,12 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		baseEval = cb.getBoard().getBaseEvaluation();
 		evalinfo = new EvalInfo();
 	}
-
-
-	protected EvalInfo getEvalInfo() {
-		return evalinfo;
-	}
 	
 	
 	public int getScore1() {
 		
-		getEvalInfo().clearEvals1();
+		evalinfo.clearEvals1();
+		evalinfo.fillBB(cb);
 		
 		calculatePawnScores();
 		calculateMaterialScore();
@@ -233,15 +229,15 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		int psqt_o = (int) (PIECE_SQUARE_TABLE_O * cb.getPSQTScore_o());
 		int psqt_e = (int) (PIECE_SQUARE_TABLE_E * cb.getPSQTScore_e());
 		
-		return cb.getBoard().getMaterialFactor().interpolateByFactor(psqt_o + getEvalInfo().eval_o_part1, psqt_e + getEvalInfo().eval_e_part1);
+		return cb.getBoard().getMaterialFactor().interpolateByFactor(psqt_o + evalinfo.eval_o_part1, psqt_e + evalinfo.eval_e_part1);
 	}
 	
 	
 	public int getScore2() {
 		
 		// clear values
-		getEvalInfo().clearEvals2();
-		getEvalInfo().clearEvalAttacks();
+		evalinfo.clearEvals2();
+		evalinfo.clearEvalAttacks();
 		
 		calculateMobilityScoresAndSetAttackBoards();
 		calculatePassedPawnScores();
@@ -251,7 +247,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		calculateKingSafetyScores();
 		calculateSpace();
 		
-		return cb.getBoard().getMaterialFactor().interpolateByFactor(getEvalInfo().eval_o_part2, getEvalInfo().eval_e_part2);
+		return cb.getBoard().getMaterialFactor().interpolateByFactor(evalinfo.eval_o_part2, evalinfo.eval_e_part2);
 	}
 	
 
@@ -260,60 +256,60 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		
 		// penalty for doubled pawns
 		for (int i = 0; i < 8; i++) {
-			if (Long.bitCount(cb.getPieces(WHITE, PAWN) & FILES[i]) > 1) {
-				getEvalInfo().eval_o_part1 -= PAWN_DOUBLE_O * PAWN_SCORES[IX_PAWN_DOUBLE];
-				getEvalInfo().eval_e_part1 -= PAWN_DOUBLE_E * PAWN_SCORES[IX_PAWN_DOUBLE];
+			if (Long.bitCount(evalinfo.bb_w_pawns & FILES[i]) > 1) {
+				evalinfo.eval_o_part1 -= PAWN_DOUBLE_O * PAWN_SCORES[IX_PAWN_DOUBLE];
+				evalinfo.eval_e_part1 -= PAWN_DOUBLE_E * PAWN_SCORES[IX_PAWN_DOUBLE];
 			}
-			if (Long.bitCount(cb.getPieces(BLACK, PAWN) & FILES[i]) > 1) {
-				getEvalInfo().eval_o_part1 += PAWN_DOUBLE_O * PAWN_SCORES[IX_PAWN_DOUBLE];
-				getEvalInfo().eval_e_part1 += PAWN_DOUBLE_E * PAWN_SCORES[IX_PAWN_DOUBLE];
+			if (Long.bitCount(evalinfo.bb_b_pawns & FILES[i]) > 1) {
+				evalinfo.eval_o_part1 += PAWN_DOUBLE_O * PAWN_SCORES[IX_PAWN_DOUBLE];
+				evalinfo.eval_e_part1 += PAWN_DOUBLE_E * PAWN_SCORES[IX_PAWN_DOUBLE];
 			}
 		}
 		
 		
 		// bonus for connected pawns
-		long pawns = getWhitePawnAttacks(cb.getPieces(WHITE, PAWN)) & cb.getPieces(WHITE, PAWN);
+		long pawns = getWhitePawnAttacks(evalinfo.bb_w_pawns) & evalinfo.bb_w_pawns;
 		while (pawns != 0) {
-			getEvalInfo().eval_o_part1 += PAWN_CONNECTED_O * PAWN_CONNECTED_MG[Long.numberOfTrailingZeros(pawns) / 8];
-			getEvalInfo().eval_e_part1 += PAWN_CONNECTED_E * PAWN_CONNECTED_EG[Long.numberOfTrailingZeros(pawns) / 8];
+			evalinfo.eval_o_part1 += PAWN_CONNECTED_O * PAWN_CONNECTED_MG[Long.numberOfTrailingZeros(pawns) / 8];
+			evalinfo.eval_e_part1 += PAWN_CONNECTED_E * PAWN_CONNECTED_EG[Long.numberOfTrailingZeros(pawns) / 8];
 			pawns &= pawns - 1;
 		}
-		pawns = getBlackPawnAttacks(cb.getPieces(BLACK, PAWN)) & cb.getPieces(BLACK, PAWN);
+		pawns = getBlackPawnAttacks(evalinfo.bb_b_pawns) & evalinfo.bb_b_pawns;
 		while (pawns != 0) {
-			getEvalInfo().eval_o_part1 -= PAWN_CONNECTED_O * PAWN_CONNECTED_MG[7 - Long.numberOfTrailingZeros(pawns) / 8];
-			getEvalInfo().eval_e_part1 -= PAWN_CONNECTED_E * PAWN_CONNECTED_EG[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			evalinfo.eval_o_part1 -= PAWN_CONNECTED_O * PAWN_CONNECTED_MG[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			evalinfo.eval_e_part1 -= PAWN_CONNECTED_E * PAWN_CONNECTED_EG[7 - Long.numberOfTrailingZeros(pawns) / 8];
 			pawns &= pawns - 1;
 		}
 		
 		
 		// bonus for neighbour pawns
-		pawns = getPawnNeighbours(cb.getPieces(WHITE, PAWN)) & cb.getPieces(WHITE, PAWN);
+		pawns = getPawnNeighbours(evalinfo.bb_w_pawns) & evalinfo.bb_w_pawns;
 		while (pawns != 0) {
-			getEvalInfo().eval_o_part1 += PAWN_NEIGHBOUR_O * PAWN_NEIGHBOUR_MG[Long.numberOfTrailingZeros(pawns) / 8];
-			getEvalInfo().eval_e_part1 += PAWN_NEIGHBOUR_E * PAWN_NEIGHBOUR_EG[Long.numberOfTrailingZeros(pawns) / 8];
+			evalinfo.eval_o_part1 += PAWN_NEIGHBOUR_O * PAWN_NEIGHBOUR_MG[Long.numberOfTrailingZeros(pawns) / 8];
+			evalinfo.eval_e_part1 += PAWN_NEIGHBOUR_E * PAWN_NEIGHBOUR_EG[Long.numberOfTrailingZeros(pawns) / 8];
 			pawns &= pawns - 1;
 		}
-		pawns = getPawnNeighbours(cb.getPieces(BLACK, PAWN)) & cb.getPieces(BLACK, PAWN);
+		pawns = getPawnNeighbours(evalinfo.bb_b_pawns) & evalinfo.bb_b_pawns;
 		while (pawns != 0) {
-			getEvalInfo().eval_o_part1 -= PAWN_NEIGHBOUR_O * PAWN_NEIGHBOUR_MG[7 - Long.numberOfTrailingZeros(pawns) / 8];
-			getEvalInfo().eval_e_part1 -= PAWN_NEIGHBOUR_E * PAWN_NEIGHBOUR_EG[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			evalinfo.eval_o_part1 -= PAWN_NEIGHBOUR_O * PAWN_NEIGHBOUR_MG[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			evalinfo.eval_e_part1 -= PAWN_NEIGHBOUR_E * PAWN_NEIGHBOUR_EG[7 - Long.numberOfTrailingZeros(pawns) / 8];
 			pawns &= pawns - 1;
 		}
 		
 		
 		// set outposts
-		getEvalInfo().passedPawnsAndOutposts = 0;
-		pawns = getWhitePawnAttacks(cb.getPieces(WHITE, PAWN)) & ~cb.getPieces(WHITE, PAWN) & ~cb.getPieces(BLACK, PAWN);
+		evalinfo.passedPawnsAndOutposts = 0;
+		pawns = getWhitePawnAttacks(evalinfo.bb_w_pawns) & ~evalinfo.bb_w_pawns & ~evalinfo.bb_b_pawns;
 		while (pawns != 0) {
-			if ((getWhiteAdjacentMask(Long.numberOfTrailingZeros(pawns)) & cb.getPieces(BLACK, PAWN)) == 0) {
-				getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
+			if ((getWhiteAdjacentMask(Long.numberOfTrailingZeros(pawns)) & evalinfo.bb_b_pawns) == 0) {
+				evalinfo.passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
 			}
 			pawns &= pawns - 1;
 		}
-		pawns = getBlackPawnAttacks(cb.getPieces(BLACK, PAWN)) & ~cb.getPieces(WHITE, PAWN) & ~cb.getPieces(BLACK, PAWN);
+		pawns = getBlackPawnAttacks(evalinfo.bb_b_pawns) & ~evalinfo.bb_w_pawns & ~evalinfo.bb_b_pawns;
 		while (pawns != 0) {
-			if ((getBlackAdjacentMask(Long.numberOfTrailingZeros(pawns)) & cb.getPieces(WHITE, PAWN)) == 0) {
-				getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
+			if ((getBlackAdjacentMask(Long.numberOfTrailingZeros(pawns)) & evalinfo.bb_w_pawns) == 0) {
+				evalinfo.passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
 			}
 			pawns &= pawns - 1;
 		}
@@ -321,48 +317,48 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		
 		int index;
 		// white
-		pawns = cb.getPieces(WHITE, PAWN);
+		pawns = evalinfo.bb_w_pawns;
 		while (pawns != 0) {
 			index = Long.numberOfTrailingZeros(pawns);
 			
 			
 			// isolated pawns
-			if ((FILES_ADJACENT[index & 7] & cb.getPieces(WHITE, PAWN)) == 0) {
-				getEvalInfo().eval_o_part1 -= PAWN_ISOLATED_O * PAWN_SCORES[IX_PAWN_ISOLATED];
-				getEvalInfo().eval_e_part1 -= PAWN_ISOLATED_E * PAWN_SCORES[IX_PAWN_ISOLATED];
+			if ((FILES_ADJACENT[index & 7] & evalinfo.bb_w_pawns) == 0) {
+				evalinfo.eval_o_part1 -= PAWN_ISOLATED_O * PAWN_SCORES[IX_PAWN_ISOLATED];
+				evalinfo.eval_e_part1 -= PAWN_ISOLATED_E * PAWN_SCORES[IX_PAWN_ISOLATED];
 			}
 			
 			
 			// backward pawns
-			else if ((getBlackAdjacentMask(index + 8) & cb.getPieces(WHITE, PAWN)) == 0) {
-				if ((PAWN_ATTACKS[WHITE][index + 8] & cb.getPieces(BLACK, PAWN)) != 0) {
-					if ((FILES[index & 7] & cb.getPieces(BLACK, PAWN)) == 0) {
-						getEvalInfo().eval_o_part1 -= PAWN_BACKWARD_O * PAWN_SCORES[IX_PAWN_BACKWARD];
-						getEvalInfo().eval_e_part1 -= PAWN_BACKWARD_E * PAWN_SCORES[IX_PAWN_BACKWARD];
+			else if ((getBlackAdjacentMask(index + 8) & evalinfo.bb_w_pawns) == 0) {
+				if ((PAWN_ATTACKS[WHITE][index + 8] & evalinfo.bb_b_pawns) != 0) {
+					if ((FILES[index & 7] & evalinfo.bb_b_pawns) == 0) {
+						evalinfo.eval_o_part1 -= PAWN_BACKWARD_O * PAWN_SCORES[IX_PAWN_BACKWARD];
+						evalinfo.eval_e_part1 -= PAWN_BACKWARD_E * PAWN_SCORES[IX_PAWN_BACKWARD];
 					}
 				}
 			}
 			
 			
 			// pawn defending 2 pawns
-			if (Long.bitCount(PAWN_ATTACKS[WHITE][index] & cb.getPieces(WHITE, PAWN)) == 2) {
-				getEvalInfo().eval_o_part1 -= PAWN_INVERSE_O * PAWN_SCORES[IX_PAWN_INVERSE];
-				getEvalInfo().eval_e_part1 -= PAWN_INVERSE_E * PAWN_SCORES[IX_PAWN_INVERSE];
+			if (Long.bitCount(PAWN_ATTACKS[WHITE][index] & evalinfo.bb_w_pawns) == 2) {
+				evalinfo.eval_o_part1 -= PAWN_INVERSE_O * PAWN_SCORES[IX_PAWN_INVERSE];
+				evalinfo.eval_e_part1 -= PAWN_INVERSE_E * PAWN_SCORES[IX_PAWN_INVERSE];
 			}
 			
 			
 			// set passed pawns
-			if ((getWhitePassedPawnMask(index) & cb.getPieces(BLACK, PAWN)) == 0) {
-				getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
+			if ((getWhitePassedPawnMask(index) & evalinfo.bb_b_pawns) == 0) {
+				evalinfo.passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
 			}
 			
 			
 			// candidate passed pawns (no pawns in front, more friendly pawns behind and adjacent than enemy pawns)
-			else if (63 - Long.numberOfLeadingZeros((cb.getPieces(WHITE, PAWN) | cb.getPieces(BLACK, PAWN)) & FILES[index & 7]) == index) {
-				if (Long.bitCount(cb.getPieces(WHITE, PAWN) & getBlackPassedPawnMask(index + 8)) >= Long
-						.bitCount(cb.getPieces(BLACK, PAWN) & getWhitePassedPawnMask(index))) {
-					getEvalInfo().eval_o_part1 += PAWN_PASSED_CANDIDATE_O * PASSED_CANDIDATE_MG[index / 8];
-					getEvalInfo().eval_e_part1 += PAWN_PASSED_CANDIDATE_E * PASSED_CANDIDATE_EG[index / 8];
+			else if (63 - Long.numberOfLeadingZeros((evalinfo.bb_w_pawns | evalinfo.bb_b_pawns) & FILES[index & 7]) == index) {
+				if (Long.bitCount(evalinfo.bb_w_pawns & getBlackPassedPawnMask(index + 8)) >= Long
+						.bitCount(evalinfo.bb_b_pawns & getWhitePassedPawnMask(index))) {
+					evalinfo.eval_o_part1 += PAWN_PASSED_CANDIDATE_O * PASSED_CANDIDATE_MG[index / 8];
+					evalinfo.eval_e_part1 += PAWN_PASSED_CANDIDATE_E * PASSED_CANDIDATE_EG[index / 8];
 				}
 			}
 
@@ -371,48 +367,48 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		
 		
 		// black
-		pawns = cb.getPieces(BLACK, PAWN);
+		pawns = evalinfo.bb_b_pawns;
 		while (pawns != 0) {
 			index = Long.numberOfTrailingZeros(pawns);
 			
 			
 			// isolated pawns
-			if ((FILES_ADJACENT[index & 7] & cb.getPieces(BLACK, PAWN)) == 0) {
-				getEvalInfo().eval_o_part1 += PAWN_ISOLATED_O * PAWN_SCORES[IX_PAWN_ISOLATED];
-				getEvalInfo().eval_e_part1 += PAWN_ISOLATED_E * PAWN_SCORES[IX_PAWN_ISOLATED];
+			if ((FILES_ADJACENT[index & 7] & evalinfo.bb_b_pawns) == 0) {
+				evalinfo.eval_o_part1 += PAWN_ISOLATED_O * PAWN_SCORES[IX_PAWN_ISOLATED];
+				evalinfo.eval_e_part1 += PAWN_ISOLATED_E * PAWN_SCORES[IX_PAWN_ISOLATED];
 			}
 			
 			
 			// backward pawns
-			else if ((getWhiteAdjacentMask(index - 8) & cb.getPieces(BLACK, PAWN)) == 0) {
-				if ((PAWN_ATTACKS[BLACK][index - 8] & cb.getPieces(WHITE, PAWN)) != 0) {
-					if ((FILES[index & 7] & cb.getPieces(WHITE, PAWN)) == 0) {
-						getEvalInfo().eval_o_part1 += PAWN_BACKWARD_O * PAWN_SCORES[IX_PAWN_BACKWARD];
-						getEvalInfo().eval_e_part1 += PAWN_BACKWARD_E * PAWN_SCORES[IX_PAWN_BACKWARD];
+			else if ((getWhiteAdjacentMask(index - 8) & evalinfo.bb_b_pawns) == 0) {
+				if ((PAWN_ATTACKS[BLACK][index - 8] & evalinfo.bb_w_pawns) != 0) {
+					if ((FILES[index & 7] & evalinfo.bb_w_pawns) == 0) {
+						evalinfo.eval_o_part1 += PAWN_BACKWARD_O * PAWN_SCORES[IX_PAWN_BACKWARD];
+						evalinfo.eval_e_part1 += PAWN_BACKWARD_E * PAWN_SCORES[IX_PAWN_BACKWARD];
 					}
 				}
 			}
 			
 			
 			// pawn defending 2 pawns
-			if (Long.bitCount(PAWN_ATTACKS[BLACK][index] & cb.getPieces(BLACK, PAWN)) == 2) {
-				getEvalInfo().eval_o_part1 += PAWN_INVERSE_O * PAWN_SCORES[IX_PAWN_INVERSE];
-				getEvalInfo().eval_e_part1 += PAWN_INVERSE_E * PAWN_SCORES[IX_PAWN_INVERSE];
+			if (Long.bitCount(PAWN_ATTACKS[BLACK][index] & evalinfo.bb_b_pawns) == 2) {
+				evalinfo.eval_o_part1 += PAWN_INVERSE_O * PAWN_SCORES[IX_PAWN_INVERSE];
+				evalinfo.eval_e_part1 += PAWN_INVERSE_E * PAWN_SCORES[IX_PAWN_INVERSE];
 			}
 			
 			
 			// set passed pawns
-			if ((getBlackPassedPawnMask(index) & cb.getPieces(WHITE, PAWN)) == 0) {
-				getEvalInfo().passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
+			if ((getBlackPassedPawnMask(index) & evalinfo.bb_w_pawns) == 0) {
+				evalinfo.passedPawnsAndOutposts |= Long.lowestOneBit(pawns);
 			}
 			
 			
 			// candidate passers
-			else if (Long.numberOfTrailingZeros((cb.getPieces(WHITE, PAWN) | cb.getPieces(BLACK, PAWN)) & FILES[index & 7]) == index) {
-				if (Long.bitCount(cb.getPieces(BLACK, PAWN) & getWhitePassedPawnMask(index - 8)) >= Long
-						.bitCount(cb.getPieces(WHITE, PAWN) & getBlackPassedPawnMask(index))) {
-					getEvalInfo().eval_o_part1 -= PAWN_PASSED_CANDIDATE_O * PASSED_CANDIDATE_MG[7 - index / 8];
-					getEvalInfo().eval_e_part1 -= PAWN_PASSED_CANDIDATE_E * PASSED_CANDIDATE_EG[7 - index / 8];
+			else if (Long.numberOfTrailingZeros((evalinfo.bb_w_pawns | evalinfo.bb_b_pawns) & FILES[index & 7]) == index) {
+				if (Long.bitCount(evalinfo.bb_b_pawns & getWhitePassedPawnMask(index - 8)) >= Long
+						.bitCount(evalinfo.bb_w_pawns & getBlackPassedPawnMask(index))) {
+					evalinfo.eval_o_part1 -= PAWN_PASSED_CANDIDATE_O * PASSED_CANDIDATE_MG[7 - index / 8];
+					evalinfo.eval_e_part1 -= PAWN_PASSED_CANDIDATE_E * PASSED_CANDIDATE_EG[7 - index / 8];
 				}
 			}
 			
@@ -421,25 +417,25 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	}
 	
 	
-	public void calculateMaterialScore() {
-		int eval_o = (Long.bitCount(cb.getPieces(WHITE, PAWN)) - Long.bitCount(cb.getPieces(BLACK, PAWN))) * 94
-				+ (Long.bitCount(cb.getPieces(WHITE, NIGHT)) - Long.bitCount(cb.getPieces(BLACK, NIGHT))) * 403
-				+ (Long.bitCount(cb.getPieces(WHITE, BISHOP)) - Long.bitCount(cb.getPieces(BLACK, BISHOP))) * 414
-				+ (Long.bitCount(cb.getPieces(WHITE, ROOK)) - Long.bitCount(cb.getPieces(BLACK, ROOK))) * 590
-				+ (Long.bitCount(cb.getPieces(WHITE, QUEEN)) - Long.bitCount(cb.getPieces(BLACK, QUEEN))) * 1179;
+	/*public void calculateMaterialScore() {
+		int eval_o = (Long.bitCount(evalinfo.bb_w_pawns) - Long.bitCount(evalinfo.bb_b_pawns)) * 94
+				+ (Long.bitCount(evalinfo.bb_w_knights) - Long.bitCount(cb.getPieces(BLACK, NIGHT))) * 403
+				+ (Long.bitCount(evalinfo.bb_w_bishops) - Long.bitCount(evalinfo.bb_b_bishops)) * 414
+				+ (Long.bitCount(evalinfo.bb_w_rooks) - Long.bitCount(evalinfo.bb_b_rooks))) * 590
+				+ (Long.bitCount(evalinfo.bb_w_queens) - Long.bitCount(evalinfo.bb_b_queens)) * 1179;
 		
-		int eval_e = (Long.bitCount(cb.getPieces(WHITE, PAWN)) - Long.bitCount(cb.getPieces(BLACK, PAWN))) * 90
-				+ (Long.bitCount(cb.getPieces(WHITE, NIGHT)) - Long.bitCount(cb.getPieces(BLACK, NIGHT))) * 370
-				+ (Long.bitCount(cb.getPieces(WHITE, BISHOP)) - Long.bitCount(cb.getPieces(BLACK, BISHOP))) * 400
-				+ (Long.bitCount(cb.getPieces(WHITE, ROOK)) - Long.bitCount(cb.getPieces(BLACK, ROOK))) * 623
-				+ (Long.bitCount(cb.getPieces(WHITE, QUEEN)) - Long.bitCount(cb.getPieces(BLACK, QUEEN))) * 1174;
+		int eval_e = (Long.bitCount(evalinfo.bb_w_pawns) - Long.bitCount(evalinfo.bb_b_pawns)) * 90
+				+ (Long.bitCount(evalinfo.bb_w_knights) - Long.bitCount(cb.getPieces(BLACK, NIGHT))) * 370
+				+ (Long.bitCount(evalinfo.bb_w_bishops) - Long.bitCount(evalinfo.bb_b_bishops)) * 400
+				+ (Long.bitCount(evalinfo.bb_w_rooks) - Long.bitCount(evalinfo.bb_b_rooks)) * 623
+				+ (Long.bitCount(evalinfo.bb_w_queens) - Long.bitCount(evalinfo.bb_b_queens)) * 1174;
 
-		getEvalInfo().eval_o_part1 += eval_o;
-		getEvalInfo().eval_e_part1 += eval_e;
-	}
+		evalinfo.eval_o_part1 += eval_o;
+		evalinfo.eval_e_part1 += eval_e;
+	}*/
 	
 
-	/*public void calculateMaterialScore() {
+	public void calculateMaterialScore() {
 		
 		
 		int w_eval_nopawns_o = baseEval.getWhiteMaterialNonPawns_o();
@@ -452,66 +448,66 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		int b_eval_pawns_o = baseEval.getBlackMaterialPawns_o();
 		int b_eval_pawns_e = baseEval.getBlackMaterialPawns_e();
 
-		getEvalInfo().eval_o_part1 += (w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o);
-		getEvalInfo().eval_e_part1 += (w_eval_nopawns_e - b_eval_nopawns_e) + (w_eval_pawns_e - b_eval_pawns_e);
-	}*/
+		evalinfo.eval_o_part1 += (w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o);
+		evalinfo.eval_e_part1 += (w_eval_nopawns_e - b_eval_nopawns_e) + (w_eval_pawns_e - b_eval_pawns_e);
+	}
 	
 	
 	private void calculateImbalances() {
 		
 		
 		// knight bonus if there are a lot of pawns
-		int value = Long.bitCount(cb.getPieces(WHITE, NIGHT));
-		getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_NIGHT_PAWNS_O * value * NIGHT_PAWN_MG[Long.bitCount(cb.getPieces(WHITE, PAWN))];
-		getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_NIGHT_PAWNS_E * value * NIGHT_PAWN_EG[Long.bitCount(cb.getPieces(WHITE, PAWN))];
+		int value = Long.bitCount(evalinfo.bb_w_knights);
+		evalinfo.eval_o_part1 += MATERIAL_IMBALANCE_NIGHT_PAWNS_O * value * NIGHT_PAWN_MG[Long.bitCount(evalinfo.bb_w_pawns)];
+		evalinfo.eval_e_part1 += MATERIAL_IMBALANCE_NIGHT_PAWNS_E * value * NIGHT_PAWN_EG[Long.bitCount(evalinfo.bb_w_pawns)];
 		
-		value = Long.bitCount(cb.getPieces(BLACK, NIGHT));
-		getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_NIGHT_PAWNS_O * value * NIGHT_PAWN_MG[Long.bitCount(cb.getPieces(BLACK, PAWN))];
-		getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_NIGHT_PAWNS_E * value * NIGHT_PAWN_EG[Long.bitCount(cb.getPieces(BLACK, PAWN))];
+		value = Long.bitCount(evalinfo.bb_b_knights);
+		evalinfo.eval_o_part1 -= MATERIAL_IMBALANCE_NIGHT_PAWNS_O * value * NIGHT_PAWN_MG[Long.bitCount(evalinfo.bb_b_pawns)];
+		evalinfo.eval_e_part1 -= MATERIAL_IMBALANCE_NIGHT_PAWNS_E * value * NIGHT_PAWN_EG[Long.bitCount(evalinfo.bb_b_pawns)];
 		
 		
 		// rook bonus if there are no pawns
-		value = Long.bitCount(cb.getPieces(WHITE, ROOK));
-		getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_ROOK_PAWNS_O * value * ROOK_PAWN_MG[Long.bitCount(cb.getPieces(WHITE, PAWN))];
-		getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_ROOK_PAWNS_E * value * ROOK_PAWN_EG[Long.bitCount(cb.getPieces(WHITE, PAWN))];
+		value = Long.bitCount(evalinfo.bb_w_rooks);
+		evalinfo.eval_o_part1 += MATERIAL_IMBALANCE_ROOK_PAWNS_O * value * ROOK_PAWN_MG[Long.bitCount(evalinfo.bb_w_pawns)];
+		evalinfo.eval_e_part1 += MATERIAL_IMBALANCE_ROOK_PAWNS_E * value * ROOK_PAWN_EG[Long.bitCount(evalinfo.bb_w_pawns)];
 		
-		value = Long.bitCount(cb.getPieces(BLACK, ROOK));
-		getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_ROOK_PAWNS_O * value * ROOK_PAWN_MG[Long.bitCount(cb.getPieces(BLACK, PAWN))];
-		getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_ROOK_PAWNS_E * value * ROOK_PAWN_EG[Long.bitCount(cb.getPieces(BLACK, PAWN))];
+		value = Long.bitCount(evalinfo.bb_b_rooks);
+		evalinfo.eval_o_part1 -= MATERIAL_IMBALANCE_ROOK_PAWNS_O * value * ROOK_PAWN_MG[Long.bitCount(evalinfo.bb_b_pawns)];
+		evalinfo.eval_e_part1 -= MATERIAL_IMBALANCE_ROOK_PAWNS_E * value * ROOK_PAWN_EG[Long.bitCount(evalinfo.bb_b_pawns)];
 		
 		
 		// double bishop bonus
-		if (Long.bitCount(cb.getPieces(WHITE, BISHOP)) == 2) {
-			getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_BISHOP_DOUBLE_O * IMBALANCE_SCORES[IX_BISHOP_DOUBLE];
-			getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_BISHOP_DOUBLE_E * IMBALANCE_SCORES[IX_BISHOP_DOUBLE];
+		if (Long.bitCount(evalinfo.bb_w_bishops) == 2) {
+			evalinfo.eval_o_part1 += MATERIAL_IMBALANCE_BISHOP_DOUBLE_O * IMBALANCE_SCORES[IX_BISHOP_DOUBLE];
+			evalinfo.eval_e_part1 += MATERIAL_IMBALANCE_BISHOP_DOUBLE_E * IMBALANCE_SCORES[IX_BISHOP_DOUBLE];
 		}
-		if (Long.bitCount(cb.getPieces(BLACK, BISHOP)) == 2) {
-			getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_BISHOP_DOUBLE_O * IMBALANCE_SCORES[IX_BISHOP_DOUBLE];
-			getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_BISHOP_DOUBLE_E * IMBALANCE_SCORES[IX_BISHOP_DOUBLE];
+		if (Long.bitCount(evalinfo.bb_b_bishops) == 2) {
+			evalinfo.eval_o_part1 -= MATERIAL_IMBALANCE_BISHOP_DOUBLE_O * IMBALANCE_SCORES[IX_BISHOP_DOUBLE];
+			evalinfo.eval_e_part1 -= MATERIAL_IMBALANCE_BISHOP_DOUBLE_E * IMBALANCE_SCORES[IX_BISHOP_DOUBLE];
 		}
 		
 		
 		// queen and nights
-		if (cb.getPieces(WHITE, QUEEN) != 0) {
-			value = Long.bitCount(cb.getPieces(WHITE, NIGHT)) * IMBALANCE_SCORES[IX_QUEEN_NIGHT];
-			getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O * value;
-			getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E * value;
+		if (evalinfo.bb_w_queens != 0) {
+			value = Long.bitCount(evalinfo.bb_w_knights) * IMBALANCE_SCORES[IX_QUEEN_NIGHT];
+			evalinfo.eval_o_part1 += MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O * value;
+			evalinfo.eval_e_part1 += MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E * value;
 		}
-		if (cb.getPieces(BLACK, QUEEN) != 0) {
-			value = Long.bitCount(cb.getPieces(BLACK, NIGHT)) * IMBALANCE_SCORES[IX_QUEEN_NIGHT];
-			getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O * value;
-			getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E * value;
+		if (evalinfo.bb_b_queens != 0) {
+			value = Long.bitCount(evalinfo.bb_b_knights) * IMBALANCE_SCORES[IX_QUEEN_NIGHT];
+			evalinfo.eval_o_part1 -= MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O * value;
+			evalinfo.eval_e_part1 -= MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E * value;
 		}
 		
 		
 		// rook pair
-		if (Long.bitCount(cb.getPieces(WHITE, ROOK)) > 1) {
-			getEvalInfo().eval_o_part1 += MATERIAL_IMBALANCE_ROOK_PAIR_O * IMBALANCE_SCORES[IX_ROOK_PAIR];
-			getEvalInfo().eval_e_part1 += MATERIAL_IMBALANCE_ROOK_PAIR_E * IMBALANCE_SCORES[IX_ROOK_PAIR];
+		if (Long.bitCount(evalinfo.bb_w_rooks) > 1) {
+			evalinfo.eval_o_part1 += MATERIAL_IMBALANCE_ROOK_PAIR_O * IMBALANCE_SCORES[IX_ROOK_PAIR];
+			evalinfo.eval_e_part1 += MATERIAL_IMBALANCE_ROOK_PAIR_E * IMBALANCE_SCORES[IX_ROOK_PAIR];
 		}
-		if (Long.bitCount(cb.getPieces(BLACK, ROOK)) > 1) {
-			getEvalInfo().eval_o_part1 -= MATERIAL_IMBALANCE_ROOK_PAIR_O * IMBALANCE_SCORES[IX_ROOK_PAIR];
-			getEvalInfo().eval_e_part1 -= MATERIAL_IMBALANCE_ROOK_PAIR_E * IMBALANCE_SCORES[IX_ROOK_PAIR];
+		if (Long.bitCount(evalinfo.bb_b_rooks) > 1) {
+			evalinfo.eval_o_part1 -= MATERIAL_IMBALANCE_ROOK_PAIR_O * IMBALANCE_SCORES[IX_ROOK_PAIR];
+			evalinfo.eval_e_part1 -= MATERIAL_IMBALANCE_ROOK_PAIR_E * IMBALANCE_SCORES[IX_ROOK_PAIR];
 		}
 	}
 	
@@ -521,29 +517,29 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		long moves;
 
 		// white pawns
-		getEvalInfo().attacks[WHITE][PAWN] = getWhitePawnAttacks(cb.getPieces(WHITE, PAWN) & ~cb.getPinnedPieces());
-		if ((getEvalInfo().attacks[WHITE][PAWN] & cb.getKingArea(BLACK)) != 0) {
-			getEvalInfo().kingAttackersFlag[WHITE] = ChessConstants.FLAG_PAWN;
+		evalinfo.attacks[WHITE][PAWN] = getWhitePawnAttacks(evalinfo.bb_w_pawns & ~cb.getPinnedPieces());
+		if ((evalinfo.attacks[WHITE][PAWN] & cb.getKingArea(BLACK)) != 0) {
+			evalinfo.kingAttackersFlag[WHITE] = ChessConstants.FLAG_PAWN;
 		}
-		long pinned = cb.getPieces(WHITE, PAWN) & cb.getPinnedPieces();
+		long pinned = evalinfo.bb_w_pawns & cb.getPinnedPieces();
 		while (pinned != 0) {
-			getEvalInfo().attacks[WHITE][PAWN] |= PAWN_ATTACKS[WHITE][Long.numberOfTrailingZeros(pinned)]
+			evalinfo.attacks[WHITE][PAWN] |= PAWN_ATTACKS[WHITE][Long.numberOfTrailingZeros(pinned)]
 					& ChessConstants.PINNED_MOVEMENT[Long.numberOfTrailingZeros(pinned)][cb.getKingIndex(WHITE)];
 			pinned &= pinned - 1;
 		}
-		getEvalInfo().attacksAll[WHITE] = getEvalInfo().attacks[WHITE][PAWN];
+		evalinfo.attacksAll[WHITE] = evalinfo.attacks[WHITE][PAWN];
 		// black pawns
-		getEvalInfo().attacks[BLACK][PAWN] = getBlackPawnAttacks(cb.getPieces(BLACK, PAWN) & ~cb.getPinnedPieces());
-		if ((getEvalInfo().attacks[BLACK][PAWN] & cb.getKingArea(WHITE)) != 0) {
-			getEvalInfo().kingAttackersFlag[BLACK] = ChessConstants.FLAG_PAWN;
+		evalinfo.attacks[BLACK][PAWN] = getBlackPawnAttacks(evalinfo.bb_b_pawns & ~cb.getPinnedPieces());
+		if ((evalinfo.attacks[BLACK][PAWN] & cb.getKingArea(WHITE)) != 0) {
+			evalinfo.kingAttackersFlag[BLACK] = ChessConstants.FLAG_PAWN;
 		}
-		pinned = cb.getPieces(BLACK, PAWN) & cb.getPinnedPieces();
+		pinned = evalinfo.bb_b_pawns & cb.getPinnedPieces();
 		while (pinned != 0) {
-			getEvalInfo().attacks[BLACK][PAWN] |= PAWN_ATTACKS[BLACK][Long.numberOfTrailingZeros(pinned)]
+			evalinfo.attacks[BLACK][PAWN] |= PAWN_ATTACKS[BLACK][Long.numberOfTrailingZeros(pinned)]
 					& ChessConstants.PINNED_MOVEMENT[Long.numberOfTrailingZeros(pinned)][cb.getKingIndex(BLACK)];
 			pinned &= pinned - 1;
 		}
-		getEvalInfo().attacksAll[BLACK] = getEvalInfo().attacks[BLACK][PAWN];
+		evalinfo.attacksAll[BLACK] = evalinfo.attacks[BLACK][PAWN];
 
 		//int score = 0;
 		for (int color = WHITE; color <= BLACK; color++) {
@@ -551,88 +547,88 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			//int tempScore = 0;
 
 			final long kingArea = cb.getKingArea(1 - color);
-			final long safeMoves = ~cb.getFriendlyPieces(color) & ~getEvalInfo().attacks[1 - color][PAWN];
+			final long safeMoves = ~evalinfo.getFriendlyPieces(color) & ~evalinfo.attacks[1 - color][PAWN];
 
 			// knights
-			long piece = cb.getPieces(color, NIGHT) & ~cb.getPinnedPieces();
+			long piece = evalinfo.getPieces(color, NIGHT) & ~cb.getPinnedPieces();
 			while (piece != 0) {
 				moves = KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 				if ((moves & kingArea) != 0) {
-					getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_NIGHT;
+					evalinfo.kingAttackersFlag[color] |= ChessConstants.FLAG_NIGHT;
 				}
-				getEvalInfo().doubleAttacks[color] |= getEvalInfo().attacksAll[color] & moves;
-				getEvalInfo().attacksAll[color] |= moves;
-				getEvalInfo().attacks[color][NIGHT] |= moves;
+				evalinfo.doubleAttacks[color] |= evalinfo.attacksAll[color] & moves;
+				evalinfo.attacksAll[color] |= moves;
+				evalinfo.attacks[color][NIGHT] |= moves;
 				int index = Long.bitCount(moves & safeMoves);
 				if (color == WHITE) {
-					getEvalInfo().eval_o_part2 += MOBILITY_KNIGHT_O * MOBILITY_KNIGHT_MG[index];	
-					getEvalInfo().eval_e_part2 += MOBILITY_KNIGHT_E * MOBILITY_KNIGHT_EG[index];
+					evalinfo.eval_o_part2 += MOBILITY_KNIGHT_O * MOBILITY_KNIGHT_MG[index];	
+					evalinfo.eval_e_part2 += MOBILITY_KNIGHT_E * MOBILITY_KNIGHT_EG[index];
 				} else {
-					getEvalInfo().eval_o_part2 -= MOBILITY_KNIGHT_O * MOBILITY_KNIGHT_MG[index];	
-					getEvalInfo().eval_e_part2 -= MOBILITY_KNIGHT_E * MOBILITY_KNIGHT_EG[index];
+					evalinfo.eval_o_part2 -= MOBILITY_KNIGHT_O * MOBILITY_KNIGHT_MG[index];	
+					evalinfo.eval_e_part2 -= MOBILITY_KNIGHT_E * MOBILITY_KNIGHT_EG[index];
 				}
 				piece &= piece - 1;
 			}
 
 			// bishops
-			piece = cb.getPieces(color, BISHOP);
+			piece = evalinfo.getPieces(color, BISHOP);
 			while (piece != 0) {
-				moves = getBishopMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces() ^ cb.getPieces(color, QUEEN));
+				moves = getBishopMoves(Long.numberOfTrailingZeros(piece), evalinfo.bb_all ^ evalinfo.getPieces(color, QUEEN));
 				if ((moves & kingArea) != 0) {
-					getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_BISHOP;
+					evalinfo.kingAttackersFlag[color] |= ChessConstants.FLAG_BISHOP;
 				}
-				getEvalInfo().doubleAttacks[color] |= getEvalInfo().attacksAll[color] & moves;
-				getEvalInfo().attacksAll[color] |= moves;
-				getEvalInfo().attacks[color][BISHOP] |= moves;
+				evalinfo.doubleAttacks[color] |= evalinfo.attacksAll[color] & moves;
+				evalinfo.attacksAll[color] |= moves;
+				evalinfo.attacks[color][BISHOP] |= moves;
 				int index = Long.bitCount(moves & safeMoves);
 				if (color == WHITE) {
-					getEvalInfo().eval_o_part2 += MOBILITY_BISHOP_O * MOBILITY_BISHOP_MG[index];	
-					getEvalInfo().eval_e_part2 += MOBILITY_BISHOP_E * MOBILITY_BISHOP_EG[index];
+					evalinfo.eval_o_part2 += MOBILITY_BISHOP_O * MOBILITY_BISHOP_MG[index];	
+					evalinfo.eval_e_part2 += MOBILITY_BISHOP_E * MOBILITY_BISHOP_EG[index];
 				} else {
-					getEvalInfo().eval_o_part2 -= MOBILITY_BISHOP_O * MOBILITY_BISHOP_MG[index];	
-					getEvalInfo().eval_e_part2 -= MOBILITY_BISHOP_E * MOBILITY_BISHOP_EG[index];
+					evalinfo.eval_o_part2 -= MOBILITY_BISHOP_O * MOBILITY_BISHOP_MG[index];	
+					evalinfo.eval_e_part2 -= MOBILITY_BISHOP_E * MOBILITY_BISHOP_EG[index];
 				}
 				piece &= piece - 1;
 			}
 
 			// rooks
-			piece = cb.getPieces(color, ROOK);
+			piece = evalinfo.getPieces(color, ROOK);
 			while (piece != 0) {
-				moves = getRookMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces() ^ cb.getPieces(color, ROOK) ^ cb.getPieces(color, QUEEN));
+				moves = getRookMoves(Long.numberOfTrailingZeros(piece), evalinfo.bb_all ^ evalinfo.getPieces(color, ROOK) ^ evalinfo.getPieces(color, QUEEN));
 				if ((moves & kingArea) != 0) {
-					getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_ROOK;
+					evalinfo.kingAttackersFlag[color] |= ChessConstants.FLAG_ROOK;
 				}
-				getEvalInfo().doubleAttacks[color] |= getEvalInfo().attacksAll[color] & moves;
-				getEvalInfo().attacksAll[color] |= moves;
-				getEvalInfo().attacks[color][ROOK] |= moves;
+				evalinfo.doubleAttacks[color] |= evalinfo.attacksAll[color] & moves;
+				evalinfo.attacksAll[color] |= moves;
+				evalinfo.attacks[color][ROOK] |= moves;
 				int index = Long.bitCount(moves & safeMoves);
 				if (color == WHITE) {
-					getEvalInfo().eval_o_part2 += MOBILITY_ROOK_O * MOBILITY_ROOK_MG[index];	
-					getEvalInfo().eval_e_part2 += MOBILITY_ROOK_E * MOBILITY_ROOK_EG[index];
+					evalinfo.eval_o_part2 += MOBILITY_ROOK_O * MOBILITY_ROOK_MG[index];	
+					evalinfo.eval_e_part2 += MOBILITY_ROOK_E * MOBILITY_ROOK_EG[index];
 				} else {
-					getEvalInfo().eval_o_part2 -= MOBILITY_ROOK_O * MOBILITY_ROOK_MG[index];	
-					getEvalInfo().eval_e_part2 -= MOBILITY_ROOK_E * MOBILITY_ROOK_EG[index];
+					evalinfo.eval_o_part2 -= MOBILITY_ROOK_O * MOBILITY_ROOK_MG[index];	
+					evalinfo.eval_e_part2 -= MOBILITY_ROOK_E * MOBILITY_ROOK_EG[index];
 				}
 				piece &= piece - 1;
 			}
 
 			// queens
-			piece = cb.getPieces(color, QUEEN);
+			piece = evalinfo.getPieces(color, QUEEN);
 			while (piece != 0) {
-				moves = getQueenMoves(Long.numberOfTrailingZeros(piece), cb.getAllPieces());
+				moves = getQueenMoves(Long.numberOfTrailingZeros(piece), evalinfo.bb_all);
 				if ((moves & kingArea) != 0) {
-					getEvalInfo().kingAttackersFlag[color] |= ChessConstants.FLAG_QUEEN;
+					evalinfo.kingAttackersFlag[color] |= ChessConstants.FLAG_QUEEN;
 				}
-				getEvalInfo().doubleAttacks[color] |= getEvalInfo().attacksAll[color] & moves;
-				getEvalInfo().attacksAll[color] |= moves;
-				getEvalInfo().attacks[color][QUEEN] |= moves;
+				evalinfo.doubleAttacks[color] |= evalinfo.attacksAll[color] & moves;
+				evalinfo.attacksAll[color] |= moves;
+				evalinfo.attacks[color][QUEEN] |= moves;
 				int index = Long.bitCount(moves & safeMoves);
 				if (color == WHITE) {
-					getEvalInfo().eval_o_part2 += MOBILITY_QUEEN_O * MOBILITY_QUEEN_MG[index];	
-					getEvalInfo().eval_e_part2 += MOBILITY_QUEEN_E * MOBILITY_QUEEN_EG[index];
+					evalinfo.eval_o_part2 += MOBILITY_QUEEN_O * MOBILITY_QUEEN_MG[index];	
+					evalinfo.eval_e_part2 += MOBILITY_QUEEN_E * MOBILITY_QUEEN_EG[index];
 				} else {
-					getEvalInfo().eval_o_part2 -= MOBILITY_QUEEN_O * MOBILITY_QUEEN_MG[index];	
-					getEvalInfo().eval_e_part2 -= MOBILITY_QUEEN_E * MOBILITY_QUEEN_EG[index];
+					evalinfo.eval_o_part2 -= MOBILITY_QUEEN_O * MOBILITY_QUEEN_MG[index];	
+					evalinfo.eval_e_part2 -= MOBILITY_QUEEN_E * MOBILITY_QUEEN_EG[index];
 				}
 				piece &= piece - 1;
 			}
@@ -641,21 +637,21 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		// TODO king-attacks with or without enemy attacks?
 		// WHITE king
 		moves = KING_MOVES[cb.getKingIndex(WHITE)] & ~KING_MOVES[cb.getKingIndex(BLACK)];
-		getEvalInfo().attacks[WHITE][KING] = moves;
-		getEvalInfo().doubleAttacks[WHITE] |= getEvalInfo().attacksAll[WHITE] & moves;
-		getEvalInfo().attacksAll[WHITE] |= moves;
-		int index = Long.bitCount(moves & ~cb.getFriendlyPieces(WHITE) & ~getEvalInfo().attacksAll[BLACK]);
-		getEvalInfo().eval_o_part2 += MOBILITY_KING_O * MOBILITY_KING_MG[index];	
-		getEvalInfo().eval_e_part2 += MOBILITY_KING_E * MOBILITY_KING_EG[index];
+		evalinfo.attacks[WHITE][KING] = moves;
+		evalinfo.doubleAttacks[WHITE] |= evalinfo.attacksAll[WHITE] & moves;
+		evalinfo.attacksAll[WHITE] |= moves;
+		int index = Long.bitCount(moves & ~evalinfo.bb_all_w_pieces & ~evalinfo.attacksAll[BLACK]);
+		evalinfo.eval_o_part2 += MOBILITY_KING_O * MOBILITY_KING_MG[index];	
+		evalinfo.eval_e_part2 += MOBILITY_KING_E * MOBILITY_KING_EG[index];
 		
 		// BLACK king
 		moves = KING_MOVES[cb.getKingIndex(BLACK)] & ~KING_MOVES[cb.getKingIndex(WHITE)];
-		getEvalInfo().attacks[BLACK][KING] = moves;
-		getEvalInfo().doubleAttacks[BLACK] |= getEvalInfo().attacksAll[BLACK] & moves;
-		getEvalInfo().attacksAll[BLACK] |= moves;
-		index = Long.bitCount(moves & ~cb.getFriendlyPieces(BLACK) & ~getEvalInfo().attacksAll[WHITE]);
-		getEvalInfo().eval_o_part2 -= MOBILITY_KING_O * MOBILITY_KING_MG[index];	
-		getEvalInfo().eval_e_part2 -= MOBILITY_KING_E * MOBILITY_KING_EG[index];
+		evalinfo.attacks[BLACK][KING] = moves;
+		evalinfo.doubleAttacks[BLACK] |= evalinfo.attacksAll[BLACK] & moves;
+		evalinfo.attacksAll[BLACK] |= moves;
+		index = Long.bitCount(moves & ~evalinfo.bb_all_b_pieces & ~evalinfo.attacksAll[WHITE]);
+		evalinfo.eval_o_part2 -= MOBILITY_KING_O * MOBILITY_KING_MG[index];	
+		evalinfo.eval_e_part2 -= MOBILITY_KING_E * MOBILITY_KING_EG[index];
 	}
 
 	
@@ -665,7 +661,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		int blackPromotionDistance = SHORT_MAX;
 
 		// white passed pawns
-		long passedPawns = getEvalInfo().passedPawnsAndOutposts & cb.getPieces(WHITE, ChessConstants.PAWN);
+		long passedPawns = evalinfo.passedPawnsAndOutposts & evalinfo.bb_w_pawns;
 		while (passedPawns != 0) {
 			final int index = 63 - Long.numberOfLeadingZeros(passedPawns);
 
@@ -680,7 +676,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		}
 
 		// black passed pawns
-		passedPawns = getEvalInfo().passedPawnsAndOutposts & cb.getPieces(BLACK, ChessConstants.PAWN);
+		passedPawns = evalinfo.passedPawnsAndOutposts & evalinfo.bb_b_pawns;
 		while (passedPawns != 0) {
 			final int index = Long.numberOfTrailingZeros(passedPawns);
 
@@ -695,11 +691,11 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		}
 		
 		if (whitePromotionDistance < blackPromotionDistance - 1) {
-			getEvalInfo().eval_o_part2 += PAWN_PASSED_UNSTOPPABLE_O * PASSED_UNSTOPPABLE;
-			getEvalInfo().eval_e_part2 += PAWN_PASSED_UNSTOPPABLE_E * PASSED_UNSTOPPABLE;
+			evalinfo.eval_o_part2 += PAWN_PASSED_UNSTOPPABLE_O * PASSED_UNSTOPPABLE;
+			evalinfo.eval_e_part2 += PAWN_PASSED_UNSTOPPABLE_E * PASSED_UNSTOPPABLE;
 		} else if (whitePromotionDistance > blackPromotionDistance + 1) {
-			getEvalInfo().eval_o_part2 -= PAWN_PASSED_UNSTOPPABLE_O * PASSED_UNSTOPPABLE;
-			getEvalInfo().eval_e_part2 -= PAWN_PASSED_UNSTOPPABLE_E * PASSED_UNSTOPPABLE;
+			evalinfo.eval_o_part2 -= PAWN_PASSED_UNSTOPPABLE_O * PASSED_UNSTOPPABLE;
+			evalinfo.eval_e_part2 -= PAWN_PASSED_UNSTOPPABLE_E * PASSED_UNSTOPPABLE;
 		}
 	}
 	
@@ -707,161 +703,161 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	public void calculateThreats() {
 		
 		
-		final long whitePawns = cb.getPieces(WHITE, PAWN);
-		final long blackPawns = cb.getPieces(BLACK, PAWN);
-		final long whiteMinorAttacks = getEvalInfo().attacks[WHITE][NIGHT] | getEvalInfo().attacks[WHITE][BISHOP];
-		final long blackMinorAttacks = getEvalInfo().attacks[BLACK][NIGHT] | getEvalInfo().attacks[BLACK][BISHOP];
-		final long whitePawnAttacks = getEvalInfo().attacks[WHITE][PAWN];
-		final long blackPawnAttacks = getEvalInfo().attacks[BLACK][PAWN];
-		final long whiteAttacks = getEvalInfo().attacksAll[WHITE];
-		final long blackAttacks = getEvalInfo().attacksAll[BLACK];
-		final long whites = cb.getFriendlyPieces(WHITE);
-		final long blacks = cb.getFriendlyPieces(BLACK);
+		final long whitePawns = evalinfo.bb_w_pawns;
+		final long blackPawns = evalinfo.bb_b_pawns;
+		final long whiteMinorAttacks = evalinfo.attacks[WHITE][NIGHT] | evalinfo.attacks[WHITE][BISHOP];
+		final long blackMinorAttacks = evalinfo.attacks[BLACK][NIGHT] | evalinfo.attacks[BLACK][BISHOP];
+		final long whitePawnAttacks = evalinfo.attacks[WHITE][PAWN];
+		final long blackPawnAttacks = evalinfo.attacks[BLACK][PAWN];
+		final long whiteAttacks = evalinfo.attacksAll[WHITE];
+		final long blackAttacks = evalinfo.attacksAll[BLACK];
+		final long whites = evalinfo.bb_all_w_pieces;
+		final long blacks = evalinfo.bb_all_b_pieces;
 
 		
 		// double attacked pieces
-		long piece = getEvalInfo().doubleAttacks[WHITE] & blacks;
+		long piece = evalinfo.doubleAttacks[WHITE] & blacks;
 		while (piece != 0) {
 			int index = cb.getPieceType(Long.numberOfTrailingZeros(piece));
-			getEvalInfo().eval_o_part2 += THREAT_DOUBLE_ATTACKED_O * DOUBLE_ATTACKED_MG[index];
-			getEvalInfo().eval_e_part2 += THREAT_DOUBLE_ATTACKED_E * DOUBLE_ATTACKED_EG[index];
+			evalinfo.eval_o_part2 += THREAT_DOUBLE_ATTACKED_O * DOUBLE_ATTACKED_MG[index];
+			evalinfo.eval_e_part2 += THREAT_DOUBLE_ATTACKED_E * DOUBLE_ATTACKED_EG[index];
 			piece &= piece - 1;
 		}
-		piece = getEvalInfo().doubleAttacks[BLACK] & whites;
+		piece = evalinfo.doubleAttacks[BLACK] & whites;
 		while (piece != 0) {
 			int index = cb.getPieceType(Long.numberOfTrailingZeros(piece));
-			getEvalInfo().eval_o_part2 -= THREAT_DOUBLE_ATTACKED_O * DOUBLE_ATTACKED_MG[index];
-			getEvalInfo().eval_e_part2 -= THREAT_DOUBLE_ATTACKED_E * DOUBLE_ATTACKED_EG[index];
+			evalinfo.eval_o_part2 -= THREAT_DOUBLE_ATTACKED_O * DOUBLE_ATTACKED_MG[index];
+			evalinfo.eval_e_part2 -= THREAT_DOUBLE_ATTACKED_E * DOUBLE_ATTACKED_EG[index];
 			piece &= piece - 1;
 		}
 		
 		
 		// unused outposts
-		int count = Long.bitCount(getEvalInfo().passedPawnsAndOutposts & cb.getEmptySpaces() & whiteMinorAttacks & whitePawnAttacks);
-		getEvalInfo().eval_o_part2 += THREAT_UNUSED_OUTPOST_O * count * THREATS_MG[IX_UNUSED_OUTPOST];
-		getEvalInfo().eval_e_part2 += THREAT_UNUSED_OUTPOST_E * count * THREATS_EG[IX_UNUSED_OUTPOST];
+		int count = Long.bitCount(evalinfo.passedPawnsAndOutposts & evalinfo.bb_free & whiteMinorAttacks & whitePawnAttacks);
+		evalinfo.eval_o_part2 += THREAT_UNUSED_OUTPOST_O * count * THREATS_MG[IX_UNUSED_OUTPOST];
+		evalinfo.eval_e_part2 += THREAT_UNUSED_OUTPOST_E * count * THREATS_EG[IX_UNUSED_OUTPOST];
 		
-		count = Long.bitCount(getEvalInfo().passedPawnsAndOutposts & cb.getEmptySpaces() & blackMinorAttacks & blackPawnAttacks);
-		getEvalInfo().eval_o_part2 -= THREAT_UNUSED_OUTPOST_O * count * THREATS_MG[IX_UNUSED_OUTPOST];
-		getEvalInfo().eval_e_part2 -= THREAT_UNUSED_OUTPOST_E * count * THREATS_EG[IX_UNUSED_OUTPOST];
+		count = Long.bitCount(evalinfo.passedPawnsAndOutposts & evalinfo.bb_free & blackMinorAttacks & blackPawnAttacks);
+		evalinfo.eval_o_part2 -= THREAT_UNUSED_OUTPOST_O * count * THREATS_MG[IX_UNUSED_OUTPOST];
+		evalinfo.eval_e_part2 -= THREAT_UNUSED_OUTPOST_E * count * THREATS_EG[IX_UNUSED_OUTPOST];
 		
 		
 		// pawn push threat
-		piece = (whitePawns << 8) & cb.getEmptySpaces() & ~blackAttacks;
+		piece = (whitePawns << 8) & evalinfo.bb_free & ~blackAttacks;
 		count = Long.bitCount(getWhitePawnAttacks(piece) & blacks);
-		getEvalInfo().eval_o_part2 += THREAT_PAWN_PUSH_O * count * THREATS_MG[IX_PAWN_PUSH_THREAT];
-		getEvalInfo().eval_e_part2 += THREAT_PAWN_PUSH_E * count * THREATS_EG[IX_PAWN_PUSH_THREAT];
+		evalinfo.eval_o_part2 += THREAT_PAWN_PUSH_O * count * THREATS_MG[IX_PAWN_PUSH_THREAT];
+		evalinfo.eval_e_part2 += THREAT_PAWN_PUSH_E * count * THREATS_EG[IX_PAWN_PUSH_THREAT];
 		 
-		piece = (blackPawns >>> 8) & cb.getEmptySpaces() & ~whiteAttacks;
+		piece = (blackPawns >>> 8) & evalinfo.bb_free & ~whiteAttacks;
 		count = Long.bitCount(getBlackPawnAttacks(piece) & whites);
-		getEvalInfo().eval_o_part2 -= THREAT_PAWN_PUSH_O * count * THREATS_MG[IX_PAWN_PUSH_THREAT];
-		getEvalInfo().eval_e_part2 -= THREAT_PAWN_PUSH_E * count * THREATS_EG[IX_PAWN_PUSH_THREAT];
+		evalinfo.eval_o_part2 -= THREAT_PAWN_PUSH_O * count * THREATS_MG[IX_PAWN_PUSH_THREAT];
+		evalinfo.eval_e_part2 -= THREAT_PAWN_PUSH_E * count * THREATS_EG[IX_PAWN_PUSH_THREAT];
 		
 		
 		// piece is attacked by a pawn
 		count = Long.bitCount(whitePawnAttacks & blacks & ~blackPawns);
-		getEvalInfo().eval_o_part2 += THREAT_PAWN_ATTACKS_O * count * THREATS_MG[IX_PAWN_ATTACKS];
-		getEvalInfo().eval_e_part2 += THREAT_PAWN_ATTACKS_E * count * THREATS_EG[IX_PAWN_ATTACKS];
+		evalinfo.eval_o_part2 += THREAT_PAWN_ATTACKS_O * count * THREATS_MG[IX_PAWN_ATTACKS];
+		evalinfo.eval_e_part2 += THREAT_PAWN_ATTACKS_E * count * THREATS_EG[IX_PAWN_ATTACKS];
 		
 		count = Long.bitCount(blackPawnAttacks & whites & ~whitePawns);
-		getEvalInfo().eval_o_part2 -= THREAT_PAWN_ATTACKS_O * count * THREATS_MG[IX_PAWN_ATTACKS];
-		getEvalInfo().eval_e_part2 -= THREAT_PAWN_ATTACKS_E * count * THREATS_EG[IX_PAWN_ATTACKS];
+		evalinfo.eval_o_part2 -= THREAT_PAWN_ATTACKS_O * count * THREATS_MG[IX_PAWN_ATTACKS];
+		evalinfo.eval_e_part2 -= THREAT_PAWN_ATTACKS_E * count * THREATS_EG[IX_PAWN_ATTACKS];
 		
 		
 		// multiple pawn attacks possible
 		if (Long.bitCount(whitePawnAttacks & blacks) > 1) {
-			getEvalInfo().eval_o_part2 += THREAT_MULTIPLE_PAWN_ATTACKS_O * THREATS_MG[IX_MULTIPLE_PAWN_ATTACKS];
-			getEvalInfo().eval_e_part2 += THREAT_MULTIPLE_PAWN_ATTACKS_E * THREATS_EG[IX_MULTIPLE_PAWN_ATTACKS];
+			evalinfo.eval_o_part2 += THREAT_MULTIPLE_PAWN_ATTACKS_O * THREATS_MG[IX_MULTIPLE_PAWN_ATTACKS];
+			evalinfo.eval_e_part2 += THREAT_MULTIPLE_PAWN_ATTACKS_E * THREATS_EG[IX_MULTIPLE_PAWN_ATTACKS];
 		}
 		if (Long.bitCount(blackPawnAttacks & whites) > 1) {
-			getEvalInfo().eval_o_part2 -= THREAT_MULTIPLE_PAWN_ATTACKS_O * THREATS_MG[IX_MULTIPLE_PAWN_ATTACKS];
-			getEvalInfo().eval_e_part2 -= THREAT_MULTIPLE_PAWN_ATTACKS_E * THREATS_EG[IX_MULTIPLE_PAWN_ATTACKS];
+			evalinfo.eval_o_part2 -= THREAT_MULTIPLE_PAWN_ATTACKS_O * THREATS_MG[IX_MULTIPLE_PAWN_ATTACKS];
+			evalinfo.eval_e_part2 -= THREAT_MULTIPLE_PAWN_ATTACKS_E * THREATS_EG[IX_MULTIPLE_PAWN_ATTACKS];
 		}
 		
 		
 		// minors under attack and not defended by a pawn
-		count = Long.bitCount(whiteAttacks & (cb.getPieces(BLACK, NIGHT) | cb.getPieces(BLACK, BISHOP) & ~blackAttacks));
-		getEvalInfo().eval_o_part2 += THREAT_MAJOR_ATTACKED_O * count * THREATS_MG[IX_MAJOR_ATTACKED];
-		getEvalInfo().eval_e_part2 += THREAT_MAJOR_ATTACKED_E * count * THREATS_EG[IX_MAJOR_ATTACKED];
+		count = Long.bitCount(whiteAttacks & (evalinfo.bb_b_knights | evalinfo.bb_b_bishops & ~blackAttacks));
+		evalinfo.eval_o_part2 += THREAT_MAJOR_ATTACKED_O * count * THREATS_MG[IX_MAJOR_ATTACKED];
+		evalinfo.eval_e_part2 += THREAT_MAJOR_ATTACKED_E * count * THREATS_EG[IX_MAJOR_ATTACKED];
 		
-		count = Long.bitCount(blackAttacks & (cb.getPieces(WHITE, NIGHT) | cb.getPieces(WHITE, BISHOP) & ~whiteAttacks));
-		getEvalInfo().eval_o_part2 -= THREAT_MAJOR_ATTACKED_O * count * THREATS_MG[IX_MAJOR_ATTACKED];
-		getEvalInfo().eval_e_part2 -= THREAT_MAJOR_ATTACKED_E * count * THREATS_EG[IX_MAJOR_ATTACKED];
+		count = Long.bitCount(blackAttacks & (evalinfo.bb_w_knights | evalinfo.bb_w_bishops & ~whiteAttacks));
+		evalinfo.eval_o_part2 -= THREAT_MAJOR_ATTACKED_O * count * THREATS_MG[IX_MAJOR_ATTACKED];
+		evalinfo.eval_e_part2 -= THREAT_MAJOR_ATTACKED_E * count * THREATS_EG[IX_MAJOR_ATTACKED];
 		
 		
 		// pawn attacked
 		count = Long.bitCount(whiteAttacks & blackPawns);
-		getEvalInfo().eval_o_part2 += THREAT_PAWN_ATTACKED_O * count * THREATS_MG[IX_PAWN_ATTACKED];
-		getEvalInfo().eval_e_part2 += THREAT_PAWN_ATTACKED_E * count * THREATS_EG[IX_PAWN_ATTACKED];
+		evalinfo.eval_o_part2 += THREAT_PAWN_ATTACKED_O * count * THREATS_MG[IX_PAWN_ATTACKED];
+		evalinfo.eval_e_part2 += THREAT_PAWN_ATTACKED_E * count * THREATS_EG[IX_PAWN_ATTACKED];
 		
 		count = Long.bitCount(blackAttacks & whitePawns);
-		getEvalInfo().eval_o_part2 -= THREAT_PAWN_ATTACKED_O * count * THREATS_MG[IX_PAWN_ATTACKED];
-		getEvalInfo().eval_e_part2 -= THREAT_PAWN_ATTACKED_E * count * THREATS_EG[IX_PAWN_ATTACKED];
+		evalinfo.eval_o_part2 -= THREAT_PAWN_ATTACKED_O * count * THREATS_MG[IX_PAWN_ATTACKED];
+		evalinfo.eval_e_part2 -= THREAT_PAWN_ATTACKED_E * count * THREATS_EG[IX_PAWN_ATTACKED];
 		
 		
-		if (cb.getPieces(BLACK, QUEEN) != 0) {
+		if (evalinfo.bb_b_queens != 0) {
 			// queen under attack by rook
-			count = Long.bitCount(getEvalInfo().attacks[WHITE][ROOK] & cb.getPieces(BLACK, QUEEN));
-			getEvalInfo().eval_o_part2 += THREAT_QUEEN_ATTACKED_ROOK_O * count * THREATS_MG[IX_QUEEN_ATTACKED];
-			getEvalInfo().eval_e_part2 += THREAT_QUEEN_ATTACKED_ROOK_E * count * THREATS_EG[IX_QUEEN_ATTACKED];
+			count = Long.bitCount(evalinfo.attacks[WHITE][ROOK] & evalinfo.bb_b_queens);
+			evalinfo.eval_o_part2 += THREAT_QUEEN_ATTACKED_ROOK_O * count * THREATS_MG[IX_QUEEN_ATTACKED];
+			evalinfo.eval_e_part2 += THREAT_QUEEN_ATTACKED_ROOK_E * count * THREATS_EG[IX_QUEEN_ATTACKED];
 			
 			// queen under attack by minors
-			count = Long.bitCount(whiteMinorAttacks & cb.getPieces(BLACK, QUEEN));
-			getEvalInfo().eval_o_part2 += THREAT_QUEEN_ATTACKED_MINOR_O * count * THREATS_MG[IX_QUEEN_ATTACKED_MINOR];
-			getEvalInfo().eval_e_part2 += THREAT_QUEEN_ATTACKED_MINOR_E * count * THREATS_EG[IX_QUEEN_ATTACKED_MINOR];
+			count = Long.bitCount(whiteMinorAttacks & evalinfo.bb_b_queens);
+			evalinfo.eval_o_part2 += THREAT_QUEEN_ATTACKED_MINOR_O * count * THREATS_MG[IX_QUEEN_ATTACKED_MINOR];
+			evalinfo.eval_e_part2 += THREAT_QUEEN_ATTACKED_MINOR_E * count * THREATS_EG[IX_QUEEN_ATTACKED_MINOR];
 		}
 
-		if (cb.getPieces(WHITE, QUEEN) != 0) {
+		if (evalinfo.bb_w_queens != 0) {
 			// queen under attack by rook
-			count = Long.bitCount(getEvalInfo().attacks[BLACK][ROOK] & cb.getPieces(WHITE, QUEEN));
-			getEvalInfo().eval_o_part2 -= THREAT_QUEEN_ATTACKED_ROOK_O * count * THREATS_MG[IX_QUEEN_ATTACKED];
-			getEvalInfo().eval_e_part2 -= THREAT_QUEEN_ATTACKED_ROOK_E * count * THREATS_EG[IX_QUEEN_ATTACKED];
+			count = Long.bitCount(evalinfo.attacks[BLACK][ROOK] & evalinfo.bb_w_queens);
+			evalinfo.eval_o_part2 -= THREAT_QUEEN_ATTACKED_ROOK_O * count * THREATS_MG[IX_QUEEN_ATTACKED];
+			evalinfo.eval_e_part2 -= THREAT_QUEEN_ATTACKED_ROOK_E * count * THREATS_EG[IX_QUEEN_ATTACKED];
 			
 			// queen under attack by minors
-			count = Long.bitCount(blackMinorAttacks & cb.getPieces(WHITE, QUEEN));
-			getEvalInfo().eval_o_part2 -= THREAT_QUEEN_ATTACKED_MINOR_O * count * THREATS_MG[IX_QUEEN_ATTACKED_MINOR];
-			getEvalInfo().eval_e_part2 -= THREAT_QUEEN_ATTACKED_MINOR_E * count * THREATS_EG[IX_QUEEN_ATTACKED_MINOR];
+			count = Long.bitCount(blackMinorAttacks & evalinfo.bb_w_queens);
+			evalinfo.eval_o_part2 -= THREAT_QUEEN_ATTACKED_MINOR_O * count * THREATS_MG[IX_QUEEN_ATTACKED_MINOR];
+			evalinfo.eval_e_part2 -= THREAT_QUEEN_ATTACKED_MINOR_E * count * THREATS_EG[IX_QUEEN_ATTACKED_MINOR];
 		}
 		
 		
 		// rook under attack by minors
-		count = Long.bitCount(whiteMinorAttacks & cb.getPieces(BLACK, ROOK));
-		getEvalInfo().eval_o_part2 += THREAT_ROOK_ATTACKED_O * count * THREATS_MG[IX_ROOK_ATTACKED];
-		getEvalInfo().eval_e_part2 += THREAT_ROOK_ATTACKED_E * count * THREATS_EG[IX_ROOK_ATTACKED];
+		count = Long.bitCount(whiteMinorAttacks & evalinfo.bb_b_rooks);
+		evalinfo.eval_o_part2 += THREAT_ROOK_ATTACKED_O * count * THREATS_MG[IX_ROOK_ATTACKED];
+		evalinfo.eval_e_part2 += THREAT_ROOK_ATTACKED_E * count * THREATS_EG[IX_ROOK_ATTACKED];
 		
-		count = Long.bitCount(blackMinorAttacks & cb.getPieces(WHITE, ROOK));
-		getEvalInfo().eval_o_part2 -= THREAT_ROOK_ATTACKED_O * count * THREATS_MG[IX_ROOK_ATTACKED];
-		getEvalInfo().eval_e_part2 -= THREAT_ROOK_ATTACKED_E * count * THREATS_EG[IX_ROOK_ATTACKED];
+		count = Long.bitCount(blackMinorAttacks & evalinfo.bb_w_rooks);
+		evalinfo.eval_o_part2 -= THREAT_ROOK_ATTACKED_O * count * THREATS_MG[IX_ROOK_ATTACKED];
+		evalinfo.eval_e_part2 -= THREAT_ROOK_ATTACKED_E * count * THREATS_EG[IX_ROOK_ATTACKED];
 
 
 		// knight fork
 		// skip when testing eval values because we break the loop if any fork has been found
 		long forked;
-		piece = getEvalInfo().attacks[WHITE][NIGHT] & ~blackAttacks & cb.getEmptySpaces();
+		piece = evalinfo.attacks[WHITE][NIGHT] & ~blackAttacks & evalinfo.bb_free;
 		while (piece != 0) {
 			forked = blacks & ~blackPawns & KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 			if (Long.bitCount(forked) > 1) {
-				if ((cb.getPieces(BLACK, KING) & forked) == 0) {
-					getEvalInfo().eval_o_part2 += THREAT_NIGHT_FORK_O * THREATS_MG[IX_NIGHT_FORK];
-					getEvalInfo().eval_e_part2 += THREAT_NIGHT_FORK_E * THREATS_EG[IX_NIGHT_FORK];
+				if ((evalinfo.bb_b_king & forked) == 0) {
+					evalinfo.eval_o_part2 += THREAT_NIGHT_FORK_O * THREATS_MG[IX_NIGHT_FORK];
+					evalinfo.eval_e_part2 += THREAT_NIGHT_FORK_E * THREATS_EG[IX_NIGHT_FORK];
 				} else {
-					getEvalInfo().eval_o_part2 += THREAT_NIGHT_FORK_KING_O * THREATS_MG[IX_NIGHT_FORK_KING];
-					getEvalInfo().eval_e_part2 += THREAT_NIGHT_FORK_KING_E * THREATS_EG[IX_NIGHT_FORK_KING];
+					evalinfo.eval_o_part2 += THREAT_NIGHT_FORK_KING_O * THREATS_MG[IX_NIGHT_FORK_KING];
+					evalinfo.eval_e_part2 += THREAT_NIGHT_FORK_KING_E * THREATS_EG[IX_NIGHT_FORK_KING];
 				}
 				break;
 			}
 			piece &= piece - 1;
 		}
-		piece = getEvalInfo().attacks[BLACK][NIGHT] & ~whiteAttacks & cb.getEmptySpaces();
+		piece = evalinfo.attacks[BLACK][NIGHT] & ~whiteAttacks & evalinfo.bb_free;
 		while (piece != 0) {
 			forked = whites & ~whitePawns & KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 			if (Long.bitCount(forked) > 1) {
-				if ((cb.getPieces(WHITE, KING) & forked) == 0) {
-					getEvalInfo().eval_o_part2 -= THREAT_NIGHT_FORK_O * THREATS_MG[IX_NIGHT_FORK];
-					getEvalInfo().eval_e_part2 -= THREAT_NIGHT_FORK_E * THREATS_EG[IX_NIGHT_FORK];
+				if ((evalinfo.bb_w_king & forked) == 0) {
+					evalinfo.eval_o_part2 -= THREAT_NIGHT_FORK_O * THREATS_MG[IX_NIGHT_FORK];
+					evalinfo.eval_e_part2 -= THREAT_NIGHT_FORK_E * THREATS_EG[IX_NIGHT_FORK];
 				} else {
-					getEvalInfo().eval_o_part2 -= THREAT_NIGHT_FORK_KING_O * THREATS_MG[IX_NIGHT_FORK_KING];
-					getEvalInfo().eval_e_part2 -= THREAT_NIGHT_FORK_KING_E * THREATS_EG[IX_NIGHT_FORK_KING];
+					evalinfo.eval_o_part2 -= THREAT_NIGHT_FORK_KING_O * THREATS_MG[IX_NIGHT_FORK_KING];
+					evalinfo.eval_e_part2 -= THREAT_NIGHT_FORK_KING_E * THREATS_EG[IX_NIGHT_FORK_KING];
 				}
 				break;
 			}
@@ -876,34 +872,34 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 
 		int whiteScore_o = 0;
 		int whiteScore_e = 0;
-		long piece = cb.getPieces(WHITE, PAWN) & cb.getKingArea(WHITE) & ~getEvalInfo().attacks[BLACK][PAWN];
+		long piece = evalinfo.bb_w_pawns & cb.getKingArea(WHITE) & ~evalinfo.attacks[BLACK][PAWN];
 		while (piece != 0) {
 			file = Long.numberOfTrailingZeros(piece) & 7;
 			whiteScore_o += SHIELD_BONUS_MG[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3];
 			whiteScore_e += SHIELD_BONUS_EG[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3];
 			piece &= ~FILES[file];
 		}
-		if (cb.getPieces(BLACK, QUEEN) == 0) {
+		if (evalinfo.bb_b_queens == 0) {
 			whiteScore_o /= 2;
 			whiteScore_e /= 2;
 		}
 
 		int blackScore_o = 0;
 		int blackScore_e = 0;
-		piece = cb.getPieces(BLACK, PAWN) & cb.getKingArea(BLACK) & ~getEvalInfo().attacks[WHITE][PAWN];
+		piece = evalinfo.bb_b_pawns & cb.getKingArea(BLACK) & ~evalinfo.attacks[WHITE][PAWN];
 		while (piece != 0) {
 			file = (63 - Long.numberOfLeadingZeros(piece)) & 7;
 			blackScore_o += SHIELD_BONUS_MG[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8];
 			blackScore_e += SHIELD_BONUS_EG[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8];
 			piece &= ~FILES[file];
 		}
-		if (cb.getPieces(WHITE, QUEEN) == 0) {
+		if (evalinfo.bb_w_queens == 0) {
 			whiteScore_o /= 2;
 			whiteScore_e /= 2;
 		}
 		
-		getEvalInfo().eval_o_part2 += PAWN_SHIELD_O * (whiteScore_o - blackScore_o);	
-		getEvalInfo().eval_e_part2 += PAWN_SHIELD_E * (whiteScore_e - blackScore_e);
+		evalinfo.eval_o_part2 += PAWN_SHIELD_O * (whiteScore_o - blackScore_o);	
+		evalinfo.eval_e_part2 += PAWN_SHIELD_E * (whiteScore_e - blackScore_e);
 	}
 	
 	
@@ -912,23 +908,23 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		
 		long piece;
 
-		final long whitePawns = cb.getPieces(WHITE, PAWN);
-		final long blackPawns = cb.getPieces(BLACK, PAWN);
-		final long whitePawnAttacks = getEvalInfo().attacks[WHITE][PAWN];
-		final long blackPawnAttacks = getEvalInfo().attacks[BLACK][PAWN];
-		final long whiteAttacks = getEvalInfo().attacksAll[WHITE];
-		final long blackAttacks = getEvalInfo().attacksAll[BLACK];
-		final long whites = cb.getFriendlyPieces(WHITE);
-		final long blacks = cb.getFriendlyPieces(BLACK);
+		final long whitePawns = evalinfo.bb_w_pawns;
+		final long blackPawns = evalinfo.bb_b_pawns;
+		final long whitePawnAttacks = evalinfo.attacks[WHITE][PAWN];
+		final long blackPawnAttacks = evalinfo.attacks[BLACK][PAWN];
+		final long whiteAttacks = evalinfo.attacksAll[WHITE];
+		final long blackAttacks = evalinfo.attacksAll[BLACK];
+		final long whites = evalinfo.bb_all_w_pieces;
+		final long blacks = evalinfo.bb_all_b_pieces;
 		
 		
 		// bonus for side to move
 		if (cb.getColorToMove() == WHITE) {
-			getEvalInfo().eval_o_part2 += OTHERS_SIDE_TO_MOVE_O * SIDE_TO_MOVE_BONUS;
-			getEvalInfo().eval_e_part2 += OTHERS_SIDE_TO_MOVE_E * SIDE_TO_MOVE_BONUS;
+			evalinfo.eval_o_part2 += OTHERS_SIDE_TO_MOVE_O * SIDE_TO_MOVE_BONUS;
+			evalinfo.eval_e_part2 += OTHERS_SIDE_TO_MOVE_E * SIDE_TO_MOVE_BONUS;
 		} else {
-			getEvalInfo().eval_o_part2 -= OTHERS_SIDE_TO_MOVE_O * SIDE_TO_MOVE_BONUS;
-			getEvalInfo().eval_e_part2 -= OTHERS_SIDE_TO_MOVE_E * SIDE_TO_MOVE_BONUS;
+			evalinfo.eval_o_part2 -= OTHERS_SIDE_TO_MOVE_O * SIDE_TO_MOVE_BONUS;
+			evalinfo.eval_e_part2 -= OTHERS_SIDE_TO_MOVE_E * SIDE_TO_MOVE_BONUS;
 		}
 		
 		
@@ -936,17 +932,17 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		
 		
 		// piece attacked and only defended by a rook or queen
-		piece = whites & blackAttacks & whiteAttacks & ~(whitePawnAttacks | getEvalInfo().attacks[WHITE][NIGHT] | getEvalInfo().attacks[WHITE][BISHOP]);
+		piece = whites & blackAttacks & whiteAttacks & ~(whitePawnAttacks | evalinfo.attacks[WHITE][NIGHT] | evalinfo.attacks[WHITE][BISHOP]);
 		while (piece != 0) {
-			getEvalInfo().eval_o_part2 -= OTHERS_ONLY_MAJOR_DEFENDERS_O * ONLY_MAJOR_DEFENDERS_MG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
-			getEvalInfo().eval_e_part2 -= OTHERS_ONLY_MAJOR_DEFENDERS_E * ONLY_MAJOR_DEFENDERS_EG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
+			evalinfo.eval_o_part2 -= OTHERS_ONLY_MAJOR_DEFENDERS_O * ONLY_MAJOR_DEFENDERS_MG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
+			evalinfo.eval_e_part2 -= OTHERS_ONLY_MAJOR_DEFENDERS_E * ONLY_MAJOR_DEFENDERS_EG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
 			
 			piece &= piece - 1;
 		}
-		piece = blacks & whiteAttacks & blackAttacks & ~(blackPawnAttacks | getEvalInfo().attacks[BLACK][NIGHT] | getEvalInfo().attacks[BLACK][BISHOP]);
+		piece = blacks & whiteAttacks & blackAttacks & ~(blackPawnAttacks | evalinfo.attacks[BLACK][NIGHT] | evalinfo.attacks[BLACK][BISHOP]);
 		while (piece != 0) {
-			getEvalInfo().eval_o_part2 += OTHERS_ONLY_MAJOR_DEFENDERS_O * ONLY_MAJOR_DEFENDERS_MG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
-			getEvalInfo().eval_e_part2 += OTHERS_ONLY_MAJOR_DEFENDERS_E * ONLY_MAJOR_DEFENDERS_EG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
+			evalinfo.eval_o_part2 += OTHERS_ONLY_MAJOR_DEFENDERS_O * ONLY_MAJOR_DEFENDERS_MG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
+			evalinfo.eval_e_part2 += OTHERS_ONLY_MAJOR_DEFENDERS_E * ONLY_MAJOR_DEFENDERS_EG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
 			
 			piece &= piece - 1;
 		}
@@ -963,12 +959,12 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 					piece &= piece - 1;
 				}
 
-				getEvalInfo().eval_o_part2 += OTHERS_HANGING_2_O * HANGING_2_MG[hangingIndex];
-				getEvalInfo().eval_e_part2 += OTHERS_HANGING_2_E * HANGING_2_EG[hangingIndex];
+				evalinfo.eval_o_part2 += OTHERS_HANGING_2_O * HANGING_2_MG[hangingIndex];
+				evalinfo.eval_e_part2 += OTHERS_HANGING_2_E * HANGING_2_EG[hangingIndex];
 				
 			} else {
-				getEvalInfo().eval_o_part2 += OTHERS_HANGING_O * HANGING_MG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
-				getEvalInfo().eval_e_part2 += OTHERS_HANGING_E * HANGING_EG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
+				evalinfo.eval_o_part2 += OTHERS_HANGING_O * HANGING_MG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
+				evalinfo.eval_e_part2 += OTHERS_HANGING_E * HANGING_EG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
 			}
 		}
 		piece = blackAttacks & whites & ~whiteAttacks;
@@ -980,33 +976,33 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 					piece &= piece - 1;
 				}
 
-				getEvalInfo().eval_o_part2 -= OTHERS_HANGING_2_O * HANGING_2_MG[hangingIndex];
-				getEvalInfo().eval_e_part2 -= OTHERS_HANGING_2_E * HANGING_2_EG[hangingIndex];
+				evalinfo.eval_o_part2 -= OTHERS_HANGING_2_O * HANGING_2_MG[hangingIndex];
+				evalinfo.eval_e_part2 -= OTHERS_HANGING_2_E * HANGING_2_EG[hangingIndex];
 			} else {
-				getEvalInfo().eval_o_part2 -= OTHERS_HANGING_O * HANGING_MG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
-				getEvalInfo().eval_e_part2 -= OTHERS_HANGING_E * HANGING_EG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
+				evalinfo.eval_o_part2 -= OTHERS_HANGING_O * HANGING_MG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
+				evalinfo.eval_e_part2 -= OTHERS_HANGING_E * HANGING_EG[cb.getPieceType(Long.numberOfTrailingZeros(piece))];
 			}
 		}
 		
 		
 		// WHITE ROOK
-		if (cb.getPieces(WHITE, ROOK) != 0) {
+		if (evalinfo.bb_w_rooks != 0) {
 
-			piece = cb.getPieces(WHITE, ROOK);
+			piece = evalinfo.bb_w_rooks;
 
 			// rook battery (same file)
 			if (Long.bitCount(piece) == 2) {
 				if ((Long.numberOfTrailingZeros(piece) & 7) == (63 - Long.numberOfLeadingZeros(piece) & 7)) {
-					getEvalInfo().eval_o_part2 += OTHERS_ROOK_BATTERY_O * OTHER_SCORES[IX_ROOK_BATTERY];
-					getEvalInfo().eval_e_part2 += OTHERS_ROOK_BATTERY_E * OTHER_SCORES[IX_ROOK_BATTERY];
+					evalinfo.eval_o_part2 += OTHERS_ROOK_BATTERY_O * OTHER_SCORES[IX_ROOK_BATTERY];
+					evalinfo.eval_e_part2 += OTHERS_ROOK_BATTERY_E * OTHER_SCORES[IX_ROOK_BATTERY];
 				}
 			}
 
 			// rook on 7th, king on 8th
 			if (cb.getKingIndex(BLACK) >= 56) {
 				value = Long.bitCount(piece & RANK_7) * OTHER_SCORES[IX_ROOK_7TH_RANK];
-				getEvalInfo().eval_o_part2 += OTHERS_ROOK_7TH_RANK_O * value;
-				getEvalInfo().eval_e_part2 += OTHERS_ROOK_7TH_RANK_E * value;
+				evalinfo.eval_o_part2 += OTHERS_ROOK_7TH_RANK_O * value;
+				evalinfo.eval_e_part2 += OTHERS_ROOK_7TH_RANK_E * value;
 			}
 
 			// prison
@@ -1014,8 +1010,8 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			if (trapped != 0) {
 				for (int i = 8; i <= 24; i += 8) {
 					if ((trapped << i & whitePawns) != 0) {
-						getEvalInfo().eval_o_part2 -= OTHERS_ROOK_TRAPPED_O * ROOK_TRAPPED[(i / 8) - 1];
-						getEvalInfo().eval_e_part2 -= OTHERS_ROOK_TRAPPED_E * ROOK_TRAPPED[(i / 8) - 1];
+						evalinfo.eval_o_part2 -= OTHERS_ROOK_TRAPPED_O * ROOK_TRAPPED[(i / 8) - 1];
+						evalinfo.eval_e_part2 -= OTHERS_ROOK_TRAPPED_E * ROOK_TRAPPED[(i / 8) - 1];
 						break;
 					}
 				}
@@ -1026,18 +1022,18 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 				if ((whitePawns & FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 					if ((blackPawns & FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 						
-						getEvalInfo().eval_o_part2 += OTHERS_ROOK_FILE_OPEN_O * OTHER_SCORES[IX_ROOK_FILE_OPEN];
-						getEvalInfo().eval_e_part2 += OTHERS_ROOK_FILE_OPEN_E * OTHER_SCORES[IX_ROOK_FILE_OPEN];
+						evalinfo.eval_o_part2 += OTHERS_ROOK_FILE_OPEN_O * OTHER_SCORES[IX_ROOK_FILE_OPEN];
+						evalinfo.eval_e_part2 += OTHERS_ROOK_FILE_OPEN_E * OTHER_SCORES[IX_ROOK_FILE_OPEN];
 						
 					} else if ((blackPawns & blackPawnAttacks & FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 						
-						getEvalInfo().eval_o_part2 += OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_O * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
-						getEvalInfo().eval_e_part2 += OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_E * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
+						evalinfo.eval_o_part2 += OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_O * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
+						evalinfo.eval_e_part2 += OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_E * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
 						
 					} else {
 						
-						getEvalInfo().eval_o_part2 += OTHERS_ROOK_FILE_SEMI_OPEN_O * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN];
-						getEvalInfo().eval_e_part2 += OTHERS_ROOK_FILE_SEMI_OPEN_E * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN];
+						evalinfo.eval_o_part2 += OTHERS_ROOK_FILE_SEMI_OPEN_O * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN];
+						evalinfo.eval_e_part2 += OTHERS_ROOK_FILE_SEMI_OPEN_E * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN];
 					}
 				}
 
@@ -1047,23 +1043,23 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		
 		
 		// BLACK ROOK
-		if (cb.getPieces(BLACK, ROOK) != 0) {
+		if (evalinfo.bb_b_rooks != 0) {
 
-			piece = cb.getPieces(BLACK, ROOK);
+			piece = evalinfo.bb_b_rooks;
 
 			// rook battery (same file)
 			if (Long.bitCount(piece) == 2) {
 				if ((Long.numberOfTrailingZeros(piece) & 7) == (63 - Long.numberOfLeadingZeros(piece) & 7)) {
-					getEvalInfo().eval_o_part2 -= OTHERS_ROOK_BATTERY_O * OTHER_SCORES[IX_ROOK_BATTERY];
-					getEvalInfo().eval_e_part2 -= OTHERS_ROOK_BATTERY_E * OTHER_SCORES[IX_ROOK_BATTERY];
+					evalinfo.eval_o_part2 -= OTHERS_ROOK_BATTERY_O * OTHER_SCORES[IX_ROOK_BATTERY];
+					evalinfo.eval_e_part2 -= OTHERS_ROOK_BATTERY_E * OTHER_SCORES[IX_ROOK_BATTERY];
 				}
 			}
 
 			// rook on 2nd, king on 1st
 			if (cb.getKingIndex(WHITE) <= 7) {
 				value = Long.bitCount(piece & RANK_2) * OTHER_SCORES[IX_ROOK_7TH_RANK];
-				getEvalInfo().eval_o_part2 -= OTHERS_ROOK_7TH_RANK_O * value;
-				getEvalInfo().eval_e_part2 -= OTHERS_ROOK_7TH_RANK_E * value;
+				evalinfo.eval_o_part2 -= OTHERS_ROOK_7TH_RANK_O * value;
+				evalinfo.eval_e_part2 -= OTHERS_ROOK_7TH_RANK_E * value;
 			}
 
 			// prison
@@ -1071,8 +1067,8 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			if (trapped != 0) {
 				for (int i = 8; i <= 24; i += 8) {
 					if ((trapped >>> i & blackPawns) != 0) {
-						getEvalInfo().eval_o_part2 += OTHERS_ROOK_TRAPPED_O * ROOK_TRAPPED[(i / 8) - 1];
-						getEvalInfo().eval_e_part2 += OTHERS_ROOK_TRAPPED_E * ROOK_TRAPPED[(i / 8) - 1];
+						evalinfo.eval_o_part2 += OTHERS_ROOK_TRAPPED_O * ROOK_TRAPPED[(i / 8) - 1];
+						evalinfo.eval_e_part2 += OTHERS_ROOK_TRAPPED_E * ROOK_TRAPPED[(i / 8) - 1];
 						break;
 					}
 				}
@@ -1084,18 +1080,18 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 				if ((blackPawns & FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 					if ((whitePawns & FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 						
-						getEvalInfo().eval_o_part2 -= OTHERS_ROOK_FILE_OPEN_O * OTHER_SCORES[IX_ROOK_FILE_OPEN];
-						getEvalInfo().eval_e_part2 -= OTHERS_ROOK_FILE_OPEN_E * OTHER_SCORES[IX_ROOK_FILE_OPEN];
+						evalinfo.eval_o_part2 -= OTHERS_ROOK_FILE_OPEN_O * OTHER_SCORES[IX_ROOK_FILE_OPEN];
+						evalinfo.eval_e_part2 -= OTHERS_ROOK_FILE_OPEN_E * OTHER_SCORES[IX_ROOK_FILE_OPEN];
 						
 					} else if ((whitePawns & whitePawnAttacks & FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 						
-						getEvalInfo().eval_o_part2 -= OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_O * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
-						getEvalInfo().eval_e_part2 -= OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_E * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
+						evalinfo.eval_o_part2 -= OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_O * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
+						evalinfo.eval_e_part2 -= OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_E * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
 						
 					} else {
 						
-						getEvalInfo().eval_o_part2 -= OTHERS_ROOK_FILE_SEMI_OPEN_O * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN];
-						getEvalInfo().eval_e_part2 -= OTHERS_ROOK_FILE_SEMI_OPEN_E * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN];
+						evalinfo.eval_o_part2 -= OTHERS_ROOK_FILE_SEMI_OPEN_O * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN];
+						evalinfo.eval_e_part2 -= OTHERS_ROOK_FILE_SEMI_OPEN_E * OTHER_SCORES[IX_ROOK_FILE_SEMI_OPEN];
 					}
 				}
 				piece &= piece - 1;
@@ -1105,92 +1101,92 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		
 		
 		// WHITE BISHOP
-		if (cb.getPieces(WHITE, BISHOP) != 0) {
+		if (evalinfo.bb_w_bishops != 0) {
 
 			// bishop outpost: protected by a pawn, cannot be attacked by enemy pawns
-			piece = cb.getPieces(WHITE, BISHOP) & getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
+			piece = evalinfo.bb_w_bishops & evalinfo.passedPawnsAndOutposts & whitePawnAttacks;
 			while (piece != 0) {
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_OUTPOST_O * BISHOP_OUTPOST_MG[Long.numberOfTrailingZeros(piece) >>> 3];
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_OUTPOST_E * BISHOP_OUTPOST_EG[Long.numberOfTrailingZeros(piece) >>> 3];
+				evalinfo.eval_o_part2 += OTHERS_BISHOP_OUTPOST_O * BISHOP_OUTPOST_MG[Long.numberOfTrailingZeros(piece) >>> 3];
+				evalinfo.eval_e_part2 += OTHERS_BISHOP_OUTPOST_E * BISHOP_OUTPOST_EG[Long.numberOfTrailingZeros(piece) >>> 3];
 				
 				piece &= piece - 1;
 			}
 
 			// prison
-			piece = cb.getPieces(WHITE, BISHOP);
+			piece = evalinfo.bb_w_bishops;
 			while (piece != 0) {
 				if (Long.bitCount((BISHOP_PRISON[Long.numberOfTrailingZeros(piece)]) & blackPawns) == 2) {
-					getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_PRISON_O * OTHER_SCORES[IX_BISHOP_PRISON];
-					getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_PRISON_E * OTHER_SCORES[IX_BISHOP_PRISON];
+					evalinfo.eval_o_part2 -= OTHERS_BISHOP_PRISON_O * OTHER_SCORES[IX_BISHOP_PRISON];
+					evalinfo.eval_e_part2 -= OTHERS_BISHOP_PRISON_E * OTHER_SCORES[IX_BISHOP_PRISON];
 				}
 				piece &= piece - 1;
 			}
 
-			if ((cb.getPieces(WHITE, BISHOP) & WHITE_SQUARES) != 0) {
+			if ((evalinfo.bb_w_bishops & WHITE_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_PAWNS_O * BISHOP_PAWN_MG[Long.bitCount(whitePawns & WHITE_SQUARES)];
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_PAWNS_E * BISHOP_PAWN_EG[Long.bitCount(whitePawns & WHITE_SQUARES)];
+				evalinfo.eval_o_part2 -= OTHERS_BISHOP_PAWNS_O * BISHOP_PAWN_MG[Long.bitCount(whitePawns & WHITE_SQUARES)];
+				evalinfo.eval_e_part2 -= OTHERS_BISHOP_PAWNS_E * BISHOP_PAWN_EG[Long.bitCount(whitePawns & WHITE_SQUARES)];
 				
 				// bonus for attacking center squares
-				value = Long.bitCount(getEvalInfo().attacks[WHITE][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_CENTER_ATTACK_O * value;
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_CENTER_ATTACK_E * value;
+				value = Long.bitCount(evalinfo.attacks[WHITE][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
+				evalinfo.eval_o_part2 += OTHERS_BISHOP_CENTER_ATTACK_O * value;
+				evalinfo.eval_e_part2 += OTHERS_BISHOP_CENTER_ATTACK_E * value;
 			}
-			if ((cb.getPieces(WHITE, BISHOP) & BLACK_SQUARES) != 0) {
+			if ((evalinfo.bb_w_bishops & BLACK_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_PAWNS_O * BISHOP_PAWN_MG[Long.bitCount(whitePawns & BLACK_SQUARES)];
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_PAWNS_E * BISHOP_PAWN_EG[Long.bitCount(whitePawns & BLACK_SQUARES)];
+				evalinfo.eval_o_part2 -= OTHERS_BISHOP_PAWNS_O * BISHOP_PAWN_MG[Long.bitCount(whitePawns & BLACK_SQUARES)];
+				evalinfo.eval_e_part2 -= OTHERS_BISHOP_PAWNS_E * BISHOP_PAWN_EG[Long.bitCount(whitePawns & BLACK_SQUARES)];
 				
 				// bonus for attacking center squares 
-				value = Long.bitCount(getEvalInfo().attacks[WHITE][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_CENTER_ATTACK_O * value;
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_CENTER_ATTACK_E * value;
+				value = Long.bitCount(evalinfo.attacks[WHITE][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
+				evalinfo.eval_o_part2 += OTHERS_BISHOP_CENTER_ATTACK_O * value;
+				evalinfo.eval_e_part2 += OTHERS_BISHOP_CENTER_ATTACK_E * value;
 			}
 
 		}
 		
 		
 		// BLACK BISHOP
-		if (cb.getPieces(BLACK, BISHOP) != 0) {
+		if (evalinfo.bb_b_bishops != 0) {
 
 			// bishop outpost: protected by a pawn, cannot be attacked by enemy pawns
-			piece = cb.getPieces(BLACK, BISHOP) & getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
+			piece = evalinfo.bb_b_bishops & evalinfo.passedPawnsAndOutposts & blackPawnAttacks;
 			while (piece != 0) { 
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_OUTPOST_O * BISHOP_OUTPOST_MG[7 - Long.numberOfTrailingZeros(piece) / 8];
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_OUTPOST_E * BISHOP_OUTPOST_EG[7 - Long.numberOfTrailingZeros(piece) / 8];
+				evalinfo.eval_o_part2 -= OTHERS_BISHOP_OUTPOST_O * BISHOP_OUTPOST_MG[7 - Long.numberOfTrailingZeros(piece) / 8];
+				evalinfo.eval_e_part2 -= OTHERS_BISHOP_OUTPOST_E * BISHOP_OUTPOST_EG[7 - Long.numberOfTrailingZeros(piece) / 8];
 				
 				piece &= piece - 1;
 			}
 
 			// prison
-			piece = cb.getPieces(BLACK, BISHOP);
+			piece = evalinfo.bb_b_bishops;
 			while (piece != 0) {
 				if (Long.bitCount((BISHOP_PRISON[Long.numberOfTrailingZeros(piece)]) & whitePawns) == 2) {
-					getEvalInfo().eval_o_part2 += OTHERS_BISHOP_PRISON_O * OTHER_SCORES[IX_BISHOP_PRISON];
-					getEvalInfo().eval_e_part2 += OTHERS_BISHOP_PRISON_E * OTHER_SCORES[IX_BISHOP_PRISON];
+					evalinfo.eval_o_part2 += OTHERS_BISHOP_PRISON_O * OTHER_SCORES[IX_BISHOP_PRISON];
+					evalinfo.eval_e_part2 += OTHERS_BISHOP_PRISON_E * OTHER_SCORES[IX_BISHOP_PRISON];
 				}
 				piece &= piece - 1;
 			}
 
-			if ((cb.getPieces(BLACK, BISHOP) & WHITE_SQUARES) != 0) {
+			if ((evalinfo.bb_b_bishops & WHITE_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_PAWNS_O * BISHOP_PAWN_MG[Long.bitCount(blackPawns & WHITE_SQUARES)];
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_PAWNS_E * BISHOP_PAWN_EG[Long.bitCount(blackPawns & WHITE_SQUARES)];
+				evalinfo.eval_o_part2 += OTHERS_BISHOP_PAWNS_O * BISHOP_PAWN_MG[Long.bitCount(blackPawns & WHITE_SQUARES)];
+				evalinfo.eval_e_part2 += OTHERS_BISHOP_PAWNS_E * BISHOP_PAWN_EG[Long.bitCount(blackPawns & WHITE_SQUARES)];
 				
 				// bonus for attacking center squares 
-				value = Long.bitCount(getEvalInfo().attacks[BLACK][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_CENTER_ATTACK_O * value;
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_CENTER_ATTACK_E * value;
+				value = Long.bitCount(evalinfo.attacks[BLACK][BISHOP] & E4_D5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
+				evalinfo.eval_o_part2 -= OTHERS_BISHOP_CENTER_ATTACK_O * value;
+				evalinfo.eval_e_part2 -= OTHERS_BISHOP_CENTER_ATTACK_E * value;
 			}
-			if ((cb.getPieces(BLACK, BISHOP) & BLACK_SQUARES) != 0) {
+			if ((evalinfo.bb_b_bishops & BLACK_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
-				getEvalInfo().eval_o_part2 += OTHERS_BISHOP_PAWNS_O * BISHOP_PAWN_MG[Long.bitCount(blackPawns & BLACK_SQUARES)];
-				getEvalInfo().eval_e_part2 += OTHERS_BISHOP_PAWNS_E * BISHOP_PAWN_EG[Long.bitCount(blackPawns & BLACK_SQUARES)];
+				evalinfo.eval_o_part2 += OTHERS_BISHOP_PAWNS_O * BISHOP_PAWN_MG[Long.bitCount(blackPawns & BLACK_SQUARES)];
+				evalinfo.eval_e_part2 += OTHERS_BISHOP_PAWNS_E * BISHOP_PAWN_EG[Long.bitCount(blackPawns & BLACK_SQUARES)];
 				
 				// bonus for attacking center squares
-				value = Long.bitCount(getEvalInfo().attacks[BLACK][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
-				getEvalInfo().eval_o_part2 -= OTHERS_BISHOP_CENTER_ATTACK_O * value;
-				getEvalInfo().eval_e_part2 -= OTHERS_BISHOP_CENTER_ATTACK_E * value;
+				value = Long.bitCount(evalinfo.attacks[BLACK][BISHOP] & D4_E5) / 2 * OTHER_SCORES[IX_BISHOP_LONG];
+				evalinfo.eval_o_part2 -= OTHERS_BISHOP_CENTER_ATTACK_O * value;
+				evalinfo.eval_e_part2 -= OTHERS_BISHOP_CENTER_ATTACK_E * value;
 			}
 		}
 		
@@ -1198,32 +1194,32 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		// pieces supporting our pawns
 		piece = (whitePawns << 8) & whites;
 		while (piece != 0) {
-			getEvalInfo().eval_o_part2 += OTHERS_PAWN_BLOCKAGE_O * PAWN_BLOCKAGE_MG[Long.numberOfTrailingZeros(piece) >>> 3];
-			getEvalInfo().eval_e_part2 += OTHERS_PAWN_BLOCKAGE_E * PAWN_BLOCKAGE_EG[Long.numberOfTrailingZeros(piece) >>> 3];
+			evalinfo.eval_o_part2 += OTHERS_PAWN_BLOCKAGE_O * PAWN_BLOCKAGE_MG[Long.numberOfTrailingZeros(piece) >>> 3];
+			evalinfo.eval_e_part2 += OTHERS_PAWN_BLOCKAGE_E * PAWN_BLOCKAGE_EG[Long.numberOfTrailingZeros(piece) >>> 3];
 			
 			piece &= piece - 1;
 		}
 		piece = (blackPawns >>> 8) & blacks;
 		while (piece != 0) {
-			getEvalInfo().eval_o_part2 -= OTHERS_PAWN_BLOCKAGE_O * PAWN_BLOCKAGE_MG[7 - Long.numberOfTrailingZeros(piece) / 8];
-			getEvalInfo().eval_e_part2 -= OTHERS_PAWN_BLOCKAGE_E * PAWN_BLOCKAGE_EG[7 - Long.numberOfTrailingZeros(piece) / 8];
+			evalinfo.eval_o_part2 -= OTHERS_PAWN_BLOCKAGE_O * PAWN_BLOCKAGE_MG[7 - Long.numberOfTrailingZeros(piece) / 8];
+			evalinfo.eval_e_part2 -= OTHERS_PAWN_BLOCKAGE_E * PAWN_BLOCKAGE_EG[7 - Long.numberOfTrailingZeros(piece) / 8];
 			
 			piece &= piece - 1;
 		}
 		
 		
 		// knight outpost: protected by a pawn, cannot be attacked by enemy pawns
-		piece = cb.getPieces(WHITE, NIGHT) & getEvalInfo().passedPawnsAndOutposts & whitePawnAttacks;
+		piece = evalinfo.bb_w_knights & evalinfo.passedPawnsAndOutposts & whitePawnAttacks;
 		while (piece != 0) {
-			getEvalInfo().eval_o_part2 += OTHERS_KNIGHT_OUTPOST_O * KNIGHT_OUTPOST_MG[Long.numberOfTrailingZeros(piece) >>> 3];
-			getEvalInfo().eval_e_part2 += OTHERS_KNIGHT_OUTPOST_E * KNIGHT_OUTPOST_EG[Long.numberOfTrailingZeros(piece) >>> 3];
+			evalinfo.eval_o_part2 += OTHERS_KNIGHT_OUTPOST_O * KNIGHT_OUTPOST_MG[Long.numberOfTrailingZeros(piece) >>> 3];
+			evalinfo.eval_e_part2 += OTHERS_KNIGHT_OUTPOST_E * KNIGHT_OUTPOST_EG[Long.numberOfTrailingZeros(piece) >>> 3];
 			
 			piece &= piece - 1;
 		}
-		piece = cb.getPieces(BLACK, NIGHT) & getEvalInfo().passedPawnsAndOutposts & blackPawnAttacks;
+		piece = evalinfo.bb_b_knights & evalinfo.passedPawnsAndOutposts & blackPawnAttacks;
 		while (piece != 0) {
-			getEvalInfo().eval_o_part2 -= OTHERS_KNIGHT_OUTPOST_O * KNIGHT_OUTPOST_MG[7 - Long.numberOfTrailingZeros(piece) / 8];
-			getEvalInfo().eval_e_part2 -= OTHERS_KNIGHT_OUTPOST_E * KNIGHT_OUTPOST_EG[7 - Long.numberOfTrailingZeros(piece) / 8];
+			evalinfo.eval_o_part2 -= OTHERS_KNIGHT_OUTPOST_O * KNIGHT_OUTPOST_MG[7 - Long.numberOfTrailingZeros(piece) / 8];
+			evalinfo.eval_e_part2 -= OTHERS_KNIGHT_OUTPOST_E * KNIGHT_OUTPOST_EG[7 - Long.numberOfTrailingZeros(piece) / 8];
 			
 			piece &= piece - 1;
 		}
@@ -1232,11 +1228,11 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		// quiescence search could leave one side in check
 		if (cb.getBoard().isInCheck()) {
 			if (cb.getColorToMove() == WHITE) {
-				getEvalInfo().eval_o_part2 -= OTHERS_IN_CHECK_O * IN_CHECK;
-				getEvalInfo().eval_e_part2 -= OTHERS_IN_CHECK_E * IN_CHECK;
+				evalinfo.eval_o_part2 -= OTHERS_IN_CHECK_O * IN_CHECK;
+				evalinfo.eval_e_part2 -= OTHERS_IN_CHECK_E * IN_CHECK;
 			} else {
-				getEvalInfo().eval_o_part2 += OTHERS_IN_CHECK_O * IN_CHECK;
-				getEvalInfo().eval_e_part2 += OTHERS_IN_CHECK_E * IN_CHECK;
+				evalinfo.eval_o_part2 += OTHERS_IN_CHECK_O * IN_CHECK;
+				evalinfo.eval_e_part2 += OTHERS_IN_CHECK_E * IN_CHECK;
 			}
 		}
 	}
@@ -1247,26 +1243,26 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		for (int kingColor = WHITE; kingColor <= BLACK; kingColor++) {
 			final int enemyColor = 1 - kingColor;
 
-			if ((cb.getPieces(enemyColor, QUEEN) | cb.getPieces(enemyColor, ROOK)) == 0) {
+			if ((evalinfo.getPieces(enemyColor, QUEEN) | evalinfo.getPieces(enemyColor, ROOK)) == 0) {
 				continue;
 			}
 
 			int counter = KS_RANK[(7 * kingColor) + ChessConstants.COLOR_FACTOR[kingColor] * cb.getKingIndex(kingColor) / 8];
 
-			counter += KS_NO_FRIENDS[Long.bitCount(cb.getKingArea(kingColor) & ~cb.getFriendlyPieces(kingColor))];
-			counter += openFiles(kingColor, cb.getPieces(kingColor, PAWN));
+			counter += KS_NO_FRIENDS[Long.bitCount(cb.getKingArea(kingColor) & ~evalinfo.getFriendlyPieces(kingColor))];
+			counter += openFiles(kingColor, evalinfo.getPieces(kingColor, PAWN));
 
 			// king can move?
-			if ((getEvalInfo().attacks[kingColor][KING] & ~cb.getFriendlyPieces(kingColor)) == 0) {
+			if ((evalinfo.attacks[kingColor][KING] & ~evalinfo.getFriendlyPieces(kingColor)) == 0) {
 				counter++;
 			}
-			counter += KS_ATTACKS[Long.bitCount(cb.getKingArea(kingColor) & getEvalInfo().attacksAll[enemyColor])];
+			counter += KS_ATTACKS[Long.bitCount(cb.getKingArea(kingColor) & evalinfo.attacksAll[enemyColor])];
 			counter += checks(kingColor);
 
 			counter += KS_DOUBLE_ATTACKS[Long
-					.bitCount(KING_MOVES[cb.getKingIndex(kingColor)] & getEvalInfo().doubleAttacks[enemyColor] & ~getEvalInfo().attacks[kingColor][PAWN])];
+					.bitCount(KING_MOVES[cb.getKingIndex(kingColor)] & evalinfo.doubleAttacks[enemyColor] & ~evalinfo.attacks[kingColor][PAWN])];
 
-			if ((cb.getCheckingPieces() & cb.getFriendlyPieces(enemyColor)) != 0) {
+			if ((cb.getCheckingPieces() & evalinfo.getFriendlyPieces(enemyColor)) != 0) {
 				counter++;
 			}
 
@@ -1274,28 +1270,28 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			counter += 1 - cb.getColorToMove() ^ enemyColor;
 
 			// bonus if there are discovered checks possible
-			counter += Long.bitCount(cb.getDiscoveredPieces() & cb.getFriendlyPieces(enemyColor)) * 2;
+			counter += Long.bitCount(cb.getDiscoveredPieces() & evalinfo.getFriendlyPieces(enemyColor)) * 2;
 
 			// pinned at first rank
 			if ((cb.getPinnedPieces() & RANK_FIRST[kingColor]) != 0) {
 				counter++;
 			}
 
-			if (cb.getPieces(enemyColor, QUEEN) == 0) {
+			if (evalinfo.getPieces(enemyColor, QUEEN) == 0) {
 				counter /= 2;
-			} else if (Long.bitCount(cb.getPieces(enemyColor, QUEEN)) == 1) {
+			} else if (Long.bitCount(evalinfo.getPieces(enemyColor, QUEEN)) == 1) {
 				// bonus for small king-queen distance
-				if ((getEvalInfo().attacksAll[kingColor] & cb.getPieces(enemyColor, QUEEN)) == 0) {
+				if ((evalinfo.attacksAll[kingColor] & evalinfo.getPieces(enemyColor, QUEEN)) == 0) {
 					counter += KS_QUEEN_TROPISM[getDistance(cb.getKingIndex(kingColor),
-							Long.numberOfTrailingZeros(cb.getPieces(enemyColor, QUEEN)))];
+							Long.numberOfTrailingZeros(evalinfo.getPieces(enemyColor, QUEEN)))];
 				}
 			}
 
-			counter += KS_ATTACK_PATTERN[getEvalInfo().kingAttackersFlag[enemyColor]];
+			counter += KS_ATTACK_PATTERN[evalinfo.kingAttackersFlag[enemyColor]];
 
 			int value = ChessConstants.COLOR_FACTOR[enemyColor] * KS_SCORES[Math.min(counter, KS_SCORES.length - 1)];
-			getEvalInfo().eval_o_part2 += KING_SAFETY_O * value;	
-			getEvalInfo().eval_e_part2 += KING_SAFETY_E * value;
+			evalinfo.eval_o_part2 += KING_SAFETY_O * value;	
+			evalinfo.eval_e_part2 += KING_SAFETY_E * value;
 		}
 	}
 	
@@ -1305,40 +1301,40 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		int score = 0;
 
 		score += OTHER_SCORES[IX_SPACE]
-				* Long.bitCount((cb.getPieces(WHITE, PAWN) >>> 8) & (cb.getPieces(WHITE, NIGHT) | cb.getPieces(WHITE, BISHOP)) & RANK_234);
+				* Long.bitCount((evalinfo.bb_w_pawns >>> 8) & (evalinfo.bb_w_knights | evalinfo.bb_w_bishops) & RANK_234);
 		score -= OTHER_SCORES[IX_SPACE]
-				* Long.bitCount((cb.getPieces(BLACK, PAWN) << 8) & (cb.getPieces(BLACK, NIGHT) | cb.getPieces(BLACK, BISHOP)) & RANK_567);
+				* Long.bitCount((evalinfo.bb_b_pawns << 8) & (evalinfo.bb_b_knights | evalinfo.bb_b_bishops) & RANK_567);
 
 		// idea taken from Laser
-		long space = cb.getPieces(WHITE, PAWN) >>> 8;
+		long space = evalinfo.bb_w_pawns >>> 8;
 		space |= space >>> 8 | space >>> 16;
-		score += SPACE[Long.bitCount(cb.getFriendlyPieces(WHITE))]
-				* Long.bitCount(space & ~cb.getPieces(WHITE, PAWN) & ~getEvalInfo().attacks[BLACK][PAWN] & FILE_CDEF);
-		space = cb.getPieces(BLACK, PAWN) << 8;
+		score += SPACE[Long.bitCount(evalinfo.bb_all_w_pieces)]
+				* Long.bitCount(space & ~evalinfo.bb_w_pawns & ~evalinfo.attacks[BLACK][PAWN] & FILE_CDEF);
+		space = evalinfo.bb_b_pawns << 8;
 		space |= space << 8 | space << 16;
-		score -= SPACE[Long.bitCount(cb.getFriendlyPieces(BLACK))]
-				* Long.bitCount(space & ~cb.getPieces(BLACK, PAWN) & ~getEvalInfo().attacks[WHITE][PAWN] & FILE_CDEF);
+		score -= SPACE[Long.bitCount(evalinfo.bb_all_b_pieces)]
+				* Long.bitCount(space & ~evalinfo.bb_b_pawns & ~evalinfo.attacks[WHITE][PAWN] & FILE_CDEF);
 
-		getEvalInfo().eval_o_part2 += SPACE_O * score;
-		getEvalInfo().eval_e_part2 += SPACE_E * score;
+		evalinfo.eval_o_part2 += SPACE_O * score;
+		evalinfo.eval_e_part2 += SPACE_E * score;
 	}
 	
 	
 	protected int openFiles(final int kingColor, final long pawns) {
 
-		if (cb.getPieces(1 - kingColor, QUEEN) == 0) {
+		if (evalinfo.getPieces(1 - kingColor, QUEEN) == 0) {
 			return 0;
 		}
-		if (Long.bitCount(cb.getPieces(1 - kingColor, ROOK)) < 2) {
+		if (Long.bitCount(evalinfo.getPieces(1 - kingColor, ROOK)) < 2) {
 			return 0;
 		}
 
-		if ((RANK_FIRST[kingColor] & cb.getPieces(kingColor, KING)) != 0) {
-			if ((KING_SIDE & cb.getPieces(kingColor, KING)) != 0) {
+		if ((RANK_FIRST[kingColor] & evalinfo.getPieces(kingColor, KING)) != 0) {
+			if ((KING_SIDE & evalinfo.getPieces(kingColor, KING)) != 0) {
 				if ((FILE_G & pawns) == 0 || (FILE_H & pawns) == 0) {
 					return KS_OTHER[2];
 				}
-			} else if ((QUEEN_SIDE & cb.getPieces(kingColor, KING)) != 0) {
+			} else if ((QUEEN_SIDE & evalinfo.getPieces(kingColor, KING)) != 0) {
 				if ((FILE_A & pawns) == 0 || (FILE_B & pawns) == 0) {
 					return KS_OTHER[2];
 				}
@@ -1350,26 +1346,26 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	protected int checks(final int kingColor) {
 		final int enemyColor = 1 - kingColor;
 		final int kingIndex = cb.getKingIndex(kingColor);
-		final long possibleSquares = ~cb.getFriendlyPieces(enemyColor)
-				& (~KING_MOVES[kingIndex] | KING_MOVES[kingIndex] & getEvalInfo().doubleAttacks[enemyColor] & ~getEvalInfo().doubleAttacks[kingColor]);
+		final long possibleSquares = ~evalinfo.getFriendlyPieces(enemyColor)
+				& (~KING_MOVES[kingIndex] | KING_MOVES[kingIndex] & evalinfo.doubleAttacks[enemyColor] & ~evalinfo.doubleAttacks[kingColor]);
 
-		int counter = checkNight(kingColor, KNIGHT_MOVES[kingIndex] & possibleSquares & getEvalInfo().attacks[enemyColor][NIGHT]);
+		int counter = checkNight(kingColor, KNIGHT_MOVES[kingIndex] & possibleSquares & evalinfo.attacks[enemyColor][NIGHT]);
 
 		long moves;
 		long queenMoves = 0;
-		if ((cb.getPieces(enemyColor, QUEEN) | cb.getPieces(enemyColor, BISHOP)) != 0) {
-			moves = getBishopMoves(kingIndex, cb.getAllPieces() ^ cb.getPieces(kingColor, QUEEN)) & possibleSquares;
+		if ((evalinfo.getPieces(enemyColor, QUEEN) | evalinfo.getPieces(enemyColor, BISHOP)) != 0) {
+			moves = getBishopMoves(kingIndex, evalinfo.bb_all ^ evalinfo.getPieces(kingColor, QUEEN)) & possibleSquares;
 			queenMoves = moves;
-			counter += checkBishop(kingColor, moves & getEvalInfo().attacks[enemyColor][BISHOP]);
+			counter += checkBishop(kingColor, moves & evalinfo.attacks[enemyColor][BISHOP]);
 		}
-		if ((cb.getPieces(enemyColor, QUEEN) | cb.getPieces(enemyColor, ROOK)) != 0) {
-			moves = getRookMoves(kingIndex, cb.getAllPieces() ^ cb.getPieces(kingColor, QUEEN)) & possibleSquares;
+		if ((evalinfo.getPieces(enemyColor, QUEEN) | evalinfo.getPieces(enemyColor, ROOK)) != 0) {
+			moves = getRookMoves(kingIndex, evalinfo.bb_all ^ evalinfo.getPieces(kingColor, QUEEN)) & possibleSquares;
 			queenMoves |= moves;
-			counter += checkRook(kingColor, moves & getEvalInfo().attacks[enemyColor][ROOK]);
+			counter += checkRook(kingColor, moves & evalinfo.attacks[enemyColor][ROOK]);
 		}
 
-		if (Long.bitCount(cb.getPieces(enemyColor, QUEEN)) == 1) {
-			counter += safeCheckQueen(kingColor, queenMoves & ~getEvalInfo().attacksAll[kingColor] & getEvalInfo().attacks[enemyColor][QUEEN]);
+		if (Long.bitCount(evalinfo.getPieces(enemyColor, QUEEN)) == 1) {
+			counter += safeCheckQueen(kingColor, queenMoves & ~evalinfo.attacksAll[kingColor] & evalinfo.attacks[enemyColor][QUEEN]);
 			counter += safeCheckQueenTouch(kingColor);
 		}
 
@@ -1377,12 +1373,12 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	}
 
 	private int safeCheckQueenTouch(final int kingColor) {
-		if ((getEvalInfo().kingAttackersFlag[1 - kingColor] & ChessConstants.FLAG_QUEEN) == 0) {
+		if ((evalinfo.kingAttackersFlag[1 - kingColor] & ChessConstants.FLAG_QUEEN) == 0) {
 			return 0;
 		}
 		final int enemyColor = 1 - kingColor;
-		if ((KING_MOVES[cb.getKingIndex(kingColor)] & ~cb.getFriendlyPieces(enemyColor) & getEvalInfo().attacks[enemyColor][QUEEN] & ~getEvalInfo().doubleAttacks[kingColor]
-				& getEvalInfo().doubleAttacks[enemyColor]) != 0) {
+		if ((KING_MOVES[cb.getKingIndex(kingColor)] & ~evalinfo.getFriendlyPieces(enemyColor) & evalinfo.attacks[enemyColor][QUEEN] & ~evalinfo.doubleAttacks[kingColor]
+				& evalinfo.doubleAttacks[enemyColor]) != 0) {
 			return KS_OTHER[0];
 		}
 		return 0;
@@ -1390,7 +1386,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 
 	private int safeCheckQueen(final int kingColor, final long safeQueenMoves) {
 		if (safeQueenMoves != 0) {
-			return KS_CHECK_QUEEN[Long.bitCount(cb.getFriendlyPieces(kingColor))];
+			return KS_CHECK_QUEEN[Long.bitCount(evalinfo.getFriendlyPieces(kingColor))];
 		}
 
 		return 0;
@@ -1402,11 +1398,11 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		}
 
 		int counter = 0;
-		if ((rookMoves & ~getEvalInfo().attacksAll[kingColor]) != 0) {
+		if ((rookMoves & ~evalinfo.attacksAll[kingColor]) != 0) {
 			counter += KS_CHECK[ROOK];
 
 			// last rank?
-			if (kingBlockedAtLastRank(kingColor, KING_MOVES[cb.getKingIndex(kingColor)] & cb.getEmptySpaces() & ~getEvalInfo().attacksAll[1 - kingColor])) {
+			if (kingBlockedAtLastRank(kingColor, KING_MOVES[cb.getKingIndex(kingColor)] & evalinfo.bb_free & ~evalinfo.attacksAll[1 - kingColor])) {
 				counter += KS_OTHER[1];
 			}
 
@@ -1419,7 +1415,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 
 	private int checkBishop(final int kingColor, final long bishopMoves) {
 		if (bishopMoves != 0) {
-			if ((bishopMoves & ~getEvalInfo().attacksAll[kingColor]) != 0) {
+			if ((bishopMoves & ~evalinfo.attacksAll[kingColor]) != 0) {
 				return KS_CHECK[BISHOP];
 			} else {
 				return KS_UCHECK[BISHOP];
@@ -1430,7 +1426,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 
 	private int checkNight(final int kingColor, final long nightMoves) {
 		if (nightMoves != 0) {
-			if ((nightMoves & ~getEvalInfo().attacksAll[kingColor]) != 0) {
+			if ((nightMoves & ~evalinfo.attacksAll[kingColor]) != 0) {
 				return KS_CHECK[NIGHT];
 			} else {
 				return KS_UCHECK[NIGHT];
@@ -1440,7 +1436,7 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	}
 
 	private boolean kingBlockedAtLastRank(final int kingColor, final long safeKingMoves) {
-		return (RANKS[7 * kingColor] & cb.getPieces(kingColor, KING)) != 0 && (safeKingMoves & RANKS[7 * kingColor]) == safeKingMoves;
+		return (RANKS[7 * kingColor] & evalinfo.getPieces(kingColor, KING)) != 0 && (safeKingMoves & RANKS[7 * kingColor]) == safeKingMoves;
 	}
 	
 
@@ -1456,15 +1452,15 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		float multiplier = 1;
 
 		// is piece blocked?
-		if ((cb.getAllPieces() & maskNextSquare) != 0) {
+		if ((evalinfo.bb_all & maskNextSquare) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[0];
 		}
 
 		// is next squared attacked?
-		if ((getEvalInfo().attacksAll[enemyColor] & maskNextSquare) == 0) {
+		if ((evalinfo.attacksAll[enemyColor] & maskNextSquare) == 0) {
 
 			// complete path free of enemy attacks?
-			if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & getEvalInfo().attacksAll[enemyColor]) == 0) {
+			if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & evalinfo.attacksAll[enemyColor]) == 0) {
 				multiplier *= PASSED_MULTIPLIERS[7];
 			} else {
 				multiplier *= PASSED_MULTIPLIERS[1];
@@ -1472,28 +1468,28 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		}
 
 		// is next squared defended?
-		if ((getEvalInfo().attacksAll[color] & maskNextSquare) != 0) {
+		if ((evalinfo.attacksAll[color] & maskNextSquare) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[3];
 		}
 
 		// is enemy king in front?
-		if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & cb.getPieces(enemyColor, ChessConstants.KING)) != 0) {
+		if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & evalinfo.getPieces(enemyColor, ChessConstants.KING)) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[2];
 		}
 
 		// under attack?
-		if (cb.getColorToMove() != color && (getEvalInfo().attacksAll[enemyColor] & square) != 0) {
+		if (cb.getColorToMove() != color && (evalinfo.attacksAll[enemyColor] & square) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[4];
 		}
 
 		// defended by rook from behind?
-		if ((maskFile & cb.getPieces(color, ROOK)) != 0 && (getEvalInfo().attacks[color][ROOK] & square) != 0 && (getEvalInfo().attacks[color][ROOK] & maskPreviousSquare) != 0) {
+		if ((maskFile & evalinfo.getPieces(color, ROOK)) != 0 && (evalinfo.attacks[color][ROOK] & square) != 0 && (evalinfo.attacks[color][ROOK] & maskPreviousSquare) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[5];
 		}
 
 		// attacked by rook from behind?
-		else if ((maskFile & cb.getPieces(enemyColor, ROOK)) != 0 && (getEvalInfo().attacks[enemyColor][ROOK] & square) != 0
-				&& (getEvalInfo().attacks[enemyColor][ROOK] & maskPreviousSquare) != 0) {
+		else if ((maskFile & evalinfo.getPieces(enemyColor, ROOK)) != 0 && (evalinfo.attacks[enemyColor][ROOK] & square) != 0
+				&& (evalinfo.attacks[enemyColor][ROOK] & maskPreviousSquare) != 0) {
 			multiplier *= PASSED_MULTIPLIERS[6];
 		}
 
@@ -1504,11 +1500,11 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		final int scoreIndex = (7 * color) + ChessConstants.COLOR_FACTOR[color] * index / 8;
 		
 		if (color == WHITE) {			
-			getEvalInfo().eval_o_part2 += PAWN_PASSED_O * PASSED_SCORE_MG[scoreIndex] * multiplier;
-			getEvalInfo().eval_e_part2 += PAWN_PASSED_E * PASSED_SCORE_EG[scoreIndex] * multiplier;
+			evalinfo.eval_o_part2 += PAWN_PASSED_O * PASSED_SCORE_MG[scoreIndex] * multiplier;
+			evalinfo.eval_e_part2 += PAWN_PASSED_E * PASSED_SCORE_EG[scoreIndex] * multiplier;
 		} else {
-			getEvalInfo().eval_o_part2 -= PAWN_PASSED_O * PASSED_SCORE_MG[scoreIndex] * multiplier;
-			getEvalInfo().eval_e_part2 -= PAWN_PASSED_E * PASSED_SCORE_EG[scoreIndex] * multiplier;	
+			evalinfo.eval_o_part2 -= PAWN_PASSED_O * PASSED_SCORE_MG[scoreIndex] * multiplier;
+			evalinfo.eval_e_part2 -= PAWN_PASSED_E * PASSED_SCORE_EG[scoreIndex] * multiplier;	
 		}
 	}
 
@@ -1516,8 +1512,8 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		// check if it cannot be stopped
 		int promotionDistance = index >>> 3;
 		if (promotionDistance == 1 && cb.getColorToMove() == BLACK) {
-			if ((POWER_LOOKUP[index - 8] & (getEvalInfo().attacksAll[WHITE] | cb.getAllPieces())) == 0) {
-				if ((POWER_LOOKUP[index] & getEvalInfo().attacksAll[WHITE]) == 0) {
+			if ((POWER_LOOKUP[index - 8] & (evalinfo.attacksAll[WHITE] | evalinfo.bb_all)) == 0) {
+				if ((POWER_LOOKUP[index] & evalinfo.attacksAll[WHITE]) == 0) {
 					return 1;
 				}
 			}
@@ -1529,8 +1525,8 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		// check if it cannot be stopped
 		int promotionDistance = 7 - index / 8;
 		if (promotionDistance == 1 && cb.getColorToMove() == WHITE) {
-			if ((POWER_LOOKUP[index + 8] & (getEvalInfo().attacksAll[BLACK] | cb.getAllPieces())) == 0) {
-				if ((POWER_LOOKUP[index] & getEvalInfo().attacksAll[BLACK]) == 0) {
+			if ((POWER_LOOKUP[index + 8] & (evalinfo.attacksAll[BLACK] | evalinfo.bb_all)) == 0) {
+				if ((POWER_LOOKUP[index] & evalinfo.attacksAll[BLACK]) == 0) {
 					return 1;
 				}
 			}
@@ -1540,19 +1536,37 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	
 	
 	protected static class EvalInfo {
-
-		// attack boards
+		
+		
 		public final long[][] attacks = new long[2][7];
 		public final long[] attacksAll = new long[2];
 		public final long[] doubleAttacks = new long[2];
 		public final int[] kingAttackersFlag = new int[2];
-
+		
 		public long passedPawnsAndOutposts;
+		
+		public long bb_free;
+		public long bb_all;
+		public long bb_all_w_pieces;
+		public long bb_all_b_pieces;
+		public long bb_w_pawns;
+		public long bb_b_pawns;
+		public long bb_w_bishops;
+		public long bb_b_bishops;
+		public long bb_w_knights;
+		public long bb_b_knights;
+		public long bb_w_queens;
+		public long bb_b_queens;
+		public long bb_w_rooks;
+		public long bb_b_rooks;
+		public long bb_w_king;
+		public long bb_b_king;
 		
 		public int eval_o_part1;
 		public int eval_e_part1;
 		public int eval_o_part2;
 		public int eval_e_part2;
+		
 		
 		public void clearEvalAttacks() {
 			kingAttackersFlag[WHITE] = 0;
@@ -1570,6 +1584,26 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		}
 		
 		
+		public void fillBB(IChessBoard cb) {
+			bb_w_pawns = cb.getPieces(WHITE, PAWN);
+			bb_b_pawns = cb.getPieces(BLACK, PAWN);
+			bb_w_bishops = cb.getPieces(WHITE, BISHOP);
+			bb_b_bishops = cb.getPieces(BLACK, BISHOP);
+			bb_w_knights = cb.getPieces(WHITE, NIGHT);
+			bb_b_knights = cb.getPieces(BLACK, NIGHT);
+			bb_w_queens = cb.getPieces(WHITE, QUEEN);
+			bb_b_queens = cb.getPieces(BLACK, QUEEN);
+			bb_w_rooks = cb.getPieces(WHITE, ROOK);
+			bb_b_rooks = cb.getPieces(BLACK, ROOK);
+			bb_w_king = cb.getPieces(WHITE, KING);
+			bb_b_king = cb.getPieces(BLACK, KING);
+			bb_all_w_pieces = bb_w_pawns | bb_w_bishops | bb_w_knights | bb_w_queens | bb_w_rooks | bb_w_king;
+			bb_all_b_pieces = bb_b_pawns | bb_b_bishops | bb_b_knights | bb_b_queens | bb_b_rooks | bb_b_king;
+			bb_all = bb_all_w_pieces | bb_all_b_pieces;
+			bb_free = ~bb_all;
+		}
+		
+		
 		public void clearEvals1() {
 			eval_o_part1 = 0;
 			eval_e_part1 = 0;
@@ -1579,6 +1613,30 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		public void clearEvals2() {
 			eval_o_part2 = 0;
 			eval_e_part2 = 0;
+		}
+		
+		
+		public long getFriendlyPieces(int colour) {
+			return colour == WHITE ? bb_all_w_pieces : bb_all_b_pieces;
+		}
+		
+		public long getPieces(int colour, int type) {
+			switch (type) {
+				case PAWN:
+					return colour == WHITE ? bb_w_pawns : bb_b_pawns;
+				case NIGHT:
+					return colour == WHITE ? bb_w_knights : bb_b_knights;
+				case BISHOP:
+					return colour == WHITE ? bb_w_bishops : bb_b_bishops;
+				case ROOK:
+					return colour == WHITE ? bb_w_rooks : bb_b_rooks;
+				case QUEEN:
+					return colour == WHITE ? bb_w_queens : bb_b_queens;
+				case KING:
+					return colour == WHITE ? bb_w_king : bb_b_king;
+				default:
+					throw new IllegalStateException();
+			}
 		}
 	}
 }
