@@ -3045,7 +3045,11 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		return false;
 	}
-			
+	
+	public final int genNonCaptureNonPromotionMoves(final IInternalMoveList list) {
+		return genNonCaptureNonPromotionMoves(getColourToMove(), list, GlobalConstants.MAX_MOVES_ON_LEVEL);
+	}
+	
 	private final int genNonCaptureNonPromotionMoves(int colour, final IInternalMoveList list, final int maxCount) {
 		int count = 0;
 		

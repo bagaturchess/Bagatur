@@ -19,6 +19,7 @@ public interface IBoard {
 	public int genAllMoves(final IInternalMoveList list);
 	public int genKingEscapes(final IInternalMoveList list);
 	public int genCapturePromotionMoves(final IInternalMoveList list);
+	public int genNonCaptureNonPromotionMoves(final IInternalMoveList list);
 	public int genAllMoves_ByFigureID(int fieldID, long excludedToFields, final IInternalMoveList list);
 	
 	public void makeMoveForward(final int move);
