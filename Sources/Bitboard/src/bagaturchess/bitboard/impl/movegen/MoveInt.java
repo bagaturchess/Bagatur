@@ -31,7 +31,6 @@ import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.plies.CastlePlies;
 import bagaturchess.bitboard.impl.plies.specials.Enpassanting;
 import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
-import bagaturchess.bitboard.impl3.internal.MoveWrapper;
 
 
 /**
@@ -430,11 +429,6 @@ public class MoveInt {
 			int promotionFigureType = Constants.PIECE_IDENTITY_2_TYPE[getPromotionFigurePID(move)];
 			result.append(Figures.TYPES_SIGN[promotionFigureType].toLowerCase());
 		}
-	}
-	
-	
-	public static final void moveToStringUCI_boardimpl3(int move, StringBuilder result) {
-		result.append(new MoveWrapper(move));
 	}
 	
 

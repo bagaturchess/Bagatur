@@ -5292,4 +5292,34 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	public int[] getMatrix() {
 		return board;
 	}
+	
+	@Override
+	public boolean isCaptureMove(int move) {
+		return MoveInt.isCapture(move);
+	}
+	
+	@Override
+	public boolean isPromotionMove(int move) {
+		return MoveInt.isPromotion(move);
+	}
+	
+	@Override
+	public boolean isCaptureOrPromotionMove(int move) {
+		return isCaptureMove(move) || isPromotionMove(move);
+	}
+
+	@Override
+	public int getSEEScore(int move) {
+		return getSee().evalExchange(move);
+	}
+	
+	@Override
+	public boolean isEnpassantMove(int move) {
+		return MoveInt.isEnpassant(move);
+	}
+	
+	@Override
+	public boolean isCastlingMove(int move) {
+		return MoveInt.isCastling(move);
+	}
 }

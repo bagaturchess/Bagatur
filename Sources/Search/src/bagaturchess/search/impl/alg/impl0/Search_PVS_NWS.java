@@ -672,7 +672,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		int best_eval = MIN;
 		int best_move = 0;
 		
-		
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		if (cur_move != 0) {
 			do {
@@ -709,15 +708,15 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				boolean isCapOrProm = MoveInt.isCaptureOrPromotion(cur_move);
+				boolean isCapOrProm = env.getBitboard().isCaptureOrPromotionMove(cur_move);
 				int moveSee = -1;
-				if (isCapOrProm && !IBitBoard.IMPL3) {
-					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
+				if (isCapOrProm) {
+					moveSee = env.getBitboard().getSEEScore(cur_move);
 				}
 				
 				
 				//Static pruning
-				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && (IBitBoard.IMPL3 || !env.getBitboard().isCheckMove(cur_move))) {
+				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
 					
 					if (searchedCount >= 4 && rest <= 8) {
 						
@@ -1402,15 +1401,15 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				boolean isCapOrProm = MoveInt.isCaptureOrPromotion(cur_move);
+				boolean isCapOrProm = env.getBitboard().isCaptureOrPromotionMove(cur_move);
 				int moveSee = -1;
-				if (isCapOrProm && !IBitBoard.IMPL3) {
-					moveSee = env.getBitboard().getSee().evalExchange(cur_move);
+				if (isCapOrProm) {
+					moveSee = env.getBitboard().getSEEScore(cur_move);
 				}
 				
 				
 				//Static pruning
-				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && (IBitBoard.IMPL3 || !env.getBitboard().isCheckMove(cur_move))) {
+				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
 					
 					if (searchedCount >= 4 && rest <= 8) {
 						
@@ -1752,7 +1751,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			//Alpha cutoff
 			if (!isMateVal(alpha_org)
-					&& !IBitBoard.IMPL3
 					&& !isMateVal(beta)
 					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
 				node.eval = staticEval;
@@ -1796,7 +1794,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			searchedMoves++;
 			
 			
-			if (!inCheck && !IBitBoard.IMPL3) {
+			if (!inCheck) {
 				
 				//Skip under promotions
 				if (MoveInt.isPromotion(cur_move)) {
@@ -1807,9 +1805,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					//Futility pruning
 					continue;
 				}
-	
+				
 				//Skip bad captures
-				int moveSee = env.getBitboard().getSee().evalExchange(cur_move);
+				int moveSee = env.getBitboard().getSEEScore(cur_move);
 				if (moveSee <= 0) {
 					continue;
 				}
@@ -2003,7 +2001,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			//Alpha cutoff
 			if (!isMateVal(alpha_org)
-			 		&& !IBitBoard.IMPL3
 					&& !isMateVal(beta)
 					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
 				return staticEval;
@@ -2050,7 +2047,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			searchedMoves++;
 			
 			
-			if (!inCheck && !IBitBoard.IMPL3) {
+			if (!inCheck) {
 				
 				//Skip under promotions
 				if (MoveInt.isPromotion(cur_move)) {
@@ -2063,7 +2060,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 	
 				//Skip bad captures
-				int moveSee = env.getBitboard().getSee().evalExchange(cur_move);
+				int moveSee = env.getBitboard().getSEEScore(cur_move);
 				if (moveSee <= 0) {
 					continue;
 				}

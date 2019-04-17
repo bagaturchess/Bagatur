@@ -73,7 +73,7 @@ public class ListCapsProm implements ISearchMoveList {
 	}
 	
 	private boolean isOk(int move) {
-		return !MoveInt.isCastling(move) && !MoveInt.isEnpassant(move);
+		return !env.getBitboard().isCastlingMove(move) && !env.getBitboard().isEnpassantMove(move);
 	}
 	
 	public int next() {
@@ -81,7 +81,7 @@ public class ListCapsProm implements ISearchMoveList {
 		if (!tptTried) {
 			tptTried = true;
 			if (tptMove != 0 && isOk(tptMove) && env.getBitboard().isPossible(tptMove)
-					&& MoveInt.isCaptureOrPromotion(tptMove)) {
+					&& env.getBitboard().isCaptureOrPromotionMove(tptMove)) {
 				tptPlied = true;
 				return tptMove;
 			}
@@ -126,9 +126,9 @@ public class ListCapsProm implements ISearchMoveList {
 				ordval += ORD_VAL_TPT_MOVE * orderingStatistics.getOrdVal_TPT();
 			}
 			
-			if (MoveInt.isCaptureOrPromotion(move)) {
+			if (env.getBitboard().isCaptureOrPromotionMove(move)) {
 				
-				int see = env.getBitboard().getSee().evalExchange(move);
+				int see = env.getBitboard().getSEEScore(move);
 				
 				if (see > 0) {
 					ordval += ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
@@ -144,7 +144,7 @@ public class ListCapsProm implements ISearchMoveList {
 			//ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
 			
 			
-			long move_ord = (ordval << 32) | move;
+			long move_ord = MoveInt.addOrderingValue(move, ordval);
 			
 			add(move_ord);
 			

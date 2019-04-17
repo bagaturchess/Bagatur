@@ -155,7 +155,7 @@ public class ListAll implements ISearchMoveList {
 	}
 	
 	private boolean isOk(int move) {
-		return !MoveInt.isCastling(move) && !MoveInt.isEnpassant(move);
+		return !env.getBitboard().isCastlingMove(move) && !env.getBitboard().isEnpassantMove(move);
 	}
 	
 	public int next() {
@@ -289,15 +289,7 @@ public class ListAll implements ISearchMoveList {
 			return 0;
 		}
 	}
-
-	public int getOrdVal(int bestmove) {
-		for (int i=0; i<size; i++) {
-			if ((int)moves[i] == bestmove) {
-				return MoveInt.getOrderingValue(moves[i]);
-			}
-		}
-		return 0;
-	}
+	
 	
 	public void genMoves() {
 		
@@ -411,13 +403,13 @@ public class ListAll implements ISearchMoveList {
 			ordval += ORD_VAL_PASSER_PUSH * orderingStatistics.getOrdVal_PASSER();
 		}
 		
-		if (MoveInt.isCastling(move)) {
+		if (env.getBitboard().isCastlingMove(move)) {
 			ordval += ORD_VAL_CASTLING * orderingStatistics.getOrdVal_CASTLING();
 		}
 		
-		if (MoveInt.isCaptureOrPromotion(move)) {
+		if (env.getBitboard().isCaptureOrPromotionMove(move)) {
 			
-			int see = env.getBitboard().getSee().evalExchange(move);
+			int see = env.getBitboard().getSEEScore(move);
 			
 			if (see > 0) {
 				ordval += ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
@@ -471,13 +463,13 @@ public class ListAll implements ISearchMoveList {
 			orderingStatistics.passer_count++;
 		}
 		
-		if (MoveInt.isCastling(move)) {
+		if (env.getBitboard().isCastlingMove(move)) {
 			orderingStatistics.castling_count++;
 		}
 		
-		if (MoveInt.isCaptureOrPromotion(move)) {
+		if (env.getBitboard().isCaptureOrPromotionMove(move)) {
 			
-			int see = env.getBitboard().getSee().evalExchange(move);
+			int see = env.getBitboard().getSEEScore(move);
 			
 			if (see > 0) {
 				orderingStatistics.wincap_count++;
@@ -527,13 +519,13 @@ public class ListAll implements ISearchMoveList {
 			orderingStatistics.passer_best++;
 		}
 		
-		if (MoveInt.isCastling(bestmove)) {
+		if (env.getBitboard().isCastlingMove(bestmove)) {
 			orderingStatistics.castling_best++;
 		}
 		
-		if (MoveInt.isCaptureOrPromotion(bestmove)) {
+		if (env.getBitboard().isCaptureOrPromotionMove(bestmove)) {
 			
-			int see = env.getBitboard().getSee().evalExchange(bestmove);
+			int see = env.getBitboard().getSEEScore(bestmove);
 			
 			if (see > 0) {
 				orderingStatistics.wincap_best++;

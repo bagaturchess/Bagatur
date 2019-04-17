@@ -23,14 +23,9 @@
 package bagaturchess.search.impl.rootsearch;
 
 
-import java.util.StringTokenizer;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.BoardUtils;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.bitboard.impl3.BoardImpl;
-import bagaturchess.bitboard.impl3.internal.MoveWrapper;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchMediator;
@@ -69,30 +64,14 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		//bitboardForSetup = new Board3_Adapter(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
 		//bitboardForSetup = new Board(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
 		
-		if (IBitBoard.IMPL3) {
-			bitboardForSetup = new BoardImpl(_bitboardForSetup.toEPD());
-			
-			String uciMoves = MoveInt.movesToStringUCI(moves, movesCount);
-			StringTokenizer st = new StringTokenizer(uciMoves, " ");
-			while (st.hasMoreTokens()) {
-				String move = st.nextToken();
-				bitboardForSetup.makeMoveForward(move);
-			}
-			
-			for (int i=0; i<movesCount; i++) {
-				_bitboardForSetup.makeMoveForward(moves[i]);
-			}
-			
-		} else {
-			bitboardForSetup = BoardUtils.createBoard_WithPawnsCache(_bitboardForSetup.toEPD(),
-					getRootSearchConfig().getEvalConfig().getPawnsCacheFactoryClassName(),
-					getRootSearchConfig().getBoardConfig(),
-					10000);
-			
-			for (int i=0; i<movesCount; i++) {
-				_bitboardForSetup.makeMoveForward(moves[i]);
-				bitboardForSetup.makeMoveForward(moves[i]);
-			}
+		bitboardForSetup = BoardUtils.createBoard_WithPawnsCache(_bitboardForSetup.toEPD(),
+				getRootSearchConfig().getEvalConfig().getPawnsCacheFactoryClassName(),
+				getRootSearchConfig().getBoardConfig(),
+				10000);
+		
+		for (int i=0; i<movesCount; i++) {
+			_bitboardForSetup.makeMoveForward(moves[i]);
+			bitboardForSetup.makeMoveForward(moves[i]);
 		}
 	}
 	
@@ -125,17 +104,8 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		int movesCount = _bitboardForSetup.getPlayedMovesCount();
 		int[] moves = _bitboardForSetup.getPlayedMoves();
 		
-		if (IBitBoard.IMPL3) {
-			String uciMoves = MoveInt.movesToStringUCI(moves, movesCount);
-			StringTokenizer st = new StringTokenizer(uciMoves, " ");
-			while (st.hasMoreTokens()) {
-				String move = st.nextToken();
-				bitboardForSetup.makeMoveForward(move);
-			}
-		} else {
-			for (int i=0; i<movesCount; i++) {
-				bitboardForSetup.makeMoveForward(moves[i]);
-			}
+		for (int i=0; i<movesCount; i++) {
+			bitboardForSetup.makeMoveForward(moves[i]);
 		}
 	}
 	

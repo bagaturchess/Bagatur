@@ -178,7 +178,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = new Board("3k4/4r3/3K4/1Q6/8/8/8/8 b - - 15 8", null, cfg.getBoardConfig());//Bug: doesn't see mate in 4
 		//IBitBoard bitboard = new Board("3k4/4r3/2K5/6Q1/8/8/8/8 b - - 15 8", null, cfg.getBoardConfig());//Bug: doesn't see mate in 2
 		
-		//BoardUtils.playGameUCI(bitboard, "d2d4 d7d5 c2c4 d5c4 g1f3 c7c6 e2e3 b7b5 a2a4 e7e6 a4b5 c6b5 b2b3 g8f6 b3c4 b5b4 f3e5 d8c7 c4c5 f8c5 f1b5 e8e7 b1d2 c8b7 c1b2 a7a6 b5a4 c5d6 e1g1 c7d8 a1c1");
+		//BoardUtils.playGameUCI(bitboard, "e2e4 d7d5 e4d5 d8d5 b1c3 d5e6 f1e2 e6g6 g1f3 g6g2 h1g1 g2h3 d2d4 h7h5 e2c4 e7e6 g1g5 e6e5 g5g3 h3f5 f3e5 f8b4 e5f7 h8h7 f7g5 h7h8 d1e2 g8e7 c4f7 e8d8 f7h5 g7g6 g3f3 f5a5 e2e4 b8c6 g5f7 d8e8 h5g6 h8g8 f7e5 g8g6 e5g6 c8f5 f3f5 a5f5 e4f5 e7f5 c1e3 c6d4 e1c1 f5e3 f2e3 d4f3 c3d5 e8f7 g6f4 b4d6 d5c7 a8c8 d1d6");
 		
 		//IBitBoard bitboard = new Board("r4rk1/pp3ppp/2pq4/3p4/4nPb1/2BBP3/PPP3PP/R3QRK1 w - - 2 15", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());

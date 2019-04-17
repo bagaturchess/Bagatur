@@ -167,13 +167,64 @@ public class Board4_Adapter extends Board4 implements IBitBoard {
 		return board;
 	}
 
-
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#makeMoveForward(java.lang.String)
 	 */
 	@Override
 	public void makeMoveForward(String ucimove) {
-		// TODO Auto-generated method stub
-		
+		throw new UnsupportedOperationException();
+	}
+
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#isCaptureMove(int)
+	 */
+	@Override
+	public boolean isCaptureMove(int move) {
+		throw new UnsupportedOperationException();
+	}
+
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#isPromotionMove(int)
+	 */
+	@Override
+	public boolean isPromotionMove(int move) {
+		throw new UnsupportedOperationException();
+	}
+
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#isCaptureOrPromotionMove(int)
+	 */
+	@Override
+	public boolean isCaptureOrPromotionMove(int move) {
+		throw new UnsupportedOperationException();
+	}
+
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#getSEEScore(int)
+	 */
+	@Override
+	public int getSEEScore(int move) {
+		throw new UnsupportedOperationException();
+	}
+	
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBitBoard#isEnpassantMove(int)
+	 */
+	@Override
+	public boolean isEnpassantMove(int move) {
+		throw new UnsupportedOperationException();
+	}
+
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBitBoard#isCastlingMove(int)
+	 */
+	@Override
+	public boolean isCastlingMove(int move) {
+		throw new UnsupportedOperationException();
 	}
 }

@@ -705,4 +705,58 @@ public class DummyBoard implements IBitBoard {
 		// TODO Auto-generated method stub
 		
 	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#isCaptureMove(int)
+	 */
+	@Override
+	public boolean isCaptureMove(int move) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#isPromotionMove(int)
+	 */
+	@Override
+	public boolean isPromotionMove(int move) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#isCaptureOrPromotionMove(int)
+	 */
+	@Override
+	public boolean isCaptureOrPromotionMove(int move) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#getSEEScore(int)
+	 */
+	@Override
+	public int getSEEScore(int move) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBitBoard#isEnpassantMove(int)
+	 */
+	@Override
+	public boolean isEnpassantMove(int move) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBitBoard#isCastlingMove(int)
+	 */
+	@Override
+	public boolean isCastlingMove(int move) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
