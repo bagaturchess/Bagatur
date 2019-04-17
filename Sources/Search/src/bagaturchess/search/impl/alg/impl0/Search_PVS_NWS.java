@@ -37,6 +37,7 @@ import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.alg.BacktrackingInfo;
 import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.env.SearchEnv;
+import bagaturchess.search.impl.movelists.ListAll;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.utils.SearchUtils;
@@ -783,6 +784,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					int lmrReduction = 0;
 					if (!inCheck
 						 && !isCheckMove
+						 //&& !((ListAll)list).isGoodMove(cur_move)
 						 //&& !mateThreat
 						 //&& !isCapOrProm
 						 && moveSee < 0
@@ -1476,6 +1478,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					int lmrReduction = 0;
 					if (!inCheck
 						 && !isCheckMove
+						 //&& !((ListAll)list).isGoodMove(cur_move)
 						 //&& !mateThreat
 						 //&& !isCapOrProm
 						 && moveSee < 0
