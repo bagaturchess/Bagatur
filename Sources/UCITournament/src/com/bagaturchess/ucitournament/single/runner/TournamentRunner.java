@@ -49,10 +49,14 @@ public class TournamentRunner {
 	private static final EngineProcess bagatur_dev 			= new EngineProcess("Bagatur DEV", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_DEV\\Bagatur_64_1_core.exe",
 															new String [0],
 															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_DEV\\");
-	
+
 	private static final EngineProcess bagatur_17 			= new EngineProcess("Bagatur 1.7", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\Bagatur_64_1_core.exe",
 															new String [0],
 															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\");
+
+	private static final EngineProcess bagatur_17a 			= new EngineProcess("Bagatur 1.7a", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7a\\Bagatur_64_1_core.exe",
+															new String [0],
+															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7a\\");
 
 	private static final EngineProcess bagatur_16c 			= new EngineProcess("Bagatur 1.6c", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.6c\\Bagatur_64_1_core.exe",
 															new String [0],
@@ -80,8 +84,8 @@ public class TournamentRunner {
 	public static void main(String[] args) {
 		
 		
-		EngineProcess engine1 = bagatur_dev;
-		EngineProcess engine2 = bagatur_17;
+		EngineProcess engine1 = bagatur_17;
+		EngineProcess engine2 = bagatur_17a;
 		
 		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
@@ -103,12 +107,11 @@ public class TournamentRunner {
 			engine2.setOptions(options);
 			
 			ITournamentSchedule schedule = new TournamentSchedule_2Engines(engines, 100000);
-			//ITournamentSchedule schedule = new TournamentSchedule_EvenScores(engines);
 			
-			//MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
+			MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
 			//MatchRunner matchRunner = new MatchRunner_FixedDepth(7);
 			//MatchRunner matchRunner = new MatchRunner_FixedNodes(10000);
-			MatchRunner matchRunner = new MatchRunner_TimeAndInc(60 * 1000, 60 * 1000, 1 * 1000, 1 * 1000);
+			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(60 * 1000, 60 * 1000, 1 * 1000, 1 * 1000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 250, 250);
 			
 			Tournament tournament = new Tournament(schedule, matchRunner, false);
