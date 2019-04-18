@@ -1,4 +1,8 @@
 
+Version 1.7a (18 April 2019)
+  * Optimizations of move ordering: bad captures are ordered with higher value
+  * Optimizations of move ordering: piece-square tables are not used in ordering
+  
 Version 1.7 (29 March 2019)
   * Support for Syzygy tablebases, based on the java porting done by ljgw https://github.com/ljgw/syzygy-bridge
   * New evaluation function

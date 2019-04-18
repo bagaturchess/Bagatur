@@ -4,5 +4,4 @@ This is the Bagatur's to-do list (a.k.a the backlog) of features requested by us
 Feel free to contribute http://sourceforge.net/projects/bagaturchess/develop
 
 1. Improve the parallel algorithm to scale on many CPU cores
-2. Support of Syzygy tablebases
-3. New tuning of Evaluation function based on currently best engines
+2. Continuous tuning of the Evaluation function based on the currently best engines
