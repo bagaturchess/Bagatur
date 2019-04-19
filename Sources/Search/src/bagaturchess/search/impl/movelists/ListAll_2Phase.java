@@ -136,7 +136,7 @@ public class ListAll_2Phase implements ISearchMoveList {
 			}
 		}
 		
-		if (!counterTried && env.getBitboard().getLastMove() != 0) {
+		/*if (!counterTried && env.getBitboard().getLastMove() != 0) {
 			counterTried = true;
 			counterMove = env.getHistory_All().getCounterMove1(env.getBitboard().getLastMove());
 			if (counterMove != 0 && isOk(counterMove) && env.getBitboard().isPossible(counterMove)) {
@@ -155,10 +155,15 @@ public class ListAll_2Phase implements ISearchMoveList {
 					}
 				}
 			}
-		}
+		}*/
 		
 		if (!generated_caps) {
 			genMoves_caps();
+			if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(cur, size, moves);
+		}
+		
+		if (!generated_noncaps && cur >= size) {
+			genMoves_noncaps();
 			if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(cur, size, moves);
 		}
 		
@@ -169,21 +174,7 @@ public class ListAll_2Phase implements ISearchMoveList {
 			return move;
 			
 		} else {
-			
-			if (!generated_noncaps) {
-				genMoves_noncaps();
-				if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(cur, size, moves);
-			}
-			
-			if (cur < size) {
-				
-				int move = (int) moves[cur++];
-				
-				return move;
-				
-			} else {
-				return 0;	
-			}
+			return 0;	
 		}
 	}
 	
