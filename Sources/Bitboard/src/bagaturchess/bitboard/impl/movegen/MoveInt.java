@@ -137,35 +137,35 @@ public class MoveInt {
 	 * Decode move 
 	 */
 	
-	public static boolean isPromotion(int move) {
+	public static final boolean isPromotion(int move) {
 		return (INIT_PROM & move) != 0; 
 	}
 	
-	public static boolean isCapture(int move) {
+	public static final boolean isCapture(int move) {
 		return (INIT_CAP & move) != 0; 
 	}
 	
-	public static boolean isCastling(int move) {
+	public static final boolean isCastling(int move) {
 		return (INIT_CAST & move) != 0; 
 	}
 	
-	public static boolean isEnpassant(int move) {
+	public static final boolean isEnpassant(int move) {
 		return (ENPAS_CHECK & move) != 0; 
 	}
 	
-	public static int getDir(int move) {
+	public static final int getDir(int move) {
 		return (move >> DIR_SHIFT) & FIGTYPE_MASK;
 	}
 	
-	public static int getSeq(int move) {
+	public static final int getSeq(int move) {
 		return (move >> SEQ_SHIFT) & FIGTYPE_MASK;
 	}
 	
-	public static int getCapturedFigurePID(int move) {
+	public static final int getCapturedFigurePID(int move) {
 		return (move >> PID1_SHIFT) & PID_MASK;	
 	}
 	
-	public static int getPromotionFigurePID(int move) {
+	public static final int getPromotionFigurePID(int move) {
 		if (isPromotion(move)) {
 			return (move >> PID2_SHIFT) & PID_MASK;
 		} else return 0;
@@ -191,27 +191,27 @@ public class MoveInt {
 		}
 	}
 	
-	public static int getColour(int move) {
+	public static final int getColour(int move) {
 		return Constants.getColourByPieceIdentity(getFigurePID(move));
 	}
 	
-	public static int getFigureType(int move) {
+	public static final int getFigureType(int move) {
 		return Constants.PIECE_IDENTITY_2_TYPE[getFigurePID(move)];
 	}
 	
-	public static boolean isWhite(int move) {
+	public static final boolean isWhite(int move) {
 		return getColour(move) == Figures.COLOUR_WHITE;
 	}
 	
-	public static int getEnpassantCapturedFieldID(int move) {
+	public static final int getEnpassantCapturedFieldID(int move) {
 		return Enpassanting.ADJOINING_FILE_FIELD_ID_AT_CAPTURE[getColour(move)][getFromFieldID(move)][getDir(move)];
 	}
 
-	public static int getCapturedFigureType(int move) {
+	public static final int getCapturedFigureType(int move) {
 		return Constants.PIECE_IDENTITY_2_TYPE[getCapturedFigurePID(move)];
 	}
 	
-	public static boolean isCastleKingSide(int move) {
+	public static final boolean isCastleKingSide(int move) {
 		//return isCastling(move) && ((move >> CAST_KING_FLAG_SHIFT) & FLAG_MASK) != 0;
 		if (isCastling(move)) {
 			int toFieldID = getToFieldID(move);
@@ -222,7 +222,7 @@ public class MoveInt {
 		return false;
 	}
 	
-	public static boolean isCastleQueenSide(int move) {
+	public static final boolean isCastleQueenSide(int move) {
 		//return isCastling(move) && ((move >> CAST_KING_FLAG_SHIFT) & FLAG_MASK) == 0;
 		if (isCastling(move)) {
 			int toFieldID = getToFieldID(move);
@@ -233,15 +233,15 @@ public class MoveInt {
 		return false;
 	}
 	
-	public static boolean isQueen(int move) {
+	public static final boolean isQueen(int move) {
 		return getFigureType(move) == Figures.TYPE_QUEEN;
 	}
 	
-	public static boolean isPawnCapture(int move) {
+	public static final boolean isPawnCapture(int move) {
 		return getCapturedFigureType(move) == Figures.TYPE_PAWN;
 	}
 	
-	public static int getDirType(int move) { 
+	public static final int getDirType(int move) { 
 		
 		//if (true) return (int) move[4];
 
@@ -258,28 +258,28 @@ public class MoveInt {
 		}
 	}
 	
-	public static int getPromotionFigureType(int move) {
+	public static final int getPromotionFigureType(int move) {
 		return Constants.PIECE_IDENTITY_2_TYPE[getPromotionFigurePID(move)];
 	}
 	
-	public static boolean isPawn(int move) {
+	public static final boolean isPawn(int move) {
 		int pid = getFigurePID(move);
 		return pid == Constants.PID_W_PAWN || pid == Constants.PID_B_PAWN;
 	}
 
-	public static boolean isCaptureOrPromotion(int move) {
+	public static final boolean isCaptureOrPromotion(int move) {
 		return isCapture(move) || isPromotion(move);
 	}
 
-	public static int getOpponentColour(int move) {
+	public static final int getOpponentColour(int move) {
 		return Figures.OPPONENT_COLOUR[getColour(move)];
 	}
 
-	public static long getToFieldBitboard(int move) {
+	public static final long getToFieldBitboard(int move) {
 		return Fields.ALL_ORDERED_A1H1[getToFieldID(move)];
 	}
 	
-	public static long getFromFieldBitboard(int move) {
+	public static final long getFromFieldBitboard(int move) {
 		return Fields.ALL_ORDERED_A1H1[getFromFieldID(move)];
 	}
 	
@@ -395,7 +395,7 @@ public class MoveInt {
 		return moveStr;
 	}
 	
-	public static String movesToStringUCI(int[] pv, int size) {
+	public static final String movesToStringUCI(int[] pv, int size) {
 		StringBuilder result = new StringBuilder(256);
 		
 		for (int i=0; i<size; i++) {
@@ -432,7 +432,7 @@ public class MoveInt {
 	}
 	
 
-	public static int[] getPV(String[] pv, IBitBoard board) {
+	public static final int[] getPV(String[] pv, IBitBoard board) {
 		
 		int[] result = null;
 		
@@ -456,7 +456,7 @@ public class MoveInt {
 	}
 	
 	
-	public static String getMovesUCI(IBitBoard bitboard) {
+	public static final String getMovesUCI(IBitBoard bitboard) {
 		
 		String result = "";
 		
@@ -473,7 +473,7 @@ public class MoveInt {
 	}
 	
 	
-	public static String movesToStringOwn(int[] pv) {
+	public static final String movesToStringOwn(int[] pv) {
 		String pvStr = "";
 		
 		for (int i=0; i<pv.length; i++) {
@@ -514,7 +514,7 @@ public class MoveInt {
 		return moveStr;
 	}
 	
-	public static long getMoveHash(int move) {
+	public static final long getMoveHash(int move) {
 		
 		long result = 0L;
 		
@@ -564,7 +564,7 @@ public class MoveInt {
 		return result;
 	}
 
-	public static int getMoveIndex(int move) {
+	public static final int getMoveIndex(int move) {
 		
 		int result = 0;
 		
