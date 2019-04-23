@@ -91,10 +91,6 @@ public class ListAll implements ISearchMoveList {
 	private boolean tptPlied;
 	private int tptMove = 0;
 	
-	private boolean fastMoveTried;
-	private boolean fastMovePlied;
-	private int fastMove = 0;
-	
 	private int prevBestMove = 0;
 	private int prevPvMove = 0;
 	private int mateMove = 0;
@@ -135,11 +131,7 @@ public class ListAll implements ISearchMoveList {
 		tptTried = false;
 		tptPlied = false;
 		
-		fastMoveTried = false;
-		fastMovePlied = false;
-		
 		tptMove = 0;
-		fastMove = 0;
 		prevBestMove = 0;
 		prevPvMove = 0;
 		mateMove = 0;
@@ -165,62 +157,6 @@ public class ListAll implements ISearchMoveList {
 			if (tptMove != 0 && isOk(tptMove) && env.getBitboard().isPossible(tptMove)) {
 				tptPlied = true;
 				return tptMove;
-			}
-		}
-		
-		if (false && !fastMoveTried) {
-			
-			fastMoveTried = true;
-			
-			//Counter move
-			if (orderingStatistics.getOrdVal_COUNTER() > orderingStatistics.getOrdVal_PREVBEST()
-					&& orderingStatistics.getOrdVal_COUNTER() > orderingStatistics.getOrdVal_PREVPV()) {
-				
-				int counterMove1 = env.getHistory_All().getCounterMove1(env.getBitboard().getLastMove());
-				if (counterMove1 != 0 && isOk(counterMove1) && env.getBitboard().isPossible(counterMove1)) {
-					fastMove = counterMove1;
-				}
-				
-				if (fastMove == 0) {
-					int counterMove2 = env.getHistory_All().getCounterMove2(env.getBitboard().getLastMove());
-					if (counterMove2 != 0 && isOk(counterMove2) && env.getBitboard().isPossible(counterMove2)) {
-						fastMove = counterMove2;
-					}
-				}
-				
-				if (fastMove == 0) {
-					int counterMove3 = env.getHistory_All().getCounterMove3(env.getBitboard().getLastMove());
-					if (counterMove3 != 0 && isOk(counterMove3) && env.getBitboard().isPossible(counterMove3)) {
-						fastMove = counterMove3;
-					}
-				}
-			} else 		
-			//Prev best move
-			if (orderingStatistics.getOrdVal_PREVBEST() > orderingStatistics.getOrdVal_COUNTER()
-					&& orderingStatistics.getOrdVal_PREVBEST() > orderingStatistics.getOrdVal_PREVPV()) {
-				
-				if (prevBestMove != 0 && isOk(prevBestMove) && env.getBitboard().isPossible(prevBestMove)) {
-					fastMove = prevBestMove;
-				}
-				
-			} else 			
-			//Prev PV move
-			if (orderingStatistics.getOrdVal_PREVPV() > orderingStatistics.getOrdVal_COUNTER()
-					&& orderingStatistics.getOrdVal_PREVPV() > orderingStatistics.getOrdVal_PREVBEST()) {
-				
-				if (prevPvMove != 0 && isOk(prevPvMove) && env.getBitboard().isPossible(prevPvMove)) {
-					fastMove = prevPvMove;
-				}
-				
-			}
-			
-			if (fastMove != 0) {
-				if (tptPlied && tptMove == fastMove) {
-					//Do nothing
-				} else {
-					fastMovePlied = true;
-					return fastMove;
-				}
 			}
 		}
 		
@@ -344,12 +280,6 @@ public class ListAll implements ISearchMoveList {
 		
 		if (move == tptMove) {
 			if (tptPlied) {
-				return;
-			}
-		}
-		
-		if (move == fastMove) {
-			if (fastMovePlied) {
 				return;
 			}
 		}
@@ -667,9 +597,6 @@ public class ListAll implements ISearchMoveList {
 			
 			tptTried = false;
 			tptPlied = false;
-			
-			fastMoveTried = false;
-			fastMovePlied = false;
 			
 		} else {
 			clear();
