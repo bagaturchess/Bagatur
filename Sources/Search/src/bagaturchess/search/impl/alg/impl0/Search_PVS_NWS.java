@@ -1762,29 +1762,17 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
     	
     	
-		ISearchMoveList list = null;
-		if (inCheck) { 
-			list = lists_escapes[depth];
-			list.clear();
-			list.setTptMove(tpt_move);
-		} else {
-			list = lists_capsproms[depth];
-			list.clear();
-			list.setTptMove(tpt_move);
-		}
+		ISearchMoveList list = inCheck ? lists_escapes[depth] : lists_capsproms[depth];
+		list.clear();
+		list.setTptMove(tpt_move);
+		
 		
 		int legalMoves = 0;
-		int best_eval = MIN;
+		int best_eval = inCheck ? MIN : staticEval;
 		int best_move = 0;
-		int cur_move = 0;
+		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		
 		int alpha = alpha_org;
-		
-		if (inCheck) {
-			cur_move = (tpt_move != 0) ? tpt_move : list.next();
-		} else {
-			cur_move = (tpt_move != 0) ? tpt_move : list.next();
-		}
 		
 		
 		int searchedMoves = 0;
@@ -1866,16 +1854,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			} else {
 				//All captures lead to evaluation which is less than the static eval
 			}
-		}
-		
-		if (!inCheck && staticEval > best_eval) {
-			best_move = 0;
-			best_eval = staticEval;
-			
-			node.leaf = true;
-			node.eval = staticEval;
-			node.bestmove = 0;
-			node.nullmove = false;
 		}
 		
 		if (allowTPTAccess(initial_maxdepth, depth)) {
@@ -2015,29 +1993,17 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
     	
     	
-		ISearchMoveList list = null;
-		if (inCheck) { 
-			list = lists_escapes[depth];
-			list.clear();
-			list.setTptMove(tpt_move);
-		} else {
-			list = lists_capsproms[depth];
-			list.clear();
-			list.setTptMove(tpt_move);
-		}
+		ISearchMoveList list = inCheck ? lists_escapes[depth] : lists_capsproms[depth];
+		list.clear();
+		list.setTptMove(tpt_move);
+		
 		
 		int legalMoves = 0;
-		int best_eval = MIN;
+		int best_eval = inCheck ? MIN : staticEval;
 		int best_move = 0;
-		int cur_move = 0;
+		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		
 		int alpha = alpha_org;
-		
-		if (inCheck) {
-			cur_move = (tpt_move != 0) ? tpt_move : list.next();
-		} else {
-			cur_move = (tpt_move != 0) ? tpt_move : list.next();
-		}
 		
 		
 		int searchedMoves = 0;
@@ -2105,11 +2071,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			} else {
 				//All captures lead to evaluation which is less than the static eval
 			}
-		}
-		
-		if (!inCheck && staticEval >= best_eval) {
-			best_move = 0;
-			best_eval = staticEval;
 		}
 		
 		if (allowTPTAccess(initial_maxdepth, depth)) {
