@@ -717,26 +717,36 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				//Static pruning
-				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
+				if (STATIC_PRUNING2 && !inCheck && !env.getBitboard().isCheckMove(cur_move)) {
 					
 					if (searchedCount >= 4 && rest <= 8) {
 						
-						//Static pruning - move count based
-						if (searchedCount >= 3 + Math.pow(rest, 2)) {
-							continue;
+						if (!isCapOrProm) {
+							
+							//Static pruning - move count based
+							if (searchedCount >= 3 + Math.pow(rest, 2)) {
+								continue;
+							}
+							
+							//Static pruning - history based
+							if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
+		 						continue;
+		 					}
+							
+							//Static pruning - evaluation based
+							if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
+								continue;
+							}
 						}
 						
-						//Static pruning - history based
-						if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
-	 						continue;
-	 					}
-						
-						//Static pruning - evaluation based
-						if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
+						//Static pruning - SEE based
+						/*int moveSee_1 = (moveSee == -1) ? env.getBitboard().getSEEScore(cur_move) : moveSee;
+						if (moveSee_1 < -20 * rest * rest) {
 							continue;
-						}
+						}*/
 					}
 				}
+				
 				
 				env.getBitboard().makeMoveForward(cur_move);
 				
@@ -1411,26 +1421,36 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				//Static pruning
-				if (STATIC_PRUNING2 && !inCheck && !isCapOrProm && !env.getBitboard().isCheckMove(cur_move)) {
+				if (STATIC_PRUNING2 && !inCheck && !env.getBitboard().isCheckMove(cur_move)) {
 					
 					if (searchedCount >= 4 && rest <= 8) {
 						
-						//Static pruning - move count based
-						if (searchedCount >= 3 + Math.pow(rest, 2)) {
-							continue;
+						if (!isCapOrProm) {
+							
+							//Static pruning - move count based
+							if (searchedCount >= 3 + Math.pow(rest, 2)) {
+								continue;
+							}
+							
+							//Static pruning - history based
+							if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
+		 						continue;
+		 					}
+							
+							//Static pruning - evaluation based
+							if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
+								continue;
+							}
 						}
 						
-						//Static pruning - history based
-						if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
-	 						continue;
-	 					}
-						
-						//Static pruning - evaluation based
-						if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
+						//Static pruning - SEE based
+						/*int moveSee_1 = (moveSee == -1) ? env.getBitboard().getSEEScore(cur_move) : moveSee;
+						if (moveSee_1 < -20 * rest * rest) {
 							continue;
-						}
+						}*/
 					}
 				}
+				
 				
 				env.getBitboard().makeMoveForward(cur_move);
 				
