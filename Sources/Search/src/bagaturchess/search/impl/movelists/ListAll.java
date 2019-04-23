@@ -399,9 +399,9 @@ public class ListAll implements ISearchMoveList {
 			ordval += ORD_VAL_MATE_MOVE * orderingStatistics.getOrdVal_MATEMOVE();
 		}
 		
-		if (env.getBitboard().isPasserPush(move)) {
+		/*if (env.getBitboard().isPasserPush(move)) {
 			ordval += ORD_VAL_PASSER_PUSH * orderingStatistics.getOrdVal_PASSER();
-		}
+		}*/
 		
 		if (env.getBitboard().isCastlingMove(move)) {
 			ordval += ORD_VAL_CASTLING * orderingStatistics.getOrdVal_CASTLING();
@@ -459,9 +459,9 @@ public class ListAll implements ISearchMoveList {
 			orderingStatistics.matemove_count++;
 		}
 				
-		if (env.getBitboard().isPasserPush(move)) {
+		/*if (env.getBitboard().isPasserPush(move)) {
 			orderingStatistics.passer_count++;
-		}
+		}*/
 		
 		if (env.getBitboard().isCastlingMove(move)) {
 			orderingStatistics.castling_count++;
@@ -515,9 +515,9 @@ public class ListAll implements ISearchMoveList {
 			orderingStatistics.matemove_best++;
 		}
 		
-		if (env.getBitboard().isPasserPush(bestmove)) {
+		/*if (env.getBitboard().isPasserPush(bestmove)) {
 			orderingStatistics.passer_best++;
-		}
+		}*/
 		
 		if (env.getBitboard().isCastlingMove(bestmove)) {
 			orderingStatistics.castling_best++;

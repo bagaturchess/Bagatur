@@ -70,7 +70,11 @@ public class TournamentRunner {
 	private static final EngineProcess chess22k 			=  new EngineProcess("Chess22k.1.12", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\Chess22k\\run.bat",
 															new String [0],
 															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\Chess22k\\");
-	
+
+	private static final EngineProcess cuckoo112 			=  new EngineProcess("Cuckoo.1.12", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\Cuckoo112\\cuckoo112.bat",
+															new String [0],
+															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\Cuckoo112\\");
+
 	private static final EngineProcess stockfish10 			= new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-10-win\\Windows\\stockfish_10_x64.exe",
 															new String [0],
 															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-10-win\\Windows");
@@ -79,13 +83,13 @@ public class TournamentRunner {
 	private static final EngineProcess houdini15a 			= new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Houdini_15a\\Houdini_15a_x64.exe",
 															new String [0],
 															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Houdini_15a\\");
-
+	
 	
 	public static void main(String[] args) {
 		
 		
-		EngineProcess engine1 = bagatur_17;
-		EngineProcess engine2 = bagatur_17a;
+		EngineProcess engine1 = stockfish10;
+		EngineProcess engine2 = bagatur_dev;
 		
 		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
@@ -108,9 +112,9 @@ public class TournamentRunner {
 			
 			ITournamentSchedule schedule = new TournamentSchedule_2Engines(engines, 100000);
 			
-			MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
-			//MatchRunner matchRunner = new MatchRunner_FixedDepth(7);
-			//MatchRunner matchRunner = new MatchRunner_FixedNodes(10000);
+			//MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
+			//MatchRunner matchRunner = new MatchRunner_FixedDepth(3);
+			MatchRunner matchRunner = new MatchRunner_FixedNodes(100000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(60 * 1000, 60 * 1000, 1 * 1000, 1 * 1000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 250, 250);
 			
@@ -119,8 +123,11 @@ public class TournamentRunner {
 			tournament.start();
 			
 		} catch (Throwable t) {
+			
 			t.printStackTrace();
+			
 		} finally {
+			
 			for (int i=0; i<engines.length; i++) {
 				try {
 					engines[i].destroy();
