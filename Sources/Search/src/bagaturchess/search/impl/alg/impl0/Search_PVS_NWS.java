@@ -740,10 +740,12 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 						
 						//Static pruning - SEE based
-						/*int moveSee_1 = (moveSee == -1) ? env.getBitboard().getSEEScore(cur_move) : moveSee;
-						if (moveSee_1 < -20 * rest * rest) {
-							continue;
-						}*/
+						if (rest <= 6) {
+							int moveSee_tmp = (moveSee == -1) ? env.getBitboard().getSEEScore(cur_move) : moveSee;
+							if (moveSee_tmp < -20 * rest * rest) {
+								continue;
+							}
+						}
 					}
 				}
 				
@@ -1444,10 +1446,12 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 						
 						//Static pruning - SEE based
-						/*int moveSee_1 = (moveSee == -1) ? env.getBitboard().getSEEScore(cur_move) : moveSee;
-						if (moveSee_1 < -20 * rest * rest) {
-							continue;
-						}*/
+						if (rest <= 6) {
+							int moveSee_tmp = (moveSee == -1) ? env.getBitboard().getSEEScore(cur_move) : moveSee;
+							if (moveSee_tmp < -20 * rest * rest) {
+								continue;
+							}
+						}
 					}
 				}
 				
