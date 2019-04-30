@@ -500,4 +500,35 @@ public class BaseEvaluation implements MoveListener, IBaseEval {
 		return val;
 	}
 
+	
+	public double getPSTMoveGoodPercent(int move) {
+		int min = interpolator.interpolateByFactor(pst.getMoveMinScores_o(move), pst.getMoveMinScores_e(move));
+		int max = interpolator.interpolateByFactor(pst.getMoveMaxScores_o(move), pst.getMoveMaxScores_e(move));
+		int score = interpolator.interpolateByFactor(pst.getMoveScores_o(move), pst.getMoveScores_e(move));
+		
+		/*if (score > max - min) {
+			throw new IllegalStateException();
+		}*/
+		
+		double b = max - min;
+		
+		if (b == 0) { 
+			return 0;
+		}
+		
+		double result = Math.abs(score) / b;
+		if (result > 1) { //because of rounding double to int
+			result = 1;
+		}
+		
+		if (result < 0) { //For sure
+			result = 0;
+		}
+		
+		/*if (result < 0 || result > 1) {
+			throw new IllegalStateException();	
+		}*/
+		
+		return result;
+	}
 }

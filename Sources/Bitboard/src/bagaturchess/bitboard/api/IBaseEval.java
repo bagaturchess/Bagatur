@@ -42,4 +42,6 @@ public interface IBaseEval {
 	
 	public int getMaterial(int pieceType);
 	public int getMaterialGain(int move);
+	
+	public double getPSTMoveGoodPercent(int move);
 }
