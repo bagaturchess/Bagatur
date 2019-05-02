@@ -804,6 +804,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2);
 						rate += 2;//for pv nodes
+						//if (isCapOrProm) rate -= 2;
+						//if (!isCapOrProm && evalDiff > 0) rate -= 2 * (evalDiff / EVAL_DIFF_MAX);
 						//rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
 						//rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
@@ -1510,6 +1512,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2);
 						rate += 2;//for non pv nodes
+						//if (isCapOrProm) rate -= 2;
+						//if (!isCapOrProm && evalDiff > 0) rate -= 2 * (evalDiff / EVAL_DIFF_MAX);
 						//rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
 						//rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
