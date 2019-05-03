@@ -87,7 +87,7 @@ public class TPTable extends LRUMapLongObject<TPTEntry> {
 			byte movenumber) {
 		
 		if (_bestmove == 0) {
-			throw new IllegalStateException();
+			//throw new IllegalStateException();
 		}
 		
 		if (_eval == ISearch.MAX || _eval == ISearch.MIN) {
