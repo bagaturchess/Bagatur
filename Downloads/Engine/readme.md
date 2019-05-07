@@ -3,6 +3,7 @@
 # Running the Program
 
 The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engine/">downloads</a> of the program runs under all Operating Systems, which support Java platform:
+* **Android**, there is an Andorid game called <a href="https://play.google.com/store/apps/details?id=com.bagaturchess">Bagatur Chess Engine with GUI</a> with own user interface (GUI) and is using Bagatur internally as a chess engine
 * **Windows**, there are *.exe files for direct run. Here are the steps necessary to run the engine:
   * Download an arbitrary UCI user interface. For example the most popular one is <a href="http://www.playwitharena.com/">Arena</a>.
   * Install the UCI user interface on your computer.
@@ -11,7 +12,6 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
   * Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway). You may use win32 or win64 version depending on your choice.
   * E2-E4 and enjoy :-)
 * **Linux**, in the bin directory there are *.bat files for giving you idea how to write bash scrip for running
-* **Android**, there is a program called <a href="https://play.google.com/store/apps/details?id=com.chessartforkids&hl=en">Chess Art For Kids</a> with own user interface (GUI) and using Bagatur internally as a chess engine
 
 
 # Revision History
