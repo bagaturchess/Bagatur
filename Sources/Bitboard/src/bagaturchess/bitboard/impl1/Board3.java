@@ -1768,11 +1768,13 @@ public abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 		}
 		
 		if (pieces.getPieces(Constants.PID_W_KING).getDataSize() == 0) {
-			throw new IllegalStateException("Captured white king");
+			//throw new IllegalStateException("Captured white king");
+			return false;//Fix for Chess Art for Kids - Chess Pieces Aware mode
 		}
 		
 		if (pieces.getPieces(Constants.PID_B_KING).getDataSize() == 0) {
-			throw new IllegalStateException("Captured black king");
+			//throw new IllegalStateException("Captured black king");
+			return false;//Fix for Chess Art for Kids - Chess Pieces Aware mode
 		}
 		
 		int kingFieldID = (colour == Constants.COLOUR_WHITE)

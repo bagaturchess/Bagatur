@@ -59,7 +59,7 @@ public class TimeSaver {
 				}
 				
 				mediator.dump("TimeSaver: Opening move " + MoveInt.moveToString(move));
-				ISearchInfo info = createInfo(move);
+				ISearchInfo info = createInfo(move, 0);
 				mediator.changedMajor(info);
 				if (mediator.getBestMoveSender() != null) mediator.getBestMoveSender().sendBestMove();
 				return true;
@@ -84,7 +84,7 @@ public class TimeSaver {
 			}
 			int move = list.reserved_getMovesBuffer()[0];
 			mediator.dump("TimeSaver: Single reply move " + MoveInt.moveToString(move));
-			ISearchInfo info = createInfo(move);
+			ISearchInfo info = createInfo(move, 1);
 			mediator.changedMajor(info);
 			if (mediator.getBestMoveSender() != null) mediator.getBestMoveSender().sendBestMove();
 			return true;
@@ -179,8 +179,10 @@ public class TimeSaver {
 	}
 	
 	
-	private static ISearchInfo createInfo(int move) {
+	private static ISearchInfo createInfo(int move, int depth) {
 		ISearchInfo info = SearchInfoFactory.getFactory().createSearchInfo();
+		info.setDepth(depth);
+		info.setSelDepth(depth);
 		info.setBestMove(move);
 		info.setPV(new int[] {move});
 		return info;
