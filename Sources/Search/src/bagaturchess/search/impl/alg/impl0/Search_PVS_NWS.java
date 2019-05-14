@@ -1885,11 +1885,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (allowTPTAccess(initial_maxdepth, depth)) {
-			//if (best_move != 0) {
+			if (best_move != 0) {
 				env.getTPT().lock();
 				env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
 				env.getTPT().unlock();
-			//}
+			}
 		}
 		
 		return best_eval;
@@ -2105,11 +2105,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (allowTPTAccess(initial_maxdepth, depth)) {
-			//if (best_move != 0) {
+			if (best_move != 0) {
 				env.getTPT().lock();
 				env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
 				env.getTPT().unlock();
-			//}
+			}
 		}
 		
 		return best_eval;
