@@ -2,7 +2,7 @@
 # Overview
 
 Bagatur chess engine is one of the strongest Java chess engines in the world.
-It is also available for Android via <a href="https://play.google.com/store/apps/details?id=com.bagaturchess">Bagatur Chess Engine with GUI</a> game, which has its own user interface.
+It is also available for Android via <a href="https://play.google.com/store/apps/details?id=com.bagaturchess">Bagatur Chess Engine with GUI</a> game, which has its own user interface. If you like the project, please give it a star.
 
 # Downloads
 
