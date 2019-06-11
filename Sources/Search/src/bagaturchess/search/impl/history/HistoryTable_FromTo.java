@@ -79,25 +79,11 @@ public class HistoryTable_FromTo implements IHistoryTable {
 	}
 	
 	
-	public int getCounterMove1(int oldmove) {
-		if (oldmove == 0) {
-			return 0;
+	public boolean isCounterMove(int last_move, int move) {
+		if (last_move == 0) {
+			return false;
 		}
-		return getHistoryTable_PerColour(MoveInt.getOpponentColour(oldmove)).getCounterMove(oldmove);
-	}
-	
-	public int getCounterMove2(int oldmove) {
-		if (oldmove == 0) {
-			return 0;
-		}
-		return getHistoryTable_PerColour(MoveInt.getOpponentColour(oldmove)).getCounterMove2(oldmove);
-	}
-	
-	public int getCounterMove3(int oldmove) {
-		if (oldmove == 0) {
-			return 0;
-		}
-		return getHistoryTable_PerColour(MoveInt.getOpponentColour(oldmove)).getCounterMove3(oldmove);
+		return getHistoryTable_PerColour(MoveInt.getOpponentColour(last_move)).getCounterMove(last_move) == move;	
 	}
 	
 	public void countFailure(int move, int depth) {

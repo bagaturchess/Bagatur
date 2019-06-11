@@ -33,6 +33,10 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	private int[][] counters1;
 	private int[][] counters2;
 	private int[][] counters3;
+	//private int[][] counters4;
+	//private int[][] counters5;
+	//private int[][] counters6;
+	//private int[][] counters7;
 	
 	
 	public HistoryTable_PieceTo() {
@@ -42,6 +46,10 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 		counters1 	= new int[Constants.PID_MAX][64];
 		counters2 	= new int[Constants.PID_MAX][64];
 		counters3 	= new int[Constants.PID_MAX][64];
+		//counters4 	= new int[Constants.PID_MAX][64];
+		//counters5 	= new int[Constants.PID_MAX][64];
+		//counters6 	= new int[Constants.PID_MAX][64];
+		//counters7 	= new int[Constants.PID_MAX][64];
 	}
 	
 	
@@ -133,49 +141,41 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 		if (counter_move != counters1[pid][to]
 				&& counter_move != counters2[pid][to]
 				&& counter_move != counters3[pid][to]
+				//&& counter_move != counters4[pid][to]
+				//&& counter_move != counters5[pid][to]
+				//&& counter_move != counters6[pid][to]
+				//&& counter_move != counters7[pid][to]
 				) {
+			//counters7[pid][to] = counters6[pid][to];
+			//counters6[pid][to] = counters5[pid][to];
+			//counters5[pid][to] = counters4[pid][to];
+			//counters4[pid][to] = counters3[pid][to];
 			counters3[pid][to] = counters2[pid][to];
 			counters2[pid][to] = counters1[pid][to];
 			counters1[pid][to] = counter_move;
+			
+			//System.out.println("diff");
 		}
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.history.IHistoryTable#getCounterMove1(int)
-	 */
 	@Override
-	public int getCounterMove1(int last_move) {
+	public boolean isCounterMove(int last_move, int move) {
 		
 		int pid = MoveInt.getFigurePID(last_move);
 		int to = MoveInt.getToFieldID(last_move);
 		
-		return counters1[pid][to];
-	}
-	
-	
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.history.IHistoryTable#getCounterMove2(int)
-	 */
-	@Override
-	public int getCounterMove2(int last_move) {
+		if (counters1[pid][to] == move
+				|| counters2[pid][to] == move
+				|| counters3[pid][to] == move
+				//|| counters4[pid][to] == move
+				//|| counters5[pid][to] == move
+				//|| counters6[pid][to] == move
+				//|| counters7[pid][to] == move
+			) {
+			return true;
+		}
 		
-		int pid = MoveInt.getFigurePID(last_move);
-		int to = MoveInt.getToFieldID(last_move);
-		
-		return counters2[pid][to];
-	}
-	
-	
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.history.IHistoryTable#getCounterMove3(int)
-	 */
-	@Override
-	public int getCounterMove3(int last_move) {
-		
-		int pid = MoveInt.getFigurePID(last_move);
-		int to = MoveInt.getToFieldID(last_move);
-		
-		return counters3[pid][to];
+		return false;
 	}
 }

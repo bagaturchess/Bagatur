@@ -35,7 +35,5 @@ public interface IHistoryTable {
 	
 	//Counter moves
 	public void addCounterMove(int last_move, int counter_move);
-	public int getCounterMove1(int last_move);
-	public int getCounterMove2(int last_move);
-	public int getCounterMove3(int last_move);
+	public boolean isCounterMove(int last_move, int move);
 }

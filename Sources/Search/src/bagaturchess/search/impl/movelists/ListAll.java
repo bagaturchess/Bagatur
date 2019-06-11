@@ -350,16 +350,8 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 		
-		if (env.getHistory_All().getCounterMove1(env.getBitboard().getLastMove()) == move) {
+		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
 			ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
-		} else {
-			if (env.getHistory_All().getCounterMove2(env.getBitboard().getLastMove()) == move) {
-				ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
-			} else {
-				if (env.getHistory_All().getCounterMove3(env.getBitboard().getLastMove()) == move) {
-					ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
-				}
-			}
 		}
 		
 		ordval += env.getHistory_All().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
@@ -410,16 +402,8 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 		
-		if (env.getHistory_All().getCounterMove1(env.getBitboard().getLastMove()) == move) {
+		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
 			orderingStatistics.counter_count++;
-		} else {
-			if (env.getHistory_All().getCounterMove2(env.getBitboard().getLastMove()) == move) {
-				orderingStatistics.counter_count++;
-			} else {
-				if (env.getHistory_All().getCounterMove3(env.getBitboard().getLastMove()) == move) {
-					orderingStatistics.counter_count++;
-				}
-			}
 		}
 	}
 	
@@ -466,16 +450,8 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 		
-		if (env.getHistory_All().getCounterMove1(env.getBitboard().getLastMove()) == bestmove) {
+		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), bestmove)) {
 			orderingStatistics.counter_best++;
-		} else {
-			if (env.getHistory_All().getCounterMove2(env.getBitboard().getLastMove()) == bestmove) {
-				orderingStatistics.counter_best++;
-			} else {
-				if (env.getHistory_All().getCounterMove3(env.getBitboard().getLastMove()) == bestmove) {
-					orderingStatistics.counter_best++;
-				}
-			}
 		}
 		
 		orderingStatistics.history_best += env.getHistory_All().getScores(bestmove);
@@ -518,16 +494,8 @@ public class ListAll implements ISearchMoveList {
 			return true;
 		}
 		
-		if (env.getHistory_All().getCounterMove1(env.getBitboard().getLastMove()) == move) {
+		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
 			return true;
-		} else {
-			if (env.getHistory_All().getCounterMove2(env.getBitboard().getLastMove()) == move) {
-				return true;
-			} else {
-				if (env.getHistory_All().getCounterMove3(env.getBitboard().getLastMove()) == move) {
-					return true;
-				}
-			}
 		}
 
 		/*
