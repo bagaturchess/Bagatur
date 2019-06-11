@@ -1782,7 +1782,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			//Alpha cutoff
 			if (!isMateVal(alpha_org)
 					&& !isMateVal(beta)
-					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
+					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) < alpha_org) {
 				node.eval = staticEval;
 				return node.eval;
 			}
@@ -1820,7 +1820,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						continue;
 					}
 				} else if (MoveInt.isCapture(cur_move)
-						&& staticEval + getAlphaTrustWindow(mediator, 1) + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
+						&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
 					//Futility pruning
 					continue;
 				}
@@ -2013,7 +2013,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			//Alpha cutoff
 			if (!isMateVal(alpha_org)
 					&& !isMateVal(beta)
-					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) + getAlphaTrustWindow(mediator, 1) < alpha_org) {
+					&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) < alpha_org) {
 				return staticEval;
 			}
 			
@@ -2054,7 +2054,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						continue;
 					}
 				} else if (MoveInt.isCapture(cur_move)
-						&& staticEval + getAlphaTrustWindow(mediator, 1) + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
+						&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
 					//Futility pruning
 					continue;
 				}
