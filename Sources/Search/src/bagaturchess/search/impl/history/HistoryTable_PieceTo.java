@@ -29,27 +29,15 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	
 	private long[][] success;
 	private long[][] failures;
-	
-	private int[][] counters1;
-	private int[][] counters2;
-	private int[][] counters3;
-	//private int[][] counters4;
-	//private int[][] counters5;
-	//private int[][] counters6;
-	//private int[][] counters7;
+
+	private static final int MAX_COUNTERS = 3;
+	private int[][][] counters;
 	
 	
 	public HistoryTable_PieceTo() {
 		success 	= new long[Constants.PID_MAX][64];
 		failures 	= new long[Constants.PID_MAX][64];
-		
-		counters1 	= new int[Constants.PID_MAX][64];
-		counters2 	= new int[Constants.PID_MAX][64];
-		counters3 	= new int[Constants.PID_MAX][64];
-		//counters4 	= new int[Constants.PID_MAX][64];
-		//counters5 	= new int[Constants.PID_MAX][64];
-		//counters6 	= new int[Constants.PID_MAX][64];
-		//counters7 	= new int[Constants.PID_MAX][64];
+		counters 	= new int[Constants.PID_MAX][64][MAX_COUNTERS];
 	}
 	
 	
@@ -138,23 +126,12 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 		int pid = MoveInt.getFigurePID(last_move);
 		int to = MoveInt.getToFieldID(last_move);
 		
-		if (counter_move != counters1[pid][to]
-				&& counter_move != counters2[pid][to]
-				&& counter_move != counters3[pid][to]
-				//&& counter_move != counters4[pid][to]
-				//&& counter_move != counters5[pid][to]
-				//&& counter_move != counters6[pid][to]
-				//&& counter_move != counters7[pid][to]
-				) {
-			//counters7[pid][to] = counters6[pid][to];
-			//counters6[pid][to] = counters5[pid][to];
-			//counters5[pid][to] = counters4[pid][to];
-			//counters4[pid][to] = counters3[pid][to];
-			counters3[pid][to] = counters2[pid][to];
-			counters2[pid][to] = counters1[pid][to];
-			counters1[pid][to] = counter_move;
-			
-			//System.out.println("diff");
+		if (!isCounterMove(last_move, counter_move)) {
+			int[] counter_moves = counters[pid][to];
+			for (int i = counter_moves.length - 1; i>=1; i--) {
+				counter_moves[i] = counter_moves[i - 1];
+			}
+			counter_moves[0] = counter_move;
 		}
 	}
 	
@@ -164,16 +141,12 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 		
 		int pid = MoveInt.getFigurePID(last_move);
 		int to = MoveInt.getToFieldID(last_move);
-		
-		if (counters1[pid][to] == move
-				|| counters2[pid][to] == move
-				|| counters3[pid][to] == move
-				//|| counters4[pid][to] == move
-				//|| counters5[pid][to] == move
-				//|| counters6[pid][to] == move
-				//|| counters7[pid][to] == move
-			) {
-			return true;
+		int[] counter_moves = counters[pid][to];
+				
+		for (int i=0; i<counter_moves.length; i++) {
+			if (counter_moves[i] == move) {
+				return true;
+			}
 		}
 		
 		return false;
