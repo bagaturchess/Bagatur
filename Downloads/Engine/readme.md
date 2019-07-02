@@ -16,6 +16,8 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 # Revision History
 
+Version 1.7b (2 July 2019)
+  * Bugfix: into the time control found during TCEC Season 16 testing by Aloril
 
 Version 1.7a (18 April 2019)
   * Optimizations of move ordering: bad captures are ordered with higher value

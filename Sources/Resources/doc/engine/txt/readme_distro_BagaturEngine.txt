@@ -16,7 +16,7 @@ Hints:
      By default it runs with 1024M of memory, but uses only 70% of it (30% are for transposition table and the rest of 40% is used for other caches).
      Because of java programming language specifics, changes in memory could lead to bad performance, anyway if necessary it could be changed by editing the corresponding *.ini or *.bat file.
      
-  2. Endgame Tablebases are not supported.
+  2. For now, Syzygy Endgame Tablebases are supported only into the single core version.
 	 
   3. On Laptop - for optimal performance make sure that: Laptop is connected to power supply (by either cable or docking station) and power plan is set to 'Maximum Performance'
    
