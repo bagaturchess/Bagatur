@@ -517,7 +517,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//IID PV Node
-		if (!tpt_found && rest >= 6) {
+		if (!tpt_found) {
 			
 			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
@@ -593,9 +593,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getTPT().unlock();
 			
 	        if (depth > 0
-	        		&& rest >= 6//depth
+	        		//&& rest >= 6//depth
 	        		&& !disableExts
-	        		&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
+	        		//&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
 	        		&& tptEntry != null
 	        		//&& tptEntry.getDepth() >= rest - 3
 	        		) {
@@ -613,7 +613,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					int reduction = (PLY * rest) / 2;
 					if (reduction >= PLY) {
 						
-						int singularBeta = ttValue - 2 * rest;
+						int singularBeta = ttValue;// - 2 * rest;
 						
 						backtrackingInfo.excluded_move = tptEntry.getBestMove_lower();
 						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, singularBeta,
@@ -776,7 +776,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				int cur_eval;
-				if (searchedCount == 0) {
+				if (cur_move == tpt_move) {
 					
 					cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, false,
 							best_move, prevbest, prevPV, rootColour,
@@ -1243,7 +1243,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//IID NONPV Node
-		if (!tpt_found && rest >= 6) {
+		if (!tpt_found) {
 			
 			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
@@ -1286,11 +1286,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		
         if (STATIC_PRUNING1 && useStaticPrunning
                 ) {
-                
+            
             if (inCheck) {
                 throw new IllegalStateException("In check in useStaticPrunning");
             }
-        
+            
             if (tpt_lower > TPTEntry.MIN_VALUE) {
                 if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
                     return tpt_lower;
@@ -1308,9 +1308,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getTPT().unlock();
 			
 	        if (depth > 0
-	        		&& rest >= 6//depth
+	        		//&& rest >= 6//depth
 	        		&& !disableExts
-	        		&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
+	        		//&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
 	        		&& tptEntry != null
 	        		//&& tptEntry.getDepth() >= rest - 3
 	        		) {
@@ -1328,7 +1328,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					int reduction = (PLY * rest) / 2;
 					if (reduction >= PLY) {
 						
-						int singularBeta = ttValue - 2 * rest;
+						int singularBeta = ttValue;// - 2 * rest;
 						
 						backtrackingInfo.excluded_move = tptEntry.getBestMove_lower();
 						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, singularBeta,
@@ -1484,7 +1484,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				int cur_eval;
-				if (searchedCount == 0) {
+				if (cur_move == tpt_move) {
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, false,
 							best_move, prevbest, prevPV, rootColour,
