@@ -25,32 +25,41 @@ package bagaturchess.search.impl.evalcache;
 
 import bagaturchess.bitboard.api.IBinarySemaphore;
 import bagaturchess.bitboard.impl.datastructs.lrmmap.LRUMapLongObject;
+import bagaturchess.search.api.internal.ISearch;
+import bagaturchess.search.impl.utils.SearchUtils;
 
 
 public class EvalCache extends LRUMapLongObject<IEvalEntry> implements IEvalCache {
 	
-	public EvalCache(int maxsize, boolean fillWithDummyEntries, IBinarySemaphore _semaphore) {
-		super(new EvalEntryFactory(), maxsize, fillWithDummyEntries, _semaphore);
+	
+	public EvalCache(int max_level, int _maxSize, boolean fillWithDummyEntries, IBinarySemaphore _semaphore) {
+		super(new EvalEntryFactory(max_level), _maxSize, fillWithDummyEntries, _semaphore);
 	}
 	
-	public IEvalEntry get(long key) {
-		EvalEntry result =  (EvalEntry) super.getAndUpdateLRU(key);
-		return result;
+	
+	public IEvalEntry get(long key) {	
+		return super.getAndUpdateLRU(key);
 	}
 	
-	public void put(long hashkey, double eval, boolean sketch) {
-		IEvalEntry entry = super.getAndUpdateLRU(hashkey);
-		if (entry != null) {
-			//Multithreaded access
-		} else {
-			entry = associateEntry(hashkey);
+	
+	public void put(long hashkey, int _level, double _eval) {
+		
+		if (_eval == ISearch.MAX || _eval == ISearch.MIN) {
+			throw new IllegalStateException("_eval=" + _eval);
 		}
-		((EvalEntry)entry).setEval((int) eval);
-		((EvalEntry)entry).setSketch(sketch);
-	}
 
-	@Override
-	public void put(long hashkey, int level, double eval, int alpha, int beta) {
-		throw new UnsupportedOperationException();
+		if (_eval >= ISearch.MAX_MAT_INTERVAL || _eval <= -ISearch.MAX_MAT_INTERVAL) {
+			if (!SearchUtils.isMateVal((int)_eval)) {
+				throw new IllegalStateException("not mate val _eval=" + _eval);
+			}
+		}
+		
+		EvalEntry entry = (EvalEntry) super.getAndUpdateLRU(hashkey);
+		if (entry != null) {
+			entry.update(_level, (int)_eval);
+		} else {
+			entry = (EvalEntry) associateEntry(hashkey);
+			entry.init(_level, (int)_eval);
+		}
 	}
 }

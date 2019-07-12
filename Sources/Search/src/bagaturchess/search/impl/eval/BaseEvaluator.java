@@ -102,29 +102,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 	public double fullEval(int depth, int alpha, int beta, int rootColour) {
 		
 		
-		long hashkey = bitboard.getHashKey();
-		
-		if (USE_CACHE && evalCache != null) {
-			evalCache.lock();
-			IEvalEntry cached = evalCache.get(hashkey);
-			
-			if (cached != null) {
-				int level = cached.getLevel();
-				switch (level) {
-					case CACHE_LEVEL_5:
-						int eval = (int) cached.getEval();
-						evalCache.unlock();
-						return (int) returnVal(eval);
-					case CACHE_LEVEL_4:
-						break;
-					default:
-						//Do Nothing
-				}
-			}
-			evalCache.unlock();
-		}
-		
-		
 		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
 			
 			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
@@ -152,6 +129,29 @@ public abstract class BaseEvaluator implements IEvaluator {
 		}
 		
 		
+		long hashkey = bitboard.getHashKey();
+		
+		if (USE_CACHE && evalCache != null) {
+			evalCache.lock();
+			IEvalEntry cached = evalCache.get(hashkey);
+			
+			if (cached != null) {
+				int level = cached.getLevel();
+				switch (level) {
+					case CACHE_LEVEL_5:
+						int eval = (int) cached.getEval();
+						evalCache.unlock();
+						return (int) returnVal(eval);
+					case CACHE_LEVEL_4:
+						break;
+					default:
+						//Do Nothing
+				}
+			}
+			evalCache.unlock();
+		}
+		
+		
 		double eval = 0;
 		
 		eval += phase1();
@@ -162,8 +162,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		if (USE_CACHE && evalCache != null) {
 			evalCache.lock();
-			//evalCache.put(hashkey, (int) eval, false);
-			evalCache.put(hashkey, CACHE_LEVEL_MAX, (int) eval, alpha, beta);
+			evalCache.put(hashkey, CACHE_LEVEL_MAX, (int) eval);
 			evalCache.unlock();
 		}
 		
@@ -290,11 +289,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 			if (USE_LAZY) {
 				if (USE_CACHE && evalCache != null) {
 					evalCache.lock();
-					evalCache.put(hashkey, CACHE_LEVEL_1, (int) eval,
-				
-														(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
-														(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
-													);
+					evalCache.put(hashkey, CACHE_LEVEL_1, (int) eval);
 					evalCache.unlock();
 				}
 				return eval_test;
@@ -309,10 +304,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 			if (USE_LAZY) {
 				if (USE_CACHE && evalCache != null) {
 					evalCache.lock();
-					evalCache.put(hashkey, CACHE_LEVEL_2, (int) eval,
-								(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
-								(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
-							);
+					evalCache.put(hashkey, CACHE_LEVEL_2, (int) eval);
 					evalCache.unlock();
 				}
 				return eval_test;
@@ -326,10 +318,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 			if (USE_LAZY) {
 				if (USE_CACHE && evalCache != null) {
 					evalCache.lock();
-					evalCache.put(hashkey, CACHE_LEVEL_3, (int) eval,
-								(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
-								(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
-						);
+					evalCache.put(hashkey, CACHE_LEVEL_3, (int) eval);
 					evalCache.unlock();
 				}
 				return eval_test;
@@ -343,10 +332,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 			if (USE_LAZY) {
 				if (USE_CACHE && evalCache != null) {
 					evalCache.lock();
-					evalCache.put(hashkey, CACHE_LEVEL_4, (int) eval,
-								(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha,
-								(bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta
-						);
+					evalCache.put(hashkey, CACHE_LEVEL_4, (int) eval);
 					evalCache.unlock();
 				}
 				return eval_test;
@@ -382,8 +368,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		if (USE_CACHE && evalCache != null) {
 			evalCache.lock();
-			//evalCache.put(hashkey, (int) eval, false);
-			evalCache.put(hashkey, CACHE_LEVEL_MAX, (int) eval, alpha, beta);
+			evalCache.put(hashkey, CACHE_LEVEL_MAX, (int) eval);
 			evalCache.unlock();
 		}
 		

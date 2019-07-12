@@ -22,43 +22,59 @@
  */
 package bagaturchess.search.impl.evalcache;
 
+
 public class EvalEntry implements IEvalEntry {
 	
-	private int eval;
-	private boolean sketch;
-
-	public EvalEntry() {
-		sketch = false;
+	byte level;
+	int eval;
+	
+	public EvalEntry(int _max_level) {
 	}
 	
-	public boolean isSketch() {
-		return sketch;
+	
+	public void init(int _level, int _eval) {
+		level = (byte) _level;
+		eval = _eval;	 
 	}
-
-	public void setSketch(boolean sketch) {
-		this.sketch = sketch;
+	
+	public void update(int _level, int _eval) {
+		
+		if (_level > level) {
+			
+			init(_level, _eval);
+			
+		} else if (_level == level) {		
+			
+			if (eval != _eval) {
+				//throw new IllegalStateException("eval=" + eval + ", _eval=" + _eval);
+				eval = _eval;
+			}
+			
+		} else {
+			//TODO
+			//throw new IllegalStateException();
+		}
 	}
-
-	public int getEval() {
-		return eval;
-	}
-
-	public void setEval(int eval) {
-		this.eval = eval;
-	}
+	
 
 	@Override
 	public int getLevel() {
-		return 1;
+		return level;
 	}
 
-	@Override
-	public int getLowerBound() {
-		throw new UnsupportedOperationException();
-	}
 
 	@Override
-	public int getUpperBound() {
-		throw new UnsupportedOperationException();
+	public int getEval() {
+		return eval;
+	}
+	
+	
+	public String toString() {
+		String result = "";
+		
+		result += " level=" + level;
+		result += ", eval=" + eval;
+		
+		return result;
 	}
 }

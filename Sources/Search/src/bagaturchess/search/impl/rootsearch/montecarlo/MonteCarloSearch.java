@@ -31,7 +31,7 @@ import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
-import bagaturchess.search.impl.evalcache.EvalCache1;
+import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
@@ -69,7 +69,7 @@ public class MonteCarloSearch extends RootSearch_BaseImpl {
 		IEvaluator evaluator = getSharedData().getEvaluatorFactory().create(
 				getBitboardForSetup(),
 				//new EvalCache(100, true, new BinarySemaphore_Dummy()),
-				new EvalCache1(5, 10000, true, new BinarySemaphore_Dummy()),
+				new EvalCache(5, 10000, true, new BinarySemaphore_Dummy()),
 				getRootSearchConfig().getEvalConfig());
 		
 		monteCarlo = new MonteCarlo(getBitboardForSetup(), evaluator);

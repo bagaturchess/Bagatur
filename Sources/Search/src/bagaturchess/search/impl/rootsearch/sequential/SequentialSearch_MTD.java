@@ -38,7 +38,7 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.impl.evalcache.EvalCache1;
+import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
@@ -132,7 +132,7 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 			IEvaluator evaluator = getSharedData().getEvaluatorFactory().create(
 					getBitboardForSetup(),
 					//new EvalCache(100, true, new BinarySemaphore_Dummy()),
-					new EvalCache1(5, 100, true, new BinarySemaphore_Dummy()),
+					new EvalCache(5, 100, true, new BinarySemaphore_Dummy()),
 					getRootSearchConfig().getEvalConfig());
 			initialValue = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, getBitboardForSetup().getColourToMove());
 		}
