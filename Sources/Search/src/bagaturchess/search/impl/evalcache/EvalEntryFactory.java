@@ -27,9 +27,6 @@ import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
 
 
 public class EvalEntryFactory implements DataObjectFactory<IEvalEntry> {
-
-	
-	private static final int TEST_SIZE = 100000;
 	
 	
 	private int max_level;
@@ -42,41 +39,6 @@ public class EvalEntryFactory implements DataObjectFactory<IEvalEntry> {
 	
 	public IEvalEntry createObject() {
 		return new EvalEntry(max_level);
-	}
-
-	
-	public static final long getEntrySize() {
-		long size = 0;
-		
-		System.gc();
-		
-		long memBefore = getFreeMemory();
-		
-		EvalEntry[] all = new EvalEntry[TEST_SIZE];
-		for (int i=0; i<all.length; i++) {
-			all[i] = new EvalEntry(1);
-		}
-		long memAfter = getFreeMemory();
-		
-		size = (memBefore - memAfter) / TEST_SIZE;
-		
-		return size;
-	}
-
-	private static long getFreeMemory() {
-		
-		long max = Runtime.getRuntime().maxMemory();
-		long total = Runtime.getRuntime().totalMemory();
-		long free = Runtime.getRuntime().freeMemory();
-		long memBefore = Runtime.getRuntime().freeMemory();
-		free = free + (max - total);
-		
-		return memBefore;
-	}
-	
-	
-	public static void main(String[] args) {
-		System.out.println(getEntrySize());
 	}
 }
 

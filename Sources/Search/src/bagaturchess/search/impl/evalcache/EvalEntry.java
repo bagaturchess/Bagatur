@@ -25,8 +25,10 @@ package bagaturchess.search.impl.evalcache;
 
 public class EvalEntry implements IEvalEntry {
 	
+	
 	byte level;
 	int eval;
+	
 	
 	public EvalEntry(int _max_level) {
 	}
