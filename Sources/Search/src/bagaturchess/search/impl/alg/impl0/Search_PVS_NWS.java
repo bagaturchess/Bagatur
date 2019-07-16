@@ -47,7 +47,10 @@ public class Search_PVS_NWS extends SearchImpl {
 	private double LMR_REDUCTION_MULTIPLIER 			= 1;
 	private double NULL_MOVE_REDUCTION_MULTIPLIER 		= 1;
 	private double IID_DEPTH_MULTIPLIER 				= 1;
+	private boolean STATIC_PRUNING1						= false;
 	private boolean STATIC_PRUNING2 					= true;
+	private static final int[] MARGIN_STATIC_NULLMOVE 	= { 0, 60, 130, 210, 300, 400, 510 };
+	private static final int[] MARGIN_RAZORING 			= { 0, 240, 280, 320 };
 	
 	
 	private BacktrackingInfo[] backtracking 			= new BacktrackingInfo[MAX_DEPTH + 1];
@@ -327,16 +330,98 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (!pv) {
+		if (!pv && !inCheck) {
+			
+	        if (STATIC_PRUNING1) {
+	            
+	            if (tpt_lower > TPTEntry.MIN_VALUE) {
+	                if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
+	                	
+	                    node.eval = tpt_lower;
+	                    node.leaf = true;
+	                    node.nullmove = false;
+	                    
+	                    node.bestmove = 0;
+	                    env.getTPT().lock();
+	                    buff_tpt_depthtracking[0] = 0;
+	                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
+	                    env.getTPT().unlock();
+	                    
+	                    
+	                    return node.eval;
+	                }
+	            }
+	            
+				if (alpha_org > backtrackingInfo.static_eval + getAlphaTrustWindow(mediator, rest)) {
+					int qeval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour, false);
+					if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
+						
+	                    node.eval = qeval;
+	                    node.leaf = true;
+	                    node.nullmove = false;
+	                    
+	                    node.bestmove = 0;
+	                    env.getTPT().lock();
+	                    buff_tpt_depthtracking[0] = 0;
+	                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
+	                    env.getTPT().unlock();
+	                    
+	                    
+	                    return node.eval;
+					}
+				}
+				
+				//Static null move pruning
+				if (rest < MARGIN_STATIC_NULLMOVE.length) {
+					if (backtrackingInfo.static_eval - MARGIN_STATIC_NULLMOVE[rest] >= beta) {
+						
+	                    node.eval = backtrackingInfo.static_eval;
+	                    node.leaf = true;
+	                    node.nullmove = false;
+	                    
+	                    node.bestmove = 0;
+	                    env.getTPT().lock();
+	                    buff_tpt_depthtracking[0] = 0;
+	                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
+	                    env.getTPT().unlock();
+	                    
+	                    
+	                    return node.eval;
+					}
+				}
+				
+				
+				//Razoring
+				if (rest < MARGIN_RAZORING.length && Math.abs(alpha_org) < MAX_MAT_INTERVAL) {
+					if (backtrackingInfo.static_eval + MARGIN_RAZORING[rest] < alpha_org) {
+						int qeval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org - MARGIN_RAZORING[rest], alpha_org - MARGIN_RAZORING[rest] + 1, rootColour, false);
+						if (qeval + MARGIN_RAZORING[rest] <= alpha_org) {
+
+		                    node.eval = qeval;
+		                    node.leaf = true;
+		                    node.nullmove = false;
+		                    
+		                    node.bestmove = 0;
+		                    env.getTPT().lock();
+		                    buff_tpt_depthtracking[0] = 0;
+		                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
+		                    env.getTPT().unlock();
+		                    
+		                    
+		                    return node.eval;
+						}
+					}
+				}
+	        }
+			
+			
 			boolean hasAtLeastOnePiece = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 				env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
 			
 			boolean hasAtLeastThreePieces = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 9 :
 				env.getBitboard().getMaterialFactor().getBlackFactor() >= 9;
 			
-			if (!inCheck
-					&& hasAtLeastOnePiece
-					) {
+			if (hasAtLeastOnePiece) {
 							
 				if (backtrackingInfo.static_eval >= beta) {
 					
@@ -430,6 +515,31 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
         
         
+		if (!pv && !inCheck) {
+			
+	        if (STATIC_PRUNING1) {
+	        	
+	            if (tpt_lower > TPTEntry.MIN_VALUE) {
+	                if (alpha_org > tpt_lower + getAlphaTrustWindow(mediator, rest) ) {
+	                	
+	                    node.eval = tpt_lower;
+	                    node.leaf = true;
+	                    node.nullmove = false;
+	                    
+	                    node.bestmove = 0;
+	                    env.getTPT().lock();
+	                    buff_tpt_depthtracking[0] = 0;
+	                    extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
+	                    env.getTPT().unlock();
+	                    
+	                    
+	                    return node.eval;
+	                }
+	            }
+	        }
+		}
+		
+		
 		//Singular move extension
 		int singularExtension = 0;
 		
@@ -644,9 +754,11 @@ public class Search_PVS_NWS extends SearchImpl {
 						cur_eval = -search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour, false);
 					}
 					
-					if (cur_eval > best_eval) {
-						
-						cur_eval = -search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour, pv);
+					if (pv) {
+						if (cur_eval > best_eval) {
+							
+							cur_eval = -search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour, pv);
+						}
 					}
 				}
 				
