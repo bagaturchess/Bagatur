@@ -37,10 +37,8 @@ import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.alg.BacktrackingInfo;
 import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.movelists.ListAll;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
-import bagaturchess.search.impl.utils.SearchUtils;
 
 
 public class Search_PVS_NWS extends SearchImpl {
@@ -387,7 +385,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 9;
 		
 		int new_mateMove = 0;
-		boolean mateThreat = false;
+		//boolean mateThreat = false;
 		boolean zungzwang = false;
 		if (useNullMove
 				&& !inCheck
@@ -458,7 +456,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (backtrackingInfo.static_eval > alpha_org) { //PV node candidate
 						if (null_val <= alpha_org) { //but bad thing appears
 							if (null_val < 0 && isMateVal(null_val)) {//and the bad thing is mate
-								mateThreat = true;
+								//mateThreat = true;
 								
 								if (allowTPTAccess(maxdepth, depth)) {
 									env.getTPT().lock();
@@ -1055,9 +1053,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
         }
         
-        if (!inCheck && useStaticPrunning) {
+        if (STATIC_PRUNING1 && useStaticPrunning) {
         	
-        	
+            if (inCheck) {
+                throw new IllegalStateException("In check in useStaticPrunning");
+            }
+            
+            
 			//Static null move pruning
 			if (rest < MARGIN_STATIC_NULLMOVE.length) {
 				if (backtrackingInfo.static_eval - MARGIN_STATIC_NULLMOVE[rest] >= beta) {
@@ -1084,7 +1086,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 9;
 		
 		int new_mateMove = 0;
-		boolean mateThreat = false;
+		//boolean mateThreat = false;
 		boolean zungzwang = false;
 		if (useNullMove
 				&& !inCheck
@@ -1155,7 +1157,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (backtrackingInfo.static_eval > alpha_org) { //PV node candidate
 						if (null_val <= alpha_org) { //but bad thing appears
 							if (null_val < 0 && isMateVal(null_val)) {//and the bad thing is mate
-								mateThreat = true;
+								//mateThreat = true;
 								
 								if (allowTPTAccess(maxdepth, depth)) {
 									env.getTPT().lock();
