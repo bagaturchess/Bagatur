@@ -103,8 +103,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		return this.pv_search(mediator, info, initial_maxdepth, maxdepth, depth,
-				alpha_org, beta, prevNullMove, prevbest, prevprevbest, prevPV, rootColour);
+		return this.pv_search(mediator, info, initial_maxdepth, maxdepth, depth, alpha_org, beta, rootColour);
 	}
 
 
@@ -116,14 +115,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
 		return nullwin_search(mediator, info, initial_maxdepth, maxdepth, depth,
-				beta, prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
-				mateMove, useMateDistancePrunning, false, false);
+				beta, rootColour, false, false);
 	}
 	
 	
 	public int pv_search(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth,
-			int maxdepth, int depth, int alpha_org, int beta, boolean prevNullMove, int prevbest, int prevprevbest,
-			int[] prevPV, int rootColour) {
+			int maxdepth, int depth, int alpha_org, int beta, int rootColour) {
 		
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
@@ -349,7 +346,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				) {
 				
 				nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta,
-						prevNullMove, prevbest, prevprevbest, prevPV, rootColour, 0, false, !inCheck, true);
+						rootColour, !inCheck, true);
 				
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
@@ -411,8 +408,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						int singularBeta = ttValue;// - 2 * rest;
 						
 						backtrackingInfo.excluded_move = tptEntry.getBestMove_lower();
-						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, singularBeta,
-								prevNullMove, prevbest, prevprevbest, prevPV, rootColour, 0, false, true, true);
+						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, singularBeta, rootColour, true, true);
 						backtrackingInfo.excluded_move = 0;
 						
 						if (singularEval < singularBeta) {
@@ -446,10 +442,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			list.setTptMove(tpt_move);
 			list.setPrevBestMove(depth > 1 ? backtracking[depth - 2].best_move : 0);
-			
-			if (prevPV != null && depth < prevPV.length) {
-				list.setPrevpvMove(prevPV[depth]);
-			}
 			
 		} else {
 			list = lists_escapes[depth];
@@ -564,8 +556,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int cur_eval;
 				if (cur_move == tpt_move) {
 					
-					cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, false,
-							best_move, prevbest, prevPV, rootColour);
+					cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
 				} else {
 					
 					boolean staticPrunning = false;
@@ -599,22 +590,16 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					
 					
-					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
-							new_maxdepth - lmrReduction, depth + 1, -alpha, false,
-							best_move, prevbest, prevPV, rootColour,
-							0, false, staticPrunning, true);
+					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha, rootColour, staticPrunning, true);
 					
 					if (cur_eval > alpha && (lmrReduction > 0 || staticPrunning) ) {
 						
-						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha, false,
-								best_move, prevbest, prevPV, rootColour,
-								0, false, false, true);
+						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha, rootColour, false, true);
 					}
 					
 					if (cur_eval > best_eval) {
 						
-						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, false,
-								best_move, prevbest, prevPV, rootColour);
+						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
 					}
 				}
 				
@@ -711,8 +696,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	public int nullwin_search(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth,
 			int maxdepth, int depth, int beta,
-			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV, int rootColour, int mateMove,
-			boolean useMateDistancePrunning, boolean useStaticPrunning, boolean useNullMove) {
+			int rootColour, boolean useStaticPrunning, boolean useNullMove) {
 		
 		int alpha_org = beta - 1;
 		
@@ -911,12 +895,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean hasAtLeastThreePieces = (colourToMove == Figures.COLOUR_WHITE) ? env.getBitboard().getMaterialFactor().getWhiteFactor() >= 9 :
 			env.getBitboard().getMaterialFactor().getBlackFactor() >= 9;
 		
-		int new_mateMove = 0;
-		//boolean mateThreat = false;
 		boolean zungzwang = false;
 		if (useNullMove
 				&& !inCheck
-				&& !prevNullMove
 				&& hasAtLeastOnePiece
 				) {
 						
@@ -931,20 +912,19 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeNullMoveForward();
 				int null_val = -nullwin_search(mediator, info,
 						initial_maxdepth, null_maxdepth,
-						depth + 1, -(beta - 1), true, prevprevbest, prevbest, prevPV, rootColour,
-						0, useMateDistancePrunning, useStaticPrunning, useNullMove);
+						depth + 1, -(beta - 1), rootColour,
+						useStaticPrunning, useNullMove);
+				env.getBitboard().makeNullMoveBackward();
 				
 				if (null_val >= beta) {
-					
-					env.getBitboard().makeNullMoveBackward();
 					
 					if (hasAtLeastThreePieces) {
 						return null_val;
 					}
 					
 					int null_val_ver = nullwin_search(mediator, info, initial_maxdepth, null_maxdepth, depth,
-							beta, prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
-							mateMove, useMateDistancePrunning, useStaticPrunning, useNullMove);
+							beta, rootColour,
+							useStaticPrunning, useNullMove);
 					
 					if (null_val_ver >= beta) {
 						return null_val_ver;
@@ -979,25 +959,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 						env.getTPT().unlock();
 					}
-				} else {
-					if (backtrackingInfo.static_eval > alpha_org) { //PV node candidate
-						if (null_val <= alpha_org) { //but bad thing appears
-							if (null_val < 0 && isMateVal(null_val)) {//and the bad thing is mate
-								//mateThreat = true;
-								
-								if (allowTPTAccess(maxdepth, depth)) {
-									env.getTPT().lock();
-									TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKey());
-									if (entry != null) {
-										new_mateMove = entry.getBestMove_lower();
-									}
-									env.getTPT().unlock();
-								}
-							}
-						}
-					}
-					
-					env.getBitboard().makeNullMoveBackward();
 				}
 			}
 		}
@@ -1013,8 +974,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					&& normDepth(maxdepth) - reduction > depth) {
 				
 				nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta,
-						prevNullMove, prevbest, prevprevbest, prevPV, rootColour,
-						mateMove, useMateDistancePrunning, useStaticPrunning, useNullMove);
+						rootColour,
+						useStaticPrunning, useNullMove);
 				
 				if (allowTPTAccess(maxdepth, depth)) {
 					env.getTPT().lock();
@@ -1093,7 +1054,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						backtrackingInfo.excluded_move = tptEntry.getBestMove_lower();
 						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, singularBeta,
-								prevNullMove, prevbest, prevprevbest, prevPV, rootColour, mateMove, useMateDistancePrunning, useStaticPrunning, useNullMove);
+								rootColour, useStaticPrunning, useNullMove);
 						backtrackingInfo.excluded_move = 0;
 						
 						if (singularEval < singularBeta) {
@@ -1121,17 +1082,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			list.setTptMove(tpt_move);
 			list.setPrevBestMove(depth > 1 ? backtracking[depth - 2].best_move : 0);
-			list.setMateMove(mateMove);
-			
-			if (prevPV != null && depth < prevPV.length) {
-				list.setPrevpvMove(prevPV[depth]);
-			}
-			
+
 		} else {
 			list = lists_escapes[depth];
 			list.clear();
 			
 			list.setTptMove(tpt_move);
+			list.setPrevBestMove(depth > 1 ? backtracking[depth - 2].best_move : 0);
 		}
 		
 		
@@ -1246,9 +1203,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int cur_eval;
 				if (cur_move == tpt_move) {
 					
-					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, false,
-							best_move, prevbest, prevPV, rootColour,
-							new_mateMove, useMateDistancePrunning, !isCheckMove, true);
+					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, !isCheckMove, true);
 				} else {
 					
 					boolean staticPrunning = false;
@@ -1282,16 +1237,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					
 					
-					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
-							new_maxdepth - lmrReduction, depth + 1, -alpha_org, false,
-							best_move, prevbest, prevPV, rootColour,
-							new_mateMove, useMateDistancePrunning, staticPrunning, true);
+					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha_org, rootColour, staticPrunning, true);
 					
 					if (cur_eval > alpha_org && (lmrReduction > 0 || staticPrunning) ) {
 						
-						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, false,
-								best_move, prevbest, prevPV, rootColour,
-								new_mateMove, useMateDistancePrunning, false, true);
+						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false, true);
 					}
 				}
 				
