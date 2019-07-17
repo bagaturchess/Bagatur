@@ -8,7 +8,7 @@ public class TimeConfigImpl implements ITimeConfig {
 	
 	
 	private double timeoptimization_ConsumedTimeVSRemainingTimePercent 	= 0.50;
-	private int moveEvallDiff_MaxScoreDiff 								= 75;
+	private int moveEvallDiff_MaxScoreDiff 								= 150;
 	private double moveEvallDiff_MaxTotalTimeUsagePercent				= 0.25;
 	
 	
