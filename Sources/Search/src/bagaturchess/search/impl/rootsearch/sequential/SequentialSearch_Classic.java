@@ -169,7 +169,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch before loop");
 					
 					int prevEval = final_initialValue;
-					int ASPIRATION_WINDOW = 10;
+					int ASPIRATION_WINDOW = 15;
 					
 					for (int maxdepth = startIteration; maxdepth <= maxIterations; maxdepth++) {
 						
@@ -180,46 +180,30 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 						
 						try {
 							
-							//Search with null window to prepare evaluation score and TPT entries
-							/*int eval = searcher.nullwin_search(final_mediator, info,
-									ISearch.PLY * (maxdepth - 1), ISearch.PLY * (maxdepth - 1),	0,
-									prevEval,
-									false, 0, 0, final_prevPV, searcher.getEnv().getBitboard().getColourToMove(),
-									0, 0, false, 0, !go.isPonder());
+							int eval = prevEval;
+							int window = ASPIRATION_WINDOW;
+							int multiplier = 2;
+							int alpha;
+							int beta;
 							
-							//Search around evaluation score with aspiration window +- ASPIRATION_WINDOW
-							int window_min = eval - ASPIRATION_WINDOW;
-							int window_max = eval + ASPIRATION_WINDOW;
-							eval = searcher.pv_search(final_mediator,
-									null, info,
-									ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
-									window_min, window_max,
-									0, 0, final_prevPV,
-									false, 0, searcher.getEnv().getBitboard().getColourToMove(),
-									0, 0, false, 0, !go.isPonder());
-							
-							//If eval is outside the aspiration window, than search with MIN and MAX values
-							if (eval <= window_min || eval >= window_max) {*/
-								int eval = searcher.pv_search(final_mediator,
+							do {
+								
+								alpha = eval - window;
+								beta = eval + window;
+								
+								eval = searcher.pv_search(final_mediator,
 										null, info,
 										ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
-										prevEval - 15, prevEval + 15,
+										alpha, beta,
 										0, 0, final_prevPV,
 										false, 0, searcher.getEnv().getBitboard().getColourToMove(),
 										0, 0, false, 0, !go.isPonder());
-							//}
-								if (eval <= prevEval - 15 || eval >= prevEval + 15) {
-									eval = searcher.pv_search(final_mediator,
-											null, info,
-											ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
-											ISearch.MIN, ISearch.MAX,
-											0, 0, final_prevPV,
-											false, 0, searcher.getEnv().getBitboard().getColourToMove(),
-											0, 0, false, 0, !go.isPonder());
-								}
+								
+								window *= multiplier;
+								
+							} while (eval < alpha || eval > beta);
 							
 							prevEval = eval;
-							
 							
 							List<Integer> pv_buffer = new ArrayList<Integer>();
 							info.setPV(PVNode.convertPV(searcher.getPvman().load(0), pv_buffer));
