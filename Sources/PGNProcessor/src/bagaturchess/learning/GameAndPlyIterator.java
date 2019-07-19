@@ -48,7 +48,8 @@ public class GameAndPlyIterator implements IGameIterator, IPlyIterator {
 	
 	
 	private int counter = 0;
-	private int currentGameResult;
+	private double currentGameResult;
+	private int currentGameMovesCount;
 	
 	private static final String NET_FILE = "net.bin";
 	private MultiLayerPerceptron network;
@@ -103,14 +104,16 @@ public class GameAndPlyIterator implements IGameIterator, IPlyIterator {
 		String result = pgnGame.getResult();
 		
 		if (result.equals("1-0")) {
-			currentGameResult = 1;
+			currentGameResult = 1000;
 		} else if (result.equals("0-1")) {
-			currentGameResult = -1;
+			currentGameResult = -1000;
 		} else if (result.equals("1/2-1/2")) {
 			currentGameResult = 0;
 		} else {
-			currentGameResult = 123;
+			currentGameResult = 12345;
 		}
+		
+		currentGameMovesCount = 2 * pgnGame.getTurns().size();
 		
 		counter++;
 		if (counter % 1000 == 0) {
@@ -124,7 +127,7 @@ public class GameAndPlyIterator implements IGameIterator, IPlyIterator {
 	
 	@Override
 	public void preMove(int colour, int move, IBoard bitboard, int moveNumber) {
-		if (currentGameResult == 123) {
+		if (currentGameResult == 12345) {
 			return;
 		}
 		
@@ -139,15 +142,16 @@ public class GameAndPlyIterator implements IGameIterator, IPlyIterator {
 			actualWhitePlayerEval = -actualWhitePlayerEval;
 		}*/
 		
-		
 		sumDiffs1 += Math.abs(0 - currentGameResult);
 		sumDiffs2 += Math.abs(currentGameResult - actualWhitePlayerEval);
 		
 		
+		double adjustment = 1;//moveNumber / (double) currentGameMovesCount;
+		
 		DataSet trainingSet = new DataSet(NeuralNetworkUtils_PST_And_AllFeatures.getInputsSize(), 1);
 		NeuralNetworkUtils.clearInputsArray(inputs);
 		NeuralNetworkUtils_PST_And_AllFeatures.fillInputs(network, inputs, (IBitBoard) bitboard, filler);
-        trainingSet.addRow(new DataSetRow(inputs, new double[]{currentGameResult}));
+        trainingSet.addRow(new DataSetRow(inputs, new double[]{adjustment * currentGameResult}));
         network.learn(trainingSet);
 		
 		bitboard.makeMoveBackward(move);
@@ -156,7 +160,7 @@ public class GameAndPlyIterator implements IGameIterator, IPlyIterator {
 	
 	@Override
 	public void postMove() {
-		if (currentGameResult == 123) {
+		if (currentGameResult == 12345) {
 			return;
 		}
 		

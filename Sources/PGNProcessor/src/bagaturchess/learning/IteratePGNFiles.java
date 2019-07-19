@@ -34,7 +34,8 @@ public class IteratePGNFiles {
 	
 	public static void main(String[] args) {
 		
-		String pgnFile = "all2600.zip";
+		//String pgnFile = "all2600.zip";
+		String pgnFile = "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\PGN";
 		try {
 			int iteration = 1;
 			while (true) {
