@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.deeplearning.impl1;
+package bagaturchess.deeplearning.impl1_v7;
 
 
 import java.util.Random;
@@ -32,7 +32,7 @@ public class NeuralNetworkUtils_AllFeatures {
 	
 	
 	public static int getInputsSize() {
-		return 2 * 47;
+		return 2 * 58;
 	}
 	
 	
@@ -45,14 +45,14 @@ public class NeuralNetworkUtils_AllFeatures {
 		
 		MultiLayerPerceptron mlp = new MultiLayerPerceptron(TransferFunctionType.LINEAR,
 				getInputsSize(),
-				//getInputsSize(),
+				20, //getInputsSize(),
 				1);
 		mlp.randomizeWeights(new WeightsRandomizer(new Random(777)));
 		
         mlp.setLearningRule(new MomentumBackpropagation());
         
-        mlp.getLearningRule().setLearningRate(0.00001);
-        //mlp.getLearningRule().setLearningRate(0.0000001);
+        //mlp.getLearningRule().setLearningRate(0.000001);
+        mlp.getLearningRule().setLearningRate(0.0000001);
         
         return mlp;
 	}

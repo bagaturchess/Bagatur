@@ -27,7 +27,6 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
-import bagaturchess.learning.goldmiddle.impl2.filler.Bagatur_V17_SignalFiller;
 
 
 public class Bagatur_ALL_SignalFiller_InArray implements Bagatur_V17_FeaturesConstants {
