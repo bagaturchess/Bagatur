@@ -36,8 +36,11 @@ import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.BoardUtils;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl1.Board3;
+import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEvalFactory;
+import bagaturchess.learning.goldmiddle.impl1.cfg.BoardConfigImpl_V17;
 import bagaturchess.tools.pgn.impl.ExcludedGames;
 import bagaturchess.tools.pgn.impl.PGNConstants;
 import bagaturchess.tools.pgn.impl.PGNGame;
@@ -53,7 +56,8 @@ public class PGNParser {
 	
 	
 	public PGNParser() {
-		bitboard = BoardUtils.createBoard_WithPawnsCache();
+		//bitboard = BoardUtils.createBoard_WithPawnsCache();
+		bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, BagaturPawnsEvalFactory.class.getName(), new BoardConfigImpl_V17(), 10000);
 		//bitboard = new Board3();
 		//bitboard.setAttacksSupport(EngineConfig.getSingleton().getFieldsStatesSupport(), EngineConfig.getSingleton().getFieldsStatesSupport());
 	}
