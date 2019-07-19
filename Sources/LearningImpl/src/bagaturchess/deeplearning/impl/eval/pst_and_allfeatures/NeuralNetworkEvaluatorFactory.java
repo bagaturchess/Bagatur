@@ -1,4 +1,4 @@
-package bagaturchess.deeplearning.impl.eval.past_and_allfeatures;
+package bagaturchess.deeplearning.impl.eval.pst_and_allfeatures;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
