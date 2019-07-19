@@ -34,10 +34,9 @@ import org.neuroph.nnet.learning.BackPropagation;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoard;
-import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
-import bagaturchess.deeplearning.impl.NeuralNetworkUtils_PST_And_AllFeatures;
-import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_SignalFiller_InArray;
+import bagaturchess.deeplearning.impl1_v7.NeuralNetworkUtils_AllFeatures;
+import bagaturchess.learning.goldmiddle.impl1.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.tools.pgn.api.IGameIterator;
 import bagaturchess.tools.pgn.api.IPlyIterator;
 import bagaturchess.tools.pgn.impl.PGNGame;
@@ -67,7 +66,7 @@ public class GameAndPlyIterator implements IGameIterator, IPlyIterator {
 		if ((new File(NET_FILE)).exists() ){
 			network = NeuralNetworkUtils.loadNetwork(NET_FILE);
 		} else {
-			network = NeuralNetworkUtils_PST_And_AllFeatures.buildNetwork();
+			network = NeuralNetworkUtils_AllFeatures.buildNetwork();
 		}
 		
         network.getLearningRule().addListener(new LearningEventListener() {
@@ -83,7 +82,7 @@ public class GameAndPlyIterator implements IGameIterator, IPlyIterator {
 			}
 		});
         
-        inputs = new double[NeuralNetworkUtils_PST_And_AllFeatures.getInputsSize()];
+        inputs = new double[NeuralNetworkUtils_AllFeatures.getInputsSize()];
 	}
 	
 	
@@ -134,7 +133,7 @@ public class GameAndPlyIterator implements IGameIterator, IPlyIterator {
 		bitboard.makeMoveForward(move);
 		
 		NeuralNetworkUtils.clearInputsArray(inputs);
-		NeuralNetworkUtils_PST_And_AllFeatures.fillInputs(network, inputs, (IBitBoard) bitboard, filler);
+		NeuralNetworkUtils_AllFeatures.fillInputs(network, inputs, (IBitBoard) bitboard, filler);
 		NeuralNetworkUtils.calculate(network);
 		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);
 		
@@ -148,9 +147,9 @@ public class GameAndPlyIterator implements IGameIterator, IPlyIterator {
 		
 		double adjustment = 1;//moveNumber / (double) currentGameMovesCount;
 		
-		DataSet trainingSet = new DataSet(NeuralNetworkUtils_PST_And_AllFeatures.getInputsSize(), 1);
+		DataSet trainingSet = new DataSet(NeuralNetworkUtils_AllFeatures.getInputsSize(), 1);
 		NeuralNetworkUtils.clearInputsArray(inputs);
-		NeuralNetworkUtils_PST_And_AllFeatures.fillInputs(network, inputs, (IBitBoard) bitboard, filler);
+		NeuralNetworkUtils_AllFeatures.fillInputs(network, inputs, (IBitBoard) bitboard, filler);
         trainingSet.addRow(new DataSetRow(inputs, new double[]{adjustment * currentGameResult}));
         network.learn(trainingSet);
 		

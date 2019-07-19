@@ -27,6 +27,10 @@ import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.random.WeightsRandomizer;
 
+import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.deeplearning.api.NeuralNetworkUtils;
+import bagaturchess.learning.goldmiddle.impl1.filler.Bagatur_ALL_SignalFiller_InArray;
+
 
 public class NeuralNetworkUtils_AllFeatures {
 	
@@ -45,15 +49,24 @@ public class NeuralNetworkUtils_AllFeatures {
 		
 		MultiLayerPerceptron mlp = new MultiLayerPerceptron(TransferFunctionType.LINEAR,
 				getInputsSize(),
-				20, //getInputsSize(),
+				//20, //getInputsSize(),
 				1);
 		mlp.randomizeWeights(new WeightsRandomizer(new Random(777)));
 		
         mlp.setLearningRule(new MomentumBackpropagation());
         
-        //mlp.getLearningRule().setLearningRate(0.000001);
-        mlp.getLearningRule().setLearningRate(0.0000001);
+        mlp.getLearningRule().setLearningRate(0.000001);
+        //mlp.getLearningRule().setLearningRate(0.0000001);
         
         return mlp;
+	}
+	
+	
+	public static void fillInputs(MultiLayerPerceptron mlp, double[] inputs, IBitBoard board, Bagatur_ALL_SignalFiller_InArray filler) {
+		NeuralNetworkUtils.clearInputsArray(inputs);
+		
+		filler.fillSignals(inputs, 0);
+		
+		mlp.setInput(inputs);
 	}
 }
