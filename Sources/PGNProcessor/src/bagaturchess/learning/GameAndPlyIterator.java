@@ -36,7 +36,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
-import bagaturchess.deeplearning.api.NeuralNetworkUtils_PST_And_AllFeatures;
+import bagaturchess.deeplearning.impl.NeuralNetworkUtils_PST_And_AllFeatures;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.tools.pgn.api.IGameIterator;
 import bagaturchess.tools.pgn.api.IPlyIterator;

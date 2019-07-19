@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.deeplearning.api;
+package bagaturchess.deeplearning.impl;
 
 
 import java.util.Random;
@@ -30,6 +30,7 @@ import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.random.WeightsRandomizer;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.deeplearning.api.NeuralNetworkUtils;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_SignalFiller_InArray;
 
 

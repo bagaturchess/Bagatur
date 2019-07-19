@@ -35,7 +35,7 @@ import org.neuroph.nnet.learning.BackPropagation;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
-import bagaturchess.deeplearning.api.NeuralNetworkUtils_AllFeatures;
+import bagaturchess.deeplearning.impl.NeuralNetworkUtils_AllFeatures;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 

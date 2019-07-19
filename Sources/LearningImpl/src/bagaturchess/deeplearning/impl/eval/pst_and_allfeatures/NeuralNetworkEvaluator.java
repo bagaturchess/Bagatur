@@ -6,7 +6,7 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
-import bagaturchess.deeplearning.api.NeuralNetworkUtils_PST_And_AllFeatures;
+import bagaturchess.deeplearning.impl.NeuralNetworkUtils_PST_And_AllFeatures;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
