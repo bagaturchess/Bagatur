@@ -129,6 +129,8 @@ public class MTDSchedulerMain {
 								
 								bagaturchess.learning.goldmiddle.impl1.cfg.BoardConfigImpl_V17.class.getName(),
 								bagaturchess.learning.goldmiddle.impl1.cfg.EvaluationConfig_V17.class.getName()
+								//bagaturchess.learning.goldmiddle.impl3.cfg.BoardConfigImpl_V18.class.getName(),
+								//bagaturchess.learning.goldmiddle.impl3.cfg.EvaluationConfig_V18.class.getName()
 								}
 				);
 		

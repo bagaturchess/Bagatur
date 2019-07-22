@@ -173,7 +173,7 @@ public class Constants {
 	/**
 	 * Square bitboards
 	 */
-	public static final long A8_bit = 1L << 63;
+	/*public static final long A8_bit = 1L << 63;
 	public static final long B8_bit = 1L << 62;
 	public static final long C8_bit = 1L << 61;
 	public static final long D8_bit = 1L << 60;
@@ -244,13 +244,13 @@ public class Constants {
 	public static final long F1_bit = 1L << 2;
 	public static final long G1_bit = 1L << 1;
 	public static final long H1_bit = 1L << 0;
-
+	 */
 
 	/**
 	 * Square indexes
 	 */
 	
-	public static final int A8 = 0;
+	/*public static final int A8 = 0;
 	public static final int B8 = 1;
 	public static final int C8 = 2;
 	public static final int D8 = 3;
@@ -321,11 +321,12 @@ public class Constants {
 	public static final int F1 = 117;
 	public static final int G1 = 118;
 	public static final int H1 = 119;
+	*/
 	
 	/**
 	 * Squares bitboards by square index
 	 */
-	public static final long[] SQUARES_bits = new long[128];
+	/*public static final long[] SQUARES_bits = new long[128];
 	static {
 		SQUARES_bits[A8] = A8_bit; 
 		SQUARES_bits[B8] = B8_bit;
@@ -399,12 +400,13 @@ public class Constants {
 		SQUARES_bits[G1] = G1_bit;
 		SQUARES_bits[H1] = H1_bit;
 	}
+	*/
 	
-	public static final long getSuareBitboard_arr(int suqareIndex) {
+	/*public static final long getSuareBitboard_arr(int suqareIndex) {
 		return SQUARES_bits[suqareIndex];
-	}
+	}*/
 	
-	public static final long getSuareBitboard_switch(int suqareIndex) {
+	/*public static final long getSuareBitboard_switch(int suqareIndex) {
 		
 		switch(suqareIndex) {
 		
@@ -556,8 +558,10 @@ public class Constants {
 				throw new IllegalStateException();
 		}
 	}
+	*/
 	
-	public static final String getSuareSign(int suqareIndex) {
+	
+	/*public static final String getSuareSign(int suqareIndex) {
 		
 		switch(suqareIndex) {
 		
@@ -709,6 +713,7 @@ public class Constants {
 				throw new IllegalStateException();
 		}
 	}
+	*/
 	
 	public static final String getPieceIDString(int pieceID) {
 		switch(pieceID) {
