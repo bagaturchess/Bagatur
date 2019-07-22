@@ -100,7 +100,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 			final IFinishCallback multiPVCallback, final Go go, boolean dont_wrap_mediator) {
 		
 		if (stopper != null) {
-			throw new IllegalStateException("MTDSequentialSearch started whithout beeing stopped");
+			throw new IllegalStateException("SequentialSearch_Classic started whithout beeing stopped");
 		}
 		stopper = new Stopper();
 		
@@ -121,7 +121,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 		}
 		final int maxIterations = maxIterations_tmp; 
 		
-		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch started from depth " + startIteration + " to depth " + maxIterations);
+		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_Classic started from depth " + startIteration + " to depth " + maxIterations);
 		
 		
 		if (prevPV == null) {
@@ -166,10 +166,10 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 			public void run() {
 				try {
 					
-					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch before loop");
+					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_Classic before loop");
 					
 					int prevEval = final_initialValue;
-					int ASPIRATION_WINDOW = 15;
+					int ASPIRATION_WINDOW = 1;
 					
 					for (int maxdepth = startIteration; maxdepth <= maxIterations; maxdepth++) {
 						
@@ -197,7 +197,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 										false, 0, 0, final_prevPV, searcher.getEnv().getBitboard().getColourToMove(),
 										0, 0, false, 0, !go.isPonder());
 								
-								if (eval >= alpha && eval <= beta) {*/
+								if (eval > alpha && eval < beta) {*/
 									eval = searcher.pv_search(final_mediator,
 										null, info,
 										ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
@@ -209,7 +209,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 								
 								window *= multiplier;
 								
-							} while (eval < alpha || eval > beta);
+							} while (eval <= alpha || eval >= beta);
 							
 							prevEval = eval;
 							
@@ -234,7 +234,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 					
 					if (!isStopped()) {
 						
-						ChannelManager.getChannel().dump("MTDSequentialSearch not stopped - stopping searcher ...");
+						ChannelManager.getChannel().dump("SequentialSearch_Classic not stopped - stopping searcher ...");
 						
 						if (stopper == null) {
 							throw new IllegalStateException();
@@ -244,7 +244,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 						
 						
 						if (multiPVCallback == null) {//Non multiPV search
-							ChannelManager.getChannel().dump("MTDSequentialSearch calling final_mediator.getBestMoveSender().sendBestMove()");
+							ChannelManager.getChannel().dump("SequentialSearch_Classic calling final_mediator.getBestMoveSender().sendBestMove()");
 							final_mediator.getBestMoveSender().sendBestMove();
 						} else {
 							//MultiPV search
