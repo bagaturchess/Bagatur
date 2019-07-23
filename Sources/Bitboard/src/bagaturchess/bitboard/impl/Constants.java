@@ -29,11 +29,11 @@ public class Constants {
 	/**
 	 * Pieces colours
 	 */
-	public static final int COLOUR_WHITE = 1;
-	public static final int COLOUR_BLACK = 2;
-	public static final int[] COLOUR_OP = new int[3];
+	public static final int COLOUR_WHITE = 0;
+	public static final int COLOUR_BLACK = 1;
+	public static final int[] COLOUR_OP = new int[2];
 	static {
-		COLOUR_OP[0] = -1;
+		//COLOUR_OP[0] = -1;
 		COLOUR_OP[COLOUR_WHITE] = COLOUR_BLACK;
 		COLOUR_OP[COLOUR_BLACK] = COLOUR_WHITE;
 	}
