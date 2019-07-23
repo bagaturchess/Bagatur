@@ -54,7 +54,7 @@ public interface IBoard {
 	public int getDraw50movesRule();
 	public boolean hasSufficientMaterial();
 	
-	public IBoard clone();
+	//public IBoard clone();
 	
 	public boolean isInCheck();
 	public boolean isInCheck(int colour);

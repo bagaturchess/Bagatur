@@ -22,6 +22,7 @@ package bagaturchess.learning.goldmiddle.impl3.eval;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.state.PiecesList;
 
 
@@ -80,6 +81,10 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 		eval += pawns.evaluate(bitboard, Constants.COLOUR_WHITE, bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN));
 		eval -= pawns.evaluate(bitboard, Constants.COLOUR_BLACK, bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN));
+		
+		eval += pawns.do_king_safety(bitboard, Constants.COLOUR_WHITE);
+		eval -= pawns.do_king_safety(bitboard, Constants.COLOUR_BLACK);
+		
 		
 		//System.out.println("eval=" + eval);
 		
@@ -226,6 +231,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 						while (b != 0) {
 							//TODO: CHECK pop_lsb if (!more_than_one(theirPawns & PawnAttacks[Us][pop_lsb(b).getValue()]))
 							if (!more_than_one(theirPawns & PawnAttacks[Us][Long.numberOfTrailingZeros(b)])) {
+							//if (!more_than_one(theirPawns & PawnAttacks[Us][Long.numberOfLeadingZeros(b)])) {
 								passedPawns[Us] |= squareID;
 							}
 							b &= b - 1;
@@ -255,6 +261,74 @@ public class Evaluator extends Evaluator_BaseImpl {
 			}
 
 			return score;
+		}
+		
+		
+		/// Entry::do_king_safety() calculates a bonus for king safety. It is called only
+		/// when king square changes, which is about 20% of total king_safety() calls.
+		public final int do_king_safety(IBitBoard bitboard, int Us) {
+		
+			int squareID_ksq = bitboard.getPiecesLists().getPieces(Us == Constants.COLOUR_WHITE ? Constants.PID_W_KING : Constants.PID_B_KING).getData()[0];
+			kingSquares[Us] = squareID_ksq;
+			//castlingRights[Us] = bitboard.hasRightsToKingCastle(Us) || bitboard.hasRightsToQueenCastle(Us)//pos.can_castle(Us);
+			int minKingPawnDistance = 0;
+		
+			long pawns = bitboard.getFiguresBitboardByColourAndType(Us, Constants.TYPE_PAWN);
+			if (pawns != 0) {
+				while ((DistanceRingBB[squareID_ksq][++minKingPawnDistance] & pawns) == 0) {
+					
+				}
+			}
+		
+			int bonus = evaluate_shelter(bitboard, Us, squareID_ksq);
+		
+			// If we can castle use the bonus after the castling if it is bigger
+			if (bitboard.hasRightsToKingCastle(Us)) {
+				bonus = Math.max(bonus, evaluate_shelter(bitboard, Us, relative_square(Us, Fields.G1_ID)));
+			}
+		
+			if (bitboard.hasRightsToQueenCastle(Us)) {
+				bonus = Math.max(bonus, evaluate_shelter(bitboard, Us, relative_square(Us, Fields.C1_ID)));
+			}
+			
+			return make_score(bonus, -16 * minKingPawnDistance);
+		}
+		
+		
+		/// Entry::evaluate_shelter() calculates the shelter bonus and the storm
+		/// penalty for a king, looking at the king file and the two closest files.
+		private final int evaluate_shelter(IBitBoard bitboard, int Us, int squareID_ksq) {
+		
+			final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
+			final int Direction_Down = (Us == Constants.COLOUR_WHITE ? Direction_SOUTH : Direction_NORTH);
+			final long BlockRanks = (Us == Constants.COLOUR_WHITE ? Rank1BB | Rank2BB : Rank8BB | Rank7BB);
+		
+			long b = (bitboard.getFiguresBitboardByColourAndType(Us, Constants.TYPE_PAWN) | bitboard.getFiguresBitboardByColourAndType(Them, Constants.TYPE_PAWN))
+						& ~forward_ranks_bb(Them, squareID_ksq);//pos.pieces(PieceType.PAWN) & ~forward_ranks_bb(Them, squareID_ksq);
+			long ourPawns = b & bitboard.getFiguresBitboardByColour(Us);
+			long theirPawns = b & bitboard.getFiguresBitboardByColour(Them);
+		
+			int safety = (shiftBB(theirPawns, Direction_Down) & (FileABB | FileHBB) & BlockRanks & squareID_ksq) != 0 ? 374 : 5;
+		
+			/*File center = Math.max(File.FILE_B, Math.min(File.FILE_G, GlobalMembers.file_of(ksq)));
+			for (File f = File(center - 1); f.getValue() <= File(center + 1); ++f)
+			{
+				//C++ TO JAVA CONVERTER TODO TASK: The following line was determined to be a copy assignment (rather than a reference assignment) - this should be verified and a 'copyFrom' method should be created:
+				//ORIGINAL LINE: b = ourPawns & file_bb(f);
+				b.copyFrom(ourPawns & GlobalMembers.file_bb(f));
+				int ourRank = b != null ? GlobalMembers.relative_rank(Us, GlobalMembers.backmost_sq(Us, new uint64_t(b))).getValue() : 0;
+				
+				//C++ TO JAVA CONVERTER TODO TASK: The following line was determined to be a copy assignment (rather than a reference assignment) - this should be verified and a 'copyFrom' method should be created:
+				//ORIGINAL LINE: b = theirPawns & file_bb(f);
+				b.copyFrom(theirPawns & GlobalMembers.file_bb(f));
+				int theirRank = b != null ? GlobalMembers.relative_rank(Us, GlobalMembers.frontmost_sq(Them, new uint64_t(b))).getValue() : 0;
+		
+				int d = Math.min(f, ~f);
+				safety += ShelterStrength[d][ourRank];
+				safety -= (ourRank != 0 && (ourRank == theirRank - 1)) ? 66 * (theirRank == Rank.RANK_3.getValue()) : UnblockedStorm[d][theirRank];
+			}*/
+		
+			return safety;
 		}
 	}
 }

@@ -104,7 +104,7 @@ public class Simulate {
 	  	System.out.printf("Gen moves: " + info.nodes
 				+ ", Time " + (end-start) + "ms, Moves per second %f", (info.nodes/((end-start)/(double)1000)));
 	  	
-		IBoard clone = (IBoard) bitBoard.clone();
+		//IBoard clone = (IBoard) bitBoard.clone();
 	  	/*if (clone.equals(bitBoard)) {
 	  		System.out.println("\r\nOK");
 	  	} else {

@@ -88,7 +88,7 @@ public class Evaluator_BaseImpl {
 	public static final long[][] PawnAttackSpan = new long[Constants.COLOUR_BLACK + 1][Fields.H8_ID + 1];
 	public static final long[][] PassedPawnMask = new long[Constants.COLOUR_BLACK + 1][Fields.H8_ID + 1];
 	public static final long[][] PawnAttacks = new long[Constants.COLOUR_BLACK + 1][Fields.H8_ID + 1];
-	
+	public static final long[][] DistanceRingBB = new long[Fields.H8_ID + 1][8];
 	
 	static {
 			
@@ -123,7 +123,7 @@ public class Evaluator_BaseImpl {
 	              if (squareID1 != squareID2)
 	              {
 	                  SquareDistance[squareID1][squareID2] = Math.max(distanceFile(squareID1, squareID2), distanceRank(squareID1, squareID2));
-	                  //DistanceRingBB[s1][SquareDistance[s1][s2]] |= s2;
+	                  DistanceRingBB[squareID1][SquareDistance[squareID1][squareID2]] |= squareID2;
 	              }
 	      
 	      int steps[][] = { {}, { 7, 9 }, { 6, 10, 15, 17 }, {}, {}, {}, { 1, 7, 8, 9 } };//For pawns, knight and king only
@@ -203,6 +203,14 @@ public class Evaluator_BaseImpl {
 	}
 	
 	
+	/// forward_ranks_bb() returns a bitboard representing the squares on all the ranks
+	/// in front of the given one, from the point of view of the given color. For instance,
+	/// forward_ranks_bb(BLACK, SQ_D3) will return the 16 squares on ranks 1 and 2.
+	public static long forward_ranks_bb(int colour, int squareID) {
+	  return ForwardRanksBB[colour][rank_of(squareID)];
+	}
+	
+	
 	/// passed_pawn_mask() returns a bitboard mask which can be used to test if a
 	/// pawn of the given color and on the given square is a passed pawn:
 	///      PassedPawnMask[c][s] = pawn_attack_span(c, s) | forward_file_bb(c, s)
@@ -267,6 +275,11 @@ public class Evaluator_BaseImpl {
 	
 	public static final boolean more_than_one(long bitboard) {
 		return (bitboard & (bitboard - 1)) != 0;
+	}
+	
+	
+	public static int relative_square(int colour, int squareID) {
+	  return squareID ^ (colour * 56);
 	}
 	
 	

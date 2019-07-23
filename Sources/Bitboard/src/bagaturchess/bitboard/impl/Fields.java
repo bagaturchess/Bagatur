@@ -593,6 +593,11 @@ public class Fields extends Bits {
 	private static final long BINARY_SEARCH_1_2_2_2_2 = E8 | F8 | G8 | H8;
 	
 	public static final int get67IDByBitboard(long bitBoard) {
+		
+		if (true) {
+			return Long.numberOfLeadingZeros(bitBoard);
+		}
+		
 		if ((BINARY_SEARCH_1_1 & bitBoard) != 0) {
 			if ((BINARY_SEARCH_1_1_1 & bitBoard) != 0) {
 				if ((BINARY_SEARCH_1_1_1_1 & bitBoard) != 0) {
