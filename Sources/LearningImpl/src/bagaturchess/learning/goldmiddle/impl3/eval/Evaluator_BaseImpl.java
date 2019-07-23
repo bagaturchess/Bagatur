@@ -90,6 +90,7 @@ public class Evaluator_BaseImpl {
 	public static final long[][] PawnAttacks = new long[Constants.COLOUR_BLACK + 1][Fields.H8_ID + 1];
 	public static final long[][] DistanceRingBB = new long[Fields.H8_ID + 1][8];
 	
+	
 	static {
 			
 		  for (int squareID = Fields.A1_ID; squareID <= Fields.H8_ID; ++squareID)
@@ -206,7 +207,7 @@ public class Evaluator_BaseImpl {
 	/// forward_ranks_bb() returns a bitboard representing the squares on all the ranks
 	/// in front of the given one, from the point of view of the given color. For instance,
 	/// forward_ranks_bb(BLACK, SQ_D3) will return the 16 squares on ranks 1 and 2.
-	public static long forward_ranks_bb(int colour, int squareID) {
+	public static final long forward_ranks_bb(int colour, int squareID) {
 	  return ForwardRanksBB[colour][rank_of(squareID)];
 	}
 	
@@ -225,14 +226,39 @@ public class Evaluator_BaseImpl {
 	}
 	
 	
-	/// relative_rank_bb() takes a color and a rank as input, and returns a bitboard
-	/// representing all squares on the given rank from the given color's point of
-	/// view.  For instance, relative_rank_bb(WHITE, 7) gives all squares on the
-	/// 7th rank, while relative_rank_bb(BLACK, 7) gives all squares on the 2nd
-	/// rank.
-	/*public static long relative_rank_bb(Color c, Rank r) {
-	  return RelativeRankBB[c][r];
-	}*/
+	/// frontmost_sq() and backmost_sq() return the square corresponding to the
+	/// most/least advanced bit relative to the given color.
+	public static final int frontmost_sq(int colour, long b) {
+		return colour == Constants.COLOUR_WHITE ? Long.numberOfLeadingZeros(b) : Long.numberOfTrailingZeros(b);//msb(b) : lsb(b);
+	}
+	
+	
+	public static final int backmost_sq(int colour, long b) {
+		return colour == Constants.COLOUR_WHITE ? Long.numberOfTrailingZeros(b) : Long.numberOfLeadingZeros(b);//lsb(b) : msb(b);
+	}
+	
+	
+	/// rank_bb() and file_bb() return a bitboard representing all the squares on
+	/// the given file or rank.
+	public static long rank_bb_byRank(int rankID) {
+	  return RankBB[rankID];
+	}
+	
+	
+	public static long rank_bb_bySquare(int squareID) {
+	  return RankBB[rank_of(squareID)];
+	}
+	
+	
+	public static long file_bb_byFile(int fileID) {
+	  return FileBB[fileID];
+	}
+	
+	
+	public static long file_bb_bySquare(int squareID) {
+	  return FileBB[file_of(squareID)];
+	}
+	
 	
 	public static final int relative_rank_byRank(int colour, int rankID) {
 		return rankID ^ (colour * 7);

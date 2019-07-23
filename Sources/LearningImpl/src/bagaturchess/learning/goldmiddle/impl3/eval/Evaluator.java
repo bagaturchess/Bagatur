@@ -36,7 +36,21 @@ public class Evaluator extends Evaluator_BaseImpl {
 	// Connected pawn bonus by opposed, phalanx, #support and rank
 	public static int[][][][] Connected = new int[2][2][3][Rank8 + 1];
 	
+	public static int[][] ShelterStrength = {
+		  {-6, 81, 93, 58, 39, 18, 25},
+		  {-43, 61, 35, -49, -29, -11, -63},
+		  {-10, 75, 23, -2, 32, 3, -45},
+		  {-39, -13, -29, -52, -48, -67, -166}
+	};
 	
+	public static int[][] UnblockedStorm = {
+		  {89, 107, 123, 93, 57, 45, 51},
+		  {44, -18, 123, 46, 39, -7, 23},
+		  {4, 52, 162, 37, 7, -14, -2},
+		  {-10, -14, 90, 15, 2, -7, -16}
+	};
+	  
+	  
 	static {
 		
 		int[] Seed = { 0, 13, 24, 18, 65, 100, 175, 330 };
@@ -267,26 +281,26 @@ public class Evaluator extends Evaluator_BaseImpl {
 		/// Entry::do_king_safety() calculates a bonus for king safety. It is called only
 		/// when king square changes, which is about 20% of total king_safety() calls.
 		public final int do_king_safety(IBitBoard bitboard, int Us) {
-		
+			
 			int squareID_ksq = bitboard.getPiecesLists().getPieces(Us == Constants.COLOUR_WHITE ? Constants.PID_W_KING : Constants.PID_B_KING).getData()[0];
 			kingSquares[Us] = squareID_ksq;
 			//castlingRights[Us] = bitboard.hasRightsToKingCastle(Us) || bitboard.hasRightsToQueenCastle(Us)//pos.can_castle(Us);
 			int minKingPawnDistance = 0;
-		
+			
 			long pawns = bitboard.getFiguresBitboardByColourAndType(Us, Constants.TYPE_PAWN);
 			if (pawns != 0) {
 				while ((DistanceRingBB[squareID_ksq][++minKingPawnDistance] & pawns) == 0) {
 					
 				}
 			}
-		
+			
 			int bonus = evaluate_shelter(bitboard, Us, squareID_ksq);
-		
+			
 			// If we can castle use the bonus after the castling if it is bigger
 			if (bitboard.hasRightsToKingCastle(Us)) {
 				bonus = Math.max(bonus, evaluate_shelter(bitboard, Us, relative_square(Us, Fields.G1_ID)));
 			}
-		
+			
 			if (bitboard.hasRightsToQueenCastle(Us)) {
 				bonus = Math.max(bonus, evaluate_shelter(bitboard, Us, relative_square(Us, Fields.C1_ID)));
 			}
@@ -310,23 +324,19 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 			int safety = (shiftBB(theirPawns, Direction_Down) & (FileABB | FileHBB) & BlockRanks & squareID_ksq) != 0 ? 374 : 5;
 		
-			/*File center = Math.max(File.FILE_B, Math.min(File.FILE_G, GlobalMembers.file_of(ksq)));
-			for (File f = File(center - 1); f.getValue() <= File(center + 1); ++f)
-			{
-				//C++ TO JAVA CONVERTER TODO TASK: The following line was determined to be a copy assignment (rather than a reference assignment) - this should be verified and a 'copyFrom' method should be created:
-				//ORIGINAL LINE: b = ourPawns & file_bb(f);
-				b.copyFrom(ourPawns & GlobalMembers.file_bb(f));
-				int ourRank = b != null ? GlobalMembers.relative_rank(Us, GlobalMembers.backmost_sq(Us, new uint64_t(b))).getValue() : 0;
+			int center = Math.max(FileB, Math.min(FileG, file_of(squareID_ksq)));
+			for (int fileID = center - 1; fileID <= center + 1; ++fileID) {
 				
-				//C++ TO JAVA CONVERTER TODO TASK: The following line was determined to be a copy assignment (rather than a reference assignment) - this should be verified and a 'copyFrom' method should be created:
-				//ORIGINAL LINE: b = theirPawns & file_bb(f);
-				b.copyFrom(theirPawns & GlobalMembers.file_bb(f));
-				int theirRank = b != null ? GlobalMembers.relative_rank(Us, GlobalMembers.frontmost_sq(Them, new uint64_t(b))).getValue() : 0;
-		
-				int d = Math.min(f, ~f);
+				b = ourPawns & file_bb_byFile(fileID);
+				int ourRank = b != 0 ? relative_rank_bySquare(Us, backmost_sq(Us, b)) : 0;
+				
+				b = theirPawns & file_bb_byFile(fileID);
+				int theirRank = b != 0 ? relative_rank_bySquare(Us, frontmost_sq(Them, b)) : 0;
+				
+				int d = Math.min(fileID, ~fileID);
 				safety += ShelterStrength[d][ourRank];
-				safety -= (ourRank != 0 && (ourRank == theirRank - 1)) ? 66 * (theirRank == Rank.RANK_3.getValue()) : UnblockedStorm[d][theirRank];
-			}*/
+				safety -= (ourRank != 0 && (ourRank == theirRank - 1)) ? 66 * (theirRank == Rank3 ? 1 : 0) : UnblockedStorm[d][theirRank];
+			}
 		
 			return safety;
 		}
