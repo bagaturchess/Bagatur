@@ -28,7 +28,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	protected double phase1() {
 		int eval = 0;
 		
-		eval = (int) evaluator.calculateScore();
+		eval = (int) evaluator.calculateScore1();
 		
 		return eval;
 	}
@@ -40,6 +40,8 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	@Override
 	protected double phase2() {
 		int eval = 0;
+		
+		eval = (int) evaluator.calculateScore2();
 		
 		return eval;
 	}

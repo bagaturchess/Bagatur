@@ -22,24 +22,52 @@ package bagaturchess.learning.goldmiddle.impl3.eval;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.state.PiecesList;
 
 
 public class Evaluator extends Evaluator_BaseImpl {
 	
 	
-	private IBitBoard bitboard;
+	public static final int Backward = make_score(9, 24);
+	public static final int Doubled = make_score(11, 56);
+	public static final int Isolated = make_score(5, 15);
+	
+	// Connected pawn bonus by opposed, phalanx, #support and rank
+	public static int[][][][] Connected = new int[2][2][3][Rank8 + 1];
+	
+	
+	static {
+		
+		int[] Seed = { 0, 13, 24, 18, 65, 100, 175, 330 };
+		
+		for (int opposed = 0; opposed <= 1; ++opposed) {
+			for (int phalanx = 0; phalanx <= 1; ++phalanx) {
+				for (int support = 0; support <= 2; ++support) {
+					for (int rankID = Rank2; rankID < Rank8; ++rankID) {
+						
+						int v = 17 * support;
+						v += (Seed[rankID] + (phalanx != 0 ? (Seed[rankID + 1] - Seed[rankID]) / 2 : 0)) >> opposed;
+						
+					  	Connected[opposed][phalanx][support][rankID] = make_score(v, v * (rankID - 2) / 4);
+					}
+				}
+			}
+		}
+	}
+	
+	private final IBitBoard bitboard;
 	private final EvalInfo evalinfo;
+	private final Pawns pawns;
 	
 	
 	public Evaluator(IBitBoard _bitboard) {
 		bitboard = _bitboard;
 		evalinfo = new EvalInfo();
+		pawns = new Pawns();
 	}
 	
 	
-	protected double calculateScore() {
+	public double calculateScore1() {
 		int eval = 0;
 		
 		evalinfo.clearEvals1();
@@ -49,6 +77,18 @@ public class Evaluator extends Evaluator_BaseImpl {
 				bitboard.getBaseEvaluation().getPST_o() + evalinfo.eval_o_part1,
 				bitboard.getBaseEvaluation().getPST_e() + evalinfo.eval_e_part1
 				);
+		
+		eval += pawns.evaluate(bitboard, Constants.COLOUR_WHITE, bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN));
+		eval -= pawns.evaluate(bitboard, Constants.COLOUR_BLACK, bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN));
+		
+		//System.out.println("eval=" + eval);
+		
+		return eval;
+	}
+	
+	
+	public double calculateScore2() {
+		int eval = 0;
 		
 		return eval;
 	}
@@ -94,29 +134,34 @@ public class Evaluator extends Evaluator_BaseImpl {
 	}
 	
 	
+	public static final int make_score(int mg, int eg) {
+		//return (eg << 16) + mg;
+		return (eg + mg) / 2;
+	}
+	
+	
 	protected static class Pawns {
 		
 		
-		public int[] scores = new int[Constants.COLOUR_BLACK + 1];
+		//public int[] scores = new int[Constants.COLOUR_BLACK + 1];
 		public long[] passedPawns = new long[Constants.COLOUR_BLACK + 1];
 		public long[] pawnAttacks = new long[Constants.COLOUR_BLACK + 1];
 		public long[] pawnAttacksSpan = new long[Constants.COLOUR_BLACK + 1];
 		public int[] kingSquares = new int[Constants.COLOUR_BLACK + 1];
-		public int[] kingSafety = new int[Constants.COLOUR_BLACK + 1];
+		//public int[] kingSafety = new int[Constants.COLOUR_BLACK + 1];
 		public int[] weakUnopposed = new int[Constants.COLOUR_BLACK + 1];
-		public int[] castlingRights = new int[Constants.COLOUR_BLACK + 1];
+		//public int[] castlingRights = new int[Constants.COLOUR_BLACK + 1];
 		public int[] semiopenFiles = new int[Constants.COLOUR_BLACK + 1];
 		public int[][] pawnsOnSquares = new int[Constants.COLOUR_BLACK + 1][Constants.COLOUR_BLACK + 1]; // [color][light/dark squares]
-		public int asymmetry;
-		public int openFiles;
+		//public int asymmetry;
+		//public int openFiles;
 		  
 		  
 		public int evaluate(IBitBoard bitboard, int Us, PiecesList Us_pawns_list) {
 
 			final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 			final int Up_direction = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
-
-			//long b;
+			
 			long neighbours;
 			long stoppers;
 			long doubled;
@@ -171,43 +216,41 @@ public class Evaluator extends Evaluator_BaseImpl {
 					// full attack info to evaluate them. Include also not passed pawns
 					// which could become passed after one or two pawn pushes when are
 					// not attacked more times than defended.
-					if ((stoppers ^ lever ^ leverPush) == 0 && Long.bitCount(supported) >= (Long.bitCount(lever) - 1) && Long.bitCount(phalanx) >= Long.bitCount(leverPush))
-					{
+					if ((stoppers ^ lever ^ leverPush) == 0 && Long.bitCount(supported) >= Long.bitCount(lever) - 1 && Long.bitCount(phalanx) >= Long.bitCount(leverPush)) {
+						
 						passedPawns[Us] |= squareID;
 						
 					} else if (stoppers == SquareBB[squareID + Up_direction] && relative_rank_bySquare(Us, squareID) >= Rank5) {
 						
 						long b = shiftBB(supported, Up_direction) & ~theirPawns;
-						while (b != 0)
-						{
-							if (!more_than_one(theirPawns & PawnAttacks[Us][pop_lsb(b).getValue()]))
-							{
+						while (b != 0) {
+							//TODO: CHECK pop_lsb if (!more_than_one(theirPawns & PawnAttacks[Us][pop_lsb(b).getValue()]))
+							if (!more_than_one(theirPawns & PawnAttacks[Us][Long.numberOfTrailingZeros(b)])) {
 								passedPawns[Us] |= squareID;
 							}
+							b &= b - 1;
 						}
 					}
 					
 					// Score this pawn
-					if ((supported | phalanx) != 0)
-					{
-						score += Connected[opposed][(boolean)phalanx][popcount(new uint64_t(supported))][relative_rank(Us, s).getValue()];
+					if ((supported | phalanx) != 0) {
+						
+						score += Connected[opposed ? 1 : 0][phalanx == 0 ? 0 : 1][Long.bitCount(supported)][relative_rank_bySquare(Us, squareID)];
+						
+					} else if (neighbours == 0) {
+						
+						score -= Isolated;
+						weakUnopposed[Us] += (!opposed ? 1 : 0);
+						
+					} else if (backward) {
+						
+						score -= Backward;
+						weakUnopposed[Us] += (!opposed ? 1 : 0);
 					}
 	
-					else if (!neighbours)
-					{
-						score -= Isolated, e.weakUnopposed[Us] += !opposed;
-					}
-	
-					else if (backward)
-					{
-						score -= Backward, e.weakUnopposed[Us] += !opposed;
-					}
-	
-					if (doubled != null && supported == null)
-					{
+					if (doubled != 0 && supported == 0) {
 						score -= Doubled;
 					}
-					*/
 	            }
 			}
 

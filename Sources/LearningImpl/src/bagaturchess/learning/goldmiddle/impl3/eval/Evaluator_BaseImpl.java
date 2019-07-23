@@ -265,9 +265,18 @@ public class Evaluator_BaseImpl {
 	}
 	
 	
+	public static final boolean more_than_one(long bitboard) {
+		return (bitboard & (bitboard - 1)) != 0;
+	}
+	
+	
 	public static void main(String[] args) {
 		/*for (int squareID = 0; squareID < 64; squareID++) {
 			System.out.println("sqID=" + squareID + ", fileID=" + file_of(squareID) + ", rankID=" + rank_of(squareID));
 		}*/
+		
+		System.out.println("more_than_one 2 " + more_than_one(2));
+		System.out.println("more_than_one 4 " + more_than_one(4));
+		System.out.println("more_than_one 3 " + more_than_one(3));
 	}
 }
