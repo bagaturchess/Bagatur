@@ -101,7 +101,7 @@ public class Evaluator_BaseImpl {
 		  
 		  for (int rankID = Rank1; rankID <= Rank8; ++rankID)
 			  RankBB[rankID] = rankID > Rank1 ? RankBB[rankID - 1] << 8 : Rank1BB;
-		          
+		  
 		  for (int fileID = FileA; fileID <= FileH; ++fileID)
 		      AdjacentFilesBB[fileID] = (fileID > FileA ? FileBB[fileID - 1] : 0) | (fileID < FileH ? FileBB[fileID + 1] : 0);
 		  
@@ -121,10 +121,11 @@ public class Evaluator_BaseImpl {
 	      
 	      for (int squareID1 = Fields.A1_ID; squareID1 <= Fields.H8_ID; ++squareID1)
 	    	  for (int squareID2 = Fields.A1_ID; squareID2 <= Fields.H8_ID; ++squareID2)
-	              if (squareID1 != squareID2)
-	              {
+	              if (squareID1 != squareID2) {
 	                  SquareDistance[squareID1][squareID2] = Math.max(distanceFile(squareID1, squareID2), distanceRank(squareID1, squareID2));
-	                  DistanceRingBB[squareID1][SquareDistance[squareID1][squareID2]] |= squareID2;
+	                  DistanceRingBB[squareID1][SquareDistance[squareID1][squareID2]] |= SquareBB[squareID2];
+	                  
+	                  //System.out.println("DistanceRingBB[" + squareID1 + "][" + SquareDistance[squareID1][squareID2] + "] = " + DistanceRingBB[squareID1][SquareDistance[squareID1][squareID2]]);
 	              }
 	      
 	      int steps[][] = { {}, { 7, 9 }, { 6, 10, 15, 17 }, {}, {}, {}, { 1, 7, 8, 9 } };//For pawns, knight and king only
@@ -137,7 +138,7 @@ public class Evaluator_BaseImpl {
 	                  if (is_ok(squareID_to) && distance(squareID, squareID_to) < 3)
 	                  {
 	                      //if (pt == PAWN)
-	                          PawnAttacks[colour][squareID] |= squareID_to;
+	                          PawnAttacks[colour][squareID] |= SquareBB[squareID_to];
 	                      /*else
 	                          PseudoAttacks[pt][s] |= to;*/
 	                  }
@@ -230,11 +231,13 @@ public class Evaluator_BaseImpl {
 	/// most/least advanced bit relative to the given color.
 	public static final int frontmost_sq(int colour, long b) {
 		return colour == Constants.COLOUR_WHITE ? Long.numberOfLeadingZeros(b) : Long.numberOfTrailingZeros(b);//msb(b) : lsb(b);
+		//return colour == Constants.COLOUR_WHITE ? Long.numberOfTrailingZeros(b) : Long.numberOfLeadingZeros(b);//lsb(b) : msb(b);
 	}
 	
 	
 	public static final int backmost_sq(int colour, long b) {
 		return colour == Constants.COLOUR_WHITE ? Long.numberOfTrailingZeros(b) : Long.numberOfLeadingZeros(b);//lsb(b) : msb(b);
+		//return colour == Constants.COLOUR_WHITE ? Long.numberOfLeadingZeros(b) : Long.numberOfTrailingZeros(b);//msb(b) : lsb(b);
 	}
 	
 	
@@ -280,12 +283,12 @@ public class Evaluator_BaseImpl {
 	
 	
 	public static final int distanceFile(int squareID1, int squareID2) {
-		return distance(file_of(squareID1), file_of(squareID2));
+		return distanceFileAndRank(file_of(squareID1), file_of(squareID2));
 	}
 	
 	
 	public static final int distanceRank(int squareID1, int squareID2) {
-		return distance(rank_of(squareID1), rank_of(squareID2));
+		return distanceFileAndRank(rank_of(squareID1), rank_of(squareID2));
 	}
 	
 	
@@ -314,8 +317,10 @@ public class Evaluator_BaseImpl {
 			System.out.println("sqID=" + squareID + ", fileID=" + file_of(squareID) + ", rankID=" + rank_of(squareID));
 		}*/
 		
-		System.out.println("more_than_one 2 " + more_than_one(2));
+		/*System.out.println("more_than_one 2 " + more_than_one(2));
 		System.out.println("more_than_one 4 " + more_than_one(4));
-		System.out.println("more_than_one 3 " + more_than_one(3));
+		System.out.println("more_than_one 3 " + more_than_one(3));*/
+		
+		System.out.println("relative_square " + relative_square(Constants.COLOUR_WHITE, Fields.G1_ID));
 	}
 }

@@ -32,10 +32,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 	public static final int Backward = make_score(9, 24);
 	public static final int Doubled = make_score(11, 56);
 	public static final int Isolated = make_score(5, 15);
-	
-	// Connected pawn bonus by opposed, phalanx, #support and rank
-	public static int[][][][] Connected = new int[2][2][3][Rank8 + 1];
-	
+		
 	public static int[][] ShelterStrength = {
 		  {-6, 81, 93, 58, 39, 18, 25},
 		  {-43, 61, 35, -49, -29, -11, -63},
@@ -49,7 +46,9 @@ public class Evaluator extends Evaluator_BaseImpl {
 		  {4, 52, 162, 37, 7, -14, -2},
 		  {-10, -14, 90, 15, 2, -7, -16}
 	};
-	  
+	
+	// Connected pawn bonus by opposed, phalanx, #support and rank
+	public static int[][][][] Connected = new int[2][2][3][Rank8 + 1];
 	  
 	static {
 		
@@ -177,7 +176,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		  
 		  
 		public int evaluate(IBitBoard bitboard, int Us, PiecesList Us_pawns_list) {
-
+			
 			final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 			final int Up_direction = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
 			
@@ -289,8 +288,9 @@ public class Evaluator extends Evaluator_BaseImpl {
 			
 			long pawns = bitboard.getFiguresBitboardByColourAndType(Us, Constants.TYPE_PAWN);
 			if (pawns != 0) {
-				while ((DistanceRingBB[squareID_ksq][++minKingPawnDistance] & pawns) == 0) {
-					
+				while ((DistanceRingBB[squareID_ksq][minKingPawnDistance] & pawns) == 0) {
+					minKingPawnDistance++;
+					//System.out.println(minKingPawnDistance);
 				}
 			}
 			
@@ -319,10 +319,10 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 			long b = (bitboard.getFiguresBitboardByColourAndType(Us, Constants.TYPE_PAWN) | bitboard.getFiguresBitboardByColourAndType(Them, Constants.TYPE_PAWN))
 						& ~forward_ranks_bb(Them, squareID_ksq);//pos.pieces(PieceType.PAWN) & ~forward_ranks_bb(Them, squareID_ksq);
-			long ourPawns = b & bitboard.getFiguresBitboardByColour(Us);
-			long theirPawns = b & bitboard.getFiguresBitboardByColour(Them);
+			long ourPawns = b & bitboard.getFiguresBitboardByColourAndType(Us, Constants.TYPE_PAWN);
+			long theirPawns = b & bitboard.getFiguresBitboardByColourAndType(Them, Constants.TYPE_PAWN);
 		
-			int safety = (shiftBB(theirPawns, Direction_Down) & (FileABB | FileHBB) & BlockRanks & squareID_ksq) != 0 ? 374 : 5;
+			int safety = (shiftBB(theirPawns, Direction_Down) & (FileABB | FileHBB) & BlockRanks & SquareBB[squareID_ksq]) != 0 ? 374 : 5;
 		
 			int center = Math.max(FileB, Math.min(FileG, file_of(squareID_ksq)));
 			for (int fileID = center - 1; fileID <= center + 1; ++fileID) {
@@ -333,7 +333,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 				b = theirPawns & file_bb_byFile(fileID);
 				int theirRank = b != 0 ? relative_rank_bySquare(Us, frontmost_sq(Them, b)) : 0;
 				
-				int d = Math.min(fileID, ~fileID);
+				int d = Math.min(fileID, fileID ^ FileH);
 				safety += ShelterStrength[d][ourRank];
 				safety -= (ourRank != 0 && (ourRank == theirRank - 1)) ? 66 * (theirRank == Rank3 ? 1 : 0) : UnblockedStorm[d][theirRank];
 			}
