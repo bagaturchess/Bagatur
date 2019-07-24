@@ -18,6 +18,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		
 		super(_bitboard, _evalCache, _evalConfig);
 		
+		//evaluator = new Evaluator(_bitboard);
 		evaluator = new Evaluator(new BoardProxy_ReversedBBs(_bitboard));
 	}
 

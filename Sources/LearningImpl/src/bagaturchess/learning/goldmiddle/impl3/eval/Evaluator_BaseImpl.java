@@ -94,7 +94,7 @@ public class Evaluator_BaseImpl {
 	static {
 			
 		  for (int squareID = Fields.A1_ID; squareID <= Fields.H8_ID; ++squareID)
-		      SquareBB[squareID] = (1 << squareID);
+		      SquareBB[squareID] = (1L << squareID);
 		  
 		  for (int fileID = FileA; fileID <= FileH; ++fileID)
 		      FileBB[fileID] = fileID > FileA ? FileBB[fileID - 1] << 1 : FileABB;
@@ -230,41 +230,45 @@ public class Evaluator_BaseImpl {
 	/// frontmost_sq() and backmost_sq() return the square corresponding to the
 	/// most/least advanced bit relative to the given color.
 	public static final int frontmost_sq(int colour, long b) {
-		return colour == Constants.COLOUR_WHITE ? Long.numberOfLeadingZeros(b) : Long.numberOfTrailingZeros(b);//msb(b) : lsb(b);
-		//return colour == Constants.COLOUR_WHITE ? Long.numberOfTrailingZeros(b) : Long.numberOfLeadingZeros(b);//lsb(b) : msb(b);
+		//return colour == Constants.COLOUR_WHITE ? Long.numberOfLeadingZeros(b) : Long.numberOfTrailingZeros(b);//msb(b) : lsb(b);
+		return Long.numberOfLeadingZeros(b);
 	}
 	
 	
 	public static final int backmost_sq(int colour, long b) {
-		return colour == Constants.COLOUR_WHITE ? Long.numberOfTrailingZeros(b) : Long.numberOfLeadingZeros(b);//lsb(b) : msb(b);
-		//return colour == Constants.COLOUR_WHITE ? Long.numberOfLeadingZeros(b) : Long.numberOfTrailingZeros(b);//msb(b) : lsb(b);
+		//return colour == Constants.COLOUR_WHITE ? Long.numberOfTrailingZeros(b) : Long.numberOfLeadingZeros(b);//lsb(b) : msb(b);
+		return Long.numberOfTrailingZeros(b);
 	}
 	
 	
 	/// rank_bb() and file_bb() return a bitboard representing all the squares on
 	/// the given file or rank.
-	public static long rank_bb_byRank(int rankID) {
+	public static final long rank_bb_byRank(int rankID) {
 	  return RankBB[rankID];
 	}
 	
 	
-	public static long rank_bb_bySquare(int squareID) {
+	public static final long rank_bb_bySquare(int squareID) {
 	  return RankBB[rank_of(squareID)];
 	}
 	
 	
-	public static long file_bb_byFile(int fileID) {
+	public static final long file_bb_byFile(int fileID) {
 	  return FileBB[fileID];
 	}
 	
 	
-	public static long file_bb_bySquare(int squareID) {
+	public static final long file_bb_bySquare(int squareID) {
 	  return FileBB[file_of(squareID)];
 	}
 	
 	
 	public static final int relative_rank_byRank(int colour, int rankID) {
-		return rankID ^ (colour * 7);
+		int result = rankID ^ (colour * 7);
+		if (result > 7 || result < 0) {
+			throw new IllegalStateException();
+		}
+		return result;
 	}
 
 	public static final int relative_rank_bySquare(int colour, int squareID) {
@@ -307,7 +311,7 @@ public class Evaluator_BaseImpl {
 	}
 	
 	
-	public static int relative_square(int colour, int squareID) {
+	public static final int relative_square(int colour, int squareID) {
 	  return squareID ^ (colour * 56);
 	}
 	

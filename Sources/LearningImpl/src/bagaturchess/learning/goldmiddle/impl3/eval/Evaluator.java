@@ -60,7 +60,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 					for (int rankID = Rank2; rankID < Rank8; ++rankID) {
 						
 						int v = 17 * support;
-						v += (Seed[rankID] + (phalanx != 0 ? (Seed[rankID + 1] - Seed[rankID]) / 2 : 0)) >> opposed;
+						v += (Seed[rankID] + (phalanx != 0 ? (Seed[rankID + 1] - Seed[rankID]) / 2 : 0)) >>> opposed;
 						
 					  	Connected[opposed][phalanx][support][rankID] = make_score(v, v * (rankID - 2) / 4);
 					}
@@ -68,6 +68,13 @@ public class Evaluator extends Evaluator_BaseImpl {
 			}
 		}
 	}
+	
+	// PassedRank[Rank] contains a bonus according to the rank of a passed pawn
+	public static final int[] PassedRank = {make_score(0, 0), make_score(5, 18), make_score(12, 23), make_score(10, 31), make_score(57, 62), make_score(163, 167), make_score(271, 250)};
+
+	// PassedFile[File] contains a bonus according to the file of a passed pawn
+	public static final int[] PassedFile = {make_score(-1, 7), make_score(0, 9), make_score(-9, -8), make_score(-30, -14), make_score(-30, -14), make_score(-9, -8), make_score(0, 9), make_score(-1, 7)};
+	  
 	
 	private final IBitBoard bitboard;
 	private final EvalInfo evalinfo;
@@ -92,12 +99,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 				bitboard.getBaseEvaluation().getPST_e() + evalinfo.eval_e_part1
 				);
 		
-		eval += pawns.evaluate(bitboard, Constants.COLOUR_WHITE, bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN));
-		eval -= pawns.evaluate(bitboard, Constants.COLOUR_BLACK, bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN));
-		
-		eval += pawns.do_king_safety(bitboard, Constants.COLOUR_WHITE);
-		eval -= pawns.do_king_safety(bitboard, Constants.COLOUR_BLACK);
-		
 		
 		//System.out.println("eval=" + eval);
 		
@@ -107,6 +108,15 @@ public class Evaluator extends Evaluator_BaseImpl {
 	
 	public double calculateScore2() {
 		int eval = 0;
+		
+		eval += pawns.evaluate(bitboard, Constants.COLOUR_WHITE, bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN));
+		eval -= pawns.evaluate(bitboard, Constants.COLOUR_BLACK, bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN));
+		
+		eval += pawns.do_king_safety(bitboard, Constants.COLOUR_WHITE);
+		eval -= pawns.do_king_safety(bitboard, Constants.COLOUR_BLACK);
+		
+		eval += pawns.passed(bitboard, Constants.COLOUR_WHITE);
+		eval -= pawns.passed(bitboard, Constants.COLOUR_BLACK);
 		
 		return eval;
 	}
@@ -178,7 +188,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		public int evaluate(IBitBoard bitboard, int Us, PiecesList Us_pawns_list) {
 			
 			final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
-			final int Up_direction = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
+			final int Direction_Up = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
 			
 			long neighbours;
 			long stoppers;
@@ -211,7 +221,10 @@ public class Evaluator extends Evaluator_BaseImpl {
 	            	int squareID = pawns_fields[i];
 	            	
 	            	int fileID = file_of(squareID);
-	            	
+	            	int rankID = rank_of(squareID);
+	            	if (rankID == 0 || rankID == 7) {
+	            		throw new IllegalStateException();
+	            	}
 	            	
 					semiopenFiles[Us] &= ~(1 << fileID);
 					pawnAttacksSpan[Us] |= pawn_attack_span(Us, squareID);
@@ -220,15 +233,15 @@ public class Evaluator extends Evaluator_BaseImpl {
 					opposed = (theirPawns & forward_file_bb(Us, squareID)) != 0;
 					stoppers = theirPawns & passed_pawn_mask(Us, squareID);
 					lever = (theirPawns & PawnAttacks[Us][squareID]);
-					leverPush = theirPawns & PawnAttacks[Us][squareID + Up_direction];
-					doubled = ourPawns & (squareID - Up_direction);
+					leverPush = theirPawns & PawnAttacks[Us][squareID + Direction_Up];
+					doubled = ourPawns & (squareID - Direction_Up);
 					neighbours = ourPawns & adjacent_files_bb(fileID);
 					phalanx = neighbours & rank_bb(squareID);
-					supported = neighbours & rank_bb(squareID - Up_direction);
+					supported = neighbours & rank_bb(squareID - Direction_Up);
 	
 					// A pawn is backward when it is behind all pawns of the same color
 					// on the adjacent files and cannot be safely advanced.
-					backward = (ourPawns & pawn_attack_span(Them, squareID + Up_direction)) == 0 && (stoppers & (leverPush | (squareID + Up_direction))) != 0;
+					backward = (ourPawns & pawn_attack_span(Them, squareID + Direction_Up)) == 0 && (stoppers & (leverPush | (squareID + Direction_Up))) != 0;
 					
 					// Passed pawns will be properly scored in evaluation because we need
 					// full attack info to evaluate them. Include also not passed pawns
@@ -236,16 +249,16 @@ public class Evaluator extends Evaluator_BaseImpl {
 					// not attacked more times than defended.
 					if ((stoppers ^ lever ^ leverPush) == 0 && Long.bitCount(supported) >= Long.bitCount(lever) - 1 && Long.bitCount(phalanx) >= Long.bitCount(leverPush)) {
 						
-						passedPawns[Us] |= squareID;
+						passedPawns[Us] |= SquareBB[squareID];
 						
-					} else if (stoppers == SquareBB[squareID + Up_direction] && relative_rank_bySquare(Us, squareID) >= Rank5) {
+					} else if (stoppers == SquareBB[squareID + Direction_Up] && relative_rank_bySquare(Us, squareID) >= Rank5) {
 						
-						long b = shiftBB(supported, Up_direction) & ~theirPawns;
+						long b = shiftBB(supported, Direction_Up) & ~theirPawns;
 						while (b != 0) {
 							//TODO: CHECK pop_lsb if (!more_than_one(theirPawns & PawnAttacks[Us][pop_lsb(b).getValue()]))
 							if (!more_than_one(theirPawns & PawnAttacks[Us][Long.numberOfTrailingZeros(b)])) {
 							//if (!more_than_one(theirPawns & PawnAttacks[Us][Long.numberOfLeadingZeros(b)])) {
-								passedPawns[Us] |= squareID;
+								passedPawns[Us] |= SquareBB[squareID];
 							}
 							b &= b - 1;
 						}
@@ -323,15 +336,17 @@ public class Evaluator extends Evaluator_BaseImpl {
 			long theirPawns = b & bitboard.getFiguresBitboardByColourAndType(Them, Constants.TYPE_PAWN);
 		
 			int safety = (shiftBB(theirPawns, Direction_Down) & (FileABB | FileHBB) & BlockRanks & SquareBB[squareID_ksq]) != 0 ? 374 : 5;
-		
+			
 			int center = Math.max(FileB, Math.min(FileG, file_of(squareID_ksq)));
 			for (int fileID = center - 1; fileID <= center + 1; ++fileID) {
 				
-				b = ourPawns & file_bb_byFile(fileID);
-				int ourRank = b != 0 ? relative_rank_bySquare(Us, backmost_sq(Us, b)) : 0;
+				long fileBB = file_bb_byFile(fileID);
 				
-				b = theirPawns & file_bb_byFile(fileID);
-				int theirRank = b != 0 ? relative_rank_bySquare(Us, frontmost_sq(Them, b)) : 0;
+				b = ourPawns & fileBB;
+				int ourRank = (b != 0 ? relative_rank_bySquare(Us, backmost_sq(Us, b)) : 0);
+				
+				b = theirPawns & fileBB;
+				int theirRank = (b != 0 ? relative_rank_bySquare(Us, frontmost_sq(Them, b)) : 0);
 				
 				int d = Math.min(fileID, fileID ^ FileH);
 				safety += ShelterStrength[d][ourRank];
@@ -340,5 +355,117 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 			return safety;
 		}
+		
+		
+		public int passed(IBitBoard bitboard, int Us) {
+
+			final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
+			final int Direction_Up = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
+			int squareID_ksq = bitboard.getPiecesLists().getPieces(Us == Constants.COLOUR_WHITE ? Constants.PID_W_KING : Constants.PID_B_KING).getData()[0];
+			
+			long b;
+			long bb;
+			long squaresToQueen;
+			long defendedSquares;
+			long unsafeSquares;
+			int score = 0;
+			
+			//C++ TO JAVA CONVERTER TODO TASK: The following line was determined to be a copy assignment (rather than a reference assignment) - this should be verified and a 'copyFrom' method should be created:
+			//ORIGINAL LINE: b = pe->passed_pawns(Us);
+			b = passedPawns[Us];
+
+			while (b != 0) {
+				
+				int squareID = Long.numberOfTrailingZeros(b);
+				
+				if (is_ok(squareID + Direction_Up)) {
+					if ((bitboard.getFiguresBitboardByColourAndType(Them, Constants.TYPE_PAWN) & forward_file_bb(Us, squareID + Direction_Up)) != 0) {
+						throw new IllegalStateException();
+					}
+				}
+            	int rankID_check = rank_of(squareID);
+            	if (rankID_check == 0 || rankID_check == 7) {
+            		throw new IllegalStateException();
+            	}
+            	
+				int rankID = relative_rank_bySquare(Us, squareID);
+				
+				int bonus = PassedRank[rankID];
+
+				if (rankID > Rank3)
+				{
+					int w = (rankID - 2) * (rankID - 2) + 2;
+					int blockSq = squareID + Direction_Up;
+
+					// Adjust bonus based on the king's proximity
+					bonus += make_score(0, (king_proximity(Them, blockSq, squareID_ksq) * 5 - king_proximity(Us, blockSq, squareID_ksq) * 2) * w);
+
+					// If blockSq is not the queening square then consider also a second push
+					if (rankID != Rank7)
+					{
+						bonus -= make_score(0, king_proximity(Us, blockSq + Direction_Up, squareID_ksq) * w);
+					}
+
+					// If the pawn is free to advance, then increase the bonus
+					/*if (pos.empty(blockSq))
+					{
+						// If there is a rook or queen attacking/defending the pawn from behind,
+						// consider all the squaresToQueen. Otherwise consider only the squares
+						// in the pawn's path attacked or occupied by the enemy.
+						defendedSquares = unsafeSquares = squaresToQueen = GlobalMembers.forward_file_bb(Us, squareID);
+
+						//C++ TO JAVA CONVERTER TODO TASK: The following line was determined to be a copy assignment (rather than a reference assignment) - this should be verified and a 'copyFrom' method should be created:
+						//ORIGINAL LINE: bb = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN) & pos.attacks_from<ROOK>(s);
+						bb.copyFrom(GlobalMembers.forward_file_bb(Them, squareID) & pos.pieces(PieceType.ROOK, PieceType.QUEEN) & pos.<PieceType.ROOK.getValue()>attacks_from(squareID));
+
+						if ((pos.pieces(Us) & bb) == null)
+						{
+							defendedSquares &= attackedBy[Us][PieceType.ALL_PIECES.getValue()];
+						}
+
+						if ((pos.pieces(Them) & bb) == null)
+						{
+							unsafeSquares &= attackedBy[Them.getValue()][PieceType.ALL_PIECES.getValue()] | pos.pieces(Them);
+						}
+
+						// If there aren't any enemy attacks, assign a big bonus. Otherwise
+						// assign a smaller bonus if the block square isn't attacked.
+						int k = unsafeSquares == null ? 20 : (unsafeSquares & blockSq) == null ? 9 : 0;
+
+						// If the path to the queen is fully defended, assign a big bonus.
+						// Otherwise assign a smaller bonus if the block square is defended.
+						if (defendedSquares == squaresToQueen)
+						{
+							k += 6;
+						}
+	
+						else if (defendedSquares & blockSq)
+						{
+							k += 4;
+						}
+	
+						bonus += GlobalMembers.make_score(k * w, k * w);
+					}*/
+				} // rank > RANK_3
+
+				// Scale down bonus for candidate passers which need more than one
+				// pawn push to become passed, or have a pawn in front of them.
+				/*if (!pos.pawn_passed(Us, squareID + Direction_Up) || (pos.pieces(PieceType.PAWN) & forward_file_bb(Us, squareID)) != 0)
+				{
+					bonus = bonus / 2;
+				}*/
+
+				score += bonus + PassedFile[file_of(squareID)];
+				
+				b &= b - 1;
+			}
+
+			return score;
+		}
+		
+		
+		private static final int king_proximity(int colour, int squareID, int kingSquareID) {
+			return Math.min(distance(kingSquareID, squareID), 5);
+		};
 	}
 }
