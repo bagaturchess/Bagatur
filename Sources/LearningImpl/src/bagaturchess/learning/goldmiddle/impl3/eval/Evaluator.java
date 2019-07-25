@@ -99,8 +99,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 				bitboard.getBaseEvaluation().getPST_e() + evalinfo.eval_e_part1
 				);
 		
-		
-		//System.out.println("eval=" + eval);
+		eval += pawns.evaluate(bitboard, Constants.COLOUR_WHITE, bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN));
+		eval -= pawns.evaluate(bitboard, Constants.COLOUR_BLACK, bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN));
 		
 		return eval;
 	}
@@ -109,8 +109,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 	public double calculateScore2() {
 		int eval = 0;
 		
-		eval += pawns.evaluate(bitboard, Constants.COLOUR_WHITE, bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN));
-		eval -= pawns.evaluate(bitboard, Constants.COLOUR_BLACK, bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN));
+		initialize(Constants.COLOUR_WHITE);
+		initialize(Constants.COLOUR_BLACK);
 		
 		eval += pawns.do_king_safety(bitboard, Constants.COLOUR_WHITE);
 		eval -= pawns.do_king_safety(bitboard, Constants.COLOUR_BLACK);
@@ -140,9 +140,257 @@ public class Evaluator extends Evaluator_BaseImpl {
 	}
 	
 	
+	
+	// Evaluation::initialize() computes king and pawn attacks, and the king ring
+	// bitboard for a given color. This is done at the beginning of the evaluation.
+	private void initialize(int Us) {
+
+		final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
+		final int Direction_Up = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
+		final int Direction_Down = (Us == Constants.COLOUR_WHITE ? Direction_SOUTH : Direction_NORTH);
+		final long LowRanks = (Us == Constants.COLOUR_WHITE ? Rank2BB | Rank3BB: Rank7BB | Rank6BB);
+		
+		// Find our pawns that are blocked or on the first two ranks
+		long b = bitboard.getFiguresBitboardByColourAndType(Us, Constants.TYPE_PAWN) & (shiftBB(~bitboard.getFreeBitboard(), Direction_Down) | LowRanks);
+		
+		// Squares occupied by those pawns, by our king or queen, or controlled by enemy pawns
+		// are excluded from the mobility area.
+		evalinfo.mobilityArea[Us] = ~(b | bitboard.getFiguresBitboardByColourAndType(Us, Constants.TYPE_KING) | bitboard.getFiguresBitboardByColourAndType(Us, Constants.TYPE_QUEEN) | pawns.pawnAttacks[Them]);
+		
+		// Initialise attackedBy bitboards for kings and pawns
+		evalinfo.attackedBy[Us][Constants.TYPE_KING] = attacks_from(getKingSquareID(bitboard, Us), Constants.TYPE_KING);
+		evalinfo.attackedBy[Us][Constants.TYPE_PAWN] = pawns.pawnAttacks[Us];
+		evalinfo.attackedBy[Us][Constants.TYPE_ALL] = evalinfo.attackedBy[Us][Constants.TYPE_KING] | evalinfo.attackedBy[Us][Constants.TYPE_PAWN];
+		evalinfo.attackedBy2[Us] = evalinfo.attackedBy[Us][Constants.TYPE_KING] & evalinfo.attackedBy[Us][Constants.TYPE_PAWN];
+		
+		evalinfo.kingRing[Us] = evalinfo.kingAttackersCount[Them] = 0;
+		
+		// Init our king safety tables only if we are going to use them
+		//TODO if (pos.non_pawn_material(Them) >= Value.RookValueMg.getValue() + Value.KnightValueMg)
+		//{
+			evalinfo.kingRing[Us] = evalinfo.attackedBy[Us][Constants.TYPE_KING];
+			if (relative_rank_bySquare(Us, getKingSquareID(bitboard, Us)) == Rank1)
+			{
+				evalinfo.kingRing[Us] |= shiftBB(evalinfo.kingRing[Us], Direction_Up);
+			}
+		
+			if (file_of(getKingSquareID(bitboard, Us)) == FileH)
+			{
+				evalinfo.kingRing[Us] |= shiftBB(evalinfo.kingRing[Us], Direction_WEST);
+			}
+		
+			else if (file_of(getKingSquareID(bitboard, Us)) == FileA)
+			{
+				evalinfo.kingRing[Us] |= shiftBB(evalinfo.kingRing[Us], Direction_EAST);
+			}
+		
+			evalinfo.kingAttackersCount[Them] = Long.bitCount(evalinfo.kingRing[Us] & pawns.pawnAttacks[Them]);
+			evalinfo.kingAttacksCount[Them] = evalinfo.kingAttackersWeight[Them] = 0;
+		//}
+	}
+	
+	
+	// Evaluation::pieces() scores pieces of a given color and type
+	private int pieces(int Us, int pieceType)
+	{
+
+	  final Color Them = (Us == Color.WHITE ? Color.BLACK : Color.WHITE);
+	  final Direction Down = (Us == Color.WHITE ? Direction.SOUTH : Direction.NORTH);
+	  final long OutpostRanks = (Us == Color.WHITE ? GlobalMembers.Rank4BB | GlobalMembers.Rank5BB | GlobalMembers.Rank6BB : GlobalMembers.Rank5BB | GlobalMembers.Rank4BB | GlobalMembers.Rank3BB);
+//C++ TO JAVA CONVERTER TODO TASK: Pointer arithmetic is detected on this variable, so pointers on this variable are left unchanged:
+	  Square * pl = pos.<Pt>squares(Us);
+
+	  uint64_t b = new uint64_t();
+	  uint64_t bb = new uint64_t();
+	  Square s;
+	  Score score = Score.SCORE_ZERO;
+
+	  attackedBy[Us][Pt] = 0;
+
+	  while ((s = *pl++) != Square.SQ_NONE)
+	  {
+		  // Find attacked squares, including x-ray attacks for bishops and rooks
+		  b = Pt == PieceType.BISHOP ? GlobalMembers.<PieceType.BISHOP.getValue()>attacks_bb(s, pos.pieces() ^ pos.pieces(PieceType.QUEEN)) : Pt == PieceType.ROOK ? GlobalMembers.< PieceType.ROOK.getValue()>attacks_bb(s, pos.pieces() ^ pos.pieces(PieceType.QUEEN) ^ pos.pieces(Us, PieceType.ROOK)) : pos.<Pt>attacks_from(s);
+
+		  if (pos.blockers_for_king(Us) & s != null)
+		  {
+			  b &= LineBB[pos.<PieceType.KING.getValue().getValue()>square(Us)][s.getValue()];
+		  }
+
+		  attackedBy2[Us] |= attackedBy[Us][PieceType.ALL_PIECES.getValue()] & b;
+		  attackedBy[Us][Pt] |= b;
+		  attackedBy[Us][PieceType.ALL_PIECES.getValue()] |= b;
+
+		  if (b & kingRing[Them.getValue()] != null)
+		  {
+			  kingAttackersCount[Us]++;
+			  kingAttackersWeight[Us] += GlobalMembers.KingAttackWeights[Pt];
+			  kingAttacksCount[Us] += GlobalMembers.popcount(b & attackedBy[Them.getValue()][PieceType.KING.getValue()]);
+		  }
+
+		  int mob = GlobalMembers.popcount(b & mobilityArea[Us]);
+
+		  mobility[Us] += GlobalMembers.MobilityBonus[Pt - 2][mob];
+
+		  if (Pt == PieceType.BISHOP || Pt == PieceType.KNIGHT)
+		  {
+			  // Bonus if piece is on an outpost square or can reach one
+//C++ TO JAVA CONVERTER TODO TASK: The following line was determined to be a copy assignment (rather than a reference assignment) - this should be verified and a 'copyFrom' method should be created:
+//ORIGINAL LINE: bb = OutpostRanks & ~pe->pawn_attacks_span(Them);
+			  bb.copyFrom(OutpostRanks & ~pe.pawn_attacks_span(Them));
+			  if (bb & s != null)
+			  {
+				  score += GlobalMembers.Outpost[Pt == PieceType.BISHOP][(boolean)(attackedBy[Us][PieceType.PAWN.getValue()] & s)] * 2;
+			  }
+
+			  else if (bb &= b & ~pos.pieces(Us))
+			  {
+				  score += GlobalMembers.Outpost[Pt == PieceType.BISHOP][(boolean)(attackedBy[Us][PieceType.PAWN.getValue()] & bb)];
+			  }
+
+			  // Knight and Bishop bonus for being right behind a pawn
+			  if (GlobalMembers.<Down>shift(pos.pieces(PieceType.PAWN)) & s != null)
+			  {
+				  score += GlobalMembers.MinorBehindPawn;
+			  }
+
+			  // Penalty if the piece is far from the king
+			  score -= GlobalMembers.KingProtector * GlobalMembers.distance(s, pos.<PieceType.KING.getValue()>square(Us));
+
+			  if (Pt == PieceType.BISHOP)
+			  {
+				  // Penalty according to number of pawns on the same color square as the
+				  // bishop, bigger when the center files are blocked with pawns.
+				  uint64_t blocked = pos.pieces(Us, PieceType.PAWN) & GlobalMembers.<Down>shift(pos.pieces());
+
+				  score -= GlobalMembers.BishopPawns * pe.pawns_on_same_color_squares(Us, s) * (1 + GlobalMembers.popcount(blocked & GlobalMembers.CenterFiles));
+
+				  // Bonus for bishop on a long diagonal which can "see" both center squares
+				  if (GlobalMembers.more_than_one(GlobalMembers.<PieceType.BISHOP.getValue()>attacks_bb(s, pos.pieces(PieceType.PAWN)) & GlobalMembers.Center))
+				  {
+					  score += GlobalMembers.LongDiagonalBishop;
+				  }
+			  }
+
+			  // An important Chess960 pattern: A cornered bishop blocked by a friendly
+			  // pawn diagonally in front of it is a very serious problem, especially
+			  // when that pawn is also blocked.
+			  if (Pt == PieceType.BISHOP && pos.is_chess960() && (s == GlobalMembers.relative_square(Us, Square.SQ_A1) || s == GlobalMembers.relative_square(Us, Square.SQ_H1)))
+			  {
+				  Direction d = GlobalMembers.pawn_push(Us) + (GlobalMembers.file_of(s) == File.FILE_A ? Direction.EAST : Direction.WEST);
+				  if (pos.piece_on(s + d) == GlobalMembers.make_piece(Us, PieceType.PAWN))
+				  {
+					  score -= !pos.empty(s + d + GlobalMembers.pawn_push(Us)) ? GlobalMembers.CorneredBishop * 4 : pos.piece_on(s + d + d) == GlobalMembers.make_piece(Us, PieceType.PAWN) ? GlobalMembers.CorneredBishop * 2 : GlobalMembers.CorneredBishop;
+				  }
+			  }
+		  }
+
+		  if (Pt == PieceType.ROOK)
+		  {
+			  // Bonus for aligning rook with enemy pawns on the same rank/file
+			  if (GlobalMembers.relative_rank(Us, s) >= Rank.RANK_5.getValue())
+			  {
+				  score += GlobalMembers.RookOnPawn * GlobalMembers.popcount(pos.pieces(Them, PieceType.PAWN) & PseudoAttacks[PieceType.ROOK.getValue()][s.getValue()]);
+			  }
+
+			  // Bonus for rook on an open or semi-open file
+			  if (pe.semiopen_file(Us, GlobalMembers.file_of(s)) != 0)
+			  {
+				  score += GlobalMembers.RookOnFile[(boolean)pe.semiopen_file(Them, GlobalMembers.file_of(s))];
+			  }
+
+			  // Penalty when trapped by the king, even more if the king cannot castle
+			  else if (mob <= 3)
+			  {
+				  File kf = GlobalMembers.file_of(pos.<PieceType.KING.getValue()>square(Us));
+				  if ((kf.getValue() < File.FILE_E.getValue()) == (GlobalMembers.file_of(s) < kf.getValue()))
+				  {
+					  score -= (GlobalMembers.TrappedRook - GlobalMembers.make_score(mob * 22, 0)) * (1 + !pos.can_castle(Us));
+				  }
+			  }
+		  }
+
+		  if (Pt == PieceType.QUEEN)
+		  {
+			  // Penalty if any relative pin or discovered attack against the queen
+			  uint64_t queenPinners = new uint64_t();
+			  if (pos.slider_blockers(pos.pieces(Them, PieceType.ROOK, PieceType.BISHOP), s, queenPinners) != null)
+			  {
+				  score -= GlobalMembers.WeakQueen;
+			  }
+		  }
+	  }
+	  if (T)
+	  {
+		  Trace.GlobalMembers.add(Pt, Us, score);
+	  }
+
+	  return score;
+	}
+	
+	
+	private long attacks_from(int squareID, int pieceType) {
+		
+		if (pieceType == Constants.TYPE_PAWN){
+			throw new IllegalStateException();
+		}
+		
+		return pieceType == Constants.TYPE_BISHOP || pieceType == Constants.TYPE_ROOK ? attacks_bb(pieceType, squareID, ~bitboard.getFreeBitboard())
+				: pieceType == Constants.TYPE_QUEEN ? attacks_from(squareID, Constants.TYPE_ROOK) | attacks_from(squareID, Constants.TYPE_BISHOP)
+				: PseudoAttacks[pieceType][squareID];
+	}
+	
+	
+	private static final int getKingSquareID(IBitBoard bitboard, int Us) {
+		return bitboard.getPiecesLists().getPieces(Us == Constants.COLOUR_WHITE ? Constants.PID_W_KING : Constants.PID_B_KING).getData()[0];
+	}
+	
+	
+	public static final int make_score(int mg, int eg) {
+		//return (eg << 16) + mg;
+		return (eg + mg) / 2;
+	}
+	
+	
 	protected static class EvalInfo {
 		
 		
+	    long[] mobilityArea = new long[Constants.COLOUR_BLACK + 1];
+
+	    // attackedBy[color][piece type] is a bitboard representing all squares
+	    // attacked by a given color and piece type. Special "piece types" which
+	    // is also calculated is ALL_PIECES.
+	    long[][] attackedBy = new long[Constants.COLOUR_BLACK + 1][Constants.TYPE_ALL + 1];
+
+	    // attackedBy2[color] are the squares attacked by 2 pieces of a given color,
+	    // possibly via x-ray or by one pawn and one piece. Diagonal x-ray through
+	    // pawn or squares attacked by 2 pawns are not explicitly added.
+	    long[] attackedBy2 = new long[Constants.COLOUR_BLACK + 1];
+
+	    // kingRing[color] are the squares adjacent to the king, plus (only for a
+	    // king on its first rank) the squares two ranks in front. For instance,
+	    // if black's king is on g8, kingRing[BLACK] is f8, h8, f7, g7, h7, f6, g6
+	    // and h6. It is set to 0 when king safety evaluation is skipped.
+	    long[] kingRing = new long[Constants.COLOUR_BLACK + 1];
+
+	    // kingAttackersCount[color] is the number of pieces of the given color
+	    // which attack a square in the kingRing of the enemy king.
+	    int[] kingAttackersCount = new int[Constants.COLOUR_BLACK + 1];
+
+	    // kingAttackersWeight[color] is the sum of the "weights" of the pieces of
+	    // the given color which attack a square in the kingRing of the enemy king.
+	    // The weights of the individual piece types are given by the elements in
+	    // the KingAttackWeights array.
+	    int[] kingAttackersWeight = new int[Constants.COLOUR_BLACK + 1];
+
+	    // kingAttacksCount[color] is the number of attacks by the given color to
+	    // squares directly adjacent to the enemy king. Pieces which attack more
+	    // than one square are counted multiple times. For instance, if there is
+	    // a white knight on g5 and black's king is on g8, this white knight adds 2
+	    // to kingAttacksCount[WHITE].
+	    int[] kingAttacksCount = new int[Constants.COLOUR_BLACK + 1];
+	    
+	    
 		public int eval_o_part1;
 		public int eval_e_part1;
 		public int eval_o_part2;
@@ -159,12 +407,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 			eval_o_part2 = 0;
 			eval_e_part2 = 0;
 		}
-	}
-	
-	
-	public static final int make_score(int mg, int eg) {
-		//return (eg << 16) + mg;
-		return (eg + mg) / 2;
 	}
 	
 	
@@ -211,8 +453,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 			pawnsOnSquares[Us][Constants.COLOUR_BLACK] = Long.bitCount(ourPawns & DarkSquares);
 			pawnsOnSquares[Us][Constants.COLOUR_WHITE] = Long.bitCount(ourPawns & LightSquares);
 			
-			//C++ TO JAVA CONVERTER TODO TASK: Pointer arithmetic is detected on this variable, so pointers on this variable are left unchanged:
-			//Square * pl = pos.<PieceType.PAWN.getValue()>squares(Us);
             int pawns_count = Us_pawns_list.getDataSize();
             if (pawns_count > 0) {
 	            int[] pawns_fields = Us_pawns_list.getData();
@@ -294,7 +534,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		/// when king square changes, which is about 20% of total king_safety() calls.
 		public final int do_king_safety(IBitBoard bitboard, int Us) {
 			
-			int squareID_ksq = bitboard.getPiecesLists().getPieces(Us == Constants.COLOUR_WHITE ? Constants.PID_W_KING : Constants.PID_B_KING).getData()[0];
+			int squareID_ksq = getKingSquareID(bitboard, Us);
 			kingSquares[Us] = squareID_ksq;
 			//castlingRights[Us] = bitboard.hasRightsToKingCastle(Us) || bitboard.hasRightsToQueenCastle(Us)//pos.can_castle(Us);
 			int minKingPawnDistance = 0;
@@ -361,7 +601,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 			final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 			final int Direction_Up = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
-			int squareID_ksq = bitboard.getPiecesLists().getPieces(Us == Constants.COLOUR_WHITE ? Constants.PID_W_KING : Constants.PID_B_KING).getData()[0];
+			int squareID_ksq = getKingSquareID(bitboard, Us);
 			
 			long b;
 			long bb;
@@ -370,8 +610,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 			long unsafeSquares;
 			int score = 0;
 			
-			//C++ TO JAVA CONVERTER TODO TASK: The following line was determined to be a copy assignment (rather than a reference assignment) - this should be verified and a 'copyFrom' method should be created:
-			//ORIGINAL LINE: b = pe->passed_pawns(Us);
 			b = passedPawns[Us];
 
 			while (b != 0) {
@@ -407,15 +645,17 @@ public class Evaluator extends Evaluator_BaseImpl {
 					}
 
 					// If the pawn is free to advance, then increase the bonus
-					/*if (pos.empty(blockSq))
-					{
+					if (bitboard.getFigureID(blockSq) == Constants.PID_NONE) {//pos.empty(blockSq))
+						
 						// If there is a rook or queen attacking/defending the pawn from behind,
 						// consider all the squaresToQueen. Otherwise consider only the squares
 						// in the pawn's path attacked or occupied by the enemy.
-						defendedSquares = unsafeSquares = squaresToQueen = GlobalMembers.forward_file_bb(Us, squareID);
+						defendedSquares = unsafeSquares = squaresToQueen = forward_file_bb(Us, squareID);
 
 						//C++ TO JAVA CONVERTER TODO TASK: The following line was determined to be a copy assignment (rather than a reference assignment) - this should be verified and a 'copyFrom' method should be created:
 						//ORIGINAL LINE: bb = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN) & pos.attacks_from<ROOK>(s);
+						
+						/*TODO 
 						bb.copyFrom(GlobalMembers.forward_file_bb(Them, squareID) & pos.pieces(PieceType.ROOK, PieceType.QUEEN) & pos.<PieceType.ROOK.getValue()>attacks_from(squareID));
 
 						if ((pos.pieces(Us) & bb) == null)
@@ -444,14 +684,15 @@ public class Evaluator extends Evaluator_BaseImpl {
 							k += 4;
 						}
 	
-						bonus += GlobalMembers.make_score(k * w, k * w);
-					}*/
+						bonus += make_score(k * w, k * w);
+						*/
+					}
 				} // rank > RANK_3
 
 				// Scale down bonus for candidate passers which need more than one
 				// pawn push to become passed, or have a pawn in front of them.
-				/*if (!pos.pawn_passed(Us, squareID + Direction_Up) || (pos.pieces(PieceType.PAWN) & forward_file_bb(Us, squareID)) != 0)
-				{
+				/*TODO
+				if (!pos.pawn_passed(Us, squareID + Direction_Up) || (pos.pieces(PieceType.PAWN) & forward_file_bb(Us, squareID)) != 0) {
 					bonus = bonus / 2;
 				}*/
 

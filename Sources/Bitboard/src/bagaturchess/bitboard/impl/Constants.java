@@ -48,6 +48,7 @@ public class Constants {
 	public static final int TYPE_ROOK = 4;
 	public static final int TYPE_QUEEN = 5;
 	public static final int TYPE_KING = 6;
+	public static final int TYPE_ALL = 7;
 	
 	/**
 	 * Pieces colours and types

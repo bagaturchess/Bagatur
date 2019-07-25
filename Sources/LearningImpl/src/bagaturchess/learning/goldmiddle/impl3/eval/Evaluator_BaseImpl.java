@@ -87,8 +87,12 @@ public class Evaluator_BaseImpl {
 	public static final long[][] ForwardFileBB = new long[Constants.COLOUR_BLACK + 1][Fields.H8_ID + 1];
 	public static final long[][] PawnAttackSpan = new long[Constants.COLOUR_BLACK + 1][Fields.H8_ID + 1];
 	public static final long[][] PassedPawnMask = new long[Constants.COLOUR_BLACK + 1][Fields.H8_ID + 1];
+	public static final long[][] PseudoAttacks = new long[Constants.TYPE_KING + 1][Fields.H8_ID + 1];
 	public static final long[][] PawnAttacks = new long[Constants.COLOUR_BLACK + 1][Fields.H8_ID + 1];
 	public static final long[][] DistanceRingBB = new long[Fields.H8_ID + 1][8];
+	
+	public Magic[] RookMagics = new Magic[Fields.H8_ID + 1];
+	public Magic[] BishopMagics = new Magic[Fields.H8_ID + 1];
 	
 	
 	static {
@@ -129,20 +133,39 @@ public class Evaluator_BaseImpl {
 	              }
 	      
 	      int steps[][] = { {}, { 7, 9 }, { 6, 10, 15, 17 }, {}, {}, {}, { 1, 7, 8, 9 } };//For pawns, knight and king only
-	      for (int colour = Constants.COLOUR_WHITE; colour <= Constants.COLOUR_BLACK; ++colour)
-	    	  for (int squareID = Fields.A1_ID; squareID <= Fields.H8_ID; ++squareID)
+	      for (int colour = Constants.COLOUR_WHITE; colour <= Constants.COLOUR_BLACK; ++colour) {
+	    	  for (int squareID = Fields.A1_ID; squareID <= Fields.H8_ID; ++squareID) {
+	    		  
 	    		  for (int i = 0; i < steps[Constants.TYPE_PAWN].length; ++i) {
 	                  
 	    			  int squareID_to = squareID + (colour == Constants.COLOUR_WHITE ? steps[Constants.TYPE_PAWN][i] : -steps[Constants.TYPE_PAWN][i]);
 
-	                  if (is_ok(squareID_to) && distance(squareID, squareID_to) < 3)
-	                  {
-	                      //if (pt == PAWN)
-	                          PawnAttacks[colour][squareID] |= SquareBB[squareID_to];
-	                      /*else
-	                          PseudoAttacks[pt][s] |= to;*/
+	                  if (is_ok(squareID_to) && distance(squareID, squareID_to) < 3) {
+	                       PawnAttacks[colour][squareID] |= SquareBB[squareID_to];
 	                  }
 	    		  }
+	    		  
+	    		  for (int i = 0; i < steps[Constants.TYPE_KNIGHT].length; ++i) {
+	                  
+	    			  int squareID_to = squareID + (colour == Constants.COLOUR_WHITE ? steps[Constants.TYPE_KNIGHT][i] : -steps[Constants.TYPE_KNIGHT][i]);
+
+	                  if (is_ok(squareID_to) && distance(squareID, squareID_to) < 3) {
+	                	  PseudoAttacks[Constants.TYPE_KNIGHT][squareID] |= SquareBB[squareID_to];
+	                  }
+	    		  }
+	    		  
+	    		  for (int i = 0; i < steps[Constants.TYPE_KING].length; ++i) {
+	                  
+	    			  int squareID_to = squareID + (colour == Constants.COLOUR_WHITE ? steps[Constants.TYPE_KING][i] : -steps[Constants.TYPE_KING][i]);
+
+	                  if (is_ok(squareID_to) && distance(squareID, squareID_to) < 3) {
+	                	  PseudoAttacks[Constants.TYPE_KING][squareID] |= SquareBB[squareID_to];
+	                  }
+	    		  }
+	    	  }
+	      }
+	      
+	      
 	}
 	
 	
@@ -314,6 +337,51 @@ public class Evaluator_BaseImpl {
 	public static final int relative_square(int colour, int squareID) {
 	  return squareID ^ (colour * 56);
 	}
+	
+	
+	public static long attacks_bb_bishopAndRook(int pieceType, int squareID, long occupied) {
+		
+		if (pieceType != Constants.TYPE_BISHOP && pieceType != Constants.TYPE_ROOK){
+			throw new IllegalStateException();
+		}
+		
+		throw new UnsupportedOperationException();
+		//final Magic m = Pt == PieceType.ROOK ? RookMagics[squareID] : BishopMagics[squareID];
+		//return new uint64_t(m.attacks[m.index(new uint64_t(occupied))]);
+	}
+	
+	
+	public static long attacks_bb(int pieceType, int squareID, long occupied) {
+		
+		if (pieceType == Constants.TYPE_PAWN){
+			throw new IllegalStateException();
+		}
+		
+		switch (pieceType) {
+			case Constants.TYPE_BISHOP:
+				return attacks_bb_bishopAndRook(Constants.TYPE_BISHOP, squareID, occupied);
+			case Constants.TYPE_ROOK :
+				return attacks_bb_bishopAndRook(Constants.TYPE_ROOK, squareID, occupied);
+			case Constants.TYPE_QUEEN :
+				return attacks_bb_bishopAndRook(Constants.TYPE_BISHOP, squareID, occupied) | attacks_bb_bishopAndRook(Constants.TYPE_ROOK, squareID, occupied);
+			default :
+				return PseudoAttacks[pieceType][squareID];
+		}
+	}
+	
+	
+	// Magic holds all magic bitboards relevant data for a single square
+	private static final class Magic {
+		long  mask;
+		long  magic;
+		//Bitboard* attacks;
+		int  shift;
+
+		// Compute the attack's index using the 'magic bitboards' approach
+		long index(long occupied) {
+			return ((occupied & mask) * magic) >>> shift;
+		}
+	};
 	
 	
 	public static void main(String[] args) {
