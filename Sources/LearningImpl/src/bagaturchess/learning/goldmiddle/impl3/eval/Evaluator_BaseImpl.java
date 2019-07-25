@@ -64,7 +64,9 @@ public class Evaluator_BaseImpl {
 	public static final long CenterFiles 			= FileCBB | FileDBB | FileEBB | FileFBB;
 	public static final long KingSide 				= FileEBB | FileFBB | FileGBB | FileHBB;
 	public static final long Center 				= (FileDBB | FileEBB) & (Rank4BB | Rank5BB);
-	  
+	
+	public static final long[] KingFlank = {QueenSide ^ FileDBB, QueenSide, QueenSide, CenterFiles, CenterFiles, KingSide, KingSide, KingSide ^ FileEBB};
+	
 	public static final int FileA = 0;
 	public static final int FileB = 1;
 	public static final int FileC = 2;
@@ -95,9 +97,6 @@ public class Evaluator_BaseImpl {
 	public static final long[][] PseudoAttacks = new long[Constants.TYPE_KING + 1][Fields.H8_ID + 1];
 	public static final long[][] PawnAttacks = new long[Constants.COLOUR_BLACK + 1][Fields.H8_ID + 1];
 	public static final long[][] DistanceRingBB = new long[Fields.H8_ID + 1][8];
-	
-	public Magic[] RookMagics = new Magic[Fields.H8_ID + 1];
-	public Magic[] BishopMagics = new Magic[Fields.H8_ID + 1];
 	
 	
 	static {
@@ -377,20 +376,6 @@ public class Evaluator_BaseImpl {
 				return PseudoAttacks[pieceType][squareID];
 		}
 	}
-	  
-	  
-	// Magic holds all magic bitboards relevant data for a single square
-	private static final class Magic {
-		long  mask;
-		long  magic;
-		//Bitboard* attacks;
-		int  shift;
-
-		// Compute the attack's index using the 'magic bitboards' approach
-		long index(long occupied) {
-			return ((occupied & mask) * magic) >>> shift;
-		}
-	};
 	
 	
 	public static void main(String[] args) {

@@ -117,7 +117,13 @@ public class Evaluator extends Evaluator_BaseImpl {
 	public static final int TrappedRook = make_score(98, 5);
 	public static final int WeakQueen = make_score(51, 10);
 	public static final int WeakUnopposedPawn = make_score(14, 20);
-	  
+
+	// Penalties for enemy's safe checks
+	public static final int QueenSafeCheck = 780;
+	public static final int RookSafeCheck = 880;
+	public static final int BishopSafeCheck = 435;
+	public static final int KnightSafeCheck = 790;
+	
 	
 	private final IBitBoard bitboard;
 	private final EvalInfo evalinfo;
@@ -167,11 +173,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 		eval += evalinfo.mobility[Constants.COLOUR_WHITE];
 		eval -= evalinfo.mobility[Constants.COLOUR_BLACK];
 		
-		eval += pawns.do_king_safety(bitboard, Constants.COLOUR_WHITE);
-		eval -= pawns.do_king_safety(bitboard, Constants.COLOUR_BLACK);
+		eval += king(bitboard, Constants.COLOUR_WHITE);
+		eval -= king(bitboard, Constants.COLOUR_BLACK);
 		
-		eval += pawns.passed(bitboard, Constants.COLOUR_WHITE);
-		eval -= pawns.passed(bitboard, Constants.COLOUR_BLACK);
+		eval += pawns.passed(bitboard, evalinfo, Constants.COLOUR_WHITE);
+		eval -= pawns.passed(bitboard, evalinfo, Constants.COLOUR_BLACK);
 		
 		return eval;
 	}
@@ -214,7 +220,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		evalinfo.mobility[Us] = 0;
 		
 		// Initialise attackedBy bitboards for kings and pawns
-		evalinfo.attackedBy[Us][Constants.TYPE_KING] = attacks_from(getKingSquareID(bitboard, Us), Constants.TYPE_KING);
+		evalinfo.attackedBy[Us][Constants.TYPE_KING] = attacks_from(bitboard, getKingSquareID(bitboard, Us), Constants.TYPE_KING);
 		evalinfo.attackedBy[Us][Constants.TYPE_PAWN] = pawns.pawnAttacks[Us];
 		evalinfo.attackedBy[Us][Constants.TYPE_ALL] = evalinfo.attackedBy[Us][Constants.TYPE_KING] | evalinfo.attackedBy[Us][Constants.TYPE_PAWN];
 		evalinfo.attackedBy2[Us] = evalinfo.attackedBy[Us][Constants.TYPE_KING] & evalinfo.attackedBy[Us][Constants.TYPE_PAWN];
@@ -282,7 +288,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		      								^ (bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN) | bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN))
 		      								^ (bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_ROOK) | bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_ROOK))
 	      								)
-	      						: attacks_from(squareID, pieceType);
+	      						: attacks_from(bitboard, squareID, pieceType);
 	      		
 	      		/*TODO if ((pos.blockers_for_king(Us) & squareBB) != 0) {
 	      		 b &= LineBB[pos.<PieceType.KING.getValue().getValue()>square(Us)][squareID];
@@ -379,14 +385,122 @@ public class Evaluator extends Evaluator_BaseImpl {
 	}
 	
 	
-	private long attacks_from(int squareID, int pieceType) {
+	// Evaluation::king() assigns bonuses and penalties to a king of a given color
+	private int king(IBitBoard bitboard, int Us) {
+
+		final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
+		final long Camp = (Us == Constants.COLOUR_WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
+
+		final int squareID_ksq = getKingSquareID(bitboard, Us);
+		long kingFlank;
+		long weak;
+		long b;
+		long b1;
+		long b2;
+		long safe;
+		long unsafeChecks;
+
+		// King shelter and enemy pawns storm
+		int score = pawns.do_king_safety(bitboard, Us);
+
+		// Find the squares that opponent attacks in our king flank, and the squares
+		// which are attacked twice in that flank.
+		kingFlank = KingFlank[file_of(squareID_ksq)];
+		
+		b1 = evalinfo.attackedBy[Them][Constants.TYPE_ALL] & kingFlank & Camp;
+		b2 = b1 & evalinfo.attackedBy2[Them];
+		
+		int tropism = Long.bitCount(b1) + Long.bitCount(b2);
+
+		// Main king safety evaluation
+		if (evalinfo.kingAttackersCount[Them] > 1 /*TODO - pos.<PieceType.QUEEN.getValue()>count(Them)*/) {
+			int kingDanger = 0;
+			unsafeChecks = 0;
+			
+			// Attacked squares defended at most once by our queen or king
+			weak = evalinfo.attackedBy[Them][Constants.TYPE_ALL] & ~evalinfo.attackedBy2[Us] & (~evalinfo.attackedBy[Us][Constants.TYPE_ALL] | evalinfo.attackedBy[Us][Constants.TYPE_KING] | evalinfo.attackedBy[Us][Constants.TYPE_QUEEN]);
+			
+			// Analyse the safe enemy's checks which are possible on next move
+			safe = ~bitboard.getFiguresBitboardByColour(Them);
+			safe &= ~evalinfo.attackedBy[Us][Constants.TYPE_ALL] | (weak & evalinfo.attackedBy2[Them]);
+			
+			b1 = attacks_bb(Constants.TYPE_ROOK, squareID_ksq, ~bitboard.getFreeBitboard() ^ bitboard.getFiguresBitboardByColourAndType(Us, Constants.TYPE_QUEEN));
+			b2 = attacks_bb(Constants.TYPE_BISHOP, squareID_ksq, ~bitboard.getFreeBitboard() ^ bitboard.getFiguresBitboardByColourAndType(Us, Constants.TYPE_QUEEN));
+			
+			// Enemy queen safe checks
+			if (((b1 | b2) & evalinfo.attackedBy[Them][Constants.TYPE_QUEEN] & safe & ~evalinfo.attackedBy[Us][Constants.TYPE_QUEEN]) != 0) {
+				kingDanger += QueenSafeCheck;
+			}
+			
+			b1 &= evalinfo.attackedBy[Them][Constants.TYPE_ROOK];
+			b2 &= evalinfo.attackedBy[Them][Constants.TYPE_BISHOP];
+			
+			// Enemy rooks checks
+			if ((b1 & safe) != 0) {
+				kingDanger += RookSafeCheck;
+			} else {
+				unsafeChecks |= b1;
+			}
+			
+			// Enemy bishops checks
+			if ((b2 & safe) != 0) {
+				kingDanger += BishopSafeCheck;
+			} else {
+				unsafeChecks |= b2;
+			}
+
+			// Enemy knights checks
+			//TODO check
+			b = attacks_from(bitboard, squareID_ksq, Constants.TYPE_KNIGHT) & evalinfo.attackedBy[Them][Constants.TYPE_KNIGHT];
+			if ((b & safe) != 0) {
+				kingDanger += KnightSafeCheck;
+			} else {
+				unsafeChecks |= b;
+			}
+
+			// Unsafe or occupied checking squares will also be considered, as long as
+			// the square is in the attacker's mobility area.
+			unsafeChecks &= evalinfo.mobilityArea[Them];
+
+			kingDanger += evalinfo.kingAttackersCount[Them] * evalinfo.kingAttackersWeight[Them]
+					  + 69 * evalinfo.kingAttacksCount[Them]
+					  + 185 * Long.bitCount(evalinfo.kingRing[Us] & weak)
+					  //TODO + 150 * Long.bitCount(pos.blockers_for_king(Us) | unsafeChecks)
+					  + tropism * tropism / 4
+					  - 873 * (bitboard.getPiecesLists().getPieces(Figures.getPidByColourAndType(Them, Constants.TYPE_QUEEN)).getDataSize() == 0 ? 1 : 0) //TODO check !pos.<PieceType.QUEEN.getValue()>count(Them)
+					  //TODO - 6 * mg_value(score) / 8
+					  - 6 * score / 8
+					  //TODO+ mg_value(mobility[Them] - mobility[Us])
+					  + (evalinfo.mobility[Them] - evalinfo.mobility[Us])
+					  - 30;
+
+			// Transform the kingDanger units into a Score, and subtract it from the evaluation
+			if (kingDanger > 0) {
+				score -= make_score(kingDanger * kingDanger / 4096, kingDanger / 16);
+			}
+		}
+		
+		// Penalty when our king is on a pawnless flank
+		if (((bitboard.getFiguresBitboardByColourAndType(Us, Constants.TYPE_PAWN) | bitboard.getFiguresBitboardByColourAndType(Them, Constants.TYPE_PAWN)) & kingFlank) == 0)
+		{
+			score -= PawnlessFlank;
+		}
+
+		// King tropism bonus, to anticipate slow motion attacks on our king
+		score -= CloseEnemies * tropism;
+
+		return score;
+	}
+		
+	
+	private static final long attacks_from(IBitBoard bitboard, int squareID, int pieceType) {
 		
 		if (pieceType == Constants.TYPE_PAWN){
 			throw new IllegalStateException();
 		}
 		
 		return pieceType == Constants.TYPE_BISHOP || pieceType == Constants.TYPE_ROOK ? attacks_bb(pieceType, squareID, ~bitboard.getFreeBitboard())
-				: pieceType == Constants.TYPE_QUEEN ? attacks_from(squareID, Constants.TYPE_ROOK) | attacks_from(squareID, Constants.TYPE_BISHOP)
+				: pieceType == Constants.TYPE_QUEEN ? attacks_from(bitboard, squareID, Constants.TYPE_ROOK) | attacks_from(bitboard, squareID, Constants.TYPE_BISHOP)
 				: PseudoAttacks[pieceType][squareID];
 	}
 	
@@ -648,7 +762,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 		
 		
-		public int passed(IBitBoard bitboard, int Us) {
+		public int passed(IBitBoard bitboard, EvalInfo evalinfo, int Us) {
 
 			final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 			final int Direction_Up = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
@@ -685,7 +799,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 				{
 					int w = (rankID - 2) * (rankID - 2) + 2;
 					int blockSq = squareID + Direction_Up;
-
+					long blockBB = SquareBB[blockSq];
+					
 					// Adjust bonus based on the king's proximity
 					bonus += make_score(0, (king_proximity(Them, blockSq, squareID_ksq) * 5 - king_proximity(Us, blockSq, squareID_ksq) * 2) * w);
 
@@ -703,25 +818,24 @@ public class Evaluator extends Evaluator_BaseImpl {
 						// in the pawn's path attacked or occupied by the enemy.
 						defendedSquares = unsafeSquares = squaresToQueen = forward_file_bb(Us, squareID);
 
-						//C++ TO JAVA CONVERTER TODO TASK: The following line was determined to be a copy assignment (rather than a reference assignment) - this should be verified and a 'copyFrom' method should be created:
 						//ORIGINAL LINE: bb = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN) & pos.attacks_from<ROOK>(s);
-						
-						/*TODO 
-						bb.copyFrom(GlobalMembers.forward_file_bb(Them, squareID) & pos.pieces(PieceType.ROOK, PieceType.QUEEN) & pos.<PieceType.ROOK.getValue()>attacks_from(squareID));
+						bb = forward_file_bb(Them, squareID)
+								& (bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN) | bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN) | bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_ROOK) | bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_ROOK))
+								& attacks_from(bitboard, squareID, Constants.TYPE_ROOK);
 
-						if ((pos.pieces(Us) & bb) == null)
+						if ((bitboard.getFiguresBitboardByColour(Us) & bb) == 0)
 						{
-							defendedSquares &= attackedBy[Us][PieceType.ALL_PIECES.getValue()];
+							defendedSquares &= evalinfo.attackedBy[Us][Constants.TYPE_ALL];
 						}
 
-						if ((pos.pieces(Them) & bb) == null)
+						if ((bitboard.getFiguresBitboardByColour(Them) & bb) == 0)
 						{
-							unsafeSquares &= attackedBy[Them.getValue()][PieceType.ALL_PIECES.getValue()] | pos.pieces(Them);
+							unsafeSquares &= evalinfo.attackedBy[Them][Constants.TYPE_ALL] | bitboard.getFiguresBitboardByColour(Them);
 						}
 
 						// If there aren't any enemy attacks, assign a big bonus. Otherwise
 						// assign a smaller bonus if the block square isn't attacked.
-						int k = unsafeSquares == null ? 20 : (unsafeSquares & blockSq) == null ? 9 : 0;
+						int k = unsafeSquares == 0 ? 20 : (unsafeSquares & blockBB) == 0 ? 9 : 0;
 
 						// If the path to the queen is fully defended, assign a big bonus.
 						// Otherwise assign a smaller bonus if the block square is defended.
@@ -730,13 +844,13 @@ public class Evaluator extends Evaluator_BaseImpl {
 							k += 6;
 						}
 	
-						else if (defendedSquares & blockSq)
+						else if ((defendedSquares & blockBB) != 0)
 						{
 							k += 4;
 						}
 	
 						bonus += make_score(k * w, k * w);
-						*/
+						
 					}
 				} // rank > RANK_3
 
