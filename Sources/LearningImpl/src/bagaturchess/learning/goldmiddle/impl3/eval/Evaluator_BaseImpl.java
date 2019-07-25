@@ -41,25 +41,30 @@ public class Evaluator_BaseImpl {
 	public static final long AllSquares 			= ~0;
 	public static final long DarkSquares 			= 0xAA55AA55AA55AA55L;
 	public static final long LightSquares 			= ~DarkSquares;
-
-	public static final long FileABB = 0x0101010101010101L;
-	public static final long FileBBB = FileABB << 1;
-	public static final long FileCBB = FileABB << 2;
-	public static final long FileDBB = FileABB << 3;
-	public static final long FileEBB = FileABB << 4;
-	public static final long FileFBB = FileABB << 5;
-	public static final long FileGBB = FileABB << 6;
-	public static final long FileHBB = FileABB << 7;
 	
-	public static final long Rank1BB = 0xFF;
-	public static final long Rank2BB = Rank1BB << (8 * 1);
-	public static final long Rank3BB = Rank1BB << (8 * 2);
-	public static final long Rank4BB = Rank1BB << (8 * 3);
-	public static final long Rank5BB = Rank1BB << (8 * 4);
-	public static final long Rank6BB = Rank1BB << (8 * 5);
-	public static final long Rank7BB = Rank1BB << (8 * 6);
-	public static final long Rank8BB = Rank1BB << (8 * 7);
+	public static final long FileABB 				= 0x0101010101010101L;
+	public static final long FileBBB 				= FileABB << 1;
+	public static final long FileCBB 				= FileABB << 2;
+	public static final long FileDBB 				= FileABB << 3;
+	public static final long FileEBB 				= FileABB << 4;
+	public static final long FileFBB 				= FileABB << 5;
+	public static final long FileGBB 				= FileABB << 6;
+	public static final long FileHBB 				= FileABB << 7;
 	
+	public static final long Rank1BB 				= 0xFF;
+	public static final long Rank2BB 				= Rank1BB << (8 * 1);
+	public static final long Rank3BB 				= Rank1BB << (8 * 2);
+	public static final long Rank4BB 				= Rank1BB << (8 * 3);
+	public static final long Rank5BB 				= Rank1BB << (8 * 4);
+	public static final long Rank6BB 				= Rank1BB << (8 * 5);
+	public static final long Rank7BB 				= Rank1BB << (8 * 6);
+	public static final long Rank8BB 				= Rank1BB << (8 * 7);
+	
+	public static final long QueenSide 				= FileABB | FileBBB | FileCBB | FileDBB;
+	public static final long CenterFiles 			= FileCBB | FileDBB | FileEBB | FileFBB;
+	public static final long KingSide 				= FileEBB | FileFBB | FileGBB | FileHBB;
+	public static final long Center 				= (FileDBB | FileEBB) & (Rank4BB | Rank5BB);
+	  
 	public static final int FileA = 0;
 	public static final int FileB = 1;
 	public static final int FileC = 2;
@@ -339,15 +344,19 @@ public class Evaluator_BaseImpl {
 	}
 	
 	
-	public static long attacks_bb_bishopAndRook(int pieceType, int squareID, long occupied) {
+	public static long attacks_bb_BishopAndRook(int pieceType, int squareID, long occupied) {
 		
 		if (pieceType != Constants.TYPE_BISHOP && pieceType != Constants.TYPE_ROOK){
 			throw new IllegalStateException();
 		}
 		
-		throw new UnsupportedOperationException();
-		//final Magic m = Pt == PieceType.ROOK ? RookMagics[squareID] : BishopMagics[squareID];
-		//return new uint64_t(m.attacks[m.index(new uint64_t(occupied))]);
+		if (pieceType == Constants.TYPE_BISHOP) {
+			return Magics.getBishopMoves(squareID, occupied);
+		} else if (pieceType == Constants.TYPE_ROOK) {
+			return Magics.getRookMoves(squareID, occupied);
+		} else {
+			throw new IllegalStateException();
+		}
 	}
 	
 	
@@ -359,17 +368,17 @@ public class Evaluator_BaseImpl {
 		
 		switch (pieceType) {
 			case Constants.TYPE_BISHOP:
-				return attacks_bb_bishopAndRook(Constants.TYPE_BISHOP, squareID, occupied);
+				return attacks_bb_BishopAndRook(Constants.TYPE_BISHOP, squareID, occupied);
 			case Constants.TYPE_ROOK :
-				return attacks_bb_bishopAndRook(Constants.TYPE_ROOK, squareID, occupied);
+				return attacks_bb_BishopAndRook(Constants.TYPE_ROOK, squareID, occupied);
 			case Constants.TYPE_QUEEN :
-				return attacks_bb_bishopAndRook(Constants.TYPE_BISHOP, squareID, occupied) | attacks_bb_bishopAndRook(Constants.TYPE_ROOK, squareID, occupied);
+				return attacks_bb_BishopAndRook(Constants.TYPE_BISHOP, squareID, occupied) | attacks_bb_BishopAndRook(Constants.TYPE_ROOK, squareID, occupied);
 			default :
 				return PseudoAttacks[pieceType][squareID];
 		}
 	}
-	
-	
+	  
+	  
 	// Magic holds all magic bitboards relevant data for a single square
 	private static final class Magic {
 		long  mask;

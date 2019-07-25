@@ -431,18 +431,6 @@ public class Evaluator_BaseImpl {
 				| bishopMagicMoves[fromIndex][(int) ((allPieces & bishopMovementMasks[fromIndex]) * bishopMagicNumbers[fromIndex] >>> bishopShifts[fromIndex])];
 	}
 
-	public static long getRookMovesEmptyBoard(final int fromIndex) {
-		return rookMagicMoves[fromIndex][0];
-	}
-
-	public static long getBishopMovesEmptyBoard(final int fromIndex) {
-		return bishopMagicMoves[fromIndex][0];
-	}
-
-	public static long getQueenMovesEmptyBoard(final int fromIndex) {
-		return bishopMagicMoves[fromIndex][0] | rookMagicMoves[fromIndex][0];
-	}
-
 	static {
 		calculateBishopMovementMasks();
 		calculateRookMovementMasks();
