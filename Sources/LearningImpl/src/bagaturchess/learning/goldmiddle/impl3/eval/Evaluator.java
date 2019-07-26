@@ -1136,7 +1136,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		public final int semiopen_file(int colour, int fileID) {
 			return semiopenFiles[colour] & (1 << fileID);
 		}
-		  
+		
 		
 		private static final int king_proximity(int colour, int squareID, int kingSquareID) {
 			return Math.min(distance(kingSquareID, squareID), 5);
