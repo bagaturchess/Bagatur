@@ -176,6 +176,10 @@ public class Evaluator_BaseImpl {
 	      for (int squareID = Fields.A1_ID; squareID <= Fields.H8_ID; ++squareID) {
 	    	  PseudoAttacks[Constants.TYPE_BISHOP][squareID] = Magics.getBishopMoves(squareID, 0);
 	      }
+	      
+	      for (int squareID = Fields.A1_ID; squareID <= Fields.H8_ID; ++squareID) {
+	    	  PseudoAttacks[Constants.TYPE_QUEEN][squareID] = PseudoAttacks[Constants.TYPE_ROOK][squareID] | PseudoAttacks[Constants.TYPE_BISHOP][squareID];
+	      }
 	}
 	
 	
