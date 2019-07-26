@@ -123,7 +123,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 	public static final int BishopPawns_E = 8;
 	public static final int CloseEnemies_O = 7;
 	public static final int CloseEnemies_E = 0;
-	public static final int CorneredBishop = make_score(50, 50);
+	public static final int CorneredBishop_O = 50;
+	public static final int CorneredBishop_E = 50;
 	public static final int Hanging_O = 62;
 	public static final int Hanging_E = 34;
 	public static final int KingProtector_O = 6;
@@ -154,7 +155,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 	public static final int ThreatBySafePawn_E = 99;
 	public static final int TrappedRook_O = 98;
 	public static final int TrappedRook_E = 5;
-	public static final int WeakQueen = make_score(51, 10);
+	public static final int WeakQueen_O = 51;
+	public static final int WeakQueen_E = 10;
 	public static final int WeakUnopposedPawn_O = 14;
 	public static final int WeakUnopposedPawn_E = 20;
 
@@ -668,9 +670,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 	
 	private void space(int Us) {
 		
+		/*
+		//TODO check if it is necessary
 		if (bitboard.getBaseEvaluation().getWhiteMaterialNonPawns_o() + bitboard.getBaseEvaluation().getBlackMaterialNonPawns_o() < 12222) {
 			return;
-		}
+		}*/
 		
 		final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 		final long SpaceMask = Us == Constants.COLOUR_WHITE ? CenterFiles & (Rank2BB | Rank3BB | Rank4BB) : CenterFiles & (Rank7BB | Rank6BB | Rank5BB);
@@ -721,28 +725,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 	
 	public static final int make_score_e(int mg, int eg) {
 		return eg;
-	}
-	
-	
-	public static final int make_score(int mg, int eg) {
-		//return (eg << 16) + mg;
-		return (eg + mg) / 2;
-	}
-	
-	
-	/// Extracting the signed lower and upper 16 bits is not so trivial because
-	/// according to the standard a simple cast to short is implementation defined
-	/// and so is a right shift of a signed integer.
-	int mg_value(int score) {
-		//union { uint16_t u; int16_t s; } mg = { uint16_t(unsigned(s)) };
-		return (short) score;
-	}
-	
-	
-	int eg_value(int score) {
-		return (short) (score >> 16);
-		//return score >> 16;
-		//union { uint16_t u; int16_t s; } eg = { uint16_t(unsigned(s + 0x8000) >> 16) };
 	}
 	
 	
