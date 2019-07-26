@@ -195,6 +195,9 @@ public class Evaluator extends Evaluator_BaseImpl {
 		eval += pawns.passed(bitboard, evalinfo, Constants.COLOUR_WHITE);
 		eval -= pawns.passed(bitboard, evalinfo, Constants.COLOUR_BLACK);
 		
+		eval += space(Constants.COLOUR_WHITE);
+		eval -= space(Constants.COLOUR_BLACK);
+		
 		return eval;
 	}
 	
@@ -630,39 +633,31 @@ public class Evaluator extends Evaluator_BaseImpl {
 	}
 	
 	
-	/*private int space(int Us)
-	{
+	private int space(int Us) {
 
-	  if (pos.non_pawn_material() < 12222)
-	  {
-		  return Score.SCORE_ZERO;
-	  }
+		if (bitboard.getBaseEvaluation().getWhiteMaterialNonPawns_o() + bitboard.getBaseEvaluation().getBlackMaterialNonPawns_o() < 12222) {
+			return 0;
+		}
 
-	  final Color Them = (Us == Color.WHITE ? Color.BLACK : Color.WHITE);
-	  final uint64_t SpaceMask = Us == Color.WHITE ? GlobalMembers.CenterFiles & (GlobalMembers.Rank2BB | GlobalMembers.Rank3BB | GlobalMembers.Rank4BB) : GlobalMembers.CenterFiles & (GlobalMembers.Rank7BB | GlobalMembers.Rank6BB | GlobalMembers.Rank5BB);
+		final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
+		final long SpaceMask = Us == Constants.COLOUR_WHITE ? CenterFiles & (Rank2BB | Rank3BB | Rank4BB) : CenterFiles & (Rank7BB | Rank6BB | Rank5BB);
 
-	  // Find the available squares for our pieces inside the area defined by SpaceMask
-	  uint64_t safe = SpaceMask & ~pos.pieces(Us, PieceType.PAWN) & ~attackedBy[Them.getValue()][PieceType.PAWN.getValue()];
+		// Find the available squares for our pieces inside the area defined by SpaceMask
+		long safe = SpaceMask & ~evalinfo.bb_pawns[Us] & ~evalinfo.attackedBy[Them][Constants.TYPE_PAWN];
 
-	  // Find all squares which are at most three squares behind some friendly pawn
-	  uint64_t behind = pos.pieces(Us, PieceType.PAWN);
-//C++ TO JAVA CONVERTER WARNING: The right shift operator was not replaced by Java's logical right shift operator since the left operand was not confirmed to be of an unsigned type, but you should review whether the logical right shift operator (>>>) is more appropriate:
-	  behind |= (Us == Color.WHITE ? behind >> 8 : behind << 8);
-//C++ TO JAVA CONVERTER WARNING: The right shift operator was not replaced by Java's logical right shift operator since the left operand was not confirmed to be of an unsigned type, but you should review whether the logical right shift operator (>>>) is more appropriate:
-	  behind |= (Us == Color.WHITE ? behind >> 16 : behind << 16);
+		// Find all squares which are at most three squares behind some friendly pawn
+		long behind = evalinfo.bb_pawns[Us];
+		behind |= (Us == Constants.COLOUR_WHITE ? behind >> 8 : behind << 8);
+		behind |= (Us == Constants.COLOUR_WHITE ? behind >> 16 : behind << 16);
 
-	  int bonus = GlobalMembers.popcount(new uint64_t(safe)) + GlobalMembers.popcount(behind & safe);
-	  int weight = pos.<PieceType.ALL_PIECES.getValue()>count(Us) - 2 * pe.open_files();
+		int bonus = Long.bitCount(safe) + Long.bitCount(behind & safe);
+		int piecesCount = 1;//TODO pos.<PieceType.ALL_PIECES.getValue()>count(Us)
+		int weight = piecesCount - 2 * pawns.openFiles;
 
-	  Score score = GlobalMembers.make_score(bonus * weight * weight / 16, 0);
-
-	  if (T)
-	  {
-		  Trace.GlobalMembers.add(SPACE, Us, score);
-	  }
-
-	  return score;
-	}*/
+		int score = make_score(bonus * weight * weight / 16, 0);
+	  
+		return score;
+	}
 	
 	
 	private static final long attacks_from(IBitBoard bitboard, int squareID, int pieceType) {
@@ -790,7 +785,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		public int[] semiopenFiles = new int[Constants.COLOUR_BLACK + 1];
 		public int[][] pawnsOnSquares = new int[Constants.COLOUR_BLACK + 1][Constants.COLOUR_BLACK + 1]; // [color][light/dark squares]
 		//public int asymmetry;
-		//public int openFiles;
+		public int openFiles;//TODO fill this field
 		  
 		
 		public int evaluate(IBitBoard bitboard, int Us, PiecesList Us_pawns_list) {
