@@ -25,7 +25,6 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.state.PiecesList;
-import bagaturchess.learning.goldmiddle.impl1.base.IChessBoard;
 
 
 public class Evaluator extends Evaluator_BaseImpl {
@@ -202,6 +201,12 @@ public class Evaluator extends Evaluator_BaseImpl {
 		eval += space(Constants.COLOUR_WHITE);
 		eval -= space(Constants.COLOUR_BLACK);
 		
+		//System.out.println("mg_value(eval)=" + mg_value(eval));
+		//System.out.println("eg_value(eval)=" + eg_value(eval));
+		/*if ((mg_value(eval) | (eg_value(eval) << 16)) != eval) {
+			throw new IllegalStateException();
+		}
+		eval = bitboard.getMaterialFactor().interpolateByFactor(mg_value(eval), eg_value(eval));*/
 		return eval * 100 / 256;
 	}
 	
@@ -490,7 +495,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 					  //TODO+ mg_value(mobility[Them] - mobility[Us])
 					  + (evalinfo.mobility[Them] - evalinfo.mobility[Us])
 					  - 30;
-
+			
 			// Transform the kingDanger units into a Score, and subtract it from the evaluation
 			if (kingDanger > 0) {
 				score -= make_score(kingDanger * kingDanger / 4096, kingDanger / 16);
@@ -645,8 +650,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 		// Find all squares which are at most three squares behind some friendly pawn
 		long behind = evalinfo.bb_pawns[Us];
-		behind |= (Us == Constants.COLOUR_WHITE ? behind >> 8 : behind << 8);
-		behind |= (Us == Constants.COLOUR_WHITE ? behind >> 16 : behind << 16);
+		behind |= (Us == Constants.COLOUR_WHITE ? behind >>> 8 : behind << 8);
+		behind |= (Us == Constants.COLOUR_WHITE ? behind >>> 16 : behind << 16);
 
 		int bonus = Long.bitCount(safe) + Long.bitCount(behind & safe);
 		int piecesCount = Long.bitCount(evalinfo.bb_all_pieces[Us]);
@@ -684,6 +689,22 @@ public class Evaluator extends Evaluator_BaseImpl {
 	public static final int make_score(int mg, int eg) {
 		//return (eg << 16) + mg;
 		return (eg + mg) / 2;
+	}
+	
+	
+	/// Extracting the signed lower and upper 16 bits is not so trivial because
+	/// according to the standard a simple cast to short is implementation defined
+	/// and so is a right shift of a signed integer.
+	int mg_value(int score) {
+		//union { uint16_t u; int16_t s; } mg = { uint16_t(unsigned(s)) };
+		return (short) score;
+	}
+	
+	
+	int eg_value(int score) {
+		return (short) (score >> 16);
+		//return score >> 16;
+		//union { uint16_t u; int16_t s; } eg = { uint16_t(unsigned(s + 0x8000) >> 16) };
 	}
 	
 	
