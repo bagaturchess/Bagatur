@@ -3,6 +3,7 @@ package bagaturchess.learning.goldmiddle.run;
 
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
+import bagaturchess.learning.goldmiddle.visitors.EvalDiffVisitorImpl;
 import bagaturchess.learning.goldmiddle.visitors.LearningVisitorImpl;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 import bagaturchess.ucitracker.api.PositionsVisitor;
@@ -26,6 +27,7 @@ public class LearningTraverser {
 			//String filePath = "./komodo-9.cg";
 			
 			PositionsVisitor learning = new LearningVisitorImpl();
+			//PositionsVisitor learning = new EvalDiffVisitorImpl();
 			
 			ILearningInput input = LearningInputFactory.createDefaultInput();
 			
