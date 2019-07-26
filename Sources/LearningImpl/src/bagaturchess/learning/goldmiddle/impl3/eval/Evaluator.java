@@ -186,13 +186,12 @@ public class Evaluator extends Evaluator_BaseImpl {
 	
 	
 	public double calculateScore1() {
-		int eval = 0;
 		
 		evalinfo.clearEvals1();
 		
 		calculateMaterialScore();
 		
-		eval = bitboard.getMaterialFactor().interpolateByFactor(
+		int eval = bitboard.getMaterialFactor().interpolateByFactor(
 				bitboard.getBaseEvaluation().getPST_o() + evalinfo.eval_o_part1,
 				bitboard.getBaseEvaluation().getPST_e() + evalinfo.eval_e_part1
 				);
@@ -202,7 +201,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 	
 	
 	public double calculateScore2() {
-		int eval = 0;
 		
 		evalinfo.clearEvals2();
 		
@@ -235,7 +233,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		space(Constants.COLOUR_WHITE);
 		space(Constants.COLOUR_BLACK);
 		
-		eval += bitboard.getMaterialFactor().interpolateByFactor(evalinfo.eval_o_part2, evalinfo.eval_e_part2);
+		int eval = bitboard.getMaterialFactor().interpolateByFactor(evalinfo.eval_o_part2, evalinfo.eval_e_part2);
 		
 		eval = eval * 100 / 256;
 		
