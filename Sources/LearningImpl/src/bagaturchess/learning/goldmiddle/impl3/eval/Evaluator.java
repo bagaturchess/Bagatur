@@ -198,7 +198,9 @@ public class Evaluator extends Evaluator_BaseImpl {
 				bitboard.getBaseEvaluation().getPST_e() + evalinfo.eval_e_part1
 				);
 		
-		return eval * 100 / 256;
+		//eval = eval * 100 / 256;
+		
+		return eval;
 	}
 	
 	
@@ -223,6 +225,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 		pieces(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN);
 		pieces(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN);
 		
+		
+		//King shelter and enemy pawns storm
+		pawns.do_king_safety(bitboard, evalinfo, Constants.COLOUR_WHITE);
+		pawns.do_king_safety(bitboard, evalinfo, Constants.COLOUR_BLACK);
+		
 		king(Constants.COLOUR_WHITE);
 		king(Constants.COLOUR_BLACK);
 		
@@ -237,7 +244,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 		int eval = bitboard.getMaterialFactor().interpolateByFactor(evalinfo.eval_o_part2, evalinfo.eval_e_part2);
 		
-		eval = eval * 100 / 256;
+		//eval = eval * 100 / 256;
 		
 		return eval;
 	}
@@ -454,9 +461,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 		long b2;
 		long safe;
 		long unsafeChecks;
-
-		// King shelter and enemy pawns storm
-		pawns.do_king_safety(bitboard, evalinfo, Us);
 
 		// Find the squares that opponent attacks in our king flank, and the squares
 		// which are attacked twice in that flank.
@@ -964,7 +968,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 			if (pawns != 0) {
 				while ((DistanceRingBB[squareID_ksq][minKingPawnDistance] & pawns) == 0) {
 					minKingPawnDistance++;
-					//System.out.println(minKingPawnDistance);
 				}
 			}
 			
