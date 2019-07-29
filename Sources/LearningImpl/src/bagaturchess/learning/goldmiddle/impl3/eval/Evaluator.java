@@ -175,10 +175,10 @@ public class Evaluator extends Evaluator_BaseImpl {
 	public static final int[] ThreatByRook_E = {make_score_e(0, 0), make_score_e(0, 24), make_score_e(38, 71), make_score_e(38, 61), make_score_e(0, 38), make_score_e(51, 38), make_score_e(0, 0)};
 	
 	
-	private final IBitBoard bitboard;
-	private final EvalInfo evalinfo;
+	protected final IBitBoard bitboard;
+	protected final EvalInfo evalinfo;
 	private final Pawns pawns;
-	private final Material material;
+	protected final Material material;
 	
 	
 	public Evaluator(IBitBoard _bitboard) {
@@ -275,7 +275,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 	
 	// Evaluation::initialize() computes king and pawn attacks, and the king ring
 	// bitboard for a given color. This is done at the beginning of the evaluation.
-	private void initialize(int Us) {
+	protected void initialize(int Us) {
 		
 		final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 		final int Direction_Up = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
@@ -703,7 +703,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 	}
 	
 	
-	private static final long attacks_from(IBitBoard bitboard, int squareID, int pieceType) {
+	protected static final long attacks_from(IBitBoard bitboard, int squareID, int pieceType) {
 		
 		if (pieceType == Constants.TYPE_PAWN){
 			throw new IllegalStateException();
@@ -715,7 +715,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 	}
 	
 	
-	private static final int getKingSquareID(IBitBoard bitboard, int Us) {
+	protected static final int getKingSquareID(IBitBoard bitboard, int Us) {
 		return bitboard.getPiecesLists().getPieces(Us == Constants.COLOUR_WHITE ? Constants.PID_W_KING : Constants.PID_B_KING).getData()[0];
 	}
 	
@@ -736,55 +736,55 @@ public class Evaluator extends Evaluator_BaseImpl {
 	}
 	
 	
-	private static class EvalInfo {
+	public static class EvalInfo {
 		
 		
-		private long[] mobilityArea = new long[Constants.COLOUR_BLACK + 1];
+		public long[] mobilityArea = new long[Constants.COLOUR_BLACK + 1];
 	    //private int[] mobility_o = new int[Constants.COLOUR_BLACK + 1];
 	    //private int[] mobility_e = new int[Constants.COLOUR_BLACK + 1];
 	    
 	    // attackedBy[color][piece type] is a bitboard representing all squares
 	    // attacked by a given color and piece type. Special "piece types" which
 	    // is also calculated is ALL_PIECES.
-		private long[][] attackedBy = new long[Constants.COLOUR_BLACK + 1][Constants.TYPE_ALL + 1];
+		public long[][] attackedBy = new long[Constants.COLOUR_BLACK + 1][Constants.TYPE_ALL + 1];
 
 	    // attackedBy2[color] are the squares attacked by 2 pieces of a given color,
 	    // possibly via x-ray or by one pawn and one piece. Diagonal x-ray through
 	    // pawn or squares attacked by 2 pawns are not explicitly added.
-		private long[] attackedBy2 = new long[Constants.COLOUR_BLACK + 1];
+		public long[] attackedBy2 = new long[Constants.COLOUR_BLACK + 1];
 
 	    // kingRing[color] are the squares adjacent to the king, plus (only for a
 	    // king on its first rank) the squares two ranks in front. For instance,
 	    // if black's king is on g8, kingRing[BLACK] is f8, h8, f7, g7, h7, f6, g6
 	    // and h6. It is set to 0 when king safety evaluation is skipped.
-		private long[] kingRing = new long[Constants.COLOUR_BLACK + 1];
+		public long[] kingRing = new long[Constants.COLOUR_BLACK + 1];
 
 	    // kingAttackersCount[color] is the number of pieces of the given color
 	    // which attack a square in the kingRing of the enemy king.
-		private int[] kingAttackersCount = new int[Constants.COLOUR_BLACK + 1];
+		public int[] kingAttackersCount = new int[Constants.COLOUR_BLACK + 1];
 
 	    // kingAttackersWeight[color] is the sum of the "weights" of the pieces of
 	    // the given color which attack a square in the kingRing of the enemy king.
 	    // The weights of the individual piece types are given by the elements in
 	    // the KingAttackWeights array.
-		private int[] kingAttackersWeight = new int[Constants.COLOUR_BLACK + 1];
+		public int[] kingAttackersWeight = new int[Constants.COLOUR_BLACK + 1];
 
 	    // kingAttacksCount[color] is the number of attacks by the given color to
 	    // squares directly adjacent to the enemy king. Pieces which attack more
 	    // than one square are counted multiple times. For instance, if there is
 	    // a white knight on g5 and black's king is on g8, this white knight adds 2
 	    // to kingAttacksCount[WHITE].
-		private int[] kingAttacksCount = new int[Constants.COLOUR_BLACK + 1];
+		public int[] kingAttacksCount = new int[Constants.COLOUR_BLACK + 1];
 	    
-		private long bb_free;
-		private long bb_all;
-		private long[] bb_all_pieces 	= new long[Constants.COLOUR_BLACK + 1];
-		private long[] bb_pawns 			= new long[Constants.COLOUR_BLACK + 1];
-		private long[] bb_knights		= new long[Constants.COLOUR_BLACK + 1];
-		private long[] bb_bishops 		= new long[Constants.COLOUR_BLACK + 1];
-		private long[] bb_queens 		= new long[Constants.COLOUR_BLACK + 1];
-		private long[] bb_rooks 			= new long[Constants.COLOUR_BLACK + 1];
-		private long[] bb_king 			= new long[Constants.COLOUR_BLACK + 1];
+		public long bb_free;
+		public long bb_all;
+		public long[] bb_all_pieces 	= new long[Constants.COLOUR_BLACK + 1];
+		public long[] bb_pawns 			= new long[Constants.COLOUR_BLACK + 1];
+		public long[] bb_knights		= new long[Constants.COLOUR_BLACK + 1];
+		public long[] bb_bishops 		= new long[Constants.COLOUR_BLACK + 1];
+		public long[] bb_queens 		= new long[Constants.COLOUR_BLACK + 1];
+		public long[] bb_rooks 			= new long[Constants.COLOUR_BLACK + 1];
+		public long[] bb_king 			= new long[Constants.COLOUR_BLACK + 1];
 		
 		private int eval_o_part1;
 		private int eval_e_part1;
@@ -792,19 +792,19 @@ public class Evaluator extends Evaluator_BaseImpl {
 		private int eval_e_part2;
 		
 		
-		private void clearEvals1() {
+		public void clearEvals1() {
 			eval_o_part1 = 0;
 			eval_e_part1 = 0;
 		}
 		
 		
-		private void clearEvals2() {
+		public void clearEvals2() {
 			eval_o_part2 = 0;
 			eval_e_part2 = 0;
 		}
 		
 		
-		private void fillBB(IBitBoard bitboard) {
+		public void fillBB(IBitBoard bitboard) {
 			bb_pawns[Constants.COLOUR_WHITE] = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN);
 			bb_pawns[Constants.COLOUR_BLACK] = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN);
 			bb_knights[Constants.COLOUR_WHITE] = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT);
@@ -836,21 +836,21 @@ public class Evaluator extends Evaluator_BaseImpl {
 	}
 	
 	
-	private static class Pawns {
+	protected static class Pawns {
 		
 		
 		//public int[] scores = new int[Constants.COLOUR_BLACK + 1];
-		private long[] passedPawns = new long[Constants.COLOUR_BLACK + 1];
-		private long[] pawnAttacks = new long[Constants.COLOUR_BLACK + 1];
-		private long[] pawnAttacksSpan = new long[Constants.COLOUR_BLACK + 1];
-		private int[] kingSquares = new int[Constants.COLOUR_BLACK + 1];
+		public long[] passedPawns = new long[Constants.COLOUR_BLACK + 1];
+		public long[] pawnAttacks = new long[Constants.COLOUR_BLACK + 1];
+		public long[] pawnAttacksSpan = new long[Constants.COLOUR_BLACK + 1];
+		public int[] kingSquares = new int[Constants.COLOUR_BLACK + 1];
 		//private int[] kingSafety = new int[Constants.COLOUR_BLACK + 1];
-		private int[] weakUnopposed = new int[Constants.COLOUR_BLACK + 1];
+		public int[] weakUnopposed = new int[Constants.COLOUR_BLACK + 1];
 		//private int[] castlingRights = new int[Constants.COLOUR_BLACK + 1];
-		private int[] semiopenFiles = new int[Constants.COLOUR_BLACK + 1];
-		private int[][] pawnsOnSquares = new int[Constants.COLOUR_BLACK + 1][Constants.COLOUR_BLACK + 1]; // [color][light/dark squares]
+		public int[] semiopenFiles = new int[Constants.COLOUR_BLACK + 1];
+		public int[][] pawnsOnSquares = new int[Constants.COLOUR_BLACK + 1][Constants.COLOUR_BLACK + 1]; // [color][light/dark squares]
 		//private int asymmetry;
-		private int openFiles;//TODO fill this field
+		public int openFiles;//TODO fill this field
 		  
 		
 		private void evaluate(IBitBoard bitboard, EvalInfo evalinfo, int Us, PiecesList Us_pawns_list) {
@@ -987,7 +987,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 		/// Entry::evaluate_shelter() calculates the shelter bonus and the storm
 		/// penalty for a king, looking at the king file and the two closest files.
-		private final int evaluate_shelter(EvalInfo evalinfo, int Us, int squareID_ksq) {
+		protected final int evaluate_shelter(EvalInfo evalinfo, int Us, int squareID_ksq) {
 		
 			final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 			final int Direction_Down = (Us == Constants.COLOUR_WHITE ? Direction_SOUTH : Direction_NORTH);
@@ -1110,23 +1110,23 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 		
 		
-		private int pawns_on_same_color_squares(int Us, int squareID) {
+		public int pawns_on_same_color_squares(int Us, int squareID) {
 			return pawnsOnSquares[Us][(DarkSquares & SquareBB[squareID]) != 0 ? 1 : 0];
 		}
 		
 		
-		private final int semiopen_file(int colour, int fileID) {
+		public final int semiopen_file(int colour, int fileID) {
 			return semiopenFiles[colour] & (1 << fileID);
 		}
 		
 		
-		private static final int king_proximity(int colour, int squareID, int kingSquareID) {
+		public static final int king_proximity(int colour, int squareID, int kingSquareID) {
 			return Math.min(distance(kingSquareID, squareID), 5);
 		};
 	}
 	
 	
-	private static class Material {
+	protected static class Material {
 		
 		
 		// Polynomial material imbalance parameters
@@ -1159,7 +1159,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		int[][] pieceCount = new int[Constants.COLOUR_BLACK + 1][Constants.TYPE_QUEEN + 1];
 		
 		
-		private void initialize(IBitBoard bitboard) {
+		public void initialize(IBitBoard bitboard) {
 			
 			pieceCount[Constants.COLOUR_WHITE][0] = (bitboard.getPiecesLists().getPieces(Constants.PID_W_BISHOP).getDataSize() > 1) ? 1 : 0;
 			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_PAWN] = bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN).getDataSize();
@@ -1177,7 +1177,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		}
 		
 		
-		private int imbalance(int Us) {
+		public int imbalance(int Us) {
 			
 			final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 			
