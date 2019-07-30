@@ -20,6 +20,16 @@
 package bagaturchess.bitboard.impl1;
 
 
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.BISHOP;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.KING;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.NIGHT;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.PAWN;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.QUEEN;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
+
+
 import bagaturchess.bitboard.api.IBaseEval;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
@@ -36,6 +46,7 @@ import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.ChessBoardUtil;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
+import bagaturchess.bitboard.impl1.internal.MoveUtil;
 
 
 public class BoardImpl implements IBitBoard {
@@ -68,11 +79,14 @@ public class BoardImpl implements IBitBoard {
 		
 		generator.startPly();
 		
-		//generator.generateAttacks(chessBoard);
+		generator.generateAttacks(chessBoard);
 		generator.generateMoves(chessBoard);
 		
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
+			if (MoveUtil.getAttackedPieceIndex(cur_move) == KING) {
+				continue;//TODO remove king captures
+			}
 			list.reserved_add(cur_move);
 		}
 		
@@ -87,11 +101,14 @@ public class BoardImpl implements IBitBoard {
 		
 		generator.startPly();
 		
-		//generator.generateAttacks(chessBoard);
+		generator.generateAttacks(chessBoard);
 		generator.generateMoves(chessBoard);
 		
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
+			if (MoveUtil.getAttackedPieceIndex(cur_move) == KING) {
+				continue;//TODO remove king captures
+			}
 			list.reserved_add(cur_move);
 		}
 		
@@ -110,6 +127,30 @@ public class BoardImpl implements IBitBoard {
 	@Override
 	public void makeMoveBackward(int move) {
 		chessBoard.undoMove(move);
+	}
+	
+	
+	@Override
+	public void makeNullMoveForward() {
+		chessBoard.doNullMove();
+	}
+	
+	
+	@Override
+	public void makeNullMoveBackward() {
+		chessBoard.undoNullMove();
+	}
+	
+	
+	@Override
+	public int getColourToMove() {
+		return chessBoard.colorToMove; 
+	}
+	
+	
+	@Override
+	public boolean isCaptureMove(int move) {
+		return MoveUtil.getAttackedPieceIndex(move) != 0;
 	}
 	
 	
@@ -162,14 +203,6 @@ public class BoardImpl implements IBitBoard {
 	}
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getColourToMove()
-	 */
-	@Override
-	public int getColourToMove() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#genCapturePromotionMoves(bagaturchess.bitboard.api.IInternalMoveList)
 	 */
 	@Override
@@ -199,22 +232,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public void makeMoveForward(String ucimove) {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#makeNullMoveForward()
-	 */
-	@Override
-	public void makeNullMoveForward() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#makeNullMoveBackward()
-	 */
-	@Override
-	public void makeNullMoveBackward() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -528,14 +545,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public IFieldsAttacks getFieldsAttacks() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#isCaptureMove(int)
-	 */
-	@Override
-	public boolean isCaptureMove(int move) {
 		throw new UnsupportedOperationException();
 	}
 

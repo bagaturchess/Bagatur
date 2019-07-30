@@ -40,11 +40,4 @@ public interface IBitBoard extends IBoard {
 	public void setAttacksSupport(boolean attacksSupport, boolean fieldsStateSupport);
 	public IPlayerAttacks getPlayerAttacks(int colour);
 	public IFieldsAttacks getFieldsAttacks();
-	
-	
-	public boolean isCaptureMove(int move);
-	public boolean isPromotionMove(int move);
-	public boolean isCaptureOrPromotionMove(int move);
-	public boolean isEnpassantMove(int move);
-	public boolean isCastlingMove(int move);
 }

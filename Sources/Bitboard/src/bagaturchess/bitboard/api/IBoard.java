@@ -38,6 +38,12 @@ public interface IBoard {
 	public ISEE getSee();
 	public int getSEEScore(int move);
 	
+	public boolean isCaptureMove(int move);
+	public boolean isPromotionMove(int move);
+	public boolean isCaptureOrPromotionMove(int move);
+	public boolean isEnpassantMove(int move);
+	public boolean isCastlingMove(int move);
+	
 	public void mark();
 	public void reset();
 	public void revert();
