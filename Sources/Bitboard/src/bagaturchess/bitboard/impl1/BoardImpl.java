@@ -55,10 +55,17 @@ public class BoardImpl implements IBitBoard {
 	private ChessBoard chessBoard;
 	private MoveGenerator generator;
 	
+	private IPiecesLists pieces;
+	private IMaterialFactor materialFactor;
+	private IBaseEval baseEval;
+	
 	
 	public BoardImpl(String fen) {
 		chessBoard = ChessBoardUtil.getNewCB(fen);
 		generator = new MoveGenerator();
+		pieces = new PiecesListsImpl(this);
+		materialFactor = new MaterialFactorImpl();
+		baseEval = new BaseEvalImpl();
 	}
 	
 	
@@ -154,6 +161,78 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
+	@Override
+	public boolean isCaptureOrPromotionMove(int move) {
+		return isCaptureMove(move) || MoveUtil.isPromotion(move);
+	}
+	
+	
+	@Override
+	public int getSEEScore(int move) {
+		return 0;//TODO implement
+	}
+	
+	
+	@Override
+	public void revert() {
+		//TODO
+	}
+	
+	
+	@Override
+	public long getHashKey() {
+		return chessBoard.zobristKey;
+	}
+	
+	
+	@Override
+	public IPiecesLists getPiecesLists() {
+		return pieces;
+	}
+	
+	
+	@Override
+	public IMaterialFactor getMaterialFactor() {
+		return materialFactor;
+	}
+	
+	
+	@Override
+	public IBaseEval getBaseEvaluation() {
+		return baseEval;
+	}
+	
+	
+	@Override
+	public long getFiguresBitboardByColourAndType(int colour, int type) {
+		return chessBoard.pieces[colour][type];//TODO Check type
+	}
+	
+	
+	@Override
+	public long getFreeBitboard() {
+		return chessBoard.emptySpaces;
+	}
+	
+	
+	@Override
+	public boolean hasRightsToKingCastle(int colour) {
+		return false;//TODO chessBoard.castlingRights;
+	}
+	
+	
+	@Override
+	public boolean hasRightsToQueenCastle(int colour) {
+		return false;//TODO chessBoard.castlingRights;
+	}
+
+	
+	@Override
+	public int getFigureID(int fieldID) {
+		return chessBoard.pieceIndexes[fieldID];//TODO Check
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#getMatrix()
 	 */
@@ -195,14 +274,6 @@ public class BoardImpl implements IBitBoard {
 	}
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getPiecesLists()
-	 */
-	@Override
-	public IPiecesLists getPiecesLists() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#genCapturePromotionMoves(bagaturchess.bitboard.api.IInternalMoveList)
 	 */
 	@Override
@@ -236,14 +307,6 @@ public class BoardImpl implements IBitBoard {
 	}
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getHashKey()
-	 */
-	@Override
-	public long getHashKey() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#getPawnsHashKey()
 	 */
 	@Override
@@ -256,14 +319,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public int getStateRepetition() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getFigureID(int)
-	 */
-	@Override
-	public int getFigureID(int fieldID) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -292,14 +347,6 @@ public class BoardImpl implements IBitBoard {
 	}
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#revert()
-	 */
-	@Override
-	public void revert() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#toEPD()
 	 */
 	@Override
@@ -312,22 +359,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public IMaterialState getMaterialState() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getMaterialFactor()
-	 */
-	@Override
-	public IMaterialFactor getMaterialFactor() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getBaseEvaluation()
-	 */
-	@Override
-	public IBaseEval getBaseEvaluation() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -428,22 +459,6 @@ public class BoardImpl implements IBitBoard {
 	}
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#hasRightsToKingCastle(int)
-	 */
-	@Override
-	public boolean hasRightsToKingCastle(int colour) {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#hasRightsToQueenCastle(int)
-	 */
-	@Override
-	public boolean hasRightsToQueenCastle(int colour) {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#getPlayedMovesCount()
 	 */
 	@Override
@@ -476,26 +491,10 @@ public class BoardImpl implements IBitBoard {
 	}
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#getFreeBitboard()
-	 */
-	@Override
-	public long getFreeBitboard() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBitBoard#getFiguresBitboardByPID(int)
 	 */
 	@Override
 	public long getFiguresBitboardByPID(int pid) {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#getFiguresBitboardByColourAndType(int, int)
-	 */
-	@Override
-	public long getFiguresBitboardByColourAndType(int colour, int type) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -557,14 +556,6 @@ public class BoardImpl implements IBitBoard {
 	}
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#isCaptureOrPromotionMove(int)
-	 */
-	@Override
-	public boolean isCaptureOrPromotionMove(int move) {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBitBoard#isEnpassantMove(int)
 	 */
 	@Override
@@ -577,14 +568,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public boolean isCastlingMove(int move) {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#getSEEScore(int)
-	 */
-	@Override
-	public int getSEEScore(int move) {
 		throw new UnsupportedOperationException();
 	}
 }

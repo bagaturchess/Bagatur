@@ -159,7 +159,7 @@ public class Simulate {
 				//if (board.isInCheck());
 				
 				int see = 0;
-				if (MoveInt.isCaptureOrPromotion(move)) {
+				if (board.isCaptureOrPromotionMove(move)) {
 					see = board.getSEEScore(move);
 				}
 				
