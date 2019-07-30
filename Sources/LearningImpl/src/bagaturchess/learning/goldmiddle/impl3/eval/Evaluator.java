@@ -213,7 +213,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_WHITE, bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN));
 		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_BLACK, bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN));
-		
+		pawns.openFiles = Long.bitCount(pawns.semiopenFiles[Constants.COLOUR_WHITE] & pawns.semiopenFiles[Constants.COLOUR_BLACK]);
+		pawns.asymmetry = Long.bitCount((pawns.passedPawns[Constants.COLOUR_WHITE] | pawns.passedPawns[Constants.COLOUR_BLACK])
+											| (pawns.semiopenFiles[Constants.COLOUR_WHITE] ^ pawns.semiopenFiles[Constants.COLOUR_BLACK])
+										);
+		  
 		initialize(Constants.COLOUR_WHITE);
 		initialize(Constants.COLOUR_BLACK);
 		
@@ -242,10 +246,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 		space(Constants.COLOUR_WHITE);
 		space(Constants.COLOUR_BLACK);
 		
-		material.initialize(bitboard);
+		/*material.initialize(bitboard);
 		int imbalance = (material.imbalance(Constants.COLOUR_WHITE) - material.imbalance(Constants.COLOUR_BLACK)) / 16;
 		evalinfo.eval_o_part2 += imbalance;
 		evalinfo.eval_e_part2 += imbalance;
+		*/
 		
 		int eval = bitboard.getMaterialFactor().interpolateByFactor(evalinfo.eval_o_part2, evalinfo.eval_e_part2);
 		
@@ -850,9 +855,9 @@ public class Evaluator extends Evaluator_BaseImpl {
 		//private int[] castlingRights = new int[Constants.COLOUR_BLACK + 1];
 		public int[] semiopenFiles = new int[Constants.COLOUR_BLACK + 1];
 		public int[][] pawnsOnSquares = new int[Constants.COLOUR_BLACK + 1][Constants.COLOUR_BLACK + 1]; // [color][light/dark squares]
-		//private int asymmetry;
-		public int openFiles;//TODO fill this field
-		  
+		public int asymmetry;
+		public int openFiles;
+		
 		
 		private void evaluate(IBitBoard bitboard, EvalInfo evalinfo, int Us, PiecesList Us_pawns_list) {
 			
