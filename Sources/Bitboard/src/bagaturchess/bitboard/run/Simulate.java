@@ -34,6 +34,7 @@ import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.dummy.DummyBoard;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
+import bagaturchess.bitboard.impl1.BoardImpl;
 
 /**
 After the 1st ply (White's move) -- 20 possible positions 
@@ -98,7 +99,7 @@ public class Simulate {
 		
 	  	System.out.println("After: " + bitBoard);
 	  	
-	  	System.out.printf("Gen moves: " + info.nodes
+	  	System.out.printf("Gen moves: " + (info.nodes - 1)
 				+ ", Time " + (end-start) + "ms, Moves per second %f", (info.nodes/((end-start)/(double)1000)));
 	  	
 		//IBoard clone = (IBoard) bitBoard.clone();
@@ -115,7 +116,9 @@ public class Simulate {
 		
 		info.nodes++;
 		
-		if (board.isInCheck()) return;
+		/*if (board.isInCheck()) {
+			return;
+		}*/
 		
 		/*if (board.isInCheck(Constants.COLOUR_OP[board.getColourToMove()])) {
 			//King will be captured
@@ -124,9 +127,16 @@ public class Simulate {
 		if (depth != 0) {
 		
 			lists[depth].reserved_clear();
-			board.genAllMoves(lists[depth]);
+			if (board.isInCheck()) {
+				board.genKingEscapes(lists[depth]);
+			} else {
+				board.genAllMoves(lists[depth]);
+			}
 
 			int curCount = lists[depth].reserved_getCurrentSize();
+			/*if (curCount == 0) {
+				throw new IllegalStateException();
+			}*/
 			
 			//Utils.randomize(lists[depth].reserved_getMovesBuffer(), 0, curCount);
 			bubbleSort(0, curCount, lists[depth].reserved_getMovesBuffer());
@@ -148,23 +158,18 @@ public class Simulate {
 				
 				//if (board.isInCheck());
 				
-				int see = 0;
+				/*int see = 0;
 				if (MoveInt.isCaptureOrPromotion(move)) {
-					see = board.getSee().evalExchange(move);
+					see = board.getSEEScore(move);
 				}
 				
 				if (MoveInt.isCapture(move) && MoveInt.getCapturedFigureType(move) == Constants.TYPE_KING) {
 					continue;
-				}
+				}*/
 				
 				board.makeMoveForward(move);
 				
-				/*count += simulate1(newLine, board,
-								Figures.OPPONENT_COLOUR[colour],
-								movesPerLevel, depth - 1 );*/
-				simulate1(info, board,
-							Figures.OPPONENT_COLOUR[colour],
-							lists, depth - 1, branching);
+				simulate1(info, board, Figures.OPPONENT_COLOUR[colour], lists, depth - 1, branching);
 				
 				board.makeMoveBackward(move);
 			}
@@ -179,7 +184,8 @@ public class Simulate {
 		
 		//BoardWithAttacks bitBoard = new BoardWithAttacks();
 		//String BOARD = "4k3/P7/8/8/8/8/7p/4K3 w - 0 0";
-		IBoard bitBoard = new Board();
+		IBoard bitBoard = new BoardImpl(Constants.INITIAL_BOARD);
+		//IBoard bitBoard = new Board();
 		//IBoard bitBoard = new DummyBoard();
 		//IBoard bitBoard = new BoardImpl();
 		//bitBoard.setAttacksSupport(false, false);
@@ -189,6 +195,7 @@ public class Simulate {
 		simulate(info, bitBoard, Figures.COLOUR_WHITE, 22, 2);
 		//simulate(info, bitBoard, Figures.COLOUR_WHITE, 11, 4);
 		//simulate(info, bitBoard, Figures.COLOUR_WHITE, 10, 5);
+		//simulate(info, bitBoard, Figures.COLOUR_WHITE, 4, 12345);
 		
 		//System.out.println(((Board)bitBoard).statistics.toString());
 		

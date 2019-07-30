@@ -47,5 +47,4 @@ public interface IBitBoard extends IBoard {
 	public boolean isCaptureOrPromotionMove(int move);
 	public boolean isEnpassantMove(int move);
 	public boolean isCastlingMove(int move);
-	public int getSEEScore(int move);
 }
