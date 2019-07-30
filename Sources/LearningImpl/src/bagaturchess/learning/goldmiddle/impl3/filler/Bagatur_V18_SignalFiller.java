@@ -31,7 +31,6 @@ import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.impl3.eval.Evaluator;
-import bagaturchess.learning.goldmiddle.impl3.eval.Evaluator.EvalInfo;
 
 
 public class Bagatur_V18_SignalFiller extends Evaluator implements ISignalFiller, Bagatur_V18_FeaturesConstants {
