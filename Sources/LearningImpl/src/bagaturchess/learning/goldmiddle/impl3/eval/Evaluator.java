@@ -194,14 +194,10 @@ public class Evaluator extends Evaluator_BaseImpl {
 		evalinfo.clearEvals1();
 		
 		calculateMaterialScore();
+		evalinfo.eval_o_part1 += bitboard.getBaseEvaluation().getPST_o();
+		evalinfo.eval_e_part1 += bitboard.getBaseEvaluation().getPST_e();
 		
-		material.initialize(bitboard);
-		int imbalance = (material.imbalance(Constants.COLOUR_WHITE) - material.imbalance(Constants.COLOUR_BLACK)) / 16;
-		
-		int eval = bitboard.getMaterialFactor().interpolateByFactor(
-				bitboard.getBaseEvaluation().getPST_o() + evalinfo.eval_o_part1 + imbalance,
-				bitboard.getBaseEvaluation().getPST_e() + evalinfo.eval_e_part1 + 0
-				);
+		int eval = bitboard.getMaterialFactor().interpolateByFactor(evalinfo.eval_o_part1, evalinfo.eval_e_part1);
 		
 		eval = eval * 100 / 256;
 		
@@ -245,6 +241,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 		space(Constants.COLOUR_WHITE);
 		space(Constants.COLOUR_BLACK);
+		
+		material.initialize(bitboard);
+		int imbalance = (material.imbalance(Constants.COLOUR_WHITE) - material.imbalance(Constants.COLOUR_BLACK)) / 16;
+		evalinfo.eval_o_part2 += imbalance;
+		evalinfo.eval_e_part2 += imbalance;
 		
 		int eval = bitboard.getMaterialFactor().interpolateByFactor(evalinfo.eval_o_part2, evalinfo.eval_e_part2);
 		
