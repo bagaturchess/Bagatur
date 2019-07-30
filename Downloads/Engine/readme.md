@@ -16,6 +16,10 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 # Revision History
 
+Version 1.8 (30 July 2019)
+  * New evaluation function
+  * Time control optimization for SMP version - don't use too much time if evaluation changes 
+
 Version 1.7b (2 July 2019)
   * Bugfix: into the time control found during TCEC Season 16 testing by Aloril
 

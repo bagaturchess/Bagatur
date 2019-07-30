@@ -30,7 +30,7 @@ Hints:
 Credits:
   Without the ideas, support and help from the following people and web sites, Bagatur would not be as it is now:
   
-  1. My Wife, for supporting me in this non-profitable hobby.
+  1. My Wife, for supporting me in this hobby.
   2. Iavor Stoimenov, for the support and helpful discussions about the chess stuffs.
   3. Ivo Simeonov, for all the ideas, support, discussions, tests and contributed source code (initial version of pawn structure evaluation, C++ portings, exe luncher, etc.).
   4. Graham Banks, for all the CCLR tournaments he organize and broadcast in Internet, as well as for his great support in case of engine issues
