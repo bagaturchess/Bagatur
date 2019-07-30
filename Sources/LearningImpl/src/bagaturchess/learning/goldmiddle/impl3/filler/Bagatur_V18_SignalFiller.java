@@ -161,7 +161,7 @@ public class Bagatur_V18_SignalFiller extends Evaluator implements ISignalFiller
 		
 		material.initialize(bitboard);
 		int imbalance_o = (material.imbalance(Constants.COLOUR_WHITE) - material.imbalance(Constants.COLOUR_BLACK)) / 16;
-		int imbalance_e = 0;
+		int imbalance_e = imbalance_o;
 		
 		signals.getSignal(FEATURE_ID_MATERIAL_IMBALANCE).addStrength(interpolateInternal(imbalance_o, imbalance_e, openningPart), openningPart);
 	}

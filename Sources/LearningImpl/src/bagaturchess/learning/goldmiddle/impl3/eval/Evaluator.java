@@ -272,7 +272,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		int w_eval_pawns_e = bitboard.getBaseEvaluation().getWhiteMaterialPawns_e();
 		int b_eval_pawns_o = bitboard.getBaseEvaluation().getBlackMaterialPawns_o();
 		int b_eval_pawns_e = bitboard.getBaseEvaluation().getBlackMaterialPawns_e();
-
+		
 		evalinfo.eval_o_part1 += (w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o);
 		evalinfo.eval_e_part1 += (w_eval_nopawns_e - b_eval_nopawns_e) + (w_eval_pawns_e - b_eval_pawns_e);
 	}
