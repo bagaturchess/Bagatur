@@ -294,7 +294,7 @@ public class PGNUtils implements PGNConstants {
 			String all_moves = "";
 			int move = 0;
 			while ((move = movesBuffer.next()) != 0) {
-				all_moves += bagaturchess.bitboard.impl1.movegen.MoveInt.moveToString(move);
+				all_moves += bagaturchess.bitboard.impl.movegen.MoveInt.moveToString(move);
 				all_moves += ", ";
 			}
 			

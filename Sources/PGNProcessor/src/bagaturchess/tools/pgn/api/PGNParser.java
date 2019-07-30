@@ -38,7 +38,6 @@ import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl1.Board3;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEvalFactory;
 import bagaturchess.learning.goldmiddle.impl1.cfg.BoardConfigImpl_V17;
 import bagaturchess.tools.pgn.impl.ExcludedGames;
