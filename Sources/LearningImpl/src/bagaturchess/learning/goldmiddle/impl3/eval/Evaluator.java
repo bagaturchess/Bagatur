@@ -684,12 +684,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 	
 	private void space(int Us) {
 		
-		/*
-		//TODO check if it is necessary
-		if (bitboard.getBaseEvaluation().getWhiteMaterialNonPawns_o() + bitboard.getBaseEvaluation().getBlackMaterialNonPawns_o() < 12222) {
-			return;
-		}*/
-		
 		final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 		final long SpaceMask = Us == Constants.COLOUR_WHITE ? CenterFiles & (Rank2BB | Rank3BB | Rank4BB) : CenterFiles & (Rank7BB | Rank6BB | Rank5BB);
 		
@@ -706,6 +700,38 @@ public class Evaluator extends Evaluator_BaseImpl {
 		int weight = piecesCount - 2 * pawns.openFiles;
 		
 		evalinfo.addEvalsInPart2(Us, bonus * weight * weight / 16, 0);
+	}
+	
+	
+	// Evaluation::initiative() computes the initiative correction value
+	// for the position. It is a second order bonus/malus based on the
+	// known attacking/defending status of the players.
+	private int initiative(int eg) {
+		
+		int squareID_ksq_w = getKingSquareID(bitboard, Constants.COLOUR_WHITE);
+		int squareID_ksq_b = getKingSquareID(bitboard, Constants.COLOUR_BLACK);
+	    int outflanking =  distanceFile(squareID_ksq_w, squareID_ksq_b)
+	                     - distanceRank(squareID_ksq_w, squareID_ksq_b);
+	    
+	    long pawnsBB = evalinfo.bb_pawns[Constants.COLOUR_WHITE] |  evalinfo.bb_pawns[Constants.COLOUR_BLACK];
+	    boolean pawnsOnBothFlanks = (pawnsBB & QueenSide) != 0 && (pawnsBB & KingSide) != 0;
+	    
+	    int material = bitboard.getBaseEvaluation().getWhiteMaterialNonPawns_e() + bitboard.getBaseEvaluation().getBlackMaterialNonPawns_e();
+	    
+	    // Compute the initiative bonus for the attacking side
+	    int complexity =   8 * pawns.asymmetry
+	    				+ 12 * Long.bitCount(pawnsBB)
+	                    + 12 * outflanking
+	                    + 16 * (pawnsOnBothFlanks ? 1 : 0)
+	                    + 48 * (material == 0 ? 1 : 0)//!material
+	                    -118 ;
+	    
+	    // Now apply the bonus: note that we find the attacking side by extracting
+	    // the sign of the endgame value, and that we carefully cap the bonus so
+	    // that the endgame score will never change sign after the bonus.
+	    int v = (((eg > 0) ? 1 : 0) - ((eg < 0) ? 1 : 0)) * Math.max(complexity, -Math.abs(eg));
+	    
+	    return v;
 	}
 	
 	
