@@ -34,9 +34,6 @@ import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.dummy.DummyBoard;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
-import bagaturchess.bitboard.impl1.Board3;
-import bagaturchess.bitboard.impl1.Board3_Adapter;
-import bagaturchess.bitboard.impl2.Board4_Adapter;
 
 /**
 After the 1st ply (White's move) -- 20 possible positions 
@@ -183,16 +180,14 @@ public class Simulate {
 		//BoardWithAttacks bitBoard = new BoardWithAttacks();
 		//String BOARD = "4k3/P7/8/8/8/8/7p/4K3 w - 0 0";
 		IBoard bitBoard = new Board();
-		//IBoard bitBoard = new Board3_Adapter();
-		//IBoard bitBoard = new Board4_Adapter();
 		//IBoard bitBoard = new DummyBoard();
 		//IBoard bitBoard = new BoardImpl();
 		//bitBoard.setAttacksSupport(false, false);
 		
 		SearchInfo info = new SearchInfo();
 		
-		//simulate(info, bitBoard, Figures.COLOUR_WHITE, 22, 2);
-		simulate(info, bitBoard, Figures.COLOUR_WHITE, 11, 4);
+		simulate(info, bitBoard, Figures.COLOUR_WHITE, 22, 2);
+		//simulate(info, bitBoard, Figures.COLOUR_WHITE, 11, 4);
 		//simulate(info, bitBoard, Figures.COLOUR_WHITE, 10, 5);
 		
 		//System.out.println(((Board)bitBoard).statistics.toString());
