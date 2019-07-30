@@ -199,7 +199,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 		int eval = bitboard.getMaterialFactor().interpolateByFactor(evalinfo.eval_o_part1, evalinfo.eval_e_part1);
 		
-		eval = eval * 100 / 256;
+		eval = eval * 100 / 213;
 		
 		return eval;
 	}
@@ -254,7 +254,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 		int eval = bitboard.getMaterialFactor().interpolateByFactor(evalinfo.eval_o_part2, evalinfo.eval_e_part2);
 		
-		eval = eval * 100 / 256;
+		eval = eval * 100 / 213;
 		
 		return eval;
 	}
