@@ -78,15 +78,11 @@ public class ListKingEscapes implements ISearchMoveList {
 		prevBestMove = 0;
 	}
 	
-	private boolean isOk(int move) {
-		return !MoveInt.isCastling(move) && !MoveInt.isEnpassant(move);
-	}
-	
 	public int next() {
 		
 		if (!tptTried) {
 			tptTried = true;
-			if (tptMove != 0 && isOk(tptMove) && env.getBitboard().isPossible(tptMove)) {
+			if (tptMove != 0 && env.getBitboard().isPossible(tptMove)) {
 				tptPlied = true;
 				return tptMove;
 			}
@@ -130,7 +126,7 @@ public class ListKingEscapes implements ISearchMoveList {
 			ordval += ORD_VAL_PREV_BEST_MOVE * orderingStatistics.getOrdVal_PREVBEST();
 		}
 		
-		if (MoveInt.isCaptureOrPromotion(move)) {
+		if (env.getBitboard().isCaptureOrPromotionMove(move)) {
 			
 			int see = env.getBitboard().getSee().evalExchange(move);
 			
