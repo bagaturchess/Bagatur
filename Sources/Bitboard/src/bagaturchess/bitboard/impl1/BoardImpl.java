@@ -282,13 +282,21 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean hasRightsToKingCastle(int colour) {
-		return false;//TODO chessBoard.castlingRights;
+		if (colour == WHITE) {
+			return (chessBoard.castlingRights & 8) != 0;
+		} else {
+			return (chessBoard.castlingRights & 2) != 0;
+		}
 	}
 	
 	
 	@Override
 	public boolean hasRightsToQueenCastle(int colour) {
-		return false;//TODO chessBoard.castlingRights;
+		if (colour == WHITE) {
+			return (chessBoard.castlingRights & 4) != 0;
+		} else {
+			return (chessBoard.castlingRights & 1) != 0;
+		}
 	}
 
 	
