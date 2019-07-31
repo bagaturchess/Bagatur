@@ -97,7 +97,7 @@ public class BoardImpl implements IBitBoard {
 		int counter = 0;
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
-			if (!chessBoard.isLegal(cur_move)) {
+			if (!chessBoard.isLegal(cur_move) || MoveUtil.getAttackedPieceIndex(cur_move) == KING) {//TODO Check
 				continue;
 			}
 			list.reserved_add(cur_move);
@@ -121,7 +121,7 @@ public class BoardImpl implements IBitBoard {
 		int counter = 0;
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
-			if (!chessBoard.isLegal(cur_move)) {
+			if (!chessBoard.isLegal(cur_move) || MoveUtil.getAttackedPieceIndex(cur_move) == KING) {//TODO Check
 				continue;
 			}
 			list.reserved_add(cur_move);
@@ -143,7 +143,7 @@ public class BoardImpl implements IBitBoard {
 		int counter = 0;
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
-			if (!chessBoard.isLegal(cur_move)) {
+			if (!chessBoard.isLegal(cur_move) || MoveUtil.getAttackedPieceIndex(cur_move) == KING) {//TODO Check
 				continue;
 			}
 			list.reserved_add(cur_move);
@@ -335,6 +335,9 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getLastMove() {
+		if (chessBoard.moveCounter == 0) {
+			return 0;
+		}
 		return chessBoard.playedMoves[chessBoard.moveCounter - 1];
 	}
 	
@@ -374,8 +377,8 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public int[] getMatrix() {
-		throw new UnsupportedOperationException();
-		//TODO return chessBoard.pieceIndexes;
+		//throw new UnsupportedOperationException();
+		return chessBoard.pieceIndexes;
 	}
 
 	/* (non-Javadoc)

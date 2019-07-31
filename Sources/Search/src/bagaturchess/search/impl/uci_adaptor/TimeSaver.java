@@ -32,6 +32,9 @@ public class TimeSaver {
 	
 	public boolean beforeMove(IBitBoard bitboardForSetup, int openningBook_Mode, ISearchMediator mediator, boolean useOpening) {
 
+		if (IBitBoard.IMPL1) {
+			return false;
+		}
 		
 		mediator.dump("TimeSaver: useOpening = " + useOpening + ", ob=" + ob);
 		//Search in the book

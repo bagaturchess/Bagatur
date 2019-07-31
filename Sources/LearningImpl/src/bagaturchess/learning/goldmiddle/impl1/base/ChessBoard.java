@@ -168,6 +168,10 @@ public class ChessBoard implements IChessBoard {
 			return ChessConstants.EMPTY;
 		}
 		
+		if (IBitBoard.IMPL1) {
+			return pid;
+		}
+		
 		switch(pid) {
 			case Constants.PID_W_PAWN:
 				return ChessConstants.PAWN;

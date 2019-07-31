@@ -242,9 +242,9 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		
 		calculateMobilityScoresAndSetAttackBoards();
 		calculatePassedPawnScores();
-		if (!IBitBoard.IMPL1) calculateThreats();
+		calculateThreats();
 		calculatePawnShieldBonus();
-		if (!IBitBoard.IMPL1) calculateOthers();
+		calculateOthers();
 		calculateKingSafetyScores();
 		calculateSpace();
 		
