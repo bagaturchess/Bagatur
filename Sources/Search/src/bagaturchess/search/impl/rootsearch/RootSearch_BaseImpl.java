@@ -26,11 +26,14 @@ package bagaturchess.search.impl.rootsearch;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.BoardUtils;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl1.BoardImpl;
+import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
+import bagaturchess.search.api.internal.SearchInfoUtils;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
@@ -69,7 +72,13 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 			
 			bitboardForSetup = new BoardImpl(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
 			
-			//TODO play the moves on the board
+			for (int i=0; i<movesCount; i++) {
+				_bitboardForSetup.makeMoveForward(moves[i]);
+				
+				StringBuilder message = new StringBuilder(32);
+				MoveInt.moveToStringUCI(moves[i], message);
+				bitboardForSetup.makeMoveForward(message.toString());
+			}
 			
 		} else {
 			

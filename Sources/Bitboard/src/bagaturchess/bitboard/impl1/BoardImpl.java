@@ -47,6 +47,7 @@ import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.ChessBoardUtil;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
+import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 
 
 public class BoardImpl implements IBitBoard {
@@ -164,6 +165,13 @@ public class BoardImpl implements IBitBoard {
 	@Override
 	public void makeMoveBackward(int move) {
 		chessBoard.undoMove(move);
+	}
+	
+	
+	@Override
+	public void makeMoveForward(String ucimove) {
+		MoveWrapper move = new MoveWrapper(ucimove, chessBoard);
+		chessBoard.doMove(move.move);
 	}
 	
 	
@@ -320,7 +328,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getLastMove() {
-		return 0;//TODO
+		return chessBoard.playedMoves[chessBoard.moveCounter - 1];
 	}
 	
 	
@@ -332,14 +340,13 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean isPossible(int move) {
-		return chessBoard.isLegal(move);//TODO Check
-		//return false;
+		return chessBoard.isLegal(move);
 	}
 	
 	
 	@Override
 	public boolean hasSingleMove() {
-		return false;//TODO
+		throw new UnsupportedOperationException();
 	}
 	
 	
@@ -386,14 +393,6 @@ public class BoardImpl implements IBitBoard {
 	@Override
 	public int genAllMoves_ByFigureID(int fieldID, long excludedToFields,
 			IInternalMoveList list) {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#makeMoveForward(java.lang.String)
-	 */
-	@Override
-	public void makeMoveForward(String ucimove) {
 		throw new UnsupportedOperationException();
 	}
 
