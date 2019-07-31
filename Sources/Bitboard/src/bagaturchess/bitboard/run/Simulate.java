@@ -198,7 +198,7 @@ public class Simulate {
 		simulate(info, bitBoard, Figures.COLOUR_WHITE, 22, 2);
 		//simulate(info, bitBoard, Figures.COLOUR_WHITE, 11, 4);
 		//simulate(info, bitBoard, Figures.COLOUR_WHITE, 10, 5);
-		//simulate(info, bitBoard, Figures.COLOUR_WHITE, 4, 12345);
+		//simulate(info, bitBoard, Figures.COLOUR_WHITE, 6, 12345);
 		
 		//System.out.println(((Board)bitBoard).statistics.toString());
 		

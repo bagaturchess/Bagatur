@@ -58,6 +58,7 @@ public class BoardImpl implements IBitBoard {
 	private IPiecesLists pieces;
 	private IMaterialFactor materialFactor;
 	private IBaseEval baseEval;
+	private IMaterialState materialState;
 	
 	
 	public BoardImpl(String fen) {
@@ -66,6 +67,7 @@ public class BoardImpl implements IBitBoard {
 		pieces = new PiecesListsImpl(this);
 		materialFactor = new MaterialFactorImpl();
 		baseEval = new BaseEvalImpl();
+		materialState = new MaterialStateImpl();
 	}
 	
 	
@@ -92,8 +94,8 @@ public class BoardImpl implements IBitBoard {
 		int counter = 0;
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
-			if (MoveUtil.getAttackedPieceIndex(cur_move) == KING) {
-				continue;//TODO remove king captures
+			if (!chessBoard.isLegal(cur_move)) {
+				continue;
 			}
 			list.reserved_add(cur_move);
 			counter++;
@@ -116,8 +118,8 @@ public class BoardImpl implements IBitBoard {
 		int counter = 0;
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
-			if (MoveUtil.getAttackedPieceIndex(cur_move) == KING) {
-				continue;//TODO remove king captures
+			if (!chessBoard.isLegal(cur_move)) {
+				continue;
 			}
 			list.reserved_add(cur_move);
 			counter++;
@@ -138,8 +140,8 @@ public class BoardImpl implements IBitBoard {
 		int counter = 0;
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
-			if (MoveUtil.getAttackedPieceIndex(cur_move) == KING) {
-				continue;//TODO remove king captures
+			if (!chessBoard.isLegal(cur_move)) {
+				continue;
 			}
 			list.reserved_add(cur_move);
 			counter++;
@@ -213,7 +215,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getSEEScore(int move) {
-		return 0;//TODO implement
+		return 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));//TODO implement
 	}
 	
 	
@@ -340,7 +342,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public IMaterialState getMaterialState() {
-		return null;
+		return materialState;
 	}
 	
 	
@@ -349,7 +351,8 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public int[] getMatrix() {
-		throw new UnsupportedOperationException();
+		//throw new UnsupportedOperationException();
+		return chessBoard.pieceIndexes;
 	}
 
 	/* (non-Javadoc)
@@ -560,5 +563,22 @@ public class BoardImpl implements IBitBoard {
 	@Override
 	public IFieldsAttacks getFieldsAttacks() {
 		throw new UnsupportedOperationException();
+	}
+	
+	
+	protected class MaterialStateImpl implements IMaterialState {
+		
+		
+		@Override
+		public int getPiecesCount() {
+			return Long.bitCount(chessBoard.allPieces);
+		}
+		
+		
+		@Override
+		public int[] getPIDsCounts() {
+			throw new UnsupportedOperationException();
+		}
+		
 	}
 }

@@ -76,9 +76,9 @@ public class MaterialFactorImpl implements IMaterialFactor {
 	@Override
 	public int interpolateByFactor(int val_o, int val_e) {
 		// TODO Auto-generated method stub
-		return 0;
+		return (val_o + val_e) / 2;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IMaterialFactor#interpolateByFactorAndColour(int, int, int)
 	 */
