@@ -49,8 +49,11 @@ public class ChessBoard implements IChessBoard {
 	}
 	
 	private static final long convertBB(long bb) {
-		//return bb;
-		return Bits.reverse(bb);
+		if (IBitBoard.IMPL1) {
+			return bb;
+		} else {
+			return Bits.reverse(bb);
+		}
 	}
 	
 	@Override
@@ -114,14 +117,24 @@ public class ChessBoard implements IChessBoard {
 	public int getKingIndex(int colour) {
 		if (colour == 0) {
 			long king = board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING);
-			int kingIndex = Fields.get67IDByBitboard(king);
+			if (IBitBoard.IMPL1) {
+				int kingIndex = Long.numberOfTrailingZeros(king);
+				return convertIndex_b2c(kingIndex);
+			} else {
+				int kingIndex = Fields.get67IDByBitboard(king);
+				return convertIndex_b2c(kingIndex);
+			}
 			//return convertIndex_b2c(board.getPiecesLists().getPieces(Constants.PID_W_KING).getData()[0]);
-			return convertIndex_b2c(kingIndex);
+			
 		} else {
 			long king = board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING);
-			int kingIndex = Fields.get67IDByBitboard(king);
-			//return convertIndex_b2c(board.getPiecesLists().getPieces(Constants.PID_B_KING).getData()[0]);
-			return convertIndex_b2c(kingIndex);
+			if (IBitBoard.IMPL1) {
+				int kingIndex = Long.numberOfTrailingZeros(king);
+				return convertIndex_b2c(kingIndex);
+			} else {
+				int kingIndex = Fields.get67IDByBitboard(king);
+				return convertIndex_b2c(kingIndex);
+			}
 		}
 	}
 	
