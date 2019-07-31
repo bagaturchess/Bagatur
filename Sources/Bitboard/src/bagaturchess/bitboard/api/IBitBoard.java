@@ -29,15 +29,15 @@ public interface IBitBoard extends IBoard {
 	public static final boolean IMPL1 = false;
 	
 	
+	/**
+	 * Bitboards
+	 */
 	public long getFreeBitboard();
 	public long getFiguresBitboardByPID(int pid);
 	public long getFiguresBitboardByColourAndType(int colour, int type);
 	public long getFiguresBitboardByColour(int colour);
 	
 	
-	/**
-	 * Bitboards
-	 */
 	public boolean getAttacksSupport();
 	public boolean getFieldsStateSupport();
 	public void setAttacksSupport(boolean attacksSupport, boolean fieldsStateSupport);

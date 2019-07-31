@@ -37,14 +37,20 @@ public class PiecesListsImpl implements IPiecesLists {
 		list = new PiecesList(board, 8);
 		list.add(16);
 	}
-
+	
+	
+	@Override
+	public PiecesList getPieces(int pid) {
+		return list;
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IPiecesLists#rem(int, int)
 	 */
 	@Override
 	public void rem(int pid, int fieldID) {
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -52,8 +58,7 @@ public class PiecesListsImpl implements IPiecesLists {
 	 */
 	@Override
 	public void add(int pid, int fieldID) {
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -61,16 +66,6 @@ public class PiecesListsImpl implements IPiecesLists {
 	 */
 	@Override
 	public void move(int pid, int fromFieldID, int toFieldID) {
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IPiecesLists#getPieces(int)
-	 */
-	@Override
-	public PiecesList getPieces(int pid) {
-		return list;
-	}
-
 }

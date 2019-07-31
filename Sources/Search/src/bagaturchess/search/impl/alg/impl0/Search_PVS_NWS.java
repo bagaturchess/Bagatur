@@ -1454,7 +1454,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			//Alpha cutoff
-			if (staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) < alpha_org) {
+			if (staticEval + env.getBitboard().getBoardConfig().getMaterial_QUEEN_E() < alpha_org) {
 				node.eval = staticEval;
 				return node.eval;
 			}
@@ -1657,7 +1657,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			//Alpha cutoff
-			if (staticEval + env.getBitboard().getBaseEvaluation().getMaterial(Figures.TYPE_QUEEN) < alpha_org) {
+			if (staticEval + env.getBitboard().getBoardConfig().getMaterial_QUEEN_E() < alpha_org) {
 				return staticEval;
 			}
 			

@@ -601,7 +601,6 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		public MaterialFactorImpl() {
-			// TODO Auto-generated constructor stub
 		}
 		
 		

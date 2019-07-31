@@ -19,19 +19,14 @@
  */
 package bagaturchess.bitboard.impl1;
 
+
 import bagaturchess.bitboard.api.IBaseEval;
 
-/**
- * @author i027638
- *
- */
+
 public class BaseEvalImpl implements IBaseEval {
 
-	/**
-	 * 
-	 */
+	
 	public BaseEvalImpl() {
-		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)
@@ -39,8 +34,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getMaterial_o() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -48,8 +42,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getMaterial_e() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -57,8 +50,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getWhiteMaterialPawns_o() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -66,8 +58,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getWhiteMaterialPawns_e() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -75,8 +66,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getBlackMaterialPawns_o() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -84,8 +74,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getBlackMaterialPawns_e() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -93,8 +82,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getWhiteMaterialNonPawns_o() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -102,8 +90,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getWhiteMaterialNonPawns_e() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -111,8 +98,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getBlackMaterialNonPawns_o() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -120,8 +106,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getBlackMaterialNonPawns_e() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -129,8 +114,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getMaterial_BARIER_NOPAWNS_O() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -138,8 +122,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getMaterial_BARIER_NOPAWNS_E() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -147,7 +130,6 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getPST_o() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -156,7 +138,6 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getPST_e() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -165,8 +146,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getMaterial(int pieceType) {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -174,8 +154,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public int getMaterialGain(int move) {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -183,8 +162,7 @@ public class BaseEvalImpl implements IBaseEval {
 	 */
 	@Override
 	public double getPSTMoveGoodPercent(int move) {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 }
