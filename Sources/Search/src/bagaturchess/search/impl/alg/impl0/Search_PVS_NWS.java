@@ -375,7 +375,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int singularExtension = 0;
 		
-		{
+		if (!IBitBoard.IMPL1) {
+			
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 			env.getTPT().unlock();
@@ -1019,7 +1020,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int singularExtension = 0;
 		
-		{
+		if (!IBitBoard.IMPL1) {
+			
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 			env.getTPT().unlock();
