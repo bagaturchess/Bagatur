@@ -124,7 +124,13 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		int[] moves = _bitboardForSetup.getPlayedMoves();
 		
 		for (int i=0; i<movesCount; i++) {
-			bitboardForSetup.makeMoveForward(moves[i]);
+			if (IBitBoard.IMPL1) {
+				StringBuilder message = new StringBuilder(8);
+				MoveInt.moveToStringUCI(moves[i], message);
+				bitboardForSetup.makeMoveForward(message.toString());
+			} else {
+				bitboardForSetup.makeMoveForward(moves[i]);
+			}
 		}
 	}
 	

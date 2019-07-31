@@ -231,7 +231,14 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public void revert() {
-		//TODO
+		for(int i = chessBoard.moveCounter - 1; i >= 0; i--) {
+			int move = chessBoard.playedMoves[i];
+			if (move == 0) {
+				chessBoard.undoNullMove();
+			} else {
+				chessBoard.undoMove(move);
+			}
+		}
 	}
 	
 	
