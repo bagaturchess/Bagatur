@@ -169,6 +169,9 @@ public class ChessBoard implements IChessBoard {
 		}
 		
 		if (IBitBoard.IMPL1) {
+			if (pid < 1 || pid > 6) {
+				throw new IllegalStateException();
+			}
 			return pid;
 		}
 		

@@ -541,9 +541,9 @@ public final class ChessBoard {
 		}
 
 		// if move was an attacking-move or pawn move, no repetition
-		if (!MoveUtil.isQuiet(move) || MoveUtil.getSourcePieceIndex(move) == PAWN) {
+		/*TODO if (!MoveUtil.isQuiet(move) || MoveUtil.getSourcePieceIndex(move) == PAWN) {
 			return false;
-		}
+		}*/
 
 		final int moveCounterMin = Math.max(0, moveCounter - 50);
 		for (int i = moveCounter - 2; i >= moveCounterMin; i -= 2) {

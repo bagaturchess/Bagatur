@@ -325,13 +325,13 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getStateRepetition() {
-		return 0;//TODO chessBoard.isRepetition(move)
+		return chessBoard.isRepetition(0) ? 3 : 0;
 	}
 	
 	
 	@Override
 	public boolean hasSufficientMaterial() {
-		return true;//TODO
+		return getMaterialFactor().getTotalFactor() > 12;
 	}
 	
 	
@@ -608,19 +608,19 @@ public class BoardImpl implements IBitBoard {
 		
 		@Override
 		public int getBlackFactor() {
-			return chessBoard.phase / 2;
+			return getTotalFactor() / 2;
 		}
 		
 		
 		@Override
 		public int getWhiteFactor() {
-			return chessBoard.phase / 2;
+			return getTotalFactor() / 2;
 		}
 		
 		
 		@Override
 		public int getTotalFactor() {
-			return chessBoard.phase;
+			return TOTAL_FACTOR_MAX - chessBoard.phase;
 		}
 		
 		
@@ -650,7 +650,20 @@ public class BoardImpl implements IBitBoard {
 		
 		public BaseEvalImpl() {
 		}
-
+		
+		
+		@Override
+		public int getPST_o() {
+			return chessBoard.psqtScore_mg;
+		}
+		
+		
+		@Override
+		public int getPST_e() {
+			return chessBoard.psqtScore_eg;
+		}
+		
+		
 		/* (non-Javadoc)
 		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterial_o()
 		 */
@@ -745,22 +758,6 @@ public class BoardImpl implements IBitBoard {
 		@Override
 		public int getMaterial_BARIER_NOPAWNS_E() {
 			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getPST_o()
-		 */
-		@Override
-		public int getPST_o() {
-			return chessBoard.psqtScore_mg;
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getPST_e()
-		 */
-		@Override
-		public int getPST_e() {
-			return chessBoard.psqtScore_eg;
 		}
 
 		/* (non-Javadoc)
