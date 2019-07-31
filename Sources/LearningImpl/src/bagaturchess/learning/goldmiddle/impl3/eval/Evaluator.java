@@ -246,11 +246,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 		space(Constants.COLOUR_WHITE);
 		space(Constants.COLOUR_BLACK);
 		
-		/*material.initialize(bitboard);
+		material.initialize(bitboard);
 		int imbalance = (material.imbalance(Constants.COLOUR_WHITE) - material.imbalance(Constants.COLOUR_BLACK)) / 16;
 		evalinfo.eval_o_part2 += imbalance;
 		evalinfo.eval_e_part2 += imbalance;
-		*/
+		
 		
 		int eval = bitboard.getMaterialFactor().interpolateByFactor(evalinfo.eval_o_part2, evalinfo.eval_e_part2);
 		

@@ -275,7 +275,8 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getFigureID(int fieldID) {
-		return chessBoard.pieceIndexes[fieldID];//TODO Check
+		throw new UnsupportedOperationException();
+		//return chessBoard.pieceIndexes[fieldID];//TODO Check
 	}
 	
 	
@@ -351,8 +352,8 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public int[] getMatrix() {
-		//throw new UnsupportedOperationException();
-		return chessBoard.pieceIndexes;
+		throw new UnsupportedOperationException();
+		//TODO return chessBoard.pieceIndexes;
 	}
 
 	/* (non-Javadoc)
@@ -580,5 +581,72 @@ public class BoardImpl implements IBitBoard {
 			throw new UnsupportedOperationException();
 		}
 		
+	}
+	
+	
+	protected class MaterialFactorImpl implements IMaterialFactor {
+		
+		
+		public MaterialFactorImpl() {
+			// TODO Auto-generated constructor stub
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IMaterialFactor#getBlackFactor()
+		 */
+		@Override
+		public int getBlackFactor() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IMaterialFactor#getWhiteFactor()
+		 */
+		@Override
+		public int getWhiteFactor() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IMaterialFactor#getTotalFactor()
+		 */
+		@Override
+		public int getTotalFactor() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IMaterialFactor#getOpenningPart()
+		 */
+		@Override
+		public double getOpenningPart() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IMaterialFactor#interpolateByFactor(int, int)
+		 */
+		@Override
+		public int interpolateByFactor(int val_o, int val_e) {
+			//throw new UnsupportedOperationException();
+			return (val_o + val_e) / 2;
+		}
+		
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IMaterialFactor#interpolateByFactorAndColour(int, int, int)
+		 */
+		@Override
+		public int interpolateByFactorAndColour(int colour, int val_o, int val_e) {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IMaterialFactor#interpolateByFactor(double, double)
+		 */
+		@Override
+		public int interpolateByFactor(double val_o, double val_e) {
+			throw new UnsupportedOperationException();
+		}
+
 	}
 }
