@@ -32,6 +32,5 @@ public interface IMaterialFactor {
 	public double getOpenningPart();
 	
 	public int interpolateByFactor(int val_o, int val_e);
-	public int interpolateByFactorAndColour(int colour, int val_o, int val_e);
 	public int interpolateByFactor(double val_o, double val_e);
 }

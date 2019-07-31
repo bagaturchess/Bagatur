@@ -64,16 +64,17 @@ public class MaterialFactor implements MoveListener, IMaterialFactor, Cloneable 
 	}
 	
 	public int interpolateByFactor(int val_o, int val_e) {
-		return BaseEvalWeights.interpolateByFactor(val_o, val_e, getTotalFactor());
+		double openningPart = getOpenningPart();
+		return (int) (val_o * openningPart + val_e * (1 - openningPart));
 	}
 	
-	public int interpolateByFactorAndColour(int colour, int val_o, int val_e) {
+	/*public int interpolateByFactorAndColour(int colour, int val_o, int val_e) {
 		if (colour == Figures.COLOUR_WHITE) {
 			return BaseEvalWeights.interpolateByFactorAndColour(val_o, val_e, getWhiteFactor());
 		} else {
 			return BaseEvalWeights.interpolateByFactorAndColour(val_o, val_e, getBlackFactor());
 		}
-	}
+	}*/
 	
 	
 	public int interpolateByFactor(double val_o, double val_e) {

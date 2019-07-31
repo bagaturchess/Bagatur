@@ -67,7 +67,7 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		
 		if (IBitBoard.IMPL1) {
 			
-			bitboardForSetup = new BoardImpl(_bitboardForSetup.toEPD());
+			bitboardForSetup = new BoardImpl(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
 			
 			//TODO play the moves on the board
 			

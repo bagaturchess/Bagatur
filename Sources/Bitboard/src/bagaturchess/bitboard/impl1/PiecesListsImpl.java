@@ -34,7 +34,7 @@ public class PiecesListsImpl implements IPiecesLists {
 	
 	
 	PiecesListsImpl(IBoard board) {
-		list = new PiecesList(board, 10);
+		list = new PiecesList(board, 8);
 		list.add(16);
 	}
 

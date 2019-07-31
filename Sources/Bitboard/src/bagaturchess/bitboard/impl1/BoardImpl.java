@@ -59,15 +59,17 @@ public class BoardImpl implements IBitBoard {
 	private IMaterialFactor materialFactor;
 	private IBaseEval baseEval;
 	private IMaterialState materialState;
+	private IBoardConfig boardConfig;
 	
 	
-	public BoardImpl(String fen) {
+	public BoardImpl(String fen, IBoardConfig _boardConfig) {
 		chessBoard = ChessBoardUtil.getNewCB(fen);
 		generator = new MoveGenerator();
 		pieces = new PiecesListsImpl(this);
 		materialFactor = new MaterialFactorImpl();
 		baseEval = new BaseEvalImpl();
 		materialState = new MaterialStateImpl();
+		boardConfig = _boardConfig;
 	}
 	
 	
@@ -215,7 +217,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getSEEScore(int move) {
-		return 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));//TODO implement
+		return 100 * (MoveUtil.getAttackedPieceIndex(move) * 10 - MoveUtil.getSourcePieceIndex(move));
 	}
 	
 	
@@ -347,6 +349,12 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
+	@Override
+	public IBoardConfig getBoardConfig() {
+		return boardConfig;
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#getMatrix()
 	 */
@@ -361,14 +369,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public PawnsModelEval getPawnsStructure() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getBoardConfig()
-	 */
-	@Override
-	public IBoardConfig getBoardConfig() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -587,66 +587,50 @@ public class BoardImpl implements IBitBoard {
 	protected class MaterialFactorImpl implements IMaterialFactor {
 		
 		
+		private static final int TOTAL_FACTOR_MAX = 2 * 28 + 4 * 13 + 4 * 6 + 4 * 6; 
+		//public static final int[] PHASE 					= {0, 0, 6, 6, 13, 28};
+		
+		
 		public MaterialFactorImpl() {
 			// TODO Auto-generated constructor stub
 		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IMaterialFactor#getBlackFactor()
-		 */
+		
+		
 		@Override
 		public int getBlackFactor() {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IMaterialFactor#getWhiteFactor()
-		 */
-		@Override
-		public int getWhiteFactor() {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IMaterialFactor#getTotalFactor()
-		 */
-		@Override
-		public int getTotalFactor() {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IMaterialFactor#getOpenningPart()
-		 */
-		@Override
-		public double getOpenningPart() {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IMaterialFactor#interpolateByFactor(int, int)
-		 */
-		@Override
-		public int interpolateByFactor(int val_o, int val_e) {
-			//throw new UnsupportedOperationException();
-			return (val_o + val_e) / 2;
+			return chessBoard.phase / 2;
 		}
 		
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IMaterialFactor#interpolateByFactorAndColour(int, int, int)
-		 */
+		
 		@Override
-		public int interpolateByFactorAndColour(int colour, int val_o, int val_e) {
-			throw new UnsupportedOperationException();
+		public int getWhiteFactor() {
+			return chessBoard.phase / 2;
 		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IMaterialFactor#interpolateByFactor(double, double)
-		 */
+		
+		
+		@Override
+		public int getTotalFactor() {
+			return chessBoard.phase;
+		}
+		
+		
+		@Override
+		public double getOpenningPart() {
+			return Math.min(1, getTotalFactor() / TOTAL_FACTOR_MAX);
+		}
+		
+		
+		@Override
+		public int interpolateByFactor(int val_o, int val_e) {
+			double openningPart = getOpenningPart();
+			int result = (int) (val_o * openningPart + (val_e * (1 - openningPart)));
+			return result;
+		}
+		
+		
 		@Override
 		public int interpolateByFactor(double val_o, double val_e) {
 			throw new UnsupportedOperationException();
 		}
-
 	}
 }

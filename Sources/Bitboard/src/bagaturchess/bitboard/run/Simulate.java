@@ -187,7 +187,7 @@ public class Simulate {
 		
 		//BoardWithAttacks bitBoard = new BoardWithAttacks();
 		//String BOARD = "4k3/P7/8/8/8/8/7p/4K3 w - 0 0";
-		IBoard bitBoard = new BoardImpl(Constants.INITIAL_BOARD);
+		IBoard bitBoard = new BoardImpl(Constants.INITIAL_BOARD, null);
 		//IBoard bitBoard = new Board();
 		//IBoard bitBoard = new DummyBoard();
 		//IBoard bitBoard = new BoardImpl();
