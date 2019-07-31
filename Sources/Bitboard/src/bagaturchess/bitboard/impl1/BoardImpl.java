@@ -253,7 +253,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public long getFiguresBitboardByColourAndType(int colour, int type) {
-		return chessBoard.pieces[colour][type];//TODO Check type
+		return chessBoard.pieces[colour][type];
 	}
 	
 	
