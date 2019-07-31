@@ -139,6 +139,10 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	@Override
 	public boolean isCounterMove(int last_move, int move) {
 		
+		if (last_move == 0) {
+			return false;
+		}
+		
 		int pid = MoveInt.getFigurePID(last_move);
 		int to = MoveInt.getToFieldID(last_move);
 		int[] counter_moves = counters[pid][to];
