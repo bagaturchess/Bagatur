@@ -233,7 +233,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public void revert() {
-		for(int i = chessBoard.moveCounter - 1; i >= 0; i--) {
+		for(int i = chessBoard.playedMovesCount - 1; i >= 0; i--) {
 			int move = chessBoard.playedMoves[i];
 			if (move == 0) {
 				chessBoard.undoNullMove();
@@ -337,10 +337,10 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getLastMove() {
-		if (chessBoard.moveCounter == 0) {
+		if (chessBoard.playedMovesCount == 0) {
 			return 0;
 		}
-		return chessBoard.playedMoves[chessBoard.moveCounter - 1];
+		return chessBoard.playedMoves[chessBoard.playedMovesCount - 1];
 	}
 	
 	

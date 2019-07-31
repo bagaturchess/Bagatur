@@ -224,6 +224,8 @@ public class ChessBoardUtil {
 
 		cb.checkingPieces = CheckUtil.getCheckingPieces(cb);
 		cb.setPinnedAndDiscoPieces();
+		cb.psqtScore_mg = 0;
+		cb.psqtScore_eg = 0;
 		calculatePositionScores(cb);
 
 		cb.phase = PHASE_TOTAL - (Long.bitCount(cb.pieces[WHITE][NIGHT] | cb.pieces[BLACK][NIGHT]) * EvalConstants.PHASE[NIGHT]

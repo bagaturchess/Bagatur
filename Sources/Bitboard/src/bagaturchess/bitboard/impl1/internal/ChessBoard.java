@@ -83,6 +83,7 @@ public final class ChessBoard {
 	public long passedPawnsAndOutposts;
 
 	public int[] playedMoves = new int[2048];
+	public int playedMovesCount = 0;
 	
 	
 	@Override
@@ -118,11 +119,13 @@ public final class ChessBoard {
 		pinnedPiecesHistory[moveCounter] = pinnedPieces;
 		discoveredPiecesHistory[moveCounter] = discoveredPieces;
 		checkingPiecesHistory[moveCounter] = checkingPieces;
-		playedMoves[moveCounter] = move;
+		playedMoves[playedMovesCount] = move;
+		playedMovesCount++;
 		moveCounter++;
 	}
 
 	private void popHistoryValues() {
+		playedMovesCount--;
 		moveCounter--;
 		epIndex = epIndexHistory[moveCounter];
 		zobristKey = zobristKeyHistory[moveCounter];
