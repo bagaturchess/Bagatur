@@ -32,6 +32,7 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 
 import bagaturchess.bitboard.api.IBaseEval;
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.api.IFieldsAttacks;
 import bagaturchess.bitboard.api.IGameStatus;
@@ -43,6 +44,7 @@ import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.ISEE;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
+import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.ChessBoardUtil;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
@@ -638,6 +640,194 @@ public class BoardImpl implements IBitBoard {
 		
 		@Override
 		public int interpolateByFactor(double val_o, double val_e) {
+			throw new UnsupportedOperationException();
+		}
+	}
+	
+	
+	protected class BaseEvalImpl implements IBaseEval {
+
+		
+		public BaseEvalImpl() {
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterial_o()
+		 */
+		@Override
+		public int getMaterial_o() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterial_e()
+		 */
+		@Override
+		public int getMaterial_e() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getWhiteMaterialPawns_o()
+		 */
+		@Override
+		public int getWhiteMaterialPawns_o() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getWhiteMaterialPawns_e()
+		 */
+		@Override
+		public int getWhiteMaterialPawns_e() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getBlackMaterialPawns_o()
+		 */
+		@Override
+		public int getBlackMaterialPawns_o() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getBlackMaterialPawns_e()
+		 */
+		@Override
+		public int getBlackMaterialPawns_e() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getWhiteMaterialNonPawns_o()
+		 */
+		@Override
+		public int getWhiteMaterialNonPawns_o() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getWhiteMaterialNonPawns_e()
+		 */
+		@Override
+		public int getWhiteMaterialNonPawns_e() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getBlackMaterialNonPawns_o()
+		 */
+		@Override
+		public int getBlackMaterialNonPawns_o() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getBlackMaterialNonPawns_e()
+		 */
+		@Override
+		public int getBlackMaterialNonPawns_e() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterial_BARIER_NOPAWNS_O()
+		 */
+		@Override
+		public int getMaterial_BARIER_NOPAWNS_O() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterial_BARIER_NOPAWNS_E()
+		 */
+		@Override
+		public int getMaterial_BARIER_NOPAWNS_E() {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getPST_o()
+		 */
+		@Override
+		public int getPST_o() {
+			return chessBoard.psqtScore_mg;
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getPST_e()
+		 */
+		@Override
+		public int getPST_e() {
+			return chessBoard.psqtScore_eg;
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterial(int)
+		 */
+		@Override
+		public int getMaterial(int pieceType) {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterialGain(int)
+		 */
+		@Override
+		public int getMaterialGain(int move) {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IBaseEval#getPSTMoveGoodPercent(int)
+		 */
+		@Override
+		public double getPSTMoveGoodPercent(int move) {
+			throw new UnsupportedOperationException();
+		}
+	}
+	
+	
+	protected class PiecesListsImpl implements IPiecesLists {
+		
+		
+		private PiecesList list;
+		
+		
+		PiecesListsImpl(IBoard board) {
+			list = new PiecesList(board, 8);
+			list.add(16);
+		}
+		
+		
+		@Override
+		public PiecesList getPieces(int pid) {
+			return list;
+		}
+		
+		
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IPiecesLists#rem(int, int)
+		 */
+		@Override
+		public void rem(int pid, int fieldID) {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IPiecesLists#add(int, int)
+		 */
+		@Override
+		public void add(int pid, int fieldID) {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IPiecesLists#move(int, int, int)
+		 */
+		@Override
+		public void move(int pid, int fromFieldID, int toFieldID) {
 			throw new UnsupportedOperationException();
 		}
 	}

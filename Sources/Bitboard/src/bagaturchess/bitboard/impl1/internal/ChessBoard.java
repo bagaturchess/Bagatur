@@ -48,7 +48,8 @@ public final class ChessBoard {
 
 	/** 4 bits: white-king,white-queen,black-king,black-queen */
 	public int castlingRights;
-	public int psqtScore;
+	public int psqtScore_mg;
+	public int psqtScore_eg;
 	public int colorToMove, colorToMoveInverse;
 	public int epIndex;
 	public int materialKey;
@@ -183,8 +184,9 @@ public final class ChessBoard {
 		pieceIndexes[fromIndex] = EMPTY;
 		pieceIndexes[toIndex] = sourcePieceIndex;
 		pieces[colorToMove][sourcePieceIndex] ^= fromToMask;
-		psqtScore += EvalConstants.PSQT[sourcePieceIndex][colorToMove][toIndex] - EvalConstants.PSQT[sourcePieceIndex][colorToMove][fromIndex];
-
+		psqtScore_mg += EvalConstants.PSQT_MG[sourcePieceIndex][colorToMove][toIndex] - EvalConstants.PSQT_MG[sourcePieceIndex][colorToMove][fromIndex];
+		psqtScore_eg += EvalConstants.PSQT_EG[sourcePieceIndex][colorToMove][toIndex] - EvalConstants.PSQT_EG[sourcePieceIndex][colorToMove][fromIndex];
+		
 		switch (sourcePieceIndex) {
 		case PAWN:
 			pawnZobristKey ^= Zobrist.piece[fromIndex][colorToMove][PAWN];
@@ -195,7 +197,8 @@ public final class ChessBoard {
 				pieces[colorToMove][MoveUtil.getMoveType(move)] |= toMask;
 				pieceIndexes[toIndex] = MoveUtil.getMoveType(move);
 				zobristKey ^= Zobrist.piece[toIndex][colorToMove][PAWN] ^ Zobrist.piece[toIndex][colorToMove][MoveUtil.getMoveType(move)];
-				psqtScore += EvalConstants.PSQT[MoveUtil.getMoveType(move)][colorToMove][toIndex] - EvalConstants.PSQT[PAWN][colorToMove][toIndex];
+				psqtScore_mg += EvalConstants.PSQT_MG[MoveUtil.getMoveType(move)][colorToMove][toIndex] - EvalConstants.PSQT_MG[PAWN][colorToMove][toIndex];
+				psqtScore_eg += EvalConstants.PSQT_EG[MoveUtil.getMoveType(move)][colorToMove][toIndex] - EvalConstants.PSQT_EG[PAWN][colorToMove][toIndex];
 			} else {
 				pawnZobristKey ^= Zobrist.piece[toIndex][colorToMove][PAWN];
 				// 2-move
@@ -240,7 +243,8 @@ public final class ChessBoard {
 				pieceIndexes[toIndex] = EMPTY;
 			}
 			pawnZobristKey ^= Zobrist.piece[toIndex][colorToMoveInverse][PAWN];
-			psqtScore -= EvalConstants.PSQT[PAWN][colorToMoveInverse][toIndex];
+			psqtScore_mg -= EvalConstants.PSQT_MG[PAWN][colorToMoveInverse][toIndex];
+			psqtScore_eg -= EvalConstants.PSQT_EG[PAWN][colorToMoveInverse][toIndex];
 			friendlyPieces[colorToMoveInverse] ^= toMask;
 			pieces[colorToMoveInverse][PAWN] ^= toMask;
 			zobristKey ^= Zobrist.piece[toIndex][colorToMoveInverse][PAWN];
@@ -255,7 +259,8 @@ public final class ChessBoard {
 			// fall-through
 		default:
 			phase += EvalConstants.PHASE[attackedPieceIndex];
-			psqtScore -= EvalConstants.PSQT[attackedPieceIndex][colorToMoveInverse][toIndex];
+			psqtScore_mg -= EvalConstants.PSQT_MG[attackedPieceIndex][colorToMoveInverse][toIndex];
+			psqtScore_eg -= EvalConstants.PSQT_EG[attackedPieceIndex][colorToMoveInverse][toIndex];
 			friendlyPieces[colorToMoveInverse] ^= toMask;
 			pieces[colorToMoveInverse][attackedPieceIndex] ^= toMask;
 			zobristKey ^= Zobrist.piece[toIndex][colorToMoveInverse][attackedPieceIndex];
@@ -328,7 +333,8 @@ public final class ChessBoard {
 		friendlyPieces[colorToMoveInverse] ^= fromToMask;
 		pieceIndexes[fromIndex] = sourcePieceIndex;
 		pieces[colorToMoveInverse][sourcePieceIndex] ^= fromToMask;
-		psqtScore += EvalConstants.PSQT[sourcePieceIndex][colorToMoveInverse][fromIndex] - EvalConstants.PSQT[sourcePieceIndex][colorToMoveInverse][toIndex];
+		psqtScore_mg += EvalConstants.PSQT_MG[sourcePieceIndex][colorToMoveInverse][fromIndex] - EvalConstants.PSQT_MG[sourcePieceIndex][colorToMoveInverse][toIndex];
+		psqtScore_eg += EvalConstants.PSQT_EG[sourcePieceIndex][colorToMoveInverse][fromIndex] - EvalConstants.PSQT_EG[sourcePieceIndex][colorToMoveInverse][toIndex];
 
 		switch (sourcePieceIndex) {
 		case EMPTY:
@@ -341,8 +347,8 @@ public final class ChessBoard {
 				materialKey -= MaterialUtil.VALUES[colorToMoveInverse][MoveUtil.getMoveType(move)] - MaterialUtil.VALUES[colorToMoveInverse][PAWN];
 				pieces[colorToMoveInverse][PAWN] ^= toMask;
 				pieces[colorToMoveInverse][MoveUtil.getMoveType(move)] ^= toMask;
-				psqtScore += EvalConstants.PSQT[PAWN][colorToMoveInverse][toIndex]
-						- EvalConstants.PSQT[MoveUtil.getMoveType(move)][colorToMoveInverse][toIndex];
+				psqtScore_mg += EvalConstants.PSQT_MG[PAWN][colorToMoveInverse][toIndex] - EvalConstants.PSQT_MG[MoveUtil.getMoveType(move)][colorToMoveInverse][toIndex];
+				psqtScore_eg += EvalConstants.PSQT_EG[PAWN][colorToMoveInverse][toIndex] - EvalConstants.PSQT_EG[MoveUtil.getMoveType(move)][colorToMoveInverse][toIndex];
 			} else {
 				pawnZobristKey ^= Zobrist.piece[toIndex][colorToMoveInverse][PAWN];
 			}
@@ -364,14 +370,16 @@ public final class ChessBoard {
 				toIndex += ChessConstants.COLOR_FACTOR_8[colorToMove];
 				toMask = Util.POWER_LOOKUP[toIndex];
 			}
-			psqtScore += EvalConstants.PSQT[PAWN][colorToMove][toIndex];
+			psqtScore_mg += EvalConstants.PSQT_MG[PAWN][colorToMove][toIndex];
+			psqtScore_eg += EvalConstants.PSQT_EG[PAWN][colorToMove][toIndex];
 			pawnZobristKey ^= Zobrist.piece[toIndex][colorToMove][PAWN];
 			pieces[colorToMove][attackedPieceIndex] |= toMask;
 			friendlyPieces[colorToMove] |= toMask;
 			materialKey += MaterialUtil.VALUES[colorToMove][PAWN];
 			break;
 		default:
-			psqtScore += EvalConstants.PSQT[attackedPieceIndex][colorToMove][toIndex];
+			psqtScore_mg += EvalConstants.PSQT_MG[attackedPieceIndex][colorToMove][toIndex];
+			psqtScore_eg += EvalConstants.PSQT_EG[attackedPieceIndex][colorToMove][toIndex];
 			phase -= EvalConstants.PHASE[attackedPieceIndex];
 			materialKey += MaterialUtil.VALUES[colorToMove][attackedPieceIndex];
 			pieces[colorToMove][attackedPieceIndex] |= toMask;

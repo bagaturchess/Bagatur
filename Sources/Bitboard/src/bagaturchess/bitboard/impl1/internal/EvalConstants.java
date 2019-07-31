@@ -153,7 +153,7 @@ public class EvalConstants {
 	public static final int[] MOBILITY_KING			= new int[MOBILITY_KING_MG.length];
 		
 	/** piece, color, square */
-	public static final int[][][] PSQT				= new int[7][2][64];
+	//public static final int[][][] PSQT				= new int[7][2][64];
 	public static final int[][][] PSQT_MG			= new int[7][2][64];
 	public static final int[][][] PSQT_EG			= new int[7][2][64];
 	
@@ -338,11 +338,11 @@ public class EvalConstants {
 			initMgEg(SHIELD_BONUS[i], SHIELD_BONUS_MG[i], SHIELD_BONUS_EG[i]);
 		}
 		
-		for (int color = WHITE; color <= BLACK; color++) {
+		/*for (int color = WHITE; color <= BLACK; color++) {
 			for (int piece = ChessConstants.PAWN; piece <= ChessConstants.KING; piece++) {
 				initMgEg(PSQT[piece][color], PSQT_MG[piece][color], PSQT_EG[piece][color]);
 			}
-		}
+		}*/
 	}
 
 	private static void initMgEg(int[] array, int[] arrayMg, int[] arrayEg) {

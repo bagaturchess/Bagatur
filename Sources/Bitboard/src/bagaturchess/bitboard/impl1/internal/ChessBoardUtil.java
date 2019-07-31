@@ -194,44 +194,8 @@ public class ChessBoardUtil {
 			}
 		}
 	}
-
-	public static void copy(final ChessBoard source, final ChessBoard target) {
-
-		// primitives
-		target.castlingRights = source.castlingRights;
-		target.psqtScore = source.psqtScore;
-		target.colorToMove = source.colorToMove;
-		target.colorToMoveInverse = source.colorToMoveInverse;
-		target.epIndex = source.epIndex;
-		target.materialKey = source.materialKey;
-		target.phase = source.phase;
-		target.allPieces = source.allPieces;
-		target.emptySpaces = source.emptySpaces;
-		target.zobristKey = source.zobristKey;
-		target.pawnZobristKey = source.pawnZobristKey;
-		target.checkingPieces = source.checkingPieces;
-		target.pinnedPieces = source.pinnedPieces;
-		target.discoveredPieces = source.discoveredPieces;
-		target.moveCounter = source.moveCounter;
-		target.moveCount = source.moveCount;
-
-		// small arrays
-		target.kingArea[WHITE] = source.kingArea[WHITE];
-		target.kingArea[BLACK] = source.kingArea[BLACK];
-		target.kingIndex[WHITE] = source.kingIndex[WHITE];
-		target.kingIndex[BLACK] = source.kingIndex[BLACK];
-		target.friendlyPieces[WHITE] = source.friendlyPieces[WHITE];
-		target.friendlyPieces[BLACK] = source.friendlyPieces[BLACK];
-
-		// large arrays
-		System.arraycopy(source.pieceIndexes, 0, target.pieceIndexes, 0, source.pieceIndexes.length);
-		System.arraycopy(source.zobristKeyHistory, 0, target.zobristKeyHistory, 0, source.zobristKeyHistory.length);
-
-		// multi-dimensional arrays
-		System.arraycopy(source.pieces[WHITE], 0, target.pieces[WHITE], 0, source.pieces[WHITE].length);
-		System.arraycopy(source.pieces[BLACK], 0, target.pieces[BLACK], 0, source.pieces[BLACK].length);
-	}
-
+	
+	
 	public static void init(ChessBoard cb) {
 
 		calculateMaterialZobrist(cb);
@@ -260,7 +224,7 @@ public class ChessBoardUtil {
 
 		cb.checkingPieces = CheckUtil.getCheckingPieces(cb);
 		cb.setPinnedAndDiscoPieces();
-		cb.psqtScore = calculatePositionScores(cb);
+		calculatePositionScores(cb);
 
 		cb.phase = PHASE_TOTAL - (Long.bitCount(cb.pieces[WHITE][NIGHT] | cb.pieces[BLACK][NIGHT]) * EvalConstants.PHASE[NIGHT]
 				+ Long.bitCount(cb.pieces[WHITE][BISHOP] | cb.pieces[BLACK][BISHOP]) * EvalConstants.PHASE[BISHOP]
@@ -273,19 +237,18 @@ public class ChessBoardUtil {
 	}
 	
 	
-	public static int calculatePositionScores(final ChessBoard cb) {
-
-		int score = 0;
+	public static void calculatePositionScores(final ChessBoard cb) {
+		
 		for (int color = WHITE; color <= BLACK; color++) {
 			for (int pieceType = PAWN; pieceType <= KING; pieceType++) {
 				long piece = cb.pieces[color][pieceType];
 				while (piece != 0) {
-					score += EvalConstants.PSQT[pieceType][color][Long.numberOfTrailingZeros(piece)];
+					cb.psqtScore_mg += EvalConstants.PSQT_MG[pieceType][color][Long.numberOfTrailingZeros(piece)];
+					cb.psqtScore_eg += EvalConstants.PSQT_EG[pieceType][color][Long.numberOfTrailingZeros(piece)];
 					piece &= piece - 1;
 				}
 			}
 		}
-		return score;
 	}
 	
 	
