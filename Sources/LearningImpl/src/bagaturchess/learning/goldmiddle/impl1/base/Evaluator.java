@@ -236,19 +236,15 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	
 	public int getScore2() {
 		
-		if (IBitBoard.IMPL1) {
-			return 0;
-		}
-		
 		// clear values
 		evalinfo.clearEvals2();
 		evalinfo.clearEvalAttacks();
 		
 		calculateMobilityScoresAndSetAttackBoards();
 		calculatePassedPawnScores();
-		calculateThreats();
+		if (!IBitBoard.IMPL1) calculateThreats();
 		calculatePawnShieldBonus();
-		calculateOthers();
+		if (!IBitBoard.IMPL1) calculateOthers();
 		calculateKingSafetyScores();
 		calculateSpace();
 		
