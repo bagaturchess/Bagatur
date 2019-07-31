@@ -128,7 +128,7 @@ public class ListKingEscapes implements ISearchMoveList {
 		
 		if (env.getBitboard().isCaptureOrPromotionMove(move)) {
 			
-			int see = env.getBitboard().getSee().evalExchange(move);
+			int see = env.getBitboard().getSEEScore(move);
 			
 			if (see > 0) {
 				ordval += ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
