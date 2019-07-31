@@ -10,6 +10,7 @@ import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.QUEEN;
 import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.ROOK;
 import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.WHITE;
 import bagaturchess.bitboard.api.IBaseEval;
+import bagaturchess.bitboard.api.IBitBoard;
 
 
 public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
@@ -234,6 +235,10 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	
 	
 	public int getScore2() {
+		
+		if (IBitBoard.IMPL1) {
+			return 0;
+		}
 		
 		// clear values
 		evalinfo.clearEvals2();

@@ -1484,17 +1484,19 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!inCheck) {
 				
-				//Skip under promotions
-				if (MoveInt.isPromotion(cur_move)) {
-					if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
+				if (!IBitBoard.IMPL1) {
+					//Skip under promotions
+					if (env.getBitboard().isPromotionMove(cur_move)) {
+						if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
+							continue;
+						}
+					} else if (MoveInt.isCapture(cur_move)
+							&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
+						//Futility pruning
 						continue;
 					}
-				} else if (MoveInt.isCapture(cur_move)
-						&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
-					//Futility pruning
-					continue;
 				}
-				
+			
 				//Skip bad captures
 				int moveSee = env.getBitboard().getSEEScore(cur_move);
 				if (moveSee <= 0) {
@@ -1688,15 +1690,17 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!inCheck) {
 				
-				//Skip under promotions
-				if (MoveInt.isPromotion(cur_move)) {
-					if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
+				if (!IBitBoard.IMPL1) {
+					//Skip under promotions
+					if (env.getBitboard().isPromotionMove(cur_move)) {
+						if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
+							continue;
+						}
+					} else if (MoveInt.isCapture(cur_move)
+							&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
+						//Futility pruning
 						continue;
 					}
-				} else if (MoveInt.isCapture(cur_move)
-						&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
-					//Futility pruning
-					continue;
 				}
 	
 				//Skip bad captures
