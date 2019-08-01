@@ -339,7 +339,8 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean hasSufficientMaterial() {
-		return getMaterialFactor().getTotalFactor() > 12;
+		return true;
+		//TODO if has pawns than not return true. return getMaterialFactor().getTotalFactor() > 12;
 	}
 	
 	
@@ -634,12 +635,16 @@ public class BoardImpl implements IBitBoard {
 		
 		@Override
 		public double getOpenningPart() {
+			if (getTotalFactor() < 0) {
+				throw new IllegalStateException();
+			}
 			return Math.min(1, getTotalFactor() / TOTAL_FACTOR_MAX);
 		}
 		
 		
 		@Override
 		public int interpolateByFactor(int val_o, int val_e) {
+			if (true) return (val_o + val_e) / 2;
 			double openningPart = getOpenningPart();
 			int result = (int) (val_o * openningPart + (val_e * (1 - openningPart)));
 			return result;
@@ -803,6 +808,7 @@ public class BoardImpl implements IBitBoard {
 		PiecesListsImpl(IBoard board) {
 			list = new PiecesList(board, 8);
 			list.add(16);
+			list.add(32);
 		}
 		
 		

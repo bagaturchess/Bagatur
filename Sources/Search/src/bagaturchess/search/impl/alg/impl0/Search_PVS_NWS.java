@@ -159,7 +159,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		int rest = normDepth(maxdepth) - depth;
 		
 		
-		if (depth > 1
+		if (!IBitBoard.IMPL1
+				&& depth > 1
     	    	&& depth <= rest
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
@@ -725,7 +726,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		int rest = normDepth(maxdepth) - depth;
 		
     	
-		if (depth > 1
+		if (!IBitBoard.IMPL1
+				&& depth > 1
     			&& depth <= rest
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
