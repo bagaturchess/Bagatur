@@ -355,7 +355,14 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean isCheckMove(int move) {
-		return false;//TODO
+		
+		boolean inCheck = false;
+		
+		chessBoard.doMove(move);
+		inCheck = chessBoard.checkingPieces != 0;
+		chessBoard.undoMove(move);
+		
+		return inCheck;
 	}
 	
 	
