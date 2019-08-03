@@ -43,7 +43,9 @@ import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.ISEE;
 import bagaturchess.bitboard.api.PawnsEvalCache;
+import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
@@ -390,8 +392,67 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean hasSufficientMaterial() {
+		
+		if (materialFactor.getTotalFactor() > 24) { // 2w knights + 2b knights
+			return true;
+		}
+		
+		
+		/**
+		 * If has pawn - true
+		 */
+		long w_pawns = getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
+		if (w_pawns != 0L) {
+			return true;
+		}
+		long b_pawns = getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
+		if (b_pawns != 0L) {
+			return true;
+		}
+		
+		/**
+		 * If has queen - true
+		 */
+		long w_queens = getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN);
+		if (w_queens != 0L) {
+			return true;
+		}
+		long b_queens = getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN);
+		if (b_queens != 0L) {
+			return true;
+		}
+
+		/**
+		 * If has rook - true
+		 */
+		long w_rooks = getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_CASTLE);
+		if (w_rooks != 0L) {
+			return true;
+		}
+		long b_rooks = getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_CASTLE);
+		if (b_rooks != 0L) {
+			return true;
+		}
+		
+		int o1 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER));
+		int k1 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT));
+		
+		int mi1 = o1 + k1;
+		
+		int o2 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER));
+		int k2 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT));
+		
+		int mi2 = o2 + k2;
+
+		if (mi1 <= 1 && mi2 <= 1) {
+			return false;
+		}
+		
+		if (o1 == 0 && o2 == 0) {
+			return false;
+		}
+		
 		return true;
-		//TODO if has pawns than not return true. return getMaterialFactor().getTotalFactor() > 12;
 	}
 	
 	
