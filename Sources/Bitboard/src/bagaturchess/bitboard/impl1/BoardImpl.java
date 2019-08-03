@@ -52,6 +52,7 @@ import bagaturchess.bitboard.impl1.internal.ChessConstants;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.MoveWrapper;
+import bagaturchess.bitboard.impl1.internal.SEEUtil;
 
 
 public class BoardImpl implements IBitBoard {
@@ -265,7 +266,8 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getSEEScore(int move) {
-		return 100 * (MoveUtil.getAttackedPieceIndex(move) * 10 - MoveUtil.getSourcePieceIndex(move));
+		//return 100 * (MoveUtil.getAttackedPieceIndex(move) * 10 - MoveUtil.getSourcePieceIndex(move));
+		return SEEUtil.getSeeCaptureScore(chessBoard, move);
 	}
 	
 	
