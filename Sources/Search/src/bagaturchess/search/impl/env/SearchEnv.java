@@ -80,8 +80,8 @@ public class SearchEnv {
 		tactics = new Tactics(bitboard);
 		
 		//history = new HistoryTable_FromTo(new BinarySemaphore_Dummy());
-		history_all = new HistoryTable_PieceTo();
-		history_incheck = new HistoryTable_PieceTo();
+		history_all = new HistoryTable_PieceTo(bitboard);
+		history_incheck = new HistoryTable_PieceTo(bitboard);
 		
 		moveListFactory = new SearchMoveListFactory();
 		

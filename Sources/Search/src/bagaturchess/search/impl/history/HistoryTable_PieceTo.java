@@ -20,8 +20,8 @@
 package bagaturchess.search.impl.history;
 
 
+import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 
 
 public class HistoryTable_PieceTo implements IHistoryTable {
@@ -32,9 +32,11 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 
 	private static final int MAX_COUNTERS = 3;
 	private int[][][] counters;
+	private IBoard board;
 	
 	
-	public HistoryTable_PieceTo() {
+	public HistoryTable_PieceTo(IBoard _board) {
+		board = _board;
 		success 	= new long[Constants.PID_MAX][64];
 		failures 	= new long[Constants.PID_MAX][64];
 		counters 	= new int[Constants.PID_MAX][64][MAX_COUNTERS];
@@ -65,12 +67,12 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	@Override
 	public void countFailure(int move, int depth) {
 		
-		if (MoveInt.isCaptureOrPromotion(move)) {
+		if (board.isCaptureOrPromotionMove(move)) {
 			return;
 		}
 		
-		int pid = MoveInt.getFigurePID(move);
-		int to = MoveInt.getToFieldID(move);
+		int pid = board.getFigurePID(move);
+		int to = board.getToFieldID(move);
 		
 		failures[pid][to] += depth * depth;
 	}
@@ -82,12 +84,12 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	@Override
 	public void countSuccess(int move, int depth) {
 		
-		if (MoveInt.isCaptureOrPromotion(move)) {
+		if (board.isCaptureOrPromotionMove(move)) {
 			return;
 		}
 		
-		int pid = MoveInt.getFigurePID(move);
-		int to = MoveInt.getToFieldID(move);
+		int pid = board.getFigurePID(move);
+		int to = board.getToFieldID(move);
 		
 		success[pid][to] += depth * depth;
 	}
@@ -99,8 +101,8 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	@Override
 	public double getScores(int move) {
 		
-		int pid = MoveInt.getFigurePID(move);
-		int to = MoveInt.getToFieldID(move);
+		int pid = board.getFigurePID(move);
+		int to = board.getToFieldID(move);
 		
 		long success_scores  = success[pid][to];
 		long failures_scores = failures[pid][to];
@@ -119,12 +121,12 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	@Override
 	public void addCounterMove(int last_move, int counter_move) {
 		
-		if (MoveInt.isCaptureOrPromotion(counter_move)) {
+		if (board.isCaptureOrPromotionMove(counter_move)) {
 			return;
 		}
 		
-		int pid = MoveInt.getFigurePID(last_move);
-		int to = MoveInt.getToFieldID(last_move);
+		int pid = board.getFigurePID(counter_move);
+		int to = board.getToFieldID(counter_move);
 		
 		if (!isCounterMove(last_move, counter_move)) {
 			int[] counter_moves = counters[pid][to];
@@ -143,8 +145,9 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 			return false;
 		}
 		
-		int pid = MoveInt.getFigurePID(last_move);
-		int to = MoveInt.getToFieldID(last_move);
+		int pid = board.getFigurePID(move);
+		int to = board.getToFieldID(move);
+		
 		int[] counter_moves = counters[pid][to];
 				
 		for (int i=0; i<counter_moves.length; i++) {

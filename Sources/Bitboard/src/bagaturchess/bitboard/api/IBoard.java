@@ -43,6 +43,8 @@ public interface IBoard {
 	public boolean isCaptureOrPromotionMove(int move);
 	public boolean isEnpassantMove(int move);
 	public boolean isCastlingMove(int move);
+	public int getFigurePID(int move);
+	public int getToFieldID(int move);
 	
 	public void mark();
 	public void reset();

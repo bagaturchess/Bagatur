@@ -43,10 +43,12 @@ import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.ISEE;
 import bagaturchess.bitboard.api.PawnsEvalCache;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.ChessBoardUtil;
+import bagaturchess.bitboard.impl1.internal.ChessConstants;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.MoveWrapper;
@@ -222,6 +224,42 @@ public class BoardImpl implements IBitBoard {
 	@Override
 	public boolean isCastlingMove(int move) {
 		return MoveUtil.isCastlingMove(move);
+	}
+	
+	
+	@Override
+	public int getFigurePID(int move) {
+		
+		int pieceType = MoveUtil.getSourcePieceIndex(move);
+		int colour = chessBoard.colorToMove;
+		
+		if (colour == WHITE) {
+			switch(pieceType) {
+				case ChessConstants.PAWN: return Constants.PID_W_PAWN;
+				case ChessConstants.NIGHT: return Constants.PID_W_KNIGHT;
+				case ChessConstants.BISHOP: return Constants.PID_W_BISHOP;
+				case ChessConstants.ROOK: return Constants.PID_W_ROOK;
+				case ChessConstants.QUEEN: return Constants.PID_W_QUEEN;
+				case ChessConstants.KING: return Constants.PID_W_KING;
+			}
+		} else {
+			switch(pieceType) {
+				case ChessConstants.PAWN: return Constants.PID_B_PAWN;
+				case ChessConstants.NIGHT: return Constants.PID_B_KNIGHT;
+				case ChessConstants.BISHOP: return Constants.PID_B_BISHOP;
+				case ChessConstants.ROOK: return Constants.PID_B_ROOK;
+				case ChessConstants.QUEEN: return Constants.PID_B_QUEEN;
+				case ChessConstants.KING: return Constants.PID_B_KING;
+			}
+		}
+		
+		throw new IllegalStateException("pieceType=" + pieceType);
+	}
+
+	
+	@Override
+	public int getToFieldID(int move) {
+		return MoveUtil.getToIndex(move);
 	}
 	
 	
@@ -651,7 +689,6 @@ public class BoardImpl implements IBitBoard {
 		
 		@Override
 		public int interpolateByFactor(int val_o, int val_e) {
-			if (true) return (val_o + val_e) / 2;
 			double openningPart = getOpenningPart();
 			int result = (int) (val_o * openningPart + (val_e * (1 - openningPart)));
 			return result;

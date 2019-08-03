@@ -563,4 +563,22 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 	public int getSEEScore(int move) {
 		return bitboard.getSEEScore(move);
 	}
+
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#getPieceType(int)
+	 */
+	@Override
+	public int getFigurePID(int move) {
+		return bitboard.getFigurePID(move);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#getToFieldID(int)
+	 */
+	@Override
+	public int getToFieldID(int move) {
+		return bitboard.getToFieldID(move);
+	}
 }

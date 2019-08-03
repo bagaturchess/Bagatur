@@ -5326,4 +5326,20 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	public boolean isCastlingMove(int move) {
 		return MoveInt.isCastling(move);
 	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#getPieceType(int)
+	 */
+	@Override
+	public int getFigurePID(int move) {
+		return MoveInt.getFigurePID(move);
+	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#getToFieldID(int)
+	 */
+	@Override
+	public int getToFieldID(int move) {
+		return MoveInt.getToFieldID(move);
+	}
 }

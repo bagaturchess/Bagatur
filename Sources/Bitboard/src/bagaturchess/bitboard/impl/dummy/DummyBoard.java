@@ -759,4 +759,22 @@ public class DummyBoard implements IBitBoard {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#getPieceType(int)
+	 */
+	@Override
+	public int getFigurePID(int move) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#getToFieldID(int)
+	 */
+	@Override
+	public int getToFieldID(int move) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
