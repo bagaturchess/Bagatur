@@ -691,6 +691,7 @@ public class BoardImpl implements IBitBoard {
 		
 		@Override
 		public int interpolateByFactor(int val_o, int val_e) {
+			if (true) return (val_o + val_e) / 2;
 			double openningPart = getOpenningPart();
 			int result = (int) (val_o * openningPart + (val_e * (1 - openningPart)));
 			return result;
