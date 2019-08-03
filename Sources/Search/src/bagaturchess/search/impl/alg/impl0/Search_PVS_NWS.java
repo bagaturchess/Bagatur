@@ -159,29 +159,30 @@ public class Search_PVS_NWS extends SearchImpl {
 		int rest = normDepth(maxdepth) - depth;
 		
 		
-		if (!IBitBoard.IMPL1
-				&& depth > 1
+		if (depth > 1
     	    	&& depth <= rest
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
     			&& env.getBitboard().getColourToMove() == rootColour
     			){
 			
-			if (inCheck) {
-				if (!env.getBitboard().hasMoveInCheck()) {
-					node.bestmove = 0;
-					node.eval = -getMateVal(depth);
-					node.leaf = true;
-					node.nullmove = false;
-					return node.eval;
-				}
-			} else {
-				if (!env.getBitboard().hasMoveInNonCheck()) {
-					node.bestmove = 0;
-					node.eval = getDrawScores(rootColour);
-					node.leaf = true;
-					node.nullmove = false;
-					return node.eval;
+			if (!IBitBoard.IMPL1) {
+				if (inCheck) {
+					if (!env.getBitboard().hasMoveInCheck()) {
+						node.bestmove = 0;
+						node.eval = -getMateVal(depth);
+						node.leaf = true;
+						node.nullmove = false;
+						return node.eval;
+					}
+				} else {
+					if (!env.getBitboard().hasMoveInNonCheck()) {
+						node.bestmove = 0;
+						node.eval = getDrawScores(rootColour);
+						node.leaf = true;
+						node.nullmove = false;
+						return node.eval;
+					}
 				}
 			}
 			
@@ -726,21 +727,22 @@ public class Search_PVS_NWS extends SearchImpl {
 		int rest = normDepth(maxdepth) - depth;
 		
     	
-		if (!IBitBoard.IMPL1
-				&& depth > 1
+		if (depth > 1
     			&& depth <= rest
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
     			&& env.getBitboard().getColourToMove() == rootColour
     			){
 			
-			if (inCheck) {
-				if (!env.getBitboard().hasMoveInCheck()) {
-					return -getMateVal(depth);
-				}
-			} else {
-				if (!env.getBitboard().hasMoveInNonCheck()) {
-					return getDrawScores(rootColour);
+			if (!IBitBoard.IMPL1) {
+				if (inCheck) {
+					if (!env.getBitboard().hasMoveInCheck()) {
+						return -getMateVal(depth);
+					}
+				} else {
+					if (!env.getBitboard().hasMoveInNonCheck()) {
+						return getDrawScores(rootColour);
+					}
 				}
 			}
 			

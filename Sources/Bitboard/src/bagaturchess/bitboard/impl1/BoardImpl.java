@@ -315,6 +315,17 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
+	public long getFiguresBitboardByColour(int colour) {
+		return getFiguresBitboardByColourAndType(colour, PAWN)
+				| getFiguresBitboardByColourAndType(colour, NIGHT)
+				| getFiguresBitboardByColourAndType(colour, BISHOP)
+				| getFiguresBitboardByColourAndType(colour, ROOK)
+				| getFiguresBitboardByColourAndType(colour, QUEEN)
+				| getFiguresBitboardByColourAndType(colour, KING);
+	}
+	
+	
+	@Override
 	public long getFreeBitboard() {
 		return chessBoard.emptySpaces;
 	}
@@ -581,14 +592,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public long getFiguresBitboardByPID(int pid) {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#getFiguresBitboardByColour(int)
-	 */
-	@Override
-	public long getFiguresBitboardByColour(int colour) {
 		throw new UnsupportedOperationException();
 	}
 

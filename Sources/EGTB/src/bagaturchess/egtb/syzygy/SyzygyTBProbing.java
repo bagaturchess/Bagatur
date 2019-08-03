@@ -183,8 +183,10 @@ public class SyzygyTBProbing {
     }
     
 	private static long convertBB(long figures) {
-		//return figures;
-		return Long.reverse(figures);
-		//return Bits.reverse(figures);
+		if (IBitBoard.IMPL1) {
+			return figures;
+		} else {
+			return Long.reverse(figures);
+		}
 	}
 }
