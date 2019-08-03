@@ -685,14 +685,15 @@ public class BoardImpl implements IBitBoard {
 			if (getTotalFactor() < 0) {
 				throw new IllegalStateException();
 			}
-			return Math.min(1, getTotalFactor() / TOTAL_FACTOR_MAX);
+			return Math.min(1, getTotalFactor() / (double) TOTAL_FACTOR_MAX);
 		}
 		
 		
 		@Override
 		public int interpolateByFactor(int val_o, int val_e) {
-			if (true) return (val_o + val_e) / 2;
+			//if (true) return (val_o + val_e) / 2;
 			double openningPart = getOpenningPart();
+			//System.out.println(openningPart);
 			int result = (int) (val_o * openningPart + (val_e * (1 - openningPart)));
 			return result;
 		}
