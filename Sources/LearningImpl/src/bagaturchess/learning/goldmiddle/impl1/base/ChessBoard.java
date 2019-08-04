@@ -168,13 +168,6 @@ public class ChessBoard implements IChessBoard {
 			return ChessConstants.EMPTY;
 		}
 		
-		if (IBitBoard.IMPL1) {
-			if (pid < 1 || pid > 6) {
-				throw new IllegalStateException();
-			}
-			return pid;
-		}
-		
 		switch(pid) {
 			case Constants.PID_W_PAWN:
 				return ChessConstants.PAWN;
