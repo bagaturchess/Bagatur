@@ -24,9 +24,7 @@ package bagaturchess.search.impl.alg.impl0;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.internal.IRootWindow;
@@ -1490,17 +1488,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!inCheck) {
 				
-				if (!IBitBoard.IMPL1) {
-					//Skip under promotions
-					if (env.getBitboard().isPromotionMove(cur_move)) {
-						if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
-							continue;
-						}
-					} else if (MoveInt.isCapture(cur_move)
-							&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
-						//Futility pruning
-						continue;
-					}
+				if (env.getBitboard().isCaptureMove(cur_move)
+							&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(env.getBitboard().getFigureType(cur_move)) < alpha) {
+					//Futility pruning
+					continue;
 				}
 			
 				//Skip bad captures
@@ -1696,17 +1687,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!inCheck) {
 				
-				if (!IBitBoard.IMPL1) {
-					//Skip under promotions
-					if (env.getBitboard().isPromotionMove(cur_move)) {
-						if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
-							continue;
-						}
-					} else if (MoveInt.isCapture(cur_move)
-							&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
-						//Futility pruning
-						continue;
-					}
+				if (env.getBitboard().isCaptureMove(cur_move)
+						&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(env.getBitboard().getFigureType(cur_move)) < alpha) {
+					//Futility pruning
+					continue;
 				}
 	
 				//Skip bad captures

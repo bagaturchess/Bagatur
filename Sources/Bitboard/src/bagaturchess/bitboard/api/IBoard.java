@@ -45,6 +45,7 @@ public interface IBoard {
 	public boolean isCastlingMove(int move);
 	public int getFigurePID(int move);
 	public int getToFieldID(int move);
+	public int getFigureType(int move);
 	
 	public void mark();
 	public void reset();

@@ -258,7 +258,13 @@ public class BoardImpl implements IBitBoard {
 		
 		throw new IllegalStateException("pieceType=" + pieceType);
 	}
-
+	
+	
+	@Override
+	public int getFigureType(int move) {
+		return  MoveUtil.getSourcePieceIndex(move);
+	}
+	
 	
 	@Override
 	public int getToFieldID(int move) {
@@ -789,6 +795,22 @@ public class BoardImpl implements IBitBoard {
 		}
 		
 		
+		@Override
+		public int getMaterial(int pieceType) {
+			
+			switch (pieceType) {
+				case ChessConstants.PAWN: return (int) Math.max(boardConfig.getMaterial_PAWN_O(), boardConfig.getMaterial_PAWN_E());
+				case ChessConstants.NIGHT: return (int) Math.max(boardConfig.getMaterial_KNIGHT_O(), boardConfig.getMaterial_KNIGHT_E());
+				case ChessConstants.BISHOP: return (int) Math.max(boardConfig.getMaterial_BISHOP_O(), boardConfig.getMaterial_BISHOP_E());
+				case ChessConstants.ROOK: return (int) Math.max(boardConfig.getMaterial_ROOK_O(), boardConfig.getMaterial_ROOK_E());
+				case ChessConstants.QUEEN: return (int) Math.max(boardConfig.getMaterial_QUEEN_O(), boardConfig.getMaterial_QUEEN_E());
+				case ChessConstants.KING: return (int) Math.max(boardConfig.getMaterial_KING_O(), boardConfig.getMaterial_KING_E());
+			}
+			
+			throw new IllegalStateException("pieceType=" + pieceType);
+		}
+		
+		
 		/* (non-Javadoc)
 		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterial_o()
 		 */
@@ -882,14 +904,6 @@ public class BoardImpl implements IBitBoard {
 		 */
 		@Override
 		public int getMaterial_BARIER_NOPAWNS_E() {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterial(int)
-		 */
-		@Override
-		public int getMaterial(int pieceType) {
 			throw new UnsupportedOperationException();
 		}
 

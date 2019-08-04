@@ -581,4 +581,13 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 	public int getToFieldID(int move) {
 		return bitboard.getToFieldID(move);
 	}
+
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#getFigureType(int)
+	 */
+	@Override
+	public int getFigureType(int move) {
+		return bitboard.getFigureType(move);
+	}
 }
