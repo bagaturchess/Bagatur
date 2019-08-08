@@ -297,8 +297,6 @@ public class NullwinSearchTask implements Runnable {
 								+ MoveInt.moveToString(entry.getBestMove_upper()) + " ");
 				}
 			}
-		} else {
-			throw new IllegalStateException("entry is null");
 		}
 	}
 }
