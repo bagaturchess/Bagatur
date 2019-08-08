@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
@@ -199,6 +200,7 @@ public class NullwinSearchTask implements Runnable {
 					
 					//int[] pv = getPVfromTPT();
 					int[] pv = PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
+					validatePV(pv);
 					info.setPV(pv);
 					if (info.getPV().length > 0) {
 						info.setBestMove(info.getPV()[0]);
@@ -216,6 +218,7 @@ public class NullwinSearchTask implements Runnable {
 					
 					//int[] pv = getPVfromTPT();
 					int[] pv = PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
+					validatePV(pv);
 					info.setPV(pv);
 					if (info.getPV().length > 0) {
 						info.setBestMove(info.getPV()[0]);
@@ -279,5 +282,23 @@ public class NullwinSearchTask implements Runnable {
 		}
 		
 		return result;
+	}
+	
+	
+	private void validatePV(int[] pv) {
+		
+		TPTEntry entry = searcher.getEnv().getTPT().get(bitboard.getHashKey());
+		if (entry != null) {
+			if (pv != null && pv.length > 0) {
+				if (pv[0] != entry.getBestMove_lower() && pv[0] != entry.getBestMove_upper()) {
+					mediator.dump(Thread.currentThread().getName() + ":	validatePV -> diff moves "
+								+ MoveInt.moveToString(pv[0]) + " "
+								+ MoveInt.moveToString(entry.getBestMove_lower()) + " "
+								+ MoveInt.moveToString(entry.getBestMove_upper()) + " ");
+				}
+			}
+		} else {
+			throw new IllegalStateException("entry is null");
+		}
 	}
 }
