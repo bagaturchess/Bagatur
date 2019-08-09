@@ -104,7 +104,7 @@ public class BoardImpl implements IBitBoard {
 		int counter = 0;
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
-			if (!chessBoard.isLegal(cur_move) || MoveUtil.getAttackedPieceIndex(cur_move) == KING) {//TODO Check
+			if (!chessBoard.isLegal(cur_move)) {
 				continue;
 			}
 			list.reserved_add(cur_move);
@@ -128,7 +128,7 @@ public class BoardImpl implements IBitBoard {
 		int counter = 0;
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
-			if (!chessBoard.isLegal(cur_move) || MoveUtil.getAttackedPieceIndex(cur_move) == KING) {//TODO Check
+			if (!chessBoard.isLegal(cur_move)) {
 				continue;
 			}
 			list.reserved_add(cur_move);
@@ -150,7 +150,7 @@ public class BoardImpl implements IBitBoard {
 		int counter = 0;
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
-			if (!chessBoard.isLegal(cur_move) || MoveUtil.getAttackedPieceIndex(cur_move) == KING) {//TODO Check
+			if (!chessBoard.isLegal(cur_move)) {
 				continue;
 			}
 			list.reserved_add(cur_move);
