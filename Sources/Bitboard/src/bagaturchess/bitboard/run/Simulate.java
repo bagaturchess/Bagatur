@@ -159,11 +159,11 @@ public class Simulate {
 				//if (board.isInCheck());
 				
 				int see = 0;
-				if (board.isCaptureOrPromotionMove(move)) {
+				if (board.getMoveOps().isCaptureOrPromotion(move)) {
 					see = board.getSEEScore(move);
 				}
 				
-				if (board.isCaptureMove(move)
+				if (board.getMoveOps().isCapture(move)
 						&& MoveInt.getCapturedFigureType(move) == Constants.TYPE_KING
 					) {
 					System.out.println("KING CAPTURE");

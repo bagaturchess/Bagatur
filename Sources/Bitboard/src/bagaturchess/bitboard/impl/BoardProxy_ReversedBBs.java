@@ -27,6 +27,7 @@ import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.api.IInternalMoveList;
 import bagaturchess.bitboard.api.IMaterialFactor;
 import bagaturchess.bitboard.api.IMaterialState;
+import bagaturchess.bitboard.api.IMoveOps;
 import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.ISEE;
@@ -517,46 +518,6 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 	}
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#isCaptureMove(int)
-	 */
-	@Override
-	public boolean isCaptureMove(int move) {
-		return bitboard.isCaptureMove(move);
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#isPromotionMove(int)
-	 */
-	@Override
-	public boolean isPromotionMove(int move) {
-		return bitboard.isPromotionMove(move);
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#isCaptureOrPromotionMove(int)
-	 */
-	@Override
-	public boolean isCaptureOrPromotionMove(int move) {
-		return bitboard.isCaptureOrPromotionMove(move);
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#isEnpassantMove(int)
-	 */
-	@Override
-	public boolean isEnpassantMove(int move) {
-		return bitboard.isEnpassantMove(move);
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#isCastlingMove(int)
-	 */
-	@Override
-	public boolean isCastlingMove(int move) {
-		return bitboard.isCastlingMove(move);
-	}
-
-	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBitBoard#getSEEScore(int)
 	 */
 	@Override
@@ -564,30 +525,11 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 		return bitboard.getSEEScore(move);
 	}
 
-
 	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getPieceType(int)
+	 * @see bagaturchess.bitboard.api.IBoard#getMoveOps()
 	 */
 	@Override
-	public int getFigurePID(int move) {
-		return bitboard.getFigurePID(move);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getToFieldID(int)
-	 */
-	@Override
-	public int getToFieldID(int move) {
-		return bitboard.getToFieldID(move);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getFigureType(int)
-	 */
-	@Override
-	public int getFigureType(int move) {
-		return bitboard.getFigureType(move);
+	public IMoveOps getMoveOps() {
+		return bitboard.getMoveOps();
 	}
 }

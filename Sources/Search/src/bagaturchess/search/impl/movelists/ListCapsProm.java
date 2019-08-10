@@ -73,7 +73,7 @@ public class ListCapsProm implements ISearchMoveList {
 	}
 	
 	private boolean isOk(int move) {
-		return !env.getBitboard().isCastlingMove(move) && !env.getBitboard().isEnpassantMove(move);
+		return !env.getBitboard().getMoveOps().isCastling(move) && !env.getBitboard().getMoveOps().isEnpassant(move);
 	}
 	
 	public int next() {
@@ -81,7 +81,7 @@ public class ListCapsProm implements ISearchMoveList {
 		if (!tptTried) {
 			tptTried = true;
 			if (tptMove != 0 && isOk(tptMove) && env.getBitboard().isPossible(tptMove)
-					&& env.getBitboard().isCaptureOrPromotionMove(tptMove)) {
+					&& env.getBitboard().getMoveOps().isCaptureOrPromotion(tptMove)) {
 				tptPlied = true;
 				return tptMove;
 			}
@@ -126,7 +126,7 @@ public class ListCapsProm implements ISearchMoveList {
 				ordval += ORD_VAL_TPT_MOVE * orderingStatistics.getOrdVal_TPT();
 			}
 			
-			if (env.getBitboard().isCaptureOrPromotionMove(move)) {
+			if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 				
 				int see = env.getBitboard().getSEEScore(move);
 				

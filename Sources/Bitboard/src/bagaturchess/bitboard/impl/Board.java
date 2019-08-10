@@ -34,6 +34,7 @@ import bagaturchess.bitboard.api.IInternalMoveList;
 import bagaturchess.bitboard.api.IMaterialFactor;
 import bagaturchess.bitboard.api.IMaterialState;
 import bagaturchess.bitboard.api.IMobility;
+import bagaturchess.bitboard.api.IMoveOps;
 import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.PawnsEvalCache;
@@ -176,6 +177,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	
 	private IBoardConfig boardConfig;
 	private IMobility attackListener;
+	private IMoveOps moveOps;
 	
 	
 	public Board() {
@@ -348,6 +350,8 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}*/
 		
 		see = new SEE(this);
+		
+		moveOps = new MoveOpsImpl();
 		
 		checkConsistency();
 	} 
@@ -5297,51 +5301,67 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return board;
 	}
 	
-	@Override
-	public boolean isCaptureMove(int move) {
-		return MoveInt.isCapture(move);
-	}
 	
-	@Override
-	public boolean isPromotionMove(int move) {
-		return MoveInt.isPromotion(move);
-	}
-	
-	@Override
-	public boolean isCaptureOrPromotionMove(int move) {
-		return isCaptureMove(move) || isPromotionMove(move);
-	}
-
 	@Override
 	public int getSEEScore(int move) {
 		return getSee().evalExchange(move);
 	}
 	
-	@Override
-	public boolean isEnpassantMove(int move) {
-		return MoveInt.isEnpassant(move);
-	}
 	
 	@Override
-	public boolean isCastlingMove(int move) {
-		return MoveInt.isCastling(move);
+	public IMoveOps getMoveOps() {
+		return moveOps;
 	}
 	
 	
-	@Override
-	public int getFigurePID(int move) {
-		return MoveInt.getFigurePID(move);
-	}
-	
-	
-	@Override
-	public int getToFieldID(int move) {
-		return MoveInt.getToFieldID(move);
-	}
-	
-	
-	@Override
-	public int getFigureType(int move) {
-		return  MoveInt.getFigureType(move);
+	private class MoveOpsImpl implements IMoveOps {
+		
+		
+		@Override
+		public boolean isCapture(int move) {
+			return MoveInt.isCapture(move);
+		}
+		
+		
+		@Override
+		public boolean isPromotion(int move) {
+			return MoveInt.isPromotion(move);
+		}
+		
+		
+		@Override
+		public boolean isCaptureOrPromotion(int move) {
+			return isCapture(move) || isPromotion(move);
+		}
+		
+		
+		@Override
+		public boolean isEnpassant(int move) {
+			return MoveInt.isEnpassant(move);
+		}
+		
+		
+		@Override
+		public boolean isCastling(int move) {
+			return MoveInt.isCastling(move);
+		}
+		
+		
+		@Override
+		public int getFigurePID(int move) {
+			return MoveInt.getFigurePID(move);
+		}
+		
+		
+		@Override
+		public int getToFieldID(int move) {
+			return MoveInt.getToFieldID(move);
+		}
+		
+		
+		@Override
+		public int getFigureType(int move) {
+			return  MoveInt.getFigureType(move);
+		}
 	}
 }

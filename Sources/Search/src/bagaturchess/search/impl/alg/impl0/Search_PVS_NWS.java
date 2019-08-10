@@ -492,7 +492,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				boolean isCapOrProm = env.getBitboard().isCaptureOrPromotionMove(cur_move);
+				boolean isCapOrProm = env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move);
 				int moveSee = -1;
 				if (isCapOrProm) {
 					moveSee = env.getBitboard().getSEEScore(cur_move);
@@ -1132,7 +1132,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				boolean isCapOrProm = env.getBitboard().isCaptureOrPromotionMove(cur_move);
+				boolean isCapOrProm = env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move);
 				int moveSee = -1;
 				if (isCapOrProm) {
 					moveSee = env.getBitboard().getSEEScore(cur_move);
@@ -1488,8 +1488,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!inCheck) {
 				
-				if (env.getBitboard().isCaptureMove(cur_move)
-							&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(env.getBitboard().getFigureType(cur_move)) < alpha) {
+				if (env.getBitboard().getMoveOps().isCapture(cur_move)
+							&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(env.getBitboard().getMoveOps().getFigureType(cur_move)) < alpha) {
 					//Futility pruning
 					continue;
 				}
@@ -1687,8 +1687,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!inCheck) {
 				
-				if (env.getBitboard().isCaptureMove(cur_move)
-						&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(env.getBitboard().getFigureType(cur_move)) < alpha) {
+				if (env.getBitboard().getMoveOps().isCapture(cur_move)
+						&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(env.getBitboard().getMoveOps().getFigureType(cur_move)) < alpha) {
 					//Futility pruning
 					continue;
 				}

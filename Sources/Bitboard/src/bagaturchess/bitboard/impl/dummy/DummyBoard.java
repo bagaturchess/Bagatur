@@ -32,6 +32,7 @@ import bagaturchess.bitboard.api.IMaterialFactor;
 import bagaturchess.bitboard.api.IMaterialState;
 import bagaturchess.bitboard.api.IMobility;
 import bagaturchess.bitboard.api.IMoveIterator;
+import bagaturchess.bitboard.api.IMoveOps;
 import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.PawnsEvalCache;
@@ -707,33 +708,6 @@ public class DummyBoard implements IBitBoard {
 	}
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#isCaptureMove(int)
-	 */
-	@Override
-	public boolean isCaptureMove(int move) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#isPromotionMove(int)
-	 */
-	@Override
-	public boolean isPromotionMove(int move) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#isCaptureOrPromotionMove(int)
-	 */
-	@Override
-	public boolean isCaptureOrPromotionMove(int move) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#getSEEScore(int)
 	 */
 	@Override
@@ -743,47 +717,11 @@ public class DummyBoard implements IBitBoard {
 	}
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#isEnpassantMove(int)
+	 * @see bagaturchess.bitboard.api.IBoard#getMoveOps()
 	 */
 	@Override
-	public boolean isEnpassantMove(int move) {
+	public IMoveOps getMoveOps() {
 		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#isCastlingMove(int)
-	 */
-	@Override
-	public boolean isCastlingMove(int move) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getPieceType(int)
-	 */
-	@Override
-	public int getFigurePID(int move) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getToFieldID(int)
-	 */
-	@Override
-	public int getToFieldID(int move) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getFigureType(int)
-	 */
-	@Override
-	public int getFigureType(int move) {
-		// TODO Auto-generated method stub
-		return 0;
+		return null;
 	}
 }

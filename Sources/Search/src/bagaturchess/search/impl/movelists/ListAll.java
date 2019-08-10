@@ -147,7 +147,7 @@ public class ListAll implements ISearchMoveList {
 	}
 	
 	private boolean isOk(int move) {
-		return !env.getBitboard().isCastlingMove(move) && !env.getBitboard().isEnpassantMove(move);
+		return !env.getBitboard().getMoveOps().isCastling(move) && !env.getBitboard().getMoveOps().isEnpassant(move);
 	}
 	
 	public int next() {
@@ -333,11 +333,11 @@ public class ListAll implements ISearchMoveList {
 			ordval += ORD_VAL_PASSER_PUSH * orderingStatistics.getOrdVal_PASSER();
 		}*/
 		
-		if (env.getBitboard().isCastlingMove(move)) {
+		if (env.getBitboard().getMoveOps().isCastling(move)) {
 			ordval += ORD_VAL_CASTLING * orderingStatistics.getOrdVal_CASTLING();
 		}
 		
-		if (env.getBitboard().isCaptureOrPromotionMove(move)) {
+		if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 			
 			int see = env.getBitboard().getSEEScore(move);
 			
@@ -385,11 +385,11 @@ public class ListAll implements ISearchMoveList {
 			orderingStatistics.passer_count++;
 		}*/
 		
-		if (env.getBitboard().isCastlingMove(move)) {
+		if (env.getBitboard().getMoveOps().isCastling(move)) {
 			orderingStatistics.castling_count++;
 		}
 		
-		if (env.getBitboard().isCaptureOrPromotionMove(move)) {
+		if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 			
 			int see = env.getBitboard().getSEEScore(move);
 			
@@ -433,11 +433,11 @@ public class ListAll implements ISearchMoveList {
 			orderingStatistics.passer_best++;
 		}*/
 		
-		if (env.getBitboard().isCastlingMove(bestmove)) {
+		if (env.getBitboard().getMoveOps().isCastling(bestmove)) {
 			orderingStatistics.castling_best++;
 		}
 		
-		if (env.getBitboard().isCaptureOrPromotionMove(bestmove)) {
+		if (env.getBitboard().getMoveOps().isCaptureOrPromotion(bestmove)) {
 			
 			int see = env.getBitboard().getSEEScore(bestmove);
 			
