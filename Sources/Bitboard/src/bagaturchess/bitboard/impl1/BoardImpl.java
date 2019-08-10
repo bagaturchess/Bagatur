@@ -292,8 +292,13 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getFigureID(int squareID) {
+		throw new UnsupportedOperationException();
+	}
+	
+	
+	@Override
+	public int getFigureType(int squareID) {
 		int pieceType = chessBoard.pieceIndexes[squareID];
-		
 		return pieceType;
 	}
 	

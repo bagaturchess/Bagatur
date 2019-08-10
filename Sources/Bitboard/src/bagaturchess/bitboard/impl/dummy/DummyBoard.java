@@ -724,4 +724,13 @@ public class DummyBoard implements IBitBoard {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see bagaturchess.bitboard.api.IBoard#getFigureType(int)
+	 */
+	@Override
+	public int getFigureType(int fieldID) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

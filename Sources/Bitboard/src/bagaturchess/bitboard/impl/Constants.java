@@ -41,7 +41,7 @@ public class Constants {
 	/**
 	 * Pieces types
 	 */
-	public static final int TYPE_NONE = -1;
+	public static final int TYPE_NONE = 0;
 	public static final int TYPE_PAWN = 1;
 	public static final int TYPE_KNIGHT = 2;
 	public static final int TYPE_BISHOP = 3;
@@ -98,7 +98,7 @@ public class Constants {
 	 */
 	public static final int[] PIECE_IDENTITY_2_TYPE = new int[13];
 	static {
-		PIECE_IDENTITY_2_TYPE[0] = -1;
+		PIECE_IDENTITY_2_TYPE[PID_NONE] = TYPE_NONE;
 		
 		PIECE_IDENTITY_2_TYPE[PID_W_PAWN] = TYPE_PAWN;
 		PIECE_IDENTITY_2_TYPE[PID_W_KNIGHT] = TYPE_KNIGHT;

@@ -34,6 +34,7 @@ public interface IBoard {
 	public int getStateRepetition();
 	
 	public int getFigureID(int fieldID);
+	public int getFigureType(int fieldID);
 	
 	public ISEE getSee();
 	public int getSEEScore(int move);

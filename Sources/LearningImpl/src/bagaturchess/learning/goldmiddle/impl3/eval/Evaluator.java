@@ -619,8 +619,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			while (b != 0) {
 				
 				int squareID = Long.numberOfTrailingZeros(b);
-				int pid = bitboard.getFigureID(squareID);
-				int pieceType = Figures.getFigureType(pid);
+				int pieceType = bitboard.getFigureType(squareID);
 				
 				evalinfo.addEvalsInPart2(Us, ThreatByMinor_O[pieceType], ThreatByMinor_E[pieceType]);
 				
@@ -636,8 +635,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			while (b != 0) {
 				
 				int squareID = Long.numberOfTrailingZeros(b);
-				int pid = bitboard.getFigureID(squareID);
-				int pieceType = Figures.getFigureType(pid);
+				int pieceType = bitboard.getFigureType(squareID);
 				
 				evalinfo.addEvalsInPart2(Us, ThreatByRook_O[pieceType], ThreatByRook_E[pieceType]);
 				
@@ -1116,7 +1114,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 					}
 					
 					// If the pawn is free to advance, then increase the bonus
-					if (bitboard.getFigureID(blockSq) == Constants.PID_NONE) {//pos.empty(blockSq))
+					if (bitboard.getFigureType(blockSq) == Constants.TYPE_NONE) {//pos.empty(blockSq))
 						
 						// If there is a rook or queen attacking/defending the pawn from behind,
 						// consider all the squaresToQueen. Otherwise consider only the squares
