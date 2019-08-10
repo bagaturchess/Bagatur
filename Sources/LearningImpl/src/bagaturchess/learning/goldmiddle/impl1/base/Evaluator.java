@@ -419,17 +419,24 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 	
 	
 	public void calculateMaterialScore() {
-		int eval_o = (int) ((Long.bitCount(evalinfo.bb_w_pawns) - Long.bitCount(evalinfo.bb_b_pawns)) * cb.getBoard().getBoardConfig().getMaterial_PAWN_O()
-				+ (Long.bitCount(evalinfo.bb_w_knights) - Long.bitCount(evalinfo.bb_b_knights)) * cb.getBoard().getBoardConfig().getMaterial_KNIGHT_O()
-				+ (Long.bitCount(evalinfo.bb_w_bishops) - Long.bitCount(evalinfo.bb_b_bishops)) * cb.getBoard().getBoardConfig().getMaterial_BISHOP_O()
-				+ (Long.bitCount(evalinfo.bb_w_rooks) - Long.bitCount(evalinfo.bb_b_rooks)) * cb.getBoard().getBoardConfig().getMaterial_ROOK_O()
-				+ (Long.bitCount(evalinfo.bb_w_queens) - Long.bitCount(evalinfo.bb_b_queens)) * cb.getBoard().getBoardConfig().getMaterial_QUEEN_O());
 		
-		int eval_e = (int) ((Long.bitCount(evalinfo.bb_w_pawns) - Long.bitCount(evalinfo.bb_b_pawns)) * cb.getBoard().getBoardConfig().getMaterial_PAWN_E()
-				+ (Long.bitCount(evalinfo.bb_w_knights) - Long.bitCount(evalinfo.bb_b_knights)) * cb.getBoard().getBoardConfig().getMaterial_KNIGHT_E()
-				+ (Long.bitCount(evalinfo.bb_w_bishops) - Long.bitCount(evalinfo.bb_b_bishops)) * cb.getBoard().getBoardConfig().getMaterial_BISHOP_E()
-				+ (Long.bitCount(evalinfo.bb_w_rooks) - Long.bitCount(evalinfo.bb_b_rooks)) * cb.getBoard().getBoardConfig().getMaterial_ROOK_E()
-				+ (Long.bitCount(evalinfo.bb_w_queens) - Long.bitCount(evalinfo.bb_b_queens)) * cb.getBoard().getBoardConfig().getMaterial_QUEEN_E());
+		int countPawns = Long.bitCount(evalinfo.bb_w_pawns) - Long.bitCount(evalinfo.bb_b_pawns);
+		int countKnights = Long.bitCount(evalinfo.bb_w_knights) - Long.bitCount(evalinfo.bb_b_knights);
+		int countBishops = Long.bitCount(evalinfo.bb_w_bishops) - Long.bitCount(evalinfo.bb_b_bishops);
+		int countRooks = Long.bitCount(evalinfo.bb_w_rooks) - Long.bitCount(evalinfo.bb_b_rooks);
+		int countQueens = Long.bitCount(evalinfo.bb_w_queens) - Long.bitCount(evalinfo.bb_b_queens);
+		
+		int eval_o = (int) (countPawns * cb.getBoard().getBoardConfig().getMaterial_PAWN_O()
+				+ countKnights * cb.getBoard().getBoardConfig().getMaterial_KNIGHT_O()
+				+ countBishops * cb.getBoard().getBoardConfig().getMaterial_BISHOP_O()
+				+ countRooks * cb.getBoard().getBoardConfig().getMaterial_ROOK_O()
+				+ countQueens * cb.getBoard().getBoardConfig().getMaterial_QUEEN_O());
+		
+		int eval_e = (int) (countPawns * cb.getBoard().getBoardConfig().getMaterial_PAWN_E()
+				+ countKnights * cb.getBoard().getBoardConfig().getMaterial_KNIGHT_E()
+				+ countBishops * cb.getBoard().getBoardConfig().getMaterial_BISHOP_E()
+				+ countRooks * cb.getBoard().getBoardConfig().getMaterial_ROOK_E()
+				+ countQueens * cb.getBoard().getBoardConfig().getMaterial_QUEEN_E());
 
 		evalinfo.eval_o_part1 += eval_o;
 		evalinfo.eval_e_part1 += eval_e;
