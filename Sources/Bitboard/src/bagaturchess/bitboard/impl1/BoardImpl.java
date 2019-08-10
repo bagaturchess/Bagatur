@@ -39,6 +39,7 @@ import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.api.IInternalMoveList;
 import bagaturchess.bitboard.api.IMaterialFactor;
 import bagaturchess.bitboard.api.IMaterialState;
+import bagaturchess.bitboard.api.IMoveOps;
 import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.ISEE;
@@ -68,6 +69,7 @@ public class BoardImpl implements IBitBoard {
 	private IBaseEval baseEval;
 	private IMaterialState materialState;
 	private IBoardConfig boardConfig;
+	private IMoveOps moveOps;
 	
 	
 	public BoardImpl(String fen, IBoardConfig _boardConfig) {
@@ -78,6 +80,7 @@ public class BoardImpl implements IBitBoard {
 		baseEval = new BaseEvalImpl();
 		materialState = new MaterialStateImpl();
 		boardConfig = _boardConfig;
+		moveOps = new MoveOpsImpl();
 	}
 	
 	
@@ -201,78 +204,6 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
-	public boolean isCaptureMove(int move) {
-		return MoveUtil.getAttackedPieceIndex(move) != 0;
-	}
-	
-	
-	@Override
-	public boolean isPromotionMove(int move) {
-		return MoveUtil.isPromotion(move);
-	}
-	
-	
-	@Override
-	public boolean isCaptureOrPromotionMove(int move) {
-		return isCaptureMove(move) || isPromotionMove(move);
-	}
-
-	
-	@Override
-	public boolean isEnpassantMove(int move) {
-		return MoveUtil.isEPMove(move);
-	}
-
-	
-	@Override
-	public boolean isCastlingMove(int move) {
-		return MoveUtil.isCastlingMove(move);
-	}
-	
-	
-	@Override
-	public int getFigurePID(int move) {
-		
-		int pieceType = MoveUtil.getSourcePieceIndex(move);
-		int colour = chessBoard.colorToMove;
-		
-		if (colour == WHITE) {
-			switch(pieceType) {
-				case ChessConstants.PAWN: return Constants.PID_W_PAWN;
-				case ChessConstants.NIGHT: return Constants.PID_W_KNIGHT;
-				case ChessConstants.BISHOP: return Constants.PID_W_BISHOP;
-				case ChessConstants.ROOK: return Constants.PID_W_ROOK;
-				case ChessConstants.QUEEN: return Constants.PID_W_QUEEN;
-				case ChessConstants.KING: return Constants.PID_W_KING;
-			}
-		} else {
-			switch(pieceType) {
-				case ChessConstants.PAWN: return Constants.PID_B_PAWN;
-				case ChessConstants.NIGHT: return Constants.PID_B_KNIGHT;
-				case ChessConstants.BISHOP: return Constants.PID_B_BISHOP;
-				case ChessConstants.ROOK: return Constants.PID_B_ROOK;
-				case ChessConstants.QUEEN: return Constants.PID_B_QUEEN;
-				case ChessConstants.KING: return Constants.PID_B_KING;
-			}
-		}
-		
-		throw new IllegalStateException("pieceType=" + pieceType);
-	}
-	
-	
-	@Override
-	public int getFigureType(int move) {
-		return  MoveUtil.getSourcePieceIndex(move);
-	}
-	
-	
-	@Override
-	public int getToFieldID(int move) {
-		return MoveUtil.getToIndex(move);
-	}
-	
-	
-	@Override
 	public int getSEEScore(int move) {
 		//return 100 * (MoveUtil.getAttackedPieceIndex(move) * 10 - MoveUtil.getSourcePieceIndex(move));
 		return SEEUtil.getSeeCaptureScore(chessBoard, move);
@@ -360,9 +291,10 @@ public class BoardImpl implements IBitBoard {
 
 	
 	@Override
-	public int getFigureID(int fieldID) {
-		throw new UnsupportedOperationException();
-		//return chessBoard.pieceIndexes[fieldID];//TODO Check
+	public int getFigureID(int squareID) {
+		int pieceType = chessBoard.pieceIndexes[squareID];
+		
+		return pieceType;
 	}
 	
 	
@@ -508,15 +440,19 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getMatrix()
-	 */
 	@Override
 	public int[] getMatrix() {
 		//throw new UnsupportedOperationException();
 		return chessBoard.pieceIndexes;
 	}
-
+	
+	
+	@Override
+	public IMoveOps getMoveOps() {
+		return moveOps;
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#getPawnsStructure()
 	 */
@@ -966,6 +902,81 @@ public class BoardImpl implements IBitBoard {
 		@Override
 		public void move(int pid, int fromFieldID, int toFieldID) {
 			throw new UnsupportedOperationException();
+		}
+	}
+	
+	
+	private class MoveOpsImpl implements IMoveOps {
+		
+		
+		@Override
+		public int getFigureType(int move) {
+			return  MoveUtil.getSourcePieceIndex(move);
+		}
+		
+		
+		@Override
+		public int getToFieldID(int move) {
+			return MoveUtil.getToIndex(move);
+		}
+		
+		@Override
+		public boolean isCapture(int move) {
+			return MoveUtil.getAttackedPieceIndex(move) != 0;
+		}
+		
+		
+		@Override
+		public boolean isPromotion(int move) {
+			return MoveUtil.isPromotion(move);
+		}
+		
+		
+		@Override
+		public boolean isCaptureOrPromotion(int move) {
+			return isCapture(move) || isPromotion(move);
+		}
+
+		
+		@Override
+		public boolean isEnpassant(int move) {
+			return MoveUtil.isEPMove(move);
+		}
+
+		
+		@Override
+		public boolean isCastling(int move) {
+			return MoveUtil.isCastlingMove(move);
+		}
+		
+		
+		@Override
+		public int getFigurePID(int move) {
+			
+			int pieceType = MoveUtil.getSourcePieceIndex(move);
+			int colour = chessBoard.colorToMove;
+			
+			if (colour == WHITE) {
+				switch(pieceType) {
+					case ChessConstants.PAWN: return Constants.PID_W_PAWN;
+					case ChessConstants.NIGHT: return Constants.PID_W_KNIGHT;
+					case ChessConstants.BISHOP: return Constants.PID_W_BISHOP;
+					case ChessConstants.ROOK: return Constants.PID_W_ROOK;
+					case ChessConstants.QUEEN: return Constants.PID_W_QUEEN;
+					case ChessConstants.KING: return Constants.PID_W_KING;
+				}
+			} else {
+				switch(pieceType) {
+					case ChessConstants.PAWN: return Constants.PID_B_PAWN;
+					case ChessConstants.NIGHT: return Constants.PID_B_KNIGHT;
+					case ChessConstants.BISHOP: return Constants.PID_B_BISHOP;
+					case ChessConstants.ROOK: return Constants.PID_B_ROOK;
+					case ChessConstants.QUEEN: return Constants.PID_B_QUEEN;
+					case ChessConstants.KING: return Constants.PID_B_KING;
+				}
+			}
+			
+			throw new IllegalStateException("pieceType=" + pieceType);
 		}
 	}
 }
