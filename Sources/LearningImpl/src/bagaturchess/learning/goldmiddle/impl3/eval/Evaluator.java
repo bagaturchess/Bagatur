@@ -191,6 +191,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 	
 	public double calculateScore1() {
 		
+		evalinfo.fillBB(bitboard);
+		
 		evalinfo.clearEvals1();
 		
 		calculateMaterialScore();
@@ -208,8 +210,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 	public double calculateScore2() {
 		
 		evalinfo.clearEvals2();
-		
-		evalinfo.fillBB(bitboard);
 		
 		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_WHITE, bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN));
 		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_BLACK, bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN));
@@ -262,6 +262,31 @@ public class Evaluator extends Evaluator_BaseImpl {
 	
 	public void calculateMaterialScore() {
 		
+		int countPawns = Long.bitCount(evalinfo.bb_pawns[Constants.COLOUR_WHITE]) - Long.bitCount(evalinfo.bb_pawns[Constants.COLOUR_BLACK]);
+		int countKnights = Long.bitCount(evalinfo.bb_knights[Constants.COLOUR_WHITE]) - Long.bitCount(evalinfo.bb_knights[Constants.COLOUR_BLACK]);
+		int countBishops = Long.bitCount(evalinfo.bb_bishops[Constants.COLOUR_WHITE]) - Long.bitCount(evalinfo.bb_bishops[Constants.COLOUR_BLACK]);
+		int countRooks = Long.bitCount(evalinfo.bb_rooks[Constants.COLOUR_WHITE]) - Long.bitCount(evalinfo.bb_rooks[Constants.COLOUR_BLACK]);
+		int countQueens = Long.bitCount(evalinfo.bb_queens[Constants.COLOUR_WHITE]) - Long.bitCount(evalinfo.bb_queens[Constants.COLOUR_BLACK]);
+		
+		int eval_o = (int) (countPawns * bitboard.getBoardConfig().getMaterial_PAWN_O()
+				+ countKnights * bitboard.getBoardConfig().getMaterial_KNIGHT_O()
+				+ countBishops * bitboard.getBoardConfig().getMaterial_BISHOP_O()
+				+ countRooks * bitboard.getBoardConfig().getMaterial_ROOK_O()
+				+ countQueens * bitboard.getBoardConfig().getMaterial_QUEEN_O());
+		
+		int eval_e = (int) (countPawns * bitboard.getBoardConfig().getMaterial_PAWN_E()
+				+ countKnights * bitboard.getBoardConfig().getMaterial_KNIGHT_E()
+				+ countBishops * bitboard.getBoardConfig().getMaterial_BISHOP_E()
+				+ countRooks * bitboard.getBoardConfig().getMaterial_ROOK_E()
+				+ countQueens * bitboard.getBoardConfig().getMaterial_QUEEN_E());
+
+		evalinfo.eval_o_part1 += eval_o;
+		evalinfo.eval_e_part1 += eval_e;
+	}
+	
+	
+	/*public void calculateMaterialScore() {
+		
 		
 		int w_eval_nopawns_o = bitboard.getBaseEvaluation().getWhiteMaterialNonPawns_o();
 		int w_eval_nopawns_e = bitboard.getBaseEvaluation().getWhiteMaterialNonPawns_e();
@@ -275,7 +300,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 		evalinfo.eval_o_part1 += (w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o);
 		evalinfo.eval_e_part1 += (w_eval_nopawns_e - b_eval_nopawns_e) + (w_eval_pawns_e - b_eval_pawns_e);
-	}
+	}*/
 	
 	
 	
