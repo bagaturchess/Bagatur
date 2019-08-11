@@ -23,8 +23,6 @@ package bagaturchess.learning.goldmiddle.impl3.eval;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
-import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.state.PiecesList;
 
 
 public class Evaluator extends Evaluator_BaseImpl {
@@ -211,8 +209,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 		evalinfo.clearEvals2();
 		
-		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_WHITE, bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN));
-		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_BLACK, bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN));
+		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_WHITE, evalinfo.bb_pawns[Constants.COLOUR_WHITE]);
+		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_BLACK, evalinfo.bb_pawns[Constants.COLOUR_BLACK]);
 		pawns.openFiles = Long.bitCount(pawns.semiopenFiles[Constants.COLOUR_WHITE] & pawns.semiopenFiles[Constants.COLOUR_BLACK]);
 		pawns.asymmetry = Long.bitCount((pawns.passedPawns[Constants.COLOUR_WHITE] | pawns.passedPawns[Constants.COLOUR_BLACK])
 											| (pawns.semiopenFiles[Constants.COLOUR_WHITE] ^ pawns.semiopenFiles[Constants.COLOUR_BLACK])
@@ -221,14 +219,14 @@ public class Evaluator extends Evaluator_BaseImpl {
 		initialize(Constants.COLOUR_WHITE);
 		initialize(Constants.COLOUR_BLACK);
 		
-		pieces(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT);
-		pieces(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT);
-		pieces(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP);
-		pieces(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP);
-		pieces(Constants.COLOUR_WHITE, Constants.TYPE_ROOK);
-		pieces(Constants.COLOUR_BLACK, Constants.TYPE_ROOK);
-		pieces(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN);
-		pieces(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN);
+		pieces(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT, evalinfo.bb_knights[Constants.COLOUR_WHITE]);
+		pieces(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT, evalinfo.bb_knights[Constants.COLOUR_BLACK]);
+		pieces(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP, evalinfo.bb_bishops[Constants.COLOUR_WHITE]);
+		pieces(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP, evalinfo.bb_bishops[Constants.COLOUR_BLACK]);
+		pieces(Constants.COLOUR_WHITE, Constants.TYPE_ROOK, evalinfo.bb_rooks[Constants.COLOUR_WHITE]);
+		pieces(Constants.COLOUR_BLACK, Constants.TYPE_ROOK, evalinfo.bb_rooks[Constants.COLOUR_BLACK]);
+		pieces(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN, evalinfo.bb_queens[Constants.COLOUR_WHITE]);
+		pieces(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN, evalinfo.bb_queens[Constants.COLOUR_BLACK]);
 		
 		//King shelter and enemy pawns storm
 		pawns.do_king_safety(bitboard, evalinfo, Constants.COLOUR_WHITE);
@@ -246,7 +244,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		space(Constants.COLOUR_WHITE);
 		space(Constants.COLOUR_BLACK);
 		
-		material.initialize(bitboard);
+		material.initialize(evalinfo);
 		int imbalance = (material.imbalance(Constants.COLOUR_WHITE) - material.imbalance(Constants.COLOUR_BLACK)) / 16;
 		evalinfo.eval_o_part2 += imbalance;
 		evalinfo.eval_e_part2 += imbalance;
@@ -323,7 +321,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		//evalinfo.mobility_e[Us] = 0;
 		
 		// Initialise attackedBy bitboards for kings and pawns
-		evalinfo.attackedBy[Us][Constants.TYPE_KING] = attacks_from(bitboard, getKingSquareID(bitboard, Us), Constants.TYPE_KING);
+		evalinfo.attackedBy[Us][Constants.TYPE_KING] = attacks_from(bitboard, getKingSquareID(evalinfo, Us), Constants.TYPE_KING);
 		evalinfo.attackedBy[Us][Constants.TYPE_PAWN] = pawns.pawnAttacks[Us];
 		evalinfo.attackedBy[Us][Constants.TYPE_ALL] = evalinfo.attackedBy[Us][Constants.TYPE_KING] | evalinfo.attackedBy[Us][Constants.TYPE_PAWN];
 		evalinfo.attackedBy2[Us] = evalinfo.attackedBy[Us][Constants.TYPE_KING] & evalinfo.attackedBy[Us][Constants.TYPE_PAWN];
@@ -332,17 +330,17 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 		// Init our king safety tables
 		evalinfo.kingRing[Us] = evalinfo.attackedBy[Us][Constants.TYPE_KING];
-		if (relative_rank_bySquare(Us, getKingSquareID(bitboard, Us)) == Rank1) {
+		if (relative_rank_bySquare(Us, getKingSquareID(evalinfo, Us)) == Rank1) {
 			
 			evalinfo.kingRing[Us] |= shiftBB(evalinfo.kingRing[Us], Direction_Up);
 		}
 	
-		if (file_of(getKingSquareID(bitboard, Us)) == FileH) {
+		if (file_of(getKingSquareID(evalinfo, Us)) == FileH) {
 			
 			evalinfo.kingRing[Us] |= shiftBB(evalinfo.kingRing[Us], Direction_WEST);
 		}
 	
-		else if (file_of(getKingSquareID(bitboard, Us)) == FileA) {
+		else if (file_of(getKingSquareID(evalinfo, Us)) == FileA) {
 			
 			evalinfo.kingRing[Us] |= shiftBB(evalinfo.kingRing[Us], Direction_EAST);
 		}
@@ -353,7 +351,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 	
 	
 	// Evaluation::pieces() scores pieces of a given color and type
-	private void pieces(int Us, int pieceType)
+	private void pieces(int Us, int pieceType, long Us_pieces)
 	{
 
 		final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
@@ -365,119 +363,115 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 		evalinfo.attackedBy[Us][pieceType] = 0;
 		
-		PiecesList pieces_list = bitboard.getPiecesLists().getPieces(Figures.getPidByColourAndType(Us, pieceType));
-		
-        int pieces_count = pieces_list.getDataSize();
-        if (pieces_count > 0) {
-            int[] pieces_fields = pieces_list.getData();
-            for (int i=0; i<pieces_count; i++) {
+        while (Us_pieces != 0) {
             	
-            	int squareID = pieces_fields[i];
-            	long squareBB = SquareBB[squareID];
-            	
-	      		// Find attacked squares, including x-ray attacks for bishops and rooks
-	      		b = pieceType == Constants.TYPE_BISHOP ? attacks_bb(Constants.TYPE_BISHOP, squareID, evalinfo.bb_all ^ (evalinfo.bb_queens[Constants.COLOUR_WHITE] | evalinfo.bb_queens[Constants.COLOUR_BLACK]))
-	      						: pieceType == Constants.TYPE_ROOK ? attacks_bb(Constants.TYPE_ROOK, squareID,
-	      									evalinfo.bb_all
-		      								^ (evalinfo.bb_queens[Constants.COLOUR_WHITE] | evalinfo.bb_queens[Constants.COLOUR_BLACK])
-		      								^ (evalinfo.bb_rooks[Constants.COLOUR_WHITE] | evalinfo.bb_rooks[Constants.COLOUR_BLACK])
-	      								)
-	      						: attacks_from(bitboard, squareID, pieceType);
-	      		
-	      		/*
-	      		//TODO implement blockers_for_king
-	      		if ((pos.blockers_for_king(Us) & squareBB) != 0) {
-	      			b &= LineBB[pos.<PieceType.KING.getValue().getValue()>square(Us)][squareID];
-	      		}*/
-	      		
-	      		evalinfo.attackedBy2[Us] |= evalinfo.attackedBy[Us][Constants.TYPE_ALL] & b;
-	      		evalinfo.attackedBy[Us][pieceType] |= b;
-	      		evalinfo.attackedBy[Us][Constants.TYPE_ALL] |= b;
-	      		
-	      		if ((b & evalinfo.kingRing[Them]) != 0) {
-	      			evalinfo.kingAttackersCount[Us]++;
-	      			evalinfo.kingAttackersWeight[Us] += KingAttackWeights[pieceType];
-	      			evalinfo.kingAttacksCount[Us] += Long.bitCount(b & evalinfo.attackedBy[Them][Constants.TYPE_KING]);
-	      		}
-	      		
-	      		int mob = Long.bitCount(b & evalinfo.mobilityArea[Us]);
-	      		
-	      		evalinfo.addEvalsInPart2(Us, MobilityBonus_O[pieceType - 2][mob], MobilityBonus_E[pieceType - 2][mob]);
-	      		
-	      		if (pieceType == Constants.TYPE_BISHOP || pieceType == Constants.TYPE_KNIGHT) {
-	      			
-	      			// Bonus if piece is on an outpost square or can reach one
-	      			bb = (OutpostRanks & ~pawns.pawnAttacksSpan[Them]);
-	      			if ((bb & squareBB) != 0) {
-	      				int o = Outpost_O[(pieceType == Constants.TYPE_BISHOP) ? 1 : 0][(evalinfo.attackedBy[Us][Constants.TYPE_PAWN] & squareBB) == 0 ? 0 : 1] * 2;
-	      				int e = Outpost_E[(pieceType == Constants.TYPE_BISHOP) ? 1 : 0][(evalinfo.attackedBy[Us][Constants.TYPE_PAWN] & squareBB) == 0 ? 0 : 1] * 2;
-	      				evalinfo.addEvalsInPart2(Us, o, e);
-	      			} else if ((bb &= (b & ~evalinfo.bb_all_pieces[Us])) != 0) {
-	      				int o = Outpost_O[(pieceType == Constants.TYPE_BISHOP) ? 1 : 0][(evalinfo.attackedBy[Us][Constants.TYPE_PAWN] & bb) == 0 ? 0 : 1 ];
-	      				int e = Outpost_E[(pieceType == Constants.TYPE_BISHOP) ? 1 : 0][(evalinfo.attackedBy[Us][Constants.TYPE_PAWN] & bb) == 0 ? 0 : 1 ];
-	      				evalinfo.addEvalsInPart2(Us, o, e);
-	      			}
-	      			  
-	      			// Knight and Bishop bonus for being right behind a pawn
-	      			if ((shiftBB(evalinfo.bb_pawns[Constants.COLOUR_WHITE] | evalinfo.bb_pawns[Constants.COLOUR_BLACK], Direction_Down) & squareBB) != 0) {
-	      				evalinfo.addEvalsInPart2(Us, MinorBehindPawn_O, MinorBehindPawn_E);
-	      			}
-	
-	      			// Penalty if the piece is far from the king
-	      			int multiplier = distance(squareID, getKingSquareID(bitboard, Us));
-	      			evalinfo.addEvalsInPart2(Us, -KingProtector_O * multiplier, -KingProtector_E * multiplier);
-	      			
-	      			if (pieceType == Constants.TYPE_BISHOP) {
-	      				// Penalty according to number of pawns on the same color square as the
-	      				// bishop, bigger when the center files are blocked with pawns.
-	      				long blocked = evalinfo.bb_pawns[Us] & shiftBB(evalinfo.bb_all, Direction_Down);
-	      				
-	      				multiplier = pawns.pawns_on_same_color_squares(Us, squareID) * (1 + Long.bitCount(blocked & CenterFiles));
-	      				evalinfo.addEvalsInPart2(Us, -BishopPawns_O * multiplier, -BishopPawns_E * multiplier);
-	
-	      				// Bonus for bishop on a long diagonal which can "see" both center squares
-	      				if (more_than_one(attacks_bb(Constants.TYPE_BISHOP, squareID, evalinfo.bb_pawns[Constants.COLOUR_WHITE] | evalinfo.bb_pawns[Constants.COLOUR_BLACK]) & Center)) {
-	      					evalinfo.addEvalsInPart2(Us, LongDiagonalBishop_O, LongDiagonalBishop_E);
-	      				}
-	      			}
-	      		}
-	
-	      		if (pieceType == Constants.TYPE_ROOK)
-	      		{
-	      			// Bonus for aligning rook with enemy pawns on the same rank/file
-	      			if (relative_rank_bySquare(Us, squareID) >= Rank5) {
-	      				int multiplier = Long.bitCount(evalinfo.bb_pawns[Them] & PseudoAttacks[Constants.TYPE_ROOK][squareID]);
-	      				evalinfo.addEvalsInPart2(Us, RookOnPawn_O * multiplier, RookOnPawn_E * multiplier);
-	      			}
-	
-	      			// Bonus for rook on an open or semi-open file
-	      			if (pawns.semiopen_file(Us, file_of(squareID)) != 0) {
-	      				int index = pawns.semiopen_file(Them, file_of(squareID)) == 0 ? 0 : 1;
-	      				evalinfo.addEvalsInPart2(Us, RookOnFile_O[index], RookOnFile_E[index]);
-	      			}
-	
-	      			// Penalty when trapped by the king, even more if the king cannot castle
-	      			else if (mob <= 3) {
-	      				int kf = file_of(getKingSquareID(bitboard, Us));
-	      				if ((kf < FileE) == (file_of(squareID) < kf)) {
-	      					int o = (TrappedRook_O - mob * 22) * (1 + ((bitboard.hasRightsToKingCastle(Us) || bitboard.hasRightsToQueenCastle(Us)) ? 0 : 1));
-	      					int e = (TrappedRook_E - 0) * (1 + ((bitboard.hasRightsToKingCastle(Us) || bitboard.hasRightsToQueenCastle(Us)) ? 0 : 1));
-	      					evalinfo.addEvalsInPart2(Us, -o, -e);
-	      				}
-	      			}
-	      		}
-	
-	      		if (pieceType == Constants.TYPE_QUEEN)
-	      		{
-	      			// Penalty if any relative pin or discovered attack against the queen
-	      			//TODO implement slider_blockers
-	      			/*long queenPinners;
-	      			if (pos.slider_blockers(pos.pieces(Them, PieceType.ROOK, PieceType.BISHOP), squareID, queenPinners) != null)
-	      			{
-	      				score -= WeakQueen;
-	      			}*/
-	      		}
-            }
+    		int squareID = Long.numberOfTrailingZeros(Us_pieces);
+        	long squareBB = SquareBB[squareID];
+        	
+      		// Find attacked squares, including x-ray attacks for bishops and rooks
+      		b = pieceType == Constants.TYPE_BISHOP ? attacks_bb(Constants.TYPE_BISHOP, squareID, evalinfo.bb_all ^ (evalinfo.bb_queens[Constants.COLOUR_WHITE] | evalinfo.bb_queens[Constants.COLOUR_BLACK]))
+      						: pieceType == Constants.TYPE_ROOK ? attacks_bb(Constants.TYPE_ROOK, squareID,
+      									evalinfo.bb_all
+	      								^ (evalinfo.bb_queens[Constants.COLOUR_WHITE] | evalinfo.bb_queens[Constants.COLOUR_BLACK])
+	      								^ (evalinfo.bb_rooks[Constants.COLOUR_WHITE] | evalinfo.bb_rooks[Constants.COLOUR_BLACK])
+      								)
+      						: attacks_from(bitboard, squareID, pieceType);
+      		
+      		/*
+      		//TODO implement blockers_for_king
+      		if ((pos.blockers_for_king(Us) & squareBB) != 0) {
+      			b &= LineBB[pos.<PieceType.KING.getValue().getValue()>square(Us)][squareID];
+      		}*/
+      		
+      		evalinfo.attackedBy2[Us] |= evalinfo.attackedBy[Us][Constants.TYPE_ALL] & b;
+      		evalinfo.attackedBy[Us][pieceType] |= b;
+      		evalinfo.attackedBy[Us][Constants.TYPE_ALL] |= b;
+      		
+      		if ((b & evalinfo.kingRing[Them]) != 0) {
+      			evalinfo.kingAttackersCount[Us]++;
+      			evalinfo.kingAttackersWeight[Us] += KingAttackWeights[pieceType];
+      			evalinfo.kingAttacksCount[Us] += Long.bitCount(b & evalinfo.attackedBy[Them][Constants.TYPE_KING]);
+      		}
+      		
+      		int mob = Long.bitCount(b & evalinfo.mobilityArea[Us]);
+      		
+      		evalinfo.addEvalsInPart2(Us, MobilityBonus_O[pieceType - 2][mob], MobilityBonus_E[pieceType - 2][mob]);
+      		
+      		if (pieceType == Constants.TYPE_BISHOP || pieceType == Constants.TYPE_KNIGHT) {
+      			
+      			// Bonus if piece is on an outpost square or can reach one
+      			bb = (OutpostRanks & ~pawns.pawnAttacksSpan[Them]);
+      			if ((bb & squareBB) != 0) {
+      				int o = Outpost_O[(pieceType == Constants.TYPE_BISHOP) ? 1 : 0][(evalinfo.attackedBy[Us][Constants.TYPE_PAWN] & squareBB) == 0 ? 0 : 1] * 2;
+      				int e = Outpost_E[(pieceType == Constants.TYPE_BISHOP) ? 1 : 0][(evalinfo.attackedBy[Us][Constants.TYPE_PAWN] & squareBB) == 0 ? 0 : 1] * 2;
+      				evalinfo.addEvalsInPart2(Us, o, e);
+      			} else if ((bb &= (b & ~evalinfo.bb_all_pieces[Us])) != 0) {
+      				int o = Outpost_O[(pieceType == Constants.TYPE_BISHOP) ? 1 : 0][(evalinfo.attackedBy[Us][Constants.TYPE_PAWN] & bb) == 0 ? 0 : 1 ];
+      				int e = Outpost_E[(pieceType == Constants.TYPE_BISHOP) ? 1 : 0][(evalinfo.attackedBy[Us][Constants.TYPE_PAWN] & bb) == 0 ? 0 : 1 ];
+      				evalinfo.addEvalsInPart2(Us, o, e);
+      			}
+      			  
+      			// Knight and Bishop bonus for being right behind a pawn
+      			if ((shiftBB(evalinfo.bb_pawns[Constants.COLOUR_WHITE] | evalinfo.bb_pawns[Constants.COLOUR_BLACK], Direction_Down) & squareBB) != 0) {
+      				evalinfo.addEvalsInPart2(Us, MinorBehindPawn_O, MinorBehindPawn_E);
+      			}
+
+      			// Penalty if the piece is far from the king
+      			int multiplier = distance(squareID, getKingSquareID(evalinfo, Us));
+      			evalinfo.addEvalsInPart2(Us, -KingProtector_O * multiplier, -KingProtector_E * multiplier);
+      			
+      			if (pieceType == Constants.TYPE_BISHOP) {
+      				// Penalty according to number of pawns on the same color square as the
+      				// bishop, bigger when the center files are blocked with pawns.
+      				long blocked = evalinfo.bb_pawns[Us] & shiftBB(evalinfo.bb_all, Direction_Down);
+      				
+      				multiplier = pawns.pawns_on_same_color_squares(Us, squareID) * (1 + Long.bitCount(blocked & CenterFiles));
+      				evalinfo.addEvalsInPart2(Us, -BishopPawns_O * multiplier, -BishopPawns_E * multiplier);
+
+      				// Bonus for bishop on a long diagonal which can "see" both center squares
+      				if (more_than_one(attacks_bb(Constants.TYPE_BISHOP, squareID, evalinfo.bb_pawns[Constants.COLOUR_WHITE] | evalinfo.bb_pawns[Constants.COLOUR_BLACK]) & Center)) {
+      					evalinfo.addEvalsInPart2(Us, LongDiagonalBishop_O, LongDiagonalBishop_E);
+      				}
+      			}
+      		}
+
+      		if (pieceType == Constants.TYPE_ROOK)
+      		{
+      			// Bonus for aligning rook with enemy pawns on the same rank/file
+      			if (relative_rank_bySquare(Us, squareID) >= Rank5) {
+      				int multiplier = Long.bitCount(evalinfo.bb_pawns[Them] & PseudoAttacks[Constants.TYPE_ROOK][squareID]);
+      				evalinfo.addEvalsInPart2(Us, RookOnPawn_O * multiplier, RookOnPawn_E * multiplier);
+      			}
+
+      			// Bonus for rook on an open or semi-open file
+      			if (pawns.semiopen_file(Us, file_of(squareID)) != 0) {
+      				int index = pawns.semiopen_file(Them, file_of(squareID)) == 0 ? 0 : 1;
+      				evalinfo.addEvalsInPart2(Us, RookOnFile_O[index], RookOnFile_E[index]);
+      			}
+
+      			// Penalty when trapped by the king, even more if the king cannot castle
+      			else if (mob <= 3) {
+      				int kf = file_of(getKingSquareID(evalinfo, Us));
+      				if ((kf < FileE) == (file_of(squareID) < kf)) {
+      					int o = (TrappedRook_O - mob * 22) * (1 + ((bitboard.hasRightsToKingCastle(Us) || bitboard.hasRightsToQueenCastle(Us)) ? 0 : 1));
+      					int e = (TrappedRook_E - 0) * (1 + ((bitboard.hasRightsToKingCastle(Us) || bitboard.hasRightsToQueenCastle(Us)) ? 0 : 1));
+      					evalinfo.addEvalsInPart2(Us, -o, -e);
+      				}
+      			}
+      		}
+
+      		if (pieceType == Constants.TYPE_QUEEN)
+      		{
+      			// Penalty if any relative pin or discovered attack against the queen
+      			//TODO implement slider_blockers
+      			/*long queenPinners;
+      			if (pos.slider_blockers(pos.pieces(Them, PieceType.ROOK, PieceType.BISHOP), squareID, queenPinners) != null)
+      			{
+      				score -= WeakQueen;
+      			}*/
+      		}
+      		
+      		Us_pieces &= Us_pieces - 1;
         }
 	}
 	
@@ -488,7 +482,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 		final long Camp = (Us == Constants.COLOUR_WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
-		final int squareID_ksq = getKingSquareID(bitboard, Us);
+		final int squareID_ksq = getKingSquareID(evalinfo, Us);
 		long kingFlank;
 		long weak;
 		long b;
@@ -562,7 +556,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 					  + 185 * Long.bitCount(evalinfo.kingRing[Us] & weak)
 					  + 150 * Long.bitCount(/*TODO pos.blockers_for_king(Us) |*/ unsafeChecks)
 					  + tropism * tropism / 4
-					  - 873 * (bitboard.getPiecesLists().getPieces(Figures.getPidByColourAndType(Them, Constants.TYPE_QUEEN)).getDataSize() == 0 ? 1 : 0) //TODO check !pos.<PieceType.QUEEN.getValue()>count(Them)
+					  - 873 * (Long.bitCount(evalinfo.bb_queens[Them]) == 0 ? 1 : 0) //TODO check !pos.<PieceType.QUEEN.getValue()>count(Them)
 					  - 30;
 			
 			// Transform the kingDanger units into a Score, and subtract it from the evaluation
@@ -731,8 +725,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 	// known attacking/defending status of the players.
 	private int initiative(int eg) {
 		
-		int squareID_ksq_w = getKingSquareID(bitboard, Constants.COLOUR_WHITE);
-		int squareID_ksq_b = getKingSquareID(bitboard, Constants.COLOUR_BLACK);
+		int squareID_ksq_w = getKingSquareID(evalinfo, Constants.COLOUR_WHITE);
+		int squareID_ksq_b = getKingSquareID(evalinfo, Constants.COLOUR_BLACK);
 	    int outflanking =  distanceFile(squareID_ksq_w, squareID_ksq_b)
 	                     - distanceRank(squareID_ksq_w, squareID_ksq_b);
 	    
@@ -770,8 +764,10 @@ public class Evaluator extends Evaluator_BaseImpl {
 	}
 	
 	
-	protected static final int getKingSquareID(IBitBoard bitboard, int Us) {
-		return bitboard.getPiecesLists().getPieces(Us == Constants.COLOUR_WHITE ? Constants.PID_W_KING : Constants.PID_B_KING).getData()[0];
+	protected static final int getKingSquareID(EvalInfo evalinfo, int Us) {
+		long bb_king = evalinfo.bb_king[Us];
+		int squareID = Long.numberOfTrailingZeros(bb_king);
+		return squareID;
 	}
 	
 	
@@ -908,7 +904,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		public int openFiles;
 		
 		
-		private void evaluate(IBitBoard bitboard, EvalInfo evalinfo, int Us, PiecesList Us_pawns_list) {
+		private void evaluate(IBitBoard bitboard, EvalInfo evalinfo, int Us, long Us_pawns) {
 			
 			final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 			final int Direction_Up = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
@@ -933,79 +929,77 @@ public class Evaluator extends Evaluator_BaseImpl {
 			pawnsOnSquares[Us][Constants.COLOUR_BLACK] = Long.bitCount(ourPawns & DarkSquares);
 			pawnsOnSquares[Us][Constants.COLOUR_WHITE] = Long.bitCount(ourPawns & LightSquares);
 			
-            int pawns_count = Us_pawns_list.getDataSize();
-            if (pawns_count > 0) {
-	            int[] pawns_fields = Us_pawns_list.getData();
-	            for (int i=0; i<pawns_count; i++) {
-	            	
-	            	int squareID = pawns_fields[i];
-	            	
-	            	int fileID = file_of(squareID);
-	            	int rankID = rank_of(squareID);
-	            	if (rankID == 0 || rankID == 7) {
-	            		throw new IllegalStateException();
-	            	}
-	            	
-					semiopenFiles[Us] &= ~(1 << fileID);
-					pawnAttacksSpan[Us] |= pawn_attack_span(Us, squareID);
+            while (Us_pawns != 0) {
+	            
+            	int squareID = Long.numberOfTrailingZeros(Us_pawns);
+            	
+            	int fileID = file_of(squareID);
+            	int rankID = rank_of(squareID);
+            	if (rankID == 0 || rankID == 7) {
+            		throw new IllegalStateException();
+            	}
+            	
+				semiopenFiles[Us] &= ~(1 << fileID);
+				pawnAttacksSpan[Us] |= pawn_attack_span(Us, squareID);
+				
+				// Flag the pawn
+				opposed = (theirPawns & forward_file_bb(Us, squareID)) != 0;
+				stoppers = theirPawns & passed_pawn_mask(Us, squareID);
+				lever = (theirPawns & PawnAttacks[Us][squareID]);
+				leverPush = theirPawns & PawnAttacks[Us][squareID + Direction_Up];
+				doubled = ourPawns & SquareBB[squareID - Direction_Up];
+				neighbours = ourPawns & adjacent_files_bb(fileID);
+				phalanx = neighbours & rank_bb(squareID);
+				supported = neighbours & rank_bb(squareID - Direction_Up);
+				
+				// A pawn is backward when it is behind all pawns of the same color
+				// on the adjacent files and cannot be safely advanced.
+				backward = (ourPawns & pawn_attack_span(Them, squareID + Direction_Up)) == 0 && (stoppers & (leverPush | (SquareBB[squareID + Direction_Up]))) != 0;
+				
+				// Passed pawns will be properly scored in evaluation because we need
+				// full attack info to evaluate them. Include also not passed pawns
+				// which could become passed after one or two pawn pushes when are
+				// not attacked more times than defended.
+				if ((stoppers ^ lever ^ leverPush) == 0 && (Long.bitCount(supported) >= Long.bitCount(lever) - 1) && Long.bitCount(phalanx) >= Long.bitCount(leverPush)) {
 					
-					// Flag the pawn
-					opposed = (theirPawns & forward_file_bb(Us, squareID)) != 0;
-					stoppers = theirPawns & passed_pawn_mask(Us, squareID);
-					lever = (theirPawns & PawnAttacks[Us][squareID]);
-					leverPush = theirPawns & PawnAttacks[Us][squareID + Direction_Up];
-					doubled = ourPawns & SquareBB[squareID - Direction_Up];
-					neighbours = ourPawns & adjacent_files_bb(fileID);
-					phalanx = neighbours & rank_bb(squareID);
-					supported = neighbours & rank_bb(squareID - Direction_Up);
+					passedPawns[Us] |= SquareBB[squareID];
 					
-					// A pawn is backward when it is behind all pawns of the same color
-					// on the adjacent files and cannot be safely advanced.
-					backward = (ourPawns & pawn_attack_span(Them, squareID + Direction_Up)) == 0 && (stoppers & (leverPush | (SquareBB[squareID + Direction_Up]))) != 0;
+				} else if (stoppers == SquareBB[squareID + Direction_Up] && relative_rank_bySquare(Us, squareID) >= Rank5) {
 					
-					// Passed pawns will be properly scored in evaluation because we need
-					// full attack info to evaluate them. Include also not passed pawns
-					// which could become passed after one or two pawn pushes when are
-					// not attacked more times than defended.
-					if ((stoppers ^ lever ^ leverPush) == 0 && (Long.bitCount(supported) >= Long.bitCount(lever) - 1) && Long.bitCount(phalanx) >= Long.bitCount(leverPush)) {
-						
-						passedPawns[Us] |= SquareBB[squareID];
-						
-					} else if (stoppers == SquareBB[squareID + Direction_Up] && relative_rank_bySquare(Us, squareID) >= Rank5) {
-						
-						long b = shiftBB(supported, Direction_Up) & ~theirPawns;
-						while (b != 0) {
-							if (!more_than_one(theirPawns & PawnAttacks[Us][Long.numberOfTrailingZeros(b)])) {
-								passedPawns[Us] |= SquareBB[squareID];
-							}
-							b &= b - 1;
+					long b = shiftBB(supported, Direction_Up) & ~theirPawns;
+					while (b != 0) {
+						if (!more_than_one(theirPawns & PawnAttacks[Us][Long.numberOfTrailingZeros(b)])) {
+							passedPawns[Us] |= SquareBB[squareID];
 						}
+						b &= b - 1;
 					}
+				}
+				
+				// Score this pawn
+				if ((supported | phalanx) != 0) {
 					
-					// Score this pawn
-					if ((supported | phalanx) != 0) {
-						
-						int supportedCount = Long.bitCount(supported);
-						int o = Connected_O[opposed ? 1 : 0][phalanx == 0 ? 0 : 1][supportedCount][relative_rank_bySquare(Us, squareID)];
-						int e = Connected_E[opposed ? 1 : 0][phalanx == 0 ? 0 : 1][supportedCount][relative_rank_bySquare(Us, squareID)];
-						evalinfo.addEvalsInPart2(Us, o, e);
-						
-					} else if (neighbours == 0) {
-						
-						evalinfo.addEvalsInPart2(Us, -Isolated_O, -Isolated_E);
-						weakUnopposed[Us] += (!opposed ? 1 : 0);
-						
-					} else if (backward) {
-						
-						evalinfo.addEvalsInPart2(Us, -Backward_O, -Backward_E);
-						weakUnopposed[Us] += (!opposed ? 1 : 0);
-					}
-	
-					if (doubled != 0 && supported == 0) {
-						evalinfo.addEvalsInPart2(Us, -Doubled_O, -Doubled_E);
-					}
-	            }
-			}
+					int supportedCount = Long.bitCount(supported);
+					int o = Connected_O[opposed ? 1 : 0][phalanx == 0 ? 0 : 1][supportedCount][relative_rank_bySquare(Us, squareID)];
+					int e = Connected_E[opposed ? 1 : 0][phalanx == 0 ? 0 : 1][supportedCount][relative_rank_bySquare(Us, squareID)];
+					evalinfo.addEvalsInPart2(Us, o, e);
+					
+				} else if (neighbours == 0) {
+					
+					evalinfo.addEvalsInPart2(Us, -Isolated_O, -Isolated_E);
+					weakUnopposed[Us] += (!opposed ? 1 : 0);
+					
+				} else if (backward) {
+					
+					evalinfo.addEvalsInPart2(Us, -Backward_O, -Backward_E);
+					weakUnopposed[Us] += (!opposed ? 1 : 0);
+				}
+
+				if (doubled != 0 && supported == 0) {
+					evalinfo.addEvalsInPart2(Us, -Doubled_O, -Doubled_E);
+				}
+				
+				Us_pawns &= Us_pawns - 1;
+            }
 		}
 
 
@@ -1013,7 +1007,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		/// when king square changes, which is about 20% of total king_safety() calls.
 		private final void do_king_safety(IBitBoard bitboard, EvalInfo evalinfo, int Us) {
 			
-			int squareID_ksq = getKingSquareID(bitboard, Us);
+			int squareID_ksq = getKingSquareID(evalinfo, Us);
 			kingSquares[Us] = squareID_ksq;
 			//castlingRights[Us] = bitboard.hasRightsToKingCastle(Us) || bitboard.hasRightsToQueenCastle(Us)//pos.can_castle(Us);
 			int minKingPawnDistance = 0;
@@ -1078,7 +1072,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 			
 			final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 			final int Direction_Up = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
-			int squareID_ksq = getKingSquareID(bitboard, Us);
+			int squareID_ksq = getKingSquareID(evalinfo, Us);
 			
 			long b;
 			long bb;
@@ -1214,21 +1208,21 @@ public class Evaluator extends Evaluator_BaseImpl {
 		int[][] pieceCount = new int[Constants.COLOUR_BLACK + 1][Constants.TYPE_QUEEN + 1];
 		
 		
-		public void initialize(IBitBoard bitboard) {
+		public void initialize(EvalInfo evalinfo) {
 			
-			pieceCount[Constants.COLOUR_WHITE][0] = (bitboard.getPiecesLists().getPieces(Constants.PID_W_BISHOP).getDataSize() > 1) ? 1 : 0;
-			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_PAWN] = bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN).getDataSize();
-			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_KNIGHT] = bitboard.getPiecesLists().getPieces(Constants.PID_W_KNIGHT).getDataSize();
-			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_BISHOP] = bitboard.getPiecesLists().getPieces(Constants.PID_W_BISHOP).getDataSize();
-			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_ROOK] = bitboard.getPiecesLists().getPieces(Constants.PID_W_ROOK).getDataSize();
-			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_QUEEN] = bitboard.getPiecesLists().getPieces(Constants.PID_W_QUEEN).getDataSize();
+			pieceCount[Constants.COLOUR_WHITE][0] = (Long.bitCount(evalinfo.bb_bishops[Constants.COLOUR_WHITE]) > 1) ? 1 : 0;
+			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_PAWN] = Long.bitCount(evalinfo.bb_pawns[Constants.COLOUR_WHITE]);
+			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_KNIGHT] = Long.bitCount(evalinfo.bb_knights[Constants.COLOUR_WHITE]);
+			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_BISHOP] = Long.bitCount(evalinfo.bb_bishops[Constants.COLOUR_WHITE]);
+			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_ROOK] = Long.bitCount(evalinfo.bb_rooks[Constants.COLOUR_WHITE]);
+			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_QUEEN] = Long.bitCount(evalinfo.bb_queens[Constants.COLOUR_WHITE]);
 			
-			pieceCount[Constants.COLOUR_BLACK][0] = (bitboard.getPiecesLists().getPieces(Constants.PID_B_BISHOP).getDataSize() > 1) ? 1 : 0;
-			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_PAWN] = bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN).getDataSize();
-			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_KNIGHT] = bitboard.getPiecesLists().getPieces(Constants.PID_B_KNIGHT).getDataSize();
-			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_BISHOP] = bitboard.getPiecesLists().getPieces(Constants.PID_B_BISHOP).getDataSize();
-			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_ROOK] = bitboard.getPiecesLists().getPieces(Constants.PID_B_ROOK).getDataSize();
-			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_QUEEN] = bitboard.getPiecesLists().getPieces(Constants.PID_B_QUEEN).getDataSize();
+			pieceCount[Constants.COLOUR_BLACK][0] = (Long.bitCount(evalinfo.bb_bishops[Constants.COLOUR_BLACK]) > 1) ? 1 : 0;
+			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_PAWN] = Long.bitCount(evalinfo.bb_pawns[Constants.COLOUR_BLACK]);
+			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_KNIGHT] = Long.bitCount(evalinfo.bb_knights[Constants.COLOUR_BLACK]);
+			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_BISHOP] = Long.bitCount(evalinfo.bb_bishops[Constants.COLOUR_BLACK]);
+			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_ROOK] = Long.bitCount(evalinfo.bb_rooks[Constants.COLOUR_BLACK]);
+			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_QUEEN] = Long.bitCount(evalinfo.bb_queens[Constants.COLOUR_BLACK]);
 		}
 		
 		

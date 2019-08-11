@@ -158,7 +158,7 @@ public class Bagatur_V18_SignalFiller extends Evaluator implements ISignalFiller
 		
 		double openningPart = bitboard.getMaterialFactor().getOpenningPart();
 		
-		material.initialize(bitboard);
+		material.initialize(evalinfo);
 		int imbalance_o = (material.imbalance(Constants.COLOUR_WHITE) - material.imbalance(Constants.COLOUR_BLACK)) / 16;
 		int imbalance_e = imbalance_o;
 		
@@ -239,7 +239,7 @@ public class Bagatur_V18_SignalFiller extends Evaluator implements ISignalFiller
 	      			}
 	
 	      			// Penalty if the piece is far from the king
-	      			int multiplier = distance(squareID, getKingSquareID(bitboard, Us));
+	      			int multiplier = distance(squareID, getKingSquareID(evalinfo, Us));
 	      			addToSignal(Us, signals.getSignal(FEATURE_ID_MOBILITY_OUTPOST_OTHERS), interpolateInternal(-KingProtector_O * multiplier, -KingProtector_E * multiplier, openningPart), openningPart);
 	      			
 	      			if (pieceType == Constants.TYPE_BISHOP) {
@@ -273,7 +273,7 @@ public class Bagatur_V18_SignalFiller extends Evaluator implements ISignalFiller
 	
 	      			// Penalty when trapped by the king, even more if the king cannot castle
 	      			else if (mob <= 3) {
-	      				int kf = file_of(getKingSquareID(bitboard, Us));
+	      				int kf = file_of(getKingSquareID(evalinfo, Us));
 	      				if ((kf < FileE) == (file_of(squareID) < kf)) {
 	      					int o = (TrappedRook_O - mob * 22) * (1 + ((bitboard.hasRightsToKingCastle(Us) || bitboard.hasRightsToQueenCastle(Us)) ? 0 : 1));
 	      					int e = (TrappedRook_E - 0) * (1 + ((bitboard.hasRightsToKingCastle(Us) || bitboard.hasRightsToQueenCastle(Us)) ? 0 : 1));
@@ -304,7 +304,7 @@ public class Bagatur_V18_SignalFiller extends Evaluator implements ISignalFiller
 		final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 		final long Camp = (Us == Constants.COLOUR_WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
-		final int squareID_ksq = getKingSquareID(bitboard, Us);
+		final int squareID_ksq = getKingSquareID(evalinfo, Us);
 		long kingFlank;
 		long weak;
 		long b;
@@ -670,7 +670,7 @@ public class Bagatur_V18_SignalFiller extends Evaluator implements ISignalFiller
 			
 			double openningPart = bitboard.getMaterialFactor().getOpenningPart();
 			
-			int squareID_ksq = getKingSquareID(bitboard, Us);
+			int squareID_ksq = getKingSquareID(evalinfo, Us);
 			kingSquares[Us] = squareID_ksq;
 			//castlingRights[Us] = bitboard.hasRightsToKingCastle(Us) || bitboard.hasRightsToQueenCastle(Us)//pos.can_castle(Us);
 			int minKingPawnDistance = 0;
@@ -704,7 +704,7 @@ public class Bagatur_V18_SignalFiller extends Evaluator implements ISignalFiller
 			
 			final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
 			final int Direction_Up = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
-			int squareID_ksq = getKingSquareID(bitboard, Us);
+			int squareID_ksq = getKingSquareID(evalinfo, Us);
 			
 			long b;
 			long bb;
