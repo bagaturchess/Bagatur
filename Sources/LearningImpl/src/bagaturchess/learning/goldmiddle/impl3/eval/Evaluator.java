@@ -189,8 +189,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 	
 	public double calculateScore1() {
 		
-		evalinfo.fillBB(bitboard);
-		
 		evalinfo.clearEvals1();
 		
 		calculateMaterialScore();
@@ -208,6 +206,8 @@ public class Evaluator extends Evaluator_BaseImpl {
 	public double calculateScore2() {
 		
 		evalinfo.clearEvals2();
+		
+		evalinfo.fillBB(bitboard);
 		
 		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_WHITE, evalinfo.bb_pawns[Constants.COLOUR_WHITE]);
 		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_BLACK, evalinfo.bb_pawns[Constants.COLOUR_BLACK]);
@@ -258,7 +258,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 	}
 	
 	
-	public void calculateMaterialScore() {
+	/*public void calculateMaterialScore() {
 		
 		int countPawns = Long.bitCount(evalinfo.bb_pawns[Constants.COLOUR_WHITE]) - Long.bitCount(evalinfo.bb_pawns[Constants.COLOUR_BLACK]);
 		int countKnights = Long.bitCount(evalinfo.bb_knights[Constants.COLOUR_WHITE]) - Long.bitCount(evalinfo.bb_knights[Constants.COLOUR_BLACK]);
@@ -280,10 +280,10 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 		evalinfo.eval_o_part1 += eval_o;
 		evalinfo.eval_e_part1 += eval_e;
-	}
+	}*/
 	
 	
-	/*public void calculateMaterialScore() {
+	public void calculateMaterialScore() {
 		
 		
 		int w_eval_nopawns_o = bitboard.getBaseEvaluation().getWhiteMaterialNonPawns_o();
@@ -298,7 +298,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		
 		evalinfo.eval_o_part1 += (w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o);
 		evalinfo.eval_e_part1 += (w_eval_nopawns_e - b_eval_nopawns_e) + (w_eval_pawns_e - b_eval_pawns_e);
-	}*/
+	}
 	
 	
 	
@@ -364,7 +364,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 		evalinfo.attackedBy[Us][pieceType] = 0;
 		
         while (Us_pieces != 0) {
-            	
+            
     		int squareID = Long.numberOfTrailingZeros(Us_pieces);
         	long squareBB = SquareBB[squareID];
         	
@@ -1223,6 +1223,22 @@ public class Evaluator extends Evaluator_BaseImpl {
 			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_BISHOP] = Long.bitCount(evalinfo.bb_bishops[Constants.COLOUR_BLACK]);
 			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_ROOK] = Long.bitCount(evalinfo.bb_rooks[Constants.COLOUR_BLACK]);
 			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_QUEEN] = Long.bitCount(evalinfo.bb_queens[Constants.COLOUR_BLACK]);
+			
+			/*
+			pieceCount[Constants.COLOUR_WHITE][0] = (bitboard.getPiecesLists().getPieces(Constants.PID_W_BISHOP).getDataSize() > 1) ? 1 : 0;
+			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_PAWN] = bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN).getDataSize();
+			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_KNIGHT] = bitboard.getPiecesLists().getPieces(Constants.PID_W_KNIGHT).getDataSize();
+			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_BISHOP] = bitboard.getPiecesLists().getPieces(Constants.PID_W_BISHOP).getDataSize();
+			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_ROOK] = bitboard.getPiecesLists().getPieces(Constants.PID_W_ROOK).getDataSize();
+			pieceCount[Constants.COLOUR_WHITE][Constants.TYPE_QUEEN] = bitboard.getPiecesLists().getPieces(Constants.PID_W_QUEEN).getDataSize();
+			
+			pieceCount[Constants.COLOUR_BLACK][0] = (bitboard.getPiecesLists().getPieces(Constants.PID_B_BISHOP).getDataSize() > 1) ? 1 : 0;
+			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_PAWN] = bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN).getDataSize();
+			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_KNIGHT] = bitboard.getPiecesLists().getPieces(Constants.PID_B_KNIGHT).getDataSize();
+			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_BISHOP] = bitboard.getPiecesLists().getPieces(Constants.PID_B_BISHOP).getDataSize();
+			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_ROOK] = bitboard.getPiecesLists().getPieces(Constants.PID_B_ROOK).getDataSize();
+			pieceCount[Constants.COLOUR_BLACK][Constants.TYPE_QUEEN] = bitboard.getPiecesLists().getPieces(Constants.PID_B_QUEEN).getDataSize();
+			*/
 		}
 		
 		
