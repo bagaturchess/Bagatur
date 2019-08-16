@@ -29,27 +29,6 @@ public class BoardConfigImpl_V18 implements IBoardConfig {
 	private double MATERIAL_BARIER_NOPAWNS_O	= Math.max(MATERIAL_KNIGHT_O, MATERIAL_BISHOP_O) + MATERIAL_PAWN_O;
 	private double MATERIAL_BARIER_NOPAWNS_E	= Math.max(MATERIAL_KNIGHT_E, MATERIAL_BISHOP_E) + MATERIAL_PAWN_E;
 	
-	private static final double[] KING_O			= Utils.reverseSpecial(new double[] {
-			64, 87, 49, 0, 0, 49, 87, 64, 
-			87, 120, 64, 25, 25, 64, 120, 87, 
-			122, 159, 85, 36, 36, 85, 159, 122, 
-			145, 176, 112, 69, 69, 112, 176, 145, 
-			169, 191, 136, 108, 108, 136, 191, 169, 
-			198, 253, 168, 120, 120, 168, 253, 198, 
-			277, 305, 241, 183, 183, 241, 305, 277, 
-			272, 325, 273, 190, 190, 273, 325, 272, 
-			});
-	
-	private static final double[] KING_E			= Utils.reverseSpecial(new double[] {
-			5, 60, 75, 75, 75, 75, 60, 5, 
-			40, 99, 128, 141, 141, 128, 99, 40, 
-			87, 164, 174, 189, 189, 174, 164, 87, 
-			98, 166, 197, 194, 194, 197, 166, 98, 
-			103, 152, 168, 169, 169, 168, 152, 103, 
-			86, 138, 165, 173, 173, 165, 138, 86, 
-			57, 98, 138, 131, 131, 138, 98, 57, 
-			0, 41, 80, 93, 93, 80, 41, 0, 
-			});
 	
 	private static final double[] PAWN_O			= Utils.reverseSpecial(new double[] {
 			0, 0, 0, 0, 0, 0, 0, 0, 
@@ -150,7 +129,8 @@ public class BoardConfigImpl_V18 implements IBoardConfig {
 			-3, 5, 8, 12, 12, 8, 5, -3, 
 			3, -5, -5, 4, 4, -5, -5, 3, 
 			});
-
+	
+	
 	private static final double[] QUEEN_E			= Utils.reverseSpecial(new double[] {
 			-75, -52, -43, -36, -36, -43, -52, -75, 
 			-50, -27, -24, -8, -8, -24, -27, -50, 
@@ -160,6 +140,30 @@ public class BoardConfigImpl_V18 implements IBoardConfig {
 			-39, -18, -9, 3, 3, -9, -18, -39, 
 			-55, -31, -22, -4, -4, -22, -31, -55, 
 			-69, -57, -47, -26, -26, -47, -57, -69, 
+			});
+	
+	
+	private static final double[] KING_O			= Utils.reverseSpecial(new double[] {
+			64, 87, 49, 0, 0, 49, 87, 64, 
+			87, 120, 64, 25, 25, 64, 120, 87, 
+			122, 159, 85, 36, 36, 85, 159, 122, 
+			145, 176, 112, 69, 69, 112, 176, 145, 
+			169, 191, 136, 108, 108, 136, 191, 169, 
+			198, 253, 168, 120, 120, 168, 253, 198, 
+			277, 305, 241, 183, 183, 241, 305, 277, 
+			272, 325, 273, 190, 190, 273, 325, 272, 
+			});
+	
+	
+	private static final double[] KING_E			= Utils.reverseSpecial(new double[] {
+			5, 60, 75, 75, 75, 75, 60, 5, 
+			40, 99, 128, 141, 141, 128, 99, 40, 
+			87, 164, 174, 189, 189, 174, 164, 87, 
+			98, 166, 197, 194, 194, 197, 166, 98, 
+			103, 152, 168, 169, 169, 168, 152, 103, 
+			86, 138, 165, 173, 173, 165, 138, 86, 
+			57, 98, 138, 131, 131, 138, 98, 57, 
+			0, 41, 80, 93, 93, 80, 41, 0, 
 			});
 	
 	
