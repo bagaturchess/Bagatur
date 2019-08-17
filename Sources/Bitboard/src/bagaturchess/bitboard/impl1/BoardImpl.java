@@ -48,10 +48,13 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
+import bagaturchess.bitboard.impl.movelist.BaseMoveList;
+import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.ChessBoardUtil;
 import bagaturchess.bitboard.impl1.internal.ChessConstants;
+import bagaturchess.bitboard.impl1.internal.EvalConstants;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.MoveWrapper;
@@ -71,9 +74,10 @@ public class BoardImpl implements IBitBoard {
 	private IBoardConfig boardConfig;
 	private IMoveOps moveOps;
 	
+	private IMoveList hasMovesList;
+	
 	
 	public BoardImpl(String fen, IBoardConfig _boardConfig) {
-		chessBoard = ChessBoardUtil.getNewCB(fen);
 		generator = new MoveGenerator();
 		pieces = new PiecesListsImpl(this);
 		materialFactor = new MaterialFactorImpl();
@@ -81,6 +85,12 @@ public class BoardImpl implements IBitBoard {
 		materialState = new MaterialStateImpl();
 		boardConfig = _boardConfig;
 		moveOps = new MoveOpsImpl();
+		
+		EvalConstants.initPSQT(boardConfig);
+		
+		chessBoard = ChessBoardUtil.getNewCB(fen);
+		
+		hasMovesList = new BaseMoveList();
 	}
 	
 	
@@ -122,25 +132,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int genKingEscapes(IInternalMoveList list) {
-		
-		generator.startPly();
-		
-		generator.generateAttacks(chessBoard);
-		generator.generateMoves(chessBoard);
-		
-		int counter = 0;
-		while (generator.hasNext()) {
-			int cur_move = generator.next();
-			if (!chessBoard.isLegal(cur_move)) {
-				continue;
-			}
-			list.reserved_add(cur_move);
-			counter++;
-		}
-		
-		generator.endPly();
-		
-		return counter;
+		return genAllMoves(list);
 	}
 	
 	
@@ -428,12 +420,6 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
-	public boolean hasSingleMove() {
-		throw new UnsupportedOperationException();
-	}
-	
-	
-	@Override
 	public IMaterialState getMaterialState() {
 		return materialState;
 	}
@@ -449,6 +435,30 @@ public class BoardImpl implements IBitBoard {
 	public int[] getMatrix() {
 		//throw new UnsupportedOperationException();
 		return chessBoard.pieceIndexes;
+	}
+	
+	
+	@Override
+	public boolean hasMoveInCheck() {
+		hasMovesList.reserved_clear();
+		genAllMoves(hasMovesList);
+		return hasMovesList.reserved_getCurrentSize() > 0;
+	}
+	
+	
+	@Override
+	public boolean hasMoveInNonCheck() {
+		hasMovesList.reserved_clear();
+		genAllMoves(hasMovesList);
+		return hasMovesList.reserved_getCurrentSize() > 0;
+	}
+	
+	
+	@Override
+	public boolean hasSingleMove() {
+		hasMovesList.reserved_clear();
+		genAllMoves(hasMovesList);
+		return hasMovesList.reserved_getCurrentSize() == 1;
 	}
 	
 	
@@ -544,22 +554,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public boolean isInCheck(int colour) {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#hasMoveInCheck()
-	 */
-	@Override
-	public boolean hasMoveInCheck() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#hasMoveInNonCheck()
-	 */
-	@Override
-	public boolean hasMoveInNonCheck() {
 		throw new UnsupportedOperationException();
 	}
 

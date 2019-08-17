@@ -164,23 +164,21 @@ public class Search_PVS_NWS extends SearchImpl {
     			&& env.getBitboard().getColourToMove() == rootColour
     			){
 			
-			if (!IBitBoard.IMPL1) {
-				if (inCheck) {
-					if (!env.getBitboard().hasMoveInCheck()) {
-						node.bestmove = 0;
-						node.eval = -getMateVal(depth);
-						node.leaf = true;
-						node.nullmove = false;
-						return node.eval;
-					}
-				} else {
-					if (!env.getBitboard().hasMoveInNonCheck()) {
-						node.bestmove = 0;
-						node.eval = getDrawScores(rootColour);
-						node.leaf = true;
-						node.nullmove = false;
-						return node.eval;
-					}
+			if (inCheck) {
+				if (!env.getBitboard().hasMoveInCheck()) {
+					node.bestmove = 0;
+					node.eval = -getMateVal(depth);
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
+				}
+			} else {
+				if (!env.getBitboard().hasMoveInNonCheck()) {
+					node.bestmove = 0;
+					node.eval = getDrawScores(rootColour);
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
 				}
 			}
 			
@@ -375,8 +373,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int singularExtension = 0;
 		
-		if (!IBitBoard.IMPL1) {
-			
+		{
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 			env.getTPT().unlock();
@@ -732,15 +729,13 @@ public class Search_PVS_NWS extends SearchImpl {
     			&& env.getBitboard().getColourToMove() == rootColour
     			){
 			
-			if (!IBitBoard.IMPL1) {
-				if (inCheck) {
-					if (!env.getBitboard().hasMoveInCheck()) {
-						return -getMateVal(depth);
-					}
-				} else {
-					if (!env.getBitboard().hasMoveInNonCheck()) {
-						return getDrawScores(rootColour);
-					}
+			if (inCheck) {
+				if (!env.getBitboard().hasMoveInCheck()) {
+					return -getMateVal(depth);
+				}
+			} else {
+				if (!env.getBitboard().hasMoveInNonCheck()) {
+					return getDrawScores(rootColour);
 				}
 			}
 			
@@ -1022,8 +1017,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int singularExtension = 0;
 		
-		if (!IBitBoard.IMPL1) {
-			
+		{
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 			env.getTPT().unlock();
