@@ -2,6 +2,7 @@ package bagaturchess.bitboard.impl1.internal;
 
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
+import bagaturchess.bitboard.api.IBoardConfig;
 
 
 /**
@@ -157,6 +158,7 @@ public class EvalConstants {
 	public static final int[][][] PSQT_MG			= new int[7][2][64];
 	public static final int[][][] PSQT_EG			= new int[7][2][64];
 	
+	
 	static
 	{	
 		PSQT_MG[ChessConstants.PAWN][WHITE] = new int[] {
@@ -290,8 +292,47 @@ public class EvalConstants {
 				57, 98, 138, 131, 131, 138, 98, 57, 
 				0, 41, 80, 93, 93, 80, 41, 0, 
 		};
-		
 	}
+	
+	
+	public static final void initPSQT(IBoardConfig config) {
+		
+		PSQT_MG[ChessConstants.PAWN][WHITE] = convertDoubleArray2IntArray(config.getPST_PAWN_O());
+		PSQT_EG[ChessConstants.PAWN][WHITE] = convertDoubleArray2IntArray(config.getPST_PAWN_E());
+		
+		PSQT_MG[ChessConstants.NIGHT][WHITE] = convertDoubleArray2IntArray(config.getPST_KNIGHT_O());
+		PSQT_EG[ChessConstants.NIGHT][WHITE] = convertDoubleArray2IntArray(config.getPST_KNIGHT_E());
+
+		PSQT_MG[ChessConstants.BISHOP][WHITE] = convertDoubleArray2IntArray(config.getPST_BISHOP_O());
+		PSQT_EG[ChessConstants.BISHOP][WHITE] = convertDoubleArray2IntArray(config.getPST_BISHOP_E());
+
+		PSQT_MG[ChessConstants.ROOK][WHITE] = convertDoubleArray2IntArray(config.getPST_ROOK_O());
+		PSQT_EG[ChessConstants.ROOK][WHITE] = convertDoubleArray2IntArray(config.getPST_ROOK_E());
+		
+		PSQT_MG[ChessConstants.QUEEN][WHITE] = convertDoubleArray2IntArray(config.getPST_QUEEN_O());
+		PSQT_EG[ChessConstants.QUEEN][WHITE] = convertDoubleArray2IntArray(config.getPST_QUEEN_E());
+		
+		PSQT_MG[ChessConstants.KING][WHITE] = convertDoubleArray2IntArray(config.getPST_KING_O());
+		PSQT_EG[ChessConstants.KING][WHITE] = convertDoubleArray2IntArray(config.getPST_KING_E());
+		
+		// create black arrays
+		for (int piece = ChessConstants.PAWN; piece <= ChessConstants.KING; piece++){
+			for (int i = 0; i < 64; i++) {
+				PSQT_MG[piece][BLACK][i] = -PSQT_MG[piece][WHITE][MIRRORED_UP_DOWN[i]];
+				PSQT_EG[piece][BLACK][i] = -PSQT_EG[piece][WHITE][MIRRORED_UP_DOWN[i]];
+			}
+		}
+	}
+	
+	
+	private static final int[] convertDoubleArray2IntArray(double[] src) {
+		int[] result = new int[src.length];
+		for (int i=0; i<result.length; i++) {
+			result[i] = (int) src[i];
+		}
+		return result;
+	}
+	
 	
 	public static final long[] ROOK_PRISON = { 
 			0, Bitboard.A8, Bitboard.A8_B8, Bitboard.A8B8C8, 0, Bitboard.G8_H8, Bitboard.H8, 0, 
@@ -303,6 +344,7 @@ public class EvalConstants {
 			0, 0, 0, 0, 0, 0, 0, 0, 
 			0, Bitboard.A1, Bitboard.A1_B1, Bitboard.A1B1C1, 0, Bitboard.G1_H1, Bitboard.H1, 0 
 	};
+	
 	
 	public static final long[] BISHOP_PRISON = { 
 			0, 0, 0, 0, 0, 0, 0, 0, //8
