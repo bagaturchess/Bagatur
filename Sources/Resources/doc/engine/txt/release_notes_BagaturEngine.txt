@@ -1,3 +1,6 @@
+Version 1.8a (25 August 2019)
+  * Enable Syzygy tablebases for SMP version
+  * 
 
 Version 1.8 (30 July 2019)
   * New evaluation function
@@ -9,7 +12,7 @@ Version 1.7b (2 July 2019)
 Version 1.7a (18 April 2019)
   * Optimizations of move ordering: bad captures are ordered with higher value
   * Optimizations of move ordering: piece-square tables are not used in ordering
-  
+
 Version 1.7 (29 March 2019)
   * Support for Syzygy tablebases, based on the java porting done by ljgw https://github.com/ljgw/syzygy-bridge
   * New evaluation function
