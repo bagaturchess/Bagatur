@@ -563,11 +563,12 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					int lmrReduction = 0;
 					if (!inCheck
-						 //&& !isCheckMove
+						 && singularExtension == 0
+						 && !isCheckMove
 						 //&& !((ListAll)list).isGoodMove(cur_move)
 						 //&& !mateThreat
 						 //&& !isCapOrProm
-						 //&& moveSee < 0
+						 && moveSee < 0
 						 //&& rest > 3
 						) {
 						
@@ -1208,11 +1209,12 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					int lmrReduction = 0;
 					if (!inCheck
-						 //&& !isCheckMove
+						 && singularExtension == 0
+						 && !isCheckMove
 						 //&& !((ListAll)list).isGoodMove(cur_move)
 						 //&& !mateThreat
 						 //&& !isCapOrProm
-						 //&& moveSee < 0
+						 && moveSee < 0
 						 //&& rest > 3
 						) {
 						
