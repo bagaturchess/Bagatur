@@ -50,6 +50,11 @@ public class TournamentRunner {
 															new String [0],
 															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_DEV\\");
 
+	private static final EngineProcess bagatur_18 			= new EngineProcess("Bagatur 1.8", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.8\\Bagatur_64_1_core.exe",
+															new String [0],
+															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.8\\");
+
+	
 	private static final EngineProcess bagatur_17 			= new EngineProcess("Bagatur 1.7", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\Bagatur_64_1_core.exe",
 															new String [0],
 															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\");
@@ -88,7 +93,7 @@ public class TournamentRunner {
 	public static void main(String[] args) {
 		
 		
-		EngineProcess engine1 = bagatur_17a;
+		EngineProcess engine1 = bagatur_18;
 		EngineProcess engine2 = bagatur_dev;
 		
 		
@@ -113,12 +118,12 @@ public class TournamentRunner {
 			
 			ITournamentSchedule schedule = new TournamentSchedule_2Engines(engines, 100000);
 			
-			MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
+			//MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
 			//MatchRunner matchRunner = new MatchRunner_FixedDepth(5);
 			//MatchRunner matchRunner = new MatchRunner_FixedNodes(100000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(60 * 1000, 60 * 1000, 1 * 1000, 1 * 1000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 250, 250);
-			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 1 * 1000, 1 * 1000);
+			MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 100, 100);
 			
 			Tournament tournament = new Tournament(schedule, matchRunner, false);
 			
