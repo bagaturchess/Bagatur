@@ -72,25 +72,20 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 			
 			bitboardForSetup = new BoardImpl(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
 			
-			for (int i=0; i<movesCount; i++) {
-				_bitboardForSetup.makeMoveForward(moves[i]);
-				
-				StringBuilder message = new StringBuilder(32);
-				MoveInt.moveToStringUCI(moves[i], message);
-				bitboardForSetup.makeMoveForward(message.toString());
-			}
-			
 		} else {
 			
 			bitboardForSetup = BoardUtils.createBoard_WithPawnsCache(_bitboardForSetup.toEPD(),
 				getRootSearchConfig().getEvalConfig().getPawnsCacheFactoryClassName(),
 				getRootSearchConfig().getBoardConfig(),
 				10000);
+		}
+		
+		for (int i=0; i<movesCount; i++) {
+			_bitboardForSetup.makeMoveForward(moves[i]);
 			
-			for (int i=0; i<movesCount; i++) {
-				_bitboardForSetup.makeMoveForward(moves[i]);
-				bitboardForSetup.makeMoveForward(moves[i]);
-			}
+			StringBuilder message = new StringBuilder(32);
+			MoveInt.moveToStringUCI(moves[i], message);
+			bitboardForSetup.makeMoveForward(message.toString());
 		}
 	}
 	
@@ -124,13 +119,9 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		int[] moves = _bitboardForSetup.getPlayedMoves();
 		
 		for (int i=0; i<movesCount; i++) {
-			if (IBitBoard.IMPL1) {
-				StringBuilder message = new StringBuilder(8);
-				MoveInt.moveToStringUCI(moves[i], message);
-				bitboardForSetup.makeMoveForward(message.toString());
-			} else {
-				bitboardForSetup.makeMoveForward(moves[i]);
-			}
+			StringBuilder message = new StringBuilder(8);
+			MoveInt.moveToStringUCI(moves[i], message);
+			bitboardForSetup.makeMoveForward(message.toString());
 		}
 	}
 	
