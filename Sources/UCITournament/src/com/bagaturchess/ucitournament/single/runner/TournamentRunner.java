@@ -119,10 +119,9 @@ public class TournamentRunner {
 			ITournamentSchedule schedule = new TournamentSchedule_2Engines(engines, 100000);
 			
 			//MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
-			//MatchRunner matchRunner = new MatchRunner_FixedDepth(5);
+			//MatchRunner matchRunner = new MatchRunner_FixedDepth(9);
 			//MatchRunner matchRunner = new MatchRunner_FixedNodes(100000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(60 * 1000, 60 * 1000, 1 * 1000, 1 * 1000);
-			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 250, 250);
 			MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 100, 100);
 			
 			Tournament tournament = new Tournament(schedule, matchRunner, false);
