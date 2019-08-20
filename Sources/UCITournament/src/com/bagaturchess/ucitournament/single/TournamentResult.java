@@ -66,9 +66,27 @@ public class TournamentResult {
 		for (String name: map.keySet()) {
 			Integer scoresObj = map.get(name);
 			int scores = scoresObj == null ? 0 : scoresObj;
-			result += name + "	" + scores + "\r\n";
+			result += name + "	" + scores + "  " + getELODiff(scores) + "\r\n";
 		}
 		
+		return result;
+	}
+	
+	
+	private int getELODiff(int scores) {
+		double log = (sumAllScores() - scores) / (double) scores;
+		if (log == 0) return 3500;
+		return (int) (-Math.log10(log) * 400D);
+	}
+	
+	
+	private int sumAllScores() {
+		int result = 0;
+		for (String name: map.keySet()) {
+			Integer scoresObj = map.get(name);
+			int scores = scoresObj == null ? 0 : scoresObj;
+			result += scores;
+		}
 		return result;
 	}
 }
