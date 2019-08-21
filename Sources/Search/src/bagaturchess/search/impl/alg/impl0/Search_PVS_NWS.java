@@ -1187,12 +1187,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						new_maxdepth += singularExtension;
 					} else if (zungzwang) {
 						new_maxdepth += PLY;
-					} else {
-						/*if (evalDiff > 0) {
-							new_maxdepth += PLY * (evalDiff / (double)EVAL_DIFF_MAX);	
-						}
-						new_maxdepth += PLY * getHistory(inCheck).getScores(cur_move);
-						*/
 					}
 				}
 				
