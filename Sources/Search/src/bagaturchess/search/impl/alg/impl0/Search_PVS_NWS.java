@@ -618,15 +618,18 @@ public class Search_PVS_NWS extends SearchImpl {
 					best_eval = cur_eval;
 					best_move = cur_move;
 					
-					backtrackingInfo.best_move = best_move;
-					
-					node.bestmove = best_move;
-					node.eval = best_eval;
-					node.leaf = false;
-					node.nullmove = false;
-					
-					if (depth + 1 < MAX_DEPTH) {
-						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
+					if (backtrackingInfo.excluded_move == 0) {
+						
+						backtrackingInfo.best_move = best_move;
+						
+						node.bestmove = best_move;
+						node.eval = best_eval;
+						node.leaf = false;
+						node.nullmove = false;
+						
+						if (depth + 1 < MAX_DEPTH) {
+							pvman.store(depth + 1, node, pvman.load(depth + 1), true);
+						}
 					}
 					
 					if (best_eval >= beta) {												
@@ -1262,7 +1265,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					best_eval = cur_eval;
 					best_move = cur_move;
 					
-					backtrackingInfo.best_move = best_move;
+					if (backtrackingInfo.excluded_move == 0) {
+						backtrackingInfo.best_move = best_move;
+					}
 					
 					if (best_eval >= beta) {
 						break;
