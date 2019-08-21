@@ -569,7 +569,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						 //&& !mateThreat
 						 //&& !isCapOrProm
 						 && moveSee < 0
-						 //&& rest > 3
+						 && rest >= 2
 						) {
 						
 						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2);
@@ -1218,7 +1218,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						 //&& !mateThreat
 						 //&& !isCapOrProm
 						 && moveSee < 0
-						 //&& rest > 3
+						 && rest >= 2
 						) {
 						
 						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2);
@@ -1236,14 +1236,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
-							new_maxdepth - lmrReduction, depth + 1, -alpha_org,
-							rootColour,
-							staticPrunning);
+							new_maxdepth - lmrReduction, depth + 1, -alpha_org, rootColour, staticPrunning);
 					
 					if (cur_eval > alpha_org && (lmrReduction > 0 || staticPrunning) ) {
 						
-						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org,
-								rootColour, false);
+						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
 					}
 				}
 				
