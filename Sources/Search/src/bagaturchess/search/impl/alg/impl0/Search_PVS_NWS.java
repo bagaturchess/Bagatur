@@ -499,7 +499,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				//Static pruning
 				if (STATIC_PRUNING2 && !inCheck && !env.getBitboard().isCheckMove(cur_move)) {
 					
-					if (searchedCount >= 4 && rest <= 8) {
+					if (searchedCount >= 4 && rest <= 8 && depth >= rest) {
 						
 						if (!isCapOrProm) {
 							
@@ -1137,7 +1137,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				//Static pruning
 				if (STATIC_PRUNING2 && !inCheck && !env.getBitboard().isCheckMove(cur_move)) {
 					
-					if (searchedCount >= 4 && rest <= 8) {
+					if (searchedCount >= 4 && rest <= 8 && depth >= rest) {
 						
 						if (!isCapOrProm) {
 							
