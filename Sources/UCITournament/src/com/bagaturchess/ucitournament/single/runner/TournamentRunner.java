@@ -93,7 +93,7 @@ public class TournamentRunner {
 	public static void main(String[] args) {
 		
 		
-		EngineProcess engine1 = bagatur_18;
+		EngineProcess engine1 = stockfish10;
 		EngineProcess engine2 = bagatur_dev;
 		
 		
@@ -111,7 +111,7 @@ public class TournamentRunner {
 			options.add("setoption name OwnBook value true");
 			options.add("setoption name Openning Mode value random intermediate");
 			options.add("setoption name Time Control Optimizations value for 1/1");
-			options.add("setoption name SyzygyPath value tbd");
+			options.add("setoption name SyzygyPath value C:/Users/i027638/OneDrive - SAP SE/DATA/OWN/chess/EGTB/syzygy");
 			
 			engine1.setOptions(options);
 			engine2.setOptions(options);
@@ -120,9 +120,9 @@ public class TournamentRunner {
 			
 			//MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
 			//MatchRunner matchRunner = new MatchRunner_FixedDepth(9);
-			//MatchRunner matchRunner = new MatchRunner_FixedNodes(100000);
+			MatchRunner matchRunner = new MatchRunner_FixedNodes(100000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(60 * 1000, 60 * 1000, 1 * 1000, 1 * 1000);
-			MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 100, 100);
+			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 100, 100);
 			
 			Tournament tournament = new Tournament(schedule, matchRunner, false);
 			
