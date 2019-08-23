@@ -24,7 +24,6 @@ package bagaturchess.search.impl.alg.impl0;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
@@ -563,28 +562,15 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					
 					int lmrReduction = 0;
-					if (!inCheck
-						 //&& !isCheckMove
-						 //&& !((ListAll)list).isGoodMove(cur_move)
-						 //&& !mateThreat
-						 //&& !isCapOrProm
-						 //&& moveSee < 0
-						 //&& rest > 3
-						) {
-						
-						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2);
-						if (!isCapOrProm && !isCheckMove) rate += 2;//for pv nodes
-						//if (isCapOrProm) rate -= 1;
-						//if (!isCapOrProm && evalDiff > 0) rate -= 2 * (evalDiff / EVAL_DIFF_MAX);
-						//rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
-						//rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
+					if (!inCheck && rest >= 2) {
+						double rate = Math.floor(Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2));
+						if (!isCapOrProm && !isCheckMove) {
+							rate += 2;
+						} else {
+							rate += 1;
+						}
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
-					}
-					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
-					if (lmrRest < 0) {
-						lmrRest = 0;
-					}
-					
+					}					
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
 							new_maxdepth - lmrReduction, depth + 1, -alpha, rootColour, staticPrunning);
@@ -1202,28 +1188,15 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					
 					int lmrReduction = 0;
-					if (!inCheck
-						 //&& !isCheckMove
-						 //&& !((ListAll)list).isGoodMove(cur_move)
-						 //&& !mateThreat
-						 //&& !isCapOrProm
-						 //&& moveSee < 0
-						 //&& rest > 3
-						) {
-						
-						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2);
-						if (!isCapOrProm && !isCheckMove) rate += 2;//for non pv nodes
-						//if (isCapOrProm) rate -= 1;
-						//if (!isCapOrProm && evalDiff > 0) rate -= 2 * (evalDiff / EVAL_DIFF_MAX);
-						//rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
-						//rate *= (1 - (evalDiff / EVAL_DIFF_MAX));//In [0, 2]
+					if (!inCheck && rest >= 2) {
+						double rate = Math.floor(Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2));
+						if (!isCapOrProm && !isCheckMove) {
+							rate += 2;
+						} else {
+							rate += 1;
+						}
 						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
 					}
-					int lmrRest = normDepth(maxdepth - lmrReduction) - depth - 1;
-					if (lmrRest < 0) {
-						lmrRest = 0;
-					}
-					
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
 							new_maxdepth - lmrReduction, depth + 1, -alpha_org,
