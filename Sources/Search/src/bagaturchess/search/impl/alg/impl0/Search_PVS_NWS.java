@@ -276,7 +276,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				&& rest >= 3 //&& rest >= depth
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
-    			&& env.getBitboard().getColourToMove() == rootColour
+    			//&& env.getBitboard().getColourToMove() == rootColour
     			){
 			
 			if (inCheck) {
@@ -802,7 +802,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				&& rest >= 3 //&& rest >= depth
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
-    			&& env.getBitboard().getColourToMove() == rootColour
+    			//&& env.getBitboard().getColourToMove() == rootColour
     			){
 			
 			if (inCheck) {
