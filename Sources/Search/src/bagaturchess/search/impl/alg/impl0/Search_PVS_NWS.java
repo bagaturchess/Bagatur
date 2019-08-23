@@ -24,6 +24,7 @@ package bagaturchess.search.impl.alg.impl0;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
@@ -35,7 +36,6 @@ import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.alg.BacktrackingInfo;
 import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.movelists.ListAll;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
 
@@ -158,6 +158,62 @@ public class Search_PVS_NWS extends SearchImpl {
 		int rest = normDepth(maxdepth) - depth;
 		
 		
+		if (depth > 1
+    	    	&& rest >= 5
+    			&& SyzygyTBProbing.getSingleton() != null
+    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
+    			//&& env.getBitboard().getColourToMove() == rootColour
+    			){
+			
+			if (inCheck) {
+				if (!env.getBitboard().hasMoveInCheck()) {
+					node.bestmove = 0;
+					node.eval = -getMateVal(depth);
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
+				}
+			} else {
+				if (!env.getBitboard().hasMoveInNonCheck()) {
+					node.bestmove = 0;
+					node.eval = getDrawScores(rootColour);
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
+				}
+			}
+			
+			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+			if (result != -1) {
+				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
+				int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+				int egtbscore =  SyzygyTBProbing.getSingleton().getWDLScore(wdl, depth);
+				if (egtbscore > 0) {
+					int distanceToDraw = 100 - env.getBitboard().getDraw50movesRule();
+					if (distanceToDraw > dtz) {
+						node.bestmove = 0;
+						node.eval = 10 * (distanceToDraw - dtz);
+						node.leaf = true;
+						node.nullmove = false;
+						return node.eval;
+					} else {
+						node.bestmove = 0;
+						node.eval = getDrawScores(rootColour);
+						node.leaf = true;
+						node.nullmove = false;
+						return node.eval;
+					}
+				} else if (egtbscore == 0) {
+					node.bestmove = 0;
+					node.eval = getDrawScores(rootColour);
+					node.leaf = true;
+					node.nullmove = false;
+					return node.eval;
+				}
+			}
+        }
+		
+		
 		boolean disableExts = false;
 		/*if (inCheck && rest < 1) {
 			if (depth >= normDepth(maxdepth)) {
@@ -166,6 +222,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}*/
 		
+		
+		rest = normDepth(maxdepth) - depth;
 		
 		boolean tpt_found = false;
 		boolean tpt_exact = false;
@@ -253,8 +311,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
-		
-		
+    	
+    	
 		if (depth >= normDepth(maxdepth)) {
 			
 			/*if (inCheck) {
@@ -270,62 +328,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (info.getSelDepth() < depth) {
 			info.setSelDepth(depth);
 		}
-		
-		
-		if (depth > 1
-				&& rest >= 3 //&& rest >= depth
-    			&& SyzygyTBProbing.getSingleton() != null
-    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
-    			//&& env.getBitboard().getColourToMove() == rootColour
-    			){
-			
-			if (inCheck) {
-				if (!env.getBitboard().hasMoveInCheck()) {
-					node.bestmove = 0;
-					node.eval = -getMateVal(depth);
-					node.leaf = true;
-					node.nullmove = false;
-					return node.eval;
-				}
-			} else {
-				if (!env.getBitboard().hasMoveInNonCheck()) {
-					node.bestmove = 0;
-					node.eval = getDrawScores(rootColour);
-					node.leaf = true;
-					node.nullmove = false;
-					return node.eval;
-				}
-			}
-			
-			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
-			if (result != -1) {
-				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
-				int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
-				int egtbscore =  SyzygyTBProbing.getSingleton().getWDLScore(wdl, depth);
-				if (egtbscore > 0) {
-					int distanceToDraw = 100 - env.getBitboard().getDraw50movesRule();
-					if (distanceToDraw > dtz) {
-						node.bestmove = 0;
-						node.eval = 10 * (distanceToDraw - dtz);
-						node.leaf = true;
-						node.nullmove = false;
-						return node.eval;
-					} else {
-						node.bestmove = 0;
-						node.eval = getDrawScores(rootColour);
-						node.leaf = true;
-						node.nullmove = false;
-						return node.eval;
-					}
-				} else if (egtbscore == 0) {
-					node.bestmove = 0;
-					node.eval = getDrawScores(rootColour);
-					node.leaf = true;
-					node.nullmove = false;
-					return node.eval;
-				}
-			}
-        }
 		
 		
 		//IID PV Node
@@ -373,12 +375,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		int singularExtension = 0;
 		
 		{
+			env.getTPT().lock();
+			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
+			env.getTPT().unlock();
 			
 	        if (depth > 0
 	        		//&& rest >= 6//depth
 	        		&& !disableExts
 	        		//&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
-	        		&& tpt_lower != MIN
+	        		&& tptEntry != null
 	        		//&& tptEntry.getDepth() >= rest - 3
 	        		) {
 	        	
@@ -388,16 +393,16 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					singularExtension = PLY;
 					
-				} else if (tpt_move != 0) {
+				} else if (tptEntry.getBestMove_lower() != 0) {
 						
-					int ttValue = tpt_lower;
+					int ttValue = tptEntry.getLowerBound();
 					
 					int reduction = (PLY * rest) / 2;
 					if (reduction >= PLY) {
 						
 						int singularBeta = ttValue;// - 2 * rest;
 						
-						backtrackingInfo.excluded_move = tpt_move;
+						backtrackingInfo.excluded_move = tptEntry.getBestMove_lower();
 						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, singularBeta,
 								rootColour, false);
 						backtrackingInfo.excluded_move = 0;
@@ -510,9 +515,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		 					}
 							
 							//Static pruning - evaluation based
-							/*if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
+							if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
 								continue;
-							}*/
+							}
 						}
 						
 						//Static pruning - SEE based
@@ -558,18 +563,17 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					
 					int lmrReduction = 0;
-					if (!inCheck && rest >= 2) {
-						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 1.5d);
-						if (!isCheckMove
-								&& singularExtension == 0
-								&& !isCapOrProm
-								) {
-							if (((ListAll)list).isGoodMove(cur_move)) {
-								rate += 1;
-							} else {
-								rate += 2;	
-							}
-						}
+					if (!inCheck
+						 //&& !isCheckMove
+						 //&& !((ListAll)list).isGoodMove(cur_move)
+						 //&& !mateThreat
+						 //&& !isCapOrProm
+						 //&& moveSee < 0
+						 //&& rest > 3
+						) {
+						
+						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2);
+						if (!isCapOrProm && !isCheckMove) rate += 2;//for pv nodes
 						//if (isCapOrProm) rate -= 1;
 						//if (!isCapOrProm && evalDiff > 0) rate -= 2 * (evalDiff / EVAL_DIFF_MAX);
 						//rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
@@ -614,18 +618,15 @@ public class Search_PVS_NWS extends SearchImpl {
 					best_eval = cur_eval;
 					best_move = cur_move;
 					
-					if (backtrackingInfo.excluded_move == 0) {
-						
-						backtrackingInfo.best_move = best_move;
-						
-						node.bestmove = best_move;
-						node.eval = best_eval;
-						node.leaf = false;
-						node.nullmove = false;
-						
-						if (depth + 1 < MAX_DEPTH) {
-							pvman.store(depth + 1, node, pvman.load(depth + 1), true);
-						}
+					backtrackingInfo.best_move = best_move;
+					
+					node.bestmove = best_move;
+					node.eval = best_eval;
+					node.leaf = false;
+					node.nullmove = false;
+					
+					if (depth + 1 < MAX_DEPTH) {
+						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
 					}
 					
 					if (best_eval >= beta) {												
@@ -721,6 +722,42 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int rest = normDepth(maxdepth) - depth;
 		
+    	
+		if (depth > 1
+				&& rest >= 5
+    			&& SyzygyTBProbing.getSingleton() != null
+    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
+    			//&& env.getBitboard().getColourToMove() == rootColour
+    			){
+			
+			if (inCheck) {
+				if (!env.getBitboard().hasMoveInCheck()) {
+					return -getMateVal(depth);
+				}
+			} else {
+				if (!env.getBitboard().hasMoveInNonCheck()) {
+					return getDrawScores(rootColour);
+				}
+			}
+			
+			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+			if (result != -1) {
+				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
+				int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+				int egtbscore =  SyzygyTBProbing.getSingleton().getWDLScore(wdl, depth);
+				if (egtbscore > 0) {
+					int distanceToDraw = 100 - env.getBitboard().getDraw50movesRule();
+					if (distanceToDraw > dtz) {
+						return 10 * (distanceToDraw - dtz);
+					} else {
+						return getDrawScores(rootColour);
+					}
+				} else if (egtbscore == 0) {
+					return getDrawScores(rootColour);
+				}
+			}
+		}
+		
 		
 		boolean disableExts = false;
 		/*if (inCheck && rest < 1) {
@@ -730,6 +767,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}*/
 		
+		rest = normDepth(maxdepth) - depth;
 		
 		boolean tpt_found = false;
 		boolean tpt_exact = false;
@@ -779,7 +817,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
-		
+    	
 		
 		if (depth >= normDepth(maxdepth)) {
 			
@@ -795,42 +833,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
 		if (info.getSelDepth() < depth) {
 			info.setSelDepth(depth);
-		}
-		
-		
-		if (depth > 1
-				&& rest >= 3 //&& rest >= depth
-    			&& SyzygyTBProbing.getSingleton() != null
-    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
-    			//&& env.getBitboard().getColourToMove() == rootColour
-    			){
-			
-			if (inCheck) {
-				if (!env.getBitboard().hasMoveInCheck()) {
-					return -getMateVal(depth);
-				}
-			} else {
-				if (!env.getBitboard().hasMoveInNonCheck()) {
-					return getDrawScores(rootColour);
-				}
-			}
-			
-			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
-			if (result != -1) {
-				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
-				int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
-				int egtbscore =  SyzygyTBProbing.getSingleton().getWDLScore(wdl, depth);
-				if (egtbscore > 0) {
-					int distanceToDraw = 100 - env.getBitboard().getDraw50movesRule();
-					if (distanceToDraw > dtz) {
-						return 10 * (distanceToDraw - dtz);
-					} else {
-						return getDrawScores(rootColour);
-					}
-				} else if (egtbscore == 0) {
-					return getDrawScores(rootColour);
-				}
-			}
 		}
 		
 		
@@ -897,8 +899,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (backtrackingInfo.static_eval >= beta) {
 				
 				//int null_reduction = PLY * (rest >= 6 ? 3 : 2);
-				//int null_reduction = PLY * (rest >= 6 ? 4 : 3);
-				int null_reduction = (int) (NULL_MOVE_REDUCTION_MULTIPLIER * Math.max(PLY, PLY * (rest / 2)));
+				int null_reduction = PLY * (rest >= 6 ? 4 : 3);
+				null_reduction = (int) (NULL_MOVE_REDUCTION_MULTIPLIER * Math.max(null_reduction, PLY * (rest / 2)));
 				
 				int null_maxdepth = maxdepth - null_reduction;
 				
@@ -1017,12 +1019,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		int singularExtension = 0;
 		
 		{
+			env.getTPT().lock();
+			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
+			env.getTPT().unlock();
 			
 	        if (depth > 0
 	        		//&& rest >= 6//depth
 	        		&& !disableExts
 	        		//&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
-	        		&& tpt_lower != MIN
+	        		&& tptEntry != null
 	        		//&& tptEntry.getDepth() >= rest - 3
 	        		) {
 	        	
@@ -1032,16 +1037,16 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					singularExtension = PLY;
 					
-				} else if (tpt_move != 0) {
+				} else if (tptEntry.getBestMove_lower() != 0) {
 						
-					int ttValue = tpt_lower;
+					int ttValue = tptEntry.getLowerBound();
 					
 					int reduction = (PLY * rest) / 2;
 					if (reduction >= PLY) {
 						
 						int singularBeta = ttValue;// - 2 * rest;
 						
-						backtrackingInfo.excluded_move = tpt_move;
+						backtrackingInfo.excluded_move = tptEntry.getBestMove_lower();
 						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, singularBeta,
 								rootColour, useStaticPrunning);
 						backtrackingInfo.excluded_move = 0;
@@ -1147,9 +1152,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		 					}
 							
 							//Static pruning - evaluation based
-							/*if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
+							if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
 								continue;
-							}*/
+							}
 						}
 						
 						//Static pruning - SEE based
@@ -1197,18 +1202,17 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					
 					int lmrReduction = 0;
-					if (!inCheck && rest >= 2) {
-						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 1.5d);
-						if (!isCheckMove
-								&& singularExtension == 0
-								&& !isCapOrProm
-								) {
-							if (((ListAll)list).isGoodMove(cur_move)) {
-								rate += 1;
-							} else {
-								rate += 2;
-							}
-						}
+					if (!inCheck
+						 //&& !isCheckMove
+						 //&& !((ListAll)list).isGoodMove(cur_move)
+						 //&& !mateThreat
+						 //&& !isCapOrProm
+						 //&& moveSee < 0
+						 //&& rest > 3
+						) {
+						
+						double rate = Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2);
+						if (!isCapOrProm && !isCheckMove) rate += 2;//for non pv nodes
 						//if (isCapOrProm) rate -= 1;
 						//if (!isCapOrProm && evalDiff > 0) rate -= 2 * (evalDiff / EVAL_DIFF_MAX);
 						//rate *= (1 - getHistory(inCheck).getScores(cur_move));//In [0, 1]
@@ -1222,11 +1226,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
-							new_maxdepth - lmrReduction, depth + 1, -alpha_org, rootColour, staticPrunning);
+							new_maxdepth - lmrReduction, depth + 1, -alpha_org,
+							rootColour,
+							staticPrunning);
 					
 					if (cur_eval > alpha_org && (lmrReduction > 0 || staticPrunning) ) {
 						
-						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
+						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org,
+								rootColour, false);
 					}
 				}
 				
@@ -1248,9 +1255,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					best_eval = cur_eval;
 					best_move = cur_move;
 					
-					if (backtrackingInfo.excluded_move == 0) {
-						backtrackingInfo.best_move = best_move;
-					}
+					backtrackingInfo.best_move = best_move;
 					
 					if (best_eval >= beta) {
 						break;
@@ -1472,12 +1477,17 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!inCheck) {
 				
-				/*if (env.getBitboard().getMoveOps().isCapture(cur_move)
-							&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(env.getBitboard().getMoveOps().getAttackedFigureType(cur_move)) < alpha) {
+				//Skip under promotions
+				/*if (MoveInt.isPromotion(cur_move)) {
+					if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
+						continue;
+					}
+				} else if (MoveInt.isCapture(cur_move)
+						&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
 					//Futility pruning
 					continue;
 				}*/
-			
+				
 				//Skip bad captures
 				int moveSee = env.getBitboard().getSEEScore(cur_move);
 				if (moveSee <= 0) {
@@ -1671,8 +1681,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!inCheck) {
 				
-				/*if (env.getBitboard().getMoveOps().isCapture(cur_move)
-						&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(env.getBitboard().getMoveOps().getAttackedFigureType(cur_move)) < alpha) {
+				//Skip under promotions
+				/*if (MoveInt.isPromotion(cur_move)) {
+					if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
+						continue;
+					}
+				} else if (MoveInt.isCapture(cur_move)
+						&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
 					//Futility pruning
 					continue;
 				}*/
