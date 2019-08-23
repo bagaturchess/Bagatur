@@ -556,8 +556,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					boolean staticPrunning = false;
 					
-					if (!isCheckMove
-						) {
+					if (!isCheckMove) {
 						staticPrunning = true;
 					}
 					
@@ -1182,8 +1181,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					boolean staticPrunning = false;
 					
-					if (!isCheckMove
-						) {
+					if (!isCheckMove) {
 						staticPrunning = true;
 					}
 					
