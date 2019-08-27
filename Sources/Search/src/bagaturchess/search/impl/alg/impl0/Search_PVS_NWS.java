@@ -562,7 +562,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					int lmrReduction = 0;
 					if (!inCheck && rest >= 2) {
-						double rate = Math.floor(Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2));
+						double rate = Math.ceil(Math.max(1, Math.log(searchedCount) * Math.log(rest) / (double) 2));
 						if (!isCapOrProm && !isCheckMove) {
 							rate += 2;
 						} else {
@@ -1187,7 +1187,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					int lmrReduction = 0;
 					if (!inCheck && rest >= 2) {
-						double rate = Math.floor(Math.max(1, Math.log(searchedCount) * Math.log(rest) / 2));
+						double rate = Math.ceil(Math.max(1, Math.log(searchedCount) * Math.log(rest) / (double) 2));
 						if (!isCapOrProm && !isCheckMove) {
 							rate += 2;
 						} else {
@@ -1197,9 +1197,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
-							new_maxdepth - lmrReduction, depth + 1, -alpha_org,
-							rootColour,
-							staticPrunning);
+							new_maxdepth - lmrReduction, depth + 1, -alpha_org, rootColour, staticPrunning);
 					
 					if (cur_eval > alpha_org && (lmrReduction > 0 || staticPrunning) ) {
 						
