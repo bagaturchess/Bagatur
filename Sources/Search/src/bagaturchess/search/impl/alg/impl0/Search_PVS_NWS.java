@@ -50,6 +50,28 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int[] MARGIN_STATIC_NULLMOVE 	= { 0, 60, 130, 210, 300, 400, 510 };
 	private static final int[] MARGIN_RAZORING 			= { 0, 240, 280, 320 };
 	
+	private static final int[][] LMR_REDUCTIONS = new int[64][64];
+	static {
+		for (int searchedCount = 0; searchedCount < 64; searchedCount++) {
+			for (int restdepth = 0; restdepth < 64; restdepth++) {
+				LMR_REDUCTIONS[searchedCount][restdepth] = (int) Math.ceil(Math.max(1, Math.log(searchedCount) * Math.log(restdepth) / (double) 2));
+			}
+		}
+	}
+	
+	private static final int[] STATIC_PRUNING_MOVE_COUNT = new int[64];
+	static {
+		for (int restdepth = 0; restdepth < STATIC_PRUNING_MOVE_COUNT.length; restdepth++) {
+			STATIC_PRUNING_MOVE_COUNT[restdepth] = (int) (3 + Math.pow(restdepth, 2));
+		}
+	}
+	
+	private static final double[] STATIC_PRUNING_HISTORY = new double[64];
+	static {
+		for (int restdepth = 0; restdepth < STATIC_PRUNING_HISTORY.length; restdepth++) {
+			STATIC_PRUNING_HISTORY[restdepth] = 0.32 / Math.pow(2, restdepth);
+		}
+	}
 	
 	private BacktrackingInfo[] backtracking 			= new BacktrackingInfo[MAX_DEPTH + 1];
 	
@@ -161,7 +183,6 @@ public class Search_PVS_NWS extends SearchImpl {
     	    	&& rest >= 5
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
-    			//&& env.getBitboard().getColourToMove() == rootColour
     			){
 			
 			if (inCheck) {
@@ -504,12 +525,12 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (!isCapOrProm) {
 							
 							//Static pruning - move count based
-							if (searchedCount >= 3 + Math.pow(rest, 2)) {
+							if (searchedCount >= STATIC_PRUNING_MOVE_COUNT[rest]) {
 								continue;
 							}
 							
 							//Static pruning - history based
-							if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
+							if (getHistory(inCheck).getScores(cur_move) <= STATIC_PRUNING_HISTORY[rest]) {
 		 						continue;
 		 					}
 							
@@ -562,13 +583,13 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					int lmrReduction = 0;
 					if (!inCheck && rest >= 2) {
-						double rate = Math.ceil(Math.max(1, Math.log(searchedCount) * Math.log(rest) / (double) 2));
+						int rate = LMR_REDUCTIONS[Math.min(63, searchedCount)][Math.min(63, rest)];
 						if (!isCapOrProm && !isCheckMove) {
 							rate += 2;
 						} else {
 							rate += 1;
 						}
-						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
+						lmrReduction += PLY * rate * LMR_REDUCTION_MULTIPLIER;
 					}					
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,
@@ -712,7 +733,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				&& rest >= 5
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
-    			//&& env.getBitboard().getColourToMove() == rootColour
     			){
 			
 			if (inCheck) {
@@ -1127,12 +1147,12 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (!isCapOrProm) {
 							
 							//Static pruning - move count based
-							if (searchedCount >= 3 + Math.pow(rest, 2)) {
+							if (searchedCount >= STATIC_PRUNING_MOVE_COUNT[rest]) {
 								continue;
 							}
 							
 							//Static pruning - history based
-							if (getHistory(inCheck).getScores(cur_move) <= 0.32 / Math.pow(2, rest)) {
+							if (getHistory(inCheck).getScores(cur_move) <= STATIC_PRUNING_HISTORY[rest]) {
 		 						continue;
 		 					}
 							
@@ -1187,13 +1207,13 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					int lmrReduction = 0;
 					if (!inCheck && rest >= 2) {
-						double rate = Math.ceil(Math.max(1, Math.log(searchedCount) * Math.log(rest) / (double) 2));
+						int rate = LMR_REDUCTIONS[Math.min(63, searchedCount)][Math.min(63, rest)];
 						if (!isCapOrProm && !isCheckMove) {
 							rate += 2;
 						} else {
 							rate += 1;
 						}
-						lmrReduction += (int) (PLY * rate * LMR_REDUCTION_MULTIPLIER);
+						lmrReduction += PLY * rate * LMR_REDUCTION_MULTIPLIER;
 					}
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth,

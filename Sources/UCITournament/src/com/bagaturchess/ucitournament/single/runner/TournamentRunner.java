@@ -93,8 +93,8 @@ public class TournamentRunner {
 	public static void main(String[] args) {
 		
 		
-		EngineProcess engine1 = stockfish10;
-		EngineProcess engine2 = bagatur_dev;
+		EngineProcess engine1 = bagatur_18;
+		EngineProcess engine2 = bagatur_workspace;
 		
 		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
@@ -120,9 +120,10 @@ public class TournamentRunner {
 			
 			//MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
 			//MatchRunner matchRunner = new MatchRunner_FixedDepth(9);
-			MatchRunner matchRunner = new MatchRunner_FixedNodes(100000);
+			//MatchRunner matchRunner = new MatchRunner_FixedNodes(10000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(60 * 1000, 60 * 1000, 1 * 1000, 1 * 1000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 100, 100);
+			MatchRunner matchRunner = new MatchRunner_TimeAndInc(5 * 1000, 5 * 1000, 50, 50);
 			
 			Tournament tournament = new Tournament(schedule, matchRunner, false);
 			

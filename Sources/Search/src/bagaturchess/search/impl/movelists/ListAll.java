@@ -190,7 +190,8 @@ public class ListAll implements ISearchMoveList {
 			
 			//int SORT_INDEX = 1;
 			//int SORT_INDEX = 2;
-			int SORT_INDEX = (int) Math.max(1, Math.sqrt(size) / 2);
+			int SORT_INDEX = 3;
+			//int SORT_INDEX = (int) Math.max(1, Math.sqrt(size) / 2);
 			
 			if (SORT_INDEX <= 0) {
 				throw new IllegalStateException();
@@ -202,11 +203,7 @@ public class ListAll implements ISearchMoveList {
 				if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(moves, cur, size);
 				if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(cur, size, moves);
 			} else if (cur < SORT_INDEX) {
-				for (int i = cur; i < size; i++) {
-					int move = (int) moves[i];
-					long ordval = genOrdVal(move);
-					moves[i] = MoveInt.addOrderingValue(move, ordval);
-					
+				for (int i = cur; i < size; i++) {					
 					//Move best move on top
 					if (moves[i] > moves[cur]) {
 						long best_move = moves[i];
