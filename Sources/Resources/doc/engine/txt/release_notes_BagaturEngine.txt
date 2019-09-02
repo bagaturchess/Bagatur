@@ -1,6 +1,6 @@
-Version 1.8a (25 August 2019)
+Version 1.8a (05 September 2019)
   * Enable Syzygy tablebases for SMP version
-  * Now LMR doesn't reduce check moves, moves with SEE >= 0 and nodes with singular move extension enabled
+  * Now LMR has new formula
 
 Version 1.8 (30 July 2019)
   * New evaluation function
