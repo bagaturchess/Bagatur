@@ -302,37 +302,31 @@ public class ListAll implements ISearchMoveList {
 		
 		long ordval = 0;
 		
+		
 		if (move == tptMove) {
 			ordval += ORD_VAL_TPT_MOVE * orderingStatistics.getOrdVal_TPT();
 		}
+		
 		
 		if (move == prevPvMove) {
 			ordval += ORD_VAL_PREVPV_MOVE * orderingStatistics.getOrdVal_PREVPV();
 		}
 		
-		/*if (prevBestMove != 0 && MoveInt.getColour(move) != MoveInt.getColour(prevBestMove)) {
-			throw new IllegalStateException();
-		}*/
 		
 		if (move == prevBestMove) {
 			ordval += ORD_VAL_PREV_BEST_MOVE * orderingStatistics.getOrdVal_PREVBEST();
 		}
 		
-		/*if (mateMove != 0 && MoveInt.getColour(move) != MoveInt.getColour(mateMove)) {
-			throw new IllegalStateException();
-		}*/
 		
 		if (move == mateMove) {
 			ordval += ORD_VAL_MATE_MOVE * orderingStatistics.getOrdVal_MATEMOVE();
 		}
 		
-		/*if (env.getBitboard().isPasserPush(move)) {
-			ordval += ORD_VAL_PASSER_PUSH * orderingStatistics.getOrdVal_PASSER();
-		}*/
 		
 		if (env.getBitboard().getMoveOps().isCastling(move)) {
 			ordval += ORD_VAL_CASTLING * orderingStatistics.getOrdVal_CASTLING();
 		}
+		
 		
 		if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 			
