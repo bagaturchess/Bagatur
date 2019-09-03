@@ -30,7 +30,7 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	private long[][] success;
 	private long[][] failures;
 
-	private static final int MAX_COUNTERS = 3;
+	private static final int MAX_COUNTERS = 5;
 	private int[][][] counters;
 	private IBoard board;
 	
@@ -121,12 +121,12 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	@Override
 	public void addCounterMove(int last_move, int counter_move) {
 		
-		if (board.getMoveOps().isCaptureOrPromotion(counter_move)) {
+		if (board.getMoveOps().isCaptureOrPromotion(last_move)) {
 			return;
 		}
 		
-		int pid = board.getMoveOps().getFigurePID(counter_move);
-		int to = board.getMoveOps().getToFieldID(counter_move);
+		int pid = board.getMoveOps().getFigurePID(last_move);
+		int to = board.getMoveOps().getToFieldID(last_move);
 		
 		if (!isCounterMove(last_move, counter_move)) {
 			int[] counter_moves = counters[pid][to];
@@ -145,8 +145,8 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 			return false;
 		}
 		
-		int pid = board.getMoveOps().getFigurePID(move);
-		int to = board.getMoveOps().getToFieldID(move);
+		int pid = board.getMoveOps().getFigurePID(last_move);
+		int to = board.getMoveOps().getToFieldID(last_move);
 		
 		int[] counter_moves = counters[pid][to];
 				
