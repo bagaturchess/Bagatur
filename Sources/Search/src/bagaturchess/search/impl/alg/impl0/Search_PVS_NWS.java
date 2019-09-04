@@ -351,7 +351,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//IID PV Node
-		/*if (!tpt_found)*/ {
+		{
 			
 			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
@@ -944,7 +944,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//IID NONPV Node
-		/*if (!tpt_found)*/ {
+		{
 			
 			int reduction = (int) (IID_DEPTH_MULTIPLIER * Math.max(2, rest / 2));
 			int iidRest = normDepth(maxdepth - PLY * reduction) - depth;
