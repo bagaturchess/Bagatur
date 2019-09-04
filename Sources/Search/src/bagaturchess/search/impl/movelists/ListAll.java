@@ -488,18 +488,10 @@ public class ListAll implements ISearchMoveList {
 		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
 			return true;
 		}
-
-		/*
-		if( env.getHistory().getScores(move) >= 0.5 ) {
-			return true;
-		}
-		*/
 		
-		/*
-		if( env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) >= 0.5 ) {
+		if( env.getHistory_All().getScores(move) >= 0.5 ) {
 			return true;
 		}
-		*/
 		
 		return false;
 	}
