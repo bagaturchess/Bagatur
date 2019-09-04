@@ -444,24 +444,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (evalDiff < -EVAL_DIFF_MAX) evalDiff = -EVAL_DIFF_MAX;
 		
 		
-		ISearchMoveList list = null;
-		
-		
-		if (!inCheck) {
-			
-			list = lists_all[depth];
-			list.clear();
-			
-			list.setTptMove(tpt_move);
-			list.setPrevBestMove(depth > 1 ? backtracking[depth - 2].best_move : 0);
-			
-		} else {
-			list = lists_escapes[depth];
-			list.clear();
-			
-			list.setTptMove(tpt_move);
-			list.setPrevBestMove(depth > 1 ? backtracking[depth - 2].best_move : 0);
-		}
+		ISearchMoveList list = !inCheck ? lists_all[depth] : lists_escapes[depth];
+		list.clear();
+		list.setTptMove(tpt_move);
+		list.setPrevBestMove(depth > 1 ? backtracking[depth - 2].best_move : 0);
 		
 		
 		int searchedCount = 0;
@@ -1061,24 +1047,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (evalDiff < -EVAL_DIFF_MAX) evalDiff = -EVAL_DIFF_MAX;
 		
 		
-		ISearchMoveList list = null;
-		
-		
-		if (!inCheck) {
-			
-			list = lists_all[depth];
-			list.clear();
-			
-			list.setTptMove(tpt_move);
-			list.setPrevBestMove(depth > 1 ? backtracking[depth - 2].best_move : 0);
-			
-		} else {
-			list = lists_escapes[depth];
-			list.clear();
-			
-			list.setTptMove(tpt_move);
-			list.setPrevBestMove(depth > 1 ? backtracking[depth - 2].best_move : 0);
-		}
+		ISearchMoveList list = !inCheck ? lists_all[depth] : lists_escapes[depth];
+		list.clear();
+		list.setTptMove(tpt_move);
+		list.setPrevBestMove(depth > 1 ? backtracking[depth - 2].best_move : 0);
 		
 		
 		int searchedCount = 0;

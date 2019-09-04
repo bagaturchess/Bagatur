@@ -371,7 +371,7 @@ public class ListAll implements ISearchMoveList {
 		if (move == mateMove) {
 			orderingStatistics.matemove_count++;
 		}
-				
+		
 		/*if (env.getBitboard().isPasserPush(move)) {
 			orderingStatistics.passer_count++;
 		}*/
@@ -449,7 +449,7 @@ public class ListAll implements ISearchMoveList {
 		orderingStatistics.history_count += 1;
 		
 		//orderingStatistics.pst_best += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(bestmove);
-		orderingStatistics.pst_count += 1;
+		//orderingStatistics.pst_count += 1;
 	}
 	
 	private void add(long move) {	
