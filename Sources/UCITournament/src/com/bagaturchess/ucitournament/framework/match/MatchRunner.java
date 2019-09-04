@@ -37,7 +37,7 @@ import bagaturchess.uci.impl.commands.info.Info;
 public abstract class MatchRunner {
 	
 	
-	private static int MAX_EVAL_DIFF = 1000;
+	//private static int MAX_EVAL_DIFF = 1000;
 	
 	
 	public MatchRunner() {
@@ -108,7 +108,7 @@ public abstract class MatchRunner {
 			/**
 			 * Check for big score diff
 			 */
-			int best_eval = infoObj.getEval();
+			/*int best_eval = infoObj.getEval();
 			if (Math.abs(best_eval) > MAX_EVAL_DIFF) {
 				if (bitboard.getColourToMove() == Figures.COLOUR_WHITE) {
 					result = best_eval > 0 ? 1 : -1;
@@ -116,7 +116,7 @@ public abstract class MatchRunner {
 					result = best_eval > 0 ? -1 : 1;
 				}
 				break;
-			}
+			}*/
 			
 			int best_move = BoardUtils.uciStrToMove(bitboard, infoObj.getPv()[0]);
 			bitboard.makeMoveForward(best_move);
