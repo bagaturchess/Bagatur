@@ -591,7 +591,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha, rootColour, staticPrunning);
 					
-					if (cur_eval > best_eval && (lmrReduction > 0 || staticPrunning)) {
+					if (cur_eval > alpha && (lmrReduction > 0 || staticPrunning)) {
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha, rootColour, false);
 					}
@@ -1209,7 +1209,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha_org, rootColour, staticPrunning);
 					
-					if (cur_eval > best_eval && (lmrReduction > 0 || staticPrunning)) {
+					if (cur_eval > alpha_org && (lmrReduction > 0 || staticPrunning)) {
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
 					}
