@@ -88,8 +88,10 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		env = _env;
 		
 		pvman = new PVManager(MAX_DEPTH);
+		
 		lists_all = new ISearchMoveList[MAX_DEPTH];
-		for (int i=0; i<lists_all.length; i++) {
+		lists_all[0] = env.getMoveListFactory().createListAll_Root(env);
+		for (int i=1; i<lists_all.length; i++) {
 			lists_all[i] = env.getMoveListFactory().createListAll(env);
 		}
 		

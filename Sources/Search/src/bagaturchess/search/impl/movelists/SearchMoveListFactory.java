@@ -16,10 +16,15 @@ public class SearchMoveListFactory implements ISearchMoveListFactory {
 	@Override
 	public ISearchMoveList createListAll(SearchEnv env) {
 		return new ListAll(env, env.getOrderingStatistics());
-		//return new ListAll_2Phase(env, env.getOrderingStatistics());
 	}
 
 
+	@Override
+	public ISearchMoveList createListAll_Root(SearchEnv env) {
+		return new ListAll_Root(env, env.getOrderingStatistics());
+	}
+	
+	
 	@Override
 	public ISearchMoveList createListCaptures(SearchEnv env) {
 		return new ListCapsProm(env, env.getOrderingStatistics());
