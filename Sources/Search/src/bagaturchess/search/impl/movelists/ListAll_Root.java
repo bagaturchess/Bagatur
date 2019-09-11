@@ -135,7 +135,7 @@ public class ListAll_Root implements ISearchMoveList {
 	
 	private long genOrdVal(int move) {
 		
-		int ordval = 1000000;
+		int ordval = 10000;
 		
 		env.getBitboard().makeMoveForward(move);
 		TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKey());
@@ -143,28 +143,14 @@ public class ListAll_Root implements ISearchMoveList {
 		
 		if (entry != null) {
 			
-			ordval = 10000 * (ISearch.MAX_DEPTH - entry.getDepth());
+			//ordval = 10000 * (ISearch.MAX_DEPTH - entry.getDepth());
+			//ordval = 10000 * entry.getDepth();
 			
-			/*if (entry.getBestMove_lower() != 0) {
+			if (entry.getBestMove_lower() != 0) {
 				//ordval += 10000;
 				ordval += -entry.getLowerBound();
-			}*/
+			}
 		}
-		
-		/*ordval += (int) (10000d * env.getHistory_All().getScores(move));
-		
-		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
-			ordval += 10000;
-		}
-		
-		int see = env.getBitboard().getSEEScore(move);
-		if (see > 0) {
-			ordval += 10000 + see;
-		} else if (see == 0) {
-			//ordval += 10000;
-		} else {
-			ordval += see / 100;
-		}*/
 		
 		//System.out.println(ordval);
 		
