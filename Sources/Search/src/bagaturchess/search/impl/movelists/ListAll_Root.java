@@ -70,11 +70,11 @@ public class ListAll_Root implements ISearchMoveList {
 		
 		if (cur < size) {
 			
-			int move = (int) moves[cur++];
+			long move = moves[cur++];
 			
-			//System.out.println(move);
+			//System.out.println(MoveInt.getOrderingValue(move));
 			
-			return move;
+			return (int) move;
 			
 		} else {
 			
@@ -135,7 +135,7 @@ public class ListAll_Root implements ISearchMoveList {
 	
 	private long genOrdVal(int move) {
 		
-		int ordval = 10000;
+		int ordval = 0;
 		
 		env.getBitboard().makeMoveForward(move);
 		TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKey());
@@ -147,7 +147,7 @@ public class ListAll_Root implements ISearchMoveList {
 			//ordval = 10000 * entry.getDepth();
 			
 			if (entry.getBestMove_lower() != 0) {
-				//ordval += 10000;
+				ordval += 10000;
 				ordval += -entry.getLowerBound();
 			}
 		}
