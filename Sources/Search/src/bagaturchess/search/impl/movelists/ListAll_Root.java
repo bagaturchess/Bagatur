@@ -41,6 +41,8 @@ public class ListAll_Root implements ISearchMoveList {
 	private int size;
 	private int cur;
 	
+	private boolean generated;
+	
 	private SearchEnv env;
 	
 	
@@ -55,18 +57,23 @@ public class ListAll_Root implements ISearchMoveList {
 		cur = 0;
 		size = 0;
 		
-		genMoves();
-		
-		for (int i=0; i<size; i++) {
-			moves[i] = MoveInt.addOrderingValue((int)moves[i], genOrdVal((int) moves[i]));
-		}
-		
-		if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(moves, cur, size);
-		if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(cur, size, moves);
+		generated = false;
 	}
 	
 	
 	public int next() {
+		
+		if (!generated) {
+			
+			genMoves();
+			
+			for (int i=0; i<size; i++) {
+				moves[i] = MoveInt.addOrderingValue((int)moves[i], genOrdVal((int) moves[i]));
+			}
+			
+			if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(moves, cur, size);
+			if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(cur, size, moves);
+		}
 		
 		if (cur < size) {
 			
@@ -120,6 +127,8 @@ public class ListAll_Root implements ISearchMoveList {
 		if (gen) {
 			env.getBitboard().genAllMoves(this);
 		}
+		
+		generated = true;
 	}
 	
 	
