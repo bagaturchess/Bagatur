@@ -163,9 +163,7 @@ public class ListAll_Root implements ISearchMoveList {
 		
 		ordval += env.getHistory_All().getScores(move) * env.getOrderingStatistics().getOrdVal_HISTORY();
 		
-		env.getBitboard().makeMoveForward(move);
-		TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKey());
-		env.getBitboard().makeMoveBackward(move);
+		TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKeyAfterMove(move));
 		
 		if (entry != null) {
 			if (entry.getBestMove_lower() != 0) {

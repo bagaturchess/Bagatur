@@ -468,6 +468,12 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
+	@Override
+	public long getHashKeyAfterMove(int move) {
+		throw new UnsupportedOperationException("TODO");
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#getPawnsStructure()
 	 */
