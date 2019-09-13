@@ -1307,6 +1307,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		switchLastMoveColour();
 		
 		if (DEBUG) {
+			if (invalidateCheckKeepers) {
 			//if (Properties.DEBUG_LEVEL <= Properties.DEBUG_LEVEL3) {
 				if (hashkey != expected_key) {
 					throw new IllegalStateException("Wrong hash key");
@@ -1315,6 +1316,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 					throw new IllegalStateException("Wrong pawn hash key");
 				}
 			//}
+			}
 		}
 		
 		playedBoardStates.inc(hashkey);
@@ -1631,7 +1633,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	
 	private final long getPawnHashKeyAfterMove(final int move) {
 		
-		if (true) throw new IllegalStateException("Check whether the pawnskay should be updated with the colour"); 
+		//if (true) throw new IllegalStateException("Check whether the pawnskay should be updated with the colour"); 
 		
 		//System.out.println("FW " + playedMovesCount + "-" + (playedMovesCount + 1) + " Before " + Move.moveToString(move) + " = " + hashkey);
 		
@@ -1774,11 +1776,17 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}
 		
 		if (MoveInt.isCapture(move)) { //Capture
-			if (true) throw new IllegalStateException("Fix when is enpass, see the makeForwardMove method where it is fixed.");
 			int capturedPID = MoveInt.getCapturedFigurePID(move);
 			final int capturedFigureType = Constants.PIECE_IDENTITY_2_TYPE[capturedPID];
-			if (capturedFigureType == Figures.TYPE_PAWN) {
-				pawnskey ^= ConstantStructure.MOVES_KEYS[capturedPID][toFieldID];
+			if (MoveInt.isEnpassant(move)) {
+				int capturedFieldID = MoveInt.getEnpassantCapturedFieldID(move);
+				if (capturedFigureType == Figures.TYPE_PAWN) {
+					pawnskey ^= ConstantStructure.MOVES_KEYS[capturedPID][capturedFieldID];
+				}
+			} else {
+				if (capturedFigureType == Figures.TYPE_PAWN) {
+					pawnskey ^= ConstantStructure.MOVES_KEYS[capturedPID][toFieldID];
+				}
 			}
 		} 
 		
@@ -1792,9 +1800,11 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return pawnskey;
 	}
 	
-	private final long getHashKeyAfterMove(final int move) {
+	
+	@Override
+	public final long getHashKeyAfterMove(final int move) {
 		
-		if (true) throw new IllegalStateException("Check whether the pawnskay should be updated with the colour");
+		//if (true) throw new IllegalStateException("Check whether the pawnskay should be updated with the colour");
 		
 		long hashkey = this.hashkey;
 		
@@ -1940,7 +1950,16 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 
 		if (MoveInt.isCapture(move)) { //Capture
 			int capturedPID = MoveInt.getCapturedFigurePID(move);
-			hashkey ^= ConstantStructure.MOVES_KEYS[capturedPID][toFieldID];
+			final int capturedFigureType = Constants.PIECE_IDENTITY_2_TYPE[capturedPID];
+			if (MoveInt.isEnpassant(move)) {
+				int capturedFieldID = MoveInt.getEnpassantCapturedFieldID(move);
+				if (capturedFigureType == Figures.TYPE_PAWN) {
+					hashkey ^= ConstantStructure.MOVES_KEYS[capturedPID][capturedFieldID];
+				}
+			} else {
+				hashkey ^= ConstantStructure.MOVES_KEYS[capturedPID][toFieldID];
+			}
+			
 		} else if (MoveInt.isCastling(move)) {
 
 			int castlePID = figureColour == Figures.COLOUR_WHITE ? Constants.PID_W_ROOK : Constants.PID_B_ROOK;

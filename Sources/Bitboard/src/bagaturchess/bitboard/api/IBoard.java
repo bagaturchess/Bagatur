@@ -30,6 +30,7 @@ public interface IBoard {
 	public void makeNullMoveBackward();
 	
 	public long getHashKey();
+	public long getHashKeyAfterMove(final int move);
 	public long getPawnsHashKey();
 	public int getStateRepetition();
 	
