@@ -300,7 +300,7 @@ public class ListAll implements ISearchMoveList {
 			//System.out.println(orderingStatistics);
 		}
 		
-		long ordval = 0;
+		long ordval = 10000;
 		
 		
 		if (move == tptMove) {

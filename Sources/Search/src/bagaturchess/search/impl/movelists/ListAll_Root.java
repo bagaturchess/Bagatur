@@ -144,7 +144,7 @@ public class ListAll_Root implements ISearchMoveList {
 	
 	private long genOrdVal(int move) {
 		
-		int ordval = 0;
+		int ordval = 10000;
 		
 		if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 			int see = env.getBitboard().getSEEScore(move);
@@ -164,7 +164,6 @@ public class ListAll_Root implements ISearchMoveList {
 		ordval += env.getHistory_All().getScores(move) * env.getOrderingStatistics().getOrdVal_HISTORY();
 		
 		TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKeyAfterMove(move));
-		
 		if (entry != null) {
 			if (entry.getBestMove_lower() != 0) {
 				ordval += OrderingStatistics.MAX_VAL;
