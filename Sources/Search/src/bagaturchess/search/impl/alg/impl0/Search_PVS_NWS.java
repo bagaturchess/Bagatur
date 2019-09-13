@@ -440,6 +440,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		ISearchMoveList list = !inCheck ? lists_all[depth] : lists_escapes[depth];
+		if (!inCheck && depth <= rest) {
+			list = lists_all_root[depth];
+		}
 		list.clear();
 		list.setTptMove(tpt_move);
 		list.setPrevBestMove(depth > 1 ? backtracking[depth - 2].best_move : 0);
@@ -1038,6 +1041,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		ISearchMoveList list = !inCheck ? lists_all[depth] : lists_escapes[depth];
+		if (!inCheck && depth <= rest) {
+			list = lists_all_root[depth];
+		}
 		list.clear();
 		list.setTptMove(tpt_move);
 		list.setPrevBestMove(depth > 1 ? backtracking[depth - 2].best_move : 0);

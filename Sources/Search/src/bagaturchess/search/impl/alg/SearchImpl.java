@@ -61,6 +61,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	private static final int DRAW_SCORE_E = 50;
 	
 	protected ISearchMoveList[] lists_all;
+	protected ISearchMoveList[] lists_all_root;
 	protected ISearchMoveList[] lists_escapes;
 	protected ISearchMoveList[] lists_capsproms;
 	protected PVManager pvman;
@@ -88,14 +89,15 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		env = _env;
 		
 		pvman = new PVManager(MAX_DEPTH);
-		
-		int ROOT_DEPTH = 0;
+
 		lists_all = new ISearchMoveList[MAX_DEPTH];
-		for (int i=0; i<ROOT_DEPTH; i++) {
-			lists_all[i] = env.getMoveListFactory().createListAll_Root(env);
-		}
-		for (int i=ROOT_DEPTH; i<lists_all.length; i++) {
+		for (int i=0; i<lists_all.length; i++) {
 			lists_all[i] = env.getMoveListFactory().createListAll(env);
+		}
+		
+		lists_all_root = new ISearchMoveList[MAX_DEPTH];
+		for (int i=0; i<lists_all_root.length; i++) {
+			lists_all_root[i] = env.getMoveListFactory().createListAll_Root(env);
 		}
 		
 		lists_escapes = new ISearchMoveList[MAX_DEPTH];
