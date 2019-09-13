@@ -146,17 +146,30 @@ public class ListAll_Root implements ISearchMoveList {
 		
 		int ordval = 0;
 		
+		if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
+			int see = env.getBitboard().getSEEScore(move);
+			if (see > 0) {
+				ordval += env.getOrderingStatistics().getOrdVal_WINCAP() + see;
+			} else if (see == 0) {
+				ordval += env.getOrderingStatistics().getOrdVal_EQCAP();
+			} else {
+				ordval += env.getOrderingStatistics().getOrdVal_LOSECAP() + see / 100;
+			}
+		}
+		
+		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
+			ordval += env.getOrderingStatistics().getOrdVal_COUNTER();
+		}
+		
+		ordval += env.getHistory_All().getScores(move) * env.getOrderingStatistics().getOrdVal_HISTORY();
+		
 		env.getBitboard().makeMoveForward(move);
 		TPTEntry entry = env.getTPT().get(env.getBitboard().getHashKey());
 		env.getBitboard().makeMoveBackward(move);
 		
 		if (entry != null) {
-			
-			//ordval = 10000 * (ISearch.MAX_DEPTH - entry.getDepth());
-			//ordval = 10000 * entry.getDepth();
-			
 			if (entry.getBestMove_lower() != 0) {
-				ordval += 10000;
+				ordval += OrderingStatistics.MAX_VAL;
 				ordval += -entry.getLowerBound();
 			}
 		}
