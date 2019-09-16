@@ -27,7 +27,6 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
-import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.tpt.TPTEntry;
@@ -51,6 +50,11 @@ public class ListAll_Root implements ISearchMoveList {
 	public ListAll_Root(SearchEnv _env, OrderingStatistics _orderingStatistics) { 
 		env = _env;
 		moves = new long[256];
+	}
+	
+	
+	@Override
+	public void newSearch() {
 	}
 	
 	
@@ -221,13 +225,9 @@ public class ListAll_Root implements ISearchMoveList {
 	public void setPrevpvMove(int prevpvMove) {
 		throw new IllegalStateException();
 	}
-	
-	@Override
-	public void newSearch() {
-	}
 
 	@Override
 	public void reset() {
-		clear();
+		throw new IllegalStateException();
 	}
 }
