@@ -41,6 +41,8 @@ public class ListAll_Root implements ISearchMoveList {
 	private int size;
 	private int cur;
 	
+	private int prevBestMove;
+	
 	private boolean generated;
 	
 	private SearchEnv env;
@@ -56,6 +58,8 @@ public class ListAll_Root implements ISearchMoveList {
 		
 		cur = 0;
 		size = 0;
+		
+		prevBestMove = 0;
 		
 		generated = false;
 	}
@@ -106,17 +110,8 @@ public class ListAll_Root implements ISearchMoveList {
 				int[] ob_moves = entry.getMoves();
 				int[] ob_counts = entry.getCounts();
 				
-				for (int i=0; i<ob_moves.length; i++) {
-					
-					//if (env.getSearchConfig().getOpenningBook_Mode() == ISearchConfig_AB.OPENNING_BOOK_MODE_POWER2) {
-						//Most played first strategy - use ord val
-						long move_ord = MoveInt.addOrderingValue(ob_moves[i], ob_counts == null ? 1 : ob_counts[i]);
-						add(move_ord);
-						
-					//} else {
-					//	//Random move - in addition randomize naturally without using ordval scores
-					//	add(ob_moves[i]);
-					//}
+				for (int i=0; i<ob_moves.length; i++) {					
+					reserved_add(ob_moves[i]);
 				}
 				
 				
@@ -138,7 +133,7 @@ public class ListAll_Root implements ISearchMoveList {
 	
 	
 	public void reserved_add(int move) {
-		add(move);
+		moves[size++] = move;
 	}
 	
 	
@@ -155,6 +150,10 @@ public class ListAll_Root implements ISearchMoveList {
 			} else {
 				ordval += env.getOrderingStatistics().getOrdVal_LOSECAP() + see / 100;
 			}
+		}
+		
+		if (move == prevBestMove) {
+			ordval += env.getOrderingStatistics().getOrdVal_PREVBEST();
 		}
 		
 		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
@@ -177,6 +176,11 @@ public class ListAll_Root implements ISearchMoveList {
 	}
 	
 	
+	public void setPrevBestMove(int _prevBestMove) {
+		prevBestMove = _prevBestMove;
+	}
+	
+	
 	public void countTotal(int move) {
 		
 	}
@@ -184,20 +188,6 @@ public class ListAll_Root implements ISearchMoveList {
 	
 	public void countSuccess(int bestmove) {
 		
-	}
-	
-	private void add(long move) {	
-		if (size == 0) {
-			moves[0] = move;
-		} else {
-			if (move > moves[0]) {
-				moves[size] = moves[0];
-				moves[0] = move;
-			} else {
-				moves[size] = move;
-			}
-		}
-		size++;
 	}
 	
 	
@@ -219,9 +209,6 @@ public class ListAll_Root implements ISearchMoveList {
 	
 	public void reserved_removeLast() {
 		throw new IllegalStateException();
-	}
-	
-	public void setPrevBestMove(int prevBestMove) {
 	}
 	
 	public void setMateMove(int mateMove) {
