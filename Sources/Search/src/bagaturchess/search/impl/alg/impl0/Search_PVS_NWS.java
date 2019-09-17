@@ -53,7 +53,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	static {
 		for (int searchedCount = 0; searchedCount < 64; searchedCount++) {
 			for (int restdepth = 0; restdepth < 64; restdepth++) {
-				LMR_REDUCTIONS[searchedCount][restdepth] = (int) Math.ceil(Math.max(1, Math.log(searchedCount) * Math.log(restdepth) / (double) 2));
+				LMR_REDUCTIONS[searchedCount][restdepth] = 1 + (int) Math.ceil(Math.max(1, Math.log(searchedCount) * Math.log(restdepth) / (double) 2));
 			}
 		}
 	}
@@ -566,8 +566,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (!inCheck) {
 						int rate = LMR_REDUCTIONS[Math.min(63, searchedCount)][Math.min(63, rest)];
 						if (!isCapOrProm && !isCheckMove) {
-							rate += 2;
-						} else {
 							rate += 1;
 						}
 						lmrReduction += PLY * rate * LMR_REDUCTION_MULTIPLIER;
@@ -1168,8 +1166,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (!inCheck) {
 						int rate = LMR_REDUCTIONS[Math.min(63, searchedCount)][Math.min(63, rest)];
 						if (!isCapOrProm && !isCheckMove) {
-							rate += 2;
-						} else {
 							rate += 1;
 						}
 						lmrReduction += PLY * rate * LMR_REDUCTION_MULTIPLIER;
