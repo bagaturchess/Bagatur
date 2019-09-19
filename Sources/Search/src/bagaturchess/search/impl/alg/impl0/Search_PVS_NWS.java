@@ -227,17 +227,6 @@ public class Search_PVS_NWS extends SearchImpl {
         }
 		
 		
-		boolean disableExts = false;
-		/*if (inCheck && rest < 1) {
-			if (depth >= normDepth(maxdepth)) {
-				maxdepth = PLY * (depth + 1);
-				disableExts = true;
-			}
-		}*/
-		
-		
-		rest = normDepth(maxdepth) - depth;
-		
 		boolean tpt_found = false;
 		boolean tpt_exact = false;
 		int tpt_depth = 0;
@@ -384,7 +373,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 	        if (depth > 0
 	        		//&& rest >= 6//depth
-	        		&& !disableExts
 	        		//&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
 	        		&& tptEntry != null
 	        		//&& tptEntry.getDepth() >= rest - 3
@@ -531,7 +519,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				int new_maxdepth = maxdepth;
-				if (depth > 0 && !disableExts) {
+				if (depth > 0) {
 					//Do extensions here
 					if (cur_move == tpt_move) {
 						new_maxdepth += singularExtension;
