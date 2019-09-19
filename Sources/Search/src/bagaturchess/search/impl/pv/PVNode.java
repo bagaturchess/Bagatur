@@ -36,7 +36,6 @@ public class PVNode {
 	public int eval;
 	public int bestmove;
 	public boolean leaf;
-	public boolean nullmove;
 	
 	
 	public PVNode() {
@@ -47,8 +46,8 @@ public class PVNode {
 	
 	private static void extractPV(PVNode res, List<Integer> result) {
 		PVNode cur = res;
-		while(cur != null && (cur.bestmove != 0 || cur.nullmove)) {
-			result.add( cur.nullmove ? 0 : cur.bestmove);
+		while(cur != null && cur.bestmove != 0) {
+			result.add(cur.bestmove);
 			cur = cur.child;
 			if (cur != null && cur.leaf) {
 				break;
@@ -65,20 +64,6 @@ public class PVNode {
 		for (int i=0; i<result.length; i++) {
 			result[i] = buff.get(i);
 		}
-		return result;
-	}
-	
-	
-	@Override
-	public String toString() {
-		String result = "";
-		
-		PVNode cur = this;
-		while(cur != null && (cur.bestmove != 0 || cur.nullmove)) {
-			result += cur.nullmove ? "OOOO, " : MoveInt.moveToString(cur.bestmove) + ", ";
-			cur = cur.child;
-		}
-		
 		return result;
 	}
 }

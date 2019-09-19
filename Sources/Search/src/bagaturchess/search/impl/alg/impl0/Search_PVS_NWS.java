@@ -163,7 +163,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		node.bestmove = 0;
 		node.eval = MIN;
-		node.nullmove = false;
 		node.leaf = true;
 		
 		if (isDrawPV(depth)) {
@@ -189,7 +188,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.bestmove = 0;
 					node.eval = -getMateVal(depth);
 					node.leaf = true;
-					node.nullmove = false;
 					return node.eval;
 				}
 			} else {
@@ -197,7 +195,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.bestmove = 0;
 					node.eval = getDrawScores(rootColour);
 					node.leaf = true;
-					node.nullmove = false;
 					return node.eval;
 				}
 			}
@@ -213,20 +210,17 @@ public class Search_PVS_NWS extends SearchImpl {
 						node.bestmove = 0;
 						node.eval = 9 * (distanceToDraw - dtz);
 						node.leaf = true;
-						node.nullmove = false;
 						return node.eval;
 					} else {
 						node.bestmove = 0;
 						node.eval = getDrawScores(rootColour);
 						node.leaf = true;
-						node.nullmove = false;
 						return node.eval;
 					}
 				} else if (egtbscore == 0) {
 					node.bestmove = 0;
 					node.eval = getDrawScores(rootColour);
 					node.leaf = true;
-					node.nullmove = false;
 					return node.eval;
 				}
 			}
@@ -285,7 +279,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.bestmove = tpt_move;
 				node.eval = tpt_lower;
 				node.leaf = true;
-				node.nullmove = false;
 				
 				env.getTPT().lock();
 				buff_tpt_depthtracking[0] = 0;
@@ -300,7 +293,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.bestmove = tpt_move;
 					node.eval = tpt_lower;
 					node.leaf = true;
-					node.nullmove = false;
 					
 					
 					env.getTPT().lock();
@@ -316,7 +308,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.bestmove = tpt_move;
 					node.eval = tpt_upper;
 					node.leaf = true;
-					node.nullmove = false;
 					
 					
 					env.getTPT().lock();
@@ -430,7 +421,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		node.bestmove = 0;
 		node.eval = MIN;
-		node.nullmove = false;
 		node.leaf = true;
 		
 		
@@ -607,7 +597,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.bestmove = best_move;
 					node.eval = best_eval;
 					node.leaf = false;
-					node.nullmove = false;
 					
 					if (depth + 1 < MAX_DEPTH) {
 						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
@@ -637,7 +626,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.bestmove = 0;
 					node.eval = -getMateVal(depth);
 					node.leaf = true;
-					node.nullmove = false;
 					return node.eval;
 				} else {
 					throw new IllegalStateException("hashkey=" + hashkey);
@@ -647,14 +635,12 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.bestmove = 0;
 					node.eval = getDrawScores(rootColour);
 					node.leaf = true;
-					node.nullmove = false;
 					return node.eval;
 				} else {
 					//throw new IllegalStateException("hashkey=" + hashkey);
 					node.bestmove = 0;
 					node.eval = backtrackingInfo.static_eval;
 					node.leaf = true;
-					node.nullmove = false;
 					return node.eval;
 				}
 			}
@@ -1270,7 +1256,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		PVNode node = pvman.load(depth);
 		node.bestmove = 0;
 		node.eval = MIN;
-		node.nullmove = false;
 		node.leaf = true;
 		
 		
@@ -1323,7 +1308,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.bestmove = tpt_move;
 				node.eval = tpt_lower;
 				node.leaf = true;
-				node.nullmove = false;
 				
 				env.getTPT().lock();
 				buff_tpt_depthtracking[0] = 0;
@@ -1338,7 +1322,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.bestmove = tpt_move;
 					node.eval = tpt_lower;
 					node.leaf = true;
-					node.nullmove = false;
 					
 					env.getTPT().lock();
 					buff_tpt_depthtracking[0] = 0;
@@ -1353,7 +1336,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.bestmove = tpt_move;
 					node.eval = tpt_upper;
 					node.leaf = true;
-					node.nullmove = false;
 					
 					env.getTPT().lock();
 					buff_tpt_depthtracking[0] = 0;
@@ -1455,7 +1437,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.bestmove = best_move;
 				node.eval = best_eval;
 				node.leaf = false;
-				node.nullmove = false;
 				
 				if (depth + 1 < MAX_DEPTH) {
 					pvman.store(depth + 1, node, pvman.load(depth + 1), true);
@@ -1479,7 +1460,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.bestmove = 0;
 					node.eval = -getMateVal(depth);
 					node.leaf = true;
-					node.nullmove = false;
 					return node.eval;
 				} else {
 					throw new IllegalStateException("!!" + env.getBitboard().toString());
