@@ -155,7 +155,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 
 			node.bestmove = 0;
 			node.eval = MIN;
-			node.nullmove = false;
 			node.leaf = true;
 			
 			depth = tptEntry.getDepth();
@@ -370,7 +369,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		
 		result.bestmove = 0;
 		result.leaf = true;
-		result.nullmove = false;
 		
 		if (info.getSelDepth() < depth) {
 			info.setSelDepth(depth);
@@ -484,69 +482,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		}
 	}
 	
-	protected void testNode(PVNode root) {
-		
-		//if (true) return;
-		
-		//if (!env.getEngineConfiguration().verifyPVAfterSearch()) return;
-		
-		int rootColour = env.getBitboard().getColourToMove();
-		
-		int sign = 1;
-		
-		//int[] moves = info.getPV();
-		int rootEval = root.eval;
-		
-		env.getBitboard().mark();
-		
-		PVNode curr = root;
-		while (!isLeaf(curr)) {
-			
-			if (curr.bestmove == 0) {
-				env.getBitboard().makeNullMoveForward();
-			} else {
-				env.getBitboard().makeMoveForward(curr.bestmove);
-			}
-			sign *= -1;
-			
-			curr = curr.child;
-			if (isLeaf(curr)) {
-				break;
-			}
-		}
-		
-		IEvaluator evaluator = env.getEval();
-		int curEval = (int) (sign * evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, rootColour));
-		
-		if (curEval != rootEval) {
-			IGameStatus status = env.getBitboard().getStatus();
-			if (status == IGameStatus.NONE) {
-				System.out.println("SearchImpl> diff evals: curEval=" + curEval + ",	eval=" + rootEval);
-			}
-		}
-		
-		env.getBitboard().reset();
-		
-		/*
-		
-		do {
-			if (curr.bestmove == 0) {
-				env.getBitboard().makeNullMoveBackward();
-			} else {
-				env.getBitboard().makeMoveBackward(curr.bestmove);
-			}
-			curr = curr.parent;
-		} while (curr != root);
-		
-		*/
-	}
-	
-	private boolean isLeaf(PVNode node) {
-		if (node == null) {
-			return true;
-		}
-		return node.leaf || (node.bestmove == 0 && !node.nullmove);
-	}
 	
 	public PVManager getPvman() {
 		return pvman;
