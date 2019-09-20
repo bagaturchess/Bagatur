@@ -469,10 +469,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				boolean isCapOrProm = env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move);
-				int moveSee = -1;
-				if (isCapOrProm) {
-					moveSee = env.getBitboard().getSEEScore(cur_move);
-				}
 				
 				
 				//Static pruning
@@ -500,8 +496,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						//Static pruning - SEE based
 						if (rest <= 6) {
-							int moveSee_tmp = (moveSee == -1) ? env.getBitboard().getSEEScore(cur_move) : moveSee;
-							if (moveSee_tmp < -20 * rest * rest) {
+							int see = env.getBitboard().getSEEScore(cur_move);
+							if (see < -20 * rest * rest) {
 								continue;
 							}
 						}
@@ -1065,10 +1061,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				boolean isCapOrProm = env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move);
-				int moveSee = -1;
-				if (isCapOrProm) {
-					moveSee = env.getBitboard().getSEEScore(cur_move);
-				}
 				
 				
 				//Static pruning
@@ -1096,8 +1088,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						//Static pruning - SEE based
 						if (rest <= 6) {
-							int moveSee_tmp = (moveSee == -1) ? env.getBitboard().getSEEScore(cur_move) : moveSee;
-							if (moveSee_tmp < -20 * rest * rest) {
+							int see = env.getBitboard().getSEEScore(cur_move);
+							if (see < -20 * rest * rest) {
 								continue;
 							}
 						}
