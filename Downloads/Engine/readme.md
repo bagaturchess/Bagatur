@@ -16,6 +16,11 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 # Revision History
 
+Version 1.8a (20 September 2019)
+  * Enable Syzygy tablebases for SMP version
+  * Corrections in PV search and collection of the best line
+  * Now LMR has new formula
+
 Version 1.8 (30 July 2019)
   * New evaluation function
   * Time control optimization for SMP version - don't use too much time if evaluation changes 
