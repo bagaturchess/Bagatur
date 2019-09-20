@@ -484,7 +484,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							//Static pruning - move count based
 							if (searchedCount >= STATIC_PRUNING_MOVE_COUNT[rest]) {
-								continue;
+								break;
 							}
 							
 							//Static pruning - history based
@@ -494,7 +494,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							//Static pruning - evaluation based
 							if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
-								continue;
+								break;
 							}
 						}
 						
@@ -1080,7 +1080,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							//Static pruning - move count based
 							if (searchedCount >= STATIC_PRUNING_MOVE_COUNT[rest]) {
-								continue;
+								break;
 							}
 							
 							//Static pruning - history based
@@ -1090,7 +1090,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							//Static pruning - evaluation based
 							if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
-								continue;
+								break;
 							}
 						}
 						
@@ -1405,7 +1405,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				//Skip bad captures
 				int moveSee = env.getBitboard().getSEEScore(cur_move);
 				if (moveSee <= 0) {
-					continue;
+					break;
 				}
 			}
 			
@@ -1603,11 +1603,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					//Futility pruning
 					continue;
 				}*/
-	
+				
 				//Skip bad captures
 				int moveSee = env.getBitboard().getSEEScore(cur_move);
 				if (moveSee <= 0) {
-					continue;
+					break;
 				}
 			}
 			

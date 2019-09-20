@@ -50,9 +50,9 @@ public class TournamentRunner {
 															new String [0],
 															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine_DEV\\");
 
-	private static final EngineProcess bagatur_18 			= new EngineProcess("Bagatur 1.8", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.8\\Bagatur_64_1_core.exe",
+	private static final EngineProcess bagatur_18a 			= new EngineProcess("Bagatur 1.8a", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.8a\\Bagatur_64_1_core.exe",
 															new String [0],
-															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.8\\");
+															"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.8a\\");
 
 	
 	private static final EngineProcess bagatur_17 			= new EngineProcess("Bagatur 1.7", "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.1.7\\Bagatur_64_1_core.exe",
@@ -93,7 +93,7 @@ public class TournamentRunner {
 	public static void main(String[] args) {
 		
 		
-		EngineProcess engine1 = bagatur_18;
+		EngineProcess engine1 = bagatur_18a;
 		EngineProcess engine2 = bagatur_workspace;
 		
 		
@@ -118,7 +118,7 @@ public class TournamentRunner {
 			
 			ITournamentSchedule schedule = new TournamentSchedule_2Engines(engines, 100000);
 			
-			MatchRunner matchRunner = new MatchRunner_TimePerMove(3000);
+			MatchRunner matchRunner = new MatchRunner_TimePerMove(500);
 			//MatchRunner matchRunner = new MatchRunner_FixedDepth(7);
 			//MatchRunner matchRunner = new MatchRunner_FixedNodes(100000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 60 * 1000, 10 * 60 * 1000, 10 * 1000, 10 * 1000);
