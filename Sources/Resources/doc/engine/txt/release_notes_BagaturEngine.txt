@@ -1,5 +1,6 @@
 Version 1.8a (05 September 2019)
   * Enable Syzygy tablebases for SMP version
+  * Corrections in PV search and collection of the best line
   * Now LMR has new formula
 
 Version 1.8 (30 July 2019)

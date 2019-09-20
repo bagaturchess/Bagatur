@@ -527,8 +527,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				boolean pv_search = false;
 				int cur_eval;
 				if (searchedCount == 0) {
+					
+					pv_search = true;
 					
 					cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
 					
@@ -551,12 +554,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha, rootColour, staticPrunning);
 					
-					if (cur_eval > alpha && (lmrReduction > 0 || staticPrunning)) {
+					if (cur_eval > alpha) {
 						
-						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha, rootColour, false);
-					}
-					
-					if (cur_eval > best_eval) {
+						pv_search = true;
 						
 						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
 					}
@@ -582,12 +582,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					backtrackingInfo.best_move = best_move;
 					
-					node.bestmove = best_move;
-					node.eval = best_eval;
-					node.leaf = false;
-					
-					if (depth + 1 < MAX_DEPTH) {
-						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
+					if (pv_search) {
+						node.bestmove = best_move;
+						node.eval = best_eval;
+						node.leaf = false;
+						
+						if (depth + 1 < MAX_DEPTH) {
+							pvman.store(depth + 1, node, pvman.load(depth + 1), true);
+						}
 					}
 					
 					if (best_eval >= beta) {
