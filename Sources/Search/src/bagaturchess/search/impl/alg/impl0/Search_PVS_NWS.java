@@ -178,7 +178,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (depth > 1
-    	    	&& rest >= 5
+    	    	&& rest >= 7
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
     			){
@@ -646,7 +646,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
     	
 		if (depth > 1
-				&& rest >= 5
+				&& rest >= 7
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
     			){
@@ -1211,9 +1211,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			node.eval = getDrawScores(rootColour);
 			return node.eval;
 		}
-				
-		
-		boolean inCheck = env.getBitboard().isInCheck();
 		
 		
 		long hashkey = env.getBitboard().getHashKey();
@@ -1296,6 +1293,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
+		
+		
+		boolean inCheck = env.getBitboard().isInCheck();
 		
 		
 		int staticEval = -1;
@@ -1448,9 +1448,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (isDraw()) {
 			return getDrawScores(rootColour);
 		}
-				
-		
-		boolean inCheck = env.getBitboard().isInCheck();
 		
 		
 		long hashkey = env.getBitboard().getHashKey();
@@ -1500,6 +1497,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
+		
+		
+		boolean inCheck = env.getBitboard().isInCheck();
 		
 		
 		int staticEval = -1;
