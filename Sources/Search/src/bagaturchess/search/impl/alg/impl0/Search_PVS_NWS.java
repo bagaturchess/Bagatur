@@ -471,40 +471,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				boolean isCapOrProm = env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move);
 				
 				
-				//Static pruning
-				/*if (STATIC_PRUNING2 && !inCheck && !env.getBitboard().isCheckMove(cur_move)) {
-					
-					if (searchedCount >= 4 && rest <= 8 && depth >= rest) {
-						
-						if (!isCapOrProm) {
-							
-							//Static pruning - move count based
-							if (searchedCount >= STATIC_PRUNING_MOVE_COUNT[rest]) {
-								break;
-							}
-							
-							//Static pruning - history based
-							if (getHistory(inCheck).getScores(cur_move) <= STATIC_PRUNING_HISTORY[rest]) {
-		 						continue;
-		 					}
-							
-							//Static pruning - evaluation based
-							if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
-								break;
-							}
-						}
-						
-						//Static pruning - SEE based
-						if (rest <= 6) {
-							int see = env.getBitboard().getSEEScore(cur_move);
-							if (see < -20 * rest * rest) {
-								continue;
-							}
-						}
-					}
-				}*/
-				
-				
 				env.getBitboard().makeMoveForward(cur_move);
 				
 				
