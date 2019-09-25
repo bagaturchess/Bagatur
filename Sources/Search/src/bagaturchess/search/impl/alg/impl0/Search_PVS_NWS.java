@@ -261,7 +261,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getTPT().unlock();
 		}
 		
-		if (backtrackingInfo.excluded_move == 0
+		/*if (backtrackingInfo.excluded_move == 0
 				&& tpt_found && tpt_depth >= rest
 			) {
 			if (tpt_exact) {
@@ -274,9 +274,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
 				env.getTPT().unlock();
 				
-				if (buff_tpt_depthtracking[0] >= rest) {
+				//if (buff_tpt_depthtracking[0] >= rest) {
 					return node.eval;
-				}
+				//}
 			} else {
 				if (tpt_lower >= beta) {
 					node.bestmove = tpt_move;
@@ -289,9 +289,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
 					env.getTPT().unlock();
 					
-					if (buff_tpt_depthtracking[0] >= rest) {
+					//if (buff_tpt_depthtracking[0] >= rest) {
 						return node.eval;
-					}
+					//}
 				}
 				if (tpt_upper <= alpha_org) {
 					node.bestmove = tpt_move;
@@ -304,12 +304,12 @@ public class Search_PVS_NWS extends SearchImpl {
 					extractFromTPT(info, rest, node, false, buff_tpt_depthtracking, rootColour, env.getTPT());
 					env.getTPT().unlock();
 					
-					if (buff_tpt_depthtracking[0] >= rest) {
+					//if (buff_tpt_depthtracking[0] >= rest) {
 						return node.eval;
-					}
+					//}
 				}
 			}
-		}
+		}*/
     	
     	
 		if (depth >= normDepth(maxdepth)) {
@@ -1259,9 +1259,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
 				env.getTPT().unlock();
 				
-				if (buff_tpt_depthtracking[0] >= 0) {
+				//if (buff_tpt_depthtracking[0] >= 0) {
 					return node.eval;
-				}
+				//}
 			} else {
 				if (tpt_lower >= beta) {
 					node.bestmove = tpt_move;
@@ -1273,9 +1273,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
 					env.getTPT().unlock();
 					
-					if (buff_tpt_depthtracking[0] >= 0) {
+					//if (buff_tpt_depthtracking[0] >= 0) {
 						return node.eval;
-					}
+					//}
 				}
 				if (tpt_upper <= alpha_org) {
 					node.bestmove = tpt_move;
@@ -1287,9 +1287,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					extractFromTPT(info, 0, node, false, buff_tpt_depthtracking, rootColour, env.getTPT());
 					env.getTPT().unlock();
 					
-					if (buff_tpt_depthtracking[0] >= 0) {
+					//if (buff_tpt_depthtracking[0] >= 0) {
 						return node.eval;
-					}
+					//}
 				}
 			}
 		}
@@ -1345,27 +1345,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				continue;
 			}
 			searchedMoves++;
-			
-			
-			if (!inCheck) {
-				
-				//Skip under promotions
-				/*if (MoveInt.isPromotion(cur_move)) {
-					if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
-						continue;
-					}
-				} else if (MoveInt.isCapture(cur_move)
-						&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
-					//Futility pruning
-					continue;
-				}*/
-				
-				//Skip bad captures
-				int moveSee = env.getBitboard().getSEEScore(cur_move);
-				if (moveSee <= 0) {
-					break;
-				}
-			}
 			
 			
 			env.getBitboard().makeMoveForward(cur_move);
@@ -1550,18 +1529,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			if (!inCheck) {
-				
-				//Skip under promotions
-				/*if (MoveInt.isPromotion(cur_move)) {
-					if (MoveInt.getPromotionFigureType(cur_move) != Constants.TYPE_QUEEN) {
-						continue;
-					}
-				} else if (MoveInt.isCapture(cur_move)
-						&& staticEval + env.getBitboard().getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move)) < alpha) {
-					//Futility pruning
-					continue;
-				}*/
-				
 				//Skip bad captures
 				int moveSee = env.getBitboard().getSEEScore(cur_move);
 				if (moveSee <= 0) {
