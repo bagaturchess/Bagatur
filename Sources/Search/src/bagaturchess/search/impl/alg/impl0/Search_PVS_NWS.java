@@ -242,7 +242,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		boolean tpt_found = false;
 		boolean tpt_exact = false;
-		int tpt_depth = 0;
 		int tpt_lower = MIN;
 		int tpt_upper = MAX;
 		int tpt_move = 0;
@@ -254,7 +253,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (tptEntry != null) {
 					tpt_found = true;
 					tpt_exact = tptEntry.isExact();
-					tpt_depth = tptEntry.getDepth();
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
 					if (tpt_exact) {
@@ -294,7 +292,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (tptEntry != null) {
 					tpt_found = true;
 					tpt_exact = tptEntry.isExact();
-					tpt_depth = tptEntry.getDepth();
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
 					if (tpt_exact) {
@@ -1192,7 +1189,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		boolean tpt_exact = false;
-		boolean tpt_found = false;
 		int tpt_move = 0;
 		int tpt_lower = MIN;
 		int tpt_upper = MAX;
@@ -1202,7 +1198,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			{
 				TPTEntry tptEntry = env.getTPT().get(hashkey);
 				if (tptEntry != null) {
-					tpt_found = true;
 					tpt_exact = tptEntry.isExact();
 					tpt_lower = tptEntry.getLowerBound();
 					tpt_upper = tptEntry.getUpperBound();
