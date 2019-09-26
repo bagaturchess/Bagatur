@@ -157,7 +157,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
 		
-		long hashkey = env.getBitboard().getHashKey();
 		
 		PVNode node = pvman.load(depth);
 		
@@ -225,6 +224,20 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
         }
+    	
+    	
+		if (depth >= normDepth(maxdepth)) {
+			
+			/*if (inCheck) {
+				throw new IllegalStateException("inCheck: depth >= normDepth(maxdepth)");
+			}*/
+			
+			node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
+			return node.eval;
+		}
+		
+		
+		long hashkey = env.getBitboard().getHashKey();
 		
 		
 		boolean tpt_found = false;
@@ -259,67 +272,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 			env.getTPT().unlock();
-		}
-		
-		/*if (backtrackingInfo.excluded_move == 0
-				&& tpt_found && tpt_depth >= rest
-			) {
-			if (tpt_exact) {
-				node.bestmove = tpt_move;
-				node.eval = tpt_lower;
-				node.leaf = true;
-				
-				env.getTPT().lock();
-				buff_tpt_depthtracking[0] = 0;
-				extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
-				env.getTPT().unlock();
-				
-				//if (buff_tpt_depthtracking[0] >= rest) {
-					return node.eval;
-				//}
-			} else {
-				if (tpt_lower >= beta) {
-					node.bestmove = tpt_move;
-					node.eval = tpt_lower;
-					node.leaf = true;
-					
-					
-					env.getTPT().lock();
-					buff_tpt_depthtracking[0] = 0;
-					extractFromTPT(info, rest, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
-					env.getTPT().unlock();
-					
-					//if (buff_tpt_depthtracking[0] >= rest) {
-						return node.eval;
-					//}
-				}
-				if (tpt_upper <= alpha_org) {
-					node.bestmove = tpt_move;
-					node.eval = tpt_upper;
-					node.leaf = true;
-					
-					
-					env.getTPT().lock();
-					buff_tpt_depthtracking[0] = 0;
-					extractFromTPT(info, rest, node, false, buff_tpt_depthtracking, rootColour, env.getTPT());
-					env.getTPT().unlock();
-					
-					//if (buff_tpt_depthtracking[0] >= rest) {
-						return node.eval;
-					//}
-				}
-			}
-		}*/
-    	
-    	
-		if (depth >= normDepth(maxdepth)) {
-			
-			/*if (inCheck) {
-				throw new IllegalStateException("inCheck: depth >= normDepth(maxdepth)");
-			}*/
-			
-			node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
-			return node.eval;
 		}
 		
 		
@@ -632,7 +584,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
 		
-		long hashkey = env.getBitboard().getHashKey();
 		
 		if (isDraw()) {
 			return getDrawScores(rootColour);
@@ -681,14 +632,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		boolean disableExts = false;
-		/*if (inCheck && rest < 1) {
-			if (depth >= normDepth(maxdepth)) {
-				maxdepth = PLY * (depth + 1);
-				disableExts = true;
-			}
-		}*/
 		
-		rest = normDepth(maxdepth) - depth;
+		
+		long hashkey = env.getBitboard().getHashKey();
+		
 		
 		boolean tpt_found = false;
 		boolean tpt_exact = false;
@@ -696,7 +643,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		int tpt_lower = MIN;
 		int tpt_upper = MAX;
 		int tpt_move = 0;
-		
         
 		if (allowTPTAccess(maxdepth, depth)) {
 			env.getTPT().lock();
@@ -1213,6 +1159,35 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		boolean inCheck = env.getBitboard().isInCheck();
+		
+		
+		int staticEval = -1;
+		if (!inCheck) {
+			staticEval = lazyEval(depth, alpha_org, beta, rootColour);
+			
+			if (staticEval >= beta) {
+				staticEval = fullEval(depth, alpha_org, beta, rootColour);
+			}
+		}
+		
+		
+		if (!inCheck) {
+			
+			//Beta cutoff
+			if (staticEval >= beta) {
+				node.eval = staticEval;
+				return node.eval;
+			}
+			
+			//Alpha cutoff
+			if (staticEval + env.getBitboard().getBoardConfig().getMaterial_QUEEN_E() < alpha_org) {
+				node.eval = staticEval;
+				return node.eval;
+			}
+		}
+    	
+		
 		long hashkey = env.getBitboard().getHashKey();
 		
 		
@@ -1248,81 +1223,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getTPT().unlock();
 		}
 		
-		if (tpt_found) {
-			if (tpt_exact) {
-				node.bestmove = tpt_move;
-				node.eval = tpt_lower;
-				node.leaf = true;
-				
-				env.getTPT().lock();
-				buff_tpt_depthtracking[0] = 0;
-				extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
-				env.getTPT().unlock();
-				
-				//if (buff_tpt_depthtracking[0] >= 0) {
-					return node.eval;
-				//}
-			} else {
-				if (tpt_lower >= beta) {
-					node.bestmove = tpt_move;
-					node.eval = tpt_lower;
-					node.leaf = true;
-					
-					env.getTPT().lock();
-					buff_tpt_depthtracking[0] = 0;
-					extractFromTPT(info, 0, node, true, buff_tpt_depthtracking, rootColour, env.getTPT());
-					env.getTPT().unlock();
-					
-					//if (buff_tpt_depthtracking[0] >= 0) {
-						return node.eval;
-					//}
-				}
-				if (tpt_upper <= alpha_org) {
-					node.bestmove = tpt_move;
-					node.eval = tpt_upper;
-					node.leaf = true;
-					
-					env.getTPT().lock();
-					buff_tpt_depthtracking[0] = 0;
-					extractFromTPT(info, 0, node, false, buff_tpt_depthtracking, rootColour, env.getTPT());
-					env.getTPT().unlock();
-					
-					//if (buff_tpt_depthtracking[0] >= 0) {
-						return node.eval;
-					//}
-				}
-			}
-		}
-		
-		
-		boolean inCheck = env.getBitboard().isInCheck();
-		
-		
-		int staticEval = -1;
-		if (!inCheck) {
-			staticEval = lazyEval(depth, alpha_org, beta, rootColour);
-			
-			if (staticEval >= beta) {
-				staticEval = fullEval(depth, alpha_org, beta, rootColour);
-			}
-		}
-		
-		
-		if (!inCheck) {
-			
-			//Beta cutoff
-			if (staticEval >= beta) {
-				node.eval = staticEval;
-				return node.eval;
-			}
-			
-			//Alpha cutoff
-			if (staticEval + env.getBitboard().getBoardConfig().getMaterial_QUEEN_E() < alpha_org) {
-				node.eval = staticEval;
-				return node.eval;
-			}
-		}
-    	
     	
 		ISearchMoveList list = inCheck ? lists_escapes[depth] : lists_capsproms[depth];
 		list.clear();
