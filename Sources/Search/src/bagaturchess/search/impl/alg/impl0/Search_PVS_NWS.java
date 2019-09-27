@@ -1224,7 +1224,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		list.setTptMove(tpt_move);
 		
 		
-		int legalMoves = 0;
 		int best_eval = inCheck ? MIN : staticEval;
 		int best_move = 0;
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
@@ -1245,9 +1244,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getBitboard().makeMoveForward(cur_move);
 			
 			
-			legalMoves++;
+			int cur_eval = -nullwin_qsearch(mediator, info, initial_maxdepth, depth + 1, -alpha, rootColour);
+			if (cur_eval > best_eval) {
+				cur_eval = -pv_qsearch(mediator, info, initial_maxdepth, depth + 1, -beta, -alpha, rootColour);
+			}
 			
-			int cur_eval = -pv_qsearch(mediator, info, initial_maxdepth, depth + 1, -beta, -alpha, rootColour);
 			
 			env.getBitboard().makeMoveBackward(cur_move);
 			
@@ -1278,7 +1279,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (best_move == 0) {
 			if (inCheck) {
-				if (legalMoves == 0) {
+				if (searchedMoves == 0) {
 					node.bestmove = 0;
 					node.eval = -getMateVal(depth);
 					node.leaf = true;
@@ -1405,7 +1406,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		list.setTptMove(tpt_move);
 		
 		
-		int legalMoves = 0;
 		int best_eval = inCheck ? MIN : staticEval;
 		int best_move = 0;
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
@@ -1435,8 +1435,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getBitboard().makeMoveForward(cur_move);
 			
 			
-			legalMoves++;
-			
 			int cur_eval = -nullwin_qsearch(mediator, info, initial_maxdepth, depth + 1, -alpha, rootColour);
 			
 			env.getBitboard().makeMoveBackward(cur_move);
@@ -1449,17 +1447,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (best_eval >= beta) {
 					break;
 				}
-				
-				if (best_eval > alpha) {
-					throw new IllegalStateException("best_eval > alpha");
-				}
 			}
 			
 		} while ((cur_move = list.next()) != 0);
 		
 		if (best_move == 0) {
 			if (inCheck) {
-				if (legalMoves == 0) {
+				if (searchedMoves == 0) {
 					return -getMateVal(depth);
 				} else {
 					throw new IllegalStateException("best_move == 0 && legalMoves != 0");
