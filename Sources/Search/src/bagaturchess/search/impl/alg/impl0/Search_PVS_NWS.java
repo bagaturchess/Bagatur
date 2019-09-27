@@ -122,10 +122,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		return this.pv_search(mediator, info, initial_maxdepth, maxdepth, depth, alpha_org, beta, rootColour);
+		return pv_search(mediator, info, initial_maxdepth, maxdepth, depth, alpha_org, beta, rootColour);
 	}
-
-
+	
+	
 	@Override
 	public int nullwin_search(ISearchMediator mediator, ISearchInfo info,
 			int initial_maxdepth, int maxdepth, int depth, int beta,
