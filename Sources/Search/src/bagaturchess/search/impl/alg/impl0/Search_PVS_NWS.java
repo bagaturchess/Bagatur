@@ -246,31 +246,29 @@ public class Search_PVS_NWS extends SearchImpl {
 		int tpt_upper = MAX;
 		int tpt_move = 0;
 		
-		if (allowTPTAccess(maxdepth, depth)) {
-			env.getTPT().lock();
-			{
-				TPTEntry tptEntry = env.getTPT().get(hashkey);
-				if (tptEntry != null) {
-					tpt_found = true;
-					tpt_exact = tptEntry.isExact();
-					tpt_lower = tptEntry.getLowerBound();
-					tpt_upper = tptEntry.getUpperBound();
-					if (tpt_exact) {
-						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_lower >= beta) {
-						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= alpha_org) {
+		env.getTPT().lock();
+		{
+			TPTEntry tptEntry = env.getTPT().get(hashkey);
+			if (tptEntry != null) {
+				tpt_found = true;
+				tpt_exact = tptEntry.isExact();
+				tpt_lower = tptEntry.getLowerBound();
+				tpt_upper = tptEntry.getUpperBound();
+				if (tpt_exact) {
+					tpt_move = tptEntry.getBestMove_lower();
+				} else if (tpt_lower >= beta) {
+					tpt_move = tptEntry.getBestMove_lower();
+				} else if (tpt_upper <= alpha_org) {
+					tpt_move = tptEntry.getBestMove_upper();
+				} else {
+					tpt_move = tptEntry.getBestMove_lower();
+					if (tpt_move == 0) {
 						tpt_move = tptEntry.getBestMove_upper();
-					} else {
-						tpt_move = tptEntry.getBestMove_lower();
-						if (tpt_move == 0) {
-							tpt_move = tptEntry.getBestMove_upper();
-						}
 					}
 				}
 			}
-			env.getTPT().unlock();
 		}
+		env.getTPT().unlock();
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
@@ -286,29 +284,27 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta, rootColour, false);
 			
-			if (allowTPTAccess(maxdepth, depth)) {
-				env.getTPT().lock();
-				TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
-				if (tptEntry != null) {
-					tpt_found = true;
-					tpt_exact = tptEntry.isExact();
-					tpt_lower = tptEntry.getLowerBound();
-					tpt_upper = tptEntry.getUpperBound();
-					if (tpt_exact) {
-						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_lower >= beta) {
-						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= alpha_org) {
+			env.getTPT().lock();
+			TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
+			if (tptEntry != null) {
+				tpt_found = true;
+				tpt_exact = tptEntry.isExact();
+				tpt_lower = tptEntry.getLowerBound();
+				tpt_upper = tptEntry.getUpperBound();
+				if (tpt_exact) {
+					tpt_move = tptEntry.getBestMove_lower();
+				} else if (tpt_lower >= beta) {
+					tpt_move = tptEntry.getBestMove_lower();
+				} else if (tpt_upper <= alpha_org) {
+					tpt_move = tptEntry.getBestMove_upper();
+				} else {
+					tpt_move = tptEntry.getBestMove_lower();
+					if (tpt_move == 0) {
 						tpt_move = tptEntry.getBestMove_upper();
-					} else {
-						tpt_move = tptEntry.getBestMove_lower();
-						if (tpt_move == 0) {
-							tpt_move = tptEntry.getBestMove_upper();
-						}
 					}
 				}
-				env.getTPT().unlock();
 			}
+			env.getTPT().unlock();
 		}
         
         
@@ -552,7 +548,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (backtrackingInfo.excluded_move == 0 && allowTPTAccess(maxdepth, depth)) {
+		if (backtrackingInfo.excluded_move == 0) {
 			env.getTPT().lock();
 			env.getTPT().put(hashkey, normDepth(maxdepth), depth, colourToMove, best_eval, alpha_org, beta, best_move, (byte)0);
 			env.getTPT().unlock();
@@ -641,32 +637,32 @@ public class Search_PVS_NWS extends SearchImpl {
 		int tpt_upper = MAX;
 		int tpt_move = 0;
         
-		if (allowTPTAccess(maxdepth, depth)) {
-			env.getTPT().lock();
-			{
-				TPTEntry tptEntry = env.getTPT().get(hashkey);
-				if (tptEntry != null) {
-					tpt_found = true;
-					tpt_exact = tptEntry.isExact();
-					tpt_depth = tptEntry.getDepth();
-					tpt_lower = tptEntry.getLowerBound();
-					tpt_upper = tptEntry.getUpperBound();
-					if (tpt_exact) {
-						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_lower >= beta) {
-						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= alpha_org) {
+		
+		env.getTPT().lock();
+		{
+			TPTEntry tptEntry = env.getTPT().get(hashkey);
+			if (tptEntry != null) {
+				tpt_found = true;
+				tpt_exact = tptEntry.isExact();
+				tpt_depth = tptEntry.getDepth();
+				tpt_lower = tptEntry.getLowerBound();
+				tpt_upper = tptEntry.getUpperBound();
+				if (tpt_exact) {
+					tpt_move = tptEntry.getBestMove_lower();
+				} else if (tpt_lower >= beta) {
+					tpt_move = tptEntry.getBestMove_lower();
+				} else if (tpt_upper <= alpha_org) {
+					tpt_move = tptEntry.getBestMove_upper();
+				} else {
+					tpt_move = tptEntry.getBestMove_lower();
+					if (tpt_move == 0) {
 						tpt_move = tptEntry.getBestMove_upper();
-					} else {
-						tpt_move = tptEntry.getBestMove_lower();
-						if (tpt_move == 0) {
-							tpt_move = tptEntry.getBestMove_upper();
-						}
 					}
 				}
 			}
-			env.getTPT().unlock();
 		}
+		env.getTPT().unlock();
+		
 		
 		if (backtrackingInfo.excluded_move == 0
 				&& tpt_found && tpt_depth >= rest) {
@@ -789,32 +785,30 @@ public class Search_PVS_NWS extends SearchImpl {
 						//System.out.println("zungzwang hit");
 					}
 					
-					if (allowTPTAccess(maxdepth, depth)) {
-						env.getTPT().lock();
-						{
-							TPTEntry tptEntry = env.getTPT().get(hashkey);
-							if (tptEntry != null) {
-								tpt_found = true;
-								tpt_exact = tptEntry.isExact();
-								tpt_depth = tptEntry.getDepth();
-								tpt_lower = tptEntry.getLowerBound();
-								tpt_upper = tptEntry.getUpperBound();
-								if (tpt_exact) {
-									tpt_move = tptEntry.getBestMove_lower();
-								} else if (tpt_lower >= beta) {
-									tpt_move = tptEntry.getBestMove_lower();
-								} else if (tpt_upper <= alpha_org) {
+					env.getTPT().lock();
+					{
+						TPTEntry tptEntry = env.getTPT().get(hashkey);
+						if (tptEntry != null) {
+							tpt_found = true;
+							tpt_exact = tptEntry.isExact();
+							tpt_depth = tptEntry.getDepth();
+							tpt_lower = tptEntry.getLowerBound();
+							tpt_upper = tptEntry.getUpperBound();
+							if (tpt_exact) {
+								tpt_move = tptEntry.getBestMove_lower();
+							} else if (tpt_lower >= beta) {
+								tpt_move = tptEntry.getBestMove_lower();
+							} else if (tpt_upper <= alpha_org) {
+								tpt_move = tptEntry.getBestMove_upper();
+							} else {
+								tpt_move = tptEntry.getBestMove_lower();
+								if (tpt_move == 0) {
 									tpt_move = tptEntry.getBestMove_upper();
-								} else {
-									tpt_move = tptEntry.getBestMove_lower();
-									if (tpt_move == 0) {
-										tpt_move = tptEntry.getBestMove_upper();
-									}
 								}
 							}
 						}
-						env.getTPT().unlock();
 					}
+					env.getTPT().unlock();
 				}
 			}
 		}
@@ -827,30 +821,28 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta, rootColour, false);
 			
-			if (allowTPTAccess(maxdepth, depth)) {
-				env.getTPT().lock();
-				TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
-				if (tptEntry != null) {
-					tpt_found = true;
-					tpt_exact = tptEntry.isExact();
-					tpt_depth = tptEntry.getDepth();
-					tpt_lower = tptEntry.getLowerBound();
-					tpt_upper = tptEntry.getUpperBound();
-					if (tpt_exact) {
-						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_lower >= beta) {
-						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= alpha_org) {
+			env.getTPT().lock();
+			TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
+			if (tptEntry != null) {
+				tpt_found = true;
+				tpt_exact = tptEntry.isExact();
+				tpt_depth = tptEntry.getDepth();
+				tpt_lower = tptEntry.getLowerBound();
+				tpt_upper = tptEntry.getUpperBound();
+				if (tpt_exact) {
+					tpt_move = tptEntry.getBestMove_lower();
+				} else if (tpt_lower >= beta) {
+					tpt_move = tptEntry.getBestMove_lower();
+				} else if (tpt_upper <= alpha_org) {
+					tpt_move = tptEntry.getBestMove_upper();
+				} else {
+					tpt_move = tptEntry.getBestMove_lower();
+					if (tpt_move == 0) {
 						tpt_move = tptEntry.getBestMove_upper();
-					} else {
-						tpt_move = tptEntry.getBestMove_lower();
-						if (tpt_move == 0) {
-							tpt_move = tptEntry.getBestMove_upper();
-						}
 					}
 				}
-				env.getTPT().unlock();
 			}
+			env.getTPT().unlock();
 		}
 		
 		
@@ -1117,7 +1109,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (backtrackingInfo.excluded_move == 0 && allowTPTAccess(maxdepth, depth)) {
+		if (backtrackingInfo.excluded_move == 0) {
 			env.getTPT().lock();
 			env.getTPT().put(hashkey, normDepth(maxdepth), depth, colourToMove, best_eval, alpha_org, beta, best_move, (byte)0);
 			env.getTPT().unlock();
@@ -1193,30 +1185,28 @@ public class Search_PVS_NWS extends SearchImpl {
 		int tpt_lower = MIN;
 		int tpt_upper = MAX;
 		
-		if (allowTPTAccess(initial_maxdepth, depth)) {
-			env.getTPT().lock();
-			{
-				TPTEntry tptEntry = env.getTPT().get(hashkey);
-				if (tptEntry != null) {
-					tpt_exact = tptEntry.isExact();
-					tpt_lower = tptEntry.getLowerBound();
-					tpt_upper = tptEntry.getUpperBound();
-					if (tpt_exact) {
-						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_lower >= beta) {
-						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= alpha_org) {
+		env.getTPT().lock();
+		{
+			TPTEntry tptEntry = env.getTPT().get(hashkey);
+			if (tptEntry != null) {
+				tpt_exact = tptEntry.isExact();
+				tpt_lower = tptEntry.getLowerBound();
+				tpt_upper = tptEntry.getUpperBound();
+				if (tpt_exact) {
+					tpt_move = tptEntry.getBestMove_lower();
+				} else if (tpt_lower >= beta) {
+					tpt_move = tptEntry.getBestMove_lower();
+				} else if (tpt_upper <= alpha_org) {
+					tpt_move = tptEntry.getBestMove_upper();
+				} else {
+					tpt_move = tptEntry.getBestMove_lower();
+					if (tpt_move == 0) {
 						tpt_move = tptEntry.getBestMove_upper();
-					} else {
-						tpt_move = tptEntry.getBestMove_lower();
-						if (tpt_move == 0) {
-							tpt_move = tptEntry.getBestMove_upper();
-						}
 					}
 				}
 			}
-			env.getTPT().unlock();
 		}
+		env.getTPT().unlock();
 		
     	
 		ISearchMoveList list = inCheck ? lists_escapes[depth] : lists_capsproms[depth];
@@ -1292,16 +1282,15 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
-		if (allowTPTAccess(initial_maxdepth, depth)) {
-			if (best_move != 0) {
-				env.getTPT().lock();
-				env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
-				env.getTPT().unlock();
-			}
+		if (best_move != 0) {
+			env.getTPT().lock();
+			env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
+			env.getTPT().unlock();
 		}
 		
 		return best_eval;
 	}
+	
 	
 	private int nullwin_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int beta, int rootColour) {
 		
@@ -1334,31 +1323,29 @@ public class Search_PVS_NWS extends SearchImpl {
 		int tpt_upper = MAX;
 		int tpt_move = 0;
 		
-		if (allowTPTAccess(initial_maxdepth, depth)) {
-			env.getTPT().lock();
-			{
-				TPTEntry tptEntry = env.getTPT().get(hashkey);
-				if (tptEntry != null) {
-					tpt_found = true;
-					tpt_exact = tptEntry.isExact();
-					tpt_lower = tptEntry.getLowerBound();
-					tpt_upper = tptEntry.getUpperBound();
-					if (tpt_exact) {
-						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_lower >= beta) {
-						tpt_move = tptEntry.getBestMove_lower();
-					} else if (tpt_upper <= alpha_org) {
+		env.getTPT().lock();
+		{
+			TPTEntry tptEntry = env.getTPT().get(hashkey);
+			if (tptEntry != null) {
+				tpt_found = true;
+				tpt_exact = tptEntry.isExact();
+				tpt_lower = tptEntry.getLowerBound();
+				tpt_upper = tptEntry.getUpperBound();
+				if (tpt_exact) {
+					tpt_move = tptEntry.getBestMove_lower();
+				} else if (tpt_lower >= beta) {
+					tpt_move = tptEntry.getBestMove_lower();
+				} else if (tpt_upper <= alpha_org) {
+					tpt_move = tptEntry.getBestMove_upper();
+				} else {
+					tpt_move = tptEntry.getBestMove_lower();
+					if (tpt_move == 0) {
 						tpt_move = tptEntry.getBestMove_upper();
-					} else {
-						tpt_move = tptEntry.getBestMove_lower();
-						if (tpt_move == 0) {
-							tpt_move = tptEntry.getBestMove_upper();
-						}
 					}
 				}
 			}
-			env.getTPT().unlock();
 		}
+		env.getTPT().unlock();
 		
 		if (tpt_found) {
 			if (tpt_exact) {
@@ -1463,20 +1450,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
-		if (allowTPTAccess(initial_maxdepth, depth)) {
-			if (best_move != 0) {
-				env.getTPT().lock();
-				env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
-				env.getTPT().unlock();
-			}
+		if (best_move != 0) {
+			env.getTPT().lock();
+			env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
+			env.getTPT().unlock();
 		}
 		
 		return best_eval;
-	}
-	
-	
-	private boolean allowTPTAccess(int maxdepth, int depth) {
-		return true;
 	}
 	
 	
