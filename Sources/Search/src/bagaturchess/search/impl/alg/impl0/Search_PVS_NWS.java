@@ -311,7 +311,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int singularExtension = 0;
 		
-		{
+		/*{
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 			env.getTPT().unlock();
@@ -330,26 +330,24 @@ public class Search_PVS_NWS extends SearchImpl {
 					singularExtension = PLY;
 					
 				} else if (tptEntry.getBestMove_lower() != 0) {
-						
-					int ttValue = tptEntry.getLowerBound();
 					
 					int reduction = (PLY * rest) / 2;
 					if (reduction >= PLY) {
 						
-						int singularBeta = ttValue;// - 2 * rest;
+						int currentBestValue = tptEntry.getLowerBound();// - 2 * rest;
 						
 						backtrackingInfo.excluded_move = tptEntry.getBestMove_lower();
-						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, singularBeta, rootColour, false);
+						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, currentBestValue, rootColour, false);
 						backtrackingInfo.excluded_move = 0;
 						
-						if (singularEval < singularBeta) {
+						if (singularEval < currentBestValue) {
 							singularExtension = PLY;
 							//System.out.println("singularExtension hit");
 						}
 					}
 				}
 	        }
-		}
+		}*/
 		
 		
 		node.bestmove = 0;
@@ -372,7 +370,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		int searchedCount = 0;
-		int legalMoves = 0;
 		int alpha = alpha_org;
 		int best_eval = MIN;
 		int best_move = 0;
@@ -419,9 +416,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(cur_move);
 				
 				
-				legalMoves++;
-				
-				
 				boolean isCheckMove = env.getBitboard().isInCheck();
 				
 				
@@ -466,6 +460,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				env.getBitboard().makeMoveBackward(cur_move);
 				
+				
+				searchedCount++;
+				
+				
 				//Add history records for the current move
 				list.countTotal(cur_move);
 				if (cur_eval < beta) {
@@ -502,8 +500,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						//throw new IllegalStateException();
 					}
 				}
-				
-				searchedCount++;
 			} while ((cur_move = list.next()) != 0);
 		}
 		
@@ -513,7 +509,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (best_move == 0) {
 			if (inCheck) {
-				if (legalMoves == 0) {
+				if (searchedCount == 0) {
 					node.bestmove = 0;
 					node.eval = -getMateVal(depth);
 					node.leaf = true;
@@ -522,7 +518,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					throw new IllegalStateException("hashkey=" + hashkey);
 				}
 			} else {
-				if (legalMoves == 0) {
+				if (searchedCount == 0) {
 					node.bestmove = 0;
 					node.eval = getDrawScores(rootColour);
 					node.leaf = true;
@@ -850,12 +846,12 @@ public class Search_PVS_NWS extends SearchImpl {
                 }
             }
         }
-        
-        
+		
+		
 		//Singular move extension
 		int singularExtension = 0;
 		
-		{
+		/*{
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 			env.getTPT().unlock();
@@ -874,28 +870,26 @@ public class Search_PVS_NWS extends SearchImpl {
 					singularExtension = PLY;
 					
 				} else if (tptEntry.getBestMove_lower() != 0) {
-						
-					int ttValue = tptEntry.getLowerBound();
 					
 					int reduction = (PLY * rest) / 2;
 					if (reduction >= PLY) {
 						
-						int singularBeta = ttValue;// - 2 * rest;
+						int currentBestValue = tptEntry.getLowerBound();// - 2 * rest;
 						
 						backtrackingInfo.excluded_move = tptEntry.getBestMove_lower();
-						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, singularBeta, rootColour, false);
+						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, currentBestValue, rootColour, false);
 						backtrackingInfo.excluded_move = 0;
 						
-						if (singularEval < singularBeta) {
+						if (singularEval < currentBestValue) {
 							singularExtension = PLY;
 							//System.out.println("singularExtension hit");
 						}
 					}
 				}
 	        }
-		}
+		}*/
 		
-		
+        
 		double evalDiff = depth >= 2 ? backtrackingInfo.static_eval - backtracking[depth - 2].static_eval : 0;
 		if (evalDiff > EVAL_DIFF_MAX) evalDiff = EVAL_DIFF_MAX;
 		if (evalDiff < -EVAL_DIFF_MAX) evalDiff = -EVAL_DIFF_MAX;
@@ -911,7 +905,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		int searchedCount = 0;
-		int legalMoves = 0;
 		int best_eval = MIN;
 		int best_move = 0;
 		
@@ -991,9 +984,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(cur_move);
 				
 				
-				legalMoves++;
-				
-				
 				boolean isCheckMove = env.getBitboard().isInCheck();
 				
 				
@@ -1041,6 +1031,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				env.getBitboard().makeMoveBackward(cur_move);
 				
+				
+				searchedCount++;
+				
+				
 				//Add history records for the current move
 				list.countTotal(cur_move);
 				if (cur_eval < beta) {
@@ -1066,8 +1060,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						throw new IllegalStateException(); 
 					}
 				}
-				
-				searchedCount++;
 			} while ((cur_move = list.next()) != 0);
 		}
 		
@@ -1077,14 +1069,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (best_move == 0) {
 			if (inCheck) {
-				if (legalMoves == 0) {
+				if (searchedCount == 0) {
 					return -getMateVal(depth);
 				} else {
 					throw new IllegalStateException("hashkey=" + hashkey);
 					//return best_eval;
 				}
 			} else {
-				if (legalMoves == 0) {
+				if (searchedCount == 0) {
 					return getDrawScores(rootColour);
 				} else {
 					//throw new IllegalStateException("hashkey=" + hashkey);
@@ -1218,7 +1210,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (searchedMoves > 0 && cur_move == tpt_move) {
 				continue;
 			}
-			searchedMoves++;
 			
 			
 			env.getBitboard().makeMoveForward(cur_move);
@@ -1231,6 +1222,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			env.getBitboard().makeMoveBackward(cur_move);
+			
+			
+			searchedMoves++;
+			
 			
 			if (cur_eval > best_eval) {
 				
@@ -1397,7 +1392,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (searchedMoves > 0 && cur_move == tpt_move) {
 				continue;
 			}
-			searchedMoves++;
 			
 			
 			if (!inCheck) {
@@ -1414,7 +1408,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			int cur_eval = -nullwin_qsearch(mediator, info, initial_maxdepth, depth + 1, -alpha, rootColour);
 			
+			
 			env.getBitboard().makeMoveBackward(cur_move);
+			
+			
+			searchedMoves++;
+			
 			
 			if (cur_eval > best_eval) {
 				
