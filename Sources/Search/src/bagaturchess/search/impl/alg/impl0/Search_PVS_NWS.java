@@ -141,7 +141,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
-		backtrackingInfo.hash_key = env.getBitboard().getHashKey() ^ backtrackingInfo.excluded_move;
+		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
+		if (backtrackingInfo.excluded_move != 0) {
+			backtrackingInfo.hash_key ^= ((long) backtrackingInfo.excluded_move);
+		}
 		backtrackingInfo.static_eval = fullEval(depth, alpha_org, beta, rootColour);
 		
 		if (alpha_org >= beta) {
@@ -311,15 +314,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int singularExtension = 0;
         /*if (depth > 0
-        		&& rest >= 8//depth
-        		&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
+        		&& rest >= depth
+        		&& backtrackingInfo.excluded_move == 0
         		) {
-     
+        	
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 			env.getTPT().unlock();
 			
-        	if (tptEntry != null && tptEntry.getDepth() >= rest - 3) {
+			if (tptEntry != null && tptEntry.getDepth() >= rest / 2) {
         		
 		        boolean hasSingleMove = env.getBitboard().hasSingleMove();
 		        
@@ -501,16 +504,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			} while ((cur_move = list.next()) != 0);
 		}
 		
+		
 		if (best_move != 0 && (best_eval == MIN || best_eval == MAX)) {
 			throw new IllegalStateException();
 		}
 		
-		if (best_move == 0 && backtrackingInfo.excluded_move != 0) {
-			node.bestmove = 0;
-			node.eval = alpha;
-			node.leaf = true;
-			return node.eval;
-		}
 		
 		if (best_move == 0) {
 			if (inCheck) {
@@ -553,7 +551,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		int alpha_org = beta - 1;
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
-		backtrackingInfo.hash_key = env.getBitboard().getHashKey() ^ backtrackingInfo.excluded_move;
+		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
+		if (backtrackingInfo.excluded_move != 0) {
+			backtrackingInfo.hash_key ^= ((long) backtrackingInfo.excluded_move);
+		}
 		backtrackingInfo.static_eval = lazyEval(depth, alpha_org, beta, rootColour);
 		backtrackingInfo.null_move = false;
 		
@@ -593,6 +594,44 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		int rest = normDepth(maxdepth) - depth;
+		
+		
+		if (depth > 1
+				&& rest >= 7
+    			&& SyzygyTBProbing.getSingleton() != null
+    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
+    			){
+			
+			if (inCheck) {
+				if (!env.getBitboard().hasMoveInCheck()) {
+					return -getMateVal(depth);
+				}
+			} else {
+				if (!env.getBitboard().hasMoveInNonCheck()) {
+					return getDrawScores(rootColour);
+				}
+			}
+			
+			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+			if (result != -1) {
+				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
+				int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+				int egtbscore =  SyzygyTBProbing.getSingleton().getWDLScore(wdl, depth);
+				if (egtbscore > 0) {
+					int distanceToDraw = 100 - env.getBitboard().getDraw50movesRule();
+					if (distanceToDraw > dtz) {
+						return 9 * (distanceToDraw - dtz);
+					} else {
+						return getDrawScores(rootColour);
+					}
+				} else if (egtbscore == 0) {
+					return getDrawScores(rootColour);
+				}
+			}
+		}
+		
+		
 		boolean tpt_found = false;
 		boolean tpt_exact = false;
 		int tpt_depth = 0;
@@ -627,9 +666,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		env.getTPT().unlock();
 		
 		
-		int rest = normDepth(maxdepth) - depth;
-		
-		
 		if (tpt_found && tpt_depth >= rest) {
 			if (tpt_exact) {
 				return tpt_lower;
@@ -639,41 +675,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				if (tpt_upper <= alpha_org) {
 					return tpt_upper;
-				}
-			}
-		}
-		
-		
-		if (depth > 1
-				&& rest >= 7
-    			&& SyzygyTBProbing.getSingleton() != null
-    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
-    			){
-			
-			if (inCheck) {
-				if (!env.getBitboard().hasMoveInCheck()) {
-					return -getMateVal(depth);
-				}
-			} else {
-				if (!env.getBitboard().hasMoveInNonCheck()) {
-					return getDrawScores(rootColour);
-				}
-			}
-			
-			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
-			if (result != -1) {
-				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
-				int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
-				int egtbscore =  SyzygyTBProbing.getSingleton().getWDLScore(wdl, depth);
-				if (egtbscore > 0) {
-					int distanceToDraw = 100 - env.getBitboard().getDraw50movesRule();
-					if (distanceToDraw > dtz) {
-						return 9 * (distanceToDraw - dtz);
-					} else {
-						return getDrawScores(rootColour);
-					}
-				} else if (egtbscore == 0) {
-					return getDrawScores(rootColour);
 				}
 			}
 		}
@@ -845,15 +846,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int singularExtension = 0;
         /*if (depth > 0
-        		&& rest >= 8//depth
-        		&& backtracking[depth - 1].excluded_move == 0 //Skip recursive calls
+        		&& rest >= depth
+        		&& backtrackingInfo.excluded_move == 0
         		) {
-     
+        	
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 			env.getTPT().unlock();
 			
-        	if (tptEntry != null && tptEntry.getDepth() >= rest - 3) {
+			if (tptEntry != null && tptEntry.getDepth() >= rest / 2) {
         		
 		        boolean hasSingleMove = env.getBitboard().hasSingleMove();
 		        
@@ -1055,13 +1056,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			} while ((cur_move = list.next()) != 0);
 		}
 		
+		
 		if (best_move != 0 && (best_eval == MIN || best_eval == MAX)) {
 			throw new IllegalStateException();
 		}
 		
-		if (best_move == 0 && backtrackingInfo.excluded_move != 0) {
-			return alpha_org;
-		}
 		
 		if (best_move == 0) {
 			if (inCheck) {
