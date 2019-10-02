@@ -236,6 +236,10 @@ public class Info {
 		
 		result += "INFO: [";
 		
+		result += "depth " + depth + " ";
+		
+		result += "pv ";
+				
 		for (int i=0; i<pv.length; i++) {
 			result += pv[i] + " "; 
 		}

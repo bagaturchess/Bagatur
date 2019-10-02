@@ -86,6 +86,7 @@ public abstract class MatchRunner {
 			
 			go(engine);
 			String info = engine.getInfoLine();
+			//System.out.println(info);
 			Info infoObj = new Info(info);
 			//System.out.println(infoObj);
 			

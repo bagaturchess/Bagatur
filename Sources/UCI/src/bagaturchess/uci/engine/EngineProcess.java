@@ -256,6 +256,7 @@ public class EngineProcess {
 						if (lines.get(i).contains("info "/*depth"*/) && lines.get(i).contains(" pv ")) {
 							//System.out.println("PV: '" + lines.get(i) + "'");
 							exitLine = lines.get(i);
+							break;
 						}
 					}
 					if (exitLine == null) {
