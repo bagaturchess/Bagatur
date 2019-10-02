@@ -683,7 +683,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		backtrackingInfo.static_eval = tpt_lower == MIN ? backtrackingInfo.static_eval : tpt_lower;
 		
 		
-        if (STATIC_PRUNING1 && useStaticPrunning && backtrackingInfo.excluded_move == 0
+        if (STATIC_PRUNING1 && useStaticPrunning
                 ) {
             
             if (inCheck) {
@@ -698,7 +698,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
         }
         
-        if (STATIC_PRUNING1 && useStaticPrunning && backtrackingInfo.excluded_move == 0) {
+        if (STATIC_PRUNING1 && useStaticPrunning) {
         	
             if (inCheck) {
                 throw new IllegalStateException("In check in useStaticPrunning");
@@ -732,7 +732,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		boolean zungzwang = false;
 		if (!inCheck
-				&& backtrackingInfo.excluded_move == 0
 				&& (depth >= 1 ? !backtracking[depth - 1].null_move : false)
 				&& hasAtLeastOnePiece
 				) {
@@ -830,7 +829,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		backtrackingInfo.static_eval = tpt_lower == MIN ? backtrackingInfo.static_eval : tpt_lower;
 		
 		
-        if (STATIC_PRUNING1 && useStaticPrunning && backtrackingInfo.excluded_move == 0
+        if (STATIC_PRUNING1 && useStaticPrunning
                 ) {
             
             if (inCheck) {
@@ -958,7 +957,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		 					}
 							
 							//Static pruning - evaluation based
-							if (backtrackingInfo.excluded_move == 0 && evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
+							if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
 								break;
 							}
 						}
