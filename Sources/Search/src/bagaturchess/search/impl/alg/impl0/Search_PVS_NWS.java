@@ -312,7 +312,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		//Singular move extension
 		int singularExtension = 0;
-        if (depth > 0
+        /*if (depth > 0
         		&& rest >= depth
         		&& backtrackingInfo.excluded_move == 0
         		) {
@@ -347,7 +347,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}	
         	}
-        }
+        }*/
 		
 		
 		node.bestmove = 0;
@@ -843,7 +843,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		//Singular move extension
 		int singularExtension = 0;
-        if (depth > 0
+        /*if (depth > 0
         		&& rest >= depth
         		&& backtrackingInfo.excluded_move == 0
         		) {
@@ -878,7 +878,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}	
         	}
-        }
+        }*/
 		
         
 		double evalDiff = depth >= 2 ? backtrackingInfo.static_eval - backtracking[depth - 2].static_eval : 0;
