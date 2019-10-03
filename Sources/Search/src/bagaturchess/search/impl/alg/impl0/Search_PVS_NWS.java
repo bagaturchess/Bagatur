@@ -44,8 +44,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private double LMR_REDUCTION_MULTIPLIER 			= 1;
 	private double NULL_MOVE_REDUCTION_MULTIPLIER 		= 1;
-	private boolean STATIC_PRUNING1						= true;
-	private boolean STATIC_PRUNING2 					= true;
+	private boolean FORWARD_PRUNING						= true;
 	private static final int[] MARGIN_STATIC_NULLMOVE 	= { 0, 60, 130, 210, 300, 400, 510 };
 	private static final int[] MARGIN_RAZORING 			= { 0, 240, 280, 320 };
 	
@@ -683,7 +682,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		backtrackingInfo.static_eval = tpt_lower == MIN ? backtrackingInfo.static_eval : tpt_lower;
 		
 		
-        if (STATIC_PRUNING1 && useStaticPrunning
+        if (FORWARD_PRUNING && useStaticPrunning
                 ) {
             
             if (inCheck) {
@@ -698,7 +697,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
         }
         
-        if (STATIC_PRUNING1 && useStaticPrunning) {
+        if (FORWARD_PRUNING && useStaticPrunning) {
         	
             if (inCheck) {
                 throw new IllegalStateException("In check in useStaticPrunning");
@@ -829,7 +828,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		backtrackingInfo.static_eval = tpt_lower == MIN ? backtrackingInfo.static_eval : tpt_lower;
 		
 		
-        if (STATIC_PRUNING1 && useStaticPrunning
+        if (FORWARD_PRUNING && useStaticPrunning
                 ) {
             
             if (inCheck) {
@@ -940,7 +939,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				//Static pruning
-				if (STATIC_PRUNING2 && !inCheck && !env.getBitboard().isCheckMove(cur_move)) {
+				if (!inCheck && !env.getBitboard().isCheckMove(cur_move)) {
 					
 					if (searchedCount >= 4 && rest <= 8 && depth >= rest) {
 						
