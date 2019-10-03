@@ -42,8 +42,6 @@ import bagaturchess.search.impl.tpt.TPTEntry;
 public class Search_PVS_NWS extends SearchImpl {
 	
 	
-	private double LMR_REDUCTION_MULTIPLIER 			= 1;
-	private double NULL_MOVE_REDUCTION_MULTIPLIER 		= 1;
 	private boolean FORWARD_PRUNING						= true;
 	private static final int[] MARGIN_STATIC_NULLMOVE 	= { 0, 60, 130, 210, 300, 400, 510 };
 	private static final int[] MARGIN_RAZORING 			= { 0, 240, 280, 320 };
@@ -444,7 +442,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (!isCapOrProm && !isCheckMove) {
 							rate += 1;
 						}
-						lmrReduction += PLY * rate * LMR_REDUCTION_MULTIPLIER;
+						lmrReduction += PLY * rate;
 					}					
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha, rootColour, !isCheckMove);
@@ -739,7 +737,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				//int null_reduction = PLY * (rest >= 6 ? 3 : 2);
 				int null_reduction = PLY * (rest >= 6 ? 4 : 3);
-				null_reduction = (int) (NULL_MOVE_REDUCTION_MULTIPLIER * Math.max(null_reduction, PLY * (rest / 2)));
+				null_reduction = (int) Math.max(null_reduction, PLY * (rest / 2));
 				
 				int null_maxdepth = maxdepth - null_reduction;
 				
@@ -1008,7 +1006,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (!isCapOrProm && !isCheckMove) {
 							rate += 1;
 						}
-						lmrReduction += PLY * rate * LMR_REDUCTION_MULTIPLIER;
+						lmrReduction += PLY * rate;
 					}
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha_org, rootColour, staticPrunning);
