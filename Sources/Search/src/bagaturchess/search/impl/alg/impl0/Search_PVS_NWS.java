@@ -1115,36 +1115,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			node.eval = getDrawScores(rootColour);
 			return node.eval;
 		}
-		
-		
-		boolean inCheck = env.getBitboard().isInCheck();
-		
-		
-		int staticEval = -1;
-		if (!inCheck) {
-			staticEval = lazyEval(depth, alpha_org, beta, rootColour);
-			
-			if (staticEval >= beta) {
-				staticEval = fullEval(depth, alpha_org, beta, rootColour);
-			}
-		}
-		
-		
-		if (!inCheck) {
-			
-			//Beta cutoff
-			if (staticEval >= beta) {
-				node.eval = staticEval;
-				return node.eval;
-			}
-			
-			//Alpha cutoff
-			if (staticEval + env.getBitboard().getBoardConfig().getMaterial_QUEEN_E() < alpha_org) {
-				node.eval = staticEval;
-				return node.eval;
-			}
-		}
-    	
+		    	
 		
 		long hashkey = env.getBitboard().getHashKey();
 		
@@ -1177,13 +1148,35 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		env.getTPT().unlock();
 		
-    	
+		
+		int staticEval = tpt_lower == MIN ? fullEval(depth, alpha_org, beta, rootColour) : tpt_lower;
+		
+		
+		boolean inCheck = env.getBitboard().isInCheck();
+		
+		
+		if (!inCheck) {
+			
+			//Beta cutoff
+			if (staticEval >= beta) {
+				node.eval = staticEval;
+				return node.eval;
+			}
+			
+			//Alpha cutoff
+			if (staticEval + env.getBitboard().getBoardConfig().getMaterial_QUEEN_E() < alpha_org) {
+				node.eval = staticEval;
+				return node.eval;
+			}
+		}
+			
+			
 		ISearchMoveList list = inCheck ? lists_escapes[depth] : lists_capsproms[depth];
 		list.clear();
 		list.setTptMove(tpt_move);
 		
 		
-		int best_eval = inCheck ? MIN : tpt_lower == MIN ? staticEval : tpt_lower;
+		int best_eval = inCheck ? MIN : staticEval;
 		int best_move = 0;
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		
@@ -1333,13 +1326,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		int staticEval = tpt_lower == MIN ? lazyEval(depth, alpha_org, beta, rootColour) : tpt_lower;
+		
+		
 		boolean inCheck = env.getBitboard().isInCheck();
-		
-		
-		int staticEval = -1;
-		if (!inCheck) {
-			staticEval = lazyEval(depth, alpha_org, beta, rootColour);
-		}
 		
 		
 		if (!inCheck) {
@@ -1353,19 +1343,15 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (staticEval + env.getBitboard().getBoardConfig().getMaterial_QUEEN_E() < alpha_org) {
 				return staticEval;
 			}
-			
-			if (!inCheck && staticEval > alpha_org) {
-				throw new IllegalStateException("!inCheck && staticEval > alpha - 1");
-			}
 		}
     	
-    	
+		
 		ISearchMoveList list = inCheck ? lists_escapes[depth] : lists_capsproms[depth];
 		list.clear();
 		list.setTptMove(tpt_move);
 		
 		
-		int best_eval = inCheck ? MIN : tpt_lower == MIN ? staticEval : tpt_lower;
+		int best_eval = inCheck ? MIN : staticEval;
 		int best_move = 0;
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		
@@ -1384,7 +1370,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (!inCheck) {
 				//Skip bad captures
 				int moveSee = env.getBitboard().getSEEScore(cur_move);
-				if (moveSee <= 0) {
+				if (moveSee < 0) {
 					break;
 				}
 			}
