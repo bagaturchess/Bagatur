@@ -1169,8 +1169,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				return node.eval;
 			}
 		}
-			
-			
+		
+		
 		ISearchMoveList list = inCheck ? lists_escapes[depth] : lists_capsproms[depth];
 		list.clear();
 		list.setTptMove(tpt_move);
@@ -1195,9 +1195,24 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getBitboard().makeMoveForward(cur_move);
 			
 			
-			int cur_eval = -nullwin_qsearch(mediator, info, initial_maxdepth, depth + 1, -alpha, rootColour);
-			if (cur_eval > best_eval) {
+			boolean pv_search = false;
+			int cur_eval;
+			if (searchedMoves == 0) {
+				
+				pv_search = true;
+				
 				cur_eval = -pv_qsearch(mediator, info, initial_maxdepth, depth + 1, -beta, -alpha, rootColour);
+				
+			} else {
+				
+				cur_eval = -nullwin_qsearch(mediator, info, initial_maxdepth, depth + 1, -alpha, rootColour);
+				
+				if (cur_eval > alpha) {
+					
+					pv_search = true;
+					
+					cur_eval = -pv_qsearch(mediator, info, initial_maxdepth, depth + 1, -beta, -alpha, rootColour);
+				}
 			}
 			
 			
@@ -1212,12 +1227,14 @@ public class Search_PVS_NWS extends SearchImpl {
 				best_eval = cur_eval;
 				best_move = cur_move;
 				
-				node.bestmove = best_move;
-				node.eval = best_eval;
-				node.leaf = false;
-				
-				if (depth + 1 < MAX_DEPTH) {
-					pvman.store(depth + 1, node, pvman.load(depth + 1), true);
+				if (pv_search) {
+					node.bestmove = best_move;
+					node.eval = best_eval;
+					node.leaf = false;
+					
+					if (depth + 1 < MAX_DEPTH) {
+						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
+					}
 				}
 				
 				if (best_eval >= beta) {						
