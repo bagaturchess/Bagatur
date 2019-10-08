@@ -159,10 +159,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		PVNode node = pvman.load(depth);
-		
 		node.bestmove = 0;
 		node.eval = MIN;
 		node.leaf = true;
+		
 		
 		if (isDrawPV(depth)) {
 			node.eval = getDrawScores(rootColour);
@@ -823,6 +823,21 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		if (tpt_found && tpt_depth >= rest) {
+			//System.out.println("rest=" + rest);
+			if (tpt_exact) {
+				return tpt_lower;
+			} else {
+				if (tpt_lower >= beta) {
+					return tpt_lower;
+				}
+				if (tpt_upper <= alpha_org) {
+					return tpt_upper;
+				}
+			}
+		}
+		
+		
 		backtrackingInfo.static_eval = tpt_lower == MIN ? backtrackingInfo.static_eval : tpt_lower;
 		
 		
@@ -1102,6 +1117,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int colourToMove = env.getBitboard().getColourToMove();
 		
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
+		
 		
 		PVNode node = pvman.load(depth);
 		node.bestmove = 0;
