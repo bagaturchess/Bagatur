@@ -36,7 +36,7 @@ public class Info {
 	private boolean mate;
 	private int depth;
 	private int seldepth;
-	private int nodes;
+	private long nodes;
 	private String currmove;
 	private int currmovenumber;
 	private int hashfull;
@@ -134,7 +134,7 @@ public class Info {
 			}
 			int nodesNumberEnd = getEndIndex(infoLine, nodesNumberStart);
 			String number = infoLine.substring(nodesNumberStart + 1, nodesNumberEnd).trim();
-			nodes = Integer.parseInt(number);
+			nodes = Long.parseLong(number);
 		}
 		
 		
@@ -212,7 +212,7 @@ public class Info {
 		return seldepth;
 	}
 
-	public int getNodes() {
+	public long getNodes() {
 		return nodes;
 	}
 
