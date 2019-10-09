@@ -202,13 +202,9 @@ public class ListKingEscapes implements ISearchMoveList {
 	}
 
 	public void countTotal(int move) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void newSearch() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

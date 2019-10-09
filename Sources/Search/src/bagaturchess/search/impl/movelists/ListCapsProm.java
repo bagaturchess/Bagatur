@@ -137,6 +137,8 @@ public class ListCapsProm implements ISearchMoveList {
 				} else {
 					ordval += ORD_VAL_LOSE_CAP * orderingStatistics.getOrdVal_LOSECAP() + see / 100;
 				}
+			} else {
+				throw new IllegalStateException();
 			}
 			
 			ordval += env.getHistory_All().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
@@ -200,23 +202,17 @@ public class ListCapsProm implements ISearchMoveList {
 	}
 	
 	public void countSuccess(int bestmove) {
-		
 	}
 
 	public void countTotal(int move) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void newSearch() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void setMateMove(int mateMove) {
-		// TODO Auto-generated method stub
-		
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override

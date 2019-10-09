@@ -67,10 +67,6 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	@Override
 	public void countFailure(int move, int depth) {
 		
-		if (board.getMoveOps().isCaptureOrPromotion(move)) {
-			return;
-		}
-		
 		int pid = board.getMoveOps().getFigurePID(move);
 		int to = board.getMoveOps().getToFieldID(move);
 		
@@ -83,10 +79,6 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	 */
 	@Override
 	public void countSuccess(int move, int depth) {
-		
-		if (board.getMoveOps().isCaptureOrPromotion(move)) {
-			return;
-		}
 		
 		int pid = board.getMoveOps().getFigurePID(move);
 		int to = board.getMoveOps().getToFieldID(move);
@@ -121,7 +113,7 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 	@Override
 	public void addCounterMove(int last_move, int counter_move) {
 		
-		if (board.getMoveOps().isCaptureOrPromotion(last_move)) {
+		if (board.getMoveOps().isCaptureOrPromotion(counter_move)) {
 			return;
 		}
 		

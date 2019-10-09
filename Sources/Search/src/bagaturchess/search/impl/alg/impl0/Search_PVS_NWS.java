@@ -1236,6 +1236,14 @@ public class Search_PVS_NWS extends SearchImpl {
 			searchedMoves++;
 			
 			
+			//Add history records for the current move
+			if (cur_eval < beta) {
+				getHistory(inCheck).countFailure(cur_move, 1);
+			} else {
+				getHistory(inCheck).countSuccess(cur_move, 1);
+			}
+			
+			
 			if (cur_eval > best_eval) {
 				
 				best_eval = cur_eval;
@@ -1417,6 +1425,14 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			searchedMoves++;
+			
+			
+			//Add history records for the current move
+			if (cur_eval < beta) {
+				getHistory(inCheck).countFailure(cur_move, 1);
+			} else {
+				getHistory(inCheck).countSuccess(cur_move, 1);
+			}
 			
 			
 			if (cur_eval > best_eval) {
