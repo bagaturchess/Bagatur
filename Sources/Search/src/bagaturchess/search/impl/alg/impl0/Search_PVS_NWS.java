@@ -687,34 +687,29 @@ public class Search_PVS_NWS extends SearchImpl {
                 throw new IllegalStateException("In check in useStaticPrunning");
             }
             
-			if (alpha_org > backtrackingInfo.static_eval + getAlphaTrustWindow(mediator, rest)) {
-				int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, rootColour);
-				if (alpha_org > qeval + getAlphaTrustWindow(mediator, rest) ) {
-					return qeval;
-				}
-			}
-        }
-        
-        if (FORWARD_PRUNING && useStaticPrunning) {
-        	
-            if (inCheck) {
-                throw new IllegalStateException("In check in useStaticPrunning");
-            }
-            
             
 			//Static null move pruning
 			if (rest < MARGIN_STATIC_NULLMOVE.length) {
-				if (backtrackingInfo.static_eval - MARGIN_STATIC_NULLMOVE[rest] >= beta) {
+				if (backtrackingInfo.static_eval >= beta + MARGIN_STATIC_NULLMOVE[rest]) {
 					return backtrackingInfo.static_eval;
 				}
 			}
 			
 			
-			//Razoring
-			if (rest < MARGIN_RAZORING.length && Math.abs(alpha_org) < MAX_MAT_INTERVAL) {
-				if (backtrackingInfo.static_eval + MARGIN_RAZORING[rest] < alpha_org) {
-					int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, alpha_org - MARGIN_RAZORING[rest] + 1, rootColour);
-					if (qeval + MARGIN_RAZORING[rest] <= alpha_org) {
+			//Razoring for all depths based on the eval deviation detected into the root node
+			if (backtrackingInfo.static_eval < alpha_org - getAlphaTrustWindow(mediator, rest)) {
+				int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta/*alpha_org - getAlphaTrustWindow(mediator, rest) + 1*/, rootColour);
+				if (qeval <= alpha_org - getAlphaTrustWindow(mediator, rest)) {
+					return qeval;
+				}
+			}
+			
+			
+			//Standard Razoring
+			if (rest < MARGIN_RAZORING.length) {
+				if (backtrackingInfo.static_eval < alpha_org - MARGIN_RAZORING[rest]) {
+					int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta/*alpha_org - MARGIN_RAZORING[rest] + 1*/, rootColour);
+					if (qeval <= alpha_org - MARGIN_RAZORING[rest]) {
 						return qeval;
 					}
 				}
@@ -824,7 +819,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (tpt_found && tpt_depth >= rest) {
-			//System.out.println("rest=" + rest);
 			if (tpt_exact) {
 				return tpt_lower;
 			} else {
@@ -848,8 +842,8 @@ public class Search_PVS_NWS extends SearchImpl {
                 throw new IllegalStateException("In check in useStaticPrunning");
             }
             
-            if (alpha_org > backtrackingInfo.static_eval + getAlphaTrustWindow(mediator, rest) ) {
-            	return tpt_lower;
+            if (backtrackingInfo.static_eval < alpha_org - getAlphaTrustWindow(mediator, rest)) {
+            	return backtrackingInfo.static_eval;
             }
         }
 		
@@ -1469,7 +1463,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	private double getAlphaTrustWindow(ISearchMediator mediator, int rest) {
+	private int getAlphaTrustWindow(ISearchMediator mediator, int rest) {
 		
 		//int DEPTH1_INTERVAL = 100;
 		//int DEPTH1_INTERVAL = (int) (move_eval_diff.getDisperse());
