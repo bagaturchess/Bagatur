@@ -372,6 +372,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int best_eval = MIN;
 		int best_move = 0;
 		
+		
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		if (cur_move != 0) {
 			do {
@@ -904,6 +905,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int best_eval = MIN;
 		int best_move = 0;
 		
+		
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		if (cur_move != 0) {
 			do {
@@ -1184,14 +1186,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		list.setTptMove(tpt_move);
 		
 		
+		int searchedMoves = 0;
 		int best_eval = inCheck ? MIN : staticEval;
+		int alpha = alpha_org;
 		int best_move = 0;
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		
-		int alpha = alpha_org;
 		
-		
-		int searchedMoves = 0;
 		if (cur_move != 0) 
 		do {
 			
@@ -1300,7 +1301,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int alpha_org = beta - 1;
 		
 		if (depth >= MAX_DEPTH) {
-			return lazyEval(depth, alpha_org, beta, rootColour);
+			return fullEval(depth, alpha_org, beta, rootColour);
 		}
 		
 		int colourToMove = env.getBitboard().getColourToMove();
@@ -1384,14 +1385,12 @@ public class Search_PVS_NWS extends SearchImpl {
 		list.setTptMove(tpt_move);
 		
 		
+		int searchedMoves = 0;
 		int best_eval = inCheck ? MIN : staticEval;
 		int best_move = 0;
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		
-		int alpha = alpha_org;
 		
-		
-		int searchedMoves = 0;
 		if (cur_move != 0) 
 		do {
 			
@@ -1412,7 +1411,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getBitboard().makeMoveForward(cur_move);
 			
 			
-			int cur_eval = -nullwin_qsearch(mediator, info, initial_maxdepth, depth + 1, -alpha, rootColour);
+			int cur_eval = -nullwin_qsearch(mediator, info, initial_maxdepth, depth + 1, -alpha_org, rootColour);
 			
 			
 			env.getBitboard().makeMoveBackward(cur_move);
