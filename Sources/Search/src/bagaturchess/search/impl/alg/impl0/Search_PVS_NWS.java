@@ -142,7 +142,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (backtrackingInfo.excluded_move != 0) {
 			backtrackingInfo.hash_key ^= ((long) backtrackingInfo.excluded_move);
 		}
-		backtrackingInfo.static_eval = fullEval(depth, alpha_org, beta, rootColour);
+		backtrackingInfo.static_eval = lazyEval(depth, alpha_org, beta, rootColour);
 		
 		if (alpha_org >= beta) {
 			throw new IllegalStateException("alpha=" + alpha_org + ", beta=" + beta);
@@ -1106,7 +1106,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (depth >= MAX_DEPTH) {
-			return fullEval(depth, alpha_org, beta, rootColour);
+			return lazyEval(depth, alpha_org, beta, rootColour);
 		}
 		
 		
@@ -1159,7 +1159,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		env.getTPT().unlock();
 		
 		
-		int staticEval = tpt_lower == MIN ? fullEval(depth, alpha_org, beta, rootColour) : tpt_lower;
+		int staticEval = tpt_lower == MIN ? lazyEval(depth, alpha_org, beta, rootColour) : tpt_lower;
 		
 		
 		boolean inCheck = env.getBitboard().isInCheck();
@@ -1301,7 +1301,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int alpha_org = beta - 1;
 		
 		if (depth >= MAX_DEPTH) {
-			return fullEval(depth, alpha_org, beta, rootColour);
+			return lazyEval(depth, alpha_org, beta, rootColour);
 		}
 		
 		int colourToMove = env.getBitboard().getColourToMove();
