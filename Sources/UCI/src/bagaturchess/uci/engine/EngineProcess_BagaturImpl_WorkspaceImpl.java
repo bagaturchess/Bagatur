@@ -37,7 +37,7 @@ public class EngineProcess_BagaturImpl_WorkspaceImpl extends EngineProcess_Bagat
 							+ " " + JAVA_OPTIONS + "-Xmx" + memoryInMB + "M"
 							+ " -cp \"" + getClassPath(workspace) + "\" "
 							+ MAIN_CLASS + " "
-							+ getMainClassArgs("bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_Classic")
+							+ getMainClassArgs("bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD")
 							+ programArgs,
 							
 							workspace + "WorkDir");
