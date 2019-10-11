@@ -401,13 +401,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				boolean isCapOrProm = env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move);
-				boolean givesCheck = env.getBitboard().isCheckMove(cur_move);
-				
-				
-				//Static pruning
-				if (!inCheck && !givesCheck && !isCapOrProm && singularExtension == PLY && searchedCount >= 1) {
-					continue;
-				}
 				
 				
 				env.getBitboard().makeMoveForward(cur_move);
@@ -936,12 +929,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean isCapOrProm = env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move);
 				boolean givesCheck = env.getBitboard().isCheckMove(cur_move);
-				
-				
-				//Static pruning
-				if (!inCheck && !givesCheck && !isCapOrProm && singularExtension == PLY && searchedCount >= 1) {
-					continue;
-				}
 				
 				
 				if (!inCheck && !givesCheck) {
