@@ -139,7 +139,7 @@ public class BetaGenerator implements IBetaGenerator {
 				betas.add(lastVal);
 				
 				int start_val = lastVal - (betasCount / 2) * initial_interval;
-				for (int i=1; i<=betasCount; i++) {
+				for (int i=2; i<=betasCount; i++) {
 					int beta = start_val + i * initial_interval;
 					if (beta != lastVal) {
 						betas.add(beta);
