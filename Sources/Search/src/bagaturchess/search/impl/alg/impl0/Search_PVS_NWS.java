@@ -318,24 +318,20 @@ public class Search_PVS_NWS extends SearchImpl {
         		&& tpt_found
         		&& tpt_move != 0
         		&& tpt_lower != MIN
-        		&& tpt_depth >= rest / 2
+        		&& tpt_depth >= rest - 3
         		&& rest >= 6
         	) {
 			
 			if (env.getBitboard().hasSingleMove()) {
-				
 				singularExtension = PLY;
-				
 			} else {
-				
 				int reduction = (PLY * rest) / 2;
 				if (reduction >= PLY) {
-					
+					int singularBeta = tpt_lower - 35;
 					backtrackingInfo.excluded_move = tpt_move;
-					int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, tpt_lower, rootColour, false);
+					int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, singularBeta, rootColour, false);
 					backtrackingInfo.excluded_move = 0;
-					
-					if (singularEval < tpt_lower - 35) {
+					if (singularEval < singularBeta) {
 						singularExtension = PLY;
 					}
 				}
@@ -405,6 +401,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				boolean isCapOrProm = env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move);
+				boolean givesCheck = env.getBitboard().isCheckMove(cur_move);
+				
+				
+				//Static pruning
+				if (!inCheck && !givesCheck && !isCapOrProm && singularExtension == PLY && searchedCount >= 1) {
+					continue;
+				}
 				
 				
 				env.getBitboard().makeMoveForward(cur_move);
@@ -852,25 +855,24 @@ public class Search_PVS_NWS extends SearchImpl {
         		&& tpt_found
         		&& tpt_move != 0
         		&& tpt_lower != MIN
-        		&& tpt_depth >= rest / 2
+        		&& tpt_depth >= rest - 3
         		&& rest >= 6
         	) {
 			
 			if (env.getBitboard().hasSingleMove()) {
-				
 				singularExtension = PLY;
-				
 			} else {
-				
 				int reduction = (PLY * rest) / 2;
 				if (reduction >= PLY) {
-					
+					int singularBeta = tpt_lower - 35;
 					backtrackingInfo.excluded_move = tpt_move;
-					int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, tpt_lower, rootColour, false);
+					int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, singularBeta, rootColour, false);
 					backtrackingInfo.excluded_move = 0;
-					
-					if (singularEval < tpt_lower - 35) {
+					if (singularEval < singularBeta) {
 						singularExtension = PLY;
+					}
+					if (singularEval > beta && tpt_lower > beta && backtrackingInfo.static_eval > beta) {
+						return beta;
 					}
 				}
 			}
@@ -933,10 +935,16 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				boolean isCapOrProm = env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move);
+				boolean givesCheck = env.getBitboard().isCheckMove(cur_move);
 				
 				
 				//Static pruning
-				if (!inCheck && !env.getBitboard().isCheckMove(cur_move)) {
+				if (!inCheck && !givesCheck && !isCapOrProm && singularExtension == PLY && searchedCount >= 1) {
+					continue;
+				}
+				
+				
+				if (!inCheck && !givesCheck) {
 					
 					if (searchedCount >= 4 && rest <= 8 && depth >= rest) {
 						
@@ -972,9 +980,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(cur_move);
 				
 				
-				boolean isCheckMove = env.getBitboard().isInCheck();
-				
-				
 				int new_maxdepth = maxdepth;
 				if (depth > 0) {
 					//Do extensions here
@@ -995,14 +1000,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					boolean staticPrunning = false;
 					
-					if (!isCheckMove) {
+					if (!givesCheck) {
 						staticPrunning = true;
 					}
 					
 					int lmrReduction = 0;
 					if (!inCheck) {
 						int rate = LMR_REDUCTIONS[Math.min(63, searchedCount)][Math.min(63, rest)];
-						if (!isCapOrProm && !isCheckMove) {
+						if (!isCapOrProm && !givesCheck) {
 							rate += 1;
 						}
 						lmrReduction += PLY * rate;
