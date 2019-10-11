@@ -313,38 +313,33 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int singularExtension = 0;
         /*if (depth > 0
-        		&& tpt_found
-        		//&& rest >= depth
         		&& backtrackingInfo.excluded_move == 0
-        		&& backtracking[depth - 1].excluded_move == 0
-        		) {
+        		//&& backtracking[depth - 1].excluded_move == 0
+        		&& tpt_found
+        		&& tpt_move != 0
+        		&& tpt_lower != MIN
+        		&& tpt_depth >= rest / 2
+        		&& rest >= 6
+        	) {
 			
-			if (tpt_depth > rest / 2) {
-        		
-		        boolean hasSingleMove = env.getBitboard().hasSingleMove();
-		        
-				if (hasSingleMove) {
+			if (env.getBitboard().hasSingleMove()) {
+				
+				singularExtension = PLY;
+				
+			} else {
+				
+				int reduction = (PLY * rest) / 2;
+				if (reduction >= PLY) {
 					
-					singularExtension = PLY;
+					backtrackingInfo.excluded_move = tpt_move;
+					int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, tpt_lower, rootColour, false);
+					backtrackingInfo.excluded_move = 0;
 					
-				} else if (tpt_move != 0 && tpt_lower != MIN) {
-					
-					int reduction = (PLY * rest) / 2;
-					if (reduction > PLY) {
-						
-						int currentBestValue = tpt_lower;
-						
-						backtrackingInfo.excluded_move = tpt_move;
-						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, currentBestValue, rootColour, false);
-						backtrackingInfo.excluded_move = 0;
-						
-						if (singularEval < currentBestValue) {
-							singularExtension = PLY;
-							//System.out.println("singularExtension hit");
-						}
+					if (singularEval < tpt_lower - 35) {
+						singularExtension = PLY;
 					}
-				}	
-        	}
+				}
+			}
         }*/
 		
 		
@@ -852,38 +847,33 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int singularExtension = 0;
         /*if (depth > 0
-        		&& tpt_found
-        		//&& rest >= depth
         		&& backtrackingInfo.excluded_move == 0
-        		&& backtracking[depth - 1].excluded_move == 0
-        		) {
+        		//&& backtracking[depth - 1].excluded_move == 0
+        		&& tpt_found
+        		&& tpt_move != 0
+        		&& tpt_lower != MIN
+        		&& tpt_depth >= rest / 2
+        		&& rest >= 6
+        	) {
 			
-			if (tpt_depth > rest / 2) {
-        		
-		        boolean hasSingleMove = env.getBitboard().hasSingleMove();
-		        
-				if (hasSingleMove) {
+			if (env.getBitboard().hasSingleMove()) {
+				
+				singularExtension = PLY;
+				
+			} else {
+				
+				int reduction = (PLY * rest) / 2;
+				if (reduction >= PLY) {
 					
-					singularExtension = PLY;
+					backtrackingInfo.excluded_move = tpt_move;
+					int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, tpt_lower, rootColour, false);
+					backtrackingInfo.excluded_move = 0;
 					
-				} else if (tpt_move != 0 && tpt_lower != MIN) {
-					
-					int reduction = (PLY * rest) / 2;
-					if (reduction > PLY) {
-						
-						int currentBestValue = tpt_lower;
-						
-						backtrackingInfo.excluded_move = tpt_move;
-						int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, currentBestValue, rootColour, false);
-						backtrackingInfo.excluded_move = 0;
-						
-						if (singularEval < currentBestValue) {
-							singularExtension = PLY;
-							//System.out.println("singularExtension hit");
-						}
+					if (singularEval < tpt_lower - 35) {
+						singularExtension = PLY;
 					}
-				}	
-        	}
+				}
+			}
         }*/
 		
         
