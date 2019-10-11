@@ -406,7 +406,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(cur_move);
 				
 				
-				boolean isCheckMove = env.getBitboard().isInCheck();
+				boolean givesCheck = env.getBitboard().isInCheck();
 				
 				
 				int new_maxdepth = maxdepth;
@@ -431,13 +431,13 @@ public class Search_PVS_NWS extends SearchImpl {
 					int lmrReduction = 0;
 					if (!inCheck) {
 						int rate = LMR_REDUCTIONS[Math.min(63, searchedCount)][Math.min(63, rest)];
-						if (!isCapOrProm && !isCheckMove) {
+						if (!isCapOrProm && !givesCheck) {
 							rate += 1;
 						}
 						lmrReduction += PLY * rate;
 					}					
 					
-					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha, rootColour, !isCheckMove);
+					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha, rootColour, !givesCheck);
 					
 					if (cur_eval > alpha) {
 						
