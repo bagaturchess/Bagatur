@@ -27,7 +27,7 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 	
 	
 	public EngineProcess_BagaturImpl_DistributionImpl(String _engineName, String programArgs) {
-		this(_engineName, "./", programArgs, 128);
+		this(_engineName, "./", programArgs, 1024);
 	}
 	
 	
