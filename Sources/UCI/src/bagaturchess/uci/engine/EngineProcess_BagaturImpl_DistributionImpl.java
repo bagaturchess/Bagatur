@@ -38,7 +38,7 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 							+ " -Xmx" + memoryInMB + "M"
 							+ " -cp \"" + getClassPath(workdir) + "\" "
 							+ MAIN_CLASS + " "
-							+ ARGS
+							+ getMainClassArgs("bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD")
 							+ programArgs,
 							
 							workdir);

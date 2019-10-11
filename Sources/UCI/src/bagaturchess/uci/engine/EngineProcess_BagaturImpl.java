@@ -24,7 +24,6 @@ package bagaturchess.uci.engine;
 
 
 import java.io.File;
-
 import bagaturchess.uci.engine.EngineProcess;
 
 
@@ -34,15 +33,33 @@ public class EngineProcess_BagaturImpl extends EngineProcess {
 	protected static String MAIN_CLASS = "bagaturchess.uci.run.Boot";
 	protected static String JAVA_OPTIONS = "";
 	
-	protected static String ARGS = "";
-	static {
-		ARGS += "bagaturchess.engines.cfg.base.UCIConfig_BaseImpl";
+	private String engineName;
+	
+	
+	public EngineProcess_BagaturImpl(String _engineName, String commandline, String workdir) {
+		
+		super(commandline, null, workdir);
+		
+		engineName = _engineName;
+		
+
+	}
+	
+
+	@Override
+	public String getName() {
+		return engineName;
+	}
+	
+	
+	protected static String getMainClassArgs(String rootSearchClassName) {
+		String ARGS = "bagaturchess.engines.cfg.base.UCIConfig_BaseImpl";
 		ARGS += " ";
 		ARGS += "bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove";
 		ARGS += " ";
 		ARGS += "bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl";
 		ARGS += " ";
-		ARGS += "bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD";
+		ARGS += rootSearchClassName;
 		ARGS += " ";
 		ARGS += "bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core";
 		ARGS += " ";
@@ -54,23 +71,7 @@ public class EngineProcess_BagaturImpl extends EngineProcess {
 		ARGS += " ";
 		ARGS += "bagaturchess.learning.goldmiddle.impl3.cfg.EvaluationConfig_V18";
 		ARGS += " ";
-	}
-	
-	
-	private String engineName;
-	
-	
-	public EngineProcess_BagaturImpl(String _engineName, String commandline, String workdir) {
-		
-		super(commandline, null, workdir);
-		
-		engineName = _engineName;
-	}
-	
-
-	@Override
-	public String getName() {
-		return engineName;
+		return ARGS;
 	}
 	
 	
