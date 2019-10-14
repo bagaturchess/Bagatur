@@ -865,9 +865,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (singularEval < singularBeta) {
 						singularExtension = PLY;
 					}
-					if (singularEval > beta && tpt_lower > beta && backtrackingInfo.static_eval > beta) {
-						return beta;
-					}
 				}
 			}
         }*/
