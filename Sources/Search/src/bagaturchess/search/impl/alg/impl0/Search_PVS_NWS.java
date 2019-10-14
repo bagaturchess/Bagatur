@@ -137,6 +137,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	public int pv_search(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int maxdepth, int depth, int alpha_org, int beta, int rootColour) {
 		
 		
+		info.setSearchedNodes(info.getSearchedNodes() + 1);
+		if (info.getSelDepth() < depth) {
+			info.setSelDepth(depth);
+		}
+		
+		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
 		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
 		if (backtrackingInfo.excluded_move != 0) {
@@ -227,13 +233,13 @@ public class Search_PVS_NWS extends SearchImpl {
     	
     	
 		if (depth >= normDepth(maxdepth)) {
-			
-			/*if (inCheck) {
-				throw new IllegalStateException("inCheck: depth >= normDepth(maxdepth)");
-			}*/
-			
-			node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
-			return node.eval;
+			if (backtrackingInfo.static_eval >= beta) {
+				node.eval = backtrackingInfo.static_eval;
+				return node.eval;
+			} else {
+				node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
+				return node.eval;
+			}
 		}
 		
 		
@@ -268,12 +274,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		env.getTPT().unlock();
-		
-		
-		info.setSearchedNodes(info.getSearchedNodes() + 1);
-		if (info.getSelDepth() < depth) {
-			info.setSelDepth(depth);
-		}
 		
 		
 		//IID PV Node
@@ -538,6 +538,13 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	public int nullwin_search(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int maxdepth, int depth, int beta, int rootColour, boolean useStaticPrunning) {
 		
+		
+		info.setSearchedNodes(info.getSearchedNodes() + 1);
+		if (info.getSelDepth() < depth) {
+			info.setSelDepth(depth);
+		}
+		
+		
 		int alpha_org = beta - 1;
 		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
@@ -562,26 +569,19 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (isDraw()) {
 			return getDrawScores(rootColour);
 		}
-		
-		
-		boolean inCheck = env.getBitboard().isInCheck();
     	
 		
 		if (depth >= normDepth(maxdepth)) {
-			
-			/*if (inCheck) {
-				throw new IllegalStateException();
-			}*/
-			
-			int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, rootColour);
-			return eval;
+			if (backtrackingInfo.static_eval >= beta) {
+				return backtrackingInfo.static_eval;
+			} else {
+				int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, rootColour);
+				return eval;
+			}
 		}
 		
 		
-		info.setSearchedNodes(info.getSearchedNodes() + 1);
-		if (info.getSelDepth() < depth) {
-			info.setSelDepth(depth);
-		}
+		boolean inCheck = env.getBitboard().isInCheck();
 		
 		
 		int rest = normDepth(maxdepth) - depth;
@@ -1083,10 +1083,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private int pv_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int alpha_org, int beta, int rootColour) {
 		
+		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);	
 		if (info.getSelDepth() < depth) {
 			info.setSelDepth(depth);
 		}
+		
 		
 		if (depth >= MAX_DEPTH) {
 			return lazyEval(depth, alpha_org, beta, rootColour);
@@ -1276,10 +1278,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private int nullwin_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int beta, int rootColour) {
 		
+		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);	
 		if (info.getSelDepth() < depth) {
 			info.setSelDepth(depth);
 		}
+		
 		
 		int alpha_org = beta - 1;
 		
@@ -1428,7 +1432,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (searchedMoves == 0) {
 					return -getMateVal(depth);
 				} else {
-					throw new IllegalStateException("best_move == 0 && legalMoves != 0");
+					throw new IllegalStateException("best_move == 0 && searchedMoves != 0");
 				}
 			} else {
 				//All captures lead to evaluation which is less than the static eval
