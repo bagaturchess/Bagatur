@@ -233,13 +233,8 @@ public class Search_PVS_NWS extends SearchImpl {
     	
     	
 		if (depth >= normDepth(maxdepth)) {
-			if (backtrackingInfo.static_eval >= beta) {
-				node.eval = backtrackingInfo.static_eval;
-				return node.eval;
-			} else {
-				node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
-				return node.eval;
-			}
+			node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
+			return node.eval;
 		}
 		
 		
@@ -572,12 +567,8 @@ public class Search_PVS_NWS extends SearchImpl {
     	
 		
 		if (depth >= normDepth(maxdepth)) {
-			if (backtrackingInfo.static_eval >= beta) {
-				return backtrackingInfo.static_eval;
-			} else {
-				int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, rootColour);
-				return eval;
-			}
+			int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, rootColour);
+			return eval;
 		}
 		
 		
