@@ -521,6 +521,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
+		
 		if (best_move == 0 || best_eval == MIN || best_eval == MAX) {
 			throw new IllegalStateException();
 		}
