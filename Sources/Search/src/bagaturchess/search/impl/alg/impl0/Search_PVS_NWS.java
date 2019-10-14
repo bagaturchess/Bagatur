@@ -150,6 +150,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		backtrackingInfo.static_eval = lazyEval(depth, alpha_org, beta, rootColour);
 		
+		
 		if (alpha_org >= beta) {
 			throw new IllegalStateException("alpha=" + alpha_org + ", beta=" + beta);
 		}
@@ -313,8 +314,9 @@ public class Search_PVS_NWS extends SearchImpl {
         		&& tpt_found
         		&& tpt_move != 0
         		&& tpt_lower != MIN
-        		&& tpt_depth >= rest - 3
-        		&& rest >= 6
+        		&& tpt_lower < alpha_org
+        		//&& tpt_depth >= rest / 2
+        		//&& rest >= 6
         	) {
 			
 			if (env.getBitboard().hasSingleMove()) {
@@ -327,7 +329,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, singularBeta, rootColour, false);
 					backtrackingInfo.excluded_move = 0;
 					if (singularEval < singularBeta) {
-						singularExtension = PLY;
+						if (env.getBitboard().getMoveOps().isCaptureOrPromotion(tpt_move)) {
+							singularExtension = PLY / 2;
+						} else {
+							singularExtension = PLY;
+						}
 					}
 				}
 			}
@@ -542,13 +548,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int alpha_org = beta - 1;
 		
+		
 		BacktrackingInfo backtrackingInfo = backtracking[depth];
 		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
 		if (backtrackingInfo.excluded_move != 0) {
 			backtrackingInfo.hash_key ^= ((long) backtrackingInfo.excluded_move);
 		}
 		backtrackingInfo.static_eval = lazyEval(depth, alpha_org, beta, rootColour);
-		backtrackingInfo.null_move = false;
 		
 		
 		int colourToMove = env.getBitboard().getColourToMove();
@@ -708,7 +714,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		boolean zungzwang = false;
 		if (!inCheck
-				&& (depth >= 1 ? !backtracking[depth - 1].null_move : false)
+				&& depth > 0
 				&& hasAtLeastOnePiece
 				) {
 			
@@ -721,9 +727,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int null_maxdepth = maxdepth - null_reduction;
 				
 				env.getBitboard().makeNullMoveForward();
-				backtrackingInfo.null_move = true;
 				int null_val = -nullwin_search(mediator, info, initial_maxdepth, null_maxdepth, depth + 1, -(beta - 1), rootColour, false);
-				backtrackingInfo.null_move = false;
 				env.getBitboard().makeNullMoveBackward();
 				
 				if (null_val >= beta) {
@@ -840,8 +844,9 @@ public class Search_PVS_NWS extends SearchImpl {
         		&& tpt_found
         		&& tpt_move != 0
         		&& tpt_lower != MIN
-        		&& tpt_depth >= rest - 3
-        		&& rest >= 6
+        		&& tpt_lower < alpha_org
+        		//&& tpt_depth >= rest / 2
+        		//&& rest >= 6
         	) {
 			
 			if (env.getBitboard().hasSingleMove()) {
@@ -854,7 +859,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, singularBeta, rootColour, false);
 					backtrackingInfo.excluded_move = 0;
 					if (singularEval < singularBeta) {
-						singularExtension = PLY;
+						if (env.getBitboard().getMoveOps().isCaptureOrPromotion(tpt_move)) {
+							singularExtension = PLY / 2;
+						} else {
+							singularExtension = PLY;
+						}
 					}
 				}
 			}
