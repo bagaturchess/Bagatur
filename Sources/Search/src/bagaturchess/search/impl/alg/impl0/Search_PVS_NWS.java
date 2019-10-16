@@ -957,7 +957,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (depth > 0) {
 					//Do extensions here
 					if (singleReply) {
-						//new_maxdepth += PLY;
+						new_maxdepth += PLY;
 					} else if (zungzwang) {
 						new_maxdepth += PLY;
 					}
