@@ -314,27 +314,21 @@ public class Search_PVS_NWS extends SearchImpl {
         		&& tpt_found
         		&& tpt_move != 0
         		&& tpt_lower != MIN
-        		&& tpt_lower < alpha_org
-        		//&& tpt_depth >= rest / 2
-        		//&& rest >= 6
+        		&& tpt_lower >= beta
+        		&& tpt_depth >= rest / 2
+        		&& rest >= 6
         	) {
 			
 			if (env.getBitboard().hasSingleMove()) {
 				singularExtension = PLY;
 			} else {
 				int reduction = (PLY * rest) / 2;
-				if (reduction >= PLY) {
-					int singularBeta = tpt_lower - 35;
-					backtrackingInfo.excluded_move = tpt_move;
-					int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, singularBeta, rootColour, false);
-					backtrackingInfo.excluded_move = 0;
-					if (singularEval < singularBeta) {
-						if (env.getBitboard().getMoveOps().isCaptureOrPromotion(tpt_move)) {
-							singularExtension = PLY / 2;
-						} else {
-							singularExtension = PLY;
-						}
-					}
+				int singularBeta = tpt_lower - 35;
+				backtrackingInfo.excluded_move = tpt_move;
+				int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, singularBeta, rootColour, false);
+				backtrackingInfo.excluded_move = 0;
+				if (singularEval < singularBeta) {
+					singularExtension = PLY;
 				}
 			}
         }*/
@@ -413,7 +407,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int new_maxdepth = maxdepth;
 				if (depth > 0) {
 					//Do extensions here
-					if (cur_move == tpt_move) {
+					if (searchedCount == 0) {
 						new_maxdepth += singularExtension;
 					}
 				}
@@ -844,27 +838,21 @@ public class Search_PVS_NWS extends SearchImpl {
         		&& tpt_found
         		&& tpt_move != 0
         		&& tpt_lower != MIN
-        		&& tpt_lower < alpha_org
-        		//&& tpt_depth >= rest / 2
-        		//&& rest >= 6
+        		&& tpt_lower >= beta
+        		&& tpt_depth >= rest / 2
+        		&& rest >= 6
         	) {
 			
 			if (env.getBitboard().hasSingleMove()) {
 				singularExtension = PLY;
 			} else {
 				int reduction = (PLY * rest) / 2;
-				if (reduction >= PLY) {
-					int singularBeta = tpt_lower - 35;
-					backtrackingInfo.excluded_move = tpt_move;
-					int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, singularBeta, rootColour, false);
-					backtrackingInfo.excluded_move = 0;
-					if (singularEval < singularBeta) {
-						if (env.getBitboard().getMoveOps().isCaptureOrPromotion(tpt_move)) {
-							singularExtension = PLY / 2;
-						} else {
-							singularExtension = PLY;
-						}
-					}
+				int singularBeta = tpt_lower - 35;
+				backtrackingInfo.excluded_move = tpt_move;
+				int singularEval = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, singularBeta, rootColour, false);
+				backtrackingInfo.excluded_move = 0;
+				if (singularEval < singularBeta) {
+					singularExtension = PLY;
 				}
 			}
         }*/
@@ -968,7 +956,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int new_maxdepth = maxdepth;
 				if (depth > 0) {
 					//Do extensions here
-					if (cur_move == tpt_move) {
+					if (searchedCount == 0) {
 						new_maxdepth += singularExtension;
 					} else if (zungzwang) {
 						new_maxdepth += PLY;
