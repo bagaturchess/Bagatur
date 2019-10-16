@@ -416,6 +416,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
 					
+					if (singularMove && cur_eval > alpha) {
+						cur_eval = -pv_search(mediator, info, initial_maxdepth, maxdepth + PLY, depth + 1, -beta, -alpha, rootColour);
+					}
+					
 				} else {
 					
 					int lmrReduction = 0;
@@ -434,13 +438,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						pv_search = true;
 						
 						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
-					}
-					
-					if (singularMove && cur_eval > alpha) {
-						
-						pv_search = true;
-						
-						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth + PLY, depth + 1, -beta, -alpha, rootColour);
 					}
 				}
 				
@@ -971,6 +968,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
 					
+					if (singularMove && cur_eval > alpha_org) {
+						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, maxdepth + PLY, depth + 1, -alpha_org, rootColour, false);
+					}
+					
 				} else {
 					
 					boolean staticPrunning = false;
@@ -993,10 +994,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (cur_eval > alpha_org && (lmrReduction > 0 || staticPrunning)) {
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
-					}
-					
-					if (singularMove && cur_eval > alpha_org) {
-						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth + PLY, depth + 1, -alpha_org, rootColour, false);
 					}
 				}
 				
