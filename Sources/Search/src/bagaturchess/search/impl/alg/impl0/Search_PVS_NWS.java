@@ -403,7 +403,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (depth > 0) {
 					//Do extensions here
 					if (singleReply) {
-						//new_maxdepth += PLY;
+						new_maxdepth += PLY;
 					}
 				}
 				
@@ -416,8 +416,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
 					
-					if (singularMove && cur_eval > alpha) {
-						cur_eval = -pv_search(mediator, info, initial_maxdepth, maxdepth + PLY, depth + 1, -beta, -alpha, rootColour);
+					if (singularMove && cur_eval > alpha && new_maxdepth == maxdepth) {
+						new_maxdepth += PLY;
+						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
 					}
 					
 				} else {
@@ -968,8 +969,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
 					
-					if (singularMove && cur_eval > alpha_org) {
-						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, maxdepth + PLY, depth + 1, -alpha_org, rootColour, false);
+					if (singularMove && cur_eval > alpha_org && new_maxdepth == maxdepth) {
+						new_maxdepth += PLY;
+						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
 					}
 					
 				} else {
