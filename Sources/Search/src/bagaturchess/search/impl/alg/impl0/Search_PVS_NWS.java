@@ -311,14 +311,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean singularMove = false;
         /*if (depth > 0
          		&& !singleReply
-         		&& tpt_lower >= beta - 35
         		&& backtrackingInfo.excluded_move == 0
         		&& rest >= 2
+         		&& tpt_lower >= beta
+         		&& tpt_depth >= rest / 2
         	) {
 			
 			int reduction = (PLY * rest) / 2;
 			int singularBeta = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, beta, rootColour, false);
-			singularBeta -= 35;
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 			if (tptEntry != null) {
 				int excluded_move = tptEntry.getBestMove_lower();
@@ -835,14 +835,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean singularMove = false;
         /*if (depth > 0
          		&& !singleReply
-         		&& tpt_lower >= beta - 35
         		&& backtrackingInfo.excluded_move == 0
         		&& rest >= 2
+         		&& tpt_lower >= beta
+         		&& tpt_depth >= rest / 2
         	) {
 			
 			int reduction = (PLY * rest) / 2;
 			int singularBeta = nullwin_search(mediator, info, initial_maxdepth, maxdepth - reduction, depth, beta, rootColour, false);
-			singularBeta -= 35;
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
 			if (tptEntry != null) {
 				int excluded_move = tptEntry.getBestMove_lower();
@@ -856,7 +856,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				}				
 			}
         }*/
-		
         
 		double evalDiff = depth >= 2 ? backtrackingInfo.static_eval - backtracking[depth - 2].static_eval : 0;
 		if (evalDiff > EVAL_DIFF_MAX) evalDiff = EVAL_DIFF_MAX;
