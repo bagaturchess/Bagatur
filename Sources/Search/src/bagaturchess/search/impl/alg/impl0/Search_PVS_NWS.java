@@ -857,6 +857,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
         }*/
         
+		
 		double evalDiff = depth >= 2 ? backtrackingInfo.static_eval - backtracking[depth - 2].static_eval : 0;
 		if (evalDiff > EVAL_DIFF_MAX) evalDiff = EVAL_DIFF_MAX;
 		if (evalDiff < -EVAL_DIFF_MAX) evalDiff = -EVAL_DIFF_MAX;
