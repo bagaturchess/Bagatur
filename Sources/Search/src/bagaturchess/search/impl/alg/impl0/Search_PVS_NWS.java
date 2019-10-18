@@ -72,7 +72,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private BacktrackingInfo[] backtracking 			= new BacktrackingInfo[MAX_DEPTH + 1];
 	
 	private static final double EVAL_DIFF_MAX 			= 50;
-	private static final int EVAL_SUM_MAX 				= 25600;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -346,11 +345,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			int cur_eval = backtracking[i].static_eval;
 			eval_inc_sum += (cur_eval - prev_eval);
 		}
-		if (eval_inc_sum < -EVAL_SUM_MAX){
-			eval_inc_sum = -EVAL_SUM_MAX;
+		if (eval_inc_sum < -getEvalSumMax()){
+			eval_inc_sum = -getEvalSumMax();
 		}
-		if (eval_inc_sum > EVAL_SUM_MAX){
-			eval_inc_sum = EVAL_SUM_MAX;
+		if (eval_inc_sum > getEvalSumMax()){
+			eval_inc_sum = getEvalSumMax();
 		}
 		
 		
@@ -420,7 +419,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (singleReply) {
 						new_maxdepth += PLY;
 					} else {
-						new_maxdepth += (PLY * eval_inc_sum * rest) / (EVAL_SUM_MAX * (depth + rest));
+						new_maxdepth += (PLY * eval_inc_sum * rest) / (getEvalSumMax() * (depth + rest));
 					}
 				}
 				
@@ -881,11 +880,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			int cur_eval = backtracking[i].static_eval;
 			eval_inc_sum += (cur_eval - prev_eval);
 		}
-		if (eval_inc_sum < -EVAL_SUM_MAX){
-			eval_inc_sum = -EVAL_SUM_MAX;
+		if (eval_inc_sum < -getEvalSumMax()){
+			eval_inc_sum = -getEvalSumMax();
 		}
-		if (eval_inc_sum > EVAL_SUM_MAX){
-			eval_inc_sum = EVAL_SUM_MAX;
+		if (eval_inc_sum > getEvalSumMax()){
+			eval_inc_sum = getEvalSumMax();
 		}
 		
 		double evalDiff = depth >= 2 ? backtrackingInfo.static_eval - backtracking[depth - 2].static_eval : 0;
@@ -991,7 +990,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					} else if (zungzwang) {
 						new_maxdepth += PLY;
 					} else {
-						new_maxdepth += (PLY * eval_inc_sum * rest) / (EVAL_SUM_MAX * (depth + rest));
+						new_maxdepth += (PLY * eval_inc_sum * rest) / (getEvalSumMax() * (depth + rest));
 					}
 				}
 				
@@ -1483,5 +1482,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		//return 1 * Math.max(1, (rest / (double) 2 )) * mediator.getTrustWindow_AlphaAspiration();
 		return 1 * mediator.getTrustWindow_AlphaAspiration();
+	}
+	
+	
+	private int getEvalSumMax() {
+		return 2000;//getAlphaTrustWindow(null, 0);
 	}
 }
