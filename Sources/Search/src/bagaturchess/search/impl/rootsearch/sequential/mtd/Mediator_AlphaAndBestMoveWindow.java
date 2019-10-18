@@ -33,8 +33,6 @@ import bagaturchess.search.impl.utils.SearchUtils;
 public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	
 	
-	private ISearchInfo lastinfo;
-	
 	/**
 	 * Table used for optimization of parameters by test games
 	 * TRUST_WINDOW_BEST_MOVE_MIN, TRUST_WINDOW_BEST_MOVE_MAX,  ELO
@@ -56,7 +54,7 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	 * 							1, 		+0 (initial baseline)
 	 * 							128,	+0
 	 */
-	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 2;
+	private static double TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER = 0.5;
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MIN = 1;
 	private static int TRUST_WINDOW_ALPHA_ASPIRATION_MAX = SearchUtils.getMateVal(1);
 	private int trustWindow_AlphaAspiration;
@@ -67,8 +65,11 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	 * 						4, 		+0 (initial baseline)
 	 * 						8,		+7
 	 */
-	private VarStatistic best_moves_diffs_per_depth;
 	private static int TRUST_WINDOW_MTD_STEP_MIN = 8;
+	
+	
+	private VarStatistic best_moves_diffs_per_depth;
+	private ISearchInfo lastinfo;
 	
 	
 	public Mediator_AlphaAndBestMoveWindow(ISearchMediator _parent) {
@@ -89,9 +90,9 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 			
 			if (lastinfo != null) {
 				
-				adjustTrustWindow_BestMove(info);
+				adjustTrustWindow_BestMove(info, lastinfo);
 				
-				adjustTrustWindow_AlphaAspiration(info);
+				adjustTrustWindow_AlphaAspiration(info, lastinfo);
 				
 				if (!info.isMateScore() && !lastinfo.isMateScore()) {
 					int eval_diff = Math.abs(info.getEval() - lastinfo.getEval());
@@ -108,7 +109,7 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	}
 
 
-	private void adjustTrustWindow_BestMove(ISearchInfo info) {
+	private void adjustTrustWindow_BestMove(ISearchInfo info, ISearchInfo previnfo) {
 		
 		int cur_mtdTrustWindow = trustWindow_BestMove;
 		
@@ -116,7 +117,7 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 			cur_mtdTrustWindow = TRUST_WINDOW_BEST_MOVE_MIN;
 		} else {
 			
-			if (lastinfo.getBestMove() == info.getBestMove()) {
+			if (previnfo.getBestMove() == info.getBestMove()) {
 				if (cur_mtdTrustWindow == 0) {
 					//cur_mtdTrustWindow = MTD_TRUST_WINDOW_MIN;
 					throw new IllegalStateException("cur_mtdTrustWindow == 0");
@@ -146,11 +147,13 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	}
 	
 	
-	private void adjustTrustWindow_AlphaAspiration(ISearchInfo info) {
+	private void adjustTrustWindow_AlphaAspiration(ISearchInfo info, ISearchInfo previnfo) {
 		
 		if (!info.isMateScore() && trustWindow_AlphaAspiration != TRUST_WINDOW_ALPHA_ASPIRATION_MAX) {
 			
-			trustWindow_AlphaAspiration += TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER * Math.max(1, Math.abs(info.getEval() - lastinfo.getEval()));
+			trustWindow_AlphaAspiration += TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER * Math.max(1, Math.abs(info.getEval() - previnfo.getEval()));
+			
+			//System.out.println(trustWindow_AlphaAspiration);
 			
 		} else {
 			trustWindow_AlphaAspiration = TRUST_WINDOW_ALPHA_ASPIRATION_MAX;
