@@ -72,6 +72,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private BacktrackingInfo[] backtracking 			= new BacktrackingInfo[MAX_DEPTH + 1];
 	
 	private static final double EVAL_DIFF_MAX 			= 50;
+	private static final int EVAL_SUM_MAX 				= 25600;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -339,6 +340,20 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.leaf = true;
 		
 		
+		int eval_inc_sum = 0;
+		for (int i = depth; i >= 2; i -= 2) {
+			int prev_eval = backtracking[i - 2].static_eval;
+			int cur_eval = backtracking[i].static_eval;
+			eval_inc_sum += (cur_eval - prev_eval);
+		}
+		if (eval_inc_sum < -EVAL_SUM_MAX){
+			eval_inc_sum = -EVAL_SUM_MAX;
+		}
+		if (eval_inc_sum > EVAL_SUM_MAX){
+			eval_inc_sum = EVAL_SUM_MAX;
+		}
+		
+		
 		ISearchMoveList list = !inCheck ? lists_all[depth] : lists_escapes[depth];
 		if (!inCheck && depth <= rest) {
 			list = lists_all_root[depth];
@@ -404,6 +419,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					//Do extensions here
 					if (singleReply) {
 						new_maxdepth += PLY;
+					} else {
+						new_maxdepth += (PLY * eval_inc_sum * rest) / (EVAL_SUM_MAX * (depth + rest));
 					}
 				}
 				
@@ -858,6 +875,19 @@ public class Search_PVS_NWS extends SearchImpl {
         }*/
         
 		
+		int eval_inc_sum = 0;
+		for (int i = depth; i >= 2; i -= 2) {
+			int prev_eval = backtracking[i - 2].static_eval;
+			int cur_eval = backtracking[i].static_eval;
+			eval_inc_sum += (cur_eval - prev_eval);
+		}
+		if (eval_inc_sum < -EVAL_SUM_MAX){
+			eval_inc_sum = -EVAL_SUM_MAX;
+		}
+		if (eval_inc_sum > EVAL_SUM_MAX){
+			eval_inc_sum = EVAL_SUM_MAX;
+		}
+		
 		double evalDiff = depth >= 2 ? backtrackingInfo.static_eval - backtracking[depth - 2].static_eval : 0;
 		if (evalDiff > EVAL_DIFF_MAX) evalDiff = EVAL_DIFF_MAX;
 		if (evalDiff < -EVAL_DIFF_MAX) evalDiff = -EVAL_DIFF_MAX;
@@ -925,7 +955,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							//Static pruning - move count based
 							if (searchedCount >= STATIC_PRUNING_MOVE_COUNT[rest]) {
-								break;
+								continue;
 							}
 							
 							//Static pruning - history based
@@ -935,7 +965,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							//Static pruning - evaluation based
 							if (evalDiff < -(EVAL_DIFF_MAX - EVAL_DIFF_MAX / rest)) {
-								break;
+								continue;
 							}
 						}
 						
@@ -960,6 +990,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						new_maxdepth += PLY;
 					} else if (zungzwang) {
 						new_maxdepth += PLY;
+					} else {
+						new_maxdepth += (PLY * eval_inc_sum * rest) / (EVAL_SUM_MAX * (depth + rest));
 					}
 				}
 				
