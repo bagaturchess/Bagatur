@@ -345,11 +345,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			int cur_eval = backtracking[i].static_eval;
 			eval_inc_sum += (cur_eval - prev_eval);
 		}
-		if (eval_inc_sum < -getEvalSumMax()){
-			eval_inc_sum = -getEvalSumMax();
+		if (eval_inc_sum < -getEvalSumMax(mediator)){
+			eval_inc_sum = -getEvalSumMax(mediator);
 		}
-		if (eval_inc_sum > getEvalSumMax()){
-			eval_inc_sum = getEvalSumMax();
+		if (eval_inc_sum > getEvalSumMax(mediator)){
+			eval_inc_sum = getEvalSumMax(mediator);
 		}
 		
 		
@@ -419,7 +419,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (singleReply) {
 						new_maxdepth += PLY;
 					} else {
-						new_maxdepth += (PLY * eval_inc_sum * rest) / (getEvalSumMax() * (depth + rest));
+						new_maxdepth += (PLY * eval_inc_sum * rest) / (getEvalSumMax(mediator) * (depth + rest));
 					}
 				}
 				
@@ -880,11 +880,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			int cur_eval = backtracking[i].static_eval;
 			eval_inc_sum += (cur_eval - prev_eval);
 		}
-		if (eval_inc_sum < -getEvalSumMax()){
-			eval_inc_sum = -getEvalSumMax();
+		if (eval_inc_sum < -getEvalSumMax(mediator)){
+			eval_inc_sum = -getEvalSumMax(mediator);
 		}
-		if (eval_inc_sum > getEvalSumMax()){
-			eval_inc_sum = getEvalSumMax();
+		if (eval_inc_sum > getEvalSumMax(mediator)){
+			eval_inc_sum = getEvalSumMax(mediator);
 		}
 		
 		double evalDiff = depth >= 2 ? backtrackingInfo.static_eval - backtracking[depth - 2].static_eval : 0;
@@ -990,7 +990,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					} else if (zungzwang) {
 						new_maxdepth += PLY;
 					} else {
-						new_maxdepth += (PLY * eval_inc_sum * rest) / (getEvalSumMax() * (depth + rest));
+						new_maxdepth += (PLY * eval_inc_sum * rest) / (getEvalSumMax(mediator) * (depth + rest));
 					}
 				}
 				
@@ -1485,7 +1485,10 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	private int getEvalSumMax() {
-		return 2000;//getAlphaTrustWindow(null, 0);
+	private int getEvalSumMax(ISearchMediator mediator) {
+		
+		//System.out.println(getAlphaTrustWindow(mediator, 0));
+		
+		return 20000;//getAlphaTrustWindow(mediator, 0);
 	}
 }
