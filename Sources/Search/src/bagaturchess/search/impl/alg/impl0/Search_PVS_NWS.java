@@ -418,8 +418,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					//Do extensions here
 					if (singleReply) {
 						new_maxdepth += PLY;
-					} else {
-						new_maxdepth += (PLY * eval_inc_sum * rest) / (getEvalSumMax(mediator) * (depth + rest));
+					} else if (searchedCount > 0) {
+						int ext = (PLY * eval_inc_sum            * rest          )
+								      / (getEvalSumMax(mediator) * (depth + rest));
+						new_maxdepth += Math.max(0, ext);
 					}
 				}
 				
@@ -989,8 +991,10 @@ public class Search_PVS_NWS extends SearchImpl {
 						new_maxdepth += PLY;
 					} else if (zungzwang) {
 						new_maxdepth += PLY;
-					} else {
-						new_maxdepth += (PLY * eval_inc_sum * rest) / (getEvalSumMax(mediator) * (depth + rest));
+					} else if (searchedCount > 0) {
+						int ext = (PLY * eval_inc_sum            * rest          )
+							          / (getEvalSumMax(mediator) * (depth + rest));
+						new_maxdepth += Math.max(0, ext);
 					}
 				}
 				
@@ -1489,6 +1493,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		//System.out.println(getAlphaTrustWindow(mediator, 0));
 		
-		return 20000;//getAlphaTrustWindow(mediator, 0);
+		return Math.max(1, getAlphaTrustWindow(mediator, 0));
 	}
 }
