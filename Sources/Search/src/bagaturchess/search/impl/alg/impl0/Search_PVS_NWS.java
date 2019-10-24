@@ -1012,12 +1012,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 				} else {
 					
-					boolean staticPrunning = false;
-					
-					if (!givesCheck) {
-						staticPrunning = true;
-					}
-					
 					int lmrReduction = 0;
 					if (!inCheck) {
 						int rate = LMR_REDUCTIONS[Math.min(63, searchedCount)][Math.min(63, rest)];
@@ -1026,6 +1020,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 						lmrReduction += PLY * rate;
 					}
+					
+					boolean staticPrunning = !givesCheck;
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha_org, rootColour, staticPrunning);
 					
