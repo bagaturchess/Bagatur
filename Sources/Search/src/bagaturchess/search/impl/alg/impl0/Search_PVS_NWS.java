@@ -416,13 +416,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				int new_maxdepth = maxdepth;
 				if (depth > 0) {
 					//Do extensions here
-					if (singleReply) {
+					/*if (singleReply) {
 						new_maxdepth += PLY;
 					} else if (searchedCount > 0) {
 						int ext = (PLY * eval_inc_sum            * rest          )
 								      / (getEvalSumMax(mediator) * (depth + rest));
 						new_maxdepth += Math.max(0, ext);
-					}
+					}*/
 				}
 				
 				
@@ -988,7 +988,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int new_maxdepth = maxdepth;
 				if (depth > 0) {
 					//Do extensions here
-					if (singleReply) {
+					/*if (singleReply) {
 						new_maxdepth += PLY;
 					} else if (zungzwang) {
 						new_maxdepth += PLY;
@@ -996,7 +996,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						int ext = (PLY * eval_inc_sum            * rest          )
 							          / (getEvalSumMax(mediator) * (depth + rest));
 						new_maxdepth += Math.max(0, ext);
-					}
+					}*/
 				}
 				
 				
