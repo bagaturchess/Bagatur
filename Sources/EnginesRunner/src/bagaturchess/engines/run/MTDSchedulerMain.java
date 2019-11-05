@@ -182,6 +182,8 @@ public class MTDSchedulerMain {
 		
 		//BoardUtils.playGameUCI(bitboard, "e2e4 d7d5 e4d5 d8d5 b1c3 d5e6 f1e2 e6g6 g1f3 g6g2 h1g1 g2h3 d2d4 h7h5 e2c4 e7e6 g1g5 e6e5 g5g3 h3f5 f3e5 f8b4 e5f7 h8h7 f7g5 h7h8 d1e2 g8e7 c4f7 e8d8 f7h5 g7g6 g3f3 f5a5 e2e4 b8c6 g5f7 d8e8 h5g6 h8g8 f7e5 g8g6 e5g6 c8f5 f3f5 a5f5 e4f5 e7f5 c1e3 c6d4 e1c1 f5e3 f2e3 d4f3 c3d5 e8f7 g6f4 b4d6 d5c7 a8c8 d1d6");
 		
+		//IBitBoard bitboard  = new Board("8/8/5k2/1Q4P1/8/8/1p4q1/4K3 b - - 0 90 ", null, cfg.getBoardConfig());//Queens endgame with qsearch goes in max depth
+		
 		//IBitBoard bitboard = new Board("r4rk1/pp3ppp/2pq4/3p4/4nPb1/2BBP3/PPP3PP/R3QRK1 w - - 2 15", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
