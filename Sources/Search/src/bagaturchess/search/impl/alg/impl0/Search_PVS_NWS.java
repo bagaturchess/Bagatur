@@ -389,6 +389,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					info.setCurrentMoveNumber((searchedCount + 1));
 				}
 				
+				
 				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
 					
 					long timestamp = System.currentTimeMillis();
@@ -476,6 +477,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					getHistory(inCheck).countSuccess(cur_move, rest);
 					getHistory(inCheck).addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
+				
 				
 				if (cur_eval > best_eval) {
 					
@@ -930,6 +932,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					info.setCurrentMoveNumber((searchedCount + 1));
 				}
 				
+				
 				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
 					
 					long timestamp = System.currentTimeMillis();
@@ -1047,6 +1050,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					getHistory(inCheck).countSuccess(cur_move, rest);
 					getHistory(inCheck).addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
+				
 				
 				if (cur_eval > best_eval) {
 					
