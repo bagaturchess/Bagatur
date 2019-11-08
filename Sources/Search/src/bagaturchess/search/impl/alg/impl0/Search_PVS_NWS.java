@@ -1222,28 +1222,19 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
+			if (!inCheck) {
+				//Skip bad captures
+				int moveSee = env.getBitboard().getSEEScore(cur_move);
+				if (moveSee < 0) {
+					break;
+				}
+			}
+			
+			
 			env.getBitboard().makeMoveForward(cur_move);
 			
 			
-			boolean pv_search = false;
-			int cur_eval;
-			if (searchedMoves == 0) {
-				
-				pv_search = true;
-				
-				cur_eval = -pv_qsearch(mediator, info, initial_maxdepth, depth + 1, -beta, -alpha, rootColour);
-				
-			} else {
-				
-				cur_eval = -nullwin_qsearch(mediator, info, initial_maxdepth, depth + 1, -alpha, rootColour);
-				
-				if (cur_eval > alpha) {
-					
-					pv_search = true;
-					
-					cur_eval = -pv_qsearch(mediator, info, initial_maxdepth, depth + 1, -beta, -alpha, rootColour);
-				}
-			}
+			int cur_eval = -pv_qsearch(mediator, info, initial_maxdepth, depth + 1, -beta, -alpha, rootColour);
 			
 			
 			env.getBitboard().makeMoveBackward(cur_move);
@@ -1263,18 +1254,14 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (cur_eval > best_eval) {
 				
 				best_eval = cur_eval;
+				best_move = cur_move;
 				
-				if (pv_search) {
-					
-					best_move = cur_move;
-					
-					node.bestmove = best_move;
-					node.eval = best_eval;
-					node.leaf = false;
-					
-					if (depth + 1 < MAX_DEPTH) {
-						pvman.store(depth + 1, node, pvman.load(depth + 1), true);
-					}
+				node.bestmove = best_move;
+				node.eval = best_eval;
+				node.leaf = false;
+				
+				if (depth + 1 < MAX_DEPTH) {
+					pvman.store(depth + 1, node, pvman.load(depth + 1), true);
 				}
 				
 				if (best_eval >= beta) {						
