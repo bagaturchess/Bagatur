@@ -1222,7 +1222,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (!inCheck) {
+			if (!inCheck && searchedMoves > 0) {
 				//Skip bad captures
 				int moveSee = env.getBitboard().getSEEScore(cur_move);
 				if (moveSee < 0) {
@@ -1410,7 +1410,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (!inCheck) {
+			if (!inCheck && searchedMoves > 0) {
 				//Skip bad captures
 				int moveSee = env.getBitboard().getSEEScore(cur_move);
 				if (moveSee < 0) {
