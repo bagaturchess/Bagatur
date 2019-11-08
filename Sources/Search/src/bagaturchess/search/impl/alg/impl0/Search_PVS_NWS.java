@@ -482,11 +482,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (cur_eval > best_eval) {
 					
 					best_eval = cur_eval;
-					best_move = cur_move;
-					
-					backtrackingInfo.best_move = best_move;
 					
 					if (pv_search) {
+						
+						best_move = cur_move;
+						
+						backtrackingInfo.best_move = best_move;
+						
 						node.bestmove = best_move;
 						node.eval = best_eval;
 						node.leaf = false;
@@ -502,7 +504,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (best_eval > alpha) {
 						alpha = best_eval; 
-						//throw new IllegalStateException();
 					}
 				}
 			} while ((cur_move = list.next()) != 0);
@@ -1003,8 +1004,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				boolean fullDepth = false;
 				int cur_eval;
 				if (searchedCount == 0) {
+					
+					fullDepth = true;
 					
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
 					
@@ -1029,6 +1033,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha_org, rootColour, staticPrunning);
 					
 					if (cur_eval > alpha_org && (lmrReduction > 0 || staticPrunning)) {
+						
+						fullDepth = true;
 						
 						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
 					}
@@ -1055,9 +1061,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (cur_eval > best_eval) {
 					
 					best_eval = cur_eval;
-					best_move = cur_move;
 					
-					backtrackingInfo.best_move = best_move;
+					if (fullDepth) {
+						
+						best_move = cur_move;
+						
+						backtrackingInfo.best_move = best_move;
+					}
 					
 					if (best_eval >= beta) {
 						break;
@@ -1253,9 +1263,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (cur_eval > best_eval) {
 				
 				best_eval = cur_eval;
-				best_move = cur_move;
 				
 				if (pv_search) {
+					
+					best_move = cur_move;
+					
 					node.bestmove = best_move;
 					node.eval = best_eval;
 					node.leaf = false;
@@ -1271,7 +1283,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (best_eval > alpha) {
 					alpha = best_eval;
-					//throw new IllegalStateException();
 				}
 			}
 			
