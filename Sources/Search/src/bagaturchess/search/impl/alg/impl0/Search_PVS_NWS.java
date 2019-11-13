@@ -25,6 +25,7 @@ package bagaturchess.search.impl.alg.impl0;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Figures;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.internal.IRootWindow;
@@ -76,6 +77,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
 	
+	private VarStatistic history_stat;
+	
 	
 	public Search_PVS_NWS(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
@@ -108,6 +111,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		lastSentMinorInfo_nodesCount = 0;
 		
 		lastSentMinorInfo_timestamp = 0;
+		
+		history_stat = new VarStatistic(false);
 	}
 	
 	
@@ -448,6 +453,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (!isCapOrProm && !givesCheck) {
 							rate += 1;
 						}
+						//rate += (1 - Math.min(1, getHistory(inCheck).getScores(cur_move) / history_stat.getEntropy()));
 						lmrReduction += PLY * rate;
 					}					
 					
@@ -477,6 +483,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					getHistory(inCheck).countSuccess(cur_move, rest);
 					getHistory(inCheck).addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
+				
+				
+				history_stat.addValue(getHistory(inCheck).getScores(cur_move), getHistory(inCheck).getScores(cur_move));
 				
 				
 				if (cur_eval > best_eval) {
@@ -1025,6 +1034,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (!isCapOrProm && !givesCheck) {
 							rate += 1;
 						}
+						//rate += (1 - Math.min(1, getHistory(inCheck).getScores(cur_move) / history_stat.getEntropy()));
 						lmrReduction += PLY * rate;
 					}
 					
@@ -1056,6 +1066,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					getHistory(inCheck).countSuccess(cur_move, rest);
 					getHistory(inCheck).addCounterMove(env.getBitboard().getLastMove(), cur_move);
 				}
+				
+				
+				history_stat.addValue(getHistory(inCheck).getScores(cur_move), getHistory(inCheck).getScores(cur_move));
 				
 				
 				if (cur_eval > best_eval) {
