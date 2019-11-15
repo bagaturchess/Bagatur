@@ -24,6 +24,7 @@ package bagaturchess.search.impl.alg.impl0;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
@@ -1230,8 +1231,18 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (cur_move != 0) 
 		do {
 			
+			
 			if (searchedMoves > 0 && cur_move == tpt_move) {
 				continue;
+			}
+			
+			
+			if (cur_move == tpt_move && !env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move)) {
+				if (env.getBitboard().isCheckMove(cur_move)
+						&& env.getBitboard().getMoveOps().getFigureType(cur_move) == Constants.TYPE_QUEEN
+					) {
+					continue;
+				}
 			}
 			
 			
@@ -1418,8 +1429,18 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (cur_move != 0) 
 		do {
 			
+			
 			if (searchedMoves > 0 && cur_move == tpt_move) {
 				continue;
+			}
+			
+			
+			if (cur_move == tpt_move && !env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move)) {
+				if (env.getBitboard().isCheckMove(cur_move)
+						&& env.getBitboard().getMoveOps().getFigureType(cur_move) == Constants.TYPE_QUEEN
+					) {
+					continue;
+				}
 			}
 			
 			
