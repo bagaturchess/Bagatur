@@ -454,6 +454,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (!isCapOrProm && !givesCheck) {
 							rate += 1;
 						}
+						rate += Math.max(0, -(eval_inc_sum / (double) getEvalSumMax(mediator)));
 						//rate += (1 - Math.min(1, getHistory(inCheck).getScores(cur_move) / history_stat.getEntropy()));
 						lmrReduction += PLY * rate;
 					}					
@@ -1035,6 +1036,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (!isCapOrProm && !givesCheck) {
 							rate += 1;
 						}
+						rate += Math.max(0, -(eval_inc_sum / (double) getEvalSumMax(mediator)));
 						//rate += (1 - Math.min(1, getHistory(inCheck).getScores(cur_move) / history_stat.getEntropy()));
 						lmrReduction += PLY * rate;
 					}
@@ -1526,6 +1528,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		//System.out.println(getAlphaTrustWindow(mediator, 0));
 		
-		return Math.max(1, getAlphaTrustWindow(mediator, 0));
+		return 100;
+		//return Math.max(1, getAlphaTrustWindow(mediator, 0));
 	}
 }
