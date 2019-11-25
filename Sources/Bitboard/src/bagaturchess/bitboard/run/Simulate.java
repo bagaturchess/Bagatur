@@ -35,6 +35,7 @@ import bagaturchess.bitboard.impl.dummy.DummyBoard;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl1.BoardImpl;
+import bagaturchess.bitboard.impl_kingcaptureallowed.Board3_Adapter;
 
 /**
 After the 1st ply (White's move) -- 20 possible positions 
@@ -164,9 +165,9 @@ public class Simulate {
 				}
 				
 				if (board.getMoveOps().isCapture(move)
-						&& MoveInt.getCapturedFigureType(move) == Constants.TYPE_KING
+						&& board.getMoveOps().getFigureType(move) == Constants.TYPE_KING
 					) {
-					System.out.println("KING CAPTURE");
+					//System.out.println("KING CAPTURE");
 					continue;
 				}
 				
@@ -187,10 +188,10 @@ public class Simulate {
 		
 		//BoardWithAttacks bitBoard = new BoardWithAttacks();
 		//String BOARD = "4k3/P7/8/8/8/8/7p/4K3 w - 0 0";
-		IBoard bitBoard = new BoardImpl(Constants.INITIAL_BOARD, null);
+		//IBoard bitBoard = new BoardImpl(Constants.INITIAL_BOARD, null);
 		//IBoard bitBoard = new Board();
 		//IBoard bitBoard = new DummyBoard();
-		//IBoard bitBoard = new BoardImpl();
+		IBoard bitBoard = new Board3_Adapter();
 		//bitBoard.setAttacksSupport(false, false);
 		
 		SearchInfo info = new SearchInfo();

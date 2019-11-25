@@ -13,31 +13,45 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.state.PiecesList;
+import bagaturchess.bitboard.impl_kingcaptureallowed.movegen.MoveInt;
 
 
 public class Board3_Adapter extends Board3 implements IBitBoard {
 	
 	
+	private IMoveOps moveOps;
+	
+	
 	public Board3_Adapter(String fenStr, IBoardConfig boardConfig) {
 		super(fenStr, boardConfig);
+		moveOps = new MoveOpsImpl();
 	}
 	
 	
 	public Board3_Adapter(String fenStr, PawnsEvalCache pawnsCache, IBoardConfig boardConfig) {
 		super(fenStr, pawnsCache, boardConfig);
+		moveOps = new MoveOpsImpl();
 	}
 
 	
 	public Board3_Adapter() {
 		super();
+		moveOps = new MoveOpsImpl();
 	}
 
 
 	public Board3_Adapter(String fen) {
 		super(fen);
+		moveOps = new MoveOpsImpl();
 	}
 
 
+	@Override
+	public int genKingEscapes(IInternalMoveList list) {
+		return genAllMoves(list);
+	}
+	
+	
 	@Override
 	public int getFigureType(int fieldID) {
 		return Figures.getFigureType(getFigureID(fieldID));
@@ -63,7 +77,7 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	
 	public final long getFiguresBitboardByPID(int pid) {
 		
-		//if (true) throw new UnsupportedOperationException();
+		if (true) throw new UnsupportedOperationException();
 		
 		//throw new IllegalStateException();
 		
@@ -82,7 +96,7 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	
 	public long getFiguresBitboardByColourAndType(int colour, int type) {
 		
-		//if (true) throw new UnsupportedOperationException();
+		if (true) throw new UnsupportedOperationException();
 		
 		return getFiguresBitboardByPID(Constants.COLOUR_AND_TYPE_2_PIECE_IDENTITY[colour][type]);
 	}
@@ -137,12 +151,6 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 
 
 	@Override
-	public int genKingEscapes(IInternalMoveList list) {
-		throw new UnsupportedOperationException();
-	}
-
-
-	@Override
 	public boolean hasSingleMove() {
 		throw new UnsupportedOperationException();
 	}
@@ -190,7 +198,7 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	 */
 	@Override
 	public int getSEEScore(int move) {
-		throw new UnsupportedOperationException();
+		return getSee().evalExchange(move);
 	}
 
 
@@ -208,6 +216,58 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	 */
 	@Override
 	public IMoveOps getMoveOps() {
-		throw new UnsupportedOperationException();
+		return moveOps;
+	}
+	
+	
+	private class MoveOpsImpl implements IMoveOps {
+		
+		
+		@Override
+		public boolean isCapture(int move) {
+			return MoveInt.isCapture(move);
+		}
+		
+		
+		@Override
+		public boolean isPromotion(int move) {
+			return MoveInt.isPromotion(move);
+		}
+		
+		
+		@Override
+		public boolean isCaptureOrPromotion(int move) {
+			return isCapture(move) || isPromotion(move);
+		}
+		
+		
+		@Override
+		public boolean isEnpassant(int move) {
+			return MoveInt.isEnpassant(move);
+		}
+		
+		
+		@Override
+		public boolean isCastling(int move) {
+			return MoveInt.isCastling(move);
+		}
+		
+		
+		@Override
+		public int getFigurePID(int move) {
+			return MoveInt.getFigurePID(move);
+		}
+		
+		
+		@Override
+		public int getToFieldID(int move) {
+			return MoveInt.getToFieldID(move);
+		}
+		
+		
+		@Override
+		public int getFigureType(int move) {
+			return  MoveInt.getFigureType(move);
+		}
 	}
 }
