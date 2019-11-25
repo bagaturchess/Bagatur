@@ -27,7 +27,6 @@ import bagaturchess.bitboard.api.IInternalMoveList;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.plies.checking.WhitePawnsChecks;
-import bagaturchess.bitboard.impl.plies.specials.Promotioning;
 import bagaturchess.bitboard.impl_kingcaptureallowed.plies.Enpassanting;
 
 
@@ -76,7 +75,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					//Opponent piece
 					final long toBitboard = Fields.ALL_A1H1[toFieldID];
 					
-					if ((toBitboard & Promotioning.WHITE_PROMOTIONS) != NUMBER_0) {
+					if ((toBitboard & Fields.WHITE_PROMOTIONS) != NUMBER_0) {
 						int cap_pid = figuresIDsPerFieldsIDs[toFieldID];
 						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_QUEEN));
 						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_ROOK));
@@ -106,7 +105,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 			if (targetPID == Constants.PID_NONE) {
 				final long toBitboard = Fields.ALL_A1H1[toFieldID];
 				
-				if ((toBitboard & Promotioning.WHITE_PROMOTIONS) != NUMBER_0) {
+				if ((toBitboard & Fields.WHITE_PROMOTIONS) != NUMBER_0) {
 					list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_QUEEN));
 					list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_ROOK));
 					list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_BISHOP));
@@ -153,7 +152,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					//Opponent piece
 					final long toBitboard = Fields.ALL_A1H1[toFieldID];
 					
-					if ((toBitboard & Promotioning.WHITE_PROMOTIONS) != NUMBER_0) {
+					if ((toBitboard & Fields.WHITE_PROMOTIONS) != NUMBER_0) {
 						int cap_pid = figuresIDsPerFieldsIDs[toFieldID];
 						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_QUEEN));
 						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_ROOK));
@@ -183,7 +182,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 			if (targetPID == Constants.PID_NONE) {
 				final long toBitboard = Fields.ALL_A1H1[toFieldID];
 				
-				if ((toBitboard & Promotioning.WHITE_PROMOTIONS) != NUMBER_0) {
+				if ((toBitboard & Fields.WHITE_PROMOTIONS) != NUMBER_0) {
 					list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_QUEEN));
 					list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_ROOK));
 					list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_BISHOP));

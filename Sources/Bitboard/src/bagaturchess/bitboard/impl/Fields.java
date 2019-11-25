@@ -101,6 +101,11 @@ public class Fields extends Bits {
 	public static final long G8 = BIT_62;
 	public static final long H8 = BIT_63;
 	
+	
+	public static final long WHITE_PROMOTIONS = A8 | B8 | C8 | D8 | E8 | F8 | G8 | H8;
+	public static final long BLACK_PROMOTIONS = A1 | B1 | C1 | D1 | E1 | F1 | G1 | H1;
+	
+	
 	public static final int A1_ID = 0;
 	public static final int B1_ID = 1;
 	public static final int C1_ID = 2;

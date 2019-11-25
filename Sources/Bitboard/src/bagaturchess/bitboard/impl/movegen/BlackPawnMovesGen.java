@@ -30,7 +30,6 @@ import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.plies.checking.BlackPawnsChecks;
 import bagaturchess.bitboard.impl.plies.specials.Enpassanting;
-import bagaturchess.bitboard.impl.plies.specials.Promotioning;
 
 /**
  * Do not use OOP in moves generators,
@@ -103,7 +102,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 			//if ((toBitboard & allOpponentBitboard) != NUMBER_0) {
 			if (Constants.isWhite(figuresIDsPerFieldsIDs[toFieldID])) {
 				
-				if ((toBitboard & Promotioning.BLACK_PROMOTIONS) != NUMBER_0) {
+				if ((toBitboard & Fields.BLACK_PROMOTIONS) != NUMBER_0) {
 					/**
 					 * Captures-Promotions
 					 */
@@ -186,7 +185,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 				
 				final int toFieldID = dirs_ids[dirID][0];
 				
-				if ((toBitboard & Promotioning.BLACK_PROMOTIONS) != NUMBER_0) {
+				if ((toBitboard & Fields.BLACK_PROMOTIONS) != NUMBER_0) {
 					/**
 					 * NonCaptures-Promotions
 					 */
@@ -260,7 +259,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 			 * Captures
 			 */
 			if ((toBitboard & allOpponentBitboard) != NUMBER_0) {
-				if ((toBitboard & Promotioning.BLACK_PROMOTIONS) != NUMBER_0) {
+				if ((toBitboard & Fields.BLACK_PROMOTIONS) != NUMBER_0) {
 					//Do nothink
 				} else {
 					/**
@@ -303,7 +302,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 			}
 
 			if ((toBitboard & freeBitboard) != NUMBER_0) {
-				if ((toBitboard & Promotioning.BLACK_PROMOTIONS) != NUMBER_0) {
+				if ((toBitboard & Fields.BLACK_PROMOTIONS) != NUMBER_0) {
 					//Do nothing
 				} else {
 					/**
@@ -446,7 +445,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 				
 				final int toFieldID = dirs_ids[dirID][0];
 				
-				if ((toBitboard & Promotioning.BLACK_PROMOTIONS) != NUMBER_0) {
+				if ((toBitboard & Fields.BLACK_PROMOTIONS) != NUMBER_0) {
 					/**
 					 * Captures-Promotions
 					 */
@@ -528,7 +527,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 				
 				final int toFieldID = dirs_ids[dirID][0];
 				
-				if ((toBitboard & Promotioning.BLACK_PROMOTIONS) != NUMBER_0) {
+				if ((toBitboard & Fields.BLACK_PROMOTIONS) != NUMBER_0) {
 					/**
 					 * NonCaptures-Promotions
 					 */
@@ -590,7 +589,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 					
 					final int toFieldID = dirs_ids[dirID][0];
 					
-					if ((toBitboard & Promotioning.BLACK_PROMOTIONS) == NUMBER_0) {
+					if ((toBitboard & Fields.BLACK_PROMOTIONS) == NUMBER_0) {
 						throw new IllegalStateException();
 					}
 					/**
@@ -636,7 +635,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 				}
 				
 				if ((toBitboard & freeBitboard) != NUMBER_0) {
-					if ((toBitboard & Promotioning.BLACK_PROMOTIONS) == NUMBER_0) {
+					if ((toBitboard & Fields.BLACK_PROMOTIONS) == NUMBER_0) {
 						throw new IllegalStateException();
 					}
 					/**
@@ -700,7 +699,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 			}
 			
 			if ((toBitboard & freeBitboard) != NUMBER_0) {
-				if ((toBitboard & Promotioning.BLACK_PROMOTIONS) == NUMBER_0) {
+				if ((toBitboard & Fields.BLACK_PROMOTIONS) == NUMBER_0) {
 					/**
 					 * NonCaptures-NonPromotions
 					 */
@@ -819,7 +818,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 				
 				if ((middleFieldBitboard & freeBitboard) != NUMBER_0) {
 					
-					if ((middleFieldBitboard & Promotioning.BLACK_PROMOTIONS) != NUMBER_0) {
+					if ((middleFieldBitboard & Fields.BLACK_PROMOTIONS) != NUMBER_0) {
 						throw new IllegalStateException();
 					}
 					
@@ -864,7 +863,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 				 * Captures
 				 */
 				if ((middleFieldBitboard & allOpponentBitboard) != NUMBER_0) {
-					if ((middleFieldBitboard & Promotioning.BLACK_PROMOTIONS) != NUMBER_0) {
+					if ((middleFieldBitboard & Fields.BLACK_PROMOTIONS) != NUMBER_0) {
 						/**
 						 * Captures-Promotions
 						 */

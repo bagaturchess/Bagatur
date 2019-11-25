@@ -27,7 +27,6 @@ import bagaturchess.bitboard.api.IInternalMoveList;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.plies.checking.BlackPawnsChecks;
-import bagaturchess.bitboard.impl.plies.specials.Promotioning;
 import bagaturchess.bitboard.impl_kingcaptureallowed.plies.Enpassanting;
 
 
@@ -79,7 +78,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 					//Opponent piece
 					final long toBitboard = Fields.ALL_A1H1[toFieldID];
 					
-					if ((toBitboard & Promotioning.BLACK_PROMOTIONS) != NUMBER_0) {
+					if ((toBitboard & Fields.BLACK_PROMOTIONS) != NUMBER_0) {
 						int cap_pid = figuresIDsPerFieldsIDs[toFieldID];
 						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_B_QUEEN));
 						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_B_ROOK));
@@ -109,7 +108,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 			if (targetPID == Constants.PID_NONE) {
 				final long toBitboard = Fields.ALL_A1H1[toFieldID];
 				
-				if ((toBitboard & Promotioning.BLACK_PROMOTIONS) != NUMBER_0) {
+				if ((toBitboard & Fields.BLACK_PROMOTIONS) != NUMBER_0) {
 					list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_B_QUEEN));
 					list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_B_ROOK));
 					list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_B_BISHOP));
@@ -156,7 +155,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 					//Opponent piece
 					final long toBitboard = Fields.ALL_A1H1[toFieldID];
 					
-					if ((toBitboard & Promotioning.BLACK_PROMOTIONS) != NUMBER_0) {
+					if ((toBitboard & Fields.BLACK_PROMOTIONS) != NUMBER_0) {
 						int cap_pid = figuresIDsPerFieldsIDs[toFieldID];
 						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_B_QUEEN));
 						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_B_ROOK));
@@ -186,7 +185,7 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 			if (targetPID == Constants.PID_NONE) {
 				final long toBitboard = Fields.ALL_A1H1[toFieldID];
 				
-				if ((toBitboard & Promotioning.BLACK_PROMOTIONS) != NUMBER_0) {
+				if ((toBitboard & Fields.BLACK_PROMOTIONS) != NUMBER_0) {
 					list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_B_QUEEN));
 					list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_B_ROOK));
 					list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_B_BISHOP));
