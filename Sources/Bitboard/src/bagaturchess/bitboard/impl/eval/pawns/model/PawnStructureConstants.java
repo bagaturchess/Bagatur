@@ -22,11 +22,12 @@
  */
 package bagaturchess.bitboard.impl.eval.pawns.model;
 
+
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.movegen.Move;
+
 
 public class PawnStructureConstants extends Fields {
 

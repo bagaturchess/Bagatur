@@ -25,14 +25,13 @@ package bagaturchess.bitboard.impl.attacks.control;
 import java.util.Comparator;
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.movegen.Move;
 
 
 public class TestScores {
 	
 	public static void dumpAll(IBitBoard board, int colour) {
 		
-		long[][] all = new long[128][Move.MOVE_LONGS_COUNT];
+		//long[][] all = new long[128][32];
 		if (board.isInCheck(colour)) {
 			throw new IllegalStateException("in check");
 		}

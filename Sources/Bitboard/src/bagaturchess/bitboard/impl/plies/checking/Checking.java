@@ -28,8 +28,6 @@ import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.datastructs.numbers.IndexNumberSet;
-import bagaturchess.bitboard.impl.movegen.Move;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.plies.BlackPawnPlies;
 import bagaturchess.bitboard.impl.plies.CastlePlies;

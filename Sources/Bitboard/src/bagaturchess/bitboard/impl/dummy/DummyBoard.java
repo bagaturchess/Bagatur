@@ -42,7 +42,6 @@ import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.attacks.SEE;
 import bagaturchess.bitboard.impl.eval.BaseEvaluation;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
-import bagaturchess.bitboard.impl.movegen.Move;
 import bagaturchess.bitboard.impl.plies.specials.Castling;
 import bagaturchess.bitboard.impl.state.PiecesLists;
 

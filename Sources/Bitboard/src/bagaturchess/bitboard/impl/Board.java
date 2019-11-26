@@ -63,7 +63,6 @@ import bagaturchess.bitboard.impl.movegen.BlackPawnMovesGen;
 import bagaturchess.bitboard.impl.movegen.CastleMovesGen;
 import bagaturchess.bitboard.impl.movegen.KingMovesGen;
 import bagaturchess.bitboard.impl.movegen.KnightMovesGen;
-import bagaturchess.bitboard.impl.movegen.Move;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movegen.OfficerMovesGen;
 import bagaturchess.bitboard.impl.movegen.QueenMovesGen;
@@ -2404,7 +2403,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 			
 			if (!hit1) {
 				throw new IllegalStateException("enpassOpenDir=" + enpassOpenDir
-						+ ", enpasInfo[playedMovesCount]" + Move.toBinaryString(backupInfo[playedMovesCount].enpassantPawnBitboard)
+						+ ", enpasInfo[playedMovesCount]" + Bits.toBinaryString(backupInfo[playedMovesCount].enpassantPawnBitboard)
 						
 						+ ", bitboard=" + this);
 			}

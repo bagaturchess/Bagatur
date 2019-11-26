@@ -113,7 +113,7 @@ public class KingMovesGen extends KingPlies {
 			if (list != null) {
 				list.reserved_add(MoveInt.createKingSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour], 
 						Castling.KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[figureColour],
-						0, Move.CASTLING_KING_SEQ));
+						0, 1));
 			}
 			count++;
 			
@@ -126,7 +126,7 @@ public class KingMovesGen extends KingPlies {
 			if (list != null) {
 				list.reserved_add(MoveInt.createQueenSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour],
 						Castling.KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[figureColour],
-						0, Move.CASTLING_QUEEN_SEQ));
+						0, 2));
 			}
 			count++;
 			
@@ -257,7 +257,7 @@ public class KingMovesGen extends KingPlies {
 			if (list != null) {
 				list.reserved_add(MoveInt.createKingSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour], 
 						Castling.KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[figureColour],
-						0, Move.CASTLING_KING_SEQ));
+						0, 1));
 			}
 			count++;
 			
@@ -270,7 +270,7 @@ public class KingMovesGen extends KingPlies {
 			if (list != null) {
 				list.reserved_add(MoveInt.createQueenSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour],
 						Castling.KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[figureColour],
-						0, Move.CASTLING_QUEEN_SEQ));
+						0, 2));
 			}
 			count++;
 			
@@ -294,7 +294,7 @@ public class KingMovesGen extends KingPlies {
 				if (list != null) {
 					list.reserved_add(MoveInt.createKingSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour], 
 							Castling.KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[figureColour],
-							0, Move.CASTLING_KING_SEQ));
+							0, 1));
 				}
 			}
 			count++;
@@ -308,7 +308,7 @@ public class KingMovesGen extends KingPlies {
 			if (list != null) {
 				list.reserved_add(MoveInt.createQueenSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour],
 						Castling.KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[figureColour],
-						0, Move.CASTLING_QUEEN_SEQ));
+						0, 2));
 			}
 			count++;
 			

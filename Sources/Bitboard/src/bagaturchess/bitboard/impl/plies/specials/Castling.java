@@ -22,13 +22,11 @@
  */
 package bagaturchess.bitboard.impl.plies.specials;
 
-import bagaturchess.bitboard.api.IInternalMoveList;
+
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.movegen.Move;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
+
 
 public class Castling extends Fields {
 	
@@ -204,68 +202,6 @@ public class Castling extends Fields {
 		CHECKING_CHECK_FIELD_BITBOARDS_ON_QUEEN_SIDE_BY_COLOUR[Figures.COLOUR_BLACK][2] = E8;
 	}
 	
-	public static final void fillKingSide(int colour, long[] move) {
-		
-		int kingPID = KINGS_PIDS_BY_COLOUR[colour];
-		
-		//if (true) throw new IllegalStateException();
-		//move[27] = 1;
-		//move[28] = ConstantStructure.getMoveHash(colour, Figures.TYPE_KING,
-		//		KING_FROM_FIELD_ID_BY_COLOUR[colour], KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[colour]);
-		//move[29] = ConstantStructure.getMoveIndex(KING_FROM_FIELD_ID_BY_COLOUR[colour], 9, 0);
-		
-		move[0] = Move.MASK_EMPTY | Move.MASK_CASTLE_SIDE | Move.MASK_CASTLE_KING_SIDE;
-		move[1] = kingPID;
-		//move[2] = colour;
-		//move[3] = Figures.TYPE_KING;
-		//move[4] = Figures.TYPE_KING;
-		move[5] = 0;
-		move[6] = Move.CASTLING_KING_SEQ;
-		//move[7] = KING_FROM_BITBOARD_BY_COLOUR[colour];
-		//move[8] = KING_TO_BITBOARD_ON_KING_SIDE_BY_COLOUR[colour];	
-		move[9] = KING_FROM_FIELD_ID_BY_COLOUR[colour];
-		move[10] = KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[colour];
-		//move[11] = capturedFigureID;
-		//move[12] = opponentColour;
-		//move[13] = Figures.FIGURES_TYPES[capturedFigureID];
-		//move[14] = colour == Figures.COLOUR_WHITE ? Constants.PID_W_ROOK : Constants.PID_B_ROOK;
-		//move[15] = CASTLE_FROM_BITBOARD_ON_KING_SIDE_BY_COLOUR[colour];
-		//move[16] = CASTLE_TO_BITBOARD_ON_KING_SIDE_BY_COLOUR[colour];
-		//move[17] = CASTLE_FROM_FIELD_ID_ON_KING_SIDE_BY_COLOUR[colour];
-		//move[18] = CASTLE_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[colour];
-	}
-	
-	public static void fillQueenSide(int colour, long[] move) {
-		
-		int kingPID = KINGS_PIDS_BY_COLOUR[colour];
-		
-		//if (true) throw new IllegalStateException();
-		
-		//move[27] = 1;
-		//move[28] = ConstantStructure.getMoveHash(colour, Figures.TYPE_KING,
-		//		KING_FROM_FIELD_ID_BY_COLOUR[colour], KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[colour]);
-		//move[29] = ConstantStructure.getMoveIndex(KING_FROM_FIELD_ID_BY_COLOUR[colour], 10, 0);
-		
-		move[0] = Move.MASK_EMPTY | Move.MASK_CASTLE_SIDE | Move.MASK_CASTLE_QUEEN_SIDE;
-		move[1] = kingPID;
-		//move[2] = colour;
-		//move[3] = Figures.TYPE_KING;
-		//move[4] = Figures.TYPE_KING;
-		move[5] = 0;
-		move[6] = Move.CASTLING_QUEEN_SEQ;;
-		//move[7] = KING_FROM_BITBOARD_BY_COLOUR[colour];
-		//move[8] = KING_TO_BITBOARD_ON_QUEEN_SIDE_BY_COLOUR[colour];	
-		move[9] = KING_FROM_FIELD_ID_BY_COLOUR[colour];
-		move[10] = KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[colour];
-		//move[11] = capturedFigureID;
-		//move[12] = opponentColour;
-		//move[13] = Figures.FIGURES_TYPES[capturedFigureID];
-		//move[14] = colour == Figures.COLOUR_WHITE ? Constants.PID_W_ROOK : Constants.PID_B_ROOK;
-		//move[15] = CASTLE_FROM_BITBOARD_ON_QUEEN_SIDE_BY_COLOUR[colour];
-		//move[16] = CASTLE_TO_BITBOARD_ON_QUEEN_SIDE_BY_COLOUR[colour];
-		//move[17] = CASTLE_FROM_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[colour];
-		//move[18] = CASTLE_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[colour];
-	}
 	
 	public static final int getRookFromFieldID_queen(int colour) {
 		return CASTLE_FROM_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[colour];

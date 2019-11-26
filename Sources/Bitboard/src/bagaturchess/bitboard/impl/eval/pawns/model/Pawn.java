@@ -22,10 +22,11 @@
  */
 package bagaturchess.bitboard.impl.eval.pawns.model;
 
+
 import bagaturchess.bitboard.common.Utils;
+import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.movegen.Move;
 
 
 public class Pawn extends PawnStructureConstants {
@@ -270,13 +271,13 @@ public class Pawn extends PawnStructureConstants {
 
 	public static void main(String[] args) {
 		long field = H2;
-		System.out.println(Move.toBinaryStringMatrix(field));
+		System.out.println(Bits.toBinaryStringMatrix(field));
 		
 		long left = (field & LETTER_H) == 0L ? field << 7 : 0;
-		System.out.println(Move.toBinaryStringMatrix(left));
+		System.out.println(Bits.toBinaryStringMatrix(left));
 		
 		long right = (field & LETTER_A) == 0L ? field << 9 : 0;
-		System.out.println(Move.toBinaryStringMatrix(right));
+		System.out.println(Bits.toBinaryStringMatrix(right));
 	}
 
 	public long getField() {

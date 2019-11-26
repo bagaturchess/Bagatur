@@ -85,7 +85,7 @@ public class MoveInt {
 	private static int INIT_PROM = (1 << PROM_FLAG_SHIFT);
 	private static int INIT_CAP_PROM = INIT_CAP | INIT_PROM;
 
-	private static int INIT_ENPAS = INIT_CAP | (1 << ENP_FLAG_SHIFT) | (Move.ENPASSANT_SEQ << SEQ_SHIFT);
+	private static int INIT_ENPAS = INIT_CAP | (1 << ENP_FLAG_SHIFT) | (1 << SEQ_SHIFT);
 	//private static int INIT_CAST_KING = (1 << CAST_FLAG_SHIFT) | (1 << CAST_KING_FLAG_SHIFT);
 	//private static int INIT_CAST_QUEEN = (1 << CAST_FLAG_SHIFT);
 	private static int INIT_CAST = (1 << CAST_FLAG_SHIFT);
@@ -612,34 +612,7 @@ public class MoveInt {
 		
 		return result;
 	}
-
 	
-	public static void check(int move, long[] shitymove) {
-		if (Move.isCapture(shitymove) != isCapture(move)) {
-			throw new IllegalStateException("long[]=" + Move.isCapture(shitymove) + ", int=" + MoveInt.isCapture(move));
-		}
-		if (Move.getFromFieldID(shitymove) != MoveInt.getFromFieldID(move)) {
-			throw new IllegalStateException("long[]=" + Move.getFromFieldID(shitymove) + ", int=" + MoveInt.getFromFieldID(move));
-		}
-		if (Move.getToFieldID(shitymove) != MoveInt.getToFieldID(move)) {
-			throw new IllegalStateException("long[]=" + Move.getToFieldID(shitymove) + ", int=" + MoveInt.getToFieldID(move));
-		}
-		if (isPromotion(move) && Move.getPromotionFigurePID(shitymove) != MoveInt.getPromotionFigurePID(move)) {
-			throw new IllegalStateException("long[]=" + Move.getPromotionFigurePID(shitymove) + ", int=" + MoveInt.getPromotionFigurePID(move));
-		}
-		if (isCapture(move) && Move.getCapturedFigurePID(shitymove) != MoveInt.getCapturedFigurePID(move)) {
-			throw new IllegalStateException("long[]=" + Move.getCapturedFigurePID(shitymove) + ", int=" + MoveInt.getCapturedFigurePID(move));
-		}
-		if (Move.getSeq(shitymove) != MoveInt.getSeq(move)) {
-			throw new IllegalStateException("long[]=" + Move.getSeq(shitymove) + ", int=" + MoveInt.getSeq(move));
-		}
-		if (Move.getDir(shitymove) != MoveInt.getDir(move)) {
-			throw new IllegalStateException("long[]=" + Move.getDir(shitymove) + ", int=" + MoveInt.getDir(move));
-		}
-		if (Move.getFigurePID(shitymove) != MoveInt.getFigurePID(move)) {
-			throw new IllegalStateException("long[]=" + Move.getFigurePID(shitymove) + ", int=" + MoveInt.getFigurePID(move));
-		}
-	}
 
 	public static boolean isEquals(int move1, int move2) {
 		return move1 == move2;
