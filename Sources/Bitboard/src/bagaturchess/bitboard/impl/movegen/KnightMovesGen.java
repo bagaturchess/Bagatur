@@ -73,9 +73,9 @@ public class KnightMovesGen extends KnightChecks {
 
 					if ((toBitboard & allOpponentBitboard) != 0L) {//Capture
 						int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
-						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, 0, capturedFigureID));
+						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, capturedFigureID));
 					} else {
-						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID, dirID, 0));
+						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID));
 					}
 				}
 				count++;
@@ -121,7 +121,7 @@ public class KnightMovesGen extends KnightChecks {
 				if (list != null) {
 					final int toFieldID = dirs_ids[dirID][0];
 					int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
-					list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, 0, capturedFigureID));
+					list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, capturedFigureID));
 				}
 				count++;
 				
@@ -164,7 +164,7 @@ public class KnightMovesGen extends KnightChecks {
 				
 				if (list != null) {
 					final int toFieldID = dirs_ids[dirID][0];
-					list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID, dirID, 0));
+					list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID));
 				}
 				count++;
 				
@@ -251,9 +251,9 @@ public class KnightMovesGen extends KnightChecks {
 		
 						if ((middleFieldBitboard & allOpponentBitboard) != 0L) {//Capture
 							int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
-							list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, 0, capturedFigureID));
+							list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, capturedFigureID));
 						} else {
-							list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID, dirID, 0));
+							list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID));
 						}
 					}
 					count++;

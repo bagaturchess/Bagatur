@@ -109,10 +109,10 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					 */
 					if (list != null) {
 						int cap_pid = figuresIDsPerFieldsIDs[toFieldID];
-						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, dirID, cap_pid, Constants.PID_W_QUEEN));
-						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, dirID, cap_pid, Constants.PID_W_ROOK));
-						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, dirID, cap_pid, Constants.PID_W_BISHOP));
-						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, dirID, cap_pid, Constants.PID_W_KNIGHT));
+						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_QUEEN));
+						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_ROOK));
+						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_BISHOP));
+						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_KNIGHT));
 					}
 					count += 4;
 					
@@ -129,7 +129,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 
 					if (list != null) {
 						int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
-						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, 0, capturedFigureID));
+						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, capturedFigureID));
 					}
 					count++;
 					
@@ -189,10 +189,10 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					 * NonCaptures-Promotions
 					 */
 					if (list != null) {
-						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, dirID, Constants.PID_W_QUEEN));
-						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, dirID, Constants.PID_W_ROOK));
-						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, dirID, Constants.PID_W_BISHOP));
-						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, dirID, Constants.PID_W_KNIGHT));
+						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_QUEEN));
+						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_ROOK));
+						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_BISHOP));
+						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_KNIGHT));
 					}
 					count += 4;
 
@@ -209,7 +209,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					 */
 					
 					if (list != null) {
-						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID, dirID, 0));
+						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID));
 					}
 					count++;
 					
@@ -268,7 +268,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					if (list != null) {
 						final int toFieldID = dirs_ids[dirID][0];
 						int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
-						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, 0, capturedFigureID));
+						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, capturedFigureID));
 					}
 					count++;
 					
@@ -312,7 +312,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					
 					if (list != null) {						
 						final int toFieldID = dirs_ids[dirID][0];
-						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID, dirID, 0));
+						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID));
 					}
 					count++;
 					
@@ -398,8 +398,6 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 						}
 						
 						break;
-					} else {
-						int debug = 0;
 					}
 				}
 			}
@@ -456,10 +454,10 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					 */
 					if (list != null) {
 						int cap_pid = figuresIDsPerFieldsIDs[toFieldID];
-						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, dirID, cap_pid, Constants.PID_W_QUEEN));
-						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, dirID, cap_pid, Constants.PID_W_ROOK));
-						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, dirID, cap_pid, Constants.PID_W_BISHOP));
-						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, dirID, cap_pid, Constants.PID_W_KNIGHT));
+						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_QUEEN));
+						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_ROOK));
+						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_BISHOP));
+						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_KNIGHT));
 					}
 					count += 4;
 					
@@ -477,7 +475,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 
 					if (list != null) {
 						int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
-						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, 0, capturedFigureID));
+						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, capturedFigureID));
 					}
 					count++;
 					
@@ -537,10 +535,10 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					 */
 					if (list != null) {
 						final int toFieldID = dirs_ids[dirID][0];
-						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, dirID, Constants.PID_W_QUEEN));
-						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, dirID, Constants.PID_W_ROOK));
-						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, dirID, Constants.PID_W_BISHOP));
-						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, dirID, Constants.PID_W_KNIGHT));
+						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_QUEEN));
+						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_ROOK));
+						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_BISHOP));
+						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_KNIGHT));
 					}
 					count += 4;
 					
@@ -601,10 +599,10 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					if (list != null) {
 						final int toFieldID = dirs_ids[dirID][0];
 						int cap_pid = figuresIDsPerFieldsIDs[toFieldID];
-						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, dirID, cap_pid, Constants.PID_W_QUEEN));
-						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, dirID, cap_pid, Constants.PID_W_ROOK));
-						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, dirID, cap_pid, Constants.PID_W_BISHOP));
-						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, dirID, cap_pid, Constants.PID_W_KNIGHT));
+						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_QUEEN));
+						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_ROOK));
+						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_BISHOP));
+						list.reserved_add(MoveInt.createCapturePromotion(fromFieldID, toFieldID, cap_pid, Constants.PID_W_KNIGHT));
 					}
 					count += 4;
 					
@@ -645,10 +643,10 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					 */
 					if (list != null) {
 						final int toFieldID = dirs_ids[dirID][0];
-						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, dirID, Constants.PID_W_QUEEN));
-						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, dirID, Constants.PID_W_ROOK));
-						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, dirID, Constants.PID_W_BISHOP));
-						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, dirID, Constants.PID_W_KNIGHT));
+						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_QUEEN));
+						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_ROOK));
+						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_BISHOP));
+						list.reserved_add(MoveInt.createPromotion(fromFieldID, toFieldID, Constants.PID_W_KNIGHT));
 					}
 					count += 4;
 					
@@ -709,7 +707,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					
 					if (list != null) {
 						final int toFieldID = dirs_ids[dirID][0];
-						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID, dirID, 0));
+						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID));
 					}
 					count++;
 					
@@ -799,8 +797,8 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 		int count = 0;
 		
 		int[] fields =  CHECK_NONATTACK_MIDDLE_FIELDS_IDS[fromFieldID][opponentKingFieldID];
-		int[] dirs = CHECK_NONATTACK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
-		int[] seqs = CHECK_NONATTACK_MIDDLE_FIELDS_SEQS[fromFieldID][opponentKingFieldID];
+		//int[] dirs = CHECK_NONATTACK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
+		//int[] seqs = CHECK_NONATTACK_MIDDLE_FIELDS_SEQS[fromFieldID][opponentKingFieldID];
 		long[] fieldBoards =  CHECK_NONATTACK_MIDDLE_FIELDS_BITBOARDS[fromFieldID][opponentKingFieldID];
 		
 		if (fields != null) {
@@ -831,9 +829,7 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 					 */
 					
 					if (list != null) {
-						int dirID = dirs[i];
-						int seq = seqs[i];
-						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID, dirID, seq));
+						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID));
 					}
 					count++;
 					
@@ -849,8 +845,8 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 		
 		
 		fields =  CHECK_ATTACK_MIDDLE_FIELDS_IDS[fromFieldID][opponentKingFieldID];
-		dirs = CHECK_ATTACK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
-		seqs = CHECK_ATTACK_MIDDLE_FIELDS_SEQS[fromFieldID][opponentKingFieldID];
+		//dirs = CHECK_ATTACK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
+		//seqs = CHECK_ATTACK_MIDDLE_FIELDS_SEQS[fromFieldID][opponentKingFieldID];
 		fieldBoards =  CHECK_ATTACK_MIDDLE_FIELDS_BITBOARDS[fromFieldID][opponentKingFieldID];
 		
 		if (fields != null) {
@@ -878,12 +874,9 @@ public class WhitePawnMovesGen extends WhitePawnsChecks {
 						 */
 
 						if (list != null) {
-							int dirID = dirs[i];
-							int seq = seqs[i];
 							int toFieldID = fields[i];
 							int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
-							int test = MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, seq, capturedFigureID);
-							list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, seq, capturedFigureID));
+							list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, capturedFigureID));
 						}
 						count++;
 						

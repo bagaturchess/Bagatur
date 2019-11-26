@@ -84,7 +84,7 @@ public class CastleMovesGen extends CastleChecks {
 					
 					if (list != null) {
 						final int toFieldID = dirs_ids[dirID][seq];
-						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID, dirID, seq));
+						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID));
 					}
 					count++;
 					
@@ -101,7 +101,7 @@ public class CastleMovesGen extends CastleChecks {
 					if (list != null) {
 						final int toFieldID = dirs_ids[dirID][seq];
 						int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
-						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, seq, capturedFigureID));
+						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, capturedFigureID));
 					}
 					count++;
 					
@@ -178,7 +178,7 @@ public class CastleMovesGen extends CastleChecks {
 					if (list != null) {
 						final int toFieldID = dirs_ids[dirID][seq];
 						int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
-						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, seq, capturedFigureID));
+						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, capturedFigureID));
 					}
 					count++;
 					
@@ -243,7 +243,7 @@ public class CastleMovesGen extends CastleChecks {
 					
 					if (list != null) {
 						final int toFieldID = dirs_ids[dirID][seq];
-						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID, dirID, seq));
+						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID));
 					}
 					count++;
 					
@@ -340,8 +340,8 @@ public class CastleMovesGen extends CastleChecks {
 		int count = 0;
 		
 		int[] fields =  CHECK_MIDDLE_FIELDS_IDS[fromFieldID][opponentKingFieldID];
-		int[] dirs = CHECK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
-		int[] seqs = CHECK_MIDDLE_FIELDS_SEQS[fromFieldID][opponentKingFieldID];
+		//int[] dirs = CHECK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
+		//int[] seqs = CHECK_MIDDLE_FIELDS_SEQS[fromFieldID][opponentKingFieldID];
 		long[] fieldBoards =  CHECK_MIDDLE_FIELDS_BITBOARDS[fromFieldID][opponentKingFieldID];
 		long[] path = FIELDS_WHOLE_PATH[fromFieldID][opponentKingFieldID];
 		
@@ -365,10 +365,8 @@ public class CastleMovesGen extends CastleChecks {
 						 */
 						
 						if (list != null) {
-							int dirID = dirs[i];
-							int seq = seqs[i];
 							int toFieldID = fields[i];							
-							list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID, dirID, seq));
+							list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID));
 						}
 						count++;
 						
@@ -383,11 +381,9 @@ public class CastleMovesGen extends CastleChecks {
 						 */
 						
 						if (list != null) {
-							int dirID = dirs[i];
-							int seq = seqs[i];
 							int toFieldID = fields[i];				
 							int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
-							list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, seq, capturedFigureID));
+							list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, capturedFigureID));
 						}
 						count++;
 						

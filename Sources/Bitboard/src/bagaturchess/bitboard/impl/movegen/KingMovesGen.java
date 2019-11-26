@@ -96,9 +96,9 @@ public class KingMovesGen extends KingPlies {
 	
 					if ((toBitboard & allOpponentBitboard) != 0L) {//Capture						
 						int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
-						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, 0, capturedFigureID));						
+						list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, capturedFigureID));						
 					} else {
-						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID, dirID, 0));
+						list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID));
 					}
 				}
 				count++;
@@ -112,8 +112,7 @@ public class KingMovesGen extends KingPlies {
 		if (kingSidePossible) {
 			if (list != null) {
 				list.reserved_add(MoveInt.createKingSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour], 
-						Castling.KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[figureColour],
-						0, 1));
+						Castling.KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[figureColour]));
 			}
 			count++;
 			
@@ -125,8 +124,7 @@ public class KingMovesGen extends KingPlies {
 		if (queenSidePossible) {
 			if (list != null) {
 				list.reserved_add(MoveInt.createQueenSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour],
-						Castling.KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[figureColour],
-						0, 2));
+						Castling.KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[figureColour]));
 			}
 			count++;
 			
@@ -184,7 +182,7 @@ public class KingMovesGen extends KingPlies {
 				
 				if (list != null) {
 					int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
-					list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, dirID, 0, capturedFigureID));
+					list.reserved_add(MoveInt.createCapture(figureID, fromFieldID, toFieldID, capturedFigureID));
 				}
 				count++;
 				
@@ -243,7 +241,7 @@ public class KingMovesGen extends KingPlies {
 				}
 				
 				if (list != null) {
-					list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID, dirID, 0));
+					list.reserved_add(MoveInt.createNonCapture(figureID, fromFieldID, toFieldID));
 				}
 				count++;
 				
@@ -256,8 +254,7 @@ public class KingMovesGen extends KingPlies {
 		if (kingSidePossible) {
 			if (list != null) {
 				list.reserved_add(MoveInt.createKingSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour], 
-						Castling.KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[figureColour],
-						0, 1));
+						Castling.KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[figureColour]));
 			}
 			count++;
 			
@@ -269,8 +266,7 @@ public class KingMovesGen extends KingPlies {
 		if (queenSidePossible) {
 			if (list != null) {
 				list.reserved_add(MoveInt.createQueenSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour],
-						Castling.KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[figureColour],
-						0, 2));
+						Castling.KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[figureColour]));
 			}
 			count++;
 			
@@ -293,8 +289,7 @@ public class KingMovesGen extends KingPlies {
 			if (list != null) {
 				if (list != null) {
 					list.reserved_add(MoveInt.createKingSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour], 
-							Castling.KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[figureColour],
-							0, 1));
+							Castling.KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[figureColour]));
 				}
 			}
 			count++;
@@ -307,8 +302,7 @@ public class KingMovesGen extends KingPlies {
 		if (queenSidePossible) {
 			if (list != null) {
 				list.reserved_add(MoveInt.createQueenSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour],
-						Castling.KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[figureColour],
-						0, 2));
+						Castling.KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[figureColour]));
 			}
 			count++;
 			

@@ -30,7 +30,6 @@ import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.plies.CastlePlies;
 import bagaturchess.bitboard.impl.plies.specials.Enpassanting;
-import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
 
 
 /**
@@ -74,7 +73,7 @@ public class MoveInt {
 	private static int SEQ_SHIFT       = 16;
 	private static int DIR_SHIFT       = 12;
 	private static int FROM_SHIFT      = 6;
-	private static int TO_SHIFT        = 0;
+	//private static int TO_SHIFT        = 0;
 	
 	//private static int FLAG_MASK       = 1;
 	private static int PID_MASK        = 15;
@@ -97,32 +96,32 @@ public class MoveInt {
 	/**
 	 * Encode move
 	 */
-	public static int createCapturePromotion(int from, int to, int dir, int cap_pid, int prom_pid) {
-		return INIT_CAP_PROM | (from << FROM_SHIFT) | to | (dir << DIR_SHIFT) | (cap_pid << PID1_SHIFT) | (prom_pid << PID2_SHIFT);
+	public static int createCapturePromotion(int from, int to, int cap_pid, int prom_pid) {
+		return INIT_CAP_PROM | (from << FROM_SHIFT) | to | (cap_pid << PID1_SHIFT) | (prom_pid << PID2_SHIFT);
 	}
 	
-	public static int createPromotion(int from, int to, int dir, int prom_pid) {
-		return INIT_PROM | (from << FROM_SHIFT) | to | (dir << DIR_SHIFT) | (prom_pid << PID2_SHIFT);
+	public static int createPromotion(int from, int to, int prom_pid) {
+		return INIT_PROM | (from << FROM_SHIFT) | to | (prom_pid << PID2_SHIFT);
 	}
 	
-	public static int createCapture(int pid, int from, int to, int dir, int seq, int cap_pid) {
-		return INIT_CAP | (from << FROM_SHIFT) | to | (dir << DIR_SHIFT) | (seq << SEQ_SHIFT) | (pid << PID2_SHIFT) | (cap_pid << PID1_SHIFT);
+	public static int createCapture(int pid, int from, int to, int cap_pid) {
+		return INIT_CAP | (from << FROM_SHIFT) | to | (pid << PID2_SHIFT) | (cap_pid << PID1_SHIFT);
 	}
 	
-	public static int createNonCapture(int pid, int from, int to, int dir, int seq) {
-		return (from << FROM_SHIFT) | to | (dir << DIR_SHIFT) | (seq << SEQ_SHIFT) | (pid << PID2_SHIFT);
+	public static int createNonCapture(int pid, int from, int to) {
+		return (from << FROM_SHIFT) | to | (pid << PID2_SHIFT);
 	}
 	
 	public static int createEnpassant(int pid, int from, int to, int dir, int cap_pid) {
 		return INIT_ENPAS | (from << FROM_SHIFT) | to | (dir << DIR_SHIFT) | (pid << PID2_SHIFT) | (cap_pid << PID1_SHIFT);
 	}
 	
-	public static int createKingSide(int kingPID, int from, int to, int dir, int seq) {
-		return INIT_CAST | (from << FROM_SHIFT) | to | (dir << DIR_SHIFT) | (kingPID << PID2_SHIFT) | (seq << SEQ_SHIFT);
+	public static int createKingSide(int kingPID, int from, int to) {
+		return INIT_CAST | (from << FROM_SHIFT) | to  | (kingPID << PID2_SHIFT);
 	}
 	
-	public static int createQueenSide(int kingPID, int from, int to, int dir, int seq) {
-		return INIT_CAST | (from << FROM_SHIFT) | to | (dir << DIR_SHIFT) | (kingPID << PID2_SHIFT) | (seq << SEQ_SHIFT);
+	public static int createQueenSide(int kingPID, int from, int to) {
+		return INIT_CAST | (from << FROM_SHIFT) | to | (kingPID << PID2_SHIFT);
 	}
 	
 	public static long addOrderingValue(int move, long ord_val) {
@@ -512,105 +511,6 @@ public class MoveInt {
 		}
 		
 		return moveStr;
-	}
-	
-	public static final long getMoveHash(int move) {
-		
-		long result = 0L;
-		
-		int pid = getFigurePID(move);
-		//int colour = Constants.getColourByPieceIdentity(pid);
-		int type = Constants.PIECE_IDENTITY_2_TYPE[pid];
-		int dirID = getDir(move);
-		int seq = getSeq(move);
-		int fromFieldID = getFromFieldID(move);
-		int toFieldID = getToFieldID(move);
-		int figureDirType = getDirType(move);
-		
-		if (isPromotion(move)) {
-			
-			int promotionFigureType = Constants.PIECE_IDENTITY_2_TYPE[getPromotionFigurePID(move)];
-			if (type == Figures.TYPE_PAWN && isCapture(move)) {
-				dirID += 2;
-			}
-			result = ConstantStructure.getMoveHash(pid, (int) promotionFigureType, (int)fromFieldID, (int)toFieldID);
-			//move[29] = ConstantStructure.getMoveIndex((int) fromFieldID, (int) dirID, (int) seq, (int) promotionFigureType);
-		} else {
-			
-			result = ConstantStructure.getMoveHash(pid, (int) (int)fromFieldID, (int)toFieldID);
-			
-			if (type == Figures.TYPE_CASTLE
-					|| type == Figures.TYPE_OFFICER
-					|| type == Figures.TYPE_QUEEN
-					) {
-				//move[29] = ConstantStructure.getMoveIndex((int) fromFieldID, (int) dirID, (int) seq, (int) figureDirType);
-			} else {
-				if (type == Figures.TYPE_PAWN && isCapture(move)) {
-					dirID += 2;
-				}
-				/*if ((Move.MASK_CASTLE_SIDE & masks) != 0) {
-					 if ((Move.MASK_CASTLE_KING_SIDE & masks) != 0) {
-						 dirID = 9;
-					 } else {
-						 dirID = 10;
-					 }
-				}*/
-				//move[29] = ConstantStructure.getMoveIndex((int) fromFieldID, (int) dirID, (int) seq);
-			}
-		}
-		
-		//System.out.println(""+result);
-		
-		return result;
-	}
-
-	public static final int getMoveIndex(int move) {
-		
-		int result = 0;
-		
-		int pid = getFigurePID(move);
-		//int colour = Constants.getColourByPieceIdentity(pid);
-		int type = Constants.PIECE_IDENTITY_2_TYPE[pid];
-		int dirID = getDir(move);
-		int seq = getSeq(move);
-		int fromFieldID = getFromFieldID(move);
-		//int toFieldID = Move.getToFieldID(move);
-		int figureDirType = getDirType(move);
-		
-		if (isPromotion(move)) {
-
-			int promotionFigureType = Constants.PIECE_IDENTITY_2_TYPE[getPromotionFigurePID(move)];
-			if (type == Figures.TYPE_PAWN && isCapture(move)) {
-				dirID += 2;
-			}
-			//result = ConstantStructure.getMoveHash(pid, (int) promotionFigureType, (int)fromFieldID, (int)toFieldID);
-			result = ConstantStructure.getMoveIndex((int) fromFieldID, (int) dirID, (int) seq, (int) promotionFigureType);
-		} else {
-			
-			//result = ConstantStructure.getMoveHash(pid, (int) (int)fromFieldID, (int)toFieldID);
-			if (type == Figures.TYPE_CASTLE
-					|| type == Figures.TYPE_OFFICER
-					|| type == Figures.TYPE_QUEEN
-					) {
-				result = ConstantStructure.getMoveIndex((int) fromFieldID, (int) dirID, (int) seq, (int) figureDirType);
-			} else {
-				if (type == Figures.TYPE_PAWN && isCapture(move)) {
-					dirID += 2;
-				}
-				/*if ((Move.MASK_CASTLE_SIDE & masks) != 0) {
-					 if ((Move.MASK_CASTLE_KING_SIDE & masks) != 0) {
-						 dirID = 9;
-					 } else {
-						 dirID = 10;
-					 }
-				}*/
-				result = ConstantStructure.getMoveIndex((int) fromFieldID, (int) dirID, (int) seq);
-			}
-		}
-		
-		//System.out.println(""+result);
-		
-		return result;
 	}
 	
 
