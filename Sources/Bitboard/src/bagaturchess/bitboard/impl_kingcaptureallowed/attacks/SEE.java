@@ -33,11 +33,11 @@ import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.attacks.control.metadata.SeeMetadata;
 import bagaturchess.bitboard.impl.attacks.control.metadata.singlecolour.FieldAttacksStateMachine;
 import bagaturchess.bitboard.impl.eval.BaseEvalWeights;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.plies.CastlePlies;
 import bagaturchess.bitboard.impl.plies.KingPlies;
 import bagaturchess.bitboard.impl.plies.KnightPlies;
 import bagaturchess.bitboard.impl.plies.OfficerPlies;
-import bagaturchess.bitboard.impl_kingcaptureallowed.movegen.MoveInt;
 
 
 public class SEE implements ISEE {

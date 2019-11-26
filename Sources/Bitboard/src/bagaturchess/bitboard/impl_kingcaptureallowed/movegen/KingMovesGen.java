@@ -26,6 +26,7 @@ package bagaturchess.bitboard.impl_kingcaptureallowed.movegen;
 import bagaturchess.bitboard.api.IInternalMoveList;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.plies.KingPlies;
 import bagaturchess.bitboard.impl_kingcaptureallowed.plies.Castling;
 
@@ -76,15 +77,13 @@ public class KingMovesGen extends KingPlies {
 		if (kingSidePossible) {
 			int figureColour = Constants.getColourByPieceIdentity(pid);
 			list.reserved_add(MoveInt.createKingSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour], 
-					Castling.KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[figureColour],
-					0, 1));
+					Castling.KING_TO_FIELD_ID_ON_KING_SIDE_BY_COLOUR[figureColour]));
 		}
 		
 		if (queenSidePossible) {
 			int figureColour = Constants.getColourByPieceIdentity(pid);
 			list.reserved_add(MoveInt.createQueenSide(Castling.KINGS_PIDS_BY_COLOUR[figureColour], Castling.KING_FROM_FIELD_ID_BY_COLOUR[figureColour],
-					Castling.KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[figureColour],
-					0, 2));
+					Castling.KING_TO_FIELD_ID_ON_QUEEN_SIDE_BY_COLOUR[figureColour]));
 		}
 	}
 	

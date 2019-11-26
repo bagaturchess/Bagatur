@@ -12,8 +12,8 @@ import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.state.PiecesList;
-import bagaturchess.bitboard.impl_kingcaptureallowed.movegen.MoveInt;
 
 
 public class Board3_Adapter extends Board3 implements IBitBoard {

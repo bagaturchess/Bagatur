@@ -25,6 +25,7 @@ package bagaturchess.bitboard.impl_kingcaptureallowed.movegen;
 
 import bagaturchess.bitboard.api.IInternalMoveList;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.plies.checking.KnightChecks;
 
 
