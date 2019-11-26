@@ -796,8 +796,8 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 		int count = 0;
 		
 		int[] fields =  CHECK_NONATTACK_MIDDLE_FIELDS_IDS[fromFieldID][opponentKingFieldID];
-		int[] dirs = CHECK_NONATTACK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
-		int[] seqs = CHECK_NONATTACK_MIDDLE_FIELDS_SEQS[fromFieldID][opponentKingFieldID];
+		//int[] dirs = CHECK_NONATTACK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
+		//int[] seqs = CHECK_NONATTACK_MIDDLE_FIELDS_SEQS[fromFieldID][opponentKingFieldID];
 		long[] fieldBoards =  CHECK_NONATTACK_MIDDLE_FIELDS_BITBOARDS[fromFieldID][opponentKingFieldID];
 		
 		if (fields != null) {
@@ -843,8 +843,8 @@ public class BlackPawnMovesGen extends BlackPawnsChecks {
 		
 		
 		fields =  CHECK_ATTACK_MIDDLE_FIELDS_IDS[fromFieldID][opponentKingFieldID];
-		dirs = CHECK_ATTACK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
-		seqs = CHECK_ATTACK_MIDDLE_FIELDS_SEQS[fromFieldID][opponentKingFieldID];
+		//dirs = CHECK_ATTACK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
+		//seqs = CHECK_ATTACK_MIDDLE_FIELDS_SEQS[fromFieldID][opponentKingFieldID];
 		fieldBoards =  CHECK_ATTACK_MIDDLE_FIELDS_BITBOARDS[fromFieldID][opponentKingFieldID];
 		
 		if (fields != null) {

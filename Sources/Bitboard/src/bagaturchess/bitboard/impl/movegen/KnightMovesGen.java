@@ -230,7 +230,7 @@ public class KnightMovesGen extends KnightChecks {
 		int count = 0;
 		
 		int[] fields =  CHECK_MIDDLE_FIELDS_IDS[fromFieldID][opponentKingFieldID];
-		int[] dirs = CHECK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
+		//int[] dirs = CHECK_MIDDLE_FIELDS_DIR_ID[fromFieldID][opponentKingFieldID];
 		long[] fieldBoards =  CHECK_MIDDLE_FIELDS_BITBOARDS[fromFieldID][opponentKingFieldID];
 		
 		if (fields != null) {
@@ -247,7 +247,6 @@ public class KnightMovesGen extends KnightChecks {
 					
 					if (list != null) {
 						int toFieldID = fields[i];
-						int dirID = dirs[i];
 		
 						if ((middleFieldBitboard & allOpponentBitboard) != 0L) {//Capture
 							int capturedFigureID = figuresIDsPerFieldsIDs[toFieldID];
