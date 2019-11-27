@@ -16,6 +16,8 @@ import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.bitboard.impl1.internal.Util;
 import bagaturchess.search.api.IEvaluator;
+import bagaturchess.search.api.internal.ISearchMediator;
+import bagaturchess.search.api.internal.SearchInterruptedException;
 
 
 public final class NegamaxUtil {
@@ -41,10 +43,14 @@ public final class NegamaxUtil {
 		}
 	}
 
-	public static AtomicInteger nrOfActiveThreads = new AtomicInteger(0);
+	//public static AtomicInteger nrOfActiveThreads = new AtomicInteger(0);
 
-	public static int calculateBestMove(IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen, final int threadNumber, final int ply, int depth, int alpha, int beta, final int nullMoveCounter) {
+	public static int calculateBestMove(ISearchMediator mediator, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen, final int threadNumber, final int ply, int depth, int alpha, int beta, final int nullMoveCounter) {
 
+		
+		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(depth, 0, alpha, beta);
+
+		
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(depth >= 0);
 			Assert.isTrue(alpha >= Util.SHORT_MIN && alpha <= Util.SHORT_MAX);
@@ -141,7 +147,7 @@ public final class NegamaxUtil {
 					// TODO less reduction if stm (other side) has only 1 major piece
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 					score = depth - reduction <= 0 ? -QuiescenceUtil.calculateBestMove(evaluator ,cb, moveGen, -beta, -beta + 1)
-							: -calculateBestMove(evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1);
+							: -calculateBestMove(mediator, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1);
 					cb.undoNullMove();
 					if (score >= beta) {
 						return score;
@@ -171,7 +177,7 @@ public final class NegamaxUtil {
 					if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
 						// no iid in pawn-endgame because the extension could cause an endless loop
 						if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
-							calculateBestMove(evaluator, cb, moveGen, threadNumber, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, 0);
+							calculateBestMove(mediator, evaluator, cb, moveGen, threadNumber, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, 0);
 							ttValue = TTUtil.getTTValue(cb.zobristKey);
 						}
 					}
@@ -300,20 +306,26 @@ public final class NegamaxUtil {
 						reduction = Math.min(depth - 1, Math.max(reduction, 1));
 					}
 
-					/* LMR */
-					if (EngineConstants.ENABLE_LMR && reduction != 1) {
-						score = -calculateBestMove(evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -alpha - 1, -alpha, 0);
+					try {
+						/* LMR */
+						if (EngineConstants.ENABLE_LMR && reduction != 1) {
+							score = -calculateBestMove(mediator, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -alpha - 1, -alpha, 0);
+						}
+	
+						/* PVS */
+						if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed > 1) {
+							score = -calculateBestMove(mediator, evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -alpha - 1, -alpha, 0);
+						}
+	
+						/* normal bounds */
+						if (score > alpha) {
+							score = -calculateBestMove(mediator, evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -beta, -alpha, 0);
+						}
+					} catch(SearchInterruptedException sie) {
+						moveGen.endPly();
+						throw sie;
 					}
-
-					/* PVS */
-					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed > 1) {
-						score = -calculateBestMove(evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -alpha - 1, -alpha, 0);
-					}
-
-					/* normal bounds */
-					if (score > alpha) {
-						score = -calculateBestMove(evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -beta, -alpha, 0);
-					}
+					
 				}
 				cb.undoMove(move);
 

@@ -31,6 +31,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 
 import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.env.SearchEnv;
+import bagaturchess.search.impl.pv.PVNode;
 
 
 public class Search_PVS_NWS extends SearchImpl {
@@ -38,13 +39,11 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	public Search_PVS_NWS(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
-		NegamaxUtil.start(((BoardImpl) args[0]).getChessBoard());
 	}
 	
 	
 	public Search_PVS_NWS(SearchEnv _env) {
 		super(_env);
-		NegamaxUtil.start(((BoardImpl) _env.getBitboard()).getChessBoard());
 	}
 	
 	
@@ -63,7 +62,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		super.newSearch();
 		
-		
+		NegamaxUtil.start(((BoardImpl) env.getBitboard()).getChessBoard());
 	}
 	
 	
@@ -75,7 +74,15 @@ public class Search_PVS_NWS extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		return NegamaxUtil.calculateBestMove(env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, 0, normDepth(maxdepth), alpha_org, beta, 0);
+		int result = NegamaxUtil.calculateBestMove(mediator, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, 0, normDepth(maxdepth), alpha_org, beta, 0);
+		
+		
+		PVNode node = pvman.load(0);
+		node.bestmove = PV.getBestMove();
+		node.eval = result;
+		node.leaf = true;
+		
+		return result;
 	}
 	
 	
@@ -86,6 +93,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		return NegamaxUtil.calculateBestMove(env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, 0, normDepth(maxdepth), beta - 1, beta, 0);	
+		return NegamaxUtil.calculateBestMove(mediator, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, 0, normDepth(maxdepth), beta - 1, beta, 0);	
 	}
 }

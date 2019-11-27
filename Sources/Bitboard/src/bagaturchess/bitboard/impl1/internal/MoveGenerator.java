@@ -107,7 +107,13 @@ public final class MoveGenerator {
 	}
 
 	public int previous() {
+		if (nextToMove[currentPly] - 1 < 0) {
+			return 0;
+		}
+		
 		return moves[nextToMove[currentPly] - 1];
+		
+		//return 0;
 	}
 
 	public boolean hasNext() {
