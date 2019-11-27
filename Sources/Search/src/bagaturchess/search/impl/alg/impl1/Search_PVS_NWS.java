@@ -39,11 +39,15 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	public Search_PVS_NWS(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
+		
+		TTUtil.setSizeMB(64);
 	}
 	
 	
 	public Search_PVS_NWS(SearchEnv _env) {
 		super(_env);
+		
+		TTUtil.setSizeMB(64);
 	}
 	
 	
@@ -74,12 +78,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		int result = NegamaxUtil.calculateBestMove(mediator, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, 0, normDepth(maxdepth), alpha_org, beta, 0);
-		
+		int result = NegamaxUtil.calculateBestMove(mediator, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, 0, normDepth(maxdepth), alpha_org, beta, 0, true);
 		
 		PVNode node = pvman.load(0);
 		node.bestmove = PV.getBestMove();
-		node.eval = result;
+		node.eval = PV.getScore();
 		node.leaf = true;
 		
 		return result;
@@ -93,6 +96,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		return NegamaxUtil.calculateBestMove(mediator, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, 0, normDepth(maxdepth), beta - 1, beta, 0);	
+		return NegamaxUtil.calculateBestMove(mediator, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, 0, normDepth(maxdepth), beta - 1, beta, 0, false);		
 	}
 }
