@@ -93,6 +93,16 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
+	public ChessBoard getChessBoard() {
+		return chessBoard;
+	}
+	
+	
+	public MoveGenerator getMoveGenerator() {
+		return generator;
+	}
+	
+	
 	@Override
 	public boolean isInCheck() {
 		return chessBoard.checkingPieces != 0;
