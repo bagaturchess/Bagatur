@@ -21,7 +21,6 @@ package bagaturchess.bitboard.impl1;
 
 
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BISHOP;
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.KING;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.NIGHT;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.PAWN;

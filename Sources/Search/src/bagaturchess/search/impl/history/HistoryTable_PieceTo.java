@@ -117,6 +117,10 @@ public class HistoryTable_PieceTo implements IHistoryTable {
 			return;
 		}
 		
+		if (last_move == 0) {
+			return;
+		}
+		
 		int pid = board.getMoveOps().getFigurePID(last_move);
 		int to = board.getMoveOps().getToFieldID(last_move);
 		
