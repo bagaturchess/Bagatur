@@ -37,14 +37,16 @@ public final class NegamaxUtil {
 		// Ethereal LMR formula with depth and number of performed moves
 		for (int depth = 1; depth < 64; depth++) {
 			for (int moveNumber = 1; moveNumber < 64; moveNumber++) {
-				LMR_TABLE[depth][moveNumber] = (int) (0.5f + Math.log(depth) * Math.log(moveNumber * 1.2f) / 2.5f);
+				//TODO LMR_TABLE[depth][moveNumber] = (int) (0.5f + Math.log(depth) * Math.log(moveNumber * 1.2f) / 2.5f);
+				LMR_TABLE[depth][moveNumber] = 1 + (int) Math.ceil(Math.max(1, Math.log(moveNumber) * Math.log(depth) / (double) 2));
 			}
 		}
 	}
 
 	//public static AtomicInteger nrOfActiveThreads = new AtomicInteger(0);
 
-	public static int calculateBestMove(ISearchMediator mediator, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen, final int threadNumber, final int ply, int depth, int alpha, int beta, final int nullMoveCounter, boolean isPv) {
+	public static int calculateBestMove(ISearchMediator mediator, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
+			final int threadNumber, final int ply, int depth, int alpha, int beta, final int nullMoveCounter, boolean isPv) {
 
 		
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(depth, 0, alpha, beta);
@@ -103,7 +105,6 @@ public final class NegamaxUtil {
 			}
 		}
 
-		// TODO JITWatch unpredictable branch
 		if (depth == 0) {
 			return QuiescenceUtil.calculateBestMove(evaluator, cb, moveGen, alpha, beta);
 		}
@@ -143,7 +144,6 @@ public final class NegamaxUtil {
 			if (EngineConstants.ENABLE_NULL_MOVE) {
 				if (nullMoveCounter < 2 && eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 					cb.doNullMove();
-					// TODO less reduction if stm (other side) has only 1 major piece
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 					score = depth - reduction <= 0 ? -QuiescenceUtil.calculateBestMove(evaluator ,cb, moveGen, -beta, -beta + 1)
 							: -calculateBestMove(mediator, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1, false);
@@ -195,7 +195,6 @@ public final class NegamaxUtil {
 				}
 				break;
 			case PHASE_ATTACKING:
-				// TODO no ordering at ALL-nodes?
 				moveGen.generateAttacks(cb);
 				moveGen.setMVVLVAScores();
 				moveGen.sort();
@@ -401,9 +400,6 @@ public final class NegamaxUtil {
 			return EngineConstants.ENDGAME_EXTENSION_DEPTH;
 		}
 		/* check-extension */
-		// TODO extend discovered checks?
-		// TODO extend checks with SEE > 0?
-		// TODO extend when mate-threat?
 		if (EngineConstants.ENABLE_CHECK_EXTENSION && cb.checkingPieces != 0) {
 			return 1;
 		}
