@@ -33,29 +33,10 @@ import bagaturchess.search.impl.utils.SearchUtils;
 public class TPTable extends LRUMapLongObject<TPTEntry> {
 	
 	
-	private long count_unique_inserts = 0;
-	
-	
 	public TPTable(int _maxSize, boolean fillWithDummyEntries, IBinarySemaphore _semaphore) {
 		super(new TPTEntryFactory(), _maxSize, fillWithDummyEntries, _semaphore);
 	}
 	
-	
-	public long getCount_UniqueInserts() {
-		return count_unique_inserts;
-	}
-	
-	public void clearCount_UniqueInserts() {
-		count_unique_inserts = 0;
-	}
-	
-	/*public void obsoleteAll() {
-		long[] keys = map.getAllKeys();
-		for (int i=0; i<keys.length; i++) {
-			long key = keys[i];
-			map.get(key).getValue().obsolete = true;
-		}
-	}*/
 	
 	public void correctAllDepths(final int reduction) {
 		
@@ -66,19 +47,14 @@ public class TPTable extends LRUMapLongObject<TPTEntry> {
 			}
 		};
 		visitValues(visitor);
-		
-		/*long[] keys = map.getAllKeys();
-		for (int i=0; i<keys.length; i++) {
-			long key = keys[i];
-			TPTEntry entry = map.get(key).getValue();
-			entry.depth = (byte) Math.max(1, entry.depth - reduction);
-		}*/
 	}
+	
 	
 	public TPTEntry get(long key) {
 		
 		return super.getAndUpdateLRU(key);
 	}
+	
 	
 	public TPTEntry put(long hashkey,
 			int _smaxdepth, int _sdepth, 
@@ -100,12 +76,9 @@ public class TPTable extends LRUMapLongObject<TPTEntry> {
 			}
 		}
 		
-		//int _depth = _smaxdepth - _sdepth;
-		
-		/*if (_depth < skipDepth
-				&& (_eval <= _alpha || _eval >= _beta) ) {
+		if (SearchUtils.isMateVal(_eval)) {
 			return null;
-		}*/
+		}
 		
 		TPTEntry entry = super.getAndUpdateLRU(hashkey);
 		if (entry != null) {
@@ -113,65 +86,8 @@ public class TPTable extends LRUMapLongObject<TPTEntry> {
 		} else {
 			entry = associateEntry(hashkey);
 			entry.init(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, movenumber);
-			count_unique_inserts++;
 		}
 		
 		return entry;
 	}
-	
-	public TPTEntry getEntryByAtleastDepth(int depth, long hashkey) {
-		
-		TPTEntry entry = get(hashkey);
-		
-		if (entry != null) {
-			if (entry.depth >= depth) {
-				return entry;
-			}
-		}
-		
-		return null;
-	}
-	
-	/*public TPTEntry getEntryByType(TPTEntryType type, long hashkey) {
-	
-	if (true) throw new IllegalStateException(); 
-	
-	lock.readLock().lock();
-	TPTEntry entry = get(hashkey);
-	lock.readLock().unlock();
-	
-	if (entry != null) {
-		throw new IllegalStateException();
-	}
-	return null;
-}*/
-	
-	/*public TPTEntry getEntryByExactDepth(int depth, long hashkey) {
-	
-	if (true) throw new IllegalStateException(); 
-	
-	lock.readLock().lock();
-	TPTEntry entry = get(hashkey);
-	lock.readLock().unlock();
-	
-	if (entry != null) {
-		if (entry.depth == depth) {
-			return entry;
-		}
-	}
-	return null;
-}*/
-	
-	/*public void makeAllDirty() {
-		
-		if (true) throw new IllegalStateException(); 
-		
-		lock.writeLock().lock();
-		long[] keys = map.getAllKeys();
-		for (int i=0; i<keys.length; i++) {
-			long key = keys[i];
-			get(key).setDirty(true);
-		}
-		lock.writeLock().unlock();
-	}*/
 }
