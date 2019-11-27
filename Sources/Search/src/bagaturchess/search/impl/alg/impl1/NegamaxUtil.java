@@ -19,6 +19,7 @@ import bagaturchess.bitboard.impl1.internal.ChessConstants.ScoreType;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
+import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
@@ -50,7 +51,7 @@ public final class NegamaxUtil {
 	private static final int FUTILITY_MARGIN_Q_SEARCH = 200;
 	
 	
-	public static int calculateBestMove(ISearchMediator mediator, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
+	public static int calculateBestMove(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
 			final int threadNumber, final int ply, int depth, int alpha, int beta, final int nullMoveCounter, boolean isPv) {
 
 		
@@ -151,7 +152,7 @@ public final class NegamaxUtil {
 					cb.doNullMove();
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 					score = depth - reduction <= 0 ? -calculateBestMove(evaluator ,cb, moveGen, -beta, -beta + 1)
-							: -calculateBestMove(mediator, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1, false);
+							: -calculateBestMove(mediator, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1, false);
 					cb.undoNullMove();
 					if (score >= beta) {
 						return score;
@@ -181,7 +182,7 @@ public final class NegamaxUtil {
 					if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
 						// no iid in pawn-endgame because the extension could cause an endless loop
 						if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
-							calculateBestMove(mediator, evaluator, cb, moveGen, threadNumber, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, 0, isPv);
+							calculateBestMove(mediator, pvman, evaluator, cb, moveGen, threadNumber, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, 0, isPv);
 							ttValue = TTUtil.getTTValue(cb.zobristKey);
 						}
 					}
@@ -312,17 +313,17 @@ public final class NegamaxUtil {
 					try {
 						/* LMR */
 						if (EngineConstants.ENABLE_LMR && reduction != 1) {
-							score = -calculateBestMove(mediator, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -alpha - 1, -alpha, 0, false);
+							score = -calculateBestMove(mediator, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -alpha - 1, -alpha, 0, false);
 						}
 	
 						/* PVS */
 						if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed > 1) {
-							score = -calculateBestMove(mediator, evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -alpha - 1, -alpha, 0, false);
+							score = -calculateBestMove(mediator, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -alpha - 1, -alpha, 0, false);
 						}
 	
 						/* normal bounds */
 						if (score > alpha) {
-							score = -calculateBestMove(mediator, evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -beta, -alpha, 0, isPv);
+							score = -calculateBestMove(mediator, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -beta, -alpha, 0, isPv);
 						}
 					} catch(SearchInterruptedException sie) {
 						moveGen.endPly();
