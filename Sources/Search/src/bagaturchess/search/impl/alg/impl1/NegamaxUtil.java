@@ -1,6 +1,8 @@
 package bagaturchess.search.impl.alg.impl1;
 
 
+import java.util.Arrays;
+
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.CheckUtil;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
@@ -13,6 +15,7 @@ import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.bitboard.impl1.internal.Util;
+import bagaturchess.bitboard.impl1.internal.ChessConstants.ScoreType;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
@@ -21,6 +24,7 @@ import bagaturchess.search.impl.utils.SearchUtils;
 
 public final class NegamaxUtil {
 
+	
 	private static final int PHASE_TT = 0;
 	private static final int PHASE_ATTACKING = 1;
 	private static final int PHASE_KILLER_1 = 2;
@@ -43,8 +47,9 @@ public final class NegamaxUtil {
 		}
 	}
 
-	//public static AtomicInteger nrOfActiveThreads = new AtomicInteger(0);
-
+	private static final int FUTILITY_MARGIN_Q_SEARCH = 200;
+	
+	
 	public static int calculateBestMove(ISearchMediator mediator, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
 			final int threadNumber, final int ply, int depth, int alpha, int beta, final int nullMoveCounter, boolean isPv) {
 
@@ -106,7 +111,7 @@ public final class NegamaxUtil {
 		}
 
 		if (depth == 0) {
-			return QuiescenceUtil.calculateBestMove(evaluator, cb, moveGen, alpha, beta);
+			return calculateBestMove(evaluator, cb, moveGen, alpha, beta);
 		}
 
 		int eval = Util.SHORT_MIN;
@@ -133,7 +138,7 @@ public final class NegamaxUtil {
 			/* razoring */
 			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < EvalConstants.SCORE_MATE_BOUND) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
-					score = QuiescenceUtil.calculateBestMove(evaluator, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1);
+					score = calculateBestMove(evaluator, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1);
 					if (score + RAZORING_MARGIN[depth] <= alpha) {
 						return score;
 					}
@@ -145,7 +150,7 @@ public final class NegamaxUtil {
 				if (nullMoveCounter < 2 && eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 					cb.doNullMove();
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
-					score = depth - reduction <= 0 ? -QuiescenceUtil.calculateBestMove(evaluator ,cb, moveGen, -beta, -beta + 1)
+					score = depth - reduction <= 0 ? -calculateBestMove(evaluator ,cb, moveGen, -beta, -beta + 1)
 							: -calculateBestMove(mediator, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1, false);
 					cb.undoNullMove();
 					if (score >= beta) {
@@ -410,5 +415,149 @@ public final class NegamaxUtil {
 		cb.moveCount = 0;
 		TTUtil.init(false);
 	}
+	
 
+	public static int calculateBestMove(IEvaluator evaluator, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta) {
+
+		/* stand-pat check */
+		int eval = Util.SHORT_MIN;
+		if (cb.checkingPieces == 0) {
+			eval = evaluator.lazyEval(0, alpha, beta, 0);
+			if (eval >= beta) {
+				return eval;
+			}
+			alpha = Math.max(alpha, eval);
+		}
+
+		moveGen.startPly();
+		moveGen.generateAttacks(cb);
+		moveGen.setMVVLVAScores();
+		moveGen.sort();
+
+		while (moveGen.hasNext()) {
+			final int move = moveGen.next();
+
+			// skip under promotions
+			if (MoveUtil.isPromotion(move)) {
+				if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
+					continue;
+				}
+			} else if (EngineConstants.ENABLE_Q_FUTILITY_PRUNING
+					&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+				// futility pruning
+				continue;
+			}
+
+			if (!cb.isLegal(move)) {
+				continue;
+			}
+
+			// skip bad-captures
+			if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move)) && SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
+				continue;
+			}
+
+			cb.doMove(move);
+
+			if (EngineConstants.ASSERT) {
+				cb.changeSideToMove();
+				Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
+				cb.changeSideToMove();
+			}
+
+			final int score = -calculateBestMove(evaluator, cb, moveGen, -beta, -alpha);
+
+			cb.undoMove(move);
+
+			if (score >= beta) {
+				moveGen.endPly();
+				return score;
+			}
+			alpha = Math.max(alpha, score);
+		}
+
+		moveGen.endPly();
+		return alpha;
+	}
+	
+	
+	public static class PV {
+
+		private static final int MOVES_LENGTH = 10;
+
+		private static int[] moves = new int[MOVES_LENGTH];
+		private static int flag;
+		private static int score;
+
+		public static void set(int bestMove, int alpha, int beta, int score, ChessBoard cb) {
+
+			PV.score = score;
+
+			if (score <= alpha) {
+				flag = TTUtil.FLAG_UPPER;
+				return;
+			} else if (score >= beta) {
+				flag = TTUtil.FLAG_LOWER;
+			} else {
+				flag = TTUtil.FLAG_EXACT;
+			}
+
+			Arrays.fill(moves, 0);
+			moves[0] = bestMove;
+			cb.doMove(bestMove);
+
+			for (int i = 1; i < MOVES_LENGTH; i++) {
+				long ttValue = TTUtil.getTTValue(cb.zobristKey);
+				if (ttValue == 0) {
+					break;
+				}
+				int move = TTUtil.getMove(ttValue);
+				moves[i] = move;
+				cb.doMove(move);
+			}
+			for (int i = MOVES_LENGTH - 1; i >= 0; i--) {
+				if (moves[i] == 0) {
+					continue;
+				}
+				cb.undoMove(moves[i]);
+			}
+		}
+
+		public static ScoreType getScoreType() {
+			switch (flag) {
+			case TTUtil.FLAG_EXACT:
+				return ScoreType.EXACT;
+			case TTUtil.FLAG_LOWER:
+				return ScoreType.LOWER;
+			case TTUtil.FLAG_UPPER:
+				return ScoreType.UPPER;
+			}
+			throw new RuntimeException("Unknown flag " + flag);
+		}
+
+		public static int getPonderMove() {
+			return moves[1];
+		}
+
+		public static int getBestMove() {
+			return moves[0];
+		}
+
+		public static int getScore() {
+			return score;
+		}
+
+		public static String asString() {
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < MOVES_LENGTH; i++) {
+				int move = moves[i];
+				if (move == 0) {
+					break;
+				}
+				sb.append(new MoveWrapper(move)).append(" ");
+			}
+			return sb.toString();
+		}
+
+	}
 }
