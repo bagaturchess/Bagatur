@@ -72,7 +72,7 @@ public final class NegamaxUtil {
 		}
 		
 		
-		PVNode node = pvman.load(0);
+		PVNode node = pvman.load(ply);
 		node.bestmove = 0;
 		node.eval = ISearch.MIN;
 		node.leaf = true;
@@ -80,8 +80,6 @@ public final class NegamaxUtil {
 		
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(depth >= 0);
-			Assert.isTrue(alpha >= Util.SHORT_MIN && alpha <= Util.SHORT_MAX);
-			Assert.isTrue(beta >= Util.SHORT_MIN && beta <= Util.SHORT_MAX);
 		}
 
 		final int alphaOrig = alpha;
@@ -89,57 +87,47 @@ public final class NegamaxUtil {
 		// get extensions
 		depth += extensions(cb, moveGen, ply);
 
-		/* mate-distance pruning */
-		if (EngineConstants.ENABLE_MATE_DISTANCE_PRUNING) {
-			alpha = Math.max(alpha, Util.SHORT_MIN + ply);
-			beta = Math.min(beta, Util.SHORT_MAX - ply - 1);
-			if (alpha >= beta) {
-				return alpha;
-			}
-		}
-
 		/* transposition-table */
 		long ttValue = TTUtil.getTTValue(cb.zobristKey);
 		int score = TTUtil.getScore(ttValue, ply);
-		if (ttValue != 0) {
+		if (!isPv && ttValue != 0) {
 			if (!EngineConstants.TEST_TT_VALUES) {
 
 				if (TTUtil.getDepth(ttValue) >= depth) {
 					switch (TTUtil.getFlag(ttValue)) {
 					case TTUtil.FLAG_EXACT:
-						if (ply == 0 && threadNumber == 0) {
-							PV.set(TTUtil.getMove(ttValue), alpha, beta, score, cb);
-						}
-						return score;
+						node.bestmove = TTUtil.getMove(ttValue);
+						node.eval = score;
+						return node.eval;
 					case TTUtil.FLAG_LOWER:
 						if (score >= beta) {
-							if (ply == 0 && threadNumber == 0) {
-								PV.set(TTUtil.getMove(ttValue), alpha, beta, score, cb);
-							}
-							return score;
+							node.bestmove = TTUtil.getMove(ttValue);
+							node.eval = score;
+							return node.eval;
 						}
 						break;
 					case TTUtil.FLAG_UPPER:
 						if (score <= alpha) {
-							if (ply == 0 && threadNumber == 0) {
-								PV.set(TTUtil.getMove(ttValue), alpha, beta, score, cb);
-							}
-							return score;
+							node.bestmove = TTUtil.getMove(ttValue);
+							node.eval = score;
+							return node.eval;
 						}
 					}
 				}
 			}
 		}
-
+		
 		if (depth == 0) {
-			return calculateBestMove(evaluator, info, cb, moveGen, alpha, beta, ply);
+			node.eval = calculateBestMove(evaluator, info, cb, moveGen, alpha, beta, ply);
+			node.bestmove = 0;
+			return node.eval;
 		}
-
+		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
 		
 		
-		int eval = Util.SHORT_MIN;
+		int eval = ISearch.MIN;
 		//final boolean isPv = beta - alpha != 1;
 		if (!isPv && cb.checkingPieces == 0) {
 
@@ -156,16 +144,27 @@ public final class NegamaxUtil {
 			/* static null move pruning */
 			if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < STATIC_NULLMOVE_MARGIN.length) {
 				if (eval - STATIC_NULLMOVE_MARGIN[depth] >= beta) {
-					return eval;
+					node.eval = eval;
+					return node.eval;
 				}
 			}
-
+			
+			//Razoring for all depths based on the eval deviation detected into the root node
+			/*if (eval < alpha - mediator.getTrustWindow_AlphaAspiration()) {
+				score = calculateBestMove(evaluator, info, cb, moveGen, alpha - mediator.getTrustWindow_AlphaAspiration(), alpha - mediator.getTrustWindow_AlphaAspiration() + 1, ply);
+				if (score <= alpha - mediator.getTrustWindow_AlphaAspiration()) {
+					node.eval = score;
+					return node.eval;
+				}
+			}*/
+			
 			/* razoring */
-			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < EvalConstants.SCORE_MATE_BOUND) {
+			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < ISearch.MAX_MAT_INTERVAL) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
 					score = calculateBestMove(evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply);
 					if (score + RAZORING_MARGIN[depth] <= alpha) {
-						return score;
+						node.eval = score;
+						return node.eval;
 					}
 				}
 			}
@@ -179,7 +178,8 @@ public final class NegamaxUtil {
 							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1, false);
 					cb.undoNullMove();
 					if (score >= beta) {
-						return score;
+						node.eval = score;
+						return node.eval;
 					}
 				}
 			}
@@ -189,7 +189,7 @@ public final class NegamaxUtil {
 
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
 		int bestMove = 0;
-		int bestScore = Util.SHORT_MIN - 1;
+		int bestScore = ISearch.MIN;
 		int ttMove = 0;
 		int counterMove = 0;
 		int killer1Move = 0;
@@ -286,7 +286,7 @@ public final class NegamaxUtil {
 						/* futility pruning */
 						if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
 							if (!MoveUtil.isPawnPush78(move)) {
-								if (eval == Util.SHORT_MIN) {
+								if (eval == ISearch.MIN) {
 									eval = evaluator.lazyEval(ply, alphaOrig, beta, 0);
 								}
 								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
@@ -358,17 +358,18 @@ public final class NegamaxUtil {
 				cb.undoMove(move);
 
 				if (score > bestScore) {
+					
 					bestScore = score;
 					bestMove = move;
-
-					if (threadNumber != 0) {
-						throw new IllegalStateException();
+					
+					node.bestmove = bestMove;
+					node.eval = bestScore;
+					node.leaf = false;
+					
+					if (ply + 1 < 90) {
+						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 					}
 					
-					if (ply == 0 && threadNumber == 0) {
-						PV.set(bestMove, alphaOrig, beta, bestScore, cb);
-					}
-
 					alpha = Math.max(alpha, score);
 					if (alpha >= beta) {
 
@@ -391,21 +392,22 @@ public final class NegamaxUtil {
 			phase++;
 		}
 		moveGen.endPly();
-
+		
 		/* checkmate or stalemate */
 		if (movesPerformed == 0) {
 			if (cb.checkingPieces == 0) {
-				return EvalConstants.SCORE_DRAW;
+				node.eval = EvalConstants.SCORE_DRAW;
+				return node.eval;
 			} else {
-				//return -SearchUtils.getMateVal(ply);
-				return Util.SHORT_MIN + ply;
+				node.eval = -SearchUtils.getMateVal(ply);
+				return node.eval;
 			}
 		}
-
+		
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(bestMove != 0);
 		}
-
+		
 		// set tt-flag
 		int flag = TTUtil.FLAG_EXACT;
 		if (bestScore >= beta) {
@@ -447,7 +449,7 @@ public final class NegamaxUtil {
 		
 		
 		/* stand-pat check */
-		int eval = Util.SHORT_MIN;
+		int eval = ISearch.MIN;
 		if (cb.checkingPieces == 0) {
 			eval = evaluator.lazyEval(0, alpha, beta, 0);
 			if (eval >= beta) {
@@ -505,86 +507,5 @@ public final class NegamaxUtil {
 
 		moveGen.endPly();
 		return alpha;
-	}
-	
-	
-	public static class PV {
-
-		private static final int MOVES_LENGTH = 10;
-
-		private static int[] moves = new int[MOVES_LENGTH];
-		private static int flag;
-		private static int score;
-
-		public static void set(int bestMove, int alpha, int beta, int score, ChessBoard cb) {
-
-			PV.score = score;
-
-			if (score <= alpha) {
-				flag = TTUtil.FLAG_UPPER;
-				return;
-			} else if (score >= beta) {
-				flag = TTUtil.FLAG_LOWER;
-			} else {
-				flag = TTUtil.FLAG_EXACT;
-			}
-
-			Arrays.fill(moves, 0);
-			moves[0] = bestMove;
-			cb.doMove(bestMove);
-
-			for (int i = 1; i < MOVES_LENGTH; i++) {
-				long ttValue = TTUtil.getTTValue(cb.zobristKey);
-				if (ttValue == 0) {
-					break;
-				}
-				int move = TTUtil.getMove(ttValue);
-				moves[i] = move;
-				cb.doMove(move);
-			}
-			for (int i = MOVES_LENGTH - 1; i >= 0; i--) {
-				if (moves[i] == 0) {
-					continue;
-				}
-				cb.undoMove(moves[i]);
-			}
-		}
-
-		public static ScoreType getScoreType() {
-			switch (flag) {
-			case TTUtil.FLAG_EXACT:
-				return ScoreType.EXACT;
-			case TTUtil.FLAG_LOWER:
-				return ScoreType.LOWER;
-			case TTUtil.FLAG_UPPER:
-				return ScoreType.UPPER;
-			}
-			throw new RuntimeException("Unknown flag " + flag);
-		}
-
-		public static int getPonderMove() {
-			return moves[1];
-		}
-
-		public static int getBestMove() {
-			return moves[0];
-		}
-
-		public static int getScore() {
-			return score;
-		}
-
-		public static String asString() {
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < MOVES_LENGTH; i++) {
-				int move = moves[i];
-				if (move == 0) {
-					break;
-				}
-				sb.append(new MoveWrapper(move)).append(" ");
-			}
-			return sb.toString();
-		}
-
 	}
 }

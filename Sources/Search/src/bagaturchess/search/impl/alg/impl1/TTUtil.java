@@ -6,7 +6,6 @@ import java.util.Arrays;
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.ChessConstants;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
-import bagaturchess.bitboard.impl1.internal.EvalConstants;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 import bagaturchess.bitboard.impl1.internal.Util;
@@ -111,15 +110,7 @@ public class TTUtil {
 				replacedDepth = currentDepth;
 			}
 		}
-
-		// correct mate-score
-		if (score > EvalConstants.SCORE_MATE_BOUND) {
-			// Math.min because of qsearch
-			score = Math.min(score + ply, Util.SHORT_MAX);
-		} else if (score < -EvalConstants.SCORE_MATE_BOUND) {
-			// Math.max because of qsearch
-			score = Math.max(score - ply, Util.SHORT_MIN);
-		}
+		
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 		}
@@ -131,13 +122,6 @@ public class TTUtil {
 
 	public static int getScore(final long value, final int ply) {
 		int score = (int) (value >> SCORE);
-
-		// correct mate-score
-		if (score > EvalConstants.SCORE_MATE_BOUND) {
-			score -= ply;
-		} else if (score < -EvalConstants.SCORE_MATE_BOUND) {
-			score += ply;
-		}
 
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
