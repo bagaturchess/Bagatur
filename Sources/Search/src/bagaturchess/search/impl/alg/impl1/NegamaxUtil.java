@@ -90,7 +90,7 @@ public final class NegamaxUtil {
 		final int alphaOrig = alpha;
 
 		// get extensions
-		depth += extensions(cb, moveGen, ply);
+		//depth += extensions(cb, moveGen, ply);
 
 		/* transposition-table */
 		long ttValue = TTUtil.getTTValue(cb.zobristKey);
@@ -455,6 +455,33 @@ public final class NegamaxUtil {
 		}
 		
 		
+		/* transposition-table */
+		/*long ttValue = TTUtil.getTTValue(cb.zobristKey);
+		int ttScore = TTUtil.getScore(ttValue);
+		if (ttValue != 0) {
+			if (!EngineConstants.TEST_TT_VALUES) {
+				if (TTUtil.getDepth(ttValue) >= 0) {
+					switch (TTUtil.getFlag(ttValue)) {
+					case TTUtil.FLAG_EXACT:
+						return ttScore;
+					case TTUtil.FLAG_LOWER:
+						if (ttScore >= beta) {
+							return ttScore;
+						}
+						break;
+					case TTUtil.FLAG_UPPER:
+						if (ttScore <= alpha) {
+							return ttScore;
+						}
+					}
+				}
+			}
+		}
+		
+		
+		final int alphaOrig = alpha;*/
+		
+		
 		/* stand-pat check */
 		int eval = ISearch.MIN;
 		if (cb.checkingPieces == 0) {
@@ -507,12 +534,25 @@ public final class NegamaxUtil {
 
 			if (score >= beta) {
 				moveGen.endPly();
+				
+				// set tt-flag
+				/*int flag = TTUtil.FLAG_EXACT;
+				if (score >= beta) {
+					flag = TTUtil.FLAG_LOWER;
+				} else if (score <= alphaOrig) {
+					flag = TTUtil.FLAG_UPPER;
+				}
+				if (!SearchUtils.isMateVal(score)) {
+					TTUtil.addValue(cb.zobristKey, score, ply, 0, flag, move);
+				}*/
+				
 				return score;
 			}
 			alpha = Math.max(alpha, score);
 		}
 
 		moveGen.endPly();
+		
 		return alpha;
 	}
 }
