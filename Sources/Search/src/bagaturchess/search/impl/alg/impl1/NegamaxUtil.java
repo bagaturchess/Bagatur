@@ -18,6 +18,7 @@ import bagaturchess.bitboard.impl1.internal.Util;
 import bagaturchess.bitboard.impl1.internal.ChessConstants.ScoreType;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearch;
+import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.pv.PVManager;
@@ -59,12 +60,18 @@ public final class NegamaxUtil {
 	}
 	
 	
-	public static int calculateBestMove(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
+	public static int calculateBestMove(ISearchMediator mediator, ISearchInfo info, PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
 			final int threadNumber, final int ply, int depth, int alpha, int beta, final int nullMoveCounter, boolean isPv) {
 
 		
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(depth, 0, alpha, beta);
 
+		
+		info.setSearchedNodes(info.getSearchedNodes() + 1);
+		if (info.getSelDepth() < ply) {
+			info.setSelDepth(ply);
+		}
+		
 		
 		PVNode node = pvman.load(0);
 		node.bestmove = 0;
@@ -126,7 +133,7 @@ public final class NegamaxUtil {
 		}
 
 		if (depth == 0) {
-			return calculateBestMove(evaluator, cb, moveGen, alpha, beta);
+			return calculateBestMove(evaluator, info, cb, moveGen, alpha, beta);
 		}
 
 		int eval = Util.SHORT_MIN;
@@ -153,7 +160,7 @@ public final class NegamaxUtil {
 			/* razoring */
 			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < EvalConstants.SCORE_MATE_BOUND) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
-					score = calculateBestMove(evaluator, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1);
+					score = calculateBestMove(evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1);
 					if (score + RAZORING_MARGIN[depth] <= alpha) {
 						return score;
 					}
@@ -165,8 +172,8 @@ public final class NegamaxUtil {
 				if (/*nullMoveCounter < 2 &&*/ eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 					cb.doNullMove();
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
-					score = depth - reduction <= 0 ? -calculateBestMove(evaluator ,cb, moveGen, -beta, -beta + 1)
-							: -calculateBestMove(mediator, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1, false);
+					score = depth - reduction <= 0 ? -calculateBestMove(evaluator, info, cb, moveGen, -beta, -beta + 1)
+							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1, false);
 					cb.undoNullMove();
 					if (score >= beta) {
 						return score;
@@ -327,17 +334,17 @@ public final class NegamaxUtil {
 					try {
 						/* LMR */
 						if (EngineConstants.ENABLE_LMR && reduction != 1) {
-							score = -calculateBestMove(mediator, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -alpha - 1, -alpha, 0, false);
+							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -alpha - 1, -alpha, 0, false);
 						}
 	
 						/* PVS */
 						if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed > 1) {
-							score = -calculateBestMove(mediator, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -alpha - 1, -alpha, 0, false);
+							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -alpha - 1, -alpha, 0, false);
 						}
 	
 						/* normal bounds */
 						if (score > alpha) {
-							score = -calculateBestMove(mediator, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -beta, -alpha, 0, isPv);
+							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -beta, -alpha, 0, isPv);
 						}
 					} catch(SearchInterruptedException sie) {
 						moveGen.endPly();
@@ -427,8 +434,12 @@ public final class NegamaxUtil {
 	}
 	
 
-	public static int calculateBestMove(IEvaluator evaluator, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta) {
-
+	public static int calculateBestMove(IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta) {
+		
+		
+		info.setSearchedNodes(info.getSearchedNodes() + 1);		
+		
+		
 		/* stand-pat check */
 		int eval = Util.SHORT_MIN;
 		if (cb.checkingPieces == 0) {
@@ -475,7 +486,7 @@ public final class NegamaxUtil {
 				cb.changeSideToMove();
 			}
 
-			final int score = -calculateBestMove(evaluator, cb, moveGen, -beta, -alpha);
+			final int score = -calculateBestMove(evaluator, info, cb, moveGen, -beta, -alpha);
 
 			cb.undoMove(move);
 
