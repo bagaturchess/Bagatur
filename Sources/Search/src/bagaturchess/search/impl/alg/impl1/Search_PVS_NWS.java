@@ -51,17 +51,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	@Override
-	public String toString() {
-		String result = "";//"" + this + " ";
-		
-		result += Thread.currentThread().getName() + "	>	";
-		result += getEnv().toString();
-		
-		return result;
-	}
-	
-	
 	public void newSearch() {
 		
 		super.newSearch();

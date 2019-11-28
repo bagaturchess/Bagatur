@@ -17,9 +17,11 @@ import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.bitboard.impl1.internal.Util;
 import bagaturchess.bitboard.impl1.internal.ChessConstants.ScoreType;
 import bagaturchess.search.api.IEvaluator;
+import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.pv.PVManager;
+import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
@@ -47,8 +49,14 @@ public final class NegamaxUtil {
 			}
 		}
 	}
-
+	
 	private static final int FUTILITY_MARGIN_Q_SEARCH = 200;
+	
+	
+	public static void start(final ChessBoard cb) {
+		//cb.moveCount = 0;
+		TTUtil.init(false);
+	}
 	
 	
 	public static int calculateBestMove(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
@@ -57,6 +65,12 @@ public final class NegamaxUtil {
 		
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(depth, 0, alpha, beta);
 
+		
+		PVNode node = pvman.load(0);
+		node.bestmove = 0;
+		node.eval = ISearch.MIN;
+		node.leaf = true;
+		
 		
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(depth >= 0);
@@ -148,7 +162,7 @@ public final class NegamaxUtil {
 
 			/* null-move */
 			if (EngineConstants.ENABLE_NULL_MOVE) {
-				if (nullMoveCounter < 2 && eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
+				if (/*nullMoveCounter < 2 &&*/ eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 					cb.doNullMove();
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 					score = depth - reduction <= 0 ? -calculateBestMove(evaluator ,cb, moveGen, -beta, -beta + 1)
@@ -177,8 +191,8 @@ public final class NegamaxUtil {
 		while (phase <= PHASE_QUIET) {
 			switch (phase) {
 			case PHASE_TT:
-				if (ttValue == 0) {
-					/* IID */
+				/*if (ttValue == 0) {
+					// IID
 					if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
 						// no iid in pawn-endgame because the extension could cause an endless loop
 						if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
@@ -186,7 +200,7 @@ public final class NegamaxUtil {
 							ttValue = TTUtil.getTTValue(cb.zobristKey);
 						}
 					}
-				}
+				}*/
 				if (ttValue != 0) {
 					ttMove = TTUtil.getMove(ttValue);
 
@@ -410,11 +424,6 @@ public final class NegamaxUtil {
 			return 1;
 		}
 		return 0;
-	}
-
-	public static void start(final ChessBoard cb) {
-		cb.moveCount = 0;
-		TTUtil.init(false);
 	}
 	
 
