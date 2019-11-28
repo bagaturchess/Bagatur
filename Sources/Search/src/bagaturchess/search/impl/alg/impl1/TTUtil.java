@@ -120,7 +120,7 @@ public class TTUtil {
 		values[replacedIndex] = value;
 	}
 
-	public static int getScore(final long value, final int ply) {
+	public static int getScore(final long value) {
 		int score = (int) (value >> SCORE);
 
 		if (EngineConstants.ASSERT) {
@@ -143,7 +143,7 @@ public class TTUtil {
 	}
 
 	// SCORE,HALF_MOVE_COUNTER,MOVE,FLAG,DEPTH
-	public static long createValue(final long score, final long move, final long flag, final long depth) {
+	private static long createValue(final long score, final long move, final long flag, final long depth) {
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 			Assert.isTrue(depth <= 255);
@@ -152,7 +152,7 @@ public class TTUtil {
 	}
 
 	public static String toString(long ttValue) {
-		return "score=" + TTUtil.getScore(ttValue, 0) + " " + new MoveWrapper(getMove(ttValue)) + " depth=" + TTUtil.getDepth(ttValue) + " flag="
+		return "score=" + TTUtil.getScore(ttValue) + " " + new MoveWrapper(getMove(ttValue)) + " depth=" + TTUtil.getDepth(ttValue) + " flag="
 				+ TTUtil.getFlag(ttValue);
 	}
 

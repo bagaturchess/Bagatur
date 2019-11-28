@@ -94,7 +94,7 @@ public final class NegamaxUtil {
 
 		/* transposition-table */
 		long ttValue = TTUtil.getTTValue(cb.zobristKey);
-		int score = TTUtil.getScore(ttValue, ply);
+		int score = TTUtil.getScore(ttValue);
 		if (!isPv && ttValue != 0) {
 			if (!EngineConstants.TEST_TT_VALUES) {
 
@@ -425,8 +425,10 @@ public final class NegamaxUtil {
 			throw new IllegalStateException();
 		}
 		
-		TTUtil.addValue(cb.zobristKey, bestScore, ply, depth, flag, bestMove);
-
+		if (!SearchUtils.isMateVal(bestScore)) {
+			TTUtil.addValue(cb.zobristKey, bestScore, ply, depth, flag, bestMove);
+		}
+		
 		return bestScore;
 	}
 
