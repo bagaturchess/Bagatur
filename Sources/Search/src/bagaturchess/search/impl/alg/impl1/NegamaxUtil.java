@@ -62,13 +62,18 @@ public final class NegamaxUtil {
 	
 	public static int calculateBestMove(ISearchMediator mediator, ISearchInfo info, PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
 			final int threadNumber, final int ply, int depth, int alpha, int beta, final int nullMoveCounter, boolean isPv) {
-
+		
 		
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(depth, 0, alpha, beta);
 		
 		
 		if (info.getSelDepth() < ply) {
 			info.setSelDepth(ply);
+		}
+		
+		
+		if (ply >= ISearch.MAX_DEPTH) {
+			return evaluator.lazyEval(ply, alpha, beta, 0);
 		}
 		
 		
@@ -366,7 +371,7 @@ public final class NegamaxUtil {
 					node.eval = bestScore;
 					node.leaf = false;
 					
-					if (ply + 1 < 90) {
+					if (ply + 1 < ISearch.MAX_DEPTH) {
 						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 					}
 					
