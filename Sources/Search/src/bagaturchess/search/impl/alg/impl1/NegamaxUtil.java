@@ -65,9 +65,8 @@ public final class NegamaxUtil {
 
 		
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(depth, 0, alpha, beta);
-
 		
-		info.setSearchedNodes(info.getSearchedNodes() + 1);
+		
 		if (info.getSelDepth() < ply) {
 			info.setSelDepth(ply);
 		}
@@ -133,9 +132,13 @@ public final class NegamaxUtil {
 		}
 
 		if (depth == 0) {
-			return calculateBestMove(evaluator, info, cb, moveGen, alpha, beta);
+			return calculateBestMove(evaluator, info, cb, moveGen, alpha, beta, ply);
 		}
 
+		
+		info.setSearchedNodes(info.getSearchedNodes() + 1);
+		
+		
 		int eval = Util.SHORT_MIN;
 		//final boolean isPv = beta - alpha != 1;
 		if (!isPv && cb.checkingPieces == 0) {
@@ -160,7 +163,7 @@ public final class NegamaxUtil {
 			/* razoring */
 			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < EvalConstants.SCORE_MATE_BOUND) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
-					score = calculateBestMove(evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1);
+					score = calculateBestMove(evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply);
 					if (score + RAZORING_MARGIN[depth] <= alpha) {
 						return score;
 					}
@@ -172,7 +175,7 @@ public final class NegamaxUtil {
 				if (/*nullMoveCounter < 2 &&*/ eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 					cb.doNullMove();
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
-					score = depth - reduction <= 0 ? -calculateBestMove(evaluator, info, cb, moveGen, -beta, -beta + 1)
+					score = depth - reduction <= 0 ? -calculateBestMove(evaluator, info, cb, moveGen, -beta, -beta + 1, ply)
 							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1, false);
 					cb.undoNullMove();
 					if (score >= beta) {
@@ -434,10 +437,13 @@ public final class NegamaxUtil {
 	}
 	
 
-	public static int calculateBestMove(IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta) {
+	public static int calculateBestMove(IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, int ply) {
 		
 		
-		info.setSearchedNodes(info.getSearchedNodes() + 1);		
+		info.setSearchedNodes(info.getSearchedNodes() + 1);
+		if (info.getSelDepth() < ply) {
+			info.setSelDepth(ply);
+		}
 		
 		
 		/* stand-pat check */
@@ -486,7 +492,7 @@ public final class NegamaxUtil {
 				cb.changeSideToMove();
 			}
 
-			final int score = -calculateBestMove(evaluator, info, cb, moveGen, -beta, -alpha);
+			final int score = -calculateBestMove(evaluator, info, cb, moveGen, -beta, -alpha, ply + 1);
 
 			cb.undoMove(move);
 
