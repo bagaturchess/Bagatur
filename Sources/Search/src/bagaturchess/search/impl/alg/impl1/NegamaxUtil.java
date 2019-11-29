@@ -1,6 +1,5 @@
 package bagaturchess.search.impl.alg.impl1;
 
-import java.util.concurrent.atomic.AtomicInteger;
 
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.CheckUtil;
@@ -44,13 +43,11 @@ public final class NegamaxUtil {
 			}
 		}
 	}
-
-	public static AtomicInteger nrOfActiveThreads = new AtomicInteger(0);
 	
 
 	public static int calculateBestMove(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
-			final int threadNumber, final int ply, int depth, int alpha, int beta, final int nullMoveCounter, boolean isPv) {
+			final int ply, int depth, int alpha, int beta, final int nullMoveCounter, boolean isPv) {
 
 		
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(depth, 0, alpha, beta);
@@ -92,13 +89,13 @@ public final class NegamaxUtil {
 				if (TTUtil.getDepth(ttValue) >= depth) {
 					switch (TTUtil.getFlag(ttValue)) {
 					case TTUtil.FLAG_EXACT:
-						if (ply == 0 && threadNumber == 0) {
+						if (ply == 0) {
 							PV.set(TTUtil.getMove(ttValue), alpha, beta, score, cb);
 						}
 						return score;
 					case TTUtil.FLAG_LOWER:
 						if (score >= beta) {
-							if (ply == 0 && threadNumber == 0) {
+							if (ply == 0) {
 								PV.set(TTUtil.getMove(ttValue), alpha, beta, score, cb);
 							}
 							return score;
@@ -106,7 +103,7 @@ public final class NegamaxUtil {
 						break;
 					case TTUtil.FLAG_UPPER:
 						if (score <= alpha) {
-							if (ply == 0 && threadNumber == 0) {
+							if (ply == 0) {
 								PV.set(TTUtil.getMove(ttValue), alpha, beta, score, cb);
 							}
 							return score;
@@ -163,7 +160,7 @@ public final class NegamaxUtil {
 					// TODO less reduction if stm (other side) has only 1 major piece
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 					score = depth - reduction <= 0 ? -QuiescenceUtil.calculateBestMove(evaluator, cb, moveGen, -beta, -beta + 1)
-							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1, false);
+							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, nullMoveCounter + 1, false);
 					cb.undoNullMove();
 					if (score >= beta) {
 						return score;
@@ -193,7 +190,7 @@ public final class NegamaxUtil {
 					if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
 						// no iid in pawn-endgame because the extension could cause an endless loop
 						if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
-							calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, threadNumber, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, 0, isPv);
+							calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, 0, isPv);
 							ttValue = TTUtil.getTTValue(cb.zobristKey);
 						}
 					}
@@ -325,17 +322,17 @@ public final class NegamaxUtil {
 					try {
 						/* LMR */
 						if (EngineConstants.ENABLE_LMR && reduction != 1) {
-							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - reduction, -alpha - 1, -alpha, 0, false);
+							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, 0, false);
 						}
 	
 						/* PVS */
 						if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed > 1) {
-							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -alpha - 1, -alpha, 0, false);
+							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, 0, false);
 						}
 	
 						/* normal bounds */
 						if (score > alpha) {
-							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, threadNumber, ply + 1, depth - 1, -beta, -alpha, 0, isPv);
+							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, 0, isPv);
 						}
 					} catch(SearchInterruptedException sie) {
 						moveGen.endPly();
@@ -348,7 +345,7 @@ public final class NegamaxUtil {
 					bestScore = score;
 					bestMove = move;
 
-					if (ply == 0 && threadNumber == 0) {
+					if (ply == 0) {
 						PV.set(bestMove, alphaOrig, beta, bestScore, cb);
 					}
 
