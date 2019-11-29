@@ -31,6 +31,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 
 import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.env.SearchEnv;
+import bagaturchess.search.impl.pv.PVNode;
 
 
 public class Search_PVS_NWS extends SearchImpl {
@@ -66,8 +67,15 @@ public class Search_PVS_NWS extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		return NegamaxUtil.calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, 0, normDepth(maxdepth), alpha_org, beta, 0, true);		
+		int result = NegamaxUtil.calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, 0, normDepth(maxdepth), alpha_org, beta, 0, true);
+		
+		PVNode node = pvman.load(0);
+		node.bestmove = PV.getBestMove();
+		node.eval = result;
+		node.leaf = true;
+		
+		return result;
 	}
 	
 	
