@@ -1,8 +1,6 @@
 package bagaturchess.search.impl.alg.impl1;
 
 
-import java.util.Arrays;
-
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.CheckUtil;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
@@ -14,8 +12,6 @@ import bagaturchess.bitboard.impl1.internal.MoveGenerator;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 import bagaturchess.bitboard.impl1.internal.SEEUtil;
-import bagaturchess.bitboard.impl1.internal.Util;
-import bagaturchess.bitboard.impl1.internal.ChessConstants.ScoreType;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
@@ -420,29 +416,12 @@ public final class NegamaxUtil {
 		} else if (bestScore <= alphaOrig) {
 			flag = TTUtil.FLAG_UPPER;
 		}
-
-		if (bestMove == 0) {
-			throw new IllegalStateException();
-		}
 		
 		if (!SearchUtils.isMateVal(bestScore)) {
 			TTUtil.addValue(cb.zobristKey, bestScore, ply, depth, flag, bestMove);
 		}
 		
 		return bestScore;
-	}
-
-	private static int extensions(final ChessBoard cb, final MoveGenerator moveGen, final int ply) {
-		/* extension when the pawn endgame starts */
-		if (EngineConstants.ENABLE_ENDGAME_EXTENSION && ply > 0 && MoveUtil.getAttackedPieceIndex(moveGen.previous()) > ChessConstants.PAWN
-				&& !MaterialUtil.containsMajorPieces(cb.materialKey)) {
-			return EngineConstants.ENDGAME_EXTENSION_DEPTH;
-		}
-		/* check-extension */
-		if (EngineConstants.ENABLE_CHECK_EXTENSION && cb.checkingPieces != 0) {
-			return 1;
-		}
-		return 0;
 	}
 	
 
@@ -554,5 +533,19 @@ public final class NegamaxUtil {
 		moveGen.endPly();
 		
 		return alpha;
+	}
+	
+	
+	private static int extensions(final ChessBoard cb, final MoveGenerator moveGen, final int ply) {
+		/* extension when the pawn endgame starts */
+		if (EngineConstants.ENABLE_ENDGAME_EXTENSION && ply > 0 && MoveUtil.getAttackedPieceIndex(moveGen.previous()) > ChessConstants.PAWN
+				&& !MaterialUtil.containsMajorPieces(cb.materialKey)) {
+			return EngineConstants.ENDGAME_EXTENSION_DEPTH;
+		}
+		/* check-extension */
+		if (EngineConstants.ENABLE_CHECK_EXTENSION && cb.checkingPieces != 0) {
+			return 1;
+		}
+		return 0;
 	}
 }
