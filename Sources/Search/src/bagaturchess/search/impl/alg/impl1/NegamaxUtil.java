@@ -12,12 +12,13 @@ import bagaturchess.bitboard.impl1.internal.MoveGenerator;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 import bagaturchess.bitboard.impl1.internal.SEEUtil;
-import bagaturchess.bitboard.impl1.internal.Util;
 import bagaturchess.search.api.IEvaluator;
+import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.pv.PVManager;
+import bagaturchess.search.impl.utils.SearchUtils;
 
 
 public final class NegamaxUtil {
@@ -60,25 +61,23 @@ public final class NegamaxUtil {
 		
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(depth >= 0);
-			Assert.isTrue(alpha >= Util.SHORT_MIN && alpha <= Util.SHORT_MAX);
-			Assert.isTrue(beta >= Util.SHORT_MIN && beta <= Util.SHORT_MAX);
+			Assert.isTrue(alpha >= ISearch.MIN && alpha <= ISearch.MAX);
+			Assert.isTrue(beta >= ISearch.MIN && beta <= ISearch.MAX);
 		}
 
 		final int alphaOrig = alpha;
-		//final ChessBoard cb = ChessBoard.getInstance(threadNumber);
-		//final MoveGenerator moveGen = MoveGenerator.getInstance(threadNumber);
 
 		// get extensions
 		depth += extensions(cb, moveGen, ply);
 
 		/* mate-distance pruning */
-		if (EngineConstants.ENABLE_MATE_DISTANCE_PRUNING) {
-			alpha = Math.max(alpha, Util.SHORT_MIN + ply);
-			beta = Math.min(beta, Util.SHORT_MAX - ply - 1);
+		/*if (EngineConstants.ENABLE_MATE_DISTANCE_PRUNING) {
+			alpha = Math.max(alpha, ISearch.MIN + ply);
+			beta = Math.min(beta, ISearch.MAX - ply - 1);
 			if (alpha >= beta) {
 				return alpha;
 			}
-		}
+		}*/
 
 		/* transposition-table */
 		long ttValue = TTUtil.getTTValue(cb.zobristKey);
@@ -122,7 +121,7 @@ public final class NegamaxUtil {
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
 		
 		
-		int eval = Util.SHORT_MIN;
+		int eval = ISearch.MIN;
 		//final boolean isPv = beta - alpha != 1;
 		if (!isPv && cb.checkingPieces == 0) {
 
@@ -154,7 +153,7 @@ public final class NegamaxUtil {
 			}
 
 			/* null-move */
-			if (EngineConstants.ENABLE_NULL_MOVE) {
+			if (EngineConstants.ENABLE_NULL_MOVE && depth > 2) {
 				if (eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 					cb.doNullMove();
 					// TODO less reduction if stm (other side) has only 1 major piece
@@ -173,7 +172,7 @@ public final class NegamaxUtil {
 
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
 		int bestMove = 0;
-		int bestScore = Util.SHORT_MIN - 1;
+		int bestScore = ISearch.MIN - 1;
 		int ttMove = 0;
 		int counterMove = 0;
 		int killer1Move = 0;
@@ -271,7 +270,7 @@ public final class NegamaxUtil {
 						/* futility pruning */
 						if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
 							if (!MoveUtil.isPawnPush78(move)) {
-								if (eval == Util.SHORT_MIN) {
+								if (eval == ISearch.MIN) {
 									eval = evaluator.lazyEval(ply, alphaOrig, beta, 0);
 								}
 								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
@@ -377,7 +376,7 @@ public final class NegamaxUtil {
 			if (cb.checkingPieces == 0) {
 				return EvalConstants.SCORE_DRAW;
 			} else {
-				return Util.SHORT_MIN + ply;
+				return -SearchUtils.getMateVal(ply);//ISearch.MIN + ply;
 			}
 		}
 
@@ -393,8 +392,10 @@ public final class NegamaxUtil {
 			flag = TTUtil.FLAG_UPPER;
 		}
 
-		TTUtil.addValue(cb.zobristKey, bestScore, ply, depth, flag, bestMove);
-
+		if (!SearchUtils.isMateVal(bestScore)) {
+			TTUtil.addValue(cb.zobristKey, bestScore, ply, depth, flag, bestMove);
+		}
+		
 		return bestScore;
 	}
 	
