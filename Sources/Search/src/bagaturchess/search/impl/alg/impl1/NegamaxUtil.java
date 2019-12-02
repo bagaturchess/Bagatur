@@ -133,7 +133,7 @@ public final class NegamaxUtil {
 
 		
 		if (depth == 0) {
-			int qeval = calculateBestMove(evaluator, cb, moveGen, alpha, beta);
+			int qeval = calculateBestMove(evaluator, info, cb, moveGen, alpha, beta, ply);
 			node.bestmove = 0;
 			node.eval = qeval;
 			node.leaf = true;
@@ -182,7 +182,7 @@ public final class NegamaxUtil {
 			/* razoring */
 			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < EvalConstants.SCORE_MATE_BOUND) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
-					score = calculateBestMove(evaluator, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1);
+					score = calculateBestMove(evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply);
 					if (score + RAZORING_MARGIN[depth] <= alpha) {
 						node.bestmove = 0;
 						node.eval = score;
@@ -198,7 +198,7 @@ public final class NegamaxUtil {
 					cb.doNullMove();
 					// TODO less reduction if stm (other side) has only 1 major piece
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
-					score = depth - reduction <= 0 ? -calculateBestMove(evaluator, cb, moveGen, -beta, -beta + 1)
+					score = depth - reduction <= 0 ? -calculateBestMove(evaluator, info, cb, moveGen, -beta, -beta + 1, ply)
 							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false);
 					cb.undoNullMove();
 					if (score >= beta) {
@@ -471,7 +471,13 @@ public final class NegamaxUtil {
 	}
 	
 	
-	public static int calculateBestMove(IEvaluator evaluator, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta) {
+	public static int calculateBestMove(IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply) {
+		
+		
+		info.setSearchedNodes(info.getSearchedNodes() + 1);
+		if (info.getSelDepth() < ply) {
+			info.setSelDepth(ply);
+		}
 		
 		
 		/* transposition-table */
@@ -519,25 +525,29 @@ public final class NegamaxUtil {
 		while (moveGen.hasNext()) {
 			final int move = moveGen.next();
 
-			// skip under promotions
-			if (MoveUtil.isPromotion(move)) {
-				if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
+			//if (cb.checkingPieces == 0) {
+				// skip under promotions
+				if (MoveUtil.isPromotion(move)) {
+					if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
+						continue;
+					}
+				} else if (EngineConstants.ENABLE_Q_FUTILITY_PRUNING
+						&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+					// futility pruning
 					continue;
 				}
-			} else if (EngineConstants.ENABLE_Q_FUTILITY_PRUNING
-					&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
-				// futility pruning
-				continue;
-			}
-
+			//}
+			
 			if (!cb.isLegal(move)) {
 				continue;
 			}
-
+			
 			// skip bad-captures
-			if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move)) && SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
-				continue;
-			}
+			//if (cb.checkingPieces == 0) {
+				if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move)) && SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
+					continue;
+				}
+			//}
 
 			cb.doMove(move);
 
@@ -547,15 +557,13 @@ public final class NegamaxUtil {
 				cb.changeSideToMove();
 			}
 
-			final int score = -calculateBestMove(evaluator, cb, moveGen, -beta, -alpha);
+			final int score = -calculateBestMove(evaluator, info, cb, moveGen, -beta, -alpha, ply + 1);
 
 			cb.undoMove(move);
 
-			if (score >= beta) {
-				moveGen.endPly();
-				
+			/*if (score > alpha) {
 				// set tt-flag
-				/*int flag = TTUtil.FLAG_EXACT;
+				int flag = TTUtil.FLAG_EXACT;
 				if (score >= beta) {
 					flag = TTUtil.FLAG_LOWER;
 				} else if (score <= alphaOrig) {
@@ -563,13 +571,16 @@ public final class NegamaxUtil {
 				}
 				if (!SearchUtils.isMateVal(score)) {
 					TTUtil.addValue(cb.zobristKey, score, ply, 0, flag, move);
-				}*/
-				
+				}
+			}*/
+			
+			if (score >= beta) {
+				moveGen.endPly();				
 				return score;
 			}
 			alpha = Math.max(alpha, score);
 		}
-
+		
 		moveGen.endPly();
 		return alpha;
 	}

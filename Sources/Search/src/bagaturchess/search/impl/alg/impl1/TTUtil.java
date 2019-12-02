@@ -77,7 +77,7 @@ public class TTUtil {
 	public static void addValue(final long key, int score, final int ply, final int depth, final int flag, final int move) {
 
 		if (EngineConstants.ASSERT) {
-			Assert.isTrue(depth >= 1);
+			Assert.isTrue(depth >= 0);
 			Assert.isTrue(move != 0);
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 			Assert.isTrue(MoveUtil.getSourcePieceIndex(move) != 0);
