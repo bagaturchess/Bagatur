@@ -46,7 +46,14 @@ public final class NegamaxUtil {
 		}
 	}
 	
+	private static final int FUTILITY_MARGIN_Q_SEARCH = 200;
+	
 
+	public static void start(final ChessBoard cb) {
+		TTUtil.init(false);
+	}
+	
+	
 	public static int calculateBestMove(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
 			final int ply, int depth, int alpha, int beta, boolean isPv) {
@@ -126,7 +133,7 @@ public final class NegamaxUtil {
 
 		
 		if (depth == 0) {
-			int qeval = QuiescenceUtil.calculateBestMove(evaluator, cb, moveGen, alpha, beta);
+			int qeval = calculateBestMove(evaluator, cb, moveGen, alpha, beta);
 			node.bestmove = 0;
 			node.eval = qeval;
 			node.leaf = true;
@@ -175,7 +182,7 @@ public final class NegamaxUtil {
 			/* razoring */
 			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < EvalConstants.SCORE_MATE_BOUND) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
-					score = QuiescenceUtil.calculateBestMove(evaluator, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1);
+					score = calculateBestMove(evaluator, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1);
 					if (score + RAZORING_MARGIN[depth] <= alpha) {
 						node.bestmove = 0;
 						node.eval = score;
@@ -191,7 +198,7 @@ public final class NegamaxUtil {
 					cb.doNullMove();
 					// TODO less reduction if stm (other side) has only 1 major piece
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
-					score = depth - reduction <= 0 ? -QuiescenceUtil.calculateBestMove(evaluator, cb, moveGen, -beta, -beta + 1)
+					score = depth - reduction <= 0 ? -calculateBestMove(evaluator, cb, moveGen, -beta, -beta + 1)
 							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false);
 					cb.undoNullMove();
 					if (score >= beta) {
@@ -464,7 +471,66 @@ public final class NegamaxUtil {
 	}
 	
 	
-	public static void start(final ChessBoard cb) {
-		TTUtil.init(false);
+	public static int calculateBestMove(IEvaluator evaluator, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta) {
+
+		/* stand-pat check */
+		int eval = ISearch.MIN;
+		if (cb.checkingPieces == 0) {
+			eval = evaluator.lazyEval(0, alpha, beta, 0);
+			if (eval >= beta) {
+				return eval;
+			}
+			alpha = Math.max(alpha, eval);
+		}
+
+		moveGen.startPly();
+		moveGen.generateAttacks(cb);
+		moveGen.setMVVLVAScores();
+		moveGen.sort();
+
+		while (moveGen.hasNext()) {
+			final int move = moveGen.next();
+
+			// skip under promotions
+			if (MoveUtil.isPromotion(move)) {
+				if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
+					continue;
+				}
+			} else if (EngineConstants.ENABLE_Q_FUTILITY_PRUNING
+					&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+				// futility pruning
+				continue;
+			}
+
+			if (!cb.isLegal(move)) {
+				continue;
+			}
+
+			// skip bad-captures
+			if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move)) && SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
+				continue;
+			}
+
+			cb.doMove(move);
+
+			if (EngineConstants.ASSERT) {
+				cb.changeSideToMove();
+				Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
+				cb.changeSideToMove();
+			}
+
+			final int score = -calculateBestMove(evaluator, cb, moveGen, -beta, -alpha);
+
+			cb.undoMove(move);
+
+			if (score >= beta) {
+				moveGen.endPly();
+				return score;
+			}
+			alpha = Math.max(alpha, score);
+		}
+
+		moveGen.endPly();
+		return alpha;
 	}
 }
