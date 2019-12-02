@@ -67,15 +67,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		int result = NegamaxUtil.calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
+		return NegamaxUtil.calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
 				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), alpha_org, beta, true);
-		
-		PVNode node = pvman.load(0);
-		node.bestmove = PV.getBestMove();
-		node.eval = result;
-		node.leaf = true;
-		
-		return result;
 	}
 	
 	

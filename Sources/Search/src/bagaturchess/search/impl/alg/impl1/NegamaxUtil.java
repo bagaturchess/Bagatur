@@ -18,6 +18,7 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.pv.PVManager;
+import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
@@ -59,6 +60,17 @@ public final class NegamaxUtil {
 		}
 		
 		
+		if (ply >= ISearch.MAX_DEPTH) {
+			return evaluator.lazyEval(ply, alpha, beta, 0);
+		}
+		
+		
+		PVNode node = pvman.load(ply);
+		node.bestmove = 0;
+		node.eval = ISearch.MIN;
+		node.leaf = true;
+		
+		
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(depth >= 0);
 			Assert.isTrue(alpha >= ISearch.MIN && alpha <= ISearch.MAX);
@@ -82,39 +94,43 @@ public final class NegamaxUtil {
 		/* transposition-table */
 		long ttValue = TTUtil.getTTValue(cb.zobristKey);
 		int score = TTUtil.getScore(ttValue);
-		if (ttValue != 0) {
+		if (!isPv && ttValue != 0) {
 			if (!EngineConstants.TEST_TT_VALUES) {
 
 				if (TTUtil.getDepth(ttValue) >= depth) {
 					switch (TTUtil.getFlag(ttValue)) {
 					case TTUtil.FLAG_EXACT:
-						if (ply == 0) {
-							PV.set(TTUtil.getMove(ttValue), alpha, beta, score, cb);
-						}
-						return score;
+						node.bestmove = TTUtil.getMove(ttValue);
+						node.eval = score;
+						node.leaf = true;
+						return node.eval;
 					case TTUtil.FLAG_LOWER:
 						if (score >= beta) {
-							if (ply == 0) {
-								PV.set(TTUtil.getMove(ttValue), alpha, beta, score, cb);
-							}
-							return score;
+							node.bestmove = TTUtil.getMove(ttValue);
+							node.eval = score;
+							node.leaf = true;
+							return node.eval;
 						}
 						break;
 					case TTUtil.FLAG_UPPER:
 						if (score <= alpha) {
-							if (ply == 0) {
-								PV.set(TTUtil.getMove(ttValue), alpha, beta, score, cb);
-							}
-							return score;
+							node.bestmove = TTUtil.getMove(ttValue);
+							node.eval = score;
+							node.leaf = true;
+							return node.eval;
 						}
 					}
 				}
 			}
 		}
 
-		// TODO JITWatch unpredictable branch
+		
 		if (depth == 0) {
-			return QuiescenceUtil.calculateBestMove(evaluator, cb, moveGen, alpha, beta);
+			int qeval = QuiescenceUtil.calculateBestMove(evaluator, cb, moveGen, alpha, beta);
+			node.bestmove = 0;
+			node.eval = qeval;
+			node.leaf = true;
+			return node.eval;
 		}
 		
 		
@@ -138,7 +154,10 @@ public final class NegamaxUtil {
 			/* static null move pruning */
 			if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < STATIC_NULLMOVE_MARGIN.length) {
 				if (eval - STATIC_NULLMOVE_MARGIN[depth] >= beta) {
-					return eval;
+					node.bestmove = 0;
+					node.eval = eval;
+					node.leaf = true;
+					return node.eval;
 				}
 			}
 
@@ -147,7 +166,10 @@ public final class NegamaxUtil {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
 					score = QuiescenceUtil.calculateBestMove(evaluator, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1);
 					if (score + RAZORING_MARGIN[depth] <= alpha) {
-						return score;
+						node.bestmove = 0;
+						node.eval = score;
+						node.leaf = true;
+						return node.eval;
 					}
 				}
 			}
@@ -162,7 +184,10 @@ public final class NegamaxUtil {
 							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false);
 					cb.undoNullMove();
 					if (score >= beta) {
-						return score;
+						node.bestmove = 0;
+						node.eval = score;
+						node.leaf = true;
+						return node.eval;
 					}
 				}
 			}
@@ -341,11 +366,16 @@ public final class NegamaxUtil {
 				cb.undoMove(move);
 
 				if (score > bestScore) {
+					
 					bestScore = score;
 					bestMove = move;
 
-					if (ply == 0) {
-						PV.set(bestMove, alphaOrig, beta, bestScore, cb);
+					node.bestmove = bestMove;
+					node.eval = bestScore;
+					node.leaf = false;
+					
+					if (ply + 1 < ISearch.MAX_DEPTH) {
+						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 					}
 
 					alpha = Math.max(alpha, score);
@@ -374,9 +404,15 @@ public final class NegamaxUtil {
 		/* checkmate or stalemate */
 		if (movesPerformed == 0) {
 			if (cb.checkingPieces == 0) {
-				return EvalConstants.SCORE_DRAW;
+				node.bestmove = 0;
+				node.eval = EvalConstants.SCORE_DRAW;
+				node.leaf = true;
+				return node.eval;
 			} else {
-				return -SearchUtils.getMateVal(ply);//ISearch.MIN + ply;
+				node.bestmove = 0;
+				node.eval = -SearchUtils.getMateVal(ply);
+				node.leaf = true;
+				return node.eval;
 			}
 		}
 
