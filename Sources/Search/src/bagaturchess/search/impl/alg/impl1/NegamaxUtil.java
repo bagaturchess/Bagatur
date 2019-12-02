@@ -160,7 +160,18 @@ public final class NegamaxUtil {
 					return node.eval;
 				}
 			}
-
+			
+			//Razoring for all depths based on the eval deviation detected into the root node
+			/*if (eval < alpha - mediator.getTrustWindow_AlphaAspiration()) {
+				score = QuiescenceUtil.calculateBestMove(evaluator, cb, moveGen, alpha - mediator.getTrustWindow_AlphaAspiration(), alpha - mediator.getTrustWindow_AlphaAspiration() + 1);
+				if (score <= alpha - mediator.getTrustWindow_AlphaAspiration()) {
+					node.bestmove = 0;
+					node.eval = score;
+					node.leaf = true;
+					return node.eval;
+				}
+			}*/
+			
 			/* razoring */
 			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < EvalConstants.SCORE_MATE_BOUND) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {

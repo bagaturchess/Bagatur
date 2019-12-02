@@ -10,7 +10,7 @@ public class EngineConstants {
 	public static final boolean ENABLE_PONDERING		= true;
 	public static final boolean GENERATE_BR_PROMOTIONS 	= false;
 
-	public static final boolean ASSERT 					= true;
+	public static final boolean ASSERT 					= false;
 
 	public static final boolean TEST_EVAL_VALUES 		= false;
 	public static final boolean TEST_EVAL_CACHES	 	= false;
