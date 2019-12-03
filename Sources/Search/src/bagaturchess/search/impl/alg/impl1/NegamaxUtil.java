@@ -88,13 +88,15 @@ public final class NegamaxUtil {
 
 		// get extensions
 		depth += extensions(cb, moveGen, ply);
-
+		
 		/* mate-distance pruning */
 		/*if (EngineConstants.ENABLE_MATE_DISTANCE_PRUNING) {
-			alpha = Math.max(alpha, ISearch.MIN + ply);
-			beta = Math.min(beta, ISearch.MAX - ply - 1);
-			if (alpha >= beta) {
-				return alpha;
+			if (ply > 0) {
+				alpha = Math.max(alpha, -SearchUtils.getMateVal(ply));
+				beta = Math.min(beta, +SearchUtils.getMateVal(ply + 1));
+				if (alpha >= beta) {
+					return alpha;
+				}
 			}
 		}*/
 
