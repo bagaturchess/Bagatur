@@ -507,7 +507,7 @@ public final class NegamaxUtil {
 		/* stand-pat check */
 		int eval = ISearch.MIN;
 		if (cb.checkingPieces == 0) {
-			eval = evaluator.lazyEval(0, alpha, beta, 0);
+			eval = evaluator.lazyEval(ply, alpha, beta, 0);
 			if (eval >= beta) {
 				return eval;
 			}
@@ -522,7 +522,7 @@ public final class NegamaxUtil {
 		while (moveGen.hasNext()) {
 			final int move = moveGen.next();
 
-			if (cb.checkingPieces == 0) {
+			//if (cb.checkingPieces == 0) {
 				// skip under promotions
 				if (MoveUtil.isPromotion(move)) {
 					if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
@@ -533,18 +533,18 @@ public final class NegamaxUtil {
 					// futility pruning
 					continue;
 				}
-			}
+			//}
 			
 			if (!cb.isLegal(move)) {
 				continue;
 			}
 			
 			// skip bad-captures
-			if (cb.checkingPieces == 0) {
+			//if (cb.checkingPieces == 0) {
 				if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move)) && SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
 					continue;
 				}
-			}
+			//}
 
 			cb.doMove(move);
 
