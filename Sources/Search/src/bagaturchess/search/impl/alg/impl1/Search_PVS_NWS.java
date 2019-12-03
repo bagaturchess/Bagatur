@@ -51,11 +51,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	public void newSearch() {
-		
+	public void newSearch() {	
 		super.newSearch();
-		
-		NegamaxUtil.start(((BoardImpl) env.getBitboard()).getChessBoard());
 	}
 	
 	
