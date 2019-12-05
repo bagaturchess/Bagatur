@@ -221,7 +221,7 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 
 	@Override
 	public int getTPTUsagePercent() {
-		return searcher.getEnv().getTPTUsagePercent();
+		return searcher.getTPTUsagePercent();
 	}
 
 

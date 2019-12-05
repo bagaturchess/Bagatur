@@ -95,6 +95,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	@Override
+	public int getTPTUsagePercent() {
+		return getEnv().getTPTUsagePercent();
+	}
+	
+	
+	@Override
 	public String toString() {
 		String result = "";//"" + this + " ";
 		

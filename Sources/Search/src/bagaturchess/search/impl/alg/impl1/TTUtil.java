@@ -91,6 +91,7 @@ public class TTUtil {
 
 			if (keys[i] == 0) {
 				replacedIndex = i;
+				usageCounter++;
 				break;
 			}
 

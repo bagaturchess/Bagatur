@@ -45,6 +45,7 @@ public interface ISearch {
 	public void setup(IBitBoard bitboard);
 	public SearchEnv getEnv();
 	public PVManager getPvman();
+	public int getTPTUsagePercent();
 	
 	public int pv_search(ISearchMediator mediator, IRootWindow rootWin, ISearchInfo info,
 			int initial_maxdepth, int maxdepth, int depth, int alpha_org, int beta,

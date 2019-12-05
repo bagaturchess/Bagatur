@@ -276,7 +276,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 
 	@Override
 	public int getTPTUsagePercent() {
-		return searcher.getEnv().getTPTUsagePercent();
+		return searcher.getTPTUsagePercent();
 	}
 
 
