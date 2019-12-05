@@ -92,8 +92,9 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	public void newSearch() {	
+	public void newSearch() {
 		super.newSearch();
+		((BoardImpl) env.getBitboard()).getMoveGenerator().clearHistoryHeuristics();
 	}
 	
 	
@@ -122,7 +123,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	public static int calculateBestMove(ISearchMediator mediator, ISearchInfo info,
+	public int calculateBestMove(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
 			final int ply, int depth, int alpha, int beta, boolean isPv) {
 
@@ -196,6 +197,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							node.leaf = true;
 							return node.eval;
 						}
+						break;
 					}
 				}
 			}
@@ -215,7 +217,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		int eval = ISearch.MIN;
-		//final boolean isPv = beta - alpha != 1;
 		if (!isPv && cb.checkingPieces == 0) {
 
 			eval = evaluator.lazyEval(ply, alphaOrig, beta, 0);
@@ -524,7 +525,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	private static int extensions(final ChessBoard cb, final MoveGenerator moveGen, final int ply) {
+	private int extensions(final ChessBoard cb, final MoveGenerator moveGen, final int ply) {
 		/* extension when the pawn endgame starts */
 		if (EngineConstants.ENABLE_ENDGAME_EXTENSION && ply > 0 && MoveUtil.getAttackedPieceIndex(moveGen.previous()) > ChessConstants.PAWN
 				&& !MaterialUtil.containsMajorPieces(cb.materialKey)) {
@@ -541,7 +542,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	public static int calculateBestMove(IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply) {
+	public int calculateBestMove(IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply) {
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
