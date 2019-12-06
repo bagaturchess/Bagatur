@@ -478,6 +478,18 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
+	public int getPlayedMovesCount() {
+		return chessBoard.playedMovesCount;
+	}
+	
+	
+	@Override
+	public int[] getPlayedMoves() {
+		return chessBoard.playedMoves;
+	}
+	
+	
+	@Override
 	public long getHashKeyAfterMove(int move) {
 		throw new UnsupportedOperationException("TODO");
 	}
@@ -577,22 +589,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public int getCastlingType(int colour) {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getPlayedMovesCount()
-	 */
-	@Override
-	public int getPlayedMovesCount() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getPlayedMoves()
-	 */
-	@Override
-	public int[] getPlayedMoves() {
 		throw new UnsupportedOperationException();
 	}
 

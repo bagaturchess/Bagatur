@@ -59,8 +59,6 @@ public final class ChessBoard {
 	public long zobristKey, pawnZobristKey;
 	public long checkingPieces, pinnedPieces, discoveredPieces;
 
-	public long moveCount;
-
 	/** which piece is on which square */
 	public final int[] pieceIndexes = new int[64];
 	public final int[] kingIndex = new int[2];
@@ -160,8 +158,6 @@ public final class ChessBoard {
 	}
 
 	public void doMove(int move) {
-
-		moveCount++;
 
 		final int fromIndex = MoveUtil.getFromIndex(move);
 		int toIndex = MoveUtil.getToIndex(move);
