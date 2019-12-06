@@ -164,7 +164,7 @@ public class PGNParser {
 						break;
 					}
 					
-					bitboard.mark();
+					//bitboard.mark();
 					
 					if (gi != null) {
 						for (int i=0; i<gi.length; i++) {
@@ -192,7 +192,8 @@ public class PGNParser {
 						}
 					}
 					
-					bitboard.reset();
+					//bitboard.reset();
+					bitboard.revert();
 				}
 			//} catch (Throwable t) {
 			//	t.printStackTrace();
