@@ -420,8 +420,6 @@ public class MoveInt {
 		}
 		
 		result.append(Fields.ALL_ORDERED_NAMES[Fields.IDX_2_ORDERED_A1H1[getFromFieldID(move)]]);
-		if (isCapture(move)) {
-		}
 		result.append(Fields.ALL_ORDERED_NAMES[Fields.IDX_2_ORDERED_A1H1[getToFieldID(move)]]);
 		
 		if (isPromotion(move)) {

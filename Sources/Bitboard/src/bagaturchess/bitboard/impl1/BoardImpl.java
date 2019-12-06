@@ -85,7 +85,9 @@ public class BoardImpl implements IBitBoard {
 		boardConfig = _boardConfig;
 		moveOps = new MoveOpsImpl();
 		
-		EvalConstants.initPSQT(boardConfig);
+		if (boardConfig != null) {
+			EvalConstants.initPSQT(boardConfig);
+		}
 		
 		chessBoard = ChessBoardUtil.getNewCB(fen);
 		
@@ -490,6 +492,19 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
+	public String toEPD() {
+		return chessBoard.toString();
+	}
+	
+	
+	@Override
+	public void setAttacksSupport(boolean attacksSupport,
+			boolean fieldsStateSupport) {
+		//Do nothing
+	}
+	
+	
+	@Override
 	public long getHashKeyAfterMove(int move) {
 		throw new UnsupportedOperationException("TODO");
 	}
@@ -551,14 +566,7 @@ public class BoardImpl implements IBitBoard {
 	public void reset() {
 		throw new UnsupportedOperationException();
 	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#toEPD()
-	 */
-	@Override
-	public String toEPD() {
-		throw new UnsupportedOperationException();
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#isPasserPush(int)
@@ -623,15 +631,7 @@ public class BoardImpl implements IBitBoard {
 	public boolean getFieldsStateSupport() {
 		throw new UnsupportedOperationException();
 	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBitBoard#setAttacksSupport(boolean, boolean)
-	 */
-	@Override
-	public void setAttacksSupport(boolean attacksSupport,
-			boolean fieldsStateSupport) {
-		throw new UnsupportedOperationException();
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBitBoard#getPlayerAttacks(int)

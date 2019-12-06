@@ -34,6 +34,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -276,10 +277,13 @@ public class Channel_Base implements IChannel {
 		}
 		
 		
-		private String getStackTrace(final Throwable throwable) {
+		private String getStackTrace(Throwable throwable) {
 		     final StringWriter sw = new StringWriter();
 		     final PrintWriter pw = new PrintWriter(sw, true);
-		     throwable.printStackTrace(pw);
+		     while (throwable != null) {
+		    	 throwable.printStackTrace(pw);
+		    	 throwable = throwable.getCause();
+		     }
 		     return sw.getBuffer().toString();
 		}
 	}

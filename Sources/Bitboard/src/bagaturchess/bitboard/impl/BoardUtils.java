@@ -36,6 +36,7 @@ import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
+import bagaturchess.bitboard.impl1.BoardImpl;
 
 
 public class BoardUtils {
@@ -55,30 +56,39 @@ public class BoardUtils {
 	
 	public static IBitBoard createBoard_WithPawnsCache(String fen, String cacheFactoryClassName, IBoardConfig boardConfig, int pawnsCacheSize) {
 		
-		DataObjectFactory<PawnsModelEval> pawnsCacheFactory = null;
-		try {
-			pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) 
-			BoardUtils.class.getClassLoader().loadClass(cacheFactoryClassName).newInstance();
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
+		IBitBoard bitboard;
+		
+		if (IBitBoard.IMPL1) {
+			
+			bitboard = new BoardImpl(fen, boardConfig);
+			
+		} else {
+			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = null;
+			try {
+				pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) 
+				BoardUtils.class.getClassLoader().loadClass(cacheFactoryClassName).newInstance();
+			} catch (Exception e) {
+				throw new IllegalStateException(e);
+			}
+			
+			//PawnsEvalCache pawnsCache = new PawnsEvalCache(pawnsCacheFactory, EngineConfigFactory.getDefaultEngineConfiguration().getPawnsCacheSize());
+			PawnsEvalCache pawnsCache = new PawnsEvalCache(pawnsCacheFactory, pawnsCacheSize, false, new BinarySemaphore_Dummy());
+			 
+			bitboard = new Board(fen, pawnsCache, boardConfig);
 		}
 		
-		//PawnsEvalCache pawnsCache = new PawnsEvalCache(pawnsCacheFactory, EngineConfigFactory.getDefaultEngineConfiguration().getPawnsCacheSize());
-		PawnsEvalCache pawnsCache = new PawnsEvalCache(pawnsCacheFactory, pawnsCacheSize, false, new BinarySemaphore_Dummy());
-		 
-		IBitBoard bitboard = new Board(fen, pawnsCache, boardConfig);
 		if (boardConfig != null) {
 			bitboard.setAttacksSupport(boardConfig.getFieldsStatesSupport(), boardConfig.getFieldsStatesSupport());
-		}
+		}	
 		
 		return bitboard;
 	}
 	
-	public static IBitBoard createBoard(String movesSign) {
+	/*public static IBitBoard createBoard(String movesSign) {
 		IBitBoard board = new Board();
 		playGame(board, movesSign);
 		return board;
-	}
+	}*/
 	
 	
 	public static int uciStrToMove(IBitBoard bitboard, String moveStr) {
@@ -130,13 +140,13 @@ public class BoardUtils {
 	
 	public static void playGame(IBitBoard board, String movesSign) {
 		
-		int colourToMove = Figures.COLOUR_WHITE;
+		//int colourToMove = Figures.COLOUR_WHITE;
 		
 		StringTokenizer st = new StringTokenizer(movesSign, ",");
 		while (st.hasMoreTokens()) {
 			
 			String moveSign = st.nextToken().trim();
-			String message = moveSign;
+			//String message = moveSign;
 			//System.out.println("colour=" + board.getColourToMove());
 			
 			int move = parseSingleMove(board, moveSign);
@@ -154,9 +164,9 @@ public class BoardUtils {
 				//colourToMove = Figures.OPPONENT_COLOUR[colourToMove];
 			}
 			
-			message += " -> ";
-			message += board.getHashKey();
-			message += "	" + board.getPawnsHashKey();
+			//message += " -> ";
+			//message += board.getHashKey();
+			//message += "	" + board.getPawnsHashKey();
 			
 			//System.out.println(message);
 		}
@@ -240,10 +250,10 @@ public class BoardUtils {
 			String moveSign = moves.get(i);
 			if (!moveSign.equals("...")) {
 				//System.out.println(moveSign);
-				int move = BoardUtils.parseSingleUCIMove(board, moveSign);
+				//int move = BoardUtils.parseSingleUCIMove(board, moveSign);
 				//colour = Figures.OPPONENT_COLOUR[colour];
 				
-				board.makeMoveForward(move);
+				board.makeMoveForward(moveSign);
 			}
 		}
 	}
@@ -310,53 +320,4 @@ public class BoardUtils {
 		
 		return type;
 	}
-	
-	public static void main(String[] args) {
-		//playGame(new Board(), );
-	}
-/**
- Identifiers
-8  6    69   69   69   48   69   49   31   
-7  33   66   65   69   69   69   35   3    
-6  69   69   69   69   69   51   69   69   
-5  69   69   69   69   12   69   69   69   
-4  69   58   69   69   69   57   69   69   
-3  69   69   21   54   69   69   69   69   
-2  30   15   41   44   69   69   69   62   
-1  42   69   69   69   11   39   69   60   
-   A    B    C    D    E    F    G    H    
-
-Types & Colours
-8  BC 0  0  0  BK 0  BN BC 
-7  BP BP BP 0  0  0  BP BP 
-6  0  0  0  0  0  BP 0  0  
-5  0  0  0  0  BN 0  0  0  
-4  0  BO 0  0  0  WP 0  0  
-3  0  0  WN WP 0  0  0  0  
-2  WP WP WP WO 0  0  0  WP 
-1  WC 0  0  0  WK WO 0  WC 
-   A  B  C  D  E  F  G  H  
-D2-D3, E7-E5, F2-F4, B8-C6, G1-F3, F7-F6, C1-D2, D7-D5, E2-E4, C8-G4, E4-D5X, D8-D5X, B1-C3, G4-F3X, D1-F3X, D5-F3X, G2-F3X, F8-B4, F4-E5X, C6-E5X, F3-F4, 
-2007-9-8 0:03:04 game.chess.engine.impl1.bitboards.play.PlayerRunnable run
-INFO: Colour 1: Ply is F3-F4
-
-2007-9-8 0:03:04 game.chess.engine.impl1.bitboards.alg.starter.SearchConfigurator setup
-INFO: EVAL_WHITE> MATERIAL (0: 15101), PAWN_STRUCTURE (1: 400), DEVELOPMENT (2: 170), SPACE (4: 100), 
-EVAL_BLACK> MATERIAL (0: 15101), PAWN_STRUCTURE (1: 400), DEVELOPMENT (2: 170), SPACE (4: 100), 
-2007-9-8 0:03:04 game.chess.engine.impl1.bitboards.alg.brain.ThinkRunnable pvGenerated
-INFO: 0 ms -> (D=1, L=5, E=146) -> [SEARCH] E5-F3, [SEARCH] O-O-O, [SEARCH] O-O-O, [SEARCH] F1-H3, [SEARCH] D8-D3X, [EVAL] null, 
-2007-9-8 0:03:04 game.chess.engine.impl1.bitboards.alg.brain.ThinkRunnable pvGenerated
-INFO: 0 ms -> (D=2, L=3, E=147) -> [SEARCH] B4-C3X, [SEARCH] D2-C3X, [SEARCH] E5-D3X, [EVAL] null, 
-2007-9-8 0:03:05 game.chess.engine.impl1.bitboards.alg.brain.ThinkRunnable pvGenerated
-INFO: 78 ms -> (D=3, L=3, E=104) -> [SEARCH] B4-C3X, [SEARCH] D2-C3X, [SEARCH] G8-E7, [EVAL] null, 
-2007-9-8 0:03:05 game.chess.engine.impl1.bitboards.alg.brain.ThinkRunnable pvGenerated
-INFO: 94 ms -> (D=4, L=4, E=92) -> [SEARCH] B4-C3X, [SEARCH] D2-C3X, [SEARCH] E5-F3, [SEARCH] E1-F2, [EVAL] null, 
-2007-9-8 0:03:05 game.chess.engine.impl1.bitboards.alg.brain.ThinkRunnable pvGenerated
-INFO: 171 ms -> (D=5, L=8, E=94) -> [SEARCH] E5-D3X, [SEARCH] F1-D3X, [SEARCH] G8-E7, [SEARCH] D3-H7X, [SEARCH] H8-H7X, [SEARCH] C3-E4, [QSEARCH] B4-D2X, [QSEARCH] E4-D2X, [EVAL] null, 
-2007-9-8 0:03:06 game.chess.engine.impl1.bitboards.alg.brain.ThinkRunnable pvGenerated
-INFO: 1094 ms -> (D=6, L=7, E=105) -> [SEARCH] E5-F3, [SEARCH] O-O-O, [SEARCH] O-O-O, [SEARCH] F1-G2, [SEARCH] F3-D2X, [SEARCH] D1-D2X, [SEARCH] D8-D3X, [EVAL] null, 
-2007-9-8 0:03:08 game.chess.engine.impl1.bitboards.alg.brain.ThinkRunnable pvGenerated
-INFO: 1703 ms -> (D=7, L=8, E=80) -> [SEARCH] E5-D3X, [SEARCH] F1-D3X, [SEARCH] G8-H6, [SEARCH] D3-H7X, [SEARCH] O-O-O, [SEARCH] O-O-O, [SEARCH] H8-H7X, [SEARCH] D1-E1, [EVAL] null, 
-
- */
 }

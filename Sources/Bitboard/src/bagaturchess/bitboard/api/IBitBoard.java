@@ -26,7 +26,7 @@ package bagaturchess.bitboard.api;
 public interface IBitBoard extends IBoard {
 	
 	
-	public static final boolean IMPL1 = false;
+	public static final boolean IMPL1 = true;
 	
 	
 	/**

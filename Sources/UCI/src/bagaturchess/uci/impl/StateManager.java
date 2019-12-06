@@ -25,12 +25,12 @@ package bagaturchess.uci.impl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.Board;
+import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.impl.BoardUtils;
-import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 import bagaturchess.uci.api.BestMoveSender;
@@ -65,7 +65,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	public StateManager(IUCIConfig _engineBootCfg) {
 		engineBootCfg = _engineBootCfg;
-		board = new Board();
+		board = BoardUtils.createBoard_WithPawnsCache();
 	}
 	
 	
@@ -205,24 +205,10 @@ public class StateManager extends Protocol implements BestMoveSender {
 				
 				sendNewline();
 				
-			} catch(Throwable e) {
-				channel.dump(e);
-				channel.sendLogToGUI("StateManager: Error: " + e.getMessage());
+			} catch(Throwable  t) {
+				channel.dump(t);
+				channel.sendLogToGUI("StateManager: Error: " + t.getMessage());
 				Thread.sleep(500);
-			}
-		}
-	}
-
-
-	private void waitAndExecute() throws InterruptedException {
-		int max_retries = 20;
-		int retries_count = 0;
-		while (searchAdaptor == null) {
-			retries_count++;
-			Thread.currentThread().sleep(1000);
-			channel.sendLogToGUI("StateManager: Waiting loading and than will sent the command to GUI ... each second will check if searchAdaptor is ready (not null). retry " + retries_count);
-			if (retries_count > max_retries) {
-				throw new IllegalStateException("StateManager: search adaptor is still null after " + max_retries + " retries.");
 			}
 		}
 	}
@@ -332,9 +318,8 @@ public class StateManager extends Protocol implements BestMoveSender {
 			
 			if (lastFEN == null || !lastFEN.equals(position.getFen())) {
 				
-				board = new Board(position.getFen());
+				board = BoardUtils.createBoard_WithPawnsCache(position.getFen(), null);
 				destroySearchAdaptor();
-				//createSearchAdaptor();
 				
 				lastFEN = position.getFen();
 			}
@@ -342,7 +327,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 		} else {
 			
 			if (lastFEN != null) {
-				board = new Board();
+				board = BoardUtils.createBoard_WithPawnsCache();
 				destroySearchAdaptor();
 				
 				lastFEN = null;	
@@ -360,8 +345,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 		for (int i = 0; i < moves.size(); i++ ) {
 			String moveSign = moves.get(i);
 			if (!moveSign.equals("...")) {
-				int move = BoardUtils.parseSingleUCIMove(board, moveSign);
-				board.makeMoveForward(move);
+				board.makeMoveForward(moveSign);
 			}
 		}
 	}
@@ -399,23 +383,19 @@ public class StateManager extends Protocol implements BestMoveSender {
 			
 			StringBuilder result = new StringBuilder(8);
 			if (IBitBoard.IMPL1) {
-				
 				MoveWrapper mw = new MoveWrapper(move);
-				result.append(mw.toString());
-				
-				board.makeMoveForward(result.toString());
-				
+				result.append(mw.toString());	
 			} else {
-				
-				board.makeMoveForward(move);
-				
 				MoveInt.moveToStringUCI(move, result);
 			}
+			
+			board.makeMoveForward(move);
 			
 			String bestMoveCommand = COMMAND_TO_GUI_BESTMOVE_STR + IChannel.WHITE_SPACE + result;
 			
 			if (ponder != 0) {
 				bestMoveCommand += IChannel.WHITE_SPACE + COMMAND_TO_GUI_BESTMOVE_PONDER_STR + IChannel.WHITE_SPACE;
+				
 				result = new StringBuilder(8);
 				if (IBitBoard.IMPL1) {
 					MoveWrapper mw = new MoveWrapper(ponder);
@@ -423,6 +403,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 				} else {
 					MoveInt.moveToStringUCI(ponder, result);
 				}
+				
 				bestMoveCommand += result;
 			}
 			
