@@ -36,6 +36,8 @@ import bagaturchess.bitboard.impl1.internal.MoveGenerator;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 import bagaturchess.bitboard.impl1.internal.SEEUtil;
+import bagaturchess.egtb.syzygy.SyzygyConstants;
+import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearch;
@@ -81,14 +83,14 @@ public class Search_PVS_NWS extends SearchImpl {
 	public Search_PVS_NWS(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
 		
-		TTUtil.setSizeMB(64);
+		TTUtil.setSizeMB(256);
 	}
 	
 	
 	public Search_PVS_NWS(SearchEnv _env) {
 		super(_env);
 		
-		TTUtil.setSizeMB(64);
+		TTUtil.setSizeMB(256);
 	}
 	
 	
@@ -209,6 +211,57 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 
+		
+		if (false
+				&& ply > 1
+    	    	&& depth >= 7
+    			&& SyzygyTBProbing.getSingleton() != null
+    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
+    			){
+			
+			if (cb.checkingPieces != 0) {
+				if (!env.getBitboard().hasMoveInCheck()) {
+					node.bestmove = 0;
+					node.eval = -getMateVal(ply);
+					node.leaf = true;
+					return node.eval;
+				}
+			} else {
+				if (!env.getBitboard().hasMoveInNonCheck()) {
+					node.bestmove = 0;
+					node.eval = getDrawScores(0);
+					node.leaf = true;
+					return node.eval;
+				}
+			}
+			
+			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+			if (result != -1) {
+				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
+				int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+				int egtbscore =  SyzygyTBProbing.getSingleton().getWDLScore(wdl, ply);
+				if (egtbscore > 0) {
+					int distanceToDraw = 100 - env.getBitboard().getDraw50movesRule();
+					if (distanceToDraw > dtz) {
+						node.bestmove = 0;
+						node.eval = 9 * (distanceToDraw - dtz);
+						node.leaf = true;
+						return node.eval;
+					} else {
+						node.bestmove = 0;
+						node.eval = getDrawScores(0);
+						node.leaf = true;
+						return node.eval;
+					}
+				} else if (egtbscore == 0) {
+					node.bestmove = 0;
+					node.eval = getDrawScores(0);
+					node.leaf = true;
+					return node.eval;
+				}
+			}
+        }
+		
 		
 		if (depth == 0) {
 			int qeval = calculateBestMove(evaluator, info, cb, moveGen, alpha, beta, ply);
