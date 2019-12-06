@@ -413,10 +413,16 @@ public class StateManager extends Protocol implements BestMoveSender {
 			}
 			
 			String bestMoveCommand = COMMAND_TO_GUI_BESTMOVE_STR + IChannel.WHITE_SPACE + result;
+			
 			if (ponder != 0) {
 				bestMoveCommand += IChannel.WHITE_SPACE + COMMAND_TO_GUI_BESTMOVE_PONDER_STR + IChannel.WHITE_SPACE;
 				result = new StringBuilder(8);
-				MoveInt.moveToStringUCI(ponder, result);
+				if (IBitBoard.IMPL1) {
+					MoveWrapper mw = new MoveWrapper(ponder);
+					result.append(mw.toString());
+				} else {
+					MoveInt.moveToStringUCI(ponder, result);
+				}
 				bestMoveCommand += result;
 			}
 			
