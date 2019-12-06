@@ -41,8 +41,8 @@ public class OpeningsGenerator {
 		//File b_root = new File("./../WorkDir/black_winners.pgn");
 		//File w_root = new File("./../PGNProcessor/white2300.pgn");
 		//File b_root = new File("./../PGNProcessor/black2300.pgn");
-		File w_root = new File("./../PGNProcessor/white2400.pgn");
-		File b_root = new File("./../PGNProcessor/black2400.pgn");
+		File w_root = new File("white_winners.zip");
+		File b_root = new File("black_winners.zip");
 		
 		if (!w_root.exists() || !b_root.exists()) {
 			throw new IllegalStateException();

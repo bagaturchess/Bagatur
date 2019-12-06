@@ -988,5 +988,49 @@ public class BoardImpl implements IBitBoard {
 			
 			throw new IllegalStateException("pieceType=" + pieceType);
 		}
+		
+		
+		@Override
+		public boolean isCastlingKingSide(int move) {
+			if (isCastling(move)) {
+				int index = MoveUtil.getToIndex(move);
+				return index == 1 || index == 57;
+			}
+			
+			return false;
+		}
+		
+		
+		@Override
+		public boolean isCastlingQueenSide(int move) {
+			
+			if (isCastling(move)) {
+				int index = MoveUtil.getToIndex(move);
+				return index == 5 || index == 61; 
+			}
+			
+			return false;
+		}
+		
+		
+		@Override
+		public int getFromFieldID(int move) {
+			return MoveUtil.getFromIndex(move);
+		}
+		
+		
+		@Override
+		public int getPromotionFigureType(int move) {
+			if (!isPromotion(move)) {
+				return 0;
+			}
+			return MoveUtil.getMoveType(move);
+		}
+		
+		
+		@Override
+		public String moveToString(int move) {
+			return (new MoveWrapper(move)).toString();
+		}
 	}
 }

@@ -228,7 +228,7 @@ public class HashMapLongObject<V> {
    */
   public Object[] getAllValues() {
 	  
-	if (true) throw new IllegalStateException("Consumes memory!");
+	//if (true) throw new IllegalStateException("Consumes memory!");
 	  
     int index = 0;
     Object[] result = new Object[count];

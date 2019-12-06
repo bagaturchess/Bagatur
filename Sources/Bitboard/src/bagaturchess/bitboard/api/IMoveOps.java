@@ -26,7 +26,12 @@ public interface IMoveOps {
 	public boolean isCaptureOrPromotion(int move);
 	public boolean isEnpassant(int move);
 	public boolean isCastling(int move);
+	public boolean isCastlingKingSide(int move);
+	public boolean isCastlingQueenSide(int move);
 	public int getFigurePID(int move);
 	public int getToFieldID(int move);
+	public int getFromFieldID(int move);
 	public int getFigureType(int move);
+	public int getPromotionFigureType(int move);
+	public String moveToString(int move);
 }

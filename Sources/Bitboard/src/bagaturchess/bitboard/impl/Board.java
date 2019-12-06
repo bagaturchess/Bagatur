@@ -5388,5 +5388,35 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		public int getFigureType(int move) {
 			return  MoveInt.getFigureType(move);
 		}
+		
+		
+		@Override
+		public boolean isCastlingKingSide(int move) {
+			return MoveInt.isCastleKingSide(move);
+		}
+		
+		
+		@Override
+		public boolean isCastlingQueenSide(int move) {
+			return MoveInt.isCastleQueenSide(move);
+		}
+		
+		
+		@Override
+		public int getFromFieldID(int move) {
+			return MoveInt.getFromFieldID(move);
+		}
+		
+		
+		@Override
+		public int getPromotionFigureType(int move) {
+			return MoveInt.getPromotionFigureType(move);
+		}
+		
+		
+		@Override
+		public String moveToString(int move) {
+			return MoveInt.moveToString(move);
+		}
 	}
 }

@@ -26,8 +26,6 @@ package bagaturchess.tools.pgn.impl;
 import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
-//import bagaturchess.bitboard.impl1.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 
@@ -54,7 +52,7 @@ public class PGNUtils implements PGNConstants {
 			result = makeCastleQueenSide(bitboard, colour, pPGNTurn);
 		} else if (pPGNTurn.startsWith(SAN_CASTLE_KING_SIDE_STR)) {
 			result = makeCastleKingSide(bitboard, colour, pPGNTurn);
-		} else { //Turn is not castle side
+		} else {
 			result = makeTurnBySAN(bitboard, colour, pPGNTurn, validateChechAndMate, pgnGame);
 		}
 		return result;
@@ -71,7 +69,7 @@ public class PGNUtils implements PGNConstants {
 		
 		int cur_move = 0;
 		while ((cur_move = movesBuffer.next()) != 0) {
-			if (MoveInt.isCastleKingSide(cur_move)) {
+			if (bitboard.getMoveOps().isCastlingKingSide(cur_move)) {
 				if (!founded) {
 					founded = true;
 					turnToMove = cur_move;
@@ -101,7 +99,7 @@ public class PGNUtils implements PGNConstants {
 		
 		int cur_move = 0;
 		while ((cur_move = movesBuffer.next()) != 0) {
-			if (MoveInt.isCastleQueenSide(cur_move)) {
+			if (bitboard.getMoveOps().isCastlingQueenSide(cur_move)) {
 				if (!founded) {
 					founded = true;
 					turnToMove = cur_move;
@@ -239,20 +237,20 @@ public class PGNUtils implements PGNConstants {
 		int cur_move = 0;
 		while ((cur_move = movesBuffer.next()) != 0) {
 
-			int soldierType = MoveInt.getFigureType(cur_move);
+			int soldierType = bitboard.getMoveOps().getFigureType(cur_move);//MoveInt.getFigureType(cur_move);
 
-			int producedSoldierType = MoveInt.getPromotionFigureType(cur_move);
+			int producedSoldierType = bitboard.getMoveOps().getPromotionFigureType(cur_move);
 			if (figureType == soldierType
-				&& (fromLetter == Fields.LETTERS[MoveInt.getFromFieldID(cur_move)]
+				&& (fromLetter == Fields.LETTERS[bitboard.getMoveOps().getFromFieldID(cur_move)]
 					|| fromLetter == SAN_FILE_UNDEFINED)
-				&& (fromDigit == Fields.DIGITS[MoveInt.getFromFieldID(cur_move)]
+				&& (fromDigit == Fields.DIGITS[bitboard.getMoveOps().getFromFieldID(cur_move)]
 					|| fromDigit == SAN_RANK_UNDEFINED)
-				&& (toLetter == Fields.LETTERS[MoveInt.getToFieldID(cur_move)]
+				&& (toLetter == Fields.LETTERS[bitboard.getMoveOps().getToFieldID(cur_move)]
 					|| toLetter == SAN_FILE_UNDEFINED)
-				&& (toDigit == Fields.DIGITS[MoveInt.getToFieldID(cur_move)]
+				&& (toDigit == Fields.DIGITS[bitboard.getMoveOps().getToFieldID(cur_move)]
 					|| toDigit == SAN_RANK_UNDEFINED)
-				&& isKiller == MoveInt.isCapture(cur_move)
-				&& (isPromotion == MoveInt.isPromotion(cur_move))
+				&& isKiller == bitboard.getMoveOps().isCapture(cur_move)
+				&& (isPromotion == bitboard.getMoveOps().isPromotion(cur_move))
 				&& ((isPromotion == true && promotionFigureType == producedSoldierType) || isPromotion == false)
 				//&& (!validateChechAndMate
 					//	|| (validateChechAndMate && (isChess == turn.isCheck() || isMate == turn.isCheck())))
@@ -294,7 +292,7 @@ public class PGNUtils implements PGNConstants {
 			String all_moves = "";
 			int move = 0;
 			while ((move = movesBuffer.next()) != 0) {
-				all_moves += bagaturchess.bitboard.impl.movegen.MoveInt.moveToString(move);
+				all_moves += bitboard.getMoveOps().moveToString(move);
 				all_moves += ", ";
 			}
 			
