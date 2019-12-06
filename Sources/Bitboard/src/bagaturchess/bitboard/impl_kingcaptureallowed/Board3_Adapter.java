@@ -299,5 +299,29 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 		public String moveToString(int move) {
 			return MoveInt.moveToString(move);
 		}
+		
+		
+		@Override
+		public int getToField_File(int move) {
+			return Fields.LETTERS[getToFieldID(move)];
+		}
+		
+		
+		@Override
+		public int getToField_Rank(int move) {
+			return Fields.DIGITS[getToFieldID(move)];
+		}
+		
+		
+		@Override
+		public int getFromField_File(int move) {
+			return Fields.LETTERS[getFromFieldID(move)];
+		}
+		
+		
+		@Override
+		public int getFromField_Rank(int move) {
+			return Fields.DIGITS[getFromFieldID(move)];
+		}
 	}
 }

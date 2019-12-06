@@ -919,6 +919,10 @@ public class BoardImpl implements IBitBoard {
 	private class MoveOpsImpl implements IMoveOps {
 		
 		
+		private final int FILES[] = { 7, 6, 5, 4, 3, 2, 1, 0 };
+		private final int RANKS[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+		
+		
 		@Override
 		public int getFigureType(int move) {
 			return  MoveUtil.getSourcePieceIndex(move);
@@ -1031,6 +1035,30 @@ public class BoardImpl implements IBitBoard {
 		@Override
 		public String moveToString(int move) {
 			return (new MoveWrapper(move)).toString();
+		}
+		
+		
+		@Override
+		public int getToField_File(int move) {
+			return FILES[getToFieldID(move) & 7];
+		}
+		
+		
+		@Override
+		public int getToField_Rank(int move) {
+			return RANKS[getToFieldID(move) >>> 3];
+		}
+		
+		
+		@Override
+		public int getFromField_File(int move) {
+			return FILES[getFromFieldID(move) & 7];
+		}
+		
+		
+		@Override
+		public int getFromField_Rank(int move) {
+			return RANKS[getFromFieldID(move) >>> 3];
 		}
 	}
 }

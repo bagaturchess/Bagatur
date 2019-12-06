@@ -30,7 +30,11 @@ public interface IMoveOps {
 	public boolean isCastlingQueenSide(int move);
 	public int getFigurePID(int move);
 	public int getToFieldID(int move);
+	public int getToField_File(int move);
+	public int getToField_Rank(int move);
 	public int getFromFieldID(int move);
+	public int getFromField_File(int move);
+	public int getFromField_Rank(int move);
 	public int getFigureType(int move);
 	public int getPromotionFigureType(int move);
 	public String moveToString(int move);

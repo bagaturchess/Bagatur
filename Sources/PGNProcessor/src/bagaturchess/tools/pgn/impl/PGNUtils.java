@@ -241,13 +241,13 @@ public class PGNUtils implements PGNConstants {
 
 			int producedSoldierType = bitboard.getMoveOps().getPromotionFigureType(cur_move);
 			if (figureType == soldierType
-				&& (fromLetter == Fields.LETTERS[bitboard.getMoveOps().getFromFieldID(cur_move)]
+				&& (fromLetter == bitboard.getMoveOps().getFromField_File(cur_move)
 					|| fromLetter == SAN_FILE_UNDEFINED)
-				&& (fromDigit == Fields.DIGITS[bitboard.getMoveOps().getFromFieldID(cur_move)]
+				&& (fromDigit == bitboard.getMoveOps().getFromField_Rank(cur_move)
 					|| fromDigit == SAN_RANK_UNDEFINED)
-				&& (toLetter == Fields.LETTERS[bitboard.getMoveOps().getToFieldID(cur_move)]
+				&& (toLetter == bitboard.getMoveOps().getToField_File(cur_move)
 					|| toLetter == SAN_FILE_UNDEFINED)
-				&& (toDigit == Fields.DIGITS[bitboard.getMoveOps().getToFieldID(cur_move)]
+				&& (toDigit == bitboard.getMoveOps().getToField_Rank(cur_move)
 					|| toDigit == SAN_RANK_UNDEFINED)
 				&& isKiller == bitboard.getMoveOps().isCapture(cur_move)
 				&& (isPromotion == bitboard.getMoveOps().isPromotion(cur_move))
