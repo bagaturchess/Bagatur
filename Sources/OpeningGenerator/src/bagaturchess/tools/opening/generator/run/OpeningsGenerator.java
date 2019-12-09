@@ -48,26 +48,16 @@ public class OpeningsGenerator {
 			throw new IllegalStateException();
 		}
 		
-		/*if (true) {
-			File f = new File("b.ob");
-			//if () {
-				System.out.println(f.exists());
-			//}
-			return;
-		}*/
-		
 		try {
 			PGNParser parser = new PGNParser();
-			
+						
 			OpeningBook whiteOpenings = new OpeningBookImpl_FullEntries();
-			OpeningBook blackOpenings = new OpeningBookImpl_FullEntries();
-			
 			IGameIterator wgi = new OpeningGamesIterator(Figures.COLOUR_WHITE, whiteOpenings);
-			IGameIterator bgi = new OpeningGamesIterator(Figures.COLOUR_BLACK, blackOpenings);
-			
 			parser.importPGNGamesInDir(w_root, wgi, true);
 			whiteOpenings.store("w.ob");
 			
+			OpeningBook blackOpenings = new OpeningBookImpl_FullEntries();			
+			IGameIterator bgi = new OpeningGamesIterator(Figures.COLOUR_BLACK, blackOpenings);
 			parser.importPGNGamesInDir(b_root, bgi, true);
 			blackOpenings.store("b.ob");
 			
