@@ -13,9 +13,9 @@ public class BookTruncater {
 	public static void main(String args[]) {
 		try {
 			
-			int size = 30;
-			String input = "w.ob";
-			String output = "w30.ob";
+			int size = 10;
+			String input = "b.ob";
+			String output = "b10.ob";
 			
 			OpeningBook ob = OpeningBookFactory.load(input);
 			
