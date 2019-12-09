@@ -38,19 +38,19 @@ public class FilterPGNFiles_ByELO {
 		
 		//Directory with zipped files downloaded from http://www.chess.co.uk/twic/twic
 		//String pgnFile = "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\PGN";
-		String pgnFile = ".\\all2500.zip";
+		String pgnFile = "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\PGN\\all.zip";
 		
 		//IGameIterator myiter = new GameIterator_CollectAllInOne("./all.pgn");
-		IGameIterator iter = new GameIterator_ELOFilter("all2600.pgn", 2600, 2600);
-		//IGameIterator witer = new GameIterator_ExtractWinners("../WorkDir/white_winners.pgn", "1-0", 2600, -1);
-		//IGameIterator biter = new GameIterator_ExtractWinners("../WorkDir/black_winners.pgn", "0-1", -1, 2600);
+		//IGameIterator iter = new GameIterator_ELOFilter("all2600.pgn", 2600, 2600);
+		IGameIterator witer = new GameIterator_ExtractWinners("white_winners.pgn", "1-0", -1, -1);
+		IGameIterator biter = new GameIterator_ExtractWinners("black_winners.pgn", "0-1", -1, -1);
 		//IGameIterator dummy = new DummyGameIterator();
 		
 		PGNParser parser = new PGNParser();
 		try {
 			//parser.importPGNGamesInDir(new File(pgnFile), dummy);
-			parser.importPGNGamesInDir(new File(pgnFile), iter);
-			//parser.importPGNGamesInDir(new File(pgnFile), new IGameIterator[] {myiter});
+			//parser.importPGNGamesInDir(new File(pgnFile), iter);
+			parser.importPGNGamesInDir(new File(pgnFile), new IGameIterator[] {witer, biter});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
