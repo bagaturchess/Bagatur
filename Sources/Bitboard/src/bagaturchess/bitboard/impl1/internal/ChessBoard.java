@@ -10,6 +10,7 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.PAWN;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.QUEEN;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 
 
 public final class ChessBoard {
@@ -71,7 +72,8 @@ public final class ChessBoard {
 	public final long[] checkingPiecesHistory = new long[EngineConstants.MAX_MOVES];
 	public final long[] pinnedPiecesHistory = new long[EngineConstants.MAX_MOVES];
 	public final long[] discoveredPiecesHistory = new long[EngineConstants.MAX_MOVES];
-
+	public final int[] lastCaptureOrPawnMoveBeforeHistory = new int[EngineConstants.MAX_MOVES];
+	
 	// attack boards
 	public final long[][] attacks = new long[2][7];
 	public final long[] attacksAll = new long[2];
@@ -82,6 +84,8 @@ public final class ChessBoard {
 
 	public int[] playedMoves = new int[2048];
 	public int playedMovesCount = 0;
+	
+	public int lastCaptureOrPawnMoveBefore = 0;
 	
 	
 	@Override
@@ -117,9 +121,10 @@ public final class ChessBoard {
 		pinnedPiecesHistory[moveCounter] = pinnedPieces;
 		discoveredPiecesHistory[moveCounter] = discoveredPieces;
 		checkingPiecesHistory[moveCounter] = checkingPieces;
+		lastCaptureOrPawnMoveBeforeHistory[moveCounter] = lastCaptureOrPawnMoveBefore;
+		moveCounter++;
 		playedMoves[playedMovesCount] = move;
 		playedMovesCount++;
-		moveCounter++;
 	}
 
 	private void popHistoryValues() {
@@ -131,6 +136,7 @@ public final class ChessBoard {
 		pinnedPieces = pinnedPiecesHistory[moveCounter];
 		discoveredPieces = discoveredPiecesHistory[moveCounter];
 		checkingPieces = checkingPiecesHistory[moveCounter];
+		lastCaptureOrPawnMoveBefore = lastCaptureOrPawnMoveBeforeHistory[moveCounter];
 	}
 
 	public void doNullMove() {
@@ -170,9 +176,15 @@ public final class ChessBoard {
 			Assert.isTrue(attackedPieceIndex != KING);
 			Assert.isTrue(attackedPieceIndex == 0 || (Util.POWER_LOOKUP[toIndex] & friendlyPieces[colorToMove]) == 0);
 		}
-
+		
 		pushHistoryValues(move);
-
+		
+		if (attackedPieceIndex != 0 || sourcePieceIndex == ChessConstants.PAWN) {
+			lastCaptureOrPawnMoveBefore = 0;
+		} else {
+			lastCaptureOrPawnMoveBefore++;
+		}
+		
 		zobristKey ^= Zobrist.piece[fromIndex][colorToMove][sourcePieceIndex] ^ Zobrist.piece[toIndex][colorToMove][sourcePieceIndex] ^ Zobrist.sideToMove;
 		if (epIndex != 0) {
 			zobristKey ^= Zobrist.epIndex[epIndex];

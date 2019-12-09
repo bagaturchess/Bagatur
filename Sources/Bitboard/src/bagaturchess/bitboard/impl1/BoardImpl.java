@@ -306,15 +306,12 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
-	@Override
-	public int getDraw50movesRule() {
-		return 0;//TODO
+	public boolean isDraw50movesRule() {
+		return chessBoard.lastCaptureOrPawnMoveBefore >= 100;
 	}
 	
-	
-	@Override
-	public boolean isDraw50movesRule() {
-		return false;//TODO
+	public int getDraw50movesRule() {
+		return chessBoard.lastCaptureOrPawnMoveBefore;
 	}
 	
 	
