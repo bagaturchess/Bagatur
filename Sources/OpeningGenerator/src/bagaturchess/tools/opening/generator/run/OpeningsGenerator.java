@@ -50,7 +50,7 @@ public class OpeningsGenerator {
 		
 		try {
 			PGNParser parser = new PGNParser();
-						
+			
 			OpeningBook whiteOpenings = new OpeningBookImpl_FullEntries();
 			IGameIterator wgi = new OpeningGamesIterator(Figures.COLOUR_WHITE, whiteOpenings);
 			parser.importPGNGamesInDir(w_root, wgi, true);

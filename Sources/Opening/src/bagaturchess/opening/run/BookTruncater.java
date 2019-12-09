@@ -9,31 +9,13 @@ import bagaturchess.opening.impl.model.Entry_BaseImpl;
 
 public class BookTruncater {
 	
-	private static HashMapLongObject<Entry_BaseImpl> remove(HashMapLongObject<Entry_BaseImpl> keys, int threshold) {
-		HashMapLongObject<Entry_BaseImpl> newKeys = new HashMapLongObject<Entry_BaseImpl>(); //keys.containsKey(key);
-		
-		for (long key: keys.getAllKeys()) {
-			Entry_BaseImpl e = keys.get(key);
-			if (e.getWeight() > threshold) {
-				newKeys.put(key, e);
-			}
-		}
-		
-		System.out.println("> " + threshold + ", " + newKeys.size());
-		
-		return newKeys;
-	}
 	
 	public static void main(String args[]) {
 		try {
 			
 			int size = 30;
-			//String input = "./../OpeningGenerator/w.ob";
-			//String output = "./../OpeningGenerator/w2.ob";
-			//String input = "./../OpeningGenerator/b.ob";
-			//String output = "./../OpeningGenerator/b2.ob";
-			String input = "./w.ob";
-			String output = "./w30.ob";
+			String input = "w.ob";
+			String output = "w30.ob";
 			
 			OpeningBook ob = OpeningBookFactory.load(input);
 			
@@ -48,5 +30,21 @@ public class BookTruncater {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	
+	private static HashMapLongObject<Entry_BaseImpl> remove(HashMapLongObject<Entry_BaseImpl> keys, int threshold) {
+		HashMapLongObject<Entry_BaseImpl> newKeys = new HashMapLongObject<Entry_BaseImpl>(); //keys.containsKey(key);
+		
+		for (long key: keys.getAllKeys()) {
+			Entry_BaseImpl e = keys.get(key);
+			if (e.getWeight() > threshold) {
+				newKeys.put(key, e);
+			}
+		}
+		
+		System.out.println("> " + threshold + ", " + newKeys.size());
+		
+		return newKeys;
 	}
 }
