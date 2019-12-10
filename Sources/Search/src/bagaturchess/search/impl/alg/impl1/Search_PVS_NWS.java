@@ -212,8 +212,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 
 		
-		if (false
-				&& ply > 1
+		if (ply > 1
     	    	&& depth >= 7
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
@@ -229,7 +228,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			} else {
 				if (!env.getBitboard().hasMoveInNonCheck()) {
 					node.bestmove = 0;
-					node.eval = getDrawScores(0);
+					node.eval = EvalConstants.SCORE_DRAW;
 					node.leaf = true;
 					return node.eval;
 				}
@@ -249,13 +248,13 @@ public class Search_PVS_NWS extends SearchImpl {
 						return node.eval;
 					} else {
 						node.bestmove = 0;
-						node.eval = getDrawScores(0);
+						node.eval = EvalConstants.SCORE_DRAW;
 						node.leaf = true;
 						return node.eval;
 					}
 				} else if (egtbscore == 0) {
 					node.bestmove = 0;
-					node.eval = getDrawScores(0);
+					node.eval = EvalConstants.SCORE_DRAW;
 					node.leaf = true;
 					return node.eval;
 				}
@@ -464,7 +463,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				movesPerformed++;
 
 				/* draw check */
-				if (cb.isRepetition(move) || MaterialUtil.isDrawByMaterial(cb)) {
+				if (isDraw()) {
 					score = EvalConstants.SCORE_DRAW;
 				} else {
 					score = alpha + 1; // initial is above alpha
