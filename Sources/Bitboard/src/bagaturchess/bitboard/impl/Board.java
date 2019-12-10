@@ -907,7 +907,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	
 	@Override
 	public void makeMoveForward(String ucimove) {
-		int move = BoardUtils.parseSingleUCIMove(this, ucimove);
+		int move = moveOps.stringToMove(ucimove);
 		makeMoveForward(move);
 	}
 	

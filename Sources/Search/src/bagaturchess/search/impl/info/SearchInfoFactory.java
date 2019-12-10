@@ -64,7 +64,7 @@ public final class SearchInfoFactory {
 		
 		String currmove = info.getCurrmove();
 		if (currmove != null) {
-			result.setCurrentMove(BoardUtils.parseSingleUCIMove(board, currmove));
+			result.setCurrentMove(board.getMoveOps().stringToMove(currmove));
 			result.setCurrentMoveNumber(info.getCurrmoveNumber());
 		}
 		
@@ -92,7 +92,7 @@ public final class SearchInfoFactory {
 			result.setEval(info.getEval());
 		}
 		
-		result.setPV(MoveInt.getPV(info.getPv(), board));
+		result.setPV(BoardUtils.getMoves(info.getPv(), board));
 		
 		
 		if (result.getPV() != null && result.getPV().length > 0) {
@@ -101,7 +101,7 @@ public final class SearchInfoFactory {
 		
 		String currmove = info.getCurrmove();
 		if (currmove != null) {
-			result.setCurrentMove(BoardUtils.parseSingleUCIMove(board, currmove));
+			result.setCurrentMove(board.getMoveOps().stringToMove(currmove));
 			result.setCurrentMoveNumber(info.getCurrmoveNumber());
 		}
 		

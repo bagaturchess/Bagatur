@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
@@ -113,7 +114,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 		final int startIteration = (go.getStartDepth() == Go.UNDEF_STARTDEPTH) ? 1 : go.getStartDepth();
 		int maxIterations_tmp = (go.getDepth() == Go.UNDEF_DEPTH) ? ISearch.MAX_DEPTH : go.getDepth();
 		Integer initialValue = (go.getBeta() == Go.UNDEF_BETA) ? null : go.getBeta();
-		int[] prevPV = MoveInt.getPV(go.getPv(), _bitboardForSetup);
+		int[] prevPV = BoardUtils.getMoves(go.getPv(), _bitboardForSetup);
 		
 		if (maxIterations_tmp > ISearch.MAX_DEPTH) {
 			maxIterations_tmp = ISearch.MAX_DEPTH;

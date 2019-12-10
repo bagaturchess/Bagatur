@@ -428,30 +428,6 @@ public class MoveInt {
 		}
 	}
 	
-
-	public static final int[] getPV(String[] pv, IBitBoard board) {
-		
-		int[] result = null;
-		
-		if (pv != null && pv.length > 0) {
-			
-			result = new int[pv.length];
-			
-			int cur = 0;
-			for (String move: pv) {
-				result[cur++] = board.getMoveOps().stringToMove(move.trim());
-				board.makeMoveForward(result[cur - 1]);
-			}
-			
-			for (int i = pv.length - 1; i >= 0; i--) {
-				board.makeMoveBackward(result[i]);
-			}
-		}
-		
-		
-		return result;
-	}
-	
 	
 	public static final String getMovesUCI(IBitBoard bitboard) {
 		

@@ -22,19 +22,12 @@
  */
 package bagaturchess.bitboard.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
-import bagaturchess.bitboard.api.IInternalMoveList;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.bitboard.impl.movelist.BaseMoveList;
-import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.bitboard.impl1.BoardImpl;
 
@@ -45,14 +38,17 @@ public class BoardUtils {
 	public static IBitBoard createBoard_WithPawnsCache() {
 		return createBoard_WithPawnsCache(Constants.INITIAL_BOARD, bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory.class.getName(), null, 1000);
 	}
-
+	
+	
 	public static IBitBoard createBoard_WithPawnsCache(IBoardConfig boardConfig) {
 		return createBoard_WithPawnsCache(Constants.INITIAL_BOARD, boardConfig);
 	}
 	
+	
 	public static IBitBoard createBoard_WithPawnsCache(String fen, IBoardConfig boardConfig) {
 		return createBoard_WithPawnsCache(fen, bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory.class.getName(), boardConfig, 1000);
 	}
+	
 	
 	public static IBitBoard createBoard_WithPawnsCache(String fen, String cacheFactoryClassName, IBoardConfig boardConfig, int pawnsCacheSize) {
 		
@@ -85,90 +81,26 @@ public class BoardUtils {
 	}
 	
 	
-	public static void playGameUCI(IBitBoard board, String movesSign) {
+	public static final int[] getMoves(String[] pv, IBitBoard board) {
 		
-		List<String> moves = new ArrayList<String>();
+		int[] result = null;
 		
-		StringTokenizer st = new StringTokenizer(movesSign, " ");
-		while(st.hasMoreTokens()) {
-			moves.add(st.nextToken());
-		}
-		
-		//int colour = Figures.COLOUR_WHITE;
-		int size = moves.size();
-		for (int i = 0; i < size; i++ ) {
+		if (pv != null && pv.length > 0) {
 			
-			String moveSign = moves.get(i);
-			if (!moveSign.equals("...")) {
-				//System.out.println(moveSign);
-				//int move = BoardUtils.parseSingleUCIMove(board, moveSign);
-				//colour = Figures.OPPONENT_COLOUR[colour];
-				
-				board.makeMoveForward(moveSign);
+			result = new int[pv.length];
+			
+			int cur = 0;
+			for (String move: pv) {
+				result[cur++] = board.getMoveOps().stringToMove(move.trim());
+				board.makeMoveForward(result[cur - 1]);
 			}
-		}
-	}
-	
-	
-	public static int parseSingleUCIMove(IBitBoard board, String moveSign) {
-		int move = 0;
-		
-		IInternalMoveList moves_list = new BaseMoveList();
-		int movesCount = board.genAllMoves(moves_list);
-		
-		String fromFieldSign = moveSign.substring(0, 2).toLowerCase();
-		String toFieldSign = moveSign.substring(2, 4).toLowerCase();
-		String promTypeSign = moveSign.length() == 5 ? moveSign.substring(4, 5).toLowerCase() : null;
-		//System.out.println("CONSOLE: " + fromFieldSign);
-		//System.out.println("CONSOLE: " + toFieldSign);
 			
-		int fromFieldID = Fields.getFieldID(fromFieldSign);
-		int toFieldID = Fields.getFieldID(toFieldSign);
-		//System.out.println("CONSOLE: " + fromFieldID);
-		//System.out.println("CONSOLE: " + toFieldID);
-			
-		int[] moves = moves_list.reserved_getMovesBuffer();
-		for (int i=0; i<movesCount; i++) {
-			int curMove = moves[i];
-			//System.out.println(Move.moveToString(curMove));
-			int curFromID = MoveInt.getFromFieldID(curMove);
-			int curToID = MoveInt.getToFieldID(curMove);
-			if (fromFieldID == curFromID && toFieldID == curToID) {
-				
-				if (promTypeSign == null) {
-					move = curMove;
-					break;
-				} else { //Promotion move
-					if (getPromotionTypeUCI(promTypeSign) == MoveInt.getPromotionFigureType(curMove)) {
-						move = curMove;
-						break;
-					}
-				}
+			for (int i = pv.length - 1; i >= 0; i--) {
+				board.makeMoveBackward(result[i]);
 			}
 		}
 		
-		if (move == 0) {
-			throw new IllegalStateException("moveSign=" + moveSign + "\r\n" + board);
-		}
 		
-		return move;
-	}
-
-	private static int getPromotionTypeUCI(String promTypeSign) {
-		int type = -1;
-		
-		if (promTypeSign.equals("n")) {
-			type = Figures.TYPE_KNIGHT;
-		} else if (promTypeSign.equals("b")) {
-			type = Figures.TYPE_OFFICER;
-		} else if (promTypeSign.equals("r")) {
-			type = Figures.TYPE_CASTLE;
-		} else if (promTypeSign.equals("q")) {
-			type = Figures.TYPE_QUEEN;
-		} else {
-			throw new IllegalStateException("Invalid promotion figure type '" + promTypeSign + "'");
-		}
-		
-		return type;
+		return result;
 	}
 }
