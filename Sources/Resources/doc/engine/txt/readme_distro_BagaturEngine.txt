@@ -42,6 +42,5 @@ Credits:
   10. Glaurung chess engine, nice ideas inside the evaluation function (e.g. king safety)
   11. Fruit, http://www.fruitchess.com/, legendary program, nice and simple design.
   12. winrun4j, http://winrun4j.sourceforge.net/, for the windows executables
-  13. CuckooChess, another java chess engine - strong and well written
-  14. Chess22k, another java chess engine - strong, well written and has an excellent evaluation function
+  13. Chess22k, another java chess engine - strong and well written
   
