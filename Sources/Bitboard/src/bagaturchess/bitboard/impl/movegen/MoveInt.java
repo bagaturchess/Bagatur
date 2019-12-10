@@ -438,53 +438,11 @@ public class MoveInt {
 		for (int i=0; i<count; i++) {
 			int curMove = moves[i];
 			StringBuilder message = new StringBuilder(32);
-			MoveInt.moveToStringUCI(curMove, message);
+			message.append(bitboard.getMoveOps().moveToString(curMove));
 			result += message.toString() + " ";
 		}
 	
 		return result;
-	}
-	
-	
-	public static final String movesToStringOwn(int[] pv) {
-		String pvStr = "";
-		
-		for (int i=0; i<pv.length; i++) {
-			pvStr += moveToStringOwn(pv[i]);
-			if (i != pv.length - 1) {
-				pvStr += ", ";
-			}
-		}
-		
-		return pvStr;
-	}
-	
-	public static final String moveToStringOwn(int move) {
-		
-		if (move == -1) {
-			throw new IllegalStateException("move=" + move);
-		}
-		
-		if (move == 0) {
-			throw new IllegalStateException();
-		}
-		
-		String moveStr = "";
-		
-		moveStr += Fields.ALL_ORDERED_NAMES[Fields.IDX_2_ORDERED_A1H1[getFromFieldID(move)]];
-		if (isCapture(move)) {
-			moveStr += "x";
-		} else {
-			moveStr += "-";
-		}
-		moveStr += Fields.ALL_ORDERED_NAMES[Fields.IDX_2_ORDERED_A1H1[getToFieldID(move)]];
-		
-		if (isPromotion(move)) {
-			int promotionFigureType = Constants.PIECE_IDENTITY_2_TYPE[getPromotionFigurePID(move)];
-			moveStr += Figures.TYPES_SIGN[promotionFigureType].toLowerCase();
-		}
-		
-		return moveStr;
 	}
 	
 
