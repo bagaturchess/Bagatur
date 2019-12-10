@@ -13,6 +13,6 @@ How to build a distribution from the sources:
 2. download http://sourceforge.net/projects/egtb-in-java/files/latest/download
 3. get ./egtbprobe.dll from the archive and copy it to "<workspace>\EGTB" directory
 3. get ./egtbprobe.jar from the archive and copy it to "<workspace>\EGTB\res" directory
-4. copy w.ob and b.ob files (they are packed in the Bagatur engine distribution, inside 'dat' sub directory) to the 'Resources\bin\engine\ob' directory (it is inside your workspace, if it isn't presented than create it)
+4. copy w.ob and b.ob files (they are packed in the Bagatur engine distribution, inside 'data' sub directory) to the 'Resources\bin\engine\ob' directory (it is inside your workspace, if it isn't presented than create it)
 5. run the ant script Ants/engine/build_BagaturEngine_distro.xml from Ants/ directory either from eclipse or command line
 6. the distribution archive file will be generated in the WorkDir directory

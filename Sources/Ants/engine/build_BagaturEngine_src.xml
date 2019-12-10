@@ -82,6 +82,8 @@
 			  <include name="Resources/.classpath"/>
 			  <include name="Resources/.project"/>
 			  <exclude name="Resources/bin/engine/ob/**/*.ob"/>
+			  <exclude name="Resources/bin/engine/ob/**/*.ob_impl0"/>
+			  <exclude name="Resources/bin/engine/ob/**/*.ob_impl1"/>
 			</fileset>
 			<fileset dir="${learningAPI_dir}/..">
 			  <include name="LearningAPI/src/**/*.java"/>
