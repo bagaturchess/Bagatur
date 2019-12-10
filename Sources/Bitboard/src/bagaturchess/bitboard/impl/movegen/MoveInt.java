@@ -439,7 +439,7 @@ public class MoveInt {
 			
 			int cur = 0;
 			for (String move: pv) {
-				result[cur++] = BoardUtils.uciStrToMove(board, move.trim());
+				result[cur++] = board.getMoveOps().stringToMove(move.trim());
 				board.makeMoveForward(result[cur - 1]);
 			}
 			

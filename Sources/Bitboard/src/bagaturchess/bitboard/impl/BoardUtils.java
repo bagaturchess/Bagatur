@@ -85,54 +85,6 @@ public class BoardUtils {
 	}
 	
 	
-	public static int uciStrToMove(IBitBoard bitboard, String moveStr) {
-		
-		int fromFieldID = Fields.getFieldID(moveStr.substring(0, 2));
-		int toFieldID = Fields.getFieldID(moveStr.substring(2, 4));
-		
-		IMoveList mlist = new BaseMoveList();
-		if (bitboard.isInCheck()) {
-			bitboard.genKingEscapes(mlist);
-		} else {
-			bitboard.genAllMoves(mlist);
-		}
-		
-		int cur_move = 0;
-		while ((cur_move = mlist.next()) != 0) {
-			if (fromFieldID == MoveInt.getFromFieldID(cur_move)
-					&& toFieldID == MoveInt.getToFieldID(cur_move)
-				) {
-				
-				if (MoveInt.isPromotion(cur_move)) {
-					if (moveStr.endsWith("q")) {
-						if (MoveInt.getPromotionFigureType(cur_move) == Figures.TYPE_QUEEN) {
-							return cur_move;
-						}
-					} else if (moveStr.endsWith("r")) {
-						if (MoveInt.getPromotionFigureType(cur_move) == Figures.TYPE_CASTLE) {
-							return cur_move;
-						}
-					} else if (moveStr.endsWith("b")) {
-						if (MoveInt.getPromotionFigureType(cur_move) == Figures.TYPE_OFFICER) {
-							return cur_move;
-						}
-					} else if (moveStr.endsWith("n")) {
-						if (MoveInt.getPromotionFigureType(cur_move) == Figures.TYPE_KNIGHT) {
-							return cur_move;
-						}
-					} else {
-						throw new IllegalStateException(moveStr);
-					}
-				} else {
-					return cur_move;
-				}
-			}
-		}
-		
-		throw new IllegalStateException(bitboard + "\r\n moveStr=" + moveStr);
-	}
-	
-	
 	public static void playGameUCI(IBitBoard board, String movesSign) {
 		
 		List<String> moves = new ArrayList<String>();

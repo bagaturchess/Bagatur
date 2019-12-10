@@ -1034,6 +1034,12 @@ public class BoardImpl implements IBitBoard {
 			return (new MoveWrapper(move)).toString();
 		}
 		
+		@Override
+		public int stringToMove(String move) {
+			MoveWrapper moveObj = new MoveWrapper(move, chessBoard);
+			return moveObj.move;
+		}
+		
 		
 		@Override
 		public int getToField_File(int move) {

@@ -99,7 +99,7 @@ public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
 			
 			String moveStr = movesString.nextToken();
 			
-			int move = BoardUtils.uciStrToMove(bitboard, moveStr);
+			int move = bitboard.getMoveOps().stringToMove(moveStr);
 			bitboard.makeMoveForward(move);
 			
 			if (bitboard.isInCheck()) {

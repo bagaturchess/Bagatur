@@ -302,6 +302,12 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 		
 		
 		@Override
+		public int stringToMove(String move) {
+			throw new UnsupportedOperationException();
+		}
+		
+		
+		@Override
 		public int getToField_File(int move) {
 			return Fields.LETTERS[getToFieldID(move)];
 		}

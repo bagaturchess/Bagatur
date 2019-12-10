@@ -119,7 +119,7 @@ public abstract class MatchRunner {
 				break;
 			}*/
 			
-			int best_move = BoardUtils.uciStrToMove(bitboard, infoObj.getPv()[0]);
+			int best_move = bitboard.getMoveOps().stringToMove(infoObj.getPv()[0]);
 			bitboard.makeMoveForward(best_move);
 			if (!gameIsOk(bitboard)) {
 				result = getResult(bitboard.getStatus());

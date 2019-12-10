@@ -68,6 +68,7 @@ import bagaturchess.bitboard.impl.movegen.OfficerMovesGen;
 import bagaturchess.bitboard.impl.movegen.QueenMovesGen;
 import bagaturchess.bitboard.impl.movegen.WhitePawnMovesGen;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
+import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.plies.BlackPawnPlies;
 import bagaturchess.bitboard.impl.plies.CastlePlies;
 import bagaturchess.bitboard.impl.plies.KingPlies;
@@ -85,6 +86,7 @@ import bagaturchess.bitboard.impl.plies.specials.Enpassanting;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl.state.PiecesLists;
 import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
+import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 
 
 public class Board extends Fields implements IBitBoard, Cloneable {
@@ -5421,6 +5423,12 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		
 		@Override
+		public int stringToMove(String move) {
+			return uciStrToMove(Board.this, move);
+		}
+		
+		
+		@Override
 		public int getToField_File(int move) {
 			return Fields.LETTERS[getToFieldID(move)];
 		}
@@ -5441,6 +5449,54 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		@Override
 		public int getFromField_Rank(int move) {
 			return Fields.DIGITS[getFromFieldID(move)];
+		}
+		
+		
+		private int uciStrToMove(IBitBoard bitboard, String moveStr) {
+			
+			int fromFieldID = Fields.getFieldID(moveStr.substring(0, 2));
+			int toFieldID = Fields.getFieldID(moveStr.substring(2, 4));
+			
+			IMoveList mlist = new BaseMoveList();
+			if (bitboard.isInCheck()) {
+				bitboard.genKingEscapes(mlist);
+			} else {
+				bitboard.genAllMoves(mlist);
+			}
+			
+			int cur_move = 0;
+			while ((cur_move = mlist.next()) != 0) {
+				if (fromFieldID == MoveInt.getFromFieldID(cur_move)
+						&& toFieldID == MoveInt.getToFieldID(cur_move)
+					) {
+					
+					if (MoveInt.isPromotion(cur_move)) {
+						if (moveStr.endsWith("q")) {
+							if (MoveInt.getPromotionFigureType(cur_move) == Figures.TYPE_QUEEN) {
+								return cur_move;
+							}
+						} else if (moveStr.endsWith("r")) {
+							if (MoveInt.getPromotionFigureType(cur_move) == Figures.TYPE_CASTLE) {
+								return cur_move;
+							}
+						} else if (moveStr.endsWith("b")) {
+							if (MoveInt.getPromotionFigureType(cur_move) == Figures.TYPE_OFFICER) {
+								return cur_move;
+							}
+						} else if (moveStr.endsWith("n")) {
+							if (MoveInt.getPromotionFigureType(cur_move) == Figures.TYPE_KNIGHT) {
+								return cur_move;
+							}
+						} else {
+							throw new IllegalStateException(moveStr);
+						}
+					} else {
+						return cur_move;
+					}
+				}
+			}
+			
+			throw new IllegalStateException(bitboard + "\r\n moveStr=" + moveStr);
 		}
 	}
 }
