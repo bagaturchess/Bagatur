@@ -298,9 +298,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			//Razoring for all depths based on the eval deviation detected into the root node
-			/*if (eval < alpha - mediator.getTrustWindow_AlphaAspiration()) {
-				score = QuiescenceUtil.calculateBestMove(evaluator, cb, moveGen, alpha - mediator.getTrustWindow_AlphaAspiration(), alpha - mediator.getTrustWindow_AlphaAspiration() + 1);
-				if (score <= alpha - mediator.getTrustWindow_AlphaAspiration()) {
+			/*int rbeta = alpha - mediator.getTrustWindow_AlphaAspiration();
+			if (eval < rbeta) {
+				score = calculateBestMove(evaluator, info, cb, moveGen, rbeta, rbeta + 1, ply);
+				if (score <= rbeta) {
 					node.bestmove = 0;
 					node.eval = score;
 					node.leaf = true;
