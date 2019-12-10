@@ -84,6 +84,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
 		
 		TTUtil.setSizeMB(256);
+		EvalUtil.setSizeMB(64);
 	}
 	
 	
@@ -91,6 +92,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		super(_env);
 		
 		TTUtil.setSizeMB(256);
+		EvalUtil.setSizeMB(64);
 	}
 	
 	
@@ -145,7 +147,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (ply >= ISearch.MAX_DEPTH) {
-			return evaluator.lazyEval(ply, alpha, beta, 0);
+			return eval(evaluator, ply, alpha, beta);
 		}
 		
 		
@@ -277,7 +279,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int eval = ISearch.MIN;
 		if (!isPv && cb.checkingPieces == 0) {
 
-			eval = evaluator.lazyEval(ply, alphaOrig, beta, 0);
+			eval = eval(evaluator, ply, alphaOrig, beta);
 
 			/* use tt value as eval */
 			if (EngineConstants.USE_TT_SCORE_AS_EVAL && ttValue != 0) {
@@ -444,7 +446,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
 							if (!MoveUtil.isPawnPush78(move)) {
 								if (eval == ISearch.MIN) {
-									eval = evaluator.lazyEval(ply, alphaOrig, beta, 0);
+									eval = eval(evaluator, ply, alphaOrig, beta);
 								}
 								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
 									continue;
@@ -640,7 +642,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		/* stand-pat check */
 		int eval = ISearch.MIN;
 		if (cb.checkingPieces == 0) {
-			eval = evaluator.lazyEval(ply, alpha, beta, 0);
+			eval = eval(evaluator, ply, alpha, beta);
 			if (eval >= beta) {
 				return eval;
 			}
@@ -713,5 +715,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		moveGen.endPly();
 		return alpha;
+	}
+	
+	
+	private int eval(IEvaluator evaluator, final int ply, int alpha, int beta) {
+		long value = EvalUtil.getValue(env.getBitboard().getHashKey());
+		if (value != 0) {
+			return EvalUtil.getScore(value);
+		}
+		int eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
+		EvalUtil.addValue(env.getBitboard().getHashKey(), eval);
+		return eval;
 	}
 }
