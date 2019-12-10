@@ -84,12 +84,6 @@ public class BoardUtils {
 		return bitboard;
 	}
 	
-	/*public static IBitBoard createBoard(String movesSign) {
-		IBitBoard board = new Board();
-		playGame(board, movesSign);
-		return board;
-	}*/
-	
 	
 	public static int uciStrToMove(IBitBoard bitboard, String moveStr) {
 		
@@ -136,101 +130,6 @@ public class BoardUtils {
 		}
 		
 		throw new IllegalStateException(bitboard + "\r\n moveStr=" + moveStr);
-	}
-	
-	public static void playGame(IBitBoard board, String movesSign) {
-		
-		//int colourToMove = Figures.COLOUR_WHITE;
-		
-		StringTokenizer st = new StringTokenizer(movesSign, ",");
-		while (st.hasMoreTokens()) {
-			
-			String moveSign = st.nextToken().trim();
-			//String message = moveSign;
-			//System.out.println("colour=" + board.getColourToMove());
-			
-			int move = parseSingleMove(board, moveSign);
-			if (move == 0) {
-				board.makeNullMoveForward();
-				move = parseSingleMove(board, moveSign);
-				if (move == 0) {
-					//parseSingleMove(board, moveSign);
-					throw new IllegalStateException("move=" + move);
-				} else {
-					board.makeMoveForward(move);
-				}
-			} else {
-				board.makeMoveForward(move);
-				//colourToMove = Figures.OPPONENT_COLOUR[colourToMove];
-			}
-			
-			//message += " -> ";
-			//message += board.getHashKey();
-			//message += "	" + board.getPawnsHashKey();
-			
-			//System.out.println(message);
-		}
-	}
-
-	private static int parseSingleMove(IBitBoard board, String moveSign) {
-		int move = 0;
-		
-		IInternalMoveList moves_list = new BaseMoveList();
-		int movesCount = board.genAllMoves(moves_list);
-		
-		int[] moves = moves_list.reserved_getMovesBuffer();
-		
-		if (moveSign.startsWith("O-O-O")) {
-			for (int i=0; i<movesCount; i++) {
-				int curMove = moves[i];
-				if (MoveInt.isCastleQueenSide(curMove)) {
-					move = curMove;
-					break;
-				}
-			}
-		} else if (moveSign.startsWith("O-O")) {
-			for (int i=0; i<movesCount; i++) {
-				int curMove = moves[i];
-				if (MoveInt.isCastleKingSide(curMove)) {
-					move = curMove;
-					break;
-				}
-			}
-		} else {
-			String fromFieldSign = moveSign.substring(0, 2).toLowerCase();
-			String toFieldSign = moveSign.substring(3, 5).toLowerCase();
-			String promTypeSign = moveSign.length() == 7 ? moveSign.substring(6, 7).toLowerCase() : null;
-			//System.out.println("CONSOLE: " + fromFieldSign);
-			//System.out.println("CONSOLE: " + toFieldSign);
-			
-			int fromFieldID = Fields.getFieldID(fromFieldSign);
-			int toFieldID = Fields.getFieldID(toFieldSign);
-			//System.out.println("CONSOLE: " + fromFieldID);
-			//System.out.println("CONSOLE: " + toFieldID);
-			
-			for (int i=0; i<movesCount; i++) {
-				int curMove = moves[i];
-				//System.out.println(Move.moveToString(curMove));
-				int curFromID = MoveInt.getFromFieldID(curMove);
-				int curToID = MoveInt.getToFieldID(curMove);
-				if (fromFieldID == curFromID && toFieldID == curToID) {
-					
-					if (promTypeSign == null) {
-						move = curMove;
-						break;
-					} else { //Promotion move
-						if (getPromotionTypeUCI(promTypeSign) == MoveInt.getPromotionFigureType(curMove)) {
-							move = curMove;
-							break;
-						}
-					}
-				}
-			}
-		}
-		
-		
-		
-		return move;
 	}
 	
 	
