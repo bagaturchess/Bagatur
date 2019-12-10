@@ -21,14 +21,9 @@ set ARGS=bagaturchess.engines.cfg.base.UCIConfig_BaseImpl
 set ARGS=%ARGS% bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove
 set ARGS=%ARGS% bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl
 set ARGS=%ARGS% bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD
-REM set ARGS=%ARGS% bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch
 set ARGS=%ARGS% bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core
-REM set ARGS=%ARGS% bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP
-REM set ARGS=%ARGS% bagaturchess.search.impl.alg.impl1.Search_NegaScout
-set ARGS=%ARGS% bagaturchess.search.impl.alg.impl0.Search_PVS_NWS
+set ARGS=%ARGS% bagaturchess.search.impl.alg.impl1.Search_PVS_NWS
 set ARGS=%ARGS% bagaturchess.engines.cfg.base.SearchConfigImpl_AB
-REM set ARGS=%ARGS% bagaturchess.engines.evaladapters.chess22k.cfg.BoardConfigImpl_Chess22k
-REM set ARGS=%ARGS% bagaturchess.engines.evaladapters.chess22k.cfg.EvaluationConfg_Chess22k
 set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl3.cfg.BoardConfigImpl_V18
 set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl3.cfg.EvaluationConfig_V18
 

@@ -63,7 +63,7 @@ public class EngineProcess_BagaturImpl extends EngineProcess {
 		ARGS += " ";
 		ARGS += "bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core";
 		ARGS += " ";
-		ARGS += "bagaturchess.search.impl.alg.impl0.Search_PVS_NWS";
+		ARGS += "bagaturchess.search.impl.alg.impl1.Search_PVS_NWS";
 		ARGS += " ";
 		ARGS += "bagaturchess.engines.cfg.base.SearchConfigImpl_AB";
 		ARGS += " ";
