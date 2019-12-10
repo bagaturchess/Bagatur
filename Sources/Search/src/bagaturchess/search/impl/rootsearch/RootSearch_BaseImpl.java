@@ -23,9 +23,9 @@
 package bagaturchess.search.impl.rootsearch;
 
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
-import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.MoveWrapper;

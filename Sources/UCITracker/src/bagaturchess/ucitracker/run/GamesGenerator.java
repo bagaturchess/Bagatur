@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
-import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;

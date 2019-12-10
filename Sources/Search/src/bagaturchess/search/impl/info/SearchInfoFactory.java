@@ -23,8 +23,8 @@
 package bagaturchess.search.impl.info;
 
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.impl.utils.SearchUtils;

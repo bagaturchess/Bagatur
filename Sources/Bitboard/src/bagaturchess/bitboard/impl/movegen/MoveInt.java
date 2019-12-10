@@ -23,8 +23,8 @@
 package bagaturchess.bitboard.impl.movegen;
 
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;

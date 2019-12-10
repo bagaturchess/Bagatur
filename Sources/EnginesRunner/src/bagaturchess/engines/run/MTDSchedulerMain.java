@@ -25,10 +25,10 @@
 package bagaturchess.engines.run;
 
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
-import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP;

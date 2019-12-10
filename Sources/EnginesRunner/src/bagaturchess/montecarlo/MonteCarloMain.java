@@ -22,9 +22,9 @@ package bagaturchess.montecarlo;
 
 import java.util.Map;
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
-import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;

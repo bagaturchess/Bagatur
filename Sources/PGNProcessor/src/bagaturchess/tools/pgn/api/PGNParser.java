@@ -31,11 +31,11 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
-import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEvalFactory;

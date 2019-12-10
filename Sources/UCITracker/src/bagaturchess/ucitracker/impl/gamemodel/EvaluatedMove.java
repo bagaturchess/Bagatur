@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
-import bagaturchess.bitboard.impl.BoardUtils;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
