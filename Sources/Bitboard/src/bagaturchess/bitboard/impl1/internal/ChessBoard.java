@@ -173,8 +173,10 @@ public final class ChessBoard {
 		final int attackedPieceIndex = MoveUtil.getAttackedPieceIndex(move);
 
 		if (EngineConstants.ASSERT) {
-			Assert.isTrue(attackedPieceIndex != KING);
-			Assert.isTrue(attackedPieceIndex == 0 || (Util.POWER_LOOKUP[toIndex] & friendlyPieces[colorToMove]) == 0);
+			Assert.isTrue(pieceIndexes[fromIndex] == sourcePieceIndex, "pieceIndexes[fromIndex] == sourcePieceIndex");
+			Assert.isTrue(pieceIndexes[toIndex] == attackedPieceIndex || MoveUtil.isEPMove(move), "pieceIndexes[toIndex] == attackedPieceIndex || MoveUtil.isEPMove(move)");
+			Assert.isTrue(attackedPieceIndex != KING, "attackedPieceIndex != KING");
+			Assert.isTrue(attackedPieceIndex == 0 || (Util.POWER_LOOKUP[toIndex] & friendlyPieces[colorToMove]) == 0, "attackedPieceIndex == 0 || (Util.POWER_LOOKUP[toIndex] & friendlyPieces[colorToMove]) == 0");
 		}
 		
 		pushHistoryValues(move);

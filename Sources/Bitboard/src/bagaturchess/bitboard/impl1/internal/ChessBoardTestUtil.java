@@ -28,39 +28,39 @@ public class ChessBoardTestUtil {
 		int[] testPieceIndexes = new int[64];
 		System.arraycopy(cb.pieceIndexes, 0, testPieceIndexes, 0, cb.pieceIndexes.length);
 
-		Assert.isTrue(Long.numberOfTrailingZeros(cb.pieces[WHITE][KING]) == cb.kingIndex[WHITE]);
-		Assert.isTrue(Long.numberOfTrailingZeros(cb.pieces[BLACK][KING]) == cb.kingIndex[BLACK]);
+		Assert.isTrue(Long.numberOfTrailingZeros(cb.pieces[WHITE][KING]) == cb.kingIndex[WHITE], "Long.numberOfTrailingZeros(cb.pieces[WHITE][KING]) == cb.kingIndex[WHITE]");
+		Assert.isTrue(Long.numberOfTrailingZeros(cb.pieces[BLACK][KING]) == cb.kingIndex[BLACK], "Long.numberOfTrailingZeros(cb.pieces[BLACK][KING]) == cb.kingIndex[BLACK]");
 
 		ChessBoardUtil.init(cb);
 
 		// zobrist keys
-		Assert.isTrue(iterativeZK == cb.zobristKey);
-		Assert.isTrue(iterativeZKPawn == cb.pawnZobristKey);
+		Assert.isTrue(iterativeZK == cb.zobristKey, "iterativeZK == cb.zobristKey");
+		Assert.isTrue(iterativeZKPawn == cb.pawnZobristKey, "iterativeZKPawn == cb.pawnZobristKey");
 
 		// king area
-		Assert.isTrue(whiteKingArea == cb.kingArea[WHITE]);
-		Assert.isTrue(blackKingArea == cb.kingArea[BLACK]);
+		Assert.isTrue(whiteKingArea == cb.kingArea[WHITE], "whiteKingArea == cb.kingArea[WHITE]");
+		Assert.isTrue(blackKingArea == cb.kingArea[BLACK], "blackKingArea == cb.kingArea[BLACK]");
 
 		// pinned and discovered pieces
-		Assert.isTrue(pinnedPieces == cb.pinnedPieces);
-		Assert.isTrue(discoveredPieces == cb.discoveredPieces);
+		Assert.isTrue(pinnedPieces == cb.pinnedPieces, "pinnedPieces == cb.pinnedPieces");
+		Assert.isTrue(discoveredPieces == cb.discoveredPieces, "discoveredPieces == cb.discoveredPieces");
 
 		// combined pieces
-		Assert.isTrue(iterativeWhitePieces == cb.friendlyPieces[WHITE]);
-		Assert.isTrue(iterativeBlackPieces == cb.friendlyPieces[BLACK]);
-		Assert.isTrue(iterativeAllPieces == cb.allPieces);
-		Assert.isTrue((iterativeBlackPieces & iterativeWhitePieces) == 0);
+		Assert.isTrue(iterativeWhitePieces == cb.friendlyPieces[WHITE], "iterativeWhitePieces == cb.friendlyPieces[WHITE]");
+		Assert.isTrue(iterativeBlackPieces == cb.friendlyPieces[BLACK], "iterativeBlackPieces == cb.friendlyPieces[BLACK]");
+		Assert.isTrue(iterativeAllPieces == cb.allPieces, "iterativeAllPieces == cb.allPieces");
+		Assert.isTrue((iterativeBlackPieces & iterativeWhitePieces) == 0, "(iterativeBlackPieces & iterativeWhitePieces) == 0");
 
 		// psqt
-		Assert.isTrue(iterativePsqt == cb.psqtScore_mg);
+		Assert.isTrue(iterativePsqt == cb.psqtScore_mg, "iterativePsqt == cb.psqtScore_mg");
 
 		// piece-indexes
 		for (int i = 0; i < testPieceIndexes.length; i++) {
-			Assert.isTrue(testPieceIndexes[i] == cb.pieceIndexes[i]);
+			Assert.isTrue(testPieceIndexes[i] == cb.pieceIndexes[i], "testPieceIndexes[i] == cb.pieceIndexes[i]");
 		}
 
-		Assert.isTrue(phase == cb.phase);
-		Assert.isTrue(materialKey == cb.materialKey);
+		Assert.isTrue(phase == cb.phase, "phase == cb.phase");
+		Assert.isTrue(materialKey == cb.materialKey, "materialKey == cb.materialKey");
 	}
 
 	public static ChessBoard getHorizontalMirroredCb(ChessBoard cb) {
