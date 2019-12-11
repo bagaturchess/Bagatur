@@ -102,4 +102,21 @@ public class BoardUtils {
 		
 		return result;
 	}
+	
+	
+	public static final String getPlayedMoves(IBitBoard bitboard) {
+		
+		String result = "";
+		
+		int count = bitboard.getPlayedMovesCount();
+		int[] moves = bitboard.getPlayedMoves();
+		for (int i=0; i<count; i++) {
+			int curMove = moves[i];
+			StringBuilder message = new StringBuilder(32);
+			message.append(bitboard.getMoveOps().moveToString(curMove));
+			result += message.toString() + " ";
+		}
+	
+		return result;
+	}
 }

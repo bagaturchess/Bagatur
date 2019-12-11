@@ -252,7 +252,7 @@ public class GamesPlayer {
 				bitboard.makeMoveBackward(cur_move);
 			}
 			
-			String allMovesStr = MoveInt.getMovesUCI(bitboard);
+			String allMovesStr = BoardUtils.getPlayedMoves(bitboard);
 			
 			StringBuilder message = new StringBuilder(32);
 			MoveInt.moveToStringUCI(cur_move, message);

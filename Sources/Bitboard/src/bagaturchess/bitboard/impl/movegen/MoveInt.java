@@ -428,23 +428,6 @@ public class MoveInt {
 		}
 	}
 	
-	
-	public static final String getMovesUCI(IBitBoard bitboard) {
-		
-		String result = "";
-		
-		int count = bitboard.getPlayedMovesCount();
-		int[] moves = bitboard.getPlayedMoves();
-		for (int i=0; i<count; i++) {
-			int curMove = moves[i];
-			StringBuilder message = new StringBuilder(32);
-			message.append(bitboard.getMoveOps().moveToString(curMove));
-			result += message.toString() + " ";
-		}
-	
-		return result;
-	}
-	
 
 	public static boolean isEquals(int move1, int move2) {
 		return move1 == move2;

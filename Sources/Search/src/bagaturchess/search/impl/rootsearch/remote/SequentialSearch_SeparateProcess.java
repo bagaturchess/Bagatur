@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
@@ -175,7 +176,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			_bitboardForSetup.makeMoveForward(moves[i]);
 		}
 		
-		String allMovesStr = MoveInt.getMovesUCI(_bitboardForSetup);
+		String allMovesStr = BoardUtils.getPlayedMoves(_bitboardForSetup);
 		
 		if (initialFEN.equals(Constants.INITIAL_BOARD)) {
 			runner.setupPosition("startpos moves " + allMovesStr);	
@@ -220,7 +221,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		
 		try {
 			
-			String allMovesStr = MoveInt.getMovesUCI(getBitboardForSetup());
+			String allMovesStr = BoardUtils.getPlayedMoves(getBitboardForSetup());
 			if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(Thread.currentThread().getName() + " " + "SequentialSearch_SeparateProcess: allMovesStr=" + allMovesStr);
 			
 			//runner.setupPosition("startpos moves " + allMovesStr);
