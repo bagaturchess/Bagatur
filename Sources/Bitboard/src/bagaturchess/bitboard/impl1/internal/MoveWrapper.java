@@ -88,7 +88,7 @@ public class MoveWrapper {
 				: (cb.pieces[cb.colorToMove][ChessConstants.ROOK] & Util.POWER_LOOKUP[fromIndex]) != 0 ? ChessConstants.ROOK 
 				: -1;
 		if (pieceIndex == -1) {
-			throw new RuntimeException("Source piece not found at index " + fromIndex + ", move is " + moveString);
+			throw new RuntimeException("Source piece not found at index " + fromIndex + ", move is " + moveString + ", fen is " + cb);
 		}
 
 		pieceIndexAttacked = 
