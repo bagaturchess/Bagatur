@@ -300,7 +300,7 @@ public class NullwinSearchTask implements Runnable {
 		}
 		
 		if (lastindex != pv.length) {
-			mediator.dump("REDUCED PV");
+			mediator.dump("REDUCED PV");//TODO check search and prevent it
 			result = new int[lastindex];
 			for (int i=0; i<lastindex; i++) {
 				result[i] = pv[i];

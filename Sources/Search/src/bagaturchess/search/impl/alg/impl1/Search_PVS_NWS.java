@@ -76,6 +76,10 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int FUTILITY_MARGIN_Q_SEARCH = 200;
 	
 	
+	private long lastSentMinorInfo_timestamp;
+	private long lastSentMinorInfo_nodesCount;
+	
+	
 	public Search_PVS_NWS(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
 		
@@ -99,8 +103,13 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	public void newSearch() {
+		
 		super.newSearch();
+		
 		((BoardImpl) env.getBitboard()).getMoveGenerator().clearHistoryHeuristics();
+		
+		lastSentMinorInfo_nodesCount = 0;
+		lastSentMinorInfo_timestamp = 0;
 	}
 	
 	
@@ -406,6 +415,27 @@ public class Search_PVS_NWS extends SearchImpl {
 			while (moveGen.hasNext()) {
 				final int move = moveGen.next();
 
+				//Build and sent minor info
+				if (depth == 0) {
+					info.setCurrentMove(move);
+					info.setCurrentMoveNumber((movesPerformed + 1));
+				}
+				
+				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
+					
+					long timestamp = System.currentTimeMillis();
+					
+					if (timestamp >= lastSentMinorInfo_timestamp + 1000)  {//Send info each second
+					
+						mediator.changedMinor(info);
+						
+						lastSentMinorInfo_timestamp = timestamp;
+					}
+					
+					lastSentMinorInfo_nodesCount = info.getSearchedNodes();
+				}
+				
+				
 				if (phase == PHASE_QUIET) {
 					if (move == ttMove || move == killer1Move || move == killer2Move || move == counterMove || !cb.isLegal(move)) {
 						continue;
