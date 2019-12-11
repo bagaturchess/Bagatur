@@ -23,6 +23,9 @@
 package bagaturchess.search.impl.alg.impl1;
 
 
+import java.util.EmptyStackException;
+import java.util.Stack;
+
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.Assert;
@@ -531,7 +534,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (ply + 1 < ISearch.MAX_DEPTH) {
 						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 					}
-
+					
 					alpha = Math.max(alpha, score);
 					if (alpha >= beta) {
 						
@@ -583,10 +586,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			TTUtil.addValue(cb.zobristKey, bestScore, ply, depth, flag, bestMove);
 		}
 		
+		//validatePV(node);
+		
 		return bestScore;
 	}
-	
-	
+
+
 	public int calculateBestMove(IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply) {
 		
 		
@@ -728,5 +733,41 @@ public class Search_PVS_NWS extends SearchImpl {
 		int eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
 		EvalUtil.addValue(env.getBitboard().getHashKey(), eval);
 		return eval;
+	}
+	
+	
+	private Stack<Integer> stack = new Stack<Integer>();
+	
+	private void validatePV(PVNode node) {
+		
+		if (node.leaf || node.bestmove == 0) {
+			throw new IllegalStateException();
+		}
+		
+		PVNode cur = node;
+		while(cur != null && cur.bestmove != 0) {
+			
+			if (env.getBitboard().isPossible(cur.bestmove)) {
+				env.getBitboard().makeMoveForward(cur.bestmove);
+				stack.push(cur.bestmove);
+			} else {
+				System.out.println("not valid move");
+			}
+			
+			cur = cur.child;
+			
+			if (cur != null && cur.leaf) {
+				break;
+			}
+		}
+		
+		try {
+			Integer move;
+			while ((move = stack.pop()) != null) {
+				env.getBitboard().makeMoveBackward(move);
+			}
+		} catch(EmptyStackException ese) {
+			//Do nothing
+		}
 	}
 }
