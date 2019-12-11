@@ -330,45 +330,6 @@ public class MoveInt {
 	}
 	
 	
-	public static final String moveToString(int move) {
-		
-		if (move == -1) {
-			throw new IllegalStateException("move=" + move);
-		}
-		
-		if (move == 0) {
-			return "OOOO";
-		}
-		
-		String moveStr = "";
-		
-		int figureType = getFigureType(move);
-		String figureSign = "";
-		if (figureType != Figures.TYPE_PAWN) {
-			figureSign = Figures.TYPES_SIGN[figureType];
-		}
-	
-		String fieldsSeparator = "-";
-		if (isCapture(move)) {
-			fieldsSeparator = "x";
-		}
-		
-		moveStr += figureSign;
-		moveStr += Fields.ALL_ORDERED_NAMES[Fields.IDX_2_ORDERED_A1H1[getFromFieldID(move)]];
-		moveStr += fieldsSeparator;
-		moveStr += Fields.ALL_ORDERED_NAMES[Fields.IDX_2_ORDERED_A1H1[getToFieldID(move)]];
-		
-		if (isPromotion(move)) {
-			moveStr += "=";
-			int promotionFigureType = Constants.PIECE_IDENTITY_2_TYPE[getPromotionFigurePID(move)];
-			moveStr += Figures.TYPES_SIGN[promotionFigureType];
-		}
-		
-		//moveStr += "(" + move[25]+ ")";
-		
-		return moveStr;
-	}
-	
 	public static final String movesToStringUCI(int[] pv, int size) {
 		StringBuilder result = new StringBuilder(256);
 		
