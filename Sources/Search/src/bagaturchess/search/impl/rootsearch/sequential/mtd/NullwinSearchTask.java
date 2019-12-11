@@ -286,6 +286,9 @@ public class NullwinSearchTask implements Runnable {
 	
 	private void validatePV(int[] pv) {	
 		for (int i=0; i<pv.length; i++) {
+			if (!bitboard.isPossible(pv[i])) {
+				throw new IllegalStateException();
+			}
 			bitboard.makeMoveForward(pv[i]);
 		}
 		for (int i=pv.length-1; i>=0; i--) {
