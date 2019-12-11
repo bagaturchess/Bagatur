@@ -25,14 +25,10 @@ package bagaturchess.uci.impl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.api.IBoardConfig;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.api.IUCIConfig;
