@@ -24,7 +24,6 @@ package bagaturchess.search.impl.pv;
 
 
 import java.util.List;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 
 
 public class PVNode {
@@ -44,18 +43,6 @@ public class PVNode {
 	}
 	
 	
-	private static void extractPV(PVNode res, List<Integer> result) {
-		PVNode cur = res;
-		while(cur != null && cur.bestmove != 0) {
-			result.add(cur.bestmove);
-			cur = cur.child;
-			if (cur != null && cur.leaf) {
-				break;
-			}
-		}
-	}
-	
-	
 	public static int[] convertPV(PVNode line, List<Integer> buff) {
 		
 		extractPV(line, buff);
@@ -65,6 +52,18 @@ public class PVNode {
 			result[i] = buff.get(i);
 		}
 		return result;
+	}
+	
+	
+	private static void extractPV(PVNode res, List<Integer> result) {
+		PVNode cur = res;
+		while(cur != null && cur.bestmove != 0) {
+			result.add(cur.bestmove);
+			cur = cur.child;
+			if (cur != null && cur.leaf) {
+				break;
+			}
+		}
 	}
 }
 
