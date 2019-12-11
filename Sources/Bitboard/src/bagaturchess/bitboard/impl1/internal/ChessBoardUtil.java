@@ -307,7 +307,21 @@ public class ChessBoardUtil {
 		fen = fen.replaceAll("1111", "4");
 		fen = fen.replaceAll("111", "3");
 		fen = fen.replaceAll("11", "2");
+		
+		fen += " ";
+		if (cb.epIndex != 0) {
+			fen += cb.epIndex;//TODO: extract field name
+		} else {
+			fen += "-";
+		}
+		
+		fen += " ";
+		fen += cb.playedMovesCount;
+		
+		fen += " ";
+		fen += ((cb.playedMovesCount + 1) / 2 + 1);
 
+		
 		return fen;
 	}
 
