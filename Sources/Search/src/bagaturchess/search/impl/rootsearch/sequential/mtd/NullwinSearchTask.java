@@ -199,7 +199,7 @@ public class NullwinSearchTask implements Runnable {
 					
 					//int[] pv = getPVfromTPT();
 					int[] pv = PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
-					validatePV(pv);
+					pv = validatePV(pv);
 					info.setPV(pv);
 					if (info.getPV().length > 0) {
 						info.setBestMove(info.getPV()[0]);
@@ -217,7 +217,7 @@ public class NullwinSearchTask implements Runnable {
 					
 					//int[] pv = getPVfromTPT();
 					int[] pv = PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
-					validatePV(pv);
+					pv = validatePV(pv);
 					info.setPV(pv);
 					if (info.getPV().length > 0) {
 						info.setBestMove(info.getPV()[0]);
@@ -284,15 +284,29 @@ public class NullwinSearchTask implements Runnable {
 	}
 	
 	
-	private void validatePV(int[] pv) {	
-		for (int i=0; i<pv.length; i++) {
-			if (!bitboard.isPossible(pv[i])) {
-				throw new IllegalStateException();
+	private int[] validatePV(int[] pv) {
+		
+		int[] result = pv;
+		
+		int lastindex;
+		for (lastindex=0; lastindex<pv.length; lastindex++) {
+			if (!bitboard.isPossible(pv[lastindex])) {
+				break;
 			}
-			bitboard.makeMoveForward(pv[i]);
+			bitboard.makeMoveForward(pv[lastindex]);
 		}
-		for (int i=pv.length-1; i>=0; i--) {
+		for (int i=lastindex - 1; i>=0; i--) {
 			bitboard.makeMoveBackward(pv[i]);
 		}
+		
+		if (lastindex != pv.length) {
+			mediator.dump("REDUCED PV");
+			result = new int[lastindex];
+			for (int i=0; i<lastindex; i++) {
+				result[i] = pv[i];
+			}
+		}
+		
+		return result;
 	}
 }
