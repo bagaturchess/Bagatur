@@ -158,7 +158,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			Assert.isTrue(alpha >= ISearch.MIN && alpha <= ISearch.MAX);
 			Assert.isTrue(beta >= ISearch.MIN && beta <= ISearch.MAX);
 		}
-
+		
 		final int alphaOrig = alpha;
 		
 		depth += extensions(cb, moveGen, ply);
@@ -566,7 +566,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		/*long ttValue = TTUtil.getTTValue(cb.zobristKey);
+		long ttValue = TTUtil.getTTValue(cb.zobristKey);
 		int ttScore = TTUtil.getScore(ttValue);
 		if (ttValue != 0) {
 			if (!EngineConstants.TEST_TT_VALUES) {
@@ -588,8 +588,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
-		
-		final int alphaOrig = alpha;*/
+		final int alphaOrig = alpha;
 		
 		int eval = ISearch.MIN;
 		if (cb.checkingPieces == 0) {
@@ -601,66 +600,84 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 
 		moveGen.startPly();
-		moveGen.generateAttacks(cb);
-		moveGen.setMVVLVAScores();
-		moveGen.sort();
-
-		while (moveGen.hasNext()) {
-			final int move = moveGen.next();
-
-			//if (cb.checkingPieces == 0) {
-				if (MoveUtil.isPromotion(move)) {
-					if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
+		
+		int phase = PHASE_TT;
+		while (phase <= PHASE_ATTACKING) {
+			switch (phase) {
+				case PHASE_TT:
+					if (ttValue != 0) {
+						int ttMove = TTUtil.getMove(ttValue);
+						if (env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
+							moveGen.addMove(ttMove);
+						}
+					}
+					break;
+				case PHASE_ATTACKING:
+					moveGen.generateAttacks(cb);
+					moveGen.setMVVLVAScores();
+					moveGen.sort();
+					break;
+			}
+			
+			while (moveGen.hasNext()) {
+				final int move = moveGen.next();
+	
+				//if (cb.checkingPieces == 0) {
+					if (MoveUtil.isPromotion(move)) {
+						if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
+							continue;
+						}
+					} else if (EngineConstants.ENABLE_Q_FUTILITY_PRUNING
+							&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
 						continue;
 					}
-				} else if (EngineConstants.ENABLE_Q_FUTILITY_PRUNING
-						&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+				//}
+				
+				if (!cb.isLegal(move)) {
 					continue;
 				}
-			//}
-			
-			if (!cb.isLegal(move)) {
-				continue;
-			}
-			
-			//if (cb.checkingPieces == 0) {
-				if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move)) && SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
-					continue;
+				
+				//if (cb.checkingPieces == 0) {
+					if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move)) && SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
+						continue;
+					}
+				//}
+	
+				cb.doMove(move);
+	
+				if (EngineConstants.ASSERT) {
+					cb.changeSideToMove();
+					Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
+					cb.changeSideToMove();
 				}
-			//}
-
-			cb.doMove(move);
-
-			if (EngineConstants.ASSERT) {
-				cb.changeSideToMove();
-				Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
-				cb.changeSideToMove();
-			}
-
-			final int score = -calculateBestMove(evaluator, info, cb, moveGen, -beta, -alpha, ply + 1);
-
-			cb.undoMove(move);
-
-			/*if (score > alpha) {
-				int flag = TTUtil.FLAG_EXACT;
+				
+				final int score = -calculateBestMove(evaluator, info, cb, moveGen, -beta, -alpha, ply + 1);
+	
+				cb.undoMove(move);
+	
+				if (score > alpha) {
+					int flag = TTUtil.FLAG_EXACT;
+					if (score >= beta) {
+						flag = TTUtil.FLAG_LOWER;
+					} else if (score <= alphaOrig) {
+						flag = TTUtil.FLAG_UPPER;
+					}
+					if (!SearchUtils.isMateVal(score)) {
+						TTUtil.addValue(cb.zobristKey, score, ply, 0, flag, move);
+					}
+				}
+				
 				if (score >= beta) {
-					flag = TTUtil.FLAG_LOWER;
-				} else if (score <= alphaOrig) {
-					flag = TTUtil.FLAG_UPPER;
+					moveGen.endPly();				
+					return score;
 				}
-				if (!SearchUtils.isMateVal(score)) {
-					TTUtil.addValue(cb.zobristKey, score, ply, 0, flag, move);
-				}
-			}*/
-			
-			if (score >= beta) {
-				moveGen.endPly();				
-				return score;
+				alpha = Math.max(alpha, score);
 			}
-			alpha = Math.max(alpha, score);
+			
+			phase++;
 		}
-		
 		moveGen.endPly();
+		
 		return alpha;
 	}
 
