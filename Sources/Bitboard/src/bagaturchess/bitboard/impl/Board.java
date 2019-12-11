@@ -5418,7 +5418,9 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		@Override
 		public String moveToString(int move) {
-			return MoveInt.moveToString(move);
+			StringBuilder result = new StringBuilder();
+			MoveInt.moveToStringUCI(move, result);
+			return result.toString();
 		}
 		
 		

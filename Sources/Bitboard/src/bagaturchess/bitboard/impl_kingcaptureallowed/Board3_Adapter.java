@@ -297,7 +297,9 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 		
 		@Override
 		public String moveToString(int move) {
-			return MoveInt.moveToString(move);
+			StringBuilder result = new StringBuilder();
+			MoveInt.moveToStringUCI(move, result);
+			return result.toString();
 		}
 		
 		
