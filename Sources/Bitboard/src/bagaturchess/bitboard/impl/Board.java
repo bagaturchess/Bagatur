@@ -5068,7 +5068,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		String result = "";
 		for (int i=0; i<playedMovesCount; i++) {
 			int move = playedMoves[i];
-			result += MoveInt.moveToString(move) + ", ";
+			result += moveOps.moveToString(move) + ", ";
 		}
 		return result;
 	}

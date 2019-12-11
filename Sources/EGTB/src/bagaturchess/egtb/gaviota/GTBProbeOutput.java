@@ -111,7 +111,7 @@ public class GTBProbeOutput implements Comparable<GTBProbeOutput> {
     @Override
     public String toString() {
     	String msg = "";
-    	msg += (move == 0) ? "" : MoveInt.moveToString(move) + " ";
+    	//msg += (move == 0) ? "" : MoveInt.moveToString(move) + " ";
     	switch(result) {
     		case DRAW:
     			msg += "DRAW";

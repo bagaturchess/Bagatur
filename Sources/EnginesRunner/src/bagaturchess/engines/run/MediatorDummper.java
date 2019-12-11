@@ -24,6 +24,7 @@
 package bagaturchess.engines.run;
 
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturEvaluator;
@@ -74,7 +75,7 @@ public class MediatorDummper implements ISearchMediator {
   			"	Eval: " + (info.isMateScore() ? (info.getMateScore() + "M") : info.getEval() ) +
   			"	NPS: " + (int)(info.getSearchedNodes()/((System.currentTimeMillis()-startTime)/(double)1000)) +
   			//" Thread: " + Thread.currentThread().getName() +
-  			"	PV: " + MoveInt.movesToString(info.getPV())
+  			"	PV: " + BoardUtils.movesToString(info.getPV(), board)
   		);
 		
 		int colour = board.getColourToMove();

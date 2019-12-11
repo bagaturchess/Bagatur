@@ -23,8 +23,6 @@
 package bagaturchess.bitboard.impl.movegen;
 
 
-import bagaturchess.bitboard.api.BoardUtils;
-import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
@@ -331,29 +329,6 @@ public class MoveInt {
 		}
 	}
 	
-	/*public static String movesToString(int[] pv, int count) {
-		String pvStr = "";
-		for (int i=0; i<count; i++) {
-			pvStr += moveToString(pv[i]);
-			if (i != count - 1) {
-				pvStr += ", ";
-			}
-		}
-		return pvStr;
-	}*/
-	
-	public static String movesToString(int[] pv) {
-		String pvStr = "";
-		
-		for (int i=0; i<pv.length; i++) {
-			pvStr += moveToString(pv[i]);
-			if (i != pv.length - 1) {
-				pvStr += ", ";
-			}
-		}
-		
-		return pvStr;
-	}
 	
 	public static final String moveToString(int move) {
 		

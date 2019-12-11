@@ -63,7 +63,7 @@ public class EvaluatedPosition implements Serializable {
 	public String toString() {
 		String result = "";
 		
-		result += "Originator: " + MoveInt.moveToString(originateMove) + " EPD: " + epd + "\r\n";
+		result += "Originator: " + /*MoveInt.moveToString(originateMove) +*/ " EPD: " + epd + "\r\n";
 		
 		Iterator<EvaluatedMove> iter = children.iterator();
 		while (iter.hasNext()) {

@@ -119,4 +119,18 @@ public class BoardUtils {
 	
 		return result;
 	}
+	
+	
+	public static String movesToString(int[] pv, IBitBoard bitboard) {
+		String pvStr = "";
+		
+		for (int i=0; i<pv.length; i++) {
+			pvStr += bitboard.getMoveOps().moveToString(pv[i]);
+			if (i != pv.length - 1) {
+				pvStr += ", ";
+			}
+		}
+		
+		return pvStr;
+	}
 }

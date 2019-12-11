@@ -50,7 +50,7 @@ public class MonteCarloMain {
 		
 		IBoardConfig boardConfig = new bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl();
 		String pawnsCacheFactoryClassName = bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.BagaturPawnsEvalFactory.class.getName();
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen, pawnsCacheFactoryClassName, boardConfig, 10000);
+		final IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen, pawnsCacheFactoryClassName, boardConfig, 10000);
 		
 		IEvalCache evalCache = new EvalCache(5, 100000, true, new BinarySemaphore_Dummy());
 		IEvaluatorFactory evalFactory = new bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.BagaturEvaluatorFactory();
@@ -73,7 +73,7 @@ public class MonteCarloMain {
 					}
 				}
 				
-				System.out.println(gamesCount + " > " + MoveInt.moveToString(best_move) + " " + best_rate);
+				System.out.println(gamesCount + " > " + bitboard.getMoveOps().moveToString(best_move) + " " + best_rate);
 			}
 		});
 	}

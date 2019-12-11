@@ -87,8 +87,8 @@ public class MultiPVEntry implements Comparable<MultiPVEntry> {
 	@Override
 	public String toString() {
 		String result = "[MultiPVEntry]: ";
-		result += MoveInt.moveToString(move);
-		result += ", eval = " + getEval() + ", pv = " + MoveInt.moveToString(move) + ", " + MoveInt.movesToString(info.getPV());
+		//result += MoveInt.moveToString(move);
+		//result += ", eval = " + getEval() + ", pv = " + /*MoveInt.moveToString(move) +*/ ", " + MoveInt.movesToString(info.getPV());
 		return result;
 	}
 }

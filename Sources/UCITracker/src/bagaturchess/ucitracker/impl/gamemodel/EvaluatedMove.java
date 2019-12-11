@@ -22,20 +22,15 @@
  */
 package bagaturchess.ucitracker.impl.gamemodel;
 
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
 
-import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
-import bagaturchess.bitboard.impl.Fields;
-import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.bitboard.impl.movelist.BaseMoveList;
-import bagaturchess.bitboard.impl.movelist.IMoveList;
 
 
 public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
@@ -169,96 +164,11 @@ public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
 		
 		//System.out.println(this);
 	}
-
-	private static boolean hasWinCaps(IBitBoard bitboard) {
-		
-		boolean result = false;
-		
-		IMoveList moves = new BaseMoveList(150);
-		
-		if (bitboard.isInCheck()) {
-			bitboard.genKingEscapes(moves);
-		} else {
-			bitboard.genAllMoves(moves);
-		}
-		
-		int cur_move = 0;
-		while ((cur_move = moves.next()) != 0) {
-			if (bitboard.getSee().evalExchange(cur_move) > 0) {
-				return true;
-			}
-		}
-		
-		return result;
-	}
-	
-	/*private int uciStrToMove1(IBitBoard bitboard, String moveStr) {
-		
-		int fromFieldID = Fields.getFieldID(moveStr.substring(0, 2));
-		int toFieldID = Fields.getFieldID(moveStr.substring(2, 4));
-		int pieceID = bitboard.getFigureID(fromFieldID);
-		int toPieceID = bitboard.getFigureID(toFieldID);
-		
-		if (toPieceID != Constants.PID_NONE) {
-			moveStr = moveStr.substring(0, 2) + "x" + moveStr.substring(2, moveStr.length());
-		}
-		
-		//long enpassantTargetPawn = 0L;
-		//if (bitboard.toEPD().getEnpassantTargetSquare() != null) {
-		//	enpassantTargetPawn = Enpassanting.getEnemyBitboard(fen.getEnpassantTargetSquare());
-		//}
-		
-		if (pieceID == Constants.PID_W_PAWN && (Fields.ALL_A1H1[toFieldID] & Promotioning.WHITE_PROMOTIONS) != 0L) {
-			if (moveStr.endsWith("q")) {
-				moveStr = moveStr.substring(0, moveStr.length() - 1) + "=Q";
-			} else if (moveStr.endsWith("r")) {
-				moveStr = moveStr.substring(0, moveStr.length() - 1) + "=R";
-			} else if (moveStr.endsWith("b")) {
-				moveStr = moveStr.substring(0, moveStr.length() - 1) + "=B";
-			} else if (moveStr.endsWith("n")) {
-				moveStr = moveStr.substring(0, moveStr.length() - 1) + "=N";
-			} else {
-				throw new IllegalStateException(moveStr);
-			}
-		} else if (pieceID == Constants.PID_B_PAWN && (Fields.ALL_A1H1[toFieldID] & Promotioning.BLACK_PROMOTIONS) != 0L) {
-			if (moveStr.endsWith("q")) {
-				moveStr = moveStr.substring(0, moveStr.length() - 1) + "=Q";
-			} else if (moveStr.endsWith("r")) {
-				moveStr = moveStr.substring(0, moveStr.length() - 1) + "=R";
-			} else if (moveStr.endsWith("b")) {
-				moveStr = moveStr.substring(0, moveStr.length() - 1) + "=B";
-			} else if (moveStr.endsWith("n")) {
-				moveStr = moveStr.substring(0, moveStr.length() - 1) + "=N";
-			} else {
-				throw new IllegalStateException(moveStr);
-			}
-		}
-		
-		String pieceIDStr = Constants.getPieceIDString(pieceID).toUpperCase();
-		if (!pieceIDStr.equals("P")) {
-			moveStr = pieceIDStr + moveStr;
-		}
-
-		int move = 0;
-		try {
-			move = PGNUtils.translatePGNMove(bitboard, bitboard.getColourToMove(), moveStr, true);
-		} catch(IllegalArgumentException iae) {
-			//Enpassant fix
-			if (pieceID == Constants.PID_W_PAWN || pieceID == Constants.PID_B_PAWN) {
-				moveStr = moveStr.substring(0, 2) + "x" + moveStr.substring(2, moveStr.length());
-				move = PGNUtils.translatePGNMove(bitboard, bitboard.getColourToMove(), moveStr, true);
-			} else {
-				throw iae;
-			}
-		}
-		
-		return move;
-	}*/
 	
 	
 	@Override
 	public String toString() {
-		return "Eval: " + eval_ofOriginatePlayer + " status: " + status + " " + MoveInt.movesToString(moves);
+		return "Eval: " + eval_ofOriginatePlayer + " status: " + status + " " /*+ MoveInt.movesToString(moves)*/;
 	}
 	
 	

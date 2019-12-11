@@ -57,7 +57,7 @@ public class TimeSaver {
 						throw new IllegalStateException("openningBook_Mode=" + openningBook_Mode);
 				}
 				
-				mediator.dump("TimeSaver: Opening move " + MoveInt.moveToString(move));
+				mediator.dump("TimeSaver: Opening move " + bitboardForSetup.getMoveOps().moveToString(move));
 				ISearchInfo info = createInfo(move, 0);
 				mediator.changedMajor(info);
 				if (mediator.getBestMoveSender() != null) mediator.getBestMoveSender().sendBestMove();
@@ -82,7 +82,7 @@ public class TimeSaver {
 				}
 			}
 			int move = list.reserved_getMovesBuffer()[0];
-			mediator.dump("TimeSaver: Single reply move " + MoveInt.moveToString(move));
+			mediator.dump("TimeSaver: Single reply move " + bitboardForSetup.getMoveOps().moveToString(move));
 			ISearchInfo info = createInfo(move, 1);
 			mediator.changedMajor(info);
 			if (mediator.getBestMoveSender() != null) mediator.getBestMoveSender().sendBestMove();

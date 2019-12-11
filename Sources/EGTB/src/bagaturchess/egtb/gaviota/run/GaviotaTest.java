@@ -83,6 +83,6 @@ public class GaviotaTest {
 		int res[] = new int[2];
 		probing.probeMove(board, res);
 
-		System.out.println("TEST probeMoveHard: " + MoveInt.moveToString(res[0]) + " " + res[1]);
+		//System.out.println("TEST probeMoveHard: " + MoveInt.moveToString(res[0]) + " " + res[1]);
 	}
 }

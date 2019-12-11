@@ -4,7 +4,6 @@ package bagaturchess.tools.pgn.run;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.impl.Board;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.tools.pgn.api.IGameIterator;
@@ -57,8 +56,8 @@ public class DummyGameIterator implements IGameIterator, IPlyIterator {
 	public void preMove(int colour, int move, IBoard bitboard, int moveNumber) {
 		testboard.makeMoveForward(move);
 		
-		if (MoveInt.isCaptureOrPromotion(move)
-				&& !MoveInt.isEnpassant(move)
+		if (bitboard.getMoveOps().isCaptureOrPromotion(move)
+				&& !bitboard.getMoveOps().isEnpassant(move)
 				) {
 			
 			IMoveList tmp_list = new BaseMoveList();
@@ -74,7 +73,7 @@ public class DummyGameIterator implements IGameIterator, IPlyIterator {
 			}
 			
 			if (!found) {
-				throw new IllegalStateException(MoveInt.moveToString(move));
+				throw new IllegalStateException();
 			}
 		}
 	}

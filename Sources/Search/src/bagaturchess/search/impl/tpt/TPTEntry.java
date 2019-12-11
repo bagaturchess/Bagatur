@@ -62,8 +62,8 @@ public class TPTEntry {
 		result += " depth=" + depth;
 		result += ", lower=" + lower;
 		result += ", upper=" + upper;
-		result += ", bestmove_lower=" + MoveInt.moveToString(bestmove_lower);
-		result += ", bestmove_upper=" + MoveInt.moveToString(bestmove_upper);
+		//result += ", bestmove_lower=" + MoveInt.moveToString(bestmove_lower);
+		//result += ", bestmove_upper=" + MoveInt.moveToString(bestmove_upper);
 		
 		return result;
 	}
