@@ -23,10 +23,17 @@
 package bagaturchess.bitboard.api;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl.Fields;
+import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
+import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.bitboard.impl1.BoardImpl;
 
@@ -132,5 +139,93 @@ public class BoardUtils {
 		}
 		
 		return pvStr;
+	}
+	
+	
+	public static void playGameUCI(IBitBoard board, String movesSign) {
+		
+		List<String> moves = new ArrayList<String>();
+		
+		StringTokenizer st = new StringTokenizer(movesSign, " ");
+		while(st.hasMoreTokens()) {
+			moves.add(st.nextToken());
+		}
+		
+		//int colour = Figures.COLOUR_WHITE;
+		int size = moves.size();
+		for (int i = 0; i < size; i++ ) {
+			
+			String moveSign = moves.get(i);
+			if (!moveSign.equals("...")) {
+				//System.out.println(moveSign);
+				int move = BoardUtils.parseSingleUCIMove(board, moveSign);
+				//colour = Figures.OPPONENT_COLOUR[colour];
+				
+				board.makeMoveForward(move);
+			}
+		}
+	}
+	
+	
+	public static int parseSingleUCIMove(IBitBoard board, String moveSign) {
+		int move = 0;
+		
+		IInternalMoveList moves_list = new BaseMoveList();
+		int movesCount = board.genAllMoves(moves_list);
+		
+		String fromFieldSign = moveSign.substring(0, 2).toLowerCase();
+		String toFieldSign = moveSign.substring(2, 4).toLowerCase();
+		String promTypeSign = moveSign.length() == 5 ? moveSign.substring(4, 5).toLowerCase() : null;
+		//System.out.println("CONSOLE: " + fromFieldSign);
+		//System.out.println("CONSOLE: " + toFieldSign);
+			
+		int fromFieldID = Fields.getFieldID(fromFieldSign);
+		int toFieldID = Fields.getFieldID(toFieldSign);
+		//System.out.println("CONSOLE: " + fromFieldID);
+		//System.out.println("CONSOLE: " + toFieldID);
+			
+		int[] moves = moves_list.reserved_getMovesBuffer();
+		for (int i=0; i<movesCount; i++) {
+			int curMove = moves[i];
+			//System.out.println(Move.moveToString(curMove));
+			int curFromID = board.getMoveOps().getFromFieldID(curMove);
+			int curToID = board.getMoveOps().getToFieldID(curMove);
+			if (fromFieldID == curFromID && toFieldID == curToID) {
+				
+				if (promTypeSign == null) {
+					move = curMove;
+					break;
+				} else { //Promotion move
+					if (getPromotionTypeUCI(promTypeSign) == board.getMoveOps().getPromotionFigureType(curMove)) {
+						move = curMove;
+						break;
+					}
+				}
+			}
+		}
+		
+		if (move == 0) {
+			throw new IllegalStateException("moveSign=" + moveSign + "\r\n" + board);
+		}
+		
+		return move;
+	}
+
+	private static int getPromotionTypeUCI(String promTypeSign) {
+		int type = -1;
+		
+		if (promTypeSign.equals("n")) {
+			type = Figures.TYPE_KNIGHT;
+		} else if (promTypeSign.equals("b")) {
+			type = Figures.TYPE_OFFICER;
+		} else if (promTypeSign.equals("r")) {
+			type = Figures.TYPE_CASTLE;
+		} else if (promTypeSign.equals("q")) {
+			type = Figures.TYPE_QUEEN;
+		} else {
+			throw new IllegalStateException("Invalid promotion figure type '" + promTypeSign + "'");
+		}
+		
+		return type;
 	}
 }
