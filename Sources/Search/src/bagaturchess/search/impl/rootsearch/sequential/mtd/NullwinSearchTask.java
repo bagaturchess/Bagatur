@@ -199,7 +199,7 @@ public class NullwinSearchTask implements Runnable {
 					
 					//int[] pv = getPVfromTPT();
 					int[] pv = PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
-					//validatePV(pv);
+					validatePV(pv);
 					info.setPV(pv);
 					if (info.getPV().length > 0) {
 						info.setBestMove(info.getPV()[0]);
@@ -217,7 +217,7 @@ public class NullwinSearchTask implements Runnable {
 					
 					//int[] pv = getPVfromTPT();
 					int[] pv = PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
-					//validatePV(pv);
+					validatePV(pv);
 					info.setPV(pv);
 					if (info.getPV().length > 0) {
 						info.setBestMove(info.getPV()[0]);
@@ -281,5 +281,15 @@ public class NullwinSearchTask implements Runnable {
 		}
 		
 		return result;
+	}
+	
+	
+	private void validatePV(int[] pv) {	
+		for (int i=0; i<pv.length; i++) {
+			bitboard.makeMoveForward(pv[i]);
+		}
+		for (int i=pv.length-1; i>=0; i--) {
+			bitboard.makeMoveBackward(pv[i]);
+		}
 	}
 }
