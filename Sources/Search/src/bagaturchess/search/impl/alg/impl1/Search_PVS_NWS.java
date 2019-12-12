@@ -755,7 +755,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(cur.bestmove);
 				stack.push(cur.bestmove);
 			} else {
-				System.out.println("not valid move " + env.getBitboard().getMoveOps().moveToString(cur.bestmove));
+				throw new IllegalStateException("not valid move " + env.getBitboard().getMoveOps().moveToString(cur.bestmove));
 			}
 			
 			cur = cur.child;
