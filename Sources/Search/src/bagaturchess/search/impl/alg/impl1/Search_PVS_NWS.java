@@ -146,7 +146,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			final int ply, int depth, int alpha, int beta, boolean isPv) {
 
 		
-		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(ply, 0, alpha, beta);
+		if (mediator != null && mediator.getStopper() != null) {
+			mediator.getStopper().stopIfNecessary(ply + depth, env.getBitboard().getColourToMove(), alpha, beta);
+		}
 		
 		
 		if (info.getSelDepth() < ply) {
