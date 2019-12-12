@@ -165,7 +165,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.leaf = true;
 		
 		
-		if (isDraw()) {
+		if (ply > 0 && isDraw()) {
 			node.eval = EvalConstants.SCORE_DRAW;
 			return node.eval;
 		}
