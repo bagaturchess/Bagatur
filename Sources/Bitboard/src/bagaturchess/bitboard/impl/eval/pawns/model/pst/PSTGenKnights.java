@@ -22,15 +22,17 @@
  */
 package bagaturchess.bitboard.impl.eval.pawns.model.pst;
 
+
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
-import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.eval.pawns.model.ModelBuilder;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModel;
 import bagaturchess.bitboard.impl.plies.KingPlies;
 import bagaturchess.bitboard.impl.plies.KnightPlies;
+
 
 public class PSTGenKnights extends PSTGen {
 	
@@ -143,7 +145,7 @@ public class PSTGenKnights extends PSTGen {
 			//IBitBoard bitboard  = new Board("1r3rk1/p1qn1ppp/4p3/1N1p4/1P1B4/P2Q4/2P2PPb/1R2R2K b - - 4 23"); //Move to b7 instead of c4 or f4
 			//IBitBoard bitboard  = new Board("1rq5/Qpp5/p1p1bpk1/4p2p/8/1PP1N1PP/2P3P1/5RK1 w - - 9 40"); //Trapped Queen, 1 move to trap
 			//IBitBoard bitboard  = new Board("1rq5/Q1p5/ppp1bpk1/4p2p/8/1PP1N1PP/2P3P1/3R2K1 w - - 0 41"); //Trapped Queen, in the trap
-			IBitBoard bitboard  = new Board("r1bq1r2/pp4k1/4p2p/3pPp1Q/3N1R1P/2PB4/6P1/6K1 w - - bm Rg4+"); //From WFC
+			IBitBoard bitboard  =  BoardUtils.createBoard_WithPawnsCache("r1bq1r2/pp4k1/4p2p/3pPp1Q/3N1R1P/2PB4/6P1/6K1 w - - bm Rg4+"); //From WFC
 			
 			//bitboard.setAttacksSupport(false, false);
 			//BoardUtils.playGame(bitboard, "c3-c4, f6-f5, c2-c3, e5-e4, f1-f4, c8-h8, f4-f1, h8-d8");

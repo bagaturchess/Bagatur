@@ -22,13 +22,15 @@
  */
 package bagaturchess.bitboard.tests.pawnstructure;
 
+
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.eval.pawns.model.ModelBuilder;
 import bagaturchess.bitboard.impl.eval.pawns.model.Pawn;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModel;
+
 
 public abstract class PawnStructureTest extends Fields {
 	
@@ -36,7 +38,7 @@ public abstract class PawnStructureTest extends Fields {
 	protected IBitBoard bitboard;
 	
 	public PawnStructureTest() {
-		bitboard = new Board(getFEN(), null);
+		bitboard = BoardUtils.createBoard_WithPawnsCache(getFEN());
 		model = ModelBuilder.build(bitboard);
 	}
 	

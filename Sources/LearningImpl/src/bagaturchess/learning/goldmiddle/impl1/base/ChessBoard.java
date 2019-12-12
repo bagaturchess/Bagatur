@@ -21,10 +21,7 @@ package bagaturchess.learning.goldmiddle.impl1.base;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.common.Utils;
-import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl.Fields;
 
 
 public class ChessBoard implements IChessBoard {
@@ -32,28 +29,14 @@ public class ChessBoard implements IChessBoard {
 	
 	private IBitBoard board;
 	
-	private static final int[] HORIZONTAL_SYMMETRY = Utils.reverseSpecial( new int[] {	
-			   0,   1,   2,   3,   4,   5,   6,   7,
-			   8,   9,  10,  11,  12,  13,  14,  15,
-			  16,  17,  18,  19,  20,  21,  22,  23,
-			  24,  25,  26,  27,  28,  29,  30,  31,
-			  32,  33,  34,  35,  36,  37,  38,  39,
-			  40,  41,  42,  43,  44,  45,  46,  47,
-			  48,  49,  50,  51,  52,  53,  54,  55,
-			  56,  57,  58,  59,  60,  61,  62,  63,
-	});
-	
 	
 	public ChessBoard(IBitBoard _board) {
 		board = _board;
 	}
 	
 	private static final long convertBB(long bb) {
-		if (IBitBoard.IMPL1) {
-			return bb;
-		} else {
-			return Bits.reverse(bb);
-		}
+		//return Bits.reverse(bb);
+		return bb;
 	}
 	
 	@Override
@@ -117,24 +100,24 @@ public class ChessBoard implements IChessBoard {
 	public int getKingIndex(int colour) {
 		if (colour == 0) {
 			long king = board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING);
-			if (IBitBoard.IMPL1) {
+			//if (IBitBoard.IMPL1) {
 				int kingIndex = Long.numberOfTrailingZeros(king);
 				return convertIndex_b2c(kingIndex);
-			} else {
+			/*} else {
 				int kingIndex = Fields.get67IDByBitboard(king);
 				return convertIndex_b2c(kingIndex);
-			}
+			}*/
 			//return convertIndex_b2c(board.getPiecesLists().getPieces(Constants.PID_W_KING).getData()[0]);
 			
 		} else {
 			long king = board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING);
-			if (IBitBoard.IMPL1) {
+			//if (IBitBoard.IMPL1) {
 				int kingIndex = Long.numberOfTrailingZeros(king);
 				return convertIndex_b2c(kingIndex);
-			} else {
+			/*} else {
 				int kingIndex = Fields.get67IDByBitboard(king);
 				return convertIndex_b2c(kingIndex);
-			}
+			}*/
 		}
 	}
 	

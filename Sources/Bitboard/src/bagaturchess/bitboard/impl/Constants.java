@@ -756,44 +756,4 @@ public class Constants {
 			throw new IllegalStateException("colour=" + colour);
 		}
 	}
-	
-	public static void main(String[] args) {
-		
-		String epd = new Board().toEPD();
-		System.out.println(epd);
-		System.out.println(INITIAL_BOARD);
-		if (epd.equals(INITIAL_BOARD)) {
-			System.out.println("true");
-		}
-		
-		/*int COUNT = 1000000;
-		
-		long result;
-		
-		result = 0L;
-		long s1 = System.currentTimeMillis(); 
-		for (int iter=0; iter<COUNT; iter++) {
-			for (int square=0; square < 128; square++) {
-				if ((square & 0x88) == 0) {
-					result ^= getSuareBitboard_arr(square);
-					//result += SQUARES[square];
-				}
-			}
-		}
-		long e1 = System.currentTimeMillis();
-		System.out.println("Array  : " + (e1-s1) + " ms");
-		
-		result = 0L;
-		long s2 = System.currentTimeMillis();
-		for (int iter=0; iter<COUNT; iter++) {
-			for (int square=0; square < 128; square++) {
-				if ((square & 0x88) == 0) {
-					result ^= getSuareBitboard_switch(square);
-				}
-			}
-		}
-		long e2 = System.currentTimeMillis();
-		System.out.println("Switch : " + (e2-s2) + " ms");
-		*/
-	}
 }

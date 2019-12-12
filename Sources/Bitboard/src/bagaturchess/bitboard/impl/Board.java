@@ -182,22 +182,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	private IMoveOps moveOps;
 	
 	
-	public Board() {
-		this((IBoardConfig) null);
-	}
-	
-	public Board(IBoardConfig boardConfig) {
-		this(Constants.INITIAL_BOARD, boardConfig);
-	}
-	
-	public Board(String fenStr) {
-		this(fenStr, (IBoardConfig)null);
-	}
-	
-	public Board(String fenStr, IBoardConfig boardConfig) {
-		this(fenStr, null, boardConfig);
-	}
-	
 	public Board(String fenStr, PawnsEvalCache _pawnsCache, IBoardConfig _boardConfig) {
 		
 		pawnsCache = _pawnsCache;

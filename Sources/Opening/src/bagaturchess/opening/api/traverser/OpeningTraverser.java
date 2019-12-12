@@ -26,12 +26,10 @@ package bagaturchess.opening.api.traverser;
 import java.util.HashSet;
 import java.util.Set;
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.Board;
 import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
-import bagaturchess.opening.impl.model.Entry_BaseImpl;
-
 
 
 public class OpeningTraverser {
@@ -39,7 +37,7 @@ public class OpeningTraverser {
 	public static void traverseAll(OpeningBook ob, OpeningsVisitor visitor) {
 		visitor.begin();
 		
-		IBitBoard bitboard = new Board();
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache();
 		traverseAll(ob, visitor, bitboard, new HashSet<Long>());
 		
 		visitor.end();
@@ -71,7 +69,7 @@ public class OpeningTraverser {
 	public static void traverseLeafs(OpeningBook ob, OpeningsVisitor visitor) {
 		visitor.begin();
 		
-		IBitBoard bitboard = new Board();
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache();
 		traverseLeafs(ob, visitor, bitboard, new HashSet<Long>());
 		
 		visitor.end();
@@ -102,7 +100,7 @@ public class OpeningTraverser {
 	
 	public static void traverseDepth(OpeningBook ob, OpeningsVisitor visitor, int depth) {
 		visitor.begin();
-		IBitBoard bitboard = new Board();
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache();
 		traverseDepth(ob, visitor, bitboard, depth, 0, new HashSet<Long>());
 		visitor.end();
 	}

@@ -1,14 +1,12 @@
 package bagaturchess.egtb.gaviota.run;
 
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.Board;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.egtb.gaviota.GTBProbeInput;
 import bagaturchess.egtb.gaviota.GTBProbeOutput;
 import bagaturchess.egtb.gaviota.GTBProbing;
-import bagaturchess.egtb.gaviota.GTBProbing_NativeWrapper;
 import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 
 
@@ -22,7 +20,7 @@ public class GaviotaTest {
 			
 			//Initialization of the board representation by given FEN
 			
-			IBitBoard board  = new Board("3k4/8/8/8/8/8/3P4/3K4 w - -", null, null);
+			IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/3P4/3K4 w - -");
 			//IBitBoard board  = new Board("3k4/8/8/8/8/8/3K4/4R3 w - -", null, null);
 			
 			//IBitBoard board  = new Board("3k4/8/8/8/8/8/3P4/3K4 w - -", null, null);

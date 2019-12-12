@@ -1,9 +1,9 @@
 package bagaturchess.tools.pgn.run;
 
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoard;
-import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.tools.pgn.api.IGameIterator;
@@ -21,7 +21,7 @@ public class DummyGameIterator implements IGameIterator, IPlyIterator {
 	
 	
 	DummyGameIterator() {
-		testboard = new Board();
+		testboard = BoardUtils.createBoard_WithPawnsCache();
 	}
 	
 	@Override

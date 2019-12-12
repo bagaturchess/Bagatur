@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import bagaturchess.bitboard.impl.Board;
+import bagaturchess.bitboard.impl.BoardProxy_ReversedBBs;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
@@ -48,6 +49,11 @@ public class BoardUtils {
 	
 	public static IBitBoard createBoard_WithPawnsCache(IBoardConfig boardConfig) {
 		return createBoard_WithPawnsCache(Constants.INITIAL_BOARD, boardConfig);
+	}
+	
+	
+	public static IBitBoard createBoard_WithPawnsCache(String fen) {
+		return createBoard_WithPawnsCache(fen, null);
 	}
 	
 	
@@ -76,7 +82,7 @@ public class BoardUtils {
 			//PawnsEvalCache pawnsCache = new PawnsEvalCache(pawnsCacheFactory, EngineConfigFactory.getDefaultEngineConfiguration().getPawnsCacheSize());
 			PawnsEvalCache pawnsCache = new PawnsEvalCache(pawnsCacheFactory, pawnsCacheSize, false, new BinarySemaphore_Dummy());
 			 
-			bitboard = new Board(fen, pawnsCache, boardConfig);
+			bitboard = new BoardProxy_ReversedBBs(new Board(fen, pawnsCache, boardConfig));
 		}
 		
 		if (boardConfig != null) {
