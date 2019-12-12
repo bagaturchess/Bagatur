@@ -29,7 +29,6 @@ import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.impl.commands.info.Info;
 
@@ -78,7 +77,7 @@ public abstract class MatchRunner {
 			
 			//System.out.println("pinko");
 			
-			String allMovesStr = getMovesUCI(bitboard);
+			String allMovesStr = BoardUtils.getPlayedMoves(bitboard);
 			
 			engine.setupPossition("startpos moves " + allMovesStr);
 			
@@ -167,21 +166,4 @@ public abstract class MatchRunner {
 		}
 		return result;
 	}
-	
-	
-	private static String getMovesUCI(IBitBoard bitboard) {
-		
-		String result = "";
-		
-		int count = bitboard.getPlayedMovesCount();
-		int[] moves = bitboard.getPlayedMoves();
-		for (int i=0; i<count; i++) {
-			int curMove = moves[i];
-			StringBuilder message = new StringBuilder(32);
-			MoveInt.moveToStringUCI(curMove, message);
-			result += message.toString() + " ";
-		}
-	
-		return result;
-	}	
 }

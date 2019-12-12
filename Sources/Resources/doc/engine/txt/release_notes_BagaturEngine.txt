@@ -1,4 +1,4 @@
-Version 1.9 (10 December 2019)
+Version 1.9 (13 December 2019)
   * New search algorithm, based on the Chess22k source code
   
 Version 1.8a (20 September 2019)

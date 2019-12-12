@@ -253,10 +253,7 @@ public class GamesPlayer {
 			}
 			
 			String allMovesStr = BoardUtils.getPlayedMoves(bitboard);
-			
-			StringBuilder message = new StringBuilder(32);
-			MoveInt.moveToStringUCI(cur_move, message);
-			String moveStr = message.toString();
+			String moveStr = bitboard.getMoveOps().moveToString(cur_move);
 				
 			//System.out.println("startpos moves " + allMovesStr + moveStr);
 			//System.out.println("MOVE " + moveStr);

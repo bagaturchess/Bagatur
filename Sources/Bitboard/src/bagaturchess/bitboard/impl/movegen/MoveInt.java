@@ -330,19 +330,6 @@ public class MoveInt {
 	}
 	
 	
-	public static final String movesToStringUCI(int[] pv, int size) {
-		StringBuilder result = new StringBuilder(256);
-		
-		for (int i=0; i<size; i++) {
-			moveToStringUCI(pv[i], result);
-			if (i != pv.length - 1) {
-				result.append(" ");
-			}
-		}
-		
-		return result.toString();
-	}
-	
 	public static final void moveToStringUCI(int move, StringBuilder result) {
 		
 		if (move == -1) {
