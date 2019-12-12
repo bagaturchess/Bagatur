@@ -8,16 +8,16 @@ public class SearchInfoUtils {
 	
 	//info multipv 1 depth 13 score cp -25 time 10344 nodes 770950 nps 74531 pv c7c6 e3e4 b8d7 e1g1 c6d5 c4d5 a8c8 c1e3 f8e8 d5e6 f7e6 a1c1 d7e5 d1a4 f6g4 a4a7 g4e3
 	
-	public static String buildMajorInfoCommand_multipv(int pvnum, ISearchInfo info, long startTime, int tptusage, long nodes) {
-		return buildMajorInfoCommand(info, startTime, tptusage, "info multipv " + pvnum, nodes);
+	public static String buildMajorInfoCommand_multipv(int pvnum, ISearchInfo info, long startTime, int tptusage, long nodes, IBitBoard board) {
+		return buildMajorInfoCommand(info, startTime, tptusage, "info multipv " + pvnum, nodes, board);
 	}
 	
 	
-	public static String buildMajorInfoCommand(ISearchInfo info, long startTime, int tptusage, long nodes) {
-		return buildMajorInfoCommand(info, startTime, tptusage, "info", nodes);
+	public static String buildMajorInfoCommand(ISearchInfo info, long startTime, int tptusage, long nodes, IBitBoard board) {
+		return buildMajorInfoCommand(info, startTime, tptusage, "info", nodes, board);
 	}
 	
-	private static String buildMajorInfoCommand(ISearchInfo info, long startTime, int tptusage, String prefix, long nodes) {
+	private static String buildMajorInfoCommand(ISearchInfo info, long startTime, int tptusage, String prefix, long nodes, IBitBoard board) {
 		
 		//info depth 1 seldepth 9 time 31 nodes 0 score cp 99 nps 0 currmove Nf5-h6 currmovenumber 25 hashfull 0 pv Nf5-h6, Rg8-g7, Nh6-f5, Nb6-a4,
 		//info depth 4 seldepth 10 score cp 31999 time 63 nodes 2733 pv d1d5 b7b5 a3a4 a5b6 a4a6
@@ -64,12 +64,7 @@ public class SearchInfoUtils {
 			
 			if (info.getPV() != null) {
 				for (int j=0; j<info.getPV().length; j++) {
-					if (IBitBoard.IMPL1) {
-						MoveWrapper mw = new MoveWrapper(info.getPV()[j]);
-						message.append(mw.toString());
-					} else {
-						MoveInt.moveToStringUCI(info.getPV()[j], message);
-					}
+					message.append(board.getMoveOps().moveToString(info.getPV()[j]));
 					if (j != info.getPV().length - 1) {
 						message.append(" ");//", ";
 					}
@@ -81,7 +76,7 @@ public class SearchInfoUtils {
 	}
 	
 	
-	public static String buildMinorInfoCommand(ISearchInfo info, long startTime, int tptusage, long nodes) {
+	public static String buildMinorInfoCommand(ISearchInfo info, long startTime, int tptusage, long nodes, IBitBoard board) {
 		long time = (System.currentTimeMillis() - startTime);
 		long timeInSecs = (time / 1000);
 		if (timeInSecs == 0) {
@@ -103,14 +98,7 @@ public class SearchInfoUtils {
 		}
 		if (info.getCurrentMove() != 0) {
 			message.append(" currmove ");
-			
-			if (IBitBoard.IMPL1) {
-				MoveWrapper mw = new MoveWrapper(info.getCurrentMove());
-				message.append(mw.toString());
-			} else {
-				MoveInt.moveToStringUCI(info.getCurrentMove(), message);
-			}
-			
+			message.append(board.getMoveOps().moveToString(info.getCurrentMove()));
 			message.append(" currmovenumber " + info.getCurrentMoveNumber());
 		}
 		if (tptusage != -1) message.append(" hashfull " + (10 * tptusage));

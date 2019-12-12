@@ -327,30 +327,7 @@ public class MoveInt {
 				throw new IllegalStateException();
 			}
 		}
-	}
-	
-	
-	public static final void moveToStringUCI(int move, StringBuilder result) {
-		
-		if (move == -1) {
-			throw new IllegalStateException("move=" + move);
-		}
-		
-		if (move == 0) {
-			result.append("OOOO");
-			return;
-			//throw new IllegalStateException();
-		}
-		
-		result.append(Fields.ALL_ORDERED_NAMES[Fields.IDX_2_ORDERED_A1H1[getFromFieldID(move)]]);
-		result.append(Fields.ALL_ORDERED_NAMES[Fields.IDX_2_ORDERED_A1H1[getToFieldID(move)]]);
-		
-		if (isPromotion(move)) {
-			int promotionFigureType = Constants.PIECE_IDENTITY_2_TYPE[getPromotionFigurePID(move)];
-			result.append(Figures.TYPES_SIGN[promotionFigureType].toLowerCase());
-		}
-	}
-	
+	}	
 
 	public static boolean isEquals(int move1, int move2) {
 		return move1 == move2;

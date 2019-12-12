@@ -33,6 +33,7 @@ import bagaturchess.uci.impl.commands.Go;
 public interface IRootSearch {
 	
 	public SharedData getSharedData();
+	public IBitBoard getBitboardForSetup();
 	
 	public int getTPTUsagePercent();
 	public void decreaseTPTDepths(int reduction);

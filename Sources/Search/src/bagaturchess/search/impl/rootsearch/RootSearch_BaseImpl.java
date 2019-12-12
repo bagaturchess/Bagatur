@@ -98,7 +98,8 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	}
 	
 	
-	protected IBitBoard getBitboardForSetup() {
+	@Override
+	public IBitBoard getBitboardForSetup() {
 		return bitboardForSetup;
 	}
 	

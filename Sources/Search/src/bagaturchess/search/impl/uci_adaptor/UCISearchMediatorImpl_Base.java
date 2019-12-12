@@ -114,7 +114,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 			lastinfo = info;
 		}
 		
-		String message = SearchInfoUtils.buildMajorInfoCommand(info, getStartTime(), rootSearch.getTPTUsagePercent(), 0);
+		String message = SearchInfoUtils.buildMajorInfoCommand(info, getStartTime(), rootSearch.getTPTUsagePercent(), 0, rootSearch.getBitboardForSetup());
 		send(message);
 		
 		//stopIfMateIsFound();
@@ -123,7 +123,7 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	
 	public void changedMinor(ISearchInfo info) {
 
-		String message = SearchInfoUtils.buildMinorInfoCommand(info, getStartTime(), rootSearch.getTPTUsagePercent(), 0);
+		String message = SearchInfoUtils.buildMinorInfoCommand(info, getStartTime(), rootSearch.getTPTUsagePercent(), 0, rootSearch.getBitboardForSetup());
 		send(message);
 		
 	}

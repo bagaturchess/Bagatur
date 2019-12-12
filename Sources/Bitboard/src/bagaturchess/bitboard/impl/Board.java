@@ -64,6 +64,7 @@ import bagaturchess.bitboard.impl.movegen.CastleMovesGen;
 import bagaturchess.bitboard.impl.movegen.KingMovesGen;
 import bagaturchess.bitboard.impl.movegen.KnightMovesGen;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
+import bagaturchess.bitboard.impl.movegen.MoveOpsImpl;
 import bagaturchess.bitboard.impl.movegen.OfficerMovesGen;
 import bagaturchess.bitboard.impl.movegen.QueenMovesGen;
 import bagaturchess.bitboard.impl.movegen.WhitePawnMovesGen;
@@ -352,7 +353,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		see = new SEE(this);
 		
-		moveOps = new MoveOpsImpl();
+		moveOps = new MoveOpsImpl(this);
 		
 		checkConsistency();
 	} 
@@ -5338,167 +5339,5 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	@Override
 	public IMoveOps getMoveOps() {
 		return moveOps;
-	}
-	
-	
-	private class MoveOpsImpl implements IMoveOps {
-		
-		
-		@Override
-		public boolean isCapture(int move) {
-			return MoveInt.isCapture(move);
-		}
-		
-		
-		@Override
-		public boolean isPromotion(int move) {
-			return MoveInt.isPromotion(move);
-		}
-		
-		
-		@Override
-		public boolean isCaptureOrPromotion(int move) {
-			return isCapture(move) || isPromotion(move);
-		}
-		
-		
-		@Override
-		public boolean isEnpassant(int move) {
-			return MoveInt.isEnpassant(move);
-		}
-		
-		
-		@Override
-		public boolean isCastling(int move) {
-			return MoveInt.isCastling(move);
-		}
-		
-		
-		@Override
-		public int getFigurePID(int move) {
-			return MoveInt.getFigurePID(move);
-		}
-		
-		
-		@Override
-		public int getToFieldID(int move) {
-			return MoveInt.getToFieldID(move);
-		}
-		
-		
-		@Override
-		public int getFigureType(int move) {
-			return  MoveInt.getFigureType(move);
-		}
-		
-		
-		@Override
-		public boolean isCastlingKingSide(int move) {
-			return MoveInt.isCastleKingSide(move);
-		}
-		
-		
-		@Override
-		public boolean isCastlingQueenSide(int move) {
-			return MoveInt.isCastleQueenSide(move);
-		}
-		
-		
-		@Override
-		public int getFromFieldID(int move) {
-			return MoveInt.getFromFieldID(move);
-		}
-		
-		
-		@Override
-		public int getPromotionFigureType(int move) {
-			return MoveInt.getPromotionFigureType(move);
-		}
-		
-		
-		@Override
-		public String moveToString(int move) {
-			StringBuilder result = new StringBuilder();
-			MoveInt.moveToStringUCI(move, result);
-			return result.toString();
-		}
-		
-		
-		@Override
-		public int stringToMove(String move) {
-			return uciStrToMove(Board.this, move);
-		}
-		
-		
-		@Override
-		public int getToField_File(int move) {
-			return Fields.LETTERS[getToFieldID(move)];
-		}
-		
-		
-		@Override
-		public int getToField_Rank(int move) {
-			return Fields.DIGITS[getToFieldID(move)];
-		}
-		
-		
-		@Override
-		public int getFromField_File(int move) {
-			return Fields.LETTERS[getFromFieldID(move)];
-		}
-		
-		
-		@Override
-		public int getFromField_Rank(int move) {
-			return Fields.DIGITS[getFromFieldID(move)];
-		}
-		
-		
-		private int uciStrToMove(IBitBoard bitboard, String moveStr) {
-			
-			int fromFieldID = Fields.getFieldID(moveStr.substring(0, 2));
-			int toFieldID = Fields.getFieldID(moveStr.substring(2, 4));
-			
-			IMoveList mlist = new BaseMoveList();
-			if (bitboard.isInCheck()) {
-				bitboard.genKingEscapes(mlist);
-			} else {
-				bitboard.genAllMoves(mlist);
-			}
-			
-			int cur_move = 0;
-			while ((cur_move = mlist.next()) != 0) {
-				if (fromFieldID == MoveInt.getFromFieldID(cur_move)
-						&& toFieldID == MoveInt.getToFieldID(cur_move)
-					) {
-					
-					if (MoveInt.isPromotion(cur_move)) {
-						if (moveStr.endsWith("q")) {
-							if (MoveInt.getPromotionFigureType(cur_move) == Figures.TYPE_QUEEN) {
-								return cur_move;
-							}
-						} else if (moveStr.endsWith("r")) {
-							if (MoveInt.getPromotionFigureType(cur_move) == Figures.TYPE_CASTLE) {
-								return cur_move;
-							}
-						} else if (moveStr.endsWith("b")) {
-							if (MoveInt.getPromotionFigureType(cur_move) == Figures.TYPE_OFFICER) {
-								return cur_move;
-							}
-						} else if (moveStr.endsWith("n")) {
-							if (MoveInt.getPromotionFigureType(cur_move) == Figures.TYPE_KNIGHT) {
-								return cur_move;
-							}
-						} else {
-							throw new IllegalStateException(moveStr);
-						}
-					} else {
-						return cur_move;
-					}
-				}
-			}
-			
-			throw new IllegalStateException(bitboard + "\r\n moveStr=" + moveStr);
-		}
 	}
 }

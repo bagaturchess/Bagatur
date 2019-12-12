@@ -12,7 +12,7 @@ import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
+import bagaturchess.bitboard.impl.movegen.MoveOpsImpl;
 import bagaturchess.bitboard.impl.state.PiecesList;
 
 
@@ -24,25 +24,25 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	
 	public Board3_Adapter(String fenStr, IBoardConfig boardConfig) {
 		super(fenStr, boardConfig);
-		moveOps = new MoveOpsImpl();
+		moveOps = new MoveOpsImpl(this);
 	}
 	
 	
 	public Board3_Adapter(String fenStr, PawnsEvalCache pawnsCache, IBoardConfig boardConfig) {
 		super(fenStr, pawnsCache, boardConfig);
-		moveOps = new MoveOpsImpl();
+		moveOps = new MoveOpsImpl(this);
 	}
 
 	
 	public Board3_Adapter() {
 		super();
-		moveOps = new MoveOpsImpl();
+		moveOps = new MoveOpsImpl(this);
 	}
 
 
 	public Board3_Adapter(String fen) {
 		super(fen);
-		moveOps = new MoveOpsImpl();
+		moveOps = new MoveOpsImpl(this);
 	}
 
 
@@ -217,119 +217,5 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	@Override
 	public IMoveOps getMoveOps() {
 		return moveOps;
-	}
-	
-	
-	private class MoveOpsImpl implements IMoveOps {
-		
-		
-		@Override
-		public boolean isCapture(int move) {
-			return MoveInt.isCapture(move);
-		}
-		
-		
-		@Override
-		public boolean isPromotion(int move) {
-			return MoveInt.isPromotion(move);
-		}
-		
-		
-		@Override
-		public boolean isCaptureOrPromotion(int move) {
-			return isCapture(move) || isPromotion(move);
-		}
-		
-		
-		@Override
-		public boolean isEnpassant(int move) {
-			return MoveInt.isEnpassant(move);
-		}
-		
-		
-		@Override
-		public boolean isCastling(int move) {
-			return MoveInt.isCastling(move);
-		}
-		
-		
-		@Override
-		public int getFigurePID(int move) {
-			return MoveInt.getFigurePID(move);
-		}
-		
-		
-		@Override
-		public int getToFieldID(int move) {
-			return MoveInt.getToFieldID(move);
-		}
-		
-		
-		@Override
-		public int getFigureType(int move) {
-			return  MoveInt.getFigureType(move);
-		}
-		
-		
-		@Override
-		public boolean isCastlingKingSide(int move) {
-			return MoveInt.isCastleKingSide(move);
-		}
-		
-		
-		@Override
-		public boolean isCastlingQueenSide(int move) {
-			return MoveInt.isCastleQueenSide(move);
-		}
-		
-		
-		@Override
-		public int getFromFieldID(int move) {
-			return MoveInt.getFromFieldID(move);
-		}
-		
-		
-		@Override
-		public int getPromotionFigureType(int move) {
-			return MoveInt.getPromotionFigureType(move);
-		}
-		
-		
-		@Override
-		public String moveToString(int move) {
-			StringBuilder result = new StringBuilder();
-			MoveInt.moveToStringUCI(move, result);
-			return result.toString();
-		}
-		
-		
-		@Override
-		public int stringToMove(String move) {
-			throw new UnsupportedOperationException();
-		}
-		
-		
-		@Override
-		public int getToField_File(int move) {
-			return Fields.LETTERS[getToFieldID(move)];
-		}
-		
-		
-		@Override
-		public int getToField_Rank(int move) {
-			return Fields.DIGITS[getToFieldID(move)];
-		}
-		
-		
-		@Override
-		public int getFromField_File(int move) {
-			return Fields.LETTERS[getFromFieldID(move)];
-		}
-		
-		
-		@Override
-		public int getFromField_Rank(int move) {
-			return Fields.DIGITS[getFromFieldID(move)];
-		}
 	}
 }
