@@ -34,6 +34,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
+import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
 
 
@@ -105,18 +106,23 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 			
 			@Override
 			public void run() {
-				while (!current_stopper.isStopped()
-						&& current_mediator_multipv.getCurrentDepth() <= final_max_depth
-						) {
+				try {
+					while (!current_stopper.isStopped()
+							&& current_mediator_multipv.getCurrentDepth() <= final_max_depth
+							) {
+						
+						try {
+							Thread.sleep(15);
+						} catch (InterruptedException e) {}
+					}
 					
-					try {
-						Thread.sleep(15);
-					} catch (InterruptedException e) {}
+					stopSearchAndWait();
+					
+					mediator.getBestMoveSender().sendBestMove();
+					
+				} catch(Throwable t) {
+					ChannelManager.getChannel().dump(t);
 				}
-				
-				stopSearchAndWait();
-				
-				mediator.getBestMoveSender().sendBestMove();
 			}
 		});
 	}

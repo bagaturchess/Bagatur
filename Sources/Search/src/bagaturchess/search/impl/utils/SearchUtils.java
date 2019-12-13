@@ -51,7 +51,7 @@ public class SearchUtils {
 			}
 		}*/
 		
-		return val != ISearch.MAX && val >= ISearch.MAX_MAT_INTERVAL;// && val % ISearch.MAX_MAT_INTERVAL == 0;
+		return val != ISearch.MAX && val >= ISearch.MAX_MAT_INTERVAL && val % ISearch.MAX_MAT_INTERVAL == 0;// && val % ISearch.MAX_MAT_INTERVAL == 0;
 	}
 	
 	public static final int getMateDepth(int score) {
