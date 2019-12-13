@@ -40,6 +40,7 @@ import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.montecarlo.MonteCarloSearch;
+import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ProcessesImpl;
 import bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImpl;
@@ -490,49 +491,7 @@ public class MTDSchedulerMain {
 		//BoardUtils.playGame(bitboard, "b3xb7, g4xf3, g2xf3, d8-g5, g1-h1, g5-h5, f3-f4, h5-f3, h1-g1, f3-g4, g1-h1, g4-f3, h1-g1, f3-g4, g1-h1, g4-f3");
 		//BoardUtils.playGame(bitboard, "f1xa6, f2xc5, d2-f3, c5-e3, d1-d2, b4xa6, h1-e1, e3-f4, a3xa6, d8xd2, f3xd2, b8xb2");
 		//BoardUtils.playGame(bitboard, "d4xd5, c6xd5, h3-h4, g8-h7, b2-b3, h7-h6, c2-c4, f5-h5");
-		
-		//bitboard.setPawnsCache(createPawnsCache());
-		
-		//System.exit(0);
-		
-		//System.out.println(System.getenv());
-		
-		/*MoveList list = new BaseMoveList();
-		int count = bitboard.genAllMoves(list);
-		for (int i=0; i<count; i++) {
-			int move = list.reserved_getMovesBuffer()[i];
-			System.out.println("" + MoveInt.moveToString(move));
-		}*/
-		
-		
-		/*
-		IEvaluatorFactory evaluatorFactory = null;
-		try {
-			evaluatorFactory = (IEvaluatorFactory) MTDSchedulerMain.class.getClassLoader().loadClass(EngineConfigFactory.getDefaultEngineConfiguration().getEvaluatorFactoryClassName()).newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new IllegalStateException(e);
-		}
-		
-		IEvaluator eval = evaluatorFactory.create(bitboard, null);
-		int evalint = eval.fullEval(0, 0, 0, bitboard.getColourToMove());
-		System.out.println(((BagaturEvaluator)eval).dump(bitboard.getColourToMove()));
-		System.out.println("STATIC EVAL: " + evalint);
-		*/
-		
-		//System.exit(0);
-		
-		/*SearchEnv env = new SearchEnv(bitboard, new SharedData(evaluatorFactory));
-		ISearch search = new SearchAB_PV(env);
-		search.search(new MediatorDummper(5000000, true), 50);*/
-		
-		//bagaturchess.configs.tune.search.exts.extmode_mixed.MixedExts_All16_UpdateIntervalX cfg =
-		//	new bagaturchess.configs.tune.search.exts.extmode_mixed.MixedExts_All16_UpdateIntervalX(new String[]{"10"});
-		//-Dengine.boot.cfg=bagaturchess.properties.EngineConfigBaseImpl
-		
-		//ISearchMediator mediator1 = new MediatorDummper(bitboard, eval, 5000000, true);
-		//IChannel channel = new Channel_Console();
-		
+
 		//Go go = new Go(ChannelManager.getChannel(), "go depth 10");
 		Go go = new Go(ChannelManager.getChannel(), "go infinite");
 		
@@ -555,56 +514,12 @@ public class MTDSchedulerMain {
 				
 				search, true);
 		
-		//ISearchMediator mediator2 = new MediatorDummper(bitboard, eval, 5000000, true);
 		
-		//searchMultiPV.newGame(bitboard);
-		//searchMultiPV.negamax(bitboard, mediator1, 1, 100, true, null);
 		search.negamax(bitboard, mediator1, timeController, go);
 		
-		//search.negamax(bitboard, mediator1, 2, 2, true);
-		
-		//ISearchMediator mediator1 = new MediatorDummper(bitboard, eval, 5000000, true);
-		//MultiPVMediator multipvMediator = new MultiPVMediator(sharedData, cfg, search, bitboard, mediator1, 1, 5, true, null);
+		//MultiPVMediator multipvMediator = new MultiPVMediator(cfg, search, bitboard, mediator1, go);
 		//multipvMediator.ready();
-		
-		//CallbackTest search_withcallback = new CallbackTest(search, eval, bitboard);
-		//search_withcallback.ready();
-		
-		/*ISearch search = new SearchLazyNew(bitboard);
-		search.search(new MediatorDummper(5000000, true), 50);*/
-		
-		
-		//search.search(new MediatorDummper(5000000, true), 50);
-		
-		//search.search( new ExplainerMediator(5000000, true, bitboard), 50);
-		
-		//IBitBoard new_bitboard = new Board(bitboard.toEPD());
-		//new_bitboard.setAttacksSupport(EngineConfig.getSingleton().getFieldsStatesSupport(), EngineConfig.getSingleton().getFieldsStatesSupport());
-		//new_bitboard.setAttacksSupport(false, false);
-		
-		//search.negamax(bitboard, new MediatorDummper(5000000, true), 9);		
-		//test();
-		
-		//IBitBoard new_bitboard1 = new Board(bitboard.toEPD());
-		//new_bitboard.setAttacksSupport(EngineConfig.getSingleton().getFieldsStatesSupport(), EngineConfig.getSingleton().getFieldsStatesSupport());
-		
-		//search.negamax(new_bitboard, new MediatorDummper(5000000, true), 12);
-		
-		/*try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		
-		/*System.out.println("SECOND");
-		
-		MoveList list = new BaseMoveList();
-		bitboard.genAllMoves(list);
-		int move = list.next();
-		bitboard.makeMoveForward(move);
-		
-		search.negamax(new Board(bitboard.toEPD()), new MediatorDummper(5000));*/
+				
 	}
 	
 	/*public static void test() {
