@@ -550,4 +550,10 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 	public long getHashKeyAfterMove(int move) {
 		return bitboard.getHashKeyAfterMove(move);
 	}
+	
+	
+	@Override
+	public String toString() {
+		return bitboard.toString();
+	}
 }

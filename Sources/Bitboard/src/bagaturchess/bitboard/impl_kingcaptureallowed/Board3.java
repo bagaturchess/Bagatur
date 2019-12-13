@@ -70,7 +70,7 @@ import bagaturchess.bitboard.impl.state.PiecesLists;
 import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
 
 
-public abstract class Board3 extends Fields implements IBitBoard, Cloneable {
+abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 	
 	
 	private static final boolean DEBUG = false;

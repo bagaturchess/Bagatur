@@ -23,6 +23,7 @@
 package bagaturchess.bitboard.run;
 
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.api.IInternalMoveList;
@@ -189,9 +190,9 @@ public class Simulate {
 		//BoardWithAttacks bitBoard = new BoardWithAttacks();
 		//String BOARD = "4k3/P7/8/8/8/8/7p/4K3 w - 0 0";
 		//IBoard bitBoard = new BoardImpl(Constants.INITIAL_BOARD, null);
-		//IBoard bitBoard = new Board();
+		IBoard bitBoard = BoardUtils.createBoard_WithPawnsCache();
 		//IBoard bitBoard = new DummyBoard();
-		IBoard bitBoard = new Board3_Adapter();
+		//IBoard bitBoard = new Board3_Adapter();
 		//bitBoard.setAttacksSupport(false, false);
 		
 		SearchInfo info = new SearchInfo();
