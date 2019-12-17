@@ -45,6 +45,7 @@ import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
+import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
@@ -187,6 +188,8 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 							int alpha;
 							int beta;
 							
+							PVManager pvman = new PVManager(ISearch.MAX_DEPTH);
+							
 							do {
 								
 								alpha = eval - window;
@@ -215,7 +218,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 							prevEval = eval;
 							
 							List<Integer> pv_buffer = new ArrayList<Integer>();
-							info.setPV(PVNode.convertPV(searcher.getPvman().load(0), pv_buffer));
+							info.setPV(PVNode.convertPV(pvman.load(0), pv_buffer));
 							if (info.getPV().length > 0) {
 								info.setBestMove(info.getPV()[0]);
 							}

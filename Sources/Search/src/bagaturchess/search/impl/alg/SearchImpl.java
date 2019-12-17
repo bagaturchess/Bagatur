@@ -23,9 +23,6 @@
 package bagaturchess.search.impl.alg;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
@@ -42,12 +39,9 @@ import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.history.IHistoryTable;
-import bagaturchess.search.impl.info.SearchInfoFactory;
-import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.tpt.TPTable;
-import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.search.impl.utils.SearchUtils;
 import bagaturchess.uci.api.ChannelManager;
 
@@ -64,14 +58,11 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	protected ISearchMoveList[] lists_all_root;
 	protected ISearchMoveList[] lists_escapes;
 	protected ISearchMoveList[] lists_capsproms;
-	protected PVManager pvman;
 	protected SearchEnv env;
 	
 	protected int[] buff_tpt_depthtracking = new int[1];
 	
 	protected GTBProbeInput temp_input = new GTBProbeInput();
-	
-	private List<Integer> pv_buffer = new ArrayList<Integer>();
 	
 	
 	public void setup(IBitBoard bitboardForSetup) {
@@ -87,8 +78,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	public SearchImpl(SearchEnv _env) {
 		env = _env;
-		
-		pvman = new PVManager(MAX_DEPTH);
 
 		lists_all = new ISearchMoveList[MAX_DEPTH];
 		for (int i=0; i<lists_all.length; i++) {
@@ -137,60 +126,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		return scores;
 	}
 	
-
-	protected int sentFromTPT(ISearchMediator mediator, int min_depth) {
-		int depth = 0;
-		
-		env.getTPT().lock();
-		ISearchInfo info = SearchInfoFactory.getFactory().createSearchInfo();
-
-		TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
-
-		if (tptEntry != null
-				&& tptEntry.isExact()
-				//&& tptEntry.getBestMove_lower() != 0
-				) {
-
-			PVNode node = pvman.load(0);
-
-			node.bestmove = 0;
-			node.eval = MIN;
-			node.leaf = true;
-			
-			depth = tptEntry.getDepth();
-
-			env.getTPT().lock();
-			buff_tpt_depthtracking[0] = 0;
-			extractFromTPT(info, depth, node, true, buff_tpt_depthtracking, env.getBitboard().getColourToMove(), env.getTPT());
-			env.getTPT().unlock();
-
-			node.eval = tptEntry.getLowerBound();
-
-			pv_buffer.clear();
-
-			int pv[] = PVNode.convertPV(pvman.load(0), pv_buffer);
-			if (pv != null && pv.length > 0) {
-				info.setPV(pv);
-				info.setBestMove(info.getPV()[0]);
-				info.setEval(node.eval);
-				info.setDepth(depth);
-				
-				depth = Math.min(depth, buff_tpt_depthtracking[0]);
-
-				if (mediator != null && depth >= min_depth) {
-					mediator.changedMajor(info);
-					if (DEBUGSearch.DEBUG_MODE) testPV(info);
-				}
-
-			} else {
-				depth = 0;
-			}
-		}
-		env.getTPT().unlock();
-
-		return depth + 1;
-	}
-	
 	
 	protected static SharedData getOrCreateSearchEnv(Object[] args) {
 		if (args[2] == null) {
@@ -216,16 +151,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		}
 	}
 	
-	
-	public abstract int pv_search(ISearchMediator mediator, IRootWindow rootWin, ISearchInfo info,
-			int initial_maxdepth, int maxdepth, int depth, int alpha, int beta,
-			int prevbest, int prevprevbest, int[] prevPV, boolean prevNullMove, int evalGain, int rootColour,
-			int totalLMReduction, int materialGain, boolean inNullMove, int mateMove, boolean useMateDistancePrunning);
-	
-	/*protected abstract int nullwin_search(ISearchMediator mediator, ISearchInfo info,
-			int initial_maxdepth, int maxdepth, int depth, int beta,
-			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV, int rootColour, int totalLMReduction, int materialGain, boolean inNullMove, int mateMove, boolean useMateDistancePrunning);
-	*/
 	
 	public SearchEnv getEnv() {
 		return env;
@@ -480,11 +405,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		for (int i=moves.length - 1; i >= 0; i--) {
 			env.getBitboard().makeMoveBackward(moves[i]);
 		}
-	}
-	
-	
-	public PVManager getPvman() {
-		return pvman;
 	}
 	
 	public static final class RootWindowImpl implements IRootWindow {

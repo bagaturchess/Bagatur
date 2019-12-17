@@ -40,7 +40,6 @@ import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.IEvaluator;
-import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
@@ -117,7 +116,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	@Override
-	public int pv_search(ISearchMediator mediator, IRootWindow rootWin,
+	public int pv_search(ISearchMediator mediator, PVManager pvman,
 			ISearchInfo info, int initial_maxdepth, int maxdepth, int depth,
 			int alpha_org, int beta, int prevbest, int prevprevbest,
 			int[] prevPV, boolean prevNullMove, int evalGain, int rootColour,
@@ -130,7 +129,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	@Override
-	public int nullwin_search(ISearchMediator mediator, ISearchInfo info,
+	public int nullwin_search(ISearchMediator mediator, PVManager pvman, ISearchInfo info,
 			int initial_maxdepth, int maxdepth, int depth, int beta,
 			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV,
 			int rootColour, int totalLMReduction, int materialGain,

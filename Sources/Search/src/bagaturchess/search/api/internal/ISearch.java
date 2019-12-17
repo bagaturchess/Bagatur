@@ -44,15 +44,14 @@ public interface ISearch {
 	public void newSearch();
 	public void setup(IBitBoard bitboard);
 	public SearchEnv getEnv();
-	public PVManager getPvman();
 	public int getTPTUsagePercent();
 	
-	public int pv_search(ISearchMediator mediator, IRootWindow rootWin, ISearchInfo info,
+	public int pv_search(ISearchMediator mediator, PVManager pvman, ISearchInfo info,
 			int initial_maxdepth, int maxdepth, int depth, int alpha_org, int beta,
 			int prevbest, int prevprevbest, int[] prevPV, boolean prevNullMove, int evalGain, int rootColour,
 			int totalLMReduction, int materialGain, boolean inNullMove, int mateMove, boolean useMateDistancePrunning);
 	
-	public int nullwin_search(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth,
+	public int nullwin_search(ISearchMediator mediator, PVManager pvman, ISearchInfo info, int initial_maxdepth,
 			int maxdepth, int depth, int beta,
 			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV, int rootColour, int totalLMReduction, int materialGain, boolean inNullMove, int mateMove,
 			boolean useMateDistancePrunning);

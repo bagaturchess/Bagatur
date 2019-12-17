@@ -37,6 +37,7 @@ import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.alg.BacktrackingInfo;
 import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.env.SearchEnv;
+import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
 
@@ -124,29 +125,29 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	@Override
-	public int pv_search(ISearchMediator mediator, IRootWindow rootWin,
+	public int pv_search(ISearchMediator mediator, PVManager pvman,
 			ISearchInfo info, int initial_maxdepth, int maxdepth, int depth,
 			int alpha_org, int beta, int prevbest, int prevprevbest,
 			int[] prevPV, boolean prevNullMove, int evalGain, int rootColour,
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		return pv_search(mediator, info, initial_maxdepth, maxdepth, depth, alpha_org, beta, rootColour);
+		return pv_search(mediator, pvman, info, initial_maxdepth, maxdepth, depth, alpha_org, beta, rootColour);
 	}
 	
 	
 	@Override
-	public int nullwin_search(ISearchMediator mediator, ISearchInfo info,
+	public int nullwin_search(ISearchMediator mediator, PVManager pvman, ISearchInfo info,
 			int initial_maxdepth, int maxdepth, int depth, int beta,
 			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV,
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		return nullwin_search(mediator, info, initial_maxdepth, maxdepth, depth, beta, rootColour, false);
+		return nullwin_search(mediator, pvman, info, initial_maxdepth, maxdepth, depth, beta, rootColour, false);
 	}
 	
 	
-	public int pv_search(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int maxdepth, int depth, int alpha_org, int beta, int rootColour) {
+	public int pv_search(ISearchMediator mediator, PVManager pvman, ISearchInfo info, int initial_maxdepth, int maxdepth, int depth, int alpha_org, int beta, int rootColour) {
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
@@ -246,7 +247,7 @@ public class Search_PVS_NWS extends SearchImpl {
     	
     	
 		if (depth >= normDepth(maxdepth)) {
-			node.eval = pv_qsearch(mediator, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
+			node.eval = pv_qsearch(mediator, pvman, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
 			return node.eval;
 		}
 		
@@ -289,7 +290,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			int reduction = 2;
 			
-			nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta, rootColour, false);
+			nullwin_search(mediator, pvman, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta, rootColour, false);
 			
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
@@ -445,11 +446,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					pv_search = true;
 					
-					cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
+					cur_eval = -pv_search(mediator, pvman, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
 					
 					if (singularMove && cur_eval > alpha && new_maxdepth == maxdepth) {
 						new_maxdepth += PLY;
-						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
+						cur_eval = -pv_search(mediator, pvman, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
 					}
 					
 				} else {
@@ -465,13 +466,13 @@ public class Search_PVS_NWS extends SearchImpl {
 						lmrReduction += PLY * rate;
 					}					
 					
-					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha, rootColour, !givesCheck);
+					cur_eval = -nullwin_search(mediator, pvman, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha, rootColour, !givesCheck);
 					
 					if (cur_eval > alpha) {
 						
 						pv_search = true;
 						
-						cur_eval = -pv_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
+						cur_eval = -pv_search(mediator, pvman, info, initial_maxdepth, new_maxdepth, depth + 1, -beta, -alpha, rootColour);
 					}
 				}
 				
@@ -569,7 +570,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	public int nullwin_search(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int maxdepth, int depth, int beta, int rootColour, boolean useStaticPrunning) {
+	public int nullwin_search(ISearchMediator mediator, PVManager pvman, ISearchInfo info, int initial_maxdepth, int maxdepth, int depth, int beta, int rootColour, boolean useStaticPrunning) {
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
@@ -759,7 +760,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int null_maxdepth = maxdepth - null_reduction;
 				
 				env.getBitboard().makeNullMoveForward();
-				int null_val = -nullwin_search(mediator, info, initial_maxdepth, null_maxdepth, depth + 1, -(beta - 1), rootColour, false);
+				int null_val = -nullwin_search(mediator, pvman, info, initial_maxdepth, null_maxdepth, depth + 1, -(beta - 1), rootColour, false);
 				env.getBitboard().makeNullMoveBackward();
 				
 				if (null_val >= beta) {
@@ -768,7 +769,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						return null_val;
 					}
 					
-					int null_val_ver = nullwin_search(mediator, info, initial_maxdepth, null_maxdepth, depth, beta, rootColour, useStaticPrunning);
+					int null_val_ver = nullwin_search(mediator, pvman, info, initial_maxdepth, null_maxdepth, depth, beta, rootColour, useStaticPrunning);
 					
 					if (null_val_ver >= beta) {
 						return null_val_ver;
@@ -811,7 +812,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			int reduction = 2;
 			
-			nullwin_search(mediator, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta, rootColour, false);
+			nullwin_search(mediator, pvman, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta, rootColour, false);
 			
 			env.getTPT().lock();
 			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
@@ -1027,11 +1028,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					fullDepth = true;
 					
-					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
+					cur_eval = -nullwin_search(mediator, pvman, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
 					
 					if (singularMove && cur_eval > alpha_org && new_maxdepth == maxdepth) {
 						new_maxdepth += PLY;
-						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
+						cur_eval = -nullwin_search(mediator, pvman, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
 					}
 					
 				} else {
@@ -1049,13 +1050,13 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					boolean staticPrunning = !givesCheck;
 					
-					cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha_org, rootColour, staticPrunning);
+					cur_eval = -nullwin_search(mediator, pvman, info, initial_maxdepth, new_maxdepth - lmrReduction, depth + 1, -alpha_org, rootColour, staticPrunning);
 					
 					if (cur_eval > alpha_org && (lmrReduction > 0 || staticPrunning)) {
 						
 						fullDepth = true;
 						
-						cur_eval = -nullwin_search(mediator, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
+						cur_eval = -nullwin_search(mediator, pvman, info, initial_maxdepth, new_maxdepth, depth + 1, -alpha_org, rootColour, false);
 					}
 				}
 				
@@ -1139,7 +1140,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	private int pv_qsearch(ISearchMediator mediator, ISearchInfo info, int initial_maxdepth, int depth, int alpha_org, int beta, int rootColour) {
+	private int pv_qsearch(ISearchMediator mediator, PVManager pvman, ISearchInfo info, int initial_maxdepth, int depth, int alpha_org, int beta, int rootColour) {
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);	
@@ -1266,7 +1267,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getBitboard().makeMoveForward(cur_move);
 			
 			
-			int cur_eval = -pv_qsearch(mediator, info, initial_maxdepth, depth + 1, -beta, -alpha, rootColour);
+			int cur_eval = -pv_qsearch(mediator, pvman, info, initial_maxdepth, depth + 1, -beta, -alpha, rootColour);
 			
 			
 			env.getBitboard().makeMoveBackward(cur_move);

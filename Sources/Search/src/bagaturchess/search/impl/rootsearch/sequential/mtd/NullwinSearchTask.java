@@ -33,6 +33,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
+import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.utils.DEBUGSearch;
@@ -166,12 +167,14 @@ public class NullwinSearchTask implements Runnable {
 			/*int eval = searcher.pv_search(mediator, rootWin, info,
 					ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0, beta - 1, beta, 0, 0, prevPV, false, 0,
 					bitboard.getColourToMove(), 0, 0, false, 0, useMateDistancePrunning);*/
-			int eval = searcher.nullwin_search(mediator, info, ISearch.PLY * (maxdepth - 0), ISearch.PLY * (maxdepth - 0),
+			PVManager pvman = new PVManager(ISearch.MAX_DEPTH);
+			int eval = searcher.nullwin_search(mediator, pvman, info, ISearch.PLY * (maxdepth - 0), ISearch.PLY * (maxdepth - 0),
 					0, beta, false, 0, 0, prevPV, searcher.getEnv().getBitboard().getColourToMove(), 0, 0, false, 0, useMateDistancePrunning);
 			
 			if (eval >= beta) {
 			//if (eval >= distribution.getLowerBound() && eval <= distribution.getUpperBound()) {
-				eval = searcher.pv_search(mediator, null, info, ISearch.PLY * maxdepth, ISearch.PLY * maxdepth,
+				pvman = new PVManager(ISearch.MAX_DEPTH);
+				eval = searcher.pv_search(mediator, pvman, info, ISearch.PLY * maxdepth, ISearch.PLY * maxdepth,
 					0, beta - 1, beta, 0, 0, prevPV, false, 0, searcher.getEnv().getBitboard().getColourToMove(), 0, 0, false, 0, useMateDistancePrunning);
 			}
 			
@@ -198,7 +201,7 @@ public class NullwinSearchTask implements Runnable {
 					//eval is lower bound
 					
 					//int[] pv = getPVfromTPT();
-					int[] pv = PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
+					int[] pv = PVNode.convertPV(pvman.load(0), pv_buffer);
 					//pv = validatePV(pv);
 					info.setPV(pv);
 					if (info.getPV().length > 0) {
@@ -216,7 +219,7 @@ public class NullwinSearchTask implements Runnable {
 					//eval < beta <=> eval <= beta - 1 <=> eval <= alpha
 					
 					//int[] pv = getPVfromTPT();
-					int[] pv = PVNode.convertPV(searcher.getPvman().load(0), pv_buffer);
+					int[] pv = PVNode.convertPV(pvman.load(0), pv_buffer);
 					//pv = validatePV(pv);
 					info.setPV(pv);
 					if (info.getPV().length > 0) {
