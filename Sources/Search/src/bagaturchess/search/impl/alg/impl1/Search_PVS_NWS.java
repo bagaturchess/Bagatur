@@ -182,8 +182,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		depth += extensions(cb, moveGen, ply);
 		
-		/* mate-distance pruning */
-		/*if (EngineConstants.ENABLE_MATE_DISTANCE_PRUNING) {
+		if (EngineConstants.ENABLE_MATE_DISTANCE_PRUNING) {
 			if (ply > 0) {
 				alpha = Math.max(alpha, -SearchUtils.getMateVal(ply));
 				beta = Math.min(beta, +SearchUtils.getMateVal(ply + 1));
@@ -191,7 +190,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					return alpha;
 				}
 			}
-		}*/
+		}
 		
 		long ttValue = TTUtil.getTTValue(cb.zobristKey);
 		int score = TTUtil.getScore(ttValue);
