@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.search.api.internal.ISearch;
+import bagaturchess.search.impl.utils.SearchUtils;
 
 
 public class BetaGenerator implements IBetaGenerator {
@@ -202,7 +203,7 @@ public class BetaGenerator implements IBetaGenerator {
 	public String toString() {
 		String result = "";
 		result += "[" + lower_bound + ", " + upper_bound + "]	trend="
-			+ trend + ", lastVal=" + lastVal;		
+			+ trend + ", lastVal=" + lastVal + ", ismate=" + SearchUtils.isMateVal(lastVal);		
 		return result;
 	}
 	
