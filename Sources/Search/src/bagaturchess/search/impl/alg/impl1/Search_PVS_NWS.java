@@ -662,7 +662,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			while (moveGen.hasNext()) {
 				final int move = moveGen.next();
 	
-				//if (cb.checkingPieces == 0) {
+				if (cb.checkingPieces == 0) {
 					if (MoveUtil.isPromotion(move)) {
 						if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
 							continue;
@@ -671,7 +671,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
 						continue;
 					}
-				//}
+				}
 				
 				if (!cb.isLegal(move)) {
 					continue;
