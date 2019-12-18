@@ -277,7 +277,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (depth == 0) {
-			int qeval = calculateBestMove(evaluator, info, cb, moveGen, alpha, beta, ply);
+			int qeval = qsearch(evaluator, info, cb, moveGen, alpha, beta, ply);
 			node.bestmove = 0;
 			node.eval = qeval;
 			node.leaf = true;
@@ -328,7 +328,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < EvalConstants.SCORE_MATE_BOUND) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
-					score = calculateBestMove(evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply);
+					score = qsearch(evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply);
 					if (score + RAZORING_MARGIN[depth] <= alpha) {
 						node.bestmove = 0;
 						node.eval = score;
@@ -343,7 +343,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 					cb.doNullMove();
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
-					score = depth - reduction <= 0 ? -calculateBestMove(evaluator, info, cb, moveGen, -beta, -beta + 1, ply)
+					score = depth - reduction <= 0 ? -qsearch(evaluator, info, cb, moveGen, -beta, -beta + 1, ply)
 							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false);
 					cb.undoNullMove();
 					if (score >= beta) {
@@ -596,7 +596,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 
 
-	public int calculateBestMove(IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply) {
+	public int qsearch(IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply) {
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
@@ -690,7 +690,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					cb.changeSideToMove();
 				}
 				
-				final int score = -calculateBestMove(evaluator, info, cb, moveGen, -beta, -alpha, ply + 1);
+				final int score = -qsearch(evaluator, info, cb, moveGen, -beta, -alpha, ply + 1);
 	
 				cb.undoMove(move);
 	
