@@ -120,7 +120,7 @@ public class BetaGenerator implements IBetaGenerator {
 			
 			if (DUMP) System.out.println("WINDOWS will be used");
 			
-			int win = Math.abs(upper_bound - lower_bound) / betasCount;
+			int win = Math.abs(upper_bound - lower_bound) / (betasCount + 1);
 			if (win <= 0) {
 				throw new IllegalStateException("win=" + win + " (upper_bound - lower_bound)=" + (upper_bound - lower_bound) );
 			}

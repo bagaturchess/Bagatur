@@ -232,12 +232,7 @@ public class SearchManager {
 			
 			sentPV = true;
 			
-			if (eval == betasGen.getLowerBound()) {
-				betasGen.increaseLower(eval + mediator.getTrustWindow_MTD_Step());
-				mediator.dump("Search stability fix in increaseLowerBound with distribution: " + this + ". Lower bound moved to " + betasGen.getLowerBound());
-			} else {
-				betasGen.increaseLower(eval);
-			}
+			betasGen.increaseLower(eval);
 		}
 		
 		boolean isLast = isLast();
@@ -274,12 +269,7 @@ public class SearchManager {
 			
 			sentPV = true;
 			
-			if (eval == betasGen.getUpperBound()) {
-				betasGen.decreaseUpper(eval - mediator.getTrustWindow_MTD_Step());
-				mediator.dump("Search stability fix in decreaseUpperBound with distribution: " + this + ". Upper bound moved to " + betasGen.getUpperBound());
-			} else {
-				betasGen.decreaseUpper(eval);
-			}
+			betasGen.decreaseUpper(eval);
 		}
 		
 		boolean isLast = isLast();
