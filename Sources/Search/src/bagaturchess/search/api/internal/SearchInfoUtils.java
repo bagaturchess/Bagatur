@@ -1,8 +1,8 @@
 package bagaturchess.search.api.internal;
 
+
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.bitboard.impl1.internal.MoveWrapper;
+
 
 public class SearchInfoUtils {
 	
