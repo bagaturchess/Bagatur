@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IEvaluator;
@@ -147,7 +147,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 			initialValue = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, getBitboardForSetup().getColourToMove());
 		}
 		
-		final int final_initialValue = initialValue;
+		//final int final_initialValue = initialValue;
 		
 		if (!dont_wrap_mediator) {
 			//Original mediator should be an instance of UCISearchMediatorImpl_Base
@@ -170,8 +170,12 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 					
 					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_Classic before loop");
 					
-					int prevEval = final_initialValue;
-					int ASPIRATION_WINDOW = 1;
+					int ASPIRATION_WINDOW = 20;
+					
+					int score;
+					int delta = ASPIRATION_WINDOW;
+					int alpha = ISearch.MIN;
+					int beta = ISearch.MAX;
 					
 					for (int maxdepth = startIteration; maxdepth <= maxIterations; maxdepth++) {
 						
@@ -182,47 +186,57 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 						
 						try {
 							
-							int eval = prevEval;
-							int window = ASPIRATION_WINDOW;
-							int multiplier = 2;
-							int alpha;
-							int beta;
+							PVManager pvman = null;
 							
-							PVManager pvman = new PVManager(ISearch.MAX_DEPTH);
+							while (true) {
+								
+								pvman = new PVManager(ISearch.MAX_DEPTH);
+								
+								score = searcher.pv_search(final_mediator,
+									pvman, info,
+									ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
+									alpha, beta,
+									0, 0, final_prevPV,
+									false, 0, searcher.getEnv().getBitboard().getColourToMove(),
+									0, 0, false, 0, !go.isPonder());
+								
+								if (score <= alpha && alpha != ISearch.MIN) {
+									if (score < -1000) {
+										alpha = ISearch.MIN;
+										beta = ISearch.MAX;
+									} else {
+										alpha = Math.max(alpha - delta, ISearch.MIN);
+									}
+									delta *= 2;
+								} else if (score >= beta && beta != ISearch.MAX) {
+									if (score > 1000) {
+										alpha = ISearch.MIN;
+										beta = ISearch.MAX;
+									} else {
+										beta = Math.min(beta + delta, ISearch.MAX);
+									}
+									delta *= 2;
+								} else {
+									if (Math.abs(score) > 1000) {
+										alpha = ISearch.MIN;
+										beta = ISearch.MAX;
+									} else {
+										delta = (delta + ASPIRATION_WINDOW) / 2;
+										alpha = Math.max(score - delta, ISearch.MIN);
+										beta = Math.min(score + delta, ISearch.MAX);
+									}
+									break;
+								};
+								
+							}
 							
-							do {
-								
-								alpha = eval - window;
-								beta = eval + window;
-								
-								/*eval = searcher.nullwin_search(final_mediator, info,
-										ISearch.PLY * maxdepth, ISearch.PLY * maxdepth,	0,
-										eval,
-										false, 0, 0, final_prevPV, searcher.getEnv().getBitboard().getColourToMove(),
-										0, 0, false, 0, !go.isPonder());
-								
-								if (eval > alpha && eval < beta) {*/
-									eval = searcher.pv_search(final_mediator,
-										null, info,
-										ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
-										alpha, beta,
-										0, 0, final_prevPV,
-										false, 0, searcher.getEnv().getBitboard().getColourToMove(),
-										0, 0, false, 0, !go.isPonder());
-								//}
-								
-								window *= multiplier;
-								
-							} while (eval <= alpha || eval >= beta);
-							
-							prevEval = eval;
 							
 							List<Integer> pv_buffer = new ArrayList<Integer>();
 							info.setPV(PVNode.convertPV(pvman.load(0), pv_buffer));
 							if (info.getPV().length > 0) {
 								info.setBestMove(info.getPV()[0]);
 							}
-							info.setEval(eval);
+							info.setEval(score);
 							
 							final_mediator.changedMajor(info);
 							
