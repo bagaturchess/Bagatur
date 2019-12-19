@@ -22,8 +22,8 @@
  */
 package bagaturchess.search.impl.utils;
 
-import bagaturchess.search.api.internal.ISearch;
 
+import bagaturchess.search.api.internal.ISearch;
 
 
 public class SearchUtils {
