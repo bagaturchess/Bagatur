@@ -174,8 +174,8 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = new Board("3rk3/8/8/8/4K3/4Q3/8/8 w - - 0 1", null, cfg.getBoardConfig());//Mate in 34 with e3c5
 		//IBitBoard bitboard = new Board("Qb2r1k1/1p1q2pp/2p5/4p2n/1PPPPpb1/2B2N2/4NPP1/R5K1 b - - 0 28", null, cfg.getBoardConfig());//g4f3 is the correct move
 		
-		IBitBoard bitboard = new Board("3k4/4r3/3K4/1Q6/8/8/8/8 b - - 15 8", null, cfg.getBoardConfig());//Bug: doesn't see mate in 4
-		//IBitBoard bitboard = new Board("3k4/4r3/2K5/6Q1/8/8/8/8 b - - 15 8", null, cfg.getBoardConfig());//Bug: doesn't see mate in 2
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("3k4/4r3/3K4/1Q6/8/8/8/8 b - - 15 8", cfg.getBoardConfig());//Bug: doesn't see mate in 4
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("3k4/4r3/2K5/6Q1/8/8/8/8 b - - 15 8", cfg.getBoardConfig());//Bug: doesn't see mate in 2
 		
 		//BoardUtils.playGameUCI(bitboard, "e2e4 d7d5 e4d5 d8d5 b1c3 d5e6 f1e2 e6g6 g1f3 g6g2 h1g1 g2h3 d2d4 h7h5 e2c4 e7e6 g1g5 e6e5 g5g3 h3f5 f3e5 f8b4 e5f7 h8h7 f7g5 h7h8 d1e2 g8e7 c4f7 e8d8 f7h5 g7g6 g3f3 f5a5 e2e4 b8c6 g5f7 d8e8 h5g6 h8g8 f7e5 g8g6 e5g6 c8f5 f3f5 a5f5 e4f5 e7f5 c1e3 c6d4 e1c1 f5e3 f2e3 d4f3 c3d5 e8f7 g6f4 b4d6 d5c7 a8c8 d1d6");
 		
@@ -184,7 +184,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = new Board("r4rk1/pp3ppp/2pq4/3p4/4nPb1/2BBP3/PPP3PP/R3QRK1 w - - 2 15", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2", null, cfg.getBoardConfig());
-		//IBitBoard bitboard  = BoardUtils.createBoard_WithPawnsCache("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - 0 0 bm Qxf7+ Rxf7+; id WAC.235", cfg.getBoardConfig());
+		IBitBoard bitboard  = BoardUtils.createBoard_WithPawnsCache("5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - 0 0 bm Qxf7+ Rxf7+; id WAC.235", cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("r1bqk2r/pp1pbppp/2n1pn2/2p5/4P3/5NP1/PPPPQPBP/RNB2RK1 b kq - 6 6  ", null, cfg.getBoardConfig());
 		//IBitBoard bitboard  = new Board("7k/6r1/8/8/8/8/1Q6/K7 w - -", null, cfg.getBoardConfig()); //Queen and King vs. Rook and King
 		//IBitBoard bitboard  = new Board("k7/1q6/8/8/8/7R/8/6K1 b - - ", null, cfg.getBoardConfig());
@@ -321,9 +321,6 @@ public class MTDSchedulerMain {
 		1nbq1r1k/3rbp1p/p1p1pp1Q/1p6/P1pPN3/5NP1/1P2PPBP/R4RK1 w - - bm Nfg5; id "WAC.293";
 		3r1rk1/p3qp1p/2bb2p1/2p5/3P4/1P6/PBQN1PPP/2R2RK1 b - - bm Bxg2 Bxh2+; id "WAC.297";
 		 */
-		
-		//bitboard.makeNullMoveForward();
-		//bitboard  = new Board(bitboard.toEPD());
 		
 		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2");
 		//IBitBoard bitboard  = new Board("r7/2p1Qpk1/2p1p1p1/4P2p/rpq5/3R3P/2P2PP1/3R2K1 w - - 6 48"); 
@@ -521,81 +518,4 @@ public class MTDSchedulerMain {
 		//multipvMediator.ready();
 				
 	}
-	
-	/*public static void test() {
-		IBitBoard bitboard  = new Board("rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -");
-		//IBitBoard bitboard  = new Board();
-		//IBitBoard bitboard  = new Board("8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2");
-		System.out.println(bitboard);
-		//MTDSequentialSearch search = new MTDSequentialSearch(new EvaluatorLearningFactory());
-		
-
-		//IBitBoard new_bitboard = new Board(bitboard.toEPD());
-		//bitboard.setAttacksSupport(EngineConfig.getSingleton().getFieldsStatesSupport(), EngineConfig.getSingleton().getFieldsStatesSupport());
-		
-		Search search = new Search(new SearchEnv(bitboard, new SharedData(new EvaluatorLearningFactory())));
-
-		int rootColour = bitboard.getColourToMove();
-		bitboard.mark();
-		
-		int MAXDEPTH = 15;
-		for (int maxdepth = 4; maxdepth<MAXDEPTH; maxdepth+=2) {
-			
-			System.out.println("\r\nMAXDEPTH: " + maxdepth);
-			
-			MoveList list = new BaseMoveList();
-			bitboard.genAllMoves(list);
-	
-			int lower = Search.MIN;
-			int cur_move = 0;
-			while ((cur_move = list.next()) != 0) {
-				bitboard.makeMoveForward(cur_move);
-				int result = singleSequence(bitboard, search, 2 * maxdepth, maxdepth / 2, rootColour, lower);
-				if (result > lower) {
-					lower = result;
-				}
-				//bitboard.makeMoveBackward(cur_move);
-				bitboard.reset();
-				System.out.println("" + MoveInt.moveToString(cur_move) + "	" + result);
-			}
-		}
-	}
-
-	private static int singleSequence(IBitBoard bitboard, Search search, int iteration, int maxdepth, int rootColour, int lower) {
-		int result = 0;
-		
-		int counter = iteration;
-		while (counter > 0) {
-			
-			SearchMediator mediator = new MediatorDummper(5000000, false);
-			search.search(mediator, maxdepth, lower);
-			ISearchInfo info = mediator.getLastInfo();
-			
-			result = info.getEval(); 
-			if (rootColour != bitboard.getColourToMove()) {
-				result *= -1;
-			}
-			//System.out.println("result=" + result);
-			
-			int[] pv = info.getPV();
-			bitboard.makeMoveForward(pv[0]);
-			//if (pv.length >= 2) bitboard.makeMoveForward(pv[1]);
-			if (bitboard.isInCheck()) {
-				if (!bitboard.hasMoveInCheck()) {
-					//result = 
-					//result = -1234567;
-					break;
-				}
-			} else {
-				if (!bitboard.hasMoveInNonCheck()) {
-					//result = -1234567;
-					break;
-				}
-			}
-			
-			counter--;
-		}
-		
-		return result;
-	}*/
 }
