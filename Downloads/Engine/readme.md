@@ -16,13 +16,19 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 # Revision History
 
+Version 1.9 (19 December 2019)
+  * New search algorithm, based on the Chess22k
+  * Search improvements: Use transposition table in quiescence search
+  * Search improvements: Disable futility pruning in quiescence search (for positions in check)
+  * Search improvements: New beta window generation in MTD(f) implementation 
+  
 Version 1.8a (20 September 2019)
   * Enable Syzygy tablebases for SMP version
   * Corrections in PV search and collection of the best line
   * Now LMR has new formula
 
 Version 1.8 (30 July 2019)
-  * New evaluation function
+  * New evaluation function, based on the Stockfish
   * Time control optimization for SMP version - don't use too much time if evaluation changes 
 
 Version 1.7b (2 July 2019)
