@@ -231,8 +231,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 							}
 							
 							
-							List<Integer> pv_buffer = new ArrayList<Integer>();
-							info.setPV(PVNode.convertPV(pvman.load(0), pv_buffer));
+							info.setPV(PVNode.convertPV(pvman.load(0), new ArrayList<Integer>()));
 							if (info.getPV().length > 0) {
 								info.setBestMove(info.getPV()[0]);
 							}
