@@ -109,12 +109,12 @@ public class Tactics {
 			throw new IllegalStateException();
 		}*/
 		
-		if (!MoveInt.isCapture(opmove) || MoveInt.isEnpassant(opmove)) {
+		if (!bitboard.getMoveOps().isCapture(opmove) || bitboard.getMoveOps().isEnpassant(opmove)) {
 			return true;
 		}
 		
 		//if (MoveInt.isCapture(opmove) && !MoveInt.isEnpassant(opmove)) {
-		int toFieldID = MoveInt.getToFieldID(opmove);
+		int toFieldID = bitboard.getMoveOps().getToFieldID(opmove);
 		
 		myMoves.reserved_clear();
 		bitboard.genAllMoves_ByFigureID(toFieldID, 0L, myMoves);
@@ -147,7 +147,7 @@ public class Tactics {
 			
 			for (int i=0; i<size; i++) {
 				int cur_my_move = moves[i];
-				if (MoveInt.isCapture(cur_my_move)) {
+				if (bitboard.getMoveOps().isCapture(cur_my_move)) {
 					int cur_move_see = bitboard.getSee().evalExchange(cur_my_move);
 					if (cur_move_see >= 0) {
 						myWinMoves[myWinMovesCount] = cur_my_move;
@@ -170,7 +170,7 @@ public class Tactics {
 			
 			for (int i=0; i<opsize; i++) {
 				int cur_op_move = opmoves[i];
-				if (MoveInt.isCapture(cur_op_move)) {
+				if (bitboard.getMoveOps().isCapture(cur_op_move)) {
 					int cur_move_see = bitboard.getSee().evalExchange(cur_op_move);
 					if (cur_move_see >= 0) {
 						opWinMoves[opWinMovesCount] = cur_op_move;
