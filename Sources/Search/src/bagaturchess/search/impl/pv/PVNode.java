@@ -59,10 +59,10 @@ public class PVNode {
 		PVNode cur = res;
 		while(cur != null && cur.bestmove != 0) {
 			result.add(cur.bestmove);
-			cur = cur.child;
-			if (cur != null && cur.leaf) {
+			if (cur.leaf) {
 				break;
 			}
+			cur = cur.child;
 		}
 	}
 }
