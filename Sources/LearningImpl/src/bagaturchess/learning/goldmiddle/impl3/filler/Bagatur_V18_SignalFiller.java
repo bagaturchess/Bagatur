@@ -53,7 +53,7 @@ public class Bagatur_V18_SignalFiller extends Evaluator implements ISignalFiller
 	
 	public Bagatur_V18_SignalFiller(IBitBoard bitboard) {
 		
-		super(new BoardProxy_ReversedBBs(bitboard));
+		super(bitboard);
 		
 		w_knights = bitboard.getPiecesLists().getPieces(Constants.PID_W_KNIGHT);
 		b_knights = bitboard.getPiecesLists().getPieces(Constants.PID_B_KNIGHT);
