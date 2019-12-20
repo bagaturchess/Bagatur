@@ -49,8 +49,6 @@ import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
-import bagaturchess.search.impl.tpt.TPTEntry;
-import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
@@ -586,7 +584,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			TTUtil.addValue(cb.zobristKey, bestScore, ply, depth, flag, bestMove);
 		}
 		
-		//validatePV(node);
+		//validatePV(node, depth, isPv);
 		
 		return bestScore;
 	}
@@ -784,14 +782,17 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private Stack<Integer> stack = new Stack<Integer>();
 	
-	private void validatePV(PVNode node) {
+	private void validatePV(PVNode node, int expectedDepth, boolean isPv) {
 		
 		if (node.leaf || node.bestmove == 0) {
 			throw new IllegalStateException();
 		}
 		
+		int actualDepth = 0;
 		PVNode cur = node;
-		while(cur != null && !cur.leaf) {
+		while(cur != null && cur.bestmove != 0) {
+			
+			actualDepth++;
 			
 			if (env.getBitboard().isPossible(cur.bestmove)) {
 				env.getBitboard().makeMoveForward(cur.bestmove);
@@ -800,10 +801,28 @@ public class Search_PVS_NWS extends SearchImpl {
 				throw new IllegalStateException("not valid move " + env.getBitboard().getMoveOps().moveToString(cur.bestmove));
 			}
 			
-			cur = cur.child;
-			
-			if (cur != null && cur.leaf) {
+			if (cur.leaf) {
 				break;
+			}
+			
+			cur = cur.child;
+		}
+		
+		if (actualDepth < expectedDepth) {
+			if (isPv) {
+				if (!isDraw()) {
+					if (env.getBitboard().isInCheck()) {
+						if (env.getBitboard().hasMoveInCheck()) {
+							//throw new IllegalStateException("actualDepth=" + actualDepth + ", expectedDepth=" + expectedDepth);
+							System.out.println("NOT ok in check");	
+						}
+					} else {
+						if (env.getBitboard().hasMoveInNonCheck()) {
+							//throw new IllegalStateException("actualDepth=" + actualDepth + ", expectedDepth=" + expectedDepth);
+							System.out.println("NOT ok in noncheck");
+						}
+					}
+				}
 			}
 		}
 		
