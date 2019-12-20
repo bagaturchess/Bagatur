@@ -49,6 +49,8 @@ import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
+import bagaturchess.search.impl.tpt.TPTEntry;
+import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
@@ -194,29 +196,23 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		long ttValue = TTUtil.getTTValue(cb.zobristKey);
 		int score = TTUtil.getScore(ttValue);
-		if (!isPv && ttValue != 0) {
-			if (!EngineConstants.TEST_TT_VALUES) {
+		if (ttValue != 0) {
+			if (!isPv /*&& ply > 0*/) {
 
 				if (TTUtil.getDepth(ttValue) >= depth) {
 					switch (TTUtil.getFlag(ttValue)) {
 					case TTUtil.FLAG_EXACT:
-						node.bestmove = TTUtil.getMove(ttValue);
-						node.eval = score;
-						node.leaf = true;
+						extractFromTT(ply, node, ttValue, info, isPv);
 						return node.eval;
 					case TTUtil.FLAG_LOWER:
 						if (score >= beta) {
-							node.bestmove = TTUtil.getMove(ttValue);
-							node.eval = score;
-							node.leaf = true;
+							extractFromTT(ply, node, ttValue, info, isPv);
 							return node.eval;
 						}
 						break;
 					case TTUtil.FLAG_UPPER:
 						if (score <= alpha) {
-							node.bestmove = TTUtil.getMove(ttValue);
-							node.eval = score;
-							node.leaf = true;
+							extractFromTT(ply, node, ttValue, info, isPv);
 							return node.eval;
 						}
 						break;
@@ -737,6 +733,52 @@ public class Search_PVS_NWS extends SearchImpl {
 		int eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
 		EvalUtil.addValue(env.getBitboard().getHashKey(), eval);
 		return eval;
+	}
+	
+	
+	private boolean extractFromTT(int ply, PVNode result, long currentTTValue, ISearchInfo info, boolean isPv) {
+		
+		if (currentTTValue == 0) {
+			throw new IllegalStateException("currentTTValue == 0");
+		}
+		
+		result.leaf = true;
+		
+		if (ply > 0 && isDraw()) {
+			result.eval = EvalConstants.SCORE_DRAW;
+			result.bestmove = 0;
+			return true;
+		}
+
+		if (info.getSelDepth() < ply) {
+			info.setSelDepth(ply);
+		}
+		
+		result.eval = TTUtil.getScore(currentTTValue);
+		result.bestmove = TTUtil.getMove(currentTTValue);
+		
+		boolean draw = false;
+		
+		if (isPv) {
+			
+			env.getBitboard().makeMoveForward(result.bestmove);
+			
+			long hashkey = env.getBitboard().getHashKey();
+			long nextTTValue = TTUtil.getTTValue(hashkey);
+			
+			if (nextTTValue != 0) {
+				draw = extractFromTT(ply + 1, result.child, nextTTValue, info, isPv);
+				if (draw) {
+					result.eval = EvalConstants.SCORE_DRAW;
+				} else {
+					result.leaf = false;
+				}
+			}
+			
+			env.getBitboard().makeMoveBackward(result.bestmove);
+		}
+		
+		return draw;
 	}
 	
 	
