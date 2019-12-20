@@ -922,7 +922,7 @@ public class BoardImpl implements IBitBoard {
 		
 		@Override
 		public int getFigureType(int move) {
-			return  MoveUtil.getSourcePieceIndex(move);
+			return MoveUtil.getSourcePieceIndex(move);
 		}
 		
 		
@@ -1026,6 +1026,12 @@ public class BoardImpl implements IBitBoard {
 				return 0;
 			}
 			return MoveUtil.getMoveType(move);
+		}
+		
+		
+		@Override
+		public int getCapturedFigureType(int cur_move) {
+			return MoveUtil.getAttackedPieceIndex(cur_move);
 		}
 		
 		

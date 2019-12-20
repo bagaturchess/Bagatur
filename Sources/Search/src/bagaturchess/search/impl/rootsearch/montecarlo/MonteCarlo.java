@@ -175,7 +175,7 @@ public class MonteCarlo {
 		while ((cur_move = movesBuffer.next()) != 0) {
 			
 			int seeMove = bitboard.getSee().evalExchange(cur_move);
-			int seeField = -bitboard.getSee().seeField(MoveInt.getFromFieldID(cur_move));
+			int seeField = -bitboard.getSee().seeField(bitboard.getMoveOps().getFromFieldID(cur_move));
 			
 			/*if (seeField != 0) {
 				System.out.println(MoveInt.moveToString(cur_move));
@@ -214,8 +214,8 @@ public class MonteCarlo {
 						|| status == IGameStatus.NO_SUFFICIENT_BLACK_MATERIAL) {
 					
 					cur_eval = (int) -evaluator.fullEval(0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, bitboard.getColourToMove());
-					if (MoveInt.isCapture(cur_move)) {
-						cur_eval -= bitboard.getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move));
+					if (bitboard.getMoveOps().isCapture(cur_move)) {
+						cur_eval -= bitboard.getBaseEvaluation().getMaterial(bitboard.getMoveOps().getCapturedFigureType(cur_move));
 					}
 					cur_eval += seeMove;
 					cur_eval += seeField / 10;
@@ -226,8 +226,8 @@ public class MonteCarlo {
 			} else {
 				
 				cur_eval = (int) -evaluator.fullEval(0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, bitboard.getColourToMove());
-				if (MoveInt.isCapture(cur_move)) {
-					cur_eval -= bitboard.getBaseEvaluation().getMaterial(MoveInt.getCapturedFigureType(cur_move));
+				if (bitboard.getMoveOps().isCapture(cur_move)) {
+					cur_eval -= bitboard.getBaseEvaluation().getMaterial(bitboard.getMoveOps().getCapturedFigureType(cur_move));
 				}
 				cur_eval += seeMove;
 				cur_eval += seeField / 10;

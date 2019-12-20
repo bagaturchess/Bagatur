@@ -166,7 +166,7 @@ public class Simulate {
 				}
 				
 				if (board.getMoveOps().isCapture(move)
-						&& MoveInt.getCapturedFigureType(move) == Constants.TYPE_KING
+						&& board.getMoveOps().getCapturedFigureType(move) == Constants.TYPE_KING
 					) {
 					System.out.println("KING CAPTURE");
 					continue;

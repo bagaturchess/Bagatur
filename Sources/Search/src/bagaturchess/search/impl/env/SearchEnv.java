@@ -27,7 +27,6 @@ package bagaturchess.search.impl.env;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
-import bagaturchess.egtb.gaviota.GTBProbing;
 import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.opening.api.OpeningBook;
@@ -36,7 +35,6 @@ import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.ISearchMoveListFactory;
 import bagaturchess.search.impl.evalcache.IEvalCache;
-import bagaturchess.search.impl.history.HistoryTable_FromTo;
 import bagaturchess.search.impl.history.HistoryTable_PieceTo;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.movelists.OrderingStatistics;

@@ -113,6 +113,12 @@ public class MoveOpsImpl implements IMoveOps {
 	
 	
 	@Override
+	public int getCapturedFigureType(int cur_move) {
+		return MoveInt.getCapturedFigureType(cur_move);
+	}
+	
+	
+	@Override
 	public String moveToString(int move) {
 		StringBuilder result = new StringBuilder();
 		moveToString(move, result);
