@@ -676,7 +676,7 @@ public class Search_PVS_NWS extends SearchImpl {
             // Step 16. Reduced depth search (LMR). If the move fails high it will be
             // re-searched at full depth.
 	        int value = MIN;
-        	boolean doFullDepthSearch;
+        	boolean doFullDepthSearch = !isPv || moveCount > 1;
             if (    depth >= 3
                 &&  moveCount > 1
                 && (!captureOrPromotion || moveCountPruning))
@@ -733,9 +733,7 @@ public class Search_PVS_NWS extends SearchImpl {
 
                 doFullDepthSearch = (value > alpha && d != newDepth);
             }
-            else
-                doFullDepthSearch = !isPv || moveCount > 1;
-
+            
             // Step 17. Full depth search when LMR is skipped or fails high
             if (doFullDepthSearch)
             	value = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, newDepth, -alpha - 1, -alpha, false, !cutNode);
@@ -753,6 +751,10 @@ public class Search_PVS_NWS extends SearchImpl {
                 //value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false);
             }
 
+            if (value == MIN) {
+            	throw new IllegalStateException();
+            }
+            
             // Step 18. Undo move
             cb.undoMove(move);
             
