@@ -76,9 +76,10 @@ public class MovePicker implements IMoveList {
 	int recaptureSquare;
 	int threshold;
 	long[] moves_quiet = new long[256];
-	long[] moves_capture_promotion = new long[256];
-	int cur_quiet, cur_capture_promotion;
-	int max_quiet, max_capture_promotion;
+	long[] moves_capture_promotion_good = new long[256];
+	long[] moves_capture_promotion_bad = new long[256];
+	int cur_quiet, cur_capture_promotion_good, cur_capture_promotion_bad;
+	int max_quiet, max_capture_promotion_good, max_capture_promotion_bad;
 	
 	
 	// MovePicker constructor for ProbCut: we generate captures with SEE greater than or equal to the given threshold.
@@ -147,8 +148,11 @@ public class MovePicker implements IMoveList {
 			  case STAGE_PROBCUT_INIT:
 			  case STAGE_QCAPTURE_INIT:
 			      
-				  cur_capture_promotion = 0;
-			      max_capture_promotion = 0;
+				  cur_capture_promotion_good = 0;
+			      max_capture_promotion_good = 0;
+			      
+				  cur_capture_promotion_bad = 0;
+			      max_capture_promotion_bad = 0;
 			      
 				  cur_quiet = 0;
 			      max_quiet = 0;
@@ -156,20 +160,23 @@ public class MovePicker implements IMoveList {
 			      if (board.isInCheck()) {
 			    	  board.genKingEscapes(this);
 			      } else {
-			    	  board.genAllMoves(this);
+			    	  board.genCapturePromotionMoves(this);
 			      }
 			      
+			      Utils.randomize(moves_capture_promotion_good, cur_capture_promotion_good, max_capture_promotion_good);
+				  Sorting.bubbleSort(cur_capture_promotion_good, max_capture_promotion_good, moves_capture_promotion_good);
+				  
 			      ++stage;
 			      //break top;
 	
 			  case STAGE_GOOD_CAPTURE:
 				  
-				  for (int i=cur_capture_promotion; i < max_capture_promotion; i++) {
-					  if (board.getSEEScore((int) moves_capture_promotion[i]) >= threshold) {
-						  cur_capture_promotion++;
-						  return (int) moves_capture_promotion[i];
+				  for (int i=cur_capture_promotion_good; i < max_capture_promotion_good; i++) {
+					  if (board.getSEEScore((int) moves_capture_promotion_good[i]) >= threshold) {
+						  cur_capture_promotion_good++;
+						  return (int) moves_capture_promotion_good[i];
 					  }
-					  cur_capture_promotion++;
+					  cur_capture_promotion_good++;
 				  }
 				  
 				  ++stage;
@@ -195,6 +202,12 @@ public class MovePicker implements IMoveList {
 	
 			  case STAGE_QUIET_INIT:
 				  
+			      if (board.isInCheck()) {
+			    	  //Do nothing
+			      } else {
+			    	  board.genAllMoves(this);
+			      }
+			      
 			      Utils.randomize(moves_quiet, cur_quiet, max_quiet);
 				  Sorting.bubbleSort(cur_quiet, max_quiet, moves_quiet);
 				  
@@ -208,18 +221,19 @@ public class MovePicker implements IMoveList {
 					  return (int) moves_quiet[i];
 				  }
 				  
-				  cur_capture_promotion = 0;
+			      Utils.randomize(moves_capture_promotion_bad, cur_capture_promotion_bad, max_capture_promotion_bad);
+				  Sorting.bubbleSort(cur_capture_promotion_bad, max_capture_promotion_bad, moves_capture_promotion_bad);
 				  
 			      ++stage;
 	
 			  case STAGE_BAD_CAPTURE:
 				  
-				  for (int i = cur_capture_promotion; i < max_capture_promotion; i++) {
-					  if (board.getSEEScore((int) moves_capture_promotion[i]) < threshold) {
-						  cur_capture_promotion++;
-						  return (int) moves_capture_promotion[i];
+				  for (int i = cur_capture_promotion_bad; i < cur_capture_promotion_bad; i++) {
+					  if (board.getSEEScore((int) moves_capture_promotion_bad[i]) < threshold) {
+						  cur_capture_promotion_bad++;
+						  return (int) moves_capture_promotion_bad[i];
 					  }
-					  cur_capture_promotion++;
+					  cur_capture_promotion_bad++;
 				  }
 				  
 				  ++stage;
@@ -273,17 +287,33 @@ public class MovePicker implements IMoveList {
 		long move = MoveInt.addOrderingValue(move_org, ordval);
 		
 		if (board.getMoveOps().isCaptureOrPromotion(move_org)) {
-			if (max_capture_promotion == 0) {
-				moves_capture_promotion[0] = move;
-			} else {
-				if (move > moves_capture_promotion[0]) {
-					moves_capture_promotion[max_capture_promotion] = moves_capture_promotion[0];
-					moves_capture_promotion[0] = move;
+			
+			if (board.getSEEScore(move_org) >= 0) {
+				if (max_capture_promotion_good == 0) {
+					moves_capture_promotion_good[0] = move;
 				} else {
-					moves_capture_promotion[max_capture_promotion] = move;
+					if (move > moves_capture_promotion_good[0]) {
+						moves_capture_promotion_good[max_capture_promotion_good] = moves_capture_promotion_good[0];
+						moves_capture_promotion_good[0] = move;
+					} else {
+						moves_capture_promotion_good[max_capture_promotion_good] = move;
+					}
 				}
+				max_capture_promotion_good++;	
+			} else {
+				if (max_capture_promotion_bad == 0) {
+					moves_capture_promotion_bad[0] = move;
+				} else {
+					if (move > moves_capture_promotion_bad[0]) {
+						moves_capture_promotion_bad[max_capture_promotion_bad] = moves_capture_promotion_bad[0];
+						moves_capture_promotion_bad[0] = move;
+					} else {
+						moves_capture_promotion_bad[max_capture_promotion_bad] = move;
+					}
+				}
+				max_capture_promotion_bad++;
 			}
-			max_capture_promotion++;	
+
 		} else {
 			if (max_quiet == 0) {
 				moves_quiet[0] = move;
