@@ -382,7 +382,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				break;
 			case PHASE_ATTACKING:
 				moveGen.generateAttacks(cb);
-				moveGen.setMVVLVAScores();
+				moveGen.setMVVLVAScores(cb);
 				moveGen.sort();
 				break;
 			case PHASE_KILLER_1:
@@ -647,7 +647,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					break;
 				case PHASE_ATTACKING:
 					moveGen.generateAttacks(cb);
-					moveGen.setMVVLVAScores();
+					moveGen.setMVVLVAScores(cb);
 					moveGen.sort();
 					break;
 			}
