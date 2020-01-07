@@ -56,11 +56,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private static final int PHASE_TT = 0;
-	private static final int PHASE_ATTACKING = 1;
+	private static final int PHASE_ATTACKING_GOOD = 1;
 	private static final int PHASE_KILLER_1 = 2;
 	private static final int PHASE_KILLER_2 = 3;
 	private static final int PHASE_COUNTER = 4;
 	private static final int PHASE_QUIET = 5;
+	private static final int PHASE_ATTACKING_BAD = 6;
 	
 	private static final int[] STATIC_NULLMOVE_MARGIN = { 0, 60, 130, 210, 300, 400, 510 };
 	private static final int[] RAZORING_MARGIN = { 0, 240, 280, 300 };
@@ -165,6 +166,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.eval = ISearch.MIN;
 		node.leaf = true;
 		
+		boolean rootNode = ply == 0 || pvman.isConnectedToTheRoot(ply - 1);
 		
 		if (ply > 0 && isDraw()) {
 			node.eval = EvalConstants.SCORE_DRAW;
@@ -364,8 +366,10 @@ public class Search_PVS_NWS extends SearchImpl {
 
 		moveGen.startPly();
 		int phase = PHASE_TT;
-		while (phase <= PHASE_QUIET) {
+		while (phase <= PHASE_ATTACKING_BAD) {
+			
 			switch (phase) {
+			
 			case PHASE_TT:
 				if (ttValue == 0) {
 					if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
@@ -380,7 +384,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.addMove(ttMove);
 				}
 				break;
-			case PHASE_ATTACKING:
+			case PHASE_ATTACKING_GOOD:
 				moveGen.generateAttacks(cb);
 				moveGen.setMVVLVAScores(cb);
 				moveGen.sort();
@@ -414,8 +418,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				moveGen.generateMoves(cb);
 				moveGen.setHHScores(cb.colorToMove);
 				moveGen.sort();
+				break;
+			case PHASE_ATTACKING_BAD:
+				moveGen.generateAttacks(cb);
+				moveGen.setMVVLVAScores(cb);
+				moveGen.sort();
 			}
-
+		
 			while (moveGen.hasNext()) {
 				final int move = moveGen.next();
 
@@ -440,11 +449,23 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				if (phase == PHASE_ATTACKING_GOOD) {
+					if (SEEUtil.getSeeCaptureScore(cb, move) < 0) {
+						continue;
+					}
+				}
+				
+				if (phase == PHASE_ATTACKING_BAD) {
+					if (SEEUtil.getSeeCaptureScore(cb, move) >= 0) {
+						continue;
+					}
+				}
+				
 				if (phase == PHASE_QUIET) {
 					if (move == ttMove || move == killer1Move || move == killer2Move || move == counterMove || !cb.isLegal(move)) {
 						continue;
 					}
-				} else if (phase == PHASE_ATTACKING) {
+				} else if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
 					if (move == ttMove || !cb.isLegal(move)) {
 						continue;
 					}
@@ -468,7 +489,7 @@ public class Search_PVS_NWS extends SearchImpl {
 								}
 							}
 						}
-					} else if (EngineConstants.ENABLE_SEE_PRUNING && depth <= 6 && phase == PHASE_ATTACKING
+					} else if (EngineConstants.ENABLE_SEE_PRUNING && depth <= 6 && phase == PHASE_ATTACKING_BAD
 							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth) {
 						continue;
 					}
@@ -519,7 +540,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				cb.undoMove(move);
-
+				
 				if (score > bestScore) {
 					
 					bestScore = score;
@@ -536,10 +557,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					alpha = Math.max(alpha, score);
 					if (alpha >= beta) {
 						
-						if (MoveUtil.isQuiet(move) && cb.checkingPieces == 0) {
-							moveGen.addCounterMove(cb.colorToMove, parentMove, move);
-							moveGen.addKillerMove(move, ply);
-							moveGen.addHHValue(cb.colorToMove, move, depth);
+						if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {
+							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
+							moveGen.addKillerMove(bestMove, ply);
+							moveGen.addHHValue(cb.colorToMove, bestMove, depth);
 						}
 
 						phase += 10;
@@ -635,7 +656,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		moveGen.startPly();
 		
 		int phase = PHASE_TT;
-		while (phase <= PHASE_ATTACKING) {
+		while (phase <= PHASE_ATTACKING_GOOD) {
 			switch (phase) {
 				case PHASE_TT:
 					if (ttValue != 0) {
@@ -645,7 +666,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 					}
 					break;
-				case PHASE_ATTACKING:
+				case PHASE_ATTACKING_GOOD:
 					moveGen.generateAttacks(cb);
 					moveGen.setMVVLVAScores(cb);
 					moveGen.sort();
