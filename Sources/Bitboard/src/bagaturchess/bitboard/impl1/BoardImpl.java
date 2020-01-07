@@ -423,7 +423,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean isPossible(int move) {
-		return chessBoard.isValidMove(move);
+		return chessBoard.isValidMove(move) && chessBoard.isLegal(move);
 	}
 	
 	
