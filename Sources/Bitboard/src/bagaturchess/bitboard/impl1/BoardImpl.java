@@ -507,6 +507,49 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
+	public final IGameStatus getStatus() {
+		
+		
+		int colourToMove = getColourToMove();
+		
+		
+		if (getStateRepetition() >= 2) {
+			//3 states repetition draw
+			return IGameStatus.DRAW_3_STATES_REPETITION;
+		}
+		
+		if (isInCheck()) {
+			if (!hasMoveInCheck()) {
+				//Mate
+				if (colourToMove == Figures.COLOUR_WHITE) {
+					return IGameStatus.MATE_BLACK_WIN;
+				} else {
+					return IGameStatus.MATE_WHITE_WIN;
+				}
+			}
+		} else {
+			if (!hasMoveInNonCheck()) {
+				//Stale Mate
+				if (colourToMove == Figures.COLOUR_WHITE) {
+					return IGameStatus.STALEMATE_WHITE_NO_MOVES;
+				} else {
+					return IGameStatus.STALEMATE_BLACK_NO_MOVES;
+				}
+			}
+		}
+		
+		if (!hasSufficientMaterial()) {
+			return IGameStatus.NO_SUFFICIENT_MATERIAL;
+		}
+		
+		if (isDraw50movesRule()) {
+			return IGameStatus.DRAW_50_MOVES_RULE;
+		}
+		
+		return IGameStatus.NONE;
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#getPawnsStructure()
 	 */
@@ -594,14 +637,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public int getCastlingType(int colour) {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getStatus()
-	 */
-	@Override
-	public IGameStatus getStatus() {
 		throw new UnsupportedOperationException();
 	}
 
