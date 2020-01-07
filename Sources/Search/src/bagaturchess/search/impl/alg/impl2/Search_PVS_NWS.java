@@ -675,7 +675,7 @@ public class Search_PVS_NWS extends SearchImpl {
 
             // Step 16. Reduced depth search (LMR). If the move fails high it will be
             // re-searched at full depth.
-	        int value = MIN;
+	        int value = alpha + 1;
         	boolean doFullDepthSearch = !isPv || moveCount > 1;
             if (    depth >= 3
                 &&  moveCount > 1
