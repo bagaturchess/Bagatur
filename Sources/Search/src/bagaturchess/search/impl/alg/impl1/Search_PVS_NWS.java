@@ -545,7 +545,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv);
 					}
 				} catch(SearchInterruptedException sie) {
-					cb.undoMove(move);
 					moveGen.endPly();
 					throw sie;
 				}
