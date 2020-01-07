@@ -300,8 +300,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			if (EngineConstants.USE_TT_SCORE_AS_EVAL && ttValue != 0) {
-				if (TTUtil.getFlag(ttValue) == TTUtil.FLAG_EXACT || TTUtil.getFlag(ttValue) == TTUtil.FLAG_UPPER && score < eval
-						|| TTUtil.getFlag(ttValue) == TTUtil.FLAG_LOWER && score > eval) {
+				if (TTUtil.getFlag(ttValue) == TTUtil.FLAG_EXACT
+						|| (TTUtil.getFlag(ttValue) == TTUtil.FLAG_UPPER && score < eval)
+						|| (TTUtil.getFlag(ttValue) == TTUtil.FLAG_LOWER && score > eval)
+					) {
 					eval = score;
 				}
 			}
