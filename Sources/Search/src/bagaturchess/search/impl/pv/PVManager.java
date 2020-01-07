@@ -49,19 +49,19 @@ public class PVManager {
 		}
 	}
 	
-	public boolean isConnectedToTheRoot(int depth) {
-		PVNode cur = pvs[depth];
-		while (cur != null) {
-			cur = cur.parent;
-			if (cur == pvs[0]) {
+	public boolean isConnectedToTheRoot(PVNode node) {
+		while (node != null) {
+			if (node == pvs[0]) {
 				return true;
 			}
+			node = node.parent;
 		}
 		return false;
 	}
 	
 	
 	public PVNode load(int depth) {
+		pvs[depth].parent = null;
 		return pvs[depth];
 	}
 	
