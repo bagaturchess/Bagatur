@@ -66,7 +66,6 @@ public class PVManager {
 	
 	
 	public PVNode load(int depth) {
-		pvs[depth].parent = null;
 		return pvs[depth];
 	}
 	
@@ -83,14 +82,6 @@ public class PVManager {
 		
 		oldChild.parent = null;
 		pvs[depth] = oldChild;
-		
-		/*if (depth == 1) {
-			System.out.println("MINKO");
-		}
-		if (pvs[depth].toString().length() > 0) {
-			System.out.println("pinok=" + pvs[depth]);
-		}*/
-
 		
 		//validate();
 	}
