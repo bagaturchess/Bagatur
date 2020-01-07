@@ -22,12 +22,15 @@
  */
 package bagaturchess.search.impl.pv;
 
+
 public class PVManager {
+	
 	
 	private static int SHIFT = 0;
 	
 	private final int maxdepth;
 	private final PVNode[] pvs;
+	
 	
 	public PVManager(int _maxdepth) {
 		maxdepth = _maxdepth;
@@ -49,7 +52,9 @@ public class PVManager {
 		}
 	}
 	
-	public boolean isConnectedToTheRoot(PVNode node) {
+	
+	public boolean isConnectedToTheRoot(int depth) {
+		PVNode node = pvs[depth];
 		while (node != null) {
 			if (node == pvs[0]) {
 				return true;
@@ -64,6 +69,7 @@ public class PVManager {
 		pvs[depth].parent = null;
 		return pvs[depth];
 	}
+	
 	
 	public void store(int depth, PVNode parent, PVNode newChild, boolean checkRef) {
 				
@@ -89,6 +95,7 @@ public class PVManager {
 		//validate();
 	}
 	
+	
 	private void validate() {
 		for (int i=0; i<pvs.length - SHIFT; i++) {
 			
@@ -107,6 +114,7 @@ public class PVManager {
 			}
 		}
 	}
+	
 	
 	public static void main(String[] args) {
 		PVManager pvm = new PVManager(10);
