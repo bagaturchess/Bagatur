@@ -28,37 +28,68 @@ public final class MoveGenerator {
 	private final int[][] HH_MOVES = new int[2][64 * 64];
 	private final int[][] BF_MOVES = new int[2][64 * 64];
 	
+	private final int[][][] HH_MOVES1 = new int[2][7][64];
+	private final int[][][] BF_MOVES1 = new int[2][7][64];
+	
 
 	public MoveGenerator() {
 		clearHistoryHeuristics();
 	}
 
 	public void clearHistoryHeuristics() {
+		
 		Arrays.fill(HH_MOVES[WHITE], 0);
 		Arrays.fill(HH_MOVES[BLACK], 0);
 		Arrays.fill(BF_MOVES[WHITE], 1);
 		Arrays.fill(BF_MOVES[BLACK], 1);
+		
+		Arrays.fill(HH_MOVES1[WHITE][0], 0);
+		Arrays.fill(HH_MOVES1[WHITE][PAWN], 0);
+		Arrays.fill(HH_MOVES1[WHITE][NIGHT], 0);
+		Arrays.fill(HH_MOVES1[WHITE][BISHOP], 0);
+		Arrays.fill(HH_MOVES1[WHITE][ROOK], 0);
+		Arrays.fill(HH_MOVES1[WHITE][QUEEN], 0);
+		Arrays.fill(HH_MOVES1[WHITE][KING], 0);
+		
+		Arrays.fill(HH_MOVES1[BLACK][0], 0);
+		Arrays.fill(HH_MOVES1[BLACK][PAWN], 0);
+		Arrays.fill(HH_MOVES1[BLACK][NIGHT], 0);
+		Arrays.fill(HH_MOVES1[BLACK][BISHOP], 0);
+		Arrays.fill(HH_MOVES1[BLACK][ROOK], 0);
+		Arrays.fill(HH_MOVES1[BLACK][QUEEN], 0);
+		Arrays.fill(HH_MOVES1[BLACK][KING], 0);
+		
+		Arrays.fill(BF_MOVES1[WHITE][0], 1);
+		Arrays.fill(BF_MOVES1[WHITE][PAWN], 1);
+		Arrays.fill(BF_MOVES1[WHITE][NIGHT], 1);
+		Arrays.fill(BF_MOVES1[WHITE][BISHOP], 1);
+		Arrays.fill(BF_MOVES1[WHITE][ROOK], 1);
+		Arrays.fill(BF_MOVES1[WHITE][QUEEN], 1);
+		Arrays.fill(BF_MOVES1[WHITE][KING], 1);
+		
+		Arrays.fill(BF_MOVES1[BLACK][0], 1);
+		Arrays.fill(BF_MOVES1[BLACK][PAWN], 1);
+		Arrays.fill(BF_MOVES1[BLACK][NIGHT], 1);
+		Arrays.fill(BF_MOVES1[BLACK][BISHOP], 1);
+		Arrays.fill(BF_MOVES1[BLACK][ROOK], 1);
+		Arrays.fill(BF_MOVES1[BLACK][QUEEN], 1);
+		Arrays.fill(BF_MOVES1[BLACK][KING], 1);
 	}
 
 	public void addHHValue(final int color, final int move, final int depth) {
 		HH_MOVES[color][MoveUtil.getFromToIndex(move)] += depth * depth;
-		if (EngineConstants.ASSERT) {
-			Assert.isTrue(HH_MOVES[color][MoveUtil.getFromToIndex(move)] >= 0);
-		}
+		HH_MOVES1[color][MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
 	}
 
 	public void addBFValue(final int color, final int move, final int depth) {
 		BF_MOVES[color][MoveUtil.getFromToIndex(move)] += depth * depth;
-		if (EngineConstants.ASSERT) {
-			Assert.isTrue(BF_MOVES[color][MoveUtil.getFromToIndex(move)] >= 0);
-		}
+		BF_MOVES1[color][MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
 	}
 
-	public int getHHScore(final int color, final int fromToIndex) {
-		if (!EngineConstants.ENABLE_HISTORY_HEURISTIC) {
-			return 1;
-		}
-		return 100 * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex];
+	public int getHHScore(final int color, final int fromToIndex, final int pieceType, final int toIndex) {
+		return 100 * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex]
+				//+ 100 * HH_MOVES1[color][pieceType][toIndex] / BF_MOVES1[color][pieceType][toIndex]
+				;
 	}
 
 	public void addKillerMove(final int move, final int ply) {
@@ -112,8 +143,6 @@ public final class MoveGenerator {
 		}
 		
 		return moves[nextToMove[currentPly] - 1];
-		
-		//return 0;
 	}
 
 	public boolean hasNext() {
@@ -133,7 +162,7 @@ public final class MoveGenerator {
 
 	public void setHHScores(final int colorToMove) {
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
-			moveScores[j] = getHHScore(colorToMove, MoveUtil.getFromToIndex(moves[j]));
+			moveScores[j] = getHHScore(colorToMove, MoveUtil.getFromToIndex(moves[j]), MoveUtil.getSourcePieceIndex(moves[j]), MoveUtil.getToIndex(moves[j]));
 		}
 	}
 

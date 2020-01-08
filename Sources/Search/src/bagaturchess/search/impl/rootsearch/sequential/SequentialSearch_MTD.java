@@ -145,8 +145,7 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 					new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(mediator));
 		}
 		
-		final SearchManager distribution = new SearchManager(mediator, getBitboardForSetup().getHashKey(),
-				startIteration, maxIterations, initialValue, searcher.getEnv().getPVs());
+		final SearchManager distribution = new SearchManager(mediator, startIteration, maxIterations, initialValue);
 		
 		//final ISearchStopper stopper = new MTDStopper(getBitboardForSetup().getColourToMove(), distribution);
 		mediator.setStopper(new CompositeStopper(new ISearchStopper[] {mediator.getStopper(), stopper}, true ));

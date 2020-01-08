@@ -197,40 +197,33 @@ public class NullwinSearchTask implements Runnable {
 				
 				pv_buffer.clear();
 				
+				//int[] pv = getPVfromTPT();
+				int[] pv = PVNode.convertPV(pvman.load(0), pv_buffer);
+				//pv = validatePV(pv);
+				info.setPV(pv);
+				if (info.getPV().length > 0) {
+					info.setBestMove(info.getPV()[0]);
+				}
+				info.setEval(eval);
+				
 				if (eval >= beta) {
 					//eval is lower bound
-					
-					//int[] pv = getPVfromTPT();
-					int[] pv = PVNode.convertPV(pvman.load(0), pv_buffer);
-					//pv = validatePV(pv);
-					info.setPV(pv);
-					if (info.getPV().length > 0) {
-						info.setBestMove(info.getPV()[0]);
-					}
-					info.setEval(eval);
+
 					info.setLowerBound(true);
 					
 					if (DEBUGSearch.DEBUG_MODE) mediator.dump(Thread.currentThread().getName() + ":	stop search (increaseLowerBound) with eval " + eval);
 					
-					distribution.increaseLowerBound(eval, info);
+					distribution.increaseLowerBound(info);
 					
 				} else {
 					//eval is upper bound
 					//eval < beta <=> eval <= beta - 1 <=> eval <= alpha
 					
-					//int[] pv = getPVfromTPT();
-					int[] pv = PVNode.convertPV(pvman.load(0), pv_buffer);
-					//pv = validatePV(pv);
-					info.setPV(pv);
-					if (info.getPV().length > 0) {
-						info.setBestMove(info.getPV()[0]);
-					}
-					info.setEval(eval);
 					info.setUpperBound(true);
 					
 					if (DEBUGSearch.DEBUG_MODE) mediator.dump(Thread.currentThread().getName() + ":	stop search (decreaseUpperBound) with eval " + eval);
 					
-					distribution.decreaseUpperBound(eval, info);
+					distribution.decreaseUpperBound(info);
 				}
 			} else if (maxdepth > distribution.getCurrentDepth()) {
 				throw new IllegalStateException("maxdepth=" + maxdepth + " distribution.getMaxdepth()=" + distribution.getCurrentDepth());

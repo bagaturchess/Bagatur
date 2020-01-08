@@ -32,8 +32,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.impl.pv.PVHistory;
-import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
@@ -43,7 +41,7 @@ public class SearchManager {
 	
 	private ReadWriteLock lock;
 	
-	private long hashkey;
+	//private long hashkey;
 	
 	private int maxIterations;
 	private int currentdepth;
@@ -54,16 +52,15 @@ public class SearchManager {
 	private ISearchMediator mediator;
 
 	private Integer initialValue;
-	private PVHistory pvHistory;
+	//private PVHistory pvHistory;
 	
 	
-	public SearchManager(ISearchMediator _mediator, long _hashkey,
-			int _startIteration, int _maxIterations, Integer _initialValue, PVHistory _pvHistory) {
+	public SearchManager(ISearchMediator _mediator, int _startIteration, int _maxIterations, Integer _initialValue) {
 
 		lock = new ReentrantReadWriteLock();
 		
 		mediator = _mediator;
-		hashkey = _hashkey;
+		//hashkey = _hashkey;
 		maxIterations = _maxIterations;
 		
 		currentdepth = _startIteration;//1;
@@ -77,8 +74,6 @@ public class SearchManager {
 		betas = new ArrayList<Integer>();
 		
 		initialValue = _initialValue;
-		
-		pvHistory = _pvHistory;
 		
 		initBetas();
 	}
@@ -224,15 +219,15 @@ public class SearchManager {
 		}
 	}
 	
-	public void increaseLowerBound(int eval, ISearchInfo info) {
+	public void increaseLowerBound(ISearchInfo info) {
 		
 		boolean sentPV = false;
 		
-		if (eval >= betasGen.getLowerBound()) {
+		if (info.getEval() >= betasGen.getLowerBound()) {
 			
 			sentPV = true;
 			
-			betasGen.increaseLower(eval);
+			betasGen.increaseLower(info.getEval());
 		}
 		
 		boolean isLast = isLast();
@@ -246,12 +241,12 @@ public class SearchManager {
 		
 		if (sentPV) {
 			
-			if (isLast) {
+			/*if (isLast) {
 				info.setLowerBound(false);
 				info.setUpperBound(false);
-			}
+			}*/
 			
-			pvHistory.putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
+			//pvHistory.putPV(hashkey, new PVHistoryEntry(info.getPV(), info.getDepth(), info.getEval()));
 			
 			if (mediator != null) {
 				
@@ -261,15 +256,15 @@ public class SearchManager {
 	}
 	
 	
-	public void decreaseUpperBound(int eval, ISearchInfo info) {
+	public void decreaseUpperBound(ISearchInfo info) {
 		
 		boolean sentPV = false;
 		
-		if (eval <= betasGen.getUpperBound()) {
+		if (info.getEval() <= betasGen.getUpperBound()) {
 			
 			sentPV = true;
 			
-			betasGen.decreaseUpper(eval);
+			betasGen.decreaseUpper(info.getEval());
 		}
 		
 		boolean isLast = isLast();
