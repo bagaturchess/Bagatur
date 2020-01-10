@@ -2,7 +2,6 @@ package bagaturchess.learning.goldmiddle.impl3.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.BoardProxy_ReversedBBs;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;
