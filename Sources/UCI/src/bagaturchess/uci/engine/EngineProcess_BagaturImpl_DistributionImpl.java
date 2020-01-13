@@ -33,7 +33,7 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 	
 	public EngineProcess_BagaturImpl_DistributionImpl(String _engineName, String workdir, String programArgs, int memoryInMB) {
 		
-		super(_engineName, "\"" + getJavaPath_javawexe() + "\""
+		super(_engineName, "\"" + getJavaPath_javaexe() + "\""
 							+ " " + JAVA_OPTIONS + " -Djava.library.path=." + java.io.File.separator + "bin" + java.io.File.pathSeparator
 							+ " -Xmx" + memoryInMB + "M"
 							+ " -cp \"" + getClassPath(workdir) + "\" "

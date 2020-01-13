@@ -24,6 +24,8 @@ package bagaturchess.uci.engine;
 
 
 import java.io.File;
+import java.util.Locale;
+
 import bagaturchess.uci.engine.EngineProcess;
 
 
@@ -75,11 +77,19 @@ public class EngineProcess_BagaturImpl extends EngineProcess {
 	}
 	
 	
-	protected static String getJavaPath_javawexe() {
+	protected static String getJavaPath_javaexe() {
+		
 		String javaHome = System.getProperty("java.home");
 	    File f = new File(javaHome);
 	    f = new File(f, "bin");
-	    f = new File(f, "javaw.exe");
+	    
+	    String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+	    if (os.contains("nix") || os.contains("nux") || os.contains("aix")) {
+	    	f = new File(f, "java");
+	    } else {
+	    	f = new File(f, "javaw.exe");
+	    }
+	    
 	    return f.getAbsolutePath();
 	}
 }
