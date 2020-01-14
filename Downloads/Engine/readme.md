@@ -16,6 +16,11 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 # Revision History
 
+Version 1.9a (14 January 2020)
+  * Bugfix: parallel search now works on Linux OS
+  * Optimization: don't perform NonPv search in the root position
+  * Improvement: add piece-to history supplementary to from-to history heuristic
+
 Version 1.9 (19 December 2019)
   * New search algorithm, based on the Chess22k
   * Search improvements: Use transposition table in quiescence search
