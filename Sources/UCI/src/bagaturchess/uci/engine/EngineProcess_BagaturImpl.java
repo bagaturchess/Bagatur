@@ -77,7 +77,7 @@ public class EngineProcess_BagaturImpl extends EngineProcess {
 	}
 	
 	
-	protected static String getJavaPath_java() {
+	protected static String getJavaPath() {
 		
 		String javaHome = System.getProperty("java.home");
 	    File f = new File(javaHome);
