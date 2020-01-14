@@ -77,19 +77,22 @@ public class EngineProcess_BagaturImpl extends EngineProcess {
 	}
 	
 	
-	protected static String getJavaPath_javaexe() {
+	protected static String getJavaPath_java() {
 		
 		String javaHome = System.getProperty("java.home");
 	    File f = new File(javaHome);
 	    f = new File(f, "bin");
 	    
+	    String pathToJava;
 	    String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 	    if (os.contains("nix") || os.contains("nux") || os.contains("aix")) {
 	    	f = new File(f, "java");
+	    	pathToJava = f.getAbsolutePath();
 	    } else {
 	    	f = new File(f, "javaw.exe");
+	    	pathToJava = "\"" + f.getAbsolutePath() + "\"";
 	    }
 	    
-	    return f.getAbsolutePath();
+	    return pathToJava;
 	}
 }

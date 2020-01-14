@@ -33,7 +33,7 @@ public class EngineProcess_BagaturImpl_WorkspaceImpl extends EngineProcess_Bagat
 	
 	public EngineProcess_BagaturImpl_WorkspaceImpl(String _engineName, String workspace, String programArgs, int memoryInMB) {
 		
-		super(_engineName, "\"" + getJavaPath_javaexe() + "\""
+		super(_engineName, getJavaPath_java()
 							+ " " + JAVA_OPTIONS + "-Xmx" + memoryInMB + "M"
 							+ " -cp \"" + getClassPath(workspace) + "\" "
 							+ MAIN_CLASS + " "
