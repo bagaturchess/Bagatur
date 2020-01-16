@@ -49,7 +49,11 @@ public class TournamentRunner {
 	private static final EngineProcess bagatur_dev 			= new EngineProcess("Bagatur DEV", "C:\\DATA\\Engines\\BagaturEngine_DEV\\Bagatur_64_1_core.exe",
 															new String [0],
 															"C:\\DATA\\Engines\\BagaturEngine_DEV\\");
-	
+
+	private static final EngineProcess bagatur_19a 			= new EngineProcess("Bagatur 1.9a", "C:\\DATA\\Engines\\BagaturEngine.1.9a\\Bagatur_64_1_core.exe",
+															new String [0],
+															"C:\\DATA\\Engines\\BagaturEngine.1.9a\\");
+													
 	private static final EngineProcess bagatur_19 			= new EngineProcess("Bagatur 1.9", "C:\\DATA\\Engines\\BagaturEngine.1.9\\Bagatur_64_1_core.exe",
 															new String [0],
 															"C:\\DATA\\Engines\\BagaturEngine.1.9\\");
@@ -76,10 +80,14 @@ public class TournamentRunner {
 															new String [0],
 															"C:\\DATA\\Engines\\Komodo9\\Windows\\");
 
-	private static final EngineProcess chess22k 			=  new EngineProcess("Chess22k.1.12", "C:\\DATA\\Engines\\Chess22k\\run.bat",
+	private static final EngineProcess chess22k_1_13 		=  new EngineProcess("Chess22k.1.13", "C:\\DATA\\Engines\\Chess22k-1.13\\run.bat",
 															new String [0],
-															"C:\\DATA\\Engines\\Chess22k\\");
+															"C:\\DATA\\Engines\\Chess22k-1.13\\");
 
+	private static final EngineProcess asparuh 				=  new EngineProcess("Asparuh", "C:\\DATA\\Engines\\Asparuh\\run.bat",
+															new String [0],
+															"C:\\DATA\\Engines\\Asparuh\\");
+	
 	private static final EngineProcess cuckoo112 			=  new EngineProcess("Cuckoo.1.12", "C:\\DATA\\Engines\\Cuckoo112\\cuckoo112.bat",
 															new String [0],
 															"C:\\DATA\\Engines\\Cuckoo112\\");
@@ -97,8 +105,8 @@ public class TournamentRunner {
 	public static void main(String[] args) {
 		
 		
-		EngineProcess engine1 = stockfish10;
-		EngineProcess engine2 = bagatur_19;
+		EngineProcess engine1 = chess22k_1_13;
+		EngineProcess engine2 = asparuh;
 		
 		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
@@ -124,10 +132,11 @@ public class TournamentRunner {
 			
 			//MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
 			//MatchRunner matchRunner = new MatchRunner_FixedDepth(7);
-			MatchRunner matchRunner = new MatchRunner_FixedNodes(10000);
+			//MatchRunner matchRunner = new MatchRunner_FixedNodes(10000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 60 * 1000, 10 * 60 * 1000, 10 * 1000, 10 * 1000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(1 * 60 * 1000, 1 * 60 * 1000, 1 * 1000, 1 * 1000);
-			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 100, 100);
+			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(20 * 1000, 20 * 1000, 200, 200);
+			MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 100, 100);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(5 * 1000, 5 * 1000, 50, 50);
 			
 			Tournament tournament = new Tournament(schedule, matchRunner, false);
