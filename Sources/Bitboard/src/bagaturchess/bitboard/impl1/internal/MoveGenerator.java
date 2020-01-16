@@ -87,8 +87,8 @@ public final class MoveGenerator {
 	}
 
 	public int getHHScore(final int color, final int fromToIndex, final int pieceType, final int toIndex) {
-		return 100 * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex]
-				+ 100 * HH_MOVES1[color][pieceType][toIndex] / BF_MOVES1[color][pieceType][toIndex]
+		return 50 * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex]
+				+ 50 * HH_MOVES1[color][pieceType][toIndex] / BF_MOVES1[color][pieceType][toIndex]
 				;
 	}
 
