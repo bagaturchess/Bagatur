@@ -652,12 +652,14 @@ public class Search_PVS_NWS extends SearchImpl {
 			return alpha;
 		}
 		
-		final int alphaOrig = alpha;
-		
 		int eval = eval(evaluator, ply, alpha, beta);
 		if (eval >= beta) {
 			return eval;
 		}
+		
+		final int alphaOrig = alpha;
+		
+		alpha = Math.max(alpha, eval);
 		
 		moveGen.startPly();
 		
