@@ -648,17 +648,17 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
+		if (cb.checkingPieces != 0) {
+			return alpha;
+		}
+		
 		final int alphaOrig = alpha;
 		
-		int eval = ISearch.MIN;
-		if (cb.checkingPieces == 0) {
-			eval = eval(evaluator, ply, alpha, beta);
-			if (eval >= beta) {
-				return eval;
-			}
-			alpha = Math.max(alpha, eval);
+		int eval = eval(evaluator, ply, alpha, beta);
+		if (eval >= beta) {
+			return eval;
 		}
-
+		
 		moveGen.startPly();
 		
 		int phase = PHASE_TT;
