@@ -10,6 +10,7 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 
 import java.util.Arrays;
+import java.util.Random;
 
 
 public final class MoveGenerator {
@@ -30,6 +31,8 @@ public final class MoveGenerator {
 	
 	private final int[][][] HH_MOVES1 = new int[2][7][64];
 	private final int[][][] BF_MOVES1 = new int[2][7][64];
+	
+	private static Random rnd = new Random();
 	
 
 	public MoveGenerator() {
@@ -165,9 +168,14 @@ public final class MoveGenerator {
 			moveScores[j] = getHHScore(colorToMove, MoveUtil.getFromToIndex(moves[j]), MoveUtil.getSourcePieceIndex(moves[j]), MoveUtil.getToIndex(moves[j]));
 		}
 	}
-
+	
+	
 	public void sort() {
+		
 		final int left = nextToMove[currentPly];
+		
+		randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
+		
 		for (int i = left, j = i; i < nextToGenerate[currentPly] - 1; j = ++i) {
 			final int score = moveScores[i + 1];
 			final int move = moves[i + 1];
@@ -182,6 +190,23 @@ public final class MoveGenerator {
 			moves[j + 1] = move;
 		}
 	}
+
+	
+	public static void randomize(int[] arr1, int[] arr2, int start, int end) {
+	    for (int i=end; i>1+start; i--) {
+	    	
+	    	int rnd_index = start + rnd.nextInt(i - start);	    
+	    	
+	    	int tmp = arr1[i-1];
+	    	arr1[i-1] = arr1[rnd_index];
+	    	arr1[rnd_index] = tmp;
+	    	
+	    	tmp = arr2[i-1];
+	    	arr2[i-1] = arr2[rnd_index];
+	    	arr2[rnd_index] = tmp;
+	    }
+	}
+	
 
 	public String getMovesAsString() {
 		StringBuilder sb = new StringBuilder();
