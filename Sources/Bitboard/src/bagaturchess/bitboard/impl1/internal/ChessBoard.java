@@ -43,6 +43,14 @@ public final class ChessBoard {
 		}
 	}
 
+	public static final int FLAG_PAWN = 1 << (ChessConstants.PAWN - 1);
+	public static final int FLAG_NIGHT = 1 << (ChessConstants.NIGHT - 1);
+	public static final int FLAG_BISHOP = 1 << (ChessConstants.BISHOP - 1);
+	public static final int FLAG_ROOK = 1 << (ChessConstants.ROOK - 1);
+	public static final int FLAG_QUEEN = 1 << (ChessConstants.QUEEN - 1);
+
+	public static final int[] FLAGS = new int[] { 0, FLAG_PAWN, FLAG_NIGHT, FLAG_BISHOP, FLAG_ROOK, FLAG_QUEEN };
+	
 	/** color, piece */
 	public final long[][] pieces = new long[2][7];
 	public final long[] friendlyPieces = new long[2];
@@ -580,6 +588,34 @@ public final class ChessBoard {
 		attacks[BLACK][QUEEN] = 0;
 		doubleAttacks[WHITE] = 0;
 		doubleAttacks[BLACK] = 0;
+	}
+
+	public void updatePawnAttacks() {
+		updatePawnAttacks(Bitboard.getWhitePawnAttacks(pieces[WHITE][PAWN] & ~pinnedPieces), WHITE);
+		updatePawnAttacks(Bitboard.getBlackPawnAttacks(pieces[BLACK][PAWN] & ~pinnedPieces), BLACK);
+	}
+
+	private void updatePawnAttacks(final long pawnAttacks, final int color) {
+		attacks[color][PAWN] = pawnAttacks;
+		if ((pawnAttacks & ChessConstants.KING_AREA[1 - color][kingIndex[1 - color]]) != 0) {
+			kingAttackersFlag[color] = FLAG_PAWN;
+		}
+		long pinned = pieces[color][PAWN] & pinnedPieces;
+		while (pinned != 0) {
+			attacks[color][PAWN] |= StaticMoves.PAWN_ATTACKS[color][Long.numberOfTrailingZeros(pinned)]
+					& ChessConstants.PINNED_MOVEMENT[Long.numberOfTrailingZeros(pinned)][kingIndex[color]];
+			pinned &= pinned - 1;
+		}
+		attacksAll[color] = attacks[color][PAWN];
+	}
+
+	public void updateAttacks(final long moves, final int piece, final int color, final long kingArea) {
+		if ((moves & kingArea) != 0) {
+			kingAttackersFlag[color] |= FLAGS[piece];
+		}
+		doubleAttacks[color] |= attacksAll[color] & moves;
+		attacksAll[color] |= moves;
+		attacks[color][piece] |= moves;
 	}
 
 }

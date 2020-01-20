@@ -1,5 +1,6 @@
 package bagaturchess.bitboard.impl1.internal;
 
+
 public class Bitboard {
 
 	// rank 1
@@ -138,6 +139,7 @@ public class Bitboard {
 	public static final long RANK_567 = RANK_5 | RANK_6 | RANK_7;
 	public static final long RANK_23456 = RANK_2 | RANK_3 | RANK_4 | RANK_5 | RANK_6;
 	public static final long RANK_34567 = RANK_3 | RANK_4 | RANK_5 | RANK_6 | RANK_7;
+	public static final long RANK_234567 = RANK_2 | RANK_3 | RANK_4 | RANK_5 | RANK_6 | RANK_7;
 	public static final long RANK_PROMOTION[] = { RANK_7, RANK_2 };
 	public static final long RANK_NON_PROMOTION[] = { ~RANK_PROMOTION[0], ~RANK_PROMOTION[1] };
 	public static final long RANK_FIRST[] = { RANK_1, RANK_8 };
@@ -206,6 +208,9 @@ public class Bitboard {
 	}
 
 	public static long getWhitePassedPawnMask(final int index) {
+		if (index > 55) {
+			return 0;
+		}
 		return (FILES[index & 7] | FILES_ADJACENT[index & 7]) << ((index >>> 3 << 3) + 8);
 	}
 
@@ -223,5 +228,4 @@ public class Bitboard {
 	public static long getBlackAdjacentMask(final int index) {
 		return getBlackPassedPawnMask(index) & ~FILES[index & 7];
 	}
-
 }
