@@ -81,11 +81,13 @@ public abstract class MatchRunner {
 			
 			engine.setupPossition("startpos moves " + allMovesStr);
 			
+			//System.out.println("STARTING ENGINE " + engine.getName());
+			
 			beforeGo(bitboard.getColourToMove());
 			
 			go(engine);
 			String info = engine.getInfoLine();
-			//System.out.println(info);
+			//System.out.println(engine.getName() + ">" + info);
 			Info infoObj = new Info(info);
 			//System.out.println(infoObj);
 			

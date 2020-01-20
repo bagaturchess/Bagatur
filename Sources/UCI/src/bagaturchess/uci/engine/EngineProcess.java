@@ -243,7 +243,7 @@ public class EngineProcess {
 			@Override
 			public void newLine(String line) {
 				
-				//System.out.println("EngineProcess: getInfoLine (and waiting bestmove to return): '" + line + "'");
+				//System.out.println(engineName + "/EngineProcess: getInfoLine new line is: '" + line + "'");
 				
 				if (line.contains("LOG")) {
 					return;
@@ -253,8 +253,8 @@ public class EngineProcess {
 				
 				if (line.contains("bestmove")) {
 					for (int i=lines.size() - 1; i >=0; i--) {
+						//System.out.println(engineName + "/EngineProcess: getInfoLine " + lines.get(i));
 						if (lines.get(i).contains("info "/*depth"*/) && lines.get(i).contains(" pv ")) {
-							//System.out.println("PV: '" + lines.get(i) + "'");
 							exitLine = lines.get(i);
 							break;
 						}
