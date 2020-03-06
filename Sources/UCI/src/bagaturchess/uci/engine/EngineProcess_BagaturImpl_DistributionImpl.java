@@ -46,7 +46,7 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 	
 	
 	private static String getClassPath(String workspace) {
-		String JAVA_CP = "";
+		String JAVA_CP = "." + java.io.File.pathSeparator;//Workaround for linux: the first classpath entry is skipped for some reason.
 		JAVA_CP += workspace + "bin/BagaturOpening.jar" + java.io.File.pathSeparator;
 		JAVA_CP += workspace + "bin/BagaturBoard.jar" + java.io.File.pathSeparator;
 		JAVA_CP += workspace + "bin/BagaturSearch.jar" + java.io.File.pathSeparator;
@@ -54,9 +54,7 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 		JAVA_CP += workspace + "bin/BagaturLearningAPI.jar" + java.io.File.pathSeparator;
 		JAVA_CP += workspace + "bin/BagaturEngines.jar" + java.io.File.pathSeparator;
 		JAVA_CP += workspace + "bin/BagaturEGTB.jar" + java.io.File.pathSeparator;
-		//JAVA_CP += workspace + "bin/egtbprobe.jar" + java.io.File.pathSeparator;//Gaviota TB are not used
 		JAVA_CP += workspace + "bin/BagaturLearningImpl.jar" + java.io.File.pathSeparator;
-		//JAVA_CP += workspace + "bin/" + java.io.File.pathSeparator;//TODO: this doesn't work/load the DLLs, they have to be added in java.library.path
 		return JAVA_CP;
 	}
 }
