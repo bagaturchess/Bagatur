@@ -34,7 +34,7 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 	public EngineProcess_BagaturImpl_DistributionImpl(String _engineName, String workdir, String programArgs, int memoryInMB) {
 		
 		super(_engineName, getJavaPath()
-							+ " " + JAVA_OPTIONS + " -Djava.library.path=." + java.io.File.separator + "bin" + java.io.File.pathSeparator
+							+ " " + JAVA_OPTIONS + " -Djava.library.path=." + java.io.File.separatorChar + "bin" + java.io.File.separatorChar
 							+ " -Xmx" + memoryInMB + "M"
 							+ " -cp \"" + getClassPath(workdir) + "\" "
 							+ MAIN_CLASS + " "
@@ -47,16 +47,16 @@ public class EngineProcess_BagaturImpl_DistributionImpl extends EngineProcess_Ba
 	
 	private static String getClassPath(String workspace) {
 		String JAVA_CP = "";
-		JAVA_CP += workspace + "bin/BagaturBoard.jar;";
-		JAVA_CP += workspace + "bin/BagaturOpening.jar;";
-		JAVA_CP += workspace + "bin/BagaturSearch.jar;";
-		JAVA_CP += workspace + "bin/BagaturUCI.jar;";
-		JAVA_CP += workspace + "bin/BagaturLearningAPI.jar;";
-		JAVA_CP += workspace + "bin/BagaturEngines.jar;";
-		JAVA_CP += workspace + "bin/BagaturEGTB.jar;";
-		JAVA_CP += workspace + "bin/egtbprobe.jar;";
-		JAVA_CP += workspace + "bin/BagaturLearningImpl.jar;";
-		//JAVA_CP += workspace + "bin/;";//TODO: this doesn't work/load the DLLs, they have to be added in java.library.path
+		JAVA_CP += workspace + "bin/BagaturBoard.jar" + java.io.File.pathSeparator;
+		JAVA_CP += workspace + "bin/BagaturOpening.jar" + java.io.File.pathSeparator;
+		JAVA_CP += workspace + "bin/BagaturSearch.jar" + java.io.File.pathSeparator;
+		JAVA_CP += workspace + "bin/BagaturUCI.jar" + java.io.File.pathSeparator;
+		JAVA_CP += workspace + "bin/BagaturLearningAPI.jar" + java.io.File.pathSeparator;
+		JAVA_CP += workspace + "bin/BagaturEngines.jar" + java.io.File.pathSeparator;
+		JAVA_CP += workspace + "bin/BagaturEGTB.jar" + java.io.File.pathSeparator;
+		JAVA_CP += workspace + "bin/egtbprobe.jar" + java.io.File.pathSeparator;
+		JAVA_CP += workspace + "bin/BagaturLearningImpl.jar" + java.io.File.pathSeparator;
+		//JAVA_CP += workspace + "bin/" + java.io.File.pathSeparator;//TODO: this doesn't work/load the DLLs, they have to be added in java.library.path
 		return JAVA_CP;
 	}
 }
