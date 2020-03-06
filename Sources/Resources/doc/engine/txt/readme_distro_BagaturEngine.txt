@@ -15,12 +15,15 @@ Hints:
   1. Bagatur needs at least 64M of memory to run.
      By default it runs with 1024M of memory, but uses only 70% of it (30% are for transposition table and the rest of 40% is used for other caches).
      Because of java programming language specifics, changes in memory could lead to bad performance, anyway if necessary it could be changed by editing the corresponding *.ini or *.bat file.
-     
+  
   2. For now, Syzygy Endgame Tablebases are supported.
 	 
   3. On Laptop - for optimal performance make sure that: Laptop is connected to power supply (by either cable or docking station) and power plan is set to 'Maximum Performance'
-   
-  4. If for some reason the EXE files do not work as expected, then there are 2 options:
+  
+  4.1 Under Linux, use Bagatur_1core.sh or Bagatur_mcore.sh placed in a 'bin' sub-directory.
+  	  You must extract the distribution in a directory which doesn't contains white spaces. Otherwise the parallel version will not work.
+  
+  4.2 Under Windows, if for some reason the EXE files do not work as expected, then there are 2 options:
      A) Edit the corresponding INI file. Find the option 'vm.location', remove semicolons (';' symbol) from the beginning of the line, and set the property to point out the wanted jvm.dll.
         jvm.dll could be found in JRE's 'bin/client' or 'bin/server' directory. For example, something like 'C:\jdk1.6.0_07\jre\bin\client\jvm.dll'
      B) (Not recommended) Use the BAT files inside the 'bin' sub-directory: Bagatur_1core.bat and Bagatur_mcore.bat

@@ -16,8 +16,10 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 # Revision History
 
+Version 1.9b (7 March 2020)
+  * Bugfix: parallel search now works on Linux, just use ./bin/Bagatur_mcore.sh
+  
 Version 1.9a (14 January 2020)
-  * Bugfix: parallel search now works on Linux OS
   * Optimization: don't perform NonPv search in the root position
   * Improvement: add piece-to history supplementary to from-to history heuristic
 
