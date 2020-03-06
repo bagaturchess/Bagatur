@@ -32,6 +32,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
 
 
@@ -85,6 +86,9 @@ public class EngineProcess {
 	
 	public void start() throws IOException {
 		
+		ChannelManager.getChannel().dump("EngineProcess:startCommand=" + startCommand);
+		ChannelManager.getChannel().dump("EngineProcess:workDir=" + new File(workDir));
+		
 		process = Runtime.getRuntime().exec(startCommand, props, new File(workDir));
 		
 		is = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -128,6 +132,7 @@ public class EngineProcess {
 		
 		String line;
 		while ((line = is.readLine()) != null) {
+			//System.out.println(line);
 			if (line.contains("uciok")) {
 				return true;
 			}
