@@ -129,6 +129,11 @@
 			<include name="Bagatur_mcore.bat"/>
 		</fileset>
 	</copy>
+  	<copy tofile="${temp_dir}/bin/Bagatur_1core.sh" >
+  		<fileset dir="${resources_dir}/bin/engine/sh">
+  			<include name="Bagatur_1core.sh"/>
+  		</fileset>
+  	</copy>
   	<copy tofile="${temp_dir}/bin/Bagatur_mcore.sh" >
   		<fileset dir="${resources_dir}/bin/engine/sh">
   			<include name="Bagatur_mcore.sh"/>
