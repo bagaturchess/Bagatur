@@ -32,18 +32,12 @@ public class PawnEvalCache {
 		final long passedPawnsAndOutpostsValue = keys[index + 2];
 
 		if ((xorKey ^ score ^ passedPawnsAndOutpostsValue) == cb.pawnZobristKey) {
-			if (Statistics.ENABLED) {
-				Statistics.pawnEvalCacheHits++;
-			}
 			if (!EngineConstants.TEST_EVAL_CACHES) {
 				cb.passedPawnsAndOutposts = passedPawnsAndOutpostsValue;
 			}
 			return score;
 		}
-
-		if (Statistics.ENABLED) {
-			Statistics.pawnEvalCacheMisses++;
-		}
+		
 		return ChessConstants.CACHE_MISS;
 	}
 

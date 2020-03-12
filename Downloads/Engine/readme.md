@@ -11,11 +11,13 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
   * Unpack this distribution somewhere (Arena has a sub-folder called 'engines', you can extract it there).
   * Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway). You may use win32 or win64 version depending on your choice.
   * E2-E4 and enjoy :-)
-* **Linux**, in the bin directory there are *.bat files for giving you idea how to write bash scrip for running
+* **Linux**, in the bin directory there are *.sh files for running
 
 
 # Revision History
-
+Version 2.0 (13 March 2019)
+  * New evaluation function, based on Chess22k
+  
 Version 1.9b (7 March 2020)
   * Bugfix: parallel search now works on Linux, just use ./bin/Bagatur_mcore.sh
   

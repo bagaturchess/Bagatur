@@ -30,15 +30,9 @@ public class MaterialCache {
 		final int score = keys[index + 1];
 
 		if ((xorKey ^ score) == materialKey) {
-			if (Statistics.ENABLED) {
-				Statistics.materialCacheHits++;
-			}
 			return score;
 		}
-
-		if (Statistics.ENABLED) {
-			Statistics.materialCacheMisses++;
-		}
+		
 		return ChessConstants.CACHE_MISS;
 	}
 

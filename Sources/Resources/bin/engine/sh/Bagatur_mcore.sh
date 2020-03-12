@@ -21,8 +21,8 @@ export ARGS="${ARGS} bagaturchess.search.impl.rootsearch.parallel.MTDParallelSea
 export ARGS="${ARGS} bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP"
 export ARGS="${ARGS} bagaturchess.search.impl.alg.impl1.Search_PVS_NWS"
 export ARGS="${ARGS} bagaturchess.engines.cfg.base.SearchConfigImpl_AB"
-export ARGS="${ARGS} bagaturchess.learning.goldmiddle.impl3.cfg.BoardConfigImpl_V18"
-export ARGS="${ARGS} bagaturchess.learning.goldmiddle.impl3.cfg.EvaluationConfig_V18"
+export ARGS="${ARGS} bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20"
+export ARGS="${ARGS} bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20"
 
 # Executes the java process of the Bagatur engine with parallel search. It uses all CPU Cores.
 # Sometimes, the engine performs a sequential search for depth below 6 because of performance reasons.

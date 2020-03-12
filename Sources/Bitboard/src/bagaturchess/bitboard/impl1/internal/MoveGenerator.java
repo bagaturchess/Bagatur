@@ -192,7 +192,7 @@ public final class MoveGenerator {
 	}
 
 	
-	public static void randomize(int[] arr1, int[] arr2, int start, int end) {
+	private static void randomize(int[] arr1, int[] arr2, int start, int end) {
 	    for (int i=end; i>1+start; i--) {
 	    	
 	    	int rnd_index = start + rnd.nextInt(i - start);	    

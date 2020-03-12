@@ -135,7 +135,8 @@ public class MaterialUtil {
 		return false;
 
 	}
-
+	
+	
 	public static boolean hasMatingMaterial(final ChessBoard cb, final int color) {
 		if (Long.bitCount(cb.friendlyPieces[color]) > 3) {
 			return true;
@@ -145,20 +146,4 @@ public class MaterialUtil {
 		}
 		return (cb.materialKey & MASK_MATING_MATERIAL[color]) != 0;
 	}
-
-	public static boolean hasEvaluator(final int material) {
-		switch (material) {
-		case 0x90: // KBNK
-		case 0x12000: // KQKP
-		case 0x100400: // KRKN
-		case 0x800400: // KRKB
-		case 0x900000: // KBNK
-		case 0x4000010: // KRKN
-		case 0x4000080: // KRKB
-		case 0x20000001: // KQKP
-			return true;
-		}
-		return false;
-	}
-
 }

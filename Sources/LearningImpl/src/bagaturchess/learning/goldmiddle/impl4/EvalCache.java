@@ -24,18 +24,13 @@ public class EvalCache {
 		final long score = keys[index + 1];
 
 		if ((storedKey ^ score) == key) {
-			if (Statistics.ENABLED) {
-				Statistics.evalCacheHits++;
-			}
 			return (int) score;
 		}
 
-		if (Statistics.ENABLED) {
-			Statistics.evalCacheMisses++;
-		}
 		return ChessConstants.CACHE_MISS;
 	}
-
+	
+	
 	public static void addValue(final long key, final int score) {
 		if (!EngineConstants.ENABLE_EVAL_CACHE) {
 			return;

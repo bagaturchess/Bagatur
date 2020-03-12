@@ -24,8 +24,8 @@ set ARGS=%ARGS% bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_
 set ARGS=%ARGS% bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core
 set ARGS=%ARGS% bagaturchess.search.impl.alg.impl1.Search_PVS_NWS
 set ARGS=%ARGS% bagaturchess.engines.cfg.base.SearchConfigImpl_AB
-set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl3.cfg.BoardConfigImpl_V18
-set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl3.cfg.EvaluationConfig_V18
+set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20
+set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20
 
 echo on
 

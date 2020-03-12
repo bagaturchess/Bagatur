@@ -28,10 +28,6 @@ public class EvalUtil {
 
 	public static int getScore(final ChessBoard cb) {
 
-		if (Statistics.ENABLED) {
-			Statistics.evalNodes++;
-		}
-
 		if (EngineConstants.ENABLE_EVAL_CACHE && !EngineConstants.TEST_EVAL_CACHES) {
 			final int score = EvalCache.getScore(cb.zobristKey);
 			if (score != ChessConstants.CACHE_MISS) {
@@ -102,21 +98,7 @@ public class EvalUtil {
 
 		return score;
 	}
-
-	private static boolean isDrawishByMaterial(final ChessBoard cb, final int color) {
-		// no pawns or queens
-		if (MaterialUtil.hasPawnsOrQueens(cb.materialKey, color)) {
-			return false;
-		}
-
-		if (Long.bitCount(cb.friendlyPieces[color]) > 3) {
-			return false;
-		}
-
-		// material difference bigger than bishop + 50
-		// TODO do not include pawn score (why...?)
-		return getImbalances(cb) * ChessConstants.COLOR_FACTOR[color] < EvalConstants.MATERIAL[BISHOP] + EvalConstants.OTHER_SCORES[EvalConstants.IX_DRAWISH];
-	}
+	
 
 	private static int taperedEval(final ChessBoard cb) {
 		final int pawnScore = getPawnScores(cb);
@@ -178,7 +160,7 @@ public class EvalUtil {
 		if (!EngineConstants.TEST_EVAL_CACHES) {
 			final int score = PawnEvalCache.updateBoardAndGetScore(cb);
 			if (score != ChessConstants.CACHE_MISS) {
-				return PawnEvalCache.updateBoardAndGetScore(cb);
+				return score;
 			}
 		}
 
