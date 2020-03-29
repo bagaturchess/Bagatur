@@ -69,9 +69,9 @@ public class EngineProcess_BagaturImpl extends EngineProcess {
 		ARGS += " ";
 		ARGS += "bagaturchess.engines.cfg.base.SearchConfigImpl_AB";
 		ARGS += " ";
-		ARGS += "bagaturchess.learning.goldmiddle.impl3.cfg.BoardConfigImpl_V18";
+		ARGS += "bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20";
 		ARGS += " ";
-		ARGS += "bagaturchess.learning.goldmiddle.impl3.cfg.EvaluationConfig_V18";
+		ARGS += "bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20";
 		ARGS += " ";
 		return ARGS;
 	}

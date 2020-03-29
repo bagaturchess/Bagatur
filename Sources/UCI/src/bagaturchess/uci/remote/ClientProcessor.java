@@ -58,8 +58,8 @@ public class ClientProcessor implements Runnable {
 				"bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core",
 				"bagaturchess.search.impl.alg.impl1.Search_PVS_NWS",
 				"bagaturchess.engines.cfg.base.SearchConfigImpl_AB",
-				"bagaturchess.learning.goldmiddle.impl3.cfg.BoardConfigImpl_V18",
-				"bagaturchess.learning.goldmiddle.impl3.cfg.EvaluationConfig_V18", };
+				"bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20",
+				"bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20", };
 
 		Boot.runStateManager(args, ChannelManager.getChannel());
 	}
