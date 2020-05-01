@@ -15,6 +15,11 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 
 # Revision History
+Version 2.1 (1 May 2020)
+  * No changes in the single core version
+  * Fixed SMP version, which now works better than the single core version :-)
+  * In SMP version: increased max threads count from 64 to 256
+
 Version 2.0 (13 March 2019)
   * New evaluation function, based on Chess22k
   
