@@ -20,7 +20,7 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 			new UCIOptionSpin_Integer("SMP Threads", currentThreadsCount,
 					"type spin default " + currentThreadsCount
 											+ " min 1"
-											+ " max 64"),
+											+ " max 256"),
 			new UCIOptionSpin_Integer("Thread Memory (MB)", currentThreadMemory,
 					"type spin default " + currentThreadMemory
 											+ " min 256"
