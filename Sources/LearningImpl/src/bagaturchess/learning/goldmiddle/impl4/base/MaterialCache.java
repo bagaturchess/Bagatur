@@ -1,11 +1,10 @@
-package bagaturchess.learning.goldmiddle.impl4;
+package bagaturchess.learning.goldmiddle.impl4.base;
 
 
 import java.util.Arrays;
 
 import bagaturchess.bitboard.impl1.internal.ChessConstants;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
-import bagaturchess.bitboard.impl1.internal.Util;
 
 
 public class MaterialCache {
@@ -37,11 +36,6 @@ public class MaterialCache {
 	}
 
 	public static void addValue(final int materialKey, final int score) {
-
-		if (EngineConstants.ASSERT) {
-			Assert.isTrue(score <= Util.SHORT_MAX);
-			Assert.isTrue(score >= Util.SHORT_MIN);
-		}
 
 		final int index = getIndex(materialKey);
 		keys[index] = materialKey ^ score;

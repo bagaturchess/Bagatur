@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl4;
+package bagaturchess.learning.goldmiddle.impl4.base;
 
 
 import java.util.Arrays;
@@ -6,7 +6,6 @@ import java.util.Arrays;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.ChessConstants;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
-import bagaturchess.bitboard.impl1.internal.Util;
 
 
 public class PawnEvalCache {
@@ -42,11 +41,6 @@ public class PawnEvalCache {
 	}
 
 	public static void addValue(final long key, final int score, final long passedPawnsAndOutpostsValue) {
-
-		if (EngineConstants.ASSERT) {
-			Assert.isTrue(score <= Util.SHORT_MAX);
-			Assert.isTrue(score >= Util.SHORT_MIN);
-		}
 
 		final int index = getIndex(key);
 		keys[index] = key ^ score ^ passedPawnsAndOutpostsValue;

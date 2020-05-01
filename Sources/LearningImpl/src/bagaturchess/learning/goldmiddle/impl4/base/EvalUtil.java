@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl4;
+package bagaturchess.learning.goldmiddle.impl4.base;
 
 
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BISHOP;

@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl4;
+package bagaturchess.learning.goldmiddle.impl4.base;
 
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 

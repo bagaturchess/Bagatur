@@ -4,7 +4,7 @@ package bagaturchess.learning.goldmiddle.impl4.eval;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
-import bagaturchess.learning.goldmiddle.impl4.EvalUtil;
+import bagaturchess.learning.goldmiddle.impl4.base.EvalUtil;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;
