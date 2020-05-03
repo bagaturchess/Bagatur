@@ -175,10 +175,10 @@ public class TTUtil {
 		case 8192:
 		case 16384:
 			int power2Entries = (int) (Math.log(value) / Math.log(2) + 16);
-			if (EngineConstants.POWER_2_TT_ENTRIES != power2Entries) {
+			//if (EngineConstants.POWER_2_TT_ENTRIES != power2Entries) {
 				EngineConstants.POWER_2_TT_ENTRIES = power2Entries;
 				init(true);
-			}
+			//}
 			break;
 		default:
 			throw new RuntimeException("Hash-size must be between 1-16384 mb and a multiple of 2");
