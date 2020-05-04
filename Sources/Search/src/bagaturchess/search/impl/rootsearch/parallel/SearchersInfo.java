@@ -256,15 +256,13 @@ public class SearchersInfo {
 		
 		public long getSearchedNodes() {
 			
-			long nodes = 0; 
-			for (Integer depth: depthsInfo.keySet()) {
-				SearcherDepthInfo info = depthsInfo.get(depth);
-				if (info != null && info.getLastSearchInfo() != null) {
-					nodes += info.getLastSearchInfo().getSearchedNodes();
-				}
+			ISearchInfo last_info = getLastSearchInfo(getMaxDepth());
+			
+			if (last_info == null) {
+				return 0;
 			}
 			
-			return nodes;
+			return last_info.getSearchedNodes();
 		}
 
 
