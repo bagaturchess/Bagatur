@@ -152,14 +152,19 @@ public class SearchersInfo {
 		
 		
 		long totalNodes = 0;
+		for (IRootSearch cur_searcher: searchersInfo.keySet()) {
+			SearcherInfo cur_searcher_infos = searchersInfo.get(cur_searcher);
+			if (cur_searcher_infos != null){
+				totalNodes += cur_searcher_infos.getSearchedNodes();
+			}
+		}
+		
+		
 		Map<Integer, MoveInfo> movesInfoPerDepth = new HashMap<Integer, MoveInfo>();
-		
-		
 		for (IRootSearch cur_searcher: searchersInfo.keySet()) {
 			
 			SearcherInfo cur_searcher_infos = searchersInfo.get(cur_searcher);
 			ISearchInfo cur_last_info = cur_searcher_infos.getLastSearchInfo(depth);
-			totalNodes += cur_searcher_infos.getSearchedNodes();
 			
 			if (cur_last_info != null) {
 				MoveInfo moveInfo = movesInfoPerDepth.get(cur_last_info.getBestMove());
@@ -251,13 +256,15 @@ public class SearchersInfo {
 		
 		public long getSearchedNodes() {
 			
-			ISearchInfo last_info = getLastSearchInfo(getMaxDepth());
-			
-			if (last_info == null) {
-				return 0;
+			long nodes = 0; 
+			for (Integer depth: depthsInfo.keySet()) {
+				SearcherDepthInfo info = depthsInfo.get(depth);
+				if (info != null && info.getLastSearchInfo() != null) {
+					nodes += info.getLastSearchInfo().getSearchedNodes();
+				}
 			}
 			
-			return last_info.getSearchedNodes();
+			return nodes;
 		}
 
 
