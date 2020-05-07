@@ -500,7 +500,9 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 											final_mediator.changedMajor(toSend);
 											lastSendInfo = toSend;
 										} else if (toSend.getDepth() == lastSendInfo.getDepth()) {
-											if (toSend.getEval() > lastSendInfo.getEval()) {
+											if (toSend.getBestMove() == lastSendInfo.getBestMove() && toSend.getEval() == lastSendInfo.getEval()) {
+												//Do nothing
+											} else {
 												if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend=" + toSend);
 												final_mediator.changedMajor(toSend);
 												lastSendInfo = toSend;
