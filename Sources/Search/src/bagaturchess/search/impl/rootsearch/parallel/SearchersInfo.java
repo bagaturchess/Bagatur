@@ -19,7 +19,7 @@ public class SearchersInfo {
 	
 	private Map<IRootSearch, SearcherInfo> searchersInfo;
 	private int cur_depth;
-	private ISearchInfo last_send_info;
+	//private ISearchInfo last_send_info;
 	private double nextDepthThreshold;
 	
 	
@@ -93,18 +93,18 @@ public class SearchersInfo {
 	
 	public ISearchInfo getNewInfoToSendIfPresented() {
 		
-		if (last_send_info != null && last_send_info.getDepth() == cur_depth) {
+		//if (last_send_info != null && last_send_info.getDepth() == cur_depth) {
 			if (hasDepthInfo(cur_depth + 1)) {
 				
 				cur_depth++;
 				
 				if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SearchersInfo: increase depth to " + cur_depth);
 			}
-		}
+		//}
 		
 		ISearchInfo cur_depth_info = getAccumulatedInfo(cur_depth);
 		
-		if (cur_depth_info != null) {
+		/*if (cur_depth_info != null) {
 			if (last_send_info == null) {
 				last_send_info = cur_depth_info;
 				return cur_depth_info;
@@ -117,13 +117,13 @@ public class SearchersInfo {
 					return cur_depth_info;
 				}
 			}
-		}
+		}*/
 		
-		return null;
+		return cur_depth_info;
 	}
 	
 	
-	public boolean needRestart(IRootSearch searcher) {
+	/*public boolean needRestart(IRootSearch searcher) {
 		
 		if (true) return false;
 		
@@ -144,7 +144,7 @@ public class SearchersInfo {
 			}
 		}
 		return false;
-	}
+	}*/
 	
 	
 	//Result can be null
@@ -208,10 +208,6 @@ public class SearchersInfo {
 	
 	
 	private boolean hasDepthInfo(int depth) {
-		
-		if (last_send_info == null) {
-			return false;
-		}
 		
 		int countResponded = 0;
 		for (IRootSearch cur_searcher: searchersInfo.keySet()) {
