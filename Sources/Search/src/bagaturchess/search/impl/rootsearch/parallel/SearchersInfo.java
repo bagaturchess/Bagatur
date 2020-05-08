@@ -19,7 +19,6 @@ public class SearchersInfo {
 	
 	private Map<IRootSearch, SearcherInfo> searchersInfo;
 	private int cur_depth;
-	//private ISearchInfo last_send_info;
 	private double nextDepthThreshold;
 	
 	
@@ -93,58 +92,17 @@ public class SearchersInfo {
 	
 	public ISearchInfo getNewInfoToSendIfPresented() {
 		
-		//if (last_send_info != null && last_send_info.getDepth() == cur_depth) {
-			if (hasDepthInfo(cur_depth + 1)) {
-				
-				cur_depth++;
-				
-				if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SearchersInfo: increase depth to " + cur_depth);
-			}
-		//}
+		if (hasDepthInfo(cur_depth + 1)) {
+			
+			cur_depth++;
+			
+			if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SearchersInfo: increase depth to " + cur_depth);
+		}
 		
 		ISearchInfo cur_depth_info = getAccumulatedInfo(cur_depth);
 		
-		/*if (cur_depth_info != null) {
-			if (last_send_info == null) {
-				last_send_info = cur_depth_info;
-				return cur_depth_info;
-			} else {
-				if (cur_depth_info.getDepth() != last_send_info.getDepth()
-						|| cur_depth_info.getBestMove() != last_send_info.getBestMove()
-						|| cur_depth_info.getEval() != last_send_info.getEval()
-						) {
-					last_send_info = cur_depth_info;
-					return cur_depth_info;
-				}
-			}
-		}*/
-		
 		return cur_depth_info;
 	}
-	
-	
-	/*public boolean needRestart(IRootSearch searcher) {
-		
-		if (true) return false;
-		
-		if (last_send_info == null) {
-			return false;
-		}
-		
-		SearcherInfo searcherinfo = searchersInfo.get(searcher);
-		if (searcherinfo != null && searcherinfo.last_restart_depth < cur_depth) {
-			ISearchInfo lastinfo = searcherinfo.getLastSearchInfo(searcherinfo.getMaxDepth());
-			if (lastinfo != null) {
-				boolean isShallow = lastinfo.getDepth() < last_send_info.getDepth() - 1;//cur_depth - 1;//last_send_info.getDepth();
-				if (isShallow) {
-					searcherinfo.last_restart_depth = cur_depth;
-					//searchersInfo.remove(searcher);
-					return true;
-				}
-			}
-		}
-		return false;
-	}*/
 	
 	
 	//Result can be null
@@ -201,7 +159,6 @@ public class SearchersInfo {
 		info_to_send.setPV(bestMoveInfo.best_info.getPV());
 		info_to_send.setSearchedNodes(totalNodes);
 		
-		//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SearchersInfo: getInfoToSend=" + info_to_send + (info_to_send == null ? "" : ", depth=" + info_to_send.getDepth()));
 		
 		return info_to_send;
 	}
@@ -211,29 +168,13 @@ public class SearchersInfo {
 		
 		int countResponded = 0;
 		for (IRootSearch cur_searcher: searchersInfo.keySet()) {
-			
 			SearcherInfo cur_searcher_infos = searchersInfo.get(cur_searcher);
-			
 			if (cur_searcher_infos != null) {
-				
-				/*if (cur_searcher_infos.getLastSearchInfo(depth) != null) {
-					return true;
-				}*/
-				
-				
 				if (cur_searcher_infos.getLastSearchInfo(depth) != null) {
 					countResponded++;
 				}
-				
-				/*
-				if (cur_searcher_infos.containsBestMove(depth, last_send_info.getBestMove())) {
-					return true;
-				}
-				*/
 			}
 		}
-		
-		//return countResponded >= 1;
 		return (countResponded / (double) searchersInfo.size() >= nextDepthThreshold);
 	}
 	
@@ -242,7 +183,6 @@ public class SearchersInfo {
 		
 		
 		private Map<Integer, SearcherDepthInfo> depthsInfo;
-		protected int last_restart_depth;
 		
 		
 		public SearcherInfo() {
@@ -282,18 +222,6 @@ public class SearchersInfo {
 		}
 		
 		
-		/*
-		public boolean containsBestMove(int depth, int move) {
-			SearcherDepthInfo searcherDepthInfo = depthsInfo.get(depth);
-			if (searcherDepthInfo == null) {
-				return false;
-			}
-			
-			return searcherDepthInfo.containsBestMove(move);
-		}
-		*/
-		
-		
 		public int getMaxDepth() {
 			
 			int max_depth = 0;
@@ -324,31 +252,12 @@ public class SearchersInfo {
 			
 			
 			public ISearchInfo getLastSearchInfo() {
-				/*ISearchInfo result = null;
-				for (int i = infos.size() - 1; i >= 0; i--) {
-					if (!infos.get(i).isUpperBound()) {
-						result = infos.get(i);
-						break;
-					}
-				}
-				return result;
-				*/
 				int last_index = infos.size() - 1;
 				if (last_index < 0) {
 					return null;
 				}
 				return infos.get(last_index);
 			}
-			
-			
-			/*public boolean containsBestMove(int move) {
-				for (int i = 0; i < infos.size(); i++) {
-					if (infos.get(i).getBestMove() == move) {
-						return true;
-					}
-				}
-				return false;
-			}*/
 		}
 	}
 	
