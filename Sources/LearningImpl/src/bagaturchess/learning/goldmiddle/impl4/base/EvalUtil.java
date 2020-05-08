@@ -26,95 +26,48 @@ public class EvalUtil {
 	public static final int PHASE_TOTAL = 4 * EvalConstants.PHASE[NIGHT] + 4 * EvalConstants.PHASE[BISHOP] + 4 * EvalConstants.PHASE[ROOK]
 			+ 2 * EvalConstants.PHASE[QUEEN];
 
-	public static int getScore(final ChessBoard cb, final EvalInfo evalInfo) {
-
-		if (EngineConstants.ENABLE_EVAL_CACHE && !EngineConstants.TEST_EVAL_CACHES) {
-			final int score = EvalCache.getScore(cb.zobristKey);
-			if (score != ChessConstants.CACHE_MISS) {
-				return score;
-			}
-		}
+	public static int getScore1(final ChessBoard cb, final EvalInfo evalInfo) {
+		
+		return taperedEval1(cb, evalInfo);
+	}
+	
+	
+	public static int getScore2(final ChessBoard cb, final EvalInfo evalInfo) {
 		
 		evalInfo.clearEvals1();
+		evalInfo.clearEvals2();
+		evalInfo.clearEvalAttacks();
+		evalInfo.fillBB(cb);
 		
-		
-		return calculateScore(cb, evalInfo);
-	}
-
-	private static int calculateScore(final ChessBoard cb, final EvalInfo evalInfo) {
-
-		int score = 0;
-		if (MaterialUtil.isDrawByMaterial(cb)) {
-			// do nothing
-		} /*else if (Long.bitCount(cb.allPieces) == 4 && MaterialUtil.hasEvaluator(cb.materialKey)) {
-			if (MaterialUtil.isKBNK(cb.materialKey)) {
-				score = EndGameEvaluator.calculateKBNKScore(cb);
-			} else if (MaterialUtil.isKRKN(cb.materialKey)) {
-				score = EndGameEvaluator.calculateKRKNScore(cb);
-			} else if (MaterialUtil.isKRKB(cb.materialKey)) {
-				score = EndGameEvaluator.calculateKRKBScore(cb);
-			} else if (MaterialUtil.isKQKP(cb.materialKey)) {
-				if (EndGameEvaluator.isKQKPDrawish(cb)) {
-					score = cb.pieces[WHITE][QUEEN] == 0 ? -50 : 50;
-				} else {
-					score = taperedEval(cb);
-				}
-			}
-		}*/ else {
-			score = taperedEval(cb, evalInfo);
-
-			/* draw-by-material */
-			if (score > 25) {
-				if (!MaterialUtil.hasMatingMaterial(cb, WHITE)) {
-					score = EvalConstants.SCORE_DRAW;
-				} /*else if (isDrawishByMaterial(cb, WHITE)) {
-					if (Statistics.ENABLED) {
-						Statistics.drawishByMaterialCount++;
-					}
-					// drive king in the corner
-					score = EndGameEvaluator.getDrawishScore(cb, WHITE);
-				}*/
-			} else if (score < -25) {
-				if (!MaterialUtil.hasMatingMaterial(cb, BLACK)) {
-					score = EvalConstants.SCORE_DRAW;
-				} /*else if (isDrawishByMaterial(cb, BLACK)) {
-					if (Statistics.ENABLED) {
-						Statistics.drawishByMaterialCount++;
-					}
-					// drive king in the corner
-					score = -EndGameEvaluator.getDrawishScore(cb, BLACK);
-				}*/
-			}
-		}
-
-		score *= ChessConstants.COLOR_FACTOR[cb.colorToMove];
-		if (EngineConstants.TEST_EVAL_CACHES) {
-			final int cachedScore = EvalCache.getScore(cb.zobristKey);
-			if (cachedScore != ChessConstants.CACHE_MISS) {
-				if (cachedScore != score) {
-					throw new RuntimeException(String.format("Cached eval score != score: %s, %s", cachedScore, score));
-				}
-			}
-		}
-
-		EvalCache.addValue(cb.zobristKey, score);
-
-		return score;
+		return taperedEval2(cb, evalInfo);
 	}
 	
 
-	private static int taperedEval(final ChessBoard cb, final EvalInfo evalInfo) {
+	private static int taperedEval1(final ChessBoard cb, final EvalInfo evalInfo) {
 		final int pawnScore = getPawnScores(cb, evalInfo);
-		final int mgEgScore = calculateMobilityScoresAndSetAttacks(cb, evalInfo) + calculateThreats(cb, evalInfo) + calculatePawnShieldBonus(cb, evalInfo);
-		final int phaseIndependentScore = calculateOthers(cb, evalInfo) + getImbalances(cb, evalInfo);
+		final int imbalances = getImbalances(cb, evalInfo);
+		
+		final int scoreMg = cb.phase == PHASE_TOTAL ? 0 : pawnScore + imbalances;
+		
+		final int scoreEg = pawnScore + imbalances;
 
+		return ((scoreMg * (PHASE_TOTAL - cb.phase)) + scoreEg * cb.phase) / PHASE_TOTAL / calculateScaleFactor(cb);		
+	}
+	
+	
+	private static int taperedEval2(final ChessBoard cb, final EvalInfo evalInfo) {
+		final int mgEgScore = calculateMobilityScoresAndSetAttacks(cb, evalInfo) + calculateThreats(cb, evalInfo) + calculatePawnShieldBonus(cb, evalInfo);
+		final int others = calculateOthers(cb, evalInfo);
+		
 		final int scoreMg = cb.phase == PHASE_TOTAL ? 0
-				: getMgScore(mgEgScore) + cb.psqtScore_mg + pawnScore + KingSafetyEval.calculateScores(cb, evalInfo) + calculateSpace(cb, evalInfo) + phaseIndependentScore;
-		final int scoreEg = getEgScore(mgEgScore) + cb.psqtScore_eg + pawnScore + PassedPawnEval.calculateScores(cb, evalInfo) + phaseIndependentScore;
+				: getMgScore(mgEgScore) + cb.psqtScore_mg + KingSafetyEval.calculateScores(cb, evalInfo) + calculateSpace(cb, evalInfo) + others;
+		
+		final int scoreEg = getEgScore(mgEgScore) + cb.psqtScore_eg + PassedPawnEval.calculateScores(cb, evalInfo) + others;
 
 		return ((scoreMg * (PHASE_TOTAL - cb.phase)) + scoreEg * cb.phase) / PHASE_TOTAL / calculateScaleFactor(cb);
 	}
-
+	
+	
 	public static int getMgScore(final int score) {
 		return (score + 0x8000) >> 16;
 	}

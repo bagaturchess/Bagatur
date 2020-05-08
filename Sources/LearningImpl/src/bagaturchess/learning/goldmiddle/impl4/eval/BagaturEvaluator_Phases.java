@@ -15,7 +15,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	
 	
 	private ChessBoard board;
-	private EvalInfo evalinfo;
+	private EvalInfo evalInfo;
 	
 	
 	public BagaturEvaluator_Phases(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -25,6 +25,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		bitboard = _bitboard;
 		
 		board = ((BoardImpl)bitboard).getChessBoard();
+		evalInfo = new EvalInfo();
 	}
 	
 	
@@ -33,13 +34,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase1() {
-		int eval = EvalUtil.getScore(board, evalinfo);
-		if (board.colorToMove == bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK) {
-			eval = -eval;
-		}
-		//int eval = (int)(500 * Math.random() - 250);
-		
-		return eval;
+		return EvalUtil.getScore1(board, evalInfo);
 	}
 
 
@@ -48,9 +43,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase2() {
-		int eval = 0;
-		
-		return eval;
+		return EvalUtil.getScore2(board, evalInfo);
 	}
 
 
