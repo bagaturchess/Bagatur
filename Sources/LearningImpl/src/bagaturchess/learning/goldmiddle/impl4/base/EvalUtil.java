@@ -26,7 +26,7 @@ public class EvalUtil {
 	public static final int PHASE_TOTAL = 4 * EvalConstants.PHASE[NIGHT] + 4 * EvalConstants.PHASE[BISHOP] + 4 * EvalConstants.PHASE[ROOK]
 			+ 2 * EvalConstants.PHASE[QUEEN];
 
-	public static int getScore(final ChessBoard cb) {
+	public static int getScore(final ChessBoard cb, final EvalInfo evalInfo) {
 
 		if (EngineConstants.ENABLE_EVAL_CACHE && !EngineConstants.TEST_EVAL_CACHES) {
 			final int score = EvalCache.getScore(cb.zobristKey);
@@ -34,11 +34,14 @@ public class EvalUtil {
 				return score;
 			}
 		}
-
-		return calculateScore(cb);
+		
+		evalInfo.clearEvals1();
+		
+		
+		return calculateScore(cb, evalInfo);
 	}
 
-	private static int calculateScore(final ChessBoard cb) {
+	private static int calculateScore(final ChessBoard cb, final EvalInfo evalInfo) {
 
 		int score = 0;
 		if (MaterialUtil.isDrawByMaterial(cb)) {
@@ -58,7 +61,7 @@ public class EvalUtil {
 				}
 			}
 		}*/ else {
-			score = taperedEval(cb);
+			score = taperedEval(cb, evalInfo);
 
 			/* draw-by-material */
 			if (score > 25) {
@@ -100,14 +103,14 @@ public class EvalUtil {
 	}
 	
 
-	private static int taperedEval(final ChessBoard cb) {
-		final int pawnScore = getPawnScores(cb);
-		final int mgEgScore = calculateMobilityScoresAndSetAttacks(cb) + calculateThreats(cb) + calculatePawnShieldBonus(cb);
-		final int phaseIndependentScore = calculateOthers(cb) + getImbalances(cb);
+	private static int taperedEval(final ChessBoard cb, final EvalInfo evalInfo) {
+		final int pawnScore = getPawnScores(cb, evalInfo);
+		final int mgEgScore = calculateMobilityScoresAndSetAttacks(cb, evalInfo) + calculateThreats(cb, evalInfo) + calculatePawnShieldBonus(cb, evalInfo);
+		final int phaseIndependentScore = calculateOthers(cb, evalInfo) + getImbalances(cb, evalInfo);
 
 		final int scoreMg = cb.phase == PHASE_TOTAL ? 0
-				: getMgScore(mgEgScore) + cb.psqtScore_mg + pawnScore + KingSafetyEval.calculateScores(cb) + calculateSpace(cb) + phaseIndependentScore;
-		final int scoreEg = getEgScore(mgEgScore) + cb.psqtScore_eg + pawnScore + PassedPawnEval.calculateScores(cb) + phaseIndependentScore;
+				: getMgScore(mgEgScore) + cb.psqtScore_mg + pawnScore + KingSafetyEval.calculateScores(cb, evalInfo) + calculateSpace(cb, evalInfo) + phaseIndependentScore;
+		final int scoreEg = getEgScore(mgEgScore) + cb.psqtScore_eg + pawnScore + PassedPawnEval.calculateScores(cb, evalInfo) + phaseIndependentScore;
 
 		return ((scoreMg * (PHASE_TOTAL - cb.phase)) + scoreEg * cb.phase) / PHASE_TOTAL / calculateScaleFactor(cb);
 	}
@@ -130,7 +133,7 @@ public class EvalUtil {
 		return 1;
 	}
 
-	public static int calculateSpace(final ChessBoard cb) {
+	public static int calculateSpace(final ChessBoard cb, final EvalInfo evalInfo) {
 
 		if (!MaterialUtil.hasPawns(cb.materialKey)) {
 			return 0;
@@ -156,7 +159,7 @@ public class EvalUtil {
 		return score;
 	}
 
-	public static int getPawnScores(final ChessBoard cb) {
+	public static int getPawnScores(final ChessBoard cb, final EvalInfo evalInfo) {
 		if (!EngineConstants.TEST_EVAL_CACHES) {
 			final int score = PawnEvalCache.updateBoardAndGetScore(cb);
 			if (score != ChessConstants.CACHE_MISS) {
@@ -164,10 +167,10 @@ public class EvalUtil {
 			}
 		}
 
-		return calculatePawnScores(cb);
+		return calculatePawnScores(cb, evalInfo);
 	}
 
-	private static int calculatePawnScores(final ChessBoard cb) {
+	private static int calculatePawnScores(final ChessBoard cb, final EvalInfo evalInfo) {
 
 		int score = 0;
 
@@ -318,17 +321,17 @@ public class EvalUtil {
 		return score;
 	}
 
-	public static int getImbalances(final ChessBoard cb) {
+	public static int getImbalances(final ChessBoard cb, final EvalInfo evalInfo) {
 		if (!EngineConstants.TEST_EVAL_CACHES) {
 			final int score = MaterialCache.getScore(cb.materialKey);
 			if (score != ChessConstants.CACHE_MISS) {
 				return score;
 			}
 		}
-		return calculateImbalances(cb);
+		return calculateImbalances(cb, evalInfo);
 	}
 
-	private static int calculateImbalances(final ChessBoard cb) {
+	private static int calculateImbalances(final ChessBoard cb, final EvalInfo evalInfo) {
 
 		int score = 0;
 
@@ -381,7 +384,7 @@ public class EvalUtil {
 		return score;
 	}
 
-	public static int calculateThreats(final ChessBoard cb) {
+	public static int calculateThreats(final ChessBoard cb, final EvalInfo evalInfo) {
 		int score = 0;
 		final long whitePawns = cb.pieces[WHITE][PAWN];
 		final long blackPawns = cb.pieces[BLACK][PAWN];
@@ -465,7 +468,7 @@ public class EvalUtil {
 		return score;
 	}
 
-	public static int calculateOthers(final ChessBoard cb) {
+	public static int calculateOthers(final ChessBoard cb, final EvalInfo evalInfo) {
 		int score = 0;
 		long piece;
 
@@ -722,7 +725,7 @@ public class EvalUtil {
 		return score;
 	}
 
-	public static int calculatePawnShieldBonus(final ChessBoard cb) {
+	public static int calculatePawnShieldBonus(final ChessBoard cb, final EvalInfo evalInfo) {
 
 		if (!MaterialUtil.hasPawns(cb.materialKey)) {
 			return 0;
@@ -755,7 +758,7 @@ public class EvalUtil {
 		return whiteScore - blackScore;
 	}
 
-	public static int calculateMobilityScoresAndSetAttacks(final ChessBoard cb) {
+	public static int calculateMobilityScoresAndSetAttacks(final ChessBoard cb, final EvalInfo evalInfo) {
 
 		cb.clearEvalAttacks();
 		cb.updatePawnAttacks();
@@ -851,4 +854,111 @@ public class EvalUtil {
 				+ (Long.bitCount(cb.pieces[WHITE][QUEEN]) - Long.bitCount(cb.pieces[BLACK][QUEEN])) * EvalConstants.MATERIAL[QUEEN];
 	}
 
+	
+	public static class EvalInfo {
+		
+		
+		public final long[][] attacks = new long[2][7];
+		public final long[] attacksAll = new long[2];
+		public final long[] doubleAttacks = new long[2];
+		public final int[] kingAttackersFlag = new int[2];
+		
+		public long passedPawnsAndOutposts;
+		
+		public long bb_free;
+		public long bb_all;
+		public long bb_all_w_pieces;
+		public long bb_all_b_pieces;
+		public long bb_w_pawns;
+		public long bb_b_pawns;
+		public long bb_w_bishops;
+		public long bb_b_bishops;
+		public long bb_w_knights;
+		public long bb_b_knights;
+		public long bb_w_queens;
+		public long bb_b_queens;
+		public long bb_w_rooks;
+		public long bb_b_rooks;
+		public long bb_w_king;
+		public long bb_b_king;
+		
+		public int eval_o_part1;
+		public int eval_e_part1;
+		public int eval_o_part2;
+		public int eval_e_part2;
+		
+		
+		public final void clearEvalAttacks() {
+			kingAttackersFlag[WHITE] = 0;
+			kingAttackersFlag[BLACK] = 0;
+			attacks[WHITE][NIGHT] = 0;
+			attacks[BLACK][NIGHT] = 0;
+			attacks[WHITE][BISHOP] = 0;
+			attacks[BLACK][BISHOP] = 0;
+			attacks[WHITE][ROOK] = 0;
+			attacks[BLACK][ROOK] = 0;
+			attacks[WHITE][QUEEN] = 0;
+			attacks[BLACK][QUEEN] = 0;
+			attacksAll[WHITE] = 0;
+			attacksAll[BLACK] = 0;
+			doubleAttacks[WHITE] = 0;
+			doubleAttacks[BLACK] = 0;
+		}
+		
+		
+		public final void fillBB(ChessBoard cb) {
+			bb_w_pawns = cb.pieces[WHITE][PAWN];
+			bb_b_pawns = cb.pieces[BLACK][PAWN];
+			bb_w_bishops = cb.pieces[WHITE][BISHOP];
+			bb_b_bishops = cb.pieces[BLACK][BISHOP];
+			bb_w_knights = cb.pieces[WHITE][NIGHT];
+			bb_b_knights = cb.pieces[BLACK][NIGHT];
+			bb_w_queens = cb.pieces[WHITE][QUEEN];
+			bb_b_queens = cb.pieces[BLACK][QUEEN];
+			bb_w_rooks = cb.pieces[WHITE][ROOK];
+			bb_b_rooks = cb.pieces[BLACK][ROOK];
+			bb_w_king = cb.pieces[WHITE][KING];
+			bb_b_king = cb.pieces[BLACK][KING];
+			bb_all_w_pieces = bb_w_pawns | bb_w_bishops | bb_w_knights | bb_w_queens | bb_w_rooks | bb_w_king;
+			bb_all_b_pieces = bb_b_pawns | bb_b_bishops | bb_b_knights | bb_b_queens | bb_b_rooks | bb_b_king;
+			bb_all = bb_all_w_pieces | bb_all_b_pieces;
+			bb_free = ~bb_all;
+		}
+		
+		
+		public final void clearEvals1() {
+			eval_o_part1 = 0;
+			eval_e_part1 = 0;
+		}
+		
+		
+		public final void clearEvals2() {
+			eval_o_part2 = 0;
+			eval_e_part2 = 0;
+		}
+		
+		
+		public final long getFriendlyPieces(int colour) {
+			return colour == WHITE ? bb_all_w_pieces : bb_all_b_pieces;
+		}
+		
+		public final long getPieces(int colour, int type) {
+			switch (type) {
+				case PAWN:
+					return colour == WHITE ? bb_w_pawns : bb_b_pawns;
+				case NIGHT:
+					return colour == WHITE ? bb_w_knights : bb_b_knights;
+				case BISHOP:
+					return colour == WHITE ? bb_w_bishops : bb_b_bishops;
+				case ROOK:
+					return colour == WHITE ? bb_w_rooks : bb_b_rooks;
+				case QUEEN:
+					return colour == WHITE ? bb_w_queens : bb_b_queens;
+				case KING:
+					return colour == WHITE ? bb_w_king : bb_b_king;
+				default:
+					throw new IllegalStateException();
+			}
+		}
+	}
 }

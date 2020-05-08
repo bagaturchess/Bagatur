@@ -12,11 +12,12 @@ import bagaturchess.bitboard.impl1.internal.ChessConstants;
 import bagaturchess.bitboard.impl1.internal.EvalConstants;
 import bagaturchess.bitboard.impl1.internal.StaticMoves;
 import bagaturchess.bitboard.impl1.internal.Util;
+import bagaturchess.learning.goldmiddle.impl4.base.EvalUtil.EvalInfo;
 
 
 public class PassedPawnEval {
 
-	public static int calculateScores(final ChessBoard cb) {
+	public static int calculateScores(final ChessBoard cb, final EvalInfo evalInfo) {
 
 		int score = 0;
 

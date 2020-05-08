@@ -5,6 +5,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.learning.goldmiddle.impl4.base.EvalUtil;
+import bagaturchess.learning.goldmiddle.impl4.base.EvalUtil.EvalInfo;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;
@@ -14,6 +15,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	
 	
 	private ChessBoard board;
+	private EvalInfo evalinfo;
 	
 	
 	public BagaturEvaluator_Phases(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -31,7 +33,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase1() {
-		int eval = EvalUtil.getScore(board);
+		int eval = EvalUtil.getScore(board, evalinfo);
 		if (board.colorToMove == bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK) {
 			eval = -eval;
 		}
