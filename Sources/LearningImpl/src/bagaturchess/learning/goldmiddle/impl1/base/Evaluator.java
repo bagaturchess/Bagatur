@@ -1,16 +1,15 @@
 package bagaturchess.learning.goldmiddle.impl1.base;
 
 
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.BISHOP;
-import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.BLACK;
 import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.KING;
 import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.NIGHT;
 import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.PAWN;
 import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.QUEEN;
 import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.ROOK;
-import static bagaturchess.learning.goldmiddle.impl1.base.ChessConstants.WHITE;
 import bagaturchess.bitboard.api.IBaseEval;
-import bagaturchess.bitboard.api.IBitBoard;
 
 
 public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
@@ -1579,6 +1578,8 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 		public void clearEvalAttacks() {
 			kingAttackersFlag[WHITE] = 0;
 			kingAttackersFlag[BLACK] = 0;
+			attacks[WHITE][PAWN] = 0;
+			attacks[BLACK][PAWN] = 0;
 			attacks[WHITE][NIGHT] = 0;
 			attacks[BLACK][NIGHT] = 0;
 			attacks[WHITE][BISHOP] = 0;
@@ -1587,8 +1588,13 @@ public class Evaluator extends Evaluator_BaseImpl implements FeatureWeights {
 			attacks[BLACK][ROOK] = 0;
 			attacks[WHITE][QUEEN] = 0;
 			attacks[BLACK][QUEEN] = 0;
+			attacks[WHITE][KING] = 0;
+			attacks[BLACK][KING] = 0;
+			attacksAll[WHITE] = 0;
+			attacksAll[BLACK] = 0;
 			doubleAttacks[WHITE] = 0;
 			doubleAttacks[BLACK] = 0;
+			passedPawnsAndOutposts = 0;
 		}
 		
 		
