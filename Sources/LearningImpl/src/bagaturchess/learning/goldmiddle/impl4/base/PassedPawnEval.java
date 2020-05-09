@@ -12,7 +12,6 @@ import bagaturchess.bitboard.impl1.internal.ChessConstants;
 import bagaturchess.bitboard.impl1.internal.EvalConstants;
 import bagaturchess.bitboard.impl1.internal.StaticMoves;
 import bagaturchess.bitboard.impl1.internal.Util;
-import bagaturchess.learning.goldmiddle.impl4.base.EvalUtil.EvalInfo;
 
 
 public class PassedPawnEval {
@@ -25,14 +24,14 @@ public class PassedPawnEval {
 		int blackPromotionDistance = Util.SHORT_MAX;
 
 		// white passed pawns
-		long passedPawns = cb.passedPawnsAndOutposts & cb.pieces[WHITE][ChessConstants.PAWN];
+		long passedPawns = evalInfo.passedPawnsAndOutposts & evalInfo.bb_w_pawns;
 		while (passedPawns != 0) {
 			final int index = 63 - Long.numberOfLeadingZeros(passedPawns);
 
-			score += getPassedPawnScore(cb, index, WHITE);
+			score += getPassedPawnScore(cb, index, WHITE, evalInfo);
 
 			if (whitePromotionDistance == Util.SHORT_MAX) {
-				whitePromotionDistance = getWhitePromotionDistance(cb, index);
+				whitePromotionDistance = getWhitePromotionDistance(cb, index, evalInfo);
 			}
 
 			// skip all passed pawns at same file
@@ -40,14 +39,14 @@ public class PassedPawnEval {
 		}
 
 		// black passed pawns
-		passedPawns = cb.passedPawnsAndOutposts & cb.pieces[BLACK][ChessConstants.PAWN];
+		passedPawns = evalInfo.passedPawnsAndOutposts & evalInfo.bb_b_pawns;
 		while (passedPawns != 0) {
 			final int index = Long.numberOfTrailingZeros(passedPawns);
 
-			score -= getPassedPawnScore(cb, index, BLACK);
+			score -= getPassedPawnScore(cb, index, BLACK, evalInfo);
 
 			if (blackPromotionDistance == Util.SHORT_MAX) {
-				blackPromotionDistance = getBlackPromotionDistance(cb, index);
+				blackPromotionDistance = getBlackPromotionDistance(cb, index, evalInfo);
 			}
 
 			// skip all passed pawns at same file
@@ -63,7 +62,7 @@ public class PassedPawnEval {
 		return score;
 	}
 
-	private static int getPassedPawnScore(final ChessBoard cb, final int index, final int color) {
+	private static int getPassedPawnScore(final ChessBoard cb, final int index, final int color, final EvalInfo evalInfo) {
 
 		final int nextIndex = index + ChessConstants.COLOR_FACTOR_8[color];
 		final long square = Util.POWER_LOOKUP[index];
@@ -74,15 +73,15 @@ public class PassedPawnEval {
 		float multiplier = 1;
 
 		// is piece blocked?
-		if ((cb.allPieces & maskNextSquare) != 0) {
+		if ((evalInfo.bb_all & maskNextSquare) != 0) {
 			multiplier *= EvalConstants.PASSED_MULTIPLIERS[0];
 		}
 
 		// is next squared attacked?
-		if ((cb.attacksAll[enemyColor] & maskNextSquare) == 0) {
+		if ((evalInfo.attacksAll[enemyColor] & maskNextSquare) == 0) {
 
 			// complete path free of enemy attacks?
-			if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & cb.attacksAll[enemyColor]) == 0) {
+			if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & evalInfo.attacksAll[enemyColor]) == 0) {
 				multiplier *= EvalConstants.PASSED_MULTIPLIERS[7];
 			} else {
 				multiplier *= EvalConstants.PASSED_MULTIPLIERS[1];
@@ -90,28 +89,28 @@ public class PassedPawnEval {
 		}
 
 		// is next squared defended?
-		if ((cb.attacksAll[color] & maskNextSquare) != 0) {
+		if ((evalInfo.attacksAll[color] & maskNextSquare) != 0) {
 			multiplier *= EvalConstants.PASSED_MULTIPLIERS[3];
 		}
 
 		// is enemy king in front?
-		if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & cb.pieces[enemyColor][ChessConstants.KING]) != 0) {
+		if ((ChessConstants.PINNED_MOVEMENT[nextIndex][index] & evalInfo.getPieces(enemyColor, ChessConstants.KING)) != 0) {
 			multiplier *= EvalConstants.PASSED_MULTIPLIERS[2];
 		}
 
 		// under attack?
-		if (cb.colorToMove != color && (cb.attacksAll[enemyColor] & square) != 0) {
+		if (cb.colorToMove != color && (evalInfo.attacksAll[enemyColor] & square) != 0) {
 			multiplier *= EvalConstants.PASSED_MULTIPLIERS[4];
 		}
 
 		// defended by rook from behind?
-		if ((maskFile & cb.pieces[color][ROOK]) != 0 && (cb.attacks[color][ROOK] & square) != 0 && (cb.attacks[color][ROOK] & maskPreviousSquare) != 0) {
+		if ((maskFile & evalInfo.getPieces(color, ROOK)) != 0 && (evalInfo.attacks[color][ROOK] & square) != 0 && (evalInfo.attacks[color][ROOK] & maskPreviousSquare) != 0) {
 			multiplier *= EvalConstants.PASSED_MULTIPLIERS[5];
 		}
 
 		// attacked by rook from behind?
-		else if ((maskFile & cb.pieces[enemyColor][ROOK]) != 0 && (cb.attacks[enemyColor][ROOK] & square) != 0
-				&& (cb.attacks[enemyColor][ROOK] & maskPreviousSquare) != 0) {
+		else if ((maskFile & evalInfo.getPieces(enemyColor, ROOK)) != 0 && (evalInfo.attacks[enemyColor][ROOK] & square) != 0
+				&& (evalInfo.attacks[enemyColor][ROOK] & maskPreviousSquare) != 0) {
 			multiplier *= EvalConstants.PASSED_MULTIPLIERS[6];
 		}
 
@@ -123,12 +122,12 @@ public class PassedPawnEval {
 		return (int) (EvalConstants.PASSED_SCORE_EG[scoreIndex] * multiplier);
 	}
 
-	private static int getBlackPromotionDistance(final ChessBoard cb, final int index) {
+	private static int getBlackPromotionDistance(final ChessBoard cb, final int index, final EvalInfo evalInfo) {
 		// check if it cannot be stopped
 		int promotionDistance = index >>> 3;
 		if (promotionDistance == 1 && cb.colorToMove == BLACK) {
-			if ((Util.POWER_LOOKUP[index - 8] & (cb.attacksAll[WHITE] | cb.allPieces)) == 0) {
-				if ((Util.POWER_LOOKUP[index] & cb.attacksAll[WHITE]) == 0) {
+			if ((Util.POWER_LOOKUP[index - 8] & (evalInfo.attacksAll[WHITE] | evalInfo.bb_all)) == 0) {
+				if ((Util.POWER_LOOKUP[index] & evalInfo.attacksAll[WHITE]) == 0) {
 					return 1;
 				}
 			}
@@ -140,7 +139,7 @@ public class PassedPawnEval {
 			}
 
 			// check if own pieces are blocking the path
-			if (Long.numberOfTrailingZeros(cb.friendlyPieces[BLACK] & Bitboard.FILES[index & 7]) < index) {
+			if (Long.numberOfTrailingZeros(evalInfo.getFriendlyPieces(BLACK) & Bitboard.FILES[index & 7]) < index) {
 				promotionDistance++;
 			}
 
@@ -154,16 +153,16 @@ public class PassedPawnEval {
 				if (!MaterialUtil.hasWhiteNonPawnPieces(cb.materialKey)) {
 					return promotionDistance;
 				}
-				if (cb.pieces[WHITE][NIGHT] != 0) {
+				if (evalInfo.bb_w_knights != 0) {
 					// check distance of enemy night
-					if (promotionDistance < Util.getDistance(Long.numberOfTrailingZeros(cb.pieces[WHITE][NIGHT]), index)) {
+					if (promotionDistance < Util.getDistance(Long.numberOfTrailingZeros(evalInfo.bb_w_knights), index)) {
 						return promotionDistance;
 					}
 				} else {
 					// can bishop stop the passed pawn?
 					if (index >>> 3 == 1) {
-						if (((Util.POWER_LOOKUP[index] & Bitboard.WHITE_SQUARES) == 0) == ((cb.pieces[WHITE][BISHOP] & Bitboard.WHITE_SQUARES) == 0)) {
-							if ((cb.attacksAll[WHITE] & Util.POWER_LOOKUP[index]) == 0) {
+						if (((Util.POWER_LOOKUP[index] & Bitboard.WHITE_SQUARES) == 0) == ((evalInfo.bb_w_bishops & Bitboard.WHITE_SQUARES) == 0)) {
+							if ((evalInfo.attacksAll[WHITE] & Util.POWER_LOOKUP[index]) == 0) {
 								return promotionDistance;
 							}
 						}
@@ -174,12 +173,12 @@ public class PassedPawnEval {
 		return Util.SHORT_MAX;
 	}
 
-	private static int getWhitePromotionDistance(final ChessBoard cb, final int index) {
+	private static int getWhitePromotionDistance(final ChessBoard cb, final int index, final EvalInfo evalInfo) {
 		// check if it cannot be stopped
 		int promotionDistance = 7 - index / 8;
 		if (promotionDistance == 1 && cb.colorToMove == WHITE) {
-			if ((Util.POWER_LOOKUP[index + 8] & (cb.attacksAll[BLACK] | cb.allPieces)) == 0) {
-				if ((Util.POWER_LOOKUP[index] & cb.attacksAll[BLACK]) == 0) {
+			if ((Util.POWER_LOOKUP[index + 8] & (evalInfo.attacksAll[BLACK] | evalInfo.bb_all)) == 0) {
+				if ((Util.POWER_LOOKUP[index] & evalInfo.attacksAll[BLACK]) == 0) {
 					return 1;
 				}
 			}
@@ -191,7 +190,7 @@ public class PassedPawnEval {
 			}
 
 			// check if own pieces are blocking the path
-			if (63 - Long.numberOfLeadingZeros(cb.friendlyPieces[WHITE] & Bitboard.FILES[index & 7]) > index) {
+			if (63 - Long.numberOfLeadingZeros(evalInfo.getFriendlyPieces(WHITE) & Bitboard.FILES[index & 7]) > index) {
 				promotionDistance++;
 			}
 
@@ -206,17 +205,17 @@ public class PassedPawnEval {
 				if (!MaterialUtil.hasBlackNonPawnPieces(cb.materialKey)) {
 					return promotionDistance;
 				}
-				if (cb.pieces[BLACK][NIGHT] != 0) {
+				if (evalInfo.bb_b_knights != 0) {
 					// check distance of enemy night
-					if (promotionDistance < Util.getDistance(Long.numberOfTrailingZeros(cb.pieces[BLACK][NIGHT]), index)) {
+					if (promotionDistance < Util.getDistance(Long.numberOfTrailingZeros(evalInfo.bb_b_knights), index)) {
 						return promotionDistance;
 					}
 				} else {
 					// can bishop stop the passed pawn?
 					if (index >>> 3 == 6) { // rank 7
-						if (((Util.POWER_LOOKUP[index] & Bitboard.WHITE_SQUARES) == 0) == ((cb.pieces[BLACK][BISHOP] & Bitboard.WHITE_SQUARES) == 0)) {
+						if (((Util.POWER_LOOKUP[index] & Bitboard.WHITE_SQUARES) == 0) == ((evalInfo.bb_b_bishops & Bitboard.WHITE_SQUARES) == 0)) {
 							// other color than promotion square
-							if ((cb.attacksAll[BLACK] & Util.POWER_LOOKUP[index]) == 0) {
+							if ((evalInfo.attacksAll[BLACK] & Util.POWER_LOOKUP[index]) == 0) {
 								return promotionDistance;
 							}
 						}

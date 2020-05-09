@@ -4,8 +4,8 @@ package bagaturchess.learning.goldmiddle.impl4.eval;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
+import bagaturchess.learning.goldmiddle.impl4.base.EvalInfo;
 import bagaturchess.learning.goldmiddle.impl4.base.EvalUtil;
-import bagaturchess.learning.goldmiddle.impl4.base.EvalUtil.EvalInfo;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;
@@ -34,6 +34,10 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase1() {
+		
+		evalInfo.clearEvals1();
+		evalInfo.fillBB(board);
+		
 		return EvalUtil.getScore1(board, evalInfo);
 	}
 
@@ -43,6 +47,9 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase2() {
+		
+		evalInfo.clearEvals2();
+		
 		return EvalUtil.getScore2(board, evalInfo);
 	}
 

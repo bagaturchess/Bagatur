@@ -19,7 +19,7 @@ public class PawnEvalCache {
 		Arrays.fill(keys, 0);
 	}
 
-	public static int updateBoardAndGetScore(final ChessBoard cb) {
+	public static int updateBoardAndGetScore(final ChessBoard cb, final EvalInfo evalInfo) {
 
 		if (!EngineConstants.ENABLE_PAWN_EVAL_CACHE) {
 			return ChessConstants.CACHE_MISS;
@@ -32,7 +32,7 @@ public class PawnEvalCache {
 
 		if ((xorKey ^ score ^ passedPawnsAndOutpostsValue) == cb.pawnZobristKey) {
 			if (!EngineConstants.TEST_EVAL_CACHES) {
-				cb.passedPawnsAndOutposts = passedPawnsAndOutpostsValue;
+				evalInfo.passedPawnsAndOutposts = passedPawnsAndOutpostsValue;
 			}
 			return score;
 		}
