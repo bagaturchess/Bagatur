@@ -26,8 +26,10 @@ package com.bagaturchess.ucitournament.single.runner;
 import java.util.ArrayList;
 import java.util.List;
 
+import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
+import bagaturchess.uci.impl.Channel_Console;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_FixedDepth;
@@ -49,6 +51,10 @@ public class TournamentRunner {
 	private static final EngineProcess bagatur_dev 			= new EngineProcess("Bagatur DEV", "C:\\DATA\\Engines\\BagaturEngine_DEV\\Bagatur_64_1_core.exe",
 															new String [0],
 															"C:\\DATA\\Engines\\BagaturEngine_DEV\\");
+
+	private static final EngineProcess bagatur_20 			= new EngineProcess("Bagatur 2.0", "C:\\DATA\\Engines\\BagaturEngine.2.0\\Bagatur_64_1_core.exe",
+															new String [0],
+															"C:\\DATA\\Engines\\BagaturEngine.2.0\\");
 
 	private static final EngineProcess bagatur_19a 			= new EngineProcess("Bagatur 1.9a", "C:\\DATA\\Engines\\BagaturEngine.1.9a\\Bagatur_64_1_core.exe",
 															new String [0],
@@ -105,14 +111,16 @@ public class TournamentRunner {
 	public static void main(String[] args) {
 		
 		
-		EngineProcess engine1 = chess22k_1_13;
-		EngineProcess engine2 = asparuh;
+		EngineProcess engine1 = bagatur_dev;
+		EngineProcess engine2 = bagatur_20;
 		
 		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
 		
 		
 		try {
+			
+			ChannelManager.setChannel(new Channel_Console());
 			
 			engine1.start();
 			engine2.start();
@@ -131,14 +139,14 @@ public class TournamentRunner {
 			ITournamentSchedule schedule = new TournamentSchedule_2Engines(engines, 100000);
 			
 			//MatchRunner matchRunner = new MatchRunner_TimePerMove(50);
-			//MatchRunner matchRunner = new MatchRunner_FixedDepth(7);
+			MatchRunner matchRunner = new MatchRunner_FixedDepth(7);
 			//MatchRunner matchRunner = new MatchRunner_FixedNodes(10000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 60 * 1000, 10 * 60 * 1000, 10 * 1000, 10 * 1000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(1 * 60 * 1000, 1 * 60 * 1000, 1 * 1000, 1 * 1000);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(20 * 1000, 20 * 1000, 200, 200);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(10 * 1000, 10 * 1000, 100, 100);
 			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(5 * 1000, 5 * 1000, 50, 50);
-			MatchRunner matchRunner = new MatchRunner_TimeAndInc(1 * 1000, 1 * 1000, 10, 10);
+			//MatchRunner matchRunner = new MatchRunner_TimeAndInc(1 * 1000, 1 * 1000, 10, 10);
 			
 			Tournament tournament = new Tournament(schedule, matchRunner, false);
 			
