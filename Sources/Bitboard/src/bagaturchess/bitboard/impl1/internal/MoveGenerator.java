@@ -192,6 +192,12 @@ public final class MoveGenerator {
 	}
 
 	
+	public void randomize() {
+		final int left = nextToMove[currentPly];
+		randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
+	}
+	
+	
 	private static void randomize(int[] arr1, int[] arr2, int start, int end) {
 	    for (int i=end; i>1+start; i--) {
 	    	

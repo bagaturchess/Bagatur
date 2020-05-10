@@ -435,7 +435,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				final int move = moveGen.next();
 
 				//Build and sent minor info
-				if (depth == 0) {
+				if (ply == 0) {
 					info.setCurrentMove(move);
 					info.setCurrentMoveNumber((movesPerformed + 1));
 				}
