@@ -69,7 +69,6 @@ import bagaturchess.bitboard.impl.movegen.OfficerMovesGen;
 import bagaturchess.bitboard.impl.movegen.QueenMovesGen;
 import bagaturchess.bitboard.impl.movegen.WhitePawnMovesGen;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
-import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.plies.BlackPawnPlies;
 import bagaturchess.bitboard.impl.plies.CastlePlies;
 import bagaturchess.bitboard.impl.plies.KingPlies;
@@ -87,7 +86,6 @@ import bagaturchess.bitboard.impl.plies.specials.Enpassanting;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl.state.PiecesLists;
 import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
-import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 
 
 public class Board extends Fields implements IBitBoard, Cloneable {

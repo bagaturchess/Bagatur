@@ -41,7 +41,7 @@ import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 public class BoardProxy_ReversedBBs implements IBitBoard {
 	
 	
-	private IBitBoard bitboard;
+	private final IBitBoard bitboard;
 	
 	
 	public BoardProxy_ReversedBBs(IBitBoard _bitboard) {
