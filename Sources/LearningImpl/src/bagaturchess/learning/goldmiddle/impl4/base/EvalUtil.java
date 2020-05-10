@@ -41,14 +41,11 @@ public class EvalUtil {
 	
 	
 	private static int taperedEval1(final ChessBoard cb, final EvalInfo evalInfo) {
-		final int pawnScore = getPawnScores(cb, evalInfo);
-		final int imbalances = getImbalances(cb, evalInfo);
 		
-		final int scoreMg = cb.phase == PHASE_TOTAL ? 0 : pawnScore + imbalances;
-		
-		final int scoreEg = pawnScore + imbalances;
+		getImbalances(cb, evalInfo);
+		getPawnScores(cb, evalInfo);
 
-		return ((scoreMg * (PHASE_TOTAL - cb.phase)) + scoreEg * cb.phase) / PHASE_TOTAL / calculateScaleFactor(cb, evalInfo);		
+		return ((evalInfo.eval_o_part1 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part1 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(cb, evalInfo);		
 	}
 	
 	
@@ -113,53 +110,56 @@ public class EvalUtil {
 	}
 	
 	
-	public static int getPawnScores(final ChessBoard cb, final EvalInfo evalInfo) {
-		if (!EngineConstants.TEST_EVAL_CACHES) {
-			final int score = PawnEvalCache.updateBoardAndGetScore(cb, evalInfo);
-			if (score != ChessConstants.CACHE_MISS) {
-				return score;
-			}
-		}
-
-		return calculatePawnScores(cb, evalInfo);
+	public static void getPawnScores(final ChessBoard cb, final EvalInfo evalInfo) {
+		calculatePawnScores(cb, evalInfo);
 	}
 
 	
-	private static int calculatePawnScores(final ChessBoard cb, final EvalInfo evalInfo) {
-
-		int score = 0;
+	private static void calculatePawnScores(final ChessBoard cb, final EvalInfo evalInfo) {
 
 		// penalty for doubled pawns
 		for (int i = 0; i < 8; i++) {
 			if (Long.bitCount(evalInfo.bb_w_pawns & Bitboard.FILES[i]) > 1) {
-				score -= EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_DOUBLE];
+				int eval = -EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_DOUBLE];
+				evalInfo.eval_o_part1 += eval;
+				evalInfo.eval_e_part1 += eval;
 			}
 			if (Long.bitCount(evalInfo.bb_b_pawns & Bitboard.FILES[i]) > 1) {
-				score += EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_DOUBLE];
+				int eval = +EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_DOUBLE];
+				evalInfo.eval_o_part1 += eval;
+				evalInfo.eval_e_part1 += eval;
 			}
 		}
 
 		// bonus for connected pawns
 		long pawns = Bitboard.getWhitePawnAttacks(evalInfo.bb_w_pawns) & evalInfo.bb_w_pawns;
 		while (pawns != 0) {
-			score += EvalConstants.PAWN_CONNECTED[Long.numberOfTrailingZeros(pawns) / 8];
+			int eval = +EvalConstants.PAWN_CONNECTED[Long.numberOfTrailingZeros(pawns) / 8];
+			evalInfo.eval_o_part1 += eval;
+			evalInfo.eval_e_part1 += eval;
 			pawns &= pawns - 1;
 		}
 		pawns = Bitboard.getBlackPawnAttacks(evalInfo.bb_b_pawns) & evalInfo.bb_b_pawns;
 		while (pawns != 0) {
-			score -= EvalConstants.PAWN_CONNECTED[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			int eval = -EvalConstants.PAWN_CONNECTED[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			evalInfo.eval_o_part1 += eval;
+			evalInfo.eval_e_part1 += eval;
 			pawns &= pawns - 1;
 		}
 
 		// bonus for neighbour pawns
 		pawns = Bitboard.getPawnNeighbours(evalInfo.bb_w_pawns) & evalInfo.bb_w_pawns;
 		while (pawns != 0) {
-			score += EvalConstants.PAWN_NEIGHBOUR[Long.numberOfTrailingZeros(pawns) / 8];
+			int eval = +EvalConstants.PAWN_NEIGHBOUR[Long.numberOfTrailingZeros(pawns) / 8];
+			evalInfo.eval_o_part1 += eval;
+			evalInfo.eval_e_part1 += eval;
 			pawns &= pawns - 1;
 		}
 		pawns = Bitboard.getPawnNeighbours(evalInfo.bb_b_pawns) & evalInfo.bb_b_pawns;
 		while (pawns != 0) {
-			score -= EvalConstants.PAWN_NEIGHBOUR[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			int eval = -EvalConstants.PAWN_NEIGHBOUR[7 - Long.numberOfTrailingZeros(pawns) / 8];
+			evalInfo.eval_o_part1 += eval;
+			evalInfo.eval_e_part1 += eval;
 			pawns &= pawns - 1;
 		}
 
@@ -189,21 +189,27 @@ public class EvalUtil {
 
 			// isolated pawns
 			if ((Bitboard.FILES_ADJACENT[index & 7] & evalInfo.bb_w_pawns) == 0) {
-				score -= EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_ISOLATED];
+				int eval = -EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_ISOLATED];
+				evalInfo.eval_o_part1 += eval;
+				evalInfo.eval_e_part1 += eval;
 			}
 
 			// backward pawns
 			else if ((Bitboard.getBlackAdjacentMask(index + 8) & evalInfo.bb_w_pawns) == 0) {
 				if ((StaticMoves.PAWN_ATTACKS[WHITE][index + 8] & evalInfo.bb_b_pawns) != 0) {
 					if ((Bitboard.FILES[index & 7] & evalInfo.bb_b_pawns) == 0) {
-						score -= EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_BACKWARD];
+						int eval = -EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_BACKWARD];
+						evalInfo.eval_o_part1 += eval;
+						evalInfo.eval_e_part1 += eval;
 					}
 				}
 			}
 
 			// pawn defending 2 pawns
 			if (Long.bitCount(StaticMoves.PAWN_ATTACKS[WHITE][index] & evalInfo.bb_w_pawns) == 2) {
-				score -= EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_INVERSE];
+				int eval = -EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_INVERSE];
+				evalInfo.eval_o_part1 += eval;
+				evalInfo.eval_e_part1 += eval;
 			}
 
 			// set passed pawns
@@ -215,7 +221,9 @@ public class EvalUtil {
 			else if (63 - Long.numberOfLeadingZeros((evalInfo.bb_w_pawns | evalInfo.bb_b_pawns) & Bitboard.FILES[index & 7]) == index) {
 				if (Long.bitCount(evalInfo.bb_w_pawns & Bitboard.getBlackPassedPawnMask(index + 8)) >= Long
 						.bitCount(evalInfo.bb_b_pawns & Bitboard.getWhitePassedPawnMask(index))) {
-					score += EvalConstants.PASSED_CANDIDATE[index / 8];
+					int eval = +EvalConstants.PASSED_CANDIDATE[index / 8];
+					evalInfo.eval_o_part1 += eval;
+					evalInfo.eval_e_part1 += eval;
 				}
 			}
 
@@ -229,21 +237,27 @@ public class EvalUtil {
 
 			// isolated pawns
 			if ((Bitboard.FILES_ADJACENT[index & 7] & evalInfo.bb_b_pawns) == 0) {
-				score += EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_ISOLATED];
+				int eval = +EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_ISOLATED];
+				evalInfo.eval_o_part1 += eval;
+				evalInfo.eval_e_part1 += eval;
 			}
 
 			// backward pawns
 			else if ((Bitboard.getWhiteAdjacentMask(index - 8) & evalInfo.bb_b_pawns) == 0) {
 				if ((StaticMoves.PAWN_ATTACKS[BLACK][index - 8] & evalInfo.bb_w_pawns) != 0) {
 					if ((Bitboard.FILES[index & 7] & evalInfo.bb_w_pawns) == 0) {
-						score += EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_BACKWARD];
+						int eval = +EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_BACKWARD];
+						evalInfo.eval_o_part1 += eval;
+						evalInfo.eval_e_part1 += eval;
 					}
 				}
 			}
 
 			// pawn defending 2 pawns
 			if (Long.bitCount(StaticMoves.PAWN_ATTACKS[BLACK][index] & evalInfo.bb_b_pawns) == 2) {
-				score += EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_INVERSE];
+				int eval = +EvalConstants.PAWN_SCORES[EvalConstants.IX_PAWN_INVERSE];
+				evalInfo.eval_o_part1 += eval;
+				evalInfo.eval_e_part1 += eval;
 			}
 
 			// set passed pawns
@@ -255,88 +269,74 @@ public class EvalUtil {
 			else if (Long.numberOfTrailingZeros((evalInfo.bb_w_pawns | evalInfo.bb_b_pawns) & Bitboard.FILES[index & 7]) == index) {
 				if (Long.bitCount(evalInfo.bb_b_pawns & Bitboard.getWhitePassedPawnMask(index - 8)) >= Long
 						.bitCount(evalInfo.bb_w_pawns & Bitboard.getBlackPassedPawnMask(index))) {
-					score -= EvalConstants.PASSED_CANDIDATE[7 - index / 8];
+					int eval = -EvalConstants.PASSED_CANDIDATE[7 - index / 8];
+					evalInfo.eval_o_part1 += eval;
+					evalInfo.eval_e_part1 += eval;
 				}
 			}
 
 			pawns &= pawns - 1;
 		}
-
-		if (EngineConstants.TEST_EVAL_CACHES) {
-			final int cachedScore = PawnEvalCache.updateBoardAndGetScore(cb, evalInfo);
-			if (cachedScore != ChessConstants.CACHE_MISS) {
-				if (cachedScore != score) {
-					throw new RuntimeException(String.format("Cached pawn eval score != score: %s, %s", cachedScore, score));
-				}
-			}
-		}
-
-		PawnEvalCache.addValue(cb.pawnZobristKey, score, evalInfo.passedPawnsAndOutposts);
-
-		return score;
 	}
 
-	public static int getImbalances(final ChessBoard cb, final EvalInfo evalInfo) {
-		if (!EngineConstants.TEST_EVAL_CACHES) {
-			final int score = MaterialCache.getScore(cb.materialKey);
-			if (score != ChessConstants.CACHE_MISS) {
-				return score;
-			}
-		}
-		return calculateImbalances(cb, evalInfo);
+	public static void getImbalances(final ChessBoard cb, final EvalInfo evalInfo) {
+		calculateImbalances(cb, evalInfo);
 	}
 
-	private static int calculateImbalances(final ChessBoard cb, final EvalInfo evalInfo) {
-
-		int score = 0;
+	private static void calculateImbalances(final ChessBoard cb, final EvalInfo evalInfo) {
 
 		// material
-		score += calculateMaterialScore(evalInfo);
-
+		calculateMaterialScore(evalInfo);
+		
+		int eval;
+		
 		// knights and pawns
-		score += Long.bitCount(evalInfo.bb_w_knights) * EvalConstants.NIGHT_PAWN[Long.bitCount(evalInfo.bb_w_pawns)];
-		score -= Long.bitCount(evalInfo.bb_b_knights) * EvalConstants.NIGHT_PAWN[Long.bitCount(evalInfo.bb_b_pawns)];
-
+		eval = +Long.bitCount(evalInfo.bb_w_knights) * EvalConstants.NIGHT_PAWN[Long.bitCount(evalInfo.bb_w_pawns)];
+		eval -= Long.bitCount(evalInfo.bb_b_knights) * EvalConstants.NIGHT_PAWN[Long.bitCount(evalInfo.bb_b_pawns)];
+		evalInfo.eval_o_part1 += eval;
+		evalInfo.eval_e_part1 += eval;
+		
 		// rooks and pawns
-		score += Long.bitCount(evalInfo.bb_w_rooks) * EvalConstants.ROOK_PAWN[Long.bitCount(evalInfo.bb_w_pawns)];
-		score -= Long.bitCount(evalInfo.bb_b_rooks) * EvalConstants.ROOK_PAWN[Long.bitCount(evalInfo.bb_b_pawns)];
-
+		eval = +Long.bitCount(evalInfo.bb_w_rooks) * EvalConstants.ROOK_PAWN[Long.bitCount(evalInfo.bb_w_pawns)];
+		eval -= Long.bitCount(evalInfo.bb_b_rooks) * EvalConstants.ROOK_PAWN[Long.bitCount(evalInfo.bb_b_pawns)];
+		evalInfo.eval_o_part1 += eval;
+		evalInfo.eval_e_part1 += eval;
+		
 		// double bishop
 		if (Long.bitCount(evalInfo.bb_w_bishops) == 2) {
-			score += EvalConstants.IMBALANCE_SCORES[EvalConstants.IX_BISHOP_DOUBLE];
+			eval = +EvalConstants.IMBALANCE_SCORES[EvalConstants.IX_BISHOP_DOUBLE];
+			evalInfo.eval_o_part1 += eval;
+			evalInfo.eval_e_part1 += eval;
 		}
 		if (Long.bitCount(evalInfo.bb_b_bishops) == 2) {
-			score -= EvalConstants.IMBALANCE_SCORES[EvalConstants.IX_BISHOP_DOUBLE];
+			eval = -EvalConstants.IMBALANCE_SCORES[EvalConstants.IX_BISHOP_DOUBLE];
+			evalInfo.eval_o_part1 += eval;
+			evalInfo.eval_e_part1 += eval;
 		}
 
 		// queen and nights
 		if (evalInfo.bb_w_queens != 0) {
-			score += Long.bitCount(evalInfo.bb_w_knights) * EvalConstants.IMBALANCE_SCORES[EvalConstants.IX_QUEEN_NIGHT];
+			eval = +Long.bitCount(evalInfo.bb_w_knights) * EvalConstants.IMBALANCE_SCORES[EvalConstants.IX_QUEEN_NIGHT];
+			evalInfo.eval_o_part1 += eval;
+			evalInfo.eval_e_part1 += eval;
 		}
 		if (evalInfo.bb_b_queens != 0) {
-			score -= Long.bitCount(evalInfo.bb_b_knights) * EvalConstants.IMBALANCE_SCORES[EvalConstants.IX_QUEEN_NIGHT];
+			eval = -Long.bitCount(evalInfo.bb_b_knights) * EvalConstants.IMBALANCE_SCORES[EvalConstants.IX_QUEEN_NIGHT];
+			evalInfo.eval_o_part1 += eval;
+			evalInfo.eval_e_part1 += eval;
 		}
 
 		// rook pair
 		if (Long.bitCount(evalInfo.bb_w_rooks) > 1) {
-			score += EvalConstants.IMBALANCE_SCORES[EvalConstants.IX_ROOK_PAIR];
+			eval = +EvalConstants.IMBALANCE_SCORES[EvalConstants.IX_ROOK_PAIR];
+			evalInfo.eval_o_part1 += eval;
+			evalInfo.eval_e_part1 += eval;
 		}
 		if (Long.bitCount(evalInfo.bb_b_rooks) > 1) {
-			score -= EvalConstants.IMBALANCE_SCORES[EvalConstants.IX_ROOK_PAIR];
+			eval = -EvalConstants.IMBALANCE_SCORES[EvalConstants.IX_ROOK_PAIR];
+			evalInfo.eval_o_part1 += eval;
+			evalInfo.eval_e_part1 += eval;
 		}
-
-		if (EngineConstants.TEST_EVAL_CACHES) {
-			final int cachedScore = MaterialCache.getScore(cb.materialKey);
-			if (cachedScore != ChessConstants.CACHE_MISS) {
-				if (cachedScore != score) {
-					throw new RuntimeException(String.format("Cached material score != score: %s, %s", cachedScore, score));
-				}
-			}
-		}
-
-		MaterialCache.addValue(cb.materialKey, score);
-
-		return score;
 	}
 
 	public static int calculateThreats(final ChessBoard cb, final EvalInfo evalInfo) {
@@ -786,11 +786,24 @@ public class EvalUtil {
 	}
 	
 	
-	public static int calculateMaterialScore(final EvalInfo evalInfo) {
-		return (Long.bitCount(evalInfo.bb_w_pawns) - Long.bitCount(evalInfo.bb_b_pawns)) * EvalConstants.MATERIAL[PAWN]
-				+ (Long.bitCount(evalInfo.bb_w_knights) - Long.bitCount(evalInfo.bb_b_knights)) * EvalConstants.MATERIAL[NIGHT]
-				+ (Long.bitCount(evalInfo.bb_w_bishops) - Long.bitCount(evalInfo.bb_b_bishops)) * EvalConstants.MATERIAL[BISHOP]
-				+ (Long.bitCount(evalInfo.bb_w_rooks) - Long.bitCount(evalInfo.bb_b_rooks)) * EvalConstants.MATERIAL[ROOK]
-				+ (Long.bitCount(evalInfo.bb_w_queens) - Long.bitCount(evalInfo.bb_b_queens)) * EvalConstants.MATERIAL[QUEEN];
+	public static void calculateMaterialScore(final EvalInfo evalInfo) {
+		
+		int count_pawns = Long.bitCount(evalInfo.bb_w_pawns) - Long.bitCount(evalInfo.bb_b_pawns);
+		int count_knights = Long.bitCount(evalInfo.bb_w_knights) - Long.bitCount(evalInfo.bb_b_knights);
+		int count_bishops = Long.bitCount(evalInfo.bb_w_bishops) - Long.bitCount(evalInfo.bb_b_bishops);
+		int count_rooks = Long.bitCount(evalInfo.bb_w_rooks) - Long.bitCount(evalInfo.bb_b_rooks);
+		int count_queens = Long.bitCount(evalInfo.bb_w_queens) - Long.bitCount(evalInfo.bb_b_queens);
+		
+		evalInfo.eval_o_part1 += count_pawns * EvalConstants.MATERIAL[PAWN]
+				+ count_knights * EvalConstants.MATERIAL[NIGHT]
+				+ count_bishops * EvalConstants.MATERIAL[BISHOP]
+				+ count_rooks * EvalConstants.MATERIAL[ROOK]
+				+ count_queens * EvalConstants.MATERIAL[QUEEN];
+		
+		evalInfo.eval_e_part1 += count_pawns * EvalConstants.MATERIAL[PAWN]
+				+ count_knights * EvalConstants.MATERIAL[NIGHT]
+				+ count_bishops * EvalConstants.MATERIAL[BISHOP]
+				+ count_rooks * EvalConstants.MATERIAL[ROOK]
+				+ count_queens * EvalConstants.MATERIAL[QUEEN];
 	}
 }
