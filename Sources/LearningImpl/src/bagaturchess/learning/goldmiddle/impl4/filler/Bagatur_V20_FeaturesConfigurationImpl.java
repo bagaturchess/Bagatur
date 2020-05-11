@@ -73,15 +73,11 @@ public class Bagatur_V20_FeaturesConfigurationImpl implements IFeaturesConfigura
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK			, "THREAT.QUEEN.ATTACKED.ROOK"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_QUEEN_ATTACKED_MINOR			, "THREAT.QUEEN.ATTACKED.MINOR"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_ROOK_ATTACKED				, "THREAT.ROOK.ATTACKED"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		//add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_NIGHT_FORK					, "THREAT.NIGHT.FORK"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		//add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_NIGHT_FORK_KING			, "THREAT.NIGHT.FORK.KING"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		
 		
 		//Others
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_SIDE_TO_MOVE					, "OTHERS.SIDE.TO.MOVE"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS			, "OTHERS.ONLY.MAJOR.DEFENDERS"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_HANGING						, "OTHERS.HANGING"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_HANGING_2					, "OTHERS.HANGING.2"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_BATTERY					, "OTHERS.ROOK.BATTERY"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_7TH_RANK				, "OTHERS.ROOK.7TH.RANK"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_ROOK_TRAPPED					, "OTHERS.ROOK.TRAPPED"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
@@ -94,8 +90,9 @@ public class Bagatur_V20_FeaturesConfigurationImpl implements IFeaturesConfigura
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK			, "OTHERS.BISHOP.CENTER.ATTACK"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_PAWN_BLOCKAGE				, "OTHERS.PAWN.BLOCKAGE"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_KNIGHT_OUTPOST				, "OTHERS.KNIGHT.OUTPOST"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_IN_CHECK						, "OTHERS.IN.CHECK"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_CASTLING						, "OTHERS.CASTLING"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_PINNED						, "OTHERS.PINNED"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_OTHERS_DISCOVERED					, "OTHERS.DISCOVERED"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		
 		//King safety and space
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_KING_SAFETY							, "KING.SAFETY"							, STANDARD         , 0, 100,  1, 0, 100,  1 ));

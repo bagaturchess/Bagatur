@@ -56,7 +56,7 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		calculatePassedPawnScores(evalInfo, evalComponentsProcessor);
 		calculateSpace(evalInfo, evalComponentsProcessor);
 		calculateOthers(cb, evalInfo, evalComponentsProcessor);
-
+		
 		return ((evalInfo.eval_o_part2 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part2 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(cb, evalInfo);
 	}
 	
@@ -493,21 +493,27 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		
 		// side to move
 		score = +ChessConstants.COLOR_FACTOR[evalInfo.colorToMove] * EvalConstants.SIDE_TO_MOVE_BONUS;
-		evalInfo.eval_o_part2 += score;
-		evalInfo.eval_e_part2 += score;
+		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_SIDE_TO_MOVE,
+				score,
+				score,
+				OTHERS_SIDE_TO_MOVE_O, OTHERS_SIDE_TO_MOVE_E);
 		
 		// piece attacked and only defended by a rook or queen
 		piece = whites & blackAttacks & whiteAttacks & ~(whitePawnAttacks | evalInfo.attacks[WHITE][NIGHT] | evalInfo.attacks[WHITE][BISHOP]);
 		if (piece != 0) {
 			score = +Long.bitCount(piece) * EvalConstants.OTHER_SCORES[EvalConstants.IX_ONLY_MAJOR_DEFENDERS];
-			evalInfo.eval_o_part2 += score;
-			evalInfo.eval_e_part2 += score;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS,
+					score,
+					score,
+					OTHERS_ONLY_MAJOR_DEFENDERS_O, OTHERS_ONLY_MAJOR_DEFENDERS_E);
 		}
 		piece = blacks & whiteAttacks & blackAttacks & ~(blackPawnAttacks | evalInfo.attacks[BLACK][NIGHT] | evalInfo.attacks[BLACK][BISHOP]);
 		if (piece != 0) {
 			score = -Long.bitCount(piece) * EvalConstants.OTHER_SCORES[EvalConstants.IX_ONLY_MAJOR_DEFENDERS];
-			evalInfo.eval_o_part2 += score;
-			evalInfo.eval_e_part2 += score;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS,
+					score,
+					score,
+					OTHERS_ONLY_MAJOR_DEFENDERS_O, OTHERS_ONLY_MAJOR_DEFENDERS_E);
 		}
 
 		// WHITE ROOK
@@ -519,16 +525,20 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 			if (Long.bitCount(piece) == 2) {
 				if ((Long.numberOfTrailingZeros(piece) & 7) == (63 - Long.numberOfLeadingZeros(piece) & 7)) {
 					score = +EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_BATTERY];
-					evalInfo.eval_o_part2 += score;
-					evalInfo.eval_e_part2 += score;
+					evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ROOK_BATTERY,
+							score,
+							score,
+							OTHERS_ROOK_BATTERY_O, OTHERS_ROOK_BATTERY_E);
 				}
 			}
 
 			// rook on 7th, king on 8th
 			if (evalInfo.kingIndex[BLACK] >= 56 && (piece & Bitboard.RANK_7) != 0) {
 				score = +Long.bitCount(piece & Bitboard.RANK_7) * EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_7TH_RANK];
-				evalInfo.eval_o_part2 += score;
-				evalInfo.eval_e_part2 += score;
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ROOK_7TH_RANK,
+						score,
+						score,
+						OTHERS_ROOK_7TH_RANK_O, OTHERS_ROOK_7TH_RANK_E);
 			}
 
 			// prison
@@ -538,8 +548,10 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 					for (int i = 8; i <= 24; i += 8) {
 						if ((trapped << i & whitePawns) != 0) {
 							score = +EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_TRAPPED];
-							evalInfo.eval_o_part2 += score;
-							evalInfo.eval_e_part2 += score;
+							evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ROOK_TRAPPED,
+									score,
+									score,
+									OTHERS_ROOK_TRAPPED_O, OTHERS_ROOK_TRAPPED_E);
 							break;
 						}
 					}
@@ -551,16 +563,22 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 				if ((whitePawns & Bitboard.FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 					if ((blackPawns & Bitboard.FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 						score = +EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_FILE_OPEN];
-						evalInfo.eval_o_part2 += score;
-						evalInfo.eval_e_part2 += score;
+						evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ROOK_FILE_OPEN,
+								score,
+								score,
+								OTHERS_ROOK_FILE_OPEN_O, OTHERS_ROOK_FILE_OPEN_E);
 					} else if ((blackPawns & blackPawnAttacks & Bitboard.FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 						score = +EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
-						evalInfo.eval_o_part2 += score;
-						evalInfo.eval_e_part2 += score;
+						evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED,
+								score,
+								score,
+								OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_O, OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_E);
 					} else {
 						score = +EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_FILE_SEMI_OPEN];
-						evalInfo.eval_o_part2 += score;
-						evalInfo.eval_e_part2 += score;
+						evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN,
+								score,
+								score,
+								OTHERS_ROOK_FILE_SEMI_OPEN_O, OTHERS_ROOK_FILE_SEMI_OPEN_E);
 					}
 				}
 
@@ -577,16 +595,20 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 			if (Long.bitCount(piece) == 2) {
 				if ((Long.numberOfTrailingZeros(piece) & 7) == (63 - Long.numberOfLeadingZeros(piece) & 7)) {
 					score = -EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_BATTERY];
-					evalInfo.eval_o_part2 += score;
-					evalInfo.eval_e_part2 += score;
+					evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ROOK_BATTERY,
+							score,
+							score,
+							OTHERS_ROOK_BATTERY_O, OTHERS_ROOK_BATTERY_E);
 				}
 			}
 
 			// rook on 2nd, king on 1st
 			if (evalInfo.kingIndex[WHITE] <= 7 && (piece & Bitboard.RANK_2) != 0) {
 				score = -Long.bitCount(piece & Bitboard.RANK_2) * EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_7TH_RANK];
-				evalInfo.eval_o_part2 += score;
-				evalInfo.eval_e_part2 += score;
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ROOK_7TH_RANK,
+						score,
+						score,
+						OTHERS_ROOK_7TH_RANK_O, OTHERS_ROOK_7TH_RANK_E);
 			}
 
 			// prison
@@ -596,8 +618,10 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 					for (int i = 8; i <= 24; i += 8) {
 						if ((trapped >>> i & blackPawns) != 0) {
 							score = -EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_TRAPPED];
-							evalInfo.eval_o_part2 += score;
-							evalInfo.eval_e_part2 += score;
+							evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ROOK_TRAPPED,
+									score,
+									score,
+									OTHERS_ROOK_TRAPPED_O, OTHERS_ROOK_TRAPPED_E);
 							break;
 						}
 					}
@@ -610,16 +634,22 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 				if ((blackPawns & Bitboard.FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 					if ((whitePawns & Bitboard.FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 						score = -EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_FILE_OPEN];
-						evalInfo.eval_o_part2 += score;
-						evalInfo.eval_e_part2 += score;
+						evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ROOK_FILE_OPEN,
+								score,
+								score,
+								OTHERS_ROOK_FILE_OPEN_O, OTHERS_ROOK_FILE_OPEN_E);
 					} else if ((whitePawns & whitePawnAttacks & Bitboard.FILES[Long.numberOfTrailingZeros(piece) & 7]) == 0) {
 						score = -EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_FILE_SEMI_OPEN_ISOLATED];
-						evalInfo.eval_o_part2 += score;
-						evalInfo.eval_e_part2 += score;
+						evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED,
+								score,
+								score,
+								OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_O, OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_E);
 					} else {
 						score = -EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_FILE_SEMI_OPEN];
-						evalInfo.eval_o_part2 += score;
-						evalInfo.eval_e_part2 += score;
+						evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN,
+								score,
+								score,
+								OTHERS_ROOK_FILE_SEMI_OPEN_O, OTHERS_ROOK_FILE_SEMI_OPEN_E);
 					}
 				}
 				piece &= piece - 1;
@@ -634,34 +664,45 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 			piece = evalInfo.bb_w_bishops & evalInfo.passedPawnsAndOutposts & whitePawnAttacks;
 			if (piece != 0) {
 				score = +Long.bitCount(piece) * EvalConstants.OTHER_SCORES[EvalConstants.IX_OUTPOST];
-				evalInfo.eval_o_part2 += score;
-				evalInfo.eval_e_part2 += score;
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_BISHOP_OUTPOST,
+						score,
+						score,
+						OTHERS_BISHOP_OUTPOST_O, OTHERS_BISHOP_OUTPOST_E);
 			}
 
 			piece = evalInfo.bb_w_bishops;
 			if ((piece & Bitboard.WHITE_SQUARES) != 0) {
 				// pawns on same color as bishop
 				score = +EvalConstants.BISHOP_PAWN[Long.bitCount(whitePawns & Bitboard.WHITE_SQUARES)];
-				evalInfo.eval_o_part2 += score;
-				evalInfo.eval_e_part2 += score;
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_BISHOP_PAWNS,
+						score,
+						score,
+						OTHERS_BISHOP_PAWNS_O, OTHERS_BISHOP_PAWNS_E);
 				
 				// attacking center squares
 				if (Long.bitCount(evalInfo.attacks[WHITE][BISHOP] & Bitboard.E4_D5) == 2) {
 					score = +EvalConstants.OTHER_SCORES[EvalConstants.IX_BISHOP_LONG];
-					evalInfo.eval_o_part2 += score;
-					evalInfo.eval_e_part2 += score;
+					evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK,
+							score,
+							score,
+							OTHERS_BISHOP_CENTER_ATTACK_O, OTHERS_BISHOP_CENTER_ATTACK_E);
 				}
 			}
 			if ((piece & Bitboard.BLACK_SQUARES) != 0) {
 				// pawns on same color as bishop
 				score = +EvalConstants.BISHOP_PAWN[Long.bitCount(whitePawns & Bitboard.BLACK_SQUARES)];
-				evalInfo.eval_o_part2 += score;
-				evalInfo.eval_e_part2 += score;
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_BISHOP_PAWNS,
+						score,
+						score,
+						OTHERS_BISHOP_PAWNS_O, OTHERS_BISHOP_PAWNS_E);
+				
 				// attacking center squares
 				if (Long.bitCount(evalInfo.attacks[WHITE][BISHOP] & Bitboard.D4_E5) == 2) {
 					score = +EvalConstants.OTHER_SCORES[EvalConstants.IX_BISHOP_LONG];
-					evalInfo.eval_o_part2 += score;
-					evalInfo.eval_e_part2 += score;
+					evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK,
+							score,
+							score,
+							OTHERS_BISHOP_CENTER_ATTACK_O, OTHERS_BISHOP_CENTER_ATTACK_E);
 				}
 			}
 
@@ -670,8 +711,10 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 			while (piece != 0) {
 				if (Long.bitCount((EvalConstants.BISHOP_PRISON[Long.numberOfTrailingZeros(piece)]) & blackPawns) == 2) {
 					score = +EvalConstants.OTHER_SCORES[EvalConstants.IX_BISHOP_PRISON];
-					evalInfo.eval_o_part2 += score;
-					evalInfo.eval_e_part2 += score;
+					evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_BISHOP_PRISON,
+							score,
+							score,
+							OTHERS_BISHOP_PRISON_O, OTHERS_BISHOP_PRISON_E);
 				}
 				piece &= piece - 1;
 			}
@@ -685,35 +728,45 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 			piece = evalInfo.bb_b_bishops & evalInfo.passedPawnsAndOutposts & blackPawnAttacks;
 			if (piece != 0) {
 				score = -Long.bitCount(piece) * EvalConstants.OTHER_SCORES[EvalConstants.IX_OUTPOST];
-				evalInfo.eval_o_part2 += score;
-				evalInfo.eval_e_part2 += score;
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_BISHOP_OUTPOST,
+						score,
+						score,
+						OTHERS_BISHOP_OUTPOST_O, OTHERS_BISHOP_OUTPOST_E);
 			}
 
 			piece = evalInfo.bb_b_bishops;
 			if ((piece & Bitboard.WHITE_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
 				score = -EvalConstants.BISHOP_PAWN[Long.bitCount(blackPawns & Bitboard.WHITE_SQUARES)];
-				evalInfo.eval_o_part2 += score;
-				evalInfo.eval_e_part2 += score;
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_BISHOP_PAWNS,
+						score,
+						score,
+						OTHERS_BISHOP_PAWNS_O, OTHERS_BISHOP_PAWNS_E);
 				
 				// bonus for attacking center squares
 				if (Long.bitCount(evalInfo.attacks[BLACK][BISHOP] & Bitboard.E4_D5) == 2) {
 					score = -EvalConstants.OTHER_SCORES[EvalConstants.IX_BISHOP_LONG];
-					evalInfo.eval_o_part2 += score;
-					evalInfo.eval_e_part2 += score;
+					evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK,
+							score,
+							score,
+							OTHERS_BISHOP_CENTER_ATTACK_O, OTHERS_BISHOP_CENTER_ATTACK_E);
 				}
 			}
 			if ((piece & Bitboard.BLACK_SQUARES) != 0) {
 				// penalty for many pawns on same color as bishop
 				score = -EvalConstants.BISHOP_PAWN[Long.bitCount(blackPawns & Bitboard.BLACK_SQUARES)];
-				evalInfo.eval_o_part2 += score;
-				evalInfo.eval_e_part2 += score;
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_BISHOP_PAWNS,
+						score,
+						score,
+						OTHERS_BISHOP_PAWNS_O, OTHERS_BISHOP_PAWNS_E);
 				
 				// bonus for attacking center squares
 				if (Long.bitCount(evalInfo.attacks[BLACK][BISHOP] & Bitboard.D4_E5) == 2) {
 					score = -EvalConstants.OTHER_SCORES[EvalConstants.IX_BISHOP_LONG];
-					evalInfo.eval_o_part2 += score;
-					evalInfo.eval_e_part2 += score;
+					evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK,
+							score,
+							score,
+							OTHERS_BISHOP_CENTER_ATTACK_O, OTHERS_BISHOP_CENTER_ATTACK_E);
 				}
 			}
 
@@ -722,8 +775,10 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 			while (piece != 0) {
 				if (Long.bitCount((EvalConstants.BISHOP_PRISON[Long.numberOfTrailingZeros(piece)]) & whitePawns) == 2) {
 					score = -EvalConstants.OTHER_SCORES[EvalConstants.IX_BISHOP_PRISON];
-					evalInfo.eval_o_part2 += score;
-					evalInfo.eval_e_part2 += score;
+					evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_BISHOP_PRISON,
+							score,
+							score,
+							OTHERS_BISHOP_PRISON_O, OTHERS_BISHOP_PRISON_E);
 				}
 				piece &= piece - 1;
 			}
@@ -734,15 +789,19 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		piece = (whitePawns << 8) & whites;
 		while (piece != 0) {
 			score = +EvalConstants.PAWN_BLOCKAGE[Long.numberOfTrailingZeros(piece) >>> 3];
-			evalInfo.eval_o_part2 += score;
-			evalInfo.eval_e_part2 += score;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_PAWN_BLOCKAGE,
+					score,
+					score,
+					OTHERS_PAWN_BLOCKAGE_O, OTHERS_PAWN_BLOCKAGE_E);
 			piece &= piece - 1;
 		}
 		piece = (blackPawns >>> 8) & blacks;
 		while (piece != 0) {
 			score = -EvalConstants.PAWN_BLOCKAGE[7 - Long.numberOfTrailingZeros(piece) / 8];
-			evalInfo.eval_o_part2 += score;
-			evalInfo.eval_e_part2 += score;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_PAWN_BLOCKAGE,
+					score,
+					score,
+					OTHERS_PAWN_BLOCKAGE_O, OTHERS_PAWN_BLOCKAGE_E);
 			piece &= piece - 1;
 		}
 
@@ -750,14 +809,18 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		piece = evalInfo.bb_w_knights & evalInfo.passedPawnsAndOutposts & whitePawnAttacks;
 		if (piece != 0) {
 			score = +Long.bitCount(piece) * EvalConstants.OTHER_SCORES[EvalConstants.IX_OUTPOST];
-			evalInfo.eval_o_part2 += score;
-			evalInfo.eval_e_part2 += score;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_KNIGHT_OUTPOST,
+					score,
+					score,
+					OTHERS_KNIGHT_OUTPOST_O, OTHERS_KNIGHT_OUTPOST_E);
 		}
 		piece = evalInfo.bb_b_knights & evalInfo.passedPawnsAndOutposts & blackPawnAttacks;
 		if (piece != 0) {
 			score = -Long.bitCount(piece) * EvalConstants.OTHER_SCORES[EvalConstants.IX_OUTPOST];
-			evalInfo.eval_o_part2 += score;
-			evalInfo.eval_e_part2 += score;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_KNIGHT_OUTPOST,
+					score,
+					score,
+					OTHERS_KNIGHT_OUTPOST_O, OTHERS_KNIGHT_OUTPOST_E);
 		}
 
 		// pinned-pieces
@@ -765,15 +828,19 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 			piece = evalInfo.pinnedPieces & whites;
 			while (piece != 0) {
 				score = +EvalConstants.PINNED[cb.pieceIndexes[Long.numberOfTrailingZeros(piece)]];
-				evalInfo.eval_o_part2 += score;
-				evalInfo.eval_e_part2 += score;
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_PINNED,
+						score,
+						score,
+						OTHERS_PINNED_O, OTHERS_PINNED_E);
 				piece &= piece - 1;
 			}
 			piece = evalInfo.pinnedPieces & blacks;
 			while (piece != 0) {
 				score = -EvalConstants.PINNED[cb.pieceIndexes[Long.numberOfTrailingZeros(piece)]];
-				evalInfo.eval_o_part2 += score;
-				evalInfo.eval_e_part2 += score;
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_PINNED,
+						score,
+						score,
+						OTHERS_PINNED_O, OTHERS_PINNED_E);
 				piece &= piece - 1;
 			}
 		}
@@ -783,15 +850,19 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 			piece = evalInfo.discoveredPieces & whites;
 			while (piece != 0) {
 				score = +EvalConstants.DISCOVERED[cb.pieceIndexes[Long.numberOfTrailingZeros(piece)]];
-				evalInfo.eval_o_part2 += score;
-				evalInfo.eval_e_part2 += score;
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_DISCOVERED,
+						score,
+						score,
+						OTHERS_DISCOVERED_O, OTHERS_DISCOVERED_E);
 				piece &= piece - 1;
 			}
 			piece = evalInfo.discoveredPieces & blacks;
 			while (piece != 0) {
 				score = -EvalConstants.DISCOVERED[cb.pieceIndexes[Long.numberOfTrailingZeros(piece)]];
-				evalInfo.eval_o_part2 += score;
-				evalInfo.eval_e_part2 += score;
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_DISCOVERED,
+						score,
+						score,
+						OTHERS_DISCOVERED_O, OTHERS_DISCOVERED_E);
 				piece &= piece - 1;
 			}
 		}
@@ -799,8 +870,10 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		if (cb.castlingRights != 0) {
 			score = +Long.bitCount(cb.castlingRights & 12) * EvalConstants.OTHER_SCORES[EvalConstants.IX_CASTLING];
 			score -= Long.bitCount(cb.castlingRights & 3) * EvalConstants.OTHER_SCORES[EvalConstants.IX_CASTLING];
-			evalInfo.eval_o_part2 += score;
-			evalInfo.eval_e_part2 += score;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_OTHERS_CASTLING,
+					score,
+					score,
+					OTHERS_CASTLING_O, OTHERS_CASTLING_E);
 		}
 	}
 

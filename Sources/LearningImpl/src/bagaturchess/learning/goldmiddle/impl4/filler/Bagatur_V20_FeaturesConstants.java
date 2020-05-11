@@ -76,15 +76,11 @@ public interface Bagatur_V20_FeaturesConstants {
 	public static final int FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK			= 1350;
 	public static final int FEATURE_ID_THREAT_QUEEN_ATTACKED_MINOR 			= 1360;
 	public static final int FEATURE_ID_THREAT_ROOK_ATTACKED 				= 1370;
-	//public static final int FEATURE_ID_THREAT_NIGHT_FORK 					= 1380;
-	//public static final int FEATURE_ID_THREAT_NIGHT_FORK_KING 			= 1390;
 	
 	
 	//Others
 	public static final int FEATURE_ID_OTHERS_SIDE_TO_MOVE	 				= 1400;
 	public static final int FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS			= 1410;
-	public static final int FEATURE_ID_OTHERS_HANGING 						= 1420;
-	public static final int FEATURE_ID_OTHERS_HANGING_2 					= 1430;
 	public static final int FEATURE_ID_OTHERS_ROOK_BATTERY 					= 1440;
 	public static final int FEATURE_ID_OTHERS_ROOK_7TH_RANK 				= 1450;
 	public static final int FEATURE_ID_OTHERS_ROOK_TRAPPED 					= 1460;
@@ -97,10 +93,12 @@ public interface Bagatur_V20_FeaturesConstants {
 	public static final int FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK 			= 1530;
 	public static final int FEATURE_ID_OTHERS_PAWN_BLOCKAGE 				= 1540;
 	public static final int FEATURE_ID_OTHERS_KNIGHT_OUTPOST 				= 1550;
-	public static final int FEATURE_ID_OTHERS_IN_CHECK 						= 1560;
+	public static final int FEATURE_ID_OTHERS_CASTLING 						= 1560;
+	public static final int FEATURE_ID_OTHERS_PINNED 						= 1570;
+	public static final int FEATURE_ID_OTHERS_DISCOVERED					= 1580;
 	
 	
 	//King safety and space
-	public static final int FEATURE_ID_KING_SAFETY 							= 1570;
-	public static final int FEATURE_ID_SPACE 								= 1580;
+	public static final int FEATURE_ID_KING_SAFETY 							= 1590;
+	public static final int FEATURE_ID_SPACE 								= 1600;
 }
