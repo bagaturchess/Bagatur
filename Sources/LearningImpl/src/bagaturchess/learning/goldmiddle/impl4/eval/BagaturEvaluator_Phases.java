@@ -14,8 +14,8 @@ import bagaturchess.search.impl.evalcache.IEvalCache;
 public class BagaturEvaluator_Phases extends BaseEvaluator {
 	
 	
-	private ChessBoard board;
-	private EvalInfo evalInfo;
+	private final ChessBoard board;
+	private final EvalInfo evalInfo;
 	
 	
 	public BagaturEvaluator_Phases(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -38,7 +38,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		evalInfo.clearEvals1();
 		evalInfo.fillBB(board);
 		
-		return EvalUtil.getScore1(board, evalInfo);
+		return EvalUtil.eval1(board, evalInfo);
 	}
 
 
@@ -50,7 +50,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		
 		evalInfo.clearEvals2();
 		
-		return EvalUtil.getScore2(board, evalInfo);
+		return EvalUtil.eval2(board, evalInfo);
 	}
 
 

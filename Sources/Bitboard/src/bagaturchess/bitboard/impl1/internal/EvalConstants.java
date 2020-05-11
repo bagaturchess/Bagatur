@@ -38,7 +38,6 @@ public class EvalConstants {
 	// threats
 	public static final int[] THREATS_MG = {34, 68, 108, 12, 66, 52, 8, 16, -6};
 	public static final int[] THREATS_EG = {32, 14, -38, 16, 10, -12, 24, 4, 10};
-	public static final int[] THREATS = new int[THREATS_MG.length];
 	public static final int IX_MULTIPLE_PAWN_ATTACKS 		= 0;
 	public static final int IX_PAWN_ATTACKS 				= 1;
 	public static final int IX_QUEEN_ATTACKED 				= 2;
@@ -86,7 +85,6 @@ public class EvalConstants {
 															{0, -16, -26, -10, 42, 6, 20},
 															{0, 0, 8, 0, 28, 24, 38},
 															{0, -22, -14, 0, 38, 10, 60}};
-	public static final int[][] SHIELD_BONUS 			= new int[4][7];
 
 	public static final int[] PASSED_SCORE_EG			= {0, 14, 18, 34, 62, 128, 238};
 	public static final int[] PASSED_CANDIDATE			= {0, 2, 2, 8, 14, 40};
@@ -138,11 +136,6 @@ public class EvalConstants {
 	public static final int[] MOBILITY_QUEEN_EG 	= {-28, -82, -102, -82, -76, -54, -40, -24, -10, -2, 8, 24, 30, 32, 38, 54, 60, 46, 70, 72, 66, 66, 52, 18, -8, -32, 64, -94};
 	public static final int[] MOBILITY_KING_MG		= {-10, -12, -8, 0, 10, 26, 36, 70, 122};
 	public static final int[] MOBILITY_KING_EG		= {-38, -2, 8, 8, 2, -12, -12, -26, -60};
-	public static final int[] MOBILITY_KNIGHT		= new int[MOBILITY_KNIGHT_MG.length];
-	public static final int[] MOBILITY_BISHOP		= new int[MOBILITY_BISHOP_MG.length];
-	public static final int[] MOBILITY_ROOK			= new int[MOBILITY_ROOK_MG.length];
-	public static final int[] MOBILITY_QUEEN		= new int[MOBILITY_QUEEN_MG.length];
-	public static final int[] MOBILITY_KING			= new int[MOBILITY_KING_MG.length];
 	
 	/** piece, color, square */
 	public static final int[][][] PSQT_MG			= new int[7][2][64];
@@ -179,20 +172,6 @@ public class EvalConstants {
 			MATERIAL[ChessConstants.ROOK] 	- MATERIAL[ChessConstants.PAWN],
 			MATERIAL[ChessConstants.QUEEN] 	- MATERIAL[ChessConstants.PAWN],
 	};
-	
-	
-	public static void initMgEg() {
-		initMgEg(MOBILITY_KNIGHT,	MOBILITY_KNIGHT_MG,	MOBILITY_KNIGHT_EG);
-		initMgEg(MOBILITY_BISHOP, 	MOBILITY_BISHOP_MG, MOBILITY_BISHOP_EG);
-		initMgEg(MOBILITY_ROOK,		MOBILITY_ROOK_MG,	MOBILITY_ROOK_EG);
-		initMgEg(MOBILITY_QUEEN,	MOBILITY_QUEEN_MG,	MOBILITY_QUEEN_EG);
-		initMgEg(MOBILITY_KING,		MOBILITY_KING_MG,	MOBILITY_KING_EG);
-		initMgEg(THREATS,			THREATS_MG,			THREATS_EG);
-		
-		for (int i = 0; i < 4; i++) {
-			initMgEg(SHIELD_BONUS[i], SHIELD_BONUS_MG[i], SHIELD_BONUS_EG[i]);
-		}
-	}
 
 	public static final void initPSQT(IBoardConfig config) {
 		
@@ -275,8 +254,6 @@ public class EvalConstants {
 		
 		Util.reverse(ROOK_PRISON);
 		Util.reverse(BISHOP_PRISON);
-		
-		initMgEg();
 	}
 	
 	public static void main(String[] args) {
