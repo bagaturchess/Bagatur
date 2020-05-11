@@ -722,16 +722,16 @@ public class EvalUtil {
 		long piece = evalInfo.bb_w_pawns & ChessConstants.KING_AREA[WHITE][cb.kingIndex[WHITE]] & ~evalInfo.attacks[BLACK][PAWN];
 		while (piece != 0) {
 			file = Long.numberOfTrailingZeros(piece) & 7;
-			evalInfo.eval_o_part2 += EvalConstants.SHIELD_BONUS_MG[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3] / evalInfo.bb_b_queens == 0 ? 2 : 1;
-			evalInfo.eval_e_part2 += EvalConstants.SHIELD_BONUS_EG[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3] / evalInfo.bb_b_queens == 0 ? 2 : 1;
+			evalInfo.eval_o_part2 += EvalConstants.SHIELD_BONUS_MG[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3] / ((evalInfo.bb_b_queens == 0) ? 2 : 1);
+			evalInfo.eval_e_part2 += EvalConstants.SHIELD_BONUS_EG[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3] / ((evalInfo.bb_b_queens == 0) ? 2 : 1);
 			piece &= ~Bitboard.FILES[file];
 		}
 
 		piece = evalInfo.bb_b_pawns & ChessConstants.KING_AREA[BLACK][cb.kingIndex[BLACK]] & ~evalInfo.attacks[WHITE][PAWN];
 		while (piece != 0) {
 			file = (63 - Long.numberOfLeadingZeros(piece)) & 7;
-			evalInfo.eval_o_part2 += -EvalConstants.SHIELD_BONUS_MG[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8] / evalInfo.bb_w_queens == 0 ? 2 : 1;
-			evalInfo.eval_e_part2 += -EvalConstants.SHIELD_BONUS_EG[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8] / evalInfo.bb_w_queens == 0 ? 2 : 1;
+			evalInfo.eval_o_part2 += -EvalConstants.SHIELD_BONUS_MG[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8] / ((evalInfo.bb_w_queens == 0) ? 2 : 1);
+			evalInfo.eval_e_part2 += -EvalConstants.SHIELD_BONUS_EG[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8] / ((evalInfo.bb_w_queens == 0) ? 2 : 1);
 			piece &= ~Bitboard.FILES[file];
 		}
 	}
