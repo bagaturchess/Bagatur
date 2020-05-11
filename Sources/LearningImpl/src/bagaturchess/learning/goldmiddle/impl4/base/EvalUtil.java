@@ -68,7 +68,7 @@ public class EvalUtil {
 	}
 	
 	
-	public static void calculateSpace(final EvalInfo evalInfo) {
+	private static void calculateSpace(final EvalInfo evalInfo) {
 
 		int score1 = 0;
 		score1 += EvalConstants.OTHER_SCORES[EvalConstants.IX_SPACE]
@@ -436,7 +436,7 @@ public class EvalUtil {
 		evalInfo.eval_e_part2 += -count * EvalConstants.THREATS_EG[EvalConstants.IX_ROOK_ATTACKED];
 	}
 
-	public static void calculateOthers(final ChessBoard cb, final EvalInfo evalInfo) {
+	private static void calculateOthers(final ChessBoard cb, final EvalInfo evalInfo) {
 		
 		long piece;
 
@@ -764,7 +764,7 @@ public class EvalUtil {
 		}
 	}
 
-	public static void calculatePawnShieldBonus(final EvalInfo evalInfo) {
+	private static void calculatePawnShieldBonus(final EvalInfo evalInfo) {
 
 		int file;
 
@@ -859,7 +859,7 @@ public class EvalUtil {
 	}
 	
 	
-	public static void calculateMaterialScore(final EvalInfo evalInfo) {
+	private static void calculateMaterialScore(final EvalInfo evalInfo) {
 		
 		int count_pawns = Long.bitCount(evalInfo.bb_w_pawns) - Long.bitCount(evalInfo.bb_b_pawns);
 		int count_knights = Long.bitCount(evalInfo.bb_w_knights) - Long.bitCount(evalInfo.bb_b_knights);
@@ -881,7 +881,7 @@ public class EvalUtil {
 	}
 	
 	
-	public static void calculateKingSafetyScores(final EvalInfo evalInfo) {
+	private static void calculateKingSafetyScores(final EvalInfo evalInfo) {
 
 		int score = 0;
 
