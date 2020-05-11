@@ -79,9 +79,6 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 				* Long.bitCount((evalInfo.bb_w_pawns >>> 8) & (evalInfo.bb_w_knights | evalInfo.bb_w_bishops) & Bitboard.RANK_234);
 		score1 -= EvalConstants.OTHER_SCORES[EvalConstants.IX_SPACE]
 				* Long.bitCount((evalInfo.bb_b_pawns << 8) & (evalInfo.bb_b_knights | evalInfo.bb_b_bishops) & Bitboard.RANK_567);
-
-		evalInfo.eval_o_part2 += score1;
-		evalInfo.eval_e_part2 += score1;
 		
 		// idea taken from Laser
 		int score2 = 0;
@@ -94,8 +91,10 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		score2 -= EvalConstants.SPACE[Long.bitCount(evalInfo.getFriendlyPieces(BLACK))]
 				* Long.bitCount(space & ~evalInfo.bb_b_pawns & ~evalInfo.attacks[WHITE][PAWN] & Bitboard.FILE_CDEF);
 		
-		evalInfo.eval_o_part2 += score2;
-		//evalInfo.eval_e_part2 += score2;
+		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_SPACE,
+				score1 + score2,
+				score1 + score2,
+				SPACE_O, SPACE_E);
 	}
 
 	
@@ -335,110 +334,146 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		long piece = evalInfo.doubleAttacks[WHITE] & blacks;
 		while (piece != 0) {
 			int eval = +EvalConstants.DOUBLE_ATTACKED[cb.pieceIndexes[Long.numberOfTrailingZeros(piece)]];
-			evalInfo.eval_o_part2 += eval;
-			evalInfo.eval_e_part2 += eval;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_DOUBLE_ATTACKED,
+					eval, eval, THREAT_DOUBLE_ATTACKED_O, THREAT_DOUBLE_ATTACKED_E);
 			piece &= piece - 1;
 		}
 		piece = evalInfo.doubleAttacks[BLACK] & whites;
 		while (piece != 0) {
 			int eval = -EvalConstants.DOUBLE_ATTACKED[cb.pieceIndexes[Long.numberOfTrailingZeros(piece)]];
-			evalInfo.eval_o_part2 += eval;
-			evalInfo.eval_e_part2 += eval;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_DOUBLE_ATTACKED,
+					eval, eval, THREAT_DOUBLE_ATTACKED_O, THREAT_DOUBLE_ATTACKED_E);
 			piece &= piece - 1;
 		}
 		
 		int count;
 		
 		if (MaterialUtil.hasPawns(evalInfo.materialKey)) {
-
+			
 			// unused outposts
 			count = Long.bitCount(evalInfo.passedPawnsAndOutposts & evalInfo.bb_free & whiteMinorAttacks & whitePawnAttacks);
-			evalInfo.eval_o_part2 += +count * EvalConstants.THREATS_MG[EvalConstants.IX_UNUSED_OUTPOST];
-			evalInfo.eval_e_part2 += +count * EvalConstants.THREATS_EG[EvalConstants.IX_UNUSED_OUTPOST];
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_UNUSED_OUTPOST,
+					+count * EvalConstants.THREATS_MG[EvalConstants.IX_UNUSED_OUTPOST],
+					+count * EvalConstants.THREATS_EG[EvalConstants.IX_UNUSED_OUTPOST],
+					THREAT_UNUSED_OUTPOST_O, THREAT_UNUSED_OUTPOST_E);
 			
 			count = Long.bitCount(evalInfo.passedPawnsAndOutposts & evalInfo.bb_free & blackMinorAttacks & blackPawnAttacks);
-			evalInfo.eval_o_part2 += -count * EvalConstants.THREATS_MG[EvalConstants.IX_UNUSED_OUTPOST];
-			evalInfo.eval_e_part2 += -count * EvalConstants.THREATS_EG[EvalConstants.IX_UNUSED_OUTPOST];
-
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_UNUSED_OUTPOST,
+					-count * EvalConstants.THREATS_MG[EvalConstants.IX_UNUSED_OUTPOST],
+					-count * EvalConstants.THREATS_EG[EvalConstants.IX_UNUSED_OUTPOST],
+					THREAT_UNUSED_OUTPOST_O, THREAT_UNUSED_OUTPOST_E);
+			
 			// pawn push threat
 			count = Long.bitCount(Bitboard.getWhitePawnAttacks((whitePawns << 8) & evalInfo.bb_free & ~blackAttacks) & blacks);
-			evalInfo.eval_o_part2 += +count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_PUSH_THREAT];
-			evalInfo.eval_e_part2 += +count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_PUSH_THREAT];
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_PAWN_PUSH,
+					+count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_PUSH_THREAT],
+					+count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_PUSH_THREAT],
+					THREAT_PAWN_PUSH_O, THREAT_PAWN_PUSH_E);
 			
 			count = Long.bitCount(Bitboard.getBlackPawnAttacks((blackPawns >>> 8) & evalInfo.bb_free & ~whiteAttacks) & whites);
-			evalInfo.eval_o_part2 += -count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_PUSH_THREAT];
-			evalInfo.eval_e_part2 += -count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_PUSH_THREAT];
-
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_PAWN_PUSH,
+					-count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_PUSH_THREAT],
+					-count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_PUSH_THREAT],
+					THREAT_PAWN_PUSH_O, THREAT_PAWN_PUSH_E);
+			
 			// piece attacked by pawn
 			count = Long.bitCount(whitePawnAttacks & blacks & ~blackPawns);
-			evalInfo.eval_o_part2 += +count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_ATTACKS];
-			evalInfo.eval_e_part2 += +count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_ATTACKS];
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_PAWN_ATTACKS,
+					+count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_ATTACKS],
+					+count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_ATTACKS],
+					THREAT_PAWN_ATTACKS_O, THREAT_PAWN_ATTACKS_E);
 			
 			count  = Long.bitCount(blackPawnAttacks & whites & ~whitePawns);
-			evalInfo.eval_o_part2 += -count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_ATTACKS];
-			evalInfo.eval_e_part2 += -count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_ATTACKS];
-
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_PAWN_ATTACKS,
+					-count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_ATTACKS],
+					-count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_ATTACKS],
+					THREAT_PAWN_ATTACKS_O, THREAT_PAWN_ATTACKS_E);
+			
 			// multiple pawn attacks possible
 			if (Long.bitCount(whitePawnAttacks & blacks) > 1) {
-				evalInfo.eval_o_part2 += EvalConstants.THREATS_MG[EvalConstants.IX_MULTIPLE_PAWN_ATTACKS];
-				evalInfo.eval_e_part2 += EvalConstants.THREATS_EG[EvalConstants.IX_MULTIPLE_PAWN_ATTACKS];
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_MULTIPLE_PAWN_ATTACKS,
+						+EvalConstants.THREATS_MG[EvalConstants.IX_MULTIPLE_PAWN_ATTACKS],
+						+EvalConstants.THREATS_EG[EvalConstants.IX_MULTIPLE_PAWN_ATTACKS],
+						THREAT_MULTIPLE_PAWN_ATTACKS_O, THREAT_MULTIPLE_PAWN_ATTACKS_E);
 			}
 			if (Long.bitCount(blackPawnAttacks & whites) > 1) {
-				evalInfo.eval_o_part2 += -EvalConstants.THREATS_MG[EvalConstants.IX_MULTIPLE_PAWN_ATTACKS];
-				evalInfo.eval_e_part2 += -EvalConstants.THREATS_EG[EvalConstants.IX_MULTIPLE_PAWN_ATTACKS];
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_MULTIPLE_PAWN_ATTACKS,
+						-EvalConstants.THREATS_MG[EvalConstants.IX_MULTIPLE_PAWN_ATTACKS],
+						-EvalConstants.THREATS_EG[EvalConstants.IX_MULTIPLE_PAWN_ATTACKS],
+						THREAT_MULTIPLE_PAWN_ATTACKS_O, THREAT_MULTIPLE_PAWN_ATTACKS_E);
 			}
-
+			
 			// pawn attacked
 			count = Long.bitCount(whiteAttacks & blackPawns);
-			evalInfo.eval_o_part2 += +count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_ATTACKED];
-			evalInfo.eval_e_part2 += +count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_ATTACKED];
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_PAWN_ATTACKED,
+					+count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_ATTACKED],
+					+count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_ATTACKED],
+					THREAT_PAWN_ATTACKED_O, THREAT_PAWN_ATTACKED_E);
 			
 			count = Long.bitCount(blackAttacks & whitePawns);
-			evalInfo.eval_o_part2 += -count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_ATTACKED];
-			evalInfo.eval_e_part2 += -count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_ATTACKED];
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_PAWN_ATTACKED,
+					-count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_ATTACKED],
+					-count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_ATTACKED],
+					THREAT_PAWN_ATTACKED_O, THREAT_PAWN_ATTACKED_E);
 		}
 		
 		// minors attacked and not defended by a pawn
 		count = Long.bitCount(whiteAttacks & (evalInfo.bb_b_knights | evalInfo.bb_b_bishops & ~blackAttacks));
-		evalInfo.eval_o_part2 += +count * EvalConstants.THREATS_MG[EvalConstants.IX_MAJOR_ATTACKED];
-		evalInfo.eval_e_part2 += +count * EvalConstants.THREATS_EG[EvalConstants.IX_MAJOR_ATTACKED];
+		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_MAJOR_ATTACKED,
+				+count * EvalConstants.THREATS_MG[EvalConstants.IX_MAJOR_ATTACKED],
+				+count * EvalConstants.THREATS_EG[EvalConstants.IX_MAJOR_ATTACKED],
+				THREAT_MAJOR_ATTACKED_O, THREAT_MAJOR_ATTACKED_E);
 		
 		count = Long.bitCount(blackAttacks & (evalInfo.bb_w_knights | evalInfo.bb_w_bishops & ~whiteAttacks));
-		evalInfo.eval_o_part2 += -count * EvalConstants.THREATS_MG[EvalConstants.IX_MAJOR_ATTACKED];
-		evalInfo.eval_e_part2 += -count * EvalConstants.THREATS_EG[EvalConstants.IX_MAJOR_ATTACKED];
+		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_MAJOR_ATTACKED,
+				-count * EvalConstants.THREATS_MG[EvalConstants.IX_MAJOR_ATTACKED],
+				-count * EvalConstants.THREATS_EG[EvalConstants.IX_MAJOR_ATTACKED],
+				THREAT_MAJOR_ATTACKED_O, THREAT_MAJOR_ATTACKED_E);
 		
 		if (evalInfo.bb_b_queens != 0) {
 			// queen attacked by rook
 			count = Long.bitCount(evalInfo.attacks[WHITE][ROOK] & evalInfo.bb_b_queens);
-			evalInfo.eval_o_part2 += +count * EvalConstants.THREATS_MG[EvalConstants.IX_QUEEN_ATTACKED];
-			evalInfo.eval_e_part2 += +count * EvalConstants.THREATS_EG[EvalConstants.IX_QUEEN_ATTACKED];
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK,
+					+count * EvalConstants.THREATS_MG[EvalConstants.IX_QUEEN_ATTACKED],
+					+count * EvalConstants.THREATS_EG[EvalConstants.IX_QUEEN_ATTACKED],
+					THREAT_QUEEN_ATTACKED_ROOK_O, THREAT_QUEEN_ATTACKED_ROOK_E);
 			
 			// queen attacked by minors
 			count = Long.bitCount(whiteMinorAttacks & evalInfo.bb_b_queens);
-			evalInfo.eval_o_part2 += +count * EvalConstants.THREATS_MG[EvalConstants.IX_QUEEN_ATTACKED_MINOR];
-			evalInfo.eval_e_part2 += +count * EvalConstants.THREATS_EG[EvalConstants.IX_QUEEN_ATTACKED_MINOR];
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_QUEEN_ATTACKED_MINOR,
+					+count * EvalConstants.THREATS_MG[EvalConstants.IX_QUEEN_ATTACKED_MINOR],
+					+count * EvalConstants.THREATS_EG[EvalConstants.IX_QUEEN_ATTACKED_MINOR],
+					THREAT_QUEEN_ATTACKED_MINOR_O, THREAT_QUEEN_ATTACKED_MINOR_E);
 		}
 
 		if (evalInfo.bb_w_queens != 0) {
 			// queen attacked by rook
 			count = Long.bitCount(evalInfo.attacks[BLACK][ROOK] & evalInfo.bb_w_queens);
-			evalInfo.eval_o_part2 += -count * EvalConstants.THREATS_MG[EvalConstants.IX_QUEEN_ATTACKED];
-			evalInfo.eval_e_part2 += -count * EvalConstants.THREATS_EG[EvalConstants.IX_QUEEN_ATTACKED];
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK,
+					-count * EvalConstants.THREATS_MG[EvalConstants.IX_QUEEN_ATTACKED],
+					-count * EvalConstants.THREATS_EG[EvalConstants.IX_QUEEN_ATTACKED],
+					THREAT_QUEEN_ATTACKED_ROOK_O, THREAT_QUEEN_ATTACKED_ROOK_E);
 			
 			// queen attacked by minors
 			count = Long.bitCount(blackMinorAttacks & evalInfo.bb_w_queens);
-			evalInfo.eval_o_part2 += -count * EvalConstants.THREATS_MG[EvalConstants.IX_QUEEN_ATTACKED_MINOR];
-			evalInfo.eval_e_part2 += -count * EvalConstants.THREATS_EG[EvalConstants.IX_QUEEN_ATTACKED_MINOR];
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_QUEEN_ATTACKED_MINOR,
+					-count * EvalConstants.THREATS_MG[EvalConstants.IX_QUEEN_ATTACKED_MINOR],
+					-count * EvalConstants.THREATS_EG[EvalConstants.IX_QUEEN_ATTACKED_MINOR],
+					THREAT_QUEEN_ATTACKED_MINOR_O, THREAT_QUEEN_ATTACKED_MINOR_E);
 		}
 
 		// rook attacked by minors
 		count = Long.bitCount(whiteMinorAttacks & evalInfo.bb_b_rooks);
-		evalInfo.eval_o_part2 += +count * EvalConstants.THREATS_MG[EvalConstants.IX_ROOK_ATTACKED];
-		evalInfo.eval_e_part2 += +count * EvalConstants.THREATS_EG[EvalConstants.IX_ROOK_ATTACKED];
+		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_ROOK_ATTACKED,
+				+count * EvalConstants.THREATS_MG[EvalConstants.IX_ROOK_ATTACKED],
+				+count * EvalConstants.THREATS_EG[EvalConstants.IX_ROOK_ATTACKED],
+				THREAT_ROOK_ATTACKED_O, THREAT_ROOK_ATTACKED_E);
 		
 		count = Long.bitCount(blackMinorAttacks & evalInfo.bb_w_rooks);
-		evalInfo.eval_o_part2 += -count * EvalConstants.THREATS_MG[EvalConstants.IX_ROOK_ATTACKED];
-		evalInfo.eval_e_part2 += -count * EvalConstants.THREATS_EG[EvalConstants.IX_ROOK_ATTACKED];
+		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_THREAT_ROOK_ATTACKED,
+				-count * EvalConstants.THREATS_MG[EvalConstants.IX_ROOK_ATTACKED],
+				-count * EvalConstants.THREATS_EG[EvalConstants.IX_ROOK_ATTACKED],
+				THREAT_ROOK_ATTACKED_O, THREAT_ROOK_ATTACKED_E);
 	}
 
 	private static void calculateOthers(final ChessBoard cb, final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
@@ -776,16 +811,20 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		long piece = evalInfo.bb_w_pawns & ChessConstants.KING_AREA[WHITE][evalInfo.kingIndex[WHITE]] & ~evalInfo.attacks[BLACK][PAWN];
 		while (piece != 0) {
 			file = Long.numberOfTrailingZeros(piece) & 7;
-			evalInfo.eval_o_part2 += EvalConstants.SHIELD_BONUS_MG[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3] / ((evalInfo.bb_b_queens == 0) ? 2 : 1);
-			evalInfo.eval_e_part2 += EvalConstants.SHIELD_BONUS_EG[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3] / ((evalInfo.bb_b_queens == 0) ? 2 : 1);
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_PAWN_SHIELD,
+					+EvalConstants.SHIELD_BONUS_MG[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3] / ((evalInfo.bb_b_queens == 0) ? 2 : 1),
+					+EvalConstants.SHIELD_BONUS_EG[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3] / ((evalInfo.bb_b_queens == 0) ? 2 : 1),
+					PAWN_SHIELD_O, PAWN_SHIELD_E);			
 			piece &= ~Bitboard.FILES[file];
 		}
 
 		piece = evalInfo.bb_b_pawns & ChessConstants.KING_AREA[BLACK][evalInfo.kingIndex[BLACK]] & ~evalInfo.attacks[WHITE][PAWN];
 		while (piece != 0) {
 			file = (63 - Long.numberOfLeadingZeros(piece)) & 7;
-			evalInfo.eval_o_part2 += -EvalConstants.SHIELD_BONUS_MG[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8] / ((evalInfo.bb_w_queens == 0) ? 2 : 1);
-			evalInfo.eval_e_part2 += -EvalConstants.SHIELD_BONUS_EG[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8] / ((evalInfo.bb_w_queens == 0) ? 2 : 1);
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_PAWN_SHIELD,
+					-EvalConstants.SHIELD_BONUS_MG[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8] / ((evalInfo.bb_w_queens == 0) ? 2 : 1),
+					-EvalConstants.SHIELD_BONUS_EG[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8] / ((evalInfo.bb_w_queens == 0) ? 2 : 1),
+					PAWN_SHIELD_O, PAWN_SHIELD_E);
 			piece &= ~Bitboard.FILES[file];
 		}
 	}
@@ -944,8 +983,10 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 			score += ChessConstants.COLOR_FACTOR[enemyColor] * EvalConstants.KS_SCORES[Math.min(counter, EvalConstants.KS_SCORES.length - 1)];
 		}
 		
-		evalInfo.eval_o_part2 += score;
-		//evalInfo.eval_e_part2 += score;
+		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_KING_SAFETY,
+				score,
+				score,
+				KING_SAFETY_O, KING_SAFETY_E);
 	}
 	
 	
@@ -1049,8 +1090,10 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 			final int index = 63 - Long.numberOfLeadingZeros(passedPawns);
 
 			int score = getPassedPawnScore(index, WHITE, evalInfo);
-			//evalInfo.eval_o_part2 += +score;
-			evalInfo.eval_e_part2 += +score;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_PAWN_PASSED,
+					score,
+					score,
+					PAWN_PASSED_O, PAWN_PASSED_E);
 			
 			if (whitePromotionDistance == Util.SHORT_MAX) {
 				whitePromotionDistance = getWhitePromotionDistance(index, evalInfo);
@@ -1066,8 +1109,10 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 			final int index = Long.numberOfTrailingZeros(passedPawns);
 
 			int score = getPassedPawnScore(index, BLACK, evalInfo);
-			//evalInfo.eval_o_part2 += -score;
-			evalInfo.eval_e_part2 += -score;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_PAWN_PASSED,
+					-score,
+					-score,
+					PAWN_PASSED_O, PAWN_PASSED_E);
 			
 			if (blackPromotionDistance == Util.SHORT_MAX) {
 				blackPromotionDistance = getBlackPromotionDistance(index, evalInfo);
@@ -1078,11 +1123,15 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		}
 
 		if (whitePromotionDistance < blackPromotionDistance - 1) {
-			//evalInfo.eval_o_part2 += +350;
-			evalInfo.eval_e_part2 += +350;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_PAWN_PASSED_UNSTOPPABLE,
+					+350,
+					+350,
+					PAWN_PASSED_UNSTOPPABLE_O, PAWN_PASSED_UNSTOPPABLE_E);
 		} else if (whitePromotionDistance > blackPromotionDistance + 1) {
-			//evalInfo.eval_o_part2 += -350;
-			evalInfo.eval_e_part2 += -350;
+			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_PAWN_PASSED_UNSTOPPABLE,
+					-350,
+					-350,
+					PAWN_PASSED_UNSTOPPABLE_O, PAWN_PASSED_UNSTOPPABLE_E);
 		}
 	}
 

@@ -50,7 +50,7 @@ public class Bagatur_V20_FeaturesConfigurationImpl implements IFeaturesConfigura
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_INVERSE						, "PAWN.INVERSE"						, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_PASSED							, "PAWN.PASSED"							, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_PASSED_CANDIDATE				, "PAWN.PASSED.CANDIDATE"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_PASSED_UNSTOPPABLE				, "PAWN.PASSED.UNSTOPPABLE"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_PASSED_UNSTOPPABLE				, "PAWN.PASSED.UNSTOPPABLE"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_PAWN_SHIELD							, "PAWN.SHIELD"							, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		
 		
@@ -73,8 +73,8 @@ public class Bagatur_V20_FeaturesConfigurationImpl implements IFeaturesConfigura
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK			, "THREAT.QUEEN.ATTACKED.ROOK"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_QUEEN_ATTACKED_MINOR			, "THREAT.QUEEN.ATTACKED.MINOR"			, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_ROOK_ATTACKED				, "THREAT.ROOK.ATTACKED"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_NIGHT_FORK					, "THREAT.NIGHT.FORK"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_NIGHT_FORK_KING				, "THREAT.NIGHT.FORK.KING"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		//add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_NIGHT_FORK					, "THREAT.NIGHT.FORK"					, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		//add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_THREAT_NIGHT_FORK_KING			, "THREAT.NIGHT.FORK.KING"				, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		
 		
 		//Others

@@ -76,8 +76,8 @@ public interface Bagatur_V20_FeaturesConstants {
 	public static final int FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK			= 1350;
 	public static final int FEATURE_ID_THREAT_QUEEN_ATTACKED_MINOR 			= 1360;
 	public static final int FEATURE_ID_THREAT_ROOK_ATTACKED 				= 1370;
-	public static final int FEATURE_ID_THREAT_NIGHT_FORK 					= 1380;
-	public static final int FEATURE_ID_THREAT_NIGHT_FORK_KING 				= 1390;
+	//public static final int FEATURE_ID_THREAT_NIGHT_FORK 					= 1380;
+	//public static final int FEATURE_ID_THREAT_NIGHT_FORK_KING 			= 1390;
 	
 	
 	//Others

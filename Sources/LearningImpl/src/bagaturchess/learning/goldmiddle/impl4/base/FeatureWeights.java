@@ -73,17 +73,17 @@ public interface FeatureWeights {
 	public static final double PAWN_INVERSE_O	=	1;
 	public static final double PAWN_INVERSE_E	=	1;
 
-	public static final double PAWN_PASSED_O	=	1;
+	public static final double PAWN_PASSED_O	=	0;
 	public static final double PAWN_PASSED_E	=	1;
 
 	public static final double PAWN_PASSED_CANDIDATE_O	=	1;
 	public static final double PAWN_PASSED_CANDIDATE_E	=	1;
 
-	public static final double PAWN_PASSED_UNSTOPPABLE_O	=	0.0;
-	public static final double PAWN_PASSED_UNSTOPPABLE_E	=	1.4403921966227626;
+	public static final double PAWN_PASSED_UNSTOPPABLE_O	=	0;
+	public static final double PAWN_PASSED_UNSTOPPABLE_E	=	1;
 
-	public static final double PAWN_SHIELD_O	=	0.6743978856635646;
-	public static final double PAWN_SHIELD_E	=	0.4498618724103228;
+	public static final double PAWN_SHIELD_O	=	1;
+	public static final double PAWN_SHIELD_E	=	1;
 
 	public static final double MOBILITY_KNIGHT_O	=	1;
 	public static final double MOBILITY_KNIGHT_E	=	1;
@@ -100,42 +100,42 @@ public interface FeatureWeights {
 	public static final double MOBILITY_KING_O	=	1;
 	public static final double MOBILITY_KING_E	=	1;
 
-	public static final double THREAT_DOUBLE_ATTACKED_O	=	0.8912793947623033;
-	public static final double THREAT_DOUBLE_ATTACKED_E	=	1.2545945494006072;
+	public static final double THREAT_DOUBLE_ATTACKED_O	=	1;
+	public static final double THREAT_DOUBLE_ATTACKED_E	=	1;
 
-	public static final double THREAT_UNUSED_OUTPOST_O	=	0.6912958716386087;
-	public static final double THREAT_UNUSED_OUTPOST_E	=	0.0;
+	public static final double THREAT_UNUSED_OUTPOST_O	=	1;
+	public static final double THREAT_UNUSED_OUTPOST_E	=	1;
 
-	public static final double THREAT_PAWN_PUSH_O	=	0.9417661837991799;
-	public static final double THREAT_PAWN_PUSH_E	=	1.702408082268009;
+	public static final double THREAT_PAWN_PUSH_O	=	1;
+	public static final double THREAT_PAWN_PUSH_E	=	1;
 
-	public static final double THREAT_PAWN_ATTACKS_O	=	1.1585896205068797;
-	public static final double THREAT_PAWN_ATTACKS_E	=	1.6283208416854833;
+	public static final double THREAT_PAWN_ATTACKS_O	=	1;
+	public static final double THREAT_PAWN_ATTACKS_E	=	1;
 
-	public static final double THREAT_MULTIPLE_PAWN_ATTACKS_O	=	0.0;
-	public static final double THREAT_MULTIPLE_PAWN_ATTACKS_E	=	0.0;
+	public static final double THREAT_MULTIPLE_PAWN_ATTACKS_O	=	1;
+	public static final double THREAT_MULTIPLE_PAWN_ATTACKS_E	=	1;
 
-	public static final double THREAT_MAJOR_ATTACKED_O	=	2.4112505700184834;
-	public static final double THREAT_MAJOR_ATTACKED_E	=	0.6192051882761219;
+	public static final double THREAT_MAJOR_ATTACKED_O	=	1;
+	public static final double THREAT_MAJOR_ATTACKED_E	=	1;
 
-	public static final double THREAT_PAWN_ATTACKED_O	=	0.2971194508155467;
-	public static final double THREAT_PAWN_ATTACKED_E	=	2.8224226165440567;
+	public static final double THREAT_PAWN_ATTACKED_O	=	1;
+	public static final double THREAT_PAWN_ATTACKED_E	=	1;
 
-	public static final double THREAT_QUEEN_ATTACKED_ROOK_O	=	1.2539004028859926;
-	public static final double THREAT_QUEEN_ATTACKED_ROOK_E	=	2.620544418011923;
+	public static final double THREAT_QUEEN_ATTACKED_ROOK_O	=	1;
+	public static final double THREAT_QUEEN_ATTACKED_ROOK_E	=	1;
 
-	public static final double THREAT_QUEEN_ATTACKED_MINOR_O	=	1.2575365628223643;
-	public static final double THREAT_QUEEN_ATTACKED_MINOR_E	=	4.179694457157629;
+	public static final double THREAT_QUEEN_ATTACKED_MINOR_O	=	1;
+	public static final double THREAT_QUEEN_ATTACKED_MINOR_E	=	1;
 
-	public static final double THREAT_ROOK_ATTACKED_O	=	0.7439327379502583;
-	public static final double THREAT_ROOK_ATTACKED_E	=	2.0670492479886096;
+	public static final double THREAT_ROOK_ATTACKED_O	=	1;
+	public static final double THREAT_ROOK_ATTACKED_E	=	1;
 
-	public static final double THREAT_NIGHT_FORK_O	=	0.07849474680762347;
+	/*public static final double THREAT_NIGHT_FORK_O	=	0.07849474680762347;
 	public static final double THREAT_NIGHT_FORK_E	=	0.3790284764717165;
 
 	public static final double THREAT_NIGHT_FORK_KING_O	=	0.4437811093943208;
 	public static final double THREAT_NIGHT_FORK_KING_E	=	0.0;
-
+	*/
 	public static final double OTHERS_SIDE_TO_MOVE_O	=	0.0;
 	public static final double OTHERS_SIDE_TO_MOVE_E	=	0.013144463417760589;
 
@@ -184,13 +184,13 @@ public interface FeatureWeights {
 	public static final double OTHERS_KNIGHT_OUTPOST_O	=	1.0835711579038405;
 	public static final double OTHERS_KNIGHT_OUTPOST_E	=	0.8548702696688225;
 
-	public static final double OTHERS_IN_CHECK_O	=	1.0;
-	public static final double OTHERS_IN_CHECK_E	=	1.0;
+	public static final double OTHERS_IN_CHECK_O	=	1;
+	public static final double OTHERS_IN_CHECK_E	=	1;
 
-	public static final double KING_SAFETY_O	=	0.5600372768266487;
-	public static final double KING_SAFETY_E	=	0.0;
+	public static final double KING_SAFETY_O	=	1;
+	public static final double KING_SAFETY_E	=	0;
 
-	public static final double SPACE_O	=	1.3075194615436971;
-	public static final double SPACE_E	=	0.1580961463716476;
+	public static final double SPACE_O	=	1;
+	public static final double SPACE_E	=	0;
 }
 
