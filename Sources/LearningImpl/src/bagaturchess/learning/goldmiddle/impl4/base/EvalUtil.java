@@ -47,29 +47,19 @@ public class EvalUtil {
 		
 		calculateMobilityScoresAndSetAttacks(cb, evalInfo);
 		calculateThreats(cb, evalInfo);
-		calculatePawnShieldBonus(cb, evalInfo);
-		calculateKingSafetyScores(cb, evalInfo);
-		calculatePassedPawnScores(cb, evalInfo);
-		calculateSpace(cb, evalInfo);
+		calculatePawnShieldBonus(evalInfo);
+		calculateKingSafetyScores(evalInfo);
+		calculatePassedPawnScores(evalInfo);
+		calculateSpace(evalInfo);
 		calculateOthers(cb, evalInfo);
 
 		return ((evalInfo.eval_o_part2 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part2 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(cb, evalInfo);
 	}
 	
 	
-	public static int getMgScore(final int score) {
-		return (score + 0x8000) >> 16;
-	}
-	
-	
-	public static int getEgScore(final int score) {
-		return (short) (score & 0xffff);
-	}
-	
-	
 	private static int calculateScaleFactor(final ChessBoard cb, final EvalInfo evalInfo) {
 		// opposite bishops endgame?
-		if (MaterialUtil.oppositeBishops(cb.materialKey)) {
+		if (MaterialUtil.oppositeBishops(evalInfo.materialKey)) {
 			if (((evalInfo.bb_w_bishops & Bitboard.BLACK_SQUARES) == 0) == ((evalInfo.bb_b_bishops & Bitboard.WHITE_SQUARES) == 0)) {
 				return 2;
 			}
@@ -78,11 +68,7 @@ public class EvalUtil {
 	}
 	
 	
-	public static void calculateSpace(final ChessBoard cb, final EvalInfo evalInfo) {
-
-		if (!MaterialUtil.hasPawns(cb.materialKey)) {
-			return;
-		}
+	public static void calculateSpace(final EvalInfo evalInfo) {
 
 		int score1 = 0;
 		score1 += EvalConstants.OTHER_SCORES[EvalConstants.IX_SPACE]
@@ -97,11 +83,11 @@ public class EvalUtil {
 		int score2 = 0;
 		long space = evalInfo.bb_w_pawns >>> 8;
 		space |= space >>> 8 | space >>> 16;
-		score2 += EvalConstants.SPACE[Long.bitCount(cb.friendlyPieces[WHITE])]
+		score2 += EvalConstants.SPACE[Long.bitCount(evalInfo.getFriendlyPieces(WHITE))]
 				* Long.bitCount(space & ~evalInfo.bb_w_pawns & ~evalInfo.attacks[BLACK][PAWN] & Bitboard.FILE_CDEF);
 		space = evalInfo.bb_b_pawns << 8;
 		space |= space << 8 | space << 16;
-		score2 -= EvalConstants.SPACE[Long.bitCount(cb.friendlyPieces[BLACK])]
+		score2 -= EvalConstants.SPACE[Long.bitCount(evalInfo.getFriendlyPieces(BLACK))]
 				* Long.bitCount(space & ~evalInfo.bb_b_pawns & ~evalInfo.attacks[WHITE][PAWN] & Bitboard.FILE_CDEF);
 		
 		evalInfo.eval_o_part2 += score2;
@@ -358,23 +344,23 @@ public class EvalUtil {
 		
 		int count;
 		
-		if (MaterialUtil.hasPawns(cb.materialKey)) {
+		if (MaterialUtil.hasPawns(evalInfo.materialKey)) {
 
 			// unused outposts
-			count = Long.bitCount(evalInfo.passedPawnsAndOutposts & cb.emptySpaces & whiteMinorAttacks & whitePawnAttacks);
+			count = Long.bitCount(evalInfo.passedPawnsAndOutposts & evalInfo.bb_free & whiteMinorAttacks & whitePawnAttacks);
 			evalInfo.eval_o_part2 += +count * EvalConstants.THREATS_MG[EvalConstants.IX_UNUSED_OUTPOST];
 			evalInfo.eval_e_part2 += +count * EvalConstants.THREATS_EG[EvalConstants.IX_UNUSED_OUTPOST];
 			
-			count = Long.bitCount(evalInfo.passedPawnsAndOutposts & cb.emptySpaces & blackMinorAttacks & blackPawnAttacks);
+			count = Long.bitCount(evalInfo.passedPawnsAndOutposts & evalInfo.bb_free & blackMinorAttacks & blackPawnAttacks);
 			evalInfo.eval_o_part2 += -count * EvalConstants.THREATS_MG[EvalConstants.IX_UNUSED_OUTPOST];
 			evalInfo.eval_e_part2 += -count * EvalConstants.THREATS_EG[EvalConstants.IX_UNUSED_OUTPOST];
 
 			// pawn push threat
-			count = Long.bitCount(Bitboard.getWhitePawnAttacks((whitePawns << 8) & cb.emptySpaces & ~blackAttacks) & blacks);
+			count = Long.bitCount(Bitboard.getWhitePawnAttacks((whitePawns << 8) & evalInfo.bb_free & ~blackAttacks) & blacks);
 			evalInfo.eval_o_part2 += +count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_PUSH_THREAT];
 			evalInfo.eval_e_part2 += +count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_PUSH_THREAT];
 			
-			count = Long.bitCount(Bitboard.getBlackPawnAttacks((blackPawns >>> 8) & cb.emptySpaces & ~whiteAttacks) & whites);
+			count = Long.bitCount(Bitboard.getBlackPawnAttacks((blackPawns >>> 8) & evalInfo.bb_free & ~whiteAttacks) & whites);
 			evalInfo.eval_o_part2 += -count * EvalConstants.THREATS_MG[EvalConstants.IX_PAWN_PUSH_THREAT];
 			evalInfo.eval_e_part2 += -count * EvalConstants.THREATS_EG[EvalConstants.IX_PAWN_PUSH_THREAT];
 
@@ -460,13 +446,13 @@ public class EvalUtil {
 		final long blackPawnAttacks = evalInfo.attacks[BLACK][PAWN];
 		final long whiteAttacks = evalInfo.attacksAll[WHITE];
 		final long blackAttacks = evalInfo.attacksAll[BLACK];
-		final long whites = cb.friendlyPieces[WHITE];
-		final long blacks = cb.friendlyPieces[BLACK];
+		final long whites = evalInfo.getFriendlyPieces(WHITE);
+		final long blacks = evalInfo.getFriendlyPieces(BLACK);
 
 		int score;
 		
 		// side to move
-		score = +ChessConstants.COLOR_FACTOR[cb.colorToMove] * EvalConstants.SIDE_TO_MOVE_BONUS;
+		score = +ChessConstants.COLOR_FACTOR[evalInfo.colorToMove] * EvalConstants.SIDE_TO_MOVE_BONUS;
 		evalInfo.eval_o_part2 += score;
 		evalInfo.eval_e_part2 += score;
 		
@@ -499,7 +485,7 @@ public class EvalUtil {
 			}
 
 			// rook on 7th, king on 8th
-			if (cb.kingIndex[BLACK] >= 56 && (piece & Bitboard.RANK_7) != 0) {
+			if (evalInfo.kingIndex[BLACK] >= 56 && (piece & Bitboard.RANK_7) != 0) {
 				score = +Long.bitCount(piece & Bitboard.RANK_7) * EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_7TH_RANK];
 				evalInfo.eval_o_part2 += score;
 				evalInfo.eval_e_part2 += score;
@@ -507,7 +493,7 @@ public class EvalUtil {
 
 			// prison
 			if ((piece & Bitboard.RANK_1) != 0) {
-				final long trapped = piece & EvalConstants.ROOK_PRISON[cb.kingIndex[WHITE]];
+				final long trapped = piece & EvalConstants.ROOK_PRISON[evalInfo.kingIndex[WHITE]];
 				if (trapped != 0) {
 					for (int i = 8; i <= 24; i += 8) {
 						if ((trapped << i & whitePawns) != 0) {
@@ -557,7 +543,7 @@ public class EvalUtil {
 			}
 
 			// rook on 2nd, king on 1st
-			if (cb.kingIndex[WHITE] <= 7 && (piece & Bitboard.RANK_2) != 0) {
+			if (evalInfo.kingIndex[WHITE] <= 7 && (piece & Bitboard.RANK_2) != 0) {
 				score = -Long.bitCount(piece & Bitboard.RANK_2) * EvalConstants.OTHER_SCORES[EvalConstants.IX_ROOK_7TH_RANK];
 				evalInfo.eval_o_part2 += score;
 				evalInfo.eval_e_part2 += score;
@@ -565,7 +551,7 @@ public class EvalUtil {
 
 			// prison
 			if ((piece & Bitboard.RANK_8) != 0) {
-				final long trapped = piece & EvalConstants.ROOK_PRISON[cb.kingIndex[BLACK]];
+				final long trapped = piece & EvalConstants.ROOK_PRISON[evalInfo.kingIndex[BLACK]];
 				if (trapped != 0) {
 					for (int i = 8; i <= 24; i += 8) {
 						if ((trapped >>> i & blackPawns) != 0) {
@@ -735,15 +721,15 @@ public class EvalUtil {
 		}
 
 		// pinned-pieces
-		if (cb.pinnedPieces != 0) {
-			piece = cb.pinnedPieces & whites;
+		if (evalInfo.pinnedPieces != 0) {
+			piece = evalInfo.pinnedPieces & whites;
 			while (piece != 0) {
 				score = +EvalConstants.PINNED[cb.pieceIndexes[Long.numberOfTrailingZeros(piece)]];
 				evalInfo.eval_o_part2 += score;
 				evalInfo.eval_e_part2 += score;
 				piece &= piece - 1;
 			}
-			piece = cb.pinnedPieces & blacks;
+			piece = evalInfo.pinnedPieces & blacks;
 			while (piece != 0) {
 				score = -EvalConstants.PINNED[cb.pieceIndexes[Long.numberOfTrailingZeros(piece)]];
 				evalInfo.eval_o_part2 += score;
@@ -753,15 +739,15 @@ public class EvalUtil {
 		}
 
 		// discovered-pieces
-		if (cb.discoveredPieces != 0) {
-			piece = cb.discoveredPieces & whites;
+		if (evalInfo.discoveredPieces != 0) {
+			piece = evalInfo.discoveredPieces & whites;
 			while (piece != 0) {
 				score = +EvalConstants.DISCOVERED[cb.pieceIndexes[Long.numberOfTrailingZeros(piece)]];
 				evalInfo.eval_o_part2 += score;
 				evalInfo.eval_e_part2 += score;
 				piece &= piece - 1;
 			}
-			piece = cb.discoveredPieces & blacks;
+			piece = evalInfo.discoveredPieces & blacks;
 			while (piece != 0) {
 				score = -EvalConstants.DISCOVERED[cb.pieceIndexes[Long.numberOfTrailingZeros(piece)]];
 				evalInfo.eval_o_part2 += score;
@@ -778,15 +764,11 @@ public class EvalUtil {
 		}
 	}
 
-	public static void calculatePawnShieldBonus(final ChessBoard cb, final EvalInfo evalInfo) {
-
-		if (!MaterialUtil.hasPawns(cb.materialKey)) {
-			return;
-		}
+	public static void calculatePawnShieldBonus(final EvalInfo evalInfo) {
 
 		int file;
 
-		long piece = evalInfo.bb_w_pawns & ChessConstants.KING_AREA[WHITE][cb.kingIndex[WHITE]] & ~evalInfo.attacks[BLACK][PAWN];
+		long piece = evalInfo.bb_w_pawns & ChessConstants.KING_AREA[WHITE][evalInfo.kingIndex[WHITE]] & ~evalInfo.attacks[BLACK][PAWN];
 		while (piece != 0) {
 			file = Long.numberOfTrailingZeros(piece) & 7;
 			evalInfo.eval_o_part2 += EvalConstants.SHIELD_BONUS_MG[Math.min(7 - file, file)][Long.numberOfTrailingZeros(piece) >>> 3] / ((evalInfo.bb_b_queens == 0) ? 2 : 1);
@@ -794,7 +776,7 @@ public class EvalUtil {
 			piece &= ~Bitboard.FILES[file];
 		}
 
-		piece = evalInfo.bb_b_pawns & ChessConstants.KING_AREA[BLACK][cb.kingIndex[BLACK]] & ~evalInfo.attacks[WHITE][PAWN];
+		piece = evalInfo.bb_b_pawns & ChessConstants.KING_AREA[BLACK][evalInfo.kingIndex[BLACK]] & ~evalInfo.attacks[WHITE][PAWN];
 		while (piece != 0) {
 			file = (63 - Long.numberOfLeadingZeros(piece)) & 7;
 			evalInfo.eval_o_part2 += -EvalConstants.SHIELD_BONUS_MG[Math.min(7 - file, file)][7 - (63 - Long.numberOfLeadingZeros(piece)) / 8] / ((evalInfo.bb_w_queens == 0) ? 2 : 1);
@@ -808,8 +790,8 @@ public class EvalUtil {
 		long moves;
 		for (int color = WHITE; color <= BLACK; color++) {
 
-			final long kingArea = ChessConstants.KING_AREA[1 - color][cb.kingIndex[1 - color]];
-			final long safeMoves = ~cb.friendlyPieces[color] & ~evalInfo.attacks[1 - color][PAWN];
+			final long kingArea = ChessConstants.KING_AREA[1 - color][evalInfo.kingIndex[1 - color]];
+			final long safeMoves = ~evalInfo.getFriendlyPieces(color) & ~evalInfo.attacks[1 - color][PAWN];
 
 			// knights
 			long piece = evalInfo.getPieces(color, NIGHT) & ~cb.pinnedPieces;
@@ -825,7 +807,7 @@ public class EvalUtil {
 			// bishops
 			piece = evalInfo.getPieces(color, BISHOP);
 			while (piece != 0) {
-				moves = MagicUtil.getBishopMoves(Long.numberOfTrailingZeros(piece), cb.allPieces ^ evalInfo.getPieces(color, QUEEN));
+				moves = MagicUtil.getBishopMoves(Long.numberOfTrailingZeros(piece), evalInfo.bb_all ^ evalInfo.getPieces(color, QUEEN));
 				evalInfo.updateAttacks(moves, BISHOP, color, kingArea);
 				int count = Long.bitCount(moves & safeMoves);
 				evalInfo.eval_o_part2 += ChessConstants.COLOR_FACTOR[color] * EvalConstants.MOBILITY_BISHOP_MG[count];
@@ -836,7 +818,7 @@ public class EvalUtil {
 			// rooks
 			piece = evalInfo.getPieces(color, ROOK);
 			while (piece != 0) {
-				moves = MagicUtil.getRookMoves(Long.numberOfTrailingZeros(piece), cb.allPieces ^ evalInfo.getPieces(color, ROOK) ^ evalInfo.getPieces(color, QUEEN));
+				moves = MagicUtil.getRookMoves(Long.numberOfTrailingZeros(piece), evalInfo.bb_all ^ evalInfo.getPieces(color, ROOK) ^ evalInfo.getPieces(color, QUEEN));
 				evalInfo.updateAttacks(moves, ROOK, color, kingArea);
 				int count = Long.bitCount(moves & safeMoves);
 				evalInfo.eval_o_part2 += ChessConstants.COLOR_FACTOR[color] * EvalConstants.MOBILITY_ROOK_MG[count];
@@ -847,7 +829,7 @@ public class EvalUtil {
 			// queens
 			piece = evalInfo.getPieces(color, QUEEN);
 			while (piece != 0) {
-				moves = MagicUtil.getQueenMoves(Long.numberOfTrailingZeros(piece), cb.allPieces);
+				moves = MagicUtil.getQueenMoves(Long.numberOfTrailingZeros(piece), evalInfo.bb_all);
 				evalInfo.updateAttacks(moves, QUEEN, color, kingArea);
 				int count = Long.bitCount(moves & safeMoves);
 				evalInfo.eval_o_part2 += ChessConstants.COLOR_FACTOR[color] * EvalConstants.MOBILITY_QUEEN_MG[count];;
@@ -858,20 +840,20 @@ public class EvalUtil {
 
 		// TODO king-attacks with or without enemy attacks?
 		// WHITE king
-		moves = StaticMoves.KING_MOVES[cb.kingIndex[WHITE]] & ~StaticMoves.KING_MOVES[cb.kingIndex[BLACK]];
+		moves = StaticMoves.KING_MOVES[evalInfo.kingIndex[WHITE]] & ~StaticMoves.KING_MOVES[evalInfo.kingIndex[BLACK]];
 		evalInfo.attacks[WHITE][KING] = moves;
 		evalInfo.doubleAttacks[WHITE] |= evalInfo.attacksAll[WHITE] & moves;
 		evalInfo.attacksAll[WHITE] |= moves;
-		int count = Long.bitCount(moves & ~cb.friendlyPieces[WHITE] & ~evalInfo.attacksAll[BLACK]);
+		int count = Long.bitCount(moves & ~evalInfo.getFriendlyPieces(WHITE) & ~evalInfo.attacksAll[BLACK]);
 		evalInfo.eval_o_part2 += EvalConstants.MOBILITY_KING_MG[count];
 		evalInfo.eval_e_part2 += EvalConstants.MOBILITY_KING_EG[count];
 		
 		// BLACK king
-		moves = StaticMoves.KING_MOVES[cb.kingIndex[BLACK]] & ~StaticMoves.KING_MOVES[cb.kingIndex[WHITE]];
+		moves = StaticMoves.KING_MOVES[evalInfo.kingIndex[BLACK]] & ~StaticMoves.KING_MOVES[evalInfo.kingIndex[WHITE]];
 		evalInfo.attacks[BLACK][KING] = moves;
 		evalInfo.doubleAttacks[BLACK] |= evalInfo.attacksAll[BLACK] & moves;
 		evalInfo.attacksAll[BLACK] |= moves;
-		count = Long.bitCount(moves & ~cb.friendlyPieces[BLACK] & ~evalInfo.attacksAll[WHITE]);
+		count = Long.bitCount(moves & ~evalInfo.getFriendlyPieces(BLACK) & ~evalInfo.attacksAll[WHITE]);
 		evalInfo.eval_o_part2 += -EvalConstants.MOBILITY_KING_MG[count];
 		evalInfo.eval_e_part2 += -EvalConstants.MOBILITY_KING_EG[count];
 	}
@@ -899,7 +881,7 @@ public class EvalUtil {
 	}
 	
 	
-	public static void calculateKingSafetyScores(final ChessBoard cb, final EvalInfo evalInfo) {
+	public static void calculateKingSafetyScores(final EvalInfo evalInfo) {
 
 		int score = 0;
 
@@ -910,7 +892,7 @@ public class EvalUtil {
 				continue;
 			}
 
-			final int kingIndex = cb.kingIndex[kingColor];
+			final int kingIndex = evalInfo.kingIndex[kingColor];
 			int counter = 0;
 
 			counter += EvalConstants.KS_NO_FRIENDS[Long.bitCount(ChessConstants.KING_AREA[kingColor][kingIndex] & ~evalInfo.getFriendlyPieces(kingColor))];
@@ -919,14 +901,14 @@ public class EvalUtil {
 			counter += EvalConstants.KS_DOUBLE_ATTACKS[Long
 					.bitCount(StaticMoves.KING_MOVES[kingIndex] & evalInfo.doubleAttacks[enemyColor] & ~evalInfo.attacks[kingColor][PAWN])];
 
-			counter += checks(cb, kingColor, evalInfo);
+			counter += checks(kingColor, evalInfo);
 
 			// bonus for stm
-			counter += 1 - cb.colorToMove ^ enemyColor;
+			counter += 1 - evalInfo.colorToMove ^ enemyColor;
 
 			// bonus if there are discovered checks possible
-			if (cb.discoveredPieces != 0) {
-				counter += Long.bitCount(cb.discoveredPieces & evalInfo.getFriendlyPieces(enemyColor)) * 2;
+			if (evalInfo.discoveredPieces != 0) {
+				counter += Long.bitCount(evalInfo.discoveredPieces & evalInfo.getFriendlyPieces(enemyColor)) * 2;
 			}
 
 			if (evalInfo.getPieces(enemyColor, QUEEN) == 0) {
@@ -947,9 +929,9 @@ public class EvalUtil {
 	}
 	
 	
-	private static int checks(final ChessBoard cb, final int kingColor, final EvalInfo evalInfo) {
+	private static int checks(final int kingColor, final EvalInfo evalInfo) {
 		final int enemyColor = 1 - kingColor;
-		final int kingIndex = cb.kingIndex[kingColor];
+		final int kingIndex = evalInfo.kingIndex[kingColor];
 		final long notAttacked = ~evalInfo.attacksAll[kingColor];
 		final long possibleSquares = ~evalInfo.getFriendlyPieces(enemyColor)
 				& (~StaticMoves.KING_MOVES[kingIndex] | evalInfo.doubleAttacks[enemyColor] & ~evalInfo.doubleAttacks[kingColor]);
@@ -969,7 +951,7 @@ public class EvalUtil {
 		if ((evalInfo.getPieces(enemyColor, QUEEN) | evalInfo.getPieces(enemyColor, ROOK)) != 0) {
 			moves = MagicUtil.getRookMoves(kingIndex, evalInfo.bb_all ^ evalInfo.getPieces(kingColor, QUEEN)) & possibleSquares;
 			queenMoves |= moves;
-			counter += checkRook(cb, kingColor, moves & evalInfo.attacks[enemyColor][ROOK], evalInfo);
+			counter += checkRook(kingColor, moves & evalInfo.attacks[enemyColor][ROOK], evalInfo);
 		}
 
 		queenMoves &= evalInfo.attacks[enemyColor][QUEEN];
@@ -988,7 +970,7 @@ public class EvalUtil {
 		return counter;
 	}
 
-	private static int checkRook(final ChessBoard cb, final int kingColor, final long rookMoves, final EvalInfo evalInfo) {
+	private static int checkRook(final int kingColor, final long rookMoves, final EvalInfo evalInfo) {
 		if (rookMoves == 0) {
 			return 0;
 		}
@@ -998,7 +980,7 @@ public class EvalUtil {
 			counter += EvalConstants.KS_OTHER[2];
 
 			// last rank?
-			if (kingBlockedAtLastRank(StaticMoves.KING_MOVES[cb.kingIndex[kingColor]] & evalInfo.bb_free & ~evalInfo.attacksAll[1 - kingColor])) {
+			if (kingBlockedAtLastRank(StaticMoves.KING_MOVES[evalInfo.kingIndex[kingColor]] & evalInfo.bb_free & ~evalInfo.attacksAll[1 - kingColor])) {
 				counter += EvalConstants.KS_OTHER[1];
 			}
 
@@ -1036,7 +1018,7 @@ public class EvalUtil {
 	}
 
 	
-	private static void calculatePassedPawnScores(final ChessBoard cb, final EvalInfo evalInfo) {
+	private static void calculatePassedPawnScores(final EvalInfo evalInfo) {
 		
 		int whitePromotionDistance = Util.SHORT_MAX;
 		int blackPromotionDistance = Util.SHORT_MAX;
@@ -1046,12 +1028,12 @@ public class EvalUtil {
 		while (passedPawns != 0) {
 			final int index = 63 - Long.numberOfLeadingZeros(passedPawns);
 
-			int score = getPassedPawnScore(cb, index, WHITE, evalInfo);
+			int score = getPassedPawnScore(index, WHITE, evalInfo);
 			evalInfo.eval_o_part2 += +score;
 			evalInfo.eval_e_part2 += +score;
 			
 			if (whitePromotionDistance == Util.SHORT_MAX) {
-				whitePromotionDistance = getWhitePromotionDistance(cb, index, evalInfo);
+				whitePromotionDistance = getWhitePromotionDistance(index, evalInfo);
 			}
 
 			// skip all passed pawns at same file
@@ -1063,12 +1045,12 @@ public class EvalUtil {
 		while (passedPawns != 0) {
 			final int index = Long.numberOfTrailingZeros(passedPawns);
 
-			int score = getPassedPawnScore(cb, index, BLACK, evalInfo);
+			int score = getPassedPawnScore(index, BLACK, evalInfo);
 			evalInfo.eval_o_part2 += -score;
 			evalInfo.eval_e_part2 += -score;
 			
 			if (blackPromotionDistance == Util.SHORT_MAX) {
-				blackPromotionDistance = getBlackPromotionDistance(cb, index, evalInfo);
+				blackPromotionDistance = getBlackPromotionDistance(index, evalInfo);
 			}
 
 			// skip all passed pawns at same file
@@ -1084,7 +1066,7 @@ public class EvalUtil {
 		}
 	}
 
-	private static int getPassedPawnScore(final ChessBoard cb, final int index, final int color, final EvalInfo evalInfo) {
+	private static int getPassedPawnScore(final int index, final int color, final EvalInfo evalInfo) {
 
 		final int nextIndex = index + ChessConstants.COLOR_FACTOR_8[color];
 		final long square = Util.POWER_LOOKUP[index];
@@ -1121,7 +1103,7 @@ public class EvalUtil {
 		}
 
 		// under attack?
-		if (cb.colorToMove != color && (evalInfo.attacksAll[enemyColor] & square) != 0) {
+		if (evalInfo.colorToMove != color && (evalInfo.attacksAll[enemyColor] & square) != 0) {
 			multiplier *= EvalConstants.PASSED_MULTIPLIERS[4];
 		}
 
@@ -1137,26 +1119,26 @@ public class EvalUtil {
 		}
 
 		// king tropism
-		multiplier *= EvalConstants.PASSED_KING_MULTI[Util.getDistance(cb.kingIndex[color], index)];
-		multiplier *= EvalConstants.PASSED_KING_MULTI[8 - Util.getDistance(cb.kingIndex[enemyColor], index)];
+		multiplier *= EvalConstants.PASSED_KING_MULTI[Util.getDistance(evalInfo.kingIndex[color], index)];
+		multiplier *= EvalConstants.PASSED_KING_MULTI[8 - Util.getDistance(evalInfo.kingIndex[enemyColor], index)];
 
 		final int scoreIndex = (7 * color) + ChessConstants.COLOR_FACTOR[color] * index / 8;
 		return (int) (EvalConstants.PASSED_SCORE_EG[scoreIndex] * multiplier);
 	}
 
-	private static int getBlackPromotionDistance(final ChessBoard cb, final int index, final EvalInfo evalInfo) {
+	private static int getBlackPromotionDistance(final int index, final EvalInfo evalInfo) {
 		// check if it cannot be stopped
 		int promotionDistance = index >>> 3;
-		if (promotionDistance == 1 && cb.colorToMove == BLACK) {
+		if (promotionDistance == 1 && evalInfo.colorToMove == BLACK) {
 			if ((Util.POWER_LOOKUP[index - 8] & (evalInfo.attacksAll[WHITE] | evalInfo.bb_all)) == 0) {
 				if ((Util.POWER_LOOKUP[index] & evalInfo.attacksAll[WHITE]) == 0) {
 					return 1;
 				}
 			}
-		} else if (MaterialUtil.onlyWhitePawnsOrOneNightOrBishop(cb.materialKey)) {
+		} else if (MaterialUtil.onlyWhitePawnsOrOneNightOrBishop(evalInfo.materialKey)) {
 
 			// check if it is my turn
-			if (cb.colorToMove == WHITE) {
+			if (evalInfo.colorToMove == WHITE) {
 				promotionDistance++;
 			}
 
@@ -1166,13 +1148,13 @@ public class EvalUtil {
 			}
 
 			// check if own king is defending the promotion square (including square just below)
-			if ((StaticMoves.KING_MOVES[cb.kingIndex[BLACK]] & ChessConstants.KING_AREA[BLACK][index] & Bitboard.RANK_12) != 0) {
+			if ((StaticMoves.KING_MOVES[evalInfo.kingIndex[BLACK]] & ChessConstants.KING_AREA[BLACK][index] & Bitboard.RANK_12) != 0) {
 				promotionDistance--;
 			}
 
 			// check distance of enemy king to promotion square
-			if (promotionDistance < Math.max(cb.kingIndex[WHITE] >>> 3, Math.abs((index & 7) - (cb.kingIndex[WHITE] & 7)))) {
-				if (!MaterialUtil.hasWhiteNonPawnPieces(cb.materialKey)) {
+			if (promotionDistance < Math.max(evalInfo.kingIndex[WHITE] >>> 3, Math.abs((index & 7) - (evalInfo.kingIndex[WHITE] & 7)))) {
+				if (!MaterialUtil.hasWhiteNonPawnPieces(evalInfo.materialKey)) {
 					return promotionDistance;
 				}
 				if (evalInfo.bb_w_knights != 0) {
@@ -1195,19 +1177,19 @@ public class EvalUtil {
 		return Util.SHORT_MAX;
 	}
 
-	private static int getWhitePromotionDistance(final ChessBoard cb, final int index, final EvalInfo evalInfo) {
+	private static int getWhitePromotionDistance(final int index, final EvalInfo evalInfo) {
 		// check if it cannot be stopped
 		int promotionDistance = 7 - index / 8;
-		if (promotionDistance == 1 && cb.colorToMove == WHITE) {
+		if (promotionDistance == 1 && evalInfo.colorToMove == WHITE) {
 			if ((Util.POWER_LOOKUP[index + 8] & (evalInfo.attacksAll[BLACK] | evalInfo.bb_all)) == 0) {
 				if ((Util.POWER_LOOKUP[index] & evalInfo.attacksAll[BLACK]) == 0) {
 					return 1;
 				}
 			}
-		} else if (MaterialUtil.onlyBlackPawnsOrOneNightOrBishop(cb.materialKey)) {
+		} else if (MaterialUtil.onlyBlackPawnsOrOneNightOrBishop(evalInfo.materialKey)) {
 
 			// check if it is my turn
-			if (cb.colorToMove == BLACK) {
+			if (evalInfo.colorToMove == BLACK) {
 				promotionDistance++;
 			}
 
@@ -1218,13 +1200,13 @@ public class EvalUtil {
 
 			// TODO maybe the enemy king can capture the pawn!!
 			// check if own king is defending the promotion square (including square just below)
-			if ((StaticMoves.KING_MOVES[cb.kingIndex[WHITE]] & ChessConstants.KING_AREA[WHITE][index] & Bitboard.RANK_78) != 0) {
+			if ((StaticMoves.KING_MOVES[evalInfo.kingIndex[WHITE]] & ChessConstants.KING_AREA[WHITE][index] & Bitboard.RANK_78) != 0) {
 				promotionDistance--;
 			}
 
 			// check distance of enemy king to promotion square
-			if (promotionDistance < Math.max(7 - cb.kingIndex[BLACK] / 8, Math.abs((index & 7) - (cb.kingIndex[BLACK] & 7)))) {
-				if (!MaterialUtil.hasBlackNonPawnPieces(cb.materialKey)) {
+			if (promotionDistance < Math.max(7 - evalInfo.kingIndex[BLACK] / 8, Math.abs((index & 7) - (evalInfo.kingIndex[BLACK] & 7)))) {
+				if (!MaterialUtil.hasBlackNonPawnPieces(evalInfo.materialKey)) {
 					return promotionDistance;
 				}
 				if (evalInfo.bb_b_knights != 0) {

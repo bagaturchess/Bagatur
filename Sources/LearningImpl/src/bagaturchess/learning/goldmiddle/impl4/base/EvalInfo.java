@@ -44,14 +44,7 @@ public class EvalInfo {
 	private static final int FLAG_QUEEN = 1 << (ChessConstants.QUEEN - 1);
 
 	private static final int[] FLAGS = new int[] { 0, FLAG_PAWN, FLAG_NIGHT, FLAG_BISHOP, FLAG_ROOK, FLAG_QUEEN };
-
 	
-	public final long[][] attacks = new long[2][7];
-	public final long[] attacksAll = new long[2];
-	public final long[] doubleAttacks = new long[2];
-	public final int[] kingAttackersFlag = new int[2];
-	
-	public long passedPawnsAndOutposts;
 	
 	public long bb_free;
 	public long bb_all;
@@ -69,6 +62,20 @@ public class EvalInfo {
 	public long bb_b_rooks;
 	public long bb_w_king;
 	public long bb_b_king;
+	
+	public int[] kingIndex = new int[2];
+	public int materialKey;
+	public int colorToMove;
+	public long discoveredPieces;
+	public long pinnedPieces;
+	
+	public final long[][] attacks = new long[2][7];
+	public final long[] attacksAll = new long[2];
+	public final long[] doubleAttacks = new long[2];
+	public final int[] kingAttackersFlag = new int[2];
+	
+	public long passedPawnsAndOutposts;
+	
 	
 	public int eval_o_part1;
 	public int eval_e_part1;
@@ -106,7 +113,7 @@ public class EvalInfo {
 	}
 	
 	
-	public final void fillBB(final ChessBoard cb) {
+	public final void fillBoardInfo(final ChessBoard cb) {
 		bb_w_pawns = cb.pieces[WHITE][PAWN];
 		bb_b_pawns = cb.pieces[BLACK][PAWN];
 		bb_w_bishops = cb.pieces[WHITE][BISHOP];
@@ -123,6 +130,16 @@ public class EvalInfo {
 		bb_all_b_pieces = bb_b_pawns | bb_b_bishops | bb_b_knights | bb_b_queens | bb_b_rooks | bb_b_king;
 		bb_all = bb_all_w_pieces | bb_all_b_pieces;
 		bb_free = ~bb_all;
+		
+		kingIndex[WHITE] = cb.kingIndex[WHITE];
+		kingIndex[BLACK] = cb.kingIndex[BLACK];
+		
+		materialKey = cb.materialKey;
+		
+		colorToMove = cb.colorToMove;
+		
+		discoveredPieces = cb.discoveredPieces;
+		pinnedPieces = cb.pinnedPieces;
 	}
 	
 	

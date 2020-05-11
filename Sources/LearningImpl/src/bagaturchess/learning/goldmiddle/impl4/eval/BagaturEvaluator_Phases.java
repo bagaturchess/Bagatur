@@ -36,7 +36,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	protected double phase1() {
 		
 		evalInfo.clearEvals1();
-		evalInfo.fillBB(board);
+		evalInfo.fillBoardInfo(board);
 		
 		return EvalUtil.eval1(board, evalInfo);
 	}
