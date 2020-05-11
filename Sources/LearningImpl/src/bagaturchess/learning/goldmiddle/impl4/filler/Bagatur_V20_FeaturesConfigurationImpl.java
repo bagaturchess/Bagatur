@@ -30,7 +30,7 @@ public class Bagatur_V20_FeaturesConfigurationImpl implements IFeaturesConfigura
 		
 		
 		//Imbalance
-		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_IMBALANCE_NIGHT_PAWNS		, "MATERIAL.IMBALANCE.NIGHT.PAWNS"		, STANDARD         , 0, 100,  1, 0, 100,  1 ));
+		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_IMBALANCE_KNIGHT_PAWNS		, "MATERIAL.IMBALANCE.KNIGHT.PAWNS"		, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAWNS		, "MATERIAL.IMBALANCE.ROOK.PAWNS"		, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_IMBALANCE_BISHOP_DOUBLE	, "MATERIAL.IMBALANCE.BISHOP.DOUBLE"	, STANDARD         , 0, 100,  1, 0, 100,  1 ));
 		add(new_featuresSet, new AdjustableFeatureSingle(FEATURE_ID_MATERIAL_IMBALANCE_QUEEN_KNIGHTS	, "MATERIAL.IMBALANCE.QUEEN.KNIGHTS"	, STANDARD         , 0, 100,  1, 0, 100,  1 ));

@@ -37,47 +37,47 @@ public interface FeatureWeights {
 	public static final double MATERIAL_QUEEN_O	=	1;
 	public static final double MATERIAL_QUEEN_E	=	1;
 	
-	public static final double MATERIAL_IMBALANCE_NIGHT_PAWNS_O	=	0.8292165247751222;
-	public static final double MATERIAL_IMBALANCE_NIGHT_PAWNS_E	=	2.337043236934307;
+	public static final double MATERIAL_IMBALANCE_KNIGHT_PAWNS_O	=	1;
+	public static final double MATERIAL_IMBALANCE_KNIGHT_PAWNS_E	=	1;
 
-	public static final double MATERIAL_IMBALANCE_ROOK_PAWNS_O	=	0.034871483447875315;
-	public static final double MATERIAL_IMBALANCE_ROOK_PAWNS_E	=	0.0;
+	public static final double MATERIAL_IMBALANCE_ROOK_PAWNS_O	=	1;
+	public static final double MATERIAL_IMBALANCE_ROOK_PAWNS_E	=	1;
 
-	public static final double MATERIAL_IMBALANCE_BISHOP_DOUBLE_O	=	0.6322994840612148;
-	public static final double MATERIAL_IMBALANCE_BISHOP_DOUBLE_E	=	0.6262170621781923;
+	public static final double MATERIAL_IMBALANCE_BISHOP_DOUBLE_O	=	1;
+	public static final double MATERIAL_IMBALANCE_BISHOP_DOUBLE_E	=	1;
 
-	public static final double MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O	=	0.31519490896052466;
-	public static final double MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E	=	0.0324008102227003;
+	public static final double MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O	=	1;
+	public static final double MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E	=	1;
 
-	public static final double MATERIAL_IMBALANCE_ROOK_PAIR_O	=	0.4788128382130924;
-	public static final double MATERIAL_IMBALANCE_ROOK_PAIR_E	=	0.0;
+	public static final double MATERIAL_IMBALANCE_ROOK_PAIR_O	=	1;
+	public static final double MATERIAL_IMBALANCE_ROOK_PAIR_E	=	1;
 
 	public static final double PIECE_SQUARE_TABLE_O	=	1;
 	public static final double PIECE_SQUARE_TABLE_E	=	1;
 
-	public static final double PAWN_DOUBLE_O	=	2.1888590124456972;
-	public static final double PAWN_DOUBLE_E	=	0.492923197730428;
+	public static final double PAWN_DOUBLE_O	=	1;
+	public static final double PAWN_DOUBLE_E	=	1;
 
-	public static final double PAWN_CONNECTED_O	=	1.3552319880814496;
-	public static final double PAWN_CONNECTED_E	=	0.8848690172374618;
+	public static final double PAWN_CONNECTED_O	=	1;
+	public static final double PAWN_CONNECTED_E	=	1;
 
-	public static final double PAWN_NEIGHBOUR_O	=	2.2828251114947764;
-	public static final double PAWN_NEIGHBOUR_E	=	0.5590331330316131;
+	public static final double PAWN_NEIGHBOUR_O	=	1;
+	public static final double PAWN_NEIGHBOUR_E	=	1;
 
-	public static final double PAWN_ISOLATED_O	=	0.6959886713841541;
-	public static final double PAWN_ISOLATED_E	=	0.8728417105940242;
+	public static final double PAWN_ISOLATED_O	=	1;
+	public static final double PAWN_ISOLATED_E	=	1;
 
-	public static final double PAWN_BACKWARD_O	=	0.33740021104291656;
-	public static final double PAWN_BACKWARD_E	=	1.5190449836905933;
+	public static final double PAWN_BACKWARD_O	=	1;
+	public static final double PAWN_BACKWARD_E	=	1;
 
-	public static final double PAWN_INVERSE_O	=	2.4217584574523645;
-	public static final double PAWN_INVERSE_E	=	0.0;
+	public static final double PAWN_INVERSE_O	=	1;
+	public static final double PAWN_INVERSE_E	=	1;
 
-	public static final double PAWN_PASSED_O	=	1;//0.28886735736064045;
-	public static final double PAWN_PASSED_E	=	1.1679355471582253;
+	public static final double PAWN_PASSED_O	=	1;
+	public static final double PAWN_PASSED_E	=	1;
 
-	public static final double PAWN_PASSED_CANDIDATE_O	=	1;//0.4583220942997007;
-	public static final double PAWN_PASSED_CANDIDATE_E	=	1;//0.10975113895144344;
+	public static final double PAWN_PASSED_CANDIDATE_O	=	1;
+	public static final double PAWN_PASSED_CANDIDATE_E	=	1;
 
 	public static final double PAWN_PASSED_UNSTOPPABLE_O	=	0.0;
 	public static final double PAWN_PASSED_UNSTOPPABLE_E	=	1.4403921966227626;
@@ -85,20 +85,20 @@ public interface FeatureWeights {
 	public static final double PAWN_SHIELD_O	=	0.6743978856635646;
 	public static final double PAWN_SHIELD_E	=	0.4498618724103228;
 
-	public static final double MOBILITY_KNIGHT_O	=	0.7880963637335189;
-	public static final double MOBILITY_KNIGHT_E	=	1.385420109938542;
+	public static final double MOBILITY_KNIGHT_O	=	1;
+	public static final double MOBILITY_KNIGHT_E	=	1;
 
-	public static final double MOBILITY_BISHOP_O	=	0.8176187830585843;
-	public static final double MOBILITY_BISHOP_E	=	1.2740107981178432;
+	public static final double MOBILITY_BISHOP_O	=	1;
+	public static final double MOBILITY_BISHOP_E	=	1;
 
-	public static final double MOBILITY_ROOK_O	=	1.2097970684547878;
-	public static final double MOBILITY_ROOK_E	=	0.6016000697126167;
+	public static final double MOBILITY_ROOK_O	=	1;
+	public static final double MOBILITY_ROOK_E	=	1;
 
-	public static final double MOBILITY_QUEEN_O	=	1.4006721570644032;
-	public static final double MOBILITY_QUEEN_E	=	1.010710407672654;
+	public static final double MOBILITY_QUEEN_O	=	1;
+	public static final double MOBILITY_QUEEN_E	=	1;
 
-	public static final double MOBILITY_KING_O	=	1.0177298369138743;
-	public static final double MOBILITY_KING_E	=	0.6957304645883313;
+	public static final double MOBILITY_KING_O	=	1;
+	public static final double MOBILITY_KING_E	=	1;
 
 	public static final double THREAT_DOUBLE_ATTACKED_O	=	0.8912793947623033;
 	public static final double THREAT_DOUBLE_ATTACKED_E	=	1.2545945494006072;

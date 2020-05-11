@@ -33,7 +33,7 @@ public interface Bagatur_V20_FeaturesConstants {
 	
 	
 	//Imbalance
-	public static final int FEATURE_ID_MATERIAL_IMBALANCE_NIGHT_PAWNS 		= 1070;
+	public static final int FEATURE_ID_MATERIAL_IMBALANCE_KNIGHT_PAWNS 		= 1070;
 	public static final int FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAWNS		= 1080;
 	public static final int FEATURE_ID_MATERIAL_IMBALANCE_BISHOP_DOUBLE 	= 1090;
 	public static final int FEATURE_ID_MATERIAL_IMBALANCE_QUEEN_KNIGHTS 	= 1100;

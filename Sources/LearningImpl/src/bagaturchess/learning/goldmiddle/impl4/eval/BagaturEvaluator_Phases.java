@@ -53,7 +53,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		
 		evalInfo.clearEvals2();
 		
-		return EvalUtil.eval2(board, evalInfo);
+		return EvalUtil.eval2(board, evalInfo, evalComponentsProcessor);
 	}
 
 
