@@ -27,8 +27,7 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 	public static final int MG = 0;
 	public static final int EG = 1;
 	
-	public static final int PHASE_TOTAL = 4 * EvalConstants.PHASE[NIGHT] + 4 * EvalConstants.PHASE[BISHOP] + 4 * EvalConstants.PHASE[ROOK]
-			+ 2 * EvalConstants.PHASE[QUEEN];
+	public static final int PHASE_TOTAL = 4 * EvalConstants.PHASE[NIGHT] + 4 * EvalConstants.PHASE[BISHOP] + 4 * EvalConstants.PHASE[ROOK] + 2 * EvalConstants.PHASE[QUEEN];
 	
 	
 	public static int eval1(final ChessBoard cb, final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
@@ -40,7 +39,7 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		calculateImbalances(evalInfo, evalComponentsProcessor);
 		calculatePawnScores(evalInfo, evalComponentsProcessor);
 		
-		return ((evalInfo.eval_o_part1 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part1 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(cb, evalInfo);		
+		return ((evalInfo.eval_o_part1 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part1 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(evalInfo);		
 	}
 	
 	
@@ -57,11 +56,11 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		calculateSpace(evalInfo, evalComponentsProcessor);
 		calculateOthers(cb, evalInfo, evalComponentsProcessor);
 		
-		return ((evalInfo.eval_o_part2 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part2 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(cb, evalInfo);
+		return ((evalInfo.eval_o_part2 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part2 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(evalInfo);
 	}
 	
 	
-	private static int calculateScaleFactor(final ChessBoard cb, final EvalInfo evalInfo) {
+	private static int calculateScaleFactor(final EvalInfo evalInfo) {
 		// opposite bishops endgame?
 		if (MaterialUtil.oppositeBishops(evalInfo.materialKey)) {
 			if (((evalInfo.bb_w_bishops & Bitboard.BLACK_SQUARES) == 0) == ((evalInfo.bb_b_bishops & Bitboard.WHITE_SQUARES) == 0)) {
