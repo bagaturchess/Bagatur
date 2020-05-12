@@ -297,7 +297,7 @@ public class FeaturesEvaluator implements IEvaluator {
 		}
 		
 		if (eval > IEvaluator.MAX_EVAL || eval < IEvaluator.MIN_EVAL) {
-			throw new IllegalStateException("eval=" + eval);
+			//throw new IllegalStateException("eval=" + eval);
 		}
 		
 		if (useEvalCache) {

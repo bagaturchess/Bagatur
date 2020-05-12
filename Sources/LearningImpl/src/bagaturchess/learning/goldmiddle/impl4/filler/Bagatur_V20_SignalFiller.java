@@ -29,6 +29,7 @@ import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.impl4.base.EvalInfo;
 import bagaturchess.learning.goldmiddle.impl4.base.EvalUtil;
 import bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcessor;
+import bagaturchess.search.api.IEvaluator;
 
 
 public class Bagatur_V20_SignalFiller implements ISignalFiller {
@@ -96,10 +97,12 @@ public class Bagatur_V20_SignalFiller implements ISignalFiller {
 		@Override
 		public void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
 			
-			double openningPart = (EvalUtil.PHASE_TOTAL - board.phase) / (double) EvalUtil.PHASE_TOTAL;
-			//double openningPart = board.phase / (double) EvalUtil.PHASE_TOTAL;
+			double openningPart = Math.min(1, (EvalUtil.PHASE_TOTAL - board.phase) / (double) EvalUtil.PHASE_TOTAL);
+			//double openningPart = Math.min(1, board.phase / (double) EvalUtil.PHASE_TOTAL);
 			
-			signals.getSignal(componentID).addStrength(interpolateInternal(value_o, value_e, openningPart), openningPart);
+			double value = interpolateInternal(value_o, value_e, openningPart);
+			
+			signals.getSignal(componentID).addStrength(value, openningPart);
 		}
 		
 		
