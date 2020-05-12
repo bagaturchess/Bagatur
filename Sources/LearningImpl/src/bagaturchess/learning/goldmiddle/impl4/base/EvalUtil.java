@@ -39,7 +39,7 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		calculateImbalances(evalInfo, evalComponentsProcessor);
 		calculatePawnScores(evalInfo, evalComponentsProcessor);
 		
-		return ((evalInfo.eval_o_part1 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part1 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(evalInfo);		
+		return (int) (((evalInfo.eval_o_part1 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part1 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(evalInfo));		
 	}
 	
 	
@@ -56,7 +56,7 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		calculateSpace(evalInfo, evalComponentsProcessor);
 		calculateOthers(cb, evalInfo, evalComponentsProcessor);
 		
-		return ((evalInfo.eval_o_part2 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part2 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(evalInfo);
+		return (int) (((evalInfo.eval_o_part2 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part2 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(evalInfo));
 	}
 	
 	
