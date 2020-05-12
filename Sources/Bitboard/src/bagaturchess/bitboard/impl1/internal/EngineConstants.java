@@ -8,7 +8,7 @@ public class EngineConstants {
 	public static final int MAX_MOVES 					= 768;
 	public static final int MAX_THREADS					= 64;
 	public static final boolean ENABLE_PONDERING		= true;
-	public static final boolean GENERATE_BR_PROMOTIONS 	= false;
+	public static final boolean GENERATE_BR_PROMOTIONS 	= true;
 
 	public static final boolean ASSERT 					= false;
 
