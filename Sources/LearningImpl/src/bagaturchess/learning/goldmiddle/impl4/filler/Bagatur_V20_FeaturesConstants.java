@@ -24,81 +24,80 @@ public interface Bagatur_V20_FeaturesConstants {
 	
 	
 	//Material
-	public static final int FEATURE_ID_MATERIAL_PAWN       					= 1010;
-	public static final int FEATURE_ID_MATERIAL_KNIGHT     					= 1020;
-	public static final int FEATURE_ID_MATERIAL_BISHOP     					= 1030;
-	public static final int FEATURE_ID_MATERIAL_ROOK      					= 1040;
-	public static final int FEATURE_ID_MATERIAL_QUEEN      					= 1050;
-	public static final int FEATURE_ID_MATERIAL_DOUBLE_BISHOP 				= 1060;
+	public static final int FEATURE_ID_MATERIAL_PAWN       					= 1;
+	public static final int FEATURE_ID_MATERIAL_KNIGHT     					= 2;
+	public static final int FEATURE_ID_MATERIAL_BISHOP     					= 3;
+	public static final int FEATURE_ID_MATERIAL_ROOK      					= 4;
+	public static final int FEATURE_ID_MATERIAL_QUEEN      					= 5;
 	
 	
 	//Imbalance
-	public static final int FEATURE_ID_MATERIAL_IMBALANCE_KNIGHT_PAWNS 		= 1070;
-	public static final int FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAWNS		= 1080;
-	public static final int FEATURE_ID_MATERIAL_IMBALANCE_BISHOP_DOUBLE 	= 1090;
-	public static final int FEATURE_ID_MATERIAL_IMBALANCE_QUEEN_KNIGHTS 	= 1100;
-	public static final int FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAIR 		= 1110;
+	public static final int FEATURE_ID_MATERIAL_IMBALANCE_KNIGHT_PAWNS 		= 6;
+	public static final int FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAWNS		= 7;
+	public static final int FEATURE_ID_MATERIAL_IMBALANCE_BISHOP_DOUBLE 	= 8;
+	public static final int FEATURE_ID_MATERIAL_IMBALANCE_QUEEN_KNIGHTS 	= 9;
+	public static final int FEATURE_ID_MATERIAL_IMBALANCE_ROOK_PAIR 		= 10;
 	
 	
 	//PST
-	public static final int FEATURE_ID_PIECE_SQUARE_TABLE 					= 1120;
+	public static final int FEATURE_ID_PIECE_SQUARE_TABLE 					= 11;
 	
 	
 	//Pawns
-	public static final int FEATURE_ID_PAWN_DOUBLE 							= 1130;
-	public static final int FEATURE_ID_PAWN_CONNECTED 						= 1140;
-	public static final int FEATURE_ID_PAWN_NEIGHBOUR 						= 1150;
-	public static final int FEATURE_ID_PAWN_ISOLATED 						= 1160;
-	public static final int FEATURE_ID_PAWN_BACKWARD 						= 1170;
-	public static final int FEATURE_ID_PAWN_INVERSE 						= 1180;
-	public static final int FEATURE_ID_PAWN_PASSED							= 1190;
-	public static final int FEATURE_ID_PAWN_PASSED_CANDIDATE 				= 1200;
-	public static final int FEATURE_ID_PAWN_PASSED_UNSTOPPABLE	 			= 1210;
-	public static final int FEATURE_ID_PAWN_SHIELD							= 1220;
+	public static final int FEATURE_ID_PAWN_DOUBLE 							= 12;
+	public static final int FEATURE_ID_PAWN_CONNECTED 						= 13;
+	public static final int FEATURE_ID_PAWN_NEIGHBOUR 						= 14;
+	public static final int FEATURE_ID_PAWN_ISOLATED 						= 15;
+	public static final int FEATURE_ID_PAWN_BACKWARD 						= 16;
+	public static final int FEATURE_ID_PAWN_INVERSE 						= 17;
+	public static final int FEATURE_ID_PAWN_PASSED							= 18;
+	public static final int FEATURE_ID_PAWN_PASSED_CANDIDATE 				= 19;
+	public static final int FEATURE_ID_PAWN_PASSED_UNSTOPPABLE	 			= 20;
+	public static final int FEATURE_ID_PAWN_SHIELD							= 21;
 	
 	
 	//Mobility
-	public static final int FEATURE_ID_MOBILITY_KNIGHT						= 1230;
-	public static final int FEATURE_ID_MOBILITY_BISHOP						= 1240;
-	public static final int FEATURE_ID_MOBILITY_ROOK						= 1250;
-	public static final int FEATURE_ID_MOBILITY_QUEEN						= 1260;
-	public static final int FEATURE_ID_MOBILITY_KING						= 1270;
+	public static final int FEATURE_ID_MOBILITY_KNIGHT						= 22;
+	public static final int FEATURE_ID_MOBILITY_BISHOP						= 23;
+	public static final int FEATURE_ID_MOBILITY_ROOK						= 24;
+	public static final int FEATURE_ID_MOBILITY_QUEEN						= 25;
+	public static final int FEATURE_ID_MOBILITY_KING						= 26;
 	
 	
 	//Threats
-	public static final int FEATURE_ID_THREAT_DOUBLE_ATTACKED 				= 1280;
-	public static final int FEATURE_ID_THREAT_UNUSED_OUTPOST				= 1290;
-	public static final int FEATURE_ID_THREAT_PAWN_PUSH						= 1300;
-	public static final int FEATURE_ID_THREAT_PAWN_ATTACKS 					= 1310;
-	public static final int FEATURE_ID_THREAT_MULTIPLE_PAWN_ATTACKS 		= 1320;
-	public static final int FEATURE_ID_THREAT_MAJOR_ATTACKED 				= 1330;
-	public static final int FEATURE_ID_THREAT_PAWN_ATTACKED 				= 1340;
-	public static final int FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK			= 1350;
-	public static final int FEATURE_ID_THREAT_QUEEN_ATTACKED_MINOR 			= 1360;
-	public static final int FEATURE_ID_THREAT_ROOK_ATTACKED 				= 1370;
+	public static final int FEATURE_ID_THREAT_DOUBLE_ATTACKED 				= 27;
+	public static final int FEATURE_ID_THREAT_UNUSED_OUTPOST				= 28;
+	public static final int FEATURE_ID_THREAT_PAWN_PUSH						= 29;
+	public static final int FEATURE_ID_THREAT_PAWN_ATTACKS 					= 30;
+	public static final int FEATURE_ID_THREAT_MULTIPLE_PAWN_ATTACKS 		= 31;
+	public static final int FEATURE_ID_THREAT_MAJOR_ATTACKED 				= 32;
+	public static final int FEATURE_ID_THREAT_PAWN_ATTACKED 				= 33;
+	public static final int FEATURE_ID_THREAT_QUEEN_ATTACKED_ROOK			= 34;
+	public static final int FEATURE_ID_THREAT_QUEEN_ATTACKED_MINOR 			= 35;
+	public static final int FEATURE_ID_THREAT_ROOK_ATTACKED 				= 36;
 	
 	
 	//Others
-	public static final int FEATURE_ID_OTHERS_SIDE_TO_MOVE	 				= 1400;
-	public static final int FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS			= 1410;
-	public static final int FEATURE_ID_OTHERS_ROOK_BATTERY 					= 1440;
-	public static final int FEATURE_ID_OTHERS_ROOK_7TH_RANK 				= 1450;
-	public static final int FEATURE_ID_OTHERS_ROOK_TRAPPED 					= 1460;
-	public static final int FEATURE_ID_OTHERS_ROOK_FILE_OPEN 				= 1470;
-	public static final int FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED	= 1480;
-	public static final int FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN 			= 1490;
-	public static final int FEATURE_ID_OTHERS_BISHOP_OUTPOST 				= 1500;
-	public static final int FEATURE_ID_OTHERS_BISHOP_PRISON					= 1510;
-	public static final int FEATURE_ID_OTHERS_BISHOP_PAWNS 					= 1520;
-	public static final int FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK 			= 1530;
-	public static final int FEATURE_ID_OTHERS_PAWN_BLOCKAGE 				= 1540;
-	public static final int FEATURE_ID_OTHERS_KNIGHT_OUTPOST 				= 1550;
-	public static final int FEATURE_ID_OTHERS_CASTLING 						= 1560;
-	public static final int FEATURE_ID_OTHERS_PINNED 						= 1570;
-	public static final int FEATURE_ID_OTHERS_DISCOVERED					= 1580;
+	public static final int FEATURE_ID_OTHERS_SIDE_TO_MOVE	 				= 37;
+	public static final int FEATURE_ID_OTHERS_ONLY_MAJOR_DEFENDERS			= 38;
+	public static final int FEATURE_ID_OTHERS_ROOK_BATTERY 					= 39;
+	public static final int FEATURE_ID_OTHERS_ROOK_7TH_RANK 				= 40;
+	public static final int FEATURE_ID_OTHERS_ROOK_TRAPPED 					= 41;
+	public static final int FEATURE_ID_OTHERS_ROOK_FILE_OPEN 				= 42;
+	public static final int FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED	= 43;
+	public static final int FEATURE_ID_OTHERS_ROOK_FILE_SEMI_OPEN 			= 44;
+	public static final int FEATURE_ID_OTHERS_BISHOP_OUTPOST 				= 45;
+	public static final int FEATURE_ID_OTHERS_BISHOP_PRISON					= 46;
+	public static final int FEATURE_ID_OTHERS_BISHOP_PAWNS 					= 47;
+	public static final int FEATURE_ID_OTHERS_BISHOP_CENTER_ATTACK 			= 48;
+	public static final int FEATURE_ID_OTHERS_PAWN_BLOCKAGE 				= 49;
+	public static final int FEATURE_ID_OTHERS_KNIGHT_OUTPOST 				= 50;
+	public static final int FEATURE_ID_OTHERS_CASTLING 						= 51;
+	public static final int FEATURE_ID_OTHERS_PINNED 						= 52;
+	public static final int FEATURE_ID_OTHERS_DISCOVERED					= 53;
 	
 	
 	//King safety and space
-	public static final int FEATURE_ID_KING_SAFETY 							= 1590;
-	public static final int FEATURE_ID_SPACE 								= 1600;
+	public static final int FEATURE_ID_KING_SAFETY 							= 54;
+	public static final int FEATURE_ID_SPACE 								= 55;
 }
