@@ -13,7 +13,7 @@ import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 
 
-class NeuralNetworkEvaluator extends BaseEvaluator {
+public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	
 	private IBitBoard bitboard;	

@@ -8,7 +8,7 @@ import bagaturchess.search.api.IEvaluatorFactory;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 
 
-class NeuralNetworkEvaluatorFactory implements IEvaluatorFactory {
+public class NeuralNetworkEvaluatorFactory implements IEvaluatorFactory {
 	
 	public NeuralNetworkEvaluatorFactory() {
 	}
