@@ -37,8 +37,10 @@ import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
+import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.UCIEnginesManager;
+import bagaturchess.uci.impl.Channel_Console;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedGame;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedMove;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedPosition;
@@ -66,6 +68,8 @@ public class GamesGenerator {
 	
 	
 	public static void main(String[] args) {
+		
+		ChannelManager.setChannel(new Channel_Console());
 		GamesGenerator control = new GamesGenerator();
 		try {
 			
@@ -111,9 +115,9 @@ public class GamesGenerator {
 					new String [0],
 					"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\texel107");*/
 			
-			EngineProcess engine = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-10-win\\Windows\\stockfish_10_x64.exe",
+			EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\stockfish-10-win\\Windows\\stockfish_10_x64.exe",
 					new String [0],
-					"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\stockfish-10-win\\Windows");
+					"C:\\DATA\\Engines\\stockfish-10-win\\Windows");
 	
 			/*EngineProcess engine = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Komodo9\\Windows\\komodo-9.02-64bit.exe",
 					new String [0],

@@ -20,10 +20,91 @@
 package bagaturchess.learning.goldmiddle.impl4.filler;
 
 
-public class Bagatur_V20_SignalFiller {
+import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl1.BoardImpl;
+import bagaturchess.bitboard.impl1.internal.ChessBoard;
+import bagaturchess.learning.api.IFeatureComplexity;
+import bagaturchess.learning.api.ISignalFiller;
+import bagaturchess.learning.api.ISignals;
+import bagaturchess.learning.goldmiddle.impl4.base.EvalInfo;
+import bagaturchess.learning.goldmiddle.impl4.base.EvalUtil;
+import bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcessor;
 
-	public Bagatur_V20_SignalFiller() {
-		// TODO Auto-generated constructor stub
+
+public class Bagatur_V20_SignalFiller implements ISignalFiller {
+	
+	
+	private final ChessBoard board;
+	private final EvalInfo evalInfo;
+	
+	
+	public Bagatur_V20_SignalFiller(IBitBoard bitboard) {
+		board = ((BoardImpl)bitboard).getChessBoard();
+		evalInfo = new EvalInfo();
 	}
-
+	
+	
+	@Override
+	public void fill(ISignals signals) {
+		
+		evalInfo.clearEvals1();
+		evalInfo.clearEvals2();
+		evalInfo.fillBoardInfo(board);
+		
+		IEvalComponentsProcessor evalComponentsProcessor = new EvalComponentsProcessor(signals);
+		
+		EvalUtil.eval1(board, evalInfo, evalComponentsProcessor);
+		EvalUtil.eval2(board, evalInfo, evalComponentsProcessor);
+	}
+	
+	
+	@Override
+	public void fillByComplexity(int complexity, ISignals signals) {
+		switch(complexity) {
+			case IFeatureComplexity.STANDARD:
+				fill(signals);
+				return;
+			case IFeatureComplexity.PAWNS_STRUCTURE:
+				//fillPawnSignals(signals);
+				return;
+			case IFeatureComplexity.PIECES_ITERATION:
+				//fillPiecesIterationSignals(signals);
+				return;
+			case IFeatureComplexity.MOVES_ITERATION:
+				//fillMovesIterationSignals(signals);
+				return;
+			case IFeatureComplexity.FIELDS_STATES_ITERATION:
+				//throw new UnsupportedOperationException("FIELDS_STATES_ITERATION");
+				return;
+			default:
+				throw new IllegalStateException("complexity=" + complexity);
+		}
+	}
+	
+	
+	private final class EvalComponentsProcessor implements IEvalComponentsProcessor {
+		
+		
+		private final ISignals signals;
+		
+		
+		private EvalComponentsProcessor(final ISignals _signals) {
+			signals = _signals;
+		}
+		
+		
+		@Override
+		public void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
+			
+			double openningPart = (EvalUtil.PHASE_TOTAL - board.phase) / (double) EvalUtil.PHASE_TOTAL;
+			//double openningPart = board.phase / (double) EvalUtil.PHASE_TOTAL;
+			
+			signals.getSignal(componentID).addStrength(interpolateInternal(value_o, value_e, openningPart), openningPart);
+		}
+		
+		
+		private double interpolateInternal(double o, double e, double openningPart) {
+			return (o * openningPart + e * (1 - openningPart));
+		}
+	}
 }
