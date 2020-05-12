@@ -1,4 +1,4 @@
-package bagaturchess.deeplearning.impl1_v7.eval;
+package bagaturchess.deeplearning.impl4_v20.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;

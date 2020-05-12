@@ -1,4 +1,4 @@
-package bagaturchess.deeplearning.impl1_v7.eval;
+package bagaturchess.deeplearning.impl4_v20.eval;
 
 
 import org.neuroph.core.NeuralNetwork;
@@ -6,8 +6,8 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
-import bagaturchess.deeplearning.impl1_v7.NeuralNetworkUtils_AllFeatures;
-import bagaturchess.learning.goldmiddle.impl1.filler.Bagatur_ALL_SignalFiller_InArray;
+import bagaturchess.deeplearning.impl4_v20.NeuralNetworkUtils_AllFeatures;
+import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;
