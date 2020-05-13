@@ -32,9 +32,6 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase1()
-	 */
 	@Override
 	protected double phase1() {
 		
@@ -43,45 +40,33 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		
 		return EvalUtil.eval1(board, evalInfo, evalComponentsProcessor);
 	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase2()
-	 */
+	
+	
 	@Override
 	protected double phase2() {
 		
 		return EvalUtil.eval2(board, evalInfo, evalComponentsProcessor);
 	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase3()
-	 */
+	
+	
 	@Override
 	protected double phase3() {
 		
 		return EvalUtil.eval3(board, evalInfo, evalComponentsProcessor);
 	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase4()
-	 */
+	
+	
 	@Override
 	protected double phase4() {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return EvalUtil.eval4(board, evalInfo, evalComponentsProcessor);
 	}
-
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase5()
-	 */
+	
+	
 	@Override
 	protected double phase5() {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return EvalUtil.eval5(board, evalInfo, evalComponentsProcessor);
 	}
 	
 	
