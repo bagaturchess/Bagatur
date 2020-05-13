@@ -83,6 +83,10 @@ public class EvalInfo {
 	public double eval_e_part2;
 	public double eval_o_part3;
 	public double eval_e_part3;
+	public double eval_o_part4;
+	public double eval_e_part4;
+	public double eval_o_part5;
+	public double eval_e_part5;
 	
 	
 	public final void clearEvals() {
@@ -92,6 +96,10 @@ public class EvalInfo {
 		eval_e_part2 = 0;
 		eval_o_part3 = 0;
 		eval_e_part3 = 0;
+		eval_o_part4 = 0;
+		eval_e_part4 = 0;
+		eval_o_part5 = 0;
+		eval_e_part5 = 0;
 	}
 	
 	

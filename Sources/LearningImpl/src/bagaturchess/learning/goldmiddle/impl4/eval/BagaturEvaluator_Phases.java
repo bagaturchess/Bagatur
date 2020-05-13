@@ -107,6 +107,12 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 			} else if (evalPhaseID == EVAL_PHASE_ID_3) {
 				evalInfo.eval_o_part3 += value_o * weight_o;
 				evalInfo.eval_e_part3 += value_e * weight_e;
+			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
+				evalInfo.eval_o_part4 += value_o * weight_o;
+				evalInfo.eval_e_part4 += value_e * weight_e;
+			} else if (evalPhaseID == EVAL_PHASE_ID_5) {
+				evalInfo.eval_o_part5 += value_o * weight_o;
+				evalInfo.eval_e_part5 += value_e * weight_e;
 			} else {
 				throw new IllegalStateException();
 			}
