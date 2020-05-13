@@ -24,6 +24,7 @@ public interface IEvalComponentsProcessor {
 	
 	public static final int EVAL_PHASE_ID_1 = 0;
 	public static final int EVAL_PHASE_ID_2 = 1;
+	public static final int EVAL_PHASE_ID_3 = 2;
 	
 	public void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e);
 }

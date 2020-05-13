@@ -38,7 +38,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	@Override
 	protected double phase1() {
 		
-		evalInfo.clearEvals1();
+		evalInfo.clearEvals();
 		evalInfo.fillBoardInfo(board);
 		
 		return EvalUtil.eval1(board, evalInfo, evalComponentsProcessor);
@@ -51,8 +51,6 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	@Override
 	protected double phase2() {
 		
-		evalInfo.clearEvals2();
-		
 		return EvalUtil.eval2(board, evalInfo, evalComponentsProcessor);
 	}
 
@@ -62,9 +60,8 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 */
 	@Override
 	protected double phase3() {
-		int eval = 0;
 		
-		return eval;
+		return EvalUtil.eval3(board, evalInfo, evalComponentsProcessor);
 	}
 
 
@@ -107,6 +104,9 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 			} else if (evalPhaseID == EVAL_PHASE_ID_2) {
 				evalInfo.eval_o_part2 += value_o * weight_o;
 				evalInfo.eval_e_part2 += value_e * weight_e;
+			} else if (evalPhaseID == EVAL_PHASE_ID_3) {
+				evalInfo.eval_o_part3 += value_o * weight_o;
+				evalInfo.eval_e_part3 += value_e * weight_e;
 			} else {
 				throw new IllegalStateException();
 			}

@@ -49,14 +49,14 @@ public class Bagatur_V20_SignalFiller implements ISignalFiller {
 	@Override
 	public void fill(ISignals signals) {
 		
-		evalInfo.clearEvals1();
-		evalInfo.clearEvals2();
+		evalInfo.clearEvals();
 		evalInfo.fillBoardInfo(board);
 		
 		IEvalComponentsProcessor evalComponentsProcessor = new EvalComponentsProcessor(signals);
 		
 		EvalUtil.eval1(board, evalInfo, evalComponentsProcessor);
 		EvalUtil.eval2(board, evalInfo, evalComponentsProcessor);
+		EvalUtil.eval3(board, evalInfo, evalComponentsProcessor);
 	}
 	
 	

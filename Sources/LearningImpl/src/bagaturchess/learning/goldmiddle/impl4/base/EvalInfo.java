@@ -81,21 +81,21 @@ public class EvalInfo {
 	public double eval_e_part1;
 	public double eval_o_part2;
 	public double eval_e_part2;
+	public double eval_o_part3;
+	public double eval_e_part3;
 	
 	
-	public final void clearEvals1() {
+	public final void clearEvals() {
 		eval_o_part1 = 0;
 		eval_e_part1 = 0;
-	}
-	
-	
-	public final void clearEvals2() {
 		eval_o_part2 = 0;
 		eval_e_part2 = 0;
+		eval_o_part3 = 0;
+		eval_e_part3 = 0;
 	}
 	
 	
-	public final void clearEvalAttacks() {
+	public final void clearAttacks() {
 		kingAttackersFlag[WHITE] = 0;
 		kingAttackersFlag[BLACK] = 0;
 		attacks[WHITE][NIGHT] = 0;
