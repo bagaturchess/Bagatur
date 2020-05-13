@@ -149,6 +149,8 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		for (int i=0; i<lists_all.length; i++) {
 			lists_all[i].newSearch();
 		}
+		
+		getEnv().getEval().beforeSearch();
 	}
 	
 	
