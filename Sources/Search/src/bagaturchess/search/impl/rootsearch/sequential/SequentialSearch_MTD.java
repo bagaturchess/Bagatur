@@ -172,7 +172,7 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 						task.run();
 					}
 					
-					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch after loop final_mediator.getStopper().isStopped()="
+					ChannelManager.getChannel().dump("MTDSequentialSearch after loop final_mediator.getStopper().isStopped()="
 							+ final_mediator.getStopper().isStopped()
 							+ ", distribution.getCurrentDepth()=" + distribution.getCurrentDepth() + ", distribution.getMaxIterations()=" + distribution.getMaxIterations());
 					
