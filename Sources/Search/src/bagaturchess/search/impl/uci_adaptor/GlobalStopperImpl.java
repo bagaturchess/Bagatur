@@ -32,29 +32,20 @@ public class GlobalStopperImpl implements ISearchStopper {
 	
 	
 	private ITimeController timeController;
-	//private BestMoveSender bestMoveSender;
 	private long nodes;
 	
-	private ISearchStopper secondaryStopper;
 	private boolean stopped;
 	
 	
 	GlobalStopperImpl(ITimeController _timeController, long _nodes) {
 		timeController = _timeController;
-		//bestMoveSender = _bestMoveSender;
 		nodes = _nodes;
-		//dumpper = _dumpper;
-		//dumpper.dump("Creation: " + timeController);
 	}
 	
 	public void markStopped() {
 		stopped = true;
-		//dumpper.dump("Marked stopped");
 	}
 	
-	public void setSecondaryStopper(ISearchStopper _secondaryStopper) {
-		secondaryStopper = _secondaryStopper;
-	}
 	
 	public void stopIfNecessary(int maxdepth, int colour, double alpha, double beta) throws SearchInterruptedException {
 		
@@ -63,38 +54,24 @@ public class GlobalStopperImpl implements ISearchStopper {
 		}
 		
 		if (stopped) {
-			//dumpper.dump("Stopping: marked as stopped");
 			throw new SearchInterruptedException();
 		}
 		
 		nodes--;
 		if (nodes <= 0) {
 			markStopped();
-				//bestMoveSender.sendBestMove();
 			throw new SearchInterruptedException();
 		}
 		
 		if (!timeController.hasTime()) {
 			markStopped();
-				//bestMoveSender.sendBestMove();
 			throw new SearchInterruptedException();
 		}
-		
-		if (secondaryStopper != null) {
-			try {
-				secondaryStopper.stopIfNecessary(maxdepth, colour, alpha, beta);
-			} catch(SearchInterruptedException sie) {
-				//dumpper.dump("secondary stopper: " + timeController);
-				//dumpper.dump("Stopping: secondaryStopper");
-				throw sie;
-			}
-		}
 	}
+	
 	
 	public boolean isStopped() {
 		if (stopped) return true; 
-		if (secondaryStopper != null) secondaryStopper.isStopped();
 		return false;
 	}
-	
 }
