@@ -422,7 +422,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			case PHASE_QUIET:
 				moveGen.generateMoves(cb);
-				moveGen.setHHScores(cb.colorToMove);
+				moveGen.setHHScores(cb.colorToMove, parentMove);
 				moveGen.sort();
 				break;
 			case PHASE_ATTACKING_BAD:
@@ -547,6 +547,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				cb.undoMove(move);
 				
+				if (MoveUtil.isQuiet(move)) {
+					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
+				}
+				
 				if (score > bestScore) {
 					
 					bestScore = score;
@@ -566,16 +570,12 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {
 							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
 							moveGen.addKillerMove(bestMove, ply);
-							moveGen.addHHValue(cb.colorToMove, bestMove, depth);
+							moveGen.addHHValue(cb.colorToMove, bestMove, parentMove, depth);
 						}
 
 						phase += 10;
 						break;
 					}
-				}
-
-				if (MoveUtil.isQuiet(move)) {
-					moveGen.addBFValue(cb.colorToMove, move, depth);
 				}
 			}
 			phase++;

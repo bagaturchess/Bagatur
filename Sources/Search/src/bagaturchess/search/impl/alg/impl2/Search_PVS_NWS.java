@@ -525,14 +525,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (MoveUtil.isQuiet(move) && cb.checkingPieces == 0) {
 						moveGen.addCounterMove(cb.colorToMove, parentMove, move);
 						moveGen.addKillerMove(move, ply);
-						moveGen.addHHValue(cb.colorToMove, move, depth);
+						moveGen.addHHValue(cb.colorToMove, move, parentMove, depth);
 					}
 					break;
 				}
 			}
 
 			if (MoveUtil.isQuiet(move)) {
-				moveGen.addBFValue(cb.colorToMove, move, depth);
+				moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
 			}
 			
             if (move != bestMove)
