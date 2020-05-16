@@ -37,7 +37,7 @@ public interface ISearch {
 	//public static final int DRAW = 0;
 	public static final int MAX_MAT_INTERVAL = IEvaluator.MAX_EVAL;
 	public static final int MAX_DEPTH = 90;
-	public static final int MIN = - (MAX_DEPTH + 10) * MAX_MAT_INTERVAL;
+	public static final int MIN = - (MAX_DEPTH + 100) * MAX_MAT_INTERVAL;
 	public static final int MAX = -MIN;
 	
 	public void newGame();
