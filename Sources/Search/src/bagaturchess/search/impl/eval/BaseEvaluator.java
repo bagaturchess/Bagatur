@@ -28,7 +28,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 	private static final int CACHE_LEVEL_5 = 5;
 	private static final int CACHE_LEVEL_MAX = CACHE_LEVEL_5;
 	
-	private static double INT_MIN = 25;
+	private static double INT_MIN = 1;
 	private static double INT1 = INT_MIN;
 	private static double INT2 = INT_MIN;
 	private static double INT3 = INT_MIN;

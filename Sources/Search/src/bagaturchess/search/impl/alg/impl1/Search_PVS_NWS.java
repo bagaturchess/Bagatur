@@ -157,7 +157,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (ply >= ISearch.MAX_DEPTH) {
-			return eval(evaluator, ply, alpha, beta);
+			return eval(evaluator, ply, alpha, beta, isPv);
 		}
 		
 		
@@ -277,7 +277,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (depth == 0) {
-			int qeval = qsearch(evaluator, info, cb, moveGen, alpha, beta, ply);
+			int qeval = qsearch(evaluator, info, cb, moveGen, alpha, beta, ply, isPv);
 			node.bestmove = 0;
 			node.eval = qeval;
 			node.leaf = true;
@@ -292,7 +292,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (!isPv && cb.checkingPieces == 0) {
 
 			
-			eval = eval(evaluator, ply, alphaOrig, beta);
+			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
 			
 			if (EngineConstants.USE_TT_SCORE_AS_EVAL && ttValue != 0) {
@@ -330,7 +330,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < EvalConstants.SCORE_MATE_BOUND) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
-					score = qsearch(evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply);
+					score = qsearch(evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply, isPv);
 					if (score + RAZORING_MARGIN[depth] <= alpha) {
 						node.bestmove = 0;
 						node.eval = score;
@@ -345,7 +345,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 					cb.doNullMove();
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
-					score = depth - reduction <= 0 ? -qsearch(evaluator, info, cb, moveGen, -beta, -beta + 1, ply)
+					score = depth - reduction <= 0 ? -qsearch(evaluator, info, cb, moveGen, -beta, -beta + 1, ply, isPv)
 							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false);
 					cb.undoNullMove();
 					if (score >= beta) {
@@ -488,7 +488,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
 							if (!MoveUtil.isPawnPush78(move)) {
 								if (eval == ISearch.MIN) {
-									eval = eval(evaluator, ply, alphaOrig, beta);
+									eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 								}
 								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
 									continue;
@@ -617,7 +617,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 
 
-	public int qsearch(IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply) {
+	public int qsearch(IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply, final boolean isPv) {
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
@@ -652,7 +652,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			return alpha;
 		}
 		
-		int eval = eval(evaluator, ply, alpha, beta);
+		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		if (eval >= beta) {
 			return eval;
 		}
@@ -713,7 +713,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					cb.changeSideToMove();
 				}
 				
-				final int score = -qsearch(evaluator, info, cb, moveGen, -beta, -alpha, ply + 1);
+				final int score = -qsearch(evaluator, info, cb, moveGen, -beta, -alpha, ply + 1, isPv);
 	
 				cb.undoMove(move);
 	
@@ -742,7 +742,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		return alpha;
 	}
-
+	
 	
 	private int extensions(final ChessBoard cb, final MoveGenerator moveGen, final int ply) {
 		if (EngineConstants.ENABLE_CHECK_EXTENSION && cb.checkingPieces != 0) {
@@ -752,7 +752,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	private int eval(IEvaluator evaluator, final int ply, int alpha, int beta) {
+	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv) {
 		long value = EvalUtil.getValue(env.getBitboard().getHashKey());
 		if (value != 0) {
 			return EvalUtil.getScore(value);
