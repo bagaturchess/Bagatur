@@ -8,6 +8,7 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.state.PiecesList;
+import bagaturchess.search.api.FullEvalFlag;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearch;
@@ -101,7 +102,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	public double fullEval(int depth, int alpha, int beta, int rootColour) {
 		
-		
 		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
 			
 			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
@@ -171,7 +171,13 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	
 	public int lazyEval(int depth, int alpha, int beta, int rootColour) {
+		return lazyEval(depth, alpha, beta, rootColour, null);
+	}
+	
+	
+	public int lazyEval(int depth, int alpha, int beta, int rootColour, FullEvalFlag flag) {
 		
+		if (flag != null) flag.value = false;
 		
 		long hashkey = bitboard.getHashKey();
 		
@@ -185,6 +191,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 					case CACHE_LEVEL_5:
 						int eval = (int) cached.getEval();
 						evalCache.unlock();
+						if (flag != null) flag.value = true;
 						return (int) returnVal(eval);
 					case CACHE_LEVEL_4:
 						int lower = cached.getEval();
@@ -371,6 +378,8 @@ public abstract class BaseEvaluator implements IEvaluator {
 			evalCache.put(hashkey, CACHE_LEVEL_MAX, (int) eval);
 			evalCache.unlock();
 		}
+		
+		if (flag != null) flag.value = true;
 		
 		return (int) returnVal(eval);
 	}

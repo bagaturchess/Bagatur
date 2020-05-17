@@ -24,6 +24,7 @@ import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEval;
+import bagaturchess.search.api.FullEvalFlag;
 import bagaturchess.search.api.IEvaluator;
 
 
@@ -1790,6 +1791,12 @@ public class BagaturEval_SignalFiller implements BagaturEval_FeaturesConstants, 
 	}
 
 
+	@Override
+	public int lazyEval(int depth, int alpha, int beta, int rootColour, FullEvalFlag flag) {
+		throw new UnsupportedOperationException();
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.search.api.IEvaluator#lazyEval(int, int, int, int)
 	 */

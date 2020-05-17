@@ -16,6 +16,7 @@ import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.learning.impl.signals.Signals;
+import bagaturchess.search.api.FullEvalFlag;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
@@ -124,6 +125,12 @@ public class FeaturesEvaluator implements IEvaluator {
 		} else {
 			return - (int) eval;
 		}
+	}
+	
+	
+	@Override
+	public int lazyEval(int depth, int alpha, int beta, int rootColour, FullEvalFlag flag) {
+		throw new UnsupportedOperationException();
 	}
 	
 	

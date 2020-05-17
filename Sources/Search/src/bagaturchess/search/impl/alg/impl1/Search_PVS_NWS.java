@@ -39,6 +39,7 @@ import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
+import bagaturchess.search.api.FullEvalFlag;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
@@ -81,6 +82,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
+	
+	private FullEvalFlag fullEvalFlag = new FullEvalFlag();
 	
 	
 	public Search_PVS_NWS(Object[] args) {
@@ -757,8 +760,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (value != 0) {
 			return EvalUtil.getScore(value);
 		}
-		int eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
-		EvalUtil.addValue(env.getBitboard().getHashKey(), eval);
+		int eval;
+		//if (isPv) {
+		//	eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
+		//} else {
+			eval = (int) evaluator.lazyEval(ply, alpha, beta, 0, fullEvalFlag);
+		//}
+		if (/*isPv ||*/ fullEvalFlag.value) {
+			EvalUtil.addValue(env.getBitboard().getHashKey(), eval);
+		}
 		return eval;
 	}
 	
