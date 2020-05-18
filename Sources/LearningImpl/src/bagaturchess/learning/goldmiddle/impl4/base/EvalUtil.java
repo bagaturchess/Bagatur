@@ -50,9 +50,9 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		calculatePawnScores(evalInfo, evalComponentsProcessor);
 		
 		evalInfo.clearAttacks();
-		evalInfo.updatePawnAttacks(cb);
+		evalInfo.updatePawnAttacks();
 		
-		calculateMobilityScoresAndSetAttacks(cb, evalInfo, evalComponentsProcessor);
+		calculateMobilityScoresAndSetAttacks(evalInfo, evalComponentsProcessor);
 		
 		return (int) (((evalInfo.eval_o_part2 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part2 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(evalInfo));
 	}
@@ -928,7 +928,7 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 		}
 	}
 
-	private static void calculateMobilityScoresAndSetAttacks(final ChessBoard cb, final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
+	private static void calculateMobilityScoresAndSetAttacks(final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
 		
 		long moves;
 		for (int color = WHITE; color <= BLACK; color++) {
@@ -937,7 +937,7 @@ public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 			final long safeMoves = ~evalInfo.getFriendlyPieces(color) & ~evalInfo.attacks[1 - color][PAWN];
 
 			// knights
-			long piece = evalInfo.getPieces(color, NIGHT) & ~cb.pinnedPieces;
+			long piece = evalInfo.getPieces(color, NIGHT) & ~evalInfo.pinnedPieces;
 			while (piece != 0) {
 				moves = StaticMoves.KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 				evalInfo.updateAttacks(moves, NIGHT, color, kingArea);

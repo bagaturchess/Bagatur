@@ -151,21 +151,21 @@ public class EvalInfo {
 	}
 	
 	
-	public void updatePawnAttacks(final ChessBoard cb) {
-		updatePawnAttacks(cb, Bitboard.getWhitePawnAttacks(cb.pieces[WHITE][PAWN] & ~cb.pinnedPieces), WHITE);
-		updatePawnAttacks(cb, Bitboard.getBlackPawnAttacks(cb.pieces[BLACK][PAWN] & ~cb.pinnedPieces), BLACK);
+	public void updatePawnAttacks() {
+		updatePawnAttacks(Bitboard.getWhitePawnAttacks(getPieces(WHITE, PAWN) & ~pinnedPieces), WHITE);
+		updatePawnAttacks(Bitboard.getBlackPawnAttacks(getPieces(BLACK, PAWN) & ~pinnedPieces), BLACK);
 	}
 	
 	
-	private void updatePawnAttacks(final ChessBoard cb, final long pawnAttacks, final int color) {
+	private void updatePawnAttacks(final long pawnAttacks, final int color) {
 		attacks[color][PAWN] = pawnAttacks;
-		if ((pawnAttacks & ChessConstants.KING_AREA[1 - color][cb.kingIndex[1 - color]]) != 0) {
+		if ((pawnAttacks & ChessConstants.KING_AREA[1 - color][kingIndex[1 - color]]) != 0) {
 			kingAttackersFlag[color] = FLAG_PAWN;
 		}
-		long pinned = cb.pieces[color][PAWN] & cb.pinnedPieces;
+		long pinned = getPieces(color, PAWN) & pinnedPieces;
 		while (pinned != 0) {
 			attacks[color][PAWN] |= StaticMoves.PAWN_ATTACKS[color][Long.numberOfTrailingZeros(pinned)]
-					& ChessConstants.PINNED_MOVEMENT[Long.numberOfTrailingZeros(pinned)][cb.kingIndex[color]];
+					& ChessConstants.PINNED_MOVEMENT[Long.numberOfTrailingZeros(pinned)][kingIndex[color]];
 			pinned &= pinned - 1;
 		}
 		attacksAll[color] = attacks[color][PAWN];
