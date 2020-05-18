@@ -36,7 +36,7 @@ public interface IMoveOps {
 	public int getFromField_File(int move);
 	public int getFromField_Rank(int move);
 	public int getFigureType(int move);
-	public int getCapturedFigureType(int cur_move);
+	public int getCapturedFigureType(int move);
 	public int getPromotionFigureType(int move);
 	public String moveToString(int move);
 	public int stringToMove(String move);
