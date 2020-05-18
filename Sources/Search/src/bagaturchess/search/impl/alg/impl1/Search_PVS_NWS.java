@@ -84,6 +84,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long lastSentMinorInfo_nodesCount;
 	
 	private FullEvalFlag fullEvalFlag = new FullEvalFlag();
+	private long fullEvalFlag_counter_false = 0;
+	private long fullEvalFlag_counter_true = 0;
 	
 	
 	public Search_PVS_NWS(Object[] args) {
@@ -760,15 +762,23 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (value != 0) {
 			return EvalUtil.getScore(value);
 		}
-		int eval;
-		//if (isPv) {
-		//	eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
-		//} else {
-			eval = (int) evaluator.lazyEval(ply, alpha, beta, 0, fullEvalFlag);
-		//}
-		if (/*isPv ||*/ fullEvalFlag.value) {
-			EvalUtil.addValue(env.getBitboard().getHashKey(), eval);
+		
+		/*int eval = (int) evaluator.lazyEval(ply, alpha, beta, 0, fullEvalFlag);
+		if (fullEvalFlag.value) {
+			fullEvalFlag_counter_true++;
+		} else {
+			fullEvalFlag_counter_false++;
 		}
+		if (fullEvalFlag_counter_true % 100000 == 0) {
+			//System.out.println("fullEvalFlag_true=" + fullEvalFlag_counter_true / (double)(fullEvalFlag_counter_true + fullEvalFlag_counter_false));
+		}
+		if (fullEvalFlag.value) {
+			EvalUtil.addValue(env.getBitboard().getHashKey(), eval);
+		}*/
+		
+		int eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
+		EvalUtil.addValue(env.getBitboard().getHashKey(), eval);
+		
 		return eval;
 	}
 	
