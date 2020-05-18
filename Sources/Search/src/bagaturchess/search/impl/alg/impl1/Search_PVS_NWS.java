@@ -723,13 +723,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				cb.undoMove(move);
 	
 				if (score > alpha) {
-					int flag = TTUtil.FLAG_EXACT;
-					if (score >= beta) {
-						flag = TTUtil.FLAG_LOWER;
-					} else if (score <= alphaOrig) {
-						flag = TTUtil.FLAG_UPPER;
-					}
 					if (!SearchUtils.isMateVal(score)) {
+						int flag = TTUtil.FLAG_EXACT;
+						if (score >= beta) {
+							flag = TTUtil.FLAG_LOWER;
+						} else if (score <= alphaOrig) {
+							flag = TTUtil.FLAG_UPPER;
+						}
 						TTUtil.addValue(cb.zobristKey, score, ply, 0, flag, move);
 					}
 				}
