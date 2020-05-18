@@ -90,9 +90,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	public Search_PVS_NWS(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
-		
-		TTUtil.setSizeMB(256);
-		EvalUtil.setSizeMB(64);
 	}
 	
 	
@@ -100,7 +97,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		super(_env);
 		
 		TTUtil.setSizeMB(256);
-		EvalUtil.setSizeMB(64);
+		EvalUtil.setSizeMB(256);
 	}
 	
 	

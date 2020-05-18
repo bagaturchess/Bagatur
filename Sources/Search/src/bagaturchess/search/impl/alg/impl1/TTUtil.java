@@ -39,6 +39,9 @@ public class TTUtil {
 			keyShifts = 64 - EngineConstants.POWER_2_TT_ENTRIES;
 			maxEntries = (int) Util.POWER_LOOKUP[EngineConstants.POWER_2_TT_ENTRIES] + 3;
 
+			keys = null;
+			values = null;
+			
 			keys = new long[maxEntries];
 			values = new long[maxEntries];
 			usageCounter = 0;

@@ -30,6 +30,9 @@ public class EvalUtil {
 			keyShifts = 64 - POWER_2_TT_ENTRIES;
 			maxEntries = (int) Util.POWER_LOOKUP[POWER_2_TT_ENTRIES] + 3;
 
+			keys = null;
+			values = null;
+			
 			keys = new long[maxEntries];
 			values = new long[maxEntries];
 			usageCounter = 0;
@@ -142,10 +145,10 @@ public class EvalUtil {
 		case 8192:
 		case 16384:
 			int power2Entries = (int) (Math.log(value) / Math.log(2) + 16);
-			if (POWER_2_TT_ENTRIES != power2Entries) {
+			//if (POWER_2_TT_ENTRIES != power2Entries) {
 				POWER_2_TT_ENTRIES = power2Entries;
 				init(true);
-			}
+			//}
 			break;
 		default:
 			throw new RuntimeException("Hash-size must be between 1-16384 mb and a multiple of 2");
