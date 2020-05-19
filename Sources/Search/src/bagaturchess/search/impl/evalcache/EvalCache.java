@@ -24,6 +24,7 @@ package bagaturchess.search.impl.evalcache;
 
 
 import bagaturchess.bitboard.api.IBinarySemaphore;
+import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
 import bagaturchess.bitboard.impl.datastructs.lrmmap.LRUMapLongObject;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.impl.utils.SearchUtils;
@@ -60,6 +61,23 @@ public class EvalCache extends LRUMapLongObject<IEvalEntry> implements IEvalCach
 		} else {
 			entry = (EvalEntry) associateEntry(hashkey);
 			entry.init(_level, (int)_eval);
+		}
+	}
+	
+	
+	private static class EvalEntryFactory implements DataObjectFactory<IEvalEntry> {
+		
+		
+		private int max_level;
+		
+		
+		public EvalEntryFactory(int _max_level) {
+			max_level = _max_level;
+		}
+		
+		
+		public IEvalEntry createObject() {
+			return new EvalEntry(max_level);
 		}
 	}
 }
