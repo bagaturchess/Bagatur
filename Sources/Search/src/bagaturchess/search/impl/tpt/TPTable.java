@@ -25,6 +25,7 @@ package bagaturchess.search.impl.tpt;
 
 import bagaturchess.bitboard.api.IBinarySemaphore;
 import bagaturchess.bitboard.impl.datastructs.IValuesVisitor_HashMapLongObject;
+import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
 import bagaturchess.bitboard.impl.datastructs.lrmmap.LRUMapLongObject;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.impl.utils.SearchUtils;
@@ -89,5 +90,12 @@ public class TPTable extends LRUMapLongObject<TPTEntry> {
 		}
 		
 		return entry;
+	}
+	
+	
+	private static class TPTEntryFactory implements DataObjectFactory<TPTEntry> {
+		public TPTEntry createObject() {
+			return new TPTEntry();
+		}
 	}
 }
