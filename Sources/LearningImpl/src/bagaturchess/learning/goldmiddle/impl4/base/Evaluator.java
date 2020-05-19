@@ -24,7 +24,7 @@ import bagaturchess.bitboard.impl1.internal.Util;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConstants;
 
 
-public class EvalUtil implements Bagatur_V20_FeaturesConstants, FeatureWeights {
+public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 	
 	
 	public static final int MG = 0;

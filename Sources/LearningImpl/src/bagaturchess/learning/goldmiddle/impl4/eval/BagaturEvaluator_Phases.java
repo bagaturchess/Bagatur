@@ -5,7 +5,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.learning.goldmiddle.impl4.base.EvalInfo;
-import bagaturchess.learning.goldmiddle.impl4.base.EvalUtil;
+import bagaturchess.learning.goldmiddle.impl4.base.Evaluator;
 import bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcessor;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
@@ -38,35 +38,35 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		evalInfo.clearEvals();
 		evalInfo.fillBoardInfo(board);
 		
-		return EvalUtil.eval1(board, evalInfo, evalComponentsProcessor);
+		return Evaluator.eval1(board, evalInfo, evalComponentsProcessor);
 	}
 	
 	
 	@Override
 	protected double phase2() {
 		
-		return EvalUtil.eval2(board, evalInfo, evalComponentsProcessor);
+		return Evaluator.eval2(board, evalInfo, evalComponentsProcessor);
 	}
 	
 	
 	@Override
 	protected double phase3() {
 		
-		return EvalUtil.eval3(board, evalInfo, evalComponentsProcessor);
+		return Evaluator.eval3(board, evalInfo, evalComponentsProcessor);
 	}
 	
 	
 	@Override
 	protected double phase4() {
 		
-		return EvalUtil.eval4(board, evalInfo, evalComponentsProcessor);
+		return Evaluator.eval4(board, evalInfo, evalComponentsProcessor);
 	}
 	
 	
 	@Override
 	protected double phase5() {
 		
-		return EvalUtil.eval5(board, evalInfo, evalComponentsProcessor);
+		return Evaluator.eval5(board, evalInfo, evalComponentsProcessor);
 	}
 	
 	

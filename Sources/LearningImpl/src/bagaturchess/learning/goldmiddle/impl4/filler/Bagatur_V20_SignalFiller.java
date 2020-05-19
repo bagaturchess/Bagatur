@@ -27,7 +27,7 @@ import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.impl4.base.EvalInfo;
-import bagaturchess.learning.goldmiddle.impl4.base.EvalUtil;
+import bagaturchess.learning.goldmiddle.impl4.base.Evaluator;
 import bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcessor;
 
 
@@ -54,11 +54,11 @@ public class Bagatur_V20_SignalFiller implements ISignalFiller {
 		
 		IEvalComponentsProcessor evalComponentsProcessor = new EvalComponentsProcessor(signals);
 		
-		EvalUtil.eval1(board, evalInfo, evalComponentsProcessor);
-		EvalUtil.eval2(board, evalInfo, evalComponentsProcessor);
-		EvalUtil.eval3(board, evalInfo, evalComponentsProcessor);
-		EvalUtil.eval4(board, evalInfo, evalComponentsProcessor);
-		EvalUtil.eval5(board, evalInfo, evalComponentsProcessor);
+		Evaluator.eval1(board, evalInfo, evalComponentsProcessor);
+		Evaluator.eval2(board, evalInfo, evalComponentsProcessor);
+		Evaluator.eval3(board, evalInfo, evalComponentsProcessor);
+		Evaluator.eval4(board, evalInfo, evalComponentsProcessor);
+		Evaluator.eval5(board, evalInfo, evalComponentsProcessor);
 	}
 	
 	
