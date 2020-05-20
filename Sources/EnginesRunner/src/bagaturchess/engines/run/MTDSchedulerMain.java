@@ -166,8 +166,7 @@ public class MTDSchedulerMain {
 		
 		//IBitBoard bitboard  = new Board("1r6/4k3/1pbpPb1p/p1p2P2/2Pp3p/3P3P/2P2RP1/R6K b - - 3 39", null/*sharedData.getAndRemovePawnsCache()*/, cfg.getBoardConfig());
 		
-		
-		IBitBoard bitboard = new Board(Constants.INITIAL_BOARD, null, cfg.getBoardConfig());
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 		//IBitBoard bitboard = new Board("4r3/4rk2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB draw
 		//IBitBoard bitboard = new Board("4r3/5k2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB white win
 		//IBitBoard bitboard = new Board("4k3/3r1p2/8/8/8/8/8/4KQ2 w - - 0 1", null, cfg.getBoardConfig());//EGTB white win
@@ -179,7 +178,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("3k4/4r3/3K4/1Q6/8/8/8/8 b - - 15 8", cfg.getBoardConfig());//Bug: doesn't see mate in 4
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("3k4/4r3/2K5/6Q1/8/8/8/8 b - - 15 8", cfg.getBoardConfig());//Bug: doesn't see mate in 2
 		
-		//BoardUtils.playGameUCI(bitboard, "e2e4 d7d5 e4d5 d8d5 b1c3 d5e6 f1e2 e6g6 g1f3 g6g2 h1g1 g2h3 d2d4 h7h5 e2c4 e7e6 g1g5 e6e5 g5g3 h3f5 f3e5 f8b4 e5f7 h8h7 f7g5 h7h8 d1e2 g8e7 c4f7 e8d8 f7h5 g7g6 g3f3 f5a5 e2e4 b8c6 g5f7 d8e8 h5g6 h8g8 f7e5 g8g6 e5g6 c8f5 f3f5 a5f5 e4f5 e7f5 c1e3 c6d4 e1c1 f5e3 f2e3 d4f3 c3d5 e8f7 g6f4 b4d6 d5c7 a8c8 d1d6");
+		BoardUtils.playGameUCI(bitboard, "e2e4 e7e5 g1f3 b8c6 f1b5 c6d4 f3d4 e5d4 e1g1 c7c6 b5c4 g8f6 f1e1 f8c5 e4e5 f6d5 d2d3 e8g8 c4d5 c6d5 c1f4 d8b6 b1d2 b6b2 d2b3 b7b6 a2a4 f8e8 f4c1 b2c3 a4a5 c8a6 c1d2 c3b2 h2h3 h7h6 f2f4 d7d6 a5b6 a7b6 b3c5 d6c5 a1b1 b2a2 f4f5 c5c4 e5e6 f7e6 b1a1 a2b2 f5f6 e8f8 e1e6 c4d3 f6g7 f8c8 e6h6 d3c2 d1h5 b2a1 g1h2 c2c1q h5d5 g8g7 d5e5 g7g8 h6h8 g8f7 h8h7");
 		
 		//IBitBoard bitboard  = new Board("8/1PQ5/6pk/7p/5p2/7q/4B3/5K2 w - - 11 50 ", null, cfg.getBoardConfig());//Queens endgame with qsearch goes in max depth
 		
