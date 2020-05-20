@@ -164,7 +164,7 @@ public class BoardUtils {
 			String moveSign = moves.get(i);
 			if (!moveSign.equals("...")) {
 				//System.out.println(moveSign);
-				int move = BoardUtils.parseSingleUCIMove(board, moveSign);
+				int move = board.getMoveOps().stringToMove(moveSign);
 				//colour = Figures.OPPONENT_COLOUR[colour];
 				
 				board.makeMoveForward(move);
