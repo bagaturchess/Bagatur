@@ -23,13 +23,9 @@ package bagaturchess.search.impl.evalcache;
 public class EvalEntry implements IEvalEntry {
 
 		
-	private boolean empty;
-	private byte level;
-	private int eval;
-	
-	
-	public EvalEntry() {
-	}
+	protected boolean empty;
+	protected byte level;
+	protected int eval;
 	
 	
 	@Override

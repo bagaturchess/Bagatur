@@ -63,11 +63,11 @@ public class EvalCache_Impl1 extends LRUMapLongObject<IEvalEntry> implements IEv
 			}
 		}
 		
-		EvalEntry entry = (EvalEntry) super.getAndUpdateLRU(hashkey);
+		EvalEntryImpl entry = (EvalEntryImpl) super.getAndUpdateLRU(hashkey);
 		if (entry != null) {
 			entry.update(_level, (int)_eval);
 		} else {
-			entry = (EvalEntry) associateEntry(hashkey);
+			entry = (EvalEntryImpl) associateEntry(hashkey);
 			entry.init(_level, (int)_eval);
 		}
 	}
@@ -81,39 +81,12 @@ public class EvalCache_Impl1 extends LRUMapLongObject<IEvalEntry> implements IEv
 		
 		
 		public IEvalEntry createObject() {
-			return new EvalEntry();
+			return new EvalEntryImpl();
 		}
 	}
 	
 	
-	private static class EvalEntry implements IEvalEntry {
-		
-		
-		boolean empty;
-		byte level;
-		int eval;
-		
-		
-		public EvalEntry() {
-		}
-		
-		
-		@Override
-		public boolean isEmpty() {
-			return empty;
-		}
-		
-
-		@Override
-		public byte getLevel() {
-			return level;
-		}
-
-
-		@Override
-		public int getEval() {
-			return eval;
-		}
+	private static class EvalEntryImpl extends EvalEntry {
 		
 		
 		private void init(int _level, int _eval) {
@@ -138,24 +111,6 @@ public class EvalCache_Impl1 extends LRUMapLongObject<IEvalEntry> implements IEv
 				//TODO
 				//throw new IllegalStateException();
 			}
-		}
-		
-		
-		@Override
-		public void setEval(int _eval) {
-			eval = _eval;
-		}
-		
-		
-		@Override
-		public void setLevel(byte _level) {
-			level = _level;
-		}
-		
-		
-		@Override
-		public void setIsEmpty(boolean _empty) {
-			empty = _empty;
 		}
 		
 		
