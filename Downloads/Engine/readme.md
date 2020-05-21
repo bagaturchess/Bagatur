@@ -15,6 +15,11 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 
 # Revision History
+Version 2.1a (21 May 2020)
+  * Improvements in single core version with small ELO increase
+  * Evaluation cache increased to 256M for better performance
+  * Additional fixes in SMP version: parallel start and stop of the slave threads
+
 Version 2.1 (1 May 2020)
   * No changes in the single core version
   * Fixed SMP version, which now works better than the single core version :-)
