@@ -30,10 +30,10 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
-public class EvalCache extends LRUMapLongObject<IEvalEntry> implements IEvalCache {
+public class EvalCache_Impl1 extends LRUMapLongObject<IEvalEntry> implements IEvalCache {
 	
 	
-	public EvalCache(int max_level, int _maxSize, boolean fillWithDummyEntries, IBinarySemaphore _semaphore) {
+	public EvalCache_Impl1(int max_level, int _maxSize, boolean fillWithDummyEntries, IBinarySemaphore _semaphore) {
 		super(new EvalEntryFactory(), _maxSize, fillWithDummyEntries, _semaphore);
 	}
 	

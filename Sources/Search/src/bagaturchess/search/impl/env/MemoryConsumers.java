@@ -20,7 +20,7 @@ import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.opening.api.OpeningBookFactory;
 import bagaturchess.search.api.IRootSearchConfig;
-import bagaturchess.search.impl.evalcache.EvalCache;
+import bagaturchess.search.impl.evalcache.EvalCache_Impl1;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.uci.api.ChannelManager;
@@ -259,8 +259,8 @@ public class MemoryConsumers {
 			
 			tpt_qs.add(new TPTable(size_tpt_qs, false, new BinarySemaphore_Dummy()));
 			
-			//evalCache.add(new EvalCache(size_ec, false, new BinarySemaphore_Dummy()));
-			evalCache.add(new EvalCache(5, size_ec, false, new BinarySemaphore_Dummy()));
+			//evalCache.add(new EvalCache_Impl1(size_ec, false, new BinarySemaphore_Dummy()));
+			evalCache.add(new EvalCache_Impl1(5, size_ec, false, new BinarySemaphore_Dummy()));
 			
 			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName());
 			pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
@@ -334,8 +334,8 @@ public class MemoryConsumers {
 		System.gc();
 		
 		int memory_before = getUsedMemory();
-		//LRUMapLongObject test_ec = new EvalCache(test_size, true, null);
-		LRUMapLongObject test_ec = new EvalCache(5, test_size, true, null);
+		//LRUMapLongObject test_ec = new EvalCache_Impl1(test_size, true, null);
+		LRUMapLongObject test_ec = new EvalCache_Impl1(5, test_size, true, null);
 		int size = getEntrySize(availableMemory, engineConfiguration.getEvalCacheUsagePercent(), test_size, memory_before);
 		test_ec.clear();
 		return size;

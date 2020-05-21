@@ -30,7 +30,7 @@ import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IEvaluatorFactory;
-import bagaturchess.search.impl.evalcache.EvalCache;
+import bagaturchess.search.impl.evalcache.EvalCache_Impl1;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.rootsearch.montecarlo.GamesResult;
 import bagaturchess.search.impl.rootsearch.montecarlo.IMonteCarloListener;
@@ -52,7 +52,7 @@ public class MonteCarloMain {
 		String pawnsCacheFactoryClassName = bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.BagaturPawnsEvalFactory.class.getName();
 		final IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen, pawnsCacheFactoryClassName, boardConfig, 10000);
 		
-		IEvalCache evalCache = new EvalCache(5, 100000, true, new BinarySemaphore_Dummy());
+		IEvalCache evalCache = new EvalCache_Impl1(5, 100000, true, new BinarySemaphore_Dummy());
 		IEvaluatorFactory evalFactory = new bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.BagaturEvaluatorFactory();
 		IEvaluator evaluator = evalFactory.create(bitboard, evalCache);
 		
