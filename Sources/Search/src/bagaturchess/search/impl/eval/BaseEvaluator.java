@@ -12,7 +12,7 @@ import bagaturchess.search.api.FullEvalFlag;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearch;
-import bagaturchess.search.impl.evalcache.EvalCache_Impl1;
+import bagaturchess.search.impl.evalcache.EvalEntry;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
 
@@ -56,7 +56,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 	protected IBaseEval baseEval;
 	
 	private IEvalCache evalCache;
-	private IEvalEntry cached = new EvalCache_Impl1.EvalEntry();
+	private IEvalEntry cached = new EvalEntry();
 	
 	
 	public BaseEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {

@@ -18,7 +18,7 @@ import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.FullEvalFlag;
 import bagaturchess.search.api.IEvaluator;
-import bagaturchess.search.impl.evalcache.EvalCache_Impl1;
+import bagaturchess.search.impl.evalcache.EvalEntry;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
 
@@ -41,7 +41,7 @@ public class FeaturesEvaluator implements IEvaluator {
 	private int[] eval_buff;
 	
 	private IEvalCache evalCache;
-	private IEvalEntry cached = new EvalCache_Impl1.EvalEntry();
+	private IEvalEntry cached = new EvalEntry();
 	
 	/*public FeaturesEvaluator(IBitBoard _bitboard, EvalCache_Impl1 _evalCache) {
 		this(_bitboard, _evalCache, new SignalFiller(_bitboard), null, null);
