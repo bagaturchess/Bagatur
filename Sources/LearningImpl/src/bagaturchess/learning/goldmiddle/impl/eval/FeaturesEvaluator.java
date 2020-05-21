@@ -81,13 +81,11 @@ public class FeaturesEvaluator implements IEvaluator {
 		long hashkey = bitboard.getHashKey();
 		
 		if (useEvalCache) {
-			evalCache.lock();
 			IEvalEntry cached = evalCache.get(hashkey);
 			
 			if (cached != null) {
 				//if (!cached.isSketch()) {
 					int eval = (int) cached.getEval();
-					evalCache.unlock();
 					if (colour == Figures.COLOUR_WHITE) {
 						return eval;
 					} else {
@@ -97,7 +95,6 @@ public class FeaturesEvaluator implements IEvaluator {
 				//	throw new IllegalStateException("cached.isSketch()");
 				//}
 			}
-			evalCache.unlock();
 		}
 			
 		IFeature[] featuresByComplexity = features_byComp[IFeatureComplexity.STANDARD];
@@ -148,13 +145,11 @@ public class FeaturesEvaluator implements IEvaluator {
 		long hashkey = bitboard.getHashKey();
 		
 		if (useEvalCache) {
-			evalCache.lock();
 			IEvalEntry cached = evalCache.get(hashkey);
 			
 			if (cached != null) {
 				//if (!cached.isSketch()) {
 					int eval = (int) cached.getEval();
-					evalCache.unlock();
 					if (colour == Figures.COLOUR_WHITE) {
 						return eval;
 					} else {
@@ -164,7 +159,6 @@ public class FeaturesEvaluator implements IEvaluator {
 				//	throw new IllegalStateException("cached.isSketch()");
 				//}
 			}
-			evalCache.unlock();
 		}
 		
 		double eval = 0;
@@ -239,9 +233,7 @@ public class FeaturesEvaluator implements IEvaluator {
 		}
 
 		if (useEvalCache && fullEval) {
-			evalCache.lock();
 			evalCache.put(hashkey, 5, (int) eval);
-			evalCache.unlock();
 		}
 		
 		int intEval = (int) eval;
@@ -260,14 +252,12 @@ public class FeaturesEvaluator implements IEvaluator {
 		long hashkey = bitboard.getHashKey();
 		
 		if (useEvalCache) {
-			evalCache.lock();
 			IEvalEntry cached = evalCache.get(hashkey);
 			
 			if (cached != null) {
 				//if (!cached.isSketch()) {
 					
 					int eval = (int) cached.getEval();
-					evalCache.unlock();
 					
 					if (colour == Figures.COLOUR_WHITE) {
 						return eval;
@@ -278,7 +268,6 @@ public class FeaturesEvaluator implements IEvaluator {
 				//	throw new IllegalStateException("cached.isSketch()=" + cached.isSketch());
 				//}
 			}
-			evalCache.unlock();
 		}
 		
 		
@@ -308,9 +297,7 @@ public class FeaturesEvaluator implements IEvaluator {
 		}
 		
 		if (useEvalCache) {
-			evalCache.lock();
 			evalCache.put(hashkey, 5, (int) eval);
-			evalCache.unlock();
 		}
 		
 		//int intEval = (int) eval;

@@ -132,7 +132,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 		long hashkey = bitboard.getHashKey();
 		
 		if (USE_CACHE && evalCache != null) {
-			evalCache.lock();
 			IEvalEntry cached = evalCache.get(hashkey);
 			
 			if (cached != null) {
@@ -140,7 +139,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 				switch (level) {
 					case CACHE_LEVEL_5:
 						int eval = (int) cached.getEval();
-						evalCache.unlock();
 						return (int) returnVal(eval);
 					case CACHE_LEVEL_4:
 						break;
@@ -148,7 +146,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 						//Do Nothing
 				}
 			}
-			evalCache.unlock();
 		}
 		
 		
@@ -161,9 +158,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		eval += phase5();
 		
 		if (USE_CACHE && evalCache != null) {
-			evalCache.lock();
 			evalCache.put(hashkey, CACHE_LEVEL_MAX, (int) eval);
-			evalCache.unlock();
 		}
 		
 		return returnVal(eval);
@@ -182,7 +177,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 		long hashkey = bitboard.getHashKey();
 		
 		if (USE_CACHE && evalCache != null) {
-			evalCache.lock();
 			IEvalEntry cached = evalCache.get(hashkey);
 			
 			if (cached != null) {
@@ -190,7 +184,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 				switch (level) {
 					case CACHE_LEVEL_5:
 						int eval = (int) cached.getEval();
-						evalCache.unlock();
 						if (flag != null) flag.value = true;
 						return (int) returnVal(eval);
 					case CACHE_LEVEL_4:
@@ -199,11 +192,9 @@ public abstract class BaseEvaluator implements IEvaluator {
 						int alpha_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha;
 						int beta_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta;
 						if (upper + INT4 <= alpha_test) {
-							evalCache.unlock();
 							return (int) returnVal(upper);
 						}
 						if (lower - INT4 >= beta_test) {
-							evalCache.unlock();
 							return (int) returnVal(lower);
 						}
 						break;
@@ -213,11 +204,9 @@ public abstract class BaseEvaluator implements IEvaluator {
 						alpha_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha;
 						beta_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta;
 						if (upper + INT3 <= alpha_test) {
-							evalCache.unlock();
 							return (int) returnVal(upper);
 						}
 						if (lower - INT3 >= beta_test) {
-							evalCache.unlock();
 							return (int) returnVal(lower);
 						}
 						break;
@@ -227,11 +216,9 @@ public abstract class BaseEvaluator implements IEvaluator {
 						alpha_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha;
 						beta_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta;
 						if (upper + INT2 <= alpha_test) {
-							evalCache.unlock();
 							return (int) returnVal(upper);
 						}
 						if (lower - INT2 >= beta_test) {
-							evalCache.unlock();
 							return (int) returnVal(lower);
 						}
 						break;
@@ -241,11 +228,9 @@ public abstract class BaseEvaluator implements IEvaluator {
 						alpha_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha;
 						beta_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta;
 						if (upper + INT1 <= alpha_test) {
-							evalCache.unlock();
 							return (int) returnVal(upper);
 						}
 						if (lower - INT1 >= beta_test) {
-							evalCache.unlock();
 							return (int) returnVal(lower);
 						}
 						break;
@@ -254,8 +239,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 						throw new IllegalStateException();
 				}
 			}
-				
-			evalCache.unlock();
 		}
 		
 		
@@ -295,9 +278,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		if (eval_test + INT1 <= alpha || eval_test - INT1 >= beta) {
 			if (USE_LAZY) {
 				if (USE_CACHE && evalCache != null) {
-					evalCache.lock();
 					evalCache.put(hashkey, CACHE_LEVEL_1, (int) eval);
-					evalCache.unlock();
 				}
 				return eval_test;
 			}
@@ -310,9 +291,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		if (eval_test + INT2 <= alpha || eval_test - INT2 >= beta) {
 			if (USE_LAZY) {
 				if (USE_CACHE && evalCache != null) {
-					evalCache.lock();
 					evalCache.put(hashkey, CACHE_LEVEL_2, (int) eval);
-					evalCache.unlock();
 				}
 				return eval_test;
 			}
@@ -324,9 +303,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		if (eval_test + INT3 <= alpha || eval_test - INT3 >= beta) {
 			if (USE_LAZY) {
 				if (USE_CACHE && evalCache != null) {
-					evalCache.lock();
 					evalCache.put(hashkey, CACHE_LEVEL_3, (int) eval);
-					evalCache.unlock();
 				}
 				return eval_test;
 			}
@@ -338,9 +315,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		if (eval_test + INT4 <= alpha || eval_test - INT4 >= beta) {
 			if (USE_LAZY) {
 				if (USE_CACHE && evalCache != null) {
-					evalCache.lock();
 					evalCache.put(hashkey, CACHE_LEVEL_4, (int) eval);
-					evalCache.unlock();
 				}
 				return eval_test;
 			}
@@ -374,9 +349,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		}
 		
 		if (USE_CACHE && evalCache != null) {
-			evalCache.lock();
 			evalCache.put(hashkey, CACHE_LEVEL_MAX, (int) eval);
-			evalCache.unlock();
 		}
 		
 		if (flag != null) flag.value = true;
@@ -390,7 +363,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 		long hashkey = bitboard.getHashKey();
 		
 		if (USE_CACHE && evalCache != null) {
-			evalCache.lock();
 			IEvalEntry cached = evalCache.get(hashkey);
 			
 			if (cached != null) {
@@ -398,13 +370,11 @@ public abstract class BaseEvaluator implements IEvaluator {
 				switch (level) {
 					case CACHE_LEVEL_5:
 						int eval = (int) cached.getEval();
-						evalCache.unlock();
 						return (int) returnVal(eval);
 					default:
 						//Do Nothing
 				}
 			}
-			evalCache.unlock();
 		}
 		
 		
