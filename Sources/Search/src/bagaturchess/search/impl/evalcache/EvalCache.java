@@ -80,4 +80,63 @@ public class EvalCache extends LRUMapLongObject<IEvalEntry> implements IEvalCach
 			return new EvalEntry(max_level);
 		}
 	}
+	
+	
+	private static class EvalEntry implements IEvalEntry {
+		
+		
+		byte level;
+		int eval;
+		
+		
+		public EvalEntry(int _max_level) {
+		}
+		
+		
+		public void init(int _level, int _eval) {
+			level = (byte) _level;
+			eval = _eval;	 
+		}
+		
+		public void update(int _level, int _eval) {
+			
+			if (_level > level) {
+				
+				init(_level, _eval);
+				
+			} else if (_level == level) {		
+				
+				if (eval != _eval) {
+					//throw new IllegalStateException("eval=" + eval + ", _eval=" + _eval);
+					eval = _eval;
+				}
+				
+			} else {
+				//TODO
+				//throw new IllegalStateException();
+			}
+		}
+		
+
+		@Override
+		public int getLevel() {
+			return level;
+		}
+
+
+		@Override
+		public int getEval() {
+			return eval;
+		}
+		
+		
+		public String toString() {
+			String result = "";
+			
+			result += " level=" + level;
+			result += ", eval=" + eval;
+			
+			return result;
+		}
+	}
 }

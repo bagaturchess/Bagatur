@@ -112,7 +112,7 @@ public class TournamentRunner {
 		
 		
 		EngineProcess engine1 = bagatur_workspace;
-		EngineProcess engine2 = stockfish10;
+		EngineProcess engine2 = cuckoo112;
 		
 		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
