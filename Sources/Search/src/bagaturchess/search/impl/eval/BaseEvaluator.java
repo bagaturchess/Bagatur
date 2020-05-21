@@ -12,6 +12,7 @@ import bagaturchess.search.api.FullEvalFlag;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearch;
+import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
 
@@ -55,7 +56,8 @@ public abstract class BaseEvaluator implements IEvaluator {
 	protected IBaseEval baseEval;
 	
 	private IEvalCache evalCache;
-		
+	private IEvalEntry cached = new EvalCache.EvalEntry();
+	
 	
 	public BaseEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
 		
@@ -132,16 +134,15 @@ public abstract class BaseEvaluator implements IEvaluator {
 		long hashkey = bitboard.getHashKey();
 		
 		if (USE_CACHE && evalCache != null) {
-			IEvalEntry cached = evalCache.get(hashkey);
 			
-			if (cached != null) {
+			evalCache.get(hashkey, cached);
+			
+			if (!cached.isEmpty()) {
 				int level = cached.getLevel();
 				switch (level) {
 					case CACHE_LEVEL_5:
 						int eval = (int) cached.getEval();
 						return (int) returnVal(eval);
-					case CACHE_LEVEL_4:
-						break;
 					default:
 						//Do Nothing
 				}
@@ -177,9 +178,10 @@ public abstract class BaseEvaluator implements IEvaluator {
 		long hashkey = bitboard.getHashKey();
 		
 		if (USE_CACHE && evalCache != null) {
-			IEvalEntry cached = evalCache.get(hashkey);
 			
-			if (cached != null) {
+			evalCache.get(hashkey, cached);
+			
+			if (!cached.isEmpty()) {
 				int level = cached.getLevel();
 				switch (level) {
 					case CACHE_LEVEL_5:
@@ -343,7 +345,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 			INT4 = int4;
 		}
 			
-			
+		
 		if (eval >= ISearch.MAX_MAT_INTERVAL || eval <= -ISearch.MAX_MAT_INTERVAL) {
 			throw new IllegalStateException();
 		}
@@ -363,9 +365,10 @@ public abstract class BaseEvaluator implements IEvaluator {
 		long hashkey = bitboard.getHashKey();
 		
 		if (USE_CACHE && evalCache != null) {
-			IEvalEntry cached = evalCache.get(hashkey);
 			
-			if (cached != null) {
+			evalCache.get(hashkey, cached);
+			
+			if (!cached.isEmpty()) {
 				int level = cached.getLevel();
 				switch (level) {
 					case CACHE_LEVEL_5:

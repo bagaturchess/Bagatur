@@ -34,12 +34,20 @@ public class EvalCache extends LRUMapLongObject<IEvalEntry> implements IEvalCach
 	
 	
 	public EvalCache(int max_level, int _maxSize, boolean fillWithDummyEntries, IBinarySemaphore _semaphore) {
-		super(new EvalEntryFactory(max_level), _maxSize, fillWithDummyEntries, _semaphore);
+		super(new EvalEntryFactory(), _maxSize, fillWithDummyEntries, _semaphore);
 	}
 	
 	
-	public IEvalEntry get(long key) {	
-		return super.getAndUpdateLRU(key);
+	public void get(long key, IEvalEntry entry) {
+		
+		EvalEntry mem = (EvalEntry) super.getAndUpdateLRU(key);
+		
+		((EvalEntry)entry).setIsEmpty(true);
+		
+		if (mem!= null) {
+			((EvalEntry)entry).setEval(mem.getEval());
+			((EvalEntry)entry).setLevel(mem.getLevel());
+		}
 	}
 	
 	
@@ -68,37 +76,52 @@ public class EvalCache extends LRUMapLongObject<IEvalEntry> implements IEvalCach
 	private static class EvalEntryFactory implements DataObjectFactory<IEvalEntry> {
 		
 		
-		private int max_level;
-		
-		
-		public EvalEntryFactory(int _max_level) {
-			max_level = _max_level;
+		public EvalEntryFactory() {
 		}
 		
 		
 		public IEvalEntry createObject() {
-			return new EvalEntry(max_level);
+			return new EvalEntry();
 		}
 	}
 	
 	
-	private static class EvalEntry implements IEvalEntry {
+	public static class EvalEntry implements IEvalEntry {
 		
 		
+		boolean empty;
 		byte level;
 		int eval;
 		
 		
-		public EvalEntry(int _max_level) {
+		public EvalEntry() {
 		}
 		
 		
-		public void init(int _level, int _eval) {
+		@Override
+		public boolean isEmpty() {
+			return empty;
+		}
+		
+
+		@Override
+		public byte getLevel() {
+			return level;
+		}
+
+
+		@Override
+		public int getEval() {
+			return eval;
+		}
+		
+		
+		private void init(int _level, int _eval) {
 			level = (byte) _level;
 			eval = _eval;	 
 		}
 		
-		public void update(int _level, int _eval) {
+		private void update(int _level, int _eval) {
 			
 			if (_level > level) {
 				
@@ -117,16 +140,19 @@ public class EvalCache extends LRUMapLongObject<IEvalEntry> implements IEvalCach
 			}
 		}
 		
-
-		@Override
-		public int getLevel() {
-			return level;
+		
+		private void setEval(int _eval) {
+			eval = _eval;
 		}
-
-
-		@Override
-		public int getEval() {
-			return eval;
+		
+		
+		private void setLevel(byte _level) {
+			level = _level;
+		}
+		
+		
+		private void setIsEmpty(boolean _empty) {
+			empty = _empty;
 		}
 		
 		

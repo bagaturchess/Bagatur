@@ -18,6 +18,7 @@ import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.FullEvalFlag;
 import bagaturchess.search.api.IEvaluator;
+import bagaturchess.search.impl.evalcache.EvalCache;
 import bagaturchess.search.impl.evalcache.IEvalCache;
 import bagaturchess.search.impl.evalcache.IEvalEntry;
 
@@ -28,7 +29,6 @@ public class FeaturesEvaluator implements IEvaluator {
 	private boolean useEvalCache = false;
 	
 	private IBitBoard bitboard;
-	private IEvalCache evalCache;
 	private Features features;
 	private IFeature[][] features_byComp;
 	private ISignals signals;
@@ -40,6 +40,8 @@ public class FeaturesEvaluator implements IEvaluator {
 	
 	private int[] eval_buff;
 	
+	private IEvalCache evalCache;
+	private IEvalEntry cached = new EvalCache.EvalEntry();
 	
 	/*public FeaturesEvaluator(IBitBoard _bitboard, EvalCache _evalCache) {
 		this(_bitboard, _evalCache, new SignalFiller(_bitboard), null, null);
@@ -81,9 +83,10 @@ public class FeaturesEvaluator implements IEvaluator {
 		long hashkey = bitboard.getHashKey();
 		
 		if (useEvalCache) {
-			IEvalEntry cached = evalCache.get(hashkey);
 			
-			if (cached != null) {
+			evalCache.get(hashkey, cached);
+			
+			if (!cached.isEmpty()) {
 				//if (!cached.isSketch()) {
 					int eval = (int) cached.getEval();
 					if (colour == Figures.COLOUR_WHITE) {
@@ -145,9 +148,10 @@ public class FeaturesEvaluator implements IEvaluator {
 		long hashkey = bitboard.getHashKey();
 		
 		if (useEvalCache) {
-			IEvalEntry cached = evalCache.get(hashkey);
 			
-			if (cached != null) {
+			evalCache.get(hashkey, cached);
+			
+			if (!cached.isEmpty()) {
 				//if (!cached.isSketch()) {
 					int eval = (int) cached.getEval();
 					if (colour == Figures.COLOUR_WHITE) {
@@ -252,9 +256,10 @@ public class FeaturesEvaluator implements IEvaluator {
 		long hashkey = bitboard.getHashKey();
 		
 		if (useEvalCache) {
-			IEvalEntry cached = evalCache.get(hashkey);
 			
-			if (cached != null) {
+			evalCache.get(hashkey, cached);
+			
+			if (!cached.isEmpty()) {
 				//if (!cached.isSketch()) {
 					
 					int eval = (int) cached.getEval();

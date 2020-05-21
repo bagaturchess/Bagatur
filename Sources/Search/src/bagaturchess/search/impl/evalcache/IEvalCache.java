@@ -1,7 +1,7 @@
 package bagaturchess.search.impl.evalcache;
 
 public interface IEvalCache {
-	public IEvalEntry get(long key);
+	public void get(long key, IEvalEntry entry);
 	public void put(long hashkey, int level, double eval);
 	public int getHitRate();
 }
