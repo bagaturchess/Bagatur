@@ -45,6 +45,7 @@ public class EvalCache_Impl1 extends LRUMapLongObject<IEvalEntry> implements IEv
 		entry.setIsEmpty(true);
 		
 		if (mem!= null) {
+			entry.setIsEmpty(false);
 			entry.setEval(mem.getEval());
 			entry.setLevel(mem.getLevel());
 		}

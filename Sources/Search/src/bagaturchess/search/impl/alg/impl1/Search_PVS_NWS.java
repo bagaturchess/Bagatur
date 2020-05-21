@@ -97,7 +97,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		super(_env);
 		
 		TTUtil.setSizeMB(256);
-		EvalUtil.setSizeMB(256);
 	}
 	
 	
@@ -756,27 +755,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv) {
-		long value = EvalUtil.getValue(env.getBitboard().getHashKey());
-		if (value != 0) {
-			return EvalUtil.getScore(value);
-		}
-		
-		/*int eval = (int) evaluator.lazyEval(ply, alpha, beta, 0, fullEvalFlag);
-		if (fullEvalFlag.value) {
-			fullEvalFlag_counter_true++;
-		} else {
-			fullEvalFlag_counter_false++;
-		}
-		if (fullEvalFlag_counter_true % 100000 == 0) {
-			//System.out.println("fullEvalFlag_true=" + fullEvalFlag_counter_true / (double)(fullEvalFlag_counter_true + fullEvalFlag_counter_false));
-		}
-		if (fullEvalFlag.value) {
-			EvalUtil.addValue(env.getBitboard().getHashKey(), eval);
-		}*/
-		
 		int eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
-		EvalUtil.addValue(env.getBitboard().getHashKey(), eval);
-		
 		return eval;
 	}
 	

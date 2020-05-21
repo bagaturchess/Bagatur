@@ -14,11 +14,11 @@ public class BagaturEvaluatorFactory implements IEvaluatorFactory {
 	}
 	
 	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache) {
-		return new BagaturEvaluator_Phases(bitboard, null, null);
+		return new BagaturEvaluator_Phases(bitboard, evalCache, null);
 	}
 	
 	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache, IEvalConfig evalConfig) {
-		return new BagaturEvaluator_Phases(bitboard, null, evalConfig);
+		return new BagaturEvaluator_Phases(bitboard, evalCache, evalConfig);
 	}
 	
 }

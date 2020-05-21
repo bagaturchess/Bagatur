@@ -43,6 +43,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.evalcache.EvalCache_Impl1;
+import bagaturchess.search.impl.evalcache.EvalCache_Impl2;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.pv.PVManager;
@@ -142,7 +143,7 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 			IEvaluator evaluator = getSharedData().getEvaluatorFactory().create(
 					getBitboardForSetup(),
 					//new EvalCache_Impl1(100, true, new BinarySemaphore_Dummy()),
-					new EvalCache_Impl1(5, 100, true, new BinarySemaphore_Dummy()),
+					new EvalCache_Impl2(2),
 					getRootSearchConfig().getEvalConfig());
 			initialValue = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, getBitboardForSetup().getColourToMove());
 		}
