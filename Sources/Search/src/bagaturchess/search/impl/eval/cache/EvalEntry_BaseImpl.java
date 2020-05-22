@@ -20,7 +20,7 @@
 package bagaturchess.search.impl.eval.cache;
 
 
-public class EvalEntry implements IEvalEntry {
+public class EvalEntry_BaseImpl implements IEvalEntry {
 
 		
 	protected boolean empty;

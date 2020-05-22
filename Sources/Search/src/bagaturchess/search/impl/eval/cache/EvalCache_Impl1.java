@@ -40,7 +40,7 @@ public class EvalCache_Impl1 extends LRUMapLongObject<IEvalEntry> implements IEv
 	
 	public void get(long key, IEvalEntry entry) {
 		
-		EvalEntry mem = (EvalEntry) super.getAndUpdateLRU(key);
+		EvalEntry_BaseImpl mem = (EvalEntry_BaseImpl) super.getAndUpdateLRU(key);
 		
 		entry.setIsEmpty(true);
 		
@@ -87,7 +87,7 @@ public class EvalCache_Impl1 extends LRUMapLongObject<IEvalEntry> implements IEv
 	}
 	
 	
-	private static class EvalEntryImpl extends EvalEntry {
+	private static class EvalEntryImpl extends EvalEntry_BaseImpl {
 		
 		
 		private void init(int _level, int _eval) {
