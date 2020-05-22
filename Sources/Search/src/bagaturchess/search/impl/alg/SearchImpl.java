@@ -255,25 +255,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	}
 	
 	
-	protected boolean hasExpectedEval() {
-		env.getTPT().lock();
-		TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
-		env.getTPT().unlock();
-		return tptEntry != null;
-	}
-	
-	protected int getExpectedEval() {
-		env.getTPT().lock();
-		TPTEntry tptEntry = env.getTPT().get(env.getBitboard().getHashKey());
-		if (tptEntry != null) {
-			env.getTPT().unlock();
-			return tptEntry.getLowerBound();
-		}
-		env.getTPT().unlock();
-		return 0;
-	}
-	
-	
 	protected boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int[] depthtracking, int rootColour, TPTable tpt) {
 		//env.getTPT().lock();
 		boolean res = extractFromTPT(info, depth, result, useLower, MIN, MAX, depthtracking, rootColour, tpt);

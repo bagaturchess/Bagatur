@@ -23,9 +23,7 @@
 package bagaturchess.search.impl.tpt;
 
 
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.internal.ISearch;
-
 
 
 public class TPTEntry {
