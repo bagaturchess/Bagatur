@@ -24,7 +24,7 @@ package bagaturchess.search.api;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 
 public interface IEvaluatorFactory {

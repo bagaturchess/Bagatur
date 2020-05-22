@@ -18,9 +18,9 @@ import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.FullEvalFlag;
 import bagaturchess.search.api.IEvaluator;
-import bagaturchess.search.impl.evalcache.EvalEntry;
-import bagaturchess.search.impl.evalcache.IEvalCache;
-import bagaturchess.search.impl.evalcache.IEvalEntry;
+import bagaturchess.search.impl.eval.cache.EvalEntry;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalEntry;
 
 
 public class FeaturesEvaluator implements IEvaluator {

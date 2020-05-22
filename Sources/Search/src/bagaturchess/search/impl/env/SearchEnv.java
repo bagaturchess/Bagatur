@@ -34,7 +34,7 @@ import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.ISearchMoveListFactory;
-import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.history.HistoryTable_PieceTo;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.movelists.OrderingStatistics;

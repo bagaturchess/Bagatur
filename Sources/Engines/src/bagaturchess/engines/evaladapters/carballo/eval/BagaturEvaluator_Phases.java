@@ -7,7 +7,7 @@ import bagaturchess.engines.evaladapters.carballo.CompleteEvaluator;
 import bagaturchess.engines.evaladapters.carballo.IBoard;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
-import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 
 public class BagaturEvaluator_Phases extends BaseEvaluator {

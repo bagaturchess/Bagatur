@@ -1,4 +1,4 @@
-package bagaturchess.search.impl.evalcache;
+package bagaturchess.search.impl.eval.cache;
 
 public interface IEvalCache {
 	public void get(long key, IEvalEntry entry);

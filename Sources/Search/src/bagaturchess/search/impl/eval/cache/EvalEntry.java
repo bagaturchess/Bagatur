@@ -1,10 +1,7 @@
-/*
+/**
  *  BagaturChess (UCI chess engine and tools)
  *  Copyright (C) 2005 Krasimir I. Topchiyski (k_topchiyski@yahoo.com)
  *  
- *  Open Source project location: http://sourceforge.net/projects/bagaturchess/develop
- *  SVN repository https://bagaturchess.svn.sourceforge.net/svnroot/bagaturchess
- *
  *  This file is part of BagaturChess program.
  * 
  *  BagaturChess is open software: you can redistribute it and/or modify
@@ -17,15 +14,52 @@
  *  Eclipse Public License for more details.
  *
  *  You should have received a copy of the Eclipse Public License version 1.0
- *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
+ *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.search.api;
+package bagaturchess.search.impl.eval.cache;
 
 
-public interface IEvaluator_Progressive extends IEvaluator {
-	public void newIteration();
-	public void enterLevel(double level);
-    public void exitLevel(double level);
-    public double getLevel();
+public class EvalEntry implements IEvalEntry {
+
+		
+	protected boolean empty;
+	protected byte level;
+	protected int eval;
+	
+	
+	@Override
+	public boolean isEmpty() {
+		return empty;
+	}
+	
+
+	@Override
+	public byte getLevel() {
+		return level;
+	}
+
+
+	@Override
+	public int getEval() {
+		return eval;
+	}
+
+
+	@Override
+	public void setEval(int _eval) {
+		eval = _eval;
+	}
+	
+	
+	@Override
+	public void setLevel(byte _level) {
+		level = _level;
+	}
+	
+	
+	@Override
+	public void setIsEmpty(boolean _empty) {
+		empty = _empty;
+	}
 }

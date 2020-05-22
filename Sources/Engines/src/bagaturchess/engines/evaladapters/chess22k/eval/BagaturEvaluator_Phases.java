@@ -6,7 +6,7 @@ import bagaturchess.engines.evaladapters.chess22k.Evaluator;
 import bagaturchess.engines.evaladapters.chess22k.IChessBoard;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
-import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 
 public class BagaturEvaluator_Phases extends BaseEvaluator {

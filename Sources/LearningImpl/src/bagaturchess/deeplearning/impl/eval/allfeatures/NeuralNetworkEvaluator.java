@@ -10,7 +10,7 @@ import bagaturchess.deeplearning.impl.NeuralNetworkUtils_AllFeatures;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
-import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 
 public class NeuralNetworkEvaluator extends BaseEvaluator {

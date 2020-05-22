@@ -7,7 +7,7 @@ import bagaturchess.learning.goldmiddle.impl1.base.Evaluator;
 import bagaturchess.learning.goldmiddle.impl1.base.IChessBoard;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
-import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 
 public class BagaturEvaluator_Phases extends BaseEvaluator {

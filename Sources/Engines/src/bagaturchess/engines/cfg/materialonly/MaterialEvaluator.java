@@ -4,7 +4,7 @@ package bagaturchess.engines.cfg.materialonly;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
-import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 
 public class MaterialEvaluator extends BaseEvaluator {

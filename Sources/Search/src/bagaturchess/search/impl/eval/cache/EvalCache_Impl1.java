@@ -20,7 +20,7 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.search.impl.evalcache;
+package bagaturchess.search.impl.eval.cache;
 
 
 import bagaturchess.bitboard.api.IBinarySemaphore;

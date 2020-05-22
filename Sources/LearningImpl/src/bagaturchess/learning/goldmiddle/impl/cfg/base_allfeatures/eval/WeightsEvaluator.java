@@ -18,7 +18,7 @@ import bagaturchess.bitboard.impl.plies.WhitePawnPlies;
 import bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.filler.ALL_SignalFillerConstants;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
-import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 
 public class WeightsEvaluator extends BaseEvaluator implements Weights {

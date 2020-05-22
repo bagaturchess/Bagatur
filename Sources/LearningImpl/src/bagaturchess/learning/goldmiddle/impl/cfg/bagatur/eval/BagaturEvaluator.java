@@ -23,7 +23,7 @@ import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.filler.BagaturEval_SignalFillerConstants;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
-import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 
 public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {

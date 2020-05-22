@@ -13,7 +13,7 @@ import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IEvaluatorFactory;
-import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 
 public class FeaturesEvaluatorFactory implements IEvaluatorFactory {

@@ -5,8 +5,8 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IEvaluatorFactory;
-import bagaturchess.search.impl.evalcache.EvalCache_Impl1;
-import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.EvalCache_Impl1;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 
 

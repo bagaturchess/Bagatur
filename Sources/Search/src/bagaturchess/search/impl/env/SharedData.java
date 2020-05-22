@@ -31,7 +31,7 @@ import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluatorFactory;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
-import bagaturchess.search.impl.evalcache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.uci.api.IChannel;
 
