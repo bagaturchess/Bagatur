@@ -35,7 +35,7 @@ public final class MoveGenerator {
 	private final ContinuationHistory[] HH_ContinuationHistory = new ContinuationHistory[2];
 	private final ContinuationHistory[] BF_ContinuationHistory = new ContinuationHistory[2];
 	
-	private static Random rnd = new Random();
+	private Random rnd = new Random();
 	
 
 	public MoveGenerator() {
@@ -207,15 +207,9 @@ public final class MoveGenerator {
 			moves[j + 1] = move;
 		}
 	}
-
-	
-	public void randomize() {
-		final int left = nextToMove[currentPly];
-		randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
-	}
 	
 	
-	private static void randomize(int[] arr1, int[] arr2, int start, int end) {
+	private void randomize(int[] arr1, int[] arr2, int start, int end) {
 	    for (int i=end; i>1+start; i--) {
 	    	
 	    	int rnd_index = start + rnd.nextInt(i - start);	    

@@ -144,11 +144,6 @@ public class TPTEntry {
 	
 	
 	public boolean isExact() {
-		return isExact(0);
-	}
-	
-	
-	public boolean isExact(int trustWindow) {
 		return lower >= upper;
 	}
 	
