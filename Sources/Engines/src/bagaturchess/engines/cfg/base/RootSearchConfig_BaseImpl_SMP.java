@@ -51,18 +51,6 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	
 	
 	@Override
-	public double getTPTQSUsagePercent() {
-		throw new UnsupportedOperationException();
-	}
-	
-	
-	@Override
-	public double getGTBUsagePercent() {
-		throw new UnsupportedOperationException();
-	}
-	
-	
-	@Override
 	public double getEvalCacheUsagePercent() {
 		throw new UnsupportedOperationException();
 	}

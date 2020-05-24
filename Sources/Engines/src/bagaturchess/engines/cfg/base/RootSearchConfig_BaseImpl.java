@@ -22,10 +22,8 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	
 	protected static final double MEM_USAGE_TPT 		= 0.77;
-	protected static final double MEM_USAGE_TPT_QS		= 0.01;
 	protected static final double MEM_USAGE_EVALCACHE 	= 0.20;
-	protected static final double MEM_USAGE_PAWNCACHE 	= 0.01;
-	protected static final double MEM_USAGE_GTB 		= 0.01;
+	protected static final double MEM_USAGE_PAWNCACHE 	= 0.03;
 	
 	/*
 	protected static final double MEM_USAGE_TPT 		= 0.43;
@@ -206,18 +204,6 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	@Override
 	public double getTPTUsagePercent() {
 		return MEM_USAGE_TPT;
-	}
-	
-	
-	@Override
-	public double getTPTQSUsagePercent() {
-		return MEM_USAGE_TPT_QS;
-	}
-	
-	
-	@Override
-	public double getGTBUsagePercent() {
-		return MEM_USAGE_GTB;
 	}
 	
 	

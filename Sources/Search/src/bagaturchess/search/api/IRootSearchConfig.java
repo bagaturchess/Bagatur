@@ -59,8 +59,6 @@ public interface IRootSearchConfig {
 	public int getTimeControlOptimizationType();
 	public boolean initCaches();
 	public double getTPTUsagePercent();
-	public double getTPTQSUsagePercent();
-	public double getGTBUsagePercent();
 	public double getEvalCacheUsagePercent();
 	public double getPawnsCacheUsagePercent();
 }

@@ -27,8 +27,6 @@ package bagaturchess.search.impl.env;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
-import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
-import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -40,7 +38,6 @@ import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.movelists.OrderingStatistics;
 import bagaturchess.search.impl.movelists.SearchMoveListFactory;
 import bagaturchess.search.impl.tpt.ITTable;
-import bagaturchess.search.impl.tpt.TTable_Impl1;
 import bagaturchess.search.impl.utils.Tactics;
 
 
@@ -56,11 +53,6 @@ public class SearchEnv {
 	private IEvalCache evalCache;
 	private PawnsEvalCache pawnsCache;
 	private ITTable tpt;
-	private ITTable tpt_qs;
-	private GTBCache_OUT egtb_cache;
-	private SyzygyTBProbing gtb_probing;
-	private boolean egtb_cache_get;
-	private boolean gtb_probing_get;
 
 	
 	private IHistoryTable history_all;
@@ -141,30 +133,6 @@ public class SearchEnv {
 			tpt = shared.getAndRemoveTPT();
 		}
 		return tpt;
-	}
-	
-	
-	public GTBCache_OUT getEGTBCache() {
-		if (!egtb_cache_get) {
-			egtb_cache = shared.getAndRemoveGTBCache_OUT();
-			egtb_cache_get = true;
-		}
-		return egtb_cache;
-	}
-	
-	
-	/**
-	 * Returns null, because the calls to GTBProbing.probe() cause jvm crashes on some hardwares as well as Java OOM errors
-	 */
-	public SyzygyTBProbing getGTBProbing() {
-		
-		if (!gtb_probing_get) {
-			gtb_probing = shared.getAndRemoveTBProbing();
-			gtb_probing_get = true;
-		}
-		
-		//return gtb_probing;
-		return null;
 	}
 	
 	
