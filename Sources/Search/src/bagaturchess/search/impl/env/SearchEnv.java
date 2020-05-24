@@ -40,7 +40,7 @@ import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.movelists.OrderingStatistics;
 import bagaturchess.search.impl.movelists.SearchMoveListFactory;
 import bagaturchess.search.impl.tpt.ITTable;
-import bagaturchess.search.impl.tpt.TPTable;
+import bagaturchess.search.impl.tpt.TTable_Impl1;
 import bagaturchess.search.impl.utils.Tactics;
 
 

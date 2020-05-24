@@ -33,7 +33,7 @@ import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.tpt.ITTable;
-import bagaturchess.search.impl.tpt.TPTable;
+import bagaturchess.search.impl.tpt.TTable_Impl1;
 import bagaturchess.uci.api.IChannel;
 
 

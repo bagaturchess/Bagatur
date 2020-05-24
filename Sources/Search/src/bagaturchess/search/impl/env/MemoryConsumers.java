@@ -25,7 +25,7 @@ import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.search.impl.tpt.ITTable;
-import bagaturchess.search.impl.tpt.TPTable;
+import bagaturchess.search.impl.tpt.TTable_Impl1;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.api.IChannel;
 
@@ -258,9 +258,9 @@ public class MemoryConsumers {
 		int threadsCount = engineConfiguration.getThreadsCount();
 		for (int i=0; i<threadsCount; i++) {
 			
-			tpt.add(new TPTable(size_tpt, false, new BinarySemaphore_Dummy()));
+			tpt.add(new TTable_Impl1(size_tpt, false, new BinarySemaphore_Dummy()));
 			
-			tpt_qs.add(new TPTable(size_tpt_qs, false, new BinarySemaphore_Dummy()));
+			tpt_qs.add(new TTable_Impl1(size_tpt_qs, false, new BinarySemaphore_Dummy()));
 			
 			//evalCache.add(new EvalCache_Impl1(size_ec, false, new BinarySemaphore_Dummy()));
 			evalCache.add(new EvalCache_Impl2(256));
@@ -287,7 +287,7 @@ public class MemoryConsumers {
 		System.gc();
 		
 		int memory_before = getUsedMemory();
-		ITTable test_tpt = new TPTable(test_size, true, null);
+		ITTable test_tpt = new TTable_Impl1(test_size, true, null);
 		int size = getEntrySize(availableMemory, engineConfiguration.getTPTUsagePercent(), test_size, memory_before);
 		return size;
 	}
@@ -303,7 +303,7 @@ public class MemoryConsumers {
 		System.gc();
 		
 		int memory_before = getUsedMemory();
-		ITTable test_tpt = new TPTable(test_size, true, null);
+		ITTable test_tpt = new TTable_Impl1(test_size, true, null);
 		int size = getEntrySize(availableMemory, engineConfiguration.getTPTQSUsagePercent(), test_size, memory_before);
 		return size;
 	}

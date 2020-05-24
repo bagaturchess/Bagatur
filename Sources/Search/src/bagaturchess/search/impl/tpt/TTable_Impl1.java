@@ -31,10 +31,10 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
-public class TPTable extends LRUMapLongObject<TPTable.TPTEntry> implements ITTable {
+public class TTable_Impl1 extends LRUMapLongObject<TTable_Impl1.TPTEntry> implements ITTable {
 	
 	
-	public TPTable(int _maxSize, boolean fillWithDummyEntries, IBinarySemaphore _semaphore) {
+	public TTable_Impl1(int _maxSize, boolean fillWithDummyEntries, IBinarySemaphore _semaphore) {
 		super(new TPTEntryFactory(), _maxSize, fillWithDummyEntries, _semaphore);
 	}
 	
