@@ -24,14 +24,12 @@ package bagaturchess.search.impl.rootsearch.sequential;
 
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IFinishCallback;
@@ -42,10 +40,8 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
-import bagaturchess.search.impl.eval.cache.EvalCache_Impl1;
 import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
 import bagaturchess.search.impl.info.SearchInfoFactory;
-import bagaturchess.search.impl.pv.PVHistoryEntry;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
@@ -126,16 +122,6 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 		
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_Classic started from depth " + startIteration + " to depth " + maxIterations);
 		
-		
-		if (prevPV == null) {
-			PVHistoryEntry historyEntry = searcher.getEnv().getPVs().getPV(getBitboardForSetup().getHashKey());
-			if (historyEntry != null) {
-				prevPV = historyEntry.getPv();
-				initialValue = historyEntry.getEval();
-			}
-		} else {
-			//TODO: store pv in pvhistory with given depth and evaluation
-		}
 		
 		final int[] final_prevPV = prevPV;
 		

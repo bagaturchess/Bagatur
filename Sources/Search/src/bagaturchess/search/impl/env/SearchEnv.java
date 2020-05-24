@@ -39,7 +39,6 @@ import bagaturchess.search.impl.history.HistoryTable_PieceTo;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.movelists.OrderingStatistics;
 import bagaturchess.search.impl.movelists.SearchMoveListFactory;
-import bagaturchess.search.impl.pv.PVHistory;
 import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.search.impl.utils.Tactics;
 
@@ -67,7 +66,6 @@ public class SearchEnv {
 	private IHistoryTable history_incheck;
 	
 	private ISearchMoveListFactory moveListFactory;
-	private PVHistory pvs_history;
 	
 	protected OrderingStatistics orderingStatistics;
 
@@ -82,8 +80,6 @@ public class SearchEnv {
 		history_incheck = new HistoryTable_PieceTo(bitboard);
 		
 		moveListFactory = new SearchMoveListFactory();
-		
-		pvs_history = new PVHistory();
 		
 		orderingStatistics = new OrderingStatistics();
 	}
@@ -116,10 +112,6 @@ public class SearchEnv {
 			pawnsCache = shared.getAndRemovePawnsCache();
 		}
 		return pawnsCache;
-	}
-	
-	public PVHistory getPVs() {
-		return pvs_history;
 	}
 	
 	public int getTPTUsagePercent() {
