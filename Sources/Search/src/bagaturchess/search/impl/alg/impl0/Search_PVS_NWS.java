@@ -29,7 +29,6 @@ import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
-import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchMoveList;
@@ -39,7 +38,7 @@ import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
-import bagaturchess.search.impl.tpt.TPTEntry;
+import bagaturchess.search.impl.tpt.ITTEntry;
 
 
 public class Search_PVS_NWS extends SearchImpl {
@@ -252,72 +251,33 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		boolean tpt_found = false;
-		boolean tpt_exact = false;
-		int tpt_depth = 0;
-		int tpt_lower = MIN;
-		int tpt_upper = MAX;
+		//boolean tpt_found = false;
+		//boolean tpt_exact = false;
+		//int tpt_depth = 0;
+		//int tpt_lower = MIN;
+		//int tpt_upper = MAX;
 		int tpt_move = 0;
-		
-		env.getTPT().lock();
 		{
-			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
-			if (tptEntry != null) {
-				tpt_found = true;
-				tpt_exact = tptEntry.isExact();
-				tpt_depth = tptEntry.getDepth();
-				tpt_lower = tptEntry.getLowerBound();
-				tpt_upper = tptEntry.getUpperBound();
-				if (tpt_exact) {
-					tpt_move = tptEntry.getBestMove_lower();
-				} else if (tpt_lower >= beta) {
-					tpt_move = tptEntry.getBestMove_lower();
-				} else if (tpt_upper <= alpha_org) {
-					tpt_move = tptEntry.getBestMove_upper();
-				} else {
-					tpt_move = tptEntry.getBestMove_lower();
-					if (tpt_move == 0) {
-						tpt_move = tptEntry.getBestMove_upper();
-					}
-				}
+			env.getTPT().get(backtrackingInfo.hash_key, tt_cached);
+			if (!tt_cached.isEmpty()) {
+				tpt_move = tt_cached.getBestMove();
 			}
 		}
-		env.getTPT().unlock();
 		
 		
 		//IID PV Node
-		if (!tpt_found && rest >= 3) {
+		if (tpt_move == 0 && rest >= 3) {
 			
 			int reduction = 2;
 			
 			nullwin_search(mediator, pvman, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta, rootColour, false);
 			
-			env.getTPT().lock();
-			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
-			if (tptEntry != null) {
-				tpt_found = true;
-				tpt_exact = tptEntry.isExact();
-				tpt_lower = tptEntry.getLowerBound();
-				tpt_upper = tptEntry.getUpperBound();
-				if (tpt_exact) {
-					tpt_move = tptEntry.getBestMove_lower();
-				} else if (tpt_lower >= beta) {
-					tpt_move = tptEntry.getBestMove_lower();
-				} else if (tpt_upper <= alpha_org) {
-					tpt_move = tptEntry.getBestMove_upper();
-				} else {
-					tpt_move = tptEntry.getBestMove_lower();
-					if (tpt_move == 0) {
-						tpt_move = tptEntry.getBestMove_upper();
-					}
-				}
+			env.getTPT().get(backtrackingInfo.hash_key, tt_cached);
+			if (!tt_cached.isEmpty()) {
+				tpt_move = tt_cached.getBestMove();
 			}
-			env.getTPT().unlock();
 		}
         
-        
-		backtrackingInfo.static_eval = tpt_lower == MIN ? backtrackingInfo.static_eval : tpt_lower;
-		
 		
 		//Singular move check
 		boolean singleReply = env.getBitboard().hasSingleMove();
@@ -561,9 +521,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		env.getTPT().lock();
 		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, colourToMove, best_eval, alpha_org, beta, best_move, (byte)0);
-		env.getTPT().unlock();
 		
 		
 		return best_eval;
@@ -652,57 +610,30 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		boolean tpt_found = false;
-		boolean tpt_exact = false;
 		int tpt_depth = 0;
-		int tpt_lower = MIN;
-		int tpt_upper = MAX;
 		int tpt_move = 0;
         
 		
-		env.getTPT().lock();
-		{
-			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
-			if (tptEntry != null) {
-				tpt_found = true;
-				tpt_exact = tptEntry.isExact();
-				tpt_depth = tptEntry.getDepth();
-				tpt_lower = tptEntry.getLowerBound();
-				tpt_upper = tptEntry.getUpperBound();
-				if (tpt_exact) {
-					tpt_move = tptEntry.getBestMove_lower();
-				} else if (tpt_lower >= beta) {
-					tpt_move = tptEntry.getBestMove_lower();
-				} else if (tpt_upper <= alpha_org) {
-					tpt_move = tptEntry.getBestMove_upper();
+		env.getTPT().get(backtrackingInfo.hash_key, tt_cached);
+		if (!tt_cached.isEmpty()) {
+			tpt_depth = tt_cached.getDepth();
+			tpt_move = tt_cached.getBestMove();
+			
+			if (tpt_depth >= rest) {
+				if (tt_cached.getFlag() == ITTEntry.FLAG_EXACT) {
+					return tt_cached.getEval();
 				} else {
-					tpt_move = tptEntry.getBestMove_lower();
-					if (tpt_move == 0) {
-						tpt_move = tptEntry.getBestMove_upper();
+					if (tt_cached.getFlag() == ITTEntry.FLAG_LOWER && tt_cached.getEval() >= beta) {
+						return tt_cached.getEval();
+					}
+					if (tt_cached.getFlag() == ITTEntry.FLAG_UPPER && tt_cached.getEval() <= alpha_org) {
+						return tt_cached.getEval();
 					}
 				}
 			}
 		}
-		env.getTPT().unlock();
 		
-		
-		if (tpt_found && tpt_depth >= rest) {
-			if (tpt_exact) {
-				return tpt_lower;
-			} else {
-				if (tpt_lower >= beta) {
-					return tpt_lower;
-				}
-				if (tpt_upper <= alpha_org) {
-					return tpt_upper;
-				}
-			}
-		}
-		
-		
-		backtrackingInfo.static_eval = tpt_lower == MIN ? backtrackingInfo.static_eval : tpt_lower;
-		
-		
+				
         if (FORWARD_PRUNING && useStaticPrunning
                 ) {
             
@@ -778,82 +709,29 @@ public class Search_PVS_NWS extends SearchImpl {
 						//System.out.println("zungzwang hit");
 					}
 					
-					env.getTPT().lock();
-					{
-						TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
-						if (tptEntry != null) {
-							tpt_found = true;
-							tpt_exact = tptEntry.isExact();
-							tpt_depth = tptEntry.getDepth();
-							tpt_lower = tptEntry.getLowerBound();
-							tpt_upper = tptEntry.getUpperBound();
-							if (tpt_exact) {
-								tpt_move = tptEntry.getBestMove_lower();
-							} else if (tpt_lower >= beta) {
-								tpt_move = tptEntry.getBestMove_lower();
-							} else if (tpt_upper <= alpha_org) {
-								tpt_move = tptEntry.getBestMove_upper();
-							} else {
-								tpt_move = tptEntry.getBestMove_lower();
-								if (tpt_move == 0) {
-									tpt_move = tptEntry.getBestMove_upper();
-								}
-							}
-						}
+					env.getTPT().get(backtrackingInfo.hash_key, tt_cached);
+					if (tpt_move == 0 && !tt_cached.isEmpty()) {
+						tpt_depth = tt_cached.getDepth();
+						tpt_move = tt_cached.getBestMove();
 					}
-					env.getTPT().unlock();
 				}
 			}
 		}
 		
 		
 		//IID NONPV Node
-		if (!tpt_found && rest >= 3) {
+		if (tpt_move == 0 && rest >= 3) {
 			
 			int reduction = 2;
 			
 			nullwin_search(mediator, pvman, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta, rootColour, false);
 			
-			env.getTPT().lock();
-			TPTEntry tptEntry = env.getTPT().get(backtrackingInfo.hash_key);
-			if (tptEntry != null) {
-				tpt_found = true;
-				tpt_exact = tptEntry.isExact();
-				tpt_depth = tptEntry.getDepth();
-				tpt_lower = tptEntry.getLowerBound();
-				tpt_upper = tptEntry.getUpperBound();
-				if (tpt_exact) {
-					tpt_move = tptEntry.getBestMove_lower();
-				} else if (tpt_lower >= beta) {
-					tpt_move = tptEntry.getBestMove_lower();
-				} else if (tpt_upper <= alpha_org) {
-					tpt_move = tptEntry.getBestMove_upper();
-				} else {
-					tpt_move = tptEntry.getBestMove_lower();
-					if (tpt_move == 0) {
-						tpt_move = tptEntry.getBestMove_upper();
-					}
-				}
-			}
-			env.getTPT().unlock();
-		}
-		
-		
-		if (tpt_found && tpt_depth >= rest) {
-			if (tpt_exact) {
-				return tpt_lower;
-			} else {
-				if (tpt_lower >= beta) {
-					return tpt_lower;
-				}
-				if (tpt_upper <= alpha_org) {
-					return tpt_upper;
-				}
+			env.getTPT().get(backtrackingInfo.hash_key, tt_cached);
+			if (!tt_cached.isEmpty()) {
+				tpt_depth = tt_cached.getDepth();
+				tpt_move = tt_cached.getBestMove();
 			}
 		}
-		
-		
-		backtrackingInfo.static_eval = tpt_lower == MIN ? backtrackingInfo.static_eval : tpt_lower;
 		
 		
         if (FORWARD_PRUNING && useStaticPrunning
@@ -1131,9 +1009,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		env.getTPT().lock();
 		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, colourToMove, best_eval, alpha_org, beta, best_move, (byte)0);
-		env.getTPT().unlock();
 		
 		
 		return best_eval;
@@ -1174,36 +1050,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		long hashkey = env.getBitboard().getHashKey();
 		
 		
-		boolean tpt_exact = false;
 		int tpt_move = 0;
-		int tpt_lower = MIN;
-		int tpt_upper = MAX;
 		
-		env.getTPT().lock();
-		{
-			TPTEntry tptEntry = env.getTPT().get(hashkey);
-			if (tptEntry != null) {
-				tpt_exact = tptEntry.isExact();
-				tpt_lower = tptEntry.getLowerBound();
-				tpt_upper = tptEntry.getUpperBound();
-				if (tpt_exact) {
-					tpt_move = tptEntry.getBestMove_lower();
-				} else if (tpt_lower >= beta) {
-					tpt_move = tptEntry.getBestMove_lower();
-				} else if (tpt_upper <= alpha_org) {
-					tpt_move = tptEntry.getBestMove_upper();
-				} else {
-					tpt_move = tptEntry.getBestMove_lower();
-					if (tpt_move == 0) {
-						tpt_move = tptEntry.getBestMove_upper();
-					}
-				}
-			}
+		env.getTPT().get(hashkey, tt_cached);
+		if (!tt_cached.isEmpty()) {
+			tpt_move = tt_cached.getBestMove();
 		}
-		env.getTPT().unlock();
 		
 		
-		int staticEval = tpt_lower == MIN ? lazyEval(depth, alpha_org, beta, rootColour) : tpt_lower;
+		int staticEval = fullEval(depth, alpha_org, beta, rootColour);
 		
 		
 		boolean inCheck = env.getBitboard().isInCheck();
@@ -1324,9 +1179,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (best_move != 0) {
-			env.getTPT().lock();
 			env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
-			env.getTPT().unlock();
 		}
 		
 		return best_eval;
@@ -1360,51 +1213,26 @@ public class Search_PVS_NWS extends SearchImpl {
 		long hashkey = env.getBitboard().getHashKey();
 		
 		
-		boolean tpt_found = false;
-		boolean tpt_exact = false;
-		int tpt_lower = MIN;
-		int tpt_upper = MAX;
 		int tpt_move = 0;
 		
-		env.getTPT().lock();
-		{
-			TPTEntry tptEntry = env.getTPT().get(hashkey);
-			if (tptEntry != null) {
-				tpt_found = true;
-				tpt_exact = tptEntry.isExact();
-				tpt_lower = tptEntry.getLowerBound();
-				tpt_upper = tptEntry.getUpperBound();
-				if (tpt_exact) {
-					tpt_move = tptEntry.getBestMove_lower();
-				} else if (tpt_lower >= beta) {
-					tpt_move = tptEntry.getBestMove_lower();
-				} else if (tpt_upper <= alpha_org) {
-					tpt_move = tptEntry.getBestMove_upper();
-				} else {
-					tpt_move = tptEntry.getBestMove_lower();
-					if (tpt_move == 0) {
-						tpt_move = tptEntry.getBestMove_upper();
-					}
-				}
-			}
-		}
-		env.getTPT().unlock();
-		
-		if (tpt_found) {
-			if (tpt_exact) {
-				return tpt_lower;
+		env.getTPT().get(hashkey, tt_cached);
+		if (!tt_cached.isEmpty()) {
+			tpt_move = tt_cached.getBestMove();
+			
+			if (tt_cached.getFlag() == ITTEntry.FLAG_EXACT) {
+				return tt_cached.getEval();
 			} else {
-				if (tpt_lower >= beta) {
-					return tpt_lower;
+				if (tt_cached.getFlag() == ITTEntry.FLAG_LOWER && tt_cached.getEval() >= beta) {
+					return tt_cached.getEval();
 				}
-				if (tpt_upper <= alpha_org) {
-					return tpt_upper;
+				if (tt_cached.getFlag() == ITTEntry.FLAG_UPPER && tt_cached.getEval() <= alpha_org) {
+					return tt_cached.getEval();
 				}
 			}
 		}
 		
 		
-		int staticEval = tpt_lower == MIN ? lazyEval(depth, alpha_org, beta, rootColour) : tpt_lower;
+		int staticEval = fullEval(depth, alpha_org, beta, rootColour);
 		
 		
 		boolean inCheck = env.getBitboard().isInCheck();
@@ -1507,9 +1335,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (best_move != 0) {
-			env.getTPT().lock();
 			env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
-			env.getTPT().unlock();
 		}
 		
 		return best_eval;

@@ -31,7 +31,7 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
-public class TPTable extends LRUMapLongObject<TPTEntry> {
+public class TPTable extends LRUMapLongObject<TPTEntry> implements ITTable {
 	
 	
 	public TPTable(int _maxSize, boolean fillWithDummyEntries, IBinarySemaphore _semaphore) {
@@ -39,6 +39,10 @@ public class TPTable extends LRUMapLongObject<TPTEntry> {
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.tpt.ITTable#correctAllDepths(int)
+	 */
+	@Override
 	public void correctAllDepths(final int reduction) {
 		
 		IValuesVisitor_HashMapLongObject<TPTEntry> visitor = new IValuesVisitor_HashMapLongObject<TPTEntry>() {
@@ -51,12 +55,42 @@ public class TPTable extends LRUMapLongObject<TPTEntry> {
 	}
 	
 	
-	public TPTEntry get(long key) {
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.tpt.ITTable#get(long, bagaturchess.search.impl.tpt.ITTEntry)
+	 */
+	@Override
+	public void get(long key, ITTEntry entry) {
 		
-		return super.getAndUpdateLRU(key);
+		entry.setIsEmpty(true);
+		
+		TPTEntry mem = super.getAndUpdateLRU(key);
+		
+		if (mem != null) {
+			
+			entry.setIsEmpty(false);
+			entry.setDepth(mem.getDepth());
+			
+			if (mem.isExact()) {
+				entry.setFlag(ITTEntry.FLAG_EXACT);
+				entry.setEval(mem.getLowerBound());
+				entry.setBestMove(mem.getBestMove_lower());
+			} else if (mem.getBestMove_lower() != 0) {
+				entry.setFlag(ITTEntry.FLAG_LOWER);
+				entry.setEval(mem.getLowerBound());
+				entry.setBestMove(mem.getBestMove_lower());
+			} else {
+				entry.setFlag(ITTEntry.FLAG_UPPER);
+				entry.setEval(mem.getUpperBound());
+				entry.setBestMove(mem.getBestMove_upper());
+			}
+		}
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see bagaturchess.search.impl.tpt.ITTable#put(long, int, int, int, int, int, int, int, byte)
+	 */
+	@Override
 	public TPTEntry put(long hashkey,
 			int _smaxdepth, int _sdepth, 
 			int _colour,

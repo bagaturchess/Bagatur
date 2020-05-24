@@ -29,11 +29,6 @@ import bagaturchess.search.api.internal.ISearch;
 public class TPTEntry {
 	
 	
-	public static final int FLAG_EXACT = 0;
-	public static final int FLAG_UPPER = 1;
-	public static final int FLAG_LOWER = 2;
-	
-	
 	byte depth;
 	int lower;
 	int upper;

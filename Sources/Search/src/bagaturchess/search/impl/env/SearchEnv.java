@@ -39,6 +39,7 @@ import bagaturchess.search.impl.history.HistoryTable_PieceTo;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.movelists.OrderingStatistics;
 import bagaturchess.search.impl.movelists.SearchMoveListFactory;
+import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.search.impl.utils.Tactics;
 
@@ -54,8 +55,8 @@ public class SearchEnv {
 	
 	private IEvalCache evalCache;
 	private PawnsEvalCache pawnsCache;
-	private TPTable tpt;
-	private TPTable tpt_qs;
+	private ITTable tpt;
+	private ITTable tpt_qs;
 	private GTBCache_OUT egtb_cache;
 	private SyzygyTBProbing gtb_probing;
 	private boolean egtb_cache_get;
@@ -123,7 +124,7 @@ public class SearchEnv {
 	}
 	
 	
-	public TPTable getTPT() {
+	public ITTable getTPT() {
 		if (tpt == null) {
 			tpt = shared.getAndRemoveTPT();
 		}
@@ -131,7 +132,7 @@ public class SearchEnv {
 	}
 	
 	
-	public TPTable getTPTQS() {
+	public ITTable getTPTQS() {
 		/*if (tpt_qs == null) {
 			tpt_qs = shared.getAndRemoveTPTQS();
 		}
@@ -211,8 +212,6 @@ public class SearchEnv {
 		//result += shared.toString();
 		result += "Eval Cache HIT RATE is: " + getEvalCache().getHitRate();
 		result += "; Pawn Cache HIT RATE is: " + getPawnsCache().getHitRate();
-		result += "; Transposition Table HIT RATE is: " + getTPT().getHitRate();
-		result += "; Transposition Table QSearch HIT RATE is: " + getTPTQS().getHitRate();
 		result += "\r\nMOVE ORDERING STATISTICS\r\n" + getMoveListFactory().toString();
 		
 		return result;

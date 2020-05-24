@@ -23,6 +23,8 @@ import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.impl.eval.cache.EvalCache_Impl1;
 import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
+import bagaturchess.search.impl.tpt.ITTEntry;
+import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.tpt.TPTable;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.api.IChannel;
@@ -77,8 +79,8 @@ public class MemoryConsumers {
 	
 	private List<IEvalCache> evalCache;
 	private List<PawnsEvalCache> pawnsCache;
-	private List<TPTable> tpt;
-	private List<TPTable> tpt_qs;
+	private List<ITTable> tpt;
+	private List<ITTable> tpt_qs;
 	private List<SyzygyTBProbing> gtbs;
 	private List<GTBCache_OUT> gtbCache_out;
 	
@@ -248,8 +250,8 @@ public class MemoryConsumers {
 		
 		evalCache 		= new Vector<IEvalCache>();
 		pawnsCache		= new Vector<PawnsEvalCache>();
-		tpt 			= new Vector<TPTable>();
-		tpt_qs			= new Vector<TPTable>();
+		tpt 			= new Vector<ITTable>();
+		tpt_qs			= new Vector<ITTable>();
 		gtbCache_out 	= new Vector<GTBCache_OUT>();
 		
 		
@@ -285,9 +287,8 @@ public class MemoryConsumers {
 		System.gc();
 		
 		int memory_before = getUsedMemory();
-		TPTable test_tpt = new TPTable(test_size, true, null);
+		ITTable test_tpt = new TPTable(test_size, true, null);
 		int size = getEntrySize(availableMemory, engineConfiguration.getTPTUsagePercent(), test_size, memory_before);
-		test_tpt.clear();
 		return size;
 	}
 	
@@ -302,9 +303,8 @@ public class MemoryConsumers {
 		System.gc();
 		
 		int memory_before = getUsedMemory();
-		TPTable test_tpt = new TPTable(test_size, true, null);
+		ITTable test_tpt = new TPTable(test_size, true, null);
 		int size = getEntrySize(availableMemory, engineConfiguration.getTPTQSUsagePercent(), test_size, memory_before);
-		test_tpt.clear();
 		return size;
 	}
 	
@@ -432,12 +432,12 @@ public class MemoryConsumers {
 	}
 
 
-	public List<TPTable> getTPT() {
+	public List<ITTable> getTPT() {
 		return tpt;
 	}
 
 
-	public List<TPTable> getTPTQS() {
+	public List<ITTable> getTPTQS() {
 		return tpt_qs;
 	}
 	

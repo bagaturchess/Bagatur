@@ -238,7 +238,7 @@ public class NullwinSearchTask implements Runnable {
 	}
 	
 	
-	private int[] getPVfromTPT() {
+	/*private int[] getPVfromTPT() {
 		
 		List<Integer> moves = new ArrayList<Integer>();
 		
@@ -269,7 +269,7 @@ public class NullwinSearchTask implements Runnable {
 		}
 		
 		return result;
-	}
+	}*/
 	
 	
 	private int[] validatePV(int[] pv) {

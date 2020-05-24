@@ -40,8 +40,10 @@ import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.pv.PVNode;
+import bagaturchess.search.impl.tpt.ITTEntry;
+import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.tpt.TPTEntry;
-import bagaturchess.search.impl.tpt.TPTable;
+import bagaturchess.search.impl.tpt.TTEntry_BaseImpl;
 import bagaturchess.search.impl.utils.SearchUtils;
 import bagaturchess.uci.api.ChannelManager;
 
@@ -63,6 +65,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	protected int[] buff_tpt_depthtracking = new int[1];
 	
 	protected GTBProbeInput temp_input = new GTBProbeInput();
+	protected ITTEntry tt_cached = new TTEntry_BaseImpl();
 	
 	
 	public void setup(IBitBoard bitboardForSetup) {
@@ -255,7 +258,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	}
 	
 	
-	protected boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int[] depthtracking, int rootColour, TPTable tpt) {
+	protected boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int[] depthtracking, int rootColour, ITTable tpt) {
 		//env.getTPT().lock();
 		boolean res = extractFromTPT(info, depth, result, useLower, MIN, MAX, depthtracking, rootColour, tpt);
 		/*//TODO: Consider if (res) {
@@ -265,7 +268,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		return res;
 	}
 	
-	private boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int alpha, int beta, int[] depthtracking, int rootColour, TPTable tpt) {
+	private boolean extractFromTPT(ISearchInfo info, int depth, PVNode result, boolean useLower, int alpha, int beta, int[] depthtracking, int rootColour, ITTable tpt) {
 		
 		//if (true) throw new IllegalStateException("Not thread safe"); 
 		
@@ -295,60 +298,50 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		
 		long hashkey = env.getBitboard().getHashKey();
 		
-		TPTEntry entry = tpt.get(hashkey);
+		tpt.get(hashkey, tt_cached);
 		
-		if (entry == null) {
+		if (tt_cached.isEmpty()) {
 			return false;
 		}
 		
-		if (entry != null) {
-			if (entry.getDepth() >= depth) {
-				
-				//info.setSearchedNodes(info.getSearchedNodes() + 1);
-				
-				if (entry.isExact()) {
-					result.bestmove = entry.getBestMove_lower();
-				} else if (entry.getLowerBound() >= beta) {
-					result.bestmove = entry.getBestMove_lower();
-				} else if (entry.getUpperBound() <= alpha) {
-					result.bestmove = entry.getBestMove_upper();
-				} else {
-					result.bestmove = useLower ? entry.getBestMove_lower() : entry.getBestMove_upper();
-				}
-				
-				/*if (result.bestmove == 0) {
-					result.bestmove = useLower ? entry.getBestMove_upper() : entry.getBestMove_lower();
-					useLower = !useLower;
-				}*/
-				
-				if (result.bestmove == 0) {
-					return false;
-				}
-				
-				//if (result.bestmove != 0 && !env.getBitboard().isPossible(result.bestmove)) {
-					//if (true) throw new IllegalStateException(env.getBitboard() +
-					//		"\r\n Not possible " + MoveInt.moveToString(result.bestmove));
-				//	return false;
-				//}
-				
-				result.leaf = false;
-				
-				if (result.bestmove == 0) {
-					env.getBitboard().makeNullMoveForward();
-				} else {
-					env.getBitboard().makeMoveForward(result.bestmove);
-				}
-				
-				draw = extractFromTPT(info, depth - 1, result.child, !useLower, -beta, -alpha, depthtracking, rootColour, tpt);
-				/*if (draw) {
-					result.eval = getDrawScores(rootColour);
-				}*/
-				
-				if (result.bestmove == 0) {
-					env.getBitboard().makeNullMoveBackward();
-				} else {
-					env.getBitboard().makeMoveBackward(result.bestmove);
-				}
+		if (tt_cached.getDepth() >= depth) {
+			
+			//info.setSearchedNodes(info.getSearchedNodes() + 1);
+			
+			result.bestmove = tt_cached.getBestMove();
+			
+			/*if (result.bestmove == 0) {
+				result.bestmove = useLower ? entry.getBestMove_upper() : entry.getBestMove_lower();
+				useLower = !useLower;
+			}*/
+			
+			if (result.bestmove == 0) {
+				return false;
+			}
+			
+			//if (result.bestmove != 0 && !env.getBitboard().isPossible(result.bestmove)) {
+				//if (true) throw new IllegalStateException(env.getBitboard() +
+				//		"\r\n Not possible " + MoveInt.moveToString(result.bestmove));
+			//	return false;
+			//}
+			
+			result.leaf = false;
+			
+			if (result.bestmove == 0) {
+				env.getBitboard().makeNullMoveForward();
+			} else {
+				env.getBitboard().makeMoveForward(result.bestmove);
+			}
+			
+			draw = extractFromTPT(info, depth - 1, result.child, !useLower, -beta, -alpha, depthtracking, rootColour, tpt);
+			/*if (draw) {
+				result.eval = getDrawScores(rootColour);
+			}*/
+			
+			if (result.bestmove == 0) {
+				env.getBitboard().makeNullMoveBackward();
+			} else {
+				env.getBitboard().makeMoveBackward(result.bestmove);
 			}
 		}
 		
