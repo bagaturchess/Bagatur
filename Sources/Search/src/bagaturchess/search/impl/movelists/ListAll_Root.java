@@ -29,7 +29,6 @@ import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.utils.Sorting;
 
 

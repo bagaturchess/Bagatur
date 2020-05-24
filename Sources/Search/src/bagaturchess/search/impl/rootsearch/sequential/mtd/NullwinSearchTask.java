@@ -34,7 +34,6 @@ import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
-import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
 

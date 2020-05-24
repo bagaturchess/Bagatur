@@ -2,7 +2,6 @@ package bagaturchess.search.impl.uci_adaptor;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.egtb.gaviota.GTBProbing;
@@ -10,9 +9,7 @@ import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.info.SearchInfoFactory;
-import bagaturchess.search.impl.tpt.TPTEntry;
 
 
 public class TimeSaver {
@@ -134,47 +131,6 @@ public class TimeSaver {
 		*/
 		
 		return false;
-	}
-	
-	//TODO: lock/unlock TPT before/after call
-	public int sentFromTPT(IBitBoard bitboardForSetup, SharedData sharedData, ISearchMediator mediator, int min_depth) {
-		
-		if (mediator == null) {
-			return 0;
-		}
-		
-		ISearchInfo info = SearchInfoFactory.getFactory().createSearchInfo();
-		
-		TPTEntry tptEntry = null;
-		/*if (sharedData.getTPT() != null) {
-			tptEntry = sharedData.getTPT().get(bitboardForSetup.getHashKey());
-		}*/
-		
-		if (tptEntry == null) {
-			return 0;
-		}
-		
-		int depth = tptEntry.getDepth();
-		
-		if (depth < min_depth) {
-			return depth;
-		}
-		
-		if (tptEntry.getBestMove_lower() == 0) {
-			return 0;
-		}
-		
-		int pv[] = new int[] {tptEntry.getBestMove_lower()};
-		info.setPV(pv);
-		info.setBestMove(info.getPV()[0]);
-		info.setEval(tptEntry.getLowerBound());
-		info.setDepth(depth);
-		info.setSelDepth(depth);
-		
-		mediator.changedMajor(info);
-		mediator.dump("TPT entry used in root with depth: " + depth);
-		
-		return depth + 1;
 	}
 	
 	

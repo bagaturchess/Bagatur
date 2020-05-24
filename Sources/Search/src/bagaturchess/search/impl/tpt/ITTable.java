@@ -29,7 +29,7 @@ public interface ITTable {
 
 	public abstract void get(long key, ITTEntry entry);
 
-	public abstract TPTEntry put(long hashkey, int _smaxdepth, int _sdepth,
+	public abstract void put(long hashkey, int _smaxdepth, int _sdepth,
 			int _colour, int _eval, int _alpha, int _beta, int _bestmove,
 			byte movenumber);
 	

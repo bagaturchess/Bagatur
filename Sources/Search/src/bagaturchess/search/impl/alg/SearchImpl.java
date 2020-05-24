@@ -42,7 +42,6 @@ import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.search.impl.tpt.ITTable;
-import bagaturchess.search.impl.tpt.TPTEntry;
 import bagaturchess.search.impl.tpt.TTEntry_BaseImpl;
 import bagaturchess.search.impl.utils.SearchUtils;
 import bagaturchess.uci.api.ChannelManager;

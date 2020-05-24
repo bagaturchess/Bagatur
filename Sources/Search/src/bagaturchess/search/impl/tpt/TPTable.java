@@ -31,7 +31,7 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
-public class TPTable extends LRUMapLongObject<TPTEntry> implements ITTable {
+public class TPTable extends LRUMapLongObject<TPTable.TPTEntry> implements ITTable {
 	
 	
 	public TPTable(int _maxSize, boolean fillWithDummyEntries, IBinarySemaphore _semaphore) {
@@ -91,7 +91,7 @@ public class TPTable extends LRUMapLongObject<TPTEntry> implements ITTable {
 	 * @see bagaturchess.search.impl.tpt.ITTable#put(long, int, int, int, int, int, int, int, byte)
 	 */
 	@Override
-	public TPTEntry put(long hashkey,
+	public void put(long hashkey,
 			int _smaxdepth, int _sdepth, 
 			int _colour,
 			int _eval, int _alpha, int _beta, int _bestmove,
@@ -112,7 +112,7 @@ public class TPTable extends LRUMapLongObject<TPTEntry> implements ITTable {
 		}
 		
 		if (SearchUtils.isMateVal(_eval)) {
-			return null;
+			return;
 		}
 		
 		TPTEntry entry = super.getAndUpdateLRU(hashkey);
@@ -122,14 +122,154 @@ public class TPTable extends LRUMapLongObject<TPTEntry> implements ITTable {
 			entry = associateEntry(hashkey);
 			entry.init(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, movenumber);
 		}
-		
-		return entry;
 	}
 	
 	
 	private static class TPTEntryFactory implements DataObjectFactory<TPTEntry> {
 		public TPTEntry createObject() {
 			return new TPTEntry();
+		}
+	}
+	
+	
+	protected static final class TPTEntry {
+		
+		
+		byte depth;
+		int lower;
+		int upper;
+		int bestmove_lower;
+		int bestmove_upper;
+		
+		
+		public TPTEntry() {
+			
+		}
+		
+		
+		public TPTEntry(int _smaxdepth, int _sdepth, int _colour,
+				int _eval, int _alpha, int _beta, int _bestmove) {
+			
+			init(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, (byte)0);
+		}
+		
+		
+		public String toString() {
+			String result = "";
+			
+			result += " depth=" + depth;
+			result += ", lower=" + lower;
+			result += ", upper=" + upper;
+			//result += ", bestmove_lower=" + MoveInt.moveToString(bestmove_lower);
+			//result += ", bestmove_upper=" + MoveInt.moveToString(bestmove_upper);
+			
+			return result;
+		}
+		
+		
+		public void init(int _smaxdepth, int _sdepth, int _colour, 
+				int _eval, int _alpha, int _beta, int _bestmove, byte _movenumber) {
+			
+			depth = (byte) (_smaxdepth - _sdepth);
+			
+			if (_eval > _alpha && _eval < _beta) {
+				lower = _eval;
+				upper = _eval;
+				bestmove_lower = _bestmove;
+				bestmove_upper = _bestmove;
+			} else {
+				if (_eval >= _beta) { //_eval is lower bound
+					lower = _eval;
+					bestmove_lower = _bestmove;
+					bestmove_upper = 0;
+					upper = ISearch.MAX;
+				} else if (_eval <= _alpha) { //_eval is upper bound
+					lower = ISearch.MIN;
+					bestmove_lower = 0;
+					bestmove_upper = _bestmove;
+					upper = _eval;
+				} else {
+					throw new IllegalStateException();
+				}
+			}		 
+		}
+		
+		public void update(int _smaxdepth, int _sdepth, int _colour,
+				int _eval, int _alpha, int _beta, int _bestmove, byte _movenumber) {
+			
+			byte _depth = (byte) (_smaxdepth - _sdepth);
+			
+			/*if (true) {
+				init(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, _movenumber);
+				return;
+			}*/
+			
+			if (_depth > depth) {
+				
+				init(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, _movenumber);
+				
+			} else if (_depth == depth) {		
+				
+				if (_eval > _alpha && _eval < _beta) {
+					
+					lower = _eval;
+					upper = _eval;
+					bestmove_lower = _bestmove;
+					bestmove_upper = _bestmove;
+					
+				} else {
+					
+					if (_eval >= _beta) { // _eval is lower bound
+						if (_eval >/*=*/ lower) {
+							
+							lower = _eval;
+							bestmove_lower = _bestmove;
+						}
+					} else if (_eval <= _alpha) { // _eval is upper bound
+						if (_eval </*=*/ upper) {
+							
+							upper = _eval;
+							bestmove_upper = _bestmove;
+						}
+					} else {
+						throw new IllegalStateException();
+					}
+				}
+			}
+			
+			if (lower == upper && (lower == ISearch.MIN || lower == ISearch.MAX)) {
+				throw new IllegalStateException();
+			}
+		}
+		
+		
+		public boolean isExact() {
+			return lower >= upper;
+		}
+		
+		
+		public int getLowerBound() {
+			return lower;
+		}
+		
+		
+		public int getUpperBound() {
+			return upper;
+		}
+		
+		
+		public int getBestMove_lower() {
+			return bestmove_lower;
+		}
+		
+		
+		public int getBestMove_upper() {
+			return bestmove_upper;
+		}
+		
+		
+		public int getDepth() {
+			return depth;
 		}
 	}
 }
