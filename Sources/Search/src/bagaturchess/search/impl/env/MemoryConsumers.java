@@ -176,9 +176,9 @@ public class MemoryConsumers {
 			
 			double percents_sum = engineConfiguration.getTPTUsagePercent()
 								+ engineConfiguration.getEvalCacheUsagePercent()
-								+ engineConfiguration.getThreadsCount() * engineConfiguration.getPawnsCacheUsagePercent();
+								+ engineConfiguration.getPawnsCacheUsagePercent();
 			
-			if (percents_sum < 0.95 || percents_sum > 1.06) {
+			if (percents_sum < 0.95 || percents_sum > 1.05) {
 				throw new IllegalStateException("Percents sum is not near to 1. It is " + percents_sum);
 			}
 			
