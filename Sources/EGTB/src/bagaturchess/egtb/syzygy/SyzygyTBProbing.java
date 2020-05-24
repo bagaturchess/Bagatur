@@ -100,7 +100,7 @@ public class SyzygyTBProbing {
      * @param board the FrankWalter board representation
      * @return a WDL result (see {@link #toXBoardScore(int)} and {@link #toMove(int)})
      */
-    public int probeDTZ(IBitBoard board){
+    public synchronized int probeDTZ(IBitBoard board){
         if (board.hasRightsToKingCastle(Constants.COLOUR_WHITE) || board.hasRightsToQueenCastle(Constants.COLOUR_WHITE)
         		|| board.hasRightsToKingCastle(Constants.COLOUR_BLACK) || board.hasRightsToQueenCastle(Constants.COLOUR_BLACK)){
             return -1;
@@ -165,7 +165,7 @@ public class SyzygyTBProbing {
      * @param depth the depth of the current search
      * @return the score associated with this position
      */
-    public int getWDLScore(int wdl, int depth) {
+    public synchronized int getWDLScore(int wdl, int depth) {
         switch (wdl){
             case SyzygyConstants.TB_LOSS:
                 return -28000 + depth;
