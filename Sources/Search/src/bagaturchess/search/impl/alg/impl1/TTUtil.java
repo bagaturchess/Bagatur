@@ -25,8 +25,6 @@ public class TTUtil {
 	public static final int FLAG_UPPER = 1;
 	public static final int FLAG_LOWER = 2;
 
-	public static long halfMoveCounter = 0;
-
 	// ///////////////////// DEPTH //12 bits
 	private static final int FLAG = 12; // 2
 	private static final int MOVE = 14; // 22
@@ -135,7 +133,7 @@ public class TTUtil {
 	}
 
 	public static int getDepth(final long value) {
-		return (int) ((value & 0xff) - halfMoveCounter);
+		return (int) (value & 0xff);
 	}
 
 	public static int getFlag(final long value) {
@@ -152,7 +150,7 @@ public class TTUtil {
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 			Assert.isTrue(depth <= 255);
 		}
-		return score << SCORE | move << MOVE | flag << FLAG | (depth + halfMoveCounter);
+		return score << SCORE | move << MOVE | flag << FLAG | depth;
 	}
 
 	public static String toString(long ttValue) {
