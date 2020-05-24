@@ -23,11 +23,42 @@
 package bagaturchess.search.impl.tpt;
 
 
+import bagaturchess.bitboard.impl1.internal.Assert;
+import bagaturchess.bitboard.impl1.internal.EngineConstants;
+import bagaturchess.bitboard.impl1.internal.MoveUtil;
+import bagaturchess.bitboard.impl1.internal.Util;
+
+
 public class TTable_Impl2 implements ITTable {
 	
 	
+	// ///////////////////// DEPTH //12 bits
+	private static final int FLAG = 12; // 2
+	private static final int MOVE = 14; // 22
+	private static final int SCORE = 48; // 16
+	
+	
+	private int keyShifts;
+	public int maxEntries;
+
+	private long[] keys;
+	private long[] values;
+
+	private long usageCounter;
+	
+	
 	public TTable_Impl2(int sizeInMB) {
-		// TODO Auto-generated constructor stub
+		
+		int POWER_2_ENTRIES = (int) (Math.log(sizeInMB) / Math.log(2) + 16);
+		keyShifts = 64 - POWER_2_ENTRIES;
+		maxEntries = (int) Util.POWER_LOOKUP[EngineConstants.POWER_2_TT_ENTRIES] + 3;
+
+		keys = null;
+		values = null;
+		
+		keys = new long[maxEntries];
+		values = new long[maxEntries];
+		usageCounter = 0;
 	}
 
 
@@ -41,27 +72,15 @@ public class TTable_Impl2 implements ITTable {
 		
 		entry.setIsEmpty(true);
 		
-		/*TPTEntry mem = super.getAndUpdateLRU(key);
+		long value = getTTValue(key);
 		
-		if (mem != null) {
-			
+		if (value != 0) {
 			entry.setIsEmpty(false);
-			entry.setDepth(mem.getDepth());
-			
-			if (mem.isExact()) {
-				entry.setFlag(ITTEntry.FLAG_EXACT);
-				entry.setEval(mem.getLowerBound());
-				entry.setBestMove(mem.getBestMove_lower());
-			} else if (mem.getBestMove_lower() != 0) {
-				entry.setFlag(ITTEntry.FLAG_LOWER);
-				entry.setEval(mem.getLowerBound());
-				entry.setBestMove(mem.getBestMove_lower());
-			} else {
-				entry.setFlag(ITTEntry.FLAG_UPPER);
-				entry.setEval(mem.getUpperBound());
-				entry.setBestMove(mem.getBestMove_upper());
-			}
-		}*/
+			entry.setDepth(getDepth(value));
+			entry.setFlag(getFlag(value));
+			entry.setEval(getScore(value));
+			entry.setBestMove(getMove(value));
+		}
 	}
 	
 	
@@ -77,6 +96,109 @@ public class TTable_Impl2 implements ITTable {
 	
 	@Override
 	public int getUsage() {
+		return (int) (usageCounter * 100 / maxEntries);
+	}
+	
+	
+	private long getTTValue(final long key) {
+
+		final int index = getIndex(key);
+
+		for (int i = 0; i < 4; i++) {
+			long value = values[index + i];
+			if ((keys[index + i] ^ value) == key) {
+				return value;
+			}
+		}
+		
 		return 0;
+	}
+	
+	
+	private int getIndex(final long key) {
+		return (int) (key >>> keyShifts);
+	}
+	
+	
+	private void addValue(final long key, int score, final int ply, final int depth, final int flag, final int move) {
+
+		if (EngineConstants.ASSERT) {
+			Assert.isTrue(depth >= 0);
+			Assert.isTrue(move != 0);
+			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
+			Assert.isTrue(MoveUtil.getSourcePieceIndex(move) != 0);
+		}
+
+		final int index = getIndex(key);
+		int replacedDepth = Integer.MAX_VALUE;
+		int replacedIndex = index;
+		for (int i = index; i < index + 4; i++) {
+
+			if (keys[i] == 0) {
+				replacedIndex = i;
+				usageCounter++;
+				break;
+			}
+
+			long currentValue = values[i];
+			int currentDepth = getDepth(currentValue);
+			if ((keys[i] ^ currentValue) == key) {
+				if (currentDepth > depth && flag != ITTEntry.FLAG_EXACT) {
+					return;
+				}
+				replacedIndex = i;
+				break;
+			}
+
+			// replace the lowest depth
+			if (currentDepth < replacedDepth) {
+				replacedIndex = i;
+				replacedDepth = currentDepth;
+			}
+		}
+		
+		if (EngineConstants.ASSERT) {
+			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
+		}
+
+		final long value = createValue(score, move, flag, depth);
+		keys[replacedIndex] = key ^ value;
+		values[replacedIndex] = value;
+	}
+	
+	
+	private static int getScore(final long value) {
+		int score = (int) (value >> SCORE);
+
+		if (EngineConstants.ASSERT) {
+			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
+		}
+
+		return score;
+	}
+	
+	
+	private static int getDepth(final long value) {
+		return (int) (value & 0xff);
+	}
+	
+	
+	private static int getFlag(final long value) {
+		return (int) (value >>> FLAG & 3);
+	}
+	
+	
+	private static int getMove(final long value) {
+		return (int) (value >>> MOVE & 0x3fffff);
+	}
+	
+	
+	// SCORE,HALF_MOVE_COUNTER,MOVE,FLAG,DEPTH
+	private static long createValue(final long score, final long move, final long flag, final long depth) {
+		if (EngineConstants.ASSERT) {
+			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
+			Assert.isTrue(depth <= 255);
+		}
+		return score << SCORE | move << MOVE | flag << FLAG | depth;
 	}
 }
