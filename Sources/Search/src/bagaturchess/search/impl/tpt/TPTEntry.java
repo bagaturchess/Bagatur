@@ -29,12 +29,6 @@ import bagaturchess.search.api.internal.ISearch;
 public class TPTEntry {
 	
 	
-	public static final int MIN_VALUE = ISearch.MIN;
-	public static final int MAX_VALUE = ISearch.MAX;
-	
-	public static final int NO_MOVE = 0;
-	
-	
 	byte depth;
 	int lower;
 	int upper;
@@ -81,11 +75,11 @@ public class TPTEntry {
 			if (_eval >= _beta) { //_eval is lower bound
 				lower = _eval;
 				bestmove_lower = _bestmove;
-				bestmove_upper = NO_MOVE;
-				upper = TPTEntry.MAX_VALUE;
+				bestmove_upper = 0;
+				upper = ISearch.MAX;
 			} else if (_eval <= _alpha) { //_eval is upper bound
-				lower = TPTEntry.MIN_VALUE;
-				bestmove_lower = NO_MOVE;
+				lower = ISearch.MIN;
+				bestmove_lower = 0;
 				bestmove_upper = _bestmove;
 				upper = _eval;
 			} else {
@@ -137,7 +131,7 @@ public class TPTEntry {
 			}
 		}
 		
-		if (lower == upper && (lower == MIN_VALUE || lower == MAX_VALUE)) {
+		if (lower == upper && (lower == ISearch.MIN || lower == ISearch.MAX)) {
 			throw new IllegalStateException();
 		}
 	}
