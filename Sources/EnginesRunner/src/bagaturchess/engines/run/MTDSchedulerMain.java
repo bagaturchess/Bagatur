@@ -86,7 +86,7 @@ public class MTDSchedulerMain {
 								"bagaturchess.engines.evalmoves.EvaluationConfg"
 								}
 				);*/
-				
+		
 		IRootSearchConfig cfg = new RootSearchConfig_BaseImpl_1Core(
 								//new RootSearchConfig_BaseImpl_SMP_Threads(
 				
