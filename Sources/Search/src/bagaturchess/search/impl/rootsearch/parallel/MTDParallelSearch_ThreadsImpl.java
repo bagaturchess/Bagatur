@@ -76,4 +76,11 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 		
 		((SequentialSearch_MTD)searcher).negamax(_bitboardForSetup, mediator, timeController, multiPVCallback, go, dont_wrap_mediator);
 	}
+	
+	
+	@Override
+	// Only one thread is enough to finish the depth
+	protected SearchersInfo getSearchersInfo(final int startIteration) {
+		return new SearchersInfo(startIteration, 0.001d); 
+	}
 }

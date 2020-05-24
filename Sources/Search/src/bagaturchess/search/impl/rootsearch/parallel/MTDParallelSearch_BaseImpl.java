@@ -100,6 +100,12 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 			final IFinishCallback multiPVCallback, Go go, boolean dont_wrap_mediator);
 	
 	
+	protected abstract SearchersInfo getSearchersInfo(final int startIteration);
+	
+	
+	//protected abstract boolean restartSearchersOnNewDepth();
+	
+	
 	protected void addSearcher(IRootSearch searcher) {
 		
 		if (getBitboardForSetup() == null) { //createBoard of this root search is not called yet
@@ -287,10 +293,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					
 					long start_time = System.currentTimeMillis();
 					
-					
-					SearchersInfo searchersInfo = new SearchersInfo(startIteration, 1d); // All threads have to finish the depth
-					//SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.377d);
-					//SearchersInfo searchersInfo = new SearchersInfo(startIteration, 0.001d); // Only one thread is enough to finish the depth
+
+					SearchersInfo searchersInfo = getSearchersInfo(startIteration);
 					
 					ISearchInfo lastSendInfo = null;
 					
