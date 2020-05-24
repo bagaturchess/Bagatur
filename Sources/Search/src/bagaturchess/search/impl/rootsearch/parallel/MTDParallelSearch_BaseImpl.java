@@ -479,13 +479,13 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 								continue;
 							}
 							
-							ChannelManager.getChannel().dump("MTDParallelSearch: select info from mediator (" + i_mediator + ")"
+							/*ChannelManager.getChannel().dump("MTDParallelSearch: select info from mediator (" + i_mediator + ")"
 									+ ", curinfo.getDepth()=" + curinfo.getDepth()
 									+ ", curinfo.getBestMove()=" + curinfo.getBestMove()
 									+ ", curinfo.getPV()=" + curinfo.getPV()
 									+ ", curinfo.isUpperBound()=" + curinfo.isUpperBound()
 									+ (curinfo.getPV() == null ? "" : ", info.getPV().length=" + curinfo.getPV().length)
-									);
+									);*/
 							
 							cur_mediator.lastSendMajorIndex = i_major;
 							

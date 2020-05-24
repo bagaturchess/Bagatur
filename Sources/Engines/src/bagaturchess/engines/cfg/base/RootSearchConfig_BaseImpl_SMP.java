@@ -45,24 +45,6 @@ public class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl imp
 	
 	
 	@Override
-	public double getTPTUsagePercent() {
-		throw new UnsupportedOperationException();
-	}
-	
-	
-	@Override
-	public double getEvalCacheUsagePercent() {
-		throw new UnsupportedOperationException();
-	}
-	
-	
-	@Override
-	public double getPawnsCacheUsagePercent() {
-		throw new UnsupportedOperationException();
-	}
-	
-	
-	@Override
 	public UCIOption[] getSupportedOptions() {
 		UCIOption[] parentOptions = super.getSupportedOptions();
 		

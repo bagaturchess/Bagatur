@@ -12,7 +12,6 @@ import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
-import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.opening.api.OpeningBookFactory;
@@ -71,12 +70,9 @@ public class MemoryConsumers {
 	private SeeMetadata seeMetadata;
 	private OpeningBook openingBook;
 	
-	//private IBinarySemaphoreFactory semaphoreFactory;
-	
 	private List<IEvalCache> evalCache;
 	private List<PawnsEvalCache> pawnsCache;
 	private List<ITTable> tpt;
-	private List<SyzygyTBProbing> gtbs;
 	
 	private IChannel channel;
 	
@@ -155,18 +151,12 @@ public class MemoryConsumers {
 		
 		ChannelManager.getChannel().dump("Loading modules for Endgame Tablebases support ... ");
 		
-		gtbs			 = new Vector<SyzygyTBProbing>();
-		
 		int threadsCount = engineConfiguration.getThreadsCount();
 		
 		if (SyzygyTBProbing.getSingleton() != null) {
 			
 			//SyzygyTBProbing.getSingleton().load("C:/Users/i027638/OneDrive - SAP SE/DATA/OWN/chess/EGTB/syzygy");
 			SyzygyTBProbing.getSingleton().load(engineConfiguration.getTbPath());
-			
-			for (int i=0; i<threadsCount; i++) {
-				gtbs.add(SyzygyTBProbing.getSingleton());
-			}
 			
 			//try {Thread.sleep(10000);} catch (InterruptedException e1) {}
 			ChannelManager.getChannel().dump("Modules for Endgame Tablebases OK. Will try to load Tablebases from => " + engineConfiguration.getTbPath());
@@ -175,10 +165,6 @@ public class MemoryConsumers {
 			//Can't load IA 32-bit .dll on a AMD 64-bit platform
 			//throw new IllegalStateException("egtbprobe dynamic library could not be loaded (or not found)");
 			//ChannelManager.getChannel().dump(GTBProbing_NativeWrapper.getErrorMessage());
-			
-			for (int i=0; i<threadsCount; i++) {
-				gtbs.add(null);
-			}
 		}
 		
 		
@@ -188,11 +174,11 @@ public class MemoryConsumers {
 			ChannelManager.getChannel().dump("Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 					+ " X : " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
 			ChannelManager.getChannel().dump("Pawns Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getPawnsCacheUsagePercent()) + "%");
 			
-			double percents_sum = engineConfiguration.getThreadsCount() * engineConfiguration.getTPTUsagePercent()
-								+ engineConfiguration.getThreadsCount() * engineConfiguration.getEvalCacheUsagePercent()
+			double percents_sum = engineConfiguration.getTPTUsagePercent()
+								+ engineConfiguration.getEvalCacheUsagePercent()
 								+ engineConfiguration.getThreadsCount() * engineConfiguration.getPawnsCacheUsagePercent();
 			
-			if (percents_sum < 0.95 || percents_sum > 1.05) {
+			if (percents_sum < 0.95 || percents_sum > 1.06) {
 				throw new IllegalStateException("Percents sum is not near to 1. It is " + percents_sum);
 			}
 			
@@ -239,13 +225,15 @@ public class MemoryConsumers {
 		pawnsCache		= new Vector<PawnsEvalCache>();
 		tpt 			= new Vector<ITTable>();
 		
+		ITTable ttable = new TTable_Impl2(size_tpt);
+		IEvalCache ecache = new EvalCache_Impl2(size_ec);
 		
 		int threadsCount = engineConfiguration.getThreadsCount();
 		for (int i=0; i<threadsCount; i++) {
 			
-			tpt.add(new TTable_Impl2(size_tpt));
+			tpt.add(ttable);
 			
-			evalCache.add(new EvalCache_Impl2(size_ec));
+			evalCache.add(ecache);
 			
 			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName());
 			pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
@@ -332,11 +320,6 @@ public class MemoryConsumers {
         }
         return 32;
 	}
-	
-	
-	/*public SeeMetadata getSeeMetadata() {
-		return seeMetadata;
-	}*/
 
 
 	public OpeningBook getOpeningBook() {
@@ -358,16 +341,9 @@ public class MemoryConsumers {
 		return pawnsCache;
 	}
 	
-	
-	public List<SyzygyTBProbing> getTBProbing() {
-		return gtbs;
-	}
-	
-	
 	public void clear() {
 		if (tpt != null) tpt.clear();
-		if (pawnsCache != null) pawnsCache.clear();
 		if (evalCache != null) evalCache.clear();
-		if (gtbs != null) gtbs.clear();
+		if (pawnsCache != null) pawnsCache.clear();
 	}
 }
