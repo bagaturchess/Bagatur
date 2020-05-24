@@ -25,12 +25,9 @@ package bagaturchess.search.impl.tpt;
  */
 public interface ITTable {
 
-	public abstract void correctAllDepths(int reduction);
-
-	public abstract void get(long key, ITTEntry entry);
-
-	public abstract void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove);
-	
-	public abstract int getUsage();
+	public void get(long key, ITTEntry entry);
+	public void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove);
+	public void correctAllDepths(int reduction);
+	public int getUsage();
 
 }

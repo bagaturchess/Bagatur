@@ -39,7 +39,6 @@ import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
-import bagaturchess.search.api.FullEvalFlag;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
@@ -201,21 +200,15 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (tpt_depth >= depth) {
 				if (tt_cached.getFlag() == ITTEntry.FLAG_EXACT) {
-					node.leaf = true;
-					node.eval = tt_cached.getEval();
-					node.bestmove = tt_cached.getBestMove();
+					extractFromTT(ply, node, tt_cached, info, isPv);
 					return node.eval;
 				} else {
 					if (tt_cached.getFlag() == ITTEntry.FLAG_LOWER && tt_cached.getEval() >= beta) {
-						node.leaf = true;
-						node.eval = tt_cached.getEval();
-						node.bestmove = tt_cached.getBestMove();
+						extractFromTT(ply, node, tt_cached, info, isPv);
 						return node.eval;
 					}
 					if (tt_cached.getFlag() == ITTEntry.FLAG_UPPER && tt_cached.getEval() <= alpha) {
-						node.leaf = true;
-						node.eval = tt_cached.getEval();
-						node.bestmove = tt_cached.getBestMove();
+						extractFromTT(ply, node, tt_cached, info, isPv);
 						return node.eval;
 					}
 				}
@@ -739,6 +732,51 @@ public class Search_PVS_NWS extends SearchImpl {
 	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv) {
 		int eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
 		return eval;
+	}
+	
+	
+	private boolean extractFromTT(int ply, PVNode result, ITTEntry entry, ISearchInfo info, boolean isPv) {
+		
+		if (entry.isEmpty()) {
+			throw new IllegalStateException("entry.isEmpty()");
+		}
+		
+		result.leaf = true;
+		
+		if (ply > 0 && isDraw()) {
+			result.eval = EvalConstants.SCORE_DRAW;
+			result.bestmove = 0;
+			return true;
+		}
+
+		if (info.getSelDepth() < ply) {
+			info.setSelDepth(ply);
+		}
+		
+		result.eval = entry.getEval();
+		result.bestmove = entry.getBestMove();
+		
+		boolean draw = false;
+		
+		if (isPv) {
+			
+			env.getBitboard().makeMoveForward(result.bestmove);
+			
+			env.getTPT().get(env.getBitboard().getHashKey(), tt_cached);
+			
+			if (!tt_cached.isEmpty()) {
+				draw = extractFromTT(ply + 1, result.child, tt_cached, info, isPv);
+				if (draw) {
+					result.eval = EvalConstants.SCORE_DRAW;
+				} else {
+					result.leaf = false;
+				}
+			}
+			
+			env.getBitboard().makeMoveBackward(result.bestmove);
+		}
+		
+		return draw;
 	}
 	
 	
