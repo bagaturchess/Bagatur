@@ -83,4 +83,10 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 	protected SearchersInfo getSearchersInfo(final int startIteration) {
 		return new SearchersInfo(startIteration, 0.001d); 
 	}
+	
+	
+	@Override
+	protected boolean restartSearchersOnNewDepth() {
+		return false;
+	}
 }

@@ -90,6 +90,17 @@ public class SearchersInfo {
 	}
 	
 	
+	public boolean needRestart(IRootSearch searcher) {
+		
+		SearcherInfo searcherinfo = searchersInfo.get(searcher);
+		if (searcherinfo != null && searcherinfo.getMaxDepth() < cur_depth) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	
 	public ISearchInfo getNewInfoToSendIfPresented() {
 		
 		if (hasDepthInfo(cur_depth + 1)) {
