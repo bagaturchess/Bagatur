@@ -521,7 +521,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, colourToMove, best_eval, alpha_org, beta, best_move, (byte)0);
+		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth) - depth, best_eval, alpha_org, beta, best_move);
 		
 		
 		return best_eval;
@@ -1009,7 +1009,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth), depth, colourToMove, best_eval, alpha_org, beta, best_move, (byte)0);
+		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth) - depth, best_eval, alpha_org, beta, best_move);
 		
 		
 		return best_eval;
@@ -1179,7 +1179,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (best_move != 0) {
-			env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
+			env.getTPT().put(hashkey, 0, best_eval, alpha_org, beta, best_move);
 		}
 		
 		return best_eval;
@@ -1335,7 +1335,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (best_move != 0) {
-			env.getTPT().put(hashkey, 0, 0, env.getBitboard().getColourToMove(), best_eval, alpha_org, beta, best_move, (byte)0);
+			env.getTPT().put(hashkey, 0, best_eval, alpha_org, beta, best_move);
 		}
 		
 		return best_eval;

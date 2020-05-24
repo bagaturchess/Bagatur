@@ -51,7 +51,7 @@ public class TTable_Impl2 implements ITTable {
 		
 		int POWER_2_ENTRIES = (int) (Math.log(sizeInMB) / Math.log(2) + 16);
 		keyShifts = 64 - POWER_2_ENTRIES;
-		maxEntries = (int) Util.POWER_LOOKUP[EngineConstants.POWER_2_TT_ENTRIES] + 3;
+		maxEntries = (int) Util.POWER_LOOKUP[POWER_2_ENTRIES] + 3;
 
 		keys = null;
 		values = null;
@@ -85,12 +85,14 @@ public class TTable_Impl2 implements ITTable {
 	
 	
 	@Override
-	public void put(long hashkey,
-			int _smaxdepth, int _sdepth, 
-			int _colour,
-			int _eval, int _alpha, int _beta, int _bestmove,
-			byte movenumber) {
-
+	public void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove) {
+		int flag = ITTEntry.FLAG_EXACT;
+		if (eval >= beta) {
+			flag = ITTEntry.FLAG_LOWER;
+		} else if (eval <= alpha) {
+			flag = ITTEntry.FLAG_UPPER;
+		}
+		addValue(hashkey, eval, depth, flag, bestmove);
 	}
 
 	
@@ -120,7 +122,7 @@ public class TTable_Impl2 implements ITTable {
 	}
 	
 	
-	private void addValue(final long key, int score, final int ply, final int depth, final int flag, final int move) {
+	private void addValue(final long key, int score, final int depth, final int flag, final int move) {
 
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(depth >= 0);

@@ -91,11 +91,7 @@ public class TTable_Impl1 extends LRUMapLongObject<TTable_Impl1.TPTEntry> implem
 	 * @see bagaturchess.search.impl.tpt.ITTable#put(long, int, int, int, int, int, int, int, byte)
 	 */
 	@Override
-	public void put(long hashkey,
-			int _smaxdepth, int _sdepth, 
-			int _colour,
-			int _eval, int _alpha, int _beta, int _bestmove,
-			byte movenumber) {
+	public void put(long hashkey, int _depth, int _eval, int _alpha, int _beta, int _bestmove) {
 		
 		if (_bestmove == 0) {
 			throw new IllegalStateException();
@@ -117,10 +113,10 @@ public class TTable_Impl1 extends LRUMapLongObject<TTable_Impl1.TPTEntry> implem
 		
 		TPTEntry entry = super.getAndUpdateLRU(hashkey);
 		if (entry != null) {
-			entry.update(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, movenumber);
+			entry.update(_depth, _eval, _alpha, _beta, _bestmove);
 		} else {
 			entry = associateEntry(hashkey);
-			entry.init(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, movenumber);
+			entry.init(_depth, _eval, _alpha, _beta, _bestmove);
 		}
 	}
 	
@@ -147,10 +143,9 @@ public class TTable_Impl1 extends LRUMapLongObject<TTable_Impl1.TPTEntry> implem
 		}
 		
 		
-		public TPTEntry(int _smaxdepth, int _sdepth, int _colour,
-				int _eval, int _alpha, int _beta, int _bestmove) {
+		public TPTEntry(int _depth, int _eval, int _alpha, int _beta, int _bestmove) {
 			
-			init(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, (byte)0);
+			init(_depth, _eval, _alpha, _beta, _bestmove);
 		}
 		
 		
@@ -167,10 +162,9 @@ public class TTable_Impl1 extends LRUMapLongObject<TTable_Impl1.TPTEntry> implem
 		}
 		
 		
-		public void init(int _smaxdepth, int _sdepth, int _colour, 
-				int _eval, int _alpha, int _beta, int _bestmove, byte _movenumber) {
+		public void init(int _depth, int _eval, int _alpha, int _beta, int _bestmove) {
 			
-			depth = (byte) (_smaxdepth - _sdepth);
+			depth = (byte) _depth;
 			
 			if (_eval > _alpha && _eval < _beta) {
 				lower = _eval;
@@ -194,10 +188,7 @@ public class TTable_Impl1 extends LRUMapLongObject<TTable_Impl1.TPTEntry> implem
 			}		 
 		}
 		
-		public void update(int _smaxdepth, int _sdepth, int _colour,
-				int _eval, int _alpha, int _beta, int _bestmove, byte _movenumber) {
-			
-			byte _depth = (byte) (_smaxdepth - _sdepth);
+		public void update(int _depth, int _eval, int _alpha, int _beta, int _bestmove) {
 			
 			/*if (true) {
 				init(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, _movenumber);
@@ -206,7 +197,7 @@ public class TTable_Impl1 extends LRUMapLongObject<TTable_Impl1.TPTEntry> implem
 			
 			if (_depth > depth) {
 				
-				init(_smaxdepth, _sdepth, _colour, _eval, _alpha, _beta, _bestmove, _movenumber);
+				init(_depth, _eval, _alpha, _beta, _bestmove);
 				
 			} else if (_depth == depth) {		
 				
