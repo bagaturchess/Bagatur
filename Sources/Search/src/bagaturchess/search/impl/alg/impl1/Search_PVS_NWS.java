@@ -216,8 +216,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		int score;
-		
 		if (ply > 1
     	    	&& depth >= 7
     			&& SyzygyTBProbing.getSingleton() != null
@@ -287,14 +285,14 @@ public class Search_PVS_NWS extends SearchImpl {
 			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
 			
-			/*if (EngineConstants.USE_TT_SCORE_AS_EVAL && ttValue != 0) {
-				if (TTUtil.getFlag(ttValue) == TTUtil.FLAG_EXACT
-						|| (TTUtil.getFlag(ttValue) == TTUtil.FLAG_UPPER && score < eval)
-						|| (TTUtil.getFlag(ttValue) == TTUtil.FLAG_LOWER && score > eval)
+			if (EngineConstants.USE_TT_SCORE_AS_EVAL && !tt_cached.isEmpty()) {
+				if (tt_cached.getFlag() == ITTEntry.FLAG_EXACT
+						|| (tt_cached.getFlag() == ITTEntry.FLAG_UPPER && tt_cached.getEval() < eval)
+						|| (tt_cached.getFlag() == ITTEntry.FLAG_LOWER && tt_cached.getEval() > eval)
 					) {
-					eval = score;
+					eval = tt_cached.getEval();
 				}
-			}*/
+			}
 			
 			
 			if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < STATIC_NULLMOVE_MARGIN.length) {
@@ -320,6 +318,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}*/
 			
 			
+			int score;
 			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < EvalConstants.SCORE_MATE_BOUND) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
 					score = qsearch(evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply, isPv);
@@ -496,7 +495,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				cb.doMove(move);
 				movesPerformed++;
 				
-				score = alpha + 1;
+				int score = alpha + 1;
 
 				if (EngineConstants.ASSERT) {
 					cb.changeSideToMove();
