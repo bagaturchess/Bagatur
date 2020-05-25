@@ -113,7 +113,7 @@ public class MTDParallelSearch_ProcessesImpl extends MTDParallelSearch_BaseImpl 
 	
 	@Override
 	// All threads have to finish the depth
-	protected SearchersInfo getSearchersInfo(final int startIteration) {
+	protected SearchersInfo createSearchersInfo(final int startIteration) {
 		return new SearchersInfo(startIteration, 1d);
 	}
 	

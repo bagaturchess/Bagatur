@@ -80,7 +80,7 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 	
 	@Override
 	// Only one thread is enough to finish the depth
-	protected SearchersInfo getSearchersInfo(final int startIteration) {
+	protected SearchersInfo createSearchersInfo(final int startIteration) {
 		return new SearchersInfo(startIteration, 0.001d); 
 	}
 	

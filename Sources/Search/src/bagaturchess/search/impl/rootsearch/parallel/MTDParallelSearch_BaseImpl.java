@@ -100,7 +100,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 			final IFinishCallback multiPVCallback, Go go, boolean dont_wrap_mediator);
 	
 	
-	protected abstract SearchersInfo getSearchersInfo(final int startIteration);
+	protected abstract SearchersInfo createSearchersInfo(final int startIteration);
 	
 	
 	protected abstract boolean restartSearchersOnNewDepth();
@@ -294,7 +294,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					long start_time = System.currentTimeMillis();
 					
 
-					SearchersInfo searchersInfo = getSearchersInfo(startIteration);
+					SearchersInfo searchersInfo = createSearchersInfo(startIteration);
 					
 					ISearchInfo lastSendInfo = null;
 					
