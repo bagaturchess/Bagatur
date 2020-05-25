@@ -611,20 +611,22 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	public void shutDown() {
 		try {
 			
-			executor.shutdownNow();
-			executor_start_stop.shutdownNow();
+			if (executor != null) executor.shutdownNow();
+			if (executor_start_stop != null) executor_start_stop.shutdownNow();
 			
 			executor = null;
 			executor_start_stop = null;
 			
-			for (int i = 0; i < searchers_ready.size(); i++) {
-				searchers_ready.get(i).shutDown();
+			if (searchers_ready != null) {
+				for (int i = 0; i < searchers_ready.size(); i++) {
+					searchers_ready.get(i).shutDown();
+				}
 			}
 			
 			searchers_ready = null;
 			
 		} catch(Throwable t) {
-			//Do nothing
+			ChannelManager.getChannel().dump(t);
 		}
 	}
 
