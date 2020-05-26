@@ -746,6 +746,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			throw new IllegalStateException("entry.isEmpty()");
 		}
 		
+		if (result == null) {
+			return false;
+		}
+		
 		result.leaf = true;
 		
 		if (ply > 0 && isDraw()) {
