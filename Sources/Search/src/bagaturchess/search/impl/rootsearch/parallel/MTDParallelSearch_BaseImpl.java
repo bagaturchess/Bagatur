@@ -621,9 +621,18 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 				for (int i = 0; i < searchers_ready.size(); i++) {
 					searchers_ready.get(i).shutDown();
 				}
+				
+				searchers_ready = null;
 			}
 			
-			searchers_ready = null;
+			if (searchers_notready != null) {
+				for (int i = 0; i < searchers_notready.size(); i++) {
+					searchers_notready.get(i).shutDown();
+				}
+				
+				searchers_notready = null;
+			}
+			
 			
 		} catch(Throwable t) {
 			ChannelManager.getChannel().dump(t);
