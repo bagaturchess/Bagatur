@@ -450,43 +450,67 @@ public final class ChessBoard {
 		return !isInCheck;
 
 	}
-
-	public boolean isValidQuietMove(final int move) {
+	
+	
+	public boolean isValidMove(final int move) {
 
 		// check piece at from square
 		final int fromIndex = MoveUtil.getFromIndex(move);
-		if ((pieces[colorToMove][MoveUtil.getSourcePieceIndex(move)] & Util.POWER_LOOKUP[fromIndex]) == 0) {
+		final long fromSquare = Util.POWER_LOOKUP[fromIndex];
+		if ((pieces[colorToMove][MoveUtil.getSourcePieceIndex(move)] & fromSquare) == 0) {
 			return false;
 		}
 
-		// no piece should be at to square
+		// check piece at to square
 		final int toIndex = MoveUtil.getToIndex(move);
-		if (pieceIndexes[toIndex] != EMPTY) {
-			return false;
+		final long toSquare = Util.POWER_LOOKUP[toIndex];
+		final int attackedPieceIndex = MoveUtil.getAttackedPieceIndex(move);
+		if (attackedPieceIndex == 0) {
+			if (pieceIndexes[toIndex] != EMPTY) {
+				return false;
+			}
+		} else {
+			if ((pieces[colorToMoveInverse][attackedPieceIndex] & toSquare) == 0 && !MoveUtil.isEPMove(move)) {
+				return false;
+			}
 		}
 
 		// check if move is possible
 		switch (MoveUtil.getSourcePieceIndex(move)) {
 		case PAWN:
-			// 2-move
-			if (Math.abs(fromIndex - toIndex) > 8 && (allPieces & Util.POWER_LOOKUP[fromIndex + ChessConstants.COLOR_FACTOR_8[colorToMove]]) != 0) {
-				return false;
+			if (MoveUtil.isEPMove(move)) {
+				if (toIndex != epIndex) {
+					return false;
+				}
+				return isLegalEPMove(fromIndex);
+			} else {
+				if (colorToMove == WHITE) {
+					if (fromIndex > toIndex) {
+						return false;
+					}
+					// 2-move
+					if (toIndex - fromIndex == 16 && (allPieces & Util.POWER_LOOKUP[fromIndex + 8]) != 0) {
+						return false;
+					}
+				} else {
+					if (fromIndex < toIndex) {
+						return false;
+					}
+					// 2-move
+					if (fromIndex - toIndex == 16 && (allPieces & Util.POWER_LOOKUP[fromIndex - 8]) != 0) {
+						return false;
+					}
+				}
 			}
 			break;
 		case NIGHT:
 			break;
 		case BISHOP:
-			if ((MagicUtil.getBishopMoves(fromIndex, allPieces) & Util.POWER_LOOKUP[toIndex]) == 0) {
-				return false;
-			}
-			break;
+			// fall-through
 		case ROOK:
-			if ((MagicUtil.getRookMoves(fromIndex, allPieces) & Util.POWER_LOOKUP[toIndex]) == 0) {
-				return false;
-			}
-			break;
+			// fall-through
 		case QUEEN:
-			if ((MagicUtil.getQueenMoves(fromIndex, allPieces) & Util.POWER_LOOKUP[toIndex]) == 0) {
+			if ((ChessConstants.IN_BETWEEN[fromIndex][toIndex] & allPieces) != 0) {
 				return false;
 			}
 			break;
@@ -501,45 +525,42 @@ public final class ChessBoard {
 				}
 				return false;
 			}
-			return true;
-
+			return isLegalKingMove(move);
 		}
 
-		if ((Util.POWER_LOOKUP[fromIndex] & pinnedPieces) == 0) {
-			return true;
-		}
-		return (ChessConstants.PINNED_MOVEMENT[fromIndex][kingIndex[colorToMove]] & Util.POWER_LOOKUP[toIndex]) != 0;
-	}
-
-	/**
-	 * Method for testing the validity of tt-moves. This test is most of the time disabled.
-	 */
-	public boolean isValidMove(int move) {
-		if (MoveUtil.getAttackedPieceIndex(move) == 0 && !MoveUtil.isPromotion(move)) {
-			return isValidQuietMove(move);
+		if ((fromSquare & pinnedPieces) != 0) {
+			if ((ChessConstants.PINNED_MOVEMENT[fromIndex][kingIndex[colorToMove]] & toSquare) == 0) {
+				return false;
+			}
 		}
 
-		if (MoveUtil.isPromotion(move) || MoveUtil.isCastlingMove(move) || MoveUtil.isEPMove(move)) {
-			// TODO
-			return true;
+		if (checkingPieces != 0) {
+			if (attackedPieceIndex == 0) {
+				return isLegalNonKingMove(move);
+			} else {
+				if (Long.bitCount(checkingPieces) == 2) {
+					return false;
+				}
+				return (toSquare & checkingPieces) != 0;
+			}
 		}
 
-		// check piece at from-position
-		final int fromIndex = MoveUtil.getFromIndex(move);
-		if ((pieces[colorToMove][MoveUtil.getSourcePieceIndex(move)] & Util.POWER_LOOKUP[fromIndex]) == 0) {
-			return false;
-		}
-
-		// same piece should be at to-position
-		final int toIndex = MoveUtil.getToIndex(move);
-		if ((pieces[colorToMoveInverse][MoveUtil.getAttackedPieceIndex(move)] & Util.POWER_LOOKUP[toIndex]) == 0) {
-			return false;
-		}
-
-		// TODO
 		return true;
 	}
-
+	
+	
+	private boolean isLegalKingMove(final int move) {
+		return !CheckUtil.isInCheckIncludingKing(MoveUtil.getToIndex(move), colorToMove, pieces[colorToMoveInverse],
+				allPieces ^ Util.POWER_LOOKUP[MoveUtil.getFromIndex(move)]);
+	}
+	
+	
+	private boolean isLegalNonKingMove(final int move) {
+		return !CheckUtil.isInCheck(kingIndex[colorToMove], colorToMove, pieces[colorToMoveInverse],
+				allPieces ^ Util.POWER_LOOKUP[MoveUtil.getFromIndex(move)] ^ Util.POWER_LOOKUP[MoveUtil.getToIndex(move)]);
+	}
+	
+	
 	public boolean isRepetition(final int move) {
 
 		if (!EngineConstants.ENABLE_REPETITION_TABLE) {

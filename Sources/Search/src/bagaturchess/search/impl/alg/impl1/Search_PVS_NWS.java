@@ -378,7 +378,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getTPT().get(cb.zobristKey, tt_cached);
 				if (!tt_cached.isEmpty()) {
 					ttMove = tt_cached.getBestMove();
-					moveGen.addMove(ttMove);
+					if (cb.isValidMove(ttMove)) {
+						moveGen.addMove(ttMove);
+					} else {
+						ttMove = 0;
+					}
 				}
 				break;
 			case PHASE_ATTACKING_GOOD:
@@ -388,7 +392,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				break;
 			case PHASE_KILLER_1:
 				killer1Move = moveGen.getKiller1(ply);
-				if (killer1Move != 0 && killer1Move != ttMove && cb.isValidQuietMove(killer1Move) && cb.isLegal(killer1Move)) {
+				if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move) && cb.isLegal(killer1Move)) {
 					moveGen.addMove(killer1Move);
 					break;
 				} else {
@@ -396,7 +400,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			case PHASE_KILLER_2:
 				killer2Move = moveGen.getKiller2(ply);
-				if (killer2Move != 0 && killer2Move != ttMove && cb.isValidQuietMove(killer2Move) && cb.isLegal(killer2Move)) {
+				if (killer2Move != 0 && killer2Move != ttMove && cb.isValidMove(killer2Move) && cb.isLegal(killer2Move)) {
 					moveGen.addMove(killer2Move);
 					break;
 				} else {
@@ -404,7 +408,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			case PHASE_COUNTER:
 				counterMove = moveGen.getCounter(cb.colorToMove, parentMove);
-				if (counterMove != 0 && counterMove != ttMove && counterMove != killer1Move && counterMove != killer2Move && cb.isValidQuietMove(counterMove)
+				if (counterMove != 0 && counterMove != ttMove && counterMove != killer1Move && counterMove != killer2Move && cb.isValidMove(counterMove)
 						&& cb.isLegal(counterMove)) {
 					moveGen.addMove(counterMove);
 					break;
@@ -650,8 +654,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				case PHASE_TT:
 					if (!tt_cached.isEmpty()) {
 						int ttMove = tt_cached.getBestMove();
-						if (env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
-							moveGen.addMove(ttMove);
+						if (cb.isValidMove(ttMove)) {
+							if (env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
+								moveGen.addMove(ttMove);
+							}
 						}
 					}
 					break;

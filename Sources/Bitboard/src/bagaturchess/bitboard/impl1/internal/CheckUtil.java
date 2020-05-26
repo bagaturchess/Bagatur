@@ -70,4 +70,15 @@ public final class CheckUtil {
 				| enemyPieces[KING] & StaticMoves.KING_MOVES[kingIndex]
 			)!= 0;
 	}
+	
+	public static boolean isInCheckIncludingKing(final int kingIndex, final int colorToMove, final long[] enemyPieces, final long allPieces) {
+		
+		// put 'super-piece' in kings position
+		return (enemyPieces[NIGHT] & StaticMoves.KNIGHT_MOVES[kingIndex]
+				| (enemyPieces[ROOK] | enemyPieces[QUEEN]) & MagicUtil.getRookMoves(kingIndex, allPieces)
+				| (enemyPieces[BISHOP] | enemyPieces[QUEEN]) & MagicUtil.getBishopMoves(kingIndex, allPieces) 
+				| enemyPieces[PAWN] & StaticMoves.PAWN_ATTACKS[colorToMove][kingIndex]
+				| enemyPieces[KING] & StaticMoves.KING_MOVES[kingIndex]
+			)!= 0;
+	}
 }
