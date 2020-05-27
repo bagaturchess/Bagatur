@@ -35,7 +35,7 @@ public class MemoryConsumers {
 	
 	private static final int SIZE_MIN_ENTRIES_MULTIPLIER				= 111;
 	private static final int SIZE_MIN_ENTRIES_TPT						= 8;
-	private static final int SIZE_MIN_ENTRIES_EC						= 8;
+	private static final int SIZE_MIN_ENTRIES_EC						= 4;
 	private static final int SIZE_MIN_ENTRIES_PEC						= 1 * SIZE_MIN_ENTRIES_MULTIPLIER;
 	
 	
@@ -96,11 +96,14 @@ public class MemoryConsumers {
 		 * The selection bellow is optimized for long games.
 		 */
 		
-		//0.29 for short games (e.g. 1/1), 0.69 for long games (e.g. 40/40)
-		double memoryUsagePercent = (engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.69 : 0.29;
-		
-		if (MIN_MEMORY_BUFFER == 0) MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;//Set only if not set statically
-		if (MEMORY_USAGE_PERCENT == 0) MEMORY_USAGE_PERCENT = memoryUsagePercent;//Set only if not set statically
+		if (MIN_MEMORY_BUFFER == 0) {
+			MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;//Set only if not set statically
+		}
+		if (MEMORY_USAGE_PERCENT == 0) {
+			//0.29 for short games (e.g. 1/1), 0.69 for long games (e.g. 40/40)
+			double memoryUsagePercent = 1;//(engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.69 : 0.29;
+			MEMORY_USAGE_PERCENT = memoryUsagePercent;//Set only if not set statically
+		}
 		
 		
 		//ChannelManager.getChannel().dump(new Exception());
@@ -151,7 +154,7 @@ public class MemoryConsumers {
 		
 		ChannelManager.getChannel().dump("Loading modules for Endgame Tablebases support ... ");
 		
-		int threadsCount = engineConfiguration.getThreadsCount();
+		//int threadsCount = engineConfiguration.getThreadsCount();
 		
 		if (SyzygyTBProbing.getSingleton() != null) {
 			
@@ -170,9 +173,9 @@ public class MemoryConsumers {
 		
 		if (engineConfiguration.initCaches()) {
 			ChannelManager.getChannel().dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
-			ChannelManager.getChannel().dump("Transposition Table usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
-			ChannelManager.getChannel().dump("Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 					+ " X : " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
-			ChannelManager.getChannel().dump("Pawns Eval Cache usage percent from the free memory " + engineConfiguration.getThreadsCount() 			+ " X : " + (100 * engineConfiguration.getPawnsCacheUsagePercent()) + "%");
+			ChannelManager.getChannel().dump("Transposition Table usage percent from the free memory " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
+			ChannelManager.getChannel().dump("Eval Cache usage percent from the free memory " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
+			ChannelManager.getChannel().dump("Pawns Eval Cache usage percent from the free memory " + (100 * engineConfiguration.getPawnsCacheUsagePercent()) + "%");
 			
 			double percents_sum = engineConfiguration.getTPTUsagePercent()
 								+ engineConfiguration.getEvalCacheUsagePercent()
@@ -203,15 +206,15 @@ public class MemoryConsumers {
 		int test_size2 = Math.min(256, availableMemory_in_MB) * 100;
 		
 		
-		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, 256);
-		ChannelManager.getChannel().dump("Transposition Table size is " + size_tpt);
+		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, getPowerOf2SizeInMegabytes(engineConfiguration.getTPTUsagePercent(), availableMemory_in_MB));
+		ChannelManager.getChannel().dump("Transposition Table size is " + size_tpt + "MB"); 
 				
-		int size_ec = Math.max(SIZE_MIN_ENTRIES_EC, 256);
-		ChannelManager.getChannel().dump("Eval Cache size is " + size_ec);
+		int size_ec = Math.max(SIZE_MIN_ENTRIES_EC, getPowerOf2SizeInMegabytes(engineConfiguration.getEvalCacheUsagePercent(), availableMemory_in_MB));
+		ChannelManager.getChannel().dump("Eval Cache size is " + size_ec + "MB");
 		
 		int size_pc = Math.max(SIZE_MIN_ENTRIES_PEC, getPawnsEvalCacheSize(availableMemory, engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName(),
 																										Math.max(test_size2, SIZE_MIN_ENTRIES_PEC)));
-		ChannelManager.getChannel().dump("Pawns Eval Cache size is " + size_pc);
+		ChannelManager.getChannel().dump("Pawns Eval Cache size is " + size_pc + " entries.");
 		
 		/*int size_gtb_out = 0;
 		if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
@@ -238,6 +241,11 @@ public class MemoryConsumers {
 			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName());
 			pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
 		}		
+	}
+
+	private int getPowerOf2SizeInMegabytes(double percent, int availableMemory_in_MB) {
+		int size = (int) Math.pow(2, (int)(Math.log(percent * availableMemory_in_MB) / Math.log(2)));
+		return size;
 	}
 	
 	
