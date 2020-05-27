@@ -101,7 +101,7 @@ public class MemoryConsumers {
 		}
 		if (MEMORY_USAGE_PERCENT == 0) {
 			//0.29 for short games (e.g. 1/1), 0.69 for long games (e.g. 40/40)
-			double memoryUsagePercent = 1;//(engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.69 : 0.29;
+			double memoryUsagePercent = 0.75;//(engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.69 : 0.29;
 			MEMORY_USAGE_PERCENT = memoryUsagePercent;//Set only if not set statically
 		}
 		
@@ -212,8 +212,7 @@ public class MemoryConsumers {
 		int size_ec = Math.max(SIZE_MIN_ENTRIES_EC, getPowerOf2SizeInMegabytes(engineConfiguration.getEvalCacheUsagePercent(), availableMemory_in_MB));
 		ChannelManager.getChannel().dump("Eval Cache size is " + size_ec + "MB");
 		
-		int size_pc = Math.max(SIZE_MIN_ENTRIES_PEC, getPawnsEvalCacheSize(availableMemory, engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName(),
-																										Math.max(test_size2, SIZE_MIN_ENTRIES_PEC)));
+		int size_pc = SIZE_MIN_ENTRIES_PEC;
 		ChannelManager.getChannel().dump("Pawns Eval Cache size is " + size_pc + " entries.");
 		
 		/*int size_gtb_out = 0;
@@ -249,60 +248,13 @@ public class MemoryConsumers {
 	}
 	
 	
-	private int getPawnsEvalCacheSize(long availableMemory, String pawnsCacheName, int test_size) {
-		int availableMemory_in_MB = (int) (availableMemory / (1024 * 1024));
-		if (availableMemory_in_MB < 1) {
-			//throw new IllegalStateException("Not enough memory for initializing Pawns Eval Cache. Please increase the -Xmx option of Java VM");
-			availableMemory_in_MB = 1;
-		}
-		
-		System.gc();
-		
-		int memory_before = getUsedMemory();
-		DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(pawnsCacheName);
-		PawnsEvalCache test_pc = new PawnsEvalCache(pawnsCacheFactory, test_size, true, null);
-		int size = getEntrySize(availableMemory, engineConfiguration.getPawnsCacheUsagePercent(), test_size, memory_before);
-		test_pc.clear();
-		return size;
-	}
-	
-	
-	private int getEntrySize(long availableMemory, double usagePercent, int test_size, int memory_before) {
-		int memory_after = getUsedMemory();
-		int size_per_entry = (memory_after - memory_before) / test_size;
-		int size = (int) ((usagePercent * availableMemory) / size_per_entry);
-		return size;
-	}
-	
-	
-	private int getAvailableMemory() {
+	private long getAvailableMemory() {
 		
 		System.gc();
 		//System.gc();
 		//System.gc();
 		
-		int max_mem = (int) Runtime.getRuntime().maxMemory();
-		
-		int total_mem = (int) Runtime.getRuntime().totalMemory();
-		int free_mem = (int) Runtime.getRuntime().freeMemory();
-		int used_mem = total_mem - free_mem;
-		
-		int available_mem = max_mem - used_mem;
-		
-		return available_mem - getStaticMemory();
-	}
-	
-	
-	private static int getUsedMemory() {
-		
-		System.gc();
-		//System.gc();
-		//System.gc();
-		
-		int total_mem = (int) Runtime.getRuntime().totalMemory();
-		int free_mem = (int) Runtime.getRuntime().freeMemory();
-		int used_mem = total_mem - free_mem;
-		return used_mem + getStaticMemory();
+		return Runtime.getRuntime().maxMemory() - getStaticMemory();
 	}
 	
 	
