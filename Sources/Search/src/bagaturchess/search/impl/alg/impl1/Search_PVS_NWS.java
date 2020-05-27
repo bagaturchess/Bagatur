@@ -195,7 +195,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		env.getTPT().get(cb.zobristKey, tt_cached);
-		if (!tt_cached.isEmpty()) {
+		if (!tt_cached.isEmpty() && cb.isValidMove(tt_cached.getBestMove())) {
+			
 			int tpt_depth = tt_cached.getDepth();
 			
 			if (tpt_depth >= depth) {
@@ -767,7 +768,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		boolean draw = false;
 		
-		if (isPv) {
+		if (isPv && ((BoardImpl) env.getBitboard()).getChessBoard().isValidMove(result.bestmove)) {
 			
 			env.getBitboard().makeMoveForward(result.bestmove);
 			
