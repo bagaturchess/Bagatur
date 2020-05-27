@@ -11,8 +11,8 @@ export JARS_PATH=".:${BIN_PATH}BagaturBoard.jar:${BIN_PATH}BagaturOpening.jar:${
 
 
 # Sets the memory (in megabytes) for the WHOLE java process.
-# Only one part of this memory (up to 35%) will be used for Transposition Table.
-export PROCESS_MEMORY=4096M
+# Only one part of this memory (up to 65%) will be used for Transposition Table.
+export PROCESS_MEMORY=8192M
 
 export ARGS=bagaturchess.engines.cfg.base.UCIConfig_BaseImpl
 export ARGS="${ARGS} bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove"
