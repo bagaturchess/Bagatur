@@ -15,13 +15,13 @@ set JARS_PATH=%BIN_PATH%egtbprobe.jar;%BIN_PATH%BagaturBoard.jar;%BIN_PATH%Bagat
 
 REM Sets the memory (in megabytes) for the WHOLE java process.
 REM Only one part of this memory (up to 35%) will be used for Transposition Table.
-set PROCESS_MEMORY=1024M
+set PROCESS_MEMORY=4096M
 
 set ARGS=bagaturchess.engines.cfg.base.UCIConfig_BaseImpl
 set ARGS=%ARGS% bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove
 set ARGS=%ARGS% bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl
-set ARGS=%ARGS% bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ProcessesImpl
-set ARGS=%ARGS% bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP
+set ARGS=%ARGS% bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImpl
+set ARGS=%ARGS% bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP_Threads
 set ARGS=%ARGS% bagaturchess.search.impl.alg.impl1.Search_PVS_NWS
 set ARGS=%ARGS% bagaturchess.engines.cfg.base.SearchConfigImpl_AB
 set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20

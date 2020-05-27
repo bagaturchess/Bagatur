@@ -12,13 +12,13 @@ export JARS_PATH=".:${BIN_PATH}BagaturBoard.jar:${BIN_PATH}BagaturOpening.jar:${
 
 # Sets the memory (in megabytes) for the WHOLE java process.
 # Only one part of this memory (up to 35%) will be used for Transposition Table.
-export PROCESS_MEMORY=1024M
+export PROCESS_MEMORY=4096M
 
 export ARGS=bagaturchess.engines.cfg.base.UCIConfig_BaseImpl
 export ARGS="${ARGS} bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove"
 export ARGS="${ARGS} bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl"
-export ARGS="${ARGS} bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ProcessesImpl"
-export ARGS="${ARGS} bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP"
+export ARGS="${ARGS} bagaturchess.search.impl.rootsearch.parallel.MTDParallelSearch_ThreadsImpl"
+export ARGS="${ARGS} bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP_Threads"
 export ARGS="${ARGS} bagaturchess.search.impl.alg.impl1.Search_PVS_NWS"
 export ARGS="${ARGS} bagaturchess.engines.cfg.base.SearchConfigImpl_AB"
 export ARGS="${ARGS} bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20"
