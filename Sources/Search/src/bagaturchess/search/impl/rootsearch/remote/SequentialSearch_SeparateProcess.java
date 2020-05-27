@@ -103,11 +103,6 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			options.add("setoption name OwnBook value false");//The separate process should not use openning book moves, because they have to be already moved by the master process.
 			options.add("setoption name Ponder value false");
 			//The UCI options of the slave engine should be set as for the master engine, especially the UCI option for Memory Optimizations.
-			if (getRootSearchConfig().getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_1_1) {
-				options.add("setoption name Time Control Optimizations value for 1/1");
-			} else if (getRootSearchConfig().getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) { 
-				options.add("setoption name Time Control Optimizations value for 40/40");
-			}
 			options.add("setoption name SyzygyPath value " + getRootSearchConfig().getTbPath());
 			
 			//options.add("setoption name Openning Mode value random intermediate");

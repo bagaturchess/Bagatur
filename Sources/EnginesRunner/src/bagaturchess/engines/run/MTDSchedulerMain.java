@@ -31,7 +31,7 @@ import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
-import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP;
+import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP_Processes;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP_Threads;
 import bagaturchess.engines.cfg.base.TimeConfigImpl;
 import bagaturchess.search.api.IEvaluator;

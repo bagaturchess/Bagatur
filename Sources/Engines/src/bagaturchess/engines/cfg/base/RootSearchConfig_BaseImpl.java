@@ -12,8 +12,6 @@ import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.api.IUCIOptionsRegistry;
 import bagaturchess.uci.impl.commands.options.UCIOption;
-import bagaturchess.uci.impl.commands.options.UCIOptionCombo;
-import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Double;
 import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Integer;
 import bagaturchess.uci.impl.commands.options.UCIOptionString;
 
@@ -28,15 +26,9 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	private String DEFAULT_TbPath = (new File(".")).getAbsolutePath() + File.separatorChar + "data" + File.separatorChar + "egtb";
 	
-	private String DEFAULT_timeControlOptimization 	= "for 40/40";
-	private String timeControlOptimization_1 		= "for 1/1";
-	
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionSpin_Integer("MultiPV", new Integer(1), "type spin default 1 min 1 max 100"),
 			new UCIOptionString("SyzygyPath", DEFAULT_TbPath, "type string default " + DEFAULT_TbPath),
-			new UCIOptionCombo("Time Control Optimizations",
-					DEFAULT_timeControlOptimization,
-					"type combo default " + DEFAULT_timeControlOptimization + " var " + DEFAULT_timeControlOptimization + " var " + timeControlOptimization_1),
 			//new UCIOptionSpin_Integer("Hidden Depth", 0, "type spin default 0 min 0 max 10"),
 	};
 	
@@ -51,8 +43,6 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private String TbPath = DEFAULT_TbPath;
 	
 	private int hiddenDepth = 0;
-	
-	private int timeControlOptimizationType = TIME_CONTROL_OPTIMIZATION_TYPE_40_40;
 	
 	
 	public RootSearchConfig_BaseImpl(String[] args) {
@@ -234,20 +224,6 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 			TbPath = (String) option.getValue();
 			return true;
 			
-		} else if ("Time Control Optimizations".equals(option.getName())) {
-				
-				if (((String) option.getValue()).equals(timeControlOptimization_1)) {
-					timeControlOptimizationType = TIME_CONTROL_OPTIMIZATION_TYPE_1_1;
-					
-				} else if (((String) option.getValue()).equals(DEFAULT_timeControlOptimization)) {
-					timeControlOptimizationType = TIME_CONTROL_OPTIMIZATION_TYPE_40_40;
-					
-				} else {
-					throw new IllegalStateException("Openning Mode set to illegal value = " + option.getValue());
-				}
-				
-				return true;
-				
 		} else if ("Hidden Depth".equals(option.getName())) {
 			hiddenDepth = (Integer) option.getValue();
 			return true;
@@ -304,11 +280,5 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	@Override
 	public boolean initCaches() {
 		return true;
-	}
-	
-	
-	@Override
-	public int getTimeControlOptimizationType() {
-		return timeControlOptimizationType;
 	}
 }
