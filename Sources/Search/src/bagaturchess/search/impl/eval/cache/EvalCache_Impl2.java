@@ -35,7 +35,8 @@ public class EvalCache_Impl2 implements IEvalCache {
 	
 	private long[] keys;
 	
-	private long usageCounter;
+	private long counter_tries;
+	private long counter_hits;
 	
 	
 	public EvalCache_Impl2(int sizeInMB) {
@@ -46,13 +47,13 @@ public class EvalCache_Impl2 implements IEvalCache {
 		maxEntries = (int) Util.POWER_LOOKUP[POWER_2_ENTRIES];
 		
 		keys = new long[2 * maxEntries];
-		
-		usageCounter = 0;
 	}
 	
 	
 	@Override
 	public void get(long key, IEvalEntry entry) {
+		
+		counter_tries++;
 		
 		entry.setIsEmpty(true);
 		
@@ -68,13 +69,12 @@ public class EvalCache_Impl2 implements IEvalCache {
 	@Override
 	public void put(long hashkey, int level, double eval) {
 		addValue(hashkey, (int) eval);
-		usageCounter++;
 	}
 	
 	
 	@Override
 	public int getHitRate() {
-		return (int) (usageCounter * 1000 / maxEntries);
+		return (int) (counter_hits * 100 / counter_tries);
 	}
 	
 	
@@ -89,6 +89,7 @@ public class EvalCache_Impl2 implements IEvalCache {
 		final long score = keys[index + 1];
 		if (storedKey == keys[index]) {//Optimistic read locking
 			if ((storedKey ^ score) == key) {
+				counter_hits++;
 				return (int) score;
 			}
 		}
