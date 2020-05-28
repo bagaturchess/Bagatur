@@ -112,7 +112,7 @@ public class TournamentRunner {
 		
 		
 		EngineProcess engine1 = bagatur_workspace;
-		EngineProcess engine2 = cuckoo112;
+		EngineProcess engine2 = chess22k_1_13;
 		
 		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
@@ -131,7 +131,7 @@ public class TournamentRunner {
 			options.add("setoption name OwnBook value true");
 			options.add("setoption name Openning Mode value random intermediate");
 			options.add("setoption name Time Control Optimizations value for 1/1");
-			options.add("setoption name SyzygyPath value C:/Users/i027638/OneDrive - SAP SE/DATA/OWN/chess/EGTB/syzygy");
+			options.add("setoption name SyzygyPath value tbd");//C:/Users/i027638/OneDrive - SAP SE/DATA/OWN/chess/EGTB/syzygy
 			
 			engine1.setOptions(options);
 			engine2.setOptions(options);
