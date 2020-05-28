@@ -23,38 +23,29 @@
 package bagaturchess.search.impl.eval.cache;
 
 
-import bagaturchess.bitboard.impl1.internal.Assert;
-import bagaturchess.bitboard.impl1.internal.ChessConstants;
-import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.bitboard.impl1.internal.Util;
 
 
 public class EvalCache_Impl2 implements IEvalCache {
 	
-	
-	private static final int SCORE 					= 48;
-	
-	
-	private int POWER_2_TT_ENTRIES 					= 23;
+	private int POWER_2_ENTRIES;
 	
 	private int keyShifts;
 	public int maxEntries;
-
+	
 	private long[] keys;
-	private long[] values;
-
+	
 	private long usageCounter;
-
+	
 	
 	public EvalCache_Impl2(int sizeInMB) {
 		
-		POWER_2_TT_ENTRIES = (int) (Math.log(sizeInMB) / Math.log(2) + 16);
+		POWER_2_ENTRIES = (int) (Math.log(sizeInMB) / Math.log(2) + 16);
 		
-		keyShifts = 64 - POWER_2_TT_ENTRIES;
-		maxEntries = (int) Util.POWER_LOOKUP[POWER_2_TT_ENTRIES] + 3;
+		keyShifts = 64 - POWER_2_ENTRIES;
+		maxEntries = (int) Util.POWER_LOOKUP[POWER_2_ENTRIES];
 		
-		keys = new long[maxEntries];
-		values = new long[maxEntries];
+		keys = new long[2 * maxEntries];
 		
 		usageCounter = 0;
 	}
@@ -65,10 +56,10 @@ public class EvalCache_Impl2 implements IEvalCache {
 		
 		entry.setIsEmpty(true);
 		
-		long value = getValue(key);
+		int value = getValue(key);
 		if (value != 0) {
 			entry.setIsEmpty(false);
-			entry.setEval(getScore(value));
+			entry.setEval(value);
 			entry.setLevel((byte)5);
 		}
 	}
@@ -77,6 +68,7 @@ public class EvalCache_Impl2 implements IEvalCache {
 	@Override
 	public void put(long hashkey, int level, double eval) {
 		addValue(hashkey, (int) eval);
+		usageCounter++;
 	}
 	
 	
@@ -91,78 +83,22 @@ public class EvalCache_Impl2 implements IEvalCache {
 	}
 	
 	
-	private int getScore(final long value) {
-		int score = (int) (value >> SCORE);
-
-		if (EngineConstants.ASSERT) {
-			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
-		}
-
-		return score;
-	}
-	
-	
-	private long getValue(final long key) {
-
+	private int getValue(final long key) {
 		final int index = getIndex(key);
-
-		for (int i = 0; i < 4; i++) {
-			long value = values[index + i];
-			if ((keys[index + i] ^ value) == key) {
-				return value;
+		final long storedKey = keys[index];
+		final long score = keys[index + 1];
+		if (storedKey == keys[index]) {//Optimistic read locking
+			if ((storedKey ^ score) == key) {
+				return (int) score;
 			}
 		}
-		
 		return 0;
 	}
 	
 
-	private void addValue(final long key, int score) {
-
-		if (EngineConstants.ASSERT) {
-			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
-			Assert.isTrue(score != ChessConstants.SCORE_NOT_RUNNING);
-		}
-
+	private void addValue(final long key, final int score) {
 		final int index = getIndex(key);
-		//int replacedDepth = Integer.MAX_VALUE;
-		int replacedIndex = index;
-		for (int i = index; i < index + 4; i++) {
-
-			if (keys[i] == 0) {
-				replacedIndex = i;
-				usageCounter++;
-				break;
-			}
-
-			long currentValue = values[i];
-			//int currentDepth = getDepth(currentValue);
-			if ((keys[i] ^ currentValue) == key) {
-				replacedIndex = i;
-				break;
-			}
-
-			// replace the lowest depth
-			//if (currentDepth < replacedDepth) {
-				replacedIndex = i;
-				//replacedDepth = currentDepth;
-			//}
-		}
-		
-		if (EngineConstants.ASSERT) {
-			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
-		}
-
-		final long value = createValue(score);
-		keys[replacedIndex] = key ^ value;
-		values[replacedIndex] = value;
-	}
-	
-	
-	private long createValue(final long score) {
-		if (EngineConstants.ASSERT) {
-			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
-		}
-		return score << SCORE;
+		keys[index] = key ^ score;
+		keys[index + 1] = score;
 	}
 }
