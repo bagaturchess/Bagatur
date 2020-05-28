@@ -27,6 +27,7 @@ import java.util.EmptyStackException;
 import java.util.Stack;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.CheckUtil;
@@ -83,6 +84,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
 	
+	private VarStatistic historyAVGScores;
+	
 	
 	public Search_PVS_NWS(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
@@ -108,6 +111,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		lastSentMinorInfo_nodesCount = 0;
 		lastSentMinorInfo_timestamp = 0;
+		
+		historyAVGScores = new VarStatistic(false);
 	}
 	
 	
@@ -472,9 +477,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 
-				if (!isPv && !wasInCheck && movesPerformed > 0 && moveGen.getScore() < 100 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
+				if (!isPv && !wasInCheck && movesPerformed > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
 
-					if (MoveUtil.isQuiet(move)) {
+					if (MoveUtil.isQuiet(move) && moveGen.getScore() <= historyAVGScores.getEntropy()) {
 						
 						if (EngineConstants.ENABLE_LMP && depth <= 4 && movesPerformed >= depth * 3 + 3) {
 							continue;
@@ -499,6 +504,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				cb.doMove(move);
 				movesPerformed++;
 				
+				if (phase == PHASE_QUIET) {
+					historyAVGScores.addValue(moveGen.getScore(), moveGen.getScore());
+				}
+				
 				int score = alpha + 1;
 
 				if (EngineConstants.ASSERT) {
@@ -506,12 +515,13 @@ public class Search_PVS_NWS extends SearchImpl {
 					Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
 					cb.changeSideToMove();
 				}
-
+				
 				int reduction = 1;
 				if (depth >= 2 && movesPerformed > 1 && MoveUtil.isQuiet(move) && !MoveUtil.isPawnPush78(move)) {
-
+					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
-					if (moveGen.getScore() > 40) {
+					
+					if (moveGen.getScore() > historyAVGScores.getEntropy()) {
 						reduction -= 1;
 					}
 					if (move == killer1Move || move == killer2Move || move == counterMove) {
@@ -520,9 +530,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (!isPv) {
 						reduction += 1;
 					}
+					
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
 				}
-
+				
 				try {
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
 						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false);
