@@ -524,6 +524,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (moveGen.getScore() > historyAVGScores.getEntropy()) {
 						reduction -= 1;
 					}
+					if (moveGen.getScore() > 2 * historyAVGScores.getEntropy()) {
+						reduction -= 1;
+					}
 					if (move == killer1Move || move == killer2Move || move == counterMove) {
 						reduction -= 1;
 					}
