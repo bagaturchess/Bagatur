@@ -478,8 +478,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 
 				if (!isPv && !wasInCheck && movesPerformed > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
-
-					if (MoveUtil.isQuiet(move) && moveGen.getScore() <= historyAVGScores.getEntropy()) {
+					
+					if (phase == PHASE_QUIET && moveGen.getScore() <= historyAVGScores.getEntropy()) {
 						
 						if (EngineConstants.ENABLE_LMP && depth <= 4 && movesPerformed >= depth * 3 + 3) {
 							continue;
