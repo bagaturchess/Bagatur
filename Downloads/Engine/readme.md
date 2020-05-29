@@ -15,6 +15,11 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 
 # Revision History
+Version 2.2 (29 May 2020)
+  * Reduced LMR and LMP for moves with high history scores
+  * SMP based on threads (not processes), it is now with 65+ ELO stronger than the single core version
+  * Injected icon in the executable files and update of WinRun4J to version 0.4.5
+
 Version 2.1a (21 May 2020)
   * Improvements in single core version with small ELO increase
   * Evaluation cache increased to 256M for better performance
