@@ -52,7 +52,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	static {
 		for (int searchedCount = 0; searchedCount < 64; searchedCount++) {
 			for (int restdepth = 0; restdepth < 64; restdepth++) {
-				LMR_REDUCTIONS[searchedCount][restdepth] = 1 + (int) Math.ceil(Math.max(1, Math.log(searchedCount) * Math.log(restdepth) / (double) 2));
+				LMR_REDUCTIONS[searchedCount][restdepth] = (int) Math.ceil(Math.max(1, Math.log(searchedCount) * Math.log(restdepth) / (double) 2));
 			}
 		}
 	}
@@ -263,24 +263,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				tpt_move = tt_cached.getBestMove();
 			}
 		}
-		
-		
-		//IID PV Node
-		if (tpt_move == 0 && rest >= 3) {
-			
-			int reduction = 2;
-			
-			nullwin_search(mediator, pvman, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta, rootColour, false);
-			
-			env.getTPT().get(backtrackingInfo.hash_key, tt_cached);
-			if (!tt_cached.isEmpty()) {
-				tpt_move = tt_cached.getBestMove();
-			}
-		}
         
 		
 		//Singular move check
-		boolean singleReply = env.getBitboard().hasSingleMove();
+		//boolean singleReply = env.getBitboard().hasSingleMove();
 		boolean singularMove = false;
         /*if (depth > 0
          		&& !singleReply
@@ -421,7 +407,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (!isCapOrProm && !givesCheck) {
 							rate += 1;
 						}
-						rate += Math.max(0, -(eval_inc_sum / (double) getEvalSumMax(mediator)));
+						//rate += Math.max(0, -(eval_inc_sum / (double) getEvalSumMax(mediator)));
 						//rate += (1 - Math.min(1, getHistory(inCheck).getScores(cur_move) / history_stat.getEntropy()));
 						lmrReduction += PLY * rate;
 					}					
@@ -651,12 +637,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			//Razoring for all depths based on the eval deviation detected into the root node
-			if (backtrackingInfo.static_eval < alpha_org - getAlphaTrustWindow(mediator, rest)) {
-				int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta/*alpha_org - getAlphaTrustWindow(mediator, rest) + 1*/, rootColour);
+			/*if (backtrackingInfo.static_eval < alpha_org - getAlphaTrustWindow(mediator, rest)) {
+				int qeval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, rootColour);
 				if (qeval <= alpha_org - getAlphaTrustWindow(mediator, rest)) {
 					return qeval;
 				}
-			}
+			}*/
 			
 			
 			//Standard Razoring
@@ -719,36 +705,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		//IID NONPV Node
-		if (tpt_move == 0 && rest >= 3) {
-			
-			int reduction = 2;
-			
-			nullwin_search(mediator, pvman, info, initial_maxdepth, maxdepth - PLY * reduction, depth, beta, rootColour, false);
-			
-			env.getTPT().get(backtrackingInfo.hash_key, tt_cached);
-			if (!tt_cached.isEmpty()) {
-				tpt_depth = tt_cached.getDepth();
-				tpt_move = tt_cached.getBestMove();
-			}
-		}
-		
-		
-        if (FORWARD_PRUNING && useStaticPrunning
-                ) {
-            
-            if (inCheck) {
-                throw new IllegalStateException("In check in useStaticPrunning");
-            }
-            
-            if (backtrackingInfo.static_eval < alpha_org - getAlphaTrustWindow(mediator, rest)) {
-            	return backtrackingInfo.static_eval;
-            }
-        }
-		
-		
 		//Singular move check
-		boolean singleReply = env.getBitboard().hasSingleMove();
+		//boolean singleReply = env.getBitboard().hasSingleMove();
 		boolean singularMove = false;
         /*if (depth > 0
          		&& !singleReply
@@ -921,7 +879,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (!isCapOrProm && !givesCheck) {
 							rate += 1;
 						}
-						rate += Math.max(0, -(eval_inc_sum / (double) getEvalSumMax(mediator)));
+						//rate += Math.max(0, -(eval_inc_sum / (double) getEvalSumMax(mediator)));
 						//rate += (1 - Math.min(1, getHistory(inCheck).getScores(cur_move) / history_stat.getEntropy()));
 						lmrReduction += PLY * rate;
 					}
@@ -1045,7 +1003,32 @@ public class Search_PVS_NWS extends SearchImpl {
 			node.eval = getDrawScores(rootColour);
 			return node.eval;
 		}
-		    	
+		
+		
+		boolean inCheck = env.getBitboard().isInCheck();
+		
+		
+		int staticEval = fullEval(depth, alpha_org, beta, rootColour);
+		
+		
+		if (inCheck) {
+			return Math.max(alpha_org, staticEval);
+		}
+		
+		
+		//Beta cutoff
+		if (staticEval >= beta) {
+			node.eval = staticEval;
+			return node.eval;
+		}
+		
+		
+		//Alpha cutoff
+		if (staticEval + env.getBitboard().getBoardConfig().getMaterial_QUEEN_E() < alpha_org) {
+			node.eval = staticEval;
+			return node.eval;
+		}
+		
 		
 		long hashkey = env.getBitboard().getHashKey();
 		
@@ -1058,35 +1041,12 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		int staticEval = fullEval(depth, alpha_org, beta, rootColour);
-		
-		
-		boolean inCheck = env.getBitboard().isInCheck();
-		
-		
-		if (!inCheck) {
-			
-			//Beta cutoff
-			if (staticEval >= beta) {
-				node.eval = staticEval;
-				return node.eval;
-			}
-			
-			//Alpha cutoff
-			if (staticEval + env.getBitboard().getBoardConfig().getMaterial_QUEEN_E() < alpha_org) {
-				node.eval = staticEval;
-				return node.eval;
-			}
-		}
-		
-		
 		ISearchMoveList list = inCheck ? lists_escapes[depth] : lists_capsproms[depth];
 		list.clear();
 		list.setTptMove(tpt_move);
 		
 		
-		int searchedMoves = 0;
-		int best_eval = inCheck ? MIN : staticEval;
+		int best_eval = Math.max(alpha_org, staticEval);
 		int alpha = alpha_org;
 		int best_move = 0;
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
@@ -1094,12 +1054,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (cur_move != 0) 
 		do {
-			
-			
-			if (searchedMoves > 0 && cur_move == tpt_move) {
-				continue;
-			}
-			
 			
 			if (cur_move == tpt_move && !env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move)) {
 				if (env.getBitboard().isCheckMove(cur_move)
@@ -1110,12 +1064,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (!inCheck && searchedMoves > 0) {
-				//Skip bad captures
-				int moveSee = env.getBitboard().getSEEScore(cur_move);
-				if (moveSee < 0) {
-					break;
-				}
+			//Skip bad captures
+			int moveSee = env.getBitboard().getSEEScore(cur_move);
+			if (moveSee < 0) {
+				continue;
 			}
 			
 			
@@ -1126,9 +1078,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			env.getBitboard().makeMoveBackward(cur_move);
-			
-			
-			searchedMoves++;
 			
 			
 			//Add history records for the current move
@@ -1162,21 +1111,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 		} while ((cur_move = list.next()) != 0);
-		
-		if (best_move == 0) {
-			if (inCheck) {
-				if (searchedMoves == 0) {
-					node.bestmove = 0;
-					node.eval = -getMateVal(depth);
-					node.leaf = true;
-					return node.eval;
-				} else {
-					throw new IllegalStateException("!!" + env.getBitboard().toString());
-				}
-			} else {
-				//All captures lead to evaluation which is less than the static eval
-			}
-		}
 		
 		if (best_move != 0) {
 			env.getTPT().put(hashkey, 0, best_eval, alpha_org, beta, best_move);
@@ -1232,23 +1166,26 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		int staticEval = fullEval(depth, alpha_org, beta, rootColour);
-		
-		
 		boolean inCheck = env.getBitboard().isInCheck();
 		
 		
-		if (!inCheck) {
-			
-			//Beta cutoff
-			if (staticEval >= beta) {
-				return staticEval;
-			}
-			
-			//Alpha cutoff
-			if (staticEval + env.getBitboard().getBoardConfig().getMaterial_QUEEN_E() < alpha_org) {
-				return staticEval;
-			}
+		int staticEval = fullEval(depth, alpha_org, beta, rootColour);
+		
+		
+		if (inCheck) {
+			return Math.max(alpha_org, staticEval);
+		}
+		
+		
+		//Beta cutoff
+		if (staticEval >= beta) {
+			return staticEval;
+		}
+		
+		
+		//Alpha cutoff
+		if (staticEval + env.getBitboard().getBoardConfig().getMaterial_QUEEN_E() < alpha_org) {
+			return staticEval;
 		}
     	
 		
@@ -1257,20 +1194,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		list.setTptMove(tpt_move);
 		
 		
-		int searchedMoves = 0;
-		int best_eval = inCheck ? MIN : staticEval;
+		int best_eval = Math.max(alpha_org, staticEval);
 		int best_move = 0;
 		int cur_move = (tpt_move != 0) ? tpt_move : list.next();
 		
 		
 		if (cur_move != 0) 
 		do {
-			
-			
-			if (searchedMoves > 0 && cur_move == tpt_move) {
-				continue;
-			}
-			
 			
 			if (cur_move == tpt_move && !env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move)) {
 				if (env.getBitboard().isCheckMove(cur_move)
@@ -1281,12 +1211,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (!inCheck && searchedMoves > 0) {
-				//Skip bad captures
-				int moveSee = env.getBitboard().getSEEScore(cur_move);
-				if (moveSee < 0) {
-					break;
-				}
+			//Skip bad captures
+			int moveSee = env.getBitboard().getSEEScore(cur_move);
+			if (moveSee < 0) {
+				continue;
 			}
 			
 			
@@ -1297,9 +1225,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			env.getBitboard().makeMoveBackward(cur_move);
-			
-			
-			searchedMoves++;
 			
 			
 			//Add history records for the current move
@@ -1322,38 +1247,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 		} while ((cur_move = list.next()) != 0);
 		
-		if (best_move == 0) {
-			if (inCheck) {
-				if (searchedMoves == 0) {
-					return -getMateVal(depth);
-				} else {
-					throw new IllegalStateException("best_move == 0 && searchedMoves != 0");
-				}
-			} else {
-				//All captures lead to evaluation which is less than the static eval
-			}
-		}
-		
 		if (best_move != 0) {
 			env.getTPT().put(hashkey, 0, best_eval, alpha_org, beta, best_move);
 		}
 		
 		return best_eval;
-	}
-	
-	
-	private int getAlphaTrustWindow(ISearchMediator mediator, int rest) {
-		
-		//int DEPTH1_INTERVAL = 100;
-		//int DEPTH1_INTERVAL = (int) (move_eval_diff.getDisperse());
-		//int DEPTH1_INTERVAL = (int) (move_eval_diff.getEntropy());
-		//int DEPTH1_INTERVAL = (int) ((move_eval_diff.getEntropy() + move_eval_diff.getDisperse()) / 2);
-		
-		//return 32;//Math.max(33,  DEPTH1_INTERVAL * (rest / (double) 2));
-		//return Math.max(1,  DEPTH1_INTERVAL * (rest / (double) 2));
-		
-		//return 1 * Math.max(1, (rest / (double) 2 )) * mediator.getTrustWindow_AlphaAspiration();
-		return 1 * mediator.getTrustWindow_AlphaAspiration();
 	}
 	
 	
