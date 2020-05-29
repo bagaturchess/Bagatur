@@ -359,7 +359,7 @@ public class Search_PVS_NWS extends SearchImpl {
 
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
 		int bestMove = 0;
-		int bestScore = ISearch.MIN - 1;
+		int bestScore = ISearch.MIN;
 		int ttMove = 0;
 		int counterMove = 0;
 		int killer1Move = 0;
