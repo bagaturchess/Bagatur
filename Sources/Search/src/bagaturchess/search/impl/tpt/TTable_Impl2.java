@@ -145,7 +145,7 @@ public class TTable_Impl2 implements ITTable {
 			long currentValue = values[i];
 			int currentDepth = getDepth(currentValue);
 			if ((keys[i] ^ currentValue) == key) {
-				if (currentDepth > depth && flag != ITTEntry.FLAG_EXACT) {
+				if (currentDepth > depth /*&& flag != ITTEntry.FLAG_EXACT*/) {
 					return;
 				}
 				replacedIndex = i;
