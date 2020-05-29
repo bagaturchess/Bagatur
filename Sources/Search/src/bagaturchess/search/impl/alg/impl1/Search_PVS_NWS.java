@@ -337,8 +337,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 
 			
-			if (EngineConstants.ENABLE_NULL_MOVE && depth > 2) {
-				if (eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
+			if (EngineConstants.ENABLE_NULL_MOVE && depth > 2 && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
+				if (eval >= beta) {
 					cb.doNullMove();
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 					int score = depth - reduction <= 0 ? -qsearch(evaluator, info, cb, moveGen, -beta, -beta + 1, ply, false)
