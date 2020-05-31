@@ -484,12 +484,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				VarStatistic avgHistory = null;
+				VarStatistic historyStat = null;
 				switch (phase) {
 					case PHASE_TT:
 						break;
 					case PHASE_ATTACKING_GOOD:
-						avgHistory = avgHistory_attacks_good;
+						historyStat = avgHistory_attacks_good;
 						break;
 					case PHASE_KILLER_1:
 						break;
@@ -498,15 +498,15 @@ public class Search_PVS_NWS extends SearchImpl {
 					case PHASE_COUNTER:
 						break;
 					case PHASE_QUIET:
-						avgHistory = avgHistory_quiet;
+						historyStat = avgHistory_quiet;
 						break;
 					case PHASE_ATTACKING_BAD:
-						avgHistory = avgHistory_attacks_bad;
+						historyStat = avgHistory_attacks_bad;
 						break;
 				}
 				
 				
-				if (avgHistory != null) avgHistory.addValue(moveGen.getScore(), moveGen.getScore());
+				if (historyStat != null) historyStat.addValue(moveGen.getScore(), moveGen.getScore());
 				
 				
 				if (!isPv && !wasInCheck && movesPerformed > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
@@ -545,19 +545,23 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				int reduction = 1;
-				if (depth >= 2 && movesPerformed > 1 && MoveUtil.isQuiet(move) && !MoveUtil.isPawnPush78(move)) {
+				if (depth >= 2 && movesPerformed > 1 && MoveUtil.isQuiet(move)) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
 					
-					if (avgHistory != null && moveGen.getScore() > avgHistory.getEntropy()) {
-						reduction -= 1;
+					if (historyStat != null) {
+						if (moveGen.getScore() > historyStat.getEntropy()) {
+							reduction -= 1;
+							if (moveGen.getScore() > historyStat.getEntropy() + historyStat.getDisperse()) {
+								reduction -= 1;
+							}
+						}
 					}
-					if (avgHistory != null && moveGen.getScore() > avgHistory.getEntropy() + avgHistory.getDisperse()) {
-						reduction -= 1;
-					}
+					
 					if (move == killer1Move || move == killer2Move || move == counterMove) {
 						reduction -= 1;
 					}
+					
 					if (!isPv) {
 						reduction += 1;
 					}
