@@ -513,6 +513,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (phase == PHASE_QUIET) {
 						
+						if (moveGen.getScore() < historyStat.getEntropy() / depth) {
+							continue;
+						}
+						
 						if (EngineConstants.ENABLE_LMP && depth <= 4 && movesPerformed >= depth * 3 + 3) {
 							continue;
 						}
@@ -532,12 +536,12 @@ public class Search_PVS_NWS extends SearchImpl {
 						continue;
 					}
 				}
-
+				
 				cb.doMove(move);
 				movesPerformed++;
 				
 				int score = alpha + 1;
-
+				
 				if (EngineConstants.ASSERT) {
 					cb.changeSideToMove();
 					Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
