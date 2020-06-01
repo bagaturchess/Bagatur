@@ -15,8 +15,8 @@ import java.util.Random;
 
 public final class MoveGenerator {
 
-	private final int[] moves = new int[1500];
-	private final int[] moveScores = new int[1500];
+	private final int[] moves = new int[3000];
+	private final int[] moveScores = new int[3000];
 	private final int[] nextToGenerate = new int[EngineConstants.MAX_PLIES * 2];
 	private final int[] nextToMove = new int[EngineConstants.MAX_PLIES * 2];
 	private int currentPly;
