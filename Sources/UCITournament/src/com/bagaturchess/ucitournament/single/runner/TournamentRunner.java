@@ -52,6 +52,10 @@ public class TournamentRunner {
 															new String [0],
 															"C:\\DATA\\Engines\\BagaturEngine_DEV\\");
 
+	private static final EngineProcess bagatur_22 			= new EngineProcess("Bagatur 2.2", "C:\\DATA\\Engines\\BagaturEngine.2.2\\Bagatur_64_1_core.exe",
+															new String [0],
+															"C:\\DATA\\Engines\\BagaturEngine.2.2\\");
+	
 	private static final EngineProcess bagatur_20 			= new EngineProcess("Bagatur 2.0", "C:\\DATA\\Engines\\BagaturEngine.2.0\\Bagatur_64_1_core.exe",
 															new String [0],
 															"C:\\DATA\\Engines\\BagaturEngine.2.0\\");
@@ -112,7 +116,7 @@ public class TournamentRunner {
 		
 		
 		EngineProcess engine1 = bagatur_workspace;
-		EngineProcess engine2 = chess22k_1_13;
+		EngineProcess engine2 = bagatur_22;
 		
 		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
