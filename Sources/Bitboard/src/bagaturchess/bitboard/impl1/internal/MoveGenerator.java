@@ -86,6 +86,8 @@ public final class MoveGenerator {
 		Arrays.fill(BF_MOVES1[BLACK][ROOK], 1);
 		Arrays.fill(BF_MOVES1[BLACK][QUEEN], 1);
 		Arrays.fill(BF_MOVES1[BLACK][KING], 1);
+		
+		currentPly = 0;
 	}
 
 	public void addHHValue(final int color, final int move, final int parentMove, final int depth) {
