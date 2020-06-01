@@ -531,8 +531,7 @@ public class Search_PVS_NWS extends SearchImpl {
 								}
 							}
 						}
-					} else if (EngineConstants.ENABLE_SEE_PRUNING && depth <= 6 && phase == PHASE_ATTACKING_BAD
-							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth) {
+					} else if (phase == PHASE_ATTACKING_BAD && depth <= 6 && SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth) {
 						continue;
 					}
 				}
@@ -549,7 +548,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				int reduction = 1;
-				if (depth >= 2 && movesPerformed > 1 && MoveUtil.isQuiet(move)) {
+				if (depth >= 2 && movesPerformed > 1) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
 					
