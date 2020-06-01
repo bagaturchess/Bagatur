@@ -377,20 +377,19 @@ public class Search_PVS_NWS extends SearchImpl {
 			switch (phase) {
 			
 			case PHASE_TT:
+				env.getTPT().get(cb.zobristKey, tt_cached);
 				if (tt_cached.isEmpty()) {
-					if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
+					if (EngineConstants.ENABLE_IID && depth >= 3) {
 						if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
-							calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, isPv);
+							calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - Math.max(2, depth / 2), alpha, beta, isPv);
+							env.getTPT().get(cb.zobristKey, tt_cached);
 						}
 					}
 				}
-				env.getTPT().get(cb.zobristKey, tt_cached);
 				if (!tt_cached.isEmpty()) {
-					ttMove = tt_cached.getBestMove();
-					if (cb.isValidMove(ttMove)) {
+					if (cb.isValidMove(tt_cached.getBestMove())) {
+						ttMove = tt_cached.getBestMove();
 						moveGen.addMove(ttMove);
-					} else {
-						ttMove = 0;
 					}
 				}
 				break;
@@ -548,7 +547,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				int reduction = 1;
-				if (depth >= 2 && movesPerformed > 1) {
+				if (depth >= 2 && movesPerformed > 1 && MoveUtil.isQuiet(move)) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
 					
