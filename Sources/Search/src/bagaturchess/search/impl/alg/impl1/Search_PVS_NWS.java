@@ -512,9 +512,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (phase == PHASE_QUIET) {
 						
-						if (moveGen.getScore() < historyStat.getEntropy() / depth) {
+						/*if (moveGen.getScore() < historyStat.getEntropy() / depth) {
 							continue;
-						}
+						}*/
 						
 						if (EngineConstants.ENABLE_LMP && depth <= 4 && movesPerformed >= depth * 3 + 3) {
 							continue;
