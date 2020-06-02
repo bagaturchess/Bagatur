@@ -375,7 +375,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int movesPerformed = 0;
 
 		moveGen.startPly();
-		Collections.sort(moveGenFragments);
+		//Collections.sort(moveGenFragments);
 		counter++;
 		if (counter % 100000 == 0) {
 			//System.out.println(moveGenFragments);
