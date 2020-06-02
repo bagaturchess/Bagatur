@@ -27,6 +27,7 @@ public interface IMoveGenFragment extends Comparable<IMoveGenFragment> {
 	public void count_move_total();
 	public double getRate();
 	public String toString();
+	public boolean isReductionAndPruningAllowed();
 	public int getReductionDecrease();
 	public boolean isLegal(int move);
 }

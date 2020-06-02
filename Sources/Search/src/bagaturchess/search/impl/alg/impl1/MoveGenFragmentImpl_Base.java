@@ -69,7 +69,7 @@ public abstract class MoveGenFragmentImpl_Base implements IMoveGenFragment {
 		if (getRate() == other.getRate()) {
 			return 1;
 		}else {
-			return (int) (10000 * (other.getRate() - getRate()));
+			return (int) (100 * (other.getRate() - getRate()));
 		}
 	}
 	
@@ -83,5 +83,11 @@ public abstract class MoveGenFragmentImpl_Base implements IMoveGenFragment {
 	@Override
 	public boolean isLegal(int move) {
 		return cb.isLegal(move);
+	}
+	
+	
+	@Override
+	public boolean isReductionAndPruningAllowed() {
+		return true;
 	}
 }

@@ -87,6 +87,7 @@ public class Search_PVS_NWS1 extends SearchImpl {
 	private long lastSentMinorInfo_nodesCount;
 	
 	private List<IMoveGenFragment> moveGenFragments;
+	private long counter;
 	
 	
 	public Search_PVS_NWS1(Object[] args) {
@@ -117,12 +118,12 @@ public class Search_PVS_NWS1 extends SearchImpl {
 		moveGenFragments = new ArrayList<IMoveGenFragment>();
 		moveGenFragments.add(new MoveGenFragmentImpl_TT(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), tt_cached));
 		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Good(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
+		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Equal(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Counter(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Killer1(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Killer2(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
-		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Equal(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
-		moveGenFragments.add(new MoveGenFragmentImpl_Quiet(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Bad(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
+		moveGenFragments.add(new MoveGenFragmentImpl_Quiet(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 	}
 	
 	
@@ -363,7 +364,7 @@ public class Search_PVS_NWS1 extends SearchImpl {
 				}
 			}
 		}
-
+		
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
@@ -375,7 +376,10 @@ public class Search_PVS_NWS1 extends SearchImpl {
 		moveGen.startPly();
 		
 		//Collections.sort(moveGenFragments);
-		//System.out.println(moveGenFragments);
+		counter++;
+		if (counter % 100000 == 0) {
+			//System.out.println(moveGenFragments);
+		}
 		
 		boolean movesLoopCompleted = false;
 		for (int i=0; i<moveGenFragments.size(); i++) {
@@ -395,8 +399,6 @@ public class Search_PVS_NWS1 extends SearchImpl {
 				if (!moveGenFragment.isLegal(move)) {
 					continue;
 				}
-				
-				moveGenFragment.count_move_total();
 				
 				//Build and sent minor info
 				if (ply == 0) {
@@ -486,6 +488,11 @@ public class Search_PVS_NWS1 extends SearchImpl {
 				
 				cb.undoMove(move);
 				
+				moveGenFragment.count_move_total();
+				if (score >= beta) {
+					moveGenFragment.count_move_cutoff();
+				}
+				
 				if (MoveUtil.isQuiet(move)) {
 					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
 				}
@@ -505,8 +512,6 @@ public class Search_PVS_NWS1 extends SearchImpl {
 					
 					alpha = Math.max(alpha, score);
 					if (alpha >= beta) {
-						
-						moveGenFragment.count_move_cutoff();
 						
 						if (MoveUtil.isQuiet(bestMove)) {
 							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
