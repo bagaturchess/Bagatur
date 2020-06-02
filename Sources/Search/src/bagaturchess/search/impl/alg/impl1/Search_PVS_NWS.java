@@ -365,15 +365,15 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
-
+		
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
-
+		
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
 		int movesPerformed = 0;
-
+		
 		moveGen.startPly();
 		//Collections.sort(moveGenFragments);
 		counter++;
@@ -382,7 +382,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		boolean movesLoopCompleted = false;
-		for (int i=0; i<moveGenFragments.size(); i++) {
+		for (int i = 0; i < moveGenFragments.size(); i++) {
 			
 			IMoveGenFragment moveGenFragment = moveGenFragments.get(i);
 			
