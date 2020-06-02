@@ -24,6 +24,7 @@ package bagaturchess.search.impl.alg.impl1;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Stack;
@@ -116,7 +117,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		lastSentMinorInfo_timestamp = 0;
 		
 		moveGenFragments = new ArrayList<IMoveGenFragment>();
-		moveGenFragments.add(new MoveGenFragmentImpl_TT(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), tt_cached));
+		moveGenFragments.add(new MoveGenFragmentImpl_TT(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), tt_cached, getEnv().getTPT()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Good(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Equal(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Counter(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
@@ -374,7 +375,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int movesPerformed = 0;
 
 		moveGen.startPly();
-		//Collections.sort(moveGenFragments);
+		Collections.sort(moveGenFragments);
 		counter++;
 		if (counter % 100000 == 0) {
 			//System.out.println(moveGenFragments);

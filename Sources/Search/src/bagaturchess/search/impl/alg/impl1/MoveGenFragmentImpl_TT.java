@@ -23,22 +23,25 @@ package bagaturchess.search.impl.alg.impl1;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
 import bagaturchess.search.impl.tpt.ITTEntry;
+import bagaturchess.search.impl.tpt.ITTable;
 
 
 public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	
-	
+	private ITTable tt;
 	private ITTEntry tt_entry;
 	
 	
-	public MoveGenFragmentImpl_TT(ChessBoard _cb, MoveGenerator _gen, ITTEntry _tt_entry) {
+	public MoveGenFragmentImpl_TT(ChessBoard _cb, MoveGenerator _gen, ITTEntry _tt_entry, ITTable _tt) {
 		super(_cb, _gen);
 		tt_entry = _tt_entry;
+		tt = _tt;
 	}
 	
 	
 	@Override
 	public void genMoves(int parentMove, int ply) {
+		tt.get(cb.zobristKey, tt_entry);
 		if (!tt_entry.isEmpty()) {
 			if (cb.isValidMove(tt_entry.getBestMove())) {
 				int ttMove = tt_entry.getBestMove();
@@ -48,10 +51,10 @@ public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	}
 	
 	
-	/*@Override
+	@Override
 	public double getRate() {
 		return 1;
-	}*/
+	}
 	
 	
 	@Override

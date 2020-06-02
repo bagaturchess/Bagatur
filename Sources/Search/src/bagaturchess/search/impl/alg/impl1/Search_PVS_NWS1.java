@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Stack;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.CheckUtil;
@@ -116,7 +117,7 @@ public class Search_PVS_NWS1 extends SearchImpl {
 		lastSentMinorInfo_timestamp = 0;
 		
 		moveGenFragments = new ArrayList<IMoveGenFragment>();
-		moveGenFragments.add(new MoveGenFragmentImpl_TT(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), tt_cached));
+		moveGenFragments.add(new MoveGenFragmentImpl_TT(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), tt_cached, getEnv().getTPT()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Good(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Equal(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Counter(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
@@ -364,15 +365,15 @@ public class Search_PVS_NWS1 extends SearchImpl {
 				}
 			}
 		}
-		
+
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
+
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
-		
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
 		int movesPerformed = 0;
-		
+
 		moveGen.startPly();
 		
 		//Collections.sort(moveGenFragments);
@@ -388,17 +389,18 @@ public class Search_PVS_NWS1 extends SearchImpl {
 			
 			if(!movesLoopCompleted) {
 				moveGenFragment.genMoves(parentMove, ply);
-			} else {
-				//moveGenFragment.count_move_cutoff();
 			}
 			
 			while (!movesLoopCompleted && moveGen.hasNext()) {
+
 				
 				final int move = moveGen.next();
+				
 				
 				if (!moveGenFragment.isLegal(move)) {
 					continue;
 				}
+				
 				
 				//Build and sent minor info
 				if (ply == 0) {
@@ -424,6 +426,10 @@ public class Search_PVS_NWS1 extends SearchImpl {
 				if (!isPv && !wasInCheck && movesPerformed > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
 					
 					if (MoveUtil.isQuiet(move)) {
+						
+						/*if (moveGen.getScore() < historyStat.getEntropy() / depth) {
+							continue;
+						}*/
 						
 						if (EngineConstants.ENABLE_LMP && depth <= 4 && movesPerformed >= depth * 3 + 3) {
 							continue;
@@ -513,12 +519,12 @@ public class Search_PVS_NWS1 extends SearchImpl {
 					alpha = Math.max(alpha, score);
 					if (alpha >= beta) {
 						
-						if (MoveUtil.isQuiet(bestMove)) {
+						if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {
 							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
 							moveGen.addKillerMove(bestMove, ply);
 							moveGen.addHHValue(cb.colorToMove, bestMove, parentMove, depth);
 						}
-						
+
 						movesLoopCompleted = true;
 						
 						break;

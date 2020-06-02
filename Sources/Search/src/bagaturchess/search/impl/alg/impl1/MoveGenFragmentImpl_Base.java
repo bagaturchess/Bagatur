@@ -69,7 +69,7 @@ public abstract class MoveGenFragmentImpl_Base implements IMoveGenFragment {
 		if (getRate() == other.getRate()) {
 			return 1;
 		}else {
-			return (int) (100 * (other.getRate() - getRate()));
+			return (int) (1000 * (other.getRate() - getRate()));
 		}
 	}
 	
