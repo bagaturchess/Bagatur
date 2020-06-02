@@ -24,17 +24,17 @@ import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.search.impl.tpt.ITTable;
+import bagaturchess.search.impl.tpt.TTEntry_BaseImpl;
 
 
 public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	
 	private ITTable tt;
-	private ITTEntry tt_entry;
+	private ITTEntry tt_entry= new TTEntry_BaseImpl();
 	
 	
-	public MoveGenFragmentImpl_TT(ChessBoard _cb, MoveGenerator _gen, ITTEntry _tt_entry, ITTable _tt) {
+	public MoveGenFragmentImpl_TT(ChessBoard _cb, MoveGenerator _gen, ITTable _tt) {
 		super(_cb, _gen);
-		tt_entry = _tt_entry;
 		tt = _tt;
 	}
 	

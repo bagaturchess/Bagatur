@@ -117,7 +117,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		lastSentMinorInfo_timestamp = 0;
 		
 		moveGenFragments = new ArrayList<IMoveGenFragment>();
-		moveGenFragments.add(new MoveGenFragmentImpl_TT(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), tt_cached, getEnv().getTPT()));
+		moveGenFragments.add(new MoveGenFragmentImpl_TT(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), getEnv().getTPT()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Good(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Equal(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 		moveGenFragments.add(new MoveGenFragmentImpl_Counter(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
