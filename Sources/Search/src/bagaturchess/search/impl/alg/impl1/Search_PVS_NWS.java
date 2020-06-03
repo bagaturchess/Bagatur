@@ -375,6 +375,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int movesPerformed = 0;
 		
 		moveGen.startPly();
+		
 		//Collections.sort(moveGenFragments);
 		counter++;
 		if (counter % 100000 == 0) {
@@ -393,7 +394,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			while (!movesLoopCompleted && moveGen.hasNext()) {
-
+				
 				
 				final int move = moveGen.next();
 				
@@ -401,6 +402,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (!moveGenFragment.isLegal(move)) {
 					continue;
 				}
+				
 				
 				if (move == bestMove) {
 					continue;
@@ -428,7 +430,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				if (!isPv && !wasInCheck && movesPerformed > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
+				if (!isPv && !wasInCheck && movesPerformed > 0 && moveGenFragment.isReductionAndPruningAllowed() && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
 					
 					if (MoveUtil.isQuiet(move)) {
 						
@@ -467,7 +469,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				int reduction = 1;
-				if (depth >= 2 && movesPerformed > 1 && MoveUtil.isQuiet(move)) {
+				if (depth >= 2 && movesPerformed > 1 && MoveUtil.isQuiet(move) && moveGenFragment.isReductionAndPruningAllowed()) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
 					
