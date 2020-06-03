@@ -402,6 +402,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					continue;
 				}
 				
+				if (move == bestMove) {
+					continue;
+				}
+				
 				
 				//Build and sent minor info
 				if (ply == 0) {
