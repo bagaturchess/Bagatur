@@ -386,12 +386,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		for (int i = 0; i < moveGenFragments.size(); i++) {
 			
 			IMoveGenFragment moveGenFragment = moveGenFragments.get(i);
-			
-			if(!movesLoopCompleted) {
-				moveGenFragment.genMoves(parentMove, ply);
-			} else {
-				//moveGenFragment.count_move_cutoff();
-			}
+			moveGenFragment.genMoves(parentMove, ply, movesLoopCompleted);
 			
 			while (!movesLoopCompleted && moveGen.hasNext()) {
 				

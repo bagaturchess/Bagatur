@@ -33,10 +33,10 @@ public class MoveGenFragmentImpl_Killer2 extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
-	public void genMoves(int parentMove, int ply) {
+	public void genMoves(int parentMove, int ply, boolean dummy) {
 		int killer2Move = gen.getKiller2(ply);
 		if (killer2Move != 0 && cb.isValidMove(killer2Move)) {
-			gen.addMove(killer2Move);
+			if (!dummy) gen.addMove(killer2Move);
 		}
 	}
 	

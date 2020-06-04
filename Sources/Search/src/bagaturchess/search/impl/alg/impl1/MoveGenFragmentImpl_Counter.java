@@ -33,10 +33,10 @@ public class MoveGenFragmentImpl_Counter extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
-	public void genMoves(int parentMove, int ply) {
+	public void genMoves(int parentMove, int ply, boolean dummy) {
 		int counterMove = gen.getCounter(cb.colorToMove, parentMove);
 		if (counterMove != 0 && cb.isValidMove(counterMove)) {
-			gen.addMove(counterMove);
+			if (!dummy) gen.addMove(counterMove);
 		}
 	}
 	

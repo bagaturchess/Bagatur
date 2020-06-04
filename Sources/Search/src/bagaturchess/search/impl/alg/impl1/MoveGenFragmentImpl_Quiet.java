@@ -33,10 +33,12 @@ public class MoveGenFragmentImpl_Quiet extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
-	public void genMoves(int parentMove, int ply) {
-		gen.generateMoves(cb);
-		gen.setHHScores(cb.colorToMove, parentMove);
-		gen.sort();
+	public void genMoves(int parentMove, int ply, boolean dummy) {
+		if (!dummy) {
+			gen.generateMoves(cb);
+			gen.setHHScores(cb.colorToMove, parentMove);
+			gen.sort();
+		}
 	}
 	
 	

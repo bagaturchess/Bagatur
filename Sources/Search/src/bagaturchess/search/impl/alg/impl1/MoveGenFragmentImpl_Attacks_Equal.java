@@ -34,10 +34,12 @@ public class MoveGenFragmentImpl_Attacks_Equal extends MoveGenFragmentImpl_Base 
 	
 	
 	@Override
-	public void genMoves(int parentMove, int ply) {
-		gen.generateAttacks(cb);
-		gen.setMVVLVAScores(cb);
-		gen.sort();
+	public void genMoves(int parentMove, int ply, boolean dummy) {
+		if (!dummy) {
+			gen.generateAttacks(cb);
+			gen.setMVVLVAScores(cb);
+			gen.sort();
+		}
 	}
 	
 	

@@ -40,12 +40,12 @@ public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
-	public void genMoves(int parentMove, int ply) {
+	public void genMoves(int parentMove, int ply, boolean dummy) {
 		tt.get(cb.zobristKey, tt_entry);
 		if (!tt_entry.isEmpty()) {
 			if (cb.isValidMove(tt_entry.getBestMove())) {
 				int ttMove = tt_entry.getBestMove();
-				gen.addMove(ttMove);
+				if (!dummy) gen.addMove(ttMove);
 			}
 		}
 	}
