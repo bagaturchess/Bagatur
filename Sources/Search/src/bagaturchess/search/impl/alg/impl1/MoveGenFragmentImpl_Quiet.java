@@ -34,20 +34,20 @@ public class MoveGenFragmentImpl_Quiet extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
-	public void genMoves(int parentMove, int ply, boolean dummy) {
+	public void genMoves(int parentMove, int ply, int depth, boolean dummy) {
 		if (!dummy) {
 			gen.generateMoves(cb);
 			gen.setHHScores(cb.colorToMove, parentMove);
 			gen.sort();
-			count_move_total(gen.getCountMoves());
+			count_move_total(gen.getCountMoves(), depth);
 		}
 	}
 	
 	
 	@Override
-	public void updateWithBestMove(int bestMove) {
+	public void updateWithBestMove(int bestMove, int depth) {
 		if (MoveUtil.isQuiet(bestMove)) {
-			count_move_cutoff();
+			count_move_cutoff(depth);
 		}
 	}
 	

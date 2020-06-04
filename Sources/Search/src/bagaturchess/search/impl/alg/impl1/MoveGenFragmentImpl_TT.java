@@ -41,31 +41,31 @@ public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
-	public void genMoves(int parentMove, int ply, boolean dummy) {
+	public void genMoves(int parentMove, int ply, int depth, boolean dummy) {
 		ttMove = 0;
 		tt.get(cb.zobristKey, tt_entry);
 		if (!tt_entry.isEmpty()) {
 			if (cb.isValidMove(tt_entry.getBestMove())) {
 				ttMove = tt_entry.getBestMove();
 				if (!dummy) gen.addMove(ttMove);
-				count_move_total(1);
+				count_move_total(1, depth);
 			}
 		}
 	}
 	
 	
 	@Override
-	public void updateWithBestMove(int bestMove) {
+	public void updateWithBestMove(int bestMove, int depth) {
 		if (bestMove == ttMove) {
-			count_move_cutoff();
+			count_move_cutoff(depth);
 		}
 	}
 	
 	
-	@Override
+	/*@Override
 	public double getRate() {
 		return 1;
-	}
+	}*/
 	
 	
 	@Override

@@ -46,13 +46,13 @@ public abstract class MoveGenFragmentImpl_Base implements IMoveGenFragment {
 	}
 	
 	
-	protected void count_move_cutoff() {
-		count_cutoffs++;
+	protected void count_move_cutoff(int depth) {
+		count_cutoffs += depth * depth;
 	}
 	
 	
-	protected void count_move_total(int count) {
-		count_totals += count;
+	protected void count_move_total(int count, int depth) {
+		count_totals += count * depth * depth;
 	}
 	
 	

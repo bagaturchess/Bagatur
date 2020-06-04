@@ -36,11 +36,11 @@ public class MoveGenFragmentImpl_Killer1 extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
-	public void genMoves(int parentMove, int ply, boolean dummy) {
+	public void genMoves(int parentMove, int ply, int depth, boolean dummy) {
 		killer1Move = gen.getKiller1(ply);
 		if (killer1Move != 0 && cb.isValidMove(killer1Move)) {
 			if (!dummy) gen.addMove(killer1Move);
-			count_move_total(1);
+			count_move_total(1, depth);
 		} else {
 			killer1Move = 0;
 		}
@@ -48,9 +48,9 @@ public class MoveGenFragmentImpl_Killer1 extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
-	public void updateWithBestMove(int bestMove) {
+	public void updateWithBestMove(int bestMove, int depth) {
 		if (bestMove == killer1Move) {
-			count_move_cutoff();
+			count_move_cutoff(depth);
 		}
 	}
 	

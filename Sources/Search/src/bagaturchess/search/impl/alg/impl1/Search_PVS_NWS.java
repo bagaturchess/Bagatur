@@ -386,7 +386,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		for (int i = 0; i < moveGenFragments.size(); i++) {
 			
 			IMoveGenFragment moveGenFragment = moveGenFragments.get(i);
-			moveGenFragment.genMoves(parentMove, ply, movesLoopCompleted);
+			moveGenFragment.genMoves(parentMove, ply, depth, movesLoopCompleted);
 			
 			while (!movesLoopCompleted && moveGen.hasNext()) {
 				
@@ -533,7 +533,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (bestMove != 0) {
 			for (int i = 0; i < moveGenFragments.size(); i++) {
 				IMoveGenFragment moveGenFragment = moveGenFragments.get(i);
-				moveGenFragment.updateWithBestMove(bestMove);
+				moveGenFragment.updateWithBestMove(bestMove, depth);
 			}
 		}
 		

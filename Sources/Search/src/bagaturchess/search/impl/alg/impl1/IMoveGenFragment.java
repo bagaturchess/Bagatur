@@ -22,11 +22,11 @@ package bagaturchess.search.impl.alg.impl1;
 
 public interface IMoveGenFragment extends Comparable<IMoveGenFragment> {
 	
-	public void genMoves(int parentMove, int ply, boolean dummy);
+	public void genMoves(int parentMove, int ply, int depth, boolean dummy);
 	public double getRate();
 	public String toString();
 	public boolean isReductionAndPruningAllowed();
 	public int getReductionDecrease();
 	public boolean isLegal(int move);
-	public void updateWithBestMove(int bestMove);
+	public void updateWithBestMove(int bestMove, int depth);
 }

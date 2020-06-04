@@ -36,11 +36,11 @@ public class MoveGenFragmentImpl_Counter extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
-	public void genMoves(int parentMove, int ply, boolean dummy) {
+	public void genMoves(int parentMove, int ply, int depth, boolean dummy) {
 		counterMove = gen.getCounter(cb.colorToMove, parentMove);
 		if (counterMove != 0 && cb.isValidMove(counterMove)) {
 			if (!dummy) gen.addMove(counterMove);
-			count_move_total(1);
+			count_move_total(1, depth);
 		} else {
 			counterMove= 0;
 		}
@@ -48,9 +48,9 @@ public class MoveGenFragmentImpl_Counter extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
-	public void updateWithBestMove(int bestMove) {
+	public void updateWithBestMove(int bestMove, int depth) {
 		if (bestMove == counterMove) {
-			count_move_cutoff();
+			count_move_cutoff(depth);
 		}
 	}
 	

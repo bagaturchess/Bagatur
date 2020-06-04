@@ -35,20 +35,20 @@ public class MoveGenFragmentImpl_Attacks_Bad extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
-	public void genMoves(int parentMove, int ply, boolean dummy) {
+	public void genMoves(int parentMove, int ply, int depth, boolean dummy) {
 		
 		gen.generateAttacks(cb);
 		gen.setMVVLVAScores(cb);
 		gen.sort();
 		
-		count_move_total(gen.getCountBadAttacks(cb));
+		count_move_total(gen.getCountBadAttacks(cb), depth);
 	}
 	
 	
 	@Override
-	public void updateWithBestMove(int bestMove) {
+	public void updateWithBestMove(int bestMove, int depth) {
 		if (!MoveUtil.isQuiet(bestMove) && SEEUtil.getSeeCaptureScore(cb, bestMove) < 0) {
-			count_move_cutoff();
+			count_move_cutoff(depth);
 		}
 	}
 	
