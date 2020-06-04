@@ -40,7 +40,7 @@ public class MoveGenFragmentImpl_Counter extends MoveGenFragmentImpl_Base {
 		counterMove = gen.getCounter(cb.colorToMove, parentMove);
 		if (counterMove != 0 && cb.isValidMove(counterMove)) {
 			if (!dummy) gen.addMove(counterMove);
-			count_move_total();
+			count_move_total(1);
 		} else {
 			counterMove= 0;
 		}

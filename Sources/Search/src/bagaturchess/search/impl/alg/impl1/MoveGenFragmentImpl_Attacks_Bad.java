@@ -41,9 +41,7 @@ public class MoveGenFragmentImpl_Attacks_Bad extends MoveGenFragmentImpl_Base {
 		gen.setMVVLVAScores(cb);
 		gen.sort();
 		
-		if (gen.hasBadAttacks(cb)) {
-			count_move_total();
-		}
+		count_move_total(gen.getCountBadAttacks(cb));
 	}
 	
 	

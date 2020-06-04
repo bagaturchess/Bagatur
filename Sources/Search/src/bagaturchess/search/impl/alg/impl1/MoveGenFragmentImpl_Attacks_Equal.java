@@ -41,9 +41,7 @@ public class MoveGenFragmentImpl_Attacks_Equal extends MoveGenFragmentImpl_Base 
 		gen.setMVVLVAScores(cb);
 		gen.sort();
 		
-		if (gen.hasEqualAttacks(cb)) {
-			count_move_total();
-		}
+		count_move_total(gen.getCountEqualAttacks(cb));
 	}
 	
 	

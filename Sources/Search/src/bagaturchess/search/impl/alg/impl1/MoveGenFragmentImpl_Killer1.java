@@ -40,7 +40,7 @@ public class MoveGenFragmentImpl_Killer1 extends MoveGenFragmentImpl_Base {
 		killer1Move = gen.getKiller1(ply);
 		if (killer1Move != 0 && cb.isValidMove(killer1Move)) {
 			if (!dummy) gen.addMove(killer1Move);
-			count_move_total();
+			count_move_total(1);
 		} else {
 			killer1Move = 0;
 		}

@@ -48,7 +48,7 @@ public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 			if (cb.isValidMove(tt_entry.getBestMove())) {
 				ttMove = tt_entry.getBestMove();
 				if (!dummy) gen.addMove(ttMove);
-				count_move_total();
+				count_move_total(1);
 			}
 		}
 	}
@@ -62,10 +62,10 @@ public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	}
 	
 	
-	/*@Override
+	@Override
 	public double getRate() {
 		return 1;
-	}*/
+	}
 	
 	
 	@Override

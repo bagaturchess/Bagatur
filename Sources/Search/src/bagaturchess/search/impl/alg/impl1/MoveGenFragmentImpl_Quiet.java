@@ -22,6 +22,7 @@ package bagaturchess.search.impl.alg.impl1;
 
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
+import bagaturchess.bitboard.impl1.internal.MoveUtil;
 
 
 public class MoveGenFragmentImpl_Quiet extends MoveGenFragmentImpl_Base {
@@ -38,18 +39,21 @@ public class MoveGenFragmentImpl_Quiet extends MoveGenFragmentImpl_Base {
 			gen.generateMoves(cb);
 			gen.setHHScores(cb.colorToMove, parentMove);
 			gen.sort();
+			count_move_total(gen.getCountMoves());
 		}
 	}
 	
 	
 	@Override
 	public void updateWithBestMove(int bestMove) {
-		
+		if (MoveUtil.isQuiet(bestMove)) {
+			count_move_cutoff();
+		}
 	}
 	
 	
-	@Override
+	/*@Override
 	public double getRate() {
 		return 0;
-	}
+	}*/
 }

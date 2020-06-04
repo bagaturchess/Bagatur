@@ -41,9 +41,7 @@ public class MoveGenFragmentImpl_Attacks_Good extends MoveGenFragmentImpl_Base {
 		gen.setMVVLVAScores(cb);
 		gen.sort();
 		
-		if (gen.hasGoodAttacks(cb)) {
-			count_move_total();
-		}
+		count_move_total(gen.getCountGoodAttacks(cb));
 	}
 	
 	

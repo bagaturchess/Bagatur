@@ -183,27 +183,35 @@ public final class MoveGenerator {
 	}
 	
 	
-	public boolean hasGoodAttacks(final ChessBoard cb) {
+	public int getCountGoodAttacks(final ChessBoard cb) {
+		int count = 0;
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
-			if (SEEUtil.getSeeCaptureScore(cb, moves[j]) > 0) return true;
+			if (SEEUtil.getSeeCaptureScore(cb, moves[j]) > 0) count++;
 		}
-		return false;
+		return count;
 	}
 	
 	
-	public boolean hasEqualAttacks(final ChessBoard cb) {
+	public int getCountEqualAttacks(final ChessBoard cb) {
+		int count = 0;
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
-			if (SEEUtil.getSeeCaptureScore(cb, moves[j]) == 0) return true;
+			if (SEEUtil.getSeeCaptureScore(cb, moves[j]) == 0) count++;
 		}
-		return false;
+		return count;
 	}
 	
 	
-	public boolean hasBadAttacks(final ChessBoard cb) {
+	public int getCountBadAttacks(final ChessBoard cb) {
+		int count = 0;
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
-			if (SEEUtil.getSeeCaptureScore(cb, moves[j]) < 0) return true;
+			if (SEEUtil.getSeeCaptureScore(cb, moves[j]) < 0) count++;
 		}
-		return false;
+		return count;
+	}
+	
+	
+	public int getCountMoves() {
+		return nextToGenerate[currentPly] - nextToMove[currentPly];
 	}
 	
 	

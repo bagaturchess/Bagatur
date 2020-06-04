@@ -51,8 +51,8 @@ public abstract class MoveGenFragmentImpl_Base implements IMoveGenFragment {
 	}
 	
 	
-	protected void count_move_total() {
-		count_totals++;
+	protected void count_move_total(int count) {
+		count_totals += count;
 	}
 	
 	
