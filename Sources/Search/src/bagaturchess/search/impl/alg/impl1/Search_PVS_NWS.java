@@ -496,11 +496,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				cb.undoMove(move);
 				
-				moveGenFragment.count_move_total();
-				if (score >= beta) {
-					moveGenFragment.count_move_cutoff();
-				}
-				
 				if (MoveUtil.isQuiet(move)) {
 					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
 				}

@@ -46,14 +46,12 @@ public abstract class MoveGenFragmentImpl_Base implements IMoveGenFragment {
 	}
 	
 	
-	@Override
-	public void count_move_cutoff() {
+	protected void count_move_cutoff() {
 		count_cutoffs++;
 	}
 	
 	
-	@Override
-	public void count_move_total() {
+	protected void count_move_total() {
 		count_totals++;
 	}
 	
