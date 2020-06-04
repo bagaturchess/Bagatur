@@ -22,6 +22,7 @@ package bagaturchess.search.impl.alg.impl1;
 
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
+import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.SEEUtil;
 
 
@@ -35,17 +36,22 @@ public class MoveGenFragmentImpl_Attacks_Equal extends MoveGenFragmentImpl_Base 
 	
 	@Override
 	public void genMoves(int parentMove, int ply, boolean dummy) {
-		if (!dummy) {
-			gen.generateAttacks(cb);
-			gen.setMVVLVAScores(cb);
-			gen.sort();
+		
+		gen.generateAttacks(cb);
+		gen.setMVVLVAScores(cb);
+		gen.sort();
+		
+		if (gen.hasEqualAttacks(cb)) {
+			count_move_total();
 		}
 	}
 	
 	
 	@Override
 	public void updateWithBestMove(int bestMove) {
-		
+		if (!MoveUtil.isQuiet(bestMove) && SEEUtil.getSeeCaptureScore(cb, bestMove) == 0) {
+			count_move_cutoff();
+		}
 	}
 	
 	

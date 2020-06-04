@@ -31,6 +31,7 @@ public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	
 	private ITTable tt;
 	private ITTEntry tt_entry= new TTEntry_BaseImpl();
+	private int ttMove;
 	
 	
 	public MoveGenFragmentImpl_TT(ChessBoard _cb, MoveGenerator _gen, ITTable _tt) {
@@ -41,11 +42,13 @@ public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	
 	@Override
 	public void genMoves(int parentMove, int ply, boolean dummy) {
+		ttMove = 0;
 		tt.get(cb.zobristKey, tt_entry);
 		if (!tt_entry.isEmpty()) {
 			if (cb.isValidMove(tt_entry.getBestMove())) {
-				int ttMove = tt_entry.getBestMove();
+				ttMove = tt_entry.getBestMove();
 				if (!dummy) gen.addMove(ttMove);
+				count_move_total();
 			}
 		}
 	}
@@ -53,14 +56,16 @@ public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	
 	@Override
 	public void updateWithBestMove(int bestMove) {
-		
+		if (bestMove == ttMove) {
+			count_move_cutoff();
+		}
 	}
 	
 	
-	@Override
+	/*@Override
 	public double getRate() {
 		return 1;
-	}
+	}*/
 	
 	
 	@Override

@@ -27,6 +27,9 @@ import bagaturchess.bitboard.impl1.internal.MoveGenerator;
 public class MoveGenFragmentImpl_Killer2 extends MoveGenFragmentImpl_Base {
 	
 	
+	private int killer2Move;
+	
+	
 	public MoveGenFragmentImpl_Killer2(ChessBoard _cb, MoveGenerator _gen) {
 		super(_cb, _gen);
 	}
@@ -34,16 +37,21 @@ public class MoveGenFragmentImpl_Killer2 extends MoveGenFragmentImpl_Base {
 	
 	@Override
 	public void genMoves(int parentMove, int ply, boolean dummy) {
-		int killer2Move = gen.getKiller2(ply);
+		killer2Move = gen.getKiller2(ply);
 		if (killer2Move != 0 && cb.isValidMove(killer2Move)) {
 			if (!dummy) gen.addMove(killer2Move);
+			count_move_total();
+		} else {
+			killer2Move = 0;
 		}
 	}
 	
 	
 	@Override
 	public void updateWithBestMove(int bestMove) {
-		
+		if (bestMove == killer2Move) {
+			count_move_cutoff();
+		}
 	}
 	
 	

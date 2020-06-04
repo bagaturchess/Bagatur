@@ -181,7 +181,32 @@ public final class MoveGenerator {
 			//moveScores[j] = SEEUtil.getSeeCaptureScore(cb, moves[j]);
 		}
 	}
-
+	
+	
+	public boolean hasGoodAttacks(final ChessBoard cb) {
+		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
+			if (SEEUtil.getSeeCaptureScore(cb, moves[j]) > 0) return true;
+		}
+		return false;
+	}
+	
+	
+	public boolean hasEqualAttacks(final ChessBoard cb) {
+		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
+			if (SEEUtil.getSeeCaptureScore(cb, moves[j]) == 0) return true;
+		}
+		return false;
+	}
+	
+	
+	public boolean hasBadAttacks(final ChessBoard cb) {
+		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
+			if (SEEUtil.getSeeCaptureScore(cb, moves[j]) < 0) return true;
+		}
+		return false;
+	}
+	
+	
 	public void setHHScores(final int colorToMove, final int parentMove) {
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
 			moveScores[j] = getHHScore(colorToMove, MoveUtil.getFromToIndex(moves[j]), MoveUtil.getSourcePieceIndex(moves[j]), MoveUtil.getToIndex(moves[j]), parentMove);
