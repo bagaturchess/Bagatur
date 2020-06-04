@@ -383,7 +383,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}*/
 		
 		boolean movesLoopCompleted = false;
-		for (int i = 0; i < moveGenFragments.size(); i++) {
+		for (int i = 0; !movesLoopCompleted && i < moveGenFragments.size(); i++) {
 			
 			IMoveGenFragment moveGenFragment = moveGenFragments.get(i);
 			moveGenFragment.genMoves(parentMove, ply, depth, movesLoopCompleted);
