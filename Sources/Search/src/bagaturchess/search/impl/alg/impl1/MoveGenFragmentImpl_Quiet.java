@@ -52,8 +52,8 @@ public class MoveGenFragmentImpl_Quiet extends MoveGenFragmentImpl_Base {
 	}
 	
 	
-	/*@Override
+	@Override
 	public double getRate() {
 		return 0;
-	}*/
+	}
 }

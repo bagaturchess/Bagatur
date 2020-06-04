@@ -87,7 +87,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
 	
-	private List<IMoveGenFragment> moveGenFragments;
+	private List<IMoveGenFragment>[] moveGenFragments;
 	private long counter;
 	
 	
@@ -116,16 +116,20 @@ public class Search_PVS_NWS extends SearchImpl {
 		lastSentMinorInfo_nodesCount = 0;
 		lastSentMinorInfo_timestamp = 0;
 		
-		moveGenFragments = new ArrayList<IMoveGenFragment>();
-		moveGenFragments.add(new MoveGenFragmentImpl_TT(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), getEnv().getTPT()));
-		//moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Good(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
-		//moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Equal(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
-		//moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Bad(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
-		moveGenFragments.add(new MoveGenFragmentImpl_Attacks(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
-		moveGenFragments.add(new MoveGenFragmentImpl_Killer1(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
-		moveGenFragments.add(new MoveGenFragmentImpl_Killer2(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
-		moveGenFragments.add(new MoveGenFragmentImpl_Counter(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
-		moveGenFragments.add(new MoveGenFragmentImpl_Quiet(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
+		moveGenFragments = new List[ISearch.MAX_DEPTH];
+		for (int i = 0; i < moveGenFragments.length; i++) {
+			moveGenFragments[i] = new ArrayList<IMoveGenFragment>();
+			moveGenFragments[i].add(new MoveGenFragmentImpl_TT(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator(), getEnv().getTPT()));
+			//moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Good(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
+			//moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Equal(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
+			//moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Bad(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
+			moveGenFragments[i].add(new MoveGenFragmentImpl_Attacks(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
+			moveGenFragments[i].add(new MoveGenFragmentImpl_Killer1(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
+			moveGenFragments[i].add(new MoveGenFragmentImpl_Killer2(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
+			moveGenFragments[i].add(new MoveGenFragmentImpl_Counter(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
+			moveGenFragments[i].add(new MoveGenFragmentImpl_Quiet(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
+
+		}
 	}
 	
 	
@@ -377,16 +381,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		moveGen.startPly();
 		
-		/*Collections.sort(moveGenFragments);
+		//Collections.sort(moveGenFragments[ply]);
 		counter++;
 		if (counter % 100000 == 0) {
-			System.out.println(moveGenFragments);
-		}*/
+			//System.out.println(moveGenFragments);
+		}
 		
 		boolean movesLoopCompleted = false;
-		for (int i = 0; !movesLoopCompleted && i < moveGenFragments.size(); i++) {
+		for (int i = 0; !movesLoopCompleted && i < moveGenFragments[ply].size(); i++) {
 			
-			IMoveGenFragment moveGenFragment = moveGenFragments.get(i);
+			IMoveGenFragment moveGenFragment = moveGenFragments[ply].get(i);
 			moveGenFragment.genMoves(parentMove, ply, depth, movesLoopCompleted);
 			
 			while (!movesLoopCompleted && moveGen.hasNext()) {
@@ -532,8 +536,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (bestMove != 0) {
-			for (int i = 0; i < moveGenFragments.size(); i++) {
-				IMoveGenFragment moveGenFragment = moveGenFragments.get(i);
+			for (int i = 0; i < moveGenFragments[ply].size(); i++) {
+				IMoveGenFragment moveGenFragment = moveGenFragments[ply].get(i);
 				moveGenFragment.updateWithBestMove(bestMove, depth);
 			}
 		}

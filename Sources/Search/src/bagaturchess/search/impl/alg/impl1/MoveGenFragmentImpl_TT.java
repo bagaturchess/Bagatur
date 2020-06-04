@@ -62,10 +62,10 @@ public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	}
 	
 	
-	/*@Override
+	@Override
 	public double getRate() {
 		return 1;
-	}*/
+	}
 	
 	
 	@Override
