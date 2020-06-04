@@ -44,6 +44,12 @@ public class MoveGenFragmentImpl_Attacks_Bad extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
+	public void updateWithBestMove(int bestMove) {
+		
+	}
+	
+	
+	@Override
 	public boolean isLegal(int move) {
 		return super.isLegal(move) && SEEUtil.getSeeCaptureScore(cb, move) < 0;
 	}

@@ -52,6 +52,12 @@ public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
+	public void updateWithBestMove(int bestMove) {
+		
+	}
+	
+	
+	@Override
 	public double getRate() {
 		return 1;
 	}

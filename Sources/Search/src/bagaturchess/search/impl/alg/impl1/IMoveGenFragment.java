@@ -30,4 +30,5 @@ public interface IMoveGenFragment extends Comparable<IMoveGenFragment> {
 	public boolean isReductionAndPruningAllowed();
 	public int getReductionDecrease();
 	public boolean isLegal(int move);
+	public void updateWithBestMove(int bestMove);
 }

@@ -42,6 +42,12 @@ public class MoveGenFragmentImpl_Counter extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
+	public void updateWithBestMove(int bestMove) {
+		
+	}
+	
+	
+	@Override
 	public int getReductionDecrease() {
 		return 1;
 	}

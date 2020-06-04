@@ -43,6 +43,12 @@ public class MoveGenFragmentImpl_Quiet extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
+	public void updateWithBestMove(int bestMove) {
+		
+	}
+	
+	
+	@Override
 	public double getRate() {
 		return 0;
 	}

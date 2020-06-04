@@ -534,6 +534,14 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
+		
+		if (bestMove != 0) {
+			for (int i = 0; i < moveGenFragments.size(); i++) {
+				IMoveGenFragment moveGenFragment = moveGenFragments.get(i);
+				moveGenFragment.updateWithBestMove(bestMove);
+			}
+		}
+		
 		moveGen.endPly();
 		
 		if (movesPerformed == 0) {
