@@ -30,7 +30,7 @@ import bagaturchess.search.impl.tpt.TTEntry_BaseImpl;
 public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	
 	private ITTable tt;
-	private ITTEntry tt_entry= new TTEntry_BaseImpl();
+	private ITTEntry tt_entry = new TTEntry_BaseImpl();
 	private int ttMove;
 	
 	
