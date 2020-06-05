@@ -381,11 +381,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		moveGen.startPly();
 		
-		//Collections.sort(moveGenFragments[ply]);
+		/*Collections.sort(moveGenFragments[ply]);
 		counter++;
 		if (counter % 100000 == 0) {
-			//System.out.println(moveGenFragments);
-		}
+			System.out.println(moveGenFragments[ply]);
+		}*/
 		
 		boolean movesLoopCompleted = false;
 		for (int i = 0; !movesLoopCompleted && i < moveGenFragments[ply].size(); i++) {
