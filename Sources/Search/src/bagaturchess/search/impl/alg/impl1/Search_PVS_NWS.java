@@ -123,7 +123,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			//moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Good(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 			//moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Equal(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 			//moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Bad(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
-			moveGenFragments[i].add(new MoveGenFragmentImpl_Attacks(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
+			moveGenFragments[i].add(new MoveGenFragmentImpl_Attacks_All(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 			moveGenFragments[i].add(new MoveGenFragmentImpl_Killer1(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 			moveGenFragments[i].add(new MoveGenFragmentImpl_Killer2(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
 			moveGenFragments[i].add(new MoveGenFragmentImpl_Counter(((BoardImpl) env.getBitboard()).getChessBoard(), ((BoardImpl) env.getBitboard()).getMoveGenerator()));
@@ -433,10 +433,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (!isPv && !wasInCheck && movesPerformed > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
 					
 					if (MoveUtil.isQuiet(move)) {
-						
-						/*if (moveGen.getScore() < historyStat.getEntropy() / depth) {
-							continue;
-						}*/
 						
 						if (EngineConstants.ENABLE_LMP && depth <= 4 && movesPerformed >= depth * 3 + 3) {
 							continue;

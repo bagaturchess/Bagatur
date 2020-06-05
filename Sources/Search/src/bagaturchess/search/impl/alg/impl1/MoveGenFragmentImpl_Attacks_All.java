@@ -25,10 +25,10 @@ import bagaturchess.bitboard.impl1.internal.MoveGenerator;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 
 
-public class MoveGenFragmentImpl_Attacks extends MoveGenFragmentImpl_Base {
+public class MoveGenFragmentImpl_Attacks_All extends MoveGenFragmentImpl_Base {
 	
 	
-	public MoveGenFragmentImpl_Attacks(ChessBoard _cb, MoveGenerator _gen) {
+	public MoveGenFragmentImpl_Attacks_All(ChessBoard _cb, MoveGenerator _gen) {
 		super(_cb, _gen);
 	}
 	
