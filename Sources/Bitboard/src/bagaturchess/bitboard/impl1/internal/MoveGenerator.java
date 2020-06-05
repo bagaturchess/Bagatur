@@ -210,6 +210,15 @@ public final class MoveGenerator {
 	}
 	
 	
+	public int getCountGoodAndEqualAttacks(final ChessBoard cb) {
+		int count = 0;
+		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
+			if (SEEUtil.getSeeCaptureScore(cb, moves[j]) >= 0) count++;
+		}
+		return count;
+	}
+	
+	
 	public int getCountMoves() {
 		return nextToGenerate[currentPly] - nextToMove[currentPly];
 	}
