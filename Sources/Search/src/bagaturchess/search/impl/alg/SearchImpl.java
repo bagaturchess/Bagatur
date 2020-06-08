@@ -64,7 +64,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	protected int[] buff_tpt_depthtracking = new int[1];
 	
 	protected GTBProbeInput temp_input = new GTBProbeInput();
-	protected ITTEntry tt_cached = new TTEntry_BaseImpl();
+	protected ITTEntry[] tt_entries_per_ply = new ITTEntry[ISearch.MAX_DEPTH];
 	
 	
 	public void setup(IBitBoard bitboardForSetup) {
@@ -99,6 +99,10 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		lists_capsproms = new ISearchMoveList[MAX_DEPTH];
 		for (int i=0; i<lists_capsproms.length; i++) {
 			lists_capsproms[i] = env.getMoveListFactory().createListCaptures(env);
+		}
+		
+		for (int i=0; i<tt_entries_per_ply.length; i++) {
+			tt_entries_per_ply[i] = new TTEntry_BaseImpl();
 		}
 		
 		initParams(env.getSearchConfig());
@@ -297,17 +301,17 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		
 		long hashkey = env.getBitboard().getHashKey();
 		
-		tpt.get(hashkey, tt_cached);
+		tpt.get(hashkey, tt_entries_per_ply[depth]);
 		
-		if (tt_cached.isEmpty()) {
+		if (tt_entries_per_ply[depth].isEmpty()) {
 			return false;
 		}
 		
-		if (tt_cached.getDepth() >= depth) {
+		if (tt_entries_per_ply[depth].getDepth() >= depth) {
 			
 			//info.setSearchedNodes(info.getSearchedNodes() + 1);
 			
-			result.bestmove = tt_cached.getBestMove();
+			result.bestmove = tt_entries_per_ply[depth].getBestMove();
 			
 			/*if (result.bestmove == 0) {
 				result.bestmove = useLower ? entry.getBestMove_upper() : entry.getBestMove_lower();

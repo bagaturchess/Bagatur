@@ -199,22 +199,22 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		env.getTPT().get(cb.zobristKey, tt_cached);
-		if (!tt_cached.isEmpty() && cb.isValidMove(tt_cached.getBestMove())) {
+		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
+		if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
 			
-			int tpt_depth = tt_cached.getDepth();
+			int tpt_depth = tt_entries_per_ply[ply].getDepth();
 			
 			if (tpt_depth >= depth) {
-				if (tt_cached.getFlag() == ITTEntry.FLAG_EXACT) {
-					extractFromTT(ply, node, tt_cached, info, isPv);
+				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT) {
+					extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 					return node.eval;
 				} else {
-					if (tt_cached.getFlag() == ITTEntry.FLAG_LOWER && tt_cached.getEval() >= beta) {
-						extractFromTT(ply, node, tt_cached, info, isPv);
+					if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[ply].getEval() >= beta) {
+						extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 						return node.eval;
 					}
-					if (tt_cached.getFlag() == ITTEntry.FLAG_UPPER && tt_cached.getEval() <= alpha) {
-						extractFromTT(ply, node, tt_cached, info, isPv);
+					if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[ply].getEval() <= alpha) {
+						extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 						return node.eval;
 					}
 				}
@@ -291,12 +291,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
 			
-			if (EngineConstants.USE_TT_SCORE_AS_EVAL && !tt_cached.isEmpty()) {
-				if (tt_cached.getFlag() == ITTEntry.FLAG_EXACT
-						|| (tt_cached.getFlag() == ITTEntry.FLAG_UPPER && tt_cached.getEval() < eval)
-						|| (tt_cached.getFlag() == ITTEntry.FLAG_LOWER && tt_cached.getEval() > eval)
+			if (EngineConstants.USE_TT_SCORE_AS_EVAL && !tt_entries_per_ply[ply].isEmpty()) {
+				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT
+						|| (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[ply].getEval() < eval)
+						|| (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[ply].getEval() > eval)
 					) {
-					eval = tt_cached.getEval();
+					eval = tt_entries_per_ply[ply].getEval();
 				}
 			}
 			
@@ -372,16 +372,16 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			switch (phase) {
 				case PHASE_TT:
-					if (tt_cached.isEmpty()) {
+					if (tt_entries_per_ply[ply].isEmpty()) {
 						if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
 							if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
 								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, isPv);
 							}
 						}
 					}
-					env.getTPT().get(cb.zobristKey, tt_cached);
-					if (!tt_cached.isEmpty()) {
-						ttMove = tt_cached.getBestMove();
+					env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
+					if (!tt_entries_per_ply[ply].isEmpty()) {
+						ttMove = tt_entries_per_ply[ply].getBestMove();
 						if (cb.isValidMove(ttMove)) {
 							moveGen.addMove(ttMove);
 						} else {
@@ -628,19 +628,19 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		env.getTPT().get(cb.zobristKey, tt_cached);
-		if (!tt_cached.isEmpty()) {
-			int tpt_depth = tt_cached.getDepth();
+		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
+		if (!tt_entries_per_ply[ply].isEmpty()) {
+			int tpt_depth = tt_entries_per_ply[ply].getDepth();
 			
 			if (tpt_depth >= 0) {
-				if (tt_cached.getFlag() == ITTEntry.FLAG_EXACT) {
-					return tt_cached.getEval();
+				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT) {
+					return tt_entries_per_ply[ply].getEval();
 				} else {
-					if (tt_cached.getFlag() == ITTEntry.FLAG_LOWER && tt_cached.getEval() >= beta) {
-						return tt_cached.getEval();
+					if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[ply].getEval() >= beta) {
+						return tt_entries_per_ply[ply].getEval();
 					}
-					if (tt_cached.getFlag() == ITTEntry.FLAG_UPPER && tt_cached.getEval() <= alpha) {
-						return tt_cached.getEval();
+					if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[ply].getEval() <= alpha) {
+						return tt_entries_per_ply[ply].getEval();
 					}
 				}
 			}
@@ -665,8 +665,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		while (phase <= PHASE_ATTACKING_GOOD) {
 			switch (phase) {
 				case PHASE_TT:
-					if (!tt_cached.isEmpty()) {
-						int ttMove = tt_cached.getBestMove();
+					if (!tt_entries_per_ply[ply].isEmpty()) {
+						int ttMove = tt_entries_per_ply[ply].getBestMove();
 						if (cb.isValidMove(ttMove)) {
 							if (env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
 								moveGen.addMove(ttMove);
@@ -780,10 +780,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			env.getBitboard().makeMoveForward(result.bestmove);
 			
-			env.getTPT().get(env.getBitboard().getHashKey(), tt_cached);
+			env.getTPT().get(env.getBitboard().getHashKey(), tt_entries_per_ply[ply + 1]);
 			
-			if (!tt_cached.isEmpty()) {
-				draw = extractFromTT(ply + 1, result.child, tt_cached, info, isPv);
+			if (!tt_entries_per_ply[ply + 1].isEmpty()) {
+				draw = extractFromTT(ply + 1, result.child, tt_entries_per_ply[ply + 1], info, isPv);
 				if (draw) {
 					result.eval = EvalConstants.SCORE_DRAW;
 				} else {

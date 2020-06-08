@@ -258,9 +258,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		//int tpt_upper = MAX;
 		int tpt_move = 0;
 		{
-			env.getTPT().get(backtrackingInfo.hash_key, tt_cached);
-			if (!tt_cached.isEmpty()) {
-				tpt_move = tt_cached.getBestMove();
+			env.getTPT().get(backtrackingInfo.hash_key, tt_entries_per_ply[depth]);
+			if (!tt_entries_per_ply[depth].isEmpty()) {
+				tpt_move = tt_entries_per_ply[depth].getBestMove();
 			}
 		}
         
@@ -600,20 +600,20 @@ public class Search_PVS_NWS extends SearchImpl {
 		int tpt_move = 0;
         
 		
-		env.getTPT().get(backtrackingInfo.hash_key, tt_cached);
-		if (!tt_cached.isEmpty()) {
-			tpt_depth = tt_cached.getDepth();
-			tpt_move = tt_cached.getBestMove();
+		env.getTPT().get(backtrackingInfo.hash_key, tt_entries_per_ply[depth]);
+		if (!tt_entries_per_ply[depth].isEmpty()) {
+			tpt_depth = tt_entries_per_ply[depth].getDepth();
+			tpt_move = tt_entries_per_ply[depth].getBestMove();
 			
 			if (tpt_depth >= rest) {
-				if (tt_cached.getFlag() == ITTEntry.FLAG_EXACT) {
-					return tt_cached.getEval();
+				if (tt_entries_per_ply[depth].getFlag() == ITTEntry.FLAG_EXACT) {
+					return tt_entries_per_ply[depth].getEval();
 				} else {
-					if (tt_cached.getFlag() == ITTEntry.FLAG_LOWER && tt_cached.getEval() >= beta) {
-						return tt_cached.getEval();
+					if (tt_entries_per_ply[depth].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[depth].getEval() >= beta) {
+						return tt_entries_per_ply[depth].getEval();
 					}
-					if (tt_cached.getFlag() == ITTEntry.FLAG_UPPER && tt_cached.getEval() <= alpha_org) {
-						return tt_cached.getEval();
+					if (tt_entries_per_ply[depth].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[depth].getEval() <= alpha_org) {
+						return tt_entries_per_ply[depth].getEval();
 					}
 				}
 			}
@@ -695,10 +695,10 @@ public class Search_PVS_NWS extends SearchImpl {
 						//System.out.println("zungzwang hit");
 					}
 					
-					env.getTPT().get(backtrackingInfo.hash_key, tt_cached);
-					if (tpt_move == 0 && !tt_cached.isEmpty()) {
-						tpt_depth = tt_cached.getDepth();
-						tpt_move = tt_cached.getBestMove();
+					env.getTPT().get(backtrackingInfo.hash_key, tt_entries_per_ply[depth]);
+					if (tpt_move == 0 && !tt_entries_per_ply[depth].isEmpty()) {
+						tpt_depth = tt_entries_per_ply[depth].getDepth();
+						tpt_move = tt_entries_per_ply[depth].getBestMove();
 					}
 				}
 			}
@@ -1035,9 +1035,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int tpt_move = 0;
 		
-		env.getTPT().get(hashkey, tt_cached);
-		if (!tt_cached.isEmpty()) {
-			tpt_move = tt_cached.getBestMove();
+		env.getTPT().get(hashkey, tt_entries_per_ply[depth]);
+		if (!tt_entries_per_ply[depth].isEmpty()) {
+			tpt_move = tt_entries_per_ply[depth].getBestMove();
 		}
 		
 		
@@ -1149,18 +1149,18 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int tpt_move = 0;
 		
-		env.getTPT().get(hashkey, tt_cached);
-		if (!tt_cached.isEmpty()) {
-			tpt_move = tt_cached.getBestMove();
+		env.getTPT().get(hashkey, tt_entries_per_ply[depth]);
+		if (!tt_entries_per_ply[depth].isEmpty()) {
+			tpt_move = tt_entries_per_ply[depth].getBestMove();
 			
-			if (tt_cached.getFlag() == ITTEntry.FLAG_EXACT) {
-				return tt_cached.getEval();
+			if (tt_entries_per_ply[depth].getFlag() == ITTEntry.FLAG_EXACT) {
+				return tt_entries_per_ply[depth].getEval();
 			} else {
-				if (tt_cached.getFlag() == ITTEntry.FLAG_LOWER && tt_cached.getEval() >= beta) {
-					return tt_cached.getEval();
+				if (tt_entries_per_ply[depth].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[depth].getEval() >= beta) {
+					return tt_entries_per_ply[depth].getEval();
 				}
-				if (tt_cached.getFlag() == ITTEntry.FLAG_UPPER && tt_cached.getEval() <= alpha_org) {
-					return tt_cached.getEval();
+				if (tt_entries_per_ply[depth].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[depth].getEval() <= alpha_org) {
+					return tt_entries_per_ply[depth].getEval();
 				}
 			}
 		}
