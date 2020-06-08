@@ -286,7 +286,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int eval = ISearch.MIN;
 		if (!isPv && cb.checkingPieces == 0) {
-
+			
 			
 			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
@@ -337,7 +337,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (EngineConstants.ENABLE_NULL_MOVE && depth > 2) {
+			if (EngineConstants.ENABLE_NULL_MOVE) {
 				if (eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 					cb.doNullMove();
 					final int reduction = Math.max(depth / 2, depth / 4 + 3 + Math.min((eval - beta) / 80, 3));
