@@ -744,10 +744,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			throw new IllegalStateException("entry.isEmpty()");
 		}
 		
-		if (result == null) {
-			return false;
-		}
-		
 		result.leaf = true;
 		
 		if (ply > 0 && isDraw()) {
@@ -765,14 +761,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		boolean draw = false;
 		
-		if (isPv && ((BoardImpl) env.getBitboard()).getChessBoard().isValidMove(result.bestmove)) {
+		PVNode childNode = result.child;
+		
+		if (isPv && childNode != null && ((BoardImpl) env.getBitboard()).getChessBoard().isValidMove(result.bestmove)) {
 			
 			env.getBitboard().makeMoveForward(result.bestmove);
 			
 			env.getTPT().get(env.getBitboard().getHashKey(), tt_entries_per_ply[ply + 1]);
 			
 			if (!tt_entries_per_ply[ply + 1].isEmpty()) {
-				draw = extractFromTT(ply + 1, result.child, tt_entries_per_ply[ply + 1], info, isPv);
+				draw = extractFromTT(ply + 1, childNode, tt_entries_per_ply[ply + 1], info, isPv);
 				if (draw) {
 					result.eval = EvalConstants.SCORE_DRAW;
 				} else {
