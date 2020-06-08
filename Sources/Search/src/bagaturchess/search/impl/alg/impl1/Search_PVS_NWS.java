@@ -199,8 +199,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		int ttMove = 0;
 		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
 		if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
+			
+			ttMove = tt_entries_per_ply[ply].getBestMove();
 			
 			int tpt_depth = tt_entries_per_ply[ply].getDepth();
 			
@@ -360,7 +363,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
-		int ttMove = 0;
 		int counterMove = 0;
 		int killer1Move = 0;
 		int killer2Move = 0;
@@ -372,21 +374,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			switch (phase) {
 				case PHASE_TT:
-					if (tt_entries_per_ply[ply].isEmpty()) {
-						if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
-							if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
-								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, isPv);
-							}
-						}
-					}
-					env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
-					if (!tt_entries_per_ply[ply].isEmpty()) {
-						ttMove = tt_entries_per_ply[ply].getBestMove();
-						if (cb.isValidMove(ttMove)) {
-							moveGen.addMove(ttMove);
-						} else {
-							ttMove = 0;
-						}
+					if (ttMove != 0 && cb.isValidMove(ttMove)) {
+						moveGen.addMove(ttMove);
 					}
 					break;
 				case PHASE_ATTACKING_GOOD:
