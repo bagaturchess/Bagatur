@@ -353,84 +353,83 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
-
+		
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
-
+		
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
 		int bestMove = 0;
-		int bestScore = ISearch.MIN - 1;
+		int bestScore = ISearch.MIN;
 		int ttMove = 0;
 		int counterMove = 0;
 		int killer1Move = 0;
 		int killer2Move = 0;
 		int movesPerformed = 0;
-
+		
 		moveGen.startPly();
 		int phase = PHASE_TT;
 		while (phase <= PHASE_ATTACKING_BAD) {
 			
 			switch (phase) {
-			
-			case PHASE_TT:
-				if (tt_cached.isEmpty()) {
-					if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
-						if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
-							calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, isPv);
+				case PHASE_TT:
+					if (tt_cached.isEmpty()) {
+						if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
+							if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
+								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, isPv);
+							}
 						}
 					}
-				}
-				env.getTPT().get(cb.zobristKey, tt_cached);
-				if (!tt_cached.isEmpty()) {
-					ttMove = tt_cached.getBestMove();
-					if (cb.isValidMove(ttMove)) {
-						moveGen.addMove(ttMove);
-					} else {
-						ttMove = 0;
+					env.getTPT().get(cb.zobristKey, tt_cached);
+					if (!tt_cached.isEmpty()) {
+						ttMove = tt_cached.getBestMove();
+						if (cb.isValidMove(ttMove)) {
+							moveGen.addMove(ttMove);
+						} else {
+							ttMove = 0;
+						}
 					}
-				}
-				break;
-			case PHASE_ATTACKING_GOOD:
-				moveGen.generateAttacks(cb);
-				moveGen.setMVVLVAScores(cb);
-				moveGen.sort();
-				break;
-			case PHASE_COUNTER:
-				counterMove = moveGen.getCounter(cb.colorToMove, parentMove);
-				if (counterMove != 0 && counterMove != ttMove && cb.isValidMove(counterMove)
-						&& cb.isLegal(counterMove)) {
-					moveGen.addMove(counterMove);
 					break;
-				} else {
-					phase++;
-				}
-			case PHASE_KILLER_1:
-				killer1Move = moveGen.getKiller1(ply);
-				if (killer1Move != 0 && killer1Move != ttMove && killer1Move != counterMove && cb.isValidMove(killer1Move) && cb.isLegal(killer1Move)) {
-					moveGen.addMove(killer1Move);
+				case PHASE_ATTACKING_GOOD:
+					moveGen.generateAttacks(cb);
+					moveGen.setMVVLVAScores(cb);
+					moveGen.sort();
 					break;
-				} else {
-					phase++;
-				}
-			case PHASE_KILLER_2:
-				killer2Move = moveGen.getKiller2(ply);
-				if (killer2Move != 0 && killer2Move != ttMove && killer2Move != counterMove && cb.isValidMove(killer2Move) && cb.isLegal(killer2Move)) {
-					moveGen.addMove(killer2Move);
+				case PHASE_COUNTER:
+					counterMove = moveGen.getCounter(cb.colorToMove, parentMove);
+					if (counterMove != 0 && counterMove != ttMove && cb.isValidMove(counterMove)
+							&& cb.isLegal(counterMove)) {
+						moveGen.addMove(counterMove);
+						break;
+					} else {
+						phase++;
+					}
+				case PHASE_KILLER_1:
+					killer1Move = moveGen.getKiller1(ply);
+					if (killer1Move != 0 && killer1Move != ttMove && killer1Move != counterMove && cb.isValidMove(killer1Move) && cb.isLegal(killer1Move)) {
+						moveGen.addMove(killer1Move);
+						break;
+					} else {
+						phase++;
+					}
+				case PHASE_KILLER_2:
+					killer2Move = moveGen.getKiller2(ply);
+					if (killer2Move != 0 && killer2Move != ttMove && killer2Move != counterMove && cb.isValidMove(killer2Move) && cb.isLegal(killer2Move)) {
+						moveGen.addMove(killer2Move);
+						break;
+					} else {
+						phase++;
+					}
+				case PHASE_QUIET:
+					moveGen.generateMoves(cb);
+					moveGen.setHHScores(cb.colorToMove, parentMove);
+					moveGen.sort();
 					break;
-				} else {
-					phase++;
-				}
-			case PHASE_QUIET:
-				moveGen.generateMoves(cb);
-				moveGen.setHHScores(cb.colorToMove, parentMove);
-				moveGen.sort();
-				break;
-			case PHASE_ATTACKING_BAD:
-				moveGen.generateAttacks(cb);
-				moveGen.setMVVLVAScores(cb);
-				moveGen.sort();
+				case PHASE_ATTACKING_BAD:
+					moveGen.generateAttacks(cb);
+					moveGen.setMVVLVAScores(cb);
+					moveGen.sort();
 			}
-		
+			
 			while (moveGen.hasNext()) {
 				final int move = moveGen.next();
 
