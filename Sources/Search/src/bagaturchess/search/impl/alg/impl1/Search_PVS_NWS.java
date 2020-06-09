@@ -555,7 +555,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					bestScore = score;
 					bestMove = move;
-
+					
 					node.bestmove = bestMove;
 					node.eval = bestScore;
 					node.leaf = false;
