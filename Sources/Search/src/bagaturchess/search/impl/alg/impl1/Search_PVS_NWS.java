@@ -619,18 +619,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
 		if (!tt_entries_per_ply[ply].isEmpty()) {
-			int tpt_depth = tt_entries_per_ply[ply].getDepth();
-			
-			if (tpt_depth >= 0) {
-				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT) {
+			if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT) {
+				return tt_entries_per_ply[ply].getEval();
+			} else {
+				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[ply].getEval() >= beta) {
 					return tt_entries_per_ply[ply].getEval();
-				} else {
-					if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[ply].getEval() >= beta) {
-						return tt_entries_per_ply[ply].getEval();
-					}
-					if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[ply].getEval() <= alpha) {
-						return tt_entries_per_ply[ply].getEval();
-					}
+				}
+				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[ply].getEval() <= alpha) {
+					return tt_entries_per_ply[ply].getEval();
 				}
 			}
 		}
