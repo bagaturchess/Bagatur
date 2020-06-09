@@ -429,7 +429,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					info.setCurrentMoveNumber((movesPerformed + 1));
 				}
 				
-				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
+				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000) { //Check time on each 50 000 nodes
 					
 					long timestamp = System.currentTimeMillis();
 					
