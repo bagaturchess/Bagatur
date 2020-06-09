@@ -420,8 +420,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			while (moveGen.hasNext()) {
+				
 				final int move = moveGen.next();
-
+				
 				//Build and sent minor info
 				if (ply == 0) {
 					info.setCurrentMove(move);
@@ -509,15 +510,17 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
 					
-					if (moveGen.getScore() > historyAVGScores.getEntropy()) {
+					/*if (moveGen.getScore() > historyAVGScores.getEntropy()) {
 						reduction -= 1;
 						if (moveGen.getScore() > 2 * historyAVGScores.getEntropy()) {
 							reduction -= 1;
 						}
-					}
+					}*/
+					
 					if (move == killer1Move || move == killer2Move || move == counterMove) {
 						reduction -= 1;
 					}
+					
 					if (!isPv) {
 						reduction += 1;
 					}
