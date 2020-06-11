@@ -94,8 +94,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	public Search_PVS_NWS(SearchEnv _env) {
 		super(_env);
-		
-		historyStatistics = new VarStatistic(false);
 	}
 	
 	
@@ -114,7 +112,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		lastSentMinorInfo_nodesCount = 0;
 		lastSentMinorInfo_timestamp = 0;
 		
-		historyStatistics.norm();
+		historyStatistics = new VarStatistic(false);
 	}
 	
 	
@@ -516,7 +514,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (moveGen.getScore() > historyStatistics.getEntropy()) {
 						reduction -= 1;
-						if (moveGen.getScore() > historyStatistics.getEntropy() + historyStatistics.getDisperse()) {
+						if (moveGen.getScore() > 2 * historyStatistics.getEntropy()) {
 							reduction -= 1;
 						}
 					}
