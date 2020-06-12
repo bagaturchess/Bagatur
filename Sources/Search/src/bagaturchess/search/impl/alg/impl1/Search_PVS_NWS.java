@@ -23,7 +23,10 @@
 package bagaturchess.search.impl.alg.impl1;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EmptyStackException;
+import java.util.List;
 import java.util.Stack;
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -86,6 +89,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private VarStatistic historyStatistics;
 	
+	List<IMoveGenFragment> moveGenFragments;
+	
 	
 	public Search_PVS_NWS(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
@@ -93,7 +98,21 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	public Search_PVS_NWS(SearchEnv _env) {
+		
 		super(_env);
+		
+		moveGenFragments = new ArrayList<IMoveGenFragment>();
+		
+		ChessBoard cb = ((BoardImpl) env.getBitboard()).getChessBoard();
+		MoveGenerator mg = ((BoardImpl) env.getBitboard()).getMoveGenerator();
+		
+		moveGenFragments.add(new MoveGenFragmentImpl_TT(cb, mg, env.getTPT()));
+		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_GoodAndEqual(cb, mg));
+		moveGenFragments.add(new MoveGenFragmentImpl_Counter(cb, mg));
+		moveGenFragments.add(new MoveGenFragmentImpl_Killer1(cb, mg));
+		moveGenFragments.add(new MoveGenFragmentImpl_Killer2(cb, mg));
+		moveGenFragments.add(new MoveGenFragmentImpl_Quiet(cb, mg));
+		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Bad(cb, mg));
 	}
 	
 	
@@ -369,6 +388,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		int movesPerformed = 0;
 		
 		moveGen.startPly();
+		
+		for (int i = 0; i < moveGenFragments.size(); i++) {
+			IMoveGenFragment fragment = moveGenFragments.get(i);
+			//fragment.genMoves(parentMove, ply, depth, true);
+		}
+		//Collections.sort(moveGenFragments);
+		
 		int phase = PHASE_TT;
 		while (phase <= PHASE_ATTACKING_BAD) {
 			
@@ -581,6 +607,14 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			phase++;
 		}
+		
+		if (bestMove != 0) {
+			for (int i = 0; i < moveGenFragments.size(); i++) {
+				IMoveGenFragment fragment = moveGenFragments.get(i);
+				fragment.updateWithBestMove(bestMove, depth);
+			}
+		}
+		
 		moveGen.endPly();
 		
 		if (movesPerformed == 0) {

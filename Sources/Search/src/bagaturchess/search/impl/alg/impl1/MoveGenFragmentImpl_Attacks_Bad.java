@@ -37,9 +37,11 @@ public class MoveGenFragmentImpl_Attacks_Bad extends MoveGenFragmentImpl_Base {
 	@Override
 	public void genMoves(int parentMove, int ply, int depth, boolean dummy) {
 		
-		gen.generateAttacks(cb);
-		gen.setMVVLVAScores(cb);
-		gen.sort();
+		if (!dummy) {
+			gen.generateAttacks(cb);
+			gen.setMVVLVAScores(cb);
+			gen.sort();
+		}
 		
 		count_move_total(gen.getCountBadAttacks(cb), depth);
 	}
