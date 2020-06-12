@@ -98,21 +98,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	public Search_PVS_NWS(SearchEnv _env) {
-		
 		super(_env);
-		
-		moveGenFragments = new ArrayList<IMoveGenFragment>();
-		
-		ChessBoard cb = ((BoardImpl) env.getBitboard()).getChessBoard();
-		MoveGenerator mg = ((BoardImpl) env.getBitboard()).getMoveGenerator();
-		
-		moveGenFragments.add(new MoveGenFragmentImpl_TT(cb, mg, env.getTPT()));
-		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_GoodAndEqual(cb, mg));
-		moveGenFragments.add(new MoveGenFragmentImpl_Counter(cb, mg));
-		moveGenFragments.add(new MoveGenFragmentImpl_Killer1(cb, mg));
-		moveGenFragments.add(new MoveGenFragmentImpl_Killer2(cb, mg));
-		moveGenFragments.add(new MoveGenFragmentImpl_Quiet(cb, mg));
-		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Bad(cb, mg));
 	}
 	
 	
@@ -132,6 +118,19 @@ public class Search_PVS_NWS extends SearchImpl {
 		lastSentMinorInfo_timestamp = 0;
 		
 		historyStatistics = new VarStatistic(false);
+		
+		moveGenFragments = new ArrayList<IMoveGenFragment>();
+		
+		ChessBoard cb = ((BoardImpl) env.getBitboard()).getChessBoard();
+		MoveGenerator mg = ((BoardImpl) env.getBitboard()).getMoveGenerator();
+		
+		moveGenFragments.add(new MoveGenFragmentImpl_TT(cb, mg, env.getTPT()));
+		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_GoodAndEqual(cb, mg));
+		moveGenFragments.add(new MoveGenFragmentImpl_Counter(cb, mg));
+		moveGenFragments.add(new MoveGenFragmentImpl_Killer1(cb, mg));
+		moveGenFragments.add(new MoveGenFragmentImpl_Killer2(cb, mg));
+		moveGenFragments.add(new MoveGenFragmentImpl_Quiet(cb, mg));
+		moveGenFragments.add(new MoveGenFragmentImpl_Attacks_Bad(cb, mg));
 	}
 	
 	
@@ -394,6 +393,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			fragment.genMoves(parentMove, ply, depth, true);
 		}
 		Collections.sort(moveGenFragments);
+		
 		
 		int phase = PHASE_TT;
 		while (phase <= PHASE_ATTACKING_BAD) {
