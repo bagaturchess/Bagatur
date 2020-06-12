@@ -443,7 +443,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					lastSentMinorInfo_nodesCount = info.getSearchedNodes();
 				}
 				
-				
 				if (phase == PHASE_ATTACKING_GOOD) {
 					if (SEEUtil.getSeeCaptureScore(cb, move) < 0) {
 						continue;
@@ -465,7 +464,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						continue;
 					}
 				}
-
+				
 				if (!isPv && !wasInCheck && movesPerformed > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
 					
 					if (phase == PHASE_QUIET && moveGen.getScore() <= historyStatistics.getEntropy()) {
