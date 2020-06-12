@@ -490,7 +490,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						continue;
 					}
 				}
-
+				
 				cb.doMove(move);
 				movesPerformed++;
 				
@@ -499,7 +499,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				int score = alpha + 1;
-
+				
 				if (EngineConstants.ASSERT) {
 					cb.changeSideToMove();
 					Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
