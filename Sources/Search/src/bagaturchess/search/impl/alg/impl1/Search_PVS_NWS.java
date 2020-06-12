@@ -391,9 +391,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		for (int i = 0; i < moveGenFragments.size(); i++) {
 			IMoveGenFragment fragment = moveGenFragments.get(i);
-			//fragment.genMoves(parentMove, ply, depth, true);
+			fragment.genMoves(parentMove, ply, depth, true);
 		}
-		//Collections.sort(moveGenFragments);
+		Collections.sort(moveGenFragments);
 		
 		int phase = PHASE_TT;
 		while (phase <= PHASE_ATTACKING_BAD) {

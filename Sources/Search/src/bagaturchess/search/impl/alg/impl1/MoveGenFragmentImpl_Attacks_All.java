@@ -35,12 +35,13 @@ public class MoveGenFragmentImpl_Attacks_All extends MoveGenFragmentImpl_Base {
 	
 	@Override
 	public void genMoves(int parentMove, int ply, int depth, boolean dummy) {
-		
-		gen.generateAttacks(cb);
-		gen.setMVVLVAScores(cb);
-		gen.sort();
-		
-		count_move_total(gen.getCountMoves(), depth);
+		if (!dummy) {
+			gen.generateAttacks(cb);
+			gen.setMVVLVAScores(cb);
+			gen.sort();
+			
+			count_move_total(gen.getCountMoves(), depth);
+		}
 	}
 	
 	
@@ -49,12 +50,6 @@ public class MoveGenFragmentImpl_Attacks_All extends MoveGenFragmentImpl_Base {
 		if (!MoveUtil.isQuiet(bestMove)) {
 			count_move_cutoff(depth);
 		}
-	}
-	
-	
-	@Override
-	public boolean isLegal(int move) {
-		return super.isLegal(move);
 	}
 	
 	
