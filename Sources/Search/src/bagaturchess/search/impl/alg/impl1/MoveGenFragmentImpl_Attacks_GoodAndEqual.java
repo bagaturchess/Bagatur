@@ -58,10 +58,4 @@ public class MoveGenFragmentImpl_Attacks_GoodAndEqual extends MoveGenFragmentImp
 	public boolean isLegal(int move) {
 		return super.isLegal(move) && SEEUtil.getSeeCaptureScore(cb, move) >= 0;
 	}
-	
-	
-	@Override
-	public boolean isReductionAndPruningAllowed() {
-		return false;
-	}
 }

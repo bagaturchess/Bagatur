@@ -82,10 +82,4 @@ public abstract class MoveGenFragmentImpl_Base implements IMoveGenFragment {
 	public boolean isLegal(int move) {
 		return cb.isLegal(move);
 	}
-	
-	
-	@Override
-	public boolean isReductionAndPruningAllowed() {
-		return true;
-	}
 }

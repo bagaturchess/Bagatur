@@ -51,10 +51,4 @@ public class MoveGenFragmentImpl_Attacks_All extends MoveGenFragmentImpl_Base {
 			count_move_cutoff(depth);
 		}
 	}
-	
-	
-	@Override
-	public boolean isReductionAndPruningAllowed() {
-		return false;
-	}
 }

@@ -66,10 +66,4 @@ public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	public double getRate() {
 		return 1;
 	}
-	
-	
-	@Override
-	public boolean isReductionAndPruningAllowed() {
-		return false;
-	}
 }
