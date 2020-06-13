@@ -631,12 +631,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				return node.eval;
 			}
 		}
-
+		
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(bestMove != 0);
 		}
 		
-
 		if (!SearchUtils.isMateVal(bestScore)) {
 			env.getTPT().put(cb.zobristKey, depth, bestScore, alphaOrig, beta, bestMove);
 		}
