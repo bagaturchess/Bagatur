@@ -53,4 +53,10 @@ public class MoveGenFragmentImpl_Killer1 extends MoveGenFragmentImpl_Base {
 			count_move_cutoff(depth);
 		}
 	}
+	
+	
+	@Override
+	public int getSearchedMove() {
+		return killer1Move;
+	}
 }

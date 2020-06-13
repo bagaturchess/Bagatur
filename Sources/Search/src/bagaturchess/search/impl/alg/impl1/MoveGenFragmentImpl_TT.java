@@ -63,6 +63,12 @@ public class MoveGenFragmentImpl_TT extends MoveGenFragmentImpl_Base {
 	
 	
 	@Override
+	public int getSearchedMove() {
+		return ttMove;
+	}
+	
+	
+	@Override
 	public double getRate() {
 		return 1;
 	}

@@ -50,10 +50,4 @@ public class MoveGenFragmentImpl_Quiet extends MoveGenFragmentImpl_Base {
 			count_move_cutoff(depth);
 		}
 	}
-	
-	
-	/*@Override
-	public double getRate() {
-		return 0;
-	}*/
 }
