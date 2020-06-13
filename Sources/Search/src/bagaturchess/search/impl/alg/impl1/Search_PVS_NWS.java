@@ -391,10 +391,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		Collections.sort(moveGenFragments);
 		//System.out.println(moveGenFragments);
 		
-		for (int i = 0; i < moveGenFragments.size(); i++) {
+		/*for (int i = 0; i < moveGenFragments.size(); i++) {
 			IMoveGenFragment fragment = moveGenFragments.get(i);
 			fragment.genMoves(parentMove, ply, depth, true);
-		}
+		}*/
 		
 		int phase = PHASE_TT;
 		while (phase <= PHASE_ATTACKING_BAD) {
@@ -609,12 +609,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			phase++;
 		}
 		
-		if (bestMove != 0) {
+		/*if (bestMove != 0) {
 			for (int i = 0; i < moveGenFragments.size(); i++) {
 				IMoveGenFragment fragment = moveGenFragments.get(i);
 				fragment.updateWithBestMove(bestMove, depth);
 			}
-		}
+		}*/
 		
 		moveGen.endPly();
 		
