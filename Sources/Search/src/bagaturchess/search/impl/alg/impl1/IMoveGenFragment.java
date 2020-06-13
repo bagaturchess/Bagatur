@@ -24,7 +24,6 @@ public interface IMoveGenFragment extends Comparable<IMoveGenFragment> {
 	public void genMoves(int parentMove, int ply, int depth, boolean dummy);
 	public double getRate();
 	public String toString();
-	public int getReductionDecrease();
 	public boolean isLegal(int move);
 	public void updateWithBestMove(int bestMove, int depth);
 }

@@ -73,12 +73,6 @@ public abstract class MoveGenFragmentImpl_Base implements IMoveGenFragment {
 	
 	
 	@Override
-	public int getReductionDecrease() {
-		return 0;
-	}
-	
-	
-	@Override
 	public boolean isLegal(int move) {
 		return cb.isLegal(move);
 	}

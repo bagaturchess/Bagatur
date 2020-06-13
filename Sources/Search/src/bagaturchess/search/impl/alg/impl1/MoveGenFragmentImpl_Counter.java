@@ -53,10 +53,4 @@ public class MoveGenFragmentImpl_Counter extends MoveGenFragmentImpl_Base {
 			count_move_cutoff(depth);
 		}
 	}
-	
-	
-	@Override
-	public int getReductionDecrease() {
-		return 1;
-	}
 }
