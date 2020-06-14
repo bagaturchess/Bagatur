@@ -525,8 +525,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					historyStatistics.addValue(moveGen.getScore(), moveGen.getScore());
 				}
 				
-				int score = alpha + 1;
-				
 				if (EngineConstants.ASSERT) {
 					cb.changeSideToMove();
 					Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
@@ -556,6 +554,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
 				}
 				
+				int score = alpha + 1;
 				try {
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false);
