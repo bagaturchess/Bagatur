@@ -532,41 +532,47 @@ public class Search_PVS_NWS extends SearchImpl {
 					cb.changeSideToMove();
 				}
 				
-				int reduction = 1;
-				if (depth >= 2 && movesPerformed > 1 && MoveUtil.isQuiet(move) && !MoveUtil.isPawnPush78(move)) {
-					
-					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
-					
-					if (moveGen.getScore() > historyStatistics.getEntropy()) {
-						reduction -= 1;
-						if (moveGen.getScore() > historyStatistics.getEntropy() + historyStatistics.getDisperse()) {
-							reduction /= 2;
-						}
-					}
-					
-					if (move == killer1Move || move == killer2Move || move == counterMove) {
-						reduction -= 1;
-					}
-					
-					if (!isPv) {
-						reduction += 1;
-					}
-					
-					reduction = Math.min(depth - 1, Math.max(reduction, 1));
-				}
-				
 				int score = alpha + 1;
 				try {
-					if (EngineConstants.ENABLE_LMR && reduction != 1) {
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false);
-					}
 					
-					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed > 1) {
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false);
-					}
-					
-					if (node.leaf || score > node.eval) {
+					if (movesPerformed == 1) {
+						
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv);
+						
+					} else {
+						
+						int reduction = 1;
+						if (depth >= 2 && MoveUtil.isQuiet(move) && !MoveUtil.isPawnPush78(move)) {
+							
+							reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
+							
+							if (moveGen.getScore() > historyStatistics.getEntropy()) {
+								reduction -= 1;
+								if (moveGen.getScore() > historyStatistics.getEntropy() + historyStatistics.getDisperse()) {
+									reduction /= 2;
+								}
+							}
+							
+							if (move == killer1Move || move == killer2Move || move == counterMove) {
+								reduction -= 1;
+							}
+							
+							if (!isPv) {
+								reduction += 1;
+							}
+							
+							reduction = Math.min(depth - 1, Math.max(reduction, 1));
+						}
+						
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false);
+						
+						if (score > alpha && reduction != 1) {
+							score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false);
+						}
+						
+						if (score > alpha) {
+							score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv);
+						}
 					}
 				} catch(SearchInterruptedException sie) {
 					moveGen.endPly();
