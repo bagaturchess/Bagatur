@@ -702,10 +702,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				final int move = moveGen.next();
 				
-				if (!cb.isLegal(move)) {
-					continue;
-				}
-				
 				if (MoveUtil.isPromotion(move)) {
 					if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
 						continue;
@@ -721,7 +717,11 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
 					continue;
 				}
-	
+				
+				if (!cb.isLegal(move)) {
+					continue;
+				}
+				
 				cb.doMove(move);
 	
 				if (EngineConstants.ASSERT) {
