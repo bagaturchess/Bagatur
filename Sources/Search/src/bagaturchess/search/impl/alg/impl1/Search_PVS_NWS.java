@@ -379,8 +379,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		final boolean wasInCheck = cb.checkingPieces != 0;
 		
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
-		int bestMove = 0;
-		int bestScore = ISearch.MIN;
 		int counterMove = 0;
 		int killer1Move = 0;
 		int killer2Move = 0;
@@ -564,7 +562,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false);
 					}
 					
-					if (score > bestScore) {
+					if (node.leaf || score > node.eval) {
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv);
 					}
 				} catch(SearchInterruptedException sie) {
@@ -578,13 +576,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
 				}
 				
-				if (score > bestScore) {
+				if (node.leaf || score > node.eval) {
 					
-					bestScore = score;
-					bestMove = move;
-					
-					node.bestmove = bestMove;
-					node.eval = bestScore;
+					node.bestmove = move;
+					node.eval = score;
 					node.leaf = false;
 					
 					if (ply + 1 < ISearch.MAX_DEPTH) {
@@ -594,10 +589,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					alpha = Math.max(alpha, score);
 					if (alpha >= beta) {
 						
-						if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {
-							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
-							moveGen.addKillerMove(bestMove, ply);
-							moveGen.addHHValue(cb.colorToMove, bestMove, parentMove, depth);
+						if (MoveUtil.isQuiet(node.bestmove) && cb.checkingPieces == 0) {
+							moveGen.addCounterMove(cb.colorToMove, parentMove, node.bestmove);
+							moveGen.addKillerMove(node.bestmove, ply);
+							moveGen.addHHValue(cb.colorToMove, node.bestmove, parentMove, depth);
 						}
 
 						phase += 10;
@@ -632,16 +627,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (EngineConstants.ASSERT) {
-			Assert.isTrue(bestMove != 0);
+			Assert.isTrue(node.bestmove != 0);
 		}
 		
-		if (!SearchUtils.isMateVal(bestScore)) {
-			env.getTPT().put(cb.zobristKey, depth, bestScore, alphaOrig, beta, bestMove);
+		if (!SearchUtils.isMateVal(node.eval)) {
+			env.getTPT().put(cb.zobristKey, depth, node.eval, alphaOrig, beta, node.bestmove);
 		}
 		
 		//validatePV(node, depth, isPv);
 		
-		return bestScore;
+		return node.eval;
 	}
 
 
