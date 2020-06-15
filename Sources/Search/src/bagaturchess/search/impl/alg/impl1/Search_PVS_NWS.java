@@ -483,8 +483,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
+				int negativSeeScore = 0;
 				if (phase == PHASE_ATTACKING_BAD) {
-					if (SEEUtil.getSeeCaptureScore(cb, move) >= 0) {
+					negativSeeScore = SEEUtil.getSeeCaptureScore(cb, move);
+					if (negativSeeScore >= 0) {
 						continue;
 					}
 				}
@@ -511,7 +513,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& depth <= 6
 							&& phase == PHASE_ATTACKING_BAD
-							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth) {
+							&& negativSeeScore < -20 * depth * depth) {
 						continue;
 					}
 				}
