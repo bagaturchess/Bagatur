@@ -749,6 +749,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			phase++;
 		}
+		
 		moveGen.endPly();
 		
 		return alpha;
