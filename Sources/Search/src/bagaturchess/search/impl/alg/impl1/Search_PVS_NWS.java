@@ -410,8 +410,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					break;
 				case PHASE_COUNTER:
 					counterMove = moveGen.getCounter(cb.colorToMove, parentMove);
-					if (counterMove != 0 && counterMove != ttMove && cb.isValidMove(counterMove)
-							&& cb.isLegal(counterMove)) {
+					if (counterMove != 0 && counterMove != ttMove && cb.isValidMove(counterMove)) {
 						moveGen.addMove(counterMove);
 						break;
 					} else {
@@ -419,7 +418,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				case PHASE_KILLER_1:
 					killer1Move = moveGen.getKiller1(ply);
-					if (killer1Move != 0 && killer1Move != ttMove && killer1Move != counterMove && cb.isValidMove(killer1Move) && cb.isLegal(killer1Move)) {
+					if (killer1Move != 0 && killer1Move != ttMove && killer1Move != counterMove && cb.isValidMove(killer1Move)) {
 						moveGen.addMove(killer1Move);
 						break;
 					} else {
@@ -427,7 +426,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				case PHASE_KILLER_2:
 					killer2Move = moveGen.getKiller2(ply);
-					if (killer2Move != 0 && killer2Move != ttMove && killer2Move != counterMove && cb.isValidMove(killer2Move) && cb.isLegal(killer2Move)) {
+					if (killer2Move != 0 && killer2Move != ttMove && killer2Move != counterMove && cb.isValidMove(killer2Move)) {
 						moveGen.addMove(killer2Move);
 						break;
 					} else {
@@ -481,11 +480,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				if (phase == PHASE_QUIET) {
-					if (move == ttMove || move == killer1Move || move == killer2Move || move == counterMove || !cb.isLegal(move)) {
+					if (move == ttMove || move == killer1Move || move == killer2Move || move == counterMove) {
 						continue;
 					}
 				} else if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
-					if (move == ttMove || !cb.isLegal(move)) {
+					if (move == ttMove) {
 						continue;
 					}
 				}
@@ -514,6 +513,10 @@ public class Search_PVS_NWS extends SearchImpl {
 							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth) {
 						continue;
 					}
+				}
+				
+				if (!cb.isLegal(move)) {
+					continue;
 				}
 				
 				cb.doMove(move);
