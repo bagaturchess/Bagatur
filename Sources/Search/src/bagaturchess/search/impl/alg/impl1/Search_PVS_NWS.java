@@ -426,7 +426,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				case PHASE_KILLER_2:
 					killer2Move = moveGen.getKiller2(ply);
-					if (killer2Move != 0 && killer2Move != ttMove && killer2Move != counterMove && cb.isValidMove(killer2Move) && cb.isLegal(killer2Move)) {
+					if (killer2Move != 0 && killer2Move != ttMove && killer2Move != counterMove && killer2Move != killer1Move && cb.isValidMove(killer2Move) && cb.isLegal(killer2Move)) {
 						moveGen.addMove(killer2Move);
 						break;
 					} else {
