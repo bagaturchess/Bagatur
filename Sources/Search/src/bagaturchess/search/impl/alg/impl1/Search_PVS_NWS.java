@@ -711,7 +711,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						continue;
 					}
 				} else if (EngineConstants.ENABLE_Q_FUTILITY_PRUNING
-						&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+						&& eval + FUTILITY_MARGIN_Q_SEARCH
+						+ EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
 					continue;
 				}
 				
