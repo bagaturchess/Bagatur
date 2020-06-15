@@ -410,8 +410,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					break;
 				case PHASE_COUNTER:
 					counterMove = moveGen.getCounter(cb.colorToMove, parentMove);
-					if (counterMove != 0 && counterMove != ttMove && cb.isValidMove(counterMove)
-							&& cb.isLegal(counterMove)) {
+					if (counterMove != 0 && counterMove != ttMove && cb.isValidMove(counterMove) && cb.isLegal(counterMove)) {
 						moveGen.addMove(counterMove);
 						break;
 					} else {
