@@ -459,8 +459,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
+				int negativeSeeScore = 0;
 				if (phase == PHASE_ATTACKING_BAD) {
-					if (SEEUtil.getSeeCaptureScore(cb, move) >= 0) {
+					negativeSeeScore = SEEUtil.getSeeCaptureScore(cb, move);
+					if (negativeSeeScore >= 0) {
 						continue;
 					}
 				}
@@ -493,8 +495,12 @@ public class Search_PVS_NWS extends SearchImpl {
 								}
 							}
 						}
-					} else if (EngineConstants.ENABLE_SEE_PRUNING && depth <= 6 && phase == PHASE_ATTACKING_BAD
-							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth) {
+					}
+					
+					if (EngineConstants.ENABLE_SEE_PRUNING
+							&& depth <= 6
+							&& phase == PHASE_ATTACKING_BAD
+							&& negativeSeeScore < -20 * depth * depth) {
 						continue;
 					}
 				}
