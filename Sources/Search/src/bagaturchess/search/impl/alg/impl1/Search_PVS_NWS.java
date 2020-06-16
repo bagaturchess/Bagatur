@@ -358,8 +358,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		final boolean wasInCheck = cb.checkingPieces != 0;
 
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
-		int bestMove = 0;
-		int bestScore = ISearch.MIN;
 		int ttMove = 0;
 		int counterMove = 0;
 		int killer1Move = 0;
@@ -560,13 +558,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
 				}
 				
-				if (score > bestScore) {
-					
-					bestScore = score;
-					bestMove = move;
+				if (score > node.eval) {
 
-					node.bestmove = bestMove;
-					node.eval = bestScore;
+					node.bestmove = move;
+					node.eval = score;
 					node.leaf = false;
 					
 					if (ply + 1 < ISearch.MAX_DEPTH) {
@@ -576,10 +571,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					alpha = Math.max(alpha, score);
 					if (alpha >= beta) {
 						
-						if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {
-							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
-							moveGen.addKillerMove(bestMove, ply);
-							moveGen.addHHValue(cb.colorToMove, bestMove, parentMove, depth);
+						if (MoveUtil.isQuiet(node.bestmove) && cb.checkingPieces == 0) {
+							moveGen.addCounterMove(cb.colorToMove, parentMove, node.bestmove);
+							moveGen.addKillerMove(node.bestmove, ply);
+							moveGen.addHHValue(cb.colorToMove, node.bestmove, parentMove, depth);
 						}
 
 						phase += 10;
@@ -606,17 +601,17 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 
 		if (EngineConstants.ASSERT) {
-			Assert.isTrue(bestMove != 0);
+			Assert.isTrue(node.bestmove != 0);
 		}
 		
 
-		if (!SearchUtils.isMateVal(bestScore)) {
-			env.getTPT().put(cb.zobristKey, depth, bestScore, alphaOrig, beta, bestMove);
+		if (!SearchUtils.isMateVal(node.eval)) {
+			env.getTPT().put(cb.zobristKey, depth, node.eval, alphaOrig, beta, node.bestmove);
 		}
 		
 		//validatePV(node, depth, isPv);
 		
-		return bestScore;
+		return node.eval;
 	}
 
 
