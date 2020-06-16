@@ -358,6 +358,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		final boolean wasInCheck = cb.checkingPieces != 0;
 
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
+		int bestMove = 0;
+		int bestScore = ISearch.MIN;
 		int ttMove = 0;
 		int counterMove = 0;
 		int killer1Move = 0;
@@ -459,10 +461,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
-				int negativeSeeScore = 0;
 				if (phase == PHASE_ATTACKING_BAD) {
-					negativeSeeScore = SEEUtil.getSeeCaptureScore(cb, move);
-					if (negativeSeeScore >= 0) {
+					if (SEEUtil.getSeeCaptureScore(cb, move) >= 0) {
 						continue;
 					}
 				}
@@ -495,12 +495,8 @@ public class Search_PVS_NWS extends SearchImpl {
 								}
 							}
 						}
-					}
-					
-					if (EngineConstants.ENABLE_SEE_PRUNING
-							&& depth <= 6
-							&& phase == PHASE_ATTACKING_BAD
-							&& negativeSeeScore < -20 * depth * depth) {
+					} else if (EngineConstants.ENABLE_SEE_PRUNING && depth <= 6 && phase == PHASE_ATTACKING_BAD
+							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth) {
 						continue;
 					}
 				}
@@ -564,10 +560,13 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
 				}
 				
-				if (score > node.eval) {
+				if (score > bestScore) {
+					
+					bestScore = score;
+					bestMove = move;
 
-					node.bestmove = move;
-					node.eval = score;
+					node.bestmove = bestMove;
+					node.eval = bestScore;
 					node.leaf = false;
 					
 					if (ply + 1 < ISearch.MAX_DEPTH) {
@@ -577,10 +576,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					alpha = Math.max(alpha, score);
 					if (alpha >= beta) {
 						
-						if (MoveUtil.isQuiet(node.bestmove) && cb.checkingPieces == 0) {
-							moveGen.addCounterMove(cb.colorToMove, parentMove, node.bestmove);
-							moveGen.addKillerMove(node.bestmove, ply);
-							moveGen.addHHValue(cb.colorToMove, node.bestmove, parentMove, depth);
+						if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {
+							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
+							moveGen.addKillerMove(bestMove, ply);
+							moveGen.addHHValue(cb.colorToMove, bestMove, parentMove, depth);
 						}
 
 						phase += 10;
@@ -607,17 +606,17 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 
 		if (EngineConstants.ASSERT) {
-			Assert.isTrue(node.bestmove != 0);
+			Assert.isTrue(bestMove != 0);
 		}
 		
 
-		if (!SearchUtils.isMateVal(node.eval)) {
-			env.getTPT().put(cb.zobristKey, depth, node.eval, alphaOrig, beta, node.bestmove);
+		if (!SearchUtils.isMateVal(bestScore)) {
+			env.getTPT().put(cb.zobristKey, depth, bestScore, alphaOrig, beta, bestMove);
 		}
 		
 		//validatePV(node, depth, isPv);
 		
-		return node.eval;
+		return bestScore;
 	}
 
 
@@ -691,20 +690,22 @@ public class Search_PVS_NWS extends SearchImpl {
 					continue;
 				}
 				
-				if (MoveUtil.isPromotion(move)) {
-					if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
+				if (cb.checkingPieces == 0) {
+					if (MoveUtil.isPromotion(move)) {
+						if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
+							continue;
+						}
+					} else if (EngineConstants.ENABLE_Q_FUTILITY_PRUNING
+							&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
 						continue;
 					}
-				} else if (EngineConstants.ENABLE_Q_FUTILITY_PRUNING
-						&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
-					continue;
 				}
 				
-				if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES
-						&& !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))
-						&& SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
-					continue;
-				}
+				//if (cb.checkingPieces == 0) {
+					if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move)) && SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
+						continue;
+					}
+				//}
 	
 				cb.doMove(move);
 	
@@ -718,10 +719,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				cb.undoMove(move);
 				
-				if (score >= beta) {
+				if (score > alpha) {
 					if (!SearchUtils.isMateVal(score)) {
 						env.getTPT().put(cb.zobristKey, 0, score, alphaOrig, beta, move);
 					}
+				}
+				
+				if (score >= beta) {
 					moveGen.endPly();				
 					return score;
 				}
