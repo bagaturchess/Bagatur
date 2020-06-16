@@ -717,13 +717,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				cb.undoMove(move);
 				
-				if (score > alpha) {
+				if (score >= beta) {
 					if (!SearchUtils.isMateVal(score)) {
 						env.getTPT().put(cb.zobristKey, 0, score, alphaOrig, beta, move);
 					}
-				}
-				
-				if (score >= beta) {
 					moveGen.endPly();				
 					return score;
 				}
