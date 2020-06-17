@@ -337,7 +337,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 			}
-
+			
 			
 			if (EngineConstants.ENABLE_NULL_MOVE && depth >= 2) {
 				if (eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
@@ -355,10 +355,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
-
+		
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
-
+		
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
@@ -366,7 +366,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int killer1Move = 0;
 		int killer2Move = 0;
 		int movesPerformed = 0;
-
+		
 		moveGen.startPly();
 		int phase = PHASE_TT;
 		while (phase <= PHASE_ATTACKING_BAD) {
