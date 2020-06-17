@@ -417,7 +417,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.setMVVLVAScores(cb);
 					moveGen.sort();
 			}
-		
+			
 			while (moveGen.hasNext()) {
 				final int move = moveGen.next();
 
@@ -442,14 +442,15 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				int seeMove = MoveUtil.isQuiet(move) ? 0 : SEEUtil.getSeeCaptureScore(cb, move);
 				if (phase == PHASE_ATTACKING_GOOD) {
-					if (SEEUtil.getSeeCaptureScore(cb, move) < 0) {
+					if (seeMove < 0) {
 						continue;
 					}
 				}
 				
 				if (phase == PHASE_ATTACKING_BAD) {
-					if (SEEUtil.getSeeCaptureScore(cb, move) >= 0) {
+					if (seeMove >= 0) {
 						continue;
 					}
 				}
@@ -482,8 +483,10 @@ public class Search_PVS_NWS extends SearchImpl {
 								}
 							}
 						}
-					} else if (EngineConstants.ENABLE_SEE_PRUNING && depth <= 6 && phase == PHASE_ATTACKING_BAD
-							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth) {
+					} else if (EngineConstants.ENABLE_SEE_PRUNING
+							&& depth <= 6
+							&& phase == PHASE_ATTACKING_BAD
+							&& seeMove < -20 * depth * depth) {
 						continue;
 					}
 				}
@@ -689,7 +692,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				//if (cb.checkingPieces == 0) {
-					if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move)) && SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
+					if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES
+							&& !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))
+							&& SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
 						continue;
 					}
 				//}
