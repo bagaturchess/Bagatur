@@ -507,7 +507,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				int reduction = 1;
-				if (depth >= 2 && movesPerformed > 1 && MoveUtil.isQuiet(move) && !MoveUtil.isPawnPush78(move)) {
+				if (depth >= 2
+						&& movesPerformed > 1
+						&& MoveUtil.isQuiet(move)
+						&& !MoveUtil.isPawnPush78(move)
+						) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
 					
