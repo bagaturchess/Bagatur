@@ -339,10 +339,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (EngineConstants.ENABLE_NULL_MOVE && depth >= 2) {
+			if (EngineConstants.ENABLE_NULL_MOVE && depth > 2) {
 				if (eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 					cb.doNullMove();
-					final int reduction = Math.max(depth / 2, depth / 4 + 3 + Math.min((eval - beta) / 80, 3));
+					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 					int score = depth - reduction <= 0 ? -qsearch(evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
 							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false);
 					cb.undoNullMove();
@@ -373,7 +373,18 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			switch (phase) {			
 				case PHASE_TT:
-					if (ttMove != 0) {
+					if (ttMove == 0) {
+						if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
+							if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
+								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, isPv);
+								env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
+								if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
+									ttMove = tt_entries_per_ply[ply].getBestMove();
+								}
+							}
+						}
+					}
+					if (ttMove != 0 && cb.isLegal(ttMove)) {
 						moveGen.addMove(ttMove);
 					}
 					break;
@@ -419,8 +430,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			while (moveGen.hasNext()) {
+				
 				final int move = moveGen.next();
-
+				
 				//Build and sent minor info
 				if (ply == 0) {
 					info.setCurrentMove(move);
@@ -464,7 +476,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						continue;
 					}
 				}
-
+				
 				if (!isPv && !wasInCheck && movesPerformed > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
 					
 					if (phase == PHASE_QUIET && moveGen.getScore() <= historyAVGScores.getEntropy()) {
@@ -490,7 +502,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						continue;
 					}
 				}
-
+				
 				cb.doMove(move);
 				movesPerformed++;
 				
@@ -499,7 +511,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				int score = alpha + 1;
-
+				
 				if (EngineConstants.ASSERT) {
 					cb.changeSideToMove();
 					Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
@@ -598,12 +610,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				return node.eval;
 			}
 		}
-
+		
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(bestMove != 0);
 		}
 		
-
 		if (!SearchUtils.isMateVal(bestScore)) {
 			env.getTPT().put(cb.zobristKey, depth, bestScore, alphaOrig, beta, bestMove);
 		}
