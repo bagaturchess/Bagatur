@@ -371,52 +371,51 @@ public class Search_PVS_NWS extends SearchImpl {
 		int phase = PHASE_TT;
 		while (phase <= PHASE_ATTACKING_BAD) {
 			
-			switch (phase) {
-			
-			case PHASE_TT:
-				if (ttMove != 0) {
-					moveGen.addMove(ttMove);
-				}
-				break;
-			case PHASE_ATTACKING_GOOD:
-				moveGen.generateAttacks(cb);
-				moveGen.setMVVLVAScores(cb);
-				moveGen.sort();
-				break;
-			case PHASE_KILLER_1:
-				killer1Move = moveGen.getKiller1(ply);
-				if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move) && cb.isLegal(killer1Move)) {
-					moveGen.addMove(killer1Move);
+			switch (phase) {			
+				case PHASE_TT:
+					if (ttMove != 0) {
+						moveGen.addMove(ttMove);
+					}
 					break;
-				} else {
-					phase++;
-				}
-			case PHASE_KILLER_2:
-				killer2Move = moveGen.getKiller2(ply);
-				if (killer2Move != 0 && killer2Move != ttMove && cb.isValidMove(killer2Move) && cb.isLegal(killer2Move)) {
-					moveGen.addMove(killer2Move);
+				case PHASE_ATTACKING_GOOD:
+					moveGen.generateAttacks(cb);
+					moveGen.setMVVLVAScores(cb);
+					moveGen.sort();
 					break;
-				} else {
-					phase++;
-				}
-			case PHASE_COUNTER:
-				counterMove = moveGen.getCounter(cb.colorToMove, parentMove);
-				if (counterMove != 0 && counterMove != ttMove && counterMove != killer1Move && counterMove != killer2Move && cb.isValidMove(counterMove)
-						&& cb.isLegal(counterMove)) {
-					moveGen.addMove(counterMove);
+				case PHASE_KILLER_1:
+					killer1Move = moveGen.getKiller1(ply);
+					if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move) && cb.isLegal(killer1Move)) {
+						moveGen.addMove(killer1Move);
+						break;
+					} else {
+						phase++;
+					}
+				case PHASE_KILLER_2:
+					killer2Move = moveGen.getKiller2(ply);
+					if (killer2Move != 0 && killer2Move != ttMove && cb.isValidMove(killer2Move) && cb.isLegal(killer2Move)) {
+						moveGen.addMove(killer2Move);
+						break;
+					} else {
+						phase++;
+					}
+				case PHASE_COUNTER:
+					counterMove = moveGen.getCounter(cb.colorToMove, parentMove);
+					if (counterMove != 0 && counterMove != ttMove && counterMove != killer1Move && counterMove != killer2Move && cb.isValidMove(counterMove)
+							&& cb.isLegal(counterMove)) {
+						moveGen.addMove(counterMove);
+						break;
+					} else {
+						phase++;
+					}
+				case PHASE_QUIET:
+					moveGen.generateMoves(cb);
+					moveGen.setHHScores(cb.colorToMove, parentMove);
+					moveGen.sort();
 					break;
-				} else {
-					phase++;
-				}
-			case PHASE_QUIET:
-				moveGen.generateMoves(cb);
-				moveGen.setHHScores(cb.colorToMove, parentMove);
-				moveGen.sort();
-				break;
-			case PHASE_ATTACKING_BAD:
-				moveGen.generateAttacks(cb);
-				moveGen.setMVVLVAScores(cb);
-				moveGen.sort();
+				case PHASE_ATTACKING_BAD:
+					moveGen.generateAttacks(cb);
+					moveGen.setMVVLVAScores(cb);
+					moveGen.sort();
 			}
 		
 			while (moveGen.hasNext()) {
