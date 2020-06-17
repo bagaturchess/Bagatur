@@ -199,10 +199,12 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		int ttMove = 0;
 		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
 		if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
 			
 			int tpt_depth = tt_entries_per_ply[ply].getDepth();
+			ttMove = tt_entries_per_ply[ply].getBestMove();
 			
 			if (tpt_depth >= depth) {
 				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT) {
@@ -340,7 +342,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (EngineConstants.ENABLE_NULL_MOVE && depth >= 2) {
 				if (eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 					cb.doNullMove();
-					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
+					final int reduction = Math.max(depth / 2, depth / 4 + 3 + Math.min((eval - beta) / 80, 3));
 					int score = depth - reduction <= 0 ? -qsearch(evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
 							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false);
 					cb.undoNullMove();
@@ -360,7 +362,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
-		int ttMove = 0;
 		int counterMove = 0;
 		int killer1Move = 0;
 		int killer2Move = 0;
@@ -373,21 +374,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			switch (phase) {
 			
 			case PHASE_TT:
-				if (tt_entries_per_ply[ply].isEmpty()) {
-					if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
-						if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
-							calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, isPv);
-						}
-					}
-				}
-				env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
-				if (!tt_entries_per_ply[ply].isEmpty()) {
-					ttMove = tt_entries_per_ply[ply].getBestMove();
-					if (cb.isValidMove(ttMove)) {
-						moveGen.addMove(ttMove);
-					} else {
-						ttMove = 0;
-					}
+				if (ttMove != 0) {
+					moveGen.addMove(ttMove);
 				}
 				break;
 			case PHASE_ATTACKING_GOOD:
