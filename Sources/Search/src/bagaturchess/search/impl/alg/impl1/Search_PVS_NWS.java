@@ -470,11 +470,17 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				if (phase == PHASE_QUIET) {
-					if (move == ttMove || move == killer1Move || move == killer2Move || move == counterMove || !cb.isLegal(move)) {
+					if (move == ttMove || move == killer1Move || move == killer2Move || move == counterMove) {
 						continue;
 					}
 				} else if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
-					if (move == ttMove || !cb.isLegal(move)) {
+					if (move == ttMove) {
+						continue;
+					}
+				}
+				
+				if (phase == PHASE_QUIET || phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
+					if (!cb.isLegal(move)) {
 						continue;
 					}
 				}
