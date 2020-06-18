@@ -374,9 +374,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			switch (phase) {			
 				case PHASE_TT:
 					if (ttMove == 0) {
-						if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
+						if (EngineConstants.ENABLE_IID && depth > ply + 1) {
 							if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
-								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, isPv);
+								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, true);
 								env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
 								if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
 									ttMove = tt_entries_per_ply[ply].getBestMove();
