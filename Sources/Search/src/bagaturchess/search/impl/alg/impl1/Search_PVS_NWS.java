@@ -387,7 +387,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							}
 						}
 					}
-					if (ttMove != 0 && cb.isLegal(ttMove)) {
+					if (ttMove != 0) {
 						moveGen.addMove(ttMove);
 					}
 					break;
@@ -398,7 +398,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					break;
 				case PHASE_KILLER_1:
 					killer1Move = moveGen.getKiller1(ply);
-					if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move) && cb.isLegal(killer1Move)) {
+					if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move)) {
 						moveGen.addMove(killer1Move);
 						break;
 					} else {
@@ -406,7 +406,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				case PHASE_KILLER_2:
 					killer2Move = moveGen.getKiller2(ply);
-					if (killer2Move != 0 && killer2Move != ttMove && cb.isValidMove(killer2Move) && cb.isLegal(killer2Move)) {
+					if (killer2Move != 0 && killer2Move != ttMove && cb.isValidMove(killer2Move)) {
 						moveGen.addMove(killer2Move);
 						break;
 					} else {
@@ -414,8 +414,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				case PHASE_COUNTER:
 					counterMove = moveGen.getCounter(cb.colorToMove, parentMove);
-					if (counterMove != 0 && counterMove != ttMove && counterMove != killer1Move && counterMove != killer2Move && cb.isValidMove(counterMove)
-							&& cb.isLegal(counterMove)) {
+					if (counterMove != 0 && counterMove != ttMove && counterMove != killer1Move && counterMove != killer2Move && cb.isValidMove(counterMove)) {
 						moveGen.addMove(counterMove);
 						break;
 					} else {
@@ -694,10 +693,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				final int move = moveGen.next();
 				
-				if (!cb.isLegal(move)) {
-					continue;
-				}
-				
 				if (MoveUtil.isPromotion(move)) {
 					if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
 						continue;
@@ -712,7 +707,11 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
 					continue;
 				}
-	
+				
+				if (!cb.isLegal(move)) {
+					continue;
+				}
+				
 				cb.doMove(move);
 	
 				if (EngineConstants.ASSERT) {
