@@ -378,7 +378,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							int reduction = 1 + 1;
 							if (depth > ply + 1) {
 							//if (isPv && depth >= 3 || !isPv && depth > ply + 1) {
-							//if (isPv && depth >= 3 || !isPv && depth >= 7 && depth >= ply) {
+							//if ((isPv && depth >= 3) || (!isPv && depth >= 7 && depth >= ply)) {
 								
 								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, alpha, beta, true);
 								
