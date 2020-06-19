@@ -374,10 +374,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			switch (phase) {			
 				case PHASE_TT:
 					if (ttMove == 0) {
-						if (EngineConstants.ENABLE_IID && depth > ply + 1) {
-							if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
+						if (EngineConstants.ENABLE_IID) {
+							int reduction = 1 + 1;
+							if (depth > ply + 1) {
+							//if (isPv && depth >= 3 || !isPv && depth >= 7) {
 								
-								int reduction = 1 + 1;
 								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, alpha, beta, true);
 								
 								env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
