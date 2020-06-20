@@ -378,9 +378,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							int reduction = 1 + 1;
 							
-							if (depth > ply + 1) {
-							//if (isPv && depth >= 3 || !isPv && depth > ply + 1) {
-							//if ((isPv && depth >= 3) || (!isPv && depth >= 7 && depth >= ply)) {
+							if (isPv && depth >= 6 || !isPv && depth > ply + 1) {
 								
 								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, alpha, beta, true);
 								
@@ -439,6 +437,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				final int move = moveGen.next();
 				
+				//if (phase == PHASE_QUIET || phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
+					if (!cb.isLegal(move)) {
+						continue;
+					}
+				//}
+				
 				//Build and sent minor info
 				if (ply == 0) {
 					info.setCurrentMove(move);
@@ -479,12 +483,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				} else if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
 					if (move == ttMove) {
-						continue;
-					}
-				}
-				
-				if (phase == PHASE_QUIET || phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
-					if (!cb.isLegal(move)) {
 						continue;
 					}
 				}
