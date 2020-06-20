@@ -376,7 +376,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (ttMove == 0) {
 						if (EngineConstants.ENABLE_IID) {
 							
-							int reduction = 1 + 1;
+							int reduction = 2;
 							
 							if (isPv && depth >= 6 || !isPv && depth > ply + 1) {
 								
