@@ -58,12 +58,11 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private static final int PHASE_TT = 0;
-	private static final int PHASE_ATTACKING_GOOD = 1;
+	private static final int PHASE_ATTACKING = 1;
 	private static final int PHASE_KILLER_1 = 2;
 	private static final int PHASE_KILLER_2 = 3;
 	private static final int PHASE_COUNTER = 4;
 	private static final int PHASE_QUIET = 5;
-	private static final int PHASE_ATTACKING_BAD = 6;
 	
 	private static final int[] STATIC_NULLMOVE_MARGIN = { 0, 60, 130, 210, 300, 400, 510 };
 	private static final int[] RAZORING_MARGIN = { 0, 240, 280, 300 };
@@ -369,7 +368,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		moveGen.startPly();
 		int phase = PHASE_TT;
-		while (phase <= PHASE_ATTACKING_BAD) {
+		while (phase <= PHASE_QUIET) {
 			
 			switch (phase) {
 				case PHASE_TT:
@@ -394,7 +393,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						moveGen.addMove(ttMove);
 					}
 					break;
-				case PHASE_ATTACKING_GOOD:
+				case PHASE_ATTACKING:
 					moveGen.generateAttacks(cb);
 					moveGen.setMVVLVAScores(cb);
 					moveGen.sort();
@@ -428,10 +427,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.setHHScores(cb.colorToMove, parentMove);
 					moveGen.sort();
 					break;
-				case PHASE_ATTACKING_BAD:
-					moveGen.generateAttacks(cb);
-					moveGen.setMVVLVAScores(cb);
-					moveGen.sort();
 			}
 			
 			while (moveGen.hasNext()) {
@@ -465,24 +460,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				int seeMove = MoveUtil.isQuiet(move) ? 0 : SEEUtil.getSeeCaptureScore(cb, move);
-				if (phase == PHASE_ATTACKING_GOOD) {
-					if (seeMove < 0) {
-						continue;
-					}
-				}
-				
-				if (phase == PHASE_ATTACKING_BAD) {
-					if (seeMove >= 0) {
-						continue;
-					}
-				}
-				
 				if (phase == PHASE_QUIET) {
 					if (move == ttMove || move == killer1Move || move == killer2Move || move == counterMove) {
 						continue;
 					}
-				} else if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
+				} else if (phase == PHASE_ATTACKING) {
 					if (move == ttMove) {
 						continue;
 					}
@@ -508,8 +490,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& depth <= 6
-							&& phase == PHASE_ATTACKING_BAD
-							&& seeMove < -20 * depth * depth) {
+							&& phase == PHASE_ATTACKING
+							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth) {
 						continue;
 					}
 				}
@@ -679,7 +661,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		moveGen.startPly();
 		
 		int phase = PHASE_TT;
-		while (phase <= PHASE_ATTACKING_GOOD) {
+		while (phase <= PHASE_ATTACKING) {
 			switch (phase) {
 				case PHASE_TT:
 					if (!tt_entries_per_ply[ply].isEmpty()) {
@@ -691,7 +673,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 					}
 					break;
-				case PHASE_ATTACKING_GOOD:
+				case PHASE_ATTACKING:
 					moveGen.generateAttacks(cb);
 					moveGen.setMVVLVAScores(cb);
 					moveGen.sort();
