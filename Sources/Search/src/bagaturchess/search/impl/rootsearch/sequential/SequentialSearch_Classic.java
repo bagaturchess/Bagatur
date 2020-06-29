@@ -24,14 +24,13 @@ package bagaturchess.search.impl.rootsearch.sequential;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
-import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.CompositeStopper;
@@ -40,7 +39,6 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
-import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
@@ -122,19 +120,8 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 		
 		if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_Classic started from depth " + startIteration + " to depth " + maxIterations);
 		
-		
 		final int[] final_prevPV = prevPV;
-		
-		if (initialValue == null) {
-			IEvaluator evaluator = getSharedData().getEvaluatorFactory().create(
-					getBitboardForSetup(),
-					//new EvalCache_Impl1(100, true, new BinarySemaphore_Dummy()),
-					new EvalCache_Impl2(2),
-					getRootSearchConfig().getEvalConfig());
-			initialValue = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, getBitboardForSetup().getColourToMove());
-		}
-		
-		//final int final_initialValue = initialValue;
+		final int final_initialValue = initialValue == null ? 0 : initialValue;
 		
 		if (!dont_wrap_mediator) {
 			//Original mediator should be an instance of UCISearchMediatorImpl_Base
@@ -157,12 +144,8 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 					
 					if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("SequentialSearch_Classic before loop");
 					
+					int prevEval = final_initialValue;
 					int ASPIRATION_WINDOW = 20;
-					
-					int score;
-					int delta = ASPIRATION_WINDOW;
-					int alpha = ISearch.MIN;
-					int beta = ISearch.MAX;
 					
 					for (int maxdepth = startIteration; maxdepth <= maxIterations; maxdepth++) {
 						
@@ -173,56 +156,47 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 						
 						try {
 							
-							PVManager pvman = null;
+							int eval = prevEval;
+							int window = ASPIRATION_WINDOW;
+							int multiplier = 2;
+							int alpha;
+							int beta;
 							
-							while (true) {
-								
-								pvman = new PVManager(ISearch.MAX_DEPTH);
-								
-								score = searcher.pv_search(final_mediator,
-									pvman, info,
-									ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
-									alpha, beta,
-									0, 0, final_prevPV,
-									false, 0, searcher.getEnv().getBitboard().getColourToMove(),
-									0, 0, false, 0, !go.isPonder());
-								
-								if (score <= alpha && alpha != ISearch.MIN) {
-									if (score < -1000) {
-										alpha = ISearch.MIN;
-										beta = ISearch.MAX;
-									} else {
-										alpha = Math.max(alpha - delta, ISearch.MIN);
-									}
-									delta *= 2;
-								} else if (score >= beta && beta != ISearch.MAX) {
-									if (score > 1000) {
-										alpha = ISearch.MIN;
-										beta = ISearch.MAX;
-									} else {
-										beta = Math.min(beta + delta, ISearch.MAX);
-									}
-									delta *= 2;
-								} else {
-									if (Math.abs(score) > 1000) {
-										alpha = ISearch.MIN;
-										beta = ISearch.MAX;
-									} else {
-										delta = (delta + ASPIRATION_WINDOW) / 2;
-										alpha = Math.max(score - delta, ISearch.MIN);
-										beta = Math.min(score + delta, ISearch.MAX);
-									}
-									break;
-								};
-								
-							}
+							PVManager pvman = new PVManager(ISearch.MAX_DEPTH);
 							
+							do {
+								
+								alpha = eval - window;
+								beta = eval + window;
+								
+								/*eval = searcher.nullwin_search(final_mediator, info,
+										ISearch.PLY * maxdepth, ISearch.PLY * maxdepth,	0,
+										eval,
+										false, 0, 0, final_prevPV, searcher.getEnv().getBitboard().getColourToMove(),
+										0, 0, false, 0, !go.isPonder());
+								
+								if (eval > alpha && eval < beta) {*/
+									eval = searcher.pv_search(final_mediator,
+										pvman, info,
+										ISearch.PLY * maxdepth, ISearch.PLY * maxdepth, 0,
+										alpha, beta,
+										0, 0, final_prevPV,
+										false, 0, searcher.getEnv().getBitboard().getColourToMove(),
+										0, 0, false, 0, !go.isPonder());
+								//}
+								
+								window *= multiplier;
+								
+							} while (eval <= alpha || eval >= beta);
 							
-							info.setPV(PVNode.convertPV(pvman.load(0), new ArrayList<Integer>()));
+							prevEval = eval;
+							
+							List<Integer> pv_buffer = new ArrayList<Integer>();
+							info.setPV(PVNode.convertPV(pvman.load(0), pv_buffer));
 							if (info.getPV().length > 0) {
 								info.setBestMove(info.getPV()[0]);
 							}
-							info.setEval(score);
+							info.setEval(eval);
 							
 							final_mediator.changedMajor(info);
 							
