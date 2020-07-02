@@ -50,7 +50,7 @@ import bagaturchess.ucitracker.impl.gamemodel.serialization.GameModelWriter;
 public class GamesGenerator {
 	
 	
-	private static int SEARCH_DEPTH_MIN = 2;
+	private static int SEARCH_DEPTH_MIN = 1;
 	private static int SEARCH_DEPTH_MAX = 10;
 	
 	private static int MAX_EVAL_DIFF = 1500;
@@ -282,8 +282,12 @@ public class GamesGenerator {
 
 				runner.go_Depth(depth);
 				
-				infos = runner.getInfoLines();
-				if (infos.size() > 1) {
+				try {
+					infos = runner.getInfoLines();
+				} catch (java.lang.IllegalStateException ise) {
+					//No pv
+				}
+				if (infos != null && infos.size() > 1) {
 					throw new IllegalStateException("Only one engine is supported");
 				}
 				
@@ -292,7 +296,7 @@ public class GamesGenerator {
 					throw new IllegalStateException("depth >  " + SEARCH_DEPTH_MAX + " and no PV info");
 				}
 				
-				if (infos.size() == 0 || infos.get(0) == null) {
+				if (infos == null || infos.size() == 0 || infos.get(0) == null) {
 					//Continue
 				} else {
 					loop = false;
