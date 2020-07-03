@@ -437,7 +437,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (ply == 0) {
 					info.setCurrentMove(move);
 					info.setCurrentMoveNumber((movesPerformed + 1));
-					mediator.changedMinor(info);
+					//mediator.changedMinor(info);
 				}
 				
 				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
