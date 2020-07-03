@@ -23,6 +23,7 @@
 package bagaturchess.search.impl.alg.impl1;
 
 
+import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
@@ -124,7 +125,7 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 			int mateMove, boolean useMateDistancePrunning) {
 		
 		return calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), alpha_org, beta, true);
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), alpha_org, beta, true, false);
 	}
 	
 	
@@ -136,13 +137,13 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
 		return calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), beta - 1, beta, false);		
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), beta - 1, beta, false, false);		
 	}
 	
 	
 	public int calculateBestMove(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
-			final int ply, int depth, int alpha, int beta, boolean isPv) {
+			final int ply, int depth, int alpha, int beta, boolean isPv, boolean inMonteCarlo) {
 
 		
 		if (mediator != null && mediator.getStopper() != null) {
@@ -274,11 +275,19 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 		
 		
 		if (depth == 0) {
-			int qeval = qsearch(evaluator, info, cb, moveGen, alpha, beta, ply, isPv);
-			node.bestmove = 0;
-			node.eval = qeval;
-			node.leaf = true;
-			return node.eval;
+			if (inMonteCarlo){
+				int qeval = qsearch(evaluator, info, cb, moveGen, alpha, beta, ply, isPv);
+				node.bestmove = 0;
+				node.eval = qeval;
+				node.leaf = true;
+				return node.eval;
+			} else {
+				int eval = search_MonteCarlo(mediator, info, pvman, evaluator, cb, moveGen, ply, depth, alphaOrig, beta, isPv);
+				node.bestmove = 0;
+				node.eval = eval;
+				node.leaf = true;
+				return node.eval;	
+			}
 		}
 		
 		
@@ -343,7 +352,7 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 					cb.doNullMove();
 					final int reduction = Math.max(depth / 2, depth / 4 + 3 + Math.min((eval - beta) / 80, 3));
 					int score = depth - reduction <= 0 ? -qsearch(evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
-							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false);
+							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false, true);
 					cb.undoNullMove();
 					if (score >= beta) {
 						node.bestmove = 0;
@@ -380,7 +389,7 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 							if (depth - reduction >= 1 && depth >= ply) {
 							//if (isPv && depth >= 6 || !isPv && depth > ply + 1) {
 								
-								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, alpha, beta, true);
+								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, alpha, beta, true, inMonteCarlo);
 								
 								env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
 								if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
@@ -533,15 +542,15 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 				
 				try {
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false);
+						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, inMonteCarlo);
 					}
 					
 					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed > 1) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false);
+						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, inMonteCarlo);
 					}
 					
 					if (score > alpha) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv);
+						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, inMonteCarlo);
 					}
 				} catch(SearchInterruptedException sie) {
 					moveGen.endPly();
@@ -739,6 +748,48 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv) {
 		int eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
 		return eval;
+	}
+	
+	
+	private int search_MonteCarlo(ISearchMediator mediator, ISearchInfo info,
+			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
+			final int ply, int depth, int alpha, int beta, boolean isPv) {
+		
+		int ITERATIONS = 33;
+		int PLIES = ply;
+		int DEPTH = ply / 4;
+		
+		boolean hasValue = false;
+		VarStatistic eval = new VarStatistic(false);
+		for (int j = 0; j < ITERATIONS; j++) {
+			
+			ArrayList<Integer> moves = new ArrayList<Integer>();
+			for (int i=0; i<PLIES; i++) {
+				calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, DEPTH, alpha, beta, isPv, true);
+				int move = pvman.load(ply).bestmove;
+				if (move != 0) {
+					int score = pvman.load(ply).eval;
+					if (i == PLIES - 1) { //Last iteration
+						int currentLineEval = score * (PLIES % 2 == 0 ? -1 : 1);
+						eval.addValue(currentLineEval, currentLineEval);
+						hasValue = true;
+					}
+					cb.doMove(move);
+					moves.add(move);
+				} else {
+					break;
+				}
+			}
+			for (int i = moves.size() - 1; i >= 0; i--) {
+				cb.undoMove(moves.get(i));
+			}
+		}
+		
+		if (hasValue) {
+			return (int) eval.getEntropy();
+		} else {
+			return qsearch(evaluator, info, cb, moveGen, alpha, beta, ply, isPv);
+		}
 	}
 	
 	
