@@ -767,7 +767,7 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 		int DEPTH = ply / 4;
 		
 		boolean hasValue = false;
-		VarStatistic eval = new VarStatistic(false);
+		VarStatistic evalStat = new VarStatistic(false);
 		for (int j = 0; j < ITERATIONS; j++) {
 			
 			ArrayList<Integer> moves = new ArrayList<Integer>();
@@ -778,7 +778,7 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 					int score = pvman.load(ply).eval;
 					if (i == PLIES - 1) { //Last iteration
 						int currentLineEval = score * (PLIES % 2 == 0 ? -1 : 1);
-						eval.addValue(currentLineEval, currentLineEval);
+						evalStat.addValue(currentLineEval, currentLineEval);
 						hasValue = true;
 					}
 					cb.doMove(move);
@@ -793,7 +793,7 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 		}
 		
 		if (hasValue) {
-			return (int) eval.getEntropy();
+			return (int) evalStat.getEntropy();
 		} else {
 			return qsearch(evaluator, info, cb, moveGen, alpha, beta, ply, isPv);
 		}
