@@ -298,8 +298,11 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 		if (!isPv && cb.checkingPieces == 0) {
 
 			
-			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
-			
+			if (inMonteCarlo){
+				eval = eval(evaluator, ply, alphaOrig, beta, isPv);
+			} else {
+				eval = search_MonteCarlo(mediator, info, pvman, evaluator, cb, moveGen, ply, depth, alphaOrig, beta, isPv);
+			}
 			
 			if (EngineConstants.USE_TT_SCORE_AS_EVAL && !tt_entries_per_ply[ply].isEmpty()) {
 				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT
@@ -485,7 +488,11 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 						if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
 							if (!MoveUtil.isPawnPush78(move)) {
 								if (eval == ISearch.MIN) {
-									eval = eval(evaluator, ply, alphaOrig, beta, isPv);
+									if (inMonteCarlo){
+										eval = eval(evaluator, ply, alphaOrig, beta, isPv);
+									} else {
+										eval = search_MonteCarlo(mediator, info, pvman, evaluator, cb, moveGen, ply, depth, alphaOrig, beta, isPv);
+									}
 								}
 								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
 									continue;
