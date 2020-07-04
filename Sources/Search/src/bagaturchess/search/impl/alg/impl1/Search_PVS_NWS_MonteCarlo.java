@@ -298,11 +298,11 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 		if (!isPv && cb.checkingPieces == 0) {
 
 			
-			if (inMonteCarlo){
+			//if (inMonteCarlo){
 				eval = eval(evaluator, ply, alphaOrig, beta, isPv);
-			} else {
-				eval = search_MonteCarlo(mediator, info, pvman, evaluator, cb, moveGen, ply, depth, alphaOrig, beta, isPv);
-			}
+			//} else {
+			//	eval = search_MonteCarlo(mediator, info, pvman, evaluator, cb, moveGen, ply, depth, alphaOrig, beta, isPv);
+			//}
 			
 			if (EngineConstants.USE_TT_SCORE_AS_EVAL && !tt_entries_per_ply[ply].isEmpty()) {
 				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT
@@ -488,11 +488,11 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 						if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
 							if (!MoveUtil.isPawnPush78(move)) {
 								if (eval == ISearch.MIN) {
-									if (inMonteCarlo){
+									//if (inMonteCarlo){
 										eval = eval(evaluator, ply, alphaOrig, beta, isPv);
-									} else {
-										eval = search_MonteCarlo(mediator, info, pvman, evaluator, cb, moveGen, ply, depth, alphaOrig, beta, isPv);
-									}
+									//} else {
+									//	eval = search_MonteCarlo(mediator, info, pvman, evaluator, cb, moveGen, ply, depth, alphaOrig, beta, isPv);
+									//}
 								}
 								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
 									continue;
@@ -762,9 +762,10 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
 			final int ply, int depth, int alpha, int beta, boolean isPv) {
 		
+		int WINDOW = 0;
 		int ITERATIONS = 33;
-		int PLIES = ply;
-		int DEPTH = ply / 4;
+		int PLIES = Math.max(1, ply);
+		int DEPTH = Math.max(1, ply / 4);
 		
 		boolean hasValue = false;
 		VarStatistic evalStat = new VarStatistic(false);
@@ -772,20 +773,25 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 			
 			ArrayList<Integer> moves = new ArrayList<Integer>();
 			for (int i=0; i<PLIES; i++) {
-				calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, DEPTH, alpha, beta, isPv, true);
+				int score = (i % 2 == 0 ? 1 : -1)
+						* calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply,
+								DEPTH,
+								(i % 2 == 0 ? alpha - WINDOW : -beta - WINDOW),
+								(i % 2 == 0 ? beta + WINDOW: -alpha + WINDOW),
+								true,
+								true);
 				int move = pvman.load(ply).bestmove;
-				if (move != 0) {
-					int score = pvman.load(ply).eval;
-					if (i == PLIES - 1) { //Last iteration
-						int currentLineEval = score * (PLIES % 2 == 0 ? -1 : 1);
-						evalStat.addValue(currentLineEval, currentLineEval);
-						hasValue = true;
-					}
-					cb.doMove(move);
-					moves.add(move);
-				} else {
+				if (move == 0) {
+					evalStat.addValue(score, score);
+					hasValue = true;
 					break;
 				}
+				if (i == PLIES - 1) { //Last iteration
+					evalStat.addValue(score, score);
+					hasValue = true;
+				}
+				cb.doMove(move);
+				moves.add(move);
 			}
 			for (int i = moves.size() - 1; i >= 0; i--) {
 				cb.undoMove(moves.get(i));
