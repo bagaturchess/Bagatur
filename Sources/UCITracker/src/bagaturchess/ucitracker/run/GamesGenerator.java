@@ -115,18 +115,17 @@ public class GamesGenerator {
 					new String [0],
 					"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\texel107");*/
 			
-			EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\stockfish-10-win\\Windows\\stockfish_10_x64.exe",
+			/*EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\stockfish-10-win\\Windows\\stockfish_10_x64.exe",
 					new String [0],
-					"C:\\DATA\\Engines\\stockfish-10-win\\Windows");
+					"C:\\DATA\\Engines\\stockfish-10-win\\Windows");*/
 	
-			/*EngineProcess engine = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Komodo9\\Windows\\komodo-9.02-64bit.exe",
+			EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\lc0-v0.25.1-windows-cpu-openblas\\lc0.exe",
 					new String [0],
-					"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Komodo9\\Windows\\");
-			*/
+					"C:\\DATA\\Engines\\lc0-v0.25.1-windows-cpu-openblas\\");
 			
 			//EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");
 			
-			control.execute(engine, "./stockfish-10.cg", 1000000, true);
+			control.execute(engine, "./lc0-v0.25.1.cg", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
