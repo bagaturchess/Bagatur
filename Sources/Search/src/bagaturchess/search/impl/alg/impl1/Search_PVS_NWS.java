@@ -570,7 +570,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (alpha >= beta) {
 						
 						if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {
-							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
 							moveGen.addKillerMove(bestMove, ply);
 							moveGen.addHHValue(cb.colorToMove, bestMove, parentMove, depth);
 						}
@@ -600,6 +599,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(bestMove != 0);
+		}
+		
+		if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {
+			moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
 		}
 		
 		if (!SearchUtils.isMateVal(bestScore)) {
