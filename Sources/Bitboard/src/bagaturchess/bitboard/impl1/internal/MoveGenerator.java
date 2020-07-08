@@ -178,10 +178,14 @@ public final class MoveGenerator {
 	public void setMVVLVAScores(final ChessBoard cb) {
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
 			moveScores[j] = MoveUtil.getAttackedPieceIndex(moves[j]) * 6 - MoveUtil.getSourcePieceIndex(moves[j]);
-			//moveScores[j] = SEEUtil.getSeeCaptureScore(cb, moves[j]);
 		}
 	}
 	
+	public void setSEEScores(final ChessBoard cb) {
+		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
+			moveScores[j] = SEEUtil.getSeeCaptureScore(cb, moves[j]);
+		}
+	}
 	
 	public int getCountGoodAttacks(final ChessBoard cb) {
 		int count = 0;
