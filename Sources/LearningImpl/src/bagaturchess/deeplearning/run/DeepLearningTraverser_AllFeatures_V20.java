@@ -18,8 +18,8 @@ public class DeepLearningTraverser_AllFeatures_V20 {
 			//String filePath = "./Houdini.15a.short.cg";
 			//String filePath = "./Houdini.15a.cg";
 			//String filePath = "./Arasan13.1.cg";
-			String filePath = "./stockfish-10.cg";
-			//String filePath = "./glaurung-2.2.cg";
+			//String filePath = "./stockfish-10.cg";
+			String filePath = "./lc0-v0.25.1.cg";
 			
 			DeepLearningVisitorImpl_AllFeatures learning = new DeepLearningVisitorImpl_AllFeatures();
 			
