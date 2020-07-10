@@ -35,7 +35,8 @@ public final class MoveGenerator {
 	private final ContinuationHistory[] HH_ContinuationHistory = new ContinuationHistory[2];
 	private final ContinuationHistory[] BF_ContinuationHistory = new ContinuationHistory[2];
 	
-	private Random rnd = new Random();
+	private Random randomizer = new Random();
+	private long randomizer_counter;
 	
 
 	public MoveGenerator() {
@@ -89,7 +90,7 @@ public final class MoveGenerator {
 		
 		currentPly = 0;
 	}
-
+	
 	public void addHHValue(final int color, final int move, final int parentMove, final int depth) {
 		HH_MOVES[color][MoveUtil.getFromToIndex(move)] += depth * depth;
 		HH_MOVES1[color][MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
@@ -239,7 +240,10 @@ public final class MoveGenerator {
 		
 		final int left = nextToMove[currentPly];
 		
-		randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
+		randomizer_counter++;
+		if (randomizer_counter % 100 == 0) {
+			randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
+		}
 		
 		for (int i = left, j = i; i < nextToGenerate[currentPly] - 1; j = ++i) {
 			final int score = moveScores[i + 1];
@@ -260,7 +264,7 @@ public final class MoveGenerator {
 	private void randomize(int[] arr1, int[] arr2, int start, int end) {
 	    for (int i=end; i>1+start; i--) {
 	    	
-	    	int rnd_index = start + rnd.nextInt(i - start);	    
+	    	int rnd_index = start + randomizer.nextInt(i - start);	    
 	    	
 	    	int tmp = arr1[i-1];
 	    	arr1[i-1] = arr1[rnd_index];
