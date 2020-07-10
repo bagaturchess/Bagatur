@@ -377,10 +377,9 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							int reduction = 2;
 							
-							if (depth - reduction >= 1 && depth >= ply) {
-							//if (isPv && depth >= 6 || !isPv && depth > ply + 1) {
+							if (isPv && depth - reduction >= 1) {
 								
-								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, alpha, beta, true);
+								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, alpha, beta, isPv);
 								
 								env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
 								if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
