@@ -377,9 +377,9 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							int reduction = 2;
 							
-							if (isPv && depth - reduction >= 1) {
+							if (depth - reduction >= 1 && depth >= ply) {
 								
-								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, alpha, beta, isPv);
+								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, alpha, beta, true);
 								
 								env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
 								if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
@@ -514,8 +514,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
 					
-					if (phase == PHASE_QUIET && moveGen.getScore() > historyAVGScores.getEntropy()) {
-						reduction /= 2;
+					if (moveGen.getScore() > historyAVGScores.getEntropy()) {
+						reduction -= 1;
+						if (moveGen.getScore() > historyAVGScores.getEntropy() + historyAVGScores.getDisperse()) {
+							reduction -= 1;
+						}
 					}
 					
 					if (move == killer1Move || move == killer2Move || move == counterMove) {
