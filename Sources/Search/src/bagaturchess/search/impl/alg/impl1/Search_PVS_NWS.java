@@ -143,7 +143,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	public int calculateBestMove(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
 			final int ply, int depth, int alpha, int beta, boolean isPv) {
-
+		
 		
 		if (mediator != null && mediator.getStopper() != null) {
 			mediator.getStopper().stopIfNecessary(ply + depth, env.getBitboard().getColourToMove(), alpha, beta);
@@ -287,7 +287,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int eval = ISearch.MIN;
 		if (!isPv && cb.checkingPieces == 0) {
-
+			
 			
 			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
@@ -315,8 +315,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			//Razoring for all depths based on the eval deviation detected into the root node
 			/*int rbeta = alpha - mediator.getTrustWindow_AlphaAspiration();
 			if (eval < rbeta) {
-				score = calculateBestMove(evaluator, info, cb, moveGen, rbeta, rbeta + 1, ply);
-				if (score <= rbeta) {
+				int score = qsearch(evaluator, info, cb, moveGen, rbeta, rbeta + 1, ply, isPv);
+				if (score < rbeta) {
 					node.bestmove = 0;
 					node.eval = score;
 					node.leaf = true;
