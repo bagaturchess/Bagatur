@@ -659,14 +659,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		moveGen.startPly();
 		
+		int ttMove = 0;
 		int phase = PHASE_TT;
 		while (phase <= PHASE_ATTACKING) {
 			switch (phase) {
 				case PHASE_TT:
 					if (!tt_entries_per_ply[ply].isEmpty()) {
-						int ttMove = tt_entries_per_ply[ply].getBestMove();
-						if (cb.isValidMove(ttMove)) {
-							if (env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
+						if (cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
+							if (env.getBitboard().getMoveOps().isCaptureOrPromotion(tt_entries_per_ply[ply].getBestMove())) {
+								ttMove = tt_entries_per_ply[ply].getBestMove();
 								moveGen.addMove(ttMove);
 							}
 						}
@@ -682,6 +683,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			while (moveGen.hasNext()) {
 				
 				final int move = moveGen.next();
+				
+				if (phase == PHASE_ATTACKING) {
+					if (move == ttMove) {
+						continue;
+					}
+				}
 				
 				if (MoveUtil.isPromotion(move)) {
 					if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
@@ -703,7 +710,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				cb.doMove(move);
-	
+				
 				if (EngineConstants.ASSERT) {
 					cb.changeSideToMove();
 					Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
