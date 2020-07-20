@@ -426,6 +426,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				final int move = moveGen.next();
 				
+				if (!cb.isLegal(move)) {
+					continue;
+				}
+				
 				//Build and sent minor info
 				if (ply == 0) {
 					info.setCurrentMove(move);
@@ -482,10 +486,6 @@ public class Search_PVS_NWS extends SearchImpl {
 							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth) {
 						continue;
 					}
-				}
-				
-				if (!cb.isLegal(move)) {
-					continue;
 				}
 				
 				cb.doMove(move);
@@ -697,13 +697,13 @@ public class Search_PVS_NWS extends SearchImpl {
 					continue;
 				}
 				
-				if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES
-						&& !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))
-						&& SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
+				if (!cb.isLegal(move)) {
 					continue;
 				}
 				
-				if (!cb.isLegal(move)) {
+				if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES
+						&& !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))
+						&& SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
 					continue;
 				}
 				
