@@ -166,8 +166,8 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 							
 							do {
 								
-								alpha = eval - window;
-								beta = eval + window;
+								alpha = Math.max(ISearch.MIN, eval - window);
+								beta = Math.min(ISearch.MAX, eval + window);
 								
 								/*eval = searcher.nullwin_search(final_mediator, info,
 										ISearch.PLY * maxdepth, ISearch.PLY * maxdepth,	0,
