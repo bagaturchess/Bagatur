@@ -636,7 +636,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (cb.checkingPieces != 0) {
-			return calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv);
+			return alpha;
+			//return calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv);
 		}
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
