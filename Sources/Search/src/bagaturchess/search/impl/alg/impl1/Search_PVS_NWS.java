@@ -506,7 +506,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int reduction = 1;
 				if (depth >= 2
 						&& movesPerformed > 1
-						&& MoveUtil.isQuiet(move)
+						//&& MoveUtil.isQuiet(move)
 						&& !MoveUtil.isPawnPush78(move)
 						) {
 					
@@ -525,6 +525,13 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (!isPv) {
 						reduction += 1;
+					}
+					
+					if (!MoveUtil.isQuiet(move)) {
+						reduction /= 2;
+						if (SEEUtil.getSeeCaptureScore(cb, move) > 0) {
+							reduction /= 2;
+						}
 					}
 					
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
