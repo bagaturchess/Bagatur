@@ -312,19 +312,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			//Razoring for all depths based on the eval deviation detected into the root node
-			/*int rbeta = alpha - mediator.getTrustWindow_AlphaAspiration();
-			if (eval < rbeta) {
-				int score = qsearch(evaluator, info, cb, moveGen, rbeta, rbeta + 1, ply, isPv);
-				if (score < rbeta) {
-					node.bestmove = 0;
-					node.eval = score;
-					node.leaf = true;
-					return node.eval;
-				}
-			}*/
-			
-			
 			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < EvalConstants.SCORE_MATE_BOUND) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
 					int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply, isPv);
