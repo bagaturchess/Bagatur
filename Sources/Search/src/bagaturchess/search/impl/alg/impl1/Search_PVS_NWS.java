@@ -607,8 +607,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		return bestScore;
 	}
-
-
+	
+	
 	public int qsearch(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply, final boolean isPv) {
 		
 		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
