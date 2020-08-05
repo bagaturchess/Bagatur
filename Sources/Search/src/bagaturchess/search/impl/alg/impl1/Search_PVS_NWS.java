@@ -641,14 +641,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		
-		if (EngineConstants.USE_TT_SCORE_AS_EVAL && !tt_entries_per_ply[ply].isEmpty()) {
+		/*if (EngineConstants.USE_TT_SCORE_AS_EVAL && !tt_entries_per_ply[ply].isEmpty()) {
 			if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT
 					|| (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[ply].getEval() < eval)
 					|| (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[ply].getEval() > eval)
 				) {
 				eval = tt_entries_per_ply[ply].getEval();
 			}
-		}
+		}*/
 		
 		if (eval >= beta) {
 			return eval;
