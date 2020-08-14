@@ -124,7 +124,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int mateMove, boolean useMateDistancePrunning) {
 		
 		return calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), alpha_org, beta, true);
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), alpha_org, beta, true, 0);
 	}
 	
 	
@@ -136,13 +136,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
 		return calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), beta - 1, beta, false);		
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), beta - 1, beta, false, 0);		
 	}
 	
 	
 	public int calculateBestMove(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
-			final int ply, int depth, int alpha, int beta, boolean isPv) {
+			final int ply, int depth, int alpha, int beta, boolean isPv,int excludedMove) {
 		
 		
 		if (mediator != null && mediator.getStopper() != null) {
@@ -197,14 +197,25 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
+		long hashkey = cb.zobristKey;
+		if (excludedMove != 0) {
+			hashkey ^= ((long) excludedMove);
+		}
 		
 		int ttMove = 0;
-		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
+		boolean isExpectedCutNode = false;
+		boolean isDepthEnoughForSingularExtension = false;
+		int ttValue = 0;
+		env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
 		if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
 			
 			int tpt_depth = tt_entries_per_ply[ply].getDepth();
 			ttMove = tt_entries_per_ply[ply].getBestMove();
-			
+			isExpectedCutNode = (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER || tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT)
+					&& tt_entries_per_ply[ply].getEval() >= beta;
+			isDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth - 3;
+			ttValue = tt_entries_per_ply[ply].getEval();
+					
 			if (tpt_depth >= depth) {
 				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT) {
 					extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
@@ -330,7 +341,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					cb.doNullMove();
 					final int reduction = Math.max(depth / 2, depth / 4 + 3 + Math.min((eval - beta) / 80, 3));
 					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
-							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false);
+							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false, 0);
 					cb.undoNullMove();
 					if (score >= beta) {
 						node.bestmove = 0;
@@ -340,6 +351,40 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 			}
+		}
+		
+		
+		//Singular move extension
+		int singularMoveExtension = 0;
+        if (ply > 0
+        	&& depth >= 4
+			&& excludedMove == 0
+			&& isExpectedCutNode
+			&& isDepthEnoughForSingularExtension
+			) {
+			
+    		/*boolean singleReply = env.getBitboard().hasSingleMove();
+    		if (!singleReply) {
+    			
+    	        int singularBeta = ttValue - 2 * depth;
+    	        int reduction = depth / 2;
+    	        
+    	        int singularValue = calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, singularBeta - 1, singularBeta, isPv, ttMove);
+    	        if (singularValue < singularBeta) {
+    	        	
+    	        	//singularMoveExtension = 1;
+    	        	
+    	        } else if (singularBeta >= beta) {
+    	        	
+        	        // Multi-cut pruning
+        	        // Our ttMove is assumed to fail high, and now we failed high also on a reduced
+        	        // search without the ttMove. So we assume this expected Cut-node is not singular,
+        	        // that multiple moves fail high, and we can prune the whole subtree by returning
+        	        // a soft bound.
+    	        	
+    	            return singularBeta;
+    	        }
+    		}*/
 		}
 		
 		
@@ -366,9 +411,9 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (depth - reduction >= 1 && depth >= ply) {
 								
-								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, alpha, beta, true);
+								calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, alpha, beta, true, 0);
 								
-								env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
+								env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
 								if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
 									ttMove = tt_entries_per_ply[ply].getBestMove();
 								}
@@ -412,6 +457,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			while (moveGen.hasNext()) {
 				
 				final int move = moveGen.next();
+				
+				if (move == excludedMove) {
+					continue;
+				}
 				
 				if (!cb.isLegal(move)) {
 					continue;
@@ -524,17 +573,23 @@ public class Search_PVS_NWS extends SearchImpl {
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
 				}
 				
+				
 				try {
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false);
+						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, 0);
 					}
 					
 					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed > 1) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false);
+						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, 0);
 					}
 					
 					if (score > alpha) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv);
+						
+						if (move == ttMove) {
+							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 + singularMoveExtension, -beta, -alpha, isPv, 0);
+						} else {
+							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, 0);
+						}
 					}
 				} catch(SearchInterruptedException sie) {
 					moveGen.endPly();
@@ -600,7 +655,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (!SearchUtils.isMateVal(bestScore)) {
-			env.getTPT().put(cb.zobristKey, depth, bestScore, alphaOrig, beta, bestMove);
+			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
 		}
 		
 		//validatePV(node, depth, isPv);
