@@ -212,7 +212,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int tpt_depth = tt_entries_per_ply[ply].getDepth();
 			ttMove = tt_entries_per_ply[ply].getBestMove();
 			isTTLowerBound = tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER;
-			isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth - 3;
+			isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
 			ttValue = tt_entries_per_ply[ply].getEval();
 					
 			if (tpt_depth >= depth) {
@@ -360,18 +360,18 @@ public class Search_PVS_NWS extends SearchImpl {
 			&& excludedMove == 0
 			&& isTTLowerBound
 			&& isTTDepthEnoughForSingularExtension
-			//&& ttValue >= beta
+			&& ttValue >= beta
 			) {
 			
-	        /*int singularBeta = ttValue - 2 * depth;
-	        int reduction = depth - 3;
+	        int singularBeta = ttValue;
+	        int reduction = depth / 2;
 	        
-	        int singularValue = calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, singularBeta - 1, singularBeta, isPv, ttMove);
+	        /*int singularValue = calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, singularBeta - 1, singularBeta, false, ttMove);
 	        if (singularValue < singularBeta) {
 	        	
 	        	singularMoveExtension = 1;
 	        	
-	        } else if (singularBeta >= beta) {
+	        } else if (singularBeta > beta) {
 	        	
     	        // Multi-cut pruning
     	        // Our ttMove is assumed to fail high, and now we failed high also on a reduced
