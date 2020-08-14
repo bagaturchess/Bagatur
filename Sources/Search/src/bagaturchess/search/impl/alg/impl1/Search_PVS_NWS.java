@@ -142,7 +142,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	public int calculateBestMove(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
-			final int ply, int depth, int alpha, int beta, boolean isPv,int excludedMove) {
+			final int ply, int depth, int alpha, int beta, boolean isPv, int excludedMove) {
 		
 		
 		if (mediator != null && mediator.getStopper() != null) {
@@ -199,21 +199,20 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		long hashkey = cb.zobristKey;
 		if (excludedMove != 0) {
-			hashkey ^= ((long) excludedMove);
+			hashkey ^= (((long)excludedMove) << 16);
 		}
 		
 		int ttMove = 0;
-		boolean isExpectedCutNode = false;
-		boolean isDepthEnoughForSingularExtension = false;
 		int ttValue = 0;
+		boolean isTTLowerBound = false;
+		boolean isTTDepthEnoughForSingularExtension = false;
 		env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
 		if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
 			
 			int tpt_depth = tt_entries_per_ply[ply].getDepth();
 			ttMove = tt_entries_per_ply[ply].getBestMove();
-			isExpectedCutNode = (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER || tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT)
-					&& tt_entries_per_ply[ply].getEval() >= beta;
-			isDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth - 3;
+			isTTLowerBound = tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER;
+			isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
 			ttValue = tt_entries_per_ply[ply].getEval();
 					
 			if (tpt_depth >= depth) {
@@ -357,34 +356,31 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int singularMoveExtension = 0;
         if (ply > 0
-        	&& depth >= 4
+        	&& depth >= 6
 			&& excludedMove == 0
-			&& isExpectedCutNode
-			&& isDepthEnoughForSingularExtension
+			&& isTTLowerBound
+			&& isTTDepthEnoughForSingularExtension
+			&& ttValue >= beta
 			) {
 			
-    		/*boolean singleReply = env.getBitboard().hasSingleMove();
-    		if (!singleReply) {
-    			
-    	        int singularBeta = ttValue - 2 * depth;
-    	        int reduction = depth / 2;
-    	        
-    	        int singularValue = calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, singularBeta - 1, singularBeta, isPv, ttMove);
-    	        if (singularValue < singularBeta) {
-    	        	
-    	        	//singularMoveExtension = 1;
-    	        	
-    	        } else if (singularBeta >= beta) {
-    	        	
-        	        // Multi-cut pruning
-        	        // Our ttMove is assumed to fail high, and now we failed high also on a reduced
-        	        // search without the ttMove. So we assume this expected Cut-node is not singular,
-        	        // that multiple moves fail high, and we can prune the whole subtree by returning
-        	        // a soft bound.
-    	        	
-    	            return singularBeta;
-    	        }
-    		}*/
+	        /*int singularBeta = ttValue - 2 * depth;
+	        int reduction = depth / 2;
+	        
+	        int singularValue = calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, singularBeta - 1, singularBeta, isPv, ttMove);
+	        if (singularValue < singularBeta) {
+	        	
+	        	singularMoveExtension = 1;
+	        	
+	        } else if (singularBeta >= beta) {
+	        	
+    	        // Multi-cut pruning
+    	        // Our ttMove is assumed to fail high, and now we failed high also on a reduced
+    	        // search without the ttMove. So we assume this expected Cut-node is not singular,
+    	        // that multiple moves fail high, and we can prune the whole subtree by returning
+    	        // a soft bound.
+	        	
+	            return singularValue;
+	        }*/
 		}
 		
 		
@@ -632,8 +628,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		moveGen.endPly();
 		
-		if (movesPerformed == 0) {
-			if (cb.checkingPieces == 0) {
+		if (movesPerformed == 0) {			
+			if (excludedMove != 0) {
+				node.bestmove = 0;
+				node.eval = alpha;
+				node.leaf = true;
+				return node.eval;
+			} else if (cb.checkingPieces == 0) {
 				node.bestmove = 0;
 				node.eval = EvalConstants.SCORE_DRAW;
 				node.leaf = true;
@@ -654,7 +655,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
 		}
 		
-		if (!SearchUtils.isMateVal(bestScore)) {
+		if (!SearchUtils.isMateVal(bestScore) && excludedMove == 0) {
 			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
 		}
 		
