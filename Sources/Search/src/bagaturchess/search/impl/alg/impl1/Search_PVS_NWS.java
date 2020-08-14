@@ -212,7 +212,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int tpt_depth = tt_entries_per_ply[ply].getDepth();
 			ttMove = tt_entries_per_ply[ply].getBestMove();
 			isTTLowerBound = tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER;
-			isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
+			isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth - 3;
 			ttValue = tt_entries_per_ply[ply].getEval();
 					
 			if (tpt_depth >= depth) {
@@ -360,11 +360,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			&& excludedMove == 0
 			&& isTTLowerBound
 			&& isTTDepthEnoughForSingularExtension
-			&& ttValue >= beta
+			//&& ttValue >= beta
 			) {
 			
 	        /*int singularBeta = ttValue - 2 * depth;
-	        int reduction = depth / 2;
+	        int reduction = depth - 3;
 	        
 	        int singularValue = calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, singularBeta - 1, singularBeta, isPv, ttMove);
 	        if (singularValue < singularBeta) {
@@ -379,7 +379,7 @@ public class Search_PVS_NWS extends SearchImpl {
     	        // that multiple moves fail high, and we can prune the whole subtree by returning
     	        // a soft bound.
 	        	
-	            return singularValue;
+	            return singularBeta;
 	        }*/
 		}
 		
