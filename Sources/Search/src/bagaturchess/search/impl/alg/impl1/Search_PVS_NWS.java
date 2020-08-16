@@ -357,13 +357,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		int singularMoveExtension = 0;
         if (ply > 0
         	&& depth >= 6
+        	&& cb.checkingPieces == 0
 			&& excludedMove == 0
 			&& isTTLowerBound
 			&& isTTDepthEnoughForSingularExtension
-			&& ttValue >= beta
 			) {
 			
-	        int singularBeta = ttValue;
+	        int singularBeta = ttValue - 50;
 	        int reduction = depth / 2;
 	        
 	        /*int singularValue = calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - reduction, singularBeta - 1, singularBeta, false, ttMove);
@@ -655,7 +655,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
 		}
 		
-		if (!SearchUtils.isMateVal(bestScore) && excludedMove == 0) {
+		if (!SearchUtils.isMateVal(bestScore)) {
 			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
 		}
 		
