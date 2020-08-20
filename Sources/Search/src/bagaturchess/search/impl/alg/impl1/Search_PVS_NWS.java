@@ -380,7 +380,7 @@ public class Search_PVS_NWS extends SearchImpl {
     	        // that multiple moves fail high, and we can prune the whole subtree by returning
     	        // a soft bound.
 	        	
-	            //return singularBeta;
+	            return singularBeta;
 	        }*/
 		}
 		
