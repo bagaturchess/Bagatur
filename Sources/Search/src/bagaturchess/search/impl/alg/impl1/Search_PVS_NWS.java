@@ -553,7 +553,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 					}
 					
-					reduction += singularMoveExtension;
+					reduction += singularMoveExtension + multiCutReduction;
 					
 					if (move == killer1Move || move == killer2Move || move == counterMove) {
 						reduction -= 1;
