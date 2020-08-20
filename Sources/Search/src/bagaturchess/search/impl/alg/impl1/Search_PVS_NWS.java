@@ -355,6 +355,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		//Singular move extension
 		int singularMoveExtension = 0;
+		int multiCutReduction = 0;
         if (ply > 0
         	&& depth >= 6
         	&& cb.checkingPieces == 0
@@ -380,7 +381,7 @@ public class Search_PVS_NWS extends SearchImpl {
     	        // that multiple moves fail high, and we can prune the whole subtree by returning
     	        // a soft bound.
 	        	
-	            return singularBeta;
+	            multiCutReduction = 1;
 	        }*/
 		}
 		
