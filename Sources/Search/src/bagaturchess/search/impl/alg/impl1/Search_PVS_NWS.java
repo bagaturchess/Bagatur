@@ -367,7 +367,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	        int singularBeta = ttValue - 50;
 	        int reduction = depth / 2;
 	        
-	        /*int singularValue = calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply,
+	        int singularValue = calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply,
 	        		depth - reduction, singularBeta - 1, singularBeta, isPv, ttMove);
 	        if (singularValue < singularBeta) {
 	        	
@@ -382,7 +382,7 @@ public class Search_PVS_NWS extends SearchImpl {
     	        // a soft bound.
 	        	
 	            multiCutReduction = 1;
-	        }*/
+	        }
 		}
 		
 		
