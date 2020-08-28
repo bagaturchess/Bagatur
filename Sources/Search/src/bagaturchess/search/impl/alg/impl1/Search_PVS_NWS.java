@@ -522,6 +522,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
+				boolean positiveSee = !MoveUtil.isQuiet(move) && SEEUtil.getSeeCaptureScore(cb, move) > 0;
+				
 				cb.doMove(move);
 				movesPerformed++;
 				
@@ -574,21 +576,23 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				int extension = cb.checkingPieces != 0 && positiveSee ? 1 : 0;
+				
 				try {
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, 0);
+						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction + extension, -alpha - 1, -alpha, false, 0);
 					}
 					
 					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed > 1) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, 0);
+						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 + extension, -alpha - 1, -alpha, false, 0);
 					}
 					
 					if (score > alpha) {
 						
 						if (move == ttMove) {
-							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 + singularMoveExtension, -beta, -alpha, isPv, 0);
+							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 + singularMoveExtension + extension, -beta, -alpha, isPv, 0);
 						} else {
-							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, 0);
+							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 + extension, -beta, -alpha, isPv, 0);
 						}
 					}
 				} catch(SearchInterruptedException sie) {
