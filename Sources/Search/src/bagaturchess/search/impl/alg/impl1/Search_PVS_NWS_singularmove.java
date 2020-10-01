@@ -211,9 +211,9 @@ public class Search_PVS_NWS_singularmove extends SearchImpl {
 			
 			int tpt_depth = tt_entries_per_ply[ply].getDepth();
 			ttMove = tt_entries_per_ply[ply].getBestMove();
+			ttValue = tt_entries_per_ply[ply].getEval();
 			isTTLowerBound = tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER;
 			isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
-			ttValue = tt_entries_per_ply[ply].getEval();
 			
 			if (tpt_depth >= depth) {
 				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT) {
