@@ -51,7 +51,6 @@ import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.ITTEntry;
-import bagaturchess.search.impl.tpt.TTEntry_BaseImpl;
 import bagaturchess.search.impl.utils.SearchUtils;
 
 
@@ -86,7 +85,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long lastSentMinorInfo_nodesCount;
 	
 	private VarStatistic historyAVGScores;
-	protected ITTEntry tt_cached = new TTEntry_BaseImpl();
 	
 	
 	public Search_PVS_NWS(Object[] args) {
@@ -127,7 +125,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int mateMove, boolean useMateDistancePrunning) {
 		
 		return calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), alpha_org, beta, true);
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), alpha_org, beta, true, 0);
 	}
 	
 	
@@ -139,13 +137,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
 		return calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), beta - 1, beta, false);		
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), beta - 1, beta, false, 0);		
 	}
 	
 	
 	public int calculateBestMove(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
-			final int ply, int depth, int alpha, int beta, boolean isPv) {
+			final int ply, int depth, int alpha, int beta, boolean isPv, int excludedMove) {
 
 		
 		if (mediator != null && mediator.getStopper() != null) {
@@ -200,23 +198,35 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
+		long hashkey = cb.zobristKey;
+		if (excludedMove != 0) {
+			hashkey ^= (((long)excludedMove) << 16);
+		}
 		
-		env.getTPT().get(cb.zobristKey, tt_cached);
-		if (!tt_cached.isEmpty() && cb.isValidMove(tt_cached.getBestMove())) {
+		int ttMove = 0;
+		int ttValue = 0;
+		boolean isTTLowerBound = false;
+		boolean isTTDepthEnoughForSingularExtension = false;
+		env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
+		if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
 			
-			int tpt_depth = tt_cached.getDepth();
+			int tpt_depth = tt_entries_per_ply[ply].getDepth();
+			ttMove = tt_entries_per_ply[ply].getBestMove();
+			ttValue = tt_entries_per_ply[ply].getEval();
+			isTTLowerBound = tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER;
+			isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
 			
 			if (tpt_depth >= depth) {
-				if (tt_cached.getFlag() == ITTEntry.FLAG_EXACT) {
-					extractFromTT(ply, node, tt_cached, info, isPv);
+				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT) {
+					extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 					return node.eval;
 				} else {
-					if (tt_cached.getFlag() == ITTEntry.FLAG_LOWER && tt_cached.getEval() >= beta) {
-						extractFromTT(ply, node, tt_cached, info, isPv);
+					if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[ply].getEval() >= beta) {
+						extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 						return node.eval;
 					}
-					if (tt_cached.getFlag() == ITTEntry.FLAG_UPPER && tt_cached.getEval() <= alpha) {
-						extractFromTT(ply, node, tt_cached, info, isPv);
+					if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[ply].getEval() <= alpha) {
+						extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 						return node.eval;
 					}
 				}
@@ -293,12 +303,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
 			
-			if (EngineConstants.USE_TT_SCORE_AS_EVAL && !tt_cached.isEmpty()) {
-				if (tt_cached.getFlag() == ITTEntry.FLAG_EXACT
-						|| (tt_cached.getFlag() == ITTEntry.FLAG_UPPER && tt_cached.getEval() < eval)
-						|| (tt_cached.getFlag() == ITTEntry.FLAG_LOWER && tt_cached.getEval() > eval)
+			if (EngineConstants.USE_TT_SCORE_AS_EVAL && !tt_entries_per_ply[ply].isEmpty()) {
+				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT
+						|| (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[ply].getEval() < eval)
+						|| (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[ply].getEval() > eval)
 					) {
-					eval = tt_cached.getEval();
+					eval = tt_entries_per_ply[ply].getEval();
 				}
 			}
 			
@@ -344,7 +354,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					cb.doNullMove();
 					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 					int score = depth - reduction <= 0 ? -qsearch(evaluator, info, cb, moveGen, -beta, -beta + 1, ply, isPv)
-							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false);
+							: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false, 0);
 					cb.undoNullMove();
 					if (score >= beta) {
 						node.bestmove = 0;
@@ -357,12 +367,44 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 
 		
+		//Singular move extension
+		int singularMoveExtension = 0;
+		int multiCutReduction = 0;
+        if (ply > 0
+        	&& depth >= 2
+        	&& cb.checkingPieces == 0
+			&& excludedMove == 0
+			&& isTTLowerBound
+			&& isTTDepthEnoughForSingularExtension
+			) {
+			
+	        int singularBeta = ttValue - 50;
+	        int reduction = depth / 2;
+	        
+	        int singularValue = calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply,
+	        		depth - reduction, singularBeta - 1, singularBeta, isPv, ttMove);
+	        if (singularValue < singularBeta) {
+	        	
+	        	singularMoveExtension = 1;
+	        	
+	        } else if (singularBeta > beta) {
+	        	
+    	        // Multi-cut pruning
+    	        // Our ttMove is assumed to fail high, and now we failed high also on a reduced
+    	        // search without the ttMove. So we assume this expected Cut-node is not singular,
+    	        // that multiple moves fail high, and we can prune the whole subtree by returning
+    	        // a soft bound.
+	        	
+	            multiCutReduction = 1;
+	        }
+		}
+        
+		
 		final boolean wasInCheck = cb.checkingPieces != 0;
 
 		final int parentMove = ply == 0 ? 0 : moveGen.previous();
 		int bestMove = 0;
 		int bestScore = ISearch.MIN - 1;
-		int ttMove = 0;
 		int counterMove = 0;
 		int killer1Move = 0;
 		int killer2Move = 0;
@@ -375,21 +417,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			switch (phase) {
 			
 			case PHASE_TT:
-				if (tt_cached.isEmpty()) {
-					if (EngineConstants.ENABLE_IID && depth > 5 && isPv) {
-						if (MaterialUtil.containsMajorPieces(cb.materialKey)) {
-							calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, depth - EngineConstants.IID_REDUCTION - 1, alpha, beta, isPv);
-						}
-					}
-				}
-				env.getTPT().get(cb.zobristKey, tt_cached);
-				if (!tt_cached.isEmpty()) {
-					ttMove = tt_cached.getBestMove();
-					if (cb.isValidMove(ttMove)) {
-						moveGen.addMove(ttMove);
-					} else {
-						ttMove = 0;
-					}
+				if (ttMove != 0) {
+					moveGen.addMove(ttMove);
 				}
 				break;
 			case PHASE_ATTACKING_GOOD:
@@ -536,20 +565,27 @@ public class Search_PVS_NWS extends SearchImpl {
 						reduction += 1;
 					}
 					
+					reduction += singularMoveExtension;
+					reduction += multiCutReduction;
+					
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
 				}
 				
 				try {
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false);
+						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, 0);
 					}
 					
 					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed > 1) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false);
+						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -alpha - 1, -alpha, false, 0);
 					}
 					
 					if (score > alpha) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv);
+						if (move == ttMove) {
+							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 + singularMoveExtension - multiCutReduction, -beta, -alpha, isPv, 0);
+						} else {
+							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -beta, -alpha, isPv, 0);
+						}
 					}
 				} catch(SearchInterruptedException sie) {
 					moveGen.endPly();
@@ -613,7 +649,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 
 		if (!SearchUtils.isMateVal(bestScore)) {
-			env.getTPT().put(cb.zobristKey, depth, bestScore, alphaOrig, beta, bestMove);
+			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
 		}
 		
 		//validatePV(node, depth, isPv);
@@ -631,19 +667,19 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		env.getTPT().get(cb.zobristKey, tt_cached);
-		if (!tt_cached.isEmpty()) {
-			int tpt_depth = tt_cached.getDepth();
+		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
+		if (!tt_entries_per_ply[ply].isEmpty()) {
+			int tpt_depth = tt_entries_per_ply[ply].getDepth();
 			
 			if (tpt_depth >= 0) {
-				if (tt_cached.getFlag() == ITTEntry.FLAG_EXACT) {
-					return tt_cached.getEval();
+				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT) {
+					return tt_entries_per_ply[ply].getEval();
 				} else {
-					if (tt_cached.getFlag() == ITTEntry.FLAG_LOWER && tt_cached.getEval() >= beta) {
-						return tt_cached.getEval();
+					if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[ply].getEval() >= beta) {
+						return tt_entries_per_ply[ply].getEval();
 					}
-					if (tt_cached.getFlag() == ITTEntry.FLAG_UPPER && tt_cached.getEval() <= alpha) {
-						return tt_cached.getEval();
+					if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[ply].getEval() <= alpha) {
+						return tt_entries_per_ply[ply].getEval();
 					}
 				}
 			}
@@ -668,8 +704,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		while (phase <= PHASE_ATTACKING_GOOD) {
 			switch (phase) {
 				case PHASE_TT:
-					if (!tt_cached.isEmpty()) {
-						int ttMove = tt_cached.getBestMove();
+					if (!tt_entries_per_ply[ply].isEmpty()) {
+						int ttMove = tt_entries_per_ply[ply].getBestMove();
 						if (cb.isValidMove(ttMove)) {
 							if (env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
 								moveGen.addMove(ttMove);
@@ -787,10 +823,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			env.getBitboard().makeMoveForward(result.bestmove);
 			
-			env.getTPT().get(env.getBitboard().getHashKey(), tt_cached);
+			env.getTPT().get(env.getBitboard().getHashKey(), tt_entries_per_ply[ply]);
 			
-			if (!tt_cached.isEmpty()) {
-				draw = extractFromTT(ply + 1, result.child, tt_cached, info, isPv);
+			if (!tt_entries_per_ply[ply].isEmpty()) {
+				draw = extractFromTT(ply + 1, result.child, tt_entries_per_ply[ply], info, isPv);
 				if (draw) {
 					result.eval = EvalConstants.SCORE_DRAW;
 				} else {
