@@ -465,6 +465,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			while (moveGen.hasNext()) {
 				final int move = moveGen.next();
 
+				/*if (move == excludedMove) {
+					continue;
+				}*/
+				
 				//Build and sent minor info
 				if (ply == 0) {
 					info.setCurrentMove(move);
