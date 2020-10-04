@@ -463,8 +463,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		
 			while (moveGen.hasNext()) {
+				
 				final int move = moveGen.next();
-
+				
+				//For now the singular move extension is disabled
 				/*if (move == excludedMove) {
 					continue;
 				}*/
