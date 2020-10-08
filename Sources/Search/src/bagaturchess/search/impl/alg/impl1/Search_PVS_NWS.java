@@ -554,25 +554,25 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				int reduction = 1;
-				if (depth >= 2 && phase == PHASE_QUIET) {
+				if (depth >= 2
+						&& phase == PHASE_QUIET
+						) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
 					
-					if (moveGen.getScore() > historyAVGScores.getEntropy()) {
-						reduction -= 1;
-					}
-					if (moveGen.getScore() > 2 * historyAVGScores.getEntropy()) {
-						reduction -= 1;
-					}
-					if (move == killer1Move || move == killer2Move || move == counterMove) {
-						reduction -= 1;
-					}
 					if (!isPv) {
 						reduction += 1;
 					}
 					
 					reduction += singularMoveExtension;
 					reduction += multiCutReduction;
+					
+					if (moveGen.getScore() > historyAVGScores.getEntropy()) {
+						reduction = 2;
+						if (moveGen.getScore() > historyAVGScores.getEntropy() + historyAVGScores.getDisperse()) {
+							reduction = 1;//Disable LMR
+						}
+					}
 					
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
 				}
