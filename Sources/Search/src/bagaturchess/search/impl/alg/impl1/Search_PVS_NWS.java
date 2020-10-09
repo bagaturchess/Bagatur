@@ -555,6 +555,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int reduction = 1;
 				if (depth >= 2
+						&& movesPerformed > 1
 						&& phase == PHASE_QUIET
 						) {
 					
