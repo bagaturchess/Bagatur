@@ -62,8 +62,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_KILLER_1 = 2;
 	private static final int PHASE_KILLER_2 = 3;
 	private static final int PHASE_COUNTER = 4;
-	private static final int PHASE_QUIET = 5;
-	private static final int PHASE_ATTACKING_BAD = 6;
+	private static final int PHASE_ATTACKING_BAD = 5;
+	private static final int PHASE_QUIET = 6;
 	
 	private static final int[] STATIC_NULLMOVE_MARGIN = { 0, 60, 130, 210, 300, 400, 510 };
 	private static final int[] RAZORING_MARGIN = { 0, 240, 280, 300 };
@@ -412,7 +412,7 @@ public class Search_PVS_NWS extends SearchImpl {
 
 		moveGen.startPly();
 		int phase = PHASE_TT;
-		while (phase <= PHASE_ATTACKING_BAD) {
+		while (phase <= PHASE_QUIET) {
 			
 			switch (phase) {
 			
@@ -451,15 +451,16 @@ public class Search_PVS_NWS extends SearchImpl {
 				} else {
 					phase++;
 				}
+			case PHASE_ATTACKING_BAD:
+				moveGen.generateAttacks(cb);
+				moveGen.setMVVLVAScores(cb);
+				moveGen.sort();
+				break;
 			case PHASE_QUIET:
 				moveGen.generateMoves(cb);
 				moveGen.setHHScores(cb.colorToMove, parentMove);
 				moveGen.sort();
 				break;
-			case PHASE_ATTACKING_BAD:
-				moveGen.generateAttacks(cb);
-				moveGen.setMVVLVAScores(cb);
-				moveGen.sort();
 			}
 		
 			while (moveGen.hasNext()) {
