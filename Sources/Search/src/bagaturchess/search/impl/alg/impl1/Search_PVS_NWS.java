@@ -492,7 +492,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					lastSentMinorInfo_nodesCount = info.getSearchedNodes();
 				}
 				
-				
 				if (phase == PHASE_ATTACKING_GOOD) {
 					if (SEEUtil.getSeeCaptureScore(cb, move) < 0) {
 						continue;
@@ -514,7 +513,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						continue;
 					}
 				}
-
+				
 				if (!isPv && !wasInCheck && movesPerformed > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
 					
 					if (phase == PHASE_QUIET && moveGen.getScore() <= historyAVGScores.getEntropy() + historyAVGScores.getDisperse()) {
@@ -538,7 +537,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						continue;
 					}
 				}
-
+				
 				cb.doMove(move);
 				movesPerformed++;
 				
@@ -547,7 +546,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				int score = alpha + 1;
-
+				
 				if (EngineConstants.ASSERT) {
 					cb.changeSideToMove();
 					Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
