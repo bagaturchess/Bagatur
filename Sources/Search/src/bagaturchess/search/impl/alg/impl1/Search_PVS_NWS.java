@@ -603,7 +603,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					bestScore = score;
 					bestMove = move;
-
+					
 					node.bestmove = bestMove;
 					node.eval = bestScore;
 					node.leaf = false;
@@ -620,7 +620,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							moveGen.addKillerMove(bestMove, ply);
 							moveGen.addHHValue(cb.colorToMove, bestMove, parentMove, depth);
 						}
-
+						
 						phase += 10;
 						break;
 					}
@@ -643,12 +643,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				return node.eval;
 			}
 		}
-
+		
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(bestMove != 0);
 		}
 		
-
+		
 		if (!SearchUtils.isMateVal(bestScore)) {
 			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
 		}
