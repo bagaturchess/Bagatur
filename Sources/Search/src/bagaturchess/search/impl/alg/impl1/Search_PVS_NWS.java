@@ -696,7 +696,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		final int alphaOrig = alpha;
-		int bestMove= 0;
+		int bestMove = 0;
 		
 		alpha = Math.max(alpha, eval);
 		
