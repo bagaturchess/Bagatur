@@ -730,22 +730,18 @@ public class Search_PVS_NWS extends SearchImpl {
 					continue;
 				}
 				
-				if (cb.checkingPieces == 0) {
-					if (MoveUtil.isPromotion(move)) {
-						if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
-							continue;
-						}
-					} else if (EngineConstants.ENABLE_Q_FUTILITY_PRUNING
-							&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+				if (MoveUtil.isPromotion(move)) {
+					if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
 						continue;
 					}
+				} else if (EngineConstants.ENABLE_Q_FUTILITY_PRUNING
+						&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+					continue;
 				}
 				
-				//if (cb.checkingPieces == 0) {
-					if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move)) && SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
-						continue;
-					}
-				//}
+				if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move)) && SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
+					continue;
+				}
 	
 				cb.doMove(move);
 	
