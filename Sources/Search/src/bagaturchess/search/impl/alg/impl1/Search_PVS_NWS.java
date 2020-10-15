@@ -370,7 +370,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int singularMoveExtension = 0;
 		int multiCutReduction = 0;
-        if (ply > 0
+        if (false 
+        	&& ply > 0
         	&& depth >= 2
         	&& cb.checkingPieces == 0
 			&& excludedMove == 0
