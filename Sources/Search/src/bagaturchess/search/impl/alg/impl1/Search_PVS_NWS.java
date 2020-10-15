@@ -667,8 +667,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			info.setSelDepth(ply);
 		}
 		
+		int ttMove = 0;
 		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
 		if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
+			ttMove = tt_entries_per_ply[ply].getBestMove();
 			if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT) {
 				return tt_entries_per_ply[ply].getEval();
 			} else {
@@ -703,12 +705,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		while (phase <= PHASE_ATTACKING_GOOD) {
 			switch (phase) {
 				case PHASE_TT:
-					if (!tt_entries_per_ply[ply].isEmpty()) {
-						int ttMove = tt_entries_per_ply[ply].getBestMove();
-						if (cb.isValidMove(ttMove)) {
-							if (env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
-								moveGen.addMove(ttMove);
-							}
+					if (ttMove != 0) {
+						if (env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
+							moveGen.addMove(ttMove);
 						}
 					}
 					break;
