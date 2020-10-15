@@ -681,12 +681,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
-		int eval = eval(evaluator, ply, alpha, beta, isPv);
-		
 		if (cb.checkingPieces != 0) {
-			return eval < alpha ? alpha : calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, 1, alpha, beta, isPv, 0);
+			//return eval < alpha ? alpha : calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, 1, alpha, beta, isPv, 0);
+			return alpha;
 		}
 		
+		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		if (eval >= beta) {
 			return eval;
 		}
