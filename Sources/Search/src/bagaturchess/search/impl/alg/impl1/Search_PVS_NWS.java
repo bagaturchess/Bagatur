@@ -737,7 +737,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
 					continue;
 				} else {
-					if (eval + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+					if (eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
 						continue;
 					}
 				}
