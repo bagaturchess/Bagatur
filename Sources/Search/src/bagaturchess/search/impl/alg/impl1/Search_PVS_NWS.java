@@ -734,27 +734,15 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
-				
-				if (MoveUtil.isPromotion(move)) {
-					if (MoveUtil.getMoveType(move) != MoveUtil.TYPE_PROMOTION_Q) {
+				if (SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
+					continue;
+				} else {
+					if (eval + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
 						continue;
 					}
-				} else if (EngineConstants.ENABLE_Q_FUTILITY_PRUNING
-						&& eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
-					continue;
-				}
-				
-				if (EngineConstants.ENABLE_Q_PRUNE_BAD_CAPTURES && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move)) && SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
-					continue;
 				}
 				
 				cb.doMove(move);
-				
-				if (EngineConstants.ASSERT) {
-					cb.changeSideToMove();
-					Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
-					cb.changeSideToMove();
-				}
 				
 				final int score = -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -alpha, ply + 1, isPv);
 				
