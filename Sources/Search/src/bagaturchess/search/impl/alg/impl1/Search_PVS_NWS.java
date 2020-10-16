@@ -365,7 +365,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
-
+		
 		
 		//Singular move extension
 		int singularMoveExtension = 0;
@@ -462,7 +462,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				moveGen.sort();
 				break;
 			}
-		
+			
 			while (moveGen.hasNext()) {
 				
 				final int move = moveGen.next();
