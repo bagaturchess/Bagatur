@@ -667,6 +667,10 @@ public class Search_PVS_NWS extends SearchImpl {
 
 	public int qsearch(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply, final boolean isPv) {
 		
+		if (cb.checkingPieces != 0) {
+			return calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, 1, alpha, beta, isPv, 0);
+			//return alpha;
+		}
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
 		if (info.getSelDepth() < ply) {
@@ -687,11 +691,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					return tt_entries_per_ply[ply].getEval();
 				}
 			}
-		}
-		
-		if (cb.checkingPieces != 0) {
-			//return eval <= alpha ? alpha : calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, 1, alpha, beta, isPv, 0);
-			return alpha;
 		}
 		
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
