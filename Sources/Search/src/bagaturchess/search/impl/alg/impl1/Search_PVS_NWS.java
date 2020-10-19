@@ -409,8 +409,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		int counterMove = 0;
 		int killer1Move = 0;
 		int killer2Move = 0;
-		int movesPerformed = 0;
-
+		int movesPerformed_attacks = 0;
+		int movesPerformed_quiet = 0;
+		
 		moveGen.startPly();
 		int phase = PHASE_TT;
 		while (phase <= PHASE_QUIET) {
@@ -481,7 +482,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				//Build and sent minor info
 				if (ply == 0) {
 					info.setCurrentMove(move);
-					info.setCurrentMoveNumber((movesPerformed + 1));
+					info.setCurrentMoveNumber((movesPerformed_attacks + movesPerformed_quiet + 1));
 				}
 				
 				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
@@ -520,11 +521,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
-				if (!isPv && !wasInCheck && movesPerformed > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
+				if (!isPv && !wasInCheck && movesPerformed_attacks + movesPerformed_quiet > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
 					
 					if (phase == PHASE_QUIET && moveGen.getScore() <= historyAVGScores.getEntropy() + historyAVGScores.getDisperse()) {
 						
-						if (EngineConstants.ENABLE_LMP && depth <= 4 && movesPerformed >= depth * 3 + 3) {
+						if (EngineConstants.ENABLE_LMP && depth <= 4 && movesPerformed_attacks + movesPerformed_quiet >= depth * 3 + 3) {
 							continue;
 						}
 						
@@ -545,7 +546,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				cb.doMove(move);
-				movesPerformed++;
+				if (MoveUtil.isQuiet(move)) {
+					movesPerformed_quiet++;
+				} else {
+					movesPerformed_attacks++;
+				}
 				
 				if (phase == PHASE_QUIET) {
 					historyAVGScores.addValue(moveGen.getScore(), moveGen.getScore());
@@ -561,12 +566,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int reduction = 1;
 				if (depth >= 2
-						&& movesPerformed > 1
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& phase == PHASE_QUIET
 						&& moveGen.getScore() <= historyAVGScores.getEntropy() + historyAVGScores.getDisperse()
 						) {
 					
-					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
+					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
 					
 					if (!isPv) {
 						reduction += 1;
@@ -583,7 +588,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, 0);
 					}
 					
-					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed > 1) {
+					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
 						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -alpha - 1, -alpha, false, 0);
 					}
 					
@@ -636,7 +641,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		moveGen.endPly();
 		
-		if (movesPerformed == 0) {
+		if (movesPerformed_attacks + movesPerformed_quiet == 0) {
 			if (cb.checkingPieces == 0) {
 				node.bestmove = 0;
 				node.eval = EvalConstants.SCORE_DRAW;
