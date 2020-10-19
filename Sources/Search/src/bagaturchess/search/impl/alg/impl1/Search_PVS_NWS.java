@@ -677,6 +677,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			info.setSelDepth(ply);
 		}
 		
+		if (ply >= ISearch.MAX_DEPTH) {
+			return eval(evaluator, ply, alpha, beta, isPv);
+		}
+		
 		int ttMove = 0;
 		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
 		if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
