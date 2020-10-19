@@ -68,7 +68,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int[] STATIC_NULLMOVE_MARGIN 	= { 0, 60, 130, 210, 300, 400, 510 };
 	private static final int[] RAZORING_MARGIN 			= { 0, 240, 280, 300 };
 	private static final int[] FUTILITY_MARGIN 			= { 0, 80, 170, 270, 380, 500, 630 };
-	private static final int FUTILITY_MARGIN_Q_SEARCH 	= 50;
+	private static final int FUTILITY_MARGIN_Q_SEARCH 	= 100;
 	
 	private static final int[][] LMR_TABLE 				= new int[64][64];
 	static {
