@@ -523,13 +523,20 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (!isPv && !wasInCheck && movesPerformed_attacks + movesPerformed_quiet > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
 					
-					if (phase == PHASE_QUIET && moveGen.getScore() <= historyAVGScores.getEntropy() + historyAVGScores.getDisperse()) {
+					if (phase == PHASE_QUIET
+							&& moveGen.getScore() <= historyAVGScores.getEntropy() + historyAVGScores.getDisperse()
+						) {
 						
-						if (EngineConstants.ENABLE_LMP && depth <= 4 && movesPerformed_attacks + movesPerformed_quiet >= depth * 3 + 3) {
+						if (EngineConstants.ENABLE_LMP
+								&& depth <= 7
+								&& movesPerformed_attacks + movesPerformed_quiet >= depth * 3 + 3
+							) {
 							continue;
 						}
 						
-						if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
+						if (EngineConstants.ENABLE_FUTILITY_PRUNING
+								&& depth < FUTILITY_MARGIN.length
+							) {
 							if (!MoveUtil.isPawnPush78(move)) {
 								if (eval == ISearch.MIN) {
 									eval = eval(evaluator, ply, alphaOrig, beta, isPv);
