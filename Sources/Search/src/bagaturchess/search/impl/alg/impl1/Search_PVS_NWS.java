@@ -205,6 +205,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int ttMove = 0;
 		int ttValue = 0;
+		int ttFlag = 0;
 		boolean isTTLowerBound = false;
 		boolean isTTDepthEnoughForSingularExtension = false;
 		env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
@@ -213,19 +214,21 @@ public class Search_PVS_NWS extends SearchImpl {
 			int tpt_depth = tt_entries_per_ply[ply].getDepth();
 			ttMove = tt_entries_per_ply[ply].getBestMove();
 			ttValue = tt_entries_per_ply[ply].getEval();
-			isTTLowerBound = tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER;
+			ttFlag = tt_entries_per_ply[ply].getFlag();
+			
+			isTTLowerBound = ttFlag == ITTEntry.FLAG_LOWER;
 			isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
 			
 			if (tpt_depth >= depth) {
-				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT) {
+				if (ttFlag == ITTEntry.FLAG_EXACT) {
 					extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 					return node.eval;
 				} else {
-					if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[ply].getEval() >= beta) {
+					if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
 						extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 						return node.eval;
 					}
-					if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[ply].getEval() <= alpha) {
+					if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
 						extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 						return node.eval;
 					}
@@ -303,12 +306,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
 			
-			if (EngineConstants.USE_TT_SCORE_AS_EVAL && !tt_entries_per_ply[ply].isEmpty()) {
-				if (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_EXACT
-						|| (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_UPPER && tt_entries_per_ply[ply].getEval() < eval)
-						|| (tt_entries_per_ply[ply].getFlag() == ITTEntry.FLAG_LOWER && tt_entries_per_ply[ply].getEval() > eval)
+			if (EngineConstants.USE_TT_SCORE_AS_EVAL && ttMove != 0) {
+				if (ttFlag == ITTEntry.FLAG_EXACT
+						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
+						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
 					) {
-					eval = tt_entries_per_ply[ply].getEval();
+					eval = ttValue;
 				}
 			}
 			
