@@ -719,6 +719,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		final int alphaOrig = alpha;
 		int bestMove = 0;
+		int performedMoves = 0;
 		
 		alpha = Math.max(alpha, eval);
 		
@@ -749,6 +750,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (!cb.isLegal(move)) {
 						continue;
 					}
+				} else {
+					if (performedMoves > 0) {
+						continue;
+					}
 				}
 				
 				if (SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
@@ -760,6 +765,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				cb.doMove(move);
+				performedMoves++;
 				
 				final int score = -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -alpha, ply + 1, isPv);
 				
