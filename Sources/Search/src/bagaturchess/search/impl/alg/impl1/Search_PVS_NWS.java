@@ -301,7 +301,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int eval = ISearch.MIN;
 		if (!isPv && cb.checkingPieces == 0) {
-
+			
 			
 			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
@@ -326,19 +326,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			//Razoring for all depths based on the eval deviation detected into the root node
-			/*int rbeta = alpha - mediator.getTrustWindow_AlphaAspiration();
-			if (eval < rbeta) {
-				score = calculateBestMove(evaluator, info, cb, moveGen, rbeta, rbeta + 1, ply);
-				if (score <= rbeta) {
-					node.bestmove = 0;
-					node.eval = score;
-					node.leaf = true;
-					return node.eval;
-				}
-			}*/
-			
-			
 			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && !SearchUtils.isMateVal(alpha)) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
 					int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply, isPv);
@@ -350,7 +337,17 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 			}
-
+			
+			
+			//Razoring like reduction for all depths based on the eval deviation detected into the root node
+			int rbeta = alpha - mediator.getTrustWindow_AlphaAspiration();
+			if (eval < rbeta && depth >= 2) {
+				int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, rbeta, rbeta + 1, ply, isPv);
+				if (score <= rbeta) {
+					depth--;
+				}
+			}
+			
 			
 			if (EngineConstants.ENABLE_NULL_MOVE && depth > 2) {
 				if (eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
