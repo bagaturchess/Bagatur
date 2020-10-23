@@ -562,10 +562,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					movesPerformed_attacks++;
 				}
 				
-				if (phase == PHASE_QUIET) {
-					historyAVGScores.addValue(moveGen.getScore(), moveGen.getScore());
-				}
-				
 				int score = alpha + 1;
 				
 				if (EngineConstants.ASSERT) {
@@ -618,6 +614,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (MoveUtil.isQuiet(move)) {
 					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
+				}
+				
+				if (phase == PHASE_QUIET) {
+					historyAVGScores.addValue(moveGen.getScore(), moveGen.getScore());
 				}
 				
 				if (score > bestScore) {
