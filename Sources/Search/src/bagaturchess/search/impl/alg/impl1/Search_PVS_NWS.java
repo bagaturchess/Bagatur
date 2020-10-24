@@ -524,7 +524,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (!isPv && !wasInCheck && movesPerformed_attacks + movesPerformed_quiet > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
 					
 					if (phase == PHASE_QUIET
-							&& moveGen.getScore() <= historyAVGScores.getEntropy() + historyAVGScores.getDisperse()
+							&& moveGen.getScore() <= historyAVGScores.getEntropy()
 						) {
 						
 						if (EngineConstants.ENABLE_LMP
@@ -574,7 +574,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& phase == PHASE_QUIET
-						&& moveGen.getScore() <= historyAVGScores.getEntropy() + historyAVGScores.getDisperse()
+						&& moveGen.getScore() <= historyAVGScores.getEntropy()
 						) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
@@ -616,8 +616,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
 				}
 				
-				if (phase == PHASE_QUIET) {
-					historyAVGScores.addValue(moveGen.getScore(), moveGen.getScore());
+				if (score > alpha) {
+					if (phase == PHASE_QUIET) {
+						historyAVGScores.addValue(moveGen.getScore(), moveGen.getScore());
+					}
 				}
 				
 				if (score > bestScore) {
