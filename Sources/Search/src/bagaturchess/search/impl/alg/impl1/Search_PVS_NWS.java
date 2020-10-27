@@ -693,6 +693,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private int getAlphaTrustWindow(ISearchMediator mediator, int depth) {
 		int value = (int) (Math.sqrt(depth) * mediator.getTrustWindow_AlphaAspiration());
+		value = Math.max(1, value);
 		//System.out.println("depth=" + depth + "	" + value);
 		return value;
 	}
