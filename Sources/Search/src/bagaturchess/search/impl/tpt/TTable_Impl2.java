@@ -126,9 +126,9 @@ public class TTable_Impl2 implements ITTable {
 
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(depth >= 0);
-			Assert.isTrue(move != 0);
+			//Assert.isTrue(move != 0);
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
-			Assert.isTrue(MoveUtil.getSourcePieceIndex(move) != 0);
+			//Assert.isTrue(MoveUtil.getSourcePieceIndex(move) != 0);
 		}
 
 		final int index = getIndex(key);
