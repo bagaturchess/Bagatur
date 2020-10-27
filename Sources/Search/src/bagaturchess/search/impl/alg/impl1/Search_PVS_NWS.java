@@ -319,9 +319,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (eval >= beta) {
 				
 				
-				if (depth >= 2 && eval >= beta + mediator.getTrustWindow_AlphaAspiration()) {
+				/*if (depth >= 2 && eval >= beta + mediator.getTrustWindow_AlphaAspiration()) {
 					depth--;
-				}
+				}*/
 				
 				
 				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < STATIC_NULLMOVE_MARGIN.length) {
@@ -354,13 +354,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				//Razoring like reduction for all depths based on the eval deviation detected into the root node
-				int rbeta = alpha - mediator.getTrustWindow_AlphaAspiration();
+				/*int rbeta = alpha - mediator.getTrustWindow_AlphaAspiration();
 				if (depth >= 2 && eval < rbeta) {
 					int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, rbeta, rbeta + 1, ply, isPv);
 					if (score <= rbeta) {
 						depth--;
 					}
-				}
+				}*/
 				
 				
 				if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length) {
