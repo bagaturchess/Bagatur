@@ -144,13 +144,14 @@ public class Search_PVS_NWS extends SearchImpl {
 	public int calculateBestMove(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
 			final int ply, int depth, int alpha, int beta, boolean isPv, int excludedMove) {
-
+		
 		
 		if (mediator != null && mediator.getStopper() != null) {
 			mediator.getStopper().stopIfNecessary(ply + depth, env.getBitboard().getColourToMove(), alpha, beta);
 		}
 		
 		
+		info.setSearchedNodes(info.getSearchedNodes() + 1);
 		if (info.getSelDepth() < ply) {
 			info.setSelDepth(ply);
 		}
@@ -294,9 +295,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			node.leaf = true;
 			return node.eval;
 		}
-		
-		
-		info.setSearchedNodes(info.getSearchedNodes() + 1);
 		
 		
 		int eval = ISearch.MIN;
@@ -707,7 +705,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			//return alpha;
 		}
 		
-		info.setSearchedNodes(info.getSearchedNodes() + 1);
 		if (info.getSelDepth() < ply) {
 			info.setSelDepth(ply);
 		}
