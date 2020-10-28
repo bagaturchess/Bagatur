@@ -95,7 +95,7 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 				
 				adjustTrustWindow_BestMove(info, lastinfo);
 				
-				adjustTrustWindow_AlphaAspiration(info);
+				adjustTrustWindow_AlphaAspiration(info, lastinfo);
 				
 				if (!info.isMateScore() && !lastinfo.isMateScore()) {
 					int eval_diff = Math.abs(info.getEval() - lastinfo.getEval());
@@ -150,15 +150,18 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	}
 	
 	
-	private void adjustTrustWindow_AlphaAspiration(ISearchInfo info) {
+	private void adjustTrustWindow_AlphaAspiration(ISearchInfo info, ISearchInfo previnfo) {
 		
 		if (!info.isMateScore() && trustWindow_AlphaAspiration != TRUST_WINDOW_ALPHA_ASPIRATION_MAX) {
 			
 			minEval = Math.min(minEval, info.getEval());
 			maxEval = Math.max(maxEval, info.getEval());
+			trustWindow_AlphaAspiration = Math.max(1, maxEval - minEval);
 			
 			//trustWindow_AlphaAspiration += TRUST_WINDOW_ALPHA_ASPIRATION_MULTIPLIER * Math.max(1, Math.abs(info.getEval() - previnfo.getEval()));
-			trustWindow_AlphaAspiration = Math.max(1, maxEval - minEval);
+			
+			//trustWindow_AlphaAspiration = Math.max(1, Math.abs(info.getEval() - previnfo.getEval()));
+			
 			//System.out.println(trustWindow_AlphaAspiration);
 			
 		} else {
