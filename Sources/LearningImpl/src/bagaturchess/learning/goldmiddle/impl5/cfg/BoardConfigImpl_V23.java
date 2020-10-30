@@ -32,23 +32,23 @@ public class BoardConfigImpl_V23 implements IBoardConfig {
 	
 	private static final double[] PAWN_O			= Utils.reverseSpecial(new double[] {
 			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0,  
-			0, 0, 0, 0, 0, 0, 0, 0, 
+			-7, 7, -3, -13, 5, -16, 10, -8, 
+			5, -12, -7, 22, -8, -5, -15, -8, 
+			13, 0, -13, 1, 11, -2, -13, 5, 
+			-4, -23, 6, 20, 40, 17, 4, -8, 
+			-9, -15, 11, 15, 32, 22, 5, -22, 
+			3, 3, 10, 19, 16, 19, 7, -5, 
 			0, 0, 0, 0, 0, 0, 0, 0, 
 			});
 	
 	private static final double[] PAWN_E			= Utils.reverseSpecial(new double[] {
 			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0, 
-			0, 0, 0, 0, 0, 0, 0, 0,  
-			0, 0, 0, 0, 0, 0, 0, 0, 
+			0, -11, 12, 21, 25, 19, 4, 7, 
+			28, 20, 21, 28, 30, 7, 6, 13, 
+			10, 5, 4, -5, -5, -5, 14, 9, 
+			6, -2, -8, -4, -13, -12, -10, -9, 
+			-10, -10, -10, 4, 4, 3, -6, -4, 
+			-10, -6, 10, 0, 14, 7, -5, -19, 
 			0, 0, 0, 0, 0, 0, 0, 0, 
 			});
 	
@@ -379,24 +379,24 @@ public class BoardConfigImpl_V23 implements IBoardConfig {
 	
 	private static int [][] pst_pawns_o = {
 		   { S_o(  0, 0), S_o(  0,  0), S_o(  0, 0), S_o( 0, 0), S_o( 0, 0), S_o( 0, 0), S_o( 0, 0), S_o( 0, 0) },
-		   { S_o(  0, 0), S_o(  0,  0), S_o(  0, 0), S_o( 0, 0), S_o( 0, 0), S_o( 0, 0), S_o( 0, 0), S_o( 0, 0) },
 		   { S_o(  3,-10), S_o(  3, -6), S_o( 10, 10), S_o( 19,  0), S_o( 16, 14), S_o( 19,  7), S_o(  7, -5), S_o( -5,-19) },
 		   { S_o( -9,-10), S_o(-15,-10), S_o( 11,-10), S_o( 15,  4), S_o( 32,  4), S_o( 22,  3), S_o(  5, -6), S_o(-22, -4) },
 		   { S_o( -4,  6), S_o(-23, -2), S_o(  6, -8), S_o( 20, -4), S_o( 40,-13), S_o( 17,-12), S_o(  4,-10), S_o( -8, -9) },
 		   { S_o( 13, 10), S_o(  0,  5), S_o(-13,  4), S_o(  1, -5), S_o( 11, -5), S_o( -2, -5), S_o(-13, 14), S_o(  5,  9) },
 		   { S_o(  5, 28), S_o(-12, 20), S_o( -7, 21), S_o( 22, 28), S_o( -8, 30), S_o( -5,  7), S_o(-15,  6), S_o( -8, 13) },
-		   { S_o( -7,  0), S_o(  7,-11), S_o( -3, 12), S_o(-13, 21), S_o(  5, 25), S_o(-16, 19), S_o( 10,  4), S_o( -8,  7) }
+		   { S_o( -7,  0), S_o(  7,-11), S_o( -3, 12), S_o(-13, 21), S_o(  5, 25), S_o(-16, 19), S_o( 10,  4), S_o( -8,  7) },
+		   { S_o(  0, 0), S_o(  0,  0), S_o(  0, 0), S_o( 0, 0), S_o( 0, 0), S_o( 0, 0), S_o( 0, 0), S_o( 0, 0) },
 	};
 	
 	private static int [][] pst_pawns_e = {
-		   { S_e(  0, 0), S_e(  0,  0), S_e(  0, 0), S_e( 0, 0), S_e( 0, 0), S_e( 0, 0), S_e( 0, 0), S_e( 0, 0) },
 		   { S_e(  0, 0), S_e(  0,  0), S_e(  0, 0), S_e( 0, 0), S_e( 0, 0), S_e( 0, 0), S_e( 0, 0), S_e( 0, 0) },
 		   { S_e(  3,-10), S_e(  3, -6), S_e( 10, 10), S_e( 19,  0), S_e( 16, 14), S_e( 19,  7), S_e(  7, -5), S_e( -5,-19) },
 		   { S_e( -9,-10), S_e(-15,-10), S_e( 11,-10), S_e( 15,  4), S_e( 32,  4), S_e( 22,  3), S_e(  5, -6), S_e(-22, -4) },
 		   { S_e( -4,  6), S_e(-23, -2), S_e(  6, -8), S_e( 20, -4), S_e( 40,-13), S_e( 17,-12), S_e(  4,-10), S_e( -8, -9) },
 		   { S_e( 13, 10), S_e(  0,  5), S_e(-13,  4), S_e(  1, -5), S_e( 11, -5), S_e( -2, -5), S_e(-13, 14), S_e(  5,  9) },
 		   { S_e(  5, 28), S_e(-12, 20), S_e( -7, 21), S_e( 22, 28), S_e( -8, 30), S_e( -5,  7), S_e(-15,  6), S_e( -8, 13) },
-		   { S_e( -7,  0), S_e(  7,-11), S_e( -3, 12), S_e(-13, 21), S_e(  5, 25), S_e(-16, 19), S_e( 10,  4), S_e( -8,  7) }
+		   { S_e( -7,  0), S_e(  7,-11), S_e( -3, 12), S_e(-13, 21), S_e(  5, 25), S_e(-16, 19), S_e( 10,  4), S_e( -8,  7) },
+		   { S_e(  0, 0), S_e(  0,  0), S_e(  0, 0), S_e( 0, 0), S_e( 0, 0), S_e( 0, 0), S_e( 0, 0), S_e( 0, 0) },
 	};
 	
 	private static int [][] pst_knights_o = {
@@ -518,7 +518,8 @@ public class BoardConfigImpl_V23 implements IBoardConfig {
 	}
 	
 	public static void main(String[] args) {
-		dumpMatrix(pst_kings_e);
+		//dumpMatrix(pst_kings_e);
+		dumpMatrix_pawns(pst_pawns_e);
 	}
 
 
@@ -529,6 +530,17 @@ public class BoardConfigImpl_V23 implements IBoardConfig {
 				rankLine += pst[rank][file] + ", ";
 			}
 			for (int file = pst[rank].length - 1; file >= 0; file--) {
+				rankLine += pst[rank][file] + ", ";
+			}
+			System.out.println(rankLine);
+		}
+	}
+	
+	
+	private static void dumpMatrix_pawns(int[][] pst) {
+		for (int rank = pst.length - 1; rank>=0; rank--) {
+			String rankLine = "";
+			for (int file = 0; file < pst[rank].length; file++) {
 				rankLine += pst[rank][file] + ", ";
 			}
 			System.out.println(rankLine);

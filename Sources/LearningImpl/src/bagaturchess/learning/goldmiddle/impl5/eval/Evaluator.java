@@ -122,6 +122,42 @@ public class Evaluator extends Evaluator_BaseImpl {
 	public static final int CloseEnemies_O = 7;
 	public static final int CloseEnemies_E = 0;
 	
+	public static final int SafeCheck[][] = {
+			{}, {}, {792, 1283}, {645, 967}, {1084, 1897}, {772, 1119}
+	};
+	  
+	public static final int FlankAttacks_O = 8;
+	public static final int FlankAttacks_E = 0;
+	
+	
+	// ThreatByMinor/ByRook[attacked PieceType] contains bonuses according to
+	// which piece type attacks which one. Attacks on lesser pieces which are
+	// pawn-defended are not considered.
+	public static final int[] ThreatByMinor_O = {make_score_o(0, 0), make_score_o(0, 31), make_score_o(39, 42), make_score_o(57, 44), make_score_o(68, 112), make_score_o(62, 120), make_score_o(0, 0)};
+	public static final int[] ThreatByMinor_E = {make_score_e(0, 0), make_score_e(0, 31), make_score_e(39, 42), make_score_e(57, 44), make_score_e(68, 112), make_score_e(62, 120), make_score_e(0, 0)};
+	public static final int[] ThreatByRook_O = {make_score_o(0, 0), make_score_o(0, 24), make_score_o(38, 71), make_score_o(38, 61), make_score_o(0, 38), make_score_o(51, 38), make_score_o(0, 0)};
+	public static final int[] ThreatByRook_E = {make_score_e(0, 0), make_score_e(0, 24), make_score_e(38, 71), make_score_e(38, 61), make_score_e(0, 38), make_score_e(51, 38), make_score_e(0, 0)};
+	public static final int ThreatByRank_O = 14;
+	public static final int ThreatByRank_E = 3;
+	public static final int ThreatByKing_O = 21;
+	public static final int ThreatByKing_E = 84;
+	public static final int ThreatByPawnPush_O = 48;
+	public static final int ThreatByPawnPush_E = 42;
+	public static final int ThreatBySafePawn_O = 169;
+	public static final int ThreatBySafePawn_E = 99;
+	public static final int WeakUnopposedPawn_O = 14;
+	public static final int WeakUnopposedPawn_E = 20;
+	public static final int Hanging_O = 62;
+	public static final int Hanging_E = 34;
+	public static final int Overload_O = 12;
+	public static final int Overload_E = 6;
+	public static final int RestrictedPiece_O = 7;
+	public static final int RestrictedPiece_E = 6;
+	public static final int KnightOnQueen_O = 20;
+	public static final int KnightOnQueen_E = 12;
+	public static final int SliderOnQueen_O = 49;
+	public static final int SliderOnQueen_E = 21;
+	
 	
 	protected final IBitBoard bitboard;
 	protected final EvalInfo evalinfo;
@@ -160,13 +196,10 @@ public class Evaluator extends Evaluator_BaseImpl {
 		evalinfo.clearEvals2();
 		
 		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_WHITE, evalinfo.bb_pawns[Constants.COLOUR_WHITE]);
-		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_BLACK, evalinfo.bb_pawns[Constants.COLOUR_BLACK]);
-		//pawns.openFiles = Long.bitCount(pawns.semiopenFiles[Constants.COLOUR_WHITE] & pawns.semiopenFiles[Constants.COLOUR_BLACK]);
-		
+		pawns.evaluate(bitboard, evalinfo, Constants.COLOUR_BLACK, evalinfo.bb_pawns[Constants.COLOUR_BLACK]);		
 		
 		initialize(Constants.COLOUR_WHITE);
 		initialize(Constants.COLOUR_BLACK);
-		
 		
 		pieces(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT, evalinfo.bb_knights[Constants.COLOUR_WHITE]);
 		pieces(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT, evalinfo.bb_knights[Constants.COLOUR_BLACK]);
@@ -176,7 +209,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 		pieces(Constants.COLOUR_BLACK, Constants.TYPE_ROOK, evalinfo.bb_rooks[Constants.COLOUR_BLACK]);
 		pieces(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN, evalinfo.bb_queens[Constants.COLOUR_WHITE]);
 		pieces(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN, evalinfo.bb_queens[Constants.COLOUR_BLACK]);
-
 		
 		//King shelter and enemy pawns storm
 		pawns.do_king_safety(bitboard, evalinfo, Constants.COLOUR_WHITE);
@@ -185,9 +217,11 @@ public class Evaluator extends Evaluator_BaseImpl {
 		king(Constants.COLOUR_WHITE);
 		king(Constants.COLOUR_BLACK);
 		
+		threats(Constants.COLOUR_WHITE);
+		threats(Constants.COLOUR_BLACK);
+		
 		pawns.passed(bitboard, evalinfo, Constants.COLOUR_WHITE);
 		pawns.passed(bitboard, evalinfo, Constants.COLOUR_BLACK);
-		
 		
 		int eval = bitboard.getMaterialFactor().interpolateByFactor(evalinfo.eval_o_part2, evalinfo.eval_e_part2);
 		
@@ -240,7 +274,7 @@ public class Evaluator extends Evaluator_BaseImpl {
 
 	    // Squares occupied by those pawns, by our king or queen, by blockers to attacks on our king
 	    // or controlled by enemy pawns are excluded from the mobility area.
-	    evalinfo.mobilityArea[Us] = ~(b | evalinfo.bb_king[Us] | evalinfo.bb_queens[Us] | blockers_for_king(Us) | pawns.pawnAttacks[Them]);
+	    evalinfo.mobilityArea[Us] = ~(b | evalinfo.bb_king[Us] | evalinfo.bb_queens[Us] | pawns.pawnAttacks[Them]);
 	    
 	    // Initialize attackedBy[] for king and pawns
 		evalinfo.attackedBy[Us][Constants.TYPE_KING] = attacks_from(bitboard, ksq_us, Constants.TYPE_KING);
@@ -323,95 +357,212 @@ public class Evaluator extends Evaluator_BaseImpl {
 		final long Camp = (Us == Constants.COLOUR_WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
 		final int squareID_ksq = getKingSquareID(evalinfo, Us);
-		long kingFlank;
-		long weak;
-		long b;
-		long b1;
-		long b2;
-		long safe;
-		long unsafeChecks;
-
-		// Find the squares that opponent attacks in our king flank, and the squares
-		// which are attacked twice in that flank.
-		kingFlank = KingFlank[file_of(squareID_ksq)];
 		
-		b1 = evalinfo.attackedBy[Them][Constants.TYPE_ALL] & kingFlank & Camp;
-		b2 = b1 & evalinfo.attackedBy2[Them];
-		
-		int tropism = Long.bitCount(b1) + Long.bitCount(b2);
+	    long weak, b1, b2, b3, safe, unsafeChecks = 0;
+	    long rookChecks, queenChecks, bishopChecks, knightChecks;
+	    int kingDanger = 0;
 
-		// Main king safety evaluation
-		if (evalinfo.kingAttackersCount[Them] > 1 - Long.bitCount(evalinfo.bb_queens[Them])) {
-			int kingDanger = 0;
-			unsafeChecks = 0;
-			
-			// Attacked squares defended at most once by our queen or king
-			weak = evalinfo.attackedBy[Them][Constants.TYPE_ALL] & ~evalinfo.attackedBy2[Us]
-					& (~evalinfo.attackedBy[Us][Constants.TYPE_ALL] | evalinfo.attackedBy[Us][Constants.TYPE_KING] | evalinfo.attackedBy[Us][Constants.TYPE_QUEEN]);
-			
-			// Analyse the safe enemy's checks which are possible on next move
-			safe = ~evalinfo.bb_all_pieces[Them];
-			safe &= ~evalinfo.attackedBy[Us][Constants.TYPE_ALL] | (weak & evalinfo.attackedBy2[Them]);
-			
-			b1 = attacks_bb(Constants.TYPE_ROOK, squareID_ksq, evalinfo.bb_all ^ evalinfo.bb_queens[Us]);
-			b2 = attacks_bb(Constants.TYPE_BISHOP, squareID_ksq, evalinfo.bb_all ^ evalinfo.bb_queens[Us]);
-			
-			// Enemy queen safe checks
-			if (((b1 | b2) & evalinfo.attackedBy[Them][Constants.TYPE_QUEEN] & safe & ~evalinfo.attackedBy[Us][Constants.TYPE_QUEEN]) != 0) {
-				kingDanger += QueenSafeCheck;
-			}
-			
-			b1 &= evalinfo.attackedBy[Them][Constants.TYPE_ROOK];
-			b2 &= evalinfo.attackedBy[Them][Constants.TYPE_BISHOP];
-			
-			// Enemy rooks checks
-			if ((b1 & safe) != 0) {
-				kingDanger += RookSafeCheck;
-			} else {
-				unsafeChecks |= b1;
-			}
-			
-			// Enemy bishops checks
-			if ((b2 & safe) != 0) {
-				kingDanger += BishopSafeCheck;
-			} else {
-				unsafeChecks |= b2;
-			}
+	    // Attacked squares defended at most once by our queen or king
+	    weak =  evalinfo.attackedBy[Them][Constants.TYPE_ALL]
+	          & ~evalinfo.attackedBy2[Us]
+	          & (~evalinfo.attackedBy[Us][Constants.TYPE_ALL] | evalinfo.attackedBy[Us][Constants.TYPE_KING] | evalinfo.attackedBy[Us][Constants.TYPE_QUEEN]);
 
-			// Enemy knights checks
-			//TODO check
-			b = attacks_from(bitboard, squareID_ksq, Constants.TYPE_KNIGHT) & evalinfo.attackedBy[Them][Constants.TYPE_KNIGHT];
-			if ((b & safe) != 0) {
-				kingDanger += KnightSafeCheck;
-			} else {
-				unsafeChecks |= b;
-			}
+	    // Analyse the safe enemy's checks which are possible on next move
+	    safe  = ~evalinfo.bb_all_pieces[Them];
+	    safe &= ~evalinfo.attackedBy[Us][Constants.TYPE_ALL] | (weak & evalinfo.attackedBy2[Them]);
 
-			// Unsafe or occupied checking squares will also be considered, as long as
-			// the square is in the attacker's mobility area.
-			unsafeChecks &= evalinfo.mobilityArea[Them];
-			
-			kingDanger += evalinfo.kingAttackersCount[Them] * evalinfo.kingAttackersWeight[Them]
-					  + 69 * evalinfo.kingAttacksCount[Them]
-					  + 185 * Long.bitCount(evalinfo.kingRing[Us] & weak)
-					  + 150 * Long.bitCount(/*TODO pos.blockers_for_king(Us) |*/ unsafeChecks)
-					  + tropism * tropism / 4
-					  - 873 * (Long.bitCount(evalinfo.bb_queens[Them]) == 0 ? 1 : 0) //TODO check !pos.<PieceType.QUEEN.getValue()>count(Them)
-					  - 30;
-			
-			// Transform the kingDanger units into a Score, and subtract it from the evaluation
-			if (kingDanger > 0) {
-				evalinfo.addEvalsInPart2(Us, -kingDanger * kingDanger / 4096, -kingDanger / 16);
-			}
+	    b1 = attacks_bb(Constants.TYPE_ROOK, squareID_ksq, evalinfo.bb_all ^ evalinfo.bb_queens[Us]);
+	    b2 = attacks_bb(Constants.TYPE_BISHOP, squareID_ksq, evalinfo.bb_all ^ evalinfo.bb_queens[Us]);
+
+	    // Enemy rooks checks
+	    rookChecks = b1 & evalinfo.attackedBy[Them][Constants.TYPE_ROOK] & safe;
+	    if (rookChecks != 0)
+	        kingDanger += SafeCheck[Constants.TYPE_ROOK][more_than_one(rookChecks) ? 1 : 0];
+	    else
+	        unsafeChecks |= b1 & evalinfo.attackedBy[Them][Constants.TYPE_ROOK];
+
+	    // Enemy queen safe checks: count them only if the checks are from squares from
+	    // which opponent cannot give a rook check, because rook checks are more valuable.
+	    queenChecks =  (b1 | b2) & evalinfo.attackedBy[Them][Constants.TYPE_QUEEN] & safe
+	                 & ~(evalinfo.attackedBy[Us][Constants.TYPE_QUEEN] | rookChecks);
+	    if (queenChecks != 0)
+	        kingDanger += SafeCheck[Constants.TYPE_QUEEN][more_than_one(queenChecks) ? 1 : 0];
+
+	    // Enemy bishops checks: count them only if they are from squares from which
+	    // opponent cannot give a queen check, because queen checks are more valuable.
+	    bishopChecks =  b2 & evalinfo.attackedBy[Them][Constants.TYPE_BISHOP] & safe
+	                  & ~queenChecks;
+	    if (bishopChecks != 0)
+	        kingDanger += SafeCheck[Constants.TYPE_BISHOP][more_than_one(bishopChecks) ? 1 : 0];
+
+	    else
+	        unsafeChecks |= b2 & evalinfo.attackedBy[Them][Constants.TYPE_BISHOP];
+
+	    // Enemy knights checks
+	    knightChecks = attacks_bb(Constants.TYPE_KNIGHT, squareID_ksq, 0L) & evalinfo.attackedBy[Them][Constants.TYPE_KNIGHT];
+	    if ((knightChecks & safe) != 0)
+	        kingDanger += SafeCheck[Constants.TYPE_KNIGHT][more_than_one(knightChecks & safe) ? 1 : 0];
+	    else
+	        unsafeChecks |= knightChecks;
+
+	    // Find the squares that opponent attacks in our king flank, the squares
+	    // which they attack twice in that flank, and the squares that we defend.
+	    b1 = evalinfo.attackedBy[Them][Constants.TYPE_ALL] & KingFlank[file_of(squareID_ksq)] & Camp;
+	    b2 = b1 & evalinfo.attackedBy2[Them];
+	    b3 = evalinfo.attackedBy[Us][Constants.TYPE_ALL] & KingFlank[file_of(squareID_ksq)] & Camp;
+
+	    int kingFlankAttack  = Long.bitCount(b1) + Long.bitCount(b2);
+	    int kingFlankDefense = Long.bitCount(b3);
+
+	    kingDanger +=        evalinfo.kingAttackersCount[Them] * evalinfo.kingAttackersWeight[Them]
+	                 + 185 * Long.bitCount(evalinfo.kingRing[Us] & weak)
+	                 + 148 * Long.bitCount(unsafeChecks)
+	                 //+  98 * popcount(pos.blockers_for_king(Us))
+	                 +  69 * evalinfo.kingAttacksCount[Them]
+	                 +   3 * kingFlankAttack * kingFlankAttack / 8
+	                 //+       mg_value(mobility[Them] - mobility[Us])
+	                 - 873 * (evalinfo.bb_queens[Them] == 0 ? 1 : 0)
+	                 - 100 * ((evalinfo.attackedBy[Us][Constants.TYPE_KNIGHT] & evalinfo.attackedBy[Us][Constants.TYPE_KING]) != 0 ? 1 : 0)
+	                 //-   6 * mg_value(score) / 8
+	                 -   4 * kingFlankDefense
+	                 +  37;
+	    
+		// Transform the kingDanger units into a Score, and subtract it from the evaluation
+		if (kingDanger > 100) {
+			evalinfo.addEvalsInPart2(Us, -kingDanger * kingDanger / 4096, -kingDanger / 16);
 		}
 		
 		// Penalty when our king is on a pawnless flank
-		if (((evalinfo.bb_pawns[Us] | evalinfo.bb_pawns[Them]) & kingFlank) == 0) {
+		if (((evalinfo.bb_pawns[Us] | evalinfo.bb_pawns[Them]) & KingFlank[file_of(squareID_ksq)]) == 0) {
 			evalinfo.addEvalsInPart2(Us, -PawnlessFlank_O, -PawnlessFlank_E);
 		}
-		
+	
 		// King tropism bonus, to anticipate slow motion attacks on our king
-		evalinfo.addEvalsInPart2(Us, -CloseEnemies_O * tropism, -CloseEnemies_E * tropism);
+		evalinfo.addEvalsInPart2(Us, -FlankAttacks_O * kingFlankAttack, -FlankAttacks_E * kingFlankAttack);
+	}
+	
+	
+	// Evaluation::threats() assigns bonuses according to the types of the
+	// attacking and the attacked pieces.
+	private void threats(int Us) {
+
+		final int Them = (Us == Constants.COLOUR_WHITE ? Constants.COLOUR_BLACK : Constants.COLOUR_WHITE);
+		final int Direction_Up = (Us == Constants.COLOUR_WHITE ? Direction_NORTH : Direction_SOUTH);
+		final long TRank3BB = (Us == Constants.COLOUR_WHITE ? Rank3BB : Rank6BB);
+
+		long b;
+		long weak;
+		long defended;
+		long nonPawnEnemies;
+		long stronglyProtected;
+		long safe;
+		long restricted;
+
+		// Non-pawn enemies
+		nonPawnEnemies = evalinfo.bb_all_pieces[Them] ^ evalinfo.bb_pawns[Them];
+
+		// Squares strongly protected by the enemy, either because they defend the
+		// square with a pawn, or because they defend the square twice and we don't.
+		stronglyProtected = evalinfo.attackedBy[Them][Constants.TYPE_PAWN] | (evalinfo.attackedBy2[Them] & ~evalinfo.attackedBy2[Us]);
+
+		// Non-pawn enemies, strongly protected
+		defended = nonPawnEnemies & stronglyProtected;
+
+		// Enemies not strongly protected and under our attack
+		weak = evalinfo.bb_all_pieces[Them] & ~stronglyProtected & evalinfo.attackedBy[Us][Constants.TYPE_ALL];
+	  
+		// Safe or protected squares
+		safe = ~evalinfo.attackedBy[Them][Constants.TYPE_ALL] | evalinfo.attackedBy[Us][Constants.TYPE_ALL];
+
+		// Bonus according to the kind of attacking pieces
+		if ((defended | weak) != 0) {
+			b = (defended | weak) & (evalinfo.attackedBy[Us][Constants.TYPE_KNIGHT] | evalinfo.attackedBy[Us][Constants.TYPE_BISHOP]);
+			while (b != 0) {
+				
+				int squareID = Long.numberOfTrailingZeros(b);
+				int pieceType = bitboard.getFigureType(squareID);
+				
+				evalinfo.addEvalsInPart2(Us, ThreatByMinor_O[pieceType], ThreatByMinor_E[pieceType]);
+				
+				if (pieceType != Constants.TYPE_PAWN) {
+					int multiplier = relative_rank_bySquare(Them, squareID);
+					evalinfo.addEvalsInPart2(Us, ThreatByRank_O * multiplier, ThreatByRank_E * multiplier);
+				}
+				
+				b &= b - 1;
+			}
+
+			b = weak & evalinfo.attackedBy[Us][Constants.TYPE_ROOK];
+			while (b != 0) {
+				
+				int squareID = Long.numberOfTrailingZeros(b);
+				int pieceType = bitboard.getFigureType(squareID);
+				
+				evalinfo.addEvalsInPart2(Us, ThreatByRook_O[pieceType], ThreatByRook_E[pieceType]);
+				
+				if (pieceType != Constants.TYPE_PAWN) {
+					int multiplier = relative_rank_bySquare(Them, squareID);
+					evalinfo.addEvalsInPart2(Us, ThreatByRank_O * multiplier, ThreatByRank_E * multiplier);
+				}
+				
+				b &= b - 1;
+			}
+
+			if ((weak & evalinfo.attackedBy[Us][Constants.TYPE_KING]) != 0) {
+				evalinfo.addEvalsInPart2(Us, ThreatByKing_O, ThreatByKing_E);
+			}
+
+			int multiplier = Long.bitCount(weak & ~evalinfo.attackedBy[Them][Constants.TYPE_ALL]);
+			evalinfo.addEvalsInPart2(Us, Hanging_O * multiplier, Hanging_E * multiplier);
+
+			b = weak & nonPawnEnemies & evalinfo.attackedBy[Them][Constants.TYPE_ALL];
+			multiplier = Long.bitCount(b);
+			evalinfo.addEvalsInPart2(Us, Overload_O * multiplier, Overload_E * multiplier);
+		}
+
+		// Bonus for restricting their piece moves
+		restricted = evalinfo.attackedBy[Them][Constants.TYPE_ALL] & ~evalinfo.attackedBy[Them][Constants.TYPE_PAWN] & ~evalinfo.attackedBy2[Them] & evalinfo.attackedBy[Us][Constants.TYPE_ALL];
+		int multiplier = Long.bitCount(restricted);
+		evalinfo.addEvalsInPart2(Us, RestrictedPiece_O * multiplier, RestrictedPiece_E * multiplier);
+
+		// Bonus for enemy unopposed weak pawns
+		if ((evalinfo.bb_rooks[Us] | evalinfo.bb_queens[Us]) != 0) {
+			evalinfo.addEvalsInPart2(Us, WeakUnopposedPawn_O * pawns.weakUnopposed[Them], WeakUnopposedPawn_E * pawns.weakUnopposed[Them]);
+		}
+
+		// Find squares where our pawns can push on the next move
+		b = shiftBB(evalinfo.bb_pawns[Us], Direction_Up) & evalinfo.bb_free;
+		b |= shiftBB(b & TRank3BB, Direction_Up) & evalinfo.bb_free;
+
+		// Keep only the squares which are relatively safe
+		b &= ~evalinfo.attackedBy[Them][Constants.TYPE_PAWN] & safe;
+
+		// Bonus for safe pawn threats on the next move
+		b = pawn_attacks_bb(b, Us) & evalinfo.bb_all_pieces[Them];
+		multiplier = Long.bitCount(b);
+		evalinfo.addEvalsInPart2(Us, ThreatByPawnPush_O * multiplier, ThreatByPawnPush_E * multiplier);
+
+		// Our safe or protected pawns
+		b = evalinfo.bb_pawns[Us] & safe;
+
+		b = pawn_attacks_bb(b, Us) & nonPawnEnemies;
+		multiplier = Long.bitCount(b);
+		evalinfo.addEvalsInPart2(Us, ThreatBySafePawn_O * multiplier, ThreatBySafePawn_E * multiplier);
+
+		// Bonus for threats on the next moves against enemy queen
+		if (Long.bitCount(evalinfo.bb_queens[Them]) == 1) {
+			
+			int squareID = Long.numberOfTrailingZeros(evalinfo.bb_queens[Them]);
+			safe = evalinfo.mobilityArea[Us] & ~stronglyProtected;
+
+			b = evalinfo.attackedBy[Us][Constants.TYPE_KNIGHT] & attacks_from(bitboard, squareID, Constants.TYPE_KNIGHT);
+			multiplier = Long.bitCount(b & safe);
+			evalinfo.addEvalsInPart2(Us, KnightOnQueen_O * multiplier, KnightOnQueen_E * multiplier);
+
+			b = (evalinfo.attackedBy[Us][Constants.TYPE_BISHOP] & attacks_from(bitboard, squareID, Constants.TYPE_BISHOP) | (evalinfo.attackedBy[Us][Constants.TYPE_ROOK] & attacks_from(bitboard, squareID, Constants.TYPE_ROOK)));
+			multiplier = Long.bitCount(b & safe & evalinfo.attackedBy2[Us]);
+			evalinfo.addEvalsInPart2(Us, SliderOnQueen_O * multiplier, SliderOnQueen_E * multiplier);
+		}
 	}
 	
 	
@@ -422,12 +573,6 @@ public class Evaluator extends Evaluator_BaseImpl {
 	
 	public static final int make_score_e(int mg, int eg) {
 		return eg;
-	}
-	
-	
-	//TODO
-	private long blockers_for_king(int Us) {
-		return 0;
 	}
 	
 	
