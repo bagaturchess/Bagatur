@@ -129,7 +129,9 @@ public class MTDSchedulerMain {
 								//bagaturchess.learning.goldmiddle.impl3.cfg.BoardConfigImpl_V18.class.getName(),
 								//bagaturchess.learning.goldmiddle.impl3.cfg.EvaluationConfig_V18.class.getName()
 								bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20.class.getName(),
-								bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20.class.getName()
+								bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20.class.getName(),
+								//bagaturchess.learning.goldmiddle.impl5.cfg.BoardConfigImpl_V23.class.getName(),
+								//bagaturchess.learning.goldmiddle.impl5.cfg.EvaluationConfig_V23.class.getName(),
 					}
 				);
 		
@@ -254,7 +256,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard  = new Board("8/1p2Q2p/p5p1/1b1p2k1/6P1/1P5P/2P2P1K/5q2 b - - 10 46");//Bad for black -700
 		
 		//IBitBoard bitboard  = new Board("8/pkp5/1p1n2K1/1P1P4/PR1NpN1P/4n1r1/4P3/8 w - - 10 59"); 
-		//IBitBoard bitboard  = new Board("7k/Q1pn2pp/2p5/P3pr2/6r1/3PBqP1/1PP2P1K/1R2R3 w - - 5 31");//Prunnings make shits
+		//IBitBoard bitboard  = new Board("7k/Q1pn2pp/2p5/P3pr2/6r1/3PBqP1/1PP2P1K/1R2R3 w - - 5 31");//Prunnings make problems
 		//IBitBoard bitboard  = new Board("3k4/1pprp2p/p3bp2/1N6/8/P2B2P1///1PPb1P1P/1K5R w - - 0 24"); 
 		
 		//IBitBoard bitboard  = new Board("5rk1/pp4p1/2n1p2p/2Npq3/2p5/6P1/P3P1BP/R4Q1K w - - bm Qxf8+; id ");
@@ -402,7 +404,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard  = new Board("r1b1kb1r/pp1p1pp1/1qn1p3/7p/1n1P3P/2PB2B1/PPQ2PP1/RN2K1NR w KQkq - 3 10");
 		//IBitBoard bitboard  = new Board("r3r1k1/1Qpn3p/p5p1/2b1qp2/4B3/P4P2/1PPB1P1P/R3K2R w KQ f6 0 20"); 
 		
-		//IBitBoard bitboard  = new Board("r4rk1/p1Q2ppp/bbp1pn2/q2p4/5B2/4PN2/PPPN1PPP/R3K2R w KQ - 10 12");//Queen sacrifice for shits
+		//IBitBoard bitboard  = new Board("r4rk1/p1Q2ppp/bbp1pn2/q2p4/5B2/4PN2/PPPN1PPP/R3K2R w KQ - 10 12");//Queen sacrifice without reason
 		//IBitBoard bitboard  = new Board("r4rk1/p4ppp/bQp1pn2/q2p4/5B2/4PN2/PPPN1PPP/R3K2R b KQ - 11 12");
 		//BoardUtils.playGame(bitboard, "a7xb6, f3-d4");
 		//BoardUtils.playGame(bitboard, "a7xb6, f3-d4, a5xd2, e1xd2, f6-g4, f4-g3, c6-c5, d4-c6, a6-b5, c6-e7, g8-h8");
