@@ -621,7 +621,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				cb.undoMove(move);
 				
-				if (MoveUtil.isQuiet(move)) {
+				if (MoveUtil.isQuiet(move) && cb.checkingPieces == 0) {
 					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
 				}
 				
