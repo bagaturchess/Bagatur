@@ -697,8 +697,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		//System.out.println("depth=" + depth + "	" + value);
 		return value;
 	}
-
-
+	
+	
 	public int qsearch(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply, final boolean isPv) {
 		
 		if (cb.checkingPieces != 0) {
