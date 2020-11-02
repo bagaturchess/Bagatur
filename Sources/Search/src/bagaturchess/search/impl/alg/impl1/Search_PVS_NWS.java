@@ -317,7 +317,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (eval >= beta) {
 				
 				
-				/*if (depth >= 2 && eval >= beta + getAlphaTrustWindow(mediator, depth)) {
+				/*if (depth >= 2 && eval >= beta + getBetaTrustWindow(mediator, depth)) {
 					depth--;
 				}*/
 				
@@ -688,6 +688,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		//validatePV(node, depth, isPv);
 		
 		return bestScore;
+	}
+	
+	
+	private int getBetaTrustWindow(ISearchMediator mediator, int depth) {
+		int value = depth * mediator.getTrustWindow_AlphaAspiration();
+		//System.out.println("depth=" + depth + "	" + value);
+		return value;
 	}
 	
 	
