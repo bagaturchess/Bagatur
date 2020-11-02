@@ -337,7 +337,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						cb.doNullMove();
 						final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply, isPv)
-								: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false, 0);
+								: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, 0);
 						cb.undoNullMove();
 						if (score >= beta) {
 							node.bestmove = 0;
