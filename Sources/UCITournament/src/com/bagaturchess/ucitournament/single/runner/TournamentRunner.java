@@ -122,10 +122,10 @@ public class TournamentRunner {
 	public static void main(String[] args) {
 		
 		
-		EngineProcess engine1 = stockfish12;
-		EngineProcess engine2 = stockfish_dev;
-		//EngineProcess engine1 = bagatur_workspace;
-		//EngineProcess engine2 = bagatur_22;
+		//EngineProcess engine1 = stockfish12;
+		//EngineProcess engine2 = stockfish_dev;
+		EngineProcess engine1 = bagatur_workspace;
+		EngineProcess engine2 = bagatur_22;
 		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
 		
