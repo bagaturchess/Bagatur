@@ -124,7 +124,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		return calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
+		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
 				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), alpha_org, beta, true, 0);
 	}
 	
@@ -136,12 +136,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		return calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
+		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
 				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), beta - 1, beta, false, 0);		
 	}
 	
 	
-	public int calculateBestMove(ISearchMediator mediator, ISearchInfo info,
+	public int search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
 			final int ply, int depth, int alpha, int beta, boolean isPv, int excludedMove) {
 		
@@ -347,7 +347,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						cb.doNullMove();
 						final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply, isPv)
-								: -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, 0);
+								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, 0);
 						cb.undoNullMove();
 						if (score >= beta) {
 							node.bestmove = 0;
@@ -401,7 +401,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	        int singularBeta = ttValue - 50;
 	        int reduction = depth / 2;
 	        
-	        int singularValue = calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply,
+	        int singularValue = search(mediator, info, pvman, evaluator, cb, moveGen, ply,
 	        		depth - reduction, singularBeta - 1, singularBeta, isPv, ttMove);
 	        if (singularValue < singularBeta) {
 	        	
@@ -610,18 +610,18 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				try {
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, 0);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, 0);
 					}
 					
 					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
-						score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -alpha - 1, -alpha, false, 0);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -alpha - 1, -alpha, false, 0);
 					}
 					
 					if (score > alpha) {
 						if (move == ttMove) {
-							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 + singularMoveExtension - multiCutReduction, -beta, -alpha, isPv, 0);
+							score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 + singularMoveExtension - multiCutReduction, -beta, -alpha, isPv, 0);
 						} else {
-							score = -calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -beta, -alpha, isPv, 0);
+							score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -beta, -alpha, isPv, 0);
 						}
 					}
 				} catch(SearchInterruptedException sie) {
@@ -719,7 +719,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	public int qsearch(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply, final boolean isPv) {
 		
 		if (cb.checkingPieces != 0) {
-			return calculateBestMove(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, 0);
+			return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, 0);
 			//return alpha;
 		}
 		
