@@ -106,7 +106,14 @@ public class TournamentRunner {
 															new String [0],
 															"C:\\DATA\\Engines\\stockfish-10-win\\Windows");
 
+	private static final EngineProcess stockfish12 			= new EngineProcess("C:\\DATA\\Engines\\stockfish-12-win\\stockfish12.exe",
+															new String [0],
+															"C:\\DATA\\Engines\\stockfish-12-win\\");
 
+	private static final EngineProcess stockfish_dev		= new EngineProcess("C:\\DATA\\Engines\\stockfish-dev\\stockfish-dev.exe",
+															new String [0],
+															"C:\\DATA\\Engines\\stockfish-dev\\");
+	
 	private static final EngineProcess houdini15a 			= new EngineProcess("C:\\DATA\\Engines\\Houdini_15a\\Houdini_15a_x64.exe",
 															new String [0],
 															"C:\\DATA\\Engines\\Houdini_15a\\");
@@ -115,9 +122,10 @@ public class TournamentRunner {
 	public static void main(String[] args) {
 		
 		
-		EngineProcess engine1 = bagatur_workspace;
-		EngineProcess engine2 = bagatur_22;
-		
+		EngineProcess engine1 = stockfish12;
+		EngineProcess engine2 = stockfish_dev;
+		//EngineProcess engine1 = bagatur_workspace;
+		//EngineProcess engine2 = bagatur_22;
 		
 		EngineProcess[] engines = new EngineProcess[] {engine1, engine2};
 		
@@ -132,6 +140,7 @@ public class TournamentRunner {
 			List<String> options = new ArrayList<String>();
 			//options.add("setoption name Logging Policy value multiple files");
 			options.add("setoption name Ponder value false");
+			options.add("setoption name Use NNUE value false");
 			options.add("setoption name OwnBook value true");
 			options.add("setoption name Openning Mode value random intermediate");
 			options.add("setoption name Time Control Optimizations value for 1/1");
