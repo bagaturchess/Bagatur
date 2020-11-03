@@ -162,6 +162,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		final int alphaOrig = alpha;
+		
+		
 		PVNode node = pvman.load(ply);
 		node.bestmove = 0;
 		node.eval = ISearch.MIN;
@@ -182,25 +185,26 @@ public class Search_PVS_NWS extends SearchImpl {
 	    }
 		
 		
+		if (EngineConstants.ENABLE_MATE_DISTANCE_PRUNING) {
+			if (ply > 0) {
+				alpha = Math.max(alpha, -SearchUtils.getMateVal(ply));
+				beta = Math.min(beta, +SearchUtils.getMateVal(ply + 1));
+				if (alpha >= beta) {
+					node.eval = alpha;
+					return node.eval;
+				}
+			}
+		}
+		
+		
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(depth >= 0);
 			Assert.isTrue(alpha >= ISearch.MIN && alpha <= ISearch.MAX);
 			Assert.isTrue(beta >= ISearch.MIN && beta <= ISearch.MAX);
 		}
 		
-		final int alphaOrig = alpha;
 		
 		depth += extensions(cb, moveGen, ply);
-		
-		if (EngineConstants.ENABLE_MATE_DISTANCE_PRUNING) {
-			if (ply > 0) {
-				alpha = Math.max(alpha, -SearchUtils.getMateVal(ply));
-				beta = Math.min(beta, +SearchUtils.getMateVal(ply + 1));
-				if (alpha >= beta) {
-					return alpha;
-				}
-			}
-		}
 		
 		long hashkey = cb.zobristKey;
 		if (excludedMove != 0) {
