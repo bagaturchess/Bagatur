@@ -126,6 +126,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
 				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), alpha_org, beta, true, 0);
+		//return rootSearch(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
+		//		((BoardImpl) env.getBitboard()).getMoveGenerator(), normDepth(maxdepth), alpha_org, beta, true);
 	}
 	
 	
@@ -137,7 +139,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
 		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), beta - 1, beta, false, 0);		
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), beta - 1, beta, false, 0);	
+		//return rootSearch(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
+		//		((BoardImpl) env.getBitboard()).getMoveGenerator(), normDepth(maxdepth), beta - 1, beta, false);		
 	}
 	
 	
@@ -146,22 +150,45 @@ public class Search_PVS_NWS extends SearchImpl {
 			int depth, int alpha, int beta, boolean isPv) {
 		
 		
-		int alpha_org = alpha;
-		
-		
 		PVNode node = pvman.load(0);
 		node.bestmove = 0;
 		node.eval = ISearch.MIN;
 		node.leaf = true;
 		
 		
-		int parentMove = moveGen.previous();
 		int ttMove = 0;
-		
 		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[0]);
 		if (!tt_entries_per_ply[0].isEmpty() && cb.isValidMove(tt_entries_per_ply[0].getBestMove())) {
+			
+			int tpt_depth = tt_entries_per_ply[0].getDepth();
+			int ttValue = tt_entries_per_ply[0].getEval();
+			int ttFlag = tt_entries_per_ply[0].getFlag();
+			
+			if (tpt_depth >= depth) {
+				if (ttFlag == ITTEntry.FLAG_EXACT) {
+					extractFromTT(0, node, tt_entries_per_ply[0], info, isPv);
+					return node.eval;
+				} else {
+					if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
+						extractFromTT(0, node, tt_entries_per_ply[0], info, isPv);
+						return node.eval;
+					}
+					if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
+						extractFromTT(0, node, tt_entries_per_ply[0], info, isPv);
+						return node.eval;
+					}
+				}
+			}
+			
 			ttMove = tt_entries_per_ply[0].getBestMove();
 		}
+		
+		
+		int alpha_org = alpha;
+		
+		
+		int parentMove = moveGen.previous();
+		
 		
 		moveGen.startPly();
 		
@@ -170,7 +197,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		moveGen.setRootScores(cb, parentMove, ttMove);
 		moveGen.sort();
 		
+		
 		int movesPerformed = 0;
+		
 		
 		while (moveGen.hasNext()) {
 			
@@ -192,11 +221,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 				} else {
 					
-					int reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
-					int newLMRDepth = Math.max(0, depth - 1 - reduction);
+					int reduction = Math.min(depth - 1, Math.max(LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)], 1));
 					
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, 1, newLMRDepth, -alpha - 1, -alpha, false, 0);
-					
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, 1, depth - 1 - reduction, -alpha - 1, -alpha, isPv, 0);
 					if (score > node.eval) {
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, 1, depth - 1, -beta, -alpha, isPv, 0);
 					}
@@ -209,6 +236,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			cb.undoMove(cur_move);
 			
+			if (MoveUtil.isQuiet(cur_move) && cb.checkingPieces == 0) {
+				moveGen.addBFValue(cb.colorToMove, cur_move, parentMove, depth);
+			}
+			
 			if (score > node.eval) {
 				
 				node.bestmove = cur_move;
@@ -219,16 +250,24 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				alpha = Math.max(alpha, score);
 				if (alpha >= beta) {
+					
+					if (MoveUtil.isQuiet(node.bestmove) && cb.checkingPieces == 0) {
+						moveGen.addHHValue(cb.colorToMove, node.bestmove, parentMove, depth);
+					}
+					
 					break;
 				}
 			}
 		}
 		
+		
 		moveGen.endPly();
+		
 		
 		if (!SearchUtils.isMateVal(node.eval)) {
 			env.getTPT().put(cb.zobristKey, depth, node.eval, alpha_org, beta, node.bestmove);
 		}
+		
 		
 		return node.eval;
 	}
@@ -515,7 +554,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
 
-		final int parentMove = ply == 0 ? 0 : moveGen.previous();
+		final int parentMove = moveGen.previous();
 		int bestMove = 0;
 		int bestScore = ISearch.MIN - 1;
 		int counterMove = 0;
