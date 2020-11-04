@@ -141,6 +141,99 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
+	private int rootSearch(ISearchMediator mediator, ISearchInfo info,
+			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
+			int depth, int alpha, int beta, boolean isPv) {
+		
+		
+		int alpha_org = alpha;
+		
+		
+		PVNode node = pvman.load(0);
+		node.bestmove = 0;
+		node.eval = ISearch.MIN;
+		node.leaf = true;
+		
+		
+		int parentMove = moveGen.previous();
+		int ttMove = 0;
+		
+		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[0]);
+		if (!tt_entries_per_ply[0].isEmpty() && cb.isValidMove(tt_entries_per_ply[0].getBestMove())) {
+			ttMove = tt_entries_per_ply[0].getBestMove();
+		}
+		
+		moveGen.startPly();
+		
+		moveGen.generateAttacks(cb);
+		moveGen.generateMoves(cb);
+		moveGen.setRootScores(cb, parentMove, ttMove);
+		moveGen.sort();
+		
+		int movesPerformed = 0;
+		
+		while (moveGen.hasNext()) {
+			
+			int cur_move = moveGen.next();
+			
+			if (!cb.isLegal(cur_move)) {
+				continue;
+			}
+			
+			cb.doMove(cur_move);
+			movesPerformed++;
+			
+			int score;
+			try {
+				
+				if (moveGen.getScore() >= 1000) {
+					
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, 1, depth - 1, -beta, -alpha, isPv, 0);
+					
+				} else {
+					
+					int reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed, 63)];
+					int newLMRDepth = Math.max(0, depth - 1 - reduction);
+					
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, 1, newLMRDepth, -alpha - 1, -alpha, false, 0);
+					
+					if (score > node.eval) {
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, 1, depth - 1, -beta, -alpha, isPv, 0);
+					}
+				}
+				
+			} catch(SearchInterruptedException sie) {
+				moveGen.endPly();
+				throw sie;
+			}
+			
+			cb.undoMove(cur_move);
+			
+			if (score > node.eval) {
+				
+				node.bestmove = cur_move;
+				node.eval = score;
+				node.leaf = false;
+				
+				pvman.store(1, node, pvman.load(1), true);
+				
+				alpha = Math.max(alpha, score);
+				if (alpha >= beta) {
+					break;
+				}
+			}
+		}
+		
+		moveGen.endPly();
+		
+		if (!SearchUtils.isMateVal(node.eval)) {
+			env.getTPT().put(cb.zobristKey, depth, node.eval, alpha_org, beta, node.bestmove);
+		}
+		
+		return node.eval;
+	}
+	
+	
 	public int search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
 			final int ply, int depth, int alpha, int beta, boolean isPv, int excludedMove) {

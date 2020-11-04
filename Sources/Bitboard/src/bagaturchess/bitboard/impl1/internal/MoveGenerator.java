@@ -236,6 +236,20 @@ public final class MoveGenerator {
 	}
 	
 	
+	public void setRootScores(final ChessBoard cb, final int parentMove, final int ttMove) {
+		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
+			if (ttMove == moves[j]) {
+				moveScores[j] = 10000;
+			} else if (!MoveUtil.isQuiet(moves[j])) {
+				moveScores[j] = 1000 + SEEUtil.getSeeCaptureScore(cb, moves[j]);
+			} else {
+				moveScores[j] = getHHScore(cb.colorToMove, MoveUtil.getFromToIndex(moves[j]), MoveUtil.getSourcePieceIndex(moves[j]), MoveUtil.getToIndex(moves[j]), parentMove);
+			}
+			//System.out.println("moveScores[j]=" + moveScores[j]);
+		}
+	}
+	
+	
 	public void sort() {
 		
 		final int left = nextToMove[currentPly];
