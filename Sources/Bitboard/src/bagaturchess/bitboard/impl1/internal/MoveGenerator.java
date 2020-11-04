@@ -250,6 +250,26 @@ public final class MoveGenerator {
 	}
 	
 	
+	public void setAllScores(final ChessBoard cb, final int parentMove, final int ttMove, int counterMove, int killer1Move, int killer2Move) {
+		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
+			if (ttMove == moves[j]) {
+				moveScores[j] = 10000;
+			} else if (counterMove == moves[j]) {
+				moveScores[j] = 1003;
+			} else if (killer1Move == moves[j]) {
+				moveScores[j] = 1002;
+			} else if (killer1Move == moves[j]) {
+				moveScores[j] = 1001;
+			} else if (!MoveUtil.isQuiet(moves[j])) {
+				moveScores[j] = 1000 + SEEUtil.getSeeCaptureScore(cb, moves[j]);
+			} else {
+				moveScores[j] = getHHScore(cb.colorToMove, MoveUtil.getFromToIndex(moves[j]), MoveUtil.getSourcePieceIndex(moves[j]), MoveUtil.getToIndex(moves[j]), parentMove);
+			}
+			//System.out.println("moveScores[j]=" + moveScores[j]);
+		}
+	}
+	
+	
 	public void sort() {
 		
 		final int left = nextToMove[currentPly];
