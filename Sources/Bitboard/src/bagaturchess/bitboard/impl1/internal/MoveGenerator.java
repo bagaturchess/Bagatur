@@ -255,11 +255,11 @@ public final class MoveGenerator {
 			if (ttMove == moves[j]) {
 				moveScores[j] = 10000;
 			} else if (counterMove == moves[j]) {
-				moveScores[j] = 1003;
+				moveScores[j] = 300;
 			} else if (killer1Move == moves[j]) {
-				moveScores[j] = 1002;
-			} else if (killer1Move == moves[j]) {
-				moveScores[j] = 1001;
+				moveScores[j] = 500;
+			} else if (killer2Move == moves[j]) {
+				moveScores[j] = 400;
 			} else if (!MoveUtil.isQuiet(moves[j])) {
 				moveScores[j] = 1000 + SEEUtil.getSeeCaptureScore(cb, moves[j]);
 			} else {
