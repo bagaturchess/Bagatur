@@ -32,6 +32,7 @@ import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.CheckUtil;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
+import bagaturchess.bitboard.impl1.internal.ChessConstants;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.bitboard.impl1.internal.EvalConstants;
 import bagaturchess.bitboard.impl1.internal.MaterialUtil;
@@ -863,6 +864,17 @@ public class Search_PVS_NWS extends SearchImpl {
 			return eval(evaluator, ply, alpha, beta, isPv);
 		}
 		
+	    // Check if we have an upcoming move which draws by repetition, or
+	    // if the opponent had an alternative move earlier to this position.
+	    if (alpha < EvalConstants.SCORE_DRAW
+	        && isDraw()
+	        ) {
+	    	alpha = EvalConstants.SCORE_DRAW;
+	    	if (alpha >= beta) {
+				return alpha;
+	    	}
+	    }
+	    
 		int ttMove = 0;
 		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
 		if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
@@ -903,9 +915,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					break;
 				case PHASE_ATTACKING_GOOD:
-					moveGen.generateAttacks(cb);
-					moveGen.setMVVLVAScores(cb);
-					moveGen.sort();
+					if (eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[ChessConstants.QUEEN] >= alpha) {
+						moveGen.generateAttacks(cb);
+						moveGen.setMVVLVAScores(cb);
+						moveGen.sort();
+					}
 					break;
 			}
 			
