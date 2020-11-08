@@ -346,7 +346,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int ttMove = 0;
 		int ttValue = 0;
-		int ttFlag = 0;
+		int ttFlag = -1;
 		boolean isTTLowerBound = false;
 		boolean isTTDepthEnoughForSingularExtension = false;
 		env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
