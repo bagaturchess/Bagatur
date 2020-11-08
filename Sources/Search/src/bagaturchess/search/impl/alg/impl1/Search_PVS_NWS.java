@@ -909,6 +909,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		final int alphaOrig = alpha;
 		int performedMoves = 0;
+		boolean movesGenerated = false;
+		int bestMove = 0;
 		
 		alpha = Math.max(alpha, eval);
 		
@@ -928,6 +930,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.generateAttacks(cb);
 					moveGen.setMVVLVAScores(cb);
 					moveGen.sort();
+					movesGenerated = true;
 					break;
 			}
 			
@@ -962,9 +965,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				alpha = Math.max(alpha, score);
 				if (alpha >= beta) {
-					if (!SearchUtils.isMateVal(alpha)) {
-						env.getTPT().put(cb.zobristKey, 0, alpha, alphaOrig, beta, move);
-					}
+					bestMove = move;
 					phase += 100;
 					break;
 				}
@@ -973,6 +974,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			phase++;
 		}
 		moveGen.endPly();
+		
+		if (!SearchUtils.isMateVal(alpha) && movesGenerated) {
+			env.getTPT().put(cb.zobristKey, 0, alpha, alphaOrig, beta, bestMove);
+		}
 		
 		return alpha;
 	}
