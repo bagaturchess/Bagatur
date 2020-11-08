@@ -376,7 +376,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
-				
+		
 		
 		if (ply > 1
     	    	&& depth >= 7
