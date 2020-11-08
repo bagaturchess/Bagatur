@@ -350,7 +350,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean isTTLowerBound = false;
 		boolean isTTDepthEnoughForSingularExtension = false;
 		env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
-		if (!tt_entries_per_ply[ply].isEmpty() && cb.isValidMove(tt_entries_per_ply[ply].getBestMove())) {
+		if (!tt_entries_per_ply[ply].isEmpty()) {
 			
 			int tpt_depth = tt_entries_per_ply[ply].getDepth();
 			ttMove = tt_entries_per_ply[ply].getBestMove();
@@ -376,7 +376,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
-		
+				
 		
 		if (ply > 1
     	    	&& depth >= 7
@@ -571,7 +571,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			switch (phase) {
 			
 			case PHASE_TT:
-				if (ttMove != 0) {
+				if (ttMove != 0 && cb.isValidMove(ttMove)) {
 					moveGen.addMove(ttMove);
 				}
 				break;
