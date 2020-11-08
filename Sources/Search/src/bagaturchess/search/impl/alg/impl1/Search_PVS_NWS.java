@@ -896,6 +896,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			return eval;
 		}
 		
+		if (eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[ChessConstants.QUEEN] < alpha) {
+			return alpha;
+		}
+		
 		final int alphaOrig = alpha;
 		int performedMoves = 0;
 		
@@ -914,11 +918,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					break;
 				case PHASE_ATTACKING_GOOD:
-					if (eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[ChessConstants.QUEEN] >= alpha) {
-						moveGen.generateAttacks(cb);
-						moveGen.setMVVLVAScores(cb);
-						moveGen.sort();
-					}
+					moveGen.generateAttacks(cb);
+					moveGen.setMVVLVAScores(cb);
+					moveGen.sort();
 					break;
 			}
 			
