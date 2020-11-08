@@ -444,7 +444,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
 			
-			if (EngineConstants.USE_TT_SCORE_AS_EVAL && ttMove != 0) {
+			if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
 				if (ttFlag == ITTEntry.FLAG_EXACT
 						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
 						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
