@@ -909,7 +909,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		final int alphaOrig = alpha;
 		int performedMoves = 0;
-		boolean movesGenerated = true;
+		boolean movesGenerated = false;
 		int bestMove = 0;
 		
 		alpha = Math.max(alpha, eval);
