@@ -921,9 +921,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			switch (phase) {
 				case PHASE_TT:
 					if (ttMove != 0 && cb.isValidMove(ttMove)) {
-						if (env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
-							moveGen.addMove(ttMove);
-						}
+						moveGen.addMove(ttMove);
 					}
 					break;
 				case PHASE_ATTACKING_GOOD:
@@ -948,16 +946,23 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
-				if (SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
-					continue;
+				performedMoves++;
+				
+				if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
+					if (SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
+						continue;
+					} else {
+						if (eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+							continue;
+						}
+					}
 				} else {
-					if (eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+					if (eval + FUTILITY_MARGIN_Q_SEARCH < alpha) {
 						continue;
 					}
 				}
 				
 				cb.doMove(move);
-				performedMoves++;
 				
 				final int score = -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -alpha, ply + 1, isPv);
 				
