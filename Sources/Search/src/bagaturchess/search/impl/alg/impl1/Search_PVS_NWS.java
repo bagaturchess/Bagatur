@@ -908,7 +908,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		final int alphaOrig = alpha;
-		int performedMoves = 0;
 		boolean movesGenerated = false;
 		int bestMove = 0;
 		
@@ -936,17 +935,15 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				final int move = moveGen.next();
 				
-				if (move != ttMove) {
+				if (phase == PHASE_ATTACKING_GOOD) {
+					if (move == ttMove) {
+						continue;
+					}
+					
 					if (!cb.isLegal(move)) {
 						continue;
 					}
-				} else {
-					if (performedMoves > 0) {
-						continue;
-					}
 				}
-				
-				performedMoves++;
 				
 				if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 					if (SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
