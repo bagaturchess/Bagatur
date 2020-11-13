@@ -446,15 +446,17 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
-				if (ttFlag == ITTEntry.FLAG_EXACT
-						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
-						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
-					) {
-					eval = ttValue;
-				}
+				//if (tpt_depth >= 1) {
+					if (ttFlag == ITTEntry.FLAG_EXACT
+							|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
+							|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
+						) {
+						eval = ttValue;
+					}
+				//}
 			}
 			
-			/*if (ttMove == 0 && depth >= 3) {
+			/*if (ttFlag == -1 && depth >= 3) {
 				depth -= 2;
 			}*/
 			
