@@ -344,6 +344,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			hashkey ^= (((long)excludedMove) << 16);
 		}
 		
+		int tpt_depth = 0;
 		int ttMove = 0;
 		int ttValue = 0;
 		int ttFlag = -1;
@@ -352,7 +353,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
 		if (!tt_entries_per_ply[ply].isEmpty()) {
 			
-			int tpt_depth = tt_entries_per_ply[ply].getDepth();
+			tpt_depth = tt_entries_per_ply[ply].getDepth();
 			ttMove = tt_entries_per_ply[ply].getBestMove();
 			ttValue = tt_entries_per_ply[ply].getEval();
 			ttFlag = tt_entries_per_ply[ply].getFlag();
