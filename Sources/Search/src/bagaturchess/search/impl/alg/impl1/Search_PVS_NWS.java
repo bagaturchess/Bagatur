@@ -878,8 +878,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	    	}
 	    }
 	    
-	    int ttValue;
-	    int ttFlag;
+	    int ttValue = 0;
+	    int ttFlag = -1;
 		int ttMove = 0;
 		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
 		if (!tt_entries_per_ply[ply].isEmpty()) {
@@ -902,6 +902,18 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
+		
+		if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
+			//if (tpt_depth >= 1) {
+				if (ttFlag == ITTEntry.FLAG_EXACT
+						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
+						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
+					) {
+					eval = ttValue;
+				}
+			//}
+		}
+		
 		if (eval >= beta) {
 			return eval;
 		}
