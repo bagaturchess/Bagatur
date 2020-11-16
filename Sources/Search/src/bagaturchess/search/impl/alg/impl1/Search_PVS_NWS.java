@@ -901,14 +901,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		
-		if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
+		/*if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
 			if (ttFlag == ITTEntry.FLAG_EXACT
 					|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
 					|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
 				) {
 				eval = ttValue;
 			}
-		}
+		}*/
 		
 		if (eval >= beta) {
 			return eval;
@@ -919,7 +919,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		final int alphaOrig = alpha;
-		boolean movesGenerated = false;
 		int bestMove = 0;
 		
 		alpha = Math.max(alpha, eval);
@@ -938,7 +937,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.generateAttacks(cb);
 					moveGen.setMVVLVAScores(cb);
 					moveGen.sort();
-					movesGenerated = true;
 					break;
 			}
 			
@@ -988,7 +986,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		moveGen.endPly();
 		
-		if (!SearchUtils.isMateVal(alpha) && movesGenerated) {
+		if (!SearchUtils.isMateVal(alpha) && bestMove != 0) {
 			env.getTPT().put(cb.zobristKey, 0, alpha, alphaOrig, beta, bestMove);
 		}
 		
