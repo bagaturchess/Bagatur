@@ -995,6 +995,154 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
+	public int qsearch_new(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply, final boolean isPv) {
+		
+		if (cb.checkingPieces != 0) {
+			return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, 0);
+			//return alpha;
+		}
+		
+		if (info.getSelDepth() < ply) {
+			info.setSelDepth(ply);
+		}
+		
+		if (ply >= ISearch.MAX_DEPTH) {
+			return eval(evaluator, ply, alpha, beta, isPv);
+		}
+		
+	    // Check if we have an upcoming move which draws by repetition, or
+	    // if the opponent had an alternative move earlier to this position.
+	    if (alpha < EvalConstants.SCORE_DRAW
+	        && isDraw()
+	        ) {
+	    	alpha = EvalConstants.SCORE_DRAW;
+	    	if (alpha >= beta) {
+				return alpha;
+	    	}
+	    }
+	    
+	    int ttValue = 0;
+	    int ttFlag = -1;
+		int ttMove = 0;
+		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
+		if (!tt_entries_per_ply[ply].isEmpty()) {
+			
+			ttValue = tt_entries_per_ply[ply].getEval();
+			ttFlag = tt_entries_per_ply[ply].getFlag();
+			
+			if (ttFlag == ITTEntry.FLAG_EXACT) {
+				return ttValue;
+			} else {
+				if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
+					return ttValue;
+				}
+				if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
+					return ttValue;
+				}
+			}
+			
+			ttMove = tt_entries_per_ply[ply].getBestMove();
+		}
+		
+		int eval = eval(evaluator, ply, alpha, beta, isPv);
+		
+		/*if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
+			if (ttFlag == ITTEntry.FLAG_EXACT
+					|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
+					|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
+				) {
+				eval = ttValue;
+			}
+		}*/
+		
+		if (eval >= beta) {
+			return eval;
+		}
+		
+		if (eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[ChessConstants.QUEEN] < alpha) {
+			return eval;
+		}
+		
+		final int alphaOrig = alpha;
+		int bestMove = 0;
+		int bestScore = ISearch.MIN;
+		
+		moveGen.startPly();
+		
+		int phase = PHASE_TT;
+		while (phase <= PHASE_ATTACKING_GOOD) {
+			switch (phase) {
+				case PHASE_TT:
+					if (ttMove != 0 && cb.isValidMove(ttMove)) {
+						moveGen.addMove(ttMove);
+					}
+					break;
+				case PHASE_ATTACKING_GOOD:
+					moveGen.generateAttacks(cb);
+					moveGen.setMVVLVAScores(cb);
+					moveGen.sort();
+					break;
+			}
+			
+			while (moveGen.hasNext()) {
+				
+				final int move = moveGen.next();
+				
+				if (phase == PHASE_ATTACKING_GOOD) {
+					if (move == ttMove) {
+						continue;
+					}
+					
+					if (!cb.isLegal(move)) {
+						continue;
+					}
+				}
+				
+				if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
+					if (SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
+						continue;
+					} else {
+						if (eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+							continue;
+						}
+					}
+				} else {
+					if (eval + FUTILITY_MARGIN_Q_SEARCH < alpha) {
+						continue;
+					}
+				}
+				
+				cb.doMove(move);
+				
+				final int score = -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -alpha, ply + 1, isPv);
+				
+				cb.undoMove(move);
+				
+				if (score > bestScore) {
+					
+					bestMove = move;
+					bestScore = score;
+					
+					alpha = Math.max(alpha, score);
+					if (alpha >= beta) {
+						phase += 100;
+						break;
+					}
+				}
+			}
+			
+			phase++;
+		}
+		moveGen.endPly();
+		
+		if (!SearchUtils.isMateVal(alpha) && bestScore > eval) {
+			env.getTPT().put(cb.zobristKey, 0, bestScore, alphaOrig, beta, bestMove);
+		}
+		
+		return Math.max(eval, bestScore);
+	}
+	
+	
 	private int extensions(final ChessBoard cb, final MoveGenerator moveGen, final int ply) {
 		if (EngineConstants.ENABLE_CHECK_EXTENSION && cb.checkingPieces != 0) {
 			return 1;
