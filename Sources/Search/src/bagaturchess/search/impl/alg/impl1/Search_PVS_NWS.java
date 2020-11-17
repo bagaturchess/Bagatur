@@ -339,6 +339,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		depth += extensions(cb, moveGen, ply);
 		
+		
 		long hashkey = cb.zobristKey;
 		if (excludedMove != 0) {
 			hashkey ^= (((long)excludedMove) << 16);
