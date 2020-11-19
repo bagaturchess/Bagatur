@@ -58,21 +58,21 @@ import bagaturchess.search.impl.utils.SearchUtils;
 public class Search_PVS_NWS extends SearchImpl {
 	
 	
-	private static final int PHASE_TT 					= 0;
-	private static final int PHASE_ATTACKING_GOOD 		= 1;
-	private static final int PHASE_KILLER_1 			= 2;
-	private static final int PHASE_KILLER_2 			= 3;
-	private static final int PHASE_COUNTER 				= 4;
-	private static final int PHASE_ATTACKING_BAD 		= 5;
-	private static final int PHASE_QUIET 				= 6;
+	private static final int PHASE_TT 							= 0;
+	private static final int PHASE_ATTACKING_GOOD 				= 1;
+	private static final int PHASE_KILLER_1 					= 2;
+	private static final int PHASE_KILLER_2 					= 3;
+	private static final int PHASE_COUNTER 						= 4;
+	private static final int PHASE_ATTACKING_BAD 				= 5;
+	private static final int PHASE_QUIET 						= 6;
 	
-	private static final int[] STATIC_NULLMOVE_MARGIN 	= { 0, 60, 130, 210, 300, 400, 510 };
-	private static final int[] RAZORING_MARGIN 			= { 0, 240, 280, 300 };
-	private static final int[] FUTILITY_MARGIN 			= { 0, 80, 170, 270, 380, 500, 630 };
-	private static final int FUTILITY_MARGIN_Q_SEARCH 	= 100;
-	private static final int FUTILITY_MARGIN_Q_SEARCH_1	= 35;
+	private static final int[] STATIC_NULLMOVE_MARGIN 			= { 0, 60, 130, 210, 300, 400, 510 };
+	private static final int[] RAZORING_MARGIN 					= { 0, 240, 280, 300 };
+	private static final int[] FUTILITY_MARGIN 					= { 0, 80, 170, 270, 380, 500, 630 };
+	private static final int FUTILITY_MARGIN_Q_SEARCH_ATTACKS 	= 100;
+	private static final int FUTILITY_MARGIN_Q_SEARCH_QUIET		= 35;
 	
-	private static final int[][] LMR_TABLE 				= new int[64][64];
+	private static final int[][] LMR_TABLE 						= new int[64][64];
 	static {
 		for (int depth = 1; depth < 64; depth++) {
 			for (int moveNumber = 1; moveNumber < 64; moveNumber++) {
@@ -916,7 +916,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			return eval;
 		}
 		
-		if (eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[ChessConstants.QUEEN] < alpha) {
+		if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + EvalConstants.MATERIAL[ChessConstants.QUEEN] < alpha) {
 			return eval;
 		}
 		
@@ -944,7 +944,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.sort();
 					break;
 				case PHASE_QUIET:
-					if (eval + FUTILITY_MARGIN_Q_SEARCH_1 >= alpha && countNotAttacking <= 0) {
+					if (eval + FUTILITY_MARGIN_Q_SEARCH_QUIET >= alpha && countNotAttacking <= 0) {
 						moveGen.generateMoves(cb);
 						moveGen.setHHScores(cb.colorToMove, parentMove);
 						moveGen.sort();
@@ -970,7 +970,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
 						continue;
 					} else {
-						if (eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+						if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
 							continue;
 						}
 					}
@@ -979,7 +979,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (countNotAttacking >= 2) {
 						break;
 					}
-					if (eval + FUTILITY_MARGIN_Q_SEARCH_1 < alpha) {
+					if (eval + FUTILITY_MARGIN_Q_SEARCH_QUIET < alpha) {
 						continue;
 					}
 				}
