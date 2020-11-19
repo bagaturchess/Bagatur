@@ -70,6 +70,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int[] RAZORING_MARGIN 			= { 0, 240, 280, 300 };
 	private static final int[] FUTILITY_MARGIN 			= { 0, 80, 170, 270, 380, 500, 630 };
 	private static final int FUTILITY_MARGIN_Q_SEARCH 	= 100;
+	private static final int FUTILITY_MARGIN_Q_SEARCH_1	= 35;
 	
 	private static final int[][] LMR_TABLE 				= new int[64][64];
 	static {
@@ -851,150 +852,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	public int qsearch_old(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply, final boolean isPv) {
-		
-		if (cb.checkingPieces != 0) {
-			return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, 0);
-			//return alpha;
-		}
-		
-		if (info.getSelDepth() < ply) {
-			info.setSelDepth(ply);
-		}
-		
-		if (ply >= ISearch.MAX_DEPTH) {
-			return eval(evaluator, ply, alpha, beta, isPv);
-		}
-		
-	    // Check if we have an upcoming move which draws by repetition, or
-	    // if the opponent had an alternative move earlier to this position.
-	    if (alpha < EvalConstants.SCORE_DRAW
-	        && isDraw()
-	        ) {
-	    	alpha = EvalConstants.SCORE_DRAW;
-	    	if (alpha >= beta) {
-				return alpha;
-	    	}
-	    }
-	    
-	    int ttValue = 0;
-	    int ttFlag = -1;
-		int ttMove = 0;
-		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
-		if (!tt_entries_per_ply[ply].isEmpty()) {
-			
-			ttValue = tt_entries_per_ply[ply].getEval();
-			ttFlag = tt_entries_per_ply[ply].getFlag();
-			
-			if (ttFlag == ITTEntry.FLAG_EXACT) {
-				return ttValue;
-			} else {
-				if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
-					return ttValue;
-				}
-				if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
-					return ttValue;
-				}
-			}
-			
-			ttMove = tt_entries_per_ply[ply].getBestMove();
-		}
-		
-		int eval = eval(evaluator, ply, alpha, beta, isPv);
-		
-		/*if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
-			if (ttFlag == ITTEntry.FLAG_EXACT
-					|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
-					|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
-				) {
-				eval = ttValue;
-			}
-		}*/
-		
-		if (eval >= beta) {
-			return eval;
-		}
-		
-		if (eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[ChessConstants.QUEEN] < alpha) {
-			return alpha;
-		}
-		
-		final int alphaOrig = alpha;
-		int bestMove = 0;
-		
-		alpha = Math.max(alpha, eval);
-		
-		moveGen.startPly();
-		
-		int phase = PHASE_TT;
-		while (phase <= PHASE_ATTACKING_GOOD) {
-			switch (phase) {
-				case PHASE_TT:
-					if (ttMove != 0 && cb.isValidMove(ttMove)) {
-						moveGen.addMove(ttMove);
-					}
-					break;
-				case PHASE_ATTACKING_GOOD:
-					moveGen.generateAttacks(cb);
-					moveGen.setMVVLVAScores(cb);
-					moveGen.sort();
-					break;
-			}
-			
-			while (moveGen.hasNext()) {
-				
-				final int move = moveGen.next();
-				
-				if (phase == PHASE_ATTACKING_GOOD) {
-					if (move == ttMove) {
-						continue;
-					}
-					
-					if (!cb.isLegal(move)) {
-						continue;
-					}
-				}
-				
-				if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
-					if (SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
-						continue;
-					} else {
-						if (eval + FUTILITY_MARGIN_Q_SEARCH + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
-							continue;
-						}
-					}
-				} else {
-					if (eval + FUTILITY_MARGIN_Q_SEARCH < alpha) {
-						continue;
-					}
-				}
-				
-				cb.doMove(move);
-				
-				final int score = -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -alpha, ply + 1, isPv);
-				
-				cb.undoMove(move);
-				
-				alpha = Math.max(alpha, score);
-				if (alpha >= beta) {
-					bestMove = move;
-					phase += 100;
-					break;
-				}
-			}
-			
-			phase++;
-		}
-		moveGen.endPly();
-		
-		if (!SearchUtils.isMateVal(alpha) && bestMove != 0) {
-			env.getTPT().put(cb.zobristKey, 0, alpha, alphaOrig, beta, bestMove);
-		}
-		
-		return alpha;
-	}
-	
-	
 	public int qsearch(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply, final boolean isPv) {
 		
 		if (cb.checkingPieces != 0) {
@@ -1067,10 +924,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
 		
+		int parentMove = moveGen.previous();
+		
+		int countNotAttacking = 0;
+		
 		moveGen.startPly();
 		
 		int phase = PHASE_TT;
-		while (phase <= PHASE_ATTACKING_GOOD) {
+		while (phase <= PHASE_QUIET) {
 			switch (phase) {
 				case PHASE_TT:
 					if (ttMove != 0 && cb.isValidMove(ttMove)) {
@@ -1082,13 +943,20 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.setMVVLVAScores(cb);
 					moveGen.sort();
 					break;
+				case PHASE_QUIET:
+					if (eval + FUTILITY_MARGIN_Q_SEARCH_1 >= alpha && countNotAttacking <= 0) {
+						moveGen.generateMoves(cb);
+						moveGen.setHHScores(cb.colorToMove, parentMove);
+						moveGen.sort();
+					}
+					break;
 			}
 			
 			while (moveGen.hasNext()) {
 				
 				final int move = moveGen.next();
 				
-				if (phase == PHASE_ATTACKING_GOOD) {
+				if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_QUIET) {
 					if (move == ttMove) {
 						continue;
 					}
@@ -1107,7 +975,11 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 					}
 				} else {
-					if (eval + FUTILITY_MARGIN_Q_SEARCH < alpha) {
+					countNotAttacking++;
+					if (countNotAttacking >= 2) {
+						break;
+					}
+					if (eval + FUTILITY_MARGIN_Q_SEARCH_1 < alpha) {
 						continue;
 					}
 				}
