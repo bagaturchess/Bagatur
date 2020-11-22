@@ -976,7 +976,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				} else {
 					countNotAttacking++;
-					if (countNotAttacking >= 2) {
+					if (countNotAttacking >= 3) {
 						break;
 					}
 					/*if (move != ttMove && moveGen.getScore() == 0) {
