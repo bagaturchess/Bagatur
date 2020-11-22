@@ -979,9 +979,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (countNotAttacking >= 3) {
 						break;
 					}
-					/*if (move != ttMove && moveGen.getScore() == 0) {
-						break;
-					}*/
 					if (eval + FUTILITY_MARGIN_Q_SEARCH_QUIET < alpha) {
 						continue;
 					}
