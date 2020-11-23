@@ -944,7 +944,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.sort();
 					break;
 				case PHASE_QUIET:
-					if (eval + FUTILITY_MARGIN_Q_SEARCH_QUIET >= alpha && countNotAttacking == 0) {
+					if (eval + FUTILITY_MARGIN_Q_SEARCH_QUIET >= alpha) {
 						moveGen.generateMoves(cb);
 						moveGen.setHHScores(cb.colorToMove, parentMove);
 						moveGen.sort();
