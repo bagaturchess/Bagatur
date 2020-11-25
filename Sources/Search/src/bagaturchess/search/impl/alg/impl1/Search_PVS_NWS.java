@@ -770,7 +770,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				cb.undoMove(move);
 				
 				if (eval != ISearch.MIN && score != alpha && !SearchUtils.isMateVal(score)) {
-					if (MoveUtil.isQuiet(move)) {
+					if (phase == PHASE_QUIET && movesPerformed_quiet <= 2) {
 						int delta = Math.max(0, score - eval);
 						quietMovesAVGScores.addValue(delta, delta);
 						//System.out.println("quietMovesAVGScores: " + quietMovesAVGScores.getEntropy() + " " + quietMovesAVGScores.getDisperse());
@@ -956,7 +956,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.sort();
 					break;
 				case PHASE_QUIET:
-					if (eval + FUTILITY_MARGIN_Q_SEARCH_QUIET >= alpha) {
+					if (eval + QUIET_MOVES_FUTILITY_MARGIN >= alpha) {
 						moveGen.generateMoves(cb);
 						moveGen.setHHScores(cb.colorToMove, parentMove);
 						moveGen.sort();
@@ -991,7 +991,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (countNotAttacking >= 3) {
 						break;
 					}
-					if (eval + FUTILITY_MARGIN_Q_SEARCH_QUIET < alpha) {
+					if (eval + QUIET_MOVES_FUTILITY_MARGIN < alpha) {
 						continue;
 					}
 				}
