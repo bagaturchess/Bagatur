@@ -87,6 +87,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long lastSentMinorInfo_nodesCount;
 	
 	private VarStatistic historyAVGScores;
+	private VarStatistic quietMovesAVGScores;
 	
 	
 	public Search_PVS_NWS(Object[] args) {
@@ -115,6 +116,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		lastSentMinorInfo_timestamp = 0;
 		
 		historyAVGScores = new VarStatistic(false);
+		quietMovesAVGScores = new VarStatistic(false);
 	}
 	
 	
@@ -767,6 +769,14 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				cb.undoMove(move);
 				
+				if (eval != ISearch.MIN && score != alpha && !SearchUtils.isMateVal(score)) {
+					if (MoveUtil.isQuiet(move)) {
+						int delta = Math.max(0, score - eval);
+						quietMovesAVGScores.addValue(delta, delta);
+						//System.out.println("quietMovesAVGScores: " + quietMovesAVGScores.getEntropy() + " " + quietMovesAVGScores.getDisperse());
+					}
+				}
+				
 				if (MoveUtil.isQuiet(move) && cb.checkingPieces == 0) {
 					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
 				}
@@ -919,6 +929,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + EvalConstants.MATERIAL[ChessConstants.QUEEN] < alpha) {
 			return eval;
 		}
+		
+		int QUIET_MOVES_FUTILITY_MARGIN = (int) (quietMovesAVGScores.getEntropy() + quietMovesAVGScores.getDisperse());
 		
 		final int alphaOrig = alpha;
 		int bestMove = 0;
