@@ -88,6 +88,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private VarStatistic historyAVGScores;
 	private VarStatistic quietMovesAVGScores;
+	private VarStatistic attackingMovesAVGScores;
 	
 	
 	public Search_PVS_NWS(Object[] args) {
@@ -117,6 +118,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		historyAVGScores = new VarStatistic(false);
 		quietMovesAVGScores = new VarStatistic(false);
+		attackingMovesAVGScores = new VarStatistic(false);
 	}
 	
 	
@@ -769,11 +771,15 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				cb.undoMove(move);
 				
-				if (eval != ISearch.MIN && score != alpha && !SearchUtils.isMateVal(score)) {
+				if (eval != ISearch.MIN && !SearchUtils.isMateVal(score)) {
 					if (phase == PHASE_QUIET && movesPerformed_quiet <= 2) {
 						int delta = Math.max(0, score - eval);
 						quietMovesAVGScores.addValue(delta, delta);
 						//System.out.println("quietMovesAVGScores: " + quietMovesAVGScores.getEntropy() + " " + quietMovesAVGScores.getDisperse());
+					} else if (phase == PHASE_ATTACKING_GOOD) {
+						int delta = Math.max(0, score - eval - EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)]);
+						attackingMovesAVGScores.addValue(delta, delta);
+						//System.out.println("attackingMovesAVGScores: " + attackingMovesAVGScores.getEntropy() + " " + attackingMovesAVGScores.getDisperse());
 					}
 				}
 				
@@ -926,11 +932,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			return eval;
 		}
 		
-		if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + EvalConstants.MATERIAL[ChessConstants.QUEEN] < alpha) {
+		int QUIET_MOVES_FUTILITY_MARGIN = FUTILITY_MARGIN_Q_SEARCH_QUIET;//(int) (quietMovesAVGScores.getEntropy() + quietMovesAVGScores.getDisperse());
+		int ATTACKING_MOVES_FUTILITY_MARGIN = FUTILITY_MARGIN_Q_SEARCH_ATTACKS;//(int) (attackingMovesAVGScores.getEntropy() + attackingMovesAVGScores.getDisperse());
+		
+		if (eval + ATTACKING_MOVES_FUTILITY_MARGIN + EvalConstants.MATERIAL[ChessConstants.QUEEN] < alpha) {
 			return eval;
 		}
-		
-		int QUIET_MOVES_FUTILITY_MARGIN = (int) (quietMovesAVGScores.getEntropy() + quietMovesAVGScores.getDisperse());
 		
 		final int alphaOrig = alpha;
 		int bestMove = 0;
@@ -982,7 +989,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (SEEUtil.getSeeCaptureScore(cb, move) <= 0) {
 						continue;
 					} else {
-						if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+						if (eval + ATTACKING_MOVES_FUTILITY_MARGIN + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
 							continue;
 						}
 					}
