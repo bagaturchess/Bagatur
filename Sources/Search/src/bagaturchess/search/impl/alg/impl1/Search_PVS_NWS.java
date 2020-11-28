@@ -940,6 +940,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		final int alphaOrig = alpha;
+		
+		alpha = Math.max(alpha, eval);
+		
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
 		
@@ -1030,7 +1033,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getTPT().put(cb.zobristKey, 0, bestScore, alphaOrig, beta, bestMove);
 		}
 		
-		return Math.max(eval, bestScore);
+		return Math.max(alpha, Math.max(eval, bestScore));
 	}
 	
 	
