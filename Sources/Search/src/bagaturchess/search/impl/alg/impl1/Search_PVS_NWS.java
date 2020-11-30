@@ -933,7 +933,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		int QUIET_MOVES_FUTILITY_MARGIN = FUTILITY_MARGIN_Q_SEARCH_QUIET;//(int) (quietMovesAVGScores.getEntropy() + quietMovesAVGScores.getDisperse());
-		int ATTACKING_MOVES_FUTILITY_MARGIN = FUTILITY_MARGIN_Q_SEARCH_ATTACKS;//(int) (attackingMovesAVGScores.getEntropy() + attackingMovesAVGScores.getDisperse());
+		int ATTACKING_MOVES_FUTILITY_MARGIN = (int) (attackingMovesAVGScores.getEntropy() + attackingMovesAVGScores.getDisperse());
 		
 		if (eval + ATTACKING_MOVES_FUTILITY_MARGIN + EvalConstants.MATERIAL[ChessConstants.QUEEN] < alpha) {
 			return eval;
