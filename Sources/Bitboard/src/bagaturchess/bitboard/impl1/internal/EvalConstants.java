@@ -64,6 +64,7 @@ public class EvalConstants {
 	public static final int[] PHASE 					= {0, 0, 6, 6, 13, 28};
 	
 	public static final int[] MATERIAL 					= {0, 100, 396, 416, 706, 1302, 3000};
+	public static final int[] MATERIAL_SEE				= {0, 100, 300, 300, 500, 900, 3000};
 	public static final int[] NIGHT_PAWN				= {68, -14, -2, 2, 8, 12, 20, 30, 36};
 	public static final int[] ROOK_PAWN					= {48, -4, -4, -4, -4, 0, 0, 0, 0};
 	
@@ -163,16 +164,16 @@ public class EvalConstants {
 			0, 0, 0, 0, 0, 0, 0, 0  //1
 		 // A  B  C  D  E  F  G  H
 	};
-	
-	public static final int[] PROMOTION_SCORE = {
-			0,
-			0,
-			MATERIAL[ChessConstants.NIGHT] 	- MATERIAL[ChessConstants.PAWN],
-			MATERIAL[ChessConstants.BISHOP] - MATERIAL[ChessConstants.PAWN],
-			MATERIAL[ChessConstants.ROOK] 	- MATERIAL[ChessConstants.PAWN],
-			MATERIAL[ChessConstants.QUEEN] 	- MATERIAL[ChessConstants.PAWN],
-	};
 
+	public static final int[] PROMOTION_SCORE_SEE = {
+			0,
+			0,
+			MATERIAL_SEE[ChessConstants.NIGHT] 	- MATERIAL_SEE[ChessConstants.PAWN],
+			MATERIAL_SEE[ChessConstants.BISHOP] - MATERIAL_SEE[ChessConstants.PAWN],
+			MATERIAL_SEE[ChessConstants.ROOK] 	- MATERIAL_SEE[ChessConstants.PAWN],
+			MATERIAL_SEE[ChessConstants.QUEEN] 	- MATERIAL_SEE[ChessConstants.PAWN],
+	};
+	
 	public static final void initPSQT(IBoardConfig config) {
 		
 		PSQT_MG[ChessConstants.PAWN][WHITE] = convertDoubleArray2IntArray(config.getPST_PAWN_O());

@@ -91,12 +91,12 @@ public class SEEUtil {
 		if (MoveUtil.isPromotion(move)) {
 
 			/* Do not consider captures if they lose material, therefore max zero */
-			return Math.max(0, EvalConstants.PROMOTION_SCORE[ChessConstants.QUEEN] + EvalConstants.MATERIAL[attackedPieceIndex]
+			return Math.max(0, EvalConstants.PROMOTION_SCORE_SEE[ChessConstants.QUEEN] + EvalConstants.MATERIAL_SEE[attackedPieceIndex]
 					- getSeeScore(cb, 1 - colorToMove, toIndex, QUEEN, allPieces, slidingMask));
 		} else {
 
 			/* Do not consider captures if they lose material, therefore max zero */
-			return Math.max(0, EvalConstants.MATERIAL[attackedPieceIndex]
+			return Math.max(0, EvalConstants.MATERIAL_SEE[attackedPieceIndex]
 					- getSeeScore(cb, 1 - colorToMove, toIndex, MoveUtil.getSourcePieceIndex(move), allPieces, slidingMask));
 		}
 
@@ -116,10 +116,10 @@ public class SEEUtil {
 
 		// add score when promotion
 		if (MoveUtil.isPromotion(move)) {
-			return EvalConstants.PROMOTION_SCORE[MoveUtil.getMoveType(move)] + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)]
+			return EvalConstants.PROMOTION_SCORE_SEE[MoveUtil.getMoveType(move)] + EvalConstants.MATERIAL_SEE[MoveUtil.getAttackedPieceIndex(move)]
 					- getSeeScore(cb, cb.colorToMoveInverse, index, MoveUtil.getMoveType(move), allPieces, slidingMask);
 		} else {
-			return EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)]
+			return EvalConstants.MATERIAL_SEE[MoveUtil.getAttackedPieceIndex(move)]
 					- getSeeScore(cb, cb.colorToMoveInverse, index, MoveUtil.getSourcePieceIndex(move), allPieces, slidingMask);
 		}
 
