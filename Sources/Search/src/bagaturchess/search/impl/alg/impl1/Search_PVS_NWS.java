@@ -975,15 +975,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
-					//if (see == 0) {
-					//	if (eval + FUTILITY_MARGIN_Q_SEARCH_QUIET < alpha) {
-					//		continue;
-					//	}
-					//} else {
-						if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
-							continue;
-						}
-					//}
+					if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+						continue;
+					}
 				} else {
 					countNotAttacking++;
 					if (countNotAttacking >= 3) {
