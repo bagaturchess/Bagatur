@@ -50,7 +50,7 @@ public class NeuralNetworkUtils_NNUE1 {
 		
 		MultiLayerPerceptron mlp = new MultiLayerPerceptron(TransferFunctionType.LINEAR,
 				getInputsSize(),
-				512,
+				256,
 				32,
 				32,
 				1);
