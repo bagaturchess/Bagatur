@@ -456,9 +456,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 			
-			/*if (ttFlag == -1 && depth >= 3) {
+			if (ttFlag == -1 && depth >= 3) {
 				depth -= 2;
-			}*/
+			}
 			
 			if (eval >= beta) {
 				
