@@ -622,11 +622,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			while (moveGen.hasNext()) {
 				
 				final int move = moveGen.next();
-				
-				if (move != ttMove) {
-					if (!cb.isLegal(move)) {
-						continue;
-					}
+
+				if (!cb.isLegal(move)) {
+					continue;
 				}
 				
 				//For now the singular move extension is disabled
@@ -959,12 +957,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				final int move = moveGen.next();
 				
+				if (!cb.isLegal(move)) {
+					continue;
+				}
+				
 				if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_QUIET) {
 					if (move == ttMove) {
-						continue;
-					}
-					
-					if (!cb.isLegal(move)) {
 						continue;
 					}
 				}
