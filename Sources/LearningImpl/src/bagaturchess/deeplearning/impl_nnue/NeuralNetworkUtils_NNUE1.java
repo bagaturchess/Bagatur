@@ -62,7 +62,7 @@ public class NeuralNetworkUtils_NNUE1 {
         //mlp.setLearningRule(new MomentumBackpropagation());
         
         //mlp.getLearningRule().setLearningRate(0.05);
-        mlp.getLearningRule().setLearningRate(0.000001);
+        mlp.getLearningRule().setLearningRate(0.0000001);
         
         return mlp;
 	}
