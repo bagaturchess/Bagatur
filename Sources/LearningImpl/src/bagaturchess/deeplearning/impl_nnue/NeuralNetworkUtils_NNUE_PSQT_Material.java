@@ -34,11 +34,11 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 
 
-public class NeuralNetworkUtils_NNUE_PSQT {
+public class NeuralNetworkUtils_NNUE_PSQT_Material {
 	
 	
 	public static int getInputsSize() {
-		return 12 * 64;
+		return 12 * 64 + 12;
 	}
 	
 	
@@ -75,12 +75,14 @@ public class NeuralNetworkUtils_NNUE_PSQT {
 	
 	
 	public static void fillInputs(double[] inputs, IBitBoard board) {
-		fillInputs(inputs, board, Constants.COLOUR_WHITE, 0, 1);
-		fillInputs(inputs, board, Constants.COLOUR_BLACK, 6 * 64, 1);
+		fillInputs_PSQT(inputs, board, Constants.COLOUR_WHITE, 0, 1);
+		fillInputs_PSQT(inputs, board, Constants.COLOUR_BLACK, 6 * 64, 1);
+		fillInputs_Material(inputs, board, Constants.COLOUR_WHITE, 12 * 64 + 0, 1);
+		fillInputs_Material(inputs, board, Constants.COLOUR_BLACK, 12 * 64 + 6, 1);
 	}
 	
 	
-	private static void fillInputs(double[] result, IBitBoard board, int colour, int shift, int signal) {
+	private static void fillInputs_PSQT(double[] result, IBitBoard board, int colour, int shift, int signal) {
 		
 		long bb_king = board.getFiguresBitboardByColourAndType(colour, Constants.TYPE_KING);
 		long bb_queens = board.getFiguresBitboardByColourAndType(colour, Constants.TYPE_QUEEN);
@@ -129,5 +131,23 @@ public class NeuralNetworkUtils_NNUE_PSQT {
         	result[shift + shift_queens + squareID_queen] = signal;
         	bb_queens &= bb_queens - 1;
         }
+	}
+	
+	
+	private static void fillInputs_Material(double[] result, IBitBoard board, int colour, int shift, int sign) {
+		
+		long bb_king = board.getFiguresBitboardByColourAndType(colour, Constants.TYPE_KING);
+		long bb_queens = board.getFiguresBitboardByColourAndType(colour, Constants.TYPE_QUEEN);
+		long bb_rooks = board.getFiguresBitboardByColourAndType(colour, Constants.TYPE_ROOK);
+		long bb_bishops = board.getFiguresBitboardByColourAndType(colour, Constants.TYPE_BISHOP);
+		long bb_knights = board.getFiguresBitboardByColourAndType(colour, Constants.TYPE_KNIGHT);
+		long bb_pawns = board.getFiguresBitboardByColourAndType(colour, Constants.TYPE_PAWN);
+		
+		result[shift + 0] = sign * Long.bitCount(bb_pawns);
+		result[shift + 1] = sign * Long.bitCount(bb_king);
+		result[shift + 2] = sign * Long.bitCount(bb_knights);
+		result[shift + 3] = sign * Long.bitCount(bb_bishops);
+		result[shift + 4] = sign * Long.bitCount(bb_rooks);
+		result[shift + 5] = sign * Long.bitCount(bb_queens);
 	}
 }
