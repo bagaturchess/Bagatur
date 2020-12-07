@@ -36,7 +36,7 @@ import bagaturchess.uci.impl.commands.info.Info;
 public abstract class MatchRunner {
 	
 	
-	private static int MAX_EVAL_DIFF = 500;
+	private static int MAX_EVAL_DIFF = 900;
 	
 	
 	public MatchRunner() {
