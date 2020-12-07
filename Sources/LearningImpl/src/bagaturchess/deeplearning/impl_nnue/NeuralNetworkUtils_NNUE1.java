@@ -24,6 +24,8 @@ import java.util.Random;
 
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
+import org.neuroph.nnet.learning.ConvolutionalBackpropagation;
+import org.neuroph.nnet.learning.DynamicBackPropagation;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.random.WeightsRandomizer;
@@ -50,9 +52,6 @@ public class NeuralNetworkUtils_NNUE1 {
 		
 		MultiLayerPerceptron mlp = new MultiLayerPerceptron(TransferFunctionType.LINEAR,
 				getInputsSize(),
-				256,
-				32,
-				32,
 				1);
 		
 		mlp.randomizeWeights(new WeightsRandomizer(new Random(777)));
@@ -60,9 +59,10 @@ public class NeuralNetworkUtils_NNUE1 {
         mlp.setLearningRule(new BackPropagation());
         //mlp.setLearningRule(new ConvolutionalBackpropagation());
         //mlp.setLearningRule(new MomentumBackpropagation());
+        //mlp.setLearningRule(new DynamicBackPropagation());
         
-        //mlp.getLearningRule().setLearningRate(0.05);
-        mlp.getLearningRule().setLearningRate(0.0000001);
+        mlp.getLearningRule().setLearningRate(0.05);
+        //mlp.getLearningRule().setLearningRate(0.0001);
         
         return mlp;
 	}
@@ -75,12 +75,12 @@ public class NeuralNetworkUtils_NNUE1 {
 	
 	
 	public static void fillInputs(double[] inputs, IBitBoard board) {
-		fillInputs_HalfKP(inputs, board, Constants.COLOUR_WHITE, 0);
-		fillInputs_HalfKP(inputs, board, Constants.COLOUR_BLACK, 6 * 64);
+		fillInputs(inputs, board, Constants.COLOUR_WHITE, 0, 1);
+		fillInputs(inputs, board, Constants.COLOUR_BLACK, 6 * 64, 1);
 	}
 	
 	
-	private static void fillInputs_HalfKP(double[] result, IBitBoard board, int colour, int shift) {
+	private static void fillInputs(double[] result, IBitBoard board, int colour, int shift, int signal) {
 		
 		long bb_king = board.getFiguresBitboardByColourAndType(colour, Constants.TYPE_KING);
 		long bb_queens = board.getFiguresBitboardByColourAndType(colour, Constants.TYPE_QUEEN);
@@ -92,41 +92,41 @@ public class NeuralNetworkUtils_NNUE1 {
 		{
 			int shift_king = 0 * 64;
 			int squareID_king = Long.numberOfTrailingZeros(bb_king);
-			result[shift + shift_king + squareID_king] = 1;
+			result[shift + shift_king + squareID_king] = signal;
 		}
 		
     	int shift_pawns = 1 * 64;
         while (bb_pawns != 0) {
         	int squareID_pawn = Long.numberOfTrailingZeros(bb_pawns);
-        	result[shift + shift_pawns + squareID_pawn] = 1;
+        	result[shift + shift_pawns + squareID_pawn] = signal;
         	bb_pawns &= bb_pawns - 1;
         }
         
     	int shift_knights = 2 * 64;
         while (bb_knights != 0) {
         	int squareID_knight = Long.numberOfTrailingZeros(bb_knights);
-        	result[shift + shift_knights + squareID_knight] = 1;
+        	result[shift + shift_knights + squareID_knight] = signal;
         	bb_knights &= bb_knights - 1;
         }
         
     	int shift_bishops = 3 * 64;
         while (bb_bishops != 0) {
         	int squareID_bishop = Long.numberOfTrailingZeros(bb_bishops);
-        	result[shift + shift_bishops + squareID_bishop] = 1;
+        	result[shift + shift_bishops + squareID_bishop] = signal;
         	bb_bishops &= bb_bishops - 1;
         }
         
       	int shift_rooks = 4 * 64;
         while (bb_rooks != 0) {
         	int squareID_rook = Long.numberOfTrailingZeros(bb_rooks);
-        	result[shift + shift_rooks + squareID_rook] = 1;
+        	result[shift + shift_rooks + squareID_rook] = signal;
         	bb_rooks &= bb_rooks - 1;
         }
         
       	int shift_queens = 5 * 64;
         while (bb_queens != 0) {
         	int squareID_queen = Long.numberOfTrailingZeros(bb_queens);
-        	result[shift + shift_queens + squareID_queen] = 1;
+        	result[shift + shift_queens + squareID_queen] = signal;
         	bb_queens &= bb_queens - 1;
         }
 	}

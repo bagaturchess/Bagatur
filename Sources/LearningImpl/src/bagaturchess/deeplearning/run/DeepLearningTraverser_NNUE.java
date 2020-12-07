@@ -18,7 +18,7 @@ public class DeepLearningTraverser_NNUE {
 			//String filePath = "./Houdini.15a.short.cg";
 			//String filePath = "./Houdini.15a.cg";
 			//String filePath = "./Arasan13.1.cg";
-			String filePath = "./stockfish-10.cg";
+			String filePath = "./stockfish-12.cg";
 			//String filePath = "./glaurung-2.2.cg";
 			
 			DeepLearningVisitorImpl_NNUE learning = new DeepLearningVisitorImpl_NNUE();

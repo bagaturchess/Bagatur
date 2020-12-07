@@ -35,6 +35,7 @@ import org.neuroph.nnet.learning.BackPropagation;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
+import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE;
 import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE1;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
@@ -86,6 +87,11 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 	@Override
 	public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
 		
+		//double expectedWhitePlayerEval_func = 1 / (double) (1 + 1 / Math.pow(Math.E, expectedWhitePlayerEval));
+		//double expectedWhitePlayerEval_func = Math.tanh(expectedWhitePlayerEval);
+		//double expectedWhitePlayerEval_func = Math.log(expectedWhitePlayerEval);
+		double expectedWhitePlayerEval_func = expectedWhitePlayerEval;
+		
 		if (status != IGameStatus.NONE) {
 			throw new IllegalStateException("status=" + status);
 		}
@@ -96,19 +102,19 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);
 		
 		
-		sumDiffs1 += Math.abs(0 - expectedWhitePlayerEval);
-		sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval);
+		sumDiffs1 += Math.abs(0 - expectedWhitePlayerEval_func);
+		sumDiffs2 += Math.abs(expectedWhitePlayerEval_func - actualWhitePlayerEval);
 		
 		
 		DataSet trainingSet = new DataSet(NeuralNetworkUtils_NNUE1.getInputsSize(), 1);
 		NeuralNetworkUtils.clearInputsArray(inputs);
 		NeuralNetworkUtils_NNUE1.fillInputs(inputs, bitboard);
-        trainingSet.addRow(new DataSetRow(inputs, new double[]{expectedWhitePlayerEval}));
+        trainingSet.addRow(new DataSetRow(inputs, new double[]{expectedWhitePlayerEval_func}));
         network.learn(trainingSet);
         
         
 		counter++;
-		if ((counter % 1000) == 0) {
+		if ((counter % 100000) == 0) {
 			
 			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 			
