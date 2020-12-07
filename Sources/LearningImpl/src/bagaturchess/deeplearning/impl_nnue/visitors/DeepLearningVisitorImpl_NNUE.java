@@ -69,20 +69,6 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		} else {
 			network = NeuralNetworkUtils_NNUE_PSQT_Material.buildNetwork();
 		}
-		
-			
-        network.getLearningRule().addListener(new LearningEventListener() {
-			
-			@Override
-			public void handleLearningEvent(LearningEvent event) {
-		        BackPropagation bp = (BackPropagation)event.getSource();
-		        
-		        //if (event.getEventType() != LearningEvent.Type.LEARNING_STOPPED)
-		            //System.out.println(bp.getCurrentIteration() + ". iteration : "+ bp.getTotalNetworkError());
-		        
-		        bp.stopLearning();
-			}
-		});
 	}
 	
 	
