@@ -34,7 +34,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 
 
-public class NeuralNetworkUtils_NNUE1 {
+public class NeuralNetworkUtils_NNUE_PSQT {
 	
 	
 	public static int getInputsSize() {
