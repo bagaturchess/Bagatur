@@ -108,8 +108,8 @@ class Weight implements Serializable {
 		
 		if (all > 0 && dir != 0) {
 			multiplier *= Math.abs(dir / all);
-		}      
-	
+		}
+		
 		
 		if (multiplier == 0) {
 			return;
