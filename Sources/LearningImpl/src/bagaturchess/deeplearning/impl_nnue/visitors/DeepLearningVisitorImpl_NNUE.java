@@ -62,8 +62,6 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 	
 	
 	public DeepLearningVisitorImpl_NNUE() throws Exception {
-		
-		
 		if ((new File(NET_FILE)).exists() ){
 			network = NeuralNetworkUtils.loadNetwork(NET_FILE);
 		} else {
