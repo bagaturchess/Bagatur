@@ -98,7 +98,7 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		NeuralNetworkUtils.clearInputsArray(inputs);
 		NeuralNetworkUtils_NNUE_PSQT_Material.fillInputs(inputs, bitboard);
         trainingSet.addRow(new DataSetRow(inputs, new double[]{expectedWhitePlayerEval_func}));
-        network.learn(trainingSet);
+        network.getLearningRule().doLearningEpoch(trainingSet);
         
         
 		counter++;
