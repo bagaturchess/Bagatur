@@ -144,10 +144,6 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		
 		if ((counter % 1000000) == 0) {
 			//System.out.println(counter);
-			for (int i=0; i < featuresArr.length; i++) {
-				//IFeature currFeature = featuresArr[i];
-				//System.out.println(currFeature);
-			}
 		}
 	}
 	
