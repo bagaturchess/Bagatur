@@ -104,7 +104,7 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 			
 			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 			
-			network.save("net.bin");
+			network.save(NET_FILE);
 		}
 	}
 	
@@ -126,6 +126,6 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		//System.out.println("End iteration " + iteration + ", Total evaluated positions count is " + counter);
 		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 		
-		network.save("net.bin");
+		network.save(NET_FILE);
 	}
 }
