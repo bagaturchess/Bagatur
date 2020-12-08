@@ -90,11 +90,11 @@ public class AdjustableFeatureSingle extends AdjustableFeature {
 	}
 	
 	private void adjust(double amount, double openningPart) {
-		//if (openningPart >= 0.5 ) {
+		if (openningPart >= 0.5 ) {
 			openning.adjust(amount * openningPart);
-		//} else {
+		} else {
 			endgame.adjust(amount * (1 - openningPart));
-		//}
+		}
 	}
 	
 	public double eval(ISignal signal, double openningPart) {
