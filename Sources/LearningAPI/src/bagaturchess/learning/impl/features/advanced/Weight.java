@@ -160,9 +160,9 @@ class Weight implements Serializable {
 	
 	strictfp void adjust(double amount) {
 		
-		if (amount != 1 && amount != -1) {
+		/*if (amount != 1 && amount != -1) {
 			throw new IllegalStateException();
-		}
+		}*/
 		
 		varstat.addValue(amount, amount);
 	}

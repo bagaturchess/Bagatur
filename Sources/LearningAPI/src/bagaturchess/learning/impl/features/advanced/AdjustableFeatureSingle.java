@@ -77,9 +77,9 @@ public class AdjustableFeatureSingle extends AdjustableFeature {
 			amount = -amount;
 		}
 		
-		if (amount != 1 && amount != -1) {
+		/*if (amount != 1 && amount != -1) {
 			throw new IllegalStateException();
-		}
+		}*/
 		
 		double adjustment = amount;
 		//double adjustment = amount * (signal.getStrength() / signal.getRange());
@@ -90,11 +90,11 @@ public class AdjustableFeatureSingle extends AdjustableFeature {
 	}
 	
 	private void adjust(double amount, double openningPart) {
-		if (openningPart >= 0.5 ) {
-			openning.adjust(amount);
-		} else {
-			endgame.adjust(amount);
-		}
+		//if (openningPart >= 0.5 ) {
+			openning.adjust(amount * openningPart);
+		//} else {
+			endgame.adjust(amount * (1 - openningPart));
+		//}
 	}
 	
 	public double eval(ISignal signal, double openningPart) {
