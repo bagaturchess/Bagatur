@@ -53,10 +53,10 @@ public class GamesGenerator {
 	private static int SEARCH_DEPTH_MIN = 1;
 	private static int SEARCH_DEPTH_MAX = 10;
 	
-	private static int MAX_EVAL_DIFF = 1500;
+	private static int MAX_EVAL_DIFF = 3000;
 	private static int MAX_MOVES = 300;
 	private static int BEST_MOVE_DIFF = 50;
-	private static int MIN_PIECES = 8;
+	private static int MIN_PIECES = 6;
 	
 	
 	private UCIEnginesManager runner;
