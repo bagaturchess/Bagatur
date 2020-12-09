@@ -87,7 +87,6 @@ public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
 		String pv = infoLine.substring(pvStart + 4, infoLine.length());
 		//System.out.println(infoLine + "	'" + eval + "' '" + pv + "'");
 		
-		boolean inCheck = bitboard.isInCheck();
 		List<Integer> movesList = new ArrayList<Integer>();
 		StringTokenizer movesString = new StringTokenizer(pv, " ");
 		while (movesString.hasMoreElements()) {
@@ -97,9 +96,6 @@ public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
 			int move = bitboard.getMoveOps().stringToMove(moveStr);
 			bitboard.makeMoveForward(move);
 			
-			if (bitboard.isInCheck()) {
-				inCheck = true;
-			}
 			movesList.add(move);
 			//System.out.println(moveStr + "=" + move);
 		}
@@ -131,10 +127,6 @@ public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
 		if (status != IGameStatus.NONE) {
 			return;
 		} else if (hasForcedWin) {
-			eval_ofOriginatePlayer = DUMMY_EVAL;
-			status = IGameStatus.UNDEFINED;
-			return;
-		} else if (inCheck) {
 			eval_ofOriginatePlayer = DUMMY_EVAL;
 			status = IGameStatus.UNDEFINED;
 			return;

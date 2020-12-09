@@ -180,6 +180,7 @@ public class GamesGenerator {
 			//System.out.println(bitboard);
 			//System.out.println("BEST MOVE: " + best);			
 			bitboard.makeMoveForward(best.getMoves()[0]);
+			
 			if (!bitboard.getStatus().equals(IGameStatus.NONE)) {
 				break;
 			}
@@ -192,6 +193,9 @@ public class GamesGenerator {
 			if (bitboard.getMaterialState().getPiecesCount() < MIN_PIECES) {
 				break;
 			}
+			
+			//if (bitboard.isInCheck()) System.out.println("isInCheck " + best.getMoves().length);
+			//System.out.println(best.getMoves().length);
 			
 			EvaluatedPosition position = new EvaluatedPosition(bitboard.toEPD(), best.getMoves()[0]);
 			position.setChildren(movesEvals);
@@ -253,21 +257,18 @@ public class GamesGenerator {
 		int cur_move = 0;
 		while ((cur_move = moves.next()) != 0) {
 			
-			bitboard.makeMoveForward(cur_move);
-			if (!bitboard.getStatus().equals(IGameStatus.NONE)) {
-				//evals.add(new EvaluatedMove(cur_move, bitboard.getStatus()));
-				bitboard.makeMoveBackward(cur_move);
-				continue;
-			} else {
-				bitboard.makeMoveBackward(cur_move);
-			}
-			
 			String allMovesStr = BoardUtils.getPlayedMoves(bitboard);
 			String moveStr = bitboard.getMoveOps().moveToString(cur_move);
-					
+			
+			bitboard.makeMoveForward(cur_move);
+			if (!bitboard.getStatus().equals(IGameStatus.NONE)) {
+				bitboard.makeMoveBackward(cur_move);
+				continue;
+			}
+			bitboard.makeMoveBackward(cur_move);
+			
 			//System.out.println("startpos moves " + allMovesStr + moveStr);
 			//System.out.println("MOVE " + moveStr);
-			
 			
 			List<String> infos = null;
 			
@@ -306,7 +307,6 @@ public class GamesGenerator {
 			//System.out.println("OUT");
 			
 			runner.enable();
-			
 			
 			for (String info: infos) {
 				if (info != null) {
