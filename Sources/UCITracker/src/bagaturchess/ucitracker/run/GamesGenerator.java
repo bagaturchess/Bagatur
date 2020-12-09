@@ -291,13 +291,11 @@ public class GamesGenerator {
 					throw new IllegalStateException("Only one engine is supported");
 				}
 				
-				depth++;
-				if (depth > SEARCH_DEPTH_MAX) {
-					throw new IllegalStateException("depth >  " + SEARCH_DEPTH_MAX + " and no PV info");
-				}
-				
 				if (infos == null || infos.size() == 0 || infos.get(0) == null) {
-					//Continue
+					depth++;
+					if (depth > SEARCH_DEPTH_MAX) {
+						throw new IllegalStateException("depth >  " + SEARCH_DEPTH_MAX + " and no PV info");
+					}
 				} else {
 					loop = false;
 				}
