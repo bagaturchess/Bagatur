@@ -93,7 +93,13 @@ public class LearningVisitorImpl implements PositionsVisitor {
 				int featureID = featuresArr[i].getId();
 				if (filter.isAdjustable(featureID)) {
 					ISignal cur_signal = signals.getSignal(featureID);
-					((IAdjustableFeature)featuresArr[i]).adjust(cur_signal, deltaP > 0 ? 1 : -1, openingPart);
+					if (cur_signal.getStrength() != 0) {
+						double adjustment = deltaP > 0 ? 1 : -1;
+						if (cur_signal.getStrength() < 0) {
+							adjustment *= -1;
+						}
+						((IAdjustableFeature)featuresArr[i]).adjust(cur_signal, adjustment, openingPart);
+					}
 				}
 			}
 		}
