@@ -158,6 +158,91 @@ public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
 	}
 	
 	
+	public EvaluatedMove(IBitBoard bitboard, String infoLine) {
+		
+		if (bitboard.getStatus() != IGameStatus.NONE) {
+			throw new IllegalStateException("status=" + bitboard.getStatus());
+		}
+		
+		/**
+		 * Extract pricipal variation
+		 */
+		int pvStart = infoLine.indexOf(" pv ");
+		if (pvStart <= 0) {
+			throw new IllegalStateException();
+		}
+		
+		String pv = infoLine.substring(pvStart + 4, infoLine.length());
+		//System.out.println(infoLine + " '" + pv + "'");
+		
+		List<Integer> movesList = new ArrayList<Integer>();
+		StringTokenizer movesString = new StringTokenizer(pv, " ");
+		while (movesString.hasMoreElements()) {
+			
+			String moveStr = movesString.nextToken();
+			
+			int move = bitboard.getMoveOps().stringToMove(moveStr);
+			bitboard.makeMoveForward(move);
+			
+			movesList.add(move);
+			//System.out.println(moveStr + "=" + move);
+		}
+		
+		Integer[] movesInteger = movesList.toArray(new Integer[0]);
+		moves = new int[movesInteger.length];
+		
+		for (int i=0; i<movesInteger.length; i++) {
+			moves[i] = movesInteger[i];
+		}
+		
+		boolean hasForcedWin = false;
+		status = bitboard.getStatus();
+		if (status != IGameStatus.NONE) {
+			eval_ofOriginatePlayer = DUMMY_EVAL;
+		} else {
+			hasForcedWin = false;//fcf.hasFastWin();
+			if (hasForcedWin) {
+				int g = 0;
+			}
+		}
+		
+		//Revert game
+		for (int i=moves.length - 1; i>=0; i--) {
+			bitboard.makeMoveBackward(moves[i]);
+		}
+		
+		if (status != IGameStatus.NONE) {
+			return;
+		} else if (hasForcedWin) {
+			eval_ofOriginatePlayer = DUMMY_EVAL;
+			status = IGameStatus.UNDEFINED;
+			return;
+		}
+		
+		//Example for mate: info depth 1 seldepth 7 score mate 1 time 0 nodes 22 pv f6e4
+		//int scoreStart = infoLine.indexOf("score cp ");
+		int scoreStart = infoLine.indexOf(" score ");
+		if (scoreStart <= 0) {
+			throw new IllegalStateException();
+		}
+		int cpOrMateStart = infoLine.indexOf(" ", scoreStart + 6);
+		
+		if (infoLine.indexOf(" mate ", cpOrMateStart) > 0) {
+			status = IGameStatus.UNDEFINED;
+			eval_ofOriginatePlayer = DUMMY_EVAL;
+		} else if (infoLine.indexOf(" cp ", cpOrMateStart) > 0) {
+			int scoreEnd = infoLine.indexOf(" ", cpOrMateStart + 4);
+			String number = infoLine.substring(cpOrMateStart + 4, scoreEnd);
+			
+			eval_ofOriginatePlayer = Integer.parseInt(number);
+		} else {
+			throw new IllegalStateException(infoLine);
+		}
+		
+		//System.out.println(this);
+	}
+	
+	
 	@Override
 	public String toString() {
 		return "Eval: " + eval_ofOriginatePlayer + " status: " + status + " " /*+ MoveInt.movesToString(moves)*/;
