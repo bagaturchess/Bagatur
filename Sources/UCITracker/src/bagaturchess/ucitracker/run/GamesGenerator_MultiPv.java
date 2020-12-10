@@ -330,9 +330,6 @@ public class GamesGenerator_MultiPv {
 			}
 			//System.out.println("depth " + depth);
 		}
-		
-		//System.out.println("OUT");
-		
 		runner.enable();
 		
 		for (String info: infos) {
@@ -343,14 +340,6 @@ public class GamesGenerator_MultiPv {
 					evals.add(move);
 				}
 			}
-			
-			/*if (info != null) {
-				EvaluatedMove move = new EvaluatedMove(bitboard, cur_move, info);
-				if (move.getStatus() == IGameStatus.NONE) {
-					//TODO: Still need for double check with engine for fast wins (with bigger depth)
-					evals.add(move);
-				}
-			}*/
 		}
 		
 		return evals;
