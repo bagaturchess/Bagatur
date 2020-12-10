@@ -195,15 +195,9 @@ public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
 			moves[i] = movesInteger[i];
 		}
 		
-		boolean hasForcedWin = false;
 		status = bitboard.getStatus();
 		if (status != IGameStatus.NONE) {
 			eval_ofOriginatePlayer = DUMMY_EVAL;
-		} else {
-			hasForcedWin = false;//fcf.hasFastWin();
-			if (hasForcedWin) {
-				int g = 0;
-			}
 		}
 		
 		//Revert game
@@ -212,10 +206,6 @@ public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
 		}
 		
 		if (status != IGameStatus.NONE) {
-			return;
-		} else if (hasForcedWin) {
-			eval_ofOriginatePlayer = DUMMY_EVAL;
-			status = IGameStatus.UNDEFINED;
 			return;
 		}
 		
