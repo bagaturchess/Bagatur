@@ -75,31 +75,10 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		double deltaP = expectedWhitePlayerEval - actualWhitePlayerEval;
 		//double deltaP = actualWhitePlayerEval - expectedWhitePlayerEval;
 		
-		for (int i=0; i<featuresArr.length; i++) {
-			ISignal cur_signal = signals.getSignal(featuresArr[i].getId());
-			
-			if (deltaP != 0) {
-				//if (cur_signal instanceof SingleSignal) {
-					((IAdjustableFeature)featuresArr[i]).adjust(cur_signal, deltaP > 0 ? 1 : -1, openingPart);
-				/*} else if (cur_signal instanceof SignalArray) {
-					SignalArray signalarray = (SignalArray)cur_signal;
-					
-					int count = signalarray.getSubsignalsCount();
-					int[] ids = signalarray.getSubIDs();
-					double[] strengths = signalarray.getSubsignals();
-					
-					for(int s=0; s<count; s++) {
-						
-						int id = ids[s];
-						
-						if (cur_signal.getStrength() > 0) {
-							featuresArr[i].adjust(cur_signal, deltaP > 0 ? 1 : -1, openingPart);
-						} else if (cur_signal.getStrength() < 0) {
-							featuresArr[i].adjust(cur_signal, deltaP > 0 ? -1 : 1, openingPart);
-						}
-					}
-				}*/
-
+		if (deltaP != 0) {
+			for (int i=0; i<featuresArr.length; i++) {
+				ISignal cur_signal = signals.getSignal(featuresArr[i].getId());
+				((IAdjustableFeature)featuresArr[i]).adjust(cur_signal, deltaP > 0 ? 1 : -1, openingPart);
 			}
 		}
 	}
