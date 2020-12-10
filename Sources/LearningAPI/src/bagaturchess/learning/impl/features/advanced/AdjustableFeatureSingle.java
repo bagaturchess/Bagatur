@@ -73,6 +73,10 @@ public class AdjustableFeatureSingle extends AdjustableFeature {
 			openingPart = 1;
 		}
 		
+		if (signal.getStrength() < 0) {
+			amount = -amount;
+		}
+		
 		adjust(amount, openingPart);
 	}
 	

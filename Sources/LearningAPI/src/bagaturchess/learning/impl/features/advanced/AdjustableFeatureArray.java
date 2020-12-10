@@ -96,10 +96,10 @@ public class AdjustableFeatureArray extends AdjustableFeature {
 			if (strengths[i] != 0) {
 				
 				if (strengths[i] < 0) {
-					amount = -amount;
+					adjust(id, -amount, openningPart);
+				} else {
+					adjust(id, amount, openningPart);
 				}
-				
-				adjust(id, amount, openningPart);
 			}
 		}
 	}

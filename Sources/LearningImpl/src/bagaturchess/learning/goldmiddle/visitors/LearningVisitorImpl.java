@@ -95,9 +95,6 @@ public class LearningVisitorImpl implements PositionsVisitor {
 					ISignal cur_signal = signals.getSignal(featureID);
 					if (cur_signal.getStrength() != 0) {
 						double adjustment = deltaP > 0 ? 1 : -1;
-						if (cur_signal.getStrength() < 0) {
-							adjustment *= -1;
-						}
 						((IAdjustableFeature)featuresArr[i]).adjust(cur_signal, adjustment, openingPart);
 					}
 				}
