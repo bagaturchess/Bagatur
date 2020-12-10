@@ -91,9 +91,9 @@ public class AdjustableFeatureSingle extends AdjustableFeature {
 	
 	private void adjust(double amount, double openningPart) {
 		if (openningPart >= 0.5 ) {
-			openning.adjust(amount * openningPart);
+			openning.adjust(amount);
 		} else {
-			endgame.adjust(amount * (1 - openningPart));
+			endgame.adjust(amount);
 		}
 	}
 	
