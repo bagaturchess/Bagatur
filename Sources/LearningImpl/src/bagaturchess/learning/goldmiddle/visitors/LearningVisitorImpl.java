@@ -62,8 +62,21 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	
 	private long startTime;
 	
+	private FeaturesFilter filter;
+	
 	
 	public LearningVisitorImpl() throws Exception {
+		this(new FeaturesFilter() {
+			@Override
+			public boolean isAdjustable(int featureID) {
+				return true;
+			}
+		});
+	}
+	
+	
+	public LearningVisitorImpl(FeaturesFilter _filter) throws Exception {
+		filter = _filter;
 	}
 	
 	
@@ -77,8 +90,11 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		
 		if (deltaP != 0) {
 			for (int i=0; i<featuresArr.length; i++) {
-				ISignal cur_signal = signals.getSignal(featuresArr[i].getId());
-				((IAdjustableFeature)featuresArr[i]).adjust(cur_signal, deltaP > 0 ? 1 : -1, openingPart);
+				int featureID = featuresArr[i].getId();
+				if (filter.isAdjustable(featureID)) {
+					ISignal cur_signal = signals.getSignal(featureID);
+					((IAdjustableFeature)featuresArr[i]).adjust(cur_signal, deltaP > 0 ? 1 : -1, openingPart);
+				}
 			}
 		}
 	}
@@ -174,5 +190,10 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		}
 		
 		if (PERSISTENT) features.store();
+	}
+	
+	
+	public static interface FeaturesFilter {
+		public boolean isAdjustable(int featureID);
 	}
 }
