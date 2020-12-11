@@ -91,7 +91,7 @@ public class BoardImpl implements IBitBoard {
 		
 		chessBoard = ChessBoardUtil.getNewCB(fen);
 		
-		hasMovesList = new BaseMoveList();
+		hasMovesList = new BaseMoveList(250);
 	}
 	
 	

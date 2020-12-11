@@ -83,6 +83,8 @@ public class GamesPlayer {
 			if (gamesCounter % 100 == 0) {
 				System.out.println("Count of played games is " + gamesCounter + ", evaluated positions are " + evaluatedPositionsCounter + ", Success is " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 				learning.endEpoch();
+				sumDiffs1 = 0;
+				sumDiffs2 = 0;
 			}
 		}
 	}

@@ -57,7 +57,7 @@ public class NeuralNetworkUtils_AllFeatures {
 		
         mlp.setLearningRule(new BackPropagation());
         
-        mlp.getLearningRule().setLearningRate(0.0000001);
+        mlp.getLearningRule().setLearningRate(0.00000001);
         //mlp.getLearningRule().setLearningRate(0.0000001);
         
         return mlp;
