@@ -303,6 +303,25 @@ public class Utils {
 	  	return arr;
 	  }
   
+	public static void bubbleSort(int from, int to, long[] moves) {
+		
+		for (int i = from; i < to; i++) {
+			boolean change = false;
+			for (int j= i + 1; j < to; j++) {
+				long i_move = moves[i];
+				long j_move = moves[j];
+				if (j_move > i_move) {
+					moves[i] = j_move;
+					moves[j] = i_move;
+					change = true;
+				}
+			}
+			if (!change) {
+				return;
+			}
+		}
+	}
+	
 	public static void bubbleSort(int[] arr1_sortby, int[] arr2, int size) {
 		
 		//int size = arr1_sortby.length;

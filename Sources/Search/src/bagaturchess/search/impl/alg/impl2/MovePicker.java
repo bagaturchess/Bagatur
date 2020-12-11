@@ -24,7 +24,6 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
-import bagaturchess.search.impl.utils.Sorting;
 
 
 /*
@@ -164,7 +163,7 @@ public class MovePicker implements IMoveList {
 			      }
 			      
 			      Utils.randomize(moves_capture_promotion_good, cur_capture_promotion_good, max_capture_promotion_good);
-				  Sorting.bubbleSort(cur_capture_promotion_good, max_capture_promotion_good, moves_capture_promotion_good);
+				  Utils.bubbleSort(cur_capture_promotion_good, max_capture_promotion_good, moves_capture_promotion_good);
 				  
 			      ++stage;
 			      //break top;
@@ -209,7 +208,7 @@ public class MovePicker implements IMoveList {
 			      }
 			      
 			      Utils.randomize(moves_quiet, cur_quiet, max_quiet);
-				  Sorting.bubbleSort(cur_quiet, max_quiet, moves_quiet);
+			      Utils.bubbleSort(cur_quiet, max_quiet, moves_quiet);
 				  
 			      ++stage;
 				
@@ -222,7 +221,7 @@ public class MovePicker implements IMoveList {
 				  }
 				  
 			      Utils.randomize(moves_capture_promotion_bad, cur_capture_promotion_bad, max_capture_promotion_bad);
-				  Sorting.bubbleSort(cur_capture_promotion_bad, max_capture_promotion_bad, moves_capture_promotion_bad);
+			      Utils.bubbleSort(cur_capture_promotion_bad, max_capture_promotion_bad, moves_capture_promotion_bad);
 				  
 			      ++stage;
 	

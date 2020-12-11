@@ -29,7 +29,6 @@ import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.utils.Sorting;
 
 
 public class ListAll_Root implements ISearchMoveList {
@@ -79,7 +78,7 @@ public class ListAll_Root implements ISearchMoveList {
 			}
 			
 			if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(moves, cur, size);
-			if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(cur, size, moves);
+			if (env.getSearchConfig().sortMoveLists()) Utils.bubbleSort(cur, size, moves);
 		}
 		
 		if (cur < size) {

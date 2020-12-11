@@ -27,7 +27,6 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.utils.Sorting;
 
 
 public class ListKingEscapes implements ISearchMoveList {
@@ -99,7 +98,7 @@ public class ListKingEscapes implements ISearchMoveList {
 		if (cur < escapes_size) {
 			if (cur == 1) {
 				if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(escapes, 1, escapes_size);
-				if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(1, escapes_size, escapes);
+				if (env.getSearchConfig().sortMoveLists()) Utils.bubbleSort(1, escapes_size, escapes);
 			}
 			return (int) escapes[cur++];
 		} else {

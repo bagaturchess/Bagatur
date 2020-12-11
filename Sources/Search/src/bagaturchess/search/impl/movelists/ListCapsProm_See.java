@@ -27,7 +27,6 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.utils.Sorting;
 
 
 public class ListCapsProm_See implements ISearchMoveList {
@@ -94,7 +93,7 @@ public class ListCapsProm_See implements ISearchMoveList {
 		if (cur < caps_size) {
 			if (cur == 1) {
 				if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(caps, 1, caps_size);
-				if (env.getSearchConfig().sortMoveLists()) Sorting.bubbleSort(1, caps_size, caps);
+				if (env.getSearchConfig().sortMoveLists()) Utils.bubbleSort(1, caps_size, caps);
 			}
 			return (int) caps[cur++];
 		} else {
