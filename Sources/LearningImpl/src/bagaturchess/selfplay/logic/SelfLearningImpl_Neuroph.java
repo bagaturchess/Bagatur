@@ -29,17 +29,13 @@ import bagaturchess.deeplearning.impl4_v20.NeuralNetworkUtils_AllFeatures;
 
 
 public class SelfLearningImpl_Neuroph implements ISelfLearning {
-
-
-	private IBitBoard bitboard;
 	
 	private MultiLayerPerceptron network;
 	
 	private double[] inputs;
 	
 	
-	public SelfLearningImpl_Neuroph(IBitBoard _bitboard, double[] _inputs, MultiLayerPerceptron _network) {
-		bitboard = _bitboard;
+	public SelfLearningImpl_Neuroph(double[] _inputs, MultiLayerPerceptron _network) {
 		inputs = _inputs;
 		network = _network;
 	}
@@ -52,7 +48,7 @@ public class SelfLearningImpl_Neuroph implements ISelfLearning {
 	    network.getLearningRule().doLearningEpoch(trainingSet);
 	}
 	
-
+	
 	@Override
 	public void endEpoch() {
 		network.save("net.bin");
