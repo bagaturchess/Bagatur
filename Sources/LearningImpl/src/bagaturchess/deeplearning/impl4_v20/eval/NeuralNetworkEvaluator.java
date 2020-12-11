@@ -25,12 +25,17 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	
 	NeuralNetworkEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
+		this(_bitboard, _evalCache, _evalConfig, (MultiLayerPerceptron) NeuralNetwork.createFromFile("net.bin"));
+	}
+	
+	
+	public NeuralNetworkEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig, MultiLayerPerceptron _network) {
 		
 		super(_bitboard, _evalCache, _evalConfig);
 		
 		bitboard = _bitboard;
 		
-		network = (MultiLayerPerceptron) NeuralNetwork.createFromFile("net.bin");
+		network = _network;
 		
 		filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
 		inputs = new double[NeuralNetworkUtils_AllFeatures.getInputsSize()];

@@ -17,7 +17,8 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.selfplay;
+package bagaturchess.selfplay.logic;
+
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.learning.api.IAdjustableFeature;
@@ -25,6 +26,7 @@ import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.impl.features.baseimpl.Features;
+
 
 public class SelfLearningImpl_Own implements ISelfLearning {
 
