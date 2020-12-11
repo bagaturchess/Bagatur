@@ -59,8 +59,6 @@ public class SelfPlayRunner_Neuroph {
 			
 			NeuralNetworkEvaluator evaluator = new NeuralNetworkEvaluator(bitboard, null, null, network);
 			
-			//Bagatur_ALL_SignalFiller_InArray filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
-			
 			ISelfLearning learning = new SelfLearningImpl_Neuroph(evaluator.getInputs(), network);
 			
 			UCIEnginesManager runner = createEngineManager();
