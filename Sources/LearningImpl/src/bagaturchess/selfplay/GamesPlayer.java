@@ -20,18 +20,26 @@
 package bagaturchess.selfplay;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.common.Utils;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.SEEUtil;
+import bagaturchess.learning.api.IAdjustableFeature;
+import bagaturchess.learning.api.ISignal;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.uci.engine.UCIEnginesManager;
+import bagaturchess.uci.engine.EngineProcess.LineCallBack;
+import bagaturchess.ucitracker.impl.gamemodel.EvaluatedMove;
 
 
 public class GamesPlayer {
@@ -49,15 +57,22 @@ public class GamesPlayer {
 	
 	private UCIEnginesManager runner;
 	
+	private double sumDiffs1;
+	private double sumDiffs2;
 	
-	public GamesPlayer(IBitBoard _bitboard, IEvaluator _evaluator, UCIEnginesManager _runner) {
+	private ISelfLearning learning;
+	
+	
+	public GamesPlayer(IBitBoard _bitboard, IEvaluator _evaluator, UCIEnginesManager _runner, ISelfLearning _learning) throws IOException {
+		
 		bitboard = _bitboard;
 		evaluator = _evaluator;
 		runner = _runner;
+		learning = _learning;
 	}
 
 
-	public void playGames() {
+	public void playGames() throws IOException {
 		
 		while (true) {
 			
@@ -65,24 +80,61 @@ public class GamesPlayer {
 			
 			gamesCounter++;
 			
-			if (gamesCounter % 1000 == 0) {
-				System.out.println("Count of played games is " + gamesCounter + ", evaluated positions are " + evaluatedPositionsCounter);
+			if (gamesCounter % 100 == 0) {
+				System.out.println("Count of played games is " + gamesCounter + ", evaluated positions are " + evaluatedPositionsCounter + ", Success is " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
+				learning.endEpoch();
 			}
 		}
 	}
 	
 	
-	private void playGame() {
+	private void playGame() throws IOException {
 		
 		movesList.clear();
 		while (bitboard.getStatus().equals(IGameStatus.NONE)) {
+			
+			runner.newGame();
+			String allMovesStr = BoardUtils.getPlayedMoves(bitboard);
+			List<String> engineMultiPVs = getMultiPVs(allMovesStr);
+			for (String infoLine: engineMultiPVs) {
+				EvaluatedMove em = new EvaluatedMove(bitboard, infoLine);
+				if (em.getStatus() == IGameStatus.NONE) {
+					
+					int root_colour = bitboard.getColourToMove();
+					
+					//Setup position
+					int[] pv_moves = em.getMoves();
+					int eval_sign = 1;
+					for (int i=0; i <= pv_moves.length - 1; i++) {
+						bitboard.makeMoveForward(pv_moves[i]);
+						eval_sign *= -1;
+					}
+					int our_eval = (int) (eval_sign * evaluator.fullEval(0, 0, 0, 0));
+					
+					//Do the adjustments
+					int engine_eval = em.eval_ofOriginatePlayer();
+					double actualWhitePlayerEval = root_colour == Constants.COLOUR_WHITE ? our_eval : -our_eval;
+					double expectedWhitePlayerEval = root_colour == Constants.COLOUR_WHITE ? engine_eval : -engine_eval;
+					
+					sumDiffs1 += Math.abs(0 - expectedWhitePlayerEval);
+					sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval);
+					
+					double deltaValueFromWhitePlayerPerspective = expectedWhitePlayerEval - actualWhitePlayerEval;
+					
+					learning.addCase(deltaValueFromWhitePlayerPerspective);
+					evaluatedPositionsCounter++;
+					
+					//Revert position
+					for (int i=pv_moves.length - 1; i >= 0; i--) {
+						bitboard.makeMoveBackward(pv_moves[i]);
+					}
+				}
+			}
+			
 			int best_move = getBestMove();
+			
 			bitboard.makeMoveForward(best_move);
 			movesList.add(best_move);
-			
-			if (bitboard.getStatus().equals(IGameStatus.NONE)) {
-				
-			}		
 		}
 		
 		//System.out.println(bitboard.toEPD() + " " + bitboard.getStatus());
@@ -92,8 +144,8 @@ public class GamesPlayer {
 			bitboard.makeMoveBackward(movesList.get(i));
 		}
 	}
-	
-	
+
+
 	private int getBestMove() {
 		
 		movesBuffer.clear();
@@ -136,7 +188,6 @@ public class GamesPlayer {
 			int cur_eval = getGameTerminationScore();
 			if (cur_eval == -1) {
 				cur_eval = (int) -evaluator.fullEval(0, 0, 0, 0);
-				evaluatedPositionsCounter++;
 			}
 			
 			bitboard.makeMoveBackward(cur_move);
@@ -182,5 +233,89 @@ public class GamesPlayer {
 		}
 		
 		return -1;
+	}
+	
+	
+	private List<String> getMultiPVs(String allMovesStr) throws IOException {
+		
+		int depth = 1;
+		
+		String info = null;
+		List<String> infos = null;
+				
+		boolean loop = true;
+		while (loop) {
+			
+			runner.setupPosition("startpos moves " + allMovesStr);
+			runner.disable();
+
+			runner.go_Depth(depth);
+			
+			infos = runner.getInfoLines(new LineCallBack() {
+					
+					
+					private List<String> lines = new ArrayList<String>();
+					private String exitLines = null; 
+					
+					
+					@Override
+					public void newLine(String line) {
+						
+						//System.out.println("EngineProcess: getInfoLine new line is: '" + line + "'");
+						
+						if (line.contains("LOG")) {
+							return;
+						}
+						
+						lines.add(line);
+						
+						if (line.contains("bestmove")) {
+							for (int i=lines.size() - 1; i >=0; i--) {
+								//System.out.println("EngineProcess: getInfoLine " + lines.get(i));
+								if (lines.get(i).contains("info "/*depth"*/) && lines.get(i).contains(" pv ")) {
+									if (exitLines == null) {
+										exitLines = lines.get(i) + ";";
+									} else {
+										exitLines += lines.get(i) + ";";
+									}	
+								}
+							}
+							if (exitLines == null) {
+								//throw new IllegalStateException("No pv: " + lines);
+							}
+						}
+					}
+					
+					
+					@Override
+					public String exitLine() {
+						return exitLines;
+					}
+				});
+				
+			if (infos != null && infos.size() > 1) {
+				throw new IllegalStateException("Only one engine is supported");
+			}
+			
+			if (infos == null || infos.size() == 0 || infos.get(0) == null) {
+				depth++;
+				System.out.println("depth = " + depth);
+				if (depth > 5) {
+					throw new IllegalStateException("depth >  " + 5 + " and no PV info");
+				}
+			} else {
+				info = infos.get(0);
+				loop = false;
+			}
+		}
+		runner.enable();
+		
+		List<String> result = new ArrayList<String>();
+		StringTokenizer st = new StringTokenizer(info, ";");
+		while (st.hasMoreTokens()) {
+			result.add(st.nextToken());
+		}
+		
+		return result;
 	}
 }

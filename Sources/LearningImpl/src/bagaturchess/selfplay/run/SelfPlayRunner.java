@@ -20,6 +20,10 @@
 package bagaturchess.selfplay.run;
 
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.learning.api.ISignalFiller;
@@ -31,12 +35,17 @@ import bagaturchess.learning.impl.features.advanced.FeaturesMerger;
 import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.selfplay.GamesPlayer;
+import bagaturchess.selfplay.ISelfLearning;
+import bagaturchess.selfplay.SelfLearningImpl_Own;
+import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.UCIEnginesManager;
+import bagaturchess.uci.impl.Channel_Console;
 
 
 public class SelfPlayRunner {
-
+	
+	
 	public static void main(String[] args) {
 		
 		try {
@@ -51,17 +60,40 @@ public class SelfPlayRunner {
 			
 			IEvaluator evaluator = new FeaturesEvaluator(bitboard, null, filler, features, signals);
 			
-			UCIEnginesManager runner = new UCIEnginesManager();
-			EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\stockfish-NNUE\\sf-nnue-bmi2.exe",
-					new String [0],
-					"C:\\DATA\\Engines\\stockfish-NNUE");
-			runner.addEngine(engine);
+			UCIEnginesManager runner = createEngineManager();
 			
-			GamesPlayer player = new GamesPlayer(bitboard, evaluator, runner);
+			ISelfLearning learning = new SelfLearningImpl_Own(bitboard, features, signals);
+			
+			GamesPlayer player = new GamesPlayer(bitboard, evaluator, runner, learning);
+			
 			player.playGames();
+			
+			runner.destroyEngines();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	
+	private static UCIEnginesManager createEngineManager() throws IOException {
+		
+		ChannelManager.setChannel(new Channel_Console());
+		
+		UCIEnginesManager runner = new UCIEnginesManager();
+		EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\stockfish-NNUE\\sf-nnue-bmi2.exe",
+				new String [0],
+				"C:\\DATA\\Engines\\stockfish-NNUE");
+		runner.addEngine(engine);
+		
+		//Setup engine
+		runner.startEngines();
+		runner.uciOK();
+		List<String> options = new ArrayList<String>();
+		options.add("setoption name MultiPV value 500");
+		runner.setOptions(options);
+		runner.isReady();
+		
+		return runner;
 	}
 }
