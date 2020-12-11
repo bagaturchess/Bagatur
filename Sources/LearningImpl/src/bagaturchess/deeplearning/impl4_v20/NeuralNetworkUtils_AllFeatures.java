@@ -20,11 +20,16 @@
 package bagaturchess.deeplearning.impl4_v20;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
+import org.neuroph.core.input.WeightedSum;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
+import org.neuroph.nnet.learning.ManhattanPropagation;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
+import org.neuroph.util.NeuronProperties;
 import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.random.WeightsRandomizer;
 
@@ -48,16 +53,27 @@ public class NeuralNetworkUtils_AllFeatures {
 	
 	public static MultiLayerPerceptron buildNetwork() {
 		
-		MultiLayerPerceptron mlp = new MultiLayerPerceptron(TransferFunctionType.LINEAR,
-				getInputsSize(),
-				//33,
-				//11,
-				1);
+        // init neuron settings
+        NeuronProperties neuronProperties = new NeuronProperties();
+        neuronProperties.setProperty("useBias", false);
+        neuronProperties.setProperty("transferFunction", TransferFunctionType.LINEAR);
+        neuronProperties.setProperty("inputFunction", WeightedSum.class);
+
+        int[] neuronsInLayers = new int[] {getInputsSize(), 1};
+        List<Integer> neuronsInLayersVector = new ArrayList<Integer>();
+        for (int i = 0; i < neuronsInLayers.length; i++) {
+            neuronsInLayersVector.add(Integer.valueOf(neuronsInLayers[i]));
+        }
+        
+		MultiLayerPerceptron mlp = new MultiLayerPerceptron(neuronsInLayersVector, neuronProperties);
+		
 		mlp.randomizeWeights(new WeightsRandomizer(new Random(777)));
 		
-        mlp.setLearningRule(new BackPropagation());
-        
-        mlp.getLearningRule().setLearningRate(0.0000000001);
+		BackPropagation backprop = new BackPropagation();
+		//backprop.setBatchMode(true);
+		backprop.setLearningRate(0.00000001);
+		
+		mlp.setLearningRule(backprop);
         
         return mlp;
 	}

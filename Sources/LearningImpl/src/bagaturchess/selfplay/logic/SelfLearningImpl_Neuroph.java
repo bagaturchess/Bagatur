@@ -35,14 +35,14 @@ public class SelfLearningImpl_Neuroph implements ISelfLearning {
 	private double[] inputs;
 	
 	private long counter;
-	private int batchSize = 100000;
-	private DataSet trainingSetBatch;
+	private int batchSize = 1;
+	private DataSet trainingSet;
 	
 	
 	public SelfLearningImpl_Neuroph(double[] _inputs, MultiLayerPerceptron _network) {
 		inputs = _inputs;
 		network = _network;
-		trainingSetBatch = new DataSet(NeuralNetworkUtils_AllFeatures.getInputsSize(), 1);
+		trainingSet = new DataSet(NeuralNetworkUtils_AllFeatures.getInputsSize(), 1);
 	}
 	
 	
@@ -51,11 +51,11 @@ public class SelfLearningImpl_Neuroph implements ISelfLearning {
 		
 		counter++;
 		
-		trainingSetBatch.addRow(new DataSetRow(createCopy(inputs), new double[]{expectedWhitePlayerEval}));
+		trainingSet.addRow(new DataSetRow(createCopy(inputs), new double[]{expectedWhitePlayerEval}));
 		
 		if (counter % batchSize == 0) {
-		    network.getLearningRule().doLearningEpoch(trainingSetBatch);
-			trainingSetBatch.clear();
+		    network.getLearningRule().doLearningEpoch(trainingSet);
+			trainingSet.clear();
 		}
 	}
 
