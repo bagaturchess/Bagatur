@@ -24,11 +24,11 @@ import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 import org.neuroph.nnet.MultiLayerPerceptron;
 
-import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.impl4_v20.NeuralNetworkUtils_AllFeatures;
 
 
 public class SelfLearningImpl_Neuroph implements ISelfLearning {
+	
 	
 	private MultiLayerPerceptron network;
 	
@@ -40,7 +40,7 @@ public class SelfLearningImpl_Neuroph implements ISelfLearning {
 		network = _network;
 	}
 	
-
+	
 	@Override
 	public void addCase(double expectedWhitePlayerEval, double actualWhitePlayerEval) {
 		DataSet trainingSet = new DataSet(NeuralNetworkUtils_AllFeatures.getInputsSize(), 1);
