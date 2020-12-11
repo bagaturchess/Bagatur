@@ -68,8 +68,8 @@ public class GamesPlayer {
 		runner = _runner;
 		learning = _learning;
 	}
-
-
+	
+	
 	public void playGames() throws IOException {
 		
 		while (true) {
@@ -143,8 +143,8 @@ public class GamesPlayer {
 			bitboard.makeMoveBackward(movesList.get(i));
 		}
 	}
-
-
+	
+	
 	private int getBestMove() {
 		
 		movesBuffer.clear();
