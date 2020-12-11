@@ -42,6 +42,11 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	}
 	
 	
+	public double[] getInputs() {
+		return inputs;
+	}
+	
+	
 	@Override
 	protected double phase1() {
 		

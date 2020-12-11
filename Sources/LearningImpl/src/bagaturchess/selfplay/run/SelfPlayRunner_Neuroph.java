@@ -32,8 +32,6 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
 import bagaturchess.deeplearning.impl4_v20.NeuralNetworkUtils_AllFeatures;
 import bagaturchess.deeplearning.impl4_v20.eval.NeuralNetworkEvaluator;
-import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_ALL_SignalFiller_InArray;
-import bagaturchess.search.api.IEvaluator;
 import bagaturchess.selfplay.logic.GamesPlayer;
 import bagaturchess.selfplay.logic.ISelfLearning;
 import bagaturchess.selfplay.logic.SelfLearningImpl_Neuroph;
@@ -59,11 +57,11 @@ public class SelfPlayRunner_Neuroph {
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache();
 			
-			IEvaluator evaluator = new NeuralNetworkEvaluator(bitboard, null, null, network);
+			NeuralNetworkEvaluator evaluator = new NeuralNetworkEvaluator(bitboard, null, null, network);
 			
-			Bagatur_ALL_SignalFiller_InArray filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
+			//Bagatur_ALL_SignalFiller_InArray filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
 			
-			ISelfLearning learning = new SelfLearningImpl_Neuroph(bitboard, filler, network);
+			ISelfLearning learning = new SelfLearningImpl_Neuroph(bitboard, evaluator.getInputs(), network);
 			
 			UCIEnginesManager runner = createEngineManager();
 			

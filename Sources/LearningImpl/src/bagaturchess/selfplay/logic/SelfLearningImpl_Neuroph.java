@@ -20,11 +20,12 @@
 package bagaturchess.selfplay.logic;
 
 
+import org.neuroph.core.data.DataSet;
+import org.neuroph.core.data.DataSetRow;
 import org.neuroph.nnet.MultiLayerPerceptron;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.impl4_v20.NeuralNetworkUtils_AllFeatures;
-import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_ALL_SignalFiller_InArray;
 
 
 public class SelfLearningImpl_Neuroph implements ISelfLearning {
@@ -32,24 +33,23 @@ public class SelfLearningImpl_Neuroph implements ISelfLearning {
 
 	private IBitBoard bitboard;
 	
-	private Bagatur_ALL_SignalFiller_InArray filler;
 	private MultiLayerPerceptron network;
 	
-	private double[] inputs = new double[NeuralNetworkUtils_AllFeatures.getInputsSize()];
+	private double[] inputs;
 	
 	
-	public SelfLearningImpl_Neuroph(IBitBoard _bitboard, Bagatur_ALL_SignalFiller_InArray _filler, MultiLayerPerceptron _network) {
+	public SelfLearningImpl_Neuroph(IBitBoard _bitboard, double[] _inputs, MultiLayerPerceptron _network) {
 		bitboard = _bitboard;
-		filler = _filler;
+		inputs = _inputs;
 		network = _network;
 	}
 	
 
 	@Override
-	public void addCase(double deltaValueFromWhitePlayerPerspective) {
-		if (deltaValueFromWhitePlayerPerspective != 0) {
-			
-		}
+	public void addCase(double expectedWhitePlayerEval, double actualWhitePlayerEval) {
+		DataSet trainingSet = new DataSet(NeuralNetworkUtils_AllFeatures.getInputsSize(), 1);
+	    trainingSet.addRow(new DataSetRow(inputs, new double[]{expectedWhitePlayerEval}));
+	    network.getLearningRule().doLearningEpoch(trainingSet);
 	}
 	
 

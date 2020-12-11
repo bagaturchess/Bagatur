@@ -118,9 +118,7 @@ public class GamesPlayer {
 					sumDiffs1 += Math.abs(0 - expectedWhitePlayerEval);
 					sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval);
 					
-					double deltaValueFromWhitePlayerPerspective = expectedWhitePlayerEval - actualWhitePlayerEval;
-					
-					learning.addCase(deltaValueFromWhitePlayerPerspective);
+					learning.addCase(expectedWhitePlayerEval, actualWhitePlayerEval);
 					evaluatedPositionsCounter++;
 					
 					//Revert position

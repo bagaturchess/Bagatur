@@ -44,7 +44,8 @@ public class SelfLearningImpl_Own implements ISelfLearning {
 	
 
 	@Override
-	public void addCase(double deltaValueFromWhitePlayerPerspective) {
+	public void addCase(double expectedWhitePlayerEval, double actualWhitePlayerEval) {
+		double deltaValueFromWhitePlayerPerspective = expectedWhitePlayerEval - actualWhitePlayerEval;
 		if (deltaValueFromWhitePlayerPerspective != 0) {
 			for (int i=0; i<features.getFeatures().length; i++) {
 				int featureID = features.getFeatures()[i].getId();

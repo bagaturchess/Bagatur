@@ -23,6 +23,7 @@ package bagaturchess.deeplearning.impl4_v20;
 import java.util.Random;
 
 import org.neuroph.nnet.MultiLayerPerceptron;
+import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.random.WeightsRandomizer;
@@ -54,7 +55,7 @@ public class NeuralNetworkUtils_AllFeatures {
 				1);
 		mlp.randomizeWeights(new WeightsRandomizer(new Random(777)));
 		
-        mlp.setLearningRule(new MomentumBackpropagation());
+        mlp.setLearningRule(new BackPropagation());
         
         mlp.getLearningRule().setLearningRate(0.0000001);
         //mlp.getLearningRule().setLearningRate(0.0000001);

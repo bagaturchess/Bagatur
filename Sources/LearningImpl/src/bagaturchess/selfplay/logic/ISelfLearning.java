@@ -21,6 +21,6 @@ package bagaturchess.selfplay.logic;
 
 
 public interface ISelfLearning {
-	public void addCase(double deltaValueFromWhitePlayerPerspective);
+	public void addCase(double expectedWhitePlayerEval, double actualWhitePlayerEval);
 	public void endEpoch();
 }
