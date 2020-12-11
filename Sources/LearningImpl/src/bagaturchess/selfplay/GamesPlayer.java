@@ -34,8 +34,6 @@ import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.SEEUtil;
-import bagaturchess.learning.api.IAdjustableFeature;
-import bagaturchess.learning.api.ISignal;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.uci.engine.UCIEnginesManager;
 import bagaturchess.uci.engine.EngineProcess.LineCallBack;
@@ -76,6 +74,8 @@ public class GamesPlayer {
 		
 		while (true) {
 			
+			runner.newGame();
+			
 			playGame();
 			
 			gamesCounter++;
@@ -93,7 +93,6 @@ public class GamesPlayer {
 		movesList.clear();
 		while (bitboard.getStatus().equals(IGameStatus.NONE)) {
 			
-			runner.newGame();
 			String allMovesStr = BoardUtils.getPlayedMoves(bitboard);
 			List<String> engineMultiPVs = getMultiPVs(allMovesStr);
 			for (String infoLine: engineMultiPVs) {
@@ -281,7 +280,8 @@ public class GamesPlayer {
 								}
 							}
 							if (exitLines == null) {
-								//throw new IllegalStateException("No pv: " + lines);
+								//System.out.println("No pv: " + lines);
+								throw new IllegalStateException("No pv: " + lines);
 							}
 						}
 					}
@@ -292,7 +292,7 @@ public class GamesPlayer {
 						return exitLines;
 					}
 				});
-				
+			
 			if (infos != null && infos.size() > 1) {
 				throw new IllegalStateException("Only one engine is supported");
 			}
@@ -304,6 +304,7 @@ public class GamesPlayer {
 					throw new IllegalStateException("depth >  " + 5 + " and no PV info");
 				}
 			} else {
+				
 				info = infos.get(0);
 				loop = false;
 			}
