@@ -31,6 +31,7 @@ import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.search.api.IEvaluator;
+import bagaturchess.uci.engine.UCIEnginesManager;
 
 
 public class GamesPlayer {
@@ -44,14 +45,20 @@ public class GamesPlayer {
 	private List<Integer> movesList = new ArrayList<Integer>();
 	
 	private long gamesCounter;
+	private long evaluatedPositionsCounter;
+	
+	private UCIEnginesManager runner;
 	
 	
-	public GamesPlayer(IBitBoard _bitboard, IEvaluator _evaluator) {
+	public GamesPlayer(IBitBoard _bitboard, IEvaluator _evaluator, UCIEnginesManager _runner) {
 		bitboard = _bitboard;
 		evaluator = _evaluator;
+		runner = _runner;
 	}
-	
+
+
 	public void playGames() {
+		
 		while (true) {
 			
 			playGame();
@@ -59,7 +66,7 @@ public class GamesPlayer {
 			gamesCounter++;
 			
 			if (gamesCounter % 1000 == 0) {
-				System.out.println("Count of played games is " + gamesCounter);
+				System.out.println("Count of played games is " + gamesCounter + ", evaluated positions are " + evaluatedPositionsCounter);
 			}
 		}
 	}
@@ -72,6 +79,10 @@ public class GamesPlayer {
 			int best_move = getBestMove();
 			bitboard.makeMoveForward(best_move);
 			movesList.add(best_move);
+			
+			if (bitboard.getStatus().equals(IGameStatus.NONE)) {
+				
+			}		
 		}
 		
 		//System.out.println(bitboard.toEPD() + " " + bitboard.getStatus());
@@ -125,6 +136,7 @@ public class GamesPlayer {
 			int cur_eval = getGameTerminationScore();
 			if (cur_eval == -1) {
 				cur_eval = (int) -evaluator.fullEval(0, 0, 0, 0);
+				evaluatedPositionsCounter++;
 			}
 			
 			bitboard.makeMoveBackward(cur_move);

@@ -31,6 +31,8 @@ import bagaturchess.learning.impl.features.advanced.FeaturesMerger;
 import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.selfplay.GamesPlayer;
+import bagaturchess.uci.engine.EngineProcess;
+import bagaturchess.uci.engine.UCIEnginesManager;
 
 
 public class SelfPlayRunner {
@@ -49,7 +51,13 @@ public class SelfPlayRunner {
 			
 			IEvaluator evaluator = new FeaturesEvaluator(bitboard, null, filler, features, signals);
 			
-			GamesPlayer player = new GamesPlayer(bitboard, evaluator);
+			UCIEnginesManager runner = new UCIEnginesManager();
+			EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\stockfish-NNUE\\sf-nnue-bmi2.exe",
+					new String [0],
+					"C:\\DATA\\Engines\\stockfish-NNUE");
+			runner.addEngine(engine);
+			
+			GamesPlayer player = new GamesPlayer(bitboard, evaluator, runner);
 			player.playGames();
 			
 		} catch (Exception e) {
