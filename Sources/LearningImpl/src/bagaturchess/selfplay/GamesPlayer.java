@@ -28,6 +28,8 @@ import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
+import bagaturchess.bitboard.impl1.BoardImpl;
+import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.search.api.IEvaluator;
 
 
@@ -41,6 +43,8 @@ public class GamesPlayer {
 	private int[] seeBuffer = new int[250];
 	private List<Integer> movesList = new ArrayList<Integer>();
 	
+	private long gamesCounter;
+	
 	
 	public GamesPlayer(IBitBoard _bitboard, IEvaluator _evaluator) {
 		bitboard = _bitboard;
@@ -49,7 +53,14 @@ public class GamesPlayer {
 	
 	public void playGames() {
 		while (true) {
+			
 			playGame();
+			
+			gamesCounter++;
+			
+			if (gamesCounter % 1000 == 0) {
+				System.out.println("Count of played games is " + gamesCounter);
+			}
 		}
 	}
 	
@@ -63,7 +74,7 @@ public class GamesPlayer {
 			movesList.add(best_move);
 		}
 		
-		System.out.println(bitboard.toEPD() + " " + bitboard.getStatus());
+		//System.out.println(bitboard.toEPD() + " " + bitboard.getStatus());
 		
 		//Revert board to the initial position
 		for (int i = movesList.size() - 1; i >= 0; i--) {
@@ -86,9 +97,13 @@ public class GamesPlayer {
 		int[] moves = movesBuffer.reserved_getMovesBuffer();
 		Utils.randomize(moves, 0, moves_size);
 		
-		//Sort by SEE
+		//Sort by SEE and return best forced move if any
 		for (int i = 0; i<moves_size; i++) {
-			int see = bitboard.getSee().evalExchange(moves[i]);
+			seeBuffer[i] = SEEUtil.getSeeCaptureScore(((BoardImpl)bitboard).getChessBoard(), moves[i]);
+		}
+		Utils.bubbleSort(seeBuffer, moves, moves_size);
+		if (moves_size >= 1 && seeBuffer[0] > 0) {
+			return moves[0];
 		}
 		
 		//Iterate moves and find best one
@@ -98,9 +113,16 @@ public class GamesPlayer {
 		int cur_move = 0;
 		while ((cur_move = movesBuffer.next()) != 0) {
 			
+			//Skip bad moves, which loose material
+			int moveSee = SEEUtil.getSeeCaptureScore(((BoardImpl)bitboard).getChessBoard(), cur_move);
+			if (best_move != 0 && moveSee < 0) {
+				continue;
+			}
+			
 			bitboard.makeMoveForward(cur_move);
 			
-			int cur_eval = getSpecialValue();
+			//Check for game termination score. If not than evaluate position normally.
+			int cur_eval = getGameTerminationScore();
 			if (cur_eval == -1) {
 				cur_eval = (int) -evaluator.fullEval(0, 0, 0, 0);
 			}
@@ -110,21 +132,18 @@ public class GamesPlayer {
 			if (cur_eval > best_eval) {
 				best_eval = cur_eval;
 				best_move = cur_move;
-				//System.out.println(best_eval);
 			}
 		}
 		
 		if (best_move == 0) {
 			throw new IllegalStateException("No moves");
 		}
-		
-		//System.out.println("end");
 				
 		return best_move;
 	}
 	
 	
-	private int getSpecialValue() {
+	private int getGameTerminationScore() {
 		
 		if (bitboard.getStateRepetition() >= 2) {
 			return 0;
