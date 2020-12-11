@@ -281,7 +281,8 @@ public class GamesPlayer {
 							}
 							if (exitLines == null) {
 								//System.out.println("No pv: " + lines);
-								throw new IllegalStateException("No pv: " + lines);
+								//throw new IllegalStateException("No pv: " + lines);
+								exitLines = "";
 							}
 						}
 					}
