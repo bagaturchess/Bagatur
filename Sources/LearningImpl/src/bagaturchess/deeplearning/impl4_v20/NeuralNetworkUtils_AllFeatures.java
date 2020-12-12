@@ -67,7 +67,7 @@ public class NeuralNetworkUtils_AllFeatures {
         
 		MultiLayerPerceptron mlp = new MultiLayerPerceptron(neuronsInLayersVector, neuronProperties);
 		
-		mlp.randomizeWeights(new WeightsRandomizer(new Random(777)));
+		//mlp.randomizeWeights(new WeightsRandomizer(new Random(777)));
 		
 		BackPropagation backprop = new BackPropagation();
 		//backprop.setBatchMode(true);
