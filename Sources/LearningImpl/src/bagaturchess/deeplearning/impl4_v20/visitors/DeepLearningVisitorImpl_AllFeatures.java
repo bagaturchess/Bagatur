@@ -57,7 +57,8 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	private long startTime;
 	
 	private Bagatur_ALL_SignalFiller_InArray filler;
-	double[] inputs;
+	private double[] inputs;
+	private DataSet trainingSet;
 	
 	
 	public DeepLearningVisitorImpl_AllFeatures() throws Exception {
@@ -69,6 +70,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		}
         
         inputs = new double[NeuralNetworkUtils_AllFeatures.getInputsSize()];
+        trainingSet = new DataSet(NeuralNetworkUtils_AllFeatures.getInputsSize(), 1);
 	}
 	
 	
@@ -94,11 +96,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval);
 		
 		
-		DataSet trainingSet = new DataSet(NeuralNetworkUtils_AllFeatures.getInputsSize(), 1);
-		//NeuralNetworkUtils.clearInputsArray(inputs);
-		//filler.fillSignals(inputs, 0);
-        trainingSet.addRow(new DataSetRow(inputs, new double[]{expectedWhitePlayerEval}));
-        network.getLearningRule().doLearningEpoch(trainingSet);
+        trainingSet.addRow(new DataSetRow(createCopy(inputs), new double[]{expectedWhitePlayerEval}));
         
         
 		counter++;
@@ -106,7 +104,11 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 			
 			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 			
+			network.getLearningRule().doLearningEpoch(trainingSet);
+			 
 			network.save("net.bin");
+			
+			trainingSet = new DataSet(NeuralNetworkUtils_AllFeatures.getInputsSize(), 1);
 		}
 	}
 	
@@ -131,5 +133,14 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 		
 		network.save("net.bin");
+	}
+	
+	
+	private double[] createCopy(double[] inputs) {
+		double[] result = new double[inputs.length];
+		for (int i = 0; i < inputs.length; i++) {
+			result[i] = inputs[i];
+		}
+		return result;
 	}
 }
