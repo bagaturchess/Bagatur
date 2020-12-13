@@ -101,7 +101,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 			 
 			network.save("net.bin");
 			
-			trainingSet = new DataSet(NeuralNetworkUtils_AllFeatures.getInputsSize(), 1);
+			trainingSet.clear();
 		}
 	}
 	
