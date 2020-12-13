@@ -27,10 +27,7 @@ import java.io.File;
 
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
-import org.neuroph.core.events.LearningEvent;
-import org.neuroph.core.events.LearningEventListener;
 import org.neuroph.nnet.MultiLayerPerceptron;
-import org.neuroph.nnet.learning.BackPropagation;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
@@ -87,10 +84,6 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		NeuralNetworkUtils.calculate(network);
 		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);
 		
-		/*if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
-			actualWhitePlayerEval = -actualWhitePlayerEval;
-		}*/
-		
 		
 		sumDiffs1 += Math.abs(0 - expectedWhitePlayerEval);
 		sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval);
@@ -100,7 +93,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
         
         
 		counter++;
-		if ((counter % 100000) == 0) {
+		if ((counter % 1000000) == 0) {
 			
 			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 			
