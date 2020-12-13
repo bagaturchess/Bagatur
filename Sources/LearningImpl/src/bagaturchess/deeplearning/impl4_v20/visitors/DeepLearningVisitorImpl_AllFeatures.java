@@ -55,6 +55,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	
 	private Bagatur_ALL_SignalFiller_InArray filler;
 	private double[] inputs;
+	
 	private DataSet trainingSet;
 	
 	
@@ -95,7 +96,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		counter++;
 		if ((counter % 1000000) == 0) {
 			
-			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
+			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, Error: " + network.getLearningRule().getTotalNetworkError());
 			
 			network.getLearningRule().doLearningEpoch(trainingSet);
 			 
@@ -123,7 +124,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		
 		//System.out.println("***************************************************************************************************");
 		//System.out.println("End iteration " + iteration + ", Total evaluated positions count is " + counter);
-		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
+		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, Error: " + network.getLearningRule().getTotalNetworkError());
 		
 		network.save("net.bin");
 	}
