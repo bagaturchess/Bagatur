@@ -58,6 +58,8 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	
 	private DataSet trainingSet;
 	
+	private double prevNetworkError = Double.MAX_VALUE;
+	
 	
 	public DeepLearningVisitorImpl_AllFeatures() throws Exception {
 		
@@ -96,11 +98,9 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		counter++;
 		if ((counter % 1000000) == 0) {
 			
-			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, Error: " + network.getLearningRule().getTotalNetworkError());
+			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 			
 			network.getLearningRule().doLearningEpoch(trainingSet);
-			 
-			network.save("net.bin");
 			
 			trainingSet.clear();
 		}
@@ -126,7 +126,13 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		//System.out.println("End iteration " + iteration + ", Total evaluated positions count is " + counter);
 		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, Error: " + network.getLearningRule().getTotalNetworkError());
 		
-		network.save("net.bin");
+		if (prevNetworkError < network.getLearningRule().getTotalNetworkError()) {
+			System.exit(0);
+		}
+				
+		network.save(NET_FILE);
+		
+		prevNetworkError = network.getLearningRule().getTotalNetworkError();
 	}
 	
 	
