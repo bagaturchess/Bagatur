@@ -17,7 +17,13 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	
 	private final ChessBoard board;
 	private final EvalInfo evalInfo;
-	private final IEvalComponentsProcessor evalComponentsProcessor;
+	private final IEvalComponentsProcessor evalComponentsProcessor_ones;
+	private final IEvalComponentsProcessor evalComponentsProcessor_weights;
+	
+	private IEvalComponentsProcessor evalComponentsProcessor;
+	
+	private long countOnes;
+	private long countWeights;
 	
 	
 	public BagaturEvaluator_Phases(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -28,7 +34,24 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		
 		board = ((BoardImpl)bitboard).getChessBoard();
 		evalInfo = new EvalInfo();
-		evalComponentsProcessor = new EvalComponentsProcessor(evalInfo);
+
+		evalComponentsProcessor_ones = new EvalComponentsProcessor_Ones(evalInfo);
+		evalComponentsProcessor_weights = new EvalComponentsProcessor_Weights(evalInfo);
+	}
+	
+	
+	@Override
+	public double fullEval(int depth, int alpha, int beta, int rootColour) {
+		//countOnes++;
+		//evalComponentsProcessor = evalComponentsProcessor_ones;
+		//double eval = super.fullEval(depth, alpha, beta, rootColour);
+		//if (Math.abs(eval) < 150) {
+			//countWeights++;
+			evalComponentsProcessor = evalComponentsProcessor_weights;
+			double eval = super.fullEval(depth, alpha, beta, rootColour);
+			//System.out.println("all: " + countOnes + ", weights " + countWeights);
+		//}
+		return eval;
 	}
 	
 	
@@ -70,13 +93,13 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	}
 	
 	
-	private static final class EvalComponentsProcessor implements IEvalComponentsProcessor {
+	private static final class EvalComponentsProcessor_Weights implements IEvalComponentsProcessor {
 		
 		
 		private final EvalInfo evalInfo;
 		
 		
-		private EvalComponentsProcessor(final EvalInfo _evalInfo) {
+		private EvalComponentsProcessor_Weights(final EvalInfo _evalInfo) {
 			evalInfo = _evalInfo;
 		}
 		
@@ -98,6 +121,41 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 			} else if (evalPhaseID == EVAL_PHASE_ID_5) {
 				evalInfo.eval_o_part5 += value_o * weight_o;
 				evalInfo.eval_e_part5 += value_e * weight_e;
+			} else {
+				throw new IllegalStateException();
+			}
+		}
+	}
+	
+	
+	private static final class EvalComponentsProcessor_Ones implements IEvalComponentsProcessor {
+		
+		
+		private final EvalInfo evalInfo;
+		
+		
+		private EvalComponentsProcessor_Ones(final EvalInfo _evalInfo) {
+			evalInfo = _evalInfo;
+		}
+		
+		
+		@Override
+		public void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
+			if (evalPhaseID == EVAL_PHASE_ID_1) {
+				evalInfo.eval_o_part1 += value_o;
+				evalInfo.eval_e_part1 += value_e;
+			} else if (evalPhaseID == EVAL_PHASE_ID_2) {
+				evalInfo.eval_o_part2 += value_o;
+				evalInfo.eval_e_part2 += value_e;
+			} else if (evalPhaseID == EVAL_PHASE_ID_3) {
+				evalInfo.eval_o_part3 += value_o;
+				evalInfo.eval_e_part3 += value_e;
+			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
+				evalInfo.eval_o_part4 += value_o;
+				evalInfo.eval_e_part4 += value_e;
+			} else if (evalPhaseID == EVAL_PHASE_ID_5) {
+				evalInfo.eval_o_part5 += value_o;
+				evalInfo.eval_e_part5 += value_e;
 			} else {
 				throw new IllegalStateException();
 			}
