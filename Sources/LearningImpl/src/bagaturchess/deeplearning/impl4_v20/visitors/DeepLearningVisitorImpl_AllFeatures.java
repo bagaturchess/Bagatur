@@ -67,19 +67,6 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		} else {
 			network = NeuralNetworkUtils_AllFeatures.buildNetwork();
 		}
-		
-        network.getLearningRule().addListener(new LearningEventListener() {
-			
-			@Override
-			public void handleLearningEvent(LearningEvent event) {
-		        BackPropagation bp = (BackPropagation)event.getSource();
-		        
-		        //if (event.getEventType() != LearningEvent.Type.LEARNING_STOPPED)
-		            //System.out.println(bp.getCurrentIteration() + ". iteration : "+ bp.getTotalNetworkError());
-		        
-		        bp.stopLearning();
-			}
-		});
         
         inputs = new double[NeuralNetworkUtils_AllFeatures.getInputsSize()];
 	}
@@ -108,11 +95,10 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		
 		
 		DataSet trainingSet = new DataSet(NeuralNetworkUtils_AllFeatures.getInputsSize(), 1);
-		NeuralNetworkUtils.clearInputsArray(inputs);
-		filler.fillSignals(inputs, 0);
-		//network.setInput(inputs);
+		//NeuralNetworkUtils.clearInputsArray(inputs);
+		//filler.fillSignals(inputs, 0);
         trainingSet.addRow(new DataSetRow(inputs, new double[]{expectedWhitePlayerEval}));
-        network.learn(trainingSet);
+        network.getLearningRule().doLearningEpoch(trainingSet);
         
         
 		counter++;
