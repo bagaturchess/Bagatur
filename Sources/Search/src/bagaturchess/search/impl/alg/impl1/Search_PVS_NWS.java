@@ -901,14 +901,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		
-		/*if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
+		if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
 			if (ttFlag == ITTEntry.FLAG_EXACT
 					|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
 					|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
 				) {
 				eval = ttValue;
 			}
-		}*/
+		}
 		
 		if (eval >= beta) {
 			return eval;
