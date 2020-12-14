@@ -43,15 +43,15 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	
 	@Override
 	public double fullEval(int depth, int alpha, int beta, int rootColour) {
-		//countOnes++;
-		//evalComponentsProcessor = evalComponentsProcessor_ones;
-		//double eval = super.fullEval(depth, alpha, beta, rootColour);
-		//if (Math.abs(eval) < 150) {
-			//countWeights++;
+		countOnes++;
+		evalComponentsProcessor = evalComponentsProcessor_ones;
+		double eval = super.fullEval(depth, alpha, beta, rootColour);
+		if (Math.abs(eval) < 150) {
+			countWeights++;
 			evalComponentsProcessor = evalComponentsProcessor_weights;
-			double eval = super.fullEval(depth, alpha, beta, rootColour);
+			eval = super.fullEval(depth, alpha, beta, rootColour);
 			//System.out.println("all: " + countOnes + ", weights " + countWeights);
-		//}
+		}
 		return eval;
 	}
 	
