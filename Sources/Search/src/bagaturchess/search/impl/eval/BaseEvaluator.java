@@ -103,6 +103,11 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	
 	public double fullEval(int depth, int alpha, int beta, int rootColour) {
+		return fullEval(depth, alpha, beta, rootColour, true);
+	}
+	
+	
+	protected double fullEval(int depth, int alpha, int beta, int rootColour, boolean useCache) {
 		
 		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
 			
@@ -133,7 +138,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		long hashkey = bitboard.getHashKey();
 		
-		if (USE_CACHE && evalCache != null) {
+		if (USE_CACHE && evalCache != null && useCache) {
 			
 			evalCache.get(hashkey, cached);
 			
@@ -158,7 +163,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		eval += phase4();
 		eval += phase5();
 		
-		if (USE_CACHE && evalCache != null) {
+		if (USE_CACHE && evalCache != null && useCache) {
 			evalCache.put(hashkey, CACHE_LEVEL_MAX, (int) eval);
 		}
 		
