@@ -46,12 +46,12 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		countOnes++;
 		evalComponentsProcessor = evalComponentsProcessor_ones;
 		double eval = super.fullEval(depth, alpha, beta, rootColour);
-		if (Math.abs(eval) < 150) {
+		/*if (Math.abs(eval) < 150) {
 			countWeights++;
 			evalComponentsProcessor = evalComponentsProcessor_weights;
-			eval = super.fullEval(depth, alpha, beta, rootColour);
+			eval = super.fullEval(depth, alpha, beta, rootColour, false);
 			//System.out.println("all: " + countOnes + ", weights " + countWeights);
-		}
+		}*/
 		return eval;
 	}
 	
@@ -143,26 +143,26 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		@Override
 		public void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
 			if (evalPhaseID == EVAL_PHASE_ID_1) {
-				evalInfo.eval_o_part1 += value_o * 1;
-				evalInfo.eval_e_part1 += value_e * 1;
+				evalInfo.eval_o_part1 += value_o;
+				evalInfo.eval_e_part1 += value_e;
 			} else if (evalPhaseID == EVAL_PHASE_ID_2) {
-				evalInfo.eval_o_part2 += value_o * 1;
-				evalInfo.eval_e_part2 += value_e * 1;
+				evalInfo.eval_o_part2 += value_o;
+				evalInfo.eval_e_part2 += value_e;
 			} else if (evalPhaseID == EVAL_PHASE_ID_3) {
-				evalInfo.eval_o_part3 += value_o * 1;
+				evalInfo.eval_o_part3 += value_o;
 				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY) {
-					evalInfo.eval_e_part3 += value_e * 1;
+					evalInfo.eval_e_part3 += value_e;
 				}
 			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
 				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
 						&& componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE) {
-					evalInfo.eval_o_part4 += value_o * 1;
+					evalInfo.eval_o_part4 += value_o;
 				}
-				evalInfo.eval_e_part4 += value_e * 1;
+				evalInfo.eval_e_part4 += value_e;
 			} else if (evalPhaseID == EVAL_PHASE_ID_5) {
-				evalInfo.eval_o_part5 += value_o * 1;
+				evalInfo.eval_o_part5 += value_o;
 				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
-					evalInfo.eval_e_part5 += value_e * 1;
+					evalInfo.eval_e_part5 += value_e;
 				}
 			} else {
 				throw new IllegalStateException();
