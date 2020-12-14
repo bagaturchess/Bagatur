@@ -7,6 +7,7 @@ import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.learning.goldmiddle.impl4.base.EvalInfo;
 import bagaturchess.learning.goldmiddle.impl4.base.Evaluator;
 import bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcessor;
+import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConstants;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
@@ -125,6 +126,35 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				throw new IllegalStateException();
 			}
 		}
+		
+		/*@Override
+		public void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
+			if (evalPhaseID == EVAL_PHASE_ID_1) {
+				evalInfo.eval_o_part1 += value_o * weight_o;
+				evalInfo.eval_e_part1 += value_e * weight_e;
+			} else if (evalPhaseID == EVAL_PHASE_ID_2) {
+				evalInfo.eval_o_part2 += value_o * weight_o;
+				evalInfo.eval_e_part2 += value_e * weight_e;
+			} else if (evalPhaseID == EVAL_PHASE_ID_3) {
+				evalInfo.eval_o_part3 += value_o * weight_o;
+				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY) {
+					evalInfo.eval_e_part3 += value_e * weight_e;
+				}
+			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
+				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
+						&& componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE) {
+					evalInfo.eval_o_part4 += value_o * weight_o;
+				}
+				evalInfo.eval_e_part4 += value_e * weight_e;
+			} else if (evalPhaseID == EVAL_PHASE_ID_5) {
+				evalInfo.eval_o_part5 += value_o * weight_o;
+				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
+					evalInfo.eval_e_part5 += value_e * weight_e;
+				}
+			} else {
+				throw new IllegalStateException();
+			}
+		}*/
 	}
 	
 	
