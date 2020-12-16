@@ -510,7 +510,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				/*if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length) {
+				if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length) {
 					if (eval + RAZORING_MARGIN[depth] < alpha) {
 						int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply, isPv);
 						if (score + RAZORING_MARGIN[depth] <= alpha) {
@@ -520,7 +520,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							return node.eval;
 						}
 					}
-				}*/
+				}
 			}
 		}
 		
