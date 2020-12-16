@@ -498,7 +498,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				//Razoring like reduction for all depths based on the eval deviation detected into the root node
-				int rbeta = alpha - getAlphaTrustWindow(mediator, depth);
+				int rbeta = alpha - 8 * getTrustWindow(mediator, depth);
 				if (eval < rbeta) {
 					int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, rbeta, rbeta + 1, ply, isPv);
 					if (score <= rbeta) {
@@ -690,16 +690,12 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
-						if (EngineConstants.ENABLE_FUTILITY_PRUNING
-								&& depth < FUTILITY_MARGIN.length
-							) {
-							if (!MoveUtil.isPawnPush78(move)) {
-								if (eval == ISearch.MIN) {
-									eval = eval(evaluator, ply, alphaOrig, beta, isPv);
-								}
-								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
-									continue;
-								}
+						if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
+							if (eval == ISearch.MIN) {
+								eval = eval(evaluator, ply, alphaOrig, beta, isPv);
+							}
+							if (eval + 2 * getTrustWindow(mediator, depth) <= alpha) {
+								continue;
 							}
 						}
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
@@ -838,16 +834,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	private int getBetaTrustWindow(ISearchMediator mediator, int depth) {
-		int value = 5 * depth * mediator.getTrustWindow_AlphaAspiration();
-		//System.out.println("depth=" + depth + "	" + value);
-		return value;
-	}
-	
-	
-	private int getAlphaTrustWindow(ISearchMediator mediator, int depth) {
-		int value = 5 * depth * mediator.getTrustWindow_AlphaAspiration();
-		value = Math.max(1, value);
+	private int getTrustWindow(ISearchMediator mediator, int depth) {
+		int value = depth * mediator.getTrustWindow_AlphaAspiration();
 		//System.out.println("depth=" + depth + "	" + value);
 		return value;
 	}
