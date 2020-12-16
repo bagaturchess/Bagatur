@@ -690,7 +690,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
-						if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
+						if (EngineConstants.ENABLE_FUTILITY_PRUNING && !SearchUtils.isMateVal(alpha)) {
 							if (eval == ISearch.MIN) {
 								eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 							}
