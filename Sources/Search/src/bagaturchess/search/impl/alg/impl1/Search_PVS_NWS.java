@@ -694,7 +694,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							if (eval == ISearch.MIN) {
 								eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 							}
-							if (eval + 2 * getTrustWindow(mediator, depth) <= alpha) {
+							if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
 								continue;
 							}
 						}
