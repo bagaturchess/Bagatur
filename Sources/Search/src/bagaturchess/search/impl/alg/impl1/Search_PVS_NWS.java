@@ -307,8 +307,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 	    // Check if we have an upcoming move which draws by repetition, or
 	    // if the opponent had an alternative move earlier to this position.
-	    if (alpha < EvalConstants.SCORE_DRAW
-	        && ply > 0
+	    if (/*alpha < EvalConstants.SCORE_DRAW
+	        &&*/ ply > 0
 	        && isDraw()
 	        ) {
 	    	alpha = EvalConstants.SCORE_DRAW;
