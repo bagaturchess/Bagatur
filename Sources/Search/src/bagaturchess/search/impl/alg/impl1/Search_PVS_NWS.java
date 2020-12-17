@@ -463,8 +463,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (eval >= beta) {
 				
 				
-				/*if (depth >= 2 && eval >= beta + getBetaTrustWindow(mediator, depth)) {
-					depth--;
+				/*if (eval >= beta + 8 * getTrustWindow(mediator, depth)) {
+					node.bestmove = 0;
+					node.eval = eval;
+					node.leaf = true;
+					return node.eval;
 				}*/
 				
 				
