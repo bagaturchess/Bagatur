@@ -59,6 +59,12 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	
 	
 	@Override
+	public int getFigureColour(int fieldID) {
+		return Figures.getFigureColour(getFigureID(fieldID));
+	}
+	
+	
+	@Override
 	public boolean isPossible(int move) {
 		throw new UnsupportedOperationException();
 	}
@@ -77,7 +83,7 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	
 	public final long getFiguresBitboardByPID(int pid) {
 		
-		if (true) throw new UnsupportedOperationException();
+		//if (true) throw new UnsupportedOperationException();
 		
 		//throw new IllegalStateException();
 		
@@ -96,7 +102,7 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	
 	public long getFiguresBitboardByColourAndType(int colour, int type) {
 		
-		if (true) throw new UnsupportedOperationException();
+		//if (true) throw new UnsupportedOperationException();
 		
 		return getFiguresBitboardByPID(Constants.COLOUR_AND_TYPE_2_PIECE_IDENTITY[colour][type]);
 	}

@@ -556,4 +556,10 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 	public String toString() {
 		return bitboard.toString();
 	}
+
+
+	@Override
+	public int getFigureColour(int fieldID) {
+		return bitboard.getFigureColour(fieldID);
+	}
 }

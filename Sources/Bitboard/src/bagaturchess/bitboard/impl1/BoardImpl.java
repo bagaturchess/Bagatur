@@ -291,7 +291,7 @@ public class BoardImpl implements IBitBoard {
 			return (chessBoard.castlingRights & 1) != 0;
 		}
 	}
-
+	
 	
 	@Override
 	public int getFigureID(int squareID) {
@@ -303,6 +303,17 @@ public class BoardImpl implements IBitBoard {
 	public int getFigureType(int squareID) {
 		int pieceType = chessBoard.pieceIndexes[squareID];
 		return pieceType;
+	}
+	
+	
+	@Override
+	public int getFigureColour(int squareID) {
+		long bb = (1L << squareID);
+		if ((bb & getFiguresBitboardByColour(Constants.COLOUR_WHITE)) != 0) {
+			return Constants.COLOUR_WHITE;
+		} else {
+			return Constants.COLOUR_BLACK;
+		}
 	}
 	
 	

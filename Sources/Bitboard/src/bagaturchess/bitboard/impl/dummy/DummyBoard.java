@@ -732,4 +732,10 @@ public class DummyBoard implements IBitBoard {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	@Override
+	public int getFigureColour(int fieldID) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

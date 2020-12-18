@@ -63,10 +63,15 @@ public class BoardUtils {
 	
 	
 	public static IBitBoard createBoard_WithPawnsCache(String fen, String cacheFactoryClassName, IBoardConfig boardConfig, int pawnsCacheSize) {
+		return createBoard_WithPawnsCache(fen, cacheFactoryClassName, boardConfig, pawnsCacheSize, IBitBoard.IMPL1);
+	}
+	
+	
+	public static IBitBoard createBoard_WithPawnsCache(String fen, String cacheFactoryClassName, IBoardConfig boardConfig, int pawnsCacheSize, boolean impl1) {
 		
 		IBitBoard bitboard;
 		
-		if (IBitBoard.IMPL1) {
+		if (impl1) {
 			
 			bitboard = new BoardImpl(fen, boardConfig);
 			

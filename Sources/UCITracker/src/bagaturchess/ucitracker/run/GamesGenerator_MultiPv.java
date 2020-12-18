@@ -48,7 +48,6 @@ import bagaturchess.ucitracker.impl.gamemodel.EvaluatedGame;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedMove;
 import bagaturchess.ucitracker.impl.gamemodel.EvaluatedPosition;
 import bagaturchess.ucitracker.impl.gamemodel.serialization.GameModelWriter;
-import sun.util.locale.StringTokenIterator;
 
 
 public class GamesGenerator_MultiPv {

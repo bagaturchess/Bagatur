@@ -4885,6 +4885,12 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	}
 	
 	
+	@Override
+	public int getFigureColour(int fieldID) {
+		return Figures.getFigureColour(getFigureID(fieldID));
+	}
+	
+	
 	public int getCastlingType(int colour) {
 		return castledByColour[colour];
 	}

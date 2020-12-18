@@ -36,6 +36,7 @@ public interface IBoard {
 	
 	public int getFigureID(int fieldID);
 	public int getFigureType(int fieldID);
+	public int getFigureColour(int fieldID);
 	
 	public ISEE getSee();
 	public int getSEEScore(int move);
