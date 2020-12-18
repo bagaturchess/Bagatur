@@ -122,6 +122,13 @@ public class SEEUtil {
 			return EvalConstants.MATERIAL_SEE[MoveUtil.getAttackedPieceIndex(move)]
 					- getSeeScore(cb, cb.colorToMoveInverse, index, MoveUtil.getSourcePieceIndex(move), allPieces, slidingMask);
 		}
+	}
+	
+	public static int getSeeFieldScore(final ChessBoard cb, int squareID) {
+		
+		final long allPieces = cb.allPieces & ~Util.POWER_LOOKUP[squareID];
+		final long slidingMask = MagicUtil.getQueenMovesEmptyBoard(squareID) & allPieces;
 
+		return -getSeeScore(cb, cb.colorToMoveInverse, squareID, cb.pieceIndexes[squareID], allPieces, slidingMask);
 	}
 }

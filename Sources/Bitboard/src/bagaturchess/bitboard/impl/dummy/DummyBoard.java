@@ -738,4 +738,10 @@ public class DummyBoard implements IBitBoard {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	@Override
+	public int getSEEFieldScore(int squareID) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

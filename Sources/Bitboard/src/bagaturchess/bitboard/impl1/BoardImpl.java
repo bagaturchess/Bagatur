@@ -208,8 +208,13 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getSEEScore(int move) {
-		//return 100 * (MoveUtil.getAttackedPieceIndex(move) * 10 - MoveUtil.getSourcePieceIndex(move));
 		return SEEUtil.getSeeCaptureScore(chessBoard, move);
+	}
+	
+	
+	@Override
+	public int getSEEFieldScore(int squareID) {
+		return SEEUtil.getSeeFieldScore(chessBoard, squareID);
 	}
 	
 	

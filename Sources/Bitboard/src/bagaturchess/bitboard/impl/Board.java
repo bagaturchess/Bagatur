@@ -5325,6 +5325,12 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	
 	
 	@Override
+	public int getSEEFieldScore(int squareID) {
+		return getSee().seeField(squareID);
+	}
+	
+	
+	@Override
 	public IMoveOps getMoveOps() {
 		return moveOps;
 	}

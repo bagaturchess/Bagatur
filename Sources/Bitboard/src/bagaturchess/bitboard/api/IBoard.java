@@ -40,6 +40,7 @@ public interface IBoard {
 	
 	public ISEE getSee();
 	public int getSEEScore(int move);
+	public int getSEEFieldScore(int squareID);
 	
 	public IMoveOps getMoveOps();
 	

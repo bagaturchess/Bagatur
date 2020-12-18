@@ -562,4 +562,10 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 	public int getFigureColour(int fieldID) {
 		return bitboard.getFigureColour(fieldID);
 	}
+
+
+	@Override
+	public int getSEEFieldScore(int squareID) {
+		return bitboard.getSEEFieldScore(squareID);
+	}
 }

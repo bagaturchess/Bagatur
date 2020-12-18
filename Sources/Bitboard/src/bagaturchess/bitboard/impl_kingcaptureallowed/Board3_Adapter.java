@@ -206,8 +206,14 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	public int getSEEScore(int move) {
 		return getSee().evalExchange(move);
 	}
-
-
+	
+	
+	@Override
+	public int getSEEFieldScore(int squareID) {
+		return getSee().seeField(squareID);
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#getHashKeyAfterMove(int)
 	 */
