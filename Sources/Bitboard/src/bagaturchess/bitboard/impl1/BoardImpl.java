@@ -118,7 +118,7 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
-	public int genAllMoves(IInternalMoveList list) {
+	public synchronized int genAllMoves(IInternalMoveList list) {
 		
 		generator.startPly();
 		
@@ -148,7 +148,7 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
-	public int genCapturePromotionMoves(IInternalMoveList list) {
+	public synchronized int genCapturePromotionMoves(IInternalMoveList list) {
 		generator.startPly();
 		
 		generator.generateAttacks(chessBoard);
@@ -463,7 +463,7 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
-	public boolean hasMoveInCheck() {
+	public synchronized boolean hasMoveInCheck() {
 		hasMovesList.clear();
 		genAllMoves(hasMovesList);
 		return hasMovesList.reserved_getCurrentSize() > 0;
@@ -471,7 +471,7 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
-	public boolean hasMoveInNonCheck() {
+	public synchronized boolean hasMoveInNonCheck() {
 		hasMovesList.clear();
 		genAllMoves(hasMovesList);
 		return hasMovesList.reserved_getCurrentSize() > 0;
@@ -479,7 +479,7 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
-	public boolean hasSingleMove() {
+	public synchronized boolean hasSingleMove() {
 		hasMovesList.clear();
 		genAllMoves(hasMovesList);
 		return hasMovesList.reserved_getCurrentSize() == 1;
