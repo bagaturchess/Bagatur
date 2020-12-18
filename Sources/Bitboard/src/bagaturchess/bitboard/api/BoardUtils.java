@@ -144,9 +144,9 @@ public class BoardUtils {
 		
 		for (int i=0; i<pv.length; i++) {
 			pvStr += bitboard.getMoveOps().moveToString(pv[i]);
-			/*if (i != pv.length - 1) {
+			if (i != pv.length - 1) {
 				pvStr += ", ";
-			}*/
+			}
 		}
 		
 		return pvStr;

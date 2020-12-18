@@ -459,7 +459,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean hasMoveInCheck() {
-		hasMovesList.reserved_clear();
+		hasMovesList.clear();
 		genAllMoves(hasMovesList);
 		return hasMovesList.reserved_getCurrentSize() > 0;
 	}
@@ -467,7 +467,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean hasMoveInNonCheck() {
-		hasMovesList.reserved_clear();
+		hasMovesList.clear();
 		genAllMoves(hasMovesList);
 		return hasMovesList.reserved_getCurrentSize() > 0;
 	}
@@ -475,7 +475,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean hasSingleMove() {
-		hasMovesList.reserved_clear();
+		hasMovesList.clear();
 		genAllMoves(hasMovesList);
 		return hasMovesList.reserved_getCurrentSize() == 1;
 	}
