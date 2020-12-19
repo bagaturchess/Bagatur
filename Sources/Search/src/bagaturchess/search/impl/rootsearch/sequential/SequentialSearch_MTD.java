@@ -117,12 +117,14 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 		final int[] final_prevPV = prevPV;
 		
 		if (initialValue == null) {
-			IEvaluator evaluator = getSharedData().getEvaluatorFactory().create(
+			initialValue = 0;
+			/*IEvaluator evaluator = getSharedData().getEvaluatorFactory().create(
 					getBitboardForSetup(),
 					//new EvalCache_Impl1(100, true, new BinarySemaphore_Dummy()),
 					new EvalCache_Impl2(2),
 					getRootSearchConfig().getEvalConfig());
 			initialValue = (int) evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, getBitboardForSetup().getColourToMove());
+			*/
 		}
 		
 		
