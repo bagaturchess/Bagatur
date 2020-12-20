@@ -50,6 +50,7 @@ public class NullwinSearchTask implements Runnable {
 	
 	private List<Integer> pv_buffer = new ArrayList<Integer>();
 	
+	PVManager pvman;
 	
 	public NullwinSearchTask(ISearch _searcher, SearchManager _distribution,
 			IBitBoard _bitboard, ISearchMediator _mediator, boolean _useMateDistancePrunning, int[] _prevPV) {
@@ -59,6 +60,7 @@ public class NullwinSearchTask implements Runnable {
 		mediator = _mediator;
 		useMateDistancePrunning = _useMateDistancePrunning;
 		prevPV = _prevPV;
+		pvman = new PVManager(ISearch.MAX_DEPTH);
 	}
 	
 	
@@ -164,7 +166,7 @@ public class NullwinSearchTask implements Runnable {
 			
 			if (eval >= beta) {*/
 			//if (eval >= distribution.getLowerBound() && eval <= distribution.getUpperBound()) {
-				PVManager pvman = new PVManager(ISearch.MAX_DEPTH);
+				
 				int eval = searcher.pv_search(mediator, pvman, info, ISearch.PLY * maxdepth, ISearch.PLY * maxdepth,
 					0, beta - 1, beta, 0, 0, prevPV, false, 0, searcher.getEnv().getBitboard().getColourToMove(), 0, 0, false, 0, useMateDistancePrunning);
 			//}
