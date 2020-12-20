@@ -10,13 +10,15 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.PAWN;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.QUEEN;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
+
+import bagaturchess.bitboard.impl.datastructs.StackLongInt;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 
 
 public final class ChessBoard {
 
 	ChessBoard() {
-
+		
 	}
 
 	private static ChessBoard[] instances;
@@ -79,6 +81,8 @@ public final class ChessBoard {
 	public int playedMovesCount = 0;
 	
 	public int lastCaptureOrPawnMoveBefore = 0;
+	
+	public StackLongInt playedBoardStates = new StackLongInt(9631);//MUST BE PRIME NUMBER
 	
 	
 	@Override
@@ -145,6 +149,8 @@ public final class ChessBoard {
 		if (EngineConstants.ASSERT) {
 			ChessBoardTestUtil.testValues(this);
 		}
+		
+		playedBoardStates.inc(zobristKey);
 	}
 
 	public void undoNullMove() {
@@ -154,6 +160,8 @@ public final class ChessBoard {
 		if (EngineConstants.ASSERT) {
 			ChessBoardTestUtil.testValues(this);
 		}
+		
+		playedBoardStates.dec(zobristKey);
 	}
 
 	public void doMove(int move) {
@@ -294,7 +302,8 @@ public final class ChessBoard {
 		if (EngineConstants.ASSERT) {
 			ChessBoardTestUtil.testValues(this);
 		}
-
+		
+		playedBoardStates.inc(zobristKey);
 	}
 
 	public void setPinnedAndDiscoPieces() {
@@ -400,6 +409,8 @@ public final class ChessBoard {
 		if (EngineConstants.ASSERT) {
 			ChessBoardTestUtil.testValues(this);
 		}
+		
+		playedBoardStates.dec(zobristKey);
 	}
 
 	public void updateKingValues(final int kingColor, final int index) {
@@ -561,23 +572,10 @@ public final class ChessBoard {
 	}
 	
 	
-	public boolean isRepetition(final int move) {
-
-		if (!EngineConstants.ENABLE_REPETITION_TABLE) {
-			return false;
-		}
-
-		// if move was an attacking-move or pawn move, no repetition
-		/*TODO if (!MoveUtil.isQuiet(move) || MoveUtil.getSourcePieceIndex(move) == PAWN) {
-			return false;
-		}*/
-
-		final int moveCounterMin = Math.max(0, moveCounter - 50);
-		for (int i = moveCounter - 2; i >= moveCounterMin; i -= 2) {
-			if (zobristKey == zobristKeyHistory[i]) {
-				return true;
-			}
-		}
-		return false;
+	public int getRepetition() {
+		int count = playedBoardStates.get(zobristKey);
+		if (count == StackLongInt.NO_VALUE) {
+			return 0;
+		} else return count;
 	}
 }

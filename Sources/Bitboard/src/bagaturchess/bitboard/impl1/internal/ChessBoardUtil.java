@@ -238,6 +238,8 @@ public class ChessBoardUtil {
 		
 		calculatePawnZobristKeys(cb);
 		calculateZobristKeys(cb);
+		
+		cb.playedBoardStates.inc(cb.zobristKey);
 	}
 	
 	

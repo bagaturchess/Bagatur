@@ -345,7 +345,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getStateRepetition() {
-		return chessBoard.isRepetition(0) ? 3 : 0;
+		return chessBoard.getRepetition();
 	}
 	
 	
