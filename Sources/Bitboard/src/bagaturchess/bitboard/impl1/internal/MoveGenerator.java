@@ -1,5 +1,6 @@
 package bagaturchess.bitboard.impl1.internal;
 
+
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BISHOP;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.KING;
@@ -14,7 +15,11 @@ import java.util.Random;
 
 
 public final class MoveGenerator {
-
+	
+	
+	public static boolean USE_ContinuationHistory = true;
+	
+	
 	private final int[] moves = new int[3000];
 	private final int[] moveScores = new int[3000];
 	private final int[] nextToGenerate = new int[EngineConstants.MAX_PLIES * 2];
@@ -32,12 +37,23 @@ public final class MoveGenerator {
 	private final int[][][] HH_MOVES1 = new int[2][7][64];
 	private final int[][][] BF_MOVES1 = new int[2][7][64];
 	
+	private final ContinuationHistory[] HH_ContinuationHistory = new ContinuationHistory[2];
+	private final ContinuationHistory[] BF_ContinuationHistory = new ContinuationHistory[2];
+	
 	private Random randomizer = new Random();
 	private long randomizer_counter;
 	
 
 	public MoveGenerator() {
 		clearHistoryHeuristics();
+		
+		if (USE_ContinuationHistory) {
+			HH_ContinuationHistory[WHITE] = new ContinuationHistory();
+			HH_ContinuationHistory[BLACK] = new ContinuationHistory();
+			
+			BF_ContinuationHistory[WHITE] = new ContinuationHistory();
+			BF_ContinuationHistory[BLACK] = new ContinuationHistory();
+		}
 	}
 
 	public void clearHistoryHeuristics() {
@@ -82,21 +98,32 @@ public final class MoveGenerator {
 		currentPly = 0;
 	}
 	
+	
 	public void addHHValue(final int color, final int move, final int parentMove, final int depth) {
 		HH_MOVES[color][MoveUtil.getFromToIndex(move)] += depth * depth;
 		HH_MOVES1[color][MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
+		if (USE_ContinuationHistory) HH_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
 	}
+	
 	
 	public void addBFValue(final int color, final int move, final int parentMove, final int depth) {
 		BF_MOVES[color][MoveUtil.getFromToIndex(move)] += depth * depth;
 		BF_MOVES1[color][MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
+		if (USE_ContinuationHistory) BF_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
 	}
+	
 	
 	public int getHHScore(final int color, final int fromToIndex, final int pieceType, final int toIndex, final int parentMove) {
 		int value1 = 100 * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex];
 		int value2 = 100 * HH_MOVES1[color][pieceType][toIndex] / BF_MOVES1[color][pieceType][toIndex];
-		int value3 = 0;
+		int value3 = USE_ContinuationHistory ? getContinuationHistoryScore(color, pieceType, toIndex, parentMove) : 0;
 		return Math.max(value1, Math.max(value2, value3));
+	}
+	
+	
+	private int getContinuationHistoryScore(final int color, final int pieceType, final int toIndex, final int parentMove) {
+		return 100 * HH_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[pieceType][toIndex] / 
+				BF_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[pieceType][toIndex];
 	}
 	
 	
@@ -108,7 +135,8 @@ public final class MoveGenerator {
 			}
 		}
 	}
-
+	
+	
 	public void addCounterMove(final int color, final int parentMove, final int counterMove) {
 		if (EngineConstants.ENABLE_COUNTER_MOVES) {
 			COUNTER_MOVES[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)] = counterMove;
