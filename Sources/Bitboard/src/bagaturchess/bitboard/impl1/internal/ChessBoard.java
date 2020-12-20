@@ -154,14 +154,15 @@ public final class ChessBoard {
 	}
 
 	public void undoNullMove() {
+		
+		playedBoardStates.dec(zobristKey);
+		
 		popHistoryValues();
 		changeSideToMove();
 
 		if (EngineConstants.ASSERT) {
 			ChessBoardTestUtil.testValues(this);
 		}
-		
-		playedBoardStates.dec(zobristKey);
 	}
 
 	public void doMove(int move) {
@@ -335,6 +336,8 @@ public final class ChessBoard {
 
 	public void undoMove(int move) {
 
+		playedBoardStates.dec(zobristKey);
+		
 		final int fromIndex = MoveUtil.getFromIndex(move);
 		int toIndex = MoveUtil.getToIndex(move);
 		long toMask = 1L << toIndex;
@@ -409,8 +412,6 @@ public final class ChessBoard {
 		if (EngineConstants.ASSERT) {
 			ChessBoardTestUtil.testValues(this);
 		}
-		
-		playedBoardStates.dec(zobristKey);
 	}
 
 	public void updateKingValues(final int kingColor, final int index) {
