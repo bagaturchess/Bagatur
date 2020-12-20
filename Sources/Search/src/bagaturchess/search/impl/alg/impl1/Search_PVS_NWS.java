@@ -501,7 +501,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				//Razoring like reduction for all depths based on the eval deviation detected into the root node
-				int rbeta = alpha - 8 * getTrustWindow(mediator, depth);
+				/*int rbeta = alpha - 8 * getTrustWindow(mediator, depth);
 				if (eval < rbeta) {
 					int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, rbeta, rbeta + 1, ply, isPv);
 					if (score <= rbeta) {
@@ -510,7 +510,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						node.leaf = true;
 						return node.eval;
 					}
-				}
+				}*/
 				
 				
 				if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length) {
@@ -693,13 +693,22 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
-						if (EngineConstants.ENABLE_FUTILITY_PRUNING && !SearchUtils.isMateVal(alpha)) {
+						if (!SearchUtils.isMateVal(alpha)) {
+							
 							if (eval == ISearch.MIN) {
-								eval = eval(evaluator, ply, alphaOrig, beta, isPv);
+								//eval = eval(evaluator, ply, alphaOrig, beta, isPv);
+								throw new IllegalStateException();
 							}
-							if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
+							
+							/*if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
 								continue;
-							}
+							}*/
+							
+							if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
+								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
+									continue;
+								}
+							}	
 						}
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& depth <= 7
@@ -895,14 +904,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		
-		if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
+		/*if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
 			if (ttFlag == ITTEntry.FLAG_EXACT
 					|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
 					|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
 				) {
 				eval = ttValue;
 			}
-		}
+		}*/
 		
 		if (eval >= beta) {
 			return eval;
