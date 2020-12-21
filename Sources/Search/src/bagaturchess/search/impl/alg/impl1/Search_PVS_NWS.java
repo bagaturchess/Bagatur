@@ -305,16 +305,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.leaf = true;
 		
 		
-	    // Check if we have an upcoming move which draws by repetition, or
-	    // if the opponent had an alternative move earlier to this position.
-	    if (/*alpha < EvalConstants.SCORE_DRAW
-	        &&*/ (isPv && isDrawPV(ply)) || (!isPv && isDraw())
-	        ) {
-	    	alpha = EvalConstants.SCORE_DRAW;
-	    	if (alpha >= beta) {
-				node.eval = alpha;
-				return node.eval;
-	    	}
+	    if ((isPv && isDrawPV(ply)) || (!isPv && isDraw())) {
+	    	return EvalConstants.SCORE_DRAW;
 	    }
 		
 		
@@ -867,15 +859,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			return eval(evaluator, ply, alpha, beta, isPv);
 		}
 		
-	    // Check if we have an upcoming move which draws by repetition, or
-	    // if the opponent had an alternative move earlier to this position.
-	    if (/*alpha < EvalConstants.SCORE_DRAW
-	        &&*/ isDraw()
-	        ) {
-	    	alpha = EvalConstants.SCORE_DRAW;
-	    	if (alpha >= beta) {
-				return alpha;
-	    	}
+	    if (isDraw()) {
+	    	return EvalConstants.SCORE_DRAW;
 	    }
 	    
 	    int ttValue = 0;
