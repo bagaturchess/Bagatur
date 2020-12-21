@@ -32,6 +32,15 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.neuroph.core.NeuralNetwork;
+import org.neuroph.core.data.DataSet;
+import org.neuroph.core.data.DataSetRow;
+import org.neuroph.core.events.LearningEvent;
+import org.neuroph.core.events.LearningEventListener;
+import org.neuroph.core.learning.error.MeanSquaredError;
+import org.neuroph.nnet.ConvolutionalNetwork;
+import org.neuroph.nnet.learning.ConvolutionalBackpropagation;
+
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
@@ -41,42 +50,84 @@ import bagaturchess.ucitracker.api.PositionsVisitor;
 public class ScannerVisitor implements PositionsVisitor {
 	
 	
-	private static final int IMAGE_SIZE = 512;
-	private static final int SQUARE_SIZE = 64;
-	
-	private static final Color BLACK_SQUARE = new Color(120, 120, 120);
-	private static final Color WHITE_SQUARE = new Color(220, 220, 220);
-	
 	private int iteration = 0;
 	
 	private int counter;
 	
 	private long startTime;
 	
+	private String PIECES_SET = "set1";
+	
 	private Image[] piecesImages = new Image[13];
+	
+	private int IMAGE_SIZE = 64;
+	private int SQUARE_SIZE = 8;
+	
+	private Color BLACK_SQUARE = new Color(120, 120, 120);
+	private Color WHITE_SQUARE = new Color(220, 220, 220);
+	
+	private static final String NET_FILE = "scanner.bin";
+	private ConvolutionalNetwork network;
 	
 	
 	public ScannerVisitor() throws Exception {
+		
 		loadPiecesImages();
+		
+		if ((new File(NET_FILE)).exists() ){
+			network = (ConvolutionalNetwork) NeuralNetwork.createFromFile(NET_FILE);
+		} else {
+			
+			network = new ConvolutionalNetwork.Builder()
+					.withInputLayer(IMAGE_SIZE, IMAGE_SIZE, 1)
+                    .withConvolutionLayer(8, 8, 8)
+                    .withPoolingLayer(8, 8)
+                    .withConvolutionLayer(8, 8, 8)
+                    .withPoolingLayer(8, 8)
+                    .withConvolutionLayer(8, 8, 8)
+                    .withFullConnectedLayer(64 * 13)
+                    .build();
+			
+            ConvolutionalBackpropagation backPropagation = new ConvolutionalBackpropagation();
+            backPropagation.setLearningRate(0.1);
+            //backPropagation.setMaxError(maxError);
+            //backPropagation.setMaxIterations(1);
+            backPropagation.addListener(new LearningEventListener() {
+				@Override
+				public void handleLearningEvent(LearningEvent arg0) {
+					System.out.println("handleLearningEvent");
+				}
+			});
+            backPropagation.setErrorFunction(new MeanSquaredError());
+
+            network.setLearningRule(backPropagation);
+		}
 	}
 	
 	
 	@Override
 	public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
         
-		BufferedImage image = drawImage(bitboard.toEPD());
+		BufferedImage image = createBoardImage(bitboard.toEPD());
+		//saveImage(bitboard.toEPD(), image);
+		double[] input = convertToFlatRGBArray(image);
 		
-		saveImage(bitboard.toEPD(), image);
+		double[] output = createOutputArray(bitboard);
+		
+		DataSet dataset = new DataSet(input.length, output.length);
+		dataset.add(new DataSetRow(input, output));
+		network.getLearningRule().doLearningEpoch(dataset);
 		
 		counter++;
-		if ((counter % 100000) == 0) {
+		//if ((counter % 10000) == 0) {
 			
 			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms");
 
-		}
+		//}
 	}
 	
 	
+	@Override
 	public void begin(IBitBoard bitboard) throws Exception {
 		
 		startTime = System.currentTimeMillis();
@@ -86,15 +137,104 @@ public class ScannerVisitor implements PositionsVisitor {
 	}
 	
 	
+	@Override
 	public void end() {
-		
-		//System.out.println("***************************************************************************************************");
-		//System.out.println("End iteration " + iteration + ", Total evaluated positions count is " + counter);
 		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	
 	
-	private BufferedImage drawImage(String fen) {
+	private double[] createOutputArray(IBitBoard bitboard) {
+		
+		double[] result = new double[64 * 13];
+		{
+			long bb_w_king = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING);
+			long bb_w_queens = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN);
+			long bb_w_rooks = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_ROOK);
+			long bb_w_bishops = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP);
+			long bb_w_knights = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT);
+			long bb_w_pawns = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN);
+			
+			int squareID_w_king = Long.numberOfTrailingZeros(bb_w_king);
+			result[64 * Constants.PID_W_KING + squareID_w_king] = 1;
+			
+	        while (bb_w_pawns != 0) {
+	        	int squareID_pawn = Long.numberOfTrailingZeros(bb_w_pawns);
+	        	result[64 * Constants.PID_W_PAWN + squareID_pawn] = 1;
+	        	bb_w_pawns &= bb_w_pawns - 1;
+	        }
+	        
+	        while (bb_w_knights != 0) {
+	        	int squareID_knight = Long.numberOfTrailingZeros(bb_w_knights);
+	        	result[64 * Constants.PID_W_KNIGHT + squareID_knight] = 1;
+	        	bb_w_knights &= bb_w_knights - 1;
+	        }
+	        
+	        while (bb_w_bishops != 0) {
+	        	int squareID_bishop = Long.numberOfTrailingZeros(bb_w_bishops);
+	        	result[64 * Constants.PID_W_BISHOP + squareID_bishop] = 1;
+	        	bb_w_bishops &= bb_w_bishops - 1;
+	        }
+	        
+	        while (bb_w_rooks != 0) {
+	        	int squareID_rook = Long.numberOfTrailingZeros(bb_w_rooks);
+	        	result[64 * Constants.PID_W_ROOK + squareID_rook] = 1;
+	        	bb_w_rooks &= bb_w_rooks - 1;
+	        }
+	        
+	        while (bb_w_queens != 0) {
+	        	int squareID_queen = Long.numberOfTrailingZeros(bb_w_queens);
+	        	result[64 * Constants.PID_W_QUEEN + squareID_queen] = 1;
+	        	bb_w_queens &= bb_w_queens - 1;
+	        }
+		}
+        
+		{
+			long bb_b_king = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING);
+			long bb_b_queens = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN);
+			long bb_b_rooks = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_ROOK);
+			long bb_b_bishops = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP);
+			long bb_b_knights = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT);
+			long bb_b_pawns = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN);
+			
+			int squareID_b_king = Long.numberOfTrailingZeros(bb_b_king);
+			result[64 * Constants.PID_B_KING + squareID_b_king] = 1;
+			
+	        while (bb_b_pawns != 0) {
+	        	int squareID_pawn = Long.numberOfTrailingZeros(bb_b_pawns);
+	        	result[64 * Constants.PID_B_PAWN + squareID_pawn] = 1;
+	        	bb_b_pawns &= bb_b_pawns - 1;
+	        }
+	        
+	        while (bb_b_knights != 0) {
+	        	int squareID_knight = Long.numberOfTrailingZeros(bb_b_knights);
+	        	result[64 * Constants.PID_B_KNIGHT + squareID_knight] = 1;
+	        	bb_b_knights &= bb_b_knights - 1;
+	        }
+	        
+	        while (bb_b_bishops != 0) {
+	        	int squareID_bishop = Long.numberOfTrailingZeros(bb_b_bishops);
+	        	result[64 * Constants.PID_B_BISHOP + squareID_bishop] = 1;
+	        	bb_b_bishops &= bb_b_bishops - 1;
+	        }
+	        
+	        while (bb_b_rooks != 0) {
+	        	int squareID_rook = Long.numberOfTrailingZeros(bb_b_rooks);
+	        	result[64 * Constants.PID_B_ROOK + squareID_rook] = 1;
+	        	bb_b_rooks &= bb_b_rooks - 1;
+	        }
+	        
+	        while (bb_b_queens != 0) {
+	        	int squareID_queen = Long.numberOfTrailingZeros(bb_b_queens);
+	        	result[64 * Constants.PID_B_QUEEN + squareID_queen] = 1;
+	        	bb_b_queens &= bb_b_queens - 1;
+	        }
+		}
+        
+		return result;
+	}
+	
+	
+	private BufferedImage createBoardImage(String fen) {
 		
 		BufferedImage image = new BufferedImage(IMAGE_SIZE, IMAGE_SIZE, BufferedImage.TYPE_INT_RGB);
 		
@@ -190,21 +330,44 @@ public class ScannerVisitor implements PositionsVisitor {
 	}
 	
 	
+	private double[] convertToFlatRGBArray(BufferedImage image) {
+		int count = 0;
+		double[] inputs = new double[3 * IMAGE_SIZE * IMAGE_SIZE];
+		for (int i = 0; i < IMAGE_SIZE; i++) {
+			for (int j = 0; j < IMAGE_SIZE; j++) {
+				
+				int rgb = image.getRGB(i, j);
+				
+				//int alpha = (rgb & 0xff000000) >>> 24;
+				int red = (rgb & 0xff0000) >> 16;
+				int green = (rgb & 0xff00) >> 8;
+				int blue = rgb & 0xff;
+				
+				inputs[count + 0] = red;
+				inputs[count + 1] = green;
+				inputs[count + 2] = blue;
+				count += 3;
+			}
+		}
+		return inputs;
+	}
+	
+	
 	private void loadPiecesImages() throws IOException{
 		
-		piecesImages[Constants.PID_W_KING] = ImageIO.read(new File("./res/set1_w_k.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_W_QUEEN] = ImageIO.read(new File("./res/set1_w_q.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_W_ROOK] = ImageIO.read(new File("./res/set1_w_r.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_W_BISHOP] = ImageIO.read(new File("./res/set1_w_b.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_W_KNIGHT] = ImageIO.read(new File("./res/set1_w_n.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_W_PAWN] = ImageIO.read(new File("./res/set1_w_p.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_W_KING] = ImageIO.read(new File("./res/" + PIECES_SET + "_w_k.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_W_QUEEN] = ImageIO.read(new File("./res/" + PIECES_SET + "_w_q.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_W_ROOK] = ImageIO.read(new File("./res/" + PIECES_SET + "_w_r.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_W_BISHOP] = ImageIO.read(new File("./res/" + PIECES_SET + "_w_b.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_W_KNIGHT] = ImageIO.read(new File("./res/" + PIECES_SET + "_w_n.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_W_PAWN] = ImageIO.read(new File("./res/" + PIECES_SET + "_w_p.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
 		
-		piecesImages[Constants.PID_B_KING] = ImageIO.read(new File("./res/set1_b_k.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_B_QUEEN] = ImageIO.read(new File("./res/set1_b_q.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_B_ROOK] = ImageIO.read(new File("./res/set1_b_r.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_B_BISHOP] = ImageIO.read(new File("./res/set1_b_b.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_B_KNIGHT] = ImageIO.read(new File("./res/set1_b_n.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_B_PAWN] = ImageIO.read(new File("./res/set1_b_p.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_B_KING] = ImageIO.read(new File("./res/" + PIECES_SET + "_b_k.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_B_QUEEN] = ImageIO.read(new File("./res/" + PIECES_SET + "_b_q.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_B_ROOK] = ImageIO.read(new File("./res/" + PIECES_SET + "_b_r.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_B_BISHOP] = ImageIO.read(new File("./res/" + PIECES_SET + "_b_b.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_B_KNIGHT] = ImageIO.read(new File("./res/" + PIECES_SET + "_b_n.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_B_PAWN] = ImageIO.read(new File("./res/" + PIECES_SET + "_b_p.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
 	}
 	
 	
