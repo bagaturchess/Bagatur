@@ -3,4 +3,4 @@ Sources/UCIRemote*
 Sources/WorkDir*
 *.cg
 *features.bin
-*net.bin
+*.bin

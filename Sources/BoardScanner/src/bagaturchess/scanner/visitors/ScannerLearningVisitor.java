@@ -86,10 +86,10 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 			
 			network = new ConvolutionalNetwork.Builder()
 					.withInputLayer(IMAGE_SIZE, IMAGE_SIZE, 3)
-                    .withConvolutionLayer(32, 32, 1)
+                    .withConvolutionLayer(8, 8, 1)
                     .withPoolingLayer(2, 2)
-                    //.withConvolutionLayer(16, 16, 1)
-                    //.withPoolingLayer(2, 2)
+                    .withConvolutionLayer(8, 8, 1)
+                    .withPoolingLayer(2, 2)
                     .withFullConnectedLayer(64 * 13)
                     .build();
 			
