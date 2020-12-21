@@ -20,7 +20,7 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.scanner;
+package bagaturchess.scanner.visitors;
 
 
 import java.awt.Color;
@@ -44,10 +44,11 @@ import org.neuroph.nnet.learning.ConvolutionalBackpropagation;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.scanner.utils.ScannerUtils;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
 
-public class ScannerVisitor implements PositionsVisitor {
+public class ScannerLearningVisitor implements PositionsVisitor {
 	
 	
 	private int iteration = 0;
@@ -56,12 +57,15 @@ public class ScannerVisitor implements PositionsVisitor {
 	
 	private long startTime;
 	
+	private double sumDiffs1;
+	private double sumDiffs2;
+	
 	private String PIECES_SET = "set1";
 	
 	private Image[] piecesImages = new Image[13];
 	
 	private int IMAGE_SIZE = 64;
-	private int SQUARE_SIZE = 8;
+	private int SQUARE_SIZE = IMAGE_SIZE / 8;
 	
 	private Color BLACK_SQUARE = new Color(120, 120, 120);
 	private Color WHITE_SQUARE = new Color(220, 220, 220);
@@ -70,32 +74,34 @@ public class ScannerVisitor implements PositionsVisitor {
 	private ConvolutionalNetwork network;
 	
 	
-	public ScannerVisitor() throws Exception {
+	public ScannerLearningVisitor() throws Exception {
 		
 		loadPiecesImages();
 		
 		if ((new File(NET_FILE)).exists() ){
+			
 			network = (ConvolutionalNetwork) NeuralNetwork.createFromFile(NET_FILE);
+			
 		} else {
 			
 			network = new ConvolutionalNetwork.Builder()
-					.withInputLayer(IMAGE_SIZE, IMAGE_SIZE, 1)
-                    .withConvolutionLayer(8, 8, 8)
-                    .withPoolingLayer(8, 8)
-                    .withConvolutionLayer(8, 8, 8)
-                    .withPoolingLayer(8, 8)
-                    .withConvolutionLayer(8, 8, 8)
+					.withInputLayer(IMAGE_SIZE, IMAGE_SIZE, 3)
+                    .withConvolutionLayer(32, 32, 1)
+                    .withPoolingLayer(2, 2)
+                    //.withConvolutionLayer(16, 16, 1)
+                    //.withPoolingLayer(2, 2)
                     .withFullConnectedLayer(64 * 13)
                     .build();
 			
             ConvolutionalBackpropagation backPropagation = new ConvolutionalBackpropagation();
-            backPropagation.setLearningRate(0.1);
+            backPropagation.setLearningRate(1);
+            
             //backPropagation.setMaxError(maxError);
-            //backPropagation.setMaxIterations(1);
+            backPropagation.setMaxIterations(1);
             backPropagation.addListener(new LearningEventListener() {
 				@Override
 				public void handleLearningEvent(LearningEvent arg0) {
-					System.out.println("handleLearningEvent");
+					//System.out.println("handleLearningEvent");
 				}
 			});
             backPropagation.setErrorFunction(new MeanSquaredError());
@@ -110,20 +116,48 @@ public class ScannerVisitor implements PositionsVisitor {
         
 		BufferedImage image = createBoardImage(bitboard.toEPD());
 		//saveImage(bitboard.toEPD(), image);
-		double[] input = convertToFlatRGBArray(image);
+		double[] expected_input = convertToFlatRGBArray(image);
+		double[] expected_output = createOutputArray(bitboard);
 		
-		double[] output = createOutputArray(bitboard);
+		network.setInput(expected_input);
+		network.calculate();
+		double[] actual_output = network.getOutput();
 		
-		DataSet dataset = new DataSet(input.length, output.length);
-		dataset.add(new DataSetRow(input, output));
-		network.getLearningRule().doLearningEpoch(dataset);
+		//String fen = ScannerUtils.convertOutputToFEN(actual_output);
+		//System.out.println(fen + " > " + bitboard.toEPD());
+		
+		sumDiffs1 += sumExpectedOutput(expected_output);
+		sumDiffs2 += sumDeltaOutput(expected_output, actual_output);
+		
+		DataSet dataset = new DataSet(expected_input.length, expected_output.length);
+		dataset.add(new DataSetRow(expected_input, expected_output));
+		network.learn(dataset);
 		
 		counter++;
-		//if ((counter % 10000) == 0) {
+		if ((counter % 100) == 0) {
 			
-			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms");
+			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%" + ", network error is " + network.getLearningRule().getTotalNetworkError());
 
-		//}
+			network.save(NET_FILE);
+		}
+	}
+
+
+	private double sumExpectedOutput(double[] expected_output) {
+		double sum = 0;
+		for (int i = 0; i < expected_output.length; i++) {
+			sum += Math.abs(0 - expected_output[i]);
+		}
+		return sum;
+	}
+	
+	
+	private double sumDeltaOutput(double[] expected_output, double[] actual_output) {
+		double sum = 0;
+		for (int i = 0; i < expected_output.length; i++) {
+			sum += Math.abs(expected_output[i] - actual_output[i]);
+		}
+		return sum;
 	}
 	
 	
@@ -134,12 +168,16 @@ public class ScannerVisitor implements PositionsVisitor {
 		
 		counter = 0;
 		iteration++;
+		
+		sumDiffs1 = 1;
+		sumDiffs2 = 1;
 	}
 	
 	
 	@Override
 	public void end() {
-		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms");
+		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
+		//network.save(NET_FILE);
 	}
 	
 	
