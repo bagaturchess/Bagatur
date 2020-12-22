@@ -63,7 +63,7 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 	
 	private Image[] piecesImages = new Image[13];
 	
-	private int IMAGE_SIZE = 32;
+	private int IMAGE_SIZE = 512;
 	private int SQUARE_SIZE = IMAGE_SIZE / 8;
 	
 	private Color BLACK_SQUARE = new Color(120, 120, 120);
@@ -94,9 +94,9 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 			
 			network = new ConvolutionalNetwork.Builder()
 					.withInputLayer(IMAGE_SIZE, IMAGE_SIZE, 1)
-                    .withConvolutionLayer(2, 2, 32)
+                    .withConvolutionLayer(2, 2, 1)
                     .withPoolingLayer(2, 2)
-                    .withConvolutionLayer(2, 2, 16)
+                    .withConvolutionLayer(2, 2, 1)
                     //.withPoolingLayer(2, 2)
                     //.withConvolutionLayer(2, 2, 16)
                     .withFullConnectedLayer(64 * 13)
@@ -104,7 +104,7 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 			
             ConvolutionalBackpropagation backPropagation = new ConvolutionalBackpropagation();
             
-            backPropagation.setLearningRate(0.1);
+            backPropagation.setLearningRate(1);
             
             //backPropagation.setMaxError(maxError);
             backPropagation.setMaxIterations(1);
@@ -129,7 +129,7 @@ public class ScannerLearningVisitor implements PositionsVisitor {
         
 		BufferedImage image = createBoardImage(bitboard.toEPD());
 		image = ScannerUtils.convertToGrayScale(image);
-		//ScannerUtils.saveImage(bitboard.toEPD(), image);
+		ScannerUtils.saveImage(bitboard.toEPD(), image);
 		double[] expected_input = ScannerUtils.convertToFlatGrayArray(image);
 		double[] expected_output = ScannerUtils.createOutputArray(bitboard);
 		
@@ -137,8 +137,8 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 		network.calculate();
 		double[] actual_output = network.getOutput();
 		
-		String fen = ScannerUtils.convertOutputToFEN(actual_output);
-		System.out.println(fen + " < " + bitboard.toEPD());
+		//String fen = ScannerUtils.convertOutputToFEN(actual_output);
+		//System.out.println(fen + " < " + bitboard.toEPD());
 		
 		sumDiffs1 += sumExpectedOutput(expected_output);
 		sumDiffs2 += sumDeltaOutput(expected_output, actual_output);
