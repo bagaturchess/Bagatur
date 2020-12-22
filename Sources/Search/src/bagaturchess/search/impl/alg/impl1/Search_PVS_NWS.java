@@ -691,9 +691,9 @@ public class Search_PVS_NWS extends SearchImpl {
 								throw new IllegalStateException();
 							}
 							
-							/*if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
+							if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
 								continue;
-							}*/
+							}
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
 								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
