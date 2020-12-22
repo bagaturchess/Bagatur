@@ -115,21 +115,25 @@ public class ScannerUtils {
 	
 	public static String convertOutputToFEN(double[] actual_output) {
 		
-		//double[] signals = new double[64];
+		double[] signals = new double[64];
 		int[] pids = new int[64];
 		for (int i = 0; i < actual_output.length; i++) {
 			
-			int pid = i / 64;
-			if (pid == Constants.PID_NONE) {
-				continue;
-			}
-			
+			int pid = i / 64;			
 			int squareID = i % 64;
 			
-			if (actual_output[i] >= 0.5d) {
+			if (signals[squareID] <= actual_output[i]) {
+				signals[squareID] = actual_output[i];
 				pids[squareID] = pid;
 			}
 		}
+		
+		/*for (int i = 0; i < signals.length; i++) {
+			if (signals[i] <= 0.5) {
+				pids[i] = Constants.PID_NONE;
+			}
+		}*/
+		
 		
 		StringBuilder sb = new StringBuilder();
 		for (int i = 63; i >= 0; i--) {
@@ -244,6 +248,13 @@ public class ScannerUtils {
 	        }
 		}
         
+		long free = bitboard.getFreeBitboard();
+        while (free != 0) {
+        	int squareID_free = Long.numberOfTrailingZeros(free);
+        	result[squareID_free] = 1;
+        	free &= free - 1;
+        }
+		
 		return result;
 	}
 }

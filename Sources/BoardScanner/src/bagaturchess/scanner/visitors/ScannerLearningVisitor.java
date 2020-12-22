@@ -94,17 +94,17 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 			
 			network = new ConvolutionalNetwork.Builder()
 					.withInputLayer(IMAGE_SIZE, IMAGE_SIZE, 1)
-                    .withConvolutionLayer(4, 4, 16)
-                    //.withPoolingLayer(2, 2)
-                    //.withConvolutionLayer(8, 8, 4)
-                    //.withPoolingLayer(8, 8)
+                    .withConvolutionLayer(2, 2, 32)
+                    .withPoolingLayer(2, 2)
                     .withConvolutionLayer(2, 2, 16)
+                    //.withPoolingLayer(2, 2)
+                    //.withConvolutionLayer(2, 2, 16)
                     .withFullConnectedLayer(64 * 13)
                     .build();
 			
             ConvolutionalBackpropagation backPropagation = new ConvolutionalBackpropagation();
             
-            backPropagation.setLearningRate(1);
+            backPropagation.setLearningRate(0.1);
             
             //backPropagation.setMaxError(maxError);
             backPropagation.setMaxIterations(1);
