@@ -29,7 +29,6 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -44,6 +43,7 @@ import org.neuroph.nnet.learning.ConvolutionalBackpropagation;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.scanner.utils.ScannerUtils;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
 
@@ -63,7 +63,7 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 	
 	private Image[] piecesImages = new Image[13];
 	
-	private int IMAGE_SIZE = 64;
+	private int IMAGE_SIZE = 32;
 	private int SQUARE_SIZE = IMAGE_SIZE / 8;
 	
 	private Color BLACK_SQUARE = new Color(120, 120, 120);
@@ -93,15 +93,17 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 			
 			
 			network = new ConvolutionalNetwork.Builder()
-					.withInputLayer(IMAGE_SIZE, IMAGE_SIZE, 3)
-                    .withConvolutionLayer(32, 32, 4)
-                    .withPoolingLayer(32, 32)
+					.withInputLayer(IMAGE_SIZE, IMAGE_SIZE, 1)
+                    .withConvolutionLayer(4, 4, 16)
+                    //.withPoolingLayer(2, 2)
                     //.withConvolutionLayer(8, 8, 4)
                     //.withPoolingLayer(8, 8)
+                    .withConvolutionLayer(2, 2, 16)
                     .withFullConnectedLayer(64 * 13)
                     .build();
 			
             ConvolutionalBackpropagation backPropagation = new ConvolutionalBackpropagation();
+            
             backPropagation.setLearningRate(1);
             
             //backPropagation.setMaxError(maxError);
@@ -126,16 +128,17 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 	public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
         
 		BufferedImage image = createBoardImage(bitboard.toEPD());
-		//saveImage(bitboard.toEPD(), image);
-		double[] expected_input = convertToFlatRGBArray(image);
-		double[] expected_output = createOutputArray(bitboard);
+		image = ScannerUtils.convertToGrayScale(image);
+		//ScannerUtils.saveImage(bitboard.toEPD(), image);
+		double[] expected_input = ScannerUtils.convertToFlatGrayArray(image);
+		double[] expected_output = ScannerUtils.createOutputArray(bitboard);
 		
 		network.setInput(expected_input);
 		network.calculate();
 		double[] actual_output = network.getOutput();
 		
-		//String fen = ScannerUtils.convertOutputToFEN(actual_output);
-		//System.out.println(fen + " > " + bitboard.toEPD());
+		String fen = ScannerUtils.convertOutputToFEN(actual_output);
+		System.out.println(fen + " < " + bitboard.toEPD());
 		
 		sumDiffs1 += sumExpectedOutput(expected_output);
 		sumDiffs2 += sumDeltaOutput(expected_output, actual_output);
@@ -189,97 +192,6 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 	public void end() {
 		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 		//network.save(NET_FILE);
-	}
-	
-	
-	private double[] createOutputArray(IBitBoard bitboard) {
-		
-		double[] result = new double[64 * 13];
-		{
-			long bb_w_king = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING);
-			long bb_w_queens = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN);
-			long bb_w_rooks = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_ROOK);
-			long bb_w_bishops = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP);
-			long bb_w_knights = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT);
-			long bb_w_pawns = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN);
-			
-			int squareID_w_king = Long.numberOfTrailingZeros(bb_w_king);
-			result[64 * Constants.PID_W_KING + squareID_w_king] = 1;
-			
-	        while (bb_w_pawns != 0) {
-	        	int squareID_pawn = Long.numberOfTrailingZeros(bb_w_pawns);
-	        	result[64 * Constants.PID_W_PAWN + squareID_pawn] = 1;
-	        	bb_w_pawns &= bb_w_pawns - 1;
-	        }
-	        
-	        while (bb_w_knights != 0) {
-	        	int squareID_knight = Long.numberOfTrailingZeros(bb_w_knights);
-	        	result[64 * Constants.PID_W_KNIGHT + squareID_knight] = 1;
-	        	bb_w_knights &= bb_w_knights - 1;
-	        }
-	        
-	        while (bb_w_bishops != 0) {
-	        	int squareID_bishop = Long.numberOfTrailingZeros(bb_w_bishops);
-	        	result[64 * Constants.PID_W_BISHOP + squareID_bishop] = 1;
-	        	bb_w_bishops &= bb_w_bishops - 1;
-	        }
-	        
-	        while (bb_w_rooks != 0) {
-	        	int squareID_rook = Long.numberOfTrailingZeros(bb_w_rooks);
-	        	result[64 * Constants.PID_W_ROOK + squareID_rook] = 1;
-	        	bb_w_rooks &= bb_w_rooks - 1;
-	        }
-	        
-	        while (bb_w_queens != 0) {
-	        	int squareID_queen = Long.numberOfTrailingZeros(bb_w_queens);
-	        	result[64 * Constants.PID_W_QUEEN + squareID_queen] = 1;
-	        	bb_w_queens &= bb_w_queens - 1;
-	        }
-		}
-        
-		{
-			long bb_b_king = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING);
-			long bb_b_queens = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN);
-			long bb_b_rooks = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_ROOK);
-			long bb_b_bishops = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP);
-			long bb_b_knights = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT);
-			long bb_b_pawns = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN);
-			
-			int squareID_b_king = Long.numberOfTrailingZeros(bb_b_king);
-			result[64 * Constants.PID_B_KING + squareID_b_king] = 1;
-			
-	        while (bb_b_pawns != 0) {
-	        	int squareID_pawn = Long.numberOfTrailingZeros(bb_b_pawns);
-	        	result[64 * Constants.PID_B_PAWN + squareID_pawn] = 1;
-	        	bb_b_pawns &= bb_b_pawns - 1;
-	        }
-	        
-	        while (bb_b_knights != 0) {
-	        	int squareID_knight = Long.numberOfTrailingZeros(bb_b_knights);
-	        	result[64 * Constants.PID_B_KNIGHT + squareID_knight] = 1;
-	        	bb_b_knights &= bb_b_knights - 1;
-	        }
-	        
-	        while (bb_b_bishops != 0) {
-	        	int squareID_bishop = Long.numberOfTrailingZeros(bb_b_bishops);
-	        	result[64 * Constants.PID_B_BISHOP + squareID_bishop] = 1;
-	        	bb_b_bishops &= bb_b_bishops - 1;
-	        }
-	        
-	        while (bb_b_rooks != 0) {
-	        	int squareID_rook = Long.numberOfTrailingZeros(bb_b_rooks);
-	        	result[64 * Constants.PID_B_ROOK + squareID_rook] = 1;
-	        	bb_b_rooks &= bb_b_rooks - 1;
-	        }
-	        
-	        while (bb_b_queens != 0) {
-	        	int squareID_queen = Long.numberOfTrailingZeros(bb_b_queens);
-	        	result[64 * Constants.PID_B_QUEEN + squareID_queen] = 1;
-	        	bb_b_queens &= bb_b_queens - 1;
-	        }
-		}
-        
-		return result;
 	}
 	
 	
@@ -379,29 +291,6 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 	}
 	
 	
-	private double[] convertToFlatRGBArray(BufferedImage image) {
-		int count = 0;
-		double[] inputs = new double[3 * IMAGE_SIZE * IMAGE_SIZE];
-		for (int i = 0; i < IMAGE_SIZE; i++) {
-			for (int j = 0; j < IMAGE_SIZE; j++) {
-				
-				int rgb = image.getRGB(i, j);
-				
-				//int alpha = (rgb & 0xff000000) >>> 24;
-				int red = (rgb & 0xff0000) >> 16;
-				int green = (rgb & 0xff00) >> 8;
-				int blue = rgb & 0xff;
-				
-				inputs[count + 0] = red;
-				inputs[count + 1] = green;
-				inputs[count + 2] = blue;
-				count += 3;
-			}
-		}
-		return inputs;
-	}
-	
-	
 	private void loadPiecesImages() throws IOException{
 		
 		piecesImages[Constants.PID_W_KING] = ImageIO.read(new File("./res/" + PIECES_SET + "_w_k.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
@@ -417,15 +306,5 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 		piecesImages[Constants.PID_B_BISHOP] = ImageIO.read(new File("./res/" + PIECES_SET + "_b_b.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
 		piecesImages[Constants.PID_B_KNIGHT] = ImageIO.read(new File("./res/" + PIECES_SET + "_b_n.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
 		piecesImages[Constants.PID_B_PAWN] = ImageIO.read(new File("./res/" + PIECES_SET + "_b_p.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
-	}
-	
-	
-	private void saveImage(String fen, BufferedImage image) {
-		try {
-			File file = new File("./data/" + (fen + ".jpg").replace('/', '_'));
-			ImageIO.write(image, "jpg", file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }
