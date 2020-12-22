@@ -28,7 +28,7 @@ public class ScannerUtils {
 	
 	public static String convertOutputToFEN(double[] actual_output) {
 		
-		double[] signals = new double[64];
+		//double[] signals = new double[64];
 		int[] pids = new int[64];
 		for (int i = 0; i < actual_output.length; i++) {
 			

@@ -38,12 +38,9 @@ import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
 import org.neuroph.core.events.LearningEvent;
 import org.neuroph.core.events.LearningEventListener;
-import org.neuroph.nnet.MultiLayerPerceptron;
-import org.neuroph.nnet.learning.BackPropagation;
+import org.neuroph.core.learning.error.MeanSquaredError;
+import org.neuroph.nnet.ConvolutionalNetwork;
 import org.neuroph.nnet.learning.ConvolutionalBackpropagation;
-import org.neuroph.util.TransferFunctionType;
-import org.neuroph.util.random.WeightsRandomizer;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
@@ -73,7 +70,7 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 	private Color WHITE_SQUARE = new Color(220, 220, 220);
 	
 	private static final String NET_FILE = "scanner.bin";
-	private MultiLayerPerceptron network;
+	private ConvolutionalNetwork network;
 	
 	
 	public ScannerLearningVisitor() throws Exception {
@@ -82,18 +79,25 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 		
 		if ((new File(NET_FILE)).exists() ){
 			
-			network = (MultiLayerPerceptron) NeuralNetwork.createFromFile(NET_FILE);
+			System.out.println("Loading network ...");
+			
+			
+			network = (ConvolutionalNetwork) NeuralNetwork.createFromFile(NET_FILE);
+			
 			
 			System.out.println("Network loaded.");
 			
 		} else {
 			
-			/*network = new ConvolutionalNetwork.Builder()
-					.withInputLayer(64, 64, 3)
-                    .withConvolutionLayer(8, 8, 1)
-                    .withPoolingLayer(2, 2)
-                    .withConvolutionLayer(8, 8, 1)
-                    .withPoolingLayer(2, 2)
+			System.out.println("Creating network ...");
+			
+			
+			network = new ConvolutionalNetwork.Builder()
+					.withInputLayer(IMAGE_SIZE, IMAGE_SIZE, 3)
+                    .withConvolutionLayer(32, 32, 4)
+                    .withPoolingLayer(32, 32)
+                    //.withConvolutionLayer(8, 8, 4)
+                    //.withPoolingLayer(8, 8)
                     .withFullConnectedLayer(64 * 13)
                     .build();
 			
@@ -110,32 +114,10 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 			});
             backPropagation.setErrorFunction(new MeanSquaredError());
 			
-            network.setLearningRule(backPropagation);*/
+            network.setLearningRule(backPropagation);
 			
-			System.out.println("Creating netowrk ...");
-			
-			network = new MultiLayerPerceptron(TransferFunctionType.LINEAR,
-					3 * IMAGE_SIZE * IMAGE_SIZE,
-					64 * 13);
-			
+            
 			System.out.println("Network created.");
-			
-			network.randomizeWeights(new WeightsRandomizer(new Random(777)));
-	        
-			network.setLearningRule(new BackPropagation());
-	        //mlp.setLearningRule(new ConvolutionalBackpropagation());
-	        //mlp.setLearningRule(new MomentumBackpropagation());
-	        //mlp.setLearningRule(new DynamicBackPropagation());
-	        
-			network.getLearningRule().setMaxIterations(1);
-			network.getLearningRule().setLearningRate(0.005);
-	        //mlp.getLearningRule().setLearningRate(0.0001);
-			network.getLearningRule().addListener(new LearningEventListener() {
-				@Override
-				public void handleLearningEvent(LearningEvent arg) {
-					//System.out.println("handleLearningEvent");
-				}
-			});
 		}
 	}
 	

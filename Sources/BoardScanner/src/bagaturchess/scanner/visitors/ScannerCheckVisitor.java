@@ -75,8 +75,14 @@ public class ScannerCheckVisitor implements PositionsVisitor {
 		
 		loadPiecesImages();
 		
+		
+		System.out.println("Loading network ...");
+		
+		
 		network = (ConvolutionalNetwork) NeuralNetwork.createFromFile(NET_FILE);
-
+		
+		
+		System.out.println("Network loaded.");
 	}
 	
 	

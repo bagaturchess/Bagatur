@@ -10,7 +10,6 @@ public class ScannerCheckMain {
 	
 	public static void main(String[] args) {
 		
-		System.out.println("Reading games ... ");
 		long startTime = System.currentTimeMillis();
 		try {
 			
@@ -18,6 +17,7 @@ public class ScannerCheckMain {
 			
 			PositionsVisitor visitor = new ScannerCheckVisitor();
 			
+			System.out.println("Reading games ... ");
 			while (true) {
 				PositionsTraverser.traverseAll(filePath, visitor, 999999999, null, null);
 			}
