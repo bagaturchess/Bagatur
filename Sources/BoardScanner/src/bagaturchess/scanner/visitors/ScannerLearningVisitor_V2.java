@@ -158,7 +158,7 @@ public class ScannerLearningVisitor_V2 implements PositionsVisitor {
 			return;
 		}
 		
-		if (dataset.size() > TRAINING_SET_SIZE) {
+		if (dataset.size() >= TRAINING_SET_SIZE) {
 			return;
 		}
 		
