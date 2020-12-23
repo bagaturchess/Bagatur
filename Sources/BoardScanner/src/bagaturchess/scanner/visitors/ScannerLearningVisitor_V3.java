@@ -169,7 +169,7 @@ public class ScannerLearningVisitor_V3 implements PositionsVisitor {
 			
 			BufferedImage image = createBoardImage(fen);
 			image = ScannerUtils.convertToGrayScale(image);
-			ScannerUtils.saveImage(fen, image);
+			//ScannerUtils.saveImage(fen, image);
 			float[] expected_input = ScannerUtils.convertToFlatGrayArray(image);
 			float[] expected_output = ScannerUtils.createOutputArray(cur_bitboard);
 			
