@@ -53,7 +53,7 @@ import deepnetts.util.FileIO;
 import deepnetts.util.Tensor;
 
 
-public class ScannerLearningVisitor implements PositionsVisitor {
+public class ScannerLearningVisitor_V2 implements PositionsVisitor {
 	
 	
 	private int iteration = 0;
@@ -61,9 +61,6 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 	private int counter;
 	
 	private long startTime;
-	
-	private double sumDiffs1;
-	private double sumDiffs2;
 	
 	private String PIECES_SET = "set1";
 	
@@ -79,9 +76,12 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 	private ConvolutionalNetwork network;
 	
 	private BackpropagationTrainer trainer;
+	private ScannerDataSet dataset;
+	
+	private int TRAINING_SET_SIZE = 1000;
 	
 	
-	public ScannerLearningVisitor() throws Exception {
+	public ScannerLearningVisitor_V2() throws Exception {
 		
 		loadPiecesImages();
 		
@@ -102,11 +102,11 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 			
 			network =  ConvolutionalNetwork.builder()
 	                .addInputLayer(IMAGE_SIZE, IMAGE_SIZE, 1)
-	                .addConvolutionalLayer(3, 3, 64)
-	                .addMaxPoolingLayer(2, 2)
 	                .addConvolutionalLayer(3, 3, 32)
+	                .addMaxPoolingLayer(2, 2)
+	                .addConvolutionalLayer(3, 3, 16)
 	                .addOutputLayer(64 * 13, ActivationType.SIGMOID)
-	                .hiddenActivationFunction(ActivationType.SIGMOID)
+	                .hiddenActivationFunction(ActivationType.LINEAR)
 	                .lossFunction(LossType.CROSS_ENTROPY)
 	                .randomSeed(123)
 	                .build();
@@ -120,96 +120,54 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 		trainer.setLearningRate(0.001f);
         //trainer.setLearningRate(0.00001f);//For ActivationType.LINEAR
         
-        trainer.setMaxEpochs(1);
+        //trainer.setMaxEpochs(1);
+        
+        trainer.setBatchMode(true);
+        trainer.setBatchSize(TRAINING_SET_SIZE);
+        
+        trainer.addListener(new TrainingListener() {
+			
+			@Override
+			public void handleEvent(TrainingEvent event) {
+				if (event.getType().equals(TrainingEvent.Type.EPOCH_FINISHED)) {
+					
+					System.out.println("End learning: Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, Training loss is " + event.getSource().getTrainingLoss());
+					
+					iteration++;
+					
+					try {
+						FileIO.writeToFile(network, NET_FILE);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+        
+        dataset = new ScannerDataSet();
 	}
 	
 	
 	@Override
 	public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
         
+		if (iteration > 1) {
+			return;
+		}
+		
+		if (dataset.size() > TRAINING_SET_SIZE) {
+			return;
+		}
+		
 		BufferedImage image = createBoardImage(bitboard.toEPD());
 		image = ScannerUtils.convertToGrayScale(image);
 		//ScannerUtils.saveImage(bitboard.toEPD(), image);
 		float[] expected_input = ScannerUtils.convertToFlatGrayArray(image);
 		float[] expected_output = ScannerUtils.createOutputArray(bitboard);
 		
-		network.setInput(new Tensor(expected_input));
-		network.forward();
-		float[] actual_output = network.getOutput();
-		
-		//String fen = ScannerUtils.convertOutputToFEN(actual_output);
-		//System.out.println(fen + " < " + bitboard.toEPD());
-		
-		sumDiffs1 += sumExpectedOutput(expected_output);
-		sumDiffs2 += sumDeltaOutput(expected_output, actual_output);
-		
-		DataSet<MLDataItem> list = new DataSet() {
-
-			@Override
-			public List getItems() {
-				List result = new ArrayList<>();
-				result.add(new TabularDataSet.Item(expected_input, expected_output));
-				return result;
-			}
-
-			@Override
-			public DataSet[] split(double... parts) {
-				throw new IllegalStateException();
-			}
-
-			@Override
-			public String[] getTargetNames() {
-				String[] result = new String[64 * 13];
-				
-				for (int i = 0; i < result.length; i++) {
-					result[i] = "LABEL" + i;
-				}
-						
-				return result;
-			}
-
-			@Override
-			public void setColumnNames(String[] columnNames) {
-				throw new IllegalStateException();
-			}
-
-			@Override
-			public String[] getColumnNames() {
-				throw new IllegalStateException();
-			}
-		};
-		
-		trainer.train(list);
+		dataset.addItem(expected_input, expected_output);
 		
 		counter++;
-		if ((counter % 100) == 0) {
-			
-			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, error " + network.getLossFunction().getTotal());
-
-			try {
-				FileIO.writeToFile(network, NET_FILE);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-
-	private double sumExpectedOutput(float[] expected_output) {
-		double sum = 0;
-		for (int i = 0; i < expected_output.length; i++) {
-			sum += Math.abs(0 - expected_output[i]);
-		}
-		return sum;
-	}
-	
-	
-	private double sumDeltaOutput(float[] expected_output, float[] actual_output) {
-		double sum = 0;
-		for (int i = 0; i < expected_output.length; i++) {
-			sum += Math.abs(expected_output[i] - actual_output[i]);
-		}
-		return sum;
 	}
 	
 	
@@ -220,16 +178,15 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 		
 		counter = 0;
 		iteration++;
-		
-		sumDiffs1 = 1;
-		sumDiffs2 = 1;
 	}
 	
 	
 	@Override
 	public void end() {
-		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
-		//network.save(NET_FILE);
+		
+		System.out.println("Start learning: Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms");
+		
+		trainer.train(dataset);
 	}
 	
 	
@@ -344,5 +301,60 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 		piecesImages[Constants.PID_B_BISHOP] = ImageIO.read(new File("./res/" + PIECES_SET + "_b_b.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
 		piecesImages[Constants.PID_B_KNIGHT] = ImageIO.read(new File("./res/" + PIECES_SET + "_b_n.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
 		piecesImages[Constants.PID_B_PAWN] = ImageIO.read(new File("./res/" + PIECES_SET + "_b_p.png")).getScaledInstance(SQUARE_SIZE, SQUARE_SIZE, Image.SCALE_REPLICATE);
+	}
+	
+	
+	private static class ScannerDataSet implements DataSet<MLDataItem> {
+		
+		
+		private List<MLDataItem> items;
+		private String[] targetNames;
+		
+		
+		private ScannerDataSet() {
+			
+			items = new ArrayList<MLDataItem>();
+			
+			targetNames = new String[64 * 13];
+			for (int i = 0; i < targetNames.length; i++) {
+				targetNames[i] = "LABEL" + i;
+			}
+		}
+		
+		
+		private void addItem(float[] inputs, float[] outputs) {
+			items.add(new TabularDataSet.Item(inputs, outputs));
+			//System.out.println("items size is " + items.size());
+		}
+		
+		
+		@Override
+		public List<MLDataItem> getItems() {
+			return items;
+		}
+		
+		
+		@Override
+		public DataSet<MLDataItem>[] split(double... parts) {
+			throw new UnsupportedOperationException();
+		}
+		
+		
+		@Override
+		public String[] getTargetNames() {
+			return targetNames;
+		}
+		
+		
+		@Override
+		public void setColumnNames(String[] columnNames) {
+			throw new UnsupportedOperationException();
+		}
+		
+		
+		@Override
+		public String[] getColumnNames() {
+			throw new UnsupportedOperationException();
+		}
 	}
 }

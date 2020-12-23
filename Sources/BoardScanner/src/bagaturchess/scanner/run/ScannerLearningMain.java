@@ -1,7 +1,8 @@
 package bagaturchess.scanner.run;
 
 
-import bagaturchess.scanner.visitors.ScannerLearningVisitor;
+import bagaturchess.scanner.visitors.ScannerLearningVisitor_V1;
+import bagaturchess.scanner.visitors.ScannerLearningVisitor_V2;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
@@ -15,7 +16,7 @@ public class ScannerLearningMain {
 			
 			String filePath = "./stockfish-12.cg";
 			
-			PositionsVisitor visitor = new ScannerLearningVisitor();
+			PositionsVisitor visitor = new ScannerLearningVisitor_V2();
 			
 			System.out.println("Reading games ... ");
 			while (true) {

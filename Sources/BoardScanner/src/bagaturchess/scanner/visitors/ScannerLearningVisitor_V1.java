@@ -29,20 +29,31 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.visrec.ml.data.BasicDataSet;
+import javax.visrec.ml.data.DataSet;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.utils.ScannerUtils;
 import bagaturchess.ucitracker.api.PositionsVisitor;
+import deepnetts.data.MLDataItem;
+import deepnetts.data.TabularDataSet;
 import deepnetts.net.ConvolutionalNetwork;
+import deepnetts.net.layers.activation.ActivationType;
+import deepnetts.net.loss.LossType;
+import deepnetts.net.train.BackpropagationTrainer;
+import deepnetts.net.train.TrainingEvent;
+import deepnetts.net.train.TrainingListener;
 import deepnetts.util.FileIO;
 import deepnetts.util.Tensor;
 
 
-public class ScannerCheckVisitor implements PositionsVisitor {
+public class ScannerLearningVisitor_V1 implements PositionsVisitor {
 	
 	
 	private int iteration = 0;
@@ -67,19 +78,51 @@ public class ScannerCheckVisitor implements PositionsVisitor {
 	private static final String NET_FILE = "scanner.bin";
 	private ConvolutionalNetwork network;
 	
+	private BackpropagationTrainer trainer;
 	
-	public ScannerCheckVisitor() throws Exception {
+	
+	public ScannerLearningVisitor_V1() throws Exception {
 		
 		loadPiecesImages();
 		
+		if ((new File(NET_FILE)).exists() ){
+			
+			System.out.println("Loading network ...");
+			
+			
+			network = (ConvolutionalNetwork) FileIO.createFromFile(new File(NET_FILE));
+			
+			
+			System.out.println("Network loaded.");
+			
+		} else {
+			
+			System.out.println("Creating network ...");
+			
+			
+			network =  ConvolutionalNetwork.builder()
+	                .addInputLayer(IMAGE_SIZE, IMAGE_SIZE, 1)
+	                .addConvolutionalLayer(3, 3, 32)
+	                .addMaxPoolingLayer(2, 2)
+	                .addConvolutionalLayer(3, 3, 16)
+	                .addMaxPoolingLayer(2, 2)
+	                .addConvolutionalLayer(3, 3, 16)
+	                .addOutputLayer(64 * 13, ActivationType.SIGMOID)
+	                .hiddenActivationFunction(ActivationType.RELU)
+	                .lossFunction(LossType.CROSS_ENTROPY)
+	                .randomSeed(123)
+	                .build();
+			
+            
+			System.out.println("Network created.");
+		}
 		
-		System.out.println("Loading network ...");
+		trainer = new BackpropagationTrainer(network);
 		
-		
-		network = (ConvolutionalNetwork) FileIO.createFromFile(new File(NET_FILE));
-		
-		
-		System.out.println("Network loaded.");
+		trainer.setLearningRate(0.001f);
+        //trainer.setLearningRate(0.00001f);//For ActivationType.LINEAR
+        
+        trainer.setMaxEpochs(1);
 	}
 	
 	
@@ -96,22 +139,60 @@ public class ScannerCheckVisitor implements PositionsVisitor {
 		network.forward();
 		float[] actual_output = network.getOutput();
 		
-		String fen = ScannerUtils.convertOutputToFEN(actual_output);
-		System.out.println(fen + " < " + bitboard.toEPD());
-		
-		/*String msg = "";
-		for (int i = 0; i < actual_output.length; i++) {
-			msg += actual_output[i] + ", ";
-		}
-		System.out.println(msg);*/
+		//String fen = ScannerUtils.convertOutputToFEN(actual_output);
+		//System.out.println(fen + " < " + bitboard.toEPD());
 		
 		sumDiffs1 += sumExpectedOutput(expected_output);
 		sumDiffs2 += sumDeltaOutput(expected_output, actual_output);
 		
+		DataSet<MLDataItem> list = new DataSet() {
+
+			@Override
+			public List getItems() {
+				List result = new ArrayList<>();
+				result.add(new TabularDataSet.Item(expected_input, expected_output));
+				return result;
+			}
+
+			@Override
+			public DataSet[] split(double... parts) {
+				throw new IllegalStateException();
+			}
+
+			@Override
+			public String[] getTargetNames() {
+				String[] result = new String[64 * 13];
+				
+				for (int i = 0; i < result.length; i++) {
+					result[i] = "LABEL" + i;
+				}
+						
+				return result;
+			}
+
+			@Override
+			public void setColumnNames(String[] columnNames) {
+				throw new IllegalStateException();
+			}
+
+			@Override
+			public String[] getColumnNames() {
+				throw new IllegalStateException();
+			}
+		};
+		
+		trainer.train(list);
+		
 		counter++;
 		if ((counter % 100) == 0) {
 			
-			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
+			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, error " + network.getLossFunction().getTotal());
+
+			try {
+				FileIO.writeToFile(network, NET_FILE);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

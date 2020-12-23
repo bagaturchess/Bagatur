@@ -101,6 +101,7 @@ public class ScannerUtils {
 				count += 3;
 			}
 		}
+		
 		return inputs;
 	}
 	
