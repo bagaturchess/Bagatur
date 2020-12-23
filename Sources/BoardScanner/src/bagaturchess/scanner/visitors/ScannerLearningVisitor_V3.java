@@ -117,6 +117,9 @@ public class ScannerLearningVisitor_V3 implements PositionsVisitor {
 		
 		trainer.setLearningRate(0.0001f);
         
+        trainer.setBatchMode(true);
+        trainer.setBatchSize(769);
+        
         trainer.addListener(new TrainingListener() {
 			
 			@Override
@@ -166,7 +169,7 @@ public class ScannerLearningVisitor_V3 implements PositionsVisitor {
 			
 			BufferedImage image = createBoardImage(fen);
 			image = ScannerUtils.convertToGrayScale(image);
-			//ScannerUtils.saveImage(bitboard.toEPD(), image);
+			ScannerUtils.saveImage(fen, image);
 			float[] expected_input = ScannerUtils.convertToFlatGrayArray(image);
 			float[] expected_output = ScannerUtils.createOutputArray(cur_bitboard);
 			

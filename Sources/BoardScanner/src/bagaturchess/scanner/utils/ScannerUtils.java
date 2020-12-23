@@ -102,7 +102,7 @@ public class ScannerUtils {
 		for (int i = 0; i < 64; i++) {
 			int[] pids = new int[64];
 			pids[i] = pid;
-			String fen = createFENFromPIDs(pids) + " w KQkq - 0 1";
+			String fen = createFENFromPIDs(pids) + " " + (pid >= 1 && pid <= 6 ? "w" : "b") + " KQkq - 0 1";
 			result.add(fen);
 		}
 		
