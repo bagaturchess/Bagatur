@@ -35,6 +35,55 @@ import bagaturchess.bitboard.impl1.internal.ChessConstants;
 public class ScannerUtils {
 	
 	
+	public static String convertOutputToFEN(float[] actual_output) {
+		
+		
+		float[] signals = new float[64];
+		int[] pids = new int[64];
+		for (int i = 0; i < actual_output.length; i++) {
+			
+			int pid = i / 64;			
+			int squareID = i % 64;
+			
+			if (signals[squareID] <= actual_output[i]) {
+				signals[squareID] = actual_output[i];
+				pids[squareID] = pid;
+			}
+		}
+		
+		/*for (int i = 0; i < signals.length; i++) {
+			if (signals[i] <= 0.5) {
+				pids[i] = Constants.PID_NONE;
+			}
+		}*/
+		
+		
+		StringBuilder sb = new StringBuilder();
+		for (int i = 63; i >= 0; i--) {
+			if (pids[i] >= 1 && pids[i] <= 6) {
+				sb.append(ChessConstants.FEN_WHITE_PIECES[Constants.PIECE_IDENTITY_2_TYPE[pids[i]]]);
+			} else {
+				sb.append(ChessConstants.FEN_BLACK_PIECES[Constants.PIECE_IDENTITY_2_TYPE[pids[i]]]);
+			}
+			
+			if (i % 8 == 0 && i != 0) {
+				sb.append("/");
+			}
+		}
+		
+		String fen = sb.toString();
+		fen = fen.replaceAll("11111111", "8");
+		fen = fen.replaceAll("1111111", "7");
+		fen = fen.replaceAll("111111", "6");
+		fen = fen.replaceAll("11111", "5");
+		fen = fen.replaceAll("1111", "4");
+		fen = fen.replaceAll("111", "3");
+		fen = fen.replaceAll("11", "2");
+		
+		return fen;
+	}
+	
+	
 	public static void saveImage(String fen, BufferedImage image) {
 		try {
 			File file = new File("./data/" + (fen + ".jpg").replace('/', '_'));
@@ -111,54 +160,6 @@ public class ScannerUtils {
 	  Graphics g = result.getGraphics();
 	  g.drawImage(image, 0, 0, null);
 	  return result;
-	}
-	
-	
-	public static String convertOutputToFEN(float[] actual_output) {
-		
-		float[] signals = new float[64];
-		int[] pids = new int[64];
-		for (int i = 0; i < actual_output.length; i++) {
-			
-			int pid = i / 64;			
-			int squareID = i % 64;
-			
-			if (signals[squareID] <= actual_output[i]) {
-				signals[squareID] = actual_output[i];
-				pids[squareID] = pid;
-			}
-		}
-		
-		/*for (int i = 0; i < signals.length; i++) {
-			if (signals[i] <= 0.5) {
-				pids[i] = Constants.PID_NONE;
-			}
-		}*/
-		
-		
-		StringBuilder sb = new StringBuilder();
-		for (int i = 63; i >= 0; i--) {
-			if (pids[i] >= 1 && pids[i] <= 6) {
-				sb.append(ChessConstants.FEN_WHITE_PIECES[Constants.PIECE_IDENTITY_2_TYPE[pids[i]]]);
-			} else {
-				sb.append(ChessConstants.FEN_BLACK_PIECES[Constants.PIECE_IDENTITY_2_TYPE[pids[i]]]);
-			}
-			
-			if (i % 8 == 0 && i != 0) {
-				sb.append("/");
-			}
-		}
-		
-		String fen = sb.toString();
-		fen = fen.replaceAll("11111111", "8");
-		fen = fen.replaceAll("1111111", "7");
-		fen = fen.replaceAll("111111", "6");
-		fen = fen.replaceAll("11111", "5");
-		fen = fen.replaceAll("1111", "4");
-		fen = fen.replaceAll("111", "3");
-		fen = fen.replaceAll("11", "2");
-		
-		return fen;
 	}
 	
 	

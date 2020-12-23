@@ -60,15 +60,16 @@ public class ScannerLearningVisitor_V2 implements PositionsVisitor {
 	
 	private long startTime;
 	
-	private String PIECES_SET = "set1";
-	
-	private Image[] piecesImages = new Image[13];
 	
 	private int IMAGE_SIZE = 64;
 	private int SQUARE_SIZE = IMAGE_SIZE / 8;
 	
+	private String PIECES_SET = "set1";
+	private Image[] piecesImages = new Image[13];
+	
 	private Color BLACK_SQUARE = new Color(120, 120, 120);
 	private Color WHITE_SQUARE = new Color(220, 220, 220);
+	
 	
 	private static final String NET_FILE = "scanner.bin";
 	private ConvolutionalNetwork network;
