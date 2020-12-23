@@ -29,22 +29,28 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.visrec.ml.data.BasicDataSet;
+import javax.visrec.ml.data.DataSet;
 
-import org.neuroph.core.NeuralNetwork;
-import org.neuroph.core.data.DataSet;
-import org.neuroph.core.data.DataSetRow;
-import org.neuroph.core.events.LearningEvent;
-import org.neuroph.core.events.LearningEventListener;
-import org.neuroph.core.learning.error.MeanSquaredError;
-import org.neuroph.nnet.ConvolutionalNetwork;
-import org.neuroph.nnet.learning.ConvolutionalBackpropagation;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.utils.ScannerUtils;
 import bagaturchess.ucitracker.api.PositionsVisitor;
+import deepnetts.data.MLDataItem;
+import deepnetts.data.TabularDataSet;
+import deepnetts.net.ConvolutionalNetwork;
+import deepnetts.net.layers.activation.ActivationType;
+import deepnetts.net.loss.LossType;
+import deepnetts.net.train.BackpropagationTrainer;
+import deepnetts.net.train.TrainingEvent;
+import deepnetts.net.train.TrainingListener;
+import deepnetts.util.FileIO;
+import deepnetts.util.Tensor;
 
 
 public class ScannerLearningVisitor implements PositionsVisitor {
@@ -63,7 +69,7 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 	
 	private Image[] piecesImages = new Image[13];
 	
-	private int IMAGE_SIZE = 512;
+	private int IMAGE_SIZE = 64;
 	private int SQUARE_SIZE = IMAGE_SIZE / 8;
 	
 	private Color BLACK_SQUARE = new Color(120, 120, 120);
@@ -71,6 +77,8 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 	
 	private static final String NET_FILE = "scanner.bin";
 	private ConvolutionalNetwork network;
+	
+	private BackpropagationTrainer trainer;
 	
 	
 	public ScannerLearningVisitor() throws Exception {
@@ -82,7 +90,7 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 			System.out.println("Loading network ...");
 			
 			
-			network = (ConvolutionalNetwork) NeuralNetwork.createFromFile(NET_FILE);
+			network = (ConvolutionalNetwork) FileIO.createFromFile(new File(NET_FILE));
 			
 			
 			System.out.println("Network loaded.");
@@ -92,35 +100,27 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 			System.out.println("Creating network ...");
 			
 			
-			network = new ConvolutionalNetwork.Builder()
-					.withInputLayer(IMAGE_SIZE, IMAGE_SIZE, 1)
-                    .withConvolutionLayer(2, 2, 1)
-                    .withPoolingLayer(2, 2)
-                    .withConvolutionLayer(2, 2, 1)
-                    //.withPoolingLayer(2, 2)
-                    //.withConvolutionLayer(2, 2, 16)
-                    .withFullConnectedLayer(64 * 13)
-                    .build();
-			
-            ConvolutionalBackpropagation backPropagation = new ConvolutionalBackpropagation();
-            
-            backPropagation.setLearningRate(1);
-            
-            //backPropagation.setMaxError(maxError);
-            backPropagation.setMaxIterations(1);
-            backPropagation.addListener(new LearningEventListener() {
-				@Override
-				public void handleLearningEvent(LearningEvent arg0) {
-					//System.out.println("handleLearningEvent");
-				}
-			});
-            backPropagation.setErrorFunction(new MeanSquaredError());
-			
-            network.setLearningRule(backPropagation);
+			network =  ConvolutionalNetwork.builder()
+	                .addInputLayer(IMAGE_SIZE, IMAGE_SIZE, 1)
+	                .addConvolutionalLayer(3, 3, 64)
+	                .addMaxPoolingLayer(2, 2)
+	                .addConvolutionalLayer(3, 3, 32)
+	                .addOutputLayer(64 * 13, ActivationType.SIGMOID)
+	                .hiddenActivationFunction(ActivationType.SIGMOID)
+	                .lossFunction(LossType.CROSS_ENTROPY)
+	                .randomSeed(123)
+	                .build();
 			
             
 			System.out.println("Network created.");
 		}
+		
+		trainer = new BackpropagationTrainer(network);
+		
+		trainer.setLearningRate(0.001f);
+        //trainer.setLearningRate(0.00001f);//For ActivationType.LINEAR
+        
+        trainer.setMaxEpochs(1);
 	}
 	
 	
@@ -130,12 +130,12 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 		BufferedImage image = createBoardImage(bitboard.toEPD());
 		image = ScannerUtils.convertToGrayScale(image);
 		//ScannerUtils.saveImage(bitboard.toEPD(), image);
-		double[] expected_input = ScannerUtils.convertToFlatGrayArray(image);
-		double[] expected_output = ScannerUtils.createOutputArray(bitboard);
+		float[] expected_input = ScannerUtils.convertToFlatGrayArray(image);
+		float[] expected_output = ScannerUtils.createOutputArray(bitboard);
 		
-		network.setInput(expected_input);
-		network.calculate();
-		double[] actual_output = network.getOutput();
+		network.setInput(new Tensor(expected_input));
+		network.forward();
+		float[] actual_output = network.getOutput();
 		
 		//String fen = ScannerUtils.convertOutputToFEN(actual_output);
 		//System.out.println(fen + " < " + bitboard.toEPD());
@@ -143,21 +143,59 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 		sumDiffs1 += sumExpectedOutput(expected_output);
 		sumDiffs2 += sumDeltaOutput(expected_output, actual_output);
 		
-		DataSet dataset = new DataSet(expected_input.length, expected_output.length);
-		dataset.add(new DataSetRow(expected_input, expected_output));
-		network.learn(dataset);
+		DataSet<MLDataItem> list = new DataSet() {
+
+			@Override
+			public List getItems() {
+				List result = new ArrayList<>();
+				result.add(new TabularDataSet.Item(expected_input, expected_output));
+				return result;
+			}
+
+			@Override
+			public DataSet[] split(double... parts) {
+				throw new IllegalStateException();
+			}
+
+			@Override
+			public String[] getTargetNames() {
+				String[] result = new String[64 * 13];
+				
+				for (int i = 0; i < result.length; i++) {
+					result[i] = "LABEL" + i;
+				}
+						
+				return result;
+			}
+
+			@Override
+			public void setColumnNames(String[] columnNames) {
+				throw new IllegalStateException();
+			}
+
+			@Override
+			public String[] getColumnNames() {
+				throw new IllegalStateException();
+			}
+		};
+		
+		trainer.train(list);
 		
 		counter++;
 		if ((counter % 100) == 0) {
 			
-			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%" + ", network error is " + network.getLearningRule().getTotalNetworkError());
+			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, error " + network.getLossFunction().getTotal());
 
-			network.save(NET_FILE);
+			try {
+				FileIO.writeToFile(network, NET_FILE);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 
-	private double sumExpectedOutput(double[] expected_output) {
+	private double sumExpectedOutput(float[] expected_output) {
 		double sum = 0;
 		for (int i = 0; i < expected_output.length; i++) {
 			sum += Math.abs(0 - expected_output[i]);
@@ -166,7 +204,7 @@ public class ScannerLearningVisitor implements PositionsVisitor {
 	}
 	
 	
-	private double sumDeltaOutput(double[] expected_output, double[] actual_output) {
+	private double sumDeltaOutput(float[] expected_output, float[] actual_output) {
 		double sum = 0;
 		for (int i = 0; i < expected_output.length; i++) {
 			sum += Math.abs(expected_output[i] - actual_output[i]);

@@ -23,8 +23,6 @@
 package bagaturchess.scanner.visitors;
 
 
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -34,14 +32,14 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.neuroph.core.NeuralNetwork;
-import org.neuroph.nnet.ConvolutionalNetwork;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.utils.ScannerUtils;
 import bagaturchess.ucitracker.api.PositionsVisitor;
+import deepnetts.net.ConvolutionalNetwork;
+import deepnetts.util.FileIO;
+import deepnetts.util.Tensor;
 
 
 public class ScannerCheckVisitor implements PositionsVisitor {
@@ -78,7 +76,7 @@ public class ScannerCheckVisitor implements PositionsVisitor {
 		System.out.println("Loading network ...");
 		
 		
-		network = (ConvolutionalNetwork) NeuralNetwork.createFromFile(NET_FILE);
+		network = (ConvolutionalNetwork) FileIO.createFromFile(new File(NET_FILE));
 		
 		
 		System.out.println("Network loaded.");
@@ -91,14 +89,14 @@ public class ScannerCheckVisitor implements PositionsVisitor {
 		BufferedImage image = createBoardImage(bitboard.toEPD());
 		image = ScannerUtils.convertToGrayScale(image);
 		//ScannerUtils.saveImage(bitboard.toEPD(), image);
-		double[] expected_input = ScannerUtils.convertToFlatGrayArray(image);
-		double[] expected_output = ScannerUtils.createOutputArray(bitboard);
+		float[] expected_input = ScannerUtils.convertToFlatGrayArray(image);
+		float[] expected_output = ScannerUtils.createOutputArray(bitboard);
 		
-		network.setInput(expected_input);
-		network.calculate();
-		double[] actual_output = network.getOutput();
+		network.setInput(new Tensor(expected_input));
+		network.forward();
+		float[] actual_output = network.getOutput();
+		
 		String fen = ScannerUtils.convertOutputToFEN(actual_output);
-		
 		System.out.println(fen + " < " + bitboard.toEPD());
 		
 		sumDiffs1 += sumExpectedOutput(expected_output);
@@ -112,7 +110,7 @@ public class ScannerCheckVisitor implements PositionsVisitor {
 	}
 
 
-	private double sumExpectedOutput(double[] expected_output) {
+	private double sumExpectedOutput(float[] expected_output) {
 		double sum = 0;
 		for (int i = 0; i < expected_output.length; i++) {
 			sum += Math.abs(0 - expected_output[i]);
@@ -121,7 +119,7 @@ public class ScannerCheckVisitor implements PositionsVisitor {
 	}
 	
 	
-	private double sumDeltaOutput(double[] expected_output, double[] actual_output) {
+	private double sumDeltaOutput(float[] expected_output, float[] actual_output) {
 		double sum = 0;
 		for (int i = 0; i < expected_output.length; i++) {
 			sum += Math.abs(expected_output[i] - actual_output[i]);

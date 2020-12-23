@@ -45,14 +45,14 @@ public class ScannerUtils {
 	}
 	
 	
-	public static double[] convertToFlatGrayArray(BufferedImage image) {
+	public static float[] convertToFlatGrayArray(BufferedImage image) {
 		
 		if (image.getHeight() != image.getWidth()) {
 			throw new IllegalStateException();
 		}
 		
 		int count = 0;
-		double[] inputs = new double[image.getHeight() * image.getHeight()];
+		float[] inputs = new float[image.getHeight() * image.getHeight()];
 		for (int i = 0; i < image.getHeight(); i++) {
 			for (int j = 0; j < image.getHeight(); j++) {
 				
@@ -113,9 +113,9 @@ public class ScannerUtils {
 	}
 	
 	
-	public static String convertOutputToFEN(double[] actual_output) {
+	public static String convertOutputToFEN(float[] actual_output) {
 		
-		double[] signals = new double[64];
+		float[] signals = new float[64];
 		int[] pids = new int[64];
 		for (int i = 0; i < actual_output.length; i++) {
 			
@@ -161,9 +161,9 @@ public class ScannerUtils {
 	}
 	
 	
-	public static double[] createOutputArray(IBitBoard bitboard) {
+	public static float[] createOutputArray(IBitBoard bitboard) {
 		
-		double[] result = new double[64 * 13];
+		float[] result = new float[64 * 13];
 		{
 			long bb_w_king = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING);
 			long bb_w_queens = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN);
