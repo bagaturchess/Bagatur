@@ -100,13 +100,13 @@ public class ScannerLearningVisitor_V2 implements PositionsVisitor {
 			
 			network =  ConvolutionalNetwork.builder()
 	                .addInputLayer(IMAGE_SIZE, IMAGE_SIZE, 1)
-	                .addConvolutionalLayer(3, 3, 32)
+	                .addConvolutionalLayer(3, 3, 64)
 	                .addMaxPoolingLayer(2, 2)
-	                .addConvolutionalLayer(3, 3, 16)
+	                .addConvolutionalLayer(3, 3, 64)
 	                .addOutputLayer(64 * 13, ActivationType.SIGMOID)
 	                .hiddenActivationFunction(ActivationType.LINEAR)
 	                .lossFunction(LossType.CROSS_ENTROPY)
-	                .randomSeed(123)
+	                .randomSeed(777)
 	                .build();
 			
             
@@ -115,11 +115,8 @@ public class ScannerLearningVisitor_V2 implements PositionsVisitor {
 		
 		trainer = new BackpropagationTrainer(network);
 		
-		trainer.setLearningRate(0.001f);
-        //trainer.setLearningRate(0.00001f);//For ActivationType.LINEAR
-        
-        //trainer.setMaxEpochs(1);
-        
+		trainer.setLearningRate(0.0001f);
+		
         trainer.setBatchMode(true);
         trainer.setBatchSize(TRAINING_SET_SIZE);
         
@@ -127,12 +124,14 @@ public class ScannerLearningVisitor_V2 implements PositionsVisitor {
 			
 			@Override
 			public void handleEvent(TrainingEvent event) {
+				
 				if (event.getType().equals(TrainingEvent.Type.EPOCH_FINISHED)) {
 					
-					System.out.println("End learning: Iteration " + iteration
+					System.out.println("End iteration " + iteration
 							+ ": Time " + (System.currentTimeMillis() - startTime)
 							+ "ms, Training loss is " + event.getSource().getTrainingLoss()
-							+ ", Training accuracy is " + event.getSource().getTrainingAccuracy()
+							//+ ", Training accuracy is " + event.getSource().getTrainingAccuracy()
+							//+ ", Loss function total is " + network.getLossFunction().getTotal()
 					);
 					
 					iteration++;
@@ -142,6 +141,8 @@ public class ScannerLearningVisitor_V2 implements PositionsVisitor {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+				} else if (event.getType().equals(TrainingEvent.Type.ITERATION_FINISHED)) {
+					//System.out.println("done");
 				}
 			}
 		});
@@ -186,7 +187,9 @@ public class ScannerLearningVisitor_V2 implements PositionsVisitor {
 	@Override
 	public void end() {
 		
-		System.out.println("Start learning: Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms");
+		System.out.println("Games loaded.");
+		
+		System.out.println("Start learning ...");
 		
 		trainer.train(dataset);
 	}
