@@ -62,7 +62,7 @@ public class ScannerLearningVisitor_V3 implements PositionsVisitor {
 	private long startTime;
 	
 	
-	private int IMAGE_SIZE = 64;
+	private int IMAGE_SIZE = 256;
 	private int SQUARE_SIZE = IMAGE_SIZE / 8;
 	
 	private String PIECES_SET = "set1";
@@ -100,7 +100,7 @@ public class ScannerLearningVisitor_V3 implements PositionsVisitor {
 			
 			network =  ConvolutionalNetwork.builder()
 	                .addInputLayer(IMAGE_SIZE, IMAGE_SIZE, 1)
-	                .addConvolutionalLayer(3, 3, 64)
+	                .addConvolutionalLayer(3, 3, 256)
 	                .addMaxPoolingLayer(2, 2)
 	                .addConvolutionalLayer(3, 3, 64)
 	                .addOutputLayer(64 * 14, ActivationType.SIGMOID)
