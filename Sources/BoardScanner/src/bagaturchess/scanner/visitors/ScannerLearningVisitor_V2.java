@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.visrec.ml.data.BasicDataSet;
 import javax.visrec.ml.data.DataSet;
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -50,7 +49,6 @@ import deepnetts.net.train.BackpropagationTrainer;
 import deepnetts.net.train.TrainingEvent;
 import deepnetts.net.train.TrainingListener;
 import deepnetts.util.FileIO;
-import deepnetts.util.Tensor;
 
 
 public class ScannerLearningVisitor_V2 implements PositionsVisitor {
@@ -131,7 +129,11 @@ public class ScannerLearningVisitor_V2 implements PositionsVisitor {
 			public void handleEvent(TrainingEvent event) {
 				if (event.getType().equals(TrainingEvent.Type.EPOCH_FINISHED)) {
 					
-					System.out.println("End learning: Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, Training loss is " + event.getSource().getTrainingLoss());
+					System.out.println("End learning: Iteration " + iteration
+							+ ": Time " + (System.currentTimeMillis() - startTime)
+							+ "ms, Training loss is " + event.getSource().getTrainingLoss()
+							+ ", Training accuracy is " + event.getSource().getTrainingAccuracy()
+					);
 					
 					iteration++;
 					
