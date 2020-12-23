@@ -35,6 +35,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.visrec.ml.data.DataSet;
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
@@ -51,7 +52,7 @@ import deepnetts.net.train.TrainingListener;
 import deepnetts.util.FileIO;
 
 
-public class ScannerLearningVisitor_V2 implements PositionsVisitor {
+public class ScannerLearningVisitor_V3 implements PositionsVisitor {
 	
 	
 	private int iteration = 0;
@@ -77,10 +78,8 @@ public class ScannerLearningVisitor_V2 implements PositionsVisitor {
 	private BackpropagationTrainer trainer;
 	private ScannerDataSet dataset;
 	
-	private int TRAINING_SET_SIZE = 1000;
 	
-	
-	public ScannerLearningVisitor_V2() throws Exception {
+	public ScannerLearningVisitor_V3() throws Exception {
 		
 		loadPiecesImages();
 		
@@ -117,9 +116,6 @@ public class ScannerLearningVisitor_V2 implements PositionsVisitor {
 		trainer = new BackpropagationTrainer(network);
 		
 		trainer.setLearningRate(0.0001f);
-		
-        trainer.setBatchMode(true);
-        trainer.setBatchSize(TRAINING_SET_SIZE);
         
         trainer.addListener(new TrainingListener() {
 			
@@ -159,17 +155,23 @@ public class ScannerLearningVisitor_V2 implements PositionsVisitor {
 			return;
 		}
 		
-		if (dataset.size() >= TRAINING_SET_SIZE) {
+		if (dataset.size() > 0) {
 			return;
 		}
 		
-		BufferedImage image = createBoardImage(bitboard.toEPD());
-		image = ScannerUtils.convertToGrayScale(image);
-		//ScannerUtils.saveImage(bitboard.toEPD(), image);
-		float[] expected_input = ScannerUtils.convertToFlatGrayArray(image);
-		float[] expected_output = ScannerUtils.createOutputArray(bitboard);
-		
-		dataset.addItem(expected_input, expected_output);
+		List<String> fens = ScannerUtils.generateFENsOfSinglePiece();
+		for (int i = 0; i < fens.size(); i++) {
+			String fen = fens.get(i);
+			IBitBoard cur_bitboard = BoardUtils.createBoard_WithPawnsCache(fen);
+			
+			BufferedImage image = createBoardImage(fen);
+			image = ScannerUtils.convertToGrayScale(image);
+			//ScannerUtils.saveImage(bitboard.toEPD(), image);
+			float[] expected_input = ScannerUtils.convertToFlatGrayArray(image);
+			float[] expected_output = ScannerUtils.createOutputArray(cur_bitboard);
+			
+			dataset.addItem(expected_input, expected_output);
+		}
 		
 		counter++;
 	}

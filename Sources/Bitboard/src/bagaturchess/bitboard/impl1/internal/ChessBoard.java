@@ -413,12 +413,15 @@ public final class ChessBoard {
 			ChessBoardTestUtil.testValues(this);
 		}
 	}
-
+	
 	public void updateKingValues(final int kingColor, final int index) {
+		if (index == 64) {//If there is no king return
+			return;
+		}
 		kingIndex[kingColor] = index;
 		kingArea[kingColor] = ChessConstants.KING_AREA[kingColor][index];
 	}
-
+	
 	public boolean isLegal(final int move) {
 		if (MoveUtil.getSourcePieceIndex(move) == KING) {
 			return !CheckUtil.isInCheckIncludingKing(MoveUtil.getToIndex(move), colorToMove, pieces[colorToMoveInverse],

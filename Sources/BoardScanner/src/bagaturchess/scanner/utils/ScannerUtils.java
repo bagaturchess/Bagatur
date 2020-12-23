@@ -24,11 +24,14 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl1.internal.Bitboard;
 import bagaturchess.bitboard.impl1.internal.ChessConstants;
 
 
@@ -45,6 +48,10 @@ public class ScannerUtils {
 			int pid = i / 64;			
 			int squareID = i % 64;
 			
+			if (pid == 0 || pid == 13) {
+				pid = Constants.PID_NONE;
+			}	
+			
 			if (signals[squareID] <= actual_output[i]) {
 				signals[squareID] = actual_output[i];
 				pids[squareID] = pid;
@@ -57,6 +64,53 @@ public class ScannerUtils {
 			}
 		}*/
 		
+		
+		String fen = createFENFromPIDs(pids);
+		
+		return fen;
+	}
+
+
+	public static List<String> generateFENsOfSinglePiece() {
+		
+		List<String> result = new ArrayList<String>();
+		
+		result.add("8/8/8/8/8/8/8/8" + " w KQkq - 0 1");
+		
+		result.addAll(generateFENsOfSinglePiece(Constants.PID_W_PAWN));
+		result.addAll(generateFENsOfSinglePiece(Constants.PID_W_KNIGHT));
+		result.addAll(generateFENsOfSinglePiece(Constants.PID_W_BISHOP));
+		result.addAll(generateFENsOfSinglePiece(Constants.PID_W_ROOK));
+		result.addAll(generateFENsOfSinglePiece(Constants.PID_W_QUEEN));
+		result.addAll(generateFENsOfSinglePiece(Constants.PID_W_KING));
+		
+		result.addAll(generateFENsOfSinglePiece(Constants.PID_B_PAWN));
+		result.addAll(generateFENsOfSinglePiece(Constants.PID_B_KNIGHT));
+		result.addAll(generateFENsOfSinglePiece(Constants.PID_B_BISHOP));
+		result.addAll(generateFENsOfSinglePiece(Constants.PID_B_ROOK));
+		result.addAll(generateFENsOfSinglePiece(Constants.PID_B_QUEEN));
+		result.addAll(generateFENsOfSinglePiece(Constants.PID_B_KING));
+		
+		return result;
+	}
+	
+	
+	private static List<String> generateFENsOfSinglePiece(int pid) {
+		
+		List<String> result = new ArrayList<String>();
+		
+		for (int i = 0; i < 64; i++) {
+			int[] pids = new int[64];
+			pids[i] = pid;
+			String fen = createFENFromPIDs(pids) + " w KQkq - 0 1";
+			result.add(fen);
+		}
+		
+		return result;
+	}
+	
+	
+	private static String createFENFromPIDs(int[] pids) {
 		
 		StringBuilder sb = new StringBuilder();
 		for (int i = 63; i >= 0; i--) {
@@ -79,7 +133,6 @@ public class ScannerUtils {
 		fen = fen.replaceAll("1111", "4");
 		fen = fen.replaceAll("111", "3");
 		fen = fen.replaceAll("11", "2");
-		
 		return fen;
 	}
 	
@@ -165,7 +218,7 @@ public class ScannerUtils {
 	
 	public static float[] createOutputArray(IBitBoard bitboard) {
 		
-		float[] result = new float[64 * 13];
+		float[] result = new float[64 * 14];
 		{
 			long bb_w_king = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING);
 			long bb_w_queens = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN);
@@ -253,10 +306,21 @@ public class ScannerUtils {
 		long free = bitboard.getFreeBitboard();
         while (free != 0) {
         	int squareID_free = Long.numberOfTrailingZeros(free);
-        	result[squareID_free] = 1;
+        	if ((free & Bitboard.WHITE_SQUARES) != 0) {
+        		result[squareID_free] = 1;
+        	}
         	free &= free - 1;
         }
 		
+		free = bitboard.getFreeBitboard();
+        while (free != 0) {
+        	int squareID_free = Long.numberOfTrailingZeros(free);
+        	if ((free & Bitboard.BLACK_SQUARES) != 0) {
+        		result[13 * 64 + squareID_free] = 1;
+        	}
+        	free &= free - 1;
+        }
+        
 		return result;
 	}
 }
