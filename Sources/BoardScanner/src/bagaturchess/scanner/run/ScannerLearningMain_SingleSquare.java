@@ -81,9 +81,9 @@ public class ScannerLearningMain_SingleSquare {
 				
 				network =  ConvolutionalNetwork.builder()
 		                .addInputLayer(imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, 1)
-		                .addConvolutionalLayer(5, 5, 128)
-		                .addMaxPoolingLayer(2, 2)
 		                .addConvolutionalLayer(5, 5, 64)
+		                .addMaxPoolingLayer(2, 2)
+		                .addConvolutionalLayer(5, 5, 32)
 		                //.addFullyConnectedLayer(64)
 		                .addOutputLayer(14, ActivationType.SOFTMAX)
 		                .hiddenActivationFunction(ActivationType.LINEAR)
