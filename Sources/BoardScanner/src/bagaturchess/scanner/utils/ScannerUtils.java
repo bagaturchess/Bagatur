@@ -20,6 +20,7 @@
 package bagaturchess.scanner.utils;
 
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -36,6 +37,22 @@ import bagaturchess.bitboard.impl1.internal.ChessConstants;
 
 
 public class ScannerUtils {
+	
+	
+	public static BufferedImage createSquareImage(ImageProperties imageProperties, int pid, Color squareColour) {
+		BufferedImage image = new BufferedImage(imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, BufferedImage.TYPE_INT_RGB);
+		
+		Graphics g = image.createGraphics();
+		
+		g.setColor(squareColour);
+		g.fillRect(0, 0, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE);
+		
+		if (pid != 0) {
+			g.drawImage(imageProperties.piecesImages[pid], 0, 0, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, squareColour, null);
+		}
+			
+		return image;
+	}
 	
 	
 	public static BufferedImage createBoardImage(ImageProperties imageProperties, String fen) {
@@ -60,11 +77,11 @@ public class ScannerUtils {
 		String[] fenArray = fen.split(" ");
 		int positionCount = 63;
 		for (int i = 0; i < fenArray[0].length(); i++) {
-
+			
 			int x = (7 - positionCount % 8) * imageProperties.SQUARE_SIZE;
 			int y = (7 - positionCount / 8) * imageProperties.SQUARE_SIZE;
 			boolean whiteSquare = (7 - positionCount % 8 + 7 - positionCount / 8) % 2 == 0;
-					
+			
 			final char character = fenArray[0].charAt(i);
 			switch (character) {
 			case '/':

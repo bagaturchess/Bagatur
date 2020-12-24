@@ -35,6 +35,7 @@ import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.scanner.utils.ImageProperties;
+import bagaturchess.scanner.utils.ScannerDataSet;
 import bagaturchess.scanner.utils.ScannerUtils;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 import deepnetts.data.MLDataItem;
@@ -187,60 +188,5 @@ public class ScannerLearningVisitor_V3 implements PositionsVisitor {
 		System.out.println("Start learning ...");
 		
 		trainer.train(dataset);
-	}
-	
-	
-	private static class ScannerDataSet implements DataSet<MLDataItem> {
-		
-		
-		private List<MLDataItem> items;
-		private String[] targetNames;
-		
-		
-		private ScannerDataSet() {
-			
-			items = new ArrayList<MLDataItem>();
-			
-			targetNames = new String[64 * 13];
-			for (int i = 0; i < targetNames.length; i++) {
-				targetNames[i] = "LABEL" + i;
-			}
-		}
-		
-		
-		private void addItem(float[] inputs, float[] outputs) {
-			items.add(new TabularDataSet.Item(inputs, outputs));
-			//System.out.println("items size is " + items.size());
-		}
-		
-		
-		@Override
-		public List<MLDataItem> getItems() {
-			return items;
-		}
-		
-		
-		@Override
-		public DataSet<MLDataItem>[] split(double... parts) {
-			throw new UnsupportedOperationException();
-		}
-		
-		
-		@Override
-		public String[] getTargetNames() {
-			return targetNames;
-		}
-		
-		
-		@Override
-		public void setColumnNames(String[] columnNames) {
-			throw new UnsupportedOperationException();
-		}
-		
-		
-		@Override
-		public String[] getColumnNames() {
-			throw new UnsupportedOperationException();
-		}
 	}
 }

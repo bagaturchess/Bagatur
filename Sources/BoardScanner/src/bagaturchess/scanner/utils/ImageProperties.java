@@ -19,6 +19,7 @@
  */
 package bagaturchess.scanner.utils;
 
+
 import java.awt.Color;
 import java.awt.Image;
 import java.io.File;
@@ -28,15 +29,12 @@ import javax.imageio.ImageIO;
 
 import bagaturchess.bitboard.impl.Constants;
 
-/**
- * @author I027638
- *
- */
+
 public class ImageProperties {
 	
 	
-	public int IMAGE_SIZE = 256;
-	public int SQUARE_SIZE = IMAGE_SIZE / 8;
+	public int IMAGE_SIZE;
+	public int SQUARE_SIZE;
 	
 	public String PIECES_SET = "set1";
 	public Image[] piecesImages = new Image[13];
@@ -45,8 +43,17 @@ public class ImageProperties {
 	public Color WHITE_SQUARE = new Color(220, 220, 220);
 	
 	
-	public ImageProperties() throws IOException {
+	public ImageProperties(int imageSize) throws IOException {
+		
+		IMAGE_SIZE = imageSize;
+		SQUARE_SIZE = IMAGE_SIZE / 8;
+		
 		loadPiecesImages();
+	}
+	
+	
+	public ImageProperties() throws IOException {
+		this(256);
 	}
 	
 	
