@@ -38,6 +38,102 @@ import bagaturchess.bitboard.impl1.internal.ChessConstants;
 public class ScannerUtils {
 	
 	
+	public static BufferedImage createBoardImage(ImageProperties imageProperties, String fen) {
+		
+		BufferedImage image = new BufferedImage(imageProperties.IMAGE_SIZE, imageProperties.IMAGE_SIZE, BufferedImage.TYPE_INT_RGB);
+		
+		Graphics g = image.createGraphics();
+		
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				
+				if ((i + j) % 2 == 0) {
+					g.setColor(imageProperties.WHITE_SQUARE);
+				} else {
+					g.setColor(imageProperties.BLACK_SQUARE);
+				}
+				
+				g.fillRect(i * imageProperties.SQUARE_SIZE, j * imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE);
+			}
+		}
+		
+		String[] fenArray = fen.split(" ");
+		int positionCount = 63;
+		for (int i = 0; i < fenArray[0].length(); i++) {
+
+			int x = (7 - positionCount % 8) * imageProperties.SQUARE_SIZE;
+			int y = (7 - positionCount / 8) * imageProperties.SQUARE_SIZE;
+			boolean whiteSquare = (7 - positionCount % 8 + 7 - positionCount / 8) % 2 == 0;
+					
+			final char character = fenArray[0].charAt(i);
+			switch (character) {
+			case '/':
+				continue;
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+				positionCount -= Character.digit(character, 10);
+				break;
+			case 'P':
+				g.drawImage(imageProperties.piecesImages[Constants.PID_W_PAWN], x, y, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, whiteSquare ? imageProperties.WHITE_SQUARE : imageProperties.BLACK_SQUARE, null);
+				positionCount--;
+				break;
+			case 'N':
+				g.drawImage(imageProperties.piecesImages[Constants.PID_W_KNIGHT], x, y, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, whiteSquare ? imageProperties.WHITE_SQUARE : imageProperties.BLACK_SQUARE, null);
+				positionCount--;
+				break;
+			case 'B':
+				g.drawImage(imageProperties.piecesImages[Constants.PID_W_BISHOP], x, y, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, whiteSquare ? imageProperties.WHITE_SQUARE : imageProperties.BLACK_SQUARE, null);
+				positionCount--;
+				break;
+			case 'R':
+				g.drawImage(imageProperties.piecesImages[Constants.PID_W_ROOK], x, y, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, whiteSquare ? imageProperties.WHITE_SQUARE : imageProperties.BLACK_SQUARE, null);
+				positionCount--;
+				break;
+			case 'Q':
+				g.drawImage(imageProperties.piecesImages[Constants.PID_W_QUEEN], x, y, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, whiteSquare ? imageProperties.WHITE_SQUARE : imageProperties.BLACK_SQUARE, null);
+				positionCount--;
+				break;
+			case 'K':
+				g.drawImage(imageProperties.piecesImages[Constants.PID_W_KING], x, y, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, whiteSquare ? imageProperties.WHITE_SQUARE : imageProperties.BLACK_SQUARE, null);
+				positionCount--;
+				break;
+			case 'p':
+				g.drawImage(imageProperties.piecesImages[Constants.PID_B_PAWN], x, y, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, whiteSquare ? imageProperties.WHITE_SQUARE : imageProperties.BLACK_SQUARE, null);
+				positionCount--;
+				break;
+			case 'n':
+				g.drawImage(imageProperties.piecesImages[Constants.PID_B_KNIGHT], x, y, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, whiteSquare ? imageProperties.WHITE_SQUARE : imageProperties.BLACK_SQUARE, null);
+				positionCount--;
+				break;
+			case 'b':
+				g.drawImage(imageProperties.piecesImages[Constants.PID_B_BISHOP], x, y, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, whiteSquare ? imageProperties.WHITE_SQUARE : imageProperties.BLACK_SQUARE, null);
+				positionCount--;
+				break;
+			case 'r':
+				g.drawImage(imageProperties.piecesImages[Constants.PID_B_ROOK], x, y, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, whiteSquare ? imageProperties.WHITE_SQUARE : imageProperties.BLACK_SQUARE, null);
+				positionCount--;
+				break;
+			case 'q':
+				g.drawImage(imageProperties.piecesImages[Constants.PID_B_QUEEN], x, y, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, whiteSquare ? imageProperties.WHITE_SQUARE : imageProperties.BLACK_SQUARE, null);
+				positionCount--;
+				break;
+			case 'k':
+				g.drawImage(imageProperties.piecesImages[Constants.PID_B_KING], x, y, imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, whiteSquare ? imageProperties.WHITE_SQUARE : imageProperties.BLACK_SQUARE, null);
+				positionCount--;
+				break;
+			}
+		}
+		
+		return image;
+	}
+	
+	
 	public static String convertOutputToFEN(float[] actual_output) {
 		
 		

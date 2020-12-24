@@ -58,7 +58,7 @@ public class ScannerCheckVisitor implements PositionsVisitor {
 	
 	private Image[] piecesImages = new Image[13];
 	
-	private int IMAGE_SIZE = 64;
+	private int IMAGE_SIZE = 256;
 	private int SQUARE_SIZE = IMAGE_SIZE / 8;
 	
 	private Color BLACK_SQUARE = new Color(120, 120, 120);
