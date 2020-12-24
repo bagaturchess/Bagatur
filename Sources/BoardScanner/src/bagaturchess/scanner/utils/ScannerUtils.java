@@ -292,6 +292,21 @@ public class ScannerUtils {
 	}
 	
 	
+	public static float[] convertToFlatGrayArray(int[][] matrix) {
+		
+		int count = 0;
+		float[] inputs = new float[matrix.length * matrix[0].length];
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[0].length; j++) {
+				int grayPixel = matrix[i][j];
+				inputs[count++] = grayPixel;
+			}
+		}
+		
+		return inputs;
+	}
+
+	
 	public static double[] convertToFlatRGBArray(BufferedImage image) {
 		
 		if (image.getHeight() != image.getWidth()) {
