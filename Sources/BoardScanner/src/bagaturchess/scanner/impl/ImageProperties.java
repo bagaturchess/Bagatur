@@ -31,8 +31,8 @@ import bagaturchess.bitboard.impl.Constants;
 
 
 public class ImageProperties {
-
-
+	
+	
 	private int imageSize;
 	private int squareSize;
 	

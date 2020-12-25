@@ -28,9 +28,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl1.internal.Bitboard;
 import bagaturchess.bitboard.impl1.internal.ChessConstants;
 
 
@@ -293,111 +291,10 @@ public class ScannerUtils {
 	}
 	
 	
-	public static float[] createOutputArray(IBitBoard bitboard) {
-		
-		float[] result = new float[64 * 14];
-		{
-			long bb_w_king = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING);
-			long bb_w_queens = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN);
-			long bb_w_rooks = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_ROOK);
-			long bb_w_bishops = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP);
-			long bb_w_knights = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT);
-			long bb_w_pawns = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN);
-			
-			int squareID_w_king = Long.numberOfTrailingZeros(bb_w_king);
-			result[64 * Constants.PID_W_KING + squareID_w_king] = 1;
-			
-	        while (bb_w_pawns != 0) {
-	        	int squareID_pawn = Long.numberOfTrailingZeros(bb_w_pawns);
-	        	result[64 * Constants.PID_W_PAWN + squareID_pawn] = 1;
-	        	bb_w_pawns &= bb_w_pawns - 1;
-	        }
-	        
-	        while (bb_w_knights != 0) {
-	        	int squareID_knight = Long.numberOfTrailingZeros(bb_w_knights);
-	        	result[64 * Constants.PID_W_KNIGHT + squareID_knight] = 1;
-	        	bb_w_knights &= bb_w_knights - 1;
-	        }
-	        
-	        while (bb_w_bishops != 0) {
-	        	int squareID_bishop = Long.numberOfTrailingZeros(bb_w_bishops);
-	        	result[64 * Constants.PID_W_BISHOP + squareID_bishop] = 1;
-	        	bb_w_bishops &= bb_w_bishops - 1;
-	        }
-	        
-	        while (bb_w_rooks != 0) {
-	        	int squareID_rook = Long.numberOfTrailingZeros(bb_w_rooks);
-	        	result[64 * Constants.PID_W_ROOK + squareID_rook] = 1;
-	        	bb_w_rooks &= bb_w_rooks - 1;
-	        }
-	        
-	        while (bb_w_queens != 0) {
-	        	int squareID_queen = Long.numberOfTrailingZeros(bb_w_queens);
-	        	result[64 * Constants.PID_W_QUEEN + squareID_queen] = 1;
-	        	bb_w_queens &= bb_w_queens - 1;
-	        }
-		}
-        
-		{
-			long bb_b_king = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING);
-			long bb_b_queens = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN);
-			long bb_b_rooks = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_ROOK);
-			long bb_b_bishops = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP);
-			long bb_b_knights = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT);
-			long bb_b_pawns = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN);
-			
-			int squareID_b_king = Long.numberOfTrailingZeros(bb_b_king);
-			result[64 * Constants.PID_B_KING + squareID_b_king] = 1;
-			
-	        while (bb_b_pawns != 0) {
-	        	int squareID_pawn = Long.numberOfTrailingZeros(bb_b_pawns);
-	        	result[64 * Constants.PID_B_PAWN + squareID_pawn] = 1;
-	        	bb_b_pawns &= bb_b_pawns - 1;
-	        }
-	        
-	        while (bb_b_knights != 0) {
-	        	int squareID_knight = Long.numberOfTrailingZeros(bb_b_knights);
-	        	result[64 * Constants.PID_B_KNIGHT + squareID_knight] = 1;
-	        	bb_b_knights &= bb_b_knights - 1;
-	        }
-	        
-	        while (bb_b_bishops != 0) {
-	        	int squareID_bishop = Long.numberOfTrailingZeros(bb_b_bishops);
-	        	result[64 * Constants.PID_B_BISHOP + squareID_bishop] = 1;
-	        	bb_b_bishops &= bb_b_bishops - 1;
-	        }
-	        
-	        while (bb_b_rooks != 0) {
-	        	int squareID_rook = Long.numberOfTrailingZeros(bb_b_rooks);
-	        	result[64 * Constants.PID_B_ROOK + squareID_rook] = 1;
-	        	bb_b_rooks &= bb_b_rooks - 1;
-	        }
-	        
-	        while (bb_b_queens != 0) {
-	        	int squareID_queen = Long.numberOfTrailingZeros(bb_b_queens);
-	        	result[64 * Constants.PID_B_QUEEN + squareID_queen] = 1;
-	        	bb_b_queens &= bb_b_queens - 1;
-	        }
-		}
-        
-		long free = bitboard.getFreeBitboard();
-        while (free != 0) {
-        	int squareID_free = Long.numberOfTrailingZeros(free);
-        	if ((free & Bitboard.WHITE_SQUARES) != 0) {
-        		result[squareID_free] = 1;
-        	}
-        	free &= free - 1;
-        }
-		
-		free = bitboard.getFreeBitboard();
-        while (free != 0) {
-        	int squareID_free = Long.numberOfTrailingZeros(free);
-        	if ((free & Bitboard.BLACK_SQUARES) != 0) {
-        		result[13 * 64 + squareID_free] = 1;
-        	}
-        	free &= free - 1;
-        }
-        
-		return result;
+	public static BufferedImage resizeImage(BufferedImage image, int squareSize) {
+		  BufferedImage result = new BufferedImage(squareSize, squareSize, BufferedImage.TYPE_INT_RGB);
+		  Graphics g = result.getGraphics();
+		  g.drawImage(image, 0, 0, squareSize, squareSize, null);
+		  return result;
 	}
 }
