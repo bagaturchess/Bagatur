@@ -24,9 +24,9 @@ import java.awt.image.BufferedImage;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.scanner.utils.BoardScanner;
-import bagaturchess.scanner.utils.ImageProperties;
-import bagaturchess.scanner.utils.ScannerUtils;
+import bagaturchess.scanner.impl.BoardScanner;
+import bagaturchess.scanner.impl.ImageProperties;
+import bagaturchess.scanner.impl.ScannerUtils;
 
 
 public class ScannerTest {

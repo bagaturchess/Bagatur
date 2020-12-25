@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import bagaturchess.scanner.utils.ImageProperties;
-import bagaturchess.scanner.utils.ScannerDataSet;
-import bagaturchess.scanner.utils.ScannerUtils;
+import bagaturchess.scanner.impl.ImageProperties;
+import bagaturchess.scanner.impl.ScannerDataSet;
+import bagaturchess.scanner.impl.ScannerUtils;
 import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.net.layers.activation.ActivationType;
 import deepnetts.net.loss.LossType;
@@ -20,7 +20,7 @@ import deepnetts.util.FileIO;
 import deepnetts.util.Tensor;
 
 
-public class ScannerLearningMain_SingleSquare {
+public class ScannerLearning {
 	
 	
 	private static final String NET_FILE = "scanner.bin";
