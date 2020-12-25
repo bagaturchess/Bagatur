@@ -21,15 +21,23 @@ package bagaturchess.scanner.run;
 
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.scanner.impl.BoardScanner;
 import bagaturchess.scanner.impl.ImageProperties;
 import bagaturchess.scanner.impl.ScannerUtils;
+import deepnetts.net.NeuralNetwork;
+import deepnetts.util.FileIO;
 
 
 public class ScannerTest {
+	
+	
+	private static final String NET_FILE = "scanner.cnn.set1.bin";
+	
+	
 	public static void main(String[] args) {
 		try {
 			
@@ -39,7 +47,9 @@ public class ScannerTest {
 			BufferedImage boardImage = ScannerUtils.createBoardImage(imageProperties, bitboard.toEPD());
 			//ScannerUtils.saveImage("board", boardImage);
 			
-			BoardScanner scanner = new BoardScanner();
+			NeuralNetwork<?> network = FileIO.createFromFile(new File(NET_FILE));
+			BoardScanner scanner = new BoardScanner(network);
+			
 			String fen = scanner.scan(ScannerUtils.convertToFlatGrayArray(boardImage));
 			
 			System.out.println(fen);
