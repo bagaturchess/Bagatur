@@ -35,6 +35,24 @@ import bagaturchess.bitboard.impl1.internal.ChessConstants;
 public class ScannerUtils {
 	
 	
+	public static float[] convertInt2Float(int[] array) {
+		float[] result = new float[array.length];
+		for (int i = 0 ; i < array.length; i++) {
+			result[i] = array[i];
+		}
+		return result;
+	}
+	
+	
+	public static int[] convertFloat2Int(float[] array) {
+		int[] result = new int[array.length];
+		for (int i = 0 ; i < array.length; i++) {
+			result[i] = (int) array[i];
+		}
+		return result;
+	}
+	
+	
 	public static BufferedImage createSquareImage(ImageProperties imageProperties, int pid, Color squareColour) {
 		BufferedImage image = new BufferedImage(imageProperties.getSquareSize(), imageProperties.getSquareSize(), BufferedImage.TYPE_INT_RGB);
 		
@@ -239,10 +257,41 @@ public class ScannerUtils {
 	}
 	
 	
-	public static float[] convertToFlatGrayArray(int[][] matrix) {
+	public static int[][] convertToGrayMatrix(BufferedImage image) {
+		
+		if (image.getHeight() != image.getWidth()) {
+			throw new IllegalStateException();
+		}
+		
+		int[][] inputs = new int[image.getHeight()][image.getHeight()];
+		for (int i = 0; i < image.getHeight(); i++) {
+			for (int j = 0; j < image.getHeight(); j++) {
+				
+				int rgb = image.getRGB(i, j);
+				
+				//int alpha = (rgb & 0xff000000) >>> 24;
+				int red = (rgb & 0xff0000) >> 16;
+				int green = (rgb & 0xff00) >> 8;
+				int blue = rgb & 0xff;
+			    
+				if (red != green || blue != green) {
+					throw new IllegalStateException();
+				}
+				
+				//inputs[count] = (red + green + blue) / 3;
+			    //inputs[count++] = red * 0.299 + green * 0.587 + blue * 0.114;
+				inputs[i][j] = green;
+			}
+		}
+		
+		return inputs;
+	}
+	
+	
+	public static int[] convertToFlatGrayArray(int[][] matrix) {
 		
 		int count = 0;
-		float[] inputs = new float[matrix.length * matrix[0].length];
+		int[] inputs = new int[matrix.length * matrix[0].length];
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[0].length; j++) {
 				int grayPixel = matrix[i][j];

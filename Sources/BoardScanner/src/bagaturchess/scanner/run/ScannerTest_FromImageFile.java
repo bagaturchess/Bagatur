@@ -35,7 +35,7 @@ import deepnetts.util.FileIO;
 public class ScannerTest_FromImageFile {
 	
 	
-	private static final String NET_FILE = "scanner.cnn.set1.bin";
+	private static final String NET_FILE = "scanner.bin";
 	
 	
 	public static void main(String[] args) {
@@ -43,10 +43,10 @@ public class ScannerTest_FromImageFile {
 		try {
 			
 			ImageProperties imageProperties = new ImageProperties(192, "set1");
-			BufferedImage boardImage = ImageIO.read(new File("./data/test1.jpg"));
+			BufferedImage boardImage = ImageIO.read(new File("./data/tests/test6.png"));
 			boardImage = ScannerUtils.resizeImage(boardImage, imageProperties.getImageSize());
 			boardImage = ScannerUtils.convertToGrayScale(boardImage);
-			ScannerUtils.saveImage("test1_converted", boardImage);
+			//ScannerUtils.saveImage("test6_converted", boardImage);
 			
 			NeuralNetwork<?> network = FileIO.createFromFile(new File(NET_FILE));
 			BoardScanner scanner = new BoardScanner(network);

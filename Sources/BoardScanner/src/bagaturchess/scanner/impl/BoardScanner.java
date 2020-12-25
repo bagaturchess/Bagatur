@@ -67,8 +67,8 @@ public class BoardScanner {
 
 	private int getPID(int[][] matrix, int i1, int j1, int filedID) {
 		
-		int[][] arr = getSquarePixelsMatrix(matrix, i1, j1);
-		float[] inputs = ScannerUtils.convertToFlatGrayArray(arr);
+		int[][] arr = MatrixSplitter.getSquarePixelsMatrix(matrix, i1, j1);
+		float[] inputs = ScannerUtils.convertInt2Float(ScannerUtils.convertToFlatGrayArray(arr));
 		
 		//BufferedImage image = ScannerUtils.createGrayImage(arr);
 		//ScannerUtils.saveImage("" + filedID, image);
@@ -92,28 +92,5 @@ public class BoardScanner {
 		int pid = (maxIndex == 13 ? Constants.PID_NONE : maxIndex);
 		
 		return pid;
-	}
-	
-	
-	private static int[][] getSquarePixelsMatrix(int[][] matrix, int i1, int j1) {
-		
-		if (matrix.length % 8 != 0) {
-			throw new IllegalStateException("size is not devidable by 8");
-		}
-		
-		int size = matrix.length / 8;
-		int[][] result = new int[size][size];
-		
-		int ic = 0;
-		for (int i = i1; i < i1 + size; i++) {
-			int jc = 0;
-			for (int j = j1; j < j1 + size; j++) {
-				result[ic][jc] = matrix[i][j];
-				jc++;
-			}
-			ic++;
-		}
-		
-		return result;
 	}
 }

@@ -1,14 +1,14 @@
-package bagaturchess.scanner.run;
+package bagaturchess.scanner.learning;
 
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
 import bagaturchess.scanner.impl.ImageProperties;
-import bagaturchess.scanner.impl.ScannerDataSet;
 import bagaturchess.scanner.impl.ScannerUtils;
 import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.net.layers.activation.ActivationType;
@@ -36,28 +36,19 @@ public class ScannerLearning {
 			
 			ImageProperties imageProperties = new ImageProperties(192, "set1");
 			
-			List<BufferedImage> grayImages = new ArrayList<BufferedImage>();
-			List<Integer> pids = new ArrayList<Integer>();
-			for (int pid = 0; pid <= 12; pid++) {
-				BufferedImage whiteImage = ScannerUtils.createSquareImage(imageProperties, pid, imageProperties.getColorWhiteSquare());
-				BufferedImage blackImage = ScannerUtils.createSquareImage(imageProperties, pid, imageProperties.getColorBlackSquare());
-				whiteImage = ScannerUtils.convertToGrayScale(whiteImage);
-				blackImage = ScannerUtils.convertToGrayScale(blackImage);
-				grayImages.add(whiteImage);
-				grayImages.add(blackImage);
-				if (pid == 0) {
-					pids.add(0);
-					pids.add(13);
-				} else {
-					pids.add(pid);
-					pids.add(pid);
-				}
-			}
+			BufferedImage boardImage = ImageIO.read(new File("./data/tests/test6.png"));
+			boardImage = ScannerUtils.resizeImage(boardImage, imageProperties.getImageSize());
+			boardImage = ScannerUtils.convertToGrayScale(boardImage);
+			ScannerUtils.saveImage("test6_converted", boardImage);
+			
+			DataSetInitPair pair = new DataSetInitPair_ByBoardImage(ScannerUtils.convertToGrayMatrix(boardImage));
+			
+			List<int[]> grayImages = pair.getGrayImages();
+			List<Integer> pids = pair.getPIDs();
 			
 			dataset = new ScannerDataSet();
 			for (int i = 0; i < grayImages.size(); i++) {
-				BufferedImage curImage = grayImages.get(i);
-				float[] networkInput = ScannerUtils.convertToFlatGrayArray(curImage);
+				float[] networkInput = ScannerUtils.convertInt2Float(grayImages.get(i));
 				float[] networkOutput = new float[14];
 				networkOutput[pids.get(i)] = 1;
 				dataset.addItem(networkInput, networkOutput);
@@ -100,7 +91,7 @@ public class ScannerLearning {
 			trainer.setLearningRate(0.001f);
 	        
 	        trainer.setBatchMode(true);
-	        trainer.setBatchSize(26);
+	        trainer.setBatchSize(grayImages.size());
 	        
 	        trainer.addListener(new TrainingListener() {
 	        	
@@ -118,8 +109,7 @@ public class ScannerLearning {
 						int failure = 0;
 						for (int i = 0; i < grayImages.size(); i++) {
 							
-							BufferedImage curImage = grayImages.get(i);
-							float[] networkInput = ScannerUtils.convertToFlatGrayArray(curImage);
+							float[] networkInput = ScannerUtils.convertInt2Float(grayImages.get(i));
 							network.setInput(new Tensor(networkInput));
 							network.forward();
 							float[] actual_output = network.getOutput();
