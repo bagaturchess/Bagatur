@@ -34,13 +34,13 @@ public class ScannerLearning {
 		
 		try {
 			
-			ImageProperties imageProperties = new ImageProperties(192);
+			ImageProperties imageProperties = new ImageProperties(192, "set1");
 			
 			List<BufferedImage> grayImages = new ArrayList<BufferedImage>();
 			List<Integer> pids = new ArrayList<Integer>();
 			for (int pid = 0; pid <= 12; pid++) {
-				BufferedImage whiteImage = ScannerUtils.createSquareImage(imageProperties, pid, imageProperties.WHITE_SQUARE);
-				BufferedImage blackImage = ScannerUtils.createSquareImage(imageProperties, pid, imageProperties.BLACK_SQUARE);
+				BufferedImage whiteImage = ScannerUtils.createSquareImage(imageProperties, pid, imageProperties.getColorWhiteSquare());
+				BufferedImage blackImage = ScannerUtils.createSquareImage(imageProperties, pid, imageProperties.getColorBlackSquare());
 				whiteImage = ScannerUtils.convertToGrayScale(whiteImage);
 				blackImage = ScannerUtils.convertToGrayScale(blackImage);
 				grayImages.add(whiteImage);
@@ -80,7 +80,7 @@ public class ScannerLearning {
 				
 				
 				network =  ConvolutionalNetwork.builder()
-		                .addInputLayer(imageProperties.SQUARE_SIZE, imageProperties.SQUARE_SIZE, 1)
+		                .addInputLayer(imageProperties.getSquareSize(), imageProperties.getSquareSize(), 1)
 		                .addConvolutionalLayer(5, 5, 56)
 		                .addMaxPoolingLayer(2, 2)
 		                .addConvolutionalLayer(5, 5, 14)

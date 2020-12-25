@@ -43,7 +43,7 @@ public class ScannerTest {
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache();
 			
-			ImageProperties imageProperties = new ImageProperties(192);
+			ImageProperties imageProperties = new ImageProperties(192, "set1");
 			BufferedImage boardImage = ScannerUtils.createBoardImage(imageProperties, bitboard.toEPD());
 			//ScannerUtils.saveImage("board", boardImage);
 			

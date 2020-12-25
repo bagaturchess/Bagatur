@@ -30,7 +30,9 @@ public class ScannerCheck {
 			
 			NeuralNetwork<?> network = FileIO.createFromFile(new File(NET_FILE));
 			
-			PositionsVisitor visitor = new ScannerCheckVisitor(new BoardScanner(network), new ImageProperties(192));
+			ImageProperties imageProperties = new ImageProperties(192, "set1");
+			
+			PositionsVisitor visitor = new ScannerCheckVisitor(new BoardScanner(network), imageProperties);
 			
 			System.out.println("Reading games ... ");
 			while (true) {
