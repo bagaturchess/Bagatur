@@ -25,8 +25,6 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
-import bagaturchess.bitboard.api.BoardUtils;
-import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.scanner.impl.BoardScanner;
 import bagaturchess.scanner.impl.ImageProperties;
 import bagaturchess.scanner.impl.ScannerUtils;
@@ -41,6 +39,7 @@ public class ScannerTest_FromImageFile {
 	
 	
 	public static void main(String[] args) {
+		
 		try {
 			
 			ImageProperties imageProperties = new ImageProperties(192, "set1");
