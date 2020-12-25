@@ -20,47 +20,21 @@
 package bagaturchess.scanner.impl;
 
 
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 import bagaturchess.bitboard.impl.Constants;
-import deepnetts.net.ConvolutionalNetwork;
-import deepnetts.util.FileIO;
+import deepnetts.net.NeuralNetwork;
 import deepnetts.util.Tensor;
 
 
 public class BoardScanner {
 	
 	
-	private static final String NET_FILE = "scanner.bin";
+	private NeuralNetwork<?> network;
 	
 	
-	private ConvolutionalNetwork network;
-	
-	
-	private int[] pidsByOutputIndex = new int[] {
-			Constants.PID_NONE,
-			Constants.PID_W_PAWN,
-			Constants.PID_W_KNIGHT,
-			Constants.PID_W_BISHOP,
-			Constants.PID_W_ROOK,
-			Constants.PID_W_QUEEN,
-			Constants.PID_W_KING,
-			Constants.PID_B_PAWN,
-			Constants.PID_B_KNIGHT,
-			Constants.PID_B_BISHOP,
-			Constants.PID_B_ROOK,
-			Constants.PID_B_QUEEN,
-			Constants.PID_B_KING,
-			Constants.PID_NONE,
-	};
-	
-	
-	public BoardScanner() throws ClassNotFoundException, IOException {
-		System.out.println("Loading network ...");
-		network = (ConvolutionalNetwork) FileIO.createFromFile(new File(NET_FILE));
-		System.out.println("Network loaded.");
+	public BoardScanner(NeuralNetwork<?> _network) throws ClassNotFoundException, IOException {
+		network = _network;
 	}
 	
 	
@@ -87,7 +61,6 @@ public class BoardScanner {
 			}
 		}
 		
-		//rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
 		return ScannerUtils.createFENFromPIDs(pids);
 	}
 
@@ -115,8 +88,8 @@ public class BoardScanner {
 				maxIndex = j;
 			}
 		}
-		//System.out.println(maxIndex);
-		int pid = pidsByOutputIndex[maxIndex];
+		
+		int pid = (maxIndex == 13 ? Constants.PID_NONE : maxIndex);
 		
 		return pid;
 	}
