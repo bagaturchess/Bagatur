@@ -20,6 +20,7 @@
 package bagaturchess.scanner.utils;
 
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -41,30 +42,18 @@ public class BoardScanner {
 	private int[] pidsByOutputIndex = new int[] {
 			Constants.PID_NONE,
 			Constants.PID_W_PAWN,
-			Constants.PID_W_PAWN,
-			Constants.PID_W_KNIGHT,
 			Constants.PID_W_KNIGHT,
 			Constants.PID_W_BISHOP,
-			Constants.PID_W_BISHOP,
-			Constants.PID_W_ROOK,
 			Constants.PID_W_ROOK,
 			Constants.PID_W_QUEEN,
-			Constants.PID_W_QUEEN,
 			Constants.PID_W_KING,
-			Constants.PID_W_KING,
+			Constants.PID_B_PAWN,
+			Constants.PID_B_KNIGHT,
+			Constants.PID_B_BISHOP,
+			Constants.PID_B_ROOK,
+			Constants.PID_B_QUEEN,
+			Constants.PID_B_KING,
 			Constants.PID_NONE,
-			Constants.PID_B_PAWN,
-			Constants.PID_B_PAWN,
-			Constants.PID_B_KNIGHT,
-			Constants.PID_B_KNIGHT,
-			Constants.PID_B_BISHOP,
-			Constants.PID_B_BISHOP,
-			Constants.PID_B_ROOK,
-			Constants.PID_B_ROOK,
-			Constants.PID_B_QUEEN,
-			Constants.PID_B_QUEEN,
-			Constants.PID_B_KING,
-			Constants.PID_B_KING,
 	};
 	
 	
@@ -87,21 +76,34 @@ public class BoardScanner {
 			matrix[i / size][i % size] = (int) flatGrayImage[i];
 		}
 		
+		int[] pids = new int[64];
 		for (int i = 0; i < size; i += size / 8) {
 			for (int j = 0; j < size; j += size / 8) {
-				int pid = getPID(matrix, i, j);
-				System.out.println(pid);
+				int file = i / (size / 8);
+				int rank = j / (size / 8);
+				int filedID = 63 - (file + 8 * rank);
+				int pid = getPID(matrix, i, j, filedID);
+				pids[filedID] = pid;
 			}
 		}
 		
-		return null;
+		//rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
+		return ScannerUtils.createFENFromPIDs(pids);
 	}
 
 
-	private int getPID(int[][] matrix, int i1, int j1) {
+	private int getPID(int[][] matrix, int i1, int j1, int filedID) {
 		
 		int[][] arr = getSquarePixelsMatrix(matrix, i1, j1);
-		network.setInput(new Tensor(ScannerUtils.convertToFlatGrayArray(arr)));
+		float[] inputs = ScannerUtils.convertToFlatGrayArray(arr);
+		
+		//BufferedImage image = ScannerUtils.createGrayImage(arr);
+		//ScannerUtils.saveImage("" + filedID, image);
+		
+		//BufferedImage image = ScannerUtils.createGrayImage(inputs);
+		//ScannerUtils.saveImage("" + filedID, image);
+		
+		network.setInput(new Tensor(inputs));
 		network.forward();
 		float[] output = network.getOutput();
 		
@@ -113,7 +115,7 @@ public class BoardScanner {
 				maxIndex = j;
 			}
 		}
-		
+		//System.out.println(maxIndex);
 		int pid = pidsByOutputIndex[maxIndex];
 		
 		return pid;

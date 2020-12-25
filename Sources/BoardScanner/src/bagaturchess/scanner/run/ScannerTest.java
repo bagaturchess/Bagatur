@@ -37,6 +37,7 @@ public class ScannerTest {
 			
 			ImageProperties imageProperties = new ImageProperties(192);
 			BufferedImage boardImage = ScannerUtils.createBoardImage(imageProperties, bitboard.toEPD());
+			ScannerUtils.saveImage("board", boardImage);
 			
 			BoardScanner scanner = new BoardScanner();
 			String fen = scanner.scan(ScannerUtils.convertToFlatGrayArray(boardImage));

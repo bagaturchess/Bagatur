@@ -223,7 +223,7 @@ public class ScannerUtils {
 	}
 	
 	
-	private static String createFENFromPIDs(int[] pids) {
+	public static String createFENFromPIDs(int[] pids) {
 		
 		StringBuilder sb = new StringBuilder();
 		for (int i = 63; i >= 0; i--) {
@@ -257,6 +257,29 @@ public class ScannerUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	
+	public static BufferedImage createGrayImage(int[][] matrix) {
+		BufferedImage image = new BufferedImage(matrix.length, matrix[0].length, BufferedImage.TYPE_INT_RGB);
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[0].length; j++) {
+				Color c = new Color(matrix[i][j], matrix[i][j], matrix[i][j]);
+				image.setRGB(i, j, c.getRGB());
+			}
+		}
+		return image;
+	}
+	
+	
+	public static BufferedImage createGrayImage(float[] vector) {
+		int size = (int) Math.sqrt(vector.length);
+		BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+		for (int i = 0; i < vector.length; i++) {
+			Color c = new Color((int)vector[i], (int)vector[i], (int)vector[i]);
+			image.setRGB(i / size, i % size, c.getRGB());
+		}
+		return image;
 	}
 	
 	
