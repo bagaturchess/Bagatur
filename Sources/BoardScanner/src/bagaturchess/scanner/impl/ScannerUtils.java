@@ -192,10 +192,10 @@ public class ScannerUtils {
 	}
 	
 	
-	public static void saveImage(String fen, BufferedImage image) {
+	public static void saveImage(String fen, BufferedImage image, String formatName) {
 		try {
-			File file = new File("./data/" + (fen + ".jpg").replace('/', '_'));
-			ImageIO.write(image, "jpg", file);
+			File file = new File("./data/" + (fen + "." + formatName).replace('/', '_'));
+			ImageIO.write(image, formatName, file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -4,6 +4,7 @@ package bagaturchess.scanner.learning;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -36,15 +37,22 @@ public class ScannerLearning {
 			
 			ImageProperties imageProperties = new ImageProperties(192, "set1");
 			
-			BufferedImage boardImage = ImageIO.read(new File("./data/tests/test6.png"));
-			boardImage = ScannerUtils.resizeImage(boardImage, imageProperties.getImageSize());
-			boardImage = ScannerUtils.convertToGrayScale(boardImage);
-			ScannerUtils.saveImage("test6_converted", boardImage);
+			String[] inputFiles = new String[] {
+					"./data/tests/lichess/test1.png",
+					"./data/tests/lichess/test2.png",
+					"./data/tests/lichess/test3.png",
+				};
 			
-			DataSetInitPair pair = new DataSetInitPair_ByBoardImage(ScannerUtils.convertToGrayMatrix(boardImage));
+			DataSetInitPair[] pairs = getInitPairs(imageProperties, inputFiles);
 			
-			List<int[]> grayImages = pair.getGrayImages();
-			List<Integer> pids = pair.getPIDs();
+			List<int[]> grayImages = new ArrayList<int[]>();
+			List<Integer> pids = new ArrayList<Integer>();
+			
+			for (int i = 0; i < pairs.length; i++) {
+				grayImages.addAll(pairs[i].getGrayImages());
+				pids.addAll(pairs[i].getPIDs());
+			}
+
 			
 			dataset = new ScannerDataSet();
 			for (int i = 0; i < grayImages.size(); i++) {
@@ -160,5 +168,24 @@ public class ScannerLearning {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	
+	private static DataSetInitPair[] getInitPairs(ImageProperties imageProperties, String[] fileNames) throws IOException {
+		DataSetInitPair[] result = new DataSetInitPair[fileNames.length];
+		for (int i = 0; i < result.length; i++) {			
+			result[i] = getInitPair(imageProperties, fileNames[i]);
+		}
+		return result;
+	}
+	
+	
+	private static DataSetInitPair getInitPair(ImageProperties imageProperties, String fileName) throws IOException {
+		BufferedImage boardImage = ImageIO.read(new File(fileName));
+		boardImage = ScannerUtils.resizeImage(boardImage, imageProperties.getImageSize());
+		boardImage = ScannerUtils.convertToGrayScale(boardImage);
+		//ScannerUtils.saveImage("test6_converted", boardImage, "png");
+		DataSetInitPair pair = new DataSetInitPair_ByBoardImage(ScannerUtils.convertToGrayMatrix(boardImage));
+		return pair;
 	}
 }

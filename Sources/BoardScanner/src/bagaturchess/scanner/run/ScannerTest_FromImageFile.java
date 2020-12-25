@@ -43,10 +43,10 @@ public class ScannerTest_FromImageFile {
 		try {
 			
 			ImageProperties imageProperties = new ImageProperties(192, "set1");
-			BufferedImage boardImage = ImageIO.read(new File("./data/tests/test6.png"));
+			BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess/test1.png"));
 			boardImage = ScannerUtils.resizeImage(boardImage, imageProperties.getImageSize());
 			boardImage = ScannerUtils.convertToGrayScale(boardImage);
-			//ScannerUtils.saveImage("test6_converted", boardImage);
+			//ScannerUtils.saveImage("test8_converted", boardImage, "png");
 			
 			NeuralNetwork<?> network = FileIO.createFromFile(new File(NET_FILE));
 			BoardScanner scanner = new BoardScanner(network);
