@@ -44,8 +44,8 @@ public class DataSetInitPair_ByBoardImage extends DataSetInitPair {
 			
 			List<int[][]> translations = new ArrayList<int[][]>();
 			translations.add(result.get(fieldID));
-			//translations.addAll(MatrixUtils.generateTranslations((int[][]) result.get(fieldID), 1));
-			//translations.addAll(MatrixUtils.generateTranslations((int[][]) result.get(fieldID), 2));
+			translations.addAll(MatrixUtils.generateTranslations(result.get(fieldID), 1));
+			translations.addAll(MatrixUtils.generateTranslations(result.get(fieldID), 2));
 			
 			//System.out.println(translations.size());
 			

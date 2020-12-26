@@ -36,11 +36,16 @@ public class ImageProperties {
 	private int imageSize;
 	private int squareSize;
 	
-	private String piecesSetFileNamePrefix = "set1";
+	private String piecesSetFileNamePrefix;
 	private Image[] piecesImages = new Image[13];
 	
 	private Color colorBlackSquare = new Color(120, 120, 120);
 	private Color colorWhiteSquare = new Color(220, 220, 220);
+	
+	
+	public ImageProperties(int _imageSize) throws IOException {
+		this(_imageSize, "set1");
+	}
 	
 	
 	public ImageProperties(int _imageSize, String _piecesSetFileNamePrefix) throws IOException {

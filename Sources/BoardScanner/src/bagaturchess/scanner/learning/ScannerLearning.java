@@ -35,11 +35,11 @@ public class ScannerLearning {
 		
 		try {
 			
-			ImageProperties imageProperties = new ImageProperties(128, "set1");
+			ImageProperties imageProperties = new ImageProperties(192);
 			
 			String[] inputFiles = new String[] {
 					"./data/tests/lichess.org/test1.png",
-					"./data/tests/chess.com/test1.png",
+					//"./data/tests/chess.com/test1.png",
 					//"./data/tests/lichess.org/test2.png",
 					//"./data/tests/lichess.org/test3.png",
 				};
