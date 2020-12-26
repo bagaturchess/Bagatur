@@ -31,7 +31,9 @@ public class MatrixUtils {
 		
 		List<int[][]> result = new ArrayList<int[][]>();
 		
-		Set<Translation> translations = generateCircles(radius);
+		result.add(matrix);
+		
+		Set<Translation> translations = generateCirclPixels(radius);
 		
 		for (Translation translation : translations) {
 			if (translation.x != 0 || translation.y != 0) {
@@ -173,7 +175,7 @@ public class MatrixUtils {
 	}
 	
 	
-	private static Set<Translation> generateCircles(int radius) {
+	private static Set<Translation> generateCirclPixels(int radius) {
 		
 		Set<Translation> result = new HashSet<Translation>();
 		
@@ -234,6 +236,6 @@ public class MatrixUtils {
 	
 	
 	public static void main(String[] args) {
-		System.out.println(generateCircles(2));
+		System.out.println(generateCirclPixels(2));
 	}
 }
