@@ -19,13 +19,61 @@
  */
 package bagaturchess.scanner.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class MatrixUtils {
 	
 	
-	public static int[][] moveLeftWithN(int[][] matrix, int N) {
+	public static List<int[][]> generateTranslations(int[][] matrix, int radius) {
+		
+		List<int[][]> result = new ArrayList<int[][]>();
+		
+		Set<Translation> translations = generateCircles(radius);
+		
+		for (Translation translation : translations) {
+			if (translation.x != 0 || translation.y != 0) {
+				result.add(moveWithXY(matrix, translation.x, translation.y));
+			}
+		}
+		
+		return result;
+	}
+	
+	
+	private static int[][] moveWithXY(int[][] matrix, int X, int Y) {
+		
+		if (X == 0 && Y == 0) {
+			throw new IllegalStateException("X=" + X + ", Y=" + Y);
+		}
+		
+		int[][] result = matrix;
+		
+		if (X > 0) {
+			if (Y > 0) {
+				result = moveRightWithN(result, X);
+				result = moveDownWithN(result, Y);
+			} else {
+				result = moveRightWithN(result, X);
+				result = moveUpWithN(result, Y);
+			}
+		} else {
+			if (Y > 0) {
+				result = moveLeftWithN(result, X);
+				result = moveDownWithN(result, Y);
+			} else {
+				result = moveLeftWithN(result, X);
+				result = moveUpWithN(result, Y);
+			}
+		}
+		
+		return result;
+	}
+	
+	
+	private static int[][] moveLeftWithN(int[][] matrix, int N) {
 		int[][] result = matrix;
 		for (int i = 0; i < N; i++) {
 			result = moveLeftWith1(result);
@@ -34,7 +82,7 @@ public class MatrixUtils {
 	}
 	
 	
-	public static int[][] moveRightWithN(int[][] matrix, int N) {
+	private static int[][] moveRightWithN(int[][] matrix, int N) {
 		int[][] result = matrix;
 		for (int i = 0; i < N; i++) {
 			result = moveRightWith1(result);
@@ -43,7 +91,7 @@ public class MatrixUtils {
 	}
 	
 	
-	public static int[][] moveUpWithN(int[][] matrix, int N) {
+	private static int[][] moveUpWithN(int[][] matrix, int N) {
 		int[][] result = matrix;
 		for (int i = 0; i < N; i++) {
 			result = moveUpWith1(result);
@@ -52,7 +100,7 @@ public class MatrixUtils {
 	}
 	
 	
-	public static int[][] moveDownWithN(int[][] matrix, int N) {
+	private static int[][] moveDownWithN(int[][] matrix, int N) {
 		int[][] result = matrix;
 		for (int i = 0; i < N; i++) {
 			result = moveDownWith1(result);

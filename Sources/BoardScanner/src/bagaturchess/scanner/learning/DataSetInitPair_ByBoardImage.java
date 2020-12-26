@@ -21,6 +21,8 @@ package bagaturchess.scanner.learning;
 
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import bagaturchess.bitboard.impl.Constants;
@@ -40,102 +42,109 @@ public class DataSetInitPair_ByBoardImage extends DataSetInitPair {
 		
 		for (Integer fieldID : result.keySet()) {
 			
-			int[][] matrix = (int[][]) result.get(fieldID);
+			List<int[][]> translations = new ArrayList<int[][]>();
+			translations.addAll(MatrixUtils.generateTranslations((int[][]) result.get(fieldID), 1));
+			translations.addAll(MatrixUtils.generateTranslations((int[][]) result.get(fieldID), 2));
 			
-			//UP=2, DOWN=2, LEFT=2, RIGHT=2
-			//int[][] arr = MatrixUtils.moveRightWithN(matrix, 2);
-			//BufferedImage image = ScannerUtils.createGrayImage(arr);
-			//ScannerUtils.saveImage("" + fieldID, image, "png");
+			//System.out.println(translations.size());
 			
-			switch (fieldID) {
-				case 0:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_W_ROOK);
-					break;
-				case 1:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_W_KNIGHT);
-					break;
-				case 2:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_W_BISHOP);
-					break;
-				case 3:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_W_KING);
-					break;
-				case 4:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_W_QUEEN);
-					break;
-				case 5:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_W_BISHOP);
-					break;
-				case 6:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_W_KNIGHT);
-					break;
-				case 7:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_W_ROOK);
-					break;
-				case 8:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_W_PAWN);
-					break;
-				case 9:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_W_PAWN);
-					break;
-				case 16:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_NONE);
-					break;
-				case 17:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_NONE);
-					break;
-				case 54:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_B_PAWN);
-					break;
-				case 55:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_B_PAWN);
-					break;
-				case 56:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_B_ROOK);
-					break;
-				case 57:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_B_KNIGHT);
-					break;
-				case 58:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_B_BISHOP);
-					break;
-				case 59:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_B_KING);
-					break;
-				case 60:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_B_QUEEN);
-					break;
-				case 61:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_B_BISHOP);
-					break;
-				case 62:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_B_KNIGHT);
-					break;
-				case 63:
-					grayImages.add(matrix);
-					pids.add(Constants.PID_B_ROOK);
-					break;
+			for (int[][] matrix : translations) {
+				
+				//UP=2, DOWN=2, LEFT=2, RIGHT=2
+				//int[][] arr = MatrixUtils.moveRightWithN(matrix, 2);
+				//BufferedImage image = ScannerUtils.createGrayImage(cur);
+				//ScannerUtils.saveImage("" + fieldID + "_" + (100 * Math.random()), image, "png");
+			
+				switch (fieldID) {
+					case 0:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_W_ROOK);
+						break;
+					case 1:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_W_KNIGHT);
+						break;
+					case 2:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_W_BISHOP);
+						break;
+					case 3:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_W_KING);
+						break;
+					case 4:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_W_QUEEN);
+						break;
+					case 5:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_W_BISHOP);
+						break;
+					case 6:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_W_KNIGHT);
+						break;
+					case 7:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_W_ROOK);
+						break;
+					case 8:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_W_PAWN);
+						break;
+					case 9:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_W_PAWN);
+						break;
+					case 16:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_NONE);
+						break;
+					case 17:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_NONE);
+						break;
+					case 54:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_B_PAWN);
+						break;
+					case 55:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_B_PAWN);
+						break;
+					case 56:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_B_ROOK);
+						break;
+					case 57:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_B_KNIGHT);
+						break;
+					case 58:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_B_BISHOP);
+						break;
+					case 59:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_B_KING);
+						break;
+					case 60:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_B_QUEEN);
+						break;
+					case 61:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_B_BISHOP);
+						break;
+					case 62:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_B_KNIGHT);
+						break;
+					case 63:
+						grayImages.add(matrix);
+						pids.add(Constants.PID_B_ROOK);
+						break;
+				}
 			}
 		}
 	}
