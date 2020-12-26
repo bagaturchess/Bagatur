@@ -18,7 +18,7 @@ import deepnetts.util.FileIO;
 public class ScannerCheck {
 	
 	
-	private static final String NET_FILE = "scanner.cnn.set1.bin";
+	private static final String NET_FILE = "scanner.bin";
 	
 	
 	public static void main(String[] args) {
@@ -88,10 +88,10 @@ public class ScannerCheck {
 			}
 			
 			counter++;
-			if ((counter % 100) == 0) {
+			//if ((counter % 100) == 0) {
 				
 				System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
-			}
+			//}
 		}
 		
 		

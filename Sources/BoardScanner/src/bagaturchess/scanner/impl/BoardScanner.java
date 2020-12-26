@@ -68,10 +68,7 @@ public class BoardScanner {
 	private int getPID(int[][] matrix, int i1, int j1, int filedID) {
 		
 		int[][] arr = MatrixSplitter.getSquarePixelsMatrix(matrix, i1, j1);
-		float[] inputs = ScannerUtils.convertInt2Float(ScannerUtils.convertToFlatGrayArray(arr));
-		
-		//BufferedImage image = ScannerUtils.createGrayImage(arr);
-		//ScannerUtils.saveImage("" + filedID, image);
+		float[][] inputs = ScannerUtils.convertInt2Float(arr);
 		
 		//BufferedImage image = ScannerUtils.createGrayImage(inputs);
 		//ScannerUtils.saveImage("" + filedID, image);

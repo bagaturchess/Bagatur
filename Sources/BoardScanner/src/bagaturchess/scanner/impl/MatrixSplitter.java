@@ -27,14 +27,14 @@ import java.util.Map;
 public class MatrixSplitter {
 
 	
-	public static Map<Integer, Object> splitTo64Squares(int[][] matrix) {
+	public static Map<Integer, int[][]> splitTo64Squares(int[][] matrix) {
 		
 		int size = matrix.length;
 		if (matrix.length != matrix[0].length) {
 			throw new IllegalStateException("matrix is not square");
 		}
 		
-		Map<Integer, Object> result = new HashMap<Integer, Object>();
+		Map<Integer, int[][]> result = new HashMap<Integer, int[][]>();
 		for (int i = 0; i < size; i += size / 8) {
 			for (int j = 0; j < size; j += size / 8) {
 				int file = i / (size / 8);

@@ -27,6 +27,7 @@ import javax.visrec.ml.data.DataSet;
 
 import deepnetts.data.MLDataItem;
 import deepnetts.data.TabularDataSet;
+import deepnetts.util.Tensor;
 
 
 public class ScannerDataSet implements DataSet<MLDataItem> {
@@ -47,8 +48,8 @@ public class ScannerDataSet implements DataSet<MLDataItem> {
 	}
 	
 	
-	public void addItem(float[] inputs, float[] outputs) {
-		items.add(new TabularDataSet.Item(inputs, outputs));
+	public void addItem(float[][] inputs, float[] outputs) {
+		items.add(new TabularDataSet.Item(new Tensor(inputs), new Tensor(outputs)));
 		//System.out.println("items size is " + items.size());
 	}
 	

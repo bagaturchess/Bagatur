@@ -45,7 +45,7 @@ public class ScannerLearning {
 			
 			DataSetInitPair[] pairs = getInitPairs(imageProperties, inputFiles);
 			
-			List<int[]> grayImages = new ArrayList<int[]>();
+			List<int[][]> grayImages = new ArrayList<int[][]>();
 			List<Integer> pids = new ArrayList<Integer>();
 			
 			for (int i = 0; i < pairs.length; i++) {
@@ -56,7 +56,7 @@ public class ScannerLearning {
 			
 			dataset = new ScannerDataSet();
 			for (int i = 0; i < grayImages.size(); i++) {
-				float[] networkInput = ScannerUtils.convertInt2Float(grayImages.get(i));
+				float[][] networkInput = ScannerUtils.convertInt2Float(grayImages.get(i));
 				float[] networkOutput = new float[14];
 				networkOutput[pids.get(i)] = 1;
 				dataset.addItem(networkInput, networkOutput);
@@ -117,7 +117,7 @@ public class ScannerLearning {
 						int failure = 0;
 						for (int i = 0; i < grayImages.size(); i++) {
 							
-							float[] networkInput = ScannerUtils.convertInt2Float(grayImages.get(i));
+							float[][] networkInput = ScannerUtils.convertInt2Float(grayImages.get(i));
 							network.setInput(new Tensor(networkInput));
 							network.forward();
 							float[] actual_output = network.getOutput();

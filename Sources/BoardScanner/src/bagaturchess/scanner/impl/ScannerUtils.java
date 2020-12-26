@@ -44,6 +44,17 @@ public class ScannerUtils {
 	}
 	
 	
+	public static float[][] convertInt2Float(int[][] array) {
+		float[][] result = new float[array.length][array.length];
+		for (int i = 0 ; i < array.length; i++) {
+			for (int j = 0 ; j < array.length; j++) {
+				result[i][j] = array[i][j];
+			}
+		}
+		return result;
+	}
+	
+	
 	public static int[] convertFloat2Int(float[] array) {
 		int[] result = new int[array.length];
 		for (int i = 0 ; i < array.length; i++) {

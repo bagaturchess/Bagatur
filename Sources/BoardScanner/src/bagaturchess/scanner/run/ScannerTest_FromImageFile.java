@@ -35,7 +35,7 @@ import deepnetts.util.FileIO;
 public class ScannerTest_FromImageFile {
 	
 	
-	private static final String NET_FILE = "scanner.bin";
+	private static final String NET_FILE = "scanner.cnn.lichess.bin";
 	
 	
 	public static void main(String[] args) {

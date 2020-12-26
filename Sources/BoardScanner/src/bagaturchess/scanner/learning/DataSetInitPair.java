@@ -27,17 +27,17 @@ import java.util.List;
 public class DataSetInitPair {
 
 	
-	protected List<int[]> grayImages;
+	protected List<int[][]> grayImages;
 	protected List<Integer> pids;
 	
 	
 	public DataSetInitPair() {
-		grayImages = new ArrayList<int[]>();
+		grayImages = new ArrayList<int[][]>();
 		pids = new ArrayList<Integer>();
 	}
 	
 	
-	public List<int[]> getGrayImages() {
+	public List<int[][]> getGrayImages() {
 		return grayImages;
 	}
 	
