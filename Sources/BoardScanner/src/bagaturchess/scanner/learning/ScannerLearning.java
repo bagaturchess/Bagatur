@@ -53,7 +53,7 @@ public class ScannerLearning {
 				grayImages.addAll(pairs[i].getGrayImages());
 				pids.addAll(pairs[i].getPIDs());
 			}
-
+			
 			
 			dataset = new ScannerDataSet();
 			for (int i = 0; i < grayImages.size(); i++) {

@@ -140,10 +140,6 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		if ((counter % 1000000) == 0) {
 			
 			//System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, Error: " + network.getLossFunction().getTotal());
-			
-			trainer.train(dataset);
-			
-			dataset.clear();
 		}
 	}
 	
@@ -163,10 +159,14 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	
 	public void end() {
 		
+		trainer.train(dataset);
+		
+		dataset.clear();
+		
 		//System.out.println("***************************************************************************************************");
 		//System.out.println("End iteration " + iteration + ", Total evaluated positions count is " + counter);
 		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, Error: " + network.getLossFunction().getTotal());
-				
+		
 		try {
 			FileIO.writeToFile(network, NET_FILE);
 		} catch (IOException e) {

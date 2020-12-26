@@ -9,8 +9,7 @@ import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_ALL_SignalFiller_In
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
-
-import deepnetts.net.ConvolutionalNetwork;
+import deepnetts.net.FeedForwardNetwork;
 import deepnetts.net.NeuralNetwork;
 import deepnetts.util.FileIO;
 import deepnetts.util.Tensor;
@@ -29,11 +28,11 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	
 	NeuralNetworkEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) throws ClassNotFoundException, IOException {
-		this(_bitboard, _evalCache, _evalConfig, (ConvolutionalNetwork) FileIO.createFromFile(new File("net.bin")));
+		this(_bitboard, _evalCache, _evalConfig, (FeedForwardNetwork) FileIO.createFromFile(new File("net.bin")));
 	}
 	
 	
-	public NeuralNetworkEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig, ConvolutionalNetwork _network) {
+	public NeuralNetworkEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig, FeedForwardNetwork _network) {
 		
 		super(_bitboard, _evalCache, _evalConfig);
 		
