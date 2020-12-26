@@ -33,8 +33,6 @@ public class MatrixUtils {
 		
 		List<int[][]> result = new ArrayList<int[][]>();
 		
-		result.add(matrix);
-		
 		Set<Translation> translations = generateCirclePixels(radius);
 		
 		for (Translation translation : translations) {

@@ -43,17 +43,16 @@ public class DataSetInitPair_ByBoardImage extends DataSetInitPair {
 		for (Integer fieldID : result.keySet()) {
 			
 			List<int[][]> translations = new ArrayList<int[][]>();
-			translations.addAll(MatrixUtils.generateTranslations((int[][]) result.get(fieldID), 1));
-			translations.addAll(MatrixUtils.generateTranslations((int[][]) result.get(fieldID), 2));
+			translations.add(result.get(fieldID));
+			//translations.addAll(MatrixUtils.generateTranslations((int[][]) result.get(fieldID), 1));
+			//translations.addAll(MatrixUtils.generateTranslations((int[][]) result.get(fieldID), 2));
 			
 			//System.out.println(translations.size());
 			
 			for (int[][] matrix : translations) {
 				
-				//UP=2, DOWN=2, LEFT=2, RIGHT=2
-				//int[][] arr = MatrixUtils.moveRightWithN(matrix, 2);
-				//BufferedImage image = ScannerUtils.createGrayImage(cur);
-				//ScannerUtils.saveImage("" + fieldID + "_" + (100 * Math.random()), image, "png");
+				//BufferedImage image = ScannerUtils.createGrayImage(matrix);
+				//ScannerUtils.saveImage("" + fieldID + "_" + (int)(100 * Math.random()), image, "png");
 			
 				switch (fieldID) {
 					case 0:

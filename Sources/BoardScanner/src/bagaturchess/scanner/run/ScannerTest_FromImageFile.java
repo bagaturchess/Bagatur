@@ -35,15 +35,15 @@ import deepnetts.util.FileIO;
 public class ScannerTest_FromImageFile {
 	
 	
-	private static final String NET_FILE = "scanner.cnn.lichess.bin";
+	private static final String NET_FILE = "scanner.bin";
 	
 	
 	public static void main(String[] args) {
 		
 		try {
 			
-			ImageProperties imageProperties = new ImageProperties(192, "set1");
-			BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess/test1.png"));
+			ImageProperties imageProperties = new ImageProperties(128, "set1");
+			BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess/test2.png"));
 			boardImage = ScannerUtils.resizeImage(boardImage, imageProperties.getImageSize());
 			boardImage = ScannerUtils.convertToGrayScale(boardImage);
 			//ScannerUtils.saveImage("test8_converted", boardImage, "png");
