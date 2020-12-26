@@ -19,10 +19,12 @@
  */
 package bagaturchess.scanner.impl;
 
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 
 public class MatrixUtils {
 	
@@ -33,7 +35,7 @@ public class MatrixUtils {
 		
 		result.add(matrix);
 		
-		Set<Translation> translations = generateCirclPixels(radius);
+		Set<Translation> translations = generateCirclePixels(radius);
 		
 		for (Translation translation : translations) {
 			if (translation.x != 0 || translation.y != 0) {
@@ -175,7 +177,7 @@ public class MatrixUtils {
 	}
 	
 	
-	private static Set<Translation> generateCirclPixels(int radius) {
+	private static Set<Translation> generateCirclePixels(int radius) {
 		
 		Set<Translation> result = new HashSet<Translation>();
 		
@@ -236,6 +238,6 @@ public class MatrixUtils {
 	
 	
 	public static void main(String[] args) {
-		System.out.println(generateCirclPixels(2));
+		System.out.println(generateCirclePixels(2));
 	}
 }
