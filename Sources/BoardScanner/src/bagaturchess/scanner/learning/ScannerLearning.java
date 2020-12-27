@@ -39,9 +39,9 @@ public class ScannerLearning {
 			
 			String[] inputFiles = new String[] {
 					"./data/tests/lichess.org/test1.png",
-					"./data/tests/lichess.org/test2.png",
-					"./data/tests/lichess.org/test3.png",
-					"./data/tests/lichess.org/test4.png",
+					//"./data/tests/lichess.org/test2.png",
+					//"./data/tests/lichess.org/test3.png",
+					//"./data/tests/lichess.org/test4.png",
 					//"./data/tests/chess.com/test1.png",
 				};
 			
@@ -140,6 +140,14 @@ public class ScannerLearning {
 							}
 						}
 						
+						if (!Float.isNaN(event.getSource().getTrainingLoss())
+								&& !Float.isInfinite(event.getSource().getTrainingLoss())) {
+							try {
+								FileIO.writeToFile(network, NET_FILE);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
 						
 						System.out.println("End iteration " + iteration
 								+ ": Time " + (System.currentTimeMillis() - startTime)
@@ -149,14 +157,6 @@ public class ScannerLearning {
 						
 						iteration++;
 						
-						if (!Float.isNaN(event.getSource().getTrainingLoss())
-								&& !Float.isInfinite(event.getSource().getTrainingLoss())) {
-							try {
-								FileIO.writeToFile(network, NET_FILE);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
 					} else if (event.getType().equals(TrainingEvent.Type.ITERATION_FINISHED)) {
 						//System.out.println("done");
 					}
