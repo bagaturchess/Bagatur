@@ -20,13 +20,13 @@
 package bagaturchess.scanner.impl;
 
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.awt.image.ConvolveOp;
-import java.awt.image.Kernel;
 import java.io.File;
 import java.io.IOException;
 
@@ -356,10 +356,20 @@ public class ScannerUtils {
 	
 	
 	public static BufferedImage resizeImage(BufferedImage image, int squareSize) {
+		
 		Image scaled =  image.getScaledInstance(squareSize, squareSize, Image.SCALE_SMOOTH);
+		
 		BufferedImage result = new BufferedImage(squareSize, squareSize, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = (Graphics2D) result.getGraphics();
+	    
+		/*g.setComposite(AlphaComposite.Src);
+	    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+	    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+	    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		 */
+		
 		g.drawImage(scaled, 0, 0, squareSize, squareSize, null);
+		
 		return result;
 	}
 }
