@@ -21,12 +21,59 @@ package bagaturchess.scanner.impl;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
 public class MatrixUtils {
+	
+	
+	public static Map<Integer, int[][]> splitTo64Squares(int[][] matrix) {
+		
+		int size = matrix.length;
+		if (matrix.length != matrix[0].length) {
+			throw new IllegalStateException("matrix is not square");
+		}
+		
+		Map<Integer, int[][]> result = new HashMap<Integer, int[][]>();
+		for (int i = 0; i < size; i += size / 8) {
+			for (int j = 0; j < size; j += size / 8) {
+				int file = i / (size / 8);
+				int rank = j / (size / 8);
+				int filedID = 63 - (file + 8 * rank);
+				int[][] arr = getSquarePixelsMatrix(matrix, i, j);
+				result.put(filedID, arr);
+			}
+		}
+		
+		return result;
+	}
+	
+	
+	public static int[][] getSquarePixelsMatrix(int[][] matrix, int i1, int j1) {
+		
+		if (matrix.length % 8 != 0) {
+			throw new IllegalStateException("size is not devidable by 8");
+		}
+		
+		int size = matrix.length / 8;
+		int[][] result = new int[size][size];
+		
+		int ic = 0;
+		for (int i = i1; i < i1 + size; i++) {
+			int jc = 0;
+			for (int j = j1; j < j1 + size; j++) {
+				result[ic][jc] = matrix[i][j];
+				jc++;
+			}
+			ic++;
+		}
+		
+		return result;
+	}
 	
 	
 	public static List<int[][]> generateTranslations(int[][] matrix, int radius) {

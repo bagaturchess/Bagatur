@@ -38,25 +38,15 @@ public class BoardScanner {
 	}
 	
 	
-	public String scan(float[] flatGrayImage) {
-		
-		int size = (int) Math.sqrt(flatGrayImage.length);
-		if (size * size != flatGrayImage.length) {
-			throw new IllegalStateException("size is not exact sqrt " + size);
-		}
-		
-		int[][] matrix = new int[size][size];
-		for (int i = 0; i < flatGrayImage.length; i++) {
-			matrix[i / size][i % size] = (int) flatGrayImage[i];
-		}
+	public String scan(int[][] grayImage) {
 		
 		int[] pids = new int[64];
-		for (int i = 0; i < size; i += size / 8) {
-			for (int j = 0; j < size; j += size / 8) {
-				int file = i / (size / 8);
-				int rank = j / (size / 8);
+		for (int i = 0; i < grayImage.length; i += grayImage.length / 8) {
+			for (int j = 0; j < grayImage.length; j += grayImage.length / 8) {
+				int file = i / (grayImage.length / 8);
+				int rank = j / (grayImage.length / 8);
 				int filedID = 63 - (file + 8 * rank);
-				int pid = getPID(matrix, i, j, filedID);
+				int pid = getPID(grayImage, i, j, filedID);
 				pids[filedID] = pid;
 			}
 		}
@@ -67,7 +57,7 @@ public class BoardScanner {
 
 	private int getPID(int[][] matrix, int i1, int j1, int filedID) {
 		
-		int[][] arr = MatrixSplitter.getSquarePixelsMatrix(matrix, i1, j1);
+		int[][] arr = MatrixUtils.getSquarePixelsMatrix(matrix, i1, j1);
 		float[][] inputs = ScannerUtils.convertInt2Float(arr);
 		
 		//BufferedImage image = ScannerUtils.createGrayImage(inputs);

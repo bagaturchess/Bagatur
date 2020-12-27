@@ -77,7 +77,7 @@ public class ScannerCheck {
 			image = ScannerUtils.convertToGrayScale(image);
 			
 			//ScannerUtils.saveImage(bitboard.toEPD(), image);
-			float[] expected_input = ScannerUtils.convertToFlatGrayArray(image);
+			int[][] expected_input = ScannerUtils.convertToGrayMatrix(image);
 			String recognized_fen = scanner.scan(expected_input);
 			
 			String expected_fen_prefix = bitboard.toEPD().split(" ")[0];

@@ -52,7 +52,7 @@ public class ScannerTest_FromImageFile {
 			NeuralNetwork<?> network = FileIO.createFromFile(new File(NET_FILE));
 			BoardScanner scanner = new BoardScanner(network);
 			
-			String fen = scanner.scan(ScannerUtils.convertToFlatGrayArray(boardImage));
+			String fen = scanner.scan(ScannerUtils.convertToGrayMatrix(boardImage));
 			
 			System.out.println(fen);
 			

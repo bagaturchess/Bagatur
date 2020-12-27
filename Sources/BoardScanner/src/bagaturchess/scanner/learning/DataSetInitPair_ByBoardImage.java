@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.scanner.impl.MatrixSplitter;
 import bagaturchess.scanner.impl.MatrixUtils;
 import bagaturchess.scanner.impl.ScannerUtils;
 
@@ -38,7 +37,7 @@ public class DataSetInitPair_ByBoardImage extends DataSetInitPair {
 		
 		super();
 		
-		Map<Integer, int[][]> result = MatrixSplitter.splitTo64Squares(matrixOfInitialBoard);
+		Map<Integer, int[][]> result = MatrixUtils.splitTo64Squares(matrixOfInitialBoard);
 		
 		for (Integer fieldID : result.keySet()) {
 			
