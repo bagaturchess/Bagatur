@@ -357,7 +357,7 @@ public class ScannerUtils {
 	
 	public static BufferedImage resizeImage(BufferedImage image, int squareSize) {
 		Image scaled =  image.getScaledInstance(squareSize, squareSize, Image.SCALE_SMOOTH);
-		BufferedImage result = new BufferedImage(squareSize, squareSize, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage result = new BufferedImage(squareSize, squareSize, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = (Graphics2D) result.getGraphics();
 		g.drawImage(scaled, 0, 0, squareSize, squareSize, null);
 		return result;
