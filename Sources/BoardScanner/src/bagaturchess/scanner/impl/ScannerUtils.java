@@ -22,7 +22,11 @@ package bagaturchess.scanner.impl;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.io.File;
 import java.io.IOException;
 
@@ -352,9 +356,10 @@ public class ScannerUtils {
 	
 	
 	public static BufferedImage resizeImage(BufferedImage image, int squareSize) {
-		  BufferedImage result = new BufferedImage(squareSize, squareSize, BufferedImage.TYPE_INT_ARGB);
-		  Graphics g = result.getGraphics();
-		  g.drawImage(image, 0, 0, squareSize, squareSize, null);
-		  return result;
+		Image scaled =  image.getScaledInstance(squareSize, squareSize, Image.SCALE_SMOOTH);
+		BufferedImage result = new BufferedImage(squareSize, squareSize, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = (Graphics2D) result.getGraphics();
+		g.drawImage(scaled, 0, 0, squareSize, squareSize, null);
+		return result;
 	}
 }

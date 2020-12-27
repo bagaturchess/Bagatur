@@ -185,8 +185,9 @@ public class ScannerLearning {
 	private static DataSetInitPair getInitPair(ImageProperties imageProperties, String fileName) throws IOException {
 		BufferedImage boardImage = ImageIO.read(new File(fileName));
 		boardImage = ScannerUtils.resizeImage(boardImage, imageProperties.getImageSize());
+		//ScannerUtils.saveImage(fileName + "_resized", boardImage, "png");
 		boardImage = ScannerUtils.convertToGrayScale(boardImage);
-		//ScannerUtils.saveImage("test6_converted", boardImage, "png");
+		//ScannerUtils.saveImage(fileName + "_grayed", boardImage, "png");
 		DataSetInitPair pair = new DataSetInitPair_ByBoardImage(ScannerUtils.convertToGrayMatrix(boardImage));
 		return pair;
 	}
