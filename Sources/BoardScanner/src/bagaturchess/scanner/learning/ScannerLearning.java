@@ -38,12 +38,12 @@ public class ScannerLearning {
 			ImageProperties imageProperties = new ImageProperties(192);
 			
 			String[] inputFiles = new String[] {
-					"./data/tests/lichess.org/test1.png",
-					//"./data/tests/lichess.org/test2.png",
-					//"./data/tests/lichess.org/test3.png",
-					//"./data/tests/lichess.org/test4.png",
-					//"./data/tests/chess.com/test1.png",
-				};
+				"./data/tests/lichess.org/test1.png",
+				"./data/tests/lichess.org/test2.png",
+				"./data/tests/lichess.org/test3.png",
+				"./data/tests/lichess.org/test4.png",
+				//"./data/tests/chess.com/test1.png",
+			};
 			
 			DataSetInitPair[] pairs = getInitPairs(imageProperties, inputFiles);
 			
@@ -85,7 +85,6 @@ public class ScannerLearning {
 		                .addConvolutionalLayer(5, 5, 64)
 		                .addMaxPoolingLayer(2, 2)
 		                .addConvolutionalLayer(5, 5, 16)
-		                //.addFullyConnectedLayer(64)
 		                .addOutputLayer(14, ActivationType.SOFTMAX)
 		                .hiddenActivationFunction(ActivationType.LINEAR)
 		                .lossFunction(LossType.CROSS_ENTROPY)
