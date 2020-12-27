@@ -352,7 +352,7 @@ public class ScannerUtils {
 	
 	
 	public static BufferedImage resizeImage(BufferedImage image, int squareSize) {
-		  BufferedImage result = new BufferedImage(squareSize, squareSize, BufferedImage.TYPE_INT_RGB);
+		  BufferedImage result = new BufferedImage(squareSize, squareSize, BufferedImage.TYPE_INT_ARGB);
 		  Graphics g = result.getGraphics();
 		  g.drawImage(image, 0, 0, squareSize, squareSize, null);
 		  return result;

@@ -39,9 +39,10 @@ public class ScannerLearning {
 			
 			String[] inputFiles = new String[] {
 					"./data/tests/lichess.org/test1.png",
+					"./data/tests/lichess.org/test2.png",
+					"./data/tests/lichess.org/test3.png",
+					"./data/tests/lichess.org/test4.png",
 					//"./data/tests/chess.com/test1.png",
-					//"./data/tests/lichess.org/test2.png",
-					//"./data/tests/lichess.org/test3.png",
 				};
 			
 			DataSetInitPair[] pairs = getInitPairs(imageProperties, inputFiles);
