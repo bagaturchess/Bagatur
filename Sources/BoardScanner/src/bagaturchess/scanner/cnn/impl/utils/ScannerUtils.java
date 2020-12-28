@@ -231,6 +231,18 @@ public class ScannerUtils {
 	}
 	
 	
+	public static BufferedImage createRGBImage(int[][][] matrix) {
+		BufferedImage image = new BufferedImage(matrix.length, matrix[0].length, BufferedImage.TYPE_INT_RGB);
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[0].length; j++) {
+				Color c = new Color(matrix[i][j][0], matrix[i][j][1], matrix[i][j][2]);
+				image.setRGB(i, j, c.getRGB());
+			}
+		}
+		return image;
+	}
+	
+	
 	public static BufferedImage createGrayImage(int[][] matrix) {
 		BufferedImage image = new BufferedImage(matrix.length, matrix[0].length, BufferedImage.TYPE_INT_RGB);
 		for (int i = 0; i < matrix.length; i++) {

@@ -43,15 +43,15 @@ public class PatternsMatcher {
 			
 			BufferedImage image_board = ImageIO.read(new File("./data/tests/lichess.org/test1.png"));
 			image_board = ScannerUtils.resizeImage(image_board, imageProperties.getImageSize());
-			image_board = ScannerUtils.convertToGrayScale(image_board);
-			int[][] board = ScannerUtils.convertToGrayMatrix(image_board);
+			//image_board = ScannerUtils.convertToGrayScale(image_board);
+			int[][][] board = ScannerUtils.convertToRGBMatrix(image_board);
 			
 			BufferedImage image_king = createPattern(Constants.PID_W_KING, imageProperties, ScannerUtils.getAVG(image_board));
-			int[][] piece = ScannerUtils.convertToGrayMatrix(image_king);
+			int[][][] piece = ScannerUtils.convertToRGBMatrix(image_king);
 			
 			MatcherData matcherData = matchImages(board, piece);
             
-            BufferedImage patternImage = ScannerUtils.createGrayImage(piece);
+            BufferedImage patternImage = ScannerUtils.createRGBImage(piece);
             ScannerUtils.saveImage("pattern", patternImage, "png");
 			
 		} catch (Exception e) {
@@ -61,7 +61,7 @@ public class PatternsMatcher {
 	
 	
 	private static BufferedImage createPattern(int pid, ImageProperties imageProperties, Color bgcolor) {
-		BufferedImage imagePiece = new BufferedImage(imageProperties.getSquareSize(), imageProperties.getSquareSize(), BufferedImage.TYPE_BYTE_GRAY);
+		BufferedImage imagePiece = new BufferedImage(imageProperties.getSquareSize(), imageProperties.getSquareSize(), BufferedImage.TYPE_INT_RGB);
 		Graphics g = imagePiece.getGraphics();
 		g.setColor(bgcolor);
 		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
@@ -90,10 +90,10 @@ public class PatternsMatcher {
 		                
 		                cur.delta += Math.abs(pixelSource - pixelPattern);
 		                
-		                if (cur.delta > result.delta) {
+		                /*if (cur.delta > result.delta) {
 		                	i = grayPattern.length;
 		                	break;
-		                }
+		                }*/
 		            }
 		        }
 		        
@@ -110,6 +110,63 @@ public class PatternsMatcher {
 		            }
 		            
 		            BufferedImage resultImage = ScannerUtils.createGrayImage(print);
+		            ScannerUtils.saveImage("result" + result.delta + "_" + x + "_" + y, resultImage, "png");
+		        }
+		    }
+		}
+		
+		return result;
+	}
+	
+	
+	private static final MatcherData matchImages(int[][][] rgbSource, int[][][] rgbPattern) {
+		
+		MatcherData result = new MatcherData();
+		result.delta = Double.MAX_VALUE;
+		
+		for (int x = 0; x <= rgbSource.length - rgbPattern.length; x++ ) {
+		    for (int y = 0; y <= rgbSource.length - rgbPattern.length; y++ ) {
+		        
+		    	MatcherData cur = new MatcherData();
+		    	cur.x = x;
+		    	cur.y = y;
+		    	
+		        for (int i = 0; i < rgbPattern.length; i++ ) {
+		            for (int j = 0; j < rgbPattern.length; j++ ) {
+		            	
+		                int pixelSource_r = rgbSource[x+i][y+j][0];
+		                int pixelSource_g = rgbSource[x+i][y+j][1];
+		                int pixelSource_b = rgbSource[x+i][y+j][2];
+		                int pixelPattern_r = rgbPattern[i][j][0];
+		                int pixelPattern_g = rgbPattern[i][j][1];
+		                int pixelPattern_b = rgbPattern[i][j][2];
+		                
+		                cur.delta += Math.abs(pixelSource_r - pixelPattern_r);
+		                cur.delta += Math.abs(pixelSource_g - pixelPattern_g);
+		                cur.delta += Math.abs(pixelSource_b - pixelPattern_b);
+		                
+		                /*if (cur.delta > result.delta) {
+		                	i = grayPattern.length;
+		                	break;
+		                }*/
+		            }
+		        }
+		        
+		        if (result.delta > cur.delta) { 
+		        	result.delta = cur.delta;
+		        	result.x = x;
+		        	result.y = y;
+		        	
+		            int[][][] print = new int[rgbPattern.length][rgbPattern.length][3];
+		            for (int i = 0; i < rgbPattern.length; i++) {
+		            	for (int j = 0; j < rgbPattern.length; j++) {
+		            		print[i][j][0] = rgbSource[result.x + i][result.y + j][0];
+		            		print[i][j][1] = rgbSource[result.x + i][result.y + j][1];
+		            		print[i][j][2] = rgbSource[result.x + i][result.y + j][2];
+		            	}
+		            }
+		            
+		            BufferedImage resultImage = ScannerUtils.createRGBImage(print);
 		            ScannerUtils.saveImage("result" + result.delta + "_" + x + "_" + y, resultImage, "png");
 		        }
 		    }
