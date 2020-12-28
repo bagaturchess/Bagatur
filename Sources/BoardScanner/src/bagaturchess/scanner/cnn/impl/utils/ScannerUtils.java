@@ -415,6 +415,26 @@ public class ScannerUtils {
 	}
 	
 	
+	public static Color getAVG(BufferedImage image) {
+		
+		long red = 0;
+		long green = 0;
+		long blue = 0;
+		long count = 0;
+        for (int i = 0; i < image.getHeight(); i++) { 
+            for (int j = 0; j < image.getWidth(); j++) {
+            	int rgb = image.getRGB(i, j);
+				red += (rgb & 0xff0000) >> 16;
+				green += (rgb & 0xff00) >> 8;
+				blue += rgb & 0xff;
+				count++;
+            }
+        }
+        
+        return new Color((int) (red / count), (int) (green / count), (int) (blue / count));
+	}
+	
+	
 	public static double compareImages(BufferedImage image1, BufferedImage image2) {
 	    
 		int width1 = image1.getWidth(); 
@@ -427,10 +447,8 @@ public class ScannerUtils {
 	    }
 	    
         long delta = 0; 
-        for (int y = 0; y < height1; y++) 
-        { 
-            for (int x = 0; x < width1; x++) 
-            { 
+        for (int y = 0; y < height1; y++) { 
+            for (int x = 0; x < width1; x++) { 
                 int rgb1 = image1.getRGB(x, y); 
                 int red1 = (rgb1 >> 16) & 0xff; 
                 int green1 = (rgb1 >> 8) & 0xff; 

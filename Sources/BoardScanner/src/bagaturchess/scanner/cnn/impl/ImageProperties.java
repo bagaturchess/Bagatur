@@ -61,19 +61,19 @@ public class ImageProperties {
 	
 	private void loadPiecesImages() throws IOException{
 		
-		piecesImages[Constants.PID_W_KING] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_k.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_W_QUEEN] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_q.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_W_ROOK] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_r.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_W_BISHOP] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_b.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_W_KNIGHT] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_n.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_W_PAWN] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_p.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_W_KING] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_k.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
+		piecesImages[Constants.PID_W_QUEEN] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_q.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
+		piecesImages[Constants.PID_W_ROOK] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_r.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
+		piecesImages[Constants.PID_W_BISHOP] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_b.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
+		piecesImages[Constants.PID_W_KNIGHT] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_n.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
+		piecesImages[Constants.PID_W_PAWN] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_p.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
 		
-		piecesImages[Constants.PID_B_KING] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_k.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_B_QUEEN] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_q.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_B_ROOK] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_r.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_B_BISHOP] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_b.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_B_KNIGHT] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_n.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_REPLICATE);
-		piecesImages[Constants.PID_B_PAWN] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_p.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_REPLICATE);
+		piecesImages[Constants.PID_B_KING] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_k.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
+		piecesImages[Constants.PID_B_QUEEN] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_q.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
+		piecesImages[Constants.PID_B_ROOK] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_r.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
+		piecesImages[Constants.PID_B_BISHOP] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_b.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
+		piecesImages[Constants.PID_B_KNIGHT] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_n.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
+		piecesImages[Constants.PID_B_PAWN] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_p.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
 	}
 	
 	
