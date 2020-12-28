@@ -43,7 +43,7 @@ public class ScannerTest_FromImageFile {
 		try {
 			
 			ImageProperties imageProperties = new ImageProperties(192);
-			BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test1.png"));
+			BufferedImage boardImage = ImageIO.read(new File("./data/tests/chess.com/test1.png"));
 			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/test2.png"));
 			boardImage = ScannerUtils.resizeImage(boardImage, imageProperties.getImageSize());
 			boardImage = ScannerUtils.convertToGrayScale(boardImage);
