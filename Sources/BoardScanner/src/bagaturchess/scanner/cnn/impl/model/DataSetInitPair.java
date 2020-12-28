@@ -17,27 +17,32 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.impl;
+package bagaturchess.scanner.cnn.impl.model;
 
 
-import java.io.IOException;
-
-import bagaturchess.scanner.model.NetworkModel;
-import deepnetts.net.NeuralNetwork;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public abstract class BoardScanner {
+public class DataSetInitPair {
+
+	
+	protected List<Object> images;
+	protected List<Integer> pids;
 	
 	
-	protected NetworkModel networkModel;
-	protected NeuralNetwork<?> network;
-	
-	
-	public BoardScanner(NetworkModel _networkModel) throws ClassNotFoundException, IOException {
-		networkModel = _networkModel;
-		network = networkModel.getNetwork();
+	DataSetInitPair() {
+		images = new ArrayList<Object>();
+		pids = new ArrayList<Integer>();
 	}
 	
 	
-	public abstract String scan(Object image);
+	public List<Object> getImages() {
+		return images;
+	}
+	
+	
+	public List<Integer> getPIDs() {
+		return pids;
+	}
 }

@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.model;
+package bagaturchess.scanner.cnn.impl.model;
 
 
 import java.awt.image.BufferedImage;
@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.scanner.impl.MatrixUtils;
-import bagaturchess.scanner.impl.ScannerUtils;
+import bagaturchess.scanner.cnn.impl.utils.MatrixUtils;
+import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 
 
 public class DataSetInitPair_ByBoardImage_RGB extends DataSetInitPair {

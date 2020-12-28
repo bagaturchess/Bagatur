@@ -17,13 +17,15 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.impl;
+package bagaturchess.scanner.cnn.impl;
 
 
 import java.io.IOException;
 
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.scanner.model.NetworkModel;
+import bagaturchess.scanner.cnn.impl.model.NetworkModel;
+import bagaturchess.scanner.cnn.impl.utils.MatrixUtils;
+import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 
 
 public class BoardScanner_Gray extends BoardScanner {

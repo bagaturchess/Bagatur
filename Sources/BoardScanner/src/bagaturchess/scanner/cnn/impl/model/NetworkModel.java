@@ -17,14 +17,14 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.model;
+package bagaturchess.scanner.cnn.impl.model;
 
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import bagaturchess.scanner.impl.ImageProperties;
+import bagaturchess.scanner.cnn.impl.ImageProperties;
 import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.util.FileIO;
 

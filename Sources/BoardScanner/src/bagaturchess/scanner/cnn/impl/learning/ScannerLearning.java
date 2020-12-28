@@ -1,4 +1,4 @@
-package bagaturchess.scanner.learning;
+package bagaturchess.scanner.cnn.impl.learning;
 
 
 import java.awt.image.BufferedImage;
@@ -9,12 +9,12 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import bagaturchess.scanner.impl.ImageProperties;
-import bagaturchess.scanner.impl.ScannerUtils;
-import bagaturchess.scanner.model.DataSetInitPair;
-import bagaturchess.scanner.model.NetworkModel;
-import bagaturchess.scanner.model.NetworkModel_Gray;
-import bagaturchess.scanner.model.NetworkModel_RGB;
+import bagaturchess.scanner.cnn.impl.ImageProperties;
+import bagaturchess.scanner.cnn.impl.model.DataSetInitPair;
+import bagaturchess.scanner.cnn.impl.model.NetworkModel;
+import bagaturchess.scanner.cnn.impl.model.NetworkModel_Gray;
+import bagaturchess.scanner.cnn.impl.model.NetworkModel_RGB;
+import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.net.train.BackpropagationTrainer;
 import deepnetts.net.train.TrainingEvent;

@@ -17,13 +17,13 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.model;
+package bagaturchess.scanner.cnn.impl.model;
 
 
 import java.awt.image.BufferedImage;
 
-import bagaturchess.scanner.impl.ImageProperties;
-import bagaturchess.scanner.impl.ScannerUtils;
+import bagaturchess.scanner.cnn.impl.ImageProperties;
+import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 
 
 public class DataSetInitPair_ByPiecesSetAndSquareColor extends DataSetInitPair {

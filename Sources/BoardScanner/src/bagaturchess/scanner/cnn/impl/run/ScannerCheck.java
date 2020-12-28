@@ -1,16 +1,16 @@
-package bagaturchess.scanner.cnn.run;
+package bagaturchess.scanner.cnn.impl.run;
 
 
 import java.awt.image.BufferedImage;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
-import bagaturchess.scanner.impl.BoardScanner;
-import bagaturchess.scanner.impl.BoardScanner_RGB;
-import bagaturchess.scanner.impl.ImageProperties;
-import bagaturchess.scanner.impl.ScannerUtils;
-import bagaturchess.scanner.model.NetworkModel;
-import bagaturchess.scanner.model.NetworkModel_RGB;
+import bagaturchess.scanner.cnn.impl.BoardScanner;
+import bagaturchess.scanner.cnn.impl.BoardScanner_RGB;
+import bagaturchess.scanner.cnn.impl.ImageProperties;
+import bagaturchess.scanner.cnn.impl.model.NetworkModel;
+import bagaturchess.scanner.cnn.impl.model.NetworkModel_RGB;
+import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 

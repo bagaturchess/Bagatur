@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.learning;
+package bagaturchess.scanner.cnn.impl.learning;
 
 
 import java.util.ArrayList;

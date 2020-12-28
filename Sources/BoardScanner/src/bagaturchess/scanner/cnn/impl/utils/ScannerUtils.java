@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.impl;
+package bagaturchess.scanner.cnn.impl.utils;
 
 
 import java.awt.AlphaComposite;
@@ -34,6 +34,7 @@ import javax.imageio.ImageIO;
 
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl1.internal.ChessConstants;
+import bagaturchess.scanner.cnn.impl.ImageProperties;
 
 
 public class ScannerUtils {
