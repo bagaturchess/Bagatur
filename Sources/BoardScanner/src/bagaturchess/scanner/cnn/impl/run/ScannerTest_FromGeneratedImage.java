@@ -53,7 +53,7 @@ public class ScannerTest_FromGeneratedImage {
 			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, imageProperties);
 			BoardScanner scanner = new BoardScanner_RGB(netmodel);
 			
-			String fen = scanner.scan(ScannerUtils.convertToGrayMatrix(boardImage));
+			String fen = scanner.scan(ScannerUtils.convertToRGBMatrix(boardImage));
 			
 			System.out.println(fen);
 			
