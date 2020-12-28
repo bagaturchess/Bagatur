@@ -26,10 +26,11 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 import bagaturchess.scanner.impl.BoardScanner;
+import bagaturchess.scanner.impl.BoardScanner_RGB;
 import bagaturchess.scanner.impl.ImageProperties;
 import bagaturchess.scanner.impl.ScannerUtils;
-import deepnetts.net.NeuralNetwork;
-import deepnetts.util.FileIO;
+import bagaturchess.scanner.model.NetworkModel;
+import bagaturchess.scanner.model.NetworkModel_RGB;
 
 
 public class ScannerTest_FromImageFile {
@@ -43,16 +44,16 @@ public class ScannerTest_FromImageFile {
 		try {
 			
 			ImageProperties imageProperties = new ImageProperties(192);
+			
+			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, imageProperties);
+			
 			BufferedImage boardImage = ImageIO.read(new File("./data/tests/chess.com/test1.png"));
-			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/test2.png"));
+			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/test7.png"));
 			boardImage = ScannerUtils.resizeImage(boardImage, imageProperties.getImageSize());
-			boardImage = ScannerUtils.convertToGrayScale(boardImage);
-			//ScannerUtils.saveImage("test8_converted", boardImage, "png");
 			
-			NeuralNetwork<?> network = FileIO.createFromFile(new File(NET_FILE));
-			BoardScanner scanner = new BoardScanner(network);
+			BoardScanner scanner = new BoardScanner_RGB(netmodel);
 			
-			String fen = scanner.scan(ScannerUtils.convertToGrayMatrix(boardImage));
+			String fen = scanner.scan(ScannerUtils.convertToRGBMatrix(boardImage));
 			
 			System.out.println(fen);
 			

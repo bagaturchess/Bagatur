@@ -17,41 +17,48 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.learning;
+package bagaturchess.scanner.model;
 
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 import bagaturchess.scanner.impl.ImageProperties;
-import bagaturchess.scanner.impl.ScannerUtils;
+import bagaturchess.scanner.learning.DataSetInitPair;
+import deepnetts.net.ConvolutionalNetwork;
+import deepnetts.util.FileIO;
 
 
-public class DataSetInitPair_ByPiecesSetAndSquareColor extends DataSetInitPair {
+public abstract class NetworkModel {
 	
 	
+	protected ConvolutionalNetwork network;
 	protected ImageProperties imageProperties;
 	
 	
-	public DataSetInitPair_ByPiecesSetAndSquareColor(ImageProperties _imageProperties) {
+	public NetworkModel(String networkFilePath, ImageProperties _imageProperties) throws ClassNotFoundException, IOException {
 		
-		super();
+		if ((new File(networkFilePath)).exists() ){
+			System.out.println("Loading network ...");
+			network = (ConvolutionalNetwork) FileIO.createFromFile(new File(networkFilePath));
+			System.out.println("Network loaded.");
+		}
 		
 		imageProperties = _imageProperties;
-		
-		for (int pid = 0; pid <= 12; pid++) {
-			BufferedImage whiteImage = ScannerUtils.createSquareImage(imageProperties, pid, imageProperties.getColorWhiteSquare());
-			BufferedImage blackImage = ScannerUtils.createSquareImage(imageProperties, pid, imageProperties.getColorBlackSquare());
-			whiteImage = ScannerUtils.convertToGrayScale(whiteImage);
-			blackImage = ScannerUtils.convertToGrayScale(blackImage);
-			images.add(ScannerUtils.convertToGrayMatrix(whiteImage));
-			images.add(ScannerUtils.convertToGrayMatrix(blackImage));
-			if (pid == 0) {
-				pids.add(0);
-				pids.add(13);
-			} else {
-				pids.add(pid);
-				pids.add(pid);
-			}
-		}
 	}
+	
+	
+	public ConvolutionalNetwork getNetwork() {
+		return network;
+	}
+	
+	
+	public abstract Object createInput(Object image);
+	
+	
+	public abstract void setInputs(Object input);
+	
+	
+	public abstract DataSetInitPair createDataSetInitPair(BufferedImage boardImage);
 }

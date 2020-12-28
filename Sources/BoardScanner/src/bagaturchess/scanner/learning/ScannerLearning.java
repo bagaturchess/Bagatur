@@ -11,14 +11,14 @@ import javax.imageio.ImageIO;
 
 import bagaturchess.scanner.impl.ImageProperties;
 import bagaturchess.scanner.impl.ScannerUtils;
+import bagaturchess.scanner.model.NetworkModel;
+import bagaturchess.scanner.model.NetworkModel_Gray;
+import bagaturchess.scanner.model.NetworkModel_RGB;
 import deepnetts.net.ConvolutionalNetwork;
-import deepnetts.net.layers.activation.ActivationType;
-import deepnetts.net.loss.LossType;
 import deepnetts.net.train.BackpropagationTrainer;
 import deepnetts.net.train.TrainingEvent;
 import deepnetts.net.train.TrainingListener;
 import deepnetts.util.FileIO;
-import deepnetts.util.Tensor;
 
 
 public class ScannerLearning {
@@ -30,12 +30,16 @@ public class ScannerLearning {
 	private static BackpropagationTrainer trainer;
 	private static ScannerDataSet dataset;
 	
+	private static NetworkModel netmodel;
+	
 	
 	public static void main(String[] args) {
 		
 		try {
 			
 			ImageProperties imageProperties = new ImageProperties(192);
+			
+			netmodel = new NetworkModel_RGB(NET_FILE, imageProperties);
 			
 			String[] inputFiles = new String[] {
 				//"./data/tests/lichess.org/test1.png",
@@ -47,60 +51,31 @@ public class ScannerLearning {
 			
 			DataSetInitPair[] pairs = getInitPairs(imageProperties, inputFiles);
 			
-			List<int[][]> grayImages = new ArrayList<int[][]>();
+			List<Object> images = new ArrayList<Object>();
 			List<Integer> pids = new ArrayList<Integer>();
 			
 			for (int i = 0; i < pairs.length; i++) {
-				grayImages.addAll(pairs[i].getGrayImages());
+				images.addAll(pairs[i].getImages());
 				pids.addAll(pairs[i].getPIDs());
 			}
 			
 			
 			dataset = new ScannerDataSet();
-			for (int i = 0; i < grayImages.size(); i++) {
-				float[][] networkInput = ScannerUtils.convertInt2Float(grayImages.get(i));
+			for (int i = 0; i < images.size(); i++) {
+				Object networkInput = netmodel.createInput(images.get(i));
 				float[] networkOutput = new float[14];
 				networkOutput[pids.get(i)] = 1;
 				dataset.addItem(networkInput, networkOutput);
 			}
 			
-			
-			if ((new File(NET_FILE)).exists() ){
-				
-				System.out.println("Loading network ...");
-				
-				
-				network = (ConvolutionalNetwork) FileIO.createFromFile(new File(NET_FILE));
-				
-				
-				System.out.println("Network loaded.");
-				
-			} else {
-				
-				System.out.println("Creating network ...");
-				
-				
-				network =  ConvolutionalNetwork.builder()
-		                .addInputLayer(imageProperties.getSquareSize(), imageProperties.getSquareSize(), 1)
-		                .addConvolutionalLayer(5, 5, 64)
-		                .addMaxPoolingLayer(2, 2)
-		                .addConvolutionalLayer(5, 5, 16)
-		                .addOutputLayer(14, ActivationType.SOFTMAX)
-		                .hiddenActivationFunction(ActivationType.LINEAR)
-		                .lossFunction(LossType.CROSS_ENTROPY)
-		                .randomSeed(777)
-		                .build();
-				
-	            
-				System.out.println("Network created.");
-			}
+			network = netmodel.getNetwork();
 			
 			trainer = new BackpropagationTrainer(network);
 			
 			trainer.setLearningRate(0.001f);
 	        
 	        trainer.setBatchMode(true);
-	        trainer.setBatchSize(grayImages.size());
+	        trainer.setBatchSize(images.size());
 	        
 	        trainer.addListener(new TrainingListener() {
 	        	
@@ -116,10 +91,10 @@ public class ScannerLearning {
 						
 						int success = 0;
 						int failure = 0;
-						for (int i = 0; i < grayImages.size(); i++) {
+						for (int i = 0; i < images.size(); i++) {
 							
-							float[][] networkInput = ScannerUtils.convertInt2Float(grayImages.get(i));
-							network.setInput(new Tensor(networkInput));
+							Object networkInput = netmodel.createInput(images.get(i));
+							netmodel.setInputs(networkInput);
 							network.forward();
 							float[] actual_output = network.getOutput();
 							
@@ -184,10 +159,7 @@ public class ScannerLearning {
 	private static DataSetInitPair getInitPair(ImageProperties imageProperties, String fileName) throws IOException {
 		BufferedImage boardImage = ImageIO.read(new File(fileName));
 		boardImage = ScannerUtils.resizeImage(boardImage, imageProperties.getImageSize());
-		//ScannerUtils.saveImage(fileName + "_resized", boardImage, "png");
-		boardImage = ScannerUtils.convertToGrayScale(boardImage);
-		//ScannerUtils.saveImage(fileName + "_grayed", boardImage, "png");
-		DataSetInitPair pair = new DataSetInitPair_ByBoardImage(ScannerUtils.convertToGrayMatrix(boardImage));
+		DataSetInitPair pair = netmodel.createDataSetInitPair(boardImage);
 		return pair;
 	}
 }

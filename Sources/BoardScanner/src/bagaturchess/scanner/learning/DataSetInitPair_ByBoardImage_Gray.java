@@ -30,12 +30,17 @@ import bagaturchess.scanner.impl.MatrixUtils;
 import bagaturchess.scanner.impl.ScannerUtils;
 
 
-public class DataSetInitPair_ByBoardImage extends DataSetInitPair {
+public class DataSetInitPair_ByBoardImage_Gray extends DataSetInitPair {
 	
 	
-	public DataSetInitPair_ByBoardImage(int[][] matrixOfInitialBoard) {
+	public DataSetInitPair_ByBoardImage_Gray(BufferedImage boardImage) {
 		
 		super();
+		
+		boardImage = ScannerUtils.convertToGrayScale(boardImage);
+		//ScannerUtils.saveImage(fileName + "_grayed", boardImage, "png");
+		
+		int[][] matrixOfInitialBoard = ScannerUtils.convertToGrayMatrix(boardImage);
 		
 		Map<Integer, int[][]> result = MatrixUtils.splitTo64Squares(matrixOfInitialBoard);
 		
@@ -55,91 +60,91 @@ public class DataSetInitPair_ByBoardImage extends DataSetInitPair {
 			
 				switch (fieldID) {
 					case 0:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_W_ROOK);
 						break;
 					case 1:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_W_KNIGHT);
 						break;
 					case 2:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_W_BISHOP);
 						break;
 					case 3:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_W_KING);
 						break;
 					case 4:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_W_QUEEN);
 						break;
 					case 5:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_W_BISHOP);
 						break;
 					case 6:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_W_KNIGHT);
 						break;
 					case 7:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_W_ROOK);
 						break;
 					case 8:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_W_PAWN);
 						break;
 					case 9:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_W_PAWN);
 						break;
 					case 16:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_NONE);
 						break;
 					case 17:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_NONE);
 						break;
 					case 54:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_B_PAWN);
 						break;
 					case 55:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_B_PAWN);
 						break;
 					case 56:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_B_ROOK);
 						break;
 					case 57:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_B_KNIGHT);
 						break;
 					case 58:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_B_BISHOP);
 						break;
 					case 59:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_B_KING);
 						break;
 					case 60:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_B_QUEEN);
 						break;
 					case 61:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_B_BISHOP);
 						break;
 					case 62:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_B_KNIGHT);
 						break;
 					case 63:
-						grayImages.add(matrix);
+						images.add(matrix);
 						pids.add(Constants.PID_B_ROOK);
 						break;
 				}

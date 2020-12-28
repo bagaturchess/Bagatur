@@ -2,17 +2,17 @@ package bagaturchess.scanner.run;
 
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.scanner.impl.BoardScanner;
+import bagaturchess.scanner.impl.BoardScanner_RGB;
 import bagaturchess.scanner.impl.ImageProperties;
 import bagaturchess.scanner.impl.ScannerUtils;
+import bagaturchess.scanner.model.NetworkModel;
+import bagaturchess.scanner.model.NetworkModel_RGB;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 import bagaturchess.ucitracker.api.PositionsVisitor;
-import deepnetts.net.NeuralNetwork;
-import deepnetts.util.FileIO;
 
 
 public class ScannerCheck {
@@ -28,11 +28,11 @@ public class ScannerCheck {
 			
 			String filePath = "./stockfish-12.cg";
 			
-			NeuralNetwork<?> network = FileIO.createFromFile(new File(NET_FILE));
-			
 			ImageProperties imageProperties = new ImageProperties(192, "set1");
 			
-			PositionsVisitor visitor = new ScannerCheckVisitor(new BoardScanner(network), imageProperties);
+			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, imageProperties);
+			
+			PositionsVisitor visitor = new ScannerCheckVisitor(new BoardScanner_RGB(netmodel), imageProperties);
 			
 			System.out.println("Reading games ... ");
 			while (true) {

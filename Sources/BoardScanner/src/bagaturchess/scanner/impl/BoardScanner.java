@@ -22,62 +22,22 @@ package bagaturchess.scanner.impl;
 
 import java.io.IOException;
 
-import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.scanner.model.NetworkModel;
 import deepnetts.net.NeuralNetwork;
-import deepnetts.util.Tensor;
 
 
-public class BoardScanner {
+public abstract class BoardScanner {
 	
 	
-	private NeuralNetwork<?> network;
+	protected NetworkModel networkModel;
+	protected NeuralNetwork<?> network;
 	
 	
-	public BoardScanner(NeuralNetwork<?> _network) throws ClassNotFoundException, IOException {
-		network = _network;
+	public BoardScanner(NetworkModel _networkModel) throws ClassNotFoundException, IOException {
+		networkModel = _networkModel;
+		network = networkModel.getNetwork();
 	}
 	
 	
-	public String scan(int[][] grayImage) {
-		
-		int[] pids = new int[64];
-		for (int i = 0; i < grayImage.length; i += grayImage.length / 8) {
-			for (int j = 0; j < grayImage.length; j += grayImage.length / 8) {
-				int file = i / (grayImage.length / 8);
-				int rank = j / (grayImage.length / 8);
-				int filedID = 63 - (file + 8 * rank);
-				int pid = getPID(grayImage, i, j, filedID);
-				pids[filedID] = pid;
-			}
-		}
-		
-		return ScannerUtils.createFENFromPIDs(pids);
-	}
-
-
-	private int getPID(int[][] matrix, int i1, int j1, int filedID) {
-		
-		int[][] arr = MatrixUtils.getSquarePixelsMatrix(matrix, i1, j1);
-		float[][] inputs = ScannerUtils.convertInt2Float(arr);
-		
-		//BufferedImage image = ScannerUtils.createGrayImage(inputs);
-		//ScannerUtils.saveImage("" + filedID, image);
-		
-		network.setInput(new Tensor(inputs));
-		network.forward();
-		float[] output = network.getOutput();
-		
-		float maxValue = 0;
-		int maxIndex = 0;
-		for (int j = 0; j < output.length; j++) {
-			if (maxValue < output[j]) {
-				maxValue = output[j];
-				maxIndex = j;
-			}
-		}
-		
-		int pid = (maxIndex == 13 ? Constants.PID_NONE : maxIndex);
-		
-		return pid;
-	}
+	public abstract String scan(Object image);
 }

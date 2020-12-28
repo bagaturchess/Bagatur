@@ -48,9 +48,14 @@ public class ScannerDataSet implements DataSet<MLDataItem> {
 	}
 	
 	
-	public void addItem(float[][] inputs, float[] outputs) {
-		items.add(new TabularDataSet.Item(new Tensor(inputs), new Tensor(outputs)));
-		//System.out.println("items size is " + items.size());
+	public void addItem(Object inputs, float[] outputs) {
+		if (inputs.getClass().equals(float[][][].class)) {
+			items.add(new TabularDataSet.Item(new Tensor((float[][][])inputs), new Tensor(outputs)));
+		} else if (inputs.getClass().equals(float[][].class)) {
+			items.add(new TabularDataSet.Item(new Tensor((float[][])inputs), new Tensor(outputs)));
+		} else {
+			throw new IllegalStateException();
+		}
 	}
 	
 	

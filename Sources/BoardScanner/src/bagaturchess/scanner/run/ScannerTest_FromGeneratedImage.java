@@ -26,13 +26,16 @@ import java.io.File;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.scanner.impl.BoardScanner;
+import bagaturchess.scanner.impl.BoardScanner_RGB;
 import bagaturchess.scanner.impl.ImageProperties;
 import bagaturchess.scanner.impl.ScannerUtils;
+import bagaturchess.scanner.model.NetworkModel;
+import bagaturchess.scanner.model.NetworkModel_RGB;
 import deepnetts.net.NeuralNetwork;
 import deepnetts.util.FileIO;
 
 
-public class ScannerTest {
+public class ScannerTest_FromGeneratedImage {
 	
 	
 	private static final String NET_FILE = "scanner.cnn.set1.bin";
@@ -47,8 +50,8 @@ public class ScannerTest {
 			BufferedImage boardImage = ScannerUtils.createBoardImage(imageProperties, bitboard.toEPD());
 			//ScannerUtils.saveImage("board", boardImage);
 			
-			NeuralNetwork<?> network = FileIO.createFromFile(new File(NET_FILE));
-			BoardScanner scanner = new BoardScanner(network);
+			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, imageProperties);
+			BoardScanner scanner = new BoardScanner_RGB(netmodel);
 			
 			String fen = scanner.scan(ScannerUtils.convertToGrayMatrix(boardImage));
 			

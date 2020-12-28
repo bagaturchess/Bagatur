@@ -59,6 +59,19 @@ public class ScannerUtils {
 	}
 	
 	
+	public static float[][][] convertInt2Float(int[][][] array) {
+		float[][][] result = new float[array.length][array.length][array[0][0].length];
+		for (int i = 0 ; i < array.length; i++) {
+			for (int j = 0 ; j < array[0].length; j++) {
+				for (int k = 0 ; k < array[0][0].length; k++) {
+					result[i][j][k] = array[i][j][k];
+				}
+			}
+		}
+		return result;
+	}
+	
+	
 	public static int[] convertFloat2Int(float[] array) {
 		int[] result = new int[array.length];
 		for (int i = 0 ; i < array.length; i++) {
@@ -296,6 +309,33 @@ public class ScannerUtils {
 				//inputs[count] = (red + green + blue) / 3;
 			    //inputs[count++] = red * 0.299 + green * 0.587 + blue * 0.114;
 				inputs[i][j] = green;
+			}
+		}
+		
+		return inputs;
+	}
+	
+	
+	public static int[][][] convertToRGBMatrix(BufferedImage image) {
+		
+		if (image.getHeight() != image.getWidth()) {
+			throw new IllegalStateException();
+		}
+		
+		int[][][] inputs = new int[image.getHeight()][image.getHeight()][3];
+		for (int i = 0; i < image.getHeight(); i++) {
+			for (int j = 0; j < image.getHeight(); j++) {
+				
+				int rgb = image.getRGB(i, j);
+				
+				//int alpha = (rgb & 0xff000000) >>> 24;
+				int red = (rgb & 0xff0000) >> 16;
+				int green = (rgb & 0xff00) >> 8;
+				int blue = rgb & 0xff;
+				
+				inputs[i][j][0] = red;
+				inputs[i][j][1] = green;
+				inputs[i][j][2] = blue;
 			}
 		}
 		
