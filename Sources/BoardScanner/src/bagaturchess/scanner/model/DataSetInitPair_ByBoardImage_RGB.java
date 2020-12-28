@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.learning;
+package bagaturchess.scanner.model;
 
 
 import java.awt.image.BufferedImage;
@@ -33,7 +33,7 @@ import bagaturchess.scanner.impl.ScannerUtils;
 public class DataSetInitPair_ByBoardImage_RGB extends DataSetInitPair {
 	
 	
-	public DataSetInitPair_ByBoardImage_RGB(BufferedImage boardImage) {
+	DataSetInitPair_ByBoardImage_RGB(BufferedImage boardImage) {
 		
 		super();
 		

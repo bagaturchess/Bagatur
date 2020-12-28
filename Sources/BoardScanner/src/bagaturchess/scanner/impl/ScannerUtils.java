@@ -412,4 +412,44 @@ public class ScannerUtils {
 		
 		return result;
 	}
+	
+	
+	public static double compareImages(BufferedImage image1, BufferedImage image2) {
+	    
+		int width1 = image1.getWidth(); 
+	    int width2 = image2.getWidth(); 
+	    int height1 = image1.getHeight(); 
+	    int height2 = image2.getHeight(); 
+	
+	    if ((width1 != width2) || (height1 != height2)) {
+	        throw new IllegalStateException("Different dimensions");
+	    }
+	    
+        long delta = 0; 
+        for (int y = 0; y < height1; y++) 
+        { 
+            for (int x = 0; x < width1; x++) 
+            { 
+                int rgb1 = image1.getRGB(x, y); 
+                int red1 = (rgb1 >> 16) & 0xff; 
+                int green1 = (rgb1 >> 8) & 0xff; 
+                int blue1 = (rgb1) & 0xff; 
+                
+                int rgb2 = image2.getRGB(x, y); 
+                int red2 = (rgb2 >> 16) & 0xff; 
+                int green2 = (rgb2 >> 8) & 0xff; 
+                int blue2 = (rgb2) & 0xff; 
+                
+                delta += Math.abs(red1 - red2); 
+                delta += Math.abs(green1 - green2); 
+                delta += Math.abs(blue1 - blue2); 
+            } 
+        } 
+        
+        double all_pixels_count = width1 * height1 * 3; 
+        
+        double avg = delta / all_pixels_count; 
+        
+        return avg / 255; 
+	}
 }

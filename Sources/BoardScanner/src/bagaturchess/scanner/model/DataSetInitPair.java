@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.learning;
+package bagaturchess.scanner.model;
 
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class DataSetInitPair {
 	protected List<Integer> pids;
 	
 	
-	public DataSetInitPair() {
+	DataSetInitPair() {
 		images = new ArrayList<Object>();
 		pids = new ArrayList<Integer>();
 	}

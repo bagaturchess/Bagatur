@@ -1,4 +1,4 @@
-package bagaturchess.scanner.run;
+package bagaturchess.scanner.cnn.run;
 
 
 import java.awt.image.BufferedImage;

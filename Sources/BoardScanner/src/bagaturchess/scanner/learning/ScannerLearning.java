@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 
 import bagaturchess.scanner.impl.ImageProperties;
 import bagaturchess.scanner.impl.ScannerUtils;
+import bagaturchess.scanner.model.DataSetInitPair;
 import bagaturchess.scanner.model.NetworkModel;
 import bagaturchess.scanner.model.NetworkModel_Gray;
 import bagaturchess.scanner.model.NetworkModel_RGB;
@@ -42,11 +43,11 @@ public class ScannerLearning {
 			netmodel = new NetworkModel_RGB(NET_FILE, imageProperties);
 			
 			String[] inputFiles = new String[] {
-				//"./data/tests/lichess.org/test1.png",
-				//"./data/tests/lichess.org/test2.png",
-				//"./data/tests/lichess.org/test3.png",
-				//"./data/tests/lichess.org/test4.png",
-				"./data/tests/chess.com/test1.png",
+				"./data/tests/lichess.org/test1.png",
+				"./data/tests/lichess.org/test2.png",
+				"./data/tests/lichess.org/test3.png",
+				"./data/tests/lichess.org/test4.png",
+				//"./data/tests/chess.com/test1.png",
 			};
 			
 			DataSetInitPair[] pairs = getInitPairs(imageProperties, inputFiles);

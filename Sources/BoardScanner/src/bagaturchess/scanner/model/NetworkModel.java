@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 
 import bagaturchess.scanner.impl.ImageProperties;
-import bagaturchess.scanner.learning.DataSetInitPair;
 import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.util.FileIO;
 

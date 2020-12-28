@@ -25,8 +25,6 @@ import java.io.IOException;
 
 import bagaturchess.scanner.impl.ImageProperties;
 import bagaturchess.scanner.impl.ScannerUtils;
-import bagaturchess.scanner.learning.DataSetInitPair;
-import bagaturchess.scanner.learning.DataSetInitPair_ByBoardImage_Gray;
 import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.net.layers.activation.ActivationType;
 import deepnetts.net.loss.LossType;

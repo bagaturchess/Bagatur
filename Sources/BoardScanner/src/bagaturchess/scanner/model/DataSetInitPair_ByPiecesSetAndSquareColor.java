@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.learning;
+package bagaturchess.scanner.model;
 
 
 import java.awt.image.BufferedImage;
@@ -32,7 +32,7 @@ public class DataSetInitPair_ByPiecesSetAndSquareColor extends DataSetInitPair {
 	protected ImageProperties imageProperties;
 	
 	
-	public DataSetInitPair_ByPiecesSetAndSquareColor(ImageProperties _imageProperties) {
+	DataSetInitPair_ByPiecesSetAndSquareColor(ImageProperties _imageProperties) {
 		
 		super();
 		
