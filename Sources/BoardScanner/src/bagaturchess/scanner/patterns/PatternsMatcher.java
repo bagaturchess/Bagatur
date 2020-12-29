@@ -141,7 +141,7 @@ public class PatternsMatcher {
 		//System.out.println("avg=" + stat.getEntropy() + ", disp=" + stat.getDisperse());
 		
 		int[][] result = new int[grayPattern.length][grayPattern.length];
-				
+		
 		for (int i = 0; i < grayPattern.length; i++) {
 			for (int j = 0; j < grayPattern.length; j++) {
 				int pixel = (int) (1 * stat.getDisperse() + (grayPattern[i][j] - stat.getEntropy()));

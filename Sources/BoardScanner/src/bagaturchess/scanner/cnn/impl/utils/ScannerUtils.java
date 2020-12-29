@@ -244,7 +244,7 @@ public class ScannerUtils {
 	
 	
 	public static BufferedImage createGrayImage(int[][] matrix) {
-		BufferedImage image = new BufferedImage(matrix.length, matrix[0].length, BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = new BufferedImage(matrix.length, matrix[0].length, BufferedImage.TYPE_BYTE_GRAY);
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[0].length; j++) {
 				Color c = new Color(matrix[i][j], matrix[i][j], matrix[i][j]);
