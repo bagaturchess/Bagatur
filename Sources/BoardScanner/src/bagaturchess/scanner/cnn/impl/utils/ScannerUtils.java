@@ -329,6 +329,19 @@ public class ScannerUtils {
 	}
 	
 	
+	public static int[][] invertGrayMatrix(int[][] matrix) {
+		int[][] result = new int[matrix.length][matrix.length];
+		
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix.length; j++) {
+				result[i][j] = 255 - matrix[i][j];
+			}
+		}
+		
+		return result;
+	}
+	
+	
 	public static int[][][] convertToRGBMatrix(BufferedImage image) {
 		
 		if (image.getHeight() != image.getWidth()) {

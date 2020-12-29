@@ -22,12 +22,12 @@ package bagaturchess.scanner.patterns;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.imageio.ImageIO;
 
-import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 
@@ -39,33 +39,89 @@ public class PatternsMatcher {
 		
 		try {
 			
-			ImageProperties imageProperties = new ImageProperties(512);
+			ImageProperties imageProperties = new ImageProperties(256, "set3");
 			
-			BufferedImage image_board = ImageIO.read(new File("./data/tests/lichess.org/test1.png"));
+			BufferedImage image_board = ImageIO.read(new File("./data/tests/chess.com/test1.png"));
 			image_board = ScannerUtils.resizeImage(image_board, imageProperties.getImageSize());
-			//image_board = ScannerUtils.convertToGrayScale(image_board);
-			int[][][] board = ScannerUtils.convertToRGBMatrix(image_board);
+			image_board = ScannerUtils.convertToGrayScale(image_board);
+			ScannerUtils.saveImage("board", image_board, "png");
+			int[][] board = ScannerUtils.convertToGrayMatrix(image_board);
 			
-			BufferedImage image_king = createPattern(Constants.PID_W_KING, imageProperties, ScannerUtils.getAVG(image_board));
-			int[][][] piece = ScannerUtils.convertToRGBMatrix(image_king);
+			/*int[][] rotatedBoard = rotateMatrix(board, 0);
+			BufferedImage resultImage = ScannerUtils.createGrayImage(rotatedBoard);
+			ScannerUtils.saveImage("board_rotated", resultImage, "png");
+			board = rotatedBoard;*/
 			
-			MatcherData matcherData = matchImages(board, piece);
+			for (int pid = 1; pid <= 12; pid++) {
+				MatcherData matcherData = matchImages(board,
+	            		imageProperties.getPiecesImages()[pid],
+	            		ScannerUtils.getAVG(image_board),
+	            		imageProperties.getSquareSize(),
+	            		0.0f, 0);
+	            
+				printInfo(board, matcherData, pid + "_" + matcherData.size + "_" + matcherData.angle);   
+			}
             
-            BufferedImage patternImage = ScannerUtils.createRGBImage(piece);
-            ScannerUtils.saveImage("pattern", patternImage, "png");
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	
-	private static BufferedImage createPattern(int pid, ImageProperties imageProperties, Color bgcolor) {
-		BufferedImage imagePiece = new BufferedImage(imageProperties.getSquareSize(), imageProperties.getSquareSize(), BufferedImage.TYPE_INT_RGB);
+	private static void printInfo(int[][] board, MatcherData matcherData, String fileName) {
+		
+		int[][] print = new int[matcherData.size][matcherData.size];
+		for (int i = 0; i < matcherData.size; i++) {
+			for (int j = 0; j < matcherData.size; j++) {
+				print[i][j] = board[matcherData.x + i][matcherData.y + j];
+			}
+		}
+		
+		BufferedImage resultImage = ScannerUtils.createGrayImage(print);
+		ScannerUtils.saveImage(fileName, resultImage, "png");
+	}
+	
+	
+	private static final MatcherData matchImages(int[][] graySource, Image pieceImage, Color bgcolor, int initialSize, float sizeDeltaPercent, int rotationAngleInDegrees) {
+		
+		MatcherData result = new MatcherData();
+		result.delta = Double.MAX_VALUE;
+		
+		int startSize = (int) ((1 - sizeDeltaPercent) * initialSize);
+		int endSize = (int) ((1 + sizeDeltaPercent) * initialSize);
+		
+		for (int size = startSize; size <= endSize; size++) {
+			for (int angle = -rotationAngleInDegrees; angle <= rotationAngleInDegrees; angle++) {
+				
+				BufferedImage image_piece = createPattern(pieceImage, size, bgcolor);
+				int[][] grayPiece = ScannerUtils.convertToGrayMatrix(image_piece);
+				if (angle != 0) {
+					grayPiece = rotateMatrix(grayPiece, angle);
+				}
+				
+				//BufferedImage resultImage = ScannerUtils.createGrayImage(grayPiece);
+				//ScannerUtils.saveImage("" + grayPiece.toString(), resultImage, "png");
+				
+				MatcherData matcherData = matchImages(graySource, grayPiece);
+				matcherData.angle = angle;
+				
+				if (result.delta > matcherData.delta) {
+					result = matcherData;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	
+	private static BufferedImage createPattern(Image piece, int size, Color bgcolor) {
+		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 		Graphics g = imagePiece.getGraphics();
 		g.setColor(bgcolor);
 		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
-		g.drawImage(imageProperties.getPiecesImages()[pid], 0, 0, null);
+		g.drawImage(piece, 0, 0, null);
+		imagePiece = ScannerUtils.convertToGrayScale(imagePiece);
 		return imagePiece;
 	}
 	
@@ -74,6 +130,7 @@ public class PatternsMatcher {
 		
 		MatcherData result = new MatcherData();
 		result.delta = Double.MAX_VALUE;
+		result.size = grayPattern.length;
 		
 		for (int x = 0; x <= graySource.length - grayPattern.length; x++ ) {
 		    for (int y = 0; y <= graySource.length - grayPattern.length; y++ ) {
@@ -81,7 +138,9 @@ public class PatternsMatcher {
 		    	MatcherData cur = new MatcherData();
 		    	cur.x = x;
 		    	cur.y = y;
+		    	cur.size = grayPattern.length;
 		    	
+		    	int count = 0;
 		        for (int i = 0; i < grayPattern.length; i++ ) {
 		            for (int j = 0; j < grayPattern.length; j++ ) {
 		            	
@@ -89,6 +148,7 @@ public class PatternsMatcher {
 		                int pixelPattern = grayPattern[i][j];
 		                
 		                cur.delta += Math.abs(pixelSource - pixelPattern);
+		                count++;
 		                
 		                /*if (cur.delta > result.delta) {
 		                	i = grayPattern.length;
@@ -96,21 +156,12 @@ public class PatternsMatcher {
 		                }*/
 		            }
 		        }
+		        //cur.delta = cur.delta / (double) (count * count); 
 		        
 		        if (result.delta > cur.delta) { 
 		        	result.delta = cur.delta;
 		        	result.x = x;
 		        	result.y = y;
-		        	
-		            int[][] print = new int[grayPattern.length][grayPattern.length];
-		            for (int i = 0; i < grayPattern.length; i++) {
-		            	for (int j = 0; j < grayPattern.length; j++) {
-		            		print[i][j] = graySource[result.x + i][result.y + j];
-		            	}
-		            }
-		            
-		            BufferedImage resultImage = ScannerUtils.createGrayImage(print);
-		            ScannerUtils.saveImage("result" + result.delta + "_" + x + "_" + y, resultImage, "png");
 		        }
 		    }
 		}
@@ -123,6 +174,7 @@ public class PatternsMatcher {
 		
 		MatcherData result = new MatcherData();
 		result.delta = Double.MAX_VALUE;
+		result.size = rgbPattern.length;
 		
 		for (int x = 0; x <= rgbSource.length - rgbPattern.length; x++ ) {
 		    for (int y = 0; y <= rgbSource.length - rgbPattern.length; y++ ) {
@@ -130,7 +182,9 @@ public class PatternsMatcher {
 		    	MatcherData cur = new MatcherData();
 		    	cur.x = x;
 		    	cur.y = y;
+		    	cur.size = rgbPattern.length;
 		    	
+		    	int count = 0;
 		        for (int i = 0; i < rgbPattern.length; i++ ) {
 		            for (int j = 0; j < rgbPattern.length; j++ ) {
 		            	
@@ -145,31 +199,44 @@ public class PatternsMatcher {
 		                cur.delta += Math.abs(pixelSource_g - pixelPattern_g);
 		                cur.delta += Math.abs(pixelSource_b - pixelPattern_b);
 		                
+		                count++;
+		                
 		                /*if (cur.delta > result.delta) {
-		                	i = grayPattern.length;
+		                	i = rgbPattern.length;
 		                	break;
 		                }*/
 		            }
 		        }
+		        //cur.delta = cur.delta / (double) (count * count); 
 		        
 		        if (result.delta > cur.delta) { 
 		        	result.delta = cur.delta;
 		        	result.x = x;
 		        	result.y = y;
-		        	
-		            int[][][] print = new int[rgbPattern.length][rgbPattern.length][3];
-		            for (int i = 0; i < rgbPattern.length; i++) {
-		            	for (int j = 0; j < rgbPattern.length; j++) {
-		            		print[i][j][0] = rgbSource[result.x + i][result.y + j][0];
-		            		print[i][j][1] = rgbSource[result.x + i][result.y + j][1];
-		            		print[i][j][2] = rgbSource[result.x + i][result.y + j][2];
-		            	}
-		            }
-		            
-		            BufferedImage resultImage = ScannerUtils.createRGBImage(print);
-		            ScannerUtils.saveImage("result" + result.delta + "_" + x + "_" + y, resultImage, "png");
 		        }
 		    }
+		}
+		
+		return result;
+	}
+	
+	
+	private static final int[][] rotateMatrix(int[][] source, float angleInDegrees) {
+		
+		int[][] result = new int[source.length][source.length];
+		
+		double angle = (angleInDegrees * Math.PI / 180);
+		int centerX = source.length / 2;
+		int centerY = source.length / 2;
+		
+		for (int x = 0; x < source.length; x++) {
+			for (int y = 0; y < source.length; y++) {
+				int x1 = (int) (centerX + (x-centerX)*Math.cos(angle) - (y-centerY)*Math.sin(angle));
+				int y1 = (int) (centerY + (x-centerX)*Math.sin(angle) + (y-centerY)*Math.cos(angle));
+				if (x1 >= 0 && x1 < source.length && y1 >= 0 && y1 < source.length) {
+					result[x1][y1] = source[x][y];
+				}
+			}
 		}
 		
 		return result;
@@ -179,6 +246,8 @@ public class PatternsMatcher {
 	private static final class MatcherData {
 		int x;
 		int y;
+		int size;
 		double delta;
+		int angle;
 	}
 }
