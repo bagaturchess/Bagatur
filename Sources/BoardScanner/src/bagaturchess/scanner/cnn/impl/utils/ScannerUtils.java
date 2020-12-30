@@ -82,7 +82,7 @@ public class ScannerUtils {
 	}
 	
 	
-	public static BufferedImage createSquareImage(ImageProperties imageProperties, int pid, Color squareColour) {
+	public static BufferedImage createPieceImage(ImageProperties imageProperties, int pid, Color squareColour) {
 		BufferedImage image = new BufferedImage(imageProperties.getSquareSize(), imageProperties.getSquareSize(), BufferedImage.TYPE_INT_RGB);
 		
 		Graphics g = image.createGraphics();
@@ -95,6 +95,19 @@ public class ScannerUtils {
 		}
 			
 		return image;
+	}
+	
+	
+	public static final int[][] createPieceImage(ImageProperties imageProperties, int pid, int bgcolor, int size) {
+		Image piece = imageProperties.getPiecesImages()[pid];
+		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+		Graphics g = imagePiece.getGraphics();
+		g.setColor(new Color(bgcolor, bgcolor, bgcolor));
+		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
+		piece = piece.getScaledInstance(size, size, Image.SCALE_SMOOTH);
+		g.drawImage(piece, 0, 0, null);
+		imagePiece = ScannerUtils.convertToGrayScale(imagePiece);
+		return ScannerUtils.convertToGrayMatrix(imagePiece);
 	}
 	
 	
@@ -442,6 +455,10 @@ public class ScannerUtils {
 	
 	public static Color getAVG(BufferedImage image) {
 		
+		if (image.getHeight() != image.getWidth()) {
+			throw new IllegalStateException();
+		}
+		
 		long red = 0;
 		long green = 0;
 		long blue = 0;
@@ -457,6 +474,25 @@ public class ScannerUtils {
         }
         
         return new Color((int) (red / count), (int) (green / count), (int) (blue / count));
+	}
+	
+	
+	public static int getAVG(int[][] grayImage) {
+		
+		if (grayImage.length != grayImage[0].length) {
+			throw new IllegalStateException();
+		}
+		
+		long gray = 0;
+		long count = 0;
+        for (int i = 0; i < grayImage.length; i++) { 
+            for (int j = 0; j < grayImage.length; j++) {
+            	gray += grayImage[i][j];
+				count++;
+            }
+        }
+        
+        return (int) (gray / count);
 	}
 	
 	

@@ -145,6 +145,125 @@ public class MatrixUtils {
 	}
 	
 	
+	public static final int[][] rotateMatrix(int[][] source, float angleInDegrees) {
+		
+		int[][] result = new int[source.length][source.length];
+		
+		double angle = (angleInDegrees * Math.PI / 180);
+		int centerX = source.length / 2;
+		int centerY = source.length / 2;
+		
+		for (int x = 0; x < source.length; x++) {
+			for (int y = 0; y < source.length; y++) {
+				int x1 = (int) (centerX + (x-centerX)*Math.cos(angle) - (y-centerY)*Math.sin(angle));
+				int y1 = (int) (centerY + (x-centerX)*Math.sin(angle) + (y-centerY)*Math.cos(angle));
+				if (x1 >= 0 && x1 < source.length && y1 >= 0 && y1 < source.length) {
+					result[x1][y1] = source[x][y];
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	
+	public static final PatternMatchingData matchImages(int[][] graySource, int[][] grayPattern) {
+		
+		PatternMatchingData result = new PatternMatchingData();
+		result.delta = Double.MAX_VALUE;
+		result.size = grayPattern.length;
+		
+		for (int x = 0; x <= graySource.length - grayPattern.length; x++ ) {
+		    for (int y = 0; y <= graySource.length - grayPattern.length; y++ ) {
+		        
+		    	PatternMatchingData cur = new PatternMatchingData();
+		    	cur.x = x;
+		    	cur.y = y;
+		    	cur.size = grayPattern.length;
+		    	
+		    	int count = 0;
+		        for (int i = 0; i < grayPattern.length; i++ ) {
+		            for (int j = 0; j < grayPattern.length; j++ ) {
+		            	
+		                int pixelSource = graySource[x+i][y+j];
+		                int pixelPattern = grayPattern[i][j];
+		                
+		                cur.delta += Math.abs(pixelSource - pixelPattern);
+		                count++;
+		                
+		                /*if (cur.delta > result.delta) {
+		                	i = grayPattern.length;
+		                	break;
+		                }*/
+		            }
+		        }
+		        //cur.delta = cur.delta / (double) (count * count); 
+		        
+		        if (result.delta > cur.delta) { 
+		        	result.delta = cur.delta;
+		        	result.x = x;
+		        	result.y = y;
+		        	
+		        	//printInfo(graySource, result, cur.size + "_" + cur.delta);
+		        }
+		    }
+		}
+		
+		return result;
+	}
+	
+	
+	public static final PatternMatchingData matchImages(int[][][] rgbSource, int[][][] rgbPattern) {
+		
+		PatternMatchingData result = new PatternMatchingData();
+		result.delta = Double.MAX_VALUE;
+		result.size = rgbPattern.length;
+		
+		for (int x = 0; x <= rgbSource.length - rgbPattern.length; x++ ) {
+		    for (int y = 0; y <= rgbSource.length - rgbPattern.length; y++ ) {
+		        
+		    	PatternMatchingData cur = new PatternMatchingData();
+		    	cur.x = x;
+		    	cur.y = y;
+		    	cur.size = rgbPattern.length;
+		    	
+		    	int count = 0;
+		        for (int i = 0; i < rgbPattern.length; i++ ) {
+		            for (int j = 0; j < rgbPattern.length; j++ ) {
+		            	
+		                int pixelSource_r = rgbSource[x+i][y+j][0];
+		                int pixelSource_g = rgbSource[x+i][y+j][1];
+		                int pixelSource_b = rgbSource[x+i][y+j][2];
+		                int pixelPattern_r = rgbPattern[i][j][0];
+		                int pixelPattern_g = rgbPattern[i][j][1];
+		                int pixelPattern_b = rgbPattern[i][j][2];
+		                
+		                cur.delta += Math.abs(pixelSource_r - pixelPattern_r);
+		                cur.delta += Math.abs(pixelSource_g - pixelPattern_g);
+		                cur.delta += Math.abs(pixelSource_b - pixelPattern_b);
+		                
+		                count++;
+		                
+		                /*if (cur.delta > result.delta) {
+		                	i = rgbPattern.length;
+		                	break;
+		                }*/
+		            }
+		        }
+		        //cur.delta = cur.delta / (double) (count * count); 
+		        
+		        if (result.delta > cur.delta) { 
+		        	result.delta = cur.delta;
+		        	result.x = x;
+		        	result.y = y;
+		        }
+		    }
+		}
+		
+		return result;
+	}
+	
+	
 	private static int[][] moveWithXY(int[][] matrix, int X, int Y) {
 		
 		if (X == 0 && Y == 0) {
@@ -332,6 +451,15 @@ public class MatrixUtils {
 	    public String toString(){  
 	    	return "[" + x + ", " + y + "]";  
 	    }
+	}
+	
+	
+	public static final class PatternMatchingData {
+		public int x;
+		public int y;
+		public int size;
+		public double delta;
+		public int angle;
 	}
 	
 	

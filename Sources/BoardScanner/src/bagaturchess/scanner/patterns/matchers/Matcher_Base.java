@@ -17,41 +17,38 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.cnn.impl.model;
+package bagaturchess.scanner.patterns.matchers;
 
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 import bagaturchess.scanner.cnn.impl.ImageProperties;
+import bagaturchess.scanner.cnn.impl.utils.MatrixUtils;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 
 
-public class DataSetInitPair_ByPiecesSetAndSquareColor extends DataSetInitPair {
+public abstract class Matcher_Base {
 	
 	
 	protected ImageProperties imageProperties;
 	
 	
-	DataSetInitPair_ByPiecesSetAndSquareColor(ImageProperties _imageProperties) {
-		
-		super();
-		
+	protected Matcher_Base(ImageProperties _imageProperties) throws IOException {
 		imageProperties = _imageProperties;
+	}
+	
+	
+	protected static void printInfo(int[][] board, MatrixUtils.PatternMatchingData matcherData, String fileName) {
 		
-		for (int pid = 0; pid <= 12; pid++) {
-			BufferedImage whiteImage = ScannerUtils.createPieceImage(imageProperties, pid, imageProperties.getColorWhiteSquare());
-			BufferedImage blackImage = ScannerUtils.createPieceImage(imageProperties, pid, imageProperties.getColorBlackSquare());
-			whiteImage = ScannerUtils.convertToGrayScale(whiteImage);
-			blackImage = ScannerUtils.convertToGrayScale(blackImage);
-			images.add(ScannerUtils.convertToGrayMatrix(whiteImage));
-			images.add(ScannerUtils.convertToGrayMatrix(blackImage));
-			if (pid == 0) {
-				pids.add(0);
-				pids.add(13);
-			} else {
-				pids.add(pid);
-				pids.add(pid);
+		int[][] print = new int[matcherData.size][matcherData.size];
+		for (int i = 0; i < matcherData.size; i++) {
+			for (int j = 0; j < matcherData.size; j++) {
+				print[i][j] = board[matcherData.x + i][matcherData.y + j];
 			}
 		}
+		
+		BufferedImage resultImage = ScannerUtils.createGrayImage(print);
+		ScannerUtils.saveImage(fileName, resultImage, "png");
 	}
 }
