@@ -111,6 +111,16 @@ public class ScannerUtils {
 	}
 	
 	
+	public static final int[][] createSquareImage(ImageProperties imageProperties, int bgcolor, int size) {
+		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+		Graphics g = imagePiece.getGraphics();
+		g.setColor(new Color(bgcolor, bgcolor, bgcolor));
+		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
+		imagePiece = ScannerUtils.convertToGrayScale(imagePiece);
+		return ScannerUtils.convertToGrayMatrix(imagePiece);
+	}
+	
+	
 	public static BufferedImage createBoardImage(ImageProperties imageProperties, String fen) {
 		
 		BufferedImage image = new BufferedImage(imageProperties.getImageSize(), imageProperties.getImageSize(), BufferedImage.TYPE_INT_RGB);

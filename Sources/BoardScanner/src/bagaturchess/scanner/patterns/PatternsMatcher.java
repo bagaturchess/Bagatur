@@ -30,8 +30,8 @@ import javax.imageio.ImageIO;
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.scanner.cnn.impl.ImageProperties;
-import bagaturchess.scanner.cnn.impl.utils.MatrixUtils;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.MatrixUtils;
 
 
 public class PatternsMatcher {

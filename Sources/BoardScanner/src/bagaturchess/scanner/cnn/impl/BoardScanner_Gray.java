@@ -24,8 +24,8 @@ import java.io.IOException;
 
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel;
-import bagaturchess.scanner.cnn.impl.utils.MatrixUtils;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.MatrixUtils;
 
 
 public class BoardScanner_Gray extends BoardScanner {
@@ -45,9 +45,9 @@ public class BoardScanner_Gray extends BoardScanner {
 			for (int j = 0; j < grayImage.length; j += grayImage.length / 8) {
 				int file = i / (grayImage.length / 8);
 				int rank = j / (grayImage.length / 8);
-				int filedID = 63 - (file + 8 * rank);
-				int pid = getPID(grayImage, i, j, filedID);
-				pids[filedID] = pid;
+				int fieldID = 63 - (file + 8 * rank);
+				int pid = getPID(grayImage, i, j, fieldID);
+				pids[fieldID] = pid;
 			}
 		}
 		

@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.cnn.impl.utils;
+package bagaturchess.scanner.common;
 
 
 import java.util.ArrayList;
@@ -197,7 +197,7 @@ public class MatrixUtils {
 		                }*/
 		            }
 		        }
-		        //cur.delta = cur.delta / (double) (count * count); 
+		        cur.delta = cur.delta / (double) (count * count); 
 		        
 		        if (result.delta > cur.delta) { 
 		        	result.delta = cur.delta;
