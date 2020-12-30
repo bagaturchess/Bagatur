@@ -121,6 +121,17 @@ public class ScannerUtils {
 	}
 	
 	
+	private static void fillRandom(BufferedImage imageSquare) {
+		for (int i = 0; i < imageSquare.getHeight(); i++) {
+			for (int j = 0; j < imageSquare.getHeight(); j++) {
+				int rand = (int) (Math.random() * 256);
+				Color c = new Color(rand, rand, rand);
+				imageSquare.setRGB(i, j, c.getRGB());
+			}
+		}
+	}
+	
+	
 	public static BufferedImage createBoardImage(ImageProperties imageProperties, String fen) {
 		
 		BufferedImage image = new BufferedImage(imageProperties.getImageSize(), imageProperties.getImageSize(), BufferedImage.TYPE_INT_RGB);
