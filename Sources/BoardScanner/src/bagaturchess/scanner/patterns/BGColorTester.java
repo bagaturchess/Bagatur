@@ -42,14 +42,18 @@ public class BGColorTester {
 			BufferedImage resultImage = ScannerUtils.createGrayImage(grayImage);
 			ScannerUtils.saveImage("input", resultImage, "png");
 			
+			int count = 0;
+			long gray = 0;
 			for (int i = 0; i < grayImage.length; i++) {
 				for (int j = 0; j < grayImage.length; j++) {
-					System.out.println(grayImage[i][j]);
+					gray += grayImage[i][j] * grayImage[i][j];
+					count++;
 				}
 			}
 			
 			int bgcolor = ScannerUtils.getAVG(grayImage);
-			System.out.println("bgcolor=" + bgcolor);
+			int bgcolor1 = (int) (gray / (count * count));
+			System.out.println("bgcolor=" + bgcolor + ", calc=" + bgcolor1);
 			
 			int[][] generated = ScannerUtils.createSquareImage(bgcolor, grayImage.length);
 			BufferedImage resultImage1 = ScannerUtils.createGrayImage(generated);
