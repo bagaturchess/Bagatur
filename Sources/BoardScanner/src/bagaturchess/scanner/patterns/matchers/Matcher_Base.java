@@ -133,7 +133,7 @@ public abstract class Matcher_Base {
 				int[][] grayPattern = pid == Constants.PID_NONE ?
 						ScannerUtils.createSquareImage(bgcolor, size)
 						: ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
-						
+				
 				MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
 				
 				if (bestData == null || bestData.delta > curData.delta) {
