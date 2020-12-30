@@ -111,13 +111,13 @@ public class ScannerUtils {
 	}
 	
 	
-	public static final int[][] createSquareImage(ImageProperties imageProperties, int bgcolor, int size) {
-		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-		Graphics g = imagePiece.getGraphics();
+	public static final int[][] createSquareImage(int bgcolor, int size) {
+		BufferedImage imageSquare = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+		Graphics g = imageSquare.getGraphics();
 		g.setColor(new Color(bgcolor, bgcolor, bgcolor));
-		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
-		imagePiece = ScannerUtils.convertToGrayScale(imagePiece);
-		return ScannerUtils.convertToGrayMatrix(imagePiece);
+		g.fillRect(0, 0, imageSquare.getWidth(), imageSquare.getHeight());
+		imageSquare = ScannerUtils.convertToGrayScale(imageSquare);
+		return ScannerUtils.convertToGrayMatrix(imageSquare);
 	}
 	
 	

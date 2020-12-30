@@ -20,7 +20,6 @@
 package bagaturchess.scanner.patterns.matchers;
 
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
@@ -37,7 +36,7 @@ import bagaturchess.scanner.common.ResultPair;
 public abstract class Matcher_Base {
 	
 	
-	private static final float SIZE_DELTA_PERCENT = 0.5f;
+	private static final float SIZE_DELTA_PERCENT = 0.3f;
 	
 	
 	protected ImageProperties imageProperties;
@@ -92,7 +91,14 @@ public abstract class Matcher_Base {
 				if (squareStat.getDisperse() < deviations.getEntropy() - deviations.getDisperse() / 7.9f) {
 					pid = Constants.PID_NONE;
 				} else {
-					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData = getPID(squareMatrix, i, j, fieldID);
+					
+					MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
+					bestPatternData.x = 0;
+					bestPatternData.y = 0;
+					bestPatternData.size = squareMatrix.length;
+					printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
+					
+					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData = getPID(squareMatrix, fieldID);
 					pid = pidAndData.getFirst();
 					MatrixUtils.PatternMatchingData data = pidAndData.getSecond();
 					result.totalDelta += data.delta;
@@ -109,9 +115,9 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	private ResultPair<Integer, MatrixUtils.PatternMatchingData> getPID(int[][] graySquareMatrix, int i1, int j1, int filedID) {
+	private ResultPair<Integer, MatrixUtils.PatternMatchingData> getPID(int[][] graySquareMatrix, int fieldID) {
 		
-		int bgcolor = ScannerUtils.getAVG(graySquareMatrix);
+		int bgcolor = (int) calculateStats(graySquareMatrix).getEntropy();
 		
 		MatrixUtils.PatternMatchingData bestData = null;
 		int bestPID = -1;
@@ -125,9 +131,9 @@ public abstract class Matcher_Base {
 			for (int size = startSize; size <= maxSize; size++) {
 				
 				int[][] grayPattern = pid == Constants.PID_NONE ?
-						ScannerUtils.createSquareImage(imageProperties, bgcolor, size)
+						ScannerUtils.createSquareImage(bgcolor, size)
 						: ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
-					
+						
 				MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
 				
 				if (bestData == null || bestData.delta > curData.delta) {
@@ -140,13 +146,21 @@ public abstract class Matcher_Base {
 		
 		
 		if (this instanceof ChessCom) {
+			
+			int[][] avgColor = ScannerUtils.createSquareImage(bgcolor, graySquareMatrix.length);
+			MatrixUtils.PatternMatchingData bestPatternData1 = new MatrixUtils.PatternMatchingData();
+			bestPatternData1.x = 0;
+			bestPatternData1.y = 0;
+			bestPatternData1.size = avgColor.length;
+			printInfo(avgColor, bestPatternData1, "" + fieldID + "_bgcolor");
+			
 			MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
 			bestPatternData.x = 0;
 			bestPatternData.y = 0;
 			bestPatternData.size = bestPattern.length;
-			printInfo(bestPattern, bestPatternData, "" + filedID + "_bestPattern");
+			printInfo(bestPattern, bestPatternData, "" + fieldID + "_bestPattern");
 			
-			printInfo(graySquareMatrix, bestData, "" + filedID);
+			printInfo(graySquareMatrix, bestData, "" + fieldID);
 		}
 		
 		return new ResultPair<Integer, MatrixUtils.PatternMatchingData>(bestPID, bestData);
