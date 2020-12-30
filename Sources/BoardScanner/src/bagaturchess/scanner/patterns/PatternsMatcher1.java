@@ -27,8 +27,6 @@ import javax.imageio.ImageIO;
 
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.ResultPair;
-import bagaturchess.scanner.patterns.matchers.ChessCom;
-import bagaturchess.scanner.patterns.matchers.LichessOrg;
 import bagaturchess.scanner.patterns.matchers.Matcher_Base;
 import bagaturchess.scanner.patterns.matchers.Matcher_Composite;
 import bagaturchess.scanner.patterns.matchers.MatchingStatistics;
@@ -41,13 +39,15 @@ public class PatternsMatcher1 {
 		
 		try {
 			
-			BufferedImage image_board = ImageIO.read(new File("./data/tests/test5.png"));
-			image_board = ScannerUtils.resizeImage(image_board, 192);
+			BufferedImage image_board = ImageIO.read(new File("./data/tests/test4.jpg"));
+			//BufferedImage image_board = ImageIO.read(new File("./data/tests/lichess.org/test7.png"));
+			//BufferedImage image_board = ImageIO.read(new File("./data/tests/chess.com/test4.png"));
+			image_board = ScannerUtils.resizeImage(image_board, 256);
 			image_board = ScannerUtils.convertToGrayScale(image_board);
 			//ScannerUtils.saveImage("board", image_board, "png");
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image_board);
 			
-			Matcher_Base matcher = new Matcher_Composite(192);
+			Matcher_Base matcher = new Matcher_Composite(256);
 			ResultPair<String, MatchingStatistics> result = matcher.scan(grayBoard);
 			String fen = result.getFirst();
 			MatchingStatistics stats = result.getSecond();

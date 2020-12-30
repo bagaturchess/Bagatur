@@ -169,9 +169,7 @@ public class MatrixUtils {
 	
 	public static final PatternMatchingData matchImages(int[][] graySource, int[][] grayPattern) {
 		
-		PatternMatchingData result = new PatternMatchingData();
-		result.delta = Double.MAX_VALUE;
-		result.size = grayPattern.length;
+		PatternMatchingData result = null;
 		
 		for (int x = 0; x <= graySource.length - grayPattern.length; x++ ) {
 		    for (int y = 0; y <= graySource.length - grayPattern.length; y++ ) {
@@ -188,7 +186,7 @@ public class MatrixUtils {
 		                int pixelSource = graySource[x+i][y+j];
 		                int pixelPattern = grayPattern[i][j];
 		                
-		                cur.delta += Math.abs(pixelSource - pixelPattern);
+		                cur.delta += Math.abs(pixelSource - pixelPattern) * Math.abs(pixelSource - pixelPattern);
 		                count++;
 		                
 		                /*if (cur.delta > result.delta) {
@@ -199,10 +197,8 @@ public class MatrixUtils {
 		        }
 		        cur.delta = cur.delta / (double) (count * count); 
 		        
-		        if (result.delta > cur.delta) { 
-		        	result.delta = cur.delta;
-		        	result.x = x;
-		        	result.y = y;
+		        if (result == null || result.delta > cur.delta) { 
+		        	result = cur;
 		        	
 		        	//printInfo(graySource, result, cur.size + "_" + cur.delta);
 		        }

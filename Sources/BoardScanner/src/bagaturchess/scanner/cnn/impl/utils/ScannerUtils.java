@@ -104,8 +104,8 @@ public class ScannerUtils {
 		Graphics g = imagePiece.getGraphics();
 		g.setColor(new Color(bgcolor, bgcolor, bgcolor));
 		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
-		piece = piece.getScaledInstance(size, size, Image.SCALE_SMOOTH);
-		g.drawImage(piece, 0, 0, null);
+		Image pieceScaled = piece.getScaledInstance(size, size, Image.SCALE_SMOOTH);
+		g.drawImage(pieceScaled, 0, 0, null);
 		imagePiece = ScannerUtils.convertToGrayScale(imagePiece);
 		return ScannerUtils.convertToGrayMatrix(imagePiece);
 	}

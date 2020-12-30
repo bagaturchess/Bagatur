@@ -20,8 +20,11 @@
 package bagaturchess.scanner.patterns.matchers;
 
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
@@ -34,8 +37,7 @@ import bagaturchess.scanner.common.ResultPair;
 public abstract class Matcher_Base {
 	
 	
-	private static final float SIZE_DELTA_PERCENT = 0.1f;
-	private static final float DISPERSE_DEVIDER = 3f;
+	private static final float SIZE_DELTA_PERCENT = 0.5f;
 	
 	
 	protected ImageProperties imageProperties;
@@ -50,9 +52,28 @@ public abstract class Matcher_Base {
 		
 		MatchingStatistics result = new MatchingStatistics();
 		result.matcherName = this.toString();
+				
+		//VarStatistic boardStat = calculateStats(grayBoard);
 		
-		double boardDisperse = calculateDisperse(grayBoard);
-		//System.out.println("boardDisperse=" + boardDisperse);
+		VarStatistic deviations = new VarStatistic(false);
+		
+		Map<Integer, VarStatistic> squaresStats = new HashMap<Integer, VarStatistic>();
+		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
+			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
+				
+				int file = i / (grayBoard.length / 8);
+				int rank = j / (grayBoard.length / 8);
+				int fieldID = 63 - (file + 8 * rank);
+				
+				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
+				
+				VarStatistic squareStat = calculateStats(squareMatrix);
+				squaresStats.put(fieldID, squareStat);
+				
+				deviations.addValue(squareStat.getDisperse(), squareStat.getDisperse());
+			}
+		}
+		
 		
 		int[] pids = new int[64];
 		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
@@ -63,19 +84,22 @@ public abstract class Matcher_Base {
 				int fieldID = 63 - (file + 8 * rank);
 				
 				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-				double squareDisperse = calculateDisperse(squareMatrix);
-				//System.out.println("squareDisperse=" + squareDisperse);
+				
+				VarStatistic squareStat = squaresStats.get(fieldID);
+				//System.out.println("squareDisperse=" + squareDisperse + ", squareEntropy=" + squareEntropy);
 				
 				int pid = -1;
-				if (squareDisperse < boardDisperse / DISPERSE_DEVIDER) {
+				if (squareStat.getDisperse() < deviations.getEntropy() - deviations.getDisperse() / 7.9f) {
 					pid = Constants.PID_NONE;
 				} else {
-					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData = getPID(squareMatrix, i, j, filedID);
+					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData = getPID(squareMatrix, i, j, fieldID);
 					pid = pidAndData.getFirst();
 					MatrixUtils.PatternMatchingData data = pidAndData.getSecond();
 					result.totalDelta += data.delta;
 				}
 				pids[fieldID] = pid;
+				
+				//System.out.println(squareDisperse);
 			}
 		}
 		
@@ -91,6 +115,7 @@ public abstract class Matcher_Base {
 		
 		MatrixUtils.PatternMatchingData bestData = null;
 		int bestPID = -1;
+		int[][] bestPattern = null;
 		
 		for (int pid = Constants.PID_NONE; pid <= Constants.PID_B_KING; pid++) {
 			
@@ -98,6 +123,7 @@ public abstract class Matcher_Base {
 			int startSize = (int) ((1 - SIZE_DELTA_PERCENT) * maxSize);
 			
 			for (int size = startSize; size <= maxSize; size++) {
+				
 				int[][] grayPattern = pid == Constants.PID_NONE ?
 						ScannerUtils.createSquareImage(imageProperties, bgcolor, size)
 						: ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
@@ -107,19 +133,30 @@ public abstract class Matcher_Base {
 				if (bestData == null || bestData.delta > curData.delta) {
 					bestData = curData;
 					bestPID = pid;
+					bestPattern = grayPattern;
 				}
 			}
 		}
 		
-		//printInfo(graySquareMatrix, bestData, "" + filedID);
+		
+		if (this instanceof ChessCom) {
+			MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
+			bestPatternData.x = 0;
+			bestPatternData.y = 0;
+			bestPatternData.size = bestPattern.length;
+			printInfo(bestPattern, bestPatternData, "" + filedID + "_bestPattern");
+			
+			printInfo(graySquareMatrix, bestData, "" + filedID);
+		}
 		
 		return new ResultPair<Integer, MatrixUtils.PatternMatchingData>(bestPID, bestData);
 	}
 	
 	
-	private static double calculateEntropy(int[][] grayMatrix) {
+	private static VarStatistic calculateStats(int[][] grayMatrix) {
 		
 		VarStatistic stat = new VarStatistic(false);
+		
 		for (int i = 0; i < grayMatrix.length; i++) {
 			for (int j = 0; j < grayMatrix.length; j++) {
 				int cur = grayMatrix[i][j];
@@ -127,21 +164,7 @@ public abstract class Matcher_Base {
 			}
 		}
 		
-		return stat.getEntropy();
-	}
-	
-	
-	private static double calculateDisperse(int[][] grayMatrix) {
-		
-		VarStatistic stat = new VarStatistic(false);
-		for (int i = 0; i < grayMatrix.length; i++) {
-			for (int j = 0; j < grayMatrix.length; j++) {
-				int cur = grayMatrix[i][j];
-				stat.addValue(cur, cur);
-			}
-		}
-		
-		return stat.getDisperse();
+		return stat;
 	}
 	
 	
