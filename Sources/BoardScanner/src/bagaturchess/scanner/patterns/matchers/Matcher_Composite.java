@@ -68,8 +68,12 @@ public class Matcher_Composite extends Matcher_Base {
 		for (int i = 0; i < matchers.size(); i++) {
 			ResultPair<Integer, MatrixUtils.PatternMatchingData> whiteKingData =
 					matchers.get(i).scanForPiece(grayBoard, Constants.PID_W_KING);
+			System.out.println("Matcher_Composite: scan: " + matchers.get(i).getClass().getCanonicalName()
+					+ " white king id is " + whiteKingData.getFirst() + " delta is " + whiteKingData.getSecond().delta);
 			ResultPair<Integer, MatrixUtils.PatternMatchingData> blackKingData =
 					matchers.get(i).scanForPiece(grayBoard, Constants.PID_B_KING);
+			System.out.println("Matcher_Composite: scan: " + matchers.get(i).getClass().getCanonicalName()
+					+ " black king id is " + blackKingData.getFirst() + " delta is " + blackKingData.getSecond().delta);
 			double cur_delta = 0;
 			cur_delta += whiteKingData.getSecond().delta;
 			cur_delta += blackKingData.getSecond().delta;
@@ -81,7 +85,7 @@ public class Matcher_Composite extends Matcher_Base {
 			}
 		}
 		
-		System.out.println("Selected matcher is " + matchers.get(best_index).getClass().getCanonicalName());
+		System.out.println("Matcher_Composite: scan: Selected matcher is " + matchers.get(best_index).getClass().getCanonicalName());
 		
 		return matchers.get(best_index).scan(grayBoard, best_whiteKingData.getFirst(), best_blackKingData.getFirst());
 	}
