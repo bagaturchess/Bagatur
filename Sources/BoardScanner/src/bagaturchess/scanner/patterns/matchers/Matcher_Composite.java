@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
@@ -35,8 +36,8 @@ public class Matcher_Composite extends Matcher_Base {
 	private static final int CLASSIFIERS_SIZE = 64;
 	
 	
-	List<Matcher_Base> matchers = new ArrayList<Matcher_Base>();
-	List<Matcher_Base> matchers_classifiers = new ArrayList<Matcher_Base>();
+	private List<Matcher_Base> matchers = new ArrayList<Matcher_Base>();
+	private List<Matcher_Base> matchers_classifiers = new ArrayList<Matcher_Base>();
 	
 	
 	public Matcher_Composite(int imageSize) throws IOException {
@@ -57,23 +58,31 @@ public class Matcher_Composite extends Matcher_Base {
 	
 	
 	@Override
-	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) {
+	public String scan(int[][] grayBoard) {
 		
-		MatchingStatistics bestStat = null;
-		int bestMatcherIndex = -1;
+		ResultPair<Integer, MatrixUtils.PatternMatchingData> best_whiteKingData = null;
+		ResultPair<Integer, MatrixUtils.PatternMatchingData> best_blackKingData = null;
 		
-		int[][] grayBoard_short = ScannerUtils.convertToGrayMatrix(ScannerUtils.resizeImage(ScannerUtils.createGrayImage(grayBoard), CLASSIFIERS_SIZE));
-		for (int i = 0; i < matchers_classifiers.size(); i++) {
-			
-			ResultPair<String, MatchingStatistics> currentMatch = matchers_classifiers.get(i).scan(grayBoard_short);
-			MatchingStatistics currentStat = currentMatch.getSecond();
-			
-			if (bestStat == null || bestStat.totalDelta > currentStat.totalDelta) {
-				bestStat = currentStat;
-				bestMatcherIndex = i;
+		int best_index = 0;
+		double best_delta = Double.MAX_VALUE;
+		for (int i = 0; i < matchers.size(); i++) {
+			ResultPair<Integer, MatrixUtils.PatternMatchingData> whiteKingData =
+					matchers.get(i).scanForPiece(grayBoard, Constants.PID_W_KING);
+			ResultPair<Integer, MatrixUtils.PatternMatchingData> blackKingData =
+					matchers.get(i).scanForPiece(grayBoard, Constants.PID_B_KING);
+			double cur_delta = 0;
+			cur_delta += whiteKingData.getSecond().delta;
+			cur_delta += blackKingData.getSecond().delta;
+			if (cur_delta < best_delta) {
+				best_delta = cur_delta;
+				best_index = i;
+				best_whiteKingData = whiteKingData;
+				best_blackKingData = blackKingData;
 			}
 		}
 		
-		return matchers.get(bestMatcherIndex).scan(grayBoard);
+		System.out.println("Selected matcher is " + matchers.get(best_index).getClass().getCanonicalName());
+		
+		return matchers.get(best_index).scan(grayBoard, best_whiteKingData.getFirst(), best_blackKingData.getFirst());
 	}
 }

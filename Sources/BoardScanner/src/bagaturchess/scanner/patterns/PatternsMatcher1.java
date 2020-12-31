@@ -26,10 +26,8 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
-import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.matchers.Matcher_Base;
 import bagaturchess.scanner.patterns.matchers.Matcher_Composite;
-import bagaturchess.scanner.patterns.matchers.MatchingStatistics;
 
 
 public class PatternsMatcher1 {
@@ -48,10 +46,8 @@ public class PatternsMatcher1 {
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image_board);
 			
 			Matcher_Base matcher = new Matcher_Composite(192);
-			ResultPair<String, MatchingStatistics> result = matcher.scan(grayBoard);
-			String fen = result.getFirst();
-			MatchingStatistics stats = result.getSecond();
-            System.out.println(fen + ", delta=" + stats.totalDelta + ", name=" + stats.matcherName);
+			String fen = matcher.scan(grayBoard);
+            System.out.println(fen);
             
 		} catch (Exception e) {
 			e.printStackTrace();

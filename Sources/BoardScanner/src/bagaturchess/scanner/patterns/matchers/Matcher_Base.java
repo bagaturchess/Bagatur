@@ -88,7 +88,7 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) {
+	protected String scan(int[][] grayBoard, int whiteKingSquareID, int blackKingSquareID) {
 		
 		MatchingStatistics result = new MatchingStatistics();
 		result.matcherName = this.getClass().getCanonicalName();
@@ -101,15 +101,22 @@ public abstract class Matcher_Base {
 		pidsToSearch.add(Constants.PID_W_BISHOP);
 		pidsToSearch.add(Constants.PID_W_ROOK);
 		pidsToSearch.add(Constants.PID_W_QUEEN);
-		pidsToSearch.add(Constants.PID_W_KING);
+		if (whiteKingSquareID != -1) pidsToSearch.add(Constants.PID_W_KING);
 		pidsToSearch.add(Constants.PID_B_PAWN);
 		pidsToSearch.add(Constants.PID_B_KNIGHT);
 		pidsToSearch.add(Constants.PID_B_BISHOP);
 		pidsToSearch.add(Constants.PID_B_ROOK);
 		pidsToSearch.add(Constants.PID_B_QUEEN);
-		pidsToSearch.add(Constants.PID_B_KING);
+		if (blackKingSquareID != -1) pidsToSearch.add(Constants.PID_B_KING);
 		
 		int[] pids = new int[64];
+		if (whiteKingSquareID != -1) {
+			pids[whiteKingSquareID] = Constants.PID_W_KING;
+		}
+		if (blackKingSquareID != -1) {
+			pids[blackKingSquareID] = Constants.PID_B_KING;
+		}
+		
 		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
 			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
 				
@@ -139,9 +146,12 @@ public abstract class Matcher_Base {
 			}
 		}
 		
-		return new ResultPair<String, MatchingStatistics>(
-				ScannerUtils.createFENFromPIDs(pids),
-				result);
+		return ScannerUtils.createFENFromPIDs(pids);
+	}
+	
+	
+	public String scan(int[][] grayBoard) {
+		return scan(grayBoard, -1, -1);
 	}
 	
 	
