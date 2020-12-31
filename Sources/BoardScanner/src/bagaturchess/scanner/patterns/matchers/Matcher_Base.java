@@ -54,7 +54,7 @@ public abstract class Matcher_Base {
 				
 		//VarStatistic boardStat = calculateStats(grayBoard);
 		
-		VarStatistic deviations = new VarStatistic(false);
+		VarStatistic colorDeviations = new VarStatistic(false);
 		
 		Map<Integer, VarStatistic> squaresStats = new HashMap<Integer, VarStatistic>();
 		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
@@ -66,10 +66,10 @@ public abstract class Matcher_Base {
 				
 				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
 				
-				VarStatistic squareStat = calculateStats(squareMatrix);
+				VarStatistic squareStat = calculateColorStats(squareMatrix);
 				squaresStats.put(fieldID, squareStat);
 				
-				deviations.addValue(squareStat.getDisperse(), squareStat.getDisperse());
+				colorDeviations.addValue(squareStat.getDisperse(), squareStat.getDisperse());
 			}
 		}
 		
@@ -88,7 +88,7 @@ public abstract class Matcher_Base {
 				//System.out.println("squareDisperse=" + squareDisperse + ", squareEntropy=" + squareEntropy);
 				
 				int pid = -1;
-				if (squareStat.getDisperse() < deviations.getEntropy() - deviations.getDisperse() / 7.9f) {
+				if (squareStat.getDisperse() < colorDeviations.getEntropy() - colorDeviations.getDisperse() / 7.9f) {
 					pid = Constants.PID_NONE;
 				} else {
 					
@@ -117,7 +117,7 @@ public abstract class Matcher_Base {
 	
 	private ResultPair<Integer, MatrixUtils.PatternMatchingData> getPID(int[][] graySquareMatrix, boolean iterateSize, boolean iterateColor, int fieldID) {
 		
-		int bgcolor = (int) calculateStats(graySquareMatrix).getEntropy();
+		int bgcolor = (int) calculateColorStats(graySquareMatrix).getEntropy();
 		
 		MatrixUtils.PatternMatchingData bestData = null;
 		int bestPID = -1;
@@ -234,7 +234,7 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	private static VarStatistic calculateStats(int[][] grayMatrix) {
+	private static VarStatistic calculateColorStats(int[][] grayMatrix) {
 		
 		VarStatistic stat = new VarStatistic(false);
 		
