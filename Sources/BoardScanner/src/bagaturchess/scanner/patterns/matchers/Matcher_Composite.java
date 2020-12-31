@@ -51,7 +51,7 @@ public class Matcher_Composite extends Matcher_Base {
 	}
 	
 	
-	protected MatrixUtils.PatternMatchingData scanForPiece(int[][] grayBoard, int pid) {
+	protected ResultPair<Integer, MatrixUtils.PatternMatchingData> scanForPiece(int[][] grayBoard, int pid) {
 		throw new UnsupportedOperationException();
 	}
 	

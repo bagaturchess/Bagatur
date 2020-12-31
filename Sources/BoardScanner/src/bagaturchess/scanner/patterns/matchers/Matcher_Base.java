@@ -91,8 +91,8 @@ public abstract class Matcher_Base {
 	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) {
 		
 		MatchingStatistics result = new MatchingStatistics();
-		result.matcherName = this.toString();
-				
+		result.matcherName = this.getClass().getCanonicalName();
+		
 		Set<Integer> emptySquares = getEmptySquares(grayBoard);
 		
 		Set<Integer> pidsToSearch = new HashSet<Integer>();
