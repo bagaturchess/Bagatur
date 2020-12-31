@@ -459,8 +459,9 @@ public class MatrixUtils {
 		public int x;
 		public int y;
 		public int size;
-		public double delta;
 		public int angle;
+		public int color;
+		public double delta;
 	}
 	
 	

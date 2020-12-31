@@ -23,7 +23,9 @@ package bagaturchess.scanner.patterns.matchers;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
@@ -52,27 +54,7 @@ public abstract class Matcher_Base {
 		MatchingStatistics result = new MatchingStatistics();
 		result.matcherName = this.toString();
 				
-		//VarStatistic boardStat = calculateStats(grayBoard);
-		
-		VarStatistic colorDeviations = new VarStatistic(false);
-		
-		Map<Integer, VarStatistic> squaresStats = new HashMap<Integer, VarStatistic>();
-		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
-			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
-				
-				int file = i / (grayBoard.length / 8);
-				int rank = j / (grayBoard.length / 8);
-				int fieldID = 63 - (file + 8 * rank);
-				
-				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-				
-				VarStatistic squareStat = calculateColorStats(squareMatrix);
-				squaresStats.put(fieldID, squareStat);
-				
-				colorDeviations.addValue(squareStat.getDisperse(), squareStat.getDisperse());
-			}
-		}
-		
+		Set<Integer> emptySquares = getEmptySquares(grayBoard);
 		
 		int[] pids = new int[64];
 		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
@@ -82,15 +64,10 @@ public abstract class Matcher_Base {
 				int rank = j / (grayBoard.length / 8);
 				int fieldID = 63 - (file + 8 * rank);
 				
-				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-				
-				VarStatistic squareStat = squaresStats.get(fieldID);
-				//System.out.println("squareDisperse=" + squareDisperse + ", squareEntropy=" + squareEntropy);
-				
-				int pid = -1;
-				if (squareStat.getDisperse() < colorDeviations.getEntropy() - colorDeviations.getDisperse() / 7.9f) {
-					pid = Constants.PID_NONE;
-				} else {
+				int pid = Constants.PID_NONE;
+				if (!emptySquares.contains(fieldID)) {
+					
+					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
 					
 					MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
 					bestPatternData.x = 0;
@@ -136,6 +113,7 @@ public abstract class Matcher_Base {
 						ScannerUtils.createSquareImage(bgcolor, size)
 						: ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
 				curData[bgcolor] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+				curData[bgcolor].color = bgcolor;
 				
 				MatrixUtils.PatternMatchingData curData_best_up = curData[bgcolor];
 				
@@ -163,6 +141,7 @@ public abstract class Matcher_Base {
 							ScannerUtils.createSquareImage(color, size)
 							: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
 					curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+					curData[color].color = color;
 					if (curData[color].delta >= curData[color - 1].delta) {
 						break;
 					}
@@ -195,6 +174,7 @@ public abstract class Matcher_Base {
 							ScannerUtils.createSquareImage(color, size)
 							: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
 					curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+					curData[color].color = color;
 					if (curData[color].delta >= curData[color + 1].delta) {
 						break;
 					}
@@ -246,6 +226,39 @@ public abstract class Matcher_Base {
 		}
 		
 		return stat;
+	}
+	
+	
+	protected Set<Integer> getEmptySquares(int[][] grayBoard) {
+		
+		Set<Integer> emptySquaresIDs = new HashSet<Integer>();
+		
+		VarStatistic colorDeviations = new VarStatistic(false);
+		Map<Integer, VarStatistic> squaresStats = new HashMap<Integer, VarStatistic>();
+		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
+			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
+				
+				int file = i / (grayBoard.length / 8);
+				int rank = j / (grayBoard.length / 8);
+				int fieldID = 63 - (file + 8 * rank);
+				
+				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
+				
+				VarStatistic squareStat = calculateColorStats(squareMatrix);
+				squaresStats.put(fieldID, squareStat);
+				
+				colorDeviations.addValue(squareStat.getDisperse(), squareStat.getDisperse());
+			}
+		}
+		
+		for (Integer fieldID: squaresStats.keySet()) {
+			VarStatistic squareStat = squaresStats.get(fieldID);
+			if (squareStat.getDisperse() < colorDeviations.getEntropy() - colorDeviations.getDisperse() / 7.9f) {
+				emptySquaresIDs.add(fieldID);
+			}
+		}
+		
+		return emptySquaresIDs;
 	}
 	
 	
