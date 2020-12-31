@@ -95,20 +95,6 @@ public abstract class Matcher_Base {
 		
 		Set<Integer> emptySquares = getEmptySquares(grayBoard);
 		
-		Set<Integer> pidsToSearch = new HashSet<Integer>();
-		pidsToSearch.add(Constants.PID_W_PAWN);
-		pidsToSearch.add(Constants.PID_W_KNIGHT);
-		pidsToSearch.add(Constants.PID_W_BISHOP);
-		pidsToSearch.add(Constants.PID_W_ROOK);
-		pidsToSearch.add(Constants.PID_W_QUEEN);
-		if (whiteKingSquareID != -1) pidsToSearch.add(Constants.PID_W_KING);
-		pidsToSearch.add(Constants.PID_B_PAWN);
-		pidsToSearch.add(Constants.PID_B_KNIGHT);
-		pidsToSearch.add(Constants.PID_B_BISHOP);
-		pidsToSearch.add(Constants.PID_B_ROOK);
-		pidsToSearch.add(Constants.PID_B_QUEEN);
-		if (blackKingSquareID != -1) pidsToSearch.add(Constants.PID_B_KING);
-		
 		int[] pids = new int[64];
 		if (whiteKingSquareID != -1) {
 			pids[whiteKingSquareID] = Constants.PID_W_KING;
@@ -134,6 +120,20 @@ public abstract class Matcher_Base {
 					bestPatternData.y = 0;
 					bestPatternData.size = squareMatrix.length;
 					printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
+					
+					Set<Integer> pidsToSearch = new HashSet<Integer>();
+					if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_W_PAWN);
+					pidsToSearch.add(Constants.PID_W_KNIGHT);
+					pidsToSearch.add(Constants.PID_W_BISHOP);
+					pidsToSearch.add(Constants.PID_W_ROOK);
+					pidsToSearch.add(Constants.PID_W_QUEEN);
+					if (whiteKingSquareID != -1) pidsToSearch.add(Constants.PID_W_KING);
+					if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_B_PAWN);
+					pidsToSearch.add(Constants.PID_B_KNIGHT);
+					pidsToSearch.add(Constants.PID_B_BISHOP);
+					pidsToSearch.add(Constants.PID_B_ROOK);
+					pidsToSearch.add(Constants.PID_B_QUEEN);
+					if (blackKingSquareID != -1) pidsToSearch.add(Constants.PID_B_KING);
 					
 					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData = getPID(squareMatrix, true, true, pidsToSearch, fieldID);
 					pid = pidAndData.getFirst();
