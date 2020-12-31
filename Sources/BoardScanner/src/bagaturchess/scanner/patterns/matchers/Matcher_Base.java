@@ -49,9 +49,10 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	protected MatrixUtils.PatternMatchingData scanForPiece(int[][] grayBoard, int pid) {
+	protected ResultPair<Integer, MatrixUtils.PatternMatchingData> scanForPiece(int[][] grayBoard, int pid) {
 		
 		MatrixUtils.PatternMatchingData bestData = null;
+		Integer bestSquare = null;
 		
 		Set<Integer> emptySquares = getEmptySquares(grayBoard);
 		
@@ -74,12 +75,16 @@ public abstract class Matcher_Base {
 					MatrixUtils.PatternMatchingData curData = pidAndData.getSecond();
 					if (bestData == null || bestData.delta > curData.delta) {
 						bestData = curData;
+						bestSquare = fieldID;
 					}
 				}
 			}
 		}
 		
-		return bestData;
+		return new ResultPair<Integer, MatrixUtils.PatternMatchingData>(
+				bestSquare,
+				bestData
+				);
 	}
 	
 	

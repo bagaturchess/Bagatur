@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 
 
@@ -47,6 +48,11 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		matchers_classifiers.add(new ChessCom(CLASSIFIERS_SIZE));
 		matchers_classifiers.add(new LichessOrg(CLASSIFIERS_SIZE));
+	}
+	
+	
+	protected MatrixUtils.PatternMatchingData scanForPiece(int[][] grayBoard, int pid) {
+		throw new UnsupportedOperationException();
 	}
 	
 	
