@@ -87,6 +87,6 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		System.out.println("Matcher_Composite: scan: Selected matcher is " + matchers.get(best_index).getClass().getCanonicalName());
 		
-		return matchers.get(best_index).scan(grayBoard, best_whiteKingData.getFirst(), best_blackKingData.getFirst());
+		return matchers.get(best_index).scan(grayBoard, -1, -1);
 	}
 }

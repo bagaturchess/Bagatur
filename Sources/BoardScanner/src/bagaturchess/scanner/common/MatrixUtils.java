@@ -194,13 +194,14 @@ public class MatrixUtils {
 		                count++;
 		                
 		                stats.addValue(Math.abs(pixelSource - pixelPattern), Math.abs(pixelSource - pixelPattern));
-		                /*if (cur.delta > result.delta) {
+		                /*if (result != null && cur.delta > result.delta) {
 		                	i = grayPattern.length;
 		                	break;
 		                }*/
 		            }
 		        }
 		        cur.delta = cur.delta / (double) (count * count); 
+		        //cur.delta *= stats.getDisperse();
 		        
 		        if (result == null || result.delta > cur.delta) { 
 		        	result = cur;
