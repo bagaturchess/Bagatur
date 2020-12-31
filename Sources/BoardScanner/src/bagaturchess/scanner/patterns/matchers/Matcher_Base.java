@@ -38,7 +38,7 @@ import bagaturchess.scanner.common.ResultPair;
 public abstract class Matcher_Base {
 	
 	
-	private static final float SIZE_DELTA_PERCENT = 0.3f;
+	private static final float SIZE_DELTA_PERCENT = 0.25f;
 	
 	
 	protected ImageProperties imageProperties;
@@ -68,7 +68,8 @@ public abstract class Matcher_Base {
 				
 				if (!emptySquares.contains(fieldID)) {
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData = getPID(squareMatrix, true, true, pidsToSearch, fieldID);
+					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData
+						= getPID(squareMatrix, true, true, pidsToSearch, fieldID);
 					if (pid != pidAndData.getFirst()) {
 						throw new IllegalStateException();
 					}
@@ -139,7 +140,8 @@ public abstract class Matcher_Base {
 					pidsToSearch.add(Constants.PID_B_QUEEN);
 					if (blackKingSquareID == -1) pidsToSearch.add(Constants.PID_B_KING);
 					
-					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData = getPID(squareMatrix, true, true, pidsToSearch, fieldID);
+					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData
+						= getPID(squareMatrix, true, true, pidsToSearch, fieldID);
 					pid = pidAndData.getFirst();
 					MatrixUtils.PatternMatchingData data = pidAndData.getSecond();
 					result.totalDelta += data.delta;
@@ -203,7 +205,7 @@ public abstract class Matcher_Base {
 					}
 				}*/
 				
-				for (int color = bgcolor + 1; color < 256; color++) {
+				for (int color = bgcolor + 1; color < 256 && iterateColor; color++) {
 					grayPattern = pid == Constants.PID_NONE ?
 							ScannerUtils.createSquareImage(color, size)
 							: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
@@ -236,7 +238,7 @@ public abstract class Matcher_Base {
 					}
 				}*/
 				
-				for (int color = bgcolor - 1; color >= 0; color--) {
+				for (int color = bgcolor - 1; color >= 0 && iterateColor; color--) {
 					grayPattern = pid == Constants.PID_NONE ?
 							ScannerUtils.createSquareImage(color, size)
 							: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
