@@ -49,12 +49,60 @@ public abstract class Matcher_Base {
 	}
 	
 	
+	protected MatrixUtils.PatternMatchingData scanForPiece(int[][] grayBoard, int pid) {
+		
+		MatrixUtils.PatternMatchingData bestData = null;
+		
+		Set<Integer> emptySquares = getEmptySquares(grayBoard);
+		
+		Set<Integer> pidsToSearch = new HashSet<Integer>();
+		pidsToSearch.add(pid);
+		
+		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
+			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
+				
+				int file = i / (grayBoard.length / 8);
+				int rank = j / (grayBoard.length / 8);
+				int fieldID = 63 - (file + 8 * rank);
+				
+				if (!emptySquares.contains(fieldID)) {
+					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
+					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData = getPID(squareMatrix, true, true, pidsToSearch, fieldID);
+					if (pid != pidAndData.getFirst()) {
+						throw new IllegalStateException();
+					}
+					MatrixUtils.PatternMatchingData curData = pidAndData.getSecond();
+					if (bestData == null || bestData.delta > curData.delta) {
+						bestData = curData;
+					}
+				}
+			}
+		}
+		
+		return bestData;
+	}
+	
+	
 	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) {
 		
 		MatchingStatistics result = new MatchingStatistics();
 		result.matcherName = this.toString();
 				
 		Set<Integer> emptySquares = getEmptySquares(grayBoard);
+		
+		Set<Integer> pidsToSearch = new HashSet<Integer>();
+		pidsToSearch.add(Constants.PID_W_PAWN);
+		pidsToSearch.add(Constants.PID_W_KNIGHT);
+		pidsToSearch.add(Constants.PID_W_BISHOP);
+		pidsToSearch.add(Constants.PID_W_ROOK);
+		pidsToSearch.add(Constants.PID_W_QUEEN);
+		pidsToSearch.add(Constants.PID_W_KING);
+		pidsToSearch.add(Constants.PID_B_PAWN);
+		pidsToSearch.add(Constants.PID_B_KNIGHT);
+		pidsToSearch.add(Constants.PID_B_BISHOP);
+		pidsToSearch.add(Constants.PID_B_ROOK);
+		pidsToSearch.add(Constants.PID_B_QUEEN);
+		pidsToSearch.add(Constants.PID_B_KING);
 		
 		int[] pids = new int[64];
 		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
@@ -75,7 +123,7 @@ public abstract class Matcher_Base {
 					bestPatternData.size = squareMatrix.length;
 					printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
 					
-					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData = getPID(squareMatrix, true, true, fieldID);
+					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData = getPID(squareMatrix, true, true, pidsToSearch, fieldID);
 					pid = pidAndData.getFirst();
 					MatrixUtils.PatternMatchingData data = pidAndData.getSecond();
 					result.totalDelta += data.delta;
@@ -92,7 +140,7 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	private ResultPair<Integer, MatrixUtils.PatternMatchingData> getPID(int[][] graySquareMatrix, boolean iterateSize, boolean iterateColor, int fieldID) {
+	private ResultPair<Integer, MatrixUtils.PatternMatchingData> getPID(int[][] graySquareMatrix, boolean iterateSize, boolean iterateColor, Set<Integer> pids, int fieldID) {
 		
 		int bgcolor = (int) calculateColorStats(graySquareMatrix).getEntropy();
 		
@@ -100,7 +148,7 @@ public abstract class Matcher_Base {
 		int bestPID = -1;
 		int[][] bestPattern = null;
 		
-		for (int pid = Constants.PID_W_PAWN; pid <= Constants.PID_B_KING; pid++) {
+		for (Integer pid : pids) {
 			
 			int maxSize = graySquareMatrix.length;
 			int startSize = iterateSize ? (int) ((1 - SIZE_DELTA_PERCENT) * maxSize) : maxSize;
