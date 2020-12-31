@@ -110,6 +110,10 @@ public abstract class Matcher_Base {
 				int rank = j / (grayBoard.length / 8);
 				int fieldID = 63 - (file + 8 * rank);
 				
+				if (fieldID == whiteKingSquareID || fieldID == blackKingSquareID) {
+					continue;
+				}
+				
 				int pid = Constants.PID_NONE;
 				if (!emptySquares.contains(fieldID)) {
 					
@@ -127,13 +131,13 @@ public abstract class Matcher_Base {
 					pidsToSearch.add(Constants.PID_W_BISHOP);
 					pidsToSearch.add(Constants.PID_W_ROOK);
 					pidsToSearch.add(Constants.PID_W_QUEEN);
-					if (whiteKingSquareID != -1) pidsToSearch.add(Constants.PID_W_KING);
+					if (whiteKingSquareID == -1) pidsToSearch.add(Constants.PID_W_KING);
 					if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_B_PAWN);
 					pidsToSearch.add(Constants.PID_B_KNIGHT);
 					pidsToSearch.add(Constants.PID_B_BISHOP);
 					pidsToSearch.add(Constants.PID_B_ROOK);
 					pidsToSearch.add(Constants.PID_B_QUEEN);
-					if (blackKingSquareID != -1) pidsToSearch.add(Constants.PID_B_KING);
+					if (blackKingSquareID == -1) pidsToSearch.add(Constants.PID_B_KING);
 					
 					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData = getPID(squareMatrix, true, true, pidsToSearch, fieldID);
 					pid = pidAndData.getFirst();
