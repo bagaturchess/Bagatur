@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import bagaturchess.bitboard.impl.utils.VarStatistic;
+
 
 public class MatrixUtils {
 	
@@ -171,6 +173,8 @@ public class MatrixUtils {
 		
 		PatternMatchingData result = null;
 		
+		VarStatistic stats = new VarStatistic(false);
+		
 		for (int x = 0; x <= graySource.length - grayPattern.length; x++ ) {
 		    for (int y = 0; y <= graySource.length - grayPattern.length; y++ ) {
 		        
@@ -189,6 +193,7 @@ public class MatrixUtils {
 		                cur.delta += Math.abs(pixelSource - pixelPattern) * Math.abs(pixelSource - pixelPattern);
 		                count++;
 		                
+		                stats.addValue(Math.abs(pixelSource - pixelPattern), Math.abs(pixelSource - pixelPattern));
 		                /*if (cur.delta > result.delta) {
 		                	i = grayPattern.length;
 		                	break;

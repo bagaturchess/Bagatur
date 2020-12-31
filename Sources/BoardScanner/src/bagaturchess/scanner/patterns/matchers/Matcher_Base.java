@@ -123,21 +123,50 @@ public abstract class Matcher_Base {
 		int bestPID = -1;
 		int[][] bestPattern = null;
 		
-		for (int pid = Constants.PID_NONE; pid <= Constants.PID_B_KING; pid++) {
+		for (int pid = Constants.PID_W_PAWN; pid <= Constants.PID_B_KING; pid++) {
 			
 			int maxSize = graySquareMatrix.length;
 			int startSize = (int) ((1 - SIZE_DELTA_PERCENT) * maxSize);
 			
 			for (int size = startSize; size <= maxSize; size++) {
 				
+				MatrixUtils.PatternMatchingData[] curData = new MatrixUtils.PatternMatchingData[256];
+				
 				int[][] grayPattern = pid == Constants.PID_NONE ?
 						ScannerUtils.createSquareImage(bgcolor, size)
 						: ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
+				curData[bgcolor] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
 				
-				MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+				//int low = 0;
+				//int high = 255;
+				MatrixUtils.PatternMatchingData curData_best_up = curData[bgcolor];
+				for (int color = bgcolor + 1; color < 256; color++) {
+					grayPattern = pid == Constants.PID_NONE ?
+							ScannerUtils.createSquareImage(color, size)
+							: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
+					curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+					if (curData[color].delta > curData[color - 1].delta) {
+						break;
+					}
+					curData_best_up = curData[color];
+				}
 				
-				if (bestData == null || bestData.delta > curData.delta) {
-					bestData = curData;
+				MatrixUtils.PatternMatchingData curData_best_down = curData[bgcolor];
+				for (int color = bgcolor - 1; color >= 0; color--) {
+					grayPattern = pid == Constants.PID_NONE ?
+							ScannerUtils.createSquareImage(color, size)
+							: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
+					curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+					if (curData[color].delta > curData[color + 1].delta) {
+						break;
+					}
+					curData_best_down = curData[color];
+				}
+				
+				MatrixUtils.PatternMatchingData curData_best = curData_best_up.delta < curData_best_down.delta ? curData_best_up : curData_best_down;
+				
+				if (bestData == null || bestData.delta > curData_best.delta) {
+					bestData = curData_best;
 					bestPID = pid;
 					bestPattern = grayPattern;
 				}
