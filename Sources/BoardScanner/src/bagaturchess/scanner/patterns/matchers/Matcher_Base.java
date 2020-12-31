@@ -163,7 +163,7 @@ public abstract class Matcher_Base {
 							ScannerUtils.createSquareImage(color, size)
 							: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
 					curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-					if (curData[color].delta > curData[color - 1].delta) {
+					if (curData[color].delta >= curData[color - 1].delta) {
 						break;
 					}
 					curData_best_up = curData[color];
@@ -195,7 +195,7 @@ public abstract class Matcher_Base {
 							ScannerUtils.createSquareImage(color, size)
 							: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
 					curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-					if (curData[color].delta > curData[color + 1].delta) {
+					if (curData[color].delta >= curData[color + 1].delta) {
 						break;
 					}
 					curData_best_down = curData[color];

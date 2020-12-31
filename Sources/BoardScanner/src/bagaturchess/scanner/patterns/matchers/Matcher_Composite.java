@@ -24,20 +24,29 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import bagaturchess.scanner.cnn.impl.ImageProperties;
+import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.ResultPair;
 
 
 public class Matcher_Composite extends Matcher_Base {
 	
 	
+	private static final int CLASSIFIERS_SIZE = 64;
+	
+	
 	List<Matcher_Base> matchers = new ArrayList<Matcher_Base>();
+	List<Matcher_Base> matchers_classifiers = new ArrayList<Matcher_Base>();
 	
 	
 	public Matcher_Composite(int imageSize) throws IOException {
-		super(new ImageProperties(imageSize));
+		
+		super(null);
+		
 		matchers.add(new ChessCom(imageSize));
 		matchers.add(new LichessOrg(imageSize));
+		
+		matchers_classifiers.add(new ChessCom(CLASSIFIERS_SIZE));
+		matchers_classifiers.add(new LichessOrg(CLASSIFIERS_SIZE));
 	}
 	
 	
@@ -45,20 +54,20 @@ public class Matcher_Composite extends Matcher_Base {
 	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) {
 		
 		MatchingStatistics bestStat = null;
-		String bestFEN = null;
+		int bestMatcherIndex = -1;
 		
-		for (int i = 0; i < matchers.size(); i++) {
+		int[][] grayBoard_short = ScannerUtils.convertToGrayMatrix(ScannerUtils.resizeImage(ScannerUtils.createGrayImage(grayBoard), CLASSIFIERS_SIZE));
+		for (int i = 0; i < matchers_classifiers.size(); i++) {
 			
-			ResultPair<String, MatchingStatistics> currentMatch = matchers.get(i).scan(grayBoard);
-			String currentFEN = currentMatch.getFirst();
+			ResultPair<String, MatchingStatistics> currentMatch = matchers_classifiers.get(i).scan(grayBoard_short);
 			MatchingStatistics currentStat = currentMatch.getSecond();
 			
 			if (bestStat == null || bestStat.totalDelta > currentStat.totalDelta) {
 				bestStat = currentStat;
-				bestFEN = currentFEN;
+				bestMatcherIndex = i;
 			}
 		}
 		
-		return new ResultPair<String, MatchingStatistics>(bestFEN, bestStat);
+		return matchers.get(bestMatcherIndex).scan(grayBoard);
 	}
 }
