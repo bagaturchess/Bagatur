@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 
@@ -33,11 +32,7 @@ import bagaturchess.scanner.common.ResultPair;
 public class Matcher_Composite extends Matcher_Base {
 	
 	
-	private static final int CLASSIFIERS_SIZE = 64;
-	
-	
 	private List<Matcher_Base> matchers = new ArrayList<Matcher_Base>();
-	private List<Matcher_Base> matchers_classifiers = new ArrayList<Matcher_Base>();
 	
 	
 	public Matcher_Composite(int imageSize) throws IOException {
@@ -46,9 +41,6 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		matchers.add(new ChessCom(imageSize));
 		matchers.add(new LichessOrg(imageSize));
-		
-		matchers_classifiers.add(new ChessCom(CLASSIFIERS_SIZE));
-		matchers_classifiers.add(new LichessOrg(CLASSIFIERS_SIZE));
 	}
 	
 	
@@ -87,6 +79,7 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		System.out.println("Matcher_Composite: scan: Selected matcher is " + matchers.get(best_index).getClass().getCanonicalName());
 		
+		//return matchers.get(best_index).scan(grayBoard, best_whiteKingData.getFirst(), best_blackKingData.getFirst());
 		return matchers.get(best_index).scan(grayBoard, -1, -1);
 	}
 }
