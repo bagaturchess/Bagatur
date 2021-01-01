@@ -57,7 +57,7 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		for (int i = 0; i < matchers_128.size(); i++) {
 			
-			ResultPair<String, MatchingStatistics> result = matchers_128.get(i).scan(grayBoard_128, -1, -1, false);
+			ResultPair<String, MatchingStatistics> result = matchers_128.get(i).scan(grayBoard_128, false);
 			MatchingStatistics stat = result.getSecond();
 			
 			System.out.println("Matcher_Composite: scan: " + matchers_128.get(i).getClass().getCanonicalName()
@@ -71,11 +71,11 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		System.out.println("Matcher_Composite: scan: Selected matcher is " + matchers.get(best_index).getClass().getCanonicalName());
 		
-		ResultPair<String, MatchingStatistics> result = matchers.get(best_index).scan(grayBoard, -1, -1, false);
+		ResultPair<String, MatchingStatistics> result = matchers.get(best_index).scan(grayBoard, false);
 		
 		if (matchers.get(best_index).getTotalDeltaThreshold() < result.getSecond().totalDelta) {
 			System.out.println("Matcher_Composite: scan: " + result.getFirst() + " total delta is " + result.getSecond().totalDelta + " start search again ...");
-			result = matchers.get(best_index).scan(grayBoard, -1, -1, true);
+			result = matchers.get(best_index).scan(grayBoard, true);
 		}
 		
 		return result;

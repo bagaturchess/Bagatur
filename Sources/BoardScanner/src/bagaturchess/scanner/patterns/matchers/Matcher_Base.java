@@ -55,7 +55,7 @@ public abstract class Matcher_Base {
 	
 	
 	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) {
-		return scan(grayBoard, -1, -1, false);
+		return scan(grayBoard, false);
 	}
 	
 	
@@ -116,7 +116,7 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	protected ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, int whiteKingSquareID, int blackKingSquareID, boolean iterateBGColors) {
+	protected ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, boolean iterateBGColors) {
 		
 		if (grayBoard.length != imageProperties.getImageSize()) {
 			throw new IllegalStateException();
@@ -130,12 +130,6 @@ public abstract class Matcher_Base {
 		ResultPair<Integer, Integer> bgcolorsOfSquares = getSquaresColor(grayBoard, emptySquares);
 		
 		int[] pids = new int[64];
-		if (whiteKingSquareID != -1) {
-			pids[whiteKingSquareID] = Constants.PID_W_KING;
-		}
-		if (blackKingSquareID != -1) {
-			pids[blackKingSquareID] = Constants.PID_B_KING;
-		}
 		
 		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
 			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
@@ -143,10 +137,6 @@ public abstract class Matcher_Base {
 				int file = i / (grayBoard.length / 8);
 				int rank = j / (grayBoard.length / 8);
 				int fieldID = 63 - (file + 8 * rank);
-				
-				if (fieldID == whiteKingSquareID || fieldID == blackKingSquareID) {
-					continue;
-				}
 				
 				int pid = Constants.PID_NONE;
 				if (!emptySquares.contains(fieldID)) {
@@ -166,13 +156,13 @@ public abstract class Matcher_Base {
 					pidsToSearch.add(Constants.PID_W_BISHOP);
 					pidsToSearch.add(Constants.PID_W_ROOK);
 					pidsToSearch.add(Constants.PID_W_QUEEN);
-					if (whiteKingSquareID == -1) pidsToSearch.add(Constants.PID_W_KING);
+					pidsToSearch.add(Constants.PID_W_KING);
 					if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_B_PAWN);
 					pidsToSearch.add(Constants.PID_B_KNIGHT);
 					pidsToSearch.add(Constants.PID_B_BISHOP);
 					pidsToSearch.add(Constants.PID_B_ROOK);
 					pidsToSearch.add(Constants.PID_B_QUEEN);
-					if (blackKingSquareID == -1) pidsToSearch.add(Constants.PID_B_KING);
+					pidsToSearch.add(Constants.PID_B_KING);
 					
 					List<Integer> bgcolors = new ArrayList<Integer>();
 					if (!iterateBGColors) {
