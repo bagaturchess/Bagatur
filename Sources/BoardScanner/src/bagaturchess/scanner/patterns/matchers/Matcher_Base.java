@@ -261,7 +261,9 @@ public abstract class Matcher_Base {
 		
 		if (this instanceof ChessCom) {
 			
-			printInfo(graySquareMatrix, bestData, "" + fieldID);
+			printInfo(graySquareMatrix, bestData, "" + fieldID + "_matching");
+			
+			printInfo(bestData, "" + fieldID + "_best");
 		}
 		
 		return new ResultPair<Integer, MatrixUtils.PatternMatchingData>(bestPID, bestData);
@@ -322,6 +324,20 @@ public abstract class Matcher_Base {
 		for (int i = 0; i < matcherData.size; i++) {
 			for (int j = 0; j < matcherData.size; j++) {
 				print[i][j] = board[matcherData.x + i][matcherData.y + j];
+			}
+		}
+		
+		BufferedImage resultImage = ScannerUtils.createGrayImage(print);
+		ScannerUtils.saveImage(fileName, resultImage, "png");
+	}
+	
+	
+	protected static void printInfo(MatrixUtils.PatternMatchingData matcherData, String fileName) {
+		
+		int[][] print = new int[matcherData.size][matcherData.size];
+		for (int i = 0; i < matcherData.size; i++) {
+			for (int j = 0; j < matcherData.size; j++) {
+				print[i][j] = matcherData.pattern[i][j];
 			}
 		}
 		

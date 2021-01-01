@@ -182,6 +182,7 @@ public class MatrixUtils {
 		    	cur.x = x;
 		    	cur.y = y;
 		    	cur.size = grayPattern.length;
+		    	cur.pattern = grayPattern;
 		    	
 		    	int count = 0;
 		        for (int i = 0; i < grayPattern.length; i++ ) {
@@ -463,6 +464,7 @@ public class MatrixUtils {
 		public int angle;
 		public int color;
 		public double delta;
+		public int[][] pattern;
 	}
 	
 	
