@@ -74,7 +74,7 @@ public abstract class Matcher_Base {
 				if (!emptySquares.contains(fieldID)) {
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
 					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData
-						= getPID(squareMatrix, true, true, bgcolor, pidsToSearch, fieldID);
+						= getPID(squareMatrix, true, null, pidsToSearch, fieldID);
 					if (pid != pidAndData.getFirst()) {
 						throw new IllegalStateException();
 					}
@@ -151,7 +151,7 @@ public abstract class Matcher_Base {
 					if (blackKingSquareID == -1) pidsToSearch.add(Constants.PID_B_KING);
 					
 					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData
-						= getPID(squareMatrix, true, true, bgcolor, pidsToSearch, fieldID);
+						= getPID(squareMatrix, true, null, pidsToSearch, fieldID);
 					pid = pidAndData.getFirst();
 					MatrixUtils.PatternMatchingData data = pidAndData.getSecond();
 					result.totalDelta += data.delta;
@@ -175,11 +175,10 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	private ResultPair<Integer, MatrixUtils.PatternMatchingData> getPID(int[][] graySquareMatrix, boolean iterateSize, boolean iterateColor, int bgcolor, Set<Integer> pids, int fieldID) {
+	private ResultPair<Integer, MatrixUtils.PatternMatchingData> getPID(int[][] graySquareMatrix, boolean iterateSize, Set<Integer> bgcolors, Set<Integer> pids, int fieldID) {
 		
 		MatrixUtils.PatternMatchingData bestData = null;
 		int bestPID = -1;
-		int[][] bestPattern = null;
 		
 		for (Integer pid : pids) {
 			
@@ -188,105 +187,100 @@ public abstract class Matcher_Base {
 			
 			for (int size = startSize; size <= maxSize; size++) {
 				
-				MatrixUtils.PatternMatchingData[] curData = new MatrixUtils.PatternMatchingData[256];
+				MatrixUtils.PatternMatchingData curData_best  = null;
 				
-				int[][] grayPattern = pid == Constants.PID_NONE ?
-						ScannerUtils.createSquareImage(bgcolor, size)
-						: ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
-				curData[bgcolor] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-				curData[bgcolor].color = bgcolor;
-				
-				MatrixUtils.PatternMatchingData curData_best_up = curData[bgcolor];
-				
-				/*int lowColor_up = bgcolor;
-				int highColor_up = 255;
-				int midColor_up;
-				while(iterateColor && lowColor_up <= highColor_up) {
+				if (bgcolors != null) {
 					
-					midColor_up = (lowColor_up + highColor_up) / 2;
-					grayPattern = pid == Constants.PID_NONE ?
-							ScannerUtils.createSquareImage(midColor_up, size)
-							: ScannerUtils.createPieceImage(imageProperties, pid, midColor_up, size);
-					curData[midColor_up] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-					
-					if (curData[midColor_up].delta < curData_best_up.delta) {
-						curData_best_up = curData[midColor_up];
-						lowColor_up = midColor_up + 1;
-					} else {
-						highColor_up = midColor_up - 1;
-					}
-				}*/
+				} else {
 				
-				for (int color = bgcolor + 1; color < 256 && iterateColor; color++) {
-					grayPattern = pid == Constants.PID_NONE ?
-							ScannerUtils.createSquareImage(color, size)
-							: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
-					curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-					curData[color].color = color;
-					if (curData[color].delta >= curData[color - 1].delta) {
-						break;
+					MatrixUtils.PatternMatchingData[] curData = new MatrixUtils.PatternMatchingData[256];
+					
+					int bgcolor = (int) calculateColorStats(graySquareMatrix).getEntropy();
+					
+					int[][] grayPattern = pid == Constants.PID_NONE ?
+							ScannerUtils.createSquareImage(bgcolor, size)
+							: ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
+					curData[bgcolor] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+					curData[bgcolor].color = bgcolor;
+					
+					MatrixUtils.PatternMatchingData curData_best_up = curData[bgcolor];
+					
+					/*int lowColor_up = bgcolor;
+					int highColor_up = 255;
+					int midColor_up;
+					while(iterateColor && lowColor_up <= highColor_up) {
+						
+						midColor_up = (lowColor_up + highColor_up) / 2;
+						grayPattern = pid == Constants.PID_NONE ?
+								ScannerUtils.createSquareImage(midColor_up, size)
+								: ScannerUtils.createPieceImage(imageProperties, pid, midColor_up, size);
+						curData[midColor_up] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+						
+						if (curData[midColor_up].delta < curData_best_up.delta) {
+							curData_best_up = curData[midColor_up];
+							lowColor_up = midColor_up + 1;
+						} else {
+							highColor_up = midColor_up - 1;
+						}
+					}*/
+					
+					for (int color = bgcolor + 1; color < 256; color++) {
+						grayPattern = pid == Constants.PID_NONE ?
+								ScannerUtils.createSquareImage(color, size)
+								: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
+						curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+						curData[color].color = color;
+						if (curData[color].delta >= curData[color - 1].delta) {
+							break;
+						}
+						curData_best_up = curData[color];
 					}
-					curData_best_up = curData[color];
+					
+					MatrixUtils.PatternMatchingData curData_best_down = curData[bgcolor];
+					
+					/*int lowColor_down = 0;
+					int highColor_down = bgcolor;
+					int midColor_down;
+					while(iterateColor && lowColor_down <= highColor_down) {
+						
+						midColor_down = (lowColor_down + highColor_down) / 2;
+						grayPattern = pid == Constants.PID_NONE ?
+								ScannerUtils.createSquareImage(midColor_down, size)
+								: ScannerUtils.createPieceImage(imageProperties, pid, midColor_down, size);
+						curData[midColor_down] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+						
+						if (curData[midColor_down].delta < curData_best_up.delta) {
+							curData_best_up = curData[midColor_down];
+							highColor_down = midColor_down - 1;
+						} else {
+							lowColor_down = midColor_down + 1;
+						}
+					}*/
+					
+					for (int color = bgcolor - 1; color >= 0; color--) {
+						grayPattern = pid == Constants.PID_NONE ?
+								ScannerUtils.createSquareImage(color, size)
+								: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
+						curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+						curData[color].color = color;
+						if (curData[color].delta >= curData[color + 1].delta) {
+							break;
+						}
+						curData_best_down = curData[color];
+					}
+					
+					curData_best = curData_best_up.delta < curData_best_down.delta ? curData_best_up : curData_best_down;
 				}
-				
-				MatrixUtils.PatternMatchingData curData_best_down = curData[bgcolor];
-				
-				/*int lowColor_down = 0;
-				int highColor_down = bgcolor;
-				int midColor_down;
-				while(iterateColor && lowColor_down <= highColor_down) {
-					
-					midColor_down = (lowColor_down + highColor_down) / 2;
-					grayPattern = pid == Constants.PID_NONE ?
-							ScannerUtils.createSquareImage(midColor_down, size)
-							: ScannerUtils.createPieceImage(imageProperties, pid, midColor_down, size);
-					curData[midColor_down] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-					
-					if (curData[midColor_down].delta < curData_best_up.delta) {
-						curData_best_up = curData[midColor_down];
-						highColor_down = midColor_down - 1;
-					} else {
-						lowColor_down = midColor_down + 1;
-					}
-				}*/
-				
-				for (int color = bgcolor - 1; color >= 0 && iterateColor; color--) {
-					grayPattern = pid == Constants.PID_NONE ?
-							ScannerUtils.createSquareImage(color, size)
-							: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
-					curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-					curData[color].color = color;
-					if (curData[color].delta >= curData[color + 1].delta) {
-						break;
-					}
-					curData_best_down = curData[color];
-				}
-				
-				MatrixUtils.PatternMatchingData curData_best = curData_best_up.delta < curData_best_down.delta ? curData_best_up : curData_best_down;
 				
 				if (bestData == null || bestData.delta > curData_best.delta) {
 					bestData = curData_best;
 					bestPID = pid;
-					bestPattern = grayPattern;
 				}
 			}
 		}
 		
 		
 		if (this instanceof ChessCom) {
-			
-			int[][] avgColor = ScannerUtils.createSquareImage(bgcolor, graySquareMatrix.length);
-			MatrixUtils.PatternMatchingData bestPatternData1 = new MatrixUtils.PatternMatchingData();
-			bestPatternData1.x = 0;
-			bestPatternData1.y = 0;
-			bestPatternData1.size = avgColor.length;
-			printInfo(avgColor, bestPatternData1, "" + fieldID + "_bgcolor");
-			
-			MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
-			bestPatternData.x = 0;
-			bestPatternData.y = 0;
-			bestPatternData.size = bestPattern.length;
-			printInfo(bestPattern, bestPatternData, "" + fieldID + "_bestPattern");
 			
 			printInfo(graySquareMatrix, bestData, "" + fieldID);
 		}
