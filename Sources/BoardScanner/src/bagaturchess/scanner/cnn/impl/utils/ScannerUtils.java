@@ -98,6 +98,104 @@ public class ScannerUtils {
 	}
 	
 	
+	public static final int[][] createPieceImage(ImageProperties imageProperties, int pid, int bgcolor, int targetAvg, int size) {
+		
+		//System.out.println("IN targetAvg=" + targetAvg);
+		
+		int[][] bestImage = createPieceImageWithPieceColorAdjustment(imageProperties, pid, bgcolor, size, 0);
+		int bestAvg = getAVG(bestImage);
+		
+		int colorAdjustment_up = 1;
+		while (true) {
+			int[][] currentImage = createPieceImageWithPieceColorAdjustment(imageProperties, pid, bgcolor, size, colorAdjustment_up);
+			int curAvg = getAVG(currentImage);
+			if (Math.abs(targetAvg - curAvg) <= Math.abs(targetAvg - bestAvg)) {
+				//System.out.println("colorAdjustment_up=" + colorAdjustment_up + ", Math.abs(targetAvg - curAvg)=" + Math.abs(targetAvg - curAvg) + ", Math.abs(targetAvg - bestAvg)=" + Math.abs(targetAvg - bestAvg));
+				bestImage = currentImage;
+				bestAvg = curAvg;
+				colorAdjustment_up++;
+			} else {
+				//System.out.println("break");
+				break;
+			}
+		}
+		
+		int colorAdjustment_down = -1;
+		while (true) {
+			int[][] currentImage = createPieceImageWithPieceColorAdjustment(imageProperties, pid, bgcolor, size, colorAdjustment_down);
+			int curAvg = getAVG(currentImage);
+			if (Math.abs(targetAvg - curAvg) <= Math.abs(targetAvg - bestAvg)) {
+				//System.out.println("colorAdjustment_down=" + colorAdjustment_down + ", Math.abs(targetAvg - curAvg)=" + Math.abs(targetAvg - curAvg) + ", Math.abs(targetAvg - bestAvg)=" + Math.abs(targetAvg - bestAvg));
+				bestImage = currentImage;
+				bestAvg = curAvg;
+				colorAdjustment_down--;
+			} else {
+				//System.out.println("break");
+				break;
+			}
+		}
+		
+		//System.out.println("OUT bestAvg=" + bestAvg);
+		
+		return bestImage;
+	}
+	
+	
+	private static final int[][] createPieceImageWithPieceColorAdjustment(ImageProperties imageProperties, int pid, int bgcolor, int size, int colorAdjustment) {
+		
+		Image piece = imageProperties.getPiecesImages()[pid];
+		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+		Graphics g = imagePiece.getGraphics();
+		g.setColor(new Color(bgcolor, bgcolor, bgcolor));
+		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
+		Image pieceScaled = piece.getScaledInstance(size, size, Image.SCALE_SMOOTH);
+		g.drawImage(pieceScaled, 0, 0, null);
+		
+		int rgb_00 = imagePiece.getRGB(0, 0);
+		int red_00 = (rgb_00 & 0xff0000) >> 16;
+		int green_00 = (rgb_00 & 0xff00) >> 8;
+		int blue_00 = rgb_00 & 0xff;
+		if (red_00 != green_00 || blue_00 != green_00) {
+			throw new IllegalStateException();
+		}
+		if (green_00 != bgcolor) {
+			//throw new IllegalStateException();
+		}
+		
+		
+		for (int i = 0; i < imagePiece.getHeight(); i++) {
+			for (int j = 0; j < imagePiece.getHeight(); j++) {
+				
+				int rgb = imagePiece.getRGB(i, j);
+				
+				int red = (rgb & 0xff0000) >> 16;
+				int green = (rgb & 0xff00) >> 8;
+				int blue = rgb & 0xff;
+			    
+				if (red != green || blue != green) {
+					//throw new IllegalStateException();
+				}
+				
+				//System.out.println(green + ", green_00=" + green_00);
+				
+				if (green != green_00) {
+					Color c = new Color(
+								Math.min(255, Math.max(0, red + colorAdjustment)),
+								Math.min(255, Math.max(0, green + colorAdjustment)),
+								Math.min(255, Math.max(0, blue + colorAdjustment))
+							);
+					
+					imagePiece.setRGB(i, j, c.getRGB());
+				}
+			}
+		}
+		
+		imagePiece = ScannerUtils.convertToGrayScale(imagePiece);
+		
+		return ScannerUtils.convertToGrayMatrix(imagePiece);
+	}
+	
+	
 	public static final int[][] createPieceImage(ImageProperties imageProperties, int pid, int bgcolor, int size) {
 		Image piece = imageProperties.getPiecesImages()[pid];
 		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);

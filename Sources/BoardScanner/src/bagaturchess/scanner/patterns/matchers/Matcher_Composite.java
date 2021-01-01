@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
-import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 
 
@@ -53,11 +52,14 @@ public class Matcher_Composite extends Matcher_Base {
 		int best_index = 0;
 		double best_delta = Double.MAX_VALUE;
 		
-		int[][] grayBoard_128 = ScannerUtils.convertToGrayMatrix(ScannerUtils.resizeImage(ScannerUtils.createGrayImage(grayBoard), 128));
+		int[][] grayBoard_128 = ScannerUtils.convertToGrayMatrix(
+					ScannerUtils.resizeImage(ScannerUtils.createGrayImage(grayBoard), 128)
+				);
 		
 		for (int i = 0; i < matchers_128.size(); i++) {
 			
 			ResultPair<String, MatchingStatistics> result = matchers_128.get(i).scan(grayBoard_128, false);
+			
 			MatchingStatistics stat = result.getSecond();
 			
 			System.out.println("Matcher_Composite: scan: " + matchers_128.get(i).getClass().getCanonicalName()
@@ -82,10 +84,10 @@ public class Matcher_Composite extends Matcher_Base {
 	}
 	
 	
-	@Override
+	/*@Override
 	protected ResultPair<Integer, MatrixUtils.PatternMatchingData> scanForPiece(int[][] grayBoard, int pid) {
 		throw new UnsupportedOperationException();
-	}
+	}*/
 
 
 	@Override

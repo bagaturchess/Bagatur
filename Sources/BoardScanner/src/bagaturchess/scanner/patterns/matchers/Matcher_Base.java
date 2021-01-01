@@ -59,63 +59,6 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	protected ResultPair<Integer, MatrixUtils.PatternMatchingData> scanForPiece(int[][] grayBoard, int pid) {
-		
-		if (grayBoard.length != imageProperties.getImageSize()) {
-			throw new IllegalStateException();
-		}
-		
-		MatrixUtils.PatternMatchingData bestData = null;
-		Integer bestSquare = null;
-		
-		Set<Integer> emptySquares = getEmptySquares(grayBoard);
-		
-		ResultPair<Integer, Integer> bgcolorsOfSquares = getSquaresColor(grayBoard, emptySquares);
-		
-		Set<Integer> pidsToSearch = new HashSet<Integer>();
-		pidsToSearch.add(pid);
-		
-		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
-			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
-				
-				int file = i / (grayBoard.length / 8);
-				int rank = j / (grayBoard.length / 8);
-				int fieldID = 63 - (file + 8 * rank);
-				
-				if (!emptySquares.contains(fieldID)) {
-					
-					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-					
-					int bgcolor_avg = (int) calculateColorStats(squareMatrix).getEntropy();
-					
-					List<Integer> bgcolors = new ArrayList<Integer>();
-					//bgcolors.add(bgcolor_avg);
-					bgcolors.add((file + rank) % 2 == 0 ? bgcolorsOfSquares.getFirst() : bgcolorsOfSquares.getSecond());
-					
-					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData
-						= getPID(squareMatrix, true, bgcolors, pidsToSearch, fieldID);
-					if (pid != pidAndData.getFirst()) {
-						throw new IllegalStateException();
-					}
-					
-					MatrixUtils.PatternMatchingData curData = pidAndData.getSecond();
-					if (bestData == null || bestData.delta > curData.delta) {
-						bestData = curData;
-						bestSquare = fieldID;
-					}
-				}
-			}
-		}
-		
-		bestData.delta *= imageProperties.getSquareSize() * Math.sqrt(imageProperties.getSquareSize());
-		
-		return new ResultPair<Integer, MatrixUtils.PatternMatchingData>(
-				bestSquare,
-				bestData
-				);
-	}
-	
-	
 	protected ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, boolean iterateBGColors) {
 		
 		if (grayBoard.length != imageProperties.getImageSize()) {
@@ -142,7 +85,7 @@ public abstract class Matcher_Base {
 				if (!emptySquares.contains(fieldID)) {
 					
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-					int bgcolor_avg = (int) calculateColorStats(grayBoard).getEntropy();
+					int bgcolor_avg = (int) calculateColorStats(squareMatrix).getEntropy();
 					
 					MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
 					bestPatternData.x = 0;
@@ -167,7 +110,7 @@ public abstract class Matcher_Base {
 					List<Integer> bgcolors = new ArrayList<Integer>();
 					if (!iterateBGColors) {
 						bgcolors.add(bgcolor_avg);
-						bgcolors.add((file + rank) % 2 == 0 ? bgcolorsOfSquares.getFirst() : bgcolorsOfSquares.getSecond());
+						//bgcolors.add((file + rank) % 2 == 0 ? bgcolorsOfSquares.getFirst() : bgcolorsOfSquares.getSecond());
 					}
 					
 					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData
