@@ -138,14 +138,16 @@ public abstract class Matcher_Base {
 		MatrixUtils.PatternMatchingData bestData = null;
 		int bestPID = -1;
 		
-		for (Integer pid : pids) {
+		int counter = 0;
 			
-			int maxSize = graySquareMatrix.length;
-			int startSize = iterateSize ? (int) ((1 - SIZE_DELTA_PERCENT) * maxSize) : maxSize;
+		int maxSize = graySquareMatrix.length;
+		int startSize = iterateSize ? (int) ((1 - SIZE_DELTA_PERCENT) * maxSize) : maxSize;
+		
+		for (int size = startSize; size <= maxSize; size++) {
 			
-			for (int size = startSize; size <= maxSize; size++) {
-				
-				MatrixUtils.PatternMatchingData curData_best  = null;
+			MatrixUtils.PatternMatchingData curData_best  = null;
+			
+			for (Integer pid : pids) {
 				
 				if (bgcolors != null && bgcolors.size() > 0) {
 					
@@ -254,17 +256,13 @@ public abstract class Matcher_Base {
 				if (bestData == null || bestData.delta > curData_best.delta) {
 					bestData = curData_best;
 					bestPID = pid;
+					
+					printInfo(bestData, "" + fieldID + "_best" + (counter++));
 				}
 			}
 		}
 		
-		
-		if (this instanceof ChessCom) {
-			
-			printInfo(graySquareMatrix, bestData, "" + fieldID + "_matching");
-			
-			printInfo(bestData, "" + fieldID + "_best");
-		}
+		printInfo(graySquareMatrix, bestData, "" + fieldID + "_matching");
 		
 		return new ResultPair<Integer, MatrixUtils.PatternMatchingData>(bestPID, bestData);
 	}
