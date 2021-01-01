@@ -96,6 +96,8 @@ public abstract class Matcher_Base {
 		
 		Set<Integer> emptySquares = getEmptySquares(grayBoard);
 		
+		//ResultPair<Integer, Integer> bgcolors = getSquaresColor(grayBoard, emptySquares);
+		
 		int[] pids = new int[64];
 		if (whiteKingSquareID != -1) {
 			pids[whiteKingSquareID] = Constants.PID_W_KING;
@@ -342,5 +344,87 @@ public abstract class Matcher_Base {
 		
 		BufferedImage resultImage = ScannerUtils.createGrayImage(print);
 		ScannerUtils.saveImage(fileName, resultImage, "png");
+	}
+	
+	
+	private ResultPair<Integer, Integer> getSquaresColor(int[][] grayBoard, Set<Integer> emptySquares) {
+		
+		VarStatistic stat_all = new VarStatistic(false);
+		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
+			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
+				
+				int file = i / (grayBoard.length / 8);
+				int rank = j / (grayBoard.length / 8);
+				int fieldID = 63 - (file + 8 * rank);
+				
+				if (emptySquares.contains(fieldID)) {
+					for (int i1 = i; i1 < i + grayBoard.length / 8; i1++) {
+						for (int j1 = j; j1 < j + grayBoard.length / 8; j1++) {
+							stat_all.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
+						}
+					}
+				}
+			}
+		}
+		
+		VarStatistic stat_white = new VarStatistic(false);
+		VarStatistic stat_black = new VarStatistic(false);
+		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
+			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
+				
+				int file = i / (grayBoard.length / 8);
+				int rank = j / (grayBoard.length / 8);
+				int fieldID = 63 - (file + 8 * rank);
+				
+				if (emptySquares.contains(fieldID)) {
+					for (int i1 = i; i1 < i + grayBoard.length / 8; i1++) {
+						for (int j1 = j; j1 < j + grayBoard.length / 8; j1++) {
+							if (grayBoard[i1][j1] > stat_all.getEntropy()) {
+								stat_white.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
+							} else {
+								stat_black.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return new ResultPair<Integer, Integer>((int)stat_white.getEntropy(), (int)stat_black.getEntropy());
+	}
+	
+	
+	private int[][] setBackground(int[][] grayBoard, Set<Integer> emptySquares, int color) {
+		
+		Set<Integer> skipColors = new HashSet<Integer>();
+		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
+			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
+				
+				int file = i / (grayBoard.length / 8);
+				int rank = j / (grayBoard.length / 8);
+				int fieldID = 63 - (file + 8 * rank);
+				
+				if (emptySquares.contains(fieldID)) {
+					for (int i1 = i; i1 < i + grayBoard.length / 8; i1++) {
+						for (int j1 = j; j1 < j + grayBoard.length / 8; j1++) {
+							skipColors.add(grayBoard[i1][j1]);
+						}
+					}
+				}
+			}
+		}
+		
+		int[][] result = new int[grayBoard.length][grayBoard.length];
+		for (int i = 0; i < grayBoard.length; i++) {
+			for (int j = 0; j < grayBoard.length; j++) {
+				if (skipColors.contains(grayBoard[i][j])) {
+					result[i][j] = color;
+				} else {
+					result[i][j] = grayBoard[i][j];
+				}
+			}
+		}
+		
+		return result;
 	}
 }
