@@ -31,4 +31,10 @@ public class LichessOrg extends Matcher_Base {
 	public LichessOrg(int imageSize) throws IOException {
 		super(new ImageProperties(imageSize, "set1"));
 	}
+	
+	
+	@Override
+	protected double getTotalDeltaThreshold() {
+		return 100;
+	}
 }

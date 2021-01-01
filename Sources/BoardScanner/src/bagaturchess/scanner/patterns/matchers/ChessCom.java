@@ -31,4 +31,10 @@ public class ChessCom extends Matcher_Base {
 	public ChessCom(int imageSize) throws IOException {
 		super(new ImageProperties(imageSize, "set3"));
 	}
+	
+
+	@Override
+	protected double getTotalDeltaThreshold() {
+		return 110;
+	}
 }
