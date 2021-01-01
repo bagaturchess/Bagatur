@@ -33,7 +33,7 @@ public class Matcher_Composite extends Matcher_Base {
 	
 	
 	private List<Matcher_Base> matchers = new ArrayList<Matcher_Base>();
-	
+	private List<Matcher_Base> matchers_64 = new ArrayList<Matcher_Base>();
 	
 	public Matcher_Composite(int imageSize) throws IOException {
 		
@@ -41,6 +41,9 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		matchers.add(new ChessCom(imageSize));
 		matchers.add(new LichessOrg(imageSize));
+		
+		matchers_64.add(new ChessCom(64));
+		matchers_64.add(new LichessOrg(64));
 	}
 	
 	
@@ -50,22 +53,27 @@ public class Matcher_Composite extends Matcher_Base {
 	
 	
 	@Override
-	public String scan(int[][] grayBoard) {
+	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) {
 		
 		ResultPair<Integer, MatrixUtils.PatternMatchingData> best_whiteKingData = null;
 		ResultPair<Integer, MatrixUtils.PatternMatchingData> best_blackKingData = null;
 		
 		int best_index = 0;
 		double best_delta = Double.MAX_VALUE;
-		for (int i = 0; i < matchers.size(); i++) {
+		for (int i = 0; i < matchers_64.size(); i++) {
+			
 			ResultPair<Integer, MatrixUtils.PatternMatchingData> whiteKingData =
-					matchers.get(i).scanForPiece(grayBoard, Constants.PID_W_KING);
-			System.out.println("Matcher_Composite: scan: " + matchers.get(i).getClass().getCanonicalName()
+					matchers_64.get(i).scanForPiece(grayBoard, Constants.PID_W_KING);
+			
+			System.out.println("Matcher_Composite: scan: " + matchers_64.get(i).getClass().getCanonicalName()
 					+ " white king id is " + whiteKingData.getFirst() + " delta is " + whiteKingData.getSecond().delta);
+			
 			ResultPair<Integer, MatrixUtils.PatternMatchingData> blackKingData =
-					matchers.get(i).scanForPiece(grayBoard, Constants.PID_B_KING);
-			System.out.println("Matcher_Composite: scan: " + matchers.get(i).getClass().getCanonicalName()
+					matchers_64.get(i).scanForPiece(grayBoard, Constants.PID_B_KING);
+			
+			System.out.println("Matcher_Composite: scan: " + matchers_64.get(i).getClass().getCanonicalName()
 					+ " black king id is " + blackKingData.getFirst() + " delta is " + blackKingData.getSecond().delta);
+			
 			double cur_delta = 0;
 			cur_delta += whiteKingData.getSecond().delta;
 			cur_delta += blackKingData.getSecond().delta;
