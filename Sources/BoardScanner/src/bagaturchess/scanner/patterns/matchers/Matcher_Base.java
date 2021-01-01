@@ -61,6 +61,10 @@ public abstract class Matcher_Base {
 	
 	protected ResultPair<Integer, MatrixUtils.PatternMatchingData> scanForPiece(int[][] grayBoard, int pid) {
 		
+		if (grayBoard.length != imageProperties.getImageSize()) {
+			throw new IllegalStateException();
+		}
+		
 		MatrixUtils.PatternMatchingData bestData = null;
 		Integer bestSquare = null;
 		
@@ -113,6 +117,10 @@ public abstract class Matcher_Base {
 	
 	
 	protected ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, int whiteKingSquareID, int blackKingSquareID, boolean iterateBGColors) {
+		
+		if (grayBoard.length != imageProperties.getImageSize()) {
+			throw new IllegalStateException();
+		}
 		
 		MatchingStatistics result = new MatchingStatistics();
 		result.matcherName = this.getClass().getCanonicalName();
@@ -168,7 +176,7 @@ public abstract class Matcher_Base {
 					
 					List<Integer> bgcolors = new ArrayList<Integer>();
 					if (!iterateBGColors) {
-						//bgcolors.add(bgcolor_avg);
+						bgcolors.add(bgcolor_avg);
 						bgcolors.add((file + rank) % 2 == 0 ? bgcolorsOfSquares.getFirst() : bgcolorsOfSquares.getSecond());
 					}
 					

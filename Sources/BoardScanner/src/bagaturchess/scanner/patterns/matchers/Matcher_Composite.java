@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 
@@ -50,43 +50,31 @@ public class Matcher_Composite extends Matcher_Base {
 	@Override
 	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) {
 		
-		ResultPair<Integer, MatrixUtils.PatternMatchingData> best_whiteKingData = null;
-		ResultPair<Integer, MatrixUtils.PatternMatchingData> best_blackKingData = null;
-		
 		int best_index = 0;
 		double best_delta = Double.MAX_VALUE;
+		
+		int[][] grayBoard_128 = ScannerUtils.convertToGrayMatrix(ScannerUtils.resizeImage(ScannerUtils.createGrayImage(grayBoard), 128));
+		
 		for (int i = 0; i < matchers_128.size(); i++) {
 			
-			ResultPair<Integer, MatrixUtils.PatternMatchingData> whiteKingData =
-					matchers_128.get(i).scanForPiece(grayBoard, Constants.PID_W_KING);
+			ResultPair<String, MatchingStatistics> result = matchers_128.get(i).scan(grayBoard_128, -1, -1, false);
+			MatchingStatistics stat = result.getSecond();
 			
 			System.out.println("Matcher_Composite: scan: " + matchers_128.get(i).getClass().getCanonicalName()
-					+ " white king id is " + whiteKingData.getFirst() + " delta is " + whiteKingData.getSecond().delta);
+					+ " " + result.getFirst() + " delta is " + stat.totalDelta);
 			
-			ResultPair<Integer, MatrixUtils.PatternMatchingData> blackKingData =
-					matchers_128.get(i).scanForPiece(grayBoard, Constants.PID_B_KING);
-			
-			System.out.println("Matcher_Composite: scan: " + matchers_128.get(i).getClass().getCanonicalName()
-					+ " black king id is " + blackKingData.getFirst() + " delta is " + blackKingData.getSecond().delta);
-			
-			double cur_delta = 0;
-			cur_delta += whiteKingData.getSecond().delta;
-			cur_delta += blackKingData.getSecond().delta;
-			if (cur_delta < best_delta) {
-				best_delta = cur_delta;
+			if (stat.totalDelta < best_delta) {
+				best_delta = stat.totalDelta;
 				best_index = i;
-				best_whiteKingData = whiteKingData;
-				best_blackKingData = blackKingData;
 			}
 		}
 		
 		System.out.println("Matcher_Composite: scan: Selected matcher is " + matchers.get(best_index).getClass().getCanonicalName());
 		
-		//return matchers.get(best_index).scan(grayBoard, best_whiteKingData.getFirst(), best_blackKingData.getFirst());
 		ResultPair<String, MatchingStatistics> result = matchers.get(best_index).scan(grayBoard, -1, -1, false);
 		
 		if (matchers.get(best_index).getTotalDeltaThreshold() < result.getSecond().totalDelta) {
-			System.out.println("Matcher_Composite: scan: total delta is " + result.getSecond().totalDelta + " start search again ...");
+			System.out.println("Matcher_Composite: scan: " + result.getFirst() + " total delta is " + result.getSecond().totalDelta + " start search again ...");
 			result = matchers.get(best_index).scan(grayBoard, -1, -1, true);
 		}
 		
