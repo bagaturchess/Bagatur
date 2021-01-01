@@ -38,8 +38,8 @@ public class PatternsMatcher1 {
 		try {
 			
 			BufferedImage image_board = ImageIO.read(new File("./data/tests/test4.jpg"));
-			//BufferedImage image_board = ImageIO.read(new File("./data/tests/lichess.org/test6.png"));
-			//BufferedImage image_board = ImageIO.read(new File("./data/tests/chess.com/test3.png"));
+			//BufferedImage image_board = ImageIO.read(new File("./data/tests/lichess.org/test4.png"));
+			//BufferedImage image_board = ImageIO.read(new File("./data/tests/chess.com/test1.png"));
 			image_board = ScannerUtils.resizeImage(image_board, 192);
 			image_board = ScannerUtils.convertToGrayScale(image_board);
 			//ScannerUtils.saveImage("board", image_board, "png");

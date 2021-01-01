@@ -56,6 +56,8 @@ public abstract class Matcher_Base {
 		
 		Set<Integer> emptySquares = getEmptySquares(grayBoard);
 		
+		ResultPair<Integer, Integer> bgcolors = getSquaresColor(grayBoard, emptySquares);
+		
 		Set<Integer> pidsToSearch = new HashSet<Integer>();
 		pidsToSearch.add(pid);
 		
@@ -66,10 +68,13 @@ public abstract class Matcher_Base {
 				int rank = j / (grayBoard.length / 8);
 				int fieldID = 63 - (file + 8 * rank);
 				
+				int bgcolor = (file + rank) % 2 == 0 ? bgcolors.getFirst() : bgcolors.getSecond();
+				//int bgcolor = (int) calculateColorStats(graySquareMatrix).getEntropy();
+				
 				if (!emptySquares.contains(fieldID)) {
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
 					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData
-						= getPID(squareMatrix, true, true, pidsToSearch, fieldID);
+						= getPID(squareMatrix, true, true, bgcolor, pidsToSearch, fieldID);
 					if (pid != pidAndData.getFirst()) {
 						throw new IllegalStateException();
 					}
@@ -96,7 +101,7 @@ public abstract class Matcher_Base {
 		
 		Set<Integer> emptySquares = getEmptySquares(grayBoard);
 		
-		//ResultPair<Integer, Integer> bgcolors = getSquaresColor(grayBoard, emptySquares);
+		ResultPair<Integer, Integer> bgcolors = getSquaresColor(grayBoard, emptySquares);
 		
 		int[] pids = new int[64];
 		if (whiteKingSquareID != -1) {
@@ -116,6 +121,9 @@ public abstract class Matcher_Base {
 				if (fieldID == whiteKingSquareID || fieldID == blackKingSquareID) {
 					continue;
 				}
+				
+				int bgcolor = (file + rank) % 2 == 0 ? bgcolors.getFirst() : bgcolors.getSecond();
+				//int bgcolor = (int) calculateColorStats(graySquareMatrix).getEntropy();
 				
 				int pid = Constants.PID_NONE;
 				if (!emptySquares.contains(fieldID)) {
@@ -143,7 +151,7 @@ public abstract class Matcher_Base {
 					if (blackKingSquareID == -1) pidsToSearch.add(Constants.PID_B_KING);
 					
 					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData
-						= getPID(squareMatrix, true, true, pidsToSearch, fieldID);
+						= getPID(squareMatrix, true, true, bgcolor, pidsToSearch, fieldID);
 					pid = pidAndData.getFirst();
 					MatrixUtils.PatternMatchingData data = pidAndData.getSecond();
 					result.totalDelta += data.delta;
@@ -154,6 +162,10 @@ public abstract class Matcher_Base {
 			}
 		}
 		
+		result.totalDelta = result.totalDelta / (double) (64 - emptySquares.size());
+		
+		System.out.println("Matcher_Base: scan: result.totalDelta=" + result.totalDelta);
+		
 		return ScannerUtils.createFENFromPIDs(pids);
 	}
 	
@@ -163,9 +175,7 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	private ResultPair<Integer, MatrixUtils.PatternMatchingData> getPID(int[][] graySquareMatrix, boolean iterateSize, boolean iterateColor, Set<Integer> pids, int fieldID) {
-		
-		int bgcolor = (int) calculateColorStats(graySquareMatrix).getEntropy();
+	private ResultPair<Integer, MatrixUtils.PatternMatchingData> getPID(int[][] graySquareMatrix, boolean iterateSize, boolean iterateColor, int bgcolor, Set<Integer> pids, int fieldID) {
 		
 		MatrixUtils.PatternMatchingData bestData = null;
 		int bestPID = -1;
