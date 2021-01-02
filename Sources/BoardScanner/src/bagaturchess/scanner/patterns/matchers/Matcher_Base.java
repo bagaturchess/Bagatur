@@ -40,8 +40,8 @@ import bagaturchess.scanner.common.ResultPair;
 public abstract class Matcher_Base {
 	
 	
-	private static final float SIZE_DELTA_PERCENT = 0.4f;
-	private static final int MAX_ROTATION_PERCENT = 5;
+	private static final float SIZE_DELTA_PERCENT = 0.25f;
+	private static final int MAX_ROTATION_PERCENT = 0;
 	
 	
 	protected ImageProperties imageProperties;
@@ -147,7 +147,7 @@ public abstract class Matcher_Base {
 		for (int size = startSize; size <= maxSize; size++) {
 			
 			for (int angle = -MAX_ROTATION_PERCENT; angle <= MAX_ROTATION_PERCENT; angle++) {
-			
+				
 				MatrixUtils.PatternMatchingData curData_best  = null;
 				
 				for (Integer pid : pids) {
@@ -278,7 +278,7 @@ public abstract class Matcher_Base {
 						bestData = curData_best;
 						bestPID = pid;
 						
-						//printInfo(bestData, "" + fieldID + "_best" + (counter++));
+						printInfo(bestData, "" + fieldID + "_best" + (counter++));
 					}
 				}
 			}

@@ -43,6 +43,8 @@ public class BGColorTester {
 			BufferedImage image = ScannerUtils.createGrayImage(imageMatrix);
 			ScannerUtils.saveImage("source", image, "png");
 			
+			imageMatrix = ScannerUtils.convertToGrayMatrix(image);
+			
 			int avg = ScannerUtils.getAVG(imageMatrix);
 			System.out.println(avg);
 			

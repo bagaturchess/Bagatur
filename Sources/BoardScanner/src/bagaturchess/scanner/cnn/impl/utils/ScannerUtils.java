@@ -317,7 +317,7 @@ public class ScannerUtils {
 	
 	public static final int[][] createPieceImage(ImageProperties imageProperties, int pid, int bgcolor, int size) {
 		Image piece = imageProperties.getPiecesImages()[pid];
-		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
 		Graphics g = imagePiece.getGraphics();
 		g.setColor(GRAY_COLORS[bgcolor]);
 		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
@@ -329,7 +329,7 @@ public class ScannerUtils {
 	
 	
 	public static final int[][] createSquareImage(int bgcolor, int size) {
-		BufferedImage imageSquare = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage imageSquare = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
 		Graphics g = imageSquare.getGraphics();
 		g.setColor(GRAY_COLORS[bgcolor]);
 		g.fillRect(0, 0, imageSquare.getWidth(), imageSquare.getHeight());
@@ -496,7 +496,7 @@ public class ScannerUtils {
 	
 	
 	public static BufferedImage createGrayImage(int[][] matrix) {
-		BufferedImage image = new BufferedImage(matrix.length, matrix[0].length, BufferedImage.TYPE_BYTE_GRAY);
+		BufferedImage image = new BufferedImage(matrix.length, matrix[0].length, BufferedImage.TYPE_INT_RGB);
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[0].length; j++) {
 				Color c = GRAY_COLORS[matrix[i][j]];
@@ -667,8 +667,7 @@ public class ScannerUtils {
 	
 	
 	public static BufferedImage convertToGrayScale(BufferedImage image) {
-	  BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-	  //result.getRaster().setPixel(0,0, new int[]{64});
+	  BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
 	  Graphics g = result.getGraphics();
 	  g.drawImage(image, 0, 0, null);
 	  return result;
