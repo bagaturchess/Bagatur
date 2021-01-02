@@ -26,15 +26,23 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.bitboard.impl1.internal.ChessConstants;
 import bagaturchess.scanner.cnn.impl.ImageProperties;
+import bagaturchess.scanner.common.MatrixUtils;
+import bagaturchess.scanner.common.ResultPair;
 
 
 public class ScannerUtils {
@@ -79,6 +87,101 @@ public class ScannerUtils {
 			result[i] = (int) array[i];
 		}
 		return result;
+	}
+	
+	
+	public static Set<Integer> getEmptySquares(int[][] grayBoard) {
+		
+		Set<Integer> emptySquaresIDs = new HashSet<Integer>();
+		
+		VarStatistic colorDeviations = new VarStatistic(false);
+		Map<Integer, VarStatistic> squaresStats = new HashMap<Integer, VarStatistic>();
+		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
+			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
+				
+				int file = i / (grayBoard.length / 8);
+				int rank = j / (grayBoard.length / 8);
+				int fieldID = 63 - (file + 8 * rank);
+				
+				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
+				
+				VarStatistic squareStat = calculateColorStats(squareMatrix);
+				squaresStats.put(fieldID, squareStat);
+				
+				colorDeviations.addValue(squareStat.getDisperse(), squareStat.getDisperse());
+			}
+		}
+		
+		for (Integer fieldID: squaresStats.keySet()) {
+			VarStatistic squareStat = squaresStats.get(fieldID);
+			if (squareStat.getDisperse() < colorDeviations.getEntropy() - colorDeviations.getDisperse() / 7.9f) {
+				emptySquaresIDs.add(fieldID);
+			}
+		}
+		
+		return emptySquaresIDs;
+	}
+	
+	
+	public static VarStatistic calculateColorStats(int[][] grayMatrix) {
+		
+		VarStatistic stat = new VarStatistic(false);
+		
+		for (int i = 0; i < grayMatrix.length; i++) {
+			for (int j = 0; j < grayMatrix.length; j++) {
+				int cur = grayMatrix[i][j];
+				stat.addValue(cur, cur);
+			}
+		}
+		
+		return stat;
+	}
+	
+	
+	public static ResultPair<Integer, Integer> getSquaresColor(int[][] grayBoard, Set<Integer> emptySquares) {
+		
+		VarStatistic stat_all = new VarStatistic(false);
+		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
+			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
+				
+				int file = i / (grayBoard.length / 8);
+				int rank = j / (grayBoard.length / 8);
+				int fieldID = 63 - (file + 8 * rank);
+				
+				if (emptySquares.contains(fieldID)) {
+					for (int i1 = i; i1 < i + grayBoard.length / 8; i1++) {
+						for (int j1 = j; j1 < j + grayBoard.length / 8; j1++) {
+							stat_all.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
+						}
+					}
+				}
+			}
+		}
+		
+		VarStatistic stat_white = new VarStatistic(false);
+		VarStatistic stat_black = new VarStatistic(false);
+		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
+			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
+				
+				int file = i / (grayBoard.length / 8);
+				int rank = j / (grayBoard.length / 8);
+				int fieldID = 63 - (file + 8 * rank);
+				
+				if (emptySquares.contains(fieldID)) {
+					for (int i1 = i; i1 < i + grayBoard.length / 8; i1++) {
+						for (int j1 = j; j1 < j + grayBoard.length / 8; j1++) {
+							if (grayBoard[i1][j1] > stat_all.getEntropy()) {
+								stat_white.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
+							} else {
+								stat_black.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return new ResultPair<Integer, Integer>((int)stat_white.getEntropy(), (int)stat_black.getEntropy());
 	}
 	
 	
@@ -212,7 +315,13 @@ public class ScannerUtils {
 	public static final int[][] createSquareImage(int bgcolor, int size) {
 		BufferedImage imageSquare = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 		Graphics g = imageSquare.getGraphics();
-		g.setColor(new Color(bgcolor, bgcolor, bgcolor));
+		
+	    ColorSpace linearRGB = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
+	    ColorSpace GRAY = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+	    Color c = new Color(GRAY, new float[] {bgcolor / (float) 255, bgcolor / (float) 255, bgcolor / (float) 255}, 1);
+	    
+		g.setColor(c);
+		
 		g.fillRect(0, 0, imageSquare.getWidth(), imageSquare.getHeight());
 		imageSquare = ScannerUtils.convertToGrayScale(imageSquare);
 		return ScannerUtils.convertToGrayMatrix(imageSquare);
@@ -547,6 +656,7 @@ public class ScannerUtils {
 	
 	public static BufferedImage convertToGrayScale(BufferedImage image) {
 	  BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+	  //result.getRaster().setPixel(0,0, new int[]{64});
 	  Graphics g = result.getGraphics();
 	  g.drawImage(image, 0, 0, null);
 	  return result;

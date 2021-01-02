@@ -35,6 +35,6 @@ public class ChessCom extends Matcher_Base {
 
 	@Override
 	protected double getTotalDeltaThreshold() {
-		return 150;
+		return 120;
 	}
 }

@@ -35,7 +35,15 @@ public class BGColorTester {
 		
 		try {
 			
-			BufferedImage image = ImageIO.read(new File("./data/tests/14_square.png"));
+			int[][] imageMatrix = ScannerUtils.createSquareImage(137, 64);
+			BufferedImage image = ScannerUtils.createGrayImage(imageMatrix);
+			ScannerUtils.saveImage("source", image, "png");
+			
+			int avg = ScannerUtils.getAVG(imageMatrix);
+			System.out.println(avg);
+			
+			
+			/*BufferedImage image = ImageIO.read(new File("./data/tests/14_square.png"));
 			image = ScannerUtils.convertToGrayScale(image);
 			int[][] grayImage = ScannerUtils.convertToGrayMatrix(image);
 			
@@ -58,7 +66,7 @@ public class BGColorTester {
 			int[][] generated = ScannerUtils.createSquareImage(bgcolor, grayImage.length);
 			BufferedImage resultImage1 = ScannerUtils.createGrayImage(generated);
 			ScannerUtils.saveImage("test", resultImage1, "png");
-			
+			*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

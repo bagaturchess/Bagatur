@@ -40,7 +40,8 @@ import bagaturchess.scanner.common.ResultPair;
 public abstract class Matcher_Base {
 	
 	
-	private static final float SIZE_DELTA_PERCENT = 0.25f;
+	private static final float SIZE_DELTA_PERCENT = 0.4f;
+	private static final int MAX_ROTATION_PERCENT = 5;
 	
 	
 	protected ImageProperties imageProperties;
@@ -68,9 +69,9 @@ public abstract class Matcher_Base {
 		MatchingStatistics result = new MatchingStatistics();
 		result.matcherName = this.getClass().getCanonicalName();
 		
-		Set<Integer> emptySquares = getEmptySquares(grayBoard);
+		Set<Integer> emptySquares = ScannerUtils.getEmptySquares(grayBoard);
 		
-		ResultPair<Integer, Integer> bgcolorsOfSquares = getSquaresColor(grayBoard, emptySquares);
+		ResultPair<Integer, Integer> bgcolorsOfSquares = ScannerUtils.getSquaresColor(grayBoard, emptySquares);
 		
 		int[] pids = new int[64];
 		
@@ -85,7 +86,7 @@ public abstract class Matcher_Base {
 				if (!emptySquares.contains(fieldID)) {
 					
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-					int bgcolor_avg = (int) calculateColorStats(squareMatrix).getEntropy();
+					int bgcolor_avg = (int) ScannerUtils.calculateColorStats(squareMatrix).getEntropy();
 					
 					MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
 					bestPatternData.x = 0;
@@ -139,125 +140,146 @@ public abstract class Matcher_Base {
 		int bestPID = -1;
 		
 		int counter = 0;
-			
+		
 		int maxSize = graySquareMatrix.length;
 		int startSize = iterateSize ? (int) ((1 - SIZE_DELTA_PERCENT) * maxSize) : maxSize;
 		
 		for (int size = startSize; size <= maxSize; size++) {
 			
-			MatrixUtils.PatternMatchingData curData_best  = null;
+			for (int angle = -MAX_ROTATION_PERCENT; angle <= MAX_ROTATION_PERCENT; angle++) {
 			
-			for (Integer pid : pids) {
+				MatrixUtils.PatternMatchingData curData_best  = null;
 				
-				if (bgcolors != null && bgcolors.size() > 0) {
+				for (Integer pid : pids) {
 					
-					for (int i = 0; i < bgcolors.size(); i++) {
+					if (bgcolors != null && bgcolors.size() > 0) {
 						
-						int bgcolor = bgcolors.get(i);
+						for (int i = 0; i < bgcolors.size(); i++) {
+							
+							int bgcolor = bgcolors.get(i);
+							
+							int[][] grayPattern = pid == Constants.PID_NONE ?
+									ScannerUtils.createSquareImage(bgcolor, size)
+									: ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
+							if (angle != 0) {
+								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+							}
+							MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+							
+							if (curData_best == null || curData_best.delta > curData.delta) {
+								curData_best = curData;
+							}
+						}
+						
+					} else {
+					
+						MatrixUtils.PatternMatchingData[] curData = new MatrixUtils.PatternMatchingData[256];
+						
+						int bgcolor = (int) ScannerUtils.calculateColorStats(graySquareMatrix).getEntropy();
 						
 						int[][] grayPattern = pid == Constants.PID_NONE ?
 								ScannerUtils.createSquareImage(bgcolor, size)
 								: ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
-						MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+						if (angle != 0) {
+							grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+						}
+						curData[bgcolor] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+						curData[bgcolor].color = bgcolor;
 						
-						if (curData_best == null || curData_best.delta > curData.delta) {
-							curData_best = curData;
-						}
-					}
-					
-				} else {
-				
-					MatrixUtils.PatternMatchingData[] curData = new MatrixUtils.PatternMatchingData[256];
-					
-					int bgcolor = (int) calculateColorStats(graySquareMatrix).getEntropy();
-					
-					int[][] grayPattern = pid == Constants.PID_NONE ?
-							ScannerUtils.createSquareImage(bgcolor, size)
-							: ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
-					curData[bgcolor] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-					curData[bgcolor].color = bgcolor;
-					
-					MatrixUtils.PatternMatchingData curData_best_up = curData[bgcolor];
-					
-					if (binarySearchOfColors) {
-						int lowColor_up = bgcolor;
-						int highColor_up = 255;
-						int midColor_up;
-						while(lowColor_up <= highColor_up) {
-							
-							midColor_up = (lowColor_up + highColor_up) / 2;
-							grayPattern = pid == Constants.PID_NONE ?
-									ScannerUtils.createSquareImage(midColor_up, size)
-									: ScannerUtils.createPieceImage(imageProperties, pid, midColor_up, size);
-							curData[midColor_up] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-							
-							if (curData[midColor_up].delta < curData_best_up.delta) {
-								curData_best_up = curData[midColor_up];
-								lowColor_up = midColor_up + 1;
-							} else {
-								highColor_up = midColor_up - 1;
-							}
-						}
-					} else {
+						MatrixUtils.PatternMatchingData curData_best_up = curData[bgcolor];
 						
-						for (int color = bgcolor + 1; color < 256; color++) {
-							grayPattern = pid == Constants.PID_NONE ?
-									ScannerUtils.createSquareImage(color, size)
-									: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
-							curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-							curData[color].color = color;
-							if (curData[color].delta >= curData[color - 1].delta) {
-								break;
+						if (binarySearchOfColors) {
+							int lowColor_up = bgcolor;
+							int highColor_up = 255;
+							int midColor_up;
+							while(lowColor_up <= highColor_up) {
+								
+								midColor_up = (lowColor_up + highColor_up) / 2;
+								grayPattern = pid == Constants.PID_NONE ?
+										ScannerUtils.createSquareImage(midColor_up, size)
+										: ScannerUtils.createPieceImage(imageProperties, pid, midColor_up, size);
+								if (angle != 0) {
+									grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+								}
+								curData[midColor_up] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+								
+								if (curData[midColor_up].delta < curData_best_up.delta) {
+									curData_best_up = curData[midColor_up];
+									lowColor_up = midColor_up + 1;
+								} else {
+									highColor_up = midColor_up - 1;
+								}
 							}
-							curData_best_up = curData[color];
+						} else {
+							
+							for (int color = bgcolor + 1; color < 256; color++) {
+								grayPattern = pid == Constants.PID_NONE ?
+										ScannerUtils.createSquareImage(color, size)
+										: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
+								if (angle != 0) {
+									grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+								}
+								curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+								curData[color].color = color;
+								if (curData[color].delta >= curData[color - 1].delta) {
+									break;
+								}
+								curData_best_up = curData[color];
+							}
 						}
+						
+						
+						MatrixUtils.PatternMatchingData curData_best_down = curData[bgcolor];
+						
+						if (binarySearchOfColors) {
+							int lowColor_down = 0;
+							int highColor_down = bgcolor;
+							int midColor_down;
+							while(lowColor_down <= highColor_down) {
+								
+								midColor_down = (lowColor_down + highColor_down) / 2;
+								grayPattern = pid == Constants.PID_NONE ?
+										ScannerUtils.createSquareImage(midColor_down, size)
+										: ScannerUtils.createPieceImage(imageProperties, pid, midColor_down, size);
+								if (angle != 0) {
+									grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+								}
+								curData[midColor_down] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+								
+								if (curData[midColor_down].delta < curData_best_up.delta) {
+									curData_best_up = curData[midColor_down];
+									highColor_down = midColor_down - 1;
+								} else {
+									lowColor_down = midColor_down + 1;
+								}
+							}
+						} else {
+						
+							for (int color = bgcolor - 1; color >= 0; color--) {
+								grayPattern = pid == Constants.PID_NONE ?
+										ScannerUtils.createSquareImage(color, size)
+										: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
+								if (angle != 0) {
+									grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+								}
+								curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+								curData[color].color = color;
+								if (curData[color].delta >= curData[color + 1].delta) {
+									break;
+								}
+								curData_best_down = curData[color];
+							}
+						}
+						
+						curData_best = curData_best_up.delta < curData_best_down.delta ? curData_best_up : curData_best_down;
 					}
 					
-					
-					MatrixUtils.PatternMatchingData curData_best_down = curData[bgcolor];
-					
-					if (binarySearchOfColors) {
-						int lowColor_down = 0;
-						int highColor_down = bgcolor;
-						int midColor_down;
-						while(lowColor_down <= highColor_down) {
-							
-							midColor_down = (lowColor_down + highColor_down) / 2;
-							grayPattern = pid == Constants.PID_NONE ?
-									ScannerUtils.createSquareImage(midColor_down, size)
-									: ScannerUtils.createPieceImage(imageProperties, pid, midColor_down, size);
-							curData[midColor_down] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-							
-							if (curData[midColor_down].delta < curData_best_up.delta) {
-								curData_best_up = curData[midColor_down];
-								highColor_down = midColor_down - 1;
-							} else {
-								lowColor_down = midColor_down + 1;
-							}
-						}
-					} else {
-					
-						for (int color = bgcolor - 1; color >= 0; color--) {
-							grayPattern = pid == Constants.PID_NONE ?
-									ScannerUtils.createSquareImage(color, size)
-									: ScannerUtils.createPieceImage(imageProperties, pid, color, size);
-							curData[color] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-							curData[color].color = color;
-							if (curData[color].delta >= curData[color + 1].delta) {
-								break;
-							}
-							curData_best_down = curData[color];
-						}
+					if (bestData == null || bestData.delta > curData_best.delta) {
+						bestData = curData_best;
+						bestPID = pid;
+						
+						//printInfo(bestData, "" + fieldID + "_best" + (counter++));
 					}
-					
-					curData_best = curData_best_up.delta < curData_best_down.delta ? curData_best_up : curData_best_down;
-				}
-				
-				if (bestData == null || bestData.delta > curData_best.delta) {
-					bestData = curData_best;
-					bestPID = pid;
-					
-					printInfo(bestData, "" + fieldID + "_best" + (counter++));
 				}
 			}
 		}
@@ -265,54 +287,6 @@ public abstract class Matcher_Base {
 		printInfo(graySquareMatrix, bestData, "" + fieldID + "_matching");
 		
 		return new ResultPair<Integer, MatrixUtils.PatternMatchingData>(bestPID, bestData);
-	}
-	
-	
-	private static VarStatistic calculateColorStats(int[][] grayMatrix) {
-		
-		VarStatistic stat = new VarStatistic(false);
-		
-		for (int i = 0; i < grayMatrix.length; i++) {
-			for (int j = 0; j < grayMatrix.length; j++) {
-				int cur = grayMatrix[i][j];
-				stat.addValue(cur, cur);
-			}
-		}
-		
-		return stat;
-	}
-	
-	
-	protected Set<Integer> getEmptySquares(int[][] grayBoard) {
-		
-		Set<Integer> emptySquaresIDs = new HashSet<Integer>();
-		
-		VarStatistic colorDeviations = new VarStatistic(false);
-		Map<Integer, VarStatistic> squaresStats = new HashMap<Integer, VarStatistic>();
-		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
-			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
-				
-				int file = i / (grayBoard.length / 8);
-				int rank = j / (grayBoard.length / 8);
-				int fieldID = 63 - (file + 8 * rank);
-				
-				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-				
-				VarStatistic squareStat = calculateColorStats(squareMatrix);
-				squaresStats.put(fieldID, squareStat);
-				
-				colorDeviations.addValue(squareStat.getDisperse(), squareStat.getDisperse());
-			}
-		}
-		
-		for (Integer fieldID: squaresStats.keySet()) {
-			VarStatistic squareStat = squaresStats.get(fieldID);
-			if (squareStat.getDisperse() < colorDeviations.getEntropy() - colorDeviations.getDisperse() / 7.9f) {
-				emptySquaresIDs.add(fieldID);
-			}
-		}
-		
-		return emptySquaresIDs;
 	}
 	
 	
@@ -341,53 +315,6 @@ public abstract class Matcher_Base {
 		
 		BufferedImage resultImage = ScannerUtils.createGrayImage(print);
 		ScannerUtils.saveImage(fileName, resultImage, "png");
-	}
-	
-	
-	private ResultPair<Integer, Integer> getSquaresColor(int[][] grayBoard, Set<Integer> emptySquares) {
-		
-		VarStatistic stat_all = new VarStatistic(false);
-		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
-			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
-				
-				int file = i / (grayBoard.length / 8);
-				int rank = j / (grayBoard.length / 8);
-				int fieldID = 63 - (file + 8 * rank);
-				
-				if (emptySquares.contains(fieldID)) {
-					for (int i1 = i; i1 < i + grayBoard.length / 8; i1++) {
-						for (int j1 = j; j1 < j + grayBoard.length / 8; j1++) {
-							stat_all.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
-						}
-					}
-				}
-			}
-		}
-		
-		VarStatistic stat_white = new VarStatistic(false);
-		VarStatistic stat_black = new VarStatistic(false);
-		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
-			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
-				
-				int file = i / (grayBoard.length / 8);
-				int rank = j / (grayBoard.length / 8);
-				int fieldID = 63 - (file + 8 * rank);
-				
-				if (emptySquares.contains(fieldID)) {
-					for (int i1 = i; i1 < i + grayBoard.length / 8; i1++) {
-						for (int j1 = j; j1 < j + grayBoard.length / 8; j1++) {
-							if (grayBoard[i1][j1] > stat_all.getEntropy()) {
-								stat_white.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
-							} else {
-								stat_black.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		return new ResultPair<Integer, Integer>((int)stat_white.getEntropy(), (int)stat_black.getEntropy());
 	}
 	
 	
