@@ -48,6 +48,21 @@ import bagaturchess.scanner.common.ResultPair;
 public class ScannerUtils {
 	
 	
+	private static final Color[] GRAY_COLORS = new Color[256];
+	
+	static {
+		
+		for (int r = 0; r < 256; r++) {
+			for (int g = 0; g < 256; g++) {
+				for (int b = 0; b < 256; b++) {
+					int gray = (int) (r * 0.2989d + g * 0.5870 + b * 0.1140);
+					GRAY_COLORS[gray] = new Color(r, g, b);
+				}
+			}
+		}
+	}
+	
+	
 	public static float[] convertInt2Float(int[] array) {
 		float[] result = new float[array.length];
 		for (int i = 0 ; i < array.length; i++) {
@@ -249,7 +264,7 @@ public class ScannerUtils {
 		Image piece = imageProperties.getPiecesImages()[pid];
 		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
 		Graphics g = imagePiece.getGraphics();
-		g.setColor(new Color(bgcolor, bgcolor, bgcolor));
+		g.setColor(GRAY_COLORS[bgcolor]);
 		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
 		Image pieceScaled = piece.getScaledInstance(size, size, Image.SCALE_SMOOTH);
 		g.drawImage(pieceScaled, 0, 0, null);
@@ -282,6 +297,7 @@ public class ScannerUtils {
 				//System.out.println(green + ", green_00=" + green_00);
 				
 				if (green != green_00) {
+					if (true) throw new IllegalStateException(); 
 					Color c = new Color(
 								Math.min(255, Math.max(0, red + colorAdjustment)),
 								Math.min(255, Math.max(0, green + colorAdjustment)),
@@ -303,11 +319,11 @@ public class ScannerUtils {
 		Image piece = imageProperties.getPiecesImages()[pid];
 		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 		Graphics g = imagePiece.getGraphics();
-		g.setColor(new Color(bgcolor, bgcolor, bgcolor));
+		g.setColor(GRAY_COLORS[bgcolor]);
 		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
 		Image pieceScaled = piece.getScaledInstance(size, size, Image.SCALE_SMOOTH);
 		g.drawImage(pieceScaled, 0, 0, null);
-		imagePiece = ScannerUtils.convertToGrayScale(imagePiece);
+		//imagePiece = ScannerUtils.convertToGrayScale(imagePiece);
 		return ScannerUtils.convertToGrayMatrix(imagePiece);
 	}
 	
@@ -315,15 +331,9 @@ public class ScannerUtils {
 	public static final int[][] createSquareImage(int bgcolor, int size) {
 		BufferedImage imageSquare = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 		Graphics g = imageSquare.getGraphics();
-		
-	    ColorSpace linearRGB = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
-	    ColorSpace GRAY = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-	    Color c = new Color(GRAY, new float[] {bgcolor / (float) 255, bgcolor / (float) 255, bgcolor / (float) 255}, 1);
-	    
-		g.setColor(c);
-		
+		g.setColor(GRAY_COLORS[bgcolor]);
 		g.fillRect(0, 0, imageSquare.getWidth(), imageSquare.getHeight());
-		imageSquare = ScannerUtils.convertToGrayScale(imageSquare);
+		//imageSquare = ScannerUtils.convertToGrayScale(imageSquare);
 		return ScannerUtils.convertToGrayMatrix(imageSquare);
 	}
 	
@@ -332,7 +342,7 @@ public class ScannerUtils {
 		for (int i = 0; i < imageSquare.getHeight(); i++) {
 			for (int j = 0; j < imageSquare.getHeight(); j++) {
 				int rand = (int) (Math.random() * 256);
-				Color c = new Color(rand, rand, rand);
+				Color c = GRAY_COLORS[rand];
 				imageSquare.setRGB(i, j, c.getRGB());
 			}
 		}
@@ -476,6 +486,7 @@ public class ScannerUtils {
 		BufferedImage image = new BufferedImage(matrix.length, matrix[0].length, BufferedImage.TYPE_INT_RGB);
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[0].length; j++) {
+				if (true) throw new IllegalStateException();
 				Color c = new Color(matrix[i][j][0], matrix[i][j][1], matrix[i][j][2]);
 				image.setRGB(i, j, c.getRGB());
 			}
@@ -488,7 +499,7 @@ public class ScannerUtils {
 		BufferedImage image = new BufferedImage(matrix.length, matrix[0].length, BufferedImage.TYPE_BYTE_GRAY);
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[0].length; j++) {
-				Color c = new Color(matrix[i][j], matrix[i][j], matrix[i][j]);
+				Color c = GRAY_COLORS[matrix[i][j]];
 				image.setRGB(i, j, c.getRGB());
 			}
 		}
@@ -500,6 +511,7 @@ public class ScannerUtils {
 		int size = (int) Math.sqrt(vector.length);
 		BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
 		for (int i = 0; i < vector.length; i++) {
+			if (true) throw new IllegalStateException();
 			Color c = new Color((int)vector[i], (int)vector[i], (int)vector[i]);
 			image.setRGB(i / size, i % size, c.getRGB());
 		}
@@ -557,12 +569,12 @@ public class ScannerUtils {
 				int blue = rgb & 0xff;
 			    
 				if (red != green || blue != green) {
-					throw new IllegalStateException();
+					//throw new IllegalStateException();
 				}
 				
 				//inputs[count] = (red + green + blue) / 3;
 			    //inputs[count++] = red * 0.299 + green * 0.587 + blue * 0.114;
-				inputs[i][j] = green;
+				inputs[i][j] = (int) (red * 0.2989d + green * 0.5870 + blue * 0.1140);
 			}
 		}
 		
@@ -701,6 +713,8 @@ public class ScannerUtils {
 				count++;
             }
         }
+        
+        if (true) throw new IllegalStateException();
         
         return new Color((int) (red / count), (int) (green / count), (int) (blue / count));
 	}
