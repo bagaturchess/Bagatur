@@ -37,7 +37,6 @@ public class DataSetInitPair_ByBoardImage_Gray extends DataSetInitPair {
 		
 		super();
 		
-		boardImage = ScannerUtils.convertToGrayScale(boardImage);
 		//ScannerUtils.saveImage(fileName + "_grayed", boardImage, "png");
 		
 		int[][] matrixOfInitialBoard = ScannerUtils.convertToGrayMatrix(boardImage);

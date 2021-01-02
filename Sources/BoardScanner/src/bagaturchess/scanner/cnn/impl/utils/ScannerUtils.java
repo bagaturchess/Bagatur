@@ -309,8 +309,6 @@ public class ScannerUtils {
 			}
 		}
 		
-		imagePiece = ScannerUtils.convertToGrayScale(imagePiece);
-		
 		return ScannerUtils.convertToGrayMatrix(imagePiece);
 	}
 	
@@ -663,14 +661,6 @@ public class ScannerUtils {
 		}
 		
 		return inputs;
-	}
-	
-	
-	public static BufferedImage convertToGrayScale(BufferedImage image) {
-	  BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
-	  Graphics g = result.getGraphics();
-	  g.drawImage(image, 0, 0, null);
-	  return result;
 	}
 	
 	

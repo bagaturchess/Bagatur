@@ -74,7 +74,6 @@ public class ScannerCheck {
 		public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
 	        
 			BufferedImage image = ScannerUtils.createBoardImage(imageProperties, bitboard.toEPD());
-			image = ScannerUtils.convertToGrayScale(image);
 			
 			//ScannerUtils.saveImage(bitboard.toEPD(), image);
 			int[][] expected_input = ScannerUtils.convertToGrayMatrix(image);

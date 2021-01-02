@@ -38,7 +38,6 @@ public class ColorAdjustmentTester {
 		try {
 			
 			BufferedImage image = ImageIO.read(new File("./data/tests/square2.png"));
-			image = ScannerUtils.convertToGrayScale(image);
 			image = ScannerUtils.resizeImage(image, Math.min(image.getHeight(), image.getWidth()));
 			int[][] grayImage = ScannerUtils.convertToGrayMatrix(image);
 			

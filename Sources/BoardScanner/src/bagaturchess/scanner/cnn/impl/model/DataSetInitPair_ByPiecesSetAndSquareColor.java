@@ -41,8 +41,6 @@ public class DataSetInitPair_ByPiecesSetAndSquareColor extends DataSetInitPair {
 		for (int pid = 0; pid <= 12; pid++) {
 			BufferedImage whiteImage = ScannerUtils.createPieceImage(imageProperties, pid, imageProperties.getColorWhiteSquare());
 			BufferedImage blackImage = ScannerUtils.createPieceImage(imageProperties, pid, imageProperties.getColorBlackSquare());
-			whiteImage = ScannerUtils.convertToGrayScale(whiteImage);
-			blackImage = ScannerUtils.convertToGrayScale(blackImage);
 			images.add(ScannerUtils.convertToGrayMatrix(whiteImage));
 			images.add(ScannerUtils.convertToGrayMatrix(blackImage));
 			if (pid == 0) {

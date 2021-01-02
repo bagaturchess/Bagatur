@@ -56,7 +56,6 @@ public class MatchingTester {
 			//BufferedImage image_board = ImageIO.read(new File("./data/tests/lichess.org/test1.png"));
 			//BufferedImage image_board = ImageIO.read(new File("./data/tests/chess.com/test1.png"));
 			//image_board = ScannerUtils.resizeImage(image_board, 192);
-			piece = ScannerUtils.convertToGrayScale(piece);
 			//ScannerUtils.saveImage("board", image_board, "png");
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(piece);
 			
@@ -111,7 +110,6 @@ public class MatchingTester {
 		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
 		piece = piece.getScaledInstance(size, size, Image.SCALE_SMOOTH);
 		g.drawImage(piece, 0, 0, null);
-		imagePiece = ScannerUtils.convertToGrayScale(imagePiece);
 		return imagePiece;
 	}
 }

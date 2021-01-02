@@ -45,7 +45,6 @@ public class PatternsMatcher {
 			
 			BufferedImage image_board = ImageIO.read(new File("./data/tests/test9.jpg"));
 			image_board = ScannerUtils.resizeImage(image_board, imageProperties.getImageSize());
-			image_board = ScannerUtils.convertToGrayScale(image_board);
 			//ScannerUtils.saveImage("board", image_board, "png");
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image_board);
 			//board = transformPattern(board);
