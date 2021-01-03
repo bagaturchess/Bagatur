@@ -35,6 +35,6 @@ public class LichessOrg extends Matcher_Base {
 	
 	@Override
 	protected double getTotalDeltaThreshold() {
-		return 300;
+		return 320;
 	}
 }
