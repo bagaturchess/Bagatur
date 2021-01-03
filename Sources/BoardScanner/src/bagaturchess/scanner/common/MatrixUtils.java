@@ -20,6 +20,7 @@
 package bagaturchess.scanner.common;
 
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;
+import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 
 
 public class MatrixUtils {
@@ -191,7 +193,7 @@ public class MatrixUtils {
 		                int pixelSource = graySource[x+i][y+j];
 		                int pixelPattern = grayPattern[i][j];
 		                
-		                cur.delta += Math.abs(pixelSource - pixelPattern) * Math.abs(pixelSource - pixelPattern);
+		                cur.delta += Math.abs(pixelSource - pixelPattern);
 		                count++;
 		                
 		                stats.addValue(Math.abs(pixelSource - pixelPattern), Math.abs(pixelSource - pixelPattern));
@@ -201,13 +203,11 @@ public class MatrixUtils {
 		                }*/
 		            }
 		        }
-		        cur.delta = cur.delta / (double) (count * count); 
+		        cur.delta = cur.delta / (double) (count); 
 		        //cur.delta *= stats.getDisperse();
 		        
 		        if (result == null || result.delta > cur.delta) { 
 		        	result = cur;
-		        	
-		        	//printInfo(graySource, result, cur.size + "_" + cur.delta);
 		        }
 		    }
 		}

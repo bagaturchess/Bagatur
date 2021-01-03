@@ -39,7 +39,7 @@ import bagaturchess.scanner.common.ResultPair;
 public class ImagePreProcessing {
 	
 	
-	private static final double SIZE_DELTA_PERCENT = 0.4;
+	private static final double SIZE_DELTA_PERCENT = 0.2;
 	private static final int MAX_ROTATION_PERCENT = 0;
 	
 	
@@ -49,7 +49,7 @@ public class ImagePreProcessing {
 			
 			ImageProperties imageProperties = new ImageProperties(256, "set3");
 			
-			BufferedImage image = ImageIO.read(new File("./data/tests/test8.jpg"));
+			BufferedImage image = ImageIO.read(new File("./data/tests/preprocess/test2.jpg"));
 			image = ScannerUtils.resizeImage(image, imageProperties.getImageSize());
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image);
 			
@@ -67,8 +67,8 @@ public class ImagePreProcessing {
 			BufferedImage emptyBoard = ScannerUtils.createBoardImage(imageProperties, "8/8/8/8/8/8/8/8");
 			ScannerUtils.saveImage("board_empty", emptyBoard, "png");
 			
-			image = ScannerUtils.enlarge(image, imageProperties.getImageSize(), 1.125f);
-			grayBoard = ScannerUtils.convertToGrayMatrix(image);
+			//image = ScannerUtils.enlarge(image, imageProperties.getImageSize(), 1.125f);
+			//grayBoard = ScannerUtils.convertToGrayMatrix(image);
 			ScannerUtils.saveImage("board_input", ScannerUtils.createGrayImage(grayBoard), "png");
 			
 			MatrixUtils.PatternMatchingData bestData = null;
@@ -76,10 +76,17 @@ public class ImagePreProcessing {
 			int startSize = (int) ((1 - SIZE_DELTA_PERCENT) * maxSize);
 			for (int size = startSize; size <= maxSize; size++) {
 				for (int angle = -MAX_ROTATION_PERCENT; angle <= MAX_ROTATION_PERCENT; angle++) {
+					
+					//BufferedImage resizedGrayPattern = ScannerUtils.resizeImage(emptyBoard,(int) (0.9 * size));
+					//BufferedImage enlargedGrayPattern = ScannerUtils.enlarge(resizedGrayPattern, resizedGrayPattern.getHeight(), 1.1f);
+					//int[][] grayPattern = ScannerUtils.convertToGrayMatrix(enlargedGrayPattern);
+					
 					int[][] grayPattern = ScannerUtils.convertToGrayMatrix(ScannerUtils.resizeImage(emptyBoard, size));
+					
 					if (angle != 0) {
 						grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
 					}
+					
 					MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(grayBoard, grayPattern);
 					
 					if (bestData == null || bestData.delta > curData.delta) {

@@ -75,10 +75,10 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		ResultPair<String, MatchingStatistics> result = matchers.get(best_index).scan(grayBoard, false);
 		
-		if (matchers.get(best_index).getTotalDeltaThreshold() < result.getSecond().totalDelta) {
+		/*if (matchers.get(best_index).getTotalDeltaThreshold() < result.getSecond().totalDelta) {
 			System.out.println("Matcher_Composite: scan: " + result.getFirst() + " total delta is " + result.getSecond().totalDelta + " start scan again ...");
 			result = matchers.get(best_index).scan(grayBoard, true);
-		}
+		}*/
 		
 		return result;
 	}
