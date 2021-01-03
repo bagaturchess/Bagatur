@@ -41,8 +41,8 @@ public class ImageProperties {
 	
 	private Color colorBlackSquare = new Color(120, 120, 120);
 	private Color colorWhiteSquare = new Color(220, 220, 220);
-	
-	
+
+
 	public ImageProperties(int _imageSize) throws IOException {
 		this(_imageSize, "set1");
 	}
@@ -99,5 +99,15 @@ public class ImageProperties {
 
 	public Color getColorWhiteSquare() {
 		return colorWhiteSquare;
+	}
+	
+	
+	public void setColorBlackSquare(Color colorBlackSquare) {
+		this.colorBlackSquare = colorBlackSquare;
+	}
+
+
+	public void setColorWhiteSquare(Color colorWhiteSquare) {
+		this.colorWhiteSquare = colorWhiteSquare;
 	}
 }

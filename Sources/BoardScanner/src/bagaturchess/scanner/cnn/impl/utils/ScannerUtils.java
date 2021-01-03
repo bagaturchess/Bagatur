@@ -48,7 +48,7 @@ import bagaturchess.scanner.common.ResultPair;
 public class ScannerUtils {
 	
 	
-	private static final Color[] GRAY_COLORS = new Color[256];
+	public static final Color[] GRAY_COLORS = new Color[256];
 	
 	static {
 		
@@ -678,6 +678,19 @@ public class ScannerUtils {
 		 */
 		
 		g.drawImage(scaled, 0, 0, squareSize, squareSize, null);
+		
+		return result;
+	}
+	
+	
+	public static BufferedImage enlarge(BufferedImage image, int initialSize, double scale) {
+		
+		BufferedImage result = new BufferedImage((int) (initialSize * scale), (int) (initialSize * scale), BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = (Graphics2D) result.getGraphics();
+		g.drawImage(image.getScaledInstance(image.getWidth(), image.getHeight(), Image.SCALE_SMOOTH),
+				(int) (initialSize * (scale - 1) / 2f),
+				(int) (initialSize * (scale - 1) / 2f),
+				image.getWidth(), image.getHeight(), null);
 		
 		return result;
 	}

@@ -1,0 +1,125 @@
+/**
+ *  BagaturChess (UCI chess engine and tools)
+ *  Copyright (C) 2005 Krasimir I. Topchiyski (k_topchiyski@yahoo.com)
+ *  
+ *  This file is part of BagaturChess program.
+ * 
+ *  BagaturChess is open software: you can redistribute it and/or modify
+ *  it under the terms of the Eclipse Public License version 1.0 as published by
+ *  the Eclipse Foundation.
+ *
+ *  BagaturChess is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Eclipse Public License for more details.
+ *
+ *  You should have received a copy of the Eclipse Public License version 1.0
+ *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
+ *
+ */
+package bagaturchess.scanner.patterns;
+
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.color.ColorSpace;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.Set;
+
+import javax.imageio.ImageIO;
+
+import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.scanner.cnn.impl.ImageProperties;
+import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.MatrixUtils;
+import bagaturchess.scanner.common.ResultPair;
+
+
+public class ImagePreProcessing {
+	
+	
+	private static final double SIZE_DELTA_PERCENT = 0.4;
+	private static final int MAX_ROTATION_PERCENT = 0;
+	
+	
+	public static void main(String[] args) {
+		
+		try {
+			
+			ImageProperties imageProperties = new ImageProperties(256, "set3");
+			
+			BufferedImage image = ImageIO.read(new File("./data/tests/test8.jpg"));
+			image = ScannerUtils.resizeImage(image, imageProperties.getImageSize());
+			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image);
+			
+			Set<Integer> emptySquares = ScannerUtils.getEmptySquares(grayBoard);
+			ResultPair<Integer, Integer> bgcolours = ScannerUtils.getSquaresColor(grayBoard, emptySquares);
+			
+			//int[][] whiteSquare = ScannerUtils.createSquareImage(bgcolours.getFirst(), imageProperties.getImageSize());
+			//int[][] blackSquare = ScannerUtils.createSquareImage(bgcolours.getSecond(), imageProperties.getImageSize());
+			//ScannerUtils.saveImage("white", ScannerUtils.createGrayImage(whiteSquare), "png");
+			//ScannerUtils.saveImage("black", ScannerUtils.createGrayImage(blackSquare), "png");
+			
+			imageProperties.setColorWhiteSquare(ScannerUtils.GRAY_COLORS[bgcolours.getFirst()]);
+			imageProperties.setColorBlackSquare(ScannerUtils.GRAY_COLORS[bgcolours.getSecond()]);
+			
+			BufferedImage emptyBoard = ScannerUtils.createBoardImage(imageProperties, "8/8/8/8/8/8/8/8");
+			ScannerUtils.saveImage("board_empty", emptyBoard, "png");
+			
+			image = ScannerUtils.enlarge(image, imageProperties.getImageSize(), 1.125f);
+			grayBoard = ScannerUtils.convertToGrayMatrix(image);
+			ScannerUtils.saveImage("board_input", ScannerUtils.createGrayImage(grayBoard), "png");
+			
+			MatrixUtils.PatternMatchingData bestData = null;
+			int maxSize = grayBoard.length;
+			int startSize = (int) ((1 - SIZE_DELTA_PERCENT) * maxSize);
+			for (int size = startSize; size <= maxSize; size++) {
+				for (int angle = -MAX_ROTATION_PERCENT; angle <= MAX_ROTATION_PERCENT; angle++) {
+					int[][] grayPattern = ScannerUtils.convertToGrayMatrix(ScannerUtils.resizeImage(emptyBoard, size));
+					if (angle != 0) {
+						grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+					}
+					MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(grayBoard, grayPattern);
+					
+					if (bestData == null || bestData.delta > curData.delta) {
+						bestData = curData;
+					}
+				}
+			}
+			
+			printInfo(grayBoard, bestData, "result_" + bestData.size + "_" + bestData.angle + "_" + bestData.delta);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	protected static void printInfo(int[][] board, MatrixUtils.PatternMatchingData matcherData, String fileName) {
+		
+		int[][] print = new int[matcherData.size][matcherData.size];
+		for (int i = 0; i < matcherData.size; i++) {
+			for (int j = 0; j < matcherData.size; j++) {
+				print[i][j] = board[matcherData.x + i][matcherData.y + j];
+			}
+		}
+		
+		BufferedImage resultImage = ScannerUtils.createGrayImage(print);
+		ScannerUtils.saveImage(fileName, resultImage, "png");
+	}
+	
+	
+	protected static void printInfo(MatrixUtils.PatternMatchingData matcherData, String fileName) {
+		
+		int[][] print = new int[matcherData.size][matcherData.size];
+		for (int i = 0; i < matcherData.size; i++) {
+			for (int j = 0; j < matcherData.size; j++) {
+				print[i][j] = matcherData.pattern[i][j];
+			}
+		}
+		
+		BufferedImage resultImage = ScannerUtils.createGrayImage(print);
+		ScannerUtils.saveImage(fileName, resultImage, "png");
+	}
+}

@@ -121,8 +121,6 @@ public abstract class Matcher_Base {
 					result.totalDelta += data.delta;
 				}
 				pids[fieldID] = pid;
-				
-				//System.out.println(squareDisperse);
 			}
 		}
 		
