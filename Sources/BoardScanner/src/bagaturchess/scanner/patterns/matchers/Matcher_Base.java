@@ -126,7 +126,7 @@ public abstract class Matcher_Base {
 		}
 		
 		result.totalDelta = result.totalDelta / (double) (64 - emptySquares.size());
-		result.totalDelta *= imageProperties.getSquareSize() * Math.sqrt(imageProperties.getSquareSize());
+		//result.totalDelta *= imageProperties.getSquareSize() * Math.sqrt(imageProperties.getSquareSize());
 		
 		return new ResultPair<String, MatchingStatistics> (ScannerUtils.createFENFromPIDs(pids), result);
 	}

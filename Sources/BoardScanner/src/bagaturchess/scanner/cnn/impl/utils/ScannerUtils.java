@@ -484,7 +484,6 @@ public class ScannerUtils {
 		BufferedImage image = new BufferedImage(matrix.length, matrix[0].length, BufferedImage.TYPE_INT_RGB);
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[0].length; j++) {
-				if (true) throw new IllegalStateException();
 				Color c = new Color(matrix[i][j][0], matrix[i][j][1], matrix[i][j][2]);
 				image.setRGB(i, j, c.getRGB());
 			}
@@ -683,10 +682,12 @@ public class ScannerUtils {
 	}
 	
 	
-	public static BufferedImage enlarge(BufferedImage image, int initialSize, double scale) {
+	public static BufferedImage enlarge(BufferedImage image, int initialSize, double scale, Color bgcolor) {
 		
 		BufferedImage result = new BufferedImage((int) (initialSize * scale), (int) (initialSize * scale), BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = (Graphics2D) result.getGraphics();
+		g.setColor(bgcolor);
+		g.fillRect(0, 0, result.getWidth(), result.getHeight());
 		g.drawImage(image.getScaledInstance(image.getWidth(), image.getHeight(), Image.SCALE_SMOOTH),
 				(int) (initialSize * (scale - 1) / 2f),
 				(int) (initialSize * (scale - 1) / 2f),
@@ -715,8 +716,6 @@ public class ScannerUtils {
 				count++;
             }
         }
-        
-        if (true) throw new IllegalStateException();
         
         return new Color((int) (red / count), (int) (green / count), (int) (blue / count));
 	}

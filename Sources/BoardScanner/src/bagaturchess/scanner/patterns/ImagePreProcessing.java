@@ -33,14 +33,15 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.MatrixUtils;
+import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 import bagaturchess.scanner.common.ResultPair;
 
 
 public class ImagePreProcessing {
 	
 	
-	private static final double SIZE_DELTA_PERCENT = 0.2;
-	private static final int MAX_ROTATION_PERCENT = 0;
+	private static final double SIZE_DELTA_PERCENT = 0.1;
+	private static final int MAX_ROTATION_PERCENT = 1;
 	
 	
 	public static void main(String[] args) {
@@ -49,7 +50,7 @@ public class ImagePreProcessing {
 			
 			ImageProperties imageProperties = new ImageProperties(256, "set3");
 			
-			BufferedImage image = ImageIO.read(new File("./data/tests/preprocess/test2.jpg"));
+			BufferedImage image = ImageIO.read(new File("./data/tests/preprocess/test4.jpg"));
 			image = ScannerUtils.resizeImage(image, imageProperties.getImageSize());
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image);
 			
@@ -94,12 +95,58 @@ public class ImagePreProcessing {
 					}
 				}
 			}
+			//https://stackoverflow.com/questions/13390238/jtransforms-fft-on-image
+			//matched filter in signal processing
+			//https://stackoverflow.com/questions/12598818/finding-a-picture-in-a-picture-with-java
 			
-			printInfo(grayBoard, bestData, "result_" + bestData.size + "_" + bestData.angle + "_" + bestData.delta);
+			BufferedImage result = extractResult(image, bestData);
+			result = ScannerUtils.enlarge(result, result.getWidth(), 1.03f, ScannerUtils.getAVG(result));
+			ScannerUtils.saveImage("result_" + bestData.size + "_" + bestData.angle + "_" + bestData.delta, result, "png");
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	
+	private static BufferedImage extractResult(BufferedImage image, PatternMatchingData matcherData) {
+		
+		int[][][] print = new int[matcherData.size][matcherData.size][3];
+		for (int i = 0; i < matcherData.size; i++) {
+			for (int j = 0; j < matcherData.size; j++) {
+				int rgb = image.getRGB(matcherData.x + i, matcherData.y + j);
+				int red = (rgb & 0xff0000) >> 16;
+				int green = (rgb & 0xff00) >> 8;
+				int blue = rgb & 0xff;
+				//int gray = (int) (red * 0.2989d + green * 0.5870 + blue * 0.1140);
+				print[i][j][0] = red;
+				print[i][j][1] = green;
+				print[i][j][2] = blue;
+			}
+		}
+		
+		return ScannerUtils.createRGBImage(print);
+	}
+
+
+	protected static void printInfo_RGB(BufferedImage image, MatrixUtils.PatternMatchingData matcherData, String fileName) {
+		
+		int[][][] print = new int[matcherData.size][matcherData.size][3];
+		for (int i = 0; i < matcherData.size; i++) {
+			for (int j = 0; j < matcherData.size; j++) {
+				int rgb = image.getRGB(matcherData.x + i, matcherData.y + j);
+				int red = (rgb & 0xff0000) >> 16;
+				int green = (rgb & 0xff00) >> 8;
+				int blue = rgb & 0xff;
+				//int gray = (int) (red * 0.2989d + green * 0.5870 + blue * 0.1140);
+				print[i][j][0] = red;
+				print[i][j][1] = green;
+				print[i][j][2] = blue;
+			}
+		}
+		
+		BufferedImage resultImage = ScannerUtils.createRGBImage(print);
+		ScannerUtils.saveImage(fileName, resultImage, "png");
 	}
 	
 	
