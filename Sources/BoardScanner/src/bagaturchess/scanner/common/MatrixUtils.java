@@ -218,9 +218,7 @@ public class MatrixUtils {
 	
 	public static final PatternMatchingData matchImages(int[][][] rgbSource, int[][][] rgbPattern) {
 		
-		PatternMatchingData result = new PatternMatchingData();
-		result.delta = Double.MAX_VALUE;
-		result.size = rgbPattern.length;
+		PatternMatchingData result = null;
 		
 		for (int x = 0; x <= rgbSource.length - rgbPattern.length; x++ ) {
 		    for (int y = 0; y <= rgbSource.length - rgbPattern.length; y++ ) {
@@ -241,9 +239,9 @@ public class MatrixUtils {
 		                int pixelPattern_g = rgbPattern[i][j][1];
 		                int pixelPattern_b = rgbPattern[i][j][2];
 		                
-		                cur.delta += Math.abs(pixelSource_r - pixelPattern_r);
-		                cur.delta += Math.abs(pixelSource_g - pixelPattern_g);
-		                cur.delta += Math.abs(pixelSource_b - pixelPattern_b);
+		                cur.delta += Math.sqrt(Math.abs(pixelSource_r - pixelPattern_r) * Math.abs(pixelSource_r - pixelPattern_r)
+		                				+ Math.abs(pixelSource_g - pixelPattern_g) * Math.abs(pixelSource_g - pixelPattern_g)
+		                				+ Math.abs(pixelSource_b - pixelPattern_b) * Math.abs(pixelSource_b - pixelPattern_b));
 		                
 		                count++;
 		                
@@ -253,12 +251,10 @@ public class MatrixUtils {
 		                }*/
 		            }
 		        }
-		        //cur.delta = cur.delta / (double) (count * count); 
+		        cur.delta = cur.delta / (double) (count); 
 		        
-		        if (result.delta > cur.delta) { 
-		        	result.delta = cur.delta;
-		        	result.x = x;
-		        	result.y = y;
+		        if (result == null || result.delta > cur.delta) { 
+		        	result = cur;
 		        }
 		    }
 		}

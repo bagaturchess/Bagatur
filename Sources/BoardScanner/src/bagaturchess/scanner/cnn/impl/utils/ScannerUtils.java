@@ -313,6 +313,18 @@ public class ScannerUtils {
 	}
 	
 	
+	public static final int[][][] createPieceImage(ImageProperties imageProperties, int pid, Color bgcolor, int size) {
+		Image piece = imageProperties.getPiecesImages()[pid];
+		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+		Graphics g = imagePiece.getGraphics();
+		g.setColor(bgcolor);
+		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
+		Image pieceScaled = piece.getScaledInstance(size, size, Image.SCALE_SMOOTH);
+		g.drawImage(pieceScaled, 0, 0, null);
+		return ScannerUtils.convertToRGBMatrix(imagePiece);
+	}
+	
+	
 	public static final int[][] createPieceImage(ImageProperties imageProperties, int pid, int bgcolor, int size) {
 		Image piece = imageProperties.getPiecesImages()[pid];
 		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
