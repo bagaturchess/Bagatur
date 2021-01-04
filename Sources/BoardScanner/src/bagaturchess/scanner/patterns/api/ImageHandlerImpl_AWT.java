@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns.impl1.awt;
+package bagaturchess.scanner.patterns.api;
 
 
 import java.awt.Image;
@@ -31,13 +31,10 @@ import javax.imageio.ImageIO;
 
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
-import bagaturchess.scanner.patterns.api.ImageHandler;
 
 
-public class ImageHandlerSingleton implements ImageHandler<BufferedImage, String> {
-	
-	
-	private static final ImageHandlerSingleton instance;
+class ImageHandlerImpl_AWT implements ImageHandler<BufferedImage, String> {
+
 	
 	
 	private static final String[] piecesSets = new String[] {"set1", "set2", "set3"};
@@ -48,12 +45,10 @@ public class ImageHandlerSingleton implements ImageHandler<BufferedImage, String
 	
     static {
     	
-    	instance = new ImageHandlerSingleton();
-    	
     	try {
 	    	for (int set = 0; set < piecesSets.length; set++) {
 		    	for(int pid = 1; pid <= 12; pid++) {
-		    		BufferedImage image = instance.loadPieceImageFromFS(pid, piecesSets[set]);
+		    		BufferedImage image = loadPieceImageFromFS(pid, piecesSets[set]);
 		    		piecesImagesFromAllSets.put(piecesSets[set] + "_" + pid, image);
 		    	}
 	    	}
@@ -63,12 +58,7 @@ public class ImageHandlerSingleton implements ImageHandler<BufferedImage, String
     }
     
     
-    public static ImageHandlerSingleton getInstance(){
-        return instance;
-    }
-    
-    
-	private ImageHandlerSingleton() {
+	ImageHandlerImpl_AWT() {
 		
 	}
 	
@@ -122,7 +112,7 @@ public class ImageHandlerSingleton implements ImageHandler<BufferedImage, String
 	}
 	
 	
-	private BufferedImage loadPieceImageFromFS(int pid, String piecesSetName) throws IOException {
+	private static BufferedImage loadPieceImageFromFS(int pid, String piecesSetName) throws IOException {
 		
 		String suffix = getSuffix(pid);
 		
@@ -132,7 +122,7 @@ public class ImageHandlerSingleton implements ImageHandler<BufferedImage, String
 	}
 
 
-	private String getSuffix(int pid) {
+	private static String getSuffix(int pid) {
 		
 		String suffix = "";
 		

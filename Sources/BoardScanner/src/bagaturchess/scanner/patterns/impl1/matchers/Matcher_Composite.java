@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
-import bagaturchess.scanner.common.MatchingStatistics;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.patterns.api.MatchingStatistics;
 
 
 public class Matcher_Composite extends Matcher_Base {

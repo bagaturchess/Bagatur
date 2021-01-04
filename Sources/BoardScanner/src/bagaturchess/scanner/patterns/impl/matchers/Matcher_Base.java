@@ -33,9 +33,9 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
-import bagaturchess.scanner.common.MatchingStatistics;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.patterns.api.MatchingStatistics;
 
 
 public abstract class Matcher_Base {

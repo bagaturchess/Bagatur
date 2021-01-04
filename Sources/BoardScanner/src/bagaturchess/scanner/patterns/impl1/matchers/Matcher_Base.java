@@ -33,9 +33,9 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
-import bagaturchess.scanner.common.MatchingStatistics;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.patterns.api.MatchingStatistics;
 
 
 public abstract class Matcher_Base {
@@ -93,7 +93,7 @@ public abstract class Matcher_Base {
 					bestPatternData.x = 0;
 					bestPatternData.y = 0;
 					bestPatternData.size = squareMatrix.length;
-					printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
+					//printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
 					
 					Set<Integer> pidsToSearch = new HashSet<Integer>();
 					pidsToSearch.add(Constants.PID_NONE);
@@ -242,7 +242,7 @@ public abstract class Matcher_Base {
 						bestData = curData_best;
 						bestPID = pid;
 						
-						printInfo(bestData, "" + fieldID + "_best" + (counter++));
+						//printInfo(bestData, "" + fieldID + "_best" + (counter++));
 					}
 				}
 			}

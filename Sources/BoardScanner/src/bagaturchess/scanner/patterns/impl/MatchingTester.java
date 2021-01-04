@@ -31,13 +31,9 @@ import javax.imageio.ImageIO;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
-import bagaturchess.scanner.common.MatchingStatistics;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
-import bagaturchess.scanner.patterns.impl.matchers.Matcher_Base;
-import bagaturchess.scanner.patterns.impl.matchers.Matcher_Composite;
-import bagaturchess.scanner.patterns.impl1.awt.ImageHandlerSingleton;
-import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 
 
 public class MatchingTester {
@@ -49,7 +45,7 @@ public class MatchingTester {
 			
 			ImageProperties imageProperties = new ImageProperties(512, "set3");
 			
-			Image pieceImage = ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_PAWN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize());
+			Image pieceImage = (Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_PAWN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize());
 			BufferedImage piece = createPattern(pieceImage,
 					imageProperties.getSquareSize(),
 					imageProperties.getColorWhiteSquare());

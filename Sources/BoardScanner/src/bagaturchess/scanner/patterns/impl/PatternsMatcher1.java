@@ -28,8 +28,8 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
-import bagaturchess.scanner.common.MatchingStatistics;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.patterns.api.MatchingStatistics;
 import bagaturchess.scanner.patterns.impl.matchers.Matcher_Base;
 import bagaturchess.scanner.patterns.impl.matchers.Matcher_Composite;
 
