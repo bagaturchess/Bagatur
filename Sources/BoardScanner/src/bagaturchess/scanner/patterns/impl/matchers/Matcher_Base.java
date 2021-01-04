@@ -160,7 +160,7 @@ public abstract class Matcher_Base {
 									ScannerUtils.createSquareImage(bgcolor, size)
 									: ScannerUtils.createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, bgcolor, size);
 							if (angle != 0) {
-								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle, 0);
 							}
 							MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
 							
@@ -179,7 +179,7 @@ public abstract class Matcher_Base {
 								ScannerUtils.createSquareImage(bgcolor, size)
 								: ScannerUtils.createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, bgcolor, size);
 						if (angle != 0) {
-							grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+							grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle, 0);
 						}
 						curData[bgcolor] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
 						curData[bgcolor].color = bgcolor;
@@ -196,7 +196,7 @@ public abstract class Matcher_Base {
 									ScannerUtils.createSquareImage(midColor_up, size)
 									: ScannerUtils.createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, midColor_up, size);
 							if (angle != 0) {
-								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle, 0);
 							}
 							curData[midColor_up] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
 							
@@ -221,7 +221,7 @@ public abstract class Matcher_Base {
 									ScannerUtils.createSquareImage(midColor_down, size)
 									: ScannerUtils.createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, midColor_down, size);
 							if (angle != 0) {
-								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle, 0);
 							}
 							curData[midColor_down] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
 							

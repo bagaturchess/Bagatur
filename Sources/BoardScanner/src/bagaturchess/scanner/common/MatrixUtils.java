@@ -261,21 +261,27 @@ public class MatrixUtils {
 	}
 	
 	
-	public static final int[][] rotateMatrix(int[][] source, float angleInDegrees) {
+	public static final int[][] rotateMatrix(int[][] source, float angleInDegrees, int bgcolor) {
 		
-		int[][] result = new int[source.length][source.length];
+		double angleInRadians = (angleInDegrees * Math.PI / 180);
 		
-		double angle = (angleInDegrees * Math.PI / 180);
+		int resultSize = (int) (source.length * (1 + Math.abs((Math.tan(angleInRadians)))));
+		
+		int[][] result = new int[resultSize][resultSize];
+		for (int x = 0; x < result.length; x++) {
+			for (int y = 0; y < result.length; y++) {
+				result[x][y] = bgcolor;
+			}
+		}
+		
 		int centerX = source.length / 2;
 		int centerY = source.length / 2;
 		
 		for (int x = 0; x < source.length; x++) {
 			for (int y = 0; y < source.length; y++) {
-				int x1 = (int) (centerX + (x-centerX)*Math.cos(angle) - (y-centerY)*Math.sin(angle));
-				int y1 = (int) (centerY + (x-centerX)*Math.sin(angle) + (y-centerY)*Math.cos(angle));
-				if (x1 >= 0 && x1 < source.length && y1 >= 0 && y1 < source.length) {
-					result[x1][y1] = source[x][y];
-				}
+				int x1 = (int) (centerX + (x-centerX) * Math.cos(angleInRadians) - (y-centerY) * Math.sin(angleInRadians));
+				int y1 = (int) (centerY + (x-centerX) * Math.sin(angleInRadians) + (y-centerY) * Math.cos(angleInRadians));
+				result[(int) Math.floor(0.5 + x1 + (resultSize - source.length) / 2)][(int) Math.floor(0.5 + y1 + (resultSize - source.length) / 2)] = source[x][y];
 			}
 		}
 		

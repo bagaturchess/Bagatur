@@ -86,7 +86,7 @@ public class ImagePreProcessing {
 					int[][] grayPattern = ScannerUtils.convertToGrayMatrix(ScannerUtils.resizeImage(emptyBoard, size));
 					
 					if (angle != 0) {
-						grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+						grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle, 0);
 					}
 					
 					MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(grayBoard, grayPattern);

@@ -38,7 +38,7 @@ public abstract class Matcher_Base {
 	
 	
 	private static final float SIZE_DELTA_PERCENT = 0.25f;
-	private static final int MAX_ROTATION_PERCENT = 0;
+	private static final int MAX_ROTATION_PERCENT = 1;
 	
 	
 	protected BoardProperties boardProperties;
@@ -133,9 +133,15 @@ public abstract class Matcher_Base {
 		int maxSize = graySquareMatrix.length;
 		int startSize = iterateSize ? (int) ((1 - SIZE_DELTA_PERCENT) * maxSize) : maxSize;
 		
-		for (int size = startSize; size <= maxSize; size++) {
+		for (int angleInDegrees = -MAX_ROTATION_PERCENT; angleInDegrees <= MAX_ROTATION_PERCENT; angleInDegrees++) {
 			
-			for (int angle = -MAX_ROTATION_PERCENT; angle <= MAX_ROTATION_PERCENT; angle++) {
+			for (int size = startSize; size <= maxSize; size++) {
+				
+				double angleInRadians = (angleInDegrees * Math.PI / 180);
+				int rotatedSize = (int) (size * (1 + Math.abs((Math.tan(angleInRadians)))));
+				if (rotatedSize > maxSize) {
+					continue;
+				}
 				
 				MatrixUtils.PatternMatchingData curData_best  = null;
 				
@@ -148,8 +154,8 @@ public abstract class Matcher_Base {
 						int[][] grayPattern = pid == Constants.PID_NONE ?
 								ImageHandlerSingleton.getInstance().createSquareImage(bgcolor, size)
 								: ImageHandlerSingleton.getInstance().createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, bgcolor, size);
-						if (angle != 0) {
-							grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
+						if (angleInDegrees != 0) {
+							grayPattern = MatrixUtils.rotateMatrix(grayPattern, angleInDegrees, bgcolor);
 						}
 						MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
 						

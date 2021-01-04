@@ -135,7 +135,7 @@ public class PatternsMatcher {
 							//if (!emptySquares.contains(fieldID)) {
 								int[][] grayPiece = ScannerUtils.createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, bgcolor, size);
 								if (angle != 0) {
-									grayPiece = MatrixUtils.rotateMatrix(grayPiece, angle);
+									grayPiece = MatrixUtils.rotateMatrix(grayPiece, angle, 0);
 								}
 								//grayPiece = transformPattern(grayPiece);
 								

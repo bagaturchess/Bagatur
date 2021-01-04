@@ -17,22 +17,32 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns.impl1.matchers;
+package bagaturchess.scanner.patterns.impl1;
 
 
 import bagaturchess.scanner.common.BoardProperties;
+import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
+import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor;
 
 
-public class Matcher_Set2 extends Matcher_Base {
+public class PreProcessingMain {
 	
 	
-	public Matcher_Set2(int imageSize) {
-		super(new BoardProperties(imageSize, "set2"));
-	}
-	
-
-	@Override
-	protected double getTotalDeltaThreshold() {
-		return 19;
+	public static void main(String[] args) {
+		
+		try {
+			
+			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test7.png");
+			
+			BoardProperties boardProperties = new BoardProperties(192);
+			ImagePreProcessor processor = new ImagePreProcessor(boardProperties);
+			
+			long startTime = System.currentTimeMillis();
+			processor.filter(image);
+			System.out.println((System.currentTimeMillis() - startTime) + "ms");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
