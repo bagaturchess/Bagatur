@@ -242,7 +242,7 @@ public abstract class Matcher_Base {
 						bestData = curData_best;
 						bestPID = pid;
 						
-						//printInfo(bestData, "" + fieldID + "_best" + (counter++));
+						printInfo(bestData, "" + fieldID + "_best" + (counter++));
 					}
 				}
 			}

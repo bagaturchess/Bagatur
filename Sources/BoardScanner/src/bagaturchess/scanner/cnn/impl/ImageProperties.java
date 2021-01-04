@@ -21,12 +21,7 @@ package bagaturchess.scanner.cnn.impl;
 
 
 import java.awt.Color;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-
-import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.scanner.patterns.impl1.awt.ImageHandlerSingleton;
 
 
 public class ImageProperties {
@@ -36,8 +31,7 @@ public class ImageProperties {
 	private int squareSize;
 	
 	private String piecesSetFileNamePrefix;
-	private BufferedImage[] piecesImages = new BufferedImage[13];
-	
+
 	private Color colorBlackSquare = new Color(120, 120, 120);
 	private Color colorWhiteSquare = new Color(220, 220, 220);
 
@@ -53,26 +47,6 @@ public class ImageProperties {
 		squareSize = getImageSize() / 8;
 		
 		piecesSetFileNamePrefix = _piecesSetFileNamePrefix;
-		
-		loadPiecesImages();
-	}
-	
-	
-	private void loadPiecesImages() throws IOException {
-		
-		piecesImages[Constants.PID_W_KING] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_W_KING, piecesSetFileNamePrefix);
-		piecesImages[Constants.PID_W_QUEEN] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_W_QUEEN, piecesSetFileNamePrefix);
-		piecesImages[Constants.PID_W_ROOK] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_W_ROOK, piecesSetFileNamePrefix);
-		piecesImages[Constants.PID_W_BISHOP] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_W_BISHOP, piecesSetFileNamePrefix);
-		piecesImages[Constants.PID_W_KNIGHT] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_W_KNIGHT, piecesSetFileNamePrefix);
-		piecesImages[Constants.PID_W_PAWN] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_W_PAWN, piecesSetFileNamePrefix);
-		
-		piecesImages[Constants.PID_B_KING] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_B_KING, piecesSetFileNamePrefix);
-		piecesImages[Constants.PID_B_QUEEN] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_B_QUEEN, piecesSetFileNamePrefix);
-		piecesImages[Constants.PID_B_ROOK] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_B_ROOK, piecesSetFileNamePrefix);
-		piecesImages[Constants.PID_B_BISHOP] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_B_BISHOP, piecesSetFileNamePrefix);
-		piecesImages[Constants.PID_B_KNIGHT] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_B_KNIGHT, piecesSetFileNamePrefix);
-		piecesImages[Constants.PID_B_PAWN] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_B_PAWN, piecesSetFileNamePrefix);
 	}
 	
 	
@@ -86,9 +60,9 @@ public class ImageProperties {
 	}
 
 
-	public Image[] getPiecesImages() {
+	/*public Image[] getPiecesImages() {
 		return piecesImages;
-	}
+	}*/
 
 
 	public Color getColorBlackSquare() {
@@ -98,6 +72,11 @@ public class ImageProperties {
 
 	public Color getColorWhiteSquare() {
 		return colorWhiteSquare;
+	}
+	
+	
+	public String getPiecesSetFileNamePrefix() {
+		return piecesSetFileNamePrefix;
 	}
 	
 	

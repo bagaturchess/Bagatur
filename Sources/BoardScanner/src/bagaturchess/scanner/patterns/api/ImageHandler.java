@@ -19,7 +19,9 @@
  */
 package bagaturchess.scanner.patterns.api;
 
+
 import java.io.IOException;
+
 
 /**
  * Handles porting to awt and to android with different implementations
@@ -30,5 +32,5 @@ public interface ImageHandler<T1, T2> {
 	public void saveImage(String fileName, String formatName, T1 image) throws IOException;
 	public int[][] convertToGrayMatrix(T1 image);
 	public T1 createGrayImage(int[][] matrix);
-	public T1 loadPieceImageFromFS(int pid, String piecesSetName) throws IOException;
+	public T1 loadPieceImageFromMemory(int pid, String piecesSetName, int size);
 }

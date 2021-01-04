@@ -20,9 +20,12 @@
 package bagaturchess.scanner.patterns.impl1.awt;
 
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -34,11 +37,29 @@ import bagaturchess.scanner.patterns.api.ImageHandler;
 public class ImageHandlerSingleton implements ImageHandler<BufferedImage, String> {
 	
 	
-	private static ImageHandlerSingleton instance;
+	private static final ImageHandlerSingleton instance;
 	
 	
-    static{
+	private static final String[] piecesSets = new String[] {"set1", "set2", "set3"};
+	
+	private static final Map<String, BufferedImage> piecesImagesFromAllSets = new HashMap<String, BufferedImage>();
+	private static final Map<String, BufferedImage> piecesImagesFromAllSetsAndSizes = new HashMap<String, BufferedImage>();
+	
+	
+    static {
+    	
     	instance = new ImageHandlerSingleton();
+    	
+    	try {
+	    	for (int set = 0; set < piecesSets.length; set++) {
+		    	for(int pid = 1; pid <= 12; pid++) {
+		    		BufferedImage image = instance.loadPieceImageFromFS(pid, piecesSets[set]);
+		    		piecesImagesFromAllSets.put(piecesSets[set] + "_" + pid, image);
+		    	}
+	    	}
+    	} catch (IOException ioe) {
+    		ioe.printStackTrace();
+    	}
     }
     
     
@@ -83,7 +104,35 @@ public class ImageHandlerSingleton implements ImageHandler<BufferedImage, String
 
 
 	@Override
-	public BufferedImage loadPieceImageFromFS(int pid, String piecesSetName) throws IOException {
+	public BufferedImage loadPieceImageFromMemory(int pid, String piecesSetName, int size) {
+		
+		String key = piecesSetName + "_" + pid + "_" + size;
+		BufferedImage result = piecesImagesFromAllSetsAndSizes.get(key);
+		if (result != null) {
+			return result;
+		}
+		
+		Image scaledImage = piecesImagesFromAllSets.get(piecesSetName + "_" + pid).getScaledInstance(size, size, Image.SCALE_SMOOTH);
+		
+		result = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+		result.getGraphics().drawImage(scaledImage, 0, 0, size, size, null);
+		piecesImagesFromAllSetsAndSizes.put(key, result);
+		
+		return result;
+	}
+	
+	
+	private BufferedImage loadPieceImageFromFS(int pid, String piecesSetName) throws IOException {
+		
+		String suffix = getSuffix(pid);
+		
+		String fileName = "./res/" + piecesSetName + suffix;
+		
+		return ImageIO.read(new File(fileName));
+	}
+
+
+	private String getSuffix(int pid) {
 		
 		String suffix = "";
 		
@@ -129,7 +178,7 @@ public class ImageHandlerSingleton implements ImageHandler<BufferedImage, String
 			default:
 				throw new IllegalStateException("pid=" + pid);
 		}
-		return ImageIO.read(new File("./res/" + piecesSetName + suffix));
+		
+		return suffix;
 	}
-
 }

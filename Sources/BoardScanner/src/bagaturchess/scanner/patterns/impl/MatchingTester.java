@@ -36,6 +36,7 @@ import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 import bagaturchess.scanner.patterns.impl.matchers.Matcher_Base;
 import bagaturchess.scanner.patterns.impl.matchers.Matcher_Composite;
+import bagaturchess.scanner.patterns.impl1.awt.ImageHandlerSingleton;
 import bagaturchess.scanner.common.ResultPair;
 
 
@@ -48,7 +49,7 @@ public class MatchingTester {
 			
 			ImageProperties imageProperties = new ImageProperties(512, "set3");
 			
-			Image pieceImage = imageProperties.getPiecesImages()[Constants.PID_B_PAWN];
+			Image pieceImage = ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_PAWN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize());
 			BufferedImage piece = createPattern(pieceImage,
 					imageProperties.getSquareSize(),
 					imageProperties.getColorWhiteSquare());
