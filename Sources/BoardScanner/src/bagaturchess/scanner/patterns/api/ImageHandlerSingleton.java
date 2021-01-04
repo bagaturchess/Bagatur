@@ -127,4 +127,10 @@ public class ImageHandlerSingleton implements ImageHandler<BufferedImage, Color,
 	public Color getAVG(BufferedImage image) {
 		return instance.getAVG(image);
 	}
+
+
+	@Override
+	public BufferedImage extractResult(BufferedImage image, PatternMatchingData bestData) {
+		return instance.extractResult(image, bestData);
+	}
 }

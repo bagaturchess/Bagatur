@@ -27,10 +27,8 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
-import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils;
-import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.common.ResultPair;
 
@@ -99,32 +97,12 @@ public class ImagePreProcessing {
 			//https://stackoverflow.com/questions/42597094/cross-correlation-with-signals-of-different-lengths-in-java
 			//https://stackoverflow.com/questions/13445497/correlation-among-2-images
 			
-			BufferedImage result = extractResult(image, bestData);
+			BufferedImage result = ImageHandlerSingleton.getInstance().extractResult(image, bestData);
 			result = ImageHandlerSingleton.getInstance().enlarge(result, result.getWidth(), 1.03f, ImageHandlerSingleton.getInstance().getAVG(result));
 			ImageHandlerSingleton.getInstance().saveImage("result_" + bestData.size + "_" + bestData.angle + "_" + bestData.delta, "png", result);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	
-	private static BufferedImage extractResult(BufferedImage image, PatternMatchingData matcherData) {
-		
-		int[][][] print = new int[matcherData.size][matcherData.size][3];
-		for (int i = 0; i < matcherData.size; i++) {
-			for (int j = 0; j < matcherData.size; j++) {
-				int rgb = image.getRGB(matcherData.x + i, matcherData.y + j);
-				int red = (rgb & 0xff0000) >> 16;
-				int green = (rgb & 0xff00) >> 8;
-				int blue = rgb & 0xff;
-				//int gray = (int) (red * 0.2989d + green * 0.5870 + blue * 0.1140);
-				print[i][j][0] = red;
-				print[i][j][1] = green;
-				print[i][j][2] = blue;
-			}
-		}
-		
-		return ScannerUtils.createRGBImage(print);
 	}
 }

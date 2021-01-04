@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils;
+import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 
 
 /**
@@ -44,4 +45,5 @@ public interface ImageHandler<T1, T2, T3> {
 	public T2 getColor(int grayColor);
 	public T1 enlarge(T1 image, int initialSize, double scale, T2 bgcolor);
 	public T2 getAVG(T1 image);
+	public T1 extractResult(T1 image, PatternMatchingData bestData);
 }

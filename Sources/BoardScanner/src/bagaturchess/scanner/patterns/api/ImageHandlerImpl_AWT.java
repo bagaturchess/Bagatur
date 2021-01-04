@@ -386,4 +386,25 @@ class ImageHandlerImpl_AWT implements ImageHandler<BufferedImage, Color, String>
         
         return new Color((int) (red / count), (int) (green / count), (int) (blue / count));
 	}
+	
+	
+	@Override
+	public BufferedImage extractResult(BufferedImage image, PatternMatchingData matcherData) {
+		
+		int[][][] print = new int[matcherData.size][matcherData.size][3];
+		for (int i = 0; i < matcherData.size; i++) {
+			for (int j = 0; j < matcherData.size; j++) {
+				int rgb = image.getRGB(matcherData.x + i, matcherData.y + j);
+				int red = (rgb & 0xff0000) >> 16;
+				int green = (rgb & 0xff00) >> 8;
+				int blue = rgb & 0xff;
+				//int gray = (int) (red * 0.2989d + green * 0.5870 + blue * 0.1140);
+				print[i][j][0] = red;
+				print[i][j][1] = green;
+				print[i][j][2] = blue;
+			}
+		}
+		
+		return ScannerUtils.createRGBImage(print);
+	}
 }
