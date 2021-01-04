@@ -20,6 +20,7 @@
 package bagaturchess.scanner.cnn.impl.run;
 
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -47,7 +48,7 @@ public class ScannerTest_FromGeneratedImage {
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache();
 			
 			ImageProperties imageProperties = new ImageProperties(192, "set1");
-			BufferedImage boardImage = ScannerUtils.createBoardImage(imageProperties, bitboard.toEPD());
+			BufferedImage boardImage = ScannerUtils.createBoardImage(imageProperties, bitboard.toEPD(), new Color(220, 220, 220), new Color(120, 120, 120));
 			//ScannerUtils.saveImage("board", boardImage);
 			
 			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, imageProperties);

@@ -48,7 +48,7 @@ public class MatchingTester {
 			Image pieceImage = (Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_PAWN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize());
 			BufferedImage piece = createPattern(pieceImage,
 					imageProperties.getSquareSize(),
-					imageProperties.getColorWhiteSquare());
+					new Color(220, 220, 220));
 			//ImageIO.read(new File("./res/set3_b_p.png"));
 			//BufferedImage image_board = ImageIO.read(new File("./data/tests/lichess.org/test1.png"));
 			//BufferedImage image_board = ImageIO.read(new File("./data/tests/chess.com/test1.png"));

@@ -20,6 +20,7 @@
 package bagaturchess.scanner.cnn.impl.model;
 
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import bagaturchess.scanner.cnn.impl.ImageProperties;
@@ -39,8 +40,8 @@ public class DataSetInitPair_ByPiecesSetAndSquareColor extends DataSetInitPair {
 		imageProperties = _imageProperties;
 		
 		for (int pid = 0; pid <= 12; pid++) {
-			BufferedImage whiteImage = ScannerUtils.createPieceImage(imageProperties, pid, imageProperties.getColorWhiteSquare());
-			BufferedImage blackImage = ScannerUtils.createPieceImage(imageProperties, pid, imageProperties.getColorBlackSquare());
+			BufferedImage whiteImage = ScannerUtils.createPieceImage(imageProperties, pid, new Color(220, 220, 220));
+			BufferedImage blackImage = ScannerUtils.createPieceImage(imageProperties, pid, new Color(120, 120, 120));
 			images.add(ScannerUtils.convertToGrayMatrix(whiteImage));
 			images.add(ScannerUtils.convertToGrayMatrix(blackImage));
 			if (pid == 0) {

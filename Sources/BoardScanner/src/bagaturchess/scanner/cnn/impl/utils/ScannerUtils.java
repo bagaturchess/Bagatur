@@ -362,7 +362,7 @@ public class ScannerUtils {
 	}
 	
 	
-	public static BufferedImage createBoardImage(ImageProperties imageProperties, String fen) {
+	public static BufferedImage createBoardImage(ImageProperties imageProperties, String fen, Color whiteSquareColor, Color blackSquareColor) {
 		
 		BufferedImage image = new BufferedImage(imageProperties.getImageSize(), imageProperties.getImageSize(), BufferedImage.TYPE_INT_RGB);
 		
@@ -372,9 +372,9 @@ public class ScannerUtils {
 			for (int j = 0; j < 8; j++) {
 				
 				if ((i + j) % 2 == 0) {
-					g.setColor(imageProperties.getColorWhiteSquare());
+					g.setColor(whiteSquareColor);
 				} else {
-					g.setColor(imageProperties.getColorBlackSquare());
+					g.setColor(blackSquareColor);
 				}
 				
 				g.fillRect(i * imageProperties.getSquareSize(), j * imageProperties.getSquareSize(), imageProperties.getSquareSize(), imageProperties.getSquareSize());
@@ -404,51 +404,51 @@ public class ScannerUtils {
 				positionCount -= Character.digit(character, 10);
 				break;
 			case 'P':
-				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_W_PAWN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? imageProperties.getColorWhiteSquare() : imageProperties.getColorBlackSquare(), null);
+				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_W_PAWN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? whiteSquareColor : blackSquareColor, null);
 				positionCount--;
 				break;
 			case 'N':
-				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_W_KNIGHT, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? imageProperties.getColorWhiteSquare() : imageProperties.getColorBlackSquare(), null);
+				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_W_KNIGHT, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? whiteSquareColor : blackSquareColor, null);
 				positionCount--;
 				break;
 			case 'B':
-				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_W_BISHOP, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? imageProperties.getColorWhiteSquare() : imageProperties.getColorBlackSquare(), null);
+				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_W_BISHOP, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? whiteSquareColor : blackSquareColor, null);
 				positionCount--;
 				break;
 			case 'R':
-				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_W_ROOK, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? imageProperties.getColorWhiteSquare() : imageProperties.getColorBlackSquare(), null);
+				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_W_ROOK, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? whiteSquareColor : blackSquareColor, null);
 				positionCount--;
 				break;
 			case 'Q':
-				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_W_QUEEN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? imageProperties.getColorWhiteSquare() : imageProperties.getColorBlackSquare(), null);
+				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_W_QUEEN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? whiteSquareColor : blackSquareColor, null);
 				positionCount--;
 				break;
 			case 'K':
-				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_W_KING, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? imageProperties.getColorWhiteSquare() : imageProperties.getColorBlackSquare(), null);
+				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_W_KING, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? whiteSquareColor : blackSquareColor, null);
 				positionCount--;
 				break;
 			case 'p':
-				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_PAWN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? imageProperties.getColorWhiteSquare() : imageProperties.getColorBlackSquare(), null);
+				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_PAWN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? whiteSquareColor : blackSquareColor, null);
 				positionCount--;
 				break;
 			case 'n':
-				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_KNIGHT, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? imageProperties.getColorWhiteSquare() : imageProperties.getColorBlackSquare(), null);
+				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_KNIGHT, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? whiteSquareColor : blackSquareColor, null);
 				positionCount--;
 				break;
 			case 'b':
-				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_BISHOP, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? imageProperties.getColorWhiteSquare() : imageProperties.getColorBlackSquare(), null);
+				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_BISHOP, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? whiteSquareColor : blackSquareColor, null);
 				positionCount--;
 				break;
 			case 'r':
-				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_ROOK, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? imageProperties.getColorWhiteSquare() : imageProperties.getColorBlackSquare(), null);
+				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_ROOK, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? whiteSquareColor : blackSquareColor, null);
 				positionCount--;
 				break;
 			case 'q':
-				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_QUEEN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? imageProperties.getColorWhiteSquare() : imageProperties.getColorBlackSquare(), null);
+				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_QUEEN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? whiteSquareColor : blackSquareColor, null);
 				positionCount--;
 				break;
 			case 'k':
-				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_KING, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? imageProperties.getColorWhiteSquare() : imageProperties.getColorBlackSquare(), null);
+				g.drawImage((Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_KING, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize()), x, y, imageProperties.getSquareSize(), imageProperties.getSquareSize(), whiteSquare ? whiteSquareColor : blackSquareColor, null);
 				positionCount--;
 				break;
 			}

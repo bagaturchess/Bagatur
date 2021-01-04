@@ -62,10 +62,10 @@ public class ImagePreProcessing {
 			//ScannerUtils.saveImage("white", ScannerUtils.createGrayImage(whiteSquare), "png");
 			//ScannerUtils.saveImage("black", ScannerUtils.createGrayImage(blackSquare), "png");
 			
-			imageProperties.setColorWhiteSquare(ScannerUtils.GRAY_COLORS[bgcolours.getFirst()]);
-			imageProperties.setColorBlackSquare(ScannerUtils.GRAY_COLORS[bgcolours.getSecond()]);
+			Color whiteSquareColor = ScannerUtils.GRAY_COLORS[bgcolours.getFirst()];
+			Color blackSquareColor = ScannerUtils.GRAY_COLORS[bgcolours.getSecond()];
 			
-			BufferedImage emptyBoard = ScannerUtils.createBoardImage(imageProperties, "8/8/8/8/8/8/8/8");
+			BufferedImage emptyBoard = ScannerUtils.createBoardImage(imageProperties, "8/8/8/8/8/8/8/8", whiteSquareColor, blackSquareColor);
 			ScannerUtils.saveImage("board_empty", emptyBoard, "png");
 			
 			//image = ScannerUtils.enlarge(image, imageProperties.getImageSize(), 1.125f);

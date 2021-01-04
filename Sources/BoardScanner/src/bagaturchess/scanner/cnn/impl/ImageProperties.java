@@ -20,10 +20,6 @@
 package bagaturchess.scanner.cnn.impl;
 
 
-import java.awt.Color;
-import java.io.IOException;
-
-
 public class ImageProperties {
 	
 	
@@ -31,17 +27,14 @@ public class ImageProperties {
 	private int squareSize;
 	
 	private String piecesSetFileNamePrefix;
-
-	private Color colorBlackSquare = new Color(120, 120, 120);
-	private Color colorWhiteSquare = new Color(220, 220, 220);
-
-
-	public ImageProperties(int _imageSize) throws IOException {
+	
+	
+	public ImageProperties(int _imageSize) {
 		this(_imageSize, "set1");
 	}
 	
 	
-	public ImageProperties(int _imageSize, String _piecesSetFileNamePrefix) throws IOException {
+	public ImageProperties(int _imageSize, String _piecesSetFileNamePrefix) {
 		
 		imageSize = _imageSize;
 		squareSize = getImageSize() / 8;
@@ -53,39 +46,14 @@ public class ImageProperties {
 	public int getImageSize() {
 		return imageSize;
 	}
-
-
+	
+	
 	public int getSquareSize() {
 		return squareSize;
-	}
-
-
-	/*public Image[] getPiecesImages() {
-		return piecesImages;
-	}*/
-
-
-	public Color getColorBlackSquare() {
-		return colorBlackSquare;
-	}
-
-
-	public Color getColorWhiteSquare() {
-		return colorWhiteSquare;
 	}
 	
 	
 	public String getPiecesSetFileNamePrefix() {
 		return piecesSetFileNamePrefix;
-	}
-	
-	
-	public void setColorBlackSquare(Color colorBlackSquare) {
-		this.colorBlackSquare = colorBlackSquare;
-	}
-
-
-	public void setColorWhiteSquare(Color colorWhiteSquare) {
-		this.colorWhiteSquare = colorWhiteSquare;
 	}
 }
