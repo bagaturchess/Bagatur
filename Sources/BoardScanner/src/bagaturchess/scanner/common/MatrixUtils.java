@@ -197,7 +197,8 @@ public class MatrixUtils {
 		                count++;
 		                
 		                stats.addValue(Math.abs(pixelSource - pixelPattern), Math.abs(pixelSource - pixelPattern));
-		                /*if (result != null && cur.delta > result.delta) {
+		                
+		                /*if (result != null && cur.delta/ (double) (count) > result.delta) {
 		                	i = grayPattern.length;
 		                	break;
 		                }*/

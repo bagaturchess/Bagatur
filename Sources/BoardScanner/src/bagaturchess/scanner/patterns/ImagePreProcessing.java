@@ -50,7 +50,7 @@ public class ImagePreProcessing {
 			
 			ImageProperties imageProperties = new ImageProperties(256, "set3");
 			
-			BufferedImage image = ImageIO.read(new File("./data/tests/preprocess/test6.png"));
+			BufferedImage image = ImageIO.read(new File("./data/tests/preprocess/test7.png"));
 			image = ScannerUtils.resizeImage(image, imageProperties.getImageSize());
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image);
 			

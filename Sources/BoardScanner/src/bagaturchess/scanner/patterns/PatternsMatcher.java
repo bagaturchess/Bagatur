@@ -42,9 +42,9 @@ public class PatternsMatcher {
 		
 		try {
 			
-			ImageProperties imageProperties = new ImageProperties(256, "set3");
+			ImageProperties imageProperties = new ImageProperties(256, "set2");
 			
-			BufferedImage image_board = ImageIO.read(new File("./data/tests/test9.png"));
+			BufferedImage image_board = ImageIO.read(new File("./data/tests/test11.png"));
 			image_board = ScannerUtils.resizeImage(image_board, imageProperties.getImageSize());
 			//ScannerUtils.saveImage("board", image_board, "png");
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image_board);
