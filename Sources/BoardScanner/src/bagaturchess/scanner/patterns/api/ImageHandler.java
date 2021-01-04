@@ -17,33 +17,18 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns.impl;
+package bagaturchess.scanner.patterns.api;
 
+import java.io.IOException;
 
-import java.awt.image.BufferedImage;
-
-import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
-
-
-public class BGColorTester {
-	
-	
-	public static void main(String[] args) {
-		
-		try {
-			
-			int[][] imageMatrix = ScannerUtils.createSquareImage(137, 64);
-			System.out.println(imageMatrix[0][0]);
-			BufferedImage image = ScannerUtils.createGrayImage(imageMatrix);
-			ScannerUtils.saveImage("source", image, "png");
-			
-			imageMatrix = ScannerUtils.convertToGrayMatrix(image);
-			
-			int avg = ScannerUtils.getAVG(imageMatrix);
-			System.out.println(avg);
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+/**
+ * Handles porting to awt and to android with different implementations
+ */
+public interface ImageHandler<T1, T2> {
+	public T1 loadImageFromFS(T2 path) throws IOException;
+	public T1 resizeImage(T1 source, int newsize);
+	public void saveImage(String fileName, String formatName, T1 image) throws IOException;
+	public int[][] convertToGrayMatrix(T1 image);
+	public T1 createGrayImage(int[][] matrix);
+	public T1 loadPieceImageFromFS(int pid, String piecesSetName) throws IOException;
 }

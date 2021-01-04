@@ -17,33 +17,24 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns.impl;
+package bagaturchess.scanner.patterns.impl1.matchers;
 
 
-import java.awt.image.BufferedImage;
+import java.io.IOException;
 
-import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.cnn.impl.ImageProperties;
 
 
-public class BGColorTester {
+public class LichessOrg extends Matcher_Base {
 	
 	
-	public static void main(String[] args) {
-		
-		try {
-			
-			int[][] imageMatrix = ScannerUtils.createSquareImage(137, 64);
-			System.out.println(imageMatrix[0][0]);
-			BufferedImage image = ScannerUtils.createGrayImage(imageMatrix);
-			ScannerUtils.saveImage("source", image, "png");
-			
-			imageMatrix = ScannerUtils.convertToGrayMatrix(image);
-			
-			int avg = ScannerUtils.getAVG(imageMatrix);
-			System.out.println(avg);
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public LichessOrg(int imageSize) throws IOException {
+		super(new ImageProperties(imageSize, "set1"));
+	}
+	
+	
+	@Override
+	protected double getTotalDeltaThreshold() {
+		return 320;
 	}
 }

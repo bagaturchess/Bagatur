@@ -17,17 +17,24 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns.impl.matchers;
+package bagaturchess.scanner.patterns.impl1.matchers;
 
 
-public class MatchingStatistics {
+import java.io.IOException;
+
+import bagaturchess.scanner.cnn.impl.ImageProperties;
+
+
+public class ChessCom extends Matcher_Base {
 	
 	
-	public double totalDelta;
-	public String matcherName;
+	public ChessCom(int imageSize) throws IOException {
+		super(new ImageProperties(imageSize, "set3"));
+	}
 	
-	
-	public MatchingStatistics() {
-		
+
+	@Override
+	protected double getTotalDeltaThreshold() {
+		return 120;
 	}
 }

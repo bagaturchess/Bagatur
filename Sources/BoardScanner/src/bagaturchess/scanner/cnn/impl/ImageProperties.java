@@ -22,12 +22,11 @@ package bagaturchess.scanner.cnn.impl;
 
 import java.awt.Color;
 import java.awt.Image;
-import java.io.File;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.scanner.patterns.impl1.awt.ImageHandlerSingleton;
 
 
 public class ImageProperties {
@@ -37,7 +36,7 @@ public class ImageProperties {
 	private int squareSize;
 	
 	private String piecesSetFileNamePrefix;
-	private Image[] piecesImages = new Image[13];
+	private BufferedImage[] piecesImages = new BufferedImage[13];
 	
 	private Color colorBlackSquare = new Color(120, 120, 120);
 	private Color colorWhiteSquare = new Color(220, 220, 220);
@@ -59,21 +58,21 @@ public class ImageProperties {
 	}
 	
 	
-	private void loadPiecesImages() throws IOException{
+	private void loadPiecesImages() throws IOException {
 		
-		piecesImages[Constants.PID_W_KING] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_k.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
-		piecesImages[Constants.PID_W_QUEEN] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_q.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
-		piecesImages[Constants.PID_W_ROOK] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_r.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
-		piecesImages[Constants.PID_W_BISHOP] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_b.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
-		piecesImages[Constants.PID_W_KNIGHT] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_n.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
-		piecesImages[Constants.PID_W_PAWN] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_w_p.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
+		piecesImages[Constants.PID_W_KING] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_W_KING, piecesSetFileNamePrefix);
+		piecesImages[Constants.PID_W_QUEEN] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_W_QUEEN, piecesSetFileNamePrefix);
+		piecesImages[Constants.PID_W_ROOK] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_W_ROOK, piecesSetFileNamePrefix);
+		piecesImages[Constants.PID_W_BISHOP] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_W_BISHOP, piecesSetFileNamePrefix);
+		piecesImages[Constants.PID_W_KNIGHT] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_W_KNIGHT, piecesSetFileNamePrefix);
+		piecesImages[Constants.PID_W_PAWN] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_W_PAWN, piecesSetFileNamePrefix);
 		
-		piecesImages[Constants.PID_B_KING] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_k.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
-		piecesImages[Constants.PID_B_QUEEN] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_q.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
-		piecesImages[Constants.PID_B_ROOK] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_r.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
-		piecesImages[Constants.PID_B_BISHOP] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_b.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
-		piecesImages[Constants.PID_B_KNIGHT] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_n.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
-		piecesImages[Constants.PID_B_PAWN] = ImageIO.read(new File("./res/" + piecesSetFileNamePrefix + "_b_p.png")).getScaledInstance(getSquareSize(), getSquareSize(), Image.SCALE_SMOOTH);
+		piecesImages[Constants.PID_B_KING] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_B_KING, piecesSetFileNamePrefix);
+		piecesImages[Constants.PID_B_QUEEN] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_B_QUEEN, piecesSetFileNamePrefix);
+		piecesImages[Constants.PID_B_ROOK] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_B_ROOK, piecesSetFileNamePrefix);
+		piecesImages[Constants.PID_B_BISHOP] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_B_BISHOP, piecesSetFileNamePrefix);
+		piecesImages[Constants.PID_B_KNIGHT] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_B_KNIGHT, piecesSetFileNamePrefix);
+		piecesImages[Constants.PID_B_PAWN] = ImageHandlerSingleton.getInstance().loadPieceImageFromFS(Constants.PID_B_PAWN, piecesSetFileNamePrefix);
 	}
 	
 	

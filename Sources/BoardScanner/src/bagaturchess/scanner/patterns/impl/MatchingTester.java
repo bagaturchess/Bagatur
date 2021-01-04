@@ -31,11 +31,11 @@ import javax.imageio.ImageIO;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.MatchingStatistics;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 import bagaturchess.scanner.patterns.impl.matchers.Matcher_Base;
 import bagaturchess.scanner.patterns.impl.matchers.Matcher_Composite;
-import bagaturchess.scanner.patterns.impl.matchers.MatchingStatistics;
 import bagaturchess.scanner.common.ResultPair;
 
 

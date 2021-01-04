@@ -20,7 +20,6 @@
 package bagaturchess.scanner.common;
 
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;
-import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 
 
 public class MatrixUtils {

@@ -17,33 +17,17 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns.impl;
+package bagaturchess.scanner.common;
 
 
-import java.awt.image.BufferedImage;
-
-import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
-
-
-public class BGColorTester {
+public class MatchingStatistics {
 	
 	
-	public static void main(String[] args) {
+	public double totalDelta;
+	public String matcherName;
+	
+	
+	public MatchingStatistics() {
 		
-		try {
-			
-			int[][] imageMatrix = ScannerUtils.createSquareImage(137, 64);
-			System.out.println(imageMatrix[0][0]);
-			BufferedImage image = ScannerUtils.createGrayImage(imageMatrix);
-			ScannerUtils.saveImage("source", image, "png");
-			
-			imageMatrix = ScannerUtils.convertToGrayMatrix(image);
-			
-			int avg = ScannerUtils.getAVG(imageMatrix);
-			System.out.println(avg);
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }
