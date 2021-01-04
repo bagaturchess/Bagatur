@@ -42,4 +42,6 @@ public interface ImageHandler<T1, T2, T3> {
 	public int[][] createPieceImage(String pieceSetName, int pid, int bgcolor, int size);
 	public T1 createBoardImage(BoardProperties boardProperties, String fen, T2 whiteSquareColor, T2 blackSquareColor);
 	public T2 getColor(int grayColor);
+	public T1 enlarge(T1 image, int initialSize, double scale, T2 bgcolor);
+	public T2 getAVG(T1 image);
 }

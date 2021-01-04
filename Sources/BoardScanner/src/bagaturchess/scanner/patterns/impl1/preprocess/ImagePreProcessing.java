@@ -100,7 +100,7 @@ public class ImagePreProcessing {
 			//https://stackoverflow.com/questions/13445497/correlation-among-2-images
 			
 			BufferedImage result = extractResult(image, bestData);
-			result = ScannerUtils.enlarge(result, result.getWidth(), 1.03f, ScannerUtils.getAVG(result));
+			result = ImageHandlerSingleton.getInstance().enlarge(result, result.getWidth(), 1.03f, ImageHandlerSingleton.getInstance().getAVG(result));
 			ImageHandlerSingleton.getInstance().saveImage("result_" + bestData.size + "_" + bestData.angle + "_" + bestData.delta, "png", result);
 			
 		} catch (Exception e) {
@@ -126,26 +126,5 @@ public class ImagePreProcessing {
 		}
 		
 		return ScannerUtils.createRGBImage(print);
-	}
-
-
-	protected static void printInfo_RGB(BufferedImage image, MatrixUtils.PatternMatchingData matcherData, String fileName) {
-		
-		int[][][] print = new int[matcherData.size][matcherData.size][3];
-		for (int i = 0; i < matcherData.size; i++) {
-			for (int j = 0; j < matcherData.size; j++) {
-				int rgb = image.getRGB(matcherData.x + i, matcherData.y + j);
-				int red = (rgb & 0xff0000) >> 16;
-				int green = (rgb & 0xff00) >> 8;
-				int blue = rgb & 0xff;
-				//int gray = (int) (red * 0.2989d + green * 0.5870 + blue * 0.1140);
-				print[i][j][0] = red;
-				print[i][j][1] = green;
-				print[i][j][2] = blue;
-			}
-		}
-		
-		BufferedImage resultImage = ScannerUtils.createRGBImage(print);
-		ScannerUtils.saveImage(fileName, resultImage, "png");
 	}
 }

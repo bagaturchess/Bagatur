@@ -22,6 +22,7 @@ package bagaturchess.scanner.patterns.api;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -343,5 +344,46 @@ class ImageHandlerImpl_AWT implements ImageHandler<BufferedImage, Color, String>
 	@Override
 	public Color getColor(int grayColor) {
 		return GRAY_COLORS[grayColor];
+	}
+	
+	
+	@Override
+	public BufferedImage enlarge(BufferedImage image, int initialSize, double scale, Color bgcolor) {
+		
+		BufferedImage result = new BufferedImage((int) (initialSize * scale), (int) (initialSize * scale), BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = (Graphics2D) result.getGraphics();
+		g.setColor(bgcolor);
+		g.fillRect(0, 0, result.getWidth(), result.getHeight());
+		g.drawImage(image.getScaledInstance(image.getWidth(), image.getHeight(), Image.SCALE_SMOOTH),
+				(int) (initialSize * (scale - 1) / 2f),
+				(int) (initialSize * (scale - 1) / 2f),
+				image.getWidth(), image.getHeight(), null);
+		
+		return result;
+	}
+	
+	
+	@Override
+	public Color getAVG(BufferedImage image) {
+		
+		if (image.getHeight() != image.getWidth()) {
+			throw new IllegalStateException();
+		}
+		
+		long red = 0;
+		long green = 0;
+		long blue = 0;
+		long count = 0;
+        for (int i = 0; i < image.getHeight(); i++) { 
+            for (int j = 0; j < image.getWidth(); j++) {
+            	int rgb = image.getRGB(i, j);
+				red += (rgb & 0xff0000) >> 16;
+				green += (rgb & 0xff00) >> 8;
+				blue += rgb & 0xff;
+				count++;
+            }
+        }
+        
+        return new Color((int) (red / count), (int) (green / count), (int) (blue / count));
 	}
 }

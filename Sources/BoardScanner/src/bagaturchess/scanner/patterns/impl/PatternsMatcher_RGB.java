@@ -34,6 +34,7 @@ import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 
 
 public class PatternsMatcher_RGB {
@@ -72,7 +73,7 @@ public class PatternsMatcher_RGB {
 				
 				MatrixUtils.PatternMatchingData matcherData = matchImages(boardProperties, rgbBoard,
 	            		pid,
-	            		ScannerUtils.getAVG(image_board),
+	            		ImageHandlerSingleton.getInstance().getAVG(image_board),
 	            		boardProperties.getSquareSize(),
 	            		0.25f, 0);
 	            

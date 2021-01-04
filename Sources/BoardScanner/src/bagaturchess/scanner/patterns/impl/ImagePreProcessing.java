@@ -103,7 +103,7 @@ public class ImagePreProcessing {
 			//https://stackoverflow.com/questions/13445497/correlation-among-2-images
 			
 			BufferedImage result = extractResult(image, bestData);
-			result = ScannerUtils.enlarge(result, result.getWidth(), 1.03f, ScannerUtils.getAVG(result));
+			result = ScannerUtils.enlarge(result, result.getWidth(), 1.03f, ImageHandlerSingleton.getInstance().getAVG(result));
 			ScannerUtils.saveImage("result_" + bestData.size + "_" + bestData.angle + "_" + bestData.delta, result, "png");
 			
 		} catch (Exception e) {

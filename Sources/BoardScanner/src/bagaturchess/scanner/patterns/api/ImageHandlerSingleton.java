@@ -115,4 +115,16 @@ public class ImageHandlerSingleton implements ImageHandler<BufferedImage, Color,
 	public Color getColor(int grayColor) {
 		return instance.getColor(grayColor);
 	}
+
+
+	@Override
+	public BufferedImage enlarge(BufferedImage image, int initialSize, double scale, Color bgcolor) {
+		return instance.enlarge(image, initialSize, scale, bgcolor);
+	}
+
+
+	@Override
+	public Color getAVG(BufferedImage image) {
+		return instance.getAVG(image);
+	}
 }
