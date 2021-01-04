@@ -22,6 +22,8 @@ package bagaturchess.scanner.patterns;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -45,6 +47,7 @@ public class PatternsMatcher1 {
 			image_board = ScannerUtils.resizeImage(image_board, 256);
 			ScannerUtils.saveImage("board_original", image_board, "png");
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image_board);
+			//grayBoard = filterBackground(grayBoard);
 			ScannerUtils.saveImage("board_gray", ScannerUtils.createGrayImage(grayBoard), "png");
 			
 			Matcher_Base matcher = new Matcher_Composite(256);
@@ -54,5 +57,46 @@ public class PatternsMatcher1 {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	
+	private static int[][] filterBackground(int[][] grayBoard) {
+		
+		Set<Integer> emptySquares = ScannerUtils.getEmptySquares(grayBoard);
+		ResultPair<Integer, Integer> bgcolors = ScannerUtils.getSquaresColor(grayBoard, emptySquares);
+		
+		//ScannerUtils.get
+		
+		return setBackground(grayBoard, emptySquares, bgcolors.getFirst(), bgcolors.getSecond(), 128);
+	}
+	
+	
+	private static int[][] setBackground(int[][] grayBoard, Set<Integer> emptySquares, int whiteSquare, int blackSquare, int color) {
+		
+		int[][] result = new int[grayBoard.length][grayBoard.length];
+		
+		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
+			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
+				
+				int file = i / (grayBoard.length / 8);
+				int rank = j / (grayBoard.length / 8);
+				int fieldID = 63 - (file + 8 * rank);
+				int bgcolor = (file + rank) % 2 == 0 ? whiteSquare : blackSquare;
+				
+				if (!emptySquares.contains(fieldID)) {
+					for (int i1 = i; i1 < i + grayBoard.length / 8; i1++) {
+						for (int j1 = j; j1 < j + grayBoard.length / 8; j1++) {
+							if (Math.abs(grayBoard[i1][j1] - bgcolor) <= -1) {
+								result[i1][j1] = color;
+							} else {
+								result[i1][j1] = grayBoard[i1][j1];
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return result;
 	}
 }
