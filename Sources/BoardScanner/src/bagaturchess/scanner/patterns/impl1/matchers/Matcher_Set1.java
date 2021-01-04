@@ -23,16 +23,16 @@ package bagaturchess.scanner.patterns.impl1.matchers;
 import bagaturchess.scanner.common.BoardProperties;
 
 
-public class ChessCom_Manual extends Matcher_Base {
+public class Matcher_Set1 extends Matcher_Base {
 	
 	
-	public ChessCom_Manual(int imageSize) {
-		super(new BoardProperties(imageSize, "set2"));
+	public Matcher_Set1(int imageSize) {
+		super(new BoardProperties(imageSize, "set1"));
 	}
 	
-
+	
 	@Override
 	protected double getTotalDeltaThreshold() {
-		return 20;
+		return 320;
 	}
 }

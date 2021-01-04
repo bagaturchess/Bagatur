@@ -39,13 +39,13 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		super(null);
 		
-		matchers.add(new LichessOrg(imageSize));
-		matchers.add(new ChessCom(imageSize));
-		matchers.add(new ChessCom_Manual(imageSize));
+		matchers.add(new Matcher_Set1(imageSize));
+		matchers.add(new Matcher_Set3(imageSize));
+		matchers.add(new Matcher_Set2(imageSize));
 		
-		matchers_64.add(new LichessOrg(64));
-		matchers_64.add(new ChessCom(64));
-		matchers_64.add(new ChessCom_Manual(64));
+		matchers_64.add(new Matcher_Set1(64));
+		matchers_64.add(new Matcher_Set3(64));
+		matchers_64.add(new Matcher_Set2(64));
 	}
 	
 	
