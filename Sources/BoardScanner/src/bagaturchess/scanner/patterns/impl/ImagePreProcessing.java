@@ -30,8 +30,8 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 import bagaturchess.scanner.common.ResultPair;
@@ -48,27 +48,27 @@ public class ImagePreProcessing {
 		
 		try {
 			
-			ImageProperties imageProperties = new ImageProperties(256, "set3");
+			BoardProperties boardProperties = new BoardProperties(256, "set3");
 			
 			BufferedImage image = ImageIO.read(new File("./data/tests/preprocess/test7.png"));
-			image = ScannerUtils.resizeImage(image, imageProperties.getImageSize());
+			image = ScannerUtils.resizeImage(image, boardProperties.getImageSize());
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image);
 			
 			Set<Integer> emptySquares = ScannerUtils.getEmptySquares(grayBoard);
 			ResultPair<Integer, Integer> bgcolours = ScannerUtils.getSquaresColor(grayBoard, emptySquares);
 			
-			//int[][] whiteSquare = ScannerUtils.createSquareImage(bgcolours.getFirst(), imageProperties.getImageSize());
-			//int[][] blackSquare = ScannerUtils.createSquareImage(bgcolours.getSecond(), imageProperties.getImageSize());
+			//int[][] whiteSquare = ScannerUtils.createSquareImage(bgcolours.getFirst(), boardProperties.getImageSize());
+			//int[][] blackSquare = ScannerUtils.createSquareImage(bgcolours.getSecond(), boardProperties.getImageSize());
 			//ScannerUtils.saveImage("white", ScannerUtils.createGrayImage(whiteSquare), "png");
 			//ScannerUtils.saveImage("black", ScannerUtils.createGrayImage(blackSquare), "png");
 			
 			Color whiteSquareColor = ScannerUtils.GRAY_COLORS[bgcolours.getFirst()];
 			Color blackSquareColor = ScannerUtils.GRAY_COLORS[bgcolours.getSecond()];
 			
-			BufferedImage emptyBoard = ScannerUtils.createBoardImage(imageProperties, "8/8/8/8/8/8/8/8", whiteSquareColor, blackSquareColor);
+			BufferedImage emptyBoard = ScannerUtils.createBoardImage(boardProperties, "8/8/8/8/8/8/8/8", whiteSquareColor, blackSquareColor);
 			ScannerUtils.saveImage("board_empty", emptyBoard, "png");
 			
-			//image = ScannerUtils.enlarge(image, imageProperties.getImageSize(), 1.125f);
+			//image = ScannerUtils.enlarge(image, boardProperties.getImageSize(), 1.125f);
 			//grayBoard = ScannerUtils.convertToGrayMatrix(image);
 			ScannerUtils.saveImage("board_input", ScannerUtils.createGrayImage(grayBoard), "png");
 			

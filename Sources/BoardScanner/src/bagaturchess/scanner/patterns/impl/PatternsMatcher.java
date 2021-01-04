@@ -29,8 +29,8 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;
-import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 
@@ -42,10 +42,10 @@ public class PatternsMatcher {
 		
 		try {
 			
-			ImageProperties imageProperties = new ImageProperties(256, "set2");
+			BoardProperties boardProperties = new BoardProperties(256, "set2");
 			
 			BufferedImage image_board = ImageIO.read(new File("./data/tests/test11.png"));
-			image_board = ScannerUtils.resizeImage(image_board, imageProperties.getImageSize());
+			image_board = ScannerUtils.resizeImage(image_board, boardProperties.getImageSize());
 			//ScannerUtils.saveImage("board", image_board, "png");
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image_board);
 			//board = transformPattern(board);
@@ -69,10 +69,10 @@ public class PatternsMatcher {
 			for (int pid = 1; pid <= 12; pid++) {
 			//for (int pid = 5; pid <= 5; pid++) {
 				
-				MatrixUtils.PatternMatchingData matcherData = matchImages(imageProperties, grayBoard,
+				MatrixUtils.PatternMatchingData matcherData = matchImages(boardProperties, grayBoard,
 	            		pid,
 	            		bgcolors,
-	            		imageProperties.getSquareSize(),
+	            		boardProperties.getSquareSize(),
 	            		0.25f, 0);
 	            
 				printInfo(grayBoard, matcherData, "best_" + pid + "_" + matcherData.size + "_" + matcherData.angle);
@@ -111,7 +111,7 @@ public class PatternsMatcher {
 	}
 	
 	
-	private static final MatrixUtils.PatternMatchingData matchImages(ImageProperties imageProperties, int[][] graySource, int pid, List<Integer> bgcolors, int maxSize, float sizeDeltaPercent, int rotationAngleInDegrees) {
+	private static final MatrixUtils.PatternMatchingData matchImages(BoardProperties boardProperties, int[][] graySource, int pid, List<Integer> bgcolors, int maxSize, float sizeDeltaPercent, int rotationAngleInDegrees) {
 		
 		MatrixUtils.PatternMatchingData result = new MatrixUtils.PatternMatchingData();
 		result.delta = Double.MAX_VALUE;
@@ -133,7 +133,7 @@ public class PatternsMatcher {
 							//int bgcolor = (file + rank) % 2 == 0 ? bgcolorsOfSquares.getFirst() : bgcolorsOfSquares.getSecond();
 									
 							//if (!emptySquares.contains(fieldID)) {
-								int[][] grayPiece = ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
+								int[][] grayPiece = ScannerUtils.createPieceImage(boardProperties, pid, bgcolor, size);
 								if (angle != 0) {
 									grayPiece = MatrixUtils.rotateMatrix(grayPiece, angle);
 								}

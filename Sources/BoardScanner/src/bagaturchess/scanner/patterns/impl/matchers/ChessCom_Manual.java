@@ -22,14 +22,14 @@ package bagaturchess.scanner.patterns.impl.matchers;
 
 import java.io.IOException;
 
-import bagaturchess.scanner.cnn.impl.ImageProperties;
+import bagaturchess.scanner.common.BoardProperties;
 
 
 public class ChessCom_Manual extends Matcher_Base {
 	
 	
 	public ChessCom_Manual(int imageSize) throws IOException {
-		super(new ImageProperties(imageSize, "set2"));
+		super(new BoardProperties(imageSize, "set2"));
 	}
 	
 

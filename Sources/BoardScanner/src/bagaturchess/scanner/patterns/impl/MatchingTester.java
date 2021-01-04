@@ -29,8 +29,8 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
@@ -43,11 +43,11 @@ public class MatchingTester {
 		
 		try {
 			
-			ImageProperties imageProperties = new ImageProperties(512, "set3");
+			BoardProperties boardProperties = new BoardProperties(512, "set3");
 			
-			Image pieceImage = (Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_PAWN, imageProperties.getPiecesSetFileNamePrefix(), imageProperties.getSquareSize());
+			Image pieceImage = (Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(Constants.PID_B_PAWN, boardProperties.getPiecesSetFileNamePrefix(), boardProperties.getSquareSize());
 			BufferedImage piece = createPattern(pieceImage,
-					imageProperties.getSquareSize(),
+					boardProperties.getSquareSize(),
 					new Color(220, 220, 220));
 			//ImageIO.read(new File("./res/set3_b_p.png"));
 			//BufferedImage image_board = ImageIO.read(new File("./data/tests/lichess.org/test1.png"));
@@ -61,7 +61,7 @@ public class MatchingTester {
 			
 			PatternMatchingData best = null;
 			
-			for (int size = 8; size <= imageProperties.getSquareSize(); size++) {
+			for (int size = 8; size <= boardProperties.getSquareSize(); size++) {
 				Image patternImage = pattern.getScaledInstance(size, size, Image.SCALE_SMOOTH);
 				BufferedImage patternScaled = createPattern(patternImage, size, ScannerUtils.getAVG(piece));
 				int[][] grayPattern = ScannerUtils.convertToGrayMatrix(patternScaled);

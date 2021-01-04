@@ -27,10 +27,10 @@ import javax.imageio.ImageIO;
 
 import bagaturchess.scanner.cnn.impl.BoardScanner;
 import bagaturchess.scanner.cnn.impl.BoardScanner_RGB;
-import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel_RGB;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.BoardProperties;
 
 
 public class ScannerTest_FromImageFile {
@@ -43,13 +43,13 @@ public class ScannerTest_FromImageFile {
 		
 		try {
 			
-			ImageProperties imageProperties = new ImageProperties(192);
+			BoardProperties boardProperties = new BoardProperties(192);
 			
-			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, imageProperties);
+			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, boardProperties);
 			
 			BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test1.png"));
 			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/test7.png"));
-			boardImage = ScannerUtils.resizeImage(boardImage, imageProperties.getImageSize());
+			boardImage = ScannerUtils.resizeImage(boardImage, boardProperties.getImageSize());
 			
 			BoardScanner scanner = new BoardScanner_RGB(netmodel);
 			

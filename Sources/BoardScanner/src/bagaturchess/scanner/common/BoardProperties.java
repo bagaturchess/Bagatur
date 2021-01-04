@@ -17,10 +17,10 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.cnn.impl;
+package bagaturchess.scanner.common;
 
 
-public class ImageProperties {
+public class BoardProperties {
 	
 	
 	private int imageSize;
@@ -29,12 +29,12 @@ public class ImageProperties {
 	private String piecesSetFileNamePrefix;
 	
 	
-	public ImageProperties(int _imageSize) {
+	public BoardProperties(int _imageSize) {
 		this(_imageSize, "set1");
 	}
 	
 	
-	public ImageProperties(int _imageSize, String _piecesSetFileNamePrefix) {
+	public BoardProperties(int _imageSize, String _piecesSetFileNamePrefix) {
 		
 		imageSize = _imageSize;
 		squareSize = getImageSize() / 8;

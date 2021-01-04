@@ -8,10 +8,10 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.scanner.cnn.impl.BoardScanner;
 import bagaturchess.scanner.cnn.impl.BoardScanner_RGB;
-import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel_RGB;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
@@ -29,11 +29,11 @@ public class ScannerCheck {
 			
 			String filePath = "./stockfish-12.cg";
 			
-			ImageProperties imageProperties = new ImageProperties(192, "set1");
+			BoardProperties boardProperties = new BoardProperties(192, "set1");
 			
-			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, imageProperties);
+			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, boardProperties);
 			
-			PositionsVisitor visitor = new ScannerCheckVisitor(new BoardScanner_RGB(netmodel), imageProperties);
+			PositionsVisitor visitor = new ScannerCheckVisitor(new BoardScanner_RGB(netmodel), boardProperties);
 			
 			System.out.println("Reading games ... ");
 			while (true) {
@@ -60,13 +60,13 @@ public class ScannerCheck {
 		private double sumDiffs1;
 		private double sumDiffs2;
 		
-		private ImageProperties imageProperties;
+		private BoardProperties boardProperties;
 		
 		private BoardScanner scanner;
 		
 		
-		public ScannerCheckVisitor(BoardScanner _scanner, ImageProperties _imageProperties) throws Exception {
-			imageProperties = _imageProperties;
+		public ScannerCheckVisitor(BoardScanner _scanner, BoardProperties _imageProperties) throws Exception {
+			boardProperties = _imageProperties;
 			scanner = _scanner;
 		}
 		
@@ -74,7 +74,7 @@ public class ScannerCheck {
 		@Override
 		public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
 	        
-			BufferedImage image = ScannerUtils.createBoardImage(imageProperties, bitboard.toEPD(), new Color(220, 220, 220),new Color(120, 120, 120));
+			BufferedImage image = ScannerUtils.createBoardImage(boardProperties, bitboard.toEPD(), new Color(220, 220, 220),new Color(120, 120, 120));
 			
 			//ScannerUtils.saveImage(bitboard.toEPD(), image);
 			int[][] expected_input = ScannerUtils.convertToGrayMatrix(image);

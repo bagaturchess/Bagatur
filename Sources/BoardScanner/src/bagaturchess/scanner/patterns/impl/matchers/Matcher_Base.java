@@ -31,8 +31,8 @@ import java.util.Set;
 
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
-import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
@@ -45,11 +45,11 @@ public abstract class Matcher_Base {
 	private static final int MAX_ROTATION_PERCENT = 0;
 	
 	
-	protected ImageProperties imageProperties;
+	protected BoardProperties boardProperties;
 	
 	
-	protected Matcher_Base(ImageProperties _imageProperties) throws IOException {
-		imageProperties = _imageProperties;
+	protected Matcher_Base(BoardProperties _imageProperties) throws IOException {
+		boardProperties = _imageProperties;
 	}
 	
 	
@@ -63,7 +63,7 @@ public abstract class Matcher_Base {
 	
 	protected ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, boolean iterateBGColors) {
 		
-		if (grayBoard.length != imageProperties.getImageSize()) {
+		if (grayBoard.length != boardProperties.getImageSize()) {
 			throw new IllegalStateException();
 		}
 		
@@ -127,7 +127,7 @@ public abstract class Matcher_Base {
 		}
 		
 		result.totalDelta = result.totalDelta / (double) (64 - emptySquares.size());
-		//result.totalDelta *= imageProperties.getSquareSize() * Math.sqrt(imageProperties.getSquareSize());
+		//result.totalDelta *= boardProperties.getSquareSize() * Math.sqrt(boardProperties.getSquareSize());
 		
 		return new ResultPair<String, MatchingStatistics> (ScannerUtils.createFENFromPIDs(pids), result);
 	}
@@ -160,7 +160,7 @@ public abstract class Matcher_Base {
 							
 							int[][] grayPattern = pid == Constants.PID_NONE ?
 									ScannerUtils.createSquareImage(bgcolor, size)
-									: ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
+									: ScannerUtils.createPieceImage(boardProperties, pid, bgcolor, size);
 							if (angle != 0) {
 								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
 							}
@@ -179,7 +179,7 @@ public abstract class Matcher_Base {
 						
 						int[][] grayPattern = pid == Constants.PID_NONE ?
 								ScannerUtils.createSquareImage(bgcolor, size)
-								: ScannerUtils.createPieceImage(imageProperties, pid, bgcolor, size);
+								: ScannerUtils.createPieceImage(boardProperties, pid, bgcolor, size);
 						if (angle != 0) {
 							grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
 						}
@@ -196,7 +196,7 @@ public abstract class Matcher_Base {
 							midColor_up = (lowColor_up + highColor_up) / 2;
 							grayPattern = pid == Constants.PID_NONE ?
 									ScannerUtils.createSquareImage(midColor_up, size)
-									: ScannerUtils.createPieceImage(imageProperties, pid, midColor_up, size);
+									: ScannerUtils.createPieceImage(boardProperties, pid, midColor_up, size);
 							if (angle != 0) {
 								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
 							}
@@ -221,7 +221,7 @@ public abstract class Matcher_Base {
 							midColor_down = (lowColor_down + highColor_down) / 2;
 							grayPattern = pid == Constants.PID_NONE ?
 									ScannerUtils.createSquareImage(midColor_down, size)
-									: ScannerUtils.createPieceImage(imageProperties, pid, midColor_down, size);
+									: ScannerUtils.createPieceImage(boardProperties, pid, midColor_down, size);
 							if (angle != 0) {
 								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
 							}

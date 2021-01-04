@@ -9,12 +9,12 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.model.DataSetInitPair;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel_Gray;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel_RGB;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.BoardProperties;
 import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.net.train.BackpropagationTrainer;
 import deepnetts.net.train.TrainingEvent;
@@ -38,9 +38,9 @@ public class ScannerLearning {
 		
 		try {
 			
-			ImageProperties imageProperties = new ImageProperties(192);
+			BoardProperties boardProperties = new BoardProperties(192);
 			
-			netmodel = new NetworkModel_RGB(NET_FILE, imageProperties);
+			netmodel = new NetworkModel_RGB(NET_FILE, boardProperties);
 			
 			String[] inputFiles = new String[] {
 				"./data/tests/lichess.org/test1.png",
@@ -50,7 +50,7 @@ public class ScannerLearning {
 				//"./data/tests/chess.com/test1.png",
 			};
 			
-			DataSetInitPair[] pairs = getInitPairs(imageProperties, inputFiles);
+			DataSetInitPair[] pairs = getInitPairs(boardProperties, inputFiles);
 			
 			List<Object> images = new ArrayList<Object>();
 			List<Integer> pids = new ArrayList<Integer>();
@@ -148,18 +148,18 @@ public class ScannerLearning {
 	}
 	
 	
-	private static DataSetInitPair[] getInitPairs(ImageProperties imageProperties, String[] fileNames) throws IOException {
+	private static DataSetInitPair[] getInitPairs(BoardProperties boardProperties, String[] fileNames) throws IOException {
 		DataSetInitPair[] result = new DataSetInitPair[fileNames.length];
 		for (int i = 0; i < result.length; i++) {			
-			result[i] = getInitPair(imageProperties, fileNames[i]);
+			result[i] = getInitPair(boardProperties, fileNames[i]);
 		}
 		return result;
 	}
 	
 	
-	private static DataSetInitPair getInitPair(ImageProperties imageProperties, String fileName) throws IOException {
+	private static DataSetInitPair getInitPair(BoardProperties boardProperties, String fileName) throws IOException {
 		BufferedImage boardImage = ImageIO.read(new File(fileName));
-		boardImage = ScannerUtils.resizeImage(boardImage, imageProperties.getImageSize());
+		boardImage = ScannerUtils.resizeImage(boardImage, boardProperties.getImageSize());
 		DataSetInitPair pair = netmodel.createDataSetInitPair(boardImage);
 		return pair;
 	}
