@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns;
+package bagaturchess.scanner.patterns.impl;
 
 
 import java.awt.Color;
@@ -33,10 +33,10 @@ import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
+import bagaturchess.scanner.patterns.impl.matchers.Matcher_Base;
+import bagaturchess.scanner.patterns.impl.matchers.Matcher_Composite;
+import bagaturchess.scanner.patterns.impl.matchers.MatchingStatistics;
 import bagaturchess.scanner.common.ResultPair;
-import bagaturchess.scanner.patterns.matchers.Matcher_Base;
-import bagaturchess.scanner.patterns.matchers.Matcher_Composite;
-import bagaturchess.scanner.patterns.matchers.MatchingStatistics;
 
 
 public class MatchingTester {

@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns.matchers;
+package bagaturchess.scanner.patterns.impl.matchers;
 
 
 import java.io.IOException;
@@ -25,16 +25,16 @@ import java.io.IOException;
 import bagaturchess.scanner.cnn.impl.ImageProperties;
 
 
-public class LichessOrg extends Matcher_Base {
+public class ChessCom extends Matcher_Base {
 	
 	
-	public LichessOrg(int imageSize) throws IOException {
-		super(new ImageProperties(imageSize, "set1"));
+	public ChessCom(int imageSize) throws IOException {
+		super(new ImageProperties(imageSize, "set3"));
 	}
 	
-	
+
 	@Override
 	protected double getTotalDeltaThreshold() {
-		return 320;
+		return 120;
 	}
 }

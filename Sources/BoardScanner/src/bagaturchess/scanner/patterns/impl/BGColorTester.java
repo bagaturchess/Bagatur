@@ -17,46 +17,62 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns;
+package bagaturchess.scanner.patterns.impl;
 
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.imageio.ImageIO;
 
-import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.scanner.cnn.impl.ImageProperties;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 
 
-public class ColorAdjustmentTester {
+public class BGColorTester {
 	
 	
 	public static void main(String[] args) {
 		
 		try {
 			
-			BufferedImage image = ImageIO.read(new File("./data/tests/square2.png"));
-			image = ScannerUtils.resizeImage(image, Math.min(image.getHeight(), image.getWidth()));
+			int[][] imageMatrix = ScannerUtils.createSquareImage(137, 64);
+			System.out.println(imageMatrix[0][0]);
+			BufferedImage image = ScannerUtils.createGrayImage(imageMatrix);
+			ScannerUtils.saveImage("source", image, "png");
+			
+			imageMatrix = ScannerUtils.convertToGrayMatrix(image);
+			
+			int avg = ScannerUtils.getAVG(imageMatrix);
+			System.out.println(avg);
+			
+			
+			/*BufferedImage image = ImageIO.read(new File("./data/tests/14_square.png"));
+			image = ScannerUtils.convertToGrayScale(image);
 			int[][] grayImage = ScannerUtils.convertToGrayMatrix(image);
 			
 			BufferedImage resultImage = ScannerUtils.createGrayImage(grayImage);
 			ScannerUtils.saveImage("input", resultImage, "png");
 			
-			//System.out.println("size is " + grayImage.length);
+			int count = 0;
+			long gray = 0;
+			for (int i = 0; i < grayImage.length; i++) {
+				for (int j = 0; j < grayImage.length; j++) {
+					gray += grayImage[i][j] * grayImage[i][j];
+					count++;
+				}
+			}
 			
-			ImageProperties imageProperties = new ImageProperties(632);
 			int bgcolor = ScannerUtils.getAVG(grayImage);
+			int bgcolor1 = (int) (gray / (count * count));
+			System.out.println("bgcolor=" + bgcolor + ", calc=" + bgcolor1);
 			
-			int[][] pieceImage = ScannerUtils.createPieceImage(imageProperties, Constants.PID_B_KNIGHT, bgcolor, imageProperties.getSquareSize());
-			BufferedImage resultImage1 = ScannerUtils.createGrayImage(pieceImage);
-			ScannerUtils.saveImage("step1", resultImage1, "png");
-			
-			pieceImage = ScannerUtils.createPieceImage(imageProperties, Constants.PID_B_KNIGHT, bgcolor, bgcolor, imageProperties.getSquareSize());
-			BufferedImage resultImage2 = ScannerUtils.createGrayImage(pieceImage);
-			ScannerUtils.saveImage("step2", resultImage2, "png");
-			
+			int[][] generated = ScannerUtils.createSquareImage(bgcolor, grayImage.length);
+			BufferedImage resultImage1 = ScannerUtils.createGrayImage(generated);
+			ScannerUtils.saveImage("test", resultImage1, "png");
+			*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

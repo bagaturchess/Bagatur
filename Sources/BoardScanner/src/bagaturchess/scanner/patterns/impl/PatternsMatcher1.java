@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns;
+package bagaturchess.scanner.patterns.impl;
 
 
 import java.awt.image.BufferedImage;
@@ -29,9 +29,9 @@ import javax.imageio.ImageIO;
 
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.ResultPair;
-import bagaturchess.scanner.patterns.matchers.Matcher_Base;
-import bagaturchess.scanner.patterns.matchers.Matcher_Composite;
-import bagaturchess.scanner.patterns.matchers.MatchingStatistics;
+import bagaturchess.scanner.patterns.impl.matchers.Matcher_Base;
+import bagaturchess.scanner.patterns.impl.matchers.Matcher_Composite;
+import bagaturchess.scanner.patterns.impl.matchers.MatchingStatistics;
 
 
 public class PatternsMatcher1 {

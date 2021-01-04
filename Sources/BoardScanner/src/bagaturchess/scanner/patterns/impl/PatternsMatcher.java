@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns;
+package bagaturchess.scanner.patterns.impl;
 
 
 import java.awt.image.BufferedImage;
