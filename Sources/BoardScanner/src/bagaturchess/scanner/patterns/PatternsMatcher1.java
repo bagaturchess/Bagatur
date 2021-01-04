@@ -39,12 +39,13 @@ public class PatternsMatcher1 {
 		
 		try {
 			
-			BufferedImage image_board = ImageIO.read(new File("./data/tests/test10.png"));
+			BufferedImage image_board = ImageIO.read(new File("./data/tests/test12.png"));
 			//BufferedImage image_board = ImageIO.read(new File("./data/tests/lichess.org/test1.png"));
 			//BufferedImage image_board = ImageIO.read(new File("./data/tests/chess.com/test1.png"));
 			image_board = ScannerUtils.resizeImage(image_board, 256);
-			ScannerUtils.saveImage("board", image_board, "png");
+			ScannerUtils.saveImage("board_original", image_board, "png");
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image_board);
+			ScannerUtils.saveImage("board_gray", ScannerUtils.createGrayImage(grayBoard), "png");
 			
 			Matcher_Base matcher = new Matcher_Composite(256);
 			ResultPair<String, MatchingStatistics> result = matcher.scan(grayBoard);

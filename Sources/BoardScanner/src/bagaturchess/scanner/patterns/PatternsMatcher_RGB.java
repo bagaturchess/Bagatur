@@ -84,6 +84,7 @@ public class PatternsMatcher_RGB {
 		}
 	}
 	
+	
 	private static void printInfo(MatrixUtils.PatternMatchingData matcherData, String fileName) {
 		
 		int[][] print = new int[matcherData.size][matcherData.size];

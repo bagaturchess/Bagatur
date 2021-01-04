@@ -95,7 +95,7 @@ public abstract class Matcher_Base {
 					printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
 					
 					Set<Integer> pidsToSearch = new HashSet<Integer>();
-					//pidsToSearch.add(Constants.PID_NONE);
+					pidsToSearch.add(Constants.PID_NONE);
 					if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_W_PAWN);
 					pidsToSearch.add(Constants.PID_W_KNIGHT);
 					pidsToSearch.add(Constants.PID_W_BISHOP);

@@ -41,7 +41,7 @@ public class ImagePreProcessing {
 	
 	
 	private static final double SIZE_DELTA_PERCENT = 0.1;
-	private static final int MAX_ROTATION_PERCENT = 1;
+	private static final int MAX_ROTATION_PERCENT = 0;
 	
 	
 	public static void main(String[] args) {
@@ -50,7 +50,7 @@ public class ImagePreProcessing {
 			
 			ImageProperties imageProperties = new ImageProperties(256, "set3");
 			
-			BufferedImage image = ImageIO.read(new File("./data/tests/preprocess/test5.jpg"));
+			BufferedImage image = ImageIO.read(new File("./data/tests/preprocess/test6.png"));
 			image = ScannerUtils.resizeImage(image, imageProperties.getImageSize());
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image);
 			
@@ -98,6 +98,8 @@ public class ImagePreProcessing {
 			//https://stackoverflow.com/questions/13390238/jtransforms-fft-on-image
 			//matched filter in signal processing
 			//https://stackoverflow.com/questions/12598818/finding-a-picture-in-a-picture-with-java
+			//https://stackoverflow.com/questions/42597094/cross-correlation-with-signals-of-different-lengths-in-java
+			//https://stackoverflow.com/questions/13445497/correlation-among-2-images
 			
 			BufferedImage result = extractResult(image, bestData);
 			result = ScannerUtils.enlarge(result, result.getWidth(), 1.03f, ScannerUtils.getAVG(result));

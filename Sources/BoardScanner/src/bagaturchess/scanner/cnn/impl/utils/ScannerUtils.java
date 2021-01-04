@@ -129,7 +129,7 @@ public class ScannerUtils {
 		
 		for (Integer fieldID: squaresStats.keySet()) {
 			VarStatistic squareStat = squaresStats.get(fieldID);
-			if (squareStat.getDisperse() < colorDeviations.getEntropy() - colorDeviations.getDisperse() / 7.9f) {
+			if (squareStat.getDisperse() < colorDeviations.getEntropy() - colorDeviations.getDisperse() / 3.5f) {
 				emptySquaresIDs.add(fieldID);
 			}
 		}
