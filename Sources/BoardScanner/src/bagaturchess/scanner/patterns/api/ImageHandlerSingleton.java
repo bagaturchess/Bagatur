@@ -28,10 +28,10 @@ import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 
 
-public class ImageHandlerSingleton implements ImageHandler<BufferedImage, Color, String> {
+public class ImageHandlerSingleton implements ImageHandler {
 	
 	
-	private static final ImageHandler<BufferedImage, Color, String> instance;
+	private static final ImageHandler instance;
 	
 	
     static {
@@ -39,43 +39,43 @@ public class ImageHandlerSingleton implements ImageHandler<BufferedImage, Color,
     }
     
     
-    public static ImageHandler<BufferedImage, Color, String> getInstance(){
+    public static ImageHandler getInstance(){
         return instance;
     }
 
 
 	@Override
-	public BufferedImage loadImageFromFS(String path) throws IOException {
+	public Object loadImageFromFS(Object path) throws IOException {
 		return instance.loadImageFromFS(path);
 	}
 
 
 	@Override
-	public BufferedImage resizeImage(BufferedImage source, int newsize) {
+	public Object resizeImage(Object source, int newsize) {
 		return instance.resizeImage(source, newsize);
 	}
 
 
 	@Override
-	public void saveImage(String fileName, String formatName, BufferedImage image) throws IOException {
+	public void saveImage(String fileName, String formatName, Object image) throws IOException {
 		instance.saveImage(fileName, formatName, image);
 	}
 
 
 	@Override
-	public int[][] convertToGrayMatrix(BufferedImage image) {
+	public int[][] convertToGrayMatrix(Object image) {
 		return instance.convertToGrayMatrix(image);
 	}
 
 
 	@Override
-	public BufferedImage createGrayImage(int[][] matrix) {
+	public Object createGrayImage(int[][] matrix) {
 		return instance.createGrayImage(matrix);
 	}
 
 
 	@Override
-	public BufferedImage loadPieceImageFromMemory(int pid, String piecesSetName, int size) {
+	public Object loadPieceImageFromMemory(int pid, String piecesSetName, int size) {
 		return instance.loadPieceImageFromMemory(pid, piecesSetName, size);
 	}
 
@@ -105,32 +105,32 @@ public class ImageHandlerSingleton implements ImageHandler<BufferedImage, Color,
 
 
 	@Override
-	public BufferedImage createBoardImage(BoardProperties boardProperties, String fen, Color whiteSquareColor,
-			Color blackSquareColor) {
+	public Object createBoardImage(BoardProperties boardProperties, String fen, Object whiteSquareColor,
+			Object blackSquareColor) {
 		return instance.createBoardImage(boardProperties, fen, whiteSquareColor, blackSquareColor);
 	}
 
 
 	@Override
-	public Color getColor(int grayColor) {
+	public Object getColor(int grayColor) {
 		return instance.getColor(grayColor);
 	}
 
 
 	@Override
-	public BufferedImage enlarge(BufferedImage image, int initialSize, double scale, Color bgcolor) {
-		return instance.enlarge(image, initialSize, scale, bgcolor);
+	public Object enlarge(Object image, double scale, Object bgcolor) {
+		return instance.enlarge(image, scale, bgcolor);
 	}
 
 
 	@Override
-	public Color getAVG(BufferedImage image) {
+	public Object getAVG(Object image) {
 		return instance.getAVG(image);
 	}
 
 
 	@Override
-	public BufferedImage extractResult(BufferedImage image, PatternMatchingData bestData) {
+	public Object extractResult(Object image, PatternMatchingData bestData) {
 		return instance.extractResult(image, bestData);
 	}
 }

@@ -75,7 +75,7 @@ public class ScannerCheck {
 		@Override
 		public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
 	        
-			BufferedImage image = ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, bitboard.toEPD(), new Color(220, 220, 220),new Color(120, 120, 120));
+			BufferedImage image = (BufferedImage) ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, bitboard.toEPD(), new Color(220, 220, 220),new Color(120, 120, 120));
 			
 			//ScannerUtils.saveImage(bitboard.toEPD(), image);
 			int[][] expected_input = ScannerUtils.convertToGrayMatrix(image);

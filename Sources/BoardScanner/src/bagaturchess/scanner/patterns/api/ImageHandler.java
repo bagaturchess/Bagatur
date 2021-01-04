@@ -30,20 +30,20 @@ import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 /**
  * Handles porting to awt and to android with different implementations
  */
-public interface ImageHandler<T1, T2, T3> {
-	public T1 loadImageFromFS(T3 path) throws IOException;
-	public T1 resizeImage(T1 source, int newsize);
-	public void saveImage(String fileName, String formatName, T1 image) throws IOException;
-	public int[][] convertToGrayMatrix(T1 image);
-	public T1 createGrayImage(int[][] matrix);
-	public T1 loadPieceImageFromMemory(int pid, String piecesSetName, int size);
+public interface ImageHandler {
+	public Object loadImageFromFS(Object path) throws IOException;
+	public Object resizeImage(Object source, int newsize);
+	public void saveImage(String fileName, String formatName, Object image) throws IOException;
+	public int[][] convertToGrayMatrix(Object image);
+	public Object createGrayImage(int[][] matrix);
+	public Object loadPieceImageFromMemory(int pid, String piecesSetName, int size);
 	public void printInfo(int[][] source, MatrixUtils.PatternMatchingData matcherData, String fileName);
 	public void printInfo(MatrixUtils.PatternMatchingData matcherData, String fileName);
 	public int[][] createSquareImage(int bgcolor, int size);
 	public int[][] createPieceImage(String pieceSetName, int pid, int bgcolor, int size);
-	public T1 createBoardImage(BoardProperties boardProperties, String fen, T2 whiteSquareColor, T2 blackSquareColor);
-	public T2 getColor(int grayColor);
-	public T1 enlarge(T1 image, int initialSize, double scale, T2 bgcolor);
-	public T2 getAVG(T1 image);
-	public T1 extractResult(T1 image, PatternMatchingData bestData);
+	public Object createBoardImage(BoardProperties boardProperties, String fen, Object whiteSquareColor, Object blackSquareColor);
+	public Object getColor(int grayColor);
+	public Object enlarge(Object image, double scale, Object bgcolor);
+	public Object getAVG(Object image);
+	public Object extractResult(Object image, PatternMatchingData bestData);
 }

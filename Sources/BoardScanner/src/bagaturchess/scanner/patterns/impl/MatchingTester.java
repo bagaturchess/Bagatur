@@ -63,7 +63,7 @@ public class MatchingTester {
 			
 			for (int size = 8; size <= boardProperties.getSquareSize(); size++) {
 				Image patternImage = pattern.getScaledInstance(size, size, Image.SCALE_SMOOTH);
-				BufferedImage patternScaled = createPattern(patternImage, size, ImageHandlerSingleton.getInstance().getAVG(piece));
+				BufferedImage patternScaled = createPattern(patternImage, size, (Color) ImageHandlerSingleton.getInstance().getAVG(piece));
 				int[][] grayPattern = ScannerUtils.convertToGrayMatrix(patternScaled);
 				
 				//BufferedImage resultImage = ScannerUtils.createGrayImage(grayPattern);

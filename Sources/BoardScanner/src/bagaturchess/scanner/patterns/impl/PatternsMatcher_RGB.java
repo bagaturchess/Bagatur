@@ -73,7 +73,7 @@ public class PatternsMatcher_RGB {
 				
 				MatrixUtils.PatternMatchingData matcherData = matchImages(boardProperties, rgbBoard,
 	            		pid,
-	            		ImageHandlerSingleton.getInstance().getAVG(image_board),
+	            		(Color) ImageHandlerSingleton.getInstance().getAVG(image_board),
 	            		boardProperties.getSquareSize(),
 	            		0.25f, 0);
 	            

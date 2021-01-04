@@ -66,7 +66,7 @@ public class ImagePreProcessing {
 			Color whiteSquareColor = ScannerUtils.GRAY_COLORS[bgcolours.getFirst()];
 			Color blackSquareColor = ScannerUtils.GRAY_COLORS[bgcolours.getSecond()];
 			
-			BufferedImage emptyBoard = ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, "8/8/8/8/8/8/8/8", whiteSquareColor, blackSquareColor);
+			BufferedImage emptyBoard = (BufferedImage) ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, "8/8/8/8/8/8/8/8", whiteSquareColor, blackSquareColor);
 			ScannerUtils.saveImage("board_empty", emptyBoard, "png");
 			
 			//image = ScannerUtils.enlarge(image, boardProperties.getImageSize(), 1.125f);
@@ -103,7 +103,7 @@ public class ImagePreProcessing {
 			//https://stackoverflow.com/questions/13445497/correlation-among-2-images
 			
 			BufferedImage result = extractResult(image, bestData);
-			result = ScannerUtils.enlarge(result, result.getWidth(), 1.03f, ImageHandlerSingleton.getInstance().getAVG(result));
+			result = ScannerUtils.enlarge(result, result.getWidth(), 1.03f, (Color) ImageHandlerSingleton.getInstance().getAVG(result));
 			ScannerUtils.saveImage("result_" + bestData.size + "_" + bestData.angle + "_" + bestData.delta, result, "png");
 			
 		} catch (Exception e) {

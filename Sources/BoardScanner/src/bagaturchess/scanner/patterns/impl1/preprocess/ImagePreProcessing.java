@@ -20,12 +20,7 @@
 package bagaturchess.scanner.patterns.impl1.preprocess;
 
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.Set;
-
-import javax.imageio.ImageIO;
 
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils;
@@ -44,9 +39,9 @@ public class ImagePreProcessing {
 		
 		try {
 			
-			BoardProperties boardProperties = new BoardProperties(256, "set3");
+			BoardProperties boardProperties = new BoardProperties(256);
 			
-			BufferedImage image = ImageIO.read(new File("./data/tests/preprocess/test7.png"));
+			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test7.png");
 			image = ImageHandlerSingleton.getInstance().resizeImage(image, boardProperties.getImageSize());
 			int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(image);
 			
@@ -58,10 +53,10 @@ public class ImagePreProcessing {
 			//ScannerUtils.saveImage("white", ScannerUtils.createGrayImage(whiteSquare), "png");
 			//ScannerUtils.saveImage("black", ScannerUtils.createGrayImage(blackSquare), "png");
 			
-			Color whiteSquareColor = ImageHandlerSingleton.getInstance().getColor(bgcolours.getFirst());
-			Color blackSquareColor = ImageHandlerSingleton.getInstance().getColor(bgcolours.getSecond());
+			Object whiteSquareColor = ImageHandlerSingleton.getInstance().getColor(bgcolours.getFirst());
+			Object blackSquareColor = ImageHandlerSingleton.getInstance().getColor(bgcolours.getSecond());
 			
-			BufferedImage emptyBoard = ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, "8/8/8/8/8/8/8/8", whiteSquareColor, blackSquareColor);
+			Object emptyBoard = ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, "8/8/8/8/8/8/8/8", whiteSquareColor, blackSquareColor);
 			ImageHandlerSingleton.getInstance().saveImage("board_empty", "png", emptyBoard);
 			
 			//image = ScannerUtils.enlarge(image, boardProperties.getImageSize(), 1.125f);
@@ -97,8 +92,8 @@ public class ImagePreProcessing {
 			//https://stackoverflow.com/questions/42597094/cross-correlation-with-signals-of-different-lengths-in-java
 			//https://stackoverflow.com/questions/13445497/correlation-among-2-images
 			
-			BufferedImage result = ImageHandlerSingleton.getInstance().extractResult(image, bestData);
-			result = ImageHandlerSingleton.getInstance().enlarge(result, result.getWidth(), 1.03f, ImageHandlerSingleton.getInstance().getAVG(result));
+			Object result = ImageHandlerSingleton.getInstance().extractResult(image, bestData);
+			result = ImageHandlerSingleton.getInstance().enlarge(result, 1.03f, ImageHandlerSingleton.getInstance().getAVG(result));
 			ImageHandlerSingleton.getInstance().saveImage("result_" + bestData.size + "_" + bestData.angle + "_" + bestData.delta, "png", result);
 			
 		} catch (Exception e) {
