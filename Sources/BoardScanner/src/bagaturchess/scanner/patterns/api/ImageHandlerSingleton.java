@@ -20,25 +20,26 @@
 package bagaturchess.scanner.patterns.api;
 
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 
 
-public class ImageHandlerSingleton implements ImageHandler<BufferedImage, String> {
+public class ImageHandlerSingleton implements ImageHandler<BufferedImage, Color, String> {
 	
 	
-	private static final ImageHandler<BufferedImage, String> instance;
+	private static final ImageHandler<BufferedImage, Color, String> instance;
 	
 	
     static {
-    	
     	instance = new bagaturchess.scanner.patterns.api.ImageHandlerImpl_AWT();
     }
     
     
-    public static ImageHandler getInstance(){
+    public static ImageHandler<BufferedImage, Color, String> getInstance(){
         return instance;
     }
 
@@ -100,5 +101,18 @@ public class ImageHandlerSingleton implements ImageHandler<BufferedImage, String
 	@Override
 	public int[][] createPieceImage(String pieceSetName, int pid, int bgcolor, int size) {
 		return instance.createPieceImage(pieceSetName, pid, bgcolor, size);
+	}
+
+
+	@Override
+	public BufferedImage createBoardImage(BoardProperties boardProperties, String fen, Color whiteSquareColor,
+			Color blackSquareColor) {
+		return instance.createBoardImage(boardProperties, fen, whiteSquareColor, blackSquareColor);
+	}
+
+
+	@Override
+	public Color getColor(int grayColor) {
+		return instance.getColor(grayColor);
 	}
 }

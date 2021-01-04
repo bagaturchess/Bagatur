@@ -12,6 +12,7 @@ import bagaturchess.scanner.cnn.impl.model.NetworkModel;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel_RGB;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
+import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
@@ -74,7 +75,7 @@ public class ScannerCheck {
 		@Override
 		public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
 	        
-			BufferedImage image = ScannerUtils.createBoardImage(boardProperties, bitboard.toEPD(), new Color(220, 220, 220),new Color(120, 120, 120));
+			BufferedImage image = ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, bitboard.toEPD(), new Color(220, 220, 220),new Color(120, 120, 120));
 			
 			//ScannerUtils.saveImage(bitboard.toEPD(), image);
 			int[][] expected_input = ScannerUtils.convertToGrayMatrix(image);

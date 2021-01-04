@@ -22,7 +22,6 @@ package bagaturchess.scanner.cnn.impl.run;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
@@ -32,8 +31,7 @@ import bagaturchess.scanner.cnn.impl.model.NetworkModel;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel_RGB;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
-import deepnetts.net.NeuralNetwork;
-import deepnetts.util.FileIO;
+import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 
 
 public class ScannerTest_FromGeneratedImage {
@@ -48,7 +46,7 @@ public class ScannerTest_FromGeneratedImage {
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache();
 			
 			BoardProperties boardProperties = new BoardProperties(192, "set1");
-			BufferedImage boardImage = ScannerUtils.createBoardImage(boardProperties, bitboard.toEPD(), new Color(220, 220, 220), new Color(120, 120, 120));
+			BufferedImage boardImage = ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, bitboard.toEPD(), new Color(220, 220, 220), new Color(120, 120, 120));
 			//ScannerUtils.saveImage("board", boardImage);
 			
 			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, boardProperties);

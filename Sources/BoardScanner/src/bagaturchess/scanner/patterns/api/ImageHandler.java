@@ -22,14 +22,15 @@ package bagaturchess.scanner.patterns.api;
 
 import java.io.IOException;
 
+import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils;
 
 
 /**
  * Handles porting to awt and to android with different implementations
  */
-public interface ImageHandler<T1, T2> {
-	public T1 loadImageFromFS(T2 path) throws IOException;
+public interface ImageHandler<T1, T2, T3> {
+	public T1 loadImageFromFS(T3 path) throws IOException;
 	public T1 resizeImage(T1 source, int newsize);
 	public void saveImage(String fileName, String formatName, T1 image) throws IOException;
 	public int[][] convertToGrayMatrix(T1 image);
@@ -39,4 +40,6 @@ public interface ImageHandler<T1, T2> {
 	public void printInfo(MatrixUtils.PatternMatchingData matcherData, String fileName);
 	public int[][] createSquareImage(int bgcolor, int size);
 	public int[][] createPieceImage(String pieceSetName, int pid, int bgcolor, int size);
+	public T1 createBoardImage(BoardProperties boardProperties, String fen, T2 whiteSquareColor, T2 blackSquareColor);
+	public T2 getColor(int grayColor);
 }

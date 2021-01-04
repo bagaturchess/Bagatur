@@ -17,25 +17,22 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns.impl;
+package bagaturchess.scanner.patterns.impl1.preprocess;
 
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
 
-import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
-import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
+import bagaturchess.scanner.common.ResultPair;
 
 
 public class ImagePreProcessing {
@@ -52,8 +49,8 @@ public class ImagePreProcessing {
 			BoardProperties boardProperties = new BoardProperties(256, "set3");
 			
 			BufferedImage image = ImageIO.read(new File("./data/tests/preprocess/test7.png"));
-			image = ScannerUtils.resizeImage(image, boardProperties.getImageSize());
-			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image);
+			image = ImageHandlerSingleton.getInstance().resizeImage(image, boardProperties.getImageSize());
+			int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(image);
 			
 			Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
 			ResultPair<Integer, Integer> bgcolours = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
@@ -63,15 +60,15 @@ public class ImagePreProcessing {
 			//ScannerUtils.saveImage("white", ScannerUtils.createGrayImage(whiteSquare), "png");
 			//ScannerUtils.saveImage("black", ScannerUtils.createGrayImage(blackSquare), "png");
 			
-			Color whiteSquareColor = ScannerUtils.GRAY_COLORS[bgcolours.getFirst()];
-			Color blackSquareColor = ScannerUtils.GRAY_COLORS[bgcolours.getSecond()];
+			Color whiteSquareColor = ImageHandlerSingleton.getInstance().getColor(bgcolours.getFirst());
+			Color blackSquareColor = ImageHandlerSingleton.getInstance().getColor(bgcolours.getSecond());
 			
 			BufferedImage emptyBoard = ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, "8/8/8/8/8/8/8/8", whiteSquareColor, blackSquareColor);
-			ScannerUtils.saveImage("board_empty", emptyBoard, "png");
+			ImageHandlerSingleton.getInstance().saveImage("board_empty", "png", emptyBoard);
 			
 			//image = ScannerUtils.enlarge(image, boardProperties.getImageSize(), 1.125f);
 			//grayBoard = ScannerUtils.convertToGrayMatrix(image);
-			ScannerUtils.saveImage("board_input", ScannerUtils.createGrayImage(grayBoard), "png");
+			ImageHandlerSingleton.getInstance().saveImage("board_input", "png", ImageHandlerSingleton.getInstance().createGrayImage(grayBoard));
 			
 			MatrixUtils.PatternMatchingData bestData = null;
 			int maxSize = grayBoard.length;
@@ -83,7 +80,7 @@ public class ImagePreProcessing {
 					//BufferedImage enlargedGrayPattern = ScannerUtils.enlarge(resizedGrayPattern, resizedGrayPattern.getHeight(), 1.1f);
 					//int[][] grayPattern = ScannerUtils.convertToGrayMatrix(enlargedGrayPattern);
 					
-					int[][] grayPattern = ScannerUtils.convertToGrayMatrix(ScannerUtils.resizeImage(emptyBoard, size));
+					int[][] grayPattern = ImageHandlerSingleton.getInstance().convertToGrayMatrix(ImageHandlerSingleton.getInstance().resizeImage(emptyBoard, size));
 					
 					if (angle != 0) {
 						grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
@@ -104,7 +101,7 @@ public class ImagePreProcessing {
 			
 			BufferedImage result = extractResult(image, bestData);
 			result = ScannerUtils.enlarge(result, result.getWidth(), 1.03f, ScannerUtils.getAVG(result));
-			ScannerUtils.saveImage("result_" + bestData.size + "_" + bestData.angle + "_" + bestData.delta, result, "png");
+			ImageHandlerSingleton.getInstance().saveImage("result_" + bestData.size + "_" + bestData.angle + "_" + bestData.delta, "png", result);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
