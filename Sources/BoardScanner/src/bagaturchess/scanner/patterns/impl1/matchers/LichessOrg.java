@@ -20,15 +20,13 @@
 package bagaturchess.scanner.patterns.impl1.matchers;
 
 
-import java.io.IOException;
-
 import bagaturchess.scanner.common.BoardProperties;
 
 
 public class LichessOrg extends Matcher_Base {
 	
 	
-	public LichessOrg(int imageSize) throws IOException {
+	public LichessOrg(int imageSize) {
 		super(new BoardProperties(imageSize, "set1"));
 	}
 	

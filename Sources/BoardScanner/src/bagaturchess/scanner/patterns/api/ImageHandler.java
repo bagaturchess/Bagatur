@@ -22,6 +22,8 @@ package bagaturchess.scanner.patterns.api;
 
 import java.io.IOException;
 
+import bagaturchess.scanner.common.MatrixUtils;
+
 
 /**
  * Handles porting to awt and to android with different implementations
@@ -33,4 +35,8 @@ public interface ImageHandler<T1, T2> {
 	public int[][] convertToGrayMatrix(T1 image);
 	public T1 createGrayImage(int[][] matrix);
 	public T1 loadPieceImageFromMemory(int pid, String piecesSetName, int size);
+	public void printInfo(int[][] source, MatrixUtils.PatternMatchingData matcherData, String fileName);
+	public void printInfo(MatrixUtils.PatternMatchingData matcherData, String fileName);
+	public int[][] createSquareImage(int bgcolor, int size);
+	public int[][] createPieceImage(String pieceSetName, int pid, int bgcolor, int size);
 }

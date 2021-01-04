@@ -20,21 +20,19 @@
 package bagaturchess.scanner.patterns.impl1.matchers;
 
 
-import java.io.IOException;
-
 import bagaturchess.scanner.common.BoardProperties;
 
 
 public class ChessCom_Manual extends Matcher_Base {
 	
 	
-	public ChessCom_Manual(int imageSize) throws IOException {
+	public ChessCom_Manual(int imageSize) {
 		super(new BoardProperties(imageSize, "set2"));
 	}
 	
 
 	@Override
 	protected double getTotalDeltaThreshold() {
-		return 10;
+		return 20;
 	}
 }

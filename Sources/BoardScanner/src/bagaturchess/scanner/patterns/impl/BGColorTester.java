@@ -23,6 +23,7 @@ package bagaturchess.scanner.patterns.impl;
 import java.awt.image.BufferedImage;
 
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.MatrixUtils;
 
 
 public class BGColorTester {
@@ -39,7 +40,7 @@ public class BGColorTester {
 			
 			imageMatrix = ScannerUtils.convertToGrayMatrix(image);
 			
-			int avg = ScannerUtils.getAVG(imageMatrix);
+			int avg = MatrixUtils.getAVG(imageMatrix);
 			System.out.println(avg);
 			
 		} catch (Exception e) {

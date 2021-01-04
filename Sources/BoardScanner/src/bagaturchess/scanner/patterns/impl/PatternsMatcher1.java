@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
 import bagaturchess.scanner.patterns.impl.matchers.Matcher_Base;
@@ -62,8 +63,8 @@ public class PatternsMatcher1 {
 	
 	private static int[][] filterBackground(int[][] grayBoard) {
 		
-		Set<Integer> emptySquares = ScannerUtils.getEmptySquares(grayBoard);
-		ResultPair<Integer, Integer> bgcolors = ScannerUtils.getSquaresColor(grayBoard, emptySquares);
+		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
+		ResultPair<Integer, Integer> bgcolors = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
 		
 		//ScannerUtils.get
 		

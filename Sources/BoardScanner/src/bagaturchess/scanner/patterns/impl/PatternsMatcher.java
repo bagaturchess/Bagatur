@@ -58,8 +58,8 @@ public class PatternsMatcher {
 			ScannerUtils.saveImage("board_rotated", resultImage, "png");
 			board = rotatedBoard;*/
 			
-			Set<Integer> emptySquares = ScannerUtils.getEmptySquares(grayBoard);
-			ResultPair<Integer, Integer> bgcolorsOfSquares = ScannerUtils.getSquaresColor(grayBoard, emptySquares);
+			Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
+			ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
 			
 			List<Integer> bgcolors = new ArrayList<Integer>();
 			bgcolors.add(bgcolorsOfSquares.getSecond());
@@ -133,7 +133,7 @@ public class PatternsMatcher {
 							//int bgcolor = (file + rank) % 2 == 0 ? bgcolorsOfSquares.getFirst() : bgcolorsOfSquares.getSecond();
 									
 							//if (!emptySquares.contains(fieldID)) {
-								int[][] grayPiece = ScannerUtils.createPieceImage(boardProperties, pid, bgcolor, size);
+								int[][] grayPiece = ScannerUtils.createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, bgcolor, size);
 								if (angle != 0) {
 									grayPiece = MatrixUtils.rotateMatrix(grayPiece, angle);
 								}

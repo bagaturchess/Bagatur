@@ -20,7 +20,6 @@
 package bagaturchess.scanner.patterns.impl1.matchers;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,9 +32,10 @@ public class Matcher_Composite extends Matcher_Base {
 	
 	
 	private List<Matcher_Base> matchers = new ArrayList<Matcher_Base>();
-	private List<Matcher_Base> matchers_128 = new ArrayList<Matcher_Base>();
+	private List<Matcher_Base> matchers_64 = new ArrayList<Matcher_Base>();
 	
-	public Matcher_Composite(int imageSize) throws IOException {
+	
+	public Matcher_Composite(int imageSize) {
 		
 		super(null);
 		
@@ -43,9 +43,9 @@ public class Matcher_Composite extends Matcher_Base {
 		matchers.add(new ChessCom(imageSize));
 		matchers.add(new ChessCom_Manual(imageSize));
 		
-		matchers_128.add(new LichessOrg(128));
-		matchers_128.add(new ChessCom(128));
-		matchers_128.add(new ChessCom_Manual(128));
+		matchers_64.add(new LichessOrg(64));
+		matchers_64.add(new ChessCom(64));
+		matchers_64.add(new ChessCom_Manual(64));
 	}
 	
 	
@@ -55,17 +55,17 @@ public class Matcher_Composite extends Matcher_Base {
 		int best_index = 0;
 		double best_delta = Double.MAX_VALUE;
 		
-		int[][] grayBoard_128 = ScannerUtils.convertToGrayMatrix(
-					ScannerUtils.resizeImage(ScannerUtils.createGrayImage(grayBoard), 128)
+		int[][] grayBoard_64 = ScannerUtils.convertToGrayMatrix(
+					ScannerUtils.resizeImage(ScannerUtils.createGrayImage(grayBoard), 64)
 				);
 		
-		for (int i = 0; i < matchers_128.size(); i++) {
+		for (int i = 0; i < matchers_64.size(); i++) {
 			
-			ResultPair<String, MatchingStatistics> result = matchers_128.get(i).scan(grayBoard_128, false);
+			ResultPair<String, MatchingStatistics> result = matchers_64.get(i).scan(grayBoard_64);
 			
 			MatchingStatistics stat = result.getSecond();
 			
-			System.out.println("Matcher_Composite: scan: " + matchers_128.get(i).getClass().getCanonicalName()
+			System.out.println("Matcher_Composite: scan: " + matchers_64.get(i).getClass().getCanonicalName()
 					+ " " + result.getFirst() + " delta is " + stat.totalDelta);
 			
 			if (stat.totalDelta < best_delta) {
@@ -76,7 +76,7 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		System.out.println("Matcher_Composite: scan: Selected matcher is " + matchers.get(best_index).getClass().getCanonicalName());
 		
-		ResultPair<String, MatchingStatistics> result = matchers.get(best_index).scan(grayBoard, false);
+		ResultPair<String, MatchingStatistics> result = matchers.get(best_index).scan(grayBoard);
 		
 		/*if (matchers.get(best_index).getTotalDeltaThreshold() < result.getSecond().totalDelta) {
 			System.out.println("Matcher_Composite: scan: " + result.getFirst() + " total delta is " + result.getSecond().totalDelta + " start scan again ...");
@@ -85,12 +85,6 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		return result;
 	}
-	
-	
-	/*@Override
-	protected ResultPair<Integer, MatrixUtils.PatternMatchingData> scanForPiece(int[][] grayBoard, int pid) {
-		throw new UnsupportedOperationException();
-	}*/
 
 
 	@Override

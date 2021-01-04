@@ -36,7 +36,7 @@ public class PatternsMatcherMain {
 		
 		try {
 			
-			int INPUT_IMAGE_SIZE = 256;
+			int INPUT_IMAGE_SIZE = 192;
 			
 			BufferedImage image_board = (BufferedImage) ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/test13.png");
 			//BufferedImage image_board = ImageHandlerImpl_AWT.getInstance().loadImageFromFS("./data/tests/lichess.org/test1.png");

@@ -20,6 +20,8 @@
 package bagaturchess.scanner.patterns.api;
 
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -31,16 +33,19 @@ import javax.imageio.ImageIO;
 
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 
 
 class ImageHandlerImpl_AWT implements ImageHandler<BufferedImage, String> {
-
 	
 	
 	private static final String[] piecesSets = new String[] {"set1", "set2", "set3"};
 	
 	private static final Map<String, BufferedImage> piecesImagesFromAllSets = new HashMap<String, BufferedImage>();
 	private static final Map<String, BufferedImage> piecesImagesFromAllSetsAndSizes = new HashMap<String, BufferedImage>();
+	
+	
+	public static final Color[] GRAY_COLORS = new Color[256];
 	
 	
     static {
@@ -55,6 +60,17 @@ class ImageHandlerImpl_AWT implements ImageHandler<BufferedImage, String> {
     	} catch (IOException ioe) {
     		ioe.printStackTrace();
     	}
+    	
+		for (int r = 0; r < 256; r++) {
+			for (int g = 0; g < 256; g++) {
+				for (int b = 0; b < 256; b++) {
+					int gray = (int) (r * 0.2989d + g * 0.5870 + b * 0.1140);
+					//if (GRAY_COLORS[gray] == null) {
+						GRAY_COLORS[gray] = new Color(r, g, b);
+					//}
+				}
+			}
+		}
     }
     
     
@@ -170,5 +186,58 @@ class ImageHandlerImpl_AWT implements ImageHandler<BufferedImage, String> {
 		}
 		
 		return suffix;
+	}
+
+
+	@Override
+	public void printInfo(int[][] source, PatternMatchingData matcherData, String fileName) {
+		
+		int[][] print = new int[matcherData.size][matcherData.size];
+		for (int i = 0; i < matcherData.size; i++) {
+			for (int j = 0; j < matcherData.size; j++) {
+				print[i][j] = source[matcherData.x + i][matcherData.y + j];
+			}
+		}
+		
+		BufferedImage resultImage = ScannerUtils.createGrayImage(print);
+		ScannerUtils.saveImage(fileName, resultImage, "png");
+	}
+
+
+	@Override
+	public void printInfo(PatternMatchingData matcherData, String fileName) {
+		
+		int[][] print = new int[matcherData.size][matcherData.size];
+		for (int i = 0; i < matcherData.size; i++) {
+			for (int j = 0; j < matcherData.size; j++) {
+				print[i][j] = matcherData.pattern[i][j];
+			}
+		}
+		
+		BufferedImage resultImage = ScannerUtils.createGrayImage(print);
+		ScannerUtils.saveImage(fileName, resultImage, "png");
+	}
+	
+	
+	@Override
+	public int[][] createSquareImage(int bgcolor, int size) {
+		BufferedImage imageSquare = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+		Graphics g = imageSquare.getGraphics();
+		g.setColor(GRAY_COLORS[bgcolor]);
+		g.fillRect(0, 0, imageSquare.getWidth(), imageSquare.getHeight());
+		return ScannerUtils.convertToGrayMatrix(imageSquare);
+	}
+	
+	
+	@Override
+	public int[][] createPieceImage(String pieceSetName, int pid, int bgcolor, int size) {
+		Image piece = (Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(pid, pieceSetName, size);
+		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+		Graphics g = imagePiece.getGraphics();
+		g.setColor(GRAY_COLORS[bgcolor]);
+		g.fillRect(0, 0, imagePiece.getWidth(), imagePiece.getHeight());
+		Image pieceScaled = piece;
+		g.drawImage(pieceScaled, 0, 0, null);
+		return ScannerUtils.convertToGrayMatrix(imagePiece);
 	}
 }

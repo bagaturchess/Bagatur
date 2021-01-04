@@ -20,21 +20,17 @@
 package bagaturchess.scanner.patterns.impl1.matchers;
 
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl.utils.VarStatistic;
-import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
+import bagaturchess.scanner.common.BoardUtils;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
 
 
@@ -48,7 +44,7 @@ public abstract class Matcher_Base {
 	protected BoardProperties boardProperties;
 	
 	
-	protected Matcher_Base(BoardProperties _imageProperties) throws IOException {
+	protected Matcher_Base(BoardProperties _imageProperties) {
 		boardProperties = _imageProperties;
 	}
 	
@@ -57,11 +53,6 @@ public abstract class Matcher_Base {
 	
 	
 	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) {
-		return scan(grayBoard, false);
-	}
-	
-	
-	protected ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, boolean iterateBGColors) {
 		
 		if (grayBoard.length != boardProperties.getImageSize()) {
 			throw new IllegalStateException();
@@ -70,9 +61,9 @@ public abstract class Matcher_Base {
 		MatchingStatistics result = new MatchingStatistics();
 		result.matcherName = this.getClass().getCanonicalName();
 		
-		Set<Integer> emptySquares = ScannerUtils.getEmptySquares(grayBoard);
+		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
 		
-		ResultPair<Integer, Integer> bgcolorsOfSquares = ScannerUtils.getSquaresColor(grayBoard, emptySquares);
+		ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
 		
 		int[] pids = new int[64];
 		
@@ -87,13 +78,13 @@ public abstract class Matcher_Base {
 				//if (!emptySquares.contains(fieldID)) {
 					
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-					int bgcolor_avg = (int) ScannerUtils.calculateColorStats(squareMatrix).getEntropy();
+					int bgcolor_avg = (int) MatrixUtils.calculateColorStats(squareMatrix).getEntropy();
 					
 					MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
 					bestPatternData.x = 0;
 					bestPatternData.y = 0;
 					bestPatternData.size = squareMatrix.length;
-					//printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
+					//ImageHandlerSingleton.getInstance().printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
 					
 					Set<Integer> pidsToSearch = new HashSet<Integer>();
 					pidsToSearch.add(Constants.PID_NONE);
@@ -111,10 +102,8 @@ public abstract class Matcher_Base {
 					pidsToSearch.add(Constants.PID_B_KING);
 					
 					List<Integer> bgcolors = new ArrayList<Integer>();
-					if (!iterateBGColors) {
-						//bgcolors.add(bgcolor_avg);
-						bgcolors.add((file + rank) % 2 == 0 ? bgcolorsOfSquares.getFirst() : bgcolorsOfSquares.getSecond());
-					}
+					//bgcolors.add(bgcolor_avg);
+					bgcolors.add((file + rank) % 2 == 0 ? bgcolorsOfSquares.getFirst() : bgcolorsOfSquares.getSecond());
 					
 					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData
 						= getPID(squareMatrix, true, bgcolors, pidsToSearch, fieldID);
@@ -129,7 +118,7 @@ public abstract class Matcher_Base {
 		result.totalDelta = result.totalDelta / (double) (64 - emptySquares.size());
 		//result.totalDelta *= boardProperties.getSquareSize() * Math.sqrt(boardProperties.getSquareSize());
 		
-		return new ResultPair<String, MatchingStatistics> (ScannerUtils.createFENFromPIDs(pids), result);
+		return new ResultPair<String, MatchingStatistics> (BoardUtils.createFENFromPIDs(pids), result);
 	}
 	
 	
@@ -152,132 +141,35 @@ public abstract class Matcher_Base {
 				
 				for (Integer pid : pids) {
 					
-					if (bgcolors != null && bgcolors.size() > 0) {
+					for (int i = 0; i < bgcolors.size(); i++) {
 						
-						for (int i = 0; i < bgcolors.size(); i++) {
-							
-							int bgcolor = bgcolors.get(i);
-							
-							int[][] grayPattern = pid == Constants.PID_NONE ?
-									ScannerUtils.createSquareImage(bgcolor, size)
-									: ScannerUtils.createPieceImage(boardProperties, pid, bgcolor, size);
-							if (angle != 0) {
-								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
-							}
-							MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-							
-							if (curData_best == null || curData_best.delta > curData.delta) {
-								curData_best = curData;
-							}
-						}
-						
-					} else {
-					
-						MatrixUtils.PatternMatchingData[] curData = new MatrixUtils.PatternMatchingData[256];
-						
-						int bgcolor = (int) ScannerUtils.calculateColorStats(graySquareMatrix).getEntropy();
+						int bgcolor = bgcolors.get(i);
 						
 						int[][] grayPattern = pid == Constants.PID_NONE ?
-								ScannerUtils.createSquareImage(bgcolor, size)
-								: ScannerUtils.createPieceImage(boardProperties, pid, bgcolor, size);
+								ImageHandlerSingleton.getInstance().createSquareImage(bgcolor, size)
+								: ImageHandlerSingleton.getInstance().createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, bgcolor, size);
 						if (angle != 0) {
 							grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
 						}
-						curData[bgcolor] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-						curData[bgcolor].color = bgcolor;
+						MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
 						
-						MatrixUtils.PatternMatchingData curData_best_up = curData[bgcolor];
-						
-						int lowColor_up = bgcolor;
-						int highColor_up = 255;
-						int midColor_up;
-						while(lowColor_up <= highColor_up) {
-							
-							midColor_up = (lowColor_up + highColor_up) / 2;
-							grayPattern = pid == Constants.PID_NONE ?
-									ScannerUtils.createSquareImage(midColor_up, size)
-									: ScannerUtils.createPieceImage(boardProperties, pid, midColor_up, size);
-							if (angle != 0) {
-								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
-							}
-							curData[midColor_up] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-							
-							if (curData[midColor_up].delta < curData_best_up.delta) {
-								curData_best_up = curData[midColor_up];
-								lowColor_up = midColor_up + 1;
-							} else {
-								highColor_up = midColor_up - 1;
-							}
+						if (curData_best == null || curData_best.delta > curData.delta) {
+							curData_best = curData;
 						}
-						
-						
-						MatrixUtils.PatternMatchingData curData_best_down = curData[bgcolor];
-						
-						int lowColor_down = 0;
-						int highColor_down = bgcolor;
-						int midColor_down;
-						while(lowColor_down <= highColor_down) {
-							
-							midColor_down = (lowColor_down + highColor_down) / 2;
-							grayPattern = pid == Constants.PID_NONE ?
-									ScannerUtils.createSquareImage(midColor_down, size)
-									: ScannerUtils.createPieceImage(boardProperties, pid, midColor_down, size);
-							if (angle != 0) {
-								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
-							}
-							curData[midColor_down] = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
-							
-							if (curData[midColor_down].delta < curData_best_up.delta) {
-								curData_best_up = curData[midColor_down];
-								highColor_down = midColor_down - 1;
-							} else {
-								lowColor_down = midColor_down + 1;
-							}
-						}
-						
-						curData_best = curData_best_up.delta < curData_best_down.delta ? curData_best_up : curData_best_down;
 					}
 					
 					if (bestData == null || bestData.delta > curData_best.delta) {
 						bestData = curData_best;
 						bestPID = pid;
 						
-						//printInfo(bestData, "" + fieldID + "_best" + (counter++));
+						//ImageHandlerSingleton.getInstance().printInfo(bestData, "" + fieldID + "_best" + (counter++));
 					}
 				}
 			}
 		}
 		
-		//printInfo(graySquareMatrix, bestData, "" + fieldID + "_matching");
+		//ImageHandlerSingleton.getInstance().printInfo(graySquareMatrix, bestData, "" + fieldID + "_matching");
 		
 		return new ResultPair<Integer, MatrixUtils.PatternMatchingData>(bestPID, bestData);
-	}
-	
-	
-	protected static void printInfo(int[][] board, MatrixUtils.PatternMatchingData matcherData, String fileName) {
-		
-		int[][] print = new int[matcherData.size][matcherData.size];
-		for (int i = 0; i < matcherData.size; i++) {
-			for (int j = 0; j < matcherData.size; j++) {
-				print[i][j] = board[matcherData.x + i][matcherData.y + j];
-			}
-		}
-		
-		BufferedImage resultImage = ScannerUtils.createGrayImage(print);
-		ScannerUtils.saveImage(fileName, resultImage, "png");
-	}
-	
-	
-	protected static void printInfo(MatrixUtils.PatternMatchingData matcherData, String fileName) {
-		
-		int[][] print = new int[matcherData.size][matcherData.size];
-		for (int i = 0; i < matcherData.size; i++) {
-			for (int j = 0; j < matcherData.size; j++) {
-				print[i][j] = matcherData.pattern[i][j];
-			}
-		}
-		
-		BufferedImage resultImage = ScannerUtils.createGrayImage(print);
-		ScannerUtils.saveImage(fileName, resultImage, "png");
 	}
 }

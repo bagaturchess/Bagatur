@@ -23,6 +23,8 @@ package bagaturchess.scanner.patterns.api;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
+
 
 public class ImageHandlerSingleton implements ImageHandler<BufferedImage, String> {
 	
@@ -74,5 +76,29 @@ public class ImageHandlerSingleton implements ImageHandler<BufferedImage, String
 	@Override
 	public BufferedImage loadPieceImageFromMemory(int pid, String piecesSetName, int size) {
 		return instance.loadPieceImageFromMemory(pid, piecesSetName, size);
+	}
+
+
+	@Override
+	public void printInfo(int[][] source, PatternMatchingData matcherData, String fileName) {
+		instance.printInfo(source, matcherData, fileName);
+	}
+
+
+	@Override
+	public void printInfo(PatternMatchingData matcherData, String fileName) {
+		instance.printInfo(matcherData, fileName);
+	}
+
+
+	@Override
+	public int[][] createSquareImage(int bgcolor, int size) {
+		return instance.createSquareImage(bgcolor, size);
+	}
+
+
+	@Override
+	public int[][] createPieceImage(String pieceSetName, int pid, int bgcolor, int size) {
+		return instance.createPieceImage(pieceSetName, pid, bgcolor, size);
 	}
 }

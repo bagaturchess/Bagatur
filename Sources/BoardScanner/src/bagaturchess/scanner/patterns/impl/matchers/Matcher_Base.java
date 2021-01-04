@@ -23,16 +23,14 @@ package bagaturchess.scanner.patterns.impl.matchers;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
+import bagaturchess.scanner.common.BoardUtils;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
@@ -70,9 +68,9 @@ public abstract class Matcher_Base {
 		MatchingStatistics result = new MatchingStatistics();
 		result.matcherName = this.getClass().getCanonicalName();
 		
-		Set<Integer> emptySquares = ScannerUtils.getEmptySquares(grayBoard);
+		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
 		
-		ResultPair<Integer, Integer> bgcolorsOfSquares = ScannerUtils.getSquaresColor(grayBoard, emptySquares);
+		ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
 		
 		int[] pids = new int[64];
 		
@@ -87,7 +85,7 @@ public abstract class Matcher_Base {
 				//if (!emptySquares.contains(fieldID)) {
 					
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-					int bgcolor_avg = (int) ScannerUtils.calculateColorStats(squareMatrix).getEntropy();
+					int bgcolor_avg = (int) MatrixUtils.calculateColorStats(squareMatrix).getEntropy();
 					
 					MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
 					bestPatternData.x = 0;
@@ -129,7 +127,7 @@ public abstract class Matcher_Base {
 		result.totalDelta = result.totalDelta / (double) (64 - emptySquares.size());
 		//result.totalDelta *= boardProperties.getSquareSize() * Math.sqrt(boardProperties.getSquareSize());
 		
-		return new ResultPair<String, MatchingStatistics> (ScannerUtils.createFENFromPIDs(pids), result);
+		return new ResultPair<String, MatchingStatistics> (BoardUtils.createFENFromPIDs(pids), result);
 	}
 	
 	
@@ -160,7 +158,7 @@ public abstract class Matcher_Base {
 							
 							int[][] grayPattern = pid == Constants.PID_NONE ?
 									ScannerUtils.createSquareImage(bgcolor, size)
-									: ScannerUtils.createPieceImage(boardProperties, pid, bgcolor, size);
+									: ScannerUtils.createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, bgcolor, size);
 							if (angle != 0) {
 								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
 							}
@@ -175,11 +173,11 @@ public abstract class Matcher_Base {
 					
 						MatrixUtils.PatternMatchingData[] curData = new MatrixUtils.PatternMatchingData[256];
 						
-						int bgcolor = (int) ScannerUtils.calculateColorStats(graySquareMatrix).getEntropy();
+						int bgcolor = (int) MatrixUtils.calculateColorStats(graySquareMatrix).getEntropy();
 						
 						int[][] grayPattern = pid == Constants.PID_NONE ?
 								ScannerUtils.createSquareImage(bgcolor, size)
-								: ScannerUtils.createPieceImage(boardProperties, pid, bgcolor, size);
+								: ScannerUtils.createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, bgcolor, size);
 						if (angle != 0) {
 							grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
 						}
@@ -196,7 +194,7 @@ public abstract class Matcher_Base {
 							midColor_up = (lowColor_up + highColor_up) / 2;
 							grayPattern = pid == Constants.PID_NONE ?
 									ScannerUtils.createSquareImage(midColor_up, size)
-									: ScannerUtils.createPieceImage(boardProperties, pid, midColor_up, size);
+									: ScannerUtils.createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, midColor_up, size);
 							if (angle != 0) {
 								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
 							}
@@ -221,7 +219,7 @@ public abstract class Matcher_Base {
 							midColor_down = (lowColor_down + highColor_down) / 2;
 							grayPattern = pid == Constants.PID_NONE ?
 									ScannerUtils.createSquareImage(midColor_down, size)
-									: ScannerUtils.createPieceImage(boardProperties, pid, midColor_down, size);
+									: ScannerUtils.createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, midColor_down, size);
 							if (angle != 0) {
 								grayPattern = MatrixUtils.rotateMatrix(grayPattern, angle);
 							}

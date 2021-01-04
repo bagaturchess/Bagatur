@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel;
-import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
+import bagaturchess.scanner.common.BoardUtils;
 import bagaturchess.scanner.common.MatrixUtils;
 
 
@@ -51,7 +51,7 @@ public class BoardScanner_RGB extends BoardScanner {
 			}
 		}
 		
-		return ScannerUtils.createFENFromPIDs(pids);
+		return BoardUtils.createFENFromPIDs(pids);
 	}
 	
 	

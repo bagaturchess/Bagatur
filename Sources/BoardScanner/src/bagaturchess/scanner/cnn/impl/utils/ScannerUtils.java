@@ -108,101 +108,6 @@ public class ScannerUtils {
 	}
 	
 	
-	public static Set<Integer> getEmptySquares(int[][] grayBoard) {
-		
-		Set<Integer> emptySquaresIDs = new HashSet<Integer>();
-		
-		VarStatistic colorDeviations = new VarStatistic(false);
-		Map<Integer, VarStatistic> squaresStats = new HashMap<Integer, VarStatistic>();
-		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
-			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
-				
-				int file = i / (grayBoard.length / 8);
-				int rank = j / (grayBoard.length / 8);
-				int fieldID = 63 - (file + 8 * rank);
-				
-				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-				
-				VarStatistic squareStat = calculateColorStats(squareMatrix);
-				squaresStats.put(fieldID, squareStat);
-				
-				colorDeviations.addValue(squareStat.getDisperse(), squareStat.getDisperse());
-			}
-		}
-		
-		for (Integer fieldID: squaresStats.keySet()) {
-			VarStatistic squareStat = squaresStats.get(fieldID);
-			if (squareStat.getDisperse() < colorDeviations.getEntropy() - colorDeviations.getDisperse() / 3.5f) {
-				emptySquaresIDs.add(fieldID);
-			}
-		}
-		
-		return emptySquaresIDs;
-	}
-	
-	
-	public static VarStatistic calculateColorStats(int[][] grayMatrix) {
-		
-		VarStatistic stat = new VarStatistic(false);
-		
-		for (int i = 0; i < grayMatrix.length; i++) {
-			for (int j = 0; j < grayMatrix.length; j++) {
-				int cur = grayMatrix[i][j];
-				stat.addValue(cur, cur);
-			}
-		}
-		
-		return stat;
-	}
-	
-	
-	public static ResultPair<Integer, Integer> getSquaresColor(int[][] grayBoard, Set<Integer> emptySquares) {
-		
-		VarStatistic stat_all = new VarStatistic(false);
-		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
-			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
-				
-				int file = i / (grayBoard.length / 8);
-				int rank = j / (grayBoard.length / 8);
-				int fieldID = 63 - (file + 8 * rank);
-				
-				if (emptySquares.contains(fieldID)) {
-					for (int i1 = i; i1 < i + grayBoard.length / 8; i1++) {
-						for (int j1 = j; j1 < j + grayBoard.length / 8; j1++) {
-							stat_all.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
-						}
-					}
-				}
-			}
-		}
-		
-		VarStatistic stat_white = new VarStatistic(false);
-		VarStatistic stat_black = new VarStatistic(false);
-		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
-			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
-				
-				int file = i / (grayBoard.length / 8);
-				int rank = j / (grayBoard.length / 8);
-				int fieldID = 63 - (file + 8 * rank);
-				
-				if (emptySquares.contains(fieldID)) {
-					for (int i1 = i; i1 < i + grayBoard.length / 8; i1++) {
-						for (int j1 = j; j1 < j + grayBoard.length / 8; j1++) {
-							if (grayBoard[i1][j1] > stat_all.getEntropy()) {
-								stat_white.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
-							} else {
-								stat_black.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		return new ResultPair<Integer, Integer>((int)stat_white.getEntropy(), (int)stat_black.getEntropy());
-	}
-	
-	
 	public static BufferedImage createPieceImage(BoardProperties boardProperties, int pid, Color squareColour) {
 		BufferedImage image = new BufferedImage(boardProperties.getSquareSize(), boardProperties.getSquareSize(), BufferedImage.TYPE_INT_RGB);
 		
@@ -224,12 +129,12 @@ public class ScannerUtils {
 		//System.out.println("IN targetAvg=" + targetAvg);
 		
 		int[][] bestImage = createPieceImageWithPieceColorAdjustment(boardProperties, pid, bgcolor, size, 0);
-		int bestAvg = getAVG(bestImage);
+		int bestAvg = MatrixUtils.getAVG(bestImage);
 		
 		int colorAdjustment_up = 1;
 		while (true) {
 			int[][] currentImage = createPieceImageWithPieceColorAdjustment(boardProperties, pid, bgcolor, size, colorAdjustment_up);
-			int curAvg = getAVG(currentImage);
+			int curAvg = MatrixUtils.getAVG(currentImage);
 			if (Math.abs(targetAvg - curAvg) <= Math.abs(targetAvg - bestAvg)) {
 				//System.out.println("colorAdjustment_up=" + colorAdjustment_up + ", Math.abs(targetAvg - curAvg)=" + Math.abs(targetAvg - curAvg) + ", Math.abs(targetAvg - bestAvg)=" + Math.abs(targetAvg - bestAvg));
 				bestImage = currentImage;
@@ -244,7 +149,7 @@ public class ScannerUtils {
 		int colorAdjustment_down = -1;
 		while (true) {
 			int[][] currentImage = createPieceImageWithPieceColorAdjustment(boardProperties, pid, bgcolor, size, colorAdjustment_down);
-			int curAvg = getAVG(currentImage);
+			int curAvg = MatrixUtils.getAVG(currentImage);
 			if (Math.abs(targetAvg - curAvg) <= Math.abs(targetAvg - bestAvg)) {
 				//System.out.println("colorAdjustment_down=" + colorAdjustment_down + ", Math.abs(targetAvg - curAvg)=" + Math.abs(targetAvg - curAvg) + ", Math.abs(targetAvg - bestAvg)=" + Math.abs(targetAvg - bestAvg));
 				bestImage = currentImage;
@@ -328,8 +233,8 @@ public class ScannerUtils {
 	}
 	
 	
-	public static final int[][] createPieceImage(BoardProperties boardProperties, int pid, int bgcolor, int size) {
-		Image piece = (Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(pid, boardProperties.getPiecesSetFileNamePrefix(), size);
+	public static final int[][] createPieceImage(String pieceSetName, int pid, int bgcolor, int size) {
+		Image piece = (Image) ImageHandlerSingleton.getInstance().loadPieceImageFromMemory(pid, pieceSetName, size);
 		BufferedImage imagePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
 		Graphics g = imagePiece.getGraphics();
 		g.setColor(GRAY_COLORS[bgcolor]);
@@ -455,33 +360,6 @@ public class ScannerUtils {
 		}
 		
 		return image;
-	}
-	
-	
-	public static String createFENFromPIDs(int[] pids) {
-		
-		StringBuilder sb = new StringBuilder();
-		for (int i = 63; i >= 0; i--) {
-			if (pids[i] >= 1 && pids[i] <= 6) {
-				sb.append(ChessConstants.FEN_WHITE_PIECES[Constants.PIECE_IDENTITY_2_TYPE[pids[i]]]);
-			} else {
-				sb.append(ChessConstants.FEN_BLACK_PIECES[Constants.PIECE_IDENTITY_2_TYPE[pids[i]]]);
-			}
-			
-			if (i % 8 == 0 && i != 0) {
-				sb.append("/");
-			}
-		}
-		
-		String fen = sb.toString();
-		fen = fen.replaceAll("11111111", "8");
-		fen = fen.replaceAll("1111111", "7");
-		fen = fen.replaceAll("111111", "6");
-		fen = fen.replaceAll("11111", "5");
-		fen = fen.replaceAll("1111", "4");
-		fen = fen.replaceAll("111", "3");
-		fen = fen.replaceAll("11", "2");
-		return fen;
 	}
 	
 	
@@ -733,25 +611,6 @@ public class ScannerUtils {
         }
         
         return new Color((int) (red / count), (int) (green / count), (int) (blue / count));
-	}
-	
-	
-	public static int getAVG(int[][] grayImage) {
-		
-		if (grayImage.length != grayImage[0].length) {
-			throw new IllegalStateException();
-		}
-		
-		long gray = 0;
-		long count = 0;
-        for (int i = 0; i < grayImage.length; i++) { 
-            for (int j = 0; j < grayImage.length; j++) {
-            	gray += grayImage[i][j];
-				count++;
-            }
-        }
-        
-        return (int) (gray / count);
 	}
 	
 	

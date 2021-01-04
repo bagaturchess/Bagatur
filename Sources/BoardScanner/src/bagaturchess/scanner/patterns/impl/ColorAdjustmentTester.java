@@ -28,6 +28,7 @@ import javax.imageio.ImageIO;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
+import bagaturchess.scanner.common.MatrixUtils;
 
 
 public class ColorAdjustmentTester {
@@ -47,9 +48,9 @@ public class ColorAdjustmentTester {
 			//System.out.println("size is " + grayImage.length);
 			
 			BoardProperties boardProperties = new BoardProperties(632);
-			int bgcolor = ScannerUtils.getAVG(grayImage);
+			int bgcolor = MatrixUtils.getAVG(grayImage);
 			
-			int[][] pieceImage = ScannerUtils.createPieceImage(boardProperties, Constants.PID_B_KNIGHT, bgcolor, boardProperties.getSquareSize());
+			int[][] pieceImage = ScannerUtils.createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), Constants.PID_B_KNIGHT, bgcolor, boardProperties.getSquareSize());
 			BufferedImage resultImage1 = ScannerUtils.createGrayImage(pieceImage);
 			ScannerUtils.saveImage("step1", resultImage1, "png");
 			

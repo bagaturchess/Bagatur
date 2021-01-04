@@ -20,15 +20,13 @@
 package bagaturchess.scanner.patterns.impl1.matchers;
 
 
-import java.io.IOException;
-
 import bagaturchess.scanner.common.BoardProperties;
 
 
 public class ChessCom extends Matcher_Base {
 	
 	
-	public ChessCom(int imageSize) throws IOException {
+	public ChessCom(int imageSize) {
 		super(new BoardProperties(imageSize, "set3"));
 	}
 	
