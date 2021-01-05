@@ -29,25 +29,21 @@ import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 
 
-public class ImagePreProcessor {
+//As it works slowly I will have a look at the links below later
+//https://stackoverflow.com/questions/13390238/jtransforms-fft-on-image
+//matched filter in signal processing
+//https://stackoverflow.com/questions/12598818/finding-a-picture-in-a-picture-with-java
+//https://stackoverflow.com/questions/42597094/cross-correlation-with-signals-of-different-lengths-in-java
+//https://stackoverflow.com/questions/13445497/correlation-among-2-images
+public class ImagePreProcessor_Impl1 extends ImagePreProcessor_Base {
 	
 	
 	private static final double SIZE_DELTA_PERCENT = 0.17;
 	private static final int MAX_ROTATION_PERCENT = 0;
 	
 	
-	private BoardProperties boardProperties;
-	
-	//As it works slowly I will have a look at the links below later
-	//https://stackoverflow.com/questions/13390238/jtransforms-fft-on-image
-	//matched filter in signal processing
-	//https://stackoverflow.com/questions/12598818/finding-a-picture-in-a-picture-with-java
-	//https://stackoverflow.com/questions/42597094/cross-correlation-with-signals-of-different-lengths-in-java
-	//https://stackoverflow.com/questions/13445497/correlation-among-2-images
-	
-	
-	public ImagePreProcessor(BoardProperties _boardProperties) {
-		boardProperties = _boardProperties;
+	public ImagePreProcessor_Impl1(BoardProperties _boardProperties) {
+		super(_boardProperties);
 	}
 	
 	
@@ -69,7 +65,7 @@ public class ImagePreProcessor {
 		//grayBoard = ScannerUtils.convertToGrayMatrix(image);
 		ImageHandlerSingleton.getInstance().saveImage("board_input", "png", ImageHandlerSingleton.getInstance().createGrayImage(grayBoard));
 		
-		int bgcolor = MatrixUtils.getAVG(grayBoard);
+		//int bgcolor = MatrixUtils.getAVG(grayBoard);
 		
 		MatrixUtils.PatternMatchingData bestData = null;
 		int maxSize = grayBoard.length;
@@ -104,6 +100,7 @@ public class ImagePreProcessor {
 		
 		Object result = ImageHandlerSingleton.getInstance().extractResult(image, bestData);
 		result = ImageHandlerSingleton.getInstance().enlarge(result, 1.03f, ImageHandlerSingleton.getInstance().getAVG(result));
+		result = ImageHandlerSingleton.getInstance().resizeImage(result, boardProperties.getImageSize());
 		ImageHandlerSingleton.getInstance().saveImage("result_" + bestData.size + "_" + bestData.angle + "_" + bestData.delta, "png", result);
 		
 		return result;

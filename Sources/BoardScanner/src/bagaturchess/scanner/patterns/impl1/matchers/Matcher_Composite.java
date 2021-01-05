@@ -31,8 +31,11 @@ import bagaturchess.scanner.patterns.api.MatchingStatistics;
 public class Matcher_Composite extends Matcher_Base {
 	
 	
+	private static final int CLASSIFIER_SIZE = 128;
+	
+	
 	private List<Matcher_Base> matchers = new ArrayList<Matcher_Base>();
-	private List<Matcher_Base> matchers_64 = new ArrayList<Matcher_Base>();
+	private List<Matcher_Base> matchers_classifier = new ArrayList<Matcher_Base>();
 	
 	
 	public Matcher_Composite(int imageSize) {
@@ -40,12 +43,12 @@ public class Matcher_Composite extends Matcher_Base {
 		super(null);
 		
 		matchers.add(new Matcher_Set1(imageSize));
-		matchers.add(new Matcher_Set3(imageSize));
 		matchers.add(new Matcher_Set2(imageSize));
+		matchers.add(new Matcher_Set3(imageSize));
 		
-		matchers_64.add(new Matcher_Set1(64));
-		matchers_64.add(new Matcher_Set3(64));
-		matchers_64.add(new Matcher_Set2(64));
+		matchers_classifier.add(new Matcher_Set1(CLASSIFIER_SIZE));
+		matchers_classifier.add(new Matcher_Set2(CLASSIFIER_SIZE));
+		matchers_classifier.add(new Matcher_Set3(CLASSIFIER_SIZE));
 	}
 	
 	
@@ -55,17 +58,17 @@ public class Matcher_Composite extends Matcher_Base {
 		int best_index = 0;
 		double best_delta = Double.MAX_VALUE;
 		
-		int[][] grayBoard_64 = ScannerUtils.convertToGrayMatrix(
-					ScannerUtils.resizeImage(ScannerUtils.createGrayImage(grayBoard), 64)
+		int[][] grayBoard_classifier = ScannerUtils.convertToGrayMatrix(
+					ScannerUtils.resizeImage(ScannerUtils.createGrayImage(grayBoard), CLASSIFIER_SIZE)
 				);
 		
-		for (int i = 0; i < matchers_64.size(); i++) {
+		for (int i = 0; i < matchers_classifier.size(); i++) {
 			
-			ResultPair<String, MatchingStatistics> result = matchers_64.get(i).scan(grayBoard_64);
+			ResultPair<String, MatchingStatistics> result = matchers_classifier.get(i).scan(grayBoard_classifier);
 			
 			MatchingStatistics stat = result.getSecond();
 			
-			System.out.println("Matcher_Composite: scan: " + matchers_64.get(i).getClass().getCanonicalName()
+			System.out.println("Matcher_Composite: scan: " + matchers_classifier.get(i).getClass().getCanonicalName()
 					+ " " + result.getFirst() + " delta is " + stat.totalDelta);
 			
 			if (stat.totalDelta < best_delta) {

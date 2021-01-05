@@ -56,7 +56,7 @@ public class ScannerUtils {
 		for (int r = 0; r < 256; r++) {
 			for (int g = 0; g < 256; g++) {
 				for (int b = 0; b < 256; b++) {
-					int gray = (int) (r * 0.2989d + g * 0.5870 + b * 0.1140);
+					int gray = (int) (r * 0.2989d + g * 0.5870 + b * 0.1141);
 					//if (GRAY_COLORS[gray] == null) {
 						GRAY_COLORS[gray] = new Color(r, g, b);
 					//}
