@@ -118,8 +118,8 @@ public class ImagePreProcessor_Impl2 extends ImagePreProcessor_Base {
 		
 		return resultImage;
 	}
-
-
+	
+	
 	private FilterInfo getSizes(int[][] source, Map<Integer, Integer> colorsCounts, VarStatistic colorsCountStat) {
 		FilterInfo finfo = new FilterInfo();
 		for (int i = 0; i < source.length; i++) {
