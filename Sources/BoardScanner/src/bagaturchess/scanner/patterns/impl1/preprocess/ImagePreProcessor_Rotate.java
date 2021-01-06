@@ -82,11 +82,6 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 			colorsCountStat.addValue(count, count);
 		}
 		
-		
-		if (colorsCounts.size() < 2) {
-			throw new IllegalStateException("Not enough colors.");
-		}
-		
 		FilterInfo bestInfo = null;
 		for (float angleInDegrees = -MAX_ROTATION_PERCENT; angleInDegrees <= MAX_ROTATION_PERCENT; angleInDegrees += 1) {
 			
@@ -106,22 +101,26 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 			}
 		}
 		
-		int[][] result = new int[bestInfo.maxX - bestInfo.minX][bestInfo.maxY - bestInfo.minY];
-		for (int i = 0; i < result.length; i++) {
-			for (int j = 0; j < result[0].length; j++) {
-				result[i][j] = bestInfo.source[bestInfo.minX + i][bestInfo.minY + j];
+		if (bestInfo.isInitialized()) {
+			int[][] result = new int[bestInfo.maxX - bestInfo.minX][bestInfo.maxY - bestInfo.minY];
+			for (int i = 0; i < result.length; i++) {
+				for (int j = 0; j < result[0].length; j++) {
+					result[i][j] = bestInfo.source[bestInfo.minX + i][bestInfo.minY + j];
+				}
 			}
+			
+			
+			Object resultImage = ImageHandlerSingleton.getInstance().createGrayImage(result);
+			resultImage = ImageHandlerSingleton.getInstance().resizeImage(resultImage, boardProperties.getImageSize());
+			//resultImage = ImageHandlerSingleton.getInstance().enlarge(resultImage, 1.025f, ImageHandlerSingleton.getInstance().getAVG(resultImage));
+			//resultImage = ImageHandlerSingleton.getInstance().resizeImage(resultImage, boardProperties.getImageSize());
+			
+			ImageHandlerSingleton.getInstance().saveImage("rotate_filter_result_" +  bestInfo.angleInDegrees, "png", resultImage);
+			
+			return resultImage;
+		} else {
+			return image;
 		}
-		
-		
-		Object resultImage = ImageHandlerSingleton.getInstance().createGrayImage(result);
-		resultImage = ImageHandlerSingleton.getInstance().resizeImage(resultImage, boardProperties.getImageSize());
-		//resultImage = ImageHandlerSingleton.getInstance().enlarge(resultImage, 1.025f, ImageHandlerSingleton.getInstance().getAVG(resultImage));
-		//resultImage = ImageHandlerSingleton.getInstance().resizeImage(resultImage, boardProperties.getImageSize());
-		
-		ImageHandlerSingleton.getInstance().saveImage("rotate_filter_result_" +  bestInfo.angleInDegrees, "png", resultImage);
-		
-		return resultImage;
 	}
 	
 	
@@ -162,6 +161,11 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 		
 		private boolean isSmaller(FilterInfo info) {
 			return maxX - minX > info.maxX - info.minX && maxY - minY > info.maxY - info.minY;
+		}
+		
+		
+		private boolean isInitialized() {
+			return minX != Integer.MAX_VALUE && minY != Integer.MAX_VALUE && maxX != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE;
 		}
 	}
 }

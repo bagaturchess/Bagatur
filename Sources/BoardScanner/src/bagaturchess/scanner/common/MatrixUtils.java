@@ -293,8 +293,6 @@ public class MatrixUtils {
 		
 		PatternMatchingData result = null;
 		
-		VarStatistic stats = new VarStatistic(false);
-		
 		for (int x = 0; x <= graySource.length - grayPattern.length; x++ ) {
 		    for (int y = 0; y <= graySource.length - grayPattern.length; y++ ) {
 		        
@@ -307,23 +305,17 @@ public class MatrixUtils {
 		    	int count = 0;
 		        for (int i = 0; i < grayPattern.length; i++ ) {
 		            for (int j = 0; j < grayPattern.length; j++ ) {
-		            	
-		                int pixelSource = graySource[x+i][y+j];
-		                int pixelPattern = grayPattern[i][j];
 		                
-		                cur.delta += Math.abs(pixelSource - pixelPattern);
+		                cur.delta += Math.abs(graySource[x+i][y+j] - grayPattern[i][j]);
 		                count++;
 		                
-		                stats.addValue(Math.abs(pixelSource - pixelPattern), Math.abs(pixelSource - pixelPattern));
-		                
-		                /*if (result != null && cur.delta/ (double) (count) > result.delta) {
+		                if (result != null && cur.delta / (float) (count) > result.delta) {
 		                	i = grayPattern.length;
 		                	break;
-		                }*/
+		                }
 		            }
 		        }
 		        cur.delta = cur.delta / (double) (count); 
-		        //cur.delta *= stats.getDisperse();
 		        
 		        if (result == null || result.delta > cur.delta) { 
 		        	result = cur;
