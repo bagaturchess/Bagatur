@@ -392,17 +392,21 @@ class ImageHandlerImpl_AWT implements ImageHandler {
 	@Override
 	public Object extractResult(Object image, PatternMatchingData matcherData, float factorOfExtension) {
 		
-		while (matcherData.x - (factorOfExtension - 1) * matcherData.size / 2f < 0) {
+		while (factorOfExtension > 1 && matcherData.x - (factorOfExtension - 1) * matcherData.size / 2f < 0) {
 			factorOfExtension -= 0.0001;
 		}
-		while (matcherData.x + matcherData.size + (factorOfExtension - 1) * matcherData.size / 2f >= ((BufferedImage)image).getWidth()) {
+		while (factorOfExtension > 1 && matcherData.x + matcherData.size + (factorOfExtension - 1) * matcherData.size / 2f >= ((BufferedImage)image).getWidth()) {
 			factorOfExtension -= 0.0001;
 		}
-		while (matcherData.y - (factorOfExtension - 1) * matcherData.size / 2f < 0) {
+		while (factorOfExtension > 1 && matcherData.y - (factorOfExtension - 1) * matcherData.size / 2f < 0) {
 			factorOfExtension -= 0.0001;
 		}
-		while (matcherData.y + matcherData.size + (factorOfExtension - 1) * matcherData.size / 2f >= ((BufferedImage)image).getHeight()) {
+		while (factorOfExtension > 1 && matcherData.y + matcherData.size + (factorOfExtension - 1) * matcherData.size / 2f >= ((BufferedImage)image).getHeight()) {
 			factorOfExtension -= 0.0001;
+		}
+		
+		if (factorOfExtension < 1) {
+			factorOfExtension = 1;
 		}
 		
 		int[][][] print = new int[(int) (matcherData.size * factorOfExtension) + 1][(int) (matcherData.size * factorOfExtension) + 1][3];
