@@ -134,7 +134,7 @@ public class ImageHandlerSingleton implements ImageHandler {
 
 
 	@Override
-	public Object extractResult(Object image, PatternMatchingData bestData) {
-		return instance.extractResult(image, bestData);
+	public Object extractResult(Object image, PatternMatchingData bestData, float factorOfExtension) {
+		return instance.extractResult(image, bestData, factorOfExtension);
 	}
 }

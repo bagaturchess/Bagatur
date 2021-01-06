@@ -98,8 +98,8 @@ public class ImagePreProcessor_Impl1 extends ImagePreProcessor_Base {
 			}
 		}
 		
-		Object result = ImageHandlerSingleton.getInstance().extractResult(image, bestData);
-		result = ImageHandlerSingleton.getInstance().enlarge(result, 1.03f, ImageHandlerSingleton.getInstance().getAVG(result));
+		Object result = ImageHandlerSingleton.getInstance().extractResult(image, bestData, 1.05f);
+		//result = ImageHandlerSingleton.getInstance().enlarge(result, 1.03f, ImageHandlerSingleton.getInstance().getAVG(result));
 		result = ImageHandlerSingleton.getInstance().resizeImage(result, boardProperties.getImageSize());
 		ImageHandlerSingleton.getInstance().saveImage("result_" + bestData.size + "_" + bestData.angle + "_" + bestData.delta, "png", result);
 		

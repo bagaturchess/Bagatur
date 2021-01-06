@@ -45,5 +45,5 @@ public interface ImageHandler {
 	public Object getColor(int grayColor);
 	public Object enlarge(Object image, double scale, Object bgcolor);
 	public Object getAVG(Object image);
-	public Object extractResult(Object image, PatternMatchingData bestData);
+	public Object extractResult(Object image, PatternMatchingData bestData, float factorOfExtension);
 }

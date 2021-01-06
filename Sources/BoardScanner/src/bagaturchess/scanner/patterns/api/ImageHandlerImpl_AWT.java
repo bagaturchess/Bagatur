@@ -389,12 +389,22 @@ class ImageHandlerImpl_AWT implements ImageHandler {
 	
 	
 	@Override
-	public Object extractResult(Object image, PatternMatchingData matcherData) {
+	public Object extractResult(Object image, PatternMatchingData matcherData, float factorOfExtension) {
 		
-		int[][][] print = new int[matcherData.size][matcherData.size][3];
-		for (int i = 0; i < matcherData.size; i++) {
-			for (int j = 0; j < matcherData.size; j++) {
-				int rgb = ((BufferedImage)image).getRGB(matcherData.x + i, matcherData.y + j);
+		int[][][] print = new int[(int) (matcherData.size * factorOfExtension) + 1][(int) (matcherData.size * factorOfExtension) + 1][3];
+		for (int i = 0; i < matcherData.size * factorOfExtension; i++) {
+			for (int j = 0; j < matcherData.size * factorOfExtension; j++) {
+				
+				int indexX = (int) (matcherData.x - (factorOfExtension - 1) * matcherData.size / 2 + i);
+				int indexY = (int) (matcherData.y - (factorOfExtension - 1) * matcherData.size / 2 + j);
+				
+				indexX = Math.max(0, indexX);
+				indexX = Math.min(((BufferedImage)image).getWidth() - 1, indexX);
+				
+				indexY = Math.max(0, indexY);
+				indexY = Math.min(((BufferedImage)image).getHeight() - 1, indexY);
+				
+				int rgb = ((BufferedImage)image).getRGB(indexX, indexY);
 				int red = (rgb & 0xff0000) >> 16;
 				int green = (rgb & 0xff00) >> 8;
 				int blue = rgb & 0xff;
