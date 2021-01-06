@@ -312,10 +312,10 @@ public class MatrixUtils {
 			                cur.delta += Math.abs(graySource[x+i][y+j] - grayPattern[i][j]);
 			                count++;
 			                
-			                if (result != null && cur.delta / (float) (count) > result.delta) {
+			                /*if (result != null && cur.delta / (float) (count) > result.delta) {
 			                	i = grayPattern.length;
 			                	break;
-			                }
+			                }*/
 			            }
 			        }
 			        cur.delta = cur.delta / (double) (count); 
