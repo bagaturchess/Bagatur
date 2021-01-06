@@ -34,7 +34,7 @@ public class PreProcessingMain {
 		
 		try {
 			
-			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test10.png");
+			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test9.png");
 			
 			BoardProperties boardProperties = new BoardProperties(192);
 			ImagePreProcessor_Base processor = new ImagePreProcessor_Crop(boardProperties);

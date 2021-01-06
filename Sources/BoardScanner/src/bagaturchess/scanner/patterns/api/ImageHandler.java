@@ -46,4 +46,5 @@ public interface ImageHandler {
 	public Object enlarge(Object image, double scale, Object bgcolor);
 	public Object getAVG(Object image);
 	public Object extractResult(Object image, PatternMatchingData bestData, float factorOfExtension);
+	public Object rotateImageByDegrees(Object image, float angle);
 }

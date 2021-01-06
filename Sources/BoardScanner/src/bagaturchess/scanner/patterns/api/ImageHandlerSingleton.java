@@ -137,4 +137,10 @@ public class ImageHandlerSingleton implements ImageHandler {
 	public Object extractResult(Object image, PatternMatchingData bestData, float factorOfExtension) {
 		return instance.extractResult(image, bestData, factorOfExtension);
 	}
+
+
+	@Override
+	public Object rotateImageByDegrees(Object image, float angle) {
+		return instance.rotateImageByDegrees(image, angle);
+	}
 }

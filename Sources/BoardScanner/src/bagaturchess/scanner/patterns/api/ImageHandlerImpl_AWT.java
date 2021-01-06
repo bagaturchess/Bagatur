@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -391,6 +392,19 @@ class ImageHandlerImpl_AWT implements ImageHandler {
 	@Override
 	public Object extractResult(Object image, PatternMatchingData matcherData, float factorOfExtension) {
 		
+		while (matcherData.x - (factorOfExtension - 1) * matcherData.size / 2f < 0) {
+			factorOfExtension -= 0.0001;
+		}
+		while (matcherData.x + matcherData.size + (factorOfExtension - 1) * matcherData.size / 2f >= ((BufferedImage)image).getWidth()) {
+			factorOfExtension -= 0.0001;
+		}
+		while (matcherData.y - (factorOfExtension - 1) * matcherData.size / 2f < 0) {
+			factorOfExtension -= 0.0001;
+		}
+		while (matcherData.y + matcherData.size + (factorOfExtension - 1) * matcherData.size / 2f >= ((BufferedImage)image).getHeight()) {
+			factorOfExtension -= 0.0001;
+		}
+		
 		int[][][] print = new int[(int) (matcherData.size * factorOfExtension) + 1][(int) (matcherData.size * factorOfExtension) + 1][3];
 		for (int i = 0; i < matcherData.size * factorOfExtension; i++) {
 			for (int j = 0; j < matcherData.size * factorOfExtension; j++) {
@@ -417,4 +431,31 @@ class ImageHandlerImpl_AWT implements ImageHandler {
 		
 		return ScannerUtils.createRGBImage(print);
 	}
+	
+	
+	@Override
+	public Object rotateImageByDegrees(Object image, float angle) {
+		
+        double rads = Math.toRadians(angle);
+        double sin = Math.abs(Math.sin(rads)), cos = Math.abs(Math.cos(rads));
+        int w = ((BufferedImage)image).getWidth();
+        int h = ((BufferedImage)image).getHeight();
+        int newWidth = (int) Math.floor(w * cos + h * sin);
+        int newHeight = (int) Math.floor(h * cos + w * sin);
+        
+        BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = rotated.createGraphics();
+        AffineTransform at = new AffineTransform();
+        at.translate((newWidth - w) / 2, (newHeight - h) / 2);
+        
+        int x = w / 2;
+        int y = h / 2;
+        
+        at.rotate(rads, x, y);
+        g2d.setTransform(at);
+        g2d.drawImage(((BufferedImage)image), 0, 0, null);
+        g2d.dispose();
+        
+        return rotated;
+    }
 }

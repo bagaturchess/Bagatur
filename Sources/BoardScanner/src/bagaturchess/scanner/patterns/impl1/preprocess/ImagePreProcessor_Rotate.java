@@ -74,7 +74,7 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 		}
 		
 		Object resultImageTmp = ImageHandlerSingleton.getInstance().createGrayImage(result_tmp);
-		ImageHandlerSingleton.getInstance().saveImage("filtered", "png", resultImageTmp);
+		ImageHandlerSingleton.getInstance().saveImage("rotate_filtered", "png", resultImageTmp);
 		
 		VarStatistic colorsCountStat = new VarStatistic(false);
 		for (int color : colorsCounts.keySet()) {
@@ -90,7 +90,12 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 		FilterInfo bestInfo = null;
 		for (float angleInDegrees = -MAX_ROTATION_PERCENT; angleInDegrees <= MAX_ROTATION_PERCENT; angleInDegrees += 1) {
 			
-			int[][] source = angleInDegrees == 0 ? grayBoard : MatrixUtils.rotateMatrix(grayBoard, angleInDegrees, 0);
+			int[][] source = grayBoard;
+			if (angleInDegrees != 0) {
+				Object grayImage = ImageHandlerSingleton.getInstance().createGrayImage(source);
+				grayImage = ImageHandlerSingleton.getInstance().rotateImageByDegrees(grayImage, angleInDegrees);
+				source = ImageHandlerSingleton.getInstance().convertToGrayMatrix(grayImage);
+			}
 			
 			FilterInfo curInfo = getSizes(source, colorsCounts, colorsCountStat);
 			curInfo.angleInDegrees = angleInDegrees;
@@ -114,7 +119,7 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 		//resultImage = ImageHandlerSingleton.getInstance().enlarge(resultImage, 1.025f, ImageHandlerSingleton.getInstance().getAVG(resultImage));
 		//resultImage = ImageHandlerSingleton.getInstance().resizeImage(resultImage, boardProperties.getImageSize());
 		
-		ImageHandlerSingleton.getInstance().saveImage("filter_result_" +  bestInfo.angleInDegrees, "png", resultImage);
+		ImageHandlerSingleton.getInstance().saveImage("rotate_filter_result_" +  bestInfo.angleInDegrees, "png", resultImage);
 		
 		return resultImage;
 	}
