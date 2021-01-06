@@ -293,42 +293,36 @@ public class MatrixUtils {
 		
 		PatternMatchingData result = null;
 		
-		int increment = 1;//Math.max(1, (graySource.length - grayPattern.length) / 2);
-		
-		while (increment > 0) {
-			for (int x = 0; x <= graySource.length - grayPattern.length; x += increment) {
-			    for (int y = 0; y <= graySource.length - grayPattern.length; y += increment) {
-			        
-			    	PatternMatchingData cur = new PatternMatchingData();
-			    	cur.x = x;
-			    	cur.y = y;
-			    	cur.size = grayPattern.length;
-			    	cur.pattern = grayPattern;
-			    	
-			    	int count = 0;
-			        for (int i = 0; i < grayPattern.length; i++ ) {
-			            for (int j = 0; j < grayPattern.length; j++ ) {
-			                
-			                cur.delta += Math.abs(graySource[x+i][y+j] - grayPattern[i][j]);
-			                count++;
-			                
-			                /*if (result != null && cur.delta / (float) (count) > result.delta) {
-			                	i = grayPattern.length;
-			                	break;
-			                }*/
-			            }
-			        }
-			        cur.delta = cur.delta / (double) (count); 
-			        
-			        if (result == null || result.delta > cur.delta) { 
-			        	result = cur;
-			        }
-			    }
-			}
-			
-			increment = increment / 2;
+		for (int x = 0; x <= graySource.length - grayPattern.length; x++) {
+		    for (int y = 0; y <= graySource.length - grayPattern.length; y++) {
+		        
+		    	PatternMatchingData cur = new PatternMatchingData();
+		    	cur.x = x;
+		    	cur.y = y;
+		    	cur.size = grayPattern.length;
+		    	cur.pattern = grayPattern;
+		    	
+		    	int count = 0;
+		        for (int i = 0; i < grayPattern.length; i++ ) {
+		            for (int j = 0; j < grayPattern.length; j++ ) {
+		                
+		                cur.delta += Math.abs(graySource[x+i][y+j] - grayPattern[i][j]);
+		                count++;
+		                
+		                /*if (result != null && cur.delta / (float) (count) > result.delta) {
+		                	i = grayPattern.length;
+		                	break;
+		                }*/
+		            }
+		        }
+		        cur.delta = cur.delta / (double) (count); 
+		        
+		        if (result == null || result.delta > cur.delta) { 
+		        	result = cur;
+		        }
+		    }
 		}
-		
+			
 		return result;
 	}
 	
