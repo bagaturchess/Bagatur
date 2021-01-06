@@ -24,11 +24,11 @@ import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
-import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Impl2;
+import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Rotate;
 import bagaturchess.scanner.patterns.impl1.matchers.Matcher_Base;
 import bagaturchess.scanner.patterns.impl1.matchers.Matcher_Composite;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Base;
-import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Impl1;
+import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Crop;
 
 
 public class AllMain {
@@ -44,7 +44,7 @@ public class AllMain {
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/chess.com/test1.png");
 			
 			BoardProperties boardProperties = new BoardProperties(192);
-			ImagePreProcessor_Base processor = new ImagePreProcessor_Impl2(boardProperties);
+			ImagePreProcessor_Base processor = new ImagePreProcessor_Rotate(boardProperties);
 			
 			long startTime = System.currentTimeMillis();
 			Object preProcessedImage = processor.filter(image);

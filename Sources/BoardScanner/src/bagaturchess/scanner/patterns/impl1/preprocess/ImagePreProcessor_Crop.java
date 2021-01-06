@@ -35,14 +35,14 @@ import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 //https://stackoverflow.com/questions/12598818/finding-a-picture-in-a-picture-with-java
 //https://stackoverflow.com/questions/42597094/cross-correlation-with-signals-of-different-lengths-in-java
 //https://stackoverflow.com/questions/13445497/correlation-among-2-images
-public class ImagePreProcessor_Impl1 extends ImagePreProcessor_Base {
+public class ImagePreProcessor_Crop extends ImagePreProcessor_Base {
 	
 	
 	private static final double SIZE_DELTA_PERCENT = 0.17;
 	private static final int MAX_ROTATION_PERCENT = 0;
 	
 	
-	public ImagePreProcessor_Impl1(BoardProperties _boardProperties) {
+	public ImagePreProcessor_Crop(BoardProperties _boardProperties) {
 		super(_boardProperties);
 	}
 	

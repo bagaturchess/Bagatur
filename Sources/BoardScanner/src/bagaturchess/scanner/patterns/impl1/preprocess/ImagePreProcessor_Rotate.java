@@ -32,13 +32,13 @@ import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 
 
-public class ImagePreProcessor_Impl2 extends ImagePreProcessor_Base {
+public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 	
 	
 	private static final int MAX_ROTATION_PERCENT = 5;
 	
 	
-	public ImagePreProcessor_Impl2(BoardProperties _boardProperties) {
+	public ImagePreProcessor_Rotate(BoardProperties _boardProperties) {
 		super(_boardProperties);
 	}
 	
@@ -54,14 +54,14 @@ public class ImagePreProcessor_Impl2 extends ImagePreProcessor_Base {
 		
 		Map<Integer, Integer> colorsCounts = new HashMap<Integer, Integer>();
 		
-		//int[][] result_tmp = new int[grayBoard.length][grayBoard.length];
+		int[][] result_tmp = new int[grayBoard.length][grayBoard.length];
 		for (int i = 0; i < grayBoard.length; i++) {
 			for (int j = 0; j < grayBoard.length; j++) {
 				int cur_color = grayBoard[i][j];
 				
 				if (Math.abs(bgcolours.getFirst() - cur_color) <= colorStat.getDisperse() / 3
 						|| Math.abs(bgcolours.getSecond() - cur_color) <= colorStat.getDisperse() / 3) {
-					//result_tmp[i][j] = grayBoard[i][j];
+					result_tmp[i][j] = grayBoard[i][j];
 					
 					if (colorsCounts.containsKey(cur_color)) {
 						Integer count = colorsCounts.get(cur_color);
@@ -73,8 +73,8 @@ public class ImagePreProcessor_Impl2 extends ImagePreProcessor_Base {
 			}
 		}
 		
-		//Object resultImageTmp = ImageHandlerSingleton.getInstance().createGrayImage(result_tmp);
-		//ImageHandlerSingleton.getInstance().saveImage("filtered", "png", resultImageTmp);
+		Object resultImageTmp = ImageHandlerSingleton.getInstance().createGrayImage(result_tmp);
+		ImageHandlerSingleton.getInstance().saveImage("filtered", "png", resultImageTmp);
 		
 		VarStatistic colorsCountStat = new VarStatistic(false);
 		for (int color : colorsCounts.keySet()) {
