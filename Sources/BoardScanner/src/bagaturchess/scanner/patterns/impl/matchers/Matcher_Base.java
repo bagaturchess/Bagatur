@@ -85,7 +85,7 @@ public abstract class Matcher_Base {
 				//if (!emptySquares.contains(fieldID)) {
 					
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-					int bgcolor_avg = (int) MatrixUtils.calculateColorStats(squareMatrix).getEntropy();
+					int bgcolor_avg = (int) MatrixUtils.calculateColorStats(squareMatrix, -1).getEntropy();
 					
 					MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
 					bestPatternData.x = 0;
@@ -173,7 +173,7 @@ public abstract class Matcher_Base {
 					
 						MatrixUtils.PatternMatchingData[] curData = new MatrixUtils.PatternMatchingData[256];
 						
-						int bgcolor = (int) MatrixUtils.calculateColorStats(graySquareMatrix).getEntropy();
+						int bgcolor = (int) MatrixUtils.calculateColorStats(graySquareMatrix, -1).getEntropy();
 						
 						int[][] grayPattern = pid == Constants.PID_NONE ?
 								ScannerUtils.createSquareImage(bgcolor, size)

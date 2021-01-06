@@ -25,6 +25,7 @@ import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Rotate;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Base;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Crop;
+import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Impl3;
 
 
 public class PreProcessingMain {
@@ -34,10 +35,10 @@ public class PreProcessingMain {
 		
 		try {
 			
-			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test9.png");
+			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test8.png");
 			
 			BoardProperties boardProperties = new BoardProperties(192);
-			ImagePreProcessor_Base processor = new ImagePreProcessor_Crop(boardProperties);
+			ImagePreProcessor_Base processor = new ImagePreProcessor_Impl3(boardProperties);
 			
 			long startTime = System.currentTimeMillis();
 			processor.filter(image);

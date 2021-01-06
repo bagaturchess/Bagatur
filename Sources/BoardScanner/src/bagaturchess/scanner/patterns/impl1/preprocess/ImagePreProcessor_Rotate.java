@@ -50,7 +50,7 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 		
 		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
 		ResultPair<Integer, Integer> bgcolours = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
-		VarStatistic colorStat = MatrixUtils.calculateColorStats(grayBoard);
+		VarStatistic colorStat = MatrixUtils.calculateColorStats(grayBoard, -1);
 		
 		Map<Integer, Integer> colorsCounts = new HashMap<Integer, Integer>();
 		

@@ -67,7 +67,7 @@ public class MatrixUtils {
 				
 				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
 				
-				VarStatistic squareStat = calculateColorStats(squareMatrix);
+				VarStatistic squareStat = calculateColorStats(squareMatrix, -1);
 				squaresStats.put(fieldID, squareStat);
 				
 				colorDeviations.addValue(squareStat.getDisperse(), squareStat.getDisperse());
@@ -132,14 +132,16 @@ public class MatrixUtils {
 	}
 	
 	
-	public static VarStatistic calculateColorStats(int[][] grayMatrix) {
+	public static VarStatistic calculateColorStats(int[][] grayMatrix, int skipValue) {
 		
 		VarStatistic stat = new VarStatistic(false);
 		
 		for (int i = 0; i < grayMatrix.length; i++) {
 			for (int j = 0; j < grayMatrix.length; j++) {
 				int cur = grayMatrix[i][j];
-				stat.addValue(cur, cur);
+				if (cur != skipValue) {
+					stat.addValue(cur, cur);
+				}
 			}
 		}
 		
