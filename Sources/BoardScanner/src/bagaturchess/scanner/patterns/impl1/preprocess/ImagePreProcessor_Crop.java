@@ -38,7 +38,7 @@ import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 public class ImagePreProcessor_Crop extends ImagePreProcessor_Base {
 	
 	
-	private static final double SIZE_DELTA_PERCENT = 0.17;
+	private static final double SIZE_DELTA_PERCENT = 0.333;
 	
 	
 	public ImagePreProcessor_Crop(BoardProperties _boardProperties) {
