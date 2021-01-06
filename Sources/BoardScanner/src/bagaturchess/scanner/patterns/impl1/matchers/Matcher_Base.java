@@ -73,43 +73,46 @@ public abstract class Matcher_Base {
 				int rank = j / (grayBoard.length / 8);
 				int fieldID = 63 - (file + 8 * rank);
 				
-				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-				//int bgcolor_avg = (int) MatrixUtils.calculateColorStats(squareMatrix).getEntropy();
-				
-				MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
-				bestPatternData.x = 0;
-				bestPatternData.y = 0;
-				bestPatternData.size = squareMatrix.length;
-				//ImageHandlerSingleton.getInstance().printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
-				
-				Set<Integer> pidsToSearch = new HashSet<Integer>();
-				pidsToSearch.add(Constants.PID_NONE);
-				if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_W_PAWN);
-				pidsToSearch.add(Constants.PID_W_KNIGHT);
-				pidsToSearch.add(Constants.PID_W_BISHOP);
-				pidsToSearch.add(Constants.PID_W_ROOK);
-				pidsToSearch.add(Constants.PID_W_QUEEN);
-				pidsToSearch.add(Constants.PID_W_KING);
-				if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_B_PAWN);
-				pidsToSearch.add(Constants.PID_B_KNIGHT);
-				pidsToSearch.add(Constants.PID_B_BISHOP);
-				pidsToSearch.add(Constants.PID_B_ROOK);
-				pidsToSearch.add(Constants.PID_B_QUEEN);
-				pidsToSearch.add(Constants.PID_B_KING);
-				
-				List<Integer> bgcolors = new ArrayList<Integer>();
-				//bgcolors.add(bgcolor_avg);
-				bgcolors.add((file + rank) % 2 == 0 ? bgcolorsOfSquares.getFirst() : bgcolorsOfSquares.getSecond());
-				
-				ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData
-					= getPID(squareMatrix, true, bgcolors, pidsToSearch, fieldID);
-				pids[fieldID] = pidAndData.getFirst();
-				MatrixUtils.PatternMatchingData data = pidAndData.getSecond();
-				result.totalDelta += data.delta;
-				
-				//if (pids[fieldID] != Constants.PID_NONE) {
+				pids[fieldID] = Constants.PID_NONE;
+						
+				if (!emptySquares.contains(fieldID)) {
+					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
+					//int bgcolor_avg = (int) MatrixUtils.calculateColorStats(squareMatrix).getEntropy();
+					
+					MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
+					bestPatternData.x = 0;
+					bestPatternData.y = 0;
+					bestPatternData.size = squareMatrix.length;
+					//ImageHandlerSingleton.getInstance().printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
+					
+					Set<Integer> pidsToSearch = new HashSet<Integer>();
+					pidsToSearch.add(Constants.PID_NONE);
+					if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_W_PAWN);
+					pidsToSearch.add(Constants.PID_W_KNIGHT);
+					pidsToSearch.add(Constants.PID_W_BISHOP);
+					pidsToSearch.add(Constants.PID_W_ROOK);
+					pidsToSearch.add(Constants.PID_W_QUEEN);
+					pidsToSearch.add(Constants.PID_W_KING);
+					if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_B_PAWN);
+					pidsToSearch.add(Constants.PID_B_KNIGHT);
+					pidsToSearch.add(Constants.PID_B_BISHOP);
+					pidsToSearch.add(Constants.PID_B_ROOK);
+					pidsToSearch.add(Constants.PID_B_QUEEN);
+					pidsToSearch.add(Constants.PID_B_KING);
+					
+					List<Integer> bgcolors = new ArrayList<Integer>();
+					//bgcolors.add(bgcolor_avg);
+					bgcolors.add((file + rank) % 2 == 0 ? bgcolorsOfSquares.getFirst() : bgcolorsOfSquares.getSecond());
+					
+					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData
+						= getPID(squareMatrix, true, bgcolors, pidsToSearch, fieldID);
+					pids[fieldID] = pidAndData.getFirst();
+					MatrixUtils.PatternMatchingData data = pidAndData.getSecond();
+					result.totalDelta += data.delta;
+					//if (pids[fieldID] != Constants.PID_NONE) {
 					countPIDs++;
-				//}
+					//}
+				}
 			}
 		}
 		

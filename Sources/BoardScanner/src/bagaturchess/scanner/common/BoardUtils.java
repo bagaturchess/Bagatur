@@ -21,10 +21,13 @@ package bagaturchess.scanner.common;
 
 
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl1.internal.ChessConstants;
 
 
 public class BoardUtils {
+	
+	
+	private static final String FEN_WHITE_PIECES[] = { "1", "P", "N", "B", "R", "Q", "K" };
+	private static final String FEN_BLACK_PIECES[] = { "1", "p", "n", "b", "r", "q", "k" };
 	
 	
 	public static String createFENFromPIDs(int[] pids) {
@@ -32,9 +35,9 @@ public class BoardUtils {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 63; i >= 0; i--) {
 			if (pids[i] >= 1 && pids[i] <= 6) {
-				sb.append(ChessConstants.FEN_WHITE_PIECES[Constants.PIECE_IDENTITY_2_TYPE[pids[i]]]);
+				sb.append(FEN_WHITE_PIECES[Constants.PIECE_IDENTITY_2_TYPE[pids[i]]]);
 			} else {
-				sb.append(ChessConstants.FEN_BLACK_PIECES[Constants.PIECE_IDENTITY_2_TYPE[pids[i]]]);
+				sb.append(FEN_BLACK_PIECES[Constants.PIECE_IDENTITY_2_TYPE[pids[i]]]);
 			}
 			
 			if (i % 8 == 0 && i != 0) {

@@ -23,8 +23,9 @@ package bagaturchess.scanner.patterns.impl1.matchers;
 import java.util.ArrayList;
 import java.util.List;
 
-import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.patterns.api.ImageHandler;
+import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
 
 
@@ -58,8 +59,10 @@ public class Matcher_Composite extends Matcher_Base {
 		int best_index = 0;
 		double best_delta = Double.MAX_VALUE;
 		
-		int[][] grayBoard_classifier = ScannerUtils.convertToGrayMatrix(
-					ScannerUtils.resizeImage(ScannerUtils.createGrayImage(grayBoard), CLASSIFIER_SIZE)
+		ImageHandler imageHandler = ImageHandlerSingleton.getInstance();
+		
+		int[][] grayBoard_classifier = imageHandler.convertToGrayMatrix(
+					imageHandler.resizeImage(imageHandler.createGrayImage(grayBoard), CLASSIFIER_SIZE)
 				);
 		
 		for (int i = 0; i < matchers_classifier.size(); i++) {

@@ -88,7 +88,7 @@ public class ImagePreProcessor_Impl2 extends ImagePreProcessor_Base {
 		}
 		
 		FilterInfo bestInfo = null;
-		for (float angleInDegrees = -MAX_ROTATION_PERCENT; angleInDegrees <= MAX_ROTATION_PERCENT; angleInDegrees += 0.1) {
+		for (float angleInDegrees = -MAX_ROTATION_PERCENT; angleInDegrees <= MAX_ROTATION_PERCENT; angleInDegrees += 1) {
 			
 			int[][] source = angleInDegrees == 0 ? grayBoard : MatrixUtils.rotateMatrix(grayBoard, angleInDegrees, 0);
 			

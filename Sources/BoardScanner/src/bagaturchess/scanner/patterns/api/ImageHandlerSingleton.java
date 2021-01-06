@@ -20,8 +20,6 @@
 package bagaturchess.scanner.patterns.api;
 
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import bagaturchess.scanner.common.BoardProperties;
@@ -31,19 +29,25 @@ import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 public class ImageHandlerSingleton implements ImageHandler {
 	
 	
-	private static final ImageHandler instance;
-	
-	
+	private static ImageHandler instance;
+    
     static {
-    	instance = new bagaturchess.scanner.patterns.api.ImageHandlerImpl_AWT();
+    	getInstance(null);
     }
     
-    
-    public static ImageHandler getInstance(){
+    public static ImageHandler getInstance(Object context){
+        if (instance == null) {
+        	instance = new bagaturchess.scanner.patterns.api.ImageHandlerImpl_AWT();
+        }
         return instance;
     }
-
-
+    
+    
+	public static ImageHandler getInstance() {
+		return instance;
+	}
+	
+	
 	@Override
 	public Object loadImageFromFS(Object path) throws IOException {
 		return instance.loadImageFromFS(path);
