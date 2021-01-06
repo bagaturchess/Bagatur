@@ -21,20 +21,21 @@ package bagaturchess.scanner.patterns.impl1.preprocess;
 
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.MatrixUtils;
+import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 
 
-public class ImagePreProcessor_Impl3 extends ImagePreProcessor_Base {
+public class ImagePreProcessor_Impl4 extends ImagePreProcessor_Base {
 	
 	
-	private static final int MAX_ROTATION_PERCENT = 5;
-	
-	
-	public ImagePreProcessor_Impl3(BoardProperties _boardProperties) {
+	public ImagePreProcessor_Impl4(BoardProperties _boardProperties) {
 		super(_boardProperties);
 	}
 	
@@ -45,59 +46,70 @@ public class ImagePreProcessor_Impl3 extends ImagePreProcessor_Base {
 		int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(image);
 		ImageHandlerSingleton.getInstance().saveImage("input", "png", image);
 		
-		//Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
-		//ResultPair<Integer, Integer> bgcolours = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
 		int[][] iteration_array = grayBoard;
-		int interations = 4;
-		while (interations > 0) {
-			VarStatistic colorStat = MatrixUtils.calculateColorStats(iteration_array, 0);
-			int[][] result_tmp = new int[iteration_array.length][iteration_array.length];
+		
+		int iterations = 20;
+		while (iterations > 0) {
+			float[][] scores = new float[iteration_array.length][iteration_array.length];
 			for (int i = 0; i < iteration_array.length; i++) {
 				for (int j = 0; j < iteration_array.length; j++) {
 					int cur_color = iteration_array[i][j];
-					if (cur_color >= colorStat.getEntropy() - colorStat.getDisperse()
-							&& cur_color <= colorStat.getEntropy() + colorStat.getDisperse()) {
+					if (cur_color != 0) {
+						int startX = Math.max(0, i - iteration_array.length / 16);
+						int endX = Math.min(iteration_array.length, i + iteration_array.length / 16);
+						int startY = Math.max(0, j - iteration_array.length / 16);
+						int endY = Math.min(iteration_array.length, j + iteration_array.length / 16);
+						for (int i1 = startX; i1 < endX; i1++) {
+							for (int j1 = startY; j1 < endY; j1++) {
+								int cur_neighbour = iteration_array[i1][j1];
+								if (cur_neighbour != 0) {
+									int delta = cur_color - cur_neighbour == 0 ? 1 : cur_color - cur_neighbour;
+									scores[i][j] += 1 / (float) Math.abs(delta);
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			VarStatistic scoresStat = new VarStatistic(false);
+			for (int i = 0; i < scores.length; i++) {
+				for (int j = 0; j < scores.length; j++) {
+					float score = scores[i][j];
+					if (score != 0) {
+						scoresStat.addValue(score, score);
+					}	
+				}
+			}
+			
+			int[][] result_tmp = new int[iteration_array.length][iteration_array.length];
+			for (int i = 0; i < iteration_array.length; i++) {
+				for (int j = 0; j < iteration_array.length; j++) {
+					if (scores[i][j] >= scoresStat.getEntropy() - scoresStat.getDisperse() && scores[i][j] <= scoresStat.getEntropy() + scoresStat.getDisperse()) {
 						result_tmp[i][j] = iteration_array[i][j];
 					}
 				}
 			}
+			
 			Object resultImageTmp = ImageHandlerSingleton.getInstance().createGrayImage(result_tmp);
-			ImageHandlerSingleton.getInstance().saveImage("rotate_filtered" + interations, "png", resultImageTmp);
+			ImageHandlerSingleton.getInstance().saveImage("rotate_filtered" + iterations, "png", resultImageTmp);
+			
+			iterations--;
 			
 			iteration_array = result_tmp;
-			
-			interations--;
 		}
 		
-		FilterInfo bestInfo = getSizes(iteration_array, 0);
-		
-		int[][] result = new int[grayBoard.length][grayBoard.length];
-		for (int i = 0; i < result.length; i++) {
-			for (int j = 0; j < result[0].length; j++) {
-				if (i >= bestInfo.minX && i <= bestInfo.maxX
-						&& j >= bestInfo.minY && j <= bestInfo.maxY) {
-					result[i][j] = grayBoard[i][j];
-				}
-			}
-		}
-		
-		Object resultImage = ImageHandlerSingleton.getInstance().createGrayImage(result);
-		resultImage = ImageHandlerSingleton.getInstance().resizeImage(resultImage, boardProperties.getImageSize());
-		//resultImage = ImageHandlerSingleton.getInstance().enlarge(resultImage, 1.025f, ImageHandlerSingleton.getInstance().getAVG(resultImage));
-		//resultImage = ImageHandlerSingleton.getInstance().resizeImage(resultImage, boardProperties.getImageSize());
-		
-		ImageHandlerSingleton.getInstance().saveImage("rotate_filter_result_" +  bestInfo.angleInDegrees, "png", resultImage);
-		
-		return resultImage;
+		return null;
 	}
 	
 	
-	private FilterInfo getSizes(int[][] source, int skipValue) {
+	private FilterInfo getSizes(int[][] source, Map<Integer, Integer> colorsCounts, VarStatistic colorsCountStat) {
 		FilterInfo finfo = new FilterInfo();
 		for (int i = 0; i < source.length; i++) {
 			for (int j = 0; j < source.length; j++) {
 				int color = source[i][j];
-				if (color != skipValue) {
+				Integer colorCount = colorsCounts.get(color);
+				if (colorCount != null && colorCount > colorsCountStat.getEntropy() - colorsCountStat.getDisperse()) {
 					if (i < finfo.minX) {
 						finfo.minX = i;
 					}
