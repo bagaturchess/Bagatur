@@ -39,18 +39,19 @@ public class AllMain {
 		
 		try {
 			
-			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test2.jpg");
+			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test11.png");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/test4.jpg");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/lichess.org/test1.png");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/chess.com/test2.png");
 			
 			BoardProperties boardProperties = new BoardProperties(192);
-			ImagePreProcessor_Base processor_crop = new ImagePreProcessor_Crop_KMeans(boardProperties);
+			//ImagePreProcessor_Base processor_crop = new ImagePreProcessor_Crop_KMeans(boardProperties);
+			ImagePreProcessor_Base processor_crop = new ImagePreProcessor_Crop(boardProperties);
 			ImagePreProcessor_Base processor_rotate = new ImagePreProcessor_Rotate(boardProperties);
 			
 			long startTime = System.currentTimeMillis();
 			Object preProcessedImage = processor_crop.filter(image);
-			//preProcessedImage = processor_rotate.filter(preProcessedImage);
+			preProcessedImage = processor_rotate.filter(preProcessedImage);
 			System.out.println("Filtered in " + (System.currentTimeMillis() - startTime) + "ms");
 			
 			int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(preProcessedImage);
