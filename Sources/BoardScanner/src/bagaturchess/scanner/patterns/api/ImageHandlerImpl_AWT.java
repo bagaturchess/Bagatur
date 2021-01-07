@@ -440,6 +440,7 @@ class ImageHandlerImpl_AWT implements ImageHandler {
 
 	@Override
 	public Object extractResult(Object image, FilterInfo filterInfo, float factorOfExtension) {
+		
 		while (factorOfExtension > 1 && filterInfo.minX - (factorOfExtension - 1) * (filterInfo.maxX - filterInfo.minX) / 2f < 0) {
 			factorOfExtension -= 0.0001;
 		}

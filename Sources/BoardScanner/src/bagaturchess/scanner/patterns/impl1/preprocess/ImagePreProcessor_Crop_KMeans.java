@@ -125,7 +125,7 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 		
 		Object resultImage = ImageHandlerSingleton.getInstance().createGrayImage(result);*/
 		
-		Object resultImage = ImageHandlerSingleton.getInstance().extractResult(image, bestInfo, 1f);
+		Object resultImage = ImageHandlerSingleton.getInstance().extractResult(image, bestInfo, 1.05f);
 		
 		resultImage = ImageHandlerSingleton.getInstance().resizeImage(resultImage, boardProperties.getImageSize());
 		ImageHandlerSingleton.getInstance().saveImage("result", "png", resultImage);
