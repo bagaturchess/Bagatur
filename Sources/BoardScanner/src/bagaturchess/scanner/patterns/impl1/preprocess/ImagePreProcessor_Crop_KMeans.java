@@ -32,6 +32,7 @@ import java.util.Set;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.FilterInfo;
+import bagaturchess.scanner.common.KMeans;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
@@ -54,92 +55,15 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 		Object grayImage = ImageHandlerSingleton.getInstance().createGrayImage(grayBoard);
 		ImageHandlerSingleton.getInstance().saveImage("input_gray", "png", grayImage);
 		
-		//K-Means start
-		int NUMBER_OF_CLUSTERS = 4;
-		
-		//Initialize
-		int[] centroids_values = initCentroids(NUMBER_OF_CLUSTERS);
-		
-		int[][] centroids_ids = new int[grayBoard.length][grayBoard.length];
-		
-		for (int i = 0; i < grayBoard.length; i++) {
-			for (int j = 0; j < grayBoard.length; j++) {
-				
-				int bestDistance = Integer.MAX_VALUE;
-				int bestCentroidID = -1;
-				for (int centroid_id = 0; centroid_id < centroids_values.length; centroid_id++) {
-					int distance = Math.abs(grayBoard[i][j] - centroids_values[centroid_id]);
-					if (distance < bestDistance) {
-						bestDistance = distance;
-						bestCentroidID = centroid_id;
-					}
-				}
-				
-				centroids_ids[i][j] = bestCentroidID;
-			}
-		}
-		
-		
-		boolean hasGlobalChange = true;
-		
-		long[] avgs_sum;
-		long[] avgs_cnt;
-		
-		//Loop until convergence
-		while (hasGlobalChange) {
-			
-			//System.out.println("start iteration " + count++);
-			
-			//Find avg
-			avgs_sum = new long[NUMBER_OF_CLUSTERS];
-			avgs_cnt = new long[NUMBER_OF_CLUSTERS];
-			
-			for (int i = 0; i < grayBoard.length; i++) {
-				for (int j = 0; j < grayBoard.length; j++) {
-					int centroid_id = centroids_ids[i][j];
-					avgs_sum[centroid_id] += grayBoard[i][j];
-					avgs_cnt[centroid_id]++;
-				}
-			}
-			
-			for (int centroid_id = 0; centroid_id < centroids_values.length; centroid_id++) {
-				centroids_values[centroid_id] = (int) (avgs_sum[centroid_id] / avgs_cnt[centroid_id]);
-				//System.out.println("centroid_id " + centroid_id + " avg " + centroids_values[centroid_id]);
-			}
-			
-			boolean hasChange = false;
-			//Adjust values
-			for (int i = 0; i < grayBoard.length; i++) {
-				for (int j = 0; j < grayBoard.length; j++) {		
-					
-					int bestDistance = Integer.MAX_VALUE;
-					int bestCentroidID = -1;
-					for (int centroid_id = 0; centroid_id < centroids_values.length; centroid_id++) {
-						int distance = Math.abs(grayBoard[i][j] - centroids_values[centroid_id]);
-						if (distance < bestDistance) {
-							bestDistance = distance;
-							bestCentroidID = centroid_id;
-						}
-					}
-					
-					if (bestCentroidID != centroids_ids[i][j]) {
-						centroids_ids[i][j] = bestCentroidID;
-						hasChange = true;
-					}
-				}
-			}
-			
-			hasGlobalChange = hasChange;
-		}
-		//K-Means end
+		KMeans kmeans= new KMeans(4, grayBoard);
 		
 		
 		//Print clusters
-		/*for (int centoridID = 0; centoridID < centroids_values.length; centoridID++) {
+		/*for (int centoridID = 0; centoridID < kmeans.centroids_values.length; centoridID++) {
 			int[][] result = new int[grayBoard.length][grayBoard.length];
 			for (int i = 0; i < grayBoard.length; i++) {
 				for (int j = 0; j < grayBoard.length; j++) {
-					int cur_centroid_id = centroids_ids[i][j];
+					int cur_centroid_id = kmeans.centroids_ids[i][j];
 					if (cur_centroid_id == centoridID) {
 						result[i][j] = grayBoard[i][j];
 					}
@@ -147,20 +71,20 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 			}
 			
 			Object resultImage = ImageHandlerSingleton.getInstance().createGrayImage(result);
-			ImageHandlerSingleton.getInstance().saveImage("kmeans" + centoridID + "_" + centroids_values[centoridID], "png", resultImage);
+			ImageHandlerSingleton.getInstance().saveImage("kmeans" + centoridID + "_" + kmeans.centroids_values[centoridID], "png", resultImage);
 		}*/
 		
 		
-		int[] weights = new int[centroids_values.length];
-		VarStatistic[] avg_x = new VarStatistic[centroids_values.length];
-		VarStatistic[] avg_y = new VarStatistic[centroids_values.length];
-		for (int centoridID = 0; centoridID < centroids_values.length; centoridID++) {
+		int[] weights = new int[kmeans.centroids_values.length];
+		VarStatistic[] avg_x = new VarStatistic[kmeans.centroids_values.length];
+		VarStatistic[] avg_y = new VarStatistic[kmeans.centroids_values.length];
+		for (int centoridID = 0; centoridID < kmeans.centroids_values.length; centoridID++) {
 			
 			avg_x[centoridID] = new VarStatistic(false);
 			avg_y[centoridID] = new VarStatistic(false);
 			for (int i = 0; i < grayBoard.length; i++) {
 				for (int j = 0; j < grayBoard.length; j++) {
-					int cur_centroid_id = centroids_ids[i][j];
+					int cur_centroid_id = kmeans.centroids_ids[i][j];
 					if (cur_centroid_id == centoridID) {
 						avg_x[centoridID].addValue(i, i);
 						avg_y[centoridID].addValue(j, j);
@@ -171,7 +95,7 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 			VarStatistic delta_avg = new VarStatistic(false);
 			for (int i = 0; i < grayBoard.length; i++) {
 				for (int j = 0; j < grayBoard.length; j++) {
-					int cur_centroid_id = centroids_ids[i][j];
+					int cur_centroid_id = kmeans.centroids_ids[i][j];
 					if (cur_centroid_id == centoridID) {
 						double distance = calculateDistanceBetweenPoints(avg_x[centoridID].getEntropy(), avg_y[centoridID].getEntropy(), i, j);
 						delta_avg.addValue(distance, distance);
@@ -190,7 +114,7 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 			List<Point> points = new ArrayList<Point>();
 			for (int i = 0; i < grayBoard.length; i++) {
 				for (int j = 0; j < grayBoard.length; j++) {
-					int cur_centroid_id = centroids_ids[i][j];
+					int cur_centroid_id = kmeans.centroids_ids[i][j];
 					if (cur_centroid_id == centoridID) {
 						double distance = calculateDistanceBetweenPoints(avg_x[centoridID].getEntropy(), avg_y[centoridID].getEntropy(), i, j);
 						points.add(new Point(i, j, grayBoard[i][j], distance));
@@ -265,15 +189,6 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 			}
 		}
 		return result_indexes;
-	}
-	
-	
-	private int[] initCentroids(int count) {
-		int[] centroids_values = new int[count];
-		for (int i = 0; i < centroids_values.length; i++) {
-			centroids_values[i] = 255 / (i + 1);
-		}
-		return centroids_values;
 	}
 	
 	
