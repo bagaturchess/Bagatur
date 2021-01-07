@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import bagaturchess.scanner.common.BoardProperties;
+import bagaturchess.scanner.common.KMeans;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
@@ -51,11 +52,39 @@ public class ImagePreProcessor_Crop extends ImagePreProcessor_Base {
 		image = ImageHandlerSingleton.getInstance().resizeImage(image, boardProperties.getImageSize());
 		int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(image);
 		
-		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
-		ResultPair<Integer, Integer> bgcolours = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
+		KMeans kmeans = new KMeans(4, grayBoard);
+		int[] clustersIndexes = kmeans.get2MaxWeightsIndexes();
+		//System.out.println(clustersIndexes[0] + " " + clustersIndexes[1]);
 		
-		Object whiteSquareColor = ImageHandlerSingleton.getInstance().getColor(bgcolours.getFirst());
-		Object blackSquareColor = ImageHandlerSingleton.getInstance().getColor(bgcolours.getSecond());
+		int[][] boardPixels_c1 = new int[grayBoard.length][grayBoard.length];
+		int[][] boardPixels_c2 = new int[grayBoard.length][grayBoard.length];
+		for (int index = 0; index < clustersIndexes.length; index++) {
+			int centoridID = clustersIndexes[index];
+			for (int i = 0; i < grayBoard.length; i++) {
+				for (int j = 0; j < grayBoard.length; j++) {
+					if (centoridID == kmeans.centroids_ids[i][j]) {
+						if (index == 0) {
+							boardPixels_c1[i][j] = grayBoard[i][j];
+						} else {
+							boardPixels_c2[i][j] = grayBoard[i][j];
+						}
+					}
+				}
+			}
+		}
+		
+		int gray1 = (int) MatrixUtils.calculateColorStats(boardPixels_c1, 0).getEntropy();
+		int gray2 = (int) MatrixUtils.calculateColorStats(boardPixels_c2, 0).getEntropy();
+		
+		//System.out.println(gray1 + " " + gray2);
+		
+		Object whiteSquareColor = ImageHandlerSingleton.getInstance().getColor(Math.max(gray1, gray2));
+		Object blackSquareColor = ImageHandlerSingleton.getInstance().getColor(Math.min(gray1, gray2));
+		
+		//Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
+		//ResultPair<Integer, Integer> bgcolours = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
+		//Object whiteSquareColor = ImageHandlerSingleton.getInstance().getColor(bgcolours.getFirst());
+		//Object blackSquareColor = ImageHandlerSingleton.getInstance().getColor(bgcolours.getSecond());
 		
 		Object emptyBoard = ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, "8/8/8/8/8/8/8/8", whiteSquareColor, blackSquareColor);
 		ImageHandlerSingleton.getInstance().saveImage("crop_board_empty", "png", emptyBoard);

@@ -124,10 +124,17 @@ public class KMeans {
 		int[] result_values = new int[2];
 		for (int i = 0; i < weights.length; i++) {
 			if (weights[i] > result_values[0]) {
-				result_values[1] = result_values[0];
 				result_values[0] = weights[i];
-				result_indexes[1] = result_indexes[0];
 				result_indexes[0] = i;
+			}
+		}
+		for (int i = 0; i < weights.length; i++) {
+			if (weights[i] == result_values[0]) {
+				continue;
+			}
+			if (weights[i] > result_values[1]) {
+				result_values[1] = weights[i];
+				result_indexes[1] = i;
 			}
 		}
 		return result_indexes;
