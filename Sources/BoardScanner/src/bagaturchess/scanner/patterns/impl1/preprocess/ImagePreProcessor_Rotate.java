@@ -60,8 +60,8 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 			for (int j = 0; j < grayBoard.length; j++) {
 				int cur_color = grayBoard[i][j];
 				
-				if (Math.abs(bgcolours.getFirst() - cur_color) <= colorStat.getDisperse() / 32
-						|| Math.abs(bgcolours.getSecond() - cur_color) <= colorStat.getDisperse() / 32) {
+				if (Math.abs(bgcolours.getFirst() - cur_color) <= colorStat.getDisperse() / 3
+						|| Math.abs(bgcolours.getSecond() - cur_color) <= colorStat.getDisperse() / 3) {
 					result_tmp[i][j] = grayBoard[i][j];
 					
 					if (colorsCounts.containsKey(cur_color)) {
