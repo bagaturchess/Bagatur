@@ -25,6 +25,7 @@ public class KMeans {
 	
 	public int[] centroids_values;
 	public int[][] centroids_ids;
+	public int[] weights;
 	private long[] avgs_sum;
 	private long[] avgs_cnt;
 	
@@ -106,6 +107,15 @@ public class KMeans {
 			hasGlobalChange = hasChange;
 		}
 		//K-Means end
+		
+		//Init weights
+		weights = new int[NUMBER_OF_CLUSTERS];
+		for (int i = 0; i < source.length; i++) {
+			for (int j = 0; j < source.length; j++) {
+				int cur_centroid_id = centroids_ids[i][j];
+				weights[cur_centroid_id]++;
+			}
+		}
 	}
 	
 	

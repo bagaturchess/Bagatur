@@ -57,7 +57,6 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 		
 		KMeans kmeans= new KMeans(4, grayBoard);
 		
-		
 		//Print clusters
 		/*for (int centoridID = 0; centoridID < kmeans.centroids_values.length; centoridID++) {
 			int[][] result = new int[grayBoard.length][grayBoard.length];
@@ -75,7 +74,6 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 		}*/
 		
 		
-		int[] weights = new int[kmeans.centroids_values.length];
 		VarStatistic[] avg_x = new VarStatistic[kmeans.centroids_values.length];
 		VarStatistic[] avg_y = new VarStatistic[kmeans.centroids_values.length];
 		for (int centoridID = 0; centoridID < kmeans.centroids_values.length; centoridID++) {
@@ -99,14 +97,13 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 					if (cur_centroid_id == centoridID) {
 						double distance = calculateDistanceBetweenPoints(avg_x[centoridID].getEntropy(), avg_y[centoridID].getEntropy(), i, j);
 						delta_avg.addValue(distance, distance);
-						weights[centoridID]++;
 					}
 				}
 			}
 			//System.out.println("centoridID " + centoridID + ": avg=" + delta_avg.getEntropy() + ", disp=" + delta_avg.getDisperse() + ", weight=" + weights[centoridID]);
 		}
 		
-		int[] centroidIDs = get2MaxWeightsIndexes(weights);
+		int[] centroidIDs = get2MaxWeightsIndexes(kmeans.weights);
 		int[][] boardPixels = new int[grayBoard.length][grayBoard.length];
 		
 		for (int index = 0; index < centroidIDs.length; index++) {
