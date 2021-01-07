@@ -119,6 +119,21 @@ public class KMeans {
 	}
 	
 	
+	public int[] get2MaxWeightsIndexes() {
+		int[] result_indexes = new int[2];
+		int[] result_values = new int[2];
+		for (int i = 0; i < weights.length; i++) {
+			if (weights[i] > result_values[0]) {
+				result_values[1] = result_values[0];
+				result_values[0] = weights[i];
+				result_indexes[1] = result_indexes[0];
+				result_indexes[0] = i;
+			}
+		}
+		return result_indexes;
+	}
+	
+	
 	private int[] initCentroids(int count) {
 		int[] centroids_values = new int[count];
 		for (int i = 0; i < centroids_values.length; i++) {
