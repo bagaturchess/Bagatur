@@ -25,9 +25,6 @@ import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Rotate;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Base;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Crop;
-import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Impl3;
-import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Impl4;
-import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Impl5;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Crop_KMeans;
 
 
