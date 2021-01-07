@@ -225,11 +225,18 @@ class ImageHandlerImpl_AWT implements ImageHandler {
 	
 	@Override
 	public int[][] createSquareImage(int bgcolor, int size) {
-		BufferedImage imageSquare = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+		/*BufferedImage imageSquare = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
 		Graphics g = imageSquare.getGraphics();
 		g.setColor(GRAY_COLORS[bgcolor]);
 		g.fillRect(0, 0, imageSquare.getWidth(), imageSquare.getHeight());
-		return ScannerUtils.convertToGrayMatrix(imageSquare);
+		return ScannerUtils.convertToGrayMatrix(imageSquare);*/
+		int[][] result = new int[size][size];
+		for (int i = 0; i < size; i++){
+			for (int j = 0; j < size; j++){
+				result[i][j] = bgcolor;
+			}
+		}
+		return result;
 	}
 	
 	
