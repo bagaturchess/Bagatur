@@ -68,6 +68,9 @@ public class KMeans {
 			//Find avg
 			avgs_sum = new long[NUMBER_OF_CLUSTERS];
 			avgs_cnt = new long[NUMBER_OF_CLUSTERS];
+			for (int i = 0; i < avgs_cnt.length; i++){
+				avgs_cnt[i] = 1;//there could be cluster with no elements
+			}
 			
 			for (int i = 0; i < source.length; i++) {
 				for (int j = 0; j < source.length; j++) {
