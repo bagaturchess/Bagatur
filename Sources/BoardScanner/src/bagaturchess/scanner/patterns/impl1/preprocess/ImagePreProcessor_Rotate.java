@@ -27,6 +27,7 @@ import java.util.Set;
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.scanner.common.BoardProperties;
+import bagaturchess.scanner.common.FilterInfo;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
@@ -147,25 +148,5 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 			}
 		}
 		return finfo;
-	}
-	
-	
-	private static class FilterInfo {
-		
-		private int minX = Integer.MAX_VALUE;
-		private int minY = Integer.MAX_VALUE;
-		private int maxX = Integer.MIN_VALUE;
-		private int maxY = Integer.MIN_VALUE;
-		private float angleInDegrees = 0;
-		private int[][] source;
-		
-		private boolean isSmaller(FilterInfo info) {
-			return maxX - minX > info.maxX - info.minX && maxY - minY > info.maxY - info.minY;
-		}
-		
-		
-		private boolean isInitialized() {
-			return minX != Integer.MAX_VALUE && minY != Integer.MAX_VALUE && maxX != Integer.MIN_VALUE && maxY != Integer.MIN_VALUE;
-		}
 	}
 }

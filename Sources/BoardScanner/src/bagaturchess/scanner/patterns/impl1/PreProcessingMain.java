@@ -27,6 +27,8 @@ import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Base;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Crop;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Impl3;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Impl4;
+import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Impl5;
+import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Crop_KMeans;
 
 
 public class PreProcessingMain {
@@ -36,10 +38,11 @@ public class PreProcessingMain {
 		
 		try {
 			
-			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test8.png");
+			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test10.png");
+			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/lichess.org/test1.png");
 			
-			BoardProperties boardProperties = new BoardProperties(192);
-			ImagePreProcessor_Base processor = new ImagePreProcessor_Impl4(boardProperties);
+			BoardProperties boardProperties = new BoardProperties(256);
+			ImagePreProcessor_Base processor = new ImagePreProcessor_Crop_KMeans(boardProperties);
 			
 			long startTime = System.currentTimeMillis();
 			processor.filter(image);

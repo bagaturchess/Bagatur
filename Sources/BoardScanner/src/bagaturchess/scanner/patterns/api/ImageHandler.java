@@ -23,6 +23,7 @@ package bagaturchess.scanner.patterns.api;
 import java.io.IOException;
 
 import bagaturchess.scanner.common.BoardProperties;
+import bagaturchess.scanner.common.FilterInfo;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 
@@ -46,5 +47,6 @@ public interface ImageHandler {
 	public Object enlarge(Object image, double scale, Object bgcolor);
 	public Object getAVG(Object image);
 	public Object extractResult(Object image, PatternMatchingData bestData, float factorOfExtension);
+	public Object extractResult(Object image, FilterInfo filterInfo, float factorOfExtension);
 	public Object rotateImageByDegrees(Object image, float angle);
 }

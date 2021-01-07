@@ -23,6 +23,7 @@ package bagaturchess.scanner.patterns.api;
 import java.io.IOException;
 
 import bagaturchess.scanner.common.BoardProperties;
+import bagaturchess.scanner.common.FilterInfo;
 import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 
 
@@ -142,5 +143,11 @@ public class ImageHandlerSingleton implements ImageHandler {
 	@Override
 	public Object rotateImageByDegrees(Object image, float angle) {
 		return instance.rotateImageByDegrees(image, angle);
+	}
+
+
+	@Override
+	public Object extractResult(Object image, FilterInfo filterInfo, float factorOfExtension) {
+		return instance.extractResult(image, filterInfo, factorOfExtension);
 	}
 }

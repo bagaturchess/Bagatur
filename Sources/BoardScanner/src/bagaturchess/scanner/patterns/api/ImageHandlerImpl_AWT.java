@@ -36,6 +36,7 @@ import javax.imageio.ImageIO;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
+import bagaturchess.scanner.common.FilterInfo;
 import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 
 
@@ -462,4 +463,51 @@ class ImageHandlerImpl_AWT implements ImageHandler {
         
         return rotated;
     }
+
+
+	@Override
+	public Object extractResult(Object image, FilterInfo filterInfo, float factorOfExtension) {
+		while (factorOfExtension > 1 && filterInfo.minX - (factorOfExtension - 1) * (filterInfo.maxX - filterInfo.minX) / 2f < 0) {
+			factorOfExtension -= 0.0001;
+		}
+		while (factorOfExtension > 1 && filterInfo.minX + (filterInfo.maxX - filterInfo.minX) + (factorOfExtension - 1) * (filterInfo.maxX - filterInfo.minX) / 2f >= ((BufferedImage)image).getWidth()) {
+			factorOfExtension -= 0.0001;
+		}
+		while (factorOfExtension > 1 && filterInfo.minY - (factorOfExtension - 1) * (filterInfo.maxY - filterInfo.minY) / 2f < 0) {
+			factorOfExtension -= 0.0001;
+		}
+		while (factorOfExtension > 1 && filterInfo.minY + (filterInfo.maxY - filterInfo.minY) + (factorOfExtension - 1) * (filterInfo.maxY - filterInfo.minY) / 2f >= ((BufferedImage)image).getHeight()) {
+			factorOfExtension -= 0.0001;
+		}
+		
+		if (factorOfExtension < 1) {
+			factorOfExtension = 1;
+		}
+		
+		int[][][] print = new int[(int) ((filterInfo.maxX - filterInfo.minX) * factorOfExtension) + 1][(int) ((filterInfo.maxY - filterInfo.minY) * factorOfExtension) + 1][3];
+		for (int i = 0; i < (filterInfo.maxX - filterInfo.minX) * factorOfExtension; i++) {
+			for (int j = 0; j < (filterInfo.maxY - filterInfo.minY) * factorOfExtension; j++) {
+				
+				int indexX = (int) (filterInfo.minX - (factorOfExtension - 1) * (filterInfo.maxX - filterInfo.minX) / 2 + i);
+				int indexY = (int) (filterInfo.minY - (factorOfExtension - 1) * (filterInfo.maxY - filterInfo.minY) / 2 + j);
+				
+				indexX = Math.max(0, indexX);
+				indexX = Math.min(((BufferedImage)image).getWidth() - 1, indexX);
+				
+				indexY = Math.max(0, indexY);
+				indexY = Math.min(((BufferedImage)image).getHeight() - 1, indexY);
+				
+				int rgb = ((BufferedImage)image).getRGB(indexX, indexY);
+				int red = (rgb & 0xff0000) >> 16;
+				int green = (rgb & 0xff00) >> 8;
+				int blue = rgb & 0xff;
+				//int gray = (int) (red * 0.2989d + green * 0.5870 + blue * 0.1140);
+				print[i][j][0] = red;
+				print[i][j][1] = green;
+				print[i][j][2] = blue;
+			}
+		}
+		
+		return ScannerUtils.createRGBImage(print);
+	}
 }
