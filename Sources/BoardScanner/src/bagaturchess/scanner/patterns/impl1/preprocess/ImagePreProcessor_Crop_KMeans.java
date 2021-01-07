@@ -50,10 +50,10 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 		
 		image = ImageHandlerSingleton.getInstance().resizeImage(image, boardProperties.getImageSize());
 		int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(image);
-		ImageHandlerSingleton.getInstance().saveImage("input", "png", image);
+		ImageHandlerSingleton.getInstance().saveImage("Crop_KMeans_input", "png", image);
 		
 		Object grayImage = ImageHandlerSingleton.getInstance().createGrayImage(grayBoard);
-		ImageHandlerSingleton.getInstance().saveImage("input_gray", "png", grayImage);
+		ImageHandlerSingleton.getInstance().saveImage("Crop_KMeans_input_gray", "png", grayImage);
 		
 		KMeans kmeans = new KMeans(4, grayBoard);
 		
@@ -128,7 +128,7 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 		Object resultImage = ImageHandlerSingleton.getInstance().extractResult(image, bestInfo, 1.05f);
 		
 		resultImage = ImageHandlerSingleton.getInstance().resizeImage(resultImage, boardProperties.getImageSize());
-		ImageHandlerSingleton.getInstance().saveImage("result", "png", resultImage);
+		ImageHandlerSingleton.getInstance().saveImage("Crop_KMeans_result", "png", resultImage);
 		
 		return resultImage;
 	}

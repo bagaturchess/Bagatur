@@ -28,6 +28,7 @@ import java.util.Set;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.FilterInfo;
+import bagaturchess.scanner.common.KMeans;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
@@ -49,8 +50,29 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 		image = ImageHandlerSingleton.getInstance().resizeImage(image, boardProperties.getImageSize());
 		int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(image);
 		
-		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
-		ResultPair<Integer, Integer> bgcolours = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
+		KMeans kmeans = new KMeans(4, grayBoard);
+		int[] clustersIndexes = kmeans.get2MaxWeightsIndexes();
+		
+		int[][] boardPixels_c1 = new int[grayBoard.length][grayBoard.length];
+		int[][] boardPixels_c2 = new int[grayBoard.length][grayBoard.length];
+		for (int index = 0; index < clustersIndexes.length; index++) {
+			int centoridID = clustersIndexes[index];
+			for (int i = 0; i < grayBoard.length; i++) {
+				for (int j = 0; j < grayBoard.length; j++) {
+					if (centoridID == kmeans.centroids_ids[i][j]) {
+						if (index == 0) {
+							boardPixels_c1[i][j] = grayBoard[i][j];
+						} else {
+							boardPixels_c2[i][j] = grayBoard[i][j];
+						}
+					}
+				}
+			}
+		}
+		
+		int gray1 = (int) MatrixUtils.calculateColorStats(boardPixels_c1, 0).getEntropy();
+		int gray2 = (int) MatrixUtils.calculateColorStats(boardPixels_c2, 0).getEntropy();
+		
 		VarStatistic colorStat = MatrixUtils.calculateColorStats(grayBoard, -1);
 		
 		Map<Integer, Integer> colorsCounts = new HashMap<Integer, Integer>();
@@ -60,8 +82,8 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 			for (int j = 0; j < grayBoard.length; j++) {
 				int cur_color = grayBoard[i][j];
 				
-				if (Math.abs(bgcolours.getFirst() - cur_color) <= colorStat.getDisperse() / 3
-						|| Math.abs(bgcolours.getSecond() - cur_color) <= colorStat.getDisperse() / 3) {
+				if (Math.abs(gray1 - cur_color) <= colorStat.getDisperse() / 3
+						|| Math.abs(gray2 - cur_color) <= colorStat.getDisperse() / 3) {
 					result_tmp[i][j] = grayBoard[i][j];
 					
 					if (colorsCounts.containsKey(cur_color)) {
@@ -75,7 +97,7 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 		}
 		
 		Object resultImageTmp = ImageHandlerSingleton.getInstance().createGrayImage(result_tmp);
-		ImageHandlerSingleton.getInstance().saveImage("rotate_filtered", "png", resultImageTmp);
+		ImageHandlerSingleton.getInstance().saveImage("Rotate_filtered", "png", resultImageTmp);
 		
 		VarStatistic colorsCountStat = new VarStatistic(false);
 		for (int color : colorsCounts.keySet()) {
@@ -116,7 +138,7 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 			//resultImage = ImageHandlerSingleton.getInstance().enlarge(resultImage, 1.025f, ImageHandlerSingleton.getInstance().getAVG(resultImage));
 			//resultImage = ImageHandlerSingleton.getInstance().resizeImage(resultImage, boardProperties.getImageSize());
 			
-			ImageHandlerSingleton.getInstance().saveImage("rotate_filter_result_" +  bestInfo.angleInDegrees, "png", resultImage);
+			ImageHandlerSingleton.getInstance().saveImage("Rotate_filter_result_" +  bestInfo.angleInDegrees, "png", resultImage);
 			
 			return resultImage;
 		} else {
