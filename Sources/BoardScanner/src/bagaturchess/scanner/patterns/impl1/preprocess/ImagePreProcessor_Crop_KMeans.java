@@ -60,8 +60,6 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 		//Initialize
 		int[] centroids_values = initCentroids(NUMBER_OF_CLUSTERS);
 		
-		VarStatistic[] avgs = initVarStats(NUMBER_OF_CLUSTERS);
-		
 		int[][] centroids_ids = new int[grayBoard.length][grayBoard.length];
 		
 		for (int i = 0; i < grayBoard.length; i++) {
@@ -84,24 +82,28 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 		
 		boolean hasGlobalChange = true;
 		
+		long[] avgs_sum;
+		long[] avgs_cnt;
+		
 		//Loop until convergence
 		while (hasGlobalChange) {
 			
 			//System.out.println("start iteration " + count++);
 			
 			//Find avg
-			avgs = initVarStats(NUMBER_OF_CLUSTERS);
+			avgs_sum = new long[NUMBER_OF_CLUSTERS];
+			avgs_cnt = new long[NUMBER_OF_CLUSTERS];
+			
 			for (int i = 0; i < grayBoard.length; i++) {
 				for (int j = 0; j < grayBoard.length; j++) {
 					int centroid_id = centroids_ids[i][j];
-					VarStatistic avg = avgs[centroid_id];
-					int value = grayBoard[i][j];
-					avg.addValue(value, value);
+					avgs_sum[centroid_id] += grayBoard[i][j];
+					avgs_cnt[centroid_id]++;
 				}
 			}
 			
 			for (int centroid_id = 0; centroid_id < centroids_values.length; centroid_id++) {
-				centroids_values[centroid_id] = (int) avgs[centroid_id].getEntropy();
+				centroids_values[centroid_id] = (int) (avgs_sum[centroid_id] / avgs_cnt[centroid_id]);
 				//System.out.println("centroid_id " + centroid_id + " avg " + centroids_values[centroid_id]);
 			}
 			
@@ -263,15 +265,6 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 			}
 		}
 		return result_indexes;
-	}
-	
-	
-	private VarStatistic[] initVarStats(int count) {
-		VarStatistic[] result = new VarStatistic[count];
-		for (int i = 0; i < result.length; i++) {
-			result[i] = new VarStatistic(false);
-		}
-		return result;
 	}
 	
 	
