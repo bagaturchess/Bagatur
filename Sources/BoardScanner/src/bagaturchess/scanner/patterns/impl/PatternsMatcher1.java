@@ -64,7 +64,7 @@ public class PatternsMatcher1 {
 	private static int[][] filterBackground(int[][] grayBoard) {
 		
 		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
-		ResultPair<Integer, Integer> bgcolors = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
+		ResultPair<Integer, Integer> bgcolors = MatrixUtils.getSquaresColor(grayBoard);
 		
 		//ScannerUtils.get
 		

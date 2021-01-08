@@ -59,7 +59,7 @@ public class PatternsMatcher {
 			board = rotatedBoard;*/
 			
 			Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
-			ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
+			ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard);
 			
 			List<Integer> bgcolors = new ArrayList<Integer>();
 			bgcolors.add(bgcolorsOfSquares.getSecond());

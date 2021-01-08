@@ -76,7 +76,7 @@ public class MatrixUtils {
 		
 		for (Integer fieldID: squaresStats.keySet()) {
 			VarStatistic squareStat = squaresStats.get(fieldID);
-			if (squareStat.getDisperse() < colorDeviations.getEntropy() + colorDeviations.getDisperse() / 8f) {
+			if (squareStat.getDisperse() < colorDeviations.getEntropy() - colorDeviations.getDisperse() / 3f) {
 				emptySquaresIDs.add(fieldID);
 			}
 		}
@@ -85,50 +85,32 @@ public class MatrixUtils {
 	}
 	
 	
-	public static ResultPair<Integer, Integer> getSquaresColor(int[][] grayBoard, Set<Integer> emptySquares) {
+	public static ResultPair<Integer, Integer> getSquaresColor(int[][] grayBoard) {
 		
-		VarStatistic stat_all = new VarStatistic(false);
-		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
-			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
-				
-				int file = i / (grayBoard.length / 8);
-				int rank = j / (grayBoard.length / 8);
-				int fieldID = 63 - (file + 8 * rank);
-				
-				if (emptySquares.contains(fieldID)) {
-					for (int i1 = i; i1 < i + grayBoard.length / 8; i1++) {
-						for (int j1 = j; j1 < j + grayBoard.length / 8; j1++) {
-							stat_all.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
+		KMeans kmeans = new KMeans(4, grayBoard);
+		int[] clustersIndexes = kmeans.get2MaxWeightsIndexes();
+		
+		int[][] boardPixels_c1 = new int[grayBoard.length][grayBoard.length];
+		int[][] boardPixels_c2 = new int[grayBoard.length][grayBoard.length];
+		for (int index = 0; index < clustersIndexes.length; index++) {
+			int centoridID = clustersIndexes[index];
+			for (int i = 0; i < grayBoard.length; i++) {
+				for (int j = 0; j < grayBoard.length; j++) {
+					if (centoridID == kmeans.centroids_ids[i][j]) {
+						if (index == 0) {
+							boardPixels_c1[i][j] = grayBoard[i][j];
+						} else {
+							boardPixels_c2[i][j] = grayBoard[i][j];
 						}
 					}
 				}
 			}
 		}
 		
-		VarStatistic stat_white = new VarStatistic(false);
-		VarStatistic stat_black = new VarStatistic(false);
-		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
-			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
-				
-				int file = i / (grayBoard.length / 8);
-				int rank = j / (grayBoard.length / 8);
-				int fieldID = 63 - (file + 8 * rank);
-				
-				if (emptySquares.contains(fieldID)) {
-					for (int i1 = i; i1 < i + grayBoard.length / 8; i1++) {
-						for (int j1 = j; j1 < j + grayBoard.length / 8; j1++) {
-							if (grayBoard[i1][j1] > stat_all.getEntropy()) {
-								stat_white.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
-							} else {
-								stat_black.addValue(grayBoard[i1][j1], grayBoard[i1][j1]);
-							}
-						}
-					}
-				}
-			}
-		}
+		int gray1 = (int) MatrixUtils.calculateColorStats(boardPixels_c1, 0).getEntropy();
+		int gray2 = (int) MatrixUtils.calculateColorStats(boardPixels_c2, 0).getEntropy();
 		
-		return new ResultPair<Integer, Integer>((int)stat_white.getEntropy(), (int)stat_black.getEntropy());
+		return new ResultPair<Integer, Integer>(Math.max(gray1, gray2), Math.min(gray1, gray2));
 	}
 	
 	

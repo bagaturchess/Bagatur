@@ -56,7 +56,7 @@ public class ImagePreProcessing {
 			int[][] grayBoard = ScannerUtils.convertToGrayMatrix(image);
 			
 			Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
-			ResultPair<Integer, Integer> bgcolours = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
+			ResultPair<Integer, Integer> bgcolours = MatrixUtils.getSquaresColor(grayBoard);
 			
 			//int[][] whiteSquare = ScannerUtils.createSquareImage(bgcolours.getFirst(), boardProperties.getImageSize());
 			//int[][] blackSquare = ScannerUtils.createSquareImage(bgcolours.getSecond(), boardProperties.getImageSize());

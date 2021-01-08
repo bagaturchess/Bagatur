@@ -70,7 +70,7 @@ public abstract class Matcher_Base {
 		
 		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
 		
-		ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
+		ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard);
 		
 		int[] pids = new int[64];
 		

@@ -29,6 +29,7 @@ import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.FilterInfo;
 import bagaturchess.scanner.common.KMeans;
 import bagaturchess.scanner.common.MatrixUtils;
+import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 
 
@@ -49,28 +50,7 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 		int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(image);
 		ImageHandlerSingleton.getInstance().saveImage("Rotate_input", "png", image);
 		
-		KMeans kmeans = new KMeans(4, grayBoard);
-		int[] clustersIndexes = kmeans.get2MaxWeightsIndexes();
-		
-		int[][] boardPixels_c1 = new int[grayBoard.length][grayBoard.length];
-		int[][] boardPixels_c2 = new int[grayBoard.length][grayBoard.length];
-		for (int index = 0; index < clustersIndexes.length; index++) {
-			int centoridID = clustersIndexes[index];
-			for (int i = 0; i < grayBoard.length; i++) {
-				for (int j = 0; j < grayBoard.length; j++) {
-					if (centoridID == kmeans.centroids_ids[i][j]) {
-						if (index == 0) {
-							boardPixels_c1[i][j] = grayBoard[i][j];
-						} else {
-							boardPixels_c2[i][j] = grayBoard[i][j];
-						}
-					}
-				}
-			}
-		}
-		
-		int gray1 = (int) MatrixUtils.calculateColorStats(boardPixels_c1, 0).getEntropy();
-		int gray2 = (int) MatrixUtils.calculateColorStats(boardPixels_c2, 0).getEntropy();
+		ResultPair<Integer, Integer> squareColors = MatrixUtils.getSquaresColor(grayBoard);
 		
 		VarStatistic colorStat = MatrixUtils.calculateColorStats(grayBoard, -1);
 		
@@ -81,8 +61,8 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 			for (int j = 0; j < grayBoard.length; j++) {
 				int cur_color = grayBoard[i][j];
 				
-				if (Math.abs(gray1 - cur_color) <= colorStat.getDisperse() / 3
-						|| Math.abs(gray2 - cur_color) <= colorStat.getDisperse() / 3) {
+				if (Math.abs(squareColors.getFirst() - cur_color) <= colorStat.getDisperse() / 3
+						|| Math.abs(squareColors.getSecond() - cur_color) <= colorStat.getDisperse() / 3) {
 					result_tmp[i][j] = grayBoard[i][j];
 					
 					if (colorsCounts.containsKey(cur_color)) {

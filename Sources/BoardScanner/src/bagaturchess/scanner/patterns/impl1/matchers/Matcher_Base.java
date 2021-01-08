@@ -61,8 +61,9 @@ public abstract class Matcher_Base {
 		result.matcherName = this.getClass().getCanonicalName();
 		
 		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
+		System.out.println(emptySquares);
 		
-		ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard, emptySquares);
+		ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard);
 		
 		int[] pids = new int[64];
 		int countPIDs = 0;
