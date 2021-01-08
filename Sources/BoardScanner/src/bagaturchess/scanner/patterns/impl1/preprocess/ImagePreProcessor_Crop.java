@@ -111,7 +111,7 @@ public class ImagePreProcessor_Crop extends ImagePreProcessor_Base {
 			}
 		}
 		
-		//System.out.println(bestData.size + " " + maxSize);
+		//System.out.println("BEST size " + bestData.size);
 		//ImageHandlerSingleton.getInstance().saveImage("Crop_board_pattern", "png", ImageHandlerSingleton.getInstance().createGrayImage(bestData.pattern));
 		
 		Object result = ImageHandlerSingleton.getInstance().extractResult(image, bestData, 1.05f);

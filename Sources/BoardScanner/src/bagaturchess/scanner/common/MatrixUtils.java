@@ -76,7 +76,7 @@ public class MatrixUtils {
 		
 		for (Integer fieldID: squaresStats.keySet()) {
 			VarStatistic squareStat = squaresStats.get(fieldID);
-			if (squareStat.getDisperse() < colorDeviations.getEntropy() - colorDeviations.getDisperse() / 3.5f) {
+			if (squareStat.getDisperse() < colorDeviations.getEntropy() + colorDeviations.getDisperse() / 8f) {
 				emptySquaresIDs.add(fieldID);
 			}
 		}
