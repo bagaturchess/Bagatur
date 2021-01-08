@@ -61,7 +61,7 @@ public abstract class Matcher_Base {
 		result.matcherName = this.getClass().getCanonicalName();
 		
 		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
-		System.out.println(emptySquares);
+		//System.out.println(emptySquares);
 		
 		ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard);
 		
