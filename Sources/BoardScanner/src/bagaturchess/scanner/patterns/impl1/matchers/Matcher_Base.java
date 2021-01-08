@@ -76,7 +76,7 @@ public abstract class Matcher_Base {
 				
 				pids[fieldID] = Constants.PID_NONE;
 						
-				if (!emptySquares.contains(fieldID)) {
+				//if (!emptySquares.contains(fieldID)) {
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
 					//int bgcolor_avg = (int) MatrixUtils.calculateColorStats(squareMatrix).getEntropy();
 					
@@ -87,7 +87,7 @@ public abstract class Matcher_Base {
 					//ImageHandlerSingleton.getInstance().printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
 					
 					Set<Integer> pidsToSearch = new HashSet<Integer>();
-					//pidsToSearch.add(Constants.PID_NONE);
+					pidsToSearch.add(Constants.PID_NONE);
 					if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_W_PAWN);
 					pidsToSearch.add(Constants.PID_W_KNIGHT);
 					pidsToSearch.add(Constants.PID_W_BISHOP);
@@ -113,7 +113,7 @@ public abstract class Matcher_Base {
 					//if (pids[fieldID] != Constants.PID_NONE) {
 					countPIDs++;
 					//}
-				}
+				//}
 			}
 		}
 		
