@@ -83,7 +83,9 @@ public class MatrixUtils {
 			}
 		}
 		
-		/*for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
+		/*VarStatistic totalStats = new VarStatistic(false);
+		Map<Integer, VarStatistic> squaresStats = new HashMap<Integer, VarStatistic>();
+		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
 			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
 				
 				int file = i / (grayBoard.length / 8);
@@ -91,11 +93,22 @@ public class MatrixUtils {
 				int fieldID = 63 - (file + 8 * rank);
 				
 				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
-				KMeans kmeans = new KMeans(4, squareMatrix);
+				KMeans kmeans = new KMeans(10, squareMatrix);
+				
+				VarStatistic squareStat = new VarStatistic(false);
+				for (int centroidID = 0; centroidID < 10; centroidID++) {
+					int weight = kmeans.weights[centroidID];
+					if (weight != 0) {
+						int value = kmeans.centroids_values[centroidID];
+						squareStat.addValue(value, value);
+					}
+				}
+				squaresStats.put(fieldID, squareStat);
+				totalStats.addValue(squareStat.getDisperse(), squareStat.getDisperse());
 				
 				String msg = "";
 				for (int centroidID = 0; centroidID < 4; centroidID++) {
-					msg += kmeans.centroids_values[centroidID] + " ";
+					msg += kmeans.weights[centroidID] + " ";
 				}
 				//System.out.println(msg);
 				
@@ -105,6 +118,13 @@ public class MatrixUtils {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			}
+		}
+		
+		for (Integer fieldID: squaresStats.keySet()) {
+			VarStatistic squareStat = squaresStats.get(fieldID);
+			if (squareStat.getDisperse() < totalStats.getEntropy() - totalStats.getDisperse()) {
+				emptySquaresIDs.add(fieldID);
 			}
 		}*/
 		
