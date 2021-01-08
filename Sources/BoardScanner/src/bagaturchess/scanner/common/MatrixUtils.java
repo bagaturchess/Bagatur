@@ -20,6 +20,7 @@
 package bagaturchess.scanner.common;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;
+import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 
 
 public class MatrixUtils {
@@ -81,6 +83,31 @@ public class MatrixUtils {
 			}
 		}
 		
+		/*for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
+			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
+				
+				int file = i / (grayBoard.length / 8);
+				int rank = j / (grayBoard.length / 8);
+				int fieldID = 63 - (file + 8 * rank);
+				
+				int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
+				KMeans kmeans = new KMeans(4, squareMatrix);
+				
+				String msg = "";
+				for (int centroidID = 0; centroidID < 4; centroidID++) {
+					msg += kmeans.centroids_values[centroidID] + " ";
+				}
+				//System.out.println(msg);
+				
+				try {
+					ImageHandlerSingleton.getInstance().saveImage(fieldID + " " + msg, "png", ImageHandlerSingleton.getInstance().createGrayImage(squareMatrix));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}*/
+		
 		return emptySquaresIDs;
 	}
 	
@@ -89,6 +116,9 @@ public class MatrixUtils {
 		
 		KMeans kmeans = new KMeans(4, grayBoard);
 		int[] clustersIndexes = kmeans.get2MaxWeightsIndexes();
+		
+		int gray1 = -1;
+		int gray2 = -1;
 		
 		int[][] boardPixels_c1 = new int[grayBoard.length][grayBoard.length];
 		int[][] boardPixels_c2 = new int[grayBoard.length][grayBoard.length];
@@ -99,17 +129,16 @@ public class MatrixUtils {
 					if (centoridID == kmeans.centroids_ids[i][j]) {
 						if (index == 0) {
 							boardPixels_c1[i][j] = grayBoard[i][j];
+							gray1 = kmeans.centroids_values[centoridID];
 						} else {
 							boardPixels_c2[i][j] = grayBoard[i][j];
+							gray2 = kmeans.centroids_values[centoridID];
 						}
 					}
 				}
 			}
 		}
-		
-		int gray1 = (int) MatrixUtils.calculateColorStats(boardPixels_c1, 0).getEntropy();
-		int gray2 = (int) MatrixUtils.calculateColorStats(boardPixels_c2, 0).getEntropy();
-		
+				
 		return new ResultPair<Integer, Integer>(Math.max(gray1, gray2), Math.min(gray1, gray2));
 	}
 	
