@@ -23,14 +23,12 @@ package bagaturchess.scanner.patterns.impl1.preprocess;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.FilterInfo;
 import bagaturchess.scanner.common.KMeans;
 import bagaturchess.scanner.common.MatrixUtils;
-import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 
 
@@ -153,7 +151,8 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 			for (int j = 0; j < source.length; j++) {
 				int color = source[i][j];
 				Integer colorCount = colorsCounts.get(color);
-				if (colorCount != null && colorCount > colorsCountStat.getEntropy() - colorsCountStat.getDisperse()) {
+				if (colorCount != null
+						&& colorCount > colorsCountStat.getEntropy() - colorsCountStat.getDisperse()) {
 					if (i < finfo.minX) {
 						finfo.minX = i;
 					}

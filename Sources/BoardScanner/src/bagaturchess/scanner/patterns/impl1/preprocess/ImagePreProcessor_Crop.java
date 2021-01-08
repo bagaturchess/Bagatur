@@ -98,9 +98,9 @@ public class ImagePreProcessor_Crop extends ImagePreProcessor_Base {
 		int maxSize = grayBoard.length;
 		int startSize = (int) ((1 - SIZE_DELTA_PERCENT) * maxSize);
 		Object[] cache = new Object[maxSize + 1];
-			
+		
 		for (int size = startSize; size <= maxSize; size++) {
-					
+			
 			int[][] grayPattern = cache[size] != null ? (int[][]) cache[size] : ImageHandlerSingleton.getInstance().convertToGrayMatrix(ImageHandlerSingleton.getInstance().resizeImage(emptyBoard, size));
 			cache[size] = grayPattern;
 			
