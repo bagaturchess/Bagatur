@@ -122,6 +122,17 @@ public class KMeans {
 	}
 	
 	
+	public int getMaxWeight() {
+		int result = 0;
+		for (int i = 0; i < weights.length; i++) {
+			if (weights[i] > result) {
+				result = weights[i];
+			}
+		}
+		return result;
+	}
+	
+	
 	public int[] get2MaxWeightsIndexes() {
 		int[] result_indexes = new int[2];
 		int[] result_values = new int[2];
