@@ -417,12 +417,14 @@ class ImageHandlerImpl_AWT implements ImageHandler {
 			factorOfExtension = 1;
 		}
 		
-		int[][][] print = new int[(int) (matcherData.size * factorOfExtension)][(int) (matcherData.size * factorOfExtension)][3];
-		for (int i = 0; i < matcherData.size * factorOfExtension; i++) {
-			for (int j = 0; j < matcherData.size * factorOfExtension; j++) {
+		int size = (int) Math.floor(0.5 + matcherData.size * factorOfExtension);
+		
+		int[][][] print = new int[size][size][3];
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
 				
-				int indexX = (int) (matcherData.x - (factorOfExtension - 1) * matcherData.size / 2 + i);
-				int indexY = (int) (matcherData.y - (factorOfExtension - 1) * matcherData.size / 2 + j);
+				int indexX = (int) (matcherData.x - ((factorOfExtension - 1) * matcherData.size) / 2 + i);
+				int indexY = (int) (matcherData.y - ((factorOfExtension - 1) * matcherData.size) / 2 + j);
 				
 				indexX = Math.max(0, indexX);
 				indexX = Math.min(((BufferedImage)image).getWidth() - 1, indexX);
@@ -448,16 +450,19 @@ class ImageHandlerImpl_AWT implements ImageHandler {
 	@Override
 	public Object extractResult(Object image, FilterInfo filterInfo, float factorOfExtension) {
 		
-		while (factorOfExtension > 1 && filterInfo.minX - (factorOfExtension - 1) * (filterInfo.maxX - filterInfo.minX) / 2f < 0) {
+		float sizeX =  (filterInfo.maxX - filterInfo.minX + 1);
+		float sizeY =  (filterInfo.maxY - filterInfo.minY + 1);
+		
+		while (factorOfExtension > 1 && filterInfo.minX - (factorOfExtension - 1) * sizeX / 2f < 0) {
 			factorOfExtension -= 0.0001;
 		}
-		while (factorOfExtension > 1 && filterInfo.minX + (filterInfo.maxX - filterInfo.minX) + (factorOfExtension - 1) * (filterInfo.maxX - filterInfo.minX) / 2f >= ((BufferedImage)image).getWidth()) {
+		while (factorOfExtension > 1 && filterInfo.minX + sizeX + (factorOfExtension - 1) * sizeX / 2f >= ((BufferedImage)image).getWidth()) {
 			factorOfExtension -= 0.0001;
 		}
-		while (factorOfExtension > 1 && filterInfo.minY - (factorOfExtension - 1) * (filterInfo.maxY - filterInfo.minY) / 2f < 0) {
+		while (factorOfExtension > 1 && filterInfo.minY - (factorOfExtension - 1) * sizeY / 2f < 0) {
 			factorOfExtension -= 0.0001;
 		}
-		while (factorOfExtension > 1 && filterInfo.minY + (filterInfo.maxY - filterInfo.minY) + (factorOfExtension - 1) * (filterInfo.maxY - filterInfo.minY) / 2f >= ((BufferedImage)image).getHeight()) {
+		while (factorOfExtension > 1 && filterInfo.minY + sizeY + (factorOfExtension - 1) * sizeY / 2f >= ((BufferedImage)image).getHeight()) {
 			factorOfExtension -= 0.0001;
 		}
 		
@@ -465,12 +470,12 @@ class ImageHandlerImpl_AWT implements ImageHandler {
 			factorOfExtension = 1;
 		}
 		
-		int[][][] print = new int[(int) ((filterInfo.maxX - filterInfo.minX) * factorOfExtension)][(int) ((filterInfo.maxY - filterInfo.minY) * factorOfExtension)][3];
-		for (int i = 0; i < (filterInfo.maxX - filterInfo.minX) * factorOfExtension; i++) {
-			for (int j = 0; j < (filterInfo.maxY - filterInfo.minY) * factorOfExtension; j++) {
+		int[][][] print = new int[(int) (sizeX * factorOfExtension)][(int) (sizeY * factorOfExtension)][3];
+		for (int i = 0; i < sizeX * factorOfExtension; i++) {
+			for (int j = 0; j < sizeY * factorOfExtension; j++) {
 				
-				int indexX = (int) (filterInfo.minX - (factorOfExtension - 1) * (filterInfo.maxX - filterInfo.minX) / 2 + i);
-				int indexY = (int) (filterInfo.minY - (factorOfExtension - 1) * (filterInfo.maxY - filterInfo.minY) / 2 + j);
+				int indexX = (int) (filterInfo.minX - ((factorOfExtension - 1) * sizeX) / 2 + i);
+				int indexY = (int) (filterInfo.minY - ((factorOfExtension - 1) * sizeY) / 2 + j);
 				
 				indexX = Math.max(0, indexX);
 				indexX = Math.min(((BufferedImage)image).getWidth() - 1, indexX);

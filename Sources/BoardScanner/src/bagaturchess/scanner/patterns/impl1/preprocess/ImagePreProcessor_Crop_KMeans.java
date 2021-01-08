@@ -110,6 +110,8 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 			}
 		}
 		
+		//ImageHandlerSingleton.getInstance().saveImage("Crop_KMeans_board_pixels", "png", ImageHandlerSingleton.getInstance().createGrayImage(boardPixels));
+		
 		FilterInfo bestInfo = getSizes(boardPixels, 0);
 		//System.out.println(bestInfo.minX + " " + bestInfo.minY + " " + bestInfo.maxX + " " + bestInfo.maxY);
 		

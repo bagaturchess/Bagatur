@@ -104,15 +104,20 @@ public class ImagePreProcessor_Crop extends ImagePreProcessor_Base {
 			
 			MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(grayBoard, grayPattern);
 			
+			//System.out.println(curData.size + " " + curData.delta);
+			
 			if (bestData == null || bestData.delta > curData.delta) {
 				bestData = curData;
 			}
 		}
 		
+		//System.out.println(bestData.size + " " + maxSize);
+		//ImageHandlerSingleton.getInstance().saveImage("Crop_board_pattern", "png", ImageHandlerSingleton.getInstance().createGrayImage(bestData.pattern));
+		
 		Object result = ImageHandlerSingleton.getInstance().extractResult(image, bestData, 1.05f);
 		//result = ImageHandlerSingleton.getInstance().enlarge(result, 1.03f, ImageHandlerSingleton.getInstance().getAVG(result));
 		result = ImageHandlerSingleton.getInstance().resizeImage(result, boardProperties.getImageSize());
-		ImageHandlerSingleton.getInstance().saveImage("Crop_result", "png", result);
+		ImageHandlerSingleton.getInstance().saveImage("Crop_board_result", "png", result);
 		
 		return result;
 	}
