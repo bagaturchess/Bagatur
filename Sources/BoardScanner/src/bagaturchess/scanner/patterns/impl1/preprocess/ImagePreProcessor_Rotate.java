@@ -47,6 +47,7 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 		
 		image = ImageHandlerSingleton.getInstance().resizeImage(image, boardProperties.getImageSize());
 		int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(image);
+		ImageHandlerSingleton.getInstance().saveImage("Rotate_input", "png", image);
 		
 		KMeans kmeans = new KMeans(4, grayBoard);
 		int[] clustersIndexes = kmeans.get2MaxWeightsIndexes();
@@ -123,7 +124,7 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 		}
 		
 		if (bestInfo.isInitialized()) {
-			int[][] result = new int[bestInfo.maxX - bestInfo.minX][bestInfo.maxY - bestInfo.minY];
+			int[][] result = new int[bestInfo.maxX - bestInfo.minX + 1][bestInfo.maxY - bestInfo.minY + 1];
 			for (int i = 0; i < result.length; i++) {
 				for (int j = 0; j < result[0].length; j++) {
 					result[i][j] = bestInfo.source[bestInfo.minX + i][bestInfo.minY + j];
@@ -136,7 +137,7 @@ public class ImagePreProcessor_Rotate extends ImagePreProcessor_Base {
 			//resultImage = ImageHandlerSingleton.getInstance().enlarge(resultImage, 1.025f, ImageHandlerSingleton.getInstance().getAVG(resultImage));
 			//resultImage = ImageHandlerSingleton.getInstance().resizeImage(resultImage, boardProperties.getImageSize());
 			
-			ImageHandlerSingleton.getInstance().saveImage("Rotate_filter_result_" +  bestInfo.angleInDegrees, "png", resultImage);
+			ImageHandlerSingleton.getInstance().saveImage("Rotate_result", "png", resultImage);
 			
 			return resultImage;
 		} else {

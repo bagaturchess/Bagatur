@@ -52,9 +52,6 @@ public class ImagePreProcessor_Crop_KMeans extends ImagePreProcessor_Base {
 		int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(image);
 		ImageHandlerSingleton.getInstance().saveImage("Crop_KMeans_input", "png", image);
 		
-		Object grayImage = ImageHandlerSingleton.getInstance().createGrayImage(grayBoard);
-		ImageHandlerSingleton.getInstance().saveImage("Crop_KMeans_input_gray", "png", grayImage);
-		
 		KMeans kmeans = new KMeans(4, grayBoard);
 		
 		//Print clusters

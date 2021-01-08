@@ -417,7 +417,7 @@ class ImageHandlerImpl_AWT implements ImageHandler {
 			factorOfExtension = 1;
 		}
 		
-		int[][][] print = new int[(int) (matcherData.size * factorOfExtension) + 1][(int) (matcherData.size * factorOfExtension) + 1][3];
+		int[][][] print = new int[(int) (matcherData.size * factorOfExtension)][(int) (matcherData.size * factorOfExtension)][3];
 		for (int i = 0; i < matcherData.size * factorOfExtension; i++) {
 			for (int j = 0; j < matcherData.size * factorOfExtension; j++) {
 				
@@ -465,7 +465,7 @@ class ImageHandlerImpl_AWT implements ImageHandler {
 			factorOfExtension = 1;
 		}
 		
-		int[][][] print = new int[(int) ((filterInfo.maxX - filterInfo.minX) * factorOfExtension) + 1][(int) ((filterInfo.maxY - filterInfo.minY) * factorOfExtension) + 1][3];
+		int[][][] print = new int[(int) ((filterInfo.maxX - filterInfo.minX) * factorOfExtension)][(int) ((filterInfo.maxY - filterInfo.minY) * factorOfExtension)][3];
 		for (int i = 0; i < (filterInfo.maxX - filterInfo.minX) * factorOfExtension; i++) {
 			for (int j = 0; j < (filterInfo.maxY - filterInfo.minY) * factorOfExtension; j++) {
 				

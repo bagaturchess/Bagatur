@@ -51,6 +51,8 @@ public class ImagePreProcessor_Crop extends ImagePreProcessor_Base {
 		
 		image = ImageHandlerSingleton.getInstance().resizeImage(image, boardProperties.getImageSize());
 		int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(image);
+		ImageHandlerSingleton.getInstance().saveImage("Crop_board_input", "png", image);
+
 		
 		KMeans kmeans = new KMeans(4, grayBoard);
 		int[] clustersIndexes = kmeans.get2MaxWeightsIndexes();
@@ -87,11 +89,7 @@ public class ImagePreProcessor_Crop extends ImagePreProcessor_Base {
 		
 		Object emptyBoard = ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, "8/8/8/8/8/8/8/8", whiteSquareColor, blackSquareColor);
 		ImageHandlerSingleton.getInstance().saveImage("Crop_board_empty", "png", emptyBoard);
-		
-		//image = ScannerUtils.enlarge(image, boardProperties.getImageSize(), 1.125f);
-		//grayBoard = ScannerUtils.convertToGrayMatrix(image);
-		ImageHandlerSingleton.getInstance().saveImage("Crop_board_input", "png", ImageHandlerSingleton.getInstance().createGrayImage(grayBoard));
-		
+				
 		//int bgcolor = MatrixUtils.getAVG(grayBoard);
 		
 		MatrixUtils.PatternMatchingData bestData = null;
@@ -114,7 +112,7 @@ public class ImagePreProcessor_Crop extends ImagePreProcessor_Base {
 		Object result = ImageHandlerSingleton.getInstance().extractResult(image, bestData, 1.05f);
 		//result = ImageHandlerSingleton.getInstance().enlarge(result, 1.03f, ImageHandlerSingleton.getInstance().getAVG(result));
 		result = ImageHandlerSingleton.getInstance().resizeImage(result, boardProperties.getImageSize());
-		ImageHandlerSingleton.getInstance().saveImage("Crop_result_" + bestData.size, "png", result);
+		ImageHandlerSingleton.getInstance().saveImage("Crop_result", "png", result);
 		
 		return result;
 	}
