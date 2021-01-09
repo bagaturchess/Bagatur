@@ -20,17 +20,24 @@
 package bagaturchess.scanner.opencv;
 
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Core.MinMaxLocResult;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.KAZE;
+import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+
+import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.scanner.common.MatrixUtils;
+import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 
 
 public class PatternMatchingMain {
@@ -43,39 +50,55 @@ public class PatternMatchingMain {
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 			
 	        String filePath = (new File(".")).getAbsolutePath();
-	        String sourceFile = filePath + "\\data\\tests\\lichess.org\\test1.png";
-	        String templateFile = filePath + "\\res\\set1_b_k.png";
+	        String sourceFile = ".\\data\\tests\\preprocess\\test11.png";
 	        
-	        for (int size = 32; size <= 64; size++) {
+	        BufferedImage source_obj = (BufferedImage) ImageHandlerSingleton.getInstance().loadImageFromFS(sourceFile);
+	        source_obj = (BufferedImage) ImageHandlerSingleton.getInstance().resizeImage(source_obj, 512);
+	        int[][] source_matrix = ImageHandlerSingleton.getInstance().convertToGrayMatrix(source_obj);
+	        int bgcolor = MatrixUtils.getAVG(source_matrix);
+	        Mat source = OpenCVUtils.bufferedImage2Mat(source_obj);
+	        Mat source_gray = new Mat(source.height(),source.width(),CvType.CV_8UC4);
+			Imgproc.cvtColor(source, source_gray, Imgproc.COLOR_BGR2GRAY);
+	        source = source_gray;
+	        
+	        for (int pid = 1; pid <= 12; pid++) {
 	        	
-		        Mat source = Imgcodecs.imread(sourceFile);
-		        Mat resizedSource = new Mat(512, 512, source.type());   
-		        Imgproc.resize(source, resizedSource, resizedSource.size(), 0, 0, Imgproc.INTER_CUBIC);
-		        source = resizedSource;
+		        MinMaxLocResult bestMatch = null;
+		        int bestSize = 0;
 		        
-		        Mat template = Imgcodecs.imread(templateFile);
-		        Mat resizedTemplate = new Mat(size, size, template.type());   
-		        Imgproc.resize(template, resizedTemplate, resizedTemplate.size(), 0, 0, Imgproc.INTER_CUBIC);
-		        template = resizedTemplate;
+		        for (int size = 32; size <= 64; size++) {
+			        
+		        	//ImageHandlerSingleton.getInstance().
+		        	BufferedImage template_obj = OpenCVUtils.createPieceImage("set1", pid, bgcolor, size);
+			        Mat template = OpenCVUtils.bufferedImage2Mat(template_obj);
+			        
+			        Mat template_gray = new Mat(template.height(),template.width(),CvType.CV_8UC4);
+			        Imgproc.cvtColor(template, template_gray, Imgproc.COLOR_BGR2GRAY);
+			        template = template_gray;
+			        
+			        Mat outputImage = new Mat();
+			        Imgproc.matchTemplate(source, template, outputImage, Imgproc.TM_CCOEFF_NORMED);
+			        
+			        MinMaxLocResult mmr = Core.minMaxLoc(outputImage);
+			        if (bestMatch == null || bestMatch.maxVal < mmr.maxVal) {
+			        	bestMatch = mmr;
+			        	bestSize = template_gray.width();
+			        }
+			        System.out.println(mmr.maxVal);
+		        }
 		        
-		        Mat outputImage = new Mat();    
-		        
-		        //Template matching method
-		        Imgproc.matchTemplate(source, template, outputImage, Imgproc.TM_CCOEFF);
-		 
-		    
-		        MinMaxLocResult mmr = Core.minMaxLoc(outputImage);
-		        
-		        Point matchLoc = mmr.maxLoc;
-		        
+		        Point matchLoc = bestMatch.maxLoc;
 		        //Draw rectangle on result image
-		        Imgproc.rectangle(source, matchLoc, new Point(matchLoc.x + template.cols(),
-		                matchLoc.y + template.rows()), new Scalar(255, 255, 255));
-		 
-		        Imgcodecs.imwrite(filePath + "\\data\\opencv" + size + ".jpg", source);
+		        Imgproc.rectangle(source, matchLoc, new Point(matchLoc.x + bestSize,
+		                matchLoc.y + bestSize), new Scalar(255, 255, 255));
+		        
+		        HighGui.imshow("Feature Matching", source);
+		        HighGui.waitKey();
 	        }
 	        
-	        System.out.println("Completed.");
+	        //Imgcodecs.imwrite(filePath + "\\data\\opencv" + ".jpg", source);
+	        
+	        //System.out.println("Completed.");
 	        
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -22,12 +22,12 @@ package bagaturchess.scanner.patterns.impl1;
 
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.opencv.matcher.Matcher_Base;
+import bagaturchess.scanner.opencv.matcher.Matcher_Composite;
 import bagaturchess.scanner.opencv.preprocess.ImagePreProcessor_OpenCV;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Rotate;
-import bagaturchess.scanner.patterns.impl1.matchers.Matcher_Base;
-import bagaturchess.scanner.patterns.impl1.matchers.Matcher_Composite;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Base;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Crop;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Crop_KMeans;
@@ -40,9 +40,9 @@ public class AllMain {
 		
 		try {
 			
-			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test11.png");
+			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test5.jpg");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/test4.jpg");
-			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/lichess.org/test2.png");
+			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/lichess.org/test2.png");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/chess.com/test1.png");
 			
 			BoardProperties boardProperties_processor = new BoardProperties(512);
@@ -58,9 +58,11 @@ public class AllMain {
 			//preProcessedImage = processor_rotate.filter(preProcessedImage);
 			System.out.println("Filtered in " + (System.currentTimeMillis() - startTime) + "ms");
 			
+			
+			BoardProperties boardProperties_matcher = new BoardProperties(256);
+			preProcessedImage = ImageHandlerSingleton.getInstance().resizeImage(preProcessedImage, boardProperties_matcher.getImageSize());
 			int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(preProcessedImage);
 			
-			BoardProperties boardProperties_matcher = new BoardProperties(512);
 			Matcher_Base matcher = new Matcher_Composite(boardProperties_matcher.getImageSize());
 			startTime = System.currentTimeMillis();
 			ResultPair<String, MatchingStatistics> result = matcher.scan(grayBoard);

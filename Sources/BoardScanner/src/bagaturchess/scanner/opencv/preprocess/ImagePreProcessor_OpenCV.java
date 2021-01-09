@@ -52,6 +52,7 @@ import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.KMeans;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.opencv.OpenCVUtils;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Base;
 
@@ -74,7 +75,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 
 		ImageHandlerSingleton.getInstance().saveImage("OpenCV_target", "png", targetPerspective_obj);
 
-		targetPerspective = bufferedImage2Mat((BufferedImage) targetPerspective_obj);
+		targetPerspective = OpenCVUtils.bufferedImage2Mat((BufferedImage) targetPerspective_obj);
 	}
 
 	public Object filter(Object image) throws IOException {
@@ -83,14 +84,16 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		
 		ImageHandlerSingleton.getInstance().saveImage("OpenCV_board_input", "png", image);
 		
-		Mat source = bufferedImage2Mat((BufferedImage) image);
+		Mat source = OpenCVUtils.bufferedImage2Mat((BufferedImage) image);
+		Mat source_gray = new Mat(source.height(),source.width(),CvType.CV_8UC4);
+		Imgproc.cvtColor(source, source_gray, Imgproc.COLOR_BGR2GRAY);
 		
 		MatOfPoint2f corners1 = new MatOfPoint2f();
 		MatOfPoint2f corners2 = new MatOfPoint2f();
-		boolean found1 = Calib3d.findChessboardCorners(source, new Size(7, 7), corners1,
-				Calib3d.CALIB_CB_ADAPTIVE_THRESH + Calib3d.CALIB_CB_NORMALIZE_IMAGE + Calib3d.CALIB_CB_FAST_CHECK);
-		boolean found2 = Calib3d.findChessboardCorners(targetPerspective, new Size(7, 7), corners2,
-				Calib3d.CALIB_CB_ADAPTIVE_THRESH + Calib3d.CALIB_CB_NORMALIZE_IMAGE + Calib3d.CALIB_CB_FAST_CHECK);
+		boolean found1 = Calib3d.findChessboardCorners(source_gray, new Size(7, 7), corners1);
+		boolean found2 = Calib3d.findChessboardCorners(targetPerspective, new Size(7, 7), corners2);
+		
+		boolean hasChessBoardInSource = Calib3d.checkChessboard(source_gray, new Size(7, 7));
 		
 		/*if (found1) {
 			TermCriteria term = new TermCriteria(TermCriteria.EPS | TermCriteria.MAX_ITER, 30, 0.1);
@@ -98,7 +101,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		}*/
 		
 		if (!found1 || !found2) {
-			System.out.println("!found1 || !found2 " + found1 + " " + found2);
+			System.out.println("!found1 || !found2 " + found1 + " " + found2 + " hasChessBoardInSource=" + hasChessBoardInSource);
 			return null;
 		}
 		
@@ -131,26 +134,11 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		Imgproc.warpAffine(img1_warp, destination, rotMat, destination.size());
 		*/
 		
-		BufferedImage result = mat2BufferedImage(img1_warp);
+		BufferedImage result = OpenCVUtils.mat2BufferedImage(img1_warp);
 		
 		ImageHandlerSingleton.getInstance().saveImage("OpenCV_board_result", "png", result);
 		
 		return result;
-	}
-	
-	
-	public static Mat bufferedImage2Mat(BufferedImage image) throws IOException {
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		ImageIO.write(image, "png", byteArrayOutputStream);
-		byteArrayOutputStream.flush();
-		return Imgcodecs.imdecode(new MatOfByte(byteArrayOutputStream.toByteArray()), Imgcodecs.IMREAD_UNCHANGED);
-	}
-	
-	
-	public static BufferedImage mat2BufferedImage(Mat matrix) throws IOException {
-		MatOfByte mob = new MatOfByte();
-		Imgcodecs.imencode(".png", matrix, mob);
-		return ImageIO.read(new ByteArrayInputStream(mob.toArray()));
 	}
 	
 	

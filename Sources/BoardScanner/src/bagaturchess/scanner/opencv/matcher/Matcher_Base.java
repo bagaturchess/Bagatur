@@ -17,19 +17,27 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns.impl1.matchers;
+package bagaturchess.scanner.opencv.matcher;
 
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Core.MinMaxLocResult;
+import org.opencv.imgproc.Imgproc;
 
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.BoardUtils;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.opencv.OpenCVUtils;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
 
@@ -48,10 +56,7 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	protected abstract double getTotalDeltaThreshold();
-	
-	
-	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) {
+	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) throws IOException {
 		
 		if (grayBoard.length != boardProperties.getImageSize()) {
 			throw new IllegalStateException("grayBoard.length=" + grayBoard.length + ", boardProperties.getImageSize()=" + boardProperties.getImageSize());
@@ -61,7 +66,6 @@ public abstract class Matcher_Base {
 		result.matcherName = this.getClass().getCanonicalName();
 		
 		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
-		//System.out.println(emptySquares);
 		
 		ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard);
 		
@@ -76,18 +80,19 @@ public abstract class Matcher_Base {
 				
 				pids[fieldID] = Constants.PID_NONE;
 						
-				//if (!emptySquares.contains(fieldID)) {
+				if (!emptySquares.contains(fieldID)) {
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
 					//int bgcolor_avg = (int) MatrixUtils.calculateColorStats(squareMatrix).getEntropy();
 					
-					MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
+					/*MatrixUtils.PatternMatchingData bestPatternData = new MatrixUtils.PatternMatchingData();
 					bestPatternData.x = 0;
 					bestPatternData.y = 0;
 					bestPatternData.size = squareMatrix.length;
-					//ImageHandlerSingleton.getInstance().printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
+					ImageHandlerSingleton.getInstance().printInfo(squareMatrix, bestPatternData, "" + fieldID + "_square");
+					*/
 					
 					Set<Integer> pidsToSearch = new HashSet<Integer>();
-					pidsToSearch.add(Constants.PID_NONE);
+					//pidsToSearch.add(Constants.PID_NONE);
 					if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_W_PAWN);
 					pidsToSearch.add(Constants.PID_W_KNIGHT);
 					pidsToSearch.add(Constants.PID_W_BISHOP);
@@ -113,7 +118,7 @@ public abstract class Matcher_Base {
 					//if (pids[fieldID] != Constants.PID_NONE) {
 					countPIDs++;
 					//}
-				//}
+				}
 			}
 		}
 		
@@ -125,16 +130,19 @@ public abstract class Matcher_Base {
 	
 	
 	private ResultPair<Integer, MatrixUtils.PatternMatchingData> getPID(int[][] graySquareMatrix, boolean iterateSize,
-			List<Integer> bgcolors, Set<Integer> pids, int fieldID) {
+			List<Integer> bgcolors, Set<Integer> pids, int fieldID) throws IOException {
+		
+		BufferedImage graySquare = (BufferedImage) ImageHandlerSingleton.getInstance().createGrayImage(graySquareMatrix);
+		Mat graySource = OpenCVUtils.bufferedImage2Mat(graySquare);
 		
 		MatrixUtils.PatternMatchingData bestData = null;
 		int bestPID = -1;
 		
-		int counter = 0;
-		
 		int maxSize = graySquareMatrix.length;
 		int startSize = iterateSize ? (int) ((1 - SIZE_DELTA_PERCENT) * maxSize) : maxSize;
-				
+		
+		int counter = 0;
+		
 		for (int size = startSize; size <= maxSize; size++) {
 			
 			MatrixUtils.PatternMatchingData curData_best  = null;
@@ -147,13 +155,29 @@ public abstract class Matcher_Base {
 				
 				for (int i = 0; i < bgcolors.size(); i++) {
 					
+			        MatrixUtils.PatternMatchingData curData = new MatrixUtils.PatternMatchingData();
+			        
 					int bgcolor = bgcolors.get(i);
 					
-					int[][] grayPattern = pid == Constants.PID_NONE ?
-							ImageHandlerSingleton.getInstance().createSquareImage(bgcolor, size)
-							: ImageHandlerSingleton.getInstance().createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, bgcolor, size);
-					MatrixUtils.PatternMatchingData curData = MatrixUtils.matchImages(graySquareMatrix, grayPattern);
+					Mat template = null;
+					if (pid == Constants.PID_NONE) {
+						int[][] emptySquare_matrix = ImageHandlerSingleton.getInstance().createSquareImage(bgcolor, size);
+						curData.pattern = emptySquare_matrix;
+						BufferedImage emptySquare = (BufferedImage) ImageHandlerSingleton.getInstance().createGrayImage(emptySquare_matrix);
+						template = OpenCVUtils.bufferedImage2Mat(emptySquare);	
+					} else {
+						BufferedImage template_obj = OpenCVUtils.createPieceImage(boardProperties.getPiecesSetFileNamePrefix(), pid, bgcolor, size);
+						curData.pattern = ImageHandlerSingleton.getInstance().convertToGrayMatrix(template_obj);
+						template = OpenCVUtils.bufferedImage2Mat(template_obj);	
+					}
 					
+			        Mat outputImage = new Mat();
+			        Imgproc.matchTemplate(graySource, template, outputImage, Imgproc.TM_CCOEFF_NORMED);
+			        MinMaxLocResult mmr = Core.minMaxLoc(outputImage);
+			        
+			        curData.size = size;
+			        curData.delta = 1 - mmr.maxVal;
+			        
 					if (curData_best == null || curData_best.delta > curData.delta) {
 						curData_best = curData;
 					}
