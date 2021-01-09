@@ -22,6 +22,7 @@ package bagaturchess.scanner.patterns.impl1;
 
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.opencv.preprocess.ImagePreProcessor_OpenCV;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Rotate;
@@ -39,20 +40,22 @@ public class AllMain {
 		
 		try {
 			
-			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test14.png");
+			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test12.png");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/test4.jpg");
-			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/lichess.org/test1.png");
-			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/chess.com/test2.png");
+			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/lichess.org/test2.png");
+			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/chess.com/test1.png");
 			
-			BoardProperties boardProperties = new BoardProperties(256);
+			BoardProperties boardProperties = new BoardProperties(512);
 			ImagePreProcessor_Base processor_crop_kmeans = new ImagePreProcessor_Crop_KMeans(boardProperties);
 			ImagePreProcessor_Base processor_crop = new ImagePreProcessor_Crop(boardProperties);
 			ImagePreProcessor_Base processor_rotate = new ImagePreProcessor_Rotate(boardProperties);
+			ImagePreProcessor_Base processor_opencv = new ImagePreProcessor_OpenCV(boardProperties);
 			
 			long startTime = System.currentTimeMillis();
-			Object preProcessedImage = processor_crop_kmeans.filter(image);
-			preProcessedImage = processor_crop.filter(preProcessedImage);
-			preProcessedImage = processor_rotate.filter(preProcessedImage);
+			Object preProcessedImage = processor_opencv.filter(image);
+			//Object preProcessedImage = processor_crop_kmeans.filter(image);
+			//preProcessedImage = processor_crop.filter(preProcessedImage);
+			//preProcessedImage = processor_rotate.filter(preProcessedImage);
 			System.out.println("Filtered in " + (System.currentTimeMillis() - startTime) + "ms");
 			
 			int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(preProcessedImage);
