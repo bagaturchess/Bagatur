@@ -40,16 +40,16 @@ public class AllMain {
 		
 		try {
 			
-			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test12.png");
+			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test11.png");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/test4.jpg");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/lichess.org/test2.png");
-			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/chess.com/test1.png");
+			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/chess.com/test1.png");
 			
-			BoardProperties boardProperties = new BoardProperties(512);
-			ImagePreProcessor_Base processor_crop_kmeans = new ImagePreProcessor_Crop_KMeans(boardProperties);
-			ImagePreProcessor_Base processor_crop = new ImagePreProcessor_Crop(boardProperties);
-			ImagePreProcessor_Base processor_rotate = new ImagePreProcessor_Rotate(boardProperties);
-			ImagePreProcessor_Base processor_opencv = new ImagePreProcessor_OpenCV(boardProperties);
+			BoardProperties boardProperties_processor = new BoardProperties(512);
+			ImagePreProcessor_Base processor_crop_kmeans = new ImagePreProcessor_Crop_KMeans(boardProperties_processor);
+			ImagePreProcessor_Base processor_crop = new ImagePreProcessor_Crop(boardProperties_processor);
+			ImagePreProcessor_Base processor_rotate = new ImagePreProcessor_Rotate(boardProperties_processor);
+			ImagePreProcessor_Base processor_opencv = new ImagePreProcessor_OpenCV(boardProperties_processor);
 			
 			long startTime = System.currentTimeMillis();
 			Object preProcessedImage = processor_opencv.filter(image);
@@ -60,7 +60,8 @@ public class AllMain {
 			
 			int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(preProcessedImage);
 			
-			Matcher_Base matcher = new Matcher_Composite(boardProperties.getImageSize());
+			BoardProperties boardProperties_matcher = new BoardProperties(512);
+			Matcher_Base matcher = new Matcher_Composite(boardProperties_matcher.getImageSize());
 			startTime = System.currentTimeMillis();
 			ResultPair<String, MatchingStatistics> result = matcher.scan(grayBoard);
             System.out.println(result.getFirst() + " " + result.getSecond().totalDelta + " " + (System.currentTimeMillis() - startTime) + "ms");

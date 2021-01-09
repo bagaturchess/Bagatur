@@ -108,29 +108,15 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		}
 		System.out.println(corners1.size() + " " + corners2.size());
 		
-		Point[] wrapPoints_corners1 = new Point[4];
-		RotatedRect rotatedRect_corners1 = Imgproc.minAreaRect(corners1);
-		rotatedRect_corners1.points(wrapPoints_corners1);
-		MatOfPoint2f corners1_unordered = new MatOfPoint2f();
-		corners1_unordered.fromArray(wrapPoints_corners1);
-		
-		Point[] wrapPoints_corners2 = new Point[4];
-		RotatedRect rotatedRect_corners2 = Imgproc.minAreaRect(corners2);
-		rotatedRect_corners2.points(wrapPoints_corners2);
-		MatOfPoint2f corners2_unordered = new MatOfPoint2f();
-		corners2_unordered.fromArray(wrapPoints_corners2);
-		
 		MatOfPoint2f corners1_ordered = new MatOfPoint2f();
-		corners1_ordered.fromArray(orderCorners(corners1_unordered.toArray(), source.width(), source.height()));
+		corners1_ordered.fromArray(getOrderedCorners(corners1.toArray(), source.width(), source.height()));
 		
 		MatOfPoint2f corners2_ordered = new MatOfPoint2f();
-		corners2_ordered.fromArray(orderCorners(corners2_unordered.toArray(), targetPerspective.width(), targetPerspective.height()));
+		corners2_ordered.fromArray(getOrderedCorners(corners2.toArray(), targetPerspective.width(), targetPerspective.height()));
         
 		Mat H = new Mat();
 		H = Calib3d.findHomography(corners1_ordered, corners2_ordered);
 		// System.out.println(H.dump());
-		
-		//cnts = Imgproc.grabCut(img, mask, rect, bgdModel, fgdModel, iterCount);
 		
 		Mat img1_warp = new Mat();
 		Imgproc.warpPerspective(source, img1_warp, H, source.size());
@@ -168,11 +154,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 	}
 	
 	
-	private Point[] orderCorners(Point[] cornersUnordered, double maxX, double maxY) {
-		
-		if (cornersUnordered.length != 4) {
-			throw new IllegalStateException();
-		}
+	private Point[] getOrderedCorners(Point[] cornersUnordered, double maxX, double maxY) {
 		
 		Point cornerTopLeft = new Point(0, 0);
 		Point cornerTopRight = new Point(0, maxY);
@@ -212,58 +194,6 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		return cornerPoints;
 	}
 	
-	
-	private Point[] orderCorners1(Point[] cornersUnordered) {
-		
-		Point[] cornerPoints = new Point[4];
-		Point p1, p2, p3, p4;
-		Point topLeft = null, topRight = null, botRight = null, botLeft = null;
-		
-		List<Point> corners = new ArrayList<Point>();
-		for (int i = 0; i < cornersUnordered.length; ++i)
-			corners.add(cornersUnordered[i]);
-
-		/* Top set of points */
-		// find p1
-		p1 = corners.get(0);
-		for (Point point : corners) {
-			if (point.y < p1.y) {
-				p1 = point;
-			}
-		}
-		corners.remove(p1);
-
-		// find p2
-		p2 = corners.get(0);
-		for (Point point : corners) {
-			if (distance(p1, point) < distance(p1, p2)) {
-				p2 = point;
-			}
-		}
-		corners.remove(p2);
-
-		/* Identify top left and top right */
-		/*
-		 * Note that the logic is safe if the points have equal x values. Safe in the
-		 * sense that different points will get assigned to topLeft and topRight
-		 */
-		topLeft = p1.x < p2.x ? p1 : p2;
-		topRight = p2.x > p1.x ? p2 : p1;
-
-		/* Bottom set of points */
-		// corners only contains 2 points, the bottom ones
-		p3 = corners.get(0);
-		p4 = corners.get(1);
-		botRight = p3.x > p4.x ? p3 : p4;
-		botLeft = p4.x < p3.x ? p4 : p3;
-
-		cornerPoints[0] = topLeft;
-		cornerPoints[1] = topRight;
-		cornerPoints[2] = botRight;
-		cornerPoints[3] = botLeft;
-
-		return cornerPoints;
-	}
 
 	private double distance(Point p1, Point p2) {
 		return Math.sqrt(Math.pow((p2.x - p1.x), 2) + Math.pow((p2.y - p1.y), 2));
