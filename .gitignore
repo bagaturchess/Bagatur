@@ -4,3 +4,4 @@ Sources/WorkDir*
 *.cg
 *features.bin
 *.bin
+Sources/BoardScanner/data*
