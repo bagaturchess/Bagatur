@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Vector;
 
 import bagaturchess.bitboard.api.PawnsEvalCache;
-import bagaturchess.bitboard.impl.attacks.control.metadata.SeeMetadata;
+//import bagaturchess.bitboard.impl.attacks.control.metadata.SeeMetadata;
 import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
@@ -67,7 +67,7 @@ public class MemoryConsumers {
 	
 	private IRootSearchConfig engineConfiguration;
 	
-	private SeeMetadata seeMetadata;
+	//private SeeMetadata seeMetadata;
 	private OpeningBook openingBook;
 	
 	private List<IEvalCache> evalCache;
@@ -129,7 +129,7 @@ public class MemoryConsumers {
 		
 		ChannelManager.getChannel().dump("SEE Metadata ... ");
 		long lastAvailable_in_MB = ((getAvailableMemory()) / (1024 * 1024));
-		seeMetadata = SeeMetadata.getSingleton();
+		//seeMetadata = SeeMetadata.getSingleton();
 		ChannelManager.getChannel().dump("SEE Metadata OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
 		
 		
