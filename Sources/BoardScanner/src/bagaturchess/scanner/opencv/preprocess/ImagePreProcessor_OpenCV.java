@@ -116,9 +116,22 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 
 	private Mat findChessBoardCornersByContour(Mat source_rgb, Mat source_gray) {
 		
+		
+		Imgproc.GaussianBlur(source_gray, source_gray, new Size(3, 3), 1);
+		
+		int kernelSize = 2;
+        Mat element = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_CROSS, new Size(2 * kernelSize + 1, 2 * kernelSize + 1),
+                new Point(kernelSize, kernelSize));
+        Imgproc.erode(source_gray, source_gray, element);
+        //Imgproc.dilate(source_gray, source_gray, element);
+        
+		/*HighGui.imshow("cannyOutput", source_gray);
+		HighGui.waitKey(0);
+        */
+        
 		Mat cannyOutput = new Mat();
 		int threshold = 10;
-		Imgproc.Canny(source_rgb, cannyOutput, threshold, 4 * threshold);
+		Imgproc.Canny(source_gray, cannyOutput, threshold, 4 * threshold);
 		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		Mat hierarchy = new Mat();
 		Imgproc.findContours(cannyOutput, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);

@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
-import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
 
 
@@ -34,13 +33,14 @@ public class OpenCVUtils {
 	
 	public static MatOfPoint findBigestContour(List<MatOfPoint> contours) {
 		MatOfPoint bigestContour = null;
-		int bigestFace = 0;
+		int bigestArea = 0;
 		for (int i = 0; i < contours.size(); i++) {
 			MatOfPoint mop = contours.get(i);
-			Rect contourRec = Imgproc.boundingRect(mop);
-			int face = contourRec.height * contourRec.width;
-			if (face > bigestFace) {
-				bigestFace = face;
+			double contourArea = Imgproc.contourArea(mop);
+			//Rect contourRec = Imgproc.boundingRect(mop);
+			//int contourArea = contourRec.height * contourRec.width;
+			if (contourArea > bigestArea) {
+				bigestArea = (int) contourArea;
 				bigestContour = mop;
 			}
 		}
@@ -217,6 +217,15 @@ public class OpenCVUtils {
     
     HighGui.imshow("Draw matches", drawing);
     HighGui.waitKey(0);
+    
+            Mat element = Imgproc.getStructuringElement(elementType, new Size(2 * kernelSize + 1, 2 * kernelSize + 1),
+                new Point(kernelSize, kernelSize));
+        if (doErosion) {
+            Imgproc.erode(matImgSrc, matImgDst, element);
+        } else {
+            Imgproc.dilate(matImgSrc, matImgDst, element);
+        }
+        
     */
 	
 }
