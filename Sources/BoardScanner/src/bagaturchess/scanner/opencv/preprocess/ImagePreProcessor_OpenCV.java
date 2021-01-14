@@ -218,14 +218,14 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 	public Mat findChessBoardCornersByBuildInFunction(Mat source_rgb, Mat source_gray) {
 		
 		MatOfPoint2f corners = new MatOfPoint2f();
-		boolean found = Calib3d.findChessboardCorners(source_gray, new Size(7, 7), corners);
+		boolean found = Calib3d.findChessboardCorners(source_rgb, new Size(7, 7), corners);
 		
 		if (found && !corners.empty()) {
 			
 			Mat result = new Mat();
 			
 			MatOfPoint2f corners_ordered = new MatOfPoint2f();
-			corners_ordered.fromArray(OpenCVUtils.getOrderedCorners(corners.toArray(), source_gray.width(), source_gray.height()));
+			corners_ordered.fromArray(OpenCVUtils.getOrderedCorners(corners.toArray(), source_rgb.width(), source_rgb.height()));
 			
 			Mat H = Calib3d.findHomography(corners_ordered, targetCorners);
 			
