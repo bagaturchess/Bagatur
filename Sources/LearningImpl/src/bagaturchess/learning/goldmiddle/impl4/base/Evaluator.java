@@ -108,11 +108,11 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		int score2 = 0;
 		long space = evalInfo.bb_w_pawns >>> 8;
 		space |= space >>> 8 | space >>> 16;
-		score2 += EvalConstants.SPACE[Long.bitCount(evalInfo.getFriendlyPieces(WHITE))]
+		score2 += EvalConstants.SPACE[Math.min(Long.bitCount(evalInfo.getFriendlyPieces(WHITE)), EvalConstants.SPACE.length - 1)]
 				* Long.bitCount(space & ~evalInfo.bb_w_pawns & ~evalInfo.attacks[BLACK][PAWN] & Bitboard.FILE_CDEF);
 		space = evalInfo.bb_b_pawns << 8;
 		space |= space << 8 | space << 16;
-		score2 -= EvalConstants.SPACE[Long.bitCount(evalInfo.getFriendlyPieces(BLACK))]
+		score2 -= EvalConstants.SPACE[Math.min(Long.bitCount(evalInfo.getFriendlyPieces(BLACK)), EvalConstants.SPACE.length - 1)]
 				* Long.bitCount(space & ~evalInfo.bb_b_pawns & ~evalInfo.attacks[WHITE][PAWN] & Bitboard.FILE_CDEF);
 		
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_5, FEATURE_ID_SPACE,
@@ -1119,7 +1119,7 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 
 			// safe check queen
 			if ((queenMoves & notAttacked) != 0) {
-				counter += EvalConstants.KS_CHECK_QUEEN[Long.bitCount(evalInfo.getFriendlyPieces(kingColor))];
+				counter += EvalConstants.KS_CHECK_QUEEN[Math.min(Long.bitCount(evalInfo.getFriendlyPieces(kingColor)), EvalConstants.KS_CHECK_QUEEN.length - 1)];
 			}
 			// safe check queen touch
 			if ((queenMoves & StaticMoves.KING_MOVES[kingIndex]) != 0) {
