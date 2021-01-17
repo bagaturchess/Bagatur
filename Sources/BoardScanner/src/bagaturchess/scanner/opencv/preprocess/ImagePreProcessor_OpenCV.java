@@ -83,7 +83,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		Imgproc.cvtColor(source_rgb, source_gray, Imgproc.COLOR_BGR2GRAY);
 		
 		
-		Mat result = findChessBoardCornersByBuildInFunction(source_rgb, source_gray);
+		Mat result = findChessBoardCornersByBuildInFunction(source_rgb);
 		
 		if (result != null) {
 			
@@ -93,7 +93,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 			
 	        result = findChessBoardCornersByContour(source_rgb, source_gray);
 	        
-	        Mat result_2 = findChessBoardCornersByBuildInFunction(source_rgb, result);
+	        Mat result_2 = findChessBoardCornersByBuildInFunction(source_rgb);
 	        
 			if (result_2 != null) {
 				System.out.println("Chess board found in a second pass.");
@@ -215,7 +215,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 	}
 	
 	
-	public Mat findChessBoardCornersByBuildInFunction(Mat source_rgb, Mat source_gray) {
+	public Mat findChessBoardCornersByBuildInFunction(Mat source_rgb) {
 		
 		MatOfPoint2f corners = new MatOfPoint2f();
 		boolean found = Calib3d.findChessboardCorners(source_rgb, new Size(7, 7), corners);
