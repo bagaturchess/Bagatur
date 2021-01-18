@@ -50,6 +50,7 @@ import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.state.PiecesList;
+import bagaturchess.bitboard.impl1.internal.CheckUtil;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.ChessBoardUtil;
 import bagaturchess.bitboard.impl1.internal.ChessConstants;
@@ -113,18 +114,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean isInCheck(int colour) {
-		
-		boolean result = false;
-		
-		if (chessBoard.colorToMove == colour) {
-			result = isInCheck();
-		} else {
-			chessBoard.doNullMove();
-			result = isInCheck();
-			chessBoard.undoNullMove();
-		}
-		
-		return result;
+		return CheckUtil.isInCheck(chessBoard, colour);
 	}
 	
 	

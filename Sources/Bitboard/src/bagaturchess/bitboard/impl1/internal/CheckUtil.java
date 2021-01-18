@@ -14,6 +14,16 @@ public final class CheckUtil {
 
 	//@formatter:off
 
+	public static boolean isInCheck(final ChessBoard cb, int color) {
+		final int kingIndex = cb.kingIndex[color];
+		int colorInverse = 1 - color;
+		return (cb.pieces[colorInverse][NIGHT] & StaticMoves.KNIGHT_MOVES[kingIndex]
+				| (cb.pieces[colorInverse][ROOK]|cb.pieces[colorInverse][QUEEN]) & MagicUtil.getRookMoves(kingIndex, cb.allPieces)
+				| (cb.pieces[colorInverse][BISHOP]|cb.pieces[colorInverse][QUEEN]) & MagicUtil.getBishopMoves(kingIndex, cb.allPieces) 
+				| cb.pieces[colorInverse][PAWN] & StaticMoves.PAWN_ATTACKS[color][kingIndex]
+			) != 0L;
+	}
+	
 	public static long getCheckingPieces(final ChessBoard cb) {
 		final int kingIndex = cb.kingIndex[cb.colorToMove];
 
