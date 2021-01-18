@@ -112,6 +112,23 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
+	public boolean isInCheck(int colour) {
+		
+		boolean result = false;
+		
+		if (chessBoard.colorToMove == colour) {
+			result = isInCheck();
+		} else {
+			chessBoard.doNullMove();
+			result = isInCheck();
+			chessBoard.undoNullMove();
+		}
+		
+		return result;
+	}
+	
+	
+	@Override
 	public String toString() {
 		return chessBoard.toString();
 	}
@@ -637,14 +654,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public int getUnstoppablePasser() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#isInCheck(int)
-	 */
-	@Override
-	public boolean isInCheck(int colour) {
 		throw new UnsupportedOperationException();
 	}
 

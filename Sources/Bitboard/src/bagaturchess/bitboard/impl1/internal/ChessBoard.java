@@ -135,7 +135,7 @@ public final class ChessBoard {
 		checkingPieces = checkingPiecesHistory[moveCounter];
 		lastCaptureOrPawnMoveBefore = lastCaptureOrPawnMoveBeforeHistory[moveCounter];
 	}
-
+	
 	public void doNullMove() {
 		pushHistoryValues(0);
 
@@ -152,7 +152,7 @@ public final class ChessBoard {
 		
 		playedBoardStates.inc(zobristKey);
 	}
-
+	
 	public void undoNullMove() {
 		
 		playedBoardStates.dec(zobristKey);
