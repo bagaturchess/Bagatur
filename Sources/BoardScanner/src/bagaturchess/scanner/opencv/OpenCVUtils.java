@@ -25,10 +25,101 @@ import java.util.List;
 
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
 
 
 public class OpenCVUtils {
+	
+	
+	public static Point[] getMinimalQuadrilateral(Point[] convexPolygon, Rect boundingRec) {
+		
+		if (convexPolygon.length <= 4) {
+			throw new IllegalStateException();
+		}
+		
+		//Create list with all entries
+		List<ListItem<Point>> all_init_list = new ArrayList<ListItem<Point>>();
+		for (int i = 0; i < convexPolygon.length; i++) {
+			ListItem<Point> cur = new ListItem<Point>();
+			cur.value = convexPolygon[i];
+			all_init_list.add(cur);
+		}
+		
+		//Link the list
+		for (int i = 0; i < all_init_list.size() - 1; i++) {
+			all_init_list.get(i).next = all_init_list.get(i + 1);
+		}
+		//Make it cyclic
+		all_init_list.get(all_init_list.size() - 1).next = all_init_list.get(0);
+		
+		
+		int countOfPoints = all_init_list.size();
+		ListItem<Point> start = all_init_list.get(0);
+		
+		while (countOfPoints > 4) {
+			
+			//System.out.println("countOfPoints=" + countOfPoints);
+			
+			double minTriangleArea = Double.MAX_VALUE;
+			ListItem<Point> best = null;
+			ListItem<Point> best_intersection = new ListItem<Point>();
+			ListItem<Point> cur = start;
+			do {
+				Point p1 = cur.value;
+				Point p2 = cur.next.value;
+				Point p3 = cur.next.next.value;
+				Point p4 = cur.next.next.next.value;
+				
+				//Do work
+				Point intersection = findIntersection(p1, p2, p4, p3);
+				if (intersection != null && boundingRec.contains(intersection)) {
+					double cur_area = triangleArea(p2, intersection, p3);
+					if (cur_area < minTriangleArea) {
+						minTriangleArea = cur_area;
+						best = cur;
+						best_intersection.value = intersection;
+						//System.out.println("minTriangleArea=" + minTriangleArea);
+					}
+				}
+				
+				cur = cur.next;
+			} while (cur != start);
+			
+			//Remove 2 points and put their intersection instead
+			best_intersection.next = best.next.next.next;
+			best.next = best_intersection;
+			countOfPoints--;
+			start = best;
+		}
+		
+		return new Point[] {start.value, start.next.value, start.next.next.value, start.next.next.next.value};
+	}
+	
+	
+	public static double triangleArea(Point A, Point B, Point C) {
+		double area = (A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y)) / 2.0;
+		return Math.abs(area);
+	}
+	
+	
+    public static Point findIntersection(Point l1s, Point l1e, Point l2s, Point l2e) {
+        
+    	double a1 = l1e.y - l1s.y;
+        double b1 = l1s.x - l1e.x;
+        double c1 = a1 * l1s.x + b1 * l1s.y;
+        
+        double a2 = l2e.y - l2s.y;
+        double b2 = l2s.x - l2e.x;
+        double c2 = a2 * l2s.x + b2 * l2s.y;
+        
+        double delta = a1 * b2 - a2 * b1;
+        if (delta == 0) {
+        	return null;
+        }
+        
+        return new Point((b2 * c1 - b1 * c2) / delta, (a1 * c2 - a2 * c1) / delta);
+    }
 	
 	
 	public static MatOfPoint findBigestContour(List<MatOfPoint> contours) {
@@ -228,4 +319,9 @@ public class OpenCVUtils {
         
     */
 	
+	
+	private static final class ListItem<T> {
+		public T value;
+		public ListItem<T> next;
+	}
 }

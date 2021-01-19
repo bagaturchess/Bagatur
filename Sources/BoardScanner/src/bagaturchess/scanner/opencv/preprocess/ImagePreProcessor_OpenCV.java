@@ -85,22 +85,8 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		
 		Mat result = findChessBoardCornersByBuildInFunction(source_rgb);
 		
-		if (result != null) {
-			
-			System.out.println("Chess board found in a standard way.");
-			
-		} else {
-			
+		if (result == null) {
 	        result = findChessBoardCornersByContour(source_rgb, source_gray);
-	        
-	        Mat result_2 = findChessBoardCornersByBuildInFunction(source_rgb);
-	        
-			if (result_2 != null) {
-				System.out.println("Chess board found in a second pass.");
-				//result = result_2;
-			} else {
-				System.out.println("Chess board found by contours.");
-			}	
 		}
 		
         //HighGui.imshow("Dump", result);
@@ -130,7 +116,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
         */
         
 		Mat cannyOutput = new Mat();
-		int threshold = 10;
+		int threshold = 20;
 		Imgproc.Canny(source_gray, cannyOutput, threshold, 4 * threshold);
 		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		Mat hierarchy = new Mat();
@@ -159,22 +145,30 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		HighGui.waitKey(0);
 		*/
 		
-        /*Rect boundingRec = Imgproc.boundingRect(bigestContour);
-        Mat bounding = new Mat(source_rgb, boundingRec);
+        Rect boundingRec = Imgproc.boundingRect(bigestContour);
+        double heightExtension = 0.05 * boundingRec.height;
+        double widthExtension = 0.05 * boundingRec.width;
+        boundingRec.x -= widthExtension / 2;
+        boundingRec.width += widthExtension;
+        boundingRec.y -= heightExtension / 2;
+        boundingRec.height += heightExtension;
+        /*Mat bounding = new Mat(source_rgb, boundingRec);
 		HighGui.imshow("bounding", bounding);
-		HighGui.waitKey(0);
-		*/
+		HighGui.waitKey(0);*/
+		
 		
 		//MatOfPoint2f curve = new MatOfPoint2f(bigestContour.toArray());
 		MatOfPoint2f curve = new MatOfPoint2f(hullContour);
-		double epsilon = 0.05 * Imgproc.arcLength(curve, true);
+		double epsilon = 0.01 * Imgproc.arcLength(curve, true);
 		MatOfPoint2f approxCurve = null;
 		//while (approxCurve == null || approxCurve.toArray().length > 6) {
 			approxCurve = new MatOfPoint2f();
 			Imgproc.approxPolyDP(curve, approxCurve, epsilon, true);
 			//epsilon += 0.001;
 		//}
-		
+		Point[] approxCurve_points = approxCurve.toArray();
+		System.out.println("Chess board found by contours with " + approxCurve_points.length + " points.");
+			
 		/*List<MatOfPoint> curve_in_list = new ArrayList<MatOfPoint>();
 		curve_in_list.add(new MatOfPoint(approxCurve.toArray()));
 		Mat drawing = source_rgb;//Mat.zeros(cannyOutput.size(), CvType.CV_8UC3);
@@ -182,8 +176,19 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		HighGui.imshow("curve_in_list", drawing);
 		HighGui.waitKey(0);
 		*/
+		if (approxCurve_points.length > 4 ) {
+			approxCurve_points = OpenCVUtils.getMinimalQuadrilateral(approxCurve_points, boundingRec);
+		}
+		/*Mat drawing = source_rgb;
+		for (int i = 0; i < minimalQuadrilateral.length; i++ ) {
+			//System.out.println("x=" + minimalQuadrilateral[i].x + " y=" + minimalQuadrilateral[i].y);
+			Imgproc.drawMarker(drawing, minimalQuadrilateral[i], new Scalar(255, 255, 255));
+		}
+		HighGui.imshow("getMinimalQuadrilateral", drawing);
+		HighGui.waitKey(0);
+		 */
 		
-		Point[] corners_of_contour = OpenCVUtils.getOrderedCorners(approxCurve.toArray(), source_gray.width(), source_gray.height());
+		Point[] corners_of_contour = OpenCVUtils.getOrderedCorners(approxCurve_points, source_gray.width(), source_gray.height());
 		
 		MatOfPoint2f src = new MatOfPoint2f(
 				corners_of_contour[0],
@@ -230,6 +235,8 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 			Mat H = Calib3d.findHomography(corners_ordered, targetCorners);
 			
 			Imgproc.warpPerspective(source_rgb, result, H, source_rgb.size());
+			
+			System.out.println("Chess board found in a standard way.");
 			
 			return result;
 		}
