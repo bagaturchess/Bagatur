@@ -24,8 +24,8 @@ import org.opencv.core.Core;
 
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.ResultPair;
-//import bagaturchess.scanner.patterns.impl1.matchers.*;
-import bagaturchess.scanner.opencv.matcher.*;
+import bagaturchess.scanner.patterns.impl1.matchers.*;
+//import bagaturchess.scanner.opencv.matcher.*;
 import bagaturchess.scanner.opencv.preprocess.ImagePreProcessor_OpenCV;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
@@ -45,7 +45,7 @@ public class AllMain {
 			
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 			
-			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test7.png");
+			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test17.png");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/test3.jpg");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/lichess.org/test2.png");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/chess.com/test1.png");
