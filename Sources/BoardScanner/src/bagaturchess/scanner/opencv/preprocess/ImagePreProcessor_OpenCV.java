@@ -147,7 +147,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		
 		//MatOfPoint2f curve = new MatOfPoint2f(bigestContour.toArray());
 		MatOfPoint2f curve = new MatOfPoint2f(hullContour);
-		double epsilon = 0.01 * Imgproc.arcLength(curve, true);
+		double epsilon = 0.005 * Imgproc.arcLength(curve, true);
 		MatOfPoint2f approxCurve = null;
 		//while (approxCurve == null || approxCurve.toArray().length > 6) {
 			approxCurve = new MatOfPoint2f();
@@ -155,7 +155,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 			//epsilon += 0.001;
 		//}
 		Point[] approxCurve_points = approxCurve.toArray();
-		System.out.println("Chess board found by contours with " + approxCurve_points.length + " points.");
+		System.out.println("ImagePreProcessor_OpenCV: Chess board found by contours with " + approxCurve_points.length + " points.");
 		/*List<MatOfPoint> curve_in_list = new ArrayList<MatOfPoint>();
 		curve_in_list.add(new MatOfPoint(approxCurve.toArray()));
 		Mat drawing = source_rgb;//Mat.zeros(cannyOutput.size(), CvType.CV_8UC3);
@@ -232,7 +232,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 			
 			Imgproc.warpPerspective(source_rgb, result, H, source_rgb.size());
 			
-			System.out.println("Chess board found in a standard way.");
+			System.out.println("ImagePreProcessor_OpenCV: Chess board found in a standard way.");
 			
 			return result;
 		}

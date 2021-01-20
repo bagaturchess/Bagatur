@@ -45,7 +45,7 @@ public class AllMain {
 			
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 			
-			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test23.png");
+			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test18.png");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/test8.jpg");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/lichess.org/test2.png");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/chess.com/test1.png");
