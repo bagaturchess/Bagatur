@@ -245,13 +245,13 @@ public abstract class Matcher_Base {
 	private Set<Integer> getAllPIDs(int fieldID) {
 		Set<Integer> pidsToSearch = new HashSet<Integer>();
 		pidsToSearch.add(Constants.PID_NONE);
-		if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_W_PAWN);
+		if (fieldID >= 8 && fieldID <= 55) pidsToSearch.add(Constants.PID_W_PAWN);
 		pidsToSearch.add(Constants.PID_W_KNIGHT);
 		pidsToSearch.add(Constants.PID_W_BISHOP);
 		pidsToSearch.add(Constants.PID_W_ROOK);
 		pidsToSearch.add(Constants.PID_W_QUEEN);
 		pidsToSearch.add(Constants.PID_W_KING);
-		if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_B_PAWN);
+		if (fieldID >= 8 && fieldID <= 55) pidsToSearch.add(Constants.PID_B_PAWN);
 		pidsToSearch.add(Constants.PID_B_KNIGHT);
 		pidsToSearch.add(Constants.PID_B_BISHOP);
 		pidsToSearch.add(Constants.PID_B_ROOK);
@@ -263,13 +263,13 @@ public abstract class Matcher_Base {
 	
 	private Set<Integer> getPiecesPIDs(int fieldID) {
 		Set<Integer> pidsToSearch = new HashSet<Integer>();
-		if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_W_PAWN);
+		if (fieldID >= 8 && fieldID <= 55) pidsToSearch.add(Constants.PID_W_PAWN);
 		pidsToSearch.add(Constants.PID_W_KNIGHT);
 		pidsToSearch.add(Constants.PID_W_BISHOP);
 		pidsToSearch.add(Constants.PID_W_ROOK);
 		pidsToSearch.add(Constants.PID_W_QUEEN);
 		pidsToSearch.add(Constants.PID_W_KING);
-		if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_B_PAWN);
+		if (fieldID >= 8 && fieldID <= 55) pidsToSearch.add(Constants.PID_B_PAWN);
 		pidsToSearch.add(Constants.PID_B_KNIGHT);
 		pidsToSearch.add(Constants.PID_B_BISHOP);
 		pidsToSearch.add(Constants.PID_B_ROOK);

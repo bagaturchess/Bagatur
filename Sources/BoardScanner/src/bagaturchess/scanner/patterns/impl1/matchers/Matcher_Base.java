@@ -75,7 +75,7 @@ public abstract class Matcher_Base {
 				int fieldID = 63 - (file + 8 * rank);
 				
 				pids[fieldID] = Constants.PID_NONE;
-						
+				
 				if (!emptySquares.contains(fieldID)) {
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
 					//int bgcolor_avg = (int) MatrixUtils.calculateColorStats(squareMatrix).getEntropy();
@@ -88,13 +88,13 @@ public abstract class Matcher_Base {
 					
 					Set<Integer> pidsToSearch = new HashSet<Integer>();
 					//pidsToSearch.add(Constants.PID_NONE);
-					if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_W_PAWN);
+					if (fieldID >= 8 && fieldID <= 55) pidsToSearch.add(Constants.PID_W_PAWN);
 					pidsToSearch.add(Constants.PID_W_KNIGHT);
 					pidsToSearch.add(Constants.PID_W_BISHOP);
 					pidsToSearch.add(Constants.PID_W_ROOK);
 					pidsToSearch.add(Constants.PID_W_QUEEN);
 					pidsToSearch.add(Constants.PID_W_KING);
-					if (fieldID >= 8 && fieldID <= 56) pidsToSearch.add(Constants.PID_B_PAWN);
+					if (fieldID >= 8 && fieldID <= 55) pidsToSearch.add(Constants.PID_B_PAWN);
 					pidsToSearch.add(Constants.PID_B_KNIGHT);
 					pidsToSearch.add(Constants.PID_B_BISHOP);
 					pidsToSearch.add(Constants.PID_B_ROOK);
