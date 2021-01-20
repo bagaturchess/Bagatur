@@ -79,13 +79,15 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		ImageHandlerSingleton.getInstance().saveImage("OpenCV_board_input", "png", image);
 		
 		Mat source_rgb = ImageHandlerSingleton.getInstance().graphic2Mat(image);
-		Mat source_gray = new Mat(source_rgb.height(), source_rgb.width(), CvType.CV_8UC4);
-		Imgproc.cvtColor(source_rgb, source_gray, Imgproc.COLOR_BGR2GRAY);
 		
 		
 		Mat result = findChessBoardCornersByBuildInFunction(source_rgb);
 		
 		if (result == null) {
+			
+			Mat source_gray = new Mat(source_rgb.height(), source_rgb.width(), CvType.CV_8UC4);
+			Imgproc.cvtColor(source_rgb, source_gray, Imgproc.COLOR_BGR2GRAY);
+			
 	        result = findChessBoardCornersByContour(source_rgb, source_gray);
 		}
 		
