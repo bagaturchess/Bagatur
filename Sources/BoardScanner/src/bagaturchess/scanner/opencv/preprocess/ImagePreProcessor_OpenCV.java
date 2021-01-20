@@ -85,10 +85,10 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		
 		if (result == null) {
 			
-			Mat source_gray = new Mat(source_rgb.height(), source_rgb.width(), CvType.CV_8UC4);
-			Imgproc.cvtColor(source_rgb, source_gray, Imgproc.COLOR_BGR2GRAY);
+			//Mat source_gray = new Mat(source_rgb.height(), source_rgb.width(), CvType.CV_8UC4);
+			//Imgproc.cvtColor(source_rgb, source_gray, Imgproc.COLOR_BGR2GRAY);
 			
-	        result = findChessBoardCornersByContour(source_rgb, source_gray);
+	        result = findChessBoardCornersByContour(source_rgb);
 		}
 		
         //HighGui.imshow("Dump", result);
@@ -102,7 +102,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 	}
 	
 	
-	private Mat findChessBoardCornersByContour(Mat source_rgb, Mat source_gray) {
+	private Mat findChessBoardCornersByContour(Mat source_rgb) {
 		
 		
 		//Imgproc.GaussianBlur(source_gray, source_gray, new Size(3, 3), 1);
@@ -119,7 +119,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
         
 		Mat cannyOutput = new Mat();
 		int threshold = 20;
-		Imgproc.Canny(source_gray, cannyOutput, threshold, 4 * threshold);
+		Imgproc.Canny(source_rgb, cannyOutput, threshold, 4 * threshold);
 		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		Mat hierarchy = new Mat();
 		Imgproc.findContours(cannyOutput, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -186,7 +186,7 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 			*/
 		}
 		
-		Point[] corners_of_contour = OpenCVUtils.getOrderedCorners(approxCurve_points, source_gray.width(), source_gray.height());
+		Point[] corners_of_contour = OpenCVUtils.getOrderedCorners(approxCurve_points, source_rgb.width(), source_rgb.height());
 		
 		MatOfPoint2f src = new MatOfPoint2f(
 				corners_of_contour[0],
@@ -196,9 +196,9 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		
 		MatOfPoint2f dst = new MatOfPoint2f(
 		        new Point(0, 0),
-		        new Point(0, source_gray.height()),
-		        new Point(source_gray.width(), source_gray.height()),
-		        new Point(source_gray.width(), 0)      
+		        new Point(0, source_rgb.height()),
+		        new Point(source_rgb.width(), source_rgb.height()),
+		        new Point(source_rgb.width(), 0)      
 		        );
 		
 		Mat result = new Mat();
