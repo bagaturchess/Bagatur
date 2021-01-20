@@ -145,18 +145,6 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		HighGui.waitKey(0);
 		*/
 		
-        Rect boundingRec = Imgproc.boundingRect(bigestContour);
-        double heightExtension = 0.05 * boundingRec.height;
-        double widthExtension = 0.05 * boundingRec.width;
-        boundingRec.x -= widthExtension / 2;
-        boundingRec.width += widthExtension;
-        boundingRec.y -= heightExtension / 2;
-        boundingRec.height += heightExtension;
-        /*Mat bounding = new Mat(source_rgb, boundingRec);
-		HighGui.imshow("bounding", bounding);
-		HighGui.waitKey(0);*/
-		
-		
 		//MatOfPoint2f curve = new MatOfPoint2f(bigestContour.toArray());
 		MatOfPoint2f curve = new MatOfPoint2f(hullContour);
 		double epsilon = 0.01 * Imgproc.arcLength(curve, true);
@@ -168,7 +156,6 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		//}
 		Point[] approxCurve_points = approxCurve.toArray();
 		System.out.println("Chess board found by contours with " + approxCurve_points.length + " points.");
-			
 		/*List<MatOfPoint> curve_in_list = new ArrayList<MatOfPoint>();
 		curve_in_list.add(new MatOfPoint(approxCurve.toArray()));
 		Mat drawing = source_rgb;//Mat.zeros(cannyOutput.size(), CvType.CV_8UC3);
@@ -176,17 +163,26 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		HighGui.imshow("curve_in_list", drawing);
 		HighGui.waitKey(0);
 		*/
+		
 		if (approxCurve_points.length > 4 ) {
+			
+	        Rect boundingRec = Imgproc.boundingRect(bigestContour);
+	        OpenCVUtils.extendRect(boundingRec, 0.05);
+	        /*Mat bounding = new Mat(source_rgb, boundingRec);
+			HighGui.imshow("bounding", bounding);
+			HighGui.waitKey(0);
+			*/
+	        
 			approxCurve_points = OpenCVUtils.getMinimalQuadrilateral(approxCurve_points, boundingRec);
+			/*Mat drawing = source_rgb;
+			for (int i = 0; i < approxCurve_points.length; i++ ) {
+				//System.out.println("x=" + minimalQuadrilateral[i].x + " y=" + minimalQuadrilateral[i].y);
+				Imgproc.drawMarker(drawing, approxCurve_points[i], new Scalar(255, 255, 255));
+			}
+			HighGui.imshow("getMinimalQuadrilateral", drawing);
+			HighGui.waitKey(0);
+			*/
 		}
-		/*Mat drawing = source_rgb;
-		for (int i = 0; i < minimalQuadrilateral.length; i++ ) {
-			//System.out.println("x=" + minimalQuadrilateral[i].x + " y=" + minimalQuadrilateral[i].y);
-			Imgproc.drawMarker(drawing, minimalQuadrilateral[i], new Scalar(255, 255, 255));
-		}
-		HighGui.imshow("getMinimalQuadrilateral", drawing);
-		HighGui.waitKey(0);
-		 */
 		
 		Point[] corners_of_contour = OpenCVUtils.getOrderedCorners(approxCurve_points, source_gray.width(), source_gray.height());
 		

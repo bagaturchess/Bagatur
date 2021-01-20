@@ -32,6 +32,16 @@ import org.opencv.imgproc.Imgproc;
 public class OpenCVUtils {
 	
 	
+	public static void extendRect( Rect rect, double percent) {
+        double heightExtension = percent * rect.height;
+        double widthExtension = percent * rect.width;
+        rect.x -= widthExtension / 2;
+        rect.width += widthExtension;
+        rect.y -= heightExtension / 2;
+        rect.height += heightExtension;
+	}
+	
+	
 	public static Point[] getMinimalQuadrilateral(Point[] convexPolygon, Rect boundingRec) {
 		
 		if (convexPolygon.length <= 4) {
@@ -86,14 +96,25 @@ public class OpenCVUtils {
 				cur = cur.next;
 			} while (cur != start);
 			
-			//Remove 2 points and put their intersection instead
+			//If there is best than remove 2 points and put their intersection instead
+			if (best == null) {
+				break;
+			}
 			best_intersection.next = best.next.next.next;
 			best.next = best_intersection;
 			countOfPoints--;
 			start = best;
 		}
 		
-		return new Point[] {start.value, start.next.value, start.next.next.value, start.next.next.next.value};
+		//Compose result
+		Point[] result = new Point[countOfPoints];
+		while (countOfPoints > 0) {
+			result[countOfPoints - 1] = start.value;
+			start = start.next;
+			countOfPoints--;
+		}
+		
+		return result;
 	}
 	
 	
