@@ -100,8 +100,8 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		
 		return resultObj;
 	}
-
-
+	
+	
 	private Mat findChessBoardCornersByContour(Mat source_rgb, Mat source_gray) {
 		
 		
