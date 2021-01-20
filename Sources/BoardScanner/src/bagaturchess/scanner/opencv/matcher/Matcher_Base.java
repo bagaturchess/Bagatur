@@ -106,7 +106,7 @@ public abstract class Matcher_Base {
 					
 					result.totalDelta += data.delta;
 					
-					if (data.delta > 0.65f) {
+					if (data.delta > 0.75f) {
 						pids[fieldID] = Constants.PID_NONE;
 					}
 					
