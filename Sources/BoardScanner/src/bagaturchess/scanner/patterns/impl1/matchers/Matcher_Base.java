@@ -76,7 +76,7 @@ public abstract class Matcher_Base {
 				
 				pids[fieldID] = Constants.PID_NONE;
 						
-				//if (!emptySquares.contains(fieldID)) {
+				if (!emptySquares.contains(fieldID)) {
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
 					//int bgcolor_avg = (int) MatrixUtils.calculateColorStats(squareMatrix).getEntropy();
 					
@@ -113,7 +113,7 @@ public abstract class Matcher_Base {
 					//if (pids[fieldID] != Constants.PID_NONE) {
 					countPIDs++;
 					//}
-				//}
+				}
 			}
 		}
 		

@@ -73,7 +73,7 @@ public class MatrixUtils {
 				KMeans kmeans = new KMeans(3, squareMatrix);
 				int maxWeightCentroidID = kmeans.getMaxWeightIndex();
 				int maxWeight = kmeans.weights[maxWeightCentroidID];
-				if(maxWeight >= 0.85f * squareMatrix.length * squareMatrix.length) {
+				if(maxWeight >= 0.90f * squareMatrix.length * squareMatrix.length) {
 					markedForEmpty[fieldID] = true;
 				}
 				VarStatistic squareStat = calculateColorStats(squareMatrix, -1); 
