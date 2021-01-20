@@ -88,7 +88,7 @@ public class MatrixUtils {
 			VarStatistic squareStat = squaresStats.get(fieldID);
 			if (markedForEmpty[fieldID]) {
 				emptySquaresIDs.add(fieldID);
-			} else if (squareStat.getDisperse() < colorDeviations.getEntropy() - colorDeviations.getDisperse() / 3f) {
+			} else if (squareStat.getDisperse() < colorDeviations.getEntropy() - colorDeviations.getDisperse() / 3) {
 				emptySquaresIDs.add(fieldID);
 			}
 		}
