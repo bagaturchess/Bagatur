@@ -32,7 +32,7 @@ import bagaturchess.scanner.patterns.api.MatchingStatistics;
 public class Matcher_Composite extends Matcher_Base {
 	
 	
-	private static final int CLASSIFIER_SIZE = 128;
+	private static final int CLASSIFIER_SIZE = 160;
 	
 	
 	private List<Matcher_Base> matchers = new ArrayList<Matcher_Base>();
