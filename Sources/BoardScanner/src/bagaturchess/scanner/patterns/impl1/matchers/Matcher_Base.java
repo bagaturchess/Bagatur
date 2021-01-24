@@ -28,6 +28,7 @@ import java.util.Set;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.BoardUtils;
+import bagaturchess.scanner.common.IMatchingInfo;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
@@ -35,7 +36,7 @@ import bagaturchess.scanner.patterns.api.MatchingStatistics;
 
 
 public abstract class Matcher_Base {
-	
+
 	
 	private static final float SIZE_DELTA_PERCENT = 0.25f;
 	
@@ -51,7 +52,7 @@ public abstract class Matcher_Base {
 	protected abstract double getTotalDeltaThreshold();
 	
 	
-	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) {
+	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, IMatchingInfo matchingInfo) {
 		
 		if (grayBoard.length != boardProperties.getImageSize()) {
 			throw new IllegalStateException("grayBoard.length=" + grayBoard.length + ", boardProperties.getImageSize()=" + boardProperties.getImageSize());
@@ -60,12 +61,15 @@ public abstract class Matcher_Base {
 		MatchingStatistics result = new MatchingStatistics();
 		result.matcherName = this.getClass().getCanonicalName();
 		
+		if (matchingInfo != null) matchingInfo.setPhaseName(this.getClass().getSimpleName());
+		
 		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
 		//System.out.println(emptySquares);
 		
 		ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard);
 		
 		int[] pids = new int[64];
+		int countAll = 0;
 		int countPIDs = 0;
 		for (int i = 0; i < grayBoard.length; i += grayBoard.length / 8) {
 			for (int j = 0; j < grayBoard.length; j += grayBoard.length / 8) {
@@ -75,6 +79,8 @@ public abstract class Matcher_Base {
 				int fieldID = 63 - (file + 8 * rank);
 				
 				pids[fieldID] = Constants.PID_NONE;
+				
+				if (matchingInfo != null) matchingInfo.setSquare(fieldID);
 				
 				if (!emptySquares.contains(fieldID)) {
 					int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(grayBoard, i, j);
@@ -114,6 +120,8 @@ public abstract class Matcher_Base {
 					countPIDs++;
 					//}
 				}
+				countAll++;
+				if (matchingInfo != null) matchingInfo.setCurrentPhaseProgress(countAll / (double) 64);
 			}
 		}
 		

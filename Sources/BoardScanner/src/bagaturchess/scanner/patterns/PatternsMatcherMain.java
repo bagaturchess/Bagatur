@@ -46,7 +46,7 @@ public class PatternsMatcherMain {
 			
 			Matcher_Base matcher = new Matcher_Composite(INPUT_IMAGE_SIZE);
 			long startTime = System.currentTimeMillis();
-			ResultPair<String, MatchingStatistics> result = matcher.scan(grayBoard);
+			ResultPair<String, MatchingStatistics> result = matcher.scan(grayBoard, null);
             System.out.println(result.getFirst() + " " + result.getSecond().totalDelta + " " + (System.currentTimeMillis() - startTime) + "ms");
             
 		} catch (Exception e) {

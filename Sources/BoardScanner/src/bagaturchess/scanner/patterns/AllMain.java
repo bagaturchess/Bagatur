@@ -23,6 +23,8 @@ package bagaturchess.scanner.patterns;
 import org.opencv.core.Core;
 
 import bagaturchess.scanner.common.BoardProperties;
+import bagaturchess.scanner.common.IMatchingInfo;
+import bagaturchess.scanner.common.MatchingInfo_BaseImpl;
 import bagaturchess.scanner.common.ResultPair;
 //import bagaturchess.scanner.patterns.impl1.matchers.*;
 import bagaturchess.scanner.patterns.opencv.matchers.*;
@@ -72,8 +74,9 @@ public class AllMain {
 			int[][] grayBoard = ImageHandlerSingleton.getInstance().convertToGrayMatrix(preProcessedImage);
 			
 			Matcher_Base matcher = new Matcher_Composite(boardProperties_matcher.getImageSize());
+			IMatchingInfo matchingInfo = new MatchingInfo_BaseImpl();
 			startTime = System.currentTimeMillis();
-			ResultPair<String, MatchingStatistics> result = matcher.scan(grayBoard);
+			ResultPair<String, MatchingStatistics> result = matcher.scan(grayBoard, matchingInfo);
             System.out.println(result.getFirst() + " " + result.getSecond().totalDelta + " " + (System.currentTimeMillis() - startTime) + "ms");
             
             System.exit(0);

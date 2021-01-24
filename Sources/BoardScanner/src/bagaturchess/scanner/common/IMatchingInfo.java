@@ -20,7 +20,11 @@
 package bagaturchess.scanner.common;
 
 
-public interface IProcessInfo {
-	public void addMessage(String message);
-	public void addSquare(int x, int y, int size);
+public interface IMatchingInfo {
+	public void setPhasesCount(int phasesCount);
+	public void setCurrentPhase(int orderNumber);
+	public void setCurrentPhaseProgress(double progress); //Between [0 and 1]
+	public void setPhaseName(String phaseName);
+	public void setSquare(int squareID);
+	public String getLastMessage();
 }

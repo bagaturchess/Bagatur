@@ -34,6 +34,7 @@ import org.opencv.imgproc.Imgproc;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.BoardUtils;
+import bagaturchess.scanner.common.IMatchingInfo;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
@@ -54,7 +55,7 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard) throws IOException {
+	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, IMatchingInfo matchingInfo) throws IOException {
 		
 		if (grayBoard.length != boardProperties.getImageSize()) {
 			throw new IllegalStateException("grayBoard.length=" + grayBoard.length + ", boardProperties.getImageSize()=" + boardProperties.getImageSize());
@@ -62,6 +63,8 @@ public abstract class Matcher_Base {
 		
 		MatchingStatistics result = new MatchingStatistics();
 		result.matcherName = this.getClass().getCanonicalName();
+		
+		if (matchingInfo != null) matchingInfo.setPhaseName(this.getClass().getSimpleName());
 		
 		//Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
 		
@@ -77,6 +80,8 @@ public abstract class Matcher_Base {
 				int fieldID = 63 - (file + 8 * rank);
 				
 				pids[fieldID] = Constants.PID_NONE;
+				
+				if (matchingInfo != null) matchingInfo.setSquare(fieldID);
 				
 				//if (!emptySquares.contains(fieldID)) {
 					
@@ -118,6 +123,7 @@ public abstract class Matcher_Base {
 					
 					//if (pids[fieldID] != Constants.PID_NONE) {
 					countPIDs++;
+					if (matchingInfo != null) matchingInfo.setCurrentPhaseProgress(countPIDs / (double) 64);
 					//}
 				//}
 			}
