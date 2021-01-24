@@ -1,4 +1,4 @@
-package bagaturchess.scanner.opencv;
+package bagaturchess.scanner.patterns.opencv;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -18,15 +18,13 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
-import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-class GeneralContours1 {
+class FindContours {
     private Mat srcGray = new Mat();
     private JFrame frame;
     private JLabel imgSrcLabel;
@@ -34,17 +32,19 @@ class GeneralContours1 {
     private static final int MAX_THRESHOLD = 255;
     private int threshold = 100;
     private Random rng = new Random(12345);
-    public GeneralContours1(String[] args) {
-        String filename = args.length > 0 ? args[0] : "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\GIT_REPO\\Bagatur\\Sources\\BoardScanner\\data\\tests\\preprocess\\test13_512.png";;
+    
+    public FindContours(String[] args) {
+        String filename = args.length > 0 ? args[0] : "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\GIT_REPO\\Bagatur\\Sources\\BoardScanner\\data\\tests\\preprocess\\test13_512.png";
         Mat src = Imgcodecs.imread(filename);
         if (src.empty()) {
             System.err.println("Cannot read image: " + filename);
             System.exit(0);
         }
         Imgproc.cvtColor(src, srcGray, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.blur(srcGray, srcGray, new Size(3, 3));
+        //Imgproc.blur(srcGray, srcGray, new Size(3, 3));
         // Create and set up the window.
-        frame = new JFrame("Creating Bounding boxes and circles for contours demo");
+        frame = new JFrame("Finding contours in your image demo");
+        frame.setSize(1000, 1000);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // Set up the content pane.
         Image img = HighGui.toBufferedImage(src);
@@ -93,33 +93,16 @@ class GeneralContours1 {
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Mat hierarchy = new Mat();
         Imgproc.findContours(cannyOutput, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-        MatOfPoint2f[] contoursPoly  = new MatOfPoint2f[contours.size()];
-        Rect[] boundRect = new Rect[contours.size()];
-        Point[] centers = new Point[contours.size()];
-        float[][] radius = new float[contours.size()][1];
-        for (int i = 0; i < contours.size(); i++) {
-            contoursPoly[i] = new MatOfPoint2f();
-            Imgproc.approxPolyDP(new MatOfPoint2f(contours.get(i).toArray()), contoursPoly[i], 3, true);
-            boundRect[i] = Imgproc.boundingRect(new MatOfPoint(contoursPoly[i].toArray()));
-            centers[i] = new Point();
-            Imgproc.minEnclosingCircle(contoursPoly[i], centers[i], radius[i]);
-        }
         Mat drawing = Mat.zeros(cannyOutput.size(), CvType.CV_8UC3);
-        List<MatOfPoint> contoursPolyList = new ArrayList<MatOfPoint>(contoursPoly.length);
-        for (MatOfPoint2f poly : contoursPoly) {
-            contoursPolyList.add(new MatOfPoint(poly.toArray()));
-        }
         for (int i = 0; i < contours.size(); i++) {
             Scalar color = new Scalar(rng.nextInt(256), rng.nextInt(256), rng.nextInt(256));
-            Imgproc.drawContours(drawing, contoursPolyList, i, color);
-            Imgproc.rectangle(drawing, boundRect[i].tl(), boundRect[i].br(), color, 2);
-            Imgproc.circle(drawing, centers[i], (int) radius[i][0], color, 2);
+            Imgproc.drawContours(drawing, contours, i, color, 2, 0/*Core.LINE_8*/, hierarchy, 0, new Point());
         }
         imgContoursLabel.setIcon(new ImageIcon(HighGui.toBufferedImage(drawing)));
         frame.repaint();
     }
 }
-public class FindContoursDemo2 {
+public class FindContoursDemo {
     public static void main(final String[] args) {
         // Load the native OpenCV library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -128,7 +111,7 @@ public class FindContoursDemo2 {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new GeneralContours1(args);
+                new FindContours(args);
             }
         });
     }

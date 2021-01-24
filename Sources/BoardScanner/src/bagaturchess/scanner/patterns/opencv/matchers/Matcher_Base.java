@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.opencv.matcher;
+package bagaturchess.scanner.patterns.opencv.matchers;
 
 
 import java.io.IOException;

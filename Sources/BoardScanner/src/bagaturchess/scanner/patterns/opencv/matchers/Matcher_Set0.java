@@ -17,16 +17,16 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.opencv.matcher;
+package bagaturchess.scanner.patterns.opencv.matchers;
 
 
 import bagaturchess.scanner.common.BoardProperties;
 
 
-public class Matcher_Set3 extends Matcher_Base {
+public class Matcher_Set0 extends Matcher_Base {
 	
 	
-	public Matcher_Set3(int imageSize) {
-		super(new BoardProperties(imageSize, "set3"));
+	public Matcher_Set0(int imageSize) {
+		super(new BoardProperties(imageSize, "set0"));
 	}
 }

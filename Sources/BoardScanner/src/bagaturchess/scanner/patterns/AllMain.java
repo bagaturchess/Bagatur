@@ -17,20 +17,20 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.patterns.impl1;
+package bagaturchess.scanner.patterns;
 
 
 import org.opencv.core.Core;
 
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.common.ResultPair;
-import bagaturchess.scanner.patterns.impl1.matchers.*;
-//import bagaturchess.scanner.opencv.matcher.*;
-import bagaturchess.scanner.opencv.preprocess.ImagePreProcessor_OpenCV;
+//import bagaturchess.scanner.patterns.impl1.matchers.*;
+import bagaturchess.scanner.patterns.opencv.matchers.*;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Rotate;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_WhiteBackground;
+import bagaturchess.scanner.patterns.opencv.preprocess.ImagePreProcessor_OpenCV;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Base;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Crop;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Crop_KMeans;
@@ -45,7 +45,7 @@ public class AllMain {
 			
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 			
-			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test18.png");
+			Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/preprocess/test25.png");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/test3.jpg");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/lichess.org/test2.png");
 			//Object image = ImageHandlerSingleton.getInstance().loadImageFromFS("./data/tests/chess.com/test1.png");

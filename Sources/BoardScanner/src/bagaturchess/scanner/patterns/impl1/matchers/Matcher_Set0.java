@@ -17,16 +17,22 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.opencv.matcher;
+package bagaturchess.scanner.patterns.impl1.matchers;
 
 
 import bagaturchess.scanner.common.BoardProperties;
 
 
-public class Matcher_Set2 extends Matcher_Base {
+public class Matcher_Set0 extends Matcher_Base {
 	
 	
-	public Matcher_Set2(int imageSize) {
-		super(new BoardProperties(imageSize, "set2"));
+	public Matcher_Set0(int imageSize) {
+		super(new BoardProperties(imageSize, "set0"));
+	}
+	
+	
+	@Override
+	protected double getTotalDeltaThreshold() {
+		return 320;
 	}
 }

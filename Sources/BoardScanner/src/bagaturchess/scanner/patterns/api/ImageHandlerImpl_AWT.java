@@ -49,7 +49,7 @@ import bagaturchess.scanner.common.MatrixUtils.PatternMatchingData;
 class ImageHandlerImpl_AWT implements ImageHandler {
 	
 	
-	private static final String[] piecesSets = new String[] {"set1", "set2", "set3"};
+	private static final String[] piecesSets = new String[] {"set0", "set1", "set2", "set3"};
 	
 	private static final Map<String, BufferedImage> piecesImagesFromAllSets = new HashMap<String, BufferedImage>();
 	private static final Map<String, BufferedImage> piecesImagesFromAllSetsAndSizes = new HashMap<String, BufferedImage>();

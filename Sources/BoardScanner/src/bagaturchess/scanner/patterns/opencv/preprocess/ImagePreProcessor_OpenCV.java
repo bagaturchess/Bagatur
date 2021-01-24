@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.scanner.opencv.preprocess;
+package bagaturchess.scanner.patterns.opencv.preprocess;
 
 
 import java.io.IOException;
@@ -38,9 +38,9 @@ import org.opencv.highgui.HighGui;
 import org.opencv.imgproc.Imgproc;
 
 import bagaturchess.scanner.common.BoardProperties;
-import bagaturchess.scanner.opencv.OpenCVUtils;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.impl1.preprocess.ImagePreProcessor_Base;
+import bagaturchess.scanner.patterns.opencv.OpenCVUtils;
 
 
 public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {

@@ -43,10 +43,12 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		super(null);
 		
+		matchers.add(new Matcher_Set0(imageSize));
 		matchers.add(new Matcher_Set1(imageSize));
 		matchers.add(new Matcher_Set2(imageSize));
 		matchers.add(new Matcher_Set3(imageSize));
 		
+		matchers_classifier.add(new Matcher_Set0(CLASSIFIER_SIZE));
 		matchers_classifier.add(new Matcher_Set1(CLASSIFIER_SIZE));
 		matchers_classifier.add(new Matcher_Set2(CLASSIFIER_SIZE));
 		matchers_classifier.add(new Matcher_Set3(CLASSIFIER_SIZE));
