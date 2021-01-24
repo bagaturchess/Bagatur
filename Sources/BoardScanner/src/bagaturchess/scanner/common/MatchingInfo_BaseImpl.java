@@ -38,8 +38,10 @@ public class MatchingInfo_BaseImpl implements IMatchingInfo {
 	private int currentPhase;
 	private String phaseName;
 	private double currentPhaseProgress;
+	private int currentSquareID;
 	
-	private String lastMessage;
+	private String latestMessage1;
+	private String latestMessage2;
 	
 	
 	public MatchingInfo_BaseImpl() {
@@ -73,13 +75,27 @@ public class MatchingInfo_BaseImpl implements IMatchingInfo {
 	
 	@Override
 	public void setSquare(int squareID) {
-		lastMessage = "Phase [" + currentPhase + "/" + phasesCount + "] " + (int)(100 * currentPhaseProgress) + "% " + phaseName + " Recognizing " + ALL_FIELD_NAMES[squareID];
-		System.out.println(lastMessage);
+		currentSquareID = squareID;
+		latestMessage1 = "Phase [" + currentPhase + "/" + phasesCount + "] " + (int) (100 * currentPhaseProgress) + "%";
+		latestMessage2 = phaseName + " working on " + ALL_FIELD_NAMES[squareID];
+		System.out.println(latestMessage1 + " " + latestMessage2);
 	}
 
 
 	@Override
-	public String getLastMessage() {
-		return lastMessage;
+	public String getLatestMessage1() {
+		return latestMessage1;
+	}
+
+
+	@Override
+	public String getLatestMessage2() {
+		return latestMessage2;
+	}
+
+
+	@Override
+	public int getCurrentSquareID() {
+		return currentSquareID;
 	}
 }

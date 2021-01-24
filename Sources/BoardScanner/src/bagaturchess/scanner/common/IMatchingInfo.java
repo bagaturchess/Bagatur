@@ -26,5 +26,7 @@ public interface IMatchingInfo {
 	public void setCurrentPhaseProgress(double progress); //Between [0 and 1]
 	public void setPhaseName(String phaseName);
 	public void setSquare(int squareID);
-	public String getLastMessage();
+	public String getLatestMessage1();
+	public String getLatestMessage2();
+	public int getCurrentSquareID();
 }
