@@ -158,9 +158,9 @@ public abstract class Matcher_Base {
 			
 			for (Integer pid : pids) {
 				
-				/*if (pid == Constants.PID_NONE && size != maxSize) {
+				if (pid == Constants.PID_NONE && size != endSize) {
 					continue;
-				}*/
+				}
 				
 				for (int i = 0; i < bgcolors.size(); i++) {
 					

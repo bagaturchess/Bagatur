@@ -78,7 +78,7 @@ public class MatchingInfo_BaseImpl implements IMatchingInfo {
 		currentSquareID = squareID;
 		latestMessage1 = "Phase [" + currentPhase + "/" + phasesCount + "] " + (int) (100 * currentPhaseProgress) + "%";
 		latestMessage2 = phaseName + " working on " + ALL_FIELD_NAMES[squareID];
-		System.out.println(latestMessage1 + " " + latestMessage2);
+		//System.out.println(latestMessage1 + " " + latestMessage2);
 	}
 
 
