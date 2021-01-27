@@ -38,7 +38,8 @@ import bagaturchess.scanner.patterns.api.MatchingStatistics;
 public abstract class Matcher_Base {
 
 	
-	private static final float SIZE_DELTA_PERCENT = 0.25f;
+	private static final float SIZE_DELTA_PERCENT_START = 0.75f;
+	private static final float SIZE_DELTA_PERCENT_END = 0.99f;
 	
 	
 	protected BoardProperties boardProperties;
@@ -112,7 +113,7 @@ public abstract class Matcher_Base {
 					bgcolors.add((file + rank) % 2 == 0 ? bgcolorsOfSquares.getFirst() : bgcolorsOfSquares.getSecond());
 					
 					ResultPair<Integer, MatrixUtils.PatternMatchingData> pidAndData
-						= getPID(squareMatrix, true, bgcolors, pidsToSearch, fieldID);
+						= getPID(squareMatrix, bgcolors, pidsToSearch, fieldID);
 					pids[fieldID] = pidAndData.getFirst();
 					MatrixUtils.PatternMatchingData data = pidAndData.getSecond();
 					result.totalDelta += data.delta;
@@ -132,7 +133,7 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	private ResultPair<Integer, MatrixUtils.PatternMatchingData> getPID(int[][] graySquareMatrix, boolean iterateSize,
+	private ResultPair<Integer, MatrixUtils.PatternMatchingData> getPID(int[][] graySquareMatrix,
 			List<Integer> bgcolors, Set<Integer> pids, int fieldID) {
 		
 		MatrixUtils.PatternMatchingData bestData = null;
@@ -141,17 +142,18 @@ public abstract class Matcher_Base {
 		int counter = 0;
 		
 		int maxSize = graySquareMatrix.length;
-		int startSize = iterateSize ? (int) ((1 - SIZE_DELTA_PERCENT) * maxSize) : maxSize;
-				
-		for (int size = startSize; size <= maxSize; size++) {
+		int startSize = (int) (SIZE_DELTA_PERCENT_START * maxSize);
+		int endSize = (int) (SIZE_DELTA_PERCENT_END * maxSize);
+		
+		for (int size = startSize; size <= endSize; size++) {
 			
 			MatrixUtils.PatternMatchingData curData_best  = null;
 			
 			for (Integer pid : pids) {
 				
-				if (pid == Constants.PID_NONE && size != maxSize) {
+				/*if (pid == Constants.PID_NONE && size != maxSize) {
 					continue;
-				}
+				}*/
 				
 				for (int i = 0; i < bgcolors.size(); i++) {
 					
