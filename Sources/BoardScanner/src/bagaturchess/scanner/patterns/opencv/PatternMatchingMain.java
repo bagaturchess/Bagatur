@@ -42,13 +42,15 @@ public class PatternMatchingMain {
 		
 		try {
 			
+			int imageSize = 512;
+			
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 			
 	        String filePath = (new File(".")).getAbsolutePath();
 	        String sourceFile = ".\\data\\tests\\preprocess\\test11.png";
 	        
 	        Object source_obj = ImageHandlerSingleton.getInstance().loadImageFromFS(sourceFile);
-	        source_obj = ImageHandlerSingleton.getInstance().resizeImage(source_obj, 512);
+	        source_obj = ImageHandlerSingleton.getInstance().resizeImage(source_obj, imageSize);
 	        int[][] source_matrix = ImageHandlerSingleton.getInstance().convertToGrayMatrix(source_obj);
 	        int bgcolor = MatrixUtils.getAVG(source_matrix);
 	        Mat source = ImageHandlerSingleton.getInstance().graphic2Mat(source_obj);
@@ -61,7 +63,10 @@ public class PatternMatchingMain {
 		        MinMaxLocResult bestMatch = null;
 		        int bestSize = 0;
 		        
-		        for (int size = 32; size <= 64; size++) {
+		        int startSize = (int) (0.68f * (imageSize / 8));
+		        int endSize = (int) (0.83f * (imageSize / 8));
+		        
+		        for (int size = startSize; size <= endSize; size++) {
 			        
 		        	//ImageHandlerSingleton.getInstance().
 		        	Object template_obj = ImageHandlerSingleton.getInstance().createPieceImage("set1", pid, bgcolor, size);
@@ -79,8 +84,10 @@ public class PatternMatchingMain {
 			        	bestMatch = mmr;
 			        	bestSize = template_gray.width();
 			        }
-			        System.out.println(mmr.maxVal);
+			        //System.out.println(mmr.maxVal);
 		        }
+		        
+		        System.out.println(bestSize);
 		        
 		        Point matchLoc = bestMatch.maxLoc;
 		        //Draw rectangle on result image
