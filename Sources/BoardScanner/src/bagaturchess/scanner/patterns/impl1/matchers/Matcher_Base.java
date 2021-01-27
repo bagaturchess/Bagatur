@@ -36,7 +36,7 @@ import bagaturchess.scanner.patterns.api.MatchingStatistics;
 
 
 public abstract class Matcher_Base {
-
+	
 	
 	private static final float SIZE_DELTA_PERCENT_START = 0.75f;
 	private static final float SIZE_DELTA_PERCENT_END = 0.99f;
