@@ -47,14 +47,14 @@ public class PatternMatchingMain {
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 			
 	        String filePath = (new File(".")).getAbsolutePath();
-	        String sourceFile = ".\\data\\tests\\preprocess\\test11.png";
+	        String sourceFile = ".\\data\\tests\\preprocess\\test14.png";
 	        
 	        Object source_obj = ImageHandlerSingleton.getInstance().loadImageFromFS(sourceFile);
 	        source_obj = ImageHandlerSingleton.getInstance().resizeImage(source_obj, imageSize);
 	        int[][] source_matrix = ImageHandlerSingleton.getInstance().convertToGrayMatrix(source_obj);
 	        int bgcolor = MatrixUtils.getAVG(source_matrix);
 	        Mat source = ImageHandlerSingleton.getInstance().graphic2Mat(source_obj);
-	        Mat source_gray = new Mat(source.height(),source.width(),CvType.CV_8UC4);
+	        Mat source_gray = new Mat(source.height(), source.width(), CvType.CV_8UC4);
 			Imgproc.cvtColor(source, source_gray, Imgproc.COLOR_BGR2GRAY);
 	        source = source_gray;
 	        
@@ -63,13 +63,17 @@ public class PatternMatchingMain {
 		        MinMaxLocResult bestMatch = null;
 		        int bestSize = 0;
 		        
-		        int startSize = (int) (0.68f * (imageSize / 8));
-		        int endSize = (int) (0.83f * (imageSize / 8));
+		        //For set1
+		        //int startSize = (int) (0.68f * (imageSize / 8));
+		        //int endSize = (int) (0.83f * (imageSize / 8));
+		        
+		        int startSize = (int) (0.65f * (imageSize / 8));
+		        int endSize = (int) (0.85f * (imageSize / 8));
 		        
 		        for (int size = startSize; size <= endSize; size++) {
 			        
 		        	//ImageHandlerSingleton.getInstance().
-		        	Object template_obj = ImageHandlerSingleton.getInstance().createPieceImage("set1", pid, bgcolor, size);
+		        	Object template_obj = ImageHandlerSingleton.getInstance().createPieceImage("set3", pid, bgcolor, size);
 			        Mat template = ImageHandlerSingleton.getInstance().graphic2Mat(template_obj);
 			        
 			        Mat template_gray = new Mat(template.height(),template.width(),CvType.CV_8UC4);
