@@ -91,6 +91,10 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 	        result = findChessBoardCornersByContour(source_rgb);
 		}
 		
+		if (result == null) {
+			return image;
+		}
+		
         //HighGui.imshow("Dump", result);
         //HighGui.waitKey(0);
         
@@ -128,6 +132,10 @@ public class ImagePreProcessor_OpenCV extends ImagePreProcessor_Base {
 		//HighGui.waitKey(0);
 		
 		MatOfPoint bigestContour = OpenCVUtils.findBigestContour(contours);
+		
+		if (bigestContour == null) {
+			return null;
+		}
 		
 		/*MatOfInt hull = new MatOfInt();
 		Imgproc.convexHull(bigestContour, hull, true);
