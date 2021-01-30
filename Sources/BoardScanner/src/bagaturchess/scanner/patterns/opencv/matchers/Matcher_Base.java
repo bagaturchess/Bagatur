@@ -67,9 +67,12 @@ public abstract class Matcher_Base {
 		
 		if (matchingInfo != null) matchingInfo.setPhaseName(this.getClass().getSimpleName());
 		
-		//Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
+		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayBoard);
 		
 		ResultPair<Integer, Integer> bgcolorsOfSquares = MatrixUtils.getSquaresColor(grayBoard);
+		
+		double maxFull = 0f;
+		double minEmpty = 1f;
 		
 		int[] pids = new int[64];
 		int countPIDs = 0;
@@ -112,15 +115,21 @@ public abstract class Matcher_Base {
 					
 					result.totalDelta += data.delta;
 					
+					if (pids[fieldID] == Constants.PID_NONE || emptySquares.contains(fieldID)) {
+						//System.out.println("EMPTY " + data.delta);
+						if (minEmpty > data.delta) {
+							minEmpty = data.delta;
+						}
+					} else {
+						//System.out.println("FULL " + data.delta);
+						if (maxFull < data.delta) {
+							maxFull = data.delta;
+						}
+					}
+					
 					if (data.delta > 0.68f) {
 						pids[fieldID] = Constants.PID_NONE;
 					}
-					
-					/*if (pids[fieldID] == Constants.PID_NONE || emptySquares.contains(fieldID)) {
-						System.out.println("EMPTY " + data.delta);
-					} else {
-						System.out.println("FULL " + data.delta);
-					}*/
 					
 					//if (pids[fieldID] != Constants.PID_NONE) {
 					countPIDs++;
@@ -129,6 +138,8 @@ public abstract class Matcher_Base {
 				//}
 			}
 		}
+		
+		System.out.println("Matcher_Base: minEmpty=" + minEmpty + ", maxFull=" + maxFull);
 		
 		result.totalDelta = result.totalDelta / (double) (countPIDs);
 		//result.totalDelta *= boardProperties.getSquareSize() * Math.sqrt(boardProperties.getSquareSize());
