@@ -26,6 +26,7 @@ import java.util.List;
 
 import bagaturchess.scanner.common.IMatchingInfo;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.common.ResultTriplet;
 import bagaturchess.scanner.patterns.api.ImageHandler;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
@@ -58,7 +59,7 @@ public class Matcher_Composite extends Matcher_Base {
 	
 	
 	@Override
-	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, IMatchingInfo matchingInfo) throws IOException {
+	public ResultTriplet<String, MatchingStatistics, Double> scan(int[][] grayBoard, IMatchingInfo matchingInfo) throws IOException {
 		
 		if (matchingInfo != null) matchingInfo.setPhasesCount(matchers_classifier.size() + 1);
 		
@@ -91,7 +92,7 @@ public class Matcher_Composite extends Matcher_Base {
 		System.out.println("Matcher_Composite: scan: Selected matcher is " + matchers.get(best_index).getClass().getCanonicalName());
 		
 		if (matchingInfo != null) matchingInfo.setCurrentPhase(matchers_classifier.size() + 1);
-		ResultPair<String, MatchingStatistics> result = matchers.get(best_index).scan(grayBoard, matchingInfo);
+		ResultTriplet<String, MatchingStatistics, Double> result = matchers.get(best_index).scan(grayBoard, matchingInfo);
 		
 		/*if (matchers.get(best_index).getTotalDeltaThreshold() < result.getSecond().totalDelta) {
 			System.out.println("Matcher_Composite: scan: " + result.getFirst() + " total delta is " + result.getSecond().totalDelta + " start scan again ...");
