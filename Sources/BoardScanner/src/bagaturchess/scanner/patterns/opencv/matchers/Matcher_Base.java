@@ -37,6 +37,7 @@ import bagaturchess.scanner.common.BoardUtils;
 import bagaturchess.scanner.common.IMatchingInfo;
 import bagaturchess.scanner.common.MatrixUtils;
 import bagaturchess.scanner.common.ResultPair;
+import bagaturchess.scanner.common.ResultTriplet;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 import bagaturchess.scanner.patterns.api.MatchingStatistics;
 
@@ -57,6 +58,11 @@ public abstract class Matcher_Base {
 	
 	
 	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, IMatchingInfo matchingInfo) throws IOException {
+		return scan(grayBoard, matchingInfo, 0.68d);
+	}
+	
+	
+	protected ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, IMatchingInfo matchingInfo, double emptySquareThreshold) throws IOException {
 		
 		if (grayBoard.length != boardProperties.getImageSize()) {
 			throw new IllegalStateException("grayBoard.length=" + grayBoard.length + ", boardProperties.getImageSize()=" + boardProperties.getImageSize());
@@ -127,7 +133,7 @@ public abstract class Matcher_Base {
 						}
 					}
 					
-					if (data.delta > 0.68f) {
+					if (data.delta > emptySquareThreshold) {
 						pids[fieldID] = Constants.PID_NONE;
 					}
 					
@@ -142,9 +148,8 @@ public abstract class Matcher_Base {
 		System.out.println("Matcher_Base: minEmpty=" + minEmpty + ", maxFull=" + maxFull);
 		
 		result.totalDelta = result.totalDelta / (double) (countPIDs);
-		//result.totalDelta *= boardProperties.getSquareSize() * Math.sqrt(boardProperties.getSquareSize());
 		
-		return new ResultPair<String, MatchingStatistics> (BoardUtils.createFENFromPIDs(pids), result);
+		return new ResultTriplet<String, MatchingStatistics, Double> (BoardUtils.createFENFromPIDs(pids), result, maxFull);
 	}
 	
 	

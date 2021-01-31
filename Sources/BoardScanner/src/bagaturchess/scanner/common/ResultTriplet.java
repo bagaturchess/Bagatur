@@ -20,25 +20,19 @@
 package bagaturchess.scanner.common;
 
 
-public class ResultPair<T1, T2> {
+public class ResultTriplet<T1, T2, T3> extends ResultPair<T1, T2> {
 	
 	
-	private T1 first;
-	private T2 second;
+	private T3 third;
 	
 	
-	public ResultPair(T1 _first, T2 _second) {
-		first = _first;
-		second = _second;
+	public ResultTriplet(T1 _first, T2 _second, T3 _third) {
+		super(_first, _second);
+		third = _third;
 	}
 	
 	
-	public T1 getFirst() {
-		return first;
-	}
-	
-	
-	public T2 getSecond() {
-		return second;
+	public T3 getThird() {
+		return third;
 	}
 }
