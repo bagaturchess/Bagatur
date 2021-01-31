@@ -57,12 +57,12 @@ public abstract class Matcher_Base {
 	}
 	
 	
-	public ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, IMatchingInfo matchingInfo) throws IOException {
+	public ResultTriplet<String, MatchingStatistics, Double> scan(int[][] grayBoard, IMatchingInfo matchingInfo) throws IOException {
 		return scan(grayBoard, matchingInfo, 0.68d);
 	}
 	
 	
-	protected ResultPair<String, MatchingStatistics> scan(int[][] grayBoard, IMatchingInfo matchingInfo, double emptySquareThreshold) throws IOException {
+	protected ResultTriplet<String, MatchingStatistics, Double> scan(int[][] grayBoard, IMatchingInfo matchingInfo, double emptySquareThreshold) throws IOException {
 		
 		if (grayBoard.length != boardProperties.getImageSize()) {
 			throw new IllegalStateException("grayBoard.length=" + grayBoard.length + ", boardProperties.getImageSize()=" + boardProperties.getImageSize());
