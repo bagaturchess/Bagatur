@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.scanner.common.IMatchingInfo;
-import bagaturchess.scanner.common.ResultPair;
 import bagaturchess.scanner.common.ResultTriplet;
 import bagaturchess.scanner.patterns.api.ImageHandler;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
@@ -35,7 +34,7 @@ import bagaturchess.scanner.patterns.api.MatchingStatistics;
 public class Matcher_Composite extends Matcher_Base {
 	
 	
-	private static final int CLASSIFIER_SIZE = 160;
+	private static final int CLASSIFIER_SIZE = 128;
 	
 	
 	private List<Matcher_Base> matchers = new ArrayList<Matcher_Base>();
@@ -46,22 +45,22 @@ public class Matcher_Composite extends Matcher_Base {
 		
 		super(null);
 		
-		matchers.add(new Matcher_Set0(imageSize));
+		//matchers.add(new Matcher_Set0(imageSize));
 		matchers.add(new Matcher_Set1(imageSize));
 		matchers.add(new Matcher_Set2(imageSize));
-		matchers.add(new Matcher_Set3(imageSize));
+		//matchers.add(new Matcher_Set3(imageSize));
 		
-		matchers_classifier.add(new Matcher_Set0(CLASSIFIER_SIZE));
+		//matchers_classifier.add(new Matcher_Set0(CLASSIFIER_SIZE));
 		matchers_classifier.add(new Matcher_Set1(CLASSIFIER_SIZE));
 		matchers_classifier.add(new Matcher_Set2(CLASSIFIER_SIZE));
-		matchers_classifier.add(new Matcher_Set3(CLASSIFIER_SIZE));
+		//matchers_classifier.add(new Matcher_Set3(CLASSIFIER_SIZE));
 	}
 	
 	
 	@Override
 	public ResultTriplet<String, MatchingStatistics, Double> scan(int[][] grayBoard, IMatchingInfo matchingInfo) throws IOException {
 		
-		if (matchingInfo != null) matchingInfo.setPhasesCount(matchers_classifier.size() + 1);
+		if (matchingInfo != null) matchingInfo.setPhasesCount(matchers_classifier.size() + 2);
 		
 		int best_index = 0;
 		double best_delta = Double.MAX_VALUE;
@@ -76,7 +75,7 @@ public class Matcher_Composite extends Matcher_Base {
 			
 			if (matchingInfo != null) matchingInfo.setCurrentPhase(i + 1);
 			
-			ResultPair<String, MatchingStatistics> result = matchers_classifier.get(i).scan(grayBoard_classifier, matchingInfo);
+			ResultTriplet<String, MatchingStatistics, Double> result = matchers_classifier.get(i).scan(grayBoard_classifier, matchingInfo);
 			
 			MatchingStatistics stat = result.getSecond();
 			
@@ -90,14 +89,12 @@ public class Matcher_Composite extends Matcher_Base {
 		}
 		
 		System.out.println("Matcher_Composite: scan: Selected matcher is " + matchers.get(best_index).getClass().getCanonicalName());
-		
 		if (matchingInfo != null) matchingInfo.setCurrentPhase(matchers_classifier.size() + 1);
 		ResultTriplet<String, MatchingStatistics, Double> result = matchers.get(best_index).scan(grayBoard, matchingInfo);
 		
-		/*if (matchers.get(best_index).getTotalDeltaThreshold() < result.getSecond().totalDelta) {
-			System.out.println("Matcher_Composite: scan: " + result.getFirst() + " total delta is " + result.getSecond().totalDelta + " start scan again ...");
-			result = matchers.get(best_index).scan(grayBoard, true);
-		}*/
+		System.out.println("Matcher_Composite: scan: Selected matcher is " + matchers.get(best_index).getClass().getCanonicalName() + " with emptySquareThreshold = " + result.getThird());
+		if (matchingInfo != null) matchingInfo.setCurrentPhase(matchers_classifier.size() + 2);
+		result = matchers.get(best_index).scan(grayBoard, matchingInfo, result.getThird());
 		
 		return result;
 	}

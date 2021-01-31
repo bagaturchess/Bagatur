@@ -145,7 +145,7 @@ public abstract class Matcher_Base {
 			}
 		}
 		
-		System.out.println("Matcher_Base: minEmpty=" + minEmpty + ", maxFull=" + maxFull);
+		System.out.println("Matcher_Base: maxFull=" + maxFull + ", minEmpty=" + minEmpty);
 		
 		result.totalDelta = result.totalDelta / (double) (countPIDs);
 		
