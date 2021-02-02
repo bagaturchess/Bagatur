@@ -45,7 +45,7 @@ public class ScannerTest_FromGeneratedImage {
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache();
 			
-			BoardProperties boardProperties = new BoardProperties(192, "set1");
+			BoardProperties boardProperties = new BoardProperties(256, "set1");
 			BufferedImage boardImage = (BufferedImage) ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, bitboard.toEPD(), new Color(220, 220, 220), new Color(120, 120, 120));
 			//ScannerUtils.saveImage("board", boardImage);
 			

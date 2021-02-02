@@ -77,4 +77,10 @@ public class BoardScanner_RGB extends BoardScanner {
 		
 		return pid;
 	}
+
+
+	@Override
+	public double probability(Object image) {
+		throw new UnsupportedOperationException();
+	}
 }

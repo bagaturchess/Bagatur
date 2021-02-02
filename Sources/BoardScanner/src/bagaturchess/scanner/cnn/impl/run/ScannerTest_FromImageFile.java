@@ -26,9 +26,9 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 import bagaturchess.scanner.cnn.impl.BoardScanner;
-import bagaturchess.scanner.cnn.impl.BoardScanner_RGB;
+import bagaturchess.scanner.cnn.impl.BoardScanner_Gray;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel;
-import bagaturchess.scanner.cnn.impl.model.NetworkModel_RGB;
+import bagaturchess.scanner.cnn.impl.model.NetworkModel_Gray;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
 
@@ -36,26 +36,24 @@ import bagaturchess.scanner.common.BoardProperties;
 public class ScannerTest_FromImageFile {
 	
 	
-	private static final String NET_FILE = "scanner.bin";
-	
-	
 	public static void main(String[] args) {
 		
 		try {
 			
-			BoardProperties boardProperties = new BoardProperties(192);
+			BoardProperties boardProperties = new BoardProperties(256);
 			
-			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, boardProperties);
+			//NetworkModel netmodel = new NetworkModel_Gray("scanner.chesscom1.bin", boardProperties);
+			NetworkModel netmodel = new NetworkModel_Gray("scanner.lichessorg1.bin", boardProperties);
 			
-			BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test1.png"));
-			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/test7.png"));
+			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test9.png"));
+			BufferedImage boardImage = ImageIO.read(new File("./data/tests/chess.com/test5.png"));
 			boardImage = ScannerUtils.resizeImage(boardImage, boardProperties.getImageSize());
 			
-			BoardScanner scanner = new BoardScanner_RGB(netmodel);
+			BoardScanner scanner = new BoardScanner_Gray(netmodel);
 			
-			String fen = scanner.scan(ScannerUtils.convertToRGBMatrix(boardImage));
+			double probability = scanner.probability(ScannerUtils.convertToGrayMatrix(boardImage));
 			
-			System.out.println(fen);
+			System.out.println(probability);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

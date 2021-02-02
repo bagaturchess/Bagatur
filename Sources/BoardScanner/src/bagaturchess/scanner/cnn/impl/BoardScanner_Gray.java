@@ -77,4 +77,42 @@ public class BoardScanner_Gray extends BoardScanner {
 		
 		return pid;
 	}
+	
+	
+	@Override
+	public double probability(Object image) {
+		int[][] grayImage = (int[][]) image;
+		
+		double probability = 0;
+		for (int i = 0; i < grayImage.length; i += grayImage.length / 8) {
+			for (int j = 0; j < grayImage.length; j += grayImage.length / 8) {
+				int file = i / (grayImage.length / 8);
+				int rank = j / (grayImage.length / 8);
+				int fieldID = 63 - (file + 8 * rank);
+				probability += getMaxProbability(grayImage, i, j, fieldID);
+			}
+		}
+		
+		return probability;
+	}
+	
+	
+	private double getMaxProbability(int[][] matrix, int i1, int j1, int filedID) {
+		
+		int[][] squareMatrix = MatrixUtils.getSquarePixelsMatrix(matrix, i1, j1);
+		
+		networkModel.setInputs(networkModel.createInput(squareMatrix));
+		
+		network.forward();
+		float[] output = network.getOutput();
+		
+		double maxValue = 0;
+		for (int j = 0; j < output.length; j++) {
+			if (maxValue < output[j]) {
+				maxValue = output[j];
+			}
+		}
+		
+		return maxValue;
+	}
 }

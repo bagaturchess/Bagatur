@@ -40,4 +40,6 @@ public abstract class BoardScanner {
 	
 	
 	public abstract String scan(Object image);
+	
+	public abstract double probability(Object image);
 }

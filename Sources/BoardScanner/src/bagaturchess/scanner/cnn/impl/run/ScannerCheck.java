@@ -7,12 +7,12 @@ import java.awt.image.BufferedImage;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.scanner.cnn.impl.BoardScanner;
-import bagaturchess.scanner.cnn.impl.BoardScanner_RGB;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel;
-import bagaturchess.scanner.cnn.impl.model.NetworkModel_RGB;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
 import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
+import bagaturchess.scanner.cnn.impl.model.NetworkModel_Gray;
+import bagaturchess.scanner.cnn.impl.BoardScanner_Gray;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
@@ -30,11 +30,11 @@ public class ScannerCheck {
 			
 			String filePath = "./stockfish-12.cg";
 			
-			BoardProperties boardProperties = new BoardProperties(192, "set1");
+			BoardProperties boardProperties = new BoardProperties(256, "set1");
 			
-			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, boardProperties);
+			NetworkModel netmodel = new NetworkModel_Gray(NET_FILE, boardProperties);
 			
-			PositionsVisitor visitor = new ScannerCheckVisitor(new BoardScanner_RGB(netmodel), boardProperties);
+			PositionsVisitor visitor = new ScannerCheckVisitor(new BoardScanner_Gray(netmodel), boardProperties);
 			
 			System.out.println("Reading games ... ");
 			while (true) {
