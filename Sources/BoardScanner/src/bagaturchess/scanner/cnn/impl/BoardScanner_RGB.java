@@ -80,7 +80,7 @@ public class BoardScanner_RGB extends BoardScanner {
 
 
 	@Override
-	public double probability(Object image) {
+	public double getAccumulatedProbability(Object image) {
 		throw new UnsupportedOperationException();
 	}
 }

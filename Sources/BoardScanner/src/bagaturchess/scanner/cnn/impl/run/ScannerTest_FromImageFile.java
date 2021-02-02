@@ -42,16 +42,16 @@ public class ScannerTest_FromImageFile {
 			
 			BoardProperties boardProperties = new BoardProperties(256);
 			
-			//NetworkModel netmodel = new NetworkModel_Gray("scanner.chesscom1.bin", boardProperties);
-			NetworkModel netmodel = new NetworkModel_Gray("scanner.lichessorg1.bin", boardProperties);
+			NetworkModel netmodel = new NetworkModel_Gray("scanner.chesscom1.bin", boardProperties);
+			//NetworkModel netmodel = new NetworkModel_Gray("scanner.lichessorg1.bin", boardProperties);
 			
-			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test9.png"));
-			BufferedImage boardImage = ImageIO.read(new File("./data/tests/chess.com/test5.png"));
+			BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test9.png"));
+			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/chess.com/test5.png"));
 			boardImage = ScannerUtils.resizeImage(boardImage, boardProperties.getImageSize());
 			
 			BoardScanner scanner = new BoardScanner_Gray(netmodel);
 			
-			double probability = scanner.probability(ScannerUtils.convertToGrayMatrix(boardImage));
+			double probability = scanner.getAccumulatedProbability(ScannerUtils.convertToGrayMatrix(boardImage));
 			
 			System.out.println(probability);
 			

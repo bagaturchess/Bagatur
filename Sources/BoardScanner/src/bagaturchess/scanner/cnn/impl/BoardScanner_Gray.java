@@ -21,6 +21,7 @@ package bagaturchess.scanner.cnn.impl;
 
 
 import java.io.IOException;
+import java.util.Set;
 
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel;
@@ -80,8 +81,10 @@ public class BoardScanner_Gray extends BoardScanner {
 	
 	
 	@Override
-	public double probability(Object image) {
+	public double getAccumulatedProbability(Object image) {
 		int[][] grayImage = (int[][]) image;
+		
+		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayImage);
 		
 		double probability = 0;
 		for (int i = 0; i < grayImage.length; i += grayImage.length / 8) {
@@ -89,7 +92,9 @@ public class BoardScanner_Gray extends BoardScanner {
 				int file = i / (grayImage.length / 8);
 				int rank = j / (grayImage.length / 8);
 				int fieldID = 63 - (file + 8 * rank);
-				probability += getMaxProbability(grayImage, i, j, fieldID);
+				if (!emptySquares.contains(fieldID)) {
+					probability += getMaxProbability(grayImage, i, j, fieldID);
+				}
 			}
 		}
 		
