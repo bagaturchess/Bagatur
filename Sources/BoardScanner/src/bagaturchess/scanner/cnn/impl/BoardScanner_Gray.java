@@ -41,14 +41,19 @@ public class BoardScanner_Gray extends BoardScanner {
 		
 		int[][] grayImage = (int[][]) imageObj;
 		
+		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayImage);
+		
 		int[] pids = new int[64];
 		for (int i = 0; i < grayImage.length; i += grayImage.length / 8) {
 			for (int j = 0; j < grayImage.length; j += grayImage.length / 8) {
 				int file = i / (grayImage.length / 8);
 				int rank = j / (grayImage.length / 8);
 				int fieldID = 63 - (file + 8 * rank);
-				int pid = getPID(grayImage, i, j, fieldID);
-				pids[fieldID] = pid;
+				pids[fieldID] = Constants.PID_NONE;
+				if (!emptySquares.contains(fieldID)) {
+					int pid = getPID(grayImage, i, j, fieldID);
+					pids[fieldID] = pid;
+				}
 			}
 		}
 		
@@ -68,6 +73,9 @@ public class BoardScanner_Gray extends BoardScanner {
 		float maxValue = 0;
 		int maxIndex = 0;
 		for (int j = 0; j < output.length; j++) {
+			if (j == 0 || j == 13) {//empty square
+				continue;
+			}
 			if (maxValue < output[j]) {
 				maxValue = output[j];
 				maxIndex = j;
@@ -82,6 +90,7 @@ public class BoardScanner_Gray extends BoardScanner {
 	
 	@Override
 	public double getAccumulatedProbability(Object image) {
+		
 		int[][] grayImage = (int[][]) image;
 		
 		Set<Integer> emptySquares = MatrixUtils.getEmptySquares(grayImage);
@@ -98,6 +107,8 @@ public class BoardScanner_Gray extends BoardScanner {
 			}
 		}
 		
+		probability = probability / (double) (63 - emptySquares.size());
+		
 		return probability;
 	}
 	
@@ -113,6 +124,9 @@ public class BoardScanner_Gray extends BoardScanner {
 		
 		double maxValue = 0;
 		for (int j = 0; j < output.length; j++) {
+			if (j == 0 || j == 13) {//empty square
+				continue;
+			}
 			if (maxValue < output[j]) {
 				maxValue = output[j];
 			}
