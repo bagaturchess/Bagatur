@@ -33,6 +33,8 @@ public class ScannerLearning {
 	
 	private static NetworkModel netmodel;
 	
+	private static long lastSave = System.currentTimeMillis();
+	
 	
 	public static void main(String[] args) {
 		
@@ -43,8 +45,8 @@ public class ScannerLearning {
 			netmodel = new NetworkModel_Gray(NET_FILE, boardProperties);
 			
 			String[] inputFiles = new String[] {
-				"./data/tests/chess.com/test5.png",
-				//"./data/tests/lichess.org/test8.png",
+				//"./data/tests/chess.com/test5.png",
+				"./data/tests/lichess.org/test8.png",
 				//"./data/tests/lichess.org/test3.png",
 				//"./data/tests/lichess.org/test4.png",
 				//"./data/tests/chess.com/test1.png",
@@ -73,10 +75,12 @@ public class ScannerLearning {
 			
 			trainer = new BackpropagationTrainer(network);
 			
-			trainer.setLearningRate(0.001f);
+			trainer.setLearningRate(0.00001f);
 	        
 	        trainer.setBatchMode(true);
 	        trainer.setBatchSize(images.size());
+	        
+	        trainer.setMaxEpochs(1000000000);
 	        
 	        trainer.addListener(new TrainingListener() {
 	        	
@@ -118,7 +122,11 @@ public class ScannerLearning {
 						if (!Float.isNaN(event.getSource().getTrainingLoss())
 								&& !Float.isInfinite(event.getSource().getTrainingLoss())) {
 							try {
-								FileIO.writeToFile(network, NET_FILE);
+								long now = System.currentTimeMillis();
+								if (now > lastSave + 10000) {
+									FileIO.writeToFile(network, NET_FILE);
+									lastSave = now;
+								}
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
