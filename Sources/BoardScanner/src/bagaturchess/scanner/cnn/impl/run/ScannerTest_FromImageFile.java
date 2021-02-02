@@ -46,7 +46,7 @@ public class ScannerTest_FromImageFile {
 			//NetworkModel netmodel = new NetworkModel_Gray("scanner.lichessorg1.bin", boardProperties);
 			BoardScanner scanner = new BoardScanner_Gray(netmodel);
 			
-			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test9.png"));
+			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test8.png"));
 			BufferedImage boardImage = ImageIO.read(new File("./data/tests/chess.com/test5.png"));
 			boardImage = ScannerUtils.resizeImage(boardImage, boardProperties.getImageSize());
 			int[][] boardMatrix= ScannerUtils.convertToGrayMatrix(boardImage);

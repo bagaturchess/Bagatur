@@ -45,8 +45,8 @@ public class ScannerLearning {
 			netmodel = new NetworkModel_Gray(NET_FILE, boardProperties);
 			
 			String[] inputFiles = new String[] {
-				//"./data/tests/chess.com/test5.png",
-				"./data/tests/lichess.org/test8.png",
+				"./data/tests/chess.com/test5.png",
+				//"./data/tests/lichess.org/test8.png",
 				//"./data/tests/lichess.org/test3.png",
 				//"./data/tests/lichess.org/test4.png",
 				//"./data/tests/chess.com/test1.png",
@@ -75,7 +75,7 @@ public class ScannerLearning {
 			
 			trainer = new BackpropagationTrainer(network);
 			
-			trainer.setLearningRate(0.00001f);
+			trainer.setLearningRate(0.001f);
 	        
 	        trainer.setBatchMode(true);
 	        trainer.setBatchSize(images.size());
