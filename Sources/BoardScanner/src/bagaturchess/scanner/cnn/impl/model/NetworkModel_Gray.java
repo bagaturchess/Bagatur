@@ -54,7 +54,7 @@ public class NetworkModel_Gray extends NetworkModel {
 		}
 	}
 	
-
+	
 	@Override
 	public Object createInput(Object image) {
 		return ScannerUtils.convertInt2Float((int[][])image);
