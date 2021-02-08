@@ -20,7 +20,6 @@
 package bagaturchess.scanner.common;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;
-import bagaturchess.scanner.patterns.api.ImageHandlerSingleton;
 
 
 public class MatrixUtils {
@@ -102,21 +100,21 @@ public class MatrixUtils {
 		KMeans kmeans = new KMeans(4, grayBoard);
 		int[] clustersIndexes = kmeans.get2MaxWeightsIndexes();
 		
-		int gray1 = -1;
-		int gray2 = -1;
+		int gray1 = 255;
+		int gray2 = 0;
 		
-		int[][] boardPixels_c1 = new int[grayBoard.length][grayBoard.length];
-		int[][] boardPixels_c2 = new int[grayBoard.length][grayBoard.length];
+		//int[][] boardPixels_c1 = new int[grayBoard.length][grayBoard.length];
+		//int[][] boardPixels_c2 = new int[grayBoard.length][grayBoard.length];
 		for (int index = 0; index < clustersIndexes.length; index++) {
 			int centoridID = clustersIndexes[index];
 			for (int i = 0; i < grayBoard.length; i++) {
 				for (int j = 0; j < grayBoard.length; j++) {
 					if (centoridID == kmeans.centroids_ids[i][j]) {
 						if (index == 0) {
-							boardPixels_c1[i][j] = grayBoard[i][j];
+							//boardPixels_c1[i][j] = grayBoard[i][j];
 							gray1 = kmeans.centroids_values[centoridID];
 						} else {
-							boardPixels_c2[i][j] = grayBoard[i][j];
+							//boardPixels_c2[i][j] = grayBoard[i][j];
 							gray2 = kmeans.centroids_values[centoridID];
 						}
 					}
