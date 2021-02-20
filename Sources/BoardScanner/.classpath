@@ -4,7 +4,11 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/UCITracker"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Bitboard"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/DeepNetts"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/opencv.4.5.1"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.8.jar"/>
+	<classpathentry kind="lib" path="lib/deepnetts.jar"/>
+	<classpathentry kind="lib" path="lib/json-20201115.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-api-2.14.0.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-core-2.14.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
