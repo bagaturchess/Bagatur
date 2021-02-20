@@ -11,6 +11,6 @@
 	<classpathentry kind="lib" path="lib/commons-lang3-3.8.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-nop-1.7.6.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UCITracker"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/DeepNetts"/>
+	<classpathentry kind="lib" path="lib/deepnetts.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
