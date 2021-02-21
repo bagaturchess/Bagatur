@@ -15,6 +15,10 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 
 # Revision History
+Version 2.2a (21 February 2021)
+  * Optimizations of search and qsearch with small ELO increase (~15)
+  * Bugfixing
+
 Version 2.2 (29 May 2020)
   * Reduced LMR and LMP for moves with high history scores
   * SMP based on threads (not processes), it is now with 65+ ELO stronger than the single core version
