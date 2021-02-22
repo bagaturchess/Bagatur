@@ -54,7 +54,7 @@ public class NetworkModel_RGB extends NetworkModel {
 		}
 	}
 	
-
+	
 	@Override
 	public Object createInput(Object image) {
 		return ScannerUtils.convertInt2Float((int[][][])image);
@@ -65,8 +65,8 @@ public class NetworkModel_RGB extends NetworkModel {
 	public void setInputs(Object input) {
 		network.setInput(new Tensor((float[][][])input));
 	}
-
-
+	
+	
 	@Override
 	public DataSetInitPair createDataSetInitPair(BufferedImage boardImage) {
 		return new DataSetInitPair_ByBoardImage_RGB(boardImage);
