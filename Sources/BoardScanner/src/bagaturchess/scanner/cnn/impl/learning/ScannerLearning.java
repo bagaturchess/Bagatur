@@ -25,7 +25,7 @@ import deepnetts.util.FileIO;
 public class ScannerLearning {
 	
 	
-	private static final String NET_FILE = "scanner.lichessorg.bin";
+	private static final String NET_FILE = "scanner.chesscom.bin";
 	private static ConvolutionalNetwork network;
 	
 	private static BackpropagationTrainer trainer;
@@ -45,21 +45,22 @@ public class ScannerLearning {
 			netmodel = new NetworkModel_Gray(NET_FILE, boardProperties);
 			
 			String[] inputFiles = new String[] {
-				//"./data/tests/cnn/chess.com/set1/input1.png",
-				//"./data/tests/cnn/chess.com/set1/input2.png",
-				//"./data/tests/cnn/chess.com/set1/input3.png",
-				//"./data/tests/cnn/chess.com/set1/input4.png",
-				//"./data/tests/cnn/chess.com/set1/input5.png",
-				//"./data/tests/cnn/chess.com/set1/input6.png",
-				//"./data/tests/cnn/chess.com/set1/input7.png",
+				"./data/tests/cnn/chess.com/set1/input1.png",
+				"./data/tests/cnn/chess.com/set1/input2.png",
+				"./data/tests/cnn/chess.com/set1/input3.png",
+				"./data/tests/cnn/chess.com/set1/input4.png",
+				"./data/tests/cnn/chess.com/set1/input5.png",
+				"./data/tests/cnn/chess.com/set1/input6.png",
+				"./data/tests/cnn/chess.com/set1/input7.png",
 				
-				"./data/tests/cnn/lichess.org/set1/input1.png",
+				/*"./data/tests/cnn/lichess.org/set1/input1.png",
 				"./data/tests/cnn/lichess.org/set1/input2.png",
 				"./data/tests/cnn/lichess.org/set1/input3.png",
 				"./data/tests/cnn/lichess.org/set1/input4.png",
 				"./data/tests/cnn/lichess.org/set1/input5.png",
 				"./data/tests/cnn/lichess.org/set1/input6.png",
 				"./data/tests/cnn/lichess.org/set1/input7.png",
+				*/
 			};
 			
 			DataSetInitPair[] pairs = getInitPairs(boardProperties, inputFiles);
