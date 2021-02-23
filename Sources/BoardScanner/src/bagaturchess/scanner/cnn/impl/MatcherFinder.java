@@ -39,12 +39,14 @@ public class MatcherFinder {
 	
 	
 	public String getMatcher(Object image) {
+		long startTime = System.currentTimeMillis();
 		double prob1 = scanner_lichessorg1.getAccumulatedProbability(image);
 		double prob2 = scanner_chesscom1.getAccumulatedProbability(image);
+		long endTime = System.currentTimeMillis();
 		if (prob1 > prob2) {
-			return "LiChess.org " + prob1 + " " + prob2;
+			return "MatcherFinder: LiChess.org " + prob1 + " " + prob2 + ", time " + (endTime - startTime);
 		} else {
-			return "Chess.com " + prob1 + " " + prob2;
+			return "MatcherFinder: Chess.com " + prob1 + " " + prob2 + ", time " + (endTime - startTime);
 		}
 	}
 }
