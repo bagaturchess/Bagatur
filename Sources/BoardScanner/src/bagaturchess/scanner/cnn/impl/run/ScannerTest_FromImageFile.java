@@ -42,9 +42,9 @@ public class ScannerTest_FromImageFile {
 			
 			BoardProperties boardProperties = new BoardProperties(256);
 			
-			//NetworkModel netmodel = new NetworkModel_Gray("scanner.bin", boardProperties);
-			NetworkModel netmodel = new NetworkModel_Gray("scanner.chesscom.bin", boardProperties);
-			//NetworkModel netmodel = new NetworkModel_Gray("scanner.lichessorg.bin", boardProperties);
+			//NetworkModel netmodel = new NetworkModel_Gray("scanner.bin", boardProperties.getSquareSize());
+			//NetworkModel netmodel = new NetworkModel_Gray("scanner.chesscom.bin", boardProperties.getSquareSize());
+			NetworkModel netmodel = new NetworkModel_Gray("scanner.lichessorg.bin", boardProperties.getSquareSize());
 			BoardScanner scanner = new BoardScanner_Gray(netmodel);
 			
 			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test8.png"));

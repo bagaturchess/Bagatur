@@ -32,7 +32,7 @@ public class ScannerCheck {
 			
 			BoardProperties boardProperties = new BoardProperties(256, "set1");
 			
-			NetworkModel netmodel = new NetworkModel_Gray(NET_FILE, boardProperties);
+			NetworkModel netmodel = new NetworkModel_Gray(NET_FILE, boardProperties.getSquareSize());
 			
 			PositionsVisitor visitor = new ScannerCheckVisitor(new BoardScanner_Gray(netmodel), boardProperties);
 			

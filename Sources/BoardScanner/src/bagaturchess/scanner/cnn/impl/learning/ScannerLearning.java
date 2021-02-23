@@ -42,7 +42,7 @@ public class ScannerLearning {
 			
 			BoardProperties boardProperties = new BoardProperties(256);
 			
-			netmodel = new NetworkModel_Gray(NET_FILE, boardProperties);
+			netmodel = new NetworkModel_Gray(NET_FILE, boardProperties.getSquareSize());
 			
 			String[] inputFiles = new String[] {
 				"./data/tests/cnn/chess.com/set1/input1.png",

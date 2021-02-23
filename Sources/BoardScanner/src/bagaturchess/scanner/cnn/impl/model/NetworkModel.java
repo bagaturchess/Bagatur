@@ -24,7 +24,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import bagaturchess.scanner.common.BoardProperties;
 import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.util.FileIO;
 
@@ -33,18 +32,15 @@ public abstract class NetworkModel {
 	
 	
 	protected ConvolutionalNetwork network;
-	protected BoardProperties boardProperties;
 	
 	
-	public NetworkModel(String networkFilePath, BoardProperties _imageProperties) throws ClassNotFoundException, IOException {
+	public NetworkModel(String networkFilePath) throws ClassNotFoundException, IOException {
 		
 		if ((new File(networkFilePath)).exists() ){
 			System.out.println("Loading network with path " + networkFilePath + " ...");
 			network = (ConvolutionalNetwork) FileIO.createFromFile(new File(networkFilePath));
 			System.out.println("Network loaded.");
 		}
-		
-		boardProperties = _imageProperties;
 	}
 	
 	

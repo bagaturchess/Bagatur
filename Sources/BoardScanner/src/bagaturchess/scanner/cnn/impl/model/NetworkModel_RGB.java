@@ -24,7 +24,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
-import bagaturchess.scanner.common.BoardProperties;
 import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.net.layers.activation.ActivationType;
 import deepnetts.net.loss.LossType;
@@ -34,14 +33,14 @@ import deepnetts.util.Tensor;
 public class NetworkModel_RGB extends NetworkModel {
 	
 	
-	public NetworkModel_RGB(String networkFilePath, BoardProperties boardProperties) throws ClassNotFoundException, IOException {
+	public NetworkModel_RGB(String networkFilePath, int squareSize) throws ClassNotFoundException, IOException {
 		
-		super(networkFilePath, boardProperties);
+		super(networkFilePath);
 		
 		if (network == null) {
 			System.out.println("Creating network ...");
 			network =  ConvolutionalNetwork.builder()
-	                .addInputLayer(boardProperties.getSquareSize(), boardProperties.getSquareSize(), 3)
+	                .addInputLayer(squareSize, squareSize, 3)
 	                .addConvolutionalLayer(5, 5, 64)
 	                .addMaxPoolingLayer(2, 2)
 	                .addConvolutionalLayer(5, 5, 16)

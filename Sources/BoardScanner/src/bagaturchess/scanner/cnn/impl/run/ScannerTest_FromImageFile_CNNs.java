@@ -82,7 +82,7 @@ public class ScannerTest_FromImageFile_CNNs {
 		
 		float result = 0;
 		for (String cnn: CNNs) {
-			NetworkModel netmodel = new NetworkModel_Gray(cnn, boardProperties);
+			NetworkModel netmodel = new NetworkModel_Gray(cnn, boardProperties.getSquareSize());
 			BoardScanner scanner = new BoardScanner_Gray(netmodel);
 			double current = scanner.getAccumulatedProbability(boardMatrix);
 			if (current > result) {

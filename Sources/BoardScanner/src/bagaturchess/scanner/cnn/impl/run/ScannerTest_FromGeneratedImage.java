@@ -49,7 +49,7 @@ public class ScannerTest_FromGeneratedImage {
 			BufferedImage boardImage = (BufferedImage) ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, bitboard.toEPD(), new Color(220, 220, 220), new Color(120, 120, 120));
 			//ScannerUtils.saveImage("board", boardImage);
 			
-			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, boardProperties);
+			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, boardProperties.getSquareSize());
 			BoardScanner scanner = new BoardScanner_RGB(netmodel);
 			
 			String fen = scanner.scan(ScannerUtils.convertToRGBMatrix(boardImage));
