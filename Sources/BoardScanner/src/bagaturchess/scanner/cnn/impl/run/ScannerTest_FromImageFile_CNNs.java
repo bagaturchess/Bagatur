@@ -22,14 +22,10 @@ package bagaturchess.scanner.cnn.impl.run;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import bagaturchess.scanner.cnn.impl.BoardScanner;
-import bagaturchess.scanner.cnn.impl.BoardScanner_Gray;
-import bagaturchess.scanner.cnn.impl.model.NetworkModel;
-import bagaturchess.scanner.cnn.impl.model.NetworkModel_Gray;
+import bagaturchess.scanner.cnn.impl.MatcherFinder;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
 
@@ -44,52 +40,17 @@ public class ScannerTest_FromImageFile_CNNs {
 			BoardProperties boardProperties = new BoardProperties(256);
 			
 			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test8.png"));
-			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/chess.com/test5.png"));
-			BufferedImage boardImage = ImageIO.read(new File("./data/tests/cnn/lichess.org/set1/input7.png"));
-			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/cnn/chess.com/set1/input7.png"));
+			BufferedImage boardImage = ImageIO.read(new File("./data/tests/chess.com/test5.png"));
+			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/cnn/lichess.org/set1/input1.png"));
+			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/cnn/chess.com/set1/input1.png"));
 			boardImage = ScannerUtils.resizeImage(boardImage, boardProperties.getImageSize());
 			int[][] boardMatrix = ScannerUtils.convertToGrayMatrix(boardImage);
 			
-			double probability1 = getMaxProbability(
-					new String[] {"scanner.lichessorg.set1.1.bin",
-									"scanner.lichessorg.set1.2.bin",
-									"scanner.lichessorg.set1.3.bin",
-									"scanner.lichessorg.set1.4.bin"
-									}, boardMatrix);
-			
-			double probability2 = getMaxProbability(
-					new String[] {"scanner.chesscom.set1.1.bin",
-									"scanner.chesscom.set1.2.bin",
-									"scanner.chesscom.set1.3.bin",
-									"scanner.chesscom.set1.4.bin"
-									}, boardMatrix);
-			
-			System.out.println("lichessorg=" + probability1 + ", chesscom=" + probability2);
-			
-			//String fen = scanner.scan(boardMatrix);
-			
-			//System.out.println(fen);
+			MatcherFinder finder = new MatcherFinder(boardProperties.getSquareSize());
+			System.out.println(finder.getMatcher(boardMatrix));
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	
-	private static float getMaxProbability(String[] CNNs, int[][] boardMatrix) throws ClassNotFoundException, IOException {
-		
-		BoardProperties boardProperties = new BoardProperties(256);
-		
-		float result = 0;
-		for (String cnn: CNNs) {
-			NetworkModel netmodel = new NetworkModel_Gray(cnn, boardProperties.getSquareSize());
-			BoardScanner scanner = new BoardScanner_Gray(netmodel);
-			double current = scanner.getAccumulatedProbability(boardMatrix);
-			if (current > result) {
-				result = (float) current;
-			}
-		}
-		
-		return result;
 	}
 }
