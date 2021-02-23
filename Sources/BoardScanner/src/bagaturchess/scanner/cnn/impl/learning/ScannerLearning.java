@@ -25,7 +25,7 @@ import deepnetts.util.FileIO;
 public class ScannerLearning {
 	
 	
-	private static final String NET_FILE = "scanner.bin";
+	private static final String NET_FILE = "scanner.lichessorg.bin";
 	private static ConvolutionalNetwork network;
 	
 	private static BackpropagationTrainer trainer;
@@ -53,13 +53,13 @@ public class ScannerLearning {
 				//"./data/tests/cnn/chess.com/set1/input6.png",
 				//"./data/tests/cnn/chess.com/set1/input7.png",
 				
-				//"./data/tests/cnn/lichess.org/set1/input1.png",
-				//"./data/tests/cnn/lichess.org/set1/input2.png",
-				//"./data/tests/cnn/lichess.org/set1/input3.png",
+				"./data/tests/cnn/lichess.org/set1/input1.png",
+				"./data/tests/cnn/lichess.org/set1/input2.png",
+				"./data/tests/cnn/lichess.org/set1/input3.png",
 				"./data/tests/cnn/lichess.org/set1/input4.png",
-				//"./data/tests/cnn/lichess.org/set1/input5.png",
-				//"./data/tests/cnn/lichess.org/set1/input6.png",
-				//"./data/tests/cnn/lichess.org/set1/input7.png",
+				"./data/tests/cnn/lichess.org/set1/input5.png",
+				"./data/tests/cnn/lichess.org/set1/input6.png",
+				"./data/tests/cnn/lichess.org/set1/input7.png",
 			};
 			
 			DataSetInitPair[] pairs = getInitPairs(boardProperties, inputFiles);
@@ -85,7 +85,7 @@ public class ScannerLearning {
 			
 			trainer = new BackpropagationTrainer(network);
 			
-			trainer.setLearningRate(0.0001f);
+			trainer.setLearningRate(1f);
 	        
 	        trainer.setBatchMode(true);
 	        trainer.setBatchSize(images.size());

@@ -43,9 +43,9 @@ public class NetworkModel_Gray extends NetworkModel {
 			System.out.println("Creating network ...");
 			network =  ConvolutionalNetwork.builder()
 	                .addInputLayer(boardProperties.getSquareSize(), boardProperties.getSquareSize(), 1)
-	                //.addConvolutionalLayer(5, 5, 64)
-	                //.addMaxPoolingLayer(2, 2)
-	                //.addConvolutionalLayer(5, 5, 16)
+	                .addConvolutionalLayer(5, 5, 64)
+	                .addMaxPoolingLayer(2, 2)
+	                .addConvolutionalLayer(5, 5, 16)
 	                .addOutputLayer(14, ActivationType.SOFTMAX)
 	                .hiddenActivationFunction(ActivationType.LINEAR)
 	                .lossFunction(LossType.CROSS_ENTROPY)
@@ -70,7 +70,7 @@ public class NetworkModel_Gray extends NetworkModel {
 		
 		for (int i = 0 ; i < result.length; i++) {
 			for (int j = 0 ; j < result.length; j++) {
-				result[i][j] = (float) ((result[i][j] - stat.getEntropy()) / 1/*stat.getDisperse()*/);
+				result[i][j] = (float) ((result[i][j] - stat.getEntropy()) / stat.getDisperse());
 			}
 		}
 		

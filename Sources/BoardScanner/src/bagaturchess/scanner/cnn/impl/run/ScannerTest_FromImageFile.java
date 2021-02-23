@@ -43,13 +43,13 @@ public class ScannerTest_FromImageFile {
 			BoardProperties boardProperties = new BoardProperties(256);
 			
 			//NetworkModel netmodel = new NetworkModel_Gray("scanner.bin", boardProperties);
-			NetworkModel netmodel = new NetworkModel_Gray("scanner.chesscom1.bin", boardProperties);
-			//NetworkModel netmodel = new NetworkModel_Gray("scanner.lichessorg1.bin", boardProperties);
+			//NetworkModel netmodel = new NetworkModel_Gray("scanner.chesscom.bin", boardProperties);
+			NetworkModel netmodel = new NetworkModel_Gray("scanner.lichessorg.bin", boardProperties);
 			BoardScanner scanner = new BoardScanner_Gray(netmodel);
 			
 			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test8.png"));
-			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/cnn/lichess.org/set1/input2.png"));
-			BufferedImage boardImage = ImageIO.read(new File("./data/tests/cnn/chess.com/set1/input1.png"));
+			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/cnn/lichess.org/set1/input1.png"));
+			BufferedImage boardImage = ImageIO.read(new File("./data/tests/cnn/chess.com/set1/input2.png"));
 			boardImage = ScannerUtils.resizeImage(boardImage, boardProperties.getImageSize());
 			int[][] boardMatrix= ScannerUtils.convertToGrayMatrix(boardImage);
 			

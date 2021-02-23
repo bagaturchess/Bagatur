@@ -39,7 +39,7 @@ public abstract class NetworkModel {
 	public NetworkModel(String networkFilePath, BoardProperties _imageProperties) throws ClassNotFoundException, IOException {
 		
 		if ((new File(networkFilePath)).exists() ){
-			System.out.println("Loading network ...");
+			System.out.println("Loading network with path " + networkFilePath + " ...");
 			network = (ConvolutionalNetwork) FileIO.createFromFile(new File(networkFilePath));
 			System.out.println("Network loaded.");
 		}
