@@ -23,6 +23,7 @@ package bagaturchess.scanner.cnn.impl.model;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
 import deepnetts.net.ConvolutionalNetwork;
@@ -42,9 +43,9 @@ public class NetworkModel_Gray extends NetworkModel {
 			System.out.println("Creating network ...");
 			network =  ConvolutionalNetwork.builder()
 	                .addInputLayer(boardProperties.getSquareSize(), boardProperties.getSquareSize(), 1)
-	                .addConvolutionalLayer(5, 5, 64)
-	                .addMaxPoolingLayer(2, 2)
-	                .addConvolutionalLayer(5, 5, 16)
+	                //.addConvolutionalLayer(5, 5, 64)
+	                //.addMaxPoolingLayer(2, 2)
+	                //.addConvolutionalLayer(5, 5, 16)
 	                .addOutputLayer(14, ActivationType.SOFTMAX)
 	                .hiddenActivationFunction(ActivationType.LINEAR)
 	                .lossFunction(LossType.CROSS_ENTROPY)
@@ -57,7 +58,23 @@ public class NetworkModel_Gray extends NetworkModel {
 	
 	@Override
 	public Object createInput(Object image) {
-		return ScannerUtils.convertInt2Float((int[][])image);
+		
+		float[][] result = ScannerUtils.convertInt2Float((int[][])image);
+		
+		VarStatistic stat = new VarStatistic(false);
+		for (int i = 0 ; i < result.length; i++) {
+			for (int j = 0 ; j < result.length; j++) {
+				stat.addValue(result[i][j], result[i][j]);
+			}
+		}
+		
+		for (int i = 0 ; i < result.length; i++) {
+			for (int j = 0 ; j < result.length; j++) {
+				result[i][j] = (float) ((result[i][j] - stat.getEntropy()) / 1/*stat.getDisperse()*/);
+			}
+		}
+		
+		return result;
 	}
 	
 	
@@ -65,8 +82,8 @@ public class NetworkModel_Gray extends NetworkModel {
 	public void setInputs(Object input) {
 		network.setInput(new Tensor((float[][])input));
 	}
-
-
+	
+	
 	@Override
 	public DataSetInitPair createDataSetInitPair(BufferedImage boardImage) {
 		return new DataSetInitPair_ByBoardImage_Gray(boardImage);

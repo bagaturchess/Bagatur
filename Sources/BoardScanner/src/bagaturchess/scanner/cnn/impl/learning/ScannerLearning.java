@@ -53,13 +53,13 @@ public class ScannerLearning {
 				//"./data/tests/cnn/chess.com/set1/input6.png",
 				//"./data/tests/cnn/chess.com/set1/input7.png",
 				
-				"./data/tests/cnn/lichess.org/set1/input1.png",
-				"./data/tests/cnn/lichess.org/set1/input2.png",
-				"./data/tests/cnn/lichess.org/set1/input3.png",
+				//"./data/tests/cnn/lichess.org/set1/input1.png",
+				//"./data/tests/cnn/lichess.org/set1/input2.png",
+				//"./data/tests/cnn/lichess.org/set1/input3.png",
 				"./data/tests/cnn/lichess.org/set1/input4.png",
-				"./data/tests/cnn/lichess.org/set1/input5.png",
-				"./data/tests/cnn/lichess.org/set1/input6.png",
-				"./data/tests/cnn/lichess.org/set1/input7.png",
+				//"./data/tests/cnn/lichess.org/set1/input5.png",
+				//"./data/tests/cnn/lichess.org/set1/input6.png",
+				//"./data/tests/cnn/lichess.org/set1/input7.png",
 			};
 			
 			DataSetInitPair[] pairs = getInitPairs(boardProperties, inputFiles);
@@ -85,12 +85,12 @@ public class ScannerLearning {
 			
 			trainer = new BackpropagationTrainer(network);
 			
-			trainer.setLearningRate(0.001f);
+			trainer.setLearningRate(0.0001f);
 	        
 	        trainer.setBatchMode(true);
 	        trainer.setBatchSize(images.size());
 	        
-	        trainer.setMaxEpochs(1000000000);
+	        trainer.setMaxEpochs(100000);
 	        
 	        trainer.addListener(new TrainingListener() {
 	        	

@@ -45,8 +45,8 @@ public class ScannerTest_FromImageFile_CNNs {
 			
 			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test8.png"));
 			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/chess.com/test5.png"));
-			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/cnn/lichess.org/set1/input4.png"));
-			BufferedImage boardImage = ImageIO.read(new File("./data/tests/cnn/chess.com/set1/input4.png"));
+			BufferedImage boardImage = ImageIO.read(new File("./data/tests/cnn/lichess.org/set1/input7.png"));
+			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/cnn/chess.com/set1/input7.png"));
 			boardImage = ScannerUtils.resizeImage(boardImage, boardProperties.getImageSize());
 			int[][] boardMatrix = ScannerUtils.convertToGrayMatrix(boardImage);
 			
@@ -54,13 +54,15 @@ public class ScannerTest_FromImageFile_CNNs {
 					new String[] {"scanner.lichessorg.set1.1.bin",
 									"scanner.lichessorg.set1.2.bin",
 									"scanner.lichessorg.set1.3.bin",
-									"scanner.lichessorg.set1.4.bin"}, boardMatrix);
+									"scanner.lichessorg.set1.4.bin"
+									}, boardMatrix);
 			
 			double probability2 = getMaxProbability(
 					new String[] {"scanner.chesscom.set1.1.bin",
 									"scanner.chesscom.set1.2.bin",
 									"scanner.chesscom.set1.3.bin",
-									"scanner.chesscom.set1.4.bin"}, boardMatrix);
+									"scanner.chesscom.set1.4.bin"
+									}, boardMatrix);
 			
 			System.out.println("lichessorg=" + probability1 + ", chesscom=" + probability2);
 			
