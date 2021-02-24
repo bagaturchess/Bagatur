@@ -54,8 +54,8 @@ public class ScannerTest_FromImageFile_CNNs {
 			
 			
 			List<String> netsNames = new ArrayList<String>();
-			netsNames.add("scanner.lichessorg1.bin");
-			netsNames.add("scanner.chesscom1.bin");
+			netsNames.add("scanner_lichessorg1.bin");
+			netsNames.add("scanner_chesscom1.bin");
 			
 			List<InputStream> netsStreams = new ArrayList<InputStream>();
 			for (int i = 0; i < netsNames.size(); i++) {
