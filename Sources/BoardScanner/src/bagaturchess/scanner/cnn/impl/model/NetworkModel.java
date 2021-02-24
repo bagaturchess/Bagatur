@@ -21,11 +21,8 @@ package bagaturchess.scanner.cnn.impl.model;
 
 
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 import deepnetts.net.ConvolutionalNetwork;
-import deepnetts.util.FileIO;
 
 
 public abstract class NetworkModel {
@@ -34,13 +31,7 @@ public abstract class NetworkModel {
 	protected ConvolutionalNetwork network;
 	
 	
-	public NetworkModel(String networkFilePath) throws ClassNotFoundException, IOException {
-		
-		if ((new File(networkFilePath)).exists() ){
-			System.out.println("Loading network with path " + networkFilePath + " ...");
-			network = (ConvolutionalNetwork) FileIO.createFromFile(new File(networkFilePath));
-			System.out.println("Network loaded.");
-		}
+	public NetworkModel() {
 	}
 	
 	

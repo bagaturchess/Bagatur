@@ -20,6 +20,7 @@
 package bagaturchess.scanner.cnn.impl;
 
 
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import bagaturchess.scanner.cnn.impl.model.NetworkModel_Gray;
@@ -33,8 +34,8 @@ public class MatcherFinder {
 	
 	
 	public MatcherFinder(int squareSize) throws ClassNotFoundException, IOException {
-		scanner_lichessorg1 = new BoardScanner_Gray(new NetworkModel_Gray("scanner.lichessorg1.bin", squareSize));
-		scanner_chesscom1 = new BoardScanner_Gray(new NetworkModel_Gray("scanner.chesscom1.bin", squareSize));
+		scanner_lichessorg1 = new BoardScanner_Gray(new NetworkModel_Gray(new FileInputStream("scanner.lichessorg1.bin"), squareSize));
+		scanner_chesscom1 = new BoardScanner_Gray(new NetworkModel_Gray(new FileInputStream("scanner.chesscom1.bin"), squareSize));
 	}
 	
 	

@@ -3,6 +3,7 @@ package bagaturchess.scanner.cnn.impl.run;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
@@ -32,7 +33,7 @@ public class ScannerCheck {
 			
 			BoardProperties boardProperties = new BoardProperties(256, "set1");
 			
-			NetworkModel netmodel = new NetworkModel_Gray(NET_FILE, boardProperties.getSquareSize());
+			NetworkModel netmodel = new NetworkModel_Gray(new FileInputStream(NET_FILE), boardProperties.getSquareSize());
 			
 			PositionsVisitor visitor = new ScannerCheckVisitor(new BoardScanner_Gray(netmodel), boardProperties);
 			

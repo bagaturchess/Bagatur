@@ -3,6 +3,7 @@ package bagaturchess.scanner.cnn.impl.learning;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class ScannerLearning {
 			
 			BoardProperties boardProperties = new BoardProperties(256);
 			
-			netmodel = new NetworkModel_Gray(NET_FILE, boardProperties.getSquareSize());
+			netmodel = new NetworkModel_Gray(new FileInputStream(NET_FILE), boardProperties.getSquareSize());
 			
 			String[] inputFiles = new String[] {
 				"./data/tests/cnn/chess.com/set1/input1.png",

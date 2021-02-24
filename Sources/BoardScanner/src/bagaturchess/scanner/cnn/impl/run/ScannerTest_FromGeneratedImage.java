@@ -22,6 +22,7 @@ package bagaturchess.scanner.cnn.impl.run;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
@@ -49,7 +50,7 @@ public class ScannerTest_FromGeneratedImage {
 			BufferedImage boardImage = (BufferedImage) ImageHandlerSingleton.getInstance().createBoardImage(boardProperties, bitboard.toEPD(), new Color(220, 220, 220), new Color(120, 120, 120));
 			//ScannerUtils.saveImage("board", boardImage);
 			
-			NetworkModel netmodel = new NetworkModel_RGB(NET_FILE, boardProperties.getSquareSize());
+			NetworkModel netmodel = new NetworkModel_RGB(new FileInputStream(NET_FILE), boardProperties.getSquareSize());
 			BoardScanner scanner = new BoardScanner_RGB(netmodel);
 			
 			String fen = scanner.scan(ScannerUtils.convertToRGBMatrix(boardImage));

@@ -22,6 +22,7 @@ package bagaturchess.scanner.cnn.impl.run;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 
 import javax.imageio.ImageIO;
 
@@ -44,7 +45,7 @@ public class ScannerTest_FromImageFile {
 			
 			//NetworkModel netmodel = new NetworkModel_Gray("scanner.bin", boardProperties.getSquareSize());
 			//NetworkModel netmodel = new NetworkModel_Gray("scanner.chesscom.bin", boardProperties.getSquareSize());
-			NetworkModel netmodel = new NetworkModel_Gray("scanner.lichessorg.bin", boardProperties.getSquareSize());
+			NetworkModel netmodel = new NetworkModel_Gray(new FileInputStream("scanner.lichessorg.bin"), boardProperties.getSquareSize());
 			BoardScanner scanner = new BoardScanner_Gray(netmodel);
 			
 			//BufferedImage boardImage = ImageIO.read(new File("./data/tests/lichess.org/test8.png"));

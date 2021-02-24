@@ -22,6 +22,8 @@ package bagaturchess.scanner.cnn.impl.model;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import deepnetts.net.ConvolutionalNetwork;
@@ -33,11 +35,16 @@ import deepnetts.util.Tensor;
 public class NetworkModel_RGB extends NetworkModel {
 	
 	
-	public NetworkModel_RGB(String networkFilePath, int squareSize) throws ClassNotFoundException, IOException {
+	public NetworkModel_RGB(InputStream networkFileStream, int squareSize) throws ClassNotFoundException, IOException {
 		
-		super(networkFilePath);
+		super();
 		
-		if (network == null) {
+		if (networkFileStream != null) {
+			System.out.println("Loading network ...");
+			ObjectInputStream ois = new ObjectInputStream(networkFileStream);
+			network = (ConvolutionalNetwork) ois.readObject();
+			System.out.println("Network loaded.");
+		} else {
 			System.out.println("Creating network ...");
 			network =  ConvolutionalNetwork.builder()
 	                .addInputLayer(squareSize, squareSize, 3)
