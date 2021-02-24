@@ -46,7 +46,7 @@ public class MatcherFinder {
 	}
 	
 	
-	public void getMatcher(Object image) {
+	public void findMatcher(Object image) {
 		
 		long startTime = System.currentTimeMillis();
 		for (int i = 0; i < scanners.size(); i++) {

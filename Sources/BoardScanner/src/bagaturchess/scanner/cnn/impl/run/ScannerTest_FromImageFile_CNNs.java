@@ -53,16 +53,17 @@ public class ScannerTest_FromImageFile_CNNs {
 			int[][] boardMatrix = ScannerUtils.convertToGrayMatrix(boardImage);
 			
 			
-			List<InputStream> netsStreams = new ArrayList<InputStream>();
-			netsStreams.add(new FileInputStream("scanner.lichessorg1.bin"));
-			netsStreams.add(new FileInputStream("scanner.chesscom1.bin"));
-
 			List<String> netsNames = new ArrayList<String>();
-			netsNames.add("LiChess.org");
-			netsNames.add("Chess.com");
+			netsNames.add("scanner.lichessorg1.bin");
+			netsNames.add("scanner.chesscom1.bin");
+			
+			List<InputStream> netsStreams = new ArrayList<InputStream>();
+			for (int i = 0; i < netsNames.size(); i++) {
+				netsStreams.add(new FileInputStream(netsNames.get(i)));
+			}
 			
 			MatcherFinder finder = new MatcherFinder(boardProperties.getSquareSize(), netsStreams, netsNames);
-			finder.getMatcher(boardMatrix);
+			finder.findMatcher(boardMatrix);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
