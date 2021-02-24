@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import bagaturchess.scanner.cnn.impl.model.DataSetInitPair;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel_Gray;
 import bagaturchess.scanner.cnn.impl.model.NetworkModel_RGB;
@@ -181,7 +180,7 @@ public class ScannerLearning {
 	private static DataSetInitPair getInitPair(BoardProperties boardProperties, String fileName) throws IOException {
 		BufferedImage boardImage = ImageIO.read(new File(fileName));
 		boardImage = ScannerUtils.resizeImage(boardImage, boardProperties.getImageSize());
-		DataSetInitPair pair = netmodel.createDataSetInitPair(boardImage);
+		DataSetInitPair pair = new DataSetInitPair_ByBoardImage_Gray(boardImage);
 		return pair;
 	}
 }

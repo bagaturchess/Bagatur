@@ -75,30 +75,6 @@ public class ScannerUtils {
 	}
 	
 	
-	public static float[][] convertInt2Float(int[][] array) {
-		float[][] result = new float[array.length][array.length];
-		for (int i = 0 ; i < array.length; i++) {
-			for (int j = 0 ; j < array.length; j++) {
-				result[i][j] = array[i][j];
-			}
-		}
-		return result;
-	}
-	
-	
-	public static float[][][] convertInt2Float(int[][][] array) {
-		float[][][] result = new float[array.length][array.length][array[0][0].length];
-		for (int i = 0 ; i < array.length; i++) {
-			for (int j = 0 ; j < array[0].length; j++) {
-				for (int k = 0 ; k < array[0][0].length; k++) {
-					result[i][j][k] = array[i][j][k];
-				}
-			}
-		}
-		return result;
-	}
-	
-	
 	public static int[] convertFloat2Int(float[] array) {
 		int[] result = new int[array.length];
 		for (int i = 0 ; i < array.length; i++) {

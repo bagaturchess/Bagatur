@@ -20,8 +20,6 @@
 package bagaturchess.scanner.cnn.impl.model;
 
 
-import java.awt.image.BufferedImage;
-
 import deepnetts.net.ConvolutionalNetwork;
 
 
@@ -44,7 +42,4 @@ public abstract class NetworkModel {
 	
 	
 	public abstract void setInputs(Object input);
-	
-	
-	public abstract DataSetInitPair createDataSetInitPair(BufferedImage boardImage);
 }

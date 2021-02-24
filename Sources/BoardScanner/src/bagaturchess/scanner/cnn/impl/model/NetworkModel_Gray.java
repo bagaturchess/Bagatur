@@ -20,13 +20,11 @@
 package bagaturchess.scanner.cnn.impl.model;
 
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 
 import bagaturchess.bitboard.impl.utils.VarStatistic;
-import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.net.layers.activation.ActivationType;
 import deepnetts.net.loss.LossType;
@@ -65,7 +63,7 @@ public class NetworkModel_Gray extends NetworkModel {
 	@Override
 	public Object createInput(Object image) {
 		
-		float[][] result = ScannerUtils.convertInt2Float((int[][])image);
+		float[][] result = convertInt2Float((int[][])image);
 		
 		VarStatistic stat = new VarStatistic(false);
 		for (int i = 0 ; i < result.length; i++) {
@@ -90,8 +88,13 @@ public class NetworkModel_Gray extends NetworkModel {
 	}
 	
 	
-	@Override
-	public DataSetInitPair createDataSetInitPair(BufferedImage boardImage) {
-		return new DataSetInitPair_ByBoardImage_Gray(boardImage);
+	private static float[][] convertInt2Float(int[][] array) {
+		float[][] result = new float[array.length][array.length];
+		for (int i = 0 ; i < array.length; i++) {
+			for (int j = 0 ; j < array.length; j++) {
+				result[i][j] = array[i][j];
+			}
+		}
+		return result;
 	}
 }
