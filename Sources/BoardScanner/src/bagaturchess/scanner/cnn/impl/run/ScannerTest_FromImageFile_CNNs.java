@@ -22,10 +22,16 @@ package bagaturchess.scanner.cnn.impl.run;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import bagaturchess.scanner.cnn.impl.BoardScanner_Gray;
 import bagaturchess.scanner.cnn.impl.MatcherFinder;
+import bagaturchess.scanner.cnn.impl.model.NetworkModel_Gray;
 import bagaturchess.scanner.cnn.impl.utils.ScannerUtils;
 import bagaturchess.scanner.common.BoardProperties;
 
@@ -46,8 +52,17 @@ public class ScannerTest_FromImageFile_CNNs {
 			boardImage = ScannerUtils.resizeImage(boardImage, boardProperties.getImageSize());
 			int[][] boardMatrix = ScannerUtils.convertToGrayMatrix(boardImage);
 			
-			MatcherFinder finder = new MatcherFinder(boardProperties.getSquareSize());
-			System.out.println(finder.getMatcher(boardMatrix));
+			
+			List<InputStream> netsStreams = new ArrayList<InputStream>();
+			netsStreams.add(new FileInputStream("scanner.lichessorg1.bin"));
+			netsStreams.add(new FileInputStream("scanner.chesscom1.bin"));
+
+			List<String> netsNames = new ArrayList<String>();
+			netsNames.add("LiChess.org");
+			netsNames.add("Chess.com");
+			
+			MatcherFinder finder = new MatcherFinder(boardProperties.getSquareSize(), netsStreams, netsNames);
+			finder.getMatcher(boardMatrix);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

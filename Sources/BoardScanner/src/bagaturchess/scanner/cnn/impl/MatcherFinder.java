@@ -20,8 +20,10 @@
 package bagaturchess.scanner.cnn.impl;
 
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import bagaturchess.scanner.cnn.impl.model.NetworkModel_Gray;
 
@@ -29,25 +31,32 @@ import bagaturchess.scanner.cnn.impl.model.NetworkModel_Gray;
 public class MatcherFinder {
 	
 	
-	private BoardScanner scanner_lichessorg1;
-	private BoardScanner scanner_chesscom1;
+	private List<BoardScanner> scanners;
+	private List<String> netsNames;
 	
 	
-	public MatcherFinder(int squareSize) throws ClassNotFoundException, IOException {
-		scanner_lichessorg1 = new BoardScanner_Gray(new NetworkModel_Gray(new FileInputStream("scanner.lichessorg1.bin"), squareSize));
-		scanner_chesscom1 = new BoardScanner_Gray(new NetworkModel_Gray(new FileInputStream("scanner.chesscom1.bin"), squareSize));
+	public MatcherFinder(int squareSize, List<InputStream> netsStreams, List<String> _netsNames) throws ClassNotFoundException, IOException {
+		
+		scanners = new ArrayList<BoardScanner>();
+		netsNames = _netsNames;
+		
+		for (int i = 0; i < netsStreams.size(); i++) {
+			scanners.add(new BoardScanner_Gray(new NetworkModel_Gray(netsStreams.get(i), squareSize)));
+		}
 	}
 	
 	
-	public String getMatcher(Object image) {
+	public void getMatcher(Object image) {
+		
 		long startTime = System.currentTimeMillis();
-		double prob1 = scanner_lichessorg1.getAccumulatedProbability(image);
-		double prob2 = scanner_chesscom1.getAccumulatedProbability(image);
-		long endTime = System.currentTimeMillis();
-		if (prob1 > prob2) {
-			return "MatcherFinder: LiChess.org " + prob1 + " " + prob2 + ", time " + (endTime - startTime);
-		} else {
-			return "MatcherFinder: Chess.com " + prob1 + " " + prob2 + ", time " + (endTime - startTime);
+		for (int i = 0; i < scanners.size(); i++) {
+			String currentName = netsNames.get(i);
+			double currentProb = scanners.get(i).getAccumulatedProbability(image);
+			
+			System.out.println("MatcherFinder: " + currentName + " " + currentProb);
 		}
+		long endTime = System.currentTimeMillis();
+		
+		System.out.println("MatcherFinder: Time is " + (endTime - startTime) + " ms");
 	}
 }
