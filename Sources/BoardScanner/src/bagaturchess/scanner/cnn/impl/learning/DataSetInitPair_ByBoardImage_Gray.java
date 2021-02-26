@@ -33,7 +33,7 @@ import bagaturchess.scanner.common.MatrixUtils;
 public class DataSetInitPair_ByBoardImage_Gray extends DataSetInitPair {
 	
 	
-	DataSetInitPair_ByBoardImage_Gray(BufferedImage boardImage) {
+	public DataSetInitPair_ByBoardImage_Gray(BufferedImage boardImage) {
 		
 		super();
 		
