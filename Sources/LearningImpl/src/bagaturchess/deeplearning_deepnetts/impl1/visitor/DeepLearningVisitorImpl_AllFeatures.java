@@ -49,7 +49,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	
 	private int counter;
 	
-	private static final String NET_FILE = "net.bin";
+	private static final String NET_FILE = "net.dn.bin";
 	private NeuralNetwork<?> network;
 	
 	
