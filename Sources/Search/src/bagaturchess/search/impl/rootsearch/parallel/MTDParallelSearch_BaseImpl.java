@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -79,8 +82,10 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		
 		super(args);
 		
-		executor 				= Executors.newFixedThreadPool(2);
-		executor_start_stop 	= Executors.newFixedThreadPool(getRootSearchConfig().getThreadsCount());
+		//executor 				= Executors.newFixedThreadPool(2);
+		//executor_start_stop 	= Executors.newFixedThreadPool(getRootSearchConfig().getThreadsCount());
+		executor 				= new ThreadPoolExecutor(2, Integer.MAX_VALUE, Integer.MAX_VALUE, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+		executor_start_stop 	= new ThreadPoolExecutor(getRootSearchConfig().getThreadsCount(), Integer.MAX_VALUE, Integer.MAX_VALUE, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
 		
 		searchers_ready 		= new Vector<IRootSearch>();
 		searchers_notready 		= new Vector<IRootSearch>();
@@ -287,10 +292,6 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					}
 					
 					
-					int CHECK_INTERVAL_MIN = 15;
-					int CHECK_INTERVAL_MAX = 15;
-					int check_interval = CHECK_INTERVAL_MIN;
-					
 					long start_time = System.currentTimeMillis();
 					
 
@@ -442,15 +443,10 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 								}
 							}
 							
-							//if (lastSendInfo == null) {
-								//Wait some time and than make check again
-								Thread.sleep(check_interval);
-								
-								check_interval = 2 * check_interval;
-								if (check_interval > CHECK_INTERVAL_MAX) {
-									check_interval = CHECK_INTERVAL_MAX;
-								}
-							//}
+							
+							//Wait some time and than make check again
+							Thread.sleep(1);
+							
 							
 							try {
 								
