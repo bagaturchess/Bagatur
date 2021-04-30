@@ -52,7 +52,8 @@ public class NPSCollectorMediator extends SearchMediatorProxy {
 	//Collects info objects from all parallel searchers
 	public synchronized void changedMinor(ISearchInfo info) {
 		
-		ISearchInfo minor = combineMinorInfos(minor_buff_result);
+		ISearchInfo result = SearchInfoFactory.getFactory().createSearchInfo();
+		ISearchInfo minor = combineMinorInfos(result);
 		
 		minor.setCurrentMove(info.getCurrentMove());
 		minor.setCurrentMoveNumber(info.getCurrentMoveNumber());
@@ -60,8 +61,6 @@ public class NPSCollectorMediator extends SearchMediatorProxy {
 		super.changedMinor(minor);
 	}
 	
-	
-	private ISearchInfo minor_buff_result = SearchInfoFactory.getFactory().createSearchInfo();
 	
 	private ISearchInfo combineMinorInfos(ISearchInfo result) {
 		

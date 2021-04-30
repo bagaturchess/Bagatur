@@ -21,11 +21,15 @@ public class SearchersInfo {
 	private int cur_depth;
 	private double nextDepthThreshold;
 	
+	private Map<IRootSearch, ISearchInfo> searchersNodesInfo;
+	
 	
 	public SearchersInfo(int startDepth, double _nextDepthThreshold) {
 		searchersInfo = new HashMap<IRootSearch, SearcherInfo>();
 		cur_depth = startDepth;
 		nextDepthThreshold = _nextDepthThreshold;
+		
+		searchersNodesInfo = new HashMap<IRootSearch, ISearchInfo>();
 	}
 	
 	
@@ -34,7 +38,31 @@ public class SearchersInfo {
 	}
 	
 	
-	public void update(IRootSearch searcher, ISearchInfo info) {
+	public void updateNodesCount(IRootSearch searcher, ISearchInfo info) {
+		ISearchInfo oldInfo = searchersNodesInfo.get(searcher);
+		if (oldInfo == null)  {
+			searchersNodesInfo.put(searcher, info);
+		} else {
+			if (info.getSearchedNodes() > oldInfo.getSearchedNodes()) {
+				searchersNodesInfo.put(searcher, info);
+			}
+		}
+	}
+	
+	
+	private long getNodesCount() {
+		long nodes = 0;
+		for (IRootSearch searcher: searchersNodesInfo.keySet()) {
+			ISearchInfo info = searchersNodesInfo.get(searcher);
+			if (info != null) {
+				nodes += info.getSearchedNodes();
+			}
+		}
+		return nodes;
+	}
+	
+	
+	public void updateMajor(IRootSearch searcher, ISearchInfo info) {
 		
 		//Skip infos without PV and best move
 		if (info.isUpperBound()) {
@@ -120,13 +148,14 @@ public class SearchersInfo {
 	private ISearchInfo getAccumulatedInfo(int depth) {
 		
 		
-		long totalNodes = 0;
-		for (IRootSearch cur_searcher: searchersInfo.keySet()) {
+		long totalNodes = getNodesCount();
+		/*for (IRootSearch cur_searcher: searchersInfo.keySet()) {
 			SearcherInfo cur_searcher_infos = searchersInfo.get(cur_searcher);
 			if (cur_searcher_infos != null){
+				//System.out.println(cur_searcher_infos + " " + cur_searcher_infos.getSearchedNodes());
 				totalNodes += cur_searcher_infos.getSearchedNodes();
 			}
-		}
+		}*/
 		
 		
 		Map<Integer, MoveInfo> movesInfoPerDepth = new HashMap<Integer, MoveInfo>();
