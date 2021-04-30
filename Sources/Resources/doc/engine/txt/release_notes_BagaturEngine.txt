@@ -1,3 +1,8 @@
+Version 2.2b (30 April 2021)
+  * No changes in the single core version
+  * Fixes in nodes counting (NPS) in SMP version (reported by TCEC, Aloril)
+  * Optimizations in SMP version (reported by TCEC, Aloril)
+
 Version 2.2a (21 February 2021)
   * Optimizations of search and qsearch with small ELO increase (~15)
   * Bugfixing
