@@ -189,7 +189,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		
 		
 		//TODO: Searchers balancer - achieves specified CPUs load of the system by starting and stopping searchers
-		executor.execute(new Runnable() {
+		/*executor.execute(new Runnable() {
 			@Override
 			public void run() {
 				
@@ -230,7 +230,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					ChannelManager.getChannel().dump(t.getMessage());
 				}
 			}
-		});
+		});*/
 		
 		
 		executor.execute(new Runnable() {
@@ -445,7 +445,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							
 							
 							//Wait some time and than make check again
-							Thread.sleep(1);
+							Thread.sleep(15);
 							//System.out.println("SLEEP");
 							
 							try {

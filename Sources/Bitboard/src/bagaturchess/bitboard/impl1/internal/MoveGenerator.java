@@ -17,7 +17,7 @@ import java.util.Random;
 public final class MoveGenerator {
 	
 	
-	public static boolean USE_ContinuationHistory = true;
+	public static boolean USE_ContinuationHistory = false;
 	
 	
 	private final int[] moves = new int[3000];

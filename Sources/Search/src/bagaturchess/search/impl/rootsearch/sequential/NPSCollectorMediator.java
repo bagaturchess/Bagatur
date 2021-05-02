@@ -9,12 +9,15 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.utils.SearchMediatorProxy;
+import bagaturchess.uci.api.ChannelManager;
 
 
 public class NPSCollectorMediator extends SearchMediatorProxy {
 	
 	
 	private List<ISearchInfo> infos;
+	
+	private long startTime = System.currentTimeMillis();
 	
 	
 	public NPSCollectorMediator(ISearchMediator _parent) {
@@ -37,6 +40,9 @@ public class NPSCollectorMediator extends SearchMediatorProxy {
 		
 		ISearchInfo result = SearchInfoFactory.getFactory().createSearchInfo();
 		ISearchInfo minor = combineMinorInfos(result);
+		
+		//long secs = Math.max(1, (System.currentTimeMillis() - startTime) / 1000);
+		//ChannelManager.getChannel().sendLogToGUI(Thread.currentThread().getName() + " NPS: " + (minor.getSearchedNodes() / secs));
 		
 		minor.setPV(info.getPV());
 		minor.setBestMove(info.getBestMove());
