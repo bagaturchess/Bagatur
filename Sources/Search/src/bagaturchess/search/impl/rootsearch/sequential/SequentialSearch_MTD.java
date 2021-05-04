@@ -38,6 +38,7 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
+import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.sequential.mtd.Mediator_AlphaAndBestMoveWindow;
@@ -55,10 +56,13 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 	private ExecutorService executor;
 	private ISearch searcher;
 	
+	private PVManager pvman;
+	
 	
 	public SequentialSearch_MTD(Object[] args) {
 		super(args);
 		executor = Executors.newFixedThreadPool(1);
+		pvman = new PVManager(ISearch.MAX_DEPTH);
 	}
 	
 	
@@ -155,7 +159,7 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 							&& distribution.getCurrentDepth() <= distribution.getMaxIterations() //Condition for fixed depth
 							) {
 						
-						Runnable task = new NullwinSearchTask(searcher, distribution, getBitboardForSetup(),
+						Runnable task = new NullwinSearchTask(searcher, distribution, getBitboardForSetup(), pvman,
 								final_mediator, !go.isPonder(), final_prevPV
 																);
 						//if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDSequentialSearch in loop : task.run()");

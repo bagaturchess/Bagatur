@@ -50,17 +50,17 @@ public class NullwinSearchTask implements Runnable {
 	
 	private List<Integer> pv_buffer = new ArrayList<Integer>();
 	
-	PVManager pvman;
+	private PVManager pvman;
 	
 	public NullwinSearchTask(ISearch _searcher, SearchManager _distribution,
-			IBitBoard _bitboard, ISearchMediator _mediator, boolean _useMateDistancePrunning, int[] _prevPV) {
+			IBitBoard _bitboard, PVManager _pvman, ISearchMediator _mediator, boolean _useMateDistancePrunning, int[] _prevPV) {
 		searcher = _searcher;
 		distribution = _distribution;
 		bitboard = _bitboard;
 		mediator = _mediator;
 		useMateDistancePrunning = _useMateDistancePrunning;
 		prevPV = _prevPV;
-		pvman = new PVManager(ISearch.MAX_DEPTH);
+		pvman = _pvman;
 	}
 	
 	
