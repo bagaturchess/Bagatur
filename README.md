@@ -25,6 +25,7 @@ Although the ELO strength of the experimential version is with 50 ELO less than 
 # Bagatur is powered by <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>
 
 ![YourKit Logo](https://www.yourkit.com/images/yklogo.png)
+
 This nice tool is used to find out and fix performance, scalability and memory allocation isses.
 In general YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling.
 
