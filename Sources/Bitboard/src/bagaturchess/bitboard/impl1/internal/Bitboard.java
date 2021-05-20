@@ -184,22 +184,22 @@ public class Bitboard {
 	public static final long WHITE_SPACE_ZONE = (RANK_2 | RANK_3 | RANK_4) & (FILE_C | FILE_D | FILE_E | FILE_F);
 	public static final long BLACK_SPACE_ZONE = (RANK_7 | RANK_6 | RANK_5) & (FILE_C | FILE_D | FILE_E | FILE_F);
 
-	public static long getWhitePawnAttacks(final long pawns) {
+	public static final long getWhitePawnAttacks(final long pawns) {
 		return pawns << 9 & Bitboard.NOT_FILE_H | pawns << 7 & Bitboard.NOT_FILE_A;
 	}
 
-	public static long getBlackPawnAttacks(final long pawns) {
+	public static final long getBlackPawnAttacks(final long pawns) {
 		return pawns >>> 9 & Bitboard.NOT_FILE_A | pawns >>> 7 & Bitboard.NOT_FILE_H;
 	}
 
-	public static long getPawnNeighbours(final long pawns) {
+	public static final long getPawnNeighbours(final long pawns) {
 		return pawns << 1 & Bitboard.NOT_FILE_H | pawns >>> 1 & Bitboard.NOT_FILE_A;
 	}
 
 	/**
 	 * @author Gerd Isenberg
 	 */
-	public static int manhattanCenterDistance(int sq) {
+	public static final int manhattanCenterDistance(int sq) {
 		int file = sq & 7;
 		int rank = sq >>> 3;
 		file ^= (file - 4) >>> 8;
@@ -207,25 +207,25 @@ public class Bitboard {
 		return (file + rank) & 7;
 	}
 
-	public static long getWhitePassedPawnMask(final int index) {
+	public static final long getWhitePassedPawnMask(final int index) {
 		if (index > 55) {
 			return 0;
 		}
 		return (FILES[index & 7] | FILES_ADJACENT[index & 7]) << ((index >>> 3 << 3) + 8);
 	}
 
-	public static long getBlackPassedPawnMask(final int index) {
+	public static final long getBlackPassedPawnMask(final int index) {
 		if (index < 8) {
 			return 0;
 		}
 		return (FILES[index & 7] | FILES_ADJACENT[index & 7]) >>> ((71 - index) >>> 3 << 3);
 	}
 
-	public static long getWhiteAdjacentMask(final int index) {
+	public static final long getWhiteAdjacentMask(final int index) {
 		return getWhitePassedPawnMask(index) & ~FILES[index & 7];
 	}
 
-	public static long getBlackAdjacentMask(final int index) {
+	public static final long getBlackAdjacentMask(final int index) {
 		return getBlackPassedPawnMask(index) & ~FILES[index & 7];
 	}
 }

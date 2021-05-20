@@ -205,11 +205,12 @@ public class MemoryConsumers {
 		int test_size1 = Math.min(256, availableMemory_in_MB) * 1000;
 		int test_size2 = Math.min(256, availableMemory_in_MB) * 100;
 		
+		int threadsCount = engineConfiguration.getThreadsCount();
 		
 		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, getPowerOf2SizeInMegabytes(engineConfiguration.getTPTUsagePercent(), availableMemory_in_MB));
 		ChannelManager.getChannel().dump("Transposition Table size is " + size_tpt + "MB"); 
 				
-		int size_ec = Math.max(SIZE_MIN_ENTRIES_EC, getPowerOf2SizeInMegabytes(engineConfiguration.getEvalCacheUsagePercent(), availableMemory_in_MB));
+		int size_ec = Math.max(SIZE_MIN_ENTRIES_EC, getPowerOf2SizeInMegabytes(engineConfiguration.getEvalCacheUsagePercent(), availableMemory_in_MB / threadsCount));
 		ChannelManager.getChannel().dump("Eval Cache size is " + size_ec + "MB");
 		
 		int size_pc = SIZE_MIN_ENTRIES_PEC;
@@ -228,14 +229,12 @@ public class MemoryConsumers {
 		tpt 			= new Vector<ITTable>();
 		
 		ITTable ttable = new TTable_Impl2(size_tpt);
-		IEvalCache ecache = new EvalCache_Impl2(size_ec);
 		
-		int threadsCount = engineConfiguration.getThreadsCount();
 		for (int i=0; i<threadsCount; i++) {
 			
 			tpt.add(ttable);
 			
-			evalCache.add(ecache);
+			evalCache.add(new EvalCache_Impl2(size_ec));
 			
 			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName());
 			pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
