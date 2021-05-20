@@ -15,6 +15,10 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
 
 
 # Revision History
+Version 2.2d (20 May 2021)
+  * SMP version: split evaluation cache per thread for better scalability on many CPUs
+  * Fix memory allocation problem in the data structure, which collects the best line
+
 Version 2.2c (2 May 2021)
   * SMP version: Disable ContinuationHistory as it consumes too much memory per each search thread. When the memory is close to the upper limit, the performance of the Java program is slow.
 
