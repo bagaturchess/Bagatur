@@ -1,4 +1,7 @@
 
+# Downloads
+ * The new versions of Bagatur are released as standard <a href="https://github.com/bagaturchess/Bagatur/releases">github releases here</a>.
+ * The old versions of Bagatur are available on <a href="https://drive.google.com/drive/folders/1eNcjxCkjbm8zZiAXB0zkgSfvcV9814xi?usp=sharing">Google Drive</a>.
 
 # Running the Program
 
@@ -12,7 +15,6 @@ The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engin
   * Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway). You may use win32 or win64 version depending on your choice.
   * E2-E4 and enjoy :-)
 * **Linux**, in the bin directory there are *.sh files for running
-
 
 # Revision History
 Version 2.2e (16 August 2021)
