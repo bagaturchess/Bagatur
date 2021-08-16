@@ -17,7 +17,7 @@ import java.util.Random;
 public final class MoveGenerator {
 	
 	
-	public static boolean USE_ContinuationHistory = false;
+	public static boolean USE_ContinuationHistory = true;
 	
 	
 	private final int[] moves = new int[3000];
@@ -117,7 +117,11 @@ public final class MoveGenerator {
 		int value1 = 100 * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex];
 		int value2 = 100 * HH_MOVES1[color][pieceType][toIndex] / BF_MOVES1[color][pieceType][toIndex];
 		int value3 = USE_ContinuationHistory ? getContinuationHistoryScore(color, pieceType, toIndex, parentMove) : 0;
-		return Math.max(value1, Math.max(value2, value3));
+		if (USE_ContinuationHistory) {
+			return value3;
+		} else {
+			return Math.max(value1, Math.max(value2, value3));
+		}
 	}
 	
 	
