@@ -1,3 +1,7 @@
+Version 2.2e (16 August 2021)
+  * Enable ContinuationHistory as it is obviously the best option for move ordering. Without it, the engine performs with 50 ELO less.
+  * The SMP version still scales well on many CPUs after splitting the evaluation cache per each thread.
+  
 Version 2.2d (20 May 2021)
   * SMP version: split evaluation cache per thread for better scalability on many CPUs
   * Fix memory allocation problem in the data structure, which collects the best line
