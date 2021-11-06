@@ -28,32 +28,28 @@ import bagaturchess.bitboard.impl1.internal.Util;
 
 public class EvalCache_Impl2 implements IEvalCache {
 	
-	private int POWER_2_ENTRIES;
-	
-	private int keyShifts;
-	public int maxEntries;
 	
 	private long[] keys;
 	
-	private long counter_tries;
-	private long counter_hits;
+	private long tries;
+	
+	private long hits;
 	
 	
 	public EvalCache_Impl2(int sizeInMB) {
 		
-		POWER_2_ENTRIES = (int) (Math.log(sizeInMB) / Math.log(2) + 16);
+		int POWER_2_ENTRIES = (int) (Math.log(sizeInMB) / Math.log(2) + 16);
 		
-		keyShifts = 64 - POWER_2_ENTRIES;
-		maxEntries = (int) Util.POWER_LOOKUP[POWER_2_ENTRIES];
+		int maxEntries = 2 * (int) Util.POWER_LOOKUP[POWER_2_ENTRIES];
 		
-		keys = new long[2 * maxEntries];
+		keys = new long[maxEntries];
 	}
 	
 	
 	@Override
 	public void get(long key, IEvalEntry entry) {
 		
-		counter_tries++;
+		tries++;
 		
 		entry.setIsEmpty(true);
 		
@@ -74,12 +70,24 @@ public class EvalCache_Impl2 implements IEvalCache {
 	
 	@Override
 	public int getHitRate() {
-		return (int) (counter_hits * 100 / counter_tries);
+		return (int) (hits * 100 / tries);
 	}
 	
 	
 	private int getIndex(final long key) {
-		return (int) (key >>> keyShifts);
+		
+		int index = (int) (key ^ (key >>> 32));
+		
+		if (index < 0) {
+			
+			index = -index;
+		}
+		
+		index = index % keys.length;
+		
+		index = 2 * (index / 2);
+		
+		return index;
 	}
 	
 	
@@ -89,7 +97,7 @@ public class EvalCache_Impl2 implements IEvalCache {
 		final long score = keys[index + 1];
 		if (storedKey == keys[index]) {//Optimistic read locking
 			if ((storedKey ^ score) == key) {
-				counter_hits++;
+				hits++;
 				return (int) score;
 			}
 		}

@@ -25,7 +25,6 @@ package bagaturchess.search.impl.tpt;
 
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
-import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.Util;
 import bagaturchess.uci.api.ChannelManager;
 
@@ -33,52 +32,58 @@ import bagaturchess.uci.api.ChannelManager;
 public class TTable_Impl2 implements ITTable {
 	
 	
-	// ///////////////////// DEPTH //12 bits
-	private static final int FLAG = 12; // 2
-	private static final int MOVE = 14; // 22
-	private static final int SCORE = 48; // 16
+	private static final int FLAG = 12;
+	private static final int MOVE = 14;
+	private static final int SCORE = 48;
 	
-	
-	private int keyShifts;
-	public int maxEntries;
 
 	private long[] keys;
+	
 	private long[] values;
-
-	private long usageCounter;
+	
+	private long counter_usage;
+	
+	private long counter_tries;
+	
+	private long counter_hits;
 	
 	
 	public TTable_Impl2(int sizeInMB) {
 		
 		ChannelManager.getChannel().dump("TTable_Impl2: Math.log(sizeInMB) / Math.log(2)=" + (Math.log(sizeInMB) / Math.log(2)));
 		
-		int POWER_2_ENTRIES = (int) (Math.log(sizeInMB) / Math.log(2) + 17);
+		int POWER_2_ENTRIES = (int) (Math.log(sizeInMB) / Math.log(2) + 16);
 		
 		POWER_2_ENTRIES = Math.min(30, POWER_2_ENTRIES);
 		
 		ChannelManager.getChannel().dump("TTable_Impl2: POWER_2_ENTRIES=" + POWER_2_ENTRIES);
 		
-		keyShifts = 64 - POWER_2_ENTRIES;
-		
-		ChannelManager.getChannel().dump("TTable_Impl2: keyShifts=" + keyShifts);
-		
 		//Can have MAX 2^31-1 entries in Java. The array indexes are integers.
-		//Max possible at the moment is 2^30-1:
+		//Max possible at the moment is 2^30:
 		//info string TTable_Impl2: POWER_2_ENTRIES=31
 		//info string TTable_Impl2: maxEntries=1073741823
-		maxEntries = (int) (Util.POWER_LOOKUP[POWER_2_ENTRIES] - 1);
+		int maxEntries = (int) (Util.POWER_LOOKUP[POWER_2_ENTRIES] + 3);
 
 		ChannelManager.getChannel().dump("TTable_Impl2: maxEntries=" + maxEntries);
 		
-		keys = null;
-		values = null;
-		
 		keys = new long[maxEntries];
+		
 		values = new long[maxEntries];
-		usageCounter = 0;
 	}
 
 
+	@Override
+	public int getUsage() {
+		return (int) (counter_usage * 100 / keys.length);
+	}
+	
+	
+	@Override
+	public int getHitRate() {
+		return (int) (counter_hits * 100 / counter_tries);
+	}
+	
+	
 	@Override
 	public void correctAllDepths(final int reduction) {
 	}
@@ -87,16 +92,39 @@ public class TTable_Impl2 implements ITTable {
 	@Override
 	public void get(long key, ITTEntry entry) {
 		
-		entry.setIsEmpty(true);
+		counter_tries++;
+		
+		if (counter_tries % 100000000 == 0) {
+			ChannelManager.getChannel().dump("TTable_Impl2.get: TableID=" + this.hashCode() + ", HitRate=" + getHitRate() + "%, Usage=" + getUsage() + "%");
+		}
 		
 		long value = getTTValue(key);
 		
-		if (value != 0) {
-			entry.setIsEmpty(false);
-			entry.setDepth(getDepth(value));
-			entry.setFlag(getFlag(value));
-			entry.setEval(getScore(value));
-			entry.setBestMove(getMove(value));
+		if (entry.isEmpty()) {
+			
+			if (value != 0) {
+				
+				entry.setIsEmpty(false);
+				
+				entry.setDepth(getDepth(value));
+				entry.setFlag(getFlag(value));
+				entry.setEval(getScore(value));
+				entry.setBestMove(getMove(value));
+			}
+			
+		} else {
+			
+			if (value != 0) {
+				
+				if (getDepth(value) > entry.getDepth()) {
+					
+					//entry.setIsEmpty(false);
+					entry.setDepth(getDepth(value));
+					entry.setFlag(getFlag(value));
+					entry.setEval(getScore(value));
+					entry.setBestMove(getMove(value));
+				}
+			}
 		}
 	}
 	
@@ -111,12 +139,6 @@ public class TTable_Impl2 implements ITTable {
 		}
 		addValue(hashkey, eval, depth, flag, bestmove);
 	}
-
-	
-	@Override
-	public int getUsage() {
-		return (int) (usageCounter * 100 / maxEntries);
-	}
 	
 	
 	private long getTTValue(final long key) {
@@ -124,8 +146,17 @@ public class TTable_Impl2 implements ITTable {
 		final int index = getIndex(key);
 
 		for (int i = 0; i < 4; i++) {
-			long value = values[index + i];
-			if ((keys[index + i] ^ value) == key) {
+			
+			
+			long stored_key 	= keys[index + i];
+			
+			long value 			= values[index + i];
+			
+			
+			if ((stored_key ^ value) == key) {
+				
+				counter_hits++;
+				
 				return value;
 			}
 		}
@@ -135,7 +166,19 @@ public class TTable_Impl2 implements ITTable {
 	
 	
 	private int getIndex(final long key) {
-		return (int) (key >>> keyShifts);
+		
+		int index = (int) (key ^ (key >>> 32));
+		
+		if (index < 0) {
+			
+			index = -index;
+		}
+		
+		index = index % (keys.length - 3);
+		
+		index = 4 * (index / 4);
+		
+		return index;
 	}
 	
 	
@@ -155,24 +198,32 @@ public class TTable_Impl2 implements ITTable {
 
 			if (keys[i] == 0) {
 				replacedIndex = i;
-				usageCounter++;
+				counter_usage++;
 				break;
 			}
 
 			long currentValue = values[i];
+			
 			int currentDepth = getDepth(currentValue);
+			
 			if ((keys[i] ^ currentValue) == key) {
+				
 				if (currentDepth > depth /*&& flag != ITTEntry.FLAG_EXACT*/) {
-					return;
+					
+					continue;
 				}
+				
 				replacedIndex = i;
+				
 				break;
 			}
-
+			
 			// replace the lowest depth
 			if (currentDepth < replacedDepth) {
-				replacedIndex = i;
+				
 				replacedDepth = currentDepth;
+				
+				replacedIndex = i;
 			}
 		}
 		
@@ -187,6 +238,7 @@ public class TTable_Impl2 implements ITTable {
 	
 	
 	private static int getScore(final long value) {
+		
 		int score = (int) (value >> SCORE);
 
 		if (EngineConstants.ASSERT) {

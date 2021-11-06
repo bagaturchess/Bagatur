@@ -1,3 +1,9 @@
+Version 2.2g (6 November 2021)
+  * Improvements in the SMP version
+  - Still the same idea of having separate transposition table for 32 threads
+  - All threads are now using all transposition tables (if they are more than 1)
+  - Bug fixing of version 2.2f
+  
 Version 2.2f (6 November 2021)
   * Improvements for the SMP version
   * Set max memory to 33GB for Windows and 96 GB for Linux

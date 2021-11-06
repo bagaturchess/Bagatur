@@ -117,22 +117,12 @@ public class SearchEnv {
 	
 	
 	public ITTable getTPT() {
-		if (tpt == null) {
-			tpt = shared.getAndRemoveTPT();
-		}
-		return tpt;
+		return shared.getTranspositionTableProvider().getTPT();
 	}
 	
 	
 	public ITTable getTPTQS() {
-		/*if (tpt_qs == null) {
-			tpt_qs = shared.getAndRemoveTPTQS();
-		}
-		return tpt_qs;*/
-		if (tpt == null) {
-			tpt = shared.getAndRemoveTPT();
-		}
-		return tpt;
+		throw new IllegalStateException();
 	}
 	
 	

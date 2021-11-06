@@ -3,6 +3,7 @@ package bagaturchess.search.impl.env;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -22,6 +23,7 @@ import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.tpt.TTable_Impl1;
 import bagaturchess.search.impl.tpt.TTable_Impl2;
+import bagaturchess.search.impl.tpt.TranspositionTableProvider;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.api.IChannel;
 
@@ -70,9 +72,9 @@ public class MemoryConsumers {
 	//private SeeMetadata seeMetadata;
 	private OpeningBook openingBook;
 	
+	private TranspositionTableProvider ttable_provider;
 	private List<IEvalCache> evalCache;
 	private List<PawnsEvalCache> pawnsCache;
-	private List<ITTable> tpt;
 	
 	private IChannel channel;
 	
@@ -112,25 +114,16 @@ public class MemoryConsumers {
 		//	throw new IllegalStateException("Not enough memory. The engine needs from at least 64MB to run. Please increase the -Xmx option of Java VM");
 		//}
 		
-		long availableMemory = (long) (MEMORY_USAGE_PERCENT * getAvailableMemory());
-		long memoryBuffer = getAvailableMemory() - availableMemory;
-		if (memoryBuffer < MIN_MEMORY_BUFFER) {
-			memoryBuffer = MIN_MEMORY_BUFFER;
-			availableMemory = getAvailableMemory() - MIN_MEMORY_BUFFER;
-		}
 		
-		ChannelManager.getChannel().dump("JVM DLL memory consumption: " + (JVMDLL_MEMORY_CONSUMPTION / (1024 * 1024)) + "MB");
-		
-		ChannelManager.getChannel().dump("Available memory for the java process " + (getAvailableMemory() / (1024 * 1024)) + "MB");
 		ChannelManager.getChannel().dump("Defined memory usage percent " + (MEMORY_USAGE_PERCENT * 100) + "%");
-		ChannelManager.getChannel().dump("Memory the Engine will use " + (availableMemory / (1024 * 1024)) + "MB");
+		ChannelManager.getChannel().dump("Memory the Engine will use " + (getAvailableMemory() / (1024 * 1024)) + "MB");
 		
 		ChannelManager.getChannel().dump("Initializing Memory Consumers ...");
 		
-		ChannelManager.getChannel().dump("SEE Metadata ... ");
+		//ChannelManager.getChannel().dump("SEE Metadata ... ");
 		long lastAvailable_in_MB = ((getAvailableMemory()) / (1024 * 1024));
 		//seeMetadata = SeeMetadata.getSingleton();
-		ChannelManager.getChannel().dump("SEE Metadata OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
+		//ChannelManager.getChannel().dump("SEE Metadata OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
 		
 		
 		ChannelManager.getChannel().dump("Openning Book enabled: " + ownBookEnabled);
@@ -172,6 +165,7 @@ public class MemoryConsumers {
 		
 		
 		if (engineConfiguration.initCaches()) {
+			
 			ChannelManager.getChannel().dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
 			ChannelManager.getChannel().dump("Transposition Table usage percent from the free memory " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
 			ChannelManager.getChannel().dump("Eval Cache usage percent from the free memory " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
@@ -185,40 +179,47 @@ public class MemoryConsumers {
 				throw new IllegalStateException("Percents sum is not near to 1. It is " + percents_sum);
 			}
 			
-			initCaches(getAvailableMemory() - memoryBuffer);
+			initCaches(getAvailableMemory());
 		}
 		
-		ChannelManager.getChannel().dump("Memory Consumers are initialized. Final available memory buffer is: " + (memoryBuffer / (1024 * 1024)) + "MB");
+		ChannelManager.getChannel().dump("Memory Consumers are initialized.");
 	}
 	
 	
 	private void initCaches(long availableMemory) {
 		
+		
 		ChannelManager.getChannel().dump("Initializing caches inside " + (int) (availableMemory / (1024 * 1024)) + "MB");
 		
-		//if (availableMemory / (1024 * 1024) < 10) {
-		//	throw new IllegalStateException("Not enough memory. At least 10 MB are necessary for caches (only "
-		//			+ (availableMemory / (1024 * 1024)) + " are available). Please increase the -Xmx option of Java VM");
-		//}
 		
-		//98GB = 100352MB
-		int availableMemory_in_MB = (int) (availableMemory / (1024 * 1024));
-		//int test_size1 = Math.min(256, availableMemory_in_MB) * 1000;
-		//int test_size2 = Math.min(256, availableMemory_in_MB) * 100;
+		int THREADS_COUNT 				= engineConfiguration.getThreadsCount();
+		int TRANSPOSITION_TABLES_COUNT 	= Math.max(1, THREADS_COUNT / 32);
 		
-		int threadsCount = engineConfiguration.getThreadsCount();
+		ChannelManager.getChannel().dump("Threads are " + THREADS_COUNT);
+		ChannelManager.getChannel().dump(TRANSPOSITION_TABLES_COUNT + " Transposition Table will be created.");
 		
-		//0-15 = 0
-		//16-31 = 1
-		//32-47 = 2
-		//...
-		int THREADS_PER_GROUP = 32;
-		int threadsGroupsCount = 1 + threadsCount / THREADS_PER_GROUP;
 		
-		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, getPowerOf2SizeInMegabytes(engineConfiguration.getTPTUsagePercent(), availableMemory_in_MB / threadsGroupsCount));
-		ChannelManager.getChannel().dump("Transposition Table size is " + size_tpt + "MB"); 
-				
-		int size_ec = Math.max(SIZE_MIN_ENTRIES_EC, getPowerOf2SizeInMegabytes(engineConfiguration.getEvalCacheUsagePercent(), availableMemory_in_MB / threadsCount));
+		int availableMemory_in_MB 		= (int) (availableMemory / (1024 * 1024));
+		
+		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, getPowerOf2SizeInMegabytes((int) (engineConfiguration.getTPTUsagePercent() * availableMemory_in_MB) / TRANSPOSITION_TABLES_COUNT));
+		ChannelManager.getChannel().dump("Transposition Table size will be " + size_tpt + "MB"); 
+		
+		
+		List<ITTable> ttables = new ArrayList<ITTable>();
+		
+		for (int i = 0; i < TRANSPOSITION_TABLES_COUNT; i++) {
+			
+			ChannelManager.getChannel().dump("Creating Transposition Table for the current Threads Group ...");
+			ITTable current_ttable = new TTable_Impl2(size_tpt);
+			ChannelManager.getChannel().dump("Transposition Table created.");
+			
+			ttables.add(current_ttable);
+		}
+		
+		ttable_provider = new TranspositionTableProvider(ttables);
+		
+		
+		int size_ec = 2 * Math.max(SIZE_MIN_ENTRIES_EC, getPowerOf2SizeInMegabytes((int) (engineConfiguration.getEvalCacheUsagePercent() * availableMemory_in_MB) / THREADS_COUNT));
 		ChannelManager.getChannel().dump("Eval Cache size is " + size_ec + "MB");
 		
 		int size_pc = SIZE_MIN_ENTRIES_PEC;
@@ -230,23 +231,15 @@ public class MemoryConsumers {
 			ChannelManager.getChannel().dump("Endgame Table Bases cache (OUT) size is " + size_gtb_out);
 		}*/
 		
-		//Create
 		
+		//Create
 		evalCache 		= new Vector<IEvalCache>();
 		pawnsCache		= new Vector<PawnsEvalCache>();
-		tpt 			= new Vector<ITTable>();
 		
 		
-		ITTable current_thread_group_ttable = null;
-		
-		for (int i = 0; i < threadsCount; i++) {
+		for (int i = 0; i < THREADS_COUNT; i++) {
 			
-			if (i % THREADS_PER_GROUP == 0) {
-				
-				current_thread_group_ttable = new TTable_Impl2(size_tpt);
-			}
-			
-			tpt.add(current_thread_group_ttable);
+			int ttable_index = i % ttables.size();
 			
 			evalCache.add(new EvalCache_Impl2(size_ec));
 			
@@ -256,25 +249,31 @@ public class MemoryConsumers {
 	}
 	
 	
-	private int getPowerOf2SizeInMegabytes(double percent, int availableMemory_in_MB) {
-		int size = (int) Math.pow(2, (int)(Math.log(percent * availableMemory_in_MB) / Math.log(2)));
+	private int getPowerOf2SizeInMegabytes(int availableMemory_in_MB) {
+		int size = (int) Math.pow(2, (int) (Math.log(availableMemory_in_MB) / Math.log(2)));
+		if (size < 32) {
+			size = 32;
+		}
 		return size;
 	}
+	
+	
+	/*private int getPowerOf2SizeInMegabytes_Minus(int availableMemory_in_MB) {
+		int size = (int) Math.pow(2, -2 + (int) (Math.log(availableMemory_in_MB) / Math.log(2)));
+		if (size < 32) {
+			size = 32;
+		}
+		return size;
+	}*/
 	
 	
 	private long getAvailableMemory() {
 		
 		System.gc();
-		//System.gc();
-		//System.gc();
 		
-		return Runtime.getRuntime().maxMemory() - getStaticMemory();
+		return (long) (MEMORY_USAGE_PERCENT * Runtime.getRuntime().maxMemory());
 	}
-	
-	
-	private static int getStaticMemory() {
-		return JVMDLL_MEMORY_CONSUMPTION;// + EGTBDLL_MEMORY_CONSUMPTION;
-	}
+
 	
 	
 	private static int getJVMBitmode() {
@@ -301,8 +300,8 @@ public class MemoryConsumers {
 	}
 
 
-	public List<ITTable> getTPT() {
-		return tpt;
+	public TranspositionTableProvider getTPTProvider() {
+		return ttable_provider;
 	}
 	
 	
@@ -316,7 +315,7 @@ public class MemoryConsumers {
 	}
 	
 	public void clear() {
-		if (tpt != null) tpt.clear();
+		if (ttable_provider != null) ttable_provider.clear();
 		if (evalCache != null) evalCache.clear();
 		if (pawnsCache != null) pawnsCache.clear();
 	}

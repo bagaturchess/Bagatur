@@ -29,5 +29,5 @@ public interface ITTable {
 	public void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove);
 	public void correctAllDepths(int reduction);
 	public int getUsage();
-
+	public int getHitRate();
 }
