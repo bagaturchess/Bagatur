@@ -201,13 +201,21 @@ public class MemoryConsumers {
 		//			+ (availableMemory / (1024 * 1024)) + " are available). Please increase the -Xmx option of Java VM");
 		//}
 		
+		//98GB = 100352MB
 		int availableMemory_in_MB = (int) (availableMemory / (1024 * 1024));
-		int test_size1 = Math.min(256, availableMemory_in_MB) * 1000;
-		int test_size2 = Math.min(256, availableMemory_in_MB) * 100;
+		//int test_size1 = Math.min(256, availableMemory_in_MB) * 1000;
+		//int test_size2 = Math.min(256, availableMemory_in_MB) * 100;
 		
 		int threadsCount = engineConfiguration.getThreadsCount();
 		
-		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, getPowerOf2SizeInMegabytes(engineConfiguration.getTPTUsagePercent(), availableMemory_in_MB));
+		//0-15 = 0
+		//16-31 = 1
+		//32-47 = 2
+		//...
+		int THREADS_PER_GROUP = 32;
+		int threadsGroupsCount = 1 + threadsCount / THREADS_PER_GROUP;
+		
+		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, getPowerOf2SizeInMegabytes(engineConfiguration.getTPTUsagePercent(), availableMemory_in_MB / threadsGroupsCount));
 		ChannelManager.getChannel().dump("Transposition Table size is " + size_tpt + "MB"); 
 				
 		int size_ec = Math.max(SIZE_MIN_ENTRIES_EC, getPowerOf2SizeInMegabytes(engineConfiguration.getEvalCacheUsagePercent(), availableMemory_in_MB / threadsCount));
@@ -228,11 +236,17 @@ public class MemoryConsumers {
 		pawnsCache		= new Vector<PawnsEvalCache>();
 		tpt 			= new Vector<ITTable>();
 		
-		ITTable ttable = new TTable_Impl2(size_tpt);
 		
-		for (int i=0; i<threadsCount; i++) {
+		ITTable current_thread_group_ttable = null;
+		
+		for (int i = 0; i < threadsCount; i++) {
 			
-			tpt.add(ttable);
+			if (i % THREADS_PER_GROUP == 0) {
+				
+				current_thread_group_ttable = new TTable_Impl2(size_tpt);
+			}
+			
+			tpt.add(current_thread_group_ttable);
 			
 			evalCache.add(new EvalCache_Impl2(size_ec));
 			
@@ -240,7 +254,8 @@ public class MemoryConsumers {
 			pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
 		}		
 	}
-
+	
+	
 	private int getPowerOf2SizeInMegabytes(double percent, int availableMemory_in_MB) {
 		int size = (int) Math.pow(2, (int)(Math.log(percent * availableMemory_in_MB) / Math.log(2)));
 		return size;

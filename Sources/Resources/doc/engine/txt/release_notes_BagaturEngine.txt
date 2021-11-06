@@ -1,3 +1,11 @@
+Version 2.2f (6 November 2021)
+  * Improvements for the SMP version
+  * Set max memory to 33GB for Windows and 96 GB for Linux
+  * Start threads per groups of 32 with separate transposition table for each group.
+  * In Java the arrays cannot be bigger than ~30GB.
+  * The recommended memory per thread is 1GB.
+  * With around 32GB per thread group, this setting should have excellent effect with 32, 64, 128, 256 and more threads.
+
 Version 2.2e (16 August 2021)
   * Enable ContinuationHistory as it is obviously the best option for move ordering. Without it, the engine performs with 50 ELO less.
   * The SMP version still scales well on many CPUs after splitting the evaluation cache per each thread.

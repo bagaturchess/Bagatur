@@ -12,7 +12,7 @@ export JARS_PATH=".:${BIN_PATH}BagaturBoard.jar:${BIN_PATH}BagaturOpening.jar:${
 
 # Sets the memory (in megabytes) for the WHOLE java process.
 # Only one part of this memory (up to 65%) will be used for Transposition Table.
-export PROCESS_MEMORY=8192M
+set PROCESS_MEMORY=96G
 
 export ARGS=bagaturchess.engines.cfg.base.UCIConfig_BaseImpl
 export ARGS="${ARGS} bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove"
@@ -27,5 +27,5 @@ export ARGS="${ARGS} bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig
 # Executes the java process of the Bagatur engine with parallel search. It uses all CPU Cores.
 # Sometimes, the engine performs a sequential search for depth below 6 because of performance reasons.
 # The idea is to optimize the engine work for short time controls (1 move for 1 second or less). 
-java -Xmx${PROCESS_MEMORY} -Djava.library.path=${BIN_PATH} -cp "${JARS_PATH}" bagaturchess.uci.run.Boot ${ARGS}
+exec java -Xmx${PROCESS_MEMORY} -Djava.library.path=${BIN_PATH} -cp "${JARS_PATH}" bagaturchess.uci.run.Boot ${ARGS}
 

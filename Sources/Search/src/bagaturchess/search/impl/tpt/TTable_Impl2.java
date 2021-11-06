@@ -27,6 +27,7 @@ import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.bitboard.impl1.internal.Util;
+import bagaturchess.uci.api.ChannelManager;
 
 
 public class TTable_Impl2 implements ITTable {
@@ -49,10 +50,26 @@ public class TTable_Impl2 implements ITTable {
 	
 	public TTable_Impl2(int sizeInMB) {
 		
-		int POWER_2_ENTRIES = (int) (Math.log(sizeInMB) / Math.log(2) + 16);
+		ChannelManager.getChannel().dump("TTable_Impl2: Math.log(sizeInMB) / Math.log(2)=" + (Math.log(sizeInMB) / Math.log(2)));
+		
+		int POWER_2_ENTRIES = (int) (Math.log(sizeInMB) / Math.log(2) + 17);
+		
+		POWER_2_ENTRIES = Math.min(30, POWER_2_ENTRIES);
+		
+		ChannelManager.getChannel().dump("TTable_Impl2: POWER_2_ENTRIES=" + POWER_2_ENTRIES);
+		
 		keyShifts = 64 - POWER_2_ENTRIES;
-		maxEntries = (int) Util.POWER_LOOKUP[POWER_2_ENTRIES] + 3;
+		
+		ChannelManager.getChannel().dump("TTable_Impl2: keyShifts=" + keyShifts);
+		
+		//Can have MAX 2^31-1 entries in Java. The array indexes are integers.
+		//Max possible at the moment is 2^30-1:
+		//info string TTable_Impl2: POWER_2_ENTRIES=31
+		//info string TTable_Impl2: maxEntries=1073741823
+		maxEntries = (int) (Util.POWER_LOOKUP[POWER_2_ENTRIES] - 1);
 
+		ChannelManager.getChannel().dump("TTable_Impl2: maxEntries=" + maxEntries);
+		
 		keys = null;
 		values = null;
 		
