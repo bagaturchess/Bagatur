@@ -1,3 +1,6 @@
+Version 2.2h (11 November 2021)
+  * Destroy the old transposition table before creating a new one (when it have to be re-created). This prevents potential OutOfMemory errors.
+
 Version 2.2g (6 November 2021)
   * Improvements in the SMP version
   - Still the same idea of having separate transposition table for 32 threads

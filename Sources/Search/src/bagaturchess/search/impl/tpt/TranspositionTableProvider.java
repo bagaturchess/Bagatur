@@ -41,7 +41,7 @@ public class TranspositionTableProvider implements ITTable {
 
 
 	public void clear() {
-		//Do nothing
+		tpts.clear();
 	}
 
 
