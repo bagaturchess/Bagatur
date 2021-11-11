@@ -162,7 +162,7 @@ public class TTable_Impl2 implements ITTable {
 	
 	private int getIndex(final long key) {
 		
-		int index = (int) (key ^ (key >>> 32));
+		long index = (int) (key ^ (key >>> 32));
 		
 		if (index < 0) {
 			
@@ -173,7 +173,7 @@ public class TTable_Impl2 implements ITTable {
 		
 		index = 4 * (index / 4);
 		
-		return index;
+		return (int) index;
 	}
 	
 	

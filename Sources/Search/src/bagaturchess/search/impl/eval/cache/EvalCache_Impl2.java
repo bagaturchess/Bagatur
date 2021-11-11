@@ -23,7 +23,6 @@
 package bagaturchess.search.impl.eval.cache;
 
 
-import bagaturchess.bitboard.impl1.internal.Util;
 import bagaturchess.uci.api.ChannelManager;
 
 
@@ -84,7 +83,7 @@ public class EvalCache_Impl2 implements IEvalCache {
 	
 	private int getIndex(final long key) {
 		
-		int index = (int) (key ^ (key >>> 32));
+		long index = (int) (key ^ (key >>> 32));
 		
 		if (index < 0) {
 			
@@ -95,7 +94,7 @@ public class EvalCache_Impl2 implements IEvalCache {
 		
 		index = 2 * (index / 2);
 		
-		return index;
+		return (int) index;
 	}
 	
 	
