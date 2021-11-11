@@ -1,3 +1,7 @@
+Version 2.2i (11 November 2021)
+  * Additional fixes to prevent potential Java OutOfMemory errors
+  - Reduce 2 times memory allocations for transposition tables and evaluation caches in order to be on the safe side for now.
+
 Version 2.2h (11 November 2021)
   * Destroy the old transposition table before creating a new one (when it have to be re-created). This prevents potential OutOfMemory errors.
 

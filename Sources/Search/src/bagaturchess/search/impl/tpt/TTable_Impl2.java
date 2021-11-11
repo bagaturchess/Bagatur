@@ -48,27 +48,22 @@ public class TTable_Impl2 implements ITTable {
 	private long counter_hits;
 	
 	
-	public TTable_Impl2(int sizeInMB) {
+	public TTable_Impl2(long size) {
 		
-		ChannelManager.getChannel().dump("TTable_Impl2: Math.log(sizeInMB) / Math.log(2)=" + (Math.log(sizeInMB) / Math.log(2)));
+		ChannelManager.getChannel().dump("TTable_Impl2: bytes_count=" + size);
 		
-		int POWER_2_ENTRIES = (int) (Math.log(sizeInMB) / Math.log(2) + 16);
+		long maxEntries = size / 16; //two longs per entry and one long has 8 bytes: 2 * 8 = 16
 		
-		POWER_2_ENTRIES = Math.min(30, POWER_2_ENTRIES);
+		if (maxEntries > 1073741823) { //1073741823 = 2^30 - 1 (should work on 32 and 64 bits), 2147483647 = 2^31 - 1 (should work on 64 bits only)
+			maxEntries = 1073741823;
+			ChannelManager.getChannel().dump("TTable_Impl2: limited to " + 1073741823 + " entries.");
+		}
 		
-		ChannelManager.getChannel().dump("TTable_Impl2: POWER_2_ENTRIES=" + POWER_2_ENTRIES);
-		
-		//Can have MAX 2^31-1 entries in Java. The array indexes are integers.
-		//Max possible at the moment is 2^30:
-		//info string TTable_Impl2: POWER_2_ENTRIES=31
-		//info string TTable_Impl2: maxEntries=1073741823
-		int maxEntries = (int) (Util.POWER_LOOKUP[POWER_2_ENTRIES] + 3);
-
 		ChannelManager.getChannel().dump("TTable_Impl2: maxEntries=" + maxEntries);
 		
-		keys = new long[maxEntries];
+		keys = new long[(int) maxEntries];
 		
-		values = new long[maxEntries];
+		values = new long[(int) maxEntries];
 	}
 
 

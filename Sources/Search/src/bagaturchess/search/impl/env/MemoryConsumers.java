@@ -31,8 +31,6 @@ import bagaturchess.uci.api.IChannel;
 public class MemoryConsumers {
 	
 	
-	private static int JVMDLL_MEMORY_CONSUMPTION 						= 20 * 1024 * 1024;
-	private static int MIN_MEMORY_BUFFER 								= 0;
 	private static double MEMORY_USAGE_PERCENT 							= 0; 
 	
 	private static final int SIZE_MIN_ENTRIES_MULTIPLIER				= 111;
@@ -40,14 +38,6 @@ public class MemoryConsumers {
 	private static final int SIZE_MIN_ENTRIES_EC						= 4;
 	private static final int SIZE_MIN_ENTRIES_PEC						= 1 * SIZE_MIN_ENTRIES_MULTIPLIER;
 	
-	
-	public static void set_JVMDLL_MEMORY_CONSUMPTION(int val) {
-		JVMDLL_MEMORY_CONSUMPTION = val;	
-	}
-	
-	public static void set_MIN_MEMORY_BUFFER(int val) {
-		MIN_MEMORY_BUFFER = val;	
-	}
 	
 	public static void set_MEMORY_USAGE_PERCENT(double val) {
 		MEMORY_USAGE_PERCENT = val;	
@@ -98,12 +88,9 @@ public class MemoryConsumers {
 		 * The selection bellow is optimized for long games.
 		 */
 		
-		if (MIN_MEMORY_BUFFER == 0) {
-			MIN_MEMORY_BUFFER 		= 5 * 1024 * 1024;//Set only if not set statically
-		}
 		if (MEMORY_USAGE_PERCENT == 0) {
 			//0.29 for short games (e.g. 1/1), 0.69 for long games (e.g. 40/40)
-			double memoryUsagePercent = 0.75;//(engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.69 : 0.29;
+			double memoryUsagePercent = 1.00;//(engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.69 : 0.29;
 			MEMORY_USAGE_PERCENT = memoryUsagePercent;//Set only if not set statically
 		}
 		
@@ -116,12 +103,11 @@ public class MemoryConsumers {
 		
 		
 		ChannelManager.getChannel().dump("Defined memory usage percent " + (MEMORY_USAGE_PERCENT * 100) + "%");
-		ChannelManager.getChannel().dump("Memory the Engine will use " + (getAvailableMemory() / (1024 * 1024)) + "MB");
+		ChannelManager.getChannel().dump("Memory the Engine will use " + (getAvailableMemoryInBytes() / (1024 * 1024)) + "MB");
 		
 		ChannelManager.getChannel().dump("Initializing Memory Consumers ...");
 		
 		//ChannelManager.getChannel().dump("SEE Metadata ... ");
-		long lastAvailable_in_MB = ((getAvailableMemory()) / (1024 * 1024));
 		//seeMetadata = SeeMetadata.getSingleton();
 		//ChannelManager.getChannel().dump("SEE Metadata OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
 		
@@ -129,14 +115,13 @@ public class MemoryConsumers {
 		ChannelManager.getChannel().dump("Openning Book enabled: " + ownBookEnabled);
 		//if (ownBookEnabled) {
 
-			lastAvailable_in_MB = ((getAvailableMemory()) / (1024 * 1024));
 			ChannelManager.getChannel().dump("Openning Book ... ");
 			if (OpeningBookFactory.getBook() == null) {
 				ChannelManager.getChannel().dump("No openning book");
 			} else {
 				try {
 					openingBook = OpeningBookFactory.getBook();
-					ChannelManager.getChannel().dump("Openning Book OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
+					ChannelManager.getChannel().dump("Openning Book OK.");
 				} catch(Exception e) {
 					ChannelManager.getChannel().dump("Unable to load Openning Book. Error is:");
 					channel.dump(e);
@@ -175,21 +160,32 @@ public class MemoryConsumers {
 								+ engineConfiguration.getEvalCacheUsagePercent()
 								+ engineConfiguration.getPawnsCacheUsagePercent();
 			
-			if (percents_sum < 0.95 || percents_sum > 1.05) {
-				throw new IllegalStateException("Percents sum is not near to 1. It is " + percents_sum);
+			if (percents_sum <= 0 || percents_sum > 1) {
+				throw new IllegalStateException("Memory split percents sum is incorrect: " + percents_sum + ". It should be between 0 and 1");
 			}
 			
-			initCaches(getAvailableMemory());
+			//Continuation history tables consume 189MB each. There is one per thread.
+			long continuation_history_memory_in_bytes = engineConfiguration.getThreadsCount() * 189 * 1024 * 1024;
+			ChannelManager.getChannel().dump("Dedicated memory for Continuation History is " + (continuation_history_memory_in_bytes / (1024 * 1024)) + " MB");
+			
+			long availableMemoryInBytes = getAvailableMemoryInBytes() - continuation_history_memory_in_bytes;
+			
+			initCaches(availableMemoryInBytes);
 		}
 		
 		ChannelManager.getChannel().dump("Memory Consumers are initialized.");
 	}
 	
 	
-	private void initCaches(long availableMemory) {
+	private void initCaches(long availableMemoryInBytes) {
 		
 		
-		ChannelManager.getChannel().dump("Initializing caches inside " + (int) (availableMemory / (1024 * 1024)) + "MB");
+		ChannelManager.getChannel().dump("Initializing caches inside "
+				+ (int) (
+							(engineConfiguration.getTPTUsagePercent() + engineConfiguration.getEvalCacheUsagePercent() + engineConfiguration.getPawnsCacheUsagePercent())
+							* availableMemoryInBytes
+							/ (1024 * 1024)
+						) + "MB");
 		
 		
 		int THREADS_COUNT 				= engineConfiguration.getThreadsCount();
@@ -198,12 +194,7 @@ public class MemoryConsumers {
 		ChannelManager.getChannel().dump("Threads are " + THREADS_COUNT);
 		ChannelManager.getChannel().dump(TRANSPOSITION_TABLES_COUNT + " Transposition Table will be created.");
 		
-		
-		int availableMemory_in_MB 		= (int) (availableMemory / (1024 * 1024));
-		
-		int size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, getPowerOf2SizeInMegabytes((int) (engineConfiguration.getTPTUsagePercent() * availableMemory_in_MB) / TRANSPOSITION_TABLES_COUNT));
-		ChannelManager.getChannel().dump("Transposition Table size will be " + size_tpt + "MB"); 
-		
+		long size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, (long) ((engineConfiguration.getTPTUsagePercent() * availableMemoryInBytes) / TRANSPOSITION_TABLES_COUNT));
 		
 		List<ITTable> ttables = new ArrayList<ITTable>();
 		
@@ -219,11 +210,10 @@ public class MemoryConsumers {
 		ttable_provider = new TranspositionTableProvider(ttables);
 		
 		
-		int size_ec = 2 * Math.max(SIZE_MIN_ENTRIES_EC, getPowerOf2SizeInMegabytes((int) (engineConfiguration.getEvalCacheUsagePercent() * availableMemory_in_MB) / THREADS_COUNT));
-		ChannelManager.getChannel().dump("Eval Cache size is " + size_ec + "MB");
+		long size_ec = Math.max(SIZE_MIN_ENTRIES_EC, (long) ((engineConfiguration.getEvalCacheUsagePercent() * availableMemoryInBytes) / THREADS_COUNT));
 		
 		int size_pc = SIZE_MIN_ENTRIES_PEC;
-		ChannelManager.getChannel().dump("Pawns Eval Cache size is " + size_pc + " entries.");
+		//ChannelManager.getChannel().dump("Pawns Eval Cache size is " + size_pc + " entries.");
 		
 		/*int size_gtb_out = 0;
 		if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
@@ -232,14 +222,11 @@ public class MemoryConsumers {
 		}*/
 		
 		
-		//Create
+		//Eval caches
 		evalCache 		= new Vector<IEvalCache>();
 		pawnsCache		= new Vector<PawnsEvalCache>();
 		
-		
 		for (int i = 0; i < THREADS_COUNT; i++) {
-			
-			int ttable_index = i % ttables.size();
 			
 			evalCache.add(new EvalCache_Impl2(size_ec));
 			
@@ -249,25 +236,7 @@ public class MemoryConsumers {
 	}
 	
 	
-	private int getPowerOf2SizeInMegabytes(int availableMemory_in_MB) {
-		int size = (int) Math.pow(2, (int) (Math.log(availableMemory_in_MB) / Math.log(2)));
-		if (size < 32) {
-			size = 32;
-		}
-		return size;
-	}
-	
-	
-	/*private int getPowerOf2SizeInMegabytes_Minus(int availableMemory_in_MB) {
-		int size = (int) Math.pow(2, -2 + (int) (Math.log(availableMemory_in_MB) / Math.log(2)));
-		if (size < 32) {
-			size = 32;
-		}
-		return size;
-	}*/
-	
-	
-	private long getAvailableMemory() {
+	private long getAvailableMemoryInBytes() {
 		
 		System.gc();
 		

@@ -24,6 +24,7 @@ package bagaturchess.search.impl.eval.cache;
 
 
 import bagaturchess.bitboard.impl1.internal.Util;
+import bagaturchess.uci.api.ChannelManager;
 
 
 public class EvalCache_Impl2 implements IEvalCache {
@@ -36,13 +37,20 @@ public class EvalCache_Impl2 implements IEvalCache {
 	private long hits;
 	
 	
-	public EvalCache_Impl2(int sizeInMB) {
+	public EvalCache_Impl2(long size) {
 		
-		int POWER_2_ENTRIES = (int) (Math.log(sizeInMB) / Math.log(2) + 16);
+		ChannelManager.getChannel().dump("EvalCache_Impl2: bytes_count=" + size);
 		
-		int maxEntries = 2 * (int) Util.POWER_LOOKUP[POWER_2_ENTRIES];
+		long maxEntries = size / 8; //one long per entry and one long has 8 bytes
 		
-		keys = new long[maxEntries];
+		if (maxEntries > 1073741823) { //1073741823 = 2^30 - 1 (should work on 32 and 64 bits), 2147483647 = 2^31 - 1 (should work on 64 bits only)
+			maxEntries = 1073741823;
+			ChannelManager.getChannel().dump("EvalCache_Impl2: limited to " + 1073741823 + " entries.");
+		}
+		
+		ChannelManager.getChannel().dump("EvalCache_Impl2: maxEntries=" + maxEntries);
+		
+		keys = new long[(int) maxEntries];
 	}
 	
 	

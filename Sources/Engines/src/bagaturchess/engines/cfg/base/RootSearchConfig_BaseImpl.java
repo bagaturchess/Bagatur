@@ -19,9 +19,9 @@ import bagaturchess.uci.impl.commands.options.UCIOptionString;
 public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IUCIOptionsProvider {
 	
 	
-	protected static final double MEM_USAGE_TPT 		= 0.67;
-	protected static final double MEM_USAGE_EVALCACHE 	= 0.32;
-	protected static final double MEM_USAGE_PAWNCACHE 	= 0.01;
+	protected static final double MEM_USAGE_TPT 		= 0.50;
+	protected static final double MEM_USAGE_EVALCACHE 	= 0.25;
+	protected static final double MEM_USAGE_PAWNCACHE 	= 0.00;
 	
 	
 	private String DEFAULT_TbPath = (new File(".")).getAbsolutePath() + File.separatorChar + "data" + File.separatorChar + "egtb";
