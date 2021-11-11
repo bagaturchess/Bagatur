@@ -36,11 +36,15 @@ B_PAWN = 9, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING,
 PIECE_NB = 16
 };*/
 public class PieceToHistory {
+	
 	int[][] array = new int[16][64];
 	
 	PieceToHistory() {
+		
 		for (int i=0;i<16;i++) {
+			
 			for (int j=0;j<64;j++) {
+				
 				array[i][j] = 1;
 			}
 		}

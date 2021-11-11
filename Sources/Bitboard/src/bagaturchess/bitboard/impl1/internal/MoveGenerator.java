@@ -45,9 +45,11 @@ public final class MoveGenerator {
 	
 
 	public MoveGenerator() {
+		
 		clearHistoryHeuristics();
 		
 		if (USE_ContinuationHistory) {
+			
 			HH_ContinuationHistory[WHITE] = new ContinuationHistory();
 			HH_ContinuationHistory[BLACK] = new ContinuationHistory();
 			

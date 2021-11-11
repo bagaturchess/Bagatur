@@ -1,3 +1,9 @@
+Version 2.3 (11 November 2021)
+  * 50 ELO stronger than 2.2e
+  * Improved SMP version
+  * Fine tuning of the memory allocation of transposition tables and evaluation caches
+  - Code works well with different memory settings. The calculations of structures' sizes looks correct.
+
 Version 2.2i (11 November 2021)
   * Additional fixes to prevent potential Java OutOfMemory errors
   - Reduce 2 times memory allocations for transposition tables and evaluation caches in order to be on the safe side for now.

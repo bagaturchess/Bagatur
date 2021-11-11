@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Vector;
 
 import bagaturchess.bitboard.api.PawnsEvalCache;
-//import bagaturchess.bitboard.impl.attacks.control.metadata.SeeMetadata;
 import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
@@ -31,7 +30,14 @@ import bagaturchess.uci.api.IChannel;
 public class MemoryConsumers {
 	
 	
-	private static double MEMORY_USAGE_PERCENT 							= 0; 
+	private static double MEMORY_USAGE_PERCENT 							= 0;
+	
+	//The static memory is between 128MB and 384MB for desktop computers.
+	//Under Android it should be less even close or equal to 0.
+	//set_STATIC_JVM_MEMORY method can be used to adjust this value.
+	//Allocate static arrays and structures created up to now. For example, opening books and egtb.
+	private static int STATIC_JVM_MEMORY_IN_MEGABYTES					= 384;
+	
 	
 	private static final int SIZE_MIN_ENTRIES_MULTIPLIER				= 111;
 	private static final int SIZE_MIN_ENTRIES_TPT						= 8;
@@ -41,6 +47,11 @@ public class MemoryConsumers {
 	
 	public static void set_MEMORY_USAGE_PERCENT(double val) {
 		MEMORY_USAGE_PERCENT = val;	
+	}
+	
+	
+	public static void set_STATIC_JVM_MEMORY(int static_jvm_memory_in_megabytes) {
+		STATIC_JVM_MEMORY_IN_MEGABYTES = static_jvm_memory_in_megabytes;	
 	}
 	
 	
@@ -164,11 +175,10 @@ public class MemoryConsumers {
 				throw new IllegalStateException("Memory split percents sum is incorrect: " + percents_sum + ". It should be between 0 and 1");
 			}
 			
-			//Continuation history tables consume 189MB each. There is one per thread.
-			long continuation_history_memory_in_bytes = engineConfiguration.getThreadsCount() * 189 * 1024 * 1024;
-			ChannelManager.getChannel().dump("Dedicated memory for Continuation History is " + (continuation_history_memory_in_bytes / (1024 * 1024)) + " MB");
+			long static_memory_in_bytes = STATIC_JVM_MEMORY_IN_MEGABYTES * 1024 * 1024;
+			ChannelManager.getChannel().dump("Excluded memory for static structures is " + STATIC_JVM_MEMORY_IN_MEGABYTES + " MB");
 			
-			long availableMemoryInBytes = getAvailableMemoryInBytes() - continuation_history_memory_in_bytes;
+			long availableMemoryInBytes = getAvailableMemoryInBytes() - static_memory_in_bytes;
 			
 			initCaches(availableMemoryInBytes);
 		}
@@ -242,7 +252,6 @@ public class MemoryConsumers {
 		
 		return (long) (MEMORY_USAGE_PERCENT * Runtime.getRuntime().maxMemory());
 	}
-
 	
 	
 	private static int getJVMBitmode() {
