@@ -2,11 +2,27 @@
 # Overview
 
 Bagatur chess engine is one of the strongest Java chess engines in the world.
-It is also available for Android via <a href="https://play.google.com/store/apps/details?id=com.bagaturchess">Bagatur Chess Engine with GUI</a> game, which has its own user interface. If you like the project, please give it a star.
+It runs on both: desktop computer and Android:
+ - For desktop computers, it runs as a program whith a console and supports commands of the <a href="http://wbec-ridderkerk.nl/html/UCIProtocol.html">UCI protocol</a>. It could be easily imported in Chess programs with user interfaces, like <a href="http://www.playwitharena.de/">Arena Chess GUI</a>.
+ - For Android, the app is available on different app stores <a href="https://metatransapps.com/bagatur-chess-engine-with-gui-chess-ai/">Bagatur Chess Engine with GUI</a>. It has its own user interface.
+If you like the project, please give it a star.
 
-# Downloads
+# Downloads for desktop computer
 
-The <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree/master/Downloads/Engine">latest release</a> runs under all Operating Systems, which support Java platform.
+The <a href="https://github.com/bagaturchess/Bagatur/releases">latest release</a> runs under all Operating Systems, which support Java platform.
+
+# UCI Options
+
+ - SMP Threads (type spin default 4 min 1 max 256): this option is available only for the <a href="https://www.chessprogramming.org/SMP">SMP version</a> of Bagatur. The SMP (multicore) version can be started by Bagatur_64_2+_cores.exe and Bagatur_mcore.bat for Windows and with Bagatur_mcore.sh under Linux.
+ - 
+All other options are available for both versions: single core and SMP.
+ - Logging Policy (type combo default none var single file var multiple files var none): 
+ - OwnBook (type check default true): 
+ - Ponder (type check default true): 
+ - UCI_AnalyseMode (type check default false)
+ - MultiPV (type spin default 1 min 1 max 100)
+ - SyzygyPath (type string default <home>\arena_3.5.1\Engines\BagaturEngine.2.3\.\data\egtb): 
+ - Openning Mode (type combo default most played first var most played first var random intermediate var random full): 
 
 # Sources
 
