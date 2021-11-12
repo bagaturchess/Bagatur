@@ -19,10 +19,10 @@ The <a href="https://github.com/bagaturchess/Bagatur/releases">latest release</a
 All other options are available for both versions: single core and SMP.
  - Logging Policy (type combo default none var single file var multiple files var none): whether Bagatur will create log files on the file system with details of its actions.
  - OwnBook (type check default true): whether to use the own book included into the download, which is packed under ./data/w.ob and ./data/b.ob. These are games extracted from a few milions of PGN games played last 20 years by grandmasters and computer programs. They are filtered and the files contain a subset of most often played games. Unfortunatelly the name of the used opening is not supported at the moment but this features is defenitelly in our backlog and will be included in the Android version.
- - Ponder (type check default true): whether to also think when the opponent think.
- - MultiPV (type spin default 1 min 1 max 100): whether to show only the best line or to show best 2-3 or ore lines.
+ - Ponder (type check default true): whether to also think when the opponent thinks.
+ - MultiPV (type spin default 1 min 1 max 100): whether to show only the best line or to show the best 2-3-N lines.
  - SyzygyPath (type string default <home>\arena_3.5.1\Engines\BagaturEngine.2.3\.\data\egtb): path to the syzygy tables.
- - Openning Mode (type combo default most played first var most played first var random intermediate var random full): Valid only when OwnBook is set to true. The  most played first option playes the most often played move (statistically) for given position. random full option playes random move from all available opening moves for this postion. And the random intermediate option is intermediate and plays random move selected only from the top 3 available moves for this position.
+ - Openning Mode (type combo default most played first var most played first var random intermediate var random full): Valid only when OwnBook is set to true. The 'most played first' option playes the most often played move (statistically) for given position. 'random full' option playes random move from all available opening moves for this postion. And the 'random intermediate' option is something in the middle and plays random move selected only from the top 3 available moves for this position.
 
 # ELO Rating
 
