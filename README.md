@@ -24,10 +24,6 @@ All other options are available for both versions: single core and SMP.
  - SyzygyPath (type string default <home>\arena_3.5.1\Engines\BagaturEngine.2.3\.\data\egtb): path to the syzygy tables.
  - Openning Mode (type combo default most played first var most played first var random intermediate var random full): Valid only when OwnBook is set to true.
 
-# Sources
-
-The <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree/master/Sources">source code</a> is writen entirely in Java programming language.
-
 # ELO Rating
 
 The <a href="http://www.computerchess.org.uk/ccrl/4040/cgi/compare_engines.cgi?family=Bagatur">ELO rating</a> is an important metric for a chess engine.
@@ -45,6 +41,10 @@ Although the ELO strength of the experimential version is with 50 ELO less than 
 This nice tool is used to find out and fix performance, scalability and memory allocation isses.
 In general YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling.
 
+# Sources
+
+The <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree/master/Sources">source code</a> is writen entirely in Java programming language.
+
 # Author
 
 The author of Bagatur engine is <a href="https://www.linkedin.com/in/topchiyski/">Krasimir Topchiyski</a>.
@@ -52,7 +52,6 @@ The author of Bagatur engine is <a href="https://www.linkedin.com/in/topchiyski/
 # Links
 
 - <a href="http://bagaturchess.github.io/Bagatur/Sources/">Sources</a>
-- <a href="http://bagaturchess.github.io/Bagatur/Downloads/Engine/">Downloads</a>
 - <a href="http://bagaturchess.github.io/Bagatur/Sources/LearningImpl/">Machine Learning / LearningImpl</a>
 - <a href="http://bagaturchess.github.io/Bagatur/Sources/UCITracker/">Machine Learning / UCITracker</a>
 
