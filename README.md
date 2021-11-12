@@ -22,7 +22,7 @@ All other options are available for both versions: single core and SMP.
  - Ponder (type check default true): whether to also think when the opponent think.
  - MultiPV (type spin default 1 min 1 max 100): whether to show only the best line or to show best 2-3 or ore lines.
  - SyzygyPath (type string default <home>\arena_3.5.1\Engines\BagaturEngine.2.3\.\data\egtb): path to the syzygy tables.
- - Openning Mode (type combo default most played first var most played first var random intermediate var random full): Valid only when OwnBook is set to true.
+ - Openning Mode (type combo default most played first var most played first var random intermediate var random full): Valid only when OwnBook is set to true. The  most played first option playes the most often played move (statistically) for given position. random full option playes random move from all available opening moves for this postion. And the random intermediate option is intermediate and plays random move selected only from the top 3 available moves for this position.
 
 # ELO Rating
 
