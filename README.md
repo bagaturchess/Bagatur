@@ -5,6 +5,7 @@ Bagatur chess engine is one of the strongest Java chess engines in the world.
 It runs on both: desktop computer and Android:
  - For desktop computers, it runs as a program whith a console and supports commands of the <a href="http://wbec-ridderkerk.nl/html/UCIProtocol.html">UCI protocol</a>. It could be easily imported in Chess programs with user interfaces, like <a href="http://www.playwitharena.de/">Arena Chess GUI</a>.
  - For Android, the app is available on different app stores <a href="https://metatransapps.com/bagatur-chess-engine-with-gui-chess-ai/">Bagatur Chess Engine with GUI</a>. It has its own user interface.
+
 If you like the project, please give it a star.
 
 # Downloads for desktop computer
@@ -14,15 +15,14 @@ The <a href="https://github.com/bagaturchess/Bagatur/releases">latest release</a
 # UCI Options
 
  - SMP Threads (type spin default 4 min 1 max 256): this option is available only for the <a href="https://www.chessprogramming.org/SMP">SMP version</a> of Bagatur. The SMP (multicore) version can be started by Bagatur_64_2+_cores.exe and Bagatur_mcore.bat for Windows and with Bagatur_mcore.sh under Linux.
- - 
+
 All other options are available for both versions: single core and SMP.
- - Logging Policy (type combo default none var single file var multiple files var none): 
- - OwnBook (type check default true): 
- - Ponder (type check default true): 
- - UCI_AnalyseMode (type check default false)
- - MultiPV (type spin default 1 min 1 max 100)
- - SyzygyPath (type string default <home>\arena_3.5.1\Engines\BagaturEngine.2.3\.\data\egtb): 
- - Openning Mode (type combo default most played first var most played first var random intermediate var random full): 
+ - Logging Policy (type combo default none var single file var multiple files var none): whether Bagatur will create log files on the file system with details of its actions.
+ - OwnBook (type check default true): whether to use the own book included into the download, which is packed under ./data/w.ob and ./data/b.ob. These are games extracted from a few milions of PGN games played last 20 years by grandmasters and computer programs. They are filtered and the files contain a subset of most often played games. Unfortunatelly the name of the used opening is not supported at the moment but this features is defenitelly in our backlog and will be included in the Android version.
+ - Ponder (type check default true): whether to also think when the opponent think.
+ - MultiPV (type spin default 1 min 1 max 100): whether to show only the best line or to show best 2-3 or ore lines.
+ - SyzygyPath (type string default <home>\arena_3.5.1\Engines\BagaturEngine.2.3\.\data\egtb): path to the syzygy tables.
+ - Openning Mode (type combo default most played first var most played first var random intermediate var random full): Valid only when OwnBook is set to true.
 
 # Sources
 
