@@ -4,10 +4,10 @@ package bagaturchess.egtb.gaviota.run;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
-import bagaturchess.egtb.gaviota.GTBProbeInput;
-import bagaturchess.egtb.gaviota.GTBProbeOutput;
 import bagaturchess.egtb.gaviota.GTBProbing;
-import bagaturchess.egtb.gaviota.cache.GTBCache_OUT;
+import bagaturchess.egtb.cache.EGTBCache;
+import bagaturchess.egtb.cache.EGTBProbeInput;
+import bagaturchess.egtb.cache.EGTBProbeOutput;
 
 
 public class GaviotaTest {
@@ -45,8 +45,8 @@ public class GaviotaTest {
 			
 			System.out.println("start brobe");
 			
-			GTBProbeInput temp_input = new GTBProbeInput();
-			GTBCache_OUT cache_out = new GTBCache_OUT(10000, true, new BinarySemaphore_Dummy());
+			EGTBProbeInput temp_input = new EGTBProbeInput();
+			EGTBCache cache_out = new EGTBCache(10000, true, new BinarySemaphore_Dummy());
 			
 			GTBProbing probing = new GTBProbing();
 			probing.setPath_Sync("C:/DATA/OWN/chess/EGTB", 4);
@@ -63,7 +63,7 @@ public class GaviotaTest {
 	}
 	
 	
-	private static void probeHard(GTBProbing probing, IBitBoard board, GTBProbeInput temp_input, GTBCache_OUT cache_out)
+	private static void probeHard(GTBProbing probing, IBitBoard board, EGTBProbeInput temp_input, EGTBCache cache_out)
 			throws InterruptedException {
 		
 		int res[] = new int[2];
@@ -71,7 +71,7 @@ public class GaviotaTest {
 		probing.probe(board, res, temp_input, cache_out);
 		
 		
-		System.out.println("TEST probeHard: " + new GTBProbeOutput(res));
+		System.out.println("TEST probeHard: " + new EGTBProbeOutput(res));
 	}
 	
 	

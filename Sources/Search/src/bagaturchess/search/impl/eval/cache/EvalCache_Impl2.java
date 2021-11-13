@@ -36,11 +36,11 @@ public class EvalCache_Impl2 implements IEvalCache {
 	private long hits;
 	
 	
-	public EvalCache_Impl2(long size) {
+	public EvalCache_Impl2(long size_in_bytes) {
 		
-		ChannelManager.getChannel().dump("EvalCache_Impl2: bytes_count=" + size);
+		ChannelManager.getChannel().dump("EvalCache_Impl2: bytes_count=" + size_in_bytes);
 		
-		long maxEntries = size / 8; //one long per entry and one long has 8 bytes
+		long maxEntries = size_in_bytes / 8; //one long per entry and one long has 8 bytes
 		
 		if (maxEntries > 1073741823) { //1073741823 = 2^30 - 1 (should work on 32 and 64 bits), 2147483647 = 2^31 - 1 (should work on 64 bits only)
 			maxEntries = 1073741823;

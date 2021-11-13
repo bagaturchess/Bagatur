@@ -1,7 +1,11 @@
-package bagaturchess.egtb.gaviota;
+package bagaturchess.egtb.cache;
 
 
-public class GTBProbeInput {
+import bagaturchess.egtb.gaviota.EGTBProbing;
+import bagaturchess.egtb.gaviota.GTBProbing;
+
+
+public class EGTBProbeInput {
 	
 	
 	public long hashkey;
@@ -15,7 +19,7 @@ public class GTBProbeInput {
 	public final byte blackPieces[] = new byte [GTBProbing.MAX_PIECES_COUNT + 1];
 	
 	
-	public GTBProbeInput() {
+	public EGTBProbeInput() {
         clear();
 	}
 

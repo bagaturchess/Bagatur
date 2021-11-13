@@ -26,8 +26,6 @@ package bagaturchess.search.impl.alg;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.egtb.gaviota.GTBProbeInput;
-import bagaturchess.egtb.gaviota.GTBProbeOutput;
 import bagaturchess.search.api.IEngineConfig;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.ISearchConfig_AB;
@@ -63,7 +61,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	protected int[] buff_tpt_depthtracking = new int[1];
 	
-	protected GTBProbeInput temp_input = new GTBProbeInput();
 	protected ITTEntry[] tt_entries_per_ply = new ITTEntry[ISearch.MAX_DEPTH];
 	
 	
@@ -209,28 +206,6 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 		return full_eval;
 		//return env.getEval().lazyEval(depth, alpha, beta, rootColour);
 		//return env.getEval().roughEval(depth, rootColour);//(depth, alpha, beta, rootColour);
-	}
-	
-	
-	protected int extractEGTBMateValue(int depth) {
-		int egtb_val = 0;
-		if (gtb_probe_result[0] == GTBProbeOutput.DRAW) {
-			throw new IllegalStateException("GTBProbeOutput.DRAW");
-		} else if (gtb_probe_result[0] == GTBProbeOutput.WMATE) {
-			egtb_val = getMateVal(Math.min(MAX_DEPTH, depth + gtb_probe_result[1]));
-			//egtb_val = 700 + 3 * getMateVal(Math.min(MAX_DEPTH, depth + gtb_probe_result[1])) / ISearch.MAX_MAT_INTERVAL;
-			if (env.getBitboard().getColourToMove() == Constants.COLOUR_BLACK) {
-				egtb_val = -egtb_val;
-			}
-		} else if (gtb_probe_result[0] == GTBProbeOutput.BMATE) {
-			egtb_val = getMateVal(Math.min(MAX_DEPTH, depth + gtb_probe_result[1]));
-			//egtb_val = 700 + 3 * getMateVal(Math.min(MAX_DEPTH, depth + gtb_probe_result[1])) / ISearch.MAX_MAT_INTERVAL;;
-			if (env.getBitboard().getColourToMove() == Constants.COLOUR_WHITE) {
-				egtb_val = -egtb_val;
-			}
-		}
-		//System.out.println("egtb_val=" + egtb_val);
-		return egtb_val;
 	}
 	
 	

@@ -31,33 +31,45 @@ public class SyzygyTBProbing {
 	
 	
 	private static boolean loadingInitiated;
+	
 	private static SyzygyTBProbing instance;
 	
 	
+    public static final SyzygyTBProbing getSingleton() {
+    	
+    	if (instance == null && !loadingInitiated) {
+    		
+    		loadingInitiated = true;
+    		
+    		instance = new SyzygyTBProbing();
+    		
+    		if (!instance.loadNativeLibrary()) {
+    			
+    			instance = null;
+    		}
+    	}
+    	
+    	return instance;
+    }
+    
+    
     private SyzygyTBProbing() {
+    	
     	loadingInitiated = false;
     }
     
     
-	public boolean loadNativeLibrary() {
+	private boolean loadNativeLibrary() {
+		
 		return SyzygyBridge.loadNativeLibrary();
 	}
 	
 	
-    public static final SyzygyTBProbing getSingleton() {
-    	if (instance == null && !loadingInitiated) {
-    		instance = new SyzygyTBProbing();
-    		if (!instance.loadNativeLibrary()) {
-    			instance = null;
-    		}
-    		loadingInitiated = true;
-    	}
-    	return instance;
-    }
-    
     public final void load(String path) {
+    	
     	SyzygyBridge.load(path);
     }
+    
     
     /**
      * wrapper for {@link com.winkelhagen.chess.syzygy.SyzygyBridge#isAvailable(int)}
@@ -127,10 +139,12 @@ public class SyzygyTBProbing {
         int promotes = (result & SyzygyConstants.TB_RESULT_PROMOTES_MASK) >> SyzygyConstants.TB_RESULT_PROMOTES_SHIFT;
         return getMove(from, to, promotes);
     }
-
+    
+    
     public int getMove(int fromSquare, int toSquare, int promotes) {
         return fromSquare | (toSquare <<6) | (promotes << 12);
     }
+    
     
     /**
      * returns the score associated to the move in the result (xboard compatible, i.e. (+/-) 28000-full moves to win/lose or 0 for draw.
@@ -159,6 +173,7 @@ public class SyzygyTBProbing {
         }
     }
     
+    
     /**
      * returns the score to use inside the main search, based on the WDL result of a TableBase query and the search depth
      * @param wdl the WinDrawLoss result from the probe
@@ -181,6 +196,7 @@ public class SyzygyTBProbing {
                 throw new IllegalStateException("wdl=" + wdl);
         }
     }
+    
     
 	private static long convertBB(long figures) {
 		return figures;

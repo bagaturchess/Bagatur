@@ -48,11 +48,11 @@ public class TTable_Impl2 implements ITTable {
 	private long counter_hits;
 	
 	
-	public TTable_Impl2(long size) {
+	public TTable_Impl2(long size_in_bytes) {
 		
-		ChannelManager.getChannel().dump("TTable_Impl2: bytes_count=" + size);
+		ChannelManager.getChannel().dump("TTable_Impl2: bytes_count=" + size_in_bytes);
 		
-		long maxEntries = size / 16; //two longs per entry and one long has 8 bytes: 2 * 8 = 16
+		long maxEntries = size_in_bytes / 16; //two longs per entry and one long has 8 bytes: 2 * 8 = 16
 		
 		if (maxEntries > 1073741823) { //1073741823 = 2^30 - 1 (should work on 32 and 64 bits), 2147483647 = 2^31 - 1 (should work on 64 bits only)
 			maxEntries = 1073741823;

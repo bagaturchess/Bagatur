@@ -9,6 +9,8 @@ import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.egtb.gaviota.EGTBProbing;
+import bagaturchess.egtb.cache.EGTBProbeInput;
+import bagaturchess.egtb.cache.EGTBProbeOutput;
 
 
 public class GTBProbing_NativeWrapper {
@@ -104,7 +106,7 @@ public class GTBProbing_NativeWrapper {
     */
     
     
-    public final void probeHard(GTBProbeInput input, int[] out) {
+    public final void probeHard(EGTBProbeInput input, int[] out) {
     	
     	
     	//For debug purpose
@@ -116,7 +118,7 @@ public class GTBProbing_NativeWrapper {
     	if (input.blackPieces[0] == EGTBProbing.NATIVE_PID_NONE
     		|| input.whitePieces[0] == EGTBProbing.NATIVE_PID_NONE
     			) {
-        	out[0] = GTBProbeOutput.UNKNOWN;
+        	out[0] = EGTBProbeOutput.UNKNOWN;
         	out[1] = 0;
     		return;
     	}
@@ -129,30 +131,30 @@ public class GTBProbing_NativeWrapper {
         if (res) {
             switch (out[0]) {
 	            case EGTBProbing.NATIVE_INFO_DRAW:
-	            	out[0] = GTBProbeOutput.DRAW;
+	            	out[0] = EGTBProbeOutput.DRAW;
 	            	out[1] = 0;
 	                break;
 	            case EGTBProbing.NATIVE_INFO_WMATE:
-	            	out[0] = GTBProbeOutput.WMATE;
+	            	out[0] = EGTBProbeOutput.WMATE;
 	            	//out[1] = out[1];
 	                break;
 	            case EGTBProbing.NATIVE_INFO_BMATE:
-	            	out[0] = GTBProbeOutput.BMATE;
+	            	out[0] = EGTBProbeOutput.BMATE;
 	            	//out[1] = out[1];
 	                break;
 	            default:
-	            	out[0] = GTBProbeOutput.UNKNOWN;
+	            	out[0] = EGTBProbeOutput.UNKNOWN;
 	            	out[1] = 0;
 	                break;
             }
         } else {
-        	out[0] = GTBProbeOutput.UNKNOWN;
+        	out[0] = EGTBProbeOutput.UNKNOWN;
         	out[1] = 0;
         }
     }
     
     
-	public void fill(IBoard board, GTBProbeInput input) {
+	public void fill(IBoard board, EGTBProbeInput input) {
 		
 		input.hashkey = board.getHashKey();
 		
