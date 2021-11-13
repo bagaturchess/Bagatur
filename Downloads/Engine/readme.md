@@ -1,20 +1,7 @@
 
 # Downloads
  * The new versions of Bagatur are released as standard <a href="https://github.com/bagaturchess/Bagatur/releases">github releases here</a>.
- * The old versions of Bagatur are available on <a href="https://drive.google.com/drive/folders/1eNcjxCkjbm8zZiAXB0zkgSfvcV9814xi?usp=sharing">Google Drive</a>.
-
-# Running the Program
-
-The <a href="https://github.com/bagaturchess/Bagatur/edit/master/Downloads/Engine/">downloads</a> of the program runs under all Operating Systems, which support Java platform:
-* **Android**, there is an Andorid game called <a href="https://play.google.com/store/apps/details?id=com.bagaturchess">Bagatur Chess Engine with GUI</a> with own user interface (GUI) and is using Bagatur internally as a chess engine
-* **Windows**, there are *.exe files for direct run. Here are the steps necessary to run the engine:
-  * Download an arbitrary UCI user interface. For example the most popular one is <a href="http://www.playwitharena.com/">Arena</a>.
-  * Install the UCI user interface on your computer.
-  * Ensure that the Java Runtime Environment (JRE) 1.6 or later is installed on your computer (it should be the case nowadays but if not, have in mind that JRE is required, only JDK doesn't work). It could be downloaded from <a href="https://java.com/">java.com</a>
-  * Unpack this distribution somewhere (Arena has a sub-folder called 'engines', you can extract it there).
-  * Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway). You may use win32 or win64 version depending on your choice.
-  * E2-E4 and enjoy :-)
-* **Linux**, in the bin directory there are *.sh files for running
+ * The old versions of Bagatur are available on github under this <a href="https://github.com/bagaturchess/Bagatur/archive/refs/tags/ALL-OLD-VERSIONS-DOWNLOADS-BEFORE-BAGATUR-2.2E.zip">zip archive download</a>, which contains all old versions under the path "/Downloads/Engine/" inside the archive file.
 
 # Revision History
 Version 2.2e (16 August 2021)
