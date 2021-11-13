@@ -6,5 +6,4 @@ by the chess knowledge inside the existing expert games, captured by UCI tracker
 
 Extremely useful tool for the fans of Artificial Intelligence!
 
-
 Have a nice usage ... and feel free to contribute.
