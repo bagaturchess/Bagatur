@@ -24,7 +24,7 @@ The program runs under all Operating Systems, which support Java platform:
   * Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway). You may use win32 or win64 version depending on your choice.
   * E2-E4 and enjoy :-)
 * **Linux**, in the bin directory there are *.sh files for running
-* 
+
 # UCI Options
 
  - SMP Threads (type spin default 4 min 1 max 256): this option is available only for the <a href="https://www.chessprogramming.org/SMP">SMP version</a> of Bagatur. The SMP (multicore) version can be started by Bagatur_64_2+_cores.exe and Bagatur_mcore.bat for Windows and with Bagatur_mcore.sh under Linux.
