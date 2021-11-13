@@ -57,6 +57,16 @@ Additional resources:
 - <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/">Machine Learning / LearningImpl</a>
 - <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/UCITracker/">Machine Learning / UCITracker</a>
 
+# More readings with technical details and explanations for each sub-component of Bagatur
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Sources/Bitboard/readme.txt>Bitboard</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Sources/EGTB/readme.txt>Endgame Tablebases</a>
+- <a href=https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl>Machine Learning</a>
+- <a href=https://github.com/bagaturchess/Bagatur/edit/master/Sources/Opening/readme.txt>Opening API</a>
+- <a href=https://github.com/bagaturchess/Bagatur/edit/master/Sources/OpeningGenerator/readme.txt>Opening Generator</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Sources/PGNProcessor/readme.txt>PGNProcessor</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Sources/Search/readme.txt>Search Algorithm</a>
+- <a href=https://github.com/bagaturchess/Bagatur/tree/master/Sources/UCITracker>UCITracker</a>
+
 # Bagatur is powered by <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>
 
 ![YourKit Logo](https://www.yourkit.com/images/yklogo.png)
