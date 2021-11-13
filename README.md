@@ -27,7 +27,7 @@ The program runs under all Operating Systems, which support Java platform:
 
 # UCI Options
 
- - SMP Threads (type spin default 4 min 1 max 256): this option is available only for the <a href="https://www.chessprogramming.org/SMP">SMP version</a> of Bagatur. The SMP (multicore) version can be started by Bagatur_64_2+_cores.exe and Bagatur_mcore.bat for Windows and with Bagatur_mcore.sh under Linux.
+ - SMP Threads (type spin default 4 min 1 max 256): this option is available only for the <a href="https://www.chessprogramming.org/SMP">SMP version</a> of Bagatur. The SMP (multicore) version can be started by Bagatur_64_2+_cores.exe and Bagatur_mcore.bat for Windows and with Bagatur_mcore.sh under Linux. It is tested with up to 64 CPU cores and threads. Theoretically it has no upper limit abd should work with 128 CPUs/threads, 256 CPUs/threads, ... but this is not proven yet.
 
 All other options are available for both versions: single core and SMP.
  - Logging Policy (type combo default none var single file var multiple files var none): whether Bagatur will create log files on the file system with details of its actions.
