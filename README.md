@@ -59,10 +59,6 @@ Although the ELO strength of the experimential version is with 50 ELO less than 
 This nice tool is used to find out and fix performance, scalability and memory allocation isses.
 In general YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling.
 
-# Sources
-
-The <a href="https://github.com/bagaturchess/Bagatur-Chess-Engine-And-Tools/tree/master/Sources">source code</a> is writen entirely in Java programming language.
-
 # Author
 
 The author of Bagatur engine is <a href="https://www.linkedin.com/in/topchiyski/">Krasimir Topchiyski</a>.
