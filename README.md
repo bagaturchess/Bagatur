@@ -3,7 +3,7 @@
 
 Bagatur chess engine is one of the strongest Java chess engines in the world.
 
-It runs on Android as well as on "desktop" Computers (or even VM with many cores into the Cloud):
+It runs on Android as well as on "desktop" Computers (or even on virtual machine with many CPU cores into the Cloud):
  - For desktop computers, it runs as a program whith a console and supports commands of the <a href="http://wbec-ridderkerk.nl/html/UCIProtocol.html">UCI protocol</a>. It could be easily imported in Chess programs with user interfaces, like <a href="http://www.playwitharena.de/">Arena Chess GUI</a>.
  - For Android, the app is available on different app stores <a href="https://metatransapps.com/bagatur-chess-engine-with-gui-chess-ai/">Bagatur Chess Engine with GUI</a>. It has its own user interface. The source code of the Android version is also open source and could be found here: https://github.com/MetatransApps/Android_APK_ChessEngineBagatur
 
