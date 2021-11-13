@@ -6,7 +6,7 @@ It runs on both: desktop computer and Android:
  - For desktop computers, it runs as a program whith a console and supports commands of the <a href="http://wbec-ridderkerk.nl/html/UCIProtocol.html">UCI protocol</a>. It could be easily imported in Chess programs with user interfaces, like <a href="http://www.playwitharena.de/">Arena Chess GUI</a>.
  - For Android, the app is available on different app stores <a href="https://metatransapps.com/bagatur-chess-engine-with-gui-chess-ai/">Bagatur Chess Engine with GUI</a>. It has its own user interface. The source code of the Android version is also open source and could be found here: https://github.com/MetatransApps/Android_APK_ChessEngineBagatur
 
-If you like the project, please give it a star.
+If you like the project, please give it a star! :-)
 
 # Downloads for desktop computer
 
