@@ -400,7 +400,7 @@ public class SyzygyTBProbing {
 		
 		long[] result = new long[2];
 		
-		SyzygyTBProbing.getSingleton().load("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\EGTB\\syzygy");
+		SyzygyTBProbing.getSingleton().load("<path>\\EGTB\\syzygy");
 		
 		SyzygyTBProbing.getSingleton().probeMove(board, result);
 		
