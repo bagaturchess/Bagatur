@@ -40,7 +40,7 @@ public class OnlineSyzygy {
 	
 	//We have to wait between each server request,
 	//because otherwise we got "Server returned HTTP response code: 429"
-	private static int[] WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS = new int[] {
+	private static int[] WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS = new int[] {
 			500,
 			1000,
 			2 * 1000,
@@ -59,7 +59,7 @@ public class OnlineSyzygy {
 	
 	public static final String getDTZandDTM_BlockingOnSocketConnection(IBitBoard board, int[] result, Logger logger) {
 	
-		if (System.currentTimeMillis() <= WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS[current_index_for_waiting_time] + last_server_response_timestamp) {
+		if (System.currentTimeMillis() <= WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time] + last_server_response_timestamp) {
 			
 			return null;
 		}
@@ -189,9 +189,9 @@ public class OnlineSyzygy {
 			
 			current_index_for_waiting_time++;
 			
-			if (current_index_for_waiting_time > WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS.length - 1) {
+			if (current_index_for_waiting_time > WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS.length - 1) {
 				
-				current_index_for_waiting_time = WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS.length - 1;
+				current_index_for_waiting_time = WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS.length - 1;
 				
 				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: increase current_index_for_waiting_time=" + current_index_for_waiting_time);
 			}
@@ -206,7 +206,7 @@ public class OnlineSyzygy {
 	
 	public static final String getWDL_BlockingOnSocketConnection(IBitBoard board, int[] result, Logger logger) {
 		
-		if (System.currentTimeMillis() <= WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS[current_index_for_waiting_time] + last_server_response_timestamp) {
+		if (System.currentTimeMillis() <= WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time] + last_server_response_timestamp) {
 			
 			return null;
 		}
@@ -366,9 +366,9 @@ public class OnlineSyzygy {
 			
 			current_index_for_waiting_time++;
 			
-			if (current_index_for_waiting_time > WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS.length - 1) {
+			if (current_index_for_waiting_time > WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS.length - 1) {
 				
-				current_index_for_waiting_time = WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS.length - 1;
+				current_index_for_waiting_time = WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS.length - 1;
 				
 				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: increase current_index_for_waiting_time=" + current_index_for_waiting_time);
 			}
@@ -482,8 +482,8 @@ public class OnlineSyzygy {
 			
 			try {
 				
-				System.out.println("Waiting " + WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS[current_index_for_waiting_time] + " ms");
-				Thread.sleep(WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS[current_index_for_waiting_time]);
+				System.out.println("Waiting " + WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time] + " ms");
+				Thread.sleep(WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time]);
 				
 			} catch (InterruptedException e) {}
 		}
