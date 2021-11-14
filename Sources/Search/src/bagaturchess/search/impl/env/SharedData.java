@@ -93,6 +93,10 @@ public class SharedData {
 		return memoryConsumers.getEvalCache().remove(0);
 	}
 	
+	public IEvalCache getSyzygyDTZCache() {
+		return memoryConsumers.getSyzygyDTZCache().remove(0);
+	}
+	
 	
 	@Override
 	public String toString() {

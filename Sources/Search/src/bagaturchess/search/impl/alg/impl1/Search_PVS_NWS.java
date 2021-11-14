@@ -26,10 +26,7 @@ package bagaturchess.search.impl.alg.impl1;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
-import com.winkelhagen.chess.syzygy.SyzygyBridge;
-
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.Assert;
@@ -56,10 +53,8 @@ import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.search.impl.utils.SearchUtils;
-
-import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
+import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.search.impl.eval.cache.EvalEntry_BaseImpl;
-import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.eval.cache.IEvalEntry;
 
 
@@ -97,9 +92,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private VarStatistic historyAVGScores;
 	
 	
-	private boolean USE_DTZ_CACHE = false;
-	
-	private IEvalCache cache_dtz;
+	private boolean USE_DTZ_CACHE = true;
 	
 	private IEvalEntry temp_cache_entry;
 	
@@ -114,8 +107,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		super(_env);
 		
 		if (USE_DTZ_CACHE) {
-			
-	    	cache_dtz = new EvalCache_Impl2(64 * 1024 * 1024);
 	    	
 	    	temp_cache_entry = new EvalEntry_BaseImpl();
 		}
@@ -138,6 +129,12 @@ public class Search_PVS_NWS extends SearchImpl {
 		lastSentMinorInfo_timestamp = 0;
 		
 		historyAVGScores = new VarStatistic(false);
+		
+		if (ChannelManager.getChannel() != null) {
+			ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Transposition table hitrate=" + env.getTPT().getHitRate() + ", usage=" + env.getTPT().getUsage());
+			ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Evaluation cache hitrate=" + env.getEvalCache().getHitRate() + ", usage=" + env.getEvalCache().getUsage());
+			ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Syzygy DTZ cache hitrate=" + env.getSyzygyDTZCache().getHitRate() + ", usage=" + env.getSyzygyDTZCache().getUsage());
+		}
 	}
 	
 	
@@ -1268,7 +1265,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	    
 	    if (USE_DTZ_CACHE) {
 	    	
-		    cache_dtz.get(hashkey, temp_cache_entry);
+	    	env.getSyzygyDTZCache().get(hashkey, temp_cache_entry);
 			
 			if (!temp_cache_entry.isEmpty()) {
 				
@@ -1280,7 +1277,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		    
 		        int probe_result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
 		        
-		        cache_dtz.put(hashkey, 5, probe_result);
+		        env.getSyzygyDTZCache().put(hashkey, 5, probe_result);
 		        
 		        return probe_result;
 			}

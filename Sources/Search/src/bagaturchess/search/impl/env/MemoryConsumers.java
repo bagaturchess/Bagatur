@@ -44,6 +44,8 @@ public class MemoryConsumers {
 	private static final int SIZE_MIN_ENTRIES_EC						= 4;
 	private static final int SIZE_MIN_ENTRIES_PEC						= 1 * SIZE_MIN_ENTRIES_MULTIPLIER;
 	
+	private static double MEM_USAGE_SYZYGY_DTZ_CACHE 					= 0.05;
+	
 	
 	public static void set_MEMORY_USAGE_PERCENT(double val) {
 		MEMORY_USAGE_PERCENT = val;	
@@ -75,6 +77,7 @@ public class MemoryConsumers {
 	
 	private TranspositionTableProvider ttable_provider;
 	private List<IEvalCache> evalCache;
+	private List<IEvalCache> syzygyDTZCache;
 	private List<PawnsEvalCache> pawnsCache;
 	
 	private IChannel channel;
@@ -165,10 +168,12 @@ public class MemoryConsumers {
 			ChannelManager.getChannel().dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
 			ChannelManager.getChannel().dump("Transposition Table usage percent from the free memory " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
 			ChannelManager.getChannel().dump("Eval Cache usage percent from the free memory " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
-			ChannelManager.getChannel().dump("Pawns Eval Cache usage percent from the free memory " + (100 * engineConfiguration.getPawnsCacheUsagePercent()) + "%");
+			ChannelManager.getChannel().dump("Syzygy DTZ Cache usage percent from the free memory " + (100 * MEM_USAGE_SYZYGY_DTZ_CACHE) + "%");			
+			
 			
 			double percents_sum = engineConfiguration.getTPTUsagePercent()
 								+ engineConfiguration.getEvalCacheUsagePercent()
+								//+ engineConfiguration.getSyzygyDTZUsagePercent()
 								+ engineConfiguration.getPawnsCacheUsagePercent();
 			
 			if (percents_sum <= 0 || percents_sum > 1) {
@@ -221,24 +226,21 @@ public class MemoryConsumers {
 		
 		
 		long size_ec = Math.max(SIZE_MIN_ENTRIES_EC, (long) ((engineConfiguration.getEvalCacheUsagePercent() * availableMemoryInBytes) / THREADS_COUNT));
+		long syzygy_ec = Math.max(SIZE_MIN_ENTRIES_EC, (long) ((MEM_USAGE_SYZYGY_DTZ_CACHE * availableMemoryInBytes) / THREADS_COUNT));
 		
 		int size_pc = SIZE_MIN_ENTRIES_PEC;
-		//ChannelManager.getChannel().dump("Pawns Eval Cache size is " + size_pc + " entries.");
-		
-		/*int size_gtb_out = 0;
-		if (GTBProbing_NativeWrapper.tryToCreateInstance() != null) {
-			size_gtb_out = Math.max(SIZE_MIN_ENTRIES_GTB, getGTBEntrySize_OUT(availableMemory, 	Math.max(test_size1, SIZE_MIN_ENTRIES_GTB)));
-			ChannelManager.getChannel().dump("Endgame Table Bases cache (OUT) size is " + size_gtb_out);
-		}*/
 		
 		
 		//Eval caches
 		evalCache 		= new Vector<IEvalCache>();
+		syzygyDTZCache  = new Vector<IEvalCache>();
 		pawnsCache		= new Vector<PawnsEvalCache>();
 		
 		for (int i = 0; i < THREADS_COUNT; i++) {
 			
 			evalCache.add(new EvalCache_Impl2(size_ec));
+			
+			syzygyDTZCache.add(new EvalCache_Impl2(syzygy_ec));
 			
 			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName());
 			pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
@@ -287,14 +289,21 @@ public class MemoryConsumers {
 		return evalCache;
 	}
 
-
+	
+	public List<IEvalCache> getSyzygyDTZCache() {
+		return syzygyDTZCache;
+	}
+	
+	
 	public List<PawnsEvalCache> getPawnsCache() {
 		return pawnsCache;
 	}
 	
+	
 	public void clear() {
 		if (ttable_provider != null) ttable_provider.clear();
 		if (evalCache != null) evalCache.clear();
+		if (syzygyDTZCache != null) syzygyDTZCache.clear(); 
 		if (pawnsCache != null) pawnsCache.clear();
 	}
 }

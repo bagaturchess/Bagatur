@@ -75,6 +75,7 @@ public class TTable_Impl2 implements ITTable {
 	
 	@Override
 	public int getHitRate() {
+		if (counter_tries == 0) return 0;
 		return (int) (counter_hits * 100 / counter_tries);
 	}
 	

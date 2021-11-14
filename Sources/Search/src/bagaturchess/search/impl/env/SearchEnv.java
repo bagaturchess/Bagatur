@@ -51,6 +51,7 @@ public class SearchEnv {
 	private Tactics tactics;
 	
 	private IEvalCache evalCache;
+	private IEvalCache syzygyDTZCache;
 	private PawnsEvalCache pawnsCache;
 	private ITTable tpt;
 
@@ -64,6 +65,7 @@ public class SearchEnv {
 
 
 	public SearchEnv(IBitBoard _bitboard, SharedData _shared) {
+		
 		shared = _shared;
 		bitboard = _bitboard;
 		tactics = new Tactics(bitboard);
@@ -153,6 +155,13 @@ public class SearchEnv {
 			evalCache = shared.getAndRemoveEvalCache();
 		}
 		return evalCache;
+	}
+	
+	public IEvalCache getSyzygyDTZCache() {
+		if (syzygyDTZCache == null) {
+			syzygyDTZCache = shared.getSyzygyDTZCache();
+		}
+		return syzygyDTZCache;
 	}
 	
 	public IRootSearchConfig getEngineConfiguration() {

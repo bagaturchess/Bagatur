@@ -31,10 +31,18 @@ public class SearchUtils {
 	
 	public static final int getMateVal(int depth) {
 		
-		if (depth <= 0) {
+		
+		if (depth < 0) {
 			
-			throw new IllegalStateException("getMateVal: depth=" + depth);
+			throw new IllegalStateException("getMateVal: depth < 0; depth=" + depth);
 		}
+		
+		
+		if (depth == 0) {
+			
+			depth = 1;
+		}
+		
 		
 		if (ISearch.MAX_DEPTH - depth + 1 <=  0) {
 			

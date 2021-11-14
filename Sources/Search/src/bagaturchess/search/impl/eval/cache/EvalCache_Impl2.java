@@ -31,6 +31,8 @@ public class EvalCache_Impl2 implements IEvalCache {
 	
 	private long[] keys;
 	
+	private long counter_usage;
+	
 	private long tries;
 	
 	private long hits;
@@ -76,7 +78,13 @@ public class EvalCache_Impl2 implements IEvalCache {
 	
 	
 	@Override
+	public int getUsage() {
+		return (int) (counter_usage * 100 / keys.length);
+	}
+	
+	@Override
 	public int getHitRate() {
+		if (tries == 0) return 0;
 		return (int) (hits * 100 / tries);
 	}
 	
@@ -113,7 +121,13 @@ public class EvalCache_Impl2 implements IEvalCache {
 	
 
 	private void addValue(final long key, final int score) {
+		
 		final int index = getIndex(key);
+		
+		if (keys[index] == 0) {
+			counter_usage++;
+		}	
+		
 		keys[index] = key ^ score;
 		keys[index + 1] = score;
 	}
