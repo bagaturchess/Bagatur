@@ -57,7 +57,7 @@ public class OnlineSyzygy {
 	private static long last_server_response_timestamp = 0;
 	
 	
-	public static final String getDTZandDTM_BlockingOnSocketConnection(IBitBoard board, int[] result) {
+	public static final String getDTZandDTM_BlockingOnSocketConnection(IBitBoard board, int[] result, Logger logger) {
 	
 		if (System.currentTimeMillis() <= WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS[current_index_for_waiting_time] + last_server_response_timestamp) {
 			
@@ -80,11 +80,15 @@ public class OnlineSyzygy {
 			
 			String json_response_text = getHTMLFromURL(url_for_the_request);
 			
+			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: json_response_text=" + json_response_text);
+			
 			current_index_for_waiting_time--;
 			
 			if (current_index_for_waiting_time < 0) {
 				
 				current_index_for_waiting_time = 0;
+				
+				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: decrease current_index_for_waiting_time=" + current_index_for_waiting_time);
 			}
 			
 			response = json_response_text;
@@ -92,6 +96,8 @@ public class OnlineSyzygy {
 			int dtz_start_index = json_response_text.indexOf("\"dtz\":");
 			
 			if (dtz_start_index != -1) {
+				
+				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: dtz_start_index=" + dtz_start_index);
 				
 				int possible_dtz_end_index1 = json_response_text.indexOf(",", dtz_start_index);
 				int possible_dtz_end_index2 = json_response_text.indexOf("}", dtz_start_index);
@@ -115,6 +121,8 @@ public class OnlineSyzygy {
 					return null;
 				}
 				
+				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: dtz_end_index=" + dtz_end_index);
+				
 				
 				String dtz_string = json_response_text.substring(dtz_start_index + 6, dtz_end_index);
 				
@@ -127,6 +135,8 @@ public class OnlineSyzygy {
 					int dtm_start_index = json_response_text.indexOf("\"dtm\":");
 					
 					if (dtm_start_index != -1) {
+						
+						logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: dtm_start_index=" + dtm_start_index);
 						
 						int possible_dtm_end_index1 = json_response_text.indexOf(",", dtm_start_index);
 						int possible_dtm_end_index2 = json_response_text.indexOf("}", dtm_start_index);
@@ -150,6 +160,9 @@ public class OnlineSyzygy {
 							return null;
 						}
 						
+						logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: dtm_end_index=" + dtm_end_index);
+						
+						
 						String dtm_string = json_response_text.substring(dtm_start_index + 6, dtm_end_index);
 						
 						try {
@@ -158,13 +171,13 @@ public class OnlineSyzygy {
 							
 						} catch (NumberFormatException nfe) {
 							
-							//Do nothing
+							logger.addException(nfe);
 						}
 					}
 					
 				} catch (NumberFormatException nfe) {
 					
-					//Do nothing
+					logger.addException(nfe);
 				}
 			}
 			
@@ -172,11 +185,15 @@ public class OnlineSyzygy {
 			
 			//e.printStackTrace();
 			
+			logger.addException(e);
+			
 			current_index_for_waiting_time++;
 			
 			if (current_index_for_waiting_time > WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS.length - 1) {
 				
 				current_index_for_waiting_time = WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS.length - 1;
+				
+				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: increase current_index_for_waiting_time=" + current_index_for_waiting_time);
 			}
 		}
 		
@@ -187,7 +204,7 @@ public class OnlineSyzygy {
 	}
 	
 	
-	public static final String getWDL_BlockingOnSocketConnection(IBitBoard board, int[] result) {
+	public static final String getWDL_BlockingOnSocketConnection(IBitBoard board, int[] result, Logger logger) {
 		
 		if (System.currentTimeMillis() <= WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS[current_index_for_waiting_time] + last_server_response_timestamp) {
 			
@@ -210,11 +227,15 @@ public class OnlineSyzygy {
 			
 			String json_response_text = getHTMLFromURL(url_for_the_request_mainline);
 			
+			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: json_response_text=" + json_response_text);
+			
 			current_index_for_waiting_time--;
 			
 			if (current_index_for_waiting_time < 0) {
 				
 				current_index_for_waiting_time = 0;
+				
+				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: decrease current_index_for_waiting_time=" + current_index_for_waiting_time);
 			}
 			
 			response = json_response_text;
@@ -242,6 +263,8 @@ public class OnlineSyzygy {
 			
 			if (winner_start_index != -1) {
 				
+				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: winner_start_index=" + winner_start_index);
+				
 				//int winner_end_index = json_response_text.indexOf(",", winner_start_index);
 				
 				int possible_winner_end_index1 = json_response_text.indexOf(",", winner_start_index);
@@ -266,6 +289,9 @@ public class OnlineSyzygy {
 					return null;
 				}
 				
+				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: winner_end_index=" + winner_end_index);
+				
+				
 				String winner_string = json_response_text.substring(winner_start_index + 9, winner_end_index);
 				
 				if (winner_string.equals("\"w\"")) {
@@ -282,6 +308,8 @@ public class OnlineSyzygy {
 			int dtz_start_index = json_response_text.indexOf("\"dtz\":");
 			
 			if (dtz_start_index != -1) {
+				
+				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: dtz_start_index=" + dtz_start_index);
 				
 				int possible_dtz_end_index1 = json_response_text.indexOf(",", dtz_start_index);
 				int possible_dtz_end_index2 = json_response_text.indexOf("}", dtz_start_index);
@@ -305,6 +333,9 @@ public class OnlineSyzygy {
 					return null;
 				}
 				
+				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: dtz_end_index=" + dtz_end_index);
+				
+				
 				String dtz_string = json_response_text.substring(dtz_start_index + 6, dtz_end_index);
 				
 				//System.out.println("dtz_string=" + dtz_string);
@@ -322,7 +353,7 @@ public class OnlineSyzygy {
 					
 				} catch (NumberFormatException nfe) {
 					
-					//Do nothing
+					logger.addException(nfe);
 				}
 			}
 			
@@ -331,11 +362,15 @@ public class OnlineSyzygy {
 			//e is FileNotFoundException if the requested position is not presented on the server
 			//e.printStackTrace();
 			
+			logger.addException(e);
+			
 			current_index_for_waiting_time++;
 			
 			if (current_index_for_waiting_time > WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS.length - 1) {
 				
 				current_index_for_waiting_time = WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS.length - 1;
+				
+				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: increase current_index_for_waiting_time=" + current_index_for_waiting_time);
 			}
 		}
 		
@@ -420,7 +455,19 @@ public class OnlineSyzygy {
 			//System.out.println("dtz=" + result[0]);
 			//System.out.println("wdl=" + result[1]);
 			
-			String response = getWDL_BlockingOnSocketConnection(board, result);
+			String response = getWDL_BlockingOnSocketConnection(board, result, new Logger() {
+				
+				@Override
+				public void addText(String message) {
+					//Do nothing
+				}
+				
+				@Override
+				public void addException(Exception exception) {
+					//Do nothing
+				}
+			});
+			
 			//System.out.println("dtz=" + result[0]);
 			//System.out.println("winner=" + result[1]);
 			
@@ -440,5 +487,13 @@ public class OnlineSyzygy {
 				
 			} catch (InterruptedException e) {}
 		}
+	}
+	
+	
+	public interface Logger {
+		
+		public void addText(String message);
+		
+		public void addException(Exception exception);
 	}
 }

@@ -23,7 +23,7 @@ public class TimeSaver {
 	}
 	
 	
-	public boolean beforeMove(IBitBoard bitboardForSetup, int openningBook_Mode, ISearchMediator mediator, boolean useOpening, long timeToThinkInMiliseconds) {
+	public boolean beforeMove(IBitBoard bitboardForSetup, int openningBook_Mode, final ISearchMediator mediator, boolean useOpening, long timeToThinkInMiliseconds) {
 		
 		mediator.dump("TimeSaver: useOpening = " + useOpening + ", ob=" + ob);
 		
@@ -114,7 +114,18 @@ public class TimeSaver {
 			//int dtz = result[0];//Depth to zeroing-move. A zeroing-move is a move which resets the move count to zero under the fifty-move rule, i.e. mate, a capture, or a pawn move.
 			//int dtm = result[1];//Depth to mate
 			
-			String server_response_json_text = OnlineSyzygy.getWDL_BlockingOnSocketConnection(bitboardForSetup, result);
+			String server_response_json_text = OnlineSyzygy.getWDL_BlockingOnSocketConnection(bitboardForSetup, result, new OnlineSyzygy.Logger() {
+				
+				@Override
+				public void addText(String message) {
+					mediator.dump(message);
+				}
+				
+				@Override
+				public void addException(Exception exception) {
+					mediator.dump(exception);
+				}
+			});
 			
 			long end_time = System.currentTimeMillis();
 			
