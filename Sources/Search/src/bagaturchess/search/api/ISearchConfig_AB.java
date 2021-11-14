@@ -47,7 +47,7 @@ public interface ISearchConfig_AB {
 	public static final int PLY_15_16 = 15;
 	
 	
-	public int getOpenningBook_Mode();
+	public int getOpeningBook_Mode();
 	
 	
 	/**

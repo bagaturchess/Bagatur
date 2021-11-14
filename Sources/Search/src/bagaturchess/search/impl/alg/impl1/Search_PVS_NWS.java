@@ -482,7 +482,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (dtz < 0) {
 					
-					throw new IllegalStateException("dtz=" + dtz);
+					//throw new IllegalStateException("dtz=" + dtz);
 					
 				} else {
 							

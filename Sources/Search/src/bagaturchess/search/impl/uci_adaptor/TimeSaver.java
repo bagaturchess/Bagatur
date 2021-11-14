@@ -25,7 +25,7 @@ public class TimeSaver {
 	}
 	
 	
-	public boolean beforeMove(IBitBoard bitboardForSetup, int openningBook_Mode, final ISearchMediator mediator, boolean useOpening, long timeToThinkInMiliseconds) {
+	public boolean beforeMove(IBitBoard bitboardForSetup, int openningBook_Mode, final ISearchMediator mediator, boolean useOpening, boolean useOnlineSyzygy, long timeToThinkInMiliseconds) {
 		
 		mediator.dump("TimeSaver: useOpening = " + useOpening + ", ob=" + ob);
 		
@@ -34,20 +34,20 @@ public class TimeSaver {
 			
 			IOpeningEntry entry = ob.getEntry(bitboardForSetup.getHashKey(), bitboardForSetup.getColourToMove());
 			
-			if (entry != null && entry.getWeight() >= OpeningBook.OPENNING_BOOK_MIN_MOVES) {
+			if (entry != null && entry.getWeight() >= OpeningBook.OPENING_BOOK_MIN_MOVES) {
 				
 				int move = 0;
 				switch (openningBook_Mode) {
 				
-					case OpeningBook.OPENNING_BOOK_MODE_POWER0:
+					case OpeningBook.OPENING_BOOK_MODE_POWER0:
 						move = entry.getRandomEntry(0);
 						break;
 						
-					case OpeningBook.OPENNING_BOOK_MODE_POWER1:
+					case OpeningBook.OPENING_BOOK_MODE_POWER1:
 						move = entry.getRandomEntry(1);
 						break;
 						
-					case OpeningBook.OPENNING_BOOK_MODE_POWER2:
+					case OpeningBook.OPENING_BOOK_MODE_POWER2:
 						move = entry.getRandomEntry(2);
 						break;
 						
@@ -137,7 +137,7 @@ public class TimeSaver {
 				
 				return true;
 				
-			} else {
+			} else if (useOnlineSyzygy) {
 				
 				//Try online probing
 				//We must have enough time to get response from the server
@@ -147,7 +147,7 @@ public class TimeSaver {
 					
 					mediator.dump("TimeSaver.OnlineSyzygy: EGTB Probing ...");
 					
-					int[] result = new int[2];
+					int[] result = new int[3];
 					
 					long start_time = System.currentTimeMillis();
 					
@@ -175,14 +175,35 @@ public class TimeSaver {
 					
 					if (server_response_json_text != null) {
 						
-						mediator.dump("TimeSaver.OnlineSyzygy: EGTB probing was sucessfull");
-						
-						dtz = result[0];//Depth to zeroing-move. A zeroing-move is a move which resets the move count to zero under the fifty-move rule, i.e. mate, a capture, or a pawn move.
-						int winner = result[1];//Winner's color or -1 if the position has not found
-						
-						if (winner != -1) {
+						if (result[1] != -1) {
 							
-							mediator.dump("TimeSaver.OnlineSyzygy: winner=" + winner + ", dtz=" + dtz);
+							mediator.dump("TimeSaver.OnlineSyzygy: EGTB probing was sucessfull");
+							
+							dtz = result[0];//Depth to zeroing-move. A zeroing-move is a move which resets the move count to zero under the fifty-move rule, i.e. mate, a capture, or a pawn move.
+							int winner = result[1];//Winner's color or -1 if the position has not found
+							int best_move = result[2];//Winner's color or -1 if the position has not found
+								
+							mediator.dump("TimeSaver.OnlineSyzygy: winner=" + winner + ", dtz=" + dtz + ", best_move=" + bitboardForSetup.getMoveOps().moveToString(best_move));
+							
+							ISearchInfo info = createInfo(best_move, (int) dtz);
+							
+							int eval = SearchUtils.getMateVal((int) Math.abs(dtz));
+							
+							info.setEval(eval);
+							
+							info.setBestMove(best_move);
+							
+							mediator.changedMajor(info);
+							
+							if (mediator.getBestMoveSender() != null) mediator.getBestMoveSender().sendBestMove();
+							
+							mediator.dump("TimeSaver.OfflineSyzygy: Syzygy move send.");
+							
+							return true;
+							
+						} else {
+						
+							mediator.dump("TimeSaver.OnlineSyzygy: EGTB probing ok - winner is still unknown.");
 						}
 						
 					} else {

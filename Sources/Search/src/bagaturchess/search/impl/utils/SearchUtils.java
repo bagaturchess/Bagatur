@@ -38,10 +38,13 @@ public class SearchUtils {
 		
 		if (ISearch.MAX_DEPTH - depth + 1 <=  0) {
 			
-			throw new IllegalStateException("getMateVal: depth=" + depth + ", ISearch.MAX_DEPTH - depth + 1=" + (ISearch.MAX_DEPTH - depth + 1));
+			//throw new IllegalStateException("getMateVal: depth=" + depth + ", ISearch.MAX_DEPTH - depth + 1=" + (ISearch.MAX_DEPTH - depth + 1));
+			return ISearch.MAX_MAT_INTERVAL * 1;
+			
+		} else {
+			
+			return ISearch.MAX_MAT_INTERVAL * (ISearch.MAX_DEPTH - depth + 1);
 		}
-		
-		return ISearch.MAX_MAT_INTERVAL * (ISearch.MAX_DEPTH - depth + 1);
 	}
 	
 	

@@ -55,6 +55,7 @@ public class UCIConfig_BaseImpl implements IUCIConfig {
 		registry.registerProvider(this);
 		
 		if (searchAdaptorImpl_ConfigObj instanceof IUCIOptionsProvider) {
+			
 			((IUCIOptionsProvider) searchAdaptorImpl_ConfigObj).registerProviders(registry);
 		}
 	}

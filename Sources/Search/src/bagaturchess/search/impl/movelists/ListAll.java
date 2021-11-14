@@ -234,7 +234,7 @@ public class ListAll implements ISearchMoveList {
 		if (env.getOpeningBook() != null) {
 			
 			IOpeningEntry entry = env.getOpeningBook().getEntry(env.getBitboard().getHashKey(), env.getBitboard().getColourToMove());
-			if (entry != null && entry.getWeight() >= OpeningBook.OPENNING_BOOK_MIN_MOVES) {
+			if (entry != null && entry.getWeight() >= OpeningBook.OPENING_BOOK_MIN_MOVES) {
 				
 				int[] ob_moves = entry.getMoves();
 				int[] ob_counts = entry.getCounts();

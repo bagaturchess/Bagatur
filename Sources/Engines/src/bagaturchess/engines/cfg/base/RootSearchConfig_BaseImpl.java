@@ -12,6 +12,7 @@ import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.api.IUCIOptionsRegistry;
 import bagaturchess.uci.impl.commands.options.UCIOption;
+import bagaturchess.uci.impl.commands.options.UCIOptionCombo;
 import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Integer;
 import bagaturchess.uci.impl.commands.options.UCIOptionString;
 
@@ -26,9 +27,13 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	private String DEFAULT_TbPath = getDefaultTBPath();
 	
+	private boolean DEFAULT_SyzygyOnline = true;
+	
+	
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOptionSpin_Integer("MultiPV", new Integer(1), "type spin default 1 min 1 max 100"),
 			new UCIOptionString("SyzygyPath", DEFAULT_TbPath, "type string default " + DEFAULT_TbPath),
+			new UCIOptionCombo("SyzygyOnline", "" + DEFAULT_SyzygyOnline, "type combo default true var true var false"),
+			new UCIOptionSpin_Integer("MultiPV", new Integer(1), "type spin default 1 min 1 max 100"),
 			//new UCIOptionSpin_Integer("Hidden Depth", 0, "type spin default 0 min 0 max 10"),
 	};
 	
@@ -41,6 +46,8 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private int multiPVsCount = 1;
 	
 	private String TbPath = DEFAULT_TbPath;
+	
+	private boolean use_online_syzygy = DEFAULT_SyzygyOnline;
 	
 	private int hiddenDepth = 0;
 	
@@ -224,6 +231,10 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 		} else if ("SyzygyPath".equals(option.getName())) {
 			TbPath = (String) option.getValue();
 			return true;
+		
+		} else if ("SyzygyOnline".equals(option.getName())) {
+			use_online_syzygy = option.getValue().equals("true");
+			return true;
 			
 		} else if ("Hidden Depth".equals(option.getName())) {
 			hiddenDepth = (Integer) option.getValue();
@@ -249,6 +260,13 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	@Override
 	public String getTbPath() {
 		return TbPath;
+	}
+	
+	
+	@Override
+	public boolean useOnlineSyzygy() {
+		
+		return use_online_syzygy;
 	}
 	
 	

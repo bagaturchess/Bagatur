@@ -48,6 +48,7 @@ public interface IRootSearchConfig {
 	 * EGTB Settings
 	 */
 	public String getTbPath();
+	public boolean useOnlineSyzygy();
 	
 	/**
 	 * Memory Settings

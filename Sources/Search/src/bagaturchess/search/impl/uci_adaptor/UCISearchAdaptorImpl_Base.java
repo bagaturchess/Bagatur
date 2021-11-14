@@ -164,7 +164,12 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 				
 				currentMediator.dump("Using TimeSaver ...");
 				
-				moveSent = saver.beforeMove(boardForSetup, sharedData.getSearchConfig().getOpenningBook_Mode(), currentMediator, searchAdaptorCfg.isOwnBookEnabled(), timeController.getRemainningTime());
+				moveSent = saver.beforeMove(boardForSetup,
+						sharedData.getSearchConfig().getOpeningBook_Mode(),
+						currentMediator,
+						searchAdaptorCfg.isOwnBookEnabled(),
+						((IRootSearchConfig) searchAdaptorCfg.getRootSearchConfig()).useOnlineSyzygy(),
+						timeController.getRemainningTime());
 			}
 			
 			if (!moveSent) {

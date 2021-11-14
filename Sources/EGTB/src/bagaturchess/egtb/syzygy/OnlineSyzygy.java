@@ -217,6 +217,7 @@ public class OnlineSyzygy {
 		
 		int dtz = -1;
 		int winner_color = -1;
+		int best_move = -1;
 		
 		String fen = board.toEPD().replace(' ', '_');
 		
@@ -302,58 +303,110 @@ public class OnlineSyzygy {
 					
 					winner_color = Constants.COLOUR_BLACK;					
 				}
-			}
-			
-			
-			int dtz_start_index = json_response_text.indexOf("\"dtz\":");
-			
-			if (dtz_start_index != -1) {
 				
-				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: dtz_start_index=" + dtz_start_index);
-				
-				int possible_dtz_end_index1 = json_response_text.indexOf(",", dtz_start_index);
-				int possible_dtz_end_index2 = json_response_text.indexOf("}", dtz_start_index);
-				
-				int dtz_end_index = 0;
-				
-				if (possible_dtz_end_index1 != -1 && possible_dtz_end_index2 != -1) {
+				if (winner_color == board.getColourToMove()) {
 					
-					dtz_end_index = Math.min(possible_dtz_end_index1, possible_dtz_end_index2);
 					
-				} else if (possible_dtz_end_index1 != -1) {
+					int bestmove_start_index = json_response_text.indexOf("\"uci\":"); //"uci":"d1c2",
 					
-					dtz_end_index = possible_dtz_end_index1;
+					if (bestmove_start_index != -1) {
+						
+						
+						logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: bestmove_start_index=" + bestmove_start_index);
+						
+						int possible_bestmove_end_index1 = json_response_text.indexOf(",", bestmove_start_index);
+						int possible_bestmove_end_index2 = json_response_text.indexOf("}", bestmove_start_index);
+						
+						int bestmove_end_index = 0;
+						
+						if (possible_bestmove_end_index1 != -1 && possible_bestmove_end_index2 != -1) {
+							
+							bestmove_end_index = Math.min(possible_bestmove_end_index1, possible_bestmove_end_index2);
+							
+						} else if (possible_bestmove_end_index1 != -1) {
+							
+							bestmove_end_index = possible_bestmove_end_index1;
+							
+						} else if (possible_bestmove_end_index2 != -1) {
+							
+							bestmove_end_index = possible_bestmove_end_index2;
+							
+						} else {
+							
+							return null;
+						}
+						
+						logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: bestmove_end_index=" + bestmove_end_index);
+						
+						
+						String bestmove_string = json_response_text.substring(bestmove_start_index + 6, bestmove_end_index);
+						
+						bestmove_string = bestmove_string.replace("\"", "");
+						
+						logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: bestmove_string=" + bestmove_string);
+						
+						try {
+							
+							best_move = board.getMoveOps().stringToMove(bestmove_string);
+							
+						} catch (NumberFormatException nfe) {
+							
+							logger.addException(nfe);
+						}
+					}
 					
-				} else if (possible_dtz_end_index2 != -1) {
 					
-					dtz_end_index = possible_dtz_end_index2;
+					int dtz_start_index = json_response_text.indexOf("\"dtz\":");
 					
-				} else {
-					
-					return null;
-				}
-				
-				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: dtz_end_index=" + dtz_end_index);
-				
-				
-				String dtz_string = json_response_text.substring(dtz_start_index + 6, dtz_end_index);
-				
-				//System.out.println("dtz_string=" + dtz_string);
-				
-				try {
-					
-					dtz = Integer.parseInt(dtz_string);
-					
-					//this is the first occurance of dtz string in json response.
-					//We have to add one move and switch the sign by multiplying to -1.
-					dtz += dtz > 0 ? 1 : -1;
-					dtz = -dtz;
-					
-					//System.out.println("dtz=" + dtz);
-					
-				} catch (NumberFormatException nfe) {
-					
-					logger.addException(nfe);
+					if (dtz_start_index != -1) {
+						
+						logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: dtz_start_index=" + dtz_start_index);
+						
+						int possible_dtz_end_index1 = json_response_text.indexOf(",", dtz_start_index);
+						int possible_dtz_end_index2 = json_response_text.indexOf("}", dtz_start_index);
+						
+						int dtz_end_index = 0;
+						
+						if (possible_dtz_end_index1 != -1 && possible_dtz_end_index2 != -1) {
+							
+							dtz_end_index = Math.min(possible_dtz_end_index1, possible_dtz_end_index2);
+							
+						} else if (possible_dtz_end_index1 != -1) {
+							
+							dtz_end_index = possible_dtz_end_index1;
+							
+						} else if (possible_dtz_end_index2 != -1) {
+							
+							dtz_end_index = possible_dtz_end_index2;
+							
+						} else {
+							
+							return null;
+						}
+						
+						logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: dtz_end_index=" + dtz_end_index);
+						
+						
+						String dtz_string = json_response_text.substring(dtz_start_index + 6, dtz_end_index);
+						
+						//System.out.println("dtz_string=" + dtz_string);
+						
+						try {
+							
+							dtz = Integer.parseInt(dtz_string);
+							
+							//this is the first occurance of dtz string in json response.
+							//We have to add one move and switch the sign by multiplying to -1.
+							dtz += dtz > 0 ? 1 : -1;
+							dtz = -dtz;
+							
+							//System.out.println("dtz=" + dtz);
+							
+						} catch (NumberFormatException nfe) {
+							
+							logger.addException(nfe);
+						}
+					}
 				}
 			}
 			
@@ -374,8 +427,16 @@ public class OnlineSyzygy {
 			}
 		}
 		
-		result[0] = dtz;
-		result[1] = winner_color;
+		
+		if (best_move != -1) {
+			
+			result[0] = dtz;
+			
+			result[1] = winner_color;
+			
+			result[2] = best_move;
+		}
+		
 		
 		return response;
 	}
@@ -447,7 +508,7 @@ public class OnlineSyzygy {
 		IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/3P4/3K4 w - -");
 		//IBitBoard board = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
 		
-		int[] result = new int[2];
+		int[] result = new int[3];
 		
 		for (int counter = 0; counter < 100; counter++) {
 		
@@ -459,12 +520,12 @@ public class OnlineSyzygy {
 				
 				@Override
 				public void addText(String message) {
-					//Do nothing
+					System.out.println(message);
 				}
 				
 				@Override
 				public void addException(Exception exception) {
-					//Do nothing
+					exception.printStackTrace();
 				}
 			});
 			
@@ -483,6 +544,7 @@ public class OnlineSyzygy {
 			try {
 				
 				System.out.println("Waiting " + WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time] + " ms");
+				
 				Thread.sleep(WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time]);
 				
 			} catch (InterruptedException e) {}
