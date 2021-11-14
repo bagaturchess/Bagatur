@@ -295,6 +295,8 @@ public class OnlineSyzygy {
 				
 				String winner_string = json_response_text.substring(winner_start_index + 9, winner_end_index);
 				
+				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: winner_string=" + winner_string);
+				
 				if (winner_string.equals("\"w\"")) {
 					
 					winner_color = Constants.COLOUR_WHITE;
@@ -428,14 +430,11 @@ public class OnlineSyzygy {
 		}
 		
 		
-		if (best_move != -1) {
-			
-			result[0] = dtz;
-			
-			result[1] = winner_color;
-			
-			result[2] = best_move;
-		}
+		result[0] = dtz;
+		
+		result[1] = winner_color;
+		
+		result[2] = best_move;
 		
 		
 		return response;

@@ -175,7 +175,7 @@ public class TimeSaver {
 					
 					if (server_response_json_text != null) {
 						
-						if (result[2] != -1) {
+						if (result[0] != -1 && result[1] != -1 && result[2] != -1) {
 							
 							mediator.dump("TimeSaver.OnlineSyzygy: EGTB probing was sucessfull");
 							
