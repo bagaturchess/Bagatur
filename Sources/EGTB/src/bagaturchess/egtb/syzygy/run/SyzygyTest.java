@@ -1,11 +1,8 @@
 package bagaturchess.egtb.syzygy.run;
 
 
-import com.winkelhagen.chess.syzygy.SyzygyBridge;
-
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.Board;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 
