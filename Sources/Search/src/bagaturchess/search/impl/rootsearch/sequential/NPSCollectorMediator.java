@@ -75,9 +75,15 @@ public class NPSCollectorMediator extends SearchMediatorProxy {
 		result.setSelDepth(0);
 		
 		synchronized (infos) {
+			
 			for (int i = 0; i < infos.size(); i++) {
+				
 				ISearchInfo cur = infos.get(i);
+				
 				result.setSearchedNodes(result.getSearchedNodes() + cur.getSearchedNodes());
+				
+				result.setTBhits(result.getTBhits() + cur.getTBhits());
+				
 				if (cur.getDepth() > result.getDepth()) {
 					result.setDepth(cur.getDepth());
 				}

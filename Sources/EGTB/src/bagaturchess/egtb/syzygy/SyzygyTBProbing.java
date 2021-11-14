@@ -112,24 +112,33 @@ public class SyzygyTBProbing {
      * @param board the FrankWalter board representation
      * @return a WDL result (see {@link #toXBoardScore(int)} and {@link #toMove(int)})
      */
-    public synchronized int probeDTZ(IBitBoard board){
-        if (board.hasRightsToKingCastle(Constants.COLOUR_WHITE) || board.hasRightsToQueenCastle(Constants.COLOUR_WHITE)
-        		|| board.hasRightsToKingCastle(Constants.COLOUR_BLACK) || board.hasRightsToQueenCastle(Constants.COLOUR_BLACK)){
+    public synchronized int probeDTZ(IBitBoard board) {
+    	
+        if (board.hasRightsToKingCastle(Constants.COLOUR_WHITE)
+        		|| board.hasRightsToQueenCastle(Constants.COLOUR_WHITE)
+        		|| board.hasRightsToKingCastle(Constants.COLOUR_BLACK)
+        		|| board.hasRightsToQueenCastle(Constants.COLOUR_BLACK)) {
+        	
             return -1;
         }
-        return SyzygyBridge.probeSyzygyDTZ(
-        		convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_WHITE)),
-        		convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_BLACK)),
-        		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING)),
-        		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN)),
-        		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_ROOK)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_ROOK)),
-        		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP)),
-        		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT)),
-        		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN)),
-                board.getDraw50movesRule(),
-                0,//board.getEpSquare()==-1?0:board.getEpSquare(),
-                board.getColourToMove() == Constants.COLOUR_WHITE
+       
+        
+        int score = SyzygyBridge.probeSyzygyDTZ(
+        		
+    		convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_WHITE)),
+    		convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_BLACK)),
+    		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING)),
+    		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN)),
+    		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_ROOK)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_ROOK)),
+    		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP)),
+    		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT)),
+    		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN)),
+            board.getDraw50movesRule(),
+            0,//board.getEpSquare()==-1?0:board.getEpSquare(),
+            board.getColourToMove() == Constants.COLOUR_WHITE
         );
+	        
+        return score;
     }
 
 
@@ -147,53 +156,35 @@ public class SyzygyTBProbing {
     
     
     /**
-     * returns the score associated to the move in the result (xboard compatible, i.e. (+/-) 28000-full moves to win/lose or 0 for draw.
-     *
-     * @param result of the DTZ tablebase operation
-     * @return the score to be displayed by xboard
-     * todo: fix: this returns DTZero, not DTMate.
-     */
-    public int toXBoardScore(int result){
-        int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
-        int dtzFull = (dtz+1)/2;
-        int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
-        switch (wdl){
-            case SyzygyConstants.TB_LOSS:
-                return -28000 + dtzFull; //LW DTM: -100000 - dtzFull
-            case SyzygyConstants.TB_BLESSED_LOSS:
-                return 0;
-            case SyzygyConstants.TB_DRAW:
-                return 0;
-            case SyzygyConstants.TB_CURSED_WIN:
-                return +28000 - dtzFull; //LW DTM: +100000 + dtzFull
-            case SyzygyConstants.TB_WIN:
-                return +28000 - dtzFull; //LW DTM: +100000 + dtzFull
-            default:
-                return 0;
-        }
-    }
-    
-    
-    /**
      * returns the score to use inside the main search, based on the WDL result of a TableBase query and the search depth
      * @param wdl the WinDrawLoss result from the probe
      * @param depth the depth of the current search
      * @return the score associated with this position
      */
-    public synchronized int getWDLScore(int wdl, int depth) {
-        switch (wdl){
+    public int getWDLScore(int wdl, int depth) {
+    	
+        switch (wdl) {
+        
             case SyzygyConstants.TB_LOSS:
                 return -28000 + depth;
+                
             case SyzygyConstants.TB_BLESSED_LOSS:
-                return 0;//-27000 + depth;
+            	return 0;
+                //return -27000 + depth;
+                
             case SyzygyConstants.TB_DRAW:
                 return 0;
+                
             case SyzygyConstants.TB_CURSED_WIN:
-                return 0;//27000 - depth;
+            	return 0;
+                //return 27000 - depth;
+                
             case SyzygyConstants.TB_WIN:
                 return 28000 - depth;
+                
             default:
-                throw new IllegalStateException("wdl=" + wdl);
+            	throw new IllegalStateException("wdl=" + wdl);
+                //return 0;
         }
     }
     

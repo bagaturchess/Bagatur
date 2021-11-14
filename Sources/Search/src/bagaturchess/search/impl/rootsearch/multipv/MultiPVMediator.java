@@ -131,6 +131,9 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 			for (int i=0; i<pvsToSend.length; i++) {
 				
 				pvsToSend[i].getInfo().setSearchedNodes(nodesInfo.getSearchedNodes());
+				
+				pvsToSend[i].getInfo().setTBhits(nodesInfo.getTBhits());
+				
 				String message = SearchInfoUtils.buildMajorInfoCommand_multipv(i+1, pvsToSend[i].getInfo(),
 						startTime, 0 /*sharedData.getTPT().getUsage()*/, 0 /*sharedData.getTPT().getCount_UniqueInserts()*/, bitboard);
 				send(message);
@@ -193,7 +196,11 @@ public class MultiPVMediator extends SearchMediatorProxy implements IFinishCallb
 		ISearchInfo result = SearchInfoFactory.getFactory().createSearchInfo();
 		
 		for (ISearchInfo cur: infos) {
+			
 			result.setSearchedNodes(result.getSearchedNodes() + cur.getSearchedNodes());
+			
+			result.setTBhits(result.getTBhits() + cur.getTBhits());
+			
 			if (cur.getDepth() > result.getDepth()) {
 				result.setDepth(cur.getDepth());
 			}

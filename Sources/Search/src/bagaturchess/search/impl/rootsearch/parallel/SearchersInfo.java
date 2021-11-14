@@ -56,6 +56,8 @@ public class SearchersInfo {
 			ISearchInfo info = searchersNodesInfo.get(searcher);
 			if (info != null) {
 				nodes += info.getSearchedNodes();
+				//result.setTBhits(result.getTBhits() + cur.getTBhits());
+				if (true) throw new IllegalStateException();
 			}
 		}
 		return nodes;
@@ -230,7 +232,7 @@ public class SearchersInfo {
 		}
 		
 		
-		public long getSearchedNodes() {
+		/*public long getSearchedNodes() {
 			
 			ISearchInfo last_info = getLastSearchInfo(getMaxDepth());
 			
@@ -239,7 +241,7 @@ public class SearchersInfo {
 			}
 			
 			return last_info.getSearchedNodes();
-		}
+		}*/
 
 
 		public void update(ISearchInfo info) {

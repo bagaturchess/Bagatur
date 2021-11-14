@@ -26,7 +26,10 @@ package bagaturchess.search.impl.alg.impl1;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
+import com.winkelhagen.chess.syzygy.SyzygyBridge;
+
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.Assert;
@@ -53,6 +56,11 @@ import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.search.impl.utils.SearchUtils;
+
+import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
+import bagaturchess.search.impl.eval.cache.EvalEntry_BaseImpl;
+import bagaturchess.search.impl.eval.cache.IEvalCache;
+import bagaturchess.search.impl.eval.cache.IEvalEntry;
 
 
 public class Search_PVS_NWS extends SearchImpl {
@@ -89,13 +97,28 @@ public class Search_PVS_NWS extends SearchImpl {
 	private VarStatistic historyAVGScores;
 	
 	
+	private boolean USE_DTZ_CACHE = false;
+	
+	private IEvalCache cache_dtz;
+	
+	private IEvalEntry temp_cache_entry;
+	
+	
 	public Search_PVS_NWS(Object[] args) {
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
 	}
 	
 	
 	public Search_PVS_NWS(SearchEnv _env) {
+		
 		super(_env);
+		
+		if (USE_DTZ_CACHE) {
+			
+	    	cache_dtz = new EvalCache_Impl2(64 * 1024 * 1024);
+	    	
+	    	temp_cache_entry = new EvalEntry_BaseImpl();
+		}
 	}
 	
 	
@@ -379,45 +402,94 @@ public class Search_PVS_NWS extends SearchImpl {
     			){
 			
 			if (cb.checkingPieces != 0) {
+				
 				if (!env.getBitboard().hasMoveInCheck()) {
+					
 					node.bestmove = 0;
 					node.eval = -getMateVal(ply);
 					node.leaf = true;
+					
 					return node.eval;
 				}
+				
 			} else {
+				
 				if (!env.getBitboard().hasMoveInNonCheck()) {
+					
 					node.bestmove = 0;
 					node.eval = EvalConstants.SCORE_DRAW;
 					node.leaf = true;
+					
 					return node.eval;
 				}
 			}
 			
-			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
-			if (result != -1) {
-				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
-				int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
-				int egtbscore =  SyzygyTBProbing.getSingleton().getWDLScore(wdl, ply);
-				if (egtbscore > 0) {
-					int distanceToDraw = 100 - env.getBitboard().getDraw50movesRule();
-					if (distanceToDraw > dtz) {
-						node.bestmove = 0;
-						node.eval = 9 * (distanceToDraw - dtz);
-						node.leaf = true;
-						return node.eval;
-					} else {
+			
+			int probe_result = probeDTZ_WithCache();
+			
+			if (probe_result != -1) {
+				
+				info.setTBhits(info.getTBhits() + 1);
+				
+				int dtz = (probe_result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
+				int wdl = (probe_result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+				//int wdl = SyzygyTBProbing.getSingleton().probeWDL(env.getBitboard());
+				
+				//Winner is minimizing DTZ and the loser is maximizing DTZ
+		        switch (wdl) {
+		        
+	            	case SyzygyConstants.TB_WIN:
+	            		
+	    				node.bestmove = 0;
+	    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
+	    				//TODO: check ISearch.MAX_DEPTH - depth + 1 > 0
+	    				node.eval = SearchUtils.getMateVal(ply + dtz);
+	    				node.leaf = true;
+	    				
+	    				return node.eval;
+	            		
+		            case SyzygyConstants.TB_LOSS:
+		            	
+	    				/*node.bestmove = 0;
+	    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
+	    				//TODO: check ISearch.MAX_DEPTH - depth + 1 > 0
+	    				node.eval = -SearchUtils.getMateVal(ply + dtz);
+	    				node.leaf = true;
+	    				
+	    				return node.eval;*/
+		            	break;
+		            
+		            case SyzygyConstants.TB_DRAW:
+		            	
 						node.bestmove = 0;
 						node.eval = EvalConstants.SCORE_DRAW;
 						node.leaf = true;
+						
 						return node.eval;
-					}
-				} else if (egtbscore == 0) {
-					node.bestmove = 0;
-					node.eval = EvalConstants.SCORE_DRAW;
-					node.leaf = true;
-					return node.eval;
-				}
+		                
+		            case SyzygyConstants.TB_BLESSED_LOSS:
+		            	
+						node.bestmove = 0;
+						node.eval = EvalConstants.SCORE_DRAW;
+						node.leaf = true;
+						
+						return node.eval;
+		                //return -27000 + ply;
+		                
+		            case SyzygyConstants.TB_CURSED_WIN:
+		            	
+						node.bestmove = 0;
+						node.eval = EvalConstants.SCORE_DRAW;
+						node.leaf = true;
+						
+						return node.eval;
+		                //return 27000 - ply;
+		                
+		            default:
+		            	
+		            	throw new IllegalStateException("wdl=" + wdl);
+		                //return 0;
+		        }
 			}
         }
 		
@@ -1121,5 +1193,45 @@ public class Search_PVS_NWS extends SearchImpl {
 		} catch(EmptyStackException ese) {
 			//Do nothing
 		}
+	}
+	
+	
+	private int probeDTZ_WithCache() {
+		
+	    int moves_till_draw = 100 - env.getBitboard().getDraw50movesRule();
+	    
+	    moves_till_draw = moves_till_draw + moves_till_draw << 8;
+	    moves_till_draw = moves_till_draw + moves_till_draw << 16;
+	    
+	    long hash_moves_till_draw = moves_till_draw + ((long) moves_till_draw) << 32;
+	    
+	    long hashkey = env.getBitboard().getHashKey() ^ hash_moves_till_draw;
+	    
+	    if (USE_DTZ_CACHE) {
+	    	
+		    cache_dtz.get(hashkey, temp_cache_entry);
+			
+			if (!temp_cache_entry.isEmpty()) {
+				
+				int probe_result = temp_cache_entry.getEval();
+		        
+				return probe_result;
+				
+			} else {
+		    
+		        int probe_result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+		        
+		        cache_dtz.put(hashkey, 5, probe_result);
+		        
+		        return probe_result;
+			}
+			
+	    } else {
+	    	
+	    	int probe_result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+	        
+	        return probe_result;
+	    }
+
 	}
 }

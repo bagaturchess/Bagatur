@@ -29,11 +29,13 @@ import bagaturchess.search.impl.utils.SearchUtils;
 
 
 public class SearchInfoImpl implements ISearchInfo {
+	
 
 	public int depth;
 	public int seldepth;
 	
 	public long nodes;
+	public long tbhits;
 	
 	public int eval;
 	
@@ -47,6 +49,10 @@ public class SearchInfoImpl implements ISearchInfo {
 	public boolean isLowerBound;
 	public boolean isUpperBound;
 	
+	
+	public long getTBhits() {
+		return tbhits;
+	}
 	
 	public int getBestMove() {
 		return bestmove;
@@ -80,6 +86,10 @@ public class SearchInfoImpl implements ISearchInfo {
 		return seldepth;
 	}
 
+	public void setTBhits(long tbhits) {
+		this.tbhits = tbhits;
+	}
+	
 	public void setBestMove(int move) {
 		bestmove = move;
 	}

@@ -42,7 +42,9 @@ public class SearchInfoUtils {
 		if (nps > 1) {
 			message.append(" nps " + nps);
 		}
-		
+		if (info.getTBhits() > 0) {
+			message.append(" tbhits " + info.getTBhits());
+		}
 		long eval = (int)info.getEval();
 		if (info.isMateScore()) {
 			message.append(" score mate " + info.getMateScore());
@@ -95,6 +97,9 @@ public class SearchInfoUtils {
 		long nps = nodes / timeInSecs;
 		if (nps > 1) {
 			message.append(" nps " + nps);
+		}
+		if (info.getTBhits() > 0) {
+			message.append(" tbhits " + info.getTBhits());
 		}
 		if (info.getCurrentMove() != 0) {
 			message.append(" currmove ");

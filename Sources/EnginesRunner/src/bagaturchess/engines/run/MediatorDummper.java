@@ -74,6 +74,7 @@ public class MediatorDummper implements ISearchMediator {
   			//" Mate: " + info.isMateScore() +
   			"	Eval: " + (info.isMateScore() ? (info.getMateScore() + "M") : info.getEval() ) +
   			"	NPS: " + (int)(info.getSearchedNodes()/((System.currentTimeMillis()-startTime)/(double)1000)) +
+  			"	TB hits: " + (int) info.getTBhits() +
   			//" Thread: " + Thread.currentThread().getName() +
   			"	PV: " + BoardUtils.movesToString(info.getPV(), board)
   		);

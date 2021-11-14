@@ -49,6 +49,9 @@ public interface ISearchInfo {
 	public long getSearchedNodes();
 	public void setSearchedNodes(long nodes);
 	
+	public long getTBhits();
+	public void setTBhits(long tbhits);
+	
 	public boolean isMateScore();
 	
 	public int getMateScore();

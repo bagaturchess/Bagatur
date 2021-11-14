@@ -24,7 +24,7 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	protected static final double MEM_USAGE_PAWNCACHE 	= 0.00;
 	
 	
-	private String DEFAULT_TbPath = (new File(".")).getAbsolutePath() + File.separatorChar + "data" + File.separatorChar + "egtb";
+	private String DEFAULT_TbPath = getDefaultTBPath();
 	
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionSpin_Integer("MultiPV", new Integer(1), "type spin default 1 min 1 max 100"),
@@ -216,6 +216,7 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	@Override
 	public boolean applyOption(UCIOption option) {
+		
 		if ("MultiPV".equals(option.getName())) {
 			multiPVsCount = (Integer) option.getValue();
 			return true;
@@ -232,32 +233,6 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 		return false;
 	}
 	
-	/*
-	public static void main(String[] args) {
-		try {
-			RootSearchConfig_BaseImpl b = new RootSearchConfig_BaseImpl(new String[] {
-											"bagaturchess.search.impl.alg.impl0.SearchMTD0",
-											"bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD",
-											"bagaturchess.learning.impl.eval.cfg.WeightsBoardConfigImpl",
-											"bagaturchess.engines.learning.cfg.weights.evaltune.WeightsEvaluationConfig_TUNE",
-											"-e",
-											//"MATERIAL_PAWN_E=-1.00",
-											"MATERIAL_PAWN_O=1.00"
-											});
-			//bagaturchess.search.impl.alg.impl0.SearchMTD0
-			//bagaturchess.engines.bagatur.cfg.search.SearchConfigImpl_MTD
-			//bagaturchess.learning.impl.eval.cfg.WeightsBoardConfigImpl
-			//bagaturchess.engines.learning.cfg.weights.evaltune.WeightsEvaluationConfig_TUNE
-			//-e
-			//MATERIAL_PAWN_E=-1.00
-			
-			b.toString();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	*/
 
 	@Override
 	public String getBoardFactoryClassName() {
@@ -280,5 +255,18 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	@Override
 	public boolean initCaches() {
 		return true;
+	}
+	
+	
+	private static final String getDefaultTBPath() {
+		
+		File work_dir = new File(".");
+		
+		if (work_dir.getName().equals("bin")) {
+			
+			work_dir = work_dir.getParentFile();
+		}
+		
+		return work_dir.getAbsolutePath() + File.separatorChar + "data" + File.separatorChar + "egtb";
 	}
 }

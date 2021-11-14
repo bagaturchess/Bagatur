@@ -60,6 +60,7 @@ public class SyzygyBridge {
             libLoaded = true;
             
         } catch (Throwable t) {
+        	
         	System.out.println("Unable to load JSyzygy library " + t);
         }
         
