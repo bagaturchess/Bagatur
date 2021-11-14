@@ -365,11 +365,15 @@ public class OnlineSyzygy {
 	private static byte[] readAllBytes(InputStream inputStream) throws IOException {
 
 		final int bufLen = 4096;
+		
 		byte[] buf = new byte[bufLen];
+		
 		int readLen;
+		
 		IOException exception = null;
 
 		try {
+			
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 			while ((readLen = inputStream.read(buf, 0, bufLen)) != -1)
@@ -392,8 +396,11 @@ public class OnlineSyzygy {
 			else
 				
 				try {
+					
 					inputStream.close();
+					
 				} catch (IOException e) {
+					
 					exception.addSuppressed(e);
 				}
 		}
