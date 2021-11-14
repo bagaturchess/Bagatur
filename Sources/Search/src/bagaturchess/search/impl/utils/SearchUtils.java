@@ -28,21 +28,25 @@ import bagaturchess.search.api.internal.ISearch;
 
 public class SearchUtils {
 	
+	
 	public static final int getMateVal(int depth) {
+		
 		if (depth <= 0) {
-			throw new IllegalStateException("depth=" + depth);
+			
+			throw new IllegalStateException("getMateVal: depth=" + depth);
 		}
+		
+		if (ISearch.MAX_DEPTH - depth + 1 <=  0) {
+			
+			throw new IllegalStateException("getMateVal: depth=" + depth + ", ISearch.MAX_DEPTH - depth + 1=" + (ISearch.MAX_DEPTH - depth + 1));
+		}
+		
 		return ISearch.MAX_MAT_INTERVAL * (ISearch.MAX_DEPTH - depth + 1);
 	}
 	
-	public static final int getMateVal_0(int depth) {
-		if (depth < 0) {
-			throw new IllegalStateException("depth=" + depth);
-		}
-		return ISearch.MAX_MAT_INTERVAL * (ISearch.MAX_DEPTH - depth + 1);
-	}
 	
 	public static final boolean isMateVal(int val) {
+		
 		val = Math.abs(val);
 		
 		/*if (val > ISearch.MAX_MAT_INTERVAL) {

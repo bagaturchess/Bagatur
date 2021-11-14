@@ -395,6 +395,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		
+		
 		if (ply > 1
     	    	&& depth >= 7
     			&& SyzygyTBProbing.getSingleton() != null
@@ -477,66 +479,78 @@ public class Search_PVS_NWS extends SearchImpl {
 				info.setTBhits(info.getTBhits() + 1);
 				
 				int dtz = (probe_result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
-				int wdl = (probe_result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
-				//int wdl = SyzygyTBProbing.getSingleton().probeWDL(env.getBitboard());
 				
-				//Winner is minimizing DTZ and the loser is maximizing DTZ
-		        switch (wdl) {
-		        
-	            	case SyzygyConstants.TB_WIN:
-	            		
-	    				node.bestmove = 0;
-	    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
-	    				//TODO: check ISearch.MAX_DEPTH - depth + 1 > 0
-	    				node.eval = SearchUtils.getMateVal(ply + dtz);
-	    				node.leaf = true;
-	    				
-	    				return node.eval;
-	            		
-		            case SyzygyConstants.TB_LOSS:
-		            	
-	    				/*node.bestmove = 0;
-	    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
-	    				//TODO: check ISearch.MAX_DEPTH - depth + 1 > 0
-	    				node.eval = -SearchUtils.getMateVal(ply + dtz);
-	    				node.leaf = true;
-	    				
-	    				return node.eval;*/
-		            	break;
-		            
-		            case SyzygyConstants.TB_DRAW:
-		            	
-						node.bestmove = 0;
-						node.eval = EvalConstants.SCORE_DRAW;
-						node.leaf = true;
-						
-						return node.eval;
-		                
-		            case SyzygyConstants.TB_BLESSED_LOSS:
-		            	
-						node.bestmove = 0;
-						node.eval = EvalConstants.SCORE_DRAW;
-						node.leaf = true;
-						
-						return node.eval;
-		                //return -27000 + ply;
-		                
-		            case SyzygyConstants.TB_CURSED_WIN:
-		            	
-						node.bestmove = 0;
-						node.eval = EvalConstants.SCORE_DRAW;
-						node.leaf = true;
-						
-						return node.eval;
-		                //return 27000 - ply;
-		                
-		            default:
-		            	
-		            	throw new IllegalStateException("wdl=" + wdl);
-		                //return 0;
-		        }
+				if (dtz < 0) {
+					
+					throw new IllegalStateException("dtz=" + dtz);
+					
+				} else {
+							
+					int wdl = (probe_result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+					//int wdl = SyzygyTBProbing.getSingleton().probeWDL(env.getBitboard());
+					
+					//Winner is minimizing DTZ and the loser is maximizing DTZ
+			        switch (wdl) {
+			        
+		            	case SyzygyConstants.TB_WIN:
+		            		
+		    				node.bestmove = 0;
+		    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
+		    				//TODO: check ISearch.MAX_DEPTH - depth + 1 > 0
+		    				node.eval = SearchUtils.getMateVal(ply + dtz);
+		    				node.leaf = true;
+		    				
+		    				return node.eval;
+		            		
+			            case SyzygyConstants.TB_LOSS:
+			            	
+		    				/*
+		    				This code doesn't work at the moment
+		    				node.bestmove = 0;
+		    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
+		    				//TODO: check ISearch.MAX_DEPTH - depth + 1 > 0
+		    				node.eval = -SearchUtils.getMateVal(ply + dtz);
+		    				node.leaf = true;
+		    				
+		    				return node.eval;*/
+			            	break;
+			            
+			            case SyzygyConstants.TB_DRAW:
+			            	
+							node.bestmove = 0;
+							node.eval = EvalConstants.SCORE_DRAW;
+							node.leaf = true;
+							
+							return node.eval;
+			                
+			            case SyzygyConstants.TB_BLESSED_LOSS:
+			            	
+							node.bestmove = 0;
+							node.eval = EvalConstants.SCORE_DRAW;
+							node.leaf = true;
+							
+							return node.eval;
+			                //return -27000 + ply;
+			                
+			            case SyzygyConstants.TB_CURSED_WIN:
+			            	
+							node.bestmove = 0;
+							node.eval = EvalConstants.SCORE_DRAW;
+							node.leaf = true;
+							
+							return node.eval;
+			                //return 27000 - ply;
+			                
+			            default:
+			            	
+			            	throw new IllegalStateException("wdl=" + wdl);
+			                //return 0;
+			        }
+				}
 			}
         }
+		
+		
 		
 		
 		if (depth == 0) {
