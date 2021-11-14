@@ -38,7 +38,7 @@ public class OnlineSyzygy {
 	private static final String CHARSET_ENCODING = "UTF-8";
 	
 	
-	//We have to wait 30 seconds between each server request,
+	//We have to wait between each server request,
 	//because otherwise we got "Server returned HTTP response code: 429"
 	private static int[] WAITING_TIME_BETWEEN_REQESTS_IN_MILISECONDS = new int[] {
 			500,
