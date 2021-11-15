@@ -230,10 +230,10 @@ public class SyzygyTBProbing {
 			//int wdl = SyzygyTBProbing.getSingleton().probeWDL(board);
 			//wdl = (wdl & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
 			
-			System.out.println(board.getMoveOps().moveToString(cur_move) + ", dtz=" + dtz + ", wdl=" + wdl);
+			//System.out.println(board.getMoveOps().moveToString(cur_move) + ", dtz=" + dtz + ", wdl=" + wdl);
 			
 			
-			//Frpm oponent perspective the win is loss
+			//From opponent perspective the win is loss
 			if (wdl == SyzygyConstants.TB_LOSS) {
 				
 				moves.add(new MoveWDLPair(wdl, dtz, cur_move));
@@ -247,6 +247,10 @@ public class SyzygyTBProbing {
 		if (moves.size() > 0) {
 			
 			Collections.sort(moves);
+			
+			for (int i = 0; i < moves.size(); i++){
+				System.out.println(board.getMoveOps().moveToString((int) moves.get(i).move) + ", dtz=" + moves.get(i).dtz + ", wdl=" + moves.get(i).wdl);
+			}
 			
 			MoveWDLPair best = moves.get(0);
 			
@@ -305,8 +309,8 @@ public class SyzygyTBProbing {
     }
     
     
-	private static long convertBB(long figures) {
-		return figures;
+	private static long convertBB(long pieces) {
+		return pieces;
 	}
 	
 	
@@ -377,7 +381,7 @@ public class SyzygyTBProbing {
 		@Override
 		public int hashCode() {
 			
-			return (int) (100 * (dtz + 1)+ move);
+			return (int) (100 * (dtz + 1) + move);
 		}
 		
 		
@@ -400,7 +404,7 @@ public class SyzygyTBProbing {
 		
 		long[] result = new long[2];
 		
-		SyzygyTBProbing.getSingleton().load("<path>\\EGTB\\syzygy");
+		SyzygyTBProbing.getSingleton().load("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\EGTB\\syzygy");
 		
 		SyzygyTBProbing.getSingleton().probeMove(board, result);
 		

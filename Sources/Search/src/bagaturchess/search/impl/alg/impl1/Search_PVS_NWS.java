@@ -493,7 +493,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		            		
 		    				node.bestmove = 0;
 		    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
-		    				//TODO: check ISearch.MAX_DEPTH - depth + 1 > 0
 		    				node.eval = SearchUtils.getMateVal(ply + dtz);
 		    				node.leaf = true;
 		    				
@@ -505,7 +504,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		    				This code doesn't work at the moment
 		    				node.bestmove = 0;
 		    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
-		    				//TODO: check ISearch.MAX_DEPTH - depth + 1 > 0
 		    				node.eval = -SearchUtils.getMateVal(ply + dtz);
 		    				node.leaf = true;
 		    				

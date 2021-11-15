@@ -8,6 +8,7 @@ import bagaturchess.egtb.syzygy.OnlineSyzygy;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
+import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.info.SearchInfoFactory;
@@ -101,7 +102,8 @@ public class TimeSaver {
 		}
 		
 		
-		if (bitboardForSetup.getMaterialState().getPiecesCount() <= 7) {
+		//Doesn't work well at the moment: plays correct most moves but does't do promotion move and make draw from winning games.
+		if (false && bitboardForSetup.getMaterialState().getPiecesCount() <= 7) {
 			
 			//Try offline probing
 			
@@ -121,9 +123,9 @@ public class TimeSaver {
 				
 				System.out.println("TimeSaver.OfflineSyzygy: Syzygy bestmove is " + bitboardForSetup.getMoveOps().moveToString(best_move));
 				
-				ISearchInfo info = createInfo(best_move, (int) dtz);
+				ISearchInfo info = createInfo(best_move, 1);
 				
-				int eval = SearchUtils.getMateVal((int) Math.abs(dtz));
+				int eval = SearchUtils.getMateVal(ISearch.MAX_DEPTH);
 				
 				info.setEval(eval);
 				
@@ -185,9 +187,9 @@ public class TimeSaver {
 								
 							mediator.dump("TimeSaver.OnlineSyzygy: winner=" + winner + ", dtz=" + dtz + ", best_move=" + bitboardForSetup.getMoveOps().moveToString(best_move));
 							
-							ISearchInfo info = createInfo(best_move, (int) dtz);
+							ISearchInfo info = createInfo(best_move, 1);
 							
-							int eval = SearchUtils.getMateVal((int) Math.abs(dtz));
+							int eval = SearchUtils.getMateVal(ISearch.MAX_DEPTH);
 							
 							info.setEval(eval);
 							
@@ -227,92 +229,4 @@ public class TimeSaver {
 		info.setPV(new int[] {move});
 		return info;
 	}
-	
-	
-	/*protected void setupBoard(IBitBoard _bitboardForSetup) {
-		bitboard.revert();
-		
-		int movesCount = _bitboardForSetup.getPlayedMovesCount();
-		int[] moves = _bitboardForSetup.getPlayedMoves();
-		for (int i=0; i<movesCount; i++) {
-			bitboard.makeMoveForward(moves[i]);
-		}
-	}
-	
-	
-	private int getOpeningMove_Evaluation(IOpeningEntry entry, SharedData sharedData, IBitBoard bitboardForSetup, ISearchMediator mediator) {
-		
-		setupBoard(bitboardForSetup);
-		
-		IEvaluator eval = sharedData.getEvaluatorFactory().create(bitboard, sharedData.getAndRemoveEvalCache(), sharedData.getEngineConfiguration().getEvalConfig());
-		
-		double best_val = Integer.MIN_VALUE;
-		int best_move = 0;
-		
-		int[] moves = entry.getMoves();
-		for (int i=0; i<moves.length; i++) {
-			
-			int cur_move = moves[i];
-			
-			bitboard.makeMoveForward(cur_move);
-			
-			IOpeningEntry cur_entry = ob.getEntry(bitboard.getHashKey(), bitboard.getColourToMove());
-			double cur_val = -minmaxOpening(cur_entry, bitboard, eval, 0);
-			
-			if (cur_val > best_val) {
-				best_val = cur_val;
-				best_move = cur_move;
-			}
-			
-			bitboard.makeMoveBackward(cur_move);
-			
-			mediator.dump("Opening move candidate: " + MoveInt.moveToString(cur_move) + ", eval is " + cur_val);
-		}
-		
-		return best_move;
-	}
-	
-	
-	private double minmaxOpening(IOpeningEntry entry, IBitBoard bitboard, IEvaluator eval, int depth) {
-		
-		if (entry == null) {
-			return eval.fullEval(0, Integer.MIN_VALUE, Integer.MAX_VALUE, bitboard.getColourToMove());
-		}
-		
-		if (bitboard.getStateRepetition() >= 2) {
-			return 0;
-		}
-		
-		if (MoveInt.isCapture(bitboard.getLastMove())) {
-			//Do nothing
-		} else {
-			if (depth > 5) {
-				return eval.fullEval(0, Integer.MIN_VALUE, Integer.MAX_VALUE, bitboard.getColourToMove());
-			}
-		}
-		
-		int[] moves = entry.getMoves();
-		
-		double best_val = Integer.MIN_VALUE;
-		for (int i=0; i<moves.length; i++) {
-			
-			int cur_move = moves[i];
-			
-			bitboard.makeMoveForward(cur_move);
-			
-			IOpeningEntry cur_entry = ob.getEntry(bitboard.getHashKey(), bitboard.getColourToMove());
-			
-			double cur_val = -minmaxOpening(cur_entry, bitboard, eval, depth + 1);
-			
-			if (cur_val > best_val) {
-				best_val = cur_val;
-			}
-			
-			bitboard.makeMoveBackward(cur_move);
-		}
-		
-		return best_val;
-	}
-	
-	*/
 }
