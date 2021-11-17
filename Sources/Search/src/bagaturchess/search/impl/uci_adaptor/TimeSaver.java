@@ -116,7 +116,7 @@ public class TimeSaver {
 			long dtz = result_long_pair[0];
 			
 			mediator.dump("TimeSaver.OfflineSyzygy: dtz = " + dtz);
-			
+    		
 			if (dtz != -1) {
 				
 				int best_move = (int) result_long_pair[1];

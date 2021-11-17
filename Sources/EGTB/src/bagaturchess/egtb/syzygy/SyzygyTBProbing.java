@@ -221,22 +221,33 @@ public class SyzygyTBProbing {
 			
 			board.makeMoveForward(cur_move);
 			
-			
-			int probe_result = SyzygyTBProbing.getSingleton().probeDTZ(board);
-			
-			int dtz = (probe_result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
-			int wdl = (probe_result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
-			
-			//int wdl = SyzygyTBProbing.getSingleton().probeWDL(board);
-			//wdl = (wdl & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
-			
-			//System.out.println(board.getMoveOps().moveToString(cur_move) + ", dtz=" + dtz + ", wdl=" + wdl);
-			
-			
-			//From opponent perspective the win is loss
-			if (wdl == SyzygyConstants.TB_LOSS) {
+			//Check for 3 fold repetition after the move
+			if (board.getStateRepetition() <= 1) {
 				
-				moves.add(new MoveWDLPair(wdl, dtz, cur_move));
+				int probe_result = SyzygyTBProbing.getSingleton().probeDTZ(board);
+				
+				int dtz = (probe_result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
+				int wdl = (probe_result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+				
+				//int wdl = SyzygyTBProbing.getSingleton().probeWDL(board);
+				//wdl = (wdl & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+				
+				//System.out.println(board.getMoveOps().moveToString(cur_move) + ", dtz=" + dtz + ", wdl=" + wdl);
+				
+				int distanceToDraw_50MoveRule = 100 - board.getDraw50movesRule();
+				//Although we specify the rule50 parameter when calling SyzygyBridge.probeSyzygyDTZ(...)
+				//Syzygy TBs report winning score/move
+				//but the +mate or +promotion moves line is longer
+				//than the moves we have until draw with 50 move rule
+				//! Without this check, the EGTB probing doesn't work correctly and the Bagatur version has smaller ELO rating (-35 ELO)
+				if (distanceToDraw_50MoveRule >= dtz) {
+					
+					//The cur_move is made on the board, so from opponent perspective the win is loss
+					if (wdl == SyzygyConstants.TB_LOSS) {
+						
+						moves.add(new MoveWDLPair(wdl, dtz, cur_move));
+					}	
+				}
 			}
 			
 			
@@ -248,9 +259,9 @@ public class SyzygyTBProbing {
 			
 			Collections.sort(moves);
 			
-			for (int i = 0; i < moves.size(); i++){
+			/*for (int i = 0; i < moves.size(); i++){
 				System.out.println(board.getMoveOps().moveToString((int) moves.get(i).move) + ", dtz=" + moves.get(i).dtz + ", wdl=" + moves.get(i).wdl);
-			}
+			}*/
 			
 			MoveWDLPair best = moves.get(0);
 			
@@ -394,6 +405,8 @@ public class SyzygyTBProbing {
 	
 	
 	public static void main(String[] args) {
+		
+		//https://syzygy-tables.info/?fen=k7/8/4Kp2/5P2/8/6b1/8/8_b_-_-_0_1
 		
 		IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("4k3/8/8/8/8/8/3R4/4K3 w - - 0 1");
 		//IBitBoard board = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
