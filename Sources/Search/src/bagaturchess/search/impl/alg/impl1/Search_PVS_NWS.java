@@ -92,7 +92,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private VarStatistic historyAVGScores;
 	
 	
-	private boolean USE_DTZ_CACHE = true;
+	private boolean USE_DTZ_CACHE = false;
 	
 	private IEvalEntry temp_cache_entry;
 	
@@ -394,8 +394,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		
-		if (ply > 1
-    	    	&& depth >= 7
+		if (ply >= 5
+    	    	&& depth >= 5
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
     			){
@@ -491,12 +491,31 @@ public class Search_PVS_NWS extends SearchImpl {
 			        
 		            	case SyzygyConstants.TB_WIN:
 		            		
-		    				node.bestmove = 0;
+							int distanceToDraw_100PlyRule = 100 - env.getBitboard().getDraw50movesRule();
+							
+							if (distanceToDraw_100PlyRule >= dtz) {
+								
+								node.bestmove = 0;
+								node.eval = 9 * (distanceToDraw_100PlyRule - dtz);
+								node.leaf = true;
+								
+								return node.eval;
+								
+							} else {
+								
+								node.bestmove = 0;
+								node.eval = EvalConstants.SCORE_DRAW;
+								node.leaf = true;
+								
+								return node.eval;
+							}
+							
+		    				/*node.bestmove = 0;
 		    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
 		    				node.eval = SearchUtils.getMateVal(ply + dtz);
 		    				node.leaf = true;
 		    				
-		    				return node.eval;
+		    				return node.eval;*/
 		            		
 			            case SyzygyConstants.TB_LOSS:
 			            	
