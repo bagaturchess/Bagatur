@@ -74,10 +74,6 @@ Additional resources:
 This nice tool is used to find out and fix performance, scalability and memory allocation isses.
 In general YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling.
 
-# Author
-
-The author of Bagatur engine is <a href="https://www.linkedin.com/in/topchiyski/">Krasimir Topchiyski</a>, email: k_topchiyski@yahoo.com
-
 # How Bagatur Chess Engine project has started
 The project has started as a bet between myself and one of my friends from my first 2 years in the University, who like to play chess.
 I was unable to win a single chess game against him! This made me nervous over the months and at the end I have promised him (we bet) that I will create a chess program, which will win a game against him!
@@ -89,6 +85,10 @@ At this point in time, the internet was almost an empty space and I was not awar
 Porgramming chess gives you diverse programming experiences ...
 
 So, better start earlier, you need time to achieve 800 ELO without crashes! :-)
+
+# Author
+
+The author of Bagatur engine is <a href="https://www.linkedin.com/in/topchiyski/">Krasimir Topchiyski</a>, email: k_topchiyski@yahoo.com
 
 # Old Revision History before version 2.2e
 Version 2.2e (16 August 2021)
