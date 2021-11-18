@@ -96,7 +96,7 @@ Because of this fact, I am always happy to see new engines and new authors!
 The author of Bagatur engine is <a href="https://www.linkedin.com/in/topchiyski/">Krasimir Topchiyski</a>, email: k_topchiyski@yahoo.com
 
 # Old Revision History before version 2.2e
-Version 2.2e (16 August 2021)
+Version 2.2e (16 August 2021), 2997 ELO
   * Enable ContinuationHistory as it is obviously the best option for move ordering. Without it, the engine performs with 50 ELO less.
   * The SMP version still scales well on many CPUs after splitting the evaluation cache per each thread.
 
@@ -104,7 +104,7 @@ Version 2.2d (20 May 2021)
   * SMP version: split evaluation cache per thread for better scalability on many CPUs
   * Fix memory allocation problem in the data structure, which collects the best line
 
-Version 2.2c (2 May 2021)
+Version 2.2c (2 May 2021), 2962 ELO
   * SMP version: Disable ContinuationHistory as it consumes too much memory per each search thread. When the memory is close to the upper limit, the performance of the Java program is slow.
 
 Version 2.2b (30 April 2021)
@@ -112,11 +112,11 @@ Version 2.2b (30 April 2021)
   * Fixes in nodes counting (NPS) in SMP version (reported by TCEC, Aloril)
   * Optimizations in SMP version (reported by TCEC, Aloril)
 
-Version 2.2a (21 February 2021)
+Version 2.2a (21 February 2021), 2992 ELO
   * Optimizations of search and qsearch with small ELO increase (~15)
   * Bugfixing
 
-Version 2.2 (29 May 2020)
+Version 2.2 (29 May 2020), 2995 ELO
   * Reduced LMR and LMP for moves with high history scores
   * SMP based on threads (not processes), it is now with 65+ ELO stronger than the single core version
   * Injected icon in the executable files and update of WinRun4J to version 0.4.5
@@ -131,43 +131,43 @@ Version 2.1 (1 May 2020)
   * Fixed SMP version, which now works better than the single core version :-)
   * In SMP version: increased max threads count from 64 to 256
 
-Version 2.0 (13 March 2019)
+Version 2.0 (13 March 2019), 2991 ELO
   * New evaluation function, based on Chess22k
   
 Version 1.9b (7 March 2020)
   * Bugfix: parallel search now works on Linux, just use ./bin/Bagatur_mcore.sh
   
-Version 1.9a (14 January 2020)
+Version 1.9a (14 January 2020), 2964 ELO
   * Optimization: don't perform NonPv search in the root position
   * Improvement: add piece-to history supplementary to from-to history heuristic
 
-Version 1.9 (19 December 2019)
+Version 1.9 (19 December 2019), 2928 ELO
   * New search algorithm, based on the Chess22k
   * Search improvements: Use transposition table in quiescence search
   * Search improvements: Disable futility pruning in quiescence search (for positions in check)
   * Search improvements: New beta window generation in MTD(f) implementation 
   
-Version 1.8a (20 September 2019)
+Version 1.8a (20 September 2019), 2821 ELO
   * Enable Syzygy tablebases for SMP version
   * Corrections in PV search and collection of the best line
   * Now LMR has new formula
 
-Version 1.8 (30 July 2019)
+Version 1.8 (30 July 2019), 2828 ELO
   * New evaluation function, based on the Stockfish
   * Time control optimization for SMP version - don't use too much time if evaluation changes 
 
 Version 1.7b (2 July 2019)
   * Bugfix: into the time control found during TCEC Season 16 testing by Aloril
 
-Version 1.7a (18 April 2019)
+Version 1.7a (18 April 2019), 2710 ELO
   * Optimizations of move ordering: bad captures are ordered with higher value
   * Optimizations of move ordering: piece-square tables are not used in ordering
 
-Version 1.7 (29 March 2019)
+Version 1.7 (29 March 2019), 2633 ELO
   * Support for Syzygy tablebases, based on the java porting done by ljgw https://github.com/ljgw/syzygy-bridge
   * New evaluation function
 
-Version 1.6c (15 March 2019)
+Version 1.6c (15 March 2019), 2524 ELO
   * Parallel search: now improved with several bug fixes
   * Parallel search: UCI option implemented for Thread Memory (MB)
   * Late move reduction is now more aggressive for all nodes
@@ -185,17 +185,17 @@ Version 1.6 (17 January 2019)
   * Use both transposition tables when probing position
   * If presented use transposition table scores before qsearch
   
-Version 1.5g (14 January 2019)
+Version 1.5g (14 January 2019), 2500 ELO
   * Memory management improvements - more memory for the transposition table
   * Use Late move reduction for remaining depth > 3
 
-Version 1.5f (31 October 2018)
+Version 1.5f (31 October 2018), 2526 ELO
   * 15 ELO stronger (measured versus 1.5e)
   * Time management improvements
   * Singular move extension implemented
   * Optimizations of quiescence search - it search all capture moves
   
-Version 1.5e (20 July 2017)
+Version 1.5e (20 July 2017), 2517 ELO
   * Endgame Tablebases support - switched OFF, because of engine crash errors (JNI and java OutOfMemory related)
   
 Version 1.5d (15 July 2017)
@@ -220,22 +220,22 @@ Version 1.5 (3 May 2017)
   * Search optimizations: adjusted best move window
   * More tuning of Endgame's mate search - use endgame table bases after depth 13
   
-Version 1.4e (15 April 2017)
+Version 1.4e (15 April 2017), 2455 ELO
   * Evaluation function tunning (versus Stockfish7)
   * Endgame improvements for mate search - use endgame table bases after depth 15
 
-Version 1.4d (31 August 2016)
+Version 1.4d (31 August 2016), 2457 ELO
   * Memory optimizations: increased memory usage percent, hence more entries into the transposition table (now on 40/40 time controls search goes deeper)
   * Fix for endgames without pawns
   * Fix for mate distance prunning
   * Updated readme files
   
-Version 1.4c (15 June 2016)
+Version 1.4c (15 June 2016), 2337 ELO
   * 25+ ELO stronger (measured versus 1.4b with 150+ games - 1m+1s and 5m+5s time controls)
   * Memory optimizations: no java objects creation during search, hence less java garbage collection and more engine performance
   * Renamed *.exe files
   
-Version 1.4b (31 May 2016)
+Version 1.4b (31 May 2016), 2442 ELO
   * 28+ ELO stronger (measured versus 1.4a)
   * Search optimizations: adjustments of the depth reduction amount used in late move reduction and null move reduction
   * Default memory increased from 256MB to 1024MB. Could be set in the corresponding *.ini files to *exe files (or bat files if you don't use *.exe starters)
@@ -258,7 +258,7 @@ Version 1.4 (11 May 2016)
   * Improved memory management
   * Fixed Pondering
   
-Version 1.3a (07 December 2012)
+Version 1.3a (07 December 2012), 2327 ELO
   * Endgame Tablebases support - Gaviota EGTB (currently, for win 32 only). Find more details in readme.txt.
   * New UCI option 'Logging Policy' is introduced - 'single file', 'multiple files' and 'none'
   * SMP version: fixed Operation System dependent issue, which causes the engine to use only one thread in some conditions
@@ -278,14 +278,14 @@ Version 1.2f (26 May 2012)
 Version 1.2e (12 May 2012)
   * 40 ELO stronger: optimized search - improved move ordering and search parameters
   
-Version 1.2d (9 December 2011)
+Version 1.2d (9 December 2011), 2219 ELO
   * 30 ELO stronger: optimized search - use the data from unsuccessful null move search in order not to reduce the strongest move of opponent
   * bugfix: "loss on time" introduced by version 1.2c
   
 Version 1.2c (4 December 2011)
   * 30 ELO stronger: optimized search by making null move heuristic a bit more aggressive
   
-Version 1.2b (3 November 2011)
+Version 1.2b (3 November 2011), 2157 ELO
   * bugfix: read and use the option set for threads count of SMP version
   
 Version 1.2a (30 October 2011)
