@@ -48,11 +48,11 @@ The download of Bagatur contains subset of syzygy tablebases placed under ./data
 Chess strength and rating of a chess engine is measured in ELO.
 According to CCRL 40/15, the latest offical ELO ratings of all well tested version (with more than 300 games and time control 40/15), are available on this page: http://www.computerchess.org.uk/ccrl/4040/cgi/compare_engines.cgi?family=Bagatur
 
+Special thanks to <a href="https://www.chessprogramming.org/Graham_Banks">Graham Banks</a>, who put a huge efforts in testing Bagatur version through the years!
+
 Latest official ELO rating of Bagatur 2.2e is ~3000 ELO. To make it easy to check, here is a probably outdated screenshot of the computerchess.org web page above:
 
 <a href="" rel="Bagatur ELO rating"><img src="ELO_2021.11.18.png" alt="" /></a>
-
-Special thanks to <a href="https://www.chessprogramming.org/Graham_Banks">Graham Banks</a>, who put a huge efforts in testing Bagatur version through the years!
 
 # Machine Learning
 
