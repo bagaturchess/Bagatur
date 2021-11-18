@@ -228,7 +228,7 @@ public class TimeSaver {
 				
 				if (result[0] != -1 && result[1] != -1 && result[2] != -1) {
 					
-					mediator.dump("TimeSaver.OnlineSyzygy: EGTB probing was sucessfull");
+					mediator.dump("TimeSaver.OnlineSyzygy: EGTB probing was successful");
 					
 					int dtz = result[0];//Depth to zeroing-move. A zeroing-move is a move which resets the move count to zero under the fifty-move rule, i.e. mate, a capture, or a pawn move.
 					int winner = result[1];//Winner's color or -1 if the position has not found
