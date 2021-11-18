@@ -230,4 +230,10 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	public IMoveOps getMoveOps() {
 		return moveOps;
 	}
+
+
+	@Override
+	public int getEnpassantSquareID() {
+		throw new UnsupportedOperationException();
+	}
 }

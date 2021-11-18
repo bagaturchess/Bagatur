@@ -151,7 +151,7 @@ public class TimeSaver {
 			}
 			
 			
-			if (useOnlineSyzygy) {
+			if (useOnlineSyzygy && bitboardForSetup.getEnpassantSquareID() == 0) {
 				
 				Runnable server_request_response_handler = new OnlineSyzygyServerHandler(bitboardForSetup, mediator);
 				
@@ -255,7 +255,7 @@ public class TimeSaver {
 						
 						if (mediator.getBestMoveSender() != null) mediator.getBestMoveSender().sendBestMove();
 						
-						mediator.dump("TimeSaver.OfflineSyzygy: Syzygy move send to UCI: " + bitboardForSetup.getMoveOps().moveToString(best_move));
+						mediator.dump("TimeSaver.OfflineSyzygy: EGTB probing ok - syzygy move send to UCI: " + bitboardForSetup.getMoveOps().moveToString(best_move));
 						
 					} else {
 						

@@ -251,6 +251,13 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 		return bitboard.getStateRepetition();
 	}
 
+	
+	@Override
+	public int getEnpassantSquareID() {
+		return bitboard.getEnpassantSquareID();
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#getFigureID(int)
 	 */

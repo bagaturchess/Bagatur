@@ -5334,4 +5334,10 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	public IMoveOps getMoveOps() {
 		return moveOps;
 	}
+	
+	
+	@Override
+	public int getEnpassantSquareID() {
+		throw new UnsupportedOperationException();
+	}
 }

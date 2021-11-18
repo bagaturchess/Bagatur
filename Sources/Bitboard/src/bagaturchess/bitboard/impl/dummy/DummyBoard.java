@@ -133,6 +133,11 @@ public class DummyBoard implements IBitBoard {
 		return true;
 	}
 
+	@Override
+	public int getEnpassantSquareID() {
+		throw new UnsupportedOperationException();
+	}
+	
 	public int getChecksCount(int colour) {
 		throw new UnsupportedOperationException();
 	}

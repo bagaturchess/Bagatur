@@ -214,6 +214,12 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
+	public int getEnpassantSquareID() {
+		return chessBoard.epIndex;
+	}
+	
+	
+	@Override
 	public int getSEEScore(int move) {
 		return SEEUtil.getSeeCaptureScore(chessBoard, move);
 	}

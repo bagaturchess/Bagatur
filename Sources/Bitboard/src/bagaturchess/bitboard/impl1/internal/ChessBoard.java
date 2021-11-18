@@ -87,7 +87,7 @@ public final class ChessBoard {
 	
 	@Override
 	public String toString() {
-		return ChessBoardUtil.toString(this);
+		return ChessBoardUtil.toString(this, true);
 	}
 
 	public boolean isDrawishByMaterial(final int color) {

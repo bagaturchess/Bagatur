@@ -267,7 +267,7 @@ public class ChessBoardUtil {
 		}
 	}
 
-	public static String toString(ChessBoard cb) {
+	public static String toString(ChessBoard cb, boolean add_ep) {
 		// TODO castling, EP, moves
 		StringBuilder sb = new StringBuilder();
 		for (int i = 63; i >= 0; i--) {
@@ -313,7 +313,7 @@ public class ChessBoardUtil {
 		fen = fen.replaceAll("11", "2");
 		
 		fen += " ";
-		if (cb.epIndex != 0) {
+		if (add_ep && cb.epIndex != 0) {
 			fen += ALL_FIELD_NAMES[cb.epIndex];
 		} else {
 			fen += "-";

@@ -22,6 +22,8 @@ public interface IBoard {
 	public int genNonCaptureNonPromotionMoves(final IInternalMoveList list);
 	public int genAllMoves_ByFigureID(int fieldID, long excludedToFields, final IInternalMoveList list);
 	
+	public int getEnpassantSquareID();
+	
 	public void makeMoveForward(final int move);
 	public void makeMoveForward(final String ucimove);
 	public void makeMoveBackward(final int move);
