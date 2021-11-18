@@ -74,7 +74,7 @@ Additional resources:
 This nice tool is used to find out and fix performance, scalability and memory allocation isses.
 In general YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling.
 
-# How Bagatur Chess Engine project has started
+# When and how Bagatur Chess Engine project has started
 The project has started as a bet between myself and one of my friends from my first 2 years in the University, who like to play chess.
 I was unable to win a single chess game against him! This made me nervous over the months and at the end I have promised him (we bet) that I will create a chess program, which will win a game against him!
 Fortunately the time frame was not mentioned during the bet and ... years later I win it! :-)
