@@ -21,7 +21,11 @@ public class TimeSaver {
 	private OpeningBook ob;
 	
 	
+	private boolean ENABLE_TB_OFFLINE_PROBING_IN_ROOT_POSITIONS = false;
+	
+	
 	public TimeSaver(OpeningBook _ob) {
+		
 		ob = _ob;
 	}
 	
@@ -103,116 +107,56 @@ public class TimeSaver {
 		
 		
 		//Doesn't work well at the moment: plays correct most moves but does't do promotion move and make draw from winning games.
-		if (false && bitboardForSetup.getMaterialState().getPiecesCount() <= 7) {
+		if (bitboardForSetup.getMaterialState().getPiecesCount() <= 7) {
+			
 			
 			//Try offline probing
-			
-			mediator.dump("TimeSaver.OfflineSyzygy: offline probing with TBs on file system...");
-			
-			long[] result_long_pair = new long[2];
-			
-			SyzygyTBProbing.getSingleton().probeMove(bitboardForSetup, result_long_pair);
-			
-			long dtz = result_long_pair[0];
-			
-			mediator.dump("TimeSaver.OfflineSyzygy: dtz = " + dtz);
-    		
-			if (dtz != -1) {
+			if (ENABLE_TB_OFFLINE_PROBING_IN_ROOT_POSITIONS) {
 				
-				int best_move = (int) result_long_pair[1];
+				mediator.dump("TimeSaver.OfflineSyzygy: offline probing with TBs on file system...");
 				
-				System.out.println("TimeSaver.OfflineSyzygy: Syzygy bestmove is " + bitboardForSetup.getMoveOps().moveToString(best_move));
+				long[] result_long_pair = new long[2];
 				
-				ISearchInfo info = createInfo(best_move, 1);
+				SyzygyTBProbing.getSingleton().probeMove(bitboardForSetup, result_long_pair);
 				
-				int eval = SearchUtils.getMateVal(ISearch.MAX_DEPTH);
+				long dtz = result_long_pair[0];
 				
-				info.setEval(eval);
-				
-				info.setBestMove(best_move);
-				
-				mediator.changedMajor(info);
-				
-				if (mediator.getBestMoveSender() != null) mediator.getBestMoveSender().sendBestMove();
-				
-				mediator.dump("TimeSaver.OfflineSyzygy: Syzygy move send.");
-				
-				return true;
-				
-			} else if (useOnlineSyzygy) {
-				
-				//Try online probing
-				//We must have enough time to get response from the server
-				if (timeToThinkInMiliseconds >= 500
-						&& bitboardForSetup.getMaterialState().getPiecesCount() <= 7
-						) {
+				mediator.dump("TimeSaver.OfflineSyzygy: dtz = " + dtz);
+	    		
+				if (dtz != -1) {
 					
-					mediator.dump("TimeSaver.OnlineSyzygy: EGTB Probing ...");
+					int best_move = (int) result_long_pair[1];
 					
-					int[] result = new int[3];
+					System.out.println("TimeSaver.OfflineSyzygy: Syzygy bestmove is " + bitboardForSetup.getMoveOps().moveToString(best_move));
 					
-					long start_time = System.currentTimeMillis();
+					ISearchInfo info = createInfo(best_move, ISearch.MAX_DEPTH);
 					
-					//OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection(bitboardForSetup, result);
-					//int dtz = result[0];//Depth to zeroing-move. A zeroing-move is a move which resets the move count to zero under the fifty-move rule, i.e. mate, a capture, or a pawn move.
-					//int dtm = result[1];//Depth to mate
+					info.setSelDepth(ISearch.MAX_DEPTH);
 					
-					String server_response_json_text = OnlineSyzygy.getWDL_BlockingOnSocketConnection(bitboardForSetup, result, new OnlineSyzygy.Logger() {
+					int eval = SearchUtils.getMateVal(ISearch.MAX_DEPTH); //9 * ((100 - bitboardForSetup.getDraw50movesRule()) - dtz)
+					
+					info.setEval(eval);
+					
+					info.setBestMove(best_move);
 						
-						@Override
-						public void addText(String message) {
-							mediator.dump(message);
-						}
-						
-						@Override
-						public void addException(Exception exception) {
-							mediator.dump(exception);
-						}
-					});
+					mediator.changedMajor(info);
 					
-					long end_time = System.currentTimeMillis();
+					if (mediator.getBestMoveSender() != null) mediator.getBestMoveSender().sendBestMove();
 					
-					mediator.dump("TimeSaver.OnlineSyzygy: url connection terminated in " + (end_time - start_time) + " ms");
-					mediator.dump("TimeSaver.OnlineSyzygy: response from server:" + server_response_json_text);
+					mediator.dump("TimeSaver.OfflineSyzygy: Syzygy move send.");
 					
-					if (server_response_json_text != null) {
-						
-						if (result[0] != -1 && result[1] != -1 && result[2] != -1) {
-							
-							mediator.dump("TimeSaver.OnlineSyzygy: EGTB probing was sucessfull");
-							
-							dtz = result[0];//Depth to zeroing-move. A zeroing-move is a move which resets the move count to zero under the fifty-move rule, i.e. mate, a capture, or a pawn move.
-							int winner = result[1];//Winner's color or -1 if the position has not found
-							int best_move = result[2];//Winner's color or -1 if the position has not found
-								
-							mediator.dump("TimeSaver.OnlineSyzygy: winner=" + winner + ", dtz=" + dtz + ", best_move=" + bitboardForSetup.getMoveOps().moveToString(best_move));
-							
-							ISearchInfo info = createInfo(best_move, 1);
-							
-							int eval = SearchUtils.getMateVal(ISearch.MAX_DEPTH);
-							
-							info.setEval(eval);
-							
-							info.setBestMove(best_move);
-							
-							mediator.changedMajor(info);
-							
-							if (mediator.getBestMoveSender() != null) mediator.getBestMoveSender().sendBestMove();
-							
-							mediator.dump("TimeSaver.OfflineSyzygy: Syzygy move send.");
-							
-							return true;
-							
-						} else {
-						
-							mediator.dump("TimeSaver.OnlineSyzygy: EGTB probing ok - winner is still unknown.");
-						}
-						
-					} else {
-						
-						mediator.dump("TimeSaver.OnlineSyzygy: EGTB probing failed - unable to get meaningful json response from the server.");
-					}
+					return true;
+					
 				}
+			}
+			
+			
+			if (useOnlineSyzygy) {
+				
+				Runnable server_request_response_handler = new OnlineSyzygyServerHandler(bitboardForSetup, mediator);
+				
+				//Execute the Online Syzygy server request in parallel to the standard search
+				new Thread(server_request_response_handler).start();
 			}
 		}
 		
@@ -228,5 +172,106 @@ public class TimeSaver {
 		info.setBestMove(move);
 		info.setPV(new int[] {move});
 		return info;
+	}
+	
+	
+	private class OnlineSyzygyServerHandler implements Runnable {
+		
+		
+		private IBitBoard bitboardForSetup;
+		
+		private ISearchMediator mediator;
+		
+		
+		OnlineSyzygyServerHandler(IBitBoard _bitboardForSetup, final ISearchMediator _mediator) {
+			
+			bitboardForSetup = _bitboardForSetup;
+			
+			mediator = _mediator;
+		}
+		
+		
+		@Override
+		public void run() {
+			
+			mediator.dump("TimeSaver.OnlineSyzygy: EGTB Probing ...");
+			
+			long hashkey_before_request = bitboardForSetup.getHashKey();
+			
+			int[] result = new int[3];
+			
+			long start_time = System.currentTimeMillis();
+			
+			//OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection(bitboardForSetup, result);
+			//int dtz = result[0];//Depth to zeroing-move. A zeroing-move is a move which resets the move count to zero under the fifty-move rule, i.e. mate, a capture, or a pawn move.
+			//int dtm = result[1];//Depth to mate
+			
+			String server_response_json_text = OnlineSyzygy.getWDL_BlockingOnSocketConnection(bitboardForSetup, result, new OnlineSyzygy.Logger() {
+				
+				@Override
+				public void addText(String message) {
+					mediator.dump(message);
+				}
+				
+				@Override
+				public void addException(Exception exception) {
+					mediator.dump(exception);
+				}
+			});
+			
+			long end_time = System.currentTimeMillis();
+			
+			mediator.dump("TimeSaver.OnlineSyzygy: url connection terminated in " + (end_time - start_time) + " ms");
+			mediator.dump("TimeSaver.OnlineSyzygy: response from server:" + server_response_json_text);
+			
+			if (server_response_json_text != null) {
+				
+				if (result[0] != -1 && result[1] != -1 && result[2] != -1) {
+					
+					mediator.dump("TimeSaver.OnlineSyzygy: EGTB probing was sucessfull");
+					
+					int dtz = result[0];//Depth to zeroing-move. A zeroing-move is a move which resets the move count to zero under the fifty-move rule, i.e. mate, a capture, or a pawn move.
+					int winner = result[1];//Winner's color or -1 if the position has not found
+					int best_move = result[2];//Winner's color or -1 if the position has not found
+						
+					mediator.dump("TimeSaver.OnlineSyzygy: winner=" + winner + ", dtz=" + dtz + ", best_move=" + bitboardForSetup.getMoveOps().moveToString(best_move));
+					
+					long hashkey_after_response = bitboardForSetup.getHashKey();
+					
+					//Has the search already made a move on the board or not?
+					if (hashkey_after_response == hashkey_before_request
+								&& !mediator.getStopper().isStopped()
+							) {
+						
+						ISearchInfo info = createInfo(best_move, 1);
+						
+						int eval = SearchUtils.getMateVal(ISearch.MAX_DEPTH);
+						
+						info.setEval(eval);
+						
+						info.setBestMove(best_move);
+						
+						mediator.changedMajor(info);
+						
+						if (mediator.getBestMoveSender() != null) mediator.getBestMoveSender().sendBestMove();
+						
+						mediator.dump("TimeSaver.OfflineSyzygy: Syzygy move send to UCI: " + bitboardForSetup.getMoveOps().moveToString(best_move));
+						
+					} else {
+						
+						mediator.dump("TimeSaver.OfflineSyzygy: Syzygy move NOT send to UCI, because hashkey_after_response != hashkey_before_request or mediator.getStopper().isStopped() is true,"
+										+ " which means the bestmove is already made by the search");
+					}
+					
+				} else {
+				
+					mediator.dump("TimeSaver.OnlineSyzygy: EGTB probing ok - winner is still unknown.");
+				}
+				
+			} else {
+				
+				mediator.dump("TimeSaver.OnlineSyzygy: EGTB probing failed - unable to get meaningful json response from the server.");
+			}
+		}
 	}
 }

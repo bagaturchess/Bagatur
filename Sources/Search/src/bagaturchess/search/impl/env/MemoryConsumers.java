@@ -1,6 +1,7 @@
 package bagaturchess.search.impl.env;
 
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -151,15 +152,30 @@ public class MemoryConsumers {
 		if (SyzygyTBProbing.getSingleton() != null) {
 			
 			//SyzygyTBProbing.getSingleton().load("C:/Users/i027638/OneDrive - SAP SE/DATA/OWN/chess/EGTB/syzygy");
-			SyzygyTBProbing.getSingleton().load(engineConfiguration.getTbPath());
 			
-			//try {Thread.sleep(10000);} catch (InterruptedException e1) {}
-			ChannelManager.getChannel().dump("Modules for Endgame Tablebases OK. Will try to load Tablebases from => " + engineConfiguration.getTbPath());
+			if (engineConfiguration.getTbPath() != null) {
+			
+				File TB_dir = new File(engineConfiguration.getTbPath());
+				
+				if (TB_dir.exists()) {
+					
+					SyzygyTBProbing.getSingleton().load(engineConfiguration.getTbPath());
+					
+					ChannelManager.getChannel().dump("Modules for Endgame Tablebases OK. Will try to load Tablebases from => " + engineConfiguration.getTbPath());
+					
+				} else {
+					
+					ChannelManager.getChannel().dump("Modules for Endgame Tablebases cannot be loaded. Directory does not exists => " + TB_dir.getAbsolutePath());
+				}
+			} else {
+				
+				ChannelManager.getChannel().dump("Modules for Endgame Tablebases cannot be loaded. Directory with Syzygy TB files is not set");
+			}
+
+
 		} else {
-			//TODO: set percent to 0 and log corresponding message for the sizes
-			//Can't load IA 32-bit .dll on a AMD 64-bit platform
-			//throw new IllegalStateException("egtbprobe dynamic library could not be loaded (or not found)");
-			//ChannelManager.getChannel().dump(GTBProbing_NativeWrapper.getErrorMessage());
+			
+			//TODO: set memory usage percent of TBs to 0 and don't create EGTB/DTZ cache at all.
 		}
 		
 		

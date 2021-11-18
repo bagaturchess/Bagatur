@@ -32,7 +32,7 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionString("SyzygyPath", DEFAULT_TbPath, "type string default " + DEFAULT_TbPath),
-			new UCIOptionCombo("SyzygyOnline", "" + DEFAULT_SyzygyOnline, "type combo default " + DEFAULT_SyzygyOnline + " var true var false"),
+			new UCIOptionCombo("SyzygyOnline", "" + DEFAULT_SyzygyOnline, "type check default " + DEFAULT_SyzygyOnline),
 			new UCIOptionSpin_Integer("MultiPV", new Integer(1), "type spin default 1 min 1 max 100"),
 			//new UCIOptionSpin_Integer("Hidden Depth", 0, "type spin default 0 min 0 max 10"),
 	};
@@ -233,7 +233,7 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 			return true;
 		
 		} else if ("SyzygyOnline".equals(option.getName())) {
-			use_online_syzygy = option.getValue().equals("true");
+			use_online_syzygy = option.getValue().equals(true);
 			return true;
 			
 		} else if ("Hidden Depth".equals(option.getName())) {
