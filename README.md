@@ -50,6 +50,7 @@ According to CCRL 40/15, the latest offical ELO ratings of all well tested versi
 
 Latest official ELO rating of Bagatur 2.2e is ~3000 ELO
 Here is a probably outdated screenshot:
+
 <a href="" rel="Bagatur ELO rating"><img src="ELO_2021.11.18.png" alt="" /></a>
 
 # Machine Learning
