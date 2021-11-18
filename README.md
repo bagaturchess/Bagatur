@@ -52,6 +52,8 @@ Latest official ELO rating of Bagatur 2.2e is ~3000 ELO. To make it easy to chec
 
 <a href="" rel="Bagatur ELO rating"><img src="ELO_2021.11.18.png" alt="" /></a>
 
+Special thanks to <a href="https://www.chessprogramming.org/Graham_Banks">Graham Banks</a>, who put a huge efforts in testing Bagatur version through the years!
+
 # Machine Learning
 
 There are some code examples of Artificial Intelligence / Machine Learning experiments with the <a href="http://neuroph.sourceforge.net/">Neuroph</a> 2.94 Java framework.
