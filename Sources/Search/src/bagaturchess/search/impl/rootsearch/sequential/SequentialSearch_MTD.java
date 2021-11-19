@@ -182,8 +182,20 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 						
 						
 						if (multiPVCallback == null) {//Non multiPV search
-							ChannelManager.getChannel().dump("MTDSequentialSearch calling final_mediator.getBestMoveSender().sendBestMove()");
-							final_mediator.getBestMoveSender().sendBestMove();
+							
+							if (!final_mediator.getStopper().isStopped()) {
+								
+								ChannelManager.getChannel().dump("MTDSequentialSearch calling final_mediator.getBestMoveSender().sendBestMove()");
+								
+								final_mediator.getBestMoveSender().sendBestMove();
+								
+							} else {
+								
+								//Online Syzygy probing has made a move
+								
+								ChannelManager.getChannel().dump("MTDSequentialSearch skiping final_mediator.getBestMoveSender().sendBestMove()");
+							}
+							
 						} else {
 							//MultiPV search
 							multiPVCallback.ready();

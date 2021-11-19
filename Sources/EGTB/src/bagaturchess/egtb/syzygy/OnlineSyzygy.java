@@ -306,6 +306,7 @@ public class OnlineSyzygy {
 					winner_color = Constants.COLOUR_BLACK;					
 				}
 				
+				
 				if (winner_color == board.getColourToMove()) {
 					
 					

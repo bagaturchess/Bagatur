@@ -243,7 +243,9 @@ public class TimeSaver {
 								&& !mediator.getStopper().isStopped()
 							) {
 						
-						ISearchInfo info = createInfo(best_move, 1);
+						ISearchInfo info = createInfo(best_move, ISearch.MAX_DEPTH);
+						
+						info.setSelDepth(ISearch.MAX_DEPTH);
 						
 						int eval = SearchUtils.getMateVal(ISearch.MAX_DEPTH);
 						
