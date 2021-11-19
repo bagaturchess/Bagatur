@@ -364,7 +364,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	@Override
 	public void sendBestMove() {
-
+		
 		channel.sendLogToGUI("StateManager: sendBestMove called");
 		
 		if (searchAdaptor == null) {

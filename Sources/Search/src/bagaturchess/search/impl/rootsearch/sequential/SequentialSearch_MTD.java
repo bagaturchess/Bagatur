@@ -29,7 +29,6 @@ import java.util.concurrent.Executors;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
-import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IFinishCallback;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.CompositeStopper;
@@ -37,7 +36,6 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
@@ -54,6 +52,7 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 	
 	
 	private ExecutorService executor;
+	
 	private ISearch searcher;
 	
 	private PVManager pvman;
@@ -175,26 +174,29 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 						ChannelManager.getChannel().dump("MTDSequentialSearch not stopped - stopping searcher ...");
 						
 						if (stopper == null) {
+							
 							throw new IllegalStateException();
 						}
+						
 						stopper.markStopped();
+						
 						stopper = null;
 						
 						
 						if (multiPVCallback == null) {//Non multiPV search
 							
-							if (!final_mediator.getStopper().isStopped()) {
+							//if (!isStopped()) {
 								
 								ChannelManager.getChannel().dump("MTDSequentialSearch calling final_mediator.getBestMoveSender().sendBestMove()");
 								
 								final_mediator.getBestMoveSender().sendBestMove();
 								
-							} else {
+							//} else {
 								
 								//Online Syzygy probing has made a move
 								
-								ChannelManager.getChannel().dump("MTDSequentialSearch skiping final_mediator.getBestMoveSender().sendBestMove()");
-							}
+								//ChannelManager.getChannel().dump("MTDSequentialSearch skiping final_mediator.getBestMoveSender().sendBestMove()");
+							//}
 							
 						} else {
 							//MultiPV search
