@@ -94,10 +94,14 @@ Chess porgramming gives you diverse programming experiences ...
 I have selected Java as a programming language, mainly because of my little (but existing) experience with it.
 I have to also admit that Java was quite modern and polular at this point in time. This was the time a few years after the first releases of the Java itself. The early ages of the Java lenguage and Java technologies.
 
-So, better start earlier, you need time to achieve 800 ELO without crashes! :-)
+So, if you plan to work on a chess engine, better start earlier, you need time to achieve stable version which beats you! :-)
 
-According to CCRL, there are below 500 chess engines in the world. This means that not many people are really interested in programming chess engines. Most probably the author of a chess engine is interested not only in programming but also in chess game. He/she must have enough willingness to invest spare time in chess programing, without any incentives, just for fun and driven by curiosity. I don't know for the other authors but I would add that small and balanced portion of craziness also helps in this topic a lot ...
+According to CCRL, there are below 500 chess engines in the world.
+This means that not many people are really interested in programming chess engines.
+Most probably the author of a chess engine is interested not only in programming but also in chess game. He/she must have enough willingness to invest spare time in chess programing, without any incentives, just for fun and driven by curiosity.
 Because of this fact, I am always happy to see new engines and new authors!
+
+I don't know for the other chess engine authors but I would add small and well balanced portion of craziness ... it helps in chess programming, while you release version after version, targeting better ELO stregnth of each new version, which actually happens in very rear cases and you cannot release version a long time. :-)
 
 # Author
 
