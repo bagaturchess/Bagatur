@@ -96,7 +96,11 @@ I have to also admit that Java was quite modern and polular at this point in tim
 
 So, if you plan to work on a chess engine, better start earlier, you need time to achieve stable version which beats you! :-)
 
-# Author
+# Contact the Author
+
+In order to contact me, you could use LinkedIn <a href="https://www.linkedin.com/in/topchiyski/">Krasimir Topchiyski</a> or email me at k_topchiyski@yahoo.com
+
+Some personal toughts ...
 
 According to CCRL, there are below 500 chess engines in the world.
 This means that not many people are really interested in programming chess engines.
@@ -105,9 +109,7 @@ Most probably the author of a chess engine is interested not only in programming
 Because of this fact, I am always happy to see new engines and new authors!
 
 I don't know for the other chess engine authors, but I would add small and well balanced portion of craziness ... it helps in chess programming, while you release version after version, targeting better ELO stregnth of each new release, which actually happens in very rear cases and you cannot release version long time.
-If this continues months, normally I feel it like "to bang your head against the wall". When I reach this state, I exit Bagatur project for a while. Always remember, it should be for fun! :-)
-
-In order to contact me, you could use LinkedIn <a href="https://www.linkedin.com/in/topchiyski/">Krasimir Topchiyski</a> or email me: k_topchiyski@yahoo.com
+If this continues months, normally I feel it like "to bang your head against the wall". When I reach this state, I exit Bagatur project for a while, awaiting for new inspiration and the muse. Always remember, it should be for fun! :-)
 
 # Old Revision History before version 2.2e
 Version 2.2e (16 August 2021), 2997 ELO
