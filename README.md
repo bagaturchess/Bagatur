@@ -101,7 +101,7 @@ This means that not many people are really interested in programming chess engin
 Most probably the author of a chess engine is interested not only in programming but also in chess game. He/she must have enough willingness to invest spare time in chess programing, without any incentives, just for fun and driven by curiosity.
 Because of this fact, I am always happy to see new engines and new authors!
 
-I don't know for the other chess engine authors but I would add small and well balanced portion of craziness ... it helps in chess programming, while you release version after version, targeting better ELO stregnth of each new version, which actually happens in very rear cases and you cannot release version a long time. :-)
+I don't know for the other chess engine authors but I would add small and well balanced portion of craziness ... it helps in chess programming, while you release version after version, targeting better ELO stregnth of each new version, which actually happens in very rear cases and you cannot release version a long time. If this continues months, normally I feel it like "to bang your head against the wall". When I reach this stage, I exit the Bagatur project for a while. Always remember, it should be for fun! :-)
 
 # Author
 
