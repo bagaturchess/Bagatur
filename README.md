@@ -108,7 +108,7 @@ Most probably the author of a chess engine is interested not only in programming
 
 Because of this fact, I am always happy to see new engines and new authors!
 
-I don't know for the other chess engine authors, but I would add small and well balanced portion of craziness ... it helps in chess programming, while you release version after version, targeting better ELO stregnth of each new release, which actually happens in very rear cases and you cannot release version long time.
+I don't know for the other chess engine authors, but I would add small and well balanced portion of craziness ... it helps in chess programming, while you release version after version, targeting better ELO stregnth of each new release, which actually happens in very rear cases and you cannot release a version long time.
 If this continues months, normally I feel it like "to bang your head against the wall". When I reach this state, I exit Bagatur project for a while, awaiting for new inspiration and the muse. Always remember, it should be for fun! :-)
 
 # Old Revision History before version 2.2e
