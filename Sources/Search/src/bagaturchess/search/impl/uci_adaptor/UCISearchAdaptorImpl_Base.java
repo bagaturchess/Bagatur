@@ -85,7 +85,7 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		//Should be initialized after the searchers to handle memory in a correct way.
 		sharedData.setMemoryConsumers(new MemoryConsumers(ChannelManager.getChannel(), rootSearchCfg, searchAdaptorCfg.isOwnBookEnabled()));
 		
-		saver = new TimeSaver(sharedData.getOpeningBook());	
+		saver = new TimeSaver(this, sharedData.getOpeningBook());	
 	}
 	
 	

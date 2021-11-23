@@ -224,6 +224,8 @@ public class OnlineSyzygy {
 		String url_for_the_request_mainline = "http://tablebase.lichess.ovh/standard/mainline?fen=" + fen;//2 times slower
 		//String url_for_the_request = "http://tablebase.lichess.ovh/standard?fen=" + fen;
 		
+		long hashkey_before_server_request = board.getHashKey();
+		
 		try {
 			
 			String json_response_text = getHTMLFromURL(url_for_the_request_mainline);
@@ -350,7 +352,14 @@ public class OnlineSyzygy {
 						
 						try {
 							
-							best_move = board.getMoveOps().stringToMove(bestmove_string);
+							if (board.getHashKey() == hashkey_before_server_request) {
+							
+								best_move = board.getMoveOps().stringToMove(bestmove_string);
+							
+							} else {
+								
+								logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: bestmove skipped, because board.getHashKey() != hashkey_before_server_request");
+							}
 							
 						} catch (NumberFormatException nfe) {
 							

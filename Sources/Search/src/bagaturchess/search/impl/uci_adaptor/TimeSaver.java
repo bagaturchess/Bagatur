@@ -13,6 +13,7 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.utils.SearchUtils;
+import bagaturchess.uci.api.IUCISearchAdaptor;
 
 
 public class TimeSaver {
@@ -20,11 +21,15 @@ public class TimeSaver {
 	
 	private OpeningBook ob;
 	
+	private IUCISearchAdaptor search_stopper;
+	
 	
 	private boolean ENABLE_TB_OFFLINE_PROBING_IN_ROOT_POSITIONS = false;
 	
 	
-	public TimeSaver(OpeningBook _ob) {
+	public TimeSaver(IUCISearchAdaptor _search_stopper, OpeningBook _ob) {
+		
+		search_stopper = _search_stopper;
 		
 		ob = _ob;
 	}
@@ -254,10 +259,13 @@ public class TimeSaver {
 						info.setBestMove(best_move);
 						
 						mediator.changedMajor(info);
+						mediator.getStopper().markStopped();
 						
-						if (mediator.getBestMoveSender() != null) mediator.getBestMoveSender().sendBestMove();
+						mediator.dump("TimeSaver.OfflineSyzygy: EGTB probing ok - syzygy move set and search is marked for stopping: " + bitboardForSetup.getMoveOps().moveToString(best_move));
 						
-						mediator.dump("TimeSaver.OfflineSyzygy: EGTB probing ok - syzygy move send to UCI: " + bitboardForSetup.getMoveOps().moveToString(best_move));
+						//Active approach leads to errors
+						//int[] move_and_ponder_from_search = search_stopper.stopSearch();
+						//if (mediator.getBestMoveSender() != null) mediator.getBestMoveSender().sendBestMove();
 						
 					} else {
 						
