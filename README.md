@@ -83,24 +83,33 @@ In general YourKit supports open source projects with innovative and intelligent
 
 # When and how Bagatur Chess Engine project has started
 The project has started as a bet between myself and one of my friends from my first 2 years in the University, who like to play chess.
-I was unable to win a single chess game against him! This made me nervous over the months and at the end I have promised him (we bet) that I will create a chess program, which will win a game against him!
+I was unable to win a single chess game against him! This made me nervous over the time and at the end I have promised him (we bet) that I will create a chess program, which will win a game against him!
 Fortunately the time frame was not mentioned during the bet and ... years later I win it! :-)
 
 The first public, open source version of Bagatur was available since 2011-02-27 here: https://sourceforge.net/projects/bagaturchess/files/BagaturEngine/older/
-The project actually started ~10 years before this date. The actual start date is between the end of 1999 and the beggining of 2000. It had many proprietary non-public versions until 2011. I even don't have history of them but they were quite weak in playing chess. First versions just succeeded to play 2-3 moves and then crashes. I have spend hours and days trying to fix the bugs and find out why it doesn't work correctly.
+The project actually started ~10 years before this date. The actual start date was between 1999 and 2000.
+It had many proprietary non-public versions until 2011. I even don't have history of them but they were quite weak in playing chess. First versions just succeeded to play 2-3 moves and then crashes. I have spend hours and days trying to fix the bugs and find out why it doesn't work correctly.
 At this point in time, the internet was almost an empty space and I was not aware of softwares running chess engines like now CuteChess and Arena and I was not aware of the existence of the UCI protocol, so I also have created an own Graphical User Interface (GUI) based on Java AWT and Swing.
-Porgramming chess gives you diverse programming experiences ...
+Chess porgramming gives you diverse programming experiences ...
 I have selected Java as a programming language, mainly because of my little (but existing) experience with it.
 I have to also admit that Java was quite modern and polular at this point in time. This was the time a few years after the first releases of the Java itself. The early ages of the Java lenguage and Java technologies.
 
-So, better start earlier, you need time to achieve 800 ELO without crashes! :-)
+So, if you plan to work on a chess engine, better start earlier, you need time to achieve stable version which beats you! :-)
 
-According to CCRL, there are below 500 chess engines in the world. This means that not many people are really interested in programming chess engines. Most probably the author of a chess engine is interested not only in programming but also in chess game. He/she must have enough willingness to invest spare time in chess programing, without any incentives, just for fun and driven by curiosity. I don't know for the other authors but I would add that small and balanced portion of craziness also helps in this topic a lot ...
+# Contact the Author
+
+In order to contact me, you could use LinkedIn <a href="https://www.linkedin.com/in/topchiyski/">Krasimir Topchiyski</a> or email me at k_topchiyski@yahoo.com
+
+Some personal toughts ...
+
+According to CCRL, there are below 500 chess engines in the world.
+This means that not many people are really interested in programming chess engines.
+Most probably the author of a chess engine is interested not only in programming but also in chess game. He/she must have enough willingness to invest spare time in chess programing, without any incentives, just for fun and driven by curiosity.
+
 Because of this fact, I am always happy to see new engines and new authors!
 
-# Author
-
-The author of Bagatur engine is <a href="https://www.linkedin.com/in/topchiyski/">Krasimir Topchiyski</a>, email: k_topchiyski@yahoo.com
+I don't know for the other chess engine authors, but I would add small and well balanced portion of craziness ... it helps in chess programming, while you release version after version, targeting better ELO stregnth of each new release, which actually happens in very rear cases and you cannot release version long time.
+If this continues months, normally I feel it like "to bang your head against the wall". When I reach this state, I exit Bagatur project for a while, awaiting for new inspiration and the muse. Always remember, it should be for fun! :-)
 
 # Old Revision History before version 2.2e
 Version 2.2e (16 August 2021), 2997 ELO
