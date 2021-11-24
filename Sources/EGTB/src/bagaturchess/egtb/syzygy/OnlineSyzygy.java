@@ -30,6 +30,7 @@ import java.nio.charset.Charset;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 
 
 public class OnlineSyzygy {
@@ -55,6 +56,13 @@ public class OnlineSyzygy {
 	
 	
 	private static long last_server_response_timestamp = 0;
+	
+	
+	private final static VarStatistic stat_response_times = new VarStatistic();
+	
+	
+	private final static VarStatistic stat_waiting_times = new VarStatistic();
+	
 	
 	
 	public static final String getDTZandDTM_BlockingOnSocketConnection(IBitBoard board, int[] result, Logger logger) {
@@ -89,7 +97,22 @@ public class OnlineSyzygy {
 				current_index_for_waiting_time = 0;
 			}
 			
+			stat_waiting_times.addValue(WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time]);
+			
 			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: current_index_for_waiting_time set to " + current_index_for_waiting_time);
+			
+			stat_response_times.addValue(System.currentTimeMillis() - last_server_response_timestamp);
+			
+			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: stat_waiting_times: AVG=" + stat_waiting_times.getEntropy()
+					+ " ms, STDEV=" + stat_waiting_times.getDisperse()
+					+ " ms, MAX=" + stat_waiting_times.getMaxVal() + " ms"
+				);
+			
+			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: stat_response_time: AVG=" + stat_response_times.getEntropy()
+					+ " ms, STDEV=" + stat_response_times.getDisperse()
+					+ " ms, MAX=" + stat_response_times.getMaxVal() + " ms"
+				);
+			
 			
 			response = json_response_text;
 			
@@ -194,6 +217,8 @@ public class OnlineSyzygy {
 				current_index_for_waiting_time = WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS.length - 1;
 			}
 			
+			stat_waiting_times.addValue(WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time]);
+			
 			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: current_index_for_waiting_time set to " + current_index_for_waiting_time);
 		}
 		
@@ -239,7 +264,22 @@ public class OnlineSyzygy {
 				current_index_for_waiting_time = 0;
 			}
 			
+			stat_waiting_times.addValue(WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time]);
+			
 			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: current_index_for_waiting_time set to " + current_index_for_waiting_time);
+			
+			stat_response_times.addValue(System.currentTimeMillis() - last_server_response_timestamp);
+			
+			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: stat_waiting_times: AVG=" + stat_waiting_times.getEntropy()
+					+ " ms, STDEV=" + stat_waiting_times.getDisperse()
+					+ " ms, MAX=" + stat_waiting_times.getMaxVal() + " ms"
+				);
+			
+			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: stat_response_times: AVG=" + stat_response_times.getEntropy()
+					+ " ms, STDEV=" + stat_response_times.getDisperse()
+					+ " ms, MAX=" + stat_response_times.getMaxVal() + " ms"
+				);
+
 			
 			response = json_response_text;
 			
@@ -436,6 +476,8 @@ public class OnlineSyzygy {
 				current_index_for_waiting_time = WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS.length - 1;
 			}
 			
+			stat_waiting_times.addValue(WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time]);
+			
 			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: current_index_for_waiting_time set to " + current_index_for_waiting_time);
 		}
 		
@@ -456,26 +498,30 @@ public class OnlineSyzygy {
 		URL url = new URL(urlToRead);
 		
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setConnectTimeout(5 * 60 * 1000); // 0 = Infinite
+		conn.setRequestProperty("Connection", "keep-alive");
 		conn.setRequestProperty("Content-Type", "application/json; utf-8");
 		conn.setRequestMethod("GET");
 		
-		byte[] bytes = readAllBytes(conn.getInputStream());
+		byte[] bytes = readAllBytes(conn);
 
+		//conn.disconnect();
+		
 		String html = new String(bytes, Charset.forName(CHARSET_ENCODING));
 
 		return html;
 	}
 	
 	
-	private static byte[] readAllBytes(InputStream inputStream) throws IOException {
+	private static byte[] readAllBytes(HttpURLConnection conn) throws IOException {
 
+		InputStream inputStream = conn.getInputStream();
+		
 		final int bufLen = 4096;
 		
 		byte[] buf = new byte[bufLen];
 		
 		int readLen;
-		
-		IOException exception = null;
 
 		try {
 			
@@ -488,26 +534,20 @@ public class OnlineSyzygy {
 
 		} catch (IOException e) {
 			
-			exception = e;
-			
 			throw e;
 			
 		} finally {
 			
-			if (exception == null)
+			try {
 				
 				inputStream.close();
-			
-			else
 				
-				try {
-					
-					inputStream.close();
-					
-				} catch (IOException e) {
-					
-					exception.addSuppressed(e);
-				}
+			} catch (IOException ioe) {
+				
+				ioe.printStackTrace();
+			}
+			
+			conn.disconnect();
 		}
 	}
 	

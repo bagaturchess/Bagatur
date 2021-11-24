@@ -22,6 +22,7 @@
  */
 package bagaturchess.bitboard.impl.utils;
 
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +30,11 @@ import java.util.List;
 
 public class VarStatistic implements Serializable {
 	
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = -3762105781046761947L;
 	
 	private static int HISTORY_LENGTH = 100;
+	
 	
 	private double count;
 	private double countNonNull;
@@ -50,10 +50,16 @@ public class VarStatistic implements Serializable {
 	private List<Double> history_long;
 	
 	
+	public VarStatistic() {
+		this(false);
+	}
+	
+	
 	public VarStatistic(boolean _keepHistory) {
 		keepHistory = _keepHistory;
 		clear();
 	}
+	
 	
 	public void norm() {
 		count /= 2;
@@ -71,17 +77,21 @@ public class VarStatistic implements Serializable {
 		total_direction /= 2;
 	}
 	
+	
 	public double getEntropy() {
 		return entropy;
 	}
+	
 	
 	public double getDisperse() {
 		return Math.sqrt(disperse);
 	}
 	
+	
 	public double getTotalAmount() {
 		return total_amount;
 	}
+	
 	
 	public double getStability() {
 		
@@ -101,9 +111,11 @@ public class VarStatistic implements Serializable {
 		//return (count / path) / Math.max(1, max_val);
 	}
 	
+	
 	public double getTotalDirection() {
 		return total_direction;
 	}
+	
 	
 	public void clear() {
 		count = 0;
@@ -119,14 +131,22 @@ public class VarStatistic implements Serializable {
 		history_long = new ArrayList<Double>();
 	}
 	
+	
 	public void devideMax(int factor) {
 		max_val = max_val / factor;
 	}
+	
 	
 	public double getChaos() {
 		if (total_amount == 0) return 1; 
 		return total_amount / Math.max(Math.abs(total_direction), 0.0000000001);
 	}
+	
+	
+	public void addValue(double value) {
+		addValue(value, value);
+	}
+	
 	
 	public void addValue(double nv, double adjustment) {
 		/*if (nv < 0) {
