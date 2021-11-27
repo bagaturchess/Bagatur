@@ -375,7 +375,7 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		/**
-		 * If has pawn - true
+		 * If has pawn = true
 		 */
 		long pawns = getFiguresBitboardByColourAndType(color, Figures.TYPE_PAWN);
 		if (pawns != 0L) {
@@ -384,7 +384,7 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		/**
-		 * If has queen - true
+		 * If has queen = true
 		 */
 		long queens = getFiguresBitboardByColourAndType(color, Figures.TYPE_QUEEN);
 		if (queens != 0L) {
@@ -393,7 +393,7 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		/**
-		 * If has rook - true
+		 * If has rook = true
 		 */
 		long rooks = getFiguresBitboardByColourAndType(color, Figures.TYPE_CASTLE);
 		if (rooks != 0L) {
@@ -415,7 +415,7 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		/**
-		 * If has 2 different colors bishop - true
+		 * If has 2 different colors bishop = true
 		 */
 		if (bishops != 0L) {
 			
@@ -427,7 +427,7 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		/**
-		 * If has 1 bishop and 1 knight - true
+		 * If has 1 bishop and 1 knight = true
 		 */
 		if (Utils.countBits(bishops) == 1 && Utils.countBits(knights) == 1) {
 			
@@ -439,7 +439,7 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		/**
-		 * If all other cases - false
+		 * If all other cases = false
 		 */
 		return false;
 	}
