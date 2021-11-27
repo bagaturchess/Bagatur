@@ -126,8 +126,8 @@ public class DummyGameIterator implements IGameIterator, IPlyIterator {
 			throw new IllegalStateException();
 		}
 		
-		boolean suffMat1 = bitboard.hasSufficientMaterial();
-		boolean suffMat2 = testboard.hasSufficientMaterial();
+		boolean suffMat1 = bitboard.hasSufficientMatingMaterial();
+		boolean suffMat2 = testboard.hasSufficientMatingMaterial();
 		if (suffMat1 != suffMat2) {
 			throw new IllegalStateException();
 		}

@@ -61,7 +61,8 @@ public interface IBoard {
 	
 	public boolean isDraw50movesRule();
 	public int getDraw50movesRule();
-	public boolean hasSufficientMaterial();
+	public boolean hasSufficientMatingMaterial();
+	public boolean hasSufficientMatingMaterial(int color);
 	
 	//public IBoard clone();
 	

@@ -1681,66 +1681,84 @@ abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 	
 	
 	@Override
-	public boolean hasSufficientMaterial() {
+	public boolean hasSufficientMatingMaterial() {
 		
-		if (materialFactor.getTotalFactor() > 12) { // 2w knights + 2b knights
-			return true;
-		}
+		return hasSufficientMatingMaterial(Figures.COLOUR_WHITE) || hasSufficientMatingMaterial(Figures.COLOUR_BLACK);
+	}
+	
+	
+	@Override
+	public boolean hasSufficientMatingMaterial(int color) {
 		
 		
 		/**
 		 * If has pawn - true
 		 */
-		if (pieces.getPieces(Constants.PID_W_PAWN).getDataSize() > 0) {
+		long pawns = getFiguresBitboardByColourAndType(color, Figures.TYPE_PAWN);
+		if (pawns != 0L) {
 			return true;
 		}
 		
-		if (pieces.getPieces(Constants.PID_B_PAWN).getDataSize() > 0) {
-			return true;
-		}
 		
 		/**
 		 * If has queen - true
 		 */
-		if (pieces.getPieces(Constants.PID_W_QUEEN).getDataSize() > 0) {
+		long queens = getFiguresBitboardByColourAndType(color, Figures.TYPE_QUEEN);
+		if (queens != 0L) {
 			return true;
 		}
 		
-		if (pieces.getPieces(Constants.PID_B_QUEEN).getDataSize() > 0) {
-			return true;
-		}
 		
 		/**
 		 * If has rook - true
 		 */
-		
-		if (pieces.getPieces(Constants.PID_W_ROOK).getDataSize() > 0) {
+		long rooks = getFiguresBitboardByColourAndType(color, Figures.TYPE_CASTLE);
+		if (rooks != 0L) {
 			return true;
 		}
 		
-		if (pieces.getPieces(Constants.PID_B_ROOK).getDataSize() > 0) {
+		
+		long bishops = getFiguresBitboardByColourAndType(color, Figures.TYPE_OFFICER);
+		long knights = getFiguresBitboardByColourAndType(color, Figures.TYPE_KNIGHT);
+		
+		
+		/**
+		 * If has 3 or more bishops and knights = true
+		 */
+		if (Utils.countBits(bishops) + Utils.countBits(knights) >= 3) {
+			
 			return true;
 		}
 		
-		int o1 = pieces.getPieces(Constants.PID_W_BISHOP).getDataSize();
-		int k1 = pieces.getPieces(Constants.PID_W_KNIGHT).getDataSize();
 		
-		int mi1 = o1 + k1;
-		
-		int o2 = pieces.getPieces(Constants.PID_B_BISHOP).getDataSize();
-		int k2 = pieces.getPieces(Constants.PID_B_KNIGHT).getDataSize();
-		
-		int mi2 = o2 + k2;
-		
-		if (mi1 <= 1 && mi2 <= 1) {
-			return false;
+		/**
+		 * If has 2 different colors bishop - true
+		 */
+		if (bishops != 0L) {
+			
+			if ((bishops & Fields.ALL_WHITE_FIELDS) != 0 && (bishops & Fields.ALL_BLACK_FIELDS) != 0) {
+				
+				return true;
+			}
 		}
 		
-		if (o1 == 0 && o2 == 0) {
-			return false;
+		
+		/**
+		 * If has 1 bishop and 1 knight - true
+		 */
+		if (Utils.countBits(bishops) == 1 && Utils.countBits(knights) == 1) {
+			
+			if ((bishops & Fields.ALL_WHITE_FIELDS) != 0 && (bishops & Fields.ALL_BLACK_FIELDS) != 0) {
+				
+				return true;
+			}
 		}
 		
-		return true;
+		
+		/**
+		 * If all other cases - false
+		 */
+		return false;
 	}
 	
 	

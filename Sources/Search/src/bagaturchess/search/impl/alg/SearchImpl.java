@@ -210,9 +210,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	
 	protected boolean isDraw() {
-		return env.getBitboard().getStateRepetition() >= 2
-				|| env.getBitboard().isDraw50movesRule()
-				|| !env.getBitboard().hasSufficientMaterial();
+		return env.getBitboard().getStateRepetition() >= 2 || isDrawPV(1);
 	}
 	
 	
@@ -228,7 +226,7 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 			return true;
 		}
 		
-		if (!env.getBitboard().hasSufficientMaterial()) {
+		if (!env.getBitboard().hasSufficientMatingMaterial()) {
 			return true;
 		}
 		

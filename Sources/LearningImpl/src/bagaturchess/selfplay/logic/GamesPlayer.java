@@ -211,7 +211,7 @@ public class GamesPlayer {
 			return 0;
 		}
 		
-		if (!bitboard.hasSufficientMaterial()) {
+		if (!bitboard.hasSufficientMatingMaterial()) {
 			return 0;
 		}
 		

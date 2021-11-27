@@ -5147,69 +5147,88 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		return typeBitboard;
 	}
 	
-	public boolean hasSufficientMaterial() {
-
-		if (materialFactor.getTotalFactor() > 12) { // 2w knights + 2b knights
-			return true;
-		}
+	
+	@Override
+	public boolean hasSufficientMatingMaterial() {
+		
+		return hasSufficientMatingMaterial(Figures.COLOUR_WHITE) || hasSufficientMatingMaterial(Figures.COLOUR_BLACK);
+	}
+	
+	
+	@Override
+	public boolean hasSufficientMatingMaterial(int color) {
 		
 		
 		/**
 		 * If has pawn - true
 		 */
-		long w_pawns = getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
-		if (w_pawns != 0L) {
+		long pawns = getFiguresBitboardByColourAndType(color, Figures.TYPE_PAWN);
+		if (pawns != 0L) {
 			return true;
 		}
-		long b_pawns = getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
-		if (b_pawns != 0L) {
-			return true;
-		}
+		
 		
 		/**
 		 * If has queen - true
 		 */
-		long w_queens = getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN);
-		if (w_queens != 0L) {
+		long queens = getFiguresBitboardByColourAndType(color, Figures.TYPE_QUEEN);
+		if (queens != 0L) {
 			return true;
 		}
-		long b_queens = getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN);
-		if (b_queens != 0L) {
-			return true;
-		}
-
+		
+		
 		/**
 		 * If has rook - true
 		 */
-		long w_rooks = getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_CASTLE);
-		if (w_rooks != 0L) {
-			return true;
-		}
-		long b_rooks = getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_CASTLE);
-		if (b_rooks != 0L) {
+		long rooks = getFiguresBitboardByColourAndType(color, Figures.TYPE_CASTLE);
+		if (rooks != 0L) {
 			return true;
 		}
 		
-		int o1 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER));
-		int k1 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT));
 		
-		int mi1 = o1 + k1;
+		long bishops = getFiguresBitboardByColourAndType(color, Figures.TYPE_OFFICER);
+		long knights = getFiguresBitboardByColourAndType(color, Figures.TYPE_KNIGHT);
 		
-		int o2 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER));
-		int k2 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT));
 		
-		int mi2 = o2 + k2;
-
-		if (mi1 <= 1 && mi2 <= 1) {
-			return false;
+		/**
+		 * If has 3 or more bishops and knights = true
+		 */
+		if (Utils.countBits(bishops) + Utils.countBits(knights) >= 3) {
+			
+			return true;
 		}
 		
-		if (o1 == 0 && o2 == 0) {
-			return false;
+		
+		/**
+		 * If has 2 different colors bishop - true
+		 */
+		if (bishops != 0L) {
+			
+			if ((bishops & Fields.ALL_WHITE_FIELDS) != 0 && (bishops & Fields.ALL_BLACK_FIELDS) != 0) {
+				
+				return true;
+			}
 		}
 		
-		return true;
+		
+		/**
+		 * If has 1 bishop and 1 knight - true
+		 */
+		if (Utils.countBits(bishops) == 1 && Utils.countBits(knights) == 1) {
+			
+			if ((bishops & Fields.ALL_WHITE_FIELDS) != 0 && (bishops & Fields.ALL_BLACK_FIELDS) != 0) {
+				
+				return true;
+			}
+		}
+		
+		
+		/**
+		 * If all other cases - false
+		 */
+		return false;
 	}
+	
 	
 	public boolean isDraw50movesRule() {
 		return lastCaptureOrPawnMoveBefore >= 100;
@@ -5257,7 +5276,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 			}
 		}
 		
-		if (!hasSufficientMaterial()) {
+		if (!hasSufficientMatingMaterial()) {
 			return IGameStatus.NO_SUFFICIENT_MATERIAL;
 		}
 		

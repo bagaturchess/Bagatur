@@ -61,7 +61,7 @@ public class EvalConstants {
 	public static final int IX_BISHOP_DOUBLE 				= 1;
 	public static final int IX_QUEEN_NIGHT 					= 2;
 	
-	public static final int[] PHASE 					= {0, 0, 6, 6, 13, 28};
+	public static final int[] PHASE 					= {0, 0, 3, 3, 5, 9};
 	
 	public static final int[] MATERIAL 					= {0, 100, 396, 416, 706, 1302, 3000};
 	public static final int[] MATERIAL_SEE				= {0, 100, 300, 300, 500, 900, 3000};

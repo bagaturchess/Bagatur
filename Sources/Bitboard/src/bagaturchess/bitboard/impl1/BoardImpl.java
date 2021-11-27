@@ -45,6 +45,7 @@ import bagaturchess.bitboard.api.ISEE;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
@@ -363,71 +364,84 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
-	public boolean hasSufficientMaterial() {
+	public boolean hasSufficientMatingMaterial() {
 		
-		if (materialFactor.getTotalFactor() > 24) { // 2w knights + 2b knights
+		return hasSufficientMatingMaterial(Figures.COLOUR_WHITE) || hasSufficientMatingMaterial(Figures.COLOUR_BLACK);
+	}
+	
+	
+	@Override
+	public boolean hasSufficientMatingMaterial(int color) {
+		
+		
+		/**
+		 * If has pawn - true
+		 */
+		long pawns = getFiguresBitboardByColourAndType(color, Figures.TYPE_PAWN);
+		if (pawns != 0L) {
+			return true;
+		}
+		
+		
+		/**
+		 * If has queen - true
+		 */
+		long queens = getFiguresBitboardByColourAndType(color, Figures.TYPE_QUEEN);
+		if (queens != 0L) {
+			return true;
+		}
+		
+		
+		/**
+		 * If has rook - true
+		 */
+		long rooks = getFiguresBitboardByColourAndType(color, Figures.TYPE_CASTLE);
+		if (rooks != 0L) {
+			return true;
+		}
+		
+		
+		long bishops = getFiguresBitboardByColourAndType(color, Figures.TYPE_OFFICER);
+		long knights = getFiguresBitboardByColourAndType(color, Figures.TYPE_KNIGHT);
+		
+		
+		/**
+		 * If has 3 or more bishops and knights = true
+		 */
+		if (Utils.countBits(bishops) + Utils.countBits(knights) >= 3) {
 			
 			return true;
 		}
 		
 		
 		/**
-		 * If has pawn - true
+		 * If has 2 different colors bishop - true
 		 */
-		long w_pawns = getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN);
-		if (w_pawns != 0L) {
-			return true;
+		if (bishops != 0L) {
+			
+			if ((bishops & Fields.ALL_WHITE_FIELDS) != 0 && (bishops & Fields.ALL_BLACK_FIELDS) != 0) {
+				
+				return true;
+			}
 		}
-		long b_pawns = getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
-		if (b_pawns != 0L) {
-			return true;
-		}
+		
 		
 		/**
-		 * If has queen - true
+		 * If has 1 bishop and 1 knight - true
 		 */
-		long w_queens = getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_QUEEN);
-		if (w_queens != 0L) {
-			return true;
+		if (Utils.countBits(bishops) == 1 && Utils.countBits(knights) == 1) {
+			
+			if ((bishops & Fields.ALL_WHITE_FIELDS) != 0 && (bishops & Fields.ALL_BLACK_FIELDS) != 0) {
+				
+				return true;
+			}
 		}
-		long b_queens = getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_QUEEN);
-		if (b_queens != 0L) {
-			return true;
-		}
-
+		
+		
 		/**
-		 * If has rook - true
+		 * If all other cases - false
 		 */
-		long w_rooks = getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_CASTLE);
-		if (w_rooks != 0L) {
-			return true;
-		}
-		long b_rooks = getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_CASTLE);
-		if (b_rooks != 0L) {
-			return true;
-		}
-		
-		int b1 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER));
-		int n1 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT));
-		
-		int mi1 = b1 + n1;
-		
-		int b2 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER));
-		int n2 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT));
-		
-		int mi2 = b2 + n2;
-
-		//Count black bishops and knights
-		if (mi1 <= 1 && mi2 <= 1) {
-			return false;
-		}
-		
-		//Count white bishops and knights
-		if (b1 == 0 && b2 == 0) {
-			return false;
-		}
-		
-		return true;
+		return false;
 	}
 	
 	
@@ -570,7 +584,7 @@ public class BoardImpl implements IBitBoard {
 			}
 		}
 		
-		if (!hasSufficientMaterial()) {
+		if (!hasSufficientMatingMaterial()) {
 			return IGameStatus.NO_SUFFICIENT_MATERIAL;
 		}
 		
@@ -726,8 +740,8 @@ public class BoardImpl implements IBitBoard {
 	protected class MaterialFactorImpl implements IMaterialFactor {
 		
 		
-		private static final int TOTAL_FACTOR_MAX = 2 * 28 + 4 * 13 + 4 * 6 + 4 * 6; 
-		//public static final int[] PHASE 					= {0, 0, 6, 6, 13, 28};
+		private static final int TOTAL_FACTOR_MAX = 2 * 9 + 4 * 5 + 4 * 3 + 4 * 3; 
+		//public static final int[] PHASE 					= {0, 0, 3, 3, 5, 9};
 		
 		
 		public MaterialFactorImpl() {
