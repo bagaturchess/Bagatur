@@ -439,7 +439,7 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		/**
-		 * If all other cases = false
+		 * In all other cases = false
 		 */
 		return false;
 	}
