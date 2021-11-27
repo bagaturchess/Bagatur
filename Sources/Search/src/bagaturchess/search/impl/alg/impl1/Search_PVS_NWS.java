@@ -327,7 +327,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 	    if ((isPv && isDrawPV(ply)) || (!isPv && isDraw())) {
 	    	
-	    	node.eval = EvalConstants.SCORE_DRAW;
+	    	node.eval = getDrawScores(-1); //node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
 	    			
 	    	return node.eval;
 	    }
@@ -419,7 +419,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (!env.getBitboard().hasMoveInNonCheck()) {
 					
 					node.bestmove = 0;
-					node.eval = EvalConstants.SCORE_DRAW;
+					node.eval = node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
 					node.leaf = true;
 					
 					return node.eval;
@@ -510,7 +510,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						} else {
 							
 							node.bestmove = 0;
-							node.eval = EvalConstants.SCORE_DRAW;
+							node.eval = node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
 							node.leaf = true;
 							
 							return node.eval;
@@ -531,7 +531,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		            case SyzygyConstants.TB_DRAW:
 		            	
 						node.bestmove = 0;
-						node.eval = EvalConstants.SCORE_DRAW;
+						node.eval = node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
 						node.leaf = true;
 						
 						return node.eval;
@@ -539,7 +539,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		            case SyzygyConstants.TB_BLESSED_LOSS:
 		            	
 						node.bestmove = 0;
-						node.eval = EvalConstants.SCORE_DRAW;
+						node.eval = node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
 						node.leaf = true;
 						
 						return node.eval;
@@ -548,7 +548,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		            case SyzygyConstants.TB_CURSED_WIN:
 		            	
 						node.bestmove = 0;
-						node.eval = EvalConstants.SCORE_DRAW;
+						node.eval = node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
 						node.leaf = true;
 						
 						return node.eval;
@@ -954,7 +954,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (movesPerformed_attacks + movesPerformed_quiet == 0) {
 			if (cb.checkingPieces == 0) {
 				node.bestmove = 0;
-				node.eval = EvalConstants.SCORE_DRAW;
+				node.eval = node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
 				node.leaf = true;
 				return node.eval;
 			} else {
@@ -1003,7 +1003,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 	    if (isDraw()) {
-	    	return EvalConstants.SCORE_DRAW;
+	    	return getDrawScores(-1); //EvalConstants.SCORE_DRAW;
 	    }
 	    
 	    int ttValue = 0;
@@ -1156,7 +1156,14 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv) {
+		
 		int eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
+		
+		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
+			
+			eval = Math.min(0, eval);
+		}
+		
 		return eval;
 	}
 	
@@ -1174,7 +1181,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		result.leaf = true;
 		
 		if (ply > 0 && isDraw()) {
-			result.eval = EvalConstants.SCORE_DRAW;
+			result.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
 			result.bestmove = 0;
 			return true;
 		}
@@ -1197,7 +1204,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (!tt_entries_per_ply[ply].isEmpty()) {
 				draw = extractFromTT(ply + 1, result.child, tt_entries_per_ply[ply], info, isPv);
 				if (draw) {
-					result.eval = EvalConstants.SCORE_DRAW;
+					result.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
 				} else {
 					result.leaf = false;
 				}

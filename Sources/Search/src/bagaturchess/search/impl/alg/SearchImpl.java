@@ -50,8 +50,8 @@ public abstract class SearchImpl extends SearchUtils implements ISearch {
 	
 	private ISearchConfig_AB searchConfig;
 	
-	private static final int DRAW_SCORE_O = -50;
-	private static final int DRAW_SCORE_E = 50;
+	private static final int DRAW_SCORE_O = 0;
+	private static final int DRAW_SCORE_E = 0;
 	
 	protected ISearchMoveList[] lists_all;
 	protected ISearchMoveList[] lists_all_root;
