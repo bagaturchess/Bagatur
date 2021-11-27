@@ -1,6 +1,11 @@
 package bagaturchess.search.impl.eval;
 
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import bagaturchess.bitboard.api.IBaseEval;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IMaterialFactor;
@@ -418,14 +423,138 @@ public abstract class BaseEvaluator implements IEvaluator {
 		return (int) returnVal(eval);
 	}
 	
+	
+	private static double[] exchange_motivation = new double[10000];
+	
+	private static Map<Integer, Set<Integer>> states_transitions = new HashMap<Integer, Set<Integer>>();
+	
+	
+	private static int states_counter = 0;
+	
+	
+	private static void generateAllPossibleExchanges(int q, int r, int b, int n, int factor_parent_state, int exchanges_count) {
+		
+		states_counter++;
+		
+		int factor_current = q * 9 + r * 5 + b * 3 + n * 3;
+		//int factor_current = q * 43 + r * 23 + b * 13 + n * 11;
+		//int factor_current = prime[q] * prime[r] * prime[b] * prime[n];
+		//int factor_current = n + (b << 4) + (r << 8) + (q << 12);
+		
+		//System.out.println("factor_current=" + factor_current);
+		
+		//System.out.println("exchanges_count=" + exchanges_count + " factor_current=" + factor_current + " q=" + q + " r=" + r + " b=" + b +" n=" + n + " states_counter=" + states_counter);
+		
+		
+		exchange_motivation[factor_current] = Math.pow(2, exchanges_count) / 128;
+		
+		
+		Set<Integer> parents = states_transitions.get(factor_current);
+		
+		if (parents == null) {
+			
+			parents = new HashSet<Integer>();
+			
+			states_transitions.put(factor_current, parents);
+		}
+		
+		parents.add((int) factor_parent_state);
+		
+		
+		if (q >= 2) generateAllPossibleExchanges(q - 2, r, b, n, factor_current, exchanges_count + 1);
+		
+		if (r >= 2) generateAllPossibleExchanges(q, r - 2, b, n, factor_current, exchanges_count + 1);
+		
+		if (b >= 2) generateAllPossibleExchanges(q, r, b - 2, n, factor_current, exchanges_count + 1);
+		
+		if (n >= 2) generateAllPossibleExchanges(q, r, b, n - 2, factor_current, exchanges_count + 1);
+		
+	}
+	
+	
+	static {
+		
+		int MAX_FACTOR = 2 * 9 + 4 * 5 + 4 * 3 + 4 * 3;
+		
+		generateAllPossibleExchanges(2, 4, 4, 4, MAX_FACTOR, 0);
+		
+		exchange_motivation[0] = 1;
+		
+		
+		int state_counter = 0;
+		
+		for (int i = 0; i < exchange_motivation.length; i++) {
+			
+			if (exchange_motivation[i] != 0) {
+				
+				state_counter++;
+				
+				System.out.println("exchange_motivator[" + i + "]=" + exchange_motivation[i] + " state_counter=" + state_counter + " states_transitions count " + states_transitions.get(i).size() + " states_transitions=" + states_transitions.get(i));
+				
+			}
+		}
+		
+		
+		/*		
+		for (int q = 0; q <= 2; q++) {
+			for (int r = 0; r <= 4; r++) {
+				for (int b = 0; b <= 4; b++) {
+					for (int n = 0; n <= 4; n++) {
+						
+						int material_factor = q * 9 + r * 5 + b * 3 + n * 3;
+						
+						//225/375
+						//if (material_factor!= 0) {
+							
+							counter++;
+							
+							//System.out.println("material_factor=" + material_factor + ", counter=" + counter);
+						//}
+					}
+				}
+			}
+		}
+		
+		for (int i = 0; i < exchange_motivator.length; i++) {
+			
+			//Linear
+			//double MAX_exchange_motivator = 10;
+			//exchange_motivator[i] = MAX_exchange_motivator  - (MAX_exchange_motivator - 1) * (i / (double) exchange_motivator.length);
+			
+			//Logarithmic
+			exchange_motivator[i] = (5.049856007249537 - Math.log(i)) / 5.049856007249537;
+			exchange_motivator[i] += 1;
+			
+			
+			//System.out.println("exchange_motivator[" + i + "]=" + exchange_motivator[i]);
+		}
+		
+		//exchange_motivator[0]=Infinity
+		exchange_motivator[0] = exchange_motivator[1];
+		*/
+	}
+	
+	
 	protected double returnVal(double eval) {
+		
+		double factor = exchange_motivation[bitboard.getMaterialFactor().getTotalFactor()];
+		
+		//if (factor != 0) {
+			
+			eval += factor * eval;
+		//}
+		
 		
 		double result = eval;
 		
 		result = drawProbability(result);
+		
 		if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+			
 			result = -result;
 		}
+		
+		
 		return result;
 	}
 	
@@ -439,13 +568,14 @@ public abstract class BaseEvaluator implements IEvaluator {
 		 */
 		if (w_bishops.getDataSize() == 1
 				&& b_bishops.getDataSize() == 1
-				&& bitboard.getMaterialFactor().getWhiteFactor() == 3
-				&& bitboard.getMaterialFactor().getBlackFactor() == 3) {
+				&& bitboard.getMaterialFactor().getTotalFactor() == 6) {//Exactly 2 bishops
 			
 			long w_colour = (bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER) & Fields.ALL_WHITE_FIELDS) != 0 ?
 					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
+			
 			long b_colour = (bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER) & Fields.ALL_WHITE_FIELDS) != 0 ?
 					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
+			
 			if (w_colour != b_colour) {
 				
 				//If one of the sides has advantage of 2-3 pawns, than let it know the game goes to draw
@@ -463,7 +593,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		 * 50 moves rule
 		 */
 		int movesBeforeDraw = 100 - bitboard.getDraw50movesRule();
-		double percents = movesBeforeDraw / (double)100;
+		double percents = movesBeforeDraw / (double) 100;
 		abs = (int) (percents * abs);//(int) ((abs + percents * abs) / (double)2);
 		
 		/**
