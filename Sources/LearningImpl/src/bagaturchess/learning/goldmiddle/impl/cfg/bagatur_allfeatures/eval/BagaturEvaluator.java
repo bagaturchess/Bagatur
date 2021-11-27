@@ -248,11 +248,15 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 		int w_double_bishops_e = 0;
 		int b_double_bishops_o = 0;
 		int b_double_bishops_e = 0;
+		
 		if (w_bishops.getDataSize() >= 2) {
+			
 			w_double_bishops_o += MATERIAL_DOUBLE_BISHOPS_O;
 			w_double_bishops_e += MATERIAL_DOUBLE_BISHOPS_E;
 		}
+		
 		if (b_bishops.getDataSize() >= 2) {
+			
 			b_double_bishops_o += MATERIAL_DOUBLE_BISHOPS_O;
 			b_double_bishops_e += MATERIAL_DOUBLE_BISHOPS_E;
 		}

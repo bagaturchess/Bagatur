@@ -366,6 +366,7 @@ public class BoardImpl implements IBitBoard {
 	public boolean hasSufficientMaterial() {
 		
 		if (materialFactor.getTotalFactor() > 24) { // 2w knights + 2b knights
+			
 			return true;
 		}
 		
@@ -406,21 +407,23 @@ public class BoardImpl implements IBitBoard {
 			return true;
 		}
 		
-		int o1 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER));
-		int k1 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT));
+		int b1 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER));
+		int n1 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KNIGHT));
 		
-		int mi1 = o1 + k1;
+		int mi1 = b1 + n1;
 		
-		int o2 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER));
-		int k2 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT));
+		int b2 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER));
+		int n2 = Utils.countBits(getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KNIGHT));
 		
-		int mi2 = o2 + k2;
+		int mi2 = b2 + n2;
 
+		//Count black bishops and knights
 		if (mi1 <= 1 && mi2 <= 1) {
 			return false;
 		}
 		
-		if (o1 == 0 && o2 == 0) {
+		//Count white bishops and knights
+		if (b1 == 0 && b2 == 0) {
 			return false;
 		}
 		
@@ -745,7 +748,15 @@ public class BoardImpl implements IBitBoard {
 		
 		@Override
 		public int getTotalFactor() {
-			return TOTAL_FACTOR_MAX - chessBoard.phase;
+			
+			int factor = TOTAL_FACTOR_MAX - chessBoard.phase;
+			
+			if (factor < 0) {
+				
+				factor = 0;
+			}
+			
+			return factor;
 		}
 		
 		
@@ -769,8 +780,8 @@ public class BoardImpl implements IBitBoard {
 		@Override
 		public int interpolateByFactor(double val_o, double val_e) {
 			double openningPart = getOpenningPart();
-			int result = (int) (val_o * openningPart + (val_e * (1 - openningPart)));
-			return result;
+			double result = (val_o * openningPart + (val_e * (1 - openningPart)));
+			return (int) result;
 		}
 	}
 	
