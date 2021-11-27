@@ -478,7 +478,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		generateAllPossibleExchanges(2, 4, 4, 4, MAX_FACTOR, 0);
 		
-		exchange_motivation[0] = 1;
+		exchange_motivation[0] = 0.75;
 		
 		
 		int state_counter = 0;
@@ -539,10 +539,19 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		double factor = exchange_motivation[bitboard.getMaterialFactor().getTotalFactor()];
 		
-		//if (factor != 0) {
+		if (factor != 0) {
 			
-			eval += factor * eval;
-		//}
+			double to_add = 8 * factor * eval;
+			
+			if (eval >= 0) {
+				
+				eval = Math.max(eval / 3, (eval + to_add) / 7);
+						
+			} else {
+				
+				eval = Math.min(eval / 3, (eval + to_add) / 7);
+			}
+		}
 		
 		
 		double result = eval;
