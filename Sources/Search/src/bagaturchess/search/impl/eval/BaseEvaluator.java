@@ -541,15 +541,15 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		if (factor != 0) {
 			
-			double to_add = 8 * factor * eval;
+			double eval_increment = 5 * factor * eval;
 			
 			if (eval >= 0) {
 				
-				eval = Math.max(eval / 3, (eval + to_add) / 7);
+				eval = Math.max(eval, eval + eval_increment);
 						
 			} else {
 				
-				eval = Math.min(eval / 3, (eval + to_add) / 7);
+				eval = Math.min(eval, eval + eval_increment);
 			}
 		}
 		
