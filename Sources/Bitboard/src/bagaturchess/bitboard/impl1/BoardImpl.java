@@ -750,27 +750,20 @@ public class BoardImpl implements IBitBoard {
 		
 		@Override
 		public int getBlackFactor() {
-			return getTotalFactor() / 2;
+			return chessBoard.material_factor_black;
 		}
 		
 		
 		@Override
 		public int getWhiteFactor() {
-			return getTotalFactor() / 2;
+			return chessBoard.material_factor_white;
 		}
 		
 		
 		@Override
 		public int getTotalFactor() {
 			
-			int factor = TOTAL_FACTOR_MAX - chessBoard.phase;
-			
-			if (factor < 0) {
-				
-				factor = 0;
-			}
-			
-			return factor;
+			return getWhiteFactor() + getBlackFactor();
 		}
 		
 		

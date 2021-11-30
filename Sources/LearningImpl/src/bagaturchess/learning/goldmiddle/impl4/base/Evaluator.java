@@ -27,10 +27,7 @@ import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConstan
 public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights {
 	
 	
-	public static final int MG = 0;
-	public static final int EG = 1;
-	
-	public static final int PHASE_TOTAL = 4 * EvalConstants.PHASE[NIGHT] + 4 * EvalConstants.PHASE[BISHOP] + 4 * EvalConstants.PHASE[ROOK] + 2 * EvalConstants.PHASE[QUEEN];
+	private static final int MAX_MATERIAL_FACTOR = 4 * EvalConstants.PHASE[NIGHT] + 4 * EvalConstants.PHASE[BISHOP] + 4 * EvalConstants.PHASE[ROOK] + 2 * EvalConstants.PHASE[QUEEN];
 	
 	
 	public static int eval1(final ChessBoard cb, final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
@@ -41,7 +38,9 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		calculateMaterialScore(evalInfo, evalComponentsProcessor);
 		calculateImbalances(evalInfo, evalComponentsProcessor);
 		
-		return (int) (((evalInfo.eval_o_part1 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part1 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(evalInfo));		
+		int total_material_factor = Math.min(MAX_MATERIAL_FACTOR, cb.material_factor_white + cb.material_factor_black);
+		
+		return (int) (evalInfo.eval_o_part1 * total_material_factor + evalInfo.eval_e_part1 * (MAX_MATERIAL_FACTOR - total_material_factor)) / MAX_MATERIAL_FACTOR;
 	}
 	
 	
@@ -54,7 +53,9 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		
 		calculateMobilityScoresAndSetAttacks(evalInfo, evalComponentsProcessor);
 		
-		return (int) (((evalInfo.eval_o_part2 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part2 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(evalInfo));
+		int total_material_factor = Math.min(MAX_MATERIAL_FACTOR, cb.material_factor_white + cb.material_factor_black);
+		
+		return (int) (evalInfo.eval_o_part2 * total_material_factor + evalInfo.eval_e_part2 * (MAX_MATERIAL_FACTOR - total_material_factor)) / MAX_MATERIAL_FACTOR;
 	}
 	
 	
@@ -63,7 +64,9 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		calculatePawnShieldBonus(evalInfo, evalComponentsProcessor);
 		calculateKingSafetyScores(evalInfo, evalComponentsProcessor);
 		
-		return (int) (((evalInfo.eval_o_part3 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part3 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(evalInfo));
+		int total_material_factor = Math.min(MAX_MATERIAL_FACTOR, cb.material_factor_white + cb.material_factor_black);
+		
+		return (int) (evalInfo.eval_o_part3 * total_material_factor + evalInfo.eval_e_part3 * (MAX_MATERIAL_FACTOR - total_material_factor)) / MAX_MATERIAL_FACTOR;
 	}
 	
 	
@@ -71,7 +74,9 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		
 		calculatePassedPawnScores(evalInfo, evalComponentsProcessor);
 		
-		return (int) (((evalInfo.eval_o_part4 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part4 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(evalInfo));
+		int total_material_factor = Math.min(MAX_MATERIAL_FACTOR, cb.material_factor_white + cb.material_factor_black);
+		
+		return (int) (evalInfo.eval_o_part4 * total_material_factor + evalInfo.eval_e_part4 * (MAX_MATERIAL_FACTOR - total_material_factor)) / MAX_MATERIAL_FACTOR;
 	}
 	
 	
@@ -81,18 +86,9 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		calculateSpace(evalInfo, evalComponentsProcessor);
 		calculateOthers(cb, evalInfo, evalComponentsProcessor);
 		
-		return (int) (((evalInfo.eval_o_part5 * (PHASE_TOTAL - cb.phase)) + evalInfo.eval_e_part5 * cb.phase) / PHASE_TOTAL / calculateScaleFactor(evalInfo));
-	}
-
-
-	private static int calculateScaleFactor(final EvalInfo evalInfo) {
-		// opposite bishops endgame?
-		if (MaterialUtil.oppositeBishops(evalInfo.materialKey)) {
-			if (((evalInfo.bb_w_bishops & Bitboard.BLACK_SQUARES) == 0) == ((evalInfo.bb_b_bishops & Bitboard.WHITE_SQUARES) == 0)) {
-				return 2;
-			}
-		}
-		return 1;
+		int total_material_factor = Math.min(MAX_MATERIAL_FACTOR, cb.material_factor_white + cb.material_factor_black);
+		
+		return (int) (evalInfo.eval_o_part5 * total_material_factor + evalInfo.eval_e_part5 * (MAX_MATERIAL_FACTOR - total_material_factor)) / MAX_MATERIAL_FACTOR;
 	}
 	
 	

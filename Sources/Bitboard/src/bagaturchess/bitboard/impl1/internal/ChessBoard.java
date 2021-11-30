@@ -12,7 +12,6 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 
 import bagaturchess.bitboard.impl.datastructs.StackLongInt;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 
 
 public final class ChessBoard {
@@ -56,8 +55,9 @@ public final class ChessBoard {
 	public int colorToMove, colorToMoveInverse;
 	public int epIndex;
 	public int materialKey;
-	public int phase;
-
+	public int material_factor_white;
+	public int material_factor_black;
+	
 	public long allPieces, emptySpaces;
 	public long zobristKey, pawnZobristKey;
 	public long checkingPieces, pinnedPieces, discoveredPieces;
@@ -206,7 +206,13 @@ public final class ChessBoard {
 		case PAWN:
 			pawnZobristKey ^= Zobrist.piece[fromIndex][colorToMove][PAWN];
 			if (MoveUtil.isPromotion(move)) {
-				phase -= EvalConstants.PHASE[MoveUtil.getMoveType(move)];
+				
+				if (colorToMove == WHITE) {
+					material_factor_white += EvalConstants.PHASE[MoveUtil.getMoveType(move)];
+				} else {
+					material_factor_black += EvalConstants.PHASE[MoveUtil.getMoveType(move)];
+				}
+				
 				materialKey += MaterialUtil.VALUES[colorToMove][MoveUtil.getMoveType(move)] - MaterialUtil.VALUES[colorToMove][PAWN];
 				pieces[colorToMove][PAWN] ^= toMask;
 				pieces[colorToMove][MoveUtil.getMoveType(move)] |= toMask;
@@ -273,7 +279,13 @@ public final class ChessBoard {
 			}
 			// fall-through
 		default:
-			phase += EvalConstants.PHASE[attackedPieceIndex];
+			
+			if (colorToMoveInverse == WHITE) {
+				material_factor_white -= EvalConstants.PHASE[attackedPieceIndex];
+			} else {
+				material_factor_black -= EvalConstants.PHASE[attackedPieceIndex];
+			}
+			
 			psqtScore_mg -= EvalConstants.PSQT_MG[attackedPieceIndex][colorToMoveInverse][toIndex];
 			psqtScore_eg -= EvalConstants.PSQT_EG[attackedPieceIndex][colorToMoveInverse][toIndex];
 			friendlyPieces[colorToMoveInverse] ^= toMask;
@@ -361,7 +373,13 @@ public final class ChessBoard {
 		case PAWN:
 			pawnZobristKey ^= Zobrist.piece[fromIndex][colorToMoveInverse][PAWN];
 			if (MoveUtil.isPromotion(move)) {
-				phase += EvalConstants.PHASE[MoveUtil.getMoveType(move)];
+				
+				if (colorToMoveInverse== WHITE) {
+					material_factor_white -= EvalConstants.PHASE[MoveUtil.getMoveType(move)];
+				} else {
+					material_factor_black -= EvalConstants.PHASE[MoveUtil.getMoveType(move)];
+				}
+				
 				materialKey -= MaterialUtil.VALUES[colorToMoveInverse][MoveUtil.getMoveType(move)] - MaterialUtil.VALUES[colorToMoveInverse][PAWN];
 				pieces[colorToMoveInverse][PAWN] ^= toMask;
 				pieces[colorToMoveInverse][MoveUtil.getMoveType(move)] ^= toMask;
@@ -398,7 +416,13 @@ public final class ChessBoard {
 		default:
 			psqtScore_mg += EvalConstants.PSQT_MG[attackedPieceIndex][colorToMove][toIndex];
 			psqtScore_eg += EvalConstants.PSQT_EG[attackedPieceIndex][colorToMove][toIndex];
-			phase -= EvalConstants.PHASE[attackedPieceIndex];
+			
+			if (colorToMove == WHITE) {
+				material_factor_white += EvalConstants.PHASE[attackedPieceIndex];
+			} else {
+				material_factor_black += EvalConstants.PHASE[attackedPieceIndex];
+			}
+			
 			materialKey += MaterialUtil.VALUES[colorToMove][attackedPieceIndex];
 			pieces[colorToMove][attackedPieceIndex] |= toMask;
 			friendlyPieces[colorToMove] |= toMask;

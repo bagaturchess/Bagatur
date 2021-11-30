@@ -42,6 +42,51 @@ public abstract class BaseEvaluator implements IEvaluator {
 	private static double INT4 = INT_MIN;
 	
 	
+	private static final int MAX_MATERIAL_FACTOR = 9 + 2 * 5 + 2 * 3 + 2 * 3;
+	
+	private static double[] material_exchange_motivation = new double[32]; //Between 0 and 1 (0 = all pieces, 1 = no pieces)
+	
+	private static Map<Integer, Set<Integer>> states_transitions = new HashMap<Integer, Set<Integer>>();
+	
+	
+	static {
+		
+		generateAllPossibleMaterialFactorStates(1, 2, 2, 2, MAX_MATERIAL_FACTOR, 0);
+		
+		material_exchange_motivation[0] = 1;
+		material_exchange_motivation[1] = 0.5;
+		material_exchange_motivation[2] = 0.5;
+		material_exchange_motivation[4] = 0.5;
+		material_exchange_motivation[7] = 0.5;
+		material_exchange_motivation[24] = 0.03125;
+		material_exchange_motivation[27] = 0.015625;
+		material_exchange_motivation[29] = 0.0078125;
+		material_exchange_motivation[30] = 0.0078125;
+		
+		int state_counter = 0;
+		
+		for (int i = 0; i < material_exchange_motivation.length; i++) {
+			
+			if (material_exchange_motivation[i] != 0) {
+				
+				state_counter++;
+				
+				if (states_transitions.get(i) != null) {
+					
+					System.out.println("material_exchange_motivation[" + i + "]=" + material_exchange_motivation[i]
+							+ " state_counter=" + state_counter
+							+ " states_transitions count " + states_transitions.get(i).size()
+							+ " states_transitions=" + states_transitions.get(i));
+					
+				} else {
+					
+					System.out.println("material_exchange_motivation[" + i + "]=" + material_exchange_motivation[i]
+							+ " state_counter=" + state_counter);
+				}
+			}
+		}
+	}
+	
 	protected IBitBoard bitboard;	
 	
 	protected PiecesList w_knights;
@@ -424,130 +469,13 @@ public abstract class BaseEvaluator implements IEvaluator {
 	}
 	
 	
-	private static double[] exchange_motivation = new double[10000];
-	
-	private static Map<Integer, Set<Integer>> states_transitions = new HashMap<Integer, Set<Integer>>();
-	
-	
-	private static int states_counter = 0;
-	
-	
-	private static void generateAllPossibleExchanges(int q, int r, int b, int n, int factor_parent_state, int exchanges_count) {
-		
-		states_counter++;
-		
-		int factor_current = q * 9 + r * 5 + b * 3 + n * 3;
-		//int factor_current = q * 43 + r * 23 + b * 13 + n * 11;
-		//int factor_current = prime[q] * prime[r] * prime[b] * prime[n];
-		//int factor_current = n + (b << 4) + (r << 8) + (q << 12);
-		
-		//System.out.println("factor_current=" + factor_current);
-		
-		//System.out.println("exchanges_count=" + exchanges_count + " factor_current=" + factor_current + " q=" + q + " r=" + r + " b=" + b +" n=" + n + " states_counter=" + states_counter);
+	protected double returnVal(double white_eval) {
 		
 		
-		exchange_motivation[factor_current] = Math.pow(2, exchanges_count) / 128;
+		white_eval = applyExchangeMotivation(white_eval);
 		
 		
-		Set<Integer> parents = states_transitions.get(factor_current);
-		
-		if (parents == null) {
-			
-			parents = new HashSet<Integer>();
-			
-			states_transitions.put(factor_current, parents);
-		}
-		
-		parents.add((int) factor_parent_state);
-		
-		
-		if (q >= 2) generateAllPossibleExchanges(q - 2, r, b, n, factor_current, exchanges_count + 1);
-		
-		if (r >= 2) generateAllPossibleExchanges(q, r - 2, b, n, factor_current, exchanges_count + 1);
-		
-		if (b >= 2) generateAllPossibleExchanges(q, r, b - 2, n, factor_current, exchanges_count + 1);
-		
-		if (n >= 2) generateAllPossibleExchanges(q, r, b, n - 2, factor_current, exchanges_count + 1);
-		
-	}
-	
-	
-	static {
-		
-		int MAX_FACTOR = 2 * 9 + 4 * 5 + 4 * 3 + 4 * 3;
-		
-		generateAllPossibleExchanges(2, 4, 4, 4, MAX_FACTOR, 0);
-		
-		exchange_motivation[0] = 0.75;
-		
-		
-		int state_counter = 0;
-		
-		for (int i = 0; i < exchange_motivation.length; i++) {
-			
-			if (exchange_motivation[i] != 0) {
-				
-				state_counter++;
-				
-				System.out.println("exchange_motivator[" + i + "]=" + exchange_motivation[i] + " state_counter=" + state_counter + " states_transitions count " + states_transitions.get(i).size() + " states_transitions=" + states_transitions.get(i));
-				
-			}
-		}
-		
-		
-		/*		
-		for (int q = 0; q <= 2; q++) {
-			for (int r = 0; r <= 4; r++) {
-				for (int b = 0; b <= 4; b++) {
-					for (int n = 0; n <= 4; n++) {
-						
-						int material_factor = q * 9 + r * 5 + b * 3 + n * 3;
-						
-						//225/375
-						//if (material_factor!= 0) {
-							
-							counter++;
-							
-							//System.out.println("material_factor=" + material_factor + ", counter=" + counter);
-						//}
-					}
-				}
-			}
-		}
-		
-		for (int i = 0; i < exchange_motivator.length; i++) {
-			
-			//Linear
-			//double MAX_exchange_motivator = 10;
-			//exchange_motivator[i] = MAX_exchange_motivator  - (MAX_exchange_motivator - 1) * (i / (double) exchange_motivator.length);
-			
-			//Logarithmic
-			exchange_motivator[i] = (5.049856007249537 - Math.log(i)) / 5.049856007249537;
-			exchange_motivator[i] += 1;
-			
-			
-			//System.out.println("exchange_motivator[" + i + "]=" + exchange_motivator[i]);
-		}
-		
-		//exchange_motivator[0]=Infinity
-		exchange_motivator[0] = exchange_motivator[1];
-		*/
-	}
-	
-	
-	protected double returnVal(double eval) {
-		
-		double factor = exchange_motivation[bitboard.getMaterialFactor().getTotalFactor()];
-		
-		if (factor != 0) {
-			
-			double eval_increment = 1.75 * factor * eval;
-			
-			eval = eval + eval_increment;
-		}
-		
-		
-		double result = eval;
+		double result = white_eval;
 		
 		result = drawProbability(result);
 		
@@ -561,16 +489,88 @@ public abstract class BaseEvaluator implements IEvaluator {
 	}
 	
 	
+	private double applyExchangeMotivation(double white_eval) {
+		
+		int material_factor_white = Math.min(MAX_MATERIAL_FACTOR, bitboard.getMaterialFactor().getWhiteFactor());
+		
+		int material_factor_black = Math.min(MAX_MATERIAL_FACTOR, bitboard.getMaterialFactor().getBlackFactor());
+		
+		if (material_factor_white >= material_exchange_motivation.length || material_factor_black >= material_exchange_motivation.length) {
+			
+			throw new IllegalStateException("material_factor_white=" + material_factor_black + " material_factor_black=" + material_factor_black);
+		}
+		
+		
+		//EXCHANGE_MOTIVATION_WEIGHT must be between 0 and 1
+		double EXCHANGE_MOTIVATION_WEIGHT = 0.5;
+		
+		if (material_factor_white == material_factor_black) {
+			
+			double white_material_scale = material_exchange_motivation[material_factor_white];
+			
+			if (white_material_scale == 0) {
+				
+				throw new IllegalStateException("factor=" + white_material_scale + " material_factor_white=" + material_factor_white);
+			}
+			
+			//Increase/Decrease WHITE evaluation
+			white_eval *= (1 + EXCHANGE_MOTIVATION_WEIGHT * white_material_scale);
+			
+		} else if (material_factor_white > material_factor_black) {
+		
+			//Here the goal of the WHITE player is to exchange pieces and reach white_material_scale = 1. This happens when material_factor_black = 0.
+			double white_material_scale = material_exchange_motivation[material_factor_white]; //Between 0 and 1 (0 = all pieces, 1 = no pieces)
+			
+			if (white_eval > 0) {
+				
+				//Increase WHITE evaluation - make it bigger positive number (closer to +Infinity) by multiplying with number >= 1
+				white_eval *= (1 + EXCHANGE_MOTIVATION_WEIGHT * white_material_scale);
+				
+			} else {
+				
+				//Increase WHITE evaluation - make it bigger negative number (closer to 0) by multiplying with number between 0.5 and 1
+				white_eval *= Math.max(0.5, 1 - EXCHANGE_MOTIVATION_WEIGHT * white_material_scale);
+			}
+			
+		} else if (material_factor_white < material_factor_black) {
+			
+			//Here the goal of the BLACK player is to exchange pieces and reach black_material_scale = 1. This happens when material_factor_white = 0.
+			double black_material_scale = material_exchange_motivation[material_factor_black]; //Between 0 and 1 (0 = all pieces, 1 = no pieces)
+			
+			if (white_eval > 0) {
+				
+				//Decrease WHITE evaluation
+				white_eval *= Math.max(0.5, 1 - EXCHANGE_MOTIVATION_WEIGHT * black_material_scale);
+				
+			} else {
+				
+				//Decrease WHITE evaluation
+				white_eval *= (1 + EXCHANGE_MOTIVATION_WEIGHT * black_material_scale);
+			}
+			
+		} else {
+			
+			throw new IllegalStateException("material_factor_white=" + material_factor_white + " material_factor_black=" + material_factor_black);
+		}
+		
+		return white_eval;
+	}
+	
+	
 	private double drawProbability(double eval) {
 		
+		
 		double abs = Math.abs(eval);
+		
 		
 		/**
 		 * Differently colored bishops, no other pieces except pawns
 		 */
 		if (w_bishops.getDataSize() == 1
-				&& b_bishops.getDataSize() == 1
-				&& bitboard.getMaterialFactor().getTotalFactor() == 6) {//Exactly 2 bishops
+					&& b_bishops.getDataSize() == 1
+					&& bitboard.getMaterialFactor().getWhiteFactor() == 3
+					&& bitboard.getMaterialFactor().getBlackFactor() == 3
+				) {
 			
 			long w_colour = (bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER) & Fields.ALL_WHITE_FIELDS) != 0 ?
 					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
@@ -580,28 +580,59 @@ public abstract class BaseEvaluator implements IEvaluator {
 			
 			if (w_colour != b_colour) {
 				
-				//If one of the sides has advantage of 2-3 pawns, than let it know the game goes to draw
-				if (abs <= 200) {
-					abs = abs / 4;
-				} else if (abs <= 400) {
-					abs = abs / 2;
-				} else if (abs <= 600) {
-					abs = (2 * abs) / 3;
-				}
+				//If one of the sides has advantage, than let it know the probability of draw increases
+				abs = abs / 2;
 			}
 		}
 		
+		
 		/**
-		 * 50 moves rule
+		 * 50 moves rule - evaluation goes down / up to 0, move after move.
 		 */
 		int movesBeforeDraw = 100 - bitboard.getDraw50movesRule();
 		double percents = movesBeforeDraw / (double) 100;
-		abs = (int) (percents * abs);//(int) ((abs + percents * abs) / (double)2);
+		abs = (int) (percents * abs);
 		
-		/**
-		 * Return value
-		 */
+		
 		return eval >= 0 ? abs : -abs;
+	}
+	
+	
+	private static void generateAllPossibleMaterialFactorStates(int q, int r, int b, int n, int factor_parent_state, int captures_count) {
+		
+		int factor_current_state = q * 9 + r * 5 + b * 3 + n * 3;
+		//int factor_current_state = q * 43 + r * 23 + b * 13 + n * 11;
+		//int factor_current_state = prime[q] * prime[r] * prime[b] * prime[n];
+		//int factor_current_state = n + (b << 4) + (r << 8) + (q << 12);
+		
+		//System.out.println("factor_current_state=" + factor_current_state);
+		
+		//System.out.println("exchanges_count=" + exchanges_count + " factor_current_state=" + factor_current_state + " q=" + q + " r=" + r + " b=" + b +" n=" + n);
+		
+		
+		material_exchange_motivation[factor_current_state] = Math.pow(2, captures_count) / 128;
+		
+		
+		Set<Integer> parents = states_transitions.get(factor_current_state);
+		
+		if (parents == null) {
+			
+			parents = new HashSet<Integer>();
+			
+			states_transitions.put(factor_current_state, parents);
+		}
+		
+		parents.add((int) factor_parent_state);
+		
+		
+		if (q >= 1) generateAllPossibleMaterialFactorStates(q - 1, r, b, n, factor_current_state, captures_count + 1);
+		
+		if (r >= 1) generateAllPossibleMaterialFactorStates(q, r - 1, b, n, factor_current_state, captures_count + 1);
+		
+		if (b >= 1) generateAllPossibleMaterialFactorStates(q, r, b - 1, n, factor_current_state, captures_count + 1);
+		
+		if (n >= 1) generateAllPossibleMaterialFactorStates(q, r, b, n - 1, factor_current_state, captures_count + 1);
+		
 	}
 	
 	

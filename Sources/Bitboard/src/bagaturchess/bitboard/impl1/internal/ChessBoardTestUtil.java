@@ -23,7 +23,8 @@ public class ChessBoardTestUtil {
 		int iterativePsqt = cb.psqtScore_mg;
 		long whiteKingArea = cb.kingArea[WHITE];
 		long blackKingArea = cb.kingArea[BLACK];
-		int phase = cb.phase;
+		int material_factor_white = cb.material_factor_white;
+		int material_factor_black = cb.material_factor_black;
 		long materialKey = cb.materialKey;
 		int[] testPieceIndexes = new int[64];
 		System.arraycopy(cb.pieceIndexes, 0, testPieceIndexes, 0, cb.pieceIndexes.length);
@@ -59,7 +60,8 @@ public class ChessBoardTestUtil {
 			Assert.isTrue(testPieceIndexes[i] == cb.pieceIndexes[i], "testPieceIndexes[i] == cb.pieceIndexes[i]");
 		}
 
-		Assert.isTrue(phase == cb.phase, "phase == cb.phase");
+		Assert.isTrue(material_factor_white == cb.material_factor_white, "material_factor_white == cb.material_factor_white");
+		Assert.isTrue(material_factor_black == cb.material_factor_black, "material_factor_black == cb.material_factor_black");
 		Assert.isTrue(materialKey == cb.materialKey, "materialKey == cb.materialKey");
 	}
 
