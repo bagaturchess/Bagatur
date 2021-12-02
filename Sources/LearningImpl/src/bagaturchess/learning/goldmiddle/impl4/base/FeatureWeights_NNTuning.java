@@ -20,7 +20,7 @@
 package bagaturchess.learning.goldmiddle.impl4.base;
 
 
-public interface FeatureWeights {
+public interface FeatureWeights_NNTuning {
 
 	public static final double MATERIAL_PAWN_O	=	0.46571962390446814;
 	public static final double MATERIAL_PAWN_E	=	1.4043278060733533;
