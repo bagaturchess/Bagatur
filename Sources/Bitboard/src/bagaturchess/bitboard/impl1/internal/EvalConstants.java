@@ -6,18 +6,11 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 import bagaturchess.bitboard.api.IBoardConfig;
 
 
-/**
- * Values have been tuned using the Texel's tuning method
- */
 public class EvalConstants {
-	//@formatter:off
 	
-	public static final int SIDE_TO_MOVE_BONUS = 16; //cannot be tuned //TODO lower in endgame
+	public static final int SIDE_TO_MOVE_BONUS 				= 0;
 	
 	public static final int SCORE_DRAW 						= 0;
-	public static final int SCORE_DRAWISH					= 10;
-	public static final int SCORE_DRAWISH_KING_CORNERED		= 20;
-	public static final int SCORE_MATE_BOUND 				= 30000;
 	
 	// other
 	public static final int[] OTHER_SCORES = {-8, 16, 18, 8, 18, 12, -158, 12, 56, 20, -44, 28, -8};

@@ -354,7 +354,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}*/
 			
 			
-			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < EvalConstants.SCORE_MATE_BOUND) {
+			if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length && Math.abs(alpha) < IEvaluator.MAX_EVAL) {
 				if (eval + RAZORING_MARGIN[depth] < alpha) {
 					score = qsearch(evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply);
 					if (score + RAZORING_MARGIN[depth] <= alpha) {
