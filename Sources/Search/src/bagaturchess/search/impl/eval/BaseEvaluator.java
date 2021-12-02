@@ -503,7 +503,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		
 		//EXCHANGE_MOTIVATION_WEIGHT must be between 0 and 1
-		double EXCHANGE_MOTIVATION_WEIGHT = 1;
+		double EXCHANGE_MOTIVATION_WEIGHT = 0.75;
 		
 		if (material_factor_white == material_factor_black) {
 			
