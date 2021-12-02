@@ -36,9 +36,6 @@ import java.util.TreeSet;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.bitboard.impl.movelist.BaseMoveList;
-import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.UCIEnginesManager;
@@ -58,8 +55,8 @@ public class GamesGenerator_MultiPv {
 	
 	private static int MAX_EVAL_DIFF = 3000;
 	private static int MAX_MOVES = 300;
-	private static int BEST_MOVE_DIFF = 50;
-	private static int MIN_PIECES = 6;
+	private static int BEST_MOVE_DIFF = 10000;
+	private static int MIN_PIECES = 0;
 	
 	
 	private UCIEnginesManager runner;
@@ -118,17 +115,22 @@ public class GamesGenerator_MultiPv {
 					new String [0],
 					"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\texel107");*/
 			
-			EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\stockfish-NNUE\\sf-nnue-bmi2.exe",
+			/*EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\stockfish-NNUE\\sf-nnue-bmi2.exe",
 					new String [0],
-					"C:\\DATA\\Engines\\stockfish-NNUE");
+					"C:\\DATA\\Engines\\stockfish-NNUE");*/
 	
+			EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\stockfish_14.1_win_x64_popcnt\\stockfish_14.1_win_x64_popcnt.exe",
+					new String [0],
+					"C:\\DATA\\OWN\\stockfish_14.1_win_x64_popcnt");
+			
+			
 			/*EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\lc0-v0.25.1-windows-cpu-openblas\\lc0.exe",
 					new String [0],
 					"C:\\DATA\\Engines\\lc0-v0.25.1-windows-cpu-openblas\\");*/
 			
 			//EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");
 			
-			control.execute(engine, "./stockfish-12.cg", 1000000, true);
+			control.execute(engine, "./stockfish-14.1.cg", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
