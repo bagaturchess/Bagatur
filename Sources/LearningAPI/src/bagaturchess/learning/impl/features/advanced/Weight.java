@@ -14,44 +14,35 @@ class Weight implements Serializable {
 	
 	private static final long serialVersionUID = 3805221518234137798L;
 	
-	//private static final double DELTA = 0.000001;
-	private static final double DELTA = 0.000001;
-	
 	private static final double MAX_ADJUSTMENT = 100;
-	private boolean norm_adjustment = false;
+	
 	
 	private double initialVal;
 	private double min_weight;
 	private double max_weight;
 	private double cur_weight;
 	
-	private double norm;
-	
 	private double max_adjustment;
 	
 	private VarStatistic varstat;
+	
 	private List<Double> appliedMultipliers;
 	
 	
 	public Weight(double min, double max, double _initialVal, boolean _norm_adjustment) {
+		
 		this(min, max, _initialVal);
-		norm_adjustment = _norm_adjustment;
 	}
 	
 	
 	public Weight(double min, double max, double _initialVal) {
 		
-		//min = -2000;
-		//max = 2000;
-		
 		initialVal = _initialVal;
 		
 		if (min > max)	throw new IllegalStateException();
-		//if (min < 0)	throw new IllegalStateException();
 		
 		min_weight = min;
 		max_weight = max;
-		norm = Math.max(Math.abs(min_weight), Math.abs(max_weight));
 		max_adjustment = (max_weight - min_weight) / MAX_ADJUSTMENT;
 		
 		if (max_adjustment < 0) throw new IllegalStateException();
@@ -86,65 +77,91 @@ class Weight implements Serializable {
 	
 	public void multiplyCurrentWeightByAmountAndDirection() {
 		
+		
 		if (varstat.getTotalAmount() == 0) {
+			
 			return;
 		}
 		
+		
 		double multiplier = (varstat.getTotalDirection() / varstat.getTotalAmount());
+		
+		if (multiplier == 0) {
+			
+			return;
+		}
+		
 		
 		//Should be added before changing
 		appliedMultipliers.add(multiplier);
 		
-		while (appliedMultipliers.size() > 10) {
+		while (appliedMultipliers.size() > 4) {
+			
 			appliedMultipliers.remove(0);
 		}
 		
 		double all = 0;
+		
 		double dir = 0;
+		
 		for (Double cur: appliedMultipliers) {
+			
 			all += Math.abs(cur);
+			
 			dir += cur;
 		}
 		
 		if (all > 0 && dir != 0) {
+			
 			multiplier *= Math.abs(dir / all);
 		}
 		
 		
-		if (multiplier == 0) {
-			return;
-		}
-		
-		
-		//Multiply
+		//Multiply the weight
 		if (cur_weight > 0) {
+			
 			cur_weight += cur_weight * multiplier;
+			
 		} else if (cur_weight < 0) {
+			
 			cur_weight -= cur_weight * multiplier;
+			
 		} else {
-			//Initialize
-			//cur_weight = multiplier;
+			
+			//Initialize the weight
 			if (multiplier > 0) {
+				
 				cur_weight = 1;
+				
 			} else if (multiplier < 0) {
+				
 				cur_weight = -1;
 			}
-
 		}
 		
+		
+		//Switch sign if necessary
 		double LOWEST = 1 / 100.0;
+		
 		if (cur_weight > 0 && cur_weight < LOWEST) {
+			
 			cur_weight = -LOWEST;
 		}
+		
 		if (cur_weight < 0 && cur_weight > -LOWEST) {
+			
 			cur_weight = LOWEST;
 		}
 		
-		//Norm
+		
+		//Keep it in bounds
 		if (cur_weight < min_weight) {
+			
 			cur_weight = min_weight;
 		}
+		
 		if (cur_weight > max_weight) {
+			
 			cur_weight = max_weight;
 		}
 	}

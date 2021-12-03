@@ -100,7 +100,7 @@ public class Features {
 	}
 	
 	public ISignals createSignals() {
-		return new Signals(this);
+		return new Signals(getFeatures());
 	}
 	
 	

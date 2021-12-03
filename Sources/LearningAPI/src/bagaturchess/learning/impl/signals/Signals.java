@@ -7,34 +7,41 @@ import java.util.Map;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignals;
-import bagaturchess.learning.impl.features.baseimpl.Features;
 
 
 public class Signals implements ISignals {
 	
 	
-	private final Features features;
 	private final Map<Integer, ISignal> signals;
 	
 	
-	public Signals(Features _features) {
-		features = _features;
-		IFeature[] featuresArr = features.getFeatures();
+	public Signals(IFeature[] features_array) {
 		
 		signals = new HashMap<Integer, ISignal>();
 		
-		for (int i=0; i<featuresArr.length; i++) {
-			signals.put(featuresArr[i].getId(), featuresArr[i].createNewSignal());
+		for (int i=0; i<features_array.length; i++) {
+			
+			IFeature feature = features_array[i];
+			
+			if (feature != null) {
+				
+				signals.put(feature.getId(), feature.createNewSignal());
+			}
 		}
 	}
 	
+	
 	public void clear() {
+		
 		for (ISignal signal: signals.values()) {
+			
 			signal.clear();
 		}
 	}
 	
+	
 	public ISignal getSignal(int id) {
+		
 		return signals.get(id);
 	}
 }

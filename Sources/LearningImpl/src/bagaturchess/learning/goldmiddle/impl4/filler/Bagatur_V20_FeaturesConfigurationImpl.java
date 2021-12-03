@@ -99,7 +99,26 @@ public class Bagatur_V20_FeaturesConfigurationImpl implements IFeaturesConfigura
 		create2Features(new_featuresSet, FEATURE_ID_SPACE								, "SPACE"								, STANDARD         , 0, 16,  1, 0, 0,  0 );
 		
 		
-		return new_featuresSet.toArray(new IFeature[0]);
+		int max_id = 0;
+		
+		for (IFeature feature: new_featuresSet) {
+			
+			if (feature.getId() > max_id) {
+				
+				max_id = feature.getId();
+			}
+		}
+		
+		
+		IFeature[] result = new IFeature[max_id + 1];
+		
+		for (IFeature feature: new_featuresSet) {
+			
+			result[feature.getId()] = feature;
+		}
+		
+		
+		return result;
 	}
 	
 	
@@ -107,9 +126,9 @@ public class Bagatur_V20_FeaturesConfigurationImpl implements IFeaturesConfigura
 			double min, double max, double initial,
 			double dummy_value1, double dummy_value2, double dummy_value3) {
 		
-		add(featuresSet, new AdjustableFeatureSingle(id			, name + ".O", complexity, min, max, initial, 0, 0, 0));
+		add(featuresSet, new AdjustableFeatureSingle(id			, name, complexity, min, max, initial, 0, 0, 0));
 		
-		add(featuresSet, new AdjustableFeatureSingle(id + 1000	, name + ".E", complexity, min, max, initial, 0, 0, 0));
+		//add(featuresSet, new AdjustableFeatureSingle(id + 1000	, name + ".E", complexity, min, max, initial, 0, 0, 0));
 	}
 	
 	

@@ -106,6 +106,12 @@ public class FeatureSingle extends Feature {
 		return getWeight(openningPart) * signal.getStrength();
 	}
 	
+	@Override
+	public double getWeight() {
+		
+		throw new UnsupportedOperationException();
+	}
+	
 	private double getWeight(double openningPart) {
 		return openningPart * openning.getWeight() + (1 - openningPart) * endgame.getWeight();
 	}

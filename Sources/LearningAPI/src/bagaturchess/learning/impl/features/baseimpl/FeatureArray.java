@@ -158,6 +158,13 @@ public class FeatureArray extends Feature {
 	}
 	
 	
+	@Override
+	public double getWeight() {
+		
+		throw new UnsupportedOperationException();
+	}
+	
+	
 	private double getWeight(int fieldID, double openningPart) {
 		return openningPart * o_weights[fieldID].getWeight()
 				+ (1 - openningPart) * e_weights[fieldID].getWeight();

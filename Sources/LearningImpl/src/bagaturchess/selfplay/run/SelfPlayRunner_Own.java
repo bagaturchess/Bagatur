@@ -58,7 +58,7 @@ public class SelfPlayRunner_Own {
 			Features features = Features.load(input.getFeaturesConfigurationClassName(), new FeaturesMerger());
 			ISignals signals = features.createSignals();
 			
-			IEvaluator evaluator = new FeaturesEvaluator(bitboard, null, filler, features, signals);
+			IEvaluator evaluator = new FeaturesEvaluator(bitboard, null, filler, null, signals);
 			
 			ISelfLearning learning = new SelfLearningImpl_Own(bitboard, features, signals);
 			

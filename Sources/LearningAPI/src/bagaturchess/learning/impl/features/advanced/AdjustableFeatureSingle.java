@@ -78,6 +78,13 @@ public class AdjustableFeatureSingle extends AdjustableFeature {
 	
 	
 	@Override
+	public double getWeight() {
+		
+		return weight.getWeight();
+	}
+	
+	
+	@Override
 	public String toString() {
 		
 		String result = "";

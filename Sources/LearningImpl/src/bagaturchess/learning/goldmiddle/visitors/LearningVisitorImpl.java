@@ -23,6 +23,8 @@
 package bagaturchess.learning.goldmiddle.visitors;
 
 
+import java.util.Map;
+
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Figures;
@@ -34,8 +36,8 @@ import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
 import bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluator;
-import bagaturchess.learning.impl.features.advanced.FeaturesMerger;
-import bagaturchess.learning.impl.features.baseimpl.Features;
+import bagaturchess.learning.impl.features.baseimpl.FeaturesByMaterialFactor;
+import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
@@ -50,25 +52,32 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	
 	private int counter;
 	
-	private IEvaluator evaluator;
 	private ISignalFiller filler;
-	private ISignals signals;
-	private Features features;
-	private IFeature[] featuresArr;
 	
+	private ISignals signals;
+	
+	private Map<Integer, IFeature[]> features_by_material_factor;
+	
+	private IEvaluator evaluator;
 	
 	private double sumDiffs1;
+	
 	private double sumDiffs2;
 	
 	private long startTime;
 	
 	private FeaturesFilter filter;
 	
+	private IBitBoard bitboard;
+	
 	
 	public LearningVisitorImpl() throws Exception {
+		
 		this(new FeaturesFilter() {
+			
 			@Override
 			public boolean isAdjustable(int featureID) {
+				
 				return true;
 			}
 		});
@@ -76,6 +85,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	
 	
 	public LearningVisitorImpl(FeaturesFilter _filter) throws Exception {
+		
 		filter = _filter;
 	}
 	
@@ -88,27 +98,29 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		double deltaP = expectedWhitePlayerEval - actualWhitePlayerEval;
 		//double deltaP = actualWhitePlayerEval - expectedWhitePlayerEval;
 		
+		int total_factor = Math.min(63, bitboard.getMaterialFactor().getTotalFactor());
+		
+		IFeature[] features = features_by_material_factor.get(total_factor);
+		
 		if (deltaP != 0) {
 			
-			for (int i=0; i<featuresArr.length; i++) {
+			for (int i = 0; i < features.length; i++) {
 				
-				int featureID = featuresArr[i].getId();
+				IFeature feature = features[i];
 				
-				if (filter.isAdjustable(featureID)) {
+				if (feature != null) {
 					
-					ISignal cur_signal = signals.getSignal(featureID);
+					int featureID = feature.getId();
 					
-					if (cur_signal.getStrength() != 0) {
+					if (filter.isAdjustable(featureID)) {
 						
-						double adjustment = deltaP > 0 ? 1 : -1;
+						ISignal cur_signal = signals.getSignal(featureID);
 						
-						if (featureID < 1000) {
+						if (cur_signal.getStrength() != 0) {
 							
-							((IAdjustableFeature) featuresArr[i]).adjust(cur_signal, adjustment * openingPart, openingPart);
+							double adjustment = deltaP > 0 ? 1 : -1;
 							
-						} else {
-							
-							((IAdjustableFeature) featuresArr[i]).adjust(cur_signal, adjustment * (1 - openingPart), openingPart);
+							((IAdjustableFeature) features[i]).adjust(cur_signal, adjustment, -1);
 						}
 					}
 				}
@@ -121,36 +133,23 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
 		
 		if (status != IGameStatus.NONE) {
+			
 			throw new IllegalStateException("status=" + status);
 		}
 		
-		//signals.clear();
-		//filler.fill(signals);
-		
-		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
-		
-		/*double actualWhitePlayerEval = 0;
-		for (int i=0; i < featuresArr.length; i++) {
-			IFeature currFeature = featuresArr[i];
-			ISignal currSignal = signals.getSignal(currFeature.getId());
-			actualWhitePlayerEval += currFeature.eval(currSignal, openingPart);
-		}*/
 		
 		double actualWhitePlayerEval = evaluator.fullEval(0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, bitboard.getColourToMove());
+		
 		if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+			
 			actualWhitePlayerEval = -actualWhitePlayerEval;
 		}
 		
-		/*if (eval != actualWhitePlayerEval) {
-			System.out.println("eval=" + eval + ", actualWhitePlayerEval=" + actualWhitePlayerEval);
-		}*/
 		
-		/*double actualWhitePlayerEval = actualEval;
-		if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
-			actualWhitePlayerEval = -actualEval;
-		}*/
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
 		newAdjustment(actualWhitePlayerEval, expectedWhitePlayerEval, openingPart);
+		
 		
 		counter++;
 		
@@ -165,48 +164,49 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		startTime = System.currentTimeMillis();
 		
 		counter = 0;
+		
 		iteration++;
+		
 		sumDiffs1 = 0;
+		
 		sumDiffs2 = 0;
 		
 		ILearningInput input = LearningInputFactory.createDefaultInput();
 		
+		this.bitboard = bitboard;
+		
 		filler = input.createFiller(bitboard);
 		
-		//features = Features.createNewFeatures(FeaturesConfigurationBagaturImpl.class.getName());
-		//if (PERSISTENT) { 
-			Features features_p = Features.load(input.getFeaturesConfigurationClassName(), new FeaturesMerger());
-			//if (features_p != null) {
-				features = features_p;
-			//}
-		//}
-		signals = features.createSignals();
+		features_by_material_factor = FeaturesByMaterialFactor.load(FeaturesByMaterialFactor.FEATURES_FILE_NAME, input.getFeaturesConfigurationClassName()).getFeaturesForEachMaterialFactor();
 		
-		featuresArr = features.getFeatures();
+		signals = new Signals(features_by_material_factor.get(0));
 		
-		/*for (int i=0; i < featuresArr.length; i++) {
-			IFeature currFeature = featuresArr[i];
-			ISignal currSignal = signals.getSignal(currFeature.getId());
-			System.out.println(currSignal);
-		}*/
-		
-		evaluator = new FeaturesEvaluator(bitboard, null, filler, features, signals);
+		evaluator = new FeaturesEvaluator(bitboard, null, filler, features_by_material_factor, signals);
 	}
 	
 	
 	public void end() {
 		
-		//System.out.println("***************************************************************************************************");
-		//System.out.println("End iteration " + iteration + ", Total evaluated positions count is " + counter);
 		System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success percent before this iteration: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
-		for (int i=0; i < featuresArr.length; i++) {
-			IFeature currFeature = featuresArr[i];
-			((IAdjustableFeature)currFeature).applyChanges();
-			//System.out.println(currFeature);
-			((IAdjustableFeature)currFeature).clear();
+		
+		for (int factor = 0; factor < 64; factor++) {
+			
+			IFeature[] features = features_by_material_factor.get(factor);
+			
+			for (int i=0; i < features.length; i++) {
+				
+				IFeature feature = features[i];
+				
+				if (feature != null) {
+					
+					((IAdjustableFeature) feature).applyChanges();
+					
+					((IAdjustableFeature) feature).clear();
+				}
+			}
 		}
 		
-		if (PERSISTENT) features.store();
+		FeaturesByMaterialFactor.store(FeaturesByMaterialFactor.FEATURES_FILE_NAME, features_by_material_factor);
 	}
 	
 	

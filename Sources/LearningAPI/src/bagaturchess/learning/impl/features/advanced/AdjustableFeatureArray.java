@@ -161,6 +161,14 @@ public class AdjustableFeatureArray extends AdjustableFeature {
 		return new SignalArray(2 * o_weights.length);
 	}
 	
+	
+	@Override
+	public double getWeight() {
+		
+		throw new UnsupportedOperationException();
+	}
+	
+	
 	@Override
 	public String toString() {
 		String result = "";

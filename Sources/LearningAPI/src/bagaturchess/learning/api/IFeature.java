@@ -8,6 +8,7 @@ public interface IFeature extends Comparable<IFeature>, Serializable {
 	public int getId();
 	public int getComplexity();
 	public String getName();
+	public double getWeight();
 	
 	public ISignal createNewSignal();
 	public void adjust(ISignal signal, double amount, double openningPart);

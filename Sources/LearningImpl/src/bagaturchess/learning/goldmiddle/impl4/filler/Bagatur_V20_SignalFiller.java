@@ -105,7 +105,8 @@ public class Bagatur_V20_SignalFiller implements ISignalFiller {
 		public void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
 			
 			signals.getSignal(componentID).addStrength(value_o, -1);
-			signals.getSignal(componentID + 1000).addStrength(value_e, -1);
+			
+			//signals.getSignal(componentID + 1000).addStrength(value_e, -1);
 		}
 	}
 }
