@@ -143,12 +143,12 @@ public class VarStatistic implements Serializable {
 	}
 	
 	
-	public void addValue(double value) {
+	public strictfp void addValue(double value) {
 		addValue(value, value);
 	}
 	
 	
-	public void addValue(double nv, double adjustment) {
+	public strictfp void addValue(double nv, double adjustment) {
 		/*if (nv < 0) {
 			throw new IllegalStateException();
 		}*/
@@ -220,6 +220,7 @@ public class VarStatistic implements Serializable {
 	}
 	
 	public static void main(String[] args) {
+		
 		VarStatistic a = new VarStatistic(true);
 		
 		a.addValue(1, 1);

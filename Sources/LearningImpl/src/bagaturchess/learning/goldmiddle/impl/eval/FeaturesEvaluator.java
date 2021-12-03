@@ -289,7 +289,21 @@ public class FeaturesEvaluator implements IEvaluator {
 			double cur_eval = 0;
 			IFeature[] featuresByComplexity = features_byComp[comp];
 			for (int i=0; i<featuresByComplexity.length; i++) {
-				cur_eval += featuresByComplexity[i].eval(signals.getSignal(featuresByComplexity[i].getId()), bitboard.getMaterialFactor().getOpenningPart());
+				
+				IFeature feature = featuresByComplexity[i];
+				
+				double opening_part = bitboard.getMaterialFactor().getOpenningPart();
+				
+				if (feature.getId() < 1000) {
+					
+					//Opening
+					cur_eval += opening_part * feature.eval(signals.getSignal(feature.getId()), opening_part);
+					
+				} else {
+					
+					//Endgame
+					cur_eval += (1 - opening_part) * feature.eval(signals.getSignal(feature.getId()), opening_part);
+				}
 			}
 			
 			//Add to total eval

@@ -150,20 +150,20 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				evalInfo.eval_e_part2 += value_e;
 			} else if (evalPhaseID == EVAL_PHASE_ID_3) {
 				evalInfo.eval_o_part3 += value_o;
-				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY) {
+				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY) {
 					evalInfo.eval_e_part3 += value_e;
-				}
+				//}
 			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
-				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
-						&& componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE) {
+				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
+				//		&& componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE) {
 					evalInfo.eval_o_part4 += value_o;
-				}
+				//}
 				evalInfo.eval_e_part4 += value_e;
 			} else if (evalPhaseID == EVAL_PHASE_ID_5) {
 				evalInfo.eval_o_part5 += value_o;
-				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
+				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
 					evalInfo.eval_e_part5 += value_e;
-				}
+				//}
 			} else {
 				throw new IllegalStateException();
 			}
