@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="lib/json-20201115.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-api-2.14.0.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-core-2.14.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Opening"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

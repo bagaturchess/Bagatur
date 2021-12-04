@@ -34,7 +34,7 @@ public class NeuralNetworkUtils_AllFeatures {
 	
 	
 	public static int getInputsSize() {
-		return 2 * 47;
+		return 55;
 	}
 	
 	
@@ -57,7 +57,7 @@ public class NeuralNetworkUtils_AllFeatures {
         //mlp.setLearningRule(new ConvolutionalBackpropagation());
         mlp.setLearningRule(new MomentumBackpropagation());
         
-        mlp.getLearningRule().setLearningRate(0.00001);
+        mlp.getLearningRule().setLearningRate(0.00000000001);
         //mlp.getLearningRule().setLearningRate(0.0000001);
         
         return mlp;

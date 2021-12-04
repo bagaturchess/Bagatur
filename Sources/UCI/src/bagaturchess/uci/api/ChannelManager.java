@@ -6,9 +6,9 @@ public class ChannelManager {
 	private static IChannel channel;
 	
 	public static IChannel getChannel() {
-		if (channel == null) {
+		/*if (channel == null) {
 			System.err.println("Channel not initialized!");
-		}
+		}*/
 		return channel;
 	}
 	

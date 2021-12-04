@@ -191,8 +191,8 @@ public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
 		Integer[] movesInteger = movesList.toArray(new Integer[0]);
 		moves = new int[movesInteger.length];
 		
-		for (int i=0; i<movesInteger.length; i++) {
-			moves[i] = movesInteger[i];
+		for (int i=0; i<moves.length; i++) {
+			moves[i] = moves[i];
 		}
 		
 		status = bitboard.getStatus();

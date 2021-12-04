@@ -50,6 +50,9 @@ import bagaturchess.ucitracker.impl.gamemodel.serialization.GameModelWriter;
 public class GamesGenerator_MultiPv {
 	
 	
+	private static final boolean USE_FEN = true;
+	
+	
 	private static int SEARCH_DEPTH_MIN = 1;
 	private static int SEARCH_DEPTH_MAX = 10;
 	
@@ -61,16 +64,24 @@ public class GamesGenerator_MultiPv {
 	
 	private UCIEnginesManager runner;
 	
+	private String initial_fen;
 	
-	public GamesGenerator_MultiPv() {
+	
+	public GamesGenerator_MultiPv(String _initial_fen) {
+		
 		runner = new UCIEnginesManager();
+		
+		initial_fen = _initial_fen;
 	}
 	
 	
 	public static void main(String[] args) {
 		
 		ChannelManager.setChannel(new Channel_Console());
-		GamesGenerator_MultiPv control = new GamesGenerator_MultiPv();
+		
+		//GamesGenerator_MultiPv control = new GamesGenerator_MultiPv(Constants.INITIAL_BOARD);
+		GamesGenerator_MultiPv control = new GamesGenerator_MultiPv("8/p5pp/1pk5/5p2/P1nn4/2NN3P/5PPK/8 w - - 0 1");
+		
 		try {
 			
 			/*Engine engine = new Engine("C:\\own\\chess\\ENGINES\\Houdini_15a\\Houdini_15a_w32.exe",
@@ -130,7 +141,7 @@ public class GamesGenerator_MultiPv {
 			
 			//EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");
 			
-			control.execute(engine, "./stockfish-14.1.cg", 1000000, true);
+			control.execute(engine, "./stockfish-14.1-4N.cg", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -170,13 +181,14 @@ public class GamesGenerator_MultiPv {
 		
 		runner.newGame();
 		
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache();
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(initial_fen);
 		
 		EvaluatedGame game = new EvaluatedGame(bitboard.toEPD());
 		
 		while (bitboard.getStatus().equals(IGameStatus.NONE)) {
 			
 			Set<EvaluatedMove> movesEvals = evalVariations(bitboard);
+			
 			if (movesEvals.size() == 0) {
 				break;
 			}
@@ -254,9 +266,8 @@ public class GamesGenerator_MultiPv {
 	
 	private Set<EvaluatedMove> evalVariations(IBitBoard bitboard) throws IOException {
 		
-		Set<EvaluatedMove> evals = new TreeSet<EvaluatedMove>();
 		
-		String allMovesStr = BoardUtils.getPlayedMoves(bitboard);
+		Set<EvaluatedMove> evals = new TreeSet<EvaluatedMove>();
 		
 			
 		List<String> infos = null;
@@ -264,14 +275,26 @@ public class GamesGenerator_MultiPv {
 		int depth = SEARCH_DEPTH_MIN;
 		
 		boolean loop = true;
+		
 		while (loop) {
 			
-			runner.setupPosition("startpos moves " + allMovesStr);
+			if (USE_FEN) {
+				
+				runner.setupPosition("fen " + bitboard.toEPD());
+				
+			} else {
+				
+				String allMovesStr = BoardUtils.getPlayedMoves(bitboard);
+				
+				runner.setupPosition("startpos moves " + allMovesStr);
+			}
+
 			runner.disable();
 
 			runner.go_Depth(depth);
 			
 			try {
+				
 				infos = runner.getInfoLines(new LineCallBack() {
 					
 					
@@ -317,20 +340,29 @@ public class GamesGenerator_MultiPv {
 			} catch (java.lang.IllegalStateException ise) {
 				//No pv
 			}
+			
 			if (infos != null && infos.size() > 1) {
+				
 				throw new IllegalStateException("Only one engine is supported");
 			}
 			
 			if (infos == null || infos.size() == 0 || infos.get(0) == null) {
+				
 				depth++;
+				
 				if (depth > SEARCH_DEPTH_MAX) {
+					
 					throw new IllegalStateException("depth >  " + SEARCH_DEPTH_MAX + " and no PV info");
 				}
+				
 			} else {
+				
 				loop = false;
 			}
+			
 			//System.out.println("depth " + depth);
 		}
+		
 		runner.enable();
 		
 		for (String info: infos) {

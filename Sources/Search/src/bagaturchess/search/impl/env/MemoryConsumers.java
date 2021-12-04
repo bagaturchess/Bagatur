@@ -66,7 +66,8 @@ public class MemoryConsumers {
 				OpeningBookFactory.initBook(is_w_openning_book, is_b_openning_book);				
 			}
 		} catch(Throwable t) {
-			ChannelManager.getChannel().dump("Unable to load Openning Book. Error while openning file streams: " + t.getMessage());
+			
+			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Unable to load Openning Book. Error while openning file streams: " + t.getMessage());
 		}
 	}
 	
@@ -90,7 +91,7 @@ public class MemoryConsumers {
 		
 		engineConfiguration = _engineConfiguration;
 		
-		ChannelManager.getChannel().dump("OS arch: " + getJVMBitmode() + " bits");
+		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("OS arch: " + getJVMBitmode() + " bits");
 		
 		/**
 		 * The memory usage percent is very important because of 2 main reason:
@@ -117,35 +118,36 @@ public class MemoryConsumers {
 		//}
 		
 		
-		ChannelManager.getChannel().dump("Defined memory usage percent " + (MEMORY_USAGE_PERCENT * 100) + "%");
-		ChannelManager.getChannel().dump("Memory the Engine will use " + (getAvailableMemoryInBytes() / (1024 * 1024)) + "MB");
+		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Defined memory usage percent " + (MEMORY_USAGE_PERCENT * 100) + "%");
+		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Memory the Engine will use " + (getAvailableMemoryInBytes() / (1024 * 1024)) + "MB");
 		
-		ChannelManager.getChannel().dump("Initializing Memory Consumers ...");
+		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Initializing Memory Consumers ...");
 		
 		//ChannelManager.getChannel().dump("SEE Metadata ... ");
 		//seeMetadata = SeeMetadata.getSingleton();
 		//ChannelManager.getChannel().dump("SEE Metadata OK => " + (lastAvailable_in_MB - ((getAvailableMemory()) / (1024 * 1024))) + "MB");
 		
 		
-		ChannelManager.getChannel().dump("Openning Book enabled: " + ownBookEnabled);
+		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Openning Book enabled: " + ownBookEnabled);
 		//if (ownBookEnabled) {
 
-			ChannelManager.getChannel().dump("Openning Book ... ");
+			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Openning Book ... ");
+			
 			if (OpeningBookFactory.getBook() == null) {
-				ChannelManager.getChannel().dump("No openning book");
+				if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("No openning book");
 			} else {
 				try {
 					openingBook = OpeningBookFactory.getBook();
-					ChannelManager.getChannel().dump("Openning Book OK.");
+					if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Openning Book OK.");
 				} catch(Exception e) {
-					ChannelManager.getChannel().dump("Unable to load Openning Book. Error is:");
+					if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Unable to load Openning Book. Error is:");
 					channel.dump(e);
 				}
 			}
 		//}
 		
 		
-		ChannelManager.getChannel().dump("Loading modules for Endgame Tablebases support ... ");
+		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Loading modules for Endgame Tablebases support ... ");
 		
 		//int threadsCount = engineConfiguration.getThreadsCount();
 		
@@ -161,15 +163,15 @@ public class MemoryConsumers {
 					
 					SyzygyTBProbing.getSingleton().load(engineConfiguration.getTbPath());
 					
-					ChannelManager.getChannel().dump("Modules for Endgame Tablebases OK. Will try to load Tablebases from => " + engineConfiguration.getTbPath());
+					if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Modules for Endgame Tablebases OK. Will try to load Tablebases from => " + engineConfiguration.getTbPath());
 					
 				} else {
 					
-					ChannelManager.getChannel().dump("Modules for Endgame Tablebases cannot be loaded. Directory does not exists => " + TB_dir.getAbsolutePath());
+					if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Modules for Endgame Tablebases cannot be loaded. Directory does not exists => " + TB_dir.getAbsolutePath());
 				}
 			} else {
 				
-				ChannelManager.getChannel().dump("Modules for Endgame Tablebases cannot be loaded. Directory with Syzygy TB files is not set");
+				if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Modules for Endgame Tablebases cannot be loaded. Directory with Syzygy TB files is not set");
 			}
 
 
@@ -181,10 +183,10 @@ public class MemoryConsumers {
 		
 		if (engineConfiguration.initCaches()) {
 			
-			ChannelManager.getChannel().dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
-			ChannelManager.getChannel().dump("Transposition Table usage percent from the free memory " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
-			ChannelManager.getChannel().dump("Eval Cache usage percent from the free memory " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
-			ChannelManager.getChannel().dump("Syzygy DTZ Cache usage percent from the free memory " + (100 * MEM_USAGE_SYZYGY_DTZ_CACHE) + "%");			
+			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Caches (Transposition Table, Eval Cache and Pawns Eval Cache) ...");
+			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Transposition Table usage percent from the free memory " + (100 * engineConfiguration.getTPTUsagePercent()) + "%");
+			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Eval Cache usage percent from the free memory " + (100 * engineConfiguration.getEvalCacheUsagePercent()) + "%");
+			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Syzygy DTZ Cache usage percent from the free memory " + (100 * MEM_USAGE_SYZYGY_DTZ_CACHE) + "%");			
 			
 			
 			double percents_sum = engineConfiguration.getTPTUsagePercent()
@@ -197,21 +199,21 @@ public class MemoryConsumers {
 			}
 			
 			long static_memory_in_bytes = STATIC_JVM_MEMORY_IN_MEGABYTES * 1024 * 1024;
-			ChannelManager.getChannel().dump("Excluded memory for static structures is " + STATIC_JVM_MEMORY_IN_MEGABYTES + " MB");
+			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Excluded memory for static structures is " + STATIC_JVM_MEMORY_IN_MEGABYTES + " MB");
 			
 			long availableMemoryInBytes = getAvailableMemoryInBytes() - static_memory_in_bytes;
 			
 			initCaches(availableMemoryInBytes);
 		}
 		
-		ChannelManager.getChannel().dump("Memory Consumers are initialized.");
+		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Memory Consumers are initialized.");
 	}
 	
 	
 	private void initCaches(long availableMemoryInBytes) {
 		
 		
-		ChannelManager.getChannel().dump("Initializing caches inside "
+		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Initializing caches inside "
 				+ (int) (
 							(engineConfiguration.getTPTUsagePercent() + engineConfiguration.getEvalCacheUsagePercent() + engineConfiguration.getPawnsCacheUsagePercent())
 							* availableMemoryInBytes
@@ -222,8 +224,8 @@ public class MemoryConsumers {
 		int THREADS_COUNT 				= engineConfiguration.getThreadsCount();
 		int TRANSPOSITION_TABLES_COUNT 	= Math.max(1, THREADS_COUNT / 32);
 		
-		ChannelManager.getChannel().dump("Threads are " + THREADS_COUNT);
-		ChannelManager.getChannel().dump(TRANSPOSITION_TABLES_COUNT + " Transposition Table will be created.");
+		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Threads are " + THREADS_COUNT);
+		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump(TRANSPOSITION_TABLES_COUNT + " Transposition Table will be created.");
 		
 		long size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, (long) ((engineConfiguration.getTPTUsagePercent() * availableMemoryInBytes) / TRANSPOSITION_TABLES_COUNT));
 		
@@ -231,9 +233,9 @@ public class MemoryConsumers {
 		
 		for (int i = 0; i < TRANSPOSITION_TABLES_COUNT; i++) {
 			
-			ChannelManager.getChannel().dump("Creating Transposition Table for the current Threads Group ...");
+			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Creating Transposition Table for the current Threads Group ...");
 			ITTable current_ttable = new TTable_Impl2(size_tpt);
-			ChannelManager.getChannel().dump("Transposition Table created.");
+			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Transposition Table created.");
 			
 			ttables.add(current_ttable);
 		}

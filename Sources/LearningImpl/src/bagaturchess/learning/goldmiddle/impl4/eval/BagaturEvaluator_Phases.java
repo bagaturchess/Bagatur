@@ -1,8 +1,6 @@
 package bagaturchess.learning.goldmiddle.impl4.eval;
 
 
-import java.util.Map;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
@@ -12,7 +10,7 @@ import bagaturchess.learning.goldmiddle.impl4.base.Evaluator;
 import bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcessor;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConstants;
-import bagaturchess.learning.impl.features.baseimpl.FeaturesByMaterialFactor;
+import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
@@ -57,6 +55,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		
 		/*
 		//countOnes++;
+		
 		if (Math.abs(eval) < 150) {
 			
 			countWeights++;
@@ -116,7 +115,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		
 		private final EvalInfo evalInfo;
 		
-		private Map<Integer, IFeature[]> features_by_material_factor;
+		private Features_Splitter features_splitter;
 		
 		
 		private EvalComponentsProcessor_Weights(final EvalInfo _evalInfo) {
@@ -125,7 +124,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 			
 			try {
 				
-				features_by_material_factor = FeaturesByMaterialFactor.load(FeaturesByMaterialFactor.FEATURES_FILE_NAME, Bagatur_V20_FeaturesConfigurationImpl.class.getName()).getFeaturesForEachMaterialFactor();
+				features_splitter = Features_Splitter.load(Features_Splitter.FEATURES_FILE_NAME, Bagatur_V20_FeaturesConfigurationImpl.class.getName());
 				
 			} catch (Exception e) {
 
@@ -137,9 +136,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		@Override
 		public void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
 			
-			int total_factor = Math.min(63, BagaturEvaluator_Phases.this.bitboard.getMaterialFactor().getTotalFactor());
-			
-			IFeature[] features = features_by_material_factor.get(total_factor);
+			IFeature[] features = features_splitter.getFeatures(BagaturEvaluator_Phases.this.bitboard);
 			
 			if (evalPhaseID == EVAL_PHASE_ID_1) {
 				

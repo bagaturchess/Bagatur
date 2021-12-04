@@ -68,12 +68,14 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	
 	public DeepLearningVisitorImpl_AllFeatures() throws Exception {
 		
-		if ((new File(NET_FILE)).exists() ){
+		if ((new File(NET_FILE)).exists()) {
+			
 			network = (FeedForwardNetwork) FileIO.createFromFile(new File(NET_FILE));
+			
 		} else {
 			
 			network =  FeedForwardNetwork.builder()
-	                .addInputLayer(110)
+	                .addInputLayer(55)
 	                .addOutputLayer(1, ActivationType.LINEAR)
 	                .hiddenActivationFunction(ActivationType.LINEAR)
 	                .lossFunction(LossType.MEAN_SQUARED_ERROR)
@@ -81,8 +83,8 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	                .build();
 		}
         
-		inputs_d = new double[110];
-		inputs_f = new float[110];
+		inputs_d = new double[55];
+		inputs_f = new float[55];
 		
 		dataset = new DataSetLearning();
 		

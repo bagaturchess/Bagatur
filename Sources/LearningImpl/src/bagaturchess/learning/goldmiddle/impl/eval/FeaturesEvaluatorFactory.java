@@ -1,16 +1,12 @@
 package bagaturchess.learning.goldmiddle.impl.eval;
 
 
-import java.util.Map;
-
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
-import bagaturchess.learning.impl.features.baseimpl.Features;
-import bagaturchess.learning.impl.features.baseimpl.FeaturesByMaterialFactor;
+import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
@@ -30,11 +26,11 @@ public class FeaturesEvaluatorFactory implements IEvaluatorFactory {
 		ILearningInput input = LearningInputFactory.createDefaultInput();
 		ISignalFiller filler = input.createFiller(bitboard);
 		
-		Map<Integer, IFeature[]> features_by_material_factor;
+		Features_Splitter features_splitter;
 		
 		try {
 			
-			features_by_material_factor = FeaturesByMaterialFactor.load(FeaturesByMaterialFactor.FEATURES_FILE_NAME, input.getFeaturesConfigurationClassName()).getFeaturesForEachMaterialFactor();
+			features_splitter = Features_Splitter.load(Features_Splitter.FEATURES_FILE_NAME, input.getFeaturesConfigurationClassName());
 		
 		} catch (Exception e) {
 			
@@ -43,9 +39,9 @@ public class FeaturesEvaluatorFactory implements IEvaluatorFactory {
 			throw new RuntimeException(e);
 		}
 		
-		ISignals signals = new Signals(features_by_material_factor.get(31));
+		ISignals signals = new Signals(features_splitter.getFeatures(bitboard));
 		
-		return new FeaturesEvaluator(bitboard, evalCache, filler, features_by_material_factor, signals);
+		return new FeaturesEvaluator(bitboard, evalCache, filler, features_splitter, signals);
 	}
 
 
@@ -55,11 +51,11 @@ public class FeaturesEvaluatorFactory implements IEvaluatorFactory {
 		ILearningInput input = LearningInputFactory.createDefaultInput();
 		ISignalFiller filler = input.createFiller(bitboard);
 		
-		Map<Integer, IFeature[]> features_by_material_factor;
+		Features_Splitter features_splitter;
 		
 		try {
 			
-			features_by_material_factor = FeaturesByMaterialFactor.load(FeaturesByMaterialFactor.FEATURES_FILE_NAME, input.getFeaturesConfigurationClassName()).getFeaturesForEachMaterialFactor();
+			features_splitter = Features_Splitter.load(Features_Splitter.FEATURES_FILE_NAME, input.getFeaturesConfigurationClassName());
 		
 		} catch (Exception e) {
 			
@@ -68,21 +64,8 @@ public class FeaturesEvaluatorFactory implements IEvaluatorFactory {
 			throw new RuntimeException(e);
 		}
 		
-		ISignals signals = new Signals(features_by_material_factor.get(31));
+		ISignals signals = new Signals(features_splitter.getFeatures(bitboard));
 		
-		return new FeaturesEvaluator(bitboard, evalCache, filler, features_by_material_factor, signals);
-	}
-	
-	
-	private Features createFeatures() {
-		Features features = null;
-		try {
-			//features = Features.createNewFeatures(FeaturesConfigurationBagaturImpl.class.getName());
-			//features = Features.load(FeaturesConfigurationBagaturImpl.class.getName());
-			features = Features.load();
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-		return features;
+		return new FeaturesEvaluator(bitboard, evalCache, filler, features_splitter, signals);
 	}
 }

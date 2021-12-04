@@ -28,6 +28,7 @@ import java.util.Map;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Figures;
+import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.learning.api.IAdjustableFeature;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.ISignal;
@@ -36,9 +37,26 @@ import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
 import bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluator;
-import bagaturchess.learning.impl.features.baseimpl.FeaturesByMaterialFactor;
+import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.IEvaluator;
+import bagaturchess.search.api.IRootSearch;
+import bagaturchess.search.api.IRootSearchConfig;
+import bagaturchess.search.api.internal.ISearch;
+import bagaturchess.search.api.internal.ISearchInfo;
+import bagaturchess.search.api.internal.ISearchMediator;
+import bagaturchess.search.api.internal.ISearchStopper;
+import bagaturchess.search.impl.env.SharedData;
+import bagaturchess.search.impl.info.SearchInfoFactory;
+import bagaturchess.search.impl.pv.PVManager;
+import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
+import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory;
+import bagaturchess.uci.api.BestMoveSender;
+import bagaturchess.uci.api.ChannelManager;
+import bagaturchess.uci.impl.Channel_Console;
+import bagaturchess.uci.impl.commands.Go;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
 
@@ -56,9 +74,13 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	
 	private ISignals signals;
 	
-	private Map<Integer, IFeature[]> features_by_material_factor;
+	private Features_Splitter features_splitter;
 	
 	private IEvaluator evaluator;
+	
+	private ISearch searcher;
+	
+	private PVManager pvman = new PVManager(ISearch.MAX_DEPTH);
 	
 	private double sumDiffs1;
 	
@@ -81,12 +103,69 @@ public class LearningVisitorImpl implements PositionsVisitor {
 				return true;
 			}
 		});
+		
+		//ChannelManager.setChannel(new Channel_Console(System.in, System.out, System.out));
 	}
 	
 	
 	public LearningVisitorImpl(FeaturesFilter _filter) throws Exception {
 		
 		filter = _filter;
+	}
+	
+	
+	@Override
+	public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
+		
+		if (status != IGameStatus.NONE) {
+			
+			throw new IllegalStateException("status=" + status);
+		}
+		
+		if (bitboard.getStatus() != IGameStatus.NONE) {
+			
+			throw new IllegalStateException("bitboard.getStatus()=" + bitboard.getStatus());
+		}
+		
+		double actualWhitePlayerEval = evaluator.fullEval(0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, bitboard.getColourToMove());
+		
+		if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+			
+			actualWhitePlayerEval = -actualWhitePlayerEval;
+		}
+		
+		/*searcher.newSearch();
+		
+		int depth = 1;
+		
+		ISearchInfo info = SearchInfoFactory.getFactory().createSearchInfo();
+		info.setDepth(depth);
+		
+		int actual_white_search_score = searcher.pv_search(dummy_mediator, pvman, info, ISearch.PLY * depth, ISearch.PLY * depth,
+				0, ISearch.MIN, ISearch.MAX, 0, 0, null, false, 0, bitboard.getColourToMove(), 0, 0, false, 0, false);
+		
+		//System.out.println("info=" + info.getDepth());
+		
+		if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+			
+			actual_white_search_score = -actual_white_search_score;
+		}
+
+		int delta = (int) (actualWhitePlayerEval - actual_white_search_score);
+		
+		//System.out.println("delta=" + delta);
+		*/
+		
+		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
+		
+		newAdjustment(actualWhitePlayerEval, expectedWhitePlayerEval, openingPart);
+		
+		
+		counter++;
+		
+		if ((counter % 100000) == 0) {
+			//System.out.println(counter);
+		}
 	}
 	
 	
@@ -98,9 +177,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		double deltaP = expectedWhitePlayerEval - actualWhitePlayerEval;
 		//double deltaP = actualWhitePlayerEval - expectedWhitePlayerEval;
 		
-		int total_factor = Math.min(63, bitboard.getMaterialFactor().getTotalFactor());
-		
-		IFeature[] features = features_by_material_factor.get(total_factor);
+		IFeature[] features = features_splitter.getFeatures(bitboard);
 		
 		if (deltaP != 0) {
 			
@@ -129,36 +206,6 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	}
 	
 	
-	@Override
-	public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
-		
-		if (status != IGameStatus.NONE) {
-			
-			throw new IllegalStateException("status=" + status);
-		}
-		
-		
-		double actualWhitePlayerEval = evaluator.fullEval(0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, bitboard.getColourToMove());
-		
-		if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
-			
-			actualWhitePlayerEval = -actualWhitePlayerEval;
-		}
-		
-		
-		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
-		
-		newAdjustment(actualWhitePlayerEval, expectedWhitePlayerEval, openingPart);
-		
-		
-		counter++;
-		
-		if ((counter % 1000000) == 0) {
-			//System.out.println(counter);
-		}
-	}
-	
-	
 	public void begin(IBitBoard bitboard) throws Exception {
 		
 		startTime = System.currentTimeMillis();
@@ -177,11 +224,33 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		
 		filler = input.createFiller(bitboard);
 		
-		features_by_material_factor = FeaturesByMaterialFactor.load(FeaturesByMaterialFactor.FEATURES_FILE_NAME, input.getFeaturesConfigurationClassName()).getFeaturesForEachMaterialFactor();
+		features_splitter = Features_Splitter.load(Features_Splitter.FEATURES_FILE_NAME, input.getFeaturesConfigurationClassName());
 		
-		signals = new Signals(features_by_material_factor.get(0));
+		signals = new Signals(features_splitter.getFeatures(bitboard));
 		
-		evaluator = new FeaturesEvaluator(bitboard, null, filler, features_by_material_factor, signals);
+		evaluator = new FeaturesEvaluator(bitboard, null, filler, features_splitter, signals);
+		
+		/*IRootSearchConfig cfg = new RootSearchConfig_BaseImpl_1Core(
+					new String[] {
+						bagaturchess.search.impl.alg.impl1.Search_PVS_NWS.class.getName(),
+						SearchConfigImpl_AB.class.getName(),
+						bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20.class.getName(),
+						bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluationConfig.class.getName(),
+					}
+				);
+
+
+		searcher = null;
+		
+		SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
+		String searchClassName =  cfg.getSearchClassName();
+		searcher = (ISearch) ReflectionUtils.createObjectByClassName_ObjectsConstructor(
+						searchClassName,
+						new Object[] {bitboard,  cfg, sharedData}
+					);
+		
+		searcher.getEnv().setEval(evaluator);
+		*/
 	}
 	
 	
@@ -189,28 +258,102 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		
 		System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success percent before this iteration: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 		
-		for (int factor = 0; factor < 64; factor++) {
-			
-			IFeature[] features = features_by_material_factor.get(factor);
-			
-			for (int i=0; i < features.length; i++) {
-				
-				IFeature feature = features[i];
-				
-				if (feature != null) {
-					
-					((IAdjustableFeature) feature).applyChanges();
-					
-					((IAdjustableFeature) feature).clear();
-				}
-			}
-		}
+		Features_Splitter.updateWeights(features_splitter);
 		
-		FeaturesByMaterialFactor.store(FeaturesByMaterialFactor.FEATURES_FILE_NAME, features_by_material_factor);
+		Features_Splitter.store(Features_Splitter.FEATURES_FILE_NAME, features_splitter);
 	}
 	
 	
 	public static interface FeaturesFilter {
 		public boolean isAdjustable(int featureID);
 	}
+	
+	
+	private final ISearchMediator dummy_mediator = new ISearchMediator() {
+		
+		
+		@Override
+		public void startIteration(int iteration) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void setStopper(ISearchStopper stopper) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void send(String msg) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void registerInfoObject(ISearchInfo info) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public int getTrustWindow_MTD_Step() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+		
+		@Override
+		public int getTrustWindow_BestMove() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+		
+		@Override
+		public int getTrustWindow_AlphaAspiration() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+		
+		@Override
+		public ISearchStopper getStopper() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public ISearchInfo getLastInfo() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public BestMoveSender getBestMoveSender() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public void dump(Throwable t) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void dump(String msg) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void changedMinor(ISearchInfo info) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void changedMajor(ISearchInfo info) {
+			// TODO Auto-generated method stub
+			
+		}
+	};
 }

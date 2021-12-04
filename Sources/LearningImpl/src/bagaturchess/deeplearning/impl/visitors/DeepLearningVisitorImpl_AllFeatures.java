@@ -36,7 +36,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
 import bagaturchess.deeplearning.impl.NeuralNetworkUtils_AllFeatures;
-import bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_SignalFiller_InArray;
+import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
 
@@ -62,11 +62,16 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	
 	public DeepLearningVisitorImpl_AllFeatures() throws Exception {
 		
+		
 		if ((new File(NET_FILE)).exists() ){
+			
 			network = NeuralNetworkUtils.loadNetwork(NET_FILE);
+			
 		} else {
+			
 			network = NeuralNetworkUtils_AllFeatures.buildNetwork();
 		}
+		
 		
         network.getLearningRule().addListener(new LearningEventListener() {
 			
@@ -81,7 +86,9 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 			}
 		});
         
+        
         inputs = new double[NeuralNetworkUtils_AllFeatures.getInputsSize()];
+        
 	}
 	
 	
@@ -116,11 +123,11 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
         
         
 		counter++;
-		if ((counter % 100000) == 0) {
+		if ((counter % 1000000) == 0) {
 			
-			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
+			//System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 			
-			network.save("net.bin");
+			//network.save("net.bin");
 		}
 	}
 	

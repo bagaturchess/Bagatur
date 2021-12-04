@@ -95,7 +95,7 @@ class Weight implements Serializable {
 		//Should be added before changing
 		appliedMultipliers.add(multiplier);
 		
-		while (appliedMultipliers.size() > 4) {
+		while (appliedMultipliers.size() > 5) {
 			
 			appliedMultipliers.remove(0);
 		}
@@ -140,8 +140,11 @@ class Weight implements Serializable {
 		}
 		
 		
-		//Switch sign if necessary
-		double LOWEST = 1 / 100.0;
+		//Make sign change if necessary
+		//SWITCHED ON:  +7%, +9%, +2%, +0.5%, +0.4%, -1.6%, +0.8%, -0.35%, +0.35%, -0.26%
+		//SWITCHED OFF: +7%, +9%, +1.7%, -0.26%, 
+		
+		/*double LOWEST = 1 / 100.0;
 		
 		if (cur_weight > 0 && cur_weight < LOWEST) {
 			
@@ -152,7 +155,7 @@ class Weight implements Serializable {
 			
 			cur_weight = LOWEST;
 		}
-		
+		*/
 		
 		//Keep it in bounds
 		if (cur_weight < min_weight) {

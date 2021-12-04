@@ -142,6 +142,10 @@ public class SearchEnv {
 		return eval;
 	}
 
+	public void setEval(IEvaluator _eval) {
+		eval = _eval;
+	}
+	
 	public void clear() {
 		shared.clear();
 	}

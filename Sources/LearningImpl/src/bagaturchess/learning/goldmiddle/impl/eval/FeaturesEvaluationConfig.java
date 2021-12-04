@@ -9,12 +9,12 @@ public class FeaturesEvaluationConfig implements IEvalConfig {
 
 	@Override
 	public boolean useLazyEval() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean useEvalCache() {
-		return true;
+		return false;
 	}
 
 	@Override

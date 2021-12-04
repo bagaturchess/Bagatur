@@ -38,12 +38,12 @@ public class PositionsVisitorImpl implements PositionsVisitor {
 	public void visitPosition(IBitBoard bitboard, IGameStatus status, int whitePlayerEval) {
 		
 		if (status != IGameStatus.NONE) {
-			System.out.println("status=" + status);
+			System.out.println("status != IGameStatus.NONE, status=" + status);
 		}
 		
 		if (status != bitboard.getStatus()) {
 			//if (status != IGameStatus.UNDEFINED) {
-				System.out.println("status=" + status);
+				System.out.println("status != bitboard.getStatus(), status=" + status + ", bitboard.getStatus()=" + bitboard.getStatus());
 			//}
 		}
 		

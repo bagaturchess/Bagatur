@@ -7,14 +7,13 @@
 package bagaturchess.learning.goldmiddle.impl.eval;
 
 
-import java.util.Map;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
+import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.FullEvalFlag;
 import bagaturchess.search.api.IEvaluator;
@@ -30,14 +29,14 @@ public class FeaturesEvaluator implements IEvaluator {
 	
 	private ISignalFiller filler;
 	
-	private Map<Integer, IFeature[]> features_by_material_factor;
+	private Features_Splitter features_splitter;
 	
 	
-	public FeaturesEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, ISignalFiller _filler, Map<Integer, IFeature[]> _features_by_material_factor, ISignals _signals) {
+	public FeaturesEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, ISignalFiller _filler, Features_Splitter _features_splitter, ISignals _signals) {
 		
 		bitboard = _bitboard;
 		
-		features_by_material_factor = _features_by_material_factor;
+		features_splitter = _features_splitter;
 		
 		signals = _signals;
 		
@@ -70,17 +69,11 @@ public class FeaturesEvaluator implements IEvaluator {
 	
 	
 	@Override
-	public double fullEval(int depth, int alpha, int beta, int rootColour) {
-
-		int colour = bitboard.getColourToMove();		
+	public double fullEval(int depth, int alpha, int beta, int rootColour) {	
 		
 		signals.clear();
 		
-		int total_factor = Math.min(63, bitboard.getMaterialFactor().getTotalFactor());
-		
-		//System.out.println("total_factor=" + total_factor);
-		
-		IFeature[] features = features_by_material_factor.get(total_factor);
+		IFeature[] features = features_splitter.getFeatures(bitboard);
 		
 		
 		filler.fillByComplexity(IFeatureComplexity.STANDARD, signals);
@@ -103,6 +96,8 @@ public class FeaturesEvaluator implements IEvaluator {
 			throw new IllegalStateException("eval=" + eval);
 		}
 		
+		
+		int colour = bitboard.getColourToMove();	
 		
 		if (colour == Figures.COLOUR_WHITE) {
 			
