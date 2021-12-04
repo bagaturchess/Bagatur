@@ -170,8 +170,11 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, Error: " + network.getLossFunction().getTotal());
 		
 		try {
+			
 			FileIO.writeToFile(network, NET_FILE);
+			
 		} catch (IOException e) {
+			
 			e.printStackTrace();
 		}
 	}

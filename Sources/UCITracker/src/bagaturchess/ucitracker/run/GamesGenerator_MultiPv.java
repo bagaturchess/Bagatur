@@ -36,6 +36,7 @@ import java.util.TreeSet;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.UCIEnginesManager;
@@ -79,8 +80,8 @@ public class GamesGenerator_MultiPv {
 		
 		ChannelManager.setChannel(new Channel_Console());
 		
-		//GamesGenerator_MultiPv control = new GamesGenerator_MultiPv(Constants.INITIAL_BOARD);
-		GamesGenerator_MultiPv control = new GamesGenerator_MultiPv("8/p5pp/1pk5/5p2/P1nn4/2NN3P/5PPK/8 w - - 0 1");
+		GamesGenerator_MultiPv control = new GamesGenerator_MultiPv(Constants.INITIAL_BOARD);
+		//GamesGenerator_MultiPv control = new GamesGenerator_MultiPv("8/p5pp/1pk5/5p2/P1nn4/2NN3P/5PPK/8 w - - 0 1");
 		
 		try {
 			
@@ -112,11 +113,6 @@ public class GamesGenerator_MultiPv {
 					new String [0],
 				"C:\\own\\chess\\ENGINES\\komodo-13b1-ja\\Windows\\");*/
 			
-			/*EngineProcess engine = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\Glaurung2.2\\glaurung-w64.exe",
-					new String [0],
-				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\SOFTWARE\\ARENA\\arena_3.5.1\\Engines\\Glaurung2.2\\");
-			*/
-			
 			/*EngineProcess engine = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Rybka\\Rybkav2.3.2a.mp.x64.exe",
 					new String [0],
 				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Rybka");
@@ -129,19 +125,28 @@ public class GamesGenerator_MultiPv {
 			/*EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\stockfish-NNUE\\sf-nnue-bmi2.exe",
 					new String [0],
 					"C:\\DATA\\Engines\\stockfish-NNUE");*/
-	
-			EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\stockfish_14.1_win_x64_popcnt\\stockfish_14.1_win_x64_popcnt.exe",
-					new String [0],
-					"C:\\DATA\\OWN\\stockfish_14.1_win_x64_popcnt");
-			
 			
 			/*EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\lc0-v0.25.1-windows-cpu-openblas\\lc0.exe",
 					new String [0],
 					"C:\\DATA\\Engines\\lc0-v0.25.1-windows-cpu-openblas\\");*/
 			
+			/*EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\stockfish_14.1_win_x64_popcnt\\stockfish_14.1_win_x64_popcnt.exe",
+					new String [0],
+					"C:\\DATA\\OWN\\stockfish_14.1_win_x64_popcnt");*/
+			
+			/*EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\Glaurung2.2\\glaurung-w64.exe",
+					new String [0],
+				"C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\Glaurung2.2");*/
+			
+			EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\Pedone_3.1\\Pedone_win.exe",
+					new String [0],
+					"C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\Pedone_3.1");
+			
+			
+			
 			//EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");
 			
-			control.execute(engine, "./stockfish-14.1-4N.cg", 1000000, true);
+			control.execute(engine, "./pedone-3.1.cg", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -157,21 +162,25 @@ public class GamesGenerator_MultiPv {
 		runner.uciOK();
 		
 		List<String> options = new ArrayList<String>();
-		options.add("setoption name MultiPV value 500");
+		options.add("setoption name MultiPV value 99");
 		runner.setOptions(options);
 		
 		runner.isReady();
 		
-		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(toFileName, appendToFile), 10 * 1024 * 1024));
-		
 		for (int i=0; i<gamesCount; i++) {
+			
 			EvaluatedGame game = playGame();
+			
+			DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(toFileName, appendToFile), 10 * 1024 * 1024));
+			
 			GameModelWriter.writeEvaluatedGame(game, dos);
+			
 			dos.flush();
+			
+			dos.close();
+			
 			System.out.println("Game " + (i+1) + " saved in " + toFileName);
 		}
-		
-		dos.close();
 		
 		runner.destroyEngines();
 	}
@@ -268,7 +277,6 @@ public class GamesGenerator_MultiPv {
 		
 		
 		Set<EvaluatedMove> evals = new TreeSet<EvaluatedMove>();
-		
 			
 		List<String> infos = null;
 		
@@ -315,7 +323,9 @@ public class GamesGenerator_MultiPv {
 						
 						if (line.contains("bestmove")) {
 							for (int i=lines.size() - 1; i >=0; i--) {
+								
 								//System.out.println("EngineProcess: getInfoLine " + lines.get(i));
+								
 								if (lines.get(i).contains("info "/*depth"*/) && lines.get(i).contains(" pv ")) {
 									if (exitLines == null) {
 										exitLines = lines.get(i) + ";";

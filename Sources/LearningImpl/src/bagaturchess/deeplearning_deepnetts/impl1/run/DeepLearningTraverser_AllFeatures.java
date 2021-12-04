@@ -7,7 +7,7 @@ import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 
 
-public class DeepLearningTraverser_AllFeatures_V20_DeepNetts {
+public class DeepLearningTraverser_AllFeatures {
 	
 	public static void main(String[] args) {
 		

@@ -7,14 +7,12 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/LearningAPI"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UCI"/>
 	<classpathentry kind="lib" path="lib/neuroph-core-2.94.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar"/>
-	<classpathentry kind="lib" path="lib/commons-lang3-3.8.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-nop-1.7.6.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UCITracker"/>
 	<classpathentry kind="lib" path="lib/deepnetts.jar"/>
-	<classpathentry kind="lib" path="lib/json-20201115.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Opening"/>
 	<classpathentry kind="lib" path="lib/log4j-api-2.14.0.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-core-2.14.0.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Opening"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-nop-1.7.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

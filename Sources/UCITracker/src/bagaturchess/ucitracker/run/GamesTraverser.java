@@ -13,6 +13,7 @@ public class GamesTraverser {
 		long startTime = System.currentTimeMillis();
 		
 		try {
+			
 			//String filePath = "./TEST/Arasan13.1.cg";
 			//String filePath = "./DATA/Houdini.15a.cg";
 			//String filePath = "./stockfish-9.cg";
@@ -20,7 +21,9 @@ public class GamesTraverser {
 			//String filePath = "./stockfish-10.cg";
 			//String filePath = "./lc0-v0.25.1.cg";
 			//String filePath = "./komodo-9.cg";
-			String filePath = "./stockfish-14.1.cg";
+			//String filePath = "./stockfish-14.1.cg";
+			String filePath = "./pedone-3.1.cg";
+			
 			
 			PositionsTraverser.traverseAll(filePath, new PositionsVisitorImpl());
 			

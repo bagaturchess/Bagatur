@@ -28,7 +28,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	
 	NeuralNetworkEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) throws ClassNotFoundException, IOException {
-		this(_bitboard, _evalCache, _evalConfig, (FeedForwardNetwork) FileIO.createFromFile(new File("net.bin")));
+		this(_bitboard, _evalCache, _evalConfig, (FeedForwardNetwork) FileIO.createFromFile(new File("net.dn.bin")));
 	}
 	
 	
@@ -42,8 +42,8 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 		
 		filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
 		
-		if (network.getInputLayer().getWidth() != 110) {
-			throw new IllegalStateException("network inputs size is not 110");
+		if (network.getInputLayer().getWidth() != 55) {
+			throw new IllegalStateException("network inputs size is not 55");
 		}	
 		
 		inputs_d = new double[network.getInputLayer().getWidth()];
