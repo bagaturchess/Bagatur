@@ -113,7 +113,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	@Override
 	public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
 		
-		if (status != IGameStatus.NONE) {
+		if (status != IGameStatus.NONE || bitboard.getStatus() != IGameStatus.NONE) {
 			throw new IllegalStateException("status=" + status);
 		}
 		

@@ -58,8 +58,8 @@ public class EvalConstants {
 	
 	public static final int[] MATERIAL 					= {0, 100, 396, 416, 706, 1302, 3000};
 	public static final int[] MATERIAL_SEE				= {0, 100, 300, 300, 500, 900, 3000};
-	public static final int[] NIGHT_PAWN				= {68, -14, -2, 2, 8, 12, 20, 30, 36, 55, 70, 70};
-	public static final int[] ROOK_PAWN					= {48, -4, -4, -4, -4, 0, 0, 0, 0, 0, 0, 0};
+	public static final int[] NIGHT_PAWN				= {68, -14, -2, 2, 8, 12, 20, 30, 36, 55, 70, 70, 70};
+	public static final int[] ROOK_PAWN					= {48, -4, -4, -4, -4, 0, 0, 0, 0, 0, 0, 0, 0};
 	
 	public static final int[] PINNED 					= {0, 2, -18, -54, -68, -84};
 	public static final int[] DISCOVERED		 		= {0, -14, 128, 110, 180, 0, 28};

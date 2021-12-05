@@ -7,6 +7,7 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
 import bagaturchess.deeplearning.impl.NeuralNetworkUtils_AllFeatures;
+import bagaturchess.deeplearning.impl.visitors.DeepLearningVisitorImpl_AllFeatures;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
@@ -30,7 +31,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 		
 		bitboard = _bitboard;
 		
-		network = (MultiLayerPerceptron) NeuralNetwork.createFromFile("net.bin");
+		network = (MultiLayerPerceptron) NeuralNetwork.createFromFile(DeepLearningVisitorImpl_AllFeatures.NET_FILE);
 		
 		filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
 		inputs = new double[NeuralNetworkUtils_AllFeatures.getInputsSize()];

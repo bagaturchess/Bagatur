@@ -124,7 +124,8 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		
 		if (bitboard.getStatus() != IGameStatus.NONE) {
 			
-			throw new IllegalStateException("bitboard.getStatus()=" + bitboard.getStatus());
+			//throw new IllegalStateException("bitboard.getStatus()=" + bitboard.getStatus());
+			return;
 		}
 		
 		double actualWhitePlayerEval = evaluator.fullEval(0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, bitboard.getColourToMove());

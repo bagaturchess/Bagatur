@@ -47,7 +47,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	
 	private int counter;
 	
-	private static final String NET_FILE = "net.bin";
+	public static final String NET_FILE = "net.nph.bin";
 	private MultiLayerPerceptron network;
 	
 	
@@ -77,6 +77,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 			
 			@Override
 			public void handleLearningEvent(LearningEvent event) {
+				
 		        BackPropagation bp = (BackPropagation)event.getSource();
 		        
 		        //if (event.getEventType() != LearningEvent.Type.LEARNING_STOPPED)
@@ -151,6 +152,6 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		//System.out.println("End iteration " + iteration + ", Total evaluated positions count is " + counter);
 		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 		
-		network.save("net.bin");
+		network.save(NET_FILE);
 	}
 }

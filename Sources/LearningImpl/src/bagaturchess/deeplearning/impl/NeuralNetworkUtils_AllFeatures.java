@@ -45,20 +45,25 @@ public class NeuralNetworkUtils_AllFeatures {
 	
 	public static MultiLayerPerceptron buildNetwork() {
 		
+		
 		MultiLayerPerceptron mlp = new MultiLayerPerceptron(TransferFunctionType.LINEAR,
 				getInputsSize(),
 				//getInputsSize(),
 				1);
-		mlp.randomizeWeights(new WeightsRandomizer(new Random(777)));
 		
-        //System.out.println(Arrays.toString(mlp.getWeights()));
+		
+		mlp.randomizeWeights(new WeightsRandomizer(new Random(777)));
         
+		
         //mlp.setLearningRule(new BackPropagation());
         //mlp.setLearningRule(new ConvolutionalBackpropagation());
         mlp.setLearningRule(new MomentumBackpropagation());
         
-        mlp.getLearningRule().setLearningRate(0.00000000001);
+        mlp.getLearningRule().setLearningRate(0.0000002); //69%
         //mlp.getLearningRule().setLearningRate(0.0000001);
+        //mlp.getLearningRule().setLearningRate(0.00000001);
+        //mlp.getLearningRule().setLearningRate(0.000000001);
+        
         
         return mlp;
 	}

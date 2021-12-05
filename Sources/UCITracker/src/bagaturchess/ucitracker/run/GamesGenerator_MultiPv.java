@@ -60,7 +60,7 @@ public class GamesGenerator_MultiPv {
 	private static int MAX_EVAL_DIFF = 3000;
 	private static int MAX_MOVES = 300;
 	private static int BEST_MOVE_DIFF = 10000;
-	private static int MIN_PIECES = 0;
+	private static int MIN_PIECES = 8;
 	
 	
 	private UCIEnginesManager runner;
@@ -157,7 +157,8 @@ public class GamesGenerator_MultiPv {
 			
 			//EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");
 			
-			control.execute(engine, "./stockfish-14.1.cg", 1000000, true); //~60%
+			control.execute(engine, "./stockfish-14.1.cg", 1000000, true);
+			//control.execute(engine, "./stockfish-14.1-4N.cg", 1000000, true);
 			//control.execute(engine, "./glaurung-2.2.cg", 1000000, true);
 			//control.execute(engine, "./pedone-3.1.cg", 1000000, true);
 			//control.execute(engine, "./wasp-5-0-0.cg", 1000000, true);
@@ -182,6 +183,10 @@ public class GamesGenerator_MultiPv {
 			
 			List<String> options = new ArrayList<String>();
 			options.add("setoption name MultiPV value 99");
+			options.add("setoption name Ponder value false");
+			options.add("setoption name OwnBook value false");
+			options.add("setoption name SyzygyPath value c:\\dummy");
+			
 			runner.setOptions(options);
 			
 			runner.isReady();
