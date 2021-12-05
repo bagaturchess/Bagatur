@@ -51,7 +51,7 @@ import bagaturchess.ucitracker.impl.gamemodel.serialization.GameModelWriter;
 public class GamesGenerator_MultiPv {
 	
 	
-	private static final boolean USE_FEN = true;
+	private static final boolean USE_FEN = false;
 	
 	
 	private static int SEARCH_DEPTH_MIN = 1;
@@ -130,23 +130,38 @@ public class GamesGenerator_MultiPv {
 					new String [0],
 					"C:\\DATA\\Engines\\lc0-v0.25.1-windows-cpu-openblas\\");*/
 			
-			/*EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\stockfish_14.1_win_x64_popcnt\\stockfish_14.1_win_x64_popcnt.exe",
+			EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\stockfish_14.1_win_x64_popcnt\\stockfish_14.1_win_x64_popcnt.exe",
 					new String [0],
-					"C:\\DATA\\OWN\\stockfish_14.1_win_x64_popcnt");*/
+					"C:\\DATA\\OWN\\stockfish_14.1_win_x64_popcnt");
 			
 			/*EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\Glaurung2.2\\glaurung-w64.exe",
 					new String [0],
 				"C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\Glaurung2.2");*/
 			
-			EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\Pedone_3.1\\Pedone_win.exe",
+			/*EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\Pedone_3.1\\Pedone_win.exe",
 					new String [0],
-					"C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\Pedone_3.1");
+					"C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\Pedone_3.1");*/
 			
+			/*EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\Fat_titz_v1.1\\fat_titz_windows_modern.exe",
+					new String [0],
+					"C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\Fat_titz_v1.1");*/
+			
+			/*EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\WASP_500-nn\\Wasp500-windows.exe",
+					new String [0],
+					"C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\WASP_500-nn");*/
+			
+			/*EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.2.3\\Bagatur_64_1_core.exe",
+					new String [0],
+					"C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.2.3");*/
 			
 			
 			//EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");
 			
-			control.execute(engine, "./pedone-3.1.cg", 1000000, true);
+			control.execute(engine, "./stockfish-14.1.cg", 1000000, true); //~60%
+			//control.execute(engine, "./glaurung-2.2.cg", 1000000, true);
+			//control.execute(engine, "./pedone-3.1.cg", 1000000, true);
+			//control.execute(engine, "./wasp-5-0-0.cg", 1000000, true);
+			//control.execute(engine, "./bagatur-2.3.cg", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -156,18 +171,21 @@ public class GamesGenerator_MultiPv {
 	
 	private void execute(EngineProcess engine, String toFileName, int gamesCount, boolean appendToFile) throws IOException {
 		
+		
 		runner.addEngine(engine);
 		
-		runner.startEngines();
-		runner.uciOK();
-		
-		List<String> options = new ArrayList<String>();
-		options.add("setoption name MultiPV value 99");
-		runner.setOptions(options);
-		
-		runner.isReady();
 		
 		for (int i=0; i<gamesCount; i++) {
+			
+			runner.startEngines();
+			runner.uciOK();
+			
+			List<String> options = new ArrayList<String>();
+			options.add("setoption name MultiPV value 99");
+			runner.setOptions(options);
+			
+			runner.isReady();
+			
 			
 			EvaluatedGame game = playGame();
 			
@@ -180,6 +198,8 @@ public class GamesGenerator_MultiPv {
 			dos.close();
 			
 			System.out.println("Game " + (i+1) + " saved in " + toFileName);
+			
+			runner.stopEngines();
 		}
 		
 		runner.destroyEngines();
@@ -199,6 +219,7 @@ public class GamesGenerator_MultiPv {
 			Set<EvaluatedMove> movesEvals = evalVariations(bitboard);
 			
 			if (movesEvals.size() == 0) {
+				
 				break;
 			}
 			
@@ -281,6 +302,7 @@ public class GamesGenerator_MultiPv {
 		List<String> infos = null;
 		
 		int depth = SEARCH_DEPTH_MIN;
+		//int depth = (Math.random() >= 0.5) ? SEARCH_DEPTH_MIN : SEARCH_DEPTH_MIN + 1;
 		
 		boolean loop = true;
 		
@@ -296,9 +318,9 @@ public class GamesGenerator_MultiPv {
 				
 				runner.setupPosition("startpos moves " + allMovesStr);
 			}
-
+			
 			runner.disable();
-
+			
 			runner.go_Depth(depth);
 			
 			try {
@@ -373,17 +395,25 @@ public class GamesGenerator_MultiPv {
 			//System.out.println("depth " + depth);
 		}
 		
+		
 		runner.enable();
 		
+		
 		for (String info: infos) {
+			
 			StringTokenizer st = new StringTokenizer(info, ";");
+			
 			while (st.hasMoreTokens()) {
+				
 				EvaluatedMove move = new EvaluatedMove(bitboard, st.nextToken());
+				
 				if (move.getStatus() == IGameStatus.NONE) {
+					
 					evals.add(move);
 				}
 			}
 		}
+		
 		
 		return evals;
 	}

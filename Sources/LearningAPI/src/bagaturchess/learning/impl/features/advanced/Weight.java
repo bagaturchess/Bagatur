@@ -95,10 +95,10 @@ class Weight implements Serializable {
 		//Should be added before changing
 		appliedMultipliers.add(multiplier);
 		
-		while (appliedMultipliers.size() > 15) {
+		/*while (appliedMultipliers.size() > 15) {
 			
 			appliedMultipliers.remove(0);
-		}
+		}*/
 		
 		double all = 0;
 		

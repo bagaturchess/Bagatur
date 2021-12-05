@@ -14,15 +14,18 @@ public class GamesTraverser {
 		
 		try {
 			
-			//String filePath = "./TEST/Arasan13.1.cg";
-			//String filePath = "./DATA/Houdini.15a.cg";
-			//String filePath = "./stockfish-9.cg";
-			//String filePath = "./glaurung-2.2.cg";
-			//String filePath = "./stockfish-10.cg";
-			//String filePath = "./lc0-v0.25.1.cg";
-			//String filePath = "./komodo-9.cg";
-			//String filePath = "./stockfish-14.1.cg";
-			String filePath = "./pedone-3.1.cg";
+			//String filePath = "Arasan13.1.cg";
+			//String filePath = "Houdini.15a.cg";
+			//String filePath = "stockfish-9.cg";
+			//String filePath = "glaurung-2.2.cg";
+			//String filePath = "stockfish-10.cg";
+			//String filePath = "lc0-v0.25.1.cg";
+			//String filePath = "komodo-9.cg";
+			//String filePath = "stockfish-14.1.cg";
+			//String filePath = "pedone-3.1.cg";
+			//String filePath = "fat_titz-1.1.cg";
+			//String filePath = "wasp-5-0-0.cg";
+			String filePath = "bagatur-2.3.cg";
 			
 			
 			PositionsTraverser.traverseAll(filePath, new PositionsVisitorImpl());
