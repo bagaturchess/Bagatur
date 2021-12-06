@@ -11,29 +11,27 @@ import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
+import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.tpt.TTEntry_BaseImpl;
-import bagaturchess.search.impl.utils.SearchUtils;
-import bagaturchess.uci.api.IUCISearchAdaptor;
 
 
 public class TimeSaver {
 	
 	
+	private static final boolean ENABLE_TB_OFFLINE_PROBING_IN_ROOT_POSITIONS = false;
+	
+	private static final boolean ENABLE_TB_ONLINE_PROBING_IN_ROOT_POSITIONS = true;
+	
+	
 	private OpeningBook ob;
 	
-	private IUCISearchAdaptor search_adapter;
+	private IUCISearchAdaptor_Extension search_adapter;
 	
 	
-	private boolean ENABLE_TB_OFFLINE_PROBING_IN_ROOT_POSITIONS = false;
-	
-	//Use online Syzygy if the position evaluation is below this number:
-	private int ONLINE_PROBING_EVAL_THRESHOLD = -50; //-1; //May be make it a UCI option?
-	
-	
-	public TimeSaver(IUCISearchAdaptor _search_stopper, OpeningBook _ob) {
+	public TimeSaver(IUCISearchAdaptor_Extension _search_stopper, OpeningBook _ob) {
 		
 		search_adapter = _search_stopper;
 		
@@ -41,7 +39,7 @@ public class TimeSaver {
 	}
 	
 	
-	public boolean beforeMove(IBitBoard bitboardForSetup, int openningBook_Mode, final ISearchMediator mediator, boolean useOpening, boolean useOnlineSyzygy, long timeToThinkInMiliseconds) {
+	public boolean beforeMove(IBitBoard bitboardForSetup, int openningBook_Mode, final ISearchMediator mediator, boolean useOpening, boolean uci_option_UseOnlineSyzygy, long timeToThinkInMiliseconds) {
 		
 		mediator.dump("TimeSaver: useOpening = " + useOpening + ", ob=" + ob);
 		
@@ -162,13 +160,16 @@ public class TimeSaver {
 			}
 			
 			
-			if (useOnlineSyzygy && bitboardForSetup.getEnpassantSquareID() == 0) {
+			if (ENABLE_TB_ONLINE_PROBING_IN_ROOT_POSITIONS && uci_option_UseOnlineSyzygy) {
 				
-				//Runnable server_request_response_handler = new OnlineSyzygyServerHandler_WDL(bitboardForSetup, mediator);
-				Runnable server_request_response_handler = new OnlineSyzygyServerHandler_DTM_DTZ(bitboardForSetup, mediator, timeToThinkInMiliseconds);
-				
-				//Execute the Online Syzygy server request in parallel to the standard search
-				new Thread(server_request_response_handler).start();
+				if (bitboardForSetup.getEnpassantSquareID() == 0) {
+					
+					//Runnable server_request_response_handler = new OnlineSyzygyServerHandler_WDL(bitboardForSetup, mediator);
+					Runnable server_request_response_handler = new OnlineSyzygyServerHandler_DTM_DTZ(bitboardForSetup, mediator, timeToThinkInMiliseconds);
+					
+					//Execute the Online Syzygy server request in parallel to the standard search
+					new Thread(server_request_response_handler).start();
+				}
 			}
 		}
 		
@@ -282,6 +283,11 @@ public class TimeSaver {
 								ITTEntry tt_entry = new TTEntry_BaseImpl();
 								
 								transposition_table.get(hashkey_before_server_request, tt_entry);
+								
+								final int DRAW_SCORE = SearchUtils.getDrawScores(bitboardForSetup, -1);
+								
+								//Use online Syzygy if the position evaluation is below this number:
+								final int ONLINE_PROBING_EVAL_THRESHOLD = DRAW_SCORE; //-50; //-1; //May be make it a UCI option?
 								
 								if (!tt_entry.isEmpty() && tt_entry.getEval() <= ONLINE_PROBING_EVAL_THRESHOLD) {
 								

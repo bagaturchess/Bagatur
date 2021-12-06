@@ -32,7 +32,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.impl.utils.SearchUtils;
+import bagaturchess.search.impl.alg.SearchUtils;
 
 
 public class SearchManager {

@@ -27,7 +27,7 @@ import bagaturchess.bitboard.api.IBinarySemaphore;
 import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
 import bagaturchess.bitboard.impl.datastructs.lrmmap.LRUMapLongObject;
 import bagaturchess.search.api.internal.ISearch;
-import bagaturchess.search.impl.utils.SearchUtils;
+import bagaturchess.search.impl.alg.SearchUtils;
 
 
 public class EvalCache_Impl1 extends LRUMapLongObject<IEvalEntry> implements IEvalCache {

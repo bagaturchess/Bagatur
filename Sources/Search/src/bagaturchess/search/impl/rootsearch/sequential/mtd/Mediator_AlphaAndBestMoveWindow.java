@@ -26,8 +26,8 @@ package bagaturchess.search.impl.rootsearch.sequential.mtd;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
+import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.utils.SearchMediatorProxy;
-import bagaturchess.search.impl.utils.SearchUtils;
 
 
 public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {

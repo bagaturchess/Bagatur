@@ -35,6 +35,7 @@ import bagaturchess.search.api.internal.ISearchMoveList;
 
 import bagaturchess.search.impl.alg.BacktrackingInfo;
 import bagaturchess.search.impl.alg.SearchImpl;
+import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
@@ -174,7 +175,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			return backtrackingInfo.static_eval;
 		}
 		
-		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
+		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(SearchUtils.normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
 		
 		
 		PVNode node = pvman.load(depth);
@@ -192,7 +193,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean inCheck = env.getBitboard().isInCheck();
 		
 		
-		int rest = normDepth(maxdepth) - depth;
+		int rest = SearchUtils.normDepth(maxdepth) - depth;
 		
 		
 		if (depth > 1
@@ -204,7 +205,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (inCheck) {
 				if (!env.getBitboard().hasMoveInCheck()) {
 					node.bestmove = 0;
-					node.eval = -getMateVal(depth);
+					node.eval = -SearchUtils.getMateVal(depth);
 					node.leaf = true;
 					return node.eval;
 				}
@@ -245,7 +246,7 @@ public class Search_PVS_NWS extends SearchImpl {
         }
     	
     	
-		if (depth >= normDepth(maxdepth)) {
+		if (depth >= SearchUtils.normDepth(maxdepth)) {
 			node.eval = pv_qsearch(mediator, pvman, info, initial_maxdepth, depth, alpha_org, beta, rootColour);	
 			return node.eval;
 		}
@@ -483,7 +484,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (inCheck) {
 				if (searchedCount == 0) {
 					node.bestmove = 0;
-					node.eval = -getMateVal(depth);
+					node.eval = -SearchUtils.getMateVal(depth);
 					node.leaf = true;
 					return node.eval;
 				} else {
@@ -507,7 +508,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth) - depth, best_eval, alpha_org, beta, best_move);
+		env.getTPT().put(backtrackingInfo.hash_key, SearchUtils.normDepth(maxdepth) - depth, best_eval, alpha_org, beta, best_move);
 		
 		
 		return best_eval;
@@ -541,7 +542,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			return backtrackingInfo.static_eval;
 		}
 		
-		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
+		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(SearchUtils.normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
 		
 		
 		if (isDraw()) {
@@ -549,7 +550,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
     	
 		
-		if (depth >= normDepth(maxdepth)) {
+		if (depth >= SearchUtils.normDepth(maxdepth)) {
 			int eval = nullwin_qsearch(mediator, info, initial_maxdepth, depth, beta, rootColour);
 			return eval;
 		}
@@ -558,7 +559,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean inCheck = env.getBitboard().isInCheck();
 		
 		
-		int rest = normDepth(maxdepth) - depth;
+		int rest = SearchUtils.normDepth(maxdepth) - depth;
 		
 		
 		if (depth > 1
@@ -569,7 +570,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (inCheck) {
 				if (!env.getBitboard().hasMoveInCheck()) {
-					return -getMateVal(depth);
+					return -SearchUtils.getMateVal(depth);
 				}
 			} else {
 				if (!env.getBitboard().hasMoveInNonCheck()) {
@@ -948,7 +949,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (best_move == 0) {
 			if (inCheck) {
 				if (searchedCount == 0) {
-					return -getMateVal(depth);
+					return -SearchUtils.getMateVal(depth);
 				} else {
 					throw new IllegalStateException();
 				}
@@ -967,7 +968,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		env.getTPT().put(backtrackingInfo.hash_key, normDepth(maxdepth) - depth, best_eval, alpha_org, beta, best_move);
+		env.getTPT().put(backtrackingInfo.hash_key, SearchUtils.normDepth(maxdepth) - depth, best_eval, alpha_org, beta, best_move);
 		
 		
 		return best_eval;
@@ -990,7 +991,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int colourToMove = env.getBitboard().getColourToMove();
 		
-		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
+		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(SearchUtils.normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
 		
 		
 		PVNode node = pvman.load(depth);
@@ -1137,7 +1138,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int colourToMove = env.getBitboard().getColourToMove();
 		
-		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
+		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(SearchUtils.normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
 		
 		if (isDraw()) {
 			return getDrawScores(rootColour);

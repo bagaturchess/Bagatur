@@ -20,25 +20,14 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.search.api;
+package bagaturchess.search.impl.uci_adaptor;
 
 
+import bagaturchess.search.api.IRootSearch;
+import bagaturchess.uci.api.IUCISearchAdaptor;
 
-public interface IEvaluator {
+
+public interface IUCISearchAdaptor_Extension extends IUCISearchAdaptor {
 	
-	
-	public static final int MAX_EVAL = 100000;
-	
-	public static final int MIN_EVAL = -MAX_EVAL;
-	
-	
-	public void beforeSearch();
-	
-	public int roughEval(int depth, int rootColour);
-	
-	public int lazyEval(int depth, int alpha, int beta, int rootColour);
-	
-	public int lazyEval(int depth, int alpha, int beta, int rootColour, FullEvalFlag flag);
-	
-	public double fullEval(int depth, int alpha, int beta, int rootColour);
+	public IRootSearch getSearcherNormal();
 }

@@ -31,7 +31,7 @@ import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.impl.utils.SearchUtils;
+import bagaturchess.search.impl.alg.SearchUtils;
 
 
 public class MonteCarlo {

@@ -25,7 +25,7 @@
 package bagaturchess.search.impl.uci_adaptor.timemanagement.controllers;
 
 
-import bagaturchess.search.impl.utils.SearchUtils;
+import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.uci.api.ITimeConfig;
 
 

@@ -48,11 +48,11 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 
 import bagaturchess.search.impl.alg.SearchImpl;
+import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.ITTEntry;
-import bagaturchess.search.impl.utils.SearchUtils;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.search.impl.eval.cache.EvalEntry_BaseImpl;
 import bagaturchess.search.impl.eval.cache.IEvalEntry;
@@ -147,7 +147,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int mateMove, boolean useMateDistancePrunning) {
 		
 		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), alpha_org, beta, true, 0);
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true, 0);
 		//return rootSearch(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
 		//		((BoardImpl) env.getBitboard()).getMoveGenerator(), normDepth(maxdepth), alpha_org, beta, true);
 	}
@@ -161,7 +161,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
 		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), beta - 1, beta, false, 0);	
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, 0);	
 		//return rootSearch(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
 		//		((BoardImpl) env.getBitboard()).getMoveGenerator(), normDepth(maxdepth), beta - 1, beta, false);		
 	}
@@ -408,7 +408,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (!env.getBitboard().hasMoveInCheck()) {
 					
 					node.bestmove = 0;
-					node.eval = -getMateVal(ply);
+					node.eval = -SearchUtils.getMateVal(ply);
 					node.leaf = true;
 					
 					return node.eval;
@@ -1204,7 +1204,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (!tt_entries_per_ply[ply].isEmpty()) {
 				draw = extractFromTT(ply + 1, result.child, tt_entries_per_ply[ply], info, isPv);
 				if (draw) {
-					result.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
+					result.eval = getDrawScores(-1);
 				} else {
 					result.leaf = false;
 				}

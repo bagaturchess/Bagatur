@@ -27,8 +27,12 @@ import bagaturchess.uci.impl.commands.Go;
 
 
 public interface IUCISearchAdaptor {
+	
 	public void goSearch(IChannel channel, BestMoveSender sender, Go go);
+	
 	public void ponderHit();
+	
 	public int[] stopSearch(); // returns best move and ponder move in array
+	
 	public void shutDown();
 }

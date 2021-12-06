@@ -8,9 +8,9 @@ import java.util.Map;
 
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.ISearchInfo;
+import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.utils.DEBUGSearch;
-import bagaturchess.search.impl.utils.SearchUtils;
 import bagaturchess.uci.api.ChannelManager;
 
 

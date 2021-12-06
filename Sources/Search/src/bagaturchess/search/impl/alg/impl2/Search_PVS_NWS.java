@@ -43,10 +43,10 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 
 import bagaturchess.search.impl.alg.SearchImpl;
+import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
-import bagaturchess.search.impl.utils.SearchUtils;
 
 
 public class Search_PVS_NWS extends SearchImpl {
@@ -158,7 +158,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int mateMove, boolean useMateDistancePrunning) {
 		
 		return calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), alpha_org, beta, true);
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true);
 	}
 	
 	
@@ -170,7 +170,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
 		return calculateBestMove(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, normDepth(maxdepth), beta - 1, beta, false);		
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false);		
 	}
 	
 	
@@ -263,7 +263,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (cb.checkingPieces != 0) {
 				if (!env.getBitboard().hasMoveInCheck()) {
 					node.bestmove = 0;
-					node.eval = -getMateVal(ply);
+					node.eval = -SearchUtils.getMateVal(ply);
 					node.leaf = true;
 					return node.eval;
 				}

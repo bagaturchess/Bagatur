@@ -40,7 +40,7 @@ import bagaturchess.uci.api.IUCISearchAdaptor;
 import bagaturchess.uci.impl.commands.Go;
 
 
-public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
+public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor_Extension {
 	
 	
 	protected static final int RETRY_COUNT_FOR_GETTING_INFO = 11;

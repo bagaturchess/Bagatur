@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.search.api.internal.ISearch;
-import bagaturchess.search.impl.utils.SearchUtils;
+import bagaturchess.search.impl.alg.SearchUtils;
 
 
 public class BetaGenerator implements IBetaGenerator {

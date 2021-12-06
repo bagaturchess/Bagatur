@@ -25,6 +25,7 @@ package bagaturchess.search.api;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.internal.ISearchMediator;
+import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.uci.impl.commands.Go;
@@ -33,14 +34,17 @@ import bagaturchess.uci.impl.commands.Go;
 public interface IRootSearch {
 	
 	public SharedData getSharedData();
+	
 	public IBitBoard getBitboardForSetup();
 	
 	public int getTPTUsagePercent();
+	
 	public void decreaseTPTDepths(int reduction);
 	
 	public void createBoard(IBitBoard bitboardForSetup);
 	
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, ITimeController timeController, Go go);
+	
 	public void negamax(IBitBoard bitboardForSetup, ISearchMediator mediator, ITimeController timeController, IFinishCallback finishCallback, Go go);
 	
 	public void stopSearchAndWait();

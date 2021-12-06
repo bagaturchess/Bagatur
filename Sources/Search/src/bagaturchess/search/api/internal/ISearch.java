@@ -22,28 +22,41 @@
  */
 package bagaturchess.search.api.internal;
 
+
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.ISearchConfig_AB;
+import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.pv.PVManager;
 
 
-
 public interface ISearch {
 	
-	public static int PLY = ISearchConfig_AB.PLY;
 	
-	//public static final int DRAW = 0;
-	public static final int MAX_MAT_INTERVAL = IEvaluator.MAX_EVAL;
-	public static final int MAX_DEPTH = 90;
-	public static final int MIN = - (MAX_DEPTH + 100) * MAX_MAT_INTERVAL;
-	public static final int MAX = -MIN;
+	public static int PLY 						= ISearchConfig_AB.PLY;
+	
+	public static final int MAX_MAT_INTERVAL 	= IEvaluator.MAX_EVAL;
+	
+	public static final int MAX_DEPTH 			= 128;
+	
+	public static final int MAX 				= SearchUtils.getMateVal(0); // MAX_MAT_INTERVAL * (MAX_DEPTH + 1)
+	
+	public static final int MIN 				= -MAX;
+	
+	public static final int DRAW_SCORE_O 		= 0;
+	
+	public static final int DRAW_SCORE_E 		= 0;
+	
 	
 	public void newGame();
+	
 	public void newSearch();
+	
 	public void setup(IBitBoard bitboard);
+	
 	public SearchEnv getEnv();
+	
 	public int getTPTUsagePercent();
 	
 	public int pv_search(ISearchMediator mediator, PVManager pvman, ISearchInfo info,
