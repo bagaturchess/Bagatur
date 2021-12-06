@@ -123,7 +123,8 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor {
 		}
 	}
 	
-	protected SharedData getSharedData() {
+	
+	public SharedData getSharedData() {
 		return sharedData;
 	}
 	

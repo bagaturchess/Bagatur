@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
@@ -64,31 +66,28 @@ public class OnlineSyzygy {
 	private final static VarStatistic stat_waiting_times = new VarStatistic();
 	
 	
-	
-	public static final String getDTZandDTM_BlockingOnSocketConnection(IBitBoard board, int[] result, Logger logger) {
-	
+	public static final String getDTZandDTM_BlockingOnSocketConnection(String fen, int colour_to_move, int[] result, Logger logger) {
+		
 		if (System.currentTimeMillis() <= WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time] + last_server_response_timestamp) {
 			
 			return null;
 		}
 		
+		result[0] = -1;
+		result[1] = -1;
+		
 		last_server_response_timestamp = System.currentTimeMillis();
 		
-		String response = null;
-		
-		int dtz = -1;
-		int dtm = -1;
-		
-		String fen = board.toEPD().replace(' ', '_');
+		String bestmove_string = null;
 		
 		//String url_for_the_request_mainline = "http://tablebase.lichess.ovh/standard/mainline?fen=" + fen;//2 times slower
 		String url_for_the_request = "http://tablebase.lichess.ovh/standard?fen=" + fen;
 		
 		try {
 			
-			String json_response_text = getHTMLFromURL(url_for_the_request);
+			String server_response_json_text = getHTMLFromURL(url_for_the_request);
 			
-			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: json_response_text=" + json_response_text);
+			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: json_response_text=" + server_response_json_text);
 			
 			current_index_for_waiting_time--;
 			
@@ -113,102 +112,67 @@ public class OnlineSyzygy {
 					+ " ms, MAX=" + stat_response_times.getMaxVal() + " ms"
 				);
 			
+			/* Example of server response taken in December 2021
+			{
+				"checkmate":false,"stalemate":false,"variant_win":false,"variant_loss":false,"insufficient_material":false,"dtz":9,"precise_dtz":null,"dtm":43,"category":"win",
 			
-			response = json_response_text;
+				"moves":
+				[
+					{"uci":"d1c2","san":"Kc2","zeroing":false,"checkmate":false,"stalemate":false,"variant_win":false,"variant_loss":false,"insufficient_material":false,"dtz":-8,"precise_dtz":null,"dtm":-42,"category":"loss"},
+					{"uci":"d1e2","san":"Ke2","zeroing":false,"checkmate":false,"stalemate":false,"variant_win":false,"variant_loss":false,"insufficient_material":false,"dtz":-8,"precise_dtz":null,"dtm":-42,"category":"loss"},
+					{"uci":"d2d3","san":"d3","zeroing":true,"checkmate":false,"stalemate":false,"variant_win":false,"variant_loss":false,"insufficient_material":false,"dtz":0,"precise_dtz":0,"dtm":0,"category":"draw"},
+					{"uci":"d2d4","san":"d4","zeroing":true,"checkmate":false,"stalemate":false,"variant_win":false,"variant_loss":false,"insufficient_material":false,"dtz":0,"precise_dtz":0,"dtm":0,"category":"draw"},
+					{"uci":"d1c1","san":"Kc1","zeroing":false,"checkmate":false,"stalemate":false,"variant_win":false,"variant_loss":false,"insufficient_material":false,"dtz":0,"precise_dtz":0,"dtm":0,"category":"draw"},
+					{"uci":"d1e1","san":"Ke1","zeroing":false,"checkmate":false,"stalemate":false,"variant_win":false,"variant_loss":false,"insufficient_material":false,"dtz":0,"precise_dtz":0,"dtm":0,"category":"draw"}
+				]
+			}*/
 			
-			int dtz_start_index = json_response_text.indexOf("\"dtz\":");
 			
-			if (dtz_start_index != -1) {
+			String game_category_string = extractJSONAttribute(logger, server_response_json_text, "\"category\":"); //Possible outcomes are "win", "draw" and "loss"
+			
+			if (game_category_string != null) {
 				
-				logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: dtz_start_index=" + dtz_start_index);
+				int[] dtz_and_dtm = extractDTZandDTM(logger, server_response_json_text);
 				
-				int possible_dtz_end_index1 = json_response_text.indexOf(",", dtz_start_index);
-				int possible_dtz_end_index2 = json_response_text.indexOf("}", dtz_start_index);
+				result[0] = dtz_and_dtm[0];
+				result[1] = dtz_and_dtm[1];
 				
-				int dtz_end_index = 0;
+				String first_array_string = extractFirstJSONArray(logger, server_response_json_text);
 				
-				if (possible_dtz_end_index1 != -1 && possible_dtz_end_index2 != -1) {
-					
-					dtz_end_index = Math.min(possible_dtz_end_index1, possible_dtz_end_index2);
-					
-				} else if (possible_dtz_end_index1 != -1) {
-					
-					dtz_end_index = possible_dtz_end_index1;
-					
-				} else if (possible_dtz_end_index2 != -1) {
-					
-					dtz_end_index = possible_dtz_end_index2;
-					
-				} else {
-					
-					return null;
-				}
+				//System.out.println("first_array_string=" + first_array_string);
 				
-				logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: dtz_end_index=" + dtz_end_index);
+				String[] array_elements = extractJSONArrayElements(logger, first_array_string);
 				
-				
-				String dtz_string = json_response_text.substring(dtz_start_index + 6, dtz_end_index);
-				
-				//System.out.println("dtz_string=" + dtz_string);
-				
-				try {
+				if (array_elements.length > 0) {						
 					
-					dtz = Integer.parseInt(dtz_string);
+					String array_element = array_elements[0];
 					
-					int dtm_start_index = json_response_text.indexOf("\"dtm\":");
+					//System.out.println("first_array_element_string=" + array_element);
+				
+					//The uci moves list is ordered - the first line of the response contains the best move
+					bestmove_string = extractJSONAttribute(logger, array_element, "\"uci\":"); //"uci":"d1c2",
 					
-					if (dtm_start_index != -1) {
+					if (bestmove_string != null) {
 						
-						logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: dtm_start_index=" + dtm_start_index);
+						bestmove_string = bestmove_string.replace("\"", ""); //The value is quoted
 						
-						int possible_dtm_end_index1 = json_response_text.indexOf(",", dtm_start_index);
-						int possible_dtm_end_index2 = json_response_text.indexOf("}", dtm_start_index);
+						logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: bestmove_string=" + bestmove_string);
 						
-						int dtm_end_index = 0;
-						
-						if (possible_dtm_end_index1 != -1 && possible_dtm_end_index2 != -1) {
+						/*if (game_category_string.equals("\"win\"")) {
 							
-							dtm_end_index = Math.min(possible_dtm_end_index1, possible_dtm_end_index2);
+						} else if (game_category_string.equals("\"draw\"")) {
 							
-						} else if (possible_dtm_end_index1 != -1) {
-							
-							dtm_end_index = possible_dtm_end_index1;
-							
-						} else if (possible_dtm_end_index2 != -1) {
-							
-							dtm_end_index = possible_dtm_end_index2;
-							
-						} else {
-							
-							return null;
-						}
-						
-						logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: dtm_end_index=" + dtm_end_index);
-						
-						
-						String dtm_string = json_response_text.substring(dtm_start_index + 6, dtm_end_index);
-						
-						try {
-							
-							dtm = Integer.parseInt(dtm_string);
-							
-						} catch (NumberFormatException nfe) {
-							
-							logger.addException(nfe);
-						}
+						}*/
 					}
-					
-				} catch (NumberFormatException nfe) {
-					
-					logger.addException(nfe);
 				}
 			}
 			
 		} catch (Exception e) {
 			
+			//e is FileNotFoundException if the requested position is not presented on the server
 			//e.printStackTrace();
 			
-			logger.addException(e);
+			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: " + e.getMessage());
 			
 			current_index_for_waiting_time++;
 			
@@ -222,40 +186,74 @@ public class OnlineSyzygy {
 			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: current_index_for_waiting_time set to " + current_index_for_waiting_time);
 		}
 		
-		result[0] = dtz;
-		result[1] = dtm;
 		
-		return response;
+		return bestmove_string;
 	}
 	
 	
-	public static final String getWDL_BlockingOnSocketConnection(IBitBoard board, int[] result, Logger logger) {
+	private static int[] extractDTZandDTM(Logger logger, String json_containing_dtz_dtm) {
+		
+		
+		int[] result = new int[2];
+		
+		result[0] = -1;
+		result[1] = -1;
+		
+		
+		String dtz_string = extractJSONAttribute(logger, json_containing_dtz_dtm, "\"dtz\":");
+		
+		if (dtz_string != null) {
+			
+			try {
+				
+				result[0] = Integer.parseInt(dtz_string);
+				
+				String dtm_string = extractJSONAttribute(logger, json_containing_dtz_dtm, "\"dtm\":");
+				
+				if (dtm_string != null) {
+					
+					try {
+						
+						result[1] = Integer.parseInt(dtm_string);
+						
+					} catch (NumberFormatException nfe) {
+						
+						//logger.addException(nfe);
+					}
+				}
+				
+			} catch (NumberFormatException nfe) {
+				
+				//logger.addException(nfe);
+			}
+		}
+		
+		
+		return result;
+	}
+	
+	
+	public static final String getWDL_BlockingOnSocketConnection(String fen, int colour_to_move, int[] result, Logger logger) {
 		
 		if (System.currentTimeMillis() <= WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time] + last_server_response_timestamp) {
 			
 			return null;
 		}
 		
+		result[0] = -1;
+		result[1] = -1;
+		
 		last_server_response_timestamp = System.currentTimeMillis();
 		
-		String response = null;
+		String bestmove_string = null;
 		
-		int dtz = -1;
-		int winner_color = -1;
-		int best_move = -1;
-		
-		String fen = board.toEPD().replace(' ', '_');
-		
-		String url_for_the_request_mainline = "http://tablebase.lichess.ovh/standard/mainline?fen=" + fen;//2 times slower
-		//String url_for_the_request = "http://tablebase.lichess.ovh/standard?fen=" + fen;
-		
-		long hashkey_before_server_request = board.getHashKey();
+		String url_for_the_request_mainline = "http://tablebase.lichess.ovh/standard/mainline?fen=" + fen;
 		
 		try {
 			
-			String json_response_text = getHTMLFromURL(url_for_the_request_mainline);
+			String server_response_json_text = getHTMLFromURL(url_for_the_request_mainline);
 			
-			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: json_response_text=" + json_response_text);
+			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: server_response_json_text=" + server_response_json_text);
 			
 			current_index_for_waiting_time--;
 			
@@ -279,11 +277,9 @@ public class OnlineSyzygy {
 					+ " ms, STDEV=" + stat_response_times.getDisperse()
 					+ " ms, MAX=" + stat_response_times.getMaxVal() + " ms"
 				);
-
 			
-			response = json_response_text;
+			/* Example of server response taken in November 2021
 			
-			/*
 			{"mainline":
 				[
 					{"uci":"d1c2","san":"Kc2","dtz":-8},
@@ -296,48 +292,38 @@ public class OnlineSyzygy {
 					{"uci":"b7a6","san":"Ka6","dtz":1},
 					{"uci":"d2d3","san":"d3","dtz":-4},
 					{"uci":"a6b7","san":"Kb7","dtz":3},
-					{"uci":"c5d6","san":"Kd6","dtz":-2},{"uci":"b7a6","san":"Ka6","dtz":1},{"uci":"d3d4","san":"d4","dtz":-2},{"uci":"a6a5","san":"Ka5","dtz":1},{"uci":"d4d5","san":"d5","dtz":-4},{"uci":"a5a4","san":"Ka4","dtz":3},{"uci":"d6c5","san":"Kc5","dtz":-2},{"uci":"a4a3","san":"Ka3","dtz":1},{"uci":"d5d6","san":"d6","dtz":-2},{"uci":"a3a2","san":"Ka2","dtz":1},{"uci":"d6d7","san":"d7","dtz":-2},{"uci":"a2a1","san":"Ka1","dtz":1},{"uci":"d7d8q","san":"d8=Q","dtz":-8},{"uci":"a1b1","san":"Kb1","dtz":7},{"uci":"d8d2","san":"Qd2","dtz":-6},{"uci":"b1a1","san":"Ka1","dtz":5},{"uci":"c5b4","san":"Kb4","dtz":-4},{"uci":"a1b1","san":"Kb1","dtz":3},{"uci":"b4a3","san":"Ka3","dtz":-2},{"uci":"b1a1","san":"Ka1","dtz":1},{"uci":"d2c1","san":"Qc1#","dtz":-1}
+					{"uci":"c5d6","san":"Kd6","dtz":-2},
+					{"uci":"b7a6","san":"Ka6","dtz":1},
+					{"uci":"d3d4","san":"d4","dtz":-2},
+					{"uci":"a6a5","san":"Ka5","dtz":1},
+					{"uci":"d4d5","san":"d5","dtz":-4},
+					{"uci":"a5a4","san":"Ka4","dtz":3},
+					{"uci":"d6c5","san":"Kc5","dtz":-2},
+					{"uci":"a4a3","san":"Ka3","dtz":1},
+					{"uci":"d5d6","san":"d6","dtz":-2},
+					{"uci":"a3a2","san":"Ka2","dtz":1},
+					{"uci":"d6d7","san":"d7","dtz":-2},
+					{"uci":"a2a1","san":"Ka1","dtz":1},
+					{"uci":"d7d8q","san":"d8=Q","dtz":-8},
+					{"uci":"a1b1","san":"Kb1","dtz":7},
+					{"uci":"d8d2","san":"Qd2","dtz":-6},
+					{"uci":"b1a1","san":"Ka1","dtz":5},
+					{"uci":"c5b4","san":"Kb4","dtz":-4},
+					{"uci":"a1b1","san":"Kb1","dtz":3},
+					{"uci":"b4a3","san":"Ka3","dtz":-2},
+					{"uci":"b1a1","san":"Ka1","dtz":1},
+					{"uci":"d2c1","san":"Qc1#","dtz":-1}
 				],
 				"winner":"w",
 				"dtz":9
 			}*/
 			
-			int winner_start_index = json_response_text.indexOf("\"winner\":");
 			
-			if (winner_start_index != -1) {
+			String winner_string = extractJSONAttribute(logger, server_response_json_text, "\"winner\":");
+			
+			if (winner_string != null) {
 				
-				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: winner_start_index=" + winner_start_index);
-				
-				//int winner_end_index = json_response_text.indexOf(",", winner_start_index);
-				
-				int possible_winner_end_index1 = json_response_text.indexOf(",", winner_start_index);
-				int possible_winner_end_index2 = json_response_text.indexOf("}", winner_start_index);
-				
-				int winner_end_index = 0;
-				
-				if (possible_winner_end_index1 != -1 && possible_winner_end_index2 != -1) {
-					
-					winner_end_index = Math.min(possible_winner_end_index1, possible_winner_end_index2);
-					
-				} else if (possible_winner_end_index1 != -1) {
-					
-					winner_end_index = possible_winner_end_index1;
-					
-				} else if (possible_winner_end_index2 != -1) {
-					
-					winner_end_index = possible_winner_end_index2;
-					
-				} else {
-					
-					return null;
-				}
-				
-				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: winner_end_index=" + winner_end_index);
-				
-				
-				String winner_string = json_response_text.substring(winner_start_index + 9, winner_end_index);
-				
-				logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: winner_string=" + winner_string);
+				int winner_color = -1;
 				
 				if (winner_string.equals("\"w\"")) {
 					
@@ -348,115 +334,54 @@ public class OnlineSyzygy {
 					winner_color = Constants.COLOUR_BLACK;					
 				}
 				
+				result[0] = winner_color;
 				
-				if (winner_color == board.getColourToMove()) {
+				if (result[0] == colour_to_move) {
 					
+					//Here the player is winning the game
 					
-					int bestmove_start_index = json_response_text.indexOf("\"uci\":"); //"uci":"d1c2",
+					String first_array_string = extractFirstJSONArray(logger, server_response_json_text);
 					
-					if (bestmove_start_index != -1) {
+					//System.out.println("first_array_string=" + first_array_string);
+					
+					String[] array_elements = extractJSONArrayElements(logger, first_array_string);
+					
+					if (array_elements.length > 0) {						
 						
+						String array_element = array_elements[0];
 						
-						logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: bestmove_start_index=" + bestmove_start_index);
+						//System.out.println("first_array_element_string=" + array_element);
 						
-						int possible_bestmove_end_index1 = json_response_text.indexOf(",", bestmove_start_index);
-						int possible_bestmove_end_index2 = json_response_text.indexOf("}", bestmove_start_index);
+						String dtz_string = extractJSONAttribute(logger, array_element, "\"dtz\":");
 						
-						int bestmove_end_index = 0;
-						
-						if (possible_bestmove_end_index1 != -1 && possible_bestmove_end_index2 != -1) {
+						if (dtz_string != null) {
 							
-							bestmove_end_index = Math.min(possible_bestmove_end_index1, possible_bestmove_end_index2);
-							
-						} else if (possible_bestmove_end_index1 != -1) {
-							
-							bestmove_end_index = possible_bestmove_end_index1;
-							
-						} else if (possible_bestmove_end_index2 != -1) {
-							
-							bestmove_end_index = possible_bestmove_end_index2;
-							
-						} else {
-							
-							return null;
-						}
-						
-						logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: bestmove_end_index=" + bestmove_end_index);
-						
-						
-						String bestmove_string = json_response_text.substring(bestmove_start_index + 6, bestmove_end_index);
-						
-						bestmove_string = bestmove_string.replace("\"", "");
-						
-						logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: bestmove_string=" + bestmove_string);
-						
-						try {
-							
-							if (board.getHashKey() == hashkey_before_server_request) {
-							
-								best_move = board.getMoveOps().stringToMove(bestmove_string);
-							
-							} else {
+							try {
 								
-								logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: bestmove skipped, because board.getHashKey() != hashkey_before_server_request");
+								int dtz = Integer.parseInt(dtz_string);
+								
+								//this is the first occurance of dtz string in json response.
+								//We have to add one move and switch the sign by multiplying to -1.
+								dtz += dtz > 0 ? 1 : -1;
+								dtz = -dtz;
+								
+								result[1] = dtz;
+										
+							} catch (NumberFormatException nfe) {
+								
+								logger.addException(nfe);
 							}
-							
-						} catch (NumberFormatException nfe) {
-							
-							logger.addException(nfe);
-						}
-					}
-					
-					
-					int dtz_start_index = json_response_text.indexOf("\"dtz\":");
-					
-					if (dtz_start_index != -1) {
-						
-						logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: dtz_start_index=" + dtz_start_index);
-						
-						int possible_dtz_end_index1 = json_response_text.indexOf(",", dtz_start_index);
-						int possible_dtz_end_index2 = json_response_text.indexOf("}", dtz_start_index);
-						
-						int dtz_end_index = 0;
-						
-						if (possible_dtz_end_index1 != -1 && possible_dtz_end_index2 != -1) {
-							
-							dtz_end_index = Math.min(possible_dtz_end_index1, possible_dtz_end_index2);
-							
-						} else if (possible_dtz_end_index1 != -1) {
-							
-							dtz_end_index = possible_dtz_end_index1;
-							
-						} else if (possible_dtz_end_index2 != -1) {
-							
-							dtz_end_index = possible_dtz_end_index2;
-							
-						} else {
-							
-							return null;
 						}
 						
-						logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: dtz_end_index=" + dtz_end_index);
 						
+						//The uci moves list is ordered - the first line of the response contains the best move
+						bestmove_string = extractJSONAttribute(logger, array_element, "\"uci\":"); //"uci":"d1c2",
 						
-						String dtz_string = json_response_text.substring(dtz_start_index + 6, dtz_end_index);
-						
-						//System.out.println("dtz_string=" + dtz_string);
-						
-						try {
+						if (bestmove_string != null) {
 							
-							dtz = Integer.parseInt(dtz_string);
+							bestmove_string = bestmove_string.replace("\"", ""); //The value is quoted
 							
-							//this is the first occurance of dtz string in json response.
-							//We have to add one move and switch the sign by multiplying to -1.
-							dtz += dtz > 0 ? 1 : -1;
-							dtz = -dtz;
-							
-							//System.out.println("dtz=" + dtz);
-							
-						} catch (NumberFormatException nfe) {
-							
-							logger.addException(nfe);
+							logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: bestmove_string=" + bestmove_string);
 						}
 					}
 				}
@@ -467,7 +392,7 @@ public class OnlineSyzygy {
 			//e is FileNotFoundException if the requested position is not presented on the server
 			//e.printStackTrace();
 			
-			logger.addException(e);
+			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: " + e.getMessage());
 			
 			current_index_for_waiting_time++;
 			
@@ -482,14 +407,103 @@ public class OnlineSyzygy {
 		}
 		
 		
-		result[0] = dtz;
+		return bestmove_string;
+	}
+
+	
+	private static String extractFirstJSONArray(Logger logger, String json_text) {
 		
-		result[1] = winner_color;
+		int start_index = json_text.indexOf("[");
 		
-		result[2] = best_move;
+		if (start_index == -1) {
+			
+			return null;
+		}
 		
+		int end_index = json_text.indexOf("]", start_index);
 		
-		return response;
+		if (end_index == -1) {
+			
+			return null;
+		}
+		
+		String attribute_value = json_text.substring(start_index, end_index + 1);
+		
+		return attribute_value;
+	}
+	
+	
+	private static String[] extractJSONArrayElements(Logger logger, String json_array) {
+		
+		List<String> array_elements_list = new ArrayList<String>();
+		
+		char[] chars = json_array.toCharArray();
+		
+		for (int i = 0; i < chars.length; i++) {
+			
+			char cur_char1 = chars[i];
+			
+			if (cur_char1 == '{') {
+				
+				for (int j = i; j < chars.length; j++) {
+					
+					char cur_char2 = chars[j];
+					
+					if (cur_char2 == '}') {
+						
+						array_elements_list.add(json_array.substring(i, j + 1));
+						
+						i = j;
+						
+						break;
+					}
+				}
+			}
+		}
+		
+		return array_elements_list.toArray(new String[0]);
+	}
+	
+	
+	private static String extractJSONAttribute(Logger logger, String json_object, String attribute_name) {
+		
+		int start_index = json_object.indexOf(attribute_name);
+		
+		if (start_index == -1) {
+			
+			return null;
+		}
+		
+		logger.addText("OnlineSyzygy.extractJSONAttribute: attribute_name=" + attribute_name + " found");
+		
+		int possible_end_index1 = json_object.indexOf(",", start_index);
+		
+		int possible_end_index2 = json_object.indexOf("}", start_index);
+		
+		int dtm_end_index = 0;
+		
+		if (possible_end_index1 != -1 && possible_end_index2 != -1) {
+			
+			dtm_end_index = Math.min(possible_end_index1, possible_end_index2);
+			
+		} else if (possible_end_index1 != -1) {
+			
+			dtm_end_index = possible_end_index1;
+			
+		} else if (possible_end_index2 != -1) {
+			
+			dtm_end_index = possible_end_index2;
+			
+		} else {
+			
+			return null;
+		}		
+		
+		String attribute_value = json_object.substring(start_index + attribute_name.length(), dtm_end_index);
+		
+		logger.addText("OnlineSyzygy.extractJSONAttribute: attribute_value=" + attribute_value);
+		
+		return attribute_value;
 	}
 	
 	
@@ -557,15 +571,16 @@ public class OnlineSyzygy {
 		IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/3P4/3K4 w - -");
 		//IBitBoard board = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
 		
-		int[] result = new int[3];
-		
 		for (int counter = 0; counter < 100; counter++) {
 		
-			//String response = getDTZandDTM_BlockingOnSocketConnection(board, result);
-			//System.out.println("dtz=" + result[0]);
-			//System.out.println("wdl=" + result[1]);
+			System.out.println("Try " + (counter + 1));
 			
-			String response = getWDL_BlockingOnSocketConnection(board, result, new Logger() {
+			String fen = board.toEPD().replace(' ', '_');
+			
+			
+			/*int[] winner_and_dtz = new int[2];
+			
+			String best_move = getWDL_BlockingOnSocketConnection(fen, board.getColourToMove(), winner_and_dtz, new Logger() {
 				
 				@Override
 				public void addText(String message) {
@@ -578,17 +593,26 @@ public class OnlineSyzygy {
 				}
 			});
 			
-			//System.out.println("dtz=" + result[0]);
-			//System.out.println("winner=" + result[1]);
+			System.out.println("winner=" + winner_and_dtz[0] + ", best_move=" + best_move + ", dtz=" + winner_and_dtz[1]);*/
 			
-			if (response != null) {
+			
+			int[] dtz_and_dtm = new int[2];
+			
+			String best_move = getDTZandDTM_BlockingOnSocketConnection(fen, board.getColourToMove(), dtz_and_dtm, new Logger() {
 				
-				System.out.println("Try " + (counter + 1) + ": OK");
+				@Override
+				public void addText(String message) {
+					System.out.println(message);
+				}
 				
-			} else {
-				
-				System.out.println("Try " + (counter + 1) + ": FAILED");
-			}
+				@Override
+				public void addException(Exception exception) {
+					exception.printStackTrace();
+				}
+			});
+			
+			System.out.println("dtz=" + dtz_and_dtm[0] + ", best_move=" + best_move + ", dtm=" + dtz_and_dtm[1]);
+			
 			
 			try {
 				
