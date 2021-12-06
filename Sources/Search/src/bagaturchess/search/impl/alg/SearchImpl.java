@@ -196,7 +196,7 @@ public abstract class SearchImpl implements ISearch {
 	
 	public int getDrawScores(int root_player_colour) {
 		
-		return SearchUtils.getDrawScores(getEnv().getBitboard(), root_player_colour);
+		return SearchUtils.getDrawScores(getEnv().getBitboard().getMaterialFactor(), root_player_colour);
 	}
 	
 	

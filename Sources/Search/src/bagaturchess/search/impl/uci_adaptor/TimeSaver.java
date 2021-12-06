@@ -302,28 +302,37 @@ public class TimeSaver {
 								
 								transposition_table.get(hashkey_before_server_request, tt_entry);
 								
-								final int DRAW_SCORE = SearchUtils.getDrawScores(bitboardForSetup.getMaterialFactor(), -1);
-								
-								//Use online Syzygy if the position evaluation is below this number:
-								final int ONLINE_PROBING_EVAL_THRESHOLD = DRAW_SCORE; //-50; //-1; //May be make it a UCI option?
-								
-								if (!tt_entry.isEmpty() && tt_entry.getEval() <= ONLINE_PROBING_EVAL_THRESHOLD) {
-								
-									//The game is draw in the best case and we go for it
-									info.setEval(0);
+								if (!tt_entry.isEmpty()) {
 									
-									send_move = true;
-									
-									mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is 0 (draw)");
-									
-									stats_online_syzygy_draws++;
+									if (tt_entry.getFlag() == ITTEntry.FLAG_EXACT
+											|| tt_entry.getFlag() == ITTEntry.FLAG_UPPER
+											) {
+
+										final int DRAW_SCORE = SearchUtils.getDrawScores(bitboardForSetup.getMaterialFactor(), -1);
+										
+										//Use online Syzygy if the position evaluation is below this number:
+										final int ONLINE_PROBING_EVAL_THRESHOLD = DRAW_SCORE; //-50; //-1; //May be make it a UCI option?
+										
+										if (tt_entry.getEval() <= ONLINE_PROBING_EVAL_THRESHOLD) {
+										
+											//The game is draw in the best case and we go for it
+											info.setEval(0);
+											
+											send_move = true;
+											
+											mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is 0 (draw)");
+											
+											stats_online_syzygy_draws++;
+										}
+									}
 								}
 							}
 							
 							if (send_move) {
 								
-								mediator.changedMajor(info);
 								mediator.getStopper().markStopped();
+								
+								mediator.changedMajor(info);
 								
 								mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - syzygy move "
 												+ bitboardForSetup.getMoveOps().moveToString(best_move)
@@ -434,8 +443,9 @@ public class TimeSaver {
 							
 							info.setBestMove(best_move);
 							
-							mediator.changedMajor(info);
 							mediator.getStopper().markStopped();
+							
+							mediator.changedMajor(info);
 							
 							mediator.dump("TimeSaver.OfflineSyzygy (OnlineSyzygyServerHandler_WDL): EGTB probing ok - syzygy move "
 											+ bitboardForSetup.getMoveOps().moveToString(best_move)
