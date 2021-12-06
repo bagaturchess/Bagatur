@@ -137,6 +137,7 @@ public class OnlineSyzygy {
 			if (game_category_string != null) {
 				
 				if (game_category_string.equals("\"win\"")
+						|| game_category_string.equals("\"blessed-loss\"")
 						|| game_category_string.equals("\"draw\"")
 						) {
 					
