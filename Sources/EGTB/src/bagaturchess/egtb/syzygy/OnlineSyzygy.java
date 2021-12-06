@@ -56,20 +56,31 @@ public class OnlineSyzygy {
 		//Wait between 2 server requests for 2 reasons:
 		//1) Response could be "Server returned HTTP response code: 429" and there is no sense to try again.
 		//2) There is no sense to send server request if the time per move (which engine/search has) is less than the server response time.
-		//2.1) The minimum waiting time is set to the average server response time + its standard deviation. This has to cover more than 75% of the cases successfully.
+		//2.1) The minimum waiting time (returned by minimalPossibleTime method) is set to the average server response time + its standard deviation. This has to cover more than 75% of the cases successfully.
 		//2.2) Increase the waiting time with factor of 2 (multiply it by 2) if there are request limits reached (e.g. 429 errors).
 		//2.3) Decrease the waiting time with factor of 2 (divide it by 2) after each successful request/response sequence.
-		return (int) (Math.pow(2, current_powerof2_for_waiting_time) * Math.max(15, stat_response_times.getEntropy() + stat_response_times.getDisperse()));
+		return (int) (Math.pow(2, current_powerof2_for_waiting_time) * minimalPossibleTime());
+	}
+
+
+	private static double minimalPossibleTime() {
+		
+		return Math.max(15, stat_response_times.getEntropy() + stat_response_times.getDisperse());
 	}
 	
 	
-	public static final String getDTZandDTM_BlockingOnSocketConnection(String fen, int colour_to_move, int[] result, Logger logger) {
+	public static final String getDTZandDTM_BlockingOnSocketConnection(String fen, int colour_to_move, long timeToThinkInMiliseconds, int[] result, Logger logger) {
 		
 		//If we have pending server request than exit
 		/*if (current_request_url == null) {
 			
 			return null;
 		}*/
+		
+		if (timeToThinkInMiliseconds < minimalPossibleTime() ) {
+			
+			return null;
+		}
 		
 		if (System.currentTimeMillis() <= getWaitingTimeBetweenRequests() + last_server_response_timestamp) {
 			
@@ -232,13 +243,18 @@ public class OnlineSyzygy {
 	}
 	
 	
-	public static final String getWDL_BlockingOnSocketConnection(String fen, int colour_to_move, int[] result, Logger logger) {
+	public static final String getWDL_BlockingOnSocketConnection(String fen, int colour_to_move, long timeToThinkInMiliseconds, int[] result, Logger logger) {
 		
 		//If we have pending server request than exit
 		/*if (current_request_url == null) {
 			
 			return null;
 		}*/
+		
+		if (timeToThinkInMiliseconds < minimalPossibleTime() ) {
+			
+			return null;
+		}
 		
 		if (System.currentTimeMillis() <= getWaitingTimeBetweenRequests() + last_server_response_timestamp) {
 			
@@ -580,7 +596,7 @@ public class OnlineSyzygy {
 			
 			/*int[] winner_and_dtz = new int[2];
 			
-			String best_move = getWDL_BlockingOnSocketConnection(fen, board.getColourToMove(), winner_and_dtz, new Logger() {
+			String best_move = getWDL_BlockingOnSocketConnection(fen, board.getColourToMove(), 500, winner_and_dtz, new Logger() {
 				
 				@Override
 				public void addText(String message) {
@@ -598,7 +614,7 @@ public class OnlineSyzygy {
 			
 			int[] dtz_and_dtm = new int[2];
 			
-			String best_move = getDTZandDTM_BlockingOnSocketConnection(fen, board.getColourToMove(), dtz_and_dtm, new Logger() {
+			String best_move = getDTZandDTM_BlockingOnSocketConnection(fen, board.getColourToMove(), 500, dtz_and_dtm, new Logger() {
 				
 				@Override
 				public void addText(String message) {
