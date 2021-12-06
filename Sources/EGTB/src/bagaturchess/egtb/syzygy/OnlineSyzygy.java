@@ -42,6 +42,8 @@ public class OnlineSyzygy {
 	
 	private static long last_server_response_timestamp 		= 0;
 	
+	private static int MAX_powerof2_for_waiting_time 		= 7;
+	
 	private static int current_powerof2_for_waiting_time 	= 0;
 	
 	private final static VarStatistic stat_response_times 	= new VarStatistic();
@@ -190,6 +192,11 @@ public class OnlineSyzygy {
 			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: " + e.getMessage());
 			
 			current_powerof2_for_waiting_time++;
+			
+			if (current_powerof2_for_waiting_time > MAX_powerof2_for_waiting_time) {
+				
+				current_powerof2_for_waiting_time = MAX_powerof2_for_waiting_time;
+			}
 			
 			stat_waiting_times.addValue(getWaitingTimeBetweenRequests());
 			
@@ -416,6 +423,11 @@ public class OnlineSyzygy {
 			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: " + e.getMessage());
 			
 			current_powerof2_for_waiting_time++;
+			
+			if (current_powerof2_for_waiting_time > MAX_powerof2_for_waiting_time) {
+				
+				current_powerof2_for_waiting_time = MAX_powerof2_for_waiting_time;
+			}
 			
 			stat_waiting_times.addValue(getWaitingTimeBetweenRequests());
 			

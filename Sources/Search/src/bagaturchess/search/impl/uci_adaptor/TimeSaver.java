@@ -21,9 +21,15 @@ import bagaturchess.search.impl.tpt.TTEntry_BaseImpl;
 public class TimeSaver {
 	
 	
-	private static final boolean ENABLE_TB_OFFLINE_PROBING_IN_ROOT_POSITIONS = false;
+	private static final boolean ENABLE_TB_OFFLINE_PROBING_IN_ROOT_POSITIONS 	= false;
 	
-	private static final boolean ENABLE_TB_ONLINE_PROBING_IN_ROOT_POSITIONS = true;
+	private static final boolean ENABLE_TB_ONLINE_PROBING_IN_ROOT_POSITIONS 	= true;
+	
+	private static int stats_online_syzygy_calls 								= 0;
+	
+	private static int stats_online_syzygy_wins 								= 0;
+	
+	private static int stats_online_syzygy_draws 								= 0;
 	
 	
 	private OpeningBook ob;
@@ -213,6 +219,11 @@ public class TimeSaver {
 			
 			mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB Probing ...");
 			
+			mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): PROBING STATISTICS [server_calls=" + stats_online_syzygy_calls
+							+ ", wins=" + stats_online_syzygy_wins
+							+ ", draws=" + stats_online_syzygy_draws
+							+ "]");
+			
 			//We have to keep hashkey and color to move, because board object may change (if move is made).
 			long hashkey_before_server_request = bitboardForSetup.getHashKey();
 			int colour_to_move = bitboardForSetup.getColourToMove();
@@ -242,6 +253,7 @@ public class TimeSaver {
 			
 			mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): url connection terminated in " + (end_time - start_time) + " ms");
 			
+			stats_online_syzygy_calls++;
 			
 			//Make server move (if possible)
 			if (bestmove_string != null) {
@@ -276,6 +288,8 @@ public class TimeSaver {
 								
 								mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is mate in (" + dtm + ") = " + info.getEval());
 								
+								stats_online_syzygy_wins++;
+								
 							} else {
 								
 								ITTable transposition_table = ((UCISearchAdaptorImpl_Base) search_adapter).getSharedData().getTranspositionTableProvider().getTPT();
@@ -297,6 +311,8 @@ public class TimeSaver {
 									send_move = true;
 									
 									mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is 0 (draw)");
+									
+									stats_online_syzygy_draws++;
 								}
 							}
 							
