@@ -21,6 +21,7 @@ import bagaturchess.search.impl.tpt.TTEntry_BaseImpl;
 public class TimeSaver {
 	
 	
+	//Doesn't work well at the moment: plays correct most moves but does't do promotion move and make draw out of winning games.
 	private static final boolean ENABLE_TB_OFFLINE_PROBING_IN_ROOT_POSITIONS 	= false;
 	
 	private static final boolean ENABLE_TB_ONLINE_PROBING_IN_ROOT_POSITIONS 	= true;
@@ -57,6 +58,7 @@ public class TimeSaver {
 			if (entry != null && entry.getWeight() >= OpeningBook.OPENING_BOOK_MIN_MOVES) {
 				
 				int move = 0;
+				
 				switch (openningBook_Mode) {
 				
 					case OpeningBook.OPENING_BOOK_MODE_POWER0:
@@ -121,11 +123,9 @@ public class TimeSaver {
 		}
 		
 		
-		//Doesn't work well at the moment: plays correct most moves but does't do promotion move and make draw from winning games.
 		if (bitboardForSetup.getMaterialState().getPiecesCount() <= 7) {
 			
-			
-			//Try offline probing
+			//Try offline probing for the current position
 			if (ENABLE_TB_OFFLINE_PROBING_IN_ROOT_POSITIONS) {
 				
 				mediator.dump("TimeSaver.OfflineSyzygy: offline probing with TBs on file system...");
@@ -166,8 +166,10 @@ public class TimeSaver {
 			}
 			
 			
+			//Try online probing for the current position
 			if (ENABLE_TB_ONLINE_PROBING_IN_ROOT_POSITIONS && uci_option_UseOnlineSyzygy) {
 				
+				//server currently dosesn't support enpassant move in FEN signature and returns error
 				if (bitboardForSetup.getEnpassantSquareID() == 0) {
 					
 					//Runnable server_request_response_handler = new OnlineSyzygyServerHandler_WDL(bitboardForSetup, mediator);
@@ -211,6 +213,8 @@ public class TimeSaver {
 			mediator = _mediator;
 			
 			timeToThinkInMiliseconds = _timeToThinkInMiliseconds;
+			
+			mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): timeToThinkInMiliseconds = " + _timeToThinkInMiliseconds);
 		}
 		
 		
@@ -298,7 +302,7 @@ public class TimeSaver {
 								
 								transposition_table.get(hashkey_before_server_request, tt_entry);
 								
-								final int DRAW_SCORE = SearchUtils.getDrawScores(bitboardForSetup, -1);
+								final int DRAW_SCORE = SearchUtils.getDrawScores(bitboardForSetup.getMaterialFactor(), -1);
 								
 								//Use online Syzygy if the position evaluation is below this number:
 								final int ONLINE_PROBING_EVAL_THRESHOLD = DRAW_SCORE; //-50; //-1; //May be make it a UCI option?

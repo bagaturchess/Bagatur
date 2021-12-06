@@ -40,9 +40,9 @@ public interface ISearch {
 	
 	public static final int MAX_DEPTH 			= 128;
 	
-	public static final int MAX 				= SearchUtils.getMateVal(0); // MAX_MAT_INTERVAL * (MAX_DEPTH + 1)
+	public static final int MAX 				= ISearch.MAX_MAT_INTERVAL * ISearch.MAX_DEPTH; //+MATE in 1 move
 	
-	public static final int MIN 				= -MAX;
+	public static final int MIN 				= -MAX; //-MATE in 1 move
 	
 	public static final int DRAW_SCORE_O 		= 0;
 	

@@ -23,20 +23,46 @@
 package bagaturchess.search.impl.alg;
 
 
-import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.api.IMaterialFactor;
 import bagaturchess.search.api.internal.ISearch;
 
 
 public class SearchUtils {
 	
 	
-	public static final int normDepth(int maxdepth) {
+	static {
 		
-		return maxdepth / ISearch.PLY;
+		//System.out.println("SearchUtils.static: ISearch.MAX=" + ISearch.MAX);
+		
+		//System.out.println("SearchUtils.static: ISearch.MIN=" + ISearch.MIN);
+		
+		for (int depth = 1; depth <= ISearch.MAX_DEPTH; depth++) {
+			
+			int mate_val = getMateVal(depth);
+			
+			System.out.println("SearchUtils.static: depth=" + depth + ", mate_val=" + mate_val);
+			
+			if (!isMateVal(mate_val)) {
+				
+				throw new IllegalStateException("SearchUtils.static: !isMateVal(mate_val), mate_val=" + mate_val);
+			}
+			
+			int test_depth = getMateDepth(mate_val);
+			
+			if (test_depth != depth) {
+			
+				throw new IllegalStateException("SearchUtils.static: test_depth != depth, test_depth=" + test_depth + ", depth=" + depth);
+			}
+		}
 	}
 	
 	
 	public static final int getMateVal(int depth) {
+		
+		if (depth <= 0) {
+			
+			throw new IllegalStateException("SearchUtils.getMateVal: depth=" + depth);
+		}
 		
 		return ISearch.MAX_MAT_INTERVAL * (1 + ISearch.MAX_DEPTH - Math.min(ISearch.MAX_DEPTH, Math.max(0, depth)));
 	}
@@ -53,42 +79,48 @@ public class SearchUtils {
 		
 		if (score % ISearch.MAX_MAT_INTERVAL != 0) {
 			
-			throw new IllegalStateException();
+			throw new IllegalStateException("SearchUtils.getMateDepth: score % ISearch.MAX_MAT_INTERVAL != 0, score=" + score);
 		}
 		
 		if (score > ISearch.MAX) {
 			
-			throw new IllegalStateException();
+			throw new IllegalStateException("SearchUtils.getMateDepth: score > ISearch.MAX, score=" + score);
 		}
 		
 		if (score < ISearch.MIN) {
 			
-			throw new IllegalStateException();
+			throw new IllegalStateException("SearchUtils.getMateDepth: score < ISearch.MIN, score=" + score);
 		}
 		
 		//Between 1 and ISearch.MAX_DEPTH + 1
 		score = Math.abs(score / ISearch.MAX_MAT_INTERVAL);
 		
-		int depth = 1 + (ISearch.MAX_DEPTH + 1) - score; 
+		int depth = (ISearch.MAX_DEPTH + 1) - score; 
 		
 		return score > 0 ? depth : -depth;
 	}
 	
 	
-	public static int getDrawScores(IBitBoard board, int root_player_colour) {
+	public static int getDrawScores(IMaterialFactor interpolater_by_material_facotr, int root_player_colour) {
 		
 		if (root_player_colour != -1) {
 			
 			throw new IllegalStateException();
 		}
 		
-		int scores = board.getMaterialFactor().interpolateByFactor(ISearch.DRAW_SCORE_O, ISearch.DRAW_SCORE_E);
+		int scores = interpolater_by_material_facotr.interpolateByFactor(ISearch.DRAW_SCORE_O, ISearch.DRAW_SCORE_E);
 		
-		if (board.getColourToMove() != root_player_colour) {
+		/*if (board.getColourToMove() != root_player_colour) {
 			
 			scores = -scores;
-		}
+		}*/
 		
 		return scores;
+	}
+	
+	
+	public static final int normDepth(int maxdepth) {
+		
+		return maxdepth / ISearch.PLY;
 	}
 }

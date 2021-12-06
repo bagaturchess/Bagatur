@@ -159,19 +159,15 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor_Ext
 		
 		if (!currentGoCommand.isPonder()) {
 			
-			boolean moveSent = false;
+			currentMediator.dump("Using TimeSaver ...");
 			
-			if (saver != null) {
-				
-				currentMediator.dump("Using TimeSaver ...");
-				
-				moveSent = saver.beforeMove(boardForSetup,
-						sharedData.getSearchConfig().getOpeningBook_Mode(),
-						currentMediator,
-						searchAdaptorCfg.isOwnBookEnabled(),
-						((IRootSearchConfig) searchAdaptorCfg.getRootSearchConfig()).useOnlineSyzygy(),
-						timeController.getRemainningTime());
-			}
+			
+			boolean moveSent = saver.beforeMove(boardForSetup,
+					sharedData.getSearchConfig().getOpeningBook_Mode(),
+					currentMediator,
+					searchAdaptorCfg.isOwnBookEnabled(),
+					((IRootSearchConfig) searchAdaptorCfg.getRootSearchConfig()).useOnlineSyzygy(),
+					timeController.getRemainningTime());
 			
 			if (!moveSent) {
 				

@@ -50,7 +50,13 @@ public class OnlineSyzygy {
 	
 	private final static VarStatistic stat_waiting_times 	= new VarStatistic();
 	
-	//private static URL current_request_url 				= null;
+	static {
+		
+		for (int i = 0; i < 10; i++) {
+			
+			stat_response_times.addValue(111); //9.009009009... requests per second
+		}
+	}
 	
 	
 	private static final int getWaitingTimeBetweenRequests() {
@@ -61,11 +67,11 @@ public class OnlineSyzygy {
 		//2.1) The minimum waiting time (returned by minimalPossibleTime method) is set to the average server response time + its standard deviation. This has to cover more than 75% of the cases successfully.
 		//2.2) Increase the waiting time with factor of 2 (multiply it by 2) if there are request limits reached (e.g. 429 errors).
 		//2.3) Decrease the waiting time with factor of 2 (divide it by 2) after each successful request/response sequence.
-		return (int) (Math.pow(2, current_powerof2_for_waiting_time) * minimalPossibleTime());
+		return (int) (Math.pow(2, current_powerof2_for_waiting_time) * minimalPossibleWaitingTime());
 	}
 
 
-	private static double minimalPossibleTime() {
+	private static double minimalPossibleWaitingTime() {
 		
 		return Math.max(15, stat_response_times.getEntropy() + stat_response_times.getDisperse());
 	}
@@ -79,12 +85,12 @@ public class OnlineSyzygy {
 			return null;
 		}*/
 		
-		if (timeToThinkInMiliseconds < minimalPossibleTime() ) {
+		if (timeToThinkInMiliseconds < minimalPossibleWaitingTime() ) {
 			
 			return null;
 		}
 		
-		if (System.currentTimeMillis() <= getWaitingTimeBetweenRequests() + last_server_response_timestamp) {
+		if (System.currentTimeMillis() <= last_server_response_timestamp + getWaitingTimeBetweenRequests()) {
 			
 			return null;
 		}
@@ -258,12 +264,12 @@ public class OnlineSyzygy {
 			return null;
 		}*/
 		
-		if (timeToThinkInMiliseconds < minimalPossibleTime() ) {
+		if (timeToThinkInMiliseconds < minimalPossibleWaitingTime() ) {
 			
 			return null;
 		}
 		
-		if (System.currentTimeMillis() <= getWaitingTimeBetweenRequests() + last_server_response_timestamp) {
+		if (System.currentTimeMillis() <= last_server_response_timestamp + getWaitingTimeBetweenRequests()) {
 			
 			return null;
 		}
@@ -534,6 +540,8 @@ public class OnlineSyzygy {
 		return attribute_value;
 	}
 	
+	
+	//private static URL current_request_url 				= null;
 	
 	private static String getHTMLFromURL(String urlToRead) throws Exception {
 
