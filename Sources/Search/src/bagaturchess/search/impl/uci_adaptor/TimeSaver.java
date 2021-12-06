@@ -376,7 +376,7 @@ public class TimeSaver {
 								
 								send_move = true;
 								
-								mediator.dump("TimeSaver.OfflineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is mate in (" + dtm + ") = " + info.getEval());
+								mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is mate in (" + dtm + ") = " + info.getEval());
 								
 							} else {
 								
@@ -393,7 +393,7 @@ public class TimeSaver {
 									
 									send_move = true;
 									
-									mediator.dump("TimeSaver.OfflineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is 0 (draw)");
+									mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is 0 (draw)");
 								}
 							}
 							
@@ -402,19 +402,19 @@ public class TimeSaver {
 								mediator.changedMajor(info);
 								mediator.getStopper().markStopped();
 								
-								mediator.dump("TimeSaver.OfflineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - syzygy move "
+								mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - syzygy move "
 												+ bitboardForSetup.getMoveOps().moveToString(best_move)
 												+ " set and search is marked for stopping.");
 							}
 							
 						} else {
 							
-							mediator.dump("TimeSaver.OfflineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): Syzygy move NOT send to UCI, because mediator.getStopper().isStopped() is true, which means the search has over.");
+							mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): Syzygy move NOT send to UCI, because mediator.getStopper().isStopped() is true, which means the search has over.");
 						}
 						
 					} else {
 						
-						mediator.dump("OnlineSyzygy.OfflineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): Syzygy move NOT send to UCI, because bitboardForSetup.getHashKey() == hashkey_before_server_request, which means the best move is already made by the search.");
+						mediator.dump("OnlineSyzygy.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): Syzygy move NOT send to UCI, because bitboardForSetup.getHashKey() == hashkey_before_server_request, which means the best move is already made by the search.");
 					}
 					
 				} catch (NumberFormatException nfe) {

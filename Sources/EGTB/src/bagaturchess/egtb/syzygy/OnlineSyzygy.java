@@ -38,37 +38,40 @@ import bagaturchess.bitboard.impl.utils.VarStatistic;
 public class OnlineSyzygy {
 	
 	
-	private static final String CHARSET_ENCODING = "UTF-8";
+	private static final String CHARSET_ENCODING 			= "UTF-8";
+	
+	private static long last_server_response_timestamp 		= 0;
+	
+	private static int current_powerof2_for_waiting_time 	= 0;
+	
+	private final static VarStatistic stat_response_times 	= new VarStatistic();
+	
+	private final static VarStatistic stat_waiting_times 	= new VarStatistic();
+	
+	//private static URL current_request_url 				= null;
 	
 	
-	//We have to wait between each server request,
-	//because otherwise we got "Server returned HTTP response code: 429"
-	private static int[] WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS = new int[] {
-			500,
-			1000,
-			2 * 1000,
-			4 * 1000,
-			8 * 1000,
-			16 * 1000,
-			32 * 1000,
-			64 * 1000
-		};
-	
-	private static int current_index_for_waiting_time = 0;
-	
-	
-	private static long last_server_response_timestamp = 0;
-	
-	
-	private final static VarStatistic stat_response_times = new VarStatistic();
-	
-	
-	private final static VarStatistic stat_waiting_times = new VarStatistic();
+	private static final int getWaitingTimeBetweenRequests() {
+		
+		//Wait between 2 server requests for 2 reasons:
+		//1) Response could be "Server returned HTTP response code: 429" and there is no sense to try again.
+		//2) There is no sense to send server request if the time per move (which engine/search has) is less than the server response time.
+		//2.1) The minimum waiting time is set to the average server response time + its standard deviation. This has to cover more than 75% of the cases successfully.
+		//2.2) Increase the waiting time with factor of 2 (multiply it by 2) if there are request limits reached (e.g. 429 errors).
+		//2.3) Decrease the waiting time with factor of 2 (divide it by 2) after each successful request/response sequence.
+		return (int) (Math.pow(2, current_powerof2_for_waiting_time) * Math.max(15, stat_response_times.getEntropy() + stat_response_times.getDisperse()));
+	}
 	
 	
 	public static final String getDTZandDTM_BlockingOnSocketConnection(String fen, int colour_to_move, int[] result, Logger logger) {
 		
-		if (System.currentTimeMillis() <= WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time] + last_server_response_timestamp) {
+		//If we have pending server request than exit
+		/*if (current_request_url == null) {
+			
+			return null;
+		}*/
+		
+		if (System.currentTimeMillis() <= getWaitingTimeBetweenRequests() + last_server_response_timestamp) {
 			
 			return null;
 		}
@@ -89,16 +92,16 @@ public class OnlineSyzygy {
 			
 			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: json_response_text=" + server_response_json_text);
 			
-			current_index_for_waiting_time--;
+			current_powerof2_for_waiting_time--;
 			
-			if (current_index_for_waiting_time < 0) {
+			if (current_powerof2_for_waiting_time < 0) {
 				
-				current_index_for_waiting_time = 0;
+				current_powerof2_for_waiting_time = 0;
 			}
 			
-			stat_waiting_times.addValue(WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time]);
+			stat_waiting_times.addValue(getWaitingTimeBetweenRequests());
 			
-			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: current_index_for_waiting_time set to " + current_index_for_waiting_time);
+			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: current_powerof2_for_waiting_time set to " + current_powerof2_for_waiting_time);
 			
 			stat_response_times.addValue(System.currentTimeMillis() - last_server_response_timestamp);
 			
@@ -128,41 +131,41 @@ public class OnlineSyzygy {
 			}*/
 			
 			
-			String game_category_string = extractJSONAttribute(logger, server_response_json_text, "\"category\":"); //Possible outcomes are "win", "draw" and "loss"
+			//Possible outcomes are "win", "draw", "loss", "blessed-loss", "cursed-win"
+			String game_category_string = extractJSONAttribute(logger, server_response_json_text, "\"category\":");
 			
 			if (game_category_string != null) {
 				
-				int[] dtz_and_dtm = extractDTZandDTM(logger, server_response_json_text);
-				
-				result[0] = dtz_and_dtm[0];
-				result[1] = dtz_and_dtm[1];
-				
-				String first_array_string = extractFirstJSONArray(logger, server_response_json_text);
-				
-				//System.out.println("first_array_string=" + first_array_string);
-				
-				String[] array_elements = extractJSONArrayElements(logger, first_array_string);
-				
-				if (array_elements.length > 0) {						
+				if (game_category_string.equals("\"win\"")
+						|| game_category_string.equals("\"draw\"")
+						) {
 					
-					String array_element = array_elements[0];
+					int[] dtz_and_dtm = extractDTZandDTM(logger, server_response_json_text);
 					
-					//System.out.println("first_array_element_string=" + array_element);
-				
-					//The uci moves list is ordered - the first line of the response contains the best move
-					bestmove_string = extractJSONAttribute(logger, array_element, "\"uci\":"); //"uci":"d1c2",
+					result[0] = dtz_and_dtm[0];
+					result[1] = dtz_and_dtm[1];
 					
-					if (bestmove_string != null) {
+					String first_array_string = extractFirstJSONArray(logger, server_response_json_text);
+					
+					//System.out.println("first_array_string=" + first_array_string);
+					
+					String[] array_elements = extractJSONArrayElements(logger, first_array_string);
+					
+					if (array_elements.length > 0) {						
 						
-						bestmove_string = bestmove_string.replace("\"", ""); //The value is quoted
+						String array_element = array_elements[0];
 						
-						logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: bestmove_string=" + bestmove_string);
+						//System.out.println("first_array_element_string=" + array_element);
+					
+						//The uci moves list is ordered - the first line of the response contains the best move
+						bestmove_string = extractJSONAttribute(logger, array_element, "\"uci\":"); //"uci":"d1c2",
 						
-						/*if (game_category_string.equals("\"win\"")) {
+						if (bestmove_string != null) {
 							
-						} else if (game_category_string.equals("\"draw\"")) {
+							bestmove_string = bestmove_string.replace("\"", ""); //The value is quoted
 							
-						}*/
+							logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: bestmove_string=" + bestmove_string);
+						}
 					}
 				}
 			}
@@ -174,16 +177,11 @@ public class OnlineSyzygy {
 			
 			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: " + e.getMessage());
 			
-			current_index_for_waiting_time++;
+			current_powerof2_for_waiting_time++;
 			
-			if (current_index_for_waiting_time > WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS.length - 1) {
-				
-				current_index_for_waiting_time = WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS.length - 1;
-			}
+			stat_waiting_times.addValue(getWaitingTimeBetweenRequests());
 			
-			stat_waiting_times.addValue(WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time]);
-			
-			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: current_index_for_waiting_time set to " + current_index_for_waiting_time);
+			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: current_powerof2_for_waiting_time set to " + current_powerof2_for_waiting_time);
 		}
 		
 		
@@ -235,7 +233,13 @@ public class OnlineSyzygy {
 	
 	public static final String getWDL_BlockingOnSocketConnection(String fen, int colour_to_move, int[] result, Logger logger) {
 		
-		if (System.currentTimeMillis() <= WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time] + last_server_response_timestamp) {
+		//If we have pending server request than exit
+		/*if (current_request_url == null) {
+			
+			return null;
+		}*/
+		
+		if (System.currentTimeMillis() <= getWaitingTimeBetweenRequests() + last_server_response_timestamp) {
 			
 			return null;
 		}
@@ -255,16 +259,16 @@ public class OnlineSyzygy {
 			
 			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: server_response_json_text=" + server_response_json_text);
 			
-			current_index_for_waiting_time--;
+			current_powerof2_for_waiting_time--;
 			
-			if (current_index_for_waiting_time < 0) {
+			if (current_powerof2_for_waiting_time < 0) {
 				
-				current_index_for_waiting_time = 0;
+				current_powerof2_for_waiting_time = 0;
 			}
 			
-			stat_waiting_times.addValue(WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time]);
+			stat_waiting_times.addValue(getWaitingTimeBetweenRequests());
 			
-			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: current_index_for_waiting_time set to " + current_index_for_waiting_time);
+			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: current_powerof2_for_waiting_time set to " + current_powerof2_for_waiting_time);
 			
 			stat_response_times.addValue(System.currentTimeMillis() - last_server_response_timestamp);
 			
@@ -394,16 +398,11 @@ public class OnlineSyzygy {
 			
 			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: " + e.getMessage());
 			
-			current_index_for_waiting_time++;
+			current_powerof2_for_waiting_time++;
 			
-			if (current_index_for_waiting_time > WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS.length - 1) {
-				
-				current_index_for_waiting_time = WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS.length - 1;
-			}
+			stat_waiting_times.addValue(getWaitingTimeBetweenRequests());
 			
-			stat_waiting_times.addValue(WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time]);
-			
-			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: current_index_for_waiting_time set to " + current_index_for_waiting_time);
+			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: current_powerof2_for_waiting_time set to " + current_powerof2_for_waiting_time);
 		}
 		
 		
@@ -509,17 +508,17 @@ public class OnlineSyzygy {
 	
 	private static String getHTMLFromURL(String urlToRead) throws Exception {
 
-		URL url = new URL(urlToRead);
+		URL current_request_url = new URL(urlToRead);
 		
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		HttpURLConnection conn = (HttpURLConnection) current_request_url.openConnection();
 		conn.setConnectTimeout(5 * 60 * 1000); // 0 = Infinite
 		conn.setRequestProperty("Connection", "keep-alive");
 		conn.setRequestProperty("Content-Type", "application/json; utf-8");
 		conn.setRequestMethod("GET");
 		
 		byte[] bytes = readAllBytes(conn);
-
-		//conn.disconnect();
+		
+		current_request_url = null;
 		
 		String html = new String(bytes, Charset.forName(CHARSET_ENCODING));
 
@@ -616,9 +615,9 @@ public class OnlineSyzygy {
 			
 			try {
 				
-				System.out.println("Waiting " + WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time] + " ms");
+				System.out.println("Waiting " + getWaitingTimeBetweenRequests() + " ms");
 				
-				Thread.sleep(WAITING_TIME_BETWEEN_REQUESTS_IN_MILISECONDS[current_index_for_waiting_time]);
+				Thread.sleep(getWaitingTimeBetweenRequests());
 				
 			} catch (InterruptedException e) {}
 		}
