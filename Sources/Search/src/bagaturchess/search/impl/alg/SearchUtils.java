@@ -79,7 +79,36 @@ public class SearchUtils {
 		
 		if (score % ISearch.MAX_MAT_INTERVAL != 0) {
 			
-			throw new IllegalStateException("SearchUtils.getMateDepth: score % ISearch.MAX_MAT_INTERVAL != 0, score=" + score);
+			//throw new IllegalStateException("SearchUtils.getMateDepth: score % ISearch.MAX_MAT_INTERVAL != 0, score=" + score);
+			//TODO: check why this is thrown
+			//More info:
+			/*info string java.lang.IllegalStateException: SearchUtils.getMateDepth: score % ISearch.MAX_MAT_INTERVAL != 0, score=-12700008
+					info string 	at bagaturchess.search.impl.alg.SearchUtils.getMateDepth(Unknown Source)
+					info string 	at bagaturchess.search.impl.info.SearchInfoImpl.getMateScore(Unknown Source)
+					info string 	at bagaturchess.search.api.internal.SearchInfoUtils.buildMajorInfoCommand(Unknown Source)
+					info string 	at bagaturchess.search.api.internal.SearchInfoUtils.buildMajorInfoCommand(Unknown Source)
+					info string 	at bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_Base.changedMajor(Unknown Source)
+					info string 	at bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch.changedMajor(Unknown Source)
+					info string 	at bagaturchess.search.impl.utils.SearchMediatorProxy.changedMajor(Unknown Source)
+					info string 	at bagaturchess.search.impl.rootsearch.sequential.mtd.Mediator_AlphaAndBestMoveWindow.changedMajor(Unknown Source)
+					info string 	at bagaturchess.search.impl.utils.SearchMediatorProxy.changedMajor(Unknown Source)
+					info string 	at bagaturchess.search.impl.rootsearch.sequential.NPSCollectorMediator.changedMajor(Unknown Source)
+					info string 	at bagaturchess.search.impl.rootsearch.sequential.mtd.SearchManager.increaseLowerBound(Unknown Source)
+					info string 	at bagaturchess.search.impl.rootsearch.sequential.mtd.NullwinSearchTask.run(Unknown Source)
+					info string 	at bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD$1.run(Unknown Source)
+					info string 	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+					info string 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+					info string 	at java.lang.Thread.run(Unknown Source)
+					*/
+			
+			if (score >= 0) {
+				
+				score += ISearch.MAX_MAT_INTERVAL / 2;
+				
+			} else {
+				
+				score -= ISearch.MAX_MAT_INTERVAL / 2;
+			}
 		}
 		
 		if (score > ISearch.MAX) {

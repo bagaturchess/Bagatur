@@ -314,7 +314,7 @@ public class TimeSaver {
 										final int ONLINE_PROBING_EVAL_THRESHOLD = DRAW_SCORE; //-50; //-1; //May be make it a UCI option?
 										
 										if (tt_entry.getEval() <= ONLINE_PROBING_EVAL_THRESHOLD) {
-										
+											
 											//The game is draw in the best case and we go for it
 											info.setEval(0);
 											

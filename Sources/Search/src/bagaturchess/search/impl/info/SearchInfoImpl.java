@@ -22,6 +22,7 @@
  */
 package bagaturchess.search.impl.info;
 
+import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.impl.alg.SearchUtils;
 
@@ -123,7 +124,8 @@ public class SearchInfoImpl implements ISearchInfo {
 	}
 
 	public int getMateScore() {
-		return SearchUtils.getMateDepth((eval + 1) / 2);
+		//eval + ISearch.MAX_MAT_INTERVAL / 2
+		return ((SearchUtils.getMateDepth(eval) + 1) / 2);
 	}
 
 	public boolean isMateScore() {
