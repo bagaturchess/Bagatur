@@ -73,13 +73,17 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int[] RAZORING_MARGIN 					= { 0, 240, 280, 300 };
 	private static final int[] FUTILITY_MARGIN 					= { 0, 80, 170, 270, 380, 500, 630 };
 	private static final int FUTILITY_MARGIN_Q_SEARCH_ATTACKS 	= 100;
-	private static final int FUTILITY_MARGIN_Q_SEARCH_QUIET		= 35;
+	//private static final int FUTILITY_MARGIN_Q_SEARCH_QUIET		= 35;
 	
 	private static final int[][] LMR_TABLE 						= new int[64][64];
+	
 	static {
+		
 		for (int depth = 1; depth < 64; depth++) {
+			
 			for (int moveNumber = 1; moveNumber < 64; moveNumber++) {
-				LMR_TABLE[depth][moveNumber] = 1 + (int) Math.ceil(Math.max(1, Math.log(moveNumber) * Math.log(depth) / (double) 2));
+				
+				LMR_TABLE[depth][moveNumber] = (int) Math.ceil(Math.max(1, Math.log(moveNumber) * Math.log(depth) / (double) 2));
 			}
 		}
 	}
@@ -737,10 +741,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int reduction = 1;
 				if (depth >= 2
-						//&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& movesPerformed_quiet > 1
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						//&& movesPerformed_quiet > 1
 						&& phase == PHASE_QUIET
-						&& moveGen.getScore() <= historyAVGScores.getEntropy()
+						//&& moveGen.getScore() <= historyAVGScores.getEntropy()
 						) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
@@ -938,13 +942,13 @@ public class Search_PVS_NWS extends SearchImpl {
 					moveGen.setMVVLVAScores(cb);
 					moveGen.sort();
 					break;
-				case PHASE_QUIET:
+				/*case PHASE_QUIET:
 					if (eval + FUTILITY_MARGIN_Q_SEARCH_QUIET >= alpha) {
 						moveGen.generateMoves(cb);
 						moveGen.setHHScores(cb.colorToMove, parentMove);
 						moveGen.sort();
 					}
-					break;
+					break;*/
 			}
 			
 			while (moveGen.hasNext()) {
@@ -970,7 +974,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
 						continue;
 					}
-				} else {
+				} /*else {
 					countNotAttacking++;
 					if (countNotAttacking >= 3) {
 						break;
@@ -978,7 +982,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (eval + FUTILITY_MARGIN_Q_SEARCH_QUIET < alpha) {
 						continue;
 					}
-				}
+				}*/
 				
 				cb.doMove(move);
 				
