@@ -147,8 +147,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
 				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true, 0);
-		//return rootSearch(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-		//		((BoardImpl) env.getBitboard()).getMoveGenerator(), normDepth(maxdepth), alpha_org, beta, true);
 	}
 	
 	
@@ -160,9 +158,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
 		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, 0);	
-		//return rootSearch(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-		//		((BoardImpl) env.getBitboard()).getMoveGenerator(), normDepth(maxdepth), beta - 1, beta, false);		
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, 0);		
 	}
 	
 	
@@ -741,16 +737,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int reduction = 1;
 				if (depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						//&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& movesPerformed_quiet > 1
 						&& phase == PHASE_QUIET
 						&& moveGen.getScore() <= historyAVGScores.getEntropy()
 						) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
-					
-					if (!isPv) {
-						reduction += 1;
-					}
 					
 					reduction += singularMoveExtension;
 					reduction += multiCutReduction;
