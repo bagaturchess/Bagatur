@@ -434,8 +434,6 @@ public class Search_PVS_NWS extends SearchImpl {
         }
 		
 		
-		
-		
 		if (depth == 0) {
 			int qeval = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha, beta, ply, isPv);
 			node.bestmove = 0;
@@ -461,9 +459,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 			
-			if (ttFlag == -1 && depth >= 2) {
+			/*if (ttFlag == -1 && depth >= 2) {
 				depth -= 1;
-			}
+			}*/
 			
 			if (eval >= beta) {
 				
@@ -871,7 +869,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 	    if (isDraw()) {
-	    	return getDrawScores(-1); //EvalConstants.SCORE_DRAW;
+	    	return getDrawScores(-1);
 	    }
 	    
 	    int ttValue = 0;
