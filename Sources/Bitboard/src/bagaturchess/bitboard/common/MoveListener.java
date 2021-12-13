@@ -22,11 +22,18 @@
  */
 package bagaturchess.bitboard.common;
 
+
 public interface MoveListener {
-	public void addPiece_Special(int pid, int fieldID);
-	public void initially_addPiece(int pid, int fieldID);
-	public void preForwardMove(int move);
-	public void postForwardMove(int move);
-	public void preBackwardMove(int move);
-	public void postBackwardMove(int move);
+	
+	public void addPiece_Special(int color, int type);
+	
+	public void initially_addPiece(int color, int type);
+	
+	public void preForwardMove(int color, int move);
+	
+	public void postForwardMove(int color, int move);
+	
+	public void preBackwardMove(int color, int move);
+	
+	public void postBackwardMove(int color, int move);
 }

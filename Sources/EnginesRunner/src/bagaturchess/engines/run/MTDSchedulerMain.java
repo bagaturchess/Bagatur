@@ -177,9 +177,11 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/8/1k2Kp2/5P2/8/2b5/8/8 w - - 0 1", cfg.getBoardConfig());
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("k7/8/4Kp2/5P2/8/6b1/8/8 b - - 0 1", cfg.getBoardConfig());
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/p6p/1pk3p1/2n2p2/P1n5/2NN1K1P/5PP1/8 w - - 4 4", cfg.getBoardConfig());
+		
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
-		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5q2/1p1K3p/7P/2k3P1/8/8/8 b - - 0 48", cfg.getBoardConfig());
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5n2/3n3p/7K/5k2/8/5P1N/8 w - - 0 1", cfg.getBoardConfig());
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5q2/1p1K3p/7P/2k3P1/8/8/8 b - - 0 48", cfg.getBoardConfig());
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5n2/3n3p/7K/5k2/8/5P1N/8 w - - 0 1", cfg.getBoardConfig());
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5n2/8/8/6kp/4K3/8/8 b - - 0 1", cfg.getBoardConfig()); //g4g3
 		
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 		//IBitBoard bitboard = new Board("4r3/4rk2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB draw

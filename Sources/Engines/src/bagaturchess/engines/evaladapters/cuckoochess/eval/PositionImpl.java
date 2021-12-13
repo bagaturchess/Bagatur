@@ -6,7 +6,7 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Bits;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.eval.PSTConstants;
+import bagaturchess.bitboard.impl.eval.PSTs;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.engines.evaladapters.cuckoochess.BitBoard;
 import bagaturchess.engines.evaladapters.cuckoochess.Evaluate;
@@ -30,12 +30,12 @@ class PositionImpl implements IPosition {
 	
 	
 	private IBitBoard board;
-	private PSTConstants pst;
+	private PSTs pst;
 	
 	
 	PositionImpl(IBitBoard _board) {
 		board = _board;
-		pst = new PSTConstants(board.getBoardConfig());
+		pst = new PSTs(board.getBoardConfig());
 	}
 	
 	

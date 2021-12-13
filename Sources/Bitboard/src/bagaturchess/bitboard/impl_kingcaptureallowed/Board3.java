@@ -558,7 +558,7 @@ abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 		if (eval != null) eval.move(move);
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
-				moveListeners[i].preForwardMove(move);
+				moveListeners[i].preForwardMove(MoveInt.getColour(move), move);
 			}
 		}
 		
@@ -839,7 +839,7 @@ abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 		
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
-				moveListeners[i].postForwardMove(move);
+				moveListeners[i].postForwardMove(MoveInt.getColour(move), move);
 			}
 		}
 		
@@ -863,7 +863,7 @@ abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 		if (eval != null) eval.unmove(move);
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
-				moveListeners[i].preBackwardMove(move);
+				moveListeners[i].preBackwardMove(MoveInt.getColour(move), move);
 			}
 		}
 		
@@ -954,7 +954,7 @@ abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 		
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
-				moveListeners[i].postBackwardMove(move);
+				moveListeners[i].postBackwardMove(MoveInt.getColour(move), move);
 			}
 		}
 		

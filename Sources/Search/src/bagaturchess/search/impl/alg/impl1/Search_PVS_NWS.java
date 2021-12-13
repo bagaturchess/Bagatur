@@ -81,9 +81,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		for (int depth = 1; depth < 64; depth++) {
 			
-			for (int moveNumber = 1; moveNumber < 64; moveNumber++) {
+			for (int move_number = 1; move_number < 64; move_number++) {
 				
-				LMR_TABLE[depth][moveNumber] = (int) Math.ceil(Math.max(1, Math.log(moveNumber) * Math.log(depth) / (double) 2));
+				LMR_TABLE[depth][move_number] = (int) Math.ceil(Math.max(1, Math.log(move_number) * Math.log(depth) / (double) 2));
 			}
 		}
 	}
@@ -198,7 +198,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 	    if ((isPv && isDrawPV(ply)) || (!isPv && isDraw())) {
 	    	
-	    	node.eval = getDrawScores(-1); //node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
+	    	node.eval = getDrawScores(-1);
 	    			
 	    	return node.eval;
 	    }
@@ -264,8 +264,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
-		
-		
 		
 		
 		if (ply >= 5
@@ -466,14 +464,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (eval >= beta) {
 				
 				
-				/*if (eval >= beta + 8 * getTrustWindow(mediator, depth)) {
-					node.bestmove = 0;
-					node.eval = eval;
-					node.leaf = true;
-					return node.eval;
-				}*/
-				
-				
 				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < STATIC_NULLMOVE_MARGIN.length) {
 					if (eval - STATIC_NULLMOVE_MARGIN[depth] >= beta) {
 						node.bestmove = 0;
@@ -501,19 +491,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 			} else if (eval <= alpha && !SearchUtils.isMateVal(alpha)) {
-				
-				
-				//Razoring like reduction for all depths based on the eval deviation detected into the root node
-				/*int rbeta = alpha - 8 * getTrustWindow(mediator, depth);
-				if (eval < rbeta) {
-					int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, rbeta, rbeta + 1, ply, isPv);
-					if (score <= rbeta) {
-						node.bestmove = 0;
-						node.eval = score;
-						node.leaf = true;
-						return node.eval;
-					}
-				}*/
 				
 				
 				if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length) {
@@ -722,7 +699,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
-				cb.doMove(move);
+				env.getBitboard().makeMoveForward(move);
 				if (MoveUtil.isQuiet(move)) {
 					movesPerformed_quiet++;
 				} else {
@@ -742,10 +719,14 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						//&& movesPerformed_quiet > 1
 						&& phase == PHASE_QUIET
-						//&& moveGen.getScore() <= historyAVGScores.getEntropy()
+						&& moveGen.getScore() <= historyAVGScores.getEntropy()
 						) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
+					
+					if (!isPv) {
+						reduction += 1;
+					}
 					
 					reduction += singularMoveExtension;
 					reduction += multiCutReduction;
@@ -774,7 +755,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					throw sie;
 				}
 				
-				cb.undoMove(move);
+				env.getBitboard().makeMoveBackward(move);
 				
 				if (MoveUtil.isQuiet(move) && cb.checkingPieces == 0) {
 					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
@@ -911,7 +892,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			return eval;
 		}
 		
-		if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + EvalConstants.MATERIAL[ChessConstants.QUEEN] < alpha) {
+		int material_queen = (int) Math.max(getEnv().getBitboard().getBoardConfig().getMaterial_QUEEN_O(), getEnv().getBitboard().getBoardConfig().getMaterial_QUEEN_E());
+		
+		if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + material_queen < alpha) {
 			return eval;
 		}
 		
@@ -970,7 +953,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
-					if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + EvalConstants.MATERIAL[MoveUtil.getAttackedPieceIndex(move)] < alpha) {
+					
+					int material_gain = getEnv().getBitboard().getBaseEvaluation().getMaterialGain(move);
+					
+					if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + material_gain < alpha) {
 						continue;
 					}
 				} /*else {
@@ -983,11 +969,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}*/
 				
-				cb.doMove(move);
+				env.getBitboard().makeMoveForward(move);
 				
 				final int score = -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -alpha, ply + 1, isPv);
 				
-				cb.undoMove(move);
+				env.getBitboard().makeMoveBackward(move);
 				
 				if (score > bestScore) {
 					

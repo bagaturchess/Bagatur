@@ -58,7 +58,7 @@ public class Bagatur_V20_SignalFiller implements ISignalFiller {
 		
 		IEvalComponentsProcessor evalComponentsProcessor = new EvalComponentsProcessor(signals);
 		
-		Evaluator.eval1(board, evalInfo, evalComponentsProcessor);
+		Evaluator.eval1(bitboard.getBoardConfig(), board, evalInfo, evalComponentsProcessor);
 		Evaluator.eval2(board, evalInfo, evalComponentsProcessor);
 		Evaluator.eval3(board, evalInfo, evalComponentsProcessor);
 		Evaluator.eval4(board, evalInfo, evalComponentsProcessor);

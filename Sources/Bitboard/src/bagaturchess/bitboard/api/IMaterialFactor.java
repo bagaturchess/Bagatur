@@ -23,7 +23,10 @@
 package bagaturchess.bitboard.api;
 
 
-public interface IMaterialFactor {
+import bagaturchess.bitboard.common.MoveListener;
+
+
+public interface IMaterialFactor extends MoveListener {
 	
 	public int getBlackFactor();
 	public int getWhiteFactor();	

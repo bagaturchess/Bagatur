@@ -20,22 +20,20 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.bitboard.impl.eval;
+package bagaturchess.bitboard.impl1;
 
 
 import bagaturchess.bitboard.api.IBaseEval;
+import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
-import bagaturchess.bitboard.api.IMaterialFactor;
 import bagaturchess.bitboard.common.MoveListener;
-import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 
 
 public class BaseEvaluation implements MoveListener, IBaseEval {
 	
 	
-	private static final int[] HORIZONTAL_SYMMETRY = Utils.reverseSpecial ( new int[]{	
+	/*private static final int[] HORIZONTAL_SYMMETRY = Utils.reverseSpecial ( new int[]{	
 			   0,   1,   2,   3,   4,   5,   6,   7,
 			   8,   9,  10,  11,  12,  13,  14,  15,
 			  16,  17,  18,  19,  20,  21,  22,  23,
@@ -45,7 +43,13 @@ public class BaseEvaluation implements MoveListener, IBaseEval {
 			  48,  49,  50,  51,  52,  53,  54,  55,
 			  56,  57,  58,  59,  60,  61,  62,  63,
 
-	});
+	});*/
+	
+	private IBitBoard board;
+	
+	private IBoardConfig boardConfig;
+	
+	//private PSTs pst;
 	
 	private double w_material_nopawns_o;
 	private double b_material_nopawns_o;
@@ -62,15 +66,14 @@ public class BaseEvaluation implements MoveListener, IBaseEval {
 	private double whitePST_e;
 	private double blackPST_e;
 	
-	private IBoardConfig boardConfig;
-	private PSTs pst;
-	private IMaterialFactor interpolator;
 	
-	
-	public BaseEvaluation(IBoardConfig _boardConfig, IMaterialFactor _interpolator) {
+	public BaseEvaluation(IBoardConfig _boardConfig, IBitBoard _board) {
+		
 		boardConfig = _boardConfig;
-		interpolator = _interpolator;
-		pst = new PSTs(boardConfig);
+		
+		board = _board;
+		
+		//pst = new PSTs(boardConfig);
 		
 		w_material_nopawns_o = 0;
 		b_material_nopawns_o = 0;
@@ -147,36 +150,35 @@ public class BaseEvaluation implements MoveListener, IBaseEval {
 		return (int) boardConfig.getMaterial_BARIER_NOPAWNS_E();
 	}
 	
-	public void move(int move) {
+	public void move(int move, int color) {
 		
-		int col = MoveInt.getColour(move);
-		int toFieldID = MoveInt.getToFieldID(move);
+		/*int toFieldID = board.getMoveOps().getToFieldID(move);
 		
-		if (col == Figures.COLOUR_WHITE) {
+		if (color == Figures.COLOUR_WHITE) {
 			
 			whitePST_o += pst.getMoveScores_o(move);
 			whitePST_e += pst.getMoveScores_e(move);
 			
-			if (MoveInt.isEnpassant(move)) {
-				int enCapField = MoveInt.getEnpassantCapturedFieldID(move);
+			if (board.getMoveOps().isEnpassant(move)) {
+				int enCapField = board.getMoveOps().getEnpassantCapturedFieldID(move);
 				blackPST_o -= pst.getPieceScores_o(HORIZONTAL_SYMMETRY[enCapField], Figures.TYPE_PAWN);
 				blackPST_e -= pst.getPieceScores_e(HORIZONTAL_SYMMETRY[enCapField], Figures.TYPE_PAWN);
 			} else {
-				if (MoveInt.isCapture(move)) {
-					int capType = MoveInt.getCapturedFigureType(move);
+				if (board.getMoveOps().isCapture(move)) {
+					int capType = board.getMoveOps().getCapturedFigureType(move);
 					blackPST_o -= pst.getPieceScores_o(HORIZONTAL_SYMMETRY[toFieldID], capType);
 					blackPST_e -= pst.getPieceScores_e(HORIZONTAL_SYMMETRY[toFieldID], capType);
 				}
 				
-				if (MoveInt.isPromotion(move)) {
-					int promType = MoveInt.getPromotionFigureType(move);
+				if (board.getMoveOps().isPromotion(move)) {
+					int promType = board.getMoveOps().getPromotionFigureType(move);
 					whitePST_o += pst.getPieceScores_o(toFieldID, promType);
 					whitePST_e += pst.getPieceScores_e(toFieldID, promType);
 				}
 				
-				if (MoveInt.isCastling(move)) {
-					int castFromID = MoveInt.getCastlingRookFromID(move);
-					int castToID = MoveInt.getCastlingRookToID(move);
+				if (board.getMoveOps().isCastling(move)) {
+					int castFromID = board.getMoveOps().getCastlingRookFromID(move);
+					int castToID = board.getMoveOps().getCastlingRookToID(move);
 					whitePST_o -= pst.getPieceScores_o(castFromID, Figures.TYPE_CASTLE);
 					whitePST_o += pst.getPieceScores_o(castToID, Figures.TYPE_CASTLE);
 					whitePST_e -= pst.getPieceScores_e(castFromID, Figures.TYPE_CASTLE);
@@ -184,68 +186,68 @@ public class BaseEvaluation implements MoveListener, IBaseEval {
 				}
 			}
 		} else {
+			
 			blackPST_o += pst.getMoveScores_o(move);
 			blackPST_e += pst.getMoveScores_e(move);
 			
-			if (MoveInt.isEnpassant(move)) {
-				int enCapField = MoveInt.getEnpassantCapturedFieldID(move);
+			if (board.getMoveOps().isEnpassant(move)) {
+				int enCapField = board.getMoveOps().getEnpassantCapturedFieldID(move);
 				whitePST_o -= pst.getPieceScores_o(enCapField, Figures.TYPE_PAWN);
 				whitePST_e -= pst.getPieceScores_e(enCapField, Figures.TYPE_PAWN);
 			} else {
-				if (MoveInt.isCapture(move)) {
-					int capType = MoveInt.getCapturedFigureType(move);
+				if (board.getMoveOps().isCapture(move)) {
+					int capType = board.getMoveOps().getCapturedFigureType(move);
 					whitePST_o -= pst.getPieceScores_o(toFieldID, capType);
 					whitePST_e -= pst.getPieceScores_e(toFieldID, capType);
 				}
 				
-				if (MoveInt.isPromotion(move)) {
-					int promType = MoveInt.getPromotionFigureType(move);
+				if (board.getMoveOps().isPromotion(move)) {
+					int promType = board.getMoveOps().getPromotionFigureType(move);
 					blackPST_o += pst.getPieceScores_o(HORIZONTAL_SYMMETRY[toFieldID], promType);
 					blackPST_e += pst.getPieceScores_e(HORIZONTAL_SYMMETRY[toFieldID], promType);
 				}
 				
-				if (MoveInt.isCastling(move)) {
-					int castFromID = MoveInt.getCastlingRookFromID(move);
-					int castToID = MoveInt.getCastlingRookToID(move);
+				if (board.getMoveOps().isCastling(move)) {
+					int castFromID = board.getMoveOps().getCastlingRookFromID(move);
+					int castToID = board.getMoveOps().getCastlingRookToID(move);
 					blackPST_o -= pst.getPieceScores_o(HORIZONTAL_SYMMETRY[castFromID], Figures.TYPE_CASTLE);
 					blackPST_o += pst.getPieceScores_o(HORIZONTAL_SYMMETRY[castToID], Figures.TYPE_CASTLE);
 					blackPST_e -= pst.getPieceScores_e(HORIZONTAL_SYMMETRY[castFromID], Figures.TYPE_CASTLE);
 					blackPST_e += pst.getPieceScores_e(HORIZONTAL_SYMMETRY[castToID], Figures.TYPE_CASTLE);
 				}
 			}
-		}
+		}*/
 	}
 	
-	public void unmove(int move) {
+	public void unmove(int move, int color) {
 
-		int col = MoveInt.getColour(move);
-		int toFieldID = MoveInt.getToFieldID(move);
+		/*int toFieldID = board.getMoveOps().getToFieldID(move);
 		
-		if (col == Figures.COLOUR_WHITE) {
+		if (color == Figures.COLOUR_WHITE) {
 			
 			whitePST_o -= pst.getMoveScores_o(move);
 			whitePST_e -= pst.getMoveScores_e(move);
 			
-			if (MoveInt.isEnpassant(move)) {
-				int enCapField = MoveInt.getEnpassantCapturedFieldID(move);
+			if (board.getMoveOps().isEnpassant(move)) {
+				int enCapField = board.getMoveOps().getEnpassantCapturedFieldID(move);
 				blackPST_o += pst.getPieceScores_o(HORIZONTAL_SYMMETRY[enCapField], Figures.TYPE_PAWN);
 				blackPST_e += pst.getPieceScores_e(HORIZONTAL_SYMMETRY[enCapField], Figures.TYPE_PAWN);
 			} else {
-				if (MoveInt.isCapture(move)) {
-					int capType = MoveInt.getCapturedFigureType(move);
+				if (board.getMoveOps().isCapture(move)) {
+					int capType = board.getMoveOps().getCapturedFigureType(move);
 					blackPST_o += pst.getPieceScores_o(HORIZONTAL_SYMMETRY[toFieldID], capType);
 					blackPST_e += pst.getPieceScores_e(HORIZONTAL_SYMMETRY[toFieldID], capType);
 				}
 				
-				if (MoveInt.isPromotion(move)) {
-					int promType = MoveInt.getPromotionFigureType(move);
+				if (board.getMoveOps().isPromotion(move)) {
+					int promType = board.getMoveOps().getPromotionFigureType(move);
 					whitePST_o -= pst.getPieceScores_o(toFieldID, promType);
 					whitePST_e -= pst.getPieceScores_e(toFieldID, promType);
 				}
 				
-				if (MoveInt.isCastling(move)) {
-					int castFromID = MoveInt.getCastlingRookFromID(move);
-					int castToID = MoveInt.getCastlingRookToID(move);
+				if (board.getMoveOps().isCastling(move)) {
+					int castFromID = board.getMoveOps().getCastlingRookFromID(move);
+					int castToID = board.getMoveOps().getCastlingRookToID(move);
 					whitePST_o += pst.getPieceScores_o(castFromID, Figures.TYPE_CASTLE);
 					whitePST_o -= pst.getPieceScores_o(castToID, Figures.TYPE_CASTLE);
 					whitePST_e += pst.getPieceScores_e(castFromID, Figures.TYPE_CASTLE);
@@ -256,94 +258,106 @@ public class BaseEvaluation implements MoveListener, IBaseEval {
 			blackPST_o -= pst.getMoveScores_o(move);
 			blackPST_e -= pst.getMoveScores_e(move);
 			
-			if (MoveInt.isEnpassant(move)) {
-				int enCapField = MoveInt.getEnpassantCapturedFieldID(move);
+			if (board.getMoveOps().isEnpassant(move)) {
+				int enCapField = board.getMoveOps().getEnpassantCapturedFieldID(move);
 				whitePST_o += pst.getPieceScores_o(enCapField, Figures.TYPE_PAWN);
 				whitePST_e += pst.getPieceScores_e(enCapField, Figures.TYPE_PAWN);
 			} else {
-				if (MoveInt.isCapture(move)) {
-					int capType = MoveInt.getCapturedFigureType(move);
+				if (board.getMoveOps().isCapture(move)) {
+					int capType = board.getMoveOps().getCapturedFigureType(move);
 					whitePST_o += pst.getPieceScores_o(toFieldID, capType);
 					whitePST_e += pst.getPieceScores_e(toFieldID, capType);
 				}
 				
-				if (MoveInt.isPromotion(move)) {
-					int promType = MoveInt.getPromotionFigureType(move);
+				if (board.getMoveOps().isPromotion(move)) {
+					int promType = board.getMoveOps().getPromotionFigureType(move);
 					blackPST_o -= pst.getPieceScores_o(HORIZONTAL_SYMMETRY[toFieldID], promType);
 					blackPST_e -= pst.getPieceScores_e(HORIZONTAL_SYMMETRY[toFieldID], promType);
 				}
 				
-				if (MoveInt.isCastling(move)) {
-					int castFromID = MoveInt.getCastlingRookFromID(move);
-					int castToID = MoveInt.getCastlingRookToID(move);
+				if (board.getMoveOps().isCastling(move)) {
+					int castFromID = board.getMoveOps().getCastlingRookFromID(move);
+					int castToID = board.getMoveOps().getCastlingRookToID(move);
 					blackPST_o += pst.getPieceScores_o(HORIZONTAL_SYMMETRY[castFromID], Figures.TYPE_CASTLE);
 					blackPST_o -= pst.getPieceScores_o(HORIZONTAL_SYMMETRY[castToID], Figures.TYPE_CASTLE);
 					blackPST_e += pst.getPieceScores_e(HORIZONTAL_SYMMETRY[castFromID], Figures.TYPE_CASTLE);
 					blackPST_e -= pst.getPieceScores_e(HORIZONTAL_SYMMETRY[castToID], Figures.TYPE_CASTLE);
 				}
 			}
-		}
+		}*/
 	}
 	
 	
-	protected void inc(int figurePID) {
+	protected void inc(int color, int type) {
 		
-		int figureColour = Figures.getFigureColour(figurePID);
-		int figureType = Figures.getFigureType(figurePID);
+		//System.out.println("inc: color=" + color + ", type=" + type);
 		
-		switch(figureColour) {
+		switch(color) {
+			
 			case Figures.COLOUR_WHITE:
-				if (figureType == Figures.TYPE_PAWN) {
-					w_material_pawns_o += getFigureMaterial_O(figureType);
-					w_material_pawns_e += getFigureMaterial_E(figureType);					
+				
+				if (type == Figures.TYPE_PAWN) {
+					w_material_pawns_o += getFigureMaterial_O(type);
+					w_material_pawns_e += getFigureMaterial_E(type);					
 				} else {
-					w_material_nopawns_o += getFigureMaterial_O(figureType);
-					w_material_nopawns_e += getFigureMaterial_E(figureType);
+					w_material_nopawns_o += getFigureMaterial_O(type);
+					w_material_nopawns_e += getFigureMaterial_E(type);
 				}
 				break;
+				
 			case Figures.COLOUR_BLACK:
-				if (figureType == Figures.TYPE_PAWN) {
-					b_material_pawns_o += getFigureMaterial_O(figureType);
-					b_material_pawns_e += getFigureMaterial_E(figureType);
+				
+				if (type == Figures.TYPE_PAWN) {
+					b_material_pawns_o += getFigureMaterial_O(type);
+					b_material_pawns_e += getFigureMaterial_E(type);
 				} else {
-					b_material_nopawns_o += getFigureMaterial_O(figureType);
-					b_material_nopawns_e += getFigureMaterial_E(figureType);
+					b_material_nopawns_o += getFigureMaterial_O(type);
+					b_material_nopawns_e += getFigureMaterial_E(type);
 				}
 				break;
+				
 			default:
+				
 				throw new IllegalArgumentException(
-						"Figure colour " + figureColour + " is undefined!");
+						"Figure colour " + type + " is undefined!");
 		}
 	}
 	
-	protected void dec(int figurePID) {
-		int figureColour = Figures.getFigureColour(figurePID);
-		int figureType = Figures.getFigureType(figurePID);
+	protected void dec(int color, int type) {
 		
-		switch(figureColour) {
+		//System.out.println("inc: color=" + color + ", type=" + type);
+		
+		switch(color) {
+		
 			case Figures.COLOUR_WHITE:
-				if (figureType == Figures.TYPE_PAWN) {
-					w_material_pawns_o -= getFigureMaterial_O(figureType);
-					w_material_pawns_e -= getFigureMaterial_E(figureType);
+				
+				if (type == Figures.TYPE_PAWN) {
+					w_material_pawns_o -= getFigureMaterial_O(type);
+					w_material_pawns_e -= getFigureMaterial_E(type);
 				} else {
-					w_material_nopawns_o -= getFigureMaterial_O(figureType);
-					w_material_nopawns_e -= getFigureMaterial_E(figureType);
+					w_material_nopawns_o -= getFigureMaterial_O(type);
+					w_material_nopawns_e -= getFigureMaterial_E(type);
 				}
 				break;
+				
 			case Figures.COLOUR_BLACK:
-				if (figureType == Figures.TYPE_PAWN) {
-					b_material_pawns_o -= getFigureMaterial_O(figureType);
-					b_material_pawns_e -= getFigureMaterial_E(figureType);
+				
+				if (type == Figures.TYPE_PAWN) {
+					b_material_pawns_o -= getFigureMaterial_O(type);
+					b_material_pawns_e -= getFigureMaterial_E(type);
 				} else {
-					b_material_nopawns_o -= getFigureMaterial_O(figureType);
-					b_material_nopawns_e -= getFigureMaterial_E(figureType);
+					b_material_nopawns_o -= getFigureMaterial_O(type);
+					b_material_nopawns_e -= getFigureMaterial_E(type);
 				}
 				break;
+				
 			default:
+				
 				throw new IllegalArgumentException(
-						"Figure colour " + figureColour + " is undefined!");
+						"Figure colour " + type + " is undefined!");
 		}
 	}
+	
 	
 	public double getFigureMaterial_O(int type) {
 		switch(type) {
@@ -390,82 +404,96 @@ public class BaseEvaluation implements MoveListener, IBaseEval {
 	 * IMPL of MoveListener ***********************************************
 	 */
 	
+	
 	@Override
-	public void addPiece_Special(int pid, int fieldID) {
+	public void addPiece_Special(int color, int type) {
 		throw new UnsupportedOperationException();
 	}
 	
+	
 	@Override
-	public void initially_addPiece(int pid, int fieldID) {
-		added(pid);
+	public void initially_addPiece(int color, int type) {
+		inc(color, type);
 	}
 
+	
 	@Override
 	public void preForwardMove(int color, int move) {
-		// TODO Auto-generated method stub
 		
+		if (board.getMoveOps().isCapture(move)) {
+			
+			int cap_type = board.getMoveOps().getCapturedFigureType(move);
+			
+			dec(1 - color, cap_type);
+		}
+		
+		if (board.getMoveOps().isPromotion(move)) {
+			
+			int prom_type = board.getMoveOps().getPromotionFigureType(move);
+			
+			inc(color, prom_type);
+			
+			int type = board.getMoveOps().getFigureType(move);
+			if (type != Figures.TYPE_PAWN) {
+				throw new IllegalStateException();
+			}
+			
+			dec(color, type);
+		}
 	}
-
+	
+	
 	@Override
-	public void postForwardMove(int color, int move) {		
-		if (MoveInt.isCapture(move)) {
-			int cap_pid = MoveInt.getCapturedFigurePID(move);
-			removed(cap_pid);
-		}
-		
-		if (MoveInt.isPromotion(move)) {
-			int prom_pid = MoveInt.getPromotionFigurePID(move);
-			added(prom_pid);
-			int pid = MoveInt.getFigurePID(move);
-			removed(pid);
-		}
+	public void postForwardMove(int color, int move) {	
 	}
 
+	
 	@Override
 	public void preBackwardMove(int color, int move) {
-		// TODO Auto-generated method stub
 		
+		if (board.getMoveOps().isCapture(move)) {
+			
+			int cap_type = board.getMoveOps().getCapturedFigureType(move);
+			
+			inc(1 - color, cap_type);
+		}
+		
+		if (board.getMoveOps().isPromotion(move)) {
+			
+			int prom_type = board.getMoveOps().getPromotionFigureType(move);
+			
+			dec(color, prom_type);
+			
+			int type = board.getMoveOps().getFigureType(move);
+			if (type != Figures.TYPE_PAWN) {
+				throw new IllegalStateException();
+			}
+			
+			inc(color, type);
+		}
 	}
-
+	
+	
 	@Override
 	public void postBackwardMove(int color, int move) {
-		if (MoveInt.isCapture(move)) {
-			int cap_pid = MoveInt.getCapturedFigurePID(move);
-			added(cap_pid);
-		}
-		
-		if (MoveInt.isPromotion(move)) {
-			int prom_pid = MoveInt.getPromotionFigurePID(move);
-			removed(prom_pid);
-			int pid = MoveInt.getFigurePID(move);
-			added(pid);
-		}
 	}
 	
-	protected void added(int figurePID) {
-		inc(figurePID);
-	}
 	
-	protected void removed(int figurePID) {
-		dec(figurePID);
-	}
-	
-
 	@Override
 	public int getMaterial(int pieceType) {
 		switch(pieceType) {
 			case Figures.TYPE_PAWN:
-				return interpolator.interpolateByFactor(boardConfig.getMaterial_PAWN_O(), boardConfig.getMaterial_PAWN_E());
+				return board.getMaterialFactor().interpolateByFactor(boardConfig.getMaterial_PAWN_O(), boardConfig.getMaterial_PAWN_E());
 			case Figures.TYPE_KNIGHT:
-				return interpolator.interpolateByFactor(boardConfig.getMaterial_KNIGHT_O(), boardConfig.getMaterial_KNIGHT_E());
+				return board.getMaterialFactor().interpolateByFactor(boardConfig.getMaterial_KNIGHT_O(), boardConfig.getMaterial_KNIGHT_E());
 			case Figures.TYPE_OFFICER:
-				return interpolator.interpolateByFactor(boardConfig.getMaterial_BISHOP_O(), boardConfig.getMaterial_BISHOP_E());
+				return board.getMaterialFactor().interpolateByFactor(boardConfig.getMaterial_BISHOP_O(), boardConfig.getMaterial_BISHOP_E());
 			case Figures.TYPE_CASTLE:
-				return interpolator.interpolateByFactor(boardConfig.getMaterial_ROOK_O(), boardConfig.getMaterial_ROOK_E());
+				return board.getMaterialFactor().interpolateByFactor(boardConfig.getMaterial_ROOK_O(), boardConfig.getMaterial_ROOK_E());
 			case Figures.TYPE_QUEEN:
-				return interpolator.interpolateByFactor(boardConfig.getMaterial_QUEEN_O(), boardConfig.getMaterial_QUEEN_E());
+				return board.getMaterialFactor().interpolateByFactor(boardConfig.getMaterial_QUEEN_O(), boardConfig.getMaterial_QUEEN_E());
 			case Figures.TYPE_KING:
-				return interpolator.interpolateByFactor(boardConfig.getMaterial_KING_O(), boardConfig.getMaterial_KING_E());
+				return board.getMaterialFactor().interpolateByFactor(boardConfig.getMaterial_KING_O(), boardConfig.getMaterial_KING_E());
 			default:
 				throw new IllegalArgumentException(
 						"Figure type " + pieceType + " is undefined!");
@@ -473,62 +501,30 @@ public class BaseEvaluation implements MoveListener, IBaseEval {
 	}
 	
 	
-	
 	public int getMaterialGain(int move) {
 		
-		if (!MoveInt.isCapture(move) && !MoveInt.isPromotion(move)) {
+		if (!board.getMoveOps().isCapture(move) && !board.getMoveOps().isPromotion(move)) {
 			return 0;
 		}
 		
 		int val = 0;
 		
-		if (MoveInt.isCapture(move)) {
-			int capturedPID = MoveInt.getCapturedFigurePID(move);
-			int figureType = Figures.getFigureType(capturedPID);
+		if (board.getMoveOps().isCapture(move)) {
 			
-			val += getMaterial(figureType);
+			int captured_type = board.getMoveOps().getCapturedFigureType(move);
+			
+			val += getMaterial(captured_type);
 		}
 		
-		if (MoveInt.isPromotion(move)) {
-			int promID = MoveInt.getPromotionFigurePID(move);
-			int promType = Figures.getFigureType(promID);
+		if (board.getMoveOps().isPromotion(move)) {
 			
-			val += getMaterial(promType);
+			int prom_type = board.getMoveOps().getPromotionFigureType(move);
+			
+			val += getMaterial(prom_type);
+			
 			val -= getMaterial(Figures.TYPE_PAWN);
 		}
 		
 		return val;
-	}
-
-	
-	public double getPSTMoveGoodPercent(int move) {
-		int min = interpolator.interpolateByFactor(pst.getMoveMinScores_o(move), pst.getMoveMinScores_e(move));
-		int max = interpolator.interpolateByFactor(pst.getMoveMaxScores_o(move), pst.getMoveMaxScores_e(move));
-		int score = interpolator.interpolateByFactor(pst.getMoveScores_o(move), pst.getMoveScores_e(move));
-		
-		/*if (score > max - min) {
-			throw new IllegalStateException();
-		}*/
-		
-		double b = max - min;
-		
-		if (b == 0) { 
-			return 0;
-		}
-		
-		double result = Math.abs(score) / b;
-		if (result > 1) { //because of rounding double to int
-			result = 1;
-		}
-		
-		if (result < 0) { //For sure
-			result = 0;
-		}
-		
-		/*if (result < 0 || result > 1) {
-			throw new IllegalStateException();	
-		}*/
-		
-		return result;
 	}
 }

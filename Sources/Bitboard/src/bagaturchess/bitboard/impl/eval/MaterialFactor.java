@@ -91,7 +91,7 @@ public class MaterialFactor implements MoveListener, IMaterialFactor, Cloneable 
 		added(pid);
 	}
 
-	public void postBackwardMove(int move) {
+	public void postBackwardMove(int color, int move) {
 		if (MoveInt.isCapture(move)) {
 			int cap_pid = MoveInt.getCapturedFigurePID(move);
 			added(cap_pid);
@@ -105,7 +105,7 @@ public class MaterialFactor implements MoveListener, IMaterialFactor, Cloneable 
 		}
 	}
 	
-	public void postForwardMove(int move) {		
+	public void postForwardMove(int color, int move) {		
 		if (MoveInt.isCapture(move)) {
 			int cap_pid = MoveInt.getCapturedFigurePID(move);
 			removed(cap_pid);
@@ -119,12 +119,12 @@ public class MaterialFactor implements MoveListener, IMaterialFactor, Cloneable 
 		}
 	}
 	
-	public void preBackwardMove(int move) {
+	public void preBackwardMove(int color, int move) {
 		// TODO Auto-generated method stub
 		
 	}
 	
-	public void preForwardMove(int move) {
+	public void preForwardMove(int color, int move) {
 		// TODO Auto-generated method stub
 		
 	}

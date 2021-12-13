@@ -944,7 +944,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
-				moveListeners[i].preForwardMove(move);
+				moveListeners[i].preForwardMove(MoveInt.getColour(move), move);
 			}
 		}
 		
@@ -1321,7 +1321,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
-				moveListeners[i].postForwardMove(move);
+				moveListeners[i].postForwardMove(MoveInt.getColour(move), move);
 			}
 		}
 		
@@ -1373,7 +1373,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
-				moveListeners[i].preBackwardMove(move);
+				moveListeners[i].preBackwardMove(MoveInt.getColour(move), move);
 			}
 		}
 		
@@ -1568,7 +1568,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
-				moveListeners[i].postBackwardMove(move);
+				moveListeners[i].postBackwardMove(MoveInt.getColour(move), move);
 			}
 		}
 		

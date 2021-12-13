@@ -14,6 +14,8 @@ import static bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcess
 import static bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcessor.EVAL_PHASE_ID_3;
 import static bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcessor.EVAL_PHASE_ID_4;
 import static bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcessor.EVAL_PHASE_ID_5;
+
+import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.impl1.internal.Bitboard;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.ChessConstants;
@@ -30,12 +32,12 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 	private static final int MAX_MATERIAL_FACTOR = 4 * EvalConstants.PHASE[NIGHT] + 4 * EvalConstants.PHASE[BISHOP] + 4 * EvalConstants.PHASE[ROOK] + 2 * EvalConstants.PHASE[QUEEN];
 	
 	
-	public static int eval1(final ChessBoard cb, final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
+	public static int eval1(IBoardConfig boardConfig, final ChessBoard cb, final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
 		
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_1, FEATURE_ID_PIECE_SQUARE_TABLE,
 				cb.psqtScore_mg, cb.psqtScore_eg, PIECE_SQUARE_TABLE_O, PIECE_SQUARE_TABLE_E);
 		
-		calculateMaterialScore(evalInfo, evalComponentsProcessor);
+		calculateMaterialScore(boardConfig, evalInfo, evalComponentsProcessor);
 		calculateImbalances(evalInfo, evalComponentsProcessor);
 		
 		int total_material_factor = Math.min(MAX_MATERIAL_FACTOR, cb.material_factor_white + cb.material_factor_black);
@@ -1010,7 +1012,7 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 	}
 	
 	
-	private static void calculateMaterialScore(final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
+	private static void calculateMaterialScore(final IBoardConfig boardConfig, final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
 		
 		int count_pawns = Long.bitCount(evalInfo.bb_w_pawns) - Long.bitCount(evalInfo.bb_b_pawns);
 		int count_knights = Long.bitCount(evalInfo.bb_w_knights) - Long.bitCount(evalInfo.bb_b_knights);
@@ -1019,19 +1021,19 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		int count_queens = Long.bitCount(evalInfo.bb_w_queens) - Long.bitCount(evalInfo.bb_b_queens);
 		
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_1, FEATURE_ID_MATERIAL_PAWN,
-				count_pawns * EvalConstants.MATERIAL[PAWN], count_pawns * EvalConstants.MATERIAL[PAWN], MATERIAL_PAWN_O, MATERIAL_PAWN_E);
+				(int) (count_pawns * boardConfig.getMaterial_PAWN_O()), (int) (count_pawns * boardConfig.getMaterial_PAWN_E()), MATERIAL_PAWN_O, MATERIAL_PAWN_E);
 
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_1, FEATURE_ID_MATERIAL_KNIGHT,
-				count_knights * EvalConstants.MATERIAL[NIGHT], count_knights * EvalConstants.MATERIAL[NIGHT], MATERIAL_KNIGHT_O, MATERIAL_KNIGHT_E);
+				(int) (count_knights * boardConfig.getMaterial_KNIGHT_O()), (int) (count_knights * boardConfig.getMaterial_KNIGHT_E()), MATERIAL_KNIGHT_O, MATERIAL_KNIGHT_E);
 
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_1, FEATURE_ID_MATERIAL_BISHOP,
-				count_bishops * EvalConstants.MATERIAL[BISHOP], count_bishops * EvalConstants.MATERIAL[BISHOP], MATERIAL_BISHOP_O, MATERIAL_BISHOP_E);
+				(int) (count_bishops * boardConfig.getMaterial_BISHOP_O()), (int) (count_bishops * boardConfig.getMaterial_BISHOP_E()), MATERIAL_BISHOP_O, MATERIAL_BISHOP_E);
 
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_1, FEATURE_ID_MATERIAL_ROOK,
-				count_rooks * EvalConstants.MATERIAL[ROOK], count_rooks * EvalConstants.MATERIAL[ROOK], MATERIAL_ROOK_O, MATERIAL_ROOK_E);
+				(int) (count_rooks * boardConfig.getMaterial_ROOK_O()), (int) (count_rooks * boardConfig.getMaterial_ROOK_E()), MATERIAL_ROOK_O, MATERIAL_ROOK_E);
 
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_1, FEATURE_ID_MATERIAL_QUEEN,
-				count_queens * EvalConstants.MATERIAL[QUEEN], count_queens * EvalConstants.MATERIAL[QUEEN], MATERIAL_QUEEN_O, MATERIAL_QUEEN_E);
+				(int) (count_queens * boardConfig.getMaterial_QUEEN_O()), (int) (count_queens * boardConfig.getMaterial_QUEEN_E()), MATERIAL_QUEEN_O, MATERIAL_QUEEN_E);
 	}
 	
 	

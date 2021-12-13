@@ -78,7 +78,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		evalInfo.clearEvals();
 		evalInfo.fillBoardInfo(board);
 		
-		return Evaluator.eval1(board, evalInfo, evalComponentsProcessor);
+		return Evaluator.eval1(bitboard.getBoardConfig(), board, evalInfo, evalComponentsProcessor);
 	}
 	
 	

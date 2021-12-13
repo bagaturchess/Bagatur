@@ -43,6 +43,7 @@ import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.ISEE;
 import bagaturchess.bitboard.api.PawnsEvalCache;
+import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
@@ -77,23 +78,64 @@ public class BoardImpl implements IBitBoard {
 	
 	private IMoveList hasMovesList;
 	
+	private MoveListener[] moveListeners;
+	
 	
 	public BoardImpl(String fen, IBoardConfig _boardConfig) {
-		generator = new MoveGenerator();
-		pieces = new PiecesListsImpl(this);
-		materialFactor = new MaterialFactorImpl();
-		baseEval = new BaseEvalImpl();
-		materialState = new MaterialStateImpl();
-		boardConfig = _boardConfig;
-		moveOps = new MoveOpsImpl();
 		
-		if (boardConfig != null) {
-			EvalConstants.initPSQT(boardConfig);
-		}
+		boardConfig = _boardConfig;
+		
+		generator = new MoveGenerator();
+		
+		pieces = new PiecesListsImpl(this);
+		
+		materialFactor = new MaterialFactorImpl();
+		
+		materialState = new MaterialStateImpl();
+		
+		moveOps = new MoveOpsImpl();
 		
 		chessBoard = ChessBoardUtil.getNewCB(fen);
 		
 		hasMovesList = new BaseMoveList(250);
+		
+		moveListeners = new MoveListener[0];
+		
+		addMoveListener(materialFactor);
+		
+		if (boardConfig != null) {
+			
+			EvalConstants.initPSQT(boardConfig);
+			
+			baseEval = new BaseEvaluation(boardConfig, this);
+			
+			for (int color = 0; color < 2; color++) {
+				for (int piece = PAWN; piece <= KING; piece++) {
+					long pieces = chessBoard.pieces[color][piece];
+					while (pieces != 0) {
+						baseEval.initially_addPiece(color, piece);
+						pieces &= pieces - 1;
+					}
+				}
+			}
+			
+			addMoveListener(baseEval);
+		}
+	}
+	
+	
+	private void addMoveListener(MoveListener listener) {
+		MoveListener[] oldMoveListeners = moveListeners;
+		MoveListener[] newMoveListeners = new MoveListener[moveListeners.length + 1];
+		if (oldMoveListeners.length > 0) {
+			for (int i=0; i<oldMoveListeners.length; i++) {
+				newMoveListeners[i] = oldMoveListeners[i];
+			}
+		}
+		
+		newMoveListeners[oldMoveListeners.length] = listener;
+		
+		moveListeners = newMoveListeners;
 	}
 	
 	
@@ -179,20 +221,46 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public void makeMoveForward(int move) {
+		
+		if (moveListeners.length > 0) {
+			for (int i=0; i<moveListeners.length; i++) {
+				moveListeners[i].preForwardMove(chessBoard.colorToMove, move);
+			}
+		}
+		
 		chessBoard.doMove(move);
+		
+		if (moveListeners.length > 0) {
+			for (int i=0; i<moveListeners.length; i++) {
+				moveListeners[i].postForwardMove(chessBoard.colorToMoveInverse, move);
+			}
+		}
 	}
 	
 	
 	@Override
 	public void makeMoveBackward(int move) {
+		
+		if (moveListeners.length > 0) {
+			for (int i=0; i<moveListeners.length; i++) {
+				moveListeners[i].preBackwardMove(chessBoard.colorToMoveInverse, move);
+			}
+		}
+		
 		chessBoard.undoMove(move);
+		
+		if (moveListeners.length > 0) {
+			for (int i=0; i<moveListeners.length; i++) {
+				moveListeners[i].postBackwardMove(chessBoard.colorToMove, move);
+			}
+		}
 	}
 	
 	
 	@Override
 	public void makeMoveForward(String ucimove) {
 		MoveWrapper move = new MoveWrapper(ucimove, chessBoard);
-		chessBoard.doMove(move.move);
+		makeMoveForward(move.move);
 	}
 	
 	
@@ -237,9 +305,9 @@ public class BoardImpl implements IBitBoard {
 		for(int i = chessBoard.playedMovesCount - 1; i >= 0; i--) {
 			int move = chessBoard.playedMoves[i];
 			if (move == 0) {
-				chessBoard.undoNullMove();
+				makeNullMoveBackward();
 			} else {
-				chessBoard.undoMove(move);
+				makeMoveBackward(move);
 			}
 		}
 	}
@@ -790,154 +858,47 @@ public class BoardImpl implements IBitBoard {
 			double result = (val_o * openningPart + (val_e * (1 - openningPart)));
 			return (int) result;
 		}
-	}
-	
-	
-	protected class BaseEvalImpl implements IBaseEval {
 
-		
-		public BaseEvalImpl() {
-		}
-		
-		
+
 		@Override
-		public int getPST_o() {
-			return chessBoard.psqtScore_mg;
-		}
-		
-		
-		@Override
-		public int getPST_e() {
-			return chessBoard.psqtScore_eg;
-		}
-		
-		
-		@Override
-		public int getMaterial(int pieceType) {
+		public void addPiece_Special(int pid, int fieldID) {
+			// TODO Auto-generated method stub
 			
-			switch (pieceType) {
-				case ChessConstants.PAWN: return (int) Math.max(boardConfig.getMaterial_PAWN_O(), boardConfig.getMaterial_PAWN_E());
-				case ChessConstants.NIGHT: return (int) Math.max(boardConfig.getMaterial_KNIGHT_O(), boardConfig.getMaterial_KNIGHT_E());
-				case ChessConstants.BISHOP: return (int) Math.max(boardConfig.getMaterial_BISHOP_O(), boardConfig.getMaterial_BISHOP_E());
-				case ChessConstants.ROOK: return (int) Math.max(boardConfig.getMaterial_ROOK_O(), boardConfig.getMaterial_ROOK_E());
-				case ChessConstants.QUEEN: return (int) Math.max(boardConfig.getMaterial_QUEEN_O(), boardConfig.getMaterial_QUEEN_E());
-				case ChessConstants.KING: return (int) Math.max(boardConfig.getMaterial_KING_O(), boardConfig.getMaterial_KING_E());
-			}
+		}
+
+
+		@Override
+		public void initially_addPiece(int pid, int fieldID) {
+			// TODO Auto-generated method stub
 			
-			throw new IllegalStateException("pieceType=" + pieceType);
-		}
-		
-		
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterial_o()
-		 */
-		@Override
-		public int getMaterial_o() {
-			throw new UnsupportedOperationException();
 		}
 
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterial_e()
-		 */
+
 		@Override
-		public int getMaterial_e() {
-			throw new UnsupportedOperationException();
+		public void preForwardMove(int color, int move) {
+			// TODO Auto-generated method stub
+			
 		}
 
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getWhiteMaterialPawns_o()
-		 */
+
 		@Override
-		public int getWhiteMaterialPawns_o() {
-			throw new UnsupportedOperationException();
+		public void postForwardMove(int color, int move) {
+			// TODO Auto-generated method stub
+			
 		}
 
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getWhiteMaterialPawns_e()
-		 */
+
 		@Override
-		public int getWhiteMaterialPawns_e() {
-			throw new UnsupportedOperationException();
+		public void preBackwardMove(int color, int move) {
+			// TODO Auto-generated method stub
+			
 		}
 
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getBlackMaterialPawns_o()
-		 */
-		@Override
-		public int getBlackMaterialPawns_o() {
-			throw new UnsupportedOperationException();
-		}
 
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getBlackMaterialPawns_e()
-		 */
 		@Override
-		public int getBlackMaterialPawns_e() {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getWhiteMaterialNonPawns_o()
-		 */
-		@Override
-		public int getWhiteMaterialNonPawns_o() {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getWhiteMaterialNonPawns_e()
-		 */
-		@Override
-		public int getWhiteMaterialNonPawns_e() {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getBlackMaterialNonPawns_o()
-		 */
-		@Override
-		public int getBlackMaterialNonPawns_o() {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getBlackMaterialNonPawns_e()
-		 */
-		@Override
-		public int getBlackMaterialNonPawns_e() {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterial_BARIER_NOPAWNS_O()
-		 */
-		@Override
-		public int getMaterial_BARIER_NOPAWNS_O() {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterial_BARIER_NOPAWNS_E()
-		 */
-		@Override
-		public int getMaterial_BARIER_NOPAWNS_E() {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getMaterialGain(int)
-		 */
-		@Override
-		public int getMaterialGain(int move) {
-			throw new UnsupportedOperationException();
-		}
-
-		/* (non-Javadoc)
-		 * @see bagaturchess.bitboard.api.IBaseEval#getPSTMoveGoodPercent(int)
-		 */
-		@Override
-		public double getPSTMoveGoodPercent(int move) {
-			throw new UnsupportedOperationException();
+		public void postBackwardMove(int color, int move) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 	

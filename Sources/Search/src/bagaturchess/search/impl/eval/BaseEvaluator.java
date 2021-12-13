@@ -90,6 +90,12 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	protected IBitBoard bitboard;	
 	
+	protected IMaterialFactor interpolator;
+	protected IBaseEval baseEval;
+	
+	private IEvalCache evalCache;
+	private IEvalEntry cached = new EvalEntry_BaseImpl();
+	
 	protected PiecesList w_knights;
 	protected PiecesList b_knights;
 	protected PiecesList w_bishops;
@@ -103,16 +109,15 @@ public abstract class BaseEvaluator implements IEvaluator {
 	protected PiecesList w_pawns;
 	protected PiecesList b_pawns;
 	
-	protected IMaterialFactor interpolator;
-	protected IBaseEval baseEval;
-	
-	private IEvalCache evalCache;
-	private IEvalEntry cached = new EvalEntry_BaseImpl();
-	
 	
 	public BaseEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
 		
 		bitboard = _bitboard;
+		
+		interpolator = _bitboard.getMaterialFactor();
+		baseEval = _bitboard.getBaseEvaluation();
+		
+		evalCache = _evalCache;
 		
 		w_knights = bitboard.getPiecesLists().getPieces(Constants.PID_W_KNIGHT);
 		b_knights = bitboard.getPiecesLists().getPieces(Constants.PID_B_KNIGHT);
@@ -126,11 +131,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 		b_king = bitboard.getPiecesLists().getPieces(Constants.PID_B_KING);
 		w_pawns = bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN);
 		b_pawns = bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN);
-		
-		interpolator = _bitboard.getMaterialFactor();
-		baseEval = _bitboard.getBaseEvaluation();
-		
-		evalCache = _evalCache;		
 	}
 	
 	
@@ -154,13 +154,20 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	
 	public double fullEval(int depth, int alpha, int beta, int rootColour) {
+		
 		return fullEval(depth, alpha, beta, rootColour, true);
 	}
 	
 	
 	protected double fullEval(int depth, int alpha, int beta, int rootColour, boolean useCache) {
 		
-		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
+		int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN));
+		int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN));
+		
+		/*if (count_pawns_w == 0 && count_pawns_b == 0) {
+			
+			int king_sq_w = 63 - Long.numberOfLeadingZeros(Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KING)));
+			int king_sq_b = 63 - Long.numberOfLeadingZeros(Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KING)));
 			
 			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
 			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
@@ -171,20 +178,20 @@ public abstract class BaseEvaluator implements IEvaluator {
 			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
 			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
 				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[king_sq_b];
+				int MD = Fields.getTropismPoint(king_sq_w, king_sq_b);
 				
 				return (int) returnVal(material_imbalance + 3 * (int) (4.7 * CMD + 1.6 * MD));
 				
 			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
 				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
+				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[king_sq_w];
+				int MD = Fields.getTropismPoint(king_sq_w, king_sq_b);
 				
 				return (int) returnVal(material_imbalance - 3 * (int) (4.7 * CMD + 1.6 * MD));
 				
 			}
-		}
+		}*/
 		
 		
 		long hashkey = bitboard.getHashKey();
@@ -209,6 +216,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		double eval = 0;
 		
 		eval += phase1();
+		//eval += eval_material_nopawnsdrawrule();
 		eval += phase2();
 		eval += phase3();
 		eval += phase4();
@@ -300,7 +308,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		}
 		
 		
-		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
+		/*if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
 			
 			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
 			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
@@ -324,7 +332,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 				return (int) returnVal(material_imbalance - 3 * (int) (4.7 * CMD + 1.6 * MD));
 				
 			}
-		}
+		}*/
 		
 		
 		double eval = 0;
@@ -437,7 +445,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		}
 		
 		
-		if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
+		/*if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
 			
 			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
 			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
@@ -461,7 +469,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 				return (int) returnVal(material_imbalance - 3 * (int) (4.7 * CMD + 1.6 * MD));
 				
 			}
-		}
+		}*/
 		
 		
 		double eval = phase1();
@@ -567,8 +575,11 @@ public abstract class BaseEvaluator implements IEvaluator {
 		/**
 		 * Differently colored bishops, no other pieces except pawns
 		 */
-		if (w_bishops.getDataSize() == 1
-					&& b_bishops.getDataSize() == 1
+		int count_bishops_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER));
+		int count_bishops_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER));
+		
+		if (count_bishops_w == 1
+					&& count_bishops_b == 1
 					&& bitboard.getMaterialFactor().getWhiteFactor() == 3
 					&& bitboard.getMaterialFactor().getBlackFactor() == 3
 				) {
@@ -649,10 +660,13 @@ public abstract class BaseEvaluator implements IEvaluator {
 		int b_eval_pawns_o = baseEval.getBlackMaterialPawns_o();
 		int b_eval_pawns_e = baseEval.getBlackMaterialPawns_e();
 		
-		if (w_pawns.getDataSize() == 0) {
+		int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN));
+		int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN));
+		
+		if (count_pawns_w == 0) {
 			
 			if (w_eval_pawns_o != 0 || w_eval_pawns_e != 0) {
-				throw new IllegalStateException();
+				throw new IllegalStateException("w_eval_pawns_o=" + w_eval_pawns_o + ", w_eval_pawns_e=" + w_eval_pawns_e);
 			}
 			
 			if (w_eval_nopawns_o < baseEval.getMaterial_BARIER_NOPAWNS_O()) {
@@ -664,10 +678,10 @@ public abstract class BaseEvaluator implements IEvaluator {
 			}
 		}
 		
-		if (b_pawns.getDataSize() == 0) {
+		if (count_pawns_b == 0) {
 			
 			if (b_eval_pawns_o != 0 || b_eval_pawns_e != 0) {
-				throw new IllegalStateException();
+				throw new IllegalStateException("b_eval_pawns_o=" + b_eval_pawns_o + ", b_eval_pawns_e=" + b_eval_pawns_e);
 			}
 			
 			if (b_eval_nopawns_o < baseEval.getMaterial_BARIER_NOPAWNS_O()) {

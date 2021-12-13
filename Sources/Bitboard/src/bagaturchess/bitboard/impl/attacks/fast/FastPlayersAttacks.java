@@ -60,7 +60,7 @@ public class FastPlayersAttacks implements MoveListener {
 		return black;
 	}
 
-	public void preForwardMove(int move) {
+	public void preForwardMove(int color, int move) {
 		
 		playedMoveIndex++;
 		
@@ -91,7 +91,7 @@ public class FastPlayersAttacks implements MoveListener {
 		data.addPromotionFigureID_OnForwardMove(promotedPID, fieldID);
 	}
 	
-	public void postForwardMove(int move) {
+	public void postForwardMove(int color, int move) {
 		
 		AffectionData data = leveldata[playedMoveIndex - 1];
 		introduce(data.introduced, data.introduced_pids);
@@ -106,7 +106,7 @@ public class FastPlayersAttacks implements MoveListener {
 
 
 	
-	public void preBackwardMove(int move) {
+	public void preBackwardMove(int color, int move) {
 		
 		playedMoveIndex--;
 		
@@ -116,7 +116,7 @@ public class FastPlayersAttacks implements MoveListener {
 		removeAffected(data);
 	}
 
-	public void postBackwardMove(int move) {
+	public void postBackwardMove(int color, int move) {
 		AffectionData data = leveldata[playedMoveIndex];
 		introduce(data.removed, data.removed_pids);
 		introduceAffected(data);

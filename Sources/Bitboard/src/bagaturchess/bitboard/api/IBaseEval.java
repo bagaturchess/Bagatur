@@ -22,7 +22,11 @@
  */
 package bagaturchess.bitboard.api;
 
-public interface IBaseEval {
+
+import bagaturchess.bitboard.common.MoveListener;
+
+
+public interface IBaseEval extends MoveListener {
 	
 	public int getMaterial_o();
 	public int getMaterial_e();
@@ -42,6 +46,4 @@ public interface IBaseEval {
 	
 	public int getMaterial(int pieceType);
 	public int getMaterialGain(int move);
-	
-	public double getPSTMoveGoodPercent(int move);
 }

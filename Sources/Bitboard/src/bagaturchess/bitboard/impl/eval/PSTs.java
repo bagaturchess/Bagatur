@@ -27,7 +27,7 @@ import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 
-public class PSTConstants {
+public class PSTs {
 	
 	private static final int[] HORIZONTAL_SYMMETRY = Utils.reverseSpecial ( new int[]{	
 			   0,   1,   2,   3,   4,   5,   6,   7,
@@ -69,7 +69,8 @@ public class PSTConstants {
 	private double MAX_SCORES_QUEEN_E;
 	
 	
-	public PSTConstants(IBoardConfig _boardCfg) {
+	public PSTs(IBoardConfig _boardCfg) {
+		
 		boardCfg = _boardCfg;
 		
 		MAX_SCORES_PAWN_O = getMax(boardCfg.getPST_PAWN_O()) * boardCfg.getWeight_PST_PAWN_O();
