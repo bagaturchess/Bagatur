@@ -85,6 +85,7 @@ In general YourKit supports open source projects with innovative and intelligent
 The project has started as a bet between myself and one of my friends from my first 2 years in the University, who like to play chess.
 I was unable to win a single chess game against him! This made me nervous over the time and at the end I have promised him (we bet) that I will create a chess program, which will win a game against him!
 Fortunately the time frame was not mentioned during the bet and ... years later I win it! :-)
+The whole story is captured in this youtube video "How was the idea of Bagatur Chess Engine application born?": https://www.youtube.com/watch?v=_rNBxbUAbS0
 
 The first public, open source version of Bagatur was available since 2011-02-27 here: https://sourceforge.net/projects/bagaturchess/files/BagaturEngine/older/
 The project actually started ~10 years before this date. The actual start date was between 1999 and 2000.
