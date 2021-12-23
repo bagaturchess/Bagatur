@@ -93,7 +93,7 @@ It had many proprietary non-public versions until 2011. I even don't have histor
 At this point in time, the internet was almost an empty space and I was not aware of softwares running chess engines like now CuteChess and Arena and I was not aware of the existence of the UCI protocol, so I also have created an own Graphical User Interface (GUI) based on Java AWT and Swing.
 Chess porgramming gives you diverse programming experiences ...
 I have selected Java as a programming language, mainly because of my little (but existing) experience with it.
-I have to also admit that Java was quite modern and polular at this point in time. This was the time a few years after the first releases of the Java itself. The early ages of the Java lenguage and Java technologies.
+I have to also admit that Java was quite modern and polular at this point in time. This was the time a few years after the first releases of the Java itself. The early ages of the Java language and Java technologies.
 
 So, if you plan to work on a chess engine, better start earlier, you need time to achieve stable version which beats you! :-)
 
