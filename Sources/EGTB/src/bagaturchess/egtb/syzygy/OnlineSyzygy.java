@@ -77,7 +77,7 @@ public class OnlineSyzygy {
 	}
 	
 	
-	public static final String getDTZandDTM_BlockingOnSocketConnection(String fen, int colour_to_move, long timeToThinkInMiliseconds, int[] result, Logger logger) {
+	public static final String getDTZandDTM_BlockingOnSocketConnection(String fen, int colour_to_move, long timeToThinkInMiliseconds, int[] dtz_and_dtm, Logger logger) {
 		
 		//If we have pending server request than exit
 		/*if (current_request_url == null) {
@@ -95,14 +95,13 @@ public class OnlineSyzygy {
 			return null;
 		}
 		
-		result[0] = -1;
-		result[1] = -1;
+		dtz_and_dtm[0] = -1;
+		dtz_and_dtm[1] = -1;
 		
 		last_server_response_timestamp = System.currentTimeMillis();
 		
 		String bestmove_string = null;
 		
-		//String url_for_the_request_mainline = "http://tablebase.lichess.ovh/standard/mainline?fen=" + fen;//2 times slower
 		String url_for_the_request = "http://tablebase.lichess.ovh/standard?fen=" + fen;
 		
 		try {
@@ -150,8 +149,39 @@ public class OnlineSyzygy {
 			}*/
 			
 			
+			//Extract DTZ
+			String dtz_string = JSONUtils.extractJSONAttribute(logger, server_response_json_text, "\"dtz\":");
+			
+			if (dtz_string != null && !dtz_string.equals("null")) {
+				
+				try {
+					
+					dtz_and_dtm[0] = Integer.parseInt(dtz_string);
+					
+				} catch (NumberFormatException nfe) {
+					
+					logger.addException(nfe);
+				}
+			}
+			
+			
+			//Extract DTM
+			String dtm_string = JSONUtils.extractJSONAttribute(logger, server_response_json_text, "\"dtm\":");
+			
+			if (dtm_string != null && !dtm_string.equals("null")) {
+				
+				try {
+					
+					dtz_and_dtm[1] = Integer.parseInt(dtm_string);
+					
+				} catch (NumberFormatException nfe) {
+					
+					logger.addException(nfe);
+				}
+			}
+			
 			//Possible outcomes are "win", "draw", "loss", "blessed-loss", "cursed-win"
-			String game_category_string = extractJSONAttribute(logger, server_response_json_text, "\"category\":");
+			String game_category_string = JSONUtils.extractJSONAttribute(logger, server_response_json_text, "\"category\":");
 			
 			if (game_category_string != null) {
 				
@@ -160,16 +190,11 @@ public class OnlineSyzygy {
 						|| game_category_string.equals("\"draw\"")
 						) {
 					
-					int[] dtz_and_dtm = extractDTZandDTM(logger, server_response_json_text);
-					
-					result[0] = dtz_and_dtm[0];
-					result[1] = dtz_and_dtm[1];
-					
-					String first_array_string = extractFirstJSONArray(logger, server_response_json_text);
+					String first_array_string = JSONUtils.extractFirstJSONArray(logger, server_response_json_text);
 					
 					//System.out.println("first_array_string=" + first_array_string);
 					
-					String[] array_elements = extractJSONArrayElements(logger, first_array_string);
+					String[] array_elements = JSONUtils.extractJSONArrayElements(logger, first_array_string);
 					
 					if (array_elements.length > 0) {						
 						
@@ -178,7 +203,7 @@ public class OnlineSyzygy {
 						//System.out.println("first_array_element_string=" + array_element);
 					
 						//The uci moves list is ordered - the first line of the response contains the best move
-						bestmove_string = extractJSONAttribute(logger, array_element, "\"uci\":"); //"uci":"d1c2",
+						bestmove_string = JSONUtils.extractJSONAttribute(logger, array_element, "\"uci\":"); //"uci":"d1c2",
 						
 						if (bestmove_string != null) {
 							
@@ -211,48 +236,6 @@ public class OnlineSyzygy {
 		
 		
 		return bestmove_string;
-	}
-	
-	
-	private static int[] extractDTZandDTM(Logger logger, String json_containing_dtz_dtm) {
-		
-		
-		int[] result = new int[2];
-		
-		result[0] = -1;
-		result[1] = -1;
-		
-		
-		String dtz_string = extractJSONAttribute(logger, json_containing_dtz_dtm, "\"dtz\":");
-		
-		if (dtz_string != null) {
-			
-			try {
-				
-				result[0] = Integer.parseInt(dtz_string);
-				
-				String dtm_string = extractJSONAttribute(logger, json_containing_dtz_dtm, "\"dtm\":");
-				
-				if (dtm_string != null) {
-					
-					try {
-						
-						result[1] = Integer.parseInt(dtm_string);
-						
-					} catch (NumberFormatException nfe) {
-						
-						//logger.addException(nfe);
-					}
-				}
-				
-			} catch (NumberFormatException nfe) {
-				
-				//logger.addException(nfe);
-			}
-		}
-		
-		
-		return result;
 	}
 	
 	
@@ -353,7 +336,7 @@ public class OnlineSyzygy {
 			}*/
 			
 			
-			String winner_string = extractJSONAttribute(logger, server_response_json_text, "\"winner\":");
+			String winner_string = JSONUtils.extractJSONAttribute(logger, server_response_json_text, "\"winner\":");
 			
 			if (winner_string != null) {
 				
@@ -374,11 +357,11 @@ public class OnlineSyzygy {
 					
 					//Here the player is winning the game
 					
-					String first_array_string = extractFirstJSONArray(logger, server_response_json_text);
+					String first_array_string = JSONUtils.extractFirstJSONArray(logger, server_response_json_text);
 					
 					//System.out.println("first_array_string=" + first_array_string);
 					
-					String[] array_elements = extractJSONArrayElements(logger, first_array_string);
+					String[] array_elements = JSONUtils.extractJSONArrayElements(logger, first_array_string);
 					
 					if (array_elements.length > 0) {						
 						
@@ -386,7 +369,7 @@ public class OnlineSyzygy {
 						
 						//System.out.println("first_array_element_string=" + array_element);
 						
-						String dtz_string = extractJSONAttribute(logger, array_element, "\"dtz\":");
+						String dtz_string = JSONUtils.extractJSONAttribute(logger, array_element, "\"dtz\":");
 						
 						if (dtz_string != null) {
 							
@@ -409,7 +392,7 @@ public class OnlineSyzygy {
 						
 						
 						//The uci moves list is ordered - the first line of the response contains the best move
-						bestmove_string = extractJSONAttribute(logger, array_element, "\"uci\":"); //"uci":"d1c2",
+						bestmove_string = JSONUtils.extractJSONAttribute(logger, array_element, "\"uci\":"); //"uci":"d1c2",
 						
 						if (bestmove_string != null) {
 							
@@ -445,100 +428,7 @@ public class OnlineSyzygy {
 	}
 
 	
-	private static String extractFirstJSONArray(Logger logger, String json_text) {
-		
-		int start_index = json_text.indexOf("[");
-		
-		if (start_index == -1) {
-			
-			return null;
-		}
-		
-		int end_index = json_text.indexOf("]", start_index);
-		
-		if (end_index == -1) {
-			
-			return null;
-		}
-		
-		String attribute_value = json_text.substring(start_index, end_index + 1);
-		
-		return attribute_value;
-	}
-	
-	
-	private static String[] extractJSONArrayElements(Logger logger, String json_array) {
-		
-		List<String> array_elements_list = new ArrayList<String>();
-		
-		char[] chars = json_array.toCharArray();
-		
-		for (int i = 0; i < chars.length; i++) {
-			
-			char cur_char1 = chars[i];
-			
-			if (cur_char1 == '{') {
-				
-				for (int j = i; j < chars.length; j++) {
-					
-					char cur_char2 = chars[j];
-					
-					if (cur_char2 == '}') {
-						
-						array_elements_list.add(json_array.substring(i, j + 1));
-						
-						i = j;
-						
-						break;
-					}
-				}
-			}
-		}
-		
-		return array_elements_list.toArray(new String[0]);
-	}
-	
-	
-	private static String extractJSONAttribute(Logger logger, String json_object, String attribute_name) {
-		
-		int start_index = json_object.indexOf(attribute_name);
-		
-		if (start_index == -1) {
-			
-			return null;
-		}
-		
-		logger.addText("OnlineSyzygy.extractJSONAttribute: attribute_name=" + attribute_name + " found");
-		
-		int possible_end_index1 = json_object.indexOf(",", start_index);
-		
-		int possible_end_index2 = json_object.indexOf("}", start_index);
-		
-		int dtm_end_index = 0;
-		
-		if (possible_end_index1 != -1 && possible_end_index2 != -1) {
-			
-			dtm_end_index = Math.min(possible_end_index1, possible_end_index2);
-			
-		} else if (possible_end_index1 != -1) {
-			
-			dtm_end_index = possible_end_index1;
-			
-		} else if (possible_end_index2 != -1) {
-			
-			dtm_end_index = possible_end_index2;
-			
-		} else {
-			
-			return null;
-		}		
-		
-		String attribute_value = json_object.substring(start_index + attribute_name.length(), dtm_end_index);
-		
-		logger.addText("OnlineSyzygy.extractJSONAttribute: attribute_value=" + attribute_value);
-		
-		return attribute_value;
-	}
+
 	
 	
 	//private static URL current_request_url 				= null;

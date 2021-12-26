@@ -214,7 +214,7 @@ public class TimeSaver {
 			
 			timeToThinkInMiliseconds = _timeToThinkInMiliseconds;
 			
-			mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): timeToThinkInMiliseconds = " + _timeToThinkInMiliseconds);
+			mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): timeToThinkInMiliseconds = " + timeToThinkInMiliseconds);
 		}
 		
 		
@@ -271,7 +271,8 @@ public class TimeSaver {
 						int dtz = dtz_and_dtm[0]; //Distance/Depth to zeroing-move. A zeroing-move is a move which resets the move count to zero under the fifty-move rule, i.e. mate, a capture, or a pawn move.
 						int dtm = dtz_and_dtm[1]; //Distance/Depth to mate.
 						
-						mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): dtm=" + dtm + ", best_move=" + bitboardForSetup.getMoveOps().moveToString(best_move) + ", dtz=" + dtz);
+						mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): dtm=" + dtm
+								+ ", best_move=" + bestmove_string + ", dtz=" + dtz);
 						
 						if (!mediator.getStopper().isStopped()) {
 							
