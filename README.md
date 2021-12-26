@@ -85,6 +85,7 @@ In general YourKit supports open source projects with innovative and intelligent
 The project has started as a bet between myself and one of my friends from my first 2 years in the University, who like to play chess.
 I was unable to win a single chess game against him! This made me nervous over the time and at the end I have promised him (we bet) that I will create a chess program, which will win a game against him!
 Fortunately the time frame was not mentioned during the bet and ... years later I win it! :-)
+The whole story is captured in this youtube video "How was the idea of Bagatur Chess Engine application born?": https://www.youtube.com/watch?v=_rNBxbUAbS0
 
 The first public, open source version of Bagatur was available since 2011-02-27 here: https://sourceforge.net/projects/bagaturchess/files/BagaturEngine/older/
 The project actually started ~10 years before this date. The actual start date was between 1999 and 2000.
@@ -92,7 +93,7 @@ It had many proprietary non-public versions until 2011. I even don't have histor
 At this point in time, the internet was almost an empty space and I was not aware of softwares running chess engines like now CuteChess and Arena and I was not aware of the existence of the UCI protocol, so I also have created an own Graphical User Interface (GUI) based on Java AWT and Swing.
 Chess porgramming gives you diverse programming experiences ...
 I have selected Java as a programming language, mainly because of my little (but existing) experience with it.
-I have to also admit that Java was quite modern and polular at this point in time. This was the time a few years after the first releases of the Java itself. The early ages of the Java lenguage and Java technologies.
+I have to also admit that Java was quite modern and polular at this point in time. This was the time a few years after the first releases of the Java itself. The early ages of the Java language and Java technologies.
 
 So, if you plan to work on a chess engine, better start earlier, you need time to achieve stable version which beats you! :-)
 
