@@ -492,6 +492,14 @@ public class OnlineSyzygy {
 	}
 	
 	
+	public interface Logger {
+		
+		public void addText(String message);
+		
+		public void addException(Exception exception);
+	}
+	
+	
 	public static void main(String[] args) {
 		
 		IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/3P4/3K4 w - -");
@@ -548,13 +556,5 @@ public class OnlineSyzygy {
 				
 			} catch (InterruptedException e) {}
 		}
-	}
-	
-	
-	public interface Logger {
-		
-		public void addText(String message);
-		
-		public void addException(Exception exception);
 	}
 }
