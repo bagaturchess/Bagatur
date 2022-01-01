@@ -267,9 +267,9 @@ public abstract class BaseEvaluator implements IEvaluator {
 		white_eval += phase4();
 		white_eval += phase5();	
 		
-		//eval = applyExchangeMotivation(eval);
+		white_eval = applyExchangeMotivation(white_eval);
 		
-		//eval = applyMaterialCorrectionByPawnsCount(eval);
+		//white_eval = applyMaterialCorrectionByPawnsCount(white_eval);
 		
 		if (white_eval > 0 && !canWin(Constants.COLOUR_WHITE)) {
 			
