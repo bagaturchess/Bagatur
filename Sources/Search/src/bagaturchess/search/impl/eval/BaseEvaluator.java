@@ -71,8 +71,8 @@ public abstract class BaseEvaluator implements IEvaluator {
 		}
 	}
 	
-	private static final double[] MATERIAL_CORRECTION_BY_PAWNS		= {0.5, 0.25, 0.12, 0.05, 0.04, 0.03, 0.02, 0.01, 0.00};
 	
+	private static final double[] MATERIAL_CORRECTION_BY_PAWNS		= {0.90, 0.95, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00};
 	
 	private static final int DOUBLE_BISHOP				= 48;
 	
@@ -562,17 +562,17 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	private double applyMaterialCorrectionByPawnsCount(double white_eval) {
 		
-		/*int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN));
+		int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN));
 		int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN));
 		
 		if (white_eval > 0) {
 			
-			white_eval -= white_eval * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
+			white_eval *= MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
 			
 		} else if (white_eval < 0) {
 			
-			white_eval += white_eval * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
-		}*/
+			white_eval *= MATERIAL_CORRECTION_BY_PAWNS[count_pawns_b];
+		}
 
 		
 		return white_eval;
@@ -596,33 +596,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		/*int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN));
 		int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN));
-		
-		
-		if (w_eval_nopawns_o > 0) {
-			
-			w_eval_nopawns_o -= w_eval_nopawns_o * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
-			
-			w_eval_nopawns_e -= w_eval_nopawns_e * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
-			
-		} else if (w_eval_nopawns_o < 0) {
-			
-			w_eval_nopawns_o += w_eval_nopawns_o * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
-			
-			w_eval_nopawns_e += w_eval_nopawns_e * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
-		}
-		
-		if (b_eval_nopawns_o > 0) {
-			
-			b_eval_nopawns_o -= b_eval_nopawns_o * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_b];
-			
-			b_eval_nopawns_e -= b_eval_nopawns_e * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_b];
-			
-		} else if (b_eval_nopawns_o < 0) {
-			
-			b_eval_nopawns_o += b_eval_nopawns_o * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_b];
-			
-			b_eval_nopawns_e += b_eval_nopawns_e * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_b];
-		}*/
 		
 		/*if (count_pawns_w == 0) {
 			

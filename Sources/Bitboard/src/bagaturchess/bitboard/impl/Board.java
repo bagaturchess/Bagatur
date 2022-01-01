@@ -224,7 +224,8 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		if (fen.getHalfmoveClock() != null) {
 			try {
-				playedMovesCount_initial = Integer.parseInt(fen.getHalfmoveClock());
+				//playedMovesCount_initial = Integer.parseInt(fen.getHalfmoveClock());
+				lastCaptureOrPawnMoveBefore = Integer.parseInt(fen.getHalfmoveClock());
 			} catch(Exception e) {
 				
 			}
