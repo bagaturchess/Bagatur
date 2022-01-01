@@ -1,3 +1,12 @@
+Version 3.0 (1 January 2022)
+  * Reduced LMR, now it finds mate in 5 in one test position using up to 10 seconds. More details: https://github.com/bagaturchess/Bagatur/issues/11
+  * UCI metric "tbhits" implemented as a part of info string
+  * Online Syzygy probing implemented. More details: https://github.com/bagaturchess/Bagatur/issues/9
+  * Endgame improvements, more accurate evaluation, it returns often 0 for draw games:
+  - knows if the last pawn is captured, then there should be enough mating material, otherwise the end game will be draw in the best case.
+  - knows only 2 knights and king are not enough mating material. More details: https://github.com/bagaturchess/Bagatur/issues/12
+  - knows it is better to exchange when the side has more material. 
+  
 Version 2.3 (11 November 2021)
   * 50 ELO stronger than 2.2e
   * Improved SMP version
