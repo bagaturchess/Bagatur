@@ -37,7 +37,7 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_1, FEATURE_ID_PIECE_SQUARE_TABLE,
 				cb.psqtScore_mg, cb.psqtScore_eg, PIECE_SQUARE_TABLE_O, PIECE_SQUARE_TABLE_E);
 		
-		calculateMaterialScore(boardConfig, evalInfo, evalComponentsProcessor);
+		//calculateMaterialScore(boardConfig, evalInfo, evalComponentsProcessor);
 		calculateImbalances(evalInfo, evalComponentsProcessor);
 		
 		int total_material_factor = Math.min(MAX_MATERIAL_FACTOR, cb.material_factor_white + cb.material_factor_black);

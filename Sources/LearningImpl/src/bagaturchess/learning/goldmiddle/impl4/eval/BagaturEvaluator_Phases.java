@@ -35,9 +35,8 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		
 		super(_bitboard, _evalCache, _evalConfig);
 		
-		bitboard = _bitboard;
-		
 		board = ((BoardImpl)bitboard).getChessBoard();
+		
 		evalInfo = new EvalInfo();
 
 		evalComponentsProcessor_ones = new EvalComponentsProcessor_Ones(evalInfo);
@@ -73,10 +72,16 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	
 	
 	@Override
-	protected double phase1() {
+	protected void phase0_init() {
 		
 		evalInfo.clearEvals();
+		
 		evalInfo.fillBoardInfo(board);
+	}
+	
+	
+	@Override
+	protected double phase1() {
 		
 		return Evaluator.eval1(bitboard.getBoardConfig(), board, evalInfo, evalComponentsProcessor);
 	}

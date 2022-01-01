@@ -72,12 +72,14 @@ public class ChessBoardUtil {
 				cb.epIndex = 104 - fenArray[3].charAt(0) + 8 * (Integer.parseInt(fenArray[3].substring(1)) - 1);
 			}
 		}
-
+		
 		if (fenArray.length > 4) {
-			// TODO
-			// 5: half-counter since last capture or pawn advance: 1
-			// fenArray[4]
+			
+			//5: half-counter since last capture or pawn advance: 1
+			String lastCaptureOrPawnMoveBefore = fenArray[4];
 
+			cb.lastCaptureOrPawnMoveBefore = Integer.parseInt(lastCaptureOrPawnMoveBefore);
+			
 			// 6: counter: 1
 			cb.moveCounter = Integer.parseInt(fenArray[5]) * 2;
 			if (cb.colorToMove == BLACK) {
@@ -323,7 +325,7 @@ public class ChessBoardUtil {
 		}
 		
 		fen += " ";
-		fen += cb.playedMovesCount;
+		fen += cb.lastCaptureOrPawnMoveBefore;
 		
 		fen += " ";
 		fen += ((cb.playedMovesCount + 1) / 2 + 1);

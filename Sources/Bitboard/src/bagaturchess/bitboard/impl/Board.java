@@ -409,7 +409,7 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		}
 		
 		result += " ";
-		result += getPlayedMovesCount_Total();
+		result += lastCaptureOrPawnMoveBefore;
 		
 		result += " ";
 		result += ((getPlayedMovesCount_Total() + 1) / 2 + 1);

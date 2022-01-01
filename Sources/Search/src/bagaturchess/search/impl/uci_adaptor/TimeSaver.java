@@ -231,6 +231,7 @@ public class TimeSaver {
 			//We have to keep hashkey and color to move, because board object may change (if move is made).
 			long hashkey_before_server_request = bitboardForSetup.getHashKey();
 			int colour_to_move = bitboardForSetup.getColourToMove();
+			int distanceToDraw_50MoveRule = 100 - bitboardForSetup.getDraw50movesRule();
 			
 			long start_time = System.currentTimeMillis();
 			
@@ -286,14 +287,31 @@ public class TimeSaver {
 							
 							if (dtm > 0) {
 								
-								//We have a winner
-								info.setEval(SearchUtils.getMateVal(dtm));
-								
-								send_move = true;
-								
-								mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is mate in (" + dtm + ") = " + info.getEval());
-								
-								stats_online_syzygy_wins++;
+								if (distanceToDraw_50MoveRule >= dtm) {
+									
+									//We have a winner
+									info.setEval(SearchUtils.getMateVal(dtm));
+									
+									send_move = true;
+									
+									mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is mate in " + dtm + ", eval= " + info.getEval());
+									
+									stats_online_syzygy_wins++;
+									
+								} else {
+									
+									final int DRAW_SCORE = SearchUtils.getDrawScores(bitboardForSetup.getMaterialFactor(), -1);
+									
+									//The game is draw in the best case and we go for it
+									info.setEval(DRAW_SCORE);
+									
+									send_move = true;
+									
+									mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is mate in " + dtm + ", but is draw because of 50 moves rule, eval= " + info.getEval());
+									
+									stats_online_syzygy_draws++;
+								}
+
 								
 							} else {
 								
@@ -303,11 +321,11 @@ public class TimeSaver {
 								
 								transposition_table.get(hashkey_before_server_request, tt_entry);
 								
-								if (!tt_entry.isEmpty()) {
+								if (!tt_entry.isEmpty() && tt_entry.getDepth() >= 7) {
 									
-									if (tt_entry.getFlag() == ITTEntry.FLAG_EXACT
+									/*if (tt_entry.getFlag() == ITTEntry.FLAG_EXACT
 											|| tt_entry.getFlag() == ITTEntry.FLAG_UPPER
-											) {
+											) {*/
 
 										final int DRAW_SCORE = SearchUtils.getDrawScores(bitboardForSetup.getMaterialFactor(), -1);
 										
@@ -317,15 +335,15 @@ public class TimeSaver {
 										if (tt_entry.getEval() <= ONLINE_PROBING_EVAL_THRESHOLD) {
 											
 											//The game is draw in the best case and we go for it
-											info.setEval(0);
+											info.setEval(DRAW_SCORE);
 											
 											send_move = true;
 											
-											mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is 0 (draw)");
+											mediator.dump("TimeSaver.OnlineSyzygy (OnlineSyzygyServerHandler_DTM_DTZ): EGTB probing ok - score is " + DRAW_SCORE + " (draw)");
 											
 											stats_online_syzygy_draws++;
 										}
-									}
+									//}
 								}
 							}
 							

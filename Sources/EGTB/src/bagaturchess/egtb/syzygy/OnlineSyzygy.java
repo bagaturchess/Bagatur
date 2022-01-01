@@ -102,11 +102,17 @@ public class OnlineSyzygy {
 		
 		String bestmove_string = null;
 		
+		/*Piece placement (from White's perspective). Each rank is described, starting with rank 8 and ending with rank 1; within each rank, the contents of each square are described from file "a" through file "h". Following the Standard Algebraic Notation (SAN), each piece is identified by a single letter taken from the standard English names (pawn = "P", knight = "N", bishop = "B", rook = "R", queen = "Q" and king = "K"). White pieces are designated using upper-case letters ("PNBRQK") while black pieces use lowercase ("pnbrqk"). Empty squares are noted using digits 1 through 8 (the number of empty squares), and "/" separates ranks.
+		Active color. "w" means White moves next, "b" means Black moves next.
+		Castling availability. If neither side can castle, this is "-". Otherwise, this has one or more letters: "K" (White can castle kingside), "Q" (White can castle queenside), "k" (Black can castle kingside), and/or "q" (Black can castle queenside). A move that temporarily prevents castling does not negate this notation.
+		En passant target square in algebraic notation. If there's no en passant target square, this is "-". If a pawn has just made a two-square move, this is the position "behind" the pawn. This is recorded regardless of whether there is a pawn in position to make an en passant capture.[6]
+		Halfmove clock: The number of halfmoves since the last capture or pawn advance, used for the fifty-move rule.[7]
+		Fullmove number: The number of the full move. It starts at 1, and is incremented after Black's move.*/
 		String url_for_the_request = "http://tablebase.lichess.ovh/standard?fen=" + fen;
 		
 		try {
 			
-			String server_response_json_text = getHTMLFromURL(url_for_the_request);
+			String server_response_json_text = getHTMLFromURL(url_for_the_request, logger);
 			
 			logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: json_response_text=" + server_response_json_text);
 			
@@ -181,13 +187,15 @@ public class OnlineSyzygy {
 			}
 			
 			//Possible outcomes are "win", "draw", "loss", "blessed-loss", "cursed-win"
+			//Possible outcomes are "win", "unknown", "maybe-win", "cursed-win", "draw", "blessed-loss", "maybe-loss", "loss"
 			String game_category_string = JSONUtils.extractJSONAttribute(logger, server_response_json_text, "\"category\":");
 			
-			if (game_category_string != null) {
+			if (game_category_string != null && !game_category_string.equals("\"unknown\"")) {
 				
 				if (game_category_string.equals("\"win\"")
 						|| game_category_string.equals("\"blessed-loss\"")
 						|| game_category_string.equals("\"draw\"")
+						//|| game_category_string.equals("\"cursed-win\"")
 						) {
 					
 					String first_array_string = JSONUtils.extractFirstJSONArray(logger, server_response_json_text);
@@ -212,6 +220,10 @@ public class OnlineSyzygy {
 							logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: bestmove_string=" + bestmove_string);
 						}
 					}
+					
+				} else {
+					
+					logger.addText("OnlineSyzygy.getDTZandDTM_BlockingOnSocketConnection: skiped category: " + game_category_string);
 				}
 			}
 			
@@ -268,7 +280,7 @@ public class OnlineSyzygy {
 		
 		try {
 			
-			String server_response_json_text = getHTMLFromURL(url_for_the_request_mainline);
+			String server_response_json_text = getHTMLFromURL(url_for_the_request_mainline, logger);
 			
 			logger.addText("OnlineSyzygy.getWDL_BlockingOnSocketConnection: server_response_json_text=" + server_response_json_text);
 			
@@ -433,8 +445,10 @@ public class OnlineSyzygy {
 	
 	//private static URL current_request_url 				= null;
 	
-	private static String getHTMLFromURL(String urlToRead) throws Exception {
-
+	private static String getHTMLFromURL(String urlToRead, Logger logger) throws Exception {
+		
+		logger.addText("OnlineSyzygy.getHTMLFromURL: open and read stream of connection " + urlToRead);
+		
 		URL current_request_url = new URL(urlToRead);
 		
 		HttpURLConnection conn = (HttpURLConnection) current_request_url.openConnection();

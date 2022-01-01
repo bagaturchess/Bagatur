@@ -11,12 +11,10 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IMaterialFactor;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
-import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.search.api.FullEvalFlag;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
-import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.impl.eval.cache.EvalEntry_BaseImpl;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.eval.cache.IEvalEntry;
@@ -26,20 +24,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	
 	private static final boolean USE_CACHE = true;
-	private static final boolean USE_LAZY = true;
-	
-	private static final int CACHE_LEVEL_1 = 1;
-	private static final int CACHE_LEVEL_2 = 2;
-	private static final int CACHE_LEVEL_3 = 3;
-	private static final int CACHE_LEVEL_4 = 4;
-	private static final int CACHE_LEVEL_5 = 5;
-	private static final int CACHE_LEVEL_MAX = CACHE_LEVEL_5;
-	
-	private static double INT_MIN = 1;
-	private static double INT1 = INT_MIN;
-	private static double INT2 = INT_MIN;
-	private static double INT3 = INT_MIN;
-	private static double INT4 = INT_MIN;
 	
 	
 	private static final int MAX_MATERIAL_FACTOR = 9 + 2 * 5 + 2 * 3 + 2 * 3;
@@ -87,6 +71,15 @@ public abstract class BaseEvaluator implements IEvaluator {
 		}
 	}
 	
+	private static final double[] MATERIAL_CORRECTION_BY_PAWNS		= {0.5, 0.25, 0.12, 0.05, 0.04, 0.03, 0.02, 0.01, 0.00};
+	
+	
+	private static final int DOUBLE_BISHOP				= 48;
+	
+	private static final int ROOKS_PAIR					= 25;
+	
+	private static final int KNIGHTS_AND_QUEEN			= 25;
+	
 	
 	protected IBitBoard bitboard;	
 	
@@ -115,6 +108,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		bitboard = _bitboard;
 		
 		interpolator = _bitboard.getMaterialFactor();
+		
 		baseEval = _bitboard.getBaseEvaluation();
 		
 		evalCache = _evalCache;
@@ -134,6 +128,11 @@ public abstract class BaseEvaluator implements IEvaluator {
 	}
 	
 	
+	protected void phase0_init() {
+		
+		//Do nothing
+	}
+	
 	protected abstract double phase1();
 	
 	protected abstract double phase2();
@@ -146,10 +145,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	
 	public void beforeSearch() {
-		INT1 = Math.max(INT_MIN, INT1 / 2);
-		INT2 = Math.max(INT_MIN, INT2 / 2);
-		INT3 = Math.max(INT_MIN, INT3 / 2);
-		INT4 = Math.max(INT_MIN, INT4 / 2);
+		//Do nothing
 	}
 	
 	
@@ -161,37 +157,87 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	protected double fullEval(int depth, int alpha, int beta, int rootColour, boolean useCache) {
 		
-		int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN));
-		int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN));
+		int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN));
+		int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN));
 		
-		/*if (count_pawns_w == 0 && count_pawns_b == 0) {
+		if (count_pawns_w == 0 && count_pawns_b == 0) {
 			
-			int king_sq_w = 63 - Long.numberOfLeadingZeros(Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_KING)));
-			int king_sq_b = 63 - Long.numberOfLeadingZeros(Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_KING)));
+			int king_sq_w = 63 - Long.numberOfLeadingZeros(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING));
+			int king_sq_b = 63 - Long.numberOfLeadingZeros(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING));
 			
 			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
 			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
-			int material_imbalance = w_eval_nopawns_e - b_eval_nopawns_e;
 			
 			//Mop-up evaluation
 			//PosEval=4.7*CMD + 1.6*(14 - MD)
 			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
-			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
+			if (w_eval_nopawns_e >= b_eval_nopawns_e) { //White can win
 				
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[king_sq_b];
-				int MD = Fields.getTropismPoint(king_sq_w, king_sq_b);
 				
-				return (int) returnVal(material_imbalance + 3 * (int) (4.7 * CMD + 1.6 * MD));
+				int file_w = king_sq_w & 7; //[0-7]
+				int rank_w = king_sq_w >>> 3; //[0-7]
+				int file_b = king_sq_b & 7; //[0-7]
+				int rank_b = king_sq_b >>> 3; //[0-7]
+				
+				int delta_file = Math.abs(file_w - file_b);
+				int delta_rank = Math.abs(rank_w - rank_b);
+				int delta_sum  = delta_file + delta_rank;
+				
+				if (14 - delta_sum < 0) {
+					throw new IllegalStateException("delta_sum=" + delta_sum);
+				}
+				
+				int MD = 14 - delta_sum;
+				
+				int material_imbalance = w_eval_nopawns_e - b_eval_nopawns_e;
+				
+				
+				
+				if (canWin(Constants.COLOUR_WHITE)) {
+					
+					return (int) returnVal(material_imbalance + 3 * (int) (4.7 * CMD + 1.6 * MD));
+					
+				} else {
+					
+					return 0;
+				}
 				
 			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
 				
 				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[king_sq_w];
-				int MD = Fields.getTropismPoint(king_sq_w, king_sq_b);
 				
-				return (int) returnVal(material_imbalance - 3 * (int) (4.7 * CMD + 1.6 * MD));
+				int file_w = king_sq_w & 7; //[0-7]
+				int rank_w = king_sq_w >>> 3; //[0-7]
+				int file_b = king_sq_b & 7; //[0-7]
+				int rank_b = king_sq_b >>> 3; //[0-7]
 				
+				int delta_file = Math.abs(file_w - file_b);
+				int delta_rank = Math.abs(rank_w - rank_b);
+				int delta_sum  = delta_file + delta_rank;
+				
+				if (14 - delta_sum < 0) {
+					throw new IllegalStateException("delta_sum=" + delta_sum);
+				}
+				
+				int MD = 14 - delta_sum;
+				
+				int material_imbalance = w_eval_nopawns_e - b_eval_nopawns_e;
+				
+				if (canWin(Constants.COLOUR_BLACK)) {
+					
+					return (int) returnVal(material_imbalance - 3 * (int) (4.7 * CMD + 1.6 * MD));
+					
+				} else {
+					
+					return 0;
+				}				
+				
+			} else {
+				
+				throw new IllegalStateException();
 			}
-		}*/
+		}
 		
 		
 		long hashkey = bitboard.getHashKey();
@@ -201,300 +247,117 @@ public abstract class BaseEvaluator implements IEvaluator {
 			evalCache.get(hashkey, cached);
 			
 			if (!cached.isEmpty()) {
-				int level = cached.getLevel();
-				switch (level) {
-					case CACHE_LEVEL_5:
-						int eval = (int) cached.getEval();
-						return (int) returnVal(eval);
-					default:
-						//Do Nothing
-				}
+				
+				int eval = (int) cached.getEval();
+				
+				return (int) returnVal(eval);
 			}
 		}
 		
 		
-		double eval = 0;
+		phase0_init();
 		
-		eval += phase1();
-		//eval += eval_material_nopawnsdrawrule();
-		eval += phase2();
-		eval += phase3();
-		eval += phase4();
-		eval += phase5();
+		double white_eval = 0;
+		
+		white_eval += eval_material_nopawnsdrawrule();
+		//eval += eval_material_imbalances();
+		white_eval += phase1();
+		white_eval += phase2();
+		white_eval += phase3();
+		white_eval += phase4();
+		white_eval += phase5();	
+		
+		//eval = applyExchangeMotivation(eval);
+		
+		//eval = applyMaterialCorrectionByPawnsCount(eval);
+		
+		if (white_eval > 0 && !canWin(Constants.COLOUR_WHITE)) {
+			
+			return 0;
+			
+		} else if (white_eval < 0 && !canWin(Constants.COLOUR_BLACK)) {
+			
+			return 0;
+		}
+		
 		
 		if (USE_CACHE && evalCache != null && useCache) {
-			evalCache.put(hashkey, CACHE_LEVEL_MAX, (int) eval);
-		}
-		
-		return returnVal(eval);
-	}
-	
-	
-	public int lazyEval(int depth, int alpha, int beta, int rootColour) {
-		return lazyEval(depth, alpha, beta, rootColour, null);
-	}
-	
-	
-	public int lazyEval(int depth, int alpha, int beta, int rootColour, FullEvalFlag flag) {
-		
-		if (flag != null) flag.value = false;
-		
-		long hashkey = bitboard.getHashKey();
-		
-		if (USE_CACHE && evalCache != null) {
 			
-			evalCache.get(hashkey, cached);
-			
-			if (!cached.isEmpty()) {
-				int level = cached.getLevel();
-				switch (level) {
-					case CACHE_LEVEL_5:
-						int eval = (int) cached.getEval();
-						if (flag != null) flag.value = true;
-						return (int) returnVal(eval);
-					case CACHE_LEVEL_4:
-						int lower = cached.getEval();
-						int upper = cached.getEval();
-						int alpha_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha;
-						int beta_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta;
-						if (upper + INT4 <= alpha_test) {
-							return (int) returnVal(upper);
-						}
-						if (lower - INT4 >= beta_test) {
-							return (int) returnVal(lower);
-						}
-						break;
-					case CACHE_LEVEL_3:
-						lower = cached.getEval();
-						upper = cached.getEval();
-						alpha_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha;
-						beta_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta;
-						if (upper + INT3 <= alpha_test) {
-							return (int) returnVal(upper);
-						}
-						if (lower - INT3 >= beta_test) {
-							return (int) returnVal(lower);
-						}
-						break;
-					case CACHE_LEVEL_2:
-						lower = cached.getEval();
-						upper = cached.getEval();
-						alpha_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha;
-						beta_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta;
-						if (upper + INT2 <= alpha_test) {
-							return (int) returnVal(upper);
-						}
-						if (lower - INT2 >= beta_test) {
-							return (int) returnVal(lower);
-						}
-						break;
-					case CACHE_LEVEL_1:
-						lower = cached.getEval();
-						upper = cached.getEval();
-						alpha_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -beta : alpha;
-						beta_test = (bitboard.getColourToMove() == Figures.COLOUR_BLACK) ? -alpha : beta;
-						if (upper + INT1 <= alpha_test) {
-							return (int) returnVal(upper);
-						}
-						if (lower - INT1 >= beta_test) {
-							return (int) returnVal(lower);
-						}
-						break;
-					default:
-						//Do Nothing
-						throw new IllegalStateException();
-				}
-			}
+			evalCache.put(hashkey, 5, (int) white_eval);
 		}
 		
 		
-		/*if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
-			
-			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
-			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
-			int material_imbalance = w_eval_nopawns_e - b_eval_nopawns_e;
-			
-			//Mop-up evaluation
-			//PosEval=4.7*CMD + 1.6*(14 - MD)
-			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
-			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
-				
-				return (int) returnVal(material_imbalance + 3 * (int) (4.7 * CMD + 1.6 * MD));
-				
-			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
-				
-				return (int) returnVal(material_imbalance - 3 * (int) (4.7 * CMD + 1.6 * MD));
-				
-			}
-		}*/
-		
-		
-		double eval = 0;
-		
-		
-		double eval1 = phase1();
-		eval += eval1;
-		int eval_test = (int) returnVal(eval);
-		if (eval_test + INT1 <= alpha || eval_test - INT1 >= beta) {
-			if (USE_LAZY) {
-				if (USE_CACHE && evalCache != null) {
-					evalCache.put(hashkey, CACHE_LEVEL_1, (int) eval);
-				}
-				return eval_test;
-			}
-		}
-		
-			
-		double eval2 = phase2();
-		eval += eval2;
-		eval_test = (int) returnVal(eval);
-		if (eval_test + INT2 <= alpha || eval_test - INT2 >= beta) {
-			if (USE_LAZY) {
-				if (USE_CACHE && evalCache != null) {
-					evalCache.put(hashkey, CACHE_LEVEL_2, (int) eval);
-				}
-				return eval_test;
-			}
-		}
-		
-		double eval3 = phase3();
-		eval += eval3;
-		eval_test = (int) returnVal(eval);
-		if (eval_test + INT3 <= alpha || eval_test - INT3 >= beta) {
-			if (USE_LAZY) {
-				if (USE_CACHE && evalCache != null) {
-					evalCache.put(hashkey, CACHE_LEVEL_3, (int) eval);
-				}
-				return eval_test;
-			}
-		}
-		
-		double eval4 = phase4();
-		eval += eval4;
-		eval_test = (int) returnVal(eval);
-		if (eval_test + INT4 <= alpha || eval_test - INT4 >= beta) {
-			if (USE_LAZY) {
-				if (USE_CACHE && evalCache != null) {
-					evalCache.put(hashkey, CACHE_LEVEL_4, (int) eval);
-				}
-				return eval_test;
-			}
-		}
-		
-		double eval5 = phase5();
-		eval += eval5;
-		
-		
-		int int1 = (int) Math.abs(eval2 + eval3 + eval4 + eval5);
-		int int2 = (int) Math.abs(eval3 + eval4 + eval5);
-		int int3 = (int) Math.abs(eval4 + eval5);
-		int int4 = (int) Math.abs(eval5);
-		
-		if (int1 > INT1) {
-			INT1 = int1;
-		}
-		if (int2 > INT2) {
-			INT2 = int2;
-		}
-		if (int3 > INT3) {
-			INT3 = int3;
-		}
-		if (int4 > INT4) {
-			INT4 = int4;
-		}
-			
-		
-		if (eval >= ISearch.MAX_MAT_INTERVAL || eval <= -ISearch.MAX_MAT_INTERVAL) {
-			throw new IllegalStateException();
-		}
-		
-		if (USE_CACHE && evalCache != null) {
-			evalCache.put(hashkey, CACHE_LEVEL_MAX, (int) eval);
-		}
-		
-		if (flag != null) flag.value = true;
-		
-		return (int) returnVal(eval);
-	}
-	
-	
-	public int roughEval(int depth, int rootColour) {
-		
-		long hashkey = bitboard.getHashKey();
-		
-		if (USE_CACHE && evalCache != null) {
-			
-			evalCache.get(hashkey, cached);
-			
-			if (!cached.isEmpty()) {
-				int level = cached.getLevel();
-				switch (level) {
-					case CACHE_LEVEL_5:
-						int eval = (int) cached.getEval();
-						return (int) returnVal(eval);
-					default:
-						//Do Nothing
-				}
-			}
-		}
-		
-		
-		/*if (w_pawns.getDataSize() == 0 && b_pawns.getDataSize() == 0) {
-			
-			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
-			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
-			int material_imbalance = w_eval_nopawns_e - b_eval_nopawns_e;
-			
-			//Mop-up evaluation
-			//PosEval=4.7*CMD + 1.6*(14 - MD)
-			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
-			if (w_eval_nopawns_e > b_eval_nopawns_e) { //White can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[b_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
-				
-				return (int) returnVal(material_imbalance + 3 * (int) (4.7 * CMD + 1.6 * MD));
-				
-			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[w_king.getData()[0]];
-				int MD = Fields.getTropismPoint(w_king.getData()[0], b_king.getData()[0]);
-				
-				return (int) returnVal(material_imbalance - 3 * (int) (4.7 * CMD + 1.6 * MD));
-				
-			}
-		}*/
-		
-		
-		double eval = phase1();
-		
-		return (int) returnVal(eval);
+		return returnVal(white_eval);
 	}
 	
 	
 	protected double returnVal(double white_eval) {
 		
+		white_eval = drawProbability(white_eval);
 		
-		white_eval = applyExchangeMotivation(white_eval);
+		return setSign(white_eval);
+	}
+
+
+	private double setSign(double white_eval) {
 		
-		
-		double result = white_eval;
-		
-		result = drawProbability(result);
-		
-		if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+		if (bitboard.getColourToMove() == Constants.COLOUR_WHITE) {
 			
-			result = -result;
+			return white_eval;
+			
+		} else {
+			
+			double black_eval = -white_eval;
+			
+			return black_eval;
+		}
+	}
+	
+	
+	private double drawProbability(double eval) {
+		
+		
+		double abs = Math.abs(eval);
+		
+		
+		/**
+		 * Differently colored bishops, no other pieces except pawns
+		 */
+		int count_bishops_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP));
+		
+		int count_bishops_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP));
+		
+		if (count_bishops_w == 1
+					&& count_bishops_b == 1
+					&& bitboard.getMaterialFactor().getWhiteFactor() == 3
+					&& bitboard.getMaterialFactor().getBlackFactor() == 3
+				) {
+			
+			long w_colour = (bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP) & Fields.ALL_WHITE_FIELDS) != 0 ?
+					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
+			
+			long b_colour = (bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP) & Fields.ALL_WHITE_FIELDS) != 0 ?
+					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
+			
+			if (w_colour != b_colour) {
+				
+				//If one of the sides has advantage, than let it know the probability of draw increases
+				abs = abs / 2;
+			}
 		}
 		
 		
-		return result;
+		/**
+		 * 50 moves rule - evaluation goes down / up to 0, move after move.
+		 */
+		int movesBeforeDraw = 100 - bitboard.getDraw50movesRule();
+		
+		double percents = movesBeforeDraw / (double) 100;
+		
+		abs = (int) (percents * abs);
+		
+		
+		return eval >= 0 ? abs : -abs;
 	}
 	
 	
@@ -566,50 +429,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 	}
 	
 	
-	private double drawProbability(double eval) {
-		
-		
-		double abs = Math.abs(eval);
-		
-		
-		/**
-		 * Differently colored bishops, no other pieces except pawns
-		 */
-		int count_bishops_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER));
-		int count_bishops_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER));
-		
-		if (count_bishops_w == 1
-					&& count_bishops_b == 1
-					&& bitboard.getMaterialFactor().getWhiteFactor() == 3
-					&& bitboard.getMaterialFactor().getBlackFactor() == 3
-				) {
-			
-			long w_colour = (bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_OFFICER) & Fields.ALL_WHITE_FIELDS) != 0 ?
-					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
-			
-			long b_colour = (bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_OFFICER) & Fields.ALL_WHITE_FIELDS) != 0 ?
-					Fields.ALL_WHITE_FIELDS : Fields.ALL_BLACK_FIELDS;
-			
-			if (w_colour != b_colour) {
-				
-				//If one of the sides has advantage, than let it know the probability of draw increases
-				abs = abs / 2;
-			}
-		}
-		
-		
-		/**
-		 * 50 moves rule - evaluation goes down / up to 0, move after move.
-		 */
-		int movesBeforeDraw = 100 - bitboard.getDraw50movesRule();
-		double percents = movesBeforeDraw / (double) 100;
-		abs = (int) (percents * abs);
-		
-		
-		return eval >= 0 ? abs : -abs;
-	}
-	
-	
 	private static void generateAllPossibleMaterialFactorStates(int q, int r, int b, int n, int factor_parent_state, int captures_count) {
 		
 		int factor_current_state = q * 9 + r * 5 + b * 3 + n * 3;
@@ -648,22 +467,164 @@ public abstract class BaseEvaluator implements IEvaluator {
 	}
 	
 	
+	private boolean canWin(int color) {
+		
+		if (color == Constants.COLOUR_WHITE) {
+			
+			long pawns_w = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN);
+			
+			if (pawns_w != 0) {
+				
+				return true;
+			}
+			
+			long queens_w = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN);
+			
+			if (queens_w != 0) {
+				
+				return true;
+			}
+			
+			long rooks_w = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_ROOK);
+			
+			if (rooks_w != 0) {
+				
+				return true;
+			}
+
+			long knights_w = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT);
+			long bishops_w = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP);
+			
+			if (knights_w != 0 && bishops_w != 0) {
+				
+				return true;
+			}
+			
+			if (Long.bitCount(knights_w) >= 3) {
+				
+				return true;
+			}
+			
+			if (Long.bitCount(bishops_w) >= 2) {
+				
+				return true;
+			}
+			
+			
+			return false;
+			
+		} else {
+			
+			long pawns_b = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN);
+			
+			if (pawns_b != 0) {
+				
+				return true;
+			}
+			
+			long queens_b = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN);
+			
+			if (queens_b != 0) {
+				
+				return true;
+			}
+			
+			long rooks_b = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_ROOK);
+			
+			if (rooks_b != 0) {
+				
+				return true;
+			}
+
+			long knights_b = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT);
+			long bishops_b = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP);
+			
+			if (knights_b != 0 && bishops_b != 0) {
+				
+				return true;
+			}
+			
+			if (Long.bitCount(knights_b) >= 3) {
+				
+				return true;
+			}
+			
+			if (Long.bitCount(bishops_b) >= 2) {
+				
+				return true;
+			}
+			
+			
+			return false;
+		}
+	}
+	
+	
+	private double applyMaterialCorrectionByPawnsCount(double white_eval) {
+		
+		/*int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN));
+		int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN));
+		
+		if (white_eval > 0) {
+			
+			white_eval -= white_eval * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
+			
+		} else if (white_eval < 0) {
+			
+			white_eval += white_eval * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
+		}*/
+
+		
+		return white_eval;
+	}
+	
+	
 	public int eval_material_nopawnsdrawrule() {
+		
 		
 		int w_eval_nopawns_o = baseEval.getWhiteMaterialNonPawns_o();
 		int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
-		int b_eval_nopawns_o = baseEval.getBlackMaterialNonPawns_o();
-		int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
-		
 		int w_eval_pawns_o = baseEval.getWhiteMaterialPawns_o();
 		int w_eval_pawns_e = baseEval.getWhiteMaterialPawns_e();
+		
+		
+		int b_eval_nopawns_o = baseEval.getBlackMaterialNonPawns_o();
+		int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
 		int b_eval_pawns_o = baseEval.getBlackMaterialPawns_o();
 		int b_eval_pawns_e = baseEval.getBlackMaterialPawns_e();
 		
-		int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_WHITE, Figures.TYPE_PAWN));
-		int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN));
 		
-		if (count_pawns_w == 0) {
+		/*int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN));
+		int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN));
+		
+		
+		if (w_eval_nopawns_o > 0) {
+			
+			w_eval_nopawns_o -= w_eval_nopawns_o * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
+			
+			w_eval_nopawns_e -= w_eval_nopawns_e * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
+			
+		} else if (w_eval_nopawns_o < 0) {
+			
+			w_eval_nopawns_o += w_eval_nopawns_o * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
+			
+			w_eval_nopawns_e += w_eval_nopawns_e * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_w];
+		}
+		
+		if (b_eval_nopawns_o > 0) {
+			
+			b_eval_nopawns_o -= b_eval_nopawns_o * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_b];
+			
+			b_eval_nopawns_e -= b_eval_nopawns_e * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_b];
+			
+		} else if (b_eval_nopawns_o < 0) {
+			
+			b_eval_nopawns_o += b_eval_nopawns_o * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_b];
+			
+			b_eval_nopawns_e += b_eval_nopawns_e * MATERIAL_CORRECTION_BY_PAWNS[count_pawns_b];
+		}*/
+		
+		/*if (count_pawns_w == 0) {
 			
 			if (w_eval_pawns_o != 0 || w_eval_pawns_e != 0) {
 				throw new IllegalStateException("w_eval_pawns_o=" + w_eval_pawns_o + ", w_eval_pawns_e=" + w_eval_pawns_e);
@@ -691,16 +652,103 @@ public abstract class BaseEvaluator implements IEvaluator {
 			if (b_eval_nopawns_e < baseEval.getMaterial_BARIER_NOPAWNS_E()) {
 				b_eval_nopawns_e = b_eval_nopawns_e / 2;
 			}
-		}
+		}*/
 		
 		return interpolator.interpolateByFactor(
-				(w_eval_nopawns_o - b_eval_nopawns_o) + (w_eval_pawns_o - b_eval_pawns_o),
-				(w_eval_nopawns_e - b_eval_nopawns_e) + (w_eval_pawns_e - b_eval_pawns_e));
+					(w_eval_nopawns_o + w_eval_pawns_o) - (b_eval_nopawns_o + b_eval_pawns_o),
+					(w_eval_nopawns_e + w_eval_pawns_e) - (b_eval_nopawns_e + b_eval_pawns_e)
+				);
 
 	}
-
+	
+	
+	private int eval_material_imbalances() {
+		
+		long pawns_w = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN);
+		long pawns_b = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN);
+		
+		long knights_w = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT);
+		long knights_b = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT);
+		
+		long bishops_w = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP);
+		long bishops_b = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP);
+		
+		long rooks_w = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_ROOK);
+		long rooks_b = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_ROOK);
+		
+		long queens_w = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN);
+		long queens_b = bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN);
+		
+		
+		int eval = 0;
+		
+		
+		// knights and pawns
+		/*eval += 3 * Long.bitCount(knights_w) * Long.bitCount(pawns_w);
+		eval -= 3 * Long.bitCount(knights_b) * Long.bitCount(pawns_b);*/
+		
+		
+		// double bishop
+		if (Long.bitCount(bishops_w) >= 2) {
+			
+			eval += DOUBLE_BISHOP;
+		}
+		
+		if (Long.bitCount(bishops_b) >= 2) {
+			
+			eval -= DOUBLE_BISHOP;
+		}
+		
+		
+		// queen and nights
+		/*if (queens_w != 0) {
+			
+			eval += KNIGHTS_AND_QUEEN * Long.bitCount(knights_w);
+		}
+		
+		if (queens_b != 0) {
+			
+			eval -= KNIGHTS_AND_QUEEN * Long.bitCount(knights_b);
+		}*/
+		
+		
+		// rooks and pawns
+		//eval += Long.bitCount(rooks_w) * ((-3) * Long.bitCount(pawns_w));
+		//eval -= Long.bitCount(rooks_b) * ((-3) * Long.bitCount(pawns_w));
+		
+		
+		// rook pair
+		/*if (Long.bitCount(rooks_w) >= 2) {
+			eval += ROOKS_PAIR;
+		}
+		if (Long.bitCount(rooks_b) >= 2) {
+			eval -= ROOKS_PAIR;
+		}*/
+		
+		
+		return eval;
+	}
+	
 	
 	protected static final int axisSymmetry(int fieldID) {
 		return Fields.HORIZONTAL_SYMMETRY[fieldID];
+	}
+	
+	
+	public int lazyEval(int depth, int alpha, int beta, int rootColour) {
+		
+		return lazyEval(depth, alpha, beta, rootColour, null);
+	}
+	
+	
+	public int lazyEval(int depth, int alpha, int beta, int rootColour, FullEvalFlag flag) {
+		
+		throw new UnsupportedOperationException();
+	}
+	
+	
+	public int roughEval(int depth, int rootColour) {
+		
+		throw new UnsupportedOperationException();
 	}
 }
