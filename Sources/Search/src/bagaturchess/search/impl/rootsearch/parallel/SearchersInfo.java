@@ -56,11 +56,21 @@ public class SearchersInfo {
 			ISearchInfo info = searchersNodesInfo.get(searcher);
 			if (info != null) {
 				nodes += info.getSearchedNodes();
-				//result.setTBhits(result.getTBhits() + cur.getTBhits());
-				if (true) throw new IllegalStateException();
 			}
 		}
 		return nodes;
+	}
+	
+	
+	private long getTBHits() {
+		long hits = 0;
+		for (IRootSearch searcher: searchersNodesInfo.keySet()) {
+			ISearchInfo info = searchersNodesInfo.get(searcher);
+			if (info != null) {
+				hits += info.getTBhits();
+			}
+		}
+		return hits;
 	}
 	
 	
@@ -151,6 +161,7 @@ public class SearchersInfo {
 		
 		
 		long totalNodes = getNodesCount();
+		long tbhits = getTBHits();
 		/*for (IRootSearch cur_searcher: searchersInfo.keySet()) {
 			SearcherInfo cur_searcher_infos = searchersInfo.get(cur_searcher);
 			if (cur_searcher_infos != null){
@@ -200,7 +211,7 @@ public class SearchersInfo {
 		info_to_send.setBestMove(bestMoveInfo.best_info.getBestMove());
 		info_to_send.setPV(bestMoveInfo.best_info.getPV());
 		info_to_send.setSearchedNodes(totalNodes);
-		
+		info_to_send.setTBhits(tbhits);
 		
 		return info_to_send;
 	}
