@@ -1,3 +1,6 @@
+Version 3.1 (7 January 2022)
+  * Hotfix: now the SMP version is working again with tbhits reporting logic
+
 Version 3.0 (1 January 2022)
   * Reduced LMR, now it finds mate in 5 in one test position using up to 10 seconds. More details: https://github.com/bagaturchess/Bagatur/issues/11
   * UCI metric "tbhits" implemented as a part of info string
