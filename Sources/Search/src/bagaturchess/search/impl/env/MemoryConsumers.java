@@ -106,7 +106,7 @@ public class MemoryConsumers {
 		
 		if (MEMORY_USAGE_PERCENT == 0) {
 			//0.29 for short games (e.g. 1/1), 0.69 for long games (e.g. 40/40)
-			double memoryUsagePercent = 1.00;//(engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.69 : 0.29;
+			double memoryUsagePercent = 0.90;//(engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.69 : 0.29;
 			MEMORY_USAGE_PERCENT = memoryUsagePercent;//Set only if not set statically
 		}
 		
