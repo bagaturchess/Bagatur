@@ -94,10 +94,12 @@ public class PositionsTraverser {
 				Set<EvaluatedMove> emoves = board.getChildren();
 				
 				for (EvaluatedMove emove: emoves) {
+					
 					int eval_ofOriginatePlayer = emove.eval_ofOriginatePlayer();
 					IGameStatus status = emove.getStatus();
 					
 					if (status == IGameStatus.NONE) { //Still possible to have forced win
+						
 						int[] moves = emove.getMoves();
 						
 						int whitePlayerEval = eval_ofOriginatePlayer;
@@ -106,12 +108,18 @@ public class PositionsTraverser {
 						}
 						
 						for (int k=0; k<moves.length; k++) {
+							
+							//System.out.println("move forward " + bitboard.getMoveOps().moveToString(moves[k]));
 							bitboard.makeMoveForward(moves[k]);
 						}
 						
+						
 						visitor.visitPosition(bitboard, status, whitePlayerEval);
 						
+						
 						for (int k=moves.length-1; k>=0; k--) {
+							
+							//System.out.println("move backward " + bitboard.getMoveOps().moveToString(moves[k]));
 							bitboard.makeMoveBackward(moves[k]);	
 						}
 						

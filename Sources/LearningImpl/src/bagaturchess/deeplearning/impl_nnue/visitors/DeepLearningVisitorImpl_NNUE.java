@@ -81,8 +81,9 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 			throw new IllegalStateException("status=" + status);
 		}
 		
-		NeuralNetworkUtils.clearInputsArray(inputs);
-		NeuralNetworkUtils_NNUE_PSQT.fillInputs(network, inputs, bitboard);
+		//NeuralNetworkUtils.clearInputsArray(inputs);
+		//NeuralNetworkUtils_NNUE_PSQT.fillInputs(network, inputs, bitboard);
+		network.setInput(bitboard.getNNUEInputs());
 		NeuralNetworkUtils.calculate(network);
 		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);
 		
@@ -92,19 +93,19 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		
 		
 		DataSet trainingSet = new DataSet(NeuralNetworkUtils_NNUE_PSQT.getInputsSize(), 1);
-		NeuralNetworkUtils.clearInputsArray(inputs);
-		NeuralNetworkUtils_NNUE_PSQT.fillInputs(inputs, bitboard);
-        trainingSet.addRow(new DataSetRow(inputs, new double[]{expectedWhitePlayerEval_func}));
+		//NeuralNetworkUtils.clearInputsArray(inputs);
+		//NeuralNetworkUtils_NNUE_PSQT.fillInputs(inputs, bitboard);
+        trainingSet.addRow(new DataSetRow(bitboard.getNNUEInputs(), new double[]{expectedWhitePlayerEval_func}));
         network.getLearningRule().doLearningEpoch(trainingSet);
         
         
 		counter++;
-		if ((counter % 100000) == 0) {
+		/*if ((counter % 10000) == 0) {
 			
-			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
+			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, positions: " + counter);
 			
 			network.save(NET_FILE);
-		}
+		}*/
 	}
 	
 	
@@ -123,8 +124,21 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		
 		//System.out.println("***************************************************************************************************");
 		//System.out.println("End iteration " + iteration + ", Total evaluated positions count is " + counter);
-		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
+		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, positions: " + counter);
 		
 		network.save(NET_FILE);
+	}
+	
+	
+	private double[] copy(double[] src) {
+	
+		double[] dst = new double[src.length];
+		
+		for (int i = 0; i < src.length; i++) {
+			
+			dst[i] = src[i];
+		}
+		
+		return dst;
 	}
 }

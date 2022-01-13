@@ -90,7 +90,8 @@ public class NNUE_Input implements MoveListener {
 		int toFieldID = board.getMoveOps().getToFieldID(move);
 		
 		setInputAt(color, pieceType, fromFieldID, 0);
-		setInputAt(color, pieceType, toFieldID, 1);
+		if (!board.getMoveOps().isPromotion(move)) setInputAt(color, pieceType, toFieldID, 1);
+		
 		
 		if (board.getMoveOps().isEnpassant(move)) {
 			
@@ -155,7 +156,8 @@ public class NNUE_Input implements MoveListener {
 		int toFieldID = board.getMoveOps().getToFieldID(move);
 		
 		setInputAt(color, pieceType, fromFieldID, 1);
-		setInputAt(color, pieceType, toFieldID, 0);
+		if (!board.getMoveOps().isPromotion(move)) setInputAt(color, pieceType, toFieldID, 0);
+		
 		
 		if (board.getMoveOps().isEnpassant(move)) {
 			
@@ -253,19 +255,19 @@ public class NNUE_Input implements MoveListener {
 				
 				if (inputs[index] != 1) {
 					
-					throw new IllegalStateException("signal=" + signal);
+					throw new IllegalStateException("signal=" + signal + ", color=" + color + ", piece_type=" + piece_type + ", square_id=" + square_id);
 				}
 				
 			} else if (signal == 1) {
 				
 				if (inputs[index] != 0) {
 					
-					throw new IllegalStateException("signal=" + signal);
+					throw new IllegalStateException("signal=" + signal + ", color=" + color + ", piece_type=" + piece_type + ", square_id=" + square_id);
 				}
 				
 			} else {
 				
-				throw new IllegalStateException("signal=" + signal);
+				throw new IllegalStateException("signal=" + signal + ", color=" + color + ", piece_type=" + piece_type + ", square_id=" + square_id);
 			}
 		}
 		
