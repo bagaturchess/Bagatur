@@ -1,15 +1,9 @@
 package bagaturchess.bitboard.impl1;
 
 
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.EMPTY;
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl1.internal.Bitboard;
-import bagaturchess.bitboard.impl1.internal.ChessConstants;
-import bagaturchess.bitboard.impl1.internal.EvalConstants;
 
 
 public class NNUE_Input implements MoveListener {
