@@ -87,4 +87,6 @@ public interface IBoard {
 	public int[] getPlayedMoves();
 	public int getLastMove();
 	public IGameStatus getStatus();
+	
+	public double[] getNNUEInputs();
 }

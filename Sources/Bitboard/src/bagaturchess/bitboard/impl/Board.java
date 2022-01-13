@@ -4715,11 +4715,12 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 			board[fieldID] = pid;
 			
 			if (pid != Constants.PID_NONE) {
+				
 				pieces.add(pid, fieldID);
 				
-				materialFactor.initially_addPiece(pid, fieldID);
-				materialState.initially_addPiece(pid, fieldID);
-				if (eval != null) eval.initially_addPiece(pid, fieldID);
+				materialFactor.initially_addPiece(pid, fieldID, 0);
+				materialState.initially_addPiece(pid, fieldID, 0);
+				if (eval != null) eval.initially_addPiece(pid, fieldID, 0);
 				/*if (moveListeners.length > 0) {
 					for (int i=0; i<moveListeners.length; i++) {
 						moveListeners[i].initially_addPiece(pid, fieldID);
@@ -5358,6 +5359,13 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	
 	@Override
 	public int getEnpassantSquareID() {
+		throw new UnsupportedOperationException();
+	}
+	
+	
+	@Override
+	public double[] getNNUEInputs() {
+		
 		throw new UnsupportedOperationException();
 	}
 }

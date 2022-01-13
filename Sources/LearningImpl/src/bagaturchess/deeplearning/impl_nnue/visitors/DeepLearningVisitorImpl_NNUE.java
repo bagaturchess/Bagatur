@@ -35,21 +35,20 @@ import org.neuroph.nnet.learning.BackPropagation;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
-import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE;
-import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_Material;
 import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
-import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT_Material;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
 
 public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 	
 	
+	public static final String NET_FILE = "nnue.dn.bin";
+	
+	
 	private int iteration = 0;
 	
 	private int counter;
 	
-	private static final String NET_FILE = "net.bin";
 	private MultiLayerPerceptron network;
 	
 	
@@ -58,14 +57,14 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 	
 	private long startTime;
 	
-	double[] inputs = new double[NeuralNetworkUtils_NNUE_PSQT_Material.getInputsSize()];
+	double[] inputs = new double[NeuralNetworkUtils_NNUE_PSQT.getInputsSize()];
 	
 	
 	public DeepLearningVisitorImpl_NNUE() throws Exception {
 		if ((new File(NET_FILE)).exists() ){
 			network = NeuralNetworkUtils.loadNetwork(NET_FILE);
 		} else {
-			network = NeuralNetworkUtils_NNUE_PSQT_Material.buildNetwork();
+			network = NeuralNetworkUtils_NNUE_PSQT.buildNetwork();
 		}
 	}
 	
@@ -83,7 +82,7 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		}
 		
 		NeuralNetworkUtils.clearInputsArray(inputs);
-		NeuralNetworkUtils_NNUE_PSQT_Material.fillInputs(network, inputs, bitboard);
+		NeuralNetworkUtils_NNUE_PSQT.fillInputs(network, inputs, bitboard);
 		NeuralNetworkUtils.calculate(network);
 		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);
 		
@@ -92,9 +91,9 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		sumDiffs2 += Math.abs(expectedWhitePlayerEval_func - actualWhitePlayerEval);
 		
 		
-		DataSet trainingSet = new DataSet(NeuralNetworkUtils_NNUE_PSQT_Material.getInputsSize(), 1);
+		DataSet trainingSet = new DataSet(NeuralNetworkUtils_NNUE_PSQT.getInputsSize(), 1);
 		NeuralNetworkUtils.clearInputsArray(inputs);
-		NeuralNetworkUtils_NNUE_PSQT_Material.fillInputs(inputs, bitboard);
+		NeuralNetworkUtils_NNUE_PSQT.fillInputs(inputs, bitboard);
         trainingSet.addRow(new DataSetRow(inputs, new double[]{expectedWhitePlayerEval_func}));
         network.getLearningRule().doLearningEpoch(trainingSet);
         

@@ -131,6 +131,7 @@ public class MTDSchedulerMain {
 								//bagaturchess.learning.goldmiddle.impl3.cfg.EvaluationConfig_V18.class.getName()
 								bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20.class.getName(),
 								bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20.class.getName(),
+								//bagaturchess.deeplearning.impl_nnue.eval.EvaluationConfig.class.getName(),
 								//bagaturchess.deeplearning.impl.eval.allfeatures.EvaluationConfig.class.getName(),
 								//bagaturchess.deeplearning_deepnetts.impl1.eval.EvaluationConfig.class.getName(),
 								//bagaturchess.deeplearning.impl_nnue.eval.EvaluationConfig.class.getName(),
@@ -178,9 +179,9 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("k7/8/4Kp2/5P2/8/6b1/8/8 b - - 0 1", cfg.getBoardConfig());
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/p6p/1pk3p1/2n2p2/P1n5/2NN1K1P/5PP1/8 w - - 4 4", cfg.getBoardConfig());
 		
-		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig()); //8/5n2/8/8/6kp/4K3/8/8 b - - 0 1
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig()); //8/5n2/8/8/6kp/4K3/8/8 b - - 0 1
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5n2/3n3p/7K/5k2/8/5P1N/8 w - - 0 1", cfg.getBoardConfig());//Cannot make mate with 2 N
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5n2/8/8/6kp/4K3/8/8 b - - 0 1", cfg.getBoardConfig()); //promote rook pawn - g4g3
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5n2/8/8/6kp/4K3/8/8 b - - 0 1", cfg.getBoardConfig()); //promote rook pawn - g4g3
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5q2/1p1K3p/7P/2k3P1/8/8/8 b - - 0 48", cfg.getBoardConfig()); //Mate in 5
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/8/1k2Kp2/5P2/8/2b5/8/8 w - - 0 1", cfg.getBoardConfig()); //Do not give the only pawn
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/7p/8/5n1K/4n1P1/k7/5P2/8 b - - 0 1", cfg.getBoardConfig()); //Black must win

@@ -80,6 +80,8 @@ public class BoardImpl implements IBitBoard {
 	
 	private MoveListener[] moveListeners;
 	
+	private NNUE_Input nnue_input;
+	
 	
 	public BoardImpl(String fen, IBoardConfig _boardConfig) {
 		
@@ -99,9 +101,11 @@ public class BoardImpl implements IBitBoard {
 		
 		hasMovesList = new BaseMoveList(250);
 		
+		
 		moveListeners = new MoveListener[0];
 		
 		addMoveListener(materialFactor);
+		
 		
 		if (boardConfig != null) {
 			
@@ -113,7 +117,7 @@ public class BoardImpl implements IBitBoard {
 				for (int piece = PAWN; piece <= KING; piece++) {
 					long pieces = chessBoard.pieces[color][piece];
 					while (pieces != 0) {
-						baseEval.initially_addPiece(color, piece);
+						baseEval.initially_addPiece(color, piece, pieces);
 						pieces &= pieces - 1;
 					}
 				}
@@ -121,6 +125,18 @@ public class BoardImpl implements IBitBoard {
 			
 			addMoveListener(baseEval);
 		}
+		
+		
+		nnue_input = new NNUE_Input(this);
+		
+		for (int color = 0; color < 2; color++) {
+			for (int piece = PAWN; piece <= KING; piece++) {
+				long pieces = chessBoard.pieces[color][piece];
+				nnue_input.initially_addPiece(color, piece, pieces);
+			}
+		}
+		
+		addMoveListener(nnue_input);
 	}
 	
 	
@@ -664,6 +680,13 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
+	@Override
+	public double[] getNNUEInputs() {
+		
+		return nnue_input.getInputs();
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#getPawnsStructure()
 	 */
@@ -868,13 +891,6 @@ public class BoardImpl implements IBitBoard {
 
 
 		@Override
-		public void initially_addPiece(int pid, int fieldID) {
-			// TODO Auto-generated method stub
-			
-		}
-
-
-		@Override
 		public void preForwardMove(int color, int move) {
 			// TODO Auto-generated method stub
 			
@@ -897,6 +913,13 @@ public class BoardImpl implements IBitBoard {
 
 		@Override
 		public void postBackwardMove(int color, int move) {
+			// TODO Auto-generated method stub
+			
+		}
+
+
+		@Override
+		public void initially_addPiece(int color, int type, long bb_pieces) {
 			// TODO Auto-generated method stub
 			
 		}

@@ -583,4 +583,11 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 	public int getSEEFieldScore(int squareID) {
 		return bitboard.getSEEFieldScore(squareID);
 	}
+	
+	
+	@Override
+	public double[] getNNUEInputs() {
+		
+		return bitboard.getNNUEInputs();
+	}
 }

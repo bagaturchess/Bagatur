@@ -27,7 +27,7 @@ public interface MoveListener {
 	
 	public void addPiece_Special(int color, int type);
 	
-	public void initially_addPiece(int color, int type);
+	public void initially_addPiece(int color, int type, long bb_pieces);
 	
 	public void preForwardMove(int color, int move);
 	

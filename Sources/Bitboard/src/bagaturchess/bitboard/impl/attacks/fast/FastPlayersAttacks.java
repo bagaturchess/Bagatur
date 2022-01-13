@@ -86,7 +86,7 @@ public class FastPlayersAttacks implements MoveListener {
 		data.addPromotionFigureID_OnForwardMove(promotedPID, fieldID);
 	}
 	
-	public void initially_addPiece(int promotedPID, int fieldID) {
+	public void initially_addPiece(int promotedPID, int fieldID, long bb_pieces) {
 		AffectionData data = leveldata[playedMoveIndex - 1];
 		data.addPromotionFigureID_OnForwardMove(promotedPID, fieldID);
 	}

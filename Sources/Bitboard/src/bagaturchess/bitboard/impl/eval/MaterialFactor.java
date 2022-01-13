@@ -87,7 +87,7 @@ public class MaterialFactor implements MoveListener, IMaterialFactor, Cloneable 
 	}
 	
 	
-	public void initially_addPiece(int pid, int fieldID) {
+	public void initially_addPiece(int pid, int fieldID, long bb_pieces) {
 		added(pid);
 	}
 

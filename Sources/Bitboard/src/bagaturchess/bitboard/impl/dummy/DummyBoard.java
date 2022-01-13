@@ -756,4 +756,11 @@ public class DummyBoard implements IBitBoard {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
+	
+	@Override
+	public double[] getNNUEInputs() {
+		
+		throw new UnsupportedOperationException();
+	}
 }

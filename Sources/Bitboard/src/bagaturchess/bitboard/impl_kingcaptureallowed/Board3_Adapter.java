@@ -236,4 +236,11 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 	public int getEnpassantSquareID() {
 		throw new UnsupportedOperationException();
 	}
+	
+	
+	@Override
+	public double[] getNNUEInputs() {
+		
+		throw new UnsupportedOperationException();
+	}
 }

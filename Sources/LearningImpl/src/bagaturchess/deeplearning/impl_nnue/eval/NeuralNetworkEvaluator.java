@@ -6,9 +6,8 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
-import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_Material;
 import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
-import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT_Material;
+import bagaturchess.deeplearning.impl_nnue.visitors.DeepLearningVisitorImpl_NNUE;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
@@ -20,7 +19,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	private IBitBoard bitboard;	
 	private MultiLayerPerceptron network;
 	
-	private double[] inputs = new double[NeuralNetworkUtils_NNUE_PSQT_Material.getInputsSize()];
+	//private double[] inputs = new double[NeuralNetworkUtils_NNUE_PSQT.getInputsSize()];
 	
 	
 	NeuralNetworkEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -29,15 +28,16 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 		
 		bitboard = _bitboard;
 		
-		network = (MultiLayerPerceptron) NeuralNetwork.createFromFile("net.bin");
+		network = (MultiLayerPerceptron) NeuralNetwork.createFromFile(DeepLearningVisitorImpl_NNUE.NET_FILE);
 	}
 	
 	
 	@Override
 	protected double phase1() {
 		
-		NeuralNetworkUtils.clearInputsArray(inputs);
-		NeuralNetworkUtils_NNUE_PSQT_Material.fillInputs(network, inputs, bitboard);
+		//NeuralNetworkUtils.clearInputsArray(inputs);
+		//NeuralNetworkUtils_NNUE_PSQT.fillInputs(network, inputs, bitboard);
+		network.setInput(bitboard.getNNUEInputs());
 		NeuralNetworkUtils.calculate(network);
 		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);
 

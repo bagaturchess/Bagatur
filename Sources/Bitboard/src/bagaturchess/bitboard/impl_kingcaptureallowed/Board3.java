@@ -1350,9 +1350,9 @@ abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 			if (pid != Constants.PID_NONE) {
 				pieces.add(pid, fieldID);
 				
-				materialFactor.initially_addPiece(pid, fieldID);
-				materialState.initially_addPiece(pid, fieldID);
-				if (eval != null) eval.initially_addPiece(pid, fieldID);
+				materialFactor.initially_addPiece(pid, fieldID, 0);
+				materialState.initially_addPiece(pid, fieldID, 0);
+				if (eval != null) eval.initially_addPiece(pid, fieldID, 0);
 				
 				hashkey ^= ConstantStructure.MOVES_KEYS[pid][fieldID];
 				if (pid == Constants.PID_W_PAWN ||
