@@ -41,7 +41,6 @@ import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.bitboard.impl1.NNUE_Input;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
 import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
-import bagaturchess.deeplearning.impl_nnue.Utils;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
 
