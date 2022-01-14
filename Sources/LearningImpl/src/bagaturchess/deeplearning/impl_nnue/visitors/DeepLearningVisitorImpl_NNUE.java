@@ -23,6 +23,9 @@
 package bagaturchess.deeplearning.impl_nnue.visitors;
 
 
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.KING;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.PAWN;
+
 import java.io.File;
 
 import org.neuroph.core.data.DataSet;
@@ -34,8 +37,11 @@ import org.neuroph.nnet.learning.BackPropagation;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
+import bagaturchess.bitboard.impl1.NNUE_Input;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
 import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
+import bagaturchess.deeplearning.impl_nnue.Utils;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
 
@@ -61,9 +67,15 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 	
 	
 	public DeepLearningVisitorImpl_NNUE() throws Exception {
-		if ((new File(NET_FILE)).exists() ){
+		
+		if ((new File(NET_FILE)).exists()) {
+			
 			network = NeuralNetworkUtils.loadNetwork(NET_FILE);
+			
+			printWeights(network.getWeights());
+			
 		} else {
+			
 			network = NeuralNetworkUtils_NNUE_PSQT.buildNetwork();
 		}
 	}
@@ -140,5 +152,47 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		}
 		
 		return dst;
+	}
+	
+	
+	public static final void printWeights(Double[] nnue_weights) {
+		
+		System.out.println("nnue_weights=" + nnue_weights.length);
+		
+		for (int color = 0; color < 2; color++) {
+			
+			for (int piece_type = PAWN; piece_type <= KING; piece_type++) {
+				
+				System.out.println("******************************************************************************************************************************************");
+				System.out.println("COLOR: " + color + ", TYPE: " + piece_type);
+				
+				VarStatistic stats = new VarStatistic();
+				
+				for (int rank = 7; rank >= 0; rank--) {
+					
+					String board_line = "";
+					
+					for (int file = 0; file < 8; file++) {
+						
+						int square_id = 8 * rank + file;
+						
+						int nnue_index = NNUE_Input.getInputIndex(color, piece_type, square_id);
+						
+						double nnue_weight = nnue_weights[nnue_index];
+						
+						stats.addValue(nnue_weight);
+								
+						board_line += nnue_weight + ", ";
+					}
+					
+					System.out.println(board_line);
+				}
+				
+				System.out.println("STATS: " + stats);
+				System.out.println("******************************************************************************************************************************************");
+			}
+		}
+		
+		System.exit(0);
 	}
 }

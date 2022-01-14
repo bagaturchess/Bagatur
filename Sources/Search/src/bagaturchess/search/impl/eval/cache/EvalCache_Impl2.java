@@ -49,9 +49,11 @@ public class EvalCache_Impl2 implements IEvalCache {
 			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("EvalCache_Impl2: limited to " + 1073741823 + " entries.");
 		}
 		
+		maxEntries = maxEntries + maxEntries % 2;
+				
 		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("EvalCache_Impl2: maxEntries=" + maxEntries);
 		
-		keys = new long[(int) maxEntries];
+		keys = new long[ (int) maxEntries];
 	}
 	
 	
@@ -107,15 +109,25 @@ public class EvalCache_Impl2 implements IEvalCache {
 	
 	
 	private int getValue(final long key) {
+		
+		//info string EvalCache_Impl2: maxEntries=14268825
+		//java.lang.ArrayIndexOutOfBoundsException: 14268825
+		
 		final int index = getIndex(key);
+		
 		final long storedKey = keys[index];
 		final long score = keys[index + 1];
+		
 		if (storedKey == keys[index]) {//Optimistic read locking
+			
 			if ((storedKey ^ score) == key) {
+				
 				hits++;
+				
 				return (int) score;
 			}
 		}
+		
 		return 0;
 	}
 	

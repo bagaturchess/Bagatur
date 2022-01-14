@@ -9,14 +9,14 @@ import bagaturchess.bitboard.impl.Constants;
 public class NNUE_Input implements MoveListener {
 	
 	
-	public static final int INPUT_SIZE = 12 * 64;
+	public static final int INPUT_SIZE 		= 12 * 64;
 	
-	private static final int SHIFT_KING 	= 0 * 64;
-	private static final int SHIFT_PAWNS 	= 1 * 64;
-	private static final int SHIFT_KNIGHTS 	= 2 * 64;
-	private static final int SHIFT_BISHOP 	= 3 * 64;
-	private static final int SHIFT_ROOK 	= 4 * 64;
-	private static final int SHIFT_QUEEN 	= 5 * 64;
+	public static final int SHIFT_KING 		= 0 * 64;
+	public static final int SHIFT_PAWNS 	= 1 * 64;
+	public static final int SHIFT_KNIGHTS 	= 2 * 64;
+	public static final int SHIFT_BISHOP 	= 3 * 64;
+	public static final int SHIFT_ROOK 		= 4 * 64;
+	public static final int SHIFT_QUEEN 	= 5 * 64;
 
 	private static final boolean CHECK_CONSISTENCY = true;
 	
@@ -215,7 +215,7 @@ public class NNUE_Input implements MoveListener {
 	}
 	
 	
-	private int getInputIndex(int color, int type, int square_id) {
+	public static final int getInputIndex(int color, int type, int square_id) {
 		
 		int index = (color == Constants.COLOUR_WHITE) ? 0 : INPUT_SIZE / 2;
 		

@@ -9,10 +9,13 @@ import bagaturchess.ucitracker.api.PositionsTraverser;
 
 public class DeepLearningTraverser_NNUE {
 	
+	
 	public static void main(String[] args) {
 		
 		System.out.println("Reading games ... ");
+		
 		long startTime = System.currentTimeMillis();
+		
 		try {
 			
 			//String filePath = "./Houdini.15a.short.cg";
@@ -26,13 +29,17 @@ public class DeepLearningTraverser_NNUE {
 			ILearningInput input = LearningInputFactory.createDefaultInput();
 			
 			while (true) {
+				
 				PositionsTraverser.traverseAll(filePath, learning, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
 			}
 			
 		} catch (Exception e) {
+			
 			e.printStackTrace();
 		}
+		
 		long endTime = System.currentTimeMillis();
+		
 		System.out.println("OK " + ((endTime - startTime) / 1000) + "sec");		
 	}
 }

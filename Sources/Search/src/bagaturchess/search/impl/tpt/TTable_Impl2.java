@@ -59,6 +59,8 @@ public class TTable_Impl2 implements ITTable {
 			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("TTable_Impl2: limited to " + 1073741823 + " entries.");
 		}
 		
+		maxEntries = maxEntries + maxEntries % 4;
+		
 		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("TTable_Impl2: maxEntries=" + maxEntries);
 		
 		keys = new long[(int) maxEntries];
