@@ -50,7 +50,9 @@ public class DataSet_1 implements DataSet<MLDataItem> {
 	
 	
 	public void addItem(Object inputs, float[] outputs) {
-		if (inputs.getClass().equals(float[][][].class)) {
+		if (inputs.getClass().equals(float[].class)) {
+			items.add(new TabularDataSet.Item(new Tensor((float[])inputs), new Tensor(outputs)));
+		} else if (inputs.getClass().equals(float[][][].class)) {
 			items.add(new TabularDataSet.Item(new Tensor((float[][][])inputs), new Tensor(outputs)));
 		} else if (inputs.getClass().equals(float[][].class)) {
 			items.add(new TabularDataSet.Item(new Tensor((float[][])inputs), new Tensor(outputs)));

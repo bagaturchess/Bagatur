@@ -586,7 +586,7 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 	
 	
 	@Override
-	public double[] getNNUEInputs() {
+	public Object getNNUEInputs() {
 		
 		return bitboard.getNNUEInputs();
 	}

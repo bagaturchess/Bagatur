@@ -681,7 +681,7 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
-	public double[] getNNUEInputs() {
+	public float[] getNNUEInputs() {
 		
 		return nnue_input.getInputs();
 	}

@@ -53,7 +53,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	@Override
 	protected double phase1() {
 		
-		for (int index = 0; index < bitboard.getNNUEInputs().length; index++) {
+		/*for (int index = 0; index < bitboard.getNNUEInputs().length; index++) {
 			
 			int piece_type = index / 64;
 			
@@ -69,7 +69,9 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 			inputs_3d[file][rank][piece_type] = (float) bitboard.getNNUEInputs()[index];
 		}
 		
-		Tensor tensor = new Tensor(inputs_3d);
+		Tensor tensor = new Tensor(inputs_3d);*/
+		
+		Tensor tensor = new Tensor((float[]) bitboard.getNNUEInputs());
 		
 		network.setInput(tensor);
 		

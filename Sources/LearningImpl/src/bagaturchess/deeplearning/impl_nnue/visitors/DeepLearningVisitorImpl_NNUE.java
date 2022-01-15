@@ -103,7 +103,7 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		}
 		
 		
-		for (int index = 0; index < bitboard.getNNUEInputs().length; index++) {
+		/*for (int index = 0; index < bitboard.getNNUEInputs().length; index++) {
 			
 			int piece_type = index / 64;
 			
@@ -120,6 +120,11 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		}
 		
 		Tensor tensor = new Tensor(inputs_3d);
+		*/
+		
+		float[] inputs_1d = (float[]) bitboard.getNNUEInputs();
+		
+		Tensor tensor = new Tensor(inputs_1d.length, 1, inputs_1d);
 		
 		network.setInput(tensor);
 		
@@ -144,7 +149,7 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
         float[] outputs = new float[1];
         outputs[0] = expectedWhitePlayerEval_func;
         
-        set.addItem(inputs_3d, outputs);
+        set.addItem(inputs_1d, outputs);
         
         trainer.train(set);
         
@@ -155,18 +160,18 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
         
         
 		counter++;
-		if ((counter % 10000) == 0) {
+		if ((counter % 1000000) == 0) {
 			
 			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, positions: " + counter);
 			
-			try {
+			/*try {
 				
 				FileIO.writeToFile(network, NET_FILE);
 				
 			} catch (IOException e) {
 				
 				e.printStackTrace();
-			}
+			}*/
 		}
 	}
 	

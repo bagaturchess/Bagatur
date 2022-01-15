@@ -21,20 +21,20 @@ public class NNUE_Input implements MoveListener {
 	private static final boolean CHECK_CONSISTENCY = true;
 	
 	
-	private double[] inputs;
+	private float[] inputs;
 	
 	private IBitBoard board;
 	
 	
 	public NNUE_Input(IBitBoard _board) {
 		
-		inputs = new double[INPUT_SIZE];
+		inputs = new float[INPUT_SIZE];
 		
 		board = _board;
 	}
 	
 	
-	public double[] getInputs() {
+	public float[] getInputs() {
 		
 		return inputs;
 	}
@@ -245,7 +245,7 @@ public class NNUE_Input implements MoveListener {
 	}
 	
 	
-	private final void setInputAt(int color, int piece_type, int square_id, double signal) {
+	private final void setInputAt(int color, int piece_type, int square_id, float signal) {
 		
 		int index = getInputIndex(color, piece_type, square_id);
 		

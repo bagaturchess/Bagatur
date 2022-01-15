@@ -26,6 +26,7 @@ import java.util.Random;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import deepnetts.net.ConvolutionalNetwork;
+import deepnetts.net.FeedForwardNetwork;
 import deepnetts.net.NeuralNetwork;
 import deepnetts.net.layers.activation.ActivationType;
 import deepnetts.net.loss.LossType;
@@ -46,38 +47,29 @@ public class NeuralNetworkUtils_NNUE_PSQT {
 	
 	public static NeuralNetwork buildNetwork() {
 		
-		
-		/*MultiLayerPerceptron mlp = new MultiLayerPerceptron(TransferFunctionType.LINEAR,
-				getInputsSize(),
-				2,
-				1);
-		
-		
-		mlp.randomizeWeights(new WeightsRandomizer(new Random(777)));
-        
-        mlp.setLearningRule(new BackPropagation());
-        //mlp.setLearningRule(new ConvolutionalBackpropagation());
-        //mlp.setLearningRule(new MomentumBackpropagation());
-        //mlp.setLearningRule(new DynamicBackPropagation());
-        
-        mlp.getLearningRule().setLearningRate(0.00001);
-        //mlp.getLearningRule().setLearningRate(0.005);
-        //mlp.getLearningRule().setLearningRate(0.0001);
-        */
-        
-        ConvolutionalNetwork neuralNet =  ConvolutionalNetwork.builder()
+        /*ConvolutionalNetwork nnet =  ConvolutionalNetwork.builder()
                 .addInputLayer(8, 8, 12)
-                .addConvolutionalLayer(3, 3, 12, 1, ActivationType.RELU)
                 //.addConvolutionalLayer(3, 3, 12, 1, ActivationType.RELU)
-                .addFullyConnectedLayer(8 * 8, ActivationType.SOFTMAX)
+                //.addConvolutionalLayer(3, 3, 12, 1, ActivationType.RELU)
+                //.addFullyConnectedLayer(8 * 8, ActivationType.SOFTMAX)
+                .addOutputLayer(1, ActivationType.LINEAR)
+                .lossFunction(LossType.MEAN_SQUARED_ERROR)
+                .randomSeed(System.currentTimeMillis() % 778)
+                .build();*/
+        
+		FeedForwardNetwork nnet =  FeedForwardNetwork.builder()
+                .addInputLayer(8 * 8 * 12)
+                //.addConvolutionalLayer(3, 3, 12, 1, ActivationType.RELU)
+                //.addConvolutionalLayer(3, 3, 12, 1, ActivationType.RELU)
+                .addFullyConnectedLayer(12, ActivationType.SOFTMAX)
                 .addOutputLayer(1, ActivationType.LINEAR)
                 .lossFunction(LossType.MEAN_SQUARED_ERROR)
                 .randomSeed(System.currentTimeMillis() % 778)
                 .build();
         
-        //neuralNet.getTrainer().setLearningRate(0.001f);
+		nnet.getTrainer().setLearningRate(0.00001f);
         
-        return neuralNet;
+        return nnet;
 	}
 	
 	
