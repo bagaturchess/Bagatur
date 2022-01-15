@@ -2,18 +2,14 @@ package bagaturchess.deeplearning.impl_nnue.eval;
 
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.deeplearning.api.NeuralNetworkUtils;
-import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
-import bagaturchess.deeplearning.impl_nnue.visitors.DeepLearningVisitorImpl_NNUE;
+import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
+import bagaturchess.deeplearning.impl_nnue.visitors.ActivationFunctions;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
-import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.net.NeuralNetwork;
 import deepnetts.util.Tensor;
 
@@ -36,7 +32,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 		
 		try {
 			
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DeepLearningVisitorImpl_NNUE.NET_FILE));
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(NNUE_Constants.NET_FILE));
 			
 			network = (NeuralNetwork) ois.readObject();
 			
@@ -53,7 +49,9 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	@Override
 	protected double phase1() {
 		
-		/*for (int index = 0; index < bitboard.getNNUEInputs().length; index++) {
+		float[] inputs = (float[]) bitboard.getNNUEInputs();
+		
+		for (int index = 0; index < inputs.length; index++) {
 			
 			int piece_type = index / 64;
 			
@@ -66,20 +64,22 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 			int file = sqare_id & 7;
 			int rank = sqare_id >>> 3;
 			
-			inputs_3d[file][rank][piece_type] = (float) bitboard.getNNUEInputs()[index];
+			inputs_3d[file][rank][piece_type] = inputs[index];
 		}
 		
-		Tensor tensor = new Tensor(inputs_3d);*/
+		Tensor tensor = new Tensor(inputs_3d);
 		
-		Tensor tensor = new Tensor((float[]) bitboard.getNNUEInputs());
+		//Tensor tensor = new Tensor((float[]) bitboard.getNNUEInputs());
 		
 		network.setInput(tensor);
 		
 		//forward method is already called in setInput(tensor)
 		//network.forward();
 		
-		double actualWhitePlayerEval = network.getOutput()[0];
+		float actualWhitePlayerEval = network.getOutput()[0];
 
+		actualWhitePlayerEval = ActivationFunctions.sigmoid_getx(actualWhitePlayerEval);
+		
 		return actualWhitePlayerEval;
 	}
 	

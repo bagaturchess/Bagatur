@@ -1,9 +1,13 @@
 package bagaturchess.bitboard.impl1;
 
 
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.KING;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.PAWN;
+
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 
 
 public class NNUE_Input implements MoveListener {
@@ -272,5 +276,47 @@ public class NNUE_Input implements MoveListener {
 		}
 		
 		inputs[index] = signal;
+	}
+	
+	
+	public static final void printWeights(Double[] nnue_weights) {
+		
+		System.out.println("nnue_weights=" + nnue_weights.length);
+		
+		for (int color = 0; color < 2; color++) {
+			
+			for (int piece_type = PAWN; piece_type <= KING; piece_type++) {
+				
+				System.out.println("******************************************************************************************************************************************");
+				System.out.println("COLOR: " + color + ", TYPE: " + piece_type);
+				
+				VarStatistic stats = new VarStatistic();
+				
+				for (int rank = 7; rank >= 0; rank--) {
+					
+					String board_line = "";
+					
+					for (int file = 0; file < 8; file++) {
+						
+						int square_id = 8 * rank + file;
+						
+						int nnue_index = NNUE_Input.getInputIndex(color, piece_type, square_id);
+						
+						double nnue_weight = nnue_weights[nnue_index];
+						
+						stats.addValue(nnue_weight);
+								
+						board_line += nnue_weight + ", ";
+					}
+					
+					System.out.println(board_line);
+				}
+				
+				System.out.println("STATS: " + stats);
+				System.out.println("******************************************************************************************************************************************");
+			}
+		}
+		
+		System.exit(0);
 	}
 }

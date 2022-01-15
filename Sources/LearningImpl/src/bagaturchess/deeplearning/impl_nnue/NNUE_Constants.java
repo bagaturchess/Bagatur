@@ -20,19 +20,7 @@
 package bagaturchess.deeplearning.impl_nnue;
 
 
-import org.neuroph.core.Layer;
-import org.neuroph.core.NeuralNetwork;
-import org.neuroph.util.ConnectionFactory;
-import org.neuroph.util.LayerFactory;
-import org.neuroph.util.TransferFunctionType;
-
-
-public class NeuralNetworkNNUE extends NeuralNetwork {
+public class NNUE_Constants {
 	
-	public NeuralNetworkNNUE() {
-		Layer inputLayer = LayerFactory.createLayer(64 * 5 * 64, TransferFunctionType.LINEAR);
-		Layer outputLayer = LayerFactory.createLayer(256, TransferFunctionType.LINEAR);
-		ConnectionFactory.fullConnect(inputLayer, outputLayer);
-		
-	}
+	public static final String NET_FILE = "nnue.dn.bin";
 }

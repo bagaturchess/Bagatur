@@ -43,20 +43,37 @@ public class DataSet_1 implements DataSet<MLDataItem> {
 		items = new ArrayList<MLDataItem>();
 		
 		targetNames = new String[13];
+		
 		for (int i = 0; i < targetNames.length; i++) {
+			
 			targetNames[i] = "LABEL" + i;
 		}
 	}
 	
 	
 	public void addItem(Object inputs, float[] outputs) {
+		
+		if (inputs instanceof Tensor) {
+			
+			items.add(new TabularDataSet.Item((Tensor) inputs, new Tensor(outputs)));
+			
+			return;
+		}
+		
 		if (inputs.getClass().equals(float[].class)) {
+			
 			items.add(new TabularDataSet.Item(new Tensor((float[])inputs), new Tensor(outputs)));
+			
 		} else if (inputs.getClass().equals(float[][][].class)) {
+			
 			items.add(new TabularDataSet.Item(new Tensor((float[][][])inputs), new Tensor(outputs)));
+			
 		} else if (inputs.getClass().equals(float[][].class)) {
+			
 			items.add(new TabularDataSet.Item(new Tensor((float[][])inputs), new Tensor(outputs)));
+			
 		} else {
+			
 			throw new IllegalStateException();
 		}
 	}
