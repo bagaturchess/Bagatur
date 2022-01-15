@@ -27,13 +27,11 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.KING;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.PAWN;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
-import org.neuroph.core.data.DataSet;
-import org.neuroph.core.data.DataSetRow;
-import org.neuroph.core.events.LearningEvent;
-import org.neuroph.core.events.LearningEventListener;
-import org.neuroph.nnet.MultiLayerPerceptron;
-import org.neuroph.nnet.learning.BackPropagation;
+import javax.visrec.ml.data.DataSet;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
@@ -42,6 +40,11 @@ import bagaturchess.bitboard.impl1.NNUE_Input;
 import bagaturchess.deeplearning.api.NeuralNetworkUtils;
 import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
 import bagaturchess.ucitracker.api.PositionsVisitor;
+import deepnetts.net.ConvolutionalNetwork;
+import deepnetts.net.NeuralNetwork;
+import deepnetts.net.train.BackpropagationTrainer;
+import deepnetts.util.FileIO;
+import deepnetts.util.Tensor;
 
 
 public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
@@ -54,7 +57,7 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 	
 	private int counter;
 	
-	private MultiLayerPerceptron network;
+	private NeuralNetwork network;
 	
 	
 	private double sumDiffs1;
@@ -64,14 +67,18 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 	
 	double[] inputs = new double[NeuralNetworkUtils_NNUE_PSQT.getInputsSize()];
 	
+	float[][][] inputs_3d = new float[8][8][12];
+	
 	
 	public DeepLearningVisitorImpl_NNUE() throws Exception {
 		
 		if ((new File(NET_FILE)).exists()) {
 			
-			network = NeuralNetworkUtils.loadNetwork(NET_FILE);
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(NET_FILE));
+			network = (ConvolutionalNetwork) ois.readObject();
+			ois.close();
 			
-			printWeights(network.getWeights());
+			//printWeights(network.getWeights());
 			
 		} else {
 			
@@ -83,40 +90,84 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 	@Override
 	public void visitPosition(IBitBoard bitboard, IGameStatus status, int expectedWhitePlayerEval) {
 		
+		
 		//double expectedWhitePlayerEval_func = 1 / (double) (1 + 1 / Math.pow(Math.E, expectedWhitePlayerEval));
 		//double expectedWhitePlayerEval_func = Math.tanh(expectedWhitePlayerEval);
 		//double expectedWhitePlayerEval_func = Math.log(expectedWhitePlayerEval);
-		double expectedWhitePlayerEval_func = expectedWhitePlayerEval;
+		float expectedWhitePlayerEval_func = expectedWhitePlayerEval;
+		
 		
 		if (status != IGameStatus.NONE) {
+			
 			throw new IllegalStateException("status=" + status);
 		}
 		
-		//NeuralNetworkUtils.clearInputsArray(inputs);
-		//NeuralNetworkUtils_NNUE_PSQT.fillInputs(network, inputs, bitboard);
-		network.setInput(bitboard.getNNUEInputs());
-		NeuralNetworkUtils.calculate(network);
-		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);
+		
+		for (int index = 0; index < bitboard.getNNUEInputs().length; index++) {
+			
+			int piece_type = index / 64;
+			
+			if (piece_type < 0 || piece_type > 11) {
+				
+				throw new IllegalStateException("piece_type=" + piece_type);
+			}
+			
+			int sqare_id = index % 64;
+			int file = sqare_id & 7;
+			int rank = sqare_id >>> 3;
+			
+			inputs_3d[file][rank][piece_type] = (float) bitboard.getNNUEInputs()[index];
+		}
+		
+		Tensor tensor = new Tensor(inputs_3d);
+		
+		network.setInput(tensor);
+		
+		//forward method is already called in setInput(tensor)
+		//network.forward();
+		
+		double actualWhitePlayerEval = network.getOutput()[0];
 		
 		
 		sumDiffs1 += Math.abs(0 - expectedWhitePlayerEval_func);
 		sumDiffs2 += Math.abs(expectedWhitePlayerEval_func - actualWhitePlayerEval);
 		
 		
-		DataSet trainingSet = new DataSet(NeuralNetworkUtils_NNUE_PSQT.getInputsSize(), 1);
-		//NeuralNetworkUtils.clearInputsArray(inputs);
-		//NeuralNetworkUtils_NNUE_PSQT.fillInputs(inputs, bitboard);
+        BackpropagationTrainer trainer = (BackpropagationTrainer) network.getTrainer();
+        
+        trainer//.setLearningRate(1f)
+                //.setMaxError(0.01f)
+                .setMaxEpochs(1);
+        
+        DataSet_1 set = new DataSet_1();
+        
+        float[] outputs = new float[1];
+        outputs[0] = expectedWhitePlayerEval_func;
+        
+        set.addItem(inputs_3d, outputs);
+        
+        trainer.train(set);
+        
+		/*DataSet trainingSet = new DataSet(NeuralNetworkUtils_NNUE_PSQT.getInputsSize(), 1);
         trainingSet.addRow(new DataSetRow(bitboard.getNNUEInputs(), new double[]{expectedWhitePlayerEval_func}));
         network.getLearningRule().doLearningEpoch(trainingSet);
+        */
         
         
 		counter++;
-		/*if ((counter % 10000) == 0) {
+		if ((counter % 10000) == 0) {
 			
 			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, positions: " + counter);
 			
-			network.save(NET_FILE);
-		}*/
+			try {
+				
+				FileIO.writeToFile(network, NET_FILE);
+				
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	
@@ -137,7 +188,14 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		//System.out.println("End iteration " + iteration + ", Total evaluated positions count is " + counter);
 		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, positions: " + counter);
 		
-		network.save(NET_FILE);
+		try {
+			
+			FileIO.writeToFile(network, NET_FILE);
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
 	}
 	
 	
