@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
 import bagaturchess.deeplearning.impl_nnue.visitors.ActivationFunctions;
 import bagaturchess.search.api.IEvalConfig;
@@ -21,7 +22,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	private NeuralNetwork network;
 	
-	float[][][] inputs_3d = new float[8][8][12];
+	float[][][] inputs_3d = new float[8][8][15];
 	
 	
 	NeuralNetworkEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -66,6 +67,33 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 			
 			inputs_3d[file][rank][piece_type] = inputs[index];
 		}
+		
+		inputs_3d[0][0][12] = bitboard.hasRightsToQueenCastle(Constants.COLOUR_WHITE) ? 1 : 0;
+		inputs_3d[0][1][12] = bitboard.hasRightsToKingCastle(Constants.COLOUR_WHITE) ? 1 : 0;
+		inputs_3d[0][2][12] = bitboard.hasRightsToQueenCastle(Constants.COLOUR_BLACK) ? 1 : 0;
+		inputs_3d[0][3][12] = bitboard.hasRightsToKingCastle(Constants.COLOUR_BLACK) ? 1 : 0;
+		
+		int moves_before_draw = bitboard.getDraw50movesRule() - 37;
+		
+		if (moves_before_draw >= 0) {
+			
+			int file = moves_before_draw & 7;
+			int rank = moves_before_draw >>> 3;
+			
+			inputs_3d[file][rank][13] = 1;
+		}
+		
+		if (bitboard.getColourToMove() == Constants.COLOUR_WHITE) {
+			
+			inputs_3d[0][0][14] = 1;
+			inputs_3d[0][1][14] = 0;
+			
+		} else {
+			
+			inputs_3d[0][0][14] = 0;
+			inputs_3d[0][1][14] = 1;
+		}
+		
 		
 		Tensor tensor = new Tensor(inputs_3d);
 		

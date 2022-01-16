@@ -41,9 +41,12 @@ public class NeuralNetworkUtils_NNUE_PSQT {
 	
 	public static NeuralNetwork buildNetwork() {
 		
+		int CHANNELS_COUNT = 15;
+		
         ConvolutionalNetwork nnet =  ConvolutionalNetwork.builder()
-                .addInputLayer(8, 8, 12)
-                .addConvolutionalLayer(3, 3, 12, 1, ActivationType.RELU)
+                .addInputLayer(8, 8, CHANNELS_COUNT)
+                .addConvolutionalLayer(3, 3, CHANNELS_COUNT, 1, ActivationType.RELU)
+                //.addConvolutionalLayer(3, 3, CHANNELS_COUNT / 2, 1, ActivationType.RELU)
                 .addFullyConnectedLayer(128, ActivationType.RELU)
                 .addOutputLayer(1, ActivationType.SIGMOID)
                 .lossFunction(LossType.CROSS_ENTROPY)

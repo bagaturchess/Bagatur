@@ -27,6 +27,7 @@ import javax.visrec.ml.data.DataSet;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 import deepnetts.data.MLDataItem;
@@ -36,7 +37,7 @@ import deepnetts.util.Tensor;
 public class DeepLearningVisitorImpl_NNUE_DataSetLoader implements PositionsVisitor {
 	
 	
-	private static final float DATASET_USAGE_PERCENT = 0.033f;
+	private static final float DATASET_USAGE_PERCENT = 0.33f;
 	
 	
 	private long startTime;	
@@ -101,7 +102,7 @@ public class DeepLearningVisitorImpl_NNUE_DataSetLoader implements PositionsVisi
 		
 		float[] inputs = (float[]) bitboard.getNNUEInputs();
 		
-		float[][][] inputs_3d = new float[8][8][12];
+		float[][][] inputs_3d = new float[8][8][15];
 		
 		for (int index = 0; index < inputs.length; index++) {
 			
@@ -118,6 +119,33 @@ public class DeepLearningVisitorImpl_NNUE_DataSetLoader implements PositionsVisi
 			
 			inputs_3d[file][rank][piece_type] = inputs[index];
 		}
+		
+		inputs_3d[0][0][12] = bitboard.hasRightsToQueenCastle(Constants.COLOUR_WHITE) ? 1 : 0;
+		inputs_3d[0][1][12] = bitboard.hasRightsToKingCastle(Constants.COLOUR_WHITE) ? 1 : 0;
+		inputs_3d[0][2][12] = bitboard.hasRightsToQueenCastle(Constants.COLOUR_BLACK) ? 1 : 0;
+		inputs_3d[0][3][12] = bitboard.hasRightsToKingCastle(Constants.COLOUR_BLACK) ? 1 : 0;
+		
+		int moves_before_draw = bitboard.getDraw50movesRule() - 37;
+		
+		if (moves_before_draw >= 0) {
+			
+			int file = moves_before_draw & 7;
+			int rank = moves_before_draw >>> 3;
+			
+			inputs_3d[file][rank][13] = 1;
+		}
+		
+		if (bitboard.getColourToMove() == Constants.COLOUR_WHITE) {
+			
+			inputs_3d[0][0][14] = 1;
+			inputs_3d[0][1][14] = 0;
+			
+		} else {
+			
+			inputs_3d[0][0][14] = 0;
+			inputs_3d[0][1][14] = 1;
+		}
+		
 		
 		Tensor tensor = new Tensor(inputs_3d);
 		
