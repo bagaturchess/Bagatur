@@ -41,15 +41,12 @@ import deepnetts.util.FileIO;
 import deepnetts.util.Tensor;
 
 
-public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
+public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsVisitor {
 	
-	
-	private int iteration = 0;
 	
 	private int counter;
 	
 	private NeuralNetwork network;
-	
 	
 	private double sumDiffs1;
 	private double sumDiffs2;
@@ -57,19 +54,21 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 	private long startTime;	
 	
 	
-	public DeepLearningVisitorImpl_NNUE() throws Exception {
+	public DeepLearningVisitorImpl_NNUE_PrintSuccessRate() throws Exception {
 		
 		if ((new File(NNUE_Constants.NET_FILE)).exists()) {
 			
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(NNUE_Constants.NET_FILE));
+			
 			network = (ConvolutionalNetwork) ois.readObject();
+			
 			ois.close();
 			
 			//NNUE_Constants.printWeights(network.getWeights());
 			
 		} else {
 			
-			network = NeuralNetworkUtils_NNUE_PSQT.buildNetwork();
+			throw new IllegalStateException();
 		}
 		
 		
@@ -115,39 +114,13 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		
 		sumDiffs1 += Math.abs(0 - ActivationFunctions.sigmoid_gety(expectedWhitePlayerEval));
 		sumDiffs2 += Math.abs(ActivationFunctions.sigmoid_gety(expectedWhitePlayerEval) - actualWhitePlayerEval);
-		
-		
-        BackpropagationTrainer trainer = (BackpropagationTrainer) network.getTrainer();
-        
-        trainer//.setLearningRate(1f)
-                //.setMaxError(0.01f)
-                .setMaxEpochs(1);
-        
-        DataSet_1 set = new DataSet_1();
-        
-        outputs = new float[1];
-        
-        outputs[0] = ActivationFunctions.sigmoid_gety(expectedWhitePlayerEval);
-        
-        set.addItem(tensor, outputs);
-        
-        trainer.train(set);
         
         
 		counter++;
 		
-		if ((counter % 1000) == 0) {
+		if ((counter % 10000) == 0) {
 			
-			System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, positions: " + counter);
-			
-			try {
-				
-				FileIO.writeToFile(network, NNUE_Constants.NET_FILE);
-				
-			} catch (IOException e) {
-				
-				e.printStackTrace();
-			}
+			System.out.println("Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, positions: " + counter);
 		}
 	}
 	
@@ -192,25 +165,15 @@ public class DeepLearningVisitorImpl_NNUE implements PositionsVisitor {
 		startTime = System.currentTimeMillis();
 		
 		counter = 0;
-		iteration++;
+		
 		sumDiffs1 = 0;
+		
 		sumDiffs2 = 0;
 	}
 	
 	
 	public void end() {
 		
-		//System.out.println("***************************************************************************************************");
-		//System.out.println("End iteration " + iteration + ", Total evaluated positions count is " + counter);
-		System.out.println("END Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, positions: " + counter);
-		
-		try {
-			
-			FileIO.writeToFile(network, NNUE_Constants.NET_FILE);
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-		}
+		System.out.println("END: positions=" + counter);
 	}
 }

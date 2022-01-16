@@ -58,9 +58,8 @@ public class GamesGenerator_MultiPv {
 	private static int SEARCH_DEPTH_MAX = 10;
 	
 	private static int MAX_EVAL_DIFF = 3000;
-	private static int MAX_MOVES = 300;
 	private static int BEST_MOVE_DIFF = 10000;
-	private static int MIN_PIECES = 8;
+	private static int MIN_PIECES = 3;
 	
 	
 	private UCIEnginesManager runner;
@@ -244,7 +243,7 @@ public class GamesGenerator_MultiPv {
 			if (Math.abs(best.eval_ofOriginatePlayer()) > MAX_EVAL_DIFF) {
 				break;
 			}
-			if (bitboard.getPlayedMovesCount() > MAX_MOVES) {
+			if (bitboard.getDraw50movesRule() > 50) {
 				break;
 			}
 			if (bitboard.getMaterialState().getPiecesCount() < MIN_PIECES) {

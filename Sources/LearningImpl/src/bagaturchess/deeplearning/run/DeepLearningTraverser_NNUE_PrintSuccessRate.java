@@ -1,13 +1,13 @@
 package bagaturchess.deeplearning.run;
 
 
-import bagaturchess.deeplearning.impl_nnue.visitors.DeepLearningVisitorImpl_NNUE;
+import bagaturchess.deeplearning.impl_nnue.visitors.DeepLearningVisitorImpl_NNUE_PrintSuccessRate;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 
 
-public class DeepLearningTraverser_NNUE {
+public class DeepLearningTraverser_NNUE_PrintSuccessRate {
 	
 	
 	public static void main(String[] args) {
@@ -24,14 +24,11 @@ public class DeepLearningTraverser_NNUE {
 			String filePath = "./stockfish-14.1.cg";
 			//String filePath = "./glaurung-2.2.cg";
 			
-			DeepLearningVisitorImpl_NNUE learning = new DeepLearningVisitorImpl_NNUE();
+			DeepLearningVisitorImpl_NNUE_PrintSuccessRate printer = new DeepLearningVisitorImpl_NNUE_PrintSuccessRate();
 			
 			ILearningInput input = LearningInputFactory.createDefaultInput();
 			
-			while (true) {
-				
-				PositionsTraverser.traverseAll(filePath, learning, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
-			}
+			PositionsTraverser.traverseAll(filePath, printer, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
 			
 		} catch (Exception e) {
 			

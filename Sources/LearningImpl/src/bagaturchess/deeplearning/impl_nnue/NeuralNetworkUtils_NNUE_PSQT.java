@@ -44,7 +44,7 @@ public class NeuralNetworkUtils_NNUE_PSQT {
         ConvolutionalNetwork nnet =  ConvolutionalNetwork.builder()
                 .addInputLayer(8, 8, 12)
                 .addConvolutionalLayer(3, 3, 12, 1, ActivationType.RELU)
-                .addFullyConnectedLayer(16, ActivationType.RELU)
+                .addFullyConnectedLayer(128, ActivationType.RELU)
                 .addOutputLayer(1, ActivationType.SIGMOID)
                 .lossFunction(LossType.CROSS_ENTROPY)
                 .randomSeed(System.currentTimeMillis() % 778)
@@ -52,9 +52,6 @@ public class NeuralNetworkUtils_NNUE_PSQT {
         
 		/*FeedForwardNetwork nnet =  FeedForwardNetwork.builder()
                 .addInputLayer(8 * 8 * 12)
-                //.addConvolutionalLayer(3, 3, 12, 1, ActivationType.RELU)
-                //.addConvolutionalLayer(3, 3, 12, 1, ActivationType.RELU)
-                //.addFullyConnectedLayer(12, ActivationType.LINEAR)
                 .addOutputLayer(1, ActivationType.LINEAR)
                 .lossFunction(LossType.MEAN_SQUARED_ERROR)
                 .randomSeed(System.currentTimeMillis() % 778)

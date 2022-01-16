@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration status="WARN">
+  <Properties>
+    <Property name="log-path">logs</Property>
+  </Properties>
+      
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%msg%n"/>
+        </Console>
+        
+        <RollingFile name="trainingLog" fileName="${log-path}/deepnetts-training.log"
+                     filePattern="${log-path}/deepnetts-training-%d{yyyy-MM-dd}.log">
+            <PatternLayout>
+                <pattern>%msg%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+        
+        <RollingFile name="errorLog" fileName="${log-path}/deepnetts-error.log"
+                     filePattern="${log-path}/deepnetts-error-%d{yyyy-MM-dd}.log">
+            <PatternLayout>
+                <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>     
+        
+        <Async name="asyncTrainingLog">
+            <AppenderRef ref="trainingLog"/>
+        </Async>        
+              
+    </Appenders>
+    
+    <Loggers>
+                   
+        <Logger name="deepnetts.core.DeepNetts" additivity="false">
+            <appender-ref ref="trainingLog" level="info"/>
+            <appender-ref ref="errorLog" level="error"/>
+            <appender-ref ref="console" level="info"/>
+        </Logger>
+        
+        <Root level="info" additivity="false">
+            <AppenderRef ref="console"/>
+        </Root>
+    </Loggers>
+    
+    
+</Configuration>
