@@ -36,6 +36,9 @@ import deepnetts.util.Tensor;
 public class DeepLearningVisitorImpl_NNUE_DataSetLoader implements PositionsVisitor {
 	
 	
+	private static final float DATASET_USAGE_PERCENT = 0.033f;
+	
+	
 	private long startTime;	
 	
 	private int counter;
@@ -60,6 +63,12 @@ public class DeepLearningVisitorImpl_NNUE_DataSetLoader implements PositionsVisi
 		if (expectedWhitePlayerEval < IEvaluator.MIN_EVAL || expectedWhitePlayerEval > IEvaluator.MAX_EVAL) {
 			
 			throw new IllegalStateException("expectedWhitePlayerEval=" + expectedWhitePlayerEval);
+		}
+		
+		
+		if (Math.random() > DATASET_USAGE_PERCENT) {
+			
+			return;
 		}
 		
 		
