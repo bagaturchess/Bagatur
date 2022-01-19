@@ -48,8 +48,15 @@ public class SyzygyTBProbing {
 	
 	private IMoveList temp_moves_list;
 	
+	private static boolean switched_off = false;
+	
 	
     public static final SyzygyTBProbing getSingleton() {
+    	
+    	if (switched_off) {
+    		
+    		return null;
+    	}
     	
     	if (instance == null && !loadingInitiated) {
     		
@@ -69,7 +76,7 @@ public class SyzygyTBProbing {
     
     public static final void clearSingleton() {
     	
-    	instance = null;
+    	switched_off = true;
     }
     
     
