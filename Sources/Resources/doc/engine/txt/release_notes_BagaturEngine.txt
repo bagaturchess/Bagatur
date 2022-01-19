@@ -1,3 +1,6 @@
+Version 3.2 (19 January 2022)
+  * Hotfix: TBs are temporarily switched off in SMP version, because of crashes in libJSyzygy.so: [libJSyzygy.so+0x6513]  probe_dtz+0x403
+
 Version 3.1 (7 January 2022)
   * Hotfix: now the SMP version is working again with tbhits reporting logic
 

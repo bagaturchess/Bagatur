@@ -149,7 +149,23 @@ public class MemoryConsumers {
 		
 		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Loading modules for Endgame Tablebases support ... ");
 		
-		//int threadsCount = engineConfiguration.getThreadsCount();
+		if (engineConfiguration.getThreadsCount() > 1) {
+			
+			//If there are are many threads than switch off syzygy calls, because of crashes:
+			
+			/*230018 <Bagatur 3.1(0): # A fatal error has been detected by the Java Runtime Environment:
+				230018 <Bagatur 3.1(0): #
+				230018 <Bagatur 3.1(0): #  SIGSEGV (0xb) at pc=0x00007fcea1f29513, pid=102795, tid=0x00007fce8b7f7700
+				230018 <Bagatur 3.1(0): #
+				230018 <Bagatur 3.1(0): # JRE version: OpenJDK Runtime Environment (8.0_312-b07) (build 1.8.0_312-b07)
+				230018 <Bagatur 3.1(0): # Java VM: OpenJDK 64-Bit Server VM (25.312-b07 mixed mode linux-amd64 )
+				230018 <Bagatur 3.1(0): # Problematic frame:
+				230018 <Bagatur 3.1(0): # C  [libJSyzygy.so+0x6513]  probe_dtz+0x403*/
+			
+			SyzygyTBProbing.clearSingleton();
+			
+			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("SyzygyTBProbing.clearSingleton() called: Syzygy TBs are switched off");
+		}
 		
 		if (SyzygyTBProbing.getSingleton() != null) {
 			

@@ -65,6 +65,18 @@ public class SyzygyTBProbing {
     	
     	return instance;
     }
+	
+    
+    public static final void clearSingleton() {
+    	
+    	instance = null;
+    }
+    
+    
+    public synchronized final void load(String path) {
+    	
+    	SyzygyBridge.load(path);
+    }
     
     
     private SyzygyTBProbing() {
@@ -75,24 +87,18 @@ public class SyzygyTBProbing {
     }
     
     
-	private boolean loadNativeLibrary() {
+	private synchronized boolean loadNativeLibrary() {
 		
 		return SyzygyBridge.loadNativeLibrary();
 	}
 	
 	
-    public final void load(String path) {
-    	
-    	SyzygyBridge.load(path);
-    }
-    
-    
     /**
      * wrapper for {@link com.winkelhagen.chess.syzygy.SyzygyBridge#isAvailable(int)}
      * @param piecesLeft the number of pieces left on the board
      * @return true iff there is a Syzygy result to be expected, given the number of pieces currently on the board
      */
-    public boolean isAvailable(int piecesLeft) {
+    public synchronized boolean isAvailable(int piecesLeft) {
     	
     	if (piecesLeft > MAX_PIECES_COUNT) {
     		
@@ -108,7 +114,7 @@ public class SyzygyTBProbing {
      * @param board the FrankWalter board representation
      * @return a WDL result (see {@link #getWDLScore(int, int)})
      */
-    public int probeWDL(IBitBoard board){
+    public synchronized int probeWDL(IBitBoard board){
     	
     	
     	if (board.getMaterialState().getPiecesCount() > MAX_PIECES_COUNT) {
@@ -148,7 +154,7 @@ public class SyzygyTBProbing {
      * @param board the FrankWalter board representation
      * @return a WDL result (see {@link #toXBoardScore(int)} and {@link #toMove(int)})
      */
-    public int probeDTZ(IBitBoard board) {
+    public synchronized int probeDTZ(IBitBoard board) {
     	
     	
     	if (board.getMaterialState().getPiecesCount() > MAX_PIECES_COUNT) {
@@ -273,7 +279,7 @@ public class SyzygyTBProbing {
 	
 	
 	
-    public int toMove(int result){
+    public static int toMove(int result){
         int from = (result & SyzygyConstants.TB_RESULT_FROM_MASK) >> SyzygyConstants.TB_RESULT_FROM_SHIFT;
         int to = (result & SyzygyConstants.TB_RESULT_TO_MASK) >> SyzygyConstants.TB_RESULT_TO_SHIFT;
         int promotes = (result & SyzygyConstants.TB_RESULT_PROMOTES_MASK) >> SyzygyConstants.TB_RESULT_PROMOTES_SHIFT;
@@ -281,7 +287,7 @@ public class SyzygyTBProbing {
     }
     
     
-    public int getMove(int fromSquare, int toSquare, int promotes) {
+    public static int getMove(int fromSquare, int toSquare, int promotes) {
         return fromSquare | (toSquare <<6) | (promotes << 12);
     }
     
@@ -292,7 +298,7 @@ public class SyzygyTBProbing {
      * @param depth the depth of the current search
      * @return the score associated with this position
      */
-    public int getWDLScore(int wdl, int depth) {
+    public static int getWDLScore(int wdl, int depth) {
     	
         switch (wdl) {
         
