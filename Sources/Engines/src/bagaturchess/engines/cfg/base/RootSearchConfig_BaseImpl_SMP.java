@@ -36,7 +36,7 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 			new UCIOptionSpin_Integer("SMP Threads", currentThreadsCount,
 					"type spin default " + currentThreadsCount
 											+ " min 1"
-											+ " max 256"),
+											+ " max " + Math.max(2, 2 * getDefaultThreadsCount())),
 	};
 	
 	
