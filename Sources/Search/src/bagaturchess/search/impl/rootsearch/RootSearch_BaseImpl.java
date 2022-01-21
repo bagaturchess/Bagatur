@@ -167,6 +167,13 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	}
 	
 	
+	@Override
+	public void recreateEvaluator() {
+
+		throw new UnsupportedOperationException();
+	}
+	
+	
 	protected class Stopper implements ISearchStopper {
 		
 		private boolean stopped;

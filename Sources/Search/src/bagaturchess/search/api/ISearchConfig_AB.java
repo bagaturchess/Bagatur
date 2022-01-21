@@ -115,14 +115,15 @@ public interface ISearchConfig_AB {
 	 * Others
 	 */
 	public boolean isOther_SingleBestmove();
-	public boolean isOther_StoreTPTInQsearch();
 	public boolean isOther_UseTPTInRoot();
 	public boolean isOther_UseTPTScores();
 	public boolean isOther_UseTPTScoresQsearchPV();
 	public boolean isOther_UseTPTScoresNonPV();
 	public boolean isOther_UseTPTScoresPV();
+	public boolean isOther_StoreTPTInQsearch();
 	public boolean isOther_UseCheckInQSearch();
 	public boolean isOther_UseSeeInQSearch();
+	public boolean isOther_UseAlphaOptimizationInQSearch();
 	public boolean isOther_UsePVHistory();
 	public int getTPTUsageDepthCut();
 	

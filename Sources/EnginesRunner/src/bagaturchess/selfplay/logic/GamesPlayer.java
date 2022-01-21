@@ -20,13 +20,20 @@
 package bagaturchess.selfplay.logic;
 
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
+import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
+import bagaturchess.deeplearning.impl_nnue.visitors.ActivationFunctions;
+import bagaturchess.deeplearning.impl_nnue.visitors.DataSet_1;
 import bagaturchess.engines.cfg.base.TimeConfigImpl;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearch;
@@ -38,6 +45,9 @@ import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
+import deepnetts.net.ConvolutionalNetwork;
+import deepnetts.net.NeuralNetwork;
+import deepnetts.util.Tensor;
 
 
 public class GamesPlayer {
@@ -58,57 +68,76 @@ public class GamesPlayer {
 	private double sumDiffs2;
 	private VarStatistic stats = new VarStatistic();
 	
-	private ISelfLearning learning;
+	private NeuralNetwork network;
+	
+	private DataSet_1 dataset;
 	
 	
-	public GamesPlayer(IBitBoard _bitboard, IRootSearch _searcher, ISelfLearning _learning) throws IOException {
+	public GamesPlayer(IBitBoard _bitboard, IRootSearch _searcher) throws Exception {
 		
 		bitboard = _bitboard;
 		
 		searcher = _searcher;
 		
-		learning = _learning;
+		if (!(new File(NNUE_Constants.NET_FILE)).exists()) {
+			
+			throw new IllegalStateException("NNUE file not found: " + NNUE_Constants.NET_FILE);
+		}
+		
+		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(NNUE_Constants.NET_FILE));
+		
+		network = (ConvolutionalNetwork) ois.readObject();
+		
+		ois.close();
 	}
 	
 	
 	public void playGames() throws IOException, InterruptedException {
 		
+		
 		searcher.createBoard(bitboard);
 		
-		evaluator = searcher.getSharedData().getEvaluatorFactory().create(bitboard, null);
 		
 		while (true) {
 			
-			//TODO: update NN in memory - recreate searcher and evaluator
-			//getEnv().getEval().beforeSearch();
+			
+			reloadNetwork();
+			
+			
+			dataset = new DataSet_1();
+			
 			
 			playGame();
 			
+			
 			gamesCounter++;
 			
-			if (gamesCounter % 100 == 0) {
+			if (gamesCounter % 1 == 0) {
 				
 				System.out.println("Count of played games is " + gamesCounter + ", evaluated positions are " + evaluatedPositionsCounter
 						+ ", accuracy is " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%"
 						+ ", stats.avg=" + stats.getEntropy()
 						+ ", stats.stdev=" + stats.getDisperse());
-				
-				learning.endEpoch();
-				
-				//sumDiffs1 = 0;
-				//sumDiffs2 = 0;
 			}
 		}
 	}
 	
 	
+	private void reloadNetwork() {
+		
+		//Update NN in memory - recreate searcher and evaluator
+		
+		searcher.recreateEvaluator();
+		
+		evaluator = searcher.getSharedData().getEvaluatorFactory().create(bitboard, null);
+	}
+
+
 	private void playGame() throws IOException, InterruptedException {
 		
 		
 		Go go = new Go(ChannelManager.getChannel(), "go depth 1");
 		//Go go = new Go(ChannelManager.getChannel(), "go infinite");
-		
-		ITimeController timeController = TimeControllerFactory.createTimeController(new TimeConfigImpl(), bitboard.getColourToMove(), go);
 		
 		Object sync_move = new Object();
 		
@@ -116,6 +145,7 @@ public class GamesPlayer {
 		
 		while (bitboard.getStatus().equals(IGameStatus.NONE)) {
 			
+			final ITimeController timeController = TimeControllerFactory.createTimeController(new TimeConfigImpl(), bitboard.getColourToMove(), go);
 			
 			final ISearchMediator mediator = new UCISearchMediatorImpl_NormalSearch(ChannelManager.getChannel(),
 					
@@ -178,6 +208,8 @@ public class GamesPlayer {
 				
 				if (pv_status_is_none) {
 					
+					evaluatedPositionsCounter++;
+					
 					double eval_search = color_sign * info.getEval();
 					
 					//Evaluate position
@@ -192,6 +224,16 @@ public class GamesPlayer {
 					//System.out.println("sumDiffs1=" + sumDiffs1 + ", sumDiffs2=" + sumDiffs2);
 					
 					stats.addValue(Math.abs(eval_search - eval_static));
+					
+					
+					float[][][] inputs_3d = new float[8][8][15];
+					
+					Tensor input = NNUE_Constants.createInput(bitboard, inputs_3d);
+			        
+			        float[] output = new float[1];
+			        output[0] = ActivationFunctions.sigmoid_gety( (bitboard.getColourToMove() == Constants.COLOUR_WHITE) ? (float) eval_static : (float) -eval_static);
+			        
+			        dataset.addItem(input, output);
 				
 				}
 				
@@ -211,8 +253,6 @@ public class GamesPlayer {
 			bitboard.makeMoveForward(best_move);
 			
 			movesList.add(best_move);
-			
-			evaluatedPositionsCounter++;
 		}
 		
 		//System.out.println(bitboard.toEPD() + " " + bitboard.getStatus());

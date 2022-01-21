@@ -137,13 +137,17 @@ public class SearchEnv {
 	
 	public IEvaluator getEval() {
 		if (eval == null) {
-			eval = shared.getEvaluatorFactory().create(bitboard, getEvalCache(), shared.getEngineConfiguration().getEvalConfig());
+			recreateEvaluator();
 		}
 		return eval;
 	}
 
 	public void setEval(IEvaluator _eval) {
 		eval = _eval;
+	}
+	
+	public void recreateEvaluator() {
+		eval = shared.getEvaluatorFactory().create(bitboard, getEvalCache(), shared.getEngineConfiguration().getEvalConfig());
 	}
 	
 	public void clear() {

@@ -63,7 +63,7 @@ public class SelfPlayRunner_Neuroph {
 			
 			UCIEnginesManager runner = createEngineManager();
 			
-			GamesPlayer player = new GamesPlayer(bitboard, null, learning);
+			GamesPlayer player = new GamesPlayer(bitboard, null);
 			
 			player.playGames();
 			

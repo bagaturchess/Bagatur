@@ -52,4 +52,6 @@ public interface IRootSearch {
 	public boolean isStopped();
 	
 	public void shutDown();
+
+	public void recreateEvaluator();
 }

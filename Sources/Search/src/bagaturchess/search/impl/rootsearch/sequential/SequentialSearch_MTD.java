@@ -74,6 +74,13 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 	
 	
 	@Override
+	public void recreateEvaluator() {
+
+		searcher.getEnv().recreateEvaluator();
+	}
+	
+	
+	@Override
 	public void createBoard(IBitBoard _bitboardForSetup) {
 		
 		super.createBoard(_bitboardForSetup);

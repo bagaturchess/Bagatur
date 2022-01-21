@@ -473,4 +473,10 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	public boolean isOther_UseTPTScores() {
 		return true;
 	}
+	
+	
+	@Override
+	public boolean isOther_UseAlphaOptimizationInQSearch() {
+		return true;
+	}
 }

@@ -32,9 +32,7 @@ import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.CheckUtil;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
-import bagaturchess.bitboard.impl1.internal.ChessConstants;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
-import bagaturchess.bitboard.impl1.internal.EvalConstants;
 import bagaturchess.bitboard.impl1.internal.MaterialUtil;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
@@ -448,13 +446,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		int eval = ISearch.MIN;
+		
 		if (!isPv && cb.checkingPieces == 0) {
 			
 			
 			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
 			
-			if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
+			if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
+				
 				if (ttFlag == ITTEntry.FLAG_EXACT
 						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
 						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
@@ -911,7 +911,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		
-		if (EngineConstants.USE_TT_SCORE_AS_EVAL) {
+		if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
 			if (ttFlag == ITTEntry.FLAG_EXACT
 					|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
 					|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
@@ -1042,41 +1042,35 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getTPT().put(cb.zobristKey, 0, bestScore, alphaOrig, beta, bestMove);
 		}
 		
-		if (alpha >= bestScore) {
+		
+		if (bestScore > eval) {
 			
-			if (alpha >= eval) {
+			if (node.eval != bestScore) {
 				
-				node.bestmove = 0;
-				node.leaf = true;
-				node.eval = eval;
-				
-			} else {
-				
-				node.bestmove = 0;
-				node.leaf = true;
-				node.eval = eval;
+				throw new IllegalStateException(); 
 			}
 			
-		} else { //bestScore > alpha
-			
-			if (bestScore >= eval) {
+			if (node.leaf) {
 				
-				if (node.eval != bestScore) {
-					
-					throw new IllegalStateException(); 
-				}
-				
-			} else {
-				
-				node.bestmove = 0;
-				node.leaf = true;
-				node.eval = eval;
+				throw new IllegalStateException(); 
 			}
 			
+		} else {
+			
+			node.bestmove = 0;
+			node.leaf = true;
+			node.eval = eval;
 		}
-		
-    	//node.eval = Math.max(alpha, Math.max(eval, bestScore));
-		
+			
+		if (getSearchConfig().isOther_UseAlphaOptimizationInQSearch()) {
+			
+			if (alpha > node.eval) {
+				
+				node.bestmove = 0;
+				node.leaf = true;
+				node.eval = alpha;
+			}
+		}
 		
     	return node.eval;
 	}

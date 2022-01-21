@@ -64,7 +64,7 @@ public class SelfPlayRunner_Own {
 			
 			UCIEnginesManager runner = createEngineManager();
 			
-			GamesPlayer player = new GamesPlayer(bitboard, null, learning);
+			GamesPlayer player = new GamesPlayer(bitboard, null);
 			
 			player.playGames();
 			

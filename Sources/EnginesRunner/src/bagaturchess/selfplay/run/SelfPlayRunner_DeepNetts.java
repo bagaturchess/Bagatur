@@ -34,7 +34,6 @@ import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
 import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
 import bagaturchess.selfplay.logic.GamesPlayer;
-import bagaturchess.selfplay.logic.ISelfLearning;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.Channel_Console;
 
@@ -48,7 +47,8 @@ public class SelfPlayRunner_DeepNetts {
 			
 			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE;
 			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE_EVALIMPL4;
-		
+			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4;
+			
 			PrintStream log = new PrintStream(new FileOutputStream(new File("bagatur.log")));
 			
 			ChannelManager.setChannel(new Channel_Console(System.in, log, log));
@@ -78,23 +78,10 @@ public class SelfPlayRunner_DeepNetts {
 			
 			//UCIEnginesManager runner = createEngineManager();
 			
-			ISelfLearning learning = new ISelfLearning() {
-				
-				@Override
-				public void endEpoch() {
-					System.out.println("ISelfLearning.endEpoch: called");
-				}
-				
-				@Override
-				public void addCase(double expectedWhitePlayerEval, double actualWhitePlayerEval) {
-					System.out.println("ISelfLearning.addCase: called");
-				}
-			};
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			
-			
-			GamesPlayer player = new GamesPlayer(bitboard, search, learning);
+			GamesPlayer player = new GamesPlayer(bitboard, search);
 			
 			player.playGames();
 			
