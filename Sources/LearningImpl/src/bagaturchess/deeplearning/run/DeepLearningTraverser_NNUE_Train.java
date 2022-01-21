@@ -160,8 +160,8 @@ public class DeepLearningTraverser_NNUE_Train implements Runnable, TrainingListe
 		
 		return network;
 	}
-
-
+	
+	
 	@Override
 	public void handleEvent(TrainingEvent event) {
 		

@@ -27,6 +27,8 @@ import java.io.PrintStream;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
+import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -36,6 +38,9 @@ import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
 import bagaturchess.selfplay.logic.GamesPlayer;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.Channel_Console;
+import deepnetts.net.ConvolutionalNetwork;
+import deepnetts.net.NeuralNetwork;
+import deepnetts.util.FileIO;
 
 
 public class SelfPlayRunner_DeepNetts {
@@ -45,8 +50,8 @@ public class SelfPlayRunner_DeepNetts {
 		
 		try {
 			
-			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE;
-			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE_EVALIMPL4;
+			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE;
+			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE_EVALIMPL4;
 			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4;
 			
 			PrintStream log = new PrintStream(new FileOutputStream(new File("bagatur.log")));
@@ -65,19 +70,8 @@ public class SelfPlayRunner_DeepNetts {
 			multipvMediator.ready();*/
 			
 			
-			/*MultiLayerPerceptron network;
-			if ((new File("net.bin")).exists() ){
-				network = NeuralNetworkUtils.loadNetwork("net.bin");
-			} else {
-				network = NeuralNetworkUtils_AllFeatures.buildNetwork();
-			}
-			
-			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache();
-			
-			NeuralNetworkEvaluator evaluator = new NeuralNetworkEvaluator(bitboard, null, null, network);*/
-			
-			//UCIEnginesManager runner = createEngineManager();
-			
+			//NeuralNetwork network = (ConvolutionalNetwork) NeuralNetworkUtils_NNUE_PSQT.buildNetwork();
+			//FileIO.writeToFile(network, NNUE_Constants.NET_FILE);
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			
@@ -85,7 +79,9 @@ public class SelfPlayRunner_DeepNetts {
 			
 			player.playGames();
 			
+			
 		} catch (Exception e) {
+			
 			e.printStackTrace();
 		}
 	}

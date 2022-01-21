@@ -29,7 +29,6 @@ import java.util.List;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
-import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
 import bagaturchess.deeplearning.impl_nnue.visitors.ActivationFunctions;
@@ -47,6 +46,8 @@ import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
 import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.net.NeuralNetwork;
+import deepnetts.net.train.BackpropagationTrainer;
+import deepnetts.util.FileIO;
 import deepnetts.util.Tensor;
 
 
@@ -57,8 +58,6 @@ public class GamesPlayer {
 	private IRootSearch searcher;
 	private IEvaluator evaluator;
 	
-	//private IMoveList movesBuffer = new BaseMoveList(250);
-	//private int[] seeBuffer = new int[250];
 	private List<Integer> movesList = new ArrayList<Integer>();
 	
 	private long gamesCounter;
@@ -67,6 +66,9 @@ public class GamesPlayer {
 	private double sumDiffs1;
 	private double sumDiffs2;
 	private VarStatistic stats = new VarStatistic();
+	private long stats_draws;
+	private long stats_wins_white;
+	private long stats_wins_black;
 	
 	private NeuralNetwork network;
 	
@@ -82,13 +84,15 @@ public class GamesPlayer {
 		if (!(new File(NNUE_Constants.NET_FILE)).exists()) {
 			
 			throw new IllegalStateException("NNUE file not found: " + NNUE_Constants.NET_FILE);
+			
+		} else {
+			
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(NNUE_Constants.NET_FILE));
+			
+			network = (ConvolutionalNetwork) ois.readObject();
+			
+			ois.close();
 		}
-		
-		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(NNUE_Constants.NET_FILE));
-		
-		network = (ConvolutionalNetwork) ois.readObject();
-		
-		ois.close();
 	}
 	
 	
@@ -110,14 +114,34 @@ public class GamesPlayer {
 			playGame();
 			
 			
+            // create a trainer and train network
+            BackpropagationTrainer trainer = (BackpropagationTrainer) network.getTrainer();
+            
+            trainer.setLearningRate(0.01f)
+                    .setMaxError(0.01f)
+                    .setMaxEpochs(1);
+                    //.setBatchMode(true)
+                    //.setBatchSize(1000);
+            
+            trainer.train(dataset);
+			
+			
+			FileIO.writeToFile(network, NNUE_Constants.NET_FILE);
+			
+			
 			gamesCounter++;
 			
-			if (gamesCounter % 1 == 0) {
+			if (gamesCounter % 10 == 0) {
 				
-				System.out.println("Count of played games is " + gamesCounter + ", evaluated positions are " + evaluatedPositionsCounter
-						+ ", accuracy is " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%"
-						+ ", stats.avg=" + stats.getEntropy()
-						+ ", stats.stdev=" + stats.getDisperse());
+				System.out.println("Games: " + gamesCounter
+						+ ", Positions: " + evaluatedPositionsCounter
+						+ ", Draws: " + stats_draws
+						+ ", White Win: " + stats_wins_white
+						+ ", Black Win: " + stats_wins_black
+						+ ", Accuracy: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%"
+						+ ", Stats.avg=" + stats.getEntropy()
+						+ ", Stats.stdev=" + stats.getDisperse()
+						);
 			}
 		}
 	}
@@ -131,9 +155,12 @@ public class GamesPlayer {
 		
 		evaluator = searcher.getSharedData().getEvaluatorFactory().create(bitboard, null);
 	}
-
-
+	
+	
 	private void playGame() throws IOException, InterruptedException {
+		
+		
+		List<float[][][]> inputs_per_move = new ArrayList<float[][][]>();
 		
 		
 		Go go = new Go(ChannelManager.getChannel(), "go depth 1");
@@ -177,6 +204,7 @@ public class GamesPlayer {
 				
 				sync_move.wait();
 			}
+			
 			
 			ISearchInfo info = mediator.getLastInfo();
 			
@@ -228,13 +256,7 @@ public class GamesPlayer {
 					
 					float[][][] inputs_3d = new float[8][8][15];
 					
-					Tensor input = NNUE_Constants.createInput(bitboard, inputs_3d);
-			        
-			        float[] output = new float[1];
-			        output[0] = ActivationFunctions.sigmoid_gety( (bitboard.getColourToMove() == Constants.COLOUR_WHITE) ? (float) eval_static : (float) -eval_static);
-			        
-			        dataset.addItem(input, output);
-				
+					inputs_per_move.add(inputs_3d);
 				}
 				
 				
@@ -246,7 +268,7 @@ public class GamesPlayer {
 					bitboard.makeMoveBackward(bestline[i]);
 				}
 			}
-			
+	        
 			
 			int best_move = info.getBestMove();
 			
@@ -256,6 +278,21 @@ public class GamesPlayer {
 		}
 		
 		//System.out.println(bitboard.toEPD() + " " + bitboard.getStatus());
+		
+		
+		float result = getGameTerminationScore_SIGMOID(bitboard.getStatus());
+		
+		for (int i = 0; i < inputs_per_move.size(); i++) {
+			
+			float[][][] inputs_3d = inputs_per_move.get(i);
+			
+			Tensor input = new Tensor(inputs_3d);
+			
+	        float[] output = new float[1];
+	        output[0] = result;
+	        
+	        dataset.addItem(input, output);
+		}
 		
 		
 		//Revert board to the initial position
@@ -268,32 +305,66 @@ public class GamesPlayer {
 	}
 	
 	
-	private int getGameTerminationScore() {
+	private float getGameTerminationScore_SIGMOID(IGameStatus status) {
 		
-		if (bitboard.getStateRepetition() >= 2) {
-			return 0;
+		
+		float SIGMOID_WIN_BLACK 	= ActivationFunctions.sigmoid_gety(IEvaluator.MIN_EVAL);
+		
+		float SIGMOID_DRAW 			= 0.5f;
+		
+		float SIGMOID_WIN_WHITE 	= ActivationFunctions.sigmoid_gety(IEvaluator.MAX_EVAL);
+		
+		switch (status) {
+		
+			case NONE:
+				throw new IllegalStateException("status=" + status);
+				
+			case DRAW_3_STATES_REPETITION:
+				stats_draws++;
+				return SIGMOID_DRAW;
+				
+			case MATE_WHITE_WIN:
+				stats_wins_white++;
+				return SIGMOID_WIN_WHITE;
+				
+			case MATE_BLACK_WIN:
+				stats_wins_black++;
+				return SIGMOID_WIN_BLACK;
+				
+			case UNDEFINED:
+				throw new IllegalStateException("status=" + status);
+				
+			case STALEMATE_WHITE_NO_MOVES:
+				stats_draws++;
+				return SIGMOID_DRAW;
+				
+			case STALEMATE_BLACK_NO_MOVES:
+				stats_draws++;
+				return SIGMOID_DRAW;
+				
+			case DRAW_50_MOVES_RULE:
+				stats_draws++;
+				return SIGMOID_DRAW;
+				
+			case NO_SUFFICIENT_MATERIAL:
+				stats_draws++;
+				return SIGMOID_DRAW;
+				
+			case PASSER_WHITE:
+				throw new IllegalStateException("status=" + status);
+				
+			case PASSER_BLACK:
+				throw new IllegalStateException("status=" + status);
+				
+			case NO_SUFFICIENT_WHITE_MATERIAL:
+				throw new IllegalStateException("status=" + status);
+				
+			case NO_SUFFICIENT_BLACK_MATERIAL:
+				throw new IllegalStateException("status=" + status);
+				
+			default:
+				throw new IllegalStateException("status=" + status);
+				
 		}
-		
-		if (!bitboard.hasSufficientMatingMaterial()) {
-			return 0;
-		}
-		
-		if (bitboard.isDraw50movesRule()) {
-			return 0;
-		}
-		
-		if (bitboard.isInCheck()) {
-			if (!bitboard.hasMoveInCheck()) {
-				//Mate
-				return 50000;
-			}
-		} else {
-			if (!bitboard.hasMoveInNonCheck()) {
-				//Stale Mate
-				return 0;
-			}
-		}
-		
-		return -1;
 	}
 }
