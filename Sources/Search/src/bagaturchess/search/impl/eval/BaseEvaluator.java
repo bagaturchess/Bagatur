@@ -102,6 +102,8 @@ public abstract class BaseEvaluator implements IEvaluator {
 	protected PiecesList w_pawns;
 	protected PiecesList b_pawns;
 	
+	private IEvalConfig evalConfig;
+	
 	
 	public BaseEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
 		
@@ -112,6 +114,8 @@ public abstract class BaseEvaluator implements IEvaluator {
 		baseEval = _bitboard.getBaseEvaluation();
 		
 		evalCache = _evalCache;
+		
+		evalConfig = _evalConfig;
 		
 		w_knights = bitboard.getPiecesLists().getPieces(Constants.PID_W_KNIGHT);
 		b_knights = bitboard.getPiecesLists().getPieces(Constants.PID_B_KNIGHT);
@@ -242,7 +246,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		long hashkey = bitboard.getHashKey();
 		
-		if (USE_CACHE && evalCache != null && useCache) {
+		if (USE_CACHE && evalCache != null && useCache && evalConfig.useEvalCache()) {
 			
 			evalCache.get(hashkey, cached);
 			
@@ -281,7 +285,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		}
 		
 		
-		if (USE_CACHE && evalCache != null && useCache) {
+		if (USE_CACHE && evalCache != null && useCache && evalConfig.useEvalCache()) {
 			
 			evalCache.put(hashkey, 5, (int) white_eval);
 		}

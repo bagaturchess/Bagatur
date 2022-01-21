@@ -435,10 +435,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (depth == 0) {
+			
 			int qeval = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha, beta, ply, isPv);
-			node.bestmove = 0;
-			node.eval = qeval;
-			node.leaf = true;
+			
+			if (node.eval != qeval) {
+				
+				throw new IllegalStateException();
+			}
+			
 			return node.eval;
 		}
 		
@@ -806,7 +810,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (movesPerformed_attacks + movesPerformed_quiet == 0) {
 			if (cb.checkingPieces == 0) {
 				node.bestmove = 0;
-				node.eval = node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
+				node.eval = node.eval = getDrawScores(-1);
 				node.leaf = true;
 				return node.eval;
 			} else {
@@ -854,8 +858,16 @@ public class Search_PVS_NWS extends SearchImpl {
 			return eval(evaluator, ply, alpha, beta, isPv);
 		}
 		
+		PVNode node = pvman.load(ply);
+		node.bestmove = 0;
+		node.eval = ISearch.MIN;
+		node.leaf = true;
+		
 	    if (isDraw()) {
-	    	return getDrawScores(-1);
+	    	
+	    	node.eval = getDrawScores(-1);
+			
+	    	return node.eval;
 	    }
 	    
 	    int ttValue = 0;
@@ -868,14 +880,27 @@ public class Search_PVS_NWS extends SearchImpl {
 			ttFlag = tt_entries_per_ply[ply].getFlag();
 			
 			if (getSearchConfig().isOther_UseTPTScores()) {
+				
 				if (ttFlag == ITTEntry.FLAG_EXACT) {
-					return ttValue;
+					
+			    	node.eval = ttValue;
+					
+			    	return node.eval;
+			    	
 				} else {
+					
 					if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
-						return ttValue;
+						
+				    	node.eval = ttValue;
+						
+				    	return node.eval;
 					}
+					
 					if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
-						return ttValue;
+						
+				    	node.eval = ttValue;
+						
+				    	return node.eval;
 					}
 				}
 			}
@@ -896,13 +921,19 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (eval >= beta) {
-			return eval;
+			
+	    	node.eval = eval;
+			
+	    	return node.eval;
 		}
 		
 		int material_queen = (int) Math.max(getEnv().getBitboard().getBoardConfig().getMaterial_QUEEN_O(), getEnv().getBitboard().getBoardConfig().getMaterial_QUEEN_E());
 		
 		if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + material_queen < alpha) {
-			return eval;
+			
+	    	node.eval = eval;
+			
+	    	return node.eval;
 		}
 		
 		final int alphaOrig = alpha;
@@ -987,6 +1018,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					bestMove = move;
 					bestScore = score;
 					
+					node.bestmove = bestMove;
+					node.eval = bestScore;
+					node.leaf = false;
+					
+					if (ply + 1 < ISearch.MAX_DEPTH) {
+						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
+					}
+					
 					alpha = Math.max(alpha, score);
 					if (alpha >= beta) {
 						phase += 100;
@@ -1003,7 +1042,43 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getTPT().put(cb.zobristKey, 0, bestScore, alphaOrig, beta, bestMove);
 		}
 		
-		return Math.max(alpha, Math.max(eval, bestScore));
+		if (alpha >= bestScore) {
+			
+			if (alpha >= eval) {
+				
+				node.bestmove = 0;
+				node.leaf = true;
+				node.eval = eval;
+				
+			} else {
+				
+				node.bestmove = 0;
+				node.leaf = true;
+				node.eval = eval;
+			}
+			
+		} else { //bestScore > alpha
+			
+			if (bestScore >= eval) {
+				
+				if (node.eval != bestScore) {
+					
+					throw new IllegalStateException(); 
+				}
+				
+			} else {
+				
+				node.bestmove = 0;
+				node.leaf = true;
+				node.eval = eval;
+			}
+			
+		}
+		
+    	//node.eval = Math.max(alpha, Math.max(eval, bestScore));
+		
+		
+    	return node.eval;
 	}
 	
 	

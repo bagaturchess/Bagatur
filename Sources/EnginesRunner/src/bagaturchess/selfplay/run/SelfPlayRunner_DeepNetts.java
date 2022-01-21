@@ -47,7 +47,7 @@ public class SelfPlayRunner_DeepNetts {
 		try {
 			
 			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE;
-			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4;
+			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE_EVALIMPL4;
 		
 			PrintStream log = new PrintStream(new FileOutputStream(new File("bagatur.log")));
 			
