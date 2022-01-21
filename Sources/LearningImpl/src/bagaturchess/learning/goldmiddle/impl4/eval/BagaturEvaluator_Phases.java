@@ -20,7 +20,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	
 	
 	private final IEvalComponentsProcessor evalComponentsProcessor_ones;
-	private final IEvalComponentsProcessor evalComponentsProcessor_weights;
+	//private final IEvalComponentsProcessor evalComponentsProcessor_weights;
 	
 	private IEvalComponentsProcessor evalComponentsProcessor;
 	
@@ -40,7 +40,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		evalInfo = new EvalInfo();
 
 		evalComponentsProcessor_ones = new EvalComponentsProcessor_Ones(evalInfo);
-		evalComponentsProcessor_weights = new EvalComponentsProcessor_Weights(evalInfo);
+		//evalComponentsProcessor_weights = new EvalComponentsProcessor_Weights(evalInfo);
 	}
 	
 	

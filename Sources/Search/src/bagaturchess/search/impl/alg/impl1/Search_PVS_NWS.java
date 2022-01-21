@@ -248,18 +248,20 @@ public class Search_PVS_NWS extends SearchImpl {
 			isTTLowerBound = ttFlag == ITTEntry.FLAG_LOWER;
 			isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
 			
-			if (tpt_depth >= depth) {
-				if (ttFlag == ITTEntry.FLAG_EXACT) {
-					extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
-					return node.eval;
-				} else {
-					if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
+			if (getSearchConfig().isOther_UseTPTScores()) {
+				if (tpt_depth >= depth) {
+					if (ttFlag == ITTEntry.FLAG_EXACT) {
 						extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 						return node.eval;
-					}
-					if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
-						extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
-						return node.eval;
+					} else {
+						if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
+							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
+							return node.eval;
+						}
+						if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
+							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
+							return node.eval;
+						}
 					}
 				}
 			}
@@ -865,14 +867,16 @@ public class Search_PVS_NWS extends SearchImpl {
 			ttValue = tt_entries_per_ply[ply].getEval();
 			ttFlag = tt_entries_per_ply[ply].getFlag();
 			
-			if (ttFlag == ITTEntry.FLAG_EXACT) {
-				return ttValue;
-			} else {
-				if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
+			if (getSearchConfig().isOther_UseTPTScores()) {
+				if (ttFlag == ITTEntry.FLAG_EXACT) {
 					return ttValue;
-				}
-				if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
-					return ttValue;
+				} else {
+					if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
+						return ttValue;
+					}
+					if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
+						return ttValue;
+					}
 				}
 			}
 			

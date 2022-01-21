@@ -50,21 +50,31 @@ public class GlobalStopperImpl implements ISearchStopper {
 	public void stopIfNecessary(int maxdepth, int colour, double alpha, double beta) throws SearchInterruptedException {
 		
 		if (maxdepth <= 1) {
+			//Do nothing
 			return;
 		}
 		
+		
 		if (stopped) {
+			
 			throw new SearchInterruptedException();
 		}
+		
 		
 		nodes--;
+		
 		if (nodes <= 0) {
+			
 			markStopped();
+			
 			throw new SearchInterruptedException();
 		}
 		
+		
 		if (!timeController.hasTime()) {
+			
 			markStopped();
+			
 			throw new SearchInterruptedException();
 		}
 	}

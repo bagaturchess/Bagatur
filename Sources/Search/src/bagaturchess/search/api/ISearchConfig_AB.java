@@ -117,6 +117,7 @@ public interface ISearchConfig_AB {
 	public boolean isOther_SingleBestmove();
 	public boolean isOther_StoreTPTInQsearch();
 	public boolean isOther_UseTPTInRoot();
+	public boolean isOther_UseTPTScores();
 	public boolean isOther_UseTPTScoresQsearchPV();
 	public boolean isOther_UseTPTScoresNonPV();
 	public boolean isOther_UseTPTScoresPV();

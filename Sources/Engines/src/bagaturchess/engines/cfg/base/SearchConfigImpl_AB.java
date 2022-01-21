@@ -467,4 +467,10 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	public int getTPTUsageDepthCut() {
 		return 0;
 	}
+
+	
+	@Override
+	public boolean isOther_UseTPTScores() {
+		return true;
+	}
 }

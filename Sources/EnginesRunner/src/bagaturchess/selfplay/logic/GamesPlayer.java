@@ -23,82 +23,206 @@ package bagaturchess.selfplay.logic;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
-import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
-import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl.movelist.BaseMoveList;
-import bagaturchess.bitboard.impl.movelist.IMoveList;
-import bagaturchess.bitboard.impl1.BoardImpl;
-import bagaturchess.bitboard.impl1.internal.SEEUtil;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
+import bagaturchess.engines.cfg.base.TimeConfigImpl;
 import bagaturchess.search.api.IEvaluator;
-import bagaturchess.uci.engine.UCIEnginesManager;
-import bagaturchess.uci.engine.EngineProcess.LineCallBack;
-import bagaturchess.ucitracker.impl.gamemodel.EvaluatedMove;
+import bagaturchess.search.api.IRootSearch;
+import bagaturchess.search.api.internal.ISearchInfo;
+import bagaturchess.search.api.internal.ISearchMediator;
+import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
+import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory;
+import bagaturchess.uci.api.BestMoveSender;
+import bagaturchess.uci.api.ChannelManager;
+import bagaturchess.uci.impl.commands.Go;
 
 
 public class GamesPlayer {
 	
 	
 	private IBitBoard bitboard;
-	private IEvaluator evaluator;
+	private IRootSearch searcher;
 	
-	private IMoveList movesBuffer = new BaseMoveList(250);
-	private int[] seeBuffer = new int[250];
+	//private IMoveList movesBuffer = new BaseMoveList(250);
+	//private int[] seeBuffer = new int[250];
 	private List<Integer> movesList = new ArrayList<Integer>();
 	
 	private long gamesCounter;
 	private long evaluatedPositionsCounter;
 	
-	private UCIEnginesManager runner;
-	
 	private double sumDiffs1;
 	private double sumDiffs2;
+	private VarStatistic stats = new VarStatistic();
 	
 	private ISelfLearning learning;
 	
 	
-	public GamesPlayer(IBitBoard _bitboard, IEvaluator _evaluator, UCIEnginesManager _runner, ISelfLearning _learning) throws IOException {
+	public GamesPlayer(IBitBoard _bitboard, IRootSearch _searcher, ISelfLearning _learning) throws IOException {
 		
 		bitboard = _bitboard;
-		evaluator = _evaluator;
-		runner = _runner;
+		
+		searcher = _searcher;
+		
 		learning = _learning;
 	}
 	
 	
-	public void playGames() throws IOException {
+	public void playGames() throws IOException, InterruptedException {
+		
+		searcher.createBoard(bitboard);
 		
 		while (true) {
 			
-			runner.newGame();
+			//TODO: update NN in memory - recreate searcher and evaluator
+			//getEnv().getEval().beforeSearch();
 			
 			playGame();
 			
 			gamesCounter++;
 			
 			if (gamesCounter % 100 == 0) {
-				System.out.println("Count of played games is " + gamesCounter + ", evaluated positions are " + evaluatedPositionsCounter + ", Success is " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
+				
+				System.out.println("Count of played games is " + gamesCounter + ", evaluated positions are " + evaluatedPositionsCounter
+						+ ", accuracy is " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%"
+						+ ", stats.avg=" + stats.getEntropy()
+						+ ", stats.stdev=" + stats.getDisperse());
+				
 				learning.endEpoch();
-				sumDiffs1 = 0;
-				sumDiffs2 = 0;
+				
+				//sumDiffs1 = 0;
+				//sumDiffs2 = 0;
 			}
 		}
 	}
 	
 	
-	private void playGame() throws IOException {
+	private void playGame() throws IOException, InterruptedException {
+		
+		
+		Go go = new Go(ChannelManager.getChannel(), "go depth 1");
+		//Go go = new Go(ChannelManager.getChannel(), "go infinite");
+		
+		ITimeController timeController = TimeControllerFactory.createTimeController(new TimeConfigImpl(), bitboard.getColourToMove(), go);
+		
+		Object sync_move = new Object();
+		
+		IEvaluator evaluator = searcher.getSharedData().getEvaluatorFactory().create(bitboard, null);
 		
 		movesList.clear();
+		
 		while (bitboard.getStatus().equals(IGameStatus.NONE)) {
 			
-			String allMovesStr = BoardUtils.getPlayedMoves(bitboard);
+			
+			final ISearchMediator mediator1 = new UCISearchMediatorImpl_NormalSearch(ChannelManager.getChannel(),
+					
+					go,
+					
+					timeController,
+					
+					bitboard.getColourToMove(),
+					
+					new BestMoveSender() {
+						@Override
+						public void sendBestMove() {
+							
+							//System.out.println("MTDSchedulerMain: Best move send");
+							
+							synchronized (sync_move) {
+							
+								sync_move.notifyAll();
+							}
+						}
+					},
+					
+					searcher, true);
+			
+			
+			searcher.negamax(bitboard, mediator1, timeController, go);
+			
+			synchronized (sync_move) {
+				
+				sync_move.wait();
+			}
+			
+			ISearchInfo info = mediator1.getLastInfo();
+			
+			if (!info.isMateScore()) {
+				
+				int[] bestline = info.getPV();
+				
+				int color_sign = 1;
+				
+				boolean pv_status_is_none = true;
+				
+				int move_index = 0;
+				for (; move_index < bestline.length; move_index++) {
+					
+					bitboard.makeMoveForward(bestline[move_index]);
+					
+					color_sign *= -1;
+					
+					if (!bitboard.getStatus().equals(IGameStatus.NONE)) {
+						
+						//System.out.println("Game status is not NONE: " + bitboard.getStatus());
+						
+						pv_status_is_none = false;
+						
+						break;
+					}
+				}
+				
+				
+				if (pv_status_is_none) {
+					
+					double eval_search = color_sign * info.getEval();
+					
+					//Evaluate position
+					double eval_static = evaluator.fullEval(0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, bitboard.getColourToMove());
+					
+					//System.out.println("eval_search=" + eval_search + ", eval_static=" + eval_static);
+					
+					sumDiffs1 += Math.abs(0 - eval_search);
+					
+					sumDiffs2 += Math.abs(eval_search - eval_static);
+					
+					//System.out.println("sumDiffs1=" + sumDiffs1 + ", sumDiffs2=" + sumDiffs2);
+					
+					stats.addValue(Math.abs(eval_search - eval_static));
+				
+				}
+				
+				
+				if (move_index >= bestline.length) {
+					move_index = bestline.length - 1;
+				}
+				for (int i = move_index; i >= 0; i--) {
+					
+					bitboard.makeMoveBackward(bestline[i]);
+				}
+			}
+			
+			
+			int best_move = info.getBestMove();
+			
+			bitboard.makeMoveForward(best_move);
+			
+			movesList.add(best_move);
+			
+			evaluatedPositionsCounter++;
+			
+			
+			/*String allMovesStr = BoardUtils.getPlayedMoves(bitboard);
+			
 			List<String> engineMultiPVs = getMultiPVs(allMovesStr);
+			
 			for (String infoLine: engineMultiPVs) {
+				
 				EvaluatedMove em = new EvaluatedMove(bitboard, infoLine);
+				
 				if (em.getStatus() == IGameStatus.NONE) {
 					
 					int root_colour = bitboard.getColourToMove();
@@ -128,24 +252,23 @@ public class GamesPlayer {
 						bitboard.makeMoveBackward(pv_moves[i]);
 					}
 				}
-			}
-			
-			int best_move = getBestMove();
-			
-			bitboard.makeMoveForward(best_move);
-			movesList.add(best_move);
+			}*/
 		}
 		
 		//System.out.println(bitboard.toEPD() + " " + bitboard.getStatus());
 		
+		
 		//Revert board to the initial position
 		for (int i = movesList.size() - 1; i >= 0; i--) {
+			
+			//System.out.println("BACK move: " + movesList.get(i));
+			
 			bitboard.makeMoveBackward(movesList.get(i));
 		}
 	}
 	
 	
-	private int getBestMove() {
+	/*private int getBestMove() {
 		
 		movesBuffer.clear();
 		if (bitboard.isInCheck()) {
@@ -202,7 +325,7 @@ public class GamesPlayer {
 		}
 				
 		return best_move;
-	}
+	}*/
 	
 	
 	private int getGameTerminationScore() {
@@ -235,7 +358,7 @@ public class GamesPlayer {
 	}
 	
 	
-	private List<String> getMultiPVs(String allMovesStr) throws IOException {
+	/*private List<String> getMultiPVs(String allMovesStr) throws IOException {
 		
 		int depth = 1;
 		
@@ -271,7 +394,7 @@ public class GamesPlayer {
 						if (line.contains("bestmove")) {
 							for (int i=lines.size() - 1; i >=0; i--) {
 								//System.out.println("EngineProcess: getInfoLine " + lines.get(i));
-								if (lines.get(i).contains("info "/*depth"*/) && lines.get(i).contains(" pv ")) {
+								if (lines.get(i).contains("info ") && lines.get(i).contains(" pv ")) {
 									if (exitLines == null) {
 										exitLines = lines.get(i) + ";";
 									} else {
@@ -319,5 +442,38 @@ public class GamesPlayer {
 		}
 		
 		return result;
+	}*/
+	
+	
+	private class BestMoveSender_Loop implements BestMoveSender {
+		
+		
+		private int last_bestmove = 0;
+		
+		private Object sync_move;
+		
+		
+		BestMoveSender_Loop(Object _sync_move) {
+			
+			sync_move = _sync_move;
+		}
+		
+		
+		@Override
+		public void sendBestMove() {
+			
+			System.out.println("MTDSchedulerMain: Best move send");
+			
+			synchronized (sync_move) {
+			
+				sync_move.notifyAll();
+			}
+		}
+	
+		
+		int getLast_Bestmove() {
+			
+			return last_bestmove;
+		}
 	}
 }

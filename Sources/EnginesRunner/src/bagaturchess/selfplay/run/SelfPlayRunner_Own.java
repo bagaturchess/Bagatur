@@ -20,50 +20,51 @@
 package bagaturchess.selfplay.run;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.neuroph.nnet.MultiLayerPerceptron;
-
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.deeplearning.api.NeuralNetworkUtils;
-import bagaturchess.deeplearning.impl4_v20.NeuralNetworkUtils_AllFeatures;
-import bagaturchess.deeplearning.impl4_v20.eval.NeuralNetworkEvaluator;
+import bagaturchess.learning.api.ISignalFiller;
+import bagaturchess.learning.api.ISignals;
+import bagaturchess.learning.goldmiddle.api.ILearningInput;
+import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
+import bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluator;
+import bagaturchess.learning.impl.features.advanced.FeaturesMerger;
+import bagaturchess.learning.impl.features.baseimpl.Features;
+import bagaturchess.search.api.IEvaluator;
 import bagaturchess.selfplay.logic.GamesPlayer;
 import bagaturchess.selfplay.logic.ISelfLearning;
-import bagaturchess.selfplay.logic.SelfLearningImpl_Neuroph;
+import bagaturchess.selfplay.logic.SelfLearningImpl_Own;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.UCIEnginesManager;
 import bagaturchess.uci.impl.Channel_Console;
 
 
-public class SelfPlayRunner_Neuroph {
+public class SelfPlayRunner_Own {
 	
 	
 	public static void main(String[] args) {
 		
 		try {
 			
-			MultiLayerPerceptron network;
-			if ((new File("net.bin")).exists() ){
-				network = NeuralNetworkUtils.loadNetwork("net.bin");
-			} else {
-				network = NeuralNetworkUtils_AllFeatures.buildNetwork();
-			}
-			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache();
 			
-			NeuralNetworkEvaluator evaluator = new NeuralNetworkEvaluator(bitboard, null, null, network);
+			ILearningInput input = LearningInputFactory.createDefaultInput();
 			
-			ISelfLearning learning = new SelfLearningImpl_Neuroph(evaluator.getInputs(), network);
+			ISignalFiller filler = input.createFiller(bitboard);
+			Features features = Features.load(input.getFeaturesConfigurationClassName(), new FeaturesMerger());
+			ISignals signals = features.createSignals();
+			
+			IEvaluator evaluator = new FeaturesEvaluator(bitboard, null, filler, null, signals);
+			
+			ISelfLearning learning = new SelfLearningImpl_Own(bitboard, features, signals);
 			
 			UCIEnginesManager runner = createEngineManager();
 			
-			GamesPlayer player = new GamesPlayer(bitboard, evaluator, runner, learning);
+			GamesPlayer player = new GamesPlayer(bitboard, null, learning);
 			
 			player.playGames();
 			

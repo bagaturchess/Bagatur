@@ -23,12 +23,9 @@
 package bagaturchess.learning.goldmiddle.visitors;
 
 
-import java.util.Map;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.learning.api.IAdjustableFeature;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.ISignal;
@@ -40,23 +37,12 @@ import bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluator;
 import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.IEvaluator;
-import bagaturchess.search.api.IRootSearch;
-import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.impl.env.SharedData;
-import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.pv.PVManager;
-import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
-import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
-import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
-import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory;
 import bagaturchess.uci.api.BestMoveSender;
-import bagaturchess.uci.api.ChannelManager;
-import bagaturchess.uci.impl.Channel_Console;
-import bagaturchess.uci.impl.commands.Go;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
 

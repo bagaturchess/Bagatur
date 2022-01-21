@@ -1,6 +1,6 @@
 
 
-package bagaturchess.learning.goldmiddle.visitors;
+package bagaturchess.engines.cfg.base;
 
 
 import bagaturchess.opening.api.OpeningBook;
@@ -12,7 +12,7 @@ import bagaturchess.uci.impl.commands.options.UCIOption;
 import bagaturchess.uci.impl.commands.options.UCIOptionCombo;
 
 
-public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvider {
+public class SearchConfigImpl_AB_SkipTTable implements ISearchConfig_AB, IUCIOptionsProvider {
 	
 	
 	private UCIOption[] options = new UCIOption[] {
@@ -114,11 +114,11 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	public int orderingWeight_LOSE_CAP        		= 1;
 	
 	
-	public SearchConfigImpl_AB() {
+	public SearchConfigImpl_AB_SkipTTable() {
 		
 	}
 	
-	public SearchConfigImpl_AB(String[] args) {
+	public SearchConfigImpl_AB_SkipTTable(String[] args) {
 		
 	}
 	
@@ -462,9 +462,16 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	public void registerProviders(IUCIOptionsRegistry registry) {
 		//Do Nothing
 	}
-
+	
+	
 	@Override
 	public int getTPTUsageDepthCut() {
 		return 0;
+	}
+	
+	
+	@Override
+	public boolean isOther_UseTPTScores() {
+		return false;
 	}
 }
