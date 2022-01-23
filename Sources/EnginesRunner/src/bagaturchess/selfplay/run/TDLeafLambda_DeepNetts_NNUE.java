@@ -80,7 +80,7 @@ public class TDLeafLambda_DeepNetts_NNUE {
 			
 			GamesRunner player = new GamesRunner(bitboard, search, ds_builder);
 			
-			player.playGames();
+			player.playGames(1000000000);
 			
 			
 		} catch (Throwable t) {

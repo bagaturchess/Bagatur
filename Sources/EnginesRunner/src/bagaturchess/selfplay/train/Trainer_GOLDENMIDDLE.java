@@ -61,6 +61,8 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 	
 	private ActivationFunction activation_function = ActivationFunction.LINEAR;
 	
+	private static final float MAX_EVAL = 5000;
+	
 	
 	public Trainer_GOLDENMIDDLE(IBitBoard _bitboard, String _filename_NN) throws Exception {
 		
@@ -144,12 +146,12 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 		} else if (game_result == 1) { //White wins
 			
 			//step = (activation_function.gety(IEvaluator.MAX_EVAL) / (float) inputs_per_move.size());
-			step = (activation_function.gety(1000) / (float) inputs_per_move.size());
+			step = (activation_function.gety(MAX_EVAL) / (float) inputs_per_move.size());
 			
 		} else { //Black wins
 			
 			//step = (activation_function.gety(IEvaluator.MIN_EVAL) / (float) inputs_per_move.size());
-			step = (activation_function.gety(-1000) / (float) inputs_per_move.size());
+			step = (activation_function.gety(-MAX_EVAL) / (float) inputs_per_move.size());
 		}
 		
 		for (int i = 0; i < inputs_per_move.size(); i++) {

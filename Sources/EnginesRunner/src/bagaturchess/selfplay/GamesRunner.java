@@ -79,13 +79,12 @@ public class GamesRunner {
 	}
 	
 	
-	public void playGames() throws Exception {
+	public void playGames(int max_games) throws Exception {
 		
 		
 		searcher.createBoard(bitboard);
 		
-		
-		while (true) {
+		while (max_games > 0) {
 			
 			
 			reloadNetworkInSearcher();
@@ -115,6 +114,8 @@ public class GamesRunner {
 						+ ", PV Accuracy: Stats.stdev=" + stats.getDisperse()
 						);
 			}
+			
+			max_games--;
 		}
 	}
 	

@@ -14,7 +14,7 @@ class Weight implements Serializable {
 	
 	private static final long serialVersionUID = 3805221518234137798L;
 	
-	private static final double MAX_ADJUSTMENT = 100;
+	private static final double MAX_ADJUSTMENT = 10000;
 	
 	
 	private double initialVal;
@@ -22,7 +22,7 @@ class Weight implements Serializable {
 	private double max_weight;
 	private double cur_weight;
 	
-	private double max_adjustment;
+	private double step_adjustment;
 	
 	private VarStatistic varstat;
 	
@@ -37,15 +37,25 @@ class Weight implements Serializable {
 	
 	public Weight(double min, double max, double _initialVal) {
 		
+		if (min < 0) {
+			
+			throw new IllegalStateException("min=" + min);
+		}
+		
 		initialVal = _initialVal;
+		
+		if (initialVal < 0) {
+			
+			throw new IllegalStateException("initialVal=" + initialVal);
+		}
 		
 		if (min > max)	throw new IllegalStateException();
 		
 		min_weight = min;
 		max_weight = max;
-		max_adjustment = (max_weight - min_weight) / MAX_ADJUSTMENT;
+		step_adjustment = (max_weight - min_weight) / MAX_ADJUSTMENT;
 		
-		if (max_adjustment < 0) throw new IllegalStateException();
+		if (step_adjustment < 0) throw new IllegalStateException();
 		
 		cur_weight = initialVal;
 		
@@ -91,14 +101,22 @@ class Weight implements Serializable {
 		if (multiplier == 0) {
 			
 			return;
+			
+		} else if (multiplier > 0) {
+			
+			cur_weight += step_adjustment;
+			
+		} else {
+			
+			cur_weight -= step_adjustment;
 		}
 		
 		//System.out.println("multiplier=" + multiplier);
 		
-		multiplier /= Math.max(1, appliedMultipliers.size());
+		//multiplier /= Math.max(1, appliedMultipliers.size());
 		
 		//Should be added before changing
-		appliedMultipliers.add(multiplier);
+		//appliedMultipliers.add(multiplier);
 		
 		/*while (appliedMultipliers.size() > 15) {
 			
@@ -125,7 +143,7 @@ class Weight implements Serializable {
 		
 		
 		//Multiply the weight
-		if (cur_weight > 0) {
+		/*if (cur_weight > 0) {
 			
 			cur_weight += cur_weight * multiplier;
 			
@@ -144,23 +162,31 @@ class Weight implements Serializable {
 				
 				cur_weight = -1;
 			}
-		}
+		}*/
 		
 		
 		//Make sign change if necessary
 		//SWITCHED ON:  +7%, +9%, +2%, +0.5%, +0.4%, -1.6%, +0.8%, -0.35%, +0.35%, -0.26%
 		//SWITCHED OFF: +7%, +9%, +1.7%, -0.26%, 
 		
-		double LOWEST = 1 / 100.0;
+		double LOWEST = 1 / MAX_ADJUSTMENT;
 		
 		if (cur_weight > 0 && cur_weight < LOWEST) {
 			
-			cur_weight = -LOWEST;
+			/*cur_weight = -LOWEST;
+			
+			throw new IllegalStateException("cur_weight < LOWEST");*/
+			
+			cur_weight = 0;
 		}
 		
 		if (cur_weight < 0 && cur_weight > -LOWEST) {
 			
-			cur_weight = LOWEST;
+			/*cur_weight = LOWEST;
+			
+			throw new IllegalStateException("cur_weight > -LOWEST");*/
+			
+			cur_weight = 0;
 		}
 		
 		

@@ -77,7 +77,7 @@ public class TDLeafLambda_GOLDENMIDDLE {
 			
 			GamesRunner player = new GamesRunner(bitboard, search, ds_builder);
 			
-			player.playGames();
+			player.playGames(10000);
 			
 		} catch (Throwable t) {
 			
