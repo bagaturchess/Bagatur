@@ -27,30 +27,34 @@ import java.io.PrintStream;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
+import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
-import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl;
-import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
 import bagaturchess.selfplay.GamesRunner;
 import bagaturchess.selfplay.train.Trainer;
-import bagaturchess.selfplay.train.Trainer_GOLDENMIDDLE;
+import bagaturchess.selfplay.train.Trainer_NNUE;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.Channel_Console;
+import deepnetts.net.NeuralNetwork;
+import deepnetts.util.FileIO;
 
 
-public class SelfPlayRunner_GOLDENMIDDLE {
+public class TDLeafLambda_DeepNetts_NNUE {
 	
 	
 	public static void main(String[] args) {
 		
 		try {
 			
-			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4_TUNING_GOLDENMIDDEL;
+			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE;
+			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE_EVALIMPL4;
+			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4;
 			
-			PrintStream log = new PrintStream(new FileOutputStream(new File("goldenmiddle.log")));
+			PrintStream log = new PrintStream(new FileOutputStream(new File("nnue.log")));
 			
 			ChannelManager.setChannel(new Channel_Console(System.in, log, log));
 		
@@ -65,19 +69,19 @@ public class SelfPlayRunner_GOLDENMIDDLE {
 			/*MultiPVMediator multipvMediator = new MultiPVMediator(cfg, search, bitboard, mediator1, go);
 			multipvMediator.ready();*/
 			
-			String filename_NN = Features_Splitter.FEATURES_FILE_NAME;
+			String filename_NN = NNUE_Constants.NET_FILE;
 			
-			Features_Splitter features = Features_Splitter.load(filename_NN, Bagatur_V20_FeaturesConfigurationImpl.class.getName());
-			Features_Splitter.store(filename_NN, features);
-			Features_Splitter.dump(features);
+			//NeuralNetwork network = NeuralNetworkUtils_NNUE_PSQT.buildNetwork();
+			//FileIO.writeToFile(network, filename_NN);
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			
-			Trainer ds_builder = new Trainer_GOLDENMIDDLE(bitboard, filename_NN);
+			Trainer ds_builder = new Trainer_NNUE(filename_NN);
 			
 			GamesRunner player = new GamesRunner(bitboard, search, ds_builder);
 			
 			player.playGames();
+			
 			
 		} catch (Throwable t) {
 			
