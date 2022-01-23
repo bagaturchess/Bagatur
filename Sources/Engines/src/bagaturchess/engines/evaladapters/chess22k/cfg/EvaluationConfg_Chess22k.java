@@ -20,6 +20,10 @@ public class EvaluationConfg_Chess22k implements IEvalConfig {
 		return true;
 	}
 	
+	@Override
+	public boolean useDefaultMaterialEval() {
+		return true;
+	}
 	
 	@Override
 	public String getEvaluatorFactoryClassName() {

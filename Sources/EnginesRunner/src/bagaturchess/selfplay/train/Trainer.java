@@ -17,10 +17,21 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.selfplay.logic;
+package bagaturchess.selfplay.train;
 
 
-public interface ISelfLearning {
-	public void addCase(double expectedWhitePlayerEval, double actualWhitePlayerEval);
-	public void endEpoch();
+import java.io.IOException;
+
+import bagaturchess.bitboard.api.IBitBoard;
+
+
+public interface Trainer {
+	
+	public void addBoardPosition(IBitBoard bitboard);
+	
+	public void setGameOutcome(float final_result_sigmoid);
+	
+	public void doEpoch() throws Exception;
+
+	public void clear();
 }

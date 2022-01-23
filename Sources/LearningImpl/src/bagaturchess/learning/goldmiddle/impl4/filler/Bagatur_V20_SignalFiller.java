@@ -29,13 +29,19 @@ import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.impl4.base.EvalInfo;
 import bagaturchess.learning.goldmiddle.impl4.base.Evaluator;
 import bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcessor;
+import bagaturchess.search.api.IEvalConfig;
 
 
 public class Bagatur_V20_SignalFiller implements ISignalFiller {
 	
 	
+	public static final IEvalConfig eval_config = new bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE();
+	
+	
 	private final IBitBoard bitboard;
+	
 	private final ChessBoard board;
+	
 	private final EvalInfo evalInfo;
 	
 	
@@ -58,7 +64,7 @@ public class Bagatur_V20_SignalFiller implements ISignalFiller {
 		
 		IEvalComponentsProcessor evalComponentsProcessor = new EvalComponentsProcessor(signals);
 		
-		Evaluator.eval1(bitboard.getBoardConfig(), board, evalInfo, evalComponentsProcessor);
+		Evaluator.eval1(eval_config, bitboard.getBoardConfig(), board, evalInfo, evalComponentsProcessor);
 		Evaluator.eval2(board, evalInfo, evalComponentsProcessor);
 		Evaluator.eval3(board, evalInfo, evalComponentsProcessor);
 		Evaluator.eval4(board, evalInfo, evalComponentsProcessor);
@@ -107,6 +113,13 @@ public class Bagatur_V20_SignalFiller implements ISignalFiller {
 			signals.getSignal(componentID).addStrength(value_o, -1);
 			
 			//signals.getSignal(componentID + 1000).addStrength(value_e, -1);
+		}
+
+
+		@Override
+		public void setEvalInfo(EvalInfo evalinfo) {
+			
+			throw new UnsupportedOperationException();
 		}
 	}
 }

@@ -20,70 +20,25 @@
 package bagaturchess.deeplearning.impl4_v20;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import org.neuroph.core.input.WeightedSum;
-import org.neuroph.nnet.MultiLayerPerceptron;
-import org.neuroph.nnet.learning.BackPropagation;
-import org.neuroph.nnet.learning.ManhattanPropagation;
-import org.neuroph.nnet.learning.MomentumBackpropagation;
-import org.neuroph.util.NeuronProperties;
-import org.neuroph.util.TransferFunctionType;
-import org.neuroph.util.random.WeightsRandomizer;
-
-import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.deeplearning.api.NeuralNetworkUtils;
-import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_ALL_SignalFiller_InArray;
+import deepnetts.net.FeedForwardNetwork;
+import deepnetts.net.NeuralNetwork;
+import deepnetts.net.layers.activation.ActivationType;
+import deepnetts.net.loss.LossType;
 
 
 public class NeuralNetworkUtils_AllFeatures {
 	
 	
-	public static int getInputsSize() {
-		return 2 * 55;
-	}
-	
-	
-	public static double[] createInputsArray() {
-		return new double[getInputsSize()];
-	}
-	
-	
-	public static MultiLayerPerceptron buildNetwork() {
-		
-        // init neuron settings
-        NeuronProperties neuronProperties = new NeuronProperties();
-        neuronProperties.setProperty("useBias", false);
-        neuronProperties.setProperty("transferFunction", TransferFunctionType.LINEAR);
-        neuronProperties.setProperty("inputFunction", WeightedSum.class);
-
-        int[] neuronsInLayers = new int[] {getInputsSize(), 1};
-        List<Integer> neuronsInLayersVector = new ArrayList<Integer>();
-        for (int i = 0; i < neuronsInLayers.length; i++) {
-            neuronsInLayersVector.add(Integer.valueOf(neuronsInLayers[i]));
-        }
+	public static NeuralNetwork buildNetwork() {
         
-		MultiLayerPerceptron mlp = new MultiLayerPerceptron(neuronsInLayersVector, neuronProperties);
-		
-		//mlp.randomizeWeights(new WeightsRandomizer(new Random(777)));
-		
-		BackPropagation backprop = new BackPropagation();
-		//backprop.setBatchMode(true);
-		backprop.setLearningRate(0.00000001);
-		
-		mlp.setLearningRule(backprop);
+		FeedForwardNetwork nnet =  FeedForwardNetwork.builder()
+                .addInputLayer(2 * 55)
+                .hiddenActivationFunction(ActivationType.LINEAR)
+                .addOutputLayer(1, ActivationType.SIGMOID)
+                .lossFunction(LossType.MEAN_SQUARED_ERROR)
+                .randomSeed(System.currentTimeMillis() % 778)
+                .build();
         
-        return mlp;
-	}
-	
-	
-	public static void fillInputs(MultiLayerPerceptron mlp, double[] inputs, IBitBoard board, Bagatur_ALL_SignalFiller_InArray filler) {
-		NeuralNetworkUtils.clearInputsArray(inputs);
-		
-		filler.fillSignals(inputs, 0);
-		
-		mlp.setInput(inputs);
+        return nnet;
 	}
 }

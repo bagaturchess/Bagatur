@@ -1,40 +1,45 @@
-package bagaturchess.learning.goldmiddle.impl3.cfg;
+package bagaturchess.learning.goldmiddle.impl4.cfg;
 
 
 import bagaturchess.learning.goldmiddle.impl.cfg.bagatur.eval.BagaturPawnsEvalFactory;
-import bagaturchess.learning.goldmiddle.impl3.eval.BagaturEvaluatorFactory;
+import bagaturchess.learning.goldmiddle.impl4.eval.BagaturEvaluatorFactory_GOLDENMIDDLE;
 import bagaturchess.search.api.IEvalConfig;
 
 
-public class EvaluationConfig_V18 implements IEvalConfig {
+public class EvaluationConfig_V20_GOLDENMIDDLE implements IEvalConfig {
 	
 	
 	@Override
 	public boolean useLazyEval() {
-		return true;
+		
+		return false;
 	}
 	
 	
 	@Override
 	public boolean useEvalCache() {
-		return true;
+		
+		return false;
 	}
 	
 	
 	@Override
 	public boolean useDefaultMaterialEval() {
-		return true;
+		
+		return false;
 	}
 	
 	
 	@Override
 	public String getEvaluatorFactoryClassName() {
-		return BagaturEvaluatorFactory.class.getName();
+		
+		return BagaturEvaluatorFactory_GOLDENMIDDLE.class.getName();
 	}
 	
 	
 	@Override
 	public String getPawnsCacheFactoryClassName() {
+		
 		return BagaturPawnsEvalFactory.class.getName();
 	}
 }

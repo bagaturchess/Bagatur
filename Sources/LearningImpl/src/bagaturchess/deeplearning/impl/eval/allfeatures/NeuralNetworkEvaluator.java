@@ -42,7 +42,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	protected double phase1() {
 		
 		NeuralNetworkUtils.clearInputsArray(inputs);
-		filler.fillSignals(inputs, 0);
+		filler.fillSignals(null, 0);
 		network.setInput(inputs);
 		NeuralNetworkUtils.calculate(network);
 		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);

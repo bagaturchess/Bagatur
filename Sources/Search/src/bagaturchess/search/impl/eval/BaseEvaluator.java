@@ -57,15 +57,15 @@ public abstract class BaseEvaluator implements IEvaluator {
 				
 				if (states_transitions.get(i) != null) {
 					
-					System.out.println("material_exchange_motivation[" + i + "]=" + material_exchange_motivation[i]
+					/*System.out.println("material_exchange_motivation[" + i + "]=" + material_exchange_motivation[i]
 							+ " state_counter=" + state_counter
 							+ " states_transitions count " + states_transitions.get(i).size()
-							+ " states_transitions=" + states_transitions.get(i));
+							+ " states_transitions=" + states_transitions.get(i));*/
 					
 				} else {
 					
-					System.out.println("material_exchange_motivation[" + i + "]=" + material_exchange_motivation[i]
-							+ " state_counter=" + state_counter);
+					/*System.out.println("material_exchange_motivation[" + i + "]=" + material_exchange_motivation[i]
+							+ " state_counter=" + state_counter);*/
 				}
 			}
 		}
@@ -102,7 +102,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 	protected PiecesList w_pawns;
 	protected PiecesList b_pawns;
 	
-	private IEvalConfig evalConfig;
+	protected IEvalConfig evalConfig;
 	
 	
 	public BaseEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -263,7 +263,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		double white_eval = 0;
 		
-		white_eval += eval_material_nopawnsdrawrule();
+		if (evalConfig!= null && evalConfig.useDefaultMaterialEval()) white_eval += eval_material_nopawnsdrawrule();
 		//eval += eval_material_imbalances();
 		white_eval += phase1();
 		white_eval += phase2();

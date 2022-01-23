@@ -245,7 +245,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		
 		System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success percent before this iteration: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 		
-		Features_Splitter.updateWeights(features_splitter);
+		Features_Splitter.updateWeights(features_splitter, true);
 		
 		Features_Splitter.store(Features_Splitter.FEATURES_FILE_NAME, features_splitter);
 	}

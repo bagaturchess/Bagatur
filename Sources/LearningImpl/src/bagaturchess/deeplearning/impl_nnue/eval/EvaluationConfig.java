@@ -17,6 +17,11 @@ public class EvaluationConfig implements IEvalConfig {
 	}
 	
 	@Override
+	public boolean useDefaultMaterialEval() {
+		return false;
+	}
+	
+	@Override
 	public String getEvaluatorFactoryClassName() {
 		return NeuralNetworkEvaluatorFactory.class.getName();
 	}

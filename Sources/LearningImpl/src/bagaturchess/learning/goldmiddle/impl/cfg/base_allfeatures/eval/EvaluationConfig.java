@@ -17,6 +17,11 @@ public class EvaluationConfig implements IEvalConfig {
 	}
 
 	@Override
+	public boolean useDefaultMaterialEval() {
+		return true;
+	}
+	
+	@Override
 	public String getEvaluatorFactoryClassName() {
 		return WeightsEvaluatorFactory.class.getName();
 	}

@@ -31,6 +31,7 @@ import java.io.ObjectInputStream;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.deeplearning.ActivationFunction;
 import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
 import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
 import bagaturchess.search.api.IEvaluator;
@@ -115,8 +116,8 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 		double actualWhitePlayerEval = outputs[0];
 		
 		
-		sumDiffs1 += Math.abs(0 - ActivationFunctions.sigmoid_gety(expectedWhitePlayerEval));
-		sumDiffs2 += Math.abs(ActivationFunctions.sigmoid_gety(expectedWhitePlayerEval) - actualWhitePlayerEval);
+		sumDiffs1 += Math.abs(0 - ActivationFunction.SIGMOID.gety(expectedWhitePlayerEval));
+		sumDiffs2 += Math.abs(ActivationFunction.SIGMOID.gety(expectedWhitePlayerEval) - actualWhitePlayerEval);
         
         
 		counter++;

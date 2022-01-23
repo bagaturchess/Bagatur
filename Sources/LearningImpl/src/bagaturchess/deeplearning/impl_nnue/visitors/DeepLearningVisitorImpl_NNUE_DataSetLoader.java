@@ -27,6 +27,7 @@ import javax.visrec.ml.data.DataSet;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
+import bagaturchess.deeplearning.ActivationFunction;
 import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.ucitracker.api.PositionsVisitor;
@@ -78,7 +79,7 @@ public class DeepLearningVisitorImpl_NNUE_DataSetLoader implements PositionsVisi
 		Tensor input = NNUE_Constants.createInput(bitboard, inputs_3d);
         
         float[] output = new float[1];
-        output[0] = ActivationFunctions.sigmoid_gety(expectedWhitePlayerEval);
+        output[0] = ActivationFunction.SIGMOID.gety(expectedWhitePlayerEval);
         
         dataset.addItem(input, output);
         

@@ -18,6 +18,11 @@ public class FeaturesEvaluationConfig implements IEvalConfig {
 	}
 
 	@Override
+	public boolean useDefaultMaterialEval() {
+		return true;
+	}
+	
+	@Override
 	public String getEvaluatorFactoryClassName() {
 		return FeaturesEvaluatorFactory.class.getName();
 	}

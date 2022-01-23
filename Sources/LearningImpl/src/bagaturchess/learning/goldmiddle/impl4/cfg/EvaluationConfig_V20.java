@@ -22,6 +22,12 @@ public class EvaluationConfig_V20 implements IEvalConfig {
 	
 	
 	@Override
+	public boolean useDefaultMaterialEval() {
+		return true;
+	}
+	
+	
+	@Override
 	public String getEvaluatorFactoryClassName() {
 		return BagaturEvaluatorFactory.class.getName();
 	}

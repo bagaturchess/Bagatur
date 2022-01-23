@@ -5,9 +5,8 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.deeplearning.ActivationFunction;
 import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
-import bagaturchess.deeplearning.impl_nnue.visitors.ActivationFunctions;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
@@ -23,6 +22,8 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	private NeuralNetwork network;
 	
 	float[][][] inputs_3d = new float[8][8][15];
+	
+	private ActivationFunction activation_function = ActivationFunction.SIGMOID;
 	
 	
 	NeuralNetworkEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -59,7 +60,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 		
 		float actualWhitePlayerEval = network.getOutput()[0];
 
-		actualWhitePlayerEval = ActivationFunctions.sigmoid_getx(actualWhitePlayerEval);
+		actualWhitePlayerEval = activation_function.SIGMOID.getx(actualWhitePlayerEval);
 		
 		return actualWhitePlayerEval;
 	}

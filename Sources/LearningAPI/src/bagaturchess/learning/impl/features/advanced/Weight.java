@@ -57,6 +57,7 @@ class Weight implements Serializable {
 		varstat = new VarStatistic(false);
 		
 		if (min == max) {
+			
 			varstat.setEntropy(min);
 		}
 		
@@ -71,6 +72,7 @@ class Weight implements Serializable {
 	
 	
 	public void clear() {
+		
 		varstat = new VarStatistic(false);
 	}
 	
@@ -91,6 +93,9 @@ class Weight implements Serializable {
 			return;
 		}
 		
+		//System.out.println("multiplier=" + multiplier);
+		
+		multiplier /= Math.max(1, appliedMultipliers.size());
 		
 		//Should be added before changing
 		appliedMultipliers.add(multiplier);
@@ -100,7 +105,8 @@ class Weight implements Serializable {
 			appliedMultipliers.remove(0);
 		}*/
 		
-		double all = 0;
+		
+		/*double all = 0;
 		
 		double dir = 0;
 		
@@ -114,7 +120,8 @@ class Weight implements Serializable {
 		if (all > 0 && dir != 0) {
 			
 			multiplier *= Math.abs(dir / all);
-		}
+			//multiplier *= (dir / all);
+		}*/
 		
 		
 		//Multiply the weight
@@ -171,25 +178,25 @@ class Weight implements Serializable {
 	
 	
 	public double getWeight() {
-		//if (useAverageWeights) {
-		//	return varstat.getEntropy();
-		//} else {
+		
 		return cur_weight;
-		//}
 	}
+	
 	
 	strictfp void adjust(double amount) {
 		
-		/*if (amount != 1 && amount != -1) {
+		if (amount != 1 && amount != -1) {
+			
 			throw new IllegalStateException();
-		}*/
+		}
 		
-		varstat.addValue(amount, amount);
+		varstat.addValue(amount);
 	}
 	
 	
 	@Override
 	public String toString() {
+		
 		String result = "";
 		
 		result += StringUtils.fill("[" + min_weight + "-" + max_weight + "] ", 8);
@@ -206,9 +213,5 @@ class Weight implements Serializable {
 		result += "]";*/
 		
 		return result;
-	}
-
-	public VarStatistic getVarstat() {
-		return varstat;
 	}
 }

@@ -6,7 +6,7 @@ import bagaturchess.learning.goldmiddle.impl4.eval.BagaturEvaluatorFactory;
 import bagaturchess.search.api.IEvalConfig;
 
 
-public class EvaluationConfig_V20_SkipEvalCache implements IEvalConfig {
+public class EvaluationConfig_V20_NNTraining implements IEvalConfig {
 	
 	
 	@Override
@@ -20,6 +20,10 @@ public class EvaluationConfig_V20_SkipEvalCache implements IEvalConfig {
 		return false;
 	}
 	
+	@Override
+	public boolean useDefaultMaterialEval() {
+		return false;
+	}
 	
 	@Override
 	public String getEvaluatorFactoryClassName() {

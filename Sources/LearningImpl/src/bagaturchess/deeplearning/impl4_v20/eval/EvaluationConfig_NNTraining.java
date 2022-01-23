@@ -1,24 +1,24 @@
-package bagaturchess.deeplearning_deepnetts.impl1.eval;
+package bagaturchess.deeplearning.impl4_v20.eval;
 
 
 import bagaturchess.search.api.IEvalConfig;
 
 
-public class EvaluationConfig implements IEvalConfig {
+public class EvaluationConfig_NNTraining implements IEvalConfig {
 	
 	@Override
 	public boolean useLazyEval() {
-		return true;
+		return false;
 	}
 	
 	@Override
 	public boolean useEvalCache() {
-		return true;
+		return false;
 	}
 	
 	@Override
 	public boolean useDefaultMaterialEval() {
-		return true;
+		return false;
 	}
 	
 	@Override

@@ -29,13 +29,9 @@ public interface IEvalConfig {
 	
 	public boolean useEvalCache();
 	
-	//STANDARD = 0;
-	//PAWNS_STRUCTURE = 1;
-	//PIECES_ITERATION = 2;
-	//MOVES_ITERATION = 3;
-	//FIELDS_STATES_ITERATION = 4;
-	//public int getEvaluationLevel();
+	public boolean useDefaultMaterialEval();
 	
 	public String getEvaluatorFactoryClassName();
+	
 	public String getPawnsCacheFactoryClassName();
 }

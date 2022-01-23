@@ -22,6 +22,12 @@ public class EvaluationConfg_Carbalo implements IEvalConfig {
 	
 	
 	@Override
+	public boolean useDefaultMaterialEval() {
+		return true;
+	}
+	
+	
+	@Override
 	public String getEvaluatorFactoryClassName() {
 		return BagaturEvaluatorFactory.class.getName();
 	}

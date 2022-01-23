@@ -40,7 +40,7 @@ public class SearchUtils {
 			
 			int mate_val = getMateVal(depth);
 			
-			System.out.println("SearchUtils.static: depth=" + depth + ", mate_val=" + mate_val);
+			//System.out.println("SearchUtils.static: depth=" + depth + ", mate_val=" + mate_val);
 			
 			if (!isMateVal(mate_val)) {
 				

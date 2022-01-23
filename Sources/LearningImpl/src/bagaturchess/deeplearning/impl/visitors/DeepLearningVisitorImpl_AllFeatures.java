@@ -101,7 +101,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		}
 		
 		NeuralNetworkUtils.clearInputsArray(inputs);
-		filler.fillSignals(inputs, 0);
+		filler.fillSignals(null, 0);
 		network.setInput(inputs);
 		NeuralNetworkUtils.calculate(network);
 		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);
@@ -117,7 +117,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		
 		DataSet trainingSet = new DataSet(NeuralNetworkUtils_AllFeatures.getInputsSize(), 1);
 		NeuralNetworkUtils.clearInputsArray(inputs);
-		filler.fillSignals(inputs, 0);
+		filler.fillSignals(null, 0);
 		//network.setInput(inputs);
         trainingSet.addRow(new DataSetRow(inputs, new double[]{expectedWhitePlayerEval}));
         network.learn(trainingSet);

@@ -23,6 +23,12 @@ public class MaterialEvalConfigImpl implements IEvalConfig {
 	}
 	
 	
+	@Override
+	public boolean useDefaultMaterialEval() {
+		return true;
+	}
+	
+	
 	public String getEvaluatorFactoryClassName() {
 		return bagaturchess.engines.cfg.materialonly.MaterialEvaluatorFactory.class.getName();
 	}

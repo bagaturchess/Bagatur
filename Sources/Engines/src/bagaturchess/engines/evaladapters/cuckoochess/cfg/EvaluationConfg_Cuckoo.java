@@ -20,6 +20,10 @@ public class EvaluationConfg_Cuckoo implements IEvalConfig {
 		return true;
 	}
 	
+	@Override
+	public boolean useDefaultMaterialEval() {
+		return true;
+	}
 	
 	@Override
 	public String getEvaluatorFactoryClassName() {

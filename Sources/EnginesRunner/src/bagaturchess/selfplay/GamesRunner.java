@@ -17,22 +17,17 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.selfplay.logic;
+package bagaturchess.selfplay;
 
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
-import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
-import bagaturchess.deeplearning.impl_nnue.visitors.ActivationFunctions;
-import bagaturchess.deeplearning.impl_nnue.visitors.DataSet_1;
 import bagaturchess.engines.cfg.base.TimeConfigImpl;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearch;
@@ -41,62 +36,50 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.TimeControllerFactory;
+import bagaturchess.selfplay.train.Trainer;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
-import deepnetts.net.ConvolutionalNetwork;
-import deepnetts.net.NeuralNetwork;
-import deepnetts.net.train.BackpropagationTrainer;
-import deepnetts.util.FileIO;
-import deepnetts.util.Tensor;
 
 
-public class GamesPlayer {
+public class GamesRunner {
 	
 	
 	private IBitBoard bitboard;
+	
 	private IRootSearch searcher;
+	
 	private IEvaluator evaluator;
 	
 	private List<Integer> movesList = new ArrayList<Integer>();
 	
 	private long gamesCounter;
+	
 	private long evaluatedPositionsCounter;
 	
 	private double sumDiffs1;
 	private double sumDiffs2;
+	
 	private VarStatistic stats = new VarStatistic();
+	
 	private long stats_draws;
 	private long stats_wins_white;
 	private long stats_wins_black;
 	
-	private NeuralNetwork network;
-	
-	private DataSet_1 dataset;
+	private Trainer trainer;
 	
 	
-	public GamesPlayer(IBitBoard _bitboard, IRootSearch _searcher) throws Exception {
+	public GamesRunner(IBitBoard _bitboard, IRootSearch _searcher, Trainer _dataset_builder) throws Exception {
 		
 		bitboard = _bitboard;
 		
 		searcher = _searcher;
 		
-		if (!(new File(NNUE_Constants.NET_FILE)).exists()) {
-			
-			throw new IllegalStateException("NNUE file not found: " + NNUE_Constants.NET_FILE);
-			
-		} else {
-			
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(NNUE_Constants.NET_FILE));
-			
-			network = (ConvolutionalNetwork) ois.readObject();
-			
-			ois.close();
-		}
+		trainer = _dataset_builder;
 	}
 	
 	
-	public void playGames() throws IOException, InterruptedException {
+	public void playGames() throws Exception {
 		
 		
 		searcher.createBoard(bitboard);
@@ -105,62 +88,49 @@ public class GamesPlayer {
 		while (true) {
 			
 			
-			reloadNetwork();
+			reloadNetworkInSearcher();
 			
 			
-			dataset = new DataSet_1();
+			trainer.clear();
 			
 			
 			playGame();
 			
-			
-            // create a trainer and train network
-            BackpropagationTrainer trainer = (BackpropagationTrainer) network.getTrainer();
             
-            trainer.setLearningRate(0.01f)
-                    .setMaxError(0.01f)
-                    .setMaxEpochs(1);
-                    //.setBatchMode(true)
-                    //.setBatchSize(1000);
+            trainer.doEpoch();
             
-            trainer.train(dataset);
-			
-			
-			FileIO.writeToFile(network, NNUE_Constants.NET_FILE);
-			
 			
 			gamesCounter++;
 			
 			if (gamesCounter % 10 == 0) {
 				
 				System.out.println("Games: " + gamesCounter
-						+ ", Positions: " + evaluatedPositionsCounter
+						+ ", Draws: " + (100 * (stats_draws) / (stats_draws + stats_wins_white + stats_wins_black)) + "%"
 						+ ", Draws: " + stats_draws
 						+ ", White Win: " + stats_wins_white
 						+ ", Black Win: " + stats_wins_black
-						+ ", Accuracy: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%"
-						+ ", Stats.avg=" + stats.getEntropy()
-						+ ", Stats.stdev=" + stats.getDisperse()
+						+ ", Positions: " + evaluatedPositionsCounter
+						+ ", PV Accuracy: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%"
+						+ ", PV Accuracy: Stats.avg=" + stats.getEntropy()
+						+ ", PV Accuracy: Stats.stdev=" + stats.getDisperse()
 						);
 			}
 		}
 	}
 	
 	
-	private void reloadNetwork() {
+	private void reloadNetworkInSearcher() throws FileNotFoundException, ClassNotFoundException, IOException {
 		
 		//Update NN in memory - recreate searcher and evaluator
 		
 		searcher.recreateEvaluator();
 		
 		evaluator = searcher.getSharedData().getEvaluatorFactory().create(bitboard, null);
+		
 	}
 	
 	
 	private void playGame() throws IOException, InterruptedException {
-		
-		
-		List<float[][][]> inputs_per_move = new ArrayList<float[][][]>();
 		
 		
 		Go go = new Go(ChannelManager.getChannel(), "go depth 1");
@@ -186,10 +156,8 @@ public class GamesPlayer {
 						@Override
 						public void sendBestMove() {
 							
-							//System.out.println("MTDSchedulerMain: Best move send");
-							
 							synchronized (sync_move) {
-							
+								
 								sync_move.notifyAll();
 							}
 						}
@@ -197,10 +165,9 @@ public class GamesPlayer {
 					
 					searcher, true);
 			
-			
-			searcher.negamax(bitboard, mediator, timeController, go);
-			
 			synchronized (sync_move) {
+				
+				searcher.negamax(bitboard, mediator, timeController, go);
 				
 				sync_move.wait();
 			}
@@ -253,10 +220,7 @@ public class GamesPlayer {
 					
 					stats.addValue(Math.abs(eval_search - eval_static));
 					
-					
-					float[][][] inputs_3d = new float[8][8][15];
-					
-					inputs_per_move.add(inputs_3d);
+					trainer.addBoardPosition(bitboard);
 				}
 				
 				
@@ -272,6 +236,8 @@ public class GamesPlayer {
 			
 			int best_move = info.getBestMove();
 			
+			//System.out.println("best_move=" + best_move);
+			
 			bitboard.makeMoveForward(best_move);
 			
 			movesList.add(best_move);
@@ -280,19 +246,9 @@ public class GamesPlayer {
 		//System.out.println(bitboard.toEPD() + " " + bitboard.getStatus());
 		
 		
-		float result = getGameTerminationScore_SIGMOID(bitboard.getStatus());
+		float game_result = getGameTerminationScore_SIGMOID(bitboard.getStatus());
 		
-		for (int i = 0; i < inputs_per_move.size(); i++) {
-			
-			float[][][] inputs_3d = inputs_per_move.get(i);
-			
-			Tensor input = new Tensor(inputs_3d);
-			
-	        float[] output = new float[1];
-	        output[0] = result;
-	        
-	        dataset.addItem(input, output);
-		}
+		trainer.setGameOutcome(game_result);
 		
 		
 		//Revert board to the initial position
@@ -308,12 +264,6 @@ public class GamesPlayer {
 	private float getGameTerminationScore_SIGMOID(IGameStatus status) {
 		
 		
-		float SIGMOID_WIN_BLACK 	= ActivationFunctions.sigmoid_gety(IEvaluator.MIN_EVAL);
-		
-		float SIGMOID_DRAW 			= 0.5f;
-		
-		float SIGMOID_WIN_WHITE 	= ActivationFunctions.sigmoid_gety(IEvaluator.MAX_EVAL);
-		
 		switch (status) {
 		
 			case NONE:
@@ -321,34 +271,34 @@ public class GamesPlayer {
 				
 			case DRAW_3_STATES_REPETITION:
 				stats_draws++;
-				return SIGMOID_DRAW;
+				return 0;
 				
 			case MATE_WHITE_WIN:
 				stats_wins_white++;
-				return SIGMOID_WIN_WHITE;
+				return 1;
 				
 			case MATE_BLACK_WIN:
 				stats_wins_black++;
-				return SIGMOID_WIN_BLACK;
+				return -1;
 				
 			case UNDEFINED:
 				throw new IllegalStateException("status=" + status);
 				
 			case STALEMATE_WHITE_NO_MOVES:
 				stats_draws++;
-				return SIGMOID_DRAW;
+				return 0;
 				
 			case STALEMATE_BLACK_NO_MOVES:
 				stats_draws++;
-				return SIGMOID_DRAW;
+				return 0;
 				
 			case DRAW_50_MOVES_RULE:
 				stats_draws++;
-				return SIGMOID_DRAW;
+				return 0;
 				
 			case NO_SUFFICIENT_MATERIAL:
 				stats_draws++;
-				return SIGMOID_DRAW;
+				return 0;
 				
 			case PASSER_WHITE:
 				throw new IllegalStateException("status=" + status);

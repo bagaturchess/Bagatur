@@ -21,7 +21,7 @@ import bagaturchess.learning.api.IFeaturesConfiguration;
 public class Features_Splitter {
 	
 	
-	public static final String FEATURES_FILE_NAME = "./features.by.material.factor.unions.bin";
+	public static final String FEATURES_FILE_NAME = "goldenmiddle.mf.bin";
 	
 	
 	private static final String FEATURES_FILE_NAME_BACKUP_SUFFIX = ".backup";
@@ -32,9 +32,12 @@ public class Features_Splitter {
 	
 	
 	public IFeature[] getFeatures(IBitBoard board) {
-		int total_factor = Math.min(63, board.getMaterialFactor().getTotalFactor());
+		
+		//int total_factor = Math.min(63, board.getMaterialFactor().getTotalFactor());
 		//return features_by_material_factor.get(total_factor);
-		return features_by_material_factor_2uniouns.get(total_factor / 16);
+		//return features_by_material_factor_2uniouns.get(total_factor / 16);
+		
+		return features_by_material_factor_2uniouns.get(0);
 	}
 	
 	
@@ -55,7 +58,7 @@ public class Features_Splitter {
 				if (!backup.exists()) {
 					
 					System.out.println("FeaturesPersistency.load: backup not found");
-					System.out.println("FILE NOT FOUND: " + fileName + ", it will be created later ...");
+					//System.out.println("FILE NOT FOUND: " + fileName + ", it will be created later ...");
 					
 				} else {
 					
@@ -77,14 +80,14 @@ public class Features_Splitter {
 			
 		} catch (Exception e) {
 			
-			//e.printStackTrace();
+			e.printStackTrace();
 			
 			features_by_material_factor_2uniouns = new ArrayList<IFeature[]>();
 			
 			features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
-			features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
-			features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
-			features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
+			//features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
+			//features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
+			//features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
 		}
 		
 		
@@ -166,7 +169,7 @@ public class Features_Splitter {
 	}
 	
 	
-	public static void updateWeights(Features_Splitter splitter) {
+	public static void updateWeights(Features_Splitter splitter, boolean clear_history) {
 		
 		for (IFeature[] features: splitter.features_by_material_factor_2uniouns) {
 			
@@ -176,9 +179,8 @@ public class Features_Splitter {
 					
 					((IAdjustableFeature) feature).applyChanges();
 					
-					((IAdjustableFeature) feature).clear();
+					if (clear_history) ((IAdjustableFeature) feature).clear();
 				}
-				
 			}
 		}
 	}
@@ -230,10 +232,14 @@ public class Features_Splitter {
 	}
 	
 
-	public static void dump(IFeature[] fs) {
+	public static void dump(Features_Splitter splitter) {
 		
-		for (int i=0; i<fs.length; i++) {
-			System.out.println(fs[i] + ", ");
+		for (IFeature[] features: splitter.features_by_material_factor_2uniouns) {
+			
+			for (IFeature feature: features) {
+					
+				System.out.println(feature + ", ");
+			}
 		}
 	}
 

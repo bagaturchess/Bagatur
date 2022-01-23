@@ -20,6 +20,10 @@ public class EvaluationConfig_V17 implements IEvalConfig {
 		return true;
 	}
 	
+	@Override
+	public boolean useDefaultMaterialEval() {
+		return true;
+	}
 	
 	@Override
 	public String getEvaluatorFactoryClassName() {

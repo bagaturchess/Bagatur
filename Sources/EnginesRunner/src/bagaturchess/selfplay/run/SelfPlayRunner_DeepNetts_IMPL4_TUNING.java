@@ -27,34 +27,37 @@ import java.io.PrintStream;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.deeplearning.impl4_v20.IMPL4_Constants;
+import bagaturchess.deeplearning.impl4_v20.NeuralNetworkUtils_AllFeatures;
 import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
 import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.impl.env.SharedData;
-import bagaturchess.search.impl.rootsearch.multipv.MultiPVRootSearch;
 import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
-import bagaturchess.selfplay.logic.GamesPlayer;
+import bagaturchess.selfplay.GamesRunner;
+import bagaturchess.selfplay.train.Trainer;
+import bagaturchess.selfplay.train.Trainer_IMPL4;
+import bagaturchess.selfplay.train.Trainer_NNUE;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.Channel_Console;
-import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.net.NeuralNetwork;
 import deepnetts.util.FileIO;
 
 
-public class SelfPlayRunner_DeepNetts {
+public class SelfPlayRunner_DeepNetts_IMPL4_TUNING {
 	
 	
 	public static void main(String[] args) {
 		
 		try {
 			
-			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE;
+			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4_TUNING;
 			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE_EVALIMPL4;
 			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4;
 			
-			PrintStream log = new PrintStream(new FileOutputStream(new File("bagatur.log")));
+			PrintStream log = new PrintStream(new FileOutputStream(new File("impl4.log")));
 			
 			ChannelManager.setChannel(new Channel_Console(System.in, log, log));
 		
@@ -69,20 +72,22 @@ public class SelfPlayRunner_DeepNetts {
 			/*MultiPVMediator multipvMediator = new MultiPVMediator(cfg, search, bitboard, mediator1, go);
 			multipvMediator.ready();*/
 			
+			String filename_NN = IMPL4_Constants.NET_FILE;
 			
-			//NeuralNetwork network = (ConvolutionalNetwork) NeuralNetworkUtils_NNUE_PSQT.buildNetwork();
-			//FileIO.writeToFile(network, NNUE_Constants.NET_FILE);
+			//NeuralNetwork network = NeuralNetworkUtils_AllFeatures.buildNetwork();
+			//FileIO.writeToFile(network, filename_NN);
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			
-			GamesPlayer player = new GamesPlayer(bitboard, search);
+			Trainer ds_builder = new Trainer_IMPL4(filename_NN);
+			
+			GamesRunner player = new GamesRunner(bitboard, search, ds_builder);
 			
 			player.playGames();
 			
+		} catch (Throwable t) {
 			
-		} catch (Exception e) {
-			
-			e.printStackTrace();
+			t.printStackTrace();
 		}
 	}
 }
