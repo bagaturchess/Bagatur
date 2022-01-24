@@ -3,7 +3,7 @@ package bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler;
 
 import bagaturchess.bitboard.api.IBaseEval;
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.common.CastlingType;
+import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
@@ -1486,7 +1486,7 @@ public class Bagatur_ALL_SignalFiller implements ISignalFiller, Bagatur_ALL_Feat
 	
 	private int castling(int colour) {
 		int result = 0;
-		if (bitboard.getCastlingType(colour) != CastlingType.NONE) {
+		if (bitboard.getCastlingType(colour) != IBoard.CastlingType.NONE) {
 			result += 3;
 		} else {
 			if (bitboard.hasRightsToKingCastle(colour)) {

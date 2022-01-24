@@ -243,4 +243,11 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 		
 		throw new UnsupportedOperationException();
 	}
+
+
+	@Override
+	public CastlingPair getCastlingPair() {
+		
+		throw new UnsupportedOperationException();
+	}
 }

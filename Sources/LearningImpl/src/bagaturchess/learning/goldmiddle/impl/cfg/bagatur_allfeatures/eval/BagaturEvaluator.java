@@ -3,8 +3,8 @@ package bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval;
 
 import bagaturchess.bitboard.api.IBaseEval;
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.api.IMaterialFactor;
-import bagaturchess.bitboard.common.CastlingType;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
@@ -1447,7 +1447,7 @@ public class BagaturEvaluator extends BaseEvaluator implements FeatureWeights {
 	
 	private int castling(int colour) {
 		int result = 0;
-		if (bitboard.getCastlingType(colour) != CastlingType.NONE) {
+		if (bitboard.getCastlingType(colour) != IBoard.CastlingType.NONE) {
 			result += 3;
 		} else {
 			if (bitboard.hasRightsToKingCastle(colour)) {

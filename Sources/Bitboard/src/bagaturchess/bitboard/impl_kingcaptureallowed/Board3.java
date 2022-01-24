@@ -35,7 +35,6 @@ import bagaturchess.bitboard.api.IMaterialState;
 import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.common.BackupInfo;
-import bagaturchess.bitboard.common.CastlingType;
 import bagaturchess.bitboard.common.Fen;
 import bagaturchess.bitboard.common.GlobalConstants;
 import bagaturchess.bitboard.common.MoveListener;
@@ -104,7 +103,7 @@ abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 	private BaseEvaluation eval;
 	protected PawnsEvalCache pawnsCache;
 	
-	protected int[] castledByColour;
+	protected IBoard.CastlingType[] castledByColour;
 	//protected int lastCastledColour = Figures.COLOUR_UNSPECIFIED;
 	
 	protected boolean[] inCheckCache;
@@ -140,7 +139,7 @@ abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 		
 		
 		board = new int[Fields.ID_MAX];
-		castledByColour = new int[Figures.COLOUR_MAX];
+		castledByColour = new IBoard.CastlingType[Figures.COLOUR_MAX];
 		
 		lastMoveColour = fen.getColourToMove() == Figures.COLOUR_WHITE ? Figures.COLOUR_BLACK : Figures.COLOUR_WHITE;
 		if (fen.getColourToMove() == Figures.COLOUR_WHITE) {
@@ -522,7 +521,7 @@ abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 	
 	
 	@Override
-	public int getCastlingType(int colour) {
+	public IBoard.CastlingType getCastlingType(int colour) {
 		return castledByColour[colour];
 	}
 	
@@ -801,7 +800,7 @@ abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 			hashkey ^= ConstantStructure.MOVES_KEYS[castlePID][fromCastleFieldID];
 			hashkey ^= ConstantStructure.MOVES_KEYS[castlePID][toCastleFieldID];
 			
-			castledByColour[figureColour] = MoveInt.isCastleKingSide(move) ? CastlingType.KING_SIDE : CastlingType.QUEEN_SIDE;
+			castledByColour[figureColour] = MoveInt.isCastleKingSide(move) ? CastlingType.KINGSIDE : CastlingType.QUEENSIDE;
 		}
 		
 		if (MoveInt.isPromotion(move)) {
@@ -1473,7 +1472,7 @@ abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 		//TODO: clone.hasEnpassant = hasEnpassant;
 		//clone.possibleQueenCastleSideByColour = Utils.copy(possibleQueenCastleSideByColour);
 		//clone.possibleKingCastleSideByColour = Utils.copy(possibleKingCastleSideByColour);
-		clone.castledByColour = Utils.copy(castledByColour);
+		//clone.castledByColour = Utils.copy(castledByColour);
 		clone.lastMoveColour = lastMoveColour;
 		clone.hashkey = hashkey;
 		clone.pawnskey = pawnskey;

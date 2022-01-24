@@ -108,8 +108,8 @@ public class DummyGameIterator implements IGameIterator, IPlyIterator {
 			throw new IllegalStateException();
 		}
 		
-		int cast1 = bitboard.getCastlingType(bitboard.getColourToMove());
-		int cast2 = testboard.getCastlingType(testboard.getColourToMove());
+		IBoard.CastlingType cast1 = bitboard.getCastlingType(bitboard.getColourToMove());
+		IBoard.CastlingType cast2 = testboard.getCastlingType(testboard.getColourToMove());
 		if (cast1 != cast2) {
 			throw new IllegalStateException();
 		}

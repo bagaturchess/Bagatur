@@ -269,10 +269,6 @@ public class DummyBoard implements IBitBoard {
 		throw new UnsupportedOperationException();
 	}
 	
-	
-	public int getCastlingType(int colour) {
-		return 0;
-	}
 
 	public boolean isCheckMove(long[] move) {
 		return false;
@@ -762,5 +758,19 @@ public class DummyBoard implements IBitBoard {
 	public double[] getNNUEInputs() {
 		
 		throw new UnsupportedOperationException();
+	}
+	
+
+	@Override
+	public CastlingType getCastlingType(int colour) {
+		
+		throw new IllegalStateException();
+	}
+
+	
+	@Override
+	public CastlingPair getCastlingPair() {
+		
+		throw new IllegalStateException();
 	}
 }

@@ -397,6 +397,18 @@ public class BoardImpl implements IBitBoard {
 	
 	
 	@Override
+	public IBoard.CastlingType getCastlingType(int colour) {
+		throw new UnsupportedOperationException();
+	}
+	
+	
+	@Override
+	public CastlingPair getCastlingPair() {
+		throw new UnsupportedOperationException();
+	}
+	
+	
+	@Override
 	public int getFigureID(int squareID) {
 		throw new UnsupportedOperationException();
 	}
@@ -758,14 +770,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public int getUnstoppablePasser() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getCastlingType(int)
-	 */
-	@Override
-	public int getCastlingType(int colour) {
 		throw new UnsupportedOperationException();
 	}
 

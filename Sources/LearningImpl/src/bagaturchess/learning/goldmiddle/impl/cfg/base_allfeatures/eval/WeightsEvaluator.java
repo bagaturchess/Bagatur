@@ -2,7 +2,7 @@ package bagaturchess.learning.goldmiddle.impl.cfg.base_allfeatures.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.common.CastlingType;
+import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
@@ -164,7 +164,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     
     private int castling(int colour) {
             int result = 0;
-            if (bitboard.getCastlingType(colour) != CastlingType.NONE) {
+            if (bitboard.getCastlingType(colour) != IBoard.CastlingType.NONE) {
                     result += 3;
             } else {
                     if (bitboard.hasRightsToKingCastle(colour)) {
@@ -220,18 +220,18 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
             long bb_black_pawns = bitboard.getFiguresBitboardByColourAndType(Figures.COLOUR_BLACK, Figures.TYPE_PAWN);
 
             
-            int w_cast_type = bitboard.getCastlingType(Figures.COLOUR_WHITE);
-            int b_cast_type = bitboard.getCastlingType(Figures.COLOUR_BLACK);
+            IBoard.CastlingType w_cast_type = bitboard.getCastlingType(Figures.COLOUR_WHITE);
+            IBoard.CastlingType b_cast_type = bitboard.getCastlingType(Figures.COLOUR_BLACK);
             
             int movedFPawn = 0;
             int missingGPawn = 0;
             if (bitboard.hasRightsToKingCastle(Figures.COLOUR_WHITE)
-                    || w_cast_type == CastlingType.KING_SIDE) {
+                    || w_cast_type == IBoard.CastlingType.KINGSIDE) {
                     movedFPawn += (Fields.F2 & bb_white_pawns) == 0L ? 1 : 0;
                     missingGPawn += (Fields.LETTER_G & bb_white_pawns) == 0L ? 1 : 0;
             }
             if (bitboard.hasRightsToKingCastle(Figures.COLOUR_BLACK)
-                            || b_cast_type == CastlingType.KING_SIDE) {
+                            || b_cast_type == IBoard.CastlingType.KINGSIDE) {
                     movedFPawn += ((Fields.F7 & bb_black_pawns) == 0L ? -1 : 0);
                     missingGPawn += (Fields.LETTER_G & bb_black_pawns) == 0L ? -1 : 0;
             }

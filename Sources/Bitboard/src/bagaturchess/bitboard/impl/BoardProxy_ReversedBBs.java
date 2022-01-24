@@ -435,14 +435,6 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 	}
 
 	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#getCastlingType(int)
-	 */
-	@Override
-	public int getCastlingType(int colour) {
-		return bitboard.getCastlingType(colour);
-	}
-
-	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#hasRightsToKingCastle(int)
 	 */
 	@Override
@@ -589,5 +581,19 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 	public Object getNNUEInputs() {
 		
 		return bitboard.getNNUEInputs();
+	}
+
+
+	@Override
+	public CastlingType getCastlingType(int colour) {
+		
+		return bitboard.getCastlingType(colour);
+	}
+
+
+	@Override
+	public CastlingPair getCastlingPair() {
+		
+		return bitboard.getCastlingPair();
 	}
 }

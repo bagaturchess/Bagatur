@@ -76,7 +76,8 @@ public interface IBoard {
 	
 	public boolean hasSingleMove();
 	
-	public int getCastlingType(int colour);
+	public CastlingType getCastlingType(int colour);
+	public CastlingPair getCastlingPair();
 	public boolean hasRightsToKingCastle(int colour);
 	public boolean hasRightsToQueenCastle(int colour);
 	
@@ -89,4 +90,24 @@ public interface IBoard {
 	public IGameStatus getStatus();
 	
 	public Object getNNUEInputs();
+	
+	
+	public static enum CastlingType {
+		NONE,
+		KINGSIDE,
+		QUEENSIDE,
+	}
+	
+	
+	public static enum CastlingPair {
+		NONE_NONE,
+		NONE_KINGSIDE,
+		KINGSIDE_NONE,
+		KINGSIDE_KINGSIDE,
+		NONE_QUEENSIDE,
+		QUEENSIDE_NONE,
+		QUEENSIDE_QUEENSIDE,
+		KINGSIDE_QUEENSIDE,
+		QUEENSIDE_KINGSIDE,
+	}
 }
