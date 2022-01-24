@@ -55,7 +55,7 @@ public class RootSearchConfig_BaseImpl_1Core extends RootSearchConfig_BaseImpl i
 							bagaturchess.search.impl.alg.impl1.Search_PVS_NWS.class.getName(),
 							bagaturchess.engines.cfg.base.SearchConfigImpl_AB_NNTraining.class.getName(),
 							bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20.class.getName(),
-							bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE.class.getName(),
+							bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Train.class.getName(),
 				}
 			);
 	

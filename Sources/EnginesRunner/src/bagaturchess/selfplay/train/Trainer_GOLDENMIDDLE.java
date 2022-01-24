@@ -56,12 +56,13 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 	private String filename_NN;
 	
 	private List<ISignals> inputs_per_move;
+	private List<IFeature[]> features_per_move_for_update;
 	private List<Float> outputs_per_move_actual;
 	private List<Float> outputs_per_move_expected;
 	
 	private ActivationFunction activation_function = ActivationFunction.LINEAR;
 	
-	private static final float MAX_EVAL = 5000;
+	private static final float MAX_EVAL = 7777;
 	
 	
 	public Trainer_GOLDENMIDDLE(IBitBoard _bitboard, String _filename_NN) throws Exception {
@@ -76,11 +77,13 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 			
 		}
 		
-		inputs_per_move = new ArrayList<ISignals>();
+		inputs_per_move 				= new ArrayList<ISignals>();
 		
-		outputs_per_move_actual = new ArrayList<Float>();
+		features_per_move_for_update 	= new ArrayList<IFeature[]>();
 		
-		outputs_per_move_expected = new ArrayList<Float>();
+		outputs_per_move_actual 		= new ArrayList<Float>();
+		
+		outputs_per_move_expected 		= new ArrayList<Float>();
 				
 		reloadFromFile();
 	}
@@ -103,6 +106,8 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 		
 		inputs_per_move.clear();
 		
+		features_per_move_for_update.clear();
+		
 		outputs_per_move_actual.clear();
 		
 		outputs_per_move_expected.clear();
@@ -112,16 +117,18 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 	@Override
 	public void addBoardPosition(IBitBoard bitboard) {
 		
-		/*if (filler == null) {
-			
-			filler = new Bagatur_V20_SignalFiller(bitboard);
-		}*/
 		
-		ISignals signals = new Signals(features_splitter.getFeatures(bitboard));
+		IFeature[] features = features_splitter.getFeatures(bitboard);
+		
+		features_per_move_for_update.add(features);
+		
+		
+		ISignals signals = new Signals(features);
 		
 		filler.fill(signals);
 		
 		inputs_per_move.add(signals);
+		
 		
 		double actual_eval = evaluator.fullEval(0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, bitboard.getColourToMove());
 		
@@ -167,9 +174,6 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 	public void doEpoch() throws Exception {		
 		
 		
-		reloadFromFile();
-		
-		
 		if (inputs_per_move.size() != outputs_per_move_actual.size()) {
 			
 			throw new IllegalStateException();
@@ -183,16 +187,19 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 		
 		for (int moveindex = 0; moveindex < inputs_per_move.size(); moveindex++) {
 			
-			ISignals signals = inputs_per_move.get(moveindex);
 			
-			float actualWhitePlayerEval = outputs_per_move_actual.get(moveindex);
-			float expectedWhitePlayerEval = outputs_per_move_expected.get(moveindex);
-		
+			float actualWhitePlayerEval 	= outputs_per_move_actual.get(moveindex);
+			
+			float expectedWhitePlayerEval 	= outputs_per_move_expected.get(moveindex);
+			
+			
 			double deltaP = expectedWhitePlayerEval - actualWhitePlayerEval;
 			
-			IFeature[] features = features_splitter.getFeatures(null);
-			
 			if (deltaP != 0) {
+				
+				ISignals signals 				= inputs_per_move.get(moveindex);
+				
+				IFeature[] features 			= features_per_move_for_update.get(moveindex);
 				
 				for (int i = 0; i < features.length; i++) {
 					
@@ -219,5 +226,8 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 		Features_Splitter.updateWeights(features_splitter, true);
 		
 		Features_Splitter.store(filename_NN, features_splitter);
+		
+		
+		reloadFromFile();
 	}
 }

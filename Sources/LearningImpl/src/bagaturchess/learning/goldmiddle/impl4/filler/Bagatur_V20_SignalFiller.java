@@ -35,7 +35,7 @@ import bagaturchess.search.api.IEvalConfig;
 public class Bagatur_V20_SignalFiller implements ISignalFiller {
 	
 	
-	public static final IEvalConfig eval_config = new bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE();
+	public static final IEvalConfig eval_config = new bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Train();
 	
 	
 	private final IBitBoard bitboard;

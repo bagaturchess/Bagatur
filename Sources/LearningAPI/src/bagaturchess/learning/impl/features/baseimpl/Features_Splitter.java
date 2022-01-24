@@ -33,11 +33,11 @@ public class Features_Splitter {
 	
 	public IFeature[] getFeatures(IBitBoard board) {
 		
-		//int total_factor = Math.min(63, board.getMaterialFactor().getTotalFactor());
+		int total_factor = Math.min(63, board.getMaterialFactor().getTotalFactor());
 		//return features_by_material_factor.get(total_factor);
-		//return features_by_material_factor_2uniouns.get(total_factor / 16);
+		return features_by_material_factor_2uniouns.get(total_factor / 16);
 		
-		return features_by_material_factor_2uniouns.get(0);
+		//return features_by_material_factor_2uniouns.get(0);
 	}
 	
 	
@@ -85,9 +85,9 @@ public class Features_Splitter {
 			features_by_material_factor_2uniouns = new ArrayList<IFeature[]>();
 			
 			features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
-			//features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
-			//features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
-			//features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
+			features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
+			features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
+			features_by_material_factor_2uniouns.add(createNewFeatures(cfgClassName));
 		}
 		
 		
@@ -224,14 +224,17 @@ public class Features_Splitter {
 	
 	
 	public String toString() {
+		
 		String result = "toString not implemented ...";
+		
 		/*for (IFeature f: features_all.values()) {
 			result += f + ", " + "\r\n";
 		}*/
+		
 		return result;
 	}
 	
-
+	
 	public static void dump(Features_Splitter splitter) {
 		
 		for (IFeature[] features: splitter.features_by_material_factor_2uniouns) {
