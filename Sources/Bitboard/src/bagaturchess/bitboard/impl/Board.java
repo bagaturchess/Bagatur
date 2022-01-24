@@ -39,7 +39,6 @@ import bagaturchess.bitboard.api.IMoveOps;
 import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.PawnsEvalCache;
-import bagaturchess.bitboard.api.IBoard.CastlingPair;
 import bagaturchess.bitboard.common.BackupInfo;
 import bagaturchess.bitboard.common.BoardStat;
 import bagaturchess.bitboard.common.Fen;
@@ -4897,15 +4896,89 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	@Override
 	public IBoard.CastlingType getCastlingType(int colour) {
 		
-		//return castledByColour[colour];
-		
-		throw new UnsupportedOperationException();
+		return castledByColour[colour];
 	}
 	
 	
 	@Override
 	public CastlingPair getCastlingPair() {
-		throw new UnsupportedOperationException();
+		
+		
+		if (castledByColour[Constants.COLOUR_WHITE] == null || castledByColour[Constants.COLOUR_BLACK] == null) {
+			
+			throw new IllegalStateException();
+		}
+		
+		
+		switch (castledByColour[Constants.COLOUR_WHITE]) {
+		
+			case NONE:
+				
+				switch (castledByColour[Constants.COLOUR_BLACK]) {
+				
+					case NONE:
+						
+						return CastlingPair.NONE_NONE;
+						
+					case KINGSIDE:
+						
+						return CastlingPair.NONE_KINGSIDE;
+						
+					case QUEENSIDE:
+						
+						return CastlingPair.NONE_QUEENSIDE;
+						
+					default:
+						
+						throw new IllegalStateException();
+				}
+				
+			case KINGSIDE:
+				
+				switch (castledByColour[Constants.COLOUR_BLACK]) {
+				
+					case NONE:
+						
+						return CastlingPair.KINGSIDE_NONE;
+						
+					case KINGSIDE:
+						
+						return CastlingPair.KINGSIDE_KINGSIDE;
+						
+					case QUEENSIDE:
+						
+						return CastlingPair.KINGSIDE_QUEENSIDE;
+						
+					default:
+						
+						throw new IllegalStateException();
+				}
+				
+			case QUEENSIDE:
+				
+				switch (castledByColour[Constants.COLOUR_BLACK]) {
+				
+					case NONE:
+						
+						return CastlingPair.QUEENSIDE_NONE;
+						
+					case KINGSIDE:
+						
+						return CastlingPair.QUEENSIDE_KINGSIDE;
+						
+					case QUEENSIDE:
+						
+						return CastlingPair.QUEENSIDE_QUEENSIDE;
+						
+					default:
+						
+						throw new IllegalStateException();
+				}
+				
+			default:
+				
+				throw new IllegalStateException();
+		}
 	}
 	
 

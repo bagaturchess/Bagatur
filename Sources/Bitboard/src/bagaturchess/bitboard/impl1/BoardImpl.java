@@ -49,6 +49,7 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
+import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.state.PiecesList;
@@ -82,6 +83,8 @@ public class BoardImpl implements IBitBoard {
 	
 	private NNUE_Input nnue_input;
 	
+	protected IBoard.CastlingType[] castledByColour;
+	
 	
 	public BoardImpl(String fen, IBoardConfig _boardConfig) {
 		
@@ -101,6 +104,9 @@ public class BoardImpl implements IBitBoard {
 		
 		hasMovesList = new BaseMoveList(250);
 		
+		castledByColour = new IBoard.CastlingType[2];
+		castledByColour[Constants.COLOUR_WHITE] = IBoard.CastlingType.NONE;
+		castledByColour[Constants.COLOUR_BLACK] = IBoard.CastlingType.NONE;
 		
 		moveListeners = new MoveListener[0];
 		
@@ -238,13 +244,22 @@ public class BoardImpl implements IBitBoard {
 	@Override
 	public void makeMoveForward(int move) {
 		
+		
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
 				moveListeners[i].preForwardMove(chessBoard.colorToMove, move);
 			}
 		}
 		
+		
+		if (moveOps.isCastling(move)) {
+			
+			castledByColour[getColourToMove()] = moveOps.isCastlingKingSide(move) ? IBoard.CastlingType.KINGSIDE : IBoard.CastlingType.QUEENSIDE;
+		}
+		
+		
 		chessBoard.doMove(move);
+		
 		
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
@@ -257,13 +272,22 @@ public class BoardImpl implements IBitBoard {
 	@Override
 	public void makeMoveBackward(int move) {
 		
+		
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
 				moveListeners[i].preBackwardMove(chessBoard.colorToMoveInverse, move);
 			}
 		}
 		
+		
 		chessBoard.undoMove(move);
+		
+		
+		if (moveOps.isCastling(move)) {
+			
+			castledByColour[getColourToMove()] = IBoard.CastlingType.NONE;
+		}
+		
 		
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
@@ -398,13 +422,90 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public IBoard.CastlingType getCastlingType(int colour) {
-		throw new UnsupportedOperationException();
+		
+		return castledByColour[colour];
 	}
 	
 	
 	@Override
 	public CastlingPair getCastlingPair() {
-		throw new UnsupportedOperationException();
+		
+		
+		if (castledByColour[Constants.COLOUR_WHITE] == null || castledByColour[Constants.COLOUR_BLACK] == null) {
+			
+			throw new IllegalStateException();
+		}
+		
+		
+		switch (castledByColour[Constants.COLOUR_WHITE]) {
+		
+			case NONE:
+				
+				switch (castledByColour[Constants.COLOUR_BLACK]) {
+				
+					case NONE:
+						
+						return CastlingPair.NONE_NONE;
+						
+					case KINGSIDE:
+						
+						return CastlingPair.NONE_KINGSIDE;
+						
+					case QUEENSIDE:
+						
+						return CastlingPair.NONE_QUEENSIDE;
+						
+					default:
+						
+						throw new IllegalStateException();
+				}
+				
+			case KINGSIDE:
+				
+				switch (castledByColour[Constants.COLOUR_BLACK]) {
+				
+					case NONE:
+						
+						return CastlingPair.KINGSIDE_NONE;
+						
+					case KINGSIDE:
+						
+						return CastlingPair.KINGSIDE_KINGSIDE;
+						
+					case QUEENSIDE:
+						
+						return CastlingPair.KINGSIDE_QUEENSIDE;
+						
+					default:
+						
+						throw new IllegalStateException();
+				}
+				
+			case QUEENSIDE:
+				
+				switch (castledByColour[Constants.COLOUR_BLACK]) {
+				
+					case NONE:
+						
+						return CastlingPair.QUEENSIDE_NONE;
+						
+					case KINGSIDE:
+						
+						return CastlingPair.QUEENSIDE_KINGSIDE;
+						
+					case QUEENSIDE:
+						
+						return CastlingPair.QUEENSIDE_QUEENSIDE;
+						
+					default:
+						
+						throw new IllegalStateException();
+				}
+				
+			default:
+				
+				throw new IllegalStateException();
+		}
 	}
 	
 	
