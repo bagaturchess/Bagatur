@@ -29,6 +29,9 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.engines.cfg.base.TimeConfigImpl;
+import bagaturchess.opening.api.IOpeningEntry;
+import bagaturchess.opening.api.OpeningBook;
+import bagaturchess.opening.api.OpeningBookFactory;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.internal.ISearchInfo;
@@ -51,8 +54,6 @@ public class GamesRunner {
 	
 	private IEvaluator evaluator;
 	
-	private List<Integer> movesList = new ArrayList<Integer>();
-	
 	private long gamesCounter;
 	
 	private long evaluatedPositionsCounter;
@@ -68,6 +69,8 @@ public class GamesRunner {
 	
 	private Trainer trainer;
 	
+	private OpeningBook ob;
+	
 	
 	public GamesRunner(IBitBoard _bitboard, IRootSearch _searcher, Trainer _dataset_builder) throws Exception {
 		
@@ -76,6 +79,8 @@ public class GamesRunner {
 		searcher = _searcher;
 		
 		trainer = _dataset_builder;
+		
+		ob = OpeningBookFactory.load("./data/w.ob", "./data/b.ob");
 	}
 	
 	
@@ -93,11 +98,34 @@ public class GamesRunner {
 			trainer.clear();
 			
 			
-			playGame();
+			List<Integer> opening_moves = playRandomOpening();
 			
-            
+			
+			List<Integer> played_moves = playGame();
+			
+			
+			float game_result = getGameTerminationScore(bitboard.getStatus());
+			
+			
+			trainer.setGameOutcome(game_result);
+			
+			
             trainer.doEpoch();
             
+            
+			//Revert played moves
+			for (int i = played_moves.size() - 1; i >= 0; i--) {
+				
+				bitboard.makeMoveBackward(played_moves.get(i));
+			}
+			
+			
+			//Revert opening moves
+			for (int i = opening_moves.size() - 1; i >= 0; i--) {
+				
+				bitboard.makeMoveBackward(opening_moves.get(i));
+			}
+			
 			
 			gamesCounter++;
 			
@@ -131,7 +159,38 @@ public class GamesRunner {
 	}
 	
 	
-	private void playGame() throws IOException, InterruptedException {
+	private List<Integer> playRandomOpening() {
+		
+		List<Integer> opening_moves = new ArrayList<Integer>();
+		
+		int counter = 0;
+		
+		IOpeningEntry entry;
+		
+		while ((entry = ob.getEntry(bitboard.getHashKey(), bitboard.getColourToMove())) != null) {
+			
+			if (entry.getWeight() < 50) {
+				
+				break;
+			}
+
+			//get next opening move using mode "random intermediate", which creates good randomness and still the starting postions are good enough (the chance of wining for both side is around ~50% in more than 99% of the cases)
+			int move = entry.getRandomEntry(OpeningBook.OPENING_BOOK_MODE_POWER1);
+			
+			bitboard.makeMoveForward(move);
+			
+			opening_moves.add(move);
+			
+			counter++;
+		}
+		
+		//System.out.println("GamesRunner.playRandomOpening: out of opening after " + counter + " moves, starting FEN is " + bitboard.toEPD());
+		
+		return opening_moves;
+	}
+	
+	
+	private List<Integer> playGame() throws IOException, InterruptedException {
 		
 		
 		Go go = new Go(ChannelManager.getChannel(), "go depth 1");
@@ -139,7 +198,7 @@ public class GamesRunner {
 		
 		Object sync_move = new Object();
 		
-		movesList.clear();
+		List<Integer> played_moves = new ArrayList<Integer>();
 		
 		while (bitboard.getStatus().equals(IGameStatus.NONE)) {
 			
@@ -241,28 +300,16 @@ public class GamesRunner {
 			
 			bitboard.makeMoveForward(best_move);
 			
-			movesList.add(best_move);
+			played_moves.add(best_move);
 		}
 		
 		//System.out.println(bitboard.toEPD() + " " + bitboard.getStatus());
 		
-		
-		float game_result = getGameTerminationScore_SIGMOID(bitboard.getStatus());
-		
-		trainer.setGameOutcome(game_result);
-		
-		
-		//Revert board to the initial position
-		for (int i = movesList.size() - 1; i >= 0; i--) {
-			
-			//System.out.println("BACK move: " + movesList.get(i));
-			
-			bitboard.makeMoveBackward(movesList.get(i));
-		}
+		return played_moves;
 	}
 	
 	
-	private float getGameTerminationScore_SIGMOID(IGameStatus status) {
+	private float getGameTerminationScore(IGameStatus status) {
 		
 		
 		switch (status) {
