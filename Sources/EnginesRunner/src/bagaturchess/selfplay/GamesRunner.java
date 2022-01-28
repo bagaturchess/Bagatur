@@ -48,6 +48,9 @@ import bagaturchess.uci.impl.commands.Go;
 public class GamesRunner {
 	
 	
+	private static final int SEARCH_DEPTH = 3;
+	
+	
 	private IBitBoard bitboard;
 	
 	private IRootSearch searcher;
@@ -193,7 +196,7 @@ public class GamesRunner {
 	private List<Integer> playGame() throws IOException, InterruptedException {
 		
 		
-		Go go = new Go(ChannelManager.getChannel(), "go depth 1");
+		Go go = new Go(ChannelManager.getChannel(), "go depth " + SEARCH_DEPTH);
 		//Go go = new Go(ChannelManager.getChannel(), "go infinite");
 		
 		Object sync_move = new Object();

@@ -12,7 +12,7 @@ class Weight implements Serializable {
 	
 	private static final long serialVersionUID = 3805221518234137798L;
 	
-	private static final double LEARNING_RATE = 1;//0.1;
+	private static final double LEARNING_RATE = 0.01;
 	
 	
 	private double initialVal;
@@ -86,7 +86,11 @@ class Weight implements Serializable {
 		
 		double multiplier = (current.getTotalDirection() / current.getTotalAmount());
 		
+		//System.out.println("multiplier=" + multiplier);
+		//System.out.println("total.getDisperse()=" + total.getDisperse());
+		
 		multiplier *= LEARNING_RATE;
+		//multiplier *= Math.max(1, total.getDisperse());
 		
 		//Multiply the weight
 		
