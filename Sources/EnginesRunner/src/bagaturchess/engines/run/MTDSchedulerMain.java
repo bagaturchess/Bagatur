@@ -130,8 +130,10 @@ public class MTDSchedulerMain {
 								//bagaturchess.learning.goldmiddle.impl3.cfg.BoardConfigImpl_V18.class.getName(),
 								//bagaturchess.learning.goldmiddle.impl3.cfg.EvaluationConfig_V18.class.getName()
 								bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20.class.getName(),
-								bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20.class.getName(),
+								//bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20.class.getName(),
 								//bagaturchess.deeplearning.impl_nnue.eval.EvaluationConfig.class.getName(),
+								//bagaturchess.deeplearning.impl4_v20.eval.EvaluationConfig.class.getName(),
+								bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Train.class.getName(),
 								//bagaturchess.deeplearning.impl.eval.allfeatures.EvaluationConfig.class.getName(),
 								//bagaturchess.deeplearning_deepnetts.impl1.eval.EvaluationConfig.class.getName(),
 								//bagaturchess.deeplearning.impl_nnue.eval.EvaluationConfig.class.getName(),
@@ -151,7 +153,7 @@ public class MTDSchedulerMain {
 		//IRootSearch search = new SequentialSearch_Classic(new Object[] {cfg, sharedData});
 		IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
 		//IRootSearch search = new MonteCarloSearch(new Object[] {cfg, sharedData});
-		//IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
+		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
 		sharedData = search.getSharedData();
 		

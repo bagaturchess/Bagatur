@@ -38,11 +38,17 @@ import bagaturchess.learning.goldmiddle.impl4.eval.BagaturEvaluatorFactory_GOLDE
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_SignalFiller;
 import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.learning.impl.signals.Signals;
-import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
 
 
 public class Trainer_GOLDENMIDDLE implements Trainer {
+	
+	
+	private static final ActivationFunction activation_function = ActivationFunction.LINEAR;
+	
+	private static final float MAX_EVAL 						= 7777;
+	
+	private static final int UPDATE_FREQUENCY_GAMES_COUNT 		= 1000;
 	
 	
 	//These members have to be recreated after each Epoch in order to read the last weights
@@ -60,9 +66,11 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 	private List<Float> outputs_per_move_actual;
 	private List<Float> outputs_per_move_expected;
 	
-	private ActivationFunction activation_function = ActivationFunction.LINEAR;
+	private long stats_count_weights_changes;
+	private long stats_sum_weights_changes;
+	private long stats_sum_deltaP;
 	
-	private static final float MAX_EVAL = 7777;
+	private int update_counter = UPDATE_FREQUENCY_GAMES_COUNT;
 	
 	
 	public Trainer_GOLDENMIDDLE(IBitBoard _bitboard, String _filename_NN) throws Exception {
@@ -197,6 +205,8 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 			
 			if (deltaP != 0) {
 				
+				stats_sum_deltaP += Math.abs(deltaP);
+				
 				ISignals signals 				= inputs_per_move.get(moveindex);
 				
 				IFeature[] features 			= features_per_move_for_update.get(moveindex);
@@ -216,18 +226,38 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 							double adjustment = deltaP > 0 ? 1 : -1;
 							
 							((IAdjustableFeature) features[i]).adjust(cur_signal, adjustment, -1);
+							
+							stats_count_weights_changes++;
+							stats_sum_weights_changes += adjustment;
 						}
 					}
 				}
 			}
 		}
 		
-		//Features_Splitter.updateWeights(features_splitter, false);
-		Features_Splitter.updateWeights(features_splitter, true);
 		
-		Features_Splitter.store(filename_NN, features_splitter);
+		update_counter--;
 		
-		
-		reloadFromFile();
+		if (update_counter <= 0) {
+			
+			
+			System.out.println("Trainer_GOLDENMIDDLE.doEpoch[updating weights]: stats_sum_deltaP=" + stats_sum_deltaP + ", stats_count_weights_changes=" + stats_count_weights_changes + ", stats_sum_weights_changes=" + stats_sum_weights_changes);
+			
+			
+			//Features_Splitter.updateWeights(features_splitter, false);
+			Features_Splitter.updateWeights(features_splitter, true);
+			
+			Features_Splitter.store(filename_NN, features_splitter);
+			
+			
+			reloadFromFile();
+
+			
+			update_counter = UPDATE_FREQUENCY_GAMES_COUNT;
+			
+			stats_count_weights_changes = 0;
+			stats_sum_weights_changes = 0;
+			stats_sum_deltaP = 0;
+		}
 	}
 }

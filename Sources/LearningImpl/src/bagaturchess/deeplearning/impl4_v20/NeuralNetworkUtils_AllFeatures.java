@@ -32,9 +32,9 @@ public class NeuralNetworkUtils_AllFeatures {
 	public static NeuralNetwork buildNetwork() {
         
 		FeedForwardNetwork nnet =  FeedForwardNetwork.builder()
-                .addInputLayer(2 * 55)
+                .addInputLayer(55)
                 .hiddenActivationFunction(ActivationType.LINEAR)
-                .addOutputLayer(1, ActivationType.SIGMOID)
+                .addOutputLayer(1, ActivationType.LINEAR)
                 .lossFunction(LossType.MEAN_SQUARED_ERROR)
                 .randomSeed(System.currentTimeMillis() % 778)
                 .build();

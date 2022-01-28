@@ -129,7 +129,7 @@ public class GamesRunner {
 			
 			gamesCounter++;
 			
-			if (gamesCounter % 10 == 0) {
+			if (gamesCounter % 1000 == 0) {
 				
 				System.out.println("Games: " + gamesCounter
 						+ ", Draws: " + (100 * (stats_draws) / (stats_draws + stats_wins_white + stats_wins_black)) + "%"

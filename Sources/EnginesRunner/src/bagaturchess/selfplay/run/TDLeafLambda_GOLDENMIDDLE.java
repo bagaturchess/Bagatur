@@ -28,6 +28,7 @@ import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
+import bagaturchess.engines.cfg.base.UCIConfig_BaseImpl;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl;
 import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.search.api.IRootSearch;
@@ -53,7 +54,17 @@ public class TDLeafLambda_GOLDENMIDDLE {
 			PrintStream log = new PrintStream(new FileOutputStream(new File("goldenmiddle.log")));
 			
 			ChannelManager.setChannel(new Channel_Console(System.in, log, log));
-		
+			
+			ChannelManager.getChannel().initLogging(new UCIConfig_BaseImpl(new String[] {"bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove",
+					"bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl",
+					"agaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD",
+					"bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core",
+					"bagaturchess.search.impl.alg.impl1.Search_PVS_NWS",
+					"bagaturchess.engines.cfg.base.SearchConfigImpl_AB",
+					"bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20",
+					"bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Play"
+					}));
+			
 			SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
 		
 			IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
@@ -70,6 +81,7 @@ public class TDLeafLambda_GOLDENMIDDLE {
 			//Features_Splitter features = Features_Splitter.create(Bagatur_V20_FeaturesConfigurationImpl.class.getName());
 			//Features_Splitter.store(filename_NN, features);
 			Features_Splitter.dump(Features_Splitter.load(filename_NN, Bagatur_V20_FeaturesConfigurationImpl.class.getName()));
+			//System.exit(0);
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			
@@ -77,7 +89,7 @@ public class TDLeafLambda_GOLDENMIDDLE {
 			
 			GamesRunner player = new GamesRunner(bitboard, search, ds_builder);
 			
-			player.playGames(10000);
+			player.playGames(1000000);
 			
 		} catch (Throwable t) {
 			

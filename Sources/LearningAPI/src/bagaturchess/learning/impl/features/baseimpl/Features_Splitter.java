@@ -33,13 +33,17 @@ public class Features_Splitter {
 	
 	public IFeature[] getFeatures(IBitBoard board) {
 		
-		int total_factor = Math.min(63, board.getMaterialFactor().getTotalFactor());
+		/*int total_factor = Math.min(63, board.getMaterialFactor().getTotalFactor());
 		
 		int material_factor_phase = total_factor / 16;
 		
 		int castling_pair = board.getCastlingPair().ordinal();
 		
-		return features_by_material_factor_2uniouns.get(4 * castling_pair + material_factor_phase);
+		return features_by_material_factor_2uniouns.get(4 * castling_pair + material_factor_phase);*/
+		
+		int total_factor = Math.min(63, board.getMaterialFactor().getTotalFactor());
+		
+		return features_by_material_factor_2uniouns.get(total_factor / 16);
 	}
 	
 	
@@ -86,13 +90,18 @@ public class Features_Splitter {
 		
 		List<IFeature[]> features = new ArrayList<IFeature[]>();
 		
-		for (int castling_pair = 0; castling_pair < 9; castling_pair++) {
+		features.add(createNewFeatures(cfgClassName));
+		features.add(createNewFeatures(cfgClassName));
+		features.add(createNewFeatures(cfgClassName));
+		features.add(createNewFeatures(cfgClassName));
+		
+		/*for (int castling_pair = 0; castling_pair < 9; castling_pair++) {
 		
 			for (int material_factor_phase = 0; material_factor_phase < 4; material_factor_phase++) {
 				
 				features.add(createNewFeatures(cfgClassName));
 			}
-		}
+		}*/
 		
 		return new Features_Splitter(features);
 	}

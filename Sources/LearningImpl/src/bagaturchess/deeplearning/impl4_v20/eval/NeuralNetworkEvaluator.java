@@ -26,7 +26,8 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	private NeuralNetwork network;
 	
-	private ActivationFunction activation_function = ActivationFunction.SIGMOID;
+	//private ActivationFunction activation_function = ActivationFunction.SIGMOID;
+	private ActivationFunction activation_function = ActivationFunction.LINEAR;
 
 	
 	public NeuralNetworkEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -45,7 +46,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 			
 			ois.close();
 			
-			if (network.getInputLayer().getWidth() != 110) {
+			if (network.getInputLayer().getWidth() != 55) {
 				
 				throw new IllegalStateException("network inputs size is " + network.getInputLayer().getWidth());
 			}	
@@ -63,6 +64,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	protected double phase1() {
 		
 		for (int i = 0; i < inputs_f.length; i++) {
+			
 			inputs_f[i] = 0;
 		}
 		
