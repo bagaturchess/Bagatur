@@ -29,7 +29,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.cfg.base.UCIConfig_BaseImpl;
-import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl_0Initially;
+import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl;
 import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -49,8 +49,6 @@ public class TDLeafLambda_GOLDENMIDDLE {
 		
 		try {
 			
-			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4_TUNING_GOLDENMIDDEL;
-			
 			PrintStream log = new PrintStream(new FileOutputStream(new File("goldenmiddle.log")));
 			
 			ChannelManager.setChannel(new Channel_Console(System.in, log, log));
@@ -62,8 +60,11 @@ public class TDLeafLambda_GOLDENMIDDLE {
 					"bagaturchess.search.impl.alg.impl1.Search_PVS_NWS",
 					"bagaturchess.engines.cfg.base.SearchConfigImpl_AB",
 					"bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20",
-					"bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Play"
+					"bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Train"
 					}));
+			
+			
+			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4_TUNING_GOLDENMIDDEL;
 			
 			SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
 		
@@ -77,10 +78,10 @@ public class TDLeafLambda_GOLDENMIDDLE {
 			multipvMediator.ready();*/
 			
 			String filename_NN = Features_Splitter.FEATURES_FILE_NAME;
-			String features_class_name = Bagatur_V20_FeaturesConfigurationImpl_0Initially.class.getName();
+			String features_class_name = Bagatur_V20_FeaturesConfigurationImpl.class.getName();
 			
-			//Features_Splitter features = Features_Splitter.create(features_class_name);
-			//Features_Splitter.store(filename_NN, features);
+			Features_Splitter features = Features_Splitter.create(features_class_name);
+			Features_Splitter.store(filename_NN, features);
 			//Features_Splitter.dump(Features_Splitter.load(filename_NN, features_class_name));
 			//System.exit(0);
 			
