@@ -29,9 +29,8 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.deeplearning.impl4_v20.IMPL4_Constants;
 import bagaturchess.deeplearning.impl4_v20.NeuralNetworkUtils_AllFeatures;
-import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
-import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
+import bagaturchess.engines.cfg.base.UCIConfig_BaseImpl;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.impl.env.SharedData;
@@ -39,7 +38,6 @@ import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
 import bagaturchess.selfplay.GamesRunner;
 import bagaturchess.selfplay.train.Trainer;
 import bagaturchess.selfplay.train.Trainer_IMPL4;
-import bagaturchess.selfplay.train.Trainer_NNUE;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.Channel_Console;
 import deepnetts.net.NeuralNetwork;
@@ -53,13 +51,22 @@ public class TDLeafLambda_DeepNetts_IMPL4_TUNING {
 		
 		try {
 			
-			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4_TUNING;
-			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE_EVALIMPL4;
-			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4;
-			
-			PrintStream log = new PrintStream(new FileOutputStream(new File("impl4.log")));
+			PrintStream log = new PrintStream(new FileOutputStream(new File("deepnetts_impl4.log")));
 			
 			ChannelManager.setChannel(new Channel_Console(System.in, log, log));
+			
+			ChannelManager.getChannel().initLogging(new UCIConfig_BaseImpl(new String[] {"bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove",
+					"bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl",
+					"agaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD",
+					"bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core",
+					"bagaturchess.search.impl.alg.impl1.Search_PVS_NWS",
+					"bagaturchess.engines.cfg.base.SearchConfigImpl_AB",
+					"bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20",
+					"bagaturchess.deeplearning.impl4_v20.eval.EvaluationConfig_NNTraining"
+					}));
+			
+			
+			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4_TUNING;
 		
 			SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
 		
@@ -79,7 +86,7 @@ public class TDLeafLambda_DeepNetts_IMPL4_TUNING {
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			
-			Trainer ds_builder = new Trainer_IMPL4(bitboard, filename_NN);
+			Trainer ds_builder = new Trainer_IMPL4(bitboard, filename_NN, cfg.getEvalConfig());
 			
 			GamesRunner player = new GamesRunner(bitboard, search, ds_builder);
 			

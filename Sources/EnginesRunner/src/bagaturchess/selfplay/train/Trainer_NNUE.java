@@ -30,6 +30,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.ActivationFunction;
 import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
 import bagaturchess.deeplearning.impl_nnue.visitors.DataSet_1;
+import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.selfplay.GamesRunner;
 import deepnetts.net.NeuralNetwork;
@@ -38,46 +39,30 @@ import deepnetts.util.FileIO;
 import deepnetts.util.Tensor;
 
 
-public class Trainer_NNUE implements Trainer {
+public class Trainer_NNUE extends Trainer_Base {
 	
 	
 	private static final float LEARNING_RATE 		= 1f;//0.001f;
 	
-	
-	private String filename_NN;
-	
 	private DataSet_1 dataset;
 	
-	private List<Tensor> inputs_per_move;
 	
-	private ActivationFunction activation_function = ActivationFunction.SIGMOID;
-	
-	
-	public Trainer_NNUE(String _filename_NN) {
+	public Trainer_NNUE(IBitBoard _bitboard, String _filename_NN, IEvalConfig evalConfig) throws Exception {
 		
-		filename_NN = _filename_NN;
-		
-		if (!(new File(filename_NN)).exists()) {
-			
-			throw new IllegalStateException("NN file not found: " + filename_NN);
-			
-		}
-		
-		inputs_per_move = new ArrayList<Tensor>();
+		super(_bitboard, _filename_NN, evalConfig, ActivationFunction.SIGMOID);
 	}
 	
 	
 	@Override
-	public void clear() {
+	public void newGame() {
 		
-		inputs_per_move.clear();
+		super.newGame();
 		
 		dataset = new DataSet_1();
 	}
 	
 	
-	@Override
-	public void doEpoch() throws Exception {
+	public void backwardView() throws Exception {
 		
 		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename_NN));
 		

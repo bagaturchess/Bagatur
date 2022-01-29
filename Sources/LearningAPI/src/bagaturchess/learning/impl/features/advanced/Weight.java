@@ -12,7 +12,7 @@ class Weight implements Serializable {
 	
 	private static final long serialVersionUID 	= 3805221518234137798L;
 	
-	private static final double LEARNING_RATE 	= 1; //0.1; //0.01;
+	private static final double LEARNING_RATE 	= 0.0333; //0.1; //1;
 	
 	private static final double MIN_WEIGHT 		= 0.1;
 	
@@ -141,9 +141,10 @@ class Weight implements Serializable {
 	
 	strictfp void adjust(double amount) {
 		
+		//For liner function derivatives we use 1 and -1. We apply them in Epochs of at least 100 elements into the dataset and also use learning rate.
 		if (amount != 1 && amount != -1) {
 			
-			if (false) throw new IllegalStateException();
+			throw new IllegalStateException();
 		}
 		
 		current.addValue(amount);

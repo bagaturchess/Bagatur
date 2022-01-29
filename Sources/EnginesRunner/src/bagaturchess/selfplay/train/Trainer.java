@@ -20,18 +20,14 @@
 package bagaturchess.selfplay.train;
 
 
-import java.io.IOException;
-
 import bagaturchess.bitboard.api.IBitBoard;
 
 
 public interface Trainer {
 	
+	public void newGame();
+	
 	public void addBoardPosition(IBitBoard bitboard);
 	
-	public void setGameOutcome(float final_result_sigmoid);
-	
-	public void doEpoch() throws Exception;
-
-	public void clear();
+	public void setGameOutcome(float final_result_sigmoid) throws Exception;
 }

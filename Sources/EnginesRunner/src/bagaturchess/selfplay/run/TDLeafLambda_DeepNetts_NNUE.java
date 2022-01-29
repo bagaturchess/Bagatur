@@ -28,8 +28,8 @@ import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
-import bagaturchess.deeplearning.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
+import bagaturchess.engines.cfg.base.UCIConfig_BaseImpl;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.impl.env.SharedData;
@@ -50,13 +50,22 @@ public class TDLeafLambda_DeepNetts_NNUE {
 		
 		try {
 			
-			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE;
-			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE_EVALIMPL4;
-			//IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4;
-			
-			PrintStream log = new PrintStream(new FileOutputStream(new File("nnue.log")));
+			PrintStream log = new PrintStream(new FileOutputStream(new File("deepnetts_nnue.log")));
 			
 			ChannelManager.setChannel(new Channel_Console(System.in, log, log));
+			
+			ChannelManager.getChannel().initLogging(new UCIConfig_BaseImpl(new String[] {"bagaturchess.search.impl.uci_adaptor.UCISearchAdaptorImpl_PonderingOpponentMove",
+					"bagaturchess.engines.cfg.base.UCISearchAdaptorConfig_BaseImpl",
+					"agaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD",
+					"bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core",
+					"bagaturchess.search.impl.alg.impl1.Search_PVS_NWS",
+					"bagaturchess.engines.cfg.base.SearchConfigImpl_AB",
+					"bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20",
+					"bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Train"
+					}));
+			
+			
+			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE;
 		
 			SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
 		
@@ -76,7 +85,7 @@ public class TDLeafLambda_DeepNetts_NNUE {
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			
-			Trainer ds_builder = new Trainer_NNUE(filename_NN);
+			Trainer ds_builder = new Trainer_NNUE(bitboard, filename_NN, cfg.getEvalConfig());
 			
 			GamesRunner player = new GamesRunner(bitboard, search, ds_builder);
 			

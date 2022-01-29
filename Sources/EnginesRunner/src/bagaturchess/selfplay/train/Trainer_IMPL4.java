@@ -20,45 +20,31 @@
 package bagaturchess.selfplay.train;
 
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.ActivationFunction;
 import bagaturchess.deeplearning.impl_nnue.visitors.DataSet_1;
+import bagaturchess.learning.api.IAdjustableFeature;
+import bagaturchess.learning.api.IFeature;
+import bagaturchess.learning.api.ISignal;
+import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_ALL_SignalFiller_InArray;
-import bagaturchess.search.api.IEvaluator;
+import bagaturchess.search.api.IEvalConfig;
 import deepnetts.net.NeuralNetwork;
 import deepnetts.net.train.BackpropagationTrainer;
-import deepnetts.net.train.opt.OptimizerType;
 import deepnetts.util.FileIO;
 import deepnetts.util.Tensor;
 
 
-public class Trainer_IMPL4 implements Trainer {
+public class Trainer_IMPL4 extends Trainer_Base {
 	
+		
+	private static final float LEARNING_RATE = 0.0001f;
 	
-	private static final float LEARNING_RATE 		= 1f;//0.01f;//0.000000000000000000000000000000000000000000001f;
-	
-	//private static final ActivationFunction activation_function = ActivationFunction.SIGMOID;
-	
-	private static final ActivationFunction activation_function = ActivationFunction.LINEAR;
-	
-	private static final float MAX_EVAL = 7777;
-	
-	
-	private IBitBoard bitboard;
-	
-	private String filename_NN;
 	
 	private DataSet_1 dataset;
-	
-	private List<Tensor> inputs_per_move;
 	
 	private Bagatur_ALL_SignalFiller_InArray filler;
 	
@@ -67,21 +53,47 @@ public class Trainer_IMPL4 implements Trainer {
 	private BackpropagationTrainer trainer;
 	
 	
-	public Trainer_IMPL4(IBitBoard _bitboard, String _filename_NN) throws Exception {
+	public Trainer_IMPL4(IBitBoard _bitboard, String _filename_NN, IEvalConfig _evalConfig) throws Exception {
 		
-		bitboard = _bitboard;
+		super(_bitboard, _filename_NN, _evalConfig, ActivationFunction.LINEAR);
 		
-		filename_NN = _filename_NN;
 		
-		if (!(new File(filename_NN)).exists()) {
-			
-			throw new IllegalStateException("NN file not found: " + filename_NN);
-			
-		}
+		reloadFromFile();
 		
-		inputs_per_move = new ArrayList<Tensor>();
+		
+		dataset = new DataSet_1();
+		
 		
 		filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
+		
+		
+		//TODO: Network must be re-created in reloadFromFile, but this doesn't work at the moment.
+		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename_NN));
+		
+		network = (NeuralNetwork) ois.readObject();
+		
+		ois.close();
+        
+		//TODO: Trainer must be re-created in reloadFromFile, but this doesn't work at the moment.
+		trainer = (BackpropagationTrainer) network.getTrainer();
+        
+        trainer.setMaxEpochs(1)
+        //.setOptimizer(OptimizerType.MOMENTUM)
+        		.setLearningRate(LEARNING_RATE);
+                //.setMaxError(0.000000000000001f);
+                //.setBatchMode(true)
+                //.setBatchSize(dataset.size());
+	}
+
+	
+	@Override
+	protected void reloadFromFile() throws Exception {
+		
+		
+		super.reloadFromFile();
+		
+		
+		/*filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
 		
 		
 		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename_NN));
@@ -98,37 +110,23 @@ public class Trainer_IMPL4 implements Trainer {
         		.setLearningRate(LEARNING_RATE);
                 //.setMaxError(0.000000000000001f);
                 //.setBatchMode(true)
-                //.setBatchSize(dataset.size());
-	}
-
-	
-	@Override
-	public void clear() {
-		
-		inputs_per_move.clear();
-		
-		dataset = new DataSet_1();
+                //.setBatchSize(dataset.size());*/
 	}
 	
 	
-	@Override
-	public void doEpoch() throws Exception {
+	/*@Override
+	public void setGameOutcome(float game_result) throws Exception {
 		
-		if (dataset.isEmpty()) {
+		if (!dataset.isEmpty()) {
 			
-			return;
+			super.setGameOutcome(game_result);
 		}
-		
-		
-        trainer.train(dataset);
-		
-		
-		FileIO.writeToFile(network, filename_NN);
-	}
+	}*/
 	
 	
 	@Override
 	public void addBoardPosition(IBitBoard bitboard) {
+		
 		
 		float[] inputs_1d = new float[55];
 		
@@ -137,69 +135,54 @@ public class Trainer_IMPL4 implements Trainer {
 		Tensor tensor = new Tensor(inputs_1d);
 		
 		inputs_per_move.add(tensor);
+		
+		
+		super.addBoardPosition(bitboard);
 	}
 	
 	
 	@Override
-	public void setGameOutcome(float game_result) {
+	public void backwardView() throws Exception {		
 		
-		float step;
 		
-		if (game_result == 0) { //Draw
+		for (int moveindex = 0; moveindex < inputs_per_move.size(); moveindex++) {
 			
-			step = 0;
-					
-		} else if (game_result == 1) { //White wins
 			
-			//step = (activation_function.gety(IEvaluator.MAX_EVAL) / (float) inputs_per_move.size());
-			step = (activation_function.gety(MAX_EVAL) / (float) inputs_per_move.size());
+			//float actualWhitePlayerEval 	= outputs_per_move_actual.get(moveindex);
 			
-		} else { //Black wins
+			float expectedWhitePlayerEval 	= outputs_per_move_expected.get(moveindex);
 			
-			//step = (activation_function.gety(IEvaluator.MIN_EVAL) / (float) inputs_per_move.size());
-			step = (activation_function.gety(-MAX_EVAL) / (float) inputs_per_move.size());
+			//double deltaP 					= expectedWhitePlayerEval - actualWhitePlayerEval;
+			
+			Tensor inputs 					= (Tensor) inputs_per_move.get(moveindex);
+
+			dataset.addItem(inputs, new float[] {expectedWhitePlayerEval});
 		}
 		
-		for (int i = 0; i < inputs_per_move.size(); i++) {
-			
-	        float[] output = new float[1];
-	        
-	        //output[0] = (float) (0.5 + i * step);
-	        output[0] = i * step;
-	        
-	        dataset.addItem(inputs_per_move.get(i), output);
-		}
+		
+		super.backwardView();
 	}
 	
 	
-	/*public void setGameOutcome_Sigmoid(float game_result) {
+	@Override
+	public void updateWeights() throws Exception {
 		
-		boolean draw = game_result == 0;
 		
-		boolean white_win = game_result == 1;
+        trainer.train(dataset);
+        
+        
+        System.out.println("Trainer_IMPL4.updateWeights: Training Accuracy=" + trainer.getTrainingAccuracy());
+        
+        
+		FileIO.writeToFile(network, filename_NN);
 		
-		float step;
 		
-		if (draw) {
-			
-			step = 0;
-					
-		} else if (white_win) {
-			
-			step = +(float) ((activation_function.gety(IEvaluator.MAX_EVAL) - 0.5) / (float) inputs_per_move.size());
-			
-		} else {
-			
-			step = -(float) ((0.5 - activation_function.gety(IEvaluator.MIN_EVAL)) / (float) inputs_per_move.size());
-		}
-		
-		for (int i = 0; i < inputs_per_move.size(); i++) {
-			
-	        float[] output = new float[1];
-	        
-	        output[0] = (float) (0.5 + i * step);
-	        
-	        dataset.addItem(inputs_per_move.get(i), output);
-		}
-	}*/
+		reloadFromFile();
+        
+        
+		dataset = new DataSet_1();
+        
+        
+		super.updateWeights();
+	}
 }

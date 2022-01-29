@@ -307,7 +307,10 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	protected double returnVal(double white_eval) {
 		
-		white_eval = drawProbability(white_eval);
+		if (evalConfig != null && !evalConfig.isTrainingMode()) {
+			
+			white_eval = drawProbability(white_eval);
+		}
 		
 		return setSign(white_eval);
 	}

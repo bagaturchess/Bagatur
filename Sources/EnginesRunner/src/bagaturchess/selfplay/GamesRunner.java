@@ -98,7 +98,7 @@ public class GamesRunner {
 			reloadNetworkInSearcher();
 			
 			
-			trainer.clear();
+			trainer.newGame();
 			
 			
 			List<Integer> opening_moves = playRandomOpening();
@@ -111,9 +111,6 @@ public class GamesRunner {
 			
 			
 			trainer.setGameOutcome(game_result);
-			
-			
-            trainer.doEpoch();
             
             
 			//Revert played moves

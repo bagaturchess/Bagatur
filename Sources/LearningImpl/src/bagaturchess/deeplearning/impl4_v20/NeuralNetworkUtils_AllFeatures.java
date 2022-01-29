@@ -31,7 +31,7 @@ public class NeuralNetworkUtils_AllFeatures {
 	
 	public static NeuralNetwork buildNetwork() {
         
-		FeedForwardNetwork nnet =  FeedForwardNetwork.builder()
+		FeedForwardNetwork nn =  FeedForwardNetwork.builder()
                 .addInputLayer(55)
                 .hiddenActivationFunction(ActivationType.LINEAR)
                 .addOutputLayer(1, ActivationType.LINEAR)
@@ -39,6 +39,6 @@ public class NeuralNetworkUtils_AllFeatures {
                 .randomSeed(System.currentTimeMillis() % 778)
                 .build();
         
-        return nnet;
+        return nn;
 	}
 }
