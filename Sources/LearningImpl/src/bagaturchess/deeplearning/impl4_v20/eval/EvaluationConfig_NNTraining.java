@@ -18,7 +18,7 @@ public class EvaluationConfig_NNTraining implements IEvalConfig {
 	
 	@Override
 	public boolean isTrainingMode() {
-		return false;
+		return true;
 	}
 	
 	@Override

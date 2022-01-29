@@ -26,7 +26,7 @@ public class EvaluationConfig_V20_GOLDENMIDDLE_Train implements IEvalConfig {
 	@Override
 	public boolean isTrainingMode() {
 		
-		return false;
+		return true;
 	}
 	
 	

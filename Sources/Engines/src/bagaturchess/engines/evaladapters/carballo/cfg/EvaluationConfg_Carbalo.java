@@ -23,7 +23,7 @@ public class EvaluationConfg_Carbalo implements IEvalConfig {
 	
 	@Override
 	public boolean isTrainingMode() {
-		return true;
+		return false;
 	}
 	
 	

@@ -207,7 +207,7 @@ public class BagaturEvalConfigImpl_v2 implements IEvalConfig, IBagaturEvalConfig
 	
 	@Override
 	public boolean isTrainingMode() {
-		return true;
+		return false;
 	}
 	
 	

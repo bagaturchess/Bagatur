@@ -20,10 +20,12 @@ public class EvaluationConfg_Cuckoo implements IEvalConfig {
 		return true;
 	}
 	
+	
 	@Override
 	public boolean isTrainingMode() {
-		return true;
+		return false;
 	}
+	
 	
 	@Override
 	public String getEvaluatorFactoryClassName() {

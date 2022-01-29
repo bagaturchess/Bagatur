@@ -22,7 +22,7 @@ public class EvaluationConfig_V17 implements IEvalConfig {
 	
 	@Override
 	public boolean isTrainingMode() {
-		return true;
+		return false;
 	}
 	
 	@Override
