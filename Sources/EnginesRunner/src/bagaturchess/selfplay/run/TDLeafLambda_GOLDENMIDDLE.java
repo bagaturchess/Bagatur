@@ -87,7 +87,9 @@ public class TDLeafLambda_GOLDENMIDDLE {
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			
-			Trainer ds_builder = new Trainer_GOLDENMIDDLE(bitboard, filename_NN);
+			Trainer ds_builder = new Trainer_GOLDENMIDDLE(bitboard, filename_NN, cfg.getEvalConfig());
+			//Trainer ds_builder = new Trainer_GOLDENMIDDLE(bitboard, filename_NN, Bagatur_V20_SignalFiller.eval_config);
+			
 			
 			GamesRunner player = new GamesRunner(bitboard, search, ds_builder);
 			
