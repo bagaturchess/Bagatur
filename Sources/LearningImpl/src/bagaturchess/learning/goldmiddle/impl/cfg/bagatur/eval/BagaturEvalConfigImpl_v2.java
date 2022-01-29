@@ -206,7 +206,7 @@ public class BagaturEvalConfigImpl_v2 implements IEvalConfig, IBagaturEvalConfig
 	
 	
 	@Override
-	public boolean useDefaultMaterialEval() {
+	public boolean isTrainingMode() {
 		return true;
 	}
 	

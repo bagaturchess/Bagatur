@@ -17,7 +17,7 @@ public class EvaluationConfig_NNTraining implements IEvalConfig {
 	}
 	
 	@Override
-	public boolean useDefaultMaterialEval() {
+	public boolean isTrainingMode() {
 		return false;
 	}
 	

@@ -17,7 +17,7 @@ public class EvaluationConfig implements IEvalConfig {
 	}
 	
 	@Override
-	public boolean useDefaultMaterialEval() {
+	public boolean isTrainingMode() {
 		return true;
 	}
 	

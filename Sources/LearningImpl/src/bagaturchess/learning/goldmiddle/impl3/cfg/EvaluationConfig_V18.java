@@ -22,7 +22,7 @@ public class EvaluationConfig_V18 implements IEvalConfig {
 	
 	
 	@Override
-	public boolean useDefaultMaterialEval() {
+	public boolean isTrainingMode() {
 		return true;
 	}
 	

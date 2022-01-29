@@ -38,7 +38,7 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_1, FEATURE_ID_PIECE_SQUARE_TABLE,
 				cb.psqtScore_mg, cb.psqtScore_eg, PIECE_SQUARE_TABLE_O, PIECE_SQUARE_TABLE_E);
 		
-		if (eval_config == null || !eval_config.useDefaultMaterialEval()) {
+		if (eval_config == null || eval_config.isTrainingMode()) {
 			
 			calculateMaterialScore(boardConfig, evalInfo, evalComponentsProcessor);
 		}

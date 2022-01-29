@@ -24,7 +24,7 @@ public class EvaluationConfig_V20_GOLDENMIDDLE_Play implements IEvalConfig {
 	
 	
 	@Override
-	public boolean useDefaultMaterialEval() {
+	public boolean isTrainingMode() {
 		
 		return false;
 	}

@@ -21,7 +21,7 @@ public class EvaluationConfg_Cuckoo implements IEvalConfig {
 	}
 	
 	@Override
-	public boolean useDefaultMaterialEval() {
+	public boolean isTrainingMode() {
 		return true;
 	}
 	

@@ -29,7 +29,7 @@ public interface IEvalConfig {
 	
 	public boolean useEvalCache();
 	
-	public boolean useDefaultMaterialEval();
+	public boolean isTrainingMode();
 	
 	public String getEvaluatorFactoryClassName();
 	

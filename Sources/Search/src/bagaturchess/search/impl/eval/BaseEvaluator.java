@@ -161,85 +161,88 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	protected double fullEval(int depth, int alpha, int beta, int rootColour, boolean useCache) {
 		
-		int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN));
-		int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN));
-		
-		if (count_pawns_w == 0 && count_pawns_b == 0) {
+		if (evalConfig != null && !evalConfig.isTrainingMode()) {
 			
-			int king_sq_w = 63 - Long.numberOfLeadingZeros(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING));
-			int king_sq_b = 63 - Long.numberOfLeadingZeros(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING));
+			int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN));
+			int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN));
 			
-			int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
-			int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
-			
-			//Mop-up evaluation
-			//PosEval=4.7*CMD + 1.6*(14 - MD)
-			//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
-			if (w_eval_nopawns_e >= b_eval_nopawns_e) { //White can win
+			if (count_pawns_w == 0 && count_pawns_b == 0) {
 				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[king_sq_b];
+				int king_sq_w = 63 - Long.numberOfLeadingZeros(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING));
+				int king_sq_b = 63 - Long.numberOfLeadingZeros(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING));
 				
-				int file_w = king_sq_w & 7; //[0-7]
-				int rank_w = king_sq_w >>> 3; //[0-7]
-				int file_b = king_sq_b & 7; //[0-7]
-				int rank_b = king_sq_b >>> 3; //[0-7]
+				int w_eval_nopawns_e = baseEval.getWhiteMaterialNonPawns_e();
+				int b_eval_nopawns_e = baseEval.getBlackMaterialNonPawns_e();
 				
-				int delta_file = Math.abs(file_w - file_b);
-				int delta_rank = Math.abs(rank_w - rank_b);
-				int delta_sum  = delta_file + delta_rank;
-				
-				if (14 - delta_sum < 0) {
-					throw new IllegalStateException("delta_sum=" + delta_sum);
-				}
-				
-				int MD = 14 - delta_sum;
-				
-				int material_imbalance = w_eval_nopawns_e - b_eval_nopawns_e;
-				
-				
-				
-				if (canWin(Constants.COLOUR_WHITE)) {
+				//Mop-up evaluation
+				//PosEval=4.7*CMD + 1.6*(14 - MD)
+				//CMD is the Center Manhattan distance of the losing king and MD the Manhattan distance between both kings.
+				if (w_eval_nopawns_e >= b_eval_nopawns_e) { //White can win
 					
-					return (int) returnVal(material_imbalance + 3 * (int) (4.7 * CMD + 1.6 * MD));
+					int CMD = Fields.CENTER_MANHATTAN_DISTANCE[king_sq_b];
+					
+					int file_w = king_sq_w & 7; //[0-7]
+					int rank_w = king_sq_w >>> 3; //[0-7]
+					int file_b = king_sq_b & 7; //[0-7]
+					int rank_b = king_sq_b >>> 3; //[0-7]
+					
+					int delta_file = Math.abs(file_w - file_b);
+					int delta_rank = Math.abs(rank_w - rank_b);
+					int delta_sum  = delta_file + delta_rank;
+					
+					if (14 - delta_sum < 0) {
+						throw new IllegalStateException("delta_sum=" + delta_sum);
+					}
+					
+					int MD = 14 - delta_sum;
+					
+					int material_imbalance = w_eval_nopawns_e - b_eval_nopawns_e;
+					
+					
+					
+					if (canWin(Constants.COLOUR_WHITE)) {
+						
+						return (int) returnVal(material_imbalance + 3 * (int) (4.7 * CMD + 1.6 * MD));
+						
+					} else {
+						
+						return 0;
+					}
+					
+				} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
+					
+					int CMD = Fields.CENTER_MANHATTAN_DISTANCE[king_sq_w];
+					
+					int file_w = king_sq_w & 7; //[0-7]
+					int rank_w = king_sq_w >>> 3; //[0-7]
+					int file_b = king_sq_b & 7; //[0-7]
+					int rank_b = king_sq_b >>> 3; //[0-7]
+					
+					int delta_file = Math.abs(file_w - file_b);
+					int delta_rank = Math.abs(rank_w - rank_b);
+					int delta_sum  = delta_file + delta_rank;
+					
+					if (14 - delta_sum < 0) {
+						throw new IllegalStateException("delta_sum=" + delta_sum);
+					}
+					
+					int MD = 14 - delta_sum;
+					
+					int material_imbalance = w_eval_nopawns_e - b_eval_nopawns_e;
+					
+					if (canWin(Constants.COLOUR_BLACK)) {
+						
+						return (int) returnVal(material_imbalance - 3 * (int) (4.7 * CMD + 1.6 * MD));
+						
+					} else {
+						
+						return 0;
+					}				
 					
 				} else {
 					
-					return 0;
+					throw new IllegalStateException();
 				}
-				
-			} else if (w_eval_nopawns_e < b_eval_nopawns_e) {//Black can win
-				
-				int CMD = Fields.CENTER_MANHATTAN_DISTANCE[king_sq_w];
-				
-				int file_w = king_sq_w & 7; //[0-7]
-				int rank_w = king_sq_w >>> 3; //[0-7]
-				int file_b = king_sq_b & 7; //[0-7]
-				int rank_b = king_sq_b >>> 3; //[0-7]
-				
-				int delta_file = Math.abs(file_w - file_b);
-				int delta_rank = Math.abs(rank_w - rank_b);
-				int delta_sum  = delta_file + delta_rank;
-				
-				if (14 - delta_sum < 0) {
-					throw new IllegalStateException("delta_sum=" + delta_sum);
-				}
-				
-				int MD = 14 - delta_sum;
-				
-				int material_imbalance = w_eval_nopawns_e - b_eval_nopawns_e;
-				
-				if (canWin(Constants.COLOUR_BLACK)) {
-					
-					return (int) returnVal(material_imbalance - 3 * (int) (4.7 * CMD + 1.6 * MD));
-					
-				} else {
-					
-					return 0;
-				}				
-				
-			} else {
-				
-				throw new IllegalStateException();
 			}
 		}
 		
@@ -263,7 +266,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		double white_eval = 0;
 		
-		if (evalConfig != null && evalConfig.useDefaultMaterialEval()) {
+		if (evalConfig != null && !evalConfig.isTrainingMode()) {
 			
 			white_eval += eval_material_nopawnsdrawrule();
 		}
@@ -275,7 +278,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		white_eval += phase4();
 		white_eval += phase5();	
 		
-		if (evalConfig != null && evalConfig.useDefaultMaterialEval()) {
+		if (evalConfig != null && !evalConfig.isTrainingMode()) {
 		
 			white_eval = applyExchangeMotivation(white_eval);
 			
