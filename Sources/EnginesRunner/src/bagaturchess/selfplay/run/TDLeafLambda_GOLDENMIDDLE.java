@@ -29,7 +29,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.cfg.base.UCIConfig_BaseImpl;
-import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl;
+import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl_0Initially;
 import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -77,10 +77,11 @@ public class TDLeafLambda_GOLDENMIDDLE {
 			multipvMediator.ready();*/
 			
 			String filename_NN = Features_Splitter.FEATURES_FILE_NAME;
+			String features_class_name = Bagatur_V20_FeaturesConfigurationImpl_0Initially.class.getName();
 			
-			//Features_Splitter features = Features_Splitter.create(Bagatur_V20_FeaturesConfigurationImpl.class.getName());
+			//Features_Splitter features = Features_Splitter.create(features_class_name);
 			//Features_Splitter.store(filename_NN, features);
-			//Features_Splitter.dump(Features_Splitter.load(filename_NN, Bagatur_V20_FeaturesConfigurationImpl.class.getName()));
+			//Features_Splitter.dump(Features_Splitter.load(filename_NN, features_class_name));
 			//System.exit(0);
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());

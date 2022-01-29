@@ -12,7 +12,7 @@ import bagaturchess.learning.api.IFeaturesConfiguration;
 import bagaturchess.learning.impl.features.advanced.AdjustableFeatureSingle;
 
 
-public class Bagatur_V20_FeaturesConfigurationImpl implements IFeaturesConfiguration, IFeatureComplexity, Bagatur_V20_FeaturesConstants {
+public class Bagatur_V20_FeaturesConfigurationImpl_1Initially implements IFeaturesConfiguration, IFeatureComplexity, Bagatur_V20_FeaturesConstants {
 	
 	
 	public IFeature[] getDefinedFeatures() {
