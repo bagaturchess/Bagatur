@@ -10,9 +10,11 @@ import bagaturchess.bitboard.impl.utils.VarStatistic;
 class Weight implements Serializable {
 	
 	
-	private static final long serialVersionUID = 3805221518234137798L;
+	private static final long serialVersionUID 	= 3805221518234137798L;
 	
-	private static final double LEARNING_RATE = 1;//0.01;
+	private static final double LEARNING_RATE 	= 1; //0.1; //0.01;
+	
+	private static final double MIN_WEIGHT 		= 0.1;
 	
 	
 	private double initialVal;
@@ -57,7 +59,7 @@ class Weight implements Serializable {
 		
 		total = new VarStatistic();
 		
-		total.addValue(initialVal);
+		reset();
 		
 		current = new VarStatistic();
 	}
@@ -106,15 +108,27 @@ class Weight implements Serializable {
 			
 		} else {
 			
-			//Initialize the weight
-			if (multiplier > 0) {
-				
-				total.addValue(1);
-				
-			} else if (multiplier < 0) {
-				
-				total.addValue(-1);
-			}
+			reset();
+		}
+		
+		if (total.getEntropy() < min_weight) {
+			
+			total = new VarStatistic();
+			
+			reset();
+		}
+	}
+	
+	
+	private void reset() {
+		
+		if (initialVal == 0) {
+			
+			total.addValue(Math.max(MIN_WEIGHT, Math.random()));
+			
+		} else {
+			
+			total.addValue(Math.max(MIN_WEIGHT, initialVal));
 		}
 	}
 	
