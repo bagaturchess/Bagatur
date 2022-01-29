@@ -48,7 +48,7 @@ import bagaturchess.uci.impl.commands.Go;
 public class GamesRunner {
 	
 	
-	private static final int SEARCH_DEPTH = 3;
+	private static final int SEARCH_DEPTH = 2;
 	
 	
 	private IBitBoard bitboard;
@@ -132,7 +132,7 @@ public class GamesRunner {
 			
 			gamesCounter++;
 			
-			if (gamesCounter % 1000 == 0) {
+			if (gamesCounter % 100 == 0) {
 				
 				System.out.println("Games: " + gamesCounter
 						+ ", Draws: " + (100 * (stats_draws) / (stats_draws + stats_wins_white + stats_wins_black)) + "%"

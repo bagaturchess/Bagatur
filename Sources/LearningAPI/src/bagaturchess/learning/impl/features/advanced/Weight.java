@@ -100,7 +100,7 @@ class Weight implements Serializable {
 			
 			total.addValue(avg + avg * multiplier);
 			
-		} else if (total.getEntropy() < 0) {
+		} else if (avg < 0) {
 			
 			total.addValue(avg - avg * multiplier);
 			
@@ -129,7 +129,7 @@ class Weight implements Serializable {
 		
 		if (amount != 1 && amount != -1) {
 			
-			throw new IllegalStateException();
+			if (false) throw new IllegalStateException();
 		}
 		
 		current.addValue(amount);
@@ -142,10 +142,10 @@ class Weight implements Serializable {
 		String result = "";
 		
 		result += StringUtils.fill("[" + min_weight + "-" + max_weight + "] ", 8);
-		result += "init: " + StringUtils.align(initialVal);
+		result += "initial: " + StringUtils.align(initialVal);
 		//result += ", avg: " + StringUtils.align(avg());
-		result += ", cur: " + StringUtils.align(total.getEntropy());
-		result += ", [" + current + "]";
+		result += ", current: " + StringUtils.align(total.getEntropy());
+		//result += ", [" + current + "]";
 		/*result += " cur=" + cut("" + cur_weight) + ", avgidx=" + avg + ", avg=" + cut("" + (max_adjustment * avg));
 		result += ", prec=" + max_adjustment;
 		result += "	[";

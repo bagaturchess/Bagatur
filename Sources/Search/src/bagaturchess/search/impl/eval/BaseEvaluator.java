@@ -263,25 +263,32 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		double white_eval = 0;
 		
-		if (evalConfig!= null && evalConfig.useDefaultMaterialEval()) white_eval += eval_material_nopawnsdrawrule();
+		if (evalConfig != null && evalConfig.useDefaultMaterialEval()) {
+			
+			white_eval += eval_material_nopawnsdrawrule();
+		}
 		//eval += eval_material_imbalances();
+		
 		white_eval += phase1();
 		white_eval += phase2();
 		white_eval += phase3();
 		white_eval += phase4();
 		white_eval += phase5();	
 		
-		white_eval = applyExchangeMotivation(white_eval);
+		if (evalConfig != null && evalConfig.useDefaultMaterialEval()) {
 		
-		//white_eval = applyMaterialCorrectionByPawnsCount(white_eval);
-		
-		if (white_eval > 0 && !canWin(Constants.COLOUR_WHITE)) {
+			white_eval = applyExchangeMotivation(white_eval);
 			
-			return 0;
+			//white_eval = applyMaterialCorrectionByPawnsCount(white_eval);
 			
-		} else if (white_eval < 0 && !canWin(Constants.COLOUR_BLACK)) {
-			
-			return 0;
+			if (white_eval > 0 && !canWin(Constants.COLOUR_WHITE)) {
+				
+				return 0;
+				
+			} else if (white_eval < 0 && !canWin(Constants.COLOUR_BLACK)) {
+				
+				return 0;
+			}
 		}
 		
 		

@@ -80,8 +80,8 @@ public class TDLeafLambda_GOLDENMIDDLE {
 			
 			//Features_Splitter features = Features_Splitter.create(Bagatur_V20_FeaturesConfigurationImpl.class.getName());
 			//Features_Splitter.store(filename_NN, features);
-			Features_Splitter.dump(Features_Splitter.load(filename_NN, Bagatur_V20_FeaturesConfigurationImpl.class.getName()));
-			System.exit(0);
+			//Features_Splitter.dump(Features_Splitter.load(filename_NN, Bagatur_V20_FeaturesConfigurationImpl.class.getName()));
+			//System.exit(0);
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			

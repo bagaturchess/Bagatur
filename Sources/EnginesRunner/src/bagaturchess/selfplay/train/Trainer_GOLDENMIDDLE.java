@@ -22,9 +22,12 @@ package bagaturchess.selfplay.train;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.common.GlobalConstants;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.deeplearning.ActivationFunction;
 import bagaturchess.learning.api.IAdjustableFeature;
@@ -35,6 +38,7 @@ import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
 import bagaturchess.learning.goldmiddle.impl4.eval.BagaturEvaluatorFactory_GOLDENMIDDLE;
+import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_SignalFiller;
 import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.learning.impl.signals.Signals;
@@ -48,15 +52,44 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 	
 	private static final float MAX_EVAL 						= 7777;
 	
-	private static final int UPDATE_FREQUENCY_GAMES_COUNT 		= 1000;
+	private static final int UPDATE_FREQUENCY_GAMES_COUNT 		= 100;
+	
+	//private static final float LAMBDA 							= 0.9833f;
+	private static final double LAMBDA 							= 0.99999997f;
+	
+	private static final Map<Integer, double[]> LAMBDAS = new HashMap<Integer, double[]>();
 	
 	
-	//These members have to be recreated after each Epoch in order to read the last weights
-	private ILearningInput input;
-	private ISignalFiller filler;
-	private Features_Splitter features_splitter;
-	private IEvaluator evaluator;
+	static {
+		
+		for (int moves_count = 1; moves_count < GlobalConstants.MAX_MOVES_IN_GAME; moves_count++) {
+			
+			double[] CURRENT_LAMBDAS = new double[moves_count];
+			
+			double current_lambda = LAMBDA;
+			
+			for (int i = CURRENT_LAMBDAS.length - 1; i >= 0; i--) {
+				
+				CURRENT_LAMBDAS[i] = current_lambda;
+				
+				//current_lambda *= current_lambda;
+			}
+			
+			LAMBDAS.put(moves_count, CURRENT_LAMBDAS);
+			
+			
+			if (moves_count == 60) {
+				
+				for (int i = CURRENT_LAMBDAS.length - 1; i >= 0; i--) {
+					
+					System.out.println("Trainer_GOLDENMIDDLE.CURRENT_LAMBDAS[60]: move " + i + " = " + CURRENT_LAMBDAS[i]);
+				}
+			}
+		}
+	}
 	
+	
+	//Members
 	private IBitBoard bitboard;
 	
 	private String filename_NN;
@@ -71,6 +104,13 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 	private long stats_sum_deltaP;
 	
 	private int update_counter = UPDATE_FREQUENCY_GAMES_COUNT;
+	
+	
+	//These members have to be recreated after each Epoch in order to read the last weights
+	private ILearningInput input;
+	private ISignalFiller filler;
+	private Features_Splitter features_splitter;
+	private IEvaluator evaluator;
 	
 	
 	public Trainer_GOLDENMIDDLE(IBitBoard _bitboard, String _filename_NN) throws Exception {
@@ -106,6 +146,11 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 		features_splitter = Features_Splitter.load(Features_Splitter.FEATURES_FILE_NAME, input.getFeaturesConfigurationClassName());
 		
 		evaluator = (new BagaturEvaluatorFactory_GOLDENMIDDLE()).create(bitboard, null, Bagatur_V20_SignalFiller.eval_config);
+		
+		
+		System.out.println("Trainer_GOLDENMIDDLE.reloadFromFile: weights dump ...");
+		
+		Features_Splitter.dump(features_splitter);
 	}
 	
 	
@@ -151,6 +196,39 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 	
 	@Override
 	public void setGameOutcome(float game_result) {
+		
+		setGameOutcome_Lmbda(game_result);
+	}
+	
+	
+	private void setGameOutcome_Lmbda(float game_result) {
+		
+		float final_eval;
+		
+		if (game_result == 0) { //Draw
+			
+			final_eval = 0;
+					
+		} else if (game_result == 1) { //White wins
+			
+			final_eval = activation_function.gety(MAX_EVAL);
+			
+		} else { //Black wins
+			
+			final_eval = activation_function.gety(-MAX_EVAL);
+		}
+		
+		
+		double[] LAMBDAS_ARRAY = LAMBDAS.get(inputs_per_move.size());
+		
+		for (int i = 0; i < inputs_per_move.size(); i++) {
+			
+	        outputs_per_move_expected.add((float) (LAMBDAS_ARRAY[i] * final_eval));
+		}
+	}
+	
+	
+	private void setGameOutcome_Linear(float game_result) {
 		
 		float step;
 		
@@ -224,6 +302,7 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 						if (cur_signal.getStrength() != 0) {
 							
 							double adjustment = deltaP > 0 ? 1 : -1;
+							//double adjustment = deltaP;
 							
 							((IAdjustableFeature) features[i]).adjust(cur_signal, adjustment, -1);
 							
@@ -242,7 +321,6 @@ public class Trainer_GOLDENMIDDLE implements Trainer {
 			
 			
 			System.out.println("Trainer_GOLDENMIDDLE.doEpoch[updating weights]: stats_sum_deltaP=" + stats_sum_deltaP + ", stats_count_weights_changes=" + stats_count_weights_changes + ", stats_sum_weights_changes=" + stats_sum_weights_changes);
-			
 			
 			//Features_Splitter.updateWeights(features_splitter, false);
 			Features_Splitter.updateWeights(features_splitter, true);
