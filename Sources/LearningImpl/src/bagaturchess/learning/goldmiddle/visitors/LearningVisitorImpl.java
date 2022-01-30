@@ -195,6 +195,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	}
 	
 	
+	@Override
 	public void end() throws Exception {
 		
 		System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success percent before this iteration: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");

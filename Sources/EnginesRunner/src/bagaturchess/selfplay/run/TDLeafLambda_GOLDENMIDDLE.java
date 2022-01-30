@@ -80,8 +80,8 @@ public class TDLeafLambda_GOLDENMIDDLE {
 			String filename_NN = Features_Splitter.FEATURES_FILE_NAME;
 			String features_class_name = Bagatur_V20_FeaturesConfigurationImpl.class.getName();
 			
-			Features_Splitter features = Features_Splitter.create(features_class_name);
-			Features_Splitter.store(filename_NN, features);
+			//Features_Splitter features = Features_Splitter.create(features_class_name);
+			//Features_Splitter.store(filename_NN, features);
 			//Features_Splitter.dump(Features_Splitter.load(filename_NN, features_class_name));
 			//System.exit(0);
 			

@@ -15,7 +15,7 @@ import bagaturchess.learning.impl.features.advanced.AdjustableFeatureSingle;
 public class Bagatur_V20_FeaturesConfigurationImpl implements IFeaturesConfiguration, IFeatureComplexity, Bagatur_V20_FeaturesConstants {
 	
 	
-	private static final double INITIAL_WEIGHT = 1;//0.0; //0.01
+	private static final double INITIAL_WEIGHT = 0; //1;//0.0; //0.01
 	
 	
 	public IFeature[] getDefinedFeatures() {

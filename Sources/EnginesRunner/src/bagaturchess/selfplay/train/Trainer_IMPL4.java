@@ -21,15 +21,13 @@ package bagaturchess.selfplay.train;
 
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.ActivationFunction;
 import bagaturchess.deeplearning.impl_nnue.visitors.DataSet_1;
-import bagaturchess.learning.api.IAdjustableFeature;
-import bagaturchess.learning.api.IFeature;
-import bagaturchess.learning.api.ISignal;
-import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.search.api.IEvalConfig;
 import deepnetts.net.NeuralNetwork;
@@ -41,7 +39,7 @@ import deepnetts.util.Tensor;
 public class Trainer_IMPL4 extends Trainer_Base {
 	
 		
-	private static final float LEARNING_RATE = 0.0001f;
+	private static final float LEARNING_RATE = 0.01f;
 	
 	
 	private DataSet_1 dataset;
@@ -55,10 +53,8 @@ public class Trainer_IMPL4 extends Trainer_Base {
 	
 	public Trainer_IMPL4(IBitBoard _bitboard, String _filename_NN, IEvalConfig _evalConfig) throws Exception {
 		
+		
 		super(_bitboard, _filename_NN, _evalConfig, ActivationFunction.LINEAR);
-		
-		
-		reloadFromFile();
 		
 		
 		dataset = new DataSet_1();
@@ -67,22 +63,7 @@ public class Trainer_IMPL4 extends Trainer_Base {
 		filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
 		
 		
-		//TODO: Network must be re-created in reloadFromFile, but this doesn't work at the moment.
-		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename_NN));
-		
-		network = (NeuralNetwork) ois.readObject();
-		
-		ois.close();
-        
-		//TODO: Trainer must be re-created in reloadFromFile, but this doesn't work at the moment.
-		trainer = (BackpropagationTrainer) network.getTrainer();
-        
-        trainer.setMaxEpochs(1)
-        //.setOptimizer(OptimizerType.MOMENTUM)
-        		.setLearningRate(LEARNING_RATE);
-                //.setMaxError(0.000000000000001f);
-                //.setBatchMode(true)
-                //.setBatchSize(dataset.size());
+		reloadNet();
 	}
 
 	
@@ -93,8 +74,12 @@ public class Trainer_IMPL4 extends Trainer_Base {
 		super.reloadFromFile();
 		
 		
-		/*filler = new Bagatur_ALL_SignalFiller_InArray(bitboard);
-		
+		//TODO: This has to be called each Epoch, but currently it throws OutOfMemoryError, so there is a memory leak ...
+		//reloadNet();
+	}
+
+
+	private void reloadNet() throws IOException, FileNotFoundException, ClassNotFoundException {
 		
 		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename_NN));
 		
@@ -110,18 +95,63 @@ public class Trainer_IMPL4 extends Trainer_Base {
         		.setLearningRate(LEARNING_RATE);
                 //.setMaxError(0.000000000000001f);
                 //.setBatchMode(true)
-                //.setBatchSize(dataset.size());*/
+                //.setBatchSize(dataset.size());
 	}
 	
 	
-	/*@Override
+	@Override
 	public void setGameOutcome(float game_result) throws Exception {
 		
-		if (!dataset.isEmpty()) {
+		
+		if (dataset.isEmpty()) {
 			
-			super.setGameOutcome(game_result);
+			//System.out.println("Game with no search moves. It has only opening moves and will be skiped.");
+			
+			return;
 		}
-	}*/
+		
+		
+		float EVAL_CHANGE_RATE = 0.5f;//0.1f;
+		float eval_increase_factor = 1 + EVAL_CHANGE_RATE;
+		float eval_decrease_factor = 1 - EVAL_CHANGE_RATE;
+		
+		for (int i = 0; i < outputs_per_move_actual.size(); i++) {
+			
+			float actual_eval_white = outputs_per_move_actual.get(i);
+			
+			float expected_eval_white = outputs_per_move_expected.get(i);
+			
+			if (expected_eval_white > 0) {
+				
+				if (expected_eval_white > actual_eval_white) {
+					
+					outputs_per_move_expected.remove(i);
+					outputs_per_move_expected.add(i, actual_eval_white * eval_increase_factor);
+					
+				} else if (expected_eval_white < actual_eval_white) {
+					
+					outputs_per_move_expected.remove(i);
+					outputs_per_move_expected.add(i, actual_eval_white * eval_decrease_factor);
+				}
+				
+			} else if (expected_eval_white < 0) {
+				
+				if (expected_eval_white > actual_eval_white) {
+					
+					outputs_per_move_expected.remove(i);
+					outputs_per_move_expected.add(i, actual_eval_white * eval_decrease_factor);
+					
+				} else if (expected_eval_white < actual_eval_white) {
+					
+					outputs_per_move_expected.remove(i);
+					outputs_per_move_expected.add(i, actual_eval_white * eval_increase_factor);
+				}
+			}
+		}
+		
+		
+		super.setGameOutcome(game_result);
+	}
 	
 	
 	@Override

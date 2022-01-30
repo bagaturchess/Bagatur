@@ -69,7 +69,7 @@ public class TDLeafLambda_DeepNetts_IMPL4_TUNING {
 			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4_TUNING;
 		
 			SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
-		
+			
 			IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
 			//IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 			

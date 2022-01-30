@@ -122,9 +122,9 @@ public class SearchUtils {
 		}
 		
 		//Between 1 and ISearch.MAX_DEPTH + 1
-		score = Math.abs(score / ISearch.MAX_MAT_INTERVAL);
+		int mate_depth = Math.abs(score / ISearch.MAX_MAT_INTERVAL);
 		
-		int depth = (ISearch.MAX_DEPTH + 1) - score; 
+		int depth = (ISearch.MAX_DEPTH + 1) - mate_depth; 
 		
 		return score > 0 ? depth : -depth;
 	}

@@ -25,6 +25,10 @@ import bagaturchess.bitboard.api.IBitBoard;
 
 public interface Trainer {
 	
+	
+	public static final float MAX_EVAL = 7777;
+	
+	
 	public void newGame();
 	
 	public void addBoardPosition(IBitBoard bitboard);

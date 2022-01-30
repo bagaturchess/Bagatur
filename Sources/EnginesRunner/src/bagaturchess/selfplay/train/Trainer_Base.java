@@ -21,8 +21,6 @@ import bagaturchess.search.impl.env.SharedData;
 public class Trainer_Base implements Trainer {
 	
 	
-	private static final float MAX_EVAL 							= 7777;
-	
 	private static final int UPDATE_FREQUENCY_GAMES_COUNT 			= 100;
 	
 	
@@ -54,7 +52,7 @@ public class Trainer_Base implements Trainer {
 				
 				for (int i = CURRENT_LAMBDAS.length - 1; i >= 0; i--) {
 					
-					System.out.println("Trainer_GOLDENMIDDLE.CURRENT_LAMBDAS[60]: move " + i + " = " + CURRENT_LAMBDAS[i]);
+					System.out.println("Trainer_Base.CURRENT_LAMBDAS[60]: move " + i + " = " + CURRENT_LAMBDAS[i]);
 				}
 			}
 		}
@@ -150,14 +148,17 @@ public class Trainer_Base implements Trainer {
 	@Override
 	public void setGameOutcome(float game_result) throws Exception {
 		
+		
 		if (inputs_per_move.size() == 0) {
 			
-			System.out.println("Game with no moves");
+			System.out.println("Trainer_Base.setGameOutcome: Game with no search moves. It has only opening moves and will be skiped.");
 			
 			return;
 		}
 		
+		
 		setGameOutcome_Lambda(game_result);
+		
 		
 		backwardView();
 	}

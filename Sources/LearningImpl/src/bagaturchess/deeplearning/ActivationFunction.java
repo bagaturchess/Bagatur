@@ -1,15 +1,21 @@
 package bagaturchess.deeplearning;
 
 
-import bagaturchess.search.api.IEvaluator;
-
-
 public abstract class ActivationFunction {
 	
 	
-	public static final ActivationFunction SIGMOID = new Sigmoid();
+	public static final ActivationFunction SIGMOID = new Sigmoid(7777);
 	
-	public static final ActivationFunction LINEAR = new Linear();
+	public static final ActivationFunction LINEAR = new Linear(7777);
+	
+	
+	protected float max_x;
+	
+	
+	protected ActivationFunction(float max_x) {
+		
+		this.max_x = max_x;
+	}
 	
 	
 	public abstract float gety(float x);
@@ -17,10 +23,16 @@ public abstract class ActivationFunction {
 	public abstract float getx(float y);
 	
 	
-	private static final class Sigmoid extends ActivationFunction {
+	public static final class Sigmoid extends ActivationFunction {
 
 		
 		private static final double SIGMOID_LOG_BASE 	= 1.005;
+		
+		
+		protected Sigmoid(float max) {
+			
+			super(max);
+		}
 		
 		/*public static final float SIGMOID_WIN_BLACK 	= ActivationFunctions.sigmoid_gety(IEvaluator.MIN_EVAL);
 		
@@ -41,6 +53,7 @@ public abstract class ActivationFunction {
 		
 		@Override
 		public float getx(float y) {
+			
 			if (y < 0 || y > 1) {
 				
 				throw new IllegalStateException("y=" + y);
@@ -48,14 +61,14 @@ public abstract class ActivationFunction {
 			
 			float x = (float) (Math.log(y / (1d - y)) / Math.log(SIGMOID_LOG_BASE));
 			
-			if (x < IEvaluator.MIN_EVAL) {
+			if (x < -max_x) {
 				
-				x = IEvaluator.MIN_EVAL;
+				x = -max_x;
 			}
 			
-			if (x > IEvaluator.MAX_EVAL) {
+			if (x > max_x) {
 				
-				x = IEvaluator.MAX_EVAL;
+				x = max_x;
 			}
 			
 			return x;
@@ -63,17 +76,45 @@ public abstract class ActivationFunction {
 	}
 	
 	
-	private static final class Linear extends ActivationFunction {
+	public static final class Linear extends ActivationFunction {
+		
+		
+		protected Linear(float max) {
+			
+			super(max);
+		}
 		
 		
 		@Override
 		public float gety(float x) {
+			
+			if (x < -max_x) {
+				
+				x = -max_x;
+			}
+			
+			if (x > max_x) {
+				
+				x = max_x;
+			}
+			
 			return x;
 		}
 		
 		
 		@Override
 		public float getx(float y) {
+			
+			if (y < -max_x) {
+				
+				y = -max_x;
+			}
+			
+			if (y > max_x) {
+				
+				y = max_x;
+			}
+			
 			return y;
 		}
 	}
