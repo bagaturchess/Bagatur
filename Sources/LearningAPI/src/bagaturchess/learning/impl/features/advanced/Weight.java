@@ -13,7 +13,7 @@ class Weight implements Serializable {
 	private static final long serialVersionUID 	= 3805221518234137798L;
 	
 	
-	private static final double LEARNING_RATE 	= 0.01; //0.02; //0.1; //1;
+	private static final double LEARNING_RATE 	= 1;//0.01; //0.02; //0.1; //1;
 	
 	private static final double MIN_WEIGHT 		= 0.1;
 	

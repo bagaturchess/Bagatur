@@ -41,9 +41,11 @@ public class Features_Splitter {
 		
 		return features_by_material_factor_2uniouns.get(4 * castling_pair + material_factor_phase);*/
 		
-		int total_factor = Math.min(63, board.getMaterialFactor().getTotalFactor());
+		//int total_factor = Math.min(63, board.getMaterialFactor().getTotalFactor());
 		
-		return features_by_material_factor_2uniouns.get(total_factor / 32);
+		//return features_by_material_factor_2uniouns.get(total_factor / 32);
+		
+		return features_by_material_factor_2uniouns.get(0);
 	}
 	
 	
@@ -91,7 +93,7 @@ public class Features_Splitter {
 		List<IFeature[]> features = new ArrayList<IFeature[]>();
 		
 		features.add(createNewFeatures(cfgClassName));
-		features.add(createNewFeatures(cfgClassName));
+		//features.add(createNewFeatures(cfgClassName));
 		//features.add(createNewFeatures(cfgClassName));
 		//features.add(createNewFeatures(cfgClassName));
 		

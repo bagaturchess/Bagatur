@@ -38,8 +38,12 @@ import deepnetts.util.Tensor;
 
 public class Trainer_IMPL4 extends Trainer_Base {
 	
-		
-	private static final float LEARNING_RATE = 1f; //0.01f;
+	
+	private static final float LEARNING_RATE = 0.1f; //0.01f;
+	
+	private static final float EVAL_INCREASE_FACTOR = 2f;
+	
+	private static final float EVAL_DECCREASE_FACTOR = 0.5f;
 	
 	
 	private DataSet_1 dataset;
@@ -111,8 +115,7 @@ public class Trainer_IMPL4 extends Trainer_Base {
 		}
 		
 		
-		float eval_increase_factor = 2f;
-		float eval_decrease_factor = 0.5f;
+
 		
 		for (int i = 0; i < outputs_per_move_actual.size(); i++) {
 			
@@ -125,12 +128,12 @@ public class Trainer_IMPL4 extends Trainer_Base {
 				if (expected_eval_white > actual_eval_white) {
 					
 					outputs_per_move_expected.remove(i);
-					outputs_per_move_expected.add(i, actual_eval_white * eval_increase_factor);
+					outputs_per_move_expected.add(i, actual_eval_white * EVAL_INCREASE_FACTOR);
 					
 				} else if (expected_eval_white < actual_eval_white) {
 					
 					outputs_per_move_expected.remove(i);
-					outputs_per_move_expected.add(i, actual_eval_white * eval_decrease_factor);
+					outputs_per_move_expected.add(i, actual_eval_white * EVAL_DECCREASE_FACTOR);
 				}
 				
 			} else if (expected_eval_white < 0) {
@@ -138,7 +141,7 @@ public class Trainer_IMPL4 extends Trainer_Base {
 				if (expected_eval_white > actual_eval_white) {
 					
 					outputs_per_move_expected.remove(i);
-					outputs_per_move_expected.add(i, actual_eval_white * eval_decrease_factor);
+					outputs_per_move_expected.add(i, actual_eval_white * EVAL_DECCREASE_FACTOR);
 					
 				} else if (expected_eval_white < actual_eval_white) {
 					
@@ -150,7 +153,7 @@ public class Trainer_IMPL4 extends Trainer_Base {
 					} else if (actual_eval_white < 0) {
 					
 						outputs_per_move_expected.remove(i);
-						outputs_per_move_expected.add(i, actual_eval_white * eval_increase_factor);
+						outputs_per_move_expected.add(i, actual_eval_white * EVAL_INCREASE_FACTOR);
 					}
 				}
 			}
@@ -217,7 +220,7 @@ public class Trainer_IMPL4 extends Trainer_Base {
 		reloadFromFile();
         
         
-		dataset = new DataSet_1();
+		dataset.clear();
         
         
 		super.updateWeights();
