@@ -54,7 +54,7 @@ public class Trainer_GOLDENMIDDLE extends Trainer_Base {
 	
 	public Trainer_GOLDENMIDDLE(IBitBoard _bitboard, String _filename_NN, IEvalConfig evalConfig) throws Exception {
 		
-		super(_bitboard, _filename_NN, evalConfig, ActivationFunction.LINEAR);
+		super(_bitboard, _filename_NN, evalConfig, ActivationFunction.LINEAR, 0.991f);
 		
 		features_per_move_for_update 	= new ArrayList<IFeature[]>();
 	}

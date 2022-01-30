@@ -20,11 +20,8 @@
 package bagaturchess.selfplay.train;
 
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.ActivationFunction;
@@ -49,7 +46,7 @@ public class Trainer_NNUE extends Trainer_Base {
 	
 	public Trainer_NNUE(IBitBoard _bitboard, String _filename_NN, IEvalConfig evalConfig) throws Exception {
 		
-		super(_bitboard, _filename_NN, evalConfig, ActivationFunction.SIGMOID);
+		super(_bitboard, _filename_NN, evalConfig, ActivationFunction.SIGMOID, 1);
 	}
 	
 	

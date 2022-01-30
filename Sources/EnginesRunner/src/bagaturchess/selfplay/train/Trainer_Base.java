@@ -24,13 +24,57 @@ public class Trainer_Base implements Trainer {
 	private static final int UPDATE_FREQUENCY_GAMES_COUNT 			= 100;
 	
 	
-	//private static final float LAMBDA 							= 0.9833f;
-	private static final double LAMBDA 								= 0.991f;
+	//Members
+	protected IBitBoard bitboard;
 	
-	private static final Map<Integer, double[]> LAMBDAS = new HashMap<Integer, double[]>();
+	protected String filename_NN;
+	
+	protected List<Object> inputs_per_move;
+	protected List<Float> outputs_per_move_actual;
+	protected List<Float> outputs_per_move_expected;
+	
+	private int update_counter = UPDATE_FREQUENCY_GAMES_COUNT;
+	
+	protected ActivationFunction activation_function;
+	
+	private IEvalConfig evalConfig;
+	
+	//These member have to be recreated after each Epoch in order to read the last weights
+	private IEvaluator evaluator;
+	
+	private double LAMBDA;
+	
+	private final Map<Integer, double[]> LAMBDAS;
 	
 	
-	static {
+	public Trainer_Base(IBitBoard _bitboard, String _filename_NN, IEvalConfig _evalConfig, ActivationFunction _activation_function, double LAMBDA) throws Exception {
+		
+		bitboard = _bitboard;
+		
+		filename_NN = _filename_NN;
+		
+		evalConfig = _evalConfig;
+		
+		activation_function = _activation_function;
+		
+		this.LAMBDA = LAMBDA;
+		
+		if (!(new File(filename_NN)).exists()) {
+			
+			throw new IllegalStateException("NN file not found: " + filename_NN);
+			
+		}
+		
+		inputs_per_move 				= new ArrayList<Object>(); 
+		
+		outputs_per_move_actual 		= new ArrayList<Float>();
+		
+		outputs_per_move_expected 		= new ArrayList<Float>();
+				
+		reloadFromFile();
+		
+		
+		LAMBDAS = new HashMap<Integer, double[]>();
 		
 		for (int moves_count = 1; moves_count < GlobalConstants.MAX_MOVES_IN_GAME; moves_count++) {
 			
@@ -56,51 +100,6 @@ public class Trainer_Base implements Trainer {
 				}
 			}
 		}
-	}
-	
-	
-	//Members
-	protected IBitBoard bitboard;
-	
-	protected String filename_NN;
-	
-	protected List<Object> inputs_per_move;
-	protected List<Float> outputs_per_move_actual;
-	protected List<Float> outputs_per_move_expected;
-	
-	private int update_counter = UPDATE_FREQUENCY_GAMES_COUNT;
-	
-	protected ActivationFunction activation_function;
-	
-	private IEvalConfig evalConfig;
-	
-	//These member have to be recreated after each Epoch in order to read the last weights
-	private IEvaluator evaluator;
-	
-	
-	public Trainer_Base(IBitBoard _bitboard, String _filename_NN, IEvalConfig _evalConfig, ActivationFunction _activation_function) throws Exception {
-		
-		bitboard = _bitboard;
-		
-		filename_NN = _filename_NN;
-		
-		evalConfig = _evalConfig;
-		
-		activation_function = _activation_function;
-		
-		if (!(new File(filename_NN)).exists()) {
-			
-			throw new IllegalStateException("NN file not found: " + filename_NN);
-			
-		}
-		
-		inputs_per_move 				= new ArrayList<Object>(); 
-		
-		outputs_per_move_actual 		= new ArrayList<Float>();
-		
-		outputs_per_move_expected 		= new ArrayList<Float>();
-				
-		reloadFromFile();
 	}
 	
 	

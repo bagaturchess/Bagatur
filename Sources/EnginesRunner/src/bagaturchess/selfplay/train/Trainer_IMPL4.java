@@ -54,7 +54,7 @@ public class Trainer_IMPL4 extends Trainer_Base {
 	public Trainer_IMPL4(IBitBoard _bitboard, String _filename_NN, IEvalConfig _evalConfig) throws Exception {
 		
 		
-		super(_bitboard, _filename_NN, _evalConfig, ActivationFunction.LINEAR);
+		super(_bitboard, _filename_NN, _evalConfig, ActivationFunction.LINEAR, 1);
 		
 		
 		dataset = new DataSet_1();
@@ -111,9 +111,8 @@ public class Trainer_IMPL4 extends Trainer_Base {
 		}
 		
 		
-		float EVAL_CHANGE_RATE = 0.5f;//0.1f;
-		float eval_increase_factor = 1 + EVAL_CHANGE_RATE;
-		float eval_decrease_factor = 1 - EVAL_CHANGE_RATE;
+		float eval_increase_factor = 2f;
+		float eval_decrease_factor = 0.5f;
 		
 		for (int i = 0; i < outputs_per_move_actual.size(); i++) {
 			
@@ -143,8 +142,16 @@ public class Trainer_IMPL4 extends Trainer_Base {
 					
 				} else if (expected_eval_white < actual_eval_white) {
 					
-					outputs_per_move_expected.remove(i);
-					outputs_per_move_expected.add(i, actual_eval_white * eval_increase_factor);
+					if (actual_eval_white > 0) {
+						
+						outputs_per_move_expected.remove(i);
+						outputs_per_move_expected.add(i, -actual_eval_white);
+						
+					} else if (actual_eval_white < 0) {
+					
+						outputs_per_move_expected.remove(i);
+						outputs_per_move_expected.add(i, actual_eval_white * eval_increase_factor);
+					}
 				}
 			}
 		}

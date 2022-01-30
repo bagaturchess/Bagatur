@@ -28,7 +28,7 @@ import deepnetts.util.Tensor;
 public class IMPL4_Constants {
 	
 	
-	public static final String NET_FILE = "deep_netts.impl4.bin";
+	public static final String NET_FILE = "deepnetts.impl4.bin";
 	
 	
 	public static final Tensor createInput(IBitBoard bitboard, float[][][] result_inputs_3d) {

@@ -51,7 +51,7 @@ public class TDLeafLambda_DeepNetts_IMPL4_TUNING {
 		
 		try {
 			
-			PrintStream log = new PrintStream(new FileOutputStream(new File("deepnetts_impl4.log")));
+			PrintStream log = new PrintStream(new FileOutputStream(new File("deepnetts.impl4.log")));
 			
 			ChannelManager.setChannel(new Channel_Console(System.in, log, log));
 			
@@ -81,8 +81,8 @@ public class TDLeafLambda_DeepNetts_IMPL4_TUNING {
 			
 			String filename_NN = IMPL4_Constants.NET_FILE;
 			
-			NeuralNetwork network = NeuralNetworkUtils_AllFeatures.buildNetwork();
-			FileIO.writeToFile(network, filename_NN);
+			//NeuralNetwork network = NeuralNetworkUtils_AllFeatures.buildNetwork();
+			//FileIO.writeToFile(network, filename_NN);
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			
