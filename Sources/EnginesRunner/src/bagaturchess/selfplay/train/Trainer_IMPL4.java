@@ -39,7 +39,7 @@ import deepnetts.util.Tensor;
 public class Trainer_IMPL4 extends Trainer_Base {
 	
 		
-	private static final float LEARNING_RATE = 0.01f;
+	private static final float LEARNING_RATE = 1f; //0.01f;
 	
 	
 	private DataSet_1 dataset;
