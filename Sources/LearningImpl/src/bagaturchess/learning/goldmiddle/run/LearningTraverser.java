@@ -3,8 +3,10 @@ package bagaturchess.learning.goldmiddle.run;
 
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
-import bagaturchess.learning.goldmiddle.visitors.EvalDiffVisitorImpl;
+import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl;
 import bagaturchess.learning.goldmiddle.visitors.LearningVisitorImpl;
+import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
+import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.ucitracker.api.PositionsTraverser;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
@@ -35,19 +37,33 @@ public class LearningTraverser {
 			//String filePath = "stockfish-14.1-4N.cg";
 			
 			
-			PositionsVisitor learning = new LearningVisitorImpl();
-			//PositionsVisitor learning = new EvalDiffVisitorImpl();
+			String filename_NN = Features_Splitter.FEATURES_FILE_NAME;
+			String features_class_name = Bagatur_V20_FeaturesConfigurationImpl.class.getName();
+			
+			//Features_Splitter features = Features_Splitter.create(features_class_name);
+			//Features_Splitter.store(filename_NN, features);
+			Features_Splitter.dump(Features_Splitter.load(filename_NN, features_class_name));
+			//System.exit(0);
+			
+			
+			IEvalConfig cfg = new bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Train();
+			
+			PositionsVisitor learning = new LearningVisitorImpl(cfg);
 			
 			ILearningInput input = LearningInputFactory.createDefaultInput();
 			
 			while (true) {
+				
 				PositionsTraverser.traverseAll(filePath, learning, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
 			}
 			
 		} catch (Exception e) {
+			
 			e.printStackTrace();
 		}
+		
 		long endTime = System.currentTimeMillis();
+		
 		System.out.println("OK " + ((endTime - startTime) / 1000) + "sec");		
 	}
 }

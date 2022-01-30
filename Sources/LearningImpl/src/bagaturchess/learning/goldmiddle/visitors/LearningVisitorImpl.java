@@ -33,16 +33,12 @@ import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
-import bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluator;
 import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.learning.impl.signals.Signals;
+import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
-import bagaturchess.search.api.internal.ISearch;
-import bagaturchess.search.api.internal.ISearchInfo;
-import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.api.internal.ISearchStopper;
-import bagaturchess.search.impl.pv.PVManager;
-import bagaturchess.uci.api.BestMoveSender;
+import bagaturchess.search.api.IEvaluatorFactory;
+import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
 
@@ -58,15 +54,9 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	
 	private ISignalFiller filler;
 	
-	private ISignals signals;
-	
 	private Features_Splitter features_splitter;
 	
 	private IEvaluator evaluator;
-	
-	private ISearch searcher;
-	
-	private PVManager pvman = new PVManager(ISearch.MAX_DEPTH);
 	
 	private double sumDiffs1;
 	
@@ -78,8 +68,10 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	
 	private IBitBoard bitboard;
 	
+	private IEvalConfig evalConfig;
 	
-	public LearningVisitorImpl() throws Exception {
+	
+	public LearningVisitorImpl(IEvalConfig _evalConfig) throws Exception {
 		
 		this(new FeaturesFilter() {
 			
@@ -90,11 +82,11 @@ public class LearningVisitorImpl implements PositionsVisitor {
 			}
 		});
 		
-		//ChannelManager.setChannel(new Channel_Console(System.in, System.out, System.out));
+		evalConfig = _evalConfig;
 	}
 	
 	
-	public LearningVisitorImpl(FeaturesFilter _filter) throws Exception {
+	private LearningVisitorImpl(FeaturesFilter _filter) throws Exception {
 		
 		filter = _filter;
 	}
@@ -121,28 +113,6 @@ public class LearningVisitorImpl implements PositionsVisitor {
 			actualWhitePlayerEval = -actualWhitePlayerEval;
 		}
 		
-		/*searcher.newSearch();
-		
-		int depth = 1;
-		
-		ISearchInfo info = SearchInfoFactory.getFactory().createSearchInfo();
-		info.setDepth(depth);
-		
-		int actual_white_search_score = searcher.pv_search(dummy_mediator, pvman, info, ISearch.PLY * depth, ISearch.PLY * depth,
-				0, ISearch.MIN, ISearch.MAX, 0, 0, null, false, 0, bitboard.getColourToMove(), 0, 0, false, 0, false);
-		
-		//System.out.println("info=" + info.getDepth());
-		
-		if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
-			
-			actual_white_search_score = -actual_white_search_score;
-		}
-
-		int delta = (int) (actualWhitePlayerEval - actual_white_search_score);
-		
-		//System.out.println("delta=" + delta);
-		*/
-		
 		double openingPart = bitboard.getMaterialFactor().getOpenningPart();
 		
 		newAdjustment(actualWhitePlayerEval, expectedWhitePlayerEval, openingPart);
@@ -167,6 +137,10 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		IFeature[] features = features_splitter.getFeatures(bitboard);
 		
 		if (deltaP != 0) {
+			
+			ISignals signals = new Signals(features);
+			
+			filler.fill(signals);
 			
 			for (int i = 0; i < features.length; i++) {
 				
@@ -213,35 +187,15 @@ public class LearningVisitorImpl implements PositionsVisitor {
 		
 		features_splitter = Features_Splitter.load(Features_Splitter.FEATURES_FILE_NAME, input.getFeaturesConfigurationClassName());
 		
-		signals = new Signals(features_splitter.getFeatures(bitboard));
+		String className = evalConfig.getEvaluatorFactoryClassName();
 		
-		evaluator = new FeaturesEvaluator(bitboard, null, filler, features_splitter, signals);
+		IEvaluatorFactory evaluator_factory = (IEvaluatorFactory) SharedData.class.getClassLoader().loadClass(className).newInstance();
 		
-		/*IRootSearchConfig cfg = new RootSearchConfig_BaseImpl_1Core(
-					new String[] {
-						bagaturchess.search.impl.alg.impl1.Search_PVS_NWS.class.getName(),
-						SearchConfigImpl_AB.class.getName(),
-						bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20.class.getName(),
-						bagaturchess.learning.goldmiddle.impl.eval.FeaturesEvaluationConfig.class.getName(),
-					}
-				);
-
-
-		searcher = null;
-		
-		SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
-		String searchClassName =  cfg.getSearchClassName();
-		searcher = (ISearch) ReflectionUtils.createObjectByClassName_ObjectsConstructor(
-						searchClassName,
-						new Object[] {bitboard,  cfg, sharedData}
-					);
-		
-		searcher.getEnv().setEval(evaluator);
-		*/
+		evaluator = evaluator_factory.create(bitboard, null, evalConfig);
 	}
 	
 	
-	public void end() {
+	public void end() throws Exception {
 		
 		System.out.println("Iteration " + iteration + ": Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success percent before this iteration: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%");
 		
@@ -252,95 +206,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 	
 	
 	public static interface FeaturesFilter {
+		
 		public boolean isAdjustable(int featureID);
 	}
-	
-	
-	private final ISearchMediator dummy_mediator = new ISearchMediator() {
-		
-		
-		@Override
-		public void startIteration(int iteration) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void setStopper(ISearchStopper stopper) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void send(String msg) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void registerInfoObject(ISearchInfo info) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public int getTrustWindow_MTD_Step() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-		
-		@Override
-		public int getTrustWindow_BestMove() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-		
-		@Override
-		public int getTrustWindow_AlphaAspiration() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-		
-		@Override
-		public ISearchStopper getStopper() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-		@Override
-		public ISearchInfo getLastInfo() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-		@Override
-		public BestMoveSender getBestMoveSender() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-		@Override
-		public void dump(Throwable t) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void dump(String msg) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void changedMinor(ISearchInfo info) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void changedMajor(ISearchInfo info) {
-			// TODO Auto-generated method stub
-			
-		}
-	};
 }

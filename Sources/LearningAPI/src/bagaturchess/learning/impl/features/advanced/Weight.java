@@ -12,16 +12,20 @@ class Weight implements Serializable {
 	
 	private static final long serialVersionUID 	= 3805221518234137798L;
 	
-	private static final double LEARNING_RATE 	= 0.0333; //0.1; //1;
+	
+	private static final double LEARNING_RATE 	= 0.02; //0.1; //1;
 	
 	private static final double MIN_WEIGHT 		= 0.1;
 	
 	
-	private double initialVal;
-	private double min_weight;
-	private double max_weight;
+	private double initial;
+	
+	private double min;
+	
+	private double max;
 	
 	private VarStatistic total;
+	
 	private VarStatistic current;
 	
 	
@@ -45,21 +49,24 @@ class Weight implements Serializable {
 		
 		if (_initialVal < 0) {
 			
-			throw new IllegalStateException("initialVal < 0: initialVal=" + initialVal);
+			throw new IllegalStateException("initialVal < 0: initialVal=" + initial);
 		}
 		
-		initialVal = _initialVal;
+		initial = _initialVal;
 		
 		
-		min_weight = min;
-		max_weight = max;
+		this.min = min;
+		
+		this.max = max;
 
-		if (initialVal < min_weight || initialVal > max_weight) throw new IllegalStateException("initialVal=" + initialVal);
+		if (initial < min || initial > max) throw new IllegalStateException("initialVal=" + initial);
 		
 		
 		total = new VarStatistic();
 		
+		
 		reset();
+		
 		
 		current = new VarStatistic();
 	}
@@ -111,7 +118,7 @@ class Weight implements Serializable {
 			reset();
 		}
 		
-		if (total.getEntropy() < min_weight) {
+		if (total.getEntropy() < min) {
 			
 			total = new VarStatistic();
 			
@@ -122,13 +129,13 @@ class Weight implements Serializable {
 	
 	private void reset() {
 		
-		if (initialVal == 0) {
+		if (initial == 0) {
 			
 			total.addValue(Math.max(MIN_WEIGHT, Math.random()));
 			
 		} else {
 			
-			total.addValue(Math.max(MIN_WEIGHT, initialVal));
+			total.addValue(Math.max(MIN_WEIGHT, initial));
 		}
 	}
 	
@@ -141,7 +148,7 @@ class Weight implements Serializable {
 	
 	strictfp void adjust(double amount) {
 		
-		//For liner function derivatives we use 1 and -1. We apply them in Epochs of at least 100 elements into the dataset and also use learning rate.
+		//1 and -1 are probably derivatives of the liner function. we use 1 and -1 and we apply them in Epochs of at least 100 games into the dataset and also use learning rate.
 		if (amount != 1 && amount != -1) {
 			
 			throw new IllegalStateException();
@@ -156,8 +163,8 @@ class Weight implements Serializable {
 		
 		String result = "";
 		
-		result += StringUtils.fill("[" + min_weight + "-" + max_weight + "] ", 8);
-		result += "initial: " + StringUtils.align(initialVal);
+		result += StringUtils.fill("[" + min + "-" + max + "] ", 8);
+		result += "initial: " + StringUtils.align(initial);
 		//result += ", avg: " + StringUtils.align(avg());
 		result += ", current: " + StringUtils.align(total.getEntropy());
 		//result += ", [" + current + "]";
