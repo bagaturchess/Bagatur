@@ -44,7 +44,7 @@ import deepnetts.net.NeuralNetwork;
 import deepnetts.util.FileIO;
 
 
-public class TDLeafLambda_DeepNetts_IMPL4_TUNING {
+public class TDLeafLambda_Perceptron_DeepNetts {
 	
 	
 	public static void main(String[] args) {
@@ -81,8 +81,8 @@ public class TDLeafLambda_DeepNetts_IMPL4_TUNING {
 			
 			String filename_NN = IMPL4_Constants.NET_FILE;
 			
-			//NeuralNetwork network = NeuralNetworkUtils_AllFeatures.buildNetwork();
-			//FileIO.writeToFile(network, filename_NN);
+			NeuralNetwork network = NeuralNetworkUtils_AllFeatures.buildNetwork();
+			FileIO.writeToFile(network, filename_NN);
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			

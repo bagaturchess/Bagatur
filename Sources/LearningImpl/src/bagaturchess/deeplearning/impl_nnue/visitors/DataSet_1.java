@@ -42,7 +42,7 @@ public class DataSet_1 implements DataSet<MLDataItem> {
 		
 		items = new ArrayList<MLDataItem>();
 		
-		targetNames = new String[13];
+		targetNames = new String[55];
 		
 		for (int i = 0; i < targetNames.length; i++) {
 			
@@ -81,6 +81,7 @@ public class DataSet_1 implements DataSet<MLDataItem> {
 	
 	@Override
 	public List<MLDataItem> getItems() {
+		
 		return items;
 	}
 	

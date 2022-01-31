@@ -27,29 +27,30 @@ import java.io.PrintStream;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.cfg.base.UCIConfig_BaseImpl;
-import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl;
-import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
 import bagaturchess.selfplay.GamesRunner;
 import bagaturchess.selfplay.train.Trainer;
-import bagaturchess.selfplay.train.Trainer_GOLDENMIDDLE;
+import bagaturchess.selfplay.train.Trainer_NNUE;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.Channel_Console;
+import deepnetts.net.NeuralNetwork;
+import deepnetts.util.FileIO;
 
 
-public class TDLeafLambda_GOLDENMIDDLE {
+public class TDLeafLambda_NNUE_DeepNetts {
 	
 	
 	public static void main(String[] args) {
 		
 		try {
 			
-			PrintStream log = new PrintStream(new FileOutputStream(new File("goldenmiddle.log")));
+			PrintStream log = new PrintStream(new FileOutputStream(new File("deepnetts_nnue.log")));
 			
 			ChannelManager.setChannel(new Channel_Console(System.in, log, log));
 			
@@ -64,8 +65,8 @@ public class TDLeafLambda_GOLDENMIDDLE {
 					}));
 			
 			
-			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4_TUNING_GOLDENMIDDEL;
-			
+			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE;
+		
 			SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
 		
 			IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
@@ -77,23 +78,19 @@ public class TDLeafLambda_GOLDENMIDDLE {
 			/*MultiPVMediator multipvMediator = new MultiPVMediator(cfg, search, bitboard, mediator1, go);
 			multipvMediator.ready();*/
 			
-			String filename_NN = Features_Splitter.FEATURES_FILE_NAME;
-			String features_class_name = Bagatur_V20_FeaturesConfigurationImpl.class.getName();
+			String filename_NN = NNUE_Constants.NET_FILE;
 			
-			//Features_Splitter features = Features_Splitter.create(features_class_name);
-			//Features_Splitter.store(filename_NN, features);
-			//Features_Splitter.dump(Features_Splitter.load(filename_NN, features_class_name));
-			//System.exit(0);
+			//NeuralNetwork network = NeuralNetworkUtils_NNUE_PSQT.buildNetwork();
+			//FileIO.writeToFile(network, filename_NN);
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			
-			Trainer ds_builder = new Trainer_GOLDENMIDDLE(bitboard, filename_NN, cfg.getEvalConfig());
-			//Trainer ds_builder = new Trainer_GOLDENMIDDLE(bitboard, filename_NN, Bagatur_V20_SignalFiller.eval_config);
-			
+			Trainer ds_builder = new Trainer_NNUE(bitboard, filename_NN, cfg.getEvalConfig());
 			
 			GamesRunner player = new GamesRunner(bitboard, search, ds_builder);
 			
-			player.playGames(1000000);
+			player.playGames(1000000000);
+			
 			
 		} catch (Throwable t) {
 			

@@ -147,6 +147,12 @@ public class Trainer_Base implements Trainer {
 	@Override
 	public void setGameOutcome(float game_result) throws Exception {
 		
+		setGameOutcome(game_result, true);
+	}
+	
+	
+	protected void setGameOutcome(float game_result, boolean callBackwardView) throws Exception {
+		
 		
 		if (inputs_per_move.size() == 0) {
 			
@@ -156,14 +162,51 @@ public class Trainer_Base implements Trainer {
 		}
 		
 		
-		setGameOutcome_Lambda(game_result);
+		if (activation_function == ActivationFunction.LINEAR) {
+		
+			setGameOutcome_Lambda(game_result);
+			
+		} else if (activation_function == ActivationFunction.SIGMOID) {
+			
+			setGameOutcome_Sigmoid(game_result);
+			
+		} else {
+			
+			throw new UnsupportedOperationException("activation_function=" + activation_function);
+		}
 		
 		
-		backwardView();
+		if (callBackwardView) {
+			
+			backwardView();
+		}
 	}
 	
 	
-	private void setGameOutcome_Lambda(float game_result) {
+	public void backwardView() throws Exception {		
+		
+		
+		if (inputs_per_move.size() != outputs_per_move_actual.size()) {
+			
+			throw new IllegalStateException();
+		}
+		
+		if (outputs_per_move_actual.size() != outputs_per_move_expected.size()) {
+			
+			throw new IllegalStateException("outputs_per_move_actual.size()=" + outputs_per_move_actual.size() + ", outputs_per_move_expected.size()=" + outputs_per_move_expected.size());
+		}
+		
+		
+		update_counter--;
+		
+		if (update_counter <= 0) {
+			
+			updateWeights();
+		}
+	}
+	
+	
+	protected void setGameOutcome_Lambda(float game_result) {
 		
 		float final_eval;
 		
@@ -185,29 +228,6 @@ public class Trainer_Base implements Trainer {
 		for (int i = 0; i < inputs_per_move.size(); i++) {
 			
 	        outputs_per_move_expected.add((float) (LAMBDAS_ARRAY[i] * final_eval));
-		}
-	}
-	
-	
-	public void backwardView() throws Exception {		
-		
-		
-		if (inputs_per_move.size() != outputs_per_move_actual.size()) {
-			
-			throw new IllegalStateException();
-		}
-		
-		if (outputs_per_move_actual.size() != outputs_per_move_expected.size()) {
-			
-			throw new IllegalStateException();
-		}
-		
-		
-		update_counter--;
-		
-		if (update_counter <= 0) {
-			
-			updateWeights();
 		}
 	}
 	
@@ -240,7 +260,7 @@ public class Trainer_Base implements Trainer {
 	}
 	
 	
-	/*public void setGameOutcome_Sigmoid(float game_result) {
+	private void setGameOutcome_Sigmoid(float game_result) {
 	
 		boolean draw = game_result == 0;
 		
@@ -254,20 +274,18 @@ public class Trainer_Base implements Trainer {
 					
 		} else if (white_win) {
 			
-			step = +(float) ((activation_function.gety(IEvaluator.MAX_EVAL) - 0.5) / (float) inputs_per_move.size());
+			step = +(float) ((activation_function.gety(MAX_EVAL) - 0.5) / (float) inputs_per_move.size());
 			
 		} else {
 			
-			step = -(float) ((0.5 - activation_function.gety(IEvaluator.MIN_EVAL)) / (float) inputs_per_move.size());
+			step = -(float) ((0.5 - activation_function.gety(-MAX_EVAL)) / (float) inputs_per_move.size());
 		}
 		
 		for (int i = 0; i < inputs_per_move.size(); i++) {
-			
-	        float[] output = new float[1];
 	        
-	        output[0] = (float) (0.5 + i * step);
+	        float output = (float) (0.5 + i * step);
 	        
-	        dataset.addItem(inputs_per_move.get(i), output);
+	        outputs_per_move_expected.add(output);
 		}
-	}*/
+	}
 }

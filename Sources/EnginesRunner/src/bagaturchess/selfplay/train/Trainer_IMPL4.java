@@ -39,18 +39,18 @@ import deepnetts.util.Tensor;
 public class Trainer_IMPL4 extends Trainer_Base {
 	
 	
-	private static final float LEARNING_RATE = 0.1f; //0.01f;
+	private static final float LEARNING_RATE = 0.0000001f; //0.1f; //0.01f;
 	
-	private static final float EVAL_INCREASE_FACTOR = 2f;
+	private static final float EVAL_INCREASE_FACTOR = 2f; //1.25f;
 	
-	private static final float EVAL_DECCREASE_FACTOR = 0.5f;
+	private static final float EVAL_DECREASE_FACTOR = 0.5f; //0.80f;
 	
-	
-	private DataSet_1 dataset;
 	
 	private Bagatur_ALL_SignalFiller_InArray filler;
 	
 	private NeuralNetwork network;
+	
+	private DataSet_1 dataset;
 	
 	private BackpropagationTrainer trainer;
 	
@@ -96,8 +96,8 @@ public class Trainer_IMPL4 extends Trainer_Base {
         
         trainer.setMaxEpochs(1)
         //.setOptimizer(OptimizerType.MOMENTUM)
-        		.setLearningRate(LEARNING_RATE);
-                //.setMaxError(0.000000000000001f);
+        		.setLearningRate(LEARNING_RATE)
+                .setMaxError(0.000000000000001f);
                 //.setBatchMode(true)
                 //.setBatchSize(dataset.size());
 	}
@@ -107,66 +107,66 @@ public class Trainer_IMPL4 extends Trainer_Base {
 	public void setGameOutcome(float game_result) throws Exception {
 		
 		
-		if (dataset.isEmpty()) {
-			
-			//System.out.println("Game with no search moves. It has only opening moves and will be skiped.");
-			
-			return;
-		}
+		setGameOutcome(game_result, false);
 		
 		
-
-		
-		for (int i = 0; i < outputs_per_move_actual.size(); i++) {
+		if (activation_function == ActivationFunction.LINEAR) {
 			
-			float actual_eval_white = outputs_per_move_actual.get(i);
 			
-			float expected_eval_white = outputs_per_move_expected.get(i);
-			
-			if (expected_eval_white > 0) {
+			for (int i = 0; i < outputs_per_move_actual.size(); i++) {
 				
-				if (expected_eval_white > actual_eval_white) {
-					
-					outputs_per_move_expected.remove(i);
-					outputs_per_move_expected.add(i, actual_eval_white * EVAL_INCREASE_FACTOR);
-					
-				} else if (expected_eval_white < actual_eval_white) {
-					
-					outputs_per_move_expected.remove(i);
-					outputs_per_move_expected.add(i, actual_eval_white * EVAL_DECCREASE_FACTOR);
-				}
+				float actual_eval_white = outputs_per_move_actual.get(i);
 				
-			} else if (expected_eval_white < 0) {
+				float expected_eval_white = outputs_per_move_expected.get(i);
 				
-				if (expected_eval_white > actual_eval_white) {
+				if (expected_eval_white > 0) {
 					
-					outputs_per_move_expected.remove(i);
-					outputs_per_move_expected.add(i, actual_eval_white * EVAL_DECCREASE_FACTOR);
-					
-				} else if (expected_eval_white < actual_eval_white) {
-					
-					if (actual_eval_white > 0) {
+					if (expected_eval_white > actual_eval_white) {
 						
-						outputs_per_move_expected.remove(i);
-						outputs_per_move_expected.add(i, -actual_eval_white);
-						
-					} else if (actual_eval_white < 0) {
-					
 						outputs_per_move_expected.remove(i);
 						outputs_per_move_expected.add(i, actual_eval_white * EVAL_INCREASE_FACTOR);
+						
+					} else if (expected_eval_white < actual_eval_white) {
+						
+						outputs_per_move_expected.remove(i);
+						outputs_per_move_expected.add(i, actual_eval_white * EVAL_DECREASE_FACTOR);
+					}
+					
+				} else if (expected_eval_white < 0) {
+					
+					if (expected_eval_white > actual_eval_white) {
+						
+						outputs_per_move_expected.remove(i);
+						outputs_per_move_expected.add(i, actual_eval_white * EVAL_DECREASE_FACTOR);
+						
+					} else if (expected_eval_white < actual_eval_white) {
+						
+						if (actual_eval_white > 0) {
+							
+							outputs_per_move_expected.remove(i);
+							outputs_per_move_expected.add(i, -actual_eval_white);
+							
+						} else if (actual_eval_white < 0) {
+						
+							outputs_per_move_expected.remove(i);
+							outputs_per_move_expected.add(i, actual_eval_white * EVAL_INCREASE_FACTOR);
+						}
 					}
 				}
 			}
+			
+		} else {
+			
+			throw new UnsupportedOperationException("activation_function=" + activation_function);
 		}
 		
 		
-		super.setGameOutcome(game_result);
+		backwardView();
 	}
 	
 	
 	@Override
 	public void addBoardPosition(IBitBoard bitboard) {
-		
 		
 		float[] inputs_1d = new float[55];
 		
@@ -187,7 +187,6 @@ public class Trainer_IMPL4 extends Trainer_Base {
 		
 		for (int moveindex = 0; moveindex < inputs_per_move.size(); moveindex++) {
 			
-			
 			//float actualWhitePlayerEval 	= outputs_per_move_actual.get(moveindex);
 			
 			float expectedWhitePlayerEval 	= outputs_per_move_expected.get(moveindex);
@@ -206,7 +205,6 @@ public class Trainer_IMPL4 extends Trainer_Base {
 	
 	@Override
 	public void updateWeights() throws Exception {
-		
 		
         trainer.train(dataset);
         

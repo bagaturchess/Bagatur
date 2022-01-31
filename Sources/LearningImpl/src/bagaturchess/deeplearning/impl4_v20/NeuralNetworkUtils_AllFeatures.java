@@ -31,6 +31,14 @@ public class NeuralNetworkUtils_AllFeatures {
 	
 	public static NeuralNetwork buildNetwork() {
         
+		/*FeedForwardNetwork nn =  FeedForwardNetwork.builder()
+                .addInputLayer(55)
+                .hiddenActivationFunction(ActivationType.LINEAR)
+                .addOutputLayer(1, ActivationType.SIGMOID)
+                .lossFunction(LossType.MEAN_SQUARED_ERROR)
+                .randomSeed(System.currentTimeMillis() % 778)
+                .build();*/
+        
 		FeedForwardNetwork nn =  FeedForwardNetwork.builder()
                 .addInputLayer(55)
                 .hiddenActivationFunction(ActivationType.LINEAR)
@@ -38,7 +46,7 @@ public class NeuralNetworkUtils_AllFeatures {
                 .lossFunction(LossType.MEAN_SQUARED_ERROR)
                 .randomSeed(System.currentTimeMillis() % 778)
                 .build();
-        
+		
         return nn;
 	}
 }
