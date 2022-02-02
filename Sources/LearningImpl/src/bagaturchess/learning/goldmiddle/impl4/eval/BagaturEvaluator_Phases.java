@@ -79,7 +79,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	@Override
 	protected double phase1() {
 		
-		return Evaluator.eval1(evalConfig, bitboard.getBoardConfig(), board, evalinfo, evalComponentsProcessor);
+		return Evaluator.eval1(!useDefaultMaterial(), bitboard.getBoardConfig(), board, evalinfo, evalComponentsProcessor);
 	}
 	
 	

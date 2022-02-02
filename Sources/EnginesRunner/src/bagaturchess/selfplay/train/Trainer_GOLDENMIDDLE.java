@@ -40,6 +40,9 @@ import bagaturchess.search.api.IEvalConfig;
 public class Trainer_GOLDENMIDDLE extends Trainer_Base {
 	
 	
+	private boolean DUMP_FEATURES = true;
+	
+	
 	private List<IFeature[]> features_per_move_for_update;
 	
 	private long stats_count_weights_changes;
@@ -69,11 +72,14 @@ public class Trainer_GOLDENMIDDLE extends Trainer_Base {
 		
 		filler = input.createFiller(bitboard);
 		
-		features_splitter = Features_Splitter.load(Features_Splitter.FEATURES_FILE_NAME, input.getFeaturesConfigurationClassName());		
+		features_splitter = Features_Splitter.load(Features_Splitter.FEATURES_FILE_NAME, input.getFeaturesConfigurationClassName());
 		
-		System.out.println("Trainer_GOLDENMIDDLE.reloadFromFile: weights dump ...");
-		
-		Features_Splitter.dump(features_splitter);
+		if (DUMP_FEATURES) {
+			
+			System.out.println("Trainer_GOLDENMIDDLE.reloadFromFile: weights dump ...");
+			
+			Features_Splitter.dump(features_splitter);
+		}
 	}
 	
 	

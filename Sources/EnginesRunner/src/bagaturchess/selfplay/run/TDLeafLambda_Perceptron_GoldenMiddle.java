@@ -67,7 +67,7 @@ public class TDLeafLambda_Perceptron_GoldenMiddle {
 			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.EVALIMPL4_TUNING_GOLDENMIDDEL;
 			
 			SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
-		
+			
 			IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
 			//IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 			

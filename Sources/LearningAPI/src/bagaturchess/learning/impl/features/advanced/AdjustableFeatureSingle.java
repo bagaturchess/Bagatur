@@ -27,6 +27,11 @@ public class AdjustableFeatureSingle extends AdjustableFeature {
 	}
 	
 	
+	public ISignal createNewSignal() {
+		return new SingleSignal();
+	}
+	
+	
 	protected void merge(AdjustableFeature other) {
 		
 		if (other instanceof AdjustableFeatureSingle) {
@@ -51,12 +56,13 @@ public class AdjustableFeatureSingle extends AdjustableFeature {
 	
 	@Override
 	public void applyChanges() {
+		
 		weight.multiplyCurrentWeightByAmountAndDirection();
-	}
-	
-	
-	public ISignal createNewSignal() {
-		return new SingleSignal();
+		
+		/*if (getId() == 5) {
+			
+			System.out.println("QUEEN.MATERIAL=" + weight.getWeight());
+		}*/
 	}
 	
 	
@@ -81,6 +87,13 @@ public class AdjustableFeatureSingle extends AdjustableFeature {
 	public double getWeight() {
 		
 		return weight.getWeight();
+	}
+	
+	
+	@Override
+	public double getLearningSpeed() {
+		
+		return weight.getLearningSpeed();
 	}
 	
 	

@@ -20,6 +20,13 @@ public class BagaturEvaluator_Phases_GOLDENMIDDLE extends BagaturEvaluator_Phase
 	}
 	
 	
+	@Override
+	protected boolean useDefaultMaterial() {
+		
+		return false;
+	}
+	
+	
 	private static class EvalComponentsProcessor_Weights implements IEvalComponentsProcessor {
 		
 		

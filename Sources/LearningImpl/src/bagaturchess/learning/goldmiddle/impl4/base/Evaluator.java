@@ -33,12 +33,12 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 	private static final int MAX_MATERIAL_FACTOR = 4 * EvalConstants.PHASE[NIGHT] + 4 * EvalConstants.PHASE[BISHOP] + 4 * EvalConstants.PHASE[ROOK] + 2 * EvalConstants.PHASE[QUEEN];
 	
 	
-	public static int eval1(IEvalConfig eval_config, IBoardConfig boardConfig, final ChessBoard cb, final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
+	public static int eval1(boolean calculateMaterial, IBoardConfig boardConfig, final ChessBoard cb, final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
 		
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_1, FEATURE_ID_PIECE_SQUARE_TABLE,
 				cb.psqtScore_mg, cb.psqtScore_eg, PIECE_SQUARE_TABLE_O, PIECE_SQUARE_TABLE_E);
 		
-		if (eval_config == null || eval_config.isTrainingMode()) {
+		if (calculateMaterial) {
 			
 			calculateMaterialScore(boardConfig, evalInfo, evalComponentsProcessor);
 		}

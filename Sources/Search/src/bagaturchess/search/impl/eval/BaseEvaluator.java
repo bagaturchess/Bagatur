@@ -266,11 +266,15 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		double white_eval = 0;
 		
-		if (evalConfig != null && !evalConfig.isTrainingMode()) {
+		if (useDefaultMaterial()) {
 			
-			white_eval += eval_material_nopawnsdrawrule();
+			if (evalConfig != null && !evalConfig.isTrainingMode()) {
+				
+				white_eval += eval_material_nopawnsdrawrule();
+			}
+			
+			//eval += eval_material_imbalances();
 		}
-		//eval += eval_material_imbalances();
 		
 		white_eval += phase1();
 		white_eval += phase2();
@@ -302,6 +306,12 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		
 		return returnVal(white_eval);
+	}
+	
+	
+	protected boolean useDefaultMaterial() {
+		
+		return true;
 	}
 	
 	

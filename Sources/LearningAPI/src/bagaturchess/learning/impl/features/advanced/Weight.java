@@ -13,7 +13,7 @@ class Weight implements Serializable {
 	private static final long serialVersionUID 	= 3805221518234137798L;
 	
 	
-	private static final double LEARNING_RATE 	= 0.5;//0.01; //0.02; //0.1; //1;
+	private static final double LEARNING_RATE 	= 1f; //0.5f; //0.01; //0.02; //0.1; //1;
 	
 	private static final double MIN_WEIGHT 		= 0.1;
 	
@@ -25,6 +25,8 @@ class Weight implements Serializable {
 	private double max;
 	
 	private VarStatistic total;
+	
+	private VarStatistic total_movements;
 	
 	private VarStatistic current;
 	
@@ -64,6 +66,7 @@ class Weight implements Serializable {
 		
 		total = new VarStatistic();
 		
+		total_movements = new VarStatistic();
 		
 		reset();
 		
@@ -93,32 +96,47 @@ class Weight implements Serializable {
 		}
 		
 		
-		double multiplier = (current.getTotalDirection() / current.getTotalAmount());
+		double current_movement = (current.getTotalDirection() / current.getTotalAmount());
+	
+		//System.out.println("movement=" + movement);
+
+		total_movements.addValue(current_movement);
 		
-		//System.out.println("multiplier=" + multiplier);
-		//System.out.println("total.getDisperse()=" + total.getDisperse());
+		/*if (current_movement > 0) {
+			
+			total_movements.addValue(+1);
+			
+		} else if (current_movement < 0) {
+			
+			total_movements.addValue(-1);
+		}*/
 		
-		multiplier *= LEARNING_RATE;
-		//multiplier *= Math.max(1, total.getDisperse());
+		System.out.println("total_movements.getTotalAmount()=" + total_movements.getTotalAmount());
 		
-		//Multiply the weight
 		
 		double avg = total.getEntropy();
 		
 		if (avg > 0) {
 			
-			total.addValue(avg + avg * multiplier);
+			total.addValue(avg + avg * current_movement * getLearningSpeed());
 			
 		} else if (avg < 0) {
 			
-			total.addValue(avg - avg * multiplier);
+			if (true) throw new IllegalStateException();
+			
+			total.addValue(avg - avg * current_movement * getLearningSpeed());
 			
 		} else {
+			
+			if (true) throw new IllegalStateException();
 			
 			reset();
 		}
 		
+		
 		if (total.getEntropy() < min) {
+			
+			if (true) throw new IllegalStateException();
 			
 			total = new VarStatistic();
 			
@@ -143,6 +161,17 @@ class Weight implements Serializable {
 	public double getWeight() {
 		
 		return total.getEntropy();
+	}
+	
+	
+	public double getLearningSpeed() {
+		
+		if (total_movements.getTotalAmount() == 0) {
+			
+			return 1;
+		}
+		
+		return Math.abs(total_movements.getTotalDirection() / total_movements.getTotalAmount());
 	}
 	
 	

@@ -56,6 +56,13 @@ public class AdjustableFeatureArray extends AdjustableFeature {
 	}*/
 	
 	
+	@Override
+	public double getLearningSpeed() {
+
+		throw new UnsupportedOperationException();
+	}
+	
+	
 	public void clear() {
 		for (int i=0; i<o_weights.length; i++) {
 			o_weights[i].clear();

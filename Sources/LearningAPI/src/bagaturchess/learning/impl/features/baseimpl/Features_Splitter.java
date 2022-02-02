@@ -8,11 +8,13 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.learning.api.IAdjustableFeature;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.api.IFeaturesConfiguration;
@@ -28,7 +30,7 @@ public class Features_Splitter {
 	
 	private Map<Integer, IFeature[]> features_by_material_factor;
 	
-	private List<IFeature[]> features_by_material_factor_2uniouns;
+	private List<IAdjustableFeature[]> features_by_material_factor_2uniouns;
 	
 	
 	public IFeature[] getFeatures(IBitBoard board) {
@@ -51,7 +53,7 @@ public class Features_Splitter {
 	
 	public static Features_Splitter load(String fileName, String cfgClassName) throws Exception {
 		
-		List<IFeature[]> features_by_material_factor_2uniouns = null;
+		List<IAdjustableFeature[]> features_by_material_factor_2uniouns = null;
 			
 		File org = new File(fileName);
 		
@@ -78,11 +80,11 @@ public class Features_Splitter {
 		
 		ObjectInputStream ois = new ObjectInputStream(is);
 		
-		features_by_material_factor_2uniouns = (List<IFeature[]>) ois.readObject();
+		features_by_material_factor_2uniouns = (List<IAdjustableFeature[]>) ois.readObject();
 		
 		ois.close();
 		
-		is.close();
+		//is.close();
 		
 		return new Features_Splitter(features_by_material_factor_2uniouns);
 	}
@@ -90,7 +92,7 @@ public class Features_Splitter {
 	
 	public static Features_Splitter create(String cfgClassName) throws Exception {
 		
-		List<IFeature[]> features = new ArrayList<IFeature[]>();
+		List<IAdjustableFeature[]> features = new ArrayList<IAdjustableFeature[]>();
 		
 		features.add(createNewFeatures(cfgClassName));
 		features.add(createNewFeatures(cfgClassName));
@@ -110,7 +112,7 @@ public class Features_Splitter {
 	
 	
 	
-	private Features_Splitter(List<IFeature[]> _features_by_material_factor_2uniouns) {
+	private Features_Splitter(List<IAdjustableFeature[]> _features_by_material_factor_2uniouns) {
 		
 		features_by_material_factor_2uniouns = _features_by_material_factor_2uniouns;
 	}
@@ -176,11 +178,20 @@ public class Features_Splitter {
 	}
 	
 	
-	private static IFeature[] createNewFeatures(String cfgClassName) throws Exception {
+	private static IAdjustableFeature[] createNewFeatures(String cfgClassName) throws Exception {
 		
 		IFeaturesConfiguration fc = (IFeaturesConfiguration) Features_Splitter.class.getClassLoader().loadClass(cfgClassName).newInstance();
 		
-		return fc.getDefinedFeatures();
+		IFeature[] features = fc.getDefinedFeatures();
+		
+		IAdjustableFeature[] features_adustable = new IAdjustableFeature[features.length];
+		
+		for (int i = 0; i < features_adustable.length; i++) {
+			
+			features_adustable[i] = (IAdjustableFeature) features[i];
+		}
+		
+		return features_adustable;
 	}
 	
 	
@@ -252,16 +263,33 @@ public class Features_Splitter {
 	
 	public static void dump(Features_Splitter splitter) {
 		
-		for (IFeature[] features: splitter.features_by_material_factor_2uniouns) {
+		VarStatistic stats = new VarStatistic();
+		
+		System.out.println("Features_Splitter.dump: ALL FEATURES");
+		
+		for (int i = 0; i < splitter.features_by_material_factor_2uniouns.size(); i++) {
+			
+			IFeature[] features = splitter.features_by_material_factor_2uniouns.get(i);
+			
+			System.out.println("Features_Splitter.dump: Features" + i);
 			
 			for (IFeature feature: features) {
+				
+				if (feature != null) {
+				
+					double current_weight_learning_rate = ((IAdjustableFeature)feature).getLearningSpeed();
 					
-				System.out.println(feature + ", ");
+					stats.addValue(current_weight_learning_rate);
+					
+					System.out.println("Features_Splitter.dump:" +  feature + ", Learning Rate=" + current_weight_learning_rate);
+				}
 			}
 		}
+		
+		System.out.println("Learning Speed: AVG=" + stats.getEntropy() + ", STDEV=" + stats.getDisperse());
 	}
-
-
+	
+	
 	public static void toJavaCode(IFeature[] features) {
 		for (int i = 0; i < features.length; i++) {
 			System.out.println(features[i].toJavaCode());

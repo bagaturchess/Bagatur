@@ -149,9 +149,6 @@ public class VarStatistic implements Serializable {
 	
 	
 	public strictfp void addValue(double nv, double adjustment) {
-		/*if (nv < 0) {
-			throw new IllegalStateException();
-		}*/
 		
 		if (nv != 0) {
 			countNonNull++;
