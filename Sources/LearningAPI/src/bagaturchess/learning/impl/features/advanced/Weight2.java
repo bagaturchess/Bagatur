@@ -7,7 +7,7 @@ import bagaturchess.bitboard.impl.utils.StringUtils;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 
 
-class Weight implements Serializable {
+class Weight2 implements Serializable {
 	
 	
 	private static final long serialVersionUID 	= 3805221518234137798L;
@@ -16,8 +16,6 @@ class Weight implements Serializable {
 	private static final double LEARNING_RATE 	= 0.25f; //1f; //0.5f; //0.01; //0.02; //0.1; //1;
 	
 	private static final double MIN_WEIGHT 		= 0.1;
-	
-	private static final int STEPS_COUNT 		= 100;
 	
 	
 	private double initial;
@@ -32,16 +30,14 @@ class Weight implements Serializable {
 	
 	private VarStatistic current;
 	
-	private double STEP = 1 / (double) STEPS_COUNT;
 	
-	
-	public Weight(double min, double max, double _initialVal, boolean _norm_adjustment) {
+	public Weight2(double min, double max, double _initialVal, boolean _norm_adjustment) {
 		
 		this(min, max, _initialVal);
 	}
 	
 	
-	public Weight(double min, double max, double _initialVal) {
+	public Weight2(double min, double max, double _initialVal) {
 		
 		if (min > max)	{
 			
@@ -65,9 +61,6 @@ class Weight implements Serializable {
 		
 		this.max = max;
 
-		STEP = Math.abs(max - min) / (double) STEPS_COUNT;
-		
-		
 		if (initial < min || initial > max) throw new IllegalStateException("initialVal=" + initial);
 		
 		
@@ -82,7 +75,7 @@ class Weight implements Serializable {
 	}
 	
 	
-	protected void merge(Weight other) {
+	protected void merge(Weight2 other) {
 		
 		throw new UnsupportedOperationException();
 	}
@@ -115,17 +108,14 @@ class Weight implements Serializable {
 			
 			total_movements.addValue(+1);
 			
-			//current_movement = STEP;
-			
 		} else if (current_movement < 0) {
 			
 			total_movements.addValue(-1);
-			
-			//current_movement = -STEP;
 		}
 		
-		current_movement *= getLearningSpeed();
-		//current_movement *= LEARNING_RATE;
+		
+		//current_movement *= getLearningSpeed();
+		current_movement *= LEARNING_RATE;
 		
 		
 		double avg = total.getEntropy();
@@ -138,7 +128,7 @@ class Weight implements Serializable {
 			
 			if (true) throw new IllegalStateException();
 			
-			total.addValue(avg - -current_movement);
+			total.addValue(avg - avg * current_movement);
 			
 		} else {
 			

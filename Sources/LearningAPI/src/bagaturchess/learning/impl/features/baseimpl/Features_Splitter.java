@@ -277,7 +277,7 @@ public class Features_Splitter {
 				
 				if (feature != null) {
 				
-					double current_weight_learning_rate = ((IAdjustableFeature)feature).getLearningSpeed();
+					double current_weight_learning_rate = ((IAdjustableFeature) feature).getLearningSpeed();
 					
 					stats.addValue(current_weight_learning_rate);
 					
@@ -286,12 +286,14 @@ public class Features_Splitter {
 			}
 		}
 		
-		System.out.println("Learning Speed: AVG=" + stats.getEntropy() + ", STDEV=" + stats.getDisperse());
+		System.out.println("Adaptive learning speed stats: AVG=" + stats.getEntropy() + ", STDEV=" + stats.getDisperse());
 	}
 	
 	
 	public static void toJavaCode(IFeature[] features) {
+		
 		for (int i = 0; i < features.length; i++) {
+			
 			System.out.println(features[i].toJavaCode());
 		}
 	}
