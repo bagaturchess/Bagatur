@@ -21,10 +21,8 @@ package bagaturchess.egtb.syzygy;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
-import bagaturchess.egtb.syzygy.OnlineSyzygy.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,7 +72,7 @@ public class SyzygyTBProbing {
     }
 	
     
-    public static final void clearSingleton() {
+    public static final void disableSingleton() {
     	
     	switched_off = true;
     }
