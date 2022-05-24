@@ -196,7 +196,7 @@ public class GamesRunner {
 		Go go = new Go(ChannelManager.getChannel(), "go depth " + SEARCH_DEPTH);
 		//Go go = new Go(ChannelManager.getChannel(), "go infinite");
 		
-		Object sync_move = new Object();
+		final Object sync_move = new Object();
 		
 		List<Integer> played_moves = new ArrayList<Integer>();
 		

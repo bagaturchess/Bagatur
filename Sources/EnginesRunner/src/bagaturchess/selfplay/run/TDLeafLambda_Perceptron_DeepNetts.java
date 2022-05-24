@@ -37,7 +37,7 @@ import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
 import bagaturchess.selfplay.GamesRunner;
 import bagaturchess.selfplay.train.Trainer;
-import bagaturchess.selfplay.train.Trainer_IMPL4;
+//import bagaturchess.selfplay.train.Trainer_IMPL4;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.Channel_Console;
 import deepnetts.net.NeuralNetwork;
@@ -86,7 +86,7 @@ public class TDLeafLambda_Perceptron_DeepNetts {
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			
-			Trainer ds_builder = new Trainer_IMPL4(bitboard, filename_NN, cfg.getEvalConfig());
+			Trainer ds_builder = null; //new Trainer_IMPL4(bitboard, filename_NN, cfg.getEvalConfig());
 			
 			GamesRunner player = new GamesRunner(bitboard, search, ds_builder);
 			
