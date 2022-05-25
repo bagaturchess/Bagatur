@@ -25,12 +25,14 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	protected static final double MEM_USAGE_PAWNCACHE 	= 0.00;
 	
 	
-	private String DEFAULT_TbPath = getDefaultTBPath();
+	private String DEFAULT_TbPath 			= getDefaultTBPath();
 	
-	private boolean DEFAULT_SyzygyOnline = false;
+	private boolean DEFAULT_SyzygyOnline 	= false;
 	
+	private int DEFAULT_MEM_USAGE_percent 	= 70;
 	
-	private UCIOption[] options = new UCIOption[] {
+	private UCIOption[] options 			= new UCIOption[] {
+			new UCIOptionSpin_Integer("MemoryUsagePercent", new Integer(1), "type spin default " + DEFAULT_MEM_USAGE_percent + " min 50 max 90"),
 			new UCIOptionString("SyzygyPath", DEFAULT_TbPath, "type string default " + DEFAULT_TbPath),
 			new UCIOptionCombo("SyzygyOnline", "" + DEFAULT_SyzygyOnline, "type check default " + DEFAULT_SyzygyOnline),
 			new UCIOptionSpin_Integer("MultiPV", new Integer(1), "type spin default 1 min 1 max 100"),
@@ -43,13 +45,15 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private IBoardConfig boardCfg;
 	private IEvalConfig evalCfg;
 	
-	private int multiPVsCount = 1;
+	private int multiPVsCount 				= 1;
 	
 	private String TbPath = DEFAULT_TbPath;
 	
 	private boolean use_online_syzygy = DEFAULT_SyzygyOnline;
 	
-	private int hiddenDepth = 0;
+	private int MEM_USAGE_percent 			= DEFAULT_MEM_USAGE_percent;
+	
+	private int hiddenDepth 				= 0;
 	
 	
 	public RootSearchConfig_BaseImpl(String[] args) {
@@ -149,54 +153,70 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	@Override
 	public int getThreadMemory_InMegabytes() {
+		
 		throw new IllegalStateException();
 	}
 	
 	@Override
 	public String getSearchClassName() {
+		
 		return searchImpl_ClassName;
 	}
 	
 	
 	@Override
 	public ISearchConfig_AB getSearchConfig() {
+		
 		return searchImpl_ConfigObj;
 	}
 	
 	
 	@Override
 	public IBoardConfig getBoardConfig() {
+		
 		return boardCfg;
 	}
 	
 	
 	@Override
 	public IEvalConfig getEvalConfig() {
+		
 		return evalCfg;
 	}
 	
 	
 	@Override
 	public double getTPTUsagePercent() {
+		
 		return MEM_USAGE_TPT;
 	}
 	
 	
 	@Override
 	public double getEvalCacheUsagePercent() {
+		
 		return MEM_USAGE_EVALCACHE;
 	}
 	
 	
 	@Override
 	public double getPawnsCacheUsagePercent() {
+		
 		return MEM_USAGE_PAWNCACHE;
 	}
 	
 	
 	@Override
 	public int getMultiPVsCount() {
+		
 		return multiPVsCount;
+	}
+	
+	
+	@Override
+	public double get_MEMORY_USAGE_PERCENT() {
+		
+		return MEM_USAGE_percent / 100f;
 	}
 	
 	
@@ -234,6 +254,10 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 		
 		} else if ("SyzygyOnline".equals(option.getName())) {
 			use_online_syzygy = option.getValue().equals(true);
+			return true;
+			
+		} else if ("MemoryUsagePercent".equals(option.getName())) {
+			MEM_USAGE_percent = (Integer) option.getValue();
 			return true;
 			
 		} else if ("Hidden Depth".equals(option.getName())) {

@@ -41,9 +41,6 @@ public interface IRootSearchConfig {
 	
 	public int getHiddenDepth();
 	
-	public int getThreadsCount();
-	public int getThreadMemory_InMegabytes();
-	
 	/**
 	 * EGTB Settings
 	 */
@@ -57,4 +54,9 @@ public interface IRootSearchConfig {
 	public double getTPTUsagePercent();
 	public double getEvalCacheUsagePercent();
 	public double getPawnsCacheUsagePercent();
+	
+	public int getThreadsCount();
+	public int getThreadMemory_InMegabytes();
+	
+	public double get_MEMORY_USAGE_PERCENT();
 }

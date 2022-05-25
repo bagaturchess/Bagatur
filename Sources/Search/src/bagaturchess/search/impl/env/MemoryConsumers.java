@@ -31,7 +31,9 @@ import bagaturchess.uci.api.IChannel;
 public class MemoryConsumers {
 	
 	
-	private static double MEMORY_USAGE_PERCENT 							= 0;
+	private static final double DEFAULT_MEMORY_USAGE_PERCENT 			= 0.5;
+	
+	private static double MEMORY_USAGE_PERCENT 							= DEFAULT_MEMORY_USAGE_PERCENT;
 	
 	//The static memory is between 128MB and 384MB for desktop computers.
 	//Under Android it should be less even close or equal to 0.
@@ -104,11 +106,12 @@ public class MemoryConsumers {
 		 * The selection bellow is optimized for long games.
 		 */
 		
-		if (MEMORY_USAGE_PERCENT == 0) {
+		//Set only if not set statically
+		//if (MEMORY_USAGE_PERCENT == 0) {
 			//0.29 for short games (e.g. 1/1), 0.69 for long games (e.g. 40/40)
-			double memoryUsagePercent = 0.90;//(engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.69 : 0.29;
-			MEMORY_USAGE_PERCENT = memoryUsagePercent;//Set only if not set statically
-		}
+			double memoryUsagePercent = engineConfiguration.get_MEMORY_USAGE_PERCENT(); //0.90;//(engineConfiguration.getTimeControlOptimizationType() == IRootSearchConfig.TIME_CONTROL_OPTIMIZATION_TYPE_40_40) ? 0.69 : 0.29;
+			set_MEMORY_USAGE_PERCENT(memoryUsagePercent);
+		//}
 		
 		
 		//ChannelManager.getChannel().dump(new Exception());
