@@ -116,7 +116,7 @@ public class TTable_Impl2 implements ITTable {
 				
 				if (getDepth(value) > entry.getDepth()) {
 					
-					//entry.setIsEmpty(false);
+					entry.setIsEmpty(false);
 					entry.setDepth(getDepth(value));
 					entry.setFlag(getFlag(value));
 					entry.setEval(getScore(value));
@@ -145,11 +145,9 @@ public class TTable_Impl2 implements ITTable {
 
 		for (int i = 0; i < 4; i++) {
 			
-			
 			long stored_key 	= keys[index + i];
 			
 			long value 			= values[index + i];
-			
 			
 			if ((stored_key ^ value) == key) {
 				

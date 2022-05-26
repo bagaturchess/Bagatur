@@ -13,16 +13,16 @@ import bagaturchess.bitboard.impl.utils.VarStatistic;
 public class NNUE_Input implements MoveListener {
 	
 	
-	public static final int INPUT_SIZE 		= 12 * 64;
+	public static final int INPUT_SIZE 				= 12 * 64;
 	
-	public static final int SHIFT_KING 		= 0 * 64;
-	public static final int SHIFT_PAWNS 	= 1 * 64;
-	public static final int SHIFT_KNIGHTS 	= 2 * 64;
-	public static final int SHIFT_BISHOP 	= 3 * 64;
-	public static final int SHIFT_ROOK 		= 4 * 64;
-	public static final int SHIFT_QUEEN 	= 5 * 64;
+	public static final int SHIFT_KING 				= 0 * 64;
+	public static final int SHIFT_PAWNS 			= 1 * 64;
+	public static final int SHIFT_KNIGHTS 			= 2 * 64;
+	public static final int SHIFT_BISHOP 			= 3 * 64;
+	public static final int SHIFT_ROOK 				= 4 * 64;
+	public static final int SHIFT_QUEEN 			= 5 * 64;
 
-	private static final boolean CHECK_CONSISTENCY = true;
+	private static final boolean CHECK_CONSISTENCY 	= true;
 	
 	
 	private float[] inputs;

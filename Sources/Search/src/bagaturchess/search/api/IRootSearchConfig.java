@@ -29,34 +29,53 @@ import bagaturchess.bitboard.api.IBoardConfig;
 public interface IRootSearchConfig {
 	
 	
-	public IBoardConfig getBoardConfig();
-	public IEvalConfig getEvalConfig();
+	public double get_MEMORY_USAGE_PERCENT();
+	
+	public boolean useTPT();
+	
+	public boolean useEvalCache();
+	
+	public boolean useSyzygyDTZCache();
+	
+	public int getMultiPVsCount();
 	
 	public String getSearchClassName();
-	public int getMultiPVsCount();
+	
 	public ISearchConfig_AB getSearchConfig();
-	
-	public String getBoardFactoryClassName();
-	public String getSemaphoreFactoryClassName();
-	
-	public int getHiddenDepth();
+
 	
 	/**
 	 * EGTB Settings
 	 */
 	public String getTbPath();
+	
 	public boolean useOnlineSyzygy();
+	
 	
 	/**
 	 * Memory Settings
 	 */
 	public boolean initCaches();
+	
 	public double getTPTUsagePercent();
+	
 	public double getEvalCacheUsagePercent();
+	
 	public double getPawnsCacheUsagePercent();
 	
+	
 	public int getThreadsCount();
+	
 	public int getThreadMemory_InMegabytes();
 	
-	public double get_MEMORY_USAGE_PERCENT();
+	
+	public IBoardConfig getBoardConfig();
+	
+	public IEvalConfig getEvalConfig();
+	
+	public String getBoardFactoryClassName();
+	
+	public String getSemaphoreFactoryClassName();
+	
+	public int getHiddenDepth();
 }

@@ -52,6 +52,7 @@ import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.uci.api.ChannelManager;
+import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
 import bagaturchess.search.impl.eval.cache.EvalEntry_BaseImpl;
 import bagaturchess.search.impl.eval.cache.IEvalEntry;
 
@@ -116,7 +117,13 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	@Override
 	public int getTPTUsagePercent() {
-		return (int) env.getTPT().getUsage();
+		
+		if (env.getTPT() == null) {
+			
+			return 0;
+		}
+		
+		return env.getTPT().getUsage();
 	}
 	
 	
@@ -131,11 +138,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		historyAVGScores = new VarStatistic(false);
 		
-		if (ChannelManager.getChannel() != null) {
-			ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Transposition table hitrate=" + env.getTPT().getHitRate() + ", usage=" + env.getTPT().getUsage());
-			ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Evaluation cache hitrate=" + env.getEvalCache().getHitRate() + ", usage=" + env.getEvalCache().getUsage());
-			ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Syzygy DTZ cache hitrate=" + env.getSyzygyDTZCache().getHitRate() + ", usage=" + env.getSyzygyDTZCache().getUsage());
+		/*if (ChannelManager.getChannel() != null) {
+			
+			if (env.getTPT() != null) ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Transposition table hitrate=" + env.getTPT().getHitRate() + ", usage=" + env.getTPT().getUsage());
+			
+			if (env.getEvalCache() != null) ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Evaluation cache hitrate=" + env.getEvalCache().getHitRate() + ", usage=" + env.getEvalCache().getUsage());
+			
+			if (env.getSyzygyDTZCache() != null) ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Syzygy DTZ cache hitrate=" + env.getSyzygyDTZCache().getHitRate() + ", usage=" + env.getSyzygyDTZCache().getUsage());
 		}
+		*/
 	}
 	
 	
@@ -229,36 +240,43 @@ public class Search_PVS_NWS extends SearchImpl {
 			hashkey ^= (((long)excludedMove) << 16);
 		}
 		
-		int tpt_depth = 0;
-		int ttMove = 0;
-		int ttValue = 0;
-		int ttFlag = -1;
-		boolean isTTLowerBound = false;
+		
+		int ttMove 									= 0;
+		int ttFlag 									= -1;
+		//int ttValue 								= IEvaluator.MIN_EVAL;
+		
+		boolean isTTLowerBound 						= false;
 		boolean isTTDepthEnoughForSingularExtension = false;
-		env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
-		if (!tt_entries_per_ply[ply].isEmpty()) {
+		
+		if (env.getTPT() != null) {
 			
-			tpt_depth = tt_entries_per_ply[ply].getDepth();
-			ttMove = tt_entries_per_ply[ply].getBestMove();
-			ttValue = tt_entries_per_ply[ply].getEval();
-			ttFlag = tt_entries_per_ply[ply].getFlag();
+			env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
 			
-			isTTLowerBound = ttFlag == ITTEntry.FLAG_LOWER;
-			isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
-			
-			if (getSearchConfig().isOther_UseTPTScores()) {
-				if (tpt_depth >= depth) {
-					if (ttFlag == ITTEntry.FLAG_EXACT) {
-						extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
-						return node.eval;
-					} else {
-						if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
+			if (!tt_entries_per_ply[ply].isEmpty()) {
+				
+				ttMove = tt_entries_per_ply[ply].getBestMove();
+				ttFlag = tt_entries_per_ply[ply].getFlag();
+				int ttValue = tt_entries_per_ply[ply].getEval();
+				
+				int tpt_depth = tt_entries_per_ply[ply].getDepth();
+				
+				isTTLowerBound = ttFlag == ITTEntry.FLAG_LOWER;
+				isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
+				
+				if (getSearchConfig().isOther_UseTPTScores()) {
+					if (tpt_depth >= depth) {
+						if (ttFlag == ITTEntry.FLAG_EXACT) {
 							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 							return node.eval;
-						}
-						if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
-							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
-							return node.eval;
+						} else {
+							if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
+								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
+								return node.eval;
+							}
+							if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
+								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
+								return node.eval;
+							}
 						}
 					}
 				}
@@ -453,7 +471,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
 			
-			if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
+			/*if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
 				
 				if (ttFlag == ITTEntry.FLAG_EXACT
 						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
@@ -461,13 +479,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					) {
 					eval = ttValue;
 				}
-			}
+			}*/
 			
 			
 			if (ttFlag == -1 && depth >= 2) {
 				
 				depth -= 1;
 			}
+			
 			
 			
 			if (eval >= beta) {
@@ -529,7 +548,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			&& isTTDepthEnoughForSingularExtension
 			) {
 			
-	        int singularBeta = ttValue - 50;
+	        int singularBeta = 0; //ttValue - 50;
 	        int reduction = depth / 2;
 	        
 	        int singularValue = search(mediator, info, pvman, evaluator, cb, moveGen, ply,
@@ -827,7 +846,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (!SearchUtils.isMateVal(bestScore)) {
-			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
+			
+			if (env.getTPT() != null) {
+				
+				env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
+			}
 		}
 		
 		//validatePV(node, depth, isPv);
@@ -870,55 +893,60 @@ public class Search_PVS_NWS extends SearchImpl {
 	    	return node.eval;
 	    }
 	    
-	    int ttValue = 0;
-	    int ttFlag = -1;
-		int ttMove = 0;
-		env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
-		if (!tt_entries_per_ply[ply].isEmpty()) {
+	   // int ttValue 	= IEvaluator.MIN_EVAL;
+	    int ttFlag 		= -1;
+		int ttMove 		= 0;
+		
+		if (env.getTPT() != null) {
 			
-			ttValue = tt_entries_per_ply[ply].getEval();
-			ttFlag = tt_entries_per_ply[ply].getFlag();
+			env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
 			
-			if (getSearchConfig().isOther_UseTPTScores()) {
+			if (!tt_entries_per_ply[ply].isEmpty()) {
 				
-				if (ttFlag == ITTEntry.FLAG_EXACT) {
+				int ttValue = tt_entries_per_ply[ply].getEval();
+				ttFlag = tt_entries_per_ply[ply].getFlag();
+				
+				if (getSearchConfig().isOther_UseTPTScores()) {
 					
-			    	node.eval = ttValue;
-					
-			    	return node.eval;
-			    	
-				} else {
-					
-					if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
+					if (ttFlag == ITTEntry.FLAG_EXACT) {
 						
 				    	node.eval = ttValue;
 						
 				    	return node.eval;
-					}
-					
-					if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
+				    	
+					} else {
 						
-				    	node.eval = ttValue;
+						if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
+							
+					    	node.eval = ttValue;
+							
+					    	return node.eval;
+						}
 						
-				    	return node.eval;
+						if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
+							
+					    	node.eval = ttValue;
+							
+					    	return node.eval;
+						}
 					}
 				}
+				
+				ttMove = tt_entries_per_ply[ply].getBestMove();
 			}
-			
-			ttMove = tt_entries_per_ply[ply].getBestMove();
 		}
 		
 		
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		
-		if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
+		/*if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
 			if (ttFlag == ITTEntry.FLAG_EXACT
 					|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
 					|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
 				) {
 				eval = ttValue;
 			}
-		}
+		}*/
 		
 		if (eval >= beta) {
 			
@@ -1038,8 +1066,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		moveGen.endPly();
 		
+		
+		//TODO: Maybe this puts are too often and SMP version could have [problems 10 times lower NPS - to check
 		if (!SearchUtils.isMateVal(alpha) && bestScore > eval) {
-			env.getTPT().put(cb.zobristKey, 0, bestScore, alphaOrig, beta, bestMove);
+			
+			if (env.getTPT() != null) {
+				
+				env.getTPT().put(cb.zobristKey, 0, bestScore, alphaOrig, beta, bestMove);
+			}
 		}
 		
 		
@@ -1124,22 +1158,25 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		boolean draw = false;
 		
-		if (isPv && ((BoardImpl) env.getBitboard()).getChessBoard().isValidMove(result.bestmove)) {
+		if (env.getTPT() != null) {
 			
-			env.getBitboard().makeMoveForward(result.bestmove);
-			
-			env.getTPT().get(env.getBitboard().getHashKey(), tt_entries_per_ply[ply]);
-			
-			if (!tt_entries_per_ply[ply].isEmpty()) {
-				draw = extractFromTT(ply + 1, result.child, tt_entries_per_ply[ply], info, isPv);
-				if (draw) {
-					result.eval = getDrawScores(-1);
-				} else {
-					result.leaf = false;
+			if (isPv && ((BoardImpl) env.getBitboard()).getChessBoard().isValidMove(result.bestmove)) {
+				
+				env.getBitboard().makeMoveForward(result.bestmove);
+				
+				env.getTPT().get(env.getBitboard().getHashKey(), tt_entries_per_ply[ply]);
+				
+				if (!tt_entries_per_ply[ply].isEmpty()) {
+					draw = extractFromTT(ply + 1, result.child, tt_entries_per_ply[ply], info, isPv);
+					if (draw) {
+						result.eval = getDrawScores(-1);
+					} else {
+						result.leaf = false;
+					}
 				}
+				
+				env.getBitboard().makeMoveBackward(result.bestmove);
 			}
-			
-			env.getBitboard().makeMoveBackward(result.bestmove);
 		}
 		
 		return draw;

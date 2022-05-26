@@ -313,9 +313,10 @@ public class TimeSaver {
 								}
 
 								
-							} else {
+							} else if (false) {
 								
-								ITTable transposition_table = ((UCISearchAdaptorImpl_Base) search_adapter).getSharedData().getTranspositionTableProvider().getTPT();
+								//ITTable transposition_table = ((UCISearchAdaptorImpl_Base) search_adapter).getSharedData().getTranspositionTableProvider().getTPT();
+								ITTable transposition_table = null;
 								
 								ITTEntry tt_entry = new TTEntry_BaseImpl();
 								

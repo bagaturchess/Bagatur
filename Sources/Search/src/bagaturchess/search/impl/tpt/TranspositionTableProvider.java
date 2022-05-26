@@ -36,11 +36,20 @@ public class TranspositionTableProvider implements ITTable {
 	
 	
 	public ITTable getTPT() {
+		
 		return this;
 	}
 
 
+	@Override
+	public void correctAllDepths(int reduction) {
+		
+		//Do nothing
+	}
+	
+	
 	public void clear() {
+		
 		tpts.clear();
 	}
 
@@ -55,6 +64,11 @@ public class TranspositionTableProvider implements ITTable {
 			ITTable current_tpt = tpts.get(i);
 			
 			current_tpt.get(key, entry);
+			
+			if (!entry.isEmpty()) {
+				
+				break;
+			}
 		}
 	}
 
@@ -100,10 +114,5 @@ public class TranspositionTableProvider implements ITTable {
 		}
 		
 		return total_hitrate / tpts.size();
-	}
-	
-	
-	@Override
-	public void correctAllDepths(int reduction) {
 	}
 }

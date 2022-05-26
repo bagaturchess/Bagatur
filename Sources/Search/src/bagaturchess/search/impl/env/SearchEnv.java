@@ -47,14 +47,21 @@ public class SearchEnv {
 	private SharedData shared;
 	
 	private IBitBoard bitboard;
+	
 	private IEvaluator eval;
+	
 	private Tactics tactics;
 	
+	
+	private ITTable tpt;
 	private IEvalCache evalCache;
 	private IEvalCache syzygyDTZCache;
-	private PawnsEvalCache pawnsCache;
-	private ITTable tpt;
+	//private PawnsEvalCache pawnsCache;
 
+	private boolean checked_tpt;
+	private boolean checked_evalCache;
+	private boolean checked_syzygyDTZCache;
+	
 	
 	private IHistoryTable history_all;
 	private IHistoryTable history_incheck;
@@ -81,37 +88,41 @@ public class SearchEnv {
 	
 	
 	public OrderingStatistics getOrderingStatistics() {
+		
 		return orderingStatistics;
 	}
 	
 	
 	public ISearchMoveListFactory getMoveListFactory() {
+		
 		return moveListFactory;
 	}
 	
 	
 	public OpeningBook getOpeningBook() {
+		
 		return shared.getOpeningBook();
 	}
 
+	
 	public IHistoryTable getHistory_All() {
+		
 		return history_all;
 	}
 
+	
 	public IHistoryTable getHistory_InCheck() {
+		
 		return history_incheck;
 	}
 	
-	public PawnsEvalCache getPawnsCache() {
-		if (pawnsCache == null) {
-			pawnsCache = shared.getAndRemovePawnsCache();
-		}
-		return pawnsCache;
-	}
 	
 	public int getTPTUsagePercent() {
+		
 		if (tpt == null) {
+			
 			return 0;
+			
 		} else {
 			return tpt.getUsage();
 		}
@@ -119,8 +130,54 @@ public class SearchEnv {
 	
 	
 	public ITTable getTPT() {
-		return shared.getTranspositionTableProvider().getTPT();
+		
+		if (!checked_tpt && tpt == null) {
+			
+			tpt = shared.getAndRemoveTranspositionTable();
+			
+			checked_tpt = true;
+		}
+		
+		return tpt;
 	}
+	
+	
+	public IEvalCache getEvalCache() {
+		
+		if (!checked_evalCache && evalCache == null) {
+			
+			evalCache = shared.getAndRemoveEvalCache();
+			
+			checked_evalCache = true;
+		}
+		
+		return evalCache;
+	}
+	
+	
+	public IEvalCache getSyzygyDTZCache() {
+		
+		if (!checked_syzygyDTZCache && syzygyDTZCache == null) {
+			
+			syzygyDTZCache = shared.getSyzygyDTZCache();
+			
+			checked_syzygyDTZCache = true;
+		}
+		
+		return syzygyDTZCache;
+	}
+	
+	
+	/*public PawnsEvalCache getPawnsCache() {
+		
+		if (!checked_evalCache && pawnsCache == null) {
+			
+			pawnsCache = shared.getAndRemovePawnsCache();
+		}
+		
+		return pawnsCache;
+	}
+	*/
 	
 	
 	public ITTable getTPTQS() {
@@ -129,9 +186,9 @@ public class SearchEnv {
 	
 	
 	public IBitBoard getBitboard() {
-		if (bitboard.getPawnsCache() != getPawnsCache()) {
+		/*if (bitboard.getPawnsCache() != getPawnsCache()) {
 			bitboard.setPawnsCache(getPawnsCache());
-		}
+		}*/
 		return bitboard;
 	}
 	
@@ -157,20 +214,6 @@ public class SearchEnv {
 	public Tactics getTactics() {
 		return tactics;
 	}
-
-	public IEvalCache getEvalCache() {
-		if (evalCache == null) {
-			evalCache = shared.getAndRemoveEvalCache();
-		}
-		return evalCache;
-	}
-	
-	public IEvalCache getSyzygyDTZCache() {
-		if (syzygyDTZCache == null) {
-			syzygyDTZCache = shared.getSyzygyDTZCache();
-		}
-		return syzygyDTZCache;
-	}
 	
 	public IRootSearchConfig getEngineConfiguration() {
 		return shared.getEngineConfiguration();
@@ -186,7 +229,7 @@ public class SearchEnv {
 		String result = "";
 		//result += shared.toString();
 		result += "Eval Cache HIT RATE is: " + getEvalCache().getHitRate();
-		result += "; Pawn Cache HIT RATE is: " + getPawnsCache().getHitRate();
+		//result += "; Pawn Cache HIT RATE is: " + getPawnsCache().getHitRate();
 		result += "\r\nMOVE ORDERING STATISTICS\r\n" + getMoveListFactory().toString();
 		
 		return result;

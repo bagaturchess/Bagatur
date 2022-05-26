@@ -51,22 +51,29 @@ public class MemoryConsumers {
 	
 	
 	public static void set_MEMORY_USAGE_PERCENT(double val) {
+		
 		MEMORY_USAGE_PERCENT = val;	
 	}
 	
 	
 	public static void set_STATIC_JVM_MEMORY(int static_jvm_memory_in_megabytes) {
+		
 		STATIC_JVM_MEMORY_IN_MEGABYTES = static_jvm_memory_in_megabytes;	
 	}
 	
 	
 	static {
+		
 		try {
+			
 			if (OpeningBookFactory.getBook() == null) {
+				
 				InputStream is_w_openning_book = new FileInputStream("./data/w.ob");
 				InputStream is_b_openning_book = new FileInputStream("./data/b.ob");
+				
 				OpeningBookFactory.initBook(is_w_openning_book, is_b_openning_book);				
 			}
+			
 		} catch(Throwable t) {
 			
 			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Unable to load Openning Book. Error while openning file streams: " + t.getMessage());
@@ -79,10 +86,10 @@ public class MemoryConsumers {
 	//private SeeMetadata seeMetadata;
 	private OpeningBook openingBook;
 	
-	private TranspositionTableProvider ttable_provider;
+	private List<ITTable> ttable_provider;
 	private List<IEvalCache> evalCache;
 	private List<IEvalCache> syzygyDTZCache;
-	private List<PawnsEvalCache> pawnsCache;
+	//private List<PawnsEvalCache> pawnsCache;
 	
 	private IChannel channel;
 	
@@ -248,39 +255,53 @@ public class MemoryConsumers {
 		
 		long size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, (long) ((engineConfiguration.getTPTUsagePercent() * availableMemoryInBytes) / TRANSPOSITION_TABLES_COUNT));
 		
-		List<ITTable> ttables = new ArrayList<ITTable>();
+		
+		ITTable global_ttable = new TTable_Impl2(size_tpt);
+		
+		/*ITTable global_ttable = null;
 		
 		for (int i = 0; i < TRANSPOSITION_TABLES_COUNT; i++) {
 			
 			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Creating Transposition Table for the current Threads Group ...");
-			ITTable current_ttable = new TTable_Impl2(size_tpt);
+			
+			if (global_ttable == null) {
+				
+				global_ttable = new TTable_Impl2(size_tpt);
+			}
+
+			//ITTable current_ttable = new TTable_Impl2(size_tpt);
+			ITTable current_ttable = global_ttable;
+			
 			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Transposition Table created.");
 			
 			ttables.add(current_ttable);
-		}
-		
-		ttable_provider = new TranspositionTableProvider(ttables);
+		}*/
 		
 		
 		long size_ec = Math.max(SIZE_MIN_ENTRIES_EC, (long) ((engineConfiguration.getEvalCacheUsagePercent() * availableMemoryInBytes) / THREADS_COUNT));
 		long syzygy_ec = Math.max(SIZE_MIN_ENTRIES_EC, (long) ((MEM_USAGE_SYZYGY_DTZ_CACHE * availableMemoryInBytes) / THREADS_COUNT));
 		
-		int size_pc = SIZE_MIN_ENTRIES_PEC;
 		
-		
-		//Eval caches
+		//Caches
+		ttable_provider = new ArrayList<ITTable>();
 		evalCache 		= new Vector<IEvalCache>();
 		syzygyDTZCache  = new Vector<IEvalCache>();
-		pawnsCache		= new Vector<PawnsEvalCache>();
+		//pawnsCache		= new Vector<PawnsEvalCache>();
 		
 		for (int i = 0; i < THREADS_COUNT; i++) {
 			
-			evalCache.add(new EvalCache_Impl2(size_ec));
+			ttable_provider.add(!engineConfiguration.useTPT() ? null : global_ttable);
 			
-			syzygyDTZCache.add(new EvalCache_Impl2(syzygy_ec));
+			evalCache.add(!engineConfiguration.useEvalCache() ? null : new EvalCache_Impl2(size_ec));
 			
+			syzygyDTZCache.add(!engineConfiguration.useSyzygyDTZCache() ? null : new EvalCache_Impl2(syzygy_ec));
+			
+			/*
+			int size_pc = SIZE_MIN_ENTRIES_PEC;
 			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName());
 			pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
+			pawnsCache.add(null);
+			*/
 		}		
 	}
 	
@@ -318,7 +339,13 @@ public class MemoryConsumers {
 	}
 
 
-	public TranspositionTableProvider getTPTProvider() {
+	/*public TranspositionTableProvider getTPTProvider() {
+		return ttable_provider;
+	}
+	*/
+	
+	
+	public List<ITTable> getTPTProvider() {
 		return ttable_provider;
 	}
 	
@@ -333,15 +360,15 @@ public class MemoryConsumers {
 	}
 	
 	
-	public List<PawnsEvalCache> getPawnsCache() {
+	/*public List<PawnsEvalCache> getPawnsCache() {
 		return pawnsCache;
-	}
+	}*/
 	
 	
 	public void clear() {
-		if (ttable_provider != null) ttable_provider.clear();
+		//if (ttable_provider != null) ttable_provider.clear();
 		if (evalCache != null) evalCache.clear();
 		if (syzygyDTZCache != null) syzygyDTZCache.clear(); 
-		if (pawnsCache != null) pawnsCache.clear();
+		//if (pawnsCache != null) pawnsCache.clear();
 	}
 }

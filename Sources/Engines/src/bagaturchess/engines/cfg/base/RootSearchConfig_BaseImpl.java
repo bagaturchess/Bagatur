@@ -25,35 +25,54 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	protected static final double MEM_USAGE_PAWNCACHE 	= 0.00;
 	
 	
-	private String DEFAULT_TbPath 			= getDefaultTBPath();
+	private static final String DEFAULT_TbPath 						= getDefaultTBPath();
 	
-	private boolean DEFAULT_SyzygyOnline 	= false;
+	private static final boolean DEFAULT_SyzygyOnline 				= false;
 	
-	private int DEFAULT_MEM_USAGE_percent 	= 70;
+	private static final int DEFAULT_MEM_USAGE_percent 				= 70;
 	
-	private UCIOption[] options 			= new UCIOption[] {
+	private static final boolean DEFAULT_UseTranspositionTable 		= true;
+	private static final boolean DEFAULT_UseEvalCache 				= true;
+	private static final boolean DEFAULT_UseSyzygyDTZCache 			= true;
+	
+	private UCIOption[] options 						= new UCIOption[] {
 			new UCIOptionSpin_Integer("MemoryUsagePercent", new Integer(1), "type spin default " + DEFAULT_MEM_USAGE_percent + " min 50 max 90"),
+			new UCIOptionCombo("UseTranspositionTable", "" + DEFAULT_UseTranspositionTable, "type check default " + DEFAULT_UseTranspositionTable),
+			new UCIOptionCombo("UseEvalCache", "" + DEFAULT_UseEvalCache, "type check default " + DEFAULT_UseEvalCache),
+			new UCIOptionCombo("UseSyzygyDTZCache ", "" + DEFAULT_UseSyzygyDTZCache, "type check default " + DEFAULT_UseSyzygyDTZCache),
 			new UCIOptionString("SyzygyPath", DEFAULT_TbPath, "type string default " + DEFAULT_TbPath),
 			new UCIOptionCombo("SyzygyOnline", "" + DEFAULT_SyzygyOnline, "type check default " + DEFAULT_SyzygyOnline),
 			new UCIOptionSpin_Integer("MultiPV", new Integer(1), "type spin default 1 min 1 max 100"),
 			//new UCIOptionSpin_Integer("Hidden Depth", 0, "type spin default 0 min 0 max 10"),
 	};
 	
+	
 	private String searchImpl_ClassName;
+	
 	private ISearchConfig_AB searchImpl_ConfigObj;
 	
+	
 	private IBoardConfig boardCfg;
+	
 	private IEvalConfig evalCfg;
 	
-	private int multiPVsCount 				= 1;
+	
+	private int MEM_USAGE_percent 						= DEFAULT_MEM_USAGE_percent;
+	
+	private boolean useTranspositionTable 				= DEFAULT_UseTranspositionTable;
+	private boolean useEvalCache 						= DEFAULT_UseEvalCache;
+	private boolean useSyzygyDTZCache 					= DEFAULT_UseSyzygyDTZCache;
+	
+	
+	private int multiPVsCount 							= 1;
+	
 	
 	private String TbPath = DEFAULT_TbPath;
 	
 	private boolean use_online_syzygy = DEFAULT_SyzygyOnline;
 	
-	private int MEM_USAGE_percent 			= DEFAULT_MEM_USAGE_percent;
 	
-	private int hiddenDepth 				= 0;
+	private int hiddenDepth 							= 0;
 	
 	
 	public RootSearchConfig_BaseImpl(String[] args) {
@@ -221,6 +240,29 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	
 	@Override
+	public boolean useTPT() {
+		
+		return useTranspositionTable;
+	}
+
+
+
+	@Override
+	public boolean useEvalCache() {
+		
+		return useEvalCache;
+	}
+
+
+
+	@Override
+	public boolean useSyzygyDTZCache() {
+		
+		return useSyzygyDTZCache;
+	}
+	
+	
+	@Override
 	public void registerProviders(IUCIOptionsRegistry registry) {
 		
 		registry.registerProvider(this);
@@ -245,25 +287,54 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	public boolean applyOption(UCIOption option) {
 		
 		if ("MultiPV".equals(option.getName())) {
-			multiPVsCount = (Integer) option.getValue();
-			return true;
 			
-		} else if ("SyzygyPath".equals(option.getName())) {
-			TbPath = (String) option.getValue();
-			return true;
-		
-		} else if ("SyzygyOnline".equals(option.getName())) {
-			use_online_syzygy = option.getValue().equals(true);
+			multiPVsCount = (Integer) option.getValue();
+			
 			return true;
 			
 		} else if ("MemoryUsagePercent".equals(option.getName())) {
+			
 			MEM_USAGE_percent = (Integer) option.getValue();
+			
+			return true;
+			
+		} else if ("UseTranspositionTable".equals(option.getName())) {
+			
+			useTranspositionTable = option.getValue().equals(true);
+			
+			return true;
+			
+		} else if ("UseEvalCache".equals(option.getName())) {
+			
+			useEvalCache = option.getValue().equals(true);
+			
+			return true;
+			
+		} else if ("UseSyzygyDTZCache".equals(option.getName())) {
+			
+			useSyzygyDTZCache = option.getValue().equals(true);
+			
+			return true;
+			
+		} else if ("SyzygyPath".equals(option.getName())) {
+			
+			TbPath = (String) option.getValue();
+			
+			return true;
+		
+		} else if ("SyzygyOnline".equals(option.getName())) {
+			
+			use_online_syzygy = option.getValue().equals(true);
+			
 			return true;
 			
 		} else if ("Hidden Depth".equals(option.getName())) {
+			
 			hiddenDepth = (Integer) option.getValue();
+			
 			return true;
 		}
+		
 		
 		return false;
 	}

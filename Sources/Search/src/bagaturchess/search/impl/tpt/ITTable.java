@@ -19,10 +19,7 @@
  */
 package bagaturchess.search.impl.tpt;
 
-/**
- * @author I027638
- *
- */
+
 public interface ITTable {
 
 	public void get(long key, ITTEntry entry);
