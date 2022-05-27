@@ -243,7 +243,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int ttMove 									= 0;
 		int ttFlag 									= -1;
-		//int ttValue 								= IEvaluator.MIN_EVAL;
+		int ttValue 								= IEvaluator.MIN_EVAL;
 		
 		boolean isTTLowerBound 						= false;
 		boolean isTTDepthEnoughForSingularExtension = false;
@@ -256,7 +256,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				ttMove = tt_entries_per_ply[ply].getBestMove();
 				ttFlag = tt_entries_per_ply[ply].getFlag();
-				int ttValue = tt_entries_per_ply[ply].getEval();
+				ttValue = tt_entries_per_ply[ply].getEval();
 				
 				int tpt_depth = tt_entries_per_ply[ply].getDepth();
 				
@@ -470,17 +470,19 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
-			
-			/*if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
+			if (ttValue != IEvaluator.MIN_EVAL) {
 				
-				if (ttFlag == ITTEntry.FLAG_EXACT
-						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
-						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
-					) {
-					eval = ttValue;
+				if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
+					
+					if (ttFlag == ITTEntry.FLAG_EXACT
+							|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
+							|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
+						) {
+						
+						eval = ttValue;
+					}
 				}
-			}*/
-			
+			}
 			
 			if (ttFlag == -1 && depth >= 2) {
 				
@@ -893,7 +895,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	    	return node.eval;
 	    }
 	    
-	   // int ttValue 	= IEvaluator.MIN_EVAL;
+	    int ttValue 	= IEvaluator.MIN_EVAL;
 	    int ttFlag 		= -1;
 		int ttMove 		= 0;
 		
@@ -903,7 +905,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!tt_entries_per_ply[ply].isEmpty()) {
 				
-				int ttValue = tt_entries_per_ply[ply].getEval();
+				ttValue = tt_entries_per_ply[ply].getEval();
 				ttFlag = tt_entries_per_ply[ply].getFlag();
 				
 				if (getSearchConfig().isOther_UseTPTScores()) {
@@ -939,14 +941,20 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		
-		/*if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
-			if (ttFlag == ITTEntry.FLAG_EXACT
-					|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
-					|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
-				) {
-				eval = ttValue;
+		if (ttValue != IEvaluator.MIN_EVAL) {
+			
+			if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
+				
+				if (ttFlag == ITTEntry.FLAG_EXACT
+						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
+						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
+					) {
+					
+					eval = ttValue;
+				}
 			}
-		}*/
+		}
+		
 		
 		if (eval >= beta) {
 			
