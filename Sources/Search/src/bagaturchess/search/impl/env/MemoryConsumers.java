@@ -8,22 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import bagaturchess.bitboard.api.PawnsEvalCache;
-import bagaturchess.bitboard.impl.datastructs.lrmmap.DataObjectFactory;
-import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
-import bagaturchess.bitboard.impl.utils.BinarySemaphore_Dummy;
-import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.opening.api.OpeningBookFactory;
 import bagaturchess.search.api.IRootSearchConfig;
-import bagaturchess.search.impl.eval.cache.EvalCache_Impl1;
 import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.tpt.ITTable;
-import bagaturchess.search.impl.tpt.TTable_Impl1;
 import bagaturchess.search.impl.tpt.TTable_Impl2;
-import bagaturchess.search.impl.tpt.TranspositionTableProvider;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.api.IChannel;
 
@@ -83,13 +75,11 @@ public class MemoryConsumers {
 	
 	private IRootSearchConfig engineConfiguration;
 	
-	//private SeeMetadata seeMetadata;
 	private OpeningBook openingBook;
 	
 	private List<ITTable> ttable_provider;
 	private List<IEvalCache> evalCache;
 	private List<IEvalCache> syzygyDTZCache;
-	//private List<PawnsEvalCache> pawnsCache;
 	
 	private IChannel channel;
 	
@@ -286,7 +276,6 @@ public class MemoryConsumers {
 		ttable_provider = new ArrayList<ITTable>();
 		evalCache 		= new Vector<IEvalCache>();
 		syzygyDTZCache  = new Vector<IEvalCache>();
-		//pawnsCache		= new Vector<PawnsEvalCache>();
 		
 		for (int i = 0; i < THREADS_COUNT; i++) {
 			
@@ -337,12 +326,6 @@ public class MemoryConsumers {
 	public OpeningBook getOpeningBook() {
 		return openingBook;
 	}
-
-
-	/*public TranspositionTableProvider getTPTProvider() {
-		return ttable_provider;
-	}
-	*/
 	
 	
 	public List<ITTable> getTPTProvider() {
@@ -360,15 +343,12 @@ public class MemoryConsumers {
 	}
 	
 	
-	/*public List<PawnsEvalCache> getPawnsCache() {
-		return pawnsCache;
-	}*/
-	
-	
 	public void clear() {
-		//if (ttable_provider != null) ttable_provider.clear();
+		
+		if (ttable_provider != null) ttable_provider.clear();
+		
 		if (evalCache != null) evalCache.clear();
+		
 		if (syzygyDTZCache != null) syzygyDTZCache.clear(); 
-		//if (pawnsCache != null) pawnsCache.clear();
 	}
 }

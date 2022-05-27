@@ -470,6 +470,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 			
+			
 			if (ttValue != IEvaluator.MIN_EVAL) {
 				
 				if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
@@ -484,11 +485,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 			
+			
 			if (ttFlag == -1 && depth >= 2) {
 				
 				depth -= 1;
 			}
-			
 			
 			
 			if (eval >= beta) {
