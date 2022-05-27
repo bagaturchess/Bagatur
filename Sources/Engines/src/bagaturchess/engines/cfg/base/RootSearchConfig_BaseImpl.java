@@ -339,13 +339,13 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 		return false;
 	}
 	
-
+	
 	@Override
 	public String getBoardFactoryClassName() {
 		throw new UnsupportedOperationException();
 	}
-
-
+	
+	
 	@Override
 	public String getSemaphoreFactoryClassName() {
 		return bagaturchess.bitboard.impl.utils.BinarySemaphoreFactory_Dummy.class.getName();
