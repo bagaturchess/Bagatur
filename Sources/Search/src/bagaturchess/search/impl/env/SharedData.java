@@ -57,14 +57,21 @@ public class SharedData {
 	
 	
 	private void init(IRootSearchConfig _engineConfiguration) {
+		
 		engineConfiguration = _engineConfiguration;
+		
 		searchConfig = engineConfiguration.getSearchConfig();
 		
 		try {
+			
 			String className = engineConfiguration.getEvalConfig().getEvaluatorFactoryClassName();
+			
 			evaluatorFactory = (IEvaluatorFactory) SharedData.class.getClassLoader().loadClass(className).newInstance();
+			
 		} catch (Exception e) {
+			
 			e.printStackTrace();
+			
 			throw new IllegalStateException(e);
 		}
 	}
@@ -79,10 +86,6 @@ public class SharedData {
 		return evaluatorFactory;
 	}
 	
-	
-	/*public TranspositionTableProvider getTranspositionTableProvider() {
-		return memoryConsumers.getTPTProvider();
-	}*/
 	
 	public ITTable getAndRemoveTranspositionTable() {
 		return memoryConsumers.getTPTProvider().remove(0);

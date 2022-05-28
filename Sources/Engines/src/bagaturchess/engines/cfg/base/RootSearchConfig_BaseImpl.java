@@ -20,9 +20,9 @@ import bagaturchess.uci.impl.commands.options.UCIOptionString;
 public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IUCIOptionsProvider {
 	
 	
-	protected static final double MEM_USAGE_TPT 		= 0.50;
-	protected static final double MEM_USAGE_EVALCACHE 	= 0.25;
-	protected static final double MEM_USAGE_PAWNCACHE 	= 0.00;
+	protected static final double MEM_USAGE_TPT 					= 0.50;
+	protected static final double MEM_USAGE_EVALCACHE 				= 0.25;
+	protected static final double MEM_USAGE_PAWNCACHE 				= 0.00;
 	
 	
 	private static final String DEFAULT_TbPath 						= getDefaultTBPath();
@@ -35,15 +35,20 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private static final boolean DEFAULT_UseEvalCache 				= true;
 	private static final boolean DEFAULT_UseSyzygyDTZCache 			= true;
 	
-	private UCIOption[] options 						= new UCIOption[] {
-			new UCIOptionSpin_Integer("MemoryUsagePercent", new Integer(1), "type spin default " + DEFAULT_MEM_USAGE_percent + " min 50 max 90"),
-			new UCIOptionCombo("UseTranspositionTable", "" + DEFAULT_UseTranspositionTable, "type check default " + DEFAULT_UseTranspositionTable),
-			new UCIOptionCombo("UseEvalCache", "" + DEFAULT_UseEvalCache, "type check default " + DEFAULT_UseEvalCache),
-			new UCIOptionCombo("UseSyzygyDTZCache ", "" + DEFAULT_UseSyzygyDTZCache, "type check default " + DEFAULT_UseSyzygyDTZCache),
-			new UCIOptionString("SyzygyPath", DEFAULT_TbPath, "type string default " + DEFAULT_TbPath),
-			new UCIOptionCombo("SyzygyOnline", "" + DEFAULT_SyzygyOnline, "type check default " + DEFAULT_SyzygyOnline),
-			new UCIOptionSpin_Integer("MultiPV", new Integer(1), "type spin default 1 min 1 max 100"),
-			//new UCIOptionSpin_Integer("Hidden Depth", 0, "type spin default 0 min 0 max 10"),
+	private UCIOption[] options 									= new UCIOption[] {
+			
+			new UCIOptionSpin_Integer("MemoryUsagePercent"	, DEFAULT_MEM_USAGE_percent				, "type spin default " + DEFAULT_MEM_USAGE_percent + " min 50 max 90"),
+			
+			new UCIOptionCombo("UseTranspositionTable"		, "" + DEFAULT_UseTranspositionTable	, "type check default " + DEFAULT_UseTranspositionTable),
+			new UCIOptionCombo("UseEvalCache"				, "" + DEFAULT_UseEvalCache				, "type check default " + DEFAULT_UseEvalCache),
+			new UCIOptionCombo("UseSyzygyDTZCache "			, "" + DEFAULT_UseSyzygyDTZCache		, "type check default " + DEFAULT_UseSyzygyDTZCache),
+			
+			new UCIOptionString("SyzygyPath"				, DEFAULT_TbPath						, "type string default " + DEFAULT_TbPath),
+			
+			new UCIOptionCombo("SyzygyOnline"				, "" + DEFAULT_SyzygyOnline				, "type check default " + DEFAULT_SyzygyOnline),
+			
+			new UCIOptionSpin_Integer("MultiPV"				, new Integer(1)						, "type spin default 1 min 1 max 100"),
+			//new UCIOptionSpin_Integer("Hidden Depth"		, 0										, "type spin default 0 min 0 max 10"),
 	};
 	
 	
@@ -160,8 +165,9 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	
 	@Override
-	public int getHiddenDepth() {
-		return hiddenDepth;
+	public boolean initCaches() {
+		
+		return true;
 	}
 	
 	
@@ -201,6 +207,19 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	public IEvalConfig getEvalConfig() {
 		
 		return evalCfg;
+	}
+	
+	
+	@Override
+	public String getTbPath() {
+		return TbPath;
+	}
+	
+	
+	@Override
+	public boolean useOnlineSyzygy() {
+		
+		return use_online_syzygy;
 	}
 	
 	
@@ -259,6 +278,12 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	public boolean useSyzygyDTZCache() {
 		
 		return useSyzygyDTZCache;
+	}
+	
+	
+	@Override
+	public int getHiddenDepth() {
+		return hiddenDepth;
 	}
 	
 	
@@ -349,25 +374,6 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	@Override
 	public String getSemaphoreFactoryClassName() {
 		return bagaturchess.bitboard.impl.utils.BinarySemaphoreFactory_Dummy.class.getName();
-	}
-
-
-	@Override
-	public String getTbPath() {
-		return TbPath;
-	}
-	
-	
-	@Override
-	public boolean useOnlineSyzygy() {
-		
-		return use_online_syzygy;
-	}
-	
-	
-	@Override
-	public boolean initCaches() {
-		return true;
 	}
 	
 	

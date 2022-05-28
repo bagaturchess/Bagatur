@@ -132,12 +132,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	@Override
-	public int getTPTUsagePercent() {
-		return (int) TTUtil.getUsagePercentage() / 10;
-	}
-	
-	
 	public void newSearch() {
 		
 		super.newSearch();

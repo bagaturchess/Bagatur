@@ -71,19 +71,24 @@ public class TTable_Impl2 implements ITTable {
 
 	@Override
 	public int getUsage() {
+		
 		return (int) (counter_usage * 100 / keys.length);
 	}
 	
 	
 	@Override
 	public int getHitRate() {
+		
 		if (counter_tries == 0) return 0;
+		
 		return (int) (counter_hits * 100 / counter_tries);
 	}
 	
 	
 	@Override
 	public void correctAllDepths(final int reduction) {
+		
+		//Do nothing
 	}
 	
 	
@@ -93,48 +98,49 @@ public class TTable_Impl2 implements ITTable {
 		counter_tries++;
 		
 		if (counter_tries % 100000000 == 0) {
-			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("TTable_Impl2.get: TableID=" + this.hashCode() + ", HitRate=" + getHitRate() + "%, Usage=" + getUsage() + "%");
+			
+			if (ChannelManager.getChannel() != null) {
+				
+				ChannelManager.getChannel().dump(
+						"TTable_Impl2.get: TableID=" + this.hashCode() +
+						", HitRate=" + getHitRate() +
+						"%, Usage=" + getUsage() + "%");
+			}
 		}
+		
+		
+		//TODO: Consider!!!
+		entry.setIsEmpty(true);
+		
 		
 		long value = getTTValue(key);
 		
-		if (entry.isEmpty()) {
+		if (value != 0) {
 			
-			if (value != 0) {
-				
-				entry.setIsEmpty(false);
-				
-				entry.setDepth(getDepth(value));
-				entry.setFlag(getFlag(value));
-				entry.setEval(getScore(value));
-				entry.setBestMove(getMove(value));
-			}
+			entry.setIsEmpty(false);
 			
-		} else {
-			
-			if (value != 0) {
-				
-				if (getDepth(value) > entry.getDepth()) {
-					
-					entry.setIsEmpty(false);
-					entry.setDepth(getDepth(value));
-					entry.setFlag(getFlag(value));
-					entry.setEval(getScore(value));
-					entry.setBestMove(getMove(value));
-				}
-			}
+			entry.setDepth(getDepth(value));
+			entry.setFlag(getFlag(value));
+			entry.setEval(getScore(value));
+			entry.setBestMove(getMove(value));	
 		}
 	}
 	
 	
 	@Override
 	public void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove) {
+		
 		int flag = ITTEntry.FLAG_EXACT;
+		
 		if (eval >= beta) {
+			
 			flag = ITTEntry.FLAG_LOWER;
+			
 		} else if (eval <= alpha) {
+			
 			flag = ITTEntry.FLAG_UPPER;
 		}
+		
 		addValue(hashkey, eval, depth, flag, bestmove);
 	}
 	

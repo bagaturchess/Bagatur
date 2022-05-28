@@ -97,12 +97,6 @@ public class Search_PVS_NWS_MonteCarlo extends SearchImpl {
 	}
 	
 	
-	@Override
-	public int getTPTUsagePercent() {
-		return (int) env.getTPT().getUsage();
-	}
-	
-	
 	public void newSearch() {
 		
 		super.newSearch();

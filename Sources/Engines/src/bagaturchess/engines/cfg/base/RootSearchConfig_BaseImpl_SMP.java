@@ -72,8 +72,11 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 	
 	@Override
 	public boolean applyOption(UCIOption option) {
+		
 		if ("SMP Threads".equals(option.getName())) {
+			
 			currentThreadsCount = (Integer) option.getValue();
+			
 			return true;
 		}
 		

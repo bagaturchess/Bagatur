@@ -130,10 +130,10 @@ public class MTDSchedulerMain {
 								//bagaturchess.learning.goldmiddle.impl3.cfg.BoardConfigImpl_V18.class.getName(),
 								//bagaturchess.learning.goldmiddle.impl3.cfg.EvaluationConfig_V18.class.getName()
 								bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20.class.getName(),
-								//bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20.class.getName(),
+								bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20.class.getName(),
 								//bagaturchess.deeplearning.impl_nnue.eval.EvaluationConfig.class.getName(),
 								//bagaturchess.deeplearning.impl4_v20.eval.EvaluationConfig_NNTraining.class.getName(),
-								bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Play.class.getName(),
+								//bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Play.class.getName(),
 								//bagaturchess.deeplearning.impl.eval.allfeatures.EvaluationConfig.class.getName(),
 								//bagaturchess.deeplearning_deepnetts.impl1.eval.EvaluationConfig.class.getName(),
 								//bagaturchess.deeplearning.impl_nnue.eval.EvaluationConfig.class.getName(),

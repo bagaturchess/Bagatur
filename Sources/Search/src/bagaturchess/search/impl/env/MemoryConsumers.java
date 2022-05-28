@@ -4,7 +4,6 @@ package bagaturchess.search.impl.env;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -268,20 +267,24 @@ public class MemoryConsumers {
 		}*/
 		
 		
+		ChannelManager.getChannel().dump("engineConfiguration.useTPT()=" + engineConfiguration.useTPT());
+		ChannelManager.getChannel().dump("engineConfiguration.useEvalCache()=" + engineConfiguration.useEvalCache());
+		ChannelManager.getChannel().dump("engineConfiguration.useSyzygyDTZCache()=" + engineConfiguration.useSyzygyDTZCache());
+		
 		long size_ec = Math.max(SIZE_MIN_ENTRIES_EC, (long) ((engineConfiguration.getEvalCacheUsagePercent() * availableMemoryInBytes) / THREADS_COUNT));
 		long syzygy_ec = Math.max(SIZE_MIN_ENTRIES_EC, (long) ((MEM_USAGE_SYZYGY_DTZ_CACHE * availableMemoryInBytes) / THREADS_COUNT));
 		
 		
 		//Caches
-		ttable_provider = new ArrayList<ITTable>();
+		ttable_provider = new Vector<ITTable>();
 		evalCache 		= new Vector<IEvalCache>();
 		syzygyDTZCache  = new Vector<IEvalCache>();
 		
 		for (int i = 0; i < THREADS_COUNT; i++) {
 			
-			ttable_provider.add(!engineConfiguration.useTPT() ? null : global_ttable);
+			ttable_provider.add(/*!engineConfiguration.useTPT() ? null :*/ global_ttable);
 			
-			evalCache.add(!engineConfiguration.useEvalCache() ? null : new EvalCache_Impl2(size_ec));
+			evalCache.add(/*!engineConfiguration.useEvalCache() ? null :*/ new EvalCache_Impl2(size_ec));
 			
 			syzygyDTZCache.add(!engineConfiguration.useSyzygyDTZCache() ? null : new EvalCache_Impl2(syzygy_ec));
 			

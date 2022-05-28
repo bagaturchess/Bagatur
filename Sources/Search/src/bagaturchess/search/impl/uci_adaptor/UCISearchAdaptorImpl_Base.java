@@ -161,7 +161,6 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor_Ext
 			
 			currentMediator.dump("Using TimeSaver ...");
 			
-			
 			boolean moveSent = saver.beforeMove(boardForSetup,
 					sharedData.getSearchConfig().getOpeningBook_Mode(),
 					currentMediator,

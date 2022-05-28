@@ -96,12 +96,6 @@ public class Search_PVS_NWS_singularmove extends SearchImpl {
 	}
 	
 	
-	@Override
-	public int getTPTUsagePercent() {
-		return (int) env.getTPT().getUsage();
-	}
-	
-	
 	public void newSearch() {
 		
 		super.newSearch();

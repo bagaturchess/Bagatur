@@ -254,7 +254,13 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 
 	@Override
 	public int getTPTUsagePercent() {
-		return searcher.getTPTUsagePercent();
+		
+		if (searcher.getEnv().getTPT() == null) {
+			
+			return 0;
+		}
+		
+		return searcher.getEnv().getTPT().getUsage();
 	}
 
 

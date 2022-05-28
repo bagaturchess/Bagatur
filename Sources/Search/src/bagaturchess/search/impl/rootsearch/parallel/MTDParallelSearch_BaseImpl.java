@@ -659,21 +659,29 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	@Override
 	public int getTPTUsagePercent() {
 		
+		
 		if (searchers_ready.size() == 0) {//Not yet initialized
+			
 			return 0;
 		}
 		
+		
 		int sum = 0;
+		
 		for (int i = 0; i < searchers_ready.size(); i++) {
+			
 			sum += searchers_ready.get(i).getTPTUsagePercent();
 		}
+		
 		return sum / searchers_ready.size();
 	}
 
 
 	@Override
 	public void decreaseTPTDepths(int reduction) {
+		
 		for (int i = 0; i < searchers_ready.size(); i++) {
+			
 			searchers_ready.get(i).decreaseTPTDepths(reduction);
 		}
 	}
@@ -681,6 +689,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	
 	@Override
 	public String toString() {
+		
 		String result = super.toString();
 		
 		result += "\r\n";

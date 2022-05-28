@@ -25,7 +25,6 @@ package bagaturchess.search.api;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.uci.impl.commands.Go;

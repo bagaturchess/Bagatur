@@ -57,8 +57,6 @@ public interface ISearch {
 	
 	public SearchEnv getEnv();
 	
-	public int getTPTUsagePercent();
-	
 	public int pv_search(ISearchMediator mediator, PVManager pvman, ISearchInfo info,
 			int initial_maxdepth, int maxdepth, int depth, int alpha_org, int beta,
 			int prevbest, int prevprevbest, int[] prevPV, boolean prevNullMove, int evalGain, int rootColour,

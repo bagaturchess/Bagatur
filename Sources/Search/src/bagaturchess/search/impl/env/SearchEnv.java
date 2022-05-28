@@ -26,7 +26,6 @@ package bagaturchess.search.impl.env;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -56,7 +55,6 @@ public class SearchEnv {
 	private ITTable tpt;
 	private IEvalCache evalCache;
 	private IEvalCache syzygyDTZCache;
-	//private PawnsEvalCache pawnsCache;
 
 	private boolean checked_tpt;
 	private boolean checked_evalCache;
@@ -73,17 +71,23 @@ public class SearchEnv {
 
 	public SearchEnv(IBitBoard _bitboard, SharedData _shared) {
 		
-		shared = _shared;
-		bitboard = _bitboard;
-		tactics = new Tactics(bitboard);
+		shared 					= _shared;
 		
-		//history = new HistoryTable_FromTo(new BinarySemaphore_Dummy());
-		history_all = new HistoryTable_PieceTo(bitboard);
-		history_incheck = new HistoryTable_PieceTo(bitboard);
+		bitboard 				= _bitboard;
 		
-		moveListFactory = new SearchMoveListFactory();
+		tactics 				= new Tactics(bitboard);
 		
-		orderingStatistics = new OrderingStatistics();
+		//history 				= new HistoryTable_FromTo(new BinarySemaphore_Dummy());
+		history_all 			= new HistoryTable_PieceTo(bitboard);
+		history_incheck 		= new HistoryTable_PieceTo(bitboard);
+		
+		moveListFactory 		= new SearchMoveListFactory();
+		
+		orderingStatistics 		= new OrderingStatistics();
+		
+		checked_tpt 			= false;
+		checked_evalCache 		= false;
+		checked_syzygyDTZCache 	= false;
 	}
 	
 	
@@ -117,25 +121,23 @@ public class SearchEnv {
 	}
 	
 	
-	public int getTPTUsagePercent() {
-		
-		if (tpt == null) {
-			
-			return 0;
-			
-		} else {
-			return tpt.getUsage();
-		}
-	}
-	
-	
 	public ITTable getTPT() {
 		
 		if (!checked_tpt && tpt == null) {
 			
-			tpt = shared.getAndRemoveTranspositionTable();
+			System.out.println("SearchEnv.getTPT: checked_tpt=" + checked_tpt + ", tpt=" + tpt);	
 			
-			checked_tpt = true;
+			synchronized (shared) {
+			
+				if (tpt == null) {
+
+					tpt = shared.getAndRemoveTranspositionTable();
+					
+					System.out.println("SearchEnv.getTPT: TPT initialized to " + tpt);	
+					
+					checked_tpt = true;
+				}
+			}
 		}
 		
 		return tpt;
@@ -146,9 +148,17 @@ public class SearchEnv {
 		
 		if (!checked_evalCache && evalCache == null) {
 			
-			evalCache = shared.getAndRemoveEvalCache();
-			
-			checked_evalCache = true;
+			synchronized (shared) {
+				
+				if (evalCache == null) {
+					
+					evalCache = shared.getAndRemoveEvalCache();
+					
+					System.out.println("SearchEnv.getEvalCache: evalCache initialized to " + evalCache);
+					
+					checked_evalCache = true;
+				}
+			}
 		}
 		
 		return evalCache;
@@ -159,38 +169,34 @@ public class SearchEnv {
 		
 		if (!checked_syzygyDTZCache && syzygyDTZCache == null) {
 			
-			syzygyDTZCache = shared.getSyzygyDTZCache();
-			
-			checked_syzygyDTZCache = true;
+			synchronized (shared) {
+				
+				if (syzygyDTZCache == null) {
+					
+					syzygyDTZCache = shared.getSyzygyDTZCache();
+					
+					System.out.println("SearchEnv.getSyzygyDTZCache: checked_syzygyDTZCache initialized to " + checked_syzygyDTZCache);
+					
+					checked_syzygyDTZCache = true;
+				}
+			}
 		}
 		
 		return syzygyDTZCache;
 	}
 	
 	
-	/*public PawnsEvalCache getPawnsCache() {
-		
-		if (!checked_evalCache && pawnsCache == null) {
-			
-			pawnsCache = shared.getAndRemovePawnsCache();
-		}
-		
-		return pawnsCache;
-	}
-	*/
-	
-	
 	public ITTable getTPTQS() {
+		
 		throw new IllegalStateException();
 	}
 	
 	
 	public IBitBoard getBitboard() {
-		/*if (bitboard.getPawnsCache() != getPawnsCache()) {
-			bitboard.setPawnsCache(getPawnsCache());
-		}*/
+		
 		return bitboard;
 	}
+	
 	
 	public IEvaluator getEval() {
 		if (eval == null) {
