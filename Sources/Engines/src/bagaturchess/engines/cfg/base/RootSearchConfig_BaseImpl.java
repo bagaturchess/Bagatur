@@ -22,32 +22,30 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	
 	protected static final double MEM_USAGE_TPT 					= 0.50;
-	protected static final double MEM_USAGE_EVALCACHE 				= 0.25;
-	protected static final double MEM_USAGE_PAWNCACHE 				= 0.00;
+	protected static final double MEM_USAGE_EVALCACHE 				= 0.35;
+	protected static final double MEM_USAGE_PAWNCACHE 				= 0.15;
 	
 	
 	private static final String DEFAULT_TbPath 						= getDefaultTBPath();
 	
 	private static final boolean DEFAULT_SyzygyOnline 				= false;
 	
-	private static final int DEFAULT_MEM_USAGE_percent 				= 70;
+	private static final int DEFAULT_MEM_USAGE_percent 				= 73;
 	
 	private static final boolean DEFAULT_UseTranspositionTable 		= true;
+	private static final boolean DEFAULT_GlobalTranspositionTable 	= true;
 	private static final boolean DEFAULT_UseEvalCache 				= true;
 	private static final boolean DEFAULT_UseSyzygyDTZCache 			= true;
 	
 	private UCIOption[] options 									= new UCIOption[] {
 			
 			new UCIOptionSpin_Integer("MemoryUsagePercent"	, DEFAULT_MEM_USAGE_percent				, "type spin default " + DEFAULT_MEM_USAGE_percent + " min 50 max 90"),
-			
-			new UCIOptionCombo("UseTranspositionTable"		, "" + DEFAULT_UseTranspositionTable	, "type check default " + DEFAULT_UseTranspositionTable),
-			new UCIOptionCombo("UseEvalCache"				, "" + DEFAULT_UseEvalCache				, "type check default " + DEFAULT_UseEvalCache),
-			new UCIOptionCombo("UseSyzygyDTZCache "			, "" + DEFAULT_UseSyzygyDTZCache		, "type check default " + DEFAULT_UseSyzygyDTZCache),
-			
+			new UCIOption("TranspositionTable"				, "" + DEFAULT_UseTranspositionTable	, "type check default " + DEFAULT_UseTranspositionTable),
+			new UCIOption("IsGlobalTranspositionTable"		, "" + DEFAULT_GlobalTranspositionTable	, "type check default " + DEFAULT_GlobalTranspositionTable),
+			new UCIOption("EvalCache"						, "" + DEFAULT_UseEvalCache				, "type check default " + DEFAULT_UseEvalCache),
 			new UCIOptionString("SyzygyPath"				, DEFAULT_TbPath						, "type string default " + DEFAULT_TbPath),
-			
-			new UCIOptionCombo("SyzygyOnline"				, "" + DEFAULT_SyzygyOnline				, "type check default " + DEFAULT_SyzygyOnline),
-			
+			new UCIOption("SyzygyOnline"					, "" + DEFAULT_SyzygyOnline				, "type check default " + DEFAULT_SyzygyOnline),
+			new UCIOption("SyzygyDTZCache "					, "" + DEFAULT_UseSyzygyDTZCache		, "type check default " + DEFAULT_UseSyzygyDTZCache),
 			new UCIOptionSpin_Integer("MultiPV"				, new Integer(1)						, "type spin default 1 min 1 max 100"),
 			//new UCIOptionSpin_Integer("Hidden Depth"		, 0										, "type spin default 0 min 0 max 10"),
 	};
@@ -66,6 +64,7 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private int MEM_USAGE_percent 								= DEFAULT_MEM_USAGE_percent;
 	
 	private boolean useTranspositionTable 						= DEFAULT_UseTranspositionTable;
+	private boolean useGlobalTranspositionTable 				= DEFAULT_GlobalTranspositionTable;
 	private boolean useEvalCache 								= DEFAULT_UseEvalCache;
 	private boolean useSyzygyDTZCache 							= DEFAULT_UseSyzygyDTZCache;
 	
@@ -267,7 +266,13 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 		return useTranspositionTable;
 	}
 
-
+	
+	@Override
+	public boolean useGlobalTPT() {
+		
+		return useGlobalTranspositionTable;
+	}
+	
 
 	@Override
 	public boolean useEvalCache() {
@@ -327,19 +332,25 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 			
 			return true;
 			
-		} else if ("UseTranspositionTable".equals(option.getName())) {
-						
+		} else if ("TranspositionTable".equals(option.getName())) {
+			
 			useTranspositionTable = option.getValue().equals("true");
 			
 			return true;
+		
+		} else if ("IsGlobalTranspositionTable".equals(option.getName())) {
+						
+			useGlobalTranspositionTable = option.getValue().equals("true");
 			
-		} else if ("UseEvalCache".equals(option.getName())) {
+			return true;
+			
+		} else if ("EvalCache".equals(option.getName())) {
 			
 			useEvalCache = option.getValue().equals("true");
 			
 			return true;
 			
-		} else if ("UseSyzygyDTZCache".equals(option.getName())) {
+		} else if ("SyzygyDTZCache".equals(option.getName())) {
 			
 			useSyzygyDTZCache = option.getValue().equals("true");
 			

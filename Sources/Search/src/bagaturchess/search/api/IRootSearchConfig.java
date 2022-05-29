@@ -33,6 +33,8 @@ public interface IRootSearchConfig {
 	
 	public boolean useTPT();
 	
+	public boolean useGlobalTPT();
+	
 	public boolean useEvalCache();
 	
 	public boolean useSyzygyDTZCache();

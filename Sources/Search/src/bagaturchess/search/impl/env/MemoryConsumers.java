@@ -237,64 +237,77 @@ public class MemoryConsumers {
 		
 		
 		int THREADS_COUNT 				= engineConfiguration.getThreadsCount();
+		
 		int TRANSPOSITION_TABLES_COUNT 	= Math.max(1, THREADS_COUNT / 32);
 		
-		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Threads are " + THREADS_COUNT);
-		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump(TRANSPOSITION_TABLES_COUNT + " Transposition Table will be created.");
-		
-		long size_tpt = Math.max(SIZE_MIN_ENTRIES_TPT, (long) ((engineConfiguration.getTPTUsagePercent() * availableMemoryInBytes) / TRANSPOSITION_TABLES_COUNT));
-		
-		
-		ITTable global_ttable = new TTable_Impl2(size_tpt);
-		
-		/*ITTable global_ttable = null;
-		
-		for (int i = 0; i < TRANSPOSITION_TABLES_COUNT; i++) {
+		if (ChannelManager.getChannel() != null) {
 			
-			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Creating Transposition Table for the current Threads Group ...");
+			ChannelManager.getChannel().dump("Threads are " + THREADS_COUNT);
 			
-			if (global_ttable == null) {
-				
-				global_ttable = new TTable_Impl2(size_tpt);
-			}
-
-			//ITTable current_ttable = new TTable_Impl2(size_tpt);
-			ITTable current_ttable = global_ttable;
+			ChannelManager.getChannel().dump(TRANSPOSITION_TABLES_COUNT + " Transposition Table will be created.");
 			
-			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Transposition Table created.");
+			ChannelManager.getChannel().dump("engineConfiguration.useTPT()=" + engineConfiguration.useTPT());
 			
-			ttables.add(current_ttable);
-		}*/
+			ChannelManager.getChannel().dump("engineConfiguration.useGlobalTPT()=" + engineConfiguration.useGlobalTPT());
+			
+			ChannelManager.getChannel().dump("engineConfiguration.useEvalCache()=" + engineConfiguration.useEvalCache());
+			
+			ChannelManager.getChannel().dump("engineConfiguration.useSyzygyDTZCache()=" + engineConfiguration.useSyzygyDTZCache());
+		}
 		
 		
-		ChannelManager.getChannel().dump("engineConfiguration.useTPT()=" + engineConfiguration.useTPT());
-		ChannelManager.getChannel().dump("engineConfiguration.useEvalCache()=" + engineConfiguration.useEvalCache());
-		ChannelManager.getChannel().dump("engineConfiguration.useSyzygyDTZCache()=" + engineConfiguration.useSyzygyDTZCache());
+		/**
+		 * Initialize caches
+		 */
+		long size_tpt 			= Math.max(SIZE_MIN_ENTRIES_TPT, (long) ((engineConfiguration.getTPTUsagePercent() * availableMemoryInBytes) / TRANSPOSITION_TABLES_COUNT));
 		
-		long size_ec = Math.max(SIZE_MIN_ENTRIES_EC, (long) ((engineConfiguration.getEvalCacheUsagePercent() * availableMemoryInBytes) / THREADS_COUNT));
-		long syzygy_ec = Math.max(SIZE_MIN_ENTRIES_EC, (long) ((MEM_USAGE_SYZYGY_DTZ_CACHE * availableMemoryInBytes) / THREADS_COUNT));
+		long size_ec 			= Math.max(SIZE_MIN_ENTRIES_EC, (long) ((engineConfiguration.getEvalCacheUsagePercent() * availableMemoryInBytes) / THREADS_COUNT));
+		
+		long syzygy_ec 			= Math.max(SIZE_MIN_ENTRIES_EC, (long) ((MEM_USAGE_SYZYGY_DTZ_CACHE * availableMemoryInBytes) / THREADS_COUNT));
 		
 		
-		//Caches
-		ttable_provider = new Vector<ITTable>();
-		evalCache 		= new Vector<IEvalCache>();
-		syzygyDTZCache  = new Vector<IEvalCache>();
+		ITTable global_ttable 	= engineConfiguration.useGlobalTPT() ? new TTable_Impl2(size_tpt) : null;
+		
+		
+		ttable_provider 		= new Vector<ITTable>();
+		
+		evalCache 				= new Vector<IEvalCache>();
+		
+		syzygyDTZCache  		= new Vector<IEvalCache>();
+		
 		
 		for (int i = 0; i < THREADS_COUNT; i++) {
 			
-			ttable_provider.add( !engineConfiguration.useTPT() ? null : global_ttable);
+			ttable_provider.add(engineConfiguration.useTPT() ? (engineConfiguration.useGlobalTPT() ? global_ttable : new TTable_Impl2(size_tpt / THREADS_COUNT)) : null);
 			
-			evalCache.add( !engineConfiguration.useEvalCache() ? null : new EvalCache_Impl2(size_ec));
+			evalCache.add(engineConfiguration.useEvalCache() ? new EvalCache_Impl2(size_ec) : null);
 			
-			syzygyDTZCache.add( !engineConfiguration.useSyzygyDTZCache() ? null : new EvalCache_Impl2(syzygy_ec));
-			
-			/*
-			int size_pc = SIZE_MIN_ENTRIES_PEC;
-			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) ReflectionUtils.createObjectByClassName_NoArgsConstructor(engineConfiguration.getEvalConfig().getPawnsCacheFactoryClassName());
-			pawnsCache.add(new PawnsEvalCache(pawnsCacheFactory, size_pc, false, new BinarySemaphore_Dummy()));
-			pawnsCache.add(null);
-			*/
+			syzygyDTZCache.add(engineConfiguration.useSyzygyDTZCache() ? new EvalCache_Impl2(syzygy_ec) : null);
 		}		
+	}
+	
+	
+	public OpeningBook getOpeningBook() {
+		
+		return openingBook;
+	}
+	
+	
+	public List<ITTable> getTPTProvider() {
+		
+		return ttable_provider;
+	}
+	
+	
+	public List<IEvalCache> getEvalCache() {
+		
+		return evalCache;
+	}
+
+	
+	public List<IEvalCache> getSyzygyDTZCache() {
+		
+		return syzygyDTZCache;
 	}
 	
 	
@@ -323,26 +336,6 @@ public class MemoryConsumers {
         }
         
         return 32;
-	}
-
-
-	public OpeningBook getOpeningBook() {
-		return openingBook;
-	}
-	
-	
-	public List<ITTable> getTPTProvider() {
-		return ttable_provider;
-	}
-	
-	
-	public List<IEvalCache> getEvalCache() {
-		return evalCache;
-	}
-
-	
-	public List<IEvalCache> getSyzygyDTZCache() {
-		return syzygyDTZCache;
 	}
 	
 	
