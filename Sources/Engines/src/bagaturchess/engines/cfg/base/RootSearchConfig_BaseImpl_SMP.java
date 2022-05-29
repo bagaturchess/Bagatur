@@ -59,6 +59,7 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 	
 	@Override
 	public UCIOption[] getSupportedOptions() {
+		
 		UCIOption[] parentOptions = super.getSupportedOptions();
 		
 		UCIOption[] result = new UCIOption[parentOptions.length + options.length];

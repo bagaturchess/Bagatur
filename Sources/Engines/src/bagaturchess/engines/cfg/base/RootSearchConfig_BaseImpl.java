@@ -9,6 +9,7 @@ import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
+import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.api.IUCIOptionsRegistry;
 import bagaturchess.uci.impl.commands.options.UCIOption;
@@ -62,22 +63,22 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private IEvalConfig evalCfg;
 	
 	
-	private int MEM_USAGE_percent 						= DEFAULT_MEM_USAGE_percent;
+	private int MEM_USAGE_percent 								= DEFAULT_MEM_USAGE_percent;
 	
-	private boolean useTranspositionTable 				= DEFAULT_UseTranspositionTable;
-	private boolean useEvalCache 						= DEFAULT_UseEvalCache;
-	private boolean useSyzygyDTZCache 					= DEFAULT_UseSyzygyDTZCache;
-	
-	
-	private int multiPVsCount 							= 1;
+	private boolean useTranspositionTable 						= DEFAULT_UseTranspositionTable;
+	private boolean useEvalCache 								= DEFAULT_UseEvalCache;
+	private boolean useSyzygyDTZCache 							= DEFAULT_UseSyzygyDTZCache;
 	
 	
-	private String TbPath = DEFAULT_TbPath;
-	
-	private boolean use_online_syzygy = DEFAULT_SyzygyOnline;
+	private int multiPVsCount 									= 1;
 	
 	
-	private int hiddenDepth 							= 0;
+	private String TbPath 										= DEFAULT_TbPath;
+	
+	private boolean use_online_syzygy 							= DEFAULT_SyzygyOnline;
+	
+	
+	private int hiddenDepth 									= 0;
 	
 	
 	public RootSearchConfig_BaseImpl(String[] args) {
@@ -110,6 +111,8 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 				}
 			}
 		}
+		
+		//ChannelManager.getChannel().dump("RootSearchConfig_BaseImpl.applyOption: UseTranspositionTable=" + useTranspositionTable);
 	}
 
 
@@ -304,6 +307,7 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	@Override
 	public UCIOption[] getSupportedOptions() {
+		
 		return options;
 	}
 	
@@ -324,20 +328,20 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 			return true;
 			
 		} else if ("UseTranspositionTable".equals(option.getName())) {
-			
-			useTranspositionTable = option.getValue().equals(true);
+						
+			useTranspositionTable = option.getValue().equals("true");
 			
 			return true;
 			
 		} else if ("UseEvalCache".equals(option.getName())) {
 			
-			useEvalCache = option.getValue().equals(true);
+			useEvalCache = option.getValue().equals("true");
 			
 			return true;
 			
 		} else if ("UseSyzygyDTZCache".equals(option.getName())) {
 			
-			useSyzygyDTZCache = option.getValue().equals(true);
+			useSyzygyDTZCache = option.getValue().equals("true");
 			
 			return true;
 			
@@ -349,7 +353,7 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 		
 		} else if ("SyzygyOnline".equals(option.getName())) {
 			
-			use_online_syzygy = option.getValue().equals(true);
+			use_online_syzygy = option.getValue().equals("true");
 			
 			return true;
 			

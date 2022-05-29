@@ -282,11 +282,11 @@ public class MemoryConsumers {
 		
 		for (int i = 0; i < THREADS_COUNT; i++) {
 			
-			ttable_provider.add(/*!engineConfiguration.useTPT() ? null :*/ global_ttable);
+			ttable_provider.add( !engineConfiguration.useTPT() ? null : global_ttable);
 			
-			evalCache.add(/*!engineConfiguration.useEvalCache() ? null :*/ new EvalCache_Impl2(size_ec));
+			evalCache.add( !engineConfiguration.useEvalCache() ? null : new EvalCache_Impl2(size_ec));
 			
-			syzygyDTZCache.add(!engineConfiguration.useSyzygyDTZCache() ? null : new EvalCache_Impl2(syzygy_ec));
+			syzygyDTZCache.add( !engineConfiguration.useSyzygyDTZCache() ? null : new EvalCache_Impl2(syzygy_ec));
 			
 			/*
 			int size_pc = SIZE_MIN_ENTRIES_PEC;

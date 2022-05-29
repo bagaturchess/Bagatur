@@ -5,11 +5,14 @@ public class RootSearchConfig_BaseImpl_SMP_Threads extends RootSearchConfig_Base
 	
 	
 	public RootSearchConfig_BaseImpl_SMP_Threads(String[] args) {
+		
 		super(args);
 	}
-
+	
+	
 	@Override
 	public boolean initCaches() {
+		
 		return true;
 	}
 }
