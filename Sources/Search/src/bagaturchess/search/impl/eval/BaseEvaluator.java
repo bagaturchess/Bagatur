@@ -18,6 +18,7 @@ import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.impl.eval.cache.EvalEntry_BaseImpl;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.eval.cache.IEvalEntry;
+import bagaturchess.uci.api.ChannelManager;
 
 
 public abstract class BaseEvaluator implements IEvaluator {
@@ -129,6 +130,11 @@ public abstract class BaseEvaluator implements IEvaluator {
 		b_king = bitboard.getPiecesLists().getPieces(Constants.PID_B_KING);
 		w_pawns = bitboard.getPiecesLists().getPieces(Constants.PID_W_PAWN);
 		b_pawns = bitboard.getPiecesLists().getPieces(Constants.PID_B_PAWN);
+		
+		if (ChannelManager.getChannel() != null) {
+			
+			ChannelManager.getChannel().dump("BaseEvaluator.constructor: evalConfig=" + evalConfig + ", evalCache=" + evalCache);
+		}
 	}
 	
 	

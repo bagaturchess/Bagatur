@@ -126,7 +126,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		historyAVGScores = new VarStatistic(false);
 		
-		/*if (ChannelManager.getChannel() != null) {
+		if (ChannelManager.getChannel() != null) {
 			
 			if (env.getTPT() != null) ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Transposition table hitrate=" + env.getTPT().getHitRate() + ", usage=" + env.getTPT().getUsage());
 			
@@ -134,7 +134,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (env.getSyzygyDTZCache() != null) ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Syzygy DTZ cache hitrate=" + env.getSyzygyDTZCache().getHitRate() + ", usage=" + env.getSyzygyDTZCache().getUsage());
 		}
-		*/
 	}
 	
 	
