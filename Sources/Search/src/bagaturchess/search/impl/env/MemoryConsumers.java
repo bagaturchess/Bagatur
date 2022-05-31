@@ -238,13 +238,13 @@ public class MemoryConsumers {
 		
 		int THREADS_COUNT 				= engineConfiguration.getThreadsCount();
 		
-		int TRANSPOSITION_TABLES_COUNT 	= Math.max(1, THREADS_COUNT / 32);
+		int TRANSPOSITION_TABLES_COUNT 	= 1; //Math.max(1, THREADS_COUNT / 32);
 		
 		if (ChannelManager.getChannel() != null) {
 			
 			ChannelManager.getChannel().dump("Threads are " + THREADS_COUNT);
 			
-			ChannelManager.getChannel().dump(TRANSPOSITION_TABLES_COUNT + " Transposition Table will be created.");
+			//ChannelManager.getChannel().dump(TRANSPOSITION_TABLES_COUNT + " Transposition Table will be created.");
 			
 			ChannelManager.getChannel().dump("engineConfiguration.useTPT()=" + engineConfiguration.useTPT());
 			
