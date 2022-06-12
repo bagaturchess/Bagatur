@@ -150,7 +150,7 @@ public class MemoryConsumers {
 		
 		if (engineConfiguration.getThreadsCount() > 1) {
 			
-			//If there are are many threads than switch off syzygy calls, because of crashes:
+			//If there are many threads than switch off syzygy calls, because of crashes:
 			
 			/*230018 <Bagatur 3.1(0): # A fatal error has been detected by the Java Runtime Environment:
 				230018 <Bagatur 3.1(0): #
