@@ -6,6 +6,7 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.PAWN;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.MoveListener;
+import bagaturchess.bitboard.common.Properties;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 
@@ -93,6 +94,8 @@ public class NNUE_Input implements MoveListener {
 		int fromFieldID = board.getMoveOps().getFromFieldID(move);
 		int toFieldID = board.getMoveOps().getToFieldID(move);
 		
+		if (Properties.DUMP_CASTLING) System.out.println("NNUE_Input.MOVE=" + board.getMoveOps().moveToString(move));
+		
 		setInputAt(color, pieceType, fromFieldID, 0);
 		if (!board.getMoveOps().isPromotion(move)) setInputAt(color, pieceType, toFieldID, 1);
 		
@@ -105,7 +108,9 @@ public class NNUE_Input implements MoveListener {
 			setInputAt(1 - color, Constants.TYPE_PAWN, captured_pawn_index, 0);
 		
 		} else if (board.getMoveOps().isCastling(move)) {
-				
+			
+			if (Properties.DUMP_CASTLING) System.out.println("NNUE_Input.MOVE.Castling=" + board.getMoveOps().moveToString(move) + ", toFieldID=" + toFieldID);
+			
 			switch (toFieldID) {
 				
 				case 1:
@@ -159,6 +164,8 @@ public class NNUE_Input implements MoveListener {
 		int fromFieldID = board.getMoveOps().getFromFieldID(move);
 		int toFieldID = board.getMoveOps().getToFieldID(move);
 		
+		if (Properties.DUMP_CASTLING) System.out.println("NNUE_Input.UNMOVE=" + board.getMoveOps().moveToString(move));
+		
 		setInputAt(color, pieceType, fromFieldID, 1);
 		if (!board.getMoveOps().isPromotion(move)) setInputAt(color, pieceType, toFieldID, 0);
 		
@@ -171,7 +178,9 @@ public class NNUE_Input implements MoveListener {
 			setInputAt(1 - color, Constants.TYPE_PAWN, captured_pawn_index, 1);
 			
 		} else if (board.getMoveOps().isCastling(move)) {
-				
+			
+			if (Properties.DUMP_CASTLING) System.out.println("NNUE_Input.UNMOVE.Castling=" + board.getMoveOps().moveToString(move) + ", toFieldID=" + toFieldID);
+			
 			switch (toFieldID) {
 			
 				case 1:

@@ -4,13 +4,13 @@ package bagaturchess.bitboard.impl1.internal;
 public class MoveUtil {
 
 	// move types
-	public static final int TYPE_NORMAL = 0;
-	public static final int TYPE_EP = 1;
-	public static final int TYPE_PROMOTION_N = ChessConstants.NIGHT;
-	public static final int TYPE_PROMOTION_B = ChessConstants.BISHOP;
-	public static final int TYPE_PROMOTION_R = ChessConstants.ROOK;
-	public static final int TYPE_PROMOTION_Q = ChessConstants.QUEEN;
-	public static final int TYPE_CASTLING = 6;
+	public static final int TYPE_NORMAL 		= 0;
+	public static final int TYPE_EP 			= 1;
+	public static final int TYPE_PROMOTION_N 	= ChessConstants.NIGHT;
+	public static final int TYPE_PROMOTION_B 	= ChessConstants.BISHOP;
+	public static final int TYPE_PROMOTION_R 	= ChessConstants.ROOK;
+	public static final int TYPE_PROMOTION_Q 	= ChessConstants.QUEEN;
+	public static final int TYPE_CASTLING 		= 6;
 
 	// shifts
 	// ///////////////////// FROM //6 bits

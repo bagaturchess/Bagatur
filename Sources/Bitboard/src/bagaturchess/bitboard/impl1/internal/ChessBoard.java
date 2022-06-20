@@ -11,13 +11,15 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.QUEEN;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 
+import bagaturchess.bitboard.common.Properties;
 import bagaturchess.bitboard.impl.datastructs.StackLongInt;
 
 
 public final class ChessBoard {
-
+	
 	ChessBoard() {
 		
+		castlingConfig = new CastlingConfig();
 	}
 
 	private static ChessBoard[] instances;
@@ -84,12 +86,14 @@ public final class ChessBoard {
 	
 	public StackLongInt playedBoardStates = new StackLongInt(9631);//MUST BE PRIME NUMBER
 	
+	public CastlingConfig castlingConfig;
+	
 	
 	@Override
 	public String toString() {
 		return ChessBoardUtil.toString(this, true);
 	}
-
+	
 	public boolean isDrawishByMaterial(final int color) {
 		// no pawns or queens
 		//if (MaterialUtil.hasPawnsOrQueens(materialKey, color)) {
@@ -101,16 +105,16 @@ public final class ChessBoard {
 		//return EvalUtil.getImbalances(this) * ChessConstants.COLOR_FACTOR[color] < EvalConstants.MATERIAL[BISHOP]
 			//	+ EvalConstants.OTHER_SCORES[EvalConstants.IX_DRAWISH];
 	}
-
+	
 	public void changeSideToMove() {
 		colorToMove = colorToMoveInverse;
 		colorToMoveInverse = 1 - colorToMove;
 	}
-
+	
 	public boolean isDiscoveredMove(final int fromIndex) {
 		return (discoveredPieces & (1L << fromIndex)) != 0;
 	}
-
+	
 	private void pushHistoryValues(int move) {
 		castlingHistory[moveCounter] = castlingRights;
 		epIndexHistory[moveCounter] = epIndex;
@@ -123,7 +127,7 @@ public final class ChessBoard {
 		playedMoves[playedMovesCount] = move;
 		playedMovesCount++;
 	}
-
+	
 	private void popHistoryValues() {
 		playedMovesCount--;
 		moveCounter--;
@@ -164,7 +168,7 @@ public final class ChessBoard {
 			ChessBoardTestUtil.testValues(this);
 		}
 	}
-
+	
 	public void doMove(int move) {
 
 		final int fromIndex = MoveUtil.getFromIndex(move);
@@ -234,21 +238,41 @@ public final class ChessBoard {
 			break;
 
 		case ROOK:
+			
 			if (castlingRights != 0) {
+				
 				zobristKey ^= Zobrist.castling[castlingRights];
-				castlingRights = CastlingUtil.getRookMovedOrAttackedCastlingRights(castlingRights, fromIndex);
+				
+				if (Properties.DUMP_CASTLING) System.out.println("ChessBoard.doMove/ROOK: castlingRights=" + castlingRights);
+				
+				castlingRights = CastlingUtil.getRookMovedOrAttackedCastlingRights(castlingRights, fromIndex, castlingConfig);
+				
+				if (Properties.DUMP_CASTLING) System.out.println("ChessBoard.doMove/ROOK: NEW castlingRights=" + castlingRights);
+				
 				zobristKey ^= Zobrist.castling[castlingRights];
 			}
+			
 			break;
 
 		case KING:
+			
 			updateKingValues(colorToMove, toIndex);
+			
 			if (castlingRights != 0) {
+				
 				if (MoveUtil.isCastlingMove(move)) {
+					
 					CastlingUtil.castleRookUpdateKeyAndPsqt(this, toIndex);
 				}
+				
 				zobristKey ^= Zobrist.castling[castlingRights];
-				castlingRights = CastlingUtil.getKingMovedCastlingRights(castlingRights, fromIndex);
+				
+				if (Properties.DUMP_CASTLING) System.out.println("ChessBoard.doMove/KING: castlingRights=" + castlingRights);
+				
+				castlingRights = CastlingUtil.getKingMovedCastlingRights(castlingRights, fromIndex, castlingConfig);
+				
+				if (Properties.DUMP_CASTLING) System.out.println("ChessBoard.doMove/KING: NEW castlingRights=" + castlingRights);
+				
 				zobristKey ^= Zobrist.castling[castlingRights];
 			}
 		}
@@ -272,9 +296,17 @@ public final class ChessBoard {
 			materialKey -= MaterialUtil.VALUES[colorToMoveInverse][PAWN];
 			break;
 		case ROOK:
+			
 			if (castlingRights != 0) {
+				
 				zobristKey ^= Zobrist.castling[castlingRights];
-				castlingRights = CastlingUtil.getRookMovedOrAttackedCastlingRights(castlingRights, toIndex);
+				
+				if (Properties.DUMP_CASTLING) System.out.println("ChessBoard.doMove/ROOK/attackedPieceIndex: castlingRights=" + castlingRights);
+				
+				castlingRights = CastlingUtil.getRookMovedOrAttackedCastlingRights(castlingRights, toIndex, castlingConfig);
+				
+				if (Properties.DUMP_CASTLING) System.out.println("ChessBoard.doMove/ROOK/attackedPieceIndex: NEW castlingRights=" + castlingRights);
+				
 				zobristKey ^= Zobrist.castling[castlingRights];
 			}
 			// fall-through
@@ -389,10 +421,14 @@ public final class ChessBoard {
 				pawnZobristKey ^= Zobrist.piece[toIndex][colorToMoveInverse][PAWN];
 			}
 			break;
+			
 		case KING:
+			
 			if (MoveUtil.isCastlingMove(move)) {
+				
 				CastlingUtil.uncastleRookUpdatePsqt(this, toIndex);
 			}
+			
 			updateKingValues(colorToMoveInverse, fromIndex);
 		}
 
@@ -553,17 +589,33 @@ public final class ChessBoard {
 				return false;
 			}
 			break;
+			
 		case KING:
+			
 			if (MoveUtil.isCastlingMove(move)) {
-				long castlingIndexes = CastlingUtil.getCastlingIndexes(this);
+				
+				/*if (true) {
+					
+					return false;
+				}*/
+				
+				long castlingIndexes = CastlingUtil.getCastlingIndexes(colorToMove, castlingRights, castlingConfig);
+				
+				if (Properties.DUMP_CASTLING) System.out.println("ChessBoard.isValidMove.Castling: castlingIndexes=" + castlingIndexes);
+				
 				while (castlingIndexes != 0) {
+					
 					if (toIndex == Long.numberOfTrailingZeros(castlingIndexes)) {
+						
 						return CastlingUtil.isValidCastlingMove(this, fromIndex, toIndex);
 					}
+					
 					castlingIndexes &= castlingIndexes - 1;
 				}
+				
 				return false;
 			}
+			
 			return isLegalKingMove(move);
 		}
 

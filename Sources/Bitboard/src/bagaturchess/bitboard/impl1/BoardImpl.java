@@ -83,6 +83,8 @@ public class BoardImpl implements IBitBoard {
 	
 	private NNUE_Input nnue_input;
 	
+	private boolean enable_NNUE_Input = true;
+	
 	protected IBoard.CastlingType[] castledByColour;
 	
 	
@@ -133,16 +135,19 @@ public class BoardImpl implements IBitBoard {
 		}
 		
 		
-		nnue_input = new NNUE_Input(this);
-		
-		for (int color = 0; color < 2; color++) {
-			for (int piece = PAWN; piece <= KING; piece++) {
-				long pieces = chessBoard.pieces[color][piece];
-				nnue_input.initially_addPiece(color, piece, pieces);
+		if (enable_NNUE_Input) {
+			
+			nnue_input = new NNUE_Input(this);
+			
+			for (int color = 0; color < 2; color++) {
+				for (int piece = PAWN; piece <= KING; piece++) {
+					long pieces = chessBoard.pieces[color][piece];
+					nnue_input.initially_addPiece(color, piece, pieces);
+				}
 			}
+			
+			addMoveListener(nnue_input);
 		}
-		
-		addMoveListener(nnue_input);
 	}
 	
 	
@@ -795,6 +800,11 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public float[] getNNUEInputs() {
+		
+		if (!enable_NNUE_Input) {
+			
+			throw new UnsupportedOperationException();
+		}
 		
 		return nnue_input.getInputs();
 	}

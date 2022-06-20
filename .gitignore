@@ -5,3 +5,4 @@ Sources/WorkDir*
 *features.bin
 *.bin
 Sources/BoardScanner/data*
+/.metadata/

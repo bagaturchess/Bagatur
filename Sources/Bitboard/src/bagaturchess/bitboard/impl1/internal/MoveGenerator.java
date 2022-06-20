@@ -13,11 +13,13 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 import java.util.Arrays;
 import java.util.Random;
 
+import bagaturchess.bitboard.common.Properties;
+
 
 public final class MoveGenerator {
 	
 	
-	public static boolean USE_ContinuationHistory = true;
+	public static boolean USE_ContinuationHistory 	= true;
 	
 	
 	private final int[] moves = new int[3000];
@@ -678,22 +680,40 @@ public final class MoveGenerator {
 	}
 
 	private void addKingMoves(final ChessBoard cb) {
+		
 		final int fromIndex = cb.kingIndex[cb.colorToMove];
+		
 		long moves = StaticMoves.KING_MOVES[fromIndex] & cb.emptySpaces;
+		
 		while (moves != 0) {
+			
 			addMove(MoveUtil.createMove(fromIndex, Long.numberOfTrailingZeros(moves), KING));
+			
 			moves &= moves - 1;
 		}
 
+		
 		// castling
 		if (cb.checkingPieces == 0) {
-			long castlingIndexes = CastlingUtil.getCastlingIndexes(cb);
+			
+			if (Properties.DUMP_CASTLING) System.out.println("MoveGenerator.addKingMoves: cb.colorToMove=" + cb.colorToMove + ", cb.castlingRights=" + cb.castlingRights + ", cb.castlingConfig=" + cb.castlingConfig);
+			
+			long castlingIndexes = CastlingUtil.getCastlingIndexes(cb.colorToMove, cb.castlingRights, cb.castlingConfig);
+			
+			if (Properties.DUMP_CASTLING) System.out.println("MoveGenerator.addKingMoves: castlingIndexes=" + castlingIndexes);
+			
 			while (castlingIndexes != 0) {
-				final int castlingIndex = Long.numberOfTrailingZeros(castlingIndexes);
+				
+				final int toIndex_king = Long.numberOfTrailingZeros(castlingIndexes);
+				
+				if (Properties.DUMP_CASTLING) System.out.println("MoveGenerator.addKingMoves: toIndex_king=" + toIndex_king);
+				
 				// no piece in between?
-				if (CastlingUtil.isValidCastlingMove(cb, fromIndex, castlingIndex)) {
-					addMove(MoveUtil.createCastlingMove(fromIndex, castlingIndex));
+				if (CastlingUtil.isValidCastlingMove(cb, fromIndex, toIndex_king)) {
+					
+					addMove(MoveUtil.createCastlingMove(fromIndex, toIndex_king));
 				}
+				
 				castlingIndexes &= castlingIndexes - 1;
 			}
 		}

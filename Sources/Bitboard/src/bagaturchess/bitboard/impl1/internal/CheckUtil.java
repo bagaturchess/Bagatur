@@ -36,6 +36,7 @@ public final class CheckUtil {
 	}
 	
 	public static long getCheckingPieces(final ChessBoard cb, final int sourcePieceIndex) {
+		
 		switch(sourcePieceIndex) {
 			case PAWN:
 				return cb.pieces[cb.colorToMoveInverse][PAWN] & StaticMoves.PAWN_ATTACKS[cb.colorToMove][cb.kingIndex[cb.colorToMove]];
@@ -60,7 +61,7 @@ public final class CheckUtil {
 				| (enemyPieces[ROOK] | enemyPieces[QUEEN]) & MagicUtil.getRookMoves(kingIndex, allPieces)
 				| (enemyPieces[BISHOP] | enemyPieces[QUEEN]) & MagicUtil.getBishopMoves(kingIndex, allPieces) 
 				| enemyPieces[PAWN] & StaticMoves.PAWN_ATTACKS[colorToMove][kingIndex]
-			)!= 0;
+			) != 0;
 	}
 
 	public static boolean isInCheckIncludingKing(final int kingIndex, final int colorToMove, final long[] enemyPieces, final long allPieces, final int enemyMajorPieces) {
@@ -69,7 +70,7 @@ public final class CheckUtil {
 		if(enemyMajorPieces==0) {
 			return (enemyPieces[PAWN] & StaticMoves.PAWN_ATTACKS[colorToMove][kingIndex]
 					| enemyPieces[KING] & StaticMoves.KING_MOVES[kingIndex]
-				)!= 0;
+				) != 0;
 		}
 		
 		// put 'super-piece' in kings position
@@ -78,7 +79,7 @@ public final class CheckUtil {
 				| (enemyPieces[BISHOP] | enemyPieces[QUEEN]) & MagicUtil.getBishopMoves(kingIndex, allPieces) 
 				| enemyPieces[PAWN] & StaticMoves.PAWN_ATTACKS[colorToMove][kingIndex]
 				| enemyPieces[KING] & StaticMoves.KING_MOVES[kingIndex]
-			)!= 0;
+			) != 0;
 	}
 	
 	public static boolean isInCheckIncludingKing(final int kingIndex, final int colorToMove, final long[] enemyPieces, final long allPieces) {
@@ -89,6 +90,6 @@ public final class CheckUtil {
 				| (enemyPieces[BISHOP] | enemyPieces[QUEEN]) & MagicUtil.getBishopMoves(kingIndex, allPieces) 
 				| enemyPieces[PAWN] & StaticMoves.PAWN_ATTACKS[colorToMove][kingIndex]
 				| enemyPieces[KING] & StaticMoves.KING_MOVES[kingIndex]
-			)!= 0;
+			) != 0;
 	}
 }
