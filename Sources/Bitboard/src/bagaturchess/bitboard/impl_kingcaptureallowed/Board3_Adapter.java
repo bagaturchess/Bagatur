@@ -14,6 +14,7 @@ import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveOpsImpl;
 import bagaturchess.bitboard.impl.state.PiecesList;
+import bagaturchess.bitboard.impl1.internal.CastlingConfig;
 
 
 public class Board3_Adapter extends Board3 implements IBitBoard {
@@ -247,6 +248,13 @@ public class Board3_Adapter extends Board3 implements IBitBoard {
 
 	@Override
 	public CastlingPair getCastlingPair() {
+		
+		throw new UnsupportedOperationException();
+	}
+	
+	
+	@Override
+	public CastlingConfig getCastlingConfig() {
 		
 		throw new UnsupportedOperationException();
 	}

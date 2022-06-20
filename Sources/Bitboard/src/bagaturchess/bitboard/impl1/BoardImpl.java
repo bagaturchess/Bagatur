@@ -53,6 +53,7 @@ import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.state.PiecesList;
+import bagaturchess.bitboard.impl1.internal.CastlingConfig;
 import bagaturchess.bitboard.impl1.internal.CheckUtil;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.ChessBoardUtil;
@@ -511,6 +512,13 @@ public class BoardImpl implements IBitBoard {
 				
 				throw new IllegalStateException();
 		}
+	}
+	
+	
+	@Override
+	public CastlingConfig getCastlingConfig() {
+		
+		return chessBoard.castlingConfig;
 	}
 	
 	

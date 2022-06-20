@@ -1,9 +1,12 @@
 package bagaturchess.bitboard.api;
 
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
+import bagaturchess.bitboard.impl1.internal.CastlingConfig;
 
 
 public interface IBoard {
+	
+	public CastlingConfig getCastlingConfig();
 	
 	public int[] getMatrix();
 	

@@ -9,6 +9,7 @@ import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.common.Properties;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
+import bagaturchess.bitboard.impl1.internal.CastlingConfig;
 
 
 public class NNUE_Input implements MoveListener {
@@ -114,27 +115,27 @@ public class NNUE_Input implements MoveListener {
 			switch (toFieldID) {
 				
 				case 1:
-					// white rook from 0 to 2
-					setInputAt(color, Constants.TYPE_ROOK, 0, 0);
-					setInputAt(color, Constants.TYPE_ROOK, 2, 1);
+					//White king side
+					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_w, 0);
+					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.F1, 1);
+					break;
+				
+				case 5:
+					//White queen side
+					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_w, 0);
+					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.D1, 1);
 					break;
 					
 				case 57:
-					// black rook from 56 to 58
-					setInputAt(color, Constants.TYPE_ROOK, 56, 0);
-					setInputAt(color, Constants.TYPE_ROOK, 58, 1);
-					break;
-					
-				case 5:
-					// white rook from 7 to 4
-					setInputAt(color, Constants.TYPE_ROOK, 7, 0);
-					setInputAt(color, Constants.TYPE_ROOK, 4, 1);
+					//Black king side
+					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_b, 0);
+					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.F8, 1);
 					break;
 					
 				case 61:
-					// black rook from 63 to 60
-					setInputAt(color, Constants.TYPE_ROOK, 63, 0);
-					setInputAt(color, Constants.TYPE_ROOK, 60, 1);
+					//Black queen side
+					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_b, 0);
+					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.D8, 1);
 					break;
 					
 				default:
@@ -183,29 +184,29 @@ public class NNUE_Input implements MoveListener {
 			
 			switch (toFieldID) {
 			
-				case 1:
-					// white rook from 0 to 2
-					setInputAt(color, Constants.TYPE_ROOK, 0, 1);
-					setInputAt(color, Constants.TYPE_ROOK, 2, 0);
-					break;
-					
-				case 57:
-					// black rook from 56 to 58
-					setInputAt(color, Constants.TYPE_ROOK, 56, 1);
-					setInputAt(color, Constants.TYPE_ROOK, 58, 0);
-					break;
-					
-				case 5:
-					// white rook from 7 to 4
-					setInputAt(color, Constants.TYPE_ROOK, 7, 1);
-					setInputAt(color, Constants.TYPE_ROOK, 4, 0);
-					break;
-					
-				case 61:
-					// black rook from 60 to 63
-					setInputAt(color, Constants.TYPE_ROOK, 63, 1);
-					setInputAt(color, Constants.TYPE_ROOK, 60, 0);
-					break;
+			case 1:
+				//White king side
+				setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_w, 1);
+				setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.F1, 0);
+				break;
+			
+			case 5:
+				//White queen side
+				setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_w, 1);
+				setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.D1, 0);
+				break;
+				
+			case 57:
+				//Black king side
+				setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_b, 1);
+				setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.F8, 0);
+				break;
+				
+			case 61:
+				//Black queen side
+				setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_b, 1);
+				setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.D8, 0);
+				break;
 					
 				default:
 					throw new RuntimeException("Incorrect king castling to-index: " + toFieldID);

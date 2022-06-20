@@ -86,6 +86,7 @@ import bagaturchess.bitboard.impl.plies.specials.Enpassanting;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl.state.PiecesLists;
 import bagaturchess.bitboard.impl.zobrist.ConstantStructure;
+import bagaturchess.bitboard.impl1.internal.CastlingConfig;
 
 
 public class Board extends Fields implements IBitBoard, Cloneable {
@@ -5450,6 +5451,13 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	
 	@Override
 	public double[] getNNUEInputs() {
+		
+		throw new UnsupportedOperationException();
+	}
+	
+	
+	@Override
+	public CastlingConfig getCastlingConfig() {
 		
 		throw new UnsupportedOperationException();
 	}
