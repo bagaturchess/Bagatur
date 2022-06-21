@@ -28,7 +28,7 @@ public class ChessBoardUtil {
 		return cb;
 	}
 
-	public static void setFenValues(String fen, ChessBoard cb) {
+	private static void setFenValues(String fen, ChessBoard cb) {
 		cb.moveCounter = 0;
 
 		String[] fenArray = fen.split(" ");
@@ -56,10 +56,10 @@ public class ChessBoardUtil {
 			}
 		} else {
 			// try to guess the castling rights
-			if (cb.kingIndex[WHITE] != 3) {
+			if (cb.kingIndex[WHITE] != cb.castlingConfig.from_SquareID_king_w) {
 				cb.castlingRights &= 3; // 0011
 			}
-			if (cb.kingIndex[BLACK] != 59) {
+			if (cb.kingIndex[BLACK] != cb.castlingConfig.from_SquareID_king_b) {
 				cb.castlingRights &= 12; // 1100
 			}
 		}
@@ -94,7 +94,7 @@ public class ChessBoardUtil {
 		}
 	}
 
-	public static void calculateZobristKeys(ChessBoard cb) {
+	private static void calculateZobristKeys(ChessBoard cb) {
 		cb.zobristKey = 0;
 
 		for (int color = 0; color < 2; color++) {
@@ -114,7 +114,7 @@ public class ChessBoardUtil {
 		cb.zobristKey ^= Zobrist.epIndex[cb.epIndex];
 	}
 
-	public static void calculatePawnZobristKeys(ChessBoard cb) {
+	private static void calculatePawnZobristKeys(ChessBoard cb) {
 		cb.pawnZobristKey = 0;
 
 		long pieces = cb.pieces[WHITE][PAWN];
@@ -197,7 +197,7 @@ public class ChessBoardUtil {
 	}
 	
 	
-	public static void init(ChessBoard cb) {
+	static void init(ChessBoard cb) {
 
 		calculateMaterialZobrist(cb);
 
@@ -245,10 +245,151 @@ public class ChessBoardUtil {
 		calculateZobristKeys(cb);
 		
 		cb.playedBoardStates.inc(cb.zobristKey);
+		
+		setCastling960Configuration(cb);
 	}
 	
 	
-	public static void calculatePositionScores(final ChessBoard cb) {
+	private static final void setCastling960Configuration(final ChessBoard cb) {
+		
+		
+		/*
+		Commented in order to prevent potential null pointer exceptions, when cb.castlingConfig is not set and stay null.
+		if (cb.castlingRights == 0) {
+			
+			return;
+		}*/
+		
+		
+		long bb_king_w = cb.pieces[WHITE][KING];
+		long bb_king_b = cb.pieces[BLACK][KING];
+		
+		if (bb_king_w == 0) {
+			
+			throw new IllegalStateException("No white king");
+		}
+		
+		if (bb_king_w == 0) {
+			
+			throw new IllegalStateException("No black king");
+		}
+		
+		
+		int king_w_square_id = CastlingConfig.E1;
+		int king_b_square_id = CastlingConfig.E8;
+		
+		
+		int count_w_kings = 0;
+		while (bb_king_w != 0) {
+			
+			king_w_square_id = Long.numberOfTrailingZeros(bb_king_w);
+			
+			bb_king_w &= bb_king_w - 1;
+			
+			count_w_kings++;
+		}
+		
+		int count_b_kings = 0;
+		while (bb_king_b != 0) {
+			
+			king_b_square_id = Long.numberOfTrailingZeros(bb_king_b);
+			
+			bb_king_b &= bb_king_b - 1;
+			
+			count_b_kings++;
+		}
+		
+		if (count_w_kings > 1) {
+			
+			throw new IllegalStateException("More than 1 white king");
+		}
+		
+		if (count_b_kings > 1) {
+			
+			throw new IllegalStateException("More than 1 black king");
+		}
+		
+		
+		//White kingside //0100
+		int rook_kingside_w = CastlingConfig.H1;
+		
+		if ((cb.castlingRights & 8) != 0) {
+			
+			for (int square_id = king_w_square_id; square_id >= CastlingConfig.H1; square_id--) {
+				
+				int source_piece_type = cb.pieceIndexes[square_id];
+				
+				if (source_piece_type == ROOK) {
+				
+					rook_kingside_w = square_id;
+					
+					break;
+				}
+			}
+		}
+		
+		//White queenside //0100
+		int rook_queenside_w = CastlingConfig.A1;
+		
+		if ((cb.castlingRights & 4) != 0) {
+			
+			for (int square_id = king_w_square_id; square_id <= CastlingConfig.A1; square_id++) {
+				
+				int source_piece_type = cb.pieceIndexes[square_id];
+				
+				if (source_piece_type == ROOK) {
+				
+					rook_queenside_w = square_id;
+					
+					break;
+				}
+			}
+		}
+		
+		//Black kingside //0010
+		int rook_kingside_b = CastlingConfig.H8;
+		
+		if ((cb.castlingRights & 2) != 0) {
+			
+			for (int square_id = king_b_square_id; square_id >= CastlingConfig.H8; square_id--) {
+				
+				int source_piece_type = cb.pieceIndexes[square_id];
+				
+				if (source_piece_type == ROOK) {
+				
+					rook_kingside_b = square_id;
+					
+					break;
+				}
+			}
+		}
+		
+		//Black queenside //0001
+		int rook_queenside_b = CastlingConfig.A8;
+		
+		if ((cb.castlingRights & 1) != 0) {
+			
+			for (int square_id = king_b_square_id; square_id <= CastlingConfig.A8; square_id++) {
+				
+				int source_piece_type = cb.pieceIndexes[square_id];
+				
+				if (source_piece_type == ROOK) {
+				
+					rook_queenside_b = square_id;
+					
+					break;
+				}
+			}
+		}
+		
+		
+		CastlingConfig castlingConfig = new CastlingConfig(king_w_square_id, rook_kingside_w, rook_queenside_w, king_b_square_id, rook_kingside_b, rook_queenside_b);
+		
+		cb.castlingConfig = castlingConfig;
+	}
+	
+	
+	private static void calculatePositionScores(final ChessBoard cb) {
 		
 		for (int color = WHITE; color <= BLACK; color++) {
 			for (int pieceType = PAWN; pieceType <= KING; pieceType++) {
@@ -333,5 +474,4 @@ public class ChessBoardUtil {
 		
 		return fen;
 	}
-
 }

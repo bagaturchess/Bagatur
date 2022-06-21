@@ -201,76 +201,65 @@ public final class CastlingUtil {
 	
 	public static void castleRookUpdateKeyAndPsqt(final ChessBoard cb, final int kingToIndex) {
 		
+		
 		if (Properties.DUMP_CASTLING) System.out.println("CastlingUtil.castleRookUpdateKeyAndPsqt: kingToIndex=" + kingToIndex);
 		
-		int from;
-		int to;
 		
-		switch (kingToIndex) {
+		int[] rook_from_to 			= getRookFromToSquareIDs(cb, kingToIndex);
 		
-			case 1:
-				
-				// White king side
-				
-				from 	= cb.castlingConfig.from_SquareID_rook_kingside_w;
-				to 		= CastlingConfig.F1;
-				
-				break;
-			
-			case 5:
-				
-				// White queen side
-				
-				from 	= cb.castlingConfig.from_SquareID_rook_queenside_w;
-				to 		= CastlingConfig.D1;
-				
-				break;
-				
-			case 57:
-				
-				// Black king side
-				
-				from 	= cb.castlingConfig.from_SquareID_rook_kingside_b;
-				to 		= CastlingConfig.F8;
-				
-				break;
-				
-			case 61:
-				
-				// Black queen side
-				
-				from 	= cb.castlingConfig.from_SquareID_rook_queenside_b;
-				to 		= CastlingConfig.D8;
-				
-				break;
-				
-			default:
-				
-				throw new RuntimeException("Incorrect king castling to-index: " + kingToIndex);
-				
-		}
+		int from 					= rook_from_to[0];
+		
+		int to 						= rook_from_to[1];
 		
 		
-		int colour 							= cb.colorToMove;
+		int colour 					= cb.colorToMove;
 		
-		long bb 							= Util.POWER_LOOKUP[from] | Util.POWER_LOOKUP[to];
+		
+		long bb 					= Util.POWER_LOOKUP[from] | Util.POWER_LOOKUP[to];
 		
 		cb.pieces[colour][ROOK] 	^= bb;
 		cb.friendlyPieces[colour] 	^= bb;
 		
-		cb.pieceIndexes[from] 				= EMPTY;
-		cb.pieceIndexes[to] 				= ROOK;
+		cb.pieceIndexes[from] 		= EMPTY;
+		cb.pieceIndexes[to] 		= ROOK;
 		
-		cb.zobristKey 						^= Zobrist.piece[from][colour][ROOK] ^ Zobrist.piece[to][colour][ROOK];
+		cb.zobristKey 				^= Zobrist.piece[from][colour][ROOK] ^ Zobrist.piece[to][colour][ROOK];
 		
-		cb.psqtScore_mg						+= EvalConstants.PSQT_MG[ROOK][colour][to] - EvalConstants.PSQT_MG[ROOK][colour][from];
-		cb.psqtScore_eg 					+= EvalConstants.PSQT_EG[ROOK][colour][to] - EvalConstants.PSQT_EG[ROOK][colour][from];
+		cb.psqtScore_mg				+= EvalConstants.PSQT_MG[ROOK][colour][to] - EvalConstants.PSQT_MG[ROOK][colour][from];
+		cb.psqtScore_eg 			+= EvalConstants.PSQT_EG[ROOK][colour][to] - EvalConstants.PSQT_EG[ROOK][colour][from];
 	}
 	
 	
 	public static void uncastleRookUpdatePsqt(final ChessBoard cb, final int kingToIndex) {
 		
+		
 		if (Properties.DUMP_CASTLING) System.out.println("CastlingUtil.uncastleRookUpdatePsqt: kingToIndex=" + kingToIndex);
+		
+		
+		int[] rook_from_to 			= getRookFromToSquareIDs(cb, kingToIndex);
+		
+		int from 					= rook_from_to[0];
+		
+		int to 						= rook_from_to[1];
+		
+		
+		int colour 					= cb.colorToMoveInverse;
+		
+		
+		long bb 					= Util.POWER_LOOKUP[from] | Util.POWER_LOOKUP[to];
+		
+		cb.pieces[colour][ROOK] 	^= bb;
+		cb.friendlyPieces[colour] 	^= bb;
+		
+		cb.pieceIndexes[from] 		= ROOK;
+		cb.pieceIndexes[to] 		= EMPTY;
+						
+		cb.psqtScore_mg 			+= EvalConstants.PSQT_MG[ROOK][colour][from] - EvalConstants.PSQT_MG[ROOK][colour][to];
+		cb.psqtScore_eg 			+= EvalConstants.PSQT_EG[ROOK][colour][from] - EvalConstants.PSQT_EG[ROOK][colour][to];
+	}
+	
+	
+	private static final int[] getRookFromToSquareIDs(final ChessBoard cb, final int kingToIndex) {
 		
 		int from;
 		int to;
@@ -318,18 +307,6 @@ public final class CastlingUtil {
 				throw new RuntimeException("Incorrect king castling to-index: " + kingToIndex);
 		}
 		
-		
-		int colour 							= cb.colorToMoveInverse;
-		
-		long bb 							= Util.POWER_LOOKUP[from] | Util.POWER_LOOKUP[to];
-		
-		cb.pieces[colour][ROOK] 	^= bb;
-		cb.friendlyPieces[colour] 	^= bb;
-		
-		cb.pieceIndexes[from] 				= ROOK;
-		cb.pieceIndexes[to] 				= EMPTY;
-						
-		cb.psqtScore_mg 					+= EvalConstants.PSQT_MG[ROOK][colour][from] - EvalConstants.PSQT_MG[ROOK][colour][to];
-		cb.psqtScore_eg 					+= EvalConstants.PSQT_EG[ROOK][colour][from] - EvalConstants.PSQT_EG[ROOK][colour][to];
+		return new int[] {from, to};
 	}
 }

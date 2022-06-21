@@ -66,13 +66,25 @@ public class CastlingConfig {
 	
 	public CastlingConfig() {
 		
-		from_SquareID_king_w 			= E1;
-		from_SquareID_rook_kingside_w 	= H1;
-		from_SquareID_rook_queenside_w 	= A1;
+		this(E1, H1, A1, E8, H8, A8);
+	}
+	
+	
+	public CastlingConfig(int from_SquareID_king_w,
+			int from_SquareID_rook_kingside_w,
+			int from_SquareID_rook_queenside_w,
+			int from_SquareID_king_b,
+			int from_SquareID_rook_kingside_b,
+			int from_SquareID_rook_queenside_b
+			) {
 		
-		from_SquareID_king_b 			= E8;
-		from_SquareID_rook_kingside_b 	= H8;
-		from_SquareID_rook_queenside_b 	= A8;
+		this.from_SquareID_king_w 				= from_SquareID_king_w;
+		this.from_SquareID_rook_kingside_w 		= from_SquareID_rook_kingside_w;
+		this.from_SquareID_rook_queenside_w 	= from_SquareID_rook_queenside_w;
+		
+		this.from_SquareID_king_b 				= from_SquareID_king_b;
+		this.from_SquareID_rook_kingside_b 		= from_SquareID_rook_kingside_b;
+		this.from_SquareID_rook_queenside_b 	= from_SquareID_rook_queenside_b;
 		
 		//bb_inbetween_king_w 			= //TODO ...
 		bb_inbetween_rook_kingside_w 	= ChessConstants.IN_BETWEEN[from_SquareID_rook_kingside_w][F1] | Util.POWER_LOOKUP[F1];
