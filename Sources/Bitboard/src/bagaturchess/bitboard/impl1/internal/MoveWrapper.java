@@ -1,6 +1,10 @@
 package bagaturchess.bitboard.impl1.internal;
 
 
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
+
+
 public class MoveWrapper {
 
 	public int fromRank;
@@ -70,13 +74,33 @@ public class MoveWrapper {
 
 	public MoveWrapper(String moveString, ChessBoard cb) {
 
-		fromFile = moveString.charAt(0);
-		fromRank = Integer.parseInt(moveString.substring(1, 2));
-		fromIndex = (fromRank - 1) * 8 + 104 - fromFile;
+		if ("O-O".equals(moveString)) {
+			
+			isCastling = true;
+			
+			fromIndex 	= cb.colorToMove == WHITE ? cb.castlingConfig.from_SquareID_king_w : cb.castlingConfig.from_SquareID_king_b;
+			
+			toIndex 	= cb.colorToMove == WHITE ? CastlingConfig.H1 : CastlingConfig.H8;
+			
+		} else if ("O-O-O".equals(moveString)) {
+			
+			isCastling = true;
+			
+			fromIndex 	= cb.colorToMove == WHITE ? cb.castlingConfig.from_SquareID_king_w : cb.castlingConfig.from_SquareID_king_b;
+			
+			toIndex 	= cb.colorToMove == WHITE ? CastlingConfig.A1 : CastlingConfig.A8;
+			
+		} else {
+			
+			fromFile = moveString.charAt(0);
+			fromRank = Integer.parseInt(moveString.substring(1, 2));
+			fromIndex = (fromRank - 1) * 8 + 104 - fromFile;
 
-		toFile = moveString.charAt(2);
-		toRank = Integer.parseInt(moveString.substring(3, 4));
-		toIndex = (toRank - 1) * 8 + 104 - toFile;
+			toFile = moveString.charAt(2);
+			toRank = Integer.parseInt(moveString.substring(3, 4));
+			toIndex = (toRank - 1) * 8 + 104 - toFile;
+		}
+		
 
 		//@formatter:off
 		pieceIndex = 

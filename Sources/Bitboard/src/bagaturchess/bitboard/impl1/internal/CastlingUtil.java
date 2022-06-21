@@ -5,6 +5,8 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.EMPTY;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.KING;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 
 import bagaturchess.bitboard.common.Properties;
 
@@ -140,23 +142,31 @@ public final class CastlingUtil {
 		}
 		
 		
+		if (Properties.DUMP_CASTLING) System.out.println("CastlingUtil.isValidCastlingMove: fromIndex=" + fromIndex + ", toIndex=" + toIndex);
+		
+		
 		long bb_RookInBetween;
+		long bb_KingInBetween;
 		
 		if (toIndex == 1) {
 			
 			bb_RookInBetween = cb.castlingConfig.bb_inbetween_rook_kingside_w;
-			
+			bb_KingInBetween = cb.castlingConfig.bb_inbetween_king_kingside_w;
+					
 		} else if (toIndex == 5) {
 			
 			bb_RookInBetween = cb.castlingConfig.bb_inbetween_rook_queenside_w;
+			bb_KingInBetween = cb.castlingConfig.bb_inbetween_king_queenside_w;
 			
 		} else if (toIndex == 57) {
 			
 			bb_RookInBetween = cb.castlingConfig.bb_inbetween_rook_kingside_b;
+			bb_KingInBetween = cb.castlingConfig.bb_inbetween_king_kingside_b;
 			
 		} else if (toIndex == 61) {
 			
 			bb_RookInBetween = cb.castlingConfig.bb_inbetween_rook_queenside_b;
+			bb_KingInBetween = cb.castlingConfig.bb_inbetween_king_queenside_b;
 			
 		} else {
 			
@@ -164,20 +174,22 @@ public final class CastlingUtil {
 		}
 		
 		
-		//TODO: Chess960 exclude king and rooks
-		if ((cb.allPieces & bb_RookInBetween) != 0) {
+		long bb_all_pieces = cb.allPieces;
+		
+		//Create bitboards without kings and rooks
+		long bb_all_pieces_no_kings = bb_all_pieces ^ (cb.pieces[WHITE][KING] | cb.pieces[BLACK][KING]);
+		long bb_all_pieces_no_rooks = bb_all_pieces ^ (cb.pieces[WHITE][ROOK] | cb.pieces[BLACK][ROOK]);
+		
+		//Chess960 exclude king and rooks
+		if ((bb_all_pieces_no_kings & bb_RookInBetween) != 0 || (bb_all_pieces_no_rooks & bb_KingInBetween) != 0) {
 			
 			return false;
 		}
 		
 		
-		if (Properties.DUMP_CASTLING) System.out.println("CastlingUtil.isValidCastlingMove: fromIndex=" + fromIndex + ", toIndex=" + toIndex);
-		
-		long kingIndexes = ChessConstants.IN_BETWEEN[fromIndex][toIndex] | Util.POWER_LOOKUP[toIndex];
-		
-		while (kingIndexes != 0) {
+		while (bb_KingInBetween != 0) {
 			
-			int intermediateIndex = Long.numberOfTrailingZeros(kingIndexes);
+			int intermediateIndex = Long.numberOfTrailingZeros(bb_KingInBetween);
 			
 			// king does not move through a checked position?
 			if (CheckUtil.isInCheckIncludingKing(
@@ -192,7 +204,7 @@ public final class CastlingUtil {
 				return false;
 			}
 			
-			kingIndexes &= kingIndexes - 1;
+			bb_KingInBetween &= bb_KingInBetween - 1;
 		}
 
 		return true;

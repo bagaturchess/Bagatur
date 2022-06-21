@@ -323,6 +323,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 		} else {
 			
 			if (lastFEN != null) {
+				
 				board = BoardUtils.createBoard_WithPawnsCache();
 				destroySearchAdaptor();
 				

@@ -68,6 +68,7 @@ public abstract class UCISearchAdaptorImpl_Base implements IUCISearchAdaptor_Ext
 		boardForSetup = (IBitBoard) args[1];
 		rootSearchCfg = (IRootSearchConfig) searchAdaptorCfg.getRootSearchConfig();
 		
+		
 		sharedData = new SharedData(rootSearchCfg, null);
 		
 		searcherNormal = createRootSearcher();

@@ -60,7 +60,7 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 	
 	
 	public void createBoard(IBitBoard _bitboardForSetup) {
-		
+				
 		int movesCount = _bitboardForSetup.getPlayedMovesCount();
 		
 		int[] moves = Utils.copy(_bitboardForSetup.getPlayedMoves());
@@ -76,12 +76,16 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 				getRootSearchConfig().getBoardConfig(),
 				10000);
 		
+		ChannelManager.getChannel().dump("RootSearch_BaseImpl.createBoard: [Chess960/FRC] Castling Configuration is " + bitboardForSetup.getCastlingConfig());
+
 		for (int i=0; i<movesCount; i++) {
 			
 			_bitboardForSetup.makeMoveForward(moves[i]);
 			
 			bitboardForSetup.makeMoveForward(moves[i]);
 		}
+		
+		
 	}
 	
 	

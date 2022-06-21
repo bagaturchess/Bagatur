@@ -310,9 +310,9 @@ public class ChessBoardUtil {
 		}
 		
 		
-		//White kingside //0100
 		int rook_kingside_w = CastlingConfig.H1;
 		
+		//White kingside //0100
 		if ((cb.castlingRights & 8) != 0) {
 			
 			for (int square_id = king_w_square_id; square_id >= CastlingConfig.H1; square_id--) {
@@ -328,9 +328,10 @@ public class ChessBoardUtil {
 			}
 		}
 		
-		//White queenside //0100
+		
 		int rook_queenside_w = CastlingConfig.A1;
 		
+		//White queenside //0100
 		if ((cb.castlingRights & 4) != 0) {
 			
 			for (int square_id = king_w_square_id; square_id <= CastlingConfig.A1; square_id++) {
@@ -346,9 +347,10 @@ public class ChessBoardUtil {
 			}
 		}
 		
-		//Black kingside //0010
+		
 		int rook_kingside_b = CastlingConfig.H8;
 		
+		//Black kingside //0010
 		if ((cb.castlingRights & 2) != 0) {
 			
 			for (int square_id = king_b_square_id; square_id >= CastlingConfig.H8; square_id--) {
@@ -364,9 +366,10 @@ public class ChessBoardUtil {
 			}
 		}
 		
-		//Black queenside //0001
+		
 		int rook_queenside_b = CastlingConfig.A8;
 		
+		//Black queenside //0001
 		if ((cb.castlingRights & 1) != 0) {
 			
 			for (int square_id = king_b_square_id; square_id <= CastlingConfig.A8; square_id++) {

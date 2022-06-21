@@ -2,7 +2,6 @@ package bagaturchess.bitboard.impl1.internal;
 
 
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BISHOP;
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.EMPTY;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.KING;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.NIGHT;
@@ -18,8 +17,6 @@ import bagaturchess.bitboard.impl.datastructs.StackLongInt;
 public final class ChessBoard {
 	
 	ChessBoard() {
-		
-		castlingConfig = new CastlingConfig();
 	}
 
 	private static ChessBoard[] instances;
