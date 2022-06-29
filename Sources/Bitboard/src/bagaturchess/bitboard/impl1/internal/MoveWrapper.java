@@ -18,6 +18,7 @@ public class MoveWrapper {
 
 	public int fromIndex;
 	public int toIndex;
+	
 	public int move;
 
 	public int pieceIndex;
@@ -32,6 +33,7 @@ public class MoveWrapper {
 	public boolean isCastling = false;
 
 	public MoveWrapper(int move) {
+		
 		this.move = move;
 
 		fromIndex = MoveUtil.getFromIndex(move);
@@ -80,7 +82,13 @@ public class MoveWrapper {
 			
 			fromIndex 	= cb.colorToMove == WHITE ? cb.castlingConfig.from_SquareID_king_w : cb.castlingConfig.from_SquareID_king_b;
 			
-			toIndex 	= cb.colorToMove == WHITE ? CastlingConfig.H1 : CastlingConfig.H8;
+			toIndex 	= cb.colorToMove == WHITE ? CastlingConfig.G1 : CastlingConfig.G8;
+			
+			fromFile 	= (char) (104 - fromIndex % 8);
+			fromRank 	= fromIndex / 8 + 1;
+
+			toFile 		= (char) (104 - toIndex % 8);
+			toRank 		= toIndex / 8 + 1;
 			
 		} else if ("O-O-O".equals(moveString)) {
 			
@@ -88,7 +96,13 @@ public class MoveWrapper {
 			
 			fromIndex 	= cb.colorToMove == WHITE ? cb.castlingConfig.from_SquareID_king_w : cb.castlingConfig.from_SquareID_king_b;
 			
-			toIndex 	= cb.colorToMove == WHITE ? CastlingConfig.A1 : CastlingConfig.A8;
+			toIndex 	= cb.colorToMove == WHITE ? CastlingConfig.C1 : CastlingConfig.C8;
+			
+			fromFile 	= (char) (104 - fromIndex % 8);
+			fromRank 	= fromIndex / 8 + 1;
+
+			toFile 		= (char) (104 - toIndex % 8);
+			toRank 		= toIndex / 8 + 1;
 			
 		} else {
 			
@@ -101,8 +115,7 @@ public class MoveWrapper {
 			toIndex = (toRank - 1) * 8 + 104 - toFile;
 		}
 		
-
-		//@formatter:off
+		
 		pieceIndex = 
 				  (cb.pieces[cb.colorToMove][ChessConstants.PAWN] & Util.POWER_LOOKUP[fromIndex]) != 0 ? ChessConstants.PAWN
 				: (cb.pieces[cb.colorToMove][ChessConstants.BISHOP] & Util.POWER_LOOKUP[fromIndex]) != 0 ? ChessConstants.BISHOP
@@ -111,10 +124,12 @@ public class MoveWrapper {
 				: (cb.pieces[cb.colorToMove][ChessConstants.QUEEN] & Util.POWER_LOOKUP[fromIndex]) != 0 ? ChessConstants.QUEEN
 				: (cb.pieces[cb.colorToMove][ChessConstants.ROOK] & Util.POWER_LOOKUP[fromIndex]) != 0 ? ChessConstants.ROOK 
 				: -1;
+		
 		if (pieceIndex == -1) {
+			
 			throw new RuntimeException("Source piece not found at index " + fromIndex + ", move is " + moveString + ", fen is " + cb);
 		}
-
+		
 		pieceIndexAttacked = 
 				  (cb.pieces[cb.colorToMoveInverse][ChessConstants.PAWN] & Util.POWER_LOOKUP[toIndex]) != 0 ? ChessConstants.PAWN
 				: (cb.pieces[cb.colorToMoveInverse][ChessConstants.BISHOP] & Util.POWER_LOOKUP[toIndex]) != 0 ? ChessConstants.BISHOP
@@ -123,7 +138,7 @@ public class MoveWrapper {
 				: (cb.pieces[cb.colorToMoveInverse][ChessConstants.QUEEN] & Util.POWER_LOOKUP[toIndex]) != 0 ? ChessConstants.QUEEN
 				: (cb.pieces[cb.colorToMoveInverse][ChessConstants.ROOK] & Util.POWER_LOOKUP[toIndex]) != 0 ? ChessConstants.ROOK 
 				: 0;
-		//@formatter:on
+		
 
 		if (pieceIndexAttacked == 0) {
 			if (pieceIndex == ChessConstants.PAWN && (toRank == 1 || toRank == 8)) {
@@ -141,18 +156,27 @@ public class MoveWrapper {
 						isQueenPromotion = true;
 						move = MoveUtil.createPromotionMove(MoveUtil.TYPE_PROMOTION_Q, fromIndex, toIndex);
 					}
+					
 				} else {
+					
 					isQueenPromotion = true;
 					move = MoveUtil.createPromotionMove(MoveUtil.TYPE_PROMOTION_Q, fromIndex, toIndex);
 				}
+				
 			} else {
-				if (pieceIndex == ChessConstants.KING && (fromIndex - toIndex == 2 || fromIndex - toIndex == -2)) {
+				
+				if (pieceIndex == ChessConstants.KING && isCastling) {
+					
 					// castling
 					move = MoveUtil.createCastlingMove(fromIndex, toIndex);
+					
 				} else if (pieceIndex == ChessConstants.PAWN && toIndex % 8 != fromIndex % 8) {
+					
 					// ep
 					move = MoveUtil.createEPMove(fromIndex, toIndex);
+					
 				} else {
+					
 					move = MoveUtil.createMove(fromIndex, toIndex, pieceIndex);
 				}
 			}

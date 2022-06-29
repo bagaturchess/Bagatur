@@ -310,9 +310,15 @@ public class StateManager extends Protocol implements BestMoveSender {
 		 */
 		Position position = new Position(channel, fromGUILine);
 		
+		channel.sendLogToGUI("StateManager: setupBoard: position.getFen()=" + position.getFen() + ", lastFEN=" + lastFEN);
+		
 		if (position.getFen() != null) {
 			
+			channel.sendLogToGUI("StateManager: setupBoard: position.getFen() != null");
+			
 			if (lastFEN == null || !lastFEN.equals(position.getFen())) {
+				
+				channel.sendLogToGUI("StateManager: setupBoard: re-create board, because (lastFEN == null || !lastFEN.equals(position.getFen()))");
 				
 				board = BoardUtils.createBoard_WithPawnsCache(position.getFen(), null);
 				destroySearchAdaptor();
@@ -322,7 +328,11 @@ public class StateManager extends Protocol implements BestMoveSender {
 			
 		} else {
 			
+			channel.sendLogToGUI("StateManager: setupBoard: position.getFen() == null");
+			
 			if (lastFEN != null) {
+				
+				channel.sendLogToGUI("StateManager: setupBoard: re-create board, because (lastFEN != null)");
 				
 				board = BoardUtils.createBoard_WithPawnsCache();
 				destroySearchAdaptor();

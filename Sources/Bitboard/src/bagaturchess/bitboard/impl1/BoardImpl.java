@@ -1176,7 +1176,7 @@ public class BoardImpl implements IBitBoard {
 		public boolean isCastlingKingSide(int move) {
 			if (isCastling(move)) {
 				int index = MoveUtil.getToIndex(move);
-				return index == 1 || index == 57;
+				return index == CastlingConfig.G1 || index == CastlingConfig.G8;
 			}
 			
 			return false;
@@ -1188,7 +1188,7 @@ public class BoardImpl implements IBitBoard {
 			
 			if (isCastling(move)) {
 				int index = MoveUtil.getToIndex(move);
-				return index == 5 || index == 61; 
+				return index == CastlingConfig.C1 || index == CastlingConfig.C8; 
 			}
 			
 			return false;

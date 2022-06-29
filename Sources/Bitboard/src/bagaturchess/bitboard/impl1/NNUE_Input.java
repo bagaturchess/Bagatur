@@ -114,31 +114,34 @@ public class NNUE_Input implements MoveListener {
 			
 			switch (toFieldID) {
 				
-				case 1:
+				case CastlingConfig.G1:
+					
 					//White king side
 					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_w, 0);
 					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.F1, 1);
 					break;
 				
-				case 5:
+				case CastlingConfig.C1:
+					
 					//White queen side
 					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_w, 0);
 					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.D1, 1);
 					break;
 					
-				case 57:
+				case CastlingConfig.G8:
 					//Black king side
 					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_b, 0);
 					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.F8, 1);
 					break;
 					
-				case 61:
+				case CastlingConfig.C8:
 					//Black queen side
 					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_b, 0);
 					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.D8, 1);
 					break;
 					
 				default:
+					
 					throw new RuntimeException("Incorrect king index: " + toFieldID);
 			}
 			
@@ -184,31 +187,36 @@ public class NNUE_Input implements MoveListener {
 			
 			switch (toFieldID) {
 			
-			case 1:
-				//White king side
-				setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_w, 1);
-				setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.F1, 0);
-				break;
-			
-			case 5:
-				//White queen side
-				setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_w, 1);
-				setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.D1, 0);
-				break;
-				
-			case 57:
-				//Black king side
-				setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_b, 1);
-				setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.F8, 0);
-				break;
-				
-			case 61:
-				//Black queen side
-				setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_b, 1);
-				setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.D8, 0);
-				break;
+				case CastlingConfig.G1:
 					
+					//White king side
+					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_w, 1);
+					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.F1, 0);
+					break;
+				
+				case CastlingConfig.C1:
+					
+					//White queen side
+					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_w, 1);
+					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.D1, 0);
+					break;
+					
+				case CastlingConfig.G8:
+					
+					//Black king side
+					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_b, 1);
+					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.F8, 0);
+					break;
+					
+				case CastlingConfig.C8:
+					
+					//Black queen side
+					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_b, 1);
+					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.D8, 0);
+					break;
+						
 				default:
+						
 					throw new RuntimeException("Incorrect king castling to-index: " + toFieldID);
 			}
 			

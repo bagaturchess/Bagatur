@@ -6,7 +6,6 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.EMPTY;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.KING;
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 
 import bagaturchess.bitboard.common.Properties;
 
@@ -90,8 +89,6 @@ public final class CastlingUtil {
 			
 			throw new IllegalStateException("colorToMove=" + colorToMove);
 		}
-		
-		//throw new RuntimeException("Unknown castling-right: " + castlingRights);
 	}
 	
 	
@@ -118,7 +115,7 @@ public final class CastlingUtil {
 	}
 	
 	
-	public static int getKingMovedCastlingRights(final int castlingRights, final int kingFromIndex, final CastlingConfig castlingConfig) {
+	/*public static int getKingMovedCastlingRights(final int castlingRights, final int kingFromIndex, final CastlingConfig castlingConfig) {
 		
 		if (kingFromIndex == castlingConfig.from_SquareID_king_w) {
 			
@@ -127,9 +124,30 @@ public final class CastlingUtil {
 		} else if (kingFromIndex == castlingConfig.from_SquareID_king_b) {
 			
 			return castlingRights & 12; // 1100
+			
+		} else {
+			
+			throw new RuntimeException("Incorrect kingFromIndex: " + kingFromIndex);
+			//return castlingRights;
 		}
+	}
+	*/
+	
+	
+	public static int getKingMovedCastlingRights(final int castlingRights, final int color, final CastlingConfig castlingConfig) {
 		
-		return castlingRights;
+		if (color == WHITE) {
+			
+			return castlingRights & 3; // 0011
+			
+		} else if (color == BLACK) {
+			
+			return castlingRights & 12; // 1100
+			
+		} else {
+			
+			throw new RuntimeException("Incorrect color: " + color);
+		}
 	}
 	
 	
@@ -148,52 +166,102 @@ public final class CastlingUtil {
 		long bb_RookInBetween;
 		long bb_KingInBetween;
 		
-		if (toIndex == 1) {
+		//Create bitboards without king and rook
+		long bb_all_pieces_no_king;
+		long bb_all_pieces_no_rook;
+		
+		if (toIndex == CastlingConfig.G1) {
 			
 			bb_RookInBetween = cb.castlingConfig.bb_inbetween_rook_kingside_w;
 			bb_KingInBetween = cb.castlingConfig.bb_inbetween_king_kingside_w;
-					
-		} else if (toIndex == 5) {
+			
+			bb_all_pieces_no_king = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_w]);
+			bb_all_pieces_no_rook = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_kingside_w]);
+			
+			if ((Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_w] & cb.pieces[WHITE][KING]) == 0L) {
+				
+				throw new IllegalStateException();
+			}
+			
+			if ((Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_kingside_w] & cb.pieces[WHITE][ROOK]) == 0L) {
+				
+				throw new IllegalStateException();
+			}
+			
+		} else if (toIndex == CastlingConfig.C1) {
 			
 			bb_RookInBetween = cb.castlingConfig.bb_inbetween_rook_queenside_w;
 			bb_KingInBetween = cb.castlingConfig.bb_inbetween_king_queenside_w;
 			
-		} else if (toIndex == 57) {
+			bb_all_pieces_no_king = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_w]);
+			bb_all_pieces_no_rook = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_queenside_w]);
+			
+			if ((Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_w] & cb.pieces[WHITE][KING]) == 0L) {
+				
+				throw new IllegalStateException();
+			}
+			
+			if ((Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_queenside_w] & cb.pieces[WHITE][ROOK]) == 0L) {
+				
+				throw new IllegalStateException();
+			}
+			
+		} else if (toIndex == CastlingConfig.G8) {
 			
 			bb_RookInBetween = cb.castlingConfig.bb_inbetween_rook_kingside_b;
 			bb_KingInBetween = cb.castlingConfig.bb_inbetween_king_kingside_b;
 			
-		} else if (toIndex == 61) {
+			bb_all_pieces_no_king = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_b]);
+			bb_all_pieces_no_rook = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_kingside_b]);
+			
+			if ((Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_b] & cb.pieces[BLACK][KING]) == 0L) {
+				
+				throw new IllegalStateException();
+			}
+			
+			if ((Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_kingside_b] & cb.pieces[BLACK][ROOK]) == 0L) {
+				
+				throw new IllegalStateException();
+			}
+			
+		} else if (toIndex == CastlingConfig.C8) {
 			
 			bb_RookInBetween = cb.castlingConfig.bb_inbetween_rook_queenside_b;
 			bb_KingInBetween = cb.castlingConfig.bb_inbetween_king_queenside_b;
+			
+			bb_all_pieces_no_king = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_b]);
+			bb_all_pieces_no_rook = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_queenside_b]);
+			
+			if ((Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_b] & cb.pieces[BLACK][KING]) == 0L) {
+				
+				throw new IllegalStateException();
+			}
+			
+			if ((Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_queenside_b] & cb.pieces[BLACK][ROOK]) == 0L) {
+				
+				throw new IllegalStateException();
+			}
 			
 		} else {
 			
 			throw new RuntimeException("Incorrect castling-index: " + toIndex);
 		}
 		
-		
-		long bb_all_pieces = cb.allPieces;
-		
-		//Create bitboards without kings and rooks
-		long bb_all_pieces_no_kings = bb_all_pieces ^ (cb.pieces[WHITE][KING] | cb.pieces[BLACK][KING]);
-		long bb_all_pieces_no_rooks = bb_all_pieces ^ (cb.pieces[WHITE][ROOK] | cb.pieces[BLACK][ROOK]);
-		
-		//Chess960 exclude king and rooks
-		if ((bb_all_pieces_no_kings & bb_RookInBetween) != 0 || (bb_all_pieces_no_rooks & bb_KingInBetween) != 0) {
+		if ((bb_all_pieces_no_rook & bb_KingInBetween) != 0
+			|| (bb_all_pieces_no_king & bb_RookInBetween) != 0) {
 			
 			return false;
 		}
 		
 		
+		//Finally, check if the KingInBetween squares are attacked by the opponent
 		while (bb_KingInBetween != 0) {
 			
-			int intermediateIndex = Long.numberOfTrailingZeros(bb_KingInBetween);
+			int intermediate_square_id = Long.numberOfTrailingZeros(bb_KingInBetween);
 			
 			// king does not move through a checked position?
 			if (CheckUtil.isInCheckIncludingKing(
-						intermediateIndex,
+						intermediate_square_id,
 						cb.colorToMove,
 						cb.pieces[cb.colorToMoveInverse],
 						cb.allPieces,

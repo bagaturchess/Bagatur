@@ -266,7 +266,7 @@ public final class ChessBoard {
 				
 				if (Properties.DUMP_CASTLING) System.out.println("ChessBoard.doMove/KING: castlingRights=" + castlingRights);
 				
-				castlingRights = CastlingUtil.getKingMovedCastlingRights(castlingRights, fromIndex, castlingConfig);
+				castlingRights = CastlingUtil.getKingMovedCastlingRights(castlingRights, colorToMove, castlingConfig);
 				
 				if (Properties.DUMP_CASTLING) System.out.println("ChessBoard.doMove/KING: NEW castlingRights=" + castlingRights);
 				

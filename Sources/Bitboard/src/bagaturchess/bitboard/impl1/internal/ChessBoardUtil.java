@@ -312,7 +312,7 @@ public class ChessBoardUtil {
 		
 		int rook_kingside_w = CastlingConfig.H1;
 		
-		//White kingside //0100
+		//White kingside //1000
 		if ((cb.castlingRights & 8) != 0) {
 			
 			for (int square_id = king_w_square_id; square_id >= CastlingConfig.H1; square_id--) {
