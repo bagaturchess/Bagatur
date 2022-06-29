@@ -206,7 +206,7 @@ public class BoardImpl implements IBitBoard {
 		int counter = 0;
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
-			if (!chessBoard.isLegal(cur_move)) {
+			if (!isPossible(cur_move)) {
 				continue;
 			}
 			list.reserved_add(cur_move);
@@ -234,7 +234,7 @@ public class BoardImpl implements IBitBoard {
 		int counter = 0;
 		while (generator.hasNext()) {
 			int cur_move = generator.next();
-			if (!chessBoard.isLegal(cur_move)) {
+			if (!isPossible(cur_move)) {
 				continue;
 			}
 			list.reserved_add(cur_move);
@@ -251,16 +251,18 @@ public class BoardImpl implements IBitBoard {
 	public void makeMoveForward(int move) {
 		
 		
-		if (moveListeners.length > 0) {
-			for (int i=0; i<moveListeners.length; i++) {
-				moveListeners[i].preForwardMove(chessBoard.colorToMove, move);
-			}
-		}
-		
-		
 		if (moveOps.isCastling(move)) {
 			
 			castledByColour[getColourToMove()] = moveOps.isCastlingKingSide(move) ? IBoard.CastlingType.KINGSIDE : IBoard.CastlingType.QUEENSIDE;
+		}
+		
+		
+		if (moveListeners.length > 0) {
+			
+			for (int i=0; i<moveListeners.length; i++) {
+				
+				moveListeners[i].preForwardMove(chessBoard.colorToMove, move);
+			}
 		}
 		
 		
@@ -268,7 +270,9 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		if (moveListeners.length > 0) {
+			
 			for (int i=0; i<moveListeners.length; i++) {
+				
 				moveListeners[i].postForwardMove(chessBoard.colorToMoveInverse, move);
 			}
 		}
@@ -297,7 +301,7 @@ public class BoardImpl implements IBitBoard {
 		
 		if (moveListeners.length > 0) {
 			for (int i=0; i<moveListeners.length; i++) {
-				moveListeners[i].postBackwardMove(chessBoard.colorToMove, move);
+				moveListeners[i].postBackwardMove(getColourToMove(), move);
 			}
 		}
 	}

@@ -429,7 +429,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				lastSentMinorInfo_nodesCount = info.getSearchedNodes();
 			}
 
-			if(!cb.isLegal(move)) {
+			if(!getEnv().getBitboard().isPossible(move)) {
+				
 				continue;
 			}
 			
@@ -732,7 +733,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
-				if (!cb.isLegal(move)) {
+				if (!getEnv().getBitboard().isPossible(move)) {
 					continue;
 				}
 				

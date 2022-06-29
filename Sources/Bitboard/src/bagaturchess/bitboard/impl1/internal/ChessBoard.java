@@ -259,7 +259,7 @@ public final class ChessBoard {
 				
 				if (MoveUtil.isCastlingMove(move)) {
 					
-					CastlingUtil.castleRookUpdateKeyAndPsqt(this, toIndex);
+					CastlingUtil.castleRookUpdateKeyAndPsqt(this, colorToMove, toIndex);
 				}
 				
 				zobristKey ^= Zobrist.castling[castlingRights];
@@ -423,7 +423,7 @@ public final class ChessBoard {
 			
 			if (MoveUtil.isCastlingMove(move)) {
 				
-				CastlingUtil.uncastleRookUpdatePsqt(this, toIndex);
+				CastlingUtil.uncastleRookUpdatePsqt(this, colorToMoveInverse, toIndex);
 			}
 			
 			updateKingValues(colorToMoveInverse, fromIndex);
@@ -480,7 +480,9 @@ public final class ChessBoard {
 	}
 	
 	public boolean isLegal(final int move) {
+		
 		if (MoveUtil.getSourcePieceIndex(move) == KING) {
+			
 			return !CheckUtil.isInCheckIncludingKing(MoveUtil.getToIndex(move), colorToMove, pieces[colorToMoveInverse],
 					allPieces ^ Util.POWER_LOOKUP[MoveUtil.getFromIndex(move)], MaterialUtil.getMajorPieces(materialKey, colorToMoveInverse));
 		}
@@ -626,7 +628,7 @@ public final class ChessBoard {
 			if (attackedPieceIndex == 0) {
 				return isLegalNonKingMove(move);
 			} else {
-				if (Long.bitCount(checkingPieces) == 2) {
+				if (Long.bitCount(checkingPieces) >= 2) {
 					return false;
 				}
 				return (toSquare & checkingPieces) != 0;

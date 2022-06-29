@@ -92,21 +92,21 @@ public final class CastlingUtil {
 	}
 	
 	
-	public static int getRookMovedOrAttackedCastlingRights(final int castlingRights, final int rookFromIndex, final CastlingConfig castlingConfig) {
+	public static int getRookMovedOrAttackedCastlingRights(final int castlingRights, final int rook_square_id, final CastlingConfig castlingConfig) {
 		
-		if (rookFromIndex == castlingConfig.from_SquareID_rook_kingside_w) {
+		if (rook_square_id == castlingConfig.from_SquareID_rook_kingside_w) {
 			
 			return castlingRights & 7; // 0111
 			
-		} else if (rookFromIndex == castlingConfig.from_SquareID_rook_queenside_w) {
+		} else if (rook_square_id == castlingConfig.from_SquareID_rook_queenside_w) {
 			
 			return castlingRights & 11; // 1011
 			
-		} else if (rookFromIndex == castlingConfig.from_SquareID_rook_kingside_b) {
+		} else if (rook_square_id == castlingConfig.from_SquareID_rook_kingside_b) {
 			
 			return castlingRights & 13; // 1101
 			
-		} else if (rookFromIndex == castlingConfig.from_SquareID_rook_queenside_b) {
+		} else if (rook_square_id == castlingConfig.from_SquareID_rook_queenside_b) {
 			
 			return castlingRights & 14; // 1110
 		}
@@ -166,7 +166,7 @@ public final class CastlingUtil {
 		long bb_RookInBetween;
 		long bb_KingInBetween;
 		
-		//Create bitboards without king and rook
+		//Create bitboards without the king and the rook, which are castling
 		long bb_all_pieces_no_king;
 		long bb_all_pieces_no_rook;
 		
@@ -279,7 +279,7 @@ public final class CastlingUtil {
 	}
 	
 	
-	public static void castleRookUpdateKeyAndPsqt(final ChessBoard cb, final int kingToIndex) {
+	public static void castleRookUpdateKeyAndPsqt(final ChessBoard cb, int color, final int kingToIndex) {
 		
 		
 		if (Properties.DUMP_CASTLING) System.out.println("CastlingUtil.castleRookUpdateKeyAndPsqt: kingToIndex=" + kingToIndex);
@@ -292,25 +292,22 @@ public final class CastlingUtil {
 		int to 						= rook_from_to[1];
 		
 		
-		int colour 					= cb.colorToMove;
-		
-		
 		long bb 					= Util.POWER_LOOKUP[from] | Util.POWER_LOOKUP[to];
 		
-		cb.pieces[colour][ROOK] 	^= bb;
-		cb.friendlyPieces[colour] 	^= bb;
+		cb.pieces[color][ROOK] 		^= bb;
+		cb.friendlyPieces[color] 	^= bb;
 		
 		cb.pieceIndexes[from] 		= EMPTY;
 		cb.pieceIndexes[to] 		= ROOK;
 		
-		cb.zobristKey 				^= Zobrist.piece[from][colour][ROOK] ^ Zobrist.piece[to][colour][ROOK];
+		cb.zobristKey 				^= Zobrist.piece[from][color][ROOK] ^ Zobrist.piece[to][color][ROOK];
 		
-		cb.psqtScore_mg				+= EvalConstants.PSQT_MG[ROOK][colour][to] - EvalConstants.PSQT_MG[ROOK][colour][from];
-		cb.psqtScore_eg 			+= EvalConstants.PSQT_EG[ROOK][colour][to] - EvalConstants.PSQT_EG[ROOK][colour][from];
+		cb.psqtScore_mg				+= EvalConstants.PSQT_MG[ROOK][color][to] - EvalConstants.PSQT_MG[ROOK][color][from];
+		cb.psqtScore_eg 			+= EvalConstants.PSQT_EG[ROOK][color][to] - EvalConstants.PSQT_EG[ROOK][color][from];
 	}
 	
 	
-	public static void uncastleRookUpdatePsqt(final ChessBoard cb, final int kingToIndex) {
+	public static void uncastleRookUpdatePsqt(final ChessBoard cb, int color, final int kingToIndex) {
 		
 		
 		if (Properties.DUMP_CASTLING) System.out.println("CastlingUtil.uncastleRookUpdatePsqt: kingToIndex=" + kingToIndex);
@@ -323,19 +320,16 @@ public final class CastlingUtil {
 		int to 						= rook_from_to[1];
 		
 		
-		int colour 					= cb.colorToMoveInverse;
-		
-		
 		long bb 					= Util.POWER_LOOKUP[from] | Util.POWER_LOOKUP[to];
 		
-		cb.pieces[colour][ROOK] 	^= bb;
-		cb.friendlyPieces[colour] 	^= bb;
+		cb.pieces[color][ROOK] 		^= bb;
+		cb.friendlyPieces[color] 	^= bb;
 		
 		cb.pieceIndexes[from] 		= ROOK;
 		cb.pieceIndexes[to] 		= EMPTY;
 						
-		cb.psqtScore_mg 			+= EvalConstants.PSQT_MG[ROOK][colour][from] - EvalConstants.PSQT_MG[ROOK][colour][to];
-		cb.psqtScore_eg 			+= EvalConstants.PSQT_EG[ROOK][colour][from] - EvalConstants.PSQT_EG[ROOK][colour][to];
+		cb.psqtScore_mg 			+= EvalConstants.PSQT_MG[ROOK][color][from] - EvalConstants.PSQT_MG[ROOK][color][to];
+		cb.psqtScore_eg 			+= EvalConstants.PSQT_EG[ROOK][color][from] - EvalConstants.PSQT_EG[ROOK][color][to];
 	}
 	
 	
@@ -346,7 +340,7 @@ public final class CastlingUtil {
 		
 		switch (kingToIndex) {
 		
-			case 1:
+			case CastlingConfig.G1:
 				
 				// White king side
 				
@@ -355,7 +349,7 @@ public final class CastlingUtil {
 				
 				break;
 			
-			case 5:
+			case CastlingConfig.C1:
 				
 				// White queen side
 				
@@ -364,7 +358,7 @@ public final class CastlingUtil {
 				
 				break;
 				
-			case 57:
+			case CastlingConfig.G8:
 				
 				// Black king side
 				
@@ -373,7 +367,7 @@ public final class CastlingUtil {
 				
 				break;
 				
-			case 61:
+			case CastlingConfig.C8:
 				
 				// Black queen side
 				

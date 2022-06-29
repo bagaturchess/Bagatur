@@ -253,14 +253,6 @@ public class ChessBoardUtil {
 	private static final void setCastling960Configuration(final ChessBoard cb) {
 		
 		
-		/*
-		Commented in order to prevent potential null pointer exceptions, when cb.castlingConfig is not set and stay null.
-		if (cb.castlingRights == 0) {
-			
-			return;
-		}*/
-		
-		
 		long bb_king_w = cb.pieces[WHITE][KING];
 		long bb_king_b = cb.pieces[BLACK][KING];
 		

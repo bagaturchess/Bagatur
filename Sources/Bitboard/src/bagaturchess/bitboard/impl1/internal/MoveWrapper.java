@@ -75,45 +75,15 @@ public class MoveWrapper {
 	}
 
 	public MoveWrapper(String moveString, ChessBoard cb) {
+		
+			
+		fromFile = moveString.charAt(0);
+		fromRank = Integer.parseInt(moveString.substring(1, 2));
+		fromIndex = (fromRank - 1) * 8 + 104 - fromFile;
 
-		if ("O-O".equals(moveString)) {
-			
-			isCastling = true;
-			
-			fromIndex 	= cb.colorToMove == WHITE ? cb.castlingConfig.from_SquareID_king_w : cb.castlingConfig.from_SquareID_king_b;
-			
-			toIndex 	= cb.colorToMove == WHITE ? CastlingConfig.G1 : CastlingConfig.G8;
-			
-			fromFile 	= (char) (104 - fromIndex % 8);
-			fromRank 	= fromIndex / 8 + 1;
-
-			toFile 		= (char) (104 - toIndex % 8);
-			toRank 		= toIndex / 8 + 1;
-			
-		} else if ("O-O-O".equals(moveString)) {
-			
-			isCastling = true;
-			
-			fromIndex 	= cb.colorToMove == WHITE ? cb.castlingConfig.from_SquareID_king_w : cb.castlingConfig.from_SquareID_king_b;
-			
-			toIndex 	= cb.colorToMove == WHITE ? CastlingConfig.C1 : CastlingConfig.C8;
-			
-			fromFile 	= (char) (104 - fromIndex % 8);
-			fromRank 	= fromIndex / 8 + 1;
-
-			toFile 		= (char) (104 - toIndex % 8);
-			toRank 		= toIndex / 8 + 1;
-			
-		} else {
-			
-			fromFile = moveString.charAt(0);
-			fromRank = Integer.parseInt(moveString.substring(1, 2));
-			fromIndex = (fromRank - 1) * 8 + 104 - fromFile;
-
-			toFile = moveString.charAt(2);
-			toRank = Integer.parseInt(moveString.substring(3, 4));
-			toIndex = (toRank - 1) * 8 + 104 - toFile;
-		}
+		toFile = moveString.charAt(2);
+		toRank = Integer.parseInt(moveString.substring(3, 4));
+		toIndex = (toRank - 1) * 8 + 104 - toFile;
 		
 		
 		pieceIndex = 
@@ -129,6 +99,7 @@ public class MoveWrapper {
 			
 			throw new RuntimeException("Source piece not found at index " + fromIndex + ", move is " + moveString + ", fen is " + cb);
 		}
+		
 		
 		pieceIndexAttacked = 
 				  (cb.pieces[cb.colorToMoveInverse][ChessConstants.PAWN] & Util.POWER_LOOKUP[toIndex]) != 0 ? ChessConstants.PAWN
@@ -165,9 +136,38 @@ public class MoveWrapper {
 				
 			} else {
 				
-				if (pieceIndex == ChessConstants.KING && isCastling) {
+				if (cb.colorToMove == WHITE) {
 					
-					// castling
+					if (pieceIndex == ChessConstants.KING && (cb.castlingRights & 8) != 0L && fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.G1) {
+						
+						isCastling = true;
+					}
+					
+					if (pieceIndex == ChessConstants.KING && (cb.castlingRights & 4) != 0L && fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.C1) {
+						
+						isCastling = true;
+					}
+					
+				} else if (cb.colorToMove == BLACK) {
+					
+					if (pieceIndex == ChessConstants.KING && (cb.castlingRights & 2) != 0L && fromIndex == cb.castlingConfig.from_SquareID_king_b && toIndex == CastlingConfig.G8) {
+						
+						isCastling = true;
+					}
+					
+					if (pieceIndex == ChessConstants.KING && (cb.castlingRights & 1) != 0L && fromIndex == cb.castlingConfig.from_SquareID_king_b && toIndex == CastlingConfig.C8) {
+						
+						isCastling = true;
+					}
+					
+				} else {
+					
+					throw new IllegalStateException("cb.colorToMove=" + cb.colorToMove);
+				}
+				
+				
+				if (isCastling) {
+					
 					move = MoveUtil.createCastlingMove(fromIndex, toIndex);
 					
 				} else if (pieceIndex == ChessConstants.PAWN && toIndex % 8 != fromIndex % 8) {
