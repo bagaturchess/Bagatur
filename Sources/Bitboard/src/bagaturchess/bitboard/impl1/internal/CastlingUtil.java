@@ -291,6 +291,11 @@ public final class CastlingUtil {
 		
 		int to 						= rook_from_to[1];
 		
+		if (from == to) {
+			
+			return;
+		}
+		
 		
 		long bb 					= Util.POWER_LOOKUP[from] | Util.POWER_LOOKUP[to];
 		
@@ -318,6 +323,11 @@ public final class CastlingUtil {
 		int from 					= rook_from_to[0];
 		
 		int to 						= rook_from_to[1];
+		
+		if (from == to) {
+			
+			return;
+		}
 		
 		
 		long bb 					= Util.POWER_LOOKUP[from] | Util.POWER_LOOKUP[to];

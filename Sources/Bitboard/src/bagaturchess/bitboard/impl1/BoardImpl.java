@@ -191,7 +191,14 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public String toString() {
-		return chessBoard.toString();
+		
+		String moves_str = "";
+		int[] moves = chessBoard.playedMoves;
+		for (int i = 0; i < chessBoard.playedMovesCount; i++) {
+			moves_str += moveOps.moveToString(moves[i]) + ",";
+		}
+		
+		return chessBoard.toString() + ", MOVES: " + moves_str;
 	}
 	
 	
@@ -750,6 +757,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public String toEPD() {
+
 		return chessBoard.toString();
 	}
 	

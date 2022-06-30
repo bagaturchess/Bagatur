@@ -112,6 +112,7 @@ public class MoveWrapper {
 		
 
 		if (pieceIndexAttacked == 0) {
+			
 			if (pieceIndex == ChessConstants.PAWN && (toRank == 1 || toRank == 8)) {
 				if (moveString.length() == 5) {
 					if (moveString.substring(4, 5).equals("n")) {
@@ -136,33 +137,27 @@ public class MoveWrapper {
 				
 			} else {
 				
-				if (cb.colorToMove == WHITE) {
+				if (pieceIndex == ChessConstants.KING) {
 					
-					if (pieceIndex == ChessConstants.KING && (cb.castlingRights & 8) != 0L && fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.G1) {
+					if (fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.G1) {
 						
-						isCastling = true;
+						isCastling = (cb.castlingRights & 8) != 0L;
 					}
 					
-					if (pieceIndex == ChessConstants.KING && (cb.castlingRights & 4) != 0L && fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.C1) {
+					if (fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.C1) {
 						
-						isCastling = true;
+						isCastling = (cb.castlingRights & 4) != 0L;
 					}
 					
-				} else if (cb.colorToMove == BLACK) {
-					
-					if (pieceIndex == ChessConstants.KING && (cb.castlingRights & 2) != 0L && fromIndex == cb.castlingConfig.from_SquareID_king_b && toIndex == CastlingConfig.G8) {
+					if (fromIndex == cb.castlingConfig.from_SquareID_king_b && toIndex == CastlingConfig.G8) {
 						
-						isCastling = true;
+						isCastling = (cb.castlingRights & 2) != 0L;
 					}
 					
-					if (pieceIndex == ChessConstants.KING && (cb.castlingRights & 1) != 0L && fromIndex == cb.castlingConfig.from_SquareID_king_b && toIndex == CastlingConfig.C8) {
+					if (fromIndex == cb.castlingConfig.from_SquareID_king_b && toIndex == CastlingConfig.C8) {
 						
-						isCastling = true;
+						isCastling = (cb.castlingRights & 1) != 0L;
 					}
-					
-				} else {
-					
-					throw new IllegalStateException("cb.colorToMove=" + cb.colorToMove);
 				}
 				
 				

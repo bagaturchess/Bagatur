@@ -95,7 +95,7 @@ public class NNUE_Input implements MoveListener {
 		int fromFieldID = board.getMoveOps().getFromFieldID(move);
 		int toFieldID = board.getMoveOps().getToFieldID(move);
 		
-		if (Properties.DUMP_CASTLING) System.out.println("NNUE_Input.MOVE=" + board.getMoveOps().moveToString(move));
+		//if (Properties.DUMP_CASTLING) System.out.println("NNUE_Input.MOVE=" + board.getMoveOps().moveToString(move));
 		
 		setInputAt(color, pieceType, fromFieldID, 0);
 		if (!board.getMoveOps().isPromotion(move)) setInputAt(color, pieceType, toFieldID, 1);
@@ -168,7 +168,7 @@ public class NNUE_Input implements MoveListener {
 		int fromFieldID = board.getMoveOps().getFromFieldID(move);
 		int toFieldID = board.getMoveOps().getToFieldID(move);
 		
-		if (Properties.DUMP_CASTLING) System.out.println("NNUE_Input.UNMOVE=" + board.getMoveOps().moveToString(move));
+		//if (Properties.DUMP_CASTLING) System.out.println("NNUE_Input.UNMOVE=" + board.getMoveOps().moveToString(move));
 		
 		setInputAt(color, pieceType, fromFieldID, 1);
 		if (!board.getMoveOps().isPromotion(move)) setInputAt(color, pieceType, toFieldID, 0);
@@ -190,29 +190,29 @@ public class NNUE_Input implements MoveListener {
 				case CastlingConfig.G1:
 					
 					//White king side
-					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_w, 1);
 					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.F1, 0);
+					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_w, 1);
 					break;
 				
 				case CastlingConfig.C1:
 					
 					//White queen side
-					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_w, 1);
 					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.D1, 0);
+					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_w, 1);
 					break;
 					
 				case CastlingConfig.G8:
 					
 					//Black king side
-					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_b, 1);
 					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.F8, 0);
+					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_kingside_b, 1);
 					break;
 					
 				case CastlingConfig.C8:
 					
 					//Black queen side
-					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_b, 1);
 					setInputAt(color, Constants.TYPE_ROOK, CastlingConfig.D8, 0);
+					setInputAt(color, Constants.TYPE_ROOK, board.getCastlingConfig().from_SquareID_rook_queenside_b, 1);
 					break;
 						
 				default:

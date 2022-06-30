@@ -181,7 +181,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("k7/8/4Kp2/5P2/8/6b1/8/8 b - - 0 1", cfg.getBoardConfig());
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/p6p/1pk3p1/2n2p2/P1n5/2NN1K1P/5PP1/8 w - - 4 4", cfg.getBoardConfig());
 		
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig()); //8/5n2/8/8/6kp/4K3/8/8 b - - 0 1
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig()); //8/5n2/8/8/6kp/4K3/8/8 b - - 0 1
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5n2/3n3p/7K/5k2/8/5P1N/8 w - - 0 1", cfg.getBoardConfig());//Cannot make mate with 2 N
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5n2/8/8/6kp/4K3/8/8 b - - 0 1", cfg.getBoardConfig()); //promote rook pawn - g4g3
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5q2/1p1K3p/7P/2k3P1/8/8/8 b - - 0 48", cfg.getBoardConfig()); //Mate in 5
@@ -189,6 +189,10 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/7p/8/5n1K/4n1P1/k7/5P2/8 b - - 0 1", cfg.getBoardConfig()); //Black must win
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5k2/4R3/5P1K/7P/5P2/8/6r1 b - - 0 96", cfg.getBoardConfig()); //TCEC
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("3K4/2r5/1R6/4k3/8/8/8/8 w - - 0 104", cfg.getBoardConfig());
+		
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("bqnrnkrb/pppppppp/8/8/8/8/PPPPPPPP/BQNRNKRB b KQkq - 1 1", cfg.getBoardConfig());
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("bqk3rb/pppppppp/3n1n2/8/8/1P1N2P1/P1PPPP1P/BQ1RNKRB b KQ - 0 4", cfg.getBoardConfig());
+		
 		
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 		//IBitBoard bitboard = new Board("4r3/4rk2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB draw
