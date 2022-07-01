@@ -1,3 +1,8 @@
+Version 3.4 (1 July 2022)
+  * Added support for Fischer random chess a.k.a. Chess960
+  * Fixes in UCI protocol in regards to 'position' command
+  * Disabled TB support for single core version, because it has issues (for SMP version it is already disabled)
+    
 Version 3.3 (30 May 2022)
   * Introducing new UCI options for better memory and scalability management, especially in SMP version:
   *   MemoryUsagePercent, TranspositionTable, IsGlobalTranspositionTable, EvalCache

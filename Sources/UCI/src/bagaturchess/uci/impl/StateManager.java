@@ -44,7 +44,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	
 	//Disabled.
-	//ATTENTION: Should be definitely disabled for openning book moves! (otherwise causes perpetual GC calls)
+	//ATTENTION: Should be definitely disabled for opening book moves! (otherwise causes perpetual GC calls)
 	private boolean GC_AFTER_MOVE = false;
 	
 	
