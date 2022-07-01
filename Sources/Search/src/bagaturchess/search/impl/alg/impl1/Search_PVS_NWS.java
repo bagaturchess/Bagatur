@@ -638,7 +638,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				final int move = moveGen.next();
 
-				if (!cb.isLegal(move)) {
+				if (!env.getBitboard().isPossible(move)) {
 					continue;
 				}
 				
@@ -1026,7 +1026,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				final int move = moveGen.next();
 				
-				if (!cb.isLegal(move)) {
+				if (!env.getBitboard().isPossible(move)) {
 					continue;
 				}
 				

@@ -76,14 +76,45 @@ public class MoveWrapper {
 
 	public MoveWrapper(String moveString, ChessBoard cb) {
 		
+		if ("O-O".equals(moveString)) {
 			
-		fromFile = moveString.charAt(0);
-		fromRank = Integer.parseInt(moveString.substring(1, 2));
-		fromIndex = (fromRank - 1) * 8 + 104 - fromFile;
+			isCastling = true;
+			
+			fromIndex 	= cb.colorToMove == WHITE ? cb.castlingConfig.from_SquareID_king_w : cb.castlingConfig.from_SquareID_king_b;
+			
+			toIndex 	= cb.colorToMove == WHITE ? CastlingConfig.G1 : CastlingConfig.G8;
+			
+			fromFile 	= (char) (104 - fromIndex % 8);
+			fromRank 	= fromIndex / 8 + 1;
 
-		toFile = moveString.charAt(2);
-		toRank = Integer.parseInt(moveString.substring(3, 4));
-		toIndex = (toRank - 1) * 8 + 104 - toFile;
+			toFile 		= (char) (104 - toIndex % 8);
+			toRank 		= toIndex / 8 + 1;
+			
+		} else if ("O-O-O".equals(moveString)) {
+			
+			isCastling = true;
+			
+			fromIndex 	= cb.colorToMove == WHITE ? cb.castlingConfig.from_SquareID_king_w : cb.castlingConfig.from_SquareID_king_b;
+			
+			toIndex 	= cb.colorToMove == WHITE ? CastlingConfig.C1 : CastlingConfig.C8;
+			
+			fromFile 	= (char) (104 - fromIndex % 8);
+			fromRank 	= fromIndex / 8 + 1;
+
+			toFile 		= (char) (104 - toIndex % 8);
+			toRank 		= toIndex / 8 + 1;
+			
+		} else {
+		
+			fromFile = moveString.charAt(0);
+			fromRank = Integer.parseInt(moveString.substring(1, 2));
+			fromIndex = (fromRank - 1) * 8 + 104 - fromFile;
+	
+			toFile = moveString.charAt(2);
+			toRank = Integer.parseInt(moveString.substring(3, 4));
+			toIndex = (toRank - 1) * 8 + 104 - toFile;
+		
+		}
 		
 		
 		pieceIndex = 
@@ -137,7 +168,7 @@ public class MoveWrapper {
 				
 			} else {
 				
-				if (pieceIndex == ChessConstants.KING) {
+				if (!isCastling && pieceIndex == ChessConstants.KING) {
 					
 					if (fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.G1) {
 						

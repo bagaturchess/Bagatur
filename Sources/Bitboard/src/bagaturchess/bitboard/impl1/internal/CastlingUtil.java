@@ -166,17 +166,15 @@ public final class CastlingUtil {
 		long bb_RookInBetween;
 		long bb_KingInBetween;
 		
-		//Create bitboards without the king and the rook, which are castling
-		long bb_all_pieces_no_king;
-		long bb_all_pieces_no_rook;
+		//Create bitboard without the king and the rook, which are castling
+		long bb_all_pieces_no_king_no_rook;
 		
 		if (toIndex == CastlingConfig.G1) {
 			
 			bb_RookInBetween = cb.castlingConfig.bb_inbetween_rook_kingside_w;
 			bb_KingInBetween = cb.castlingConfig.bb_inbetween_king_kingside_w;
 			
-			bb_all_pieces_no_king = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_w]);
-			bb_all_pieces_no_rook = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_kingside_w]);
+			bb_all_pieces_no_king_no_rook = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_w] | Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_kingside_w]);
 			
 			if ((Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_w] & cb.pieces[WHITE][KING]) == 0L) {
 				
@@ -193,8 +191,7 @@ public final class CastlingUtil {
 			bb_RookInBetween = cb.castlingConfig.bb_inbetween_rook_queenside_w;
 			bb_KingInBetween = cb.castlingConfig.bb_inbetween_king_queenside_w;
 			
-			bb_all_pieces_no_king = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_w]);
-			bb_all_pieces_no_rook = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_queenside_w]);
+			bb_all_pieces_no_king_no_rook = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_w] | Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_queenside_w]);
 			
 			if ((Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_w] & cb.pieces[WHITE][KING]) == 0L) {
 				
@@ -211,8 +208,7 @@ public final class CastlingUtil {
 			bb_RookInBetween = cb.castlingConfig.bb_inbetween_rook_kingside_b;
 			bb_KingInBetween = cb.castlingConfig.bb_inbetween_king_kingside_b;
 			
-			bb_all_pieces_no_king = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_b]);
-			bb_all_pieces_no_rook = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_kingside_b]);
+			bb_all_pieces_no_king_no_rook = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_b] | Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_kingside_b]);
 			
 			if ((Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_b] & cb.pieces[BLACK][KING]) == 0L) {
 				
@@ -229,8 +225,7 @@ public final class CastlingUtil {
 			bb_RookInBetween = cb.castlingConfig.bb_inbetween_rook_queenside_b;
 			bb_KingInBetween = cb.castlingConfig.bb_inbetween_king_queenside_b;
 			
-			bb_all_pieces_no_king = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_b]);
-			bb_all_pieces_no_rook = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_queenside_b]);
+			bb_all_pieces_no_king_no_rook = cb.allPieces & ~(Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_b] | Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_rook_queenside_b]);
 			
 			if ((Util.POWER_LOOKUP[cb.castlingConfig.from_SquareID_king_b] & cb.pieces[BLACK][KING]) == 0L) {
 				
@@ -247,12 +242,14 @@ public final class CastlingUtil {
 			throw new RuntimeException("Incorrect castling-index: " + toIndex);
 		}
 		
-		if ((bb_all_pieces_no_rook & bb_KingInBetween) != 0
-			|| (bb_all_pieces_no_king & bb_RookInBetween) != 0) {
+		if ((bb_all_pieces_no_king_no_rook & bb_KingInBetween) != 0
+			|| (bb_all_pieces_no_king_no_rook & bb_RookInBetween) != 0) {
 			
 			return false;
 		}
 		
+		
+		int king_color = (Util.POWER_LOOKUP[fromIndex] & cb.pieces[WHITE][KING]) == 0L ? WHITE : BLACK;
 		
 		//Finally, check if the KingInBetween squares are attacked by the opponent
 		while (bb_KingInBetween != 0) {
@@ -262,10 +259,9 @@ public final class CastlingUtil {
 			// king does not move through a checked position?
 			if (CheckUtil.isInCheckIncludingKing(
 						intermediate_square_id,
-						cb.colorToMove,
-						cb.pieces[cb.colorToMoveInverse],
-						cb.allPieces,
-						MaterialUtil.getMajorPieces(cb.materialKey, cb.colorToMoveInverse)
+						king_color,
+						cb.pieces[1 - king_color],
+						cb.allPieces
 					)
 				) {
 				
@@ -279,71 +275,7 @@ public final class CastlingUtil {
 	}
 	
 	
-	public static void castleRookUpdateKeyAndPsqt(final ChessBoard cb, int color, final int kingToIndex) {
-		
-		
-		if (Properties.DUMP_CASTLING) System.out.println("CastlingUtil.castleRookUpdateKeyAndPsqt: kingToIndex=" + kingToIndex);
-		
-		
-		int[] rook_from_to 			= getRookFromToSquareIDs(cb, kingToIndex);
-		
-		int from 					= rook_from_to[0];
-		
-		int to 						= rook_from_to[1];
-		
-		if (from == to) {
-			
-			return;
-		}
-		
-		
-		long bb 					= Util.POWER_LOOKUP[from] | Util.POWER_LOOKUP[to];
-		
-		cb.pieces[color][ROOK] 		^= bb;
-		cb.friendlyPieces[color] 	^= bb;
-		
-		cb.pieceIndexes[from] 		= EMPTY;
-		cb.pieceIndexes[to] 		= ROOK;
-		
-		cb.zobristKey 				^= Zobrist.piece[from][color][ROOK] ^ Zobrist.piece[to][color][ROOK];
-		
-		cb.psqtScore_mg				+= EvalConstants.PSQT_MG[ROOK][color][to] - EvalConstants.PSQT_MG[ROOK][color][from];
-		cb.psqtScore_eg 			+= EvalConstants.PSQT_EG[ROOK][color][to] - EvalConstants.PSQT_EG[ROOK][color][from];
-	}
-	
-	
-	public static void uncastleRookUpdatePsqt(final ChessBoard cb, int color, final int kingToIndex) {
-		
-		
-		if (Properties.DUMP_CASTLING) System.out.println("CastlingUtil.uncastleRookUpdatePsqt: kingToIndex=" + kingToIndex);
-		
-		
-		int[] rook_from_to 			= getRookFromToSquareIDs(cb, kingToIndex);
-		
-		int from 					= rook_from_to[0];
-		
-		int to 						= rook_from_to[1];
-		
-		if (from == to) {
-			
-			return;
-		}
-		
-		
-		long bb 					= Util.POWER_LOOKUP[from] | Util.POWER_LOOKUP[to];
-		
-		cb.pieces[color][ROOK] 		^= bb;
-		cb.friendlyPieces[color] 	^= bb;
-		
-		cb.pieceIndexes[from] 		= ROOK;
-		cb.pieceIndexes[to] 		= EMPTY;
-						
-		cb.psqtScore_mg 			+= EvalConstants.PSQT_MG[ROOK][color][from] - EvalConstants.PSQT_MG[ROOK][color][to];
-		cb.psqtScore_eg 			+= EvalConstants.PSQT_EG[ROOK][color][from] - EvalConstants.PSQT_EG[ROOK][color][to];
-	}
-	
-	
-	private static final int[] getRookFromToSquareIDs(final ChessBoard cb, final int kingToIndex) {
+	public static final int[] getRookFromToSquareIDs(final ChessBoard cb, final int kingToIndex) {
 		
 		int from;
 		int to;

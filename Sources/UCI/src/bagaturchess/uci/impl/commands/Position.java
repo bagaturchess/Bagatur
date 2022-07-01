@@ -69,16 +69,6 @@ public class Position extends Protocol {
 			}
 		}
 		
-		String nextword = st.nextToken();
-		if (nextword.equals(COMMAND_TO_ENGINE_POSITION_START_POS)) {
-			//fen = Constants.INITIAL_BOARD;
-		} else if (nextword.equals(COMMAND_TO_ENGINE_POSITION_FEN)) {
-			int fenStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_POSITION_FEN) + COMMAND_TO_ENGINE_POSITION_FEN.length();
-			fen = commandLine.substring(fenStartIndex, commandLine.length()).trim();
-		} else {
-			channel.dump("LOG Parsing 'position' command (there is no startpos or fen): " + commandLine);
-		}
-		
 		int movesStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_POSITION_MOVES);
 		if (movesStartIndex >= 0) {
 			String movesStr = commandLine.substring(movesStartIndex + COMMAND_TO_ENGINE_POSITION_MOVES.length()).trim();
@@ -88,7 +78,17 @@ public class Position extends Protocol {
 				moves.add(move);
 			}
 		}
-				
+		
+		String nextword = st.nextToken();
+		if (nextword.equals(COMMAND_TO_ENGINE_POSITION_START_POS)) {
+			//fen = Constants.INITIAL_BOARD;
+		} else if (nextword.equals(COMMAND_TO_ENGINE_POSITION_FEN)) {
+			int fenStartIndex = commandLine.indexOf(COMMAND_TO_ENGINE_POSITION_FEN) + COMMAND_TO_ENGINE_POSITION_FEN.length();
+			fen = commandLine.substring(fenStartIndex, movesStartIndex < 0 ? commandLine.length() : movesStartIndex).trim();
+		} else {
+			channel.dump("LOG Parsing 'position' command (there is no startpos or fen): " + commandLine);
+		}
+		
 		System.out.println("LOG " + this);
 	}
 	
@@ -101,9 +101,14 @@ public class Position extends Protocol {
 	}
 	
 	public static void main(String[] args) {
+		
 		try {
+			
 			new Position(new Channel_Console(), "position startpos moves e2e4 e7e5");
 			new Position(new Channel_Console(), "position fen rn1b2rk/1pp3p1/qp1p2R1/5Q2/3RN2P/1PP5/3PbP2/4K3 w - -");
+			new Position(new Channel_Console(), "position fen rbbkrnnq/pppppppp/8/8/8/8/PPPPPPPP/RBBKRNNQ w KQkq - 0 1");
+			new Position(new Channel_Console(), "position fen rbbkrnnq/pppppppp/8/8/8/8/PPPPPPPP/RBBKRNNQ w KQkq - 0 1 moves e2e4 c7c6");
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

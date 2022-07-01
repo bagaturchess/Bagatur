@@ -33,7 +33,6 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private static final int DEFAULT_MEM_USAGE_percent 				= 73;
 	
 	private static final boolean DEFAULT_UseTranspositionTable 		= true;
-	private static final boolean DEFAULT_GlobalTranspositionTable 	= true;
 	private static final boolean DEFAULT_UseEvalCache 				= true;
 	private static final boolean DEFAULT_UseSyzygyDTZCache 			= true;
 	
@@ -41,7 +40,6 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 			
 			new UCIOptionSpin_Integer("MemoryUsagePercent"	, DEFAULT_MEM_USAGE_percent				, "type spin default " + DEFAULT_MEM_USAGE_percent + " min 50 max 90"),
 			new UCIOption("TranspositionTable"				, "" + DEFAULT_UseTranspositionTable	, "type check default " + DEFAULT_UseTranspositionTable),
-			new UCIOption("IsGlobalTranspositionTable"		, "" + DEFAULT_GlobalTranspositionTable	, "type check default " + DEFAULT_GlobalTranspositionTable),
 			new UCIOption("EvalCache"						, "" + DEFAULT_UseEvalCache				, "type check default " + DEFAULT_UseEvalCache),
 			new UCIOptionString("SyzygyPath"				, DEFAULT_TbPath						, "type string default " + DEFAULT_TbPath),
 			new UCIOption("SyzygyOnline"					, "" + DEFAULT_SyzygyOnline				, "type check default " + DEFAULT_SyzygyOnline),
@@ -64,7 +62,6 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private int MEM_USAGE_percent 								= DEFAULT_MEM_USAGE_percent;
 	
 	private boolean useTranspositionTable 						= DEFAULT_UseTranspositionTable;
-	private boolean useGlobalTranspositionTable 				= DEFAULT_GlobalTranspositionTable;
 	private boolean useEvalCache 								= DEFAULT_UseEvalCache;
 	private boolean useSyzygyDTZCache 							= DEFAULT_UseSyzygyDTZCache;
 	
@@ -265,13 +262,6 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 		
 		return useTranspositionTable;
 	}
-
-	
-	@Override
-	public boolean useGlobalTPT() {
-		
-		return useGlobalTranspositionTable;
-	}
 	
 
 	@Override
@@ -338,12 +328,6 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 			
 			return true;
 		
-		} else if ("IsGlobalTranspositionTable".equals(option.getName())) {
-						
-			useGlobalTranspositionTable = option.getValue().equals("true");
-			
-			return true;
-			
 		} else if ("EvalCache".equals(option.getName())) {
 			
 			useEvalCache = option.getValue().equals("true");

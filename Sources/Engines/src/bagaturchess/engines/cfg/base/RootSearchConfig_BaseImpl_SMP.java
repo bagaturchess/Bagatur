@@ -29,10 +29,17 @@ import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Integer;
 public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl implements IRootSearchConfig_SMP, IUCIOptionsProvider {
 	
 	
-	private int currentThreadsCount = getDefaultThreadsCount();
+	private static final boolean DEFAULT_GlobalTranspositionTable 	= true;
+	
+	
+	private int currentThreadsCount 								= getDefaultThreadsCount();
+	
+	private boolean useGlobalTranspositionTable 					= DEFAULT_GlobalTranspositionTable;
+	
 	
 	//setoption name SMP Threads value 16
 	private UCIOption[] options = new UCIOption[] {
+			new UCIOption("IsGlobalTranspositionTable"		, "" + DEFAULT_GlobalTranspositionTable	, "type check default " + DEFAULT_GlobalTranspositionTable),
 			new UCIOptionSpin_Integer("SMP Threads", currentThreadsCount,
 					"type spin default " + currentThreadsCount
 											+ " min 1"
@@ -58,6 +65,13 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 	
 	
 	@Override
+	public boolean useGlobalTPT() {
+		
+		return useGlobalTranspositionTable;
+	}
+	
+	
+	@Override
 	public UCIOption[] getSupportedOptions() {
 		
 		UCIOption[] parentOptions = super.getSupportedOptions();
@@ -79,6 +93,13 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 			currentThreadsCount = (Integer) option.getValue();
 			
 			return true;
+			
+		} else if ("IsGlobalTranspositionTable".equals(option.getName())) {
+			
+			useGlobalTranspositionTable = option.getValue().equals("true");
+			
+			return true;
+		
 		}
 		
 		return super.applyOption(option);

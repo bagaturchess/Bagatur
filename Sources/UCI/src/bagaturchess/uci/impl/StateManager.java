@@ -314,6 +314,8 @@ public class StateManager extends Protocol implements BestMoveSender {
 		
 		if (position.getFen() != null) {
 			
+			//set fen if it is different than the existing
+			
 			channel.sendLogToGUI("StateManager: setupBoard: position.getFen() != null");
 			
 			if (lastFEN == null || !lastFEN.equals(position.getFen())) {
@@ -328,6 +330,8 @@ public class StateManager extends Protocol implements BestMoveSender {
 			
 		} else {
 			
+			//set default startpos
+			
 			channel.sendLogToGUI("StateManager: setupBoard: position.getFen() == null");
 			
 			if (lastFEN != null) {
@@ -339,9 +343,11 @@ public class StateManager extends Protocol implements BestMoveSender {
 				
 				lastFEN = null;	
 			}
-			
-			revertGame();
 		}
+		
+		
+		revertGame();
+		
 		
 		playMoves(position);
 	}

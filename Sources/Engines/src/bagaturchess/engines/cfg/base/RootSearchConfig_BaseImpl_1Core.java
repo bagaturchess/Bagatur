@@ -64,4 +64,11 @@ public class RootSearchConfig_BaseImpl_1Core extends RootSearchConfig_BaseImpl i
 	public RootSearchConfig_BaseImpl_1Core(String[] args) {
 		super(args);
 	}
+
+
+	@Override
+	public boolean useGlobalTPT() {
+		
+		return true;
+	}
 }

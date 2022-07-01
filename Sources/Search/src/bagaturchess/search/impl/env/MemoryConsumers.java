@@ -149,7 +149,7 @@ public class MemoryConsumers {
 		
 		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Loading modules for Endgame Tablebases support ... ");
 		
-		if (engineConfiguration.getThreadsCount() > 1) {
+		//if (engineConfiguration.getThreadsCount() > 1) {
 			
 			//If there are many threads than switch off syzygy calls, because of crashes:
 			
@@ -165,7 +165,7 @@ public class MemoryConsumers {
 			SyzygyTBProbing.disableSingleton();
 			
 			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("SyzygyTBProbing.clearSingleton() called: Syzygy TBs are switched off");
-		}
+		//}
 		
 		if (SyzygyTBProbing.getSingleton() != null) {
 			

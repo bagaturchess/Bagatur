@@ -31,9 +31,11 @@ public class ChessBoardTestUtil {
 
 		Assert.isTrue(Long.numberOfTrailingZeros(cb.pieces[WHITE][KING]) == cb.kingIndex[WHITE], "Long.numberOfTrailingZeros(cb.pieces[WHITE][KING]) == cb.kingIndex[WHITE]");
 		Assert.isTrue(Long.numberOfTrailingZeros(cb.pieces[BLACK][KING]) == cb.kingIndex[BLACK], "Long.numberOfTrailingZeros(cb.pieces[BLACK][KING]) == cb.kingIndex[BLACK]");
-
-		ChessBoardUtil.init(cb);
-
+		
+		
+		//ChessBoardUtil.init(cb);
+		
+		
 		// zobrist keys
 		Assert.isTrue(iterativeZK == cb.zobristKey, "iterativeZK == cb.zobristKey");
 		Assert.isTrue(iterativeZKPawn == cb.pawnZobristKey, "iterativeZKPawn == cb.pawnZobristKey");

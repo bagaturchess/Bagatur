@@ -104,11 +104,11 @@ public class SEEUtil {
 
 	public static int getSeeCaptureScore(final ChessBoard cb, final int move) {
 
-		if (EngineConstants.ASSERT) {
+		/*if (EngineConstants.ASSERT) {
 			if (MoveUtil.getAttackedPieceIndex(move) == 0) {
 				Assert.isTrue(MoveUtil.getMoveType(move) != 0);
 			}
-		}
+		}*/
 
 		final int index = MoveUtil.getToIndex(move);
 		final long allPieces = cb.allPieces & ~Util.POWER_LOOKUP[MoveUtil.getFromIndex(move)];
