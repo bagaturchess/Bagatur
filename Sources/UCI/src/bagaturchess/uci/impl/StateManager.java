@@ -29,6 +29,7 @@ import java.util.List;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.api.IUCIConfig;
@@ -303,58 +304,46 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	private void setupBoard(String fromGUILine) throws FileNotFoundException {
 		
+		
 		channel.sendLogToGUI("StateManager: setupBoard called with " + fromGUILine);
 		
+		
 		/*
-		 * Setup startup board with FEN or played moves
+		 * Setup startup board with FEN and played moves
 		 */
 		Position position = new Position(channel, fromGUILine);
 		
-		channel.sendLogToGUI("StateManager: setupBoard: position.getFen()=" + position.getFen() + ", lastFEN=" + lastFEN);
+		String current_fen = position.getFen();
 		
-		if (position.getFen() != null) {
+		if (current_fen == null) {
 			
-			//set fen if it is different than the existing
+			current_fen = Constants.INITIAL_BOARD;
+		}
+		
+		
+		channel.sendLogToGUI("StateManager: setupBoard: current_fen=" + current_fen + ", lastFEN=" + lastFEN);
+		
+		
+		if (lastFEN == null || !lastFEN.equals(current_fen)) {
 			
-			channel.sendLogToGUI("StateManager: setupBoard: position.getFen() != null");
+			channel.sendLogToGUI("StateManager: setupBoard: re-create board, because (lastFEN == null || !lastFEN.equals(current_fen))");
 			
-			if (lastFEN == null || !lastFEN.equals(position.getFen())) {
-				
-				channel.sendLogToGUI("StateManager: setupBoard: re-create board, because (lastFEN == null || !lastFEN.equals(position.getFen()))");
-				
-				board = BoardUtils.createBoard_WithPawnsCache(position.getFen(), null);
-				destroySearchAdaptor();
-				
-				lastFEN = position.getFen();
-			}
+			lastFEN = current_fen;
 			
-		} else {
+			board = BoardUtils.createBoard_WithPawnsCache(lastFEN);
 			
-			//set default startpos
-			
-			channel.sendLogToGUI("StateManager: setupBoard: position.getFen() == null");
-			
-			if (lastFEN != null) {
-				
-				channel.sendLogToGUI("StateManager: setupBoard: re-create board, because (lastFEN != null)");
-				
-				board = BoardUtils.createBoard_WithPawnsCache();
-				destroySearchAdaptor();
-				
-				lastFEN = null;	
-			}
+			destroySearchAdaptor();
 		}
 		
 		
 		revertGame();
 		
 		
-		playMoves(position);
+		playMoves(position.getMoves());
 	}
 
 
-	private void playMoves(Position position) {
-		List<String> moves = position.getMoves();
+	private void playMoves(List<String> moves) {
 		for (int i = 0; i < moves.size(); i++ ) {
 			String moveSign = moves.get(i);
 			if (!moveSign.equals("...")) {

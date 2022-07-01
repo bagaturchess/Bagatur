@@ -19,6 +19,8 @@
  */
 package bagaturchess.bitboard.impl1.internal;
 
+import bagaturchess.bitboard.api.IFieldsAttacks;
+import bagaturchess.bitboard.impl.attacks.control.metadata.singlecolour.FieldAttacks;
 
 /**
  * Encapsulates the castling generalization logic for FRC-Chess960 support
@@ -44,6 +46,8 @@ public class CastlingConfig {
 	public static final int G8 				= 57;
 	public static final int H8 				= 56;
 	
+	public static final CastlingConfig CLASSIC_CHESS = new CastlingConfig(E1, H1, A1, E8, H8, A8);
+	
 	
 	//Starting square IDs
 	public int from_SquareID_king_w;
@@ -65,12 +69,6 @@ public class CastlingConfig {
 	public long bb_inbetween_king_queenside_b;
 	public long bb_inbetween_rook_kingside_b;
 	public long bb_inbetween_rook_queenside_b;
-	
-	
-	/*public CastlingConfig() {
-		
-		this(E1, H1, A1, E8, H8, A8);
-	}*/
 	
 	
 	public CastlingConfig(int from_SquareID_king_w,
@@ -98,6 +96,32 @@ public class CastlingConfig {
 		bb_inbetween_king_queenside_b 			= ChessConstants.IN_BETWEEN[from_SquareID_king_b][C8] | Util.POWER_LOOKUP[C8];
 		bb_inbetween_rook_kingside_b 			= ChessConstants.IN_BETWEEN[from_SquareID_rook_kingside_b][F8] | Util.POWER_LOOKUP[F8];
 		bb_inbetween_rook_queenside_b 			= ChessConstants.IN_BETWEEN[from_SquareID_rook_queenside_b][D8] | Util.POWER_LOOKUP[D8];
+	}
+	
+	
+	@Override
+	public boolean equals(Object o) {
+		
+		if (o == this) {
+			
+			return true;
+		}
+		
+		CastlingConfig other = (CastlingConfig) o;
+		
+		return from_SquareID_king_w == other.from_SquareID_king_w
+						&& from_SquareID_rook_kingside_w == other.from_SquareID_rook_kingside_w
+						&& from_SquareID_rook_queenside_w == other.from_SquareID_rook_queenside_w
+						&& from_SquareID_king_b == other.from_SquareID_king_b
+						&& from_SquareID_rook_kingside_b == other.from_SquareID_rook_kingside_b
+						&& from_SquareID_rook_queenside_b == other.from_SquareID_rook_queenside_b;
+	}
+	
+	
+	@Override
+	public int hashCode() {
+
+		return from_SquareID_king_w ^ from_SquareID_rook_kingside_w ^ from_SquareID_rook_queenside_w ^ from_SquareID_king_b ^ from_SquareID_rook_kingside_b ^ from_SquareID_rook_queenside_b;
 	}
 	
 	

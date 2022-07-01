@@ -76,6 +76,8 @@ public class MoveWrapper {
 
 	public MoveWrapper(String moveString, ChessBoard cb) {
 		
+		
+		//Castling is notated as O-O or O-O-O in FRC/960 chess and with from-to square notations in classic chess
 		if ("O-O".equals(moveString)) {
 			
 			isCastling = true;
@@ -104,8 +106,10 @@ public class MoveWrapper {
 			toFile 		= (char) (104 - toIndex % 8);
 			toRank 		= toIndex / 8 + 1;
 			
-		} else {
+		}
 		
+		if (!isCastling) {
+			
 			fromFile = moveString.charAt(0);
 			fromRank = Integer.parseInt(moveString.substring(1, 2));
 			fromIndex = (fromRank - 1) * 8 + 104 - fromFile;
@@ -113,7 +117,6 @@ public class MoveWrapper {
 			toFile = moveString.charAt(2);
 			toRank = Integer.parseInt(moveString.substring(3, 4));
 			toIndex = (toRank - 1) * 8 + 104 - toFile;
-		
 		}
 		
 		
@@ -168,31 +171,32 @@ public class MoveWrapper {
 				
 			} else {
 				
-				/* Castling is noted as O-O and O-O-O, which is handled above. This code stays for completeness if we need to make it working with from-to square notations in future.
-				if (!isCastling && pieceIndex == ChessConstants.KING) {
+				if (!isCastling && CastlingConfig.CLASSIC_CHESS.equals(cb.castlingConfig)) {
 					
-					if (fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.G1) {
+					//Castling is notated as O-O or O-O-O in 960 chess and with from-to square notations in classic chess
+					if (pieceIndex == ChessConstants.KING) {
 						
-						isCastling = (cb.castlingRights & 8) != 0L;
-					}
-					
-					if (fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.C1) {
+						if (fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.G1) {
+							
+							isCastling = (cb.castlingRights & 8) != 0L;
+						}
 						
-						isCastling = (cb.castlingRights & 4) != 0L;
-					}
-					
-					if (fromIndex == cb.castlingConfig.from_SquareID_king_b && toIndex == CastlingConfig.G8) {
+						if (fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.C1) {
+							
+							isCastling = (cb.castlingRights & 4) != 0L;
+						}
 						
-						isCastling = (cb.castlingRights & 2) != 0L;
-					}
-					
-					if (fromIndex == cb.castlingConfig.from_SquareID_king_b && toIndex == CastlingConfig.C8) {
+						if (fromIndex == cb.castlingConfig.from_SquareID_king_b && toIndex == CastlingConfig.G8) {
+							
+							isCastling = (cb.castlingRights & 2) != 0L;
+						}
 						
-						isCastling = (cb.castlingRights & 1) != 0L;
+						if (fromIndex == cb.castlingConfig.from_SquareID_king_b && toIndex == CastlingConfig.C8) {
+							
+							isCastling = (cb.castlingRights & 1) != 0L;
+						}
 					}
 				}
-				*/
-				
 				
 				if (isCastling) {
 					
@@ -200,7 +204,6 @@ public class MoveWrapper {
 					
 				} else if (pieceIndex == ChessConstants.PAWN && toIndex % 8 != fromIndex % 8) {
 					
-					// ep
 					move = MoveUtil.createEPMove(fromIndex, toIndex);
 					
 				} else {

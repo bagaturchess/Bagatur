@@ -108,6 +108,12 @@ public class Boot {
 							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "SMP Threads"));
 							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "Thread Memory (MB)"));
 							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "SyzygyPath"));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "MemoryUsagePercent"));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "TranspositionTable"));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "EvalCache"));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "SyzygyOnline"));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "SyzygyDTZCache"));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "IsGlobalTranspositionTable"));
 							
 							OptionsManager optionsManager = new OptionsManager(communicationChanel, (IUCIOptionsProvider) optionsRegistry, customActions);
 							manager.setOptionsManager(optionsManager);
