@@ -168,6 +168,7 @@ public class MoveWrapper {
 				
 			} else {
 				
+				/* Castling is noted as O-O and O-O-O, which is handled above. This code stays for completeness if we need to make it working with from-to square notations in future.
 				if (!isCastling && pieceIndex == ChessConstants.KING) {
 					
 					if (fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.G1) {
@@ -190,6 +191,7 @@ public class MoveWrapper {
 						isCastling = (cb.castlingRights & 1) != 0L;
 					}
 				}
+				*/
 				
 				
 				if (isCastling) {
