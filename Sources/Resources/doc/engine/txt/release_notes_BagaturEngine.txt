@@ -5,7 +5,7 @@ Version 3.4 (1 July 2022)
     
 Version 3.3 (30 May 2022)
   * Introducing new UCI options for better memory and scalability management, especially in SMP version:
-  *   MemoryUsagePercent, TranspositionTable, IsGlobalTranspositionTable, EvalCache
+  * MemoryUsagePercent, TranspositionTable, IsGlobalTranspositionTable, EvalCache
   * SMP version scales on 104 logical cores during TCEC Season 22 testing games and achieved 22 Mnps with IsGlobalTranspositionTable UCI option set to false
 
 Version 3.2 (19 January 2022)
