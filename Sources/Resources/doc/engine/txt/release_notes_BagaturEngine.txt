@@ -1,3 +1,8 @@
+Version 3.4a (5 July 2022)
+  * Bugfix: update Zobrist key with side_to_move during castling in both classic and FRC/960 chess
+  * Use small static array for rook from to squares during castling instead of creating it each time
+  * Increase memory of single core version to 4G
+  
 Version 3.4 (1 July 2022)
   * Added support for Fischer random chess a.k.a. Chess960
   * Fixes in UCI protocol in regards to 'position' command
