@@ -85,6 +85,8 @@ public final class ChessBoard {
 	
 	public CastlingConfig castlingConfig;
 	
+	private int[] buff_castling_rook_from_to = new int[2];
+	
 	
 	@Override
 	public String toString() {
@@ -379,9 +381,9 @@ public final class ChessBoard {
 			throw new IllegalStateException("sourcePieceIndex != KING || !MoveUtil.isCastlingMove(move)");
 		}
 		
-		int[] rook_from_to_squares 	= CastlingUtil.getRookFromToSquareIDs(this, toIndex_king);
-		final int fromIndex_rook 	= rook_from_to_squares[0];
-		final int toIndex_rook 		= rook_from_to_squares[1];
+		CastlingUtil.getRookFromToSquareIDs(this, toIndex_king, buff_castling_rook_from_to);
+		final int fromIndex_rook 	= buff_castling_rook_from_to[0];
+		final int toIndex_rook 		= buff_castling_rook_from_to[1];
 		
 		
 		if (fromIndex_king == toIndex_king) {
@@ -464,7 +466,6 @@ public final class ChessBoard {
 		
 		updateKingValues(colorToMove, toIndex_king);
 		
-		
 		zobristKey 						^= Zobrist.piece[fromIndex_king][colorToMove][KING] ^ Zobrist.piece[toIndex_king][colorToMove][KING];
 		zobristKey 						^= Zobrist.piece[fromIndex_rook][colorToMove][ROOK] ^ Zobrist.piece[toIndex_rook][colorToMove][ROOK];
 		
@@ -472,6 +473,9 @@ public final class ChessBoard {
 			zobristKey ^= Zobrist.epIndex[epIndex];
 			epIndex = 0;
 		}
+		
+		zobristKey ^= Zobrist.sideToMove;
+		
 		
 		if (castlingRights != 0) {
 			
@@ -658,9 +662,9 @@ public final class ChessBoard {
 			throw new IllegalStateException("sourcePieceIndex != KING || !MoveUtil.isCastlingMove(move)");
 		}
 		
-		int[] rook_from_to_squares 	= CastlingUtil.getRookFromToSquareIDs(this, toIndex_king);
-		final int fromIndex_rook 	= rook_from_to_squares[0];
-		final int toIndex_rook 		= rook_from_to_squares[1];
+		CastlingUtil.getRookFromToSquareIDs(this, toIndex_king, buff_castling_rook_from_to);
+		final int fromIndex_rook 	= buff_castling_rook_from_to[0];
+		final int toIndex_rook 		= buff_castling_rook_from_to[1];
 		
 		
 		if (fromIndex_king == toIndex_king) {

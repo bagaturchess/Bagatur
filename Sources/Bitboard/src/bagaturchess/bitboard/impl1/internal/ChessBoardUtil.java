@@ -241,12 +241,12 @@ public class ChessBoardUtil {
 				+ Long.bitCount(cb.pieces[BLACK][ROOK]) * EvalConstants.PHASE[ROOK]
 				+ Long.bitCount(cb.pieces[BLACK][QUEEN]) * EvalConstants.PHASE[QUEEN]);
 		
+		setCastling960Configuration(cb);
+		
 		calculatePawnZobristKeys(cb);
 		calculateZobristKeys(cb);
 		
 		cb.playedBoardStates.inc(cb.zobristKey);
-		
-		setCastling960Configuration(cb);
 	}
 	
 	

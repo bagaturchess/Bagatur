@@ -13,6 +13,7 @@ public class ChessBoardTestUtil {
 
 	public static void testValues(ChessBoard cb) {
 
+		int castlingRights = cb.castlingRights;
 		long iterativeZK = cb.zobristKey;
 		long iterativeZKPawn = cb.pawnZobristKey;
 		long iterativeWhitePieces = cb.friendlyPieces[WHITE];
@@ -28,16 +29,19 @@ public class ChessBoardTestUtil {
 		long materialKey = cb.materialKey;
 		int[] testPieceIndexes = new int[64];
 		System.arraycopy(cb.pieceIndexes, 0, testPieceIndexes, 0, cb.pieceIndexes.length);
-
+		
 		Assert.isTrue(Long.numberOfTrailingZeros(cb.pieces[WHITE][KING]) == cb.kingIndex[WHITE], "Long.numberOfTrailingZeros(cb.pieces[WHITE][KING]) == cb.kingIndex[WHITE]");
 		Assert.isTrue(Long.numberOfTrailingZeros(cb.pieces[BLACK][KING]) == cb.kingIndex[BLACK], "Long.numberOfTrailingZeros(cb.pieces[BLACK][KING]) == cb.kingIndex[BLACK]");
 		
 		
-		//ChessBoardUtil.init(cb);
+		ChessBoardUtil.init(cb);
 		
+		
+		Assert.isTrue(castlingRights == cb.castlingRights, "castlingRights == cb.castlingRights, castlingRights=" + castlingRights + ", cb.castlingRights=" + cb.castlingRights);
+
 		
 		// zobrist keys
-		Assert.isTrue(iterativeZK == cb.zobristKey, "iterativeZK == cb.zobristKey");
+		Assert.isTrue(iterativeZK == cb.zobristKey, "iterativeZK == cb.zobristKey, iterativeZK=" + iterativeZK + ", cb.zobristKey=" + cb.zobristKey);
 		Assert.isTrue(iterativeZKPawn == cb.pawnZobristKey, "iterativeZKPawn == cb.pawnZobristKey");
 
 		// king area

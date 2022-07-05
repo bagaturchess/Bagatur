@@ -275,7 +275,7 @@ public final class CastlingUtil {
 	}
 	
 	
-	public static final int[] getRookFromToSquareIDs(final ChessBoard cb, final int kingToIndex) {
+	public static final void getRookFromToSquareIDs(final ChessBoard cb, final int kingToIndex, int[] result) {
 		
 		int from;
 		int to;
@@ -323,6 +323,7 @@ public final class CastlingUtil {
 				throw new RuntimeException("Incorrect king castling to-index: " + kingToIndex);
 		}
 		
-		return new int[] {from, to};
+		result[0] = from;
+		result[1] = to;
 	}
 }
