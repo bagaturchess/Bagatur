@@ -1,3 +1,6 @@
+Version 3.4b (6 July 2022)
+  * Add UCI_Chess960 option to make it working with cutechess-cli
+
 Version 3.4a (5 July 2022)
   * Bugfix: update Zobrist key with side_to_move during castling in both classic and FRC/960 chess
   * Use small static array for rook from to squares during castling instead of creating it each time

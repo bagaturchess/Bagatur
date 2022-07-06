@@ -30,4 +30,5 @@ public interface ISearchAdaptorConfig extends IUCIOptionsProvider {
 	public boolean isOwnBookEnabled();
 	public boolean isPonderingEnabled();
 	public boolean isAnalyzeMode();
+	public boolean isChess960();
 }
