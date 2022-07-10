@@ -2,7 +2,6 @@ package bagaturchess.bitboard.impl1.internal;
 
 
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.EMPTY;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.KING;
@@ -113,25 +112,6 @@ public final class CastlingUtil {
 		
 		return castlingRights;
 	}
-	
-	
-	/*public static int getKingMovedCastlingRights(final int castlingRights, final int kingFromIndex, final CastlingConfig castlingConfig) {
-		
-		if (kingFromIndex == castlingConfig.from_SquareID_king_w) {
-			
-			return castlingRights & 3; // 0011
-			
-		} else if (kingFromIndex == castlingConfig.from_SquareID_king_b) {
-			
-			return castlingRights & 12; // 1100
-			
-		} else {
-			
-			throw new RuntimeException("Incorrect kingFromIndex: " + kingFromIndex);
-			//return castlingRights;
-		}
-	}
-	*/
 	
 	
 	public static int getKingMovedCastlingRights(final int castlingRights, final int color, final CastlingConfig castlingConfig) {
@@ -249,7 +229,7 @@ public final class CastlingUtil {
 		}
 		
 		
-		int king_color = (Util.POWER_LOOKUP[fromIndex] & cb.pieces[WHITE][KING]) == 0L ? WHITE : BLACK;
+		int king_color = (Util.POWER_LOOKUP[fromIndex] & cb.pieces[WHITE][KING]) != 0L ? WHITE : BLACK;
 		
 		//Finally, check if the KingInBetween squares are attacked by the opponent
 		while (bb_KingInBetween != 0) {

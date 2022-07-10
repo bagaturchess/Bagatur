@@ -71,10 +71,7 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		
 		//bitboardForSetup = new Board(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
 		
-		bitboardForSetup = BoardUtils.createBoard_WithPawnsCache(_bitboardForSetup.toEPD(),
-				getRootSearchConfig().getEvalConfig().getPawnsCacheFactoryClassName(),
-				getRootSearchConfig().getBoardConfig(),
-				10000);
+		bitboardForSetup = BoardUtils.createBoard_WithPawnsCache(_bitboardForSetup.toEPD(), getRootSearchConfig().getBoardConfig());
 		
 		ChannelManager.getChannel().dump("RootSearch_BaseImpl.createBoard: [Chess960/FRC] Castling Configuration is " + bitboardForSetup.getCastlingConfig());
 

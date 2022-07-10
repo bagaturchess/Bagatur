@@ -10,7 +10,8 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 
 public class ChessBoardTestUtil {
-
+	
+	
 	public static void testValues(ChessBoard cb) {
 
 		int castlingRights = cb.castlingRights;
@@ -34,7 +35,13 @@ public class ChessBoardTestUtil {
 		Assert.isTrue(Long.numberOfTrailingZeros(cb.pieces[BLACK][KING]) == cb.kingIndex[BLACK], "Long.numberOfTrailingZeros(cb.pieces[BLACK][KING]) == cb.kingIndex[BLACK]");
 		
 		
-		ChessBoardUtil.init(cb);
+		boolean[] castling_rights = new boolean[4];
+		castling_rights[0] = (cb.castlingRights & 8) != 0;
+		castling_rights[1] = (cb.castlingRights & 4) != 0;
+		castling_rights[2] = (cb.castlingRights & 2) != 0;
+		castling_rights[3] = (cb.castlingRights & 1) != 0;
+				
+		ChessBoardUtil.init(cb, castling_rights);
 		
 		
 		Assert.isTrue(castlingRights == cb.castlingRights, "castlingRights == cb.castlingRights, castlingRights=" + castlingRights + ", cb.castlingRights=" + cb.castlingRights);
@@ -70,36 +77,4 @@ public class ChessBoardTestUtil {
 		Assert.isTrue(material_factor_black == cb.material_factor_black, "material_factor_black == cb.material_factor_black");
 		Assert.isTrue(materialKey == cb.materialKey, "materialKey == cb.materialKey");
 	}
-
-	public static ChessBoard getHorizontalMirroredCb(ChessBoard cb) {
-		ChessBoard testCb = ChessBoard.getTestInstance();
-
-		for (int color = ChessConstants.WHITE; color <= ChessConstants.BLACK; color++) {
-			for (int piece = ChessConstants.PAWN; piece <= ChessConstants.KING; piece++) {
-				testCb.pieces[color][piece] = Util.mirrorHorizontal(cb.pieces[color][piece]);
-			}
-		}
-
-		testCb.colorToMove = cb.colorToMove;
-		ChessBoardUtil.init(testCb);
-		testCb.moveCounter = cb.moveCounter;
-		return testCb;
-	}
-
-	public static ChessBoard getVerticalMirroredCb(ChessBoard cb) {
-		ChessBoard testCb = ChessBoard.getTestInstance();
-
-		for (int piece = ChessConstants.PAWN; piece <= ChessConstants.KING; piece++) {
-			testCb.pieces[WHITE][piece] = Util.mirrorVertical(cb.pieces[BLACK][piece]);
-		}
-		for (int piece = ChessConstants.PAWN; piece <= ChessConstants.KING; piece++) {
-			testCb.pieces[BLACK][piece] = Util.mirrorVertical(cb.pieces[WHITE][piece]);
-		}
-
-		testCb.colorToMove = cb.colorToMoveInverse;
-		ChessBoardUtil.init(testCb);
-		testCb.moveCounter = cb.moveCounter;
-		return testCb;
-	}
-
 }

@@ -681,6 +681,8 @@ public final class MoveGenerator {
 
 	private void addKingMoves(final ChessBoard cb) {
 		
+		if (Properties.DUMP_CASTLING) System.out.println("MoveGenerator.addKingMoves");
+		
 		final int fromIndex = cb.kingIndex[cb.colorToMove];
 		
 		long moves = StaticMoves.KING_MOVES[fromIndex] & cb.emptySpaces;

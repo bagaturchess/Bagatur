@@ -131,7 +131,7 @@ public class MoveWrapper {
 		
 		if (pieceIndex == -1) {
 			
-			throw new RuntimeException("Source piece not found at index " + fromIndex + ", move is " + moveString + ", fen is " + cb);
+			throw new RuntimeException("Source piece not found at index " + fromIndex + ", move is " + moveString + ", board is " + cb.toString());
 		}
 		
 		
@@ -171,7 +171,7 @@ public class MoveWrapper {
 				
 			} else {
 				
-				if (!isCastling && CastlingConfig.CLASSIC_CHESS.equals(cb.castlingConfig)) {
+				if (!isCastling) {
 					
 					//Castling is notated as O-O or O-O-O in 960 chess and with from-to square notations in classic chess
 					if (pieceIndex == ChessConstants.KING) {
@@ -198,11 +198,52 @@ public class MoveWrapper {
 					}
 				}
 				
+				
+				//System.out.println("isCastling=" + isCastling);
+				
 				if (isCastling) {
 					
 					move = MoveUtil.createCastlingMove(fromIndex, toIndex);
 					
-				} else if (pieceIndex == ChessConstants.PAWN && toIndex % 8 != fromIndex % 8) {
+					if (cb.isValidMove(move)) {
+						
+						//System.out.println("VALID CASTLING ");
+						
+						return;
+						
+					} else {
+						
+						//System.out.println("NOT VALID CASTLING");
+					}
+					
+				} else {
+					
+					//Do some checks and verifications for king moves to prevent wrong moves send from UCI GUI
+					if (pieceIndex == ChessConstants.KING) {
+						
+						int from_file = fromIndex & 7;
+						int from_rank = fromIndex >>> 3;
+						
+						int to_file = toIndex & 7;
+						int to_rank = toIndex >>> 3;
+						
+						int delta_file = Math.abs(from_file - to_file);
+						int delta_rank = Math.abs(from_rank - to_rank);
+						
+						if (delta_file > 1) {
+							
+							throw new IllegalStateException("King move with delta_file=" + delta_file);
+						}
+						
+						if (delta_rank > 1) {
+							
+							throw new IllegalStateException("King move with delta_rank=" + delta_rank);
+						}
+					}
+				}
+				
+				
+				if (pieceIndex == ChessConstants.PAWN && toIndex % 8 != fromIndex % 8) {
 					
 					move = MoveUtil.createEPMove(fromIndex, toIndex);
 					

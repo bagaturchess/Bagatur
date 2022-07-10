@@ -167,12 +167,25 @@ public class BoardUtils {
 		for (int i = 0; i < size; i++ ) {
 			
 			String moveSign = moves.get(i);
+			
 			if (!moveSign.equals("...")) {
+				
 				//System.out.println(moveSign);
+				
 				int move = board.getMoveOps().stringToMove(moveSign);
-				//colour = Figures.OPPONENT_COLOUR[colour];
+				
+				if (board.getMoveOps().isCastling(move)) {
+					
+					//System.out.println("CASTLING");
+				} else {
+					
+					//System.out.println("NOT CASTLING");
+				}
+				
 				
 				board.makeMoveForward(move);
+				
+				//System.out.println(board);
 			}
 		}
 	}

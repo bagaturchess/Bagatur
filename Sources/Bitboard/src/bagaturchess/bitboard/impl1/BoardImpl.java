@@ -263,15 +263,20 @@ public class BoardImpl implements IBitBoard {
 			castledByColour[getColourToMove()] = moveOps.isCastlingKingSide(move) ? IBoard.CastlingType.KINGSIDE : IBoard.CastlingType.QUEENSIDE;
 		}
 		
-		
-		if (moveListeners.length > 0) {
+		try {
 			
-			for (int i=0; i<moveListeners.length; i++) {
+			if (moveListeners.length > 0) {
 				
-				moveListeners[i].preForwardMove(chessBoard.colorToMove, move);
+				for (int i=0; i<moveListeners.length; i++) {
+					
+					moveListeners[i].preForwardMove(chessBoard.colorToMove, move);
+				}
 			}
+			
+		} catch(Exception cause) {
+			
+			throw new IllegalStateException(this.toString(), cause);
 		}
-		
 		
 		chessBoard.doMove(move);
 		

@@ -852,7 +852,7 @@ public final class ChessBoard {
 	
 	
 	public boolean isValidMove(final int move) {
-
+		
 		// check piece at from square
 		final int fromIndex = MoveUtil.getFromIndex(move);
 		final long fromSquare = Util.POWER_LOOKUP[fromIndex];
@@ -865,14 +865,22 @@ public final class ChessBoard {
 		final long toSquare = Util.POWER_LOOKUP[toIndex];
 		final int attackedPieceIndex = MoveUtil.getAttackedPieceIndex(move);
 		if (attackedPieceIndex == 0) {
-			if (pieceIndexes[toIndex] != EMPTY) {
-				return false;
+			if (MoveUtil.isCastlingMove(move)) {
+				//The rook or king can be on the to_square
+				if (pieceIndexes[toIndex] != EMPTY && pieceIndexes[toIndex] != ROOK && pieceIndexes[toIndex] != KING) {
+					return false;
+				}
+			} else {
+				if (pieceIndexes[toIndex] != EMPTY) {
+					return false;
+				}
 			}
 		} else {
 			if ((pieces[colorToMoveInverse][attackedPieceIndex] & toSquare) == 0 && !MoveUtil.isEPMove(move)) {
 				return false;
 			}
 		}
+
 
 		// check if move is possible
 		switch (MoveUtil.getSourcePieceIndex(move)) {
