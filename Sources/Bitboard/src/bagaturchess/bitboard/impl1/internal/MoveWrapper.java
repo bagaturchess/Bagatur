@@ -199,7 +199,61 @@ public class MoveWrapper {
 				}
 				
 				
-				//System.out.println("isCastling=" + isCastling);
+				//Sometimes UCI castling moves are with from_square of the king and the from_square of rook
+				if (!isCastling && pieceIndex == ChessConstants.KING) {
+					
+					int from_file = fromIndex & 7;
+					int from_rank = fromIndex >>> 3;
+					
+					int to_file = toIndex & 7;
+					int to_rank = toIndex >>> 3;
+					
+					int delta_file = Math.abs(from_file - to_file);
+					int delta_rank = Math.abs(from_rank - to_rank);
+					
+					if (delta_rank > 1) {
+						
+						throw new IllegalStateException("King move with delta_rank=" + delta_rank);
+					}
+					
+					if ((cb.pieces[cb.colorToMove][ChessConstants.ROOK] & Util.POWER_LOOKUP[toIndex]) != 0) {
+						
+						if (toIndex == cb.castlingConfig.from_SquareID_rook_kingside_w) {
+							
+							isCastling = true;
+							
+							toIndex = CastlingConfig.G1;
+							
+						} else if (toIndex == cb.castlingConfig.from_SquareID_rook_queenside_w) {
+							
+							isCastling = true;
+							
+							toIndex = CastlingConfig.C1;
+							
+						} else if (toIndex == cb.castlingConfig.from_SquareID_rook_kingside_b) {
+							
+							isCastling = true;
+							
+							toIndex = CastlingConfig.G8;
+							
+						} else if (toIndex == cb.castlingConfig.from_SquareID_rook_queenside_b) {
+							
+							isCastling = true;
+							
+							toIndex = CastlingConfig.C8;
+							
+						} else {
+							
+							throw new IllegalStateException("King move is castling and king goes to a rook, which is not on the initial square.");
+						}
+						
+					} else {
+						
+						//Here we have king move which is not castling
+						//throw new IllegalStateException("King move with delta_file=" + delta_file + ", toIndex=" + toIndex + " -> no rook on this square.");
+					}
+				}
+				
 				
 				if (isCastling) {
 					
@@ -207,41 +261,11 @@ public class MoveWrapper {
 					
 					if (cb.isValidMove(move)) {
 						
-						//System.out.println("VALID CASTLING ");
-						
 						return;
 						
-					} else {
-						
-						//System.out.println("NOT VALID CASTLING");
-					}
-					
-				} else {
-					
-					//Do some checks and verifications for king moves to prevent wrong moves send from UCI GUI
-					if (pieceIndex == ChessConstants.KING) {
-						
-						int from_file = fromIndex & 7;
-						int from_rank = fromIndex >>> 3;
-						
-						int to_file = toIndex & 7;
-						int to_rank = toIndex >>> 3;
-						
-						int delta_file = Math.abs(from_file - to_file);
-						int delta_rank = Math.abs(from_rank - to_rank);
-						
-						if (delta_file > 1) {
-							
-							throw new IllegalStateException("King move with delta_file=" + delta_file);
-						}
-						
-						if (delta_rank > 1) {
-							
-							throw new IllegalStateException("King move with delta_rank=" + delta_rank);
-						}
-					}
+					}					
 				}
-				
+
 				
 				if (pieceIndex == ChessConstants.PAWN && toIndex % 8 != fromIndex % 8) {
 					

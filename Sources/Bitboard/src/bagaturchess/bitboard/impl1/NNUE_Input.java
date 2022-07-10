@@ -97,8 +97,20 @@ public class NNUE_Input implements MoveListener {
 		
 		if (Properties.DUMP_CASTLING) System.out.println("NNUE_Input.MOVE=" + board.getMoveOps().moveToString(move));
 		
-		setInputAt(color, pieceType, fromFieldID, 0);
-		if (!board.getMoveOps().isPromotion(move)) setInputAt(color, pieceType, toFieldID, 1);
+		
+		if (board.getMoveOps().isCastling(move) && fromFieldID == toFieldID) {
+			
+			//Do nothing
+			
+		} else {
+			
+			setInputAt(color, pieceType, fromFieldID, 0);
+			
+			if (!board.getMoveOps().isPromotion(move)) {
+				
+				setInputAt(color, pieceType, toFieldID, 1);
+			}
+		}
 		
 		
 		if (board.getMoveOps().isEnpassant(move)) {
@@ -170,8 +182,20 @@ public class NNUE_Input implements MoveListener {
 		
 		if (Properties.DUMP_CASTLING) System.out.println("NNUE_Input.UNMOVE=" + board.getMoveOps().moveToString(move));
 		
-		setInputAt(color, pieceType, fromFieldID, 1);
-		if (!board.getMoveOps().isPromotion(move)) setInputAt(color, pieceType, toFieldID, 0);
+		
+		if (board.getMoveOps().isCastling(move) && fromFieldID == toFieldID) {
+			
+			//Do nothing
+			
+		} else {
+			
+			setInputAt(color, pieceType, fromFieldID, 1);
+			
+			if (!board.getMoveOps().isPromotion(move)) {
+				
+				setInputAt(color, pieceType, toFieldID, 0);
+			}
+		}
 		
 		
 		if (board.getMoveOps().isEnpassant(move)) {
