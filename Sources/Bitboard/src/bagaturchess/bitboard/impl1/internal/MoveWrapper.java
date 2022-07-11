@@ -4,6 +4,8 @@ package bagaturchess.bitboard.impl1.internal;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 
+import bagaturchess.bitboard.common.Properties;
+
 
 public class MoveWrapper {
 
@@ -131,7 +133,18 @@ public class MoveWrapper {
 		
 		if (pieceIndex == -1) {
 			
-			throw new RuntimeException("Source piece not found at index " + fromIndex + ", move is " + moveString + ", board is " + cb.toString());
+			long bb = cb.pieces[cb.colorToMove][ChessConstants.NIGHT];
+			
+			while (bb != 0) {
+				
+				System.out.println(Long.numberOfTrailingZeros(bb));
+				
+				bb &= bb - 1;
+			}
+			
+			throw new RuntimeException("Source piece not found at index "
+					 + ", cb.pieces[cb.colorToMove][ChessConstants.NIGHT]=" + cb.pieces[cb.colorToMove][ChessConstants.NIGHT]
+					 + fromIndex + ", cb.colorToMove=" + cb.colorToMove + ", move=" + moveString + ", board=" + cb.toString());
 		}
 		
 		
@@ -199,7 +212,7 @@ public class MoveWrapper {
 				}
 				
 				
-				//Sometimes UCI castling moves are with from_square of the king and the from_square of rook
+				//Sometimes Chess960 UCI castling moves are send from GUI with from_square of the king and the from_square of rook
 				if (!isCastling && pieceIndex == ChessConstants.KING) {
 					
 					int from_file = fromIndex & 7;
@@ -263,7 +276,10 @@ public class MoveWrapper {
 						
 						return;
 						
-					}					
+					} else {
+						
+						throw new IllegalStateException("Not valid castling move.");
+					}
 				}
 
 				
