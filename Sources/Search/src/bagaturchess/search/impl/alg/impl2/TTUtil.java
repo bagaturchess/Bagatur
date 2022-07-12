@@ -152,11 +152,13 @@ public class TTUtil {
 		return score << SCORE | move << MOVE | flag << FLAG | (depth + halfMoveCounter);
 	}
 
-	public static String toString(long ttValue) {
+	/*public static String toString(long ttValue) {
 		return "score=" + TTUtil.getScore(ttValue) + " " + new MoveWrapper(getMove(ttValue)) + " depth=" + TTUtil.getDepth(ttValue) + " flag="
 				+ TTUtil.getFlag(ttValue);
 	}
-
+	 */
+	
+	
 	public static void setSizeMB(int value) {
 		switch (value) {
 		case 1:

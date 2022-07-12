@@ -145,6 +145,10 @@ public class MTDSchedulerMain {
 		
 		ChannelManager.setChannel(new Channel_Console(System.in, System.out, System.out));
 		
+		
+		BoardUtils.isFRC = true;
+		System.out.println("BoardUtils.isFRC=" + BoardUtils.isFRC);
+		
 		SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
 		
 		//IRootSearch search = new MTDParallelSearch_ProcessesImpl(new Object[] {cfg, sharedData});
@@ -190,7 +194,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5k2/4R3/5P1K/7P/5P2/8/6r1 b - - 0 96", cfg.getBoardConfig()); //TCEC
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("3K4/2r5/1R6/4k3/8/8/8/8 w - - 0 104", cfg.getBoardConfig());
 		
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("brknnrqb/pppppppp/8/8/8/8/PPPPPPPP/BRKNNRQB w FBfb - 0 1", cfg.getBoardConfig());
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("qrnknrbb/pppppppp/8/8/8/8/PPPPPPPP/QRNKNRBB w FBfb - 0 1", cfg.getBoardConfig());
 		
 		System.out.println(bitboard);
 		
@@ -202,7 +206,7 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("rbbkrnnq/pppppppp/8/8/8/8/PPPPPPPP/RBBKRNNQ w KQkq - 0 1", cfg.getBoardConfig());
 		//BoardUtils.playGameUCI(bitboard, "d2d4 d7d5 c2c3 g8f6 g1f3 f8e6 f3e5 h8f8 g2g4 c7c6 h2h3 g7g5 f1g3 b8e5 d4e5 f6d7 e2e4 d5d4 c3d4 e6d4 c1g5 d7e5 g5e3 d4f3 e1f1 d8c7 d1c1 f7f6 f1d1");
 		//BoardUtils.playGameUCI(bitboard, "e2e4 e7e6 d2d4 d7d5 e4e5 c7c5 c2c3 b8c6 g1f3 d8b6 a2a3 c5c4 g2g3 c8d7 d1e2 c6a5 b1d2 f8e7 a3a4 g8h6 f1g2 e8g8 h2h4 a7a6 e2d1 a8c8 h4h5 b6d8 g2h3 b7b6 d1c2 d8e8 g3g4 g8h8 g4g5 h6f5");
-		//BoardUtils.playGameUCI(bitboard, "b2b4 h8g6 e2e3 e7e6 b4b5 c7c5 c2c4 b7b6 h1g3 d7d5 c4d5 a8d5 b1c3 d5b7 c1a3 c8c7 a3a7 f8e7 a7a4 b8d7 f1e2 g6h4 e1f1 O-O h4g6 a4c2");
+		BoardUtils.playGameUCI(bitboard, "c1d3 g7g6 g2g3 f7f5 f2f4 e8d6 d3e5 c8b6 a2a4 g8d5 h1f3 d5f3 e1f3 d8c8 a1a2 e7e6 c2c4 d6e4 a4a5 d7d6 a5b6 a7b6 a2a8 b8a8 e5d3 a8a4 g1e3 h8g7 b2b3 a4a2 f3g5 e4g5 f4g5 c8d7 b3b4 f8a8 b4b5 a2a1 d1c1 a1c1");
 		//kQ3rq1/1bpN2pp/4p3/1n6/3P3n/1P2b3/PB2p1PP/1R1BKR1Q b KQ - 0 17, MOVES: b2b3,b7b6,h1g3,c8d6,c2c4,h8g6,d2d4,e7e6,c1d3,g6h4,f2f3,d8g5,e2e4,g5e3,g1h1,e8b8,a1b2,a8b7,c4c5,d6b5,g3e2,f7f5,d3e5,f5e4,c5b6,e4f3,e5d7,b8a8,b6a7,f3e2,a7b8q,
 		
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());

@@ -66,8 +66,8 @@ import bagaturchess.bitboard.impl1.internal.SEEUtil;
 
 
 public class BoardImpl implements IBitBoard {
-	
-	
+
+
 	private ChessBoard chessBoard;
 	private MoveGenerator generator;
 	
@@ -88,10 +88,14 @@ public class BoardImpl implements IBitBoard {
 	
 	protected IBoard.CastlingType[] castledByColour;
 	
+	private boolean isFRC;
 	
-	public BoardImpl(String fen, IBoardConfig _boardConfig) {
+	
+	public BoardImpl(String fen, IBoardConfig _boardConfig, boolean _isFRC) {
 		
 		boardConfig = _boardConfig;
+		
+		isFRC = _isFRC;
 		
 		generator = new MoveGenerator();
 		
@@ -152,6 +156,12 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
+	public boolean isFRC() {
+		
+		return isFRC;
+	}
+	
+	
 	private void addMoveListener(MoveListener listener) {
 		MoveListener[] oldMoveListeners = moveListeners;
 		MoveListener[] newMoveListeners = new MoveListener[moveListeners.length + 1];
@@ -195,10 +205,10 @@ public class BoardImpl implements IBitBoard {
 		String moves_str = "";
 		int[] moves = chessBoard.playedMoves;
 		for (int i = 0; i < chessBoard.playedMovesCount; i++) {
-			moves_str += moveOps.moveToString(moves[i]) + ",";
+			moves_str += moveOps.moveToString(moves[i]) + " ";
 		}
 		
-		return chessBoard.toString() + ", MOVES: " + moves_str;
+		return chessBoard.toString() + " moves " + moves_str;
 	}
 	
 	
@@ -258,12 +268,14 @@ public class BoardImpl implements IBitBoard {
 	public void makeMoveForward(int move) {
 		
 		
-		if (moveOps.isCastling(move)) {
-			
-			castledByColour[getColourToMove()] = moveOps.isCastlingKingSide(move) ? IBoard.CastlingType.KINGSIDE : IBoard.CastlingType.QUEENSIDE;
-		}
-		
 		try {
+			
+			
+			if (moveOps.isCastling(move)) {
+				
+				castledByColour[getColourToMove()] = moveOps.isCastlingKingSide(move) ? IBoard.CastlingType.KINGSIDE : IBoard.CastlingType.QUEENSIDE;
+			}
+			
 			
 			if (moveListeners.length > 0) {
 				
@@ -273,20 +285,22 @@ public class BoardImpl implements IBitBoard {
 				}
 			}
 			
+
+		
+			chessBoard.doMove(move);
+			
+			
+			if (moveListeners.length > 0) {
+				
+				for (int i=0; i<moveListeners.length; i++) {
+					
+					moveListeners[i].postForwardMove(chessBoard.colorToMoveInverse, move);
+				}
+			}
+		
 		} catch(Exception cause) {
 			
 			throw new IllegalStateException(this.toString(), cause);
-		}
-		
-		chessBoard.doMove(move);
-		
-		
-		if (moveListeners.length > 0) {
-			
-			for (int i=0; i<moveListeners.length; i++) {
-				
-				moveListeners[i].postForwardMove(chessBoard.colorToMoveInverse, move);
-			}
 		}
 	}
 	
@@ -295,33 +309,41 @@ public class BoardImpl implements IBitBoard {
 	public void makeMoveBackward(int move) {
 		
 		
-		if (moveListeners.length > 0) {
-			for (int i=0; i<moveListeners.length; i++) {
-				moveListeners[i].preBackwardMove(chessBoard.colorToMoveInverse, move);
-			}
-		}
-		
-		
-		chessBoard.undoMove(move);
-		
-		
-		if (moveOps.isCastling(move)) {
+		try {
 			
-			castledByColour[getColourToMove()] = IBoard.CastlingType.NONE;
-		}
-		
-		
-		if (moveListeners.length > 0) {
-			for (int i=0; i<moveListeners.length; i++) {
-				moveListeners[i].postBackwardMove(getColourToMove(), move);
+			
+			if (moveListeners.length > 0) {
+				for (int i=0; i<moveListeners.length; i++) {
+					moveListeners[i].preBackwardMove(chessBoard.colorToMoveInverse, move);
+				}
 			}
+		
+		
+			chessBoard.undoMove(move);
+			
+			
+			if (moveOps.isCastling(move)) {
+				
+				castledByColour[getColourToMove()] = IBoard.CastlingType.NONE;
+			}
+			
+			
+			if (moveListeners.length > 0) {
+				for (int i=0; i<moveListeners.length; i++) {
+					moveListeners[i].postBackwardMove(getColourToMove(), move);
+				}
+			}
+		
+		} catch(Exception cause) {
+			
+			throw new IllegalStateException(this.toString(), cause);
 		}
 	}
 	
 	
 	@Override
 	public void makeMoveForward(String ucimove) {
-		MoveWrapper move = new MoveWrapper(ucimove, chessBoard);
+		MoveWrapper move = new MoveWrapper(ucimove, chessBoard, isFRC);
 		makeMoveForward(move.move);
 	}
 	
@@ -1235,12 +1257,12 @@ public class BoardImpl implements IBitBoard {
 		
 		@Override
 		public String moveToString(int move) {
-			return (new MoveWrapper(move)).toString();
+			return (new MoveWrapper(move, isFRC, chessBoard.castlingConfig)).toString();
 		}
 		
 		@Override
 		public int stringToMove(String move) {
-			MoveWrapper moveObj = new MoveWrapper(move, chessBoard);
+			MoveWrapper moveObj = new MoveWrapper(move, chessBoard, isFRC);
 			return moveObj.move;
 		}
 		

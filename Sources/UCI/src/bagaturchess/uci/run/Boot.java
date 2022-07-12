@@ -114,6 +114,7 @@ public class Boot {
 							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "SyzygyOnline"));
 							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "SyzygyDTZCache"));
 							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "IsGlobalTranspositionTable"));
+							customActions.add(new UCIOptionAction_RecreateSearchAdaptor(manager, "UCI_Chess960"));
 							
 							OptionsManager optionsManager = new OptionsManager(communicationChanel, (IUCIOptionsProvider) optionsRegistry, customActions);
 							manager.setOptionsManager(optionsManager);

@@ -332,14 +332,16 @@ public final class MoveGenerator {
 	}
 	
 
-	public String getMovesAsString() {
+	/*public String getMovesAsString() {
 		StringBuilder sb = new StringBuilder();
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
 			sb.append(new MoveWrapper(moves[j]) + ", ");
 		}
 		return sb.toString();
 	}
-
+	 */
+	
+	
 	public void generateMoves(final ChessBoard cb) {
 
 		switch (Long.bitCount(cb.checkingPieces)) {

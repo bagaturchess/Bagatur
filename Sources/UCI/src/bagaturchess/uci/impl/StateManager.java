@@ -61,7 +61,9 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	
 	public StateManager(IUCIConfig _engineBootCfg) {
+		
 		engineBootCfg = _engineBootCfg;
+		
 		board = BoardUtils.createBoard_WithPawnsCache();
 	}
 	
@@ -329,6 +331,8 @@ public class StateManager extends Protocol implements BestMoveSender {
 			channel.sendLogToGUI("StateManager: setupBoard: re-create board, because (lastFEN == null || !lastFEN.equals(current_fen))");
 			
 			lastFEN = current_fen;
+			
+			channel.sendLogToGUI("StateManager: setupBoard: BoardUtils.isFRC=" + BoardUtils.isFRC);
 			
 			board = BoardUtils.createBoard_WithPawnsCache(lastFEN);
 			

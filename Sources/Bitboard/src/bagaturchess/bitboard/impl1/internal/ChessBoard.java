@@ -10,6 +10,7 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.QUEEN;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.common.Properties;
 import bagaturchess.bitboard.impl.datastructs.StackLongInt;
 
@@ -192,10 +193,10 @@ public final class ChessBoard {
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(pieceIndexes[fromIndex] == sourcePieceIndex, "pieceIndexes[fromIndex] == sourcePieceIndex"
 					+ ", sourcePieceIndex=" + sourcePieceIndex + ", pieceIndexes[fromIndex]=" + pieceIndexes[fromIndex] + ", fromIndex=" + fromIndex
-					+ ", move=" + (new MoveWrapper(move)).toString() + ", board=" + this);
+					+ ", move=" + (new MoveWrapper(move, BoardUtils.isFRC, castlingConfig)).toString() + ", board=" + this);
 			Assert.isTrue(pieceIndexes[toIndex] == attackedPieceIndex || MoveUtil.isEPMove(move), "pieceIndexes[toIndex] == attackedPieceIndex || MoveUtil.isEPMove(move)"
 						+ ", attackedPieceIndex="	+ attackedPieceIndex + ", pieceIndexes[toIndex]=" + pieceIndexes[toIndex] + ", toIndex=" + toIndex
-						+ ", move=" + (new MoveWrapper(move)).toString() + ", board=" + this);
+						+ ", move=" + (new MoveWrapper(move, BoardUtils.isFRC, castlingConfig)).toString() + ", board=" + this);
 			Assert.isTrue(attackedPieceIndex == 0 || (Util.POWER_LOOKUP[toIndex] & friendlyPieces[colorToMove]) == 0, "attackedPieceIndex == 0 || (Util.POWER_LOOKUP[toIndex] & friendlyPieces[colorToMove]) == 0");
 		}
 		

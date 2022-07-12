@@ -33,6 +33,8 @@ public class ChessBoardUtil {
 		
 		init(cb, castling_rights);		
 		
+		cb.playedBoardStates.inc(cb.zobristKey);
+		
 		setCastling960Configuration(cb);
 		
 		if (fenArray.length > 2) {
@@ -361,9 +363,6 @@ public class ChessBoardUtil {
 		calculatePawnZobristKeys(cb);
 		
 		calculateZobristKeys(cb);
-		
-		
-		cb.playedBoardStates.inc(cb.zobristKey);
 	}
 	
 	

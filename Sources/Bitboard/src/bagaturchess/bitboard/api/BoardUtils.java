@@ -42,6 +42,9 @@ import bagaturchess.bitboard.impl1.BoardImpl;
 public class BoardUtils {
 	
 	
+	public static boolean isFRC = false;
+	
+	
 	public static IBitBoard createBoard_WithPawnsCache() {
 		return createBoard_WithPawnsCache(Constants.INITIAL_BOARD, bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEvalFactory.class.getName(), null, 1000);
 	}
@@ -73,10 +76,12 @@ public class BoardUtils {
 		
 		if (impl1) {
 			
-			bitboard = new BoardImpl(fen, boardConfig);
+			bitboard = new BoardImpl(fen, boardConfig, isFRC);
 			
 		} else {
+			
 			DataObjectFactory<PawnsModelEval> pawnsCacheFactory = null;
+			
 			try {
 				pawnsCacheFactory = (DataObjectFactory<PawnsModelEval>) 
 				BoardUtils.class.getClassLoader().loadClass(cacheFactoryClassName).newInstance();
@@ -177,11 +182,7 @@ public class BoardUtils {
 				if (board.getMoveOps().isCastling(move)) {
 					
 					//System.out.println("CASTLING");
-				} else {
-					
-					//System.out.println("NOT CASTLING");
 				}
-				
 				
 				board.makeMoveForward(move);
 				

@@ -1,6 +1,7 @@
 package bagaturchess.engines.cfg.base;
 
 
+import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.uci.api.ISearchAdaptorConfig;
@@ -44,7 +45,7 @@ public class UCISearchAdaptorConfig_BaseImpl implements ISearchAdaptorConfig {
 											args[1], Utils.copyOfRange(args, 2)
 										);
 	}
-
+	
 	
 	@Override
 	public ITimeConfig getTimeConfig() {
@@ -119,6 +120,7 @@ public class UCISearchAdaptorConfig_BaseImpl implements ISearchAdaptorConfig {
 			return true;
 		} else if ("UCI_Chess960".equals(option.getName())) {
 			isChess960 = (Boolean) option.getValue();
+			BoardUtils.isFRC = isChess960;
 			return true;
 		}
 		

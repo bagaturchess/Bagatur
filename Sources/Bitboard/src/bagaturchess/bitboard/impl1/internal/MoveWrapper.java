@@ -34,7 +34,7 @@ public class MoveWrapper {
 	public boolean isEP = false;
 	public boolean isCastling = false;
 
-	public MoveWrapper(int move) {
+	public MoveWrapper(int move, boolean isFRC, CastlingConfig castling_cfg) {
 		
 		this.move = move;
 
@@ -53,8 +53,38 @@ public class MoveWrapper {
 		case MoveUtil.TYPE_NORMAL:
 			break;
 		case MoveUtil.TYPE_CASTLING:
+			
 			isCastling = true;
+			
+			if (isFRC) {
+				
+				if (fromIndex == toIndex) {
+					
+					//Do nothing
+					
+				} else {
+					
+					if (toIndex == CastlingConfig.G1) {
+						
+						toIndex = castling_cfg.from_SquareID_rook_kingside_w;
+						
+					} else if (toIndex == CastlingConfig.C1) {
+						
+						toIndex = castling_cfg.from_SquareID_rook_queenside_w;
+						
+					} else if (toIndex == CastlingConfig.G8) {
+						
+						toIndex = castling_cfg.from_SquareID_rook_kingside_b;
+						
+					} else if (toIndex == CastlingConfig.C8) {
+						
+						toIndex = castling_cfg.from_SquareID_rook_queenside_b;
+					}
+				}
+			}
+			
 			break;
+			
 		case MoveUtil.TYPE_EP:
 			isEP = true;
 			break;
@@ -76,7 +106,7 @@ public class MoveWrapper {
 
 	}
 
-	public MoveWrapper(String moveString, ChessBoard cb) {
+	public MoveWrapper(String moveString, ChessBoard cb, boolean isFRC) {
 		
 		
 		//Castling is notated as O-O or O-O-O in FRC/960 chess and with from-to square notations in classic chess
@@ -133,15 +163,6 @@ public class MoveWrapper {
 		
 		if (pieceIndex == -1) {
 			
-			long bb = cb.pieces[cb.colorToMove][ChessConstants.NIGHT];
-			
-			while (bb != 0) {
-				
-				System.out.println(Long.numberOfTrailingZeros(bb));
-				
-				bb &= bb - 1;
-			}
-			
 			throw new RuntimeException("Source piece not found at index "
 					 + ", cb.pieces[cb.colorToMove][ChessConstants.NIGHT]=" + cb.pieces[cb.colorToMove][ChessConstants.NIGHT]
 					 + fromIndex + ", cb.colorToMove=" + cb.colorToMove + ", move=" + moveString + ", board=" + cb.toString());
@@ -184,11 +205,13 @@ public class MoveWrapper {
 				
 			} else {
 				
-				if (!isCastling) {
+				
+				if (!isCastling && pieceIndex == ChessConstants.KING) {
 					
-					//Castling is notated as O-O or O-O-O in 960 chess and with from-to square notations in classic chess
-					if (pieceIndex == ChessConstants.KING) {
+					if (!isFRC) {
 						
+						//Castling is notated as O-O or O-O-O in 960 chess in Arena GUI and with from-to square notations in classic chess
+							
 						if (fromIndex == cb.castlingConfig.from_SquareID_king_w && toIndex == CastlingConfig.G1) {
 							
 							isCastling = (cb.castlingRights & 8) != 0L;
@@ -208,62 +231,77 @@ public class MoveWrapper {
 							
 							isCastling = (cb.castlingRights & 1) != 0L;
 						}
-					}
-				}
-				
-				
-				//Sometimes Chess960 UCI castling moves are send from GUI with from_square of the king and the from_square of rook
-				if (!isCastling && pieceIndex == ChessConstants.KING) {
-					
-					int from_file = fromIndex & 7;
-					int from_rank = fromIndex >>> 3;
-					
-					int to_file = toIndex & 7;
-					int to_rank = toIndex >>> 3;
-					
-					int delta_file = Math.abs(from_file - to_file);
-					int delta_rank = Math.abs(from_rank - to_rank);
-					
-					if (delta_rank > 1) {
 						
-						throw new IllegalStateException("King move with delta_rank=" + delta_rank);
-					}
+					} else {
 					
-					if ((cb.pieces[cb.colorToMove][ChessConstants.ROOK] & Util.POWER_LOOKUP[toIndex]) != 0) {
+					
+						//In Cutechess GUI Chess960 castling moves are send with from_square of the king and the from_square of rook
+							
+						int from_file = fromIndex & 7;
+						int from_rank = fromIndex >>> 3;
 						
-						if (toIndex == cb.castlingConfig.from_SquareID_rook_kingside_w) {
+						int to_file = toIndex & 7;
+						int to_rank = toIndex >>> 3;
+						
+						int delta_file = Math.abs(from_file - to_file);
+						int delta_rank = Math.abs(from_rank - to_rank);
+						
+						if (delta_rank > 1) {
+							
+							throw new IllegalStateException("King move with delta_rank=" + delta_rank);
+						}
+						
+						if (fromIndex == toIndex) {
+							
+							if (toIndex == CastlingConfig.G1 || toIndex == CastlingConfig.C1
+									|| toIndex == CastlingConfig.G8 || toIndex == CastlingConfig.C8) {
+								
+								//Do nothing
+								
+							} else {
+								
+								throw new IllegalStateException("King move is castling and the move has the same from_to squares, which are not G1 C1 G8 C8.");
+							}
 							
 							isCastling = true;
 							
-							toIndex = CastlingConfig.G1;
+						} else if ((cb.pieces[cb.colorToMove][ChessConstants.ROOK] & Util.POWER_LOOKUP[toIndex]) != 0) {
 							
-						} else if (toIndex == cb.castlingConfig.from_SquareID_rook_queenside_w) {
-							
-							isCastling = true;
-							
-							toIndex = CastlingConfig.C1;
-							
-						} else if (toIndex == cb.castlingConfig.from_SquareID_rook_kingside_b) {
-							
-							isCastling = true;
-							
-							toIndex = CastlingConfig.G8;
-							
-						} else if (toIndex == cb.castlingConfig.from_SquareID_rook_queenside_b) {
-							
-							isCastling = true;
-							
-							toIndex = CastlingConfig.C8;
+							if (toIndex == cb.castlingConfig.from_SquareID_rook_kingside_w) {
+								
+								isCastling = true;
+								
+								toIndex = CastlingConfig.G1;
+								
+							} else if (toIndex == cb.castlingConfig.from_SquareID_rook_queenside_w) {
+								
+								isCastling = true;
+								
+								toIndex = CastlingConfig.C1;
+								
+							} else if (toIndex == cb.castlingConfig.from_SquareID_rook_kingside_b) {
+								
+								isCastling = true;
+								
+								toIndex = CastlingConfig.G8;
+								
+							} else if (toIndex == cb.castlingConfig.from_SquareID_rook_queenside_b) {
+								
+								isCastling = true;
+								
+								toIndex = CastlingConfig.C8;
+								
+							} else {
+								
+								throw new IllegalStateException("King move is castling and king goes to a rook, which is not on the initial square.");
+							}
 							
 						} else {
 							
-							throw new IllegalStateException("King move is castling and king goes to a rook, which is not on the initial square.");
+							//Here we have king move which is not castling
+							
+							isCastling = false;
 						}
-						
-					} else {
-						
-						//Here we have king move which is not castling
-						//throw new IllegalStateException("King move with delta_file=" + delta_file + ", toIndex=" + toIndex + " -> no rook on this square.");
 					}
 				}
 				
@@ -278,7 +316,9 @@ public class MoveWrapper {
 						
 					} else {
 						
-						throw new IllegalStateException("Not valid castling move.");
+						//Here we have king move which is not castling
+						
+						isCastling = false;
 					}
 				}
 
@@ -292,6 +332,7 @@ public class MoveWrapper {
 					move = MoveUtil.createMove(fromIndex, toIndex, pieceIndex);
 				}
 			}
+			
 		} else {
 			if (pieceIndex == ChessConstants.PAWN && (toRank == 1 || toRank == 8)) {
 				if (moveString.length() == 5) {

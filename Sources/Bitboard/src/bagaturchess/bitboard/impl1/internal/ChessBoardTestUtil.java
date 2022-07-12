@@ -40,9 +40,8 @@ public class ChessBoardTestUtil {
 		castling_rights[1] = (cb.castlingRights & 4) != 0;
 		castling_rights[2] = (cb.castlingRights & 2) != 0;
 		castling_rights[3] = (cb.castlingRights & 1) != 0;
-				
-		ChessBoardUtil.init(cb, castling_rights);
 		
+		ChessBoardUtil.init(cb, castling_rights);
 		
 		Assert.isTrue(castlingRights == cb.castlingRights, "castlingRights == cb.castlingRights, castlingRights=" + castlingRights + ", cb.castlingRights=" + cb.castlingRights);
 
