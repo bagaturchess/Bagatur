@@ -107,8 +107,6 @@ public class BoardImpl implements IBitBoard {
 		
 		moveOps = new MoveOpsImpl();
 		
-		chessBoard = ChessBoardUtil.getNewCB(fen);
-		
 		hasMovesList = new BaseMoveList(250);
 		
 		castledByColour = new IBoard.CastlingType[2];
@@ -124,6 +122,8 @@ public class BoardImpl implements IBitBoard {
 			
 			EvalConstants.initPSQT(boardConfig);
 			
+			chessBoard = ChessBoardUtil.getNewCB(fen);
+			
 			baseEval = new BaseEvaluation(boardConfig, this);
 			
 			for (int color = 0; color < 2; color++) {
@@ -137,6 +137,10 @@ public class BoardImpl implements IBitBoard {
 			}
 			
 			addMoveListener(baseEval);
+			
+		} else {
+			
+			chessBoard = ChessBoardUtil.getNewCB(fen);
 		}
 		
 		

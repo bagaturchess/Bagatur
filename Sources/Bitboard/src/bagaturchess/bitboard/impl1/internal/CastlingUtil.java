@@ -241,7 +241,10 @@ public final class CastlingUtil {
 						intermediate_square_id,
 						king_color,
 						cb.pieces[1 - king_color],
-						cb.allPieces
+						bb_all_pieces_no_king_no_rook
+						//cb.allPieces
+						//We need to exclude the rook, because in Chess960 the king could go to attacked square, which is covered by the rook.
+						//Example: last move is white makes queen side castling and goes in check 1rn2r2/1pnkb3/2ppp3/p4p2/2P2P2/1P1BN3/3PPBP1/q1KR3R w - - 0 22
 					)
 				) {
 				

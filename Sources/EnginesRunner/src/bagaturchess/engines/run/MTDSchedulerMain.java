@@ -30,6 +30,8 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.Board;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl.movelist.BaseMoveList;
+import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP_Processes;
@@ -194,7 +196,15 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5k2/4R3/5P1K/7P/5P2/8/6r1 b - - 0 96", cfg.getBoardConfig()); //TCEC
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("3K4/2r5/1R6/4k3/8/8/8/8 w - - 0 104", cfg.getBoardConfig());
 		
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("qrnknrbb/pppppppp/8/8/8/8/PPPPPPPP/QRNKNRBB w FBfb - 0 1", cfg.getBoardConfig());
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("nqbnrbkr/pppppppp/8/8/8/8/PPPPPPPP/NRBKRNQB w EBhe", cfg.getBoardConfig());
+		//BoardUtils.playGameUCI(bitboard, "a1b3 e7e5 e2e4 a7a5 b3a5 b8a7 b2b4 d7d5 f1g3 b7b6 a5b3 d5e4 a2a3 f7f5 f2f3 d8f7 f3e4 f5f4 g3e2 c7c5 b4c5 b6c5 d2d3 a7c7 b3d2 c5c4 d2c4 f8c5 g1f1 c8e6 e2c3 e6g4 e1e2 f7d6 c3d5 c7d8 c4d6 d8d6 h2h3 g4e2 f1e2 g8g8 a3a4 a8c7 d5c3 e8b8 c3b5 c7b5 a4b5 d6d4 c1d2 b8a8 e2g4 a8a1 g4e6 f8f7 d1c1 a1c1");
+		//BoardUtils.playGameUCI(bitboard, "a1b3 e7e5 e2e4 a7a5 b3a5 b8a7 b2b4 d7d5 f1g3 b7b6 a5b3 d5e4 a2a3 f7f5 f2f3 d8f7 f3e4 f5f4 g3e2 c7c5 b4c5 b6c5 d2d3 a7c7 b3d2 c5c4 d2c4 f8c5 g1f1 c8e6 e2c3 e6g4 e1e2 f7d6 c3d5 c7d8 c4d6 d8d6 h2h3 g4e2 f1e2 g8g8 a3a4 a8c7 d5c3 e8b8 c3b5 c7b5 a4b5 d6d4 c1d2 b8a8 e2g4 a8a1 g4e6 f8f7 d1c1");
+
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("nrnbkrbq/pppppppp/8/8/8/8/PPPPPPPP/NRNBKRBQ w FBfb - 0 1", cfg.getBoardConfig());
+		BoardUtils.playGameUCI(bitboard, "c2c4 e7e6 a1c2 h7h6 c1d3 g8h7 c2e3 g7g5 f2f3 c7c6 d1c2 a7a5 h2h4 g5h4 g1f2 h8d4 h1h2 d7d6 f1h1 d8g5 b2b3 h7d3 c2d3 d4c5 e3g4 c5b4 f3f4 g5e7 f2h4 f7f5 g4e3 b4a3 h4f2 a3a2 h2h6");
+		//BoardUtils.playGameUCI(bitboard, "c2c4 e7e6 a1c2 h7h6 c1d3 g8h7 c2e3 g7g5 f2f3 c7c6 d1c2 a7a5 h2h4 g5h4 g1f2 h8d4 h1h2 d7d6 f1h1 d8g5 b2b3 h7d3 c2d3 d4c5 e3g4 c5b4 f3f4 g5e7 f2h4 f7f5 g4e3 b4a3 h4f2 a3a2 h2h6 a8c7 h6g7 e8d7 g7a1 a2a1 e1c1");
+		//1rn2r2/1pnkb3/2ppp3/p4p2/2P2P2/1P1BN3/3PPBP1/q1KR3R w - - 0 22 moves c2c4 e7e6 a1c2 h7h6 c1d3 g8h7 c2e3 g7g5 f2f3 c7c6 d1c2 a7a5 h2h4 g5h4 g1f2 h8d4 h1h2 d7d6 f1h1 d8g5 b2b3 h7d3 c2d3 d4c5 e3g4 c5b4 f3f4 g5e7 f2h4 f7f5 g4e3 b4a3 h4f2 a3a2 h2h6 a8c7 h6g7 e8d7 g7a1 a2a1 e1c1 
+		
 		
 		System.out.println(bitboard);
 		
@@ -206,8 +216,20 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("rbbkrnnq/pppppppp/8/8/8/8/PPPPPPPP/RBBKRNNQ w KQkq - 0 1", cfg.getBoardConfig());
 		//BoardUtils.playGameUCI(bitboard, "d2d4 d7d5 c2c3 g8f6 g1f3 f8e6 f3e5 h8f8 g2g4 c7c6 h2h3 g7g5 f1g3 b8e5 d4e5 f6d7 e2e4 d5d4 c3d4 e6d4 c1g5 d7e5 g5e3 d4f3 e1f1 d8c7 d1c1 f7f6 f1d1");
 		//BoardUtils.playGameUCI(bitboard, "e2e4 e7e6 d2d4 d7d5 e4e5 c7c5 c2c3 b8c6 g1f3 d8b6 a2a3 c5c4 g2g3 c8d7 d1e2 c6a5 b1d2 f8e7 a3a4 g8h6 f1g2 e8g8 h2h4 a7a6 e2d1 a8c8 h4h5 b6d8 g2h3 b7b6 d1c2 d8e8 g3g4 g8h8 g4g5 h6f5");
-		BoardUtils.playGameUCI(bitboard, "c1d3 g7g6 g2g3 f7f5 f2f4 e8d6 d3e5 c8b6 a2a4 g8d5 h1f3 d5f3 e1f3 d8c8 a1a2 e7e6 c2c4 d6e4 a4a5 d7d6 a5b6 a7b6 a2a8 b8a8 e5d3 a8a4 g1e3 h8g7 b2b3 a4a2 f3g5 e4g5 f4g5 c8d7 b3b4 f8a8 b4b5 a2a1 d1c1 a1c1");
 		//kQ3rq1/1bpN2pp/4p3/1n6/3P3n/1P2b3/PB2p1PP/1R1BKR1Q b KQ - 0 17, MOVES: b2b3,b7b6,h1g3,c8d6,c2c4,h8g6,d2d4,e7e6,c1d3,g6h4,f2f3,d8g5,e2e4,g5e3,g1h1,e8b8,a1b2,a8b7,c4c5,d6b5,g3e2,f7f5,d3e5,f5e4,c5b6,e4f3,e5d7,b8a8,b6a7,f3e2,a7b8q,
+		
+		/*IMoveList movesBuffer = new BaseMoveList();
+		if (bitboard.isInCheck()) {
+			bitboard.genKingEscapes(movesBuffer);
+		} else {
+			bitboard.genAllMoves(movesBuffer);
+		}
+		
+		int cur_move = 0;
+		while ((cur_move = movesBuffer.next()) != 0) {
+			System.out.println(bitboard.getMoveOps().moveToString(cur_move));
+		}
+		*/
 		
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 		//IBitBoard bitboard = new Board("4r3/4rk2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB draw

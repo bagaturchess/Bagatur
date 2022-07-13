@@ -12,6 +12,9 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 public class ChessBoardTestUtil {
 	
 	
+	private static int[] testPieceIndexes = new int[64];
+	
+	
 	public static void testValues(ChessBoard cb) {
 
 		int castlingRights = cb.castlingRights;
@@ -22,13 +25,13 @@ public class ChessBoardTestUtil {
 		long iterativeAllPieces = cb.allPieces;
 		long pinnedPieces = cb.pinnedPieces;
 		long discoveredPieces = cb.discoveredPieces;
-		int iterativePsqt = cb.psqtScore_mg;
+		int iterativePsqt_mg = cb.psqtScore_mg;
+		int iterativePsqt_eg = cb.psqtScore_eg;
 		long whiteKingArea = cb.kingArea[WHITE];
 		long blackKingArea = cb.kingArea[BLACK];
 		int material_factor_white = cb.material_factor_white;
 		int material_factor_black = cb.material_factor_black;
 		long materialKey = cb.materialKey;
-		int[] testPieceIndexes = new int[64];
 		System.arraycopy(cb.pieceIndexes, 0, testPieceIndexes, 0, cb.pieceIndexes.length);
 		
 		Assert.isTrue(Long.numberOfTrailingZeros(cb.pieces[WHITE][KING]) == cb.kingIndex[WHITE], "Long.numberOfTrailingZeros(cb.pieces[WHITE][KING]) == cb.kingIndex[WHITE]");
@@ -41,7 +44,9 @@ public class ChessBoardTestUtil {
 		castling_rights[2] = (cb.castlingRights & 2) != 0;
 		castling_rights[3] = (cb.castlingRights & 1) != 0;
 		
+		
 		ChessBoardUtil.init(cb, castling_rights);
+		
 		
 		Assert.isTrue(castlingRights == cb.castlingRights, "castlingRights == cb.castlingRights, castlingRights=" + castlingRights + ", cb.castlingRights=" + cb.castlingRights);
 
@@ -65,7 +70,8 @@ public class ChessBoardTestUtil {
 		Assert.isTrue((iterativeBlackPieces & iterativeWhitePieces) == 0, "(iterativeBlackPieces & iterativeWhitePieces) == 0");
 
 		// psqt
-		Assert.isTrue(iterativePsqt == cb.psqtScore_mg, "iterativePsqt == cb.psqtScore_mg");
+		Assert.isTrue(iterativePsqt_mg == cb.psqtScore_mg, "iterativePsqt_mg == cb.psqtScore_mg, iterativePsqt_mg=" + iterativePsqt_mg + ", cb.psqtScore_mg=" + cb.psqtScore_mg);
+		Assert.isTrue(iterativePsqt_eg == cb.psqtScore_eg, "iterativePsqt_eg == cb.psqtScore_eg, iterativePsqt_eg=" + iterativePsqt_eg + ", cb.psqtScore_eg=" + cb.psqtScore_eg);
 
 		// piece-indexes
 		for (int i = 0; i < testPieceIndexes.length; i++) {

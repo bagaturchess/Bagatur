@@ -296,7 +296,7 @@ public final class MoveGenerator {
 		final int left = nextToMove[currentPly];
 		
 		randomizer_counter++;
-		if (randomizer_counter % 100 == 0) {
+		if (randomizer_counter % 10 == 0) {
 			randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
 		}
 		
