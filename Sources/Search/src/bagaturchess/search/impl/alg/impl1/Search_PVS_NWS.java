@@ -123,7 +123,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		lastSentMinorInfo_nodesCount = 0;
 		lastSentMinorInfo_timestamp = 0;
 		
-		historyAVGScores = new VarStatistic(false);
+		historyAVGScores = new VarStatistic();
 		
 		if (ChannelManager.getChannel() != null) {
 			
@@ -637,7 +637,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				final int move = moveGen.next();
 
-				if (!env.getBitboard().isPossible(move)) {
+				if (!cb.isLegal(move)) {
 					continue;
 				}
 				
@@ -791,7 +791,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (score > alpha) {
 					if (phase == PHASE_QUIET) {
-						historyAVGScores.addValue(moveGen.getScore(), moveGen.getScore());
+						historyAVGScores.addValue(moveGen.getScore());
 					}
 				}
 				
@@ -1025,7 +1025,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				final int move = moveGen.next();
 				
-				if (!env.getBitboard().isPossible(move)) {
+				if (!cb.isLegal(move)) {
 					continue;
 				}
 				

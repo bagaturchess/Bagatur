@@ -200,11 +200,13 @@ public class MTDSchedulerMain {
 		//BoardUtils.playGameUCI(bitboard, "a1b3 e7e5 e2e4 a7a5 b3a5 b8a7 b2b4 d7d5 f1g3 b7b6 a5b3 d5e4 a2a3 f7f5 f2f3 d8f7 f3e4 f5f4 g3e2 c7c5 b4c5 b6c5 d2d3 a7c7 b3d2 c5c4 d2c4 f8c5 g1f1 c8e6 e2c3 e6g4 e1e2 f7d6 c3d5 c7d8 c4d6 d8d6 h2h3 g4e2 f1e2 g8g8 a3a4 a8c7 d5c3 e8b8 c3b5 c7b5 a4b5 d6d4 c1d2 b8a8 e2g4 a8a1 g4e6 f8f7 d1c1 a1c1");
 		//BoardUtils.playGameUCI(bitboard, "a1b3 e7e5 e2e4 a7a5 b3a5 b8a7 b2b4 d7d5 f1g3 b7b6 a5b3 d5e4 a2a3 f7f5 f2f3 d8f7 f3e4 f5f4 g3e2 c7c5 b4c5 b6c5 d2d3 a7c7 b3d2 c5c4 d2c4 f8c5 g1f1 c8e6 e2c3 e6g4 e1e2 f7d6 c3d5 c7d8 c4d6 d8d6 h2h3 g4e2 f1e2 g8g8 a3a4 a8c7 d5c3 e8b8 c3b5 c7b5 a4b5 d6d4 c1d2 b8a8 e2g4 a8a1 g4e6 f8f7 d1c1");
 
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("nrnbkrbq/pppppppp/8/8/8/8/PPPPPPPP/NRNBKRBQ w FBfb - 0 1", cfg.getBoardConfig());
-		BoardUtils.playGameUCI(bitboard, "c2c4 e7e6 a1c2 h7h6 c1d3 g8h7 c2e3 g7g5 f2f3 c7c6 d1c2 a7a5 h2h4 g5h4 g1f2 h8d4 h1h2 d7d6 f1h1 d8g5 b2b3 h7d3 c2d3 d4c5 e3g4 c5b4 f3f4 g5e7 f2h4 f7f5 g4e3 b4a3 h4f2 a3a2 h2h6");
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("nrnbkrbq/pppppppp/8/8/8/8/PPPPPPPP/NRNBKRBQ w FBfb - 0 1", cfg.getBoardConfig());
+		//BoardUtils.playGameUCI(bitboard, "c2c4 e7e6 a1c2 h7h6 c1d3 g8h7 c2e3 g7g5 f2f3 c7c6 d1c2 a7a5 h2h4 g5h4 g1f2 h8d4 h1h2 d7d6 f1h1 d8g5 b2b3 h7d3 c2d3 d4c5 e3g4 c5b4 f3f4 g5e7 f2h4 f7f5 g4e3 b4a3 h4f2 a3a2 h2h6");
 		//BoardUtils.playGameUCI(bitboard, "c2c4 e7e6 a1c2 h7h6 c1d3 g8h7 c2e3 g7g5 f2f3 c7c6 d1c2 a7a5 h2h4 g5h4 g1f2 h8d4 h1h2 d7d6 f1h1 d8g5 b2b3 h7d3 c2d3 d4c5 e3g4 c5b4 f3f4 g5e7 f2h4 f7f5 g4e3 b4a3 h4f2 a3a2 h2h6 a8c7 h6g7 e8d7 g7a1 a2a1 e1c1");
 		//1rn2r2/1pnkb3/2ppp3/p4p2/2P2P2/1P1BN3/3PPBP1/q1KR3R w - - 0 22 moves c2c4 e7e6 a1c2 h7h6 c1d3 g8h7 c2e3 g7g5 f2f3 c7c6 d1c2 a7a5 h2h4 g5h4 g1f2 h8d4 h1h2 d7d6 f1h1 d8g5 b2b3 h7d3 c2d3 d4c5 e3g4 c5b4 f3f4 g5e7 f2h4 f7f5 g4e3 b4a3 h4f2 a3a2 h2h6 a8c7 h6g7 e8d7 g7a1 a2a1 e1c1 
 		
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("brqnkbnr/pppppppp/8/8/8/8/PPPPPPPP/BRQNKBNR w HBhb - 0 1", cfg.getBoardConfig());
+		BoardUtils.playGameUCI(bitboard, "g1f3 d8e6 e2e3 g8f6 f1e2 g7g6 c2c4 b7b6 b2b3 f8g7 a1b2 c7c5 e1g1 e8h8 h2h3 a7a6 d1c3 d7d5 c4d5 f6d5 c3d5 a8d5 h3h4 f8d8 h4h5 d5e4 d2d3 e4d3 e2d3 d8d3 b2g7 g8g7 h5g6 h7g6 e3e4 c8c7 c1h6 g7h6");
 		
 		System.out.println(bitboard);
 		

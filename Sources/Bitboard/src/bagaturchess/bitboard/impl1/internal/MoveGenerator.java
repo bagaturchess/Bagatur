@@ -296,8 +296,8 @@ public final class MoveGenerator {
 		final int left = nextToMove[currentPly];
 		
 		randomizer_counter++;
-		if (randomizer_counter % 10 == 0) {
-			randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
+		if (randomizer_counter % 100 == 0) {
+			if (false) randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
 		}
 		
 		for (int i = left, j = i; i < nextToGenerate[currentPly] - 1; j = ++i) {
@@ -317,7 +317,8 @@ public final class MoveGenerator {
 	
 	
 	private void randomize(int[] arr1, int[] arr2, int start, int end) {
-	    for (int i=end; i>1+start; i--) {
+		
+	    for (int i = end; i > start + 1; i--) {
 	    	
 	    	int rnd_index = start + randomizer.nextInt(i - start);	    
 	    	
