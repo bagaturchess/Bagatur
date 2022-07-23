@@ -60,12 +60,12 @@ public class MoveWrapper {
 				
 				if (isFRC) {
 					
-					if (fromIndex == toIndex) {
+					/*if (fromIndex == toIndex) {
 						
 						//Do nothing
 						
 					} else {
-						
+					*/
 						if (toIndex == CastlingConfig.G1) {
 							
 							toIndex = castling_cfg.from_SquareID_rook_kingside_w;
@@ -81,8 +81,12 @@ public class MoveWrapper {
 						} else if (toIndex == CastlingConfig.C8) {
 							
 							toIndex = castling_cfg.from_SquareID_rook_queenside_b;
+							
+						} else {
+							
+							throw new IllegalStateException("toIndex=" + toIndex);
 						}
-					}
+					//}
 				}
 				
 				break;
