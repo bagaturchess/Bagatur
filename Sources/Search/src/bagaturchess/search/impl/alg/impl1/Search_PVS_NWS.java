@@ -835,7 +835,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (cb.checkingPieces == 0) {
 				
 				node.bestmove = 0;
-				node.eval = node.eval = getDrawScores(-1);
+				node.eval = getDrawScores(-1);
 				node.leaf = true;
 				
 				return node.eval;
@@ -866,7 +866,12 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		//validatePV(node, depth, isPv);
+		if (bestScore != node.eval) {
+			
+			throw new IllegalStateException();
+		}
+		
+		//validatePV(node, evaluator, node.eval, ply, depth, isPv, false);
 		
 		
 		return bestScore;
@@ -1133,6 +1138,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		//validatePV(node, evaluator, node.eval, ply, ply, isPv, true);
+		
+		
     	return node.eval;
 	}
 	
@@ -1161,10 +1169,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	private boolean extractFromTT(int ply, PVNode result, ITTEntry entry, ISearchInfo info, boolean isPv) {
 		
 		if (entry.isEmpty()) {
+			
 			throw new IllegalStateException("entry.isEmpty()");
 		}
 		
 		if (result == null) {
+			
 			return false;
 		}
 		
@@ -1180,7 +1190,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (info.getSelDepth() < ply) {
+		if (info != null && info.getSelDepth() < ply) {
 			
 			info.setSelDepth(ply);
 		}
@@ -1193,16 +1203,23 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 			
-			if (isPv && ((BoardImpl) env.getBitboard()).getChessBoard().isValidMove(result.bestmove)) {
+			if (isPv) {
+				
+				if (!env.getBitboard().isPossible(result.bestmove)) {
+					
+					throw new IllegalStateException("!env.getBitboard().isPossible(result.bestmove)");
+				}
 				
 				env.getBitboard().makeMoveForward(result.bestmove);
+				
+				ply++;
 				
 				env.getTPT().get(env.getBitboard().getHashKey(), tt_entries_per_ply[ply]);
 				
 				if (!tt_entries_per_ply[ply].isEmpty()) {
 					
 					
-					draw = extractFromTT(ply + 1, result.child, tt_entries_per_ply[ply], info, isPv);
+					draw = extractFromTT(ply, result.child, tt_entries_per_ply[ply], info, isPv);
 					
 					
 					if (draw) {
@@ -1224,37 +1241,113 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
+	
+	
 	private Stack<Integer> stack = new Stack<Integer>();
 	
-	private void validatePV(PVNode node, int expectedDepth, boolean isPv) {
+	
+	private void validatePV(PVNode node, IEvaluator evaluator, int eval, int ply, int expectedDepth, boolean isPv, boolean qsearch) {
 		
-		if (node.leaf || node.bestmove == 0) {
-			throw new IllegalStateException();
+		
+		if (!qsearch) {
+			
+			if (node.leaf || node.bestmove == 0) {
+				
+				throw new IllegalStateException();
+			}
 		}
 		
+		
+		if (env.getTPT() != null) {
+			
+			env.getTPT().get(getEnv().getBitboard().getHashKey(), tt_entries_per_ply[ply]);
+			
+			if (!tt_entries_per_ply[ply].isEmpty()) {
+				
+				int tt_eval = tt_entries_per_ply[ply].getEval();
+				
+				if (tt_eval == eval) {
+					
+					//System.out.println("OK");
+					return;
+				}
+			}
+		}
+		
+		
+		int eval_sign = 1;
+		
 		int actualDepth = 0;
+		
 		PVNode cur = node;
+		
 		while(cur != null && cur.bestmove != 0) {
 			
 			actualDepth++;
 			
+			int colorToMove = env.getBitboard().getColourToMove();
+			
+			boolean wasInCheck = env.getBitboard().isInCheck();
+			
+			boolean isCheckMove = env.getBitboard().isCheckMove(cur.bestmove);
+			
 			if (env.getBitboard().isPossible(cur.bestmove)) {
+				
 				env.getBitboard().makeMoveForward(cur.bestmove);
+				
 				stack.push(cur.bestmove);
+				
 			} else {
+				
 				throw new IllegalStateException("not valid move " + env.getBitboard().getMoveOps().moveToString(cur.bestmove));
 			}
 			
+			eval_sign *= -1;
+			
+			if (wasInCheck) {
+				
+				if (env.getBitboard().isInCheck(colorToMove)) {
+					
+					throw new IllegalStateException("In check after move");
+				}
+			}
+			
+			if (isCheckMove) {
+				
+				if (!env.getBitboard().isInCheck()) {
+					
+					throw new IllegalStateException("Not in check after check move");
+				}
+			}
+			
 			if (cur.leaf) {
+				
 				break;
 			}
 			
 			cur = cur.child;
 		}
 		
-		if (actualDepth < expectedDepth) {
-			if (isPv) {
-				if (!isDraw()) {
+		
+		if (isPv) {
+			
+			int static_eval = eval_sign * eval(evaluator, 0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, isPv);
+			
+			if (!qsearch || !getSearchConfig().isOther_UseAlphaOptimizationInQSearch()) {
+				
+				if (eval != static_eval) {
+					
+					System.out.println("EVALDIFF=" + (eval - static_eval) + ", eval=" + eval + ", static_eval=" + static_eval);
+					//throw new IllegalStateException("eval=" + eval + ", static_eval=" + static_eval);
+				}
+			}
+		}
+
+
+		
+		//if (actualDepth < expectedDepth) {
+			//if (isPv) {
+				/*if (!isDraw()) {
 					if (env.getBitboard().isInCheck()) {
 						if (env.getBitboard().hasMoveInCheck()) {
 							//throw new IllegalStateException("actualDepth=" + actualDepth + ", expectedDepth=" + expectedDepth);
@@ -1266,16 +1359,22 @@ public class Search_PVS_NWS extends SearchImpl {
 							System.out.println("NOT ok in noncheck");
 						}
 					}
-				}
-			}
-		}
+				}*/
+			//}
+		//}
+		
 		
 		try {
+			
 			Integer move;
+			
 			while ((move = stack.pop()) != null) {
+				
 				env.getBitboard().makeMoveBackward(move);
 			}
-		} catch(EmptyStackException ese) {
+			
+		} catch (EmptyStackException ese) {
+			
 			//Do nothing
 		}
 	}

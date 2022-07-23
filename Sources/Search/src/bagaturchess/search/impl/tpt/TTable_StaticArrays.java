@@ -200,7 +200,7 @@ public class TTable_StaticArrays implements ITTable {
 
 		final int index = getIndex(key);
 		int replacedDepth = Integer.MAX_VALUE;
-		int replacedIndex = index;
+		int replacedIndex = -1;
 		for (int i = index; i < index + 4; i++) {
 
 			if (keys[i] == 0) {
@@ -215,14 +215,12 @@ public class TTable_StaticArrays implements ITTable {
 			
 			if ((keys[i] ^ currentValue) == key) {
 				
-				if (currentDepth > depth /*&& flag != ITTEntry.FLAG_EXACT*/) {
+				if (currentDepth <= depth) {
 					
-					continue;
+					replacedIndex = i;
+					
+					break;
 				}
-				
-				replacedIndex = i;
-				
-				break;
 			}
 			
 			// replace the lowest depth
@@ -238,6 +236,11 @@ public class TTable_StaticArrays implements ITTable {
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 		}
 
+		if (replacedIndex == -1) {
+			
+			throw new IllegalStateException();
+		}
+		
 		final long value = createValue(score, move, flag, depth);
 		keys[replacedIndex] = key ^ value;
 		values[replacedIndex] = value;
