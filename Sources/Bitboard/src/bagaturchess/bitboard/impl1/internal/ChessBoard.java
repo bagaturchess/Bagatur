@@ -506,7 +506,8 @@ public final class ChessBoard {
 		changeSideToMove();
 
 		// update checking pieces
-		if (isDiscoveredMove(fromIndex_king)) {
+		checkingPieces = CheckUtil.getCheckingPieces(this);
+		/*if (isDiscoveredMove(fromIndex_king)) {
 			checkingPieces = CheckUtil.getCheckingPieces(this);
 		} else {
 			if (MoveUtil.isNormalMove(move)) {
@@ -515,6 +516,7 @@ public final class ChessBoard {
 				checkingPieces = CheckUtil.getCheckingPieces(this);
 			}
 		}
+		*/
 		
 		// TODO can this be done incrementally?
 		setPinnedAndDiscoPieces();
