@@ -60,33 +60,31 @@ public class MoveWrapper {
 				
 				if (isFRC) {
 					
-					/*if (fromIndex == toIndex) {
+					if (toIndex == CastlingConfig.G1) {
 						
-						//Do nothing
+						toIndex = castling_cfg.from_SquareID_rook_kingside_w;
+						
+					} else if (toIndex == CastlingConfig.C1) {
+						
+						toIndex = castling_cfg.from_SquareID_rook_queenside_w;
+						
+					} else if (toIndex == CastlingConfig.G8) {
+						
+						toIndex = castling_cfg.from_SquareID_rook_kingside_b;
+						
+					} else if (toIndex == CastlingConfig.C8) {
+						
+						toIndex = castling_cfg.from_SquareID_rook_queenside_b;
 						
 					} else {
-					*/
-						if (toIndex == CastlingConfig.G1) {
-							
-							toIndex = castling_cfg.from_SquareID_rook_kingside_w;
-							
-						} else if (toIndex == CastlingConfig.C1) {
-							
-							toIndex = castling_cfg.from_SquareID_rook_queenside_w;
-							
-						} else if (toIndex == CastlingConfig.G8) {
-							
-							toIndex = castling_cfg.from_SquareID_rook_kingside_b;
-							
-						} else if (toIndex == CastlingConfig.C8) {
-							
-							toIndex = castling_cfg.from_SquareID_rook_queenside_b;
-							
-						} else {
-							
-							throw new IllegalStateException("toIndex=" + toIndex);
-						}
-					//}
+						
+						throw new IllegalStateException("toIndex=" + toIndex);
+					}
+					
+					toFile = (char) (104 - toIndex % 8);
+					toRank = toIndex / 8 + 1;
+					
+					this.move = MoveUtil.createCastlingMove(fromIndex, toIndex);
 				}
 				
 				break;
