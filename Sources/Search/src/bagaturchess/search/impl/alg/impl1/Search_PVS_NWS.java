@@ -32,6 +32,7 @@ import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.CheckUtil;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
+import bagaturchess.bitboard.impl1.internal.ChessConstants;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.bitboard.impl1.internal.MaterialUtil;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
@@ -91,7 +92,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long lastSentMinorInfo_nodesCount;
 	
 	private VarStatistic historyAVGScores;
-	
+	private VarStatistic lmrAboveAlphaAVGScores_white;
+	private VarStatistic lmrAboveAlphaAVGScores_black;
 	
 	private boolean USE_DTZ_CACHE = false;
 	
@@ -120,10 +122,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		((BoardImpl) env.getBitboard()).getMoveGenerator().clearHistoryHeuristics();
 		
-		lastSentMinorInfo_nodesCount = 0;
-		lastSentMinorInfo_timestamp = 0;
+		lastSentMinorInfo_nodesCount 	= 0;
+		lastSentMinorInfo_timestamp 	= 0;
 		
-		historyAVGScores = new VarStatistic();
+		historyAVGScores 				= new VarStatistic();
+		
+		lmrAboveAlphaAVGScores_white 	= new VarStatistic();
+		lmrAboveAlphaAVGScores_black	= new VarStatistic();
 		
 		if (ChannelManager.getChannel() != null) {
 			
@@ -160,6 +165,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, 0);		
 	}
 	
+	
+	private VarStatistic getLMRStats(int color) {
+		
+		return color == ChessConstants.WHITE ? lmrAboveAlphaAVGScores_white : lmrAboveAlphaAVGScores_black;
+	}
 	
 	public int search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
@@ -745,14 +755,15 @@ public class Search_PVS_NWS extends SearchImpl {
 				int reduction = 1;
 				if (depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						//&& movesPerformed_quiet > 1
 						&& phase == PHASE_QUIET
 						&& moveGen.getScore() <= historyAVGScores.getEntropy()
+						//&& moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= getLMRStats(cb.colorToMoveInverse).getEntropy() + getLMRStats(cb.colorToMoveInverse).getDisperse()
 						) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
 					
 					if (!isPv) {
+						
 						reduction += 1;
 					}
 					
@@ -763,21 +774,40 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				try {
+					
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
+						
+						moveGen.addLMR_All(cb.colorToMoveInverse, move, depth);
+						
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, 0);
+						
+						if (score > alpha) {
+							
+							moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
+							
+							moveGen.updateLMRAboveAlpha_Stats(cb.colorToMoveInverse, getLMRStats(cb.colorToMoveInverse));
+							
+							//System.out.println(getLMRStats(cb.colorToMoveInverse).getEntropy());
+						}
 					}
 					
 					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
+						
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -alpha - 1, -alpha, false, 0);
 					}
 					
 					if (score > alpha) {
+						
 						if (move == ttMove) {
+							
 							score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 + singularMoveExtension - multiCutReduction, -beta, -alpha, isPv, 0);
+							
 						} else {
+							
 							score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -beta, -alpha, isPv, 0);
 						}
 					}
+					
 				} catch(SearchInterruptedException sie) {
 					moveGen.endPly();
 					throw sie;

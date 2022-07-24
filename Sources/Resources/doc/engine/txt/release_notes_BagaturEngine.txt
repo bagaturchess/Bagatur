@@ -1,3 +1,6 @@
+Version 3.4f (24 July 2022)
+  * Fix for FRC: send castling moves to GUI always as "king capture own rook"
+  
 Version 3.4e (14 July 2022)
   * Fixes for FRC: prevent king being attacked after castling (e.g. 1rn2r2/1pnkb3/2ppp3/p4p2/2P2P2/1P1BN3/3PPBP1/q1KR3R w - - 0 22)
   * Add one more way for FRC castling notation in addition to "capture own rook or equal from_to square" - when king move has file difference bigger then 1, like in classic chess

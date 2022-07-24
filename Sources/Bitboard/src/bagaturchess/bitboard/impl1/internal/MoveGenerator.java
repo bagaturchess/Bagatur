@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import bagaturchess.bitboard.common.Properties;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 
 
 public final class MoveGenerator {
@@ -42,6 +43,10 @@ public final class MoveGenerator {
 	private final ContinuationHistory[] HH_ContinuationHistory = new ContinuationHistory[2];
 	private final ContinuationHistory[] BF_ContinuationHistory = new ContinuationHistory[2];
 	
+	private final int[][] LMR_ALL 				= new int[2][64 * 64];
+	private final int[][] LMR_ABOVE_ALPHA 		= new int[2][64 * 64];
+	private static int LMR_STAT_MULTIPLIER 		= 1000;
+	
 	private Random randomizer = new Random();
 	private long randomizer_counter;
 	
@@ -66,6 +71,10 @@ public final class MoveGenerator {
 		Arrays.fill(HH_MOVES[BLACK], 0);
 		Arrays.fill(BF_MOVES[WHITE], 1);
 		Arrays.fill(BF_MOVES[BLACK], 1);
+		Arrays.fill(LMR_ALL[WHITE], 1);
+		Arrays.fill(LMR_ALL[BLACK], 1);
+		Arrays.fill(LMR_ABOVE_ALPHA[WHITE], 0);
+		Arrays.fill(LMR_ABOVE_ALPHA[BLACK], 0);
 		
 		Arrays.fill(HH_MOVES1[WHITE][0], 0);
 		Arrays.fill(HH_MOVES1[WHITE][PAWN], 0);
@@ -97,7 +106,7 @@ public final class MoveGenerator {
 		Arrays.fill(BF_MOVES1[BLACK][BISHOP], 1);
 		Arrays.fill(BF_MOVES1[BLACK][ROOK], 1);
 		Arrays.fill(BF_MOVES1[BLACK][QUEEN], 1);
-		Arrays.fill(BF_MOVES1[BLACK][KING], 1);
+		Arrays.fill(BF_MOVES1[BLACK][KING], 1);	
 		
 		currentPly = 0;
 	}
@@ -121,17 +130,54 @@ public final class MoveGenerator {
 		int value1 = 100 * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex];
 		int value2 = 100 * HH_MOVES1[color][pieceType][toIndex] / BF_MOVES1[color][pieceType][toIndex];
 		int value3 = USE_ContinuationHistory ? getContinuationHistoryScore(color, pieceType, toIndex, parentMove) : 0;
-		if (USE_ContinuationHistory) {
+		
+		/*if (USE_ContinuationHistory) {
 			return value3;
 		} else {
 			return Math.max(value1, Math.max(value2, value3));
 		}
+		*/
+		
+		return (value1 + value2 + value3) / 3;
 	}
 	
 	
 	private int getContinuationHistoryScore(final int color, final int pieceType, final int toIndex, final int parentMove) {
 		return 100 * HH_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[pieceType][toIndex] / 
 				BF_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[pieceType][toIndex];
+	}
+	
+	
+	public void addLMR_All(final int color, final int move, final int depth) {
+		LMR_ALL[color][MoveUtil.getFromToIndex(move)] += depth * depth;
+	}
+	
+	
+	public void addLMR_AboveAlpha(final int color, final int move, final int depth) {
+		LMR_ABOVE_ALPHA[color][MoveUtil.getFromToIndex(move)] += depth * depth;
+	}
+	
+	
+	public int getLMR_Rate(final int color, final int move) {
+		
+		int fromToIndex = MoveUtil.getFromToIndex(move);
+		
+		return LMR_STAT_MULTIPLIER * LMR_ABOVE_ALPHA[color][fromToIndex] / LMR_ALL[color][fromToIndex];
+	}
+	
+	
+	public VarStatistic updateLMRAboveAlpha_Stats(final int color, VarStatistic stats) {
+		
+		stats.clear();
+		
+		for (int fromToIndex = 0; fromToIndex < LMR_ALL[color].length; fromToIndex++) {
+			
+			int rate = LMR_STAT_MULTIPLIER * LMR_ABOVE_ALPHA[color][fromToIndex] / LMR_ALL[color][fromToIndex];
+			
+			stats.addValue(rate);
+		}
+
+		return stats;
 	}
 	
 	
@@ -297,7 +343,7 @@ public final class MoveGenerator {
 		
 		randomizer_counter++;
 		if (randomizer_counter % 100 == 0) {
-			if (false) randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
+			randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
 		}
 		
 		for (int i = left, j = i; i < nextToGenerate[currentPly] - 1; j = ++i) {
