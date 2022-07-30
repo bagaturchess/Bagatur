@@ -26,6 +26,7 @@ package bagaturchess.search.impl.tpt;
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.bitboard.impl1.internal.Util;
+import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.uci.api.ChannelManager;
 
 
@@ -134,6 +135,11 @@ public class TTable_StaticArrays implements ITTable {
 	
 	@Override
 	public void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove) {
+		
+		if (SearchUtils.isMateVal(eval)) {
+			
+			return;
+		}
 		
 		int flag = ITTEntry.FLAG_EXACT;
 		

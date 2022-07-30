@@ -171,10 +171,10 @@ public abstract class SearchImpl implements ISearch {
 	}
 	
 	
-	protected boolean isDrawPV(int depth) {
+	protected boolean isDrawPV(int ply) {
 		
 		//Skip the draw check for the root, we need at least one move in the pv
-		if (depth == 0) {
+		if (ply == 0) {
 			
 			return false;
 		}

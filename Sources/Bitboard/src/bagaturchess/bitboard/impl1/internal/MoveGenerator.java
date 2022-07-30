@@ -71,8 +71,8 @@ public final class MoveGenerator {
 		Arrays.fill(HH_MOVES[BLACK], 0);
 		Arrays.fill(BF_MOVES[WHITE], 1);
 		Arrays.fill(BF_MOVES[BLACK], 1);
-		Arrays.fill(LMR_ALL[WHITE], 1);
-		Arrays.fill(LMR_ALL[BLACK], 1);
+		Arrays.fill(LMR_ALL[WHITE], 0);
+		Arrays.fill(LMR_ALL[BLACK], 0);
 		Arrays.fill(LMR_ABOVE_ALPHA[WHITE], 0);
 		Arrays.fill(LMR_ABOVE_ALPHA[BLACK], 0);
 		
@@ -158,28 +158,42 @@ public final class MoveGenerator {
 	}
 	
 	
-	public int getLMR_Rate(final int color, final int move) {
-		
-		int fromToIndex = MoveUtil.getFromToIndex(move);
-		
-		return LMR_STAT_MULTIPLIER * LMR_ABOVE_ALPHA[color][fromToIndex] / LMR_ALL[color][fromToIndex];
-	}
-	
-	
-	public VarStatistic updateLMRAboveAlpha_Stats(final int color, VarStatistic stats) {
+	public VarStatistic updateLMRStats(final int color, VarStatistic stats) {
 		
 		stats.clear();
 		
 		for (int fromToIndex = 0; fromToIndex < LMR_ALL[color].length; fromToIndex++) {
 			
-			int rate = LMR_STAT_MULTIPLIER * LMR_ABOVE_ALPHA[color][fromToIndex] / LMR_ALL[color][fromToIndex];
+			boolean has_stats = LMR_ALL[color][fromToIndex] != 0;
 			
-			stats.addValue(rate);
+			if (has_stats) { //Prevent adding zeros for from_to squares without statistics yet
+				
+				stats.addValue(getLMR_Rate_internal(color, fromToIndex));
+			}
 		}
 
 		return stats;
 	}
 	
+	
+	public int getLMR_Rate(final int color, final int move) {
+		
+		int fromToIndex = MoveUtil.getFromToIndex(move);
+		
+		return getLMR_Rate_internal(color, fromToIndex);
+	}
+	
+	
+	private int getLMR_Rate_internal(final int color, final int fromToIndex) {
+		
+		if (LMR_ALL[color][fromToIndex] == 0) {
+			
+			return 0;
+		}
+		
+		return LMR_STAT_MULTIPLIER * LMR_ABOVE_ALPHA[color][fromToIndex] / LMR_ALL[color][fromToIndex];
+	}
+
 	
 	public void addKillerMove(final int move, final int ply) {
 		if (EngineConstants.ENABLE_KILLER_MOVES) {

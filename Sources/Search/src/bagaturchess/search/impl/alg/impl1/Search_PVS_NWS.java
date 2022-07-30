@@ -91,11 +91,17 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
 	
+	
 	private VarStatistic historyAVGScores;
+	
 	private VarStatistic lmrAboveAlphaAVGScores_white;
 	private VarStatistic lmrAboveAlphaAVGScores_black;
 	
+	private static final boolean USE_LMR_ABOVE_ALPHA = false;
+	
+	
 	private boolean USE_DTZ_CACHE = false;
+	
 	
 	private IEvalEntry temp_cache_entry;
 	
@@ -777,17 +783,20 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
 						
-						moveGen.addLMR_All(cb.colorToMoveInverse, move, depth);
+						if (USE_LMR_ABOVE_ALPHA) moveGen.addLMR_All(cb.colorToMoveInverse, move, depth);
 						
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, 0);
 						
-						if (score > alpha) {
+						if (USE_LMR_ABOVE_ALPHA) {
 							
-							moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
-							
-							moveGen.updateLMRAboveAlpha_Stats(cb.colorToMoveInverse, getLMRStats(cb.colorToMoveInverse));
-							
-							//System.out.println(getLMRStats(cb.colorToMoveInverse).getEntropy());
+							if (score > alpha) {
+								
+								moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
+								
+								moveGen.updateLMRStats(cb.colorToMoveInverse, getLMRStats(cb.colorToMoveInverse));
+								
+								//System.out.println("COLOR " + cb.colorToMoveInverse + " ENTROPY=" + getLMRStats(cb.colorToMoveInverse).getEntropy() + " DISPERSE=" + getLMRStats(cb.colorToMoveInverse).getDisperse());
+							}
 						}
 					}
 					
@@ -887,14 +896,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (!SearchUtils.isMateVal(bestScore)) {
+		if (env.getTPT() != null) {
 			
-			if (env.getTPT() != null) {
-				
-				env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
-			}
+			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
 		}
-		
+			
 		
 		if (bestScore != node.eval) {
 			
@@ -938,7 +944,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	    if (isDraw()) {
 	    	
 	    	node.eval = getDrawScores(-1);
-			
+	    	
 	    	return node.eval;
 	    }
 	    
@@ -1141,12 +1147,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			//TODO: Maybe this puts are too often and SMP version could have [problems 10 times lower NPS - to check
-			if (!SearchUtils.isMateVal(alpha)) {
-				
-				if (env.getTPT() != null) {
+			if (env.getTPT() != null) {
 					
-					env.getTPT().put(cb.zobristKey, 0, bestScore, alphaOrig, beta, bestMove);
-				}
+				env.getTPT().put(cb.zobristKey, 0, bestScore, alphaOrig, beta, bestMove);
 			}
 			
 		} else {
@@ -1209,15 +1212,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		result.leaf = true;
-		
-		if (ply > 0 && isDraw()) {
 			
-			result.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
+	    if ((isPv && isDrawPV(ply)) || (ply > 0 && !isPv && isDraw())) {
+	    	
+			result.eval = getDrawScores(-1);
 			
 			result.bestmove = 0;
 			
 			return true;
-		}
+	    }
 		
 		
 		if (info != null && info.getSelDepth() < ply) {
@@ -1235,42 +1238,43 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (isPv) {
 				
-				if (!env.getBitboard().isPossible(result.bestmove)) {
-					
-					throw new IllegalStateException("!env.getBitboard().isPossible(result.bestmove)");
-				}
-				
-				env.getBitboard().makeMoveForward(result.bestmove);
-				
 				ply++;
 				
-				env.getTPT().get(env.getBitboard().getHashKey(), tt_entries_per_ply[ply]);
-				
-				if (!tt_entries_per_ply[ply].isEmpty()) {
+				if (ply < ISearch.MAX_DEPTH) {
 					
-					
-					draw = extractFromTT(ply, result.child, tt_entries_per_ply[ply], info, isPv);
-					
-					
-					if (draw) {
+					if (!env.getBitboard().isPossible(result.bestmove)) {
 						
-						result.eval = getDrawScores(-1);
-						
-					} else {
-						
-						result.leaf = false;
+						throw new IllegalStateException("!env.getBitboard().isPossible(result.bestmove)");
 					}
+					
+					env.getBitboard().makeMoveForward(result.bestmove);
+					
+					env.getTPT().get(env.getBitboard().getHashKey(), tt_entries_per_ply[ply]);
+					
+					if (!tt_entries_per_ply[ply].isEmpty()) {
+						
+						
+						draw = extractFromTT(ply, result.child, tt_entries_per_ply[ply], info, isPv);
+						
+						
+						if (draw) {
+							
+							result.eval = getDrawScores(-1);
+							
+						} else {
+							
+							result.leaf = false;
+						}
+					}
+					
+					env.getBitboard().makeMoveBackward(result.bestmove);
 				}
-				
-				env.getBitboard().makeMoveBackward(result.bestmove);
 			}
 		}
 		
 		
 		return draw;
 	}
-	
-	
 	
 	
 	private Stack<Integer> stack = new Stack<Integer>();
