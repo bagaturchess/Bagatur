@@ -241,7 +241,7 @@ public class MoveWrapper {
 						
 					} else {
 					
-						//Chess960
+						//FRC
 					
 						//In Cutechess GUI Chess960 castling moves are send with from_square of the king and the from_square of rook
 						

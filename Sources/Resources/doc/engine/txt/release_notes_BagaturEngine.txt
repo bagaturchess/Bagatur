@@ -1,6 +1,6 @@
 Version 3.4g (29 July 2022)
   * Bugfixing (not related with FRC), of an issue introduced with version 3.4f. It is related with the extraction of moves from Transposition Table and building the PV to show as output.
-  * Bugfixing (not related with FRC), sometimes in mate positions, after repetition of move 2 times, Bagatur evaluation jumps between 0 and +-Mate score.
+  * Bugfixing (not related with FRC), sometimes in mate positions, after repetition of move 2 times, Bagatur evaluation jumps between 0 and +-mate score.
   
 Version 3.4f (24 July 2022)
   * Fix for FRC: send castling moves to GUI always as "king capture own rook"
