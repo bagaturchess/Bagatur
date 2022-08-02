@@ -276,9 +276,9 @@ public class StateManager extends Protocol implements BestMoveSender {
 			destroySearchAdaptor();
 				
 			createSearchAdaptor();
-			
-			mustRecreateSearchAdaptor = false;
 		}
+		
+		mustRecreateSearchAdaptor = false;
 	}
 	
 	
