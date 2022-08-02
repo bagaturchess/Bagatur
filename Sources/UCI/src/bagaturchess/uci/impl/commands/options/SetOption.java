@@ -74,7 +74,7 @@ public class SetOption extends Protocol {
 				channel.dump("Incorrect 'setoption' command (there is no space after 'name' string): " + commandLine);
 			} else {
 				int nameEndIndex = line.length();
-				String nameStr = line.substring(nameStartIndex + 1, nameEndIndex).toLowerCase().trim();
+				String nameStr = line.substring(nameStartIndex + 1, nameEndIndex).trim();
 				name = nameStr;
 			}
 		} else {

@@ -14,15 +14,20 @@ public class UCIOptionAction_RecreateSearchAdaptor implements IUCIOptionAction {
 	private String optionName;
 	
 	public UCIOptionAction_RecreateSearchAdaptor(StateManager _stateManager, String _optionName) {
+		
 		stateManager = _stateManager;
 		optionName = _optionName;
+		
+		throw new IllegalStateException();
 	}
 	
 	@Override
 	public void execute() throws FileNotFoundException {
-		if (stateManager.destroySearchAdaptor()) {
+		/*if (stateManager.destroySearchAdaptor()) {
 			stateManager.createSearchAdaptor();
-		}
+		}*/
+		
+		throw new IllegalStateException();
 	}
 	
 	
