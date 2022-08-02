@@ -25,8 +25,6 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	
 	private static final int MAX_INDEX 				= 200;
 	
-	private int openingBook_Mode					= OpeningBook.OPENING_BOOK_MODE_POWER2;
-	
 	private IExtensionMode mode 					= IExtensionMode.DYNAMIC;
 	private int dynamicExt_UpdateInterval			= 1000;
 	
@@ -427,6 +425,23 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 	
 	@Override
 	public int getOpeningBook_Mode(){
+		
+		int openingBook_Mode = OpeningBook.OPENING_BOOK_MODE_POWER2;
+		
+		if (((String) options[0].getValue()).equals("most played first")) {
+			openingBook_Mode = OpeningBook.OPENING_BOOK_MODE_POWER2;
+			
+		} else if (((String) options[0].getValue()).equals("random intermediate")) {
+			openingBook_Mode = OpeningBook.OPENING_BOOK_MODE_POWER1;
+			
+		} else if (((String) options[0].getValue()).equals("random full")) {
+			openingBook_Mode = OpeningBook.OPENING_BOOK_MODE_POWER0;
+			
+		} else {
+			
+			throw new IllegalStateException(UCIOptions.OPTION_NAME_Opening_Mode + "set to illegal value = " + options[0].getValue());
+		}
+		
 		return openingBook_Mode;
 	}
 	
@@ -438,19 +453,6 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 			//other_UseTPTScoresPV = (Boolean) option.getValue();
 			//return true;
 		} else if (UCIOptions.OPTION_NAME_Opening_Mode.equals(option.getName())) {
-			
-			if (((String) option.getValue()).equals("most played first")) {
-				openingBook_Mode = OpeningBook.OPENING_BOOK_MODE_POWER2;
-				
-			} else if (((String) option.getValue()).equals("random intermediate")) {
-				openingBook_Mode = OpeningBook.OPENING_BOOK_MODE_POWER1;
-				
-			} else if (((String) option.getValue()).equals("random full")) {
-				openingBook_Mode = OpeningBook.OPENING_BOOK_MODE_POWER0;
-				
-			} else {
-				throw new IllegalStateException(UCIOptions.OPTION_NAME_Opening_Mode + "set to illegal value = " + option.getValue());
-			}
 			
 			return true;
 		}
@@ -466,18 +468,21 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 
 	@Override
 	public int getTPTUsageDepthCut() {
+		
 		return 0;
 	}
 
 	
 	@Override
 	public boolean isOther_UseTPTScores() {
+		
 		return true;
 	}
 	
 	
 	@Override
 	public boolean isOther_UseAlphaOptimizationInQSearch() {
+		
 		return true;
 	}
 }

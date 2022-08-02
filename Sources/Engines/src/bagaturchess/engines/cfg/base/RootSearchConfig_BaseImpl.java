@@ -38,11 +38,11 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private UCIOption[] options 									= new UCIOption[] {
 			
 			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_MemoryUsagePercent	, DEFAULT_MEM_USAGE_percent				, "type spin default " + DEFAULT_MEM_USAGE_percent + " min 50 max 90"),
-			new UCIOption(UCIOptions.OPTION_NAME_TranspositionTable				, "" + DEFAULT_UseTranspositionTable	, "type check default " + DEFAULT_UseTranspositionTable),
-			new UCIOption(UCIOptions.OPTION_NAME_EvalCache						, "" + DEFAULT_UseEvalCache				, "type check default " + DEFAULT_UseEvalCache),
+			new UCIOption(UCIOptions.OPTION_NAME_TranspositionTable				, DEFAULT_UseTranspositionTable	, "type check default " + DEFAULT_UseTranspositionTable),
+			new UCIOption(UCIOptions.OPTION_NAME_EvalCache						, DEFAULT_UseEvalCache				, "type check default " + DEFAULT_UseEvalCache),
 			new UCIOptionString(UCIOptions.OPTION_NAME_SyzygyPath				, DEFAULT_TbPath						, "type string default " + DEFAULT_TbPath),
-			new UCIOption(UCIOptions.OPTION_NAME_SyzygyOnline					, "" + DEFAULT_SyzygyOnline				, "type check default " + DEFAULT_SyzygyOnline),
-			new UCIOption(UCIOptions.OPTION_NAME_SyzygyDTZCache					, "" + DEFAULT_UseSyzygyDTZCache		, "type check default " + DEFAULT_UseSyzygyDTZCache),
+			new UCIOption(UCIOptions.OPTION_NAME_SyzygyOnline					, DEFAULT_SyzygyOnline				, "type check default " + DEFAULT_SyzygyOnline),
+			new UCIOption(UCIOptions.OPTION_NAME_SyzygyDTZCache					, DEFAULT_UseSyzygyDTZCache		, "type check default " + DEFAULT_UseSyzygyDTZCache),
 			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_MultiPV			, new Integer(1)						, "type spin default 1 min 1 max 100"),
 			//new UCIOptionSpin_Integer("UCIOptions.OPTION_NAME_Hidden Depth"		, 0										, "type spin default 0 min 0 max 10"),
 	};
@@ -56,24 +56,6 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	private IBoardConfig boardCfg;
 	
 	private IEvalConfig evalCfg;
-	
-	
-	private int MEM_USAGE_percent 								= DEFAULT_MEM_USAGE_percent;
-	
-	private boolean useTranspositionTable 						= DEFAULT_UseTranspositionTable;
-	private boolean useEvalCache 								= DEFAULT_UseEvalCache;
-	private boolean useSyzygyDTZCache 							= DEFAULT_UseSyzygyDTZCache;
-	
-	
-	private int multiPVsCount 									= 1;
-	
-	
-	private String TbPath 										= DEFAULT_TbPath;
-	
-	private boolean use_online_syzygy 							= DEFAULT_SyzygyOnline;
-	
-	
-	private int hiddenDepth 									= 0;
 	
 	
 	public RootSearchConfig_BaseImpl(String[] args) {
@@ -171,14 +153,17 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	@Override
 	public int getThreadsCount() {
+		
 		return 1;
 	}
+	
 	
 	@Override
 	public int getThreadMemory_InMegabytes() {
 		
 		throw new IllegalStateException();
 	}
+	
 	
 	@Override
 	public String getSearchClassName() {
@@ -210,14 +195,15 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	@Override
 	public String getTbPath() {
-		return TbPath;
+		
+		return (String) options[3].getValue();
 	}
 	
 	
 	@Override
 	public boolean useOnlineSyzygy() {
 		
-		return use_online_syzygy;
+		return (Boolean) options[4].getValue();
 	}
 	
 	
@@ -245,28 +231,28 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	@Override
 	public int getMultiPVsCount() {
 		
-		return multiPVsCount;
+		return (Integer) options[6].getValue();
 	}
 	
 	
 	@Override
 	public double get_MEMORY_USAGE_PERCENT() {
 		
-		return MEM_USAGE_percent / 100f;
+		return (Integer) options[0].getValue() / 100f;
 	}
 	
 	
 	@Override
 	public boolean useTPT() {
 		
-		return useTranspositionTable;
+		return (Boolean) options[1].getValue();
 	}
 	
 
 	@Override
 	public boolean useEvalCache() {
 		
-		return useEvalCache;
+		return (Boolean) options[2].getValue();
 	}
 
 
@@ -274,13 +260,14 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	@Override
 	public boolean useSyzygyDTZCache() {
 		
-		return useSyzygyDTZCache;
+		return (Boolean) options[5].getValue();
 	}
 	
 	
 	@Override
 	public int getHiddenDepth() {
-		return hiddenDepth;
+		
+		return 0;
 	}
 	
 	
@@ -311,53 +298,33 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 		
 		if (UCIOptions.OPTION_NAME_MultiPV.equals(option.getName())) {
 			
-			multiPVsCount = (Integer) option.getValue();
-			
 			return true;
 			
 		} else if (UCIOptions.OPTION_NAME_MemoryUsagePercent.equals(option.getName())) {
-			
-			MEM_USAGE_percent = (Integer) option.getValue();
 			
 			return true;
 			
 		} else if (UCIOptions.OPTION_NAME_TranspositionTable.equals(option.getName())) {
 			
-			useTranspositionTable = option.getValue().equals("true");
-			
 			return true;
 		
 		} else if (UCIOptions.OPTION_NAME_EvalCache.equals(option.getName())) {
-			
-			useEvalCache = option.getValue().equals("true");
 			
 			return true;
 			
 		} else if (UCIOptions.OPTION_NAME_SyzygyDTZCache.equals(option.getName())) {
 			
-			useSyzygyDTZCache = option.getValue().equals("true");
-			
 			return true;
 			
 		} else if (UCIOptions.OPTION_NAME_SyzygyPath.equals(option.getName())) {
-			
-			TbPath = (String) option.getValue();
 			
 			return true;
 		
 		} else if (UCIOptions.OPTION_NAME_SyzygyOnline.equals(option.getName())) {
 			
-			use_online_syzygy = option.getValue().equals("true");
-			
 			return true;
 			
-		} /*else if (UCIOptions.OPTION_NAME_Hidden_Depth.equals(option.getName())) {
-			
-			hiddenDepth = (Integer) option.getValue();
-			
-			return true;
-		}*/
-		
+		}
 		
 		return false;
 	}
@@ -365,12 +332,14 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	@Override
 	public String getBoardFactoryClassName() {
+		
 		throw new UnsupportedOperationException();
 	}
 	
 	
 	@Override
 	public String getSemaphoreFactoryClassName() {
+		
 		return bagaturchess.bitboard.impl.utils.BinarySemaphoreFactory_Dummy.class.getName();
 	}
 	

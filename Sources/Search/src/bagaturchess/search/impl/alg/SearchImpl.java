@@ -128,7 +128,8 @@ public abstract class SearchImpl implements ISearch {
 		
 		if (args[2] == null) {
 			
-			return new SharedData(ChannelManager.getChannel(), (IEngineConfig) args[1]);
+			throw new IllegalStateException();
+			//return new SharedData(ChannelManager.getChannel(), (IEngineConfig) args[1]);
 			
 		} else {
 			

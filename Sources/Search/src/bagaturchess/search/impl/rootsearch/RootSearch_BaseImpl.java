@@ -55,7 +55,12 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		
 		rootSearchConfig = (IRootSearchConfig) args[0];
 		
-		sharedData = (SharedData) (args[1] == null ? new SharedData(ChannelManager.getChannel(), rootSearchConfig) : args[1]);
+		if (args[1] == null) {
+		
+			throw new IllegalStateException();
+		}
+		
+		sharedData = (SharedData) args[1];
 	}
 	
 	

@@ -20,8 +20,6 @@ public class UCIConfig_BaseImpl implements IUCIConfig {
 	
 	private static final String DEFAULT_loggingPolicy = "single file"; //"none";
 	
-	private String loggingPolicy = DEFAULT_loggingPolicy;
-	
 	//Example  "option name Logging policy type combo default single file var single file var multiple files var none"
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionCombo(UCIOptions.OPTION_NAME_Logging_Policy,
@@ -64,22 +62,26 @@ public class UCIConfig_BaseImpl implements IUCIConfig {
 	
 	@Override
 	public UCIOption[] getSupportedOptions() {
+		
 		return options;
 	}
 	
 	
 	@Override
 	public boolean applyOption(UCIOption option) {
+		
 		if (UCIOptions.OPTION_NAME_Logging_Policy.equals(option.getName())) {
-			loggingPolicy = (String) option.getValue();
+			
 			return true;
 		}
+		
 		return false;
 	}
 	
 	
 	@Override
 	public String getUCIAdaptor_LoggingPolicy() {
-		return loggingPolicy;
+		
+		return (String) options[0].getValue();
 	}
 }

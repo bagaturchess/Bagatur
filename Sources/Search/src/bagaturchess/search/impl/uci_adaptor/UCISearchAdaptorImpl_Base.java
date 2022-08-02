@@ -36,7 +36,6 @@ import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.uci.api.BestMoveSender;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.api.ISearchAdaptorConfig;
-import bagaturchess.uci.api.IUCISearchAdaptor;
 import bagaturchess.uci.impl.commands.Go;
 
 

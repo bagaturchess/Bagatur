@@ -30,45 +30,45 @@ import bagaturchess.uci.impl.commands.options.UCIOptions;
 public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl implements IRootSearchConfig_SMP, IUCIOptionsProvider {
 	
 	
+	private static final int DEFAULT_SMP_Threads 					= getDefaultThreadsCount();
+	
 	private static final boolean DEFAULT_GlobalTranspositionTable 	= true;
-	
-	
-	private int currentThreadsCount 								= getDefaultThreadsCount();
-	
-	private boolean useGlobalTranspositionTable 					= DEFAULT_GlobalTranspositionTable;
 	
 	
 	//setoption name UCIOptions.OPTION_NAME_SMP_Threads value 16
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOption(UCIOptions.OPTION_NAME_IsGlobalTranspositionTable		, "" + DEFAULT_GlobalTranspositionTable	, "type check default " + DEFAULT_GlobalTranspositionTable),
-			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_SMP_Threads		, currentThreadsCount,
-					"type spin default " + currentThreadsCount
+			new UCIOption(UCIOptions.OPTION_NAME_IsGlobalTranspositionTable		, DEFAULT_GlobalTranspositionTable	, "type check default " + DEFAULT_GlobalTranspositionTable),
+			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_SMP_Threads		, DEFAULT_SMP_Threads,
+					"type spin default " + DEFAULT_SMP_Threads
 											+ " min 1"
-											+ " max " + Math.max(2, 2 * getDefaultThreadsCount())),
+											+ " max " + Math.max(2, 2 * DEFAULT_SMP_Threads)),
 	};
 	
 	
 	public RootSearchConfig_BaseImpl_SMP(String[] args) {
+		
 		super(args);
 	}
 	
 	
 	@Override
 	public String getSemaphoreFactoryClassName() {
+		
 		return bagaturchess.bitboard.impl.utils.BinarySemaphoreFactory.class.getName();
 	}
 	
 	
 	@Override
 	public int getThreadsCount() {
-		return currentThreadsCount;
+		
+		return (Integer) options[1].getValue();
 	}
 	
 	
 	@Override
 	public boolean useGlobalTPT() {
 		
-		return useGlobalTranspositionTable;
+		return (Boolean) options[0].getValue();
 	}
 	
 	
@@ -91,13 +91,9 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 		
 		if (UCIOptions.OPTION_NAME_SMP_Threads.equals(option.getName())) {
 			
-			currentThreadsCount = (Integer) option.getValue();
-			
 			return true;
 			
 		} else if (UCIOptions.OPTION_NAME_IsGlobalTranspositionTable.equals(option.getName())) {
-			
-			useGlobalTranspositionTable = option.getValue().equals("true");
 			
 			return true;
 		

@@ -34,11 +34,6 @@ public class UCISearchAdaptorConfig_BaseImpl implements ISearchAdaptorConfig {
 	private String rootSearchImpl_ClassName;
 	private Object rootSearchImpl_ConfigObj;
 	
-	private boolean isOwnBookEnabled 	= DEFAULT_OwnBook;
-	private boolean isPonderingEnabled 	= DEFAULT_Ponder;
-	private boolean isAnalyzeMode 		= DEFAULT_AnalyseMode;
-	private boolean isChess960 			= DEFAULT_Chess960;
-	
 	
 	public UCISearchAdaptorConfig_BaseImpl(String[] args) {
 		rootSearchImpl_ClassName = args[0];
@@ -50,43 +45,50 @@ public class UCISearchAdaptorConfig_BaseImpl implements ISearchAdaptorConfig {
 	
 	@Override
 	public ITimeConfig getTimeConfig() {
+		
 		return timeCfg;
 	}
 	
 	
 	@Override
 	public String getRootSearchClassName() {
+		
 		return rootSearchImpl_ClassName;
 	}
 	
 	
 	@Override
 	public Object getRootSearchConfig() {
+		
 		return rootSearchImpl_ConfigObj;
 	}
 	
 	
 	@Override
 	public boolean isOwnBookEnabled() {
-		return isOwnBookEnabled;
+		
+		return (Boolean) options[0].getValue();
 	}
 	
 	
 	@Override
 	public boolean isPonderingEnabled() {
-		return isPonderingEnabled;
+		
+		return (Boolean) options[1].getValue();
 	}
 	
 	
 	@Override
 	public boolean isAnalyzeMode() {
-		return isAnalyzeMode;
+		
+		return (Boolean) options[2].getValue();
 	}
 	
 	
 	@Override
 	public boolean isChess960() {
-		return isChess960;
+		
+		return (Boolean) options[3].getValue();
 	}
 	
 	
@@ -96,6 +98,7 @@ public class UCISearchAdaptorConfig_BaseImpl implements ISearchAdaptorConfig {
 		registry.registerProvider(this);
 		
 		if (rootSearchImpl_ConfigObj instanceof IUCIOptionsProvider) {
+			
 			((IUCIOptionsProvider) rootSearchImpl_ConfigObj).registerProviders(registry);
 		}
 	}
@@ -111,18 +114,23 @@ public class UCISearchAdaptorConfig_BaseImpl implements ISearchAdaptorConfig {
 	public boolean applyOption(UCIOption option) {
 		
 		if (UCIOptions.OPTION_NAME_Ponder.equals(option.getName())) {
-			isPonderingEnabled = (Boolean) option.getValue();
+			
 			return true;
+			
 		} else if (UCIOptions.OPTION_NAME_OwnBook.equals(option.getName())) {
-			isOwnBookEnabled = (Boolean) option.getValue();
+			
 			return true;
+			
 		} else if (UCIOptions.OPTION_NAME_UCI_AnalyseMode.equals(option.getName())) {
-			isAnalyzeMode = (Boolean) option.getValue();
+			
 			return true;
+			
 		} else if (UCIOptions.OPTION_NAME_UCI_Chess960.equals(option.getName())) {
-			isChess960 = (Boolean) option.getValue();
-			BoardUtils.isFRC = isChess960;
+			
+			BoardUtils.isFRC = isChess960();
+			
 			return true;
+			
 		}
 		
 		return false;
