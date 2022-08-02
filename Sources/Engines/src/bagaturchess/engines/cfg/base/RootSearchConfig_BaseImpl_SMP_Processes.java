@@ -10,7 +10,7 @@ public class RootSearchConfig_BaseImpl_SMP_Processes extends RootSearchConfig_Ba
 	
 	private int currentThreadMemory = 1024;
 	
-	//setoption name SMP Threads value 16
+	//setoption name UCIOptions.OPTION_NAME_SMP_Threads value 16
 	private UCIOption[] options = new UCIOption[] {
 			new UCIOptionSpin_Integer("Thread Memory (MB)", currentThreadMemory,
 					"type spin default " + currentThreadMemory

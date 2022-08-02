@@ -30,6 +30,7 @@ import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 import bagaturchess.uci.impl.Channel_Console;
+import bagaturchess.uci.impl.commands.options.UCIOptions;
 
 import com.bagaturchess.ucitournament.framework.match.MatchRunner;
 import com.bagaturchess.ucitournament.framework.match.MatchRunner_FixedDepth;
@@ -138,7 +139,7 @@ public class TournamentRunner {
 			engine2.start();
 			
 			List<String> options = new ArrayList<String>();
-			//options.add("setoption name Logging Policy value multiple files");
+			//options.add("setoption name UCIOptions.OPTION_NAME_Logging_Policy value multiple files");
 			options.add("setoption name Ponder value false");
 			options.add("setoption name Use NNUE value false");
 			options.add("setoption name OwnBook value true");

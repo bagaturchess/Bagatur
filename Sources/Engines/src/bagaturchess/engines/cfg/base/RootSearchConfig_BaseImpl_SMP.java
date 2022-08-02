@@ -24,6 +24,7 @@ import bagaturchess.search.api.IRootSearchConfig_SMP;
 import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.impl.commands.options.UCIOption;
 import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Integer;
+import bagaturchess.uci.impl.commands.options.UCIOptions;
 
 
 public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl implements IRootSearchConfig_SMP, IUCIOptionsProvider {
@@ -37,10 +38,10 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 	private boolean useGlobalTranspositionTable 					= DEFAULT_GlobalTranspositionTable;
 	
 	
-	//setoption name SMP Threads value 16
+	//setoption name UCIOptions.OPTION_NAME_SMP_Threads value 16
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOption("IsGlobalTranspositionTable"		, "" + DEFAULT_GlobalTranspositionTable	, "type check default " + DEFAULT_GlobalTranspositionTable),
-			new UCIOptionSpin_Integer("SMP Threads", currentThreadsCount,
+			new UCIOption(UCIOptions.OPTION_NAME_IsGlobalTranspositionTable		, "" + DEFAULT_GlobalTranspositionTable	, "type check default " + DEFAULT_GlobalTranspositionTable),
+			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_SMP_Threads		, currentThreadsCount,
 					"type spin default " + currentThreadsCount
 											+ " min 1"
 											+ " max " + Math.max(2, 2 * getDefaultThreadsCount())),
@@ -88,13 +89,13 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 	@Override
 	public boolean applyOption(UCIOption option) {
 		
-		if ("SMP Threads".equals(option.getName())) {
+		if (UCIOptions.OPTION_NAME_SMP_Threads.equals(option.getName())) {
 			
 			currentThreadsCount = (Integer) option.getValue();
 			
 			return true;
 			
-		} else if ("IsGlobalTranspositionTable".equals(option.getName())) {
+		} else if (UCIOptions.OPTION_NAME_IsGlobalTranspositionTable.equals(option.getName())) {
 			
 			useGlobalTranspositionTable = option.getValue().equals("true");
 			

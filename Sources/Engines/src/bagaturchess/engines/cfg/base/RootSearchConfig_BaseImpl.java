@@ -9,13 +9,12 @@ import bagaturchess.bitboard.impl.utils.ReflectionUtils;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
-import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.api.IUCIOptionsRegistry;
 import bagaturchess.uci.impl.commands.options.UCIOption;
-import bagaturchess.uci.impl.commands.options.UCIOptionCombo;
 import bagaturchess.uci.impl.commands.options.UCIOptionSpin_Integer;
 import bagaturchess.uci.impl.commands.options.UCIOptionString;
+import bagaturchess.uci.impl.commands.options.UCIOptions;
 
 
 public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IUCIOptionsProvider {
@@ -38,14 +37,14 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	
 	private UCIOption[] options 									= new UCIOption[] {
 			
-			new UCIOptionSpin_Integer("MemoryUsagePercent"	, DEFAULT_MEM_USAGE_percent				, "type spin default " + DEFAULT_MEM_USAGE_percent + " min 50 max 90"),
-			new UCIOption("TranspositionTable"				, "" + DEFAULT_UseTranspositionTable	, "type check default " + DEFAULT_UseTranspositionTable),
-			new UCIOption("EvalCache"						, "" + DEFAULT_UseEvalCache				, "type check default " + DEFAULT_UseEvalCache),
-			new UCIOptionString("SyzygyPath"				, DEFAULT_TbPath						, "type string default " + DEFAULT_TbPath),
-			new UCIOption("SyzygyOnline"					, "" + DEFAULT_SyzygyOnline				, "type check default " + DEFAULT_SyzygyOnline),
-			new UCIOption("SyzygyDTZCache "					, "" + DEFAULT_UseSyzygyDTZCache		, "type check default " + DEFAULT_UseSyzygyDTZCache),
-			new UCIOptionSpin_Integer("MultiPV"				, new Integer(1)						, "type spin default 1 min 1 max 100"),
-			//new UCIOptionSpin_Integer("Hidden Depth"		, 0										, "type spin default 0 min 0 max 10"),
+			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_MemoryUsagePercent	, DEFAULT_MEM_USAGE_percent				, "type spin default " + DEFAULT_MEM_USAGE_percent + " min 50 max 90"),
+			new UCIOption(UCIOptions.OPTION_NAME_TranspositionTable				, "" + DEFAULT_UseTranspositionTable	, "type check default " + DEFAULT_UseTranspositionTable),
+			new UCIOption(UCIOptions.OPTION_NAME_EvalCache						, "" + DEFAULT_UseEvalCache				, "type check default " + DEFAULT_UseEvalCache),
+			new UCIOptionString(UCIOptions.OPTION_NAME_SyzygyPath				, DEFAULT_TbPath						, "type string default " + DEFAULT_TbPath),
+			new UCIOption(UCIOptions.OPTION_NAME_SyzygyOnline					, "" + DEFAULT_SyzygyOnline				, "type check default " + DEFAULT_SyzygyOnline),
+			new UCIOption(UCIOptions.OPTION_NAME_SyzygyDTZCache					, "" + DEFAULT_UseSyzygyDTZCache		, "type check default " + DEFAULT_UseSyzygyDTZCache),
+			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_MultiPV			, new Integer(1)						, "type spin default 1 min 1 max 100"),
+			//new UCIOptionSpin_Integer("UCIOptions.OPTION_NAME_Hidden Depth"		, 0										, "type spin default 0 min 0 max 10"),
 	};
 	
 	
@@ -310,54 +309,54 @@ public abstract class RootSearchConfig_BaseImpl implements IRootSearchConfig, IU
 	@Override
 	public boolean applyOption(UCIOption option) {
 		
-		if ("MultiPV".equals(option.getName())) {
+		if (UCIOptions.OPTION_NAME_MultiPV.equals(option.getName())) {
 			
 			multiPVsCount = (Integer) option.getValue();
 			
 			return true;
 			
-		} else if ("MemoryUsagePercent".equals(option.getName())) {
+		} else if (UCIOptions.OPTION_NAME_MemoryUsagePercent.equals(option.getName())) {
 			
 			MEM_USAGE_percent = (Integer) option.getValue();
 			
 			return true;
 			
-		} else if ("TranspositionTable".equals(option.getName())) {
+		} else if (UCIOptions.OPTION_NAME_TranspositionTable.equals(option.getName())) {
 			
 			useTranspositionTable = option.getValue().equals("true");
 			
 			return true;
 		
-		} else if ("EvalCache".equals(option.getName())) {
+		} else if (UCIOptions.OPTION_NAME_EvalCache.equals(option.getName())) {
 			
 			useEvalCache = option.getValue().equals("true");
 			
 			return true;
 			
-		} else if ("SyzygyDTZCache".equals(option.getName())) {
+		} else if (UCIOptions.OPTION_NAME_SyzygyDTZCache.equals(option.getName())) {
 			
 			useSyzygyDTZCache = option.getValue().equals("true");
 			
 			return true;
 			
-		} else if ("SyzygyPath".equals(option.getName())) {
+		} else if (UCIOptions.OPTION_NAME_SyzygyPath.equals(option.getName())) {
 			
 			TbPath = (String) option.getValue();
 			
 			return true;
 		
-		} else if ("SyzygyOnline".equals(option.getName())) {
+		} else if (UCIOptions.OPTION_NAME_SyzygyOnline.equals(option.getName())) {
 			
 			use_online_syzygy = option.getValue().equals("true");
 			
 			return true;
 			
-		} else if ("Hidden Depth".equals(option.getName())) {
+		} /*else if (UCIOptions.OPTION_NAME_Hidden_Depth.equals(option.getName())) {
 			
 			hiddenDepth = (Integer) option.getValue();
 			
 			return true;
-		}
+		}*/
 		
 		
 		return false;

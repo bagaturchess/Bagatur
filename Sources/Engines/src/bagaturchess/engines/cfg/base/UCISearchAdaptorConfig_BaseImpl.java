@@ -10,6 +10,7 @@ import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.api.IUCIOptionsRegistry;
 import bagaturchess.uci.impl.commands.options.UCIOption;
 import bagaturchess.uci.impl.commands.options.UCIOptionCombo;
+import bagaturchess.uci.impl.commands.options.UCIOptions;
 
 
 public class UCISearchAdaptorConfig_BaseImpl implements ISearchAdaptorConfig {
@@ -24,10 +25,10 @@ public class UCISearchAdaptorConfig_BaseImpl implements ISearchAdaptorConfig {
 	private final ITimeConfig timeCfg 					= new TimeConfigImpl();
 	
 	private UCIOption[] options 						= new UCIOption[] {
-			new UCIOption("OwnBook"			, DEFAULT_OwnBook		, "type check default " + DEFAULT_OwnBook),
-			new UCIOption("Ponder"			, DEFAULT_Ponder		, "type check default " + DEFAULT_Ponder),
-			new UCIOption("UCI_AnalyseMode"	, DEFAULT_AnalyseMode	, "type check default " + DEFAULT_AnalyseMode),
-			new UCIOption("UCI_Chess960"	, DEFAULT_Chess960		, "type check default " + DEFAULT_Chess960)
+			new UCIOption(UCIOptions.OPTION_NAME_OwnBook			, DEFAULT_OwnBook		, "type check default " + DEFAULT_OwnBook),
+			new UCIOption(UCIOptions.OPTION_NAME_Ponder				, DEFAULT_Ponder		, "type check default " + DEFAULT_Ponder),
+			new UCIOption(UCIOptions.OPTION_NAME_UCI_AnalyseMode	, DEFAULT_AnalyseMode	, "type check default " + DEFAULT_AnalyseMode),
+			new UCIOption(UCIOptions.OPTION_NAME_UCI_Chess960		, DEFAULT_Chess960		, "type check default " + DEFAULT_Chess960)
 	};
 	
 	private String rootSearchImpl_ClassName;
@@ -109,16 +110,16 @@ public class UCISearchAdaptorConfig_BaseImpl implements ISearchAdaptorConfig {
 	@Override
 	public boolean applyOption(UCIOption option) {
 		
-		if ("Ponder".equals(option.getName())) {
+		if (UCIOptions.OPTION_NAME_Ponder.equals(option.getName())) {
 			isPonderingEnabled = (Boolean) option.getValue();
 			return true;
-		} else if ("OwnBook".equals(option.getName())) {
+		} else if (UCIOptions.OPTION_NAME_OwnBook.equals(option.getName())) {
 			isOwnBookEnabled = (Boolean) option.getValue();
 			return true;
-		} else if ("UCI_AnalyseMode".equals(option.getName())) {
+		} else if (UCIOptions.OPTION_NAME_UCI_AnalyseMode.equals(option.getName())) {
 			isAnalyzeMode = (Boolean) option.getValue();
 			return true;
-		} else if ("UCI_Chess960".equals(option.getName())) {
+		} else if (UCIOptions.OPTION_NAME_UCI_Chess960.equals(option.getName())) {
 			isChess960 = (Boolean) option.getValue();
 			BoardUtils.isFRC = isChess960;
 			return true;

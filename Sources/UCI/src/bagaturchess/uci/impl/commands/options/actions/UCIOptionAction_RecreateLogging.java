@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import bagaturchess.uci.api.IChannel;
 import bagaturchess.uci.api.IUCIConfig;
 import bagaturchess.uci.api.IUCIOptionAction;
+import bagaturchess.uci.impl.commands.options.UCIOptions;
 
 
 public class UCIOptionAction_RecreateLogging implements IUCIOptionAction {
@@ -28,6 +29,6 @@ public class UCIOptionAction_RecreateLogging implements IUCIOptionAction {
 	
 	@Override
 	public String getOptionName() {
-		return "Logging Policy";
+		return UCIOptions.OPTION_NAME_Logging_Policy;
 	}
 }

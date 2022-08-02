@@ -51,6 +51,7 @@ import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 import bagaturchess.uci.engine.UCIEnginesManager;
 import bagaturchess.uci.impl.commands.Go;
 import bagaturchess.uci.impl.commands.info.Info;
+import bagaturchess.uci.impl.commands.options.UCIOptions;
 
 
 public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
@@ -99,7 +100,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			runner.uciOK();
 			
 			List<String> options = new ArrayList<String>();
-			//options.add("setoption name Logging Policy value multiple files");
+			//options.add("setoption name UCIOptions.OPTION_NAME_Logging_Policy value multiple files");
 			options.add("setoption name OwnBook value false");//The separate process should not use openning book moves, because they have to be already moved by the master process.
 			options.add("setoption name Ponder value false");
 			//The UCI options of the slave engine should be set as for the master engine, especially the UCI option for Memory Optimizations.
@@ -107,7 +108,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 			
 			//options.add("setoption name Openning Mode value random intermediate");
 			
-			/*315 <Bagatur1.5f(1): option name Logging Policy type combo default none var single file var multiple files var none
+			/*315 <Bagatur1.5f(1): option name UCIOptions.OPTION_NAME_Logging_Policy type combo default none var single file var multiple files var none
 			316 <Bagatur1.5f(1): option name OwnBook type check default true
 			316 <Bagatur1.5f(1): option name Ponder type check default true
 			316 <Bagatur1.5f(1): option name UCI_AnalyseMode type check default false

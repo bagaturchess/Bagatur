@@ -25,9 +25,7 @@ package bagaturchess.uci.impl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
@@ -40,25 +38,11 @@ import bagaturchess.uci.api.UCISearchAdaptorFactory;
 import bagaturchess.uci.impl.commands.Go;
 import bagaturchess.uci.impl.commands.Position;
 import bagaturchess.uci.impl.commands.options.SetOption;
+import bagaturchess.uci.impl.commands.options.UCIOptions;
 import bagaturchess.uci.impl.commands.options.actions.OptionsManager;
 
 
 public class StateManager extends Protocol implements BestMoveSender {
-	
-	
-	private static final Set<String> Options_RecreateSearchAdaptor = new HashSet<String>();
-	
-	static {
-		Options_RecreateSearchAdaptor.add("SMP Threads");
-		Options_RecreateSearchAdaptor.add("SyzygyPath");
-		Options_RecreateSearchAdaptor.add("MemoryUsagePercent");
-		Options_RecreateSearchAdaptor.add("TranspositionTable");
-		Options_RecreateSearchAdaptor.add("EvalCache");
-		Options_RecreateSearchAdaptor.add("SyzygyOnline");
-		Options_RecreateSearchAdaptor.add("SyzygyDTZCache");
-		Options_RecreateSearchAdaptor.add("IsGlobalTranspositionTable");
-		Options_RecreateSearchAdaptor.add("UCI_Chess960");
-	};
 	
 	
 	//Disabled.
@@ -76,7 +60,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	private String lastFEN;
 	
-	private boolean mustRecreateSearchAdaptor;
+	private boolean mustCreateSearchAdaptor;
 	
 	
 	public StateManager(IUCIConfig _engineBootCfg) {
@@ -85,7 +69,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 		
 		board = BoardUtils.createBoard_WithPawnsCache();
 		
-		mustRecreateSearchAdaptor = true;
+		mustCreateSearchAdaptor = true;
 	}
 	
 	
@@ -271,14 +255,14 @@ public class StateManager extends Protocol implements BestMoveSender {
 			
 			createSearchAdaptor();
 			
-		} else if (mustRecreateSearchAdaptor) {
+		} else if (mustCreateSearchAdaptor) {
 			
 			destroySearchAdaptor();
 				
 			createSearchAdaptor();
 		}
 		
-		mustRecreateSearchAdaptor = false;
+		mustCreateSearchAdaptor = false;
 	}
 	
 	
@@ -351,9 +335,9 @@ public class StateManager extends Protocol implements BestMoveSender {
 		SetOption setoption = new SetOption(channel, fromGUILine);
 		channel.sendLogToGUI("StateManager: Set-option parsed: " + setoption);
 		
-		if (Options_RecreateSearchAdaptor.contains(setoption.getName())) {
+		if (UCIOptions.needsRestart(setoption.getName())) {
 			
-			mustRecreateSearchAdaptor = true;
+			mustCreateSearchAdaptor = true;
 		}
 		
 		optionsManager.set(setoption);

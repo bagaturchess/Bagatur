@@ -10,13 +10,14 @@ import bagaturchess.uci.api.IUCIOptionsProvider;
 import bagaturchess.uci.api.IUCIOptionsRegistry;
 import bagaturchess.uci.impl.commands.options.UCIOption;
 import bagaturchess.uci.impl.commands.options.UCIOptionCombo;
+import bagaturchess.uci.impl.commands.options.UCIOptions;
 
 
 public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvider {
 	
 	
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOptionCombo("Opening Mode",
+			new UCIOptionCombo(UCIOptions.OPTION_NAME_Opening_Mode,
 					"most played first",
 					"type combo default " + "most played first" + " var most played first var random intermediate var random full"),
 	};
@@ -436,7 +437,7 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 		if ("Search [Use TPT scores in PV Nodes]".equals(option.getName())) {
 			//other_UseTPTScoresPV = (Boolean) option.getValue();
 			//return true;
-		} else if ("Opening Mode".equals(option.getName())) {
+		} else if (UCIOptions.OPTION_NAME_Opening_Mode.equals(option.getName())) {
 			
 			if (((String) option.getValue()).equals("most played first")) {
 				openingBook_Mode = OpeningBook.OPENING_BOOK_MODE_POWER2;
@@ -448,7 +449,7 @@ public class SearchConfigImpl_AB implements ISearchConfig_AB, IUCIOptionsProvide
 				openingBook_Mode = OpeningBook.OPENING_BOOK_MODE_POWER0;
 				
 			} else {
-				throw new IllegalStateException("Opening Mode set to illegal value = " + option.getValue());
+				throw new IllegalStateException(UCIOptions.OPTION_NAME_Opening_Mode + "set to illegal value = " + option.getValue());
 			}
 			
 			return true;
