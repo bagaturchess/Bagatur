@@ -1,3 +1,7 @@
+Version 3.4h (2 August 2022)
+  * Bugfixing: When setting UCI options, which need re-creation of search objects, use their direct names, without converting to lower case.
+  * Optimization: create search objects only once, after all UCI options are set.
+
 Version 3.4g (29 July 2022)
   * Bugfixing (not related with FRC), of an issue introduced with version 3.4f. It is related with the extraction of moves from Transposition Table and building the PV to show as output.
   * Bugfixing (not related with FRC), sometimes in mate positions, after repetition of move 2 times, Bagatur evaluation jumps between 0 and +-mate score.
