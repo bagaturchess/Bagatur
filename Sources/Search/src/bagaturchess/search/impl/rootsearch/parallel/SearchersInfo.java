@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import bagaturchess.search.api.IRootSearch;
+import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.info.SearchInfoFactory;
@@ -322,40 +323,63 @@ public class SearchersInfo {
 		int cnt;
 		int best_eval;
 		ISearchInfo best_info;
+		boolean hasMate;
 		
 		
 		MoveInfo(ISearchInfo first_info) {
 			
-			sum = first_info.getEval();
-			cnt = 1;
-			best_eval = first_info.getEval();
-			best_info = first_info;
+			best_eval = ISearch.MIN;
 			
-			if (best_info == null) {
-				throw new IllegalStateException("best_info == null");
-			}
+			addInfo(first_info);
 		}
 		
 		
 		void addInfo(ISearchInfo info) {
 			
-			sum += info.getEval();
-			cnt += 1;
-			if (info.getEval() > best_eval) {
-				best_eval = info.getEval();
-				best_info = info;
-			}
+			int new_eval = info.getEval();
 			
-			if (best_info == null) {
-				throw new IllegalStateException("best_info == null");
+			if (hasMate) {
+				
+				if (SearchUtils.isMateVal(new_eval)) {
+					
+					if (new_eval > best_eval) {
+						best_eval = new_eval;
+						best_info = info;
+					}
+				}
+				
+			} else {
+				
+				if (SearchUtils.isMateVal(new_eval)) {
+					
+					if (new_eval > best_eval) {
+						best_eval = new_eval;
+						best_info = info;
+					}
+					
+					hasMate = true;
+					
+				} else {
+					
+					if (new_eval > best_eval) {
+						best_eval = new_eval;
+						best_info = info;
+					}
+					
+					sum += new_eval;
+					cnt += 1;
+				}
 			}
 		}
 		
 		
 		int getEval() {
-			if (SearchUtils.isMateVal(best_eval)) {
+			
+			if (hasMate) {
+				
 				return best_eval;
 			}
+			
 			return sum / cnt;
 		}
 	}
