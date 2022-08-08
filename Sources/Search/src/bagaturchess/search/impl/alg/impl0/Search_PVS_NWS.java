@@ -212,11 +212,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 			
-			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+			int result = SyzygyTBProbing.getSingleton().probeWDL(env.getBitboard());
 			if (result != -1) {
 				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
 				int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
-				int egtbscore =  SyzygyTBProbing.getSingleton().getWDLScore(wdl, depth);
+				int egtbscore =  SyzygyTBProbing.getWDLScore(wdl, depth);
 				if (egtbscore > 0) {
 					int distanceToDraw = 100 - env.getBitboard().getDraw50movesRule();
 					if (distanceToDraw > dtz) {
@@ -572,11 +572,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 			
-			int result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+			int result = SyzygyTBProbing.getSingleton().probeWDL(env.getBitboard());
 			if (result != -1) {
 				int dtz = (result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
 				int wdl = (result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
-				int egtbscore =  SyzygyTBProbing.getSingleton().getWDLScore(wdl, depth);
+				int egtbscore =  SyzygyTBProbing.getWDLScore(wdl, depth);
 				if (egtbscore > 0) {
 					int distanceToDraw = 100 - env.getBitboard().getDraw50movesRule();
 					if (distanceToDraw > dtz) {

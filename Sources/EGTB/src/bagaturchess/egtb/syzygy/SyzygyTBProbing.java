@@ -28,11 +28,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.winkelhagen.chess.syzygy.SyzygyBridge;
-
 
 /**
- * converter class to fit the FrankWalter board representation on the SyzygyBridge
+ * converter class to fit the FrankWalter board representation on the SyzygyJNIBridge
  */
 public class SyzygyTBProbing {
 	
@@ -43,8 +41,6 @@ public class SyzygyTBProbing {
 	private static boolean loadingInitiated;
 	
 	private static SyzygyTBProbing instance;
-	
-	private IMoveList temp_moves_list;
 	
 	private static boolean switched_off = false;
 	
@@ -65,6 +61,8 @@ public class SyzygyTBProbing {
     		if (!instance.loadNativeLibrary()) {
     			
     			instance = null;
+    			
+    			switched_off = true;
     		}
     	}
     	
@@ -80,37 +78,35 @@ public class SyzygyTBProbing {
     
     public synchronized final void load(String path) {
     	
-    	SyzygyBridge.load(path);
+    	SyzygyJNIBridge.load(path);
     }
     
     
     private SyzygyTBProbing() {
     	
     	loadingInitiated = false;
-    	
-    	temp_moves_list = new BaseMoveList();
     }
     
     
 	private synchronized boolean loadNativeLibrary() {
 		
-		return SyzygyBridge.loadNativeLibrary();
+		return SyzygyJNIBridge.loadNativeLibrary();
 	}
 	
 	
     /**
-     * wrapper for {@link com.winkelhagen.chess.syzygy.SyzygyBridge#isAvailable(int)}
+     * wrapper for {@link bagaturchess.egtb.syzygy.SyzygyJNIBridge#isAvailable(int)}
      * @param piecesLeft the number of pieces left on the board
      * @return true iff there is a Syzygy result to be expected, given the number of pieces currently on the board
      */
-    public synchronized boolean isAvailable(int piecesLeft) {
+    public boolean isAvailable(int piecesLeft) {
     	
     	if (piecesLeft > MAX_PIECES_COUNT) {
     		
     		return false;
     	}
     	
-        return SyzygyBridge.isAvailable(piecesLeft);
+        return SyzygyJNIBridge.isAvailable(piecesLeft);
     }
     
     
@@ -119,14 +115,13 @@ public class SyzygyTBProbing {
      * @param board the FrankWalter board representation
      * @return a WDL result (see {@link #getWDLScore(int, int)})
      */
-    public synchronized int probeWDL(IBitBoard board){
+    public int probeWDL(IBitBoard board) {
     	
     	
     	if (board.getMaterialState().getPiecesCount() > MAX_PIECES_COUNT) {
     		
     		return -1;
     	}
-    	
     	
     	
         if (board.hasRightsToKingCastle(Constants.COLOUR_WHITE)
@@ -137,8 +132,13 @@ public class SyzygyTBProbing {
             return -1;
         }
         
+        if (board.getEnpassantSquareID() != 0) {
+        	
+        	return -1;
+        }
         
-        return SyzygyBridge.probeSyzygyWDL(
+        
+        return SyzygyJNIBridge.probeSyzygyWDL(
         		convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_WHITE)),
         		convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_BLACK)),
         		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING)),
@@ -147,7 +147,8 @@ public class SyzygyTBProbing {
         		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP)),
         		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT)),
         		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN)),
-                0,//board.getEpSquare()==-1?0:board.getEpSquare(),
+        		board.getDraw50movesRule(),
+                0, //Enpassant index
                 board.getColourToMove() == Constants.COLOUR_WHITE
         );
     }
@@ -159,7 +160,7 @@ public class SyzygyTBProbing {
      * @param board the FrankWalter board representation
      * @return a WDL result (see {@link #toXBoardScore(int)} and {@link #toMove(int)})
      */
-    public synchronized int probeDTZ(IBitBoard board) {
+    /*public int probeDTZ(IBitBoard board) {
     	
     	
     	if (board.getMaterialState().getPiecesCount() > MAX_PIECES_COUNT) {
@@ -177,7 +178,7 @@ public class SyzygyTBProbing {
         }
        
         
-        int score = SyzygyBridge.probeSyzygyDTZ(
+        int score = SyzygyJNIBridge.probeSyzygyDTZ(
         		
     		convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_WHITE)),
     		convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_BLACK)),
@@ -193,10 +194,10 @@ public class SyzygyTBProbing {
         );
 	        
         return score;
-    }
+    }*/
 
 
-	public synchronized void probeMove(IBitBoard board, long[] out) {
+	public void probeMove(IBitBoard board, long[] out) {
     	
     	
     	out[0] = -1;
@@ -219,6 +220,14 @@ public class SyzygyTBProbing {
         }
 		
         
+        if (board.getEnpassantSquareID() != 0) {
+        	
+        	return;
+        }
+
+        
+    	IMoveList temp_moves_list = new BaseMoveList();
+    	
         temp_moves_list.clear();
         
 		board.genAllMoves(temp_moves_list);
@@ -233,9 +242,9 @@ public class SyzygyTBProbing {
 			board.makeMoveForward(cur_move);
 			
 			//Check for 3 fold repetition after the move
-			if (board.getStateRepetition() <= 1) {
+			if (board.getStateRepetition() <= 2) {
 				
-				int probe_result = SyzygyTBProbing.getSingleton().probeDTZ(board);
+				int probe_result = SyzygyTBProbing.getSingleton().probeWDL(board);
 				
 				int dtz = (probe_result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
 				int wdl = (probe_result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
@@ -243,10 +252,10 @@ public class SyzygyTBProbing {
 				//int wdl = SyzygyTBProbing.getSingleton().probeWDL(board);
 				//wdl = (wdl & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
 				
-				//System.out.println(board.getMoveOps().moveToString(cur_move) + ", dtz=" + dtz + ", wdl=" + wdl);
+				System.out.println(board.getMoveOps().moveToString(cur_move) + ", dtz=" + dtz + ", wdl=" + wdl);
 				
 				int distanceToDraw_50MoveRule = 100 - board.getDraw50movesRule();
-				//Although we specify the rule50 parameter when calling SyzygyBridge.probeSyzygyDTZ(...)
+				//Although we specify the rule50 parameter when calling SyzygyJNIBridge.probeSyzygyDTZ(...)
 				//Syzygy TBs report winning score/move
 				//but the +mate or +promotion moves line is longer
 				//than the moves we have until draw with 50 move rule

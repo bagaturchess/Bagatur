@@ -1,33 +1,27 @@
-package com.winkelhagen.chess.syzygy;
+package bagaturchess.egtb.syzygy;
 
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import bagaturchess.uci.api.ChannelManager;
 
 
 /**
  * A bridge between Java and the Fathom library to access Syzygy tablebases.
  *
- * https://github.com/ljgw
+ * C source code downloaded from:  https://github.com/jdart1/Fathom
  * 
- * to compile the JSyzygy library on linux (libJSyzygy.so) the following cookbook can be executed
- * <ul><li>generate the SyzygyBridge header file</li></ul>
- * <pre>javac -cp ~/.m2/repository/org/apache/logging/log4j/log4j-api/2.11.1/log4j-api-2.11.1.jar src/main/java/com/winkelhagen/chess/syzygy/SyzygyBridge.java -h .</pre>
- * <ul><li>compile the Fathom library</li></ul>
- * <pre>Linux (ubuntu 18.04.1 LTS):
- * gcc -std=gnu99 -O2 -Wall -D TB_USE_ATOMIC -D TB_NO_HW_POP_COUNT -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libJSyzygy.so tbprobe.c</pre>
- * <pre>Windows (10, mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0):
- * gcc -std=gnu99 -O2 -Wall -D TB_USE_ATOMIC -DTB_NO_HW_POP_COUNT -fPIC -I"%JAVA_HOME%/include" -I"%JAVA_HOME%/include/win32" -shared -o JSyzygy.dll tbprobe.c</pre>
+ * For SyzygyLib build instructions see build_syzygy_lib.txt
  */
-public class SyzygyBridge {
+public class SyzygyJNIBridge {
 
     private static boolean libLoaded = false;
     private static int tbLargest = 0;
 
-    private SyzygyBridge(){}
+    private SyzygyJNIBridge(){}
 
     private static final String FILE_SCHEME = "file";
 
@@ -37,23 +31,23 @@ public class SyzygyBridge {
         try {
         	
             String libName = System.mapLibraryName("JSyzygy");
-            Path jarfile = Paths.get(SyzygyBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            Path jarfile = Paths.get(SyzygyJNIBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             File libFile = jarfile.getParent().resolve(libName).toFile();
-            System.out.println("Looking for " + libName + " at location " + libFile);
+            if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Looking for " + libName + " at location " + libFile);
             if (libFile.exists()) {
                 System.load(libFile.getAbsolutePath());
-                System.out.println(libName + " is now loaded");
+                if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump(libName + " is now loaded");
             } else {
-                URL classpathLibUrl = SyzygyBridge.class.getClassLoader().getResource(libName);
-                System.out.println("Looking for " + libName + " at location " + classpathLibUrl);
+                URL classpathLibUrl = SyzygyJNIBridge.class.getClassLoader().getResource(libName);
+                if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Looking for " + libName + " at location " + classpathLibUrl);
                 if (classpathLibUrl != null && FILE_SCHEME.equalsIgnoreCase(classpathLibUrl.toURI().getScheme()) && Paths.get(classpathLibUrl.toURI()).toFile().exists()){
                     File classpathLibFile = Paths.get(classpathLibUrl.toURI()).toFile();
                     System.load(classpathLibFile.getAbsolutePath());
-                    System.out.println("Loaded " + libName + " located in the resources directory");
+                    if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Loaded " + libName + " located in the resources directory");
                 } else {
-                	System.out.println("Looking for " + libName + " at java.library.path: " + System.getProperty("java.library.path"));
+                	if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Looking for " + libName + " at java.library.path: " + System.getProperty("java.library.path"));
                     System.loadLibrary("JSyzygy");
-                    System.out.println("Loaded " + libName + " located in the java library path");
+                    if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Loaded " + libName + " located in the java library path");
                 }
             }
             
@@ -61,12 +55,19 @@ public class SyzygyBridge {
             
         } catch (Throwable t) {
         	
-        	System.out.println("Unable to load JSyzygy library " + t);
+        	if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Unable to load JSyzygy library " + t);
         }
         
         return libLoaded;
     }
-	 
+	
+	
+    private static native boolean init(String path);
+    private static native int getTBLargest();
+    private static native int probeWDL(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn);
+    //private static native int probeDTZ(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn);
+    
+    
     /**
      *
      * @return true iff the JSyzygy JNI library is loaded.
@@ -90,19 +91,19 @@ public class SyzygyBridge {
      * @return the supported size of the loaded tablebases
      */
     public static synchronized int load(String path){
-        System.out.println("Loading syzygy tablebases from " + path);
+    	if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Loading syzygy tablebases from " + path);
         if (tbLargest>0){
-        	System.out.println("Syzygy tablebases are already loaded");
+        	if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Syzygy tablebases are already loaded");
             return tbLargest;
         }
         boolean result = init(path);
 
         if (result) {
             tbLargest = getTBLargest();
-            System.out.println("Syzygy tablebases loaded");
+            if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Syzygy tablebases loaded");
         } else {
             tbLargest = -1;
-            System.out.println("Syzygy tablebases NOT loaded");
+            if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Syzygy tablebases NOT loaded");
         }
 
         return tbLargest;
@@ -130,8 +131,8 @@ public class SyzygyBridge {
      * @param turn true if white is to move, false if black is.
      * @return WDL result (see c code)
      */
-    public static int probeSyzygyWDL(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int ep, boolean turn){ //NOSONAR
-        return probeWDL(white, black, kings, queens, rooks, bishops, knights, pawns, ep, turn);
+    public static int probeSyzygyWDL(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn){ //NOSONAR
+        return probeWDL(white, black, kings, queens, rooks, bishops, knights, pawns, rule50, ep, turn);
     }
 
     /**
@@ -149,15 +150,8 @@ public class SyzygyBridge {
      * @param turn true if white is to move, false if black is.
      * @return DTZ result (see c code)
      */
-    public static int probeSyzygyDTZ(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn){ //NOSONAR
+    /*public static int probeSyzygyDTZ(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn){ //NOSONAR
         return probeDTZ(white, black, kings, queens, rooks, bishops, knights, pawns, rule50, ep, turn);
     }
-
-
-    private static native boolean init(String path);
-    private static native int getTBLargest();
-    private static native int probeWDL(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int ep, boolean turn); //NOSONAR
-    private static native int probeDTZ(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn); //NOSONAR
-    
-    
+    */
 }

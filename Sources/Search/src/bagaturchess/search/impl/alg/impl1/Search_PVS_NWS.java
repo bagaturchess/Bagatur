@@ -100,7 +100,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final boolean USE_LMR_ABOVE_ALPHA = false;
 	
 	
-	private boolean USE_DTZ_CACHE = false;
+	private boolean USE_DTZ_CACHE = true;
 	
 	
 	private IEvalEntry temp_cache_entry;
@@ -207,7 +207,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.leaf = true;
 		
 		
-	    if ((isPv && isDrawPV(ply)) || (!isPv && isDraw())) {
+		if ((isPv && isDrawPV(ply)) || (!isPv && isDraw())) {
+	    //if (isDrawPV(ply)) {
 	    	
 	    	node.eval = getDrawScores(-1);
 	    			
@@ -297,8 +298,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (ply >= 5
-    	    	&& depth >= 5
+		if (ply >= 1
+    	    	//&& depth >= 5
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
     			){
@@ -391,8 +392,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		        
 	            	case SyzygyConstants.TB_WIN:
 	            		
-						int distanceToDraw_50MoveRule = 100 - env.getBitboard().getDraw50movesRule();
-						//Although we specify the rule50 parameter when calling SyzygyBridge.probeSyzygyDTZ(...)
+						int distanceToDraw_50MoveRule = 99 - env.getBitboard().getDraw50movesRule();
+						//Although we specify the rule50 parameter when calling SyzygyJNIBridge.probeSyzygyDTZ(...)
 						//Syzygy TBs report winning score/move
 						//but the +mate or +promotion moves line is longer
 						//than the moves we have until draw with 50 move rule
@@ -941,7 +942,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.eval = ISearch.MIN;
 		node.leaf = true;
 		
-	    if (isDraw()) {
+		if (isDraw()) {
+	    //if (isDrawPV(ply)) {
 	    	
 	    	node.eval = getDrawScores(-1);
 	    	
@@ -1212,8 +1214,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		result.leaf = true;
-			
-	    if ((isPv && isDrawPV(ply)) || (ply > 0 && !isPv && isDraw())) {
+		
+		if ((isPv && isDrawPV(ply)) || (!isPv && isDraw())) {
+	    //if (isDrawPV(ply)) {
 	    	
 			result.eval = getDrawScores(-1);
 			
@@ -1415,18 +1418,18 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private int probeDTZ_WithCache() {
-		
-	    int moves_till_draw = 100 - env.getBitboard().getDraw50movesRule();
-	    
-	    moves_till_draw = moves_till_draw + moves_till_draw << 8;
-	    moves_till_draw = moves_till_draw + moves_till_draw << 16;
-	    
-	    long hash_moves_till_draw = moves_till_draw + ((long) moves_till_draw) << 32;
-	    
-	    long hashkey = env.getBitboard().getHashKey() ^ hash_moves_till_draw;
 	    
 	    if (USE_DTZ_CACHE) {
 	    	
+		    int moves_till_draw = 99 - env.getBitboard().getDraw50movesRule();
+		    
+		    moves_till_draw = moves_till_draw + moves_till_draw << 8;
+		    moves_till_draw = moves_till_draw + moves_till_draw << 16;
+		    
+		    long hash_moves_till_draw = moves_till_draw + ((long) moves_till_draw) << 32;
+		    
+		    long hashkey = env.getBitboard().getHashKey() ^ hash_moves_till_draw;
+		    
 	    	env.getSyzygyDTZCache().get(hashkey, temp_cache_entry);
 			
 			if (!temp_cache_entry.isEmpty()) {
@@ -1437,7 +1440,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			} else {
 		    
-		        int probe_result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+		        int probe_result = SyzygyTBProbing.getSingleton().probeWDL(env.getBitboard());
 		        
 		        env.getSyzygyDTZCache().put(hashkey, 5, probe_result);
 		        
@@ -1446,7 +1449,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 	    } else {
 	    	
-	    	int probe_result = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+	    	int probe_result = SyzygyTBProbing.getSingleton().probeWDL(env.getBitboard());
 	        
 	        return probe_result;
 	    }

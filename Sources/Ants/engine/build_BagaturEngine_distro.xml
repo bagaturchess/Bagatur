@@ -26,8 +26,8 @@
   <target name="build_distro" description="Building Distribution">
     <ant antfile="${ants_dir}/common/build_Board.xml" dir="${bitboard_dir}/src"/>
     <ant antfile="${ants_dir}/common/build_Opening.xml" dir="${opening_dir}/src"/>
-  	<ant antfile="${ants_dir}/common/build_EGTB.xml" dir="${engines_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_UCI.xml" dir="${uci_dir}/src"/>
+  	<ant antfile="${ants_dir}/common/build_EGTB.xml" dir="${engines_dir}/src"/>
   	<ant antfile="${ants_dir}/engine/build_Search.xml" dir="${search_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_LearningAPI.xml" dir="${learningAPI_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_UCITracker.xml" dir="${ucitracker_dir}/src"/>
