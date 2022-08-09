@@ -97,10 +97,10 @@ public class Search_PVS_NWS extends SearchImpl {
 	private VarStatistic lmrAboveAlphaAVGScores_white;
 	private VarStatistic lmrAboveAlphaAVGScores_black;
 	
-	private static final boolean USE_LMR_ABOVE_ALPHA = false;
+	private static final boolean USE_LMR_ABOVE_ALPHA 	= false;
 	
 	
-	private boolean USE_DTZ_CACHE = true;
+	private static final boolean USE_DTZ_CACHE 			= true;
 	
 	
 	private IEvalEntry temp_cache_entry;
@@ -298,7 +298,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (ply >= 1
+		if (ply >= 5
     	    	//&& depth >= 5
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
@@ -1421,14 +1421,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	    
 	    if (USE_DTZ_CACHE) {
 	    	
-		    int moves_till_draw = 99 - env.getBitboard().getDraw50movesRule();
+	    	long hash50movesRule = 128 + env.getBitboard().getDraw50movesRule();
+		    hash50movesRule += hash50movesRule << 8;
+		    hash50movesRule += hash50movesRule << 16;
+		    hash50movesRule += hash50movesRule << 32;
 		    
-		    moves_till_draw = moves_till_draw + moves_till_draw << 8;
-		    moves_till_draw = moves_till_draw + moves_till_draw << 16;
-		    
-		    long hash_moves_till_draw = moves_till_draw + ((long) moves_till_draw) << 32;
-		    
-		    long hashkey = env.getBitboard().getHashKey() ^ hash_moves_till_draw;
+		    long hashkey = hash50movesRule ^ env.getBitboard().getHashKey();
 		    
 	    	env.getSyzygyDTZCache().get(hashkey, temp_cache_entry);
 			
