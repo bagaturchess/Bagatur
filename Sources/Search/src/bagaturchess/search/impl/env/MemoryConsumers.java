@@ -163,7 +163,6 @@ public class MemoryConsumers {
 				230018 <Bagatur 3.1(0): # C  [libJSyzygy.so+0x6513]  probe_dtz+0x403*/
 			
 			//SyzygyTBProbing.disableSingleton();
-			//if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("SyzygyTBProbing.clearSingleton() called: Syzygy TBs are switched off");
 		//}
 		
 		if (SyzygyTBProbing.getSingleton() != null) {

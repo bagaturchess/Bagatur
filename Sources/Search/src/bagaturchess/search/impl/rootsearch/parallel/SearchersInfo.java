@@ -160,29 +160,23 @@ public class SearchersInfo {
 	//Result can be null
 	private ISearchInfo getAccumulatedInfo(int depth) {
 		
-		
-		long totalNodes = getNodesCount();
-		long tbhits = getTBHits();
-		/*for (IRootSearch cur_searcher: searchersInfo.keySet()) {
-			SearcherInfo cur_searcher_infos = searchersInfo.get(cur_searcher);
-			if (cur_searcher_infos != null){
-				//System.out.println(cur_searcher_infos + " " + cur_searcher_infos.getSearchedNodes());
-				totalNodes += cur_searcher_infos.getSearchedNodes();
-			}
-		}*/
-		
-		
 		Map<Integer, MoveInfo> movesInfoPerDepth = new HashMap<Integer, MoveInfo>();
+		
 		for (IRootSearch cur_searcher: searchersInfo.keySet()) {
 			
 			SearcherInfo cur_searcher_infos = searchersInfo.get(cur_searcher);
 			ISearchInfo cur_last_info = cur_searcher_infos.getLastSearchInfo(depth);
 			
 			if (cur_last_info != null) {
+				
 				MoveInfo moveInfo = movesInfoPerDepth.get(cur_last_info.getBestMove());
+				
 				if (moveInfo == null) {
+					
 					movesInfoPerDepth.put(cur_last_info.getBestMove(), new MoveInfo(cur_last_info));
+					
 				} else {
+					
 					moveInfo.addInfo(cur_last_info);
 				}
 			}
@@ -190,18 +184,26 @@ public class SearchersInfo {
 		
 		
 		MoveInfo bestMoveInfo = null;
+		
 		for (Integer move: movesInfoPerDepth.keySet()) {
+			
 			MoveInfo cur_moveInfo = movesInfoPerDepth.get(move);
+			
 			if (bestMoveInfo == null) {
+				
 				bestMoveInfo = cur_moveInfo;
+				
 			} else {
+				
 				if (cur_moveInfo.getEval() > bestMoveInfo.getEval()) {
+					
 					bestMoveInfo = cur_moveInfo;
 				}
 			}
 		}
 		
 		if (bestMoveInfo == null) {
+			
 			return null;
 		}
 		
@@ -211,8 +213,8 @@ public class SearchersInfo {
 		info_to_send.setEval(bestMoveInfo.getEval());
 		info_to_send.setBestMove(bestMoveInfo.best_info.getBestMove());
 		info_to_send.setPV(bestMoveInfo.best_info.getPV());
-		info_to_send.setSearchedNodes(totalNodes);
-		info_to_send.setTBhits(tbhits);
+		info_to_send.setSearchedNodes(getNodesCount());
+		info_to_send.setTBhits(getTBHits());
 		
 		return info_to_send;
 	}
@@ -242,18 +244,6 @@ public class SearchersInfo {
 		public SearcherInfo() {
 			depthsInfo = new HashMap<Integer, SearchersInfo.SearcherInfo.SearcherDepthInfo>();
 		}
-		
-		
-		/*public long getSearchedNodes() {
-			
-			ISearchInfo last_info = getLastSearchInfo(getMaxDepth());
-			
-			if (last_info == null) {
-				return 0;
-			}
-			
-			return last_info.getSearchedNodes();
-		}*/
 
 
 		public void update(ISearchInfo info) {
@@ -343,6 +333,7 @@ public class SearchersInfo {
 				if (SearchUtils.isMateVal(new_eval)) {
 					
 					if (new_eval > best_eval) {
+						
 						best_eval = new_eval;
 						best_info = info;
 					}
@@ -352,16 +343,15 @@ public class SearchersInfo {
 				
 				if (SearchUtils.isMateVal(new_eval)) {
 					
-					if (new_eval > best_eval) {
-						best_eval = new_eval;
-						best_info = info;
-					}
-					
 					hasMate = true;
+					
+					best_eval = new_eval;
+					best_info = info;
 					
 				} else {
 					
 					if (new_eval > best_eval) {
+						
 						best_eval = new_eval;
 						best_info = info;
 					}

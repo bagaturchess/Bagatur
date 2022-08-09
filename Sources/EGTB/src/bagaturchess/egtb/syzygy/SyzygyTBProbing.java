@@ -23,6 +23,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
+import bagaturchess.uci.api.ChannelManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,6 +74,8 @@ public class SyzygyTBProbing {
     public static final void disableSingleton() {
     	
     	switched_off = true;
+    	
+		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("SyzygyTBProbing.clearSingleton() called: Syzygy TBs are now switched off");
     }
     
     
