@@ -178,7 +178,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.leaf = true;
 		
 		
-		if (isDrawPV(depth)) {
+		if (isDraw(true)) {
 			node.eval = getDrawScores(rootColour);
 			return node.eval;
 		}
@@ -539,7 +539,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(SearchUtils.normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
 		
 		
-		if (isDraw()) {
+		if (isDraw(true)) {
 			return getDrawScores(rootColour);
 		}
     	
@@ -994,7 +994,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.leaf = true;
 		
 		
-		if (isDrawPV(depth)) {
+		if (isDraw(true)) {
 			node.eval = getDrawScores(rootColour);
 			return node.eval;
 		}
@@ -1134,7 +1134,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (mediator != null && mediator.getStopper() != null) mediator.getStopper().stopIfNecessary(SearchUtils.normDepth(initial_maxdepth), colourToMove, alpha_org, beta);
 		
-		if (isDraw()) {
+		if (isDraw(true)) {
 			return getDrawScores(rootColour);
 		}
 		

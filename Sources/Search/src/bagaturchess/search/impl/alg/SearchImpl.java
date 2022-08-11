@@ -166,18 +166,11 @@ public abstract class SearchImpl implements ISearch {
 	}
 	
 	
-	protected boolean isDraw() {
+	protected boolean isDraw(boolean isPV) {
 		
-		return env.getBitboard().getStateRepetition() >= 2 || isDrawPV(1);
-	}
-	
-	
-	protected boolean isDrawPV(int ply) {
-		
-		//Skip the draw check for the root, we need at least one move in the pv
-		if (ply == 0) {
+		if (!isPV && env.getBitboard().getStateRepetition() >= 2) {
 			
-			return false;
+			return true;
 		}
 		
 		if (env.getBitboard().getStateRepetition() >= 3
@@ -190,6 +183,7 @@ public abstract class SearchImpl implements ISearch {
 			
 			return true;
 		}
+		
 		
 		return false;
 	}

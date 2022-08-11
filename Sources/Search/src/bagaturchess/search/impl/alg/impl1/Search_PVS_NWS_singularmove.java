@@ -164,7 +164,7 @@ public class Search_PVS_NWS_singularmove extends SearchImpl {
 	    // if the opponent had an alternative move earlier to this position.
 	    if (/*alpha < EvalConstants.SCORE_DRAW
 	        &&*/ ply > 0
-	        && isDraw()
+	        && isDraw(isPv)
 	        ) {
 			node.eval = EvalConstants.SCORE_DRAW;
 			return node.eval;
@@ -820,7 +820,7 @@ public class Search_PVS_NWS_singularmove extends SearchImpl {
 		
 		result.leaf = true;
 		
-		if (ply > 0 && isDraw()) {
+		if (ply > 0 && isDraw(isPv)) {
 			result.eval = EvalConstants.SCORE_DRAW;
 			result.bestmove = 0;
 			return true;
@@ -889,7 +889,7 @@ public class Search_PVS_NWS_singularmove extends SearchImpl {
 		
 		if (actualDepth < expectedDepth) {
 			if (isPv) {
-				if (!isDraw()) {
+				if (!isDraw(isPv)) {
 					if (env.getBitboard().isInCheck()) {
 						if (env.getBitboard().hasMoveInCheck()) {
 							//throw new IllegalStateException("actualDepth=" + actualDepth + ", expectedDepth=" + expectedDepth);

@@ -194,7 +194,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.leaf = true;
 		
 		
-		if (ply > 0 && isDraw()) {
+		if (ply > 0 && isDraw(isPv)) {
 			node.eval = EvalConstants.SCORE_DRAW;
 			return node.eval;
 		}
@@ -809,7 +809,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		result.leaf = true;
 		
-		if (ply > 0 && isDraw()) {
+		if (ply > 0 && isDraw(isPv)) {
 			result.eval = EvalConstants.SCORE_DRAW;
 			result.bestmove = 0;
 			return true;

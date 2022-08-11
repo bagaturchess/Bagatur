@@ -207,8 +207,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.leaf = true;
 		
 		
-		if ((isPv && isDrawPV(ply)) || (!isPv && isDraw())) {
-	    //if (isDrawPV(ply)) {
+	    if (ply > 0
+	    		&& alpha < getDrawScores(-1)
+	    		&& isDraw(isPv)) {
 	    	
 	    	node.eval = getDrawScores(-1);
 	    			
@@ -942,8 +943,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.eval = ISearch.MIN;
 		node.leaf = true;
 		
-		if (isDraw()) {
-	    //if (isDrawPV(ply)) {
+		if (ply > 0
+	    		&& alpha < getDrawScores(-1)
+	    		&& isDraw(isPv)) {
 	    	
 	    	node.eval = getDrawScores(-1);
 	    	
@@ -1215,8 +1217,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		result.leaf = true;
 		
-		if ((isPv && isDrawPV(ply)) || (!isPv && isDraw())) {
-	    //if (isDrawPV(ply)) {
+		if (ply > 0
+				&& isDraw(isPv)) {
 	    	
 			result.eval = getDrawScores(-1);
 			
