@@ -208,7 +208,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 	    if (ply > 0
-	    		&& alpha < getDrawScores(-1)
 	    		&& isDraw(isPv)) {
 	    	
 	    	node.eval = getDrawScores(-1);
@@ -944,7 +943,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.leaf = true;
 		
 		if (ply > 0
-	    		&& alpha < getDrawScores(-1)
 	    		&& isDraw(isPv)) {
 	    	
 	    	node.eval = getDrawScores(-1);
