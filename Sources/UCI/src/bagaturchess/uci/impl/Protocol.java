@@ -30,7 +30,7 @@ import java.util.Map;
 public class Protocol {
 	
 	
-	public static final String COMMAND_TO_GUI_ID_VERSION_STR = "3.5";
+	public static final String COMMAND_TO_GUI_ID_VERSION_STR = "3.6";
 	
 	public static final String COMMAND_TO_ENGINE_UCI_STR = "uci";
 	public static final String COMMAND_TO_ENGINE_ISREADY_STR = "isready";

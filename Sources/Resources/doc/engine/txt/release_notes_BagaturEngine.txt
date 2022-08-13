@@ -1,3 +1,7 @@
+Version 3.6 (12 August 2022)
+  * Add Syzygy TB support
+  * Bugfixing: Bagatur evaluation jumps in SMP version
+  
 Version 3.5 (3 August 2022)
   * Code improvements and bugfixing in regards to UCI options handling
   
