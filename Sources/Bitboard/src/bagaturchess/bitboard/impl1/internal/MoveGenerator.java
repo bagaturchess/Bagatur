@@ -43,15 +43,30 @@ public final class MoveGenerator {
 	private final ContinuationHistory[] HH_ContinuationHistory = new ContinuationHistory[2];
 	private final ContinuationHistory[] BF_ContinuationHistory = new ContinuationHistory[2];
 	
-	private final int[][] LMR_ALL 				= new int[2][64 * 64];
-	private final int[][] LMR_ABOVE_ALPHA 		= new int[2][64 * 64];
-	private static int LMR_STAT_MULTIPLIER 		= 1000;
+	
+	private final static int LMR_STAT_MULTIPLIER 				= 1000;
+	private static final double LMR_RATE_THREASHOLD_ABOVE_ALPHA = 0.01; //Top X%
+	private static final double LMR_RATE_THREASHOLD_BELOW_ALPHA = 0.0001; //Top Y%
+	private final long[][] LMR_ALL 								= new long[2][64 * 64];
+	private final long[][] LMR_ABOVE_ALPHA 						= new long[2][64 * 64];
+	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
+	private final long[][] LMR_STATS_COUNTER_ABOVE_ALPHA 		= new long[2][LMR_STAT_MULTIPLIER + 1];
+	private final long[][] LMR_STATS_COUNTER_BELOW_ALPHA 		= new long[2][LMR_STAT_MULTIPLIER + 1];
+	private static int[] lmr_rate_all_above_alpha 				= new int[2];
+	private static int[] lmr_rate_pointer_above_alpha 			= new int[2];
+	private static int[] lmr_rate_all_below_alpha 				= new int[2];
+	private static int[] lmr_rate_pointer_below_alpha 			= new int[2];
+	
+	private VarStatistic[] lmrBelowAlphaAVGScores 				= new VarStatistic[2];
 	
 	private Random randomizer = new Random();
 	private long randomizer_counter;
 	
 
 	public MoveGenerator() {
+		
+		lmrBelowAlphaAVGScores[0] = new VarStatistic();
+		lmrBelowAlphaAVGScores[1] = new VarStatistic();
 		
 		clearHistoryHeuristics();
 		
@@ -75,6 +90,18 @@ public final class MoveGenerator {
 		Arrays.fill(LMR_ALL[BLACK], 0);
 		Arrays.fill(LMR_ABOVE_ALPHA[WHITE], 0);
 		Arrays.fill(LMR_ABOVE_ALPHA[BLACK], 0);
+		Arrays.fill(LMR_BELOW_ALPHA[WHITE], 0);
+		Arrays.fill(LMR_BELOW_ALPHA[BLACK], 0);
+		Arrays.fill(LMR_STATS_COUNTER_ABOVE_ALPHA[WHITE], 0);
+		Arrays.fill(LMR_STATS_COUNTER_ABOVE_ALPHA[BLACK], 0);
+		Arrays.fill(LMR_STATS_COUNTER_BELOW_ALPHA[WHITE], 0);
+		Arrays.fill(LMR_STATS_COUNTER_BELOW_ALPHA[BLACK], 0);
+		Arrays.fill(lmr_rate_all_above_alpha, 0);
+		Arrays.fill(lmr_rate_pointer_above_alpha, 0);
+		Arrays.fill(lmr_rate_all_below_alpha, 0);
+		Arrays.fill(lmr_rate_pointer_below_alpha, 0);
+		lmrBelowAlphaAVGScores[0].clear();
+		lmrBelowAlphaAVGScores[1].clear();
 		
 		Arrays.fill(HH_MOVES1[WHITE][0], 0);
 		Arrays.fill(HH_MOVES1[WHITE][PAWN], 0);
@@ -149,30 +176,62 @@ public final class MoveGenerator {
 	
 	
 	public void addLMR_All(final int color, final int move, final int depth) {
+		
 		LMR_ALL[color][MoveUtil.getFromToIndex(move)] += depth * depth;
 	}
 	
 	
 	public void addLMR_AboveAlpha(final int color, final int move, final int depth) {
-		LMR_ABOVE_ALPHA[color][MoveUtil.getFromToIndex(move)] += depth * depth;
+		
+		//System.out.println("addLMR_AboveAlpha: COLOR " + color + ", LMR_RATE_THREASHOLD_ABOVE_ALPHA=" + LMR_RATE_THREASHOLD_ABOVE_ALPHA + " POINTER=" + getLMR_ThreasholdPointer_AboveAlpha(color));
+		
+		int fromToIndex = MoveUtil.getFromToIndex(move);
+		
+		LMR_ABOVE_ALPHA[color][fromToIndex] += depth * depth;
+		
+		int rate = getLMR_Rate_internal(color, fromToIndex);
+		
+		LMR_STATS_COUNTER_ABOVE_ALPHA[color][rate]++;
+		
+		lmr_rate_all_above_alpha[color]++;
+		
+		/*int sum = 0;
+		int pointer = LMR_STAT_MULTIPLIER - 1;
+		while (pointer > 0 && sum / (double) lmr_rate_all_above_alpha[color] < LMR_RATE_THREASHOLD_ABOVE_ALPHA) {
+			sum += LMR_STATS_COUNTER_ABOVE_ALPHA[color][pointer];
+			pointer--;
+		}
+		
+		lmr_rate_pointer_above_alpha[color] = pointer;
+		*/
 	}
 	
 	
-	public VarStatistic updateLMRStats(final int color, VarStatistic stats) {
+	public void addLMR_BelowAlpha(final int color, final int move, final int depth) {
 		
-		stats.clear();
+		//System.out.println("addLMR_BelowAlpha: COLOR " + color + ", LMR_RATE_THREASHOLD_BELOW_ALPHA=" + LMR_RATE_THREASHOLD_BELOW_ALPHA + " POINTER=" + getLMR_ThreasholdPointer_BelowAlpha(color));
 		
-		for (int fromToIndex = 0; fromToIndex < LMR_ALL[color].length; fromToIndex++) {
-			
-			boolean has_stats = LMR_ALL[color][fromToIndex] != 0;
-			
-			if (has_stats) { //Prevent adding zeros for from_to squares without statistics yet
-				
-				stats.addValue(getLMR_Rate_internal(color, fromToIndex));
-			}
+		int fromToIndex = MoveUtil.getFromToIndex(move);
+		
+		LMR_BELOW_ALPHA[color][fromToIndex] += depth * depth;
+		
+		int rate = getLMR_Rate_internal(color, fromToIndex);
+		
+		LMR_STATS_COUNTER_BELOW_ALPHA[color][rate]++;
+		
+		lmr_rate_all_below_alpha[color]++;
+		
+		/*int sum = 0;
+		int pointer = LMR_STAT_MULTIPLIER - 1;
+		while (pointer > 0 && sum / (double) lmr_rate_all_below_alpha[color] < LMR_RATE_THREASHOLD_BELOW_ALPHA) {
+			sum += LMR_STATS_COUNTER_BELOW_ALPHA[color][pointer];
+			pointer--;
 		}
-
-		return stats;
+		
+		lmr_rate_pointer_below_alpha[color] = pointer;
+		*/
+		
+		lmrBelowAlphaAVGScores[color].addValue(rate);
 	}
 	
 	
@@ -180,20 +239,34 @@ public final class MoveGenerator {
 		
 		int fromToIndex = MoveUtil.getFromToIndex(move);
 		
+		if (LMR_ALL[color][fromToIndex] == 0) {
+			
+			return 0;
+		}
+		
 		return getLMR_Rate_internal(color, fromToIndex);
 	}
 	
 	
 	private int getLMR_Rate_internal(final int color, final int fromToIndex) {
 		
-		if (LMR_ALL[color][fromToIndex] == 0) {
-			
-			return 0;
-		}
-		
-		return LMR_STAT_MULTIPLIER * LMR_ABOVE_ALPHA[color][fromToIndex] / LMR_ALL[color][fromToIndex];
+		return (int) (LMR_STAT_MULTIPLIER * LMR_ABOVE_ALPHA[color][fromToIndex] / LMR_ALL[color][fromToIndex]);
 	}
-
+	
+	
+	public int getLMR_ThreasholdPointer_AboveAlpha(int color) {
+		
+		return lmr_rate_pointer_above_alpha[color];
+	}
+	
+	
+	public int getLMR_ThreasholdPointer_BelowAlpha(int color) {
+		
+		//return lmr_rate_pointer_below_alpha[color];
+		
+		return (int) (lmrBelowAlphaAVGScores[color].getEntropy() + lmrBelowAlphaAVGScores[color].getDisperse());
+	}
+	
 	
 	public void addKillerMove(final int move, final int ply) {
 		if (EngineConstants.ENABLE_KILLER_MOVES) {
@@ -839,5 +912,4 @@ public final class MoveGenerator {
 			moves &= moves - 1;
 		}
 	}
-
 }

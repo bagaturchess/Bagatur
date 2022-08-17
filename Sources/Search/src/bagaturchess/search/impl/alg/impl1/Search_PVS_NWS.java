@@ -94,10 +94,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private VarStatistic historyAVGScores;
 	
-	private VarStatistic lmrAboveAlphaAVGScores_white;
-	private VarStatistic lmrAboveAlphaAVGScores_black;
-	
-	private static final boolean USE_LMR_ABOVE_ALPHA 	= false;
+	private static final boolean USE_LMR_ABOVE_ALPHA 	= true;
 	
 	
 	private static final boolean USE_DTZ_CACHE 			= true;
@@ -132,9 +129,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		lastSentMinorInfo_timestamp 	= 0;
 		
 		historyAVGScores 				= new VarStatistic();
-		
-		lmrAboveAlphaAVGScores_white 	= new VarStatistic();
-		lmrAboveAlphaAVGScores_black	= new VarStatistic();
 		
 		if (ChannelManager.getChannel() != null) {
 			
@@ -171,11 +165,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, 0);		
 	}
 	
-	
-	private VarStatistic getLMRStats(int color) {
-		
-		return color == ChessConstants.WHITE ? lmrAboveAlphaAVGScores_white : lmrAboveAlphaAVGScores_black;
-	}
 	
 	public int search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
@@ -759,12 +748,25 @@ public class Search_PVS_NWS extends SearchImpl {
 					cb.changeSideToMove();
 				}
 				
+				
+				/*System.out.println("COLOR " + cb.colorToMoveInverse
+						+ ", moveGen.getLMR_Rate(cb.colorToMoveInverse, move) =" + moveGen.getLMR_Rate(cb.colorToMoveInverse, move)
+						+ ", moveGen.getLMR_ThreasholdPointer_AboveAlpha(cb.colorToMoveInverse)=" + moveGen.getLMR_ThreasholdPointer_AboveAlpha(cb.colorToMoveInverse)
+						+ ", moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse)=" + moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse));
+				*/
+				
 				int reduction = 1;
 				if (depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& phase == PHASE_QUIET
-						&& moveGen.getScore() <= historyAVGScores.getEntropy()
-						//&& moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= getLMRStats(cb.colorToMoveInverse).getEntropy() + getLMRStats(cb.colorToMoveInverse).getDisperse()
+						//&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move)
+						//&& moveGen.getScore() <= historyAVGScores.getEntropy()
+						//&& moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_AboveAlpha(cb.colorToMoveInverse)
+						&& (Math.random() <= 0.16 || moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse))
+						/*&& (Math.random() <= 0.16
+								|| moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= Math.max(moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse), moveGen.getLMR_ThreasholdPointer_AboveAlpha(cb.colorToMoveInverse))
+							)
+						*/
 						) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
@@ -794,9 +796,9 @@ public class Search_PVS_NWS extends SearchImpl {
 								
 								moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
 								
-								moveGen.updateLMRStats(cb.colorToMoveInverse, getLMRStats(cb.colorToMoveInverse));
+							} else {
 								
-								//System.out.println("COLOR " + cb.colorToMoveInverse + " ENTROPY=" + getLMRStats(cb.colorToMoveInverse).getEntropy() + " DISPERSE=" + getLMRStats(cb.colorToMoveInverse).getDisperse());
+								moveGen.addLMR_BelowAlpha(cb.colorToMoveInverse, move, depth);
 							}
 						}
 					}
