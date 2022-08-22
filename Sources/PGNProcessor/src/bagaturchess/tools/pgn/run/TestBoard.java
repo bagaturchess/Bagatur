@@ -40,9 +40,9 @@ public class TestBoard implements IPlyIterator {
 	
 	public static void main(String[] args) {
 				
-				//File root = new File("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\PGN\\twic");
-				//File root = new File("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\PGN\\pgnmentor");
-				File root = new File("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\PGN");
+				//File root = new File("C:\\Users\\DATA\\OWN\\chess\\PGN\\twic");
+				//File root = new File("C:\\Users\\DATA\\OWN\\chess\\PGN\\pgnmentor");
+				File root = new File("C:\\Users\\DATA\\OWN\\chess\\PGN");
 				
 				if (!root.exists()) {
 					throw new IllegalStateException();

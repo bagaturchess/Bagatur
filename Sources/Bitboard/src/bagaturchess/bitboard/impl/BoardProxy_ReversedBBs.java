@@ -19,6 +19,7 @@
  */
 package bagaturchess.bitboard.impl;
 
+
 import bagaturchess.bitboard.api.IBaseEval;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
@@ -35,10 +36,7 @@ import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl1.internal.CastlingConfig;
 
-/**
- * @author i027638
- *
- */
+
 public class BoardProxy_ReversedBBs implements IBitBoard {
 	
 	

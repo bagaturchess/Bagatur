@@ -1,3 +1,7 @@
+Version 3.6a (21 August 2022)
+  * Bugfixing: Syzygy TB support - DTZ handling
+  * Optimization: Decision whether to use or not LMR based on below alpha statistics of previous LMR searches
+  
 Version 3.6 (12 August 2022)
   * Add Syzygy TB support
   * Bugfixing: Bagatur evaluation jumps in SMP version

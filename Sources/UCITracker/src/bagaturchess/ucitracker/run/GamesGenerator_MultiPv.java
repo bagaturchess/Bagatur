@@ -112,14 +112,14 @@ public class GamesGenerator_MultiPv {
 					new String [0],
 				"C:\\own\\chess\\ENGINES\\komodo-13b1-ja\\Windows\\");*/
 			
-			/*EngineProcess engine = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Rybka\\Rybkav2.3.2a.mp.x64.exe",
+			/*EngineProcess engine = new EngineProcess("C:\\Users\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Rybka\\Rybkav2.3.2a.mp.x64.exe",
 					new String [0],
-				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Rybka");
+				"C:\\Users\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\Rybka");
 			*/
 			
-			/*EngineProcess engine = new EngineProcess("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\texel107\\texel64.exe",
+			/*EngineProcess engine = new EngineProcess("C:\\Users\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\texel107\\texel64.exe",
 					new String [0],
-					"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\texel107");*/
+					"C:\\Users\\DATA\\OWN\\chess\\software\\ARENA\\arena_3.5.1\\Engines\\texel107");*/
 			
 			/*EngineProcess engine = new EngineProcess("C:\\DATA\\Engines\\stockfish-NNUE\\sf-nnue-bmi2.exe",
 					new String [0],

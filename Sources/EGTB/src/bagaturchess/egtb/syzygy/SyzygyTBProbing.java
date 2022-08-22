@@ -163,7 +163,7 @@ public class SyzygyTBProbing {
      * @param board the FrankWalter board representation
      * @return a WDL result (see {@link #toXBoardScore(int)} and {@link #toMove(int)})
      */
-    /*public int probeDTZ(IBitBoard board) {
+    public int probeDTZ(IBitBoard board) {
     	
     	
     	if (board.getMaterialState().getPiecesCount() > MAX_PIECES_COUNT) {
@@ -180,6 +180,11 @@ public class SyzygyTBProbing {
             return -1;
         }
        
+        if (board.getEnpassantSquareID() != 0) {
+        	
+        	return -1;
+        }
+        
         
         int score = SyzygyJNIBridge.probeSyzygyDTZ(
         		
@@ -192,12 +197,12 @@ public class SyzygyTBProbing {
     		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT)),
     		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN)),
             board.getDraw50movesRule(),
-            0,//board.getEpSquare()==-1?0:board.getEpSquare(),
+            0, //Enpassant index
             board.getColourToMove() == Constants.COLOUR_WHITE
         );
 	        
         return score;
-    }*/
+    }
 
 
 	public void probeMove(IBitBoard board, long[] out) {
@@ -249,15 +254,17 @@ public class SyzygyTBProbing {
 				
 				int probe_result = SyzygyTBProbing.getSingleton().probeWDL(board);
 				
-				int dtz = (probe_result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
+				//int dtz = (probe_result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
 				int wdl = (probe_result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
 				
 				//int wdl = SyzygyTBProbing.getSingleton().probeWDL(board);
 				//wdl = (wdl & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
 				
-				System.out.println(board.getMoveOps().moveToString(cur_move) + ", dtz=" + dtz + ", wdl=" + wdl);
+				int dtz = probeDTZ(board);
+			
+				System.out.println(board.getMoveOps().moveToString(cur_move) + ", dtz=" + dtz + ", wdl=" + wdl + ", probe_result=" + probe_result);
 				
-				int distanceToDraw_50MoveRule = 100 - board.getDraw50movesRule();
+				int distanceToDraw_50MoveRule = 99 - board.getDraw50movesRule();
 				//Although we specify the rule50 parameter when calling SyzygyJNIBridge.probeSyzygyDTZ(...)
 				//Syzygy TBs report winning score/move
 				//but the +mate or +promotion moves line is longer
@@ -440,7 +447,7 @@ public class SyzygyTBProbing {
 		
 		long[] result = new long[2];
 		
-		SyzygyTBProbing.getSingleton().load("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\EGTB\\syzygy");
+		SyzygyTBProbing.getSingleton().load(System.getenv("SYZYGY_HOME"));
 		
 		SyzygyTBProbing.getSingleton().probeMove(board, result);
 		

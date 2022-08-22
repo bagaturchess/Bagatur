@@ -32,7 +32,6 @@ import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.CheckUtil;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
-import bagaturchess.bitboard.impl1.internal.ChessConstants;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.bitboard.impl1.internal.MaterialUtil;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
@@ -92,11 +91,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long lastSentMinorInfo_nodesCount;
 	
 	
-	private VarStatistic historyAVGScores;
-	
-	private static final boolean USE_LMR_ABOVE_ALPHA 	= true;
-	
-	
 	private static final boolean USE_DTZ_CACHE 			= true;
 	
 	
@@ -127,8 +121,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		lastSentMinorInfo_nodesCount 	= 0;
 		lastSentMinorInfo_timestamp 	= 0;
-		
-		historyAVGScores 				= new VarStatistic();
 		
 		if (ChannelManager.getChannel() != null) {
 			
@@ -309,7 +301,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (!env.getBitboard().hasMoveInNonCheck()) {
 					
 					node.bestmove = 0;
-					node.eval = node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
+					node.eval = node.eval = getDrawScores(-1);
 					node.leaf = true;
 					
 					return node.eval;
@@ -362,25 +354,31 @@ public class Search_PVS_NWS extends SearchImpl {
 			*/
 			
 			
-			int probe_result = probeDTZ_WithCache();
+			int probe_result = probeWDL_WithCache();
 			
 			if (probe_result != -1) {
 				
 				info.setTBhits(info.getTBhits() + 1);
-				
-				int dtz = (probe_result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
-				if (dtz < 0) {
-					throw new IllegalStateException("dtz=" + dtz);
-				}
 							
 				int wdl = (probe_result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
-				//int wdl = SyzygyTBProbing.getSingleton().probeWDL(env.getBitboard());
 				
 				//Winner is minimizing DTZ and the loser is maximizing DTZ
 		        switch (wdl) {
 		        
 	            	case SyzygyConstants.TB_WIN:
 	            		
+	    				//int dtz = (probe_result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
+	            		int dtz = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+	            		
+	    				if (dtz < 0) {
+	    					
+	    					/**
+	    					 * In this not mate position "8/6P1/8/2kB2K1/8/8/8/4r3 w - - 1 19", DTZ is -1 and WDL is 2 (WIN).
+	    					 */
+	    					break;
+	    					//throw new IllegalStateException("dtz=" + dtz + ", env.getBitboard()=" + env.getBitboard());
+	    				}
+	    				
 						int distanceToDraw_50MoveRule = 99 - env.getBitboard().getDraw50movesRule();
 						//Although we specify the rule50 parameter when calling SyzygyJNIBridge.probeSyzygyDTZ(...)
 						//Syzygy TBs report winning score/move
@@ -391,8 +389,9 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							node.bestmove = 0;
 		    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
-		    				//node.eval = SearchUtils.getMateVal(ply + dtz);
-							node.eval = 9 * (distanceToDraw_50MoveRule - dtz);
+		    				node.eval = SearchUtils.getMateVal(ply + dtz);
+							//node.eval = 10 * 9 * (distanceToDraw_50MoveRule - dtz);
+							//node.eval = 10 * 9 * (ply + dtz);
 							node.leaf = true;
 							
 							return node.eval;
@@ -400,7 +399,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						} else {
 							
 							node.bestmove = 0;
-							node.eval = node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
+							node.eval = node.eval = getDrawScores(-1);
 							node.leaf = true;
 							
 							return node.eval;
@@ -421,7 +420,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		            case SyzygyConstants.TB_DRAW:
 		            	
 						node.bestmove = 0;
-						node.eval = node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
+						node.eval = node.eval = getDrawScores(-1);
 						node.leaf = true;
 						
 						return node.eval;
@@ -429,7 +428,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		            case SyzygyConstants.TB_BLESSED_LOSS:
 		            	
 						node.bestmove = 0;
-						node.eval = node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
+						node.eval = node.eval = getDrawScores(-1);
 						node.leaf = true;
 						
 						return node.eval;
@@ -438,7 +437,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		            case SyzygyConstants.TB_CURSED_WIN:
 		            	
 						node.bestmove = 0;
-						node.eval = node.eval = getDrawScores(-1); //EvalConstants.SCORE_DRAW;
+						node.eval = node.eval = getDrawScores(-1);
 						node.leaf = true;
 						
 						return node.eval;
@@ -697,7 +696,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (!isPv && !wasInCheck && movesPerformed_attacks + movesPerformed_quiet > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
 					
 					if (phase == PHASE_QUIET
-							&& moveGen.getScore() <= historyAVGScores.getEntropy()
+							&& moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove)
 						) {
 						
 						if (EngineConstants.ENABLE_LMP
@@ -733,7 +732,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
+				
 				env.getBitboard().makeMoveForward(move);
+				
+				
 				if (MoveUtil.isQuiet(move)) {
 					movesPerformed_quiet++;
 				} else {
@@ -755,18 +757,18 @@ public class Search_PVS_NWS extends SearchImpl {
 						+ ", moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse)=" + moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse));
 				*/
 				
+				/*System.out.println("COLOR " + cb.colorToMoveInverse
+						+ ", moveGen.getLMR_Stat_Rate() =" + moveGen.getLMR_Stat_Rate()
+						);
+				*/
+				
+				boolean doLMR = depth >= 2
+							&& movesPerformed_attacks + movesPerformed_quiet > 1
+							&& phase == PHASE_QUIET;
+				
 				int reduction = 1;
-				if (depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& phase == PHASE_QUIET
-						//&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move)
-						//&& moveGen.getScore() <= historyAVGScores.getEntropy()
-						//&& moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_AboveAlpha(cb.colorToMoveInverse)
-						&& (Math.random() <= 0.16 || moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse))
-						/*&& (Math.random() <= 0.16
-								|| moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= Math.max(moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse), moveGen.getLMR_ThreasholdPointer_AboveAlpha(cb.colorToMoveInverse))
-							)
-						*/
+				if (doLMR
+						&& (Math.random() <= 0.10 || moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse))
 						) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
@@ -786,20 +788,17 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
 						
-						if (USE_LMR_ABOVE_ALPHA) moveGen.addLMR_All(cb.colorToMoveInverse, move, depth);
+						moveGen.addLMR_All(cb.colorToMoveInverse, move, depth);
 						
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, 0);
 						
-						if (USE_LMR_ABOVE_ALPHA) {
+						if (score > alpha) {
 							
-							if (score > alpha) {
-								
-								moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
-								
-							} else {
-								
-								moveGen.addLMR_BelowAlpha(cb.colorToMoveInverse, move, depth);
-							}
+							moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
+							
+						} else {
+							
+							moveGen.addLMR_BelowAlpha(cb.colorToMoveInverse, move, depth);
 						}
 					}
 					
@@ -821,21 +820,21 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					
 				} catch(SearchInterruptedException sie) {
+					
 					moveGen.endPly();
+					
 					throw sie;
 				}
 				
+				
 				env.getBitboard().makeMoveBackward(move);
 				
+				
 				if (MoveUtil.isQuiet(move) && cb.checkingPieces == 0) {
+					
 					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
 				}
 				
-				if (score > alpha) {
-					if (phase == PHASE_QUIET) {
-						historyAVGScores.addValue(moveGen.getScore());
-					}
-				}
 				
 				if (score > bestScore) {
 					
@@ -1419,7 +1418,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	private int probeDTZ_WithCache() {
+	private int probeWDL_WithCache() {
 	    
 	    if (USE_DTZ_CACHE) {
 	    	

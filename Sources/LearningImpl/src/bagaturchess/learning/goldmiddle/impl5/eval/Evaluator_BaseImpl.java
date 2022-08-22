@@ -19,13 +19,11 @@
  */
 package bagaturchess.learning.goldmiddle.impl5.eval;
 
+
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 
-/**
- * @author i027638
- *
- */
+
 public class Evaluator_BaseImpl {
 	
 	

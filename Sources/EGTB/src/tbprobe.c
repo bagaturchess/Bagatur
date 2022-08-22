@@ -516,6 +516,39 @@ unsigned tb_probe_wdl_impl(
     return (unsigned)(v + 2);
 }
 
+unsigned tb_probe_dtz_impl(
+    uint64_t white,
+    uint64_t black,
+    uint64_t kings,
+    uint64_t queens,
+    uint64_t rooks,
+    uint64_t bishops,
+    uint64_t knights,
+    uint64_t pawns,
+    unsigned ep,
+    bool turn)
+{
+    Pos pos =
+    {
+        white,
+        black,
+        kings,
+        queens,
+        rooks,
+        bishops,
+        knights,
+        pawns,
+        0,
+        (uint8_t)ep,
+        turn
+    };
+    int success;
+    int v = probe_dtz(&pos, &success);
+    if (success == 0)
+        return TB_RESULT_FAILED;
+    return (unsigned)(v);
+}
+
 static unsigned dtz_to_wdl(int cnt50, int dtz)
 {
     int wdl = 0;

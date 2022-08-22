@@ -182,7 +182,7 @@ public class MTDSchedulerMain {
 		
 		//IBitBoard bitboard  = new Board("1r6/4k3/1pbpPb1p/p1p2P2/2Pp3p/3P3P/2P2RP1/R6K b - - 3 39", null/*sharedData.getAndRemovePawnsCache()*/, cfg.getBoardConfig());
 		
-		//SyzygyTBProbing.getSingleton().load("C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\EGTB\\syzygy");
+		//SyzygyTBProbing.getSingleton().load(System.getenv("SYZYGY_HOME"");
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/8/1k2Kp2/5P2/8/2b5/8/8 w - - 0 1", cfg.getBoardConfig());
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("k7/8/4Kp2/5P2/8/6b1/8/8 b - - 0 1", cfg.getBoardConfig());
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/p6p/1pk3p1/2n2p2/P1n5/2NN1K1P/5PP1/8 w - - 4 4", cfg.getBoardConfig());
@@ -205,9 +205,19 @@ public class MTDSchedulerMain {
 		//BoardUtils.playGameUCI(bitboard, "c2c4 e7e6 a1c2 h7h6 c1d3 g8h7 c2e3 g7g5 f2f3 c7c6 d1c2 a7a5 h2h4 g5h4 g1f2 h8d4 h1h2 d7d6 f1h1 d8g5 b2b3 h7d3 c2d3 d4c5 e3g4 c5b4 f3f4 g5e7 f2h4 f7f5 g4e3 b4a3 h4f2 a3a2 h2h6 a8c7 h6g7 e8d7 g7a1 a2a1 e1c1");
 		//1rn2r2/1pnkb3/2ppp3/p4p2/2P2P2/1P1BN3/3PPBP1/q1KR3R w - - 0 22 moves c2c4 e7e6 a1c2 h7h6 c1d3 g8h7 c2e3 g7g5 f2f3 c7c6 d1c2 a7a5 h2h4 g5h4 g1f2 h8d4 h1h2 d7d6 f1h1 d8g5 b2b3 h7d3 c2d3 d4c5 e3g4 c5b4 f3f4 g5e7 f2h4 f7f5 g4e3 b4a3 h4f2 a3a2 h2h6 a8c7 h6g7 e8d7 g7a1 a2a1 e1c1 
 		
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("1r1k3r/pbpn3p/1p1n1p1q/P3p3/4P2N/1PN5/2PP1Q1P/R1K1R2B b Eb - 3 14", cfg.getBoardConfig());
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("1r1k3r/pbpn3p/1p1n1p1q/P3p3/4P2N/1PN5/2PP1Q1P/R1K1R2B b Eb - 3 14", cfg.getBoardConfig());
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("1rk4r/pbpn3p/1p1n1p1q/P3p3/4P2N/1PN5/2PP1Q1P/R1K1R2B w - - 4 15", cfg.getBoardConfig());
 		//BoardUtils.playGameUCI(bitboard, "g1f3 d8e6 e2e3 g8f6 f1e2 g7g6 c2c4 b7b6 b2b3 f8g7 a1b2 c7c5 e1g1 e8h8 h2h3 a7a6 d1c3 d7d5 c4d5 f6d5 c3d5 a8d5 h3h4 f8d8 h4h5 d5e4 d2d3 e4d3 e2d3 d8d3 b2g7 g8g7 h5g6 h7g6 e3e4 c8c7 c1h6 g7h6");
+		
+		//IBitBoard bitboard  = BoardUtils.createBoard_WithPawnsCache("8/5p2/2kn2p1/2n4p/5P2/2BK2P1/B6P/8 w - - 23 58");
+		//IBitBoard bitboard  = BoardUtils.createBoard_WithPawnsCache("8/5p2/n1kn2p1/7p/5P2/2B3P1/B1K4P/8 w - - 25 59");
+		//IBitBoard bitboard  = BoardUtils.createBoard_WithPawnsCache("8/5p2/2kn2p1/2n4p/5P2/2B1K1P1/B6P/8 b - - 20 56");
+		IBitBoard bitboard  = BoardUtils.createBoard_WithPawnsCache("8/6P1/8/2kB2K1/8/8/8/4r3 w - - 1 19"); //DTZ is -1
+		
+		//IBitBoard bitboard  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/4R3/3K4 w - -");//White win
+		//IBitBoard bitboard  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/3P4/3K4 w - -");//White win
+		SyzygyTBProbing.getSingleton().load(System.getenv("SYZYGY_HOME"));
+		
 		System.out.println(bitboard);
 		
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("bqnrnkrb/pppppppp/8/8/8/8/PPPPPPPP/BQNRNKRB b KQkq - 1 1", cfg.getBoardConfig());

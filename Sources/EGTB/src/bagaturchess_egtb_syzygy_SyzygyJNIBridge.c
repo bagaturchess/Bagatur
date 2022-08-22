@@ -30,3 +30,10 @@ JNIEXPORT jint JNICALL Java_bagaturchess_egtb_syzygy_SyzygyJNIBridge_probeWDL
 
     return tb_probe_wdl_impl(white, black, kings, queens, rooks, bishops, knights, pawns, ep, color_to_move);
   }
+
+
+JNIEXPORT jint JNICALL Java_bagaturchess_egtb_syzygy_SyzygyJNIBridge_probeDTZ
+  (JNIEnv * env, jclass this_class, jlong white, jlong black, jlong kings, jlong queens, jlong rooks, jlong bishops, jlong knights, jlong pawns, jint rule50, jint ep, jboolean color_to_move) {
+
+    return tb_probe_dtz_impl(white, black, kings, queens, rooks, bishops, knights, pawns, ep, color_to_move);
+  }

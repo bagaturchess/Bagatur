@@ -145,7 +145,7 @@ public class TournamentRunner {
 			options.add("setoption name OwnBook value true");
 			options.add("setoption name Openning Mode value random intermediate");
 			options.add("setoption name Time Control Optimizations value for 1/1");
-			options.add("setoption name SyzygyPath value tbd");//C:/Users/i027638/OneDrive - SAP SE/DATA/OWN/chess/EGTB/syzygy
+			options.add("setoption name SyzygyPath value tbd");//C:/Users/DATA/OWN/chess/EGTB/syzygy
 			
 			engine1.setOptions(options);
 			engine2.setOptions(options);

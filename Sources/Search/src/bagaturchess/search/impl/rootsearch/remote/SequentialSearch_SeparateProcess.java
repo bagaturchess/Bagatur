@@ -77,7 +77,7 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 		
 		
 		/*EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngine_WorkerNode",
-				"C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\GIT_REPO\\Bagatur-Chess-Engine-And-Tools\\Sources\\",
+				"C:\\Users\\DATA\\OWN\\chess\\GIT_REPO\\Bagatur-Chess-Engine-And-Tools\\Sources\\",
 				"",
 				getRootSearchConfig().getThreadMemory_InMegabytes());*/
 		

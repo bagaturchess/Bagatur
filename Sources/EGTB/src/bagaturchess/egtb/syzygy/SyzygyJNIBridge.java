@@ -65,7 +65,7 @@ public class SyzygyJNIBridge {
     private static native boolean init(String path);
     private static native int getTBLargest();
     private static native int probeWDL(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn);
-    //private static native int probeDTZ(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn);
+    private static native int probeDTZ(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn);
     
     
     /**
@@ -150,8 +150,7 @@ public class SyzygyJNIBridge {
      * @param turn true if white is to move, false if black is.
      * @return DTZ result (see c code)
      */
-    /*public static int probeSyzygyDTZ(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn){ //NOSONAR
+    public static int probeSyzygyDTZ(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn){ //NOSONAR
         return probeDTZ(white, black, kings, queens, rooks, bishops, knights, pawns, rule50, ep, turn);
     }
-    */
 }

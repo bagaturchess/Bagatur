@@ -37,8 +37,8 @@ public class FilterPGNFiles_ByELO {
 		//http://www.gladiators-chess.ru/downloads.php?cat_id=2&rowstart=60
 		
 		//Directory with zipped files downloaded from http://www.chess.co.uk/twic/twic
-		//String pgnFile = "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\PGN";
-		String pgnFile = "C:\\Users\\i027638\\OneDrive - SAP SE\\DATA\\OWN\\chess\\PGN\\all.zip";
+		//String pgnFile = "C:\\Users\\DATA\\OWN\\chess\\PGN";
+		String pgnFile = "C:\\Users\\DATA\\OWN\\chess\\PGN\\all.zip";
 		
 		//IGameIterator myiter = new GameIterator_CollectAllInOne("./all.pgn");
 		//IGameIterator iter = new GameIterator_ELOFilter("all2600.pgn", 2600, 2600);
