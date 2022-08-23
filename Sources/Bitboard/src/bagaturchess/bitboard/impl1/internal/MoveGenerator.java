@@ -107,10 +107,10 @@ public final class MoveGenerator {
 		Arrays.fill(lmr_rate_pointer_above_alpha, 0);
 		Arrays.fill(lmr_rate_all_below_alpha, 0);
 		Arrays.fill(lmr_rate_pointer_below_alpha, 0);
-		lmrBelowAlphaAVGScores[0].clear();
-		lmrBelowAlphaAVGScores[1].clear();
-		lmrAboveAlphaAVGScores[0].clear();
-		lmrAboveAlphaAVGScores[1].clear();
+		lmrBelowAlphaAVGScores[WHITE].clear();
+		lmrBelowAlphaAVGScores[BLACK].clear();
+		lmrAboveAlphaAVGScores[WHITE].clear();
+		lmrAboveAlphaAVGScores[BLACK].clear();
 		
 		Arrays.fill(HH_MOVES1[WHITE][0], 0);
 		Arrays.fill(HH_MOVES1[WHITE][PAWN], 0);
