@@ -63,9 +63,10 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_ATTACKING_GOOD 				= 1;
 	private static final int PHASE_KILLER_1 					= 2;
 	private static final int PHASE_KILLER_2 					= 3;
-	private static final int PHASE_COUNTER 						= 4;
-	private static final int PHASE_ATTACKING_BAD 				= 5;
-	private static final int PHASE_QUIET 						= 6;
+	private static final int PHASE_COUNTER_1 					= 4;
+	private static final int PHASE_COUNTER_2 					= 5;
+	private static final int PHASE_ATTACKING_BAD 				= 6;
+	private static final int PHASE_QUIET 						= 7;
 	
 	private static final int[] STATIC_NULLMOVE_MARGIN 			= { 0, 60, 130, 210, 300, 400, 510 };
 	private static final int[] RAZORING_MARGIN 					= { 0, 240, 280, 300 };
@@ -279,11 +280,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (ply >= 5
-    	    	//&& depth >= 5
+		if (ply >= 15
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
     			){
+			
 			
 			if (cb.checkingPieces != 0) {
 				
@@ -580,9 +581,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		final int parentMove = moveGen.previous();
 		int bestMove = 0;
 		int bestScore = ISearch.MIN - 1;
-		int counterMove = 0;
 		int killer1Move = 0;
 		int killer2Move = 0;
+		int counterMove1 = 0;
+		int counterMove2 = 0;
 		int movesPerformed_attacks = 0;
 		int movesPerformed_quiet = 0;
 		
@@ -603,7 +605,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				moveGen.sort();
 				break;
 			case PHASE_KILLER_1:
-				killer1Move = moveGen.getKiller1(ply);
+				killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
 				if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move)) {
 					moveGen.addMove(killer1Move);
 					break;
@@ -611,21 +613,31 @@ public class Search_PVS_NWS extends SearchImpl {
 					phase++;
 				}
 			case PHASE_KILLER_2:
-				killer2Move = moveGen.getKiller2(ply);
+				killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
 				if (killer2Move != 0 && killer2Move != ttMove && cb.isValidMove(killer2Move)) {
 					moveGen.addMove(killer2Move);
 					break;
 				} else {
 					phase++;
 				}
-			case PHASE_COUNTER:
-				counterMove = moveGen.getCounter(cb.colorToMove, parentMove);
-				if (counterMove != 0 && counterMove != ttMove && counterMove != killer1Move && counterMove != killer2Move && cb.isValidMove(counterMove)) {
-					moveGen.addMove(counterMove);
+			case PHASE_COUNTER_1:
+				counterMove1 = moveGen.getCounter1(cb.colorToMove, parentMove);
+				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
+					moveGen.addMove(counterMove1);
 					break;
 				} else {
 					phase++;
 				}
+			case PHASE_COUNTER_2:
+				/*counterMove2 = moveGen.getCounter2(cb.colorToMove, parentMove);
+				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
+					moveGen.addMove(counterMove2);
+					break;
+				} else {
+					phase++;
+				}*/
+				phase++;
+				
 			case PHASE_ATTACKING_BAD:
 				moveGen.generateAttacks(cb);
 				moveGen.setMVVLVAScores(cb);
@@ -684,7 +696,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				if (phase == PHASE_QUIET) {
-					if (move == ttMove || move == killer1Move || move == killer2Move || move == counterMove) {
+					if (move == ttMove || move == killer1Move || move == killer2Move || move == counterMove1 || move == counterMove2) {
 						continue;
 					}
 				} else if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
@@ -764,7 +776,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean doLMR = depth >= 2
 							&& movesPerformed_attacks + movesPerformed_quiet > 1
-							&& phase == PHASE_QUIET;
+							//&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move)
+							//&& (phase == PHASE_QUIET || phase == PHASE_KILLER_1 || phase == PHASE_KILLER_2)
+							&& phase == PHASE_QUIET
+							;
 				
 				int reduction = 1;
 				if (doLMR
@@ -854,7 +869,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {
 							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
-							moveGen.addKillerMove(bestMove, ply);
+							moveGen.addKillerMove(cb.colorToMove, bestMove, ply);
 							moveGen.addHHValue(cb.colorToMove, bestMove, parentMove, depth);
 						}
 						

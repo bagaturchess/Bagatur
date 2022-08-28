@@ -20,32 +20,31 @@ import bagaturchess.bitboard.impl.utils.VarStatistic;
 public final class MoveGenerator {
 	
 	
-	public static boolean USE_ContinuationHistory 	= true;
+	public static boolean USE_ContinuationHistory 				= true;
 	
 	
-	private final int[] moves = new int[3000];
-	private final int[] moveScores = new int[3000];
-	private final int[] nextToGenerate = new int[EngineConstants.MAX_PLIES * 2];
-	private final int[] nextToMove = new int[EngineConstants.MAX_PLIES * 2];
+	private final int[] moves 									= new int[3000];
+	private final int[] moveScores 								= new int[3000];
+	private final int[] nextToGenerate 							= new int[EngineConstants.MAX_PLIES * 2];
+	private final int[] nextToMove 								= new int[EngineConstants.MAX_PLIES * 2];
 	private int currentPly;
 
-	private final int[][][] COUNTER_MOVES = new int[2][7][64];
+	private final IBetaCutoffMoves[][][] COUNTER_MOVES 			= new IBetaCutoffMoves[2][7][64];
 
-	private final int[] KILLER_MOVE_1 = new int[EngineConstants.MAX_PLIES * 2];
-	private final int[] KILLER_MOVE_2 = new int[EngineConstants.MAX_PLIES * 2];
+	private final IBetaCutoffMoves[][] KILLER_MOVES 			= new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
 
-	private final int[][] HH_MOVES = new int[2][64 * 64];
-	private final int[][] BF_MOVES = new int[2][64 * 64];
+	private final int[][] HH_MOVES 								= new int[2][64 * 64];
+	private final int[][] BF_MOVES 								= new int[2][64 * 64];
 	
-	private final int[][][] HH_MOVES1 = new int[2][7][64];
-	private final int[][][] BF_MOVES1 = new int[2][7][64];
+	private final int[][][] HH_MOVES1 							= new int[2][7][64];
+	private final int[][][] BF_MOVES1 							= new int[2][7][64];
 	
-	private final ContinuationHistory[] HH_ContinuationHistory = new ContinuationHistory[2];
-	private final ContinuationHistory[] BF_ContinuationHistory = new ContinuationHistory[2];
+	private final ContinuationHistory[] HH_ContinuationHistory 	= new ContinuationHistory[2];
+	private final ContinuationHistory[] BF_ContinuationHistory 	= new ContinuationHistory[2];
 	
 	
 	private static final int LMR_STAT_MULTIPLIER 				= 1000;
-	private static final double LMR_DEVIATION_MULTIPLIER 		= 1.5; //1.75 //1.5 //0 //1.25 //2.5 //1
+	private static final double LMR_DEVIATION_MULTIPLIER 		= 1; //1.5; //1.75 //1.5 //0 //1.25 //2.5 //1
 	private final long[][] LMR_ALL 								= new long[2][64 * 64];
 	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
 	private final long[][] LMR_ABOVE_ALPHA 						= new long[2][64 * 64];
@@ -145,6 +144,25 @@ public final class MoveGenerator {
 		Arrays.fill(BF_MOVES1[BLACK][KING], 1);	
 		
 		currentPly = 0;
+		
+		for (int i = 0; i < COUNTER_MOVES.length; i++) {
+			
+			for (int j = 0; j < COUNTER_MOVES[i].length; j++) {
+				
+				for (int k = 0; k < COUNTER_MOVES[i][j].length; k++) {
+					
+					COUNTER_MOVES[i][j][k] = new BetaCutoffMoves_Counts();
+				}
+			}
+		}
+		
+		for (int i = 0; i < KILLER_MOVES.length; i++) {
+			
+			for (int j = 0; j < KILLER_MOVES[i].length; j++) {
+				
+				KILLER_MOVES[i][j] = new BetaCutoffMoves_LastIn();
+			}
+		}
 	}
 	
 	
@@ -306,44 +324,60 @@ public final class MoveGenerator {
 	}
 	
 	
-	public void addKillerMove(final int move, final int ply) {
+	public void addKillerMove(final int color, final int move, final int ply) {
+		
 		if (EngineConstants.ENABLE_KILLER_MOVES) {
-			if (KILLER_MOVE_1[ply] != move) {
-				KILLER_MOVE_2[ply] = KILLER_MOVE_1[ply];
-				KILLER_MOVE_1[ply] = move;
-			}
+			
+			KILLER_MOVES[color][ply].addMove(move);
 		}
 	}
 	
 	
 	public void addCounterMove(final int color, final int parentMove, final int counterMove) {
+		
 		if (EngineConstants.ENABLE_COUNTER_MOVES) {
-			COUNTER_MOVES[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)] = counterMove;
+			
+			COUNTER_MOVES[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
 		}
 	}
+	
 
-	public int getCounter(final int color, final int parentMove) {
-		return COUNTER_MOVES[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)];
+	public int getCounter1(final int color, final int parentMove) {
+		
+		return COUNTER_MOVES[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
+	}
+	
+	
+	public int getCounter2(final int color, final int parentMove) {
+		
+		return COUNTER_MOVES[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest2();
+	}
+	
+	
+	public int getKiller1(final int color, final int ply) {
+		
+		return KILLER_MOVES[color][ply].getBest1();
 	}
 
-	public int getKiller1(final int ply) {
-		return KILLER_MOVE_1[ply];
+	
+	public int getKiller2(final int color, final int ply) {
+		
+		return KILLER_MOVES[color][ply].getBest2();
 	}
-
-	public int getKiller2(final int ply) {
-		return KILLER_MOVE_2[ply];
-	}
-
+	
+	
 	public void startPly() {
 		nextToGenerate[currentPly + 1] = nextToGenerate[currentPly];
 		nextToMove[currentPly + 1] = nextToGenerate[currentPly];
 		currentPly++;
 	}
 
+	
 	public void endPly() {
 		currentPly--;
 	}
 
+	
 	public int next() {
 		return moves[nextToMove[currentPly]++];
 	}
@@ -442,7 +476,7 @@ public final class MoveGenerator {
 	}
 	
 	
-	public void setAllScores(final ChessBoard cb, final int parentMove, final int ttMove, int counterMove, int killer1Move, int killer2Move) {
+	/*public void setAllScores(final ChessBoard cb, final int parentMove, final int ttMove, int counterMove, int killer1Move, int killer2Move) {
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
 			if (ttMove == moves[j]) {
 				moveScores[j] = 10000;
@@ -459,7 +493,7 @@ public final class MoveGenerator {
 			}
 			//System.out.println("moveScores[j]=" + moveScores[j]);
 		}
-	}
+	}*/
 	
 	
 	public void sort() {
@@ -467,7 +501,7 @@ public final class MoveGenerator {
 		final int left = nextToMove[currentPly];
 		
 		randomizer_counter++;
-		if (randomizer_counter % 100 == 0) {
+		if (true || randomizer_counter % 100 == 0) {
 			randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
 		}
 		
@@ -948,6 +982,100 @@ public final class MoveGenerator {
 				addMove(MoveUtil.createPromotionAttack(MoveUtil.TYPE_PROMOTION_R, fromIndex, toIndex, pieceIndexes[toIndex]));
 			}
 			moves &= moves - 1;
+		}
+	}
+	
+	
+	static interface IBetaCutoffMoves {
+		
+		void addMove(int move);
+		
+		int getBest1();
+		
+		int getBest2();
+	}
+	
+	
+	private static final class BetaCutoffMoves_Counts implements IBetaCutoffMoves {
+		
+		
+		private int[][] moves_piece_to;
+		private long[][] counts;
+
+		private int best_move1;
+		private int best_move2;
+		private long max_count;
+		
+		
+		private BetaCutoffMoves_Counts() {
+			
+			moves_piece_to 	= new int[7][64];
+			counts 			= new long[7][64];
+		}
+		
+		
+		public void addMove(int move) {
+			
+			int piece = MoveUtil.getSourcePieceIndex(move);
+			int to = MoveUtil.getToIndex(move);
+			
+			moves_piece_to[piece][to] = move;
+			counts[piece][to]++;
+			
+			if (counts[piece][to] > max_count) {
+				
+				max_count = counts[piece][to];
+				best_move2 = best_move1;
+				best_move1 = move;
+			}
+		}
+		
+		
+		public int getBest1() {
+			
+			return best_move1;
+		}
+		
+		
+		public int getBest2() {
+			
+			return best_move2;
+		}
+	}
+
+	
+	private static final class BetaCutoffMoves_LastIn implements IBetaCutoffMoves {
+		
+		
+		private int best_move1;
+		private int best_move2;
+		
+		
+		private BetaCutoffMoves_LastIn() {
+			
+		}
+		
+		
+		public void addMove(int move) {
+			
+			if (best_move1 != move) {
+				
+				best_move2 = best_move1;
+				
+				best_move1 = move;
+			}
+		}
+		
+		
+		public int getBest1() {
+			
+			return best_move1;
+		}
+		
+		
+		public int getBest2() {
+			
+			return best_move2;
 		}
 	}
 }

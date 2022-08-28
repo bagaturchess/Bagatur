@@ -519,7 +519,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (MoveUtil.isQuiet(move) && cb.checkingPieces == 0) {
 						moveGen.addCounterMove(cb.colorToMove, parentMove, move);
-						moveGen.addKillerMove(move, ply);
+						moveGen.addKillerMove(cb.colorToMove, move, ply);
 						moveGen.addHHValue(cb.colorToMove, move, parentMove, depth);
 					}
 					break;

@@ -37,7 +37,7 @@ public class MoveGenFragmentImpl_Counter extends MoveGenFragmentImpl_Base {
 	
 	@Override
 	public void genMoves(int parentMove, int ply, int depth, boolean dummy) {
-		counterMove = gen.getCounter(cb.colorToMove, parentMove);
+		counterMove = gen.getCounter1(cb.colorToMove, parentMove);
 		if (counterMove != 0 && cb.isValidMove(counterMove)) {
 			if (!dummy) gen.addMove(counterMove);
 			count_move_total(1, depth);

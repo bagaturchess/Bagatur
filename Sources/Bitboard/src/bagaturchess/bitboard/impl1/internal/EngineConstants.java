@@ -4,8 +4,8 @@ public class EngineConstants {
 
 	//@formatter:off
 	
-	public static final int MAX_PLIES 					= 256;
 	public static final int MAX_MOVES 					= 768;
+	public static final int MAX_PLIES 					= 2 * MAX_MOVES;
 	public static final int MAX_THREADS					= 64;
 	public static final boolean ENABLE_PONDERING		= true;
 	public static final boolean GENERATE_BR_PROMOTIONS 	= true;
