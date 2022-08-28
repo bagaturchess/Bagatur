@@ -280,7 +280,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (ply >= 15
+		if (ply >= 7
     			&& SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
     			){
