@@ -88,6 +88,11 @@ public class VarStatistic implements Serializable {
 	}
 	
 	
+	public double getVariance() {
+		return disperse;
+	}
+	
+	
 	public double getTotalAmount() {
 		return total_amount;
 	}
@@ -206,12 +211,12 @@ public class VarStatistic implements Serializable {
 	public String toString() {
 		String result = "";
 		
-		result += StringUtils.fill("" + count, 6);
-		result += "  " + StringUtils.align(entropy);
-		result += "  " + StringUtils.align(getDisperse());
-		result += "  " + StringUtils.align(getTotalAmount());
-		result += "  " + StringUtils.align(getTotalDirection());
-		result += "  " + StringUtils.align(getChaos());
+		result += StringUtils.fill("SAMPLES_COUNT=" + count, 6);
+		result += ", MEAN=" + StringUtils.align(entropy);
+		result += ", STDEV=" + StringUtils.align(getDisperse());
+		result += ", AMOUNT=" + StringUtils.align(getTotalAmount());
+		result += ", DIRECTION=" + StringUtils.align(getTotalDirection());
+		result += ", CHAOS=" + StringUtils.align(getChaos());
 		
 		return result;
 	}

@@ -22,38 +22,12 @@ public final class MoveGenerator {
 	
 	public static boolean USE_ContinuationHistory 				= true;
 	
-	
-	private final int[] moves 									= new int[3000];
-	private final int[] moveScores 								= new int[3000];
-	private final int[] nextToGenerate 							= new int[EngineConstants.MAX_PLIES * 2];
-	private final int[] nextToMove 								= new int[EngineConstants.MAX_PLIES * 2];
-	private int currentPly;
-
-	private final IBetaCutoffMoves[][][] COUNTER_MOVES 			= new IBetaCutoffMoves[2][7][64];
-
-	private final IBetaCutoffMoves[][] KILLER_MOVES 			= new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
-
-	private final int[][] HH_MOVES 								= new int[2][64 * 64];
-	private final int[][] BF_MOVES 								= new int[2][64 * 64];
-	
-	private final int[][][] HH_MOVES1 							= new int[2][7][64];
-	private final int[][][] BF_MOVES1 							= new int[2][7][64];
-	
-	private final ContinuationHistory[] HH_ContinuationHistory 	= new ContinuationHistory[2];
-	private final ContinuationHistory[] BF_ContinuationHistory 	= new ContinuationHistory[2];
-	
-	
-	private static final int LMR_STAT_MULTIPLIER 				= 1000;
-	private static final double LMR_DEVIATION_MULTIPLIER 		= 1; //1.5; //1.75 //1.5 //0 //1.25 //2.5 //1
-	private final long[][] LMR_ALL 								= new long[2][64 * 64];
-	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
-	private final long[][] LMR_ABOVE_ALPHA 						= new long[2][64 * 64];
-	private VarStatistic[] lmrBelowAlphaAVGScores 				= new VarStatistic[2];
-	private VarStatistic[] lmrAboveAlphaAVGScores 				= new VarStatistic[2];
+	public static final int MOVE_SCORE_SCALE 					= 100;
 	
 	private static final boolean BUILD_EXACT_STATS 				= false;
 	private static final double LMR_RATE_THREASHOLD_ABOVE_ALPHA = 0.95; //Top X%
 	private static final double LMR_RATE_THREASHOLD_BELOW_ALPHA = 0.0001; //Top Y%
+	private static final int LMR_STAT_MULTIPLIER 				= 1000;
 	private static final long[][] LMR_STATS_COUNTER_ABOVE_ALPHA = new long[2][LMR_STAT_MULTIPLIER + 1];
 	private static final long[][] LMR_STATS_COUNTER_BELOW_ALPHA = new long[2][LMR_STAT_MULTIPLIER + 1];
 	private static int[] lmr_rate_all_above_alpha 				= new int[2];
@@ -62,19 +36,40 @@ public final class MoveGenerator {
 	private static int[] lmr_rate_pointer_below_alpha 			= new int[2];
 	
 	
+	private final int[] moves 									= new int[3000];
+	private final long[] moveScores 							= new long[3000];
+	private final int[] nextToGenerate 							= new int[EngineConstants.MAX_PLIES * 2];
+	private final int[] nextToMove 								= new int[EngineConstants.MAX_PLIES * 2];
+	private int currentPly;
+
+	private final IBetaCutoffMoves[][][] COUNTER_MOVES 			= new IBetaCutoffMoves[2][7][64];
+
+	private final IBetaCutoffMoves[][] KILLER_MOVES 			= new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
+
+	private final long[][] HH_MOVES 							= new long[2][64 * 64];
+	private final long[][] BF_MOVES 							= new long[2][64 * 64];
+	
+	private final long[][][] HH_MOVES1 							= new long[2][7][64];
+	private final long[][][] BF_MOVES1 							= new long[2][7][64];
+	
+	private final ContinuationHistory[] HH_ContinuationHistory 	= new ContinuationHistory[2];
+	private final ContinuationHistory[] BF_ContinuationHistory 	= new ContinuationHistory[2];
+	
+	
+	private static final double LMR_DEVIATION_MULTIPLIER 		= 2; //1.25; //1.5; //1.75 //1.5 //0 //1.25 //2.5 //1
+	private final long[][] LMR_ALL 								= new long[2][64 * 64];
+	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
+	private final long[][] LMR_ABOVE_ALPHA 						= new long[2][64 * 64];
+	private VarStatistic[] lmrBelowAlphaAVGScores 				= new VarStatistic[2];
+	private VarStatistic[] lmrAboveAlphaAVGScores 				= new VarStatistic[2];
+	
+	
 	private Random randomizer = new Random();
 	private long randomizer_counter;
 	
-
+	
 	public MoveGenerator() {
 		
-		lmrBelowAlphaAVGScores[0] = new VarStatistic();
-		lmrBelowAlphaAVGScores[1] = new VarStatistic();
-		
-		lmrAboveAlphaAVGScores[0] = new VarStatistic();
-		lmrAboveAlphaAVGScores[1] = new VarStatistic();
-		
-		clearHistoryHeuristics();
 		
 		if (USE_ContinuationHistory) {
 			
@@ -84,32 +79,26 @@ public final class MoveGenerator {
 			BF_ContinuationHistory[WHITE] = new ContinuationHistory();
 			BF_ContinuationHistory[BLACK] = new ContinuationHistory();
 		}
+		
+		
+		lmrBelowAlphaAVGScores[0] = new VarStatistic();
+		lmrBelowAlphaAVGScores[1] = new VarStatistic();
+		
+		lmrAboveAlphaAVGScores[0] = new VarStatistic();
+		lmrAboveAlphaAVGScores[1] = new VarStatistic();
+		
+		
+		clearHistoryHeuristics();
+		
 	}
-
+	
+	
 	public void clearHistoryHeuristics() {
 		
 		Arrays.fill(HH_MOVES[WHITE], 0);
 		Arrays.fill(HH_MOVES[BLACK], 0);
 		Arrays.fill(BF_MOVES[WHITE], 1);
 		Arrays.fill(BF_MOVES[BLACK], 1);
-		Arrays.fill(LMR_ALL[WHITE], 0);
-		Arrays.fill(LMR_ALL[BLACK], 0);
-		Arrays.fill(LMR_BELOW_ALPHA[WHITE], 0);
-		Arrays.fill(LMR_BELOW_ALPHA[BLACK], 0);
-		Arrays.fill(LMR_ABOVE_ALPHA[WHITE], 0);
-		Arrays.fill(LMR_ABOVE_ALPHA[BLACK], 0);
-		Arrays.fill(LMR_STATS_COUNTER_ABOVE_ALPHA[WHITE], 0);
-		Arrays.fill(LMR_STATS_COUNTER_ABOVE_ALPHA[BLACK], 0);
-		Arrays.fill(LMR_STATS_COUNTER_BELOW_ALPHA[WHITE], 0);
-		Arrays.fill(LMR_STATS_COUNTER_BELOW_ALPHA[BLACK], 0);
-		Arrays.fill(lmr_rate_all_above_alpha, 0);
-		Arrays.fill(lmr_rate_pointer_above_alpha, 0);
-		Arrays.fill(lmr_rate_all_below_alpha, 0);
-		Arrays.fill(lmr_rate_pointer_below_alpha, 0);
-		lmrBelowAlphaAVGScores[WHITE].clear();
-		lmrBelowAlphaAVGScores[BLACK].clear();
-		lmrAboveAlphaAVGScores[WHITE].clear();
-		lmrAboveAlphaAVGScores[BLACK].clear();
 		
 		Arrays.fill(HH_MOVES1[WHITE][0], 0);
 		Arrays.fill(HH_MOVES1[WHITE][PAWN], 0);
@@ -143,7 +132,27 @@ public final class MoveGenerator {
 		Arrays.fill(BF_MOVES1[BLACK][QUEEN], 1);
 		Arrays.fill(BF_MOVES1[BLACK][KING], 1);	
 		
-		currentPly = 0;
+		
+		Arrays.fill(LMR_ALL[WHITE], 0);
+		Arrays.fill(LMR_ALL[BLACK], 0);
+		Arrays.fill(LMR_BELOW_ALPHA[WHITE], 0);
+		Arrays.fill(LMR_BELOW_ALPHA[BLACK], 0);
+		Arrays.fill(LMR_ABOVE_ALPHA[WHITE], 0);
+		Arrays.fill(LMR_ABOVE_ALPHA[BLACK], 0);
+		Arrays.fill(LMR_STATS_COUNTER_ABOVE_ALPHA[WHITE], 0);
+		Arrays.fill(LMR_STATS_COUNTER_ABOVE_ALPHA[BLACK], 0);
+		Arrays.fill(LMR_STATS_COUNTER_BELOW_ALPHA[WHITE], 0);
+		Arrays.fill(LMR_STATS_COUNTER_BELOW_ALPHA[BLACK], 0);
+		Arrays.fill(lmr_rate_all_above_alpha, 0);
+		Arrays.fill(lmr_rate_pointer_above_alpha, 0);
+		Arrays.fill(lmr_rate_all_below_alpha, 0);
+		Arrays.fill(lmr_rate_pointer_below_alpha, 0);
+		
+		lmrBelowAlphaAVGScores[WHITE].clear();
+		lmrBelowAlphaAVGScores[BLACK].clear();
+		lmrAboveAlphaAVGScores[WHITE].clear();
+		lmrAboveAlphaAVGScores[BLACK].clear();
+		
 		
 		for (int i = 0; i < COUNTER_MOVES.length; i++) {
 			
@@ -163,6 +172,8 @@ public final class MoveGenerator {
 				KILLER_MOVES[i][j] = new BetaCutoffMoves_LastIn();
 			}
 		}
+		
+		currentPly = 0;
 	}
 	
 	
@@ -181,9 +192,9 @@ public final class MoveGenerator {
 	
 	
 	public int getHHScore(final int color, final int fromToIndex, final int pieceType, final int toIndex, final int parentMove) {
-		int value1 = 100 * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex];
-		int value2 = 100 * HH_MOVES1[color][pieceType][toIndex] / BF_MOVES1[color][pieceType][toIndex];
-		int value3 = USE_ContinuationHistory ? getContinuationHistoryScore(color, pieceType, toIndex, parentMove) : 0;
+		int value1 = (int) (MOVE_SCORE_SCALE * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex]);
+		int value2 = (int) (MOVE_SCORE_SCALE * HH_MOVES1[color][pieceType][toIndex] / BF_MOVES1[color][pieceType][toIndex]);
+		int value3 = (int) (USE_ContinuationHistory ? getContinuationHistoryScore(color, pieceType, toIndex, parentMove) : 0);
 		
 		if (USE_ContinuationHistory) {
 			
@@ -198,8 +209,8 @@ public final class MoveGenerator {
 	}
 	
 	
-	private int getContinuationHistoryScore(final int color, final int pieceType, final int toIndex, final int parentMove) {
-		return 100 * HH_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[pieceType][toIndex] / 
+	private long getContinuationHistoryScore(final int color, final int pieceType, final int toIndex, final int parentMove) {
+		return MOVE_SCORE_SCALE * HH_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[pieceType][toIndex] / 
 				BF_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[pieceType][toIndex];
 	}
 	
@@ -382,8 +393,16 @@ public final class MoveGenerator {
 		return moves[nextToMove[currentPly]++];
 	}
 
-	public int getScore() {
-		return moveScores[nextToMove[currentPly] - 1];
+	public long getScore() {
+		
+		long val = moveScores[nextToMove[currentPly] - 1];
+		
+		if (val < 0) {
+			
+			throw new IllegalStateException("getScore: val=" + val);
+		}
+		
+		return val;
 	}
 
 	public int previous() {
@@ -456,8 +475,15 @@ public final class MoveGenerator {
 	
 	
 	public void setHHScores(final int colorToMove, final int parentMove) {
+		
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
+			
 			moveScores[j] = getHHScore(colorToMove, MoveUtil.getFromToIndex(moves[j]), MoveUtil.getSourcePieceIndex(moves[j]), MoveUtil.getToIndex(moves[j]), parentMove);
+			
+			if (moveScores[j] < 0) {
+				
+				throw new IllegalStateException();
+			}
 		}
 	}
 	
@@ -506,7 +532,7 @@ public final class MoveGenerator {
 		}
 		
 		for (int i = left, j = i; i < nextToGenerate[currentPly] - 1; j = ++i) {
-			final int score = moveScores[i + 1];
+			final long score = moveScores[i + 1];
 			final int move = moves[i + 1];
 			while (score > moveScores[j]) {
 				moveScores[j + 1] = moveScores[j];
@@ -521,19 +547,19 @@ public final class MoveGenerator {
 	}
 	
 	
-	private void randomize(int[] arr1, int[] arr2, int start, int end) {
+	private void randomize(long[] arr1, int[] arr2, int start, int end) {
 		
 	    for (int i = end; i > start + 1; i--) {
 	    	
 	    	int rnd_index = start + randomizer.nextInt(i - start);	    
 	    	
-	    	int tmp = arr1[i-1];
+	    	long tmp1 = arr1[i-1];
 	    	arr1[i-1] = arr1[rnd_index];
-	    	arr1[rnd_index] = tmp;
+	    	arr1[rnd_index] = tmp1;
 	    	
-	    	tmp = arr2[i-1];
+	    	int tmp2 = arr2[i-1];
 	    	arr2[i-1] = arr2[rnd_index];
-	    	arr2[rnd_index] = tmp;
+	    	arr2[rnd_index] = tmp2;
 	    }
 	}
 	

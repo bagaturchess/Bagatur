@@ -27,6 +27,7 @@ import java.util.EmptyStackException;
 import java.util.Stack;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.Assert;
@@ -98,14 +99,33 @@ public class Search_PVS_NWS extends SearchImpl {
 	private IEvalEntry temp_cache_entry;
 	
 	
+	private VarStatistic move_line_scores_w;
+	private VarStatistic move_line_scores_b;
+	private long move_line_distros_counter_w 			= 0;
+	private long move_line_distros_counter_b 			= 0;
+	
+	private static final int MOVES_SCALE 				= 100;
+	
+	private static final boolean MOVES_SCALE_DUMP		= false;
+	private int[] move_line_distros_w 					= new int[MOVES_SCALE];
+	private int[] move_line_distros_b 					= new int[MOVES_SCALE];
+	private int[] move_line_diffs 						= new int[MOVES_SCALE];
+	
+	//private static final double SQRT_2PI 				= Math.sqrt(2 * Math.PI);
+	//private static final double RECIPROCAL_4PI			= 1 / (double) (4 * Math.PI);
+	
+	
 	public Search_PVS_NWS(Object[] args) {
+		
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
 	}
 	
 	
 	public Search_PVS_NWS(SearchEnv _env) {
 		
+		
 		super(_env);
+		
 		
 		if (USE_DTZ_CACHE) {
 	    	
@@ -116,12 +136,22 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	public void newSearch() {
 		
+		
 		super.newSearch();
+		
 		
 		((BoardImpl) env.getBitboard()).getMoveGenerator().clearHistoryHeuristics();
 		
+		
 		lastSentMinorInfo_nodesCount 	= 0;
 		lastSentMinorInfo_timestamp 	= 0;
+		
+		
+		move_line_scores_w 				= new VarStatistic();
+		move_line_scores_b 				= new VarStatistic();
+		move_line_distros_counter_w 	= 0;
+		move_line_distros_counter_b 	= 0;
+		
 		
 		if (ChannelManager.getChannel() != null) {
 			
@@ -143,7 +173,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int mateMove, boolean useMateDistancePrunning) {
 		
 		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true, 0);
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true, 0, 0, 0);
 	}
 	
 	
@@ -155,13 +185,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
 		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, 0);		
+				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, 0, 0, 0);		
 	}
 	
 	
 	public int search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
-			final int ply, int depth, int alpha, int beta, boolean isPv, int excludedMove) {
+			final int ply, int depth, int alpha, int beta, boolean isPv, int pv_scores_w, int pv_scores_b, int excludedMove) {
 		
 		
 		if (mediator != null && mediator.getStopper() != null) {
@@ -176,7 +206,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (ply >= ISearch.MAX_DEPTH) {
-			return eval(evaluator, ply, alpha, beta, isPv);
+			
+			return eval(evaluator, ply, alpha, beta, isPv, pv_scores_w, pv_scores_b);
 		}
 		
 		
@@ -455,7 +486,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (depth == 0) {
 			
-			int qeval = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha, beta, ply, isPv);
+			int qeval = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha, beta, ply, isPv, pv_scores_w, pv_scores_b);
 			
 			if (node.eval != qeval) {
 				
@@ -471,7 +502,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (!isPv && cb.checkingPieces == 0) {
 			
 			
-			eval = eval(evaluator, ply, alphaOrig, beta, isPv);
+			eval = eval(evaluator, ply, alphaOrig, beta, isPv, pv_scores_w, pv_scores_b);
 			
 			
 			if (ttValue != IEvaluator.MIN_EVAL) {
@@ -512,8 +543,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 						cb.doNullMove();
 						final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
-						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
-								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, 0);
+						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv, pv_scores_w, pv_scores_b)
+								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, pv_scores_w, pv_scores_b, 0);
 						cb.undoNullMove();
 						if (score >= beta) {
 							node.bestmove = 0;
@@ -529,7 +560,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length) {
 					if (eval + RAZORING_MARGIN[depth] < alpha) {
-						int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply, isPv);
+						int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply, isPv, pv_scores_w, pv_scores_b);
 						if (score + RAZORING_MARGIN[depth] <= alpha) {
 							node.bestmove = 0;
 							node.eval = score;
@@ -558,7 +589,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	        int reduction = depth / 2;
 	        
 	        int singularValue = search(mediator, info, pvman, evaluator, cb, moveGen, ply,
-	        		depth - reduction, singularBeta - 1, singularBeta, isPv, ttMove);
+	        		depth - reduction, singularBeta - 1, singularBeta, isPv, pv_scores_w, pv_scores_b, ttMove);
 	        if (singularValue < singularBeta) {
 	        	
 	        	singularMoveExtension = 1;
@@ -597,6 +628,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			case PHASE_TT:
 				if (ttMove != 0 && cb.isValidMove(ttMove)) {
 					moveGen.addMove(ttMove);
+					moveGen.setHHScores(cb.colorToMove, parentMove);
 				}
 				break;
 			case PHASE_ATTACKING_GOOD:
@@ -608,6 +640,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
 				if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move)) {
 					moveGen.addMove(killer1Move);
+					moveGen.setHHScores(cb.colorToMove, parentMove);
 					break;
 				} else {
 					phase++;
@@ -616,6 +649,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
 				if (killer2Move != 0 && killer2Move != ttMove && cb.isValidMove(killer2Move)) {
 					moveGen.addMove(killer2Move);
+					moveGen.setHHScores(cb.colorToMove, parentMove);
 					break;
 				} else {
 					phase++;
@@ -624,6 +658,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				counterMove1 = moveGen.getCounter1(cb.colorToMove, parentMove);
 				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
 					moveGen.addMove(counterMove1);
+					moveGen.setHHScores(cb.colorToMove, parentMove);
 					break;
 				} else {
 					phase++;
@@ -632,6 +667,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				/*counterMove2 = moveGen.getCounter2(cb.colorToMove, parentMove);
 				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
 					moveGen.addMove(counterMove2);
+					moveGen.setHHScores(cb.colorToMove, parentMove);
 					break;
 				} else {
 					phase++;
@@ -748,6 +784,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(move);
 				
 				
+				int new_pv_scores_w = (int) (cb.colorToMoveInverse == Constants.COLOUR_WHITE ? pv_scores_w + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_w);
+				int new_pv_scores_b = (int) (cb.colorToMoveInverse == Constants.COLOUR_BLACK ? pv_scores_b + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_b);
+				
+				
 				if (MoveUtil.isQuiet(move)) {
 					movesPerformed_quiet++;
 				} else {
@@ -783,7 +823,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int reduction = 1;
 				if (doLMR
-						&& (Math.random() <= 0.10 || moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse))
+						&& (!EngineConstants.ENABLE_LMR_STATS
+								|| EngineConstants.ENABLE_LMR_STATS && (Math.random() <= 0.10 || moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse)))
 						) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
@@ -804,8 +845,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
 						
 						moveGen.addLMR_All(cb.colorToMoveInverse, move, depth);
-						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, 0);
+												
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, new_pv_scores_w, new_pv_scores_b, 0);
 						
 						if (score > alpha) {
 							
@@ -819,18 +860,18 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
 						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -alpha - 1, -alpha, false, 0);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -alpha - 1, -alpha, false, new_pv_scores_w, new_pv_scores_b, 0);
 					}
 					
 					if (score > alpha) {
 						
 						if (move == ttMove) {
 							
-							score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 + singularMoveExtension - multiCutReduction, -beta, -alpha, isPv, 0);
+							score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 + singularMoveExtension - multiCutReduction, -beta, -alpha, isPv, new_pv_scores_w, new_pv_scores_b, 0);
 							
 						} else {
 							
-							score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -beta, -alpha, isPv, 0);
+							score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -beta, -alpha, isPv, new_pv_scores_w, new_pv_scores_b, 0);
 						}
 					}
 					
@@ -938,11 +979,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	public int qsearch(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen, int alpha, final int beta, final int ply, final boolean isPv) {
+	public int qsearch(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen,
+			int alpha, final int beta, final int ply, final boolean isPv, int pv_scores_w, int pv_scores_b) {
 		
 		if (cb.checkingPieces != 0) {
-			return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, 0);
-			//return alpha;
+			//return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, pv_scores, 0);
+			return alpha;
 		}
 		
 		if (info.getSelDepth() < ply) {
@@ -950,7 +992,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (ply >= ISearch.MAX_DEPTH) {
-			return eval(evaluator, ply, alpha, beta, isPv);
+			
+			return eval(evaluator, ply, alpha, beta, isPv, pv_scores_w, pv_scores_b);
 		}
 		
 		PVNode node = pvman.load(ply);
@@ -1012,7 +1055,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		int eval = eval(evaluator, ply, alpha, beta, isPv);
+		int eval = eval(evaluator, ply, alpha, beta, isPv, pv_scores_w, pv_scores_b);
 		
 		if (ttValue != IEvaluator.MIN_EVAL) {
 			
@@ -1118,7 +1161,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				env.getBitboard().makeMoveForward(move);
 				
-				final int score = -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -alpha, ply + 1, isPv);
+				final int score = -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -alpha, ply + 1, isPv, pv_scores_w, pv_scores_b);
 				
 				env.getBitboard().makeMoveBackward(move);
 				
@@ -1197,23 +1240,195 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private int extensions(final ChessBoard cb, final MoveGenerator moveGen, final int ply) {
+		
 		if (EngineConstants.ENABLE_CHECK_EXTENSION && cb.checkingPieces != 0) {
+			
 			return 1;
 		}
+		
 		return 0;
 	}
 	
 	
-	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv) {
+	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv, int pv_scores_w, int pv_scores_b) {
 		
 		int eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
+		
+		boolean white = env.getBitboard().getColourToMove() == Constants.COLOUR_WHITE;
+		
+		if (EngineConstants.USE_MOVE_SCORE_AS_EVAL) {
+			
+			if (white)  {
+				
+				/**
+				 * WHITE
+				 */
+				
+				//pv_scores_w = inverse_linner(pv_scores_w);
+				//pv_scores_w = (int) inverse_Gaussian(pv_scores_w, move_line_scores_w);
+				pv_scores_w = (int) inverse_linner_stdev(pv_scores_w, move_line_scores_w);
+				
+				if (pv_scores_w < 0) {
+					
+					throw new IllegalStateException("pv_scores_w=" + pv_scores_w);
+				}
+				
+				move_line_scores_w.addValue(pv_scores_w);
+				
+				pv_scores_w = Math.min(move_line_distros_w.length - 1, Math.max(0, pv_scores_w));
+				
+				
+				if (MOVES_SCALE_DUMP) {
+					
+					move_line_distros_w[pv_scores_w]++;
+					move_line_distros_counter_w++;
+				}
+			
+			} else {
+				
+				/**
+				 * BLACK
+				 */
+				
+				//pv_scores_b = inverse_linner(pv_scores_b);
+				//pv_scores_b = (int) inverse_Gaussian(pv_scores_b, move_line_scores_b);
+				pv_scores_b = (int) inverse_linner_stdev(pv_scores_b, move_line_scores_b);
+				
+				if (pv_scores_b < 0) {
+					
+					throw new IllegalStateException("pv_scores_b=" + pv_scores_b);
+				}
+				
+				move_line_scores_b.addValue(pv_scores_b);
+				
+				pv_scores_b = Math.min(move_line_distros_b.length - 1, Math.max(0, pv_scores_b));
+				
+				
+				if (MOVES_SCALE_DUMP) {
+					
+					move_line_distros_b[pv_scores_b]++;
+					move_line_distros_counter_b++;
+				}
+			}
+			
+			
+			/**
+			 * Adjust static evaluation
+			 */
+			
+			int moves_score = 0;
+			
+			if (white) {
+				
+				moves_score = (int) ((+pv_scores_w -pv_scores_b) / -39d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states);
+
+			} else {
+				
+				moves_score = (int) ((+pv_scores_b -pv_scores_w) / -39d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states)
+			}
+			
+			//System.out.println("moves_score=" + moves_score);
+			
+			//move_line_diffs[move_line_diffs.length / 2 - moves_score]++;
+			
+			eval += moves_score;
+			
+			
+			/**
+			 * DUMP DATA
+			 */
+			if (MOVES_SCALE_DUMP
+					&& move_line_distros_counter_w > 1000000
+					&& move_line_distros_counter_b > 1000000
+				) {
+				
+				
+				String dump = "**************************************************************";
+				
+				dump += "!!! SCORE DIFFS !!!\r\n";
+				
+				
+				for (int i = 0; i < move_line_diffs.length; i++) {
+					dump += move_line_diffs[i] + "\r\n";
+				}
+				
+				dump += "!!! WHITE !!!\r\n";
+				
+				
+				for (int i = 0; i < move_line_distros_w.length; i++) {
+					dump += move_line_distros_w[i] + "\r\n";
+				}
+				
+				
+				dump += "!!! BLACK !!!\r\n";
+				for (int i = 0; i < move_line_distros_b.length; i++) {
+					dump += move_line_distros_b[i] + "\r\n";
+				}
+				
+				
+				System.out.println(dump);
+				System.out.println("WHITE_STATS=" + move_line_scores_w);
+				System.out.println("BLACK_STATS=" + move_line_scores_b);
+				
+				
+				System.exit(0);
+			}	
+		}
+		
 		
 		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
 			
 			eval = Math.min(0, eval);
 		}
 		
+		
 		return eval;
+	}
+
+
+	private int inverse_linner(int pv_scores) {
+		
+		return (int) (55 * pv_scores / (double) MoveGenerator.MOVE_SCORE_SCALE);
+	}
+	
+	
+	private int inverse_linner_stdev(int pv_scores, VarStatistic move_line_scores) {
+		
+		return (int) (pv_scores / (double) (0.2 * Math.max(1, move_line_scores.getDisperse())));
+	}
+	
+	
+	public double inverse_Gaussian(double pv_scores, VarStatistic move_line_scores) {
+		
+		
+		//https://en.wikipedia.org/wiki/Inverse_Gaussian_distribution
+		
+		
+		double mean 		= move_line_scores.getEntropy();
+		double stdev 		= move_line_scores.getDisperse();
+		
+		double y 			= pv_scores;
+		
+		double x 			= MOVES_SCALE
+							
+							* Math.sqrt(
+				
+									stdev / (2 * Math.PI * y * y * y)
+								)
+				
+							* Math.exp(								
+									-(stdev * (y - mean) * (y - mean)) / (2 * mean * mean* y)
+								)
+							;
+		
+		pv_scores 		= (int) x;
+		
+		return pv_scores;
+		
+	    /*double y = sample * sample;
+	    double x = mu + (mu * mu * y) / (2 * lambda) - (mu / (2 * lambda)) * Math.sqrt(4 * mu * lambda * y + mu * mu * y * y);
+	    return x;
+	    */
 	}
 	
 	
@@ -1384,7 +1599,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (isPv) {
 			
-			int static_eval = eval_sign * eval(evaluator, 0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, isPv);
+			int static_eval = eval_sign * eval(evaluator, 0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, isPv, 0, 0);
 			
 			if (!qsearch || !getSearchConfig().isOther_UseAlphaOptimizationInQSearch()) {
 				

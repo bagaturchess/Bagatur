@@ -37,7 +37,7 @@ PIECE_NB = 16
 };*/
 public class PieceToHistory {
 	
-	int[][] array = new int[16][64];
+	long[][] array = new long[16][64];
 	
 	PieceToHistory() {
 		
