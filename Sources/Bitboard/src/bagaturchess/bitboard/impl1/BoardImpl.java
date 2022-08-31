@@ -1264,6 +1264,13 @@ public class BoardImpl implements IBitBoard {
 			return (new MoveWrapper(move, isFRC, chessBoard.castlingConfig)).toString();
 		}
 		
+		
+		@Override
+		public void moveToString(int move, StringBuilder text_buffer) {
+			(new MoveWrapper(move, isFRC, chessBoard.castlingConfig)).toString(text_buffer);
+		}
+		
+		
 		@Override
 		public int stringToMove(String move) {
 			MoveWrapper moveObj = new MoveWrapper(move, chessBoard, isFRC);

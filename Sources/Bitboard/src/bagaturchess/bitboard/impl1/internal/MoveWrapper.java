@@ -366,6 +366,21 @@ public class MoveWrapper {
 		}
 		return moveString;
 	}
+	
+	
+	public void toString(StringBuilder text_buffr) {
+		text_buffr.append("" + fromFile + fromRank + toFile + toRank);
+		if (isQueenPromotion) {
+			text_buffr.append("q");
+		} else if (isNightPromotion) {
+			text_buffr.append("n");
+		} else if (isRookPromotion) {
+			text_buffr.append("r");
+		} else if (isBishopPromotion) {
+			text_buffr.append("b");
+		}
+	}
+	
 
 	@Override
 	public boolean equals(Object obj) {

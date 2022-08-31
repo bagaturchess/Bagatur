@@ -209,6 +209,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
+		
 		if (info.getSelDepth() < ply) {
 			info.setSelDepth(ply);
 		}

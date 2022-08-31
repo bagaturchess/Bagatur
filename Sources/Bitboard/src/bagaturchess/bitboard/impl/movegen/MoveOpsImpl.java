@@ -204,7 +204,7 @@ public class MoveOpsImpl implements IMoveOps {
 	}
 	
 	
-	private final void moveToString(int move, StringBuilder result) {
+	public final void moveToString(int move, StringBuilder result) {
 		
 		if (move == -1) {
 			throw new IllegalStateException("move=" + move);

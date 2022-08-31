@@ -39,5 +39,6 @@ public interface IMoveOps {
 	public int getCapturedFigureType(int move);
 	public int getPromotionFigureType(int move);
 	public String moveToString(int move);
+	public void moveToString(int move, StringBuilder text_buffer);
 	public int stringToMove(String move);
 }

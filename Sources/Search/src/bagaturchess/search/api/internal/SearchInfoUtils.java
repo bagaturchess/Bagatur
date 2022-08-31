@@ -66,7 +66,7 @@ public class SearchInfoUtils {
 			
 			if (info.getPV() != null) {
 				for (int j=0; j<info.getPV().length; j++) {
-					message.append(board.getMoveOps().moveToString(info.getPV()[j]));
+					board.getMoveOps().moveToString(info.getPV()[j], message);
 					if (j != info.getPV().length - 1) {
 						message.append(" ");//", ";
 					}
@@ -103,7 +103,7 @@ public class SearchInfoUtils {
 		}
 		if (info.getCurrentMove() != 0) {
 			message.append(" currmove ");
-			message.append(board.getMoveOps().moveToString(info.getCurrentMove()));
+			board.getMoveOps().moveToString(info.getCurrentMove(), message);
 			message.append(" currmovenumber " + info.getCurrentMoveNumber());
 		}
 		if (tptusage != -1) message.append(" hashfull " + (10 * tptusage));
