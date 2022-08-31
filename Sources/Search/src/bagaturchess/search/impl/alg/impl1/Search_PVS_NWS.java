@@ -1375,11 +1375,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (white) {
 				
-				moves_score = (int) ((+pv_scores_w -pv_scores_b) / 1d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states);
+				moves_score = (int) ((+pv_scores_w -pv_scores_b) / 2d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states);
 
 			} else {
 				
-				moves_score = (int) ((+pv_scores_b -pv_scores_w) / 1d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states)
+				moves_score = (int) ((+pv_scores_b -pv_scores_w) / 2d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states)
 			}
 			
 			moves_score = moves_score / ply;

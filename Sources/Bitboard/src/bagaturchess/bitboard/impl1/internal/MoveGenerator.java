@@ -368,12 +368,14 @@ public final class MoveGenerator {
 	public int getCounter1(final int color, final int parentMove) {
 		
 		return COUNTER_MOVES_LOCAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
+		//return COUNTER_MOVES_GLOBAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
 	}
 	
 	
 	public int getCounter2(final int color, final int parentMove) {
 		
-		return COUNTER_MOVES_GLOBAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest2();
+		return COUNTER_MOVES_GLOBAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
+		//return COUNTER_MOVES_LOCAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
 	}
 	
 	
