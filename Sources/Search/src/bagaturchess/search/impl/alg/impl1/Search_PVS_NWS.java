@@ -111,7 +111,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long move_line_distros_counter_w 			= 0;
 	private long move_line_distros_counter_b 			= 0;
 	
-	private static final int MOVES_SCALE 				= 100;
+	private static final int MOVES_SCALE 				= 20;
 	
 	private static final boolean MOVES_SCALE_DUMP		= false;
 	private int[] move_line_distros_w 					= new int[MOVES_SCALE];
@@ -1375,11 +1375,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (white) {
 				
-				moves_score = (int) ((+pv_scores_w -pv_scores_b) / 2d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states);
+				moves_score = (int) ((+pv_scores_w -pv_scores_b) / 1d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states);
 
 			} else {
 				
-				moves_score = (int) ((+pv_scores_b -pv_scores_w) / 2d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states)
+				moves_score = (int) ((+pv_scores_b -pv_scores_w) / 1d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states)
 			}
 			
 			moves_score = moves_score / ply;
@@ -1435,8 +1435,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					list_values.add(val);
 				}
 				for (int i = 0; i < list_keys.size(); i++) {
-					dump += list_keys.get(i) + "=" + list_values.get(i) + "\r\n";
-					//dump += list_values.get(i) + "\r\n";
+					//dump += list_keys.get(i) + "=" + list_values.get(i) + "\r\n";
+					dump += list_values.get(i) + "\r\n";
 				}
 				
 				
