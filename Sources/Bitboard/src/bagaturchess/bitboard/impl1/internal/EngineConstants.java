@@ -51,7 +51,7 @@ public class EngineConstants {
 	public static final boolean ENABLE_Q_PRUNE_BAD_CAPTURES = true;
 	public static final boolean ENABLE_Q_FUTILITY_PRUNING 	= true;
 	public static final boolean USE_TT_SCORE_AS_EVAL 		= true;
-	public static final boolean USE_MOVE_SCORE_AS_EVAL 		= true;
+	public static final boolean USE_MOVE_SCORE_AS_EVAL 		= false;
 
 	// Evaluation-function
 	public static final boolean ENABLE_EVAL_CACHE		= true;

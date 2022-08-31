@@ -23,8 +23,13 @@
 package bagaturchess.search.impl.alg.impl1;
 
 
+import java.util.ArrayList;
 import java.util.EmptyStackException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
+import java.util.TreeMap;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
@@ -101,6 +106,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private VarStatistic move_line_scores_w;
 	private VarStatistic move_line_scores_b;
+	private VarStatistic move_line_scores_diffs_org;
+	private VarStatistic move_line_scores_diffs_scaled;
 	private long move_line_distros_counter_w 			= 0;
 	private long move_line_distros_counter_b 			= 0;
 	
@@ -109,7 +116,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final boolean MOVES_SCALE_DUMP		= false;
 	private int[] move_line_distros_w 					= new int[MOVES_SCALE];
 	private int[] move_line_distros_b 					= new int[MOVES_SCALE];
-	private int[] move_line_diffs 						= new int[MOVES_SCALE];
+	private Map<Integer, Long> move_line_diffs 			= new TreeMap<Integer, Long>();
 	
 	//private static final double SQRT_2PI 				= Math.sqrt(2 * Math.PI);
 	//private static final double RECIPROCAL_4PI			= 1 / (double) (4 * Math.PI);
@@ -149,6 +156,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		move_line_scores_w 				= new VarStatistic();
 		move_line_scores_b 				= new VarStatistic();
+		move_line_scores_diffs_org 		= new VarStatistic();
+		move_line_scores_diffs_scaled 	= new VarStatistic();
 		move_line_distros_counter_w 	= 0;
 		move_line_distros_counter_b 	= 0;
 		
@@ -626,65 +635,90 @@ public class Search_PVS_NWS extends SearchImpl {
 			switch (phase) {
 			
 			case PHASE_TT:
+				
 				if (ttMove != 0 && cb.isValidMove(ttMove)) {
 					moveGen.addMove(ttMove);
-					moveGen.setHHScores(cb.colorToMove, parentMove);
+					if (!env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
+						moveGen.setHHScores(cb.colorToMove, parentMove);
+					}
 				}
+				
 				break;
+				
 			case PHASE_ATTACKING_GOOD:
+				
 				moveGen.generateAttacks(cb);
 				moveGen.setMVVLVAScores(cb);
 				moveGen.sort();
+				
 				break;
-			case PHASE_KILLER_1:
-				killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
-				if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move)) {
-					moveGen.addMove(killer1Move);
-					moveGen.setHHScores(cb.colorToMove, parentMove);
-					break;
-				} else {
-					phase++;
-				}
-			case PHASE_KILLER_2:
-				killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
-				if (killer2Move != 0 && killer2Move != ttMove && cb.isValidMove(killer2Move)) {
-					moveGen.addMove(killer2Move);
-					moveGen.setHHScores(cb.colorToMove, parentMove);
-					break;
-				} else {
-					phase++;
-				}
+				
 			case PHASE_COUNTER_1:
+				
 				counterMove1 = moveGen.getCounter1(cb.colorToMove, parentMove);
 				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
 					moveGen.addMove(counterMove1);
 					moveGen.setHHScores(cb.colorToMove, parentMove);
-					break;
 				} else {
 					phase++;
 				}
+				
+				break;
+				
 			case PHASE_COUNTER_2:
-				/*counterMove2 = moveGen.getCounter2(cb.colorToMove, parentMove);
+				
+				counterMove2 = moveGen.getCounter2(cb.colorToMove, parentMove);
 				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
 					moveGen.addMove(counterMove2);
 					moveGen.setHHScores(cb.colorToMove, parentMove);
-					break;
 				} else {
 					phase++;
-				}*/
-				phase++;
+					
+				}
+				
+				break;
+				
+			case PHASE_KILLER_1:
+				
+				killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
+				if (killer1Move != 0 && killer1Move != ttMove && killer1Move != counterMove1 && killer1Move != counterMove2 && cb.isValidMove(killer1Move)) {
+					moveGen.addMove(killer1Move);
+					moveGen.setHHScores(cb.colorToMove, parentMove);
+				} else {
+					phase++;
+				}
+				
+				break;
+				
+			case PHASE_KILLER_2:
+				
+				killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
+				if (killer2Move != 0 && killer2Move != killer1Move && killer2Move != ttMove && killer2Move != counterMove1 && killer2Move != counterMove2 && cb.isValidMove(killer2Move)) {
+					moveGen.addMove(killer2Move);
+					moveGen.setHHScores(cb.colorToMove, parentMove);
+				} else {
+					phase++;
+				}
+				
+				break;
 				
 			case PHASE_ATTACKING_BAD:
+				
 				moveGen.generateAttacks(cb);
 				moveGen.setMVVLVAScores(cb);
 				moveGen.sort();
+				
 				break;
+				
 			case PHASE_QUIET:
+				
 				moveGen.generateMoves(cb);
 				moveGen.setHHScores(cb.colorToMove, parentMove);
 				moveGen.sort();
+				
 				break;
 			}
+			
 			
 			while (moveGen.hasNext()) {
 				
@@ -1252,11 +1286,32 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv, int pv_scores_w, int pv_scores_b) {
 		
-		int eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
 		
-		boolean white = env.getBitboard().getColourToMove() == Constants.COLOUR_WHITE;
+		int eval;
+		
+		/**
+		 * TODO: Use material eval + moves scores to predict eval and then call full eval only if the forecast is out of alpha - TOLERANCE and beta + TOLERANCE bounds.
+		 */
+		eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
+		
+		eval = adjustEval(eval, ply, pv_scores_w, pv_scores_b);
+		
+		
+		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
+			
+			eval = Math.min(0, eval);
+		}
+		
+		
+		return eval;
+	}
+
+
+	private int adjustEval(int eval, final int ply, int pv_scores_w, int pv_scores_b) {
 		
 		if (EngineConstants.USE_MOVE_SCORE_AS_EVAL) {
+			
+			boolean white = env.getBitboard().getColourToMove() == Constants.COLOUR_WHITE;
 			
 			if (white)  {
 				
@@ -1264,9 +1319,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				 * WHITE
 				 */
 				
-				//pv_scores_w = inverse_linner(pv_scores_w);
+				pv_scores_w = inverse_linner(pv_scores_w);
+				//pv_scores_w = (int) inverse_linner_stdev(pv_scores_w, move_line_scores_w);
 				//pv_scores_w = (int) inverse_Gaussian(pv_scores_w, move_line_scores_w);
-				pv_scores_w = (int) inverse_linner_stdev(pv_scores_w, move_line_scores_w);
 				
 				if (pv_scores_w < 0) {
 					
@@ -1290,9 +1345,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				 * BLACK
 				 */
 				
-				//pv_scores_b = inverse_linner(pv_scores_b);
+				pv_scores_b = inverse_linner(pv_scores_b);
+				//pv_scores_b = (int) inverse_linner_stdev(pv_scores_b, move_line_scores_b);
 				//pv_scores_b = (int) inverse_Gaussian(pv_scores_b, move_line_scores_b);
-				pv_scores_b = (int) inverse_linner_stdev(pv_scores_b, move_line_scores_b);
 				
 				if (pv_scores_b < 0) {
 					
@@ -1320,18 +1375,41 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (white) {
 				
-				moves_score = (int) ((+pv_scores_w -pv_scores_b) / -39d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states);
+				moves_score = (int) ((+pv_scores_w -pv_scores_b) / 1d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states);
 
 			} else {
 				
-				moves_score = (int) ((+pv_scores_b -pv_scores_w) / -39d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states)
+				moves_score = (int) ((+pv_scores_b -pv_scores_w) / 1d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states)
 			}
 			
-			//System.out.println("moves_score=" + moves_score);
+			moves_score = moves_score / ply;
 			
-			//move_line_diffs[move_line_diffs.length / 2 - moves_score]++;
+			moves_score = Math.min(move_line_distros_b.length - 1, Math.max(-(move_line_distros_b.length - 1), moves_score));
+			
+			move_line_scores_diffs_org.addValue(moves_score);
+			
+			
+			//moves_score = inverse_linner_normalized(moves_score);
+			moves_score = inverse_linner(moves_score);
+			
+			move_line_scores_diffs_scaled.addValue(moves_score);
+			
 			
 			eval += moves_score;
+			
+			
+			if (MOVES_SCALE_DUMP) {
+				
+				//System.out.println("moves_score=" + moves_score);
+				
+				Long value = move_line_diffs.get(moves_score);
+				
+				if (value == null) {
+					value = new Long(0);
+				}
+				
+				move_line_diffs.put(moves_score, value + 1);
+			}
 			
 			
 			/**
@@ -1345,15 +1423,24 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				String dump = "**************************************************************";
 				
+				
 				dump += "!!! SCORE DIFFS !!!\r\n";
 				
-				
-				for (int i = 0; i < move_line_diffs.length; i++) {
-					dump += move_line_diffs[i] + "\r\n";
+				List<Integer> list_keys = new ArrayList<Integer>();
+				List<Long> list_values = new ArrayList<Long>();
+				Set<Integer> keys = move_line_diffs.keySet();
+				for (Integer key : keys) {
+					Long val = move_line_diffs.get(key);
+					list_keys.add(key);
+					list_values.add(val);
+				}
+				for (int i = 0; i < list_keys.size(); i++) {
+					dump += list_keys.get(i) + "=" + list_values.get(i) + "\r\n";
+					//dump += list_values.get(i) + "\r\n";
 				}
 				
-				dump += "!!! WHITE !!!\r\n";
 				
+				dump += "!!! WHITE !!!\r\n";
 				
 				for (int i = 0; i < move_line_distros_w.length; i++) {
 					dump += move_line_distros_w[i] + "\r\n";
@@ -1367,18 +1454,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				System.out.println(dump);
-				System.out.println("WHITE_STATS=" + move_line_scores_w);
-				System.out.println("BLACK_STATS=" + move_line_scores_b);
-				
+				System.out.println("WHITE_STATS		=	" + move_line_scores_w);
+				System.out.println("BLACK_STATS		=	" + move_line_scores_b);
+				System.out.println("DIFF_STATS_ORG		=	" + move_line_scores_diffs_org);
+				System.out.println("DIFF_STATS_SCALED	=	" + move_line_scores_diffs_scaled);
 				
 				System.exit(0);
 			}	
-		}
-		
-		
-		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
-			
-			eval = Math.min(0, eval);
 		}
 		
 		
@@ -1388,7 +1470,14 @@ public class Search_PVS_NWS extends SearchImpl {
 
 	private int inverse_linner(int pv_scores) {
 		
-		return (int) (55 * pv_scores / (double) MoveGenerator.MOVE_SCORE_SCALE);
+		return pv_scores;
+	}
+	
+	
+	private int inverse_linner_normalized(int pv_scores) {
+		
+		return (int) ((pv_scores - move_line_scores_diffs_scaled.getEntropy()) / Math.max(1, move_line_scores_diffs_scaled.getDisperse()));
+		//return (int) (pv_scores - move_line_scores_diffs_scaled.getEntropy());
 	}
 	
 	
@@ -1402,6 +1491,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//https://en.wikipedia.org/wiki/Inverse_Gaussian_distribution
+		//!!! http://hyperphysics.phy-astr.gsu.edu/hbase/Math/gaufcn.html
 		
 		
 		double mean 		= move_line_scores.getEntropy();

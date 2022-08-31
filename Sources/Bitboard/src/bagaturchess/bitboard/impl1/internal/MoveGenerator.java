@@ -42,7 +42,8 @@ public final class MoveGenerator {
 	private final int[] nextToMove 								= new int[EngineConstants.MAX_PLIES * 2];
 	private int currentPly;
 
-	private final IBetaCutoffMoves[][][] COUNTER_MOVES 			= new IBetaCutoffMoves[2][7][64];
+	private final IBetaCutoffMoves[][][] COUNTER_MOVES_LOCAL	= new IBetaCutoffMoves[2][7][64];
+	private final IBetaCutoffMoves[][][] COUNTER_MOVES_GLOBAL	= new IBetaCutoffMoves[2][7][64];
 
 	private final IBetaCutoffMoves[][] KILLER_MOVES 			= new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
 
@@ -56,7 +57,7 @@ public final class MoveGenerator {
 	private final ContinuationHistory[] BF_ContinuationHistory 	= new ContinuationHistory[2];
 	
 	
-	private static final double LMR_DEVIATION_MULTIPLIER 		= 2; //1.25; //1.5; //1.75 //1.5 //0 //1.25 //2.5 //1
+	private static final double LMR_DEVIATION_MULTIPLIER 		= 2; //4; //2; //1.25; //1.5; //1.75 //1.5 //0 //1.25 //2.5 //1
 	private final long[][] LMR_ALL 								= new long[2][64 * 64];
 	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
 	private final long[][] LMR_ABOVE_ALPHA 						= new long[2][64 * 64];
@@ -68,7 +69,7 @@ public final class MoveGenerator {
 	private long randomizer_counter;
 	
 	
-	public MoveGenerator() {
+	public MoveGenerator() {		
 		
 		
 		if (USE_ContinuationHistory) {
@@ -78,6 +79,18 @@ public final class MoveGenerator {
 			
 			BF_ContinuationHistory[WHITE] = new ContinuationHistory();
 			BF_ContinuationHistory[BLACK] = new ContinuationHistory();
+		}
+		
+		
+		for (int i = 0; i < COUNTER_MOVES_GLOBAL.length; i++) {
+			
+			for (int j = 0; j < COUNTER_MOVES_GLOBAL[i].length; j++) {
+				
+				for (int k = 0; k < COUNTER_MOVES_GLOBAL[i][j].length; k++) {
+					
+					COUNTER_MOVES_GLOBAL[i][j][k] = new BetaCutoffMoves_Counts();
+				}
+			}
 		}
 		
 		
@@ -132,7 +145,6 @@ public final class MoveGenerator {
 		Arrays.fill(BF_MOVES1[BLACK][QUEEN], 1);
 		Arrays.fill(BF_MOVES1[BLACK][KING], 1);	
 		
-		
 		Arrays.fill(LMR_ALL[WHITE], 0);
 		Arrays.fill(LMR_ALL[BLACK], 0);
 		Arrays.fill(LMR_BELOW_ALPHA[WHITE], 0);
@@ -153,23 +165,22 @@ public final class MoveGenerator {
 		lmrAboveAlphaAVGScores[WHITE].clear();
 		lmrAboveAlphaAVGScores[BLACK].clear();
 		
-		
-		for (int i = 0; i < COUNTER_MOVES.length; i++) {
-			
-			for (int j = 0; j < COUNTER_MOVES[i].length; j++) {
-				
-				for (int k = 0; k < COUNTER_MOVES[i][j].length; k++) {
-					
-					COUNTER_MOVES[i][j][k] = new BetaCutoffMoves_Counts();
-				}
-			}
-		}
-		
 		for (int i = 0; i < KILLER_MOVES.length; i++) {
 			
 			for (int j = 0; j < KILLER_MOVES[i].length; j++) {
 				
 				KILLER_MOVES[i][j] = new BetaCutoffMoves_LastIn();
+			}
+		}
+		
+		for (int i = 0; i < COUNTER_MOVES_LOCAL.length; i++) {
+			
+			for (int j = 0; j < COUNTER_MOVES_LOCAL[i].length; j++) {
+				
+				for (int k = 0; k < COUNTER_MOVES_LOCAL[i][j].length; k++) {
+					
+					COUNTER_MOVES_LOCAL[i][j][k] = new BetaCutoffMoves_LastIn();
+				}
 			}
 		}
 		
@@ -348,20 +359,21 @@ public final class MoveGenerator {
 		
 		if (EngineConstants.ENABLE_COUNTER_MOVES) {
 			
-			COUNTER_MOVES[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
+			COUNTER_MOVES_LOCAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
+			COUNTER_MOVES_GLOBAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
 		}
 	}
 	
 
 	public int getCounter1(final int color, final int parentMove) {
 		
-		return COUNTER_MOVES[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
+		return COUNTER_MOVES_LOCAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
 	}
 	
 	
 	public int getCounter2(final int color, final int parentMove) {
 		
-		return COUNTER_MOVES[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest2();
+		return COUNTER_MOVES_GLOBAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest2();
 	}
 	
 	
@@ -527,7 +539,7 @@ public final class MoveGenerator {
 		final int left = nextToMove[currentPly];
 		
 		randomizer_counter++;
-		if (true || randomizer_counter % 100 == 0) {
+		if (randomizer_counter % 10 == 0) {
 			randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
 		}
 		
