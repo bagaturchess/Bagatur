@@ -111,7 +111,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long move_line_distros_counter_w 			= 0;
 	private long move_line_distros_counter_b 			= 0;
 	
-	private static final int MOVES_SCALE 				= 20;
+	//TODO: According to the graphics, the negative numbers' distribution looks better, so we may try to use -diff.
+	private static final int MOVES_SCALE 				= 20; // 2 * 20 + 1 = 41 units, not aways well balanced around 0.
 	
 	private static final boolean MOVES_SCALE_DUMP		= false;
 	private int[] move_line_distros_w 					= new int[MOVES_SCALE];
@@ -1374,28 +1375,30 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			/**
 			 * Adjust static evaluation
+			 * 
+			 * TODO: According to the graphics, the negative numbers' distribution looks better, so we may try to use -diff.
 			 */
 			
 			if (white) {
 				
-				moves_score = (int) ((+pv_scores_w -pv_scores_b) / 1d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states);
+				moves_score = (+pv_scores_w -pv_scores_b);
 
 			} else {
 				
-				moves_score = (int) ((+pv_scores_b -pv_scores_w) / 1d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states)
+				moves_score = (+pv_scores_b -pv_scores_w);
 			}
 			
 			moves_score = moves_score / ply;
 			
 			moves_score = Math.min(move_line_distros_b.length - 1, Math.max(-(move_line_distros_b.length - 1), moves_score));
 			
-			move_line_scores_diffs_org.addValue(moves_score);
+			if (MOVES_SCALE_DUMP) move_line_scores_diffs_org.addValue(moves_score);
 			
 			
 			//moves_score = inverse_linner_normalized(moves_score);
 			moves_score = inverse_linner(moves_score);
 			
-			move_line_scores_diffs_scaled.addValue(moves_score);
+			if (MOVES_SCALE_DUMP) move_line_scores_diffs_scaled.addValue(moves_score);
 			
 			
 			
