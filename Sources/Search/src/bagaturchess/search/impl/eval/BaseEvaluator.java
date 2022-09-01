@@ -290,7 +290,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		if (evalConfig != null && !evalConfig.isTrainingMode()) {
 		
-			//white_eval = applyExchangeMotivation(white_eval);
+			white_eval = applyExchangeMotivation(white_eval);
 			
 			//white_eval = applyMaterialCorrectionByPawnsCount(white_eval);
 			

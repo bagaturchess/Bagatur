@@ -1291,11 +1291,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		int eval;
 		
 		/**
-		 * TODO: Use material eval + moves scores to predict eval and then call full eval only if the forecast is out of alpha - TOLERANCE and beta + TOLERANCE bounds.
+		 * TODO: Use material eval + moves_scores to predict eval and then call full eval only if the forecast is out of alpha - TOLERANCE and beta + TOLERANCE bounds.
 		 */
 		eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
 		
-		eval = adjustEval(eval, ply, pv_scores_w, pv_scores_b);
+		eval += adjustEval(ply, pv_scores_w, pv_scores_b);
 		
 		
 		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
@@ -1308,7 +1308,11 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 
 
-	private int adjustEval(int eval, final int ply, int pv_scores_w, int pv_scores_b) {
+	private int adjustEval(final int ply, int pv_scores_w, int pv_scores_b) {
+		
+		
+		int moves_score = 0;
+		
 		
 		if (EngineConstants.USE_MOVE_SCORE_AS_EVAL) {
 			
@@ -1372,8 +1376,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			 * Adjust static evaluation
 			 */
 			
-			int moves_score = 0;
-			
 			if (white) {
 				
 				moves_score = (int) ((+pv_scores_w -pv_scores_b) / 1d); //65d (3 states) //39d (5 states) //28d (7 states) //22d (9 states) //18f (11 states) //15d (13 states);
@@ -1395,8 +1397,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			move_line_scores_diffs_scaled.addValue(moves_score);
 			
-			
-			eval += moves_score;
 			
 			
 			if (MOVES_SCALE_DUMP) {
@@ -1465,7 +1465,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		return eval;
+		return moves_score;
 	}
 
 
