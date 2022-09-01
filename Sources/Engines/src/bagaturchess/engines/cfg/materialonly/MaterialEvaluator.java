@@ -16,31 +16,31 @@ public class MaterialEvaluator extends BaseEvaluator {
 	
 	
 	@Override
-	protected double phase1() {
+	protected int phase1() {
 		return eval_material_nopawnsdrawrule() + interpolator.interpolateByFactor(baseEval.getPST_o(), baseEval.getPST_e());
 	}
 	
 	
 	@Override
-	protected double phase2() {
+	protected int phase2() {
 		return 0;
 	}
 	
 	
 	@Override
-	protected double phase3() {
+	protected int phase3() {
 		return 0;
 	}
 	
 	
 	@Override
-	protected double phase4() {
+	protected int phase4() {
 		return 0;
 	}
 	
 	
 	@Override
-	protected double phase5() {
+	protected int phase5() {
 		return 0;
 	}
 }

@@ -69,7 +69,7 @@ public class FeaturesEvaluator implements IEvaluator {
 	
 	
 	@Override
-	public double fullEval(int depth, int alpha, int beta, int rootColour) {	
+	public int fullEval(int depth, int alpha, int beta, int rootColour) {	
 		
 		signals.clear();
 		
@@ -101,11 +101,11 @@ public class FeaturesEvaluator implements IEvaluator {
 		
 		if (colour == Figures.COLOUR_WHITE) {
 			
-			return eval;
+			return (int) eval;
 			
 		} else {
 			
-			return -eval;
+			return (int) -eval;
 		}
 	}
 	

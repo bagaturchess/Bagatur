@@ -40,5 +40,5 @@ public interface IEvaluator {
 	
 	public int lazyEval(int depth, int alpha, int beta, int rootColour, FullEvalFlag flag);
 	
-	public double fullEval(int depth, int alpha, int beta, int rootColour);
+	public int fullEval(int depth, int alpha, int beta, int rootColour);
 }

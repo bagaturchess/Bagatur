@@ -1810,7 +1810,7 @@ public class BagaturEval_SignalFiller implements BagaturEval_FeaturesConstants, 
 	 * @see bagaturchess.search.api.IEvaluator#fullEval(int, int, int, int)
 	 */
 	@Override
-	public double fullEval(int depth, int alpha, int beta, int rootColour) {
+	public int fullEval(int depth, int alpha, int beta, int rootColour) {
 		throw new UnsupportedOperationException();
 	}
 }

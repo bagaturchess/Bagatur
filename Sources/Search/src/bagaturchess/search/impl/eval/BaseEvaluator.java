@@ -143,15 +143,15 @@ public abstract class BaseEvaluator implements IEvaluator {
 		//Do nothing
 	}
 	
-	protected abstract double phase1();
+	protected abstract int phase1();
 	
-	protected abstract double phase2();
+	protected abstract int phase2();
 	
-	protected abstract double phase3();
+	protected abstract int phase3();
 	
-	protected abstract double phase4();
+	protected abstract int phase4();
 	
-	protected abstract double phase5();
+	protected abstract int phase5();
 	
 	
 	public void beforeSearch() {
@@ -159,13 +159,13 @@ public abstract class BaseEvaluator implements IEvaluator {
 	}
 	
 	
-	public double fullEval(int depth, int alpha, int beta, int rootColour) {
+	public int fullEval(int depth, int alpha, int beta, int rootColour) {
 		
 		return fullEval(depth, alpha, beta, rootColour, true);
 	}
 	
 	
-	protected double fullEval(int depth, int alpha, int beta, int rootColour, boolean useCache) {
+	protected int fullEval(int depth, int alpha, int beta, int rootColour, boolean useCache) {
 		
 		if (evalConfig != null && !evalConfig.isTrainingMode()) {
 			
@@ -270,7 +270,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		phase0_init();
 		
-		double white_eval = 0;
+		int white_eval = 0;
 		
 		if (useDefaultMaterial()) {
 			
@@ -290,7 +290,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		if (evalConfig != null && !evalConfig.isTrainingMode()) {
 		
-			white_eval = applyExchangeMotivation(white_eval);
+			//white_eval = applyExchangeMotivation(white_eval);
 			
 			//white_eval = applyMaterialCorrectionByPawnsCount(white_eval);
 			
@@ -321,7 +321,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 	}
 	
 	
-	protected double returnVal(double white_eval) {
+	protected int returnVal(int white_eval) {
 		
 		if (evalConfig != null && !evalConfig.isTrainingMode()) {
 			
@@ -332,7 +332,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 	}
 
 
-	private double setSign(double white_eval) {
+	private int setSign(int white_eval) {
 		
 		if (bitboard.getColourToMove() == Constants.COLOUR_WHITE) {
 			
@@ -340,17 +340,17 @@ public abstract class BaseEvaluator implements IEvaluator {
 			
 		} else {
 			
-			double black_eval = -white_eval;
+			int black_eval = -white_eval;
 			
 			return black_eval;
 		}
 	}
 	
 	
-	private double drawProbability(double eval) {
+	private int drawProbability(int eval) {
 		
 		
-		double abs = Math.abs(eval);
+		int abs = Math.abs(eval);
 		
 		
 		/**
@@ -385,16 +385,16 @@ public abstract class BaseEvaluator implements IEvaluator {
 		 */
 		int movesBeforeDraw = 100 - bitboard.getDraw50movesRule();
 		
-		double percents = movesBeforeDraw / (double) 100;
+		//int percents = movesBeforeDraw / (double) 100;
 		
-		abs = (int) (percents * abs);
+		abs = (int) (movesBeforeDraw * abs) / 100;
 		
 		
 		return eval >= 0 ? abs : -abs;
 	}
 	
 	
-	private double applyExchangeMotivation(double white_eval) {
+	private int applyExchangeMotivation(int white_eval) {
 		
 		int material_factor_white = Math.min(MAX_MATERIAL_FACTOR, bitboard.getMaterialFactor().getWhiteFactor());
 		

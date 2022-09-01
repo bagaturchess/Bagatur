@@ -39,7 +39,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase1()
 	 */
 	@Override
-	protected double phase1() {
+	protected int phase1() {
 		int eval = evaluator.evaluate1(board, ai);
 		
 		return eval;
@@ -50,7 +50,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase2()
 	 */
 	@Override
-	protected double phase2() {
+	protected int phase2() {
 		int eval = evaluator.evaluate2(board, ai);
 		
 		return eval;
@@ -61,7 +61,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase3()
 	 */
 	@Override
-	protected double phase3() {
+	protected int phase3() {
 		int eval = 0;
 		
 		return eval;
@@ -72,7 +72,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase4()
 	 */
 	@Override
-	protected double phase4() {
+	protected int phase4() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -82,7 +82,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	 * @see bagaturchess.search.impl.eval.BaseEvaluator#phase5()
 	 */
 	@Override
-	protected double phase5() {
+	protected int phase5() {
 		// TODO Auto-generated method stub
 		return 0;
 	}

@@ -38,7 +38,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	
 	@Override
-	protected double phase1() {
+	protected int phase1() {
 		
 		NeuralNetworkUtils.clearInputsArray(inputs);
 		filler.fillSignals(inputs, 0);
@@ -46,12 +46,12 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 		NeuralNetworkUtils.calculate(network);
 		double actualWhitePlayerEval = NeuralNetworkUtils.getOutput(network);
 
-		return actualWhitePlayerEval;
+		return (int) actualWhitePlayerEval;
 	}
 	
 	
 	@Override
-	protected double phase2() {
+	protected int phase2() {
 
 		int eval = 0;
 		
@@ -60,7 +60,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	
 	@Override
-	protected double phase3() {
+	protected int phase3() {
 		
 		int eval = 0;
 				
@@ -69,7 +69,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	
 	@Override
-	protected double phase4() {
+	protected int phase4() {
 		
 		int eval = 0;
 		
@@ -78,7 +78,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	
 	@Override
-	protected double phase5() {
+	protected int phase5() {
 		
 		int eval = 0;
 		

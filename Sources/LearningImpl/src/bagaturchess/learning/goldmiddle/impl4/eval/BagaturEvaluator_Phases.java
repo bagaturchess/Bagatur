@@ -44,9 +44,9 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	
 	
 	@Override
-	public double fullEval(int depth, int alpha, int beta, int rootColour) {
+	public int fullEval(int depth, int alpha, int beta, int rootColour) {
 		
-		double eval = super.fullEval(depth, alpha, beta, rootColour);
+		int eval = super.fullEval(depth, alpha, beta, rootColour);
 		
 		/*
 		//countOnes++;
@@ -77,35 +77,35 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	
 	
 	@Override
-	protected double phase1() {
+	protected int phase1() {
 		
 		return Evaluator.eval1(!useDefaultMaterial(), bitboard.getBoardConfig(), board, evalinfo, evalComponentsProcessor);
 	}
 	
 	
 	@Override
-	protected double phase2() {
+	protected int phase2() {
 		
 		return Evaluator.eval2(board, evalinfo, evalComponentsProcessor);
 	}
 	
 	
 	@Override
-	protected double phase3() {
+	protected int phase3() {
 		
 		return Evaluator.eval3(board, evalinfo, evalComponentsProcessor);
 	}
 	
 	
 	@Override
-	protected double phase4() {
+	protected int phase4() {
 		
 		return Evaluator.eval4(board, evalinfo, evalComponentsProcessor);
 	}
 	
 	
 	@Override
-	protected double phase5() {
+	protected int phase5() {
 		
 		return Evaluator.eval5(board, evalinfo, evalComponentsProcessor);
 	}

@@ -34,18 +34,18 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
     
     
 	@Override
-	protected double phase1() {
+	protected int phase1() {
 		
 		double eval = 0;
 		
 		eval += eval_material_nopawnsdrawrule();
         
-        return eval;
+        return (int) eval;
 	}
 	
 	
     @Override
-    protected double phase2() {
+    protected int phase2() {
         
         double eval = 0;
         
@@ -53,35 +53,35 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
         //as well as in endgames the pawns evaluation affects more the final evaluation than the evaluation of eval_standard and eval_pieces
         eval += eval_pawns();
         
-        return eval;
+        return (int) eval;
     }
     
     
     @Override
-    protected double phase3() {
+    protected int phase3() {
     	
         double eval = 0;
         
         eval += eval_standard();
         eval += eval_pieces();
         
-        return eval;
+        return (int) eval;
     }
     
     
     @Override
-    protected double phase4() {
+    protected int phase4() {
     	
         double eval = 0;
         
         eval += mobilityKingSafetyPinsAttacks();
         
-        return eval;
+        return (int) eval;
     }
     
     
     @Override
-    protected double phase5() {
+    protected int phase5() {
     	
         double eval = 0;
         
@@ -91,7 +91,7 @@ public class WeightsEvaluator extends BaseEvaluator implements Weights {
         //That is why currently the method is not called
         //eval += safeMobilityTrapsHanging();
         
-        return eval;
+        return (int) eval;
     }
 
 

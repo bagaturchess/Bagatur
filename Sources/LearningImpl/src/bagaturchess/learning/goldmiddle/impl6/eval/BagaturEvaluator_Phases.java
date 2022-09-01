@@ -53,7 +53,7 @@ public class BagaturEvaluator_Phases implements IEvaluator {
 
 
 	@Override
-	public double fullEval(int depth, int alpha, int beta, int rootColour) {
+	public int fullEval(int depth, int alpha, int beta, int rootColour) {
 		return combineEvals(evaluator1.fullEval(depth, alpha, beta, rootColour), evaluator2.fullEval(depth, alpha, beta, rootColour));
 	}
 }
