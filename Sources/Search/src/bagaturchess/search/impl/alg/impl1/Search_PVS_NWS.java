@@ -1293,9 +1293,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		/**
 		 * TODO: Use material eval + moves_scores to predict eval and then call full eval only if the forecast is out of alpha - TOLERANCE and beta + TOLERANCE bounds.
 		 */
-		eval = (int) evaluator.fullEval(ply, alpha, beta, 0);
+		eval = evaluator.fullEval(ply, alpha, beta, 0);
 		
-		eval += adjustEval(ply, pv_scores_w, pv_scores_b);
+		eval += adjustEval_ByMovesScores(ply, pv_scores_w, pv_scores_b);
 		
 		
 		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
@@ -1308,7 +1308,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 
 
-	private int adjustEval(final int ply, int pv_scores_w, int pv_scores_b) {
+	private int adjustEval_ByMovesScores(final int ply, int pv_scores_w, int pv_scores_b) {
 		
 		
 		int moves_score = 0;
