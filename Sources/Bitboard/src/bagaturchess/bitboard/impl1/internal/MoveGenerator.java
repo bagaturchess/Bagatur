@@ -56,8 +56,8 @@ public final class MoveGenerator {
 	private final ContinuationHistory[] HH_ContinuationHistory 	= new ContinuationHistory[2];
 	private final ContinuationHistory[] BF_ContinuationHistory 	= new ContinuationHistory[2];
 	
-	
-	private static final double LMR_DEVIATION_MULTIPLIER 		= 2; //4; //2; //1.25; //1.5; //1.75 //1.5 //0 //1.25 //2.5 //1
+	//LMR_DEVIATION_MULTIPLIER must be between 0 and 2. Values more than 2 actually means that the LMR optimization is always performed. Value 0 means that it is executed in around 50% of the cases.
+	private static final double LMR_DEVIATION_MULTIPLIER 		= 1.5; //1d; //1.5; //2; //1.25; //1.5; //1.75 //1.5 //0 //1.25 //2.5 //1 //4
 	private final long[][] LMR_ALL 								= new long[2][64 * 64];
 	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
 	private final long[][] LMR_ABOVE_ALPHA 						= new long[2][64 * 64];
@@ -228,11 +228,25 @@ public final class MoveGenerator {
 	
 	public void addLMR_All(final int color, final int move, final int depth) {
 		
+		
+		if (!EngineConstants.ENABLE_LMR_STATS) {
+			
+			return;
+		}
+		
+		
 		LMR_ALL[color][MoveUtil.getFromToIndex(move)] += depth * depth;
 	}
 	
 	
 	public void addLMR_AboveAlpha(final int color, final int move, final int depth) {
+		
+		
+		if (!EngineConstants.ENABLE_LMR_STATS) {
+			
+			return;
+		}
+		
 		
 		int fromToIndex = MoveUtil.getFromToIndex(move);
 		
@@ -262,6 +276,13 @@ public final class MoveGenerator {
 	
 	
 	public void addLMR_BelowAlpha(final int color, final int move, final int depth) {
+		
+		
+		if (!EngineConstants.ENABLE_LMR_STATS) {
+			
+			return;
+		}
+		
 		
 		int fromToIndex = MoveUtil.getFromToIndex(move);
 		
@@ -293,6 +314,13 @@ public final class MoveGenerator {
 	
 	public int getLMR_Rate(final int color, final int move) {
 		
+		
+		if (!EngineConstants.ENABLE_LMR_STATS) {
+			
+			return 0;
+		}
+		
+		
 		int fromToIndex = MoveUtil.getFromToIndex(move);
 		
 		if (LMR_ALL[color][fromToIndex] == 0) {
@@ -306,13 +334,35 @@ public final class MoveGenerator {
 	
 	private int getLMR_Rate_internal(final int color, final int fromToIndex) {
 		
+		
+		if (!EngineConstants.ENABLE_LMR_STATS) {
+			
+			return 0;
+		}
+		
+		
+		long count_all = LMR_ALL[color][fromToIndex];
+		
+		if (count_all == 0) {
+			
+			return 0;
+		}
+		
+		
 		//return (int) (LMR_STAT_MULTIPLIER * (LMR_ABOVE_ALPHA[color][fromToIndex]) / LMR_ALL[color][fromToIndex]);
 		
-		return (int) (LMR_STAT_MULTIPLIER * (LMR_ALL[color][fromToIndex] - LMR_BELOW_ALPHA[color][fromToIndex]) / LMR_ALL[color][fromToIndex]);
+		return (int) (LMR_STAT_MULTIPLIER * (count_all - LMR_BELOW_ALPHA[color][fromToIndex]) / count_all);
 	}
 	
 	
 	public int getLMR_ThreasholdPointer_AboveAlpha(int color) {
+		
+		
+		if (!EngineConstants.ENABLE_LMR_STATS) {
+			
+			return 0;
+		}
+		
 		
 		if (BUILD_EXACT_STATS) {
 			
@@ -330,6 +380,11 @@ public final class MoveGenerator {
 	
 	
 	public int getLMR_ThreasholdPointer_BelowAlpha(int color) {
+		
+		if (!EngineConstants.ENABLE_LMR_STATS) {
+			
+			return 0;
+		}
 		
 		if (BUILD_EXACT_STATS) {
 			
@@ -493,6 +548,20 @@ public final class MoveGenerator {
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
 			
 			moveScores[j] = getHHScore(colorToMove, MoveUtil.getFromToIndex(moves[j]), MoveUtil.getSourcePieceIndex(moves[j]), MoveUtil.getToIndex(moves[j]), parentMove);
+			
+			if (moveScores[j] < 0) {
+				
+				throw new IllegalStateException();
+			}
+		}
+	}
+	
+	
+	public void setMovesScores(int colorToMove) {
+		
+		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
+			
+			moveScores[j] = getLMR_Rate_internal(colorToMove, MoveUtil.getFromToIndex(moves[j]));
 			
 			if (moveScores[j] < 0) {
 				

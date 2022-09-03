@@ -715,7 +715,19 @@ public class Search_PVS_NWS extends SearchImpl {
 			case PHASE_QUIET:
 				
 				moveGen.generateMoves(cb);
-				moveGen.setHHScores(cb.colorToMove, parentMove);
+				
+				
+				/**
+				 * The moves_scores are the sum of scores of each move of side to move.
+				 * Each particular move's score is calculated by the ration between the beta cutoffs occurrences after this move divided by the number of all occurrences of the move.
+				 * The cutoffs statistics are measured only by moves performed by LMR at shallow depths.
+				 * If we base the move ordering on the moves_scores, we actually are increasing the probability of cutoffs in the whole search tree on an optimal depth.
+				 * This approach should be kind of dynamic optimization.
+				 */
+				moveGen.setMovesScores(cb.colorToMove);
+				//moveGen.setHHScores(cb.colorToMove, parentMove);
+				
+				
 				moveGen.sort();
 				
 				break;
@@ -780,7 +792,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (!isPv && !wasInCheck && movesPerformed_attacks + movesPerformed_quiet > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
 					
 					if (phase == PHASE_QUIET
-							&& moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove)
+							&& (!EngineConstants.ENABLE_LMP_STATS_DECISION
+									|| (EngineConstants.ENABLE_LMP_STATS_DECISION && moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove)))
 						) {
 						
 						if (EngineConstants.ENABLE_LMP
@@ -793,8 +806,9 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (!SearchUtils.isMateVal(alpha)) {
 							
 							if (eval == ISearch.MIN) {
+								
 								//eval = eval(evaluator, ply, alphaOrig, beta, isPv);
-								throw new IllegalStateException();
+								throw new IllegalStateException("eval == ISearch.MIN");
 							}
 							
 							if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
@@ -817,12 +831,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				int new_pv_scores_w = (int) (cb.colorToMove == Constants.COLOUR_WHITE ? pv_scores_w + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_w);
+				int new_pv_scores_b = (int) (cb.colorToMove == Constants.COLOUR_BLACK ? pv_scores_b + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_b);
+				
 				env.getBitboard().makeMoveForward(move);
-				
-				
-				int new_pv_scores_w = (int) (cb.colorToMoveInverse == Constants.COLOUR_WHITE ? pv_scores_w + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_w);
-				int new_pv_scores_b = (int) (cb.colorToMoveInverse == Constants.COLOUR_BLACK ? pv_scores_b + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_b);
-				
+								
 				
 				if (MoveUtil.isQuiet(move)) {
 					movesPerformed_quiet++;
@@ -859,8 +872,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int reduction = 1;
 				if (doLMR
-						&& (!EngineConstants.ENABLE_LMR_STATS
-								|| EngineConstants.ENABLE_LMR_STATS && (Math.random() <= 0.10 || moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse)))
+						&& (!EngineConstants.ENABLE_LMR_STATS_DECISION
+								|| EngineConstants.ENABLE_LMR_STATS_DECISION && (Math.random() <= 0.10 || moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse)))
 						) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
@@ -1296,7 +1309,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		 */
 		eval = evaluator.fullEval(ply, alpha, beta, 0);
 		
-		eval += adjustEval_ByMovesScores(ply, pv_scores_w, pv_scores_b);
+		eval += getMovesScores(ply, pv_scores_w, pv_scores_b);
 		
 		
 		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
@@ -1309,7 +1322,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 
 
-	private int adjustEval_ByMovesScores(final int ply, int pv_scores_w, int pv_scores_b) {
+	private int getMovesScores(final int ply, int pv_scores_w, int pv_scores_b) {
 		
 		
 		int moves_score = 0;
