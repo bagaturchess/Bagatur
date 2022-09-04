@@ -582,7 +582,7 @@ public final class MoveGenerator {
 			
 			moveScores[j] = getLMR_Rate_internal(colorToMove, from_to_index);
 			
-			//moveScores[j] += getHHScore(colorToMove, from_to_index, MoveUtil.getSourcePieceIndex(move), MoveUtil.getToIndex(move), parentMove);
+			moveScores[j] += getHHScore(colorToMove, from_to_index, MoveUtil.getSourcePieceIndex(move), MoveUtil.getToIndex(move), parentMove);
 			
 			if (moveScores[j] < 0) {
 				
