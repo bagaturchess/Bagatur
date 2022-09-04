@@ -20,14 +20,21 @@ import bagaturchess.bitboard.impl.utils.VarStatistic;
 public final class MoveGenerator {
 	
 	
-	public static boolean USE_ContinuationHistory 				= true;
-	
 	public static final int MOVE_SCORE_SCALE 					= 100;
+	
+	
+	private static final int LMR_STAT_MULTIPLIER 				= 10 * MOVE_SCORE_SCALE;
+	//LMR_DEVIATION_MULTIPLIER must be between 0 and 2. Values more than 2 actually means that the LMR optimization is always performed. Value 0 means that it is executed in around 50% of the cases.
+	private static final double LMR_DEVIATION_MULTIPLIER 		= 1.5; //1d; //1.5; //2; //1.25; //1.5; //1.75 //1.5 //0 //1.25 //2.5 //1 //4
+	private final long[][] LMR_ALL 								= new long[2][64 * 64];
+	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
+	private final long[][] LMR_ABOVE_ALPHA 						= new long[2][64 * 64];
+	private VarStatistic[] lmrBelowAlphaAVGScores 				= new VarStatistic[2];
+	private VarStatistic[] lmrAboveAlphaAVGScores 				= new VarStatistic[2];
 	
 	private static final boolean BUILD_EXACT_STATS 				= false;
 	private static final double LMR_RATE_THREASHOLD_ABOVE_ALPHA = 0.95; //Top X%
 	private static final double LMR_RATE_THREASHOLD_BELOW_ALPHA = 0.0001; //Top Y%
-	private static final int LMR_STAT_MULTIPLIER 				= 1000;
 	private static final long[][] LMR_STATS_COUNTER_ABOVE_ALPHA = new long[2][LMR_STAT_MULTIPLIER + 1];
 	private static final long[][] LMR_STATS_COUNTER_BELOW_ALPHA = new long[2][LMR_STAT_MULTIPLIER + 1];
 	private static int[] lmr_rate_all_above_alpha 				= new int[2];
@@ -41,7 +48,8 @@ public final class MoveGenerator {
 	private final int[] nextToGenerate 							= new int[EngineConstants.MAX_PLIES * 2];
 	private final int[] nextToMove 								= new int[EngineConstants.MAX_PLIES * 2];
 	private int currentPly;
-
+	
+	
 	private final IBetaCutoffMoves[][][] COUNTER_MOVES_LOCAL	= new IBetaCutoffMoves[2][7][64];
 	private final IBetaCutoffMoves[][][] COUNTER_MOVES_GLOBAL	= new IBetaCutoffMoves[2][7][64];
 
@@ -53,16 +61,10 @@ public final class MoveGenerator {
 	private final long[][][] HH_MOVES1 							= new long[2][7][64];
 	private final long[][][] BF_MOVES1 							= new long[2][7][64];
 	
+	public static boolean USE_ContinuationHistory 				= true;
+	
 	private final ContinuationHistory[] HH_ContinuationHistory 	= new ContinuationHistory[2];
 	private final ContinuationHistory[] BF_ContinuationHistory 	= new ContinuationHistory[2];
-	
-	//LMR_DEVIATION_MULTIPLIER must be between 0 and 2. Values more than 2 actually means that the LMR optimization is always performed. Value 0 means that it is executed in around 50% of the cases.
-	private static final double LMR_DEVIATION_MULTIPLIER 		= 1.5; //1d; //1.5; //2; //1.25; //1.5; //1.75 //1.5 //0 //1.25 //2.5 //1 //4
-	private final long[][] LMR_ALL 								= new long[2][64 * 64];
-	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
-	private final long[][] LMR_ABOVE_ALPHA 						= new long[2][64 * 64];
-	private VarStatistic[] lmrBelowAlphaAVGScores 				= new VarStatistic[2];
-	private VarStatistic[] lmrAboveAlphaAVGScores 				= new VarStatistic[2];
 	
 	
 	private Random randomizer = new Random();
@@ -94,11 +96,11 @@ public final class MoveGenerator {
 		}
 		
 		
-		lmrBelowAlphaAVGScores[0] = new VarStatistic();
-		lmrBelowAlphaAVGScores[1] = new VarStatistic();
+		lmrBelowAlphaAVGScores[WHITE] = new VarStatistic();
+		lmrBelowAlphaAVGScores[BLACK] = new VarStatistic();
 		
-		lmrAboveAlphaAVGScores[0] = new VarStatistic();
-		lmrAboveAlphaAVGScores[1] = new VarStatistic();
+		lmrAboveAlphaAVGScores[WHITE] = new VarStatistic();
+		lmrAboveAlphaAVGScores[BLACK] = new VarStatistic();
 		
 		
 		clearHistoryHeuristics();
@@ -252,9 +254,18 @@ public final class MoveGenerator {
 		
 		LMR_ABOVE_ALPHA[color][fromToIndex] += depth * depth;
 		
-		int rate = getLMR_Rate_internal(color, fromToIndex);
+		
+		if (EngineConstants.ENABLE_LMR_STATS_DECISION || EngineConstants.ENABLE_LMP_STATS_DECISION) {
+			
+			int rate = getLMR_Rate_internal(color, fromToIndex);
+			
+			lmrAboveAlphaAVGScores[color].addValue(rate);
+		}
+		
 		
 		if (BUILD_EXACT_STATS) {
+			
+			int rate = getLMR_Rate_internal(color, fromToIndex);
 			
 			//System.out.println("addLMR_AboveAlpha: COLOR " + color + ", LMR_RATE_THREASHOLD_ABOVE_ALPHA=" + LMR_RATE_THREASHOLD_ABOVE_ALPHA + " POINTER=" + getLMR_ThreasholdPointer_AboveAlpha(color));
 			
@@ -270,8 +281,6 @@ public final class MoveGenerator {
 			
 			lmr_rate_pointer_above_alpha[color] = pointer;
 		}
-		
-		lmrAboveAlphaAVGScores[color].addValue(rate);
 	}
 	
 	
@@ -287,10 +296,19 @@ public final class MoveGenerator {
 		int fromToIndex = MoveUtil.getFromToIndex(move);
 		
 		LMR_BELOW_ALPHA[color][fromToIndex] += depth * depth;
-
-		int rate = getLMR_Rate_internal(color, fromToIndex);
+		
+		
+		if (EngineConstants.ENABLE_LMR_STATS_DECISION || EngineConstants.ENABLE_LMP_STATS_DECISION) {
+			
+			int rate = getLMR_Rate_internal(color, fromToIndex);
+			
+			lmrBelowAlphaAVGScores[color].addValue(rate);
+		}
+		
 		
 		if (BUILD_EXACT_STATS) {
+			
+			int rate = getLMR_Rate_internal(color, fromToIndex);
 			
 			//System.out.println("addLMR_BelowAlpha: COLOR " + color + ", LMR_RATE_THREASHOLD_BELOW_ALPHA=" + LMR_RATE_THREASHOLD_BELOW_ALPHA + " POINTER=" + getLMR_ThreasholdPointer_BelowAlpha(color));
 			
@@ -306,29 +324,12 @@ public final class MoveGenerator {
 			
 			lmr_rate_pointer_below_alpha[color] = pointer;
 		}
-		
-		
-		lmrBelowAlphaAVGScores[color].addValue(rate);
 	}
 	
 	
-	public int getLMR_Rate(final int color, final int move) {
+	public int getLMR_Rate(final int color, final int move) {		
 		
-		
-		if (!EngineConstants.ENABLE_LMR_STATS) {
-			
-			return 0;
-		}
-		
-		
-		int fromToIndex = MoveUtil.getFromToIndex(move);
-		
-		if (LMR_ALL[color][fromToIndex] == 0) {
-			
-			return 0;
-		}
-		
-		return getLMR_Rate_internal(color, fromToIndex);
+		return getLMR_Rate_internal(color, MoveUtil.getFromToIndex(move));
 	}
 	
 	
@@ -345,13 +346,13 @@ public final class MoveGenerator {
 		
 		if (count_all == 0) {
 			
-			return 0;
+			return 1 * LMR_STAT_MULTIPLIER; //Force search to explorer all moves at least once as fast as possible
 		}
 		
 		
 		//return (int) (LMR_STAT_MULTIPLIER * (LMR_ABOVE_ALPHA[color][fromToIndex]) / LMR_ALL[color][fromToIndex]);
 		
-		return (int) (LMR_STAT_MULTIPLIER * (count_all - LMR_BELOW_ALPHA[color][fromToIndex]) / count_all);
+		return (int) ((LMR_STAT_MULTIPLIER * (count_all - LMR_BELOW_ALPHA[color][fromToIndex])) / count_all);
 	}
 	
 	
@@ -370,11 +371,18 @@ public final class MoveGenerator {
 			
 		} else {
 		
-			int pointer_above_alpha = (int) (lmrAboveAlphaAVGScores[color].getEntropy() + LMR_DEVIATION_MULTIPLIER * lmrAboveAlphaAVGScores[color].getDisperse());
-	
-			//System.out.println("AboveAlpha: color=" + color + ", Entropy=" + lmrAboveAlphaAVGScores[color].getEntropy() + ", Disperse=" + lmrAboveAlphaAVGScores[color].getDisperse());
-			
-			return pointer_above_alpha;
+			if (EngineConstants.ENABLE_LMR_STATS_DECISION || EngineConstants.ENABLE_LMP_STATS_DECISION) {
+					
+				int pointer_above_alpha = (int) (lmrAboveAlphaAVGScores[color].getEntropy() + LMR_DEVIATION_MULTIPLIER * lmrAboveAlphaAVGScores[color].getDisperse());
+		
+				//System.out.println("AboveAlpha: color=" + color + ", Entropy=" + lmrAboveAlphaAVGScores[color].getEntropy() + ", Disperse=" + lmrAboveAlphaAVGScores[color].getDisperse());
+				
+				return pointer_above_alpha;
+				
+			} else {
+				
+				return 0;
+			}
 		}
 	}
 	
@@ -392,11 +400,18 @@ public final class MoveGenerator {
 			
 		} else {
 		
-			int pointer_below_alpha = (int) (lmrBelowAlphaAVGScores[color].getEntropy() + LMR_DEVIATION_MULTIPLIER * lmrBelowAlphaAVGScores[color].getDisperse());
+			if (EngineConstants.ENABLE_LMR_STATS_DECISION || EngineConstants.ENABLE_LMP_STATS_DECISION) {
 			
-			//System.out.println("BelowAlpha: color=" + color + ", Entropy=" + lmrBelowAlphaAVGScores[color].getEntropy() + ", Disperse=" + lmrBelowAlphaAVGScores[color].getDisperse());
-			
-			return pointer_below_alpha;
+				int pointer_below_alpha = (int) (lmrBelowAlphaAVGScores[color].getEntropy() + LMR_DEVIATION_MULTIPLIER * lmrBelowAlphaAVGScores[color].getDisperse());
+				
+				//System.out.println("BelowAlpha: color=" + color + ", Entropy=" + lmrBelowAlphaAVGScores[color].getEntropy() + ", Disperse=" + lmrBelowAlphaAVGScores[color].getDisperse());
+				
+				return pointer_below_alpha;
+				
+			} else {
+				
+				return 0;
+			}
 		}
 	}
 	
@@ -557,11 +572,17 @@ public final class MoveGenerator {
 	}
 	
 	
-	public void setMovesScores(int colorToMove) {
+	public void setMovesScores(int colorToMove, final int parentMove) {
 		
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
 			
-			moveScores[j] = getLMR_Rate_internal(colorToMove, MoveUtil.getFromToIndex(moves[j]));
+			int move = moves[j];
+			
+			int from_to_index = MoveUtil.getFromToIndex(move);
+			
+			moveScores[j] = getLMR_Rate_internal(colorToMove, from_to_index);
+			
+			//moveScores[j] += getHHScore(colorToMove, from_to_index, MoveUtil.getSourcePieceIndex(move), MoveUtil.getToIndex(move), parentMove);
 			
 			if (moveScores[j] < 0) {
 				
@@ -654,6 +675,13 @@ public final class MoveGenerator {
 		}
 		return sb.toString();
 	}
+	*/
+	
+	
+	
+	
+	/**
+	 * Moves generation
 	 */
 	
 	

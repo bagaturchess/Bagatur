@@ -71,8 +71,9 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_KILLER_2 					= 3;
 	private static final int PHASE_COUNTER_1 					= 4;
 	private static final int PHASE_COUNTER_2 					= 5;
-	private static final int PHASE_ATTACKING_BAD 				= 6;
-	private static final int PHASE_QUIET 						= 7;
+	private static final int PHASE_QUIET 						= 6;
+	private static final int PHASE_ATTACKING_BAD 				= 7;
+	
 	
 	private static final int[] STATIC_NULLMOVE_MARGIN 			= { 0, 60, 130, 210, 300, 400, 510 };
 	private static final int[] RAZORING_MARGIN 					= { 0, 240, 280, 300 };
@@ -632,7 +633,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		moveGen.startPly();
 		int phase = PHASE_TT;
-		while (phase <= PHASE_QUIET) {
+		while (phase <= PHASE_ATTACKING_BAD) {
 			
 			switch (phase) {
 			
@@ -655,39 +656,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				break;
 				
-			case PHASE_COUNTER_1:
-				
-				counterMove1 = moveGen.getCounter1(cb.colorToMove, parentMove);
-				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
-					moveGen.addMove(counterMove1);
-					moveGen.setHHScores(cb.colorToMove, parentMove);
-				} else {
-					phase++;
-				}
-				
-				break;
-				
-			case PHASE_COUNTER_2:
-				
-				counterMove2 = moveGen.getCounter2(cb.colorToMove, parentMove);
-				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
-					moveGen.addMove(counterMove2);
-					moveGen.setHHScores(cb.colorToMove, parentMove);
-				} else {
-					phase++;
-					
-				}
-				
-				break;
-				
 			case PHASE_KILLER_1:
 				
 				killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
 				if (killer1Move != 0 && killer1Move != ttMove && killer1Move != counterMove1 && killer1Move != counterMove2 && cb.isValidMove(killer1Move)) {
 					moveGen.addMove(killer1Move);
 					moveGen.setHHScores(cb.colorToMove, parentMove);
-				} else {
-					phase++;
 				}
 				
 				break;
@@ -698,19 +672,30 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (killer2Move != 0 && killer2Move != killer1Move && killer2Move != ttMove && killer2Move != counterMove1 && killer2Move != counterMove2 && cb.isValidMove(killer2Move)) {
 					moveGen.addMove(killer2Move);
 					moveGen.setHHScores(cb.colorToMove, parentMove);
-				} else {
-					phase++;
+				}
+				
+				break;
+			
+			case PHASE_COUNTER_1:
+				
+				counterMove1 = moveGen.getCounter1(cb.colorToMove, parentMove);
+				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
+					moveGen.addMove(counterMove1);
+					moveGen.setHHScores(cb.colorToMove, parentMove);
 				}
 				
 				break;
 				
-			case PHASE_ATTACKING_BAD:
+			/*case PHASE_COUNTER_2:
 				
-				moveGen.generateAttacks(cb);
-				moveGen.setMVVLVAScores(cb);
-				moveGen.sort();
+				counterMove2 = moveGen.getCounter2(cb.colorToMove, parentMove);
+				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
+					moveGen.addMove(counterMove2);
+					moveGen.setHHScores(cb.colorToMove, parentMove);
+				}
 				
 				break;
+			*/
 				
 			case PHASE_QUIET:
 				
@@ -724,13 +709,22 @@ public class Search_PVS_NWS extends SearchImpl {
 				 * If we base the move ordering on the moves_scores, we actually are increasing the probability of cutoffs in the whole search tree on an optimal depth.
 				 * This approach should be kind of dynamic optimization.
 				 */
-				moveGen.setMovesScores(cb.colorToMove);
+				moveGen.setMovesScores(cb.colorToMove, parentMove);
 				//moveGen.setHHScores(cb.colorToMove, parentMove);
 				
 				
 				moveGen.sort();
 				
 				break;
+			
+			case PHASE_ATTACKING_BAD:
+				
+				moveGen.generateAttacks(cb);
+				moveGen.setMVVLVAScores(cb);
+				moveGen.sort();
+				
+				break;
+				
 			}
 			
 			
@@ -799,6 +793,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (EngineConstants.ENABLE_LMP
 								&& depth <= 7
 								&& movesPerformed_attacks + movesPerformed_quiet >= depth * 3 + 3
+								&& !SearchUtils.isMateVal(alpha)
 							) {
 							continue;
 						}
@@ -807,13 +802,13 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (eval == ISearch.MIN) {
 								
-								//eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 								throw new IllegalStateException("eval == ISearch.MIN");
 							}
 							
-							if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
+							/*if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
 								continue;
 							}
+							*/
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
 								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
@@ -831,8 +826,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				int new_pv_scores_w = (int) (cb.colorToMove == Constants.COLOUR_WHITE ? pv_scores_w + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_w);
-				int new_pv_scores_b = (int) (cb.colorToMove == Constants.COLOUR_BLACK ? pv_scores_b + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_b);
+				int new_pv_scores_w = 0; //moveGen.getScore(); //(int) (cb.colorToMove == Constants.COLOUR_WHITE ? pv_scores_w + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_w);
+				int new_pv_scores_b = 0; //moveGen.getScore(); //(int) (cb.colorToMove == Constants.COLOUR_BLACK ? pv_scores_b + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_b);
 				
 				env.getBitboard().makeMoveForward(move);
 								
@@ -1151,7 +1146,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		moveGen.startPly();
 		
 		int phase = PHASE_TT;
-		while (phase <= PHASE_QUIET) {
+		while (phase <= PHASE_ATTACKING_GOOD) {
 			switch (phase) {
 				case PHASE_TT:
 					if (ttMove != 0 && cb.isValidMove(ttMove)) {
