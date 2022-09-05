@@ -733,6 +733,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				final int move = moveGen.next();
 
 				if (!cb.isLegal(move)) {
+					
 					continue;
 				}
 				
@@ -1027,7 +1028,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int alpha, final int beta, final int ply, final boolean isPv, int pv_scores_w, int pv_scores_b) {
 		
 		if (cb.checkingPieces != 0) {
-			//return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, pv_scores, 0);
+			//return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, pv_scores_w, pv_scores_b, 0);
 			return alpha;
 		}
 		
@@ -1139,43 +1140,42 @@ public class Search_PVS_NWS extends SearchImpl {
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
 		
-		int parentMove = moveGen.previous();
-		
-		int countNotAttacking = 0;
-		
 		moveGen.startPly();
 		
 		int phase = PHASE_TT;
+		
 		while (phase <= PHASE_ATTACKING_GOOD) {
+			
 			switch (phase) {
+			
 				case PHASE_TT:
-					if (ttMove != 0 && cb.isValidMove(ttMove)) {
+					
+					if (ttMove != 0 && env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove) && cb.isValidMove(ttMove)) {
 						moveGen.addMove(ttMove);
 					}
+					
 					break;
+					
 				case PHASE_ATTACKING_GOOD:
+					
 					moveGen.generateAttacks(cb);
 					moveGen.setMVVLVAScores(cb);
 					moveGen.sort();
+					
 					break;
-				/*case PHASE_QUIET:
-					if (eval + FUTILITY_MARGIN_Q_SEARCH_QUIET >= alpha) {
-						moveGen.generateMoves(cb);
-						moveGen.setHHScores(cb.colorToMove, parentMove);
-						moveGen.sort();
-					}
-					break;*/
 			}
+			
 			
 			while (moveGen.hasNext()) {
 				
 				final int move = moveGen.next();
 				
 				if (!cb.isLegal(move)) {
+					
 					continue;
 				}
 				
-				if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_QUIET) {
+				if (phase == PHASE_ATTACKING_GOOD) {
 					if (move == ttMove) {
 						continue;
 					}

@@ -24,8 +24,9 @@ public final class MoveGenerator {
 	
 	
 	private static final int LMR_STAT_MULTIPLIER 				= 10 * MOVE_SCORE_SCALE;
+	
 	//LMR_DEVIATION_MULTIPLIER must be between 0 and 2. Values more than 2 actually means that the LMR optimization is always performed. Value 0 means that it is executed in around 50% of the cases.
-	private static final double LMR_DEVIATION_MULTIPLIER 		= 1.5; //1d; //1.5; //2; //1.25; //1.5; //1.75 //1.5 //0 //1.25 //2.5 //1 //4
+	private static final double LMR_DEVIATION_MULTIPLIER 		= 2; //1d; //1.5; //2; //1.25; //1.5; //1.75 //1.5 //0 //1.25 //2.5 //1 //4
 	private final long[][] LMR_ALL 								= new long[2][64 * 64];
 	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
 	private final long[][] LMR_ABOVE_ALPHA 						= new long[2][64 * 64];
