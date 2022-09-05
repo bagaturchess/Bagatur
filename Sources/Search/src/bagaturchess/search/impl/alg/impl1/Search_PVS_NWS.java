@@ -731,7 +731,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			while (moveGen.hasNext()) {
 				
 				final int move = moveGen.next();
-
+				
 				if (!cb.isLegal(move)) {
 					
 					continue;
@@ -1150,7 +1150,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 				case PHASE_TT:
 					
-					if (ttMove != 0 && env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove) && cb.isValidMove(ttMove)) {
+					if (ttMove != 0 && cb.isValidMove(ttMove)) {
 						moveGen.addMove(ttMove);
 					}
 					
