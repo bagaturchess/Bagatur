@@ -50,12 +50,12 @@ public final class MoveGenerator {
 	private final int[] nextToMove 								= new int[EngineConstants.MAX_PLIES * 2];
 	private int currentPly;
 	
-	
-	private final IBetaCutoffMoves[][][] COUNTER_MOVES_LOCAL	= new IBetaCutoffMoves[2][7][64];
-	private final IBetaCutoffMoves[][][] COUNTER_MOVES_GLOBAL	= new IBetaCutoffMoves[2][7][64];
 
+	private static final boolean CLEAR_TABLES_ON_NEW_SEARCH 	= false;
 	private final IBetaCutoffMoves[][] KILLER_MOVES 			= new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
-
+	private final IBetaCutoffMoves[][][] COUNTER_MOVES_LASTIN	= new IBetaCutoffMoves[2][7][64];
+	private final IBetaCutoffMoves[][][] COUNTER_MOVES_COUNTS	= new IBetaCutoffMoves[2][7][64];
+	
 	private final long[][] HH_MOVES 							= new long[2][64 * 64];
 	private final long[][] BF_MOVES 							= new long[2][64 * 64];
 	
@@ -72,7 +72,39 @@ public final class MoveGenerator {
 	private long randomizer_counter;
 	
 	
-	public MoveGenerator() {		
+	public MoveGenerator() {
+		
+		
+		for (int i = 0; i < KILLER_MOVES.length; i++) {
+			
+			for (int j = 0; j < KILLER_MOVES[i].length; j++) {
+				
+				KILLER_MOVES[i][j] = new BetaCutoffMoves_LastIn();
+			}
+		}
+		
+		for (int i = 0; i < COUNTER_MOVES_LASTIN.length; i++) {
+			
+			for (int j = 0; j < COUNTER_MOVES_LASTIN[i].length; j++) {
+				
+				for (int k = 0; k < COUNTER_MOVES_LASTIN[i][j].length; k++) {
+					
+					COUNTER_MOVES_LASTIN[i][j][k] = new BetaCutoffMoves_LastIn();
+				}
+			}
+		}
+		
+		
+		for (int i = 0; i < COUNTER_MOVES_COUNTS.length; i++) {
+			
+			for (int j = 0; j < COUNTER_MOVES_COUNTS[i].length; j++) {
+				
+				for (int k = 0; k < COUNTER_MOVES_COUNTS[i][j].length; k++) {
+					
+					COUNTER_MOVES_COUNTS[i][j][k] = new BetaCutoffMoves_Counts();
+				}
+			}
+		}
 		
 		
 		if (USE_ContinuationHistory) {
@@ -82,18 +114,6 @@ public final class MoveGenerator {
 			
 			BF_ContinuationHistory[WHITE] = new ContinuationHistory();
 			BF_ContinuationHistory[BLACK] = new ContinuationHistory();
-		}
-		
-		
-		for (int i = 0; i < COUNTER_MOVES_GLOBAL.length; i++) {
-			
-			for (int j = 0; j < COUNTER_MOVES_GLOBAL[i].length; j++) {
-				
-				for (int k = 0; k < COUNTER_MOVES_GLOBAL[i][j].length; k++) {
-					
-					COUNTER_MOVES_GLOBAL[i][j][k] = new BetaCutoffMoves_Counts();
-				}
-			}
 		}
 		
 		
@@ -148,6 +168,40 @@ public final class MoveGenerator {
 		Arrays.fill(BF_MOVES1[BLACK][QUEEN], 1);
 		Arrays.fill(BF_MOVES1[BLACK][KING], 1);	
 		
+		if (CLEAR_TABLES_ON_NEW_SEARCH) {
+			
+			for (int i = 0; i < COUNTER_MOVES_LASTIN.length; i++) {
+				
+				for (int j = 0; j < COUNTER_MOVES_LASTIN[i].length; j++) {
+					
+					for (int k = 0; k < COUNTER_MOVES_LASTIN[i][j].length; k++) {
+						
+						COUNTER_MOVES_LASTIN[i][j][k].clear();
+					}
+				}
+			}
+			
+			for (int i = 0; i < COUNTER_MOVES_COUNTS.length; i++) {
+				
+				for (int j = 0; j < COUNTER_MOVES_COUNTS[i].length; j++) {
+					
+					for (int k = 0; k < COUNTER_MOVES_COUNTS[i][j].length; k++) {
+						
+						COUNTER_MOVES_COUNTS[i][j][k].clear();
+					}
+				}
+			}
+			
+			if (USE_ContinuationHistory) {
+				
+				HH_ContinuationHistory[WHITE].clear();
+				HH_ContinuationHistory[BLACK].clear();
+				
+				BF_ContinuationHistory[WHITE].clear();
+				BF_ContinuationHistory[BLACK].clear();
+			}
+		}
+		
 		Arrays.fill(LMR_ALL[WHITE], 0);
 		Arrays.fill(LMR_ALL[BLACK], 0);
 		Arrays.fill(LMR_BELOW_ALPHA[WHITE], 0);
@@ -168,24 +222,6 @@ public final class MoveGenerator {
 		lmrAboveAlphaAVGScores[WHITE].clear();
 		lmrAboveAlphaAVGScores[BLACK].clear();
 		
-		for (int i = 0; i < KILLER_MOVES.length; i++) {
-			
-			for (int j = 0; j < KILLER_MOVES[i].length; j++) {
-				
-				KILLER_MOVES[i][j] = new BetaCutoffMoves_LastIn();
-			}
-		}
-		
-		for (int i = 0; i < COUNTER_MOVES_LOCAL.length; i++) {
-			
-			for (int j = 0; j < COUNTER_MOVES_LOCAL[i].length; j++) {
-				
-				for (int k = 0; k < COUNTER_MOVES_LOCAL[i][j].length; k++) {
-					
-					COUNTER_MOVES_LOCAL[i][j][k] = new BetaCutoffMoves_LastIn();
-				}
-			}
-		}
 		
 		currentPly = 0;
 	}
@@ -430,23 +466,23 @@ public final class MoveGenerator {
 		
 		if (EngineConstants.ENABLE_COUNTER_MOVES) {
 			
-			COUNTER_MOVES_LOCAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
-			COUNTER_MOVES_GLOBAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
+			COUNTER_MOVES_LASTIN[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
+			COUNTER_MOVES_COUNTS[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
 		}
 	}
 	
 
 	public int getCounter1(final int color, final int parentMove) {
 		
-		return COUNTER_MOVES_LOCAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
-		//return COUNTER_MOVES_GLOBAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
+		return COUNTER_MOVES_LASTIN[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
+		//return COUNTER_MOVES_COUNTS[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
 	}
 	
 	
 	public int getCounter2(final int color, final int parentMove) {
 		
-		return COUNTER_MOVES_GLOBAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
-		//return COUNTER_MOVES_LOCAL[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
+		return COUNTER_MOVES_COUNTS[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
+		//return COUNTER_MOVES_LASTIN[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
 	}
 	
 	
@@ -1131,6 +1167,8 @@ public final class MoveGenerator {
 		int getBest1();
 		
 		int getBest2();
+		
+		void clear();
 	}
 	
 	
@@ -1147,8 +1185,7 @@ public final class MoveGenerator {
 		
 		private BetaCutoffMoves_Counts() {
 			
-			moves_piece_to 	= new int[7][64];
-			counts 			= new long[7][64];
+			clear();
 		}
 		
 		
@@ -1178,6 +1215,18 @@ public final class MoveGenerator {
 		public int getBest2() {
 			
 			return best_move2;
+		}
+
+
+		@Override
+		public void clear() {
+			
+			moves_piece_to 	= new int[7][64];
+			counts 			= new long[7][64];
+			
+			best_move1 = 0;
+			best_move2 = 0;
+			max_count = 0;
 		}
 	}
 
@@ -1214,6 +1263,14 @@ public final class MoveGenerator {
 		public int getBest2() {
 			
 			return best_move2;
+		}
+		
+		
+		@Override
+		public void clear() {
+			
+			best_move1 = 0;
+			best_move2 = 0;
 		}
 	}
 }
