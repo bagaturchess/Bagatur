@@ -1,3 +1,9 @@
+Version 3.6b (04 September 2022)
+  * TBs: DTZ or DTM check improved. Still not 100% accurate - alone king condition used. Still direct DTM from native syzygy lib is not used, because of JNI/C types related issues, which need more time.
+  * TBs: Syzygy native lib changes and JNI integration code adoption - methods time are incorrect. How Value has to be converted to int?
+  * Search revision: move ordering based on the LMR beta cutoff move's ration. Added clear method in History Tables. CLEAR_TABLES_ON_NEW_SEARCH flag introduced and set to false.
+  * Search revision: enable LMP and LMR for all nodes (without statistical constraints - in this case "faster" is over "too accurate")
+  
 Version 3.6a (21 August 2022)
   * Bugfixing: Syzygy TB support - DTZ handling
   * Optimization: Decision whether to use or not LMR based on below alpha statistics of previous LMR searches
@@ -8,11 +14,11 @@ Version 3.6 (12 August 2022)
   
 Version 3.5 (3 August 2022)
   * Code improvements and bugfixing in regards to UCI options handling
-  
+  	
 Version 3.4h (2 August 2022)
   * Bugfixing: When setting UCI options, which need re-creation of search objects, use their direct names, without converting to lower case.
   * Optimization: create search objects only once, after all UCI options are set.
-
+	
 Version 3.4g (29 July 2022)
   * Bugfixing (not related with FRC), of an issue introduced with version 3.4f. It is related with the extraction of moves from Transposition Table and building the PV to show as output.
   * Bugfixing (not related with FRC), sometimes in mate positions, after repetition of move 2 times, Bagatur evaluation jumps between 0 and +-mate score.
