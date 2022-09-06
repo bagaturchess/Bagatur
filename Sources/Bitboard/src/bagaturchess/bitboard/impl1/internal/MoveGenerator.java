@@ -595,21 +595,7 @@ public final class MoveGenerator {
 	}
 	
 	
-	public void setHHScores(final int colorToMove, final int parentMove) {
-		
-		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
-			
-			moveScores[j] = getHHScore(colorToMove, MoveUtil.getFromToIndex(moves[j]), MoveUtil.getSourcePieceIndex(moves[j]), MoveUtil.getToIndex(moves[j]), parentMove);
-			
-			if (moveScores[j] < 0) {
-				
-				throw new IllegalStateException();
-			}
-		}
-	}
-	
-	
-	public void setMovesScores(int colorToMove, final int parentMove) {
+	public void setHHScores(int colorToMove, final int parentMove) {
 		
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
 			
@@ -617,6 +603,13 @@ public final class MoveGenerator {
 			
 			int from_to_index = MoveUtil.getFromToIndex(move);
 			
+			/**
+			 * Each particular move's score is calculated by the ration between the beta cutoffs occurrences after this move divided by the number of all occurrences of the move.
+			 * The cutoffs statistics are measured only by moves performed by LMR at shallow depths.
+			 * If we base the move ordering on this scores, we actually are increasing the probability of cutoffs in the whole search tree on an optimal depth, which means the PV should be found in a optimal way from time perspective.
+			 * This approach should be kind of dynamic optimization as all other heuristic here are.
+			 * I am happy that this approach doesn't makes the search speed worse.
+			 */
 			moveScores[j] = getLMR_Rate_internal(colorToMove, from_to_index);
 			
 			moveScores[j] += getHHScore(colorToMove, from_to_index, MoveUtil.getSourcePieceIndex(move), MoveUtil.getToIndex(move), parentMove);

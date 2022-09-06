@@ -714,19 +714,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			case PHASE_QUIET:
 				
 				moveGen.generateMoves(cb);
-				
-				
-				/**
-				 * The moves_scores are the sum of scores of each move of side to move.
-				 * Each particular move's score is calculated by the ration between the beta cutoffs occurrences after this move divided by the number of all occurrences of the move.
-				 * The cutoffs statistics are measured only by moves performed by LMR at shallow depths.
-				 * If we base the move ordering on the moves_scores, we actually are increasing the probability of cutoffs in the whole search tree on an optimal depth.
-				 * This approach should be kind of dynamic optimization.
-				 */
-				moveGen.setMovesScores(cb.colorToMove, parentMove);
-				//moveGen.setHHScores(cb.colorToMove, parentMove);
-				
-				
+				moveGen.setHHScores(cb.colorToMove, parentMove);
 				moveGen.sort();
 				
 				break;
