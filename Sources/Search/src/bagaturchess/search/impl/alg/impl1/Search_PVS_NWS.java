@@ -431,14 +431,28 @@ public class Search_PVS_NWS extends SearchImpl {
 						//! Without this check, the EGTB probing doesn't work correctly and the Bagatur version has smaller ELO rating (-35 ELO)
 						if (distanceToDraw_50MoveRule >= dtz) {
 							
-							node.bestmove = 0;
-		    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
-		    				node.eval = SearchUtils.getMateVal(ply + dtz);
-							//node.eval = 10 * 9 * (distanceToDraw_50MoveRule - dtz);
-							//node.eval = 10 * 9 * (ply + dtz);
-							node.leaf = true;
+							int op_factor = cb.colorToMoveInverse == Constants.COLOUR_WHITE ? env.getBitboard().getMaterialFactor().getWhiteFactor() : env.getBitboard().getMaterialFactor().getBlackFactor();
 							
-							return node.eval;
+							//Opponent has only king so DTZ is DTM
+							if (op_factor == 0 && !env.getBitboard().hasSufficientMatingMaterial(cb.colorToMoveInverse)) {
+								
+								node.bestmove = 0;
+			    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
+			    				node.eval = SearchUtils.getMateVal(ply + dtz);
+								node.leaf = true;
+								
+								return node.eval;
+								
+							} else {
+								
+								node.bestmove = 0;
+								node.eval = IEvaluator.MAX_EVAL / (ply + dtz);
+								//node.eval = 10 * 9 * (distanceToDraw_50MoveRule - dtz);
+								//node.eval = 4 * 9 * ((ISearch.MAX_DEPTH - ply) + (distanceToDraw_50MoveRule - dtz));
+								node.leaf = true;
+								
+								return node.eval;
+							}
 							
 						} else {
 							
