@@ -25,6 +25,14 @@ JNIEXPORT jint JNICALL Java_bagaturchess_egtb_syzygy_SyzygyJNIBridge_getTBLarges
 
 /*
  * Class:     bagaturchess_egtb_syzygy_SyzygyJNIBridge
+ * Method:    probeDTM
+ * Signature: (JJJJJJJJIIZ)I
+ */
+JNIEXPORT jint JNICALL Java_bagaturchess_egtb_syzygy_SyzygyJNIBridge_probeDTM
+(JNIEnv*, jclass, jlong, jlong, jlong, jlong, jlong, jlong, jlong, jlong, jint, jint, jboolean);
+
+/*
+ * Class:     bagaturchess_egtb_syzygy_SyzygyJNIBridge
  * Method:    probeWDL
  * Signature: (JJJJJJJJIIZ)I
  */

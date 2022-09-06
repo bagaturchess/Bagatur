@@ -64,6 +64,7 @@ public class SyzygyJNIBridge {
 	
     private static native boolean init(String path);
     private static native int getTBLargest();
+    private static native int probeDTM(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn);
     private static native int probeWDL(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn);
     private static native int probeDTZ(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn);
     
@@ -117,6 +118,24 @@ public class SyzygyJNIBridge {
         return tbLargest;
     }
 
+    /**
+     * Returns a result containing the Win/Draw/Loss characteristics of the position. Notes: assumes castling is no longer possible and that there is no 50 move rule.
+     * @param white all white pieces (bitboard)
+     * @param black all black pieces (bitboard)
+     * @param kings all kings (bitboard)
+     * @param queens all queens (bitboard)
+     * @param rooks all rooks (bitboard)
+     * @param bishops all bishops (bitboard)
+     * @param knights all knights (bitboard)
+     * @param pawns all pawns (bitboard)
+     * @param ep the square where an En Passant capture can take place (or 0 if there is no En Passant)
+     * @param turn true if white is to move, false if black is.
+     * @return WDL result (see c code)
+     */
+    public static int probeSyzygyDTM(long white, long black, long kings, long queens, long rooks, long bishops, long knights, long pawns, int rule50, int ep, boolean turn){ //NOSONAR
+        return probeDTM(white, black, kings, queens, rooks, bishops, knights, pawns, rule50, ep, turn);
+    }
+    
     /**
      * Returns a result containing the Win/Draw/Loss characteristics of the position. Notes: assumes castling is no longer possible and that there is no 50 move rule.
      * @param white all white pieces (bitboard)

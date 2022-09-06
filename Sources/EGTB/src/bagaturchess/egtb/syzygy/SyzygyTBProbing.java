@@ -114,9 +114,49 @@ public class SyzygyTBProbing {
     
     
     /**
+     * probes the Syzygy TableBases for a DTM result
+     */
+    public int probeDTM(IBitBoard board) {
+    	
+    	
+    	if (board.getMaterialState().getPiecesCount() > MAX_PIECES_COUNT) {
+    		
+    		return -1;
+    	}
+    	
+    	
+        if (board.hasRightsToKingCastle(Constants.COLOUR_WHITE)
+        		|| board.hasRightsToQueenCastle(Constants.COLOUR_WHITE)
+        		|| board.hasRightsToKingCastle(Constants.COLOUR_BLACK)
+        		|| board.hasRightsToQueenCastle(Constants.COLOUR_BLACK)) {
+        	
+            return -1;
+        }
+        
+        if (board.getEnpassantSquareID() != 0) {
+        	
+        	return -1;
+        }
+        
+        
+        return SyzygyJNIBridge.probeSyzygyDTM(
+        		convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_WHITE)),
+        		convertBB(board.getFiguresBitboardByColour(Constants.COLOUR_BLACK)),
+        		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KING)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KING)),
+        		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_QUEEN)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_QUEEN)),
+        		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_ROOK)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_ROOK)),
+        		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_BISHOP)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_BISHOP)),
+        		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_KNIGHT)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_KNIGHT)),
+        		convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN)) | convertBB(board.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN)),
+        		board.getDraw50movesRule(),
+                0, //Enpassant index
+                board.getColourToMove() == Constants.COLOUR_WHITE
+        );
+    }
+    
+    
+    /**
      * probes the Syzygy TableBases for a WinDrawLoss result
-     * @param board the FrankWalter board representation
-     * @return a WDL result (see {@link #getWDLScore(int, int)})
      */
     public int probeWDL(IBitBoard board) {
     	
@@ -160,8 +200,6 @@ public class SyzygyTBProbing {
 	/**
      * probes the Syzygy TableBases for a DistanceToZero result.
      * If castling is still allowed, no accurate DTZ can be given
-     * @param board the FrankWalter board representation
-     * @return a WDL result (see {@link #toXBoardScore(int)} and {@link #toMove(int)})
      */
     public int probeDTZ(IBitBoard board) {
     	
@@ -261,8 +299,9 @@ public class SyzygyTBProbing {
 				//wdl = (wdl & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
 				
 				int dtz = probeDTZ(board);
-			
-				System.out.println(board.getMoveOps().moveToString(cur_move) + ", dtz=" + dtz + ", wdl=" + wdl + ", probe_result=" + probe_result);
+				int dtm = wdl == 2 ? probeDTM(board) : -1;
+				
+				System.out.println(board.getMoveOps().moveToString(cur_move) + ", dtz=" + dtz + ", wdl=" + wdl + ", dtm=" + dtm + ", probe_result=" + probe_result);
 				
 				int distanceToDraw_50MoveRule = 99 - board.getDraw50movesRule();
 				//Although we specify the rule50 parameter when calling SyzygyJNIBridge.probeSyzygyDTZ(...)

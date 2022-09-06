@@ -25,6 +25,13 @@ JNIEXPORT jint JNICALL Java_bagaturchess_egtb_syzygy_SyzygyJNIBridge_getTBLarges
   }
 
 
+JNIEXPORT jint JNICALL Java_bagaturchess_egtb_syzygy_SyzygyJNIBridge_probeDTM
+(JNIEnv* env, jclass this_class, jlong white, jlong black, jlong kings, jlong queens, jlong rooks, jlong bishops, jlong knights, jlong pawns, jint rule50, jint ep, jboolean color_to_move) {
+
+    return tb_probe_dtm_win_impl(white, black, kings, queens, rooks, bishops, knights, pawns, ep, color_to_move);
+}
+
+
 JNIEXPORT jint JNICALL Java_bagaturchess_egtb_syzygy_SyzygyJNIBridge_probeWDL
   (JNIEnv * env, jclass this_class, jlong white, jlong black, jlong kings, jlong queens, jlong rooks, jlong bishops, jlong knights, jlong pawns, jint rule50, jint ep, jboolean color_to_move) {
 

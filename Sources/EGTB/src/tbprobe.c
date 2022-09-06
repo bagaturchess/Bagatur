@@ -483,6 +483,40 @@ static int root_probe_wdl(const Pos *pos, bool useRule50, struct TbRootMoves *rm
 static int root_probe_dtz(const Pos *pos, bool hasRepeated, bool useRule50, struct TbRootMoves *rm);
 static uint16_t probe_root(Pos *pos, int *score, unsigned *results);
 
+
+unsigned tb_probe_dtm_win_impl(
+    uint64_t white,
+    uint64_t black,
+    uint64_t kings,
+    uint64_t queens,
+    uint64_t rooks,
+    uint64_t bishops,
+    uint64_t knights,
+    uint64_t pawns,
+    unsigned ep,
+    bool turn)
+{
+    Pos pos =
+    {
+        white,
+        black,
+        kings,
+        queens,
+        rooks,
+        bishops,
+        knights,
+        pawns,
+        0,
+        (uint8_t)ep,
+        turn
+    };
+    int success;
+    int v = TB_probe_dtm(&pos, 2, &success);
+    if (success == 0)
+        return TB_RESULT_FAILED;
+    return (unsigned)(v);
+}
+
 unsigned tb_probe_wdl_impl(
     uint64_t white,
     uint64_t black,

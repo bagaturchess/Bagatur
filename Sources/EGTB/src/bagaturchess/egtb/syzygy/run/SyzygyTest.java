@@ -23,9 +23,9 @@ public class SyzygyTest {
 			
 			//IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/3P4/3K4 w - -");//White win
 			//IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/4R3/3K4 w - -");//White win
-			//IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("8/8/8/8/8/7k/5Kp1/8 b - - 0 1");//Black win
+			IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("8/8/8/8/8/7k/5Kp1/8 b - - 0 1");//Black win
 			//IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("8/8/8/8/8/7k/5Kp1/8 w - - 0 1");//Draw
-			IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("8/6P1/8/2kB2K1/8/8/8/4r3 w - - 1 19"); //TDZ is -1
+			//IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("8/6P1/8/2kB2K1/8/8/8/4r3 w - - 1 19"); //TDZ is -1
 			
 			System.out.println(board);
 			
@@ -42,18 +42,19 @@ public class SyzygyTest {
 				
 				System.out.println("start probing");
 				
-				/*long[] out = new long[2];
+				long[] out = new long[2];
 				SyzygyTBProbing.getSingleton().probeMove(board, out);
 				MoveWrapper best_move = new MoveWrapper((int) out[1], false, board.getCastlingConfig());
 				System.out.println("best_move=" + best_move);
-				*/
 				
-				int probing_result = SyzygyTBProbing.getSingleton().probeWDL(board);
+				
+				/*int probing_result = SyzygyTBProbing.getSingleton().probeWDL(board);
 				int dtz = SyzygyTBProbing.getSingleton().probeDTZ(board);
 				int wdl = (probing_result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
 				System.out.println("probing_result=" + probing_result);
 				System.out.println("dtz=" + dtz);
 				System.out.println("wdl=" + wdl);
+				*/
 				
 				/*int result2 = SyzygyTBProbing.getSingleton().probeDTZ(board);
 				int dtz = (result2 & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
