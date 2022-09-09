@@ -616,7 +616,7 @@ public final class MoveGenerator {
 			
 			if (moveScores[j] < 0) {
 				
-				throw new IllegalStateException();
+				throw new IllegalStateException("moveScores[j] < 0");
 			}
 		}
 	}
