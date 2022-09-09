@@ -791,38 +791,42 @@ public class Search_PVS_NWS extends SearchImpl {
 					) {
 					
 					if (phase == PHASE_QUIET
+							&& depth <= 7
 							&& (!EngineConstants.ENABLE_LMP_STATS_DECISION
 									|| (EngineConstants.ENABLE_LMP_STATS_DECISION && moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove)))
 						) {
 						
 						if (EngineConstants.ENABLE_LMP
-								&& depth <= 7
 								&& movesPerformed_attacks + movesPerformed_quiet >= depth * 3 + 3
 							) {
+							
 							continue;
 						}
+						
+						if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
 							
+							if (eval + FUTILITY_MARGIN[depth] <= alpha) {
+								
+								continue;
+							}
+						}	
+						
 						if (eval == ISearch.MIN) {
 							
 							throw new IllegalStateException("eval == ISearch.MIN");
 						}
 						
-						/*if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
+						if (eval + getTrustWindow(mediator, depth) <= alpha) {
+							
 							continue;
 						}
-						*/
 						
-						if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
-							if (eval + FUTILITY_MARGIN[depth] <= alpha) {
-								continue;
-							}
-						}	
-
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& depth <= 7
 							&& phase == PHASE_ATTACKING_BAD
 							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth
 						) {
+						
 						continue;
 					}
 				}
@@ -1019,8 +1023,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private int getTrustWindow(ISearchMediator mediator, int depth) {
-		int value = depth * mediator.getTrustWindow_AlphaAspiration();
-		//System.out.println("depth=" + depth + "	" + value);
+		
+		int value = depth * Math.max(50, mediator.getTrustWindow_AlphaAspiration());
+		
+		//System.out.println("mediator.getTrustWindow_AlphaAspiration()=" + mediator.getTrustWindow_AlphaAspiration()
+		//						+ ", depth=" + depth + ", value=" + value);
+		
 		return value;
 	}
 	
