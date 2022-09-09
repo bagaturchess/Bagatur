@@ -786,12 +786,13 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
-				if (!isPv && !wasInCheck && movesPerformed_attacks + movesPerformed_quiet > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))
+				if (!isPv
+						&& depth <= 7
+						&& !wasInCheck && movesPerformed_attacks + movesPerformed_quiet > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))
 						&& !SearchUtils.isMateVal(alpha) && !SearchUtils.isMateVal(beta)
 					) {
 					
 					if (phase == PHASE_QUIET
-							&& depth <= 7
 							&& (!EngineConstants.ENABLE_LMP_STATS_DECISION
 									|| (EngineConstants.ENABLE_LMP_STATS_DECISION && moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove)))
 						) {
@@ -816,13 +817,13 @@ public class Search_PVS_NWS extends SearchImpl {
 							throw new IllegalStateException("eval == ISearch.MIN");
 						}
 						
-						if (eval + getTrustWindow(mediator, depth) <= alpha) {
+						/*if (eval + getTrustWindow(mediator, depth) <= alpha) {
 							
 							continue;
 						}
+						*/
 						
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
-							&& depth <= 7
 							&& phase == PHASE_ATTACKING_BAD
 							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth
 						) {
