@@ -786,7 +786,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
-				if (!isPv && !wasInCheck && movesPerformed_attacks + movesPerformed_quiet > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))) {
+				if (!isPv && !wasInCheck && movesPerformed_attacks + movesPerformed_quiet > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))
+						&& !SearchUtils.isMateVal(alpha) && !SearchUtils.isMateVal(beta)
+					) {
 					
 					if (phase == PHASE_QUIET
 							&& (!EngineConstants.ENABLE_LMP_STATS_DECISION
@@ -796,29 +798,26 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (EngineConstants.ENABLE_LMP
 								&& depth <= 7
 								&& movesPerformed_attacks + movesPerformed_quiet >= depth * 3 + 3
-								&& !SearchUtils.isMateVal(alpha)
 							) {
 							continue;
 						}
+							
+						if (eval == ISearch.MIN) {
+							
+							throw new IllegalStateException("eval == ISearch.MIN");
+						}
 						
-						if (!SearchUtils.isMateVal(alpha)) {
-							
-							if (eval == ISearch.MIN) {
-								
-								throw new IllegalStateException("eval == ISearch.MIN");
-							}
-							
-							/*if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
+						/*if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
+							continue;
+						}
+						*/
+						
+						if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
+							if (eval + FUTILITY_MARGIN[depth] <= alpha) {
 								continue;
 							}
-							*/
-							
-							if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
-								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
-									continue;
-								}
-							}	
-						}
+						}	
+
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& depth <= 7
 							&& phase == PHASE_ATTACKING_BAD
