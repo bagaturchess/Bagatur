@@ -113,7 +113,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long move_line_distros_counter_b 			= 0;
 	
 	//TODO: According to the graphics, the negative numbers' distribution looks better, so we may try to use -diff.
-	private static final int MOVES_SCALE 				= 20; // 2 * 20 + 1 = 41 units, not aways well balanced around 0.
+	private static final int MOVES_SCALE 				= 350; //2 * 350 + 1 = 701 units, // 2 * 200 + 1 = 401 units, // 2 * 50 + 1 = 101 units, 2 * 20 + 1 = 41 units, not always well balanced around 0.
 	
 	private static final boolean MOVES_SCALE_DUMP		= false;
 	private int[] move_line_distros_w 					= new int[MOVES_SCALE];
@@ -833,8 +833,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				int new_pv_scores_w = 0; //moveGen.getScore(); //(int) (cb.colorToMove == Constants.COLOUR_WHITE ? pv_scores_w + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_w);
-				int new_pv_scores_b = 0; //moveGen.getScore(); //(int) (cb.colorToMove == Constants.COLOUR_BLACK ? pv_scores_b + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_b);
+				int new_pv_scores_w = (int) (cb.colorToMove == Constants.COLOUR_WHITE ? pv_scores_w + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_w);
+				int new_pv_scores_b = (int) (cb.colorToMove == Constants.COLOUR_BLACK ? pv_scores_b + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_b);
 				
 				env.getBitboard().makeMoveForward(move);
 								
@@ -1020,18 +1020,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		return bestScore;
-	}
-	
-	
-	private int getTrustWindow(ISearchMediator mediator, int depth) {
-		
-		int value = 4 * depth * Math.max(1, mediator.getTrustWindow_AlphaAspiration());
-		//int value = 1 * depth * Math.max(1, mediator.getTrustWindow_AlphaAspiration());
-		
-		//System.out.println("mediator.getTrustWindow_AlphaAspiration()=" + mediator.getTrustWindow_AlphaAspiration()
-		//						+ ", depth=" + depth + ", value=" + value);
-		
-		return value;
 	}
 	
 	
@@ -1315,7 +1303,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		 */
 		eval = evaluator.fullEval(ply, alpha, beta, 0);
 		
-		eval += getMovesScores(ply, pv_scores_w, pv_scores_b);
+		if (EngineConstants.USE_MOVE_SCORE_AS_EVAL) {
+			
+			eval += getMovesScores(ply, pv_scores_w, pv_scores_b) / 7;
+		}
 		
 		
 		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
@@ -1328,162 +1319,172 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 
 
+	private int getTrustWindow(ISearchMediator mediator, int depth) {
+		
+		int value = 4 * depth * Math.max(1, mediator.getTrustWindow_AlphaAspiration());
+		//int value = 1 * depth * Math.max(1, mediator.getTrustWindow_AlphaAspiration());
+		
+		//System.out.println("mediator.getTrustWindow_AlphaAspiration()=" + mediator.getTrustWindow_AlphaAspiration()
+		//						+ ", depth=" + depth + ", value=" + value);
+		
+		return value;
+	}
+	
+	
 	private int getMovesScores(final int ply, int pv_scores_w, int pv_scores_b) {
 		
 		
 		int moves_score = 0;
 		
+			
+		boolean white = env.getBitboard().getColourToMove() == Constants.COLOUR_WHITE;
 		
-		if (EngineConstants.USE_MOVE_SCORE_AS_EVAL) {
-			
-			boolean white = env.getBitboard().getColourToMove() == Constants.COLOUR_WHITE;
-			
-			if (white)  {
-				
-				/**
-				 * WHITE
-				 */
-				
-				pv_scores_w = inverse_linner(pv_scores_w);
-				//pv_scores_w = (int) inverse_linner_stdev(pv_scores_w, move_line_scores_w);
-				//pv_scores_w = (int) inverse_Gaussian(pv_scores_w, move_line_scores_w);
-				
-				if (pv_scores_w < 0) {
-					
-					throw new IllegalStateException("pv_scores_w=" + pv_scores_w);
-				}
-				
-				move_line_scores_w.addValue(pv_scores_w);
-				
-				pv_scores_w = Math.min(move_line_distros_w.length - 1, Math.max(0, pv_scores_w));
-				
-				
-				if (MOVES_SCALE_DUMP) {
-					
-					move_line_distros_w[pv_scores_w]++;
-					move_line_distros_counter_w++;
-				}
-			
-			} else {
-				
-				/**
-				 * BLACK
-				 */
-				
-				pv_scores_b = inverse_linner(pv_scores_b);
-				//pv_scores_b = (int) inverse_linner_stdev(pv_scores_b, move_line_scores_b);
-				//pv_scores_b = (int) inverse_Gaussian(pv_scores_b, move_line_scores_b);
-				
-				if (pv_scores_b < 0) {
-					
-					throw new IllegalStateException("pv_scores_b=" + pv_scores_b);
-				}
-				
-				move_line_scores_b.addValue(pv_scores_b);
-				
-				pv_scores_b = Math.min(move_line_distros_b.length - 1, Math.max(0, pv_scores_b));
-				
-				
-				if (MOVES_SCALE_DUMP) {
-					
-					move_line_distros_b[pv_scores_b]++;
-					move_line_distros_counter_b++;
-				}
-			}
-			
+		if (white)  {
 			
 			/**
-			 * Adjust static evaluation
-			 * 
-			 * TODO: According to the graphics, the negative numbers' distribution looks better, so we may try to use -diff.
+			 * WHITE
 			 */
 			
-			if (white) {
+			pv_scores_w = inverse_linner(pv_scores_w);
+			//pv_scores_w = (int) inverse_linner_stdev(pv_scores_w, move_line_scores_w);
+			//pv_scores_w = (int) inverse_Gaussian(pv_scores_w, move_line_scores_w);
+			
+			if (pv_scores_w < 0) {
 				
-				moves_score = (+pv_scores_w -pv_scores_b);
-
-			} else {
-				
-				moves_score = (+pv_scores_b -pv_scores_w);
+				throw new IllegalStateException("pv_scores_w=" + pv_scores_w);
 			}
 			
-			moves_score = moves_score / ply;
+			move_line_scores_w.addValue(pv_scores_w);
 			
-			moves_score = Math.min(move_line_distros_b.length - 1, Math.max(-(move_line_distros_b.length - 1), moves_score));
-			
-			if (MOVES_SCALE_DUMP) move_line_scores_diffs_org.addValue(moves_score);
-			
-			
-			//moves_score = inverse_linner_normalized(moves_score);
-			moves_score = inverse_linner(moves_score);
-			
-			if (MOVES_SCALE_DUMP) move_line_scores_diffs_scaled.addValue(moves_score);
-			
+			pv_scores_w = Math.min(move_line_distros_w.length - 1, Math.max(0, pv_scores_w));
 			
 			
 			if (MOVES_SCALE_DUMP) {
 				
-				//System.out.println("moves_score=" + moves_score);
+				move_line_distros_w[pv_scores_w]++;
+				move_line_distros_counter_w++;
+			}
+		
+		} else {
+			
+			/**
+			 * BLACK
+			 */
+			
+			pv_scores_b = inverse_linner(pv_scores_b);
+			//pv_scores_b = (int) inverse_linner_stdev(pv_scores_b, move_line_scores_b);
+			//pv_scores_b = (int) inverse_Gaussian(pv_scores_b, move_line_scores_b);
+			
+			if (pv_scores_b < 0) {
 				
-				Long value = move_line_diffs.get(moves_score);
+				throw new IllegalStateException("pv_scores_b=" + pv_scores_b);
+			}
+			
+			move_line_scores_b.addValue(pv_scores_b);
+			
+			pv_scores_b = Math.min(move_line_distros_b.length - 1, Math.max(0, pv_scores_b));
+			
+			
+			if (MOVES_SCALE_DUMP) {
 				
-				if (value == null) {
-					value = new Long(0);
-				}
-				
-				move_line_diffs.put(moves_score, value + 1);
+				move_line_distros_b[pv_scores_b]++;
+				move_line_distros_counter_b++;
+			}
+		}
+		
+		
+		/**
+		 * Adjust static evaluation
+		 * 
+		 * TODO: According to the graphics, the negative numbers' distribution looks better, so we may try to use -diff.
+		 */
+		
+		if (white) {
+			
+			moves_score = (+pv_scores_w -pv_scores_b);
+
+		} else {
+			
+			moves_score = (+pv_scores_b -pv_scores_w);
+		}
+		
+		moves_score = moves_score / ply;
+		
+		moves_score = Math.min(move_line_distros_b.length - 1, Math.max(-(move_line_distros_b.length - 1), moves_score));
+		
+		
+		if (MOVES_SCALE_DUMP) move_line_scores_diffs_org.addValue(moves_score);
+		
+		
+		//moves_score = inverse_linner_normalized(moves_score);
+		moves_score = inverse_linner(moves_score);
+		
+		
+		if (MOVES_SCALE_DUMP) move_line_scores_diffs_scaled.addValue(moves_score);
+		
+		
+		if (MOVES_SCALE_DUMP) {
+			
+			//System.out.println("moves_score=" + moves_score);
+			
+			Long value = move_line_diffs.get(moves_score);
+			
+			if (value == null) {
+				value = new Long(0);
+			}
+			
+			move_line_diffs.put(moves_score, value + 1);
+		}
+		
+		
+		/**
+		 * DUMP DATA
+		 */
+		if (MOVES_SCALE_DUMP
+				&& move_line_distros_counter_w > 1000000
+				&& move_line_distros_counter_b > 1000000
+			) {
+			
+			
+			String dump = "**************************************************************";
+			
+			
+			dump += "!!! SCORE DIFFS !!!\r\n";
+			
+			List<Integer> list_keys = new ArrayList<Integer>();
+			List<Long> list_values = new ArrayList<Long>();
+			Set<Integer> keys = move_line_diffs.keySet();
+			for (Integer key : keys) {
+				Long val = move_line_diffs.get(key);
+				list_keys.add(key);
+				list_values.add(val);
+			}
+			for (int i = 0; i < list_keys.size(); i++) {
+				//dump += list_keys.get(i) + "=" + list_values.get(i) + "\r\n";
+				dump += list_values.get(i) + "\r\n";
 			}
 			
 			
-			/**
-			 * DUMP DATA
-			 */
-			if (MOVES_SCALE_DUMP
-					&& move_line_distros_counter_w > 1000000
-					&& move_line_distros_counter_b > 1000000
-				) {
-				
-				
-				String dump = "**************************************************************";
-				
-				
-				dump += "!!! SCORE DIFFS !!!\r\n";
-				
-				List<Integer> list_keys = new ArrayList<Integer>();
-				List<Long> list_values = new ArrayList<Long>();
-				Set<Integer> keys = move_line_diffs.keySet();
-				for (Integer key : keys) {
-					Long val = move_line_diffs.get(key);
-					list_keys.add(key);
-					list_values.add(val);
-				}
-				for (int i = 0; i < list_keys.size(); i++) {
-					//dump += list_keys.get(i) + "=" + list_values.get(i) + "\r\n";
-					dump += list_values.get(i) + "\r\n";
-				}
-				
-				
-				dump += "!!! WHITE !!!\r\n";
-				
-				for (int i = 0; i < move_line_distros_w.length; i++) {
-					dump += move_line_distros_w[i] + "\r\n";
-				}
-				
-				
-				dump += "!!! BLACK !!!\r\n";
-				for (int i = 0; i < move_line_distros_b.length; i++) {
-					dump += move_line_distros_b[i] + "\r\n";
-				}
-				
-				
-				System.out.println(dump);
-				System.out.println("WHITE_STATS		=	" + move_line_scores_w);
-				System.out.println("BLACK_STATS		=	" + move_line_scores_b);
-				System.out.println("DIFF_STATS_ORG		=	" + move_line_scores_diffs_org);
-				System.out.println("DIFF_STATS_SCALED	=	" + move_line_scores_diffs_scaled);
-				
-				System.exit(0);
-			}	
+			dump += "!!! WHITE !!!\r\n";
+			
+			for (int i = 0; i < move_line_distros_w.length; i++) {
+				dump += move_line_distros_w[i] + "\r\n";
+			}
+			
+			
+			dump += "!!! BLACK !!!\r\n";
+			for (int i = 0; i < move_line_distros_b.length; i++) {
+				dump += move_line_distros_b[i] + "\r\n";
+			}
+			
+			
+			System.out.println(dump);
+			System.out.println("WHITE_STATS		=	" + move_line_scores_w);
+			System.out.println("BLACK_STATS		=	" + move_line_scores_b);
+			System.out.println("DIFF_STATS_ORG		=	" + move_line_scores_diffs_org);
+			System.out.println("DIFF_STATS_SCALED	=	" + move_line_scores_diffs_scaled);
+			
+			System.exit(0);
 		}
 		
 		
