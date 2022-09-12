@@ -115,7 +115,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	//TODO: According to the graphics, the negative numbers' distribution looks better, so we may try to use -diff.
 	private static final int MOVES_SCALE 				= 350; //2 * 350 + 1 = 701 units, // 2 * 200 + 1 = 401 units, // 2 * 50 + 1 = 101 units, 2 * 20 + 1 = 41 units, not always well balanced around 0.
 	private static final int MOVES_SCALE_EVAL_DIVIDER 	= 7;
-			
+	
 	private static final boolean MOVES_SCALE_DUMP		= false;
 	private int[] move_line_distros_w 					= new int[MOVES_SCALE];
 	private int[] move_line_distros_b 					= new int[MOVES_SCALE];
