@@ -41,7 +41,7 @@ public class EngineConstants {
 	// Search reductions
 	public static final boolean ENABLE_NULL_MOVE 				= true;
 	public static final boolean ENABLE_LMR 						= true;
-	public static final boolean ENABLE_LMR_STATS				= true;
+	public static final boolean ENABLE_LMR_STATS				= false;
 	public static final boolean ENABLE_LMR_STATS_DECISION		= false;
 	public static final boolean ENABLE_LMP 						= true;
 	public static final boolean ENABLE_LMP_STATS_DECISION		= false;

@@ -113,10 +113,23 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long move_line_distros_counter_b 			= 0;
 	
 	//TODO: According to the graphics, the negative numbers' distribution looks better, so we may try to use -diff.
-	private static final int MOVES_SCALE 				= 350; //2 * 350 + 1 = 701 units, // 2 * 200 + 1 = 401 units, // 2 * 50 + 1 = 101 units, 2 * 20 + 1 = 41 units, not always well balanced around 0.
-	private static final int MOVES_SCALE_EVAL_DIVIDER 	= 7;
+	private static final int MOVES_SCALE;
+	private static final int MOVES_SCALE_EVAL_DIVIDER;
+	static {
+		if (EngineConstants.ENABLE_LMR_STATS) {
+			
+			MOVES_SCALE = 350; //2 * 350 + 1 = 701 units, // 2 * 200 + 1 = 401 units, // 2 * 50 + 1 = 101 units, 2 * 20 + 1 = 41 units, not always well balanced around 0.
+			MOVES_SCALE_EVAL_DIVIDER = 7;
+			
+		}  else {
+			
+			MOVES_SCALE = 150;
+			MOVES_SCALE_EVAL_DIVIDER = 3; //2 * 150 + 1 = 301 units
+		}
+	}
 	
 	private static final boolean MOVES_SCALE_DUMP		= false;
+
 	private int[] move_line_distros_w 					= new int[MOVES_SCALE];
 	private int[] move_line_distros_b 					= new int[MOVES_SCALE];
 	private Map<Integer, Long> move_line_diffs 			= new TreeMap<Integer, Long>();
