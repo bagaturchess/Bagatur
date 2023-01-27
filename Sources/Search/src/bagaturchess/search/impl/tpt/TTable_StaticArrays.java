@@ -209,7 +209,9 @@ public class TTable_StaticArrays implements ITTable {
 		int replacedIndex = -1;
 		for (int i = index; i < index + 4; i++) {
 
-			if (keys[i] == 0) {
+			long cur_key = keys[i];
+
+			if (cur_key == 0) {
 				replacedIndex = i;
 				counter_usage++;
 				break;
@@ -219,7 +221,7 @@ public class TTable_StaticArrays implements ITTable {
 			
 			int currentDepth = getDepth(currentValue);
 			
-			if ((keys[i] ^ currentValue) == key) {
+			if ((cur_key ^ currentValue) == key) {
 				
 				if (currentDepth <= depth) {
 					
