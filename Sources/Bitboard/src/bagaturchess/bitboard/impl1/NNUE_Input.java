@@ -40,43 +40,43 @@ public class NNUE_Input implements MoveListener {
 	}
 	
 	
-	public float[] getInputs() {
+	public final float[] getInputs() {
 		
 		return inputs;
 	}
 	
 	
 	@Override
-	public void preForwardMove(int color, int move) {
+	public final void preForwardMove(int color, int move) {
 		move(move, color);
 	}
 	
 	
 	@Override
-	public void postForwardMove(int color, int move) {
+	public final void postForwardMove(int color, int move) {
 		//Do nothing
 	}
 	
 	
 	@Override
-	public void preBackwardMove(int color, int move) {
+	public final void preBackwardMove(int color, int move) {
 		//Do nothing
 	}
 	
 	@Override
-	public void postBackwardMove(int color, int move) {
+	public final void postBackwardMove(int color, int move) {
 		unmove(move, color);
 	}
 	
 	
 	@Override
-	public void addPiece_Special(int color, int type) {
+	public final void addPiece_Special(int color, int type) {
 		//Do nothing
 	}
 	
 	
 	@Override
-	public void initially_addPiece(int color, int type, long bb_pieces) {
+	public final void initially_addPiece(int color, int type, long bb_pieces) {
 		
         while (bb_pieces != 0) {
         	
@@ -89,7 +89,7 @@ public class NNUE_Input implements MoveListener {
 	}
 	
 	
-	public void move(int move, int color) {
+	public final void move(int move, int color) {
 		
 		int pieceType = board.getMoveOps().getFigureType(move);
 		int fromFieldID = board.getMoveOps().getFromFieldID(move);
@@ -174,7 +174,7 @@ public class NNUE_Input implements MoveListener {
 	}
 
 
-	public void unmove(int move, int color) {
+	public final void unmove(int move, int color) {
 
 		int pieceType = board.getMoveOps().getFigureType(move);
 		int fromFieldID = board.getMoveOps().getFromFieldID(move);

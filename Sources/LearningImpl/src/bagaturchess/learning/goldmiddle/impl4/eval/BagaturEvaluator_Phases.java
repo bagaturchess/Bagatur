@@ -111,7 +111,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	}
 	
 	
-	private static class EvalComponentsProcessor_Ones implements IEvalComponentsProcessor {
+	private static final class EvalComponentsProcessor_Ones implements IEvalComponentsProcessor {
 		
 		
 		private EvalInfo evalinfo;
@@ -129,7 +129,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		
 		
 		@Override
-		public void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
+		public final void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
 			
 			if (evalPhaseID == EVAL_PHASE_ID_1) {
 				

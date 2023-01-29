@@ -1145,48 +1145,48 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		@Override
-		public int getFigureType(int move) {
+		public final int getFigureType(int move) {
 			return MoveUtil.getSourcePieceIndex(move);
 		}
 		
 		
 		@Override
-		public int getToFieldID(int move) {
+		public final int getToFieldID(int move) {
 			return MoveUtil.getToIndex(move);
 		}
 		
 		@Override
-		public boolean isCapture(int move) {
+		public final boolean isCapture(int move) {
 			return MoveUtil.getAttackedPieceIndex(move) != 0;
 		}
 		
 		
 		@Override
-		public boolean isPromotion(int move) {
+		public final boolean isPromotion(int move) {
 			return MoveUtil.isPromotion(move);
 		}
 		
 		
 		@Override
-		public boolean isCaptureOrPromotion(int move) {
+		public final boolean isCaptureOrPromotion(int move) {
 			return isCapture(move) || isPromotion(move);
 		}
 
 		
 		@Override
-		public boolean isEnpassant(int move) {
+		public final boolean isEnpassant(int move) {
 			return MoveUtil.isEPMove(move);
 		}
 
 		
 		@Override
-		public boolean isCastling(int move) {
+		public final boolean isCastling(int move) {
 			return MoveUtil.isCastlingMove(move);
 		}
 		
 		
 		@Override
-		public int getFigurePID(int move) {
+		public final int getFigurePID(int move) {
 			
 			int pieceType = MoveUtil.getSourcePieceIndex(move);
 			int colour = chessBoard.colorToMove;
@@ -1216,7 +1216,7 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		@Override
-		public boolean isCastlingKingSide(int move) {
+		public final boolean isCastlingKingSide(int move) {
 			if (isCastling(move)) {
 				int index = MoveUtil.getToIndex(move);
 				return index == CastlingConfig.G1 || index == CastlingConfig.G8;
@@ -1227,7 +1227,7 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		@Override
-		public boolean isCastlingQueenSide(int move) {
+		public final boolean isCastlingQueenSide(int move) {
 			
 			if (isCastling(move)) {
 				int index = MoveUtil.getToIndex(move);
@@ -1239,13 +1239,13 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		@Override
-		public int getFromFieldID(int move) {
+		public final int getFromFieldID(int move) {
 			return MoveUtil.getFromIndex(move);
 		}
 		
 		
 		@Override
-		public int getPromotionFigureType(int move) {
+		public final int getPromotionFigureType(int move) {
 			if (!isPromotion(move)) {
 				return 0;
 			}
@@ -1254,50 +1254,50 @@ public class BoardImpl implements IBitBoard {
 		
 		
 		@Override
-		public int getCapturedFigureType(int cur_move) {
+		public final int getCapturedFigureType(int cur_move) {
 			return MoveUtil.getAttackedPieceIndex(cur_move);
 		}
 		
 		
 		@Override
-		public String moveToString(int move) {
+		public final String moveToString(int move) {
 			return (new MoveWrapper(move, isFRC, chessBoard.castlingConfig)).toString();
 		}
 		
 		
 		@Override
-		public void moveToString(int move, StringBuilder text_buffer) {
+		public final void moveToString(int move, StringBuilder text_buffer) {
 			(new MoveWrapper(move, isFRC, chessBoard.castlingConfig)).toString(text_buffer);
 		}
 		
 		
 		@Override
-		public int stringToMove(String move) {
+		public final int stringToMove(String move) {
 			MoveWrapper moveObj = new MoveWrapper(move, chessBoard, isFRC);
 			return moveObj.move;
 		}
 		
 		
 		@Override
-		public int getToField_File(int move) {
+		public final int getToField_File(int move) {
 			return FILES[getToFieldID(move) & 7];
 		}
 		
 		
 		@Override
-		public int getToField_Rank(int move) {
+		public final int getToField_Rank(int move) {
 			return RANKS[getToFieldID(move) >>> 3];
 		}
 		
 		
 		@Override
-		public int getFromField_File(int move) {
+		public final int getFromField_File(int move) {
 			return FILES[getFromFieldID(move) & 7];
 		}
 		
 		
 		@Override
-		public int getFromField_Rank(int move) {
+		public final int getFromField_Rank(int move) {
 			return RANKS[getFromFieldID(move) >>> 3];
 		}
 	}

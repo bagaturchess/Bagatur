@@ -29,84 +29,84 @@ public class MoveUtil {
 	private static final int MASK_PROMOTION = 1 << 21; // 1
 	private static final int MASK_QUIET = MASK_PROMOTION | MASK_ATTACK;
 
-	public static int getFromIndex(final int move) {
+	public static final int getFromIndex(final int move) {
 		return move & MASK_6_BITS;
 	}
 
-	public static int getToIndex(final int move) {
+	public static final int getToIndex(final int move) {
 		return move >>> SHIFT_TO & MASK_6_BITS;
 	}
 
-	public static int getFromToIndex(final int move) {
+	public static final int getFromToIndex(final int move) {
 		return move & MASK_12_BITS;
 	}
 
-	public static int getAttackedPieceIndex(final int move) {
+	public static final int getAttackedPieceIndex(final int move) {
 		return move >>> SHIFT_ATTACK & MASK_3_BITS;
 	}
 
-	public static int getSourcePieceIndex(final int move) {
+	public static final int getSourcePieceIndex(final int move) {
 		return move >>> SHIFT_SOURCE & MASK_3_BITS;
 	}
 
-	public static int getMoveType(final int move) {
+	public static final int getMoveType(final int move) {
 		return move >>> SHIFT_MOVE_TYPE & MASK_3_BITS;
 	}
 
-	public static int createMove(final int fromIndex, final int toIndex, final int sourcePieceIndex) {
+	public static final int createMove(final int fromIndex, final int toIndex, final int sourcePieceIndex) {
 		return sourcePieceIndex << SHIFT_SOURCE | toIndex << SHIFT_TO | fromIndex;
 	}
 
-	public static int createWhitePawnMove(final int fromIndex) {
+	public static final int createWhitePawnMove(final int fromIndex) {
 		return ChessConstants.PAWN << SHIFT_SOURCE | (fromIndex + 8) << SHIFT_TO | fromIndex;
 	}
 
-	public static int createBlackPawnMove(final int fromIndex) {
+	public static final int createBlackPawnMove(final int fromIndex) {
 		return ChessConstants.PAWN << SHIFT_SOURCE | (fromIndex - 8) << SHIFT_TO | fromIndex;
 	}
 
-	public static int createWhitePawn2Move(final int fromIndex) {
+	public static final int createWhitePawn2Move(final int fromIndex) {
 		return ChessConstants.PAWN << SHIFT_SOURCE | (fromIndex + 16) << SHIFT_TO | fromIndex;
 	}
 
-	public static int createBlackPawn2Move(final int fromIndex) {
+	public static final int createBlackPawn2Move(final int fromIndex) {
 		return ChessConstants.PAWN << SHIFT_SOURCE | (fromIndex - 16) << SHIFT_TO | fromIndex;
 	}
 
-	public static int createPromotionMove(final int promotionPiece, final int fromIndex, final int toIndex) {
+	public static final int createPromotionMove(final int promotionPiece, final int fromIndex, final int toIndex) {
 		return 1 << SHIFT_PROMOTION | promotionPiece << SHIFT_MOVE_TYPE | ChessConstants.PAWN << SHIFT_SOURCE | toIndex << SHIFT_TO | fromIndex;
 	}
 
-	public static int createAttackMove(final int fromIndex, final int toIndex, final int sourcePieceIndex, final int attackedPieceIndex) {
+	public static final int createAttackMove(final int fromIndex, final int toIndex, final int sourcePieceIndex, final int attackedPieceIndex) {
 		return attackedPieceIndex << SHIFT_ATTACK | sourcePieceIndex << SHIFT_SOURCE | toIndex << SHIFT_TO | fromIndex;
 	}
 
-	public static int createSeeAttackMove(final long fromSquare, final int sourcePieceIndex) {
+	public static final int createSeeAttackMove(final long fromSquare, final int sourcePieceIndex) {
 		return sourcePieceIndex << SHIFT_SOURCE | Long.numberOfTrailingZeros(fromSquare);
 	}
 
-	public static int createPromotionAttack(final int promotionPiece, final int fromIndex, final int toIndex, final int attackedPieceIndex) {
+	public static final int createPromotionAttack(final int promotionPiece, final int fromIndex, final int toIndex, final int attackedPieceIndex) {
 		return 1 << SHIFT_PROMOTION | promotionPiece << SHIFT_MOVE_TYPE | attackedPieceIndex << SHIFT_ATTACK | ChessConstants.PAWN << SHIFT_SOURCE
 				| toIndex << SHIFT_TO | fromIndex;
 	}
 
-	public static int createEPMove(final int fromIndex, final int toIndex) {
+	public static final int createEPMove(final int fromIndex, final int toIndex) {
 		return TYPE_EP << SHIFT_MOVE_TYPE | ChessConstants.PAWN << SHIFT_ATTACK | ChessConstants.PAWN << SHIFT_SOURCE | toIndex << SHIFT_TO | fromIndex;
 	}
 
-	public static int createCastlingMove(final int fromIndex, final int toIndex) {
+	public static final int createCastlingMove(final int fromIndex, final int toIndex) {
 		return TYPE_CASTLING << SHIFT_MOVE_TYPE | ChessConstants.KING << SHIFT_SOURCE | toIndex << SHIFT_TO | fromIndex;
 	}
 
-	public static boolean isPromotion(final int move) {
+	public static final boolean isPromotion(final int move) {
 		return (move & MASK_PROMOTION) != 0;
 	}
 
-	public static boolean isPawnPush78(final int move) {
+	public static final boolean isPawnPush78(final int move) {
 		return getSourcePieceIndex(move) == ChessConstants.PAWN && (getToIndex(move) > 47 || getToIndex(move) < 16);
 	}
 
-	public static boolean isPawnPush678(final int move, final int color) {
+	public static final boolean isPawnPush678(final int move, final int color) {
 		if (color == ChessConstants.WHITE) {
 			return getSourcePieceIndex(move) == ChessConstants.PAWN && getToIndex(move) > 39;
 		} else {
@@ -117,19 +117,19 @@ public class MoveUtil {
 	/**
 	 * no promotion and no attack
 	 */
-	public static boolean isQuiet(final int move) {
+	public static final boolean isQuiet(final int move) {
 		return (move & MASK_QUIET) == 0;
 	}
 
-	public static boolean isNormalMove(final int move) {
+	public static final boolean isNormalMove(final int move) {
 		return getMoveType(move) == TYPE_NORMAL;
 	}
 
-	public static boolean isEPMove(final int move) {
+	public static final boolean isEPMove(final int move) {
 		return getMoveType(move) == TYPE_EP;
 	}
 
-	public static boolean isCastlingMove(int move) {
+	public static final boolean isCastlingMove(int move) {
 		return getMoveType(move) == TYPE_CASTLING;
 	}
 

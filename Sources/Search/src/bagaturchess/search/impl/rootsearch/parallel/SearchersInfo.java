@@ -309,11 +309,11 @@ public class SearchersInfo {
 	private class MoveInfo {
 		
 		
-		int sum;
-		int cnt;
-		int best_eval;
-		ISearchInfo best_info;
-		boolean hasMate;
+		private int sum;
+		private int cnt;
+		private int best_eval;
+		private ISearchInfo best_info;
+		private boolean hasMate;
 		
 		
 		MoveInfo(ISearchInfo first_info) {

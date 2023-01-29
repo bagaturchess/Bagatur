@@ -151,13 +151,13 @@ public class EvalInfo {
 	}
 	
 	
-	public void updatePawnAttacks() {
+	public final void updatePawnAttacks() {
 		updatePawnAttacks(Bitboard.getWhitePawnAttacks(getPieces(WHITE, PAWN) & ~pinnedPieces), WHITE);
 		updatePawnAttacks(Bitboard.getBlackPawnAttacks(getPieces(BLACK, PAWN) & ~pinnedPieces), BLACK);
 	}
 	
 	
-	private void updatePawnAttacks(final long pawnAttacks, final int color) {
+	private final void updatePawnAttacks(final long pawnAttacks, final int color) {
 		attacks[color][PAWN] = pawnAttacks;
 		if ((pawnAttacks & ChessConstants.KING_AREA[1 - color][kingIndex[1 - color]]) != 0) {
 			kingAttackersFlag[color] = FLAG_PAWN;
@@ -172,7 +172,7 @@ public class EvalInfo {
 	}
 	
 	
-	public void updateAttacks(final long moves, final int piece, final int color, final long kingArea) {
+	public final void updateAttacks(final long moves, final int piece, final int color, final long kingArea) {
 		if ((moves & kingArea) != 0) {
 			kingAttackersFlag[color] |= FLAGS[piece];
 		}
