@@ -81,6 +81,13 @@ public class SyzygyTBProbing {
     
     public synchronized final void load(String path) {
     	
+    	if (path == null) {
+    		
+    		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("SyzygyTBProbing.load(path) called: Syzygy tablebases NOT loaded, because path is null");
+    		
+    		return;
+    	}
+    	
     	SyzygyJNIBridge.load(path);
     }
     
