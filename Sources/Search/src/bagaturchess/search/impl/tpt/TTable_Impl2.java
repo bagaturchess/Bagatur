@@ -26,6 +26,7 @@ package bagaturchess.search.impl.tpt;
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.bitboard.impl1.internal.Util;
+import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
 
 
@@ -101,7 +102,7 @@ public class TTable_Impl2 implements ITTable {
 			
 			if (ChannelManager.getChannel() != null) {
 				
-				ChannelManager.getChannel().dump(
+				if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(
 						"TTable_Impl2.get: TableID=" + this.hashCode() +
 						", HitRate=" + getHitRate() +
 						"%, Usage=" + getUsage() + "%");
