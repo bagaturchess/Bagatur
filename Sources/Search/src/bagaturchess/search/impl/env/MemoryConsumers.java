@@ -264,7 +264,7 @@ public class MemoryConsumers {
 		
 		
 		//ITTable global_ttable 	= engineConfiguration.useGlobalTPT() ? new TTable_Impl2(size_tpt) : null;
-		ITTable global_ttable 	= engineConfiguration.useGlobalTPT() ? new TTable_StaticArrays(size_tpt) : null;
+		ITTable global_ttable 	= engineConfiguration.useGlobalTPT() ? TTable_StaticArrays.getInstance(size_tpt) : null;
 		
 		ttable_provider 		= new Vector<ITTable>();
 		

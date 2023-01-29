@@ -27,10 +27,11 @@ import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.bitboard.impl1.internal.Util;
 import bagaturchess.search.impl.alg.SearchUtils;
+import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
 
 
-public class TTable_StaticArrays implements ITTable {
+public final class TTable_StaticArrays implements ITTable {
 	
 	
 	private static final int FLAG = 12;
@@ -42,19 +43,59 @@ public class TTable_StaticArrays implements ITTable {
 	
 	private static long[] values;
 	
-	private long counter_usage;
+	private static long counter_usage;
 	
-	private long counter_tries;
+	private static long counter_tries;
 	
-	private long counter_hits;
+	private static long counter_hits;
 	
 	
-	public TTable_StaticArrays(long size_in_bytes) {
+	private static TTable_StaticArrays instance;
+	
+	
+	private TTable_StaticArrays() {
+		
+		//Do nothing
+	}
+
+
+	public static final ITTable getInstance(long size_in_bytes) {
+		
+		
+		if (instance == null) {
+			
+			instance = new TTable_StaticArrays();
+		}
+		
+		
+		init(size_in_bytes);
+		
+		
+		return instance;
+	}
+	
+	
+	private static final void init(long size_in_bytes) {
+		
 		
 		/*if (keys != null && values != null) {
 			
 			if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("TTable_StaticArrays: Arrays are already initialized!");
 		}*/
+		
+		
+		//Clear references, so GC can free up the memory.
+		keys = null;
+		
+		values = null;
+		
+		
+		counter_usage = 0;
+		
+		counter_tries = 0;
+		
+		counter_hits = 0;
+		
 		
 		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("TTable_StaticArrays: bytes_count=" + size_in_bytes);
 		
@@ -76,14 +117,14 @@ public class TTable_StaticArrays implements ITTable {
 
 
 	@Override
-	public int getUsage() {
+	public final int getUsage() {
 		
 		return (int) (counter_usage * 100 / keys.length);
 	}
 	
 	
 	@Override
-	public int getHitRate() {
+	public final int getHitRate() {
 		
 		if (counter_tries == 0) return 0;
 		
@@ -92,14 +133,14 @@ public class TTable_StaticArrays implements ITTable {
 	
 	
 	@Override
-	public void correctAllDepths(final int reduction) {
+	public final void correctAllDepths(final int reduction) {
 		
 		//Do nothing
 	}
 	
 	
 	@Override
-	public void get(long key, ITTEntry entry) {
+	public final void get(long key, ITTEntry entry) {
 		
 		counter_tries++;
 		
@@ -107,7 +148,7 @@ public class TTable_StaticArrays implements ITTable {
 			
 			if (ChannelManager.getChannel() != null) {
 				
-				ChannelManager.getChannel().dump(
+				if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump(
 						"TTable_StaticArrays.get: TableID=" + this.hashCode() +
 						", HitRate=" + getHitRate() +
 						"%, Usage=" + getUsage() + "%");
@@ -134,7 +175,7 @@ public class TTable_StaticArrays implements ITTable {
 	
 	
 	@Override
-	public void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove) {
+	public final void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove) {
 		
 		if (SearchUtils.isMateVal(eval)) {
 			
@@ -156,7 +197,7 @@ public class TTable_StaticArrays implements ITTable {
 	}
 	
 	
-	private long getTTValue(final long key) {
+	private static final long getTTValue(final long key) {
 
 		final int index = getIndex(key);
 
@@ -164,13 +205,13 @@ public class TTable_StaticArrays implements ITTable {
 			
 			long stored_key 	= keys[index + i];
 			
-			long value 			= values[index + i];
+			long stored_value 	= values[index + i];
 			
-			if ((stored_key ^ value) == key) {
+			if ((stored_key ^ stored_value) == key) {
 				
 				counter_hits++;
 				
-				return value;
+				return stored_value;
 			}
 		}
 		
@@ -178,7 +219,73 @@ public class TTable_StaticArrays implements ITTable {
 	}
 	
 	
-	private int getIndex(final long key) {
+	private static final void addValue(final long new_key, int score, final int new_depth, final int flag, final int move) {
+
+		if (EngineConstants.ASSERT) {
+			Assert.isTrue(new_depth >= 0);
+			//Assert.isTrue(move != 0);
+			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
+			//Assert.isTrue(MoveUtil.getSourcePieceIndex(move) != 0);
+		}
+
+		final long new_value = createValue(score, move, flag, new_depth);
+		
+		final int start_index = getIndex(new_key);
+		int replaced_min_depth = Integer.MAX_VALUE;
+		int replaced_index = -1;
+		for (int i = start_index; i < start_index + 4; i++) {
+
+			long stored_key = keys[i];
+
+			if (stored_key == 0) {
+				replaced_index = i;
+				counter_usage++;
+				break;
+			}
+
+			long stored_value = values[i];
+			
+			int stored_depth = getDepth(stored_value);
+			
+			if ((stored_key ^ stored_value) == new_key) {
+				
+				if (stored_value == new_value) {
+					
+					return;
+				}
+				
+				if (stored_depth <= new_depth) {
+					
+					replaced_index = i;
+					
+					break;
+				}
+			}
+			
+			// replace the lowest depth
+			if (stored_depth < replaced_min_depth) {
+				
+				replaced_min_depth = stored_depth;
+				
+				replaced_index = i;
+			}
+		}
+		
+		if (EngineConstants.ASSERT) {
+			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
+		}
+
+		if (replaced_index == -1) {
+			
+			throw new IllegalStateException();
+		}
+		
+		keys[replaced_index] = new_key ^ new_value;
+		values[replaced_index] = new_value;
+	}
+	
+	
+	private static final int getIndex(final long key) {
 		
 		long index = (int) (key ^ (key >>> 32));
 		
@@ -195,67 +302,7 @@ public class TTable_StaticArrays implements ITTable {
 	}
 	
 	
-	private void addValue(final long key, int score, final int depth, final int flag, final int move) {
-
-		if (EngineConstants.ASSERT) {
-			Assert.isTrue(depth >= 0);
-			//Assert.isTrue(move != 0);
-			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
-			//Assert.isTrue(MoveUtil.getSourcePieceIndex(move) != 0);
-		}
-
-		final int index = getIndex(key);
-		int replacedDepth = Integer.MAX_VALUE;
-		int replacedIndex = -1;
-		for (int i = index; i < index + 4; i++) {
-
-			long cur_key = keys[i];
-
-			if (cur_key == 0) {
-				replacedIndex = i;
-				counter_usage++;
-				break;
-			}
-
-			long currentValue = values[i];
-			
-			int currentDepth = getDepth(currentValue);
-			
-			if ((cur_key ^ currentValue) == key) {
-				
-				if (currentDepth <= depth) {
-					
-					replacedIndex = i;
-					
-					break;
-				}
-			}
-			
-			// replace the lowest depth
-			if (currentDepth < replacedDepth) {
-				
-				replacedDepth = currentDepth;
-				
-				replacedIndex = i;
-			}
-		}
-		
-		if (EngineConstants.ASSERT) {
-			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
-		}
-
-		if (replacedIndex == -1) {
-			
-			throw new IllegalStateException();
-		}
-		
-		final long value = createValue(score, move, flag, depth);
-		keys[replacedIndex] = key ^ value;
-		values[replacedIndex] = value;
-	}
-	
-	
-	private static int getScore(final long value) {
+	private static final int getScore(final long value) {
 		
 		int score = (int) (value >> SCORE);
 
@@ -267,23 +314,23 @@ public class TTable_StaticArrays implements ITTable {
 	}
 	
 	
-	private static int getDepth(final long value) {
+	private static final int getDepth(final long value) {
 		return (int) (value & 0xff);
 	}
 	
 	
-	private static int getFlag(final long value) {
+	private static final int getFlag(final long value) {
 		return (int) (value >>> FLAG & 3);
 	}
 	
 	
-	private static int getMove(final long value) {
+	private static final int getMove(final long value) {
 		return (int) (value >>> MOVE & 0x3fffff);
 	}
 	
 	
 	// SCORE,HALF_MOVE_COUNTER,MOVE,FLAG,DEPTH
-	private static long createValue(final long score, final long move, final long flag, final long depth) {
+	private static final long createValue(final long score, final long move, final long flag, final long depth) {
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 			Assert.isTrue(depth <= 255);
