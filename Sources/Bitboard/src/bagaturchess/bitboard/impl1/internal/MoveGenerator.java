@@ -633,18 +633,43 @@ public final class MoveGenerator {
 	}
 	
 	
-	/*public void setRootScores(final ChessBoard cb, final int parentMove, final int ttMove) {
+	public void setRootScores(final ChessBoard cb, final int parentMove, final int ttMove, final int ply) {
+		
+		int killer1Move = getKiller1(cb.colorToMove, ply);
+		int killer2Move = getKiller2(cb.colorToMove, ply);
+		int counterMove1 = getCounter1(cb.colorToMove, parentMove);
+		//int counterMove2 = getCounter2(cb.colorToMove, parentMove);
+		
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
-			if (ttMove == moves[j]) {
-				moveScores[j] = 10000;
-			} else if (!MoveUtil.isQuiet(moves[j])) {
-				moveScores[j] = 1000 + SEEUtil.getSeeCaptureScore(cb, moves[j]);
+			
+			int cur_move = moves[j];
+			
+			if (ttMove == cur_move) {
+				
+				moveScores[j] = 10000 * 100;
+			
+			} else if (killer1Move == cur_move) {
+				
+				moveScores[j] = 5000 * 100;
+				
+			} else if (killer2Move == cur_move) {
+				
+				moveScores[j] = 4000 * 100;
+				
+			} else if (counterMove1 == cur_move) {
+				
+				moveScores[j] = 3000 * 100;
+				
+			} else if (MoveUtil.isQuiet(cur_move)) {
+				
+				moveScores[j] = getHHScore(cb.colorToMove, MoveUtil.getFromToIndex(cur_move), MoveUtil.getSourcePieceIndex(cur_move), MoveUtil.getToIndex(cur_move), parentMove);
+				
 			} else {
-				moveScores[j] = getHHScore(cb.colorToMove, MoveUtil.getFromToIndex(moves[j]), MoveUtil.getSourcePieceIndex(moves[j]), MoveUtil.getToIndex(moves[j]), parentMove);
+				
+				moveScores[j] = 100 * (MoveUtil.getAttackedPieceIndex(cur_move) * 6 - MoveUtil.getSourcePieceIndex(cur_move));
 			}
-			//System.out.println("moveScores[j]=" + moveScores[j]);
 		}
-	}*/
+	}
 	
 	
 	/*public void setAllScores(final ChessBoard cb, final int parentMove, final int ttMove, int counterMove, int killer1Move, int killer2Move) {

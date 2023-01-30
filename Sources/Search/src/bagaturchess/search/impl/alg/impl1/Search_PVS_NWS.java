@@ -201,7 +201,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		moveGen.setRootSearchFirstMoveIndex(root_search_first_move_index);
 		
-		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
+		return root_search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
 				moveGen, 0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true, 0, 0, 0);
 	}
 	
@@ -217,8 +217,253 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		moveGen.setRootSearchFirstMoveIndex(root_search_first_move_index);
 		
-		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
+		return root_search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
 				moveGen, 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, 0, 0, 0);		
+	}
+	
+	
+	private int root_search(ISearchMediator mediator, ISearchInfo info,
+			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
+			final int ply, int depth, int alpha, int beta, boolean isPv, int pv_scores_w, int pv_scores_b, int excludedMove) {
+		
+		
+		info.setSearchedNodes(info.getSearchedNodes() + 1);
+		
+		if (info.getSelDepth() < ply) {
+			info.setSelDepth(ply);
+		}
+		
+		
+		final int alphaOrig = alpha;
+		
+		
+		PVNode node = pvman.load(ply);
+		node.bestmove = 0;
+		node.eval = ISearch.MIN;
+		node.leaf = true;
+		
+		
+		if (EngineConstants.ASSERT) {
+			Assert.isTrue(depth >= 0);
+			Assert.isTrue(alpha >= ISearch.MIN && alpha <= ISearch.MAX);
+			Assert.isTrue(beta >= ISearch.MIN && beta <= ISearch.MAX);
+		}
+		
+		
+		depth += extensions(cb, moveGen, ply);
+		
+		
+		long hashkey = cb.zobristKey;
+		if (excludedMove != 0) {
+			hashkey ^= (((long)excludedMove) << 16);
+		}
+		
+		
+		int ttMove 									= 0;
+		
+		if (env.getTPT() != null) {
+			
+			env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
+			
+			if (!tt_entries_per_ply[ply].isEmpty()) {
+				
+				ttMove = tt_entries_per_ply[ply].getBestMove();
+			}
+		}
+		
+		
+		final int parentMove = moveGen.previous();
+		int bestMove = 0;
+		int bestScore = ISearch.MIN - 1;
+		
+		int movesPerformed_attacks = 0;
+		int movesPerformed_quiet = 0;
+		
+		
+		moveGen.startPly();
+		
+		
+		moveGen.generateMoves(cb);
+		moveGen.generateAttacks(cb);
+		moveGen.setRootScores(cb, parentMove, ttMove, ply);
+		moveGen.sort();
+			
+			
+		while (moveGen.hasNext()) {
+			
+			final int move = moveGen.next();
+			
+			if (!cb.isLegal(move)) {
+				
+				continue;
+			}
+			
+			//Build and sent minor info
+			info.setCurrentMove(move);
+			info.setCurrentMoveNumber((movesPerformed_attacks + movesPerformed_quiet + 1));
+			
+			
+			int new_pv_scores_w = (int) (cb.colorToMove == Constants.COLOUR_WHITE ? pv_scores_w + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_w);
+			int new_pv_scores_b = (int) (cb.colorToMove == Constants.COLOUR_BLACK ? pv_scores_b + (env.getBitboard().getMoveOps().isCaptureOrPromotion(move) ? 0 : moveGen.getScore()) : pv_scores_b);
+			
+			env.getBitboard().makeMoveForward(move);
+							
+			
+			if (MoveUtil.isQuiet(move)) {
+				movesPerformed_quiet++;
+			} else {
+				movesPerformed_attacks++;
+			}
+			
+			int score = alpha + 1;
+			
+			if (EngineConstants.ASSERT) {
+				cb.changeSideToMove();
+				Assert.isTrue(0 == CheckUtil.getCheckingPieces(cb));
+				cb.changeSideToMove();
+			}
+			
+			
+			boolean doLMR = depth >= 2
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& MoveUtil.isQuiet(move)
+						;
+			
+			int reduction = 1;
+			if (doLMR) {
+				
+				reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
+				
+				reduction = Math.min(depth - 1, Math.max(reduction, 1));
+			}
+			
+			
+			try {
+				
+				if (EngineConstants.ENABLE_LMR && reduction != 1) {
+					
+					moveGen.addLMR_All(cb.colorToMoveInverse, move, depth);
+											
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, new_pv_scores_w, new_pv_scores_b, 0);
+					
+					if (score > alpha) {
+						
+						moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
+						
+					} else {
+						
+						moveGen.addLMR_BelowAlpha(cb.colorToMoveInverse, move, depth);
+					}
+				}
+				
+				if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
+					
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, new_pv_scores_w, new_pv_scores_b, 0);
+				}
+				
+				if (score > alpha) {
+					
+					if (move == ttMove) {
+						
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, new_pv_scores_w, new_pv_scores_b, 0);
+						
+					} else {
+						
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, new_pv_scores_w, new_pv_scores_b, 0);
+					}
+				}
+				
+			} catch(SearchInterruptedException sie) {
+				
+				moveGen.endPly();
+				
+				throw sie;
+			}
+			
+			
+			env.getBitboard().makeMoveBackward(move);
+			
+			
+			if (MoveUtil.isQuiet(move) && cb.checkingPieces == 0) {
+				
+				moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
+			}
+			
+			
+			if (score > bestScore) {
+				
+				bestScore = score;
+				bestMove = move;
+				
+				node.bestmove = bestMove;
+				node.eval = bestScore;
+				node.leaf = false;
+				
+				if (ply + 1 < ISearch.MAX_DEPTH) {
+					pvman.store(ply + 1, node, pvman.load(ply + 1), true);
+				}
+				
+				alpha = Math.max(alpha, score);
+				
+				if (alpha >= beta) {
+					
+					if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {
+						moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
+						moveGen.addKillerMove(cb.colorToMove, bestMove, ply);
+						moveGen.addHHValue(cb.colorToMove, bestMove, parentMove, depth);
+					}
+					
+					break;
+				}
+			}
+		}
+		
+		
+		moveGen.endPly();
+		
+		
+		if (movesPerformed_attacks + movesPerformed_quiet == 0) {
+			
+			if (cb.checkingPieces == 0) {
+				
+				node.bestmove = 0;
+				node.eval = getDrawScores(-1);
+				node.leaf = true;
+				
+				return node.eval;
+				
+			} else {
+				
+				node.bestmove = 0;
+				node.eval = -SearchUtils.getMateVal(ply);
+				node.leaf = true;
+				
+				return node.eval;
+			}
+		}
+		
+		
+		if (EngineConstants.ASSERT) {
+			
+			Assert.isTrue(bestMove != 0);
+		}
+		
+		
+		if (env.getTPT() != null) {
+			
+			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
+		}
+			
+		
+		if (bestScore != node.eval) {
+			
+			throw new IllegalStateException();
+		}
+		
+		//validatePV(node, evaluator, node.eval, ply, depth, isPv, false);
+		
+		
+		return bestScore;
 	}
 	
 	
@@ -765,12 +1010,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				/*if (move == excludedMove) {
 					continue;
 				}*/
-				
-				//Build and sent minor info
-				if (ply == 0) {
-					info.setCurrentMove(move);
-					info.setCurrentMoveNumber((movesPerformed_attacks + movesPerformed_quiet + 1));
-				}
 				
 				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
 					

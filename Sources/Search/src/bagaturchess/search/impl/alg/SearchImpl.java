@@ -25,7 +25,6 @@ package bagaturchess.search.impl.alg;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
-import bagaturchess.search.api.IEngineConfig;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.IRootWindow;
@@ -38,7 +37,6 @@ import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.search.impl.tpt.TTEntry_BaseImpl;
-import bagaturchess.uci.api.ChannelManager;
 
 
 public abstract class SearchImpl implements ISearch {
