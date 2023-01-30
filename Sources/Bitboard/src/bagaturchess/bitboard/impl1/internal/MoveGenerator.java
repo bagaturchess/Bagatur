@@ -718,9 +718,13 @@ public final class MoveGenerator {
 		}
 		
 		
-		//Lazy SMP logic
-		//currentPly == 1 (not 0), because first we make currentPly++ and then call sort method
+		//The ELO is smaller with this code enabled. It looks like it is better when all threads start searching the TT move.
+		//My explanation is that, they do enough randomization (in this method: randomize(...) before sorting) of the moves with the same scores, so they work in different sub-trees anyway and 
+		//as the TT move is most probably the best one, the SMP version goes a few moves deeper for the same time.
 		if (false && currentPly == 1) {
+		
+			//Lazy SMP logic
+			//currentPly == 1 (not 0), because first we make currentPly++ and then call sort method
 			
 			int current_moves_count = (end_index - start_index + 1);
 			
