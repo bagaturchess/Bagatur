@@ -69,7 +69,6 @@ public final class MoveGenerator {
 	
 	
 	private Random randomizer = new Random();
-	private long randomizer_counter;
 	
 	private int root_search_first_move_index;
 	
@@ -227,8 +226,6 @@ public final class MoveGenerator {
 		
 		
 		currentPly = 0;
-		
-		randomizer_counter = 0;
 	}
 	
 	
@@ -694,14 +691,13 @@ public final class MoveGenerator {
 	
 	public void sort() {
 		
+		
 		final int start_index = nextToMove[currentPly];
 		final int end_index = nextToGenerate[currentPly] - 1;
 		
 		
-		randomizer_counter++;
-		if (randomizer_counter % 4 == 0) {
-			randomize(moveScores, moves, start_index, end_index);
-		}
+		randomize(moveScores, moves, start_index, end_index);
+		
 		
 		for (int i = start_index, j = i; i < end_index; j = ++i) {
 			final long score = moveScores[i + 1];
