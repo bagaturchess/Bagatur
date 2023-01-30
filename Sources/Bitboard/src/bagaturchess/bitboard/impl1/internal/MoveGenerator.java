@@ -19,7 +19,7 @@ import bagaturchess.bitboard.impl.utils.VarStatistic;
 
 public final class MoveGenerator {
 	
-	
+
 	public static final int MOVE_SCORE_SCALE 					= 100;
 	
 	
@@ -70,6 +70,8 @@ public final class MoveGenerator {
 	
 	private Random randomizer = new Random();
 	private long randomizer_counter;
+	
+	private int root_search_first_move_index;
 	
 	
 	public MoveGenerator() {
@@ -125,6 +127,7 @@ public final class MoveGenerator {
 		
 		
 		clearHistoryHeuristics();
+		
 		
 	}
 	
@@ -224,6 +227,14 @@ public final class MoveGenerator {
 		
 		
 		currentPly = 0;
+		
+		randomizer_counter = 0;
+	}
+	
+	
+	public void setRootSearchFirstMoveIndex(int _root_search_first_move_index) {
+		
+		root_search_first_move_index = _root_search_first_move_index;
 	}
 	
 	
@@ -544,7 +555,7 @@ public final class MoveGenerator {
 
 	public void setMVVLVAScores(final ChessBoard cb) {
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
-			moveScores[j] = MoveUtil.getAttackedPieceIndex(moves[j]) * 6 - MoveUtil.getSourcePieceIndex(moves[j]);
+			moveScores[j] = 100 * (MoveUtil.getAttackedPieceIndex(moves[j]) * 6 - MoveUtil.getSourcePieceIndex(moves[j]));
 		}
 	}
 	
@@ -622,7 +633,7 @@ public final class MoveGenerator {
 	}
 	
 	
-	public void setRootScores(final ChessBoard cb, final int parentMove, final int ttMove) {
+	/*public void setRootScores(final ChessBoard cb, final int parentMove, final int ttMove) {
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
 			if (ttMove == moves[j]) {
 				moveScores[j] = 10000;
@@ -633,7 +644,7 @@ public final class MoveGenerator {
 			}
 			//System.out.println("moveScores[j]=" + moveScores[j]);
 		}
-	}
+	}*/
 	
 	
 	/*public void setAllScores(final ChessBoard cb, final int parentMove, final int ttMove, int counterMove, int killer1Move, int killer2Move) {
@@ -658,25 +669,49 @@ public final class MoveGenerator {
 	
 	public void sort() {
 		
-		final int left = nextToMove[currentPly];
+		final int start_index = nextToMove[currentPly];
+		final int end_index = nextToGenerate[currentPly] - 1;
+		
 		
 		randomizer_counter++;
-		if (randomizer_counter % 10 == 0) {
-			randomize(moveScores, moves, left, nextToGenerate[currentPly] - 1);
+		if (randomizer_counter % 4 == 0) {
+			randomize(moveScores, moves, start_index, end_index);
 		}
 		
-		for (int i = left, j = i; i < nextToGenerate[currentPly] - 1; j = ++i) {
+		for (int i = start_index, j = i; i < end_index; j = ++i) {
 			final long score = moveScores[i + 1];
 			final int move = moves[i + 1];
 			while (score > moveScores[j]) {
 				moveScores[j + 1] = moveScores[j];
 				moves[j + 1] = moves[j];
-				if (j-- == left) {
+				if (j-- == start_index) {
 					break;
 				}
 			}
 			moveScores[j + 1] = score;
 			moves[j + 1] = move;
+		}
+		
+		
+		//Lazy SMP logic
+		//currentPly == 1 (not 0), because first we make currentPly++ and then call sort method
+		if (false && currentPly == 1) {
+			
+			int current_moves_count = (end_index - start_index + 1);
+			
+			if (current_moves_count >= 2) {
+				
+				int index_to_swap = root_search_first_move_index % current_moves_count;
+				
+				long score 									= moveScores[start_index + index_to_swap];
+				int move 									= moves[start_index + index_to_swap];
+				
+				moveScores[start_index + index_to_swap] 	= moveScores[start_index];
+				moves[start_index + index_to_swap] 			= moves[start_index];
+				
+				moveScores[start_index] 					= score;
+				moves[start_index] 							= move;
+			}
 		}
 	}
 	

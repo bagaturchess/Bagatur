@@ -56,6 +56,9 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 	
 	private PVManager pvman;
 	
+	//Used for Lazy SMP
+	private int root_search_first_move_index = 0;
+	
 	
 	public SequentialSearch_MTD(Object[] args) {
 		
@@ -64,6 +67,12 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 		executor = Executors.newFixedThreadPool(1);
 		
 		pvman = new PVManager(ISearch.MAX_DEPTH);
+	}
+	
+	
+	public void setRootSearchFirstMoveIndex(int _root_search_first_move_index) {
+		
+		root_search_first_move_index = _root_search_first_move_index;
 	}
 	
 	
@@ -93,6 +102,8 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 						
 						new Object[] {getBitboardForSetup(),  getRootSearchConfig(), getSharedData()}
 					);
+		
+		searcher.setRootSearchFirstMoveIndex(root_search_first_move_index);
 	}
 	
 	

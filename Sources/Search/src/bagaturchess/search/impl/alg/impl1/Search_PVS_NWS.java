@@ -197,8 +197,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
+		MoveGenerator moveGen = ((BoardImpl) env.getBitboard()).getMoveGenerator();
+		
+		moveGen.setRootSearchFirstMoveIndex(root_search_first_move_index);
+		
 		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true, 0, 0, 0);
+				moveGen, 0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true, 0, 0, 0);
 	}
 	
 	
@@ -209,12 +213,16 @@ public class Search_PVS_NWS extends SearchImpl {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
+		MoveGenerator moveGen = ((BoardImpl) env.getBitboard()).getMoveGenerator();
+		
+		moveGen.setRootSearchFirstMoveIndex(root_search_first_move_index);
+		
 		return search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				((BoardImpl) env.getBitboard()).getMoveGenerator(), 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, 0, 0, 0);		
+				moveGen, 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, 0, 0, 0);		
 	}
 	
 	
-	public int search(ISearchMediator mediator, ISearchInfo info,
+	private int search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
 			final int ply, int depth, int alpha, int beta, boolean isPv, int pv_scores_w, int pv_scores_b, int excludedMove) {
 		

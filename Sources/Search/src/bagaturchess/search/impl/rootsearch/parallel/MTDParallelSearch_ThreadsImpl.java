@@ -52,8 +52,11 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 		for (int i = 0; i < getRootSearchConfig().getThreadsCount(); i++ ) {
 			
 			try {
+				
 				SequentialSearch_MTD searcher = (SequentialSearch_MTD)
 						ReflectionUtils.createObjectByClassName_ObjectsConstructor(SequentialSearch_MTD.class.getName(), new Object[] {getRootSearchConfig(), getSharedData()});
+				
+				searcher.setRootSearchFirstMoveIndex(i);
 				
 				addSearcher(searcher);
 				

@@ -59,6 +59,9 @@ public abstract class SearchImpl implements ISearch {
 	
 	protected int[] gtb_probe_result 			= new int[2];
 	
+	//Used for Lazy SMP
+	protected int root_search_first_move_index = 0;
+
 	
 	public void setup(IBitBoard bitboardForSetup) {
 		
@@ -71,6 +74,12 @@ public abstract class SearchImpl implements ISearch {
 			
 			env.getBitboard().makeMoveForward(moves[i]);
 		}
+	}
+	
+	
+	public void setRootSearchFirstMoveIndex(int _root_search_first_move_index) {
+		
+		root_search_first_move_index = _root_search_first_move_index;
 	}
 	
 	

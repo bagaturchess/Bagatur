@@ -66,4 +66,6 @@ public interface ISearch {
 			int maxdepth, int depth, int beta,
 			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV, int rootColour, int totalLMReduction, int materialGain, boolean inNullMove, int mateMove,
 			boolean useMateDistancePrunning);
+	
+	public void setRootSearchFirstMoveIndex(int _root_search_first_move_index);
 }
