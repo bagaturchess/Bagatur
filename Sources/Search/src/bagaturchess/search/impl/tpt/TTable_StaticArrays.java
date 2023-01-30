@@ -49,7 +49,6 @@ public final class TTable_StaticArrays implements ITTable {
 	
 	private static long counter_hits;
 	
-	
 	private static TTable_StaticArrays instance;
 	
 	
@@ -219,50 +218,63 @@ public final class TTable_StaticArrays implements ITTable {
 	}
 	
 	
-	private static final void addValue(final long new_key, int score, final int new_depth, final int flag, final int move) {
+	private static final void addValue(final long new_key, int score, final int new_depth, final int flag, final int new_move) {
 
 		if (EngineConstants.ASSERT) {
+			
 			Assert.isTrue(new_depth >= 0);
 			//Assert.isTrue(move != 0);
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 			//Assert.isTrue(MoveUtil.getSourcePieceIndex(move) != 0);
 		}
 
-		final long new_value = createValue(score, move, flag, new_depth);
+		final long new_value 	= createValue(score, new_move, flag, new_depth);
 		
-		final int start_index = getIndex(new_key);
-		int replaced_min_depth = Integer.MAX_VALUE;
-		int replaced_index = -1;
+		final int start_index 	= getIndex(new_key);
+		
+		int replaced_min_depth 	= Integer.MAX_VALUE;
+		int replaced_index 		= -1;
+
 		for (int i = start_index; i < start_index + 4; i++) {
 
 			long stored_key = keys[i];
 
 			if (stored_key == 0) {
-				replaced_index = i;
+				
+				replaced_min_depth 	= 0;
+				replaced_index 		= i;
 				counter_usage++;
+				
 				break;
 			}
-
+			
 			long stored_value = values[i];
 			
 			int stored_depth = getDepth(stored_value);
 			
 			if ((stored_key ^ stored_value) == new_key) {
 				
-				if (stored_value == new_value) {
+				//Minimize writes in the shared static arrays, because in multi-threaded case it impacts performance.
+				if (new_value == stored_value) {
 					
 					return;
 				}
 				
-				if (stored_depth <= new_depth) {
+				if (new_depth >= stored_depth) {
+					
+					replaced_min_depth = stored_depth;
 					
 					replaced_index = i;
 					
 					break;
+					
+				} else {
+					
+					return;
 				}
 			}
 			
-			// replace the lowest depth
+			// keep the lowest depth and its index 
 			if (stored_depth < replaced_min_depth) {
 				
 				replaced_min_depth = stored_depth;
@@ -272,6 +284,7 @@ public final class TTable_StaticArrays implements ITTable {
 		}
 		
 		if (EngineConstants.ASSERT) {
+			
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 		}
 
