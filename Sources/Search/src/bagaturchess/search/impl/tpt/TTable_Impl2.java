@@ -71,14 +71,14 @@ public class TTable_Impl2 implements ITTable {
 
 
 	@Override
-	public int getUsage() {
+	public final int getUsage() {
 		
 		return (int) (counter_usage * 100 / keys.length);
 	}
 	
 	
 	@Override
-	public int getHitRate() {
+	public final int getHitRate() {
 		
 		if (counter_tries == 0) return 0;
 		
@@ -87,14 +87,14 @@ public class TTable_Impl2 implements ITTable {
 	
 	
 	@Override
-	public void correctAllDepths(final int reduction) {
+	public final void correctAllDepths(final int reduction) {
 		
 		//Do nothing
 	}
 	
 	
 	@Override
-	public void get(long key, ITTEntry entry) {
+	public final void get(long key, ITTEntry entry) {
 		
 		counter_tries++;
 		
@@ -110,7 +110,6 @@ public class TTable_Impl2 implements ITTable {
 		}
 		
 		
-		//TODO: Consider!!!
 		entry.setIsEmpty(true);
 		
 		
@@ -129,7 +128,7 @@ public class TTable_Impl2 implements ITTable {
 	
 	
 	@Override
-	public void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove) {
+	public final void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove) {
 		
 		int flag = ITTEntry.FLAG_EXACT;
 		
@@ -146,7 +145,7 @@ public class TTable_Impl2 implements ITTable {
 	}
 	
 	
-	private long getTTValue(final long key) {
+	private final long getTTValue(final long key) {
 
 		final int index = getIndex(key);
 
@@ -168,7 +167,7 @@ public class TTable_Impl2 implements ITTable {
 	}
 	
 	
-	private int getIndex(final long key) {
+	private final int getIndex(final long key) {
 		
 		long index = (int) (key ^ (key >>> 32));
 		
@@ -185,58 +184,82 @@ public class TTable_Impl2 implements ITTable {
 	}
 	
 	
-	private void addValue(final long key, int score, final int depth, final int flag, final int move) {
+	private final void addValue(final long new_key, int score, final int new_depth, final int flag, final int new_move) {
 
 		if (EngineConstants.ASSERT) {
-			Assert.isTrue(depth >= 0);
+			Assert.isTrue(new_depth >= 0);
 			//Assert.isTrue(move != 0);
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 			//Assert.isTrue(MoveUtil.getSourcePieceIndex(move) != 0);
 		}
 
-		final int index = getIndex(key);
-		int replacedDepth = Integer.MAX_VALUE;
-		int replacedIndex = index;
-		for (int i = index; i < index + 4; i++) {
+		final long new_value 		= createValue(score, new_move, flag, new_depth);
+		
+		final int start_index_entry = getIndex(new_key);
+		
+		int replaced_min_depth 		= Integer.MAX_VALUE;
+		int replaced_index 			= -1;
 
-			if (keys[i] == 0) {
-				replacedIndex = i;
+		for (int i = start_index_entry; i < start_index_entry + 4; i++) {
+
+			long stored_key = keys[i];
+
+			if (stored_key == 0) {
+				
+				replaced_min_depth 	= 0;
+				replaced_index 		= i;
 				counter_usage++;
+				
 				break;
 			}
-
-			long currentValue = values[i];
 			
-			int currentDepth = getDepth(currentValue);
+			long stored_value = values[i];
 			
-			if ((keys[i] ^ currentValue) == key) {
+			int stored_depth = getDepth(stored_value);
+			
+			if ((stored_key ^ stored_value) == new_key) {
 				
-				if (currentDepth > depth /*&& flag != ITTEntry.FLAG_EXACT*/) {
+				//Minimize writes in the shared static arrays, because in multi-threaded case it impacts performance.
+				if (new_value == stored_value) {
 					
-					continue;
+					return;
 				}
 				
-				replacedIndex = i;
-				
-				break;
+				if (new_depth >= stored_depth) {
+					
+					replaced_min_depth = stored_depth;
+					
+					replaced_index = i;
+					
+					break;
+					
+				} else {
+					
+					return;
+				}
 			}
 			
-			// replace the lowest depth
-			if (currentDepth < replacedDepth) {
+			// keep the lowest depth and its index 
+			if (stored_depth < replaced_min_depth) {
 				
-				replacedDepth = currentDepth;
+				replaced_min_depth = stored_depth;
 				
-				replacedIndex = i;
+				replaced_index = i;
 			}
 		}
 		
 		if (EngineConstants.ASSERT) {
+			
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 		}
 
-		final long value = createValue(score, move, flag, depth);
-		keys[replacedIndex] = key ^ value;
-		values[replacedIndex] = value;
+		if (replaced_index == -1) {
+			
+			throw new IllegalStateException();
+		}
+		
+		keys[replaced_index] = new_key ^ new_value;
+		values[replaced_index] = new_value;
 	}
 	
 	
