@@ -695,8 +695,11 @@ public final class MoveGenerator {
 		final int start_index = nextToMove[currentPly];
 		final int end_index = nextToGenerate[currentPly] - 1;
 		
-		
-		randomize(moveScores, moves, start_index, end_index);
+		//Randomize non attacks only
+		if (moveScores[start_index + 1] <= MOVE_SCORE_SCALE) {
+			
+			randomize(moveScores, moves, start_index, end_index);
+		}
 		
 		
 		for (int i = start_index, j = i; i < end_index; j = ++i) {
