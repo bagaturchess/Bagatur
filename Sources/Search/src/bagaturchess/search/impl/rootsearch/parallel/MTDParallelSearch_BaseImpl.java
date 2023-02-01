@@ -24,8 +24,11 @@ package bagaturchess.search.impl.rootsearch.parallel;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
@@ -234,6 +237,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		
 		
 		executor.execute(new Runnable() {
+			
 			@Override
 			public void run() {
 				
@@ -402,9 +406,15 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							
 							
 							//Collect all major infos, put them in searchersInfo, and send the best info if available
-							ISearchInfo newInfo = collectAndSendInfos(final_mediator, mediators_bucket, searchersInfo, lastSendInfo);
-							boolean newDepth = lastSendInfo == null || newInfo.getDepth() > lastSendInfo.getDepth();
-							lastSendInfo = newInfo;
+							processNewInfos(mediators_bucket, searchersInfo);
+							ISearchInfo newInfo = sendNewMergedInfo(searchersInfo, lastSendInfo);
+							
+							boolean newDepth = lastSendInfo == null || (newInfo != null && newInfo.getDepth() > lastSendInfo.getDepth());
+							
+							if (newInfo != null) {
+								
+								lastSendInfo = newInfo;
+							}
 							
 							//System.out.println("newDepth=" + newDepth);
 							
@@ -508,7 +518,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					
 					
 					//Send all infos after the searchers are stopped
-					lastSendInfo = collectAndSendInfos(final_mediator, mediators_bucket, searchersInfo, lastSendInfo);
+					processNewInfos(mediators_bucket, searchersInfo);
+					sendNewMergedInfo(searchersInfo, lastSendInfo);
 					
 					
 					if (stopper == null) {
@@ -535,10 +546,57 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 			}
 			
 			
-			private ISearchInfo collectAndSendInfos(
-					final ISearchMediator final_mediator,
-					final List<BucketMediator> mediators_bucket,
-					SearchersInfo searchersInfo, ISearchInfo lastSendInfo) {
+			private ISearchInfo sendNewMergedInfo(SearchersInfo searchersInfo, ISearchInfo lastSendInfo) {
+				
+				ISearchInfo toSend = searchersInfo.getNewInfoToSendIfPresented();
+				
+				if (toSend != null) {
+					
+					if (lastSendInfo != null) {
+						
+						if (toSend.getDepth() > lastSendInfo.getDepth()) {
+							
+							if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend=" + toSend);
+							
+							final_mediator.changedMajor(toSend);
+							
+							return toSend;
+							
+						} else if (toSend.getDepth() == lastSendInfo.getDepth()) {
+							
+							if (toSend.getBestMove() == lastSendInfo.getBestMove() && toSend.getEval() == lastSendInfo.getEval()) {
+								
+								//Do nothing
+								
+							} else {
+								
+								if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend=" + toSend);
+								
+								final_mediator.changedMajor(toSend);
+								
+								return toSend;
+							}
+							
+						} else {
+							
+							//Do nothing
+						}
+						
+					} else {							
+						
+						if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend=" + toSend);
+						
+						final_mediator.changedMajor(toSend);
+						
+						return toSend;
+					}
+				}
+				
+				return null;
+			}
+			
+			
+			private void processNewInfos(final List<BucketMediator> mediators_bucket, SearchersInfo searchersInfo) {
 				
 				for (int i_mediator = 0; i_mediator < mediators_bucket.size(); i_mediator++) {
 						
@@ -546,72 +604,46 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					BucketMediator cur_mediator = mediators_bucket.get(i_mediator);
 					
 					
-					//Add minor infos
-					for (int i_minor = cur_mediator.lastSendMinorIndex + 1; i_minor < cur_mediator.minorInfos.size() ; i_minor++) {							
+					//Set searched nodes count and TB hits
+					long searched_nodes = 0;
+					long tb_hits 		= 0;
+					Object[] infos 		= cur_mediator.allInfos.toArray();
+					
+					for (int i = 0; i < infos.length; i++) {							
 						
-						ISearchInfo curinfo = cur_mediator.minorInfos.get(i_minor);
+						ISearchInfo cur_info = (ISearchInfo) infos[i];
 						
-						if (curinfo == null) { //Because of multi threaded access to arraylist
-							continue;
-						}
+						searched_nodes += cur_info.getSearchedNodes();
 						
-						cur_mediator.lastSendMinorIndex = i_minor;
-						
-						searchersInfo.updateNodesCount(searchers_ready.get(i_mediator), curinfo);
+						tb_hits += cur_info.getTBhits();
 					}
-
+					
+					searchersInfo.setNodesCountAndTBHits(searchers_ready.get(i_mediator), searched_nodes, tb_hits);
+					
 					
 					//Add major infos
 					for (int i_major = cur_mediator.lastSendMajorIndex + 1; i_major < cur_mediator.majorInfos.size() ; i_major++) {							
 						
-						ISearchInfo curinfo = cur_mediator.majorInfos.get(i_major);
+						ISearchInfo cur_info = cur_mediator.majorInfos.get(i_major);
 						
-						if (curinfo == null) { //Because of multi threaded access to arraylist
+						if (cur_info == null) { //Because of multi threaded access to arraylist
+							
 							continue;
 						}
 						
 						/*ChannelManager.getChannel().dump("MTDParallelSearch: select info from mediator (" + i_mediator + ")"
-								+ ", curinfo.getDepth()=" + curinfo.getDepth()
-								+ ", curinfo.getBestMove()=" + curinfo.getBestMove()
-								+ ", curinfo.getPV()=" + curinfo.getPV()
-								+ ", curinfo.isUpperBound()=" + curinfo.isUpperBound()
-								+ (curinfo.getPV() == null ? "" : ", info.getPV().length=" + curinfo.getPV().length)
+								+ ", cur_info.getDepth()=" + cur_info.getDepth()
+								+ ", cur_info.getBestMove()=" + cur_info.getBestMove()
+								+ ", cur_info.getPV()=" + cur_info.getPV()
+								+ ", cur_info.isUpperBound()=" + cur_info.isUpperBound()
+								+ (cur_info.getPV() == null ? "" : ", info.getPV().length=" + cur_info.getPV().length)
 								);*/
 						
 						cur_mediator.lastSendMajorIndex = i_major;
 						
-						searchersInfo.updateMajor(searchers_ready.get(i_mediator), curinfo);
-						searchersInfo.updateNodesCount(searchers_ready.get(i_mediator), curinfo);
-						
-						ISearchInfo toSend = searchersInfo.getNewInfoToSendIfPresented();
-						
-						if (toSend != null) {
-							if (lastSendInfo != null) {
-								if (toSend.getDepth() > lastSendInfo.getDepth()) {
-									if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend=" + toSend);
-									final_mediator.changedMajor(toSend);
-									lastSendInfo = toSend;
-								} else if (toSend.getDepth() == lastSendInfo.getDepth()) {
-									if (toSend.getBestMove() == lastSendInfo.getBestMove() && toSend.getEval() == lastSendInfo.getEval()) {
-										//Do nothing
-									} else {
-										if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend=" + toSend);
-										final_mediator.changedMajor(toSend);
-										lastSendInfo = toSend;
-									}
-								} else {
-									//Do nothing
-								}
-							} else {									
-								if (DEBUGSearch.DEBUG_MODE) ChannelManager.getChannel().dump("MTDParallelSearch: hasInfoToSend=true, infoToSend=" + toSend);
-								final_mediator.changedMajor(toSend);
-								lastSendInfo = toSend;
-							}
-						}
+						searchersInfo.updateMajor(searchers_ready.get(i_mediator), cur_info);
 					}
 				}
-				
-				return lastSendInfo;
 			}
 		});
 		
@@ -702,9 +734,8 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 	private static class BucketMediator extends SearchMediatorProxy {
 		
 		
-		protected int lastSendMinorIndex = -1;
 		protected int lastSendMajorIndex = -1;
-		protected List<ISearchInfo> minorInfos;
+		protected Set<ISearchInfo> allInfos;
 		protected List<ISearchInfo> majorInfos;
 		
 		private ISearchStopper stopper;
@@ -718,23 +749,20 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 			
 			//root_stopper = _parent.getStopper();
 			
-			minorInfos = new ArrayList<ISearchInfo>();
+			allInfos 	= ConcurrentHashMap.newKeySet();
 			majorInfos = new ArrayList<ISearchInfo>();
 			
 			
 			
 			bestmovesender = new BestMoveSender() {
+				
 				@Override
 				public void sendBestMove() {
 					//Do nothing
 				}
 			};
 			
-			clearStopper();
-		}
-		
-		
-		protected void clearStopper() {
+			
 			stopper = new ISearchStopper() {
 				
 				@Override
@@ -768,12 +796,15 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					+ ", info.isUpperBound()=" + info.isUpperBound()
 					+ (info.getPV() == null ? "" : ", info.getPV().length=" + info.getPV().length)
 					);
+			
+			allInfos.add(info);
 		}
 		
 		
 		@Override
 		public void changedMinor(ISearchInfo info) {
-			minorInfos.add(info);
+			
+			allInfos.add(info);
 		}
 		
 		

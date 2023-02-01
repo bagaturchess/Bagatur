@@ -37,7 +37,7 @@ public class TTable_Impl2 implements ITTable {
 	private static final int MOVE = 14;
 	private static final int SCORE = 48;
 	
-
+	
 	private long[] keys;
 	
 	private long[] values;

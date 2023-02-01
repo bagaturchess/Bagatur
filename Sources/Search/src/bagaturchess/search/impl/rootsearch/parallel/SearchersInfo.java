@@ -22,7 +22,8 @@ public class SearchersInfo {
 	private int cur_depth;
 	private double nextDepthThreshold;
 	
-	private Map<IRootSearch, ISearchInfo> searchersNodesInfo;
+	private Map<IRootSearch, Long> searchers_searched_nodes_count;
+	private Map<IRootSearch, Long> searchers_tb_hits;
 	
 	
 	public SearchersInfo(int startDepth, double _nextDepthThreshold) {
@@ -30,7 +31,8 @@ public class SearchersInfo {
 		cur_depth = startDepth;
 		nextDepthThreshold = _nextDepthThreshold;
 		
-		searchersNodesInfo = new HashMap<IRootSearch, ISearchInfo>();
+		searchers_searched_nodes_count = new HashMap<IRootSearch, Long>();
+		searchers_tb_hits = new HashMap<IRootSearch, Long>();
 	}
 	
 	
@@ -39,39 +41,46 @@ public class SearchersInfo {
 	}
 	
 	
-	public void updateNodesCount(IRootSearch searcher, ISearchInfo info) {
-		ISearchInfo oldInfo = searchersNodesInfo.get(searcher);
-		if (oldInfo == null)  {
-			searchersNodesInfo.put(searcher, info);
-		} else {
-			if (info.getSearchedNodes() > oldInfo.getSearchedNodes()) {
-				searchersNodesInfo.put(searcher, info);
-			}
-		}
+	public void setNodesCountAndTBHits(IRootSearch searcher, long searched_nodes_count, long tb_hits_count) {
+		
+		searchers_searched_nodes_count.put(searcher, searched_nodes_count);
+		searchers_tb_hits.put(searcher, tb_hits_count);
 	}
 	
 	
 	private long getNodesCount() {
+		
 		long nodes = 0;
-		for (IRootSearch searcher: searchersNodesInfo.keySet()) {
-			ISearchInfo info = searchersNodesInfo.get(searcher);
-			if (info != null) {
-				nodes += info.getSearchedNodes();
+		
+		for (IRootSearch searcher: searchers_searched_nodes_count.keySet()) {
+			
+			Long searched_nodes_count = searchers_searched_nodes_count.get(searcher);
+			
+			if (searched_nodes_count != null) {
+				
+				nodes += searched_nodes_count;
 			}
 		}
+		
 		return nodes;
 	}
 	
 	
 	private long getTBHits() {
-		long hits = 0;
-		for (IRootSearch searcher: searchersNodesInfo.keySet()) {
-			ISearchInfo info = searchersNodesInfo.get(searcher);
-			if (info != null) {
-				hits += info.getTBhits();
+		
+		long tb_hits = 0;
+		
+		for (IRootSearch searcher: searchers_tb_hits.keySet()) {
+			
+			Long tb_hits_count = searchers_tb_hits.get(searcher);
+			
+			if (tb_hits_count != null) {
+				
+				tb_hits += tb_hits_count;
 			}
 		}
-		return hits;
+		
+		return tb_hits;
 	}
 	
 	
@@ -309,16 +318,20 @@ public class SearchersInfo {
 	private class MoveInfo {
 		
 		
+		private int best_eval;
 		private int sum;
 		private int cnt;
-		private int best_eval;
+		
+		private boolean is_mate;
+		private int mate_val;
+		
 		private ISearchInfo best_info;
-		private boolean hasMate;
 		
 		
 		MoveInfo(ISearchInfo first_info) {
 			
 			best_eval = ISearch.MIN;
+			mate_val = ISearch.MIN;
 			
 			addInfo(first_info);
 		}
@@ -328,13 +341,13 @@ public class SearchersInfo {
 			
 			int new_eval = info.getEval();
 			
-			if (hasMate) {
+			if (is_mate) {
 				
 				if (SearchUtils.isMateVal(new_eval)) {
 					
-					if (new_eval > best_eval) {
+					if (new_eval > mate_val) {
 						
-						best_eval = new_eval;
+						mate_val = new_eval;
 						best_info = info;
 					}
 				}
@@ -343,34 +356,40 @@ public class SearchersInfo {
 				
 				if (SearchUtils.isMateVal(new_eval)) {
 					
-					hasMate = true;
+					is_mate = true;
 					
-					best_eval = new_eval;
+					mate_val = new_eval;
 					best_info = info;
 					
 				} else {
 					
 					if (new_eval > best_eval) {
-						
 						best_eval = new_eval;
 						best_info = info;
 					}
 					
 					sum += new_eval;
-					cnt += 1;
 				}
 			}
+			
+			cnt += 1;
 		}
 		
 		
 		int getEval() {
 			
-			if (hasMate) {
+			if (is_mate) {
 				
-				return best_eval;
+				return mate_val;
 			}
 			
 			return sum / cnt;
+		}
+		
+		
+		int getCount() {
+			
+			return cnt;
 		}
 	}
 }

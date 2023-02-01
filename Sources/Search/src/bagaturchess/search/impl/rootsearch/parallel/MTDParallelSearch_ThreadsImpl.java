@@ -69,7 +69,8 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 	
 	@Override
 	protected ISearchMediator sequentialSearchers_WrapMediator(ISearchMediator mediator) {
-		return new NPSCollectorMediator(new Mediator_AlphaAndBestMoveWindow(mediator));
+		
+		return new Mediator_AlphaAndBestMoveWindow(mediator);
 	}
 	
 	
@@ -84,7 +85,7 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 	@Override
 	// Only one thread is enough to finish the depth
 	protected SearchersInfo createSearchersInfo(final int startIteration) {
-		return new SearchersInfo(startIteration, 0.001d); 
+		return new SearchersInfo(startIteration, 0.00001d); 
 	}
 	
 	
