@@ -50,7 +50,7 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 	@Override
 	protected void sequentialSearchers_Create() {
 		
-		ITTable last_tt 					= null;
+		//ITTable last_tt 					= null;
 		int root_search_first_move_index 	= 0;
 		
 		for (int i = 0; i < getRootSearchConfig().getThreadsCount(); i++ ) {
@@ -60,7 +60,9 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 				SequentialSearch_MTD searcher = (SequentialSearch_MTD)
 						ReflectionUtils.createObjectByClassName_ObjectsConstructor(SequentialSearch_MTD.class.getName(), new Object[] {getRootSearchConfig(), getSharedData()});
 				
-				ITTable current_tt = searcher.getTPT();
+				//getTPT - throws NPE as searcher still doesn;t have TT set.
+				//Will not be used anyway, because with root_search_first_move_index ELO is less
+				/*ITTable current_tt = searcher.getTPT();
 				
 				if (current_tt != last_tt) {
 					
@@ -68,7 +70,7 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 				}
 				
 				last_tt = current_tt;
-				
+				*/
 				
 				searcher.setRootSearchFirstMoveIndex(root_search_first_move_index++);
 				
