@@ -24,7 +24,7 @@ public class UCIOptions {
 	public static final String OPTION_NAME_MultiPV 						= "MultiPV";
 	public static final String OPTION_NAME_Opening_Mode 				= "Opening Mode";
 	public static final String OPTION_NAME_SMP_Threads 					= "SMP Threads";
-	public static final String OPTION_NAME_IsGlobalTranspositionTable 	= "IsGlobalTranspositionTable";
+	public static final String OPTION_NAME_CountTranspositionTables 	= "CountTranspositionTables";
 	
 	
 	private static final Set<String> Options_RecreateSearchAdaptor = new HashSet<String>();
@@ -38,7 +38,7 @@ public class UCIOptions {
 		Options_RecreateSearchAdaptor.add(UCIOptions.OPTION_NAME_EvalCache);
 		Options_RecreateSearchAdaptor.add(UCIOptions.OPTION_NAME_SyzygyOnline);
 		Options_RecreateSearchAdaptor.add(UCIOptions.OPTION_NAME_SyzygyDTZCache);
-		Options_RecreateSearchAdaptor.add(UCIOptions.OPTION_NAME_IsGlobalTranspositionTable);
+		Options_RecreateSearchAdaptor.add(UCIOptions.OPTION_NAME_CountTranspositionTables);
 		Options_RecreateSearchAdaptor.add(UCIOptions.OPTION_NAME_UCI_Chess960);
 	};
 	

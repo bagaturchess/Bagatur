@@ -31,9 +31,9 @@ public interface IRootSearchConfig {
 	
 	public double get_MEMORY_USAGE_PERCENT();
 	
-	public boolean useTPT();
+	public int getTPTsCount();
 	
-	public boolean useGlobalTPT();
+	public boolean useTPT();
 	
 	public boolean useEvalCache();
 	

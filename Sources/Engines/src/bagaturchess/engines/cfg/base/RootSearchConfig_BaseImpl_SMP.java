@@ -32,16 +32,23 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 	
 	private static final int DEFAULT_SMP_Threads 					= getDefaultThreadsCount();
 	
-	private static final boolean DEFAULT_GlobalTranspositionTable 	= true;
+	private static final int DEFAULT_CountTranspositionTables 		= 1;
 	
 	
 	//setoption name UCIOptions.OPTION_NAME_SMP_Threads value 16
 	private UCIOption[] options = new UCIOption[] {
-			new UCIOption(UCIOptions.OPTION_NAME_IsGlobalTranspositionTable		, DEFAULT_GlobalTranspositionTable	, "type check default " + DEFAULT_GlobalTranspositionTable),
-			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_SMP_Threads		, DEFAULT_SMP_Threads,
+			
+			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_CountTranspositionTables		, DEFAULT_CountTranspositionTables,
+					"type spin default " + DEFAULT_CountTranspositionTables
+					+ " min 1"
+					+ " max " + Math.max(2, DEFAULT_SMP_Threads)
+				),
+					
+			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_SMP_Threads					, DEFAULT_SMP_Threads,
 					"type spin default " + DEFAULT_SMP_Threads
-											+ " min 1"
-											+ " max " + Math.max(2, 2 * DEFAULT_SMP_Threads)),
+					+ " min 1"
+					+ " max " + Math.max(2, 2 * DEFAULT_SMP_Threads)
+				),
 	};
 	
 	
@@ -66,9 +73,9 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 	
 	
 	@Override
-	public boolean useGlobalTPT() {
+	public int getTPTsCount() {
 		
-		return (Boolean) options[0].getValue();
+		return (Integer) options[0].getValue();
 	}
 	
 	
@@ -93,7 +100,7 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 			
 			return true;
 			
-		} else if (UCIOptions.OPTION_NAME_IsGlobalTranspositionTable.equals(option.getName())) {
+		} else if (UCIOptions.OPTION_NAME_CountTranspositionTables.equals(option.getName())) {
 			
 			return true;
 		
@@ -108,7 +115,7 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 		int threads = Runtime.getRuntime().availableProcessors();
 		
 		threads /= 2;//2 logical processors for 1 core in most hardware architectures
-		threads--;//One thread for the logging thread, OS, etc.
+		//threads--;//One thread for the logging thread, OS, etc.
 		
 		if (threads < 1) {
 			threads = 1;

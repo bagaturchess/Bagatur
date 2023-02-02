@@ -90,8 +90,8 @@ public class MTDSchedulerMain {
 								}
 				);*/
 		
-		IRootSearchConfig cfg = new RootSearchConfig_BaseImpl_1Core(
-								//new RootSearchConfig_BaseImpl_SMP_Threads(
+		IRootSearchConfig cfg = //new RootSearchConfig_BaseImpl_1Core(
+								new RootSearchConfig_BaseImpl_SMP_Threads(
 				
 				new String[] {
 								bagaturchess.search.impl.alg.impl1.Search_PVS_NWS.class.getName(),
@@ -154,12 +154,12 @@ public class MTDSchedulerMain {
 		SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
 		
 		//IRootSearch search = new MTDParallelSearch_ProcessesImpl(new Object[] {cfg, sharedData});
-		//IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, sharedData});
+		IRootSearch search = new MTDParallelSearch_ThreadsImpl(new Object[] {cfg, sharedData});
 		//IRootSearch search = new SequentialSearch_SeparateProcess(new Object[] {cfg, sharedData});
 		//IRootSearch search = new SequentialSearch_Classic(new Object[] {cfg, sharedData});
-		IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
+		//IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
 		//IRootSearch search = new MonteCarloSearch(new Object[] {cfg, sharedData});
-		IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
+		//IRootSearch searchMultiPV = new MultiPVRootSearch(cfg, search);
 		
 		sharedData = search.getSharedData();
 		

@@ -65,10 +65,10 @@ public class RootSearchConfig_BaseImpl_1Core extends RootSearchConfig_BaseImpl i
 		super(args);
 	}
 
-
+	
 	@Override
-	public boolean useGlobalTPT() {
+	public int getTPTsCount() {
 		
-		return true;
+		return 1;
 	}
 }
