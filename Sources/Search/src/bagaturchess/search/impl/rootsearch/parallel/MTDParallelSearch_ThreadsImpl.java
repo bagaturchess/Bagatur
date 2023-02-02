@@ -50,8 +50,8 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 	@Override
 	protected void sequentialSearchers_Create() {
 		
-		ITTable last_tt = null;
-		int root_search_first_move_index = 0;
+		ITTable last_tt 					= null;
+		int root_search_first_move_index 	= 0;
 		
 		for (int i = 0; i < getRootSearchConfig().getThreadsCount(); i++ ) {
 			
@@ -67,11 +67,13 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 					root_search_first_move_index = 0;
 				}
 				
+				last_tt = current_tt;
+				
+				
 				searcher.setRootSearchFirstMoveIndex(root_search_first_move_index++);
 				
 				addSearcher(searcher);
 				
-				last_tt = current_tt;
 				
 			} catch (Throwable t) {
 				ChannelManager.getChannel().dump(t);
