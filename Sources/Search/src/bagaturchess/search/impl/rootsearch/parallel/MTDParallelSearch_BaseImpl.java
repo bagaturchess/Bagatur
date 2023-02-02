@@ -410,7 +410,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							processNewInfos(mediators_bucket, searchersInfo);
 							ISearchInfo newInfo = sendNewMergedInfo(searchersInfo, lastSendInfo);
 							
-							boolean newDepth = lastSendInfo == null || (newInfo != null && newInfo.getDepth() > lastSendInfo.getDepth());
+							boolean nextDepthReached = lastSendInfo == null || (newInfo != null && newInfo.getDepth() > lastSendInfo.getDepth());
 							
 							if (newInfo != null) {
 								
@@ -419,7 +419,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 							
 							//System.out.println("newDepth=" + newDepth);
 							
-							if (newDepth && restartSearchersOnNewDepth()) {
+							if (nextDepthReached && restartSearchersOnNewDepth()) {
 								
 								final AtomicInteger semaphore_stop = new AtomicInteger(0);
 								
