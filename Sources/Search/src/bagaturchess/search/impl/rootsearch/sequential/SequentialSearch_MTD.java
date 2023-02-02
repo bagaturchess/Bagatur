@@ -41,6 +41,7 @@ import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
 import bagaturchess.search.impl.rootsearch.sequential.mtd.Mediator_AlphaAndBestMoveWindow;
 import bagaturchess.search.impl.rootsearch.sequential.mtd.NullwinSearchTask;
 import bagaturchess.search.impl.rootsearch.sequential.mtd.SearchManager;
+import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
@@ -262,6 +263,13 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 	}
 
 
+	@Override
+	public ITTable getTPT() {
+		
+		return searcher.getEnv().getTPT();
+	}
+	
+	
 	@Override
 	public void decreaseTPTDepths(int reduction) {
 		

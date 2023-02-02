@@ -35,6 +35,7 @@ import bagaturchess.search.impl.eval.cache.EvalCache_Impl1;
 import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
+import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
@@ -136,6 +137,13 @@ public class MonteCarloSearch extends RootSearch_BaseImpl {
 	public int getTPTUsagePercent() {
 		//Do nothing
 		return 0;
+	}
+	
+	
+	@Override
+	public ITTable getTPT() {
+		
+		throw new UnsupportedOperationException();
 	}
 	
 	

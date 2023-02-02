@@ -48,6 +48,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
+import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.search.impl.utils.SearchMediatorProxy;
@@ -716,6 +717,13 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 			
 			searchers_ready.get(i).decreaseTPTDepths(reduction);
 		}
+	}
+	
+	
+	@Override
+	public ITTable getTPT() {
+		
+		throw new UnsupportedOperationException();
 	}
 	
 	

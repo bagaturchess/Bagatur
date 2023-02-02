@@ -31,6 +31,7 @@ import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
 import bagaturchess.search.impl.rootsearch.sequential.NPSCollectorMediator;
 import bagaturchess.search.impl.rootsearch.sequential.mtd.Mediator_AlphaAndBestMoveWindow;
+import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
@@ -49,6 +50,9 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 	@Override
 	protected void sequentialSearchers_Create() {
 		
+		ITTable last_tt = null;
+		int root_search_first_move_index = 0;
+		
 		for (int i = 0; i < getRootSearchConfig().getThreadsCount(); i++ ) {
 			
 			try {
@@ -56,9 +60,18 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 				SequentialSearch_MTD searcher = (SequentialSearch_MTD)
 						ReflectionUtils.createObjectByClassName_ObjectsConstructor(SequentialSearch_MTD.class.getName(), new Object[] {getRootSearchConfig(), getSharedData()});
 				
-				searcher.setRootSearchFirstMoveIndex(i);
+				ITTable current_tt = searcher.getTPT();
+				
+				if (current_tt != last_tt) {
+					
+					root_search_first_move_index = 0;
+				}
+				
+				searcher.setRootSearchFirstMoveIndex(root_search_first_move_index++);
 				
 				addSearcher(searcher);
+				
+				last_tt = current_tt;
 				
 			} catch (Throwable t) {
 				ChannelManager.getChannel().dump(t);

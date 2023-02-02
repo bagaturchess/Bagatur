@@ -33,6 +33,7 @@ import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
+import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.impl.commands.Go;
@@ -130,18 +131,28 @@ public class MultiPVRootSearch extends RootSearch_BaseImpl {
 	
 	@Override
 	public void shutDown() {
+		
 		rootSearch.shutDown();
 	}
 	
 	
 	@Override
 	public int getTPTUsagePercent() {
+		
 		return rootSearch.getTPTUsagePercent();
 	}
 	
 	
 	@Override
+	public ITTable getTPT() {
+		
+		return rootSearch.getTPT();
+	}
+	
+	
+	@Override
 	public void decreaseTPTDepths(int reduction) {
+		
 		rootSearch.decreaseTPTDepths(reduction);
 	}
 	

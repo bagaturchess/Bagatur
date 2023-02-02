@@ -41,6 +41,7 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.info.SearchInfoFactory;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
+import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.search.impl.utils.DEBUGSearch;
 import bagaturchess.uci.api.ChannelManager;
@@ -398,6 +399,13 @@ public class SequentialSearch_SeparateProcess extends RootSearch_BaseImpl {
 	@Override
 	public int getTPTUsagePercent() {
 		return hashfull;
+	}
+	
+	
+	@Override
+	public ITTable getTPT() {
+		
+		throw new UnsupportedOperationException();
 	}
 	
 	

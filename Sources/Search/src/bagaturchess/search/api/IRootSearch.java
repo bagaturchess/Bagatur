@@ -26,6 +26,7 @@ package bagaturchess.search.api;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SharedData;
+import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.uci_adaptor.timemanagement.ITimeController;
 import bagaturchess.uci.impl.commands.Go;
 
@@ -37,6 +38,8 @@ public interface IRootSearch {
 	public IBitBoard getBitboardForSetup();
 	
 	public int getTPTUsagePercent();
+	
+	public ITTable getTPT();
 	
 	public void decreaseTPTDepths(int reduction);
 	
