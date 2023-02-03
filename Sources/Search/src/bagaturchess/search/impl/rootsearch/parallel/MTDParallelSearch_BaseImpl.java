@@ -467,6 +467,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 								}
 								
 								final_mediator.getStopper().stopIfNecessary(searchersInfo.getCurrentDepth(), colourToMove, ISearch.MIN, ISearch.MAX);
+								
 							} catch(SearchInterruptedException sie) {
 							}
 							
@@ -478,6 +479,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 									break;
 								}
 							}
+							
 							allSearchersFinished = !hasRunningSearcher;
 					}
 					

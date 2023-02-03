@@ -102,12 +102,16 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 	@Override
 	// Only one thread is enough to finish the depth
 	protected SearchersInfo createSearchersInfo(final int startIteration) {
-		return new SearchersInfo(startIteration, 0.00001d); 
+		
+		//return new SearchersInfo(startIteration, 0.00001d); //0.00001d (small 0+ number) - Send info when the first thread reaches new depth
+		return new SearchersInfo(startIteration, 1d); //1d - Send info when all threads reach the current depth
+		//return new SearchersInfo(startIteration, 0.5d); //0.5d - Send info when the half of the threads reach the current depth
 	}
 	
 	
 	@Override
 	protected boolean restartSearchersOnNewDepth() {
+		
 		return false;
 	}
 }
