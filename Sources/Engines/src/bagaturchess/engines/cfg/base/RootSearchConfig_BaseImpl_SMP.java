@@ -30,18 +30,21 @@ import bagaturchess.uci.impl.commands.options.UCIOptions;
 public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_BaseImpl implements IRootSearchConfig_SMP, IUCIOptionsProvider {
 	
 	
-	private static final int DEFAULT_SMP_Threads 					= getDefaultThreadsCount();
+	private static final int DEFAULT_SMP_Threads 				= getDefaultThreadsCount();
 	
-	private static final int DEFAULT_CountTranspositionTables 		= 1;
+	private static final int DEFAULT_CountTranspositionTables 	= 1;
+	
+	//private static final int MAX_CountTranspositionTables 	= DEFAULT_SMP_Threads;
+	private static final int MAX_CountTranspositionTables 		= (int) Math.sqrt(DEFAULT_SMP_Threads);
 	
 	
-	//setoption name UCIOptions.OPTION_NAME_SMP_Threads value 16
+	//setoption name CountTranspositionTables (UCIOptions.OPTION_NAME_CountTranspositionTables) value 8
 	private UCIOption[] options = new UCIOption[] {
 			
 			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_CountTranspositionTables		, DEFAULT_CountTranspositionTables,
 					"type spin default " + DEFAULT_CountTranspositionTables
 					+ " min 1"
-					+ " max " + Math.max(2, DEFAULT_SMP_Threads)
+					+ " max " + MAX_CountTranspositionTables
 				),
 					
 			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_SMP_Threads					, DEFAULT_SMP_Threads,

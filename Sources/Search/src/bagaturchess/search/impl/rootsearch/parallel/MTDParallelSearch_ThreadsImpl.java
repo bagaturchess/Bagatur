@@ -100,12 +100,23 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 	
 	
 	@Override
-	// Only one thread is enough to finish the depth
 	protected SearchersInfo createSearchersInfo(final int startIteration) {
 		
+		// Is one thread is enough to start the new depth?
 		//return new SearchersInfo(startIteration, 0.00001d); //0.00001d (small 0+ number) - Send info when the first thread reaches new depth
-		return new SearchersInfo(startIteration, 1d); //1d - Send info when all threads reach the current depth
 		//return new SearchersInfo(startIteration, 0.5d); //0.5d - Send info when the half of the threads reach the current depth
+		//return new SearchersInfo(startIteration, 1d); //1d - Send info when all threads reach the current depth. 1d is a risky extreme - if one thread hangs, search of the current depth will never end.
+		//0.75d - Send info when 75% of the threads reach the current depth
+		
+		//Assumptions what is the difference:
+		//1. If there is 1 TT (or less TTs) than the consensus of a smaller amount of threads should be necessary to prove the new_depth move is valid and search errors are compensated, because they share mostly the same search data stored in the TT(s).
+		//3. The small amount of TTs is used, the more help each thread receives (although the NPS degradation on some OS/Java versions), the bigger depth each one thread will reach faster.
+		//4. We use at min 2 threads and max MAX_THREADS - 2, in order to stay away from both extremes.
+		//2. Just note: The more aggressive static and forward pruning in the single core version of the search is, the more need of validation of the move in the new depth is necessary.
+		double at_least_2_threads = 2 * 1 / (double) getRootSearchConfig().getThreadsCount();
+		//double max_threads_minus_2 = Math.min(1, 1 / (double) getRootSearchConfig().getTPTsCount()) - at_least_2_threads;
+		//return new SearchersInfo(startIteration, Math.max(at_least_2_threads, max_threads_minus_2));
+		return new SearchersInfo(startIteration, at_least_2_threads);
 	}
 	
 	

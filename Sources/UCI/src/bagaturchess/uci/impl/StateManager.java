@@ -281,7 +281,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 		String result = "\r\n\r\n";
 		result += "***************************************************************************";
 		result += "\r\n";
-		result += "* Copyright (C) 2005-2022 Krasimir I. Topchiyski (k_topchiyski@yahoo.com) *";
+		result += "* Copyright (C) 2005-2023 Krasimir I. Topchiyski (k_topchiyski@yahoo.com) *";
 		result += "\r\n";
 		result += "*                                                                         *";
 		result += "\r\n";

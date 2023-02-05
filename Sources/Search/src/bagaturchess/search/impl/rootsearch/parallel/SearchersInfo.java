@@ -34,6 +34,8 @@ public class SearchersInfo {
 		
 		searchers_searched_nodes_count = new HashMap<IRootSearch, Long>();
 		searchers_tb_hits = new HashMap<IRootSearch, Long>();
+		
+		ChannelManager.getChannel().dump("SearchersInfo.init(...): nextDepthThreshold=" + nextDepthThreshold);
 	}
 	
 	
