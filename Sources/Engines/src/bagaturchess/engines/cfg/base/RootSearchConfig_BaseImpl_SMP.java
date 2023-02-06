@@ -46,7 +46,7 @@ public abstract class RootSearchConfig_BaseImpl_SMP extends RootSearchConfig_Bas
 					+ " min 1"
 					+ " max " + MAX_CountTranspositionTables
 				),
-					
+			
 			new UCIOptionSpin_Integer(UCIOptions.OPTION_NAME_SMP_Threads					, DEFAULT_SMP_Threads,
 					"type spin default " + DEFAULT_SMP_Threads
 					+ " min 1"

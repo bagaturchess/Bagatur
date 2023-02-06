@@ -16,7 +16,6 @@ import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.tpt.TTable_Impl2;
-import bagaturchess.search.impl.tpt.TTable_StaticArrays;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.api.IChannel;
 
