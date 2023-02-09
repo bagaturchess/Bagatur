@@ -696,8 +696,9 @@ public final class MoveGenerator {
 		final int end_index = nextToGenerate[currentPly] - 1;
 		
 		//Randomize non attacks only
-		if (moveScores[start_index + 1] <= MOVE_SCORE_SCALE) {
-			
+		long first_score = moveScores[start_index + 1];
+		if (currentPly == 1 || (first_score <= MOVE_SCORE_SCALE && (first_score == 0 || first_score % 2 == 0))) {
+				
 			randomize(moveScores, moves, start_index, end_index);
 		}
 		
