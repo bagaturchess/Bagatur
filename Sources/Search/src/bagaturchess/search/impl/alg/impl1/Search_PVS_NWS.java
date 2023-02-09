@@ -1266,21 +1266,19 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (env.getTPT() != null) {
-				
-			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
-		}
-			
-		
 		if (bestScore != node.eval) {
 			
 			throw new IllegalStateException();
 		}
 		
-		//validatePV(node, evaluator, node.eval, ply, depth, isPv, false);
+		
+		if (env.getTPT() != null) {
+				
+			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
+		}
 		
 		
-		return bestScore;
+		return node.eval;
 	}
 	
 	
@@ -1503,16 +1501,21 @@ public class Search_PVS_NWS extends SearchImpl {
 				throw new IllegalStateException(); 
 			}
 			
-			if (env.getTPT() != null) {
-						
-				env.getTPT().put(cb.zobristKey, 0, bestScore, alphaOrig, beta, bestMove);
-			}
-			
 		} else {
 			
 			node.bestmove = 0;
 			node.leaf = true;
 			node.eval = eval;
+		}
+		
+		
+		if (env.getTPT() != null) {
+			
+			if (bestScore > eval) {
+				
+				env.getTPT().put(cb.zobristKey, 0, bestScore, alphaOrig, beta, bestMove);
+				
+			}
 		}
 		
 		
@@ -1525,9 +1528,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.eval = alpha;
 			}
 		}
-		
-		
-		//validatePV(node, evaluator, node.eval, ply, ply, isPv, true);
 		
 		
     	return node.eval;
