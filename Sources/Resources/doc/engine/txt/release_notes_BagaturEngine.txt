@@ -1,18 +1,16 @@
 Version 3.7 (07 February 2023)
- * 
  * SMP version:
- * 1. On https://tcec-chess.com/ S24, there is still NPS sclaing issue, because the achieved value is 5-10M nps and the expected is 30M nps.
- * 2. The issue is reproducable on CentOS Stream release 8 and Java OpenJDK 1.8.0.
- * 3. The tests show that with up to 64 cores (128 logical porcessors) it still achieves more stable and deeper depth, for a fixed time, with only 1 Transposition Table, although the NPS is between 3 and 6 times smaller.
+ * 1. On https://tcec-chess.com/ S24, there is still NPS scaling issue, because the achieved value is 5-10M nps and the expected is 30M nps.
+ * 2. The issue is reproducible on CentOS Stream release 8 and Java OpenJDK 1.8.0.
+ * 3. The tests show that with up to 64 cores (128 logical processors) it still achieves more stable and deeper depth, for a fixed time, with only 1 Transposition Table, although the NPS is between 3 and 6 times smaller.
  * 4. A new UCI option is introduced for SMP version - CountTranspositionTables.
- * 5. On CentOS Stream release 8 and Java OpenJDK 1.8.0, with 8 Transposition Tables the SMP search achieves similar depth and time, so there is sense to set it not to be 1, only when there is a NPS sclaing issue. In such cases it could be set up to SQRT(THREADS_COUNT) Transposition Tables.
+ * 5. On CentOS Stream release 8 and Java OpenJDK 1.8.0, with 8 Transposition Tables the SMP search achieves similar depth and time, so there is sense to set it not to be 1, only when there is a NPS scaling issue. In such cases it could be set up to SQRT(THREADS_COUNT) Transposition Tables.
  * 6. More details about the tests of the SMP version, could be found here: https://github.com/bagaturchess/Bagatur/tree/master/Sources/Search#readme
  * 7. Bug fixing and optimizations inside the bagaturchess.search.impl.rootsearch.parallel.SearchersInfo class.
  * 8. SMP version: Code clean up and simplification
  * 
  * Single Core version
  * 1. Randomize the non-attacking moves, before moves' ordering and sorting, in order to benefit from the search's undeterminism and minimize error.
- * 
  
 
 Version 3.6b (04 September 2022)
