@@ -695,13 +695,12 @@ public final class MoveGenerator {
 		final int start_index = nextToMove[currentPly];
 		final int end_index = nextToGenerate[currentPly] - 1;
 		
-		//Randomize non attacks only
+		//Randomize non attacks only and all moves at the root node
 		long first_score = moveScores[start_index + 1];
-		if (currentPly == 1 || (first_score <= MOVE_SCORE_SCALE && (first_score == 0 || first_score % 2 == 0))) {
+		if (currentPly == 1 || first_score <= MOVE_SCORE_SCALE) {
 				
 			randomize(moveScores, moves, start_index, end_index);
 		}
-		
 		
 		for (int i = start_index, j = i; i < end_index; j = ++i) {
 			final long score = moveScores[i + 1];
@@ -1277,6 +1276,10 @@ public final class MoveGenerator {
 
 		@Override
 		public void clear() {
+			
+			//Allow GC to free up the used memory
+			moves_piece_to = null;
+			counts = null;
 			
 			moves_piece_to 	= new int[7][64];
 			counts 			= new long[7][64];
