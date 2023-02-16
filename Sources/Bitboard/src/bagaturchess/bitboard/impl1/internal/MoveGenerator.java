@@ -695,9 +695,8 @@ public final class MoveGenerator {
 		final int start_index = nextToMove[currentPly];
 		final int end_index = nextToGenerate[currentPly] - 1;
 		
-		//Randomize non attacks only and all moves at the root node
-		long first_score = moveScores[start_index + 1];
-		if (currentPly == 1 || first_score <= MOVE_SCORE_SCALE) {
+		//Randomize non attacks only
+		if (MoveUtil.isQuiet(moves[start_index])) {
 				
 			randomize(moveScores, moves, start_index, end_index);
 		}
