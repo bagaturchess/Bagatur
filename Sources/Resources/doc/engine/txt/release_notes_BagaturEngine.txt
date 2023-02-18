@@ -1,3 +1,6 @@
+Version 3.7a (18 February 2023)
+ * Change the condition for randomizing the non-attacking moves. Now they are always randomized.
+ 
 Version 3.7 (07 February 2023)
  * SMP version:
  * 1. On https://tcec-chess.com/ S24, there is still NPS scaling issue, because the achieved value is 5-10M nps and the expected is 30M nps.

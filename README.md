@@ -41,7 +41,7 @@ All other options are available for both versions: single core and SMP.
  - SyzygyPath (type string default ./data/egtb): path to the syzygy tables. If you send 'uci' command to the engine, it will show the full path to the syzygy directory.
  - SyzygyOnline: if true and TB probing with local files is unsuccessful with up to 7 pieces, than it will request lichess server on this url http://tablebase.lichess.ovh/standard?fen=...
  - Openning Mode (type combo default most played first var most played first var random intermediate var random full): Valid only when OwnBook is set to true. The 'most played first' option playes the most often played move (statistically) for given position. 'random full' option playes random move from all available opening moves for this postion. And the 'random intermediate' option is something in the middle and plays random move selected only from the top 3 available moves for this position.
- - UCI_Chess960 (type check default false): FRC chess or classic chess
+ - UCI_Chess960 (type check default false): false = classic chess, true = Fischer Random Chess (both FRC and DFRC modes are supported). 
  - MemoryUsagePercent (type spin default 73 min 50 max 90): This is option for fine tunning and should not be changeed in general. It is Java specific and prevents the JVM to overdo the Garbage Collection.
  - TranspositionTable (type check default true): whether to use Transposition Table.
  - EvalCache (type check default true): whether to use cache for the evaluation function. (This cache is per thread for the SMP version)
