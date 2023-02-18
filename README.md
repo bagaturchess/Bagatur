@@ -29,10 +29,9 @@ The program runs under all Operating Systems, which support Java platform:
 
 # UCI Options
 
-Option available only for the <a href="https://www.chessprogramming.org/SMP">SMP version</a> of Bagatur.
-The SMP (multicore) version can be started by Bagatur_64_2+_cores.exe and Bagatur_mcore.bat for Windows and with Bagatur_mcore.sh under Linux.
-It is tested with up to 64 CPU cores and threads. There is kknown sclaing issues, because of Java, explained here: 
+Option available only for the <a href="https://www.chessprogramming.org/SMP">SMP version</a> of Bagatur. The SMP (multicore) version can be started by Bagatur_64_2+_cores.exe and Bagatur_mcore.bat for Windows and with Bagatur_mcore.sh under Linux. It is tested with up to 64 CPU cores and threads. There is known sclaing issues, caused by Java (more info here: https://github.com/bagaturchess/Bagatur/blob/master/Sources/Search/SMP.scaling.issue.txt).
  - SMP Threads (type spin default [logical_processors/2] min 1 max [logical_processors/2]):
+ - CountTranspositionTables type spin default 1 min 1 max [SQRT(logical_processors/2)] - Defines the count of Transposition Tables, which the SMP version will use. In most cases, it should be best to be set to 1 and could be changed only for experiments. See also https://github.com/bagaturchess/Bagatur/blob/master/Sources/Search/SMP.scaling.issue.txt
 
 All other options are available for both versions: single core and SMP.
  - Logging Policy (type combo default single file var single file var multiple files var none): whether Bagatur will create log files on the file system with details of its actions.
@@ -42,13 +41,11 @@ All other options are available for both versions: single core and SMP.
  - SyzygyPath (type string default ./data/egtb): path to the syzygy tables. If you send 'uci' command to the engine, it will show the full path to the syzygy directory.
  - SyzygyOnline: if true and TB probing with local files is unsuccessful with up to 7 pieces, than it will request lichess server on this url http://tablebase.lichess.ovh/standard?fen=...
  - Openning Mode (type combo default most played first var most played first var random intermediate var random full): Valid only when OwnBook is set to true. The 'most played first' option playes the most often played move (statistically) for given position. 'random full' option playes random move from all available opening moves for this postion. And the 'random intermediate' option is something in the middle and plays random move selected only from the top 3 available moves for this position.
-option name UCI_Chess960 type check default false
-option name CountTranspositionTables type spin default 1 min 1 max 2
-option name SMP Threads type spin default 8 min 1 max 16
-option name MemoryUsagePercent type spin default 73 min 50 max 90
-option name TranspositionTable type check default true
-option name EvalCache type check default true
-option name SyzygyDTZCache type check default true
+ - UCI_Chess960 (type check default false): FRC chess or classic chess
+ - MemoryUsagePercent (type spin default 73 min 50 max 90): This is option for fine tunning and should not be changeed in general. It is Java specific and prevents the JVM to overdo the Garbage Collection.
+ - TranspositionTable (type check default true): whether to use Transposition Table.
+ - EvalCache (type check default true): whether to use cache for the evaluation function. (This cache is per thread for the SMP version)
+ - SyzygyDTZCache (type check default true): whether to use cache for used syzygy scores. (This cache is per thread for the SMP version)
 
 # Syzygy Endgame Tablebases
 
