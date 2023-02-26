@@ -407,14 +407,15 @@ public class ChessBoardUtil {
 			count_b_kings++;
 		}
 		
-		if (count_w_kings > 1) {
+		//There should be a possibility to have 2 kings in order to be able to edit the board in android version (e.g. Bagatur app)
+		if (count_w_kings > 2) {
 			
-			throw new IllegalStateException("More than 1 white king");
+			throw new IllegalStateException("More than 2 white king");
 		}
 		
-		if (count_b_kings > 1) {
+		if (count_b_kings > 2) {
 			
-			throw new IllegalStateException("More than 1 black king");
+			throw new IllegalStateException("More than 2 black king");
 		}
 		
 		
