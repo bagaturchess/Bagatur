@@ -68,6 +68,8 @@ public final class MoveGenerator {
 	private final ContinuationHistory[] BF_ContinuationHistory 	= new ContinuationHistory[2];
 	
 	
+	private long counter_sorting;
+	
 	private Random randomizer = new Random();
 	
 	private int root_search_first_move_index;
@@ -695,11 +697,13 @@ public final class MoveGenerator {
 		final int start_index = nextToMove[currentPly];
 		final int end_index = nextToGenerate[currentPly] - 1;
 		
-		//Randomize non attacks only
-		if (MoveUtil.isQuiet(moves[start_index])) {
+		//Randomize each 3 sortings
+		//In order to increase the effect of nondeterminism, ensure first ordering is randomized.
+		if (counter_sorting == 0 || counter_sorting % 5 == 0) {
 				
 			randomize(moveScores, moves, start_index, end_index);
 		}
+		
 		
 		for (int i = start_index, j = i; i < end_index; j = ++i) {
 			final long score = moveScores[i + 1];
@@ -740,6 +744,9 @@ public final class MoveGenerator {
 				moves[start_index] 							= move;
 			}
 		}
+		
+		
+		counter_sorting++;
 	}
 	
 	
