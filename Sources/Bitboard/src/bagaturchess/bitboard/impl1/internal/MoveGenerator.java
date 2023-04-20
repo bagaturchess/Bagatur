@@ -54,6 +54,8 @@ public final class MoveGenerator {
 	private static final boolean CLEAR_TABLES_ON_NEW_SEARCH 	= false;
 	private final IBetaCutoffMoves[][] KILLER_MOVES 			= new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
 	private final IBetaCutoffMoves[][][] COUNTER_MOVES_LASTIN	= new IBetaCutoffMoves[2][7][64];
+
+	private static final boolean USE_COUNTER_MOVES_COUNTS 		= false;
 	private final IBetaCutoffMoves[][][] COUNTER_MOVES_COUNTS	= new IBetaCutoffMoves[2][7][64];
 	
 	private final long[][] HH_MOVES 							= new long[2][64 * 64];
@@ -97,14 +99,16 @@ public final class MoveGenerator {
 			}
 		}
 		
-		
-		for (int i = 0; i < COUNTER_MOVES_COUNTS.length; i++) {
-			
-			for (int j = 0; j < COUNTER_MOVES_COUNTS[i].length; j++) {
-				
-				for (int k = 0; k < COUNTER_MOVES_COUNTS[i][j].length; k++) {
-					
-					COUNTER_MOVES_COUNTS[i][j][k] = new BetaCutoffMoves_Counts();
+		if (USE_COUNTER_MOVES_COUNTS) {
+
+			for (int i = 0; i < COUNTER_MOVES_COUNTS.length; i++) {
+
+				for (int j = 0; j < COUNTER_MOVES_COUNTS[i].length; j++) {
+
+					for (int k = 0; k < COUNTER_MOVES_COUNTS[i][j].length; k++) {
+
+						COUNTER_MOVES_COUNTS[i][j][k] = new BetaCutoffMoves_Counts();
+					}
 				}
 			}
 		}
@@ -184,14 +188,17 @@ public final class MoveGenerator {
 					}
 				}
 			}
-			
-			for (int i = 0; i < COUNTER_MOVES_COUNTS.length; i++) {
-				
-				for (int j = 0; j < COUNTER_MOVES_COUNTS[i].length; j++) {
-					
-					for (int k = 0; k < COUNTER_MOVES_COUNTS[i][j].length; k++) {
-						
-						COUNTER_MOVES_COUNTS[i][j][k].clear();
+
+			if (USE_COUNTER_MOVES_COUNTS) {
+
+				for (int i = 0; i < COUNTER_MOVES_COUNTS.length; i++) {
+
+					for (int j = 0; j < COUNTER_MOVES_COUNTS[i].length; j++) {
+
+						for (int k = 0; k < COUNTER_MOVES_COUNTS[i][j].length; k++) {
+
+							COUNTER_MOVES_COUNTS[i][j][k].clear();
+						}
 					}
 				}
 			}
@@ -477,7 +484,11 @@ public final class MoveGenerator {
 		if (EngineConstants.ENABLE_COUNTER_MOVES) {
 			
 			COUNTER_MOVES_LASTIN[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
-			COUNTER_MOVES_COUNTS[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
+
+			if (USE_COUNTER_MOVES_COUNTS) {
+
+				COUNTER_MOVES_COUNTS[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
+			}
 		}
 	}
 	
@@ -490,7 +501,12 @@ public final class MoveGenerator {
 	
 	
 	public int getCounter2(final int color, final int parentMove) {
-		
+
+		if (!USE_COUNTER_MOVES_COUNTS) {
+
+			return 0;
+		}
+
 		return COUNTER_MOVES_COUNTS[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
 		//return COUNTER_MOVES_LASTIN[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
 	}
