@@ -55,7 +55,7 @@ public final class MoveGenerator {
 	private final IBetaCutoffMoves[][] KILLER_MOVES 			= new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
 	private final IBetaCutoffMoves[][][] COUNTER_MOVES_LASTIN	= new IBetaCutoffMoves[2][7][64];
 
-	private static final boolean USE_COUNTER_MOVES_COUNTS 		= false;
+	public static final boolean USE_COUNTER_MOVES_COUNTS 		= false;
 	private final IBetaCutoffMoves[][][] COUNTER_MOVES_COUNTS	= new IBetaCutoffMoves[2][7][64];
 	
 	private final long[][] HH_MOVES 							= new long[2][64 * 64];
