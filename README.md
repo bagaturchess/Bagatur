@@ -29,9 +29,9 @@ The program runs under all Operating Systems, which support Java platform:
 
 # UCI Options
 
-Option available only for the <a href="https://www.chessprogramming.org/SMP">SMP version</a> of Bagatur. The SMP (multicore) version can be started by Bagatur_64_2+_cores.exe and Bagatur_mcore.bat for Windows and with Bagatur_mcore.sh under Linux. It is tested with up to 64 CPU cores and threads. There is known sclaing issues, caused by Java (more info here: https://github.com/bagaturchess/Bagatur/blob/master/Sources/Search/SMP.scaling.issue.txt).
+Option available only for the <a href="https://www.chessprogramming.org/SMP">SMP version</a> of Bagatur. The SMP (multicore) version can be started by Bagatur_64_2+_cores.exe and Bagatur_mcore.bat for Windows and with Bagatur_mcore.sh under Linux. It is tested with up to 64 CPU cores and threads. There is known sclaing issues, caused by Java (more info here: https://github.com/bagaturchess/Bagatur/blob/master/Search/SMP.scaling.issue.txt).
  - SMP Threads (type spin default [logical_processors/2] min 1 max [logical_processors/2]):
- - CountTranspositionTables type spin default 1 min 1 max [SQRT(logical_processors/2)] - Defines the count of Transposition Tables, which the SMP version will use. In most cases, it should be best to be set to 1 and could be changed only for experiments. See also https://github.com/bagaturchess/Bagatur/blob/master/Sources/Search/SMP.scaling.issue.txt
+ - CountTranspositionTables type spin default 1 min 1 max [SQRT(logical_processors/2)] - Defines the count of Transposition Tables, which the SMP version will use. In most cases, it should be best to be set to 1 and could be changed only for experiments. See also https://github.com/bagaturchess/Bagatur/blob/master/Search/SMP.scaling.issue.txt
 
 All other options are available for both versions: single core and SMP.
  - Logging Policy (type combo default single file var single file var multiple files var none): whether Bagatur will create log files on the file system with details of its actions.
@@ -65,22 +65,22 @@ Latest official ELO rating of Bagatur 2.2e is ~3000 ELO. To make it easy to chec
 # Machine Learning
 
 There are some code examples of Artificial Intelligence / Machine Learning experiments with the <a href="http://neuroph.sourceforge.net/">Neuroph</a> 2.94 Java framework.
-The starting point into the source code is located <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/src/bagaturchess/deeplearning/run">here</a> and the documentation is <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl">here</a>.
+The starting point into the source code is located <a href="https://github.com/bagaturchess/Bagatur/tree/master/LearningImpl/src/bagaturchess/deeplearning/run">here</a> and the documentation is <a href="https://github.com/bagaturchess/Bagatur/tree/master/LearningImpl">here</a>.
 Although the ELO strength of the experimential version is with 50 ELO less than the version with the manually tuned evaluation function's parameters, the results are successful meaning that the neural network's <a href="https://en.wikipedia.org/wiki/Backpropagation">backpropagation</a> algorithm works as expected for <a href="https://en.wikipedia.org/wiki/Multilayer_perceptron">multi layer perceptron</a> neural network. This makes the experiments a good showcase of <a href="http://neuroph.sourceforge.net/">Neuroph</a> Java framework.
 
 Additional resources:
-- <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl/">Machine Learning / LearningImpl</a>
-- <a href="https://github.com/bagaturchess/Bagatur/tree/master/Sources/UCITracker/">Machine Learning / UCITracker</a>
+- <a href="https://github.com/bagaturchess/Bagatur/tree/master/LearningImpl/">Machine Learning / LearningImpl</a>
+- <a href="https://github.com/bagaturchess/Bagatur/tree/master/UCITracker/">Machine Learning / UCITracker</a>
 
 # More readings with technical details and explanations for each sub-component of Bagatur
-- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Sources/Bitboard/readme.txt>Bitboard</a>
-- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Sources/EGTB/readme.txt>Endgame Tablebases</a>
-- <a href=https://github.com/bagaturchess/Bagatur/tree/master/Sources/LearningImpl>Machine Learning</a>
-- <a href=https://github.com/bagaturchess/Bagatur/edit/master/Sources/Opening/readme.txt>Opening API</a>
-- <a href=https://github.com/bagaturchess/Bagatur/edit/master/Sources/OpeningGenerator/readme.txt>Opening Generator</a>
-- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Sources/PGNProcessor/readme.txt>PGNProcessor</a>
-- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Sources/Search/readme.txt>Search Algorithm</a>
-- <a href=https://github.com/bagaturchess/Bagatur/tree/master/Sources/UCITracker>UCITracker</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Bitboard/readme.txt>Bitboard</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/EGTB/readme.txt>Endgame Tablebases</a>
+- <a href=https://github.com/bagaturchess/Bagatur/tree/master/LearningImpl>Machine Learning</a>
+- <a href=https://github.com/bagaturchess/Bagatur/edit/master/Opening/readme.txt>Opening API</a>
+- <a href=https://github.com/bagaturchess/Bagatur/edit/master/OpeningGenerator/readme.txt>Opening Generator</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/PGNProcessor/readme.txt>PGNProcessor</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Search/readme.txt>Search Algorithm</a>
+- <a href=https://github.com/bagaturchess/Bagatur/tree/master/UCITracker>UCITracker</a>
 
 # Bagatur is powered by <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>
 

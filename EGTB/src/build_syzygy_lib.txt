@@ -1,0 +1,12 @@
+ * <ul><li>generate the SyzygyJNIBridge header file</li></ul>
+ * <pre>javac -h . src/bagaturchess/egtb/syzygy/SyzygyJNIBridge.java</pre>
+ * 
+ * <ul><li>compile the Fathom Java library</li></ul>
+ * <pre>Linux (ubuntu 18.04.1 LTS):
+ * tar zxvf jre-8u341-linux-x64.tar.gz -> get h files from $JAVA_HOME/include and $JAVA_HOME/include/linux and copy them to the current dir = '.'
+ * gcc -std=gnu99 -m64 -O2 -Wall -D TB_USE_ATOMIC -D TB_NO_HW_POP_COUNT -fPIC -I. -shared -o libJSyzygy.so bagaturchess_egtb_syzygy_SyzygyJNIBridge.c</pre>
+ * <pre>Windows (10, mingw-w64\x86_64-8.1.0-win32-seh-rt_v6-rev0):
+ * gcc -std=gnu99 -Wl,--kill-at -O2 -Wall -D TB_USE_ATOMIC -D TB_NO_HW_POP_COUNT -fPIC -I. -I"%JAVA_HOME%/include" -I"%JAVA_HOME%/include/win32" -shared -o JSyzygy.dll bagaturchess_egtb_syzygy_SyzygyJNIBridge.c</pre>
+ * 
+ * From TCEC chat by TerjeWeiss: #define TB_NO_THREADS << comment out this
+ 

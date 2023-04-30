@@ -1,0 +1,131 @@
+<project name="BagaturEngine_src" default="all" basedir="./">
+	
+	<description>
+        Bagatur Engine - pack sources
+    </description>
+	
+	<property name="project_name" value="BagaturEngine_src" />
+	
+	<target name="clean" description="clean up">
+		<delete dir="${temp_dir}" />
+	</target>
+
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${temp_dir}" />
+	</target>
+	
+	<target name="copy" description="copy source">
+		<copy todir="${temp_dir}">
+		    <fileset dir="${ants_dir}/..">
+		      <include name="Ants/common/**/"/>
+		      <include name="Ants/engine/**/"/>
+			  <include name="Ants/LICENSE"/>
+			  <include name="Ants/readme.txt"/>
+			  <include name="Ants/.classpath"/>
+			  <include name="Ants/.project"/>
+		    </fileset>
+		    <fileset dir="${bitboard_dir}/..">
+		      <include name="Bitboard/src/**/*.java"/>
+		      <include name="Bitboard/LICENSE"/>
+		      <include name="Bitboard/readme.txt"/>
+		      <include name="Bitboard/.classpath"/>
+		      <include name="Bitboard/.project"/>
+		    </fileset>
+			<fileset dir="${opening_dir}/..">
+		      <include name="Opening/src/**/*.java"/>
+		      <include name="Opening/LICENSE"/>
+		      <include name="Opening/readme.txt"/>
+		      <include name="Opening/.classpath"/>
+		      <include name="Opening/.project"/>
+			</fileset>
+			<fileset dir="${uci_dir}/..">
+		      <include name="UCI/src/**/*.java"/>
+		      <include name="UCI/LICENSE"/>
+		      <include name="UCI/readme.txt"/>
+		      <include name="UCI/.classpath"/>
+		      <include name="UCI/.project"/>
+			</fileset>
+			<fileset dir="${search_dir}/..">
+		      <include name="Search/src/**/*.java"/>
+		      <include name="Search/LICENSE"/>
+		      <include name="Search/readme.txt"/>
+		      <include name="Search/.classpath"/>
+		      <include name="Search/.project"/>
+			</fileset>
+			<fileset dir="${engines_dir}/..">
+		      <include name="Engines/src/**/*.java"/>
+		      <include name="Engines/LICENSE"/>
+		      <include name="Engines/readme.txt"/>
+		      <include name="Engines/.classpath"/>
+		      <include name="Engines/.project"/>
+			</fileset>
+			<fileset dir="${enginesrunner_dir}/..">
+		      <include name="EnginesRunner/src/**/*.java"/>
+		      <include name="EnginesRunner/LICENSE"/>
+		      <include name="EnginesRunner/readme.txt"/>
+		      <include name="EnginesRunner/.classpath"/>
+		      <include name="EnginesRunner/.project"/>
+			</fileset>
+			<fileset dir="${work_dir}/..">
+		      <include name="WorkDir"/>
+		      <include name="WorkDir/LICENSE"/>
+		      <include name="WorkDir/readme.txt"/>
+		      <include name="WorkDir/.classpath"/>
+		      <include name="WorkDir/.project"/>
+			</fileset>
+			<fileset dir="${resources_dir}/..">
+		      <include name="Resources/bin/engine/**/*"/>
+			  <exclude name="Resources/bin/engine/egtb/**/*"/>
+			  <include name="Resources/bin/engine/egtb/**/*.txt"/>
+			  <include name="Resources/doc/engine/**/*"/>
+			  <include name="Resources/.classpath"/>
+			  <include name="Resources/.project"/>
+			  <exclude name="Resources/bin/engine/ob/**/*.ob"/>
+			  <exclude name="Resources/bin/engine/ob/**/*.ob_impl0"/>
+			  <exclude name="Resources/bin/engine/ob/**/*.ob_impl1"/>
+			</fileset>
+			<fileset dir="${learningAPI_dir}/..">
+			  <include name="LearningAPI/src/**/*.java"/>
+		      <include name="LearningAPI/LICENSE"/>
+		      <include name="LearningAPI/readme.txt"/>
+		      <include name="LearningAPI/.classpath"/>
+		      <include name="LearningAPI/.project"/>
+			</fileset>
+			<fileset dir="${ucitracker_dir}/..">
+			  <include name="UCITracker/src/**/*.java"/>
+		      <include name="UCITracker/LICENSE"/>
+		      <include name="UCITracker/readme.txt"/>
+		      <include name="UCITracker/.classpath"/>
+		      <include name="UCITracker/.project"/>
+			</fileset>
+			<fileset dir="${learningImpl_dir}/..">
+			  <include name="LearningImpl/src/**/*.java"/>
+		      <include name="LearningImpl/LICENSE"/>
+		      <include name="LearningImpl/readme.txt"/>
+		      <include name="LearningImpl/.classpath"/>
+		      <include name="LearningImpl/.project"/>
+			</fileset>
+			<fileset dir="${egtb_dir}/..">
+			  <include name="EGTB/src/**/*.java"/>
+		      <include name="EGTB/LICENSE"/>
+		      <include name="EGTB/readme.txt"/>
+		      <include name="EGTB/.classpath"/>
+		      <include name="EGTB/.project"/>
+			</fileset>
+		</copy>
+		<copy tofile="${temp_dir}/readme.txt">
+			<fileset dir="${resources_dir}/doc/engine/txt">
+			  <include name="readme_src_BagaturEngine.txt"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="zip" description="generate the zip">
+		<zip zipfile="${work_dir}/src.zip" basedir="${temp_dir}" />
+	</target>
+
+	<target name="all" depends="init, copy, zip, clean" description="all">
+	</target>
+</project>
+

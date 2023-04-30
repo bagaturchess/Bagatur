@@ -1,0 +1,41 @@
+SYZYGY DOWNLOADS:
+http://tablebase.lichess.ovh/tables/standard/7/
+
+SYZYGY ONLINE:
+https://github.com/niklasf/lila-tablebase#http-api
+https://syzygy-tables.info/
+https://lichess.org/blog/W3WeMyQAACQAdfAL/7-piece-syzygy-tablebases-are-complete
+
+
+INFO SOURCE:
+https://www.chessprogramming.org/Syzygy_Bases
+
+Winner is minimizing DTZ and the loser is maximizing DTZ
+
+File Types
+Syzygy Bases consist of two sets of files,
+WDL files (extension .rtbw) storing win/draw/loss information considering the fifty-move rule for access during search,
+and DTZ files (extension .rtbz) with distance-to-zero information for access at the root.
+WDL has full data for two sides but DTZ50 omitted data of one side to save space. Each endgame has a pair of those types.
+
+Search
+During the Search:
+With the WDL tables stored on SSD [12] , it is possible to probe the tables at all depths without much slowdown.
+They have been tested in Ronald de Man's engine Sjaak (playing on FICS as TrojanKnight(C)) a couple of months quite successfully,
+don't probing in quiescence search.
+At the Root:
+Since pure DTZ50-optimal play (i.e. minimaxing the number of moves to the next capture or pawn move by either side) can be very unnatural,
+it might be desirable to let the engine search on the winning moves until it becomes clear that insufficient progress is being made
+and only then switch to DTZ-optimal play (e.g. by detecting repetitions and monitoring the halfmove clock) [13].
+
+
+Ronald de Man in a reply to Nguyen Pham, April 15, 2020 [28] :
+Syzygy WDL is double sided, DTZ is single sided.
+WDL:
+So to know whether a 7-piece position is winning, losing or drawn (or cursed),
+the engine needs to do only a single probe of a 7-piece WDL table.
+(It may in addition have to do some probes of 6-piece WDL tables if any direct captures are available.)
+DTZ:
+If the engine needs to know the DTZ value (which is only necessary when a TB root position has been reached),
+the probing code may have to do a 1-ply search to get to the "right" side of the DTZ table.
+For 6-piece TBs, DTZ is 81.9GB when storing only the smaller side of each table. Storing both sides might require perhaps 240GB.

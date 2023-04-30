@@ -1,9 +1,9 @@
 *.class
-Sources/UCIRemote*
-Sources/WorkDir*
+UCIRemote*
+WorkDir*
 *.cg
 *features.bin
 *.bin
-Sources/BoardScanner/data*
-Sources/EGTB/bin/*
-/.metadata/
+BoardScanner/data*
+EGTB/bin/*
+.metadata/
