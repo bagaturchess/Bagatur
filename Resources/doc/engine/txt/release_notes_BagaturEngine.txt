@@ -1,4 +1,5 @@
 Version 3.7c (1 May 2023)
+ * 3.7b is still weaker than version 3.0. These changes aim to restore the ELO after the new features and changes after 3.0:
  * Keep Continuation History tables between the searches and not clear them, like in version 3.0.
  * Enable again the LMR reduction's skip rate with a high value in order to not affect CPU performance.
  
