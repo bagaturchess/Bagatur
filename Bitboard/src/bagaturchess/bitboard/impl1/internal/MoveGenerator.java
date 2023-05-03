@@ -19,21 +19,31 @@ import bagaturchess.bitboard.impl.utils.VarStatistic;
 
 public final class MoveGenerator {
 	
-
+	
+	private static final boolean CLEAR_TABLES_ON_NEW_SEARCH 	= true;
+	public static boolean USE_COUNTER_MOVES_COUNTS 				= true;
+	public static boolean USE_ContinuationHistory 				= true;
+	private static final boolean BUILD_EXACT_STATS 				= false;
+	
 	public static final int MOVE_SCORE_SCALE 					= 100;
 	
 	
 	private static final int LMR_STAT_MULTIPLIER 				= 10 * MOVE_SCORE_SCALE;
 	
-	//LMR_DEVIATION_MULTIPLIER must be between 0 and 2. Values more than 2 actually means that the LMR optimization is always performed. Value 0 means that it is executed in around 50% of the cases.
-	private static final double LMR_DEVIATION_MULTIPLIER 		= 2; //1d; //1.5; //2; //1.25; //1.5; //1.75 //1.5 //0 //1.25 //2.5 //1 //4
+	//Bigger value of LMR_DEVIATION_MULTIPLIER means less LMR skips.
+	//LMR_DEVIATION_MULTIPLIER is senseful between 0 and 2.
+	//The value of LMR_DEVIATION_MULTIPLIER equal to 2, leads to skip of LMR reductions for top 5% of the moves sorted by their LMR rate.
+	//We select 5% in order to keep the skip rate in the frame of the standard deviation.
+	// Values more than 2 actually means that the LMR optimization is always performed and there are no skips. Value 0 means that it is executed in around 50% of the cases.
+	private static final double LMR_DEVIATION_MULTIPLIER 		= 4;
+	
 	private final long[][] LMR_ALL 								= new long[2][64 * 64];
 	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
 	private final long[][] LMR_ABOVE_ALPHA 						= new long[2][64 * 64];
 	private VarStatistic[] lmrBelowAlphaAVGScores 				= new VarStatistic[2];
 	private VarStatistic[] lmrAboveAlphaAVGScores 				= new VarStatistic[2];
 	
-	private static final boolean BUILD_EXACT_STATS 				= false;
+	
 	private static final double LMR_RATE_THREASHOLD_ABOVE_ALPHA = 0.95; //Top X%
 	private static final double LMR_RATE_THREASHOLD_BELOW_ALPHA = 0.0001; //Top Y%
 	private static final long[][] LMR_STATS_COUNTER_ABOVE_ALPHA = new long[2][LMR_STAT_MULTIPLIER + 1];
@@ -51,11 +61,10 @@ public final class MoveGenerator {
 	private int currentPly;
 	
 
-	private static final boolean CLEAR_TABLES_ON_NEW_SEARCH 	= false;
+
 	private final IBetaCutoffMoves[][] KILLER_MOVES 			= new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
 	private final IBetaCutoffMoves[][][] COUNTER_MOVES_LASTIN	= new IBetaCutoffMoves[2][7][64];
 
-	public static boolean USE_COUNTER_MOVES_COUNTS 			= false;
 	private final IBetaCutoffMoves[][][] COUNTER_MOVES_COUNTS	= new IBetaCutoffMoves[2][7][64];
 	
 	private final long[][] HH_MOVES 							= new long[2][64 * 64];
@@ -63,8 +72,6 @@ public final class MoveGenerator {
 	
 	private final long[][][] HH_MOVES1 							= new long[2][7][64];
 	private final long[][][] BF_MOVES1 							= new long[2][7][64];
-	
-	public static boolean USE_ContinuationHistory 				= true;
 	
 	private final ContinuationHistory[] HH_ContinuationHistory 	= new ContinuationHistory[2];
 	private final ContinuationHistory[] BF_ContinuationHistory 	= new ContinuationHistory[2];
@@ -132,8 +139,6 @@ public final class MoveGenerator {
 		
 		
 		clearHistoryHeuristics();
-		
-		
 	}
 	
 	
@@ -176,19 +181,21 @@ public final class MoveGenerator {
 		Arrays.fill(BF_MOVES1[BLACK][QUEEN], 1);
 		Arrays.fill(BF_MOVES1[BLACK][KING], 1);	
 		
+		
 		if (CLEAR_TABLES_ON_NEW_SEARCH) {
+
+			//No sense to clear it as they are last in and will be overided from the new search moves
+			/*for (int i = 0; i < COUNTER_MOVES_LASTIN.length; i++) {
 			
-			for (int i = 0; i < COUNTER_MOVES_LASTIN.length; i++) {
+			for (int j = 0; j < COUNTER_MOVES_LASTIN[i].length; j++) {
 				
-				for (int j = 0; j < COUNTER_MOVES_LASTIN[i].length; j++) {
+				for (int k = 0; k < COUNTER_MOVES_LASTIN[i][j].length; k++) {
 					
-					for (int k = 0; k < COUNTER_MOVES_LASTIN[i][j].length; k++) {
-						
-						COUNTER_MOVES_LASTIN[i][j][k].clear();
-					}
+					COUNTER_MOVES_LASTIN[i][j][k].clear();
 				}
 			}
-
+			}*/
+			
 			if (USE_COUNTER_MOVES_COUNTS) {
 
 				for (int i = 0; i < COUNTER_MOVES_COUNTS.length; i++) {
@@ -203,14 +210,15 @@ public final class MoveGenerator {
 				}
 			}
 			
-			if (USE_ContinuationHistory) {
+			//Do not clear it, as in version 3.0 which is the strongest this structure is permanent
+			/*if (USE_ContinuationHistory) {
 				
 				HH_ContinuationHistory[WHITE].clear();
 				HH_ContinuationHistory[BLACK].clear();
 				
 				BF_ContinuationHistory[WHITE].clear();
 				BF_ContinuationHistory[BLACK].clear();
-			}
+			}*/
 		}
 		
 		Arrays.fill(LMR_ALL[WHITE], 0);
@@ -400,11 +408,8 @@ public final class MoveGenerator {
 		
 		if (count_all == 0) {
 			
-			return 1 * LMR_STAT_MULTIPLIER; //Force search to explorer all moves at least once as fast as possible
+			return 0;
 		}
-		
-		
-		//return (int) (LMR_STAT_MULTIPLIER * (LMR_ABOVE_ALPHA[color][fromToIndex]) / LMR_ALL[color][fromToIndex]);
 		
 		return (int) ((LMR_STAT_MULTIPLIER * (count_all - LMR_BELOW_ALPHA[color][fromToIndex])) / count_all);
 	}
@@ -424,11 +429,11 @@ public final class MoveGenerator {
 			return lmr_rate_pointer_above_alpha[color];
 			
 		} else {
-		
+			
 			if (EngineConstants.ENABLE_LMR_STATS_DECISION || EngineConstants.ENABLE_LMP_STATS_DECISION) {
-					
+				
 				int pointer_above_alpha = (int) (lmrAboveAlphaAVGScores[color].getEntropy() + LMR_DEVIATION_MULTIPLIER * lmrAboveAlphaAVGScores[color].getDisperse());
-		
+				
 				//System.out.println("AboveAlpha: color=" + color + ", Entropy=" + lmrAboveAlphaAVGScores[color].getEntropy() + ", Disperse=" + lmrAboveAlphaAVGScores[color].getDisperse());
 				
 				return pointer_above_alpha;

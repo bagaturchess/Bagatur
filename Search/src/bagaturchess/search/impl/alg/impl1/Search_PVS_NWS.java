@@ -137,6 +137,10 @@ public class Search_PVS_NWS extends SearchImpl {
 	//private static final double SQRT_2PI 				= Math.sqrt(2 * Math.PI);
 	//private static final double RECIPROCAL_4PI			= 1 / (double) (4 * Math.PI);
 	
+	private long lmr_all;
+	private long lmr_allowed;
+	private long lmr_done;
+	
 	
 	public Search_PVS_NWS(Object[] args) {
 		
@@ -1055,7 +1059,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (phase == PHASE_QUIET
 							&& (!EngineConstants.ENABLE_LMP_STATS_DECISION
-									|| (EngineConstants.ENABLE_LMP_STATS_DECISION && moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove)))
+									|| (EngineConstants.ENABLE_LMP_STATS_DECISION
+											&& moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove)
+										)
+								)
 						) {
 						
 						if (EngineConstants.ENABLE_LMP
@@ -1126,18 +1133,41 @@ public class Search_PVS_NWS extends SearchImpl {
 						);
 				*/
 				
-				boolean doLMR = depth >= 2
-							&& movesPerformed_attacks + movesPerformed_quiet > 1
-							//&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move)
-							//&& (phase == PHASE_QUIET || phase == PHASE_KILLER_1 || phase == PHASE_KILLER_2)
-							&& phase == PHASE_QUIET
-							;
 				
+				boolean LMR_allowed = moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse);
+				
+				//System.out.println("lmr_allowed=" + lmr_allowed + ", moveGen.getLMR_Rate(cb.colorToMoveInverse, move)=" + moveGen.getLMR_Rate(cb.colorToMoveInverse, move) + ", moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse)=" + moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse));
+				
+				lmr_all++;
+				
+				if (LMR_allowed) {
+					
+					lmr_allowed++;
+				}
+				
+				boolean doLMR = depth >= 2
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						//&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move)
+						//&& (phase == PHASE_QUIET || phase == PHASE_KILLER_1 || phase == PHASE_KILLER_2)
+						&& phase == PHASE_QUIET;
+						
 				int reduction = 1;
-				if (doLMR
-						&& (!EngineConstants.ENABLE_LMR_STATS_DECISION
-								|| EngineConstants.ENABLE_LMR_STATS_DECISION && (Math.random() <= 0.10 || moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse)))
-						) {
+				
+				if (doLMR &&
+						(!EngineConstants.ENABLE_LMR_STATS_DECISION
+								|| (EngineConstants.ENABLE_LMR_STATS_DECISION && LMR_allowed)
+						)
+					) {
+					
+					lmr_done++;
+					
+					//float lmr_done_rate = lmr_done / (float) lmr_all;
+					//float lmr_allowed_rate = lmr_allowed / (float) lmr_all;
+					//System.out.println("lmr_done_rate=" + lmr_done_rate + ", lmr_allowed_rate=" + lmr_allowed_rate);
+					
+					//TODO: branching factor calculation in this way is an easy approximation, maybe not perfect.
+					//lmr_done is between 0 and 0.5, because the first move is never reduced by LMR.
+					//System.out.println("Search branching factor: " + 1f / (lmr_done / (float) lmr_all));
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
 					
@@ -1150,6 +1180,17 @@ public class Search_PVS_NWS extends SearchImpl {
 					reduction += multiCutReduction;
 					
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
+					
+				} else {
+					
+					if (doLMR && !LMR_allowed) {
+						
+						//Makes the magic of the controlled LMR skip logic:
+						//If this code is not here, than step by step the overall LMR rate goes down to 0 and search becomes extremely shallow (without LMR optimization at all).
+						//It increases the statistics of this move so next time it will be more likely this move to be reduced by LMR
+						moveGen.addLMR_All(cb.colorToMoveInverse, move, 1);
+						moveGen.addLMR_BelowAlpha(cb.colorToMoveInverse, move, 1);
+					}
 				}
 				
 				try {

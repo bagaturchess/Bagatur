@@ -1,3 +1,7 @@
+Version 3.7c (1 May 2023)
+ * Keep Continuation History tables between the searches and not clear them, like in version 3.0.
+ * Enable again the LMR reduction's skip rate with a high value in order to not affect CPU performance.
+ 
 Version 3.7b (25 March 2023)
  * Less aggressive randomization of move order before sorting.
   
