@@ -71,8 +71,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_KILLER_2 					= 3;
 	private static final int PHASE_COUNTER_1 					= 4;
 	private static final int PHASE_COUNTER_2 					= 5;
-	private static final int PHASE_QUIET 						= 6;
-	private static final int PHASE_ATTACKING_BAD 				= 7;
+	private static final int PHASE_ATTACKING_BAD 				= 6;
+	private static final int PHASE_QUIET 						= 7;
 	
 	
 	private static final int[] STATIC_NULLMOVE_MARGIN 			= { 0, 60, 130, 210, 300, 400, 510 };
@@ -918,15 +918,18 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		moveGen.startPly();
 		int phase = PHASE_TT;
-		while (phase <= PHASE_ATTACKING_BAD) {
+		while (phase <= PHASE_QUIET) {
 			
 			switch (phase) {
 			
 			case PHASE_TT:
 				
 				if (ttMove != 0 && cb.isValidMove(ttMove)) {
+					
 					moveGen.addMove(ttMove);
+					
 					if (!env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
+						
 						moveGen.setHHScores(cb.colorToMove, parentMove);
 					}
 				}
@@ -944,8 +947,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			case PHASE_KILLER_1:
 				
 				killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
+				
 				if (killer1Move != 0 && killer1Move != ttMove && killer1Move != counterMove1 && killer1Move != counterMove2 && cb.isValidMove(killer1Move)) {
+					
 					moveGen.addMove(killer1Move);
+					
 					moveGen.setHHScores(cb.colorToMove, parentMove);
 				}
 				
@@ -964,7 +970,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			case PHASE_COUNTER_1:
 				
 				counterMove1 = moveGen.getCounter1(cb.colorToMove, parentMove);
+				
 				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
+					
 					moveGen.addMove(counterMove1);
 					moveGen.setHHScores(cb.colorToMove, parentMove);
 				}
@@ -981,14 +989,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				break;
 			*/
-				
-			case PHASE_QUIET:
-				
-				moveGen.generateMoves(cb);
-				moveGen.setHHScores(cb.colorToMove, parentMove);
-				moveGen.sort();
-				
-				break;
 			
 			case PHASE_ATTACKING_BAD:
 				
@@ -998,6 +998,20 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				break;
 				
+			case PHASE_QUIET:
+				
+				moveGen.generateMoves(cb);
+				moveGen.setHHScores(cb.colorToMove, parentMove);
+				moveGen.sort();
+				
+				break;
+				
+			/*default:
+				
+				phase++;
+				
+				continue;
+				*/
 			}
 			
 			
@@ -1259,6 +1273,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					
 					alpha = Math.max(alpha, score);
+					
 					if (alpha >= beta) {
 						
 						if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {

@@ -25,10 +25,10 @@ public final class MoveGenerator {
 	public static boolean USE_ContinuationHistory 				= true;
 	private static final boolean BUILD_EXACT_STATS 				= false;
 	
-	public static final int MOVE_SCORE_SCALE 					= 100;
+	public static final int MOVE_SCORE_SCALE 					= 1000;
 	
 	
-	private static final int LMR_STAT_MULTIPLIER 				= 10 * MOVE_SCORE_SCALE;
+	private static final int LMR_STAT_MULTIPLIER 				= 1 * MOVE_SCORE_SCALE; // Should be at least 1000
 	
 	//Bigger value of LMR_DEVIATION_MULTIPLIER means less LMR skips.
 	//LMR_DEVIATION_MULTIPLIER is senseful between 0 and 2.
@@ -60,7 +60,6 @@ public final class MoveGenerator {
 	private final int[] nextToMove 								= new int[EngineConstants.MAX_PLIES * 2];
 	private int currentPly;
 	
-
 
 	private final IBetaCutoffMoves[][] KILLER_MOVES 			= new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
 	private final IBetaCutoffMoves[][][] COUNTER_MOVES_LASTIN	= new IBetaCutoffMoves[2][7][64];
@@ -267,6 +266,7 @@ public final class MoveGenerator {
 	
 	
 	public int getHHScore(final int color, final int fromToIndex, final int pieceType, final int toIndex, final int parentMove) {
+		
 		int value1 = (int) (MOVE_SCORE_SCALE * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex]);
 		int value2 = (int) (MOVE_SCORE_SCALE * HH_MOVES1[color][pieceType][toIndex] / BF_MOVES1[color][pieceType][toIndex]);
 		int value3 = (int) (USE_ContinuationHistory ? getContinuationHistoryScore(color, pieceType, toIndex, parentMove) : 0);
@@ -640,10 +640,11 @@ public final class MoveGenerator {
 			 * If we base the move ordering on this scores, we actually are increasing the probability of cutoffs in the whole search tree on an optimal depth, which means the PV should be found in a optimal way from time perspective.
 			 * This approach should be kind of dynamic optimization as all other heuristic here are.
 			 * I am happy that this approach doesn't makes the search speed worse.
-			 */
+			 * */
 			moveScores[j] = getLMR_Rate_internal(colorToMove, from_to_index);
-			
 			moveScores[j] += getHHScore(colorToMove, from_to_index, MoveUtil.getSourcePieceIndex(move), MoveUtil.getToIndex(move), parentMove);
+			
+			//moveScores[j] = getLMR_Rate_internal(colorToMove, from_to_index);
 			
 			if (moveScores[j] < 0) {
 				
