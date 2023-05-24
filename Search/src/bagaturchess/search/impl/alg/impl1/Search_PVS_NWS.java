@@ -161,6 +161,13 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
+	@Override
+	protected boolean useTPTKeyWithMoveCounter() {
+		
+		return false;
+	}
+	
+	
 	public void newSearch() {
 		
 		
@@ -257,8 +264,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		depth += extensions(cb, moveGen, ply);
 		
 		
-		long hashkey = cb.zobristKey;
+		long hashkey = getHashkeyTPT(cb);
+		
 		if (excludedMove != 0) {
+			
 			hashkey ^= (((long)excludedMove) << 16);
 		}
 		
@@ -461,7 +470,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (bestScore != node.eval) {
 			
-			throw new IllegalStateException();
+			throw new IllegalStateException("bestScore != node.eval");
 		}
 		
 		//validatePV(node, evaluator, node.eval, ply, depth, isPv, false);
@@ -477,13 +486,19 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (mediator != null && mediator.getStopper() != null) {
+			
 			mediator.getStopper().stopIfNecessary(ply + depth, env.getBitboard().getColourToMove(), alpha, beta);
 		}
 		
+		if (ply < 1) {
+			
+			throw new IllegalStateException("ply < 1 => use root_search");
+		}
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
 		
 		if (info.getSelDepth() < ply) {
+			
 			info.setSelDepth(ply);
 		}
 		
@@ -494,7 +509,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		final int alphaOrig = alpha;
+		final int alpha_org = alpha;
 		
 		
 		PVNode node = pvman.load(ply);
@@ -503,8 +518,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.leaf = true;
 		
 		
-	    if (ply > 0
-	    		&& isDraw(isPv)) {
+	    if (isDraw(isPv)) {
 	    	
 	    	node.eval = getDrawScores(-1);
 	    			
@@ -513,18 +527,22 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (EngineConstants.ENABLE_MATE_DISTANCE_PRUNING) {
-			if (ply > 0) {
-				alpha = Math.max(alpha, -SearchUtils.getMateVal(ply));
-				beta = Math.min(beta, +SearchUtils.getMateVal(ply + 1));
-				if (alpha >= beta) {
-					node.eval = alpha;
-					return node.eval;
-				}
+			
+			alpha = Math.max(alpha, -SearchUtils.getMateVal(ply));
+			
+			beta = Math.min(beta, +SearchUtils.getMateVal(ply + 1));
+			
+			if (alpha >= beta) {
+				
+				node.eval = alpha;
+				
+				return node.eval;
 			}
 		}
 		
 		
 		if (EngineConstants.ASSERT) {
+			
 			Assert.isTrue(depth >= 0);
 			Assert.isTrue(alpha >= ISearch.MIN && alpha <= ISearch.MAX);
 			Assert.isTrue(beta >= ISearch.MIN && beta <= ISearch.MAX);
@@ -534,8 +552,23 @@ public class Search_PVS_NWS extends SearchImpl {
 		depth += extensions(cb, moveGen, ply);
 		
 		
-		long hashkey = cb.zobristKey;
+		if (depth == 0) {
+			
+			int qeval = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha, beta, ply, isPv, pv_scores_w, pv_scores_b);
+			
+			if (node.eval != qeval) {
+				
+				throw new IllegalStateException("node.eval != qeval");
+			}
+			
+			return node.eval;
+		}
+		
+		
+		long hashkey = getHashkeyTPT(cb);
+		
 		if (excludedMove != 0) {
+			
 			hashkey ^= (((long)excludedMove) << 16);
 		}
 		
@@ -594,35 +627,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (ply >= 7
-    			&& SyzygyTBProbing.getSingleton() != null
+		int egtb_eval = ISearch.MIN;
+		
+		if (SyzygyTBProbing.getSingleton() != null
     			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
     			){
-			
-			
-			if (cb.checkingPieces != 0) {
-				
-				if (!env.getBitboard().hasMoveInCheck()) {
-					
-					node.bestmove = 0;
-					node.eval = -SearchUtils.getMateVal(ply);
-					node.leaf = true;
-					
-					return node.eval;
-				}
-				
-			} else {
-				
-				if (!env.getBitboard().hasMoveInNonCheck()) {
-					
-					node.bestmove = 0;
-					node.eval = node.eval = getDrawScores(-1);
-					node.leaf = true;
-					
-					return node.eval;
-				}
-			}
-			
 			
 			/*
 			SYZYGY DOWNLOADS:
@@ -702,104 +711,110 @@ public class Search_PVS_NWS extends SearchImpl {
 						//! Without this check, the EGTB probing doesn't work correctly and the Bagatur version has smaller ELO rating (-35 ELO)
 						if (distanceToDraw_50MoveRule >= dtz) {
 							
-							int op_factor = cb.colorToMoveInverse == Constants.COLOUR_WHITE ? env.getBitboard().getMaterialFactor().getWhiteFactor() : env.getBitboard().getMaterialFactor().getBlackFactor();
+							/*int op_factor = cb.colorToMoveInverse == Constants.COLOUR_WHITE ? env.getBitboard().getMaterialFactor().getWhiteFactor() : env.getBitboard().getMaterialFactor().getBlackFactor();
 							
 							//Opponent has only king so DTZ is DTM
 							if (op_factor == 0 && !env.getBitboard().hasSufficientMatingMaterial(cb.colorToMoveInverse)) {
 								
-								node.bestmove = 0;
 			    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
-			    				node.eval = SearchUtils.getMateVal(ply + dtz);
-								node.leaf = true;
-								
-								return node.eval;
+			    				egtb_eval = SearchUtils.getMateVal(ply + dtz);
 								
 							} else {
 								
-								node.bestmove = 0;
-								node.eval = IEvaluator.MAX_EVAL / (ply + dtz);
-								//node.eval = 10 * 9 * (distanceToDraw_50MoveRule - dtz);
-								//node.eval = 4 * 9 * ((ISearch.MAX_DEPTH - ply) + (distanceToDraw_50MoveRule - dtz));
-								node.leaf = true;
-								
-								return node.eval;
-							}
+								egtb_eval = IEvaluator.MAX_EVAL / (ply + dtz);
+							}*/
 							
-						} else {
+							//TODO: the eval is too less in order to be more attractive for search than maybe rook and 1+ passed pawns?
+							egtb_eval = IEvaluator.MAX_EVAL / (ply + dtz);
 							
-							node.bestmove = 0;
-							node.eval = node.eval = getDrawScores(-1);
-							node.leaf = true;
+						} /*else {
 							
-							return node.eval;
-						}
+							egtb_eval = getDrawScores(-1);
+						}*/
 	            		
+						break;
+						
 		            case SyzygyConstants.TB_LOSS:
 		            	
 	    				/*
-	    				This code doesn't work at the moment
-	    				node.bestmove = 0;
+	    				This code doesn't work correctly
 	    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
-	    				node.eval = -SearchUtils.getMateVal(ply + dtz);
-	    				node.leaf = true;
-	    				
-	    				return node.eval;*/
+	    				egtb_eval = -SearchUtils.getMateVal(ply + dtz);
+	    				*/
 		            	break;
 		            
 		            case SyzygyConstants.TB_DRAW:
 		            	
-						node.bestmove = 0;
-						node.eval = node.eval = getDrawScores(-1);
-						node.leaf = true;
-						
-						return node.eval;
+						egtb_eval = getDrawScores(-1);
 		                
+						break;
+						
 		            case SyzygyConstants.TB_BLESSED_LOSS:
 		            	
-						node.bestmove = 0;
-						node.eval = node.eval = getDrawScores(-1);
-						node.leaf = true;
-						
-						return node.eval;
-		                //return -27000 + ply;
+		            	egtb_eval = getDrawScores(-1);
 		                
+						break;
+						
 		            case SyzygyConstants.TB_CURSED_WIN:
 		            	
-						node.bestmove = 0;
-						node.eval = node.eval = getDrawScores(-1);
-						node.leaf = true;
-						
-						return node.eval;
-		                //return 27000 - ply;
+		            	egtb_eval = getDrawScores(-1);
 		                
+						break;
+						
 		            default:
 		            	
 		            	throw new IllegalStateException("wdl=" + wdl);
-		                //return 0;
 		        }
 			}
         }
 		
 		
-		if (depth == 0) {
+		if (egtb_eval != ISearch.MIN) {
 			
-			int qeval = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha, beta, ply, isPv, pv_scores_w, pv_scores_b);
-			
-			if (node.eval != qeval) {
+			if (cb.checkingPieces != 0) {
 				
-				throw new IllegalStateException();
+				if (!env.getBitboard().hasMoveInCheck()) {
+					
+					egtb_eval = -SearchUtils.getMateVal(ply);
+				}
+				
+			} else {
+				
+				if (!env.getBitboard().hasMoveInNonCheck()) {
+					
+					egtb_eval = getDrawScores(-1);
+				}
 			}
-			
-			return node.eval;
 		}
+		
+		
+		/*if (egtb_eval > alpha) {
+			
+			alpha = egtb_eval;
+			
+			if (alpha >= beta) {
+				
+				node.bestmove = 0;
+				node.eval = egtb_eval;
+				node.leaf = true;
+				
+				return node.eval;
+				
+			} else {
+				
+				//Currently beta = alpha -1
+				throw new IllegalStateException("beta = alpha and best move will not be set");
+			}
+		}
+		*/
 		
 		
 		int eval = ISearch.MIN;
 		
-		if (!isPv && cb.checkingPieces == 0) {
+		if (!isPv && cb.checkingPieces == 0 && egtb_eval == ISearch.MIN) {
 			
 			
-			eval = eval(evaluator, ply, alphaOrig, beta, isPv, pv_scores_w, pv_scores_b);
+			eval = eval(evaluator, ply, alpha_org, beta, isPv, pv_scores_w, pv_scores_b);
 			
 			
 			if (ttValue != IEvaluator.MIN_EVAL) {
@@ -827,26 +842,36 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < STATIC_NULLMOVE_MARGIN.length) {
+					
 					if (eval - STATIC_NULLMOVE_MARGIN[depth] >= beta) {
+						
 						node.bestmove = 0;
 						node.eval = eval;
 						node.leaf = true;
+						
 						return node.eval;
 					}
 				}
 				
 				
 				if (EngineConstants.ENABLE_NULL_MOVE && depth >= 3) {
+					
 					if (MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
+						
 						cb.doNullMove();
+						
 						final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv, pv_scores_w, pv_scores_b)
 								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, pv_scores_w, pv_scores_b, 0);
+						
 						cb.undoNullMove();
+						
 						if (score >= beta) {
+							
 							node.bestmove = 0;
 							node.eval = score;
 							node.leaf = true;
+							
 							return node.eval;
 						}
 					}
@@ -856,12 +881,18 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length) {
+					
 					if (eval + RAZORING_MARGIN[depth] < alpha) {
+						
+						
 						int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply, isPv, pv_scores_w, pv_scores_b);
+						
 						if (score + RAZORING_MARGIN[depth] <= alpha) {
+							
 							node.bestmove = 0;
 							node.eval = score;
 							node.leaf = true;
+							
 							return node.eval;
 						}
 					}
@@ -909,6 +940,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		final int parentMove = moveGen.previous();
 		int bestMove = 0;
 		int bestScore = ISearch.MIN - 1;
+		
 		int killer1Move = 0;
 		int killer2Move = 0;
 		int counterMove1 = 0;
@@ -1005,13 +1037,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				moveGen.sort();
 				
 				break;
-				
-			/*default:
-				
-				phase++;
-				
-				continue;
-				*/
 			}
 			
 			
@@ -1086,24 +1111,27 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
-						if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
+						if (eval != ISearch.MIN) { //Is set
 							
-							if (eval + FUTILITY_MARGIN[depth] <= alpha) {
+							/*if (eval == ISearch.MIN) {
 								
+								throw new IllegalStateException("eval == ISearch.MIN");
+							}*/
+							
+							
+							if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
+								
+								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
+									
+									continue;
+								}
+							}
+							
+							/*if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
 								continue;
 							}
-						}	
-						
-						if (eval == ISearch.MIN) {
-							
-							throw new IllegalStateException("eval == ISearch.MIN");
+							*/
 						}
-						
-						/*if (eval + getTrustWindow(mediator, depth) <= alpha) {
-							
-							continue;
-						}
-						*/
 						
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& phase == PHASE_ATTACKING_BAD
@@ -1324,13 +1352,49 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (bestScore != node.eval) {
 			
-			throw new IllegalStateException();
+			throw new IllegalStateException("bestScore != node.eval");
+		}
+
+		
+		if (bestMove != node.bestmove) {
+			
+			throw new IllegalStateException("bestMove != node.bestmove");
 		}
 		
 		
 		if (env.getTPT() != null) {
+			
+			if (useTPTKeyWithMoveCounter()) {
 				
-			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
+				//Here we can put mate values and egtb values in TT
+				
+				if (egtb_eval > node.eval) {
+					
+					node.bestmove = 0;
+					node.eval = egtb_eval;
+					node.leaf = true;
+				}
+				
+				env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
+				
+			} else {
+				
+				//Here we must not put mate values and egtb values in TT
+				if (node.eval != getDrawScores(-1) //Not draw score
+						&& egtb_eval == ISearch.MIN //Not EGTB score
+						&& Math.abs(node.eval) < ISearch.MAX_MAT_INTERVAL / ISearch.MAX_DEPTH //Not EGTB and mate score for current node or for its parent node.
+					) {
+					
+					env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
+				}
+				
+				if (egtb_eval > node.eval) {
+					
+					node.bestmove = 0;
+					node.eval = egtb_eval;
+					node.leaf = true;
+				}
+			}
 		}
 		
 		
@@ -1361,8 +1425,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.eval = ISearch.MIN;
 		node.leaf = true;
 		
-		if (ply > 0
-	    		&& isDraw(isPv)) {
+		if (isDraw(isPv)) {
 	    	
 	    	node.eval = getDrawScores(-1);
 	    	
@@ -1370,13 +1433,15 @@ public class Search_PVS_NWS extends SearchImpl {
 	    }
 	    
 	    
+		long hashkey = getHashkeyTPT(cb);
+		
 		int ttMove 		= 0;
 	    int ttFlag 		= -1;
 	    int ttValue 	= IEvaluator.MIN_EVAL;
 
 		if (env.getTPT() != null) {
 			
-			env.getTPT().get(cb.zobristKey, tt_entries_per_ply[ply]);
+			env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
 			
 			if (!tt_entries_per_ply[ply].isEmpty()) {
 				
@@ -1505,6 +1570,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					int material_gain = getEnv().getBitboard().getBaseEvaluation().getMaterialGain(move);
 					
 					if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + material_gain < alpha) {
+						
 						continue;
 					}
 				}
@@ -1549,12 +1615,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (node.eval != bestScore) {
 				
-				throw new IllegalStateException(); 
+				throw new IllegalStateException("node.eval != bestScore"); 
 			}
 			
 			if (node.leaf) {
 				
-				throw new IllegalStateException(); 
+				throw new IllegalStateException("node.leaf"); 
 			}
 			
 		} else {
@@ -1569,7 +1635,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (bestScore > eval) {
 				
-				env.getTPT().put(cb.zobristKey, 0, bestScore, alphaOrig, beta, bestMove);
+				env.getTPT().put(hashkey, 0, bestScore, alphaOrig, beta, bestMove);
 				
 			}
 		}
@@ -1588,7 +1654,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
     	return node.eval;
 	}
-		
+	
 	
 	private int extensions(final ChessBoard cb, final MoveGenerator moveGen, final int ply) {
 		
@@ -1629,7 +1695,7 @@ public class Search_PVS_NWS extends SearchImpl {
 
 	private int getTrustWindow(ISearchMediator mediator, int depth) {
 		
-		int value = 4 * depth * Math.max(1, mediator.getTrustWindow_AlphaAspiration());
+		int value = depth * Math.max(1, mediator.getTrustWindow_AlphaAspiration());
 		//int value = 1 * depth * Math.max(1, mediator.getTrustWindow_AlphaAspiration());
 		
 		//System.out.println("mediator.getTrustWindow_AlphaAspiration()=" + mediator.getTrustWindow_AlphaAspiration()
@@ -1898,32 +1964,41 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (ply < ISearch.MAX_DEPTH) {
 					
-					if (!env.getBitboard().isPossible(result.bestmove)) {
+					if (result.bestmove != 0) {
 						
-						throw new IllegalStateException("!env.getBitboard().isPossible(result.bestmove)");
-					}
-					
-					env.getBitboard().makeMoveForward(result.bestmove);
-					
-					env.getTPT().get(env.getBitboard().getHashKey(), tt_entries_per_ply[ply]);
-					
-					if (!tt_entries_per_ply[ply].isEmpty()) {
-						
-						
-						draw = extractFromTT(ply, result.child, tt_entries_per_ply[ply], info, isPv);
-						
-						
-						if (draw) {
+						if (!env.getBitboard().isPossible(result.bestmove)) {
 							
-							result.eval = getDrawScores(-1);
-							
-						} else {
-							
-							result.leaf = false;
+							throw new IllegalStateException("!env.getBitboard().isPossible(result.bestmove)");
 						}
+						
+						env.getBitboard().makeMoveForward(result.bestmove);
+						
+						env.getTPT().get(env.getBitboard().getHashKey(), tt_entries_per_ply[ply]);
+						
+						if (!tt_entries_per_ply[ply].isEmpty()) {
+							
+							
+							draw = extractFromTT(ply, result.child, tt_entries_per_ply[ply], info, isPv);
+							
+							
+							if (draw) {
+								
+								result.eval = getDrawScores(-1);
+								
+							} else {
+								
+								result.leaf = false;
+							}
+						}
+						
+						env.getBitboard().makeMoveBackward(result.bestmove);
+						
+					} else {
+						
+						//It is currently possible in positions with EGTB hit
+						
+						draw = (result.eval == getDrawScores(-1));
 					}
-					
-					env.getBitboard().makeMoveBackward(result.bestmove);
 				}
 			}
 		}
@@ -1943,7 +2018,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (node.leaf || node.bestmove == 0) {
 				
-				throw new IllegalStateException();
+				throw new IllegalStateException("node.leaf || node.bestmove == 0");
 			}
 		}
 		

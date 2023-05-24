@@ -2,7 +2,7 @@ package bagaturchess.bitboard.impl1.internal;
 
 
 public class MoveUtil {
-
+	
 	// move types
 	public static final int TYPE_NORMAL 		= 0;
 	public static final int TYPE_EP 			= 1;
@@ -11,7 +11,7 @@ public class MoveUtil {
 	public static final int TYPE_PROMOTION_R 	= ChessConstants.ROOK;
 	public static final int TYPE_PROMOTION_Q 	= ChessConstants.QUEEN;
 	public static final int TYPE_CASTLING 		= 6;
-
+	
 	// shifts
 	// ///////////////////// FROM //6 bits
 	private static final int SHIFT_TO = 6; // 6
@@ -19,20 +19,20 @@ public class MoveUtil {
 	private static final int SHIFT_ATTACK = 15; // 3
 	private static final int SHIFT_MOVE_TYPE = 18; // 3
 	private static final int SHIFT_PROMOTION = 21; // 1
-
+	
 	// masks
 	private static final int MASK_3_BITS = 7; // 6
 	private static final int MASK_6_BITS = 0x3f; // 6
 	private static final int MASK_12_BITS = 0xfff;
-
+	
 	private static final int MASK_ATTACK = 7 << 15; // 3
 	private static final int MASK_PROMOTION = 1 << 21; // 1
 	private static final int MASK_QUIET = MASK_PROMOTION | MASK_ATTACK;
-
+	
 	public static final int getFromIndex(final int move) {
 		return move & MASK_6_BITS;
 	}
-
+	
 	public static final int getToIndex(final int move) {
 		return move >>> SHIFT_TO & MASK_6_BITS;
 	}

@@ -33,9 +33,9 @@ import bagaturchess.uci.api.ChannelManager;
 public class TTable_Impl2 implements ITTable {
 	
 	
-	private static final int FLAG = 12;
-	private static final int MOVE = 14;
-	private static final int SCORE = 48;
+	private static final int FLAG = 9; //12
+	private static final int MOVE = 11; //14
+	private static final int SCORE = 45; //48
 	
 	
 	private long[] keys;
@@ -268,6 +268,7 @@ public class TTable_Impl2 implements ITTable {
 		int score = (int) (value >> SCORE);
 
 		if (EngineConstants.ASSERT) {
+			
 			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 		}
 
@@ -281,12 +282,12 @@ public class TTable_Impl2 implements ITTable {
 	
 	
 	private static int getFlag(final long value) {
-		return (int) (value >>> FLAG & 3);
+		return (int) (value >>> FLAG & 3); //...00000011 - last 2 right bits after the shift
 	}
 	
-	
+	//21 bits - 0x3fffff, 24 bits - 0x3ffffff
 	private static int getMove(final long value) {
-		return (int) (value >>> MOVE & 0x3fffff);
+		return (int) (value >>> MOVE & 0x3fffff); //1111111111111111111111 binary or 4194303 decimal
 	}
 	
 	

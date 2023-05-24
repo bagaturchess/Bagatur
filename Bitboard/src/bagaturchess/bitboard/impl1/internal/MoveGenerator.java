@@ -34,7 +34,7 @@ public final class MoveGenerator {
 	//LMR_DEVIATION_MULTIPLIER is senseful between 0 and 2.
 	//The value of LMR_DEVIATION_MULTIPLIER equal to 2, leads to skip of LMR reductions for top 5% of the moves sorted by their LMR rate.
 	//We select 5% in order to keep the skip rate in the frame of the standard deviation.
-	// Values more than 2 actually means that the LMR optimization is always performed and there are no skips. Value 0 means that it is executed in around 50% of the cases.
+	//Values more than 2 actually means that the LMR optimization is always performed and there are no skips. Value 0 means that it is executed in around 50% of the cases.
 	private static final double LMR_DEVIATION_MULTIPLIER 		= 4;
 	
 	private final long[][] LMR_ALL 								= new long[2][64 * 64];
@@ -574,8 +574,25 @@ public final class MoveGenerator {
 	}
 
 	public void setMVVLVAScores(final ChessBoard cb) {
+		
+		final int scale = 100;
+		
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
-			moveScores[j] = 100 * (MoveUtil.getAttackedPieceIndex(moves[j]) * 6 - MoveUtil.getSourcePieceIndex(moves[j]));
+			
+			int move = moves[j];
+			
+			//getAttackedPieceIndex and getSourcePieceIndex returns value in [1, 6]
+			
+			int score = (6 * MoveUtil.getAttackedPieceIndex(move) - 1 * MoveUtil.getSourcePieceIndex(move));
+			
+			if (MoveUtil.isPromotion(move)) {
+				
+				//MoveUtil.getMoveType(move) returns value in [2, 5] when the move is promotion
+				score += 1 * MoveUtil.getMoveType(move);
+				
+			}
+			
+			moveScores[j] = scale * score;
 		}
 	}
 	
@@ -634,6 +651,9 @@ public final class MoveGenerator {
 			
 			int from_to_index = MoveUtil.getFromToIndex(move);
 			
+			//long score = 0;
+			long score = getHHScore(colorToMove, from_to_index, MoveUtil.getSourcePieceIndex(move), MoveUtil.getToIndex(move), parentMove);
+			
 			/**
 			 * Each particular move's score is calculated by the ration between the beta cutoffs occurrences after this move divided by the number of all occurrences of the move.
 			 * The cutoffs statistics are measured only by moves performed by LMR at shallow depths.
@@ -641,15 +661,15 @@ public final class MoveGenerator {
 			 * This approach should be kind of dynamic optimization as all other heuristic here are.
 			 * I am happy that this approach doesn't makes the search speed worse.
 			 * */
-			moveScores[j] = getLMR_Rate_internal(colorToMove, from_to_index);
-			moveScores[j] += getHHScore(colorToMove, from_to_index, MoveUtil.getSourcePieceIndex(move), MoveUtil.getToIndex(move), parentMove);
+			score += getLMR_Rate_internal(colorToMove, from_to_index);
+			//score += 0;
 			
-			//moveScores[j] = getLMR_Rate_internal(colorToMove, from_to_index);
-			
-			if (moveScores[j] < 0) {
+			if (score < 0) {
 				
-				throw new IllegalStateException("moveScores[j] < 0");
+				throw new IllegalStateException("score < 0");
 			}
+			
+			moveScores[j] = score;
 		}
 	}
 	
