@@ -35,7 +35,7 @@ public final class MoveGenerator {
 	//The value of LMR_DEVIATION_MULTIPLIER equal to 2, leads to skip of LMR reductions for top 5% of the moves sorted by their LMR rate.
 	//We select 5% in order to keep the skip rate in the frame of the standard deviation.
 	//Values more than 2 actually means that the LMR optimization is always performed and there are no skips. Value 0 means that it is executed in around 50% of the cases.
-	private static final double LMR_DEVIATION_MULTIPLIER 		= 4;
+	private static final double LMR_DEVIATION_MULTIPLIER 		= 2;
 	
 	private final long[][] LMR_ALL 								= new long[2][64 * 64];
 	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
