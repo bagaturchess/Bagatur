@@ -811,7 +811,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int eval = ISearch.MIN;
 		
-		if (!isPv && cb.checkingPieces == 0 && egtb_eval == ISearch.MIN) {
+		if (!isPv && cb.checkingPieces == 0
+				//&& egtb_eval == ISearch.MIN
+			) {
 			
 			
 			eval = eval(evaluator, ply, alpha_org, beta, isPv, pv_scores_w, pv_scores_b);
