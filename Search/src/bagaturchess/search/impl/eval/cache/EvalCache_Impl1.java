@@ -58,7 +58,7 @@ public class EvalCache_Impl1 extends LRUMapLongObject<IEvalEntry> implements IEv
 			throw new IllegalStateException("_eval=" + _eval);
 		}
 
-		if (_eval >= ISearch.MAX_MAT_INTERVAL || _eval <= -ISearch.MAX_MAT_INTERVAL) {
+		if (_eval >= ISearch.MAX_MATERIAL_INTERVAL || _eval <= -ISearch.MAX_MATERIAL_INTERVAL) {
 			if (!SearchUtils.isMateVal((int)_eval)) {
 				throw new IllegalStateException("not mate val _eval=" + _eval);
 			}

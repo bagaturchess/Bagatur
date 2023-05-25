@@ -339,17 +339,17 @@ public class SearchManager {
 				/*+ (((IRootSearchConfig_SMP)sharedData.getEngineConfiguration()).getThreadsCount() - 1)*/ >= betasGen.getUpperBound();
 				
 		if (!last) {
-			if (betasGen.getLowerBound() >= ISearch.MAX_MAT_INTERVAL
+			if (betasGen.getLowerBound() >= ISearch.MAX_MATERIAL_INTERVAL
 					&& SearchUtils.isMateVal(betasGen.getLowerBound())
-					&& (betasGen.getUpperBound() - betasGen.getLowerBound() < ISearch.MAX_MAT_INTERVAL)
+					&& (betasGen.getUpperBound() - betasGen.getLowerBound() < ISearch.MAX_MATERIAL_INTERVAL)
 				) {
 				//Mate found
 				last = true;
 			}
 			
-			if (betasGen.getUpperBound() <= -ISearch.MAX_MAT_INTERVAL
+			if (betasGen.getUpperBound() <= -ISearch.MAX_MATERIAL_INTERVAL
 					&& SearchUtils.isMateVal(betasGen.getUpperBound())
-					&& (betasGen.getUpperBound() - betasGen.getLowerBound() < ISearch.MAX_MAT_INTERVAL)
+					&& (betasGen.getUpperBound() - betasGen.getLowerBound() < ISearch.MAX_MATERIAL_INTERVAL)
 				) {
 				//Mate found
 				last = true;

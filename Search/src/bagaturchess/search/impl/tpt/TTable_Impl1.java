@@ -101,7 +101,7 @@ public class TTable_Impl1 extends LRUMapLongObject<TTable_Impl1.TPTEntry> implem
 			throw new IllegalStateException("_eval=" + _eval);
 		}
 
-		if (_eval >= ISearch.MAX_MAT_INTERVAL || _eval <= -ISearch.MAX_MAT_INTERVAL) {
+		if (_eval >= ISearch.MAX_MATERIAL_INTERVAL || _eval <= -ISearch.MAX_MATERIAL_INTERVAL) {
 			if (!SearchUtils.isMateVal(_eval)) {
 				throw new IllegalStateException("not mate val _eval=" + _eval);
 			}

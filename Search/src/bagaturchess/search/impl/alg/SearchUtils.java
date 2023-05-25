@@ -32,6 +32,16 @@ public class SearchUtils {
 	
 	static {
 		
+		if (isMateVal(ISearch.MIN)) {
+			
+			throw new IllegalStateException("isMateVal(MIN)");
+		}
+
+		if (isMateVal(ISearch.MAX)) {
+			
+			throw new IllegalStateException("isMateVal(MAX)");
+		}
+		
 		//System.out.println("SearchUtils.static: ISearch.MAX=" + ISearch.MAX);
 		
 		//System.out.println("SearchUtils.static: ISearch.MIN=" + ISearch.MIN);
@@ -64,90 +74,56 @@ public class SearchUtils {
 			throw new IllegalStateException("SearchUtils.getMateVal: depth=" + depth);
 		}
 		
-		return ISearch.MAX_MAT_INTERVAL * (1 + ISearch.MAX_DEPTH - Math.min(ISearch.MAX_DEPTH, Math.max(0, depth)));
+		return ISearch.MAX_MATERIAL_INTERVAL * (ISearch.MAX_DEPTH + 1 - depth);
 	}
 	
 	
 	public static final boolean isMateVal(int val) {
 		
-		return Math.abs(val) >= ISearch.MAX_MAT_INTERVAL;
-		//return Math.abs(val) != ISearch.MAX && Math.abs(val) >= ISearch.MAX_MAT_INTERVAL;
+		return Math.abs(val) >= ISearch.MAX_MATERIAL_INTERVAL
+				&& Math.abs(val) <= ISearch.MAX_MATE_INTERVAL
+				&& Math.abs(val) % ISearch.MAX_MATERIAL_INTERVAL == 0;
+		//return Math.abs(val) >= ISearch.MAX_MATERIAL_INTERVAL;
 	}
 	
 	
 	public static final int getMateDepth(int score) {
 		
-		if (score % ISearch.MAX_MAT_INTERVAL != 0) {
+		if (!isMateVal(score)) {
 			
-			//throw new IllegalStateException("SearchUtils.getMateDepth: score % ISearch.MAX_MAT_INTERVAL != 0, score=" + score);
-			//TODO: check why this is thrown
-			//More info:
-			/*info string java.lang.IllegalStateException: SearchUtils.getMateDepth: score % ISearch.MAX_MAT_INTERVAL != 0, score=-12700008
-					info string 	at bagaturchess.search.impl.alg.SearchUtils.getMateDepth(Unknown Source)
-					info string 	at bagaturchess.search.impl.info.SearchInfoImpl.getMateScore(Unknown Source)
-					info string 	at bagaturchess.search.api.internal.SearchInfoUtils.buildMajorInfoCommand(Unknown Source)
-					info string 	at bagaturchess.search.api.internal.SearchInfoUtils.buildMajorInfoCommand(Unknown Source)
-					info string 	at bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_Base.changedMajor(Unknown Source)
-					info string 	at bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch.changedMajor(Unknown Source)
-					info string 	at bagaturchess.search.impl.utils.SearchMediatorProxy.changedMajor(Unknown Source)
-					info string 	at bagaturchess.search.impl.rootsearch.sequential.mtd.Mediator_AlphaAndBestMoveWindow.changedMajor(Unknown Source)
-					info string 	at bagaturchess.search.impl.utils.SearchMediatorProxy.changedMajor(Unknown Source)
-					info string 	at bagaturchess.search.impl.rootsearch.sequential.NPSCollectorMediator.changedMajor(Unknown Source)
-					info string 	at bagaturchess.search.impl.rootsearch.sequential.mtd.SearchManager.increaseLowerBound(Unknown Source)
-					info string 	at bagaturchess.search.impl.rootsearch.sequential.mtd.NullwinSearchTask.run(Unknown Source)
-					info string 	at bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD$1.run(Unknown Source)
-					info string 	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
-					info string 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
-					info string 	at java.lang.Thread.run(Unknown Source)
-					*/
-			
-			if (score >= 0) {
-				
-				score += ISearch.MAX_MAT_INTERVAL / 2;
-				
-			} else {
-				
-				score -= ISearch.MAX_MAT_INTERVAL / 2;
-			}
+			throw new IllegalStateException("!isMateVal(score)");
 		}
 		
-		if (score > ISearch.MAX) {
+		if (Math.abs(score) % ISearch.MAX_MATERIAL_INTERVAL != 0) {
 			
-			//throw new IllegalStateException("SearchUtils.getMateDepth: score > ISearch.MAX, score=" + score);
-			
-			score = ISearch.MAX;
+			throw new IllegalStateException("Math.abs(score) % ISearch.MAX_MATERIAL_INTERVAL != 0");
 		}
 		
-		if (score < ISearch.MIN) {
+		if (score == ISearch.MIN) {
 			
-			//throw new IllegalStateException("SearchUtils.getMateDepth: score < ISearch.MIN, score=" + score);
+			throw new IllegalStateException("score == ISearch.MIN");
+		}
+		
+		if (score == ISearch.MAX) {
 			
-			/*info string java.lang.IllegalStateException: SearchUtils.getMateDepth: score < ISearch.MIN, score=-12812144
-					info string 	at bagaturchess.search.impl.alg.SearchUtils.getMateDepth(Unknown Source)
-					info string 	at bagaturchess.search.impl.info.SearchInfoImpl.getMateScore(Unknown Source)
-					info string 	at bagaturchess.search.api.internal.SearchInfoUtils.buildMajorInfoCommand(Unknown Source)
-					info string 	at bagaturchess.search.api.internal.SearchInfoUtils.buildMajorInfoCommand(Unknown Source)
-					info string 	at bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_Base.changedMajor(Unknown Source)
-					info string 	at bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch.changedMajor(Unknown Source)
-					info string 	at bagaturchess.search.impl.utils.SearchMediatorProxy.changedMajor(Unknown Source)
-					info string 	at bagaturchess.search.impl.rootsearch.sequential.mtd.Mediator_AlphaAndBestMoveWindow.changedMajor(Unknown Source)
-					info string 	at bagaturchess.search.impl.utils.SearchMediatorProxy.changedMajor(Unknown Source)
-					info string 	at bagaturchess.search.impl.rootsearch.sequential.NPSCollectorMediator.changedMajor(Unknown Source)
-					info string 	at bagaturchess.search.impl.rootsearch.sequential.mtd.SearchManager.increaseLowerBound(Unknown Source)
-					info string 	at bagaturchess.search.impl.rootsearch.sequential.mtd.NullwinSearchTask.run(Unknown Source)
-					info string 	at bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD$1.run(Unknown Source)
-					info string 	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
-					info string 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
-					info string 	at java.lang.Thread.run(Unknown Source)
-			*/
+			throw new IllegalStateException("score == ISearch.MAX");
+		}
+		
+		
+		if (score > ISearch.MAX_MATE_INTERVAL) {
+			
+			throw new IllegalStateException("score > ISearch.MAX_MATE_INTERVAL");
+		}
+		
+		if (score < -ISearch.MAX_MATE_INTERVAL) {
 					
-			score = ISearch.MIN;
+			throw new IllegalStateException("score < -ISearch.MAX_MATE_INTERVAL");
 		}
 		
-		//Between 1 and ISearch.MAX_DEPTH + 1
-		int mate_depth = Math.abs(score / ISearch.MAX_MAT_INTERVAL);
+		//Between 1 and ISearch.MAX_DEPTH
+		int mate_depth = Math.abs(score / ISearch.MAX_MATERIAL_INTERVAL);
 		
-		int depth = (ISearch.MAX_DEPTH + 1) - mate_depth; 
+		int depth = 1 + ISearch.MAX_DEPTH - mate_depth; 
 		
 		return score > 0 ? depth : -depth;
 	}

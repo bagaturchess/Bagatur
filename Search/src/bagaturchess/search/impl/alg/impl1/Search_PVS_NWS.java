@@ -287,7 +287,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		final int parentMove = moveGen.previous();
 		int bestMove = 0;
-		int bestScore = ISearch.MIN - 1;
+		int bestScore = ISearch.MIN;
 		
 		int movesPerformed_attacks = 0;
 		int movesPerformed_quiet = 0;
@@ -725,7 +725,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							}*/
 							
 							//TODO: the eval is too less in order to be more attractive for search than maybe rook and 1+ passed pawns?
-							egtb_eval = IEvaluator.MAX_EVAL / (ply + dtz);
+							egtb_eval = MAX_MATERIAL_INTERVAL / (ply + dtz + 1); //+1 in order to be less than a mate in max_depth plies.
 							
 						} /*else {
 							
@@ -834,7 +834,16 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (ttFlag == -1 && depth >= 2) {
+			if (egtb_eval != ISearch.MIN && egtb_eval > eval) {
+				
+				eval = egtb_eval;
+			}
+			
+			
+			//Reduce depth in cases where the probability of PV node
+			//1. Is very low (When the node is not in TT) or
+			//2. PV node is already a fact for some reason (There is a TB hit search could rely on, because it improves the PV score).
+			if (depth >= 2 && (ttFlag == -1 || egtb_eval != ISearch.MIN)) {
 				
 				depth -= 1;
 			}
@@ -847,11 +856,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (eval - STATIC_NULLMOVE_MARGIN[depth] >= beta) {
 						
-						node.bestmove = 0;
-						node.eval = eval;
-						node.leaf = true;
-						
-						return node.eval;
+						if (egtb_eval == ISearch.MIN || egtb_eval >= eval) {
+							
+							node.bestmove = 0;
+							node.eval = eval;
+							node.leaf = true;
+							
+							return node.eval;
+						}
 					}
 				}
 				
@@ -870,11 +882,14 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (score >= beta) {
 							
-							node.bestmove = 0;
-							node.eval = score;
-							node.leaf = true;
-							
-							return node.eval;
+							if (egtb_eval == ISearch.MIN || egtb_eval >= score) {
+								
+								node.bestmove = 0;
+								node.eval = score;
+								node.leaf = true;
+								
+								return node.eval;
+							}
 						}
 					}
 				}
@@ -891,11 +906,14 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (score + RAZORING_MARGIN[depth] <= alpha) {
 							
-							node.bestmove = 0;
-							node.eval = score;
-							node.leaf = true;
-							
-							return node.eval;
+							if (egtb_eval == ISearch.MIN || egtb_eval <= score) {
+								
+								node.bestmove = 0;
+								node.eval = score;
+								node.leaf = true;
+								
+								return node.eval;
+							}
 						}
 					}
 				}
@@ -941,7 +959,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		final int parentMove = moveGen.previous();
 		int bestMove = 0;
-		int bestScore = ISearch.MIN - 1;
+		int bestScore = ISearch.MIN;
 		
 		int killer1Move = 0;
 		int killer2Move = 0;
@@ -1383,8 +1401,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				//Here we must not put mate values and egtb values in TT
 				if (node.eval != getDrawScores(-1) //Not draw score
-						&& egtb_eval == ISearch.MIN //Not EGTB score
-						&& Math.abs(node.eval) < ISearch.MAX_MAT_INTERVAL / ISearch.MAX_DEPTH //Not EGTB and mate score for current node or for its parent node.
+						&& egtb_eval == MIN //Not EGTB score
+						&& Math.abs(node.eval) < MAX_MATERIAL_INTERVAL / MAX_DEPTH //Not EGTB and mate score for current node or for its parent node.
 					) {
 					
 					env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
@@ -1414,6 +1432,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		if (info.getSelDepth() < ply) {
+			
 			info.setSelDepth(ply);
 		}
 		
