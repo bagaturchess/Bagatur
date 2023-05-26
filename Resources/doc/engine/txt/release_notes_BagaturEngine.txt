@@ -1,8 +1,9 @@
  Version 3.7d (24 May 2023)
- * 3.7c is still weaker than version 3.0. These changes aim to restore the ELO strength
+ * 3.7c is still weaker than version 3.0. These changes in 3.7d aim to restore the ELO strength.
  * Move ordering: bad captures are now before quiet moves (like in version 3.0).
+ * Search: Randomize move lists before sorting 2.5 times more often.
+ * Search: Switch on Adaptive LMR, it keeps around 5% of all nodes not reduced by LMR.
  * EGTB Handling: search scores of Draw, Mate and EGTB hits are not stored in TT.
- * Switch on Adaptive LMR: it keeps around 5% of all nodes not reduced by LMR.
 
  Version 3.7c (1 May 2023)
  * 3.7b is still weaker than version 3.0. These changes aim to restore the ELO after the new features and changes after 3.0:
