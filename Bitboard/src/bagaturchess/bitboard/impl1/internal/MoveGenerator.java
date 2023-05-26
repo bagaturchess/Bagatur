@@ -739,9 +739,8 @@ public final class MoveGenerator {
 		final int start_index = nextToMove[currentPly];
 		final int end_index = nextToGenerate[currentPly] - 1;
 		
-		//Randomize each 3 sortings
 		//In order to increase the effect of nondeterminism, ensure first ordering is randomized.
-		if (counter_sorting == 0 || counter_sorting % 5 == 0) {
+		if (counter_sorting == 0 || counter_sorting % 2 == 0) {
 				
 			randomize(moveScores, moves, start_index, end_index);
 		}
