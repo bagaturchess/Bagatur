@@ -785,6 +785,15 @@ public class Search_PVS_NWS extends SearchImpl {
 					egtb_eval = getDrawScores(-1);
 				}
 			}
+			
+			//if (ply > 7) {
+			
+				node.bestmove = 0;
+				node.eval = egtb_eval;
+				node.leaf = true;
+				
+				return node.eval;
+			//}
 		}
 		
 		
@@ -834,10 +843,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (egtb_eval != ISearch.MIN && egtb_eval > eval) {
+			/*if (egtb_eval != ISearch.MIN && egtb_eval > eval) {
 				
 				eval = egtb_eval;
-			}
+			}*/
 			
 			
 			//Reduce depth in cases where the probability of PV node
@@ -1400,7 +1409,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			} else {
 				
 				//Here we must not put mate values and egtb values in TT
-				if (node.eval != getDrawScores(-1) //Not draw score
+				/*if (node.eval != getDrawScores(-1) //Not draw score
 						&& egtb_eval == MIN //Not EGTB score
 						&& Math.abs(node.eval) < MAX_MATERIAL_INTERVAL / MAX_DEPTH //Not EGTB and mate score for current node or for its parent node.
 					) {
@@ -1413,6 +1422,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.bestmove = 0;
 					node.eval = egtb_eval;
 					node.leaf = true;
+				}*/
+				
+				if (!SearchUtils.isMateVal(node.eval)) {
+					
+					env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
 				}
 			}
 		}
