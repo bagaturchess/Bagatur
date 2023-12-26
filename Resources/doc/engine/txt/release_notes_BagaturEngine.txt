@@ -1,3 +1,9 @@
+ Version 3.7e (26 December 2023)
+ * Bugfixing - mate with bishop and knight is now possible.
+ * EGTB Handling: return score directly if there is EGTB hit.
+ * EGTB Handling: search scores of Draw and EGTB hits are now stored in TT again.
+ 
+ 
  Version 3.7d (24 May 2023)
  * 3.7c is still weaker than version 3.0. These changes in 3.7d aim to restore the ELO strength.
  * Move ordering: bad captures are now before quiet moves (like in version 3.0).
