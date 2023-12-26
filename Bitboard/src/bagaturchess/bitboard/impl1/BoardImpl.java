@@ -683,10 +683,7 @@ public class BoardImpl implements IBitBoard {
 		 */
 		if (Utils.countBits(bishops) == 1 && Utils.countBits(knights) == 1) {
 			
-			if ((bishops & Fields.ALL_WHITE_FIELDS) != 0 && (bishops & Fields.ALL_BLACK_FIELDS) != 0) {
-				
-				return true;
-			}
+			return true;
 		}
 		
 		
