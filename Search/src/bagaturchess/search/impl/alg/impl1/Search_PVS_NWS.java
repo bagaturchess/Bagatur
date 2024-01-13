@@ -877,13 +877,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				if (EngineConstants.ENABLE_NULL_MOVE && depth >= 3) {
+				if (EngineConstants.ENABLE_NULL_MOVE) {
 					
 					if (MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 						
 						cb.doNullMove();
 						
-						final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
+						final int reduction = depth / 2 + 1;
 						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv, pv_scores_w, pv_scores_b)
 								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, pv_scores_w, pv_scores_b, 0);
 						
