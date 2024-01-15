@@ -12,7 +12,12 @@ public class ProbeMain {
 		
 		System.load(dll.getAbsolutePath());
 		
-		NNUEJNIBridge.init("./nn-baff1edbea57.nnue");
+		
+		//File nnue = new File("nn-baff1edbea57.nnue");
+		//File nnue = new File("nn-0000000000a0.nnue");
+		File nnue = new File("nn-04cf2b4ed1da.nnue");
+		
+		NNUEJNIBridge.init(nnue.getAbsolutePath());
 		
 		//NNUE_JNI_Bridge.eval("fen");
 	}
