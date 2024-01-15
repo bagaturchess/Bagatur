@@ -10,9 +10,9 @@ extern "C" {
 /*
  * Class:     bagaturchess_nnue_NNUE_JNI_Bridge
  * Method:    init
- * Signature: (Ljava/lang/String;)Z
+ * Signature: (Ljava/lang/String;)V
  */
-JNIEXPORT jboolean JNICALL Java_bagaturchess_nnue_NNUE_1JNI_1Bridge_init
+JNIEXPORT void JNICALL Java_bagaturchess_nnue_NNUE_1JNI_1Bridge_init
   (JNIEnv *, jclass, jstring);
 
 /*
