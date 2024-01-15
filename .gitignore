@@ -6,4 +6,5 @@ WorkDir*
 *.bin
 BoardScanner/data*
 EGTB/bin/*
+NNUE/bin/*
 .metadata/
