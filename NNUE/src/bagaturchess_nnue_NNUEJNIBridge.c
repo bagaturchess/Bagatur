@@ -3,8 +3,10 @@
 #include "nnue.cpp"
 #include "misc.h"
 #include "misc.cpp"
+#include "bagaturchess_nnue_NNUEJNIBridge.h"
 
-JNIEXPORT void JNICALL Java_bagaturchess_nnue_NNUE_1JNI_1Bridge_init
+
+JNIEXPORT void JNICALL Java_bagaturchess_nnue_NNUEJNIBridge_init
   (JNIEnv *env, jclass this_class, jstring filename) {
 
     const char *nnue_filename = env->GetStringUTFChars(filename, NULL);
@@ -15,7 +17,7 @@ JNIEXPORT void JNICALL Java_bagaturchess_nnue_NNUE_1JNI_1Bridge_init
 }
 
 
-JNIEXPORT jint JNICALL Java_bagaturchess_nnue_NNUE_1JNI_1Bridge_eval
+JNIEXPORT jint JNICALL Java_bagaturchess_nnue_NNUEJNIBridge_eval
 	(JNIEnv *env, jclass this_class, jstring fen_str) {
 
 	  const char *fen = env->GetStringUTFChars(fen_str, NULL);

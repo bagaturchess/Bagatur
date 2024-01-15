@@ -1,7 +1,7 @@
 package bagaturchess.nnue;
 
 
-public class NNUE_JNI_Bridge {
+public class NNUEJNIBridge {
 
 	public static native void init(String filename);
 	
