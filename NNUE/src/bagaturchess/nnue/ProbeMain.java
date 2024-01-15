@@ -2,6 +2,10 @@ package bagaturchess.nnue;
 
 import java.io.File;
 
+import bagaturchess.bitboard.api.BoardUtils;
+import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.Constants;
+
 
 public class ProbeMain {
 	
@@ -19,6 +23,13 @@ public class ProbeMain {
 		
 		NNUEJNIBridge.init(nnue.getAbsolutePath());
 		
-		//NNUE_JNI_Bridge.eval("fen");
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
+		
+		String fen = bitboard.toEPD();
+		System.out.println("fen=" + fen);
+		
+		int score = NNUEJNIBridge.eval(fen);
+			
+		System.out.println("score=" + score);
 	}
 }
