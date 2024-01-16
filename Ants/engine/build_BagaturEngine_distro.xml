@@ -18,7 +18,7 @@
   <property name="ucitracker_dir" value="${workspace_root}/UCITracker" />
   <property name="learningImpl_dir" value="${workspace_root}/LearningImpl" />
   <property name="egtb_dir" value="${workspace_root}/EGTB" />
-
+  <property name="nnue_dir" value="${workspace_root}/NNUE" />
 
   <property name="temp_dir" value="${work_dir}/temp" />
   
@@ -28,6 +28,7 @@
     <ant antfile="${ants_dir}/common/build_Opening.xml" dir="${opening_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_UCI.xml" dir="${uci_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_EGTB.xml" dir="${engines_dir}/src"/>
+  	<ant antfile="${ants_dir}/common/build_NNUE.xml" dir="${engines_dir}/src"/>
   	<ant antfile="${ants_dir}/engine/build_Search.xml" dir="${search_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_LearningAPI.xml" dir="${learningAPI_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_UCITracker.xml" dir="${ucitracker_dir}/src"/>
@@ -41,6 +42,7 @@
 	      <include name="BagaturOpening.jar"/>
 	      <include name="BagaturSearch.jar"/>
 	      <include name="BagaturUCI.jar"/>
+	      <!--include name="BagaturNNUE.jar"/-->
 	      <include name="BagaturEngines.jar"/>
 	      <include name="BagaturLearningAPI.jar"/>
 	      <include name="BagaturEGTB.jar"/>
@@ -230,8 +232,9 @@
   	<delete file="${work_dir}/BagaturEngines.jar"/>
   	<delete file="${work_dir}/BagaturLearningAPI.jar"/>
   	<delete file="${work_dir}/BagaturEGTB.jar"/>
+  	<delete file="${work_dir}/BagaturNNUE.jar"/>
   	<delete file="${work_dir}/BagaturLearningImpl.jar"/>
-  	<!--delete file="${work_dir}/BagaturUCITracker.jar"/-->
+  	<delete file="${work_dir}/BagaturUCITracker.jar"/>
   	<delete file="${work_dir}/src.zip"/>
   	
   </target>
