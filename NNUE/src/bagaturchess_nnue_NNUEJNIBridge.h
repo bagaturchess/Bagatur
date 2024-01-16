@@ -20,8 +20,16 @@ JNIEXPORT void JNICALL Java_bagaturchess_nnue_NNUEJNIBridge_init
  * Method:    eval
  * Signature: (Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_bagaturchess_nnue_NNUEJNIBridge_eval
+JNIEXPORT jint JNICALL Java_bagaturchess_nnue_NNUEJNIBridge_eval__Ljava_lang_String_2
   (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     bagaturchess_nnue_NNUEJNIBridge
+ * Method:    eval
+ * Signature: (I[I[I)I
+ */
+JNIEXPORT jint JNICALL Java_bagaturchess_nnue_NNUEJNIBridge_eval__I_3I_3I
+  (JNIEnv *, jclass, jint, jintArray, jintArray);
 
 #ifdef __cplusplus
 }
