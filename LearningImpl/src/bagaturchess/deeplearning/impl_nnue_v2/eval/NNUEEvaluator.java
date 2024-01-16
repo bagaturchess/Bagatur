@@ -32,11 +32,11 @@ public class NNUEEvaluator extends BaseEvaluator {
 		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
 		
 		String fen = bitboard.toEPD();
-		System.out.println("fen=" + fen);
+		//System.out.println("fen=" + fen);
 		
 		int score = NNUEJNIBridge.eval(fen);
 			
-		System.out.println("score=" + score);
+		//System.out.println("NNUE score=" + score);
 	}
 	
 	private IBitBoard bitboard;
