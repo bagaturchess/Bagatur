@@ -326,7 +326,7 @@ public class Features {
 			
 			} else {
 				
-				System.out.println("EMPTY index " + i);
+				//System.out.println("EMPTY index " + i);
 			}
 		}
 	}

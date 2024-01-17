@@ -30,6 +30,15 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	}
 	
 	
+	
+	@Override
+	protected boolean useDefaultMaterial() {
+		
+		return true;
+		//return false;
+	}
+	
+	
 	protected BagaturEvaluator_Phases(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig, IEvalComponentsProcessor _evalComponentsProcessor) {
 		
 		super(_bitboard, _evalCache, _evalConfig);
@@ -41,13 +50,6 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		evalinfo = new EvalInfo();
 		
 		evalComponentsProcessor.setEvalInfo(evalinfo);
-	}
-	
-	
-	@Override
-	protected boolean useDefaultMaterial() {
-		
-		return true;
 	}
 	
 	
@@ -155,18 +157,18 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				
 				evalinfo.eval_o_part3 += value_o;
 				
-				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY) {
+				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY) {
 					
 					evalinfo.eval_e_part3 += value_e;
-				//}
+				}
 					
 			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
 				
-				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
-				//		&& componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE) {
+				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
+						&& componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE) {
 					
 					evalinfo.eval_o_part4 += value_o;
-				//}
+				}
 					
 				evalinfo.eval_e_part4 += value_e;
 				
@@ -174,10 +176,10 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				
 				evalinfo.eval_o_part5 += value_o;
 				
-				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
+				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
 					
 					evalinfo.eval_e_part5 += value_e;
-				//}
+				}
 					
 			} else {
 				
@@ -223,18 +225,18 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				
 				evalinfo.eval_o_part3 += value_o * weight_o;
 				
-				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY) {
+				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY) {
 					
 					evalinfo.eval_e_part3 += value_e * weight_e;
-				//}
+				}
 					
 			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
 				
-				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
-				//		&& componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE) {
+				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
+						&& componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE) {
 					
 					evalinfo.eval_o_part4 += value_o * weight_o;
-				//}
+				}
 					
 				evalinfo.eval_e_part4 += value_e * weight_e;
 				
@@ -242,10 +244,10 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				
 				evalinfo.eval_o_part5 += value_o * weight_o;
 				
-				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
+				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
 					
 					evalinfo.eval_e_part5 += value_e * weight_e;
-				//}
+				}
 					
 			} else {
 				
