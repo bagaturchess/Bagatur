@@ -26,6 +26,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	public BagaturEvaluator_Phases(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
 		
 		this(_bitboard, _evalCache, _evalConfig, new EvalComponentsProcessor_Ones());
+		//this(_bitboard, _evalCache, _evalConfig, new EvalComponentsProcessor_Weights());
 	}
 	
 	
@@ -40,6 +41,13 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		evalinfo = new EvalInfo();
 		
 		evalComponentsProcessor.setEvalInfo(evalinfo);
+	}
+	
+	
+	@Override
+	protected boolean useDefaultMaterial() {
+		
+		return true;
 	}
 	
 	
@@ -169,6 +177,74 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
 					
 					evalinfo.eval_e_part5 += value_e;
+				//}
+					
+			} else {
+				
+				throw new IllegalStateException();
+			}
+		}
+	}
+	
+	
+	private static final class EvalComponentsProcessor_Weights implements IEvalComponentsProcessor {
+		
+		
+		private EvalInfo evalinfo;
+		
+		
+		private EvalComponentsProcessor_Weights() {
+		}
+		
+		
+		@Override
+		public void setEvalInfo(EvalInfo _evalinfo) {
+			
+			evalinfo = _evalinfo;
+		}
+		
+		
+		@Override
+		public final void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
+			
+			if (evalPhaseID == EVAL_PHASE_ID_1) {
+				
+				evalinfo.eval_o_part1 += value_o * weight_o;
+				
+				evalinfo.eval_e_part1 += value_e * weight_e;
+				
+			} else if (evalPhaseID == EVAL_PHASE_ID_2) {
+				
+				evalinfo.eval_o_part2 += value_o * weight_o;
+				
+				evalinfo.eval_e_part2 += value_e * weight_e;
+				
+			} else if (evalPhaseID == EVAL_PHASE_ID_3) {
+				
+				evalinfo.eval_o_part3 += value_o * weight_o;
+				
+				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY) {
+					
+					evalinfo.eval_e_part3 += value_e * weight_e;
+				//}
+					
+			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
+				
+				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
+				//		&& componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE) {
+					
+					evalinfo.eval_o_part4 += value_o * weight_o;
+				//}
+					
+				evalinfo.eval_e_part4 += value_e * weight_e;
+				
+			} else if (evalPhaseID == EVAL_PHASE_ID_5) {
+				
+				evalinfo.eval_o_part5 += value_o * weight_o;
+				
+				//if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
+					
+					evalinfo.eval_e_part5 += value_e * weight_e;
 				//}
 					
 			} else {
