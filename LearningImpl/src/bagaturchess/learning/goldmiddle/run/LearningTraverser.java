@@ -41,14 +41,21 @@ public class LearningTraverser {
 			String filename_NN = Features_Splitter.FEATURES_FILE_NAME;
 			String features_class_name = Bagatur_V20_FeaturesConfigurationImpl.class.getName();
 			
-			Features_Splitter features = Features_Splitter.create(features_class_name);
-			Features_Splitter.store(filename_NN, features);
-			//Features_Splitter features = Features_Splitter.load(filename_NN, features_class_name);
-			//Features.toJavaCode(features.getFeatures(0), "_O");
-			//Features.toJavaCode(features.getFeatures(1), "_E");
-			//Features_Splitter.dump(features);
-			//System.exit(0);
 			
+			if (true) {
+				
+				Features_Splitter features = Features_Splitter.create(features_class_name);
+				Features_Splitter.store(filename_NN, features);
+				//Features_Splitter.dump(features);
+			
+			} else {
+				
+				Features_Splitter features = Features_Splitter.load(filename_NN, features_class_name);
+				Features.toJavaCode(features.getFeatures(1), "_O");
+				Features.toJavaCode(features.getFeatures(0), "_E");
+				System.exit(0);
+			}
+					
 			
 			IEvalConfig cfg = new bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Train();
 			
