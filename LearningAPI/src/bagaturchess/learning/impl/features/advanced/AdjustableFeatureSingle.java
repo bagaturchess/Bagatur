@@ -114,6 +114,7 @@ public class AdjustableFeatureSingle extends AdjustableFeature {
 	public String toJavaCode(String suffix) {
 		
 		return "public static final double " + getName().replace('.', '_') + suffix + "	=	"
-				+ (1000000 * weight.getHistory().getStability()) + ";" + "\r\n";
+				+ (weight.getWeight()) + ";" + "\r\n";
+		
 	}
 }
