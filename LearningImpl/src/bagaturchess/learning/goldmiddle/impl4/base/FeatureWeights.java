@@ -30,7 +30,7 @@ public interface FeatureWeights {
 
 	public static final double MATERIAL_ROOK_O	=	0.7195422514484597;
 
-	public static final double MATERIAL_QUEEN_O	=	0.6528608047838583;
+	public static final double MATERIAL_QUEEN_O	=	0.7761125414158323;
 
 	public static final double MATERIAL_IMBALANCE_KNIGHT_PAWNS_O	=	0.6879971448823266;
 
@@ -140,7 +140,7 @@ public interface FeatureWeights {
 
 	public static final double MATERIAL_ROOK_E	=	0.709753644473913;
 
-	public static final double MATERIAL_QUEEN_E	=	0.5159213093725276;
+	public static final double MATERIAL_QUEEN_E	=	0.7647474246323746;
 
 	public static final double MATERIAL_IMBALANCE_KNIGHT_PAWNS_E	=	0.7270215470549424;
 
