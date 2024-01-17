@@ -19,6 +19,6 @@ public interface IFeature extends Comparable<IFeature>, Serializable {
 	public int compareTo(IFeature f);	
 	public int hashCode();
 	public boolean equals(Object obj);
-	public String toJavaCode();
+	public String toJavaCode(String suffix);
 
 }

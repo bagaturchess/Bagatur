@@ -32,6 +32,8 @@ class Weight implements Serializable {
 	
 	private VarStatistic current;
 	
+	private VarStatistic current_history;
+	
 	private double STEP = 1 / (double) STEPS_COUNT;
 	
 	
@@ -79,6 +81,8 @@ class Weight implements Serializable {
 		
 		
 		current = new VarStatistic();
+		
+		current_history = new VarStatistic();
 	}
 	
 	
@@ -189,6 +193,12 @@ class Weight implements Serializable {
 	}
 	
 	
+	public VarStatistic getHistory() {
+		
+		return current_history;
+	}
+	
+	
 	strictfp void adjust(double amount) {
 		
 		//1 and -1 are probably derivatives of the liner function. we use 1 and -1 and we apply them in Epochs of at least 100 games into the dataset and also use learning rate.
@@ -198,6 +208,8 @@ class Weight implements Serializable {
 		}
 		
 		current.addValue(amount);
+		
+		current_history.addValue(amount);
 	}
 	
 	

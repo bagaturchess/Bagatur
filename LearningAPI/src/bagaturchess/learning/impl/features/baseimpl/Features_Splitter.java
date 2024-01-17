@@ -51,6 +51,12 @@ public class Features_Splitter {
 	}
 	
 	
+	public IFeature[] getFeatures(int index) {
+		
+		return features_by_material_factor_2uniouns.get(index);
+	}
+	
+	
 	public static Features_Splitter load(String fileName, String cfgClassName) throws Exception {
 		
 		List<IAdjustableFeature[]> features_by_material_factor_2uniouns = null;
@@ -290,11 +296,11 @@ public class Features_Splitter {
 	}
 	
 	
-	public static void toJavaCode(IFeature[] features) {
+	public static void toJavaCode(IFeature[] features, String suffix) {
 		
 		for (int i = 0; i < features.length; i++) {
 			
-			System.out.println(features[i].toJavaCode());
+			System.out.println(features[i].toJavaCode(suffix));
 		}
 	}
 }

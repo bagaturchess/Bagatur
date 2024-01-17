@@ -316,9 +316,18 @@ public class Features {
 	}
 
 
-	public static void toJavaCode(IFeature[] features) {
+	public static void toJavaCode(IFeature[] features, String suffix) {
+		
 		for (int i = 0; i < features.length; i++) {
-			System.out.println(features[i].toJavaCode());
+			
+			if (features[i] != null) {
+				
+				System.out.println(features[i].toJavaCode(suffix));
+			
+			} else {
+				
+				System.out.println("EMPTY index " + i);
+			}
 		}
 	}
 }

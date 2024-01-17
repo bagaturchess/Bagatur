@@ -12,7 +12,7 @@ public class GenerateWeights {
 		if (f == null) {
 			System.out.println("Cannot load features from file");
 		} else {
-			Features.toJavaCode(f.getFeatures());
+			Features.toJavaCode(f.getFeatures(), "");
 		}
 	}
 

@@ -31,7 +31,7 @@ public class FeatureSingle extends Feature {
 	
 	
 	@Override
-	public String toJavaCode() {
+	public String toJavaCode(String suffix) {
 		String o = "public static final double " + getName().replace('.', '_') + "_O	=	" + openning + ";";
 		String e = "public static final double " + getName().replace('.', '_') + "_E	=	" + endgame + ";";
 		
