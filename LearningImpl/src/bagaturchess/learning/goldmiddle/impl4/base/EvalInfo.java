@@ -77,16 +77,16 @@ public class EvalInfo {
 	public long passedPawnsAndOutposts;
 	
 	
-	public double eval_o_part1;
-	public double eval_e_part1;
-	public double eval_o_part2;
-	public double eval_e_part2;
-	public double eval_o_part3;
-	public double eval_e_part3;
-	public double eval_o_part4;
-	public double eval_e_part4;
-	public double eval_o_part5;
-	public double eval_e_part5;
+	public int eval_o_part1;
+	public int eval_e_part1;
+	public int eval_o_part2;
+	public int eval_e_part2;
+	public int eval_o_part3;
+	public int eval_e_part3;
+	public int eval_o_part4;
+	public int eval_e_part4;
+	public int eval_o_part5;
+	public int eval_e_part5;
 	
 	
 	public final void clearEvals() {
