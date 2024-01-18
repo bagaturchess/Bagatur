@@ -22,224 +22,224 @@ package bagaturchess.learning.goldmiddle.impl4.base;
 
 public interface FeatureWeights {
 
-	public static final double MATERIAL_PAWN_O	=	0.5789268027563873;
+	public static final double MATERIAL_PAWN_O	=	0.5863420596553173;
 
-	public static final double MATERIAL_KNIGHT_O	=	0.776315823884392;
+	public static final double MATERIAL_KNIGHT_O	=	0.7772707365870575;
 
-	public static final double MATERIAL_BISHOP_O	=	0.7935011471363392;
+	public static final double MATERIAL_BISHOP_O	=	0.7935419035174985;
 
-	public static final double MATERIAL_ROOK_O	=	0.7195509810386622;
+	public static final double MATERIAL_ROOK_O	=	0.7190530789277395;
 
-	public static final double MATERIAL_QUEEN_O	=	0.6519354957732427;
+	public static final double MATERIAL_QUEEN_O	=	0.6255047865312556;
 
-	public static final double MATERIAL_IMBALANCE_KNIGHT_PAWNS_O	=	0.688552720570597;
+	public static final double MATERIAL_IMBALANCE_KNIGHT_PAWNS_O	=	0.6985085137447838;
 
-	public static final double MATERIAL_IMBALANCE_ROOK_PAWNS_O	=	0.6068415137876091;
+	public static final double MATERIAL_IMBALANCE_ROOK_PAWNS_O	=	0.6488410857582467;
 
-	public static final double MATERIAL_IMBALANCE_BISHOP_DOUBLE_O	=	0.8388712201186828;
+	public static final double MATERIAL_IMBALANCE_BISHOP_DOUBLE_O	=	0.8509343414123658;
 
-	public static final double MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O	=	0.8179783852065052;
+	public static final double MATERIAL_IMBALANCE_QUEEN_KNIGHTS_O	=	0.8376771247597046;
 
-	public static final double MATERIAL_IMBALANCE_ROOK_PAIR_O	=	0.33267461466522497;
+	public static final double MATERIAL_IMBALANCE_ROOK_PAIR_O	=	0.33100395943376476;
 
-	public static final double PIECE_SQUARE_TABLE_O	=	0.6617674375682708;
+	public static final double PIECE_SQUARE_TABLE_O	=	0.6889708936859309;
 
-	public static final double PAWN_DOUBLE_O	=	0.334237521388063;
+	public static final double PAWN_DOUBLE_O	=	0.3143266322549482;
 
-	public static final double PAWN_CONNECTED_O	=	0.6141023734199268;
+	public static final double PAWN_CONNECTED_O	=	0.6540741062279237;
 
-	public static final double PAWN_NEIGHBOUR_O	=	0.5960713638401226;
+	public static final double PAWN_NEIGHBOUR_O	=	0.628652687544038;
 
-	public static final double PAWN_ISOLATED_O	=	0.519093615392834;
+	public static final double PAWN_ISOLATED_O	=	0.5229140239706992;
 
-	public static final double PAWN_BACKWARD_O	=	0.48921522801175155;
+	public static final double PAWN_BACKWARD_O	=	0.4818252540626859;
 
-	public static final double PAWN_INVERSE_O	=	0.5271665683189118;
+	public static final double PAWN_INVERSE_O	=	0.5275733748483831;
 
-	public static final double PAWN_PASSED_O	=	0.5395163765046587;
+	public static final double PAWN_PASSED_O	=	0.5325962615761565;
 
-	public static final double PAWN_PASSED_CANDIDATE_O	=	0.5565375595186222;
+	public static final double PAWN_PASSED_CANDIDATE_O	=	0.5748775363603819;
 
-	public static final double PAWN_PASSED_UNSTOPPABLE_O	=	1.9530286998875073;
+	public static final double PAWN_PASSED_UNSTOPPABLE_O	=	1.9562854724735248;
 
-	public static final double PAWN_SHIELD_O	=	0.46272499663496003;
+	public static final double PAWN_SHIELD_O	=	0.45147370242111295;
 
-	public static final double MOBILITY_KNIGHT_O	=	0.5461300632129266;
+	public static final double MOBILITY_KNIGHT_O	=	0.54736217816542;
 
-	public static final double MOBILITY_BISHOP_O	=	0.591311653308221;
+	public static final double MOBILITY_BISHOP_O	=	0.5908474200030696;
 
-	public static final double MOBILITY_ROOK_O	=	0.5091793918590046;
+	public static final double MOBILITY_ROOK_O	=	0.5195042855522819;
 
-	public static final double MOBILITY_QUEEN_O	=	0.39243686617399925;
+	public static final double MOBILITY_QUEEN_O	=	0.3798307290648821;
 
-	public static final double MOBILITY_KING_O	=	0.4306061503014664;
+	public static final double MOBILITY_KING_O	=	0.4043450974233327;
 
-	public static final double THREAT_DOUBLE_ATTACKED_O	=	0.6184807514490166;
+	public static final double THREAT_DOUBLE_ATTACKED_O	=	0.6356071619509069;
 
-	public static final double THREAT_UNUSED_OUTPOST_O	=	0.5175626236327118;
+	public static final double THREAT_UNUSED_OUTPOST_O	=	0.49350037572534494;
 
-	public static final double THREAT_PAWN_PUSH_O	=	0.40686962052340603;
+	public static final double THREAT_PAWN_PUSH_O	=	0.38886107015318705;
 
-	public static final double THREAT_PAWN_ATTACKS_O	=	1.0944573599565564;
+	public static final double THREAT_PAWN_ATTACKS_O	=	1.31281088413518;
 
-	public static final double THREAT_MULTIPLE_PAWN_ATTACKS_O	=	0.8182758705938413;
+	public static final double THREAT_MULTIPLE_PAWN_ATTACKS_O	=	0.8871203300112035;
 
-	public static final double THREAT_MAJOR_ATTACKED_O	=	0.8121137697174334;
+	public static final double THREAT_MAJOR_ATTACKED_O	=	0.9290249384500622;
 
-	public static final double THREAT_PAWN_ATTACKED_O	=	0.48830848621166956;
+	public static final double THREAT_PAWN_ATTACKED_O	=	0.5066700980187372;
 
-	public static final double THREAT_QUEEN_ATTACKED_ROOK_O	=	1.1825350377629873;
+	public static final double THREAT_QUEEN_ATTACKED_ROOK_O	=	1.492912220355582;
 
-	public static final double THREAT_QUEEN_ATTACKED_MINOR_O	=	1.4398619826991355;
+	public static final double THREAT_QUEEN_ATTACKED_MINOR_O	=	1.8704373038228455;
 
-	public static final double THREAT_ROOK_ATTACKED_O	=	0.8812414893586337;
+	public static final double THREAT_ROOK_ATTACKED_O	=	0.97821654865402;
 
 	public static final double OTHERS_SIDE_TO_MOVE_O	=	0.5;
 
-	public static final double OTHERS_ONLY_MAJOR_DEFENDERS_O	=	0.5380937485071285;
+	public static final double OTHERS_ONLY_MAJOR_DEFENDERS_O	=	0.5365859568406623;
 
-	public static final double OTHERS_ROOK_BATTERY_O	=	0.5323820656481061;
+	public static final double OTHERS_ROOK_BATTERY_O	=	0.5330978893002768;
 
-	public static final double OTHERS_ROOK_7TH_RANK_O	=	0.4442294315586833;
+	public static final double OTHERS_ROOK_7TH_RANK_O	=	0.4033691421220137;
 
-	public static final double OTHERS_ROOK_TRAPPED_O	=	0.5061948166197623;
+	public static final double OTHERS_ROOK_TRAPPED_O	=	0.5073999382865827;
 
-	public static final double OTHERS_ROOK_FILE_OPEN_O	=	0.514010496139251;
+	public static final double OTHERS_ROOK_FILE_OPEN_O	=	0.4959754474645797;
 
-	public static final double OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_O	=	0.6588014722401686;
+	public static final double OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_O	=	0.700431163952609;
 
-	public static final double OTHERS_ROOK_FILE_SEMI_OPEN_O	=	0.5298986247939271;
+	public static final double OTHERS_ROOK_FILE_SEMI_OPEN_O	=	0.548229656818569;
 
-	public static final double OTHERS_BISHOP_OUTPOST_O	=	0.6517868187294884;
+	public static final double OTHERS_BISHOP_OUTPOST_O	=	0.6453139100410592;
 
 	public static final double OTHERS_BISHOP_PRISON_O	=	0.5;
 
-	public static final double OTHERS_BISHOP_PAWNS_O	=	0.4301907830447321;
+	public static final double OTHERS_BISHOP_PAWNS_O	=	0.4140880922488354;
 
-	public static final double OTHERS_BISHOP_CENTER_ATTACK_O	=	0.6527959521147545;
+	public static final double OTHERS_BISHOP_CENTER_ATTACK_O	=	0.6758126770957553;
 
-	public static final double OTHERS_PAWN_BLOCKAGE_O	=	0.4986357959579766;
+	public static final double OTHERS_PAWN_BLOCKAGE_O	=	0.502264762012135;
 
-	public static final double OTHERS_KNIGHT_OUTPOST_O	=	0.695529887155603;
+	public static final double OTHERS_KNIGHT_OUTPOST_O	=	0.7170684829185735;
 
-	public static final double OTHERS_CASTLING_O	=	0.6908118964739891;
+	public static final double OTHERS_CASTLING_O	=	0.7277407619801686;
 
-	public static final double OTHERS_PINNED_O	=	0.5866992066302315;
+	public static final double OTHERS_PINNED_O	=	0.6189114326208208;
 
-	public static final double OTHERS_DISCOVERED_O	=	0.4742278578167541;
+	public static final double OTHERS_DISCOVERED_O	=	0.4909933479395378;
 
-	public static final double KING_SAFETY_O	=	0.9904157990209883;
+	public static final double KING_SAFETY_O	=	1.1143498821191187;
 
-	public static final double SPACE_O	=	0.79532722048264;
+	public static final double SPACE_O	=	0.8393102323583491;
 
-	public static final double MATERIAL_PAWN_E	=	0.7657492330981635;
+	public static final double MATERIAL_PAWN_E	=	0.7873772326396882;
 
-	public static final double MATERIAL_KNIGHT_E	=	0.6801967299992506;
+	public static final double MATERIAL_KNIGHT_E	=	0.682366796049846;
 
-	public static final double MATERIAL_BISHOP_E	=	0.686371327295944;
+	public static final double MATERIAL_BISHOP_E	=	0.689385765861764;
 
-	public static final double MATERIAL_ROOK_E	=	0.7098860377640556;
+	public static final double MATERIAL_ROOK_E	=	0.7132332989442368;
 
-	public static final double MATERIAL_QUEEN_E	=	0.515948391139744;
+	public static final double MATERIAL_QUEEN_E	=	0.5168374571869393;
 
-	public static final double MATERIAL_IMBALANCE_KNIGHT_PAWNS_E	=	0.7288094427117866;
+	public static final double MATERIAL_IMBALANCE_KNIGHT_PAWNS_E	=	0.7772937619489211;
 
-	public static final double MATERIAL_IMBALANCE_ROOK_PAWNS_E	=	0.37499138573611934;
+	public static final double MATERIAL_IMBALANCE_ROOK_PAWNS_E	=	0.36637503915272596;
 
-	public static final double MATERIAL_IMBALANCE_BISHOP_DOUBLE_E	=	0.8426306419862908;
+	public static final double MATERIAL_IMBALANCE_BISHOP_DOUBLE_E	=	0.8767330609848667;
 
-	public static final double MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E	=	0.4314705368902323;
+	public static final double MATERIAL_IMBALANCE_QUEEN_KNIGHTS_E	=	0.37683223992292836;
 
-	public static final double MATERIAL_IMBALANCE_ROOK_PAIR_E	=	0.2263343889701624;
+	public static final double MATERIAL_IMBALANCE_ROOK_PAIR_E	=	0.20236089043123395;
 
-	public static final double PIECE_SQUARE_TABLE_E	=	0.532922289566062;
+	public static final double PIECE_SQUARE_TABLE_E	=	0.5377445535162237;
 
-	public static final double PAWN_DOUBLE_E	=	0.35741626775282676;
+	public static final double PAWN_DOUBLE_E	=	0.3510140309661018;
 
-	public static final double PAWN_CONNECTED_E	=	0.6524683447704527;
+	public static final double PAWN_CONNECTED_E	=	0.6715530659288164;
 
-	public static final double PAWN_NEIGHBOUR_E	=	0.558293881428565;
+	public static final double PAWN_NEIGHBOUR_E	=	0.5506035165846905;
 
-	public static final double PAWN_ISOLATED_E	=	0.4238700853870457;
+	public static final double PAWN_ISOLATED_E	=	0.42189639049953664;
 
-	public static final double PAWN_BACKWARD_E	=	0.38540862436664636;
+	public static final double PAWN_BACKWARD_E	=	0.36653003130659306;
 
-	public static final double PAWN_INVERSE_E	=	0.6590114993622325;
+	public static final double PAWN_INVERSE_E	=	0.7008658813921437;
 
-	public static final double PAWN_PASSED_E	=	0.6683035962445938;
+	public static final double PAWN_PASSED_E	=	0.6707868317970568;
 
-	public static final double PAWN_PASSED_CANDIDATE_E	=	0.6531099644677046;
+	public static final double PAWN_PASSED_CANDIDATE_E	=	0.6994009363637556;
 
-	public static final double PAWN_PASSED_UNSTOPPABLE_E	=	0.5424181811506879;
+	public static final double PAWN_PASSED_UNSTOPPABLE_E	=	0.5032108777802474;
 
-	public static final double PAWN_SHIELD_E	=	0.519983575393829;
+	public static final double PAWN_SHIELD_E	=	0.5127040550482895;
 
-	public static final double MOBILITY_KNIGHT_E	=	0.5452782357106943;
+	public static final double MOBILITY_KNIGHT_E	=	0.5376653144312864;
 
-	public static final double MOBILITY_BISHOP_E	=	0.5754478814449955;
+	public static final double MOBILITY_BISHOP_E	=	0.5617432685422686;
 
-	public static final double MOBILITY_ROOK_E	=	0.416793718299391;
+	public static final double MOBILITY_ROOK_E	=	0.3720241271761086;
 
-	public static final double MOBILITY_QUEEN_E	=	0.24634574915252325;
+	public static final double MOBILITY_QUEEN_E	=	0.20497952674187886;
 
-	public static final double MOBILITY_KING_E	=	0.4932585269481682;
+	public static final double MOBILITY_KING_E	=	0.472271241238816;
 
-	public static final double THREAT_DOUBLE_ATTACKED_E	=	0.7269695227739056;
+	public static final double THREAT_DOUBLE_ATTACKED_E	=	0.7836299736396188;
 
-	public static final double THREAT_UNUSED_OUTPOST_E	=	0.6811689110971137;
+	public static final double THREAT_UNUSED_OUTPOST_E	=	0.6818723748568097;
 
-	public static final double THREAT_PAWN_PUSH_E	=	0.45446044558248616;
+	public static final double THREAT_PAWN_PUSH_E	=	0.43750327826763435;
 
-	public static final double THREAT_PAWN_ATTACKS_E	=	1.1144605625880795;
+	public static final double THREAT_PAWN_ATTACKS_E	=	1.3593676554405345;
 
-	public static final double THREAT_MULTIPLE_PAWN_ATTACKS_E	=	0.7410178027488704;
+	public static final double THREAT_MULTIPLE_PAWN_ATTACKS_E	=	0.7809949895210978;
 
-	public static final double THREAT_MAJOR_ATTACKED_E	=	0.908659785539944;
+	public static final double THREAT_MAJOR_ATTACKED_E	=	1.0781782902792207;
 
-	public static final double THREAT_PAWN_ATTACKED_E	=	0.38917296124608874;
+	public static final double THREAT_PAWN_ATTACKED_E	=	0.3586351595599413;
 
-	public static final double THREAT_QUEEN_ATTACKED_ROOK_E	=	0.7581310902884433;
+	public static final double THREAT_QUEEN_ATTACKED_ROOK_E	=	0.8502105475689865;
 
-	public static final double THREAT_QUEEN_ATTACKED_MINOR_E	=	1.332954149177097;
+	public static final double THREAT_QUEEN_ATTACKED_MINOR_E	=	1.773869434205635;
 
-	public static final double THREAT_ROOK_ATTACKED_E	=	1.4310765377815389;
+	public static final double THREAT_ROOK_ATTACKED_E	=	1.8461371860919045;
 
 	public static final double OTHERS_SIDE_TO_MOVE_E	=	0.5;
 
-	public static final double OTHERS_ONLY_MAJOR_DEFENDERS_E	=	0.5134203158823109;
+	public static final double OTHERS_ONLY_MAJOR_DEFENDERS_E	=	0.5257985009195135;
 
-	public static final double OTHERS_ROOK_BATTERY_E	=	0.679906072543327;
+	public static final double OTHERS_ROOK_BATTERY_E	=	0.6727917362605558;
 
-	public static final double OTHERS_ROOK_7TH_RANK_E	=	0.5338103555274175;
+	public static final double OTHERS_ROOK_7TH_RANK_E	=	0.5105947542768248;
 
-	public static final double OTHERS_ROOK_TRAPPED_E	=	0.5415361070238917;
+	public static final double OTHERS_ROOK_TRAPPED_E	=	0.5757988099942134;
 
-	public static final double OTHERS_ROOK_FILE_OPEN_E	=	0.47103190260677624;
+	public static final double OTHERS_ROOK_FILE_OPEN_E	=	0.42321987804289507;
 
-	public static final double OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_E	=	0.6071804068362832;
+	public static final double OTHERS_ROOK_FILE_SEMI_OPEN_ISOLATED_E	=	0.6418389703531913;
 
-	public static final double OTHERS_ROOK_FILE_SEMI_OPEN_E	=	0.5174128363835381;
+	public static final double OTHERS_ROOK_FILE_SEMI_OPEN_E	=	0.519806940857564;
 
-	public static final double OTHERS_BISHOP_OUTPOST_E	=	0.9096294691617225;
+	public static final double OTHERS_BISHOP_OUTPOST_E	=	0.9672090851468162;
 
 	public static final double OTHERS_BISHOP_PRISON_E	=	0.5;
 
-	public static final double OTHERS_BISHOP_PAWNS_E	=	0.5085577936813205;
+	public static final double OTHERS_BISHOP_PAWNS_E	=	0.4917718252299657;
 
-	public static final double OTHERS_BISHOP_CENTER_ATTACK_E	=	0.48526032163044186;
+	public static final double OTHERS_BISHOP_CENTER_ATTACK_E	=	0.45386745265891026;
 
-	public static final double OTHERS_PAWN_BLOCKAGE_E	=	0.5791138719375781;
+	public static final double OTHERS_PAWN_BLOCKAGE_E	=	0.5783208272719874;
 
-	public static final double OTHERS_KNIGHT_OUTPOST_E	=	0.9931943594135935;
+	public static final double OTHERS_KNIGHT_OUTPOST_E	=	1.0953049156622867;
 
-	public static final double OTHERS_CASTLING_E	=	1.268772373633646;
+	public static final double OTHERS_CASTLING_E	=	1.5511419554980002;
 
-	public static final double OTHERS_PINNED_E	=	0.6094480340128513;
+	public static final double OTHERS_PINNED_E	=	0.6554872432835184;
 
-	public static final double OTHERS_DISCOVERED_E	=	0.3766526960776713;
+	public static final double OTHERS_DISCOVERED_E	=	0.36322143419892194;
 
-	public static final double KING_SAFETY_E	=	0.5795570381568416;
+	public static final double KING_SAFETY_E	=	0.5800037752022673;
 
-	public static final double SPACE_E	=	0.5150217433925917;
+	public static final double SPACE_E	=	0.5528843121948097;
 }
 
