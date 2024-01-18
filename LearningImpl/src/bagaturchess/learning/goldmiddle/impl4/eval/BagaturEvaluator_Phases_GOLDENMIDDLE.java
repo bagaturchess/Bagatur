@@ -2,21 +2,46 @@ package bagaturchess.learning.goldmiddle.impl4.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl1.BoardImpl;
+import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.goldmiddle.impl4.base.EvalInfo;
+import bagaturchess.learning.goldmiddle.impl4.base.Evaluator;
 import bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcessor;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl;
 import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.search.api.IEvalConfig;
+import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 
-public class BagaturEvaluator_Phases_GOLDENMIDDLE extends BagaturEvaluator_Phases {
+public class BagaturEvaluator_Phases_GOLDENMIDDLE extends BaseEvaluator {
+	
+	
+	private IEvalComponentsProcessor evalComponentsProcessor;
+	
+	private final EvalInfo evalinfo;
+	
+	private final ChessBoard board;
 	
 	
 	public BagaturEvaluator_Phases_GOLDENMIDDLE(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
 		
-		super(_bitboard, _evalCache, _evalConfig, new EvalComponentsProcessor_Weights(_bitboard));
+		this(_bitboard, _evalCache, _evalConfig, new EvalComponentsProcessor_Weights(_bitboard));
+	}
+
+
+	protected BagaturEvaluator_Phases_GOLDENMIDDLE(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig, IEvalComponentsProcessor _evalComponentsProcessor) {
+		
+		super(_bitboard, _evalCache, _evalConfig);
+		
+		board = ((BoardImpl)bitboard).getChessBoard();
+		
+		evalComponentsProcessor = _evalComponentsProcessor;
+		
+		evalinfo = new EvalInfo();
+		
+		evalComponentsProcessor.setEvalInfo(evalinfo);
 	}
 	
 	
@@ -24,6 +49,59 @@ public class BagaturEvaluator_Phases_GOLDENMIDDLE extends BagaturEvaluator_Phase
 	protected boolean useDefaultMaterial() {
 		
 		return false;
+	}
+	
+	
+	@Override
+	public int fullEval(int depth, int alpha, int beta, int rootColour) {
+		
+		int eval = super.fullEval(depth, alpha, beta, rootColour);
+		
+		return eval;
+	}
+	
+	
+	@Override
+	protected void phase0_init() {
+		
+		evalinfo.clearEvals();
+		
+		evalinfo.fillBoardInfo(board);
+	}
+	
+	
+	@Override
+	protected int phase1() {
+		
+		return Evaluator.eval1(!useDefaultMaterial(), bitboard.getBoardConfig(), board, evalinfo, evalComponentsProcessor);
+	}
+	
+	
+	@Override
+	protected int phase2() {
+		
+		return Evaluator.eval2(board, evalinfo, evalComponentsProcessor);
+	}
+	
+	
+	@Override
+	protected int phase3() {
+		
+		return Evaluator.eval3(board, evalinfo, evalComponentsProcessor);
+	}
+	
+	
+	@Override
+	protected int phase4() {
+		
+		return Evaluator.eval4(board, evalinfo, evalComponentsProcessor);
+	}
+	
+	
+	@Override
+	protected int phase5() {
+		
+		return Evaluator.eval5(board, evalinfo, evalComponentsProcessor);
 	}
 	
 	
