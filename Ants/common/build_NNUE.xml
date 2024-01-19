@@ -27,8 +27,7 @@
 	<target name="resources" description="copy resources">
 		<copy todir="${classes}" flatten="true">
 	    	<resources>
-				<file file="${project_root}/LICENSE"/>
-				<file file="${project_root}/README.MD"/>
+				<file file="${project_root}/README.md"/>
 			</resources>
 		</copy>
 	</target>

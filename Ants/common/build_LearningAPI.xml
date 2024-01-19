@@ -27,7 +27,7 @@
 		<copy todir="${temp_dir}" flatten="true">
 	    	<resources>
 				<file file="${project_root}/LICENSE"/>
-				<file file="${project_root}/readme.txt"/>
+				<file file="${project_root}/readme.md"/>
 			</resources>
 		</copy>
 	</target>
