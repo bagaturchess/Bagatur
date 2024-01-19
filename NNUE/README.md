@@ -1,28 +1,22 @@
-# What is it
+# Purpose
 
-nnue-probe is library for probing NNUE neural networks for chess.
-The core nnue probing code is taken from [CFish](https://github.com/syzygy1/Cfish) and modified a bit.
+This project aims to act as JNI bridge to nnue-probe code located at https://github.com/dshawul/nnue-probe
+Currently it is compiled under Windows only and JNNUE.dll is available in the root of the project.
+The compilation command, which was performed in src directory, is located in /src/info.txt
 
-# How to build
+The library is compatible with the nn-6b4236f2ec01.nnue network, uploaded by user vdv on 21-05-01 10:24:00 here: https://tests.stockfishchess.org/nns
+This is the latest network recognized successfully by the C code, provided by dshawul.
+Currently, the newest networks cannot be loaded with this library.
 
-To compile
+# References & Thanks
 
-    make clean; make COMP=gcc 
+1. https://www.youtube.com/watch?v=59Fp4JVNob0
 
-Cross-compiling for windows from linux using mingw is possible by setting `COMP=win`
+2. https://github.com/dshawul/nnue-probe
 
-# Probing from python
+3. https://tests.stockfishchess.org/nns
 
-    from __future__ import print_function
-    from ctypes import *
-    nnue = cdll.LoadLibrary("libnnueprobe.so")
-    nnue.nnue_init(b"nn-04cf2b4ed1da.nnue")
-    score = nnue.nnue_evaluate_fen(b"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-    print("Score = ", score)
+4. https://hxim.github.io/Stockfish-Evaluation-Guide/
 
-The result
 
-    Loading NNUE : nn-04cf2b4ed1da.nnue
-    NNUE loaded !
-    Score =  42
 
