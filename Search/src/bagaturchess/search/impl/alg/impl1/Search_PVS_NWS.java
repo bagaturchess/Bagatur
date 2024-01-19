@@ -1679,11 +1679,20 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv) {
 		
-		int eval = evaluator.fullEval(ply, alpha, beta, -1);
+		/*int eval = 0;
+		
+		if (isPv) {
+			
+			eval = getEnv().getEval_NNUE().fullEval(ply, alpha, beta, -1);
+			
+		} else {
+			
+			eval = evaluator.fullEval(ply, alpha, beta, -1);
+		}*/
 		
 		/*int eval = evaluator.roughEval(ply,  -1);
 		
-		int error_window = (int) (LAZY_EVAL_MARGIN.getEntropy() + 2 * LAZY_EVAL_MARGIN.getDisperse());
+		int error_window = (int) (LAZY_EVAL_MARGIN.getEntropy() + 3 * LAZY_EVAL_MARGIN.getDisperse());
 		
 		if (eval >= alpha - error_window && eval <= beta + error_window) {
 			
@@ -1695,6 +1704,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			LAZY_EVAL_MARGIN.addValue(diff);
 		}*/
+		
+		int eval = evaluator.fullEval(ply, alpha, beta, -1);
 		
 		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
 			
