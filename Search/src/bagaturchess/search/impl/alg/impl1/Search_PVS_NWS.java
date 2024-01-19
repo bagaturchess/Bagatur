@@ -27,6 +27,7 @@ import java.util.EmptyStackException;
 import java.util.Stack;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.CheckUtil;
@@ -58,23 +59,23 @@ import bagaturchess.search.impl.eval.cache.IEvalEntry;
 public class Search_PVS_NWS extends SearchImpl {
 	
 	
-	private static final int PHASE_TT 							= 0;
-	private static final int PHASE_ATTACKING_GOOD 				= 1;
-	private static final int PHASE_KILLER_1 					= 2;
-	private static final int PHASE_KILLER_2 					= 3;
-	private static final int PHASE_COUNTER_1 					= 4;
-	private static final int PHASE_COUNTER_2 					= 5;
-	private static final int PHASE_ATTACKING_BAD 				= 6;
-	private static final int PHASE_QUIET 						= 7;
+	private static final int PHASE_TT 								= 0;
+	private static final int PHASE_ATTACKING_GOOD 					= 1;
+	private static final int PHASE_KILLER_1 						= 2;
+	private static final int PHASE_KILLER_2 						= 3;
+	private static final int PHASE_COUNTER_1 						= 4;
+	private static final int PHASE_COUNTER_2 						= 5;
+	private static final int PHASE_ATTACKING_BAD 					= 6;
+	private static final int PHASE_QUIET 							= 7;
 	
 	
-	private static final int[] STATIC_NULLMOVE_MARGIN 			= { 0, 60, 130, 210, 300, 400, 510 };
-	private static final int[] RAZORING_MARGIN 					= { 0, 240, 280, 300 };
-	private static final int[] FUTILITY_MARGIN 					= { 0, 80, 170, 270, 380, 500, 630 };
-	private static final int FUTILITY_MARGIN_Q_SEARCH_ATTACKS 	= 100;
-	//private static final int FUTILITY_MARGIN_Q_SEARCH_QUIET		= 35;
+	private static final int[] STATIC_NULLMOVE_MARGIN 				= { 0, 60, 130, 210, 300, 400, 510 };
+	private static final int[] RAZORING_MARGIN 						= { 0, 240, 280, 300 };
+	private static final int[] FUTILITY_MARGIN 						= { 0, 80, 170, 270, 380, 500, 630 };
+	private static final int FUTILITY_MARGIN_Q_SEARCH_ATTACKS 		= 35;
+	private static final VarStatistic LAZY_EVAL_MARGIN 			= new VarStatistic();
 	
-	private static final int[][] LMR_TABLE 						= new int[64][64];
+	private static final int[][] LMR_TABLE 							= new int[64][64];
 	
 	static {
 		
@@ -92,16 +93,10 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long lastSentMinorInfo_nodesCount;
 	
 	
-	private static final boolean USE_DTZ_CACHE 			= true;
+	private static final boolean USE_DTZ_CACHE 						= true;
 	
 	
 	private IEvalEntry temp_cache_entry;
-	
-	
-
-	private long lmr_all;
-	private long lmr_allowed;
-	private long lmr_done;
 	
 	
 	public Search_PVS_NWS(Object[] args) {
@@ -142,6 +137,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		lastSentMinorInfo_nodesCount 	= 0;
 		lastSentMinorInfo_timestamp 	= 0;
 		
+		LAZY_EVAL_MARGIN.clear();
+		LAZY_EVAL_MARGIN.addValue(250);
 		
 		if (ChannelManager.getChannel() != null) {
 			
@@ -1192,12 +1189,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				//System.out.println("lmr_allowed=" + lmr_allowed + ", moveGen.getLMR_Rate(cb.colorToMoveInverse, move)=" + moveGen.getLMR_Rate(cb.colorToMoveInverse, move) + ", moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse)=" + moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse));
 				
-				lmr_all++;
-				
-				if (LMR_allowed) {
-					
-					lmr_allowed++;
-				}
 				
 				boolean doLMR = depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
@@ -1212,8 +1203,6 @@ public class Search_PVS_NWS extends SearchImpl {
 								|| (EngineConstants.ENABLE_LMR_STATS_DECISION && LMR_allowed)
 						)
 					) {
-					
-					lmr_done++;
 					
 					//float lmr_done_rate = lmr_done / (float) lmr_all;
 					//float lmr_allowed_rate = lmr_allowed / (float) lmr_all;
@@ -1499,6 +1488,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		
+		
 		if (ttValue != IEvaluator.MIN_EVAL) {
 			
 			if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
@@ -1521,6 +1511,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	    	return node.eval;
 		}
 		
+		
 		int material_queen = (int) Math.max(getEnv().getBitboard().getBoardConfig().getMaterial_QUEEN_O(), getEnv().getBitboard().getBoardConfig().getMaterial_QUEEN_E());
 		
 		if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + material_queen < alpha) {
@@ -1529,6 +1520,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 	    	return node.eval;
 		}
+		
 		
 		final int alphaOrig = alpha;
 		
@@ -1687,11 +1679,23 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv) {
 		
+		int eval = evaluator.fullEval(ply, alpha, beta, -1);
 		
-		int eval;
+		/*int eval = evaluator.roughEval(ply,  -1);
 		
-		eval = evaluator.fullEval(ply, alpha, beta, 0);
-				
+		int error_window = (int) (LAZY_EVAL_MARGIN.getEntropy() + 2 * LAZY_EVAL_MARGIN.getDisperse());
+		
+		if (eval >= alpha - error_window && eval <= beta + error_window) {
+			
+			int rough_eval = eval;
+			
+			eval = evaluator.fullEval(ply, alpha, beta, -1);
+			
+			int diff = Math.abs(eval - rough_eval);
+			
+			LAZY_EVAL_MARGIN.addValue(diff);
+		}*/
+		
 		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
 			
 			eval = Math.min(0, eval);
@@ -1700,7 +1704,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		return eval;
 	}
-
+	
 
 	private int getTrustWindow(ISearchMediator mediator, int depth) {
 		
