@@ -21,21 +21,14 @@ public class NNUEEvaluator extends BaseEvaluator {
 	
 	static {
 		
-		File dll = new File("./JNNUE.dll");
+		NNUEJNIBridge.loadLib();
 		
-		System.load(dll.getAbsolutePath());
+		NNUEJNIBridge.init();
 		
-		File nnue = new File("nn-6b4236f2ec01.nnue");
-		
-		NNUEJNIBridge.init(nnue.getName());
-		
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
-		
-		String fen = bitboard.toEPD();
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
+		//String fen = bitboard.toEPD();
 		//System.out.println("fen=" + fen);
-		
-		int score = NNUEJNIBridge.eval(fen);
-			
+		//int score = NNUEJNIBridge.eval(fen);
 		//System.out.println("NNUE score=" + score);
 	}
 	

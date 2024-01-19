@@ -42,7 +42,7 @@
 	      <include name="BagaturOpening.jar"/>
 	      <include name="BagaturSearch.jar"/>
 	      <include name="BagaturUCI.jar"/>
-	      <!--include name="BagaturNNUE.jar"/-->
+	      <include name="BagaturNNUE.jar"/>
 	      <include name="BagaturEngines.jar"/>
 	      <include name="BagaturLearningAPI.jar"/>
 	      <include name="BagaturEGTB.jar"/>
@@ -52,6 +52,18 @@
   	
 	<copy todir="${temp_dir}/bin">
 	    <fileset dir="${resources_dir}/bin/engine/egtb/bin/">
+		  <include name="*"/>
+	    </fileset>
+	</copy>
+	
+	<copy todir="${temp_dir}/bin">
+	    <fileset dir="${resources_dir}/bin/engine/nnue/bin">
+		  <include name="*"/>
+	    </fileset>
+	</copy>
+	
+	<copy todir="${temp_dir}">
+	    <fileset dir="${resources_dir}/bin/engine/nnue/">
 		  <include name="*"/>
 	    </fileset>
 	</copy>
@@ -131,6 +143,11 @@
 			<include name="Bagatur_mcore.bat"/>
 		</fileset>
 	</copy>
+	<copy tofile="${temp_dir}/bin/Bagatur_NNUE_1core.bat" >
+		<fileset dir="${resources_dir}/bin/engine/bat">
+			<include name="Bagatur_NNUE_1core.bat"/>
+		</fileset>
+	</copy>
   	<copy tofile="${temp_dir}/bin/Bagatur_1core.sh" >
   		<fileset dir="${resources_dir}/bin/engine/sh">
   			<include name="Bagatur_1core.sh"/>
@@ -141,31 +158,21 @@
   			<include name="Bagatur_mcore.sh"/>
   		</fileset>
   	</copy>
-  	<copy tofile="${temp_dir}/bin/Bagatur_1core.bmp" >
-  		<fileset dir="${resources_dir}/bin/engine/logo">
-  			<include name="BagaturEngine.bmp"/>
-  		</fileset>
-  	</copy>
-  	<copy tofile="${temp_dir}/bin/Bagatur_mcore.bmp" >
+  	
+  	
+  	<copy tofile="${temp_dir}/Bagatur_NNUE_1_core.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
 			<include name="BagaturEngine.bmp"/>
 		</fileset>
 	</copy>
-  	
-  	
-  	<copy tofile="${temp_dir}/Bagatur_32_1_core.bmp" >
-		<fileset dir="${resources_dir}/bin/engine/logo">
-			<include name="BagaturEngine.bmp"/>
+  	<copy tofile="${temp_dir}/Bagatur_NNUE_1_core.exe" >
+		<fileset dir="${resources_dir}/bin/engine/exe">
+			<include name="Bagatur_64.exe"/>
 		</fileset>
 	</copy>
-  	<copy tofile="${temp_dir}/Bagatur_32_1_core.exe" >
+  	<copy tofile="${temp_dir}/Bagatur_NNUE_1_core.ini" >
 		<fileset dir="${resources_dir}/bin/engine/exe">
-			<include name="Bagatur_32.exe"/>
-		</fileset>
-	</copy>
-  	<copy tofile="${temp_dir}/Bagatur_32_1_core.ini" >
-		<fileset dir="${resources_dir}/bin/engine/exe">
-			<include name="Bagatur_1core.ini"/>
+			<include name="Bagatur_NNUE_1core.ini"/>
 		</fileset>
 	</copy>
   	

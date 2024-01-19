@@ -49,6 +49,8 @@ public class SearchEnv {
 	
 	private IEvaluator eval;
 	
+	private IEvaluator eval_NNUE;
+	
 	private Tactics tactics;
 	
 	
@@ -199,19 +201,32 @@ public class SearchEnv {
 	
 	
 	public IEvaluator getEval() {
+		
 		if (eval == null) {
+			
 			recreateEvaluator();
 		}
+		
 		return eval;
 	}
-
-	public void setEval(IEvaluator _eval) {
-		eval = _eval;
+	
+	
+	public IEvaluator getEval_NNUE() {
+		
+		if (eval_NNUE == null) {
+			
+			recreateEvaluator();
+		}
+		
+		return eval_NNUE;
 	}
+	
 	
 	public void recreateEvaluator() {
 		eval = shared.getEvaluatorFactory().create(bitboard, getEvalCache(), shared.getEngineConfiguration().getEvalConfig());
+		//eval_NNUE = shared.getEvaluatorFactory_NNUE().create(bitboard, getEvalCache(), shared.getEngineConfiguration().getEvalConfig());
 	}
+	
 	
 	public void clear() {
 		shared.clear();

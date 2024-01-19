@@ -23,14 +23,12 @@
 package bagaturchess.search.impl.env;
 
 
-import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluatorFactory;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.tpt.ITTable;
-import bagaturchess.search.impl.tpt.TranspositionTableProvider;
 import bagaturchess.uci.api.IChannel;
 
 
@@ -38,6 +36,7 @@ public class SharedData {
 	
 	
 	private IEvaluatorFactory evaluatorFactory;
+	private IEvaluatorFactory evaluatorFactory_NNUE;
 	private IRootSearchConfig engineConfiguration;
 	private ISearchConfig_AB searchConfig;
 	private MemoryConsumers memoryConsumers;
@@ -68,6 +67,10 @@ public class SharedData {
 			
 			evaluatorFactory = (IEvaluatorFactory) SharedData.class.getClassLoader().loadClass(className).newInstance();
 			
+			String className_NNUE = "bagaturchess.deeplearning.impl_nnue_v2.eval.NNUEEvaluatorFactory";
+			
+			evaluatorFactory_NNUE = (IEvaluatorFactory) SharedData.class.getClassLoader().loadClass(className_NNUE).newInstance();
+			
 		} catch (Exception e) {
 			
 			e.printStackTrace();
@@ -84,6 +87,11 @@ public class SharedData {
 	
 	public IEvaluatorFactory getEvaluatorFactory() {
 		return evaluatorFactory;
+	}
+	
+	
+	public IEvaluatorFactory getEvaluatorFactory_NNUE() {
+		return evaluatorFactory_NNUE;
 	}
 	
 	
