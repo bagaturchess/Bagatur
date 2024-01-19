@@ -1,4 +1,6 @@
 
+# Purpose
+
 The learning API is a natural continuation of the UCI Tracker in regards to tune and evolve the evaluation function
 by the chess knowledge inside the existing expert games, captured by UCI tracker. 
 
@@ -18,3 +20,7 @@ The goal is to make the counts of +1 and -1 equal for each feature and moves the
 
 At the end of each tuning iteration, the weights are multiplied by weight, so next time the error / delta between both evaluations will be smaller.
 Code location is method multiplyCurrentWeightByAmountAndDirection in https://github.com/bagaturchess/Bagatur/blob/master/Sources/LearningAPI/src/bagaturchess/learning/impl/features/advanced/Weight.java
+
+#See also
+
+https://github.com/bagaturchess/Bagatur/issues/16
