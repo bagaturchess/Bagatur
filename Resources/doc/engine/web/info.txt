@@ -1,4 +1,0 @@
-The content of the old versions of this file is not valid anymore:
-1. It is now true, that the MTD(f) works better in 1 thread and SMP version should use parallelism only at the root node - to start many threads, each one runing MTD(f) search of the root position.
-2. LazySMP still gives worst ELO strength - If we start all threads with different root moves, than the ELO is less, compared to if all threads start from the last best move got from the  Transposition Table.
-3. More details about the MTD(f) algorithm and SMP version, could be found here: https://github.com/bagaturchess/Bagatur/tree/master/Sources/Search#readme
