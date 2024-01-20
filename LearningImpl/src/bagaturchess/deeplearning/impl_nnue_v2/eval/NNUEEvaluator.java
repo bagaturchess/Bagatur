@@ -48,6 +48,13 @@ public class NNUEEvaluator extends BaseEvaluator {
 	
 	
 	@Override
+	public boolean useEvalCache_Reads() {
+		
+		return true;
+	}
+	
+	
+	@Override
 	protected int phase1() {
 		
 

@@ -138,6 +138,12 @@ public abstract class BaseEvaluator implements IEvaluator {
 	}
 	
 	
+	public boolean useEvalCache_Reads() {
+		
+		return true;
+	}
+	
+	
 	protected void phase0_init() {
 		
 		//Do nothing
@@ -249,7 +255,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		long hashkey = bitboard.getHashKey();
 		
-		if (USE_CACHE && evalCache != null && evalConfig != null && evalConfig.useEvalCache()) {
+		if (USE_CACHE && evalCache != null && evalConfig != null && evalConfig.useEvalCache() && useEvalCache_Reads()) {
 			
 			evalCache.get(hashkey, cached);
 			
@@ -397,7 +403,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		long hashkey = bitboard.getHashKey();
 		
-		if (USE_CACHE && evalCache != null && useCache && evalConfig != null && evalConfig.useEvalCache()) {
+		if (USE_CACHE && evalCache != null && useCache && evalConfig != null && evalConfig.useEvalCache() && useEvalCache_Reads()) {
 			
 			evalCache.get(hashkey, cached);
 			
