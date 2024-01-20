@@ -12,7 +12,7 @@ import bagaturchess.bitboard.impl.utils.VarStatistic;
 
 
 
-class Weight implements Serializable {
+public class Weight implements Serializable {
 	
 	
 	private static final long serialVersionUID = 3805221518234137798L;
@@ -76,7 +76,7 @@ class Weight implements Serializable {
 	}
 	
 	
-	protected void merge(Weight other) {
+	public void merge(Weight other) {
 		if (other.min_weight != min_weight) min_weight = other.min_weight;
 		if (other.max_weight != max_weight) max_weight = other.max_weight;
 	}
@@ -161,7 +161,8 @@ class Weight implements Serializable {
 		//}
 	}
 	
-	strictfp void adjust(double amount) {
+	
+	public strictfp void adjust(double amount) {
 		
 		if (amount != 1 && amount != -1) {
 			throw new IllegalStateException();

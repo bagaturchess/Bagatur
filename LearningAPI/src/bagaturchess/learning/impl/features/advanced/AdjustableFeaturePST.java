@@ -1,9 +1,11 @@
 package bagaturchess.learning.impl.features.advanced;
 
+
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.utils.StringUtils;
 import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.impl.signals.SignalArray;
+
 
 public class AdjustableFeaturePST extends AdjustableFeatureArray {
 	

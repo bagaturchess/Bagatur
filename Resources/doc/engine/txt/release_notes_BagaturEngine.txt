@@ -1,8 +1,12 @@
+ Version 4.0 (20 January 2023)
+ * Adding exe and bat file for NNUE version of Bagatur, currently supporting Windows only. More information: https://github.com/bagaturchess/Bagatur/tree/master/NNUE
+ * Optimizations in the evaluation function - use int instead of double during calculations
+ * Use directly the Transposition Table score and moves in the root seacrh node too
+ 
  Version 3.7e (26 December 2023)
  * Bugfixing - mate with bishop and knight is now possible.
  * EGTB Handling: return score directly if there is EGTB hit.
  * EGTB Handling: search scores of Draw and EGTB hits are now stored in TT again.
- 
  
  Version 3.7d (24 May 2023)
  * 3.7c is still weaker than version 3.0. These changes in 3.7d aim to restore the ELO strength.

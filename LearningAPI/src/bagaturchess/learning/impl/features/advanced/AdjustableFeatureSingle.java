@@ -5,6 +5,7 @@ package bagaturchess.learning.impl.features.advanced;
 
 import bagaturchess.bitboard.impl.utils.StringUtils;
 import bagaturchess.learning.api.ISignal;
+import bagaturchess.learning.impl.features.baseimpl.Weight;
 import bagaturchess.learning.impl.signals.SingleSignal;
 
 
