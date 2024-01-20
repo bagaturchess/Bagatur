@@ -1,7 +1,7 @@
  Version 4.0 (20 January 2023)
- * Adding exe and bat file for NNUE version of Bagatur, currently supporting Windows only. More information: https://github.com/bagaturchess/Bagatur/tree/master/NNUE
+ * Adding exe and bat file for NNUE version of Bagatur, currently under Windows only. More information: https://github.com/bagaturchess/Bagatur/tree/master/NNUE
  * Optimizations in the evaluation function - use int instead of double during calculations
- * Use directly the Transposition Table score and moves in the root seacrh node too
+ * Use directly the Transposition Table score in the root search node too
  
  Version 3.7e (26 December 2023)
  * Bugfixing - mate with bishop and knight is now possible.
