@@ -1,228 +1,185 @@
+
+
 package bagaturchess.learning.impl.features.advanced;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import bagaturchess.bitboard.impl.utils.StringUtils;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
 
 
-class Weight implements Serializable {
+
+public class Weight implements Serializable {
 	
 	
-	private static final long serialVersionUID 	= 3805221518234137798L;
+	private static final long serialVersionUID = 3805221518234137798L;
 	
+	//private static final double DELTA = 0.000001;
+	private static final double DELTA = 0.000001;
 	
-	private static final double LEARNING_RATE 	= 0.25f; //1f; //0.5f; //0.01; //0.02; //0.1; //1;
+	private static final double MAX_ADJUSTMENT = 100;
+	private boolean norm_adjustment = false;
 	
-	private static final double MIN_WEIGHT 		= 0.1;
+	private double initialVal;
+	private double min_weight;
+	private double max_weight;
+	private double cur_weight;
 	
-	private static final int STEPS_COUNT 		= 100;
+	private double norm;
 	
+	private double max_adjustment;
 	
-	private double initial;
-	
-	private double min;
-	
-	private double max;
-	
-	private VarStatistic total;
-	
-	private VarStatistic total_movements;
-	
-	private VarStatistic current;
-	
-	private VarStatistic current_history;
-	
-	private double STEP = 1 / (double) STEPS_COUNT;
+	private VarStatistic varstat;
+	private List<Double> appliedMultipliers;
 	
 	
 	public Weight(double min, double max, double _initialVal, boolean _norm_adjustment) {
-		
 		this(min, max, _initialVal);
+		norm_adjustment = _norm_adjustment;
 	}
 	
 	
 	public Weight(double min, double max, double _initialVal) {
 		
-		if (min > max)	{
-			
-			throw new IllegalStateException("min > max: min=" + min + ", max=" + max);
+		//min = -2000;
+		//max = 2000;
+		
+		initialVal = _initialVal;
+		
+		if (min > max)	throw new IllegalStateException();
+		//if (min < 0)	throw new IllegalStateException();
+		
+		min_weight = min;
+		max_weight = max;
+		norm = Math.max(Math.abs(min_weight), Math.abs(max_weight));
+		max_adjustment = (max_weight - min_weight) / MAX_ADJUSTMENT;
+		
+		if (max_adjustment < 0) throw new IllegalStateException();
+		
+		cur_weight = initialVal;
+		
+		if (initialVal < min_weight || initialVal > max_weight) throw new IllegalStateException("initialVal=" + initialVal);
+		
+		if (cur_weight < min) throw new IllegalStateException("cur_weight=" + cur_weight + " min=" + min);
+		if (cur_weight > max) throw new IllegalStateException();
+		
+		varstat = new VarStatistic(false);
+		
+		if (min == max) {
+			varstat.setEntropy(min);
 		}
 		
-		if (min < 0) {
-			
-			throw new IllegalStateException("min < 0: min=" + min);
-		}
-		
-		if (_initialVal < 0) {
-			
-			throw new IllegalStateException("initialVal < 0: initialVal=" + initial);
-		}
-		
-		initial = _initialVal;
-		
-		
-		this.min = min;
-		
-		this.max = max;
-
-		STEP = Math.abs(max - min) / (double) STEPS_COUNT;
-		
-		
-		if (initial < min || initial > max) throw new IllegalStateException("initialVal=" + initial);
-		
-		
-		total = new VarStatistic();
-		
-		total_movements = new VarStatistic();
-		
-		reset();
-		
-		
-		current = new VarStatistic();
-		
-		current_history = new VarStatistic();
+		appliedMultipliers = new ArrayList<Double>();
 	}
 	
 	
-	protected void merge(Weight other) {
-		
-		throw new UnsupportedOperationException();
+	public void merge(Weight other) {
+		if (other.min_weight != min_weight) min_weight = other.min_weight;
+		if (other.max_weight != max_weight) max_weight = other.max_weight;
 	}
 	
 	
 	public void clear() {
-		
-		current = new VarStatistic();
+		varstat = new VarStatistic(false);
 	}
 	
 	
 	public void multiplyCurrentWeightByAmountAndDirection() {
 		
+		if (varstat.getTotalAmount() == 0) {
+			return;
+		}
 		
-		if (current.getTotalAmount() == 0) {
-			
+		double multiplier = (varstat.getTotalDirection() / varstat.getTotalAmount());
+		
+		//Should be added before changing
+		appliedMultipliers.add(multiplier);
+		
+		/*while (appliedMultipliers.size() > 23) {
+			appliedMultipliers.remove(0);
+		}*/
+		
+		double all = 0;
+		double dir = 0;
+		for (Double cur: appliedMultipliers) {
+			all += Math.abs(cur);
+			dir += cur;
+		}
+		
+		if (all > 0 && dir != 0) {
+			multiplier *= Math.abs(dir / all);
+		}      
+	
+		
+		if (multiplier == 0) {
 			return;
 		}
 		
 		
-		double current_movement = (current.getTotalDirection() / current.getTotalAmount());
-		//double current_movement = current.getEntropy() / 2;
-		
-		//System.out.println("current_movement=" + current_movement);
-		
-		
-		//total_movements.addValue(current_movement);
-		
-		if (current_movement > 0) {
-			
-			total_movements.addValue(+1);
-			
-			//current_movement = STEP;
-			
-		} else if (current_movement < 0) {
-			
-			total_movements.addValue(-1);
-			
-			//current_movement = -STEP;
-		}
-		
-		current_movement *= getLearningSpeed();
-		//current_movement *= LEARNING_RATE;
-		
-		
-		double avg = total.getEntropy();
-		
-		if (avg > 0) {
-			
-			total.addValue(avg + avg * current_movement);
-			
-		} else if (avg < 0) {
-			
-			if (true) throw new IllegalStateException();
-			
-			total.addValue(avg - -current_movement);
-			
+		//Multiply
+		if (cur_weight > 0) {
+			cur_weight += cur_weight * multiplier;
+		} else if (cur_weight < 0) {
+			cur_weight -= cur_weight * multiplier;
 		} else {
-			
-			if (true) throw new IllegalStateException();
-			
-			reset();
+			//Initialize
+			//cur_weight = multiplier;
+			if (multiplier > 0) {
+				cur_weight = 1;
+			} else if (multiplier < 0) {
+				cur_weight = -1;
+			}
+
 		}
 		
-		
-		if (total.getEntropy() < min) {
-			
-			if (true) throw new IllegalStateException();
-			
-			total = new VarStatistic();
-			
-			reset();
+		double LOWEST = 1 / 100.0;
+		if (cur_weight > 0 && cur_weight < LOWEST) {
+			cur_weight = -LOWEST;
 		}
-	}
-	
-	
-	private void reset() {
+		if (cur_weight < 0 && cur_weight > -LOWEST) {
+			cur_weight = LOWEST;
+		}
 		
-		if (initial == 0) {
-			
-			total.addValue(Math.max(MIN_WEIGHT, Math.random()));
-			
-		} else {
-			
-			total.addValue(Math.max(MIN_WEIGHT, initial));
+		//Norm
+		if (cur_weight < min_weight) {
+			cur_weight = min_weight;
+		}
+		if (cur_weight > max_weight) {
+			cur_weight = max_weight;
 		}
 	}
 	
 	
 	public double getWeight() {
-		
-		return total.getEntropy();
+		//if (useAverageWeights) {
+		//	return varstat.getEntropy();
+		//} else {
+		return cur_weight;
+		//}
 	}
 	
-	
-	public double getLearningSpeed() {
+	public strictfp void adjust(double amount) {
 		
-		if (total_movements.getTotalAmount() == 0) {
-			
-			return 1;
-		}
-		
-		return Math.abs(total_movements.getTotalDirection() / total_movements.getTotalAmount());
-	}
-	
-	
-	public VarStatistic getHistory() {
-		
-		return current_history;
-	}
-	
-	
-	strictfp void adjust(double amount) {
-		
-		//1 and -1 are probably derivatives of the liner function. we use 1 and -1 and we apply them in Epochs of at least 100 games into the dataset and also use learning rate.
 		if (amount != 1 && amount != -1) {
-			
 			throw new IllegalStateException();
 		}
 		
-		current.addValue(amount);
-		
-		current_history.addValue(amount);
+		varstat.addValue(amount, amount);
 	}
 	
 	
 	@Override
 	public String toString() {
-		
 		String result = "";
 		
-		result += StringUtils.fill("[" + min + "-" + max + "] ", 8);
-		result += "initial: " + StringUtils.align(initial);
+		result += StringUtils.fill("[" + min_weight + "-" + max_weight + "] ", 8);
+		result += "init: " + StringUtils.align(initialVal);
 		//result += ", avg: " + StringUtils.align(avg());
-		result += ", current: " + StringUtils.align(total.getEntropy());
-		//result += ", [" + current + "]";
+		result += ", cur: " + StringUtils.align(cur_weight);
+		result += ", [" + varstat + "]";
 		/*result += " cur=" + cut("" + cur_weight) + ", avgidx=" + avg + ", avg=" + cut("" + (max_adjustment * avg));
 		result += ", prec=" + max_adjustment;
 		result += "	[";
@@ -232,5 +189,9 @@ class Weight implements Serializable {
 		result += "]";*/
 		
 		return result;
+	}
+
+	public VarStatistic getVarstat() {
+		return varstat;
 	}
 }
