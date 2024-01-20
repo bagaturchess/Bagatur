@@ -1694,19 +1694,14 @@ public class Search_PVS_NWS extends SearchImpl {
 			LAZY_EVAL_MARGIN.addValue(diff);
 		}*/
 		
-		/*int eval = 0;
 		
-		if (isPv) {
+		int eval = evaluator.fullEval(ply, alpha, beta, -1);
+		
+		/*if (isPv || (eval >= alpha - 7 && eval <= beta + 7)) {
 			
 			eval = getEnv().getEval_NNUE().fullEval(ply, alpha, beta, -1);
 			
-		} else {
-			
-			eval = evaluator.fullEval(ply, alpha, beta, -1);
 		}*/
-		
-		
-		int eval = evaluator.fullEval(ply, alpha, beta, -1);
 		
 		
 		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
