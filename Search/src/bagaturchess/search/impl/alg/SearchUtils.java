@@ -133,7 +133,7 @@ public class SearchUtils {
 		
 		if (root_player_colour != -1) {
 			
-			throw new IllegalStateException();
+			//throw new IllegalStateException();
 		}
 		
 		int scores = interpolater_by_material_facotr.interpolateByFactor(ISearch.DRAW_SCORE_O, ISearch.DRAW_SCORE_E);
