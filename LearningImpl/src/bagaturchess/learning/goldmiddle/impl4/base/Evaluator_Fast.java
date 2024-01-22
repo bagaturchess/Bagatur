@@ -32,15 +32,12 @@ public class Evaluator_Fast implements Bagatur_V20_FeaturesConstants, FeatureWei
 	private static final int MAX_MATERIAL_FACTOR = 4 * EvalConstants.PHASE[NIGHT] + 4 * EvalConstants.PHASE[BISHOP] + 4 * EvalConstants.PHASE[ROOK] + 2 * EvalConstants.PHASE[QUEEN];
 	
 	
-	public static int eval1(boolean calculateMaterial, IBoardConfig boardConfig, final ChessBoard cb, final EvalInfo evalInfo) {
+	public static int eval1(IBoardConfig boardConfig, final ChessBoard cb, final EvalInfo evalInfo) {
 		
 		evalInfo.eval_o_part1 += cb.psqtScore_mg;
 		evalInfo.eval_e_part1 += cb.psqtScore_eg;
 		
-		if (calculateMaterial) {
-			
-			calculateMaterialScore(boardConfig, evalInfo);
-		}
+		calculateMaterialScore(boardConfig, evalInfo);
 		
 		calculateImbalances(evalInfo);
 		

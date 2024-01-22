@@ -272,16 +272,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		int white_eval = 0;
 		
-		if (useDefaultMaterial()) {
-			
-			if (evalConfig != null && !evalConfig.isTrainingMode()) {
-				
-				white_eval += eval_material_nopawnsdrawrule();
-			}
-			
-			//eval += eval_material_imbalances();
-		}
-		
 		white_eval += phase1();
 		//white_eval += phase2();
 		//white_eval += phase3();
@@ -420,16 +410,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		int white_eval = 0;
 		
-		if (useDefaultMaterial()) {
-			
-			if (evalConfig != null && !evalConfig.isTrainingMode()) {
-				
-				white_eval += eval_material_nopawnsdrawrule();
-			}
-			
-			//eval += eval_material_imbalances();
-		}
-		
 		white_eval += phase1();
 		white_eval += phase2();
 		white_eval += phase3();
@@ -460,17 +440,6 @@ public abstract class BaseEvaluator implements IEvaluator {
 		
 		
 		return returnVal(white_eval);
-	}
-	
-	
-	/**
-	 * If true, the evaluation of material is not multiplied by weights
-	 * and is incrementally calculated within the Board representation
-	 * If false, the evaluation of material is performed within the IEvalComponentsProcessor
-	 */
-	protected boolean useDefaultMaterial() {
-		
-		return true;
 	}
 	
 	

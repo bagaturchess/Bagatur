@@ -30,17 +30,6 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	}
 	
 	
-	/**
-	 * If true, the evaluation of material is not multiplied by weights
-	 * and is incrementally calculated within the Board representation
-	 * If false, the evaluation of material is performed within the IEvalComponentsProcessor
-	 */
-	protected boolean useDefaultMaterial() {
-		
-		return true;
-	}
-	
-	
 	protected BagaturEvaluator_Phases(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig, IEvalComponentsProcessor _evalComponentsProcessor) {
 		
 		super(_bitboard, _evalCache, _evalConfig);
@@ -91,7 +80,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	@Override
 	protected int phase1() {
 		
-		return Evaluator.eval1(!useDefaultMaterial(), bitboard.getBoardConfig(), board, evalinfo, evalComponentsProcessor);
+		return Evaluator.eval1(bitboard.getBoardConfig(), board, evalinfo, evalComponentsProcessor);
 	}
 	
 	

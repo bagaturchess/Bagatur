@@ -46,13 +46,6 @@ public class BagaturEvaluator_Phases_GOLDENMIDDLE extends BaseEvaluator {
 	
 	
 	@Override
-	protected boolean useDefaultMaterial() {
-		
-		return false;
-	}
-	
-	
-	@Override
 	public int fullEval(int depth, int alpha, int beta, int rootColour) {
 		
 		int eval = super.fullEval(depth, alpha, beta, rootColour);
@@ -73,7 +66,7 @@ public class BagaturEvaluator_Phases_GOLDENMIDDLE extends BaseEvaluator {
 	@Override
 	protected int phase1() {
 		
-		return Evaluator.eval1(!useDefaultMaterial(), bitboard.getBoardConfig(), board, evalinfo, evalComponentsProcessor);
+		return Evaluator.eval1(bitboard.getBoardConfig(), board, evalinfo, evalComponentsProcessor);
 	}
 	
 	

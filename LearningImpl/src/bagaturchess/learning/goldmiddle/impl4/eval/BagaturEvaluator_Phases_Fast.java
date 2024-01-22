@@ -29,19 +29,6 @@ public class BagaturEvaluator_Phases_Fast extends BaseEvaluator {
 	}
 	
 	
-	/**
-	 * If true, the evaluation of material is not multiplied by weights
-	 * and is incrementally calculated within the Board representation
-	 * If false, the evaluation of material is performed within the IEvalComponentsProcessor
-	 */
-	@Override
-	protected boolean useDefaultMaterial() {
-		
-		return true;
-		//return false;
-	}
-	
-	
 	@Override
 	public int fullEval(int depth, int alpha, int beta, int rootColour) {
 		
@@ -63,7 +50,7 @@ public class BagaturEvaluator_Phases_Fast extends BaseEvaluator {
 	@Override
 	protected int phase1() {
 		
-		return Evaluator_Fast.eval1(!useDefaultMaterial(), bitboard.getBoardConfig(), board, evalinfo);
+		return Evaluator_Fast.eval1(bitboard.getBoardConfig(), board, evalinfo);
 	}
 	
 	
