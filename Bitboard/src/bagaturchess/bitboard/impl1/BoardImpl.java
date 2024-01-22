@@ -230,30 +230,6 @@ public class BoardImpl implements IBitBoard {
 			if (!isPossible(cur_move)) {
 				continue;
 			}
-			list.reserved_add(cur_move);
-			counter++;
-		}
-		
-		generator.endPly();
-		
-		return counter;
-	}
-	
-	
-	@Override
-	public int genKingEscapes(IInternalMoveList list) {
-		
-		generator.startPly();
-		
-		generator.generateAttacks(chessBoard);
-		generator.generateMoves(chessBoard);
-		
-		int counter = 0;
-		while (generator.hasNext()) {
-			int cur_move = generator.next();
-			if (!isPossible(cur_move)) {
-				continue;
-			}
 			int type = getMoveOps().getCapturedFigureType(cur_move);
 			if (type == Figures.TYPE_KING) {
 				continue;
@@ -271,6 +247,12 @@ public class BoardImpl implements IBitBoard {
 		generator.endPly();
 		
 		return counter;
+	}
+	
+	
+	@Override
+	public int genKingEscapes(IInternalMoveList list) {
+		return genAllMoves(list);
 	}
 	
 	
