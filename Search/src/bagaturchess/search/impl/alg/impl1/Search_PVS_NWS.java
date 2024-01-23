@@ -431,7 +431,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			} else {
 				
 				node.bestmove = 0;
-				node.eval = -SearchUtils.getMateVal(ply);
+				node.eval = -SearchUtils.getMateVal(ply, getEnv().getBitboard());
 				node.leaf = true;
 				
 				return node.eval;

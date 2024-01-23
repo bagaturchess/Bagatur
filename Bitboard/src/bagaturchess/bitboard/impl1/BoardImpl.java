@@ -230,7 +230,7 @@ public class BoardImpl implements IBitBoard {
 			if (!isPossible(cur_move)) {
 				continue;
 			}
-			int type = getMoveOps().getCapturedFigureType(cur_move);
+			/*int type = getMoveOps().getCapturedFigureType(cur_move);
 			if (type == Figures.TYPE_KING) {
 				continue;
 			}
@@ -239,7 +239,7 @@ public class BoardImpl implements IBitBoard {
 				makeMoveBackward(cur_move);
 				continue;
 			}
-			makeMoveBackward(cur_move);
+			makeMoveBackward(cur_move);*/
 			list.reserved_add(cur_move);
 			counter++;
 		}

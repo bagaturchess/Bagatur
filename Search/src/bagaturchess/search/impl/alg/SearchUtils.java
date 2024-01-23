@@ -23,6 +23,7 @@
 package bagaturchess.search.impl.alg;
 
 
+import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IMaterialFactor;
 import bagaturchess.search.api.internal.ISearch;
 
@@ -64,6 +65,17 @@ public class SearchUtils {
 				throw new IllegalStateException("SearchUtils.static: test_depth != depth, test_depth=" + test_depth + ", depth=" + depth);
 			}
 		}
+	}
+	
+	
+	public static final int getMateVal(int depth, IBitBoard bitboard) {
+		
+		if (depth <= 0) {
+			
+			throw new IllegalStateException("SearchUtils.getMateVal: depth=" + depth + ", board=" + bitboard.toEPD());
+		}
+		
+		return ISearch.MAX_MATERIAL_INTERVAL * (ISearch.MAX_DEPTH + 1 - depth);
 	}
 	
 	

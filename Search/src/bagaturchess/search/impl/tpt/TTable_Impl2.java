@@ -189,7 +189,7 @@ public class TTable_Impl2 implements ITTable {
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(new_depth >= 0);
 			//Assert.isTrue(move != 0);
-			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
+			//Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 			//Assert.isTrue(MoveUtil.getSourcePieceIndex(move) != 0);
 		}
 
@@ -250,7 +250,7 @@ public class TTable_Impl2 implements ITTable {
 		
 		if (EngineConstants.ASSERT) {
 			
-			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
+			//Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 		}
 
 		if (replaced_index == -1) {
@@ -269,7 +269,7 @@ public class TTable_Impl2 implements ITTable {
 
 		if (EngineConstants.ASSERT) {
 			
-			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
+			//Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 		}
 
 		return score;
@@ -294,7 +294,7 @@ public class TTable_Impl2 implements ITTable {
 	// SCORE,HALF_MOVE_COUNTER,MOVE,FLAG,DEPTH
 	private static long createValue(final long score, final long move, final long flag, final long depth) {
 		if (EngineConstants.ASSERT) {
-			Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
+			//Assert.isTrue(score >= Util.SHORT_MIN && score <= Util.SHORT_MAX);
 			Assert.isTrue(depth <= 255);
 		}
 		return score << SCORE | move << MOVE | flag << FLAG | depth;

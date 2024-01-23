@@ -30,6 +30,7 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.cfg.base.UCIConfig_BaseImpl;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl;
+import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
@@ -80,10 +81,19 @@ public class TDLeafLambda_Perceptron_GoldenMiddle {
 			String filename_NN = Features_Splitter.FEATURES_FILE_NAME;
 			String features_class_name = Bagatur_V20_FeaturesConfigurationImpl.class.getName();
 			
-			//Features_Splitter features = Features_Splitter.create(features_class_name);
-			//Features_Splitter.store(filename_NN, features);
-			//Features_Splitter.dump(Features_Splitter.load(filename_NN, features_class_name));
-			//System.exit(0);
+			if (true) {
+				
+				Features_Splitter features = Features_Splitter.create(features_class_name);
+				Features_Splitter.store(filename_NN, features);
+				//Features_Splitter.dump(features);
+			
+			} else {
+				
+				Features_Splitter features = Features_Splitter.load(filename_NN, features_class_name);
+				Features.toJavaCode(features.getFeatures(1), "_O");
+				Features.toJavaCode(features.getFeatures(0), "_E");
+				System.exit(0);
+			}
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 			

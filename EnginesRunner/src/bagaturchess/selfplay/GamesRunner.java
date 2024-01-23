@@ -48,7 +48,7 @@ import bagaturchess.uci.impl.commands.Go;
 public class GamesRunner {
 	
 	
-	private static final int SEARCH_DEPTH = 2;
+	private static final int SEARCH_DEPTH = 1;
 	
 	
 	private IBitBoard bitboard;
@@ -105,6 +105,8 @@ public class GamesRunner {
 			
 			
 			List<Integer> played_moves = playGame();
+			
+			//System.out.println("Game status: " + bitboard.getStatus());
 			
 			
 			float game_result = getGameTerminationScore(bitboard.getStatus());
@@ -235,6 +237,7 @@ public class GamesRunner {
 			
 			ISearchInfo info = mediator.getLastInfo();
 			
+			
 			if (!info.isMateScore()) {
 				
 				int[] bestline = info.getPV();
@@ -242,12 +245,22 @@ public class GamesRunner {
 				int color_sign = 1;
 				
 				boolean pv_status_is_none = true;
+				boolean has_not_possible_move = false;
 				
-				int move_index = 0;
-				for (; move_index < bestline.length; move_index++) {
+				int move_index = -1;
+				for (move_index = 0; move_index < bestline.length; move_index++) {
+					
+					if (!bitboard.isPossible(bestline[move_index])) {
+						
+						has_not_possible_move = true;
+						
+						//System.out.println("Not possible move detected. Position will be skipped.");
+						
+						break;
+					}
 					
 					bitboard.makeMoveForward(bestline[move_index]);
-					
+										
 					color_sign *= -1;
 					
 					if (!bitboard.getStatus().equals(IGameStatus.NONE)) {
@@ -261,7 +274,7 @@ public class GamesRunner {
 				}
 				
 				
-				if (pv_status_is_none) {
+				if (pv_status_is_none && !has_not_possible_move) {
 					
 					evaluatedPositionsCounter++;
 					
@@ -287,6 +300,11 @@ public class GamesRunner {
 				if (move_index >= bestline.length) {
 					move_index = bestline.length - 1;
 				}
+				
+				if (has_not_possible_move) {
+					move_index--;
+				}
+				
 				for (int i = move_index; i >= 0; i--) {
 					
 					bitboard.makeMoveBackward(bestline[i]);
