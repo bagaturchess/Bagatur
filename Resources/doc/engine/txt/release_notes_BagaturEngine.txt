@@ -1,3 +1,6 @@
+ Version 4.1 (23 January 2023)
+ * Optimizations and bugfixing in the evaluation function
+ 
  Version 4.0 (20 January 2023)
  * Adding exe and bat file for NNUE version of Bagatur, currently under Windows only. More information: https://github.com/bagaturchess/Bagatur/tree/master/NNUE
  * Optimizations in the evaluation function - use int instead of double during calculations
