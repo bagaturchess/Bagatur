@@ -1,6 +1,7 @@
 # Purpose
 
 This sub-project aims to act as JNI bridge to nnue-probe code located at https://github.com/dshawul/nnue-probe.
+So, Bagatur or any other Java chess engine could integrate NNUE evaluation function.
 
 Currently it is compiled under Windows only and JNNUE.dll is available in the root of the project.
 The compilation command, which was performed in src directory, is located in /src/info.txt
@@ -14,7 +15,7 @@ To give it a try, you could run the main function inside bagaturchess.nnue.Probe
 In order to test NNUE as Bagatur evaluation function, there is special evaluation configuration class
 <a href="https://github.com/bagaturchess/Bagatur/blob/master/LearningImpl/src/bagaturchess/deeplearning/impl_nnue_v2/eval/EvaluationConfig.java/">bagaturchess.deeplearning.impl_nnue_v2.eval.EvaluationConfig</a>
 under <a href="https://github.com/bagaturchess/Bagatur/tree/master/LearningImpl">LearningImpl</a> sub-project.
-When used in production, Bagatur plays with around 12 times slower NPS speed and 230 weaker ELO strength.
+When used in production, Bagatur plays with around 12 times slower NPS speed and 230 weaker Elo strength.
 
 # References & Thanks
 
