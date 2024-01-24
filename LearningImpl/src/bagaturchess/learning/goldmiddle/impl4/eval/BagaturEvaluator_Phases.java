@@ -200,6 +200,21 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		@Override
 		public final void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
 			
+			//Keep material and some other features (with big values and impact) with unchanged weights
+			if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_MATERIAL_PAWN
+					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_MATERIAL_KNIGHT
+					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_MATERIAL_BISHOP
+					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_MATERIAL_ROOK
+					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_MATERIAL_QUEEN
+					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY
+					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_CANDIDATE
+					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
+					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE
+					) {
+				weight_o = 1;
+				weight_e = 1;
+			}
+			
 			if (evalPhaseID == EVAL_PHASE_ID_1) {
 				
 				evalinfo.eval_o_part1 += value_o * weight_o;
