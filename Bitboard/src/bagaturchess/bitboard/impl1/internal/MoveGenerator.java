@@ -54,8 +54,8 @@ public final class MoveGenerator {
 	private static int[] lmr_rate_pointer_below_alpha 			= new int[2];
 	
 	
-	private final int[] moves 									= new int[3000];
-	private final long[] moveScores 							= new long[3000];
+	private final int[] moves 									= new int[30000];
+	private final long[] moveScores 							= new long[30000];
 	private final int[] nextToGenerate 							= new int[EngineConstants.MAX_PLIES * 2];
 	private final int[] nextToMove 								= new int[EngineConstants.MAX_PLIES * 2];
 	private int currentPly;
