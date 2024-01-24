@@ -1104,8 +1104,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (!isPv
 						&& depth <= 7
-						&& !wasInCheck && movesPerformed_attacks + movesPerformed_quiet > 0 && !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))
-						&& !SearchUtils.isMateVal(alpha) && !SearchUtils.isMateVal(beta)
+						&& !wasInCheck
+						&& movesPerformed_attacks + movesPerformed_quiet > 0
+						&& !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))
+						&& !SearchUtils.isMateVal(alpha)
+						&& !SearchUtils.isMateVal(beta)
 					) {
 					
 					if (phase == PHASE_QUIET
@@ -1192,6 +1195,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean doLMR = depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						//&& !wasInCheck
+						//&& cb.checkingPieces == 0
 						//&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move)
 						//&& (phase == PHASE_QUIET || phase == PHASE_KILLER_1 || phase == PHASE_KILLER_2)
 						&& phase == PHASE_QUIET;
@@ -1412,9 +1417,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			int alpha, final int beta, final int ply, final boolean isPv) {
 		
 		if (cb.checkingPieces != 0) {
-			//With queens on the board, this extension goes out of control.
-			//return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, pv_scores_w, pv_scores_b, 0);
-			return alpha;
+			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
+			return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, 0);
+			//return alpha;
 		}
 		
 		if (info.getSelDepth() < ply) {
@@ -1539,7 +1544,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 				case PHASE_TT:
 					
-					if (ttMove != 0 && cb.isValidMove(ttMove)) {
+					if (ttMove != 0
+							&& getEnv().getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)
+							&& cb.isValidMove(ttMove)) {
+						
 						moveGen.addMove(ttMove);
 					}
 					
