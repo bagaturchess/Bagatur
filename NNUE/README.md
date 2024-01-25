@@ -12,10 +12,13 @@ Currently, the newest networks cannot be loaded with this library.
 
 To give it a try, you could run the main function inside bagaturchess.nnue.ProbeMain.
 
-In order to test NNUE as Bagatur evaluation function, there is special evaluation configuration class
+In order to test NNUE as Bagatur evaluation function on code level, there is special evaluation configuration class
 <a href="https://github.com/bagaturchess/Bagatur/blob/master/LearningImpl/src/bagaturchess/deeplearning/impl_nnue_v2/eval/EvaluationConfig.java/">bagaturchess.deeplearning.impl_nnue_v2.eval.EvaluationConfig</a>
 under <a href="https://github.com/bagaturchess/Bagatur/tree/master/LearningImpl">LearningImpl</a> sub-project.
 When used in production, Bagatur plays with around 12 times slower NPS speed and 230 weaker Elo strength.
+
+Since version 4.0, there are also separate exe and bat files in the distribution for running the NNUE version: Bagatur_NNUE_1_core.exe and /bin/Bagatur_NNUE_1core.bat
+The downloads of Bagatur versions could be found in the release section: https://github.com/bagaturchess/Bagatur/releases
 
 # References & Thanks
 
