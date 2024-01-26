@@ -63,12 +63,6 @@ public class GamesGenerator_NNUE {
 	private NNUEProbeUtils.Input input;
 	
 	
-	public GamesGenerator_NNUE() {
-		
-		input = new NNUEProbeUtils.Input();
-	}
-	
-	
 	public static void main(String[] args) {
 		
 		GamesGenerator_NNUE control = new GamesGenerator_NNUE();
@@ -81,6 +75,12 @@ public class GamesGenerator_NNUE {
 			
 			e.printStackTrace();
 		}
+	}
+	
+	
+	public GamesGenerator_NNUE() {
+		
+		input = new NNUEProbeUtils.Input();
 	}
 	
 	
