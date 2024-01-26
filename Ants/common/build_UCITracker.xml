@@ -6,7 +6,7 @@
 	
 	<property name="project_name" value="BagaturUCITracker" />
 	<property name="project_root" value="${ucitracker_dir}" />
-	<property name="classpath" value="${work_dir}/BagaturBoard.jar;${work_dir}/BagaturUCI.jar" />
+	<property name="classpath" value="${work_dir}/BagaturBoard.jar;${work_dir}/BagaturUCI.jar;${work_dir}/BagaturNNUE.jar" />
 	
 	<property name="src" location="${project_root}/src" />
 	<property name="classes" location="${work_dir}/assembly" />
