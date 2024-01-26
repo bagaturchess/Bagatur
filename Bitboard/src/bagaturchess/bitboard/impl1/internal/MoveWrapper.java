@@ -171,8 +171,8 @@ public class MoveWrapper {
 		if (pieceIndex == -1) {
 			
 			throw new RuntimeException("Source piece not found at index "
-					 + ", cb.pieces[cb.colorToMove][ChessConstants.NIGHT]=" + cb.pieces[cb.colorToMove][ChessConstants.NIGHT]
-					 + fromIndex + ", cb.colorToMove=" + cb.colorToMove + ", move=" + moveString + ", board=" + cb.toString());
+					 + ", cb.pieces[cb.colorToMove][type]=" + cb.pieces[cb.colorToMove][ChessConstants.NIGHT]
+							 + ", fromIndex=" + fromIndex + ", cb.colorToMove=" + cb.colorToMove + ", move=" + moveString + ", board=" + cb.toString());
 		}
 		
 		

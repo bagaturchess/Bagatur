@@ -36,7 +36,8 @@ public class LearningTraverser {
 			//String filePath = "bagatur-2.3.cg"; //Without MutiPV: Reaches around 26% accuracy
 			
 			//String filePath = "stockfish-14.1-4N.cg";
-			String filePath = "stockfish-16.cg";
+			//String filePath = "stockfish-16.cg";
+			String filePath = "NNUE.cg";
 			
 			String filename_NN = Features_Splitter.FEATURES_FILE_NAME;
 			String features_class_name = Bagatur_V20_FeaturesConfigurationImpl.class.getName();
