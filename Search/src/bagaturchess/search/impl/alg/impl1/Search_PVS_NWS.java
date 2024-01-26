@@ -769,14 +769,14 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 			
-			//if (ply > 7) {
+			if (ply > 7) {
 			
 				node.bestmove = 0;
 				node.eval = egtb_eval;
 				node.leaf = true;
 				
 				return node.eval;
-			//}
+			}
 		}
 		
 		
