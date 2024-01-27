@@ -29,7 +29,7 @@ public class ProbeMain {
 		
 		int score_fen = NNUEJNIBridge.eval(fen);
 		
-		System.out.println("score by fen =" + score_fen);
+		System.out.println("score by fen = " + score_fen);
 		
 		NNUEProbeUtils.Input input = new NNUEProbeUtils.Input();
 		NNUEProbeUtils.fillInput(bitboard, input);

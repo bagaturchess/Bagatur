@@ -158,7 +158,11 @@
   			<include name="Bagatur_mcore.sh"/>
   		</fileset>
   	</copy>
-  	
+  	<copy tofile="${temp_dir}/bin/Bagatur_NNUE_1core.sh" >
+  		<fileset dir="${resources_dir}/bin/engine/sh">
+  			<include name="Bagatur_NNUE_1core.sh"/>
+  		</fileset>
+  	</copy>
   	
   	<copy tofile="${temp_dir}/Bagatur_NNUE_1_core.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
