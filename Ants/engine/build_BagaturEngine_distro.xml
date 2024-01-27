@@ -148,6 +148,11 @@
 			<include name="Bagatur_NNUE_1core.bat"/>
 		</fileset>
 	</copy>
+	<copy tofile="${temp_dir}/bin/Bagatur_NNUE_mcore.bat" >
+		<fileset dir="${resources_dir}/bin/engine/bat">
+			<include name="Bagatur_NNUE_mcore.bat"/>
+		</fileset>
+	</copy>
   	<copy tofile="${temp_dir}/bin/Bagatur_1core.sh" >
   		<fileset dir="${resources_dir}/bin/engine/sh">
   			<include name="Bagatur_1core.sh"/>
@@ -161,6 +166,11 @@
   	<copy tofile="${temp_dir}/bin/Bagatur_NNUE_1core.sh" >
   		<fileset dir="${resources_dir}/bin/engine/sh">
   			<include name="Bagatur_NNUE_1core.sh"/>
+  		</fileset>
+  	</copy>
+  	<copy tofile="${temp_dir}/bin/Bagatur_NNUE_mcore.sh" >
+  		<fileset dir="${resources_dir}/bin/engine/sh">
+  			<include name="Bagatur_NNUE_mcore.sh"/>
   		</fileset>
   	</copy>
   	
