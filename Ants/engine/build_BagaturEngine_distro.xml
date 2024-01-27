@@ -173,23 +173,6 @@
   			<include name="Bagatur_NNUE_mcore.sh"/>
   		</fileset>
   	</copy>
-  	
-  	<copy tofile="${temp_dir}/Bagatur_NNUE_1_core.bmp" >
-		<fileset dir="${resources_dir}/bin/engine/logo">
-			<include name="BagaturEngine.bmp"/>
-		</fileset>
-	</copy>
-  	<copy tofile="${temp_dir}/Bagatur_NNUE_1_core.exe" >
-		<fileset dir="${resources_dir}/bin/engine/exe">
-			<include name="Bagatur_64.exe"/>
-		</fileset>
-	</copy>
-  	<copy tofile="${temp_dir}/Bagatur_NNUE_1_core.ini" >
-		<fileset dir="${resources_dir}/bin/engine/exe">
-			<include name="Bagatur_NNUE_1core.ini"/>
-		</fileset>
-	</copy>
-  	
 	
   	<copy tofile="${temp_dir}/Bagatur_64_1_core.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
@@ -206,7 +189,21 @@
 			<include name="Bagatur_1core.ini"/>
 		</fileset>
 	</copy>
-  	
+  	<copy tofile="${temp_dir}/Bagatur_NNUE_1_core.bmp" >
+		<fileset dir="${resources_dir}/bin/engine/logo">
+			<include name="BagaturEngine.bmp"/>
+		</fileset>
+	</copy>
+  	<copy tofile="${temp_dir}/Bagatur_NNUE_1_core.exe" >
+		<fileset dir="${resources_dir}/bin/engine/exe">
+			<include name="Bagatur_64.exe"/>
+		</fileset>
+	</copy>
+  	<copy tofile="${temp_dir}/Bagatur_NNUE_1_core.ini" >
+		<fileset dir="${resources_dir}/bin/engine/exe">
+			<include name="Bagatur_NNUE_1core.ini"/>
+		</fileset>
+	</copy>
   	
   	<copy tofile="${temp_dir}/Bagatur_64_2+_cores.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
@@ -223,7 +220,21 @@
 			<include name="Bagatur_2cores.ini"/>
 		</fileset>
 	</copy>
-	
+  	<copy tofile="${temp_dir}/Bagatur_NNUE_64_2+_cores.bmp" >
+		<fileset dir="${resources_dir}/bin/engine/logo">
+			<include name="BagaturEngine.bmp"/>
+		</fileset>
+	</copy>
+  	<copy tofile="${temp_dir}/Bagatur_NNUE_64_2+_cores.exe" >
+		<fileset dir="${resources_dir}/bin/engine/exe">
+			<include name="Bagatur_64.exe"/>
+		</fileset>
+	</copy>
+  	<copy tofile="${temp_dir}/Bagatur_NNUE_64_2+_cores.ini" >
+		<fileset dir="${resources_dir}/bin/engine/exe">
+			<include name="Bagatur_NNUE_2cores.ini"/>
+		</fileset>
+	</copy>
 	
   	<!--copy tofile="${temp_dir}/Bagatur_64_4+_cores.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
