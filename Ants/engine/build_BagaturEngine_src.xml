@@ -113,6 +113,14 @@
 		      <include name="EGTB/.classpath"/>
 		      <include name="EGTB/.project"/>
 			</fileset>
+			<fileset dir="${nnue_dir}/..">
+			  <include name="NNUE/src/**/*.java"/>
+			  <include name="NNUE/src/*"/>
+		      <include name="NNUE/LICENSE"/>
+		      <include name="NNUE/README.md"/>
+		      <include name="NNUE/.classpath"/>
+		      <include name="NNUE/.project"/>
+			</fileset>
 		</copy>
 		<copy tofile="${temp_dir}/readme.txt">
 			<fileset dir="${resources_dir}/doc/engine/txt">
