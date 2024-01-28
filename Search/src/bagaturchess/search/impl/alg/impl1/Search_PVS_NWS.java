@@ -1419,8 +1419,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (cb.checkingPieces != 0) {
 			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
-			return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, 0);
-			//return alpha;
+			//return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, 0);
+			return alpha;
 		}
 		
 		if (info.getSelDepth() < ply) {
@@ -1546,7 +1546,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				case PHASE_TT:
 					
 					if (ttMove != 0
-							&& getEnv().getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)
+							//&& getEnv().getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)
 							&& cb.isValidMove(ttMove)) {
 						
 						moveGen.addMove(ttMove);
