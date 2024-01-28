@@ -235,22 +235,6 @@
 			<include name="Bagatur_NNUE_2cores.ini"/>
 		</fileset>
 	</copy>
-	
-  	<!--copy tofile="${temp_dir}/Bagatur_64_4+_cores.bmp" >
-		<fileset dir="${resources_dir}/bin/engine/logo">
-			<include name="BagaturEngine.bmp"/>
-		</fileset>
-	</copy>
-  	<copy tofile="${temp_dir}/Bagatur_64_4+_cores.exe" >
-		<fileset dir="${resources_dir}/bin/engine/exe">
-			<include name="Bagatur_64.exe"/>
-		</fileset>
-	</copy>
-  	<copy tofile="${temp_dir}/Bagatur_64_4+_cores.ini" >
-		<fileset dir="${resources_dir}/bin/engine/exe">
-			<include name="Bagatur_4cores.ini"/>
-		</fileset>
-	</copy-->
   	
   	
 	<zip zipfile="${work_dir}/BagaturEngine${distro_sufix}.zip" basedir="${temp_dir}" />
