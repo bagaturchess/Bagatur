@@ -1196,8 +1196,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				boolean doLMR = depth >= 2
 						//&& depth >= Math.max(2, maxdepth / 2) //Many other heuristics are working under shallow depths
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& !wasInCheck
-						&& cb.checkingPieces == 0
+						//&& !wasInCheck
+						//&& cb.checkingPieces == 0
 						//&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move)
 						//&& (phase == PHASE_QUIET || phase == PHASE_KILLER_1 || phase == PHASE_KILLER_2)
 						&& phase == PHASE_QUIET;
