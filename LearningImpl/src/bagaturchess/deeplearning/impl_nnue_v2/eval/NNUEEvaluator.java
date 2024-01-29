@@ -107,7 +107,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		int actualWhitePlayerEval = NNUEJNIBridge.eval(input.color, input.pieces, input.squares);
 		
-		actualWhitePlayerEval = (2 * actualWhitePlayerEval) / 3;
+		//actualWhitePlayerEval = (2 * actualWhitePlayerEval) / 3;
 		
 		//String fen = bitboard.toEPD();
 		

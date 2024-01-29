@@ -56,7 +56,11 @@ public class GamesGenerator_NNUE {
 	
 	private static int MAX_EVAL_DIFF = 7777;
 	private static int MAX_MOVES = 300;
-	private static int BEST_MOVE_DIFF = MAX_EVAL_DIFF; //50
+	/**
+	 * BEST_MOVE_DIFF affects the corner cases a lot.
+	 * It should be a good mixture of games with different values in one single file for learning.
+	 */
+	private static int BEST_MOVE_DIFF = MAX_EVAL_DIFF; //550; //250; //150; //50; // 25;
 	private static int MIN_PIECES = 6;
 	
 	
@@ -198,10 +202,10 @@ public class GamesGenerator_NNUE {
 		int cur_move = 0;
 		while ((cur_move = moves.next()) != 0) {
 			
-			String allMovesStr = BoardUtils.getPlayedMoves(bitboard);
+			//String allMovesStr = BoardUtils.getPlayedMoves(bitboard);
 			//System.out.println("allMovesStr=" + allMovesStr);
 			
-			String moveStr = bitboard.getMoveOps().moveToString(cur_move);
+			//String moveStr = bitboard.getMoveOps().moveToString(cur_move);
 			//System.out.println("moveStr=" + moveStr);
 			
 			bitboard.makeMoveForward(cur_move);
@@ -214,7 +218,7 @@ public class GamesGenerator_NNUE {
 			
 			int actualPlayerEval = NNUEJNIBridge.eval(input.color, input.pieces, input.squares);
 			
-			actualPlayerEval = (2 * actualPlayerEval) / 3;
+			//actualPlayerEval = (2 * actualPlayerEval) / 3;
 			
 			/*if (bitboard.getColourToMove() == BLACK) {
 				
