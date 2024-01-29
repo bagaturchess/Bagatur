@@ -54,9 +54,9 @@ public class GamesGenerator_NNUE {
 	}
 	
 	
-	private static int MAX_EVAL_DIFF = 3000;
+	private static int MAX_EVAL_DIFF = 7777;
 	private static int MAX_MOVES = 300;
-	private static int BEST_MOVE_DIFF = 50;
+	private static int BEST_MOVE_DIFF = MAX_EVAL_DIFF; //50
 	private static int MIN_PIECES = 6;
 	
 	
@@ -69,7 +69,7 @@ public class GamesGenerator_NNUE {
 		
 		try {
 
-			control.execute("./NNUE.cg", 1000000, false);
+			control.execute("./NNUE.cg", 1000000, true);
 			
 		} catch (Exception e) {
 			
