@@ -1,8 +1,12 @@
- Version 4.1 (23 January 2023)
+ Version 4.1a (30 January 2024)
+ * NNUE support - adding script files for running under Linux for both 1 core and multicore versions
+ * NNUE support - adding exe and bat files for multicore version under Windows
+ 
+ Version 4.1 (23 January 2024)
  * Optimizations and bugfixing in the evaluation function
  
- Version 4.0 (20 January 2023)
- * Adding exe and bat file for NNUE version of Bagatur, currently under Windows only. More information: https://github.com/bagaturchess/Bagatur/tree/master/NNUE
+ Version 4.0 (20 January 2024)
+ * Adding exe and bat file for 1 core NNUE version of Bagatur, currently under Windows only. More information: https://github.com/bagaturchess/Bagatur/tree/master/NNUE
  * Optimizations in the evaluation function - use int instead of double during calculations
  * Use directly the Transposition Table score in the root search node too
  
