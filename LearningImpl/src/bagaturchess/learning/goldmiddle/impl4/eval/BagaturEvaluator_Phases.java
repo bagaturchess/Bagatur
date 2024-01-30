@@ -206,10 +206,10 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_MATERIAL_BISHOP
 					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_MATERIAL_ROOK
 					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_MATERIAL_QUEEN
-					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY
-					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_CANDIDATE
-					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
-					|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE
+					//|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY
+					//|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_CANDIDATE
+					//|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
+					//|| componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE
 					) {
 				weight_o = 1;
 				weight_e = 1;
