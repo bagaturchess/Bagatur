@@ -52,6 +52,11 @@ public class Bagatur_V41_FeaturesConfigurationImpl implements IFeaturesConfigura
 		create2Features(new_featuresSet, FEATURE_ID_MOBILITY_KING						, "MOBILITY.KING"						, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
 
 		
+		//King safety and space
+		create2Features(new_featuresSet, FEATURE_ID_KING_SAFETY							, "KING.SAFETY"							, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		create2Features(new_featuresSet, FEATURE_ID_SPACE								, "SPACE"								, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+
+		
 		int max_id = 0;
 		
 		for (IFeature feature: new_featuresSet) {

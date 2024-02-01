@@ -50,4 +50,9 @@ public interface Bagatur_V41_FeaturesConstants {
 	public static final int FEATURE_ID_MOBILITY_ROOK						= 24;
 	public static final int FEATURE_ID_MOBILITY_QUEEN						= 25;
 	public static final int FEATURE_ID_MOBILITY_KING						= 26;
+	
+	
+	//King safety and space
+	public static final int FEATURE_ID_KING_SAFETY 							= 54;
+	public static final int FEATURE_ID_SPACE 								= 55;
 }

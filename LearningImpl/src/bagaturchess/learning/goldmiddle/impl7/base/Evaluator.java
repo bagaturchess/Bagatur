@@ -13,6 +13,7 @@ import static bagaturchess.learning.goldmiddle.api.IEvalComponentsProcessor.EVAL
 import static bagaturchess.learning.goldmiddle.api.IEvalComponentsProcessor.EVAL_PHASE_ID_2;
 import static bagaturchess.learning.goldmiddle.api.IEvalComponentsProcessor.EVAL_PHASE_ID_3;
 import static bagaturchess.learning.goldmiddle.api.IEvalComponentsProcessor.EVAL_PHASE_ID_4;
+import static bagaturchess.learning.goldmiddle.api.IEvalComponentsProcessor.EVAL_PHASE_ID_5;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.impl1.internal.Bitboard;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
@@ -61,7 +62,7 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 	public static int eval3(final ChessBoard cb, final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
 		
 		calculatePawnShieldBonus(evalInfo, evalComponentsProcessor);
-		//calculateKingSafetyScores(evalInfo, evalComponentsProcessor);
+		calculateKingSafetyScores(evalInfo, evalComponentsProcessor);
 		
 		
 		int total_material_factor = Math.min(MAX_MATERIAL_FACTOR, cb.material_factor_white + cb.material_factor_black);
@@ -82,10 +83,10 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 	
 	public static int eval5(final ChessBoard cb, final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
 		
-		/*calculateThreats(cb, evalInfo, evalComponentsProcessor);
+		//calculateThreats(cb, evalInfo, evalComponentsProcessor);
 		calculateSpace(evalInfo, evalComponentsProcessor);
-		calculateOthers(cb, evalInfo, evalComponentsProcessor);
-		*/
+		//calculateOthers(cb, evalInfo, evalComponentsProcessor);
+		
 		
 		int total_material_factor = Math.min(MAX_MATERIAL_FACTOR, cb.material_factor_white + cb.material_factor_black);
 		
@@ -93,7 +94,7 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 	}
 	
 	
-	/*private static void calculateSpace(final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
+	private static void calculateSpace(final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
 
 		int score1 = 0;
 		score1 += EvalConstants.OTHER_SCORES[EvalConstants.IX_SPACE]
@@ -117,7 +118,7 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 				score1 + score2,
 				SPACE_O, SPACE_E);
 	}
-	*/
+	
 	
 	private static void calculatePawnScores(final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
 
@@ -1037,7 +1038,7 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 				(int) (count_queens * boardConfig.getMaterial_QUEEN_O()), (int) (count_queens * boardConfig.getMaterial_QUEEN_E()), MATERIAL_QUEEN_O, MATERIAL_QUEEN_E);
 	}
 	
-	/*
+	
 	private static void calculateKingSafetyScores(final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
 
 		int score = 0;
@@ -1128,7 +1129,8 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 
 		return counter;
 	}
-
+	
+	
 	private static int checkRook(final int kingColor, final long rookMoves, final EvalInfo evalInfo) {
 		if (rookMoves == 0) {
 			return 0;
@@ -1149,7 +1151,8 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 
 		return counter;
 	}
-
+	
+	
 	private static int checkBishop(final long safeSquares, final long bishopMoves) {
 		if (bishopMoves == 0) {
 			return 0;
@@ -1160,7 +1163,8 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 			return EvalConstants.KS_OTHER[2];
 		}
 	}
-
+	
+	
 	private static int checkNight(final long safeSquares, final long nightMoves) {
 		if (nightMoves == 0) {
 			return 0;
@@ -1171,11 +1175,12 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 			return EvalConstants.KS_OTHER[2];
 		}
 	}
-
+	
+	
 	private static boolean kingBlockedAtLastRank(final long safeKingMoves) {
 		return (Bitboard.RANK_234567 & safeKingMoves) == 0;
 	}
-	*/
+	
 	
 	private static void calculatePassedPawnScores(final EvalInfo evalInfo, final IEvalComponentsProcessor evalComponentsProcessor) {
 		
