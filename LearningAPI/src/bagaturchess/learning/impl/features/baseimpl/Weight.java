@@ -128,9 +128,9 @@ public class Weight implements Serializable {
 			//Initialize
 			//cur_weight = multiplier;
 			if (multiplier > 0) {
-				cur_weight = 1;
+				cur_weight = initialVal;
 			} else if (multiplier < 0) {
-				cur_weight = -1;
+				cur_weight = -initialVal;
 			}
 
 		}
