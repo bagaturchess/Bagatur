@@ -2,10 +2,11 @@ package bagaturchess.learning.goldmiddle.impl7.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
+import bagaturchess.learning.goldmiddle.api.IEvalComponentsProcessor;
 import bagaturchess.learning.goldmiddle.impl7.base.EvalInfo;
+import bagaturchess.learning.goldmiddle.impl7.base.Evaluator;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
@@ -14,25 +15,31 @@ import bagaturchess.search.impl.eval.cache.IEvalCache;
 public class BagaturEvaluator_Phases extends BaseEvaluator {
 	
 	
-	private static final int MAX_MATERIAL_FACTOR = 4 * 3 + 4 * 3 + 4 * 5 + 2 * 9;
-	
-	
 	private final ChessBoard board;
-	
-	private final IBoardConfig board_cfg;
 	
 	private final EvalInfo evalInfo;
 	
+	private IEvalComponentsProcessor evalComponentsProcessor;
 	
-	protected BagaturEvaluator_Phases(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
+	
+	public BagaturEvaluator_Phases(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
+		
+		//this(_bitboard, _evalCache, _evalConfig, new EvalComponentsProcessor_Ones());
+		this(_bitboard, _evalCache, _evalConfig, new EvalComponentsProcessor_Weights());
+	}
+	
+	
+	protected BagaturEvaluator_Phases(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig, IEvalComponentsProcessor _evalComponentsProcessor) {
 		
 		super(_bitboard, _evalCache, _evalConfig);
 		
 		board = ((BoardImpl)bitboard).getChessBoard();
 		
-		board_cfg = bitboard.getBoardConfig();
+		evalComponentsProcessor = _evalComponentsProcessor;
 		
 		evalInfo = new EvalInfo();
+		
+		evalComponentsProcessor.setEvalInfo(evalInfo);
 	}
 	
 	
@@ -58,60 +65,150 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	@Override
 	protected int phase1() {
 		
-		int count_pawns = Long.bitCount(evalInfo.bb_w_pawns) - Long.bitCount(evalInfo.bb_b_pawns);
-		int count_knights = Long.bitCount(evalInfo.bb_w_knights) - Long.bitCount(evalInfo.bb_b_knights);
-		int count_bishops = Long.bitCount(evalInfo.bb_w_bishops) - Long.bitCount(evalInfo.bb_b_bishops);
-		int count_rooks = Long.bitCount(evalInfo.bb_w_rooks) - Long.bitCount(evalInfo.bb_b_rooks);
-		int count_queens = Long.bitCount(evalInfo.bb_w_queens) - Long.bitCount(evalInfo.bb_b_queens);
-		
-		int score_o = 0;
-		int score_e = 0;
-		
-		score_o += (int) (count_pawns * board_cfg.getMaterial_PAWN_O());
-		score_o += (int) (count_knights * board_cfg.getMaterial_KNIGHT_O());
-		score_o += (int) (count_bishops * board_cfg.getMaterial_BISHOP_O());
-		score_o += (int) (count_rooks * board_cfg.getMaterial_ROOK_O());
-		score_o += (int) (count_queens * board_cfg.getMaterial_QUEEN_O());
-		
-		score_e += (int) (count_pawns * board_cfg.getMaterial_PAWN_E());
-		score_e += (int) (count_knights * board_cfg.getMaterial_KNIGHT_E());
-		score_e += (int) (count_bishops * board_cfg.getMaterial_BISHOP_E());
-		score_e += (int) (count_rooks * board_cfg.getMaterial_ROOK_E());
-		score_e += (int) (count_queens * board_cfg.getMaterial_QUEEN_E());
-		
-		score_o += board.psqtScore_mg;
-		score_e += board.psqtScore_eg;
-		
-		int total_material_factor = Math.min(MAX_MATERIAL_FACTOR, board.material_factor_white + board.material_factor_black);
-		
-		return (int) (score_o * total_material_factor + score_e * (MAX_MATERIAL_FACTOR - total_material_factor)) / MAX_MATERIAL_FACTOR;
+		return Evaluator.eval1(bitboard.getBoardConfig(), board, evalInfo, evalComponentsProcessor);
 	}
 	
 	
 	@Override
 	protected int phase2() {
 		
-		return 0;
+		return Evaluator.eval2(board, evalInfo, evalComponentsProcessor);
 	}
 	
 	
 	@Override
 	protected int phase3() {
 		
-		return 0;
+		return Evaluator.eval3(board, evalInfo, evalComponentsProcessor);
 	}
 	
 	
 	@Override
 	protected int phase4() {
 		
-		return 0;
+		return Evaluator.eval4(board, evalInfo, evalComponentsProcessor);
 	}
 	
 	
 	@Override
 	protected int phase5() {
 		
-		return 0;
+		return Evaluator.eval5(board, evalInfo, evalComponentsProcessor);
+	}
+	
+	
+	private static final class EvalComponentsProcessor_Ones implements IEvalComponentsProcessor {
+		
+		
+		private EvalInfo evalinfo;
+		
+		
+		private EvalComponentsProcessor_Ones() {
+		}
+		
+		
+		@Override
+		public void setEvalInfo(Object _evalinfo) {
+			
+			evalinfo = (EvalInfo) _evalinfo;
+		}
+		
+		
+		@Override
+		public final void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
+			
+			if (evalPhaseID == EVAL_PHASE_ID_1) {
+				
+				evalinfo.eval_o_part1 += value_o;
+				
+				evalinfo.eval_e_part1 += value_e;
+				
+			} else if (evalPhaseID == EVAL_PHASE_ID_2) {
+				
+				evalinfo.eval_o_part2 += value_o;
+				
+				evalinfo.eval_e_part2 += value_e;
+				
+			} else if (evalPhaseID == EVAL_PHASE_ID_3) {
+				
+				evalinfo.eval_o_part3 += value_o;
+				
+				evalinfo.eval_e_part3 += value_e;
+					
+			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
+				
+				evalinfo.eval_o_part4 += value_o;
+					
+				evalinfo.eval_e_part4 += value_e;
+				
+			} else if (evalPhaseID == EVAL_PHASE_ID_5) {
+				
+				evalinfo.eval_o_part5 += value_o;
+				
+				evalinfo.eval_e_part5 += value_e;
+					
+			} else {
+				
+				throw new IllegalStateException();
+			}
+		}
+	}
+	
+	
+	private static final class EvalComponentsProcessor_Weights implements IEvalComponentsProcessor {
+		
+		
+		private EvalInfo evalinfo;
+		
+		
+		private EvalComponentsProcessor_Weights() {
+		}
+		
+		
+		@Override
+		public void setEvalInfo(Object _evalinfo) {
+			
+			evalinfo = (EvalInfo) _evalinfo;
+		}
+		
+		
+		@Override
+		public final void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e) {
+			
+			if (evalPhaseID == EVAL_PHASE_ID_1) {
+				
+				evalinfo.eval_o_part1 += value_o * weight_o;
+				
+				evalinfo.eval_e_part1 += value_e * weight_e;
+				
+			} else if (evalPhaseID == EVAL_PHASE_ID_2) {
+				
+				evalinfo.eval_o_part2 += value_o * weight_o;
+				
+				evalinfo.eval_e_part2 += value_e * weight_e;
+				
+			} else if (evalPhaseID == EVAL_PHASE_ID_3) {
+				
+				evalinfo.eval_o_part3 += value_o * weight_o;
+				
+				evalinfo.eval_e_part3 += value_e * weight_e;
+					
+			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
+				
+				evalinfo.eval_o_part4 += value_o * weight_o;
+					
+				evalinfo.eval_e_part4 += value_e * weight_e;
+				
+			} else if (evalPhaseID == EVAL_PHASE_ID_5) {
+				
+				evalinfo.eval_o_part5 += value_o * weight_o;
+				
+				evalinfo.eval_e_part5 += value_e * weight_e;
+					
+			} else {
+				
+				throw new IllegalStateException();
+			}
+		}
 	}
 }

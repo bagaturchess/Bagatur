@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.learning.goldmiddle.impl4.base;
+package bagaturchess.learning.goldmiddle.api;
 
 
 public interface IEvalComponentsProcessor {
@@ -28,7 +28,7 @@ public interface IEvalComponentsProcessor {
 	public static final int EVAL_PHASE_ID_4 = 3;
 	public static final int EVAL_PHASE_ID_5 = 4;
 	
-	public void setEvalInfo(EvalInfo evalinfo);
+	public void setEvalInfo(Object evalinfo);
 	
 	public void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e);
 }

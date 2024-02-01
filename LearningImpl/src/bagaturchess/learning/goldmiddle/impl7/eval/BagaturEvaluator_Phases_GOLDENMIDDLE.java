@@ -1,4 +1,4 @@
-package bagaturchess.learning.goldmiddle.impl4.eval;
+package bagaturchess.learning.goldmiddle.impl7.eval;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -6,9 +6,9 @@ import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.learning.api.IFeature;
 import bagaturchess.learning.goldmiddle.api.IEvalComponentsProcessor;
-import bagaturchess.learning.goldmiddle.impl4.base.EvalInfo;
-import bagaturchess.learning.goldmiddle.impl4.base.Evaluator;
-import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl;
+import bagaturchess.learning.goldmiddle.impl7.base.EvalInfo;
+import bagaturchess.learning.goldmiddle.impl7.base.Evaluator;
+import bagaturchess.learning.goldmiddle.impl7.filler.Bagatur_V41_FeaturesConfigurationImpl;
 import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
@@ -114,7 +114,7 @@ public class BagaturEvaluator_Phases_GOLDENMIDDLE extends BaseEvaluator {
 			
 			try {
 				
-				features_splitter = Features_Splitter.load(Features_Splitter.FEATURES_FILE_NAME, Bagatur_V20_FeaturesConfigurationImpl.class.getName());
+				features_splitter = Features_Splitter.load(Features_Splitter.FEATURES_FILE_NAME, Bagatur_V41_FeaturesConfigurationImpl.class.getName());
 				
 			} catch (Exception e) {
 

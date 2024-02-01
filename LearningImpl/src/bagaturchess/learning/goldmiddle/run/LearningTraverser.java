@@ -4,6 +4,7 @@ package bagaturchess.learning.goldmiddle.run;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConfigurationImpl;
+import bagaturchess.learning.goldmiddle.impl7.filler.Bagatur_V41_FeaturesConfigurationImpl;
 import bagaturchess.learning.goldmiddle.visitors.LearningVisitorImpl;
 import bagaturchess.learning.impl.features.baseimpl.Features;
 import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
@@ -40,7 +41,7 @@ public class LearningTraverser {
 			String filePath = "NNUE.cg";
 			
 			String filename_NN = Features_Splitter.FEATURES_FILE_NAME;
-			String features_class_name = Bagatur_V20_FeaturesConfigurationImpl.class.getName();
+			String features_class_name = Bagatur_V41_FeaturesConfigurationImpl.class.getName();
 			
 			
 			if (true) {
@@ -58,7 +59,7 @@ public class LearningTraverser {
 			}
 					
 			
-			IEvalConfig cfg = new bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Train();
+			IEvalConfig cfg = new bagaturchess.learning.goldmiddle.impl7.cfg.EvaluationConfig_V41_GOLDENMIDDLE_Train();
 			
 			PositionsVisitor learning = new LearningVisitorImpl(cfg);
 			

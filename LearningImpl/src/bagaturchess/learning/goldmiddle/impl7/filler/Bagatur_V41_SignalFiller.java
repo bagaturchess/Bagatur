@@ -17,8 +17,10 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.learning.goldmiddle.impl4.filler;
+package bagaturchess.learning.goldmiddle.impl7.filler;
 
+
+import java.nio.channels.IllegalSelectorException;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl1.BoardImpl;
@@ -27,12 +29,12 @@ import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.api.IEvalComponentsProcessor;
-import bagaturchess.learning.goldmiddle.impl4.base.EvalInfo;
-import bagaturchess.learning.goldmiddle.impl4.base.Evaluator;
+import bagaturchess.learning.goldmiddle.impl7.base.EvalInfo;
+import bagaturchess.learning.goldmiddle.impl7.base.Evaluator;
 import bagaturchess.search.api.IEvalConfig;
 
 
-public class Bagatur_V20_SignalFiller implements ISignalFiller {
+public class Bagatur_V41_SignalFiller implements ISignalFiller {
 	
 	
 	public static final IEvalConfig eval_config = new bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Train();
@@ -45,7 +47,7 @@ public class Bagatur_V20_SignalFiller implements ISignalFiller {
 	private final EvalInfo evalInfo;
 	
 	
-	public Bagatur_V20_SignalFiller(IBitBoard _bitboard) {
+	public Bagatur_V41_SignalFiller(IBitBoard _bitboard) {
 		
 		bitboard = _bitboard;
 		

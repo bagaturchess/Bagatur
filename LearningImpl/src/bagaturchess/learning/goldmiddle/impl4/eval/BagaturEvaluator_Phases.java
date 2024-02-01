@@ -4,9 +4,9 @@ package bagaturchess.learning.goldmiddle.impl4.eval;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
+import bagaturchess.learning.goldmiddle.api.IEvalComponentsProcessor;
 import bagaturchess.learning.goldmiddle.impl4.base.EvalInfo;
 import bagaturchess.learning.goldmiddle.impl4.base.Evaluator;
-import bagaturchess.learning.goldmiddle.impl4.base.IEvalComponentsProcessor;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_V20_FeaturesConstants;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
@@ -123,9 +123,9 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		
 		
 		@Override
-		public void setEvalInfo(EvalInfo _evalinfo) {
+		public void setEvalInfo(Object _evalinfo) {
 			
-			evalinfo = _evalinfo;
+			evalinfo = (EvalInfo) _evalinfo;
 		}
 		
 		
@@ -191,9 +191,9 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 		
 		
 		@Override
-		public void setEvalInfo(EvalInfo _evalinfo) {
+		public void setEvalInfo(Object _evalinfo) {
 			
-			evalinfo = _evalinfo;
+			evalinfo = (EvalInfo) _evalinfo;
 		}
 		
 		
