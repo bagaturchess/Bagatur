@@ -75,7 +75,7 @@ public class FeaturesEvaluator implements IEvaluator {
 		IFeature[] features = features_splitter.getFeatures(bitboard);
 		
 		
-		filler.fillByComplexity(IFeatureComplexity.STANDARD, signals);
+		filler.fillByComplexity(IFeatureComplexity.GROUP1, signals);
 		
 		double eval = 0;
 		

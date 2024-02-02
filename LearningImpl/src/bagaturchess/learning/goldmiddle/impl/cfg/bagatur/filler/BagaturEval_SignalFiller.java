@@ -95,19 +95,19 @@ public class BagaturEval_SignalFiller implements BagaturEval_FeaturesConstants, 
 	
 	public void fillByComplexity(int complexity, ISignals signals) {
 		switch(complexity) {
-			case IFeatureComplexity.STANDARD:
+			case IFeatureComplexity.GROUP1:
 				fillStandardSignals(signals);
 				return;
-			case IFeatureComplexity.PAWNS_STRUCTURE:
+			case IFeatureComplexity.GROUP2:
 				fillPawnSignals(signals);
 				return;
-			case IFeatureComplexity.PIECES_ITERATION:
+			case IFeatureComplexity.GROUP3:
 				fillPiecesIterationSignals(signals);
 				return;
-			case IFeatureComplexity.MOVES_ITERATION:
+			case IFeatureComplexity.GROUP4:
 				fillMovesIterationSignals(signals);
 				return;
-			case IFeatureComplexity.FIELDS_STATES_ITERATION:
+			case IFeatureComplexity.GROUP5:
 				//throw new UnsupportedOperationException("FIELDS_STATES_ITERATION");
 				return;
 			default:

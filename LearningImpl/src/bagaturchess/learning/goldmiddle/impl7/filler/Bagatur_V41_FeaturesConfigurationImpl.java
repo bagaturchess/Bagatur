@@ -25,37 +25,37 @@ public class Bagatur_V41_FeaturesConfigurationImpl implements IFeaturesConfigura
 		
 		
 		//Material
-		createFeature(new_featuresSet, FEATURE_ID_MATERIAL_PAWN       				, "MATERIAL.PAWN"       				, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_MATERIAL_KNIGHT     				, "MATERIAL.KNIGHT"     				, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_MATERIAL_BISHOP     				, "MATERIAL.BISHOP"     				, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_MATERIAL_ROOK       				, "MATERIAL.ROOK"       				, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_MATERIAL_QUEEN      				, "MATERIAL.QUEEN"      				, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_MATERIAL_PAWN       				, "MATERIAL.PAWN"       				, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_MATERIAL_KNIGHT     				, "MATERIAL.KNIGHT"     				, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_MATERIAL_BISHOP     				, "MATERIAL.BISHOP"     				, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_MATERIAL_ROOK       				, "MATERIAL.ROOK"       				, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_MATERIAL_QUEEN      				, "MATERIAL.QUEEN"      				, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
 		
 		
 		//Pawns
-		createFeature(new_featuresSet, FEATURE_ID_PAWN_DOUBLE						, "PAWN.DOUBLE"							, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_PAWN_CONNECTED					, "PAWN.CONNECTED"						, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_PAWN_NEIGHBOUR					, "PAWN.NEIGHBOUR"						, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_PAWN_ISOLATED						, "PAWN.ISOLATED"						, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_PAWN_BACKWARD						, "PAWN.BACKWARD"						, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_PAWN_INVERSE						, "PAWN.INVERSE"						, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_PAWN_PASSED						, "PAWN.PASSED"							, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_PAWN_PASSED_CANDIDATE				, "PAWN.PASSED.CANDIDATE"				, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_PAWN_PASSED_UNSTOPPABLE			, "PAWN.PASSED.UNSTOPPABLE"				, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
-		createFeature(new_featuresSet, FEATURE_ID_PAWN_SHIELD						, "PAWN.SHIELD"							, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_PAWN_DOUBLE						, "PAWN.DOUBLE"							, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_PAWN_CONNECTED					, "PAWN.CONNECTED"						, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_PAWN_NEIGHBOUR					, "PAWN.NEIGHBOUR"						, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_PAWN_ISOLATED						, "PAWN.ISOLATED"						, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_PAWN_BACKWARD						, "PAWN.BACKWARD"						, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_PAWN_INVERSE						, "PAWN.INVERSE"						, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_PAWN_PASSED						, "PAWN.PASSED"							, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_PAWN_PASSED_CANDIDATE				, "PAWN.PASSED.CANDIDATE"				, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_PAWN_PASSED_UNSTOPPABLE			, "PAWN.PASSED.UNSTOPPABLE"				, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_PAWN_SHIELD						, "PAWN.SHIELD"							, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
 		
 		
 		//Mobility
-		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_KNIGHT				, "MOBILITY.KNIGHT"						, STANDARD         , createArray(9, 0), createArray(9, 4), createArray(9, INITIAL_WEIGHT));
-		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_BISHOP				, "MOBILITY.BISHOP"						, STANDARD         , createArray(14, 0), createArray(14, 4), createArray(16, INITIAL_WEIGHT));
-		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_ROOK				, "MOBILITY.ROOK"						, STANDARD         , createArray(15, 0), createArray(15, 4), createArray(16, INITIAL_WEIGHT));
-		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_QUEEN				, "MOBILITY.QUEEN"						, STANDARD         , createArray(28, 0), createArray(28, 4), createArray(28, INITIAL_WEIGHT));
-		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_KING				, "MOBILITY.KING"						, STANDARD         , createArray(9, 0), createArray(9, 4), createArray(9, INITIAL_WEIGHT));
+		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_KNIGHT				, "MOBILITY.KNIGHT"						, GROUP1         , createArray(9, 0), createArray(9, 4), createArray(9, INITIAL_WEIGHT));
+		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_BISHOP				, "MOBILITY.BISHOP"						, GROUP1         , createArray(14, 0), createArray(14, 4), createArray(16, INITIAL_WEIGHT));
+		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_ROOK				, "MOBILITY.ROOK"						, GROUP1         , createArray(15, 0), createArray(15, 4), createArray(16, INITIAL_WEIGHT));
+		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_QUEEN				, "MOBILITY.QUEEN"						, GROUP1         , createArray(28, 0), createArray(28, 4), createArray(28, INITIAL_WEIGHT));
+		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_KING				, "MOBILITY.KING"						, GROUP1         , createArray(9, 0), createArray(9, 4), createArray(9, INITIAL_WEIGHT));
 
 		
 		//King safety and space
-		createFeature_Array(new_featuresSet, FEATURE_ID_KING_SAFETY					, "KING.SAFETY"							, STANDARD         , createArray(26, 0), createArray(26, 1000), createArray(26, INITIAL_WEIGHT));
-		createFeature(new_featuresSet, FEATURE_ID_SPACE								, "SPACE"								, STANDARD         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature_Array(new_featuresSet, FEATURE_ID_KING_SAFETY					, "KING.SAFETY"							, GROUP1         , createArray(26, 0), createArray(26, 1000), createArray(26, INITIAL_WEIGHT));
+		createFeature(new_featuresSet, FEATURE_ID_SPACE								, "SPACE"								, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
 
 		
 		int max_id = 0;

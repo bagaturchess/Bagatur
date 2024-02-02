@@ -123,16 +123,16 @@ public class Bagatur_V18_SignalFiller extends Evaluator implements ISignalFiller
 	@Override
 	public void fillByComplexity(int complexity, ISignals signals) {
 		switch(complexity) {
-			case IFeatureComplexity.STANDARD:
+			case IFeatureComplexity.GROUP1:
 				fill(signals);
 				return;
-			case IFeatureComplexity.PAWNS_STRUCTURE:
+			case IFeatureComplexity.GROUP2:
 				return;
-			case IFeatureComplexity.PIECES_ITERATION:
+			case IFeatureComplexity.GROUP3:
 				return;
-			case IFeatureComplexity.MOVES_ITERATION:
+			case IFeatureComplexity.GROUP4:
 				return;
-			case IFeatureComplexity.FIELDS_STATES_ITERATION:
+			case IFeatureComplexity.GROUP5:
 				return;
 			default:
 				throw new IllegalStateException("complexity=" + complexity);
