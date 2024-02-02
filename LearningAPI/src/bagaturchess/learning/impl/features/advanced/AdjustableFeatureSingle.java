@@ -92,6 +92,13 @@ public class AdjustableFeatureSingle extends AdjustableFeature {
 	
 	
 	@Override
+	public double getWeight(int index) {
+
+		throw new UnsupportedOperationException();
+	}
+	
+	
+	@Override
 	public double getLearningSpeed() {
 		
 		throw new UnsupportedOperationException();

@@ -15,8 +15,8 @@ public class AdjustableFeatureArray extends AdjustableFeature {
 	private static final long serialVersionUID = 2173196658581176792L;
 	
 	
-	protected Weight[] o_weights;
-	protected Weight[] e_weights;
+	protected Weight[] weights;
+	//protected Weight[] e_weights;
 	
 	
 	public AdjustableFeatureArray(int _id, String _name, int _complexity,
@@ -41,22 +41,6 @@ public class AdjustableFeatureArray extends AdjustableFeature {
 	}
 	
 	
-	/*@Override
-	protected void merge(AdjustableFeature other) {
-		super.merge(other);
-		if (other instanceof AdjustableFeatureArray) {
-			AdjustableFeatureArray other_arr = (AdjustableFeatureArray) other;
-			for (int i=0; i<o_weights.length; i++) {
-				o_weights[i].merge(other_arr.o_weights[i]);
-			}
-			
-			for (int i=0; i<e_weights.length; i++) {
-				e_weights[i].merge(other_arr.e_weights[i]);
-			}
-		}
-	}*/
-	
-	
 	@Override
 	public double getLearningSpeed() {
 
@@ -65,31 +49,22 @@ public class AdjustableFeatureArray extends AdjustableFeature {
 	
 	
 	public void clear() {
-		for (int i=0; i<o_weights.length; i++) {
-			o_weights[i].clear();
-		}
-		
-		for (int i=0; i<e_weights.length; i++) {
-			e_weights[i].clear();
+		for (int i=0; i<weights.length; i++) {
+			weights[i].clear();
 		}
 	}
 	
 	
 	public void createNewWeights(double[] _omin, double[] _omax, double[] oinitial,
 			double[] _emin, double[] _emax, double[] einitial) {
-		o_weights = new Weight[_omin.length];
-		for (int i=0; i<o_weights.length; i++) {
-			o_weights[i] = new Weight((int)_omin[i], (int)_omax[i], oinitial[i]);
-		}
-		
-		e_weights = new Weight[_emin.length];
-		for (int i=0; i<e_weights.length; i++) {
-			e_weights[i] = new Weight((int)_emin[i], (int)_emax[i], einitial[i]);
+		weights = new Weight[_omin.length];
+		for (int i=0; i<weights.length; i++) {
+			weights[i] = new Weight((int)_omin[i], (int)_omax[i], oinitial[i]);
 		}
 	}
 	
 	
-	public void adjust(ISignal signal, double amount, double openningPart) {
+	public void adjust(ISignal signal, double amount, double dummy) {
 		
 		SignalArray signalpst = (SignalArray)signal;
 		
@@ -104,42 +79,24 @@ public class AdjustableFeatureArray extends AdjustableFeature {
 			if (strengths[i] != 0) {
 				
 				if (strengths[i] < 0) {
-					adjust(id, -amount, openningPart);
+					adjust(id, -amount, dummy);
 				} else {
-					adjust(id, amount, openningPart);
+					adjust(id, amount, dummy);
 				}
 			}
 		}
 	}
 	
-	protected void adjust(int fieldID, double amount, double openingPart) {
+	protected void adjust(int fieldID, double amount, double dummy) {
 		
-		//if (amount == 0) throw new IllegalStateException("amount=" + amount);
-		
-		if (openingPart > 1) {
-			openingPart = 1;
-		}
-		
-		if (openingPart > 1 || openingPart < 0) {
-			throw new IllegalStateException("openingPart=" + openingPart);
-		}
-		
-		if (openingPart >= 0.5 ) {
-			o_weights[fieldID].adjust(amount);
-		} else {
-			e_weights[fieldID].adjust(amount);
-		}
+			weights[fieldID].adjust(amount);
 	}
 	
 
 	@Override
 	public void applyChanges() {
-		for (int i=0; i<o_weights.length; i++) {
-			o_weights[i].multiplyCurrentWeightByAmountAndDirection();
-		}
-		
-		for (int i=0; i<e_weights.length; i++) {
-			e_weights[i].multiplyCurrentWeightByAmountAndDirection();
+		for (int i=0; i<weights.length; i++) {
+			weights[i].multiplyCurrentWeightByAmountAndDirection();
 		}
 	}
 	
@@ -153,27 +110,28 @@ public class AdjustableFeatureArray extends AdjustableFeature {
 		
 		double result = 0;
 		for(int i=0; i<count; i++) {
-			result += strengths[i] * getWeight(ids[i], openningPart);
+			result += strengths[i] * getWeight(ids[i]);
 		}
 		
 		return result;
 	}
 	
-	
-	private double getWeight(int fieldID, double openningPart) {
-		return openningPart * o_weights[fieldID].getWeight()
-				+ (1 - openningPart) * e_weights[fieldID].getWeight();
-	}
-	
 	public ISignal createNewSignal() {
-		return new SignalArray(2 * o_weights.length);
+		return new SignalArray(2 * weights.length);
 	}
 	
 	
 	@Override
 	public double getWeight() {
+
+		throw new UnsupportedOperationException(); 
+	}
+	
+	
+	@Override
+	public double getWeight(int index) {
 		
-		throw new UnsupportedOperationException();
+		return weights[index].getWeight();
 	}
 	
 	
@@ -190,14 +148,10 @@ public class AdjustableFeatureArray extends AdjustableFeature {
 		//int linecounter = 0;
 		String o_line = "";
 		String e_line = "";
-		for (int fieldID=0; fieldID<o_weights.length; fieldID++) {
-			String o_cur = StringUtils.fill("" + (int)o_weights[fieldID].getWeight() + ", ", 2);
+		for (int fieldID=0; fieldID<weights.length; fieldID++) {
+			String o_cur = StringUtils.fill("" + weights[fieldID].getWeight() + ", ", 2);
 			o_cur += "  ";
 			o_line += o_cur;
-			
-			String e_cur = StringUtils.fill("" + (int)e_weights[fieldID].getWeight() + ", ", 2);
-			e_cur += "  ";
-			e_line += e_cur;
 		}
 	
 		matrix = o_line + "		" + e_line + "\r\n" + matrix;

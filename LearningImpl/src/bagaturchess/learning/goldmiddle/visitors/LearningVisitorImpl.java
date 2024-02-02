@@ -33,6 +33,7 @@ import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
+import bagaturchess.learning.impl.features.advanced.AdjustableFeatureArray;
 import bagaturchess.learning.impl.features.baseimpl.Features_Splitter;
 import bagaturchess.learning.impl.signals.Signals;
 import bagaturchess.search.api.IEvalConfig;
@@ -152,13 +153,24 @@ public class LearningVisitorImpl implements PositionsVisitor {
 					
 					if (filter.isAdjustable(featureID)) {
 						
-						ISignal cur_signal = signals.getSignal(featureID);
-						
-						if (cur_signal.getStrength() != 0) {
+						if (feature instanceof AdjustableFeatureArray) {
+							
+							ISignal cur_signal = signals.getSignal(featureID);
 							
 							double adjustment = deltaP > 0 ? 1 : -1;
-							
+								
 							((IAdjustableFeature) features[i]).adjust(cur_signal, adjustment, -1);
+							
+						} else {
+						
+							ISignal cur_signal = signals.getSignal(featureID);
+							
+							if (cur_signal.getStrength() != 0) {
+								
+								double adjustment = deltaP > 0 ? 1 : -1;
+								
+								((IAdjustableFeature) features[i]).adjust(cur_signal, adjustment, -1);
+							}
 						}
 					}
 				}

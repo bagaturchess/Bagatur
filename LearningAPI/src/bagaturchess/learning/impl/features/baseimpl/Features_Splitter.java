@@ -269,7 +269,7 @@ public class Features_Splitter {
 	
 	public static void dump(Features_Splitter splitter) {
 		
-		VarStatistic stats = new VarStatistic();
+		//VarStatistic stats = new VarStatistic();
 		
 		System.out.println("Features_Splitter.dump: ALL FEATURES");
 		
@@ -283,16 +283,16 @@ public class Features_Splitter {
 				
 				if (feature != null) {
 				
-					double current_weight_learning_rate = ((IAdjustableFeature) feature).getLearningSpeed();
+					//double current_weight_learning_rate = ((IAdjustableFeature) feature).getLearningSpeed();
 					
-					stats.addValue(current_weight_learning_rate);
+					//stats.addValue(current_weight_learning_rate);
 					
-					System.out.println("Features_Splitter.dump:" +  feature + ", Learning Rate=" + current_weight_learning_rate);
+					System.out.println("Features_Splitter.dump:" +  feature);
 				}
 			}
 		}
 		
-		System.out.println("Adaptive learning speed stats: AVG=" + stats.getEntropy() + ", STDEV=" + stats.getDisperse());
+		//System.out.println("Adaptive learning speed stats: AVG=" + stats.getEntropy() + ", STDEV=" + stats.getDisperse());
 	}
 	
 	

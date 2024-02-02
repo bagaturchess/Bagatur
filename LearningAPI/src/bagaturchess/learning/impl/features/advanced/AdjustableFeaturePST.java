@@ -44,14 +44,10 @@ public class AdjustableFeaturePST extends AdjustableFeatureArray {
 			
 			//if ((square & 0x88) == 0) {
 				
-				String o_cur = StringUtils.fill("" + (int)o_weights[fieldID].getWeight() + ", ", 2);
+				String o_cur = StringUtils.fill("" + (int)weights[fieldID].getWeight() + ", ", 2);
 				o_cur += "  ";
 				o_line += o_cur;
-				
-				String e_cur = StringUtils.fill("" + (int)e_weights[fieldID].getWeight() + ", ", 2);
-				e_cur += "  ";
-				e_line += e_cur;
-				
+								
 				linecounter++;
 				if (linecounter == 8) {
 					linecounter = 0;
@@ -84,7 +80,7 @@ public class AdjustableFeaturePST extends AdjustableFeatureArray {
 		//String e_line = "";
 		for (int fieldID=0; fieldID<Fields.ID_MAX; fieldID++) {
 			
-				String o_cur = StringUtils.fill("" + (int)e_weights[fieldID].getWeight(), 2);
+				String o_cur = StringUtils.fill("" + (int)weights[fieldID].getWeight(), 2);
 				o_cur += ",	";
 				o_line += o_cur;
 				

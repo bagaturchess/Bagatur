@@ -1,5 +1,6 @@
 package bagaturchess.learning.api;
 
+
 import java.io.Serializable;
 
 
@@ -9,6 +10,7 @@ public interface IFeature extends Comparable<IFeature>, Serializable {
 	public int getComplexity();
 	public String getName();
 	public double getWeight();
+	public double getWeight(int index);
 	
 	public ISignal createNewSignal();
 	public void adjust(ISignal signal, double amount, double openningPart);

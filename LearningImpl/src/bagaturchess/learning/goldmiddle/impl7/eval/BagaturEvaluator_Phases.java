@@ -152,6 +152,15 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				throw new IllegalStateException();
 			}
 		}
+		
+		
+		@Override
+		public void addEvalComponent(int evalPhaseID, int componentID,
+				int fieldID, int value_o, int value_e, double weight_o,
+				double weight_e) {
+
+			throw new UnsupportedOperationException();
+		}
 	}
 	
 	
@@ -209,6 +218,15 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				
 				throw new IllegalStateException();
 			}
+		}
+		
+		
+		@Override
+		public void addEvalComponent(int evalPhaseID, int componentID,
+				int fieldID, int value_o, int value_e, double weight_o,
+				double weight_e) {
+
+			throw new UnsupportedOperationException();
 		}
 	}
 }

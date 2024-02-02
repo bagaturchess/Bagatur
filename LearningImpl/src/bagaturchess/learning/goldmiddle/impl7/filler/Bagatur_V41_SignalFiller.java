@@ -20,8 +20,6 @@
 package bagaturchess.learning.goldmiddle.impl7.filler;
 
 
-import java.nio.channels.IllegalSelectorException;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
@@ -31,13 +29,9 @@ import bagaturchess.learning.api.ISignals;
 import bagaturchess.learning.goldmiddle.api.IEvalComponentsProcessor;
 import bagaturchess.learning.goldmiddle.impl7.base.EvalInfo;
 import bagaturchess.learning.goldmiddle.impl7.base.Evaluator;
-import bagaturchess.search.api.IEvalConfig;
 
 
 public class Bagatur_V41_SignalFiller implements ISignalFiller {
-	
-	
-	public static final IEvalConfig eval_config = new bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Train();
 	
 	
 	private final IBitBoard bitboard;
@@ -128,11 +122,33 @@ public class Bagatur_V41_SignalFiller implements ISignalFiller {
 				
 				throw new IllegalStateException("features_index=" + features_index);
 			}
-			
-			//signals.getSignal(componentID + 1000).addStrength(value_e, -1);
 		}
 
 
+		@Override
+		public void addEvalComponent(int evalPhaseID, int componentID,
+				int fieldID, int value_o, int value_e, double weight_o,
+				double weight_e) {
+
+			int total_factor = Math.min(63, bitboard.getMaterialFactor().getTotalFactor());
+			
+			int features_index = total_factor / 32;
+			
+			if (features_index == 0) {
+				
+				signals.getSignal(componentID).addStrength(fieldID, value_e, -1);
+				
+			} else if (features_index == 1) {
+				
+				signals.getSignal(componentID).addStrength(fieldID, value_o, -1);
+				
+			} else {
+				
+				throw new IllegalStateException("features_index=" + features_index);
+			}
+		}
+		
+		
 		@Override
 		public void setEvalInfo(Object evalinfo) {
 			

@@ -170,5 +170,47 @@ public class BagaturEvaluator_Phases_GOLDENMIDDLE extends BaseEvaluator {
 				throw new IllegalStateException();
 			}
 		}
+		
+		
+		@Override
+		public void addEvalComponent(int evalPhaseID, int componentID, int fieldID, int value_o, int value_e, double weight_o, double weight_e) {
+			
+			IFeature[] features = features_splitter.getFeatures(bitboard);
+			
+			if (evalPhaseID == EVAL_PHASE_ID_1) {
+				
+				evalinfo.eval_o_part1 += value_o * features[componentID].getWeight(fieldID);
+				
+				evalinfo.eval_e_part1 += value_e * features[componentID].getWeight(fieldID);
+				
+			} else if (evalPhaseID == EVAL_PHASE_ID_2) {
+				
+				evalinfo.eval_o_part2 += value_o * features[componentID].getWeight(fieldID);
+				
+				evalinfo.eval_e_part2 += value_e * features[componentID].getWeight(fieldID);
+				
+			} else if (evalPhaseID == EVAL_PHASE_ID_3) {
+				
+				evalinfo.eval_o_part3 += value_o * features[componentID].getWeight(fieldID);
+				
+				evalinfo.eval_e_part3 += value_e * features[componentID].getWeight(fieldID);
+					
+			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
+				
+				evalinfo.eval_o_part4 += value_o * features[componentID].getWeight(fieldID);
+					
+				evalinfo.eval_e_part4 += value_e * features[componentID].getWeight(fieldID);
+				
+			} else if (evalPhaseID == EVAL_PHASE_ID_5) {
+				
+				evalinfo.eval_o_part5 += value_o * features[componentID].getWeight(fieldID);
+				
+				evalinfo.eval_e_part5 += value_e * features[componentID].getWeight(fieldID);
+					
+			} else {
+				
+				throw new IllegalStateException();
+			}
+		}
 	}
 }

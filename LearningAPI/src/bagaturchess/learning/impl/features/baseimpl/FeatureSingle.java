@@ -112,6 +112,14 @@ public class FeatureSingle extends Feature {
 		throw new UnsupportedOperationException();
 	}
 	
+	
+	@Override
+	public double getWeight(int index) {
+
+		throw new UnsupportedOperationException();
+	}
+	
+	
 	private double getWeight(double openningPart) {
 		return openningPart * openning.getWeight() + (1 - openningPart) * endgame.getWeight();
 	}

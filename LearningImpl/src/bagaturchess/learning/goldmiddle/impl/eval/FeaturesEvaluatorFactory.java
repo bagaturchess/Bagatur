@@ -16,6 +16,7 @@ import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 public class FeaturesEvaluatorFactory implements IEvaluatorFactory {
 	
+	
 	public FeaturesEvaluatorFactory() {
 	}
 	

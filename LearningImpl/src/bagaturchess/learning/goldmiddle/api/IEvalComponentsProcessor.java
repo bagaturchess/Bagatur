@@ -31,4 +31,6 @@ public interface IEvalComponentsProcessor {
 	public void setEvalInfo(Object evalinfo);
 	
 	public void addEvalComponent(int evalPhaseID, int componentID, int value_o, int value_e, double weight_o, double weight_e);
+	
+	public void addEvalComponent(int evalPhaseID, int componentID, int fieldID, int value_o, int value_e, double weight_o, double weight_e);
 }

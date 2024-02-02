@@ -132,6 +132,15 @@ public class Bagatur_V20_SignalFiller implements ISignalFiller {
 
 
 		@Override
+		public void addEvalComponent(int evalPhaseID, int componentID,
+				int fieldID, int value_o, int value_e, double weight_o,
+				double weight_e) {
+
+			throw new UnsupportedOperationException();
+		}
+		
+		
+		@Override
 		public void setEvalInfo(Object evalinfo) {
 			
 			throw new UnsupportedOperationException();
