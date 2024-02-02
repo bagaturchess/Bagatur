@@ -70,25 +70,8 @@ public class Bagatur_V41_SignalFiller implements ISignalFiller {
 	
 	@Override
 	public void fillByComplexity(int complexity, ISignals signals) {
-		switch(complexity) {
-			case IFeatureComplexity.GROUP1:
-				fill(signals);
-				return;
-			case IFeatureComplexity.GROUP2:
-				//fillPawnSignals(signals);
-				return;
-			case IFeatureComplexity.GROUP3:
-				//fillPiecesIterationSignals(signals);
-				return;
-			case IFeatureComplexity.GROUP4:
-				//fillMovesIterationSignals(signals);
-				return;
-			case IFeatureComplexity.GROUP5:
-				//throw new UnsupportedOperationException("FIELDS_STATES_ITERATION");
-				return;
-			default:
-				throw new IllegalStateException("complexity=" + complexity);
-		}
+
+		throw new UnsupportedOperationException();
 	}
 	
 	

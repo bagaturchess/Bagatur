@@ -46,16 +46,16 @@ public class Bagatur_V41_FeaturesConfigurationImpl implements IFeaturesConfigura
 		
 		
 		//Mobility
-		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_KNIGHT				, "MOBILITY.KNIGHT"						, GROUP1         , createArray(9, 0), createArray(9, 4), createArray(9, INITIAL_WEIGHT));
-		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_BISHOP				, "MOBILITY.BISHOP"						, GROUP1         , createArray(14, 0), createArray(14, 4), createArray(16, INITIAL_WEIGHT));
-		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_ROOK				, "MOBILITY.ROOK"						, GROUP1         , createArray(15, 0), createArray(15, 4), createArray(16, INITIAL_WEIGHT));
-		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_QUEEN				, "MOBILITY.QUEEN"						, GROUP1         , createArray(28, 0), createArray(28, 4), createArray(28, INITIAL_WEIGHT));
-		createFeature_Array(new_featuresSet, FEATURE_ID_MOBILITY_KING				, "MOBILITY.KING"						, GROUP1         , createArray(9, 0), createArray(9, 4), createArray(9, INITIAL_WEIGHT));
+		createFeature(new_featuresSet, FEATURE_ID_MOBILITY_KNIGHT					, "MOBILITY.KNIGHT"						, GROUP2         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_MOBILITY_BISHOP					, "MOBILITY.BISHOP"						, GROUP2         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_MOBILITY_ROOK						, "MOBILITY.ROOK"						, GROUP2         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_MOBILITY_QUEEN					, "MOBILITY.QUEEN"						, GROUP2         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_MOBILITY_KING						, "MOBILITY.KING"						, GROUP2         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
 
 		
 		//King safety and space
-		createFeature_Array(new_featuresSet, FEATURE_ID_KING_SAFETY					, "KING.SAFETY"							, GROUP1         , createArray(26, 0), createArray(26, 1000), createArray(26, INITIAL_WEIGHT));
-		createFeature(new_featuresSet, FEATURE_ID_SPACE								, "SPACE"								, GROUP1         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_KING_SAFETY						, "KING.SAFETY"							, GROUP3         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
+		createFeature(new_featuresSet, FEATURE_ID_SPACE								, "SPACE"								, GROUP3         , 0, 4, INITIAL_WEIGHT, 0, 0,  0 );
 
 		
 		int max_id = 0;

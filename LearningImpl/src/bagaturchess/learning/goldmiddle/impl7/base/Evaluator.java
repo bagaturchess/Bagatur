@@ -947,7 +947,7 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 				moves = StaticMoves.KNIGHT_MOVES[Long.numberOfTrailingZeros(piece)];
 				evalInfo.updateAttacks(moves, NIGHT, color, kingArea);
 				int count = Long.bitCount(moves & safeMoves);
-				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_MOBILITY_KNIGHT, count,
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_MOBILITY_KNIGHT,
 						ChessConstants.COLOR_FACTOR[color] * EvalConstants.MOBILITY_KNIGHT_MG[count],
 						ChessConstants.COLOR_FACTOR[color] * EvalConstants.MOBILITY_KNIGHT_EG[count],
 						MOBILITY_KNIGHT_O, MOBILITY_KNIGHT_E);
@@ -960,7 +960,7 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 				moves = MagicUtil.getBishopMoves(Long.numberOfTrailingZeros(piece), evalInfo.bb_all ^ evalInfo.getPieces(color, QUEEN));
 				evalInfo.updateAttacks(moves, BISHOP, color, kingArea);
 				int count = Long.bitCount(moves & safeMoves);
-				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_MOBILITY_BISHOP, count,
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_MOBILITY_BISHOP,
 						ChessConstants.COLOR_FACTOR[color] * EvalConstants.MOBILITY_BISHOP_MG[count],
 						ChessConstants.COLOR_FACTOR[color] * EvalConstants.MOBILITY_BISHOP_EG[count],
 						MOBILITY_BISHOP_O, MOBILITY_BISHOP_E);
@@ -973,7 +973,7 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 				moves = MagicUtil.getRookMoves(Long.numberOfTrailingZeros(piece), evalInfo.bb_all ^ evalInfo.getPieces(color, ROOK) ^ evalInfo.getPieces(color, QUEEN));
 				evalInfo.updateAttacks(moves, ROOK, color, kingArea);
 				int count = Long.bitCount(moves & safeMoves);
-				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_MOBILITY_ROOK, count,
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_MOBILITY_ROOK,
 						ChessConstants.COLOR_FACTOR[color] * EvalConstants.MOBILITY_ROOK_MG[count],
 						ChessConstants.COLOR_FACTOR[color] * EvalConstants.MOBILITY_ROOK_EG[count],
 						MOBILITY_ROOK_O, MOBILITY_ROOK_E);
@@ -986,7 +986,7 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 				moves = MagicUtil.getQueenMoves(Long.numberOfTrailingZeros(piece), evalInfo.bb_all);
 				evalInfo.updateAttacks(moves, QUEEN, color, kingArea);
 				int count = Long.bitCount(moves & safeMoves);
-				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_MOBILITY_QUEEN, count,
+				evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_MOBILITY_QUEEN,
 						ChessConstants.COLOR_FACTOR[color] * EvalConstants.MOBILITY_QUEEN_MG[count],
 						ChessConstants.COLOR_FACTOR[color] * EvalConstants.MOBILITY_QUEEN_EG[count],
 						MOBILITY_QUEEN_O, MOBILITY_QUEEN_E);
@@ -1001,7 +1001,7 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 		evalInfo.doubleAttacks[WHITE] |= evalInfo.attacksAll[WHITE] & moves;
 		evalInfo.attacksAll[WHITE] |= moves;
 		int count = Long.bitCount(moves & ~evalInfo.getFriendlyPieces(WHITE) & ~evalInfo.attacksAll[BLACK]);
-		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_MOBILITY_KING, count,
+		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_MOBILITY_KING,
 				EvalConstants.MOBILITY_KING_MG[count],
 				EvalConstants.MOBILITY_KING_EG[count],
 				MOBILITY_KING_O, MOBILITY_KING_E);
@@ -1012,7 +1012,7 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 		evalInfo.doubleAttacks[BLACK] |= evalInfo.attacksAll[BLACK] & moves;
 		evalInfo.attacksAll[BLACK] |= moves;
 		count = Long.bitCount(moves & ~evalInfo.getFriendlyPieces(BLACK) & ~evalInfo.attacksAll[WHITE]);
-		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_MOBILITY_KING, count,
+		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_2, FEATURE_ID_MOBILITY_KING,
 				-EvalConstants.MOBILITY_KING_MG[count],
 				-EvalConstants.MOBILITY_KING_EG[count],
 				MOBILITY_KING_O, MOBILITY_KING_E);
@@ -1085,12 +1085,12 @@ public class Evaluator implements Bagatur_V41_FeaturesConstants, FeatureWeights 
 			
 			counter += EvalConstants.KS_ATTACK_PATTERN[evalInfo.kingAttackersFlag[enemyColor]];
 			score += ChessConstants.COLOR_FACTOR[enemyColor] * EvalConstants.KS_SCORES[Math.min(counter, EvalConstants.KS_SCORES.length - 1)];
-			
-			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_3, FEATURE_ID_KING_SAFETY, Math.min(counter, EvalConstants.KS_SCORES.length - 1), 
-					score,
-					score,
-					KING_SAFETY_O, KING_SAFETY_E);
 		}
+		
+		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_3, FEATURE_ID_KING_SAFETY,
+				score,
+				score,
+				KING_SAFETY_O, KING_SAFETY_E);
 	}
 	
 	
