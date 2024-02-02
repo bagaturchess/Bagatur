@@ -117,7 +117,7 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_5, FEATURE_ID_SPACE,
 				score1 + score2,
-				score1 + score2,
+				0,
 				SPACE_O, SPACE_E);
 	}
 
