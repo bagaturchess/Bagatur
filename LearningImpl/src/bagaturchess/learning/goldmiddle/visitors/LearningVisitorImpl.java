@@ -28,6 +28,7 @@ import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.learning.api.IAdjustableFeature;
 import bagaturchess.learning.api.IFeature;
+import bagaturchess.learning.api.IFeatureComplexity;
 import bagaturchess.learning.api.ISignal;
 import bagaturchess.learning.api.ISignalFiller;
 import bagaturchess.learning.api.ISignals;
@@ -147,7 +148,7 @@ public class LearningVisitorImpl implements PositionsVisitor {
 				
 				IFeature feature = features[i];
 				
-				if (feature != null) {
+				if (feature != null /*&& feature.getComplexity() == IFeatureComplexity.GROUP3*/) {
 					
 					int featureID = feature.getId();
 					
