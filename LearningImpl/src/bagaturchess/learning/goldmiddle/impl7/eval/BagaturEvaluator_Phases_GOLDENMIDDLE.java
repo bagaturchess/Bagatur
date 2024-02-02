@@ -177,7 +177,7 @@ public class BagaturEvaluator_Phases_GOLDENMIDDLE extends BaseEvaluator {
 		public void addEvalComponent(int evalPhaseID, int componentID, int fieldID, int value_o, int value_e, double weight_o, double weight_e) {
 			
 			IFeature[] features_o = features_splitter.getFeatures(1);
-			IFeature[] features_e = features_splitter.getFeatures(1);
+			IFeature[] features_e = features_splitter.getFeatures(0);
 			
 			if (evalPhaseID == EVAL_PHASE_ID_1) {
 				
