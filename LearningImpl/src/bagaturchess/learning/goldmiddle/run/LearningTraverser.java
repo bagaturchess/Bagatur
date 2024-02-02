@@ -40,14 +40,21 @@ public class LearningTraverser {
 			//String filePath = "stockfish-16.cg";
 			String filePath = "NNUE.cg";
 			
+			
+			ILearningInput input = LearningInputFactory.createDefaultInput();
+			
+			
 			String filename_NN = Features_Splitter.FEATURES_FILE_NAME;
-			String features_class_name = Bagatur_V41_FeaturesConfigurationImpl.class.getName();
+			String features_class_name = input.getFeaturesConfigurationClassName();
 			
 			
 			if (true) {
 				
 				Features_Splitter features = Features_Splitter.create(features_class_name);
 				Features_Splitter.store(filename_NN, features);
+				//Features.toJavaCode(features.getFeatures(1), "_O");
+				//Features.toJavaCode(features.getFeatures(0), "_E");
+				//System.exit(0);
 				//Features_Splitter.dump(features);
 			
 			} else {
@@ -59,11 +66,9 @@ public class LearningTraverser {
 			}
 					
 			
-			IEvalConfig cfg = new bagaturchess.learning.goldmiddle.impl7.cfg.EvaluationConfig_V41_GOLDENMIDDLE_Train();
+			IEvalConfig cfg = new bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Train();
 			
 			PositionsVisitor learning = new LearningVisitorImpl(cfg);
-			
-			ILearningInput input = LearningInputFactory.createDefaultInput();
 			
 			while (true) {
 				
