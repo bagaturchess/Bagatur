@@ -121,15 +121,15 @@ public class EvalConstants {
 	};		
 		
 	public static final int[] MOBILITY_KNIGHT_MG	= {-34, -16, -6, 0, 12, 16, 26, 28, 56};
-	public static final int[] MOBILITY_KNIGHT_EG	= {-98, -34, -12, 0, 4, 12, 12, 14, 4};
-	public static final int[] MOBILITY_BISHOP_MG	= {-16, 2, 16, 24, 28, 36, 38, 40, 36, 42, 58, 82, 28, 120};
-	public static final int[] MOBILITY_BISHOP_EG	= {-36, -8, 6, 18, 28, 28, 36, 38, 42, 40, 32, 34, 54, 32};
+	public static final int[] MOBILITY_KNIGHT_EG	= {-98, -34, -12, 0, 4, 12, 12, 14, 16};
+	public static final int[] MOBILITY_BISHOP_MG	= {-16, 2, 16, 24, 28, 36, 38, 40, 41, 42, 58, 82, 90, 120};
+	public static final int[] MOBILITY_BISHOP_EG	= {-36, -8, 6, 18, 28, 28, 36, 38, 42, 44, 46, 50, 54, 60};
 	public static final int[] MOBILITY_ROOK_MG 		= {-34, -24, -18, -14, -12, -4, 0, 8, 16, 26, 30, 40, 52, 68, 66};
 	public static final int[] MOBILITY_ROOK_EG 		= {-38, -12, 0, 8, 18, 24, 28, 28, 34, 34, 38, 40, 40, 42, 46};
-	public static final int[] MOBILITY_QUEEN_MG		= {-12, -14, -10, -14, -8, -6, -8, -8, -6, -4, -2, -2, -4, 2, 0, 0, 2, 16, 8, 22, 32, 66, 48, 156, 172, 236, 68, 336};
-	public static final int[] MOBILITY_QUEEN_EG 	= {-28, -82, -102, -82, -76, -54, -40, -24, -10, -2, 8, 24, 30, 32, 38, 54, 60, 46, 70, 72, 66, 66, 52, 18, -8, -32, 64, -94};
-	public static final int[] MOBILITY_KING_MG		= {-10, -12, -8, 0, 10, 26, 36, 70, 122};
-	public static final int[] MOBILITY_KING_EG		= {-38, -2, 8, 8, 2, -12, -12, -26, -60};
+	public static final int[] MOBILITY_QUEEN_MG		= {-16, -14, -12, -10, -8, -8, -6, -4, -4, -4, -2, -2, -2, 0, 0, 0, 2, 8, 16, 22, 32, 48, 66, 70, 80, 90, 100, 110};
+	public static final int[] MOBILITY_QUEEN_EG 	= {-102, -82, -82, -72, -63, -54, -40, -24, -10, -2, 8, 24, 30, 32, 38, 54, 60, 65, 70, 72, 74, 76, 78, 80, 82, 84, 86, 90};
+	public static final int[] MOBILITY_KING_MG		= {-12, -10, -8, 0, 10, 26, 36, 70, 85};
+	public static final int[] MOBILITY_KING_EG		= {-38, -2, 8, 8, 10, 12, 12, 26, 35};
 	
 	/** piece, color, square */
 	public static final int[][][] PSQT_MG			= new int[7][2][64];
