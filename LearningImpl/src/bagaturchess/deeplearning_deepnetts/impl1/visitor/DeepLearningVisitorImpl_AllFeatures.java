@@ -59,7 +59,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	private long startTime;
 	
 	private Bagatur_ALL_SignalFiller_InArray filler;
-	private double[] inputs_d;
+	//private double[] inputs_d;
 	private float[] inputs_f;
 	
 	private BackpropagationTrainer trainer;
@@ -83,7 +83,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	                .build();
 		}
         
-		inputs_d = new double[55];
+		//inputs_d = new double[55];
 		inputs_f = new float[55];
 		
 		dataset = new DataSetLearning();
@@ -117,14 +117,14 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 			throw new IllegalStateException("status=" + status);
 		}
 		
-		for (int i = 0; i < inputs_d.length; i++) {
-			inputs_d[i] = 0;
-		}
-		filler.fillSignals(inputs_d, 0);
+		//for (int i = 0; i < inputs_d.length; i++) {
+		//	inputs_d[i] = 0;
+		//}
+		filler.fillSignals(inputs_f, 0);
 		
-		for (int i = 0; i < inputs_d.length; i++) {
-			inputs_f[i] = (float) inputs_d[i];
-		}
+		//for (int i = 0; i < inputs_d.length; i++) {
+		//	inputs_f[i] = (float) inputs_d[i];
+		//}
 		
 		network.setInput(new Tensor(inputs_f));
 		network.forward();
@@ -135,7 +135,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval);
 		
 		
-		dataset.addItem(createCopy(inputs_f), new float[]{expectedWhitePlayerEval});
+		dataset.addItem(inputs_f, new float[]{expectedWhitePlayerEval});
         
         
 		counter++;
