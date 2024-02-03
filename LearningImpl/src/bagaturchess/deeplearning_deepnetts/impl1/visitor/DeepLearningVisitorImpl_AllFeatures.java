@@ -120,7 +120,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		for (int i = 0; i < inputs_d.length; i++) {
 			inputs_d[i] = 0;
 		}
-		filler.fillSignals(null, 0);
+		filler.fillSignals(inputs_d, 0);
 		
 		for (int i = 0; i < inputs_d.length; i++) {
 			inputs_f[i] = (float) inputs_d[i];

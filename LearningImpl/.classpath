@@ -11,7 +11,9 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Opening"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-nop-1.7.6.jar"/>
-	<classpathentry kind="lib" path="lib/deepnetts-1.2ce-dev.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NNUE"/>
+	<classpathentry kind="lib" path="lib/deepnetts-1.2ce-dev.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-api-2.7.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-core-2.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
