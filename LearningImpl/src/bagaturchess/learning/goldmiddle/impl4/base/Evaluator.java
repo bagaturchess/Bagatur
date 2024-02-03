@@ -897,7 +897,7 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 			score -= Long.bitCount(cb.castlingRights & 3) * EvalConstants.OTHER_SCORES[EvalConstants.IX_CASTLING];
 			evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_5, FEATURE_ID_OTHERS_CASTLING,
 					score,
-					score,
+					0,
 					OTHERS_CASTLING_O, OTHERS_CASTLING_E);
 		}
 	}
