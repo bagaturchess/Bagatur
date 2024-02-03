@@ -95,8 +95,8 @@ public class EvalConstants {
 	};	
 	
 	//concept borrowed from Ed Schroder
-	public static final int[] KS_SCORES = { //TODO negative values? //TODO first values are not used
-			0, -10, 0, 0, -150, -150, -130, -100, -50, 40, 
+	public static final int[] KS_SCORES = {
+			0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 
 			70, 80, 100, 110, 130, 160, 190, 240, 290, 
 			330, 400, 480, 540, 630, 620, 800 };
 	public static final int[] KS_QUEEN_TROPISM 		= {0, 0, 1, 1, 1, 1, 0, 0};	// index 0 and 1 are never evaluated	
