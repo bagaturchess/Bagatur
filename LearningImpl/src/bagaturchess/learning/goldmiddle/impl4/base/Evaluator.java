@@ -1084,7 +1084,7 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_3, FEATURE_ID_KING_SAFETY,
 				score,
-				score,
+				0,
 				KING_SAFETY_O, KING_SAFETY_E);
 	}
 	
