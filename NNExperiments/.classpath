@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/sapjvm_8"/>
+	<classpathentry kind="lib" path="lib/deepnetts-1.2ce-dev.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-api-2.7.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-core-2.7.jar"/>
+	<classpathentry kind="lib" path="lib/neuroph-core-2.94.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-nop-1.7.6.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Bitboard"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Search"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/LearningImpl"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/UCITracker"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -46,6 +46,17 @@ import deepnetts.util.FileIO;
 public class TDLeafLambda_NNUE_DeepNetts {
 	
 	
+	public static final IRootSearchConfig NNUE = new RootSearchConfig_BaseImpl_1Core(
+			
+		new String[] {
+				bagaturchess.search.impl.alg.impl1.Search_PVS_NWS.class.getName(),
+				bagaturchess.engines.cfg.base.SearchConfigImpl_AB_NNTraining.class.getName(),
+				bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20.class.getName(),
+				bagaturchess.deeplearning.impl_nnue.eval.EvaluationConfig.class.getName(),
+			}
+		);
+	
+	
 	public static void main(String[] args) {
 		
 		try {
@@ -65,7 +76,7 @@ public class TDLeafLambda_NNUE_DeepNetts {
 					}));
 			
 			
-			IRootSearchConfig cfg = RootSearchConfig_BaseImpl_1Core.NNUE;
+			IRootSearchConfig cfg = NNUE;
 		
 			SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
 		
