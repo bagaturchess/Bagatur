@@ -44,28 +44,13 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 	}
 	
 	
-	@Override
+	/*@Override
 	public int fullEval(int depth, int alpha, int beta, int rootColour) {
 		
-		int eval = super.fullEval(depth, alpha, beta, rootColour);
-		
-		/*
-		//countOnes++;
-		
-		if (Math.abs(eval) < 150) {
-			
-			countWeights++;
-			
-			evalComponentsProcessor = evalComponentsProcessor_weights;
-			
-			eval = super.fullEval(depth, alpha, beta, rootColour, false);
-			
-			//System.out.println("all: " + countOnes + ", weights " + countWeights);
-		}*/
-		
+		int eval = super.fullEval(depth, alpha, beta, rootColour);		
 		
 		return eval;
-	}
+	}*/
 	
 	
 	@Override
@@ -148,18 +133,11 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				
 				evalinfo.eval_o_part3 += value_o;
 				
-				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY) {
-					
-					evalinfo.eval_e_part3 += value_e;
-				}
+				evalinfo.eval_e_part3 += value_e;
 					
 			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
 				
-				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
-						&& componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE) {
-					
-					evalinfo.eval_o_part4 += value_o;
-				}
+				evalinfo.eval_o_part4 += value_o;
 					
 				evalinfo.eval_e_part4 += value_e;
 				
@@ -167,10 +145,7 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				
 				evalinfo.eval_o_part5 += value_o;
 				
-				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
-					
-					evalinfo.eval_e_part5 += value_e;
-				}
+				evalinfo.eval_e_part5 += value_e;
 					
 			} else {
 				
@@ -240,18 +215,11 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				
 				evalinfo.eval_o_part3 += value_o * weight_o;
 				
-				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY) {
-					
-					evalinfo.eval_e_part3 += value_e * weight_e;
-				}
+				evalinfo.eval_e_part3 += value_e * weight_e;
 					
 			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
 				
-				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
-						&& componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE) {
-					
-					evalinfo.eval_o_part4 += value_o * weight_o;
-				}
+				evalinfo.eval_o_part4 += value_o * weight_o;
 					
 				evalinfo.eval_e_part4 += value_e * weight_e;
 				
@@ -259,11 +227,8 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				
 				evalinfo.eval_o_part5 += value_o * weight_o;
 				
-				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
-					
-					evalinfo.eval_e_part5 += value_e * weight_e;
-				}
-					
+				evalinfo.eval_e_part5 += value_e * weight_e;
+									
 			} else {
 				
 				throw new IllegalStateException();
