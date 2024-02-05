@@ -25,8 +25,11 @@ package bagaturchess.deeplearning.impl_nnue.visitors;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
@@ -38,6 +41,7 @@ import bagaturchess.search.api.IEvaluator;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.net.NeuralNetwork;
+import deepnetts.net.layers.activation.ActivationType;
 import deepnetts.net.train.BackpropagationTrainer;
 import deepnetts.util.FileIO;
 import deepnetts.util.Tensor;
@@ -48,7 +52,7 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 	
 	private int counter;
 	
-	private NeuralNetwork network;
+	private ConvolutionalNetwork network;
 	
 	private double sumDiffs1;
 	private double sumDiffs2;
@@ -70,7 +74,23 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 			
 		} else {
 			
-			throw new IllegalStateException();
+			network = ConvolutionalNetwork.builder()
+						.addInputLayer(8, 8, 15)
+						//.addFullyConnectedLayer(12)
+						//.addConvolutionalLayer(2, 2, 15)
+						//.addConvolutionalLayer(4, 4, 15)
+						//.addConvolutionalLayer(8, 8, 15)
+						.hiddenActivationFunction(ActivationType.TANH)
+						//.addMaxPoolingLayer(2, 2, 1)
+						//.addConvolutionalLayer(3, 3, 15)
+						//.addMaxPoolingLayer(2, 2, 1)
+						.addOutputLayer(1, ActivationType.LINEAR)
+						.build();
+			
+			//network.getTrainer().setBatchMode(true);
+			//network.getTrainer().setBatchSize(1000);
+			
+			//throw new IlrlegalStateException();
 		}
 		
 		
@@ -116,15 +136,15 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 		double actualWhitePlayerEval = outputs[0];
 		
 		
-		sumDiffs1 += Math.abs(0 - ActivationFunction.SIGMOID.gety(expectedWhitePlayerEval));
-		sumDiffs2 += Math.abs(ActivationFunction.SIGMOID.gety(expectedWhitePlayerEval) - actualWhitePlayerEval);
+		sumDiffs1 += Math.abs(0 - expectedWhitePlayerEval);
+		sumDiffs2 += Math.abs(expectedWhitePlayerEval - Math.signum(actualWhitePlayerEval) * ActivationFunction.SIGMOID.getx((float) Math.abs(actualWhitePlayerEval)));
         
-        
+		//System.out.println();
 		counter++;
 		
 		if ((counter % 10000) == 0) {
 			
-			System.out.println("Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, positions: " + counter);
+			//System.out.println("Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, positions: " + counter);
 		}
 	}
 	
@@ -143,6 +163,22 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 	
 	public void end() {
 		
-		System.out.println("END: positions=" + counter);
+		System.out.println("END: Positions=" + counter + ", Time " + (System.currentTimeMillis() - startTime) + "ms, "
+				+ "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, "
+				//+ "Error: " + network.getTrainer().getMaxError() + ", Loss: " + network.getTrainer().getTrainingLoss()
+				);
+		
+		/*try {
+			
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(NNUE_Constants.NET_FILE));
+			
+			oos.writeObject(network);
+			
+			oos.close();			
+
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}*/
 	}
 }

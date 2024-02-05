@@ -21,14 +21,18 @@ public class DeepLearningTraverser_NNUE_PrintSuccessRate {
 			//String filePath = "./Houdini.15a.short.cg";
 			//String filePath = "./Houdini.15a.cg";
 			//String filePath = "./Arasan13.1.cg";
-			String filePath = "./stockfish-14.1.cg";
+			//String filePath = "./stockfish-14.1.cg";
 			//String filePath = "./glaurung-2.2.cg";
+			String filePath = "./NNUE.cg";
 			
 			DeepLearningVisitorImpl_NNUE_PrintSuccessRate printer = new DeepLearningVisitorImpl_NNUE_PrintSuccessRate();
 			
 			ILearningInput input = LearningInputFactory.createDefaultInput();
 			
-			PositionsTraverser.traverseAll(filePath, printer, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
+			while (true) {
+				
+				PositionsTraverser.traverseAll(filePath, printer, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
+			}
 			
 		} catch (Exception e) {
 			
