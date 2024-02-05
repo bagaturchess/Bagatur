@@ -4,9 +4,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Bitboard"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/LearningImpl"/>
-	<classpathentry kind="lib" path="/LearningImpl/lib/commons-lang3-3.8.jar"/>
-	<classpathentry kind="lib" path="/LearningImpl/lib/neuroph-core-2.94.jar"/>
-	<classpathentry kind="lib" path="/LearningImpl/lib/slf4j-api-1.7.5.jar"/>
-	<classpathentry kind="lib" path="/LearningImpl/lib/slf4j-nop-1.7.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
