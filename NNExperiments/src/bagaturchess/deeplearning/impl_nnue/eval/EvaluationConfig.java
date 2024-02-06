@@ -8,12 +8,12 @@ public class EvaluationConfig implements IEvalConfig {
 	
 	@Override
 	public boolean useLazyEval() {
-		return false;
+		return true;
 	}
 	
 	@Override
 	public boolean useEvalCache() {
-		return false;
+		return true;
 	}
 	
 	@Override

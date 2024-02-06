@@ -4,9 +4,23 @@ package bagaturchess.deeplearning;
 public abstract class ActivationFunction {
 	
 	
-	public static final ActivationFunction SIGMOID = new Sigmoid(7777);
+	public static final ActivationFunction SIGMOID = new Sigmoid(9999);
 	
-	public static final ActivationFunction LINEAR = new Linear(7777);
+	public static final ActivationFunction LINEAR = new Linear(9999);
+	
+	
+	public static void main(String[] args) {
+		
+		float black_win = ActivationFunction.SIGMOID.getx(0.03f);
+		float draw = ActivationFunction.SIGMOID.getx(0.5f);
+		float white_win = ActivationFunction.SIGMOID.getx(0.97f);
+		
+		System.out.println("black_win=" + black_win + ", draw=" + draw + ", white_win=" + white_win);
+		
+		System.out.println(ActivationFunction.SIGMOID.gety(black_win));
+		System.out.println(ActivationFunction.SIGMOID.gety(draw));
+		System.out.println(ActivationFunction.SIGMOID.gety(white_win));
+	}
 	
 	
 	protected float max_x;
@@ -26,7 +40,7 @@ public abstract class ActivationFunction {
 	public static final class Sigmoid extends ActivationFunction {
 
 		
-		private static final double SIGMOID_LOG_BASE 	= 1.005;
+		private static final double SIGMOID_LOG_BASE 	= 1.0004;
 		
 		
 		protected Sigmoid(float max) {
@@ -61,7 +75,7 @@ public abstract class ActivationFunction {
 			
 			float x = (float) (Math.log(y / (1d - y)) / Math.log(SIGMOID_LOG_BASE));
 			
-			if (x < -max_x) {
+			/*if (x < -max_x) {
 				
 				x = -max_x;
 			}
@@ -69,7 +83,7 @@ public abstract class ActivationFunction {
 			if (x > max_x) {
 				
 				x = max_x;
-			}
+			}*/
 			
 			return x;
 		}

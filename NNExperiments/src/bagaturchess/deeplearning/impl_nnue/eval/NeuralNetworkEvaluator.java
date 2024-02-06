@@ -23,7 +23,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	float[][][] inputs_3d = new float[8][8][15];
 	
-	private ActivationFunction activation_function = ActivationFunction.SIGMOID;
+	//private ActivationFunction activation_function = ActivationFunction.SIGMOID;
 	
 	
 	NeuralNetworkEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -60,7 +60,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 		
 		float actualWhitePlayerEval = network.getOutput()[0];
 
-		actualWhitePlayerEval = activation_function.SIGMOID.getx(actualWhitePlayerEval);
+		actualWhitePlayerEval = ActivationFunction.SIGMOID.getx(actualWhitePlayerEval);
 		
 		return (int) actualWhitePlayerEval;
 	}

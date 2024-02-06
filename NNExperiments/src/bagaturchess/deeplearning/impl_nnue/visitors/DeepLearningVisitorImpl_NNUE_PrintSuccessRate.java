@@ -79,15 +79,17 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 			network = ConvolutionalNetwork.builder()
 						.addInputLayer(8, 8, 15)
 						//.addFullyConnectedLayer(12)
-						//.addConvolutionalLayer(2, 2, 15)
+						.addConvolutionalLayer(2, 2, 15)
 						//.addConvolutionalLayer(4, 4, 15)
 						//.addConvolutionalLayer(8, 8, 15)
 						.hiddenActivationFunction(ActivationType.TANH)
 						//.addMaxPoolingLayer(2, 2, 1)
 						//.addConvolutionalLayer(3, 3, 15)
 						//.addMaxPoolingLayer(2, 2, 1)
-						.addOutputLayer(1, ActivationType.LINEAR)
+						.addOutputLayer(1, ActivationType.SIGMOID)
 						.build();
+			
+			network.getTrainer().setLearningRate(1f);
 			
 			//network.getTrainer().setBatchMode(true);
 			//network.getTrainer().setBatchSize(1000);
@@ -150,13 +152,16 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 		
 		double actualWhitePlayerEval = outputs[0];
 		
+		double actualWhitePlayerEval_x = ActivationFunction.SIGMOID.getx((float) actualWhitePlayerEval);
+		double expectedWhitePlayerEval_y = ActivationFunction.SIGMOID.gety(expectedWhitePlayerEval);
 		
 		sumDiffs1 += Math.abs(0 - expectedWhitePlayerEval);
-		sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval);
+		//sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval);
 		//sumDiffs2 += Math.abs(expectedWhitePlayerEval - Math.signum(actualWhitePlayerEval) * ActivationFunction.SIGMOID.getx((float) Math.abs(actualWhitePlayerEval)));
+		sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval_x);
 		
 		DataSet_1 dataset = new DataSet_1();
-		dataset.addItem(tensor, new float[] {expectedWhitePlayerEval});
+		dataset.addItem(tensor, new float[] {(float) expectedWhitePlayerEval_y});
 		network.getTrainer().train(dataset);
 
 		
@@ -165,7 +170,7 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 		
 		if ((counter % 10000) == 0) {
 			
-			//System.out.println("Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, positions: " + counter);
+			System.out.println("Time " + (System.currentTimeMillis() - startTime) + "ms, " + "Success: " + (100 * (1 - (sumDiffs2 / sumDiffs1))) + "%, positions: " + counter);
 		}
 	}
 	
@@ -189,7 +194,7 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 				//+ "Error: " + network.getTrainer().getMaxError() + ", Loss: " + network.getTrainer().getTrainingLoss()
 				);
 		
-		/*try {
+		try {
 			
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(NNUE_Constants.NET_FILE));
 			
@@ -200,6 +205,6 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 		} catch (Exception e) {
 			
 			e.printStackTrace();
-		}*/
+		}
 	}
 }

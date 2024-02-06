@@ -23,7 +23,7 @@ public class DeepLearningTraverser_NNUE_PrintSuccessRate {
 			//String filePath = "./Arasan13.1.cg";
 			//String filePath = "./stockfish-14.1.cg";
 			//String filePath = "./glaurung-2.2.cg";
-			String filePath = "./NNUE.cg";
+			String filePath = "./NNUE_big.cg";
 			
 			DeepLearningVisitorImpl_NNUE_PrintSuccessRate printer = new DeepLearningVisitorImpl_NNUE_PrintSuccessRate();
 			
