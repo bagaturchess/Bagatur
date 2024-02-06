@@ -43,6 +43,8 @@ import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.net.NeuralNetwork;
 import deepnetts.net.layers.activation.ActivationType;
 import deepnetts.net.train.BackpropagationTrainer;
+import deepnetts.net.train.TrainingEvent;
+import deepnetts.net.train.TrainingListener;
 import deepnetts.util.FileIO;
 import deepnetts.util.Tensor;
 
@@ -91,6 +93,19 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 			//network.getTrainer().setBatchSize(1000);
 			
 			//throw new IlrlegalStateException();
+			
+			
+			network.getTrainer().addListener(new TrainingListener() {
+				
+				@Override
+				public void handleEvent(TrainingEvent event) {
+					
+					if (event.getType() == TrainingEvent.Type.EPOCH_FINISHED) {
+						
+						event.getSource().stop();
+					}
+				}
+			});
 		}
 		
 		
@@ -137,8 +152,14 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 		
 		
 		sumDiffs1 += Math.abs(0 - expectedWhitePlayerEval);
-		sumDiffs2 += Math.abs(expectedWhitePlayerEval - Math.signum(actualWhitePlayerEval) * ActivationFunction.SIGMOID.getx((float) Math.abs(actualWhitePlayerEval)));
-        
+		sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval);
+		//sumDiffs2 += Math.abs(expectedWhitePlayerEval - Math.signum(actualWhitePlayerEval) * ActivationFunction.SIGMOID.getx((float) Math.abs(actualWhitePlayerEval)));
+		
+		DataSet_1 dataset = new DataSet_1();
+		dataset.addItem(tensor, new float[] {expectedWhitePlayerEval});
+		network.getTrainer().train(dataset);
+
+		
 		//System.out.println();
 		counter++;
 		

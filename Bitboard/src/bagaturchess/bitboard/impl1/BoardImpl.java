@@ -84,7 +84,7 @@ public class BoardImpl implements IBitBoard {
 	
 	private NNUE_Input nnue_input;
 	
-	private boolean enable_NNUE_Input = false;
+	private boolean enable_NNUE_Input = true;
 	
 	protected IBoard.CastlingType[] castledByColour;
 	
