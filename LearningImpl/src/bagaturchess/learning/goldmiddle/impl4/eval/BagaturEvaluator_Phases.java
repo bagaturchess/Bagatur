@@ -133,11 +133,19 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				
 				evalinfo.eval_o_part3 += value_o;
 				
-				evalinfo.eval_e_part3 += value_e;
+				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_KING_SAFETY) {
+					
+					evalinfo.eval_e_part3 += value_e;
+				}
 					
 			} else if (evalPhaseID == EVAL_PHASE_ID_4) {
 				
-				evalinfo.eval_o_part4 += value_o;
+				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED
+						//&& componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_PAWN_PASSED_UNSTOPPABLE
+						) {
+					
+					evalinfo.eval_o_part4 += value_o;
+				}
 					
 				evalinfo.eval_e_part4 += value_e;
 				
@@ -145,7 +153,10 @@ public class BagaturEvaluator_Phases extends BaseEvaluator {
 				
 				evalinfo.eval_o_part5 += value_o;
 				
-				evalinfo.eval_e_part5 += value_e;
+				if (componentID != Bagatur_V20_FeaturesConstants.FEATURE_ID_SPACE) {
+					
+					evalinfo.eval_e_part5 += value_e;
+				}
 					
 			} else {
 				

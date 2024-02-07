@@ -117,7 +117,7 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_5, FEATURE_ID_SPACE,
 				score1 + score2,
-				0,
+				score1 + score2,
 				SPACE_O, SPACE_E);
 	}
 
@@ -1084,7 +1084,7 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 		
 		evalComponentsProcessor.addEvalComponent(EVAL_PHASE_ID_3, FEATURE_ID_KING_SAFETY,
 				score,
-				0,
+				score,
 				KING_SAFETY_O, KING_SAFETY_E);
 	}
 	
@@ -1297,13 +1297,13 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 	private static int getBlackPromotionDistance(final int index, final EvalInfo evalInfo) {
 		// check if it cannot be stopped
 		int promotionDistance = index >>> 3;
-		if (promotionDistance == 1 && evalInfo.colorToMove == BLACK) {
+		/*if (promotionDistance == 1 && evalInfo.colorToMove == BLACK) {
 			if ((Util.POWER_LOOKUP[index - 8] & (evalInfo.attacksAll[WHITE] | evalInfo.bb_all)) == 0) {
 				if ((Util.POWER_LOOKUP[index] & evalInfo.attacksAll[WHITE]) == 0) {
 					return 1;
 				}
 			}
-		} else if (MaterialUtil.onlyWhitePawnsOrOneNightOrBishop(evalInfo.materialKey)) {
+		} else*/ if (!MaterialUtil.hasWhiteNonPawnPieces(evalInfo.materialKey)) {
 
 			// check if it is my turn
 			if (evalInfo.colorToMove == WHITE) {
@@ -1348,13 +1348,13 @@ public class Evaluator implements Bagatur_V20_FeaturesConstants, FeatureWeights 
 	private static int getWhitePromotionDistance(final int index, final EvalInfo evalInfo) {
 		// check if it cannot be stopped
 		int promotionDistance = 7 - index / 8;
-		if (promotionDistance == 1 && evalInfo.colorToMove == WHITE) {
+		/*if (promotionDistance == 1 && evalInfo.colorToMove == WHITE) {
 			if ((Util.POWER_LOOKUP[index + 8] & (evalInfo.attacksAll[BLACK] | evalInfo.bb_all)) == 0) {
 				if ((Util.POWER_LOOKUP[index] & evalInfo.attacksAll[BLACK]) == 0) {
 					return 1;
 				}
 			}
-		} else if (MaterialUtil.onlyBlackPawnsOrOneNightOrBishop(evalInfo.materialKey)) {
+		} else*/ if (!MaterialUtil.hasBlackNonPawnPieces(evalInfo.materialKey)) {
 
 			// check if it is my turn
 			if (evalInfo.colorToMove == BLACK) {
