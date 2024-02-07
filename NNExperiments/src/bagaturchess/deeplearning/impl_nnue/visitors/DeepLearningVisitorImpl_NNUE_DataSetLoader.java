@@ -38,7 +38,7 @@ import deepnetts.util.Tensor;
 public class DeepLearningVisitorImpl_NNUE_DataSetLoader implements PositionsVisitor {
 	
 	
-	private static final float DATASET_USAGE_PERCENT = 0.33f;
+	private static final float DATASET_USAGE_PERCENT = 1f;
 	
 	
 	private long startTime;	
