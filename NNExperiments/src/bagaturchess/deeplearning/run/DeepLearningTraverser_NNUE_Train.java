@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 
 import deepnetts.net.ConvolutionalNetwork;
+import deepnetts.net.FeedForwardNetwork;
 import deepnetts.net.NeuralNetwork;
 import deepnetts.net.layers.activation.ActivationType;
 import deepnetts.net.train.TrainingEvent;
@@ -43,7 +44,7 @@ public class DeepLearningTraverser_NNUE_Train {
 			
 			PositionsTraverser.traverseAll(filePath, loader, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
 			
-			ConvolutionalNetwork network = createConvolutionalNetwork();
+			NeuralNetwork network = createConvolutionalNetwork();
 			
 			while (true) {
 				
@@ -67,11 +68,14 @@ public class DeepLearningTraverser_NNUE_Train {
 	}
 	
 	
-	private static ConvolutionalNetwork createConvolutionalNetwork() {
+	private static NeuralNetwork createConvolutionalNetwork() {
 		
 		ConvolutionalNetwork network = ConvolutionalNetwork.builder()
 				.addInputLayer(8, 8, 15)
-				.addFullyConnectedLayer(64)
+				//.addFullyConnectedLayer(8)
+				.addFullyConnectedLayer(4)
+				.addFullyConnectedLayer(2)
+				.addFullyConnectedLayer(1)
 				//.addConvolutionalLayer(2, 2, 15)
 				//.addConvolutionalLayer(4, 4, 15)
 				//.addConvolutionalLayer(8, 8, 15)
@@ -104,8 +108,8 @@ public class DeepLearningTraverser_NNUE_Train {
 					
 					System.out.println(
 							"Epoch: " + epoch
-							+ ", Accuracy: " + event.getSource().getTrainingAccuracy()
-							+ ", Loss: " + event.getSource().getTrainingLoss()
+							//+ ", Accuracy: " + event.getSource().getTrainingAccuracy()
+							//+ ", Loss: " + event.getSource().getTrainingLoss()
 						);
 					
 					epoch++;
@@ -115,8 +119,8 @@ public class DeepLearningTraverser_NNUE_Train {
 		
 		return network;
 	}
-	
-	
+
+
 	private static void saveNetwork(NeuralNetwork network) {
 		
 		try {
