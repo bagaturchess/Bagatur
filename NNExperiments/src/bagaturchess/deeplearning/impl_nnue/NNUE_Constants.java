@@ -31,6 +31,21 @@ public class NNUE_Constants {
 	public static final String NET_FILE = "nnue.dn.bin";
 	
 	
+	public static final void clear3DArray(float[][][] inputs_3d) {
+		
+	    for (int i = 0; i < inputs_3d.length; i++) {
+	    	
+	        for (int j = 0; j < inputs_3d[i].length; j++) {
+	        	
+	            for (int k = 0; k < inputs_3d[i][j].length; k++) {
+	            	
+	                inputs_3d[i][j][k] = 0.0f;
+	            }
+	        }
+	    }	
+	}
+	
+	
 	public static final Tensor createInput(IBitBoard bitboard, float[][][] result_inputs_3d) {
 		
 		/*float[] inputs_1d = (float[]) bitboard.getNNUEInputs();

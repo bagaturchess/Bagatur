@@ -75,14 +75,15 @@ public class DeepLearningTraverser_NNUE_Train {
 				//.addConvolutionalLayer(2, 2, 15)
 				//.addConvolutionalLayer(4, 4, 15)
 				//.addConvolutionalLayer(8, 8, 15)
-				.hiddenActivationFunction(ActivationType.TANH)
 				//.addMaxPoolingLayer(2, 2, 1)
 				//.addConvolutionalLayer(3, 3, 15)
 				//.addMaxPoolingLayer(2, 2, 1)
+				.hiddenActivationFunction(ActivationType.TANH)
+				.randomSeed(135)
 				.addOutputLayer(1, ActivationType.SIGMOID)
 				.build();
-	
-		network.getTrainer().setLearningRate(1f);
+		
+		network.getTrainer().setLearningRate(0.5f);
 		
 		network.getTrainer().setBatchMode(true);
 		//network.getTrainer().setBatchSize(10000);

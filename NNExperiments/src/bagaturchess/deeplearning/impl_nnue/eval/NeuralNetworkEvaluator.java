@@ -51,6 +51,8 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	@Override
 	protected int phase1() {
 		
+		NNUE_Constants.clear3DArray(inputs_3d);
+		
 		Tensor tensor = NNUE_Constants.createInput(bitboard, inputs_3d);
 		
 		network.setInput(tensor);
