@@ -23,33 +23,38 @@
 package bagaturchess.deeplearning.impl_nnue.visitors;
 
 
-import javax.visrec.ml.data.DataSet;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.deeplearning.ActivationFunction;
 import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.ucitracker.api.PositionsVisitor;
-import deepnetts.data.MLDataItem;
+import deepnetts.net.ConvolutionalNetwork;
 import deepnetts.util.Tensor;
 
 
-public class DeepLearningVisitorImpl_NNUE_DataSetLoader implements PositionsVisitor {
+public class DeepLearningVisitorImpl_NNUE_Train_Convolutional implements PositionsVisitor {
 	
 	
-	private static final float DATASET_USAGE_PERCENT = 1f;
+	private static int CHUNK_SIZE = 10000;
 	
 	
 	private long startTime;	
 	
-	private int counter;
+	private int counter_positions;
 	
-	private DataSet_1 dataset = new DataSet_1();
+	private int counter_chunks;
+	
+	private DataSet_1 dataset;
+	
+	private ConvolutionalNetwork network;
 	
 	
-	public DeepLearningVisitorImpl_NNUE_DataSetLoader() throws Exception {
+	public DeepLearningVisitorImpl_NNUE_Train_Convolutional(ConvolutionalNetwork _network) throws Exception {
 		
+		dataset = new DataSet_1();
+		
+		network = _network;
 	}
 	
 	
@@ -68,14 +73,7 @@ public class DeepLearningVisitorImpl_NNUE_DataSetLoader implements PositionsVisi
 		}
 		
 		
-		if (Math.random() > DATASET_USAGE_PERCENT) {
-			
-			return;
-		}
-		
-		
 		float[][][] inputs_3d = new float[8][8][15];
-		
 		Tensor input = NNUE_Constants.createInput(bitboard, inputs_3d);
         
         float[] output = new float[1];
@@ -83,13 +81,24 @@ public class DeepLearningVisitorImpl_NNUE_DataSetLoader implements PositionsVisi
         
         dataset.addItem(input, output);
         
-        
-		counter++;
+		counter_positions++;
 		
-		if ((counter % 100000) == 0) {
+		if ((counter_positions % 100000) == 0) {
 			
-			System.out.println("Time " + (System.currentTimeMillis() - startTime) + "ms, positions: " + counter);
+			//System.out.println("Time " + (System.currentTimeMillis() - startTime) + "ms, positions: " + counter_positions);
 			
+		}
+		
+		
+		if (counter_positions % CHUNK_SIZE == 0) {
+			
+			counter_chunks++;
+			
+			network.getTrainer().train(dataset);
+			
+			//System.out.println("Chunk: " + counter_chunks + ", Time: " + (System.currentTimeMillis() - startTime) + "ms, Positions: " + counter_positions);
+			
+			dataset = new DataSet_1();
 		}
 	}
 	
@@ -98,18 +107,14 @@ public class DeepLearningVisitorImpl_NNUE_DataSetLoader implements PositionsVisi
 		
 		startTime = System.currentTimeMillis();
 		
-		counter = 0;
+		counter_positions = 0;
+		
+		counter_chunks = 0;
 	}
 	
 	
 	public void end() {
 		
-		System.out.println("END: Time " + (System.currentTimeMillis() - startTime) + "ms, positions: " + counter);
-	}
-	
-	
-	public DataSet<MLDataItem> getDataSet() {
-		
-		return dataset;
+		System.out.println("Training END: Time " + (System.currentTimeMillis() - startTime) + "ms, Positions: " + counter_positions);
 	}
 }

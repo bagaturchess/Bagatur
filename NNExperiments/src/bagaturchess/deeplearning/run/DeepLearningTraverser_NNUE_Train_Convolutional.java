@@ -5,20 +5,22 @@ import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 
 import deepnetts.net.ConvolutionalNetwork;
-import deepnetts.net.FeedForwardNetwork;
 import deepnetts.net.NeuralNetwork;
 import deepnetts.net.layers.activation.ActivationType;
+import deepnetts.net.loss.LossType;
 import deepnetts.net.train.TrainingEvent;
 import deepnetts.net.train.TrainingListener;
+import bagaturchess.deeplearning.ActivationFunction;
 import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
-import bagaturchess.deeplearning.impl_nnue.visitors.DeepLearningVisitorImpl_NNUE_DataSetLoader;
-import bagaturchess.deeplearning.impl_nnue.visitors.DeepLearningVisitorImpl_NNUE_PrintSuccessRate;
+import bagaturchess.deeplearning.impl_nnue.visitors.DeepLearningVisitorImpl_NNUE_Train_Convolutional;
+import bagaturchess.deeplearning.impl_nnue.visitors.DeepLearningVisitorImpl_NNUE_PrintSuccessRate_Convolutional;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
 import bagaturchess.ucitracker.api.PositionsTraverser;
+import bagaturchess.ucitracker.api.PositionsVisitor;
 
 
-public class DeepLearningTraverser_NNUE_Train {
+public class DeepLearningTraverser_NNUE_Train_Convolutional {
 	
 	
 	public static void main(String[] args) {
@@ -35,26 +37,30 @@ public class DeepLearningTraverser_NNUE_Train {
 			//String filePath = "./stockfish-14.1.cg";
 			//String filePath = "./glaurung-2.2.cg";
 			//String filePath = "./NNUE_big.cg";
-			String filePath = "./NNUE.cg";
+			//String filePath = "./NNUE.cg";
+			String filePath = "./NNUE_big.cg";
 			
-			
-			DeepLearningVisitorImpl_NNUE_DataSetLoader loader = new DeepLearningVisitorImpl_NNUE_DataSetLoader();
+			ConvolutionalNetwork network = createConvolutionalNetwork();
 			
 			ILearningInput input = LearningInputFactory.createDefaultInput();
 			
-			PositionsTraverser.traverseAll(filePath, loader, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
-			
-			NeuralNetwork network = createConvolutionalNetwork();
+			int iteration = 0;
 			
 			while (true) {
 				
-				network.getTrainer().train(loader.getDataSet());
+				iteration++;
+				
+				System.out.println("Iteration: " + iteration);
+				
+				PositionsVisitor trainer = new DeepLearningVisitorImpl_NNUE_Train_Convolutional(network);
+				
+				PositionsTraverser.traverseAll(filePath, trainer, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
 				
 				saveNetwork(network);
 				
-				DeepLearningVisitorImpl_NNUE_PrintSuccessRate printer = new DeepLearningVisitorImpl_NNUE_PrintSuccessRate();
+				PositionsVisitor success_rate_printer = new DeepLearningVisitorImpl_NNUE_PrintSuccessRate_Convolutional(ActivationFunction.SIGMOID);
 				
-				PositionsTraverser.traverseAll(filePath, printer, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
+				PositionsTraverser.traverseAll(filePath, success_rate_printer, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
 			}
 			
 		} catch (Exception e) {
@@ -68,14 +74,14 @@ public class DeepLearningTraverser_NNUE_Train {
 	}
 	
 	
-	private static NeuralNetwork createConvolutionalNetwork() {
+	private static ConvolutionalNetwork createConvolutionalNetwork() {
 		
 		ConvolutionalNetwork network = ConvolutionalNetwork.builder()
 				.addInputLayer(8, 8, 15)
-				//.addFullyConnectedLayer(8)
+				.addFullyConnectedLayer(8)
 				.addFullyConnectedLayer(4)
 				.addFullyConnectedLayer(2)
-				.addFullyConnectedLayer(1)
+				//.addFullyConnectedLayer(1)
 				//.addConvolutionalLayer(2, 2, 15)
 				//.addConvolutionalLayer(4, 4, 15)
 				//.addConvolutionalLayer(8, 8, 15)
@@ -85,12 +91,13 @@ public class DeepLearningTraverser_NNUE_Train {
 				.hiddenActivationFunction(ActivationType.TANH)
 				.randomSeed(135)
 				.addOutputLayer(1, ActivationType.SIGMOID)
+				.lossFunction(LossType.CROSS_ENTROPY)
 				.build();
 		
-		network.getTrainer().setLearningRate(0.5f);
+		network.getTrainer().setLearningRate(1f);
 		
 		network.getTrainer().setBatchMode(true);
-		//network.getTrainer().setBatchSize(10000);
+		//network.getTrainer().setBatchSize(CHUNK_SIZE);
 		
 		//throw new IlrlegalStateException();
 		
@@ -106,12 +113,12 @@ public class DeepLearningTraverser_NNUE_Train {
 					
 					event.getSource().stop();
 					
-					System.out.println(
+					/*System.out.println(
 							"Epoch: " + epoch
 							//+ ", Accuracy: " + event.getSource().getTrainingAccuracy()
 							//+ ", Loss: " + event.getSource().getTrainingLoss()
 						);
-					
+					*/
 					epoch++;
 				}
 			}
@@ -119,9 +126,9 @@ public class DeepLearningTraverser_NNUE_Train {
 		
 		return network;
 	}
-
-
-	private static void saveNetwork(NeuralNetwork network) {
+	
+	
+	private static void saveNetwork(NeuralNetwork<?> network) {
 		
 		try {
 			

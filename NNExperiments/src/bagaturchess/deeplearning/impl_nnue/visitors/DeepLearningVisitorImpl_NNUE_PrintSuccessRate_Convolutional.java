@@ -34,29 +34,32 @@ import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 import deepnetts.net.ConvolutionalNetwork;
+import deepnetts.net.NeuralNetwork;
 import deepnetts.util.Tensor;
 
 
-public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsVisitor {
+public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate_Convolutional implements PositionsVisitor {
 	
 	
 	private int counter;
 	
-	private ConvolutionalNetwork network;
+	private NeuralNetwork<?> network;
 	
 	private double sumDiffs1;
 	private double sumDiffs2;
 	
 	private long startTime;	
 	
+	private ActivationFunction output_activation_function;
 	
-	public DeepLearningVisitorImpl_NNUE_PrintSuccessRate() throws Exception {
+	
+	public DeepLearningVisitorImpl_NNUE_PrintSuccessRate_Convolutional(ActivationFunction _output_activation_function) throws Exception {
 		
 		if ((new File(NNUE_Constants.NET_FILE)).exists()) {
 			
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(NNUE_Constants.NET_FILE));
 			
-			network = (ConvolutionalNetwork) ois.readObject();
+			network = (NeuralNetwork<?>) ois.readObject();
 			
 			ois.close();
 			
@@ -64,6 +67,8 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 			
 			throw new IllegalStateException();
 		}
+		
+		output_activation_function = _output_activation_function;
 	}
 	
 	
@@ -95,7 +100,7 @@ public class DeepLearningVisitorImpl_NNUE_PrintSuccessRate implements PositionsV
 		
 		double actualWhitePlayerEval = outputs[0];
 		
-		double actualWhitePlayerEval_x = ActivationFunction.SIGMOID.getx((float) actualWhitePlayerEval);
+		double actualWhitePlayerEval_x = output_activation_function.getx((float) actualWhitePlayerEval);
 		//double expectedWhitePlayerEval_y = ActivationFunction.SIGMOID.gety(expectedWhitePlayerEval);
 		
 		sumDiffs1 += Math.abs(0 - expectedWhitePlayerEval);

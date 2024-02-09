@@ -79,6 +79,7 @@ public class NNUE_Constants {
 		result_inputs_3d[0][2][12] = bitboard.hasRightsToQueenCastle(Constants.COLOUR_BLACK) ? 1 : 0;
 		result_inputs_3d[0][3][12] = bitboard.hasRightsToKingCastle(Constants.COLOUR_BLACK) ? 1 : 0;
 		
+		
 		int moves_before_draw = bitboard.getDraw50movesRule() - 37;
 		
 		if (moves_before_draw >= 0) {
@@ -88,6 +89,7 @@ public class NNUE_Constants {
 			
 			result_inputs_3d[file][rank][13] = 1;
 		}
+		
 		
 		if (bitboard.getColourToMove() == Constants.COLOUR_WHITE) {
 			
@@ -102,6 +104,7 @@ public class NNUE_Constants {
 		
 		
 		Tensor tensor = new Tensor(result_inputs_3d);
+		
 		
 		return tensor;
 	}

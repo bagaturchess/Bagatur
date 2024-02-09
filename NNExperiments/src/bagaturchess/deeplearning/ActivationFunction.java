@@ -102,7 +102,7 @@ public abstract class ActivationFunction {
 		@Override
 		public float gety(float x) {
 			
-			if (x < -max_x) {
+			/*if (x < -max_x) {
 				
 				x = -max_x;
 			}
@@ -110,7 +110,7 @@ public abstract class ActivationFunction {
 			if (x > max_x) {
 				
 				x = max_x;
-			}
+			}*/
 			
 			return x;
 		}
@@ -119,7 +119,7 @@ public abstract class ActivationFunction {
 		@Override
 		public float getx(float y) {
 			
-			if (y < -max_x) {
+			/*if (y < -max_x) {
 				
 				y = -max_x;
 			}
@@ -127,7 +127,7 @@ public abstract class ActivationFunction {
 			if (y > max_x) {
 				
 				y = max_x;
-			}
+			}*/
 			
 			return y;
 		}
