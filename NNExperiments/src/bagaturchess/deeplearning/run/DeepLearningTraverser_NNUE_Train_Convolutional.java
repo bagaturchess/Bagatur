@@ -38,7 +38,7 @@ public class DeepLearningTraverser_NNUE_Train_Convolutional {
 			//String filePath = "./glaurung-2.2.cg";
 			//String filePath = "./NNUE_big.cg";
 			//String filePath = "./NNUE.cg";
-			String filePath = "./NNUE_big.cg";
+			String filePath = "./NNUE_big_v2.cg";
 			
 			ConvolutionalNetwork network = createConvolutionalNetwork();
 			
@@ -78,9 +78,13 @@ public class DeepLearningTraverser_NNUE_Train_Convolutional {
 		
 		ConvolutionalNetwork network = ConvolutionalNetwork.builder()
 				.addInputLayer(8, 8, 15)
+				//.addFullyConnectedLayer(16)
+				//.addFullyConnectedLayer(8)
 				.addFullyConnectedLayer(8)
-				.addFullyConnectedLayer(4)
-				.addFullyConnectedLayer(2)
+				.addFullyConnectedLayer(8)
+				.addFullyConnectedLayer(8)
+				//.addFullyConnectedLayer(4)
+				//.addFullyConnectedLayer(2)
 				//.addFullyConnectedLayer(1)
 				//.addConvolutionalLayer(2, 2, 15)
 				//.addConvolutionalLayer(4, 4, 15)
