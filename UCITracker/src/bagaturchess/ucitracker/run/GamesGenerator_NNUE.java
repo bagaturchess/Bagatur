@@ -54,14 +54,14 @@ public class GamesGenerator_NNUE {
 	}
 	
 	
-	private static int MAX_EVAL_DIFF = 7777;
+	private static int MAX_EVAL_DIFF = 9999;
 	private static int MAX_MOVES = 300;
 	/**
 	 * BEST_MOVE_DIFF affects the corner cases a lot.
 	 * It should be a good mixture of games with different values in one single file for learning.
 	 */
 	private static int BEST_MOVE_DIFF = MAX_EVAL_DIFF; //550; //250; //150; //50; // 25;
-	private static int MIN_PIECES = 6;
+	private static int MIN_PIECES = 2;
 	
 	
 	private NNUEProbeUtils.Input input;
