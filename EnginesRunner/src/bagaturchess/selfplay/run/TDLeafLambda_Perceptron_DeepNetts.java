@@ -27,8 +27,8 @@ import java.io.PrintStream;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.deeplearning.impl4_v20.IMPL4_Constants;
-import bagaturchess.deeplearning.impl4_v20.NeuralNetworkUtils_AllFeatures;
+import bagaturchess.deeplearning_deepnetts.impl4_v20.IMPL4_Constants;
+import bagaturchess.deeplearning_deepnetts.impl4_v20.NeuralNetworkUtils_AllFeatures;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.cfg.base.UCIConfig_BaseImpl;
 import bagaturchess.search.api.IRootSearch;
@@ -53,7 +53,7 @@ public class TDLeafLambda_Perceptron_DeepNetts {
 							bagaturchess.search.impl.alg.impl1.Search_PVS_NWS.class.getName(),
 							bagaturchess.engines.cfg.base.SearchConfigImpl_AB_NNTraining.class.getName(),
 							bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20.class.getName(),
-							bagaturchess.deeplearning.impl4_v20.eval.EvaluationConfig_NNTraining.class.getName(),
+							bagaturchess.deeplearning_deepnetts.impl4_v20.eval.EvaluationConfig_NNTraining.class.getName(),
 				}
 			);
 	
@@ -72,7 +72,7 @@ public class TDLeafLambda_Perceptron_DeepNetts {
 					"bagaturchess.search.impl.alg.impl1.Search_PVS_NWS",
 					"bagaturchess.engines.cfg.base.SearchConfigImpl_AB",
 					"bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20",
-					"bagaturchess.deeplearning.impl4_v20.eval.EvaluationConfig_NNTraining"
+					"bagaturchess.deeplearning_deepnetts.impl4_v20.eval.EvaluationConfig_NNTraining"
 					}));
 			
 			

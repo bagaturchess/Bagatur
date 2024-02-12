@@ -1,0 +1,184 @@
+package bagaturchess.deeplearning_neuroph.run;
+
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.visrec.ml.data.DataSet;
+
+import bagaturchess.deeplearning_deepnetts.impl_nnue.NNUE_Constants;
+import bagaturchess.deeplearning_deepnetts.impl_nnue.NeuralNetworkUtils_NNUE_PSQT;
+import bagaturchess.deeplearning_deepnetts.impl_nnue.visitors.DeepLearningVisitorImpl_NNUE_DataSetLoader;
+import bagaturchess.learning.goldmiddle.api.ILearningInput;
+import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
+import bagaturchess.ucitracker.api.PositionsTraverser;
+import deepnetts.data.MLDataItem;
+import deepnetts.net.ConvolutionalNetwork;
+import deepnetts.net.train.BackpropagationTrainer;
+import deepnetts.net.train.TrainingEvent;
+import deepnetts.net.train.TrainingListener;
+import deepnetts.util.FileIO;
+
+
+public class DeepLearningTraverser_NNUE_Train implements Runnable, TrainingListener {
+	
+	
+	private DataSet<MLDataItem> dataset;
+	
+	private boolean training_finished = false;
+	
+	private long current_epoch_iterations_count = 0;
+	
+	
+	public DeepLearningTraverser_NNUE_Train(DataSet<MLDataItem> dataset) {
+		
+		this.dataset = dataset;
+	}
+	
+	
+	public static void main(String[] args) {
+		
+		System.out.println("Reading games ... ");
+		
+		long startTime = System.currentTimeMillis();
+		
+		try {
+			
+			//String filePath = "./Houdini.15a.short.cg";
+			//String filePath = "./Houdini.15a.cg";
+			//String filePath = "./Arasan13.1.cg";
+			String filePath = "./stockfish-14.1.cg";
+			//String filePath = "./glaurung-2.2.cg";
+			
+			DeepLearningVisitorImpl_NNUE_DataSetLoader learning = new DeepLearningVisitorImpl_NNUE_DataSetLoader();
+			
+			ILearningInput input = LearningInputFactory.createDefaultInput();
+			
+			PositionsTraverser.traverseAll(filePath, learning, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
+			
+			DataSet<MLDataItem> dataset = learning.getDataSet();
+			
+			DeepLearningTraverser_NNUE_Train instance = new DeepLearningTraverser_NNUE_Train(dataset);
+			
+			ExecutorService executor = Executors.newFixedThreadPool(1);
+			
+			executor.execute(instance);
+			
+			Thread.sleep(48 * 60 * 60 * 1000);
+			
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+		}
+		
+		long endTime = System.currentTimeMillis();
+		
+		System.out.println("OK " + ((endTime - startTime) / 1000) + "sec");		
+	}
+	
+	
+    public void run() {
+        
+        try {
+        	
+            final ConvolutionalNetwork neuralNet = getNewOrLoadNetwork();
+            
+            Thread saverThread = new Thread(new Runnable() {
+            	
+    			@Override
+    			public void run() {
+    				
+    				try {
+    					
+    					while (!training_finished) {
+    						
+    				        Thread.sleep(5 * 60 * 1000);
+    				        //Thread.sleep(10 * 1000);
+    				        
+    				        
+    				        // Save trained network to file
+    				        FileIO.writeToFile(neuralNet, NNUE_Constants.NET_FILE);
+    				        
+    				        System.out.println("Network saved as " + NNUE_Constants.NET_FILE + ", current_epoch_iterations_count=" + current_epoch_iterations_count);
+    					}
+    					
+    				} catch(Throwable t) {
+    					
+    					t.printStackTrace();
+    				}
+    			}
+    		});
+            
+            saverThread.start();
+            
+            
+            // create a trainer and train network
+            BackpropagationTrainer trainer = neuralNet.getTrainer();
+            
+            trainer.setLearningRate(0.01f)
+                    .setMaxError(0.01f)
+                    .setMaxEpochs(100);
+                    //.setBatchMode(true)
+                    //.setBatchSize(1000);
+            
+            trainer.addListener(this);
+            
+            trainer.train(dataset);
+            
+            
+            training_finished = true;
+            
+            
+        } catch (Throwable t) {
+        	
+        	t.printStackTrace();
+        }
+    }
+    
+    
+	private static final ConvolutionalNetwork getNewOrLoadNetwork() throws Exception {
+		
+		ConvolutionalNetwork network = null;
+		
+		if ((new File(NNUE_Constants.NET_FILE)).exists()) {
+			
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(NNUE_Constants.NET_FILE));
+			
+			network = (ConvolutionalNetwork) ois.readObject();
+			
+			ois.close();
+			
+			//NNUE_Constants.printWeights(network.getWeights());
+			
+		} else {
+			
+			network = (ConvolutionalNetwork) NeuralNetworkUtils_NNUE_PSQT.buildNetwork();
+		}
+		
+		return network;
+	}
+	
+	
+	@Override
+	public void handleEvent(TrainingEvent event) {
+		
+	    /*public static enum TrainingEvent.Type {
+        	STARTED, STOPPED, EPOCH_FINISHED, MINI_BATCH, ITERATION_FINISHED;
+    	}*/
+		
+		if (event.getType() != TrainingEvent.Type.ITERATION_FINISHED
+				&& event.getType() != TrainingEvent.Type.MINI_BATCH) {
+			
+			System.out.println("TrainingListener.handleEvent: event.getType()=" + TrainingEvent.Type.values()[event.getType().ordinal()].name());
+			
+			current_epoch_iterations_count = 0;
+			
+		} else {
+			
+			current_epoch_iterations_count++;
+		}
+	}
+}

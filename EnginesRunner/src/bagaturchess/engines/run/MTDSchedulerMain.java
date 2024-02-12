@@ -115,9 +115,9 @@ public class MTDSchedulerMain {
 								
 								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl.class.getName(),
 								//bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.EvaluationConfig.class.getName(),
-								//bagaturchess.deeplearning.impl.eval.pst.EvaluationConfig.class.getName()
-								//bagaturchess.deeplearning.impl.eval.allfeatures.EvaluationConfig.class.getName()
-								//bagaturchess.deeplearning.impl.eval.past_and_allfeatures.EvaluationConfig.class.getName()
+								//bagaturchess.deeplearning_neuroph.impl.eval.pst.EvaluationConfig.class.getName()
+								//bagaturchess.deeplearning_neuroph.impl.eval.allfeatures.EvaluationConfig.class.getName()
+								//bagaturchess.deeplearning_neuroph.impl.eval.past_and_allfeatures.EvaluationConfig.class.getName()
 								
 								//bagaturchess.engines.evaladapters.chess22k.cfg.BoardConfigImpl_Chess22k.class.getName(),
 								//bagaturchess.engines.evaladapters.chess22k.cfg.EvaluationConfg_Chess22k.class.getName()
@@ -133,16 +133,16 @@ public class MTDSchedulerMain {
 								//bagaturchess.learning.goldmiddle.impl3.cfg.EvaluationConfig_V18.class.getName()
 								//bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20.class.getName(),
 								//bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20.class.getName(),
-								//bagaturchess.deeplearning.impl_nnue_v2.eval.EvaluationConfig.class.getName()
+								//bagaturchess.deeplearning_neuroph.impl_nnue_v2.eval.EvaluationConfig.class.getName()
 								bagaturchess.learning.goldmiddle.impl7.cfg.BoardConfigImpl_V41.class.getName(),
 								bagaturchess.learning.goldmiddle.impl7.cfg.EvaluationConfig_V41.class.getName(),
-								//bagaturchess.deeplearning.impl_nnue.eval.EvaluationConfig.class.getName(),
-								//bagaturchess.deeplearning.impl4_v20.eval.EvaluationConfig_NNTraining.class.getName(),
+								//bagaturchess.deeplearning_deepnetts.impl_nnue.eval.EvaluationConfig.class.getName(),
+								//bagaturchess.deeplearning_deepnetts.impl4_v20.eval.EvaluationConfig_NNTraining.class.getName(),
 								//bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20_GOLDENMIDDLE_Play.class.getName(),
-								//bagaturchess.deeplearning.impl.eval.allfeatures.EvaluationConfig.class.getName(),
+								//bagaturchess.deeplearning_neuroph.impl.eval.allfeatures.EvaluationConfig.class.getName(),
 								//bagaturchess.deeplearning_deepnetts.impl1.eval.EvaluationConfig.class.getName(),
-								//bagaturchess.deeplearning.impl_nnue.eval.EvaluationConfig.class.getName(),
-								//bagaturchess.deeplearning.impl4_v20.eval.EvaluationConfig.class.getName(),
+								//bagaturchess.deeplearning_deepnetts.impl_nnue.eval.EvaluationConfig.class.getName(),
+								//bagaturchess.deeplearning_deepnetts.impl4_v20.eval.EvaluationConfig.class.getName(),
 								//bagaturchess.learning.goldmiddle.impl5.cfg.BoardConfigImpl_V23.class.getName(),
 								//bagaturchess.learning.goldmiddle.impl5.cfg.EvaluationConfig_V23.class.getName(),
 					}

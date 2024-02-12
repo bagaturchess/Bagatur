@@ -24,9 +24,9 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.deeplearning.ActivationFunction;
-import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
-import bagaturchess.deeplearning.impl_nnue.visitors.DataSet_1;
+import bagaturchess.deeplearning_neuroph.ActivationFunction;
+import bagaturchess.deeplearning_deepnetts.impl_nnue.NNUE_Constants;
+import bagaturchess.deeplearning_deepnetts.impl_nnue.visitors.DataSet_1;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.selfplay.GamesRunner;

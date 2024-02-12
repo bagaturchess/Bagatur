@@ -27,7 +27,7 @@ import java.io.PrintStream;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.deeplearning.impl_nnue.NNUE_Constants;
+import bagaturchess.deeplearning_deepnetts.impl_nnue.NNUE_Constants;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.cfg.base.UCIConfig_BaseImpl;
 import bagaturchess.search.api.IRootSearch;
@@ -52,7 +52,7 @@ public class TDLeafLambda_NNUE_DeepNetts {
 				bagaturchess.search.impl.alg.impl1.Search_PVS_NWS.class.getName(),
 				bagaturchess.engines.cfg.base.SearchConfigImpl_AB_NNTraining.class.getName(),
 				bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20.class.getName(),
-				bagaturchess.deeplearning.impl_nnue.eval.EvaluationConfig.class.getName(),
+				bagaturchess.deeplearning_deepnetts.impl_nnue.eval.EvaluationConfig.class.getName(),
 			}
 		);
 	
