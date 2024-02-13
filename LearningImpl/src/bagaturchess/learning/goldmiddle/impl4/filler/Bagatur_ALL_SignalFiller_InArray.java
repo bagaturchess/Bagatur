@@ -356,7 +356,7 @@ public class Bagatur_ALL_SignalFiller_InArray implements Bagatur_V20_FeaturesCon
 		
 		
 		public double getStrength_o() {	
-			return strength_o;
+			return (strength_o + strength_e) / 2;
 		}
 		
 
