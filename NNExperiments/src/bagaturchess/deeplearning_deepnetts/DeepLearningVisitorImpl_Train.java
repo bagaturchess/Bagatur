@@ -20,7 +20,7 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.deeplearning_deepnetts.impl_nnue.visitors;
+package bagaturchess.deeplearning_deepnetts;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -44,7 +44,7 @@ public abstract class DeepLearningVisitorImpl_Train implements PositionsVisitor 
 	
 	private int counter_chunks;
 	
-	private DataSet_1 dataset;
+	private DataSet_Training dataset;
 	
 	private NeuralNetwork<?> network;
 	
@@ -57,7 +57,7 @@ public abstract class DeepLearningVisitorImpl_Train implements PositionsVisitor 
 		
 		input_size = _input_size;
 		
-		dataset = new DataSet_1(input_size);
+		dataset = new DataSet_Training(input_size);
 		
 		network = _network;
 		
@@ -107,7 +107,7 @@ public abstract class DeepLearningVisitorImpl_Train implements PositionsVisitor 
 			
 			//System.out.println("Chunk: " + counter_chunks + ", Time: " + (System.currentTimeMillis() - startTime) + "ms, Positions: " + counter_positions);
 			
-			dataset = new DataSet_1(input_size);
+			dataset = new DataSet_Training(input_size);
 		}
 	}
 	

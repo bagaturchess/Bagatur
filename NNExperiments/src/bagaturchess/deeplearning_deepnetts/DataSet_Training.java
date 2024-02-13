@@ -17,7 +17,7 @@
  *  along with BagaturChess. If not, see http://www.eclipse.org/legal/epl-v10.html
  *
  */
-package bagaturchess.deeplearning_deepnetts.impl1.visitor;
+package bagaturchess.deeplearning_deepnetts;
 
 
 import java.util.ArrayList;
@@ -31,31 +31,59 @@ import deepnetts.data.TabularDataSet;
 import deepnetts.util.Tensor;
 
 
-public class DataSetLearning implements DataSet<MLDataItem> {
+public class DataSet_Training implements DataSet<MLDataItem> {
 	
 	
 	private List<MLDataItem> items;
 	private String[] targetNames;
+	private int input_size;
 	
-	
-	public DataSetLearning() {
+	public DataSet_Training(int _input_size) {
+		
+		input_size = _input_size;
 		
 		items = new ArrayList<MLDataItem>();
 		
-		targetNames = new String[110];
+		targetNames = new String[input_size];
+		
 		for (int i = 0; i < targetNames.length; i++) {
+			
 			targetNames[i] = "LABEL" + i;
 		}
 	}
 	
 	
-	public void addItem(float[] inputs, float[] outputs) {
-		items.add(new TabularDataSet.Item(new Tensor(inputs), new Tensor(outputs)));
+	public void addItem(Object inputs, float[] outputs) {
+		
+		if (inputs instanceof Tensor) {
+			
+			items.add(new TabularDataSet.Item((Tensor) inputs, new Tensor(outputs)));
+			
+			return;
+		}
+		
+		if (inputs.getClass().equals(float[].class)) {
+			
+			items.add(new TabularDataSet.Item(new Tensor((float[])inputs), new Tensor(outputs)));
+			
+		} else if (inputs.getClass().equals(float[][][].class)) {
+			
+			items.add(new TabularDataSet.Item(new Tensor((float[][][])inputs), new Tensor(outputs)));
+			
+		} else if (inputs.getClass().equals(float[][].class)) {
+			
+			items.add(new TabularDataSet.Item(new Tensor((float[][])inputs), new Tensor(outputs)));
+			
+		} else {
+			
+			throw new IllegalStateException();
+		}
 	}
 	
 	
 	@Override
 	public List<MLDataItem> getItems() {
+		
 		return items;
 	}
 	
@@ -64,7 +92,7 @@ public class DataSetLearning implements DataSet<MLDataItem> {
 	public DataSet<MLDataItem>[] split(double... parts) {
 		throw new UnsupportedOperationException();
 	}
-
+	
 
 	@Override
 	public List<Column> getColumns() {
@@ -82,4 +110,22 @@ public class DataSetLearning implements DataSet<MLDataItem> {
 	public void setColumns(List<Column> arg0) {
 		throw new UnsupportedOperationException();
 	}
+
+
+	/*@Override
+	public String[] getColumnNames() {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public String[] getTargetNames() {
+		return targetNames;
+	}
+
+
+	@Override
+	public void setColumnNames(String[] arg0) {
+		throw new UnsupportedOperationException();
+	}*/
 }

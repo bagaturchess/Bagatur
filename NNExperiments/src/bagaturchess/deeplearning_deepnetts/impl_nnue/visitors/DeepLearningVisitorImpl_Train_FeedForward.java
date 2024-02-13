@@ -25,6 +25,7 @@ package bagaturchess.deeplearning_deepnetts.impl_nnue.visitors;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.ActivationFunction;
+import bagaturchess.deeplearning_deepnetts.DeepLearningVisitorImpl_Train;
 import deepnetts.net.FeedForwardNetwork;
 import deepnetts.util.Tensor;
 

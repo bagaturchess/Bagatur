@@ -25,6 +25,7 @@ package bagaturchess.deeplearning_deepnetts.impl_nnue.visitors;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.ActivationFunction;
+import bagaturchess.deeplearning_deepnetts.DeepLearningVisitorImpl_PrintSuccessRate;
 import bagaturchess.deeplearning_deepnetts.impl_nnue.NNUE_Constants;
 import deepnetts.util.Tensor;
 

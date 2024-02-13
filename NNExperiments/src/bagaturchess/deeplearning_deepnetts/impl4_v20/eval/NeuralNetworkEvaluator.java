@@ -24,7 +24,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	float[] inputs_f;
 	
-	private NeuralNetwork network;
+	private NeuralNetwork<?> network;
 	
 	//private ActivationFunction activation_function = ActivationFunction.SIGMOID;
 	private ActivationFunction activation_function = ActivationFunction.LINEAR;
@@ -42,7 +42,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 			
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(IMPL4_Constants.NET_FILE));
 			
-			network = (NeuralNetwork) ois.readObject();
+			network = (NeuralNetwork<?>) ois.readObject();
 			
 			ois.close();
 			

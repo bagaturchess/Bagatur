@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
+import bagaturchess.deeplearning_deepnetts.DataSet_Training;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_ALL_SignalFiller_InArray;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 
@@ -63,7 +64,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 	private float[] inputs_f;
 	
 	private BackpropagationTrainer trainer;
-	private DataSetLearning dataset;
+	private DataSet_Training dataset;
 	
 	
 	public DeepLearningVisitorImpl_AllFeatures() throws Exception {
@@ -86,7 +87,7 @@ public class DeepLearningVisitorImpl_AllFeatures implements PositionsVisitor {
 		//inputs_d = new double[55];
 		inputs_f = new float[55];
 		
-		dataset = new DataSetLearning();
+		dataset = new DataSet_Training(55);
 		
 		trainer = new BackpropagationTrainer(network);
 		

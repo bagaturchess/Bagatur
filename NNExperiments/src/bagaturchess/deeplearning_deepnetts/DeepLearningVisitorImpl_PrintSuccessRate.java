@@ -20,7 +20,7 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.deeplearning_deepnetts.impl_nnue.visitors;
+package bagaturchess.deeplearning_deepnetts;
 
 
 import java.io.File;
@@ -97,7 +97,7 @@ public abstract class DeepLearningVisitorImpl_PrintSuccessRate implements Positi
 		//sumDiffs2 += Math.abs(expectedWhitePlayerEval - Math.signum(actualWhitePlayerEval) * ActivationFunction.SIGMOID.getx((float) Math.abs(actualWhitePlayerEval)));
 		sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval_x);
 		
-		//DataSet_1 dataset = new DataSet_1();
+		//DataSet_Training dataset = new DataSet_Training();
 		//dataset.addItem(tensor, new float[] {(float) expectedWhitePlayerEval_y});
 		//network.getTrainer().train(dataset);
 
