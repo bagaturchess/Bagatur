@@ -36,13 +36,15 @@ public class DataSet_1 implements DataSet<MLDataItem> {
 	
 	private List<MLDataItem> items;
 	private String[] targetNames;
+	private int input_size;
 	
-	
-	public DataSet_1() {
+	public DataSet_1(int _input_size) {
+		
+		input_size = _input_size;
 		
 		items = new ArrayList<MLDataItem>();
 		
-		targetNames = new String[55];
+		targetNames = new String[input_size];
 		
 		for (int i = 0; i < targetNames.length; i++) {
 			

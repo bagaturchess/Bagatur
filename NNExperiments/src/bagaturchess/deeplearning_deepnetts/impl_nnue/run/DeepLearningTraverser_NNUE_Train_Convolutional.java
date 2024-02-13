@@ -13,7 +13,7 @@ import deepnetts.net.train.TrainingListener;
 import bagaturchess.deeplearning.ActivationFunction;
 import bagaturchess.deeplearning_deepnetts.impl_nnue.NNUE_Constants;
 import bagaturchess.deeplearning_deepnetts.impl_nnue.visitors.DeepLearningVisitorImpl_PrintSuccessRate_Convolutional;
-import bagaturchess.deeplearning_deepnetts.impl_nnue.visitors.DeepLearningVisitorImpl_NNUE_Train_Convolutional;
+import bagaturchess.deeplearning_deepnetts.impl_nnue.visitors.DeepLearningVisitorImpl_Train_Convolutional;
 import bagaturchess.learning.goldmiddle.api.ILearningInput;
 import bagaturchess.learning.goldmiddle.api.LearningInputFactory;
 import bagaturchess.ucitracker.api.PositionsTraverser;
@@ -44,6 +44,9 @@ public class DeepLearningTraverser_NNUE_Train_Convolutional {
 			
 			ILearningInput input = LearningInputFactory.createDefaultInput();
 			
+			ActivationFunction output_activation_function = ActivationFunction.SIGMOID;
+			
+			
 			int iteration = 0;
 			
 			while (true) {
@@ -52,13 +55,13 @@ public class DeepLearningTraverser_NNUE_Train_Convolutional {
 				
 				System.out.println("Iteration: " + iteration);
 				
-				PositionsVisitor trainer = new DeepLearningVisitorImpl_NNUE_Train_Convolutional(network);
+				PositionsVisitor trainer = new DeepLearningVisitorImpl_Train_Convolutional(network, output_activation_function);
 				
 				PositionsTraverser.traverseAll(filePath, trainer, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
 				
 				saveNetwork(network);
 				
-				PositionsVisitor success_rate_printer = new DeepLearningVisitorImpl_PrintSuccessRate_Convolutional(ActivationFunction.SIGMOID);
+				PositionsVisitor success_rate_printer = new DeepLearningVisitorImpl_PrintSuccessRate_Convolutional(output_activation_function);
 				
 				PositionsTraverser.traverseAll(filePath, success_rate_printer, 999999999, input.createBoardConfig(), input.getPawnsEvalFactoryClassName());
 			}

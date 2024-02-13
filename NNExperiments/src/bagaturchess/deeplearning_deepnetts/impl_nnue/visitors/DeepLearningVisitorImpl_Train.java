@@ -23,29 +23,19 @@
 package bagaturchess.deeplearning_deepnetts.impl_nnue.visitors;
 
 
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.deeplearning.ActivationFunction;
-import bagaturchess.deeplearning_deepnetts.impl_nnue.NNUE_Constants;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.ucitracker.api.PositionsVisitor;
-import deepnetts.net.FeedForwardNetwork;
 import deepnetts.net.NeuralNetwork;
-import deepnetts.net.layers.activation.ActivationType;
-import deepnetts.net.loss.LossType;
-import deepnetts.net.train.BackpropagationTrainer;
-import deepnetts.net.train.TrainingEvent;
-import deepnetts.net.train.TrainingListener;
 import deepnetts.util.Tensor;
 
 
-public class DeepLearningVisitorImpl_NNUE_Train_FeedForward implements PositionsVisitor {
+public abstract class DeepLearningVisitorImpl_Train implements PositionsVisitor {
 	
 	
-	private static int CHUNK_SIZE = 10000; //200000;
+	private static int CHUNK_SIZE = 10000;
 	
 	
 	private long startTime;	
@@ -56,15 +46,26 @@ public class DeepLearningVisitorImpl_NNUE_Train_FeedForward implements Positions
 	
 	private DataSet_1 dataset;
 	
-	private FeedForwardNetwork network;
+	private NeuralNetwork<?> network;
+	
+	private ActivationFunction output_activation_function;
+	
+	private int input_size;
 	
 	
-	public DeepLearningVisitorImpl_NNUE_Train_FeedForward(FeedForwardNetwork _network) throws Exception {
+	public DeepLearningVisitorImpl_Train(NeuralNetwork<?> _network, ActivationFunction _output_activation_function, int _input_size) throws Exception {
 		
-		dataset = new DataSet_1();
+		input_size = _input_size;
+		
+		dataset = new DataSet_1(input_size);
 		
 		network = _network;
+		
+		output_activation_function = _output_activation_function;
 	}
+	
+	
+	protected abstract Tensor createNNInput(IBitBoard bitboard);
 	
 	
 	@Override
@@ -82,15 +83,12 @@ public class DeepLearningVisitorImpl_NNUE_Train_FeedForward implements Positions
 		}
 		
 		
-		float[] nnue_input = (float[])bitboard.getNNUEInputs();
-		//System.out.println("nnue_input=" + nnue_input.length);
-		float[] inputs_1d = new float[nnue_input.length];
-		System.arraycopy((float[])bitboard.getNNUEInputs(), 0, inputs_1d, 0, nnue_input.length);
+		Tensor input = createNNInput(bitboard);
         
         float[] output = new float[1];
-        output[0] = ActivationFunction.SIGMOID.gety(expectedWhitePlayerEval);
+        output[0] = output_activation_function.gety(expectedWhitePlayerEval);
         
-        dataset.addItem(inputs_1d, output);
+        dataset.addItem(input, output);
         
 		counter_positions++;
 		
@@ -109,7 +107,7 @@ public class DeepLearningVisitorImpl_NNUE_Train_FeedForward implements Positions
 			
 			//System.out.println("Chunk: " + counter_chunks + ", Time: " + (System.currentTimeMillis() - startTime) + "ms, Positions: " + counter_positions);
 			
-			dataset = new DataSet_1();
+			dataset = new DataSet_1(input_size);
 		}
 	}
 	
