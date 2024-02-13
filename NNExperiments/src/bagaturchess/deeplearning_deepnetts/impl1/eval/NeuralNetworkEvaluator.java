@@ -17,6 +17,9 @@ import deepnetts.util.FileIO;
 public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	
+	public static final String NET_NAME = "net.dn.bin";
+	
+	
 	private IBitBoard bitboard;
 	
 	private FeedForwardNetwork network;
@@ -30,7 +33,7 @@ public class NeuralNetworkEvaluator extends BaseEvaluator {
 	
 	NeuralNetworkEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) throws ClassNotFoundException, IOException {
 		this(_bitboard, _evalCache, _evalConfig,
-				(FeedForwardNetwork) FileIO.createFromFile(new File("net.dn.bin")));
+				(FeedForwardNetwork) FileIO.createFromFile(new File(NET_NAME)));
 	}
 	
 	

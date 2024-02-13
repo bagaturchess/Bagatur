@@ -97,6 +97,8 @@ public abstract class DeepLearningVisitorImpl_PrintSuccessRate implements Positi
 		//sumDiffs2 += Math.abs(expectedWhitePlayerEval - Math.signum(actualWhitePlayerEval) * ActivationFunction.SIGMOID.getx((float) Math.abs(actualWhitePlayerEval)));
 		sumDiffs2 += Math.abs(expectedWhitePlayerEval - actualWhitePlayerEval_x);
 		
+		//System.out.println("actualWhitePlayerEval_x=" + actualWhitePlayerEval_x);
+		
 		//DataSet_Training dataset = new DataSet_Training();
 		//dataset.addItem(tensor, new float[] {(float) expectedWhitePlayerEval_y});
 		//network.getTrainer().train(dataset);
