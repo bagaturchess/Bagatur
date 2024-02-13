@@ -26,6 +26,7 @@ package bagaturchess.deeplearning_deepnetts.impl_nnue.visitors;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.ActivationFunction;
 import bagaturchess.deeplearning_deepnetts.DeepLearningVisitorImpl_PrintSuccessRate;
+import bagaturchess.deeplearning_deepnetts.impl_nnue.NNUE_Constants;
 import deepnetts.net.FeedForwardNetwork;
 
 
@@ -51,5 +52,12 @@ public class DeepLearningVisitorImpl_PrintSuccessRate_FeedForward extends DeepLe
 		float[] outputs = network.getOutput();
 		
 		return outputs[0];
+	}
+	
+	
+	@Override
+	protected String getNNFileName() {
+		
+		return NNUE_Constants.NET_FILE;
 	}
 }

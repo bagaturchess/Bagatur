@@ -30,7 +30,6 @@ import java.io.ObjectInputStream;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.deeplearning.ActivationFunction;
-import bagaturchess.deeplearning_deepnetts.impl_nnue.NNUE_Constants;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.ucitracker.api.PositionsVisitor;
 import deepnetts.net.NeuralNetwork;
@@ -53,9 +52,9 @@ public abstract class DeepLearningVisitorImpl_PrintSuccessRate implements Positi
 	
 	public DeepLearningVisitorImpl_PrintSuccessRate(ActivationFunction _output_activation_function) throws Exception {
 		
-		if ((new File(NNUE_Constants.NET_FILE)).exists()) {
+		if ((new File(getNNFileName())).exists()) {
 			
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(NNUE_Constants.NET_FILE));
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(getNNFileName()));
 			
 			network = (NeuralNetwork<?>) ois.readObject();
 			
@@ -71,6 +70,8 @@ public abstract class DeepLearningVisitorImpl_PrintSuccessRate implements Positi
 	
 
 	protected abstract float getNNOutput(IBitBoard bitboard);
+	
+	protected abstract String getNNFileName();
 	
 	
 	@Override

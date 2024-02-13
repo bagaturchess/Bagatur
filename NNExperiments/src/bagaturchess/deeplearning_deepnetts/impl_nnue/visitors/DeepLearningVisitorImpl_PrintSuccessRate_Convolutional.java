@@ -53,4 +53,11 @@ public class DeepLearningVisitorImpl_PrintSuccessRate_Convolutional extends Deep
 		
 		return network.getOutput()[0];
 	}
+
+
+	@Override
+	protected String getNNFileName() {
+		
+		return NNUE_Constants.NET_FILE;
+	}
 }

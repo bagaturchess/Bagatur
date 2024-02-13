@@ -26,6 +26,8 @@ package bagaturchess.deeplearning_deepnetts.impl1.visitor;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.deeplearning.ActivationFunction;
 import bagaturchess.deeplearning_deepnetts.DeepLearningVisitorImpl_PrintSuccessRate;
+import bagaturchess.deeplearning_deepnetts.impl1.eval.NeuralNetworkEvaluator;
+import bagaturchess.deeplearning_deepnetts.impl_nnue.NNUE_Constants;
 import bagaturchess.learning.goldmiddle.impl4.filler.Bagatur_ALL_SignalFiller_InArray;
 import deepnetts.net.FeedForwardNetwork;
 
@@ -60,10 +62,17 @@ public class DeepLearningVisitorImpl_PrintSuccessRate_AllFeatures extends DeepLe
 		((FeedForwardNetwork) network).setInput(inputs);
 		
 		//forward method is already called in setInput(tensor)
-		network.forward();
+		//network.forward();
 		
 		float[] outputs = network.getOutput();
 		
 		return outputs[0];
+	}
+	
+	
+	@Override
+	protected String getNNFileName() {
+		
+		return NeuralNetworkEvaluator.NET_NAME;
 	}
 }
