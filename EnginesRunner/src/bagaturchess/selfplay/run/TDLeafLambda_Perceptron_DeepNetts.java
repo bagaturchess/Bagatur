@@ -27,8 +27,6 @@ import java.io.PrintStream;
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.deeplearning_deepnetts.impl4_v20.IMPL4_Constants;
-import bagaturchess.deeplearning_deepnetts.impl4_v20.NeuralNetworkUtils_AllFeatures;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
 import bagaturchess.engines.cfg.base.UCIConfig_BaseImpl;
 import bagaturchess.search.api.IRootSearch;
@@ -53,7 +51,7 @@ public class TDLeafLambda_Perceptron_DeepNetts {
 							bagaturchess.search.impl.alg.impl1.Search_PVS_NWS.class.getName(),
 							bagaturchess.engines.cfg.base.SearchConfigImpl_AB_NNTraining.class.getName(),
 							bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20.class.getName(),
-							bagaturchess.deeplearning_deepnetts.impl4_v20.eval.EvaluationConfig_NNTraining.class.getName(),
+							bagaturchess.deeplearning_deepnetts.impl1.eval.EvaluationConfig.class.getName(),
 				}
 			);
 	
@@ -89,9 +87,9 @@ public class TDLeafLambda_Perceptron_DeepNetts {
 			/*MultiPVMediator multipvMediator = new MultiPVMediator(cfg, search, bitboard, mediator1, go);
 			multipvMediator.ready();*/
 			
-			String filename_NN = IMPL4_Constants.NET_FILE;
+			String filename_NN = null;//IMPL4_Constants.NET_FILE;
 			
-			NeuralNetwork network = NeuralNetworkUtils_AllFeatures.buildNetwork();
+			NeuralNetwork network = null;//NeuralNetworkUtils_AllFeatures.buildNetwork();
 			FileIO.writeToFile(network, filename_NN);
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
