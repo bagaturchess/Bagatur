@@ -38,7 +38,7 @@ public class LearningTraverser {
 			
 			//String filePath = "stockfish-14.1-4N.cg";
 			//String filePath = "stockfish-16.cg";
-			String filePath = "NNUE.cg";
+			String filePath = "NNUE_big_v2.cg";
 			
 			
 			ILearningInput input = LearningInputFactory.createDefaultInput();
