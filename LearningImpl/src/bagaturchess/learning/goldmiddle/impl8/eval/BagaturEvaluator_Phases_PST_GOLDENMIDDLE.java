@@ -139,7 +139,115 @@ public class BagaturEvaluator_Phases_PST_GOLDENMIDDLE extends BaseEvaluator impl
 			piece &= piece - 1;
 		}
 		
+		
+		//Queens
+		piece = evalinfo.getPieces(WHITE, QUEEN);
+		
+		while (piece != 0) {
 			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			eval_o +=  1 * features_o[FEATURE_ID_PST_QUEEN].getWeight(square_index);
+			eval_e +=  1 * features_e[FEATURE_ID_PST_QUEEN].getWeight(square_index);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		piece = evalinfo.getPieces(BLACK, QUEEN);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			eval_o +=  -1 * features_o[FEATURE_ID_PST_QUEEN].getWeight(square_index);
+			eval_e +=  -1 * features_e[FEATURE_ID_PST_QUEEN].getWeight(square_index);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		//Rooks
+		piece = evalinfo.getPieces(WHITE, ROOK);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			eval_o +=  1 * features_o[FEATURE_ID_PST_ROOK].getWeight(square_index);
+			eval_e +=  1 * features_e[FEATURE_ID_PST_ROOK].getWeight(square_index);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		piece = evalinfo.getPieces(BLACK, ROOK);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			eval_o +=  -1 * features_o[FEATURE_ID_PST_ROOK].getWeight(square_index);
+			eval_e +=  -1 * features_e[FEATURE_ID_PST_ROOK].getWeight(square_index);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		//Bishops
+		piece = evalinfo.getPieces(WHITE, BISHOP);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			eval_o +=  1 * features_o[FEATURE_ID_PST_BISHOP].getWeight(square_index);
+			eval_e +=  1 * features_e[FEATURE_ID_PST_BISHOP].getWeight(square_index);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		piece = evalinfo.getPieces(BLACK, BISHOP);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			eval_o +=  -1 * features_o[FEATURE_ID_PST_BISHOP].getWeight(square_index);
+			eval_e +=  -1 * features_e[FEATURE_ID_PST_BISHOP].getWeight(square_index);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		//Knights
+		piece = evalinfo.getPieces(WHITE, NIGHT);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			eval_o +=  1 * features_o[FEATURE_ID_PST_KNIGHT].getWeight(square_index);
+			eval_e +=  1 * features_e[FEATURE_ID_PST_KNIGHT].getWeight(square_index);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		piece = evalinfo.getPieces(BLACK, NIGHT);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			eval_o +=  -1 * features_o[FEATURE_ID_PST_KNIGHT].getWeight(square_index);
+			eval_e +=  -1 * features_e[FEATURE_ID_PST_KNIGHT].getWeight(square_index);
+			
+			piece &= piece - 1;
+		}
+		
+		
 		int total_material_factor = Math.min(MAX_MATERIAL_FACTOR, board.material_factor_white + board.material_factor_black);
 		
 		return (int) (eval_o * total_material_factor + eval_e * (MAX_MATERIAL_FACTOR - total_material_factor)) / MAX_MATERIAL_FACTOR;

@@ -24,6 +24,10 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.PAWN;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.KING;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.QUEEN;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.BISHOP;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.NIGHT;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl1.BoardImpl;
@@ -108,6 +112,106 @@ public class Bagatur_PST_SignalFiller implements ISignalFiller, Bagatur_PST_Feat
 			final int square_index = EvalConstants.MIRRORED_UP_DOWN[Long.numberOfTrailingZeros(piece)];
 			
 			signals.getSignal(FEATURE_ID_PST_KING).addStrength(square_index, -1, 0);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		//Queens
+		piece = evalInfo.getPieces(WHITE, QUEEN);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			signals.getSignal(FEATURE_ID_PST_QUEEN).addStrength(square_index, 1, 0);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		piece = evalInfo.getPieces(BLACK, QUEEN);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			signals.getSignal(FEATURE_ID_PST_QUEEN).addStrength(square_index, -1, 0);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		//Rooks
+		piece = evalInfo.getPieces(WHITE, ROOK);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			signals.getSignal(FEATURE_ID_PST_ROOK).addStrength(square_index, 1, 0);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		piece = evalInfo.getPieces(BLACK, ROOK);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			signals.getSignal(FEATURE_ID_PST_ROOK).addStrength(square_index, -1, 0);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		//Bishops
+		piece = evalInfo.getPieces(WHITE, BISHOP);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			signals.getSignal(FEATURE_ID_PST_BISHOP).addStrength(square_index, 1, 0);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		piece = evalInfo.getPieces(BLACK, BISHOP);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			signals.getSignal(FEATURE_ID_PST_BISHOP).addStrength(square_index, -1, 0);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		//Knights
+		piece = evalInfo.getPieces(WHITE, NIGHT);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			signals.getSignal(FEATURE_ID_PST_KNIGHT).addStrength(square_index, 1, 0);
+			
+			piece &= piece - 1;
+		}
+		
+		
+		piece = evalInfo.getPieces(BLACK, NIGHT);
+		
+		while (piece != 0) {
+			
+			final int square_index = Long.numberOfTrailingZeros(piece);
+			
+			signals.getSignal(FEATURE_ID_PST_KNIGHT).addStrength(square_index, -1, 0);
 			
 			piece &= piece - 1;
 		}
