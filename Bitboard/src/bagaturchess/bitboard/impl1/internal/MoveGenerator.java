@@ -707,7 +707,14 @@ public final class MoveGenerator {
 				
 			} else {
 				
-				moveScores[j] = 100 * (MoveUtil.getAttackedPieceIndex(cur_move) * 6 - MoveUtil.getSourcePieceIndex(cur_move));
+				if (SEEUtil.getSeeCaptureScore(cb, cur_move) >= 0) {
+				
+					moveScores[j] = 5000 + 100 * (MoveUtil.getAttackedPieceIndex(cur_move) * 6 - MoveUtil.getSourcePieceIndex(cur_move));
+					
+				} else {
+					
+					moveScores[j] = -5000 + 100 * (MoveUtil.getAttackedPieceIndex(cur_move) * 6 - MoveUtil.getSourcePieceIndex(cur_move));
+				}
 			}
 		}
 	}
