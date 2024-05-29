@@ -358,15 +358,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				if (score > alpha) {
-					
-					if (move == ttMove) {
 						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, 0);
-						
-					} else {
-						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, 0);
-					}
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, 0);
 				}
 				
 			} catch(SearchInterruptedException sie) {
@@ -447,7 +440,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 			
-			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
+			if (!SearchUtils.isMateVal(bestScore)) {
+				
+				env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
+			}
 		}
 			
 		
@@ -911,40 +907,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 			}
 		}
-		
-		
-		//Singular move extension
-		int singularMoveExtension = 0;
-		int multiCutReduction = 0;
-        if (false
-        	&& ply > 0
-        	&& depth >= 2
-        	&& cb.checkingPieces == 0
-			&& excludedMove == 0
-			&& isTTLowerBound
-			&& isTTDepthEnoughForSingularExtension
-			) {
-			
-	        int singularBeta = 0; //ttValue - 50;
-	        int reduction = depth / 2;
-	        
-	        int singularValue = search(mediator, info, pvman, evaluator, cb, moveGen, ply,
-	        		depth - reduction, singularBeta - 1, singularBeta, isPv, ttMove);
-	        if (singularValue < singularBeta) {
-	        	
-	        	singularMoveExtension = 1;
-	        	
-	        } else if (singularBeta > beta) {
-	        	
-    	        // Multi-cut pruning
-    	        // Our ttMove is assumed to fail high, and now we failed high also on a reduced
-    	        // search without the ttMove. So we assume this expected Cut-node is not singular,
-    	        // that multiple moves fail high, and we can prune the whole subtree by returning
-    	        // a soft bound.
-	        	
-	            multiCutReduction = 1;
-	        }
-		}
         
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
@@ -1225,9 +1187,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						reduction += 1;
 					}
 					
-					reduction += singularMoveExtension;
-					reduction += multiCutReduction;
-					
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
 					
 				} else {
@@ -1262,19 +1221,12 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
 						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -alpha - 1, -alpha, false, 0);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, 0);
 					}
 					
 					if (score > alpha) {
 						
-						if (move == ttMove) {
-							
-							score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 + singularMoveExtension - multiCutReduction, -beta, -alpha, isPv, 0);
-							
-						} else {
-							
-							score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1 - multiCutReduction, -beta, -alpha, isPv, 0);
-						}
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, 0);
 					}
 					
 				} catch(SearchInterruptedException sie) {
@@ -1669,7 +1621,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 		if (env.getTPT() != null) {
 			
-			env.getTPT().put(hashkey, 0, bestScore, alphaOrig, beta, bestMove);
+			if (!SearchUtils.isMateVal(bestScore)) {
+				
+				env.getTPT().put(hashkey, 0, bestScore, alphaOrig, beta, bestMove);
+			}
 		}
 		
 		
