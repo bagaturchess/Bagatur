@@ -1465,22 +1465,22 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (ttFlag == ITTEntry.FLAG_EXACT) {
 						
-				    	node.eval = ttValue;
-						
+				    	extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
+				    	
 				    	return node.eval;
 				    	
 					} else {
 						
 						if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
 							
-					    	node.eval = ttValue;
+							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 							
 					    	return node.eval;
 						}
 						
 						if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
 							
-					    	node.eval = ttValue;
+							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 							
 					    	return node.eval;
 						}
@@ -1613,7 +1613,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 					}
 					
-					alpha = Math.max(alpha, score);
+					alpha = Math.max(alpha, bestScore);
 					
 					if (alpha >= beta) {
 						
@@ -1647,16 +1647,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			node.bestmove = 0;
 			node.leaf = true;
 			node.eval = eval;
-		}
-		
-		
-		if (env.getTPT() != null) {
 			
-			if (bestScore > eval) {
-				
-				env.getTPT().put(hashkey, 0, bestScore, alphaOrig, beta, bestMove);
-				
-			}
+			bestScore = eval;
+			bestMove = 0;
 		}
 		
 		
@@ -1667,7 +1660,16 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.bestmove = 0;
 				node.leaf = true;
 				node.eval = alpha;
+				
+				bestScore = alpha;
+				bestMove = 0;
 			}
+		}
+		
+			
+		if (env.getTPT() != null) {
+			
+			env.getTPT().put(hashkey, 0, bestScore, alphaOrig, beta, bestMove);
 		}
 		
 		
@@ -1715,7 +1717,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
 			
-			eval = Math.min(0, eval);
+			eval = Math.min(getDrawScores(-1), eval);
 		}
 		
 		
@@ -1773,7 +1775,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 			
-			if (isPv) {
+			//if (isPv) {
 				
 				ply++;
 				
@@ -1792,6 +1794,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (!tt_entries_per_ply[ply].isEmpty()) {
 							
+							result.leaf = false;
 							
 							draw = extractFromTT(ply, result.child, tt_entries_per_ply[ply], info, isPv);
 							
@@ -1799,10 +1802,6 @@ public class Search_PVS_NWS extends SearchImpl {
 							if (draw) {
 								
 								result.eval = getDrawScores(-1);
-								
-							} else {
-								
-								result.leaf = false;
 							}
 						}
 						
@@ -1816,7 +1815,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 			}
-		}
+		//}
 		
 		
 		return draw;
