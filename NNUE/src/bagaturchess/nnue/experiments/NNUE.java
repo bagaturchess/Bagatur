@@ -134,10 +134,6 @@ public class NNUE {
         return c * 32 + r;
     }
 
-    private static void decode_fen(String fen, int[] pieces, int[] squares, int player, int castle, int fifty, int move_number) {
-        // Implementation of FEN decoder
-    }
-
     private static int nnue_evaluate_pos(Position pos) {
         int out_value;
         int[] input_mask = new int[FtOutDims / 8];
@@ -203,7 +199,7 @@ public class NNUE {
     private static void refresh_accumulator(Position pos) {
         Accumulator accumulator = pos.nnue[0].accumulator;
 
-        int[][] activeIndices = new int[2][];
+        int[][] activeIndices = new int[2][30];
         append_active_indices(pos, activeIndices);
 
         for (int c = 0; c < 2; c++) {
@@ -263,7 +259,6 @@ public class NNUE {
 
     private static void append_active_indices(Position pos, int[][] active) {
         for (int c = 0; c < 2; c++) {
-            active[c] = new int[30]; // Adjust size as needed
             half_kp_append_active_indices(pos, c, active[c]);
         }
     }
@@ -349,6 +344,43 @@ public class NNUE {
         static final int bking = 1;
     }
     
+    private static class Position {
+        NNUEData[] nnue = new NNUEData[3];
+        int player;
+        int[] pieces;
+        int[] squares;
+        
+        public Position() {
+            for (int i = 0; i < nnue.length; i++) {
+                nnue[i] = new NNUEData();
+            }
+        }
+        
+        public Position(int[] _squares, int[] _pieces, int _player) {
+        	this();
+        	squares = _squares;
+        	pieces = _pieces;
+        	player = _player;
+        }
+    }
+
+    private static class NNUEData {
+        Accumulator accumulator = new Accumulator();
+        DirtyPiece dirtyPiece = new DirtyPiece();
+    }
+
+    private static class Accumulator {
+        boolean computedAccumulation;
+        int[][] accumulation = new int[2][256];
+    }
+    
+    private static class DirtyPiece {
+        int dirtyNum;
+        int[] pc = new int[30];
+        int[] from = new int[30];
+        int[] to = new int[30];
+    }
+
     
     // Constants for FEN decoding
     private static final String PIECE_NAME = "_KQRBNPkqrbnp_";
@@ -471,5 +503,19 @@ public class NNUE {
     	
         int eval = nnue_evaluate_pos(pos);
         System.out.println("Evaluation: " + eval);
+        
+    	long startTime = System.currentTimeMillis();
+    	int count = 0;
+    	while (true) {
+    		int evaluationN = nnue_evaluate_pos(pos);
+    		count++;
+    		if (count % 10000 == 0) {
+    			System.out.println("NPS: " + count / Math.max(1, (System.currentTimeMillis() - startTime) / 1000));
+    			System.out.println("Evaluation: " + evaluationN);
+    		}
+    		pos.nnue[0].accumulator.computedAccumulation = false;
+    		pos.nnue[1].accumulator.computedAccumulation = false;
+    		pos.nnue[2].accumulator.computedAccumulation = false;
+    	}
     }
 }
