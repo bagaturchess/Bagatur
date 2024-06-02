@@ -219,7 +219,7 @@ public class NNUE {
     }
     
     private static void transform(Position pos, byte[] output, int[] outMask) {
-        if (!update_accumulator(pos));
+         if (!update_accumulator(pos))
             refresh_accumulator(pos);
 
         int[][] accumulation = pos.nnue[0].accumulator.accumulation;
