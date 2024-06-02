@@ -1,4 +1,4 @@
-package bagaturchess.deeplearning.impl_nnue_v2.eval;
+package bagaturchess.deeplearning.impl_nnue_v2.java_eval;
 
 
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;

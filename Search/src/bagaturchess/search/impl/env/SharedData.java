@@ -67,7 +67,7 @@ public class SharedData {
 			
 			evaluatorFactory = (IEvaluatorFactory) SharedData.class.getClassLoader().loadClass(className).newInstance();
 			
-			String className_NNUE = "bagaturchess.deeplearning.impl_nnue_v2.eval.NNUEEvaluatorFactory";
+			String className_NNUE = "bagaturchess.deeplearning.impl_nnue_v2.jni_eval.NNUEEvaluatorFactory";
 			
 			evaluatorFactory_NNUE = (IEvaluatorFactory) SharedData.class.getClassLoader().loadClass(className_NNUE).newInstance();
 			

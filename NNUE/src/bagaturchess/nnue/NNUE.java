@@ -314,21 +314,21 @@ public class NNUE {
             	// Difference calculation for the deactivated features
                 System.arraycopy(prevAcc.accumulation[c], 0, accumulator.accumulation[c], 0, kHalfDimensions);
 
-                for (int index : removed_indices[c]) {
+                /*for (int index : removed_indices[c]) {
                     int offset = kHalfDimensions * index;
 
                     for (int j = 0; j < kHalfDimensions; j++)
                         accumulator.accumulation[c][j] -= ft_weights[offset + j];
-                }
+                }*/
             }
 
             // Difference calculation for the activated features
-            for (int index : added_indices[c]) {
+            /*for (int index : added_indices[c]) {
                 int offset = kHalfDimensions * index;
 
                 for (int j = 0; j < kHalfDimensions; j++)
                     accumulator.accumulation[c][j] += ft_weights[offset + j];
-            }
+            }*/
         }
 
         accumulator.computedAccumulation = true;
