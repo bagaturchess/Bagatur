@@ -1,4 +1,4 @@
-package bagaturchess.nnue.experiments;
+package bagaturchess.nnue;
 
 import java.io.File;
 import java.net.URI;
@@ -51,8 +51,16 @@ public class NNUE {
     private static final int NetworkStart = TransformerStart + 4 + 2 * 256 + 2 * 256 * 64 * 641;
     
 
+    static {
+    	
+        // Initialize and test the NNUE functions here
+    	File net = new File("./nn-6b4236f2ec01.nnue");
+    	//File net = new File("./nn-04cf2b4ed1da.nnue");
+    	nnue_init(net.toURI());
+    }
+    
     private static void nnue_init(URI evalFile) {
-        System.out.println("Loading NNUE : " + evalFile);
+        //System.out.println("Loading NNUE : " + evalFile);
         if (load_eval_file(evalFile)) {
             System.out.println("NNUE loaded!");
         } else {
@@ -134,7 +142,26 @@ public class NNUE {
         return c * 32 + r;
     }
 
-    private static int nnue_evaluate_pos(Position pos) {
+    public static int nnue_evaluate_pos(Position pos) {
+
+        NetData netData = new NetData();
+
+        transform(pos, netData.input, null);
+
+        affine_txfm(netData.input, netData.hidden1_out, FtOutDims, 32,
+                hidden1_biases, hidden1_weights, null, null, true);
+
+        affine_txfm(netData.hidden1_out, netData.hidden2_out, 32, 32,
+                hidden2_biases, hidden2_weights, null, null, false);
+
+        int out_value = affine_propagate(netData.hidden2_out, output_biases,
+                output_weights);
+
+        return out_value / FV_SCALE;
+    }
+
+    private static int nnue_evaluate_incremental(Position pos, Move move) {
+        update_dirty_pieces(pos, move);
         int out_value;
         int[] input_mask = new int[FtOutDims / 8];
         int[] hidden1_mask = new int[1];
@@ -154,9 +181,45 @@ public class NNUE {
 
         return out_value / FV_SCALE;
     }
-
+    
+    // Update dirty pieces based on the move
+    private static void update_dirty_pieces(Position pos, Move move) {
+        
+    	DirtyPiece dirtyPiece = pos.nnue[0].dirtyPiece;
+        dirtyPiece.dirtyNum = 1;
+        dirtyPiece.pc[0] = move.piece;
+        dirtyPiece.from[0] = move.from;
+        dirtyPiece.to[0] = move.to;
+        pos.nnue[0].accumulator.computedAccumulation = false;
+        
+        // Update color to move
+        pos.player = 1 - pos.player;
+        
+        // Update pieces and squares arrays
+        for (int i = 0; i < pos.pieces.length; i++) {
+            if (pos.squares[i] == move.from) {
+                pos.squares[i] = move.to;
+                break;
+            }
+        }
+        
+        // Handle capture
+        for (int i = 0; i < pos.pieces.length; i++) {
+            if (pos.squares[i] == move.to && pos.pieces[i] != move.piece) {
+                // Remove captured piece
+                for (int j = i; j < pos.pieces.length - 1; j++) {
+                    pos.pieces[j] = pos.pieces[j + 1];
+                    pos.squares[j] = pos.squares[j + 1];
+                }
+                pos.pieces[pos.pieces.length - 1] = 0;
+                pos.squares[pos.squares.length - 1] = 0;
+                break;
+            }
+        }
+    }
+    
     private static void transform(Position pos, byte[] output, int[] outMask) {
-        if (!update_accumulator(pos))
+        if (!update_accumulator(pos));
             refresh_accumulator(pos);
 
         int[][] accumulation = pos.nnue[0].accumulator.accumulation;
@@ -217,15 +280,16 @@ public class NNUE {
     }
 
     private static boolean update_accumulator(Position pos) {
+        
         Accumulator accumulator = pos.nnue[0].accumulator;
         if (accumulator.computedAccumulation)
             return true;
-
+        
         Accumulator prevAcc = null;
         if ((pos.nnue[1] == null || !(prevAcc = pos.nnue[1].accumulator).computedAccumulation)
                 && (pos.nnue[2] == null || !(prevAcc = pos.nnue[2].accumulator).computedAccumulation))
-            return false;
-
+           return false;
+        
         int[][] removed_indices = new int[2][];
         int[][] added_indices = new int[2][];
         boolean[] reset = new boolean[2];
@@ -235,6 +299,8 @@ public class NNUE {
             if (reset[c]) {
                 System.arraycopy(ft_biases, 0, accumulator.accumulation[c], 0, ft_biases.length);
             } else {
+            	
+            	// Difference calculation for the deactivated features
                 System.arraycopy(prevAcc.accumulation[c], 0, accumulator.accumulation[c], 0, kHalfDimensions);
 
                 for (int index : removed_indices[c]) {
@@ -245,6 +311,7 @@ public class NNUE {
                 }
             }
 
+            // Difference calculation for the activated features
             for (int index : added_indices[c]) {
                 int offset = kHalfDimensions * index;
 
@@ -339,21 +406,34 @@ public class NNUE {
         byte[] hidden2_out = new byte[32];
     }
 
-    private static class PieceType {
-        static final int wking = 0;
-        static final int bking = 1;
+    public class PieceType {
+        static final int EMPTY = 0;
+        static final int wking = 1;
+        static final int bking = 7;
+        static final int wqueen = 2;
+        static final int bqueen = 8;
+        static final int wrook = 3;
+        static final int brook = 9;
+        static final int wbishop = 4;
+        static final int bbishop = 10;
+        static final int wknight = 5;
+        static final int bknight = 11;
+        static final int wpawn = 6;
+        static final int bpawn = 12;
     }
     
-    private static class Position {
-        NNUEData[] nnue = new NNUEData[3];
-        int player;
-        int[] pieces;
-        int[] squares;
+    public static class Position {
+        
+    	NNUEData[] nnue = new NNUEData[3];
+        public int player;
+        public int[] pieces = new int[33];
+        public int[] squares = new int[33];
         
         public Position() {
             for (int i = 0; i < nnue.length; i++) {
                 nnue[i] = new NNUEData();
             }
+            clear();
         }
         
         public Position(int[] _squares, int[] _pieces, int _player) {
@@ -362,8 +442,14 @@ public class NNUE {
         	pieces = _pieces;
         	player = _player;
         }
+        
+        public void clear() {
+    		nnue[0].accumulator.computedAccumulation = false;
+    		nnue[1].accumulator.computedAccumulation = false;
+    		nnue[2].accumulator.computedAccumulation = false;
+        }
     }
-
+    
     private static class NNUEData {
         Accumulator accumulator = new Accumulator();
         DirtyPiece dirtyPiece = new DirtyPiece();
@@ -381,6 +467,18 @@ public class NNUE {
         int[] to = new int[30];
     }
 
+    // Move class to store move information
+    public static class Move {
+        int piece;
+        int from;
+        int to;
+
+        public Move(int piece, int from, int to) {
+            this.piece = piece;
+            this.from = from;
+            this.to = to;
+        }
+    }
     
     // Constants for FEN decoding
     private static final String PIECE_NAME = "_KQRBNPkqrbnp_";
@@ -472,11 +570,6 @@ public class NNUE {
     }
     
     public static void main(String[] args) {
-    	
-        // Initialize and test the NNUE functions here
-    	//File net = new File("./nn-6b4236f2ec01.nnue");
-    	File net = new File("./nn-04cf2b4ed1da.nnue");
-    	nnue_init(net.toURI());
 
         // FEN decoding
         String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -504,6 +597,12 @@ public class NNUE {
         int eval = nnue_evaluate_pos(pos);
         System.out.println("Evaluation: " + eval);
         
+        // Example of incremental evaluation after a move
+        /*Move move = new Move(6, 12, 28); //e2e4
+        int evalAfterMove = nnue_evaluate_incremental(pos, move);
+        System.out.println("Evaluation after move: " + evalAfterMove);
+        */
+        
     	long startTime = System.currentTimeMillis();
     	int count = 0;
     	while (true) {
@@ -514,8 +613,8 @@ public class NNUE {
     			System.out.println("Evaluation: " + evaluationN);
     		}
     		pos.nnue[0].accumulator.computedAccumulation = false;
-    		pos.nnue[1].accumulator.computedAccumulation = false;
-    		pos.nnue[2].accumulator.computedAccumulation = false;
+    		pos.nnue[1].accumulator.computedAccumulation = true;
+    		pos.nnue[2].accumulator.computedAccumulation = true;
     	}
     }
 }
