@@ -25,7 +25,8 @@ set ARGS=%ARGS% bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP_Thre
 set ARGS=%ARGS% bagaturchess.search.impl.alg.impl1.Search_PVS_NWS
 set ARGS=%ARGS% bagaturchess.engines.cfg.base.SearchConfigImpl_AB
 set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20
-set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20
+REM classical evaluation set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20
+set ARGS=%ARGS% bagaturchess.deeplearning.impl_nnue_v2.java_eval.EvaluationConfig
 
 echo on
 

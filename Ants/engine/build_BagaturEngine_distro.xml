@@ -143,7 +143,7 @@
 			<include name="Bagatur_mcore.bat"/>
 		</fileset>
 	</copy>
-	<copy tofile="${temp_dir}/bin/Bagatur_NNUE_1core.bat" >
+	<!--copy tofile="${temp_dir}/bin/Bagatur_NNUE_1core.bat" >
 		<fileset dir="${resources_dir}/bin/engine/bat">
 			<include name="Bagatur_NNUE_1core.bat"/>
 		</fileset>
@@ -152,7 +152,7 @@
 		<fileset dir="${resources_dir}/bin/engine/bat">
 			<include name="Bagatur_NNUE_mcore.bat"/>
 		</fileset>
-	</copy>
+	</copy-->
   	<copy tofile="${temp_dir}/bin/Bagatur_1core.sh" >
   		<fileset dir="${resources_dir}/bin/engine/sh">
   			<include name="Bagatur_1core.sh"/>
@@ -163,7 +163,7 @@
   			<include name="Bagatur_mcore.sh"/>
   		</fileset>
   	</copy>
-  	<copy tofile="${temp_dir}/bin/Bagatur_NNUE_1core.sh" >
+  	<!--copy tofile="${temp_dir}/bin/Bagatur_NNUE_1core.sh" >
   		<fileset dir="${resources_dir}/bin/engine/sh">
   			<include name="Bagatur_NNUE_1core.sh"/>
   		</fileset>
@@ -172,7 +172,7 @@
   		<fileset dir="${resources_dir}/bin/engine/sh">
   			<include name="Bagatur_NNUE_mcore.sh"/>
   		</fileset>
-  	</copy>
+  	</copy-->
 	
   	<copy tofile="${temp_dir}/Bagatur_64_1_core.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
@@ -189,7 +189,7 @@
 			<include name="Bagatur_1core.ini"/>
 		</fileset>
 	</copy>
-  	<copy tofile="${temp_dir}/Bagatur_NNUE_1_core.bmp" >
+  	<!--copy tofile="${temp_dir}/Bagatur_NNUE_1_core.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
 			<include name="BagaturEngine.bmp"/>
 		</fileset>
@@ -203,7 +203,7 @@
 		<fileset dir="${resources_dir}/bin/engine/exe">
 			<include name="Bagatur_NNUE_1core.ini"/>
 		</fileset>
-	</copy>
+	</copy-->
   	
   	<copy tofile="${temp_dir}/Bagatur_64_2+_cores.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
@@ -220,7 +220,7 @@
 			<include name="Bagatur_2cores.ini"/>
 		</fileset>
 	</copy>
-  	<copy tofile="${temp_dir}/Bagatur_NNUE_64_2+_cores.bmp" >
+  	<!--copy tofile="${temp_dir}/Bagatur_NNUE_64_2+_cores.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
 			<include name="BagaturEngine.bmp"/>
 		</fileset>
@@ -234,7 +234,7 @@
 		<fileset dir="${resources_dir}/bin/engine/exe">
 			<include name="Bagatur_NNUE_2cores.ini"/>
 		</fileset>
-	</copy>
+	</copy-->
   	
   	
 	<zip zipfile="${work_dir}/BagaturEngine${distro_sufix}.zip" basedir="${temp_dir}" />
