@@ -612,9 +612,7 @@ public class NNUE {
     			System.out.println("NPS: " + count / Math.max(1, (System.currentTimeMillis() - startTime) / 1000));
     			System.out.println("Evaluation: " + evaluationN);
     		}
-    		pos.nnue[0].accumulator.computedAccumulation = false;
-    		pos.nnue[1].accumulator.computedAccumulation = true;
-    		pos.nnue[2].accumulator.computedAccumulation = true;
+    		pos.clear();
     	}
     }
 }
