@@ -121,6 +121,10 @@ public class NNUE {
             offset += 4;
         }
         read_output_weights(output_weights, buffer, offset);
+        
+        // Permute biases for AVX2
+        //permute_biases(hidden1_biases);
+        //permute_biases(hidden2_biases);
     }
 
     private static int read_hidden_weights(int[] w, int dims, int offset, ByteBuffer buffer) {
@@ -142,6 +146,20 @@ public class NNUE {
         return c * 32 + r;
     }
 
+    // Permute biases for AVX2
+    /*private static void permute_biases(int[] biases) {
+        int[] tmp = new int[32];
+        tmp[0] = biases[0];
+        tmp[1] = biases[4];
+        tmp[2] = biases[1];
+        tmp[3] = biases[5];
+        tmp[4] = biases[2];
+        tmp[5] = biases[6];
+        tmp[6] = biases[3];
+        tmp[7] = biases[7];
+        System.arraycopy(tmp, 0, biases, 0, 32);
+    }*/
+        
     public static int nnue_evaluate_pos(Position pos) {
 
         NetData netData = new NetData();
@@ -219,7 +237,7 @@ public class NNUE {
     }
     
     private static void transform(Position pos, byte[] output, int[] outMask) {
-         if (!update_accumulator(pos))
+        //if (!update_accumulator(pos))
             refresh_accumulator(pos);
 
         int[][] accumulation = pos.nnue[0].accumulator.accumulation;
@@ -262,17 +280,22 @@ public class NNUE {
     private static void refresh_accumulator(Position pos) {
         Accumulator accumulator = pos.nnue[0].accumulator;
 
-        int[][] activeIndices = new int[2][30];
-        append_active_indices(pos, activeIndices);
+        int[][] activeIndices = new int[2][30]; // Adjust the size based on expected active indices
+        int[] activeSizes = new int[2]; // To track the number of active indices for each player
+        append_active_indices(pos, activeIndices, activeSizes);
 
         for (int c = 0; c < 2; c++) {
-            System.arraycopy(ft_biases, 0, accumulator.accumulation[c], 0, ft_biases.length);
+            // Copy biases to the accumulator
+            System.arraycopy(ft_biases, 0, accumulator.accumulation[c], 0, kHalfDimensions);
 
-            for (int index : activeIndices[c]) {
+            // Accumulate weights based on active indices
+            for (int k = 0; k < activeSizes[c]; k++) {
+                int index = activeIndices[c][k];
                 int offset = kHalfDimensions * index;
 
-                for (int j = 0; j < kHalfDimensions; j++)
+                for (int j = 0; j < kHalfDimensions; j++) {
                     accumulator.accumulation[c][j] += ft_weights[offset + j];
+                }
             }
         }
 
@@ -290,8 +313,8 @@ public class NNUE {
                 && (pos.nnue[2] == null || !(prevAcc = pos.nnue[2].accumulator).computedAccumulation))
            return false;
         
-        int[][] removed_indices = new int[2][];
-        int[][] added_indices = new int[2][];
+        int[][] removed_indices = new int[2][30];
+        int[][] added_indices = new int[2][30];
         boolean[] reset = new boolean[2];
         append_changed_indices(pos, removed_indices, added_indices, reset);
 
@@ -324,19 +347,13 @@ public class NNUE {
         return true;
     }
 
-    private static void append_active_indices(Position pos, int[][] active) {
-        for (int c = 0; c < 2; c++) {
-            half_kp_append_active_indices(pos, c, active[c]);
-        }
-    }
-
     private static void append_changed_indices(Position pos, int[][] removed, int[][] added, boolean[] reset) {
         DirtyPiece dp = pos.nnue[0].dirtyPiece;
         if (pos.nnue[1].accumulator.computedAccumulation) {
             for (int c = 0; c < 2; c++) {
                 reset[c] = dp.pc[0] == KING(c);
                 if (reset[c])
-                    half_kp_append_active_indices(pos, c, added[c]);
+                    half_kp_append_active_indices(pos, c, added[c], new int[]{0});
                 else
                     half_kp_append_changed_indices(pos, c, dp, removed[c], added[c]);
             }
@@ -345,7 +362,7 @@ public class NNUE {
             for (int c = 0; c < 2; c++) {
                 reset[c] = dp.pc[0] == KING(c) || dp2.pc[0] == KING(c);
                 if (reset[c])
-                    half_kp_append_active_indices(pos, c, added[c]);
+                    half_kp_append_active_indices(pos, c, added[c], new int[]{0});
                 else {
                     half_kp_append_changed_indices(pos, c, dp, removed[c], added[c]);
                     half_kp_append_changed_indices(pos, c, dp2, removed[c], added[c]);
@@ -354,14 +371,21 @@ public class NNUE {
         }
     }
 
-    private static void half_kp_append_active_indices(Position pos, int c, int[] active) {
+    // Append active indices method
+    private static void append_active_indices(Position pos, int[][] active, int[] activeSizes) {
+        for (int c = 0; c < 2; c++) {
+            activeSizes[c] = 0;
+            half_kp_append_active_indices(pos, c, active[c], activeSizes);
+        }
+    }
+
+    private static void half_kp_append_active_indices(Position pos, int c, int[] active, int[] activeSizes) {
         int ksq = pos.squares[c];
         ksq = orient(c, ksq);
-        int size = 0;
         for (int i = 2; pos.pieces[i] != 0; i++) {
             int sq = pos.squares[i];
             int pc = pos.pieces[i];
-            active[size++] = make_index(c, sq, pc, ksq);
+            active[activeSizes[c]++] = make_index(c, sq, pc, ksq);
         }
     }
 
