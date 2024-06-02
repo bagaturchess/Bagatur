@@ -1,6 +1,5 @@
 package bagaturchess.nnue;
 
-import java.io.File;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
@@ -20,6 +19,8 @@ public class NNUEMain {
 		NNUE.Position pos = new NNUE.Position();
 		NNUEProbeUtils.Input input = new NNUEProbeUtils.Input();
 		
+		NNUE nnue = new NNUE();
+		
     	long startTime = System.currentTimeMillis();
     	int count = 0;
     	while (true) {
@@ -30,7 +31,7 @@ public class NNUEMain {
     		pos.squares = input.squares;
     		pos.pieces = input.pieces;
     		
-    		int score = NNUE.nnue_evaluate_pos(pos);
+    		int score = nnue.nnue_evaluate_pos(pos);
     		count++;
     		if (count % 100000 == 0) {
     			System.out.println("NPS: " + count / Math.max(1, (System.currentTimeMillis() - startTime) / 1000));

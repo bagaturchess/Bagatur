@@ -10,6 +10,7 @@ import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.nnue.NNUE;
 import bagaturchess.nnue.NNUEJNIBridge;
 import bagaturchess.nnue.NNUEProbeUtils;
 import bagaturchess.search.api.IEvalConfig;
@@ -40,7 +41,11 @@ public class NNUEEvaluator extends BaseEvaluator {
 	
 	private final IBoardConfig board_cfg;
 	
+	private NNUE.Position pos;
+	
 	private NNUEProbeUtils.Input input;
+	
+	private NNUE nnue;
 	
 	
 	NNUEEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
@@ -52,6 +57,10 @@ public class NNUEEvaluator extends BaseEvaluator {
 		board_cfg = bitboard.getBoardConfig();
 		
 		input = new NNUEProbeUtils.Input();
+		
+		pos = new NNUE.Position();
+		
+		nnue = new NNUE();
 	}
 	
 	
@@ -103,9 +112,26 @@ public class NNUEEvaluator extends BaseEvaluator {
 	@Override
 	protected int phase2() {
 		
+		//input = new NNUEProbeUtils.Input();
+		
 		NNUEProbeUtils.fillInput(bitboard, input);
 		
-		int actualWhitePlayerEval = NNUEJNIBridge.eval(input.color, input.pieces, input.squares);
+		//int actualWhitePlayerEval_c = NNUEJNIBridge.eval(input.color, input.pieces, input.squares);
+		
+		//pos = new NNUE.Position();
+		pos.clear();
+		
+		pos.player = input.color;
+		pos.squares = input.squares;
+		pos.pieces = input.pieces;
+		
+		int actualWhitePlayerEval_java = nnue.nnue_evaluate_pos(pos);
+		
+		/*if (actualWhitePlayerEval_c == actualWhitePlayerEval_java) {
+			System.out.println("OK actualWhitePlayerEval_c=" + actualWhitePlayerEval_c);
+		} else {
+			System.out.println("NOTOK actualWhitePlayerEval_c=" + actualWhitePlayerEval_c + " actualWhitePlayerEval_java=" + actualWhitePlayerEval_java);
+		}*/
 		
 		//actualWhitePlayerEval = (2 * actualWhitePlayerEval) / 3;
 		
@@ -115,10 +141,10 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		if (bitboard.getColourToMove() == BLACK) {
 			
-			actualWhitePlayerEval = -actualWhitePlayerEval;
+			actualWhitePlayerEval_java = -actualWhitePlayerEval_java;
 		}
 		
-		return (int) actualWhitePlayerEval;
+		return (int) actualWhitePlayerEval_java;
 	}
 	
 	

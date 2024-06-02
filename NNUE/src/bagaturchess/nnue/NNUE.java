@@ -121,10 +121,6 @@ public class NNUE {
             offset += 4;
         }
         read_output_weights(output_weights, buffer, offset);
-        
-        // Permute biases for AVX2
-        //permute_biases(hidden1_biases);
-        //permute_biases(hidden2_biases);
     }
 
     private static int read_hidden_weights(int[] w, int dims, int offset, ByteBuffer buffer) {
@@ -145,24 +141,15 @@ public class NNUE {
     private static int wt_idx(int r, int c, int dims) {
         return c * 32 + r;
     }
-
-    // Permute biases for AVX2
-    /*private static void permute_biases(int[] biases) {
-        int[] tmp = new int[32];
-        tmp[0] = biases[0];
-        tmp[1] = biases[4];
-        tmp[2] = biases[1];
-        tmp[3] = biases[5];
-        tmp[4] = biases[2];
-        tmp[5] = biases[6];
-        tmp[6] = biases[3];
-        tmp[7] = biases[7];
-        System.arraycopy(tmp, 0, biases, 0, 32);
-    }*/
-        
-    public static int nnue_evaluate_pos(Position pos) {
-
-        NetData netData = new NetData();
+    
+    
+    private NetData netData = new NetData();
+    private int[][] activeIndices = new int[2][30]; // Adjust the size based on expected active indices
+    private int[] activeSizes = new int[2]; // To track the number of active indices for each player
+    
+    public int nnue_evaluate_pos(Position pos) {
+    	
+    	netData.clear();
 
         transform(pos, netData.input, null);
 
@@ -178,7 +165,7 @@ public class NNUE {
         return out_value / FV_SCALE;
     }
 
-    private static int nnue_evaluate_incremental(Position pos, Move move) {
+    private int nnue_evaluate_incremental(Position pos, Move move) {
         update_dirty_pieces(pos, move);
         int out_value;
         int[] input_mask = new int[FtOutDims / 8];
@@ -236,7 +223,7 @@ public class NNUE {
         }
     }
     
-    private static void transform(Position pos, byte[] output, int[] outMask) {
+    private void transform(Position pos, byte[] output, int[] outMask) {
         //if (!update_accumulator(pos))
             refresh_accumulator(pos);
 
@@ -277,11 +264,11 @@ public class NNUE {
             output[i] = (byte) clamp(tmp[i] >> SHIFT, 0, 127);
     }
 
-    private static void refresh_accumulator(Position pos) {
+    private void refresh_accumulator(Position pos) {
         Accumulator accumulator = pos.nnue[0].accumulator;
-
-        int[][] activeIndices = new int[2][30]; // Adjust the size based on expected active indices
-        int[] activeSizes = new int[2]; // To track the number of active indices for each player
+        
+        activeSizes[0] = 0;
+        activeSizes[1] = 0;
         append_active_indices(pos, activeIndices, activeSizes);
 
         for (int c = 0; c < 2; c++) {
@@ -403,31 +390,38 @@ public class NNUE {
                 added[addedSize++] = make_index(c, dp.to[i], pc, ksq);
         }
     }
-
+    
     private static int make_index(int c, int s, int pc, int ksq) {
         return orient(c, s) + PieceToIndex[c][pc] + PS_END * ksq;
     }
-
+    
     private static int orient(int c, int s) {
         return s ^ (c == 0 ? 0x00 : 0x3f);
     }
-
+    
     private static int clamp(int value, int min, int max) {
         return Math.max(min, Math.min(max, value));
     }
-
+    
     private static boolean isKing(int p) {
         return (p == PieceType.wking || p == PieceType.bking);
     }
-
+    
     private static int KING(int c) {
         return (c == 0 ? PieceType.bking : PieceType.wking);
     }
-
+    
     private static class NetData {
+    	
         byte[] input = new byte[FtOutDims];
         byte[] hidden1_out = new byte[32];
         byte[] hidden2_out = new byte[32];
+		
+        public void clear() {
+			Arrays.fill(input, (byte)0);
+			Arrays.fill(hidden1_out, (byte)0);
+			Arrays.fill(hidden2_out, (byte)0);
+		}
     }
 
     public class PieceType {
@@ -618,7 +612,9 @@ public class NNUE {
         
     	Position pos = new Position(square, piece, player[0]);
     	
-        int eval = nnue_evaluate_pos(pos);
+    	NNUE nnue = new NNUE();
+    	
+        int eval = nnue.nnue_evaluate_pos(pos);
         System.out.println("Evaluation: " + eval);
         
         // Example of incremental evaluation after a move
@@ -630,7 +626,7 @@ public class NNUE {
     	long startTime = System.currentTimeMillis();
     	int count = 0;
     	while (true) {
-    		int evaluationN = nnue_evaluate_pos(pos);
+    		int evaluationN = nnue.nnue_evaluate_pos(pos);
     		count++;
     		if (count % 10000 == 0) {
     			System.out.println("NPS: " + count / Math.max(1, (System.currentTimeMillis() - startTime) / 1000));
