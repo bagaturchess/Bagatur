@@ -51,6 +51,10 @@ All other options are available for both versions: single core and SMP.
 
 The download of Bagatur contains subset of syzygy tablebases placed under ./data/egtb/ directory. It contaiuns 22 of the most common endgames with up to 5 pieces. By default the option 'SyzygyPath' is set to this directory. You could change this UCI option if you have complete or bigger set of syzygy tablebases donwloaded on your computer.
  
+# NNUE (Efficiently Updatable Neural Network)
+
+Since version 5.0, Bagatur is using NNUE as evaluation function. There was a Java porting. More info: https://github.com/bagaturchess/Bagatur/tree/master/NNUE
+
 # Elo Rating
 
 Chess strength and rating of a chess engine is measured in Elo.
@@ -58,13 +62,14 @@ According to CCRL 40/15, the latest offical Elo ratings of all well tested versi
 
 Special Thanks to <a href="https://www.chessprogramming.org/Graham_Banks">Graham Banks</a>, who put a huge efforts in testing Bagatur versions through the years!
 
-Latest official Elo rating of Bagatur 2.2e is ~3000 Elo. To make it easy to check, here is a probably outdated screenshot of the computerchess.org web page above:
+Latest official Elo rating of Bagatur is ~3000 Elo. To make it easy to check, here is a probably outdated screenshot of the computerchess.org web page above:
 
 <a href="" rel="Bagatur Elo rating"><img src="ELO_2021.11.18.png" alt="" /></a>
 
 # Machine Learning
 
 There are some code examples of Artificial Intelligence / Machine Learning experiments with the <a href="http://neuroph.sourceforge.net/">Neuroph</a> 2.94 Java framework.
+This was coded before NNUE times and now stays only as reference on how to use Neuroph, Deepnetts and DeepLearning4J Java frameworks.
 The starting point into the source code is located <a href="https://github.com/bagaturchess/Bagatur/tree/master/LearningImpl/src/bagaturchess/deeplearning/run">here</a> and the documentation is <a href="https://github.com/bagaturchess/Bagatur/tree/master/LearningImpl">here</a>.
 Although the Elo strength of the experimential version is with 50 Elo less than the version with the manually tuned evaluation function's parameters, the results are successful meaning that the neural network's <a href="https://en.wikipedia.org/wiki/Backpropagation">backpropagation</a> algorithm works as expected for <a href="https://en.wikipedia.org/wiki/Multilayer_perceptron">multi layer perceptron</a> neural network. This makes the experiments a good showcase of <a href="http://neuroph.sourceforge.net/">Neuroph</a> Java framework.
 
@@ -81,6 +86,7 @@ Additional resources:
 - <a href=https://github.com/bagaturchess/Bagatur/blob/master/PGNProcessor/readme.txt>PGNProcessor</a>
 - <a href=https://github.com/bagaturchess/Bagatur/blob/master/Search/readme.txt>Search Algorithm</a>
 - <a href=https://github.com/bagaturchess/Bagatur/tree/master/UCITracker>UCITracker</a>
+- <a href=https://github.com/bagaturchess/Bagatur/tree/master/NNUE>NNUE</a>
 
 # Bagatur is powered by <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>
 
@@ -111,7 +117,7 @@ In order to contact me, you could use LinkedIn <a href="https://www.linkedin.com
 
 Some personal toughts ...
 
-According to CCRL, there are below 500 chess engines in the world.
+According to CCRL, there are below 500+ chess engines in the world.
 This means that not many people are really interested in programming chess engines.
 Most probably the author of a chess engine is interested not only in programming but also in chess game. He/she must have enough willingness to invest spare time in chess programing, without any incentives, just for fun and driven by curiosity.
 

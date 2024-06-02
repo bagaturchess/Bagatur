@@ -1,3 +1,7 @@
+ Version 5.0 (2 June 2024)
+ * NNUE Java porting implemented and works correctly without incremental updates. More info: https://github.com/bagaturchess/Bagatur/tree/master/NNUE
+ * Switching the default evaluation to NNUE Java as it is now 50 Elo stronger than the classical version. (Which was NOT the case with JNI NNUE version introduced in version 4.1a)
+ 
  Version 4.1a (30 January 2024)
  * NNUE support - adding script files for running under Linux for both 1 core and multicore versions
  * NNUE support - adding exe and bat files for multicore version under Windows
