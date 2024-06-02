@@ -127,6 +127,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		int actualWhitePlayerEval_java = nnue.nnue_evaluate_pos(pos);
 		
+		//C and Java evaluations are now with small difference just because of NNUE biases
 		/*if (actualWhitePlayerEval_c == actualWhitePlayerEval_java) {
 			System.out.println("OK actualWhitePlayerEval_c=" + actualWhitePlayerEval_c);
 		} else {

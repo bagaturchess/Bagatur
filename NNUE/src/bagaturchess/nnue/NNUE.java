@@ -53,14 +53,14 @@ public class NNUE {
 
     static {
     	
-        // Initialize and test the NNUE functions here
+        // Initialize the NNUE functions here
     	File net = new File("./nn-6b4236f2ec01.nnue");
     	//File net = new File("./nn-04cf2b4ed1da.nnue");
     	nnue_init(net.toURI());
     }
     
     private static void nnue_init(URI evalFile) {
-        //System.out.println("Loading NNUE : " + evalFile);
+        System.out.println("Loading NNUE : " + evalFile);
         if (load_eval_file(evalFile)) {
             System.out.println("NNUE loaded!");
         } else {
@@ -143,13 +143,14 @@ public class NNUE {
     }
     
     
+    //Instance caches
     private NetData netData = new NetData();
     private int[][] activeIndices = new int[2][30]; // Adjust the size based on expected active indices
     private int[] activeSizes = new int[2]; // To track the number of active indices for each player
     
     public int nnue_evaluate_pos(Position pos) {
     	
-    	netData.clear();
+    	//netData.clear();
 
         transform(pos, netData.input, null);
 
