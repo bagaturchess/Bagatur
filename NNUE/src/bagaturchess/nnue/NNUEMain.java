@@ -16,22 +16,17 @@ public class NNUEMain {
 		String fen = bitboard.toEPD();
 		System.out.println("fen=" + fen);
 		
-		NNUE.Position pos = new NNUE.Position();
 		NNUEProbeUtils.Input input = new NNUEProbeUtils.Input();
 		
-		NNUE nnue = new NNUE();
+		NNUE nnue = new NNUE(bitboard);
 		
     	long startTime = System.currentTimeMillis();
     	int count = 0;
     	while (true) {
     		
-    		pos.clear();
     		NNUEProbeUtils.fillInput(bitboard, input);
-    		pos.player = input.color;
-    		pos.squares = input.squares;
-    		pos.pieces = input.pieces;
     		
-    		int score = nnue.nnue_evaluate_pos(pos);
+    		int score = nnue.nnue_evaluate_pos(input.color, input.pieces, input.squares);
     		count++;
     		if (count % 100000 == 0) {
     			System.out.println("NPS: " + count / Math.max(1, (System.currentTimeMillis() - startTime) / 1000));

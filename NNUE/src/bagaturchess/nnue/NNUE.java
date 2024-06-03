@@ -8,6 +8,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.common.MoveListener;
+import bagaturchess.bitboard.common.Properties;
+import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl.Figures;
+import bagaturchess.bitboard.impl.movelist.IMoveList;
+import bagaturchess.bitboard.impl1.internal.CastlingConfig;
+
 public class NNUE {
 
     private static final int PS_W_PAWN = 1;
@@ -143,16 +151,31 @@ public class NNUE {
     }
     
     
-    //Instance caches
-    private NetData netData = new NetData();
+    //Instance caches    
     private int[][] activeIndices = new int[2][30]; // Adjust the size based on expected active indices
     private int[] activeSizes = new int[2]; // To track the number of active indices for each player
     
-    public int nnue_evaluate_pos(Position pos) {
+    private NetData netData = new NetData();
+    private Position pos = new Position();
+    private MoveListener incremential_updates;
+    
+    public NNUE(IBitBoard bitboard) {
+    	
+    	incremential_updates = new IncrementalUpdates(bitboard);
+    }
+    
+    public int nnue_evaluate_pos(int color, int[] pieces, int[] squares) {
     	
     	//netData.clear();
-
-        transform(pos, netData.input, null);
+    	
+    	//TODO: uncomment this to skip incremental updates
+		pos.player = color;
+		pos.pieces = pieces;
+		pos.squares = squares;
+        refresh_accumulator();
+    	
+    	
+        transform(pos.player, pos.nnue[0].accumulator.accumulation, netData.input, null);
 
         affine_txfm(netData.input, netData.hidden1_out, FtOutDims, 32,
                 hidden1_biases, hidden1_weights, null, null, true);
@@ -166,71 +189,40 @@ public class NNUE {
         return out_value / FV_SCALE;
     }
 
-    private int nnue_evaluate_incremental(Position pos, Move move) {
-        update_dirty_pieces(pos, move);
-        int out_value;
-        int[] input_mask = new int[FtOutDims / 8];
-        int[] hidden1_mask = new int[1];
-
-        NetData netData = new NetData();
-
-        transform(pos, netData.input, input_mask);
-
-        affine_txfm(netData.input, netData.hidden1_out, FtOutDims, 32,
-                hidden1_biases, hidden1_weights, input_mask, hidden1_mask, true);
-
-        affine_txfm(netData.hidden1_out, netData.hidden2_out, 32, 32,
-                hidden2_biases, hidden2_weights, hidden1_mask, null, false);
-
-        out_value = affine_propagate(netData.hidden2_out, output_biases,
-                output_weights);
-
-        return out_value / FV_SCALE;
+    public MoveListener getIncrementalUpdates() {
+    	
+    	return incremential_updates;
     }
     
-    // Update dirty pieces based on the move
-    private static void update_dirty_pieces(Position pos, Move move) {
+    private void refresh_accumulator() {
         
-    	DirtyPiece dirtyPiece = pos.nnue[0].dirtyPiece;
-        dirtyPiece.dirtyNum = 1;
-        dirtyPiece.pc[0] = move.piece;
-        dirtyPiece.from[0] = move.from;
-        dirtyPiece.to[0] = move.to;
-        pos.nnue[0].accumulator.computedAccumulation = false;
+        activeSizes[0] = 0;
+        activeSizes[1] = 0;
+        append_active_indices(pos, activeIndices, activeSizes);
+
+        Accumulator accumulator = pos.nnue[0].accumulator;
         
-        // Update color to move
-        pos.player = 1 - pos.player;
-        
-        // Update pieces and squares arrays
-        for (int i = 0; i < pos.pieces.length; i++) {
-            if (pos.squares[i] == move.from) {
-                pos.squares[i] = move.to;
-                break;
-            }
-        }
-        
-        // Handle capture
-        for (int i = 0; i < pos.pieces.length; i++) {
-            if (pos.squares[i] == move.to && pos.pieces[i] != move.piece) {
-                // Remove captured piece
-                for (int j = i; j < pos.pieces.length - 1; j++) {
-                    pos.pieces[j] = pos.pieces[j + 1];
-                    pos.squares[j] = pos.squares[j + 1];
+        for (int c = 0; c < 2; c++) {
+            // Copy biases to the accumulator
+            System.arraycopy(ft_biases, 0, accumulator.accumulation[c], 0, kHalfDimensions);
+
+            // Accumulate weights based on active indices
+            for (int k = 0; k < activeSizes[c]; k++) {
+                int index = activeIndices[c][k];
+                int offset = kHalfDimensions * index;
+
+                for (int j = 0; j < kHalfDimensions; j++) {
+                    accumulator.accumulation[c][j] += ft_weights[offset + j];
                 }
-                pos.pieces[pos.pieces.length - 1] = 0;
-                pos.squares[pos.squares.length - 1] = 0;
-                break;
             }
         }
+
+        accumulator.computedAccumulation = true;
     }
     
-    private void transform(Position pos, byte[] output, int[] outMask) {
-        //if (!update_accumulator(pos))
-            refresh_accumulator(pos);
-
-        int[][] accumulation = pos.nnue[0].accumulator.accumulation;
-
-        int[] perspectives = {pos.player, 1 - pos.player};
+    private static void transform(int color, int[][] accumulation, byte[] output, int[] outMask) {
+    	
+        int[] perspectives = {color, 1 - color};
         for (int p = 0; p < 2; p++) {
             int offset = kHalfDimensions * p;
 
@@ -265,31 +257,6 @@ public class NNUE {
             output[i] = (byte) clamp(tmp[i] >> SHIFT, 0, 127);
     }
 
-    private void refresh_accumulator(Position pos) {
-        Accumulator accumulator = pos.nnue[0].accumulator;
-        
-        activeSizes[0] = 0;
-        activeSizes[1] = 0;
-        append_active_indices(pos, activeIndices, activeSizes);
-
-        for (int c = 0; c < 2; c++) {
-            // Copy biases to the accumulator
-            System.arraycopy(ft_biases, 0, accumulator.accumulation[c], 0, kHalfDimensions);
-
-            // Accumulate weights based on active indices
-            for (int k = 0; k < activeSizes[c]; k++) {
-                int index = activeIndices[c][k];
-                int offset = kHalfDimensions * index;
-
-                for (int j = 0; j < kHalfDimensions; j++) {
-                    accumulator.accumulation[c][j] += ft_weights[offset + j];
-                }
-            }
-        }
-
-        accumulator.computedAccumulation = true;
-    }
-
     private static boolean update_accumulator(Position pos) {
         
         Accumulator accumulator = pos.nnue[0].accumulator;
@@ -314,21 +281,21 @@ public class NNUE {
             	// Difference calculation for the deactivated features
                 System.arraycopy(prevAcc.accumulation[c], 0, accumulator.accumulation[c], 0, kHalfDimensions);
 
-                /*for (int index : removed_indices[c]) {
+                for (int index : removed_indices[c]) {
                     int offset = kHalfDimensions * index;
 
                     for (int j = 0; j < kHalfDimensions; j++)
                         accumulator.accumulation[c][j] -= ft_weights[offset + j];
-                }*/
+                }
             }
 
             // Difference calculation for the activated features
-            /*for (int index : added_indices[c]) {
+            for (int index : added_indices[c]) {
                 int offset = kHalfDimensions * index;
 
                 for (int j = 0; j < kHalfDimensions; j++)
                     accumulator.accumulation[c][j] += ft_weights[offset + j];
-            }*/
+            }
         }
 
         accumulator.computedAccumulation = true;
@@ -485,18 +452,115 @@ public class NNUE {
         int[] from = new int[30];
         int[] to = new int[30];
     }
+    
+    private class IncrementalUpdates implements MoveListener {
+    	
+    	
+    	private IBitBoard bitboard;
+    	private NNUEProbeUtils.Input input;
+    	
+    	
+    	IncrementalUpdates(IBitBoard _bitboard) {
+    		
+    		bitboard 	= _bitboard;
+    		input 		= new NNUEProbeUtils.Input();
+    		
+			pos.player = input.color;
+			pos.pieces = input.pieces;
+			pos.squares = input.squares;
+    	}
+    	
+    	
+    	//@Override
+    	public final void preForwardMove(int color, int move) {
+    		//TODO: comment this to skip incremental updates
+    		//move(move, color, bitboard);
+    	}
+    	
+    	
+    	//@Override
+    	public final void postForwardMove(int color, int move) {
+    		//Do nothing
+    	}
+    	
+    	
+    	//@Override
+    	public final void preBackwardMove(int color, int move) {
+    		//Do nothing
+    	}
+    	
+    	//@Override
+    	public final void postBackwardMove(int color, int move) {
+    		//TODO: comment this to skip incremental updates
+    		//unmove(move, color, bitboard);
+    	}
+    	
+    	
+    	//@Override
+    	public final void addPiece_Special(int color, int type) {
+    		//Do nothing
+    	}
+    	
+    	
+    	//@Override
+    	public final void initially_addPiece(int color, int type, long bb_pieces) {
+    		
+    		//Do nothing
+    	}
+    	
+    	
+    	public final void move(int move, int color, IBitBoard board) {
+    		
+    		int pieceType = board.getMoveOps().getFigureType(move);
+    		int fromFieldID = board.getMoveOps().getFromFieldID(move);
+    		int toFieldID = board.getMoveOps().getToFieldID(move);   		
+    		
+    		if (pieceType == Figures.TYPE_KING
+    				|| board.getMoveOps().isCastling(move)
+    				|| board.getMoveOps().isEnpassant(move)
+    				|| board.getMoveOps().isCapture(move)
+    				|| board.getMoveOps().isPromotion(move)) {
+    			
+    			NNUEProbeUtils.fillInput(bitboard, input);
+    			
+    			refresh_accumulator();
+    			
+    		} else {
+    			
+    			//TODO: Make index and update for both colors
+    			
+    			NNUEProbeUtils.fillInput(bitboard, input);
+    			
+    			refresh_accumulator();
+    		}
+    	}
 
-    // Move class to store move information
-    public static class Move {
-        int piece;
-        int from;
-        int to;
 
-        public Move(int piece, int from, int to) {
-            this.piece = piece;
-            this.from = from;
-            this.to = to;
-        }
+    	public final void unmove(int move, int color, IBitBoard board) {
+    		
+    		int pieceType = board.getMoveOps().getFigureType(move);
+    		int fromFieldID = board.getMoveOps().getFromFieldID(move);
+    		int toFieldID = board.getMoveOps().getToFieldID(move);   		
+    		
+    		if (pieceType == Figures.TYPE_KING
+    				|| board.getMoveOps().isCastling(move)
+    				|| board.getMoveOps().isEnpassant(move)
+    				|| board.getMoveOps().isCapture(move)
+    				|| board.getMoveOps().isPromotion(move)) {
+    			
+    			NNUEProbeUtils.fillInput(bitboard, input);
+    			
+    			refresh_accumulator();
+    			
+    		} else {
+    			
+    			//TODO: Make index and update for both colors
+    			
+    			NNUEProbeUtils.fillInput(bitboard, input);
+    			
+    			refresh_accumulator();
+    		}
+    	}
     }
     
     // Constants for FEN decoding
@@ -611,11 +675,9 @@ public class NNUE {
         //System.out.println("output_weights: " + Arrays.toString(output_weights));
         //System.out.println("output_biases: " + Arrays.toString(output_biases));
         
-    	Position pos = new Position(square, piece, player[0]);
+    	NNUE nnue = new NNUE(null);
     	
-    	NNUE nnue = new NNUE();
-    	
-        int eval = nnue.nnue_evaluate_pos(pos);
+        int eval = nnue.nnue_evaluate_pos(player[0], piece, square);
         System.out.println("Evaluation: " + eval);
         
         // Example of incremental evaluation after a move
@@ -627,13 +689,12 @@ public class NNUE {
     	long startTime = System.currentTimeMillis();
     	int count = 0;
     	while (true) {
-    		int evaluationN = nnue.nnue_evaluate_pos(pos);
+    		int evaluationN = nnue.nnue_evaluate_pos(player[0], piece, square);
     		count++;
     		if (count % 10000 == 0) {
     			System.out.println("NPS: " + count / Math.max(1, (System.currentTimeMillis() - startTime) / 1000));
     			System.out.println("Evaluation: " + evaluationN);
     		}
-    		pos.clear();
     	}
     }
 }

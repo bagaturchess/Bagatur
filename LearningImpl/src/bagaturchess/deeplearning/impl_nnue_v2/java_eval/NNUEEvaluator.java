@@ -41,8 +41,6 @@ public class NNUEEvaluator extends BaseEvaluator {
 	
 	private final IBoardConfig board_cfg;
 	
-	private NNUE.Position pos;
-	
 	private NNUEProbeUtils.Input input;
 	
 	private NNUE nnue;
@@ -58,9 +56,9 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		input = new NNUEProbeUtils.Input();
 		
-		pos = new NNUE.Position();
+		nnue = new NNUE(bitboard);
 		
-		nnue = new NNUE();
+		bitboard.addMoveListener(nnue.getIncrementalUpdates());
 	}
 	
 	
@@ -118,14 +116,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		//int actualWhitePlayerEval_c = NNUEJNIBridge.eval(input.color, input.pieces, input.squares);
 		
-		//pos = new NNUE.Position();
-		pos.clear();
-		
-		pos.player = input.color;
-		pos.squares = input.squares;
-		pos.pieces = input.pieces;
-		
-		int actualWhitePlayerEval_java = nnue.nnue_evaluate_pos(pos);
+		int actualWhitePlayerEval_java = nnue.nnue_evaluate_pos(input.color, input.pieces, input.squares);
 		
 		//C and Java evaluations are now with small difference just because of NNUE biases
 		/*if (actualWhitePlayerEval_c == actualWhitePlayerEval_java) {

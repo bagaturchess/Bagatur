@@ -23,6 +23,7 @@
 package bagaturchess.bitboard.common;
 
 
+	
 public interface MoveListener {
 	
 	public void addPiece_Special(int color, int type);
