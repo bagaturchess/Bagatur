@@ -166,15 +166,17 @@ public class NNUE {
     	incremential_updates = new IncrementalUpdates(bitboard);
     }
     
-    public int nnue_evaluate_pos(int color, int[] pieces, int[] squares) {
+    public int nnue_evaluate_pos(int color, int[] pieces, int[] squares, boolean incremental_updates) {
     	
     	//netData.clear();
     	
-    	//TODO: uncomment this to skip incremental updates
-		pos.player = color;
-		pos.pieces = pieces;
-		pos.squares = squares;
-        refresh_accumulator();
+    	//TODO: comment this to skip incremental updates
+		//if (!incremental_updates) {
+			pos.player = color;
+			pos.pieces = pieces;
+			pos.squares = squares;
+	        refresh_accumulator();
+		//}
     	
     	
         transform(pos.player, pos.nnue[0].accumulator.accumulation, netData.input, null);
@@ -524,7 +526,7 @@ public class NNUE {
     		if (pieceType == Figures.TYPE_KING
     				|| board.getMoveOps().isCastling(move)
     				|| board.getMoveOps().isEnpassant(move)
-    				|| board.getMoveOps().isCapture(move)
+    				//|| board.getMoveOps().isCapture(move)
     				|| board.getMoveOps().isPromotion(move)) {
     			
     			refresh_accumulator();
@@ -549,6 +551,22 @@ public class NNUE {
     	        int offset_to = kHalfDimensions * index_to;
                 for (int j = 0; j < kHalfDimensions; j++)
                     pos.nnue[0].accumulator.accumulation[color][j] += ft_weights[offset_to + j];
+                
+                if (board.getMoveOps().isCapture(move)) {
+                	
+                	color = 1 - color;
+                	
+        	        int ksq_op = pos.squares[color];
+        	        ksq_op = orient(color, ksq_op);
+        	        
+                	int piece_captured = board.getMoveOps().getCapturedFigureType(move);
+                	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color);
+                	
+                	int index_to_captured = make_index(color, square_to, piece_captured, ksq_op);
+        	        int offset_to_captured = kHalfDimensions * index_to_captured;
+                    for (int j = 0; j < kHalfDimensions; j++)
+                        pos.nnue[0].accumulator.accumulation[color][j] -= ft_weights[offset_to_captured + j];
+                }
     		}
     	}
 
@@ -567,7 +585,7 @@ public class NNUE {
     		if (pieceType == Figures.TYPE_KING
     				|| board.getMoveOps().isCastling(move)
     				|| board.getMoveOps().isEnpassant(move)
-    				|| board.getMoveOps().isCapture(move)
+    				//|| board.getMoveOps().isCapture(move)
     				|| board.getMoveOps().isPromotion(move)) {
     			
     			refresh_accumulator();
@@ -592,6 +610,22 @@ public class NNUE {
     	        int offset_to = kHalfDimensions * index_to;
                 for (int j = 0; j < kHalfDimensions; j++)
                     pos.nnue[0].accumulator.accumulation[color][j] -= ft_weights[offset_to + j];
+                
+                if (board.getMoveOps().isCapture(move)) {
+                	
+                	color = 1 - color;
+                	
+        	        int ksq_op = pos.squares[color];
+        	        ksq_op = orient(color, ksq_op);
+        	        
+                	int piece_captured = board.getMoveOps().getCapturedFigureType(move);
+                	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color);
+                	
+                	int index_to_captured = make_index(color, square_to, piece_captured, ksq_op);
+        	        int offset_to_captured = kHalfDimensions * index_to_captured;
+                    for (int j = 0; j < kHalfDimensions; j++)
+                        pos.nnue[0].accumulator.accumulation[color][j] += ft_weights[offset_to_captured + j];
+                }
     		}
     	}
     }
@@ -710,7 +744,7 @@ public class NNUE {
         
     	NNUE nnue = new NNUE(null);
     	
-        int eval = nnue.nnue_evaluate_pos(player[0], piece, square);
+        int eval = nnue.nnue_evaluate_pos(player[0], piece, square, false);
         System.out.println("Evaluation: " + eval);
         
         // Example of incremental evaluation after a move
@@ -722,7 +756,7 @@ public class NNUE {
     	long startTime = System.currentTimeMillis();
     	int count = 0;
     	while (true) {
-    		int evaluationN = nnue.nnue_evaluate_pos(player[0], piece, square);
+    		int evaluationN = nnue.nnue_evaluate_pos(player[0], piece, square, false);
     		count++;
     		if (count % 10000 == 0) {
     			System.out.println("NPS: " + count / Math.max(1, (System.currentTimeMillis() - startTime) / 1000));

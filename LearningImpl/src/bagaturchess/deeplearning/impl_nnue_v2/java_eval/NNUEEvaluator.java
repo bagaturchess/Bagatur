@@ -116,7 +116,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		//int actualWhitePlayerEval_c = NNUEJNIBridge.eval(input.color, input.pieces, input.squares);
 		
-		int actualWhitePlayerEval_java = nnue.nnue_evaluate_pos(input.color, input.pieces, input.squares);
+		int actualWhitePlayerEval_java = nnue.nnue_evaluate_pos(input.color, input.pieces, input.squares, true);
 		
 		//C and Java evaluations are now with small difference just because of NNUE biases
 		/*if (actualWhitePlayerEval_c == actualWhitePlayerEval_java) {

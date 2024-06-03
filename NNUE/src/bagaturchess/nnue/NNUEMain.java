@@ -26,7 +26,7 @@ public class NNUEMain {
     		
     		NNUEProbeUtils.fillInput(bitboard, input);
     		
-    		int score = nnue.nnue_evaluate_pos(input.color, input.pieces, input.squares);
+    		int score = nnue.nnue_evaluate_pos(input.color, input.pieces, input.squares, false);
     		count++;
     		if (count % 100000 == 0) {
     			System.out.println("NPS: " + count / Math.max(1, (System.currentTimeMillis() - startTime) / 1000));
