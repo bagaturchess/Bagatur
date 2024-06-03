@@ -10,14 +10,12 @@ import java.util.Arrays;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.MoveListener;
-import bagaturchess.bitboard.common.Properties;
-import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Figures;
-import bagaturchess.bitboard.impl.movelist.IMoveList;
-import bagaturchess.bitboard.impl1.internal.CastlingConfig;
 
 public class NNUE {
 
+	private static final boolean DO_INCREMENTAL_UPDATES = false;
+	
     private static final int PS_W_PAWN = 1;
     private static final int PS_B_PAWN = 1 * 64 + 1;
     private static final int PS_W_KNIGHT = 2 * 64 + 1;
@@ -170,13 +168,13 @@ public class NNUE {
     	
     	//netData.clear();
     	
-    	//TODO: comment this to skip incremental updates
-		//if (!incremental_updates) {
+    	//TODO: uncomment this to skip incremental updates
+		if (!DO_INCREMENTAL_UPDATES || !incremental_updates) {
 			pos.player = color;
 			pos.pieces = pieces;
 			pos.squares = squares;
 	        refresh_accumulator();
-		//}
+		}
     	
     	
         transform(pos.player, pos.nnue[0].accumulator.accumulation, netData.input, null);
@@ -482,8 +480,7 @@ public class NNUE {
     	//@Override
     	public final void postForwardMove(int color, int move) {
     		
-    		//TODO: comment this to skip incremental updates
-    		//move(move, color, bitboard);
+    		if (DO_INCREMENTAL_UPDATES) move(move, color, bitboard);
     	}
     	
     	
@@ -494,8 +491,8 @@ public class NNUE {
     	
     	//@Override
     	public final void postBackwardMove(int color, int move) {
-    		//TODO: comment this to skip incremental updates
-    		//unmove(move, color, bitboard);
+    		
+    		if (DO_INCREMENTAL_UPDATES) unmove(move, color, bitboard);
     	}
     	
     	
