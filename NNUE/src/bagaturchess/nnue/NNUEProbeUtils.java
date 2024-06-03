@@ -1,9 +1,11 @@
 package bagaturchess.nnue;
 
 
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.ChessConstants;
+import bagaturchess.bitboard.impl1.internal.Util;
 import bagaturchess.bitboard.api.IBitBoard;
 
 
@@ -176,6 +178,25 @@ public class NNUEProbeUtils {
 		return result;
 	}
 	
+	public static int convertColor(int color) {
+		return color == ChessConstants.WHITE ? 0 : 1;
+	}
+	
+	public static int convertPiece(int pieceType, int color) {
+		switch(pieceType) {
+			case Constants.TYPE_PAWN: return color == ChessConstants.WHITE ? 6 : 12;
+			case Constants.TYPE_KNIGHT: return color == ChessConstants.WHITE ? 5 : 11;
+			case Constants.TYPE_BISHOP: return color == ChessConstants.WHITE ? 4 : 10;
+			case Constants.TYPE_ROOK: return color == ChessConstants.WHITE ? 3 : 9;
+			case Constants.TYPE_QUEEN: return color == ChessConstants.WHITE ? 2 : 8;
+			case Constants.TYPE_KING: throw new IllegalStateException(); //return color == ChessConstants.WHITE ? 1 : 7;
+			default: throw new IllegalStateException();
+		}
+	}
+	
+	public static int convertSquare(int squareID) {
+		return getSquareID(Util.POWER_LOOKUP[squareID]);
+	}
 	
 	public static class Input {
 		

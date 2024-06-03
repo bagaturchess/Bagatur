@@ -512,6 +512,11 @@ public class NNUE {
     	
     	public final void move(int move, int color, IBitBoard board) {
     		
+    		NNUEProbeUtils.fillInput(bitboard, input);
+			pos.player = input.color;
+			pos.pieces = input.pieces;
+			pos.squares = input.squares;
+			
     		int pieceType = board.getMoveOps().getFigureType(move);
     		int fromFieldID = board.getMoveOps().getFromFieldID(move);
     		int toFieldID = board.getMoveOps().getToFieldID(move);   		
@@ -522,27 +527,39 @@ public class NNUE {
     				|| board.getMoveOps().isCapture(move)
     				|| board.getMoveOps().isPromotion(move)) {
     			
-        		NNUEProbeUtils.fillInput(bitboard, input);
-    			pos.player = input.color;
-    			pos.pieces = input.pieces;
-    			pos.squares = input.squares;
     			refresh_accumulator();
     			
     		} else {
     			
-    			//TODO: Make index and update for both colors
+    			//Make index and update accumulator
+    			color = NNUEProbeUtils.convertColor(color);
+    			int piece = NNUEProbeUtils.convertPiece(pieceType, color);
+    			int square_from = NNUEProbeUtils.convertSquare(fromFieldID);
+    			int square_to = NNUEProbeUtils.convertSquare(toFieldID);
     			
-        		NNUEProbeUtils.fillInput(bitboard, input);
-    			pos.player = input.color;
-    			pos.pieces = input.pieces;
-    			pos.squares = input.squares;
-    			refresh_accumulator();
+    	        int ksq = pos.squares[color];
+    	        ksq = orient(color, ksq);
+    	        
+    	        int index_from = make_index(color, square_from, piece, ksq);
+    	        int offset_from = kHalfDimensions * index_from;
+                for (int j = 0; j < kHalfDimensions; j++)
+                    pos.nnue[0].accumulator.accumulation[color][j] -= ft_weights[offset_from + j];
+                
+    	        int index_to = make_index(color, square_to, piece, ksq);
+    	        int offset_to = kHalfDimensions * index_to;
+                for (int j = 0; j < kHalfDimensions; j++)
+                    pos.nnue[0].accumulator.accumulation[color][j] += ft_weights[offset_to + j];
     		}
     	}
 
 
     	public final void unmove(int move, int color, IBitBoard board) {
     		
+    		NNUEProbeUtils.fillInput(bitboard, input);
+			pos.player = input.color;
+			pos.pieces = input.pieces;
+			pos.squares = input.squares;
+			
     		int pieceType = board.getMoveOps().getFigureType(move);
     		int fromFieldID = board.getMoveOps().getFromFieldID(move);
     		int toFieldID = board.getMoveOps().getToFieldID(move);   		
@@ -553,21 +570,28 @@ public class NNUE {
     				|| board.getMoveOps().isCapture(move)
     				|| board.getMoveOps().isPromotion(move)) {
     			
-        		NNUEProbeUtils.fillInput(bitboard, input);
-    			pos.player = input.color;
-    			pos.pieces = input.pieces;
-    			pos.squares = input.squares;
     			refresh_accumulator();
     			
     		} else {
     			
-    			//TODO: Make index and update for both colors
+    			//Make index and update accumulator
+    			color = NNUEProbeUtils.convertColor(color);
+    			int piece = NNUEProbeUtils.convertPiece(pieceType, color);
+    			int square_from = NNUEProbeUtils.convertSquare(fromFieldID);
+    			int square_to = NNUEProbeUtils.convertSquare(toFieldID);
     			
-        		NNUEProbeUtils.fillInput(bitboard, input);
-    			pos.player = input.color;
-    			pos.pieces = input.pieces;
-    			pos.squares = input.squares;
-    			refresh_accumulator();
+    	        int ksq = pos.squares[color];
+    	        ksq = orient(color, ksq);
+    	        
+    	        int index_from = make_index(color, square_from, piece, ksq);
+    	        int offset_from = kHalfDimensions * index_from;
+                for (int j = 0; j < kHalfDimensions; j++)
+                    pos.nnue[0].accumulator.accumulation[color][j] += ft_weights[offset_from + j];
+                
+    	        int index_to = make_index(color, square_to, piece, ksq);
+    	        int offset_to = kHalfDimensions * index_to;
+                for (int j = 0; j < kHalfDimensions; j++)
+                    pos.nnue[0].accumulator.accumulation[color][j] -= ft_weights[offset_to + j];
     		}
     	}
     }
