@@ -155,12 +155,14 @@ public class NNUE {
     private int[][] activeIndices = new int[2][30]; // Adjust the size based on expected active indices
     private int[] activeSizes = new int[2]; // To track the number of active indices for each player
     
-    private NetData netData = new NetData();
-    private Position pos = new Position();
+    private NetData netData;
+    private Position pos;
     private MoveListener incremential_updates;
     
     public NNUE(IBitBoard bitboard) {
     	
+    	netData = new NetData();
+    	pos = new Position();
     	incremential_updates = new IncrementalUpdates(bitboard);
     }
     
@@ -465,22 +467,21 @@ public class NNUE {
     		bitboard 	= _bitboard;
     		input 		= new NNUEProbeUtils.Input();
     		
-			pos.player = input.color;
-			pos.pieces = input.pieces;
-			pos.squares = input.squares;
     	}
     	
     	
     	//@Override
     	public final void preForwardMove(int color, int move) {
-    		//TODO: comment this to skip incremental updates
-    		//move(move, color, bitboard);
+
+    		//Do nothing
     	}
     	
     	
     	//@Override
     	public final void postForwardMove(int color, int move) {
-    		//Do nothing
+    		
+    		//TODO: comment this to skip incremental updates
+    		//move(move, color, bitboard);
     	}
     	
     	
@@ -521,16 +522,20 @@ public class NNUE {
     				|| board.getMoveOps().isCapture(move)
     				|| board.getMoveOps().isPromotion(move)) {
     			
-    			NNUEProbeUtils.fillInput(bitboard, input);
-    			
+        		NNUEProbeUtils.fillInput(bitboard, input);
+    			pos.player = input.color;
+    			pos.pieces = input.pieces;
+    			pos.squares = input.squares;
     			refresh_accumulator();
     			
     		} else {
     			
     			//TODO: Make index and update for both colors
     			
-    			NNUEProbeUtils.fillInput(bitboard, input);
-    			
+        		NNUEProbeUtils.fillInput(bitboard, input);
+    			pos.player = input.color;
+    			pos.pieces = input.pieces;
+    			pos.squares = input.squares;
     			refresh_accumulator();
     		}
     	}
@@ -548,16 +553,20 @@ public class NNUE {
     				|| board.getMoveOps().isCapture(move)
     				|| board.getMoveOps().isPromotion(move)) {
     			
-    			NNUEProbeUtils.fillInput(bitboard, input);
-    			
+        		NNUEProbeUtils.fillInput(bitboard, input);
+    			pos.player = input.color;
+    			pos.pieces = input.pieces;
+    			pos.squares = input.squares;
     			refresh_accumulator();
     			
     		} else {
     			
     			//TODO: Make index and update for both colors
     			
-    			NNUEProbeUtils.fillInput(bitboard, input);
-    			
+        		NNUEProbeUtils.fillInput(bitboard, input);
+    			pos.player = input.color;
+    			pos.pieces = input.pieces;
+    			pos.squares = input.squares;
     			refresh_accumulator();
     		}
     	}
