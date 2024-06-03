@@ -216,7 +216,7 @@ abstract class Board3 extends Fields implements IBitBoard, Cloneable {
 	} 
 	
 	
-	private void addMoveListener(MoveListener listener) {
+	public void addMoveListener(MoveListener listener) {
 		MoveListener[] oldMoveListeners = moveListeners;
 		MoveListener[] newMoveListeners = new MoveListener[moveListeners.length + 1];
 		if (oldMoveListeners.length > 0) {

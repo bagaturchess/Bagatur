@@ -49,7 +49,6 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
-import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.state.PiecesList;
@@ -84,7 +83,7 @@ public class BoardImpl implements IBitBoard {
 	
 	private NNUE_Input nnue_input;
 	
-	private boolean enable_NNUE_Input = true;
+	private boolean enable_NNUE_Input = false;
 	
 	protected IBoard.CastlingType[] castledByColour;
 	
@@ -166,7 +165,7 @@ public class BoardImpl implements IBitBoard {
 	}
 	
 	
-	private void addMoveListener(MoveListener listener) {
+	public void addMoveListener(MoveListener listener) {
 		MoveListener[] oldMoveListeners = moveListeners;
 		MoveListener[] newMoveListeners = new MoveListener[moveListeners.length + 1];
 		if (oldMoveListeners.length > 0) {

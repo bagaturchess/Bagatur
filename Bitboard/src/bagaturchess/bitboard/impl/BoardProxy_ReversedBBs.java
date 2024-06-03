@@ -33,6 +33,7 @@ import bagaturchess.bitboard.api.IPiecesLists;
 import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.ISEE;
 import bagaturchess.bitboard.api.PawnsEvalCache;
+import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl1.internal.CastlingConfig;
 
@@ -601,5 +602,12 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 	public CastlingConfig getCastlingConfig() {
 		
 		return bitboard.getCastlingConfig();
+	}
+
+
+	@Override
+	public void addMoveListener(MoveListener listener) {
+
+		bitboard.addMoveListener(listener);
 	}
 }

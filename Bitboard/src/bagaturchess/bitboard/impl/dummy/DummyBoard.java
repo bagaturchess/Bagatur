@@ -38,6 +38,7 @@ import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.common.BackupInfo;
 import bagaturchess.bitboard.common.BoardStat;
+import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.attacks.SEE;
 import bagaturchess.bitboard.impl.eval.BaseEvaluation;
@@ -779,6 +780,12 @@ public class DummyBoard implements IBitBoard {
 	@Override
 	public CastlingConfig getCastlingConfig() {
 
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void addMoveListener(MoveListener listener) {
+		
 		throw new UnsupportedOperationException();
 	}
 }
