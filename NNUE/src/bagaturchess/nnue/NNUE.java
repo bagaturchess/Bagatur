@@ -178,41 +178,7 @@ public class NNUE {
 	        
 		} else {
     	
-			if (incremental_updates.must_refresh) {
-				
-				refresh_accumulator();
-				
-			} else {
-				
-				DirtyPieces dirty_pieces = pos.nnue[0].dirtyPieces;
-	    		
-	    		for (int i = 0; i < dirty_pieces.dirtyNum; i++) {
-	    			
-	    			if (dirty_pieces.from[i] == dirty_pieces.to[i]) {
-	    				
-	    				continue;
-	    			}
-	    					
-	    	        int ksq = pos.squares[dirty_pieces.c[i]];
-	    	        ksq = orient(dirty_pieces.c[i], ksq);
-	    	        
-	    	        if (dirty_pieces.from[i] != 64) {//64 marks no entry e.g. during capture or promotion
-		    	        int index_from = make_index(dirty_pieces.c[i], dirty_pieces.from[i], dirty_pieces.pc[i], ksq);
-		    	        int offset_from = kHalfDimensions * index_from;
-		                for (int j = 0; j < kHalfDimensions; j++)
-		                    pos.nnue[0].accumulator.accumulation[color][j] -= ft_weights[offset_from + j];
-	    	        }
-	    	        
-	    	        if (dirty_pieces.to[i] != 64) {
-		    	        int index_to = make_index(dirty_pieces.c[i], dirty_pieces.to[i], dirty_pieces.pc[i], ksq);
-		    	        int offset_to = kHalfDimensions * index_to;
-		                for (int j = 0; j < kHalfDimensions; j++)
-		                    pos.nnue[0].accumulator.accumulation[color][j] += ft_weights[offset_to + j];
-	    	        }
-	    		}
-			}
-			
-			incremental_updates.reset();
+			update_accumulator();
 		}
 		
 		
@@ -229,6 +195,50 @@ public class NNUE {
 
         return out_value / FV_SCALE;
     }
+    
+    
+	private void update_accumulator() {
+		
+		if (incremental_updates.must_refresh) {
+			
+			refresh_accumulator();
+			
+		} else {
+			
+			DirtyPieces dirty_pieces = pos.nnue[0].dirtyPieces;
+			
+			for (int i = 0; i < dirty_pieces.dirtyNum; i++) {
+				
+				if (dirty_pieces.from[i] == dirty_pieces.to[i]) {
+					
+					continue;
+				}
+				
+				//boolean capture = dirty_pieces.from[i] >= 64 || dirty_pieces.to[i] >= 64;
+				
+				int color_pc = dirty_pieces.c[i];
+				
+		        int ksq = pos.squares[color_pc];
+		        ksq = orient(color_pc, ksq);
+		        
+		        if (dirty_pieces.from[i] < 64) {//64 marks no entry e.g. during capture or promotion
+			        int index_from = make_index(color_pc, dirty_pieces.from[i], dirty_pieces.pc[i], ksq);
+			        int offset_from = kHalfDimensions * index_from;
+		            for (int j = 0; j < kHalfDimensions; j++)
+		                pos.nnue[0].accumulator.accumulation[color_pc][j] -= ft_weights[offset_from + j];
+		        }
+		        
+		        if (dirty_pieces.to[i] < 64) {
+			        int index_to = make_index(color_pc, dirty_pieces.to[i], dirty_pieces.pc[i], ksq);
+			        int offset_to = kHalfDimensions * index_to;
+		            for (int j = 0; j < kHalfDimensions; j++)
+		                pos.nnue[0].accumulator.accumulation[color_pc][j] += ft_weights[offset_to + j];
+		        }
+			}
+		}
+		
+		incremental_updates.reset();
+	}
 
     public MoveListener getIncrementalUpdates() {
     	
@@ -298,7 +308,7 @@ public class NNUE {
             output[i] = (byte) clamp(tmp[i] >> SHIFT, 0, 127);
     }
 
-    private static boolean update_accumulator(Position pos) {
+    /*private static boolean update_accumulator(Position pos) {
         
         Accumulator accumulator = pos.nnue[0].accumulator;
         if (accumulator.computedAccumulation)
@@ -365,7 +375,7 @@ public class NNUE {
                 }
             }
         }
-    }
+    }*/
 
     // Append active indices method
     private static void append_active_indices(Position pos, int[][] active, int[] activeSizes) {
@@ -489,10 +499,10 @@ public class NNUE {
     
     private static class DirtyPieces {
         int dirtyNum;
-        int[] c = new int[30];
-        int[] pc = new int[30];
-        int[] from = new int[30];
-        int[] to = new int[30];
+        int[] c = new int[300];
+        int[] pc = new int[300];
+        int[] from = new int[300];
+        int[] to = new int[300];
     }
     
     private class IncrementalUpdates implements MoveListener {
@@ -500,11 +510,13 @@ public class NNUE {
     	
     	private IBitBoard bitboard;
     	private boolean must_refresh; 
+    	private int capture_promotion_marker; //Necessary because we cannot identify correctly the captured piece in addDurtyPiece
     	
     	IncrementalUpdates(IBitBoard _bitboard) {
     		
     		bitboard = _bitboard;
     		must_refresh = true;
+    		capture_promotion_marker = 64;
     	}
     	
     	
@@ -512,6 +524,7 @@ public class NNUE {
     		
     		must_refresh = false;
     		pos.nnue[0].dirtyPieces.dirtyNum = 0;
+    		capture_promotion_marker = 64;//reset it to not have type overflow
     	}
     	
     	
@@ -524,6 +537,11 @@ public class NNUE {
     	
     	//@Override
     	public final void postForwardMove(int color, int move) {
+    		
+    		if (pos.nnue[0].dirtyPieces.dirtyNum >= pos.nnue[0].dirtyPieces.c.length) {
+    			//Refresh will be faster
+    			must_refresh = true;
+    		}
     		
     		if (must_refresh) {
     			
@@ -552,15 +570,13 @@ public class NNUE {
     			addDurtyPiece(color, piece, square_from, square_to);
     			
     			if (bitboard.getMoveOps().isCapture(move)) {
+    				
     				color = 1 - color;
-                	
-        	        int ksq_op = pos.squares[color];
-        	        ksq_op = orient(color, ksq_op);
         	        
                 	int piece_captured = bitboard.getMoveOps().getCapturedFigureType(move);
                 	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color);
                 	
-                	addDurtyPiece(color, piece_captured, square_to, 64);
+                	addDurtyPiece(color, piece_captured, square_to, capture_promotion_marker++);
     			}
     		}
     	}
@@ -572,6 +588,11 @@ public class NNUE {
     	
     	//@Override
     	public final void postBackwardMove(int color, int move) {
+    		
+    		if (pos.nnue[0].dirtyPieces.dirtyNum >= pos.nnue[0].dirtyPieces.c.length) {
+    			//Refresh will be faster
+    			must_refresh = true;
+    		}
     		
     		if (must_refresh) {
     			
@@ -600,15 +621,13 @@ public class NNUE {
     			addDurtyPiece(color, piece, square_to, square_from);
     			
     			if (bitboard.getMoveOps().isCapture(move)) {
+    				
     				color = 1 - color;
-                	
-        	        int ksq_op = pos.squares[color];
-        	        ksq_op = orient(color, ksq_op);
         	        
                 	int piece_captured = bitboard.getMoveOps().getCapturedFigureType(move);
                 	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color);
                 	
-                	addDurtyPiece(color, piece_captured, 64, square_to);
+                	addDurtyPiece(color, piece_captured, capture_promotion_marker++, square_to);
     			}
     		}
     	}
@@ -619,13 +638,19 @@ public class NNUE {
     		DirtyPieces dirty_pieces = pos.nnue[0].dirtyPieces;
     		
     		int index = 0;
-    		for (int i = 0; i < dirty_pieces.dirtyNum; i++) {
-    			if (piece == dirty_pieces.pc[i]) {
-    				if (square_from == dirty_pieces.to[i]) {
-    					break;
-    				}
-    			}
-    			index++;
+    		if (square_from < 64 && square_to < 64) {
+    			
+        		for (int i = 0; i < dirty_pieces.dirtyNum; i++) {
+        			if (piece == dirty_pieces.pc[i]) {
+        				if (square_from == dirty_pieces.to[i]) {
+        					break;
+        				}
+        			}
+        			index++;
+        		}
+    		} else {
+    			
+    			index = dirty_pieces.dirtyNum;
     		}
     		
     		if (index < dirty_pieces.dirtyNum) {
