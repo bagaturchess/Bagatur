@@ -1,5 +1,6 @@
 package bagaturchess.nnue;
 
+
 import java.io.File;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -12,9 +13,10 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.impl.Figures;
 
+
 public class NNUE {
 
-	private static final boolean DO_INCREMENTAL_UPDATES = true;
+	public static final boolean DO_INCREMENTAL_UPDATES = true;
 	
     private static final int PS_W_PAWN = 1;
     private static final int PS_B_PAWN = 1 * 64 + 1;
@@ -221,29 +223,24 @@ public class NNUE {
 		        int ksq = pos.squares[color_pc];
 		        ksq = orient(color_pc, ksq);
 		        
-		        if (dirty_pieces.from[i] < 64) {//64 marks no entry e.g. during capture or promotion
-			        int index_from = make_index(color_pc, dirty_pieces.from[i], dirty_pieces.pc[i], ksq);
-			        int offset_from = kHalfDimensions * index_from;
+		        if (dirty_pieces.from[i] < 64) {//>=64 marks no entry e.g. during capture or promotion
+			        int index_removed = make_index(color_pc, dirty_pieces.from[i], dirty_pieces.pc[i], ksq);
+			        int offset_removed = kHalfDimensions * index_removed;
 		            for (int j = 0; j < kHalfDimensions; j++)
-		                pos.nnue[0].accumulator.accumulation[color_pc][j] -= ft_weights[offset_from + j];
+		                pos.nnue[0].accumulator.accumulation[color_pc][j] -= ft_weights[offset_removed + j];
 		        }
 		        
 		        if (dirty_pieces.to[i] < 64) {
-			        int index_to = make_index(color_pc, dirty_pieces.to[i], dirty_pieces.pc[i], ksq);
-			        int offset_to = kHalfDimensions * index_to;
+			        int index_added = make_index(color_pc, dirty_pieces.to[i], dirty_pieces.pc[i], ksq);
+			        int offset_added = kHalfDimensions * index_added;
 		            for (int j = 0; j < kHalfDimensions; j++)
-		                pos.nnue[0].accumulator.accumulation[color_pc][j] += ft_weights[offset_to + j];
+		                pos.nnue[0].accumulator.accumulation[color_pc][j] += ft_weights[offset_added + j];
 		        }
 			}
 		}
 		
 		incremental_updates.reset();
 	}
-
-    public MoveListener getIncrementalUpdates() {
-    	
-    	return incremental_updates;
-    }
     
     private void refresh_accumulator() {
         
@@ -269,6 +266,11 @@ public class NNUE {
         }
 
         accumulator.computedAccumulation = true;
+    }
+    
+    public MoveListener getIncrementalUpdates() {
+    	
+    	return incremental_updates;
     }
     
     private static void transform(int color, int[][] accumulation, byte[] output, int[] outMask) {
@@ -690,124 +692,6 @@ public class NNUE {
     		
     		//Do nothing
     	}
-    	
-    	
-    	/*public final void move(int move, int color, IBitBoard board) {
-    		
-    		NNUEProbeUtils.fillInput(bitboard, input);
-			pos.player = input.color;
-			pos.pieces = input.pieces;
-			pos.squares = input.squares;
-			
-    		int pieceType = board.getMoveOps().getFigureType(move);
-    		int fromFieldID = board.getMoveOps().getFromFieldID(move);
-    		int toFieldID = board.getMoveOps().getToFieldID(move);   		
-    		
-    		if (pieceType == Figures.TYPE_KING
-    				|| board.getMoveOps().isCastling(move)
-    				|| board.getMoveOps().isEnpassant(move)
-    				//|| board.getMoveOps().isCapture(move)
-    				|| board.getMoveOps().isPromotion(move)) {
-    			
-    			refresh_accumulator();
-    			
-    		} else {
-    			
-    			//Make index and update accumulator
-    			color = NNUEProbeUtils.convertColor(color);
-    			int piece = NNUEProbeUtils.convertPiece(pieceType, color);
-    			int square_from = NNUEProbeUtils.convertSquare(fromFieldID);
-    			int square_to = NNUEProbeUtils.convertSquare(toFieldID);
-    			
-    	        int ksq = pos.squares[color];
-    	        ksq = orient(color, ksq);
-    	        
-    	        int index_from = make_index(color, square_from, piece, ksq);
-    	        int offset_from = kHalfDimensions * index_from;
-                for (int j = 0; j < kHalfDimensions; j++)
-                    pos.nnue[0].accumulator.accumulation[color][j] -= ft_weights[offset_from + j];
-                
-    	        int index_to = make_index(color, square_to, piece, ksq);
-    	        int offset_to = kHalfDimensions * index_to;
-                for (int j = 0; j < kHalfDimensions; j++)
-                    pos.nnue[0].accumulator.accumulation[color][j] += ft_weights[offset_to + j];
-                
-                if (board.getMoveOps().isCapture(move)) {
-                	
-                	color = 1 - color;
-                	
-        	        int ksq_op = pos.squares[color];
-        	        ksq_op = orient(color, ksq_op);
-        	        
-                	int piece_captured = board.getMoveOps().getCapturedFigureType(move);
-                	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color);
-                	
-                	int index_to_captured = make_index(color, square_to, piece_captured, ksq_op);
-        	        int offset_to_captured = kHalfDimensions * index_to_captured;
-                    for (int j = 0; j < kHalfDimensions; j++)
-                        pos.nnue[0].accumulator.accumulation[color][j] -= ft_weights[offset_to_captured + j];
-                }
-    		}
-    	}
-
-
-    	public final void unmove(int move, int color, IBitBoard board) {
-    		
-    		NNUEProbeUtils.fillInput(bitboard, input);
-			pos.player = input.color;
-			pos.pieces = input.pieces;
-			pos.squares = input.squares;
-			
-    		int pieceType = board.getMoveOps().getFigureType(move);
-    		int fromFieldID = board.getMoveOps().getFromFieldID(move);
-    		int toFieldID = board.getMoveOps().getToFieldID(move);   		
-    		
-    		if (pieceType == Figures.TYPE_KING
-    				|| board.getMoveOps().isCastling(move)
-    				|| board.getMoveOps().isEnpassant(move)
-    				//|| board.getMoveOps().isCapture(move)
-    				|| board.getMoveOps().isPromotion(move)) {
-    			
-    			refresh_accumulator();
-    			
-    		} else {
-    			
-    			//Make index and update accumulator
-    			color = NNUEProbeUtils.convertColor(color);
-    			int piece = NNUEProbeUtils.convertPiece(pieceType, color);
-    			int square_from = NNUEProbeUtils.convertSquare(fromFieldID);
-    			int square_to = NNUEProbeUtils.convertSquare(toFieldID);
-    			
-    	        int ksq = pos.squares[color];
-    	        ksq = orient(color, ksq);
-    	        
-    	        int index_from = make_index(color, square_from, piece, ksq);
-    	        int offset_from = kHalfDimensions * index_from;
-                for (int j = 0; j < kHalfDimensions; j++)
-                    pos.nnue[0].accumulator.accumulation[color][j] += ft_weights[offset_from + j];
-                
-    	        int index_to = make_index(color, square_to, piece, ksq);
-    	        int offset_to = kHalfDimensions * index_to;
-                for (int j = 0; j < kHalfDimensions; j++)
-                    pos.nnue[0].accumulator.accumulation[color][j] -= ft_weights[offset_to + j];
-                
-                if (board.getMoveOps().isCapture(move)) {
-                	
-                	color = 1 - color;
-                	
-        	        int ksq_op = pos.squares[color];
-        	        ksq_op = orient(color, ksq_op);
-        	        
-                	int piece_captured = board.getMoveOps().getCapturedFigureType(move);
-                	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color);
-                	
-                	int index_to_captured = make_index(color, square_to, piece_captured, ksq_op);
-        	        int offset_to_captured = kHalfDimensions * index_to_captured;
-                    for (int j = 0; j < kHalfDimensions; j++)
-                        pos.nnue[0].accumulator.accumulation[color][j] += ft_weights[offset_to_captured + j];
-                }
-    		}
-    	}*/
     }
     
     // Constants for FEN decoding

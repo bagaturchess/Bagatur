@@ -58,7 +58,10 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		nnue = new NNUE(bitboard);
 		
-		bitboard.addMoveListener(nnue.getIncrementalUpdates());
+		if (NNUE.DO_INCREMENTAL_UPDATES) {
+			
+			bitboard.addMoveListener(nnue.getIncrementalUpdates());
+		}
 	}
 	
 	
@@ -116,7 +119,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		//int actualWhitePlayerEval_c = NNUEJNIBridge.eval(input.color, input.pieces, input.squares);
 		
-		int actualWhitePlayerEval_java = nnue.nnue_evaluate_pos(input.color, input.pieces, input.squares, true);
+		int actualWhitePlayerEval_java = nnue.nnue_evaluate_pos(input.color, input.pieces, input.squares, NNUE.DO_INCREMENTAL_UPDATES);
 		
 		//C and Java evaluations are now with small difference just because of NNUE biases
 		/*if (actualWhitePlayerEval_c == actualWhitePlayerEval_java) {
