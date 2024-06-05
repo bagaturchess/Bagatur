@@ -540,7 +540,7 @@ public class NNUE {
     	//@Override
     	public final void postForwardMove(int color, int move) {
     		
-    		if (pos.nnue[0].dirtyPieces.dirtyNum >= pos.nnue[0].dirtyPieces.c.length) {
+    		if (pos.nnue[0].dirtyPieces.dirtyNum >= bitboard.getMaterialState().getPiecesCount()) {
     			//Refresh will be faster
     			must_refresh = true;
     		}
@@ -591,7 +591,7 @@ public class NNUE {
     	//@Override
     	public final void postBackwardMove(int color, int move) {
     		
-    		if (pos.nnue[0].dirtyPieces.dirtyNum >= pos.nnue[0].dirtyPieces.c.length) {
+    		if (pos.nnue[0].dirtyPieces.dirtyNum >= bitboard.getMaterialState().getPiecesCount()) {
     			//Refresh will be faster
     			must_refresh = true;
     		}
@@ -635,16 +635,16 @@ public class NNUE {
     	}
     	
     	
-    	private void addDurtyPiece(int color, int piece, int square_from, int square_to) {
+    	private void addDurtyPiece(int color, int piece, int square_remove, int square_add) {
 		
     		DirtyPieces dirty_pieces = pos.nnue[0].dirtyPieces;
     		
     		int index = 0;
-    		if (square_from < 64 && square_to < 64) {
+    		if (square_remove < 64 && square_add < 64) {
     			
         		for (int i = 0; i < dirty_pieces.dirtyNum; i++) {
         			if (piece == dirty_pieces.pc[i]) {
-        				if (square_from == dirty_pieces.to[i]) {
+        				if (square_remove == dirty_pieces.to[i]) {
         					break;
         				}
         			}
@@ -662,12 +662,12 @@ public class NNUE {
     				throw new IllegalStateException();
     			}
     			
-    			if (dirty_pieces.to[index] != square_from) {
+    			if (dirty_pieces.to[index] != square_remove) {
     				
-    				throw new IllegalStateException("dirty_pieces.to[index]=" + dirty_pieces.to[index] + ", square_from=" + square_from + ", piece=" + piece);
+    				throw new IllegalStateException("dirty_pieces.to[index]=" + dirty_pieces.to[index] + ", square_from=" + square_remove + ", piece=" + piece);
     			}
         		//dirty_pieces.from[index] = square_from;
-        		dirty_pieces.to[index] = square_to;
+        		dirty_pieces.to[index] = square_add;
     			
     		} else {
     			
@@ -675,8 +675,8 @@ public class NNUE {
     			
     			dirty_pieces.c[index] = color;
         		dirty_pieces.pc[index] = piece;
-        		dirty_pieces.from[index] = square_from;
-        		dirty_pieces.to[index] = square_to;
+        		dirty_pieces.from[index] = square_remove;
+        		dirty_pieces.to[index] = square_add;
     		}
 		}
     	
