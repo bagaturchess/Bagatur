@@ -264,8 +264,6 @@ public class NNUE {
                 }
             }
         }
-
-        accumulator.computedAccumulation = true;
     }
     
     public MoveListener getIncrementalUpdates() {
@@ -472,7 +470,6 @@ public class NNUE {
             for (int i = 0; i < nnue.length; i++) {
                 nnue[i] = new NNUEData();
             }
-            clear();
         }
         
         public Position(int[] _squares, int[] _pieces, int _player) {
@@ -480,12 +477,6 @@ public class NNUE {
         	squares = _squares;
         	pieces = _pieces;
         	player = _player;
-        }
-        
-        public void clear() {
-    		nnue[0].accumulator.computedAccumulation = false;
-    		nnue[1].accumulator.computedAccumulation = false;
-    		nnue[2].accumulator.computedAccumulation = false;
         }
     }
     
@@ -495,7 +486,6 @@ public class NNUE {
     }
 
     private static class Accumulator {
-        boolean computedAccumulation;
         int[][] accumulation = new int[2][256];
     }
     
@@ -521,8 +511,16 @@ public class NNUE {
     		capture_promotion_marker = 64;
     	}
     	
+    	//int all;
+    	//int refreshes;
     	
     	void reset() {
+    		//all++;
+    		//if (must_refresh) refreshes++;
+    		//if (all % 100000 == 0) {
+    			//System.out.println("refreshes=" + (refreshes / (double) all));
+    		//}
+    		
     		
     		must_refresh = false;
     		pos.nnue[0].dirtyPieces.dirtyNum = 0;
