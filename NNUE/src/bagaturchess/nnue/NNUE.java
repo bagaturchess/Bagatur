@@ -168,7 +168,7 @@ public class NNUE {
     
     public int nnue_evaluate_pos(int color, int[] pieces, int[] squares, boolean incremental_updates_flag) {
     	
-    	//netData.clear();
+    	//netData.clear(); //TODO: All indexes are re-calculated anyway
 		
     	pos.player = color;
 		pos.pieces = pieces;
@@ -180,7 +180,7 @@ public class NNUE {
 	        
 		} else {
     	
-			update_accumulator();
+			update_accumulator(color);
 		}
 		
 		
@@ -199,7 +199,7 @@ public class NNUE {
     }
     
     
-	private void update_accumulator() {
+	private void update_accumulator(int color) {
 		
 		if (incremental_updates.must_refresh) {
 			
@@ -216,7 +216,11 @@ public class NNUE {
 					continue;
 				}
 				
-				//boolean capture = dirty_pieces.from[i] >= 64 || dirty_pieces.to[i] >= 64;
+				boolean capture = (dirty_pieces.from[i] >= 64 && dirty_pieces.from[i] < 128)
+						|| (dirty_pieces.to[i] >= 64 && dirty_pieces.to[i] < 128);
+				
+				boolean promotion = (dirty_pieces.from[i] >= 128)
+						|| (dirty_pieces.to[i] >= 128);
 				
 				int color_pc = dirty_pieces.c[i];
 				
@@ -414,6 +418,14 @@ public class NNUE {
         return orient(c, s) + PieceToIndex[c][pc] + PS_END * ksq;
     }
     
+    private static int make_index(int c_orient, int c, int s, int pc, int ksq) {
+        return orient(c_orient, s) + PieceToIndex[c][pc] + PS_END * ksq;
+    }
+    
+    private static int make_index_not_orient(int c, int s, int pc, int ksq) {
+        return s + PieceToIndex[c][pc] + PS_END * ksq;
+    }
+    
     private static int orient(int c, int s) {
         return s ^ (c == 0 ? 0x00 : 0x3f);
     }
@@ -502,29 +514,32 @@ public class NNUE {
     	
     	private IBitBoard bitboard;
     	private boolean must_refresh; 
-    	private int capture_promotion_marker; //Necessary because we cannot identify correctly the captured piece in addDurtyPiece
+    	private int capture_marker; //Necessary because we cannot identify correctly the captured piece in addDurtyPiece
+    	private int promotion_marker; //Necessary because we cannot identify correctly the captured piece in addDurtyPiece
     	
     	IncrementalUpdates(IBitBoard _bitboard) {
     		
     		bitboard = _bitboard;
     		must_refresh = true;
-    		capture_promotion_marker = 64;
+    		capture_marker = 64;
+    		promotion_marker = 128;
     	}
     	
-    	//int all;
-    	//int refreshes;
+    	int all;
+    	int refreshes;
     	
     	void reset() {
-    		//all++;
-    		//if (must_refresh) refreshes++;
-    		//if (all % 100000 == 0) {
+    		all++;
+    		if (must_refresh) refreshes++;
+    		if (all % 100000 == 0) {
     			//System.out.println("refreshes=" + (refreshes / (double) all));
-    		//}
+    		}
     		
     		
     		must_refresh = false;
     		pos.nnue[0].dirtyPieces.dirtyNum = 0;
-    		capture_promotion_marker = 64;//reset it to not have type overflow
+    		capture_marker = 64;//reset it to not have type overflow
+    		promotion_marker = 128;//reset it to not have type overflow
     	}
     	
     	
@@ -556,7 +571,8 @@ public class NNUE {
     				|| bitboard.getMoveOps().isCastling(move)
     				|| bitboard.getMoveOps().isEnpassant(move)
     				|| bitboard.getMoveOps().isCapture(move)
-    				|| bitboard.getMoveOps().isPromotion(move)) {
+    				//|| bitboard.getMoveOps().isPromotion(move)
+    				) {
     			
     			must_refresh = true;
     			
@@ -571,12 +587,21 @@ public class NNUE {
     			
     			if (bitboard.getMoveOps().isCapture(move)) {
     				
-    				color = 1 - color;
+    				int color_op = 1 - color;
         	        
                 	int piece_captured = bitboard.getMoveOps().getCapturedFigureType(move);
-                	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color);
+                	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color_op);
                 	
-                	addDurtyPiece(color, piece_captured, square_to, capture_promotion_marker++);
+                	addDurtyPiece(color_op, piece_captured, square_to, capture_marker++);
+    			}
+    			
+    			if (bitboard.getMoveOps().isPromotion(move)) {
+        	        
+                	int piece_promoted = bitboard.getMoveOps().getPromotionFigureType(move);
+                	piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
+                	
+                	addDurtyPiece(color, piece_promoted, promotion_marker++, square_to);
+                	addDurtyPiece(color, piece, square_to, promotion_marker++);
     			}
     		}
     	}
@@ -607,7 +632,8 @@ public class NNUE {
     				|| bitboard.getMoveOps().isCastling(move)
     				|| bitboard.getMoveOps().isEnpassant(move)
     				|| bitboard.getMoveOps().isCapture(move)
-    				|| bitboard.getMoveOps().isPromotion(move)) {
+    				//|| bitboard.getMoveOps().isPromotion(move)
+    				) {
     			
     			must_refresh = true;
     			
@@ -622,12 +648,23 @@ public class NNUE {
     			
     			if (bitboard.getMoveOps().isCapture(move)) {
     				
-    				color = 1 - color;
+    				int op_color = 1 - color;
         	        
                 	int piece_captured = bitboard.getMoveOps().getCapturedFigureType(move);
-                	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color);
+                	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, op_color);
                 	
-                	addDurtyPiece(color, piece_captured, capture_promotion_marker++, square_to);
+                	addDurtyPiece(op_color, piece_captured, capture_marker++, square_to);
+                	
+                	//System.out.println("capture_marker=" + capture_marker);
+    			}
+    			
+    			if (bitboard.getMoveOps().isPromotion(move)) {
+        	        
+                	int piece_promoted = bitboard.getMoveOps().getPromotionFigureType(move);
+                	piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
+                	
+                	addDurtyPiece(color, piece_promoted, square_to, promotion_marker++);
+                	addDurtyPiece(color, piece, promotion_marker++, square_to);
     			}
     		}
     	}
