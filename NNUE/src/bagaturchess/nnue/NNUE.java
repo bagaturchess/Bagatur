@@ -553,7 +553,7 @@ public class NNUE {
     	//@Override
     	public final void postForwardMove(int color, int move) {
     		
-    		if (pos.nnue[0].dirtyPieces.dirtyNum >= bitboard.getMaterialState().getPiecesCount()) {
+    		if (2 * pos.nnue[0].dirtyPieces.dirtyNum >= bitboard.getMaterialState().getPiecesCount() - 2) {
     			//Refresh will be faster
     			must_refresh = true;
     		}
@@ -614,7 +614,7 @@ public class NNUE {
     	//@Override
     	public final void postBackwardMove(int color, int move) {
     		
-    		if (pos.nnue[0].dirtyPieces.dirtyNum >= bitboard.getMaterialState().getPiecesCount()) {
+    		if (2 * pos.nnue[0].dirtyPieces.dirtyNum >= bitboard.getMaterialState().getPiecesCount() - 2) {
     			//Refresh will be faster
     			must_refresh = true;
     		}
