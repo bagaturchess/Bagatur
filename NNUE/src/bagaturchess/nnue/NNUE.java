@@ -16,7 +16,7 @@ import bagaturchess.bitboard.impl.Figures;
 
 public class NNUE {
 
-	public static final boolean DO_INCREMENTAL_UPDATES = true;
+	public static final boolean DO_INCREMENTAL_UPDATES = false;
 	
     private static final int PS_W_PAWN = 1;
     private static final int PS_B_PAWN = 1 * 64 + 1;
