@@ -818,7 +818,7 @@ public class BoardImpl implements IBitBoard {
 		int colourToMove = getColourToMove();
 		
 		
-		if (getStateRepetition() >= 2) {
+		if (getStateRepetition() >= 3) {
 			//3 states repetition draw
 			return IGameStatus.DRAW_3_STATES_REPETITION;
 		}

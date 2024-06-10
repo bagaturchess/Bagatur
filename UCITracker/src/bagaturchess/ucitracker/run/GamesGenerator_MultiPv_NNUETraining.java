@@ -24,8 +24,10 @@ package bagaturchess.ucitracker.run;
 
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +44,12 @@ import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.UCIEnginesManager;
 import bagaturchess.uci.engine.EngineProcess.LineCallBack;
 import bagaturchess.uci.impl.Channel_Console;
-import bagaturchess.ucitracker.impl.gamemodel.EvaluatedGame;
-import bagaturchess.ucitracker.impl.gamemodel.EvaluatedMove;
-import bagaturchess.ucitracker.impl.gamemodel.EvaluatedPosition;
-import bagaturchess.ucitracker.impl.gamemodel.serialization.GameModelWriter;
+import bagaturchess.ucitracker.impl2.gamemodel.EvaluatedMove;
+import bagaturchess.ucitracker.impl2.gamemodel.EvaluatedGame;
+import bagaturchess.ucitracker.impl2.gamemodel.GameModelWriter;
 
 
-public class GamesGenerator_MultiPv {
+public class GamesGenerator_MultiPv_NNUETraining {
 	
 	
 	private static final boolean USE_FEN = false;
@@ -57,9 +58,7 @@ public class GamesGenerator_MultiPv {
 	private static int SEARCH_DEPTH_MIN = 1;
 	private static int SEARCH_DEPTH_MAX = 10;
 	
-	private static int MAX_EVAL_DIFF = 3000;
-	private static int BEST_MOVE_DIFF = 10000;
-	private static int MIN_PIECES = 3;
+	private static int BEST_MOVE_DIFF = 10;
 	
 	
 	private UCIEnginesManager runner;
@@ -67,7 +66,7 @@ public class GamesGenerator_MultiPv {
 	private String initial_fen;
 	
 	
-	public GamesGenerator_MultiPv(String _initial_fen) {
+	public GamesGenerator_MultiPv_NNUETraining(String _initial_fen) {
 		
 		runner = new UCIEnginesManager();
 		
@@ -79,7 +78,7 @@ public class GamesGenerator_MultiPv {
 		
 		ChannelManager.setChannel(new Channel_Console());
 		
-		GamesGenerator_MultiPv control = new GamesGenerator_MultiPv(Constants.INITIAL_BOARD);
+		GamesGenerator_MultiPv_NNUETraining control = new GamesGenerator_MultiPv_NNUETraining(Constants.INITIAL_BOARD);
 		//GamesGenerator_MultiPv control = new GamesGenerator_MultiPv("8/p5pp/1pk5/5p2/P1nn4/2NN3P/5PPK/8 w - - 0 1");
 		
 		try {
@@ -162,7 +161,7 @@ public class GamesGenerator_MultiPv {
 			//control.execute(engine, "./pedone-3.1.cg", 1000000, true);
 			//control.execute(engine, "./wasp-5-0-0.cg", 1000000, true);
 			//control.execute(engine, "./bagatur-2.3.cg", 1000000, true);
-			control.execute(engine, "./stockfish-16.1.cg", 1000000, true);
+			control.execute(engine, "./stockfish-16.1.txt", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -185,7 +184,7 @@ public class GamesGenerator_MultiPv {
 			options.add("setoption name MultiPV value 99");
 			options.add("setoption name Ponder value false");
 			options.add("setoption name OwnBook value false");
-			options.add("setoption name SyzygyPath value c:\\dummy");
+			options.add("setoption name SyzygyPath value C:\\dummy\\");
 			
 			runner.setOptions(options);
 			
@@ -194,13 +193,13 @@ public class GamesGenerator_MultiPv {
 			
 			EvaluatedGame game = playGame();
 			
-			DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(toFileName, appendToFile), 10 * 1024 * 1024));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true));
 			
-			GameModelWriter.writeEvaluatedGame(game, dos);
+			GameModelWriter.writeEvaluatedGame(game, bw);
 			
-			dos.flush();
+			bw.flush();
 			
-			dos.close();
+			bw.close();
 			
 			System.out.println("Game " + (i+1) + " saved in " + toFileName);
 			
@@ -217,46 +216,32 @@ public class GamesGenerator_MultiPv {
 		
 		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(initial_fen);
 		
-		EvaluatedGame game = new EvaluatedGame(bitboard.toEPD());
+		EvaluatedGame game = new EvaluatedGame();
 		
-		while (bitboard.getStatus().equals(IGameStatus.NONE)) {
+		while (true) {
 			
 			Set<EvaluatedMove> movesEvals = evalVariations(bitboard);
 			
 			if (movesEvals.size() == 0) {
 				
-				break;
+				throw new IllegalStateException();
 			}
 			
 			EvaluatedMove best = getBestVariation(bitboard.isInCheck(), movesEvals);
-			
-			//if (bitboard.getPlayedMovesCount() == 20) {
-			//	System.out.println(bitboard);
-			//}
-			
-			//System.out.println(bitboard);
-			//System.out.println("BEST MOVE: " + best);			
+					
 			bitboard.makeMoveForward(best.getMoves()[0]);
 			
 			if (!bitboard.getStatus().equals(IGameStatus.NONE)) {
-				break;
-			}
-			if (Math.abs(best.eval_ofOriginatePlayer()) > MAX_EVAL_DIFF) {
-				break;
-			}
-			if (bitboard.getDraw50movesRule() > 50) {
-				break;
-			}
-			if (bitboard.getMaterialState().getPiecesCount() < MIN_PIECES) {
+				
+				System.out.println("STATUS: " + bitboard.getStatus());
+				
+				game.setResult(getGameTerminationScore(bitboard.getStatus()));
+				
 				break;
 			}
 			
-			//if (bitboard.isInCheck()) System.out.println("isInCheck " + best.getMoves().length);
-			//System.out.println(best.getMoves().length);
-			
-			EvaluatedPosition position = new EvaluatedPosition(bitboard.toEPD(), best.getMoves()[0]);
-			position.setChildren(movesEvals);
-			game.addBoard(position);
+			int eval = bitboard.getColourToMove() == Constants.COLOUR_BLACK ? best.eval_ofOriginatePlayer() : -best.eval_ofOriginatePlayer();
+			game.addBoard(bitboard.getMoveOps().moveToString(best.getMoves()[0]), bitboard.toEPD(), eval);
 		}
 		
 		//System.out.println(bitboard);
@@ -276,7 +261,7 @@ public class GamesGenerator_MultiPv {
 			int besteval = best.eval_ofOriginatePlayer();
 			int size = 0;
 			for (EvaluatedMove cur: evals) {
-				if (cur.eval_ofOriginatePlayer() + BEST_MOVE_DIFF < besteval) {
+				if (cur.eval_ofOriginatePlayer() + BEST_MOVE_DIFF <= besteval) {
 					break;
 				}
 				size++;
@@ -307,7 +292,6 @@ public class GamesGenerator_MultiPv {
 		List<String> infos = null;
 		
 		int depth = SEARCH_DEPTH_MIN;
-		//int depth = (Math.random() >= 0.5) ? SEARCH_DEPTH_MIN : SEARCH_DEPTH_MIN + 1;
 		
 		boolean loop = true;
 		
@@ -411,15 +395,63 @@ public class GamesGenerator_MultiPv {
 			while (st.hasMoreTokens()) {
 				
 				EvaluatedMove move = new EvaluatedMove(bitboard, st.nextToken());
-				
-				if (move.getStatus() == IGameStatus.NONE) {
 					
-					evals.add(move);
-				}
+				evals.add(move);
 			}
 		}
 		
 		
 		return evals;
+	}
+	
+	
+	private float getGameTerminationScore(IGameStatus status) {
+		
+		
+		switch (status) {
+		
+			case NONE:
+				throw new IllegalStateException("status=" + status);
+				
+			case DRAW_3_STATES_REPETITION:
+				return 0.5f;
+				
+			case MATE_WHITE_WIN:
+				return 1;
+				
+			case MATE_BLACK_WIN:
+				return 0;
+				
+			case UNDEFINED:
+				throw new IllegalStateException("status=" + status);
+				
+			case STALEMATE_WHITE_NO_MOVES:
+				return 0.5f;
+				
+			case STALEMATE_BLACK_NO_MOVES:
+				return 0.5f;
+				
+			case DRAW_50_MOVES_RULE:
+				return 0.5f;
+				
+			case NO_SUFFICIENT_MATERIAL:
+				return 0.5f;
+				
+			case PASSER_WHITE:
+				throw new IllegalStateException("status=" + status);
+				
+			case PASSER_BLACK:
+				throw new IllegalStateException("status=" + status);
+				
+			case NO_SUFFICIENT_WHITE_MATERIAL:
+				throw new IllegalStateException("status=" + status);
+				
+			case NO_SUFFICIENT_BLACK_MATERIAL:
+				throw new IllegalStateException("status=" + status);
+				
+			default:
+				throw new IllegalStateException("status=" + status);
+				
+		}
 	}
 }
