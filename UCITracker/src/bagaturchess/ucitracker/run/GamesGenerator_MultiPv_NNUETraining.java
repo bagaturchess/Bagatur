@@ -58,7 +58,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 	private static int SEARCH_DEPTH_MIN = 1;
 	private static int SEARCH_DEPTH_MAX = 10;
 	
-	private static int BEST_MOVE_DIFF = 10;
+	private static int BEST_MOVE_DIFF = 3;
 	
 	
 	private UCIEnginesManager runner;
