@@ -97,6 +97,11 @@ public class NNUE
 			outputBiases[i] = toLittleEndian(networkData.readShort());
 		}
 		
+		//24 non zero shorts left at the end of the file
+		/*for (int i = 0; i < 24; i++) {
+			System.out.println(toLittleEndian(networkData.readShort()));
+		}*/
+		
 		networkData.close();
 	}
 
@@ -137,6 +142,7 @@ public class NNUE
 
 	public static int getIndex(int square, int piece_side, int piece_type, int perspective)
 	{
+		//System.out.println("square=" + square + ", piece_side=" + piece_side + ", piece_type=" + piece_type + ", perspective=" + perspective);
 		return perspective == WHITE
 				? piece_side * COLOR_STRIDE + piece_type * PIECE_STRIDE
 						+ square

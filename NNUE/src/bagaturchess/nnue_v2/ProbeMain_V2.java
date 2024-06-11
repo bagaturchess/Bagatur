@@ -25,6 +25,7 @@ public class ProbeMain_V2 {
 		try {
 			
 			NNUE network = new NNUE("./network.data");
+			//NNUE network = new NNUE("./simple-20.bin");
 			
 	        Accumulators accumulators = new Accumulators(network);
 	        

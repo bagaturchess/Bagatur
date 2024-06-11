@@ -155,12 +155,12 @@ public class NNUEProbeUtils {
 	
 	public static int convertPiece(int pieceType, int color) {
 		switch(pieceType) {
-			case Constants.TYPE_PAWN: return color == ChessConstants.WHITE ? 0 : 6;
-			case Constants.TYPE_KNIGHT: return color == ChessConstants.WHITE ? 1 : 7;
-			case Constants.TYPE_BISHOP: return color == ChessConstants.WHITE ? 2 : 8;
-			case Constants.TYPE_ROOK: return color == ChessConstants.WHITE ? 3 : 9;
-			case Constants.TYPE_QUEEN: return color == ChessConstants.WHITE ? 4 : 10;
-			case Constants.TYPE_KING: return color == ChessConstants.WHITE ? 5 : 11;
+			case Constants.TYPE_PAWN: return color == ChessConstants.WHITE ? 0 : 0;
+			case Constants.TYPE_KNIGHT: return color == ChessConstants.WHITE ? 1 : 1;
+			case Constants.TYPE_BISHOP: return color == ChessConstants.WHITE ? 2 : 2;
+			case Constants.TYPE_ROOK: return color == ChessConstants.WHITE ? 3 : 3;
+			case Constants.TYPE_QUEEN: return color == ChessConstants.WHITE ? 4 : 4;
+			case Constants.TYPE_KING: return color == ChessConstants.WHITE ? 5 : 5;
 			default: throw new IllegalStateException();
 		}
 	}
