@@ -10,30 +10,57 @@ import bagaturchess.bitboard.api.IBitBoard;
 
 public class ProbeMain_V2 {    
 	
+	private static final NNUEProbeUtils.Input input = new NNUEProbeUtils.Input();
+	private static NNUE network;
+	private static Accumulators accumulators;
+	
+	static {
+		
+		
+		try {
+			
+			//network = new NNUE("./network.data");
+			network = new NNUE("./simple-5.bin");
+			
+			accumulators = new Accumulators(network);
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+	}
+	
+	
 	public static void main(String[] args) {
 		
-		String fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-		//String fen = "4kq2/8/8/8/8/8/8/2QK4 w - - 0 1";
-		//String fen = "4k3/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-		
-        IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen);
-        
-        int pieces_count = bitboard.getMaterialState().getPiecesCount();
-        System.out.println("pieces_count: " + pieces_count);
-        System.out.println("side: " + bitboard.getColourToMove());
+		String fen0 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+		String fen1 = "4kq2/8/8/8/8/8/8/2QK4 w - - 0 1";
+		String fen2 = "4k3/8/8/8/8/8/8/2QK4 w - - 0 1";
+		String fen3 = "4kq2/8/8/8/8/8/8/3K4 w - - 0 1";
+		String fen4 = "4k3/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+		String fen5 = "rnbqkbnr/pppppppp/8/8/8/8/8/4K3 w KQkq - 0 1";
+		String fen6 = "4kr2/8/8/8/8/8/8/2RK4 w - - 0 1";
+		String fen7 = "4k3/8/8/8/8/8/8/2RK4 w - - 0 1";
+		String fen8 = "4kr2/8/8/8/8/8/8/3K4 w - - 0 1";
+        //System.out.println("pieces_count: " + pieces_count);
+        //System.out.println("side: " + bitboard.getColourToMove());
         
 		try {
 			
-			NNUE network = new NNUE("./network.data");
-			//NNUE network = new NNUE("./simple-20.bin");
-			
-	        Accumulators accumulators = new Accumulators(network);
+			evaluate(fen0);
+	        evaluate(fen1);
+	        evaluate(fen2);
+	        evaluate(fen3);
+	        evaluate(fen4);
+	        evaluate(fen5);
+	        evaluate(fen6);
+	        evaluate(fen7);
+	        evaluate(fen8);
 	        
-			NNUEProbeUtils.Input input = new NNUEProbeUtils.Input();
-			
-			
-	        NNUEProbeUtils.fillInput(bitboard, input);
+	        /*IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen1);
 	        
+			int pieces_count = bitboard.getMaterialState().getPiecesCount();
+			
 	        System.out.println("input.white_king_sq: " + input.white_king_sq);
 	        System.out.println("input.black_king_sq: " + input.black_king_sq);
 	        System.out.println("input.white_pieces: " + Arrays.toString(input.white_pieces));
@@ -59,11 +86,29 @@ public class ProbeMain_V2 {
 	    			System.out.println("Evaluation: " + eval);
 	    		}
 	    		count++;
-	    	}
+	    	}*/
 	        
 		} catch (IOException e) {
 			
 			e.printStackTrace();
 		}
+	}
+
+	private static void evaluate(String fen) throws IOException {
+		
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen);
+		
+		int pieces_count = bitboard.getMaterialState().getPiecesCount();
+		
+		NNUEProbeUtils.fillInput(bitboard, input);
+		
+		accumulators.fullAccumulatorUpdate(input.white_king_sq, input.black_king_sq, input.white_pieces, input.white_squares, input.black_pieces, input.black_squares);
+		
+		int eval = bitboard.getColourToMove() == NNUE.WHITE ?
+		        NNUE.evaluate(network, accumulators.getWhiteAccumulator(), accumulators.getBlackAccumulator(), pieces_count)
+		        :
+		        NNUE.evaluate(network, accumulators.getBlackAccumulator(), accumulators.getWhiteAccumulator(), pieces_count);
+		
+		System.out.println("fen=" + fen + ", eval=" + eval);
 	}
 }

@@ -1,16 +1,12 @@
 package bagaturchess.deeplearning.impl_nnue_v3;
 
 
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 
-import java.io.File;
 import java.io.IOException;
 
-import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
-import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.nnue_v2.Accumulators;
 import bagaturchess.nnue_v2.NNUE;
 import bagaturchess.nnue_v2.NNUEProbeUtils;
@@ -39,8 +35,8 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		try {
 			
-			nnue = new NNUE("./network.data");
-			//nnue = new NNUE("./simple-20.bin");
+			//nnue = new NNUE("./network.data");
+			nnue = new NNUE("./simple-12.bin");
 			
 		} catch (IOException e) {
 			
@@ -120,31 +116,17 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		int pieces_count = bitboard.getMaterialState().getPiecesCount();
 		
-		int actualWhitePlayerEval_java = bitboard.getColourToMove() == NNUE.WHITE ?
+		int actualWhitePlayerEval = bitboard.getColourToMove() == NNUE.WHITE ?
 		        NNUE.evaluate(nnue, accumulators.getWhiteAccumulator(), accumulators.getBlackAccumulator(), pieces_count)
 		        :
 		        NNUE.evaluate(nnue, accumulators.getBlackAccumulator(), accumulators.getWhiteAccumulator(), pieces_count);
-	        
-		
-		//C and Java evaluations are now with small difference just because of NNUE biases
-		/*if (actualWhitePlayerEval_c == actualWhitePlayerEval_java) {
-			System.out.println("OK actualWhitePlayerEval_c=" + actualWhitePlayerEval_c);
-		} else {
-			System.out.println("NOTOK actualWhitePlayerEval_c=" + actualWhitePlayerEval_c + " actualWhitePlayerEval_java=" + actualWhitePlayerEval_java);
-		}*/
-		
-		//actualWhitePlayerEval = (2 * actualWhitePlayerEval) / 3;
-		
-		//String fen = bitboard.toEPD();
-		
-		//int actualWhitePlayerEval = NNUEJNIBridge.eval(fen) / 3;
 		
 		if (bitboard.getColourToMove() == BLACK) {
 			
-			actualWhitePlayerEval_java = -actualWhitePlayerEval_java;
+			actualWhitePlayerEval = -actualWhitePlayerEval;
 		}
 		
-		return (int) actualWhitePlayerEval_java;
+		return (int) actualWhitePlayerEval;
 	}
 	
 	
