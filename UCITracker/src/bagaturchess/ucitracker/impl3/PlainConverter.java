@@ -8,13 +8,13 @@ import java.io.IOException;
 
 public class PlainConverter {
 
-	private static final long MAX_POSITIONS = 200000000;
+	private static final long MAX_POSITIONS = 100000000;
 	
 	
 	public static void main(String[] args) {
 		
 		String inputFilePath = "C:\\DATA\\NNUE\\test80-2024-04-apr-2tb7p\\all.plain"; // Path to the input file
-        String outputFilePath = "output.txt"; // Path to the output file
+        String outputFilePath = "dataset.txt"; // Path to the output file
 
         long lines_counter = 0;
         
