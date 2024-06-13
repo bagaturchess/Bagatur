@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class PlainConverter {
+public class PlainConverter_ALL {
 
 	private static final long MAX_POSITIONS = 100000000;
 	
