@@ -4,14 +4,11 @@ package bagaturchess.deeplearning.impl_nnue_v2.java_eval;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 
-import java.io.File;
-
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.nnue.NNUE;
-import bagaturchess.nnue.NNUEJNIBridge;
 import bagaturchess.nnue.NNUEProbeUtils;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
@@ -22,20 +19,6 @@ public class NNUEEvaluator extends BaseEvaluator {
 	
 	
 	private static final int MAX_MATERIAL_FACTOR = 4 * 3 + 4 * 3 + 4 * 5 + 2 * 9;
-	
-	
-	static {
-		
-		NNUEJNIBridge.loadLib();
-		
-		NNUEJNIBridge.init();
-		
-		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
-		//String fen = bitboard.toEPD();
-		//System.out.println("fen=" + fen);
-		//int score = NNUEJNIBridge.eval(fen);
-		//System.out.println("NNUE score=" + score);
-	}
 	
 	private IBitBoard bitboard;
 	

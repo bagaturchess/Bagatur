@@ -140,7 +140,7 @@ public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
      *         from being compared to this Object.
 	 */
 	public int compareTo(EvaluatedMove other) {
-		if (other.status != IGameStatus.NONE && status != IGameStatus.NONE) {
+		/*if (other.status != IGameStatus.NONE && status != IGameStatus.NONE) {
 			return -1;
 		}
 		
@@ -150,7 +150,7 @@ public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
 		
 		if (other.status == IGameStatus.NONE && status != IGameStatus.NONE) {
 			return 1;
-		}
+		}*/
 		
 		if (eval_ofOriginatePlayer - other.eval_ofOriginatePlayer == 0) {
 			return -1;

@@ -5,5 +5,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Bitboard"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UCI"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NNUE"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/LearningImpl"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Search"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Opening"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

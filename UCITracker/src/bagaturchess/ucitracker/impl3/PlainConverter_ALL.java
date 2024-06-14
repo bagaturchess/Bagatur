@@ -11,7 +11,7 @@ import java.io.IOException;
 public class PlainConverter_ALL {
 	
 	
-	private static final long MAX_POSITIONS = 1000000000;
+	private static final long MAX_POSITIONS = 100000000000L;
 	
 	
 	public static void main(String[] args) {

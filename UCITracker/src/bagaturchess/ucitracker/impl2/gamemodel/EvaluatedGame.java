@@ -57,4 +57,9 @@ public class EvaluatedGame implements Serializable {
 		
 		result = _result;
 	}
+	
+	public int getPositionsCount() {
+		
+		return fens.size();
+	}
 }

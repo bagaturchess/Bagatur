@@ -26,6 +26,7 @@ package bagaturchess.ucitracker.run;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -39,6 +40,9 @@ import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.opening.api.IOpeningEntry;
+import bagaturchess.opening.api.OpeningBook;
+import bagaturchess.opening.api.OpeningBookFactory;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.engine.EngineProcess;
 import bagaturchess.uci.engine.UCIEnginesManager;
@@ -58,19 +62,19 @@ public class GamesGenerator_MultiPv_NNUETraining {
 	private static int SEARCH_DEPTH_MIN = 1;
 	private static int SEARCH_DEPTH_MAX = 10;
 	
-	private static int BEST_MOVE_DIFF = 3;
+	private static int BEST_MOVE_DIFF = 1; //Small randomness
 	
 	
 	private UCIEnginesManager runner;
 	
-	private String initial_fen;
+	private OpeningBook ob;
 	
 	
-	public GamesGenerator_MultiPv_NNUETraining(String _initial_fen) {
+	public GamesGenerator_MultiPv_NNUETraining() throws FileNotFoundException, ClassNotFoundException, IOException {
 		
 		runner = new UCIEnginesManager();
 		
-		initial_fen = _initial_fen;
+		ob = OpeningBookFactory.load("./../WorkDir/data/w.ob", "./../WorkDir/data/b.ob");
 	}
 	
 	
@@ -78,10 +82,10 @@ public class GamesGenerator_MultiPv_NNUETraining {
 		
 		ChannelManager.setChannel(new Channel_Console());
 		
-		GamesGenerator_MultiPv_NNUETraining control = new GamesGenerator_MultiPv_NNUETraining(Constants.INITIAL_BOARD);
-		//GamesGenerator_MultiPv control = new GamesGenerator_MultiPv("8/p5pp/1pk5/5p2/P1nn4/2NN3P/5PPK/8 w - - 0 1");
 		
 		try {
+			
+			GamesGenerator_MultiPv_NNUETraining control = new GamesGenerator_MultiPv_NNUETraining();
 			
 			/*Engine engine = new Engine("C:\\own\\chess\\ENGINES\\Houdini_15a\\Houdini_15a_w32.exe",
 					new String [0],
@@ -161,7 +165,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			//control.execute(engine, "./pedone-3.1.cg", 1000000, true);
 			//control.execute(engine, "./wasp-5-0-0.cg", 1000000, true);
 			//control.execute(engine, "./bagatur-2.3.cg", 1000000, true);
-			control.execute(engine, "./stockfish-16.1.txt", 1000000, true);
+			control.execute(engine, "./stockfish-16.1-NNUE.txt", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -171,9 +175,9 @@ public class GamesGenerator_MultiPv_NNUETraining {
 	
 	private void execute(EngineProcess engine, String toFileName, int gamesCount, boolean appendToFile) throws IOException {
 		
+		int positions = 0;
 		
 		runner.addEngine(engine);
-		
 		
 		for (int i=0; i<gamesCount; i++) {
 			
@@ -190,8 +194,15 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			
 			runner.isReady();
 			
+			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
 			
-			EvaluatedGame game = playGame();
+			playRandomOpening(bitboard);
+			
+			System.out.println(bitboard);
+					
+			EvaluatedGame game = playGame(bitboard);
+			
+			positions += game.getPositionsCount();
 			
 			BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true));
 			
@@ -201,7 +212,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			
 			bw.close();
 			
-			System.out.println("Game " + (i+1) + " saved in " + toFileName);
+			System.out.println("Game " + (i+1) + " saved in " + toFileName + ", positions are " + positions);
 			
 			runner.stopEngines();
 		}
@@ -210,11 +221,37 @@ public class GamesGenerator_MultiPv_NNUETraining {
 	}
 	
 	
-	private EvaluatedGame playGame() throws IOException {
+	private void playRandomOpening(IBitBoard bitboard) {
+		
+		while (true) {
+			
+			IOpeningEntry entry = ob.getEntry(bitboard.getHashKey(), bitboard.getColourToMove());
+			
+			//System.out.println("entry=" + entry);
+					
+			if (entry == null) {
+				
+				break;
+			}
+			
+			/*if (entry.getWeight() < OpeningBook.OPENING_BOOK_MIN_MOVES) {
+				
+				break;
+			}*/
+			
+			//OPENING_BOOK_MODE_POWER2=most played first, OPENING_BOOK_MODE_POWER1=random intermediate, OPENING_BOOK_MODE_POWER0=random full
+			int mode = OpeningBook.OPENING_BOOK_MODE_POWER0;
+
+			int move = entry.getRandomEntry(mode);
+			
+			bitboard.makeMoveForward(move);
+		}
+	}
+
+
+	private EvaluatedGame playGame(IBitBoard bitboard) throws IOException {
 		
 		runner.newGame();
-		
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(initial_fen);
 		
 		EvaluatedGame game = new EvaluatedGame();
 		
@@ -241,7 +278,15 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			}
 			
 			int eval = bitboard.getColourToMove() == Constants.COLOUR_BLACK ? best.eval_ofOriginatePlayer() : -best.eval_ofOriginatePlayer();
-			game.addBoard(bitboard.getMoveOps().moveToString(best.getMoves()[0]), bitboard.toEPD(), eval);
+
+			if (best.getMoves().length == 1) {
+				
+				game.addBoard(bitboard.getMoveOps().moveToString(best.getMoves()[0]), bitboard.toEPD(), eval);
+				
+			} else {
+				
+				//TODO: play moves and add the corresponding board
+			}
 		}
 		
 		//System.out.println(bitboard);
