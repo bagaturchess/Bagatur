@@ -175,6 +175,8 @@ public class GamesGenerator_MultiPv_NNUETraining {
 	
 	private void execute(EngineProcess engine, String toFileName, int gamesCount, boolean appendToFile) throws IOException {
 		
+		BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true), 16 * 1024 * 1024);
+		
 		int positions = 0;
 		
 		runner.addEngine(engine);
@@ -204,13 +206,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			
 			positions += game.getPositionsCount();
 			
-			BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true));
-			
 			GameModelWriter.writeEvaluatedGame(game, bw);
-			
-			bw.flush();
-			
-			bw.close();
 			
 			System.out.println("Game " + (i+1) + " saved in " + toFileName + ", positions are " + positions);
 			
