@@ -15,7 +15,7 @@ import bagaturchess.bitboard.impl.utils.VarStatistic;
 public class PlainConverter_Balanced {
 	
 	
-	private static final long MAX_POSITIONS 					= 100000000;
+	private static final long MAX_POSITIONS 					= 300000000;
 	
 	private static final Map<Integer, Long> scores_distribution = new HashMap<Integer, Long>();
 	

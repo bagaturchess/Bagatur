@@ -1,25 +1,28 @@
 package bagaturchess.ucitracker.impl3;
 
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class PlainConverter_ALL {
 
-	private static final long MAX_POSITIONS = 100000000;
+public class PlainConverter_ALL {
+	
+	
+	private static final long MAX_POSITIONS = 1000000000;
 	
 	
 	public static void main(String[] args) {
 		
 		String inputFilePath = "C:\\DATA\\NNUE\\test80-2024-04-apr-2tb7p\\all.plain"; // Path to the input file
-        String outputFilePath = "dataset.txt"; // Path to the output file
+        String outputFilePath = "C:\\DATA\\NNUE\\test80-2024-04-apr-2tb7p\\dataset.txt"; // Path to the output file
 
         long lines_counter = 0;
         
-        try (BufferedReader br = new BufferedReader(new FileReader(inputFilePath), 1024 * 1024);
-             BufferedWriter bw = new BufferedWriter(new FileWriter(outputFilePath))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(inputFilePath), 32 * 1024 * 1024);
+             BufferedWriter bw = new BufferedWriter(new FileWriter(outputFilePath), 32 * 1024 * 1024)) {
 
             String line;
             String fen = null, score = null, result = null;
@@ -43,19 +46,20 @@ public class PlainConverter_ALL {
                     	result= "0";
                     }
                 } else if (line.equals("e")) {
-                    //if (fen != null && score != null && result != null) {
-                        bw.write(fen + " | " + score + " | " + result);
-                        bw.newLine();
-                        lines_counter++;
-                        if (lines_counter == MAX_POSITIONS) {
-                        	bw.close();
-                        	break;
-                        }
-                    //}
-                    // Reset variables for the next entry
-                    fen = null;
-                    score = null;
-                    result = null;
+                    
+                    bw.write(fen + " | " + score + " | " + result);
+                    bw.newLine();
+                    lines_counter++;
+                    
+                    if (lines_counter == MAX_POSITIONS) {
+                    	bw.close();
+                    	break;
+                    }
+                    
+                    if (lines_counter % 1000000 == 0) {
+                    	
+                    	System.out.println("Positions Count: " + (lines_counter / 1000000) + "M");
+                    }
                 }
             }
 
