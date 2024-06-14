@@ -15,7 +15,7 @@
   <property name="enginesrunner_dir" value="${workspace_root}/EnginesRunner" />
   <property name="resources_dir" value="${workspace_root}/Resources" />
   <property name="learningAPI_dir" value="${workspace_root}/LearningAPI" />
-  <property name="ucitracker_dir" value="${workspace_root}/UCITracker" />
+  <!--property name="ucitracker_dir" value="${workspace_root}/UCITracker" /-->
   <property name="learningImpl_dir" value="${workspace_root}/LearningImpl" />
   <property name="egtb_dir" value="${workspace_root}/EGTB" />
   <property name="nnue_dir" value="${workspace_root}/NNUE" />
@@ -31,7 +31,7 @@
   	<ant antfile="${ants_dir}/common/build_NNUE.xml" dir="${engines_dir}/src"/>
   	<ant antfile="${ants_dir}/engine/build_Search.xml" dir="${search_dir}/src"/>
   	<ant antfile="${ants_dir}/common/build_LearningAPI.xml" dir="${learningAPI_dir}/src"/>
-  	<ant antfile="${ants_dir}/common/build_UCITracker.xml" dir="${ucitracker_dir}/src"/>
+  	<!-- ant antfile="${ants_dir}/common/build_UCITracker.xml" dir="${ucitracker_dir}/src"/-->
   	<ant antfile="${ants_dir}/common/build_LearningImpl.xml" dir="${learningImpl_dir}/src"/>
   	<ant antfile="${ants_dir}/engine/build_Engines.xml" dir="${engines_dir}/src"/>
   	<ant antfile="${ants_dir}/engine/build_BagaturEngine_src.xml" dir="${ants_dir}/engine"/>
