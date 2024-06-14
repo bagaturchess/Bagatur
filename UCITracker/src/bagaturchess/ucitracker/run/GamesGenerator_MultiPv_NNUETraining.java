@@ -157,7 +157,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 					"C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.2.3");*/
 			
 			
-			//EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");
+			//EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");			
 			
 			//control.execute(engine, "./stockfish-14.1.cg", 1000000, true);
 			//control.execute(engine, "./stockfish-14.1-4N.cg", 1000000, true);
@@ -175,7 +175,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 	
 	private void execute(EngineProcess engine, String toFileName, int gamesCount, boolean appendToFile) throws IOException {
 		
-		BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true), 1024 * 1024);
+		BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true), 512 * 1024);
 		
 		int positions = 0;
 		
@@ -207,6 +207,8 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			positions += game.getPositionsCount();
 			
 			GameModelWriter.writeEvaluatedGame(game, bw);
+			
+			bw.flush();
 			
 			System.out.println("Game " + (i+1) + " saved in " + toFileName + ", positions are " + positions);
 			
@@ -273,15 +275,25 @@ public class GamesGenerator_MultiPv_NNUETraining {
 				break;
 			}
 			
-			int eval = bitboard.getColourToMove() == Constants.COLOUR_BLACK ? best.eval_ofOriginatePlayer() : -best.eval_ofOriginatePlayer();
+			if (best.eval_ofOriginatePlayer() != 0 && best.eval_ofOriginatePlayer() % EvaluatedMove.MATE == 0) {
 
-			if (best.getMoves().length == 1) {
-				
-				game.addBoard(bitboard.getMoveOps().moveToString(best.getMoves()[0]), bitboard.toEPD(), eval);
+				if (best.getMoves().length == 1) {
+					//Sometimes the pv is cut
+					//throw new IllegalStateException(best.eval_ofOriginatePlayer() + " " + bitboard.toString());
+				}
 				
 			} else {
 				
-				//TODO: play moves and add the corresponding board
+				int eval = bitboard.getColourToMove() == Constants.COLOUR_BLACK ? best.eval_ofOriginatePlayer() : -best.eval_ofOriginatePlayer();
+
+				if (best.getMoves().length == 1) {
+					
+					game.addBoard(bitboard.getMoveOps().moveToString(best.getMoves()[0]), bitboard.toEPD(), eval);
+					
+				} else {
+					
+					//TODO: play moves and add the corresponding board
+				}
 			}
 		}
 		

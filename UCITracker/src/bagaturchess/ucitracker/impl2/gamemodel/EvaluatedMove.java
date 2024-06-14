@@ -31,11 +31,14 @@ import java.util.StringTokenizer;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
+import bagaturchess.search.api.IEvaluator;
 
 
 public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
 	
 	private static final long serialVersionUID = -3973149070109725527L;
+	
+	public static final int MATE = IEvaluator.MAX_EVAL;
 	
 	int eval_ofOriginatePlayer;
 	int[] moves;
@@ -111,7 +114,11 @@ public class EvaluatedMove implements Comparable<EvaluatedMove>, Serializable{
 		
 		if (infoLine.indexOf(" mate ", cpOrMateStart) > 0) {
 			status = IGameStatus.UNDEFINED;
-			eval_ofOriginatePlayer = 20000;
+			int scoreEnd = infoLine.indexOf(" ", cpOrMateStart + 6);
+			String number = infoLine.substring(cpOrMateStart + 6, scoreEnd);
+			int mate_in = Integer.parseInt(number);
+			//System.out.println(mate_in);
+			eval_ofOriginatePlayer = mate_in * MATE;
 		} else if (infoLine.indexOf(" cp ", cpOrMateStart) > 0) {
 			int scoreEnd = infoLine.indexOf(" ", cpOrMateStart + 4);
 			String number = infoLine.substring(cpOrMateStart + 4, scoreEnd);
