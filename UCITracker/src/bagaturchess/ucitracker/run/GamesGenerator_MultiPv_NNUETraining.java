@@ -175,7 +175,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 	
 	private void execute(EngineProcess engine, String toFileName, int gamesCount, boolean appendToFile) throws IOException {
 		
-		BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true), 16 * 1024 * 1024);
+		BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true), 1024 * 1024);
 		
 		int positions = 0;
 		
