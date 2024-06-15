@@ -2,7 +2,6 @@ package bagaturchess.nnue_v2;
 
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
@@ -19,8 +18,8 @@ public class ProbeMain_V2 {
 		
 		try {
 			
-			//network = new NNUE("./network.data");
-			network = new NNUE("./simple-5.bin");
+			//network = new NNUE("./network.bin");
+			network = new NNUE("./simple-130.bin");
 			
 			accumulators = new Accumulators(network);
 			
