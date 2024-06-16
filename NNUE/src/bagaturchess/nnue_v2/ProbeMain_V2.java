@@ -15,11 +15,9 @@ public class ProbeMain_V2 {
 	
 	static {
 		
-		
 		try {
 			
-			//network = new NNUE("./network.bin");
-			network = new NNUE("./simple-130.bin");
+			network = new NNUE("./network_own_v2.nnue");
 			
 			accumulators = new Accumulators(network);
 			

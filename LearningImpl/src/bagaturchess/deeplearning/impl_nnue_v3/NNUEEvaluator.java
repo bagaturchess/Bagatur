@@ -35,8 +35,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		try {
 			
-			//nnue = new NNUE("./network.bin");
-			nnue = new NNUE("./simple-130.bin");
+			nnue = new NNUE("./network_own_v2.nnue");
 			
 		} catch (IOException e) {
 			
