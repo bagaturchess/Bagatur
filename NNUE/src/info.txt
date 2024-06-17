@@ -1,5 +1,0 @@
-WINDOWS:
-g++ -shared -o JNNUE.dll -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux bagaturchess_nnue_NNUEJNIBridge.c
-
-LINUX:
-g++ -fPIC -shared -o libJNNUE.so -I${JAVA_HOME}/include -I${JAVA_HOME}/include/linux bagaturchess_nnue_NNUEJNIBridge.c

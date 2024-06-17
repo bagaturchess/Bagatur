@@ -21,7 +21,7 @@ How to build a distribution from the sources:
 Fortunately, in this project I am not alone - without the ideas, support and help from many people and web sites, Bagatur would not be as it is now!
 Credits and many thanks to:
   1. My wife and my family, because every now and then I have been stealing from our leisure time to work on this project.
-  2. My Employer, SAP, for the great colleagues, for the company values and the culture we have, for the opportunities to have a global impact and to get better in different topics, out of the assignments, roles and tasks I work on each day, and last but not least, for the flex work model we use.
+  2. https://github.com/xu-shawn/Serendipity, thanks to Shawn for explaining to me how he has trained the NNUE network of Serendipity chess engine as well as for the reference Java code, which handles the network.
   3. Desislava Chocheva, for her hospitality and willingness to help. Without her support this video couldn't be a fact.
   4. Ivo Zhekov, for motivating me to start this project as well as for accepting the challenge with such a strong opponent in front of the camera.
   5. Simeon Stoichkov, for his general support, regarding chess topics in Bulgaria, as well as for the nice chess pieces and the chess clock, used in this video.
