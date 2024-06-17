@@ -5,7 +5,7 @@ Currently it has two flavours:
 1. Java NNUE based on <a href="https://github.com/jw1912/bullet">Bullet</a>. This is the strongest one.
 2. Older Stockfish NNUE designed to function both as a Java port and as a JNI bridge for the C code available at https://github.com/dshawul/nnue-probe.
 
-#Java NNUE based on <a href="https://github.com/jw1912/bullet">Bullet</a>
+# Java NNUE based on <a href="https://github.com/jw1912/bullet">Bullet</a>
 
 ## Architecture
 It uses the <a href="https://github.com/jw1912/bullet/blob/main/examples/simple.rs">simple</a> network from Bullet release 1.0.0 with the following modifications:
@@ -82,7 +82,7 @@ To test NNUE as the evaluation function in Bagatur at the code level, special ev
 With Bullet based NNUE Bagatur plays with around 200 Elo stronger than with Older Stockfish NNUE evaluation (Java porting).
 So future releases of Bagatur will be based on this implementation.
 
-#Older Stockfish NNUE
+# Older Stockfish NNUE
 
 ## Java porting
 
