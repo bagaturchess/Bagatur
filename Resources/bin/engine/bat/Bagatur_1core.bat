@@ -26,7 +26,8 @@ set ARGS=%ARGS% bagaturchess.search.impl.alg.impl1.Search_PVS_NWS
 set ARGS=%ARGS% bagaturchess.engines.cfg.base.SearchConfigImpl_AB
 set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20
 REM classical evaluation set ARGS=%ARGS% bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20
-set ARGS=%ARGS% bagaturchess.deeplearning.impl_nnue_v2.java_eval.EvaluationConfig
+REM older Stockfish NNUE set ARGS=%ARGS% bagaturchess.deeplearning.impl_nnue_v2.java_eval.EvaluationConfig
+set ARGS=%ARGS% bagaturchess.deeplearning.impl_nnue_v3.EvaluationConfig
 echo on
 
 REM Executes the java process of the Bagatur engine with sequential (not parallel) search. It uses only one CPU Core.

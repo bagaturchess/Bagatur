@@ -23,7 +23,8 @@ export ARGS="${ARGS} bagaturchess.search.impl.alg.impl1.Search_PVS_NWS"
 export ARGS="${ARGS} bagaturchess.engines.cfg.base.SearchConfigImpl_AB"
 export ARGS="${ARGS} bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20"
 # classical evaluation export ARGS="${ARGS} bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20"
-export ARGS="${ARGS} bagaturchess.deeplearning.impl_nnue_v2.java_eval.EvaluationConfig"
+# older Stockfish NNUE export ARGS="${ARGS} bagaturchess.deeplearning.impl_nnue_v2.java_eval.EvaluationConfig"
+export ARGS="${ARGS} bagaturchess.deeplearning.impl_nnue_v3.EvaluationConfig"
 
 # Executes the java process of the Bagatur engine with parallel search. It uses all CPU Cores.
 # Sometimes, the engine performs a sequential search for depth below 6 because of performance reasons.
