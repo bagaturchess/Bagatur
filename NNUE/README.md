@@ -112,7 +112,7 @@ Using the Java porting in production, Bagatur operates at about 2-3 times slower
 
 # How to run it out of the box
 
-The newer versiosn utilizes the Java NNUE based on Bullet.
+The newer versions utilizes the Java NNUE based on Bullet.
 As of version 5.0, NNUE is used as the evaluation function, and the classic version with its custom evaluation function is no longer supported.
 Bagatur versions can be downloaded from the: https://github.com/bagaturchess/Bagatur/releases
 
