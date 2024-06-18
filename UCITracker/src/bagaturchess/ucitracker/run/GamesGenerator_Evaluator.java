@@ -35,7 +35,7 @@ import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
-import bagaturchess.deeplearning.impl_nnue_v2.java_eval.NNUEEvaluatorFactory;
+import bagaturchess.deeplearning.impl_nnue_v3.NNUEEvaluatorFactory;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IEvaluatorFactory;
 import bagaturchess.uci.api.ChannelManager;
@@ -48,8 +48,8 @@ import bagaturchess.ucitracker.impl2.gamemodel.GameModelWriter;
 public class GamesGenerator_Evaluator {
 	
 	
-	private static int BEST_MOVE_DIFF 	= 0;
-	private static int MAX_EVAL 		= 800;
+	private static int BEST_MOVE_DIFF 	= 5;
+	private static int MAX_EVAL 		= 3000;
 	
 	private String initial_fen;
 	
@@ -68,7 +68,7 @@ public class GamesGenerator_Evaluator {
 		
 		try {
 			
-			control.execute("./self-play.txt", 1000000, true);
+			control.execute("./self-play-eval-only.txt", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -78,37 +78,26 @@ public class GamesGenerator_Evaluator {
 	
 	private void execute(String toFileName, int gamesCount, boolean appendToFile) throws IOException {
 		
+		BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true), 512 * 1024);
+		
+		int positions = 0;
 		
 		for (int i=0; i<gamesCount; i++) {
 			
 			IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(initial_fen);
-			
-			/*IMoveList moves = new BaseMoveList(150);
-			
-			if (bitboard.isInCheck()) {
-				bitboard.genKingEscapes(moves);
-			} else {
-				bitboard.genAllMoves(moves);
-			}
-			int cur_move = 0;
-			while ((cur_move = moves.next()) != 0) {
-				System.out.println("cur_move=" + cur_move);
-			}*/
 			
 			IEvaluatorFactory eval_factory = new NNUEEvaluatorFactory();
 			IEvaluator evaluator = eval_factory.create(bitboard, null);
 			
 			EvaluatedGame game = playGame(bitboard, evaluator);
 			
-			BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true));
+			positions += game.getPositionsCount();
 			
 			GameModelWriter.writeEvaluatedGame(game, bw);
 			
 			bw.flush();
 			
-			bw.close();
-			
-			System.out.println("Game " + (i+1) + " saved in " + toFileName);
+			System.out.println("Game " + (i+1) + " saved in " + toFileName + ", positions are " + positions);
 		}
 	}
 	
@@ -133,16 +122,16 @@ public class GamesGenerator_Evaluator {
 				*/
 			}
 			
-			if (true) {
+			/*if (true) {
 				
 				throw new UnsupportedOperationException("Without qsearch doesn't work correctly");
-			}
+			}*/
 			
 			EvaluatedMove best = getBestVariation(bitboard.isInCheck(), movesEvals);
 			
 			bitboard.makeMoveForward(best.getMoves()[0]);
 			
-			System.out.println(bitboard);
+			//System.out.println(bitboard);
 			
 			if (!bitboard.getStatus().equals(IGameStatus.NONE)) {
 				
@@ -153,26 +142,53 @@ public class GamesGenerator_Evaluator {
 				break;
 			}
 			
-			int eval = bitboard.getColourToMove() == Constants.COLOUR_BLACK ? best.eval_ofOriginatePlayer() : -best.eval_ofOriginatePlayer();
-			game.addBoard(bitboard.getMoveOps().moveToString(best.getMoves()[0]), bitboard.toEPD(), eval);
-			
-			System.out.println("best.eval_ofOriginatePlayer()=" + best.eval_ofOriginatePlayer());
-			
-			if (Math.abs(best.eval_ofOriginatePlayer()) > MAX_EVAL) {
-				
-				//System.out.println("");
-				if (true) throw new IllegalStateException();
-				
-				if (bitboard.getColourToMove() == Constants.COLOUR_WHITE) {
-					
-					game.setResult(getGameTerminationScore(IGameStatus.MATE_BLACK_WIN));
-					
-				} else {
-					
-					game.setResult(getGameTerminationScore(IGameStatus.MATE_WHITE_WIN));
+			if (best.eval_ofOriginatePlayer() != 0 && best.eval_ofOriginatePlayer() % EvaluatedMove.MATE == 0) {
+
+				if (best.getMoves().length == 1) {
+					//Sometimes the pv is cut
+					//throw new IllegalStateException(best.eval_ofOriginatePlayer() + " " + bitboard.toString());
 				}
 				
-				break;
+			} else {
+				
+				int eval = -evaluator.fullEval(0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, -1);
+				if (bitboard.getColourToMove() == Constants.COLOUR_WHITE) {
+					eval = -eval;
+				}
+				game.addBoard(bitboard.getMoveOps().moveToString(best.getMoves()[0]), bitboard.toEPD(), eval);
+				
+				//System.out.println("best.eval_ofOriginatePlayer()=" + best.eval_ofOriginatePlayer());
+				
+				if (Math.abs(eval) > MAX_EVAL) {
+					
+					//System.out.println("");
+					//if (true) throw new IllegalStateException();
+					
+					System.out.println("STATUS: " + bitboard.getStatus() + " terminated by score");
+					
+					if (bitboard.getColourToMove() == Constants.COLOUR_WHITE) {
+						
+						if (eval > 0) {
+							
+							game.setResult(getGameTerminationScore(IGameStatus.MATE_WHITE_WIN));
+						} else {
+							
+							game.setResult(getGameTerminationScore(IGameStatus.MATE_BLACK_WIN));
+						}
+						
+					} else {
+						
+						if (eval > 0) {
+							
+							game.setResult(getGameTerminationScore(IGameStatus.MATE_BLACK_WIN));
+						} else {
+							
+							game.setResult(getGameTerminationScore(IGameStatus.MATE_WHITE_WIN));
+						}
+					}
+					
+					break;
+				}
 			}
 		}
 		
@@ -238,13 +254,17 @@ public class GamesGenerator_Evaluator {
 			//String moveStr = bitboard.getMoveOps().moveToString(cur_move);
 			//System.out.println("moveStr=" + moveStr);
 			
+			int see_score = bitboard.getSEEScore(cur_move);
+			int see_field = bitboard.getSEEFieldScore(bitboard.getMoveOps().getFromFieldID(cur_move));
+			//if (see_score != 0) System.out.println("see_score=" + see_score);
+			
 			bitboard.makeMoveForward(cur_move);
 			/*if (!bitboard.getStatus().equals(IGameStatus.NONE)) {
 				bitboard.makeMoveBackward(cur_move);
 				continue;
 			}*/
 			
-			int actualPlayerEval = -evaluator.fullEval(0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, -1);
+			int actualPlayerEval = see_field + see_score -evaluator.fullEval(0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, -1);
 			
 			//actualPlayerEval = (2 * actualPlayerEval) / 3;
 			
