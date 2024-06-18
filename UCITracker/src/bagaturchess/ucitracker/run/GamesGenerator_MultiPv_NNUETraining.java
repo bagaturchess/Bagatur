@@ -65,14 +65,10 @@ public class GamesGenerator_MultiPv_NNUETraining {
 	private static int BEST_MOVE_DIFF = 1; //Small randomness
 	
 	
-	private UCIEnginesManager runner;
-	
 	private OpeningBook ob;
 	
 	
 	public GamesGenerator_MultiPv_NNUETraining() throws FileNotFoundException, ClassNotFoundException, IOException {
-		
-		runner = new UCIEnginesManager();
 		
 		ob = OpeningBookFactory.load("./../WorkDir/data/w.ob", "./../WorkDir/data/b.ob");
 	}
@@ -179,9 +175,20 @@ public class GamesGenerator_MultiPv_NNUETraining {
 		
 		int positions = 0;
 		
-		runner.addEngine(engine);
+		UCIEnginesManager runner = null;
 		
 		for (int i=0; i<gamesCount; i++) {
+			
+			if (positions % 100 == 0) {
+				
+				if (runner != null) {
+					
+					runner.destroyEngines();
+				}
+				
+				runner = new UCIEnginesManager();
+				runner.addEngine(engine);
+			}
 			
 			runner.startEngines();
 			runner.uciOK();
@@ -202,7 +209,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			
 			System.out.println(bitboard);
 					
-			EvaluatedGame game = playGame(bitboard);
+			EvaluatedGame game = playGame(bitboard, runner);
 			
 			positions += game.getPositionsCount();
 			
@@ -247,7 +254,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 	}
 
 
-	private EvaluatedGame playGame(IBitBoard bitboard) throws IOException {
+	private EvaluatedGame playGame(IBitBoard bitboard, UCIEnginesManager runner) throws IOException {
 		
 		runner.newGame();
 		
@@ -255,7 +262,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 		
 		while (true) {
 			
-			Set<EvaluatedMove> movesEvals = evalVariations(bitboard);
+			Set<EvaluatedMove> movesEvals = evalVariations(bitboard, runner);
 			
 			if (movesEvals.size() == 0) {
 				
@@ -337,7 +344,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 	}
 	
 	
-	private Set<EvaluatedMove> evalVariations(IBitBoard bitboard) throws IOException {
+	private Set<EvaluatedMove> evalVariations(IBitBoard bitboard, UCIEnginesManager runner) throws IOException {
 		
 		
 		Set<EvaluatedMove> evals = new TreeSet<EvaluatedMove>();
