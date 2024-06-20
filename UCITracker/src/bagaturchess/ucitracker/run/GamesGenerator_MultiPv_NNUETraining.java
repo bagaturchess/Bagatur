@@ -161,7 +161,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			//control.execute(engine, "./pedone-3.1.cg", 1000000, true);
 			//control.execute(engine, "./wasp-5-0-0.cg", 1000000, true);
 			//control.execute(engine, "./bagatur-2.3.cg", 1000000, true);
-			control.execute(engine, "./stockfish-16.1-NNUE.txt", 1000000, true);
+			control.execute(engine, "C:/DATA/NNUE/stockfish-16.1-NNUE.txt", 1000000, true);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -171,7 +171,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 	
 	private void execute(EngineProcess engine, String toFileName, int gamesCount, boolean appendToFile) throws IOException {
 		
-		BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true), 512 * 1024);
+		BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true), 256 * 1024);
 		
 		int positions = 0;
 		
