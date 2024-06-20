@@ -215,7 +215,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			
 			GameModelWriter.writeEvaluatedGame(game, bw);
 			
-			bw.flush();
+			//bw.flush();
 			
 			System.out.println("Game " + (i+1) + " saved in " + toFileName + ", positions are " + positions);
 			
