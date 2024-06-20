@@ -82,7 +82,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 			actualWhitePlayerEval = -actualWhitePlayerEval;
 		}
 		
-		return (int) actualWhitePlayerEval;
+		return actualWhitePlayerEval;
 	}
 	
 	
