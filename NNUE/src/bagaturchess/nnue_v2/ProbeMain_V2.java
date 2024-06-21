@@ -17,7 +17,7 @@ public class ProbeMain_V2 {
 		
 		try {
 			
-			network = new NNUE("./network_bagatur_v1.nnue");
+			network = new NNUE("./simple-583.bin");
 			
 			accumulators = new Accumulators(network);
 			
@@ -39,8 +39,6 @@ public class ProbeMain_V2 {
 		String fen6 = "4kr2/8/8/8/8/8/8/2RK4 w - - 0 1";
 		String fen7 = "4k3/8/8/8/8/8/8/2RK4 w - - 0 1";
 		String fen8 = "4kr2/8/8/8/8/8/8/3K4 w - - 0 1";
-        //System.out.println("pieces_count: " + pieces_count);
-        //System.out.println("side: " + bitboard.getColourToMove());
         
 		try {
 			
@@ -64,7 +62,9 @@ public class ProbeMain_V2 {
 	        System.out.println("input.white_squares: " + Arrays.toString(input.white_squares));
 	        System.out.println("input.black_pieces: " + Arrays.toString(input.black_pieces));
 	        System.out.println("input.black_squares: " + Arrays.toString(input.black_squares));
-	        
+	        //System.out.println("pieces_count: " + pieces_count);
+        	//System.out.println("side: " + bitboard.getColourToMove());
+         
 	        long startTime = System.currentTimeMillis();
 	    	int count = 0;
 	    	while (true) {
