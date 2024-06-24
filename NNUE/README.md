@@ -110,7 +110,9 @@ and
 These can be found under the <a href="https://github.com/bagaturchess/Bagatur/tree/master/LearningImpl">LearningImpl</a> sub-project.
 Using the Java porting in production, Bagatur operates at about 2-3 times slower NPS speed but gains approximately 100 Elo in strength compared to the classic version. With the JNI version in production, Bagatur runs about 12 times slower in NPS speed and is 80 Elo weaker in strength compared to the classic version.
 
-# Newer Stockfish NNUE probing code, based in JNI, could be found here: https://github.com/VedantJoshi1409/stockfish_nnue_probe
+# Newer Stockfish NNUE probing code
+
+Based on JNI, could be found here: https://github.com/VedantJoshi1409/stockfish_nnue_probe
 
 # How to run it out of the box
 
