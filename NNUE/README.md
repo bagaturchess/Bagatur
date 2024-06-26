@@ -1,11 +1,12 @@
 # Purpose
 
 This sub-project serves as a Java NNUE framework. This enables Bagatur or any other Java chess engine to integrate the NNUE evaluation function.
-Currently it has two flavours:
-1. Java NNUE based on <a href="https://github.com/jw1912/bullet">Bullet</a>. This is the strongest one.
-2. Older Stockfish NNUE designed to function both as a Java port and as a JNI bridge for the C code available at https://github.com/dshawul/nnue-probe.
+Currently it has a few flavors:
+1. Java NNUE based on <a href="https://github.com/jw1912/bullet">Bullet's</a> simple network example. It is 240 Elo stronger that the classic evaluation function.
+2. Older Stockfish NNUE designed to function both as a Java port and as a JNI bridge for the C code available at https://github.com/dshawul/nnue-probe. The pure Java version is 100 Elo stronger that the classic evaluation function and JNI based version is 80 Elo weaker that the classic evaluation function. 
+3. Newer Stockfish NNUE probing code based on JNI: <a href="https://github.com/VedantJoshi1409/stockfish_nnue_probe">stockfish_nnue_probe</a>. It is 380 Elo stronger that the classic evaluation function.
 
-# Java NNUE based on <a href="https://github.com/jw1912/bullet">Bullet</a>
+# Java NNUE based on <a href="https://github.com/jw1912/bullet">Bullet's</a> simple network example.
 
 ## Architecture
 It uses the <a href="https://github.com/jw1912/bullet/blob/main/examples/simple.rs">simple</a> network from Bullet release 1.0.0 with the following modifications:
