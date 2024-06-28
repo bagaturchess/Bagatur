@@ -1,0 +1,3 @@
+https://github.com/cj5716/Alexandria/blob/morelayers-v2/src/nnue.h#L45
+https://github.com/dede1751/carp/blob/main/chess/src/nnue/nnue_notes.txt
+
