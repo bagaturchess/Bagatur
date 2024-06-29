@@ -1,19 +1,18 @@
 package bagaturchess.nnue_v3;
 
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.nnue_v2.NNUEProbeUtils;
+
 
 public class NNUE {
 	
@@ -21,7 +20,7 @@ public class NNUE {
     private static final int NUM_INPUTS = 768;
     private static final int L1_SIZE = 1024; //128; //2560; //1024;
     private static final int L2_SIZE = 5;//8;
-    private static final int L3_SIZE = 16;
+    private static final int L3_SIZE = 32;
     private static final int OUTPUT_BUCKETS = 1;
     
     private static final short FT_QUANT = 255;
