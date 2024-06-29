@@ -19,16 +19,16 @@ public class NNUE {
 	
     // Net arch: (768 -> L1_SIZE) x 2 -> (L2_SIZE -> L3_SIZE -> 1) x OUTPUT_BUCKETS
     private static final int NUM_INPUTS = 768;
-    private static final int L1_SIZE = 1536;
-    private static final int L2_SIZE = 16;
-    private static final int L3_SIZE = 32;
+    private static final int L1_SIZE = 1024; //128; //2560; //1024;
+    private static final int L2_SIZE = 5;//8;
+    private static final int L3_SIZE = 16;
     private static final int OUTPUT_BUCKETS = 1;
-
+    
     private static final short FT_QUANT = 255;
-    private static final short FT_SHIFT = 0;
-    private static final short L1_QUANT = 64;
+    private static final short FT_SHIFT = 1;
+    private static final short L1_QUANT = 256;
     private static final int NET_SCALE = 400;
-
+    
 	public static final int WHITE = 0;
 	public static final int BLACK = 1;
 	
@@ -36,6 +36,22 @@ public class NNUE {
 	private static final int PIECE_STRIDE = 64;
 	
 	private static final float CLIPPED_MAX = 1.0f;
+	
+	private final static int screlu[] = new int[Short.MAX_VALUE - Short.MIN_VALUE + 1];
+	
+	static
+	{
+		for(int i = Short.MIN_VALUE; i <= Short.MAX_VALUE;i ++)
+		{
+			screlu[i - (int) Short.MIN_VALUE] = screlu((short)(i));
+		}
+	}
+	
+	private static int screlu(short i)
+	{
+		int v = Math.max(0, Math.min(i, FT_QUANT));
+		return v * v;
+	}
 	
     public static class Network {
         public short[] FTWeights = new short[NUM_INPUTS * L1_SIZE];
@@ -67,8 +83,6 @@ public class NNUE {
     
     public void init(String filename) throws IOException {
         
-    	UnquantisedNetwork unquantisedNet = new UnquantisedNetwork();
-
         File file = new File(filename);
         	
 		byte[] evalData = Files.readAllBytes(Paths.get(file.toURI()));
@@ -79,35 +93,40 @@ public class NNUE {
         
         FloatBuffer fbuffer = buffer.asFloatBuffer();
         
+        
+        UnquantisedNetwork unquantisedNet = new UnquantisedNetwork();
+        
         fbuffer.get(unquantisedNet.FTWeights);
-
+        
         fbuffer.get(unquantisedNet.FTBiases);
         
-        for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
-            
-        	for (int i = 0; i < 2 * L1_SIZE; i++) {
+        for (int i = 0; i < 2 * L1_SIZE; i++) {
+        	for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
             	fbuffer.get(unquantisedNet.L1Weights[i][bucket]);
-
             }
-        	
+        }
+        
+        for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
             fbuffer.get(unquantisedNet.L1Biases[bucket]);
         }
-        
-        for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
         	
-            for (int i = 0; i < L2_SIZE; i++) {
-            	fbuffer.get(unquantisedNet.L2Weights[i][bucket]);
-            }
+        for (int i = 0; i < L2_SIZE; i++) {
+        	for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
+        		fbuffer.get(unquantisedNet.L2Weights[i][bucket]);
+        	}
+        }
 
+        for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
             fbuffer.get(unquantisedNet.L2Biases[bucket]);
+        }
+        	
+        for (int i = 0; i < L3_SIZE; i++) {
+        	for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
+        		unquantisedNet.L3Weights[i][bucket] = fbuffer.get();
+        	}
         }
         
         for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
-        	
-            for (int i = 0; i < L3_SIZE; i++) {
-            	unquantisedNet.L3Weights[i][bucket] = fbuffer.get();
-            }
-            
             unquantisedNet.L3Biases[bucket] = fbuffer.get();
         }
         
@@ -122,11 +141,19 @@ public class NNUE {
 
         // Transpose and quantize L1, L2, and L3 weights and biases
         for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
-            for (int i = 0; i < 2 * L1_SIZE; i++) {
+        	
+        	for (int i = 0; i < 2; ++i)
+                for (int j = 0; j < L2_SIZE; ++j)
+                    for (int k = 0; k < L1_SIZE; ++k)
+                        net.L1Weights[bucket][  i * L1_SIZE * L2_SIZE
+                                              + j * L1_SIZE
+                                              + k] = (short) Math.round(unquantisedNet.L1Weights[i * L1_SIZE + k][bucket][j] * L1_QUANT);
+        	
+            /*for (int i = 0; i < 2 * L1_SIZE; i++) {
                 for (int j = 0; j < L2_SIZE; j++) {
                     net.L1Weights[bucket][i * L2_SIZE + j] = (short) Math.round(unquantisedNet.L1Weights[i][bucket][j] * L1_QUANT);
                 }
-            }
+            }*/
 
             System.arraycopy(unquantisedNet.L1Biases[bucket], 0, net.L1Biases[bucket], 0, L2_SIZE);
 
@@ -186,19 +213,21 @@ public class NNUE {
         int[] sums = new int[L2_SIZE];
         int weightOffset = 0;
         short[][] accs = { us, them };
-
+        
         for (short[] acc : accs) {
             for (int i = 0; i < L1_SIZE; i++) {
                 short clipped = (short) Math.max(0, Math.min(acc[i], FT_QUANT));
-                short squared = (short) ((clipped * clipped) >> FT_SHIFT);
-
+                //short squared = (short) ((clipped * clipped) >> FT_SHIFT);
+                int squared = screlu[clipped - (int) Short.MIN_VALUE] >> FT_SHIFT;
+            	//int squared = screlu[clipped - (int) Short.MIN_VALUE];
+				
                 for (int out = 0; out < L2_SIZE; out++) {
                     sums[out] += squared * weights[weightOffset + out * L1_SIZE + i];
                 }
             }
             weightOffset += L1_SIZE * L2_SIZE;
         }
-
+        
         for (int i = 0; i < L2_SIZE; i++) {
             float sumDiv = (float) (FT_QUANT * FT_QUANT * L1_QUANT >> FT_SHIFT);
             float clipped = Math.max(0.0f, Math.min((sums[i] / sumDiv) + biases[i], CLIPPED_MAX));
@@ -234,13 +263,13 @@ public class NNUE {
         output[0] = sum;
     }
 
-    public int output(Accumulator boardAccumulator, boolean sideToMove, int outputBucket) {
+    public int output(Accumulator boardAccumulator, int sideToMove, int outputBucket) {
         float[] L1Outputs = new float[L2_SIZE];
         float[] L2Outputs = new float[L3_SIZE];
         float[] L3Output = new float[1];
 
-        short[] us = boardAccumulator.values[sideToMove ? 1 : 0];
-        short[] them = boardAccumulator.values[sideToMove ? 0 : 1];
+        short[] us = boardAccumulator.values[sideToMove];
+        short[] them = boardAccumulator.values[1 - sideToMove];
         activateFTAndPropagateL1(us, them, net.L1Weights[outputBucket], net.L1Biases[outputBucket], L1Outputs);
 
         propagateL2(L1Outputs, net.L2Weights[outputBucket], net.L2Biases[outputBucket], L2Outputs);
@@ -318,7 +347,7 @@ public class NNUE {
 		
 		nnue.accumulate(accumulators, input.white_pieces, input.white_squares, input.black_pieces, input.black_squares);
 		
-		int eval = nnue.output(accumulators, bitboard.getColourToMove() == NNUE.WHITE, (pieces_count - 2) / 32);
+		int eval = nnue.output(accumulators, bitboard.getColourToMove(), (pieces_count - 2) / 32);
 		
 		System.out.println("fen=" + fen + ", eval=" + eval);
 	}

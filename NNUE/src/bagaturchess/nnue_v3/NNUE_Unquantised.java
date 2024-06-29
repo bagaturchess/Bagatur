@@ -19,10 +19,10 @@ public class NNUE_Unquantised {
 	
     // Net arch: (768 -> L1_SIZE) x 2 -> (L2_SIZE -> L3_SIZE -> 1) x OUTPUT_BUCKETS
     private static final int NUM_INPUTS = 768;
-    private static final int L1_SIZE = 1536;
-    private static final int L2_SIZE = 16;
+    private static final int L1_SIZE = 1024;
+    private static final int L2_SIZE = 8;
     private static final int L3_SIZE = 32;
-    private static final int OUTPUT_BUCKETS = 1;
+    private static final int OUTPUT_BUCKETS = 8;
     
     private static final int NET_SCALE = 400;
 
@@ -81,31 +81,33 @@ public class NNUE_Unquantised {
         
         fbuffer.get(unquantisedNet.FTBiases);
         
-        for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
-            
-        	for (int i = 0; i < 2 * L1_SIZE; i++) {
+        for (int i = 0; i < 2 * L1_SIZE; i++) {
+        	for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
             	fbuffer.get(unquantisedNet.L1Weights[i][bucket]);
-
             }
-        	
+        }
+        
+        for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
             fbuffer.get(unquantisedNet.L1Biases[bucket]);
         }
-        
-        for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
         	
-            for (int i = 0; i < L2_SIZE; i++) {
-            	fbuffer.get(unquantisedNet.L2Weights[i][bucket]);
-            }
+        for (int i = 0; i < L2_SIZE; i++) {
+        	for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
+        		fbuffer.get(unquantisedNet.L2Weights[i][bucket]);
+        	}
+        }
 
+        for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
             fbuffer.get(unquantisedNet.L2Biases[bucket]);
+        }
+        	
+        for (int i = 0; i < L3_SIZE; i++) {
+        	for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
+        		unquantisedNet.L3Weights[i][bucket] = fbuffer.get();
+        	}
         }
         
         for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
-        	
-            for (int i = 0; i < L3_SIZE; i++) {
-            	unquantisedNet.L3Weights[i][bucket] = fbuffer.get();
-            }
-            
             unquantisedNet.L3Biases[bucket] = fbuffer.get();
         }
         
@@ -121,11 +123,18 @@ public class NNUE_Unquantised {
         // Transpose and quantize L1, L2, and L3 weights and biases
         for (int bucket = 0; bucket < OUTPUT_BUCKETS; bucket++) {
         	
-            for (int i = 0; i < 2 * L1_SIZE; i++) {
+        	for (int i = 0; i < 2; ++i)
+                for (int j = 0; j < L2_SIZE; ++j)
+                    for (int k = 0; k < L1_SIZE; ++k)
+                        net.L1Weights[bucket][  i * L1_SIZE * L2_SIZE
+                                              + j * L1_SIZE
+                                              + k] = unquantisedNet.L1Weights[i * L1_SIZE + k][bucket][j];
+                                              
+            /*for (int i = 0; i < 2 * L1_SIZE; i++) {
                 for (int j = 0; j < L2_SIZE; j++) {
                     net.L1Weights[bucket][i * L2_SIZE + j] = unquantisedNet.L1Weights[i][bucket][j];
                 }
-            }
+            }*/
 
             System.arraycopy(unquantisedNet.L1Biases[bucket], 0, net.L1Biases[bucket], 0, L2_SIZE);
 
@@ -191,7 +200,7 @@ public class NNUE_Unquantised {
     	
         int weightOffset = 0;
         float[][] accs = { us, them };
-
+        
         for (float[] acc : accs) {
             for (int i = 0; i < L1_SIZE; i++) {
                 float clipped = Math.max(0, Math.min(acc[i], CLIPPED_MAX));
@@ -203,7 +212,7 @@ public class NNUE_Unquantised {
             }
             weightOffset += L1_SIZE * L2_SIZE;
         }
-
+        
         for (int i = 0; i < L2_SIZE; i++) {
             float sumDiv = (float) 1;
             float clipped = Math.max(0.0f, Math.min((sums[i] / sumDiv) + biases[i], CLIPPED_MAX));
