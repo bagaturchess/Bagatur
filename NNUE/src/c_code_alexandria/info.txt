@@ -1,0 +1,5 @@
+g++ -std=c++2a -shared -o nnue.dll nnue.cpp -march=native -O3 -mno-avx512f -mno-avx512bw -DUSE_SIMD -DUSE_AVX2
+g++ -std=c++2a -shared -I. -o nnue.dll nnue.cpp bagaturchess_nnue_v4_NNUE.cpp -march=native -O3 -mno-avx512f -mno-avx512bw -DUSE_SIMD -DUSE_AVX2
+g++ -std=c++2a -shared -I. -o nnue.dll nnue.cpp bagaturchess_nnue_v4_NNUE.cpp -march=native -O3 -mno-avx512f -mno-avx512bw -DUSE_SIMD -DUSE_AVX2 -DNDEBUG -mavx2 -mbmi -mfma -funroll-loops -O3 -flto -fno-exceptions -DNDEBUG -Wall -Wcast-qual -Wextra -Wshadow -Wdouble-promotion -Wformat=2 -Wnull-dereference -Wlogical-op -Wold-style-cast -Wundef -DUSE_VNNI512 -mfma -MMD -MP
+
+
