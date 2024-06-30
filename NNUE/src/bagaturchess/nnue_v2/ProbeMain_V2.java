@@ -102,9 +102,9 @@ public class ProbeMain_V2 {
 		accumulators.fullAccumulatorUpdate(input.white_king_sq, input.black_king_sq, input.white_pieces, input.white_squares, input.black_pieces, input.black_squares);
 		
 		int eval = bitboard.getColourToMove() == NNUE.WHITE ?
-		        NNUE.evaluate(network, accumulators.getWhiteAccumulator(), accumulators.getBlackAccumulator(), pieces_count)
+		        NNUE.evaluate(network, accumulators.getWhiteAccumulator(), accumulators.getBlackAccumulator(), pieces_count, new int[8])
 		        :
-		        NNUE.evaluate(network, accumulators.getBlackAccumulator(), accumulators.getWhiteAccumulator(), pieces_count);
+		        NNUE.evaluate(network, accumulators.getBlackAccumulator(), accumulators.getWhiteAccumulator(), pieces_count, new int[8]);
 		
 		System.out.println("fen=" + fen + ", eval=" + eval);
 	}

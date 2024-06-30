@@ -4,6 +4,7 @@ package bagaturchess.deeplearning.impl_nnue_v3;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.nnue_v2.Accumulators;
@@ -24,6 +25,8 @@ public class NNUEEvaluator extends BaseEvaluator {
 	private static NNUE nnue;
 	
 	private Accumulators accumulators;
+	
+	private int[] vectorevalbuff = new int[8];
 	
 	static {
 		
@@ -69,13 +72,15 @@ public class NNUEEvaluator extends BaseEvaluator {
 		NNUEProbeUtils.fillInput(bitboard, input);
 		
 		accumulators.fullAccumulatorUpdate(input.white_king_sq, input.black_king_sq, input.white_pieces, input.white_squares, input.black_pieces, input.black_squares);
-				
+		
 		int pieces_count = bitboard.getMaterialState().getPiecesCount();
 		
+		Arrays.fill(vectorevalbuff, 0);
+		
 		int actualWhitePlayerEval = bitboard.getColourToMove() == NNUE.WHITE ?
-		        NNUE.evaluate(nnue, accumulators.getWhiteAccumulator(), accumulators.getBlackAccumulator(), pieces_count)
+		        NNUE.evaluate(nnue, accumulators.getWhiteAccumulator(), accumulators.getBlackAccumulator(), pieces_count, vectorevalbuff)
 		        :
-		        NNUE.evaluate(nnue, accumulators.getBlackAccumulator(), accumulators.getWhiteAccumulator(), pieces_count);
+		        NNUE.evaluate(nnue, accumulators.getBlackAccumulator(), accumulators.getWhiteAccumulator(), pieces_count, vectorevalbuff);
 		
 		if (bitboard.getColourToMove() == BLACK) {
 			

@@ -110,16 +110,25 @@ public class NNUE
 		return (short) (((input & 0xFF) << 8) | ((input & 0xFF00) >> 8));
 	}
 
-	public static int evaluate(NNUE network, NNUEAccumulator us, NNUEAccumulator them, int pieces_count)
+	static int[] buff = new int[8];
+	
+	public static int evaluate(NNUE network, NNUEAccumulator us, NNUEAccumulator them, int pieces_count, int[] vectorevalbuffer)
 	{
-		int eval = 0;
 
+		short[] L2Weights = network.L2Weights[chooseOutputBucket(pieces_count)];
+		short[] UsValues = us.values;
+		short[] ThemValues = them.values;
+		
+		int eval = 0;
+		
 		for (int i = 0; i < HIDDEN_SIZE; i++)
 		{
-			eval += screlu[us.values[i] - (int) Short.MIN_VALUE] * (int) network.L2Weights[chooseOutputBucket(pieces_count)][i]
-					+ screlu[them.values[i] - (int) Short.MIN_VALUE] * (int) network.L2Weights[chooseOutputBucket(pieces_count)][i + HIDDEN_SIZE];
+			eval += screlu[UsValues[i] - (int) Short.MIN_VALUE] * (int) L2Weights[i]
+					+ screlu[ThemValues[i] - (int) Short.MIN_VALUE] * (int) L2Weights[i + HIDDEN_SIZE];
 		}
 
+		//int eval = JNIUtils.evaluateVectorized(L2Weights, UsValues, ThemValues, new int[8]);
+		
 		eval /= QA;
 		eval += network.outputBiases[chooseOutputBucket(pieces_count)];
 
@@ -128,7 +137,24 @@ public class NNUE
 
 		return eval;
 	}
-
+	
+	/*private static int evaluateVectorized(short[] L2Weights, short[] UsValues, short[] ThemValues) {
+		
+		int eval = 0;
+		
+		for (int i = 0; i < HIDDEN_SIZE; i++)
+		{
+			int us_value = Math.max(0, Math.min(UsValues[i], QA));
+			int them_value = Math.max(0, Math.min(ThemValues[i], QA));
+			
+			eval += us_value * us_value * L2Weights[i]
+					+ them_value * them_value * L2Weights[i + HIDDEN_SIZE];
+		}
+		
+		return eval;
+	}*/
+	
+	
 	public static int chooseOutputBucket(int pieces_count)
 	{
 		return (pieces_count - 2) / DIVISOR;
