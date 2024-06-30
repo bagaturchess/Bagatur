@@ -64,7 +64,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		nnue.accumulate(accumulators, input.white_pieces, input.white_squares, input.black_pieces, input.black_squares);
 		
-		int actualWhitePlayerEval = nnue.output(accumulators, bitboard.getColourToMove(), 0);
+		int actualWhitePlayerEval = nnue.output(accumulators, bitboard.getColourToMove(), (bitboard.getMaterialState().getPiecesCount() - 2) / 4);
 
 		if (bitboard.getColourToMove() == BLACK) {
 			
