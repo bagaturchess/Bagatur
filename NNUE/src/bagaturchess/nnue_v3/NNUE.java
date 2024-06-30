@@ -18,10 +18,10 @@ public class NNUE {
 	
     // Net arch: (768 -> L1_SIZE) x 2 -> (L2_SIZE -> L3_SIZE -> 1) x OUTPUT_BUCKETS
     private static final int NUM_INPUTS = 768;
-    private static final int L1_SIZE = 1024; //128; //2560; //1024;
-    private static final int L2_SIZE = 5;//8;
+    private static final int L1_SIZE = 1536;
+    private static final int L2_SIZE = 8;
     private static final int L3_SIZE = 32;
-    private static final int OUTPUT_BUCKETS = 1;
+    private static final int OUTPUT_BUCKETS = 8;
     
     private static final short FT_QUANT = 255;
     private static final short FT_SHIFT = 1;
