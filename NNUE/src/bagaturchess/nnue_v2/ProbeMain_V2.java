@@ -9,24 +9,6 @@ import bagaturchess.bitboard.api.IBitBoard;
 
 public class ProbeMain_V2 {    
 	
-	private static final NNUEProbeUtils.Input input = new NNUEProbeUtils.Input();
-	private static NNUE network;
-	private static Accumulators accumulators;
-	
-	static {
-		
-		try {
-			
-			network = new NNUE("./network_bagatur_v1.nnue");
-			
-			accumulators = new Accumulators(network);
-			
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-		}
-	}
-	
 	
 	public static void main(String[] args) {
 		
@@ -95,16 +77,9 @@ public class ProbeMain_V2 {
 		
 		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen);
 		
-		int pieces_count = bitboard.getMaterialState().getPiecesCount();
+		NNUE network = new NNUE("./network_bagatur_v1.nnue", bitboard);
 		
-		NNUEProbeUtils.fillInput(bitboard, input);
-		
-		accumulators.fullAccumulatorUpdate(input.white_king_sq, input.black_king_sq, input.white_pieces, input.white_squares, input.black_pieces, input.black_squares);
-		
-		int eval = bitboard.getColourToMove() == NNUE.WHITE ?
-		        NNUE.evaluate(network, accumulators.getWhiteAccumulator(), accumulators.getBlackAccumulator(), pieces_count, new int[8])
-		        :
-		        NNUE.evaluate(network, accumulators.getBlackAccumulator(), accumulators.getWhiteAccumulator(), pieces_count, new int[8]);
+		int eval = network.evaluate();
 		
 		System.out.println("fen=" + fen + ", eval=" + eval);
 	}

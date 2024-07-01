@@ -20,5 +20,4 @@ public class NNUEEvaluatorFactory implements IEvaluatorFactory {
 	public IEvaluator create(IBitBoard bitboard, IEvalCache evalCache, IEvalConfig evalConfig) {
 		return new NNUEEvaluator(bitboard, evalCache, evalConfig);
 	}
-	
 }

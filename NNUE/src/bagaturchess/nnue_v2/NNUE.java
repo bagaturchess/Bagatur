@@ -6,9 +6,16 @@ import java.io.IOException;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 
+import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.common.MoveListener;
+import bagaturchess.bitboard.impl.Constants;
+
 
 public class NNUE
 {
+	
+	public static final boolean DO_INCREMENTAL_UPDATES = false;
+	
 	public static final int WHITE = 0;
 	public static final int BLACK = 1;
 	
@@ -45,6 +52,14 @@ public class NNUE
 	
 	private final static int screlu[] = new int[Short.MAX_VALUE - Short.MIN_VALUE + 1];
 	
+	
+	private IncrementalUpdates incremental_updates;
+	private DirtyPieces dirtyPieces = new DirtyPieces();
+	private Accumulators accumulators;
+	private NNUEProbeUtils.Input input;
+	private IBitBoard bitboard;
+	
+	
 	static
 	{
 		for(int i = Short.MIN_VALUE; i <= Short.MAX_VALUE;i ++)
@@ -59,7 +74,7 @@ public class NNUE
 		return v * v;
 	}
 	
-	public NNUE(String filePath) throws IOException
+	public NNUE(String filePath, IBitBoard _bitboard) throws IOException
 	{
 		DataInputStream networkData = new DataInputStream(new BufferedInputStream(new FileInputStream(filePath), 16 * 4096));
 		
@@ -103,18 +118,97 @@ public class NNUE
 		}*/
 		
 		networkData.close();
+		
+		bitboard = _bitboard;
+		
+		accumulators = new Accumulators(this);
+		
+		input = new NNUEProbeUtils.Input();
+		
+		if (DO_INCREMENTAL_UPDATES) {
+			
+			incremental_updates = new IncrementalUpdates(bitboard);
+			bitboard.addMoveListener(incremental_updates);
+		}
 	}
 
+	
 	private static short toLittleEndian(short input)
 	{
 		return (short) (((input & 0xFF) << 8) | ((input & 0xFF00) >> 8));
 	}
-
+	
+	
+	public int evaluate() {
+		
+		if (DO_INCREMENTAL_UPDATES && !incremental_updates.must_refresh) {
+			
+			refresh_accumulators();
+			
+		} else {
+			
+			NNUEProbeUtils.fillInput(bitboard, input);
+			
+			accumulators.fullAccumulatorUpdate(input.white_king_sq, input.black_king_sq, input.white_pieces, input.white_squares, input.black_pieces, input.black_squares);
+		}
+		
+		int pieces_count = bitboard.getMaterialState().getPiecesCount();
+		
+		int eval = bitboard.getColourToMove() == NNUE.WHITE ?
+		        evaluate(this, accumulators.getWhiteAccumulator(), accumulators.getBlackAccumulator(), pieces_count)
+		        :
+		        evaluate(this, accumulators.getBlackAccumulator(), accumulators.getWhiteAccumulator(), pieces_count);
+		        
+		return eval;
+	}
+	
+	
+    private void refresh_accumulators() {
+		
+		for (int i = 0; i < dirtyPieces.dirtyNum; i++) {
+			
+			if (dirtyPieces.from[i] == dirtyPieces.to[i]) {
+				
+				continue;
+			}
+			
+			/*boolean capture = (dirtyPieces.from[i] >= 64 && dirtyPieces.from[i] < 128)
+					|| (dirtyPieces.to[i] >= 64 && dirtyPieces.to[i] < 128);
+			
+			boolean promotion = (dirtyPieces.from[i] >= 128)
+					|| (dirtyPieces.to[i] >= 128);
+			
+			int color_pc = dirtyPieces.c[i];
+			*/
+			
+			int piece = dirtyPieces.pc[i];
+			
+			int index_to_remove = dirtyPieces.from[i];
+			
+			if (dirtyPieces.from[i] < 64) {//>=64 marks no entry e.g. during capture or promotion
+				
+				accumulators.getWhiteAccumulator().sub(getIndex(index_to_remove, NNUE.WHITE, piece, NNUE.WHITE));
+				accumulators.getBlackAccumulator().sub(getIndex(index_to_remove, NNUE.WHITE, piece, NNUE.BLACK));
+			}
+			
+			int index_to_add = dirtyPieces.to[i];
+			
+			if (dirtyPieces.to[i] < 64) {
+				
+				accumulators.getWhiteAccumulator().add(getIndex(index_to_add, NNUE.WHITE, piece, NNUE.WHITE));
+				accumulators.getBlackAccumulator().add(getIndex(index_to_add, NNUE.WHITE, piece, NNUE.BLACK));
+			}
+		}
+		
+    	incremental_updates.reset();
+    }
+    
+    
 	static int[] buff = new int[16];
 	
-	public static int evaluate(NNUE network, NNUEAccumulator us, NNUEAccumulator them, int pieces_count, int[] vectorevalbuffer)
+	public static int evaluate(NNUE network, NNUEAccumulator us, NNUEAccumulator them, int pieces_count)
 	{
-
+		
 		short[] L2Weights = network.L2Weights[chooseOutputBucket(pieces_count)];
 		short[] UsValues = us.values;
 		short[] ThemValues = them.values;
@@ -206,5 +300,252 @@ public class NNUE
 				values[i] += network.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE][i];
 			}
 		}
+		
+		public void sub(int featureIndex)
+		{
+			for (int i = 0; i < HIDDEN_SIZE; i++)
+			{
+				values[i] -= network.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE][i];
+			}
+		}
+
+		public void addsub(int featureIndexToAdd, int featureIndexToSubtract)
+		{
+			for (int i = 0; i < HIDDEN_SIZE; i++)
+			{
+				values[i] += network.L1Weights[featureIndexToAdd + bucketIndex * FEATURE_SIZE][i]
+						- network.L1Weights[featureIndexToSubtract + bucketIndex * FEATURE_SIZE][i];
+			}
+		}
 	}
+	
+	
+    private class IncrementalUpdates implements MoveListener {
+    	
+    	
+    	private IBitBoard bitboard;
+    	private boolean must_refresh; 
+    	private int capture_marker; //Necessary because we cannot identify correctly the captured piece in addDurtyPiece
+    	private int promotion_marker; //Necessary because we cannot identify correctly the captured piece in addDurtyPiece
+    	
+    	IncrementalUpdates(IBitBoard _bitboard) {
+    		
+    		bitboard = _bitboard;
+    		must_refresh = true;
+    		capture_marker = 64;
+    		promotion_marker = 128;
+    	}
+    	
+    	int all;
+    	int refreshes;
+    	
+    	void reset() {
+    		all++;
+    		if (must_refresh) refreshes++;
+    		if (all % 100000 == 0) {
+    			//System.out.println("refreshes=" + (refreshes / (double) all));
+    		}
+    		
+    		
+    		must_refresh = false;
+    		dirtyPieces.dirtyNum = 0;
+    		capture_marker = 64;//reset it to not have type overflow
+    		promotion_marker = 128;//reset it to not have type overflow
+    	}
+    	
+    	
+    	//@Override
+    	public final void preForwardMove(int color, int move) {
+
+    		//Do nothing
+    	}
+    	
+    	
+    	//@Override
+    	public final void postForwardMove(int color, int move) {
+    		
+    		if (2 * dirtyPieces.dirtyNum >= bitboard.getMaterialState().getPiecesCount() - 2) {
+    			//Refresh will be faster
+    			must_refresh = true;
+    		}
+    		
+    		if (must_refresh) {
+    			
+    			return;
+    		}
+    		
+       		int pieceType = bitboard.getMoveOps().getFigureType(move);
+    		int fromFieldID = bitboard.getMoveOps().getFromFieldID(move);
+    		int toFieldID = bitboard.getMoveOps().getToFieldID(move);   		
+    		
+    		if (pieceType == Constants.TYPE_KING
+    				|| bitboard.getMoveOps().isCastling(move)
+    				|| bitboard.getMoveOps().isEnpassant(move)
+    				//|| bitboard.getMoveOps().isCapture(move)
+    				//|| bitboard.getMoveOps().isPromotion(move)
+    				) {
+    			
+    			must_refresh = true;
+    			
+    		} else {
+    			
+    			color = NNUEProbeUtils.convertColor(color);
+    			int piece = NNUEProbeUtils.convertPiece(pieceType, color);
+    			int square_from = NNUEProbeUtils.convertSquare(fromFieldID);
+    			int square_to = NNUEProbeUtils.convertSquare(toFieldID);
+    			
+    			addDurtyPiece(color, piece, square_from, square_to);
+    			
+    			if (bitboard.getMoveOps().isCapture(move)) {
+    				
+    				int color_op = 1 - color;
+        	        
+                	int piece_captured = bitboard.getMoveOps().getCapturedFigureType(move);
+                	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color_op);
+                	
+                	addDurtyPiece(color_op, piece_captured, square_to, capture_marker++);
+    			}
+    			
+    			if (bitboard.getMoveOps().isPromotion(move)) {
+        	        
+                	int piece_promoted = bitboard.getMoveOps().getPromotionFigureType(move);
+                	piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
+                	
+                	addDurtyPiece(color, piece_promoted, promotion_marker++, square_to);
+                	addDurtyPiece(color, piece, square_to, promotion_marker++);
+    			}
+    		}
+    	}
+
+		//@Override
+    	public final void preBackwardMove(int color, int move) {
+    		//Do nothing
+    	}
+    	
+    	//@Override
+    	public final void postBackwardMove(int color, int move) {
+    		
+    		if (2 * dirtyPieces.dirtyNum >= bitboard.getMaterialState().getPiecesCount() - 2) {
+    			//Refresh will be faster
+    			must_refresh = true;
+    		}
+    		
+    		if (must_refresh) {
+    			
+    			return;
+    		}
+    		
+       		int pieceType = bitboard.getMoveOps().getFigureType(move);
+    		int fromFieldID = bitboard.getMoveOps().getFromFieldID(move);
+    		int toFieldID = bitboard.getMoveOps().getToFieldID(move);   		
+    		
+    		if (pieceType == Constants.TYPE_KING
+    				|| bitboard.getMoveOps().isCastling(move)
+    				|| bitboard.getMoveOps().isEnpassant(move)
+    				//|| bitboard.getMoveOps().isCapture(move)
+    				//|| bitboard.getMoveOps().isPromotion(move)
+    				) {
+    			
+    			must_refresh = true;
+    			
+    		} else {
+    			
+    			color = NNUEProbeUtils.convertColor(color);
+    			int piece = NNUEProbeUtils.convertPiece(pieceType, color);
+    			int square_from = NNUEProbeUtils.convertSquare(fromFieldID);
+    			int square_to = NNUEProbeUtils.convertSquare(toFieldID);
+    			
+    			addDurtyPiece(color, piece, square_to, square_from);
+    			
+    			if (bitboard.getMoveOps().isCapture(move)) {
+    				
+    				int op_color = 1 - color;
+        	        
+                	int piece_captured = bitboard.getMoveOps().getCapturedFigureType(move);
+                	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, op_color);
+                	
+                	addDurtyPiece(op_color, piece_captured, capture_marker++, square_to);
+                	
+                	//System.out.println("capture_marker=" + capture_marker);
+    			}
+    			
+    			if (bitboard.getMoveOps().isPromotion(move)) {
+        	        
+                	int piece_promoted = bitboard.getMoveOps().getPromotionFigureType(move);
+                	piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
+                	
+                	addDurtyPiece(color, piece_promoted, square_to, promotion_marker++);
+                	addDurtyPiece(color, piece, promotion_marker++, square_to);
+    			}
+    		}
+    	}
+    	
+    	
+    	private void addDurtyPiece(int color, int piece, int square_remove, int square_add) {
+		
+    		DirtyPieces dirty_pieces = dirtyPieces;
+    		
+    		int index = 0;
+    		if (square_remove < 64 && square_add < 64) {
+    			
+        		for (int i = 0; i < dirty_pieces.dirtyNum; i++) {
+        			if (piece == dirty_pieces.pc[i]) {
+        				if (square_remove == dirty_pieces.to[i]) {
+        					break;
+        				}
+        			}
+        			index++;
+        		}
+    		} else {
+    			
+    			index = dirty_pieces.dirtyNum;
+    		}
+    		
+    		if (index < dirty_pieces.dirtyNum) {
+    			
+    			if (dirty_pieces.c[index] != color) {
+    				
+    				throw new IllegalStateException();
+    			}
+    			
+    			if (dirty_pieces.to[index] != square_remove) {
+    				
+    				throw new IllegalStateException("dirty_pieces.to[index]=" + dirty_pieces.to[index] + ", square_from=" + square_remove + ", piece=" + piece);
+    			}
+        		//dirty_pieces.from[index] = square_from;
+        		dirty_pieces.to[index] = square_add;
+    			
+    		} else {
+    			
+    			dirty_pieces.dirtyNum++;
+    			
+    			dirty_pieces.c[index] = color;
+        		dirty_pieces.pc[index] = piece;
+        		dirty_pieces.from[index] = square_remove;
+        		dirty_pieces.to[index] = square_add;
+    		}
+		}
+    	
+    	
+    	//@Override
+    	public final void addPiece_Special(int color, int type) {
+    		//Do nothing
+    	}
+    	
+    	
+    	//@Override
+    	public final void initially_addPiece(int color, int type, long bb_pieces) {
+    		
+    		//Do nothing
+    	}
+    }
+    
+    
+    private static class DirtyPieces {
+        int dirtyNum;
+        int[] c = new int[300];
+        int[] pc = new int[300];
+        int[] from = new int[300];
+        int[] to = new int[300];
+    }
 }

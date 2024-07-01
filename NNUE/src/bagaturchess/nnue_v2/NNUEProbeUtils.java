@@ -5,6 +5,7 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.ChessConstants;
+import bagaturchess.bitboard.impl1.internal.Util;
 import bagaturchess.bitboard.api.IBitBoard;
 
 
@@ -163,6 +164,10 @@ public class NNUEProbeUtils {
 			case Constants.TYPE_KING: return color == ChessConstants.WHITE ? 5 : 5;
 			default: throw new IllegalStateException();
 		}
+	}
+	
+	public static int convertSquare(int squareID) {
+		return getSquareID(Util.POWER_LOOKUP[squareID]);
 	}
 	
 	public static class Input {
