@@ -83,6 +83,10 @@ public class NNUE {
     
     int[] sumsL2 = new int[L2_SIZE];
     float[] sumsL3 = new float[L3_SIZE];
+    float[] L1Outputs = new float[L2_SIZE];
+    float[] L2Outputs = new float[L3_SIZE];
+    float[] L3Output = new float[1];
+    
     
     public void init(String filename) throws IOException {
         
@@ -270,9 +274,10 @@ public class NNUE {
     }
 
     public int output(Accumulator boardAccumulator, int sideToMove, int outputBucket) {
-        float[] L1Outputs = new float[L2_SIZE];
-        float[] L2Outputs = new float[L3_SIZE];
-        float[] L3Output = new float[1];
+    	
+    	Arrays.fill(L1Outputs, 0);
+    	Arrays.fill(L2Outputs, 0);
+    	Arrays.fill(L3Output, 0);
 
         short[] us = boardAccumulator.values[sideToMove];
         short[] them = boardAccumulator.values[1 - sideToMove];
