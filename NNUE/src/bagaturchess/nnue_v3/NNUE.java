@@ -8,6 +8,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
@@ -18,8 +19,8 @@ public class NNUE {
 	
     // Net arch: (768 -> L1_SIZE) x 2 -> (L2_SIZE -> L3_SIZE -> 1) x OUTPUT_BUCKETS
     private static final int NUM_INPUTS = 768;
-    private static final int L1_SIZE = 1536;
-    private static final int L2_SIZE = 8;
+    private static final int L1_SIZE = 512;
+    private static final int L2_SIZE = 2;
     private static final int L3_SIZE = 32;
     private static final int OUTPUT_BUCKETS = 8;
     
@@ -79,6 +80,9 @@ public class NNUE {
     public static class Accumulator {
         public short[][] values = new short[2][L1_SIZE];
     }
+    
+    int[] sumsL2 = new int[L2_SIZE];
+    float[] sumsL3 = new float[L3_SIZE];
     
     public void init(String filename) throws IOException {
         
@@ -209,7 +213,9 @@ public class NNUE {
     }
 
     public void activateFTAndPropagateL1(short[] us, short[] them, short[] weights, float[] biases, float[] output) {
-        int[] sums = new int[L2_SIZE];
+        
+    	Arrays.fill(sumsL2, 0);
+    	
         int weightOffset = 0;
         short[][] accs = { us, them };
         
@@ -221,34 +227,35 @@ public class NNUE {
             	//int squared = screlu[clipped - (int) Short.MIN_VALUE];
 				
                 for (int out = 0; out < L2_SIZE; out++) {
-                    sums[out] += squared * weights[weightOffset + out * L1_SIZE + i];
+                	sumsL2[out] += squared * weights[weightOffset + out * L1_SIZE + i];
                 }
             }
             weightOffset += L1_SIZE * L2_SIZE;
         }
         
+        float sumDiv = (float) (FT_QUANT * FT_QUANT * L1_QUANT >> FT_SHIFT);
         for (int i = 0; i < L2_SIZE; i++) {
-            float sumDiv = (float) (FT_QUANT * FT_QUANT * L1_QUANT >> FT_SHIFT);
-            float clipped = Math.max(0.0f, Math.min((sums[i] / sumDiv) + biases[i], CLIPPED_MAX));
+            float clipped = Math.max(0.0f, Math.min((sumsL2[i] / sumDiv) + biases[i], CLIPPED_MAX));
             output[i] = clipped * clipped;
         }
     }
-
+    
     public void propagateL2(float[] inputs, float[] weights, float[] biases, float[] output) {
-        float[] sums = new float[L3_SIZE];
-
+        
+    	Arrays.fill(sumsL3, 0);
+    	
         for (int i = 0; i < L3_SIZE; i++) {
-            sums[i] = biases[i];
+        	sumsL3[i] = biases[i];
         }
 
         for (int i = 0; i < L2_SIZE; i++) {
             for (int out = 0; out < L3_SIZE; out++) {
-                sums[out] += inputs[i] * weights[out * L2_SIZE + i];
+            	sumsL3[out] += inputs[i] * weights[out * L2_SIZE + i];
             }
         }
 
         for (int i = 0; i < L3_SIZE; i++) {
-            float clipped = Math.max(0.0f, Math.min(sums[i], CLIPPED_MAX));
+            float clipped = Math.max(0.0f, Math.min(sumsL3[i], CLIPPED_MAX));
             output[i] = clipped * clipped;
         }
     }
