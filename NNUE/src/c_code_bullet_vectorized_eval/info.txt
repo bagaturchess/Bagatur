@@ -1,1 +1,1 @@
-gcc -shared -fPIC -O3 -Ofast -flto -ffast-math -march=native -mavx2 -funroll-loops -fomit-frame-pointer -o VectorEval.dll -I. bagaturchess_nnue_v2_JNIUtils.c
+gcc -shared -fPIC -O3 -Ofast -flto -ffast-math -march=native -mavx512f -mavx512dq -mavx512vl -mavx512bw -funroll-loops -fomit-frame-pointer -o VectorEval.dll -I. bagaturchess_nnue_v2_JNIUtils.c
