@@ -1,5 +1,6 @@
 package bagaturchess.nnue_v2;
 
+
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
@@ -19,6 +20,7 @@ public class JNIUtils {
 		
 		loadLib();
 	}
+	
 	
 	public static native int evaluateVectorized(short[] L2Weights, short[] UsValues, short[] ThemValues, int[] vectorevalbuffer);
 

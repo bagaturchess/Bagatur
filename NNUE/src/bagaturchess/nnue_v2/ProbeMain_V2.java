@@ -17,7 +17,7 @@ public class ProbeMain_V2 {
 		
 		try {
 			
-			network = new NNUE("./simple-583.bin");
+			network = new NNUE("./network_bagatur_v1.nnue");
 			
 			accumulators = new Accumulators(network);
 			
