@@ -1351,6 +1351,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
+		//validatePV(node, evaluator, node.eval, ply, depth, isPv, false);
 		
 		return node.eval;
 	}
@@ -1358,12 +1359,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	public int qsearch(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen,
 			int alpha, final int beta, final int ply, final boolean isPv) {
-		
-		if (cb.checkingPieces != 0) {
-			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
-			//return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv, 0);
-			return alpha;
-		}
 		
 		if (info.getSelDepth() < ply) {
 			
@@ -1387,7 +1382,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	    	return node.eval;
 	    }
 	    
-	    
+		if (cb.checkingPieces != 0) {
+			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
+			//return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv);
+			return alpha;
+		}
+		
 		long hashkey = getHashkeyTPT(cb);
 		
 		int ttMove 		= 0;
@@ -1617,6 +1617,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
+		//validatePV(node, evaluator, node.eval, ply, 0, isPv, true);
 		
     	return node.eval;
 	}
