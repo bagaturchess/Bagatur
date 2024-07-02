@@ -172,14 +172,7 @@ public class NNUE
 				continue;
 			}
 			
-			/*boolean capture = (dirtyPieces.from[i] >= 64 && dirtyPieces.from[i] < 128)
-					|| (dirtyPieces.to[i] >= 64 && dirtyPieces.to[i] < 128);
-			
-			boolean promotion = (dirtyPieces.from[i] >= 128)
-					|| (dirtyPieces.to[i] >= 128);
-			
-			int color_pc = dirtyPieces.c[i];
-			*/
+			int piece_color = dirtyPieces.c[i];
 			
 			int piece = dirtyPieces.pc[i];
 			
@@ -187,16 +180,16 @@ public class NNUE
 			
 			if (dirtyPieces.from[i] < 64) {//>=64 marks no entry e.g. during capture or promotion
 				
-				accumulators.getWhiteAccumulator().sub(getIndex(index_to_remove, NNUE.WHITE, piece, NNUE.WHITE));
-				accumulators.getBlackAccumulator().sub(getIndex(index_to_remove, NNUE.WHITE, piece, NNUE.BLACK));
+				accumulators.getWhiteAccumulator().sub(getIndex(index_to_remove, piece_color, piece, WHITE));
+				accumulators.getBlackAccumulator().sub(getIndex(index_to_remove, piece_color, piece, BLACK));
 			}
 			
 			int index_to_add = dirtyPieces.to[i];
 			
 			if (dirtyPieces.to[i] < 64) {
 				
-				accumulators.getWhiteAccumulator().add(getIndex(index_to_add, NNUE.WHITE, piece, NNUE.WHITE));
-				accumulators.getBlackAccumulator().add(getIndex(index_to_add, NNUE.WHITE, piece, NNUE.BLACK));
+				accumulators.getWhiteAccumulator().add(getIndex(index_to_add, piece_color, piece, WHITE));
+				accumulators.getBlackAccumulator().add(getIndex(index_to_add, piece_color, piece, BLACK));
 			}
 		}
 		
