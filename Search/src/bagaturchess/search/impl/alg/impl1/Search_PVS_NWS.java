@@ -500,7 +500,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	    }
 		
 		
-		if (EngineConstants.ENABLE_MATE_DISTANCE_PRUNING) {
+		if (EngineConstants.ENABLE_MATE_DISTANCE_PRUNING && !isPv) {
 			
 			alpha = Math.max(alpha, -SearchUtils.getMateVal(ply));
 			

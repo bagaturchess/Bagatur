@@ -124,8 +124,12 @@ public class SearchInfoImpl implements ISearchInfo {
 	}
 
 	public int getMateScore() {
-		//eval + ISearch.MAX_MAT_INTERVAL / 2
-		return ((SearchUtils.getMateDepth(eval) + 1) / 2);
+		int depth = SearchUtils.getMateDepth(eval);
+		if (depth > 0) {
+			return ((depth + 1) / 2);
+		} else {
+			return -((Math.abs(depth) + 1) / 2);
+		}
 	}
 
 	public boolean isMateScore() {

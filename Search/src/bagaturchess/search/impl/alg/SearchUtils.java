@@ -137,6 +137,11 @@ public class SearchUtils {
 		
 		int depth = 1 + ISearch.MAX_DEPTH - mate_depth; 
 		
+		if (depth <= 0) {
+			
+			throw new IllegalStateException("depth=" + depth);
+		}
+		
 		return score > 0 ? depth : -depth;
 	}
 	
