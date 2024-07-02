@@ -200,6 +200,11 @@ public abstract class RootSearch_BaseImpl implements IRootSearch {
 		@Override
 		public void stopIfNecessary(int maxdepth, int colour, double alpha, double beta) throws SearchInterruptedException {
 			
+			if (maxdepth <= 1) {
+				//Do nothing
+				return;
+			}
+			
 			if (stopped) {
 				
 				throw new SearchInterruptedException();

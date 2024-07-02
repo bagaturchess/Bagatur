@@ -164,7 +164,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		moveGen.setRootSearchFirstMoveIndex(root_search_first_move_index);
 		
 		return root_search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				moveGen, 0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true);
+				moveGen, 0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true, SearchUtils.normDepth(initial_maxdepth));
 	}
 	
 	
@@ -180,13 +180,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		moveGen.setRootSearchFirstMoveIndex(root_search_first_move_index);
 		
 		return root_search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				moveGen, 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false);		
+				moveGen, 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, SearchUtils.normDepth(initial_maxdepth));		
 	}
 	
 	
 	private int root_search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
-			final int ply, int depth, int alpha, int beta, boolean isPv) {
+			final int ply, int depth, int alpha, int beta, boolean isPv, int initialMaxDepth) {
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
@@ -335,7 +335,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					moveGen.addLMR_All(cb.colorToMoveInverse, move, depth);
 											
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false);
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 					
 					if (score > alpha) {
 						
@@ -349,12 +349,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
 					
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false);
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
 				if (score > alpha) {
 						
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv);
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
 				}
 				
 			} catch(SearchInterruptedException sie) {
@@ -456,12 +456,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private int search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
-			final int ply, int depth, int alpha, int beta, boolean isPv) {
+			final int ply, int depth, int alpha, int beta, boolean isPv, int initialMaxDepth) {
 		
 		
 		if (mediator != null && mediator.getStopper() != null) {
 			
-			mediator.getStopper().stopIfNecessary(ply + depth, env.getBitboard().getColourToMove(), alpha, beta);
+			mediator.getStopper().stopIfNecessary(initialMaxDepth, env.getBitboard().getColourToMove(), alpha, beta);
 		}
 		
 		if (ply < 1) {
@@ -854,7 +854,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
 						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
-								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv);
+								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, initialMaxDepth);
 						
 						cb.undoNullMove();
 						
@@ -1197,7 +1197,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						moveGen.addLMR_All(cb.colorToMoveInverse, move, depth);
 												
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 						
 						if (score > alpha) {
 							
@@ -1211,12 +1211,12 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
 						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
 					
 					if (score > alpha) {
 						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
 					}
 					
 				} catch(SearchInterruptedException sie) {

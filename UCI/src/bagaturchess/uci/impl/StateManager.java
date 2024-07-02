@@ -97,7 +97,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 				if (fromGUILine == null) {
 					
 					channel.sendLogToGUI("StateManager: System.exit(0), because the end of stream is reached");
-					Thread.sleep(111);//Wait to write the log
+					Thread.sleep(20);//Wait to write the log
 					System.exit(0);
 					
 					return;
@@ -176,7 +176,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 							
 							channel.sendLogToGUI("StateManager: System.exit(0), because of QUIT command");
 							
-							Thread.sleep(111); //Wait to write the log
+							Thread.sleep(20); //Wait to write the log
 							
 							System.exit(0);
 							
@@ -196,7 +196,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 				
 				channel.sendLogToGUI("StateManager: Error: " + t.getMessage());
 				
-				Thread.sleep(111);
+				Thread.sleep(11); //Wait to write the log
 			}
 		}
 	}
