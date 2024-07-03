@@ -317,7 +317,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			boolean doLMR = depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						//&& MoveUtil.isQuiet(move)
+						&& MoveUtil.isQuiet(move)
 						;
 			
 			int reduction = 1;
@@ -1131,7 +1131,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						//&& cb.checkingPieces == 0
 						//&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move)
 						//&& (phase == PHASE_QUIET || phase == PHASE_KILLER_1 || phase == PHASE_KILLER_2)
-						//&& phase == PHASE_QUIET
+						&& phase == PHASE_QUIET
 						;
 						
 				int reduction = 1;
