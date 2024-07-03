@@ -212,7 +212,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		depth += extensions(cb, moveGen, ply);
+		//depth += extensions(cb, moveGen, ply);
 		
 		
 		long hashkey = getHashkeyTPT(cb);
@@ -317,7 +317,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			boolean doLMR = depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& MoveUtil.isQuiet(move)
+						//&& MoveUtil.isQuiet(move)
 						;
 			
 			int reduction = 1;
@@ -523,7 +523,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		depth += extensions(cb, moveGen, ply);
+		//depth += extensions(cb, moveGen, ply);
 		
 		
 		if (depth == 0) {
@@ -766,27 +766,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		/*if (egtb_eval > alpha) {
-			
-			alpha = egtb_eval;
-			
-			if (alpha >= beta) {
-				
-				node.bestmove = 0;
-				node.eval = egtb_eval;
-				node.leaf = true;
-				
-				return node.eval;
-				
-			} else {
-				
-				//Currently beta = alpha -1
-				throw new IllegalStateException("beta = alpha and best move will not be set");
-			}
-		}
-		*/
-		
-		
 		int eval = ISearch.MIN;
 		
 		if (!isPv && cb.checkingPieces == 0
@@ -797,7 +776,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			eval = eval(evaluator, ply, alpha_org, beta, isPv);
 			
 			
-			if (ttValue != IEvaluator.MIN_EVAL) {
+			/*if (ttValue != IEvaluator.MIN_EVAL) {
 				
 				if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
 					
@@ -809,7 +788,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						eval = ttValue;
 					}
 				}
-			}
+			}*/
 			
 			
 			/*if (egtb_eval != ISearch.MIN && egtb_eval > eval) {
@@ -875,7 +854,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			} else if (eval <= alpha && !SearchUtils.isMateVal(alpha)) {
 				
 				
-				if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length) {
+				/*if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length) {
 					
 					if (eval + RAZORING_MARGIN[depth] < alpha) {
 						
@@ -894,7 +873,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							}
 						}
 					}
-				}
+				}*/
 			}
 		}
         
@@ -975,7 +954,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				break;
 				
-			/*case PHASE_COUNTER_2:
+			case PHASE_COUNTER_2:
 				
 				counterMove2 = moveGen.getCounter2(cb.colorToMove, parentMove);
 				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
@@ -984,7 +963,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				break;
-			*/
+			
 			
 			case PHASE_ATTACKING_BAD:
 				
@@ -1071,12 +1050,12 @@ public class Search_PVS_NWS extends SearchImpl {
 								)
 						) {
 						
-						if (EngineConstants.ENABLE_LMP
+						/*if (EngineConstants.ENABLE_LMP
 								&& movesPerformed_attacks + movesPerformed_quiet >= depth * 3 + 3
 							) {
 							
 							continue;
-						}
+						}*/
 						
 						if (eval != ISearch.MIN) { //Is set
 							
@@ -1152,7 +1131,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						//&& cb.checkingPieces == 0
 						//&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move)
 						//&& (phase == PHASE_QUIET || phase == PHASE_KILLER_1 || phase == PHASE_KILLER_2)
-						&& phase == PHASE_QUIET;
+						//&& phase == PHASE_QUIET
+						;
 						
 				int reduction = 1;
 				
@@ -1312,42 +1292,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (env.getTPT() != null) {
-			
-			if (useTPTKeyWithMoveCounter()) {
 				
-				//Here we can put mate values and egtb values in TT
-				
-				if (egtb_eval > node.eval) {
-					
-					node.bestmove = 0;
-					node.eval = egtb_eval;
-					node.leaf = true;
-				}
+			if (!SearchUtils.isMateVal(node.eval)) {
 				
 				env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
-				
-			} else {
-				
-				//Here we must not put mate values and egtb values in TT
-				/*if (node.eval != getDrawScores(-1) //Not draw score
-						&& egtb_eval == MIN //Not EGTB score
-						&& Math.abs(node.eval) < MAX_MATERIAL_INTERVAL / MAX_DEPTH //Not EGTB and mate score for current node or for its parent node.
-					) {
-					
-					env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
-				}
-				
-				if (egtb_eval > node.eval) {
-					
-					node.bestmove = 0;
-					node.eval = egtb_eval;
-					node.leaf = true;
-				}*/
-				
-				if (!SearchUtils.isMateVal(node.eval)) {
-					
-					env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
-				}
 			}
 		}
 		
@@ -1381,12 +1329,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	    	
 	    	return node.eval;
 	    }
-	    
-		if (cb.checkingPieces != 0) {
-			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
-			//return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 0, alpha, beta, isPv);
-			return alpha;
-		}
 		
 		long hashkey = getHashkeyTPT(cb);
 		
@@ -1434,6 +1376,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 	  	
 		
+		if (cb.checkingPieces != 0) {
+			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
+			return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 1, alpha, beta, isPv, 1);
+			//return alpha;
+		}
+		
+		
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		
 		
@@ -1479,13 +1428,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		moveGen.startPly();
 		
-		int phase = PHASE_TT;
+		int phase = PHASE_ATTACKING_GOOD;
 		
 		while (phase <= PHASE_ATTACKING_GOOD) {
 			
 			switch (phase) {
 			
-				case PHASE_TT:
+				/*case PHASE_TT:
 					
 					if (ttMove != 0
 							//&& getEnv().getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)
@@ -1495,7 +1444,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					
 					break;
-					
+				*/
+			
 				case PHASE_ATTACKING_GOOD:
 					
 					moveGen.generateAttacks(cb);
@@ -1515,18 +1465,12 @@ public class Search_PVS_NWS extends SearchImpl {
 					continue;
 				}
 				
-				if (phase == PHASE_ATTACKING_GOOD) {
-					if (move == ttMove) {
-						continue;
-					}
-				}
-				
 				int see = SEEUtil.getSeeCaptureScore(cb, move);
 				if (see < 0) {
 					continue;
 				}
 				
-				if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
+				/*if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 					
 					int material_gain = getEnv().getBitboard().getBaseEvaluation().getMaterialGain(move);
 					
@@ -1534,7 +1478,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						continue;
 					}
-				}
+				}*/
 				
 				env.getBitboard().makeMoveForward(move);
 				
