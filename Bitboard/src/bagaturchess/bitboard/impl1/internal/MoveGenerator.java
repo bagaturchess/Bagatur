@@ -22,7 +22,8 @@ public final class MoveGenerator {
 	
 	private static final boolean CLEAR_TABLES_ON_NEW_SEARCH 	= true;
 	public static boolean USE_COUNTER_MOVES_COUNTS 				= true;
-	public static boolean USE_ContinuationHistory 				= true;
+	public static boolean USE_ContinuationHistory 				= false;
+	
 	private static final boolean BUILD_EXACT_STATS 				= false;
 	
 	public static final int MOVE_SCORE_SCALE 					= 1000;
@@ -31,11 +32,11 @@ public final class MoveGenerator {
 	private static final int LMR_STAT_MULTIPLIER 				= 1 * MOVE_SCORE_SCALE; // Should be at least 1000
 	
 	//Bigger value of LMR_DEVIATION_MULTIPLIER means less LMR skips.
-	//LMR_DEVIATION_MULTIPLIER is senseful between 0 and 2.
+	//LMR_DEVIATION_MULTIPLIER must be between 0 and 2.
 	//The value of LMR_DEVIATION_MULTIPLIER equal to 2, leads to skip of LMR reductions for top 5% of the moves sorted by their LMR rate.
 	//We select 5% in order to keep the skip rate in the frame of the standard deviation.
 	//Values more than 2 actually means that the LMR optimization is always performed and there are no skips. Value 0 means that it is executed in around 50% of the cases.
-	private static final double LMR_DEVIATION_MULTIPLIER 		= 2;
+	private static final double LMR_DEVIATION_MULTIPLIER 		= 1;
 	
 	private final long[][] LMR_ALL 								= new long[2][64 * 64];
 	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
