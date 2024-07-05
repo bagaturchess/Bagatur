@@ -1050,12 +1050,12 @@ public class Search_PVS_NWS extends SearchImpl {
 								)
 						) {
 						
-						/*if (EngineConstants.ENABLE_LMP
+						if (EngineConstants.ENABLE_LMP
 								&& movesPerformed_attacks + movesPerformed_quiet >= depth * 3 + 3
 							) {
 							
 							continue;
-						}*/
+						}
 						
 						if (eval != ISearch.MIN) { //Is set
 							
