@@ -26,6 +26,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	private static final boolean USE_CACHE = true;
 	
+	private static final boolean USE_MOPUP_EVAL = false;
 	
 	private static final int MAX_MATERIAL_FACTOR = 9 + 2 * 5 + 2 * 3 + 2 * 3;
 	
@@ -167,7 +168,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	public int roughEval(int depth, int rootColour) {
 		
-		if (evalConfig != null && !evalConfig.isTrainingMode()) {
+		if (USE_MOPUP_EVAL && evalConfig != null && !evalConfig.isTrainingMode()) {
 			
 			int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN));
 			int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN));
@@ -305,7 +306,7 @@ public abstract class BaseEvaluator implements IEvaluator {
 	
 	protected int fullEval(int depth, int alpha, int beta, int rootColour, boolean useCache) {
 		
-		if (evalConfig != null && !evalConfig.isTrainingMode()) {
+		if (USE_MOPUP_EVAL && evalConfig != null && !evalConfig.isTrainingMode()) {
 			
 			int count_pawns_w = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_WHITE, Constants.TYPE_PAWN));
 			int count_pawns_b = Long.bitCount(bitboard.getFiguresBitboardByColourAndType(Constants.COLOUR_BLACK, Constants.TYPE_PAWN));
