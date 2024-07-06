@@ -38,17 +38,17 @@
 //     const unsigned char *const gEmbeddedNNUEEnd;     // a marker to the end
 //     const unsigned int         gEmbeddedNNUESize;    // the size of the embedded file
 // Note that this does not work in Microsoft Visual Studio.
-#if !defined(_MSC_VER) && !defined(NNUE_EMBEDDING_OFF)
-INCBIN(EmbeddedNNUEBig, EvalFileDefaultNameBig);
-INCBIN(EmbeddedNNUESmall, EvalFileDefaultNameSmall);
-#else
+//#if !defined(_MSC_VER) && !defined(NNUE_EMBEDDING_OFF)
+//INCBIN(EmbeddedNNUEBig, EvalFileDefaultNameBig);
+//INCBIN(EmbeddedNNUESmall, EvalFileDefaultNameSmall);
+//#else
 const unsigned char        gEmbeddedNNUEBigData[1]   = {0x0};
 const unsigned char* const gEmbeddedNNUEBigEnd       = &gEmbeddedNNUEBigData[1];
 const unsigned int         gEmbeddedNNUEBigSize      = 1;
 const unsigned char        gEmbeddedNNUESmallData[1] = {0x0};
 const unsigned char* const gEmbeddedNNUESmallEnd     = &gEmbeddedNNUESmallData[1];
 const unsigned int         gEmbeddedNNUESmallSize    = 1;
-#endif
+//#endif
 
 
 namespace Stockfish {
