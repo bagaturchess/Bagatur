@@ -5,7 +5,7 @@
 
 using namespace Stockfish;
 
-JNIEXPORT void JNICALL Java_NNUEBridge_NNUEBridge_init
+JNIEXPORT void JNICALL Java_bagaturchess_nnue_1v5_NNUEBridge_init
 (JNIEnv *env, jclass this_class, jstring bigNet, jstring smallNet) {
 
 const char *big = env->GetStringUTFChars(bigNet, NULL);
@@ -17,7 +17,7 @@ env->ReleaseStringUTFChars(bigNet, big);
 env->ReleaseStringUTFChars(smallNet, small);
 }
 
-JNIEXPORT jint JNICALL Java_NNUEBridge_NNUEBridge_evalFen
+JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v5_NNUEBridge_evalFen
         (JNIEnv * env, jclass this_class, jstring javaFen) {
 const char *fen = env->GetStringUTFChars(javaFen, NULL);
 
@@ -28,7 +28,7 @@ env->ReleaseStringUTFChars(javaFen, fen);
 return eval;
 }
 
-JNIEXPORT jint JNICALL Java_NNUEBridge_NNUEBridge_evalArray
+JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v5_NNUEBridge_evalArray
         (JNIEnv * env, jclass this_class, jintArray pieceBoard, jint side, jint rule50) {
     jint *board = env->GetIntArrayElements(pieceBoard, NULL);
     bool c_side = side == 0;
@@ -41,7 +41,7 @@ JNIEXPORT jint JNICALL Java_NNUEBridge_NNUEBridge_evalArray
     return eval;
 }
 
-JNIEXPORT jint JNICALL Java_NNUEBridge_NNUEBridge_fasterEvalArray
+JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v5_NNUEBridge_fasterEvalArray
         (JNIEnv * env, jclass this_class, jintArray pieces, jintArray squares,
          jint pieceAmount, jint side, jint rule50) {
     jint *c_pieces = (jint*)env->GetPrimitiveArrayCritical(pieces, 0);
