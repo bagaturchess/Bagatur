@@ -9,6 +9,9 @@ import java.nio.file.Paths;
 import bagaturchess.uci.api.ChannelManager;
 
 
+/**
+ * Experiment by probing via CFish's NNUE
+ */
 public class NNUEJNIBridge {
 
 	

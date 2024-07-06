@@ -13,6 +13,7 @@ public class ProbeMain_Stockfish {
 	
 	public static void main(String[] args) {
 		
+		
 		NNUEBridge.init("nn-b1a57edbea57.nnue", "nn-baff1ede1f90.nnue");
 		
 		

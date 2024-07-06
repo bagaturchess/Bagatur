@@ -11,6 +11,9 @@ import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.impl.Constants;
 
 
+/**
+ * Experiment by probing via Bullet NNUE with 1 layers
+ */
 public class NNUE
 {
 	

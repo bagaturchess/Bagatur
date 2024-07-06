@@ -1,11 +1,17 @@
 package bagaturchess.nnue_v5;
 
+
 import java.io.File;
 
+/**
+ * Experiment by probing via Stockfish's NNUE
+ */
 public class NNUEBridge {
 	
     static {
+    	
         File dll = new File("probe.dll");
+        
         System.load(dll.getAbsolutePath());
     }
 

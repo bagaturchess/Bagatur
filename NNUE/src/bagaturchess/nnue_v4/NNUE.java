@@ -18,6 +18,9 @@ import bagaturchess.nnue_v2.NNUEProbeUtils;
 import bagaturchess.uci.api.ChannelManager;
 
 
+/**
+ * Experiment by probing via Alexandria's NNUE
+ */
 public class NNUE {
 	
     // Net arch: (768 -> L1_SIZE) x 2 -> (L2_SIZE -> L3_SIZE -> 1) x OUTPUT_BUCKETS

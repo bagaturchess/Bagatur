@@ -15,6 +15,9 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.nnue_v2.NNUEProbeUtils;
 
 
+/**
+ * Experiment by probing via Bullet NNUE with 3 layers
+ */
 public class NNUE {
 	
     // Net arch: (768 -> L1_SIZE) x 2 -> (L2_SIZE -> L3_SIZE -> 1) x OUTPUT_BUCKETS
