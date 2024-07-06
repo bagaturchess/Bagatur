@@ -1,0 +1,72 @@
+bitboard.o: bitboard.cpp bitboard.h types.h
+evaluate.o: evaluate.cpp evaluate.h types.h incbin/incbin.h \
+ nnue/evaluate_nnue.h nnue/../misc.h nnue/../types.h \
+ nnue/nnue_architecture.h nnue/features/half_ka_v2_hm.h \
+ nnue/features/../../misc.h nnue/features/../../types.h \
+ nnue/features/../nnue_common.h nnue/features/../../misc.h \
+ nnue/layers/affine_transform.h nnue/layers/../nnue_common.h \
+ nnue/layers/simd.h nnue/layers/affine_transform_sparse_input.h \
+ nnue/layers/../../bitboard.h nnue/layers/../../types.h \
+ nnue/layers/affine_transform.h nnue/layers/clipped_relu.h \
+ nnue/layers/sqr_clipped_relu.h nnue/nnue_common.h \
+ nnue/nnue_feature_transformer.h nnue/../position.h nnue/../bitboard.h \
+ nnue/../nnue/nnue_accumulator.h nnue/../nnue/nnue_architecture.h \
+ nnue/../nnue/nnue_common.h nnue/../nnue/nnue_architecture.h \
+ nnue/../types.h nnue/nnue_accumulator.h position.h
+main.o: main.cpp probe.h
+misc.o: misc.cpp misc.h types.h
+position.o: position.cpp position.h bitboard.h types.h \
+ nnue/nnue_accumulator.h nnue/nnue_architecture.h \
+ nnue/features/half_ka_v2_hm.h nnue/features/../../misc.h \
+ nnue/features/../../types.h nnue/features/../nnue_common.h \
+ nnue/features/../../misc.h nnue/layers/affine_transform.h \
+ nnue/layers/../nnue_common.h nnue/layers/simd.h \
+ nnue/layers/affine_transform_sparse_input.h nnue/layers/../../bitboard.h \
+ nnue/layers/affine_transform.h nnue/layers/clipped_relu.h \
+ nnue/layers/sqr_clipped_relu.h nnue/nnue_common.h \
+ nnue/nnue_architecture.h misc.h
+NNUEBridge_NNUEBridge.o: NNUEBridge_NNUEBridge.cpp \
+ NNUEBridge_NNUEBridge.h probe.h
+evaluate_nnue.o: nnue/evaluate_nnue.cpp nnue/evaluate_nnue.h \
+ nnue/../misc.h nnue/../types.h nnue/nnue_architecture.h \
+ nnue/features/half_ka_v2_hm.h nnue/features/../../misc.h \
+ nnue/features/../../types.h nnue/features/../nnue_common.h \
+ nnue/features/../../misc.h nnue/layers/affine_transform.h \
+ nnue/layers/../nnue_common.h nnue/layers/simd.h \
+ nnue/layers/affine_transform_sparse_input.h nnue/layers/../../bitboard.h \
+ nnue/layers/../../types.h nnue/layers/affine_transform.h \
+ nnue/layers/clipped_relu.h nnue/layers/sqr_clipped_relu.h \
+ nnue/nnue_common.h nnue/nnue_feature_transformer.h nnue/../position.h \
+ nnue/../bitboard.h nnue/../nnue/nnue_accumulator.h \
+ nnue/../nnue/nnue_architecture.h nnue/../nnue/nnue_common.h \
+ nnue/../nnue/nnue_architecture.h nnue/../types.h nnue/nnue_accumulator.h \
+ nnue/../evaluate.h
+half_ka_v2_hm.o: nnue/features/half_ka_v2_hm.cpp \
+ nnue/features/half_ka_v2_hm.h nnue/features/../../misc.h \
+ nnue/features/../../types.h nnue/features/../nnue_common.h \
+ nnue/features/../../misc.h nnue/features/../../bitboard.h \
+ nnue/features/../../types.h nnue/features/../../position.h \
+ nnue/features/../../bitboard.h \
+ nnue/features/../../nnue/nnue_accumulator.h \
+ nnue/features/../../nnue/nnue_architecture.h \
+ nnue/features/../../nnue/features/half_ka_v2_hm.h \
+ nnue/features/../../nnue/layers/affine_transform.h \
+ nnue/features/../../nnue/layers/../nnue_common.h \
+ nnue/features/../../nnue/layers/simd.h \
+ nnue/features/../../nnue/layers/affine_transform_sparse_input.h \
+ nnue/features/../../nnue/layers/../../bitboard.h \
+ nnue/features/../../nnue/layers/affine_transform.h \
+ nnue/features/../../nnue/layers/clipped_relu.h \
+ nnue/features/../../nnue/layers/sqr_clipped_relu.h \
+ nnue/features/../../nnue/nnue_common.h \
+ nnue/features/../../nnue/nnue_architecture.h
+probe.o: probe.cpp probe.h bitboard.h types.h position.h \
+ nnue/nnue_accumulator.h nnue/nnue_architecture.h \
+ nnue/features/half_ka_v2_hm.h nnue/features/../../misc.h \
+ nnue/features/../../types.h nnue/features/../nnue_common.h \
+ nnue/features/../../misc.h nnue/layers/affine_transform.h \
+ nnue/layers/../nnue_common.h nnue/layers/simd.h \
+ nnue/layers/affine_transform_sparse_input.h nnue/layers/../../bitboard.h \
+ nnue/layers/affine_transform.h nnue/layers/clipped_relu.h \
+ nnue/layers/sqr_clipped_relu.h nnue/nnue_common.h \
+ nnue/nnue_architecture.h evaluate.h

@@ -387,7 +387,7 @@ endif
 
 # Define the flags for the compiler
 ENV_CXXFLAGS = -Wall -Wcast-qual -fno-exceptions
-CXXFLAGS = $(ENV_CXXFLAGS) -std=c++17 -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/win32 $(EXTRACXXFLAGS)
+CXXFLAGS = $(ENV_CXXFLAGS) -std=c++17 -I. $(EXTRACXXFLAGS)
 
 # Define the dependency flags
 ENV_DEPENDFLAGS =
