@@ -25,8 +25,8 @@ position.o: position.cpp position.h bitboard.h types.h \
  nnue/layers/affine_transform.h nnue/layers/clipped_relu.h \
  nnue/layers/sqr_clipped_relu.h nnue/nnue_common.h \
  nnue/nnue_architecture.h misc.h
-NNUEBridge_NNUEBridge.o: NNUEBridge_NNUEBridge.cpp \
- NNUEBridge_NNUEBridge.h probe.h
+bagaturchess_nnue_v5_NNUEBridge.o: bagaturchess_nnue_v5_NNUEBridge.cpp \
+ bagaturchess_nnue_v5_NNUEBridge.h probe.h
 evaluate_nnue.o: nnue/evaluate_nnue.cpp nnue/evaluate_nnue.h \
  nnue/../misc.h nnue/../types.h nnue/nnue_architecture.h \
  nnue/features/half_ka_v2_hm.h nnue/features/../../misc.h \

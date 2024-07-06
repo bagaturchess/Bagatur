@@ -1,4 +1,4 @@
-#include "NNUEBridge_NNUEBridge.h"
+#include "bagaturchess_nnue_v5_NNUEBridge.h"
 #include <iostream>
 
 #include "probe.h"

@@ -54,10 +54,10 @@ PGOBENCH = $(WINE_PATH) ./$(EXE) bench
 ### Source and object files
 SRCS = bitboard.cpp evaluate.cpp main.cpp \
 	misc.cpp position.cpp \
-	NNUEBridge_NNUEBridge.cpp nnue/evaluate_nnue.cpp nnue/features/half_ka_v2_hm.cpp probe.cpp
+	bagaturchess_nnue_v5_NNUEBridge.cpp nnue/evaluate_nnue.cpp nnue/features/half_ka_v2_hm.cpp probe.cpp
 
 HEADERS = bitboard.h evaluate.h misc.h \
-		NNUEBridge_NNUEBridge.h nnue/evaluate_nnue.h nnue/features/half_ka_v2_hm.h nnue/layers/affine_transform.h \
+		bagaturchess_nnue_v5_NNUEBridge.h nnue/evaluate_nnue.h nnue/features/half_ka_v2_hm.h nnue/layers/affine_transform.h \
 		nnue/layers/affine_transform_sparse_input.h nnue/layers/clipped_relu.h nnue/layers/simd.h \
 		nnue/layers/sqr_clipped_relu.h nnue/nnue_accumulator.h nnue/nnue_architecture.h \
 		nnue/nnue_common.h nnue/nnue_feature_transformer.h position.h probe.h \
