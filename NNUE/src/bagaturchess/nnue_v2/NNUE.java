@@ -54,7 +54,7 @@ public class NNUE
 	
 	
 	private IncrementalUpdates incremental_updates;
-	private DirtyPieces dirtyPieces = new DirtyPieces();
+	private DirtyPieces dirtyPieces;
 	private Accumulators accumulators;
 	private NNUEProbeUtils.Input input;
 	private IBitBoard bitboard;
@@ -126,6 +126,8 @@ public class NNUE
 		input = new NNUEProbeUtils.Input();
 		
 		if (DO_INCREMENTAL_UPDATES) {
+			
+			dirtyPieces = new DirtyPieces();
 			
 			incremental_updates = new IncrementalUpdates(bitboard);
 			bitboard.addMoveListener(incremental_updates);

@@ -28,7 +28,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		try {
 		
-			nnue = new NNUE("./network_bagatur_v1.nnue", bitboard);
+			nnue = new NNUE("./network_bagatur.nnue", bitboard);
 		
 		} catch (IOException e) {
 			

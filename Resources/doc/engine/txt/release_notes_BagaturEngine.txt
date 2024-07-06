@@ -1,3 +1,12 @@
+ Version 5.1a (7 July 2024)
+ * Update NUEE network file with new version
+ * Bug fixing for an issue which appears on very fast time control (e.g. 40/0:01+0.01)
+ * Bug fixing of PV line - now the last move is always valid
+ * Bug fixing for negative mate scores reported to GUI
+ * Disable chess extension but make sure qsearch extends all check positions with search of depth 1
+ * Disable Mop-up evaluation and rely on the NNUE evaluation
+ * LMR skips are more often on moves which produce beta cutoffs
+ 
  Version 5.1 (17 June 2024)
  * NNUE in Java based on Bullet trainer and custom training process. More info: https://github.com/bagaturchess/Bagatur/tree/master/NNUE
  
