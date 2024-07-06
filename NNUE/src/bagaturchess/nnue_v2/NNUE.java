@@ -213,15 +213,15 @@ public class NNUE
 			eval += screlu[UsValues[i] - Short.MIN_VALUE] * L2Weights[i]
 					+ screlu[ThemValues[i] - Short.MIN_VALUE] * L2Weights[i + HIDDEN_SIZE];
 		}
-
+		
 		//int eval = JNIUtils.evaluateVectorized(L2Weights, UsValues, ThemValues);
 		
 		eval /= QA;
 		eval += network.outputBiases[chooseOutputBucket(pieces_count)];
-
+		
 		eval *= SCALE;
 		eval /= QA * QB;
-
+		
 		return eval;
 	}
 	
