@@ -52,18 +52,16 @@ BINDIR = $(PREFIX)/bin
 PGOBENCH = $(WINE_PATH) ./$(EXE) bench
 
 ### Source and object files
-SRCS = benchmark.cpp bitboard.cpp evaluate.cpp main.cpp \
-	misc.cpp movegen.cpp movepick.cpp position.cpp \
-	search.cpp thread.cpp timeman.cpp tt.cpp uci.cpp ucioption.cpp tune.cpp syzygy/tbprobe.cpp \
-	nnue/nnue_misc.cpp nnue/features/half_ka_v2_hm.cpp nnue/network.cpp engine.cpp score.cpp memory.cpp
+SRCS = bitboard.cpp evaluate.cpp main.cpp \
+	misc.cpp position.cpp \
+	NNUEBridge_NNUEBridge.cpp nnue/evaluate_nnue.cpp nnue/features/half_ka_v2_hm.cpp probe.cpp
 
-HEADERS = benchmark.h bitboard.h evaluate.h misc.h movegen.h movepick.h \
-		nnue/nnue_misc.h nnue/features/half_ka_v2_hm.h nnue/layers/affine_transform.h \
+HEADERS = bitboard.h evaluate.h misc.h \
+		NNUEBridge_NNUEBridge.h nnue/evaluate_nnue.h nnue/features/half_ka_v2_hm.h nnue/layers/affine_transform.h \
 		nnue/layers/affine_transform_sparse_input.h nnue/layers/clipped_relu.h nnue/layers/simd.h \
 		nnue/layers/sqr_clipped_relu.h nnue/nnue_accumulator.h nnue/nnue_architecture.h \
-		nnue/nnue_common.h nnue/nnue_feature_transformer.h position.h \
-		search.h syzygy/tbprobe.h thread.h thread_win32_osx.h timeman.h \
-		tt.h tune.h types.h uci.h ucioption.h perft.h nnue/network.h engine.h score.h numa.h memory.h
+		nnue/nnue_common.h nnue/nnue_feature_transformer.h position.h probe.h \
+		types.h
 
 OBJS = $(notdir $(SRCS:.cpp=.o))
 
@@ -153,8 +151,8 @@ dotprod = no
 arm_version = 0
 STRIP = strip
 
-ifneq ($(shell which clang-format-18 2> /dev/null),)
-	CLANG-FORMAT = clang-format-18
+ifneq ($(shell which clang-format-17 2> /dev/null),)
+	CLANG-FORMAT = clang-format-17
 else
 	CLANG-FORMAT = clang-format
 endif
@@ -387,8 +385,16 @@ ifeq ($(MAKELEVEL),0)
        export ENV_LDFLAGS := $(LDFLAGS)
 endif
 
-CXXFLAGS = $(ENV_CXXFLAGS) -Wall -Wcast-qual -fno-exceptions -std=c++17 $(EXTRACXXFLAGS)
+# Define the flags for the compiler
+ENV_CXXFLAGS = -Wall -Wcast-qual -fno-exceptions
+CXXFLAGS = $(ENV_CXXFLAGS) -std=c++17 -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/win32 $(EXTRACXXFLAGS)
+
+# Define the dependency flags
+ENV_DEPENDFLAGS =
 DEPENDFLAGS = $(ENV_DEPENDFLAGS) -std=c++17
+
+# Define the linker flags
+ENV_LDFLAGS =
 LDFLAGS = $(ENV_LDFLAGS) $(EXTRALDFLAGS)
 
 ifeq ($(COMP),)
@@ -489,8 +495,8 @@ ifeq ($(COMP),clang)
 endif
 
 ifeq ($(KERNEL),Darwin)
-	CXXFLAGS += -mmacosx-version-min=10.15
-	LDFLAGS += -mmacosx-version-min=10.15
+	CXXFLAGS += -mmacosx-version-min=10.14
+	LDFLAGS += -mmacosx-version-min=10.14
 	ifneq ($(arch),any)
 		CXXFLAGS += -arch $(arch)
 		LDFLAGS += -arch $(arch)
@@ -544,6 +550,11 @@ else
 	ifeq ($(KERNEL),Darwin)
 		EXTRAPROFILEFLAGS = -fvisibility=hidden
 	endif
+endif
+
+### Travis CI script uses COMPILER to overwrite CXX
+ifdef COMPILER
+	COMPCXX=$(COMPILER)
 endif
 
 ### Allow overwriting CXX from command line
@@ -881,8 +892,8 @@ profile-build: net config-sanity objclean profileclean
 	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) $(profile_make)
 	@echo ""
 	@echo "Step 2/4. Running benchmark for pgo-build ..."
-	$(PGOBENCH) > PGOBENCH.out 2>&1
-	tail -n 4 PGOBENCH.out
+#	$(PGOBENCH) > PGOBENCH.out 2>&1
+#	tail -n 4 PGOBENCH.out
 	@echo ""
 	@echo "Step 3/4. Building optimized executable ..."
 	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) objclean
@@ -1051,14 +1062,14 @@ FORCE:
 
 clang-profile-make:
 	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) \
-	EXTRACXXFLAGS='-fprofile-generate ' \
-	EXTRALDFLAGS=' -fprofile-generate' \
+	EXTRACXXFLAGS='-fprofile-instr-generate ' \
+	EXTRALDFLAGS=' -fprofile-instr-generate' \
 	all
 
 clang-profile-use:
 	$(XCRUN) llvm-profdata merge -output=stockfish.profdata *.profraw
 	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) \
-	EXTRACXXFLAGS='-fprofile-use=stockfish.profdata' \
+	EXTRACXXFLAGS='-fprofile-instr-use=stockfish.profdata' \
 	EXTRALDFLAGS='-fprofile-use ' \
 	all
 

@@ -20,6 +20,7 @@
 #define EVALUATE_H_INCLUDED
 
 #include <string>
+#include <unordered_map>
 
 #include "types.h"
 
@@ -29,26 +30,36 @@ class Position;
 
 namespace Eval {
 
+int   simple_eval(const Position& pos, Color c);
+Value evaluate(const Position& pos);
+
 // The default net name MUST follow the format nn-[SHA256 first 12 digits].nnue
 // for the build process (profile-build and fishtest) to work. Do not change the
-// name of the macro or the location where this macro is defined, as it is used
-// in the Makefile/Fishtest.
-#define EvalFileDefaultNameBig "nn-ddcfb9224cdb.nnue"
-#define EvalFileDefaultNameSmall "nn-37f18f62d772.nnue"
+// name of the macro, as it is used in the Makefile.
+#define EvalFileDefaultNameBig "nn-b1a57edbea57.nnue"
+#define EvalFileDefaultNameSmall "nn-baff1ede1f90.nnue"
+
+struct EvalFile {
+    // UCI option name
+    std::string optionName;
+    // Default net name, will use one of the macros above
+    std::string defaultName;
+    // Selected net name, either via uci option or default
+    std::string current;
+    // Net description extracted from the net file
+    std::string netDescription;
+};
 
 namespace NNUE {
-struct Networks;
-struct AccumulatorCaches;
-}
 
-std::string trace(Position& pos, const Eval::NNUE::Networks& networks);
+enum NetSize : int;
 
-int   simple_eval(const Position& pos, Color c);
-bool  use_smallnet(const Position& pos);
-Value evaluate(const NNUE::Networks&          networks,
-               const Position&                pos,
-               Eval::NNUE::AccumulatorCaches& caches,
-               int                            optimism);
+using EvalFiles = std::unordered_map<Eval::NNUE::NetSize, EvalFile>;
+
+EvalFiles load_networks(const std::string&, EvalFiles);
+
+}  // namespace NNUE
+
 }  // namespace Eval
 
 }  // namespace Stockfish

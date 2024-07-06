@@ -16,26 +16,21 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// Class for difference calculation of NNUE evaluation function
+#include "bitboard.h"
 
-#ifndef NNUE_ACCUMULATOR_H_INCLUDED
-#define NNUE_ACCUMULATOR_H_INCLUDED
+#include <bitset>
 
-#include <cstdint>
+namespace Stockfish {
 
-#include "nnue_architecture.h"
-#include "nnue_common.h"
+uint8_t PopCnt16[1 << 16];
 
-namespace Stockfish::Eval::NNUE {
 
-// Class that holds the result of affine transformation of input features
-template<IndexType Size>
-struct alignas(CacheLineSize) Accumulator {
-    std::int16_t accumulation[2][Size];
-    std::int32_t psqtAccumulation[2][PSQTBuckets];
-    bool         computed[2];
-};
+void Bitboards::init() {
 
-}  // namespace Stockfish::Eval::NNUE
+    for (unsigned i = 0; i < (1 << 16); ++i)
+        PopCnt16[i] = uint8_t(std::bitset<16>(i).count());
 
-#endif  // NNUE_ACCUMULATOR_H_INCLUDED
+}
+
+
+}  // namespace Stockfish
