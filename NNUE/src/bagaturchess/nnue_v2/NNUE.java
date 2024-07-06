@@ -210,8 +210,8 @@ public class NNUE
 		
 		for (int i = 0; i < HIDDEN_SIZE; i++)
 		{
-			eval += screlu[UsValues[i] - (int) Short.MIN_VALUE] * (int) L2Weights[i]
-					+ screlu[ThemValues[i] - (int) Short.MIN_VALUE] * (int) L2Weights[i + HIDDEN_SIZE];
+			eval += screlu[UsValues[i] - Short.MIN_VALUE] * L2Weights[i]
+					+ screlu[ThemValues[i] - Short.MIN_VALUE] * L2Weights[i + HIDDEN_SIZE];
 		}
 
 		//int eval = JNIUtils.evaluateVectorized(L2Weights, UsValues, ThemValues);
