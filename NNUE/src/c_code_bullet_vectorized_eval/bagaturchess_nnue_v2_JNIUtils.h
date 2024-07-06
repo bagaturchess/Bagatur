@@ -13,7 +13,7 @@ extern "C" {
  * Signature: ([S[S[S)I
  */
 JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_evaluateVectorized
-  (JNIEnv *, jclass, jshortArray, jshortArray, jshortArray, jintArray);
+  (JNIEnv *, jclass, jshortArray, jshortArray, jshortArray);
 
 #ifdef __cplusplus
 }

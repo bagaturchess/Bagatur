@@ -10,12 +10,10 @@ static __m512i zero_vec;
 static int initialized = 0;
 
 JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_evaluateVectorized
-  (JNIEnv *env, jclass clazz, jshortArray L2Weights, jshortArray UsValues, jshortArray ThemValues, jintArray evalVec) {
-	  
+  (JNIEnv *env, jclass clazz, jshortArray L2Weights, jshortArray UsValues, jshortArray ThemValues) {
     jshort *l2_weights = (*env)->GetShortArrayElements(env, L2Weights, NULL);
     jshort *us_values = (*env)->GetShortArrayElements(env, UsValues, NULL);
     jshort *them_values = (*env)->GetShortArrayElements(env, ThemValues, NULL);
-    jint *eval_vec_array = (*env)->GetIntArrayElements(env, evalVec, NULL);
 
     if (!initialized) {
         qa_vec = _mm512_set1_epi16(QA);
@@ -26,7 +24,8 @@ JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_evaluateVectorized
     __m512i eval_vec = _mm512_setzero_si512(); // Initialize eval_vec to zero
 
     for (int i = 0; i < HIDDEN_SIZE; i += 32) { // Process 32 elements at a time
-        // Prefetch next data to cache
+
+    	// Prefetch next data to cache
         _mm_prefetch((char*)&us_values[i + 32], _MM_HINT_T0);
         _mm_prefetch((char*)&them_values[i + 32], _MM_HINT_T0);
         _mm_prefetch((char*)&l2_weights[i + 32], _MM_HINT_T0);
@@ -57,19 +56,12 @@ JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_evaluateVectorized
         eval_vec = _mm512_add_epi32(eval_vec, them_result);
     }
 
-    // Store the result back to eval_vec_array
-    _mm512_storeu_si512((__m512i*)eval_vec_array, eval_vec);
+    // Sum all elements in eval_vec using _mm512_reduce_add_epi32
+    int eval = _mm512_reduce_add_epi32(eval_vec);
 
     (*env)->ReleaseShortArrayElements(env, L2Weights, l2_weights, 0);
     (*env)->ReleaseShortArrayElements(env, UsValues, us_values, 0);
     (*env)->ReleaseShortArrayElements(env, ThemValues, them_values, 0);
-    (*env)->ReleaseIntArrayElements(env, evalVec, eval_vec_array, 0);
-
-    // Return the sum of all elements in eval_vec_array
-    int eval = 0;
-    for (int i = 0; i < 16; i++) { // Adjust to 16 as AVX-512 processes 16 32-bit integers at a time
-        eval += eval_vec_array[i];
-    }
 
     return eval;
 }

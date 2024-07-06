@@ -22,7 +22,7 @@ public class JNIUtils {
 	}
 	
 	
-	public static native int evaluateVectorized(short[] L2Weights, short[] UsValues, short[] ThemValues, int[] vectorevalbuffer);
+	public static native int evaluateVectorized(short[] L2Weights, short[] UsValues, short[] ThemValues);
 
 	
 	public static void loadLib() {
@@ -55,5 +55,4 @@ public class JNIUtils {
         	if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Unable to load JNNUE library " + t);
         }
 	}
-
 }

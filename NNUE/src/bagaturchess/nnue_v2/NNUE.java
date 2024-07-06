@@ -199,8 +199,6 @@ public class NNUE
     }
     
     
-	static int[] buff = new int[16];
-	
 	public static int evaluate(NNUE network, NNUEAccumulator us, NNUEAccumulator them, int pieces_count)
 	{
 		
@@ -216,7 +214,7 @@ public class NNUE
 					+ screlu[ThemValues[i] - (int) Short.MIN_VALUE] * (int) L2Weights[i + HIDDEN_SIZE];
 		}
 
-		//int eval = JNIUtils.evaluateVectorized(L2Weights, UsValues, ThemValues, buff);
+		//int eval = JNIUtils.evaluateVectorized(L2Weights, UsValues, ThemValues);
 		
 		eval /= QA;
 		eval += network.outputBiases[chooseOutputBucket(pieces_count)];
