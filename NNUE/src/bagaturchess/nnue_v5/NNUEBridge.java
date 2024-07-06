@@ -15,6 +15,11 @@ public class NNUEBridge {
         System.load(dll.getAbsolutePath());
     }
 
+	static {
+		
+		NNUEBridge.init("nn-b1a57edbea57.nnue", "nn-baff1ede1f90.nnue");
+	}
+	
     public static native void init(String bigNet, String smallNet);
 
     public static native int evalFen(String fen);

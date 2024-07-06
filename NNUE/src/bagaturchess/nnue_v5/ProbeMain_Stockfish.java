@@ -13,10 +13,6 @@ public class ProbeMain_Stockfish {
 	
 	public static void main(String[] args) {
 		
-		
-		NNUEBridge.init("nn-b1a57edbea57.nnue", "nn-baff1ede1f90.nnue");
-		
-		
 		String fen0 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 		String fen1 = "4kq2/8/8/8/8/8/8/2QK4 w - - 0 1";
 		String fen2 = "4k3/8/8/8/8/8/8/2QK4 w - - 0 1";

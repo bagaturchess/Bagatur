@@ -17,12 +17,6 @@ public class NNUEEvaluator extends BaseEvaluator {
 	private IBitBoard bitboard;
 	
 	private NNUEProbeUtils.Input input;
-
-
-	static {
-		
-		NNUEBridge.init("nn-b1a57edbea57.nnue", "nn-baff1ede1f90.nnue");
-	}
 	
 	
 	NNUEEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
