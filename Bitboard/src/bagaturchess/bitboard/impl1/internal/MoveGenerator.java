@@ -268,8 +268,6 @@ public final class MoveGenerator {
 	
 	public int getHHScore(final int color, final int fromToIndex, final int pieceType, final int toIndex, final int parentMove) {
 		
-		int value1 = (int) (MOVE_SCORE_SCALE * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex]);
-		int value2 = (int) (MOVE_SCORE_SCALE * HH_MOVES1[color][pieceType][toIndex] / BF_MOVES1[color][pieceType][toIndex]);
 		int value3 = (int) (USE_ContinuationHistory ? getContinuationHistoryScore(color, pieceType, toIndex, parentMove) : 0);
 		
 		if (USE_ContinuationHistory) {
@@ -277,7 +275,10 @@ public final class MoveGenerator {
 			return value3;
 			
 		} else {
-			
+
+			int value1 = (int) (MOVE_SCORE_SCALE * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex]);
+			int value2 = (int) (MOVE_SCORE_SCALE * HH_MOVES1[color][pieceType][toIndex] / BF_MOVES1[color][pieceType][toIndex]);
+
 			return Math.max(value1, Math.max(value2, value3));
 		}
 		
