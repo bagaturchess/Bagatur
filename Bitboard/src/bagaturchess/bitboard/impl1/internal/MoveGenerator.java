@@ -681,7 +681,7 @@ public final class MoveGenerator {
 		int killer1Move = getKiller1(cb.colorToMove, ply);
 		int killer2Move = getKiller2(cb.colorToMove, ply);
 		int counterMove1 = getCounter1(cb.colorToMove, parentMove);
-		//int counterMove2 = getCounter2(cb.colorToMove, parentMove);
+		int counterMove2 = getCounter2(cb.colorToMove, parentMove);
 		
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
 			
@@ -703,6 +703,10 @@ public final class MoveGenerator {
 				
 				moveScores[j] = 3000 * 100;
 				
+			} else if (counterMove2 == cur_move) {
+				
+				moveScores[j] = 2000 * 100;
+				
 			} else if (MoveUtil.isQuiet(cur_move)) {
 				
 				moveScores[j] = getHHScore(cb.colorToMove, MoveUtil.getFromToIndex(cur_move), MoveUtil.getSourcePieceIndex(cur_move), MoveUtil.getToIndex(cur_move), parentMove);
@@ -711,7 +715,7 @@ public final class MoveGenerator {
 				
 				if (SEEUtil.getSeeCaptureScore(cb, cur_move) >= 0) {
 				
-					moveScores[j] = 5000 + 100 * (MoveUtil.getAttackedPieceIndex(cur_move) * 6 - MoveUtil.getSourcePieceIndex(cur_move));
+					moveScores[j] = 7000 * 100 + 100 * (MoveUtil.getAttackedPieceIndex(cur_move) * 6 - MoveUtil.getSourcePieceIndex(cur_move));
 					
 				} else {
 					
