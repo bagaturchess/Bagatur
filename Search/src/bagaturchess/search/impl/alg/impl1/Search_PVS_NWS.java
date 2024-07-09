@@ -368,9 +368,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getBitboard().makeMoveBackward(move);
 			
 			
-			if (MoveUtil.isQuiet(move) && cb.checkingPieces == 0) {
+			if (MoveUtil.isQuiet(move)) {
 				
-				moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
+				moveGen.addBFValue(cb.checkingPieces == 0 ? 0 : 1, cb.colorToMove, move, parentMove, depth);
 			}
 			
 			
@@ -391,10 +391,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (alpha >= beta) {
 					
-					if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {
+					if (MoveUtil.isQuiet(bestMove)) {
 						moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
 						moveGen.addKillerMove(cb.colorToMove, bestMove, ply);
-						moveGen.addHHValue(cb.colorToMove, bestMove, parentMove, depth);
+						moveGen.addHHValue(cb.checkingPieces == 0 ? 0 : 1, cb.colorToMove, bestMove, parentMove, depth);
 					}
 					
 					break;
@@ -905,7 +905,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (!env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
 						
-						moveGen.setHHScores(cb.colorToMove, parentMove);
+						moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 					}
 				}
 				
@@ -927,7 +927,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					moveGen.addMove(killer1Move);
 					
-					moveGen.setHHScores(cb.colorToMove, parentMove);
+					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 				}
 				
 				break;
@@ -937,7 +937,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
 				if (killer2Move != 0 && killer2Move != killer1Move && killer2Move != ttMove && killer2Move != counterMove1 && killer2Move != counterMove2 && cb.isValidMove(killer2Move)) {
 					moveGen.addMove(killer2Move);
-					moveGen.setHHScores(cb.colorToMove, parentMove);
+					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 				}
 				
 				break;
@@ -949,7 +949,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
 					
 					moveGen.addMove(counterMove1);
-					moveGen.setHHScores(cb.colorToMove, parentMove);
+					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 				}
 				
 				break;
@@ -959,7 +959,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				counterMove2 = moveGen.getCounter2(cb.colorToMove, parentMove);
 				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
 					moveGen.addMove(counterMove2);
-					moveGen.setHHScores(cb.colorToMove, parentMove);
+					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 				}
 				
 				break;
@@ -976,7 +976,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			case PHASE_QUIET:
 				
 				moveGen.generateMoves(cb);
-				moveGen.setHHScores(cb.colorToMove, parentMove);
+				moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 				moveGen.sort();
 				
 				break;
@@ -1210,9 +1210,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveBackward(move);
 				
 				
-				if (MoveUtil.isQuiet(move) && cb.checkingPieces == 0) {
+				if (MoveUtil.isQuiet(move)) {
 					
-					moveGen.addBFValue(cb.colorToMove, move, parentMove, depth);
+					moveGen.addBFValue(wasInCheck ? 1 : 0, cb.colorToMove, move, parentMove, depth);
 				}
 				
 				
@@ -1233,10 +1233,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (alpha >= beta) {
 						
-						if (MoveUtil.isQuiet(bestMove) && cb.checkingPieces == 0) {
+						if (MoveUtil.isQuiet(bestMove)) {
 							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
 							moveGen.addKillerMove(cb.colorToMove, bestMove, ply);
-							moveGen.addHHValue(cb.colorToMove, bestMove, parentMove, depth);
+							moveGen.addHHValue(wasInCheck ? 1 : 0, cb.colorToMove, bestMove, parentMove, depth);
 						}
 						
 						phase += 379;

@@ -73,8 +73,8 @@ public final class MoveGenerator {
 	private final long[][][] HH_MOVES1 							= new long[2][7][64];
 	private final long[][][] BF_MOVES1 							= new long[2][7][64];
 	
-	private final ContinuationHistory[] HH_ContinuationHistory 	= new ContinuationHistory[2];
-	private final ContinuationHistory[] BF_ContinuationHistory 	= new ContinuationHistory[2];
+	private final ContinuationHistory[][] HH_ContinuationHistory 	= new ContinuationHistory[2][2];
+	private final ContinuationHistory[][] BF_ContinuationHistory 	= new ContinuationHistory[2][2];
 	
 	
 	private long counter_sorting;
@@ -123,11 +123,15 @@ public final class MoveGenerator {
 		
 		if (USE_ContinuationHistory) {
 			
-			HH_ContinuationHistory[WHITE] = new ContinuationHistory();
-			HH_ContinuationHistory[BLACK] = new ContinuationHistory();
+			HH_ContinuationHistory[0][WHITE] = new ContinuationHistory();
+			HH_ContinuationHistory[1][WHITE] = new ContinuationHistory();
+			HH_ContinuationHistory[0][BLACK] = new ContinuationHistory();
+			HH_ContinuationHistory[1][BLACK] = new ContinuationHistory();
 			
-			BF_ContinuationHistory[WHITE] = new ContinuationHistory();
-			BF_ContinuationHistory[BLACK] = new ContinuationHistory();
+			BF_ContinuationHistory[0][WHITE] = new ContinuationHistory();
+			BF_ContinuationHistory[1][WHITE] = new ContinuationHistory();
+			BF_ContinuationHistory[0][BLACK] = new ContinuationHistory();
+			BF_ContinuationHistory[1][BLACK] = new ContinuationHistory();
 		}
 		
 		
@@ -252,23 +256,23 @@ public final class MoveGenerator {
 	}
 	
 	
-	public void addHHValue(final int color, final int move, final int parentMove, final int depth) {
+	public void addHHValue(final int inCheck, final int color, final int move, final int parentMove, final int depth) {
 		HH_MOVES[color][MoveUtil.getFromToIndex(move)] += depth * depth;
 		HH_MOVES1[color][MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
-		if (USE_ContinuationHistory) HH_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
+		if (USE_ContinuationHistory) HH_ContinuationHistory[inCheck][color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
 	}
 	
 	
-	public void addBFValue(final int color, final int move, final int parentMove, final int depth) {
+	public void addBFValue(final int inCheck, final int color, final int move, final int parentMove, final int depth) {
 		BF_MOVES[color][MoveUtil.getFromToIndex(move)] += depth * depth;
 		BF_MOVES1[color][MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
-		if (USE_ContinuationHistory) BF_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
+		if (USE_ContinuationHistory) BF_ContinuationHistory[inCheck][color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
 	}
 	
 	
-	public int getHHScore(final int color, final int fromToIndex, final int pieceType, final int toIndex, final int parentMove) {
+	public int getHHScore(final int inCheck, final int color, final int fromToIndex, final int pieceType, final int toIndex, final int parentMove) {
 		
-		int value3 = (int) (USE_ContinuationHistory ? getContinuationHistoryScore(color, pieceType, toIndex, parentMove) : 0);
+		int value3 = (int) (USE_ContinuationHistory ? getContinuationHistoryScore(inCheck, color, pieceType, toIndex, parentMove) : 0);
 		
 		if (USE_ContinuationHistory) {
 			
@@ -286,9 +290,9 @@ public final class MoveGenerator {
 	}
 	
 	
-	private long getContinuationHistoryScore(final int color, final int pieceType, final int toIndex, final int parentMove) {
-		return MOVE_SCORE_SCALE * HH_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[pieceType][toIndex] / 
-				BF_ContinuationHistory[color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[pieceType][toIndex];
+	private long getContinuationHistoryScore(final int inCheck, final int color, final int pieceType, final int toIndex, final int parentMove) {
+		return MOVE_SCORE_SCALE * HH_ContinuationHistory[inCheck][color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[pieceType][toIndex] / 
+				BF_ContinuationHistory[inCheck][color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[pieceType][toIndex];
 	}
 	
 	
@@ -645,7 +649,7 @@ public final class MoveGenerator {
 	}
 	
 	
-	public void setHHScores(int colorToMove, final int parentMove) {
+	public void setHHScores(final int inCheck, final int colorToMove, final int parentMove) {
 		
 		for (int j = nextToMove[currentPly]; j < nextToGenerate[currentPly]; j++) {
 			
@@ -654,7 +658,7 @@ public final class MoveGenerator {
 			int from_to_index = MoveUtil.getFromToIndex(move);
 			
 			//long score = 0;
-			long score = getHHScore(colorToMove, from_to_index, MoveUtil.getSourcePieceIndex(move), MoveUtil.getToIndex(move), parentMove);
+			long score = getHHScore(inCheck, colorToMove, from_to_index, MoveUtil.getSourcePieceIndex(move), MoveUtil.getToIndex(move), parentMove);
 			
 			/**
 			 * Each particular move's score is calculated by the ration between the beta cutoffs occurrences after this move divided by the number of all occurrences of the move.
@@ -709,7 +713,7 @@ public final class MoveGenerator {
 				
 			} else if (MoveUtil.isQuiet(cur_move)) {
 				
-				moveScores[j] = getHHScore(cb.colorToMove, MoveUtil.getFromToIndex(cur_move), MoveUtil.getSourcePieceIndex(cur_move), MoveUtil.getToIndex(cur_move), parentMove);
+				moveScores[j] = getHHScore(cb.checkingPieces == 0 ? 0 : 1, cb.colorToMove, MoveUtil.getFromToIndex(cur_move), MoveUtil.getSourcePieceIndex(cur_move), MoveUtil.getToIndex(cur_move), parentMove);
 				
 			} else {
 				
@@ -753,7 +757,7 @@ public final class MoveGenerator {
 		final int end_index = nextToGenerate[currentPly] - 1;
 		
 		//In order to increase the effect of nondeterminism, ensure first ordering is randomized.
-		if (counter_sorting == 0 || counter_sorting % 2 == 0) {
+		if (counter_sorting == 0 || counter_sorting % 10 == 0) {
 				
 			randomize(moveScores, moves, start_index, end_index);
 		}

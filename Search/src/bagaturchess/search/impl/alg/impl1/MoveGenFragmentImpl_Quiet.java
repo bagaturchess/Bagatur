@@ -37,7 +37,7 @@ public class MoveGenFragmentImpl_Quiet extends MoveGenFragmentImpl_Base {
 	public void genMoves(int parentMove, int ply, int depth, boolean dummy) {
 		if (!dummy) {
 			gen.generateMoves(cb);
-			gen.setHHScores(cb.colorToMove, parentMove);
+			gen.setHHScores(-1, cb.colorToMove, parentMove);
 			gen.sort();
 			count_move_total(gen.getCountMoves(), depth);
 		}
