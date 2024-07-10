@@ -779,27 +779,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			eval = eval(evaluator, ply, alpha_org, beta, isPv);
 			
 			
-			/*if (ttValue != IEvaluator.MIN_EVAL) {
-				
-				if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
-					
-					if (ttFlag == ITTEntry.FLAG_EXACT
-							|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
-							|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
-						) {
-						
-						eval = ttValue;
-					}
-				}
-			}*/
-			
-			
-			/*if (egtb_eval != ISearch.MIN && egtb_eval > eval) {
-				
-				eval = egtb_eval;
-			}*/
-			
-			
 			//Reduce depth in cases where the probability of PV node
 			//1. Is very low (When the node is not in TT) or
 			//2. PV node is already a fact for some reason (There is a TB hit search could rely on, because it improves the PV score).
@@ -1674,21 +1653,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
-		
-		
-		if (ttValue != IEvaluator.MIN_EVAL) {
-			
-			if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
-				
-				if (ttFlag == ITTEntry.FLAG_EXACT
-						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
-						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
-					) {
-					
-					eval = ttValue;
-				}
-			}
-		}
 		
 		
 		if (eval >= beta) {
