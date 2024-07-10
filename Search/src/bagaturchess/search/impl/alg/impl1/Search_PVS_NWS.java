@@ -73,7 +73,10 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int[] RAZORING_MARGIN 						= { 0, 240, 280, 300 };
 	private static final int[] FUTILITY_MARGIN 						= { 0, 80, 170, 270, 380, 500, 630 };
 	private static final int FUTILITY_MARGIN_Q_SEARCH_ATTACKS 		= 35;
-	private static final VarStatistic LAZY_EVAL_MARGIN 			= new VarStatistic();
+	
+	private static final int MULTICUT_MOVES_COUNT 					= 2;
+	
+	private static final VarStatistic LAZY_EVAL_MARGIN 				= new VarStatistic();
 	
 	private static final int[][] LMR_TABLE 							= new int[64][64];
 	
@@ -526,7 +529,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		depth += extensions(cb, moveGen, ply);
 		
 		
-		if (depth == 0) {
+		if (depth <= 0) {
 			
 			int qeval = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha, beta, ply, isPv);
 			
@@ -877,6 +880,30 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
         
+		boolean extend_best_move = false;
+		
+		//TODO: Test it again
+		/*if (!isPv && depth >= 4) {
+			
+			int mc_moves_count = mc_search(mediator, info, pvman, evaluator, cb, moveGen, ply, depth, alpha, beta, isPv, initialMaxDepth, ttMove);
+			
+			if (mc_moves_count >= MULTICUT_MOVES_COUNT) {
+				
+				node.bestmove = 0;
+				node.eval = beta;
+				node.leaf = true;
+				
+				return node.eval;
+			}
+			
+			if (mc_moves_count == 1
+					&& cb.checkingPieces == 0
+				) {
+				
+				//TODO depth++ maybe, not only first move(s)
+				extend_best_move = true;
+			}	
+		}*/
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
 		
@@ -890,6 +917,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		int counterMove2 = 0;
 		int movesPerformed_attacks = 0;
 		int movesPerformed_quiet = 0;
+		
+		int new_depth = depth;
 		
 		moveGen.startPly();
 		int phase = PHASE_TT;
@@ -1119,12 +1148,14 @@ public class Search_PVS_NWS extends SearchImpl {
 				*/
 				
 				
+				new_depth = (bestScore == ISearch.MIN && extend_best_move) ? depth + 1 : depth;
+				
 				boolean LMR_allowed = moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse);
 				
 				//System.out.println("lmr_allowed=" + lmr_allowed + ", moveGen.getLMR_Rate(cb.colorToMoveInverse, move)=" + moveGen.getLMR_Rate(cb.colorToMoveInverse, move) + ", moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse)=" + moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse));
 				
 				
-				boolean doLMR = depth >= 2
+				boolean doLMR = new_depth >= 2
 						//&& depth >= Math.max(2, maxdepth / 2) //Many other heuristics are working under shallow depths
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						//&& !wasInCheck
@@ -1150,14 +1181,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					//lmr_done is between 0 and 0.5, because the first move is never reduced by LMR.
 					//System.out.println("Search branching factor: " + 1f / (lmr_done / (float) lmr_all));
 					
-					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
+					reduction = LMR_TABLE[Math.min(new_depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
 					
 					if (!isPv) {
 						
 						reduction += 1;
 					}
 					
-					reduction = Math.min(depth - 1, Math.max(reduction, 1));
+					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 					
 				} else {
 					
@@ -1175,28 +1206,28 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
 						
-						moveGen.addLMR_All(cb.colorToMoveInverse, move, depth);
+						moveGen.addLMR_All(cb.colorToMoveInverse, move, new_depth);
 												
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, new_depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 						
 						if (score > alpha) {
 							
-							moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
+							moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, new_depth);
 							
 						} else {
 							
-							moveGen.addLMR_BelowAlpha(cb.colorToMoveInverse, move, depth);
+							moveGen.addLMR_BelowAlpha(cb.colorToMoveInverse, move, new_depth);
 						}
 					}
 					
 					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
 						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, new_depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
 					
 					if (score > alpha) {
 						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, new_depth - 1, -beta, -alpha, isPv, initialMaxDepth);
 					}
 					
 				} catch(SearchInterruptedException sie) {
@@ -1212,7 +1243,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (MoveUtil.isQuiet(move)) {
 					
-					moveGen.addBFValue(wasInCheck ? 1 : 0, cb.colorToMove, move, parentMove, depth);
+					moveGen.addBFValue(wasInCheck ? 1 : 0, cb.colorToMove, move, parentMove, new_depth);
 				}
 				
 				
@@ -1236,7 +1267,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (MoveUtil.isQuiet(bestMove)) {
 							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
 							moveGen.addKillerMove(cb.colorToMove, bestMove, ply);
-							moveGen.addHHValue(wasInCheck ? 1 : 0, cb.colorToMove, bestMove, parentMove, depth);
+							moveGen.addHHValue(wasInCheck ? 1 : 0, cb.colorToMove, bestMove, parentMove, new_depth);
 						}
 						
 						phase += 379;
@@ -1295,13 +1326,272 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			if (!SearchUtils.isMateVal(node.eval)) {
 				
-				env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
+				env.getTPT().put(hashkey, new_depth, node.eval, alpha_org, beta, node.bestmove);
 			}
 		}
 		
 		//validatePV(node, evaluator, node.eval, ply, depth, isPv, false);
 		
 		return node.eval;
+	}
+
+
+	private int mc_search(ISearchMediator mediator, ISearchInfo info,
+			PVManager pvman, IEvaluator evaluator, ChessBoard cb,
+			MoveGenerator moveGen, final int ply, int depth, int alpha,
+			int beta, boolean isPv, int initialMaxDepth, int ttMove) {
+		
+		//https://www.chessprogramming.org/Multi-Cut
+		// M is the number of moves to look at when checking for mc-prune.
+		// C is the number of cutoffs to cause an mc-prune, C < M.
+		// R is the search depth reduction for mc-prune searches.
+		/*int zwSearch( int beta, int depth, bool cut) {
+		   if ( depth <= 0 ) return quiesce( beta-1, beta );
+
+		   if ( depth >= R && cut ) {
+		      int c = 0;
+		      for ( first M moves )
+		         score = -zwSearch( 1-beta, depth-1-R, !cut);
+		         if ( score >= beta ) {
+		            if ( ++c == C )
+		               return beta; // mc-prune
+		         }
+		      }
+		   }
+		   for ( all moves ) {
+		      score = -zwSearch( 1-beta, depth-1, !cut);
+		      if ( score  >= beta )
+		         return beta;
+		   }
+		   return beta - 1;
+		}*/
+		
+		final int M = 5;
+		final int C = MULTICUT_MOVES_COUNT;
+		final int R = depth / 2;
+		
+		depth = depth - R;
+		
+		final boolean wasInCheck = cb.checkingPieces != 0;
+		
+		final int parentMove = moveGen.previous();
+		
+		int killer1Move = 0;
+		int killer2Move = 0;
+		int counterMove1 = 0;
+		int counterMove2 = 0;
+		int movesPerformed_attacks = 0;
+		int movesPerformed_quiet = 0;
+		
+		int moves_better_than_beta = 0;
+		int all_moves = 0;
+		
+		moveGen.startPly();
+		
+		int phase = PHASE_TT;
+		while (phase <= PHASE_QUIET) {
+			
+			switch (phase) {
+			
+			case PHASE_TT:
+				
+				if (ttMove != 0 && cb.isValidMove(ttMove)) {
+					
+					moveGen.addMove(ttMove);
+					
+					if (!env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
+						
+						moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
+					}
+				}
+				
+				break;
+				
+			case PHASE_ATTACKING_GOOD:
+				
+				moveGen.generateAttacks(cb);
+				moveGen.setMVVLVAScores(cb);
+				moveGen.sort();
+				
+				break;
+				
+			case PHASE_KILLER_1:
+				
+				killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
+				
+				if (killer1Move != 0 && killer1Move != ttMove && killer1Move != counterMove1 && killer1Move != counterMove2 && cb.isValidMove(killer1Move)) {
+					
+					moveGen.addMove(killer1Move);
+					
+					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
+				}
+				
+				break;
+				
+			case PHASE_KILLER_2:
+				
+				killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
+				if (killer2Move != 0 && killer2Move != killer1Move && killer2Move != ttMove && killer2Move != counterMove1 && killer2Move != counterMove2 && cb.isValidMove(killer2Move)) {
+					moveGen.addMove(killer2Move);
+					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
+				}
+				
+				break;
+			
+			case PHASE_COUNTER_1:
+				
+				counterMove1 = moveGen.getCounter1(cb.colorToMove, parentMove);
+				
+				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
+					
+					moveGen.addMove(counterMove1);
+					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
+				}
+				
+				break;
+				
+			case PHASE_COUNTER_2:
+				
+				counterMove2 = moveGen.getCounter2(cb.colorToMove, parentMove);
+				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
+					moveGen.addMove(counterMove2);
+					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
+				}
+				
+				break;
+			
+			
+			case PHASE_ATTACKING_BAD:
+				
+				moveGen.generateAttacks(cb);
+				moveGen.setMVVLVAScores(cb);
+				moveGen.sort();
+				
+				break;
+				
+			case PHASE_QUIET:
+				
+				moveGen.generateMoves(cb);
+				moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
+				moveGen.sort();
+				
+				break;
+			}
+			
+			
+			while (moveGen.hasNext()) {
+				
+				final int move = moveGen.next();
+				
+				if (!cb.isLegal(move)) {
+					
+					continue;
+				}
+				
+				if (phase == PHASE_ATTACKING_GOOD) {
+					if (SEEUtil.getSeeCaptureScore(cb, move) < 0) {
+						continue;
+					}
+				}
+				
+				if (phase == PHASE_ATTACKING_BAD) {
+					if (SEEUtil.getSeeCaptureScore(cb, move) >= 0) {
+						continue;
+					}
+				}
+				
+				if (phase == PHASE_QUIET) {
+					if (move == ttMove || move == killer1Move || move == killer2Move || move == counterMove1 || move == counterMove2) {
+						continue;
+					}
+				} else if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
+					if (move == ttMove) {
+						continue;
+					}
+				}	
+				
+				
+				all_moves++;
+				
+				
+				env.getBitboard().makeMoveForward(move);
+				
+				
+				if (MoveUtil.isQuiet(move)) {
+					movesPerformed_quiet++;
+				} else {
+					movesPerformed_attacks++;
+				}
+				
+				boolean LMR_allowed = moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse);
+				
+				boolean doLMR = depth >= 2
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& phase == PHASE_QUIET
+						;
+						
+				int reduction = 1;
+				
+				if (doLMR &&
+						(!EngineConstants.ENABLE_LMR_STATS_DECISION
+								|| (EngineConstants.ENABLE_LMR_STATS_DECISION && LMR_allowed)
+						)
+					) {
+					
+					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
+					
+					if (!isPv) {
+						
+						reduction += 1;
+					}
+					
+					reduction = Math.min(depth - 1, Math.max(reduction, 1));
+					
+				}
+				
+				int score = alpha + 1;
+				
+				if (EngineConstants.ENABLE_LMR && reduction != 1) {
+											
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
+				}
+				
+				if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
+					
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+				}
+				
+				if (score > alpha) {
+					
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
+				}
+				
+				env.getBitboard().makeMoveBackward(move);
+						
+				
+				if (score >= beta) {
+						
+					moves_better_than_beta++;
+						
+					if (moves_better_than_beta >= C) {
+							
+						break;
+					}
+				}
+				
+				if (all_moves >= M) {
+					
+					break;
+				}
+			}
+			
+			phase++;
+		}
+		
+		moveGen.endPly();
+		
+		
+		return moves_better_than_beta;
 	}
 	
 	
