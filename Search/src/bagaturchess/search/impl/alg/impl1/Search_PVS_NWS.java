@@ -895,7 +895,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (mc_moves_count == 1) {
 				
-				//TODO: maybe extend not by depth++, not only the first move(s)
+				//TODO: maybe extend node by depth++, not only the first move(s)
 				//extend_best_move = true;
 			}	
 		}*/
