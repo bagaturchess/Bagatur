@@ -526,7 +526,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		depth += extensions(cb, moveGen, ply);
+		//depth += extensions(cb, moveGen, ply);
 		
 		
 		if (depth <= 0) {
