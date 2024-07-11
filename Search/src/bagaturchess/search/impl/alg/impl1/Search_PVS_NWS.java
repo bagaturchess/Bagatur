@@ -68,12 +68,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_ATTACKING_BAD 					= 6;
 	private static final int PHASE_QUIET 							= 7;
 	
-	
-	private static final int[] STATIC_NULLMOVE_MARGIN 				= { 0, 60, 130, 210, 300, 400, 510 };
-	private static final int[] RAZORING_MARGIN 						= { 0, 240, 280, 300 };
-	private static final int[] FUTILITY_MARGIN 						= { 0, 80, 170, 270, 380, 500, 630 };
-	//private static final int FUTILITY_MARGIN_Q_SEARCH_ATTACKS 		= 35;
-	
 	private static final int MULTICUT_MOVES_COUNT 					= 2;
 	
 	private static final VarStatistic LAZY_EVAL_MARGIN 				= new VarStatistic();
@@ -806,9 +800,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (eval >= beta) {
 				
 				
-				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < STATIC_NULLMOVE_MARGIN.length) {
+				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < 10) {
 					
-					if (eval - STATIC_NULLMOVE_MARGIN[depth] >= beta) {
+					if (eval - depth * 60 >= beta) {
 						
 						if (egtb_eval == ISearch.MIN || egtb_eval >= eval) {
 							
@@ -851,13 +845,15 @@ public class Search_PVS_NWS extends SearchImpl {
 			} else if (eval <= alpha && !SearchUtils.isMateVal(alpha)) {
 				
 				
-				if (EngineConstants.ENABLE_RAZORING && depth < RAZORING_MARGIN.length) {
+				if (EngineConstants.ENABLE_RAZORING && depth < 5) {
 					
-					if (eval + RAZORING_MARGIN[depth] < alpha) {
+					int razoringMargin = 240 * depth;
+					
+					if (eval + razoringMargin < alpha) {
 						
-						int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply, isPv);
+						int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha - razoringMargin - 1, alpha - razoringMargin, ply, isPv);
 						
-						if (score + RAZORING_MARGIN[depth] <= alpha) {
+						if (score < alpha - razoringMargin) {
 							
 							if (egtb_eval == ISearch.MIN || egtb_eval <= score) {
 								
@@ -876,7 +872,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean extend_best_move = false;
 		
 		//TODO: Test it again
-		/*if (depth >= 4
+		/*if (depth >= 1
 				&& isTTLowerBoundOrExact && ttValue >= beta
 				&& isTTDepthEnoughForSingularExtension
 				&& cb.checkingPieces == 0
@@ -1061,7 +1057,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& depth <= 7
 						&& !wasInCheck
 						&& movesPerformed_attacks + movesPerformed_quiet > 0
-						&& !cb.isDiscoveredMove(MoveUtil.getFromIndex(move))
 						&& !SearchUtils.isMateVal(alpha)
 						&& !SearchUtils.isMateVal(beta)
 					) {
@@ -1075,32 +1070,21 @@ public class Search_PVS_NWS extends SearchImpl {
 						) {
 						
 						if (EngineConstants.ENABLE_LMP
-								&& movesPerformed_attacks + movesPerformed_quiet >= depth * 3 + 3
+								&& movesPerformed_attacks + movesPerformed_quiet >= 3 + depth * depth
 							) {
 							
 							continue;
 						}
 						
-						if (eval != ISearch.MIN) { //Is set
+						if (eval != ISearch.MIN) { //eval is set
 							
-							/*if (eval == ISearch.MIN) {
+							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								throw new IllegalStateException("eval == ISearch.MIN");
-							}*/
-							
-							
-							if (EngineConstants.ENABLE_FUTILITY_PRUNING && depth < FUTILITY_MARGIN.length) {
-								
-								if (eval + FUTILITY_MARGIN[depth] <= alpha) {
+								if (eval + depth * 80 <= alpha) {
 									
 									continue;
 								}
 							}
-							
-							/*if (eval + 4 * getTrustWindow(mediator, depth) <= alpha) {
-								continue;
-							}
-							*/
 						}
 						
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
@@ -1363,11 +1347,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		   return beta - 1;
 		}*/
 		
-		final int M = 5;
+		final int M = 8;
 		final int C = MULTICUT_MOVES_COUNT;
 		final int R = depth / 2;
 		
-		depth = depth - R;
+		depth -= R;
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
 		
