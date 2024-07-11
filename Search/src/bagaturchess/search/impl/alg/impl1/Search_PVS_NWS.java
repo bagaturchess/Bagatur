@@ -72,7 +72,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int[] STATIC_NULLMOVE_MARGIN 				= { 0, 60, 130, 210, 300, 400, 510 };
 	private static final int[] RAZORING_MARGIN 						= { 0, 240, 280, 300 };
 	private static final int[] FUTILITY_MARGIN 						= { 0, 80, 170, 270, 380, 500, 630 };
-	private static final int FUTILITY_MARGIN_Q_SEARCH_ATTACKS 		= 35;
+	//private static final int FUTILITY_MARGIN_Q_SEARCH_ATTACKS 		= 35;
 	
 	private static final int MULTICUT_MOVES_COUNT 					= 2;
 	
@@ -239,7 +239,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					int tpt_depth = tt_entries_per_ply[ply].getDepth();
 					
-					if (tpt_depth >= depth) {
+					if (!isPv && tpt_depth >= depth) {
 						
 						if (ttFlag == ITTEntry.FLAG_EXACT) {
 							
@@ -549,7 +549,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int ttFlag 									= -1;
 		int ttValue 								= IEvaluator.MIN_EVAL;
 		
-		boolean isTTLowerBound 						= false;
+		boolean isTTLowerBoundOrExact				= false;
 		boolean isTTDepthEnoughForSingularExtension = false;
 			
 		if (env.getTPT() != null) {
@@ -564,12 +564,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int tpt_depth = tt_entries_per_ply[ply].getDepth();
 				
-				isTTLowerBound = ttFlag == ITTEntry.FLAG_LOWER;
-				isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
+				isTTLowerBoundOrExact = ttFlag == ITTEntry.FLAG_LOWER || ttFlag == ITTEntry.FLAG_EXACT;
+				isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth - 4;
 				
 				if (getSearchConfig().isOther_UseTPTScores()) {
 					
-					if (tpt_depth >= depth) {
+					if (!isPv && tpt_depth >= depth) {
 						
 						if (ttFlag == ITTEntry.FLAG_EXACT) {
 							
@@ -779,6 +779,21 @@ public class Search_PVS_NWS extends SearchImpl {
 			eval = eval(evaluator, ply, alpha_org, beta, isPv);
 			
 			
+			if (ttValue != IEvaluator.MIN_EVAL) {
+				
+				if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
+					
+					if (ttFlag == ITTEntry.FLAG_EXACT
+							|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
+							|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
+						) {
+						
+						eval = ttValue;
+					}
+				}
+			}
+			
+			
 			//Reduce depth in cases where the probability of PV node
 			//1. Is very low (When the node is not in TT) or
 			//2. PV node is already a fact for some reason (There is a TB hit search could rely on, because it improves the PV score).
@@ -840,7 +855,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (eval + RAZORING_MARGIN[depth] < alpha) {
 						
-						
 						int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha - RAZORING_MARGIN[depth], alpha - RAZORING_MARGIN[depth] + 1, ply, isPv);
 						
 						if (score + RAZORING_MARGIN[depth] <= alpha) {
@@ -862,24 +876,26 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean extend_best_move = false;
 		
 		//TODO: Test it again
-		/*if (!isPv && depth >= 4) {
+		/*if (depth >= 4
+				&& isTTLowerBoundOrExact && ttValue >= beta
+				&& isTTDepthEnoughForSingularExtension
+				&& cb.checkingPieces == 0
+			) {
 			
 			int mc_moves_count = mc_search(mediator, info, pvman, evaluator, cb, moveGen, ply, depth, alpha, beta, isPv, initialMaxDepth, ttMove);
 			
-			if (mc_moves_count >= MULTICUT_MOVES_COUNT) {
+			if (!isPv && mc_moves_count >= MULTICUT_MOVES_COUNT) {
 				
 				node.bestmove = 0;
-				node.eval = beta;
+				node.eval = ttValue;
 				node.leaf = true;
 				
 				return node.eval;
 			}
 			
-			if (mc_moves_count == 1
-					&& cb.checkingPieces == 0
-				) {
+			if (mc_moves_count == 1) {
 				
-				//TODO depth++ maybe, not only first move(s)
+				//TODO depth++ maybe, not only the first move(s)
 				extend_best_move = true;
 			}	
 		}*/
@@ -1614,7 +1630,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				ttValue = tt_entries_per_ply[ply].getEval();
 				ttFlag = tt_entries_per_ply[ply].getFlag();
 				
-				if (getSearchConfig().isOther_UseTPTScores()) {
+				if (!isPv && getSearchConfig().isOther_UseTPTScores()) {
 					
 					if (ttFlag == ITTEntry.FLAG_EXACT) {
 						
@@ -1655,6 +1671,21 @@ public class Search_PVS_NWS extends SearchImpl {
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		
 		
+		if (ttValue != IEvaluator.MIN_EVAL) {
+			
+			if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
+				
+				if (ttFlag == ITTEntry.FLAG_EXACT
+						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
+						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
+					) {
+					
+					eval = ttValue;
+				}
+			}
+		}
+		
+		
 		if (eval >= beta) {
 			
 	    	node.eval = eval;
@@ -1663,17 +1694,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		int material_queen = (int) Math.max(getEnv().getBitboard().getBoardConfig().getMaterial_QUEEN_O(), getEnv().getBitboard().getBoardConfig().getMaterial_QUEEN_E());
+		/*int material_queen = (int) Math.max(getEnv().getBitboard().getBoardConfig().getMaterial_QUEEN_O(), getEnv().getBitboard().getBoardConfig().getMaterial_QUEEN_E());
 		
 		if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + material_queen < alpha) {
 			
 	    	node.eval = eval;
 			
 	    	return node.eval;
-		}
+		}*/
 		
-		
-		final int alphaOrig = alpha;
+		int alphaOrig = alpha;
 		
 		alpha = Math.max(alpha, eval);
 		
@@ -1687,18 +1717,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		while (phase <= PHASE_ATTACKING_GOOD) {
 			
 			switch (phase) {
-			
-				/*case PHASE_TT:
-					
-					if (ttMove != 0
-							//&& getEnv().getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)
-							&& cb.isValidMove(ttMove)) {
-						
-						moveGen.addMove(ttMove);
-					}
-					
-					break;
-				*/
 			
 				case PHASE_ATTACKING_GOOD:
 					
@@ -1720,25 +1738,19 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				int see = SEEUtil.getSeeCaptureScore(cb, move);
+				
 				if (see < 0) {
+					
 					continue;
 				}
 				
-				/*if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
-					
-					int material_gain = getEnv().getBitboard().getBaseEvaluation().getMaterialGain(move);
-					
-					if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + material_gain < alpha) {
-						
-						continue;
-					}
-				}*/
 				
 				env.getBitboard().makeMoveForward(move);
 				
 				final int score = -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -alpha, ply + 1, isPv);
 				
 				env.getBitboard().makeMoveBackward(move);
+				
 				
 				if (score > bestScore) {
 					
