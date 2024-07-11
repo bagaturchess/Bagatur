@@ -895,8 +895,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (mc_moves_count == 1) {
 				
-				//TODO depth++ maybe, not only the first move(s)
-				extend_best_move = true;
+				//TODO: maybe extend not by depth++, not only the first move(s)
+				//extend_best_move = true;
 			}	
 		}*/
 		
@@ -1337,9 +1337,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			int beta, boolean isPv, int initialMaxDepth, int ttMove) {
 		
 		//https://www.chessprogramming.org/Multi-Cut
+		
 		// M is the number of moves to look at when checking for mc-prune.
 		// C is the number of cutoffs to cause an mc-prune, C < M.
 		// R is the search depth reduction for mc-prune searches.
+		
 		/*int zwSearch( int beta, int depth, bool cut) {
 		   if ( depth <= 0 ) return quiesce( beta-1, beta );
 
@@ -1375,8 +1377,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		int killer2Move = 0;
 		int counterMove1 = 0;
 		int counterMove2 = 0;
-		int movesPerformed_attacks = 0;
-		int movesPerformed_quiet = 0;
 		
 		int moves_better_than_beta = 0;
 		int all_moves = 0;
@@ -1511,17 +1511,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				env.getBitboard().makeMoveForward(move);
 				
-				
-				if (MoveUtil.isQuiet(move)) {
-					movesPerformed_quiet++;
-				} else {
-					movesPerformed_attacks++;
-				}
-				
 				boolean LMR_allowed = moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse);
 				
 				boolean doLMR = depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& all_moves > 1
 						&& phase == PHASE_QUIET
 						;
 						
@@ -1533,7 +1526,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						)
 					) {
 					
-					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
+					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(all_moves, 63)];
 					
 					if (!isPv) {
 						
@@ -1551,7 +1544,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
-				if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
+				if (EngineConstants.ENABLE_PVS && score > alpha && all_moves > 1) {
 					
 					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
