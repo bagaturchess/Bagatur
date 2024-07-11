@@ -126,11 +126,11 @@
 			<include name="backlog_BagaturEngine.txt"/>
 		</fileset>
 	</copy-->
-  	<!--copy tofile="${temp_dir}/Bagatur.ico" >
+  	<copy tofile="${temp_dir}/Bagatur.jpg" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
-			<include name="Bagatur.ico"/>
+			<include name="Bagatur.jpg"/>
 		</fileset>
-	</copy-->
+	</copy>
   	
   	
 	<copy tofile="${temp_dir}/bin/Bagatur_1core.bat" >
