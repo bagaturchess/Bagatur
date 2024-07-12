@@ -96,6 +96,10 @@ public class Search_PVS_NWS extends SearchImpl {
 	private IEvalEntry temp_cache_entry;
 	
 	
+	private long all_nodes;
+	private long multicut_nodes;
+	private long singular_nodes;
+	
 	public Search_PVS_NWS(Object[] args) {
 		
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
@@ -545,7 +549,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		boolean isTTLowerBoundOrExact				= false;
 		boolean isTTDepthEnoughForSingularExtension = false;
-			
+		
 		if (env.getTPT() != null) {
 			
 			env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
@@ -559,7 +563,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int tpt_depth = tt_entries_per_ply[ply].getDepth();
 				
 				isTTLowerBoundOrExact = ttFlag == ITTEntry.FLAG_LOWER || ttFlag == ITTEntry.FLAG_EXACT;
-				isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth - 4;
+				isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
 				
 				if (getSearchConfig().isOther_UseTPTScores()) {
 					
@@ -869,10 +873,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
         
+		
+		all_nodes++;
+		
 		boolean extend_best_move = false;
 		
 		//TODO: Test it again
-		/*if (depth >= 1
+		/*if (depth >= 4
 				&& isTTLowerBoundOrExact && ttValue >= beta
 				&& isTTDepthEnoughForSingularExtension
 				&& cb.checkingPieces == 0
@@ -882,18 +889,28 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!isPv && mc_moves_count >= MULTICUT_MOVES_COUNT) {
 				
-				node.bestmove = 0;
-				node.eval = ttValue;
-				node.leaf = true;
+				multicut_nodes++;
 				
-				return node.eval;
+				if (multicut_nodes % 10000 == 0) {
+					
+					//System.out.println("MULTICUT: " + multicut_nodes / (double) all_nodes);
+				}
+				
+				depth--;
 			}
 			
 			if (mc_moves_count == 1) {
 				
+				singular_nodes++;
+				
+				if (singular_nodes % 1000 == 0) {
+					
+					//System.out.println("SINGULAR: " + singular_nodes / (double) all_nodes);
+				}
+				
 				//TODO: maybe extend node by depth++, not only the first move(s)
-				//extend_best_move = true;
-			}	
+				extend_best_move = true;
+			}
 		}*/
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
@@ -1347,7 +1364,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		   return beta - 1;
 		}*/
 		
-		final int M = 8;
+		final int M = 2;
 		final int C = MULTICUT_MOVES_COUNT;
 		final int R = depth / 2;
 		
