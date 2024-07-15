@@ -148,7 +148,7 @@ public class NNUE
 		
 		if (DO_INCREMENTAL_UPDATES && !incremental_updates.must_refresh) {
 			
-			refresh_accumulators();
+			incremental_update_accumulators();
 			
 		} else {
 			
@@ -168,7 +168,7 @@ public class NNUE
 	}
 	
 	
-    private void refresh_accumulators() {
+    private void incremental_update_accumulators() {
 		
 		for (int i = 0; i < dirtyPieces.dirtyNum; i++) {
 			
