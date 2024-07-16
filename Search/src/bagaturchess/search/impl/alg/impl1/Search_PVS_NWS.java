@@ -926,8 +926,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		int movesPerformed_attacks = 0;
 		int movesPerformed_quiet = 0;
 		
-		int new_depth = depth;
-		
 		moveGen.startPly();
 		int phase = PHASE_TT;
 		while (phase <= PHASE_QUIET) {
@@ -1117,6 +1115,48 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				int new_depth = (bestScore == ISearch.MIN && extend_best_move) ? depth : depth - 1;
+				
+				
+				boolean LMR_allowed = moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse);
+				
+				boolean doLMR = new_depth >= 2
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& phase == PHASE_QUIET
+						;
+						
+				int reduction = 1;
+				
+				if (doLMR &&
+						(!EngineConstants.ENABLE_LMR_STATS_DECISION
+								|| (EngineConstants.ENABLE_LMR_STATS_DECISION && LMR_allowed)
+						)
+					) {
+					
+					reduction = LMR_TABLE[Math.min(new_depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
+					
+					if (!isPv) {
+						
+						reduction += 1;
+					}
+					
+					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
+					
+				} else {
+					
+					if (doLMR && !LMR_allowed) {
+						
+						//If this code is not here, than step by step the overall LMR rate goes down to 0 and search becomes extremely shallow (without LMR optimization at all).
+						//It increases the statistics of this move so next time it will be more likely this move to be reduced by LMR
+						moveGen.addLMR_All(cb.colorToMoveInverse, move, 1);
+						moveGen.addLMR_BelowAlpha(cb.colorToMoveInverse, move, 1);
+					}
+				}
+				
+				
+				int lmr_depth = new_depth - reduction;
+		                
+				
 				env.getBitboard().makeMoveForward(move);
 								
 				
@@ -1135,79 +1175,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				/*System.out.println("COLOR " + cb.colorToMoveInverse
-						+ ", moveGen.getLMR_Rate(cb.colorToMoveInverse, move) =" + moveGen.getLMR_Rate(cb.colorToMoveInverse, move)
-						+ ", moveGen.getLMR_ThreasholdPointer_AboveAlpha(cb.colorToMoveInverse)=" + moveGen.getLMR_ThreasholdPointer_AboveAlpha(cb.colorToMoveInverse)
-						+ ", moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse)=" + moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse));
-				*/
-				
-				/*System.out.println("COLOR " + cb.colorToMoveInverse
-						+ ", moveGen.getLMR_Stat_Rate() =" + moveGen.getLMR_Stat_Rate()
-						);
-				*/
-				
-				
-				new_depth = (bestScore == ISearch.MIN && extend_best_move) ? depth + 1 : depth;
-				
-				boolean LMR_allowed = moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse);
-				
-				//System.out.println("lmr_allowed=" + lmr_allowed + ", moveGen.getLMR_Rate(cb.colorToMoveInverse, move)=" + moveGen.getLMR_Rate(cb.colorToMoveInverse, move) + ", moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse)=" + moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse));
-				
-				
-				boolean doLMR = new_depth >= 2
-						//&& depth >= Math.max(2, maxdepth / 2) //Many other heuristics are working under shallow depths
-						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						//&& !wasInCheck
-						//&& cb.checkingPieces == 0
-						//&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move)
-						//&& (phase == PHASE_QUIET || phase == PHASE_KILLER_1 || phase == PHASE_KILLER_2)
-						&& phase == PHASE_QUIET
-						;
-						
-				int reduction = 1;
-				
-				if (doLMR &&
-						(!EngineConstants.ENABLE_LMR_STATS_DECISION
-								|| (EngineConstants.ENABLE_LMR_STATS_DECISION && LMR_allowed)
-						)
-					) {
-					
-					//float lmr_done_rate = lmr_done / (float) lmr_all;
-					//float lmr_allowed_rate = lmr_allowed / (float) lmr_all;
-					//System.out.println("lmr_done_rate=" + lmr_done_rate + ", lmr_allowed_rate=" + lmr_allowed_rate);
-					
-					//TODO: branching factor calculation in this way is an easy approximation, maybe not perfect.
-					//lmr_done is between 0 and 0.5, because the first move is never reduced by LMR.
-					//System.out.println("Search branching factor: " + 1f / (lmr_done / (float) lmr_all));
-					
-					reduction = LMR_TABLE[Math.min(new_depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
-					
-					if (!isPv) {
-						
-						reduction += 1;
-					}
-					
-					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
-					
-				} else {
-					
-					if (doLMR && !LMR_allowed) {
-						
-						//Makes the magic of the controlled LMR skip logic:
-						//If this code is not here, than step by step the overall LMR rate goes down to 0 and search becomes extremely shallow (without LMR optimization at all).
-						//It increases the statistics of this move so next time it will be more likely this move to be reduced by LMR
-						moveGen.addLMR_All(cb.colorToMoveInverse, move, 1);
-						moveGen.addLMR_BelowAlpha(cb.colorToMoveInverse, move, 1);
-					}
-				}
-				
 				try {
 					
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
 						
 						moveGen.addLMR_All(cb.colorToMoveInverse, move, new_depth);
 												
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, new_depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 						
 						if (score > alpha) {
 							
@@ -1221,12 +1195,12 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
 						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, new_depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
 					
 					if (score > alpha) {
 						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, new_depth - 1, -beta, -alpha, isPv, initialMaxDepth);
+						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, new_depth, -beta, -alpha, isPv, initialMaxDepth);
 					}
 					
 				} catch(SearchInterruptedException sie) {
@@ -1325,7 +1299,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			if (!SearchUtils.isMateVal(node.eval)) {
 				
-				env.getTPT().put(hashkey, new_depth, node.eval, alpha_org, beta, node.bestmove);
+				env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
 			}
 		}
 		
