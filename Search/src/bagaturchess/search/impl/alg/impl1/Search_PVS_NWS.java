@@ -960,10 +960,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
 				
-				if (killer1Move != 0 && killer1Move != ttMove && killer1Move != counterMove1 && killer1Move != counterMove2 && cb.isValidMove(killer1Move)) {
+				if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move)) {
 					
 					moveGen.addMove(killer1Move);
-					
 					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 				}
 				
@@ -972,7 +971,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			case PHASE_KILLER_2:
 				
 				killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
-				if (killer2Move != 0 && killer2Move != killer1Move && killer2Move != ttMove && killer2Move != counterMove1 && killer2Move != counterMove2 && cb.isValidMove(killer2Move)) {
+				
+				if (killer2Move != 0 && killer2Move != ttMove && killer2Move != killer1Move && cb.isValidMove(killer2Move)) {
+					
 					moveGen.addMove(killer2Move);
 					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 				}
@@ -994,7 +995,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			case PHASE_COUNTER_2:
 				
 				counterMove2 = moveGen.getCounter2(cb.colorToMove, parentMove);
+				
 				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
+					
 					moveGen.addMove(counterMove2);
 					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 				}
