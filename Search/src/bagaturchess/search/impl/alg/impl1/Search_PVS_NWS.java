@@ -1071,6 +1071,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
+				boolean not_good_lmr_history = moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove);
+				
 				if (!isPv
 						&& depth <= 7
 						&& !wasInCheck
@@ -1082,7 +1084,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (phase == PHASE_QUIET
 							&& (!EngineConstants.ENABLE_LMP_STATS_DECISION
 									|| (EngineConstants.ENABLE_LMP_STATS_DECISION
-											&& moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove)
+											&& not_good_lmr_history
 										)
 								)
 						) {
@@ -1118,13 +1120,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				int new_depth = (bestScore == ISearch.MIN && extend_best_move) ? depth : depth - 1;
 				
 				
-				boolean LMR_allowed = moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse);
+				boolean LMR_allowed = not_good_lmr_history;
 				
 				boolean doLMR = new_depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& movesPerformed_attacks + movesPerformed_quiet >= 1
 						&& phase == PHASE_QUIET
 						;
-						
+				
 				int reduction = 1;
 				
 				if (doLMR &&
@@ -1148,14 +1150,14 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						//If this code is not here, than step by step the overall LMR rate goes down to 0 and search becomes extremely shallow (without LMR optimization at all).
 						//It increases the statistics of this move so next time it will be more likely this move to be reduced by LMR
-						moveGen.addLMR_All(cb.colorToMoveInverse, move, 1);
-						moveGen.addLMR_BelowAlpha(cb.colorToMoveInverse, move, 1);
+						moveGen.addLMR_All(cb.colorToMove, move, 1);
+						moveGen.addLMR_BelowAlpha(cb.colorToMove, move, 1);
 					}
 				}
 				
 				
 				int lmr_depth = new_depth - reduction;
-		                
+
 				
 				env.getBitboard().makeMoveForward(move);
 								
