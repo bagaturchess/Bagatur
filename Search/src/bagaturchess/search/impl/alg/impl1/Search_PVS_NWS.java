@@ -45,6 +45,7 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.SearchInterruptedException;
 
+import bagaturchess.search.impl.alg.BacktrackingInfo;
 import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.env.SearchEnv;
@@ -95,6 +96,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private IEvalEntry temp_cache_entry;
 	
+	private BacktrackingInfo[] search_info 							= new BacktrackingInfo[MAX_DEPTH + 1];
+	
 	
 	private long all_nodes;
 	private long multicut_nodes;
@@ -115,6 +118,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (USE_DTZ_CACHE) {
 	    	
 	    	temp_cache_entry = new EvalEntry_BaseImpl();
+		}
+		
+		for (int i=0; i<search_info.length; i++) {
+			
+			search_info[i] = new BacktrackingInfo(); 
 		}
 	}
 	
@@ -484,6 +492,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		BacktrackingInfo si = search_info[ply];
+		
+		si.hash_key = env.getBitboard().getHashKey();
+		if (si.excluded_move != 0) {
+			si.hash_key ^= ((long) si.excluded_move);
+		}
+		si.static_eval = eval(evaluator, ply, alpha, beta, isPv);
+		
 		final int alpha_org = alpha;
 		
 		
@@ -540,7 +556,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		long hashkey = getHashkeyTPT(cb);
+		long hashkey = si.hash_key;
 		
 		
 		int ttMove 									= 0;
@@ -567,7 +583,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (getSearchConfig().isOther_UseTPTScores()) {
 					
-					if (!isPv && tpt_depth >= depth) {
+					if (!isPv && tpt_depth >= depth && si.excluded_move == 0) {
 						
 						if (ttFlag == ITTEntry.FLAG_EXACT) {
 							
@@ -767,29 +783,25 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		int eval = ISearch.MIN;
+		int eval = si.static_eval;
 		
-		if (!isPv && cb.checkingPieces == 0
-				//&& egtb_eval == ISearch.MIN
-			) {
+		if (ttValue != IEvaluator.MIN_EVAL) {
 			
-			
-			eval = eval(evaluator, ply, alpha_org, beta, isPv);
-			
-			
-			if (ttValue != IEvaluator.MIN_EVAL) {
+			if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
 				
-				if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
+				if (ttFlag == ITTEntry.FLAG_EXACT
+						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
+						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
+					) {
 					
-					if (ttFlag == ITTEntry.FLAG_EXACT
-							|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
-							|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
-						) {
-						
-						eval = ttValue;
-					}
+					eval = ttValue;
 				}
 			}
+		}
+		
+		if (!isPv && cb.checkingPieces == 0
+				&& si.excluded_move == 0
+			) {
 			
 			
 			//Reduce depth in cases where the probability of PV node
@@ -874,12 +886,49 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
         
 		
-		all_nodes++;
+		boolean extend_tt_move = false;
 		
-		boolean extend_best_move = false;
+		
+		if (si.excluded_move == 0
+				&& depth >= 4
+				&& isTTLowerBoundOrExact
+				//&& ttValue >= beta
+				&& isTTDepthEnoughForSingularExtension
+				&& cb.checkingPieces == 0
+			) {
+			
+			int singular_beta = ttValue - depth; //TODO: Adjust margin
+			int singular_depth = 1; //depth / 2;
+			
+			si.excluded_move = ttMove;
+			
+			int singular_value = 0; //search(mediator, info, pvman, evaluator, cb, moveGen, ply, singular_depth, singular_beta - 1, singular_beta, isPv, initialMaxDepth);
+			
+			si.excluded_move = 0;
+			
+			node.bestmove = 0;
+			node.eval = ISearch.MIN;
+			node.leaf = true;
+			
+			if (singular_value < singular_beta) {
+				
+				//extend_tt_move = true;
+				
+			} /*else if (singular_value > beta) {
+				
+				node.bestmove = 0;
+				node.eval = singular_value;
+				node.leaf = true;
+				
+				return node.eval;
+			}*/
+		}
+		
 		
 		//TODO: Test it again
-		/*if (depth >= 4
+		/*all_nodes++;
+		
+		if (depth >= 4
 				&& isTTLowerBoundOrExact && ttValue >= beta
 				&& isTTDepthEnoughForSingularExtension
 				&& cb.checkingPieces == 0
@@ -1030,10 +1079,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					continue;
 				}
 				
-				//For now the singular move extension is disabled
-				/*if (move == excludedMove) {
+				if (move == si.excluded_move) {
+					
 					continue;
-				}*/
+				}
+				
 				
 				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
 					
@@ -1071,12 +1121,20 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
+				
+				if (MoveUtil.isQuiet(move)) {
+					movesPerformed_quiet++;
+				} else {
+					movesPerformed_attacks++;
+				}
+				
+				
 				boolean not_good_lmr_history = moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove);
 				
 				if (!isPv
 						&& depth <= 7
 						&& !wasInCheck
-						&& movesPerformed_attacks + movesPerformed_quiet > 0
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& !SearchUtils.isMateVal(alpha)
 						&& !SearchUtils.isMateVal(beta)
 					) {
@@ -1117,13 +1175,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				int new_depth = (bestScore == ISearch.MIN && extend_best_move) ? depth : depth - 1;
+				int new_depth = (move == ttMove && extend_tt_move) ? depth : depth - 1;
 				
 				
 				boolean LMR_allowed = not_good_lmr_history;
 				
 				boolean doLMR = new_depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet >= 1
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& phase == PHASE_QUIET
 						;
 				
@@ -1160,13 +1218,7 @@ public class Search_PVS_NWS extends SearchImpl {
 
 				
 				env.getBitboard().makeMoveForward(move);
-								
 				
-				if (MoveUtil.isQuiet(move)) {
-					movesPerformed_quiet++;
-				} else {
-					movesPerformed_attacks++;
-				}
 				
 				int score = alpha + 1;
 				
@@ -1260,6 +1312,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (movesPerformed_attacks + movesPerformed_quiet == 0) {
 			
+			if (si.excluded_move != 0) {
+				
+				node.bestmove = 0;
+				node.eval = beta + 1; //Extend the tt move, because it is the only move
+				node.leaf = true;
+				
+				return node.eval;
+			}
+			
 			if (cb.checkingPieces == 0) {
 				
 				node.bestmove = 0;
@@ -1299,7 +1360,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 				
-			if (!SearchUtils.isMateVal(node.eval)) {
+			if (!SearchUtils.isMateVal(node.eval) && si.excluded_move == 0) {
 				
 				env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
 			}
