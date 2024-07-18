@@ -571,7 +571,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int tpt_depth = tt_entries_per_ply[ply].getDepth();
 				
 				isTTLowerBoundOrExact = ttFlag == ITTEntry.FLAG_LOWER || ttFlag == ITTEntry.FLAG_EXACT;
-				isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth - 3;
+				isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
 				
 				if (getSearchConfig().isOther_UseTPTScores()) {
 					
@@ -886,10 +886,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (depth >= 4
 				&& isTTLowerBoundOrExact
 				&& isTTDepthEnoughForSingularExtension
-				//&& ttValue >= beta
+				&& ttValue >= beta
 			) {
 			
-			int singular_beta = ttValue - depth; //TODO: Adjust margin
+			//TODO: Adjust beta margin and depth
+			int singular_beta = ttValue;
 			int singular_depth = depth / 2;
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, cb, moveGen, ply,
@@ -897,10 +898,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (singular_value < singular_beta) {
 				
+				//Singular extension - only ttMove is good
 				extend_tt_move = true;
 				
 			} else if (!isPv && singular_value > beta) {
 				
+				//Multicut pruning - 2 moves above beta
 				node.bestmove = 0;
 				node.eval = singular_value;
 				node.leaf = true;
