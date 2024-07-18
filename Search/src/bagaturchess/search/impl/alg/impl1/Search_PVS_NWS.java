@@ -494,12 +494,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		BacktrackingInfo si = search_info[ply];
 		
-		si.hash_key = env.getBitboard().getHashKey();
-		if (si.excluded_move != 0) {
-			si.hash_key ^= ((long) si.excluded_move);
-		}
-		si.static_eval = eval(evaluator, ply, alpha, beta, isPv);
-		
 		final int alpha_org = alpha;
 		
 		
@@ -556,7 +550,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		long hashkey = si.hash_key;
+		long hashkey = env.getBitboard().getHashKey();
 		
 		
 		int ttMove 									= 0;
@@ -579,7 +573,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int tpt_depth = tt_entries_per_ply[ply].getDepth();
 				
 				isTTLowerBoundOrExact = ttFlag == ITTEntry.FLAG_LOWER || ttFlag == ITTEntry.FLAG_EXACT;
-				isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth / 2;
+				isTTDepthEnoughForSingularExtension = tt_entries_per_ply[ply].getDepth() >= depth - 3;
 				
 				if (getSearchConfig().isOther_UseTPTScores()) {
 					
@@ -783,25 +777,28 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		int eval = si.static_eval;
-		
-		if (ttValue != IEvaluator.MIN_EVAL) {
-			
-			if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
-				
-				if (ttFlag == ITTEntry.FLAG_EXACT
-						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
-						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
-					) {
-					
-					eval = ttValue;
-				}
-			}
-		}
+		int eval = ISearch.MIN;
 		
 		if (!isPv && cb.checkingPieces == 0
 				&& si.excluded_move == 0
 			) {
+			
+			
+			eval = eval(evaluator, ply, alpha, beta, isPv);
+			
+			if (ttValue != IEvaluator.MIN_EVAL) {
+				
+				if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
+					
+					if (ttFlag == ITTEntry.FLAG_EXACT
+							|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
+							|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
+						) {
+						
+						eval = ttValue;
+					}
+				}
+			}
 			
 			
 			//Reduce depth in cases where the probability of PV node
@@ -889,41 +886,37 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean extend_tt_move = false;
 		
 		
-		if (si.excluded_move == 0
+		//TODO: Test it again
+		/*if (si.excluded_move == 0
 				&& depth >= 4
 				&& isTTLowerBoundOrExact
-				//&& ttValue >= beta
 				&& isTTDepthEnoughForSingularExtension
-				&& cb.checkingPieces == 0
+				//&& cb.checkingPieces == 0
 			) {
 			
 			int singular_beta = ttValue - depth; //TODO: Adjust margin
-			int singular_depth = 1; //depth / 2;
+			int singular_depth = depth / 2;
 			
 			si.excluded_move = ttMove;
 			
-			int singular_value = 0; //search(mediator, info, pvman, evaluator, cb, moveGen, ply, singular_depth, singular_beta - 1, singular_beta, isPv, initialMaxDepth);
+			int singular_value = search(mediator, info, pvman, evaluator, cb, moveGen,
+					ply, singular_depth, singular_beta - 1, singular_beta, isPv, initialMaxDepth);
 			
 			si.excluded_move = 0;
 			
-			node.bestmove = 0;
-			node.eval = ISearch.MIN;
-			node.leaf = true;
-			
 			if (singular_value < singular_beta) {
 				
-				//extend_tt_move = true;
+				extend_tt_move = true;
 				
-			} /*else if (singular_value > beta) {
+			} else if (singular_value > beta) {
 				
 				node.bestmove = 0;
 				node.eval = singular_value;
 				node.leaf = true;
 				
 				return node.eval;
-			}*/
-		}
-		
+			}
+		}*/
 		
 		//TODO: Test it again
 		/*all_nodes++;
@@ -961,6 +954,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				extend_best_move = true;
 			}
 		}*/
+		
+		
+		node.bestmove = 0;
+		node.eval = ISearch.MIN;
+		node.leaf = true;
+		
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
 		
@@ -1315,7 +1314,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (si.excluded_move != 0) {
 				
 				node.bestmove = 0;
-				node.eval = beta + 1; //Extend the tt move, because it is the only move
+				node.eval = ttValue; //TODO: Must extend the tt move, because it is the only move
 				node.leaf = true;
 				
 				return node.eval;
