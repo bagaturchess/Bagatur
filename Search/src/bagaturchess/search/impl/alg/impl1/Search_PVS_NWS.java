@@ -492,8 +492,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		BacktrackingInfo si = search_info[ply];
-		
 		final int alpha_org = alpha;
 		
 		
@@ -577,7 +575,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (getSearchConfig().isOther_UseTPTScores()) {
 					
-					if (!isPv && tpt_depth >= depth && si.excluded_move == 0) {
+					if (!isPv && tpt_depth >= depth) {
 						
 						if (ttFlag == ITTEntry.FLAG_EXACT) {
 							
@@ -779,8 +777,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int eval = ISearch.MIN;
 		
-		if (!isPv && cb.checkingPieces == 0
-				&& si.excluded_move == 0
+		if (!isPv
+				&& cb.checkingPieces == 0
 			) {
 			
 			
@@ -885,30 +883,23 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		boolean extend_tt_move = false;
 		
-		
-		//TODO: Test it again
-		/*if (si.excluded_move == 0
-				&& depth >= 4
+		if (depth >= 4
 				&& isTTLowerBoundOrExact
 				&& isTTDepthEnoughForSingularExtension
-				//&& cb.checkingPieces == 0
+				//&& ttValue >= beta
 			) {
 			
 			int singular_beta = ttValue - depth; //TODO: Adjust margin
 			int singular_depth = depth / 2;
 			
-			si.excluded_move = ttMove;
-			
-			int singular_value = search(mediator, info, pvman, evaluator, cb, moveGen,
-					ply, singular_depth, singular_beta - 1, singular_beta, isPv, initialMaxDepth);
-			
-			si.excluded_move = 0;
+			int singular_value = singular_move_search(mediator, info, pvman, evaluator, cb, moveGen, ply,
+					singular_depth, singular_beta - 1, singular_beta, false, initialMaxDepth, ttMove, eval);
 			
 			if (singular_value < singular_beta) {
 				
 				extend_tt_move = true;
 				
-			} else if (singular_value > beta) {
+			} else if (!isPv && singular_value > beta) {
 				
 				node.bestmove = 0;
 				node.eval = singular_value;
@@ -916,49 +907,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				return node.eval;
 			}
-		}*/
-		
-		//TODO: Test it again
-		/*all_nodes++;
-		
-		if (depth >= 4
-				&& isTTLowerBoundOrExact && ttValue >= beta
-				&& isTTDepthEnoughForSingularExtension
-				&& cb.checkingPieces == 0
-			) {
-			
-			int mc_moves_count = mc_search(mediator, info, pvman, evaluator, cb, moveGen, ply, depth, alpha, beta, isPv, initialMaxDepth, ttMove);
-			
-			if (!isPv && mc_moves_count >= MULTICUT_MOVES_COUNT) {
-				
-				multicut_nodes++;
-				
-				if (multicut_nodes % 10000 == 0) {
-					
-					//System.out.println("MULTICUT: " + multicut_nodes / (double) all_nodes);
-				}
-				
-				depth--;
-			}
-			
-			if (mc_moves_count == 1) {
-				
-				singular_nodes++;
-				
-				if (singular_nodes % 1000 == 0) {
-					
-					//System.out.println("SINGULAR: " + singular_nodes / (double) all_nodes);
-				}
-				
-				//TODO: maybe extend node by depth++, not only the first move(s)
-				extend_best_move = true;
-			}
-		}*/
-		
-		
-		node.bestmove = 0;
-		node.eval = ISearch.MIN;
-		node.leaf = true;
+		}
 		
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
@@ -1078,26 +1027,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					continue;
 				}
 				
-				if (move == si.excluded_move) {
-					
-					continue;
-				}
-				
-				
-				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
-					
-					long timestamp = System.currentTimeMillis();
-					
-					if (timestamp >= lastSentMinorInfo_timestamp + 1000)  {//Send info each second
-					
-						mediator.changedMinor(info);
-						
-						lastSentMinorInfo_timestamp = timestamp;
-					}
-					
-					lastSentMinorInfo_nodesCount = info.getSearchedNodes();
-				}
-				
 				if (phase == PHASE_ATTACKING_GOOD) {
 					if (SEEUtil.getSeeCaptureScore(cb, move) < 0) {
 						continue;
@@ -1118,6 +1047,21 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (move == ttMove) {
 						continue;
 					}
+				}
+				
+				
+				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
+					
+					long timestamp = System.currentTimeMillis();
+					
+					if (timestamp >= lastSentMinorInfo_timestamp + 1000)  {//Send info each second
+					
+						mediator.changedMinor(info);
+						
+						lastSentMinorInfo_timestamp = timestamp;
+					}
+					
+					lastSentMinorInfo_nodesCount = info.getSearchedNodes();
 				}
 				
 				
@@ -1311,15 +1255,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (movesPerformed_attacks + movesPerformed_quiet == 0) {
 			
-			if (si.excluded_move != 0) {
-				
-				node.bestmove = 0;
-				node.eval = ttValue; //TODO: Must extend the tt move, because it is the only move
-				node.leaf = true;
-				
-				return node.eval;
-			}
-			
 			if (cb.checkingPieces == 0) {
 				
 				node.bestmove = 0;
@@ -1359,7 +1294,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 				
-			if (!SearchUtils.isMateVal(node.eval) && si.excluded_move == 0) {
+			if (!SearchUtils.isMateVal(node.eval)) {
 				
 				env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
 			}
@@ -1369,45 +1304,12 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		return node.eval;
 	}
-
-
-	private int mc_search(ISearchMediator mediator, ISearchInfo info,
+	
+	
+	private int singular_move_search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb,
 			MoveGenerator moveGen, final int ply, int depth, int alpha,
-			int beta, boolean isPv, int initialMaxDepth, int ttMove) {
-		
-		//https://www.chessprogramming.org/Multi-Cut
-		
-		// M is the number of moves to look at when checking for mc-prune.
-		// C is the number of cutoffs to cause an mc-prune, C < M.
-		// R is the search depth reduction for mc-prune searches.
-		
-		/*int zwSearch( int beta, int depth, bool cut) {
-		   if ( depth <= 0 ) return quiesce( beta-1, beta );
-
-		   if ( depth >= R && cut ) {
-		      int c = 0;
-		      for ( first M moves )
-		         score = -zwSearch( 1-beta, depth-1-R, !cut);
-		         if ( score >= beta ) {
-		            if ( ++c == C )
-		               return beta; // mc-prune
-		         }
-		      }
-		   }
-		   for ( all moves ) {
-		      score = -zwSearch( 1-beta, depth-1, !cut);
-		      if ( score  >= beta )
-		         return beta;
-		   }
-		   return beta - 1;
-		}*/
-		
-		final int M = 2;
-		final int C = MULTICUT_MOVES_COUNT;
-		final int R = depth / 2;
-		
-		depth -= R;
+			int beta, boolean isPv, int initialMaxDepth, int ttMove, int eval) {
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
 		
@@ -1418,7 +1320,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		int counterMove1 = 0;
 		int counterMove2 = 0;
 		
-		int moves_better_than_beta = 0;
+		int bestScore = ISearch.MIN;
+		
 		int all_moves = 0;
 		
 		moveGen.startPly();
@@ -1454,10 +1357,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
 				
-				if (killer1Move != 0 && killer1Move != ttMove && killer1Move != counterMove1 && killer1Move != counterMove2 && cb.isValidMove(killer1Move)) {
+				if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move)) {
 					
 					moveGen.addMove(killer1Move);
-					
 					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 				}
 				
@@ -1466,7 +1368,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			case PHASE_KILLER_2:
 				
 				killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
-				if (killer2Move != 0 && killer2Move != killer1Move && killer2Move != ttMove && killer2Move != counterMove1 && killer2Move != counterMove2 && cb.isValidMove(killer2Move)) {
+				
+				if (killer2Move != 0 && killer2Move != killer1Move && killer2Move != ttMove && cb.isValidMove(killer2Move)) {
+					
 					moveGen.addMove(killer2Move);
 					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 				}
@@ -1488,7 +1392,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			case PHASE_COUNTER_2:
 				
 				counterMove2 = moveGen.getCounter2(cb.colorToMove, parentMove);
+				
 				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
+					
 					moveGen.addMove(counterMove2);
 					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 				}
@@ -1523,6 +1429,12 @@ public class Search_PVS_NWS extends SearchImpl {
 					continue;
 				}
 				
+				//Skip tt move
+				if (move == ttMove) {
+					
+					continue;
+				}
+				
 				if (phase == PHASE_ATTACKING_GOOD) {
 					if (SEEUtil.getSeeCaptureScore(cb, move) < 0) {
 						continue;
@@ -1549,9 +1461,55 @@ public class Search_PVS_NWS extends SearchImpl {
 				all_moves++;
 				
 				
+				boolean not_good_lmr_history = moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove);
+				
+				if (!isPv
+						&& depth <= 7
+						&& !wasInCheck
+						&& all_moves > 1
+						&& !SearchUtils.isMateVal(alpha)
+						&& !SearchUtils.isMateVal(beta)
+					) {
+					
+					if (phase == PHASE_QUIET
+							&& (!EngineConstants.ENABLE_LMP_STATS_DECISION
+									|| (EngineConstants.ENABLE_LMP_STATS_DECISION
+											&& not_good_lmr_history
+										)
+								)
+						) {
+						
+						if (EngineConstants.ENABLE_LMP
+								&& all_moves >= 3 + depth * depth
+							) {
+							
+							continue;
+						}
+						
+						if (eval != ISearch.MIN) { //eval is set
+							
+							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
+								
+								if (eval + depth * 80 <= alpha) {
+									
+									continue;
+								}
+							}
+						}
+						
+					} else if (EngineConstants.ENABLE_SEE_PRUNING
+							&& phase == PHASE_ATTACKING_BAD
+							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth
+						) {
+						
+						continue;
+					}
+				}
+
+				
 				env.getBitboard().makeMoveForward(move);
 				
-				boolean LMR_allowed = moveGen.getLMR_Rate(cb.colorToMoveInverse, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMoveInverse);
+				boolean LMR_allowed = not_good_lmr_history;
 				
 				boolean doLMR = depth >= 2
 						&& all_moves > 1
@@ -1597,19 +1555,18 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveBackward(move);
 						
 				
-				if (score >= beta) {
+				if (score > bestScore) {
+					
+					bestScore = score;
+					
+					alpha = Math.max(alpha, score);
+					
+					if (alpha >= beta) {
 						
-					moves_better_than_beta++;
+						phase += 379;
 						
-					if (moves_better_than_beta >= C) {
-							
 						break;
 					}
-				}
-				
-				if (all_moves >= M) {
-					
-					break;
 				}
 			}
 			
@@ -1618,8 +1575,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		moveGen.endPly();
 		
+		if (bestScore == ISearch.MIN) {
+			
+			//Extend tt move, because it is the only move in this position.
+			bestScore = alpha;
+		}
 		
-		return moves_better_than_beta;
+		return bestScore;
 	}
 	
 	
