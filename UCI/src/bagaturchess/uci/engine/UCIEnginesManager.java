@@ -167,6 +167,18 @@ public class UCIEnginesManager {
 	}
 	
 	
+	public void go_Nodes(int nodes) throws IOException {
+		
+		//disable();
+		
+		for (EngineProcess engine: engines) {			
+			engine.go_FixedNodes(nodes);
+		}
+		//System.out.println("Started");
+		
+		//enable();
+	}
+	
 	public void enable() {
 		for (EngineProcess engine: engines) {			
 			engine.setDummperMode(true);
