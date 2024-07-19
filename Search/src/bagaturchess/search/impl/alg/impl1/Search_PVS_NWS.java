@@ -886,7 +886,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (depth >= 4
 				&& isTTLowerBoundOrExact
 				&& isTTDepthEnoughForSingularExtension
-				&& ttValue >= beta
 			) {
 			
 			//TODO: Adjust beta margin and depth
@@ -1314,6 +1313,51 @@ public class Search_PVS_NWS extends SearchImpl {
 			MoveGenerator moveGen, final int ply, int depth, int alpha,
 			int beta, boolean isPv, int initialMaxDepth, int ttMove, int eval) {
 		
+		
+		long hashkey = env.getBitboard().getHashKey() ^ ttMove;
+		
+		int ttMove2 = 0; 
+				
+		if (env.getTPT() != null) {
+			
+			env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
+			
+			if (!tt_entries_per_ply[ply].isEmpty()) {
+				
+				ttMove2 = tt_entries_per_ply[ply].getBestMove();
+				int ttFlag = tt_entries_per_ply[ply].getFlag();
+				int ttValue = tt_entries_per_ply[ply].getEval();
+				
+				int tpt_depth = tt_entries_per_ply[ply].getDepth();
+				
+				if (getSearchConfig().isOther_UseTPTScores()) {
+					
+					if (!isPv && tpt_depth >= depth) {
+						
+						if (ttFlag == ITTEntry.FLAG_EXACT) {
+							
+							return ttValue;
+							
+						} else {
+							
+							if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
+								
+								return ttValue;
+							}
+							
+							if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
+								
+								return ttValue;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		
+		final int alpha_org = alpha;
+		
 		final boolean wasInCheck = cb.checkingPieces != 0;
 		
 		final int parentMove = moveGen.previous();
@@ -1324,6 +1368,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int counterMove2 = 0;
 		
 		int bestScore = ISearch.MIN;
+		int bestMove = 0;
 		
 		int all_moves = 0;
 		
@@ -1336,11 +1381,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			case PHASE_TT:
 				
-				if (ttMove != 0 && cb.isValidMove(ttMove)) {
+				if (ttMove2 != 0 && cb.isValidMove(ttMove2)) {
 					
-					moveGen.addMove(ttMove);
+					moveGen.addMove(ttMove2);
 					
-					if (!env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)) {
+					if (!env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove2)) {
 						
 						moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
 					}
@@ -1360,7 +1405,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
 				
-				if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move)) {
+				if (killer1Move != 0 && killer1Move != ttMove2 && cb.isValidMove(killer1Move)) {
 					
 					moveGen.addMove(killer1Move);
 					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
@@ -1372,7 +1417,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
 				
-				if (killer2Move != 0 && killer2Move != killer1Move && killer2Move != ttMove && cb.isValidMove(killer2Move)) {
+				if (killer2Move != 0 && killer2Move != killer1Move && killer2Move != ttMove2 && cb.isValidMove(killer2Move)) {
 					
 					moveGen.addMove(killer2Move);
 					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
@@ -1384,7 +1429,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				counterMove1 = moveGen.getCounter1(cb.colorToMove, parentMove);
 				
-				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
+				if (counterMove1 != 0 && counterMove1 != ttMove2 && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
 					
 					moveGen.addMove(counterMove1);
 					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
@@ -1396,7 +1441,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				counterMove2 = moveGen.getCounter2(cb.colorToMove, parentMove);
 				
-				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
+				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove2 && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
 					
 					moveGen.addMove(counterMove2);
 					moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove);
@@ -1561,6 +1606,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (score > bestScore) {
 					
 					bestScore = score;
+					bestMove = move;
 					
 					alpha = Math.max(alpha, score);
 					
@@ -1583,6 +1629,16 @@ public class Search_PVS_NWS extends SearchImpl {
 			//Extend tt move, because it is the only move in this position.
 			bestScore = alpha;
 		}
+		
+		
+		if (env.getTPT() != null) {
+			
+			if (!SearchUtils.isMateVal(bestScore) && bestMove != 0) {
+				
+				env.getTPT().put(hashkey, depth, bestScore, alpha_org, beta, bestMove);
+			}
+		}
+		
 		
 		return bestScore;
 	}
