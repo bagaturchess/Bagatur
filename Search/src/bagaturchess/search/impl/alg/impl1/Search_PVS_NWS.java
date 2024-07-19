@@ -221,15 +221,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		//depth += extensions(cb, moveGen, ply);
-		
-		
 		long hashkey = getHashkeyTPT(cb);
 		
 		
-		int ttMove 									= 0;
-		int ttFlag 									= -1;
-		int ttValue 								= IEvaluator.MIN_EVAL;
+		int ttMove = 0;
 		
 		if (env.getTPT() != null) {
 			
@@ -238,39 +233,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (!tt_entries_per_ply[ply].isEmpty()) {
 				
 				ttMove = tt_entries_per_ply[ply].getBestMove();
-				ttFlag = tt_entries_per_ply[ply].getFlag();
-				ttValue = tt_entries_per_ply[ply].getEval();
-				
-				if (getSearchConfig().isOther_UseTPTScores()) {
-					
-					int tpt_depth = tt_entries_per_ply[ply].getDepth();
-					
-					if (!isPv && tpt_depth >= depth) {
-						
-						if (ttFlag == ITTEntry.FLAG_EXACT) {
-							
-							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
-							
-							return node.eval;
-							
-						} else {
-							
-							if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
-								
-								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
-								
-								return node.eval;
-							}
-							
-							if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
-								
-								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
-								
-								return node.eval;
-							}
-						}
-					}
-				}
 			}
 		}
 		
@@ -449,7 +411,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
 			}
 		}
-			
+		
 		
 		if (bestScore != node.eval) {
 			
