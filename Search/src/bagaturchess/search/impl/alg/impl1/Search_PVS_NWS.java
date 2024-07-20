@@ -69,8 +69,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_ATTACKING_BAD 					= 6;
 	private static final int PHASE_QUIET 							= 7;
 	
-	private static final int MULTICUT_MOVES_COUNT 					= 2;
-	
 	private static final VarStatistic LAZY_EVAL_MARGIN 				= new VarStatistic();
 	
 	private static final int[][] LMR_TABLE 							= new int[64][64];
@@ -98,10 +96,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private BacktrackingInfo[] search_info 							= new BacktrackingInfo[MAX_DEPTH + 1];
 	
-	
-	private long all_nodes;
-	private long multicut_nodes;
-	private long singular_nodes;
 	
 	public Search_PVS_NWS(Object[] args) {
 		
@@ -1633,7 +1627,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		long hashkey = getHashkeyTPT(cb);
 		
-		int ttMove 		= 0;
 	    int ttFlag 		= -1;
 	    int ttValue 	= IEvaluator.MIN_EVAL;
 
@@ -1671,8 +1664,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 					}
 				}
-				
-				ttMove = tt_entries_per_ply[ply].getBestMove();
 			}
 		}
 	  	
@@ -1894,18 +1885,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		return eval;
-	}
-	
-
-	private int getTrustWindow(ISearchMediator mediator, int depth) {
-		
-		int value = depth * Math.max(1, mediator.getTrustWindow_AlphaAspiration());
-		//int value = 1 * depth * Math.max(1, mediator.getTrustWindow_AlphaAspiration());
-		
-		//System.out.println("mediator.getTrustWindow_AlphaAspiration()=" + mediator.getTrustWindow_AlphaAspiration()
-		//						+ ", depth=" + depth + ", value=" + value);
-		
-		return value;
 	}
 	
 	
