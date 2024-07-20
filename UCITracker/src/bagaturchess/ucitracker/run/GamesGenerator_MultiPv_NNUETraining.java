@@ -23,11 +23,8 @@
 package bagaturchess.ucitracker.run;
 
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
-import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,6 +42,7 @@ import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.opening.api.OpeningBookFactory;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.uci.engine.EngineProcess;
+import bagaturchess.uci.engine.EngineProcess_BagaturImpl_WorkspaceImpl;
 import bagaturchess.uci.engine.UCIEnginesManager;
 import bagaturchess.uci.engine.EngineProcess.LineCallBack;
 import bagaturchess.uci.impl.Channel_Console;
@@ -148,9 +146,9 @@ public class GamesGenerator_MultiPv_NNUETraining {
 					new String [0],
 					"C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\WASP_500-nn");*/
 			
-			/*EngineProcess engine = new EngineProcess("C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.2.3\\Bagatur_64_1_core.exe",
+			/*EngineProcess engine = new EngineProcess("C:\\DATA\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.5.1a\\Bagatur_64_1_core.exe",
 					new String [0],
-					"C:\\DATA\\OWN\\BAGATUR\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.2.3");*/
+					"C:\\DATA\\ARENA\\arena_3.5.1\\Engines\\BagaturEngine.5.1a");*/
 			
 			
 			//EngineProcess engine = new EngineProcess_BagaturImpl_WorkspaceImpl("BagaturEngineClient", "");			
@@ -171,7 +169,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 	
 	private void execute(EngineProcess engine, String toFileName, int gamesCount, boolean appendToFile) throws IOException {
 		
-		BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true), 256 * 1024);
+		BufferedWriter bw = new BufferedWriter(new FileWriter(toFileName, true), 16 * 1024);
 		
 		int positions = 0;
 		
@@ -198,6 +196,7 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			options.add("setoption name Ponder value false");
 			options.add("setoption name OwnBook value false");
 			options.add("setoption name SyzygyPath value C:\\dummy\\");
+			options.add("setoption name Logging Policy value single file");
 			
 			runner.setOptions(options);
 			
@@ -208,14 +207,14 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			playRandomOpening(bitboard);
 			
 			System.out.println(bitboard);
-					
+			
 			EvaluatedGame game = playGame(bitboard, runner);
 			
 			positions += game.getPositionsCount();
 			
 			GameModelWriter.writeEvaluatedGame(game, bw);
 			
-			//bw.flush();
+			bw.flush();
 			
 			System.out.println("Game " + (i+1) + " saved in " + toFileName + ", positions are " + positions);
 			
@@ -270,7 +269,19 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			}
 			
 			EvaluatedMove best = getBestVariation(bitboard.isInCheck(), movesEvals);
-					
+				
+			
+			if (best.eval_ofOriginatePlayer() != 0 && best.eval_ofOriginatePlayer() % EvaluatedMove.MATE == 0) {
+
+				//Skip mate scores
+				
+			} else {
+				
+				int eval = bitboard.getColourToMove() == Constants.COLOUR_WHITE ? best.eval_ofOriginatePlayer() : -best.eval_ofOriginatePlayer();
+
+				game.addBoard(bitboard.getMoveOps().moveToString(best.getMoves()[0]), bitboard.toEPD(), eval);
+			}
+			
 			bitboard.makeMoveForward(best.getMoves()[0]);
 			
 			if (!bitboard.getStatus().equals(IGameStatus.NONE)) {
@@ -280,27 +291,6 @@ public class GamesGenerator_MultiPv_NNUETraining {
 				game.setResult(getGameTerminationScore(bitboard.getStatus()));
 				
 				break;
-			}
-			
-			if (best.eval_ofOriginatePlayer() != 0 && best.eval_ofOriginatePlayer() % EvaluatedMove.MATE == 0) {
-
-				if (best.getMoves().length == 1) {
-					//Sometimes the pv is cut
-					//throw new IllegalStateException(best.eval_ofOriginatePlayer() + " " + bitboard.toString());
-				}
-				
-			} else {
-				
-				int eval = bitboard.getColourToMove() == Constants.COLOUR_BLACK ? best.eval_ofOriginatePlayer() : -best.eval_ofOriginatePlayer();
-
-				if (best.getMoves().length == 1) {
-					
-					game.addBoard(bitboard.getMoveOps().moveToString(best.getMoves()[0]), bitboard.toEPD(), eval);
-					
-				} else {
-					
-					//TODO: play moves and add the corresponding board
-				}
 			}
 		}
 		
@@ -370,7 +360,8 @@ public class GamesGenerator_MultiPv_NNUETraining {
 			
 			runner.disable();
 			
-			runner.go_Depth(depth);
+			runner.go_Nodes(5555);
+			//runner.go_Depth(depth);
 			
 			try {
 				
