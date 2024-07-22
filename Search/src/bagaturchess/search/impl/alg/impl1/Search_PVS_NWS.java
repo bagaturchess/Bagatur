@@ -735,6 +735,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (!isPv
 				&& cb.checkingPieces == 0
+				&& !SearchUtils.isMateVal(alpha)
+				&& !SearchUtils.isMateVal(beta)
+				&& egtb_eval == ISearch.MIN
 			) {
 			
 			
@@ -755,10 +758,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			//Reduce depth in cases where the probability of PV node
-			//1. Is very low (When the node is not in TT) or
-			//2. PV node is already a fact for some reason (There is a TB hit search could rely on, because it improves the PV score).
-			if (depth >= 2 && (ttFlag == -1 || egtb_eval != ISearch.MIN)) {
+			if (depth >= 2 && ttFlag == -1) {
 				
 				depth -= 1;
 			}
@@ -771,14 +771,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (eval - depth * 60 >= beta) {
 						
-						if (egtb_eval == ISearch.MIN || egtb_eval >= eval) {
+						node.bestmove = 0;
+						node.eval = eval;
+						node.leaf = true;
 							
-							node.bestmove = 0;
-							node.eval = eval;
-							node.leaf = true;
-							
-							return node.eval;
-						}
+						return node.eval;
 					}
 				}
 				
@@ -797,19 +794,16 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (score >= beta) {
 							
-							if (egtb_eval == ISearch.MIN || egtb_eval >= score) {
-								
-								node.bestmove = 0;
-								node.eval = score;
-								node.leaf = true;
-								
-								return node.eval;
-							}
+							node.bestmove = 0;
+							node.eval = score;
+							node.leaf = true;
+							
+							return node.eval;
 						}
 					}
 				}
 				
-			} else if (eval <= alpha && !SearchUtils.isMateVal(alpha)) {
+			} else if (eval <= alpha) {
 				
 				
 				if (EngineConstants.ENABLE_RAZORING && depth < 5) {
@@ -822,20 +816,17 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (score < alpha - razoringMargin) {
 							
-							if (egtb_eval == ISearch.MIN || egtb_eval <= score) {
-								
-								node.bestmove = 0;
-								node.eval = score;
-								node.leaf = true;
-								
-								return node.eval;
-							}
+							node.bestmove = 0;
+							node.eval = score;
+							node.leaf = true;
+							
+							return node.eval;
 						}
 					}
 				}
 			}
 		}
-        
+		
 		
 		boolean extend_tt_move = false;
 		
@@ -866,6 +857,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				return node.eval;
 			}
 		}
+		
+		
+		/*if (isPv && ttFlag == -1 && depth >= 3) {
+			
+			depth -= 2;
+		}*/
 		
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
@@ -1038,6 +1035,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& !SearchUtils.isMateVal(alpha)
 						&& !SearchUtils.isMateVal(beta)
+						&& egtb_eval == ISearch.MIN
 					) {
 					
 					if (phase == PHASE_QUIET
