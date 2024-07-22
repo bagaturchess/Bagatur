@@ -1055,7 +1055,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
-						if (eval != ISearch.MIN) { //eval is set
+						/*if (eval != ISearch.MIN) { //eval is set
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
@@ -1064,7 +1064,7 @@ public class Search_PVS_NWS extends SearchImpl {
 									continue;
 								}
 							}
-						}
+						}*/
 						
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& phase == PHASE_ATTACKING_BAD
@@ -1116,7 +1116,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				int lmr_depth = new_depth - reduction;
-
+				
 				
 				env.getBitboard().makeMoveForward(move);
 				
@@ -1490,7 +1490,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
-						if (eval != ISearch.MIN) { //eval is set
+						/*if (eval != ISearch.MIN) { //eval is set
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
@@ -1499,7 +1499,7 @@ public class Search_PVS_NWS extends SearchImpl {
 									continue;
 								}
 							}
-						}
+						}*/
 						
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& phase == PHASE_ATTACKING_BAD
@@ -1557,7 +1557,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				env.getBitboard().makeMoveBackward(move);
-						
+				
 				
 				if (score > bestScore) {
 					
@@ -1828,7 +1828,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 		if (env.getTPT() != null) {
 			
-			if (!SearchUtils.isMateVal(bestScore)) {
+			if (!SearchUtils.isMateVal(bestScore) && bestMove != 0) {
 				
 				env.getTPT().put(hashkey, 0, bestScore, alphaOrig, beta, bestMove);
 			}
