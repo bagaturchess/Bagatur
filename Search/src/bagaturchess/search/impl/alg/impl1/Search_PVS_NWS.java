@@ -844,7 +844,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (singular_value < singular_beta) {
 				
-				//Singular extension - only ttMove is good
+				//Singular extension - only ttMove has good score
 				extend_tt_move = true;
 				
 			} else if (!isPv && singular_value > beta) {
