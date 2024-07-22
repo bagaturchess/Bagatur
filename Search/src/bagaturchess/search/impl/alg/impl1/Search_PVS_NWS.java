@@ -1074,7 +1074,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				int new_depth = (move == ttMove && extend_tt_move) ? depth : depth - 1;
+				int new_depth = (move == ttMove && extend_tt_move) ?(isPv ? depth : depth + 1) : depth - 1;
 				
 				
 				boolean LMR_allowed = not_good_lmr_history;
