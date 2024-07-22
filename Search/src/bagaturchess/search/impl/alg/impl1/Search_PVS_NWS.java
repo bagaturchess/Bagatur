@@ -836,7 +836,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			) {
 			
 			//TODO: Adjust beta margin and depth
-			int singular_beta = ttValue;
+			int singular_beta = ttValue - 2 * depth;
 			int singular_depth = depth / 2;
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, cb, moveGen, ply,
@@ -1081,8 +1081,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean doLMR = new_depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& phase == PHASE_QUIET
-						;
+						&& phase == PHASE_QUIET;
 				
 				int reduction = 1;
 				
