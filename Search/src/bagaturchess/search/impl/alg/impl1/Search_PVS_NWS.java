@@ -1265,10 +1265,10 @@ public class Search_PVS_NWS extends SearchImpl {
 	private int singular_move_search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb,
 			MoveGenerator moveGen, final int ply, int depth, int alpha,
-			int beta, boolean isPv, int initialMaxDepth, int ttMove, int eval) {
+			int beta, boolean isPv, int initialMaxDepth, int ttMove1, int eval) {
 		
 		
-		long hashkey = env.getBitboard().getHashKey() ^ ttMove;
+		long hashkey = env.getBitboard().getHashKey() ^ ttMove1;
 		
 		int ttMove2 = 0; 
 				
@@ -1432,7 +1432,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				//Skip tt move
-				if (move == ttMove) {
+				if (move == ttMove1) {
 					
 					continue;
 				}
@@ -1450,11 +1450,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				if (phase == PHASE_QUIET) {
-					if (move == ttMove || move == killer1Move || move == killer2Move || move == counterMove1 || move == counterMove2) {
+					if (move == ttMove2 || move == killer1Move || move == killer2Move || move == counterMove1 || move == counterMove2) {
 						continue;
 					}
 				} else if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
-					if (move == ttMove) {
+					if (move == ttMove2) {
 						continue;
 					}
 				}	
