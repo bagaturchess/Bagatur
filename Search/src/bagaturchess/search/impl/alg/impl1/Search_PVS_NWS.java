@@ -1169,7 +1169,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (MoveUtil.isQuiet(move)) {
 					
-					moveGen.addBFValue(wasInCheck ? 1 : 0, cb.colorToMove, move, parentMove, new_depth);
+					moveGen.addBFValue(wasInCheck ? 1 : 0, cb.colorToMove, move, parentMove, depth);
 				}
 				
 				
@@ -1193,7 +1193,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (MoveUtil.isQuiet(bestMove)) {
 							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
 							moveGen.addKillerMove(cb.colorToMove, bestMove, ply);
-							moveGen.addHHValue(wasInCheck ? 1 : 0, cb.colorToMove, bestMove, parentMove, new_depth);
+							moveGen.addHHValue(wasInCheck ? 1 : 0, cb.colorToMove, bestMove, parentMove, depth);
 						}
 						
 						phase += 379;
