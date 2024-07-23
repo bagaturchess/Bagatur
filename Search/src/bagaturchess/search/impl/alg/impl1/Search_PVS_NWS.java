@@ -859,7 +859,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		/*if (isPv && ttFlag == -1 && depth >= 3) {
+		//Still no tt move, so help the search to find the tt move/score faster
+		/*if (isPv && ttFlag == -1 && depth >= 2) {
 			
 			depth -= 2;
 		}*/
