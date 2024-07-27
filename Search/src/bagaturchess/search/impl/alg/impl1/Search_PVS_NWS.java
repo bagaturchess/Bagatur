@@ -282,8 +282,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			boolean doLMR = depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& MoveUtil.isQuiet(move)
-						;
+						&& MoveUtil.isQuiet(move);
 			
 			int reduction = 1;
 			if (doLMR) {
@@ -860,7 +859,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//Still no tt move, so help the search to find the tt move/score faster
-		/*if (isPv && ttFlag == -1 && depth >= 2) {
+		/*if (isPv && ttFlag == -1 && depth >= 3) {
 			
 			depth -= 2;
 		}*/
