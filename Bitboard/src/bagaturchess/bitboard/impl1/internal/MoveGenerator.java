@@ -38,9 +38,8 @@ public final class MoveGenerator {
 	//Values more than 2 actually means that the LMR optimization is always performed and there are no skips. Value 0 means that it is executed in around 50% of the cases.
 	private static final double LMR_DEVIATION_MULTIPLIER 		= 1;
 	
-	private final long[][] LMR_ALL 								= new long[2][64 * 64];
-	private final long[][] LMR_BELOW_ALPHA 						= new long[2][64 * 64];
-	private final long[][] LMR_ABOVE_ALPHA 						= new long[2][64 * 64];
+	private final CombinedHistory lmr_history 					= new CombinedHistory(MOVE_SCORE_SCALE, true);
+	
 	private VarStatistic[] lmrBelowAlphaAVGScores 				= new VarStatistic[2];
 	private VarStatistic[] lmrAboveAlphaAVGScores 				= new VarStatistic[2];
 	
@@ -67,11 +66,7 @@ public final class MoveGenerator {
 
 	private final IBetaCutoffMoves[][][] COUNTER_MOVES_COUNTS	= new IBetaCutoffMoves[2][7][64];
 	
-	private final long[][] HH_MOVES 							= new long[2][64 * 64];
-	private final long[][] BF_MOVES 							= new long[2][64 * 64];
-	
-	private final long[][][] HH_MOVES1 							= new long[2][7][64];
-	private final long[][][] BF_MOVES1 							= new long[2][7][64];
+	private final CombinedHistory history 						= new CombinedHistory(MOVE_SCORE_SCALE, false);
 	
 	private final ContinuationHistory[][] HH_ContinuationHistory 	= new ContinuationHistory[2][2];
 	private final ContinuationHistory[][] BF_ContinuationHistory 	= new ContinuationHistory[2][2];
@@ -148,42 +143,8 @@ public final class MoveGenerator {
 	
 	public void clearHistoryHeuristics() {
 		
-		Arrays.fill(HH_MOVES[WHITE], 0);
-		Arrays.fill(HH_MOVES[BLACK], 0);
-		Arrays.fill(BF_MOVES[WHITE], 1);
-		Arrays.fill(BF_MOVES[BLACK], 1);
 		
-		Arrays.fill(HH_MOVES1[WHITE][0], 0);
-		Arrays.fill(HH_MOVES1[WHITE][PAWN], 0);
-		Arrays.fill(HH_MOVES1[WHITE][NIGHT], 0);
-		Arrays.fill(HH_MOVES1[WHITE][BISHOP], 0);
-		Arrays.fill(HH_MOVES1[WHITE][ROOK], 0);
-		Arrays.fill(HH_MOVES1[WHITE][QUEEN], 0);
-		Arrays.fill(HH_MOVES1[WHITE][KING], 0);
-		
-		Arrays.fill(HH_MOVES1[BLACK][0], 0);
-		Arrays.fill(HH_MOVES1[BLACK][PAWN], 0);
-		Arrays.fill(HH_MOVES1[BLACK][NIGHT], 0);
-		Arrays.fill(HH_MOVES1[BLACK][BISHOP], 0);
-		Arrays.fill(HH_MOVES1[BLACK][ROOK], 0);
-		Arrays.fill(HH_MOVES1[BLACK][QUEEN], 0);
-		Arrays.fill(HH_MOVES1[BLACK][KING], 0);
-		
-		Arrays.fill(BF_MOVES1[WHITE][0], 1);
-		Arrays.fill(BF_MOVES1[WHITE][PAWN], 1);
-		Arrays.fill(BF_MOVES1[WHITE][NIGHT], 1);
-		Arrays.fill(BF_MOVES1[WHITE][BISHOP], 1);
-		Arrays.fill(BF_MOVES1[WHITE][ROOK], 1);
-		Arrays.fill(BF_MOVES1[WHITE][QUEEN], 1);
-		Arrays.fill(BF_MOVES1[WHITE][KING], 1);
-		
-		Arrays.fill(BF_MOVES1[BLACK][0], 1);
-		Arrays.fill(BF_MOVES1[BLACK][PAWN], 1);
-		Arrays.fill(BF_MOVES1[BLACK][NIGHT], 1);
-		Arrays.fill(BF_MOVES1[BLACK][BISHOP], 1);
-		Arrays.fill(BF_MOVES1[BLACK][ROOK], 1);
-		Arrays.fill(BF_MOVES1[BLACK][QUEEN], 1);
-		Arrays.fill(BF_MOVES1[BLACK][KING], 1);	
+		history.clear();	
 		
 		
 		if (CLEAR_TABLES_ON_NEW_SEARCH) {
@@ -225,12 +186,9 @@ public final class MoveGenerator {
 			}*/
 		}
 		
-		Arrays.fill(LMR_ALL[WHITE], 0);
-		Arrays.fill(LMR_ALL[BLACK], 0);
-		Arrays.fill(LMR_BELOW_ALPHA[WHITE], 0);
-		Arrays.fill(LMR_BELOW_ALPHA[BLACK], 0);
-		Arrays.fill(LMR_ABOVE_ALPHA[WHITE], 0);
-		Arrays.fill(LMR_ABOVE_ALPHA[BLACK], 0);
+		lmr_history.clear();
+		
+		
 		Arrays.fill(LMR_STATS_COUNTER_ABOVE_ALPHA[WHITE], 0);
 		Arrays.fill(LMR_STATS_COUNTER_ABOVE_ALPHA[BLACK], 0);
 		Arrays.fill(LMR_STATS_COUNTER_BELOW_ALPHA[WHITE], 0);
@@ -257,33 +215,34 @@ public final class MoveGenerator {
 	
 	
 	public void addHHValue(final int inCheck, final int color, final int move, final int parentMove, final int depth) {
-		HH_MOVES[color][MoveUtil.getFromToIndex(move)] += depth * depth;
-		HH_MOVES1[color][MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
+		
+		history.addValue_Good(color, move, depth);
+		
 		if (USE_ContinuationHistory) HH_ContinuationHistory[inCheck][color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
 	}
 	
 	
 	public void addBFValue(final int inCheck, final int color, final int move, final int parentMove, final int depth) {
-		BF_MOVES[color][MoveUtil.getFromToIndex(move)] += depth * depth;
-		BF_MOVES1[color][MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
+		
+		history.addValue_All(color, move, depth);
+		
 		if (USE_ContinuationHistory) BF_ContinuationHistory[inCheck][color == WHITE ? BLACK : WHITE].array[MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].array[MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
 	}
 	
 	
-	public int getHHScore(final int inCheck, final int color, final int fromToIndex, final int pieceType, final int toIndex, final int parentMove) {
+	public int getHHScore(final int inCheck, final int color, final int move, final int parentMove) {
 		
-		int value3 = (int) (USE_ContinuationHistory ? getContinuationHistoryScore(inCheck, color, pieceType, toIndex, parentMove) : 0);
+		//int value3 = (int) (USE_ContinuationHistory ? getContinuationHistoryScore(inCheck, color, pieceType, toIndex, parentMove) : 0);
 		
 		if (USE_ContinuationHistory) {
 			
-			return value3;
+			throw new IllegalStateException();
+			//return value3;
 			
 		} else {
 
-			int value1 = (int) (MOVE_SCORE_SCALE * HH_MOVES[color][fromToIndex] / BF_MOVES[color][fromToIndex]);
-			int value2 = (int) (MOVE_SCORE_SCALE * HH_MOVES1[color][pieceType][toIndex] / BF_MOVES1[color][pieceType][toIndex]);
-
-			return Math.max(value1, Math.max(value2, value3));
+			return history.getScore(color, move);
+			//return Math.max(value1, Math.max(value2, value3));
 		}
 		
 		//return (value1 + value2 + value3) / 3;
@@ -303,9 +262,9 @@ public final class MoveGenerator {
 			
 			return;
 		}
+		                                    
 		
-		
-		LMR_ALL[color][MoveUtil.getFromToIndex(move)] += depth * depth;
+		lmr_history.addValue_All(color, move, depth);
 	}
 	
 	
@@ -318,14 +277,14 @@ public final class MoveGenerator {
 		}
 		
 		
-		int fromToIndex = MoveUtil.getFromToIndex(move);
+		//int fromToIndex = MoveUtil.getFromToIndex(move);
 		
-		LMR_ABOVE_ALPHA[color][fromToIndex] += depth * depth;
+		//LMR_ABOVE_ALPHA[color][MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;
 		
 		
 		if (EngineConstants.ENABLE_LMR_STATS_DECISION || EngineConstants.ENABLE_LMP_STATS_DECISION) {
 			
-			int rate = getLMR_Rate_internal(color, fromToIndex);
+			int rate = getLMR_Rate_internal(color, move);
 			
 			lmrAboveAlphaAVGScores[color].addValue(rate);
 		}
@@ -333,7 +292,7 @@ public final class MoveGenerator {
 		
 		if (BUILD_EXACT_STATS) {
 			
-			int rate = getLMR_Rate_internal(color, fromToIndex);
+			int rate = getLMR_Rate_internal(color, move);
 			
 			//System.out.println("addLMR_AboveAlpha: COLOR " + color + ", LMR_RATE_THREASHOLD_ABOVE_ALPHA=" + LMR_RATE_THREASHOLD_ABOVE_ALPHA + " POINTER=" + getLMR_ThreasholdPointer_AboveAlpha(color));
 			
@@ -355,53 +314,17 @@ public final class MoveGenerator {
 	public void addLMR_BelowAlpha(final int color, final int move, final int depth) {
 		
 		
-		if (!EngineConstants.ENABLE_LMR_STATS) {
-			
-			return;
-		}
-		
-		
-		int fromToIndex = MoveUtil.getFromToIndex(move);
-		
-		LMR_BELOW_ALPHA[color][fromToIndex] += depth * depth;
-		
-		
-		if (EngineConstants.ENABLE_LMR_STATS_DECISION || EngineConstants.ENABLE_LMP_STATS_DECISION) {
-			
-			int rate = getLMR_Rate_internal(color, fromToIndex);
-			
-			lmrBelowAlphaAVGScores[color].addValue(rate);
-		}
-		
-		
-		if (BUILD_EXACT_STATS) {
-			
-			int rate = getLMR_Rate_internal(color, fromToIndex);
-			
-			//System.out.println("addLMR_BelowAlpha: COLOR " + color + ", LMR_RATE_THREASHOLD_BELOW_ALPHA=" + LMR_RATE_THREASHOLD_BELOW_ALPHA + " POINTER=" + getLMR_ThreasholdPointer_BelowAlpha(color));
-			
-			LMR_STATS_COUNTER_BELOW_ALPHA[color][rate]++;
-			lmr_rate_all_below_alpha[color]++;
-			
-			int sum = 0;
-			int pointer = LMR_STAT_MULTIPLIER - 1;
-			while (pointer > 0 && sum / (double) lmr_rate_all_below_alpha[color] < LMR_RATE_THREASHOLD_BELOW_ALPHA) {
-				sum += LMR_STATS_COUNTER_BELOW_ALPHA[color][pointer];
-				pointer--;
-			}
-			
-			lmr_rate_pointer_below_alpha[color] = pointer;
-		}
+		lmr_history.addValue_Good(color, move, depth);
 	}
 	
 	
 	public int getLMR_Rate(final int color, final int move) {		
 		
-		return getLMR_Rate_internal(color, MoveUtil.getFromToIndex(move));
+		return getLMR_Rate_internal(color, move);
 	}
 	
 	
-	private int getLMR_Rate_internal(final int color, final int fromToIndex) {
+	private int getLMR_Rate_internal(final int color, final int move) {
 		
 		
 		if (!EngineConstants.ENABLE_LMR_STATS) {
@@ -410,14 +333,7 @@ public final class MoveGenerator {
 		}
 		
 		
-		long count_all = LMR_ALL[color][fromToIndex];
-		
-		if (count_all == 0) {
-			
-			return 0;
-		}
-		
-		return (int) ((LMR_STAT_MULTIPLIER * (count_all - LMR_BELOW_ALPHA[color][fromToIndex])) / count_all);
+		return lmr_history.getScore(color, move);
 	}
 	
 	
@@ -658,7 +574,7 @@ public final class MoveGenerator {
 			int from_to_index = MoveUtil.getFromToIndex(move);
 			
 			//long score = 0;
-			long score = getHHScore(inCheck, colorToMove, from_to_index, MoveUtil.getSourcePieceIndex(move), MoveUtil.getToIndex(move), parentMove);
+			long score = getHHScore(inCheck, colorToMove, move, parentMove);
 			
 			/**
 			 * Each particular move's score is calculated by the ration between the beta cutoffs occurrences after this move divided by the number of all occurrences of the move.
@@ -667,7 +583,7 @@ public final class MoveGenerator {
 			 * This approach should be kind of dynamic optimization as all other heuristic here are.
 			 * I am happy that this approach doesn't makes the search speed worse.
 			 * */
-			score += getLMR_Rate_internal(colorToMove, from_to_index);
+			score += getLMR_Rate_internal(colorToMove, move);
 			//score += 0;
 			
 			if (score < 0) {
@@ -713,7 +629,7 @@ public final class MoveGenerator {
 				
 			} else if (MoveUtil.isQuiet(cur_move)) {
 				
-				moveScores[j] = getHHScore(cb.checkingPieces == 0 ? 0 : 1, cb.colorToMove, MoveUtil.getFromToIndex(cur_move), MoveUtil.getSourcePieceIndex(cur_move), MoveUtil.getToIndex(cur_move), parentMove);
+				moveScores[j] = getHHScore(cb.checkingPieces == 0 ? 0 : 1, cb.colorToMove, cur_move, parentMove);
 				
 			} else {
 				

@@ -303,7 +303,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (score > alpha) {
 						
-						moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
+						//moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
 						
 					} else {
 						
@@ -1027,7 +1027,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				boolean not_good_lmr_history = moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove);
+				boolean not_good_lmr_history = true; //moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove);
 				
 				if (!isPv
 						&& depth <= 7
@@ -1137,7 +1137,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (score > alpha) {
 							
-							moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, new_depth);
+							//moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, new_depth);
 							
 						} else {
 							
@@ -1462,7 +1462,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				all_moves++;
 				
 				
-				boolean not_good_lmr_history = moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove);
+				boolean not_good_lmr_history = true; //moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove);
 				
 				if (!isPv
 						&& depth <= 7
