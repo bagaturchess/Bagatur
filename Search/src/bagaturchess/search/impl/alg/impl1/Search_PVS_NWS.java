@@ -303,11 +303,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (score > alpha) {
 						
-						//moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
+						moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
 						
-					} else {
-						
-						moveGen.addLMR_BelowAlpha(cb.colorToMoveInverse, move, depth);
 					}
 				}
 				
@@ -1027,8 +1024,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				boolean not_good_lmr_history = true; //moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove);
-				
 				if (!isPv
 						&& depth <= 7
 						&& !wasInCheck
@@ -1038,13 +1033,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& egtb_eval == ISearch.MIN
 					) {
 					
-					if (phase == PHASE_QUIET
-							&& (!EngineConstants.ENABLE_LMP_STATS_DECISION
-									|| (EngineConstants.ENABLE_LMP_STATS_DECISION
-											&& not_good_lmr_history
-										)
-								)
-						) {
+					if (phase == PHASE_QUIET) {
 						
 						if (EngineConstants.ENABLE_LMP
 								&& movesPerformed_attacks + movesPerformed_quiet >= 3 + depth * depth
@@ -1076,20 +1065,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int new_depth = (move == ttMove && extend_tt_move) ?(isPv ? depth : depth + 1) : depth - 1;
 				
-				
-				boolean LMR_allowed = not_good_lmr_history;
-				
 				boolean doLMR = new_depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& phase == PHASE_QUIET;
 				
 				int reduction = 1;
 				
-				if (doLMR &&
-						(!EngineConstants.ENABLE_LMR_STATS_DECISION
-								|| (EngineConstants.ENABLE_LMR_STATS_DECISION && LMR_allowed)
-						)
-					) {
+				if (doLMR) {
 					
 					reduction = LMR_TABLE[Math.min(new_depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
 					
@@ -1100,15 +1082,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 					
-				} else {
-					
-					if (doLMR && !LMR_allowed) {
-						
-						//If this code is not here, than step by step the overall LMR rate goes down to 0 and search becomes extremely shallow (without LMR optimization at all).
-						//It increases the statistics of this move so next time it will be more likely this move to be reduced by LMR
-						moveGen.addLMR_All(cb.colorToMove, move, 1);
-						moveGen.addLMR_BelowAlpha(cb.colorToMove, move, 1);
-					}
 				}
 				
 				
@@ -1137,11 +1110,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (score > alpha) {
 							
-							//moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, new_depth);
+							moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, new_depth);
 							
-						} else {
-							
-							moveGen.addLMR_BelowAlpha(cb.colorToMoveInverse, move, new_depth);
 						}
 					}
 					
@@ -1462,8 +1432,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				all_moves++;
 				
 				
-				boolean not_good_lmr_history = true; //moveGen.getLMR_Rate(cb.colorToMove, move) <= moveGen.getLMR_ThreasholdPointer_BelowAlpha(cb.colorToMove);
-				
 				if (!isPv
 						&& depth <= 7
 						&& !wasInCheck
@@ -1472,13 +1440,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !SearchUtils.isMateVal(beta)
 					) {
 					
-					if (phase == PHASE_QUIET
-							&& (!EngineConstants.ENABLE_LMP_STATS_DECISION
-									|| (EngineConstants.ENABLE_LMP_STATS_DECISION
-											&& not_good_lmr_history
-										)
-								)
-						) {
+					if (phase == PHASE_QUIET) {
 						
 						if (EngineConstants.ENABLE_LMP
 								&& all_moves >= 3 + depth * depth
@@ -1506,24 +1468,18 @@ public class Search_PVS_NWS extends SearchImpl {
 						continue;
 					}
 				}
-
+				
 				
 				env.getBitboard().makeMoveForward(move);
 				
-				boolean LMR_allowed = not_good_lmr_history;
 				
 				boolean doLMR = depth >= 2
 						&& all_moves > 1
-						&& phase == PHASE_QUIET
-						;
-						
+						&& phase == PHASE_QUIET;
+				
 				int reduction = 1;
 				
-				if (doLMR &&
-						(!EngineConstants.ENABLE_LMR_STATS_DECISION
-								|| (EngineConstants.ENABLE_LMR_STATS_DECISION && LMR_allowed)
-						)
-					) {
+				if (doLMR) {
 					
 					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(all_moves, 63)];
 					

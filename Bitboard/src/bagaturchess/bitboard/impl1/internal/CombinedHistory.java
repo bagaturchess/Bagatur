@@ -16,9 +16,7 @@ import java.util.Arrays;
 public class CombinedHistory {
 	
 	
-	private int MOVE_SCORE_SCALE 		= 1000;
-	
-	private boolean reversed;
+	private int scale 					= 1000;
 	
 	private final long[][] HH_MOVES1 	= new long[2][64 * 64];
 	private final long[][] BF_MOVES1 	= new long[2][64 * 64];
@@ -27,10 +25,9 @@ public class CombinedHistory {
 	private final long[][][] BF_MOVES2 	= new long[2][7][64];
 	
 	
-	public CombinedHistory(int scale, boolean _reversed) {
+	public CombinedHistory(int _scale) {
 		
-		MOVE_SCORE_SCALE = scale;
-		reversed = _reversed;
+		scale = _scale;
 		
 		clear();
 	}
@@ -95,20 +92,10 @@ public class CombinedHistory {
 		int fromToIndex = MoveUtil.getFromToIndex(move);
 		int pieceType = MoveUtil.getSourcePieceIndex(move);
 		int toIndex = MoveUtil.getToIndex(move);
-		
-		if (reversed) {
 			
-			int value1 = (int) (MOVE_SCORE_SCALE * (BF_MOVES1[color][fromToIndex] - HH_MOVES1[color][fromToIndex]) / BF_MOVES1[color][fromToIndex]);
-			int value2 = (int) (MOVE_SCORE_SCALE * (BF_MOVES2[color][pieceType][toIndex] - HH_MOVES2[color][pieceType][toIndex]) / BF_MOVES2[color][pieceType][toIndex]);
-	
-			return value1 + value2;
-			
-		} else {
-			
-			int value1 = (int) (MOVE_SCORE_SCALE * HH_MOVES1[color][fromToIndex] / BF_MOVES1[color][fromToIndex]);
-			int value2 = (int) (MOVE_SCORE_SCALE * HH_MOVES2[color][pieceType][toIndex] / BF_MOVES2[color][pieceType][toIndex]);
-	
-			return value1 + value2;
-		}
+		int value1 = (int) (scale * HH_MOVES1[color][fromToIndex] / BF_MOVES1[color][fromToIndex]);
+		int value2 = (int) (scale * HH_MOVES2[color][pieceType][toIndex] / BF_MOVES2[color][pieceType][toIndex]);
+
+		return value1 + value2;
 	}
 }
