@@ -69,8 +69,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_ATTACKING_BAD 					= 6;
 	private static final int PHASE_QUIET 							= 7;
 	
-	private static final VarStatistic LAZY_EVAL_MARGIN 				= new VarStatistic();
-	
 	private static final int[][] LMR_TABLE 							= new int[64][64];
 	
 	static {
@@ -139,9 +137,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		lastSentMinorInfo_nodesCount 	= 0;
 		lastSentMinorInfo_timestamp 	= 0;
-		
-		LAZY_EVAL_MARGIN.clear();
-		LAZY_EVAL_MARGIN.addValue(250);
 		
 		if (ChannelManager.getChannel() != null) {
 			
