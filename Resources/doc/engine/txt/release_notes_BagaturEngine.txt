@@ -1,3 +1,8 @@
+ Version 5.1b (3 August 2024)
+ * Singular move extension implemented
+ * Revise search and move ordering
+ * Revise time management
+ 
  Version 5.1a (7 July 2024)
  * Updated logo
  * Updated NUEE network file with new version
