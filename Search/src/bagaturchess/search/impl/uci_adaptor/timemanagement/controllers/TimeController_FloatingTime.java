@@ -65,18 +65,10 @@ public abstract class TimeController_FloatingTime extends TimeController_Consume
 		
 		if (colour == Figures.COLOUR_WHITE) {
 			totalClockTime = (long) (wtime / getTotalClockTime_EmergencyDevideFactor(wtime));
-			if (totalClockTime >= TOTAL_CLOCK_TIME_DEVIDE_FACTOR * wtime_inc) {
-				minMoveTime = (long) Math.max(wtime / (getTotalClockTime_DevideFactor() * getTotalClockTime_EmergencyDevideFactor(wtime)), wtime_inc);	
-			} else {
-				minMoveTime = (long) Math.min(wtime / (getTotalClockTime_DevideFactor() * getTotalClockTime_EmergencyDevideFactor(wtime)), wtime_inc);
-			}
+			minMoveTime = (long) (wtime / (getTotalClockTime_DevideFactor() * getTotalClockTime_EmergencyDevideFactor(wtime)) + wtime_inc);	
 		} else {
 			totalClockTime = (long) (btime / getTotalClockTime_EmergencyDevideFactor(btime));
-			if (totalClockTime >= TOTAL_CLOCK_TIME_DEVIDE_FACTOR * btime_inc) {
-				minMoveTime = (long) Math.max(btime / (getTotalClockTime_DevideFactor() * getTotalClockTime_EmergencyDevideFactor(btime)), btime_inc);	
-			} else {
-				minMoveTime = (long) Math.min(btime / (getTotalClockTime_DevideFactor() * getTotalClockTime_EmergencyDevideFactor(btime)), btime_inc);
-			}
+			minMoveTime = (long) (btime / (getTotalClockTime_DevideFactor() * getTotalClockTime_EmergencyDevideFactor(btime)) + btime_inc);	
 		}
 	}
 	
