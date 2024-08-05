@@ -1,3 +1,5 @@
 Source: https://github.com/VedantJoshi1409/stockfish_nnue_probe/tree/main
-Makefile and than:
+Makefile:
+make -j build ARCH=x86-64-avx2
+and than:
 g++ -lpthread -shared -o probe.dll bitboard.o evaluate.o evaluate_nnue.o half_ka_v2_hm.o misc.o bagaturchess_nnue_v5_NNUEBridge.o position.o probe.o -I. -O2 -s
