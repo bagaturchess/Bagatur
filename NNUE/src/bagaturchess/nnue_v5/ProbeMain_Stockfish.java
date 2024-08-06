@@ -82,6 +82,8 @@ public class ProbeMain_Stockfish {
 		
 		NNUEProbeUtils.fillInput(bitboard, input);
 		
+		//int eval = NNUEBridge.evalFen(fen);
+		
 		/*int[] board_array = new int[64];
 		for (int i = 0; i < input.pieces.length; i++) {
 			if (input.pieces[i] <= 0) {
