@@ -1062,7 +1062,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean doLMR = new_depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& phase == PHASE_QUIET;
+						&& MoveUtil.isQuiet(move);
 				
 				int reduction = 1;
 				
@@ -1470,7 +1470,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean doLMR = depth >= 2
 						&& all_moves > 1
-						&& phase == PHASE_QUIET;
+						&& MoveUtil.isQuiet(move);
 				
 				int reduction = 1;
 				
