@@ -1037,7 +1037,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
-						/*if (eval != ISearch.MIN) { //eval is set
+						if (eval != ISearch.MIN) { //eval is set
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
@@ -1046,7 +1046,7 @@ public class Search_PVS_NWS extends SearchImpl {
 									continue;
 								}
 							}
-						}*/
+						}
 						
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& phase == PHASE_ATTACKING_BAD
@@ -1444,7 +1444,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
-						/*if (eval != ISearch.MIN) { //eval is set
+						if (eval != ISearch.MIN) { //eval is set
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
@@ -1453,7 +1453,7 @@ public class Search_PVS_NWS extends SearchImpl {
 									continue;
 								}
 							}
-						}*/
+						}
 						
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& phase == PHASE_ATTACKING_BAD
