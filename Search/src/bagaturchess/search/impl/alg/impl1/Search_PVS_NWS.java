@@ -83,6 +83,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
+	private static final int FUTILITY_MARGIN 						= 80;
+	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
 	
@@ -1041,7 +1043,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								if (eval + depth * 80 <= alpha) {
+								if (eval + depth * FUTILITY_MARGIN <= alpha) {
 									
 									continue;
 								}
@@ -1448,7 +1450,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								if (eval + depth * 80 <= alpha) {
+								if (eval + depth * FUTILITY_MARGIN <= alpha) {
 									
 									continue;
 								}
