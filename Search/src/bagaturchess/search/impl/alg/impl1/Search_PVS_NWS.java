@@ -293,16 +293,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			try {
 				
 				if (EngineConstants.ENABLE_LMR && reduction != 1) {
-					
-					moveGen.addLMR_All(cb.colorToMoveInverse, move, depth);
-											
+										
 					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
-					
-					if (score > alpha) {
-						
-						moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, depth);
-						
-					}
 				}
 				
 				if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
@@ -1100,16 +1092,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				try {
 					
 					if (EngineConstants.ENABLE_LMR && reduction != 1) {
-						
-						moveGen.addLMR_All(cb.colorToMoveInverse, move, new_depth);
 												
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
-						
-						if (score > alpha) {
-							
-							moveGen.addLMR_AboveAlpha(cb.colorToMoveInverse, move, new_depth);
-							
-						}
 					}
 					
 					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {

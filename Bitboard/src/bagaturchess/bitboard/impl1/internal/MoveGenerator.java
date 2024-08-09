@@ -130,37 +130,6 @@ public final class MoveGenerator {
 	}
 	
 	
-	public void addLMR_All(final int color, final int move, final int depth) {
-		
-		lmr_history.addValue_All(color, move, depth);
-	}
-	
-	
-	public void addLMR_AboveAlpha(final int color, final int move, final int depth) {
-		
-		lmr_history.addValue_Good(color, move, depth);
-	}
-	
-	
-	public int getLMR_Rate(final int color, final int move) {		
-		
-		return getLMR_Rate_internal(color, move);
-	}
-	
-	
-	private int getLMR_Rate_internal(final int color, final int move) {
-		
-		
-		if (!EngineConstants.ENABLE_LMR_STATS) {
-			
-			return 0;
-		}
-		
-		
-		return lmr_history.getScore(color, move);
-	}
-	
-	
 	public void addKillerMove(final int color, final int move, final int ply) {
 		
 		if (EngineConstants.ENABLE_KILLER_MOVES) {
