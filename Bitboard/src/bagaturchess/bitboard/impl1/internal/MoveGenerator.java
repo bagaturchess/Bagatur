@@ -33,8 +33,7 @@ public final class MoveGenerator {
 	private final IBetaCutoffMoves[][][] COUNTER_MOVES_COUNTS	= new IBetaCutoffMoves[2][7][64];
 	
 	private final CombinedHistory history 						= new CombinedHistory(MOVE_SCORE_SCALE);
-	private final CombinedHistory lmr_history 					= new CombinedHistory(MOVE_SCORE_SCALE);	
-	
+
 	private long counter_sorting;
 	
 	private Random randomizer = new Random();
@@ -98,8 +97,6 @@ public final class MoveGenerator {
 		
 		
 		history.clear();
-		
-		lmr_history.clear();
 		
 		
 		currentPly = 0;
