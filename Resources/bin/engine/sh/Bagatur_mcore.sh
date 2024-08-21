@@ -7,7 +7,7 @@ export BIN_PATH=./bin/
 
 
 # Sets the path to jar files containing the compiled java code of Bagatur engine
-export JARS_PATH=".:${BIN_PATH}BagaturBoard.jar:${BIN_PATH}BagaturOpening.jar:${BIN_PATH}BagaturSearch.jar:${BIN_PATH}BagaturUCI.jar:${BIN_PATH}BagaturEngines.jar:${BIN_PATH}BagaturLearningAPI.jar:${BIN_PATH}BagaturEGTB.jar:${BIN_PATH}BagaturLearningImpl.jar:"
+export JARS_PATH=".:${BIN_PATH}BagaturEngine.jar:"
 
 
 # Sets the memory (in megabytes) for the WHOLE java process.

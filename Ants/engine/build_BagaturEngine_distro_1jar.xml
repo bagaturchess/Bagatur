@@ -1,0 +1,207 @@
+<project name="BagaturEngine" basedir="." default="build_distro">
+  
+  
+  <property name="distro_sufix" value="_DEV" />
+  
+  
+  <property name="workspace_root" value="../../"/>
+  <property name="ants_dir" value="${workspace_root}/Ants" />
+  <property name="work_dir" value="${workspace_root}/WorkDir" />
+  <property name="bitboard_dir" value="${workspace_root}/Bitboard" />
+  <property name="opening_dir" value="${workspace_root}/Opening" />
+  <property name="uci_dir" value="${workspace_root}/UCI" />
+  <property name="search_dir" value="${workspace_root}/Search" />
+  <property name="engines_dir" value="${workspace_root}/Engines" />
+  <property name="enginesrunner_dir" value="${workspace_root}/EnginesRunner" />
+  <property name="resources_dir" value="${workspace_root}/Resources" />
+  <property name="learningAPI_dir" value="${workspace_root}/LearningAPI" />
+  <property name="learningImpl_dir" value="${workspace_root}/LearningImpl" />
+  <property name="egtb_dir" value="${workspace_root}/EGTB" />
+  <property name="nnue_dir" value="${workspace_root}/NNUE" />
+
+  <property name="temp_dir" value="${work_dir}/temp" />
+  
+	
+  <target name="build_distro" description="Building Distribution">
+  	
+  	
+  	<mkdir dir="${temp_dir}" />
+  	
+  	
+  	<javac debug="true" debuglevel="lines" compiler="javac1.7"
+  		srcdir="${bitboard_dir}/src" destdir="${temp_dir}"
+  		excludes="/bagaturchess/bitboard/tests/**/*.java"/>
+  	
+  	<javac debug="true" debuglevel="lines" compiler="javac1.7"
+  		srcdir="${opening_dir}/src" destdir="${temp_dir}"  classpath="${temp_dir}"/>
+  	
+  	<javac debug="true" debuglevel="lines" compiler="javac1.7"
+  		srcdir="${uci_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
+  	
+  	<javac debug="true" debuglevel="lines" compiler="javac1.7"
+  		srcdir="${egtb_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
+  	
+  	<javac debug="true" debuglevel="lines" compiler="javac1.7"
+  		srcdir="${nnue_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
+  	
+  	<javac debug="true" debuglevel="lines" compiler="javac1.7"
+  		srcdir="${search_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
+  	
+  	<javac debug="true" debuglevel="lines" compiler="javac1.7"
+  		srcdir="${learningAPI_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
+  	
+  	<javac debug="true" debuglevel="lines" compiler="javac1.7"
+  		srcdir="${learningImpl_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
+  	
+  	<javac debug="true" debuglevel="lines" compiler="javac1.7"
+  		srcdir="${engines_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
+  	
+  	<javac debug="true" debuglevel="lines" compiler="javac1.7"
+  		srcdir="${engines_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
+  	
+  	
+  	<jar jarfile="${work_dir}/BagaturEngine.jar" basedir="${temp_dir}"/>
+  	
+  	
+  	<delete dir="${temp_dir}" />
+  	
+  	
+  	<ant antfile="${ants_dir}/engine/build_BagaturEngine_src.xml" dir="${ants_dir}/engine"/>
+  	
+  	
+	<copy todir="${temp_dir}/bin">
+	    <fileset dir="${work_dir}/">
+	      <include name="BagaturEngine.jar"/>
+	    </fileset>
+	</copy>
+  	
+	<copy todir="${temp_dir}/bin">
+	    <fileset dir="${resources_dir}/bin/engine/egtb/bin/">
+		  <include name="*"/>
+	    </fileset>
+	</copy>
+	
+	<copy todir="${temp_dir}/bin">
+	    <fileset dir="${resources_dir}/bin/engine/nnue/bin">
+		  <include name="*"/>
+	    </fileset>
+	</copy>
+	
+	<copy todir="${temp_dir}">
+	    <fileset dir="${resources_dir}/bin/engine/nnue/">
+		  <include name="*"/>
+	    </fileset>
+	</copy>
+	
+	<copy tofile="${temp_dir}/data/w.ob">
+	    <fileset dir="${resources_dir}/bin/engine/ob">
+		  <include name="w.ob"/>
+	    </fileset>
+	</copy>
+	<copy tofile="${temp_dir}/data/b.ob">
+	    <fileset dir="${resources_dir}/bin/engine/ob">
+		  <include name="b.ob"/>
+	    </fileset>
+	</copy>
+  	
+	<copy todir="${temp_dir}/data/egtb/">
+	    <fileset dir="${resources_dir}/bin/engine/egtb/">
+		  <include name="*.rtbw"/>
+	      <include name="*.rtbz"/>
+	    </fileset>
+	</copy>
+
+  	<copy todir="${temp_dir}">
+	    <fileset dir="${work_dir}/">
+		    <include name="src.zip"/>
+	    </fileset>
+	    <fileset dir="${ants_dir}/">
+	    	<include name="LICENSE"/>
+	    </fileset>
+	</copy>
+  	
+	<copy tofile="${temp_dir}/readme.txt" >
+		<fileset dir="${resources_dir}/doc/engine/txt">
+			<include name="readme_distro_BagaturEngine.txt"/>
+		</fileset>
+	</copy>
+	<copy tofile="${temp_dir}/release_notes.txt" >
+		<fileset dir="${resources_dir}/doc/engine/txt">
+			<include name="release_notes_BagaturEngine.txt"/>
+		</fileset>
+	</copy>
+  	
+  	<copy tofile="${temp_dir}/Bagatur.jpg" >
+		<fileset dir="${resources_dir}/bin/engine/logo">
+			<include name="Bagatur.jpg"/>
+		</fileset>
+	</copy>
+  	
+  	
+	<copy tofile="${temp_dir}/bin/Bagatur_1core.bat" >
+		<fileset dir="${resources_dir}/bin/engine/bat">
+			<include name="Bagatur_1core.bat"/>
+		</fileset>
+	</copy>
+  	<copy tofile="${temp_dir}/bin/Bagatur_mcore.bat" >
+		<fileset dir="${resources_dir}/bin/engine/bat">
+			<include name="Bagatur_mcore.bat"/>
+		</fileset>
+	</copy>
+  	
+  	<copy tofile="${temp_dir}/bin/Bagatur_1core.sh" >
+  		<fileset dir="${resources_dir}/bin/engine/sh">
+  			<include name="Bagatur_1core.sh"/>
+  		</fileset>
+  	</copy>
+  	<copy tofile="${temp_dir}/bin/Bagatur_mcore.sh" >
+  		<fileset dir="${resources_dir}/bin/engine/sh">
+  			<include name="Bagatur_mcore.sh"/>
+  		</fileset>
+  	</copy>
+	
+  	<copy tofile="${temp_dir}/Bagatur_64_1_core.bmp" >
+		<fileset dir="${resources_dir}/bin/engine/logo">
+			<include name="BagaturEngine.bmp"/>
+		</fileset>
+	</copy>
+  	<copy tofile="${temp_dir}/Bagatur_64_1_core.exe" >
+		<fileset dir="${resources_dir}/bin/engine/exe">
+			<include name="Bagatur_64.exe"/>
+		</fileset>
+	</copy>
+  	<copy tofile="${temp_dir}/Bagatur_64_1_core.ini" >
+		<fileset dir="${resources_dir}/bin/engine/exe">
+			<include name="Bagatur_1core.ini"/>
+		</fileset>
+	</copy>
+  	
+  	<copy tofile="${temp_dir}/Bagatur_64_2+_cores.bmp" >
+		<fileset dir="${resources_dir}/bin/engine/logo">
+			<include name="BagaturEngine.bmp"/>
+		</fileset>
+	</copy>
+  	<copy tofile="${temp_dir}/Bagatur_64_2+_cores.exe" >
+		<fileset dir="${resources_dir}/bin/engine/exe">
+			<include name="Bagatur_64.exe"/>
+		</fileset>
+	</copy>
+  	<copy tofile="${temp_dir}/Bagatur_64_2+_cores.ini" >
+		<fileset dir="${resources_dir}/bin/engine/exe">
+			<include name="Bagatur_2cores.ini"/>
+		</fileset>
+	</copy>
+  	
+  	
+	<zip zipfile="${work_dir}/BagaturEngine${distro_sufix}.zip" basedir="${temp_dir}" />
+  	
+  	
+  	<delete dir="${temp_dir}"/>
+  	<delete file="${work_dir}/BagaturEngine.jar"/>
+  	<delete file="${work_dir}/src.zip"/>
+  	<delete file="${work_dir}/data/w.ob"/>
+	<delete file="${work_dir}/data/b.ob"/>
+	<delete dir="${work_dir}/data"/>
+  	
+  </target>
+</project>
