@@ -1,6 +1,7 @@
 package bagaturchess.nnue_v2;
 
 
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import bagaturchess.bitboard.api.BoardUtils;
@@ -77,7 +78,7 @@ public class ProbeMain_V2 {
 		
 		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen);
 		
-		NNUE network = new NNUE("./network_bagatur.nnue", bitboard);
+		NNUE network = new NNUE(new FileInputStream("./network_bagatur.nnue"), bitboard);
 		
 		int eval = network.evaluate();
 		

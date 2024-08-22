@@ -60,6 +60,13 @@
   		srcdir="${engines_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
   	
   	
+  	<copy todir="${temp_dir}">
+  		<fileset dir="${resources_dir}/bin/engine/nnue">
+  			<include name="network_bagatur.nnue"/>
+  		</fileset>
+  	</copy>
+  	
+  	
   	<jar jarfile="${work_dir}/BagaturEngine.jar" basedir="${temp_dir}"/>
   	
   	
@@ -77,18 +84,6 @@
   	
 	<copy todir="${temp_dir}/bin">
 	    <fileset dir="${resources_dir}/bin/engine/egtb/bin/">
-		  <include name="*"/>
-	    </fileset>
-	</copy>
-	
-	<copy todir="${temp_dir}/bin">
-	    <fileset dir="${resources_dir}/bin/engine/nnue/bin">
-		  <include name="*"/>
-	    </fileset>
-	</copy>
-	
-	<copy todir="${temp_dir}">
-	    <fileset dir="${resources_dir}/bin/engine/nnue/">
 		  <include name="*"/>
 	    </fileset>
 	</copy>

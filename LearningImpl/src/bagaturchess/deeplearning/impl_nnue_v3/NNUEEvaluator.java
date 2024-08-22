@@ -4,6 +4,7 @@ package bagaturchess.deeplearning.impl_nnue_v3;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.nnue_v2.NNUE;
@@ -28,7 +29,9 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		try {
 		
-			nnue = new NNUE("./network_bagatur.nnue", bitboard);
+			InputStream is = getClass().getResourceAsStream("/network_bagatur.nnue");
+			
+			nnue = new NNUE(is, bitboard);
 		
 		} catch (IOException e) {
 			

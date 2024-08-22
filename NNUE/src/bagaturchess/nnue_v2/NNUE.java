@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
+import java.io.InputStream;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.MoveListener;
@@ -71,15 +72,17 @@ public class NNUE
 		}
 	}
 	
-	private static int screlu(short i)
-	{
+	private static int screlu(short i) {
 		int v = Math.max(0, Math.min(i, QA));
 		return v * v;
 	}
 	
-	public NNUE(String filePath, IBitBoard _bitboard) throws IOException
-	{
-		DataInputStream networkData = new DataInputStream(new BufferedInputStream(new FileInputStream(filePath), 16 * 4096));
+	public NNUE(InputStream is, IBitBoard _bitboard) throws IOException {
+		DataInputStream networkData = new DataInputStream(
+				new BufferedInputStream(
+						is, 16 * 4096
+				)
+		);
 		
 		L1Weights = new short[FEATURE_SIZE * INPUT_BUCKET_SIZE][HIDDEN_SIZE];
 
@@ -138,8 +141,7 @@ public class NNUE
 	}
 
 	
-	private static short toLittleEndian(short input)
-	{
+	private static short toLittleEndian(short input) {
 		return (short) (((input & 0xFF) << 8) | ((input & 0xFF00) >> 8));
 	}
 	
@@ -202,8 +204,7 @@ public class NNUE
     }
     
     
-	public static int evaluate(NNUE network, NNUEAccumulator us, NNUEAccumulator them, int pieces_count)
-	{
+	public static int evaluate(NNUE network, NNUEAccumulator us, NNUEAccumulator them, int pieces_count) {
 		
 		short[] L2Weights = network.L2Weights[chooseOutputBucket(pieces_count)];
 		short[] UsValues = us.values;
@@ -245,19 +246,16 @@ public class NNUE
 	}*/
 	
 	
-	public static int chooseOutputBucket(int pieces_count)
-	{
+	public static int chooseOutputBucket(int pieces_count) {
 		return (pieces_count - 2) / DIVISOR;
 	}
 
-	public static int chooseInputBucket(int king_sq, int side)
-	{
+	public static int chooseInputBucket(int king_sq, int side) {
 		return side == WHITE ? INPUT_BUCKETS[king_sq]
 				: INPUT_BUCKETS[king_sq ^ 0b111000];
 	}
 
-	public static int getIndex(int square, int piece_side, int piece_type, int perspective)
-	{
+	public static int getIndex(int square, int piece_side, int piece_type, int perspective) {
 		//System.out.println("square=" + square + ", piece_side=" + piece_side + ", piece_type=" + piece_type + ", perspective=" + perspective);
 		return perspective == WHITE
 				? piece_side * COLOR_STRIDE + piece_type * PIECE_STRIDE
@@ -272,8 +270,7 @@ public class NNUE
 		private int bucketIndex;
 		NNUE network;
 
-		public NNUEAccumulator(NNUE network, int bucketIndex)
-		{
+		public NNUEAccumulator(NNUE network, int bucketIndex) {
 			this.network = network;
 			this.bucketIndex = bucketIndex;
 			System.arraycopy(network.L1Biases, 0, values, 0, HIDDEN_SIZE);
@@ -284,29 +281,25 @@ public class NNUE
 			System.arraycopy(network.L1Biases, 0, values, 0, HIDDEN_SIZE);
 		}
 
-		public void setBucketIndex(int bucketIndex)
-		{
+		public void setBucketIndex(int bucketIndex) {
 			this.bucketIndex = bucketIndex;
 		}
 
-		public void add(int featureIndex)
-		{
+		public void add(int featureIndex) {
 			for (int i = 0; i < HIDDEN_SIZE; i++)
 			{
 				values[i] += network.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE][i];
 			}
 		}
 		
-		public void sub(int featureIndex)
-		{
+		public void sub(int featureIndex) {
 			for (int i = 0; i < HIDDEN_SIZE; i++)
 			{
 				values[i] -= network.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE][i];
 			}
 		}
 
-		public void addsub(int featureIndexToAdd, int featureIndexToSubtract)
-		{
+		public void addsub(int featureIndexToAdd, int featureIndexToSubtract) {
 			for (int i = 0; i < HIDDEN_SIZE; i++)
 			{
 				values[i] += network.L1Weights[featureIndexToAdd + bucketIndex * FEATURE_SIZE][i]
