@@ -25,7 +25,7 @@ Hints:
   4.2 Under Windows, if for some reason the EXE files do not work as expected, then there are 2 options:
      A) Edit the corresponding INI file. Find the option 'vm.location', remove semicolons (';' symbol) from the beginning of the line, and set the property to point out the wanted jvm.dll.
         jvm.dll could be found in JRE's 'bin/client' or 'bin/server' directory. For example, the path on your disk should be similar to 'C:\jdk1.6.0_07\jre\bin\client\jvm.dll'
-     B) (Not recommended) Use the BAT files inside the 'bin' sub-directory: Bagatur_1core.bat and Bagatur_mcore.bat
+     B) Use the BAT files inside the 'bin' sub-directory: Bagatur_1core.bat and Bagatur_mcore.bat
         They can be edited so that the full path to java.exe is valid (it is also enough to add the java.exe to the system path variable)
 
 If you are interested in the story "How was the idea of Bagatur Chess Engine application born?", than this YouTube video will be most probably interesting for you: https://youtu.be/_rNBxbUAbS0
