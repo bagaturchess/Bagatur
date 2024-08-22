@@ -67,7 +67,13 @@
   	</copy>
   	
   	
-  	<jar jarfile="${work_dir}/BagaturEngine.jar" basedir="${temp_dir}"/>
+  	<jar jarfile="${work_dir}/BagaturEngine.jar" basedir="${temp_dir}">
+        <manifest>
+            <attribute name="Manifest-Version" value="1.0"/>
+        	<attribute name="Created-By" value="Krasimir Topchiyski"/>
+            <attribute name="Main-Class" value="bagaturchess.uci.run.Boot"/>
+        </manifest>
+  	</jar>
   	
   	
   	<delete dir="${temp_dir}" />
