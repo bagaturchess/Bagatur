@@ -1,7 +1,7 @@
 package bagaturchess.uci.run;
 
 
-public class BagaturMain_MCores {
+public class BagaturMain_MCore {
 	
 	
 	public static void main(String[] _args) {

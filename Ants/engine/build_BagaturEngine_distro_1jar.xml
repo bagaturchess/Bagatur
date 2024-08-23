@@ -71,7 +71,7 @@
         <manifest>
             <attribute name="Manifest-Version" value="1.0"/>
         	<attribute name="Created-By" value="Krasimir Topchiyski"/>
-            <attribute name="Main-Class" value="bagaturchess.uci.run.BagaturMain_1Core"/>
+            <!--attribute name="Main-Class" value="bagaturchess.uci.run.BagaturMain_MCore"/-->
         </manifest>
   	</jar>
   	
