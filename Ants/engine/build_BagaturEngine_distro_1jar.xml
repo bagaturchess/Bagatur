@@ -161,33 +161,33 @@
   		</fileset>
   	</copy>
 	
-  	<copy tofile="${temp_dir}/Bagatur_64_1_core.bmp" >
+  	<copy tofile="${temp_dir}/Bagatur_1_core.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
 			<include name="BagaturEngine.bmp"/>
 		</fileset>
 	</copy>
-  	<copy tofile="${temp_dir}/Bagatur_64_1_core.exe" >
+  	<copy tofile="${temp_dir}/Bagatur_1_core.exe" >
 		<fileset dir="${resources_dir}/bin/engine/exe">
 			<include name="Bagatur_64.exe"/>
 		</fileset>
 	</copy>
-  	<copy tofile="${temp_dir}/Bagatur_64_1_core.ini" >
+  	<copy tofile="${temp_dir}/Bagatur_1_core.ini" >
 		<fileset dir="${resources_dir}/bin/engine/exe">
 			<include name="Bagatur_1core.ini"/>
 		</fileset>
 	</copy>
   	
-  	<copy tofile="${temp_dir}/Bagatur_64_2+_cores.bmp" >
+  	<copy tofile="${temp_dir}/Bagatur_m_core.bmp" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
 			<include name="BagaturEngine.bmp"/>
 		</fileset>
 	</copy>
-  	<copy tofile="${temp_dir}/Bagatur_64_2+_cores.exe" >
+  	<copy tofile="${temp_dir}/Bagatur_m_core.exe" >
 		<fileset dir="${resources_dir}/bin/engine/exe">
 			<include name="Bagatur_64.exe"/>
 		</fileset>
 	</copy>
-  	<copy tofile="${temp_dir}/Bagatur_64_2+_cores.ini" >
+  	<copy tofile="${temp_dir}/Bagatur_m_core.ini" >
 		<fileset dir="${resources_dir}/bin/engine/exe">
 			<include name="Bagatur_2cores.ini"/>
 		</fileset>
