@@ -25,7 +25,7 @@ The program runs under all Operating Systems, which support Java platform:
   * Unpack this distribution somewhere (Arena has a sub-folder called 'engines', you can extract it there).
   * Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway). You may use win32 or win64 version depending on your choice.
   * E2-E4 and enjoy :-)
-* **Linux**, in the bin directory there are *.sh files for running
+* **Linux**, in the root directory there are *.sh files for running
 
 # UCI Options
 
@@ -62,9 +62,7 @@ According to CCRL 40/15, the latest offical Elo ratings of all well tested versi
 
 Special Thanks to <a href="https://www.chessprogramming.org/Graham_Banks">Graham Banks</a>, who put a huge efforts in testing Bagatur versions through the years!
 
-Latest official Elo rating of Bagatur is ~3000 Elo. To make it easy to check, here is a probably outdated screenshot of the computerchess.org web page above:
-
-<a href="" rel="Bagatur Elo rating"><img src="ELO_2021.11.18.png" alt="" /></a>
+Latest official Elo rating of Bagatur is ~3400 Elo.
 
 # More readings with technical details and explanations for each sub-component of Bagatur
 - <a href=https://github.com/bagaturchess/Bagatur/blob/master/Bitboard/readme.txt>Bitboard</a>
