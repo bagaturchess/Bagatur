@@ -1,6 +1,4 @@
 #!/bin/bash
-# Goes to parent directory (the root of the distribution)
-cd ..
 
 # Sets path to libraries
 export BIN_PATH=./bin/

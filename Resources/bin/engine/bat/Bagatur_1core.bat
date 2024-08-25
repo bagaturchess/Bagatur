@@ -1,8 +1,4 @@
 
-
-REM Goes to parent directory (the root of the distribution)
-cd ..
-
 echo off
 
 REM Sets path to libraries
