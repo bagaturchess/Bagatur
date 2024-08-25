@@ -1,3 +1,9 @@
+ Version 5.1c (30 August 2024)
+ * Revise how distribution looks like:
+ * Pack all java classes and NNUE data file into a single jar file
+ * Move bat/sh scripts to the root of the distribution
+ * Add a configured main class to run the engine in order to remove the necessary program arguments in the scripts
+ 
  Version 5.1b (3 August 2024)
  * Singular move extension implemented
  * Revise search and move ordering
