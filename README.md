@@ -24,7 +24,7 @@ The program runs under all Operating Systems, which support Java platform:
   * Install the UCI user interface on your computer.
   * Ensure that the Java Runtime Environment (JRE) 1.8 or later is installed on your computer (it should be the case nowadays but if not, have in mind that JRE is required, only JDK doesn't work). It could be downloaded from <a href="https://java.com/">java.com</a>
   * Unpack this distribution somewhere (Arena has a sub-folder called 'engines', you can extract it there).
-  * Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway). You may use win32 or win64 version depending on your choice.
+  * Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway).
   * E2-E4 and enjoy :-)
 * **Linux**, in the root directory there are *.sh files for running
 
@@ -50,7 +50,7 @@ All other options are available for both versions: single core and SMP.
 
 # Syzygy Endgame Tablebases
 
-The download of Bagatur contains subset of syzygy tablebases placed under ./data/egtb/ directory. It contaiuns 22 of the most common endgames with up to 5 pieces. By default the option 'SyzygyPath' is set to this directory. You could change this UCI option if you have complete or bigger set of syzygy tablebases donwloaded on your computer.
+The download of Bagatur contains subset of syzygy tablebases placed under ./data/egtb/ directory. It contaiuns 22 of the most common endgames with up to 5 pieces. By default the option 'SyzygyPath' is set to this directory. You could change this UCI option if you have complete or bigger set of syzygy tablebases downloaded on your computer.
  
 # NNUE (Efficiently Updatable Neural Network)
 

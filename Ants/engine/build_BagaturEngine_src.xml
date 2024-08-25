@@ -76,6 +76,7 @@
 			</fileset>
 			<fileset dir="${resources_dir}/..">
 		      <include name="Resources/bin/engine/**/*"/>
+			  <exclude name="Resources/bin/engine/nnue/**/*"/>
 			  <exclude name="Resources/bin/engine/egtb/**/*"/>
 			  <include name="Resources/bin/engine/egtb/**/*.txt"/>
 			  <include name="Resources/doc/engine/**/*"/>
