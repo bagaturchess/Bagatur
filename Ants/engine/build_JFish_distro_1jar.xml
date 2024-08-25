@@ -118,24 +118,10 @@
 	</copy>
 
   	<copy todir="${temp_dir}">
-	    <fileset dir="${work_dir}/">
-		    <include name="src.zip"/>
-	    </fileset>
 	    <fileset dir="${resources_dir}/doc/engine/txt">
 	    	<include name="LICENSE_GNU_V2"/>
 	    </fileset>
 	</copy>
-  	
-	<!--copy tofile="${temp_dir}/readme.txt" >
-		<fileset dir="${resources_dir}/doc/engine/txt">
-			<include name="readme_distro_BagaturEngine.txt"/>
-		</fileset>
-	</copy>
-	<copy tofile="${temp_dir}/release_notes.txt" >
-		<fileset dir="${resources_dir}/doc/engine/txt">
-			<include name="release_notes_BagaturEngine.txt"/>
-		</fileset>
-	</copy-->
   	
   	<copy tofile="${temp_dir}/JFish.jpg" >
 		<fileset dir="${resources_dir}/bin/engine/logo">
