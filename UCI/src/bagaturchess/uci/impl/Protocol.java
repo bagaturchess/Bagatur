@@ -30,6 +30,7 @@ import java.util.Map;
 public class Protocol {
 	
 	
+	public static final String COMMAND_TO_GUI_ID_NAME = "Bagatur";
 	public static final String COMMAND_TO_GUI_ID_VERSION_STR = "5.1b";
 	
 	public static final String COMMAND_TO_ENGINE_UCI_STR = "uci";

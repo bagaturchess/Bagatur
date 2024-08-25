@@ -281,11 +281,11 @@ public class StateManager extends Protocol implements BestMoveSender {
 		String result = "\r\n\r\n";
 		result += "***************************************************************************";
 		result += "\r\n";
-		result += "* Copyright (C) 2005-2023 Krasimir I. Topchiyski (k_topchiyski@yahoo.com) *";
+		result += "* Copyright (C) 2005-2024 Krasimir I. Topchiyski (k_topchiyski@yahoo.com) *";
 		result += "\r\n";
 		result += "*                                                                         *";
 		result += "\r\n";
-		result += "* Welcome to Bagatur UCI engine, version " + COMMAND_TO_GUI_ID_VERSION_STR + "                              *";
+		result += "* Welcome to " + COMMAND_TO_GUI_ID_NAME + " UCI engine, version " + COMMAND_TO_GUI_ID_VERSION_STR + "                              *";
 		result += "\r\n";
 		result += "*                                                                         *";
 		result += "\r\n";
@@ -309,7 +309,7 @@ public class StateManager extends Protocol implements BestMoveSender {
 	
 	private void sendEngineID() throws IOException {
 		String id_name = COMMAND_TO_GUI_ID_STR + IChannel.WHITE_SPACE;
-		id_name += COMMAND_TO_GUI_ID_NAME_STR + IChannel.WHITE_SPACE + "Bagatur " + COMMAND_TO_GUI_ID_VERSION_STR;
+		id_name += COMMAND_TO_GUI_ID_NAME_STR + IChannel.WHITE_SPACE + COMMAND_TO_GUI_ID_NAME + IChannel.WHITE_SPACE + COMMAND_TO_GUI_ID_VERSION_STR;
 		channel.sendCommandToGUI(id_name);
 		
 		String id_author = COMMAND_TO_GUI_ID_STR + IChannel.WHITE_SPACE;
