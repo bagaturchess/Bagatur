@@ -2,9 +2,8 @@
 
 This is the Bagatur's to-do list (a.k.a the backlog) of features requested by users (or needed to be implemented, because of technical reasons).
 
-0. NNUE incremental updates.
-1. NNUE implementation of the evaluation function - Done without incremental updates. More info: https://github.com/bagaturchess/Bagatur/tree/master/NNUE
-2. Improve the parallel algorithm to scale batter on many CPU cores - Done but has Java issue when all threads read and write the same memory in a big long arrays. More info: https://github.com/bagaturchess/Bagatur/blob/master/Search/SMP.scaling.issue.txt
-3. Continuous tuning of the Evaluation function based on the currently best engines - not applicable after NNUE implementation.
+1. NNUE incremental updates - Done but there is no Elo gain.
+2. NNUE implementation of the evaluation function - Done, more info: https://github.com/bagaturchess/Bagatur/tree/master/NNUE
+3. Improve the parallel algorithm to scale batter on many CPU cores - Done but has Java issue when all threads read and write the same memory in a big long arrays. More info: https://github.com/bagaturchess/Bagatur/blob/master/Search/SMP.scaling.issue.txt
 
 You are more than welcome to contribute.
