@@ -1,3 +1,4 @@
+![Bagatur logo](Resources/bin/engine/logo/Bagatur.jpg)
 
 # Overview
 
