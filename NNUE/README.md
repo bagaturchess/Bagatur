@@ -113,7 +113,8 @@ Using the Java porting in production, Bagatur operates at about 2-3 times slower
 
 # Newer Stockfish NNUE probing code
 
-Based on JNI, could be found here: https://github.com/VedantJoshi1409/stockfish_nnue_probe
+Based on JNI, could be found here: https://github.com/VedantJoshi1409/stockfish_nnue_probe 
+as well as the JFish chess engine which is using it: https://github.com/bagaturchess/JFish
 
 # How to run it out of the box
 
