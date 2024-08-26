@@ -16,6 +16,7 @@ public class BagaturMain_MCore {
 			"bagaturchess.engines.cfg.base.SearchConfigImpl_AB",
 			"bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20",
 			"bagaturchess.deeplearning.impl_nnue_v3.EvaluationConfig"
+			//"bagaturchess.deeplearning.impl_nnue_v2b.EvaluationConfig"
 		};
 		
 		Boot.main(args);
