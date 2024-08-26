@@ -114,10 +114,16 @@ If this continues months, normally I feel it like "to bang your head against the
 This nice tool is used to find out and fix performance, scalability and memory allocation isses.
 In general YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling.
 
+# Bagatur flavours
+
+The chess engine <a href=https://github.com/bagaturchess/JFish>JFish</a> is using Bagatur as a basis and on top it uses the Stockfish NNUE as evaluation function. The idea behind is to have strongest chess engine in Java as a reference.
+
 # Revisions history
+
 Packed in one place, the release history is available <a href="https://github.com/bagaturchess/Bagatur/blob/master/Resources/doc/engine/txt/release_notes_BagaturEngine.txt">here</a>
 
 # Credits
+
 Fortunately, in this project I am not alone - without the ideas, support and help from many people and web sites, Bagatur would not be as it is now!
 Credits and many thanks to:
   1. My wife and my family, because every now and then I have been stealing from our leisure time to work on this project.
