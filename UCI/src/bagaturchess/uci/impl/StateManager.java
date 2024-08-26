@@ -285,7 +285,8 @@ public class StateManager extends Protocol implements BestMoveSender {
 		result += "\r\n";
 		result += "*                                                                         *";
 		result += "\r\n";
-		result += "* Welcome to " + COMMAND_TO_GUI_ID_NAME + " UCI engine, version " + COMMAND_TO_GUI_ID_VERSION_STR + "                              *";
+		result += "* Welcome to " + COMMAND_TO_GUI_ID_NAME
+				+ " UCI engine, version " + COMMAND_TO_GUI_ID_VERSION_STR + "                              " + (COMMAND_TO_GUI_ID_NAME.equals("JFish") ? "  " : "") + "*";
 		result += "\r\n";
 		result += "*                                                                         *";
 		result += "\r\n";
