@@ -1,4 +1,5 @@
  Version 5.1c (30 August 2024)
+ * Fix *.sh scripts and make them working
  * Revise how distribution looks like:
  * Pack all java classes and NNUE data file into a single jar file
  * Move bat/sh scripts to the root of the distribution
