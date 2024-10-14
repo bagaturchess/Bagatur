@@ -279,7 +279,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			boolean doLMR = depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& MoveUtil.isQuiet(move);
+						&& MoveUtil.isQuiet(move)
+						&& moveGen.getScore() <= 1000; //Is not special (killer or counter)
 			
 			int reduction = 1;
 			if (doLMR) {
@@ -845,10 +846,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//Still no tt move, so help the search to find the tt move/score faster
-		if (isPv && ttFlag == -1 && depth >= 3) {
+		/*if (isPv && ttFlag == -1 && depth >= 3) {
 			
 			depth -= 2;
-		}
+		}*/
 		
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
@@ -1031,7 +1032,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
-						if (eval != ISearch.MIN) { //eval is set
+						/*if (eval != ISearch.MIN) { //eval is set
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
@@ -1040,7 +1041,7 @@ public class Search_PVS_NWS extends SearchImpl {
 									continue;
 								}
 							}
-						}
+						}*/
 						
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& phase == PHASE_ATTACKING_BAD
@@ -1056,7 +1057,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean doLMR = new_depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& MoveUtil.isQuiet(move);
+						&& phase == PHASE_QUIET;
 				
 				int reduction = 1;
 				
@@ -1456,7 +1457,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean doLMR = depth >= 2
 						&& all_moves > 1
-						&& MoveUtil.isQuiet(move);
+						&& phase == PHASE_QUIET;
 				
 				int reduction = 1;
 				
