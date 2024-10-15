@@ -752,7 +752,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (eval >= beta) {
+			if (eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 				
 				
 				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < 10) {
@@ -770,24 +770,21 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (EngineConstants.ENABLE_NULL_MOVE && depth >= 3) {
 					
-					if (MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
+					cb.doNullMove();
+					
+					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
+					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
+							: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, initialMaxDepth);
+					
+					cb.undoNullMove();
+					
+					if (score >= beta) {
 						
-						cb.doNullMove();
+						node.bestmove = 0;
+						node.eval = score;
+						node.leaf = true;
 						
-						final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
-						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
-								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, initialMaxDepth);
-						
-						cb.undoNullMove();
-						
-						if (score >= beta) {
-							
-							node.bestmove = 0;
-							node.eval = score;
-							node.leaf = true;
-							
-							return node.eval;
-						}
+						return node.eval;
 					}
 				}
 				
