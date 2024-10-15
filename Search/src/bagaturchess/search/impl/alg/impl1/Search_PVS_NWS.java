@@ -84,6 +84,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private static final int FUTILITY_MARGIN 						= 80;
+	private static final int STATIC_NULL_MOVE_MARGIN 				= 60;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -755,7 +756,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < 10) {
 					
-					if (eval - depth * 60 >= beta) {
+					if (eval - depth * STATIC_NULL_MOVE_MARGIN >= beta) {
 						
 						node.bestmove = 0;
 						node.eval = eval;
