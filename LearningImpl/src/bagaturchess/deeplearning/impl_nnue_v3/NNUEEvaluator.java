@@ -3,6 +3,7 @@ package bagaturchess.deeplearning.impl_nnue_v3;
 
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -30,6 +31,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 		try {
 		
 			InputStream is = getClass().getResourceAsStream("/network_bagatur.nnue");
+			//InputStream is = new FileInputStream("./network_bagatur.nnue");
 			
 			nnue = new NNUE(is, bitboard);
 		
