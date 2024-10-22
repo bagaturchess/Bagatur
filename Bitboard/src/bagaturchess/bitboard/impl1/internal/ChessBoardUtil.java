@@ -83,12 +83,12 @@ public class ChessBoardUtil {
 		if (fenArray.length > 4) {
 			
 			//5: half-counter since last capture or pawn advance: 1
-			String lastCaptureOrPawnMoveBefore = fenArray[4];
+			String lastCaptureOrPawnMoveBefore = fenArray[4].equals("-") ? "1" : fenArray[4];
 
 			cb.lastCaptureOrPawnMoveBefore = Integer.parseInt(lastCaptureOrPawnMoveBefore);
 			
 			// 6: counter: 1
-			cb.moveCounter = Integer.parseInt(fenArray[5]) * 2;
+			cb.moveCounter = Integer.parseInt(fenArray[5].equals("-") ? "1" : fenArray[5]) * 2;
 			if (cb.colorToMove == BLACK) {
 				cb.moveCounter++;
 			}
