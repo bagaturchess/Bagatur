@@ -69,6 +69,11 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_ATTACKING_BAD 					= 6;
 	private static final int PHASE_QUIET 							= 7;
 	
+	private static final int LMR_MIN_DEPTH 							= 2;
+	private static final int LMR_MIN_MOVES 							= 1;
+	private static final int LMR_BASE 								= 1;
+	private static final double LMR_DIVIDER 						= 2;
+	
 	private static final int[][] LMR_TABLE 							= new int[64][64];
 	
 	static {
@@ -77,7 +82,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			for (int move_number = 1; move_number < 64; move_number++) {
 				
-				LMR_TABLE[depth][move_number] = (int) Math.ceil(Math.max(1, Math.log(move_number) * Math.log(depth) / (double) 2));
+				LMR_TABLE[depth][move_number] = (int) Math.ceil(Math.max(LMR_BASE, Math.log(move_number) * Math.log(depth) / (double) LMR_DIVIDER));
 			}
 		}
 	}
@@ -279,8 +284,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			boolean doLMR = depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet > 1
+			boolean doLMR = depth >= LMR_MIN_DEPTH
+						&& movesPerformed_attacks + movesPerformed_quiet > LMR_MIN_MOVES
 						&& MoveUtil.isQuiet(move)
 						&& moveGen.getScore() <= 1000; //Is not special (killer or counter)
 			
@@ -1054,8 +1059,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int new_depth = (move == ttMove && extend_tt_move) ?(isPv ? depth : depth + 1) : depth - 1;
 				
-				boolean doLMR = new_depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet > 1
+				boolean doLMR = new_depth >= LMR_MIN_DEPTH
+						&& movesPerformed_attacks + movesPerformed_quiet > LMR_MIN_MOVES
 						&& phase == PHASE_QUIET;
 				
 				int reduction = 1;
@@ -1454,8 +1459,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(move);
 				
 				
-				boolean doLMR = depth >= 2
-						&& all_moves > 1
+				boolean doLMR = depth >= LMR_MIN_DEPTH
+						&& all_moves > LMR_MIN_MOVES
 						&& phase == PHASE_QUIET;
 				
 				int reduction = 1;
