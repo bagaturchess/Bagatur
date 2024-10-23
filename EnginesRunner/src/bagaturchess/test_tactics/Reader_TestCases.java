@@ -378,8 +378,7 @@ public class Reader_TestCases {
 
         // Parsing the input text
         List<ChessPuzzle> puzzles = parseText(inputText);
-
-        // Output each puzzle
+        
         for (ChessPuzzle puzzle : puzzles) {
         	
         	//System.out.println(puzzle);
@@ -389,16 +388,11 @@ public class Reader_TestCases {
             for (String best_move: puzzle.getBestMovesStr()) {
 
             	int best_move_int = getBestMove(bitboard, best_move);
+            	
             	puzzle.addBestMove(best_move_int);
             }
         }
         
         return puzzles;
 	}
-	
-	
-    public static void main(String[] args) throws IOException {
-    	
-    	List<ChessPuzzle> puzzles = getTestCases("test-cases.epd");
-    }
 }
