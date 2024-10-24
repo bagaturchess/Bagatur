@@ -52,7 +52,7 @@ public class Main_TestCases {
     	int all_tests_count = 0;
     	int passed_tests_count = 0;
     	
-   		Go go = new Go(ChannelManager.getChannel(), "go nodes 100000");
+   		Go go = new Go(ChannelManager.getChannel(), "go nodes 10000");
 		
     	for (ChessPuzzle puzzle: puzzles) {
     		
@@ -80,6 +80,8 @@ public class Main_TestCases {
     								    		
     											search.stopSearchAndWait();
     								    		
+    											search.shutDown();
+    											
     								    		synchronized (sync) {
     								    			
     								    			sync.notifyAll();
@@ -123,7 +125,7 @@ public class Main_TestCases {
     	
     	try {
     		
-			Thread.sleep(1000);
+			Thread.sleep(500);
 			
 		} catch (InterruptedException e) {
 			
@@ -131,6 +133,8 @@ public class Main_TestCases {
 		}
     	
     	System.out.println("all_tests_count=" + all_tests_count + ", passed_tests_count=" + passed_tests_count);
+    	
+    	System.exit(0);
     }
     
     

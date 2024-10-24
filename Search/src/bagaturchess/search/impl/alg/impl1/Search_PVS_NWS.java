@@ -69,10 +69,19 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_ATTACKING_BAD 					= 6;
 	private static final int PHASE_QUIET 							= 7;
 	
+	private static final int FUTILITY_MARGIN 						= 80;
+	private static final int STATIC_NULL_MOVE_MARGIN 				= 60;
+	private static final int RAZORING_MARGIN 						= 240;
+	
+	private static final int NULL_MOVE_BASE_DEPTH					= 3;
+	private static final int NULL_MOVE_MIN_DEPTH 					= 3;
+	private static final int NULL_MOVE_DIVIDER 						= 4;
+	
 	private static final int LMR_MIN_DEPTH 							= 2;
 	private static final int LMR_MIN_MOVES 							= 1;
 	private static final int LMR_BASE 								= 1;
 	private static final double LMR_DIVIDER 						= 2;
+	
 	
 	private static final int[][] LMR_TABLE 							= new int[64][64];
 	
@@ -87,10 +96,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 	}
 	
-	
-	private static final int FUTILITY_MARGIN 						= 80;
-	private static final int STATIC_NULL_MOVE_MARGIN 				= 60;
-	private static final int RAZORING_MARGIN 						= 240;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -773,11 +778,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				if (EngineConstants.ENABLE_NULL_MOVE && depth >= 3) {
+				if (EngineConstants.ENABLE_NULL_MOVE && depth >= NULL_MOVE_MIN_DEPTH) {
 					
 					cb.doNullMove();
 					
-					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
+					final int reduction = depth / NULL_MOVE_DIVIDER + NULL_MOVE_BASE_DEPTH + Math.min((eval - beta) / STATIC_NULL_MOVE_MARGIN, NULL_MOVE_BASE_DEPTH);
 					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
 							: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, initialMaxDepth);
 					
