@@ -290,14 +290,14 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			boolean doLMR = depth >= LMR_MIN_DEPTH
-						&& movesPerformed_attacks + movesPerformed_quiet > LMR_MIN_MOVES
-						&& MoveUtil.isQuiet(move)
-						&& moveGen.getScore() <= 1000; //Is not special (killer or counter)
+						&& movesPerformed_attacks + movesPerformed_quiet > LMR_MIN_MOVES;
 			
 			int reduction = 1;
 			if (doLMR) {
 				
 				reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
+				
+				reduction -= MoveUtil.isQuiet(move) ? 0 : 1;
 				
 				reduction = Math.min(depth - 1, Math.max(reduction, 1));
 			}
@@ -1065,8 +1065,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int new_depth = (move == ttMove && extend_tt_move) ?(isPv ? depth : depth + 1) : depth - 1;
 				
 				boolean doLMR = new_depth >= LMR_MIN_DEPTH
-						&& movesPerformed_attacks + movesPerformed_quiet > LMR_MIN_MOVES
-						&& phase == PHASE_QUIET;
+						&& movesPerformed_attacks + movesPerformed_quiet > LMR_MIN_MOVES;
 				
 				int reduction = 1;
 				
@@ -1078,6 +1077,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						reduction += 1;
 					}
+					
+					reduction -= MoveUtil.isQuiet(move) ? 0 : 1;
 					
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 					
@@ -1465,8 +1466,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				boolean doLMR = depth >= LMR_MIN_DEPTH
-						&& all_moves > LMR_MIN_MOVES
-						&& phase == PHASE_QUIET;
+						&& all_moves > LMR_MIN_MOVES;
 				
 				int reduction = 1;
 				
@@ -1478,6 +1478,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						reduction += 1;
 					}
+					
+					reduction -= MoveUtil.isQuiet(move) ? 0 : 1;
 					
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
 					
