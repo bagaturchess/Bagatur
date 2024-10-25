@@ -74,7 +74,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int RAZORING_MARGIN 						= 240;
 	
 	private static final int NULL_MOVE_BASE_DEPTH					= 3;
-	private static final int NULL_MOVE_MIN_DEPTH 					= 3;
+	private static final int NULL_MOVE_MIN_DEPTH 					= 1;
 	private static final int NULL_MOVE_DIVIDER 						= 4;
 	
 	private static final int LMR_MIN_DEPTH 							= 2;
