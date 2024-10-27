@@ -75,7 +75,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private static final int NULL_MOVE_BASE_DEPTH					= 3;
 	private static final int NULL_MOVE_MIN_DEPTH 					= 1;
-	private static final int NULL_MOVE_DIVIDER 						= 4;
+	private static final double NULL_MOVE_DIVIDER 					= 4;
 	
 	private static final int LMR_MIN_DEPTH 							= 2;
 	private static final int LMR_MIN_MOVES 							= 2;
@@ -782,7 +782,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					cb.doNullMove();
 					
-					final int reduction = depth / NULL_MOVE_DIVIDER + NULL_MOVE_BASE_DEPTH + Math.min((eval - beta) / STATIC_NULL_MOVE_MARGIN, NULL_MOVE_BASE_DEPTH);
+					final int reduction = (int) (depth / NULL_MOVE_DIVIDER + NULL_MOVE_BASE_DEPTH + Math.min((eval - beta) / STATIC_NULL_MOVE_MARGIN, NULL_MOVE_BASE_DEPTH));
 					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
 							: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, initialMaxDepth);
 					
