@@ -486,7 +486,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		//depth += extensions(cb, moveGen, ply);
+		depth += extensions(cb, moveGen, ply);
 		
 		
 		if (depth <= 0) {
@@ -828,6 +828,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (depth >= 4
 				&& isTTLowerBoundOrExact
 				&& isTTDepthEnoughForSingularExtension
+				&& cb.checkingPieces != 0
 			) {
 			
 			//TODO: Adjust beta margin and depth
