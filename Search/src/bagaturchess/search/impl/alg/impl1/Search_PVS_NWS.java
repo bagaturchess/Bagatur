@@ -831,9 +831,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				&& cb.checkingPieces != 0
 			) {
 			
-			//TODO: Adjust beta margin and depth
-			int singular_beta = ttValue - 2 * depth;
 			int singular_depth = depth / 2;
+			int beta_margin = 1;
+			int singular_beta = ttValue - beta_margin;
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, cb, moveGen, ply,
 					singular_depth, singular_beta - 1, singular_beta, false, initialMaxDepth, ttMove, eval);
@@ -843,7 +843,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				//Singular extension - only ttMove has good score
 				extend_tt_move = true;
 				
-			} else if (!isPv && singular_value > beta) {
+			} else if (!isPv && singular_value > beta + beta_margin) {
 				
 				//Multicut pruning - 2 moves above beta
 				node.bestmove = 0;
