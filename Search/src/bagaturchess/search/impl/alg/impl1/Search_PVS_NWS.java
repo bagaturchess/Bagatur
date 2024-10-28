@@ -762,7 +762,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (eval >= beta && MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
+			if (eval >= beta + 35
+					&& MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 				
 				
 				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < 10) {
