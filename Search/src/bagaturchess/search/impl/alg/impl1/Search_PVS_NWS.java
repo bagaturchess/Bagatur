@@ -69,20 +69,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_ATTACKING_BAD 					= 6;
 	private static final int PHASE_QUIET 							= 7;
 	
-	private static final int FUTILITY_MARGIN 						= 80;
-	private static final int STATIC_NULL_MOVE_MARGIN 				= 60;
-	private static final int RAZORING_MARGIN 						= 240;
-	
-	private static final int NULL_MOVE_BASE_DEPTH					= 3;
-	private static final int NULL_MOVE_MIN_DEPTH 					= 1;
-	private static final double NULL_MOVE_DIVIDER 					= 4;
-	
-	private static final int LMR_MIN_DEPTH 							= 2;
-	private static final int LMR_MIN_MOVES 							= 2;
-	private static final int LMR_BASE 								= 1;
-	private static final double LMR_DIVIDER 						= 2;
-	
-	
 	private static final int[][] LMR_TABLE 							= new int[64][64];
 	
 	static {
@@ -91,11 +77,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			for (int move_number = 1; move_number < 64; move_number++) {
 				
-				LMR_TABLE[depth][move_number] = (int) Math.ceil(Math.max(LMR_BASE, Math.log(move_number) * Math.log(depth) / (double) LMR_DIVIDER));
+				LMR_TABLE[depth][move_number] = (int) Math.ceil(Math.max(1, Math.log(move_number) * Math.log(depth) / (double) 2));
 			}
 		}
 	}
 	
+	
+	private static final int FUTILITY_MARGIN 						= 80;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -289,15 +277,14 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			boolean doLMR = depth >= LMR_MIN_DEPTH
-						&& movesPerformed_attacks + movesPerformed_quiet > LMR_MIN_MOVES;
+			boolean doLMR = depth >= 2
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& MoveUtil.isQuiet(move);
 			
 			int reduction = 1;
 			if (doLMR) {
 				
 				reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
-				
-				reduction -= MoveUtil.isQuiet(move) ? 0 : 1;
 				
 				reduction = Math.min(depth - 1, Math.max(reduction, 1));
 			}
@@ -486,7 +473,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		depth += extensions(cb, moveGen, ply);
+		//depth += extensions(cb, moveGen, ply);
 		
 		
 		if (depth <= 0) {
@@ -762,13 +749,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (eval >= beta + 35
-					&& MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
+			if (eval >= beta) {
 				
 				
 				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < 10) {
 					
-					if (eval - depth * STATIC_NULL_MOVE_MARGIN >= beta) {
+					if (eval - depth * 60 >= beta) {
 						
 						node.bestmove = 0;
 						node.eval = eval;
@@ -779,23 +765,26 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				if (EngineConstants.ENABLE_NULL_MOVE && depth >= NULL_MOVE_MIN_DEPTH) {
+				if (EngineConstants.ENABLE_NULL_MOVE && depth >= 3) {
 					
-					cb.doNullMove();
-					
-					final int reduction = (int) (depth / NULL_MOVE_DIVIDER + NULL_MOVE_BASE_DEPTH + Math.min((eval - beta) / STATIC_NULL_MOVE_MARGIN, NULL_MOVE_BASE_DEPTH));
-					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
-							: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, initialMaxDepth);
-					
-					cb.undoNullMove();
-					
-					if (score >= beta) {
+					if (MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 						
-						node.bestmove = 0;
-						node.eval = score;
-						node.leaf = true;
+						cb.doNullMove();
 						
-						return node.eval;
+						final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
+						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
+								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, initialMaxDepth);
+						
+						cb.undoNullMove();
+						
+						if (score >= beta) {
+							
+							node.bestmove = 0;
+							node.eval = score;
+							node.leaf = true;
+							
+							return node.eval;
+						}
 					}
 				}
 				
@@ -804,7 +793,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (EngineConstants.ENABLE_RAZORING && depth < 5) {
 					
-					int razoringMargin = RAZORING_MARGIN * depth;
+					int razoringMargin = 240 * depth;
 					
 					if (eval + razoringMargin < alpha) {
 						
@@ -829,12 +818,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (depth >= 4
 				&& isTTLowerBoundOrExact
 				&& isTTDepthEnoughForSingularExtension
-				&& cb.checkingPieces != 0
 			) {
 			
+			//TODO: Adjust beta margin and depth
+			int singular_beta = ttValue - 2 * depth;
 			int singular_depth = depth / 2;
-			int beta_margin = 1;
-			int singular_beta = ttValue - beta_margin;
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, cb, moveGen, ply,
 					singular_depth, singular_beta - 1, singular_beta, false, initialMaxDepth, ttMove, eval);
@@ -844,7 +832,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				//Singular extension - only ttMove has good score
 				extend_tt_move = true;
 				
-			} else if (!isPv && singular_value > beta + beta_margin) {
+			} else if (!isPv && singular_value > beta) {
 				
 				//Multicut pruning - 2 moves above beta
 				node.bestmove = 0;
@@ -857,10 +845,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//Still no tt move, so help the search to find the tt move/score faster
-		/*if (isPv && ttFlag == -1 && depth >= 3) {
+		if (isPv && ttFlag == -1 && depth >= 3) {
 			
 			depth -= 2;
-		}*/
+		}
 		
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
@@ -1066,8 +1054,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int new_depth = (move == ttMove && extend_tt_move) ?(isPv ? depth : depth + 1) : depth - 1;
 				
-				boolean doLMR = new_depth >= LMR_MIN_DEPTH
-						&& movesPerformed_attacks + movesPerformed_quiet > LMR_MIN_MOVES;
+				boolean doLMR = new_depth >= 2
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& MoveUtil.isQuiet(move);
 				
 				int reduction = 1;
 				
@@ -1079,8 +1068,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						reduction += 1;
 					}
-					
-					reduction -= MoveUtil.isQuiet(move) ? 0 : 1;
 					
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 					
@@ -1467,8 +1454,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(move);
 				
 				
-				boolean doLMR = depth >= LMR_MIN_DEPTH
-						&& all_moves > LMR_MIN_MOVES;
+				boolean doLMR = depth >= 2
+						&& all_moves > 1
+						&& MoveUtil.isQuiet(move);
 				
 				int reduction = 1;
 				
@@ -1480,8 +1468,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						reduction += 1;
 					}
-					
-					reduction -= MoveUtil.isQuiet(move) ? 0 : 1;
 					
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
 					
