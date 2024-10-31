@@ -1050,7 +1050,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				int new_depth = (move == ttMove && extend_tt_move) ?(isPv ? depth : depth + 1) : depth - 1;
+				int new_depth = (move == ttMove && extend_tt_move) ? (isPv ? depth : depth + 1) : depth - 1;
 				
 				boolean doLMR = new_depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
