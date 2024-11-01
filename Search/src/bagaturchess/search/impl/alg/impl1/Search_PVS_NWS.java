@@ -82,7 +82,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 	}
 	
-	private static final int LMR_MIN_MOVES 							= 2;
+	private static final int LMR_MIN_MOVES_PV						= 4;
+	private static final int LMR_MIN_MOVES_NonPV					= 2;
 	
 	private static final int FUTILITY_MARGIN 						= 80;
 	
@@ -96,6 +97,19 @@ public class Search_PVS_NWS extends SearchImpl {
 	private IEvalEntry temp_cache_entry;
 	
 	private BacktrackingInfo[] search_info 							= new BacktrackingInfo[MAX_DEPTH + 1];
+	
+	
+	private static final int getLMRMinMoves(boolean isPv) {
+		
+		if (isPv) {
+			
+			return LMR_MIN_MOVES_PV;
+			
+		} else {
+			
+			return LMR_MIN_MOVES_NonPV;
+		}
+	}
 	
 	
 	public Search_PVS_NWS(Object[] args) {
@@ -279,7 +293,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			boolean doLMR = depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet > LMR_MIN_MOVES
+						&& movesPerformed_attacks + movesPerformed_quiet > getLMRMinMoves(isPv)
 						&& MoveUtil.isQuiet(move);
 			
 			int reduction = 1;
@@ -1054,7 +1068,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int new_depth = (move == ttMove && extend_tt_move) ? (isPv ? depth : depth + 1) : depth - 1;
 				
 				boolean doLMR = new_depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet > LMR_MIN_MOVES
+						&& movesPerformed_attacks + movesPerformed_quiet > getLMRMinMoves(isPv)
 						&& MoveUtil.isQuiet(move);
 				
 				int reduction = 1;
@@ -1454,7 +1468,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				boolean doLMR = depth >= 2
-						&& all_moves > LMR_MIN_MOVES
+						&& all_moves > getLMRMinMoves(isPv)
 						&& MoveUtil.isQuiet(move);
 				
 				int reduction = 1;
