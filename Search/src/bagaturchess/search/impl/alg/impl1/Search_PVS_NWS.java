@@ -82,6 +82,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 	}
 	
+	private static final int LMR_MIN_MOVES 							= 2;
 	
 	private static final int FUTILITY_MARGIN 						= 80;
 	
@@ -278,7 +279,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			boolean doLMR = depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& movesPerformed_attacks + movesPerformed_quiet > LMR_MIN_MOVES
 						&& MoveUtil.isQuiet(move);
 			
 			int reduction = 1;
@@ -1053,7 +1054,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int new_depth = (move == ttMove && extend_tt_move) ? (isPv ? depth : depth + 1) : depth - 1;
 				
 				boolean doLMR = new_depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& movesPerformed_attacks + movesPerformed_quiet > LMR_MIN_MOVES
 						&& MoveUtil.isQuiet(move);
 				
 				int reduction = 1;
@@ -1453,7 +1454,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				boolean doLMR = depth >= 2
-						&& all_moves > 1
+						&& all_moves > LMR_MIN_MOVES
 						&& MoveUtil.isQuiet(move);
 				
 				int reduction = 1;
