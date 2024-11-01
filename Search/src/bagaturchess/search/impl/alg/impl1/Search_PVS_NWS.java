@@ -843,10 +843,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//Still no tt move, so help the search to find the tt move/score faster
-		if (isPv && ttFlag == -1 && depth >= 3) {
+		/*if (isPv && ttFlag == -1 && depth >= 3) {
 			
 			depth -= 2;
-		}
+		}*/
 		
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
