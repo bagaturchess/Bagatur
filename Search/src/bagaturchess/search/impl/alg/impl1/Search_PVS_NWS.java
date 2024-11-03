@@ -82,7 +82,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 	}
 	
-	private static final int LMR_MIN_MOVES_PV						= 4;
+	private static final int LMR_MIN_MOVES_PV						= 2;
 	private static final int LMR_MIN_MOVES_NonPV					= 2;
 	
 	private static final int FUTILITY_MARGIN 						= 80;
