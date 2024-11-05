@@ -44,7 +44,7 @@ public class Mediator_AlphaAndBestMoveWindow extends SearchMediatorProxy {
 	 * 							4, 							 4,	+7
 	 */
 	private static int TRUST_WINDOW_BEST_MOVE_MULTIPLIER = 2;
-	private static int TRUST_WINDOW_BEST_MOVE_MIN = 8;
+	private static int TRUST_WINDOW_BEST_MOVE_MIN = 2;
 	private static int TRUST_WINDOW_BEST_MOVE_MAX = 16;
 	private int trustWindow_BestMove;
 	
