@@ -312,7 +312,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
-				if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
+				if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1 && isPv) {
 					
 					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
@@ -1109,7 +1109,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
 					
-					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
+					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1 && isPv) {
 						
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
@@ -1493,7 +1493,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
-				if (EngineConstants.ENABLE_PVS && score > alpha && all_moves > 1) {
+				if (EngineConstants.ENABLE_PVS && score > alpha && all_moves > 1 && isPv) {
 					
 					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
