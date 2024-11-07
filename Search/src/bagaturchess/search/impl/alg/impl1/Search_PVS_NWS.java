@@ -1467,41 +1467,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(move);
 				
 				
-				boolean doLMR = depth >= 2
-						&& all_moves > getLMRMinMoves(isPv)
-						&& MoveUtil.isQuiet(move);
+				int score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
 				
-				int reduction = 1;
-				
-				if (doLMR) {
-					
-					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(all_moves, 63)];
-					
-					if (!isPv) {
-						
-						reduction += 1;
-					}
-					
-					reduction = Math.min(depth - 1, Math.max(reduction, 1));
-					
-				}
-				
-				int score = alpha + 1;
-				
-				if (EngineConstants.ENABLE_LMR && reduction != 1) {
-											
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
-				}
-				
-				if (EngineConstants.ENABLE_PVS && score > alpha && all_moves > 1) {
-					
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
-				}
-				
-				if (score > alpha) {
-					
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
-				}
 				
 				env.getBitboard().makeMoveBackward(move);
 				
