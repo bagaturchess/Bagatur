@@ -89,7 +89,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int STATIC_NULL_MOVE_BASE 					= 15;
 	private static final int RAZORING_MARGIN_BASE 					= 30;
 		
-	private static final int TEMPO_EVAL 							= 35;
+	private static final int TEMPO 									= 35;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -768,13 +768,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (eval >= beta + TEMPO_EVAL
+			if (eval >= beta + TEMPO
 					&& MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 				
 				
 				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < 10) {
 					
-					if (eval - STATIC_NULL_MOVE_BASE - 2 * depth * TEMPO_EVAL >= beta) {
+					if (eval - STATIC_NULL_MOVE_BASE - 2 * depth * TEMPO >= beta) {
 						
 						node.bestmove = 0;
 						node.eval = eval;
@@ -810,7 +810,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (EngineConstants.ENABLE_RAZORING && depth < 5) {
 					
-					int razoringMargin = RAZORING_MARGIN_BASE + 6 * depth * TEMPO_EVAL;
+					int razoringMargin = RAZORING_MARGIN_BASE + 6 * depth * TEMPO;
 					
 					if (eval + razoringMargin < alpha) {
 						
@@ -1052,7 +1052,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								if (eval + FUTILITY_MARGIN_BASE + 2 * depth * TEMPO_EVAL <= alpha) {
+								if (eval + FUTILITY_MARGIN_BASE + 2 * depth * TEMPO <= alpha) {
 									
 									continue;
 								}
@@ -1451,7 +1451,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								if (eval + FUTILITY_MARGIN_BASE + 2 * depth * TEMPO_EVAL <= alpha) {
+								if (eval + FUTILITY_MARGIN_BASE + 2 * depth * TEMPO <= alpha) {
 									
 									continue;
 								}
