@@ -89,7 +89,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int STATIC_NULL_MOVE_BASE 					= 15;
 	private static final int RAZORING_MARGIN_BASE 					= 30;
 		
-	private static final int TEMPO 									= 35;
+	private static final int TEMPO_O 								= 35;
+	private static final int TEMPO_E 								= 35; //15
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -113,6 +114,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			return LMR_MIN_MOVES_NonPV;
 		}
+	}
+	
+	
+	private int getTEMPO() {
+		
+		return getEnv().getBitboard().getMaterialFactor().interpolateByFactor(TEMPO_O, TEMPO_E);
 	}
 	
 	
@@ -768,13 +775,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (eval >= beta + TEMPO
+			if (eval >= beta + getTEMPO()
 					&& MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 				
 				
 				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < 10) {
 					
-					if (eval - STATIC_NULL_MOVE_BASE - 2 * depth * TEMPO >= beta) {
+					if (eval - STATIC_NULL_MOVE_BASE - 2 * depth * getTEMPO() >= beta) {
 						
 						node.bestmove = 0;
 						node.eval = eval;
@@ -789,7 +796,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 					cb.doNullMove();
 					
-					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
+					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 2 * getTEMPO(), 3);
 					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
 							: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, initialMaxDepth);
 					
@@ -810,7 +817,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (EngineConstants.ENABLE_RAZORING && depth < 5) {
 					
-					int razoringMargin = RAZORING_MARGIN_BASE + 6 * depth * TEMPO;
+					int razoringMargin = RAZORING_MARGIN_BASE + 6 * depth * getTEMPO();
 					
 					if (eval + razoringMargin < alpha) {
 						
@@ -1052,7 +1059,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								if (eval + FUTILITY_MARGIN_BASE + 2 * depth * TEMPO <= alpha) {
+								if (eval + FUTILITY_MARGIN_BASE + 2 * depth * getTEMPO() <= alpha) {
 									
 									continue;
 								}
@@ -1227,8 +1234,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		return node.eval;
 	}
-	
-	
+
+
 	private int singular_move_search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb,
 			MoveGenerator moveGen, final int ply, int depth, int alpha,
@@ -1451,7 +1458,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								if (eval + FUTILITY_MARGIN_BASE + 2 * depth * TEMPO <= alpha) {
+								if (eval + FUTILITY_MARGIN_BASE + 2 * depth * getTEMPO() <= alpha) {
 									
 									continue;
 								}
