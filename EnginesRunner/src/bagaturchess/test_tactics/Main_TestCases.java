@@ -36,7 +36,7 @@ public class Main_TestCases {
 								bagaturchess.search.impl.alg.impl1.Search_PVS_NWS.class.getName(),
 								
 								bagaturchess.engines.cfg.base.SearchConfigImpl_AB.class.getName(),
-								bagaturchess.learning.goldmiddle.impl7.cfg.BoardConfigImpl_V41.class.getName(),
+								bagaturchess.learning.goldmiddle.pesto.cfg.BoardConfigImpl_PeSTO.class.getName(),
 								bagaturchess.deeplearning.impl_nnue_v3.EvaluationConfig.class.getName(),
 								//bagaturchess.learning.goldmiddle.pesto.cfg.BoardConfigImpl_PeSTO.class.getName(),
 								//bagaturchess.learning.goldmiddle.pesto.cfg.EvaluationConfig_PeSTO.class.getName()

@@ -14,7 +14,7 @@ public class BagaturMain_1Core {
 			"bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core",
 			"bagaturchess.search.impl.alg.impl1.Search_PVS_NWS",
 			"bagaturchess.engines.cfg.base.SearchConfigImpl_AB",
-			"bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20",
+			"bagaturchess.learning.goldmiddle.pesto.cfg.BoardConfigImpl_PeSTO",
 			"bagaturchess.deeplearning.impl_nnue_v3.EvaluationConfig"
 			//"bagaturchess.deeplearning.impl_nnue_v2b.EvaluationConfig"
 		};
