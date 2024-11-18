@@ -840,6 +840,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean extend_tt_move = false;
 		
 		if (depth >= 4
+				&& depth < 2 * initialMaxDepth
 				&& isTTLowerBoundOrExact
 				&& isTTDepthEnoughForSingularExtension
 			) {
