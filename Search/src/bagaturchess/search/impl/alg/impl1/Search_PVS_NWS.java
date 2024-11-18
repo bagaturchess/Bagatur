@@ -1600,9 +1600,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (cb.checkingPieces != 0) {
 			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
-			//return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 1, alpha, beta, isPv, 1);
-			node.eval = alpha;
-			return node.eval;
+			return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 1, alpha, beta, isPv, 1);
+			//node.eval = alpha;
+			//return node.eval;
 		}
 		
 		
