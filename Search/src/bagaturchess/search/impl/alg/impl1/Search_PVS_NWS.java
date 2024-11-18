@@ -882,8 +882,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
 		
-		int killer1Move = 0;
-		int killer2Move = 0;
+		PVNode parent = pvman.load(ply - 1);
+		
+		int killer1Move = parent.child != null ? parent.child.bestmove : 0;
+		int killer2Move = (parent.child != null && parent.child.child != null && parent.child.child.child != null) ? parent.child.child.child.bestmove : 0;
 		int counterMove1 = 0;
 		int counterMove2 = 0;
 		int movesPerformed_attacks = 0;
@@ -919,7 +921,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_KILLER_1:
 				
-				killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
+				if (!cb.isValidMove(killer1Move)) killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
 				
 				if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move)) {
 					
@@ -931,7 +933,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_KILLER_2:
 				
-				killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
+				if (!cb.isValidMove(killer2Move)) killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
 				
 				if (killer2Move != 0 && killer2Move != ttMove && killer2Move != killer1Move && cb.isValidMove(killer2Move)) {
 					
@@ -1291,8 +1293,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		final int parentMove = moveGen.previous();
 		
-		int killer1Move = 0;
-		int killer2Move = 0;
+		PVNode parent = pvman.load(ply - 1);
+		
+		int killer1Move = parent.child != null ? parent.child.bestmove : 0;
+		int killer2Move = (parent.child != null && parent.child.child != null && parent.child.child.child != null) ? parent.child.child.child.bestmove : 0;
 		int counterMove1 = 0;
 		int counterMove2 = 0;
 		
@@ -1332,7 +1336,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_KILLER_1:
 				
-				killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
+				if (!cb.isValidMove(killer1Move)) killer1Move = moveGen.getKiller1(cb.colorToMove, ply);
 				
 				if (killer1Move != 0 && killer1Move != ttMove2 && cb.isValidMove(killer1Move)) {
 					
@@ -1344,7 +1348,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_KILLER_2:
 				
-				killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
+				if (!cb.isValidMove(killer2Move)) killer2Move = moveGen.getKiller2(cb.colorToMove, ply);
 				
 				if (killer2Move != 0 && killer2Move != killer1Move && killer2Move != ttMove2 && cb.isValidMove(killer2Move)) {
 					
@@ -1596,8 +1600,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (cb.checkingPieces != 0) {
 			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
-			return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 1, alpha, beta, isPv, 1);
-			//return alpha;
+			//return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 1, alpha, beta, isPv, 1);
+			node.eval = alpha;
+			return node.eval;
 		}
 		
 		
