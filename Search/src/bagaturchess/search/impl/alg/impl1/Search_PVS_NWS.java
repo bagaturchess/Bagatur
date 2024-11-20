@@ -40,6 +40,7 @@ import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.IEvaluator;
+import bagaturchess.search.api.IEvaluatorFactory;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
@@ -103,6 +104,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private BacktrackingInfo[] search_info 							= new BacktrackingInfo[MAX_DEPTH + 1];
 	
+	private IEvaluator evaluator_PeSTO;
+	
 	
 	private static final int getLMRMinMoves(boolean isPv) {
 		
@@ -123,13 +126,13 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	public Search_PVS_NWS(Object[] args) {
+	public Search_PVS_NWS(Object[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
 	}
 	
 	
-	public Search_PVS_NWS(SearchEnv _env) {
+	public Search_PVS_NWS(SearchEnv _env) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		
 		
 		super(_env);
@@ -144,6 +147,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			search_info[i] = new BacktrackingInfo(); 
 		}
+		
+		IEvaluatorFactory pesto_factory = (IEvaluatorFactory) getClass().getClassLoader().loadClass("bagaturchess.learning.goldmiddle.pesto.eval.BagaturEvaluatorFactory_PeSTO").newInstance();
+		
+		evaluator_PeSTO = pesto_factory.create(env.getBitboard(), null);
 	}
 	
 	
