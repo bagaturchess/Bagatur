@@ -106,6 +106,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private IEvaluator evaluator_PeSTO;
 	
+	private VarStatistic LAZY_EVAL_MARGIN;
+	
 	
 	private static final int getLMRMinMoves(boolean isPv) {
 		
@@ -181,6 +183,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (env.getSyzygyDTZCache() != null) ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Syzygy DTZ cache hitrate=" + env.getSyzygyDTZCache().getHitRate() + ", usage=" + env.getSyzygyDTZCache().getUsage());
 		}
+		
+		LAZY_EVAL_MARGIN = new VarStatistic();
 	}
 	
 	
@@ -1785,13 +1789,20 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
+	private static long evals = 0;
+	private static long evals_full = 0;
+	
 	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv) {
 		
-		/*int eval = evaluator.roughEval(ply,  -1);
+		/*evals++;
 		
-		int error_window = (int) (LAZY_EVAL_MARGIN.getEntropy() + 3 * LAZY_EVAL_MARGIN.getDisperse());
+		int eval = evaluator_PeSTO.fullEval(ply, alpha, beta, -1);
 		
-		if (eval >= alpha - error_window && eval <= beta + error_window) {
+		int error_window = (int) (1 * LAZY_EVAL_MARGIN.getEntropy() + 1 * LAZY_EVAL_MARGIN.getDisperse());
+		
+		if (isPv || (eval >= alpha - error_window && eval <= beta + error_window)) {
+			
+			evals_full++;
 			
 			int rough_eval = eval;
 			
@@ -1800,8 +1811,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			int diff = Math.abs(eval - rough_eval);
 			
 			LAZY_EVAL_MARGIN.addValue(diff);
-		}*/
+		}
 		
+		if (evals_full % 137 == 0) {
+			
+			System.out.println("Ratio: " + (100 * evals_full) / evals);
+		}*/
 		
 		int eval = evaluator.fullEval(ply, alpha, beta, -1);
 		
