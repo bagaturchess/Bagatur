@@ -463,6 +463,20 @@ public class Search_PVS_NWS extends SearchImpl {
 			info.setSelDepth(ply);
 		}
 		
+		if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
+			
+			long timestamp = System.currentTimeMillis();
+			
+			if (timestamp >= lastSentMinorInfo_timestamp + 1000)  {//Send info each second
+			
+				mediator.changedMinor(info);
+				
+				lastSentMinorInfo_timestamp = timestamp;
+			}
+			
+			lastSentMinorInfo_nodesCount = info.getSearchedNodes();
+		}
+		
 		
 		if (ply >= ISearch.MAX_DEPTH) {
 			
@@ -885,20 +899,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			depth -= 2;
 		}*/
-		
-		if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
-			
-			long timestamp = System.currentTimeMillis();
-			
-			if (timestamp >= lastSentMinorInfo_timestamp + 1000)  {//Send info each second
-			
-				mediator.changedMinor(info);
-				
-				lastSentMinorInfo_timestamp = timestamp;
-			}
-			
-			lastSentMinorInfo_nodesCount = info.getSearchedNodes();
-		}
 		
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
