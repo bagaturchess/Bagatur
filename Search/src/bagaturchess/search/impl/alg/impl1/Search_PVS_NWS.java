@@ -1131,7 +1131,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
 					
-					if (EngineConstants.ENABLE_PVS && isPv && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
+					if (EngineConstants.ENABLE_PVS && score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
 						
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
