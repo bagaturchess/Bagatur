@@ -127,7 +127,7 @@ public class SearchEnv {
 		
 		if (!checked_tpt && tpt == null) {
 			
-			System.out.println("SearchEnv.getTPT: checked_tpt=" + checked_tpt + ", tpt=" + tpt);	
+			//System.out.println("SearchEnv.getTPT: checked_tpt=" + checked_tpt + ", tpt=" + tpt);	
 			
 			synchronized (shared) {
 			
@@ -135,7 +135,7 @@ public class SearchEnv {
 
 					tpt = shared.getAndRemoveTranspositionTable();
 					
-					System.out.println("SearchEnv.getTPT: TPT initialized to " + tpt);	
+					//System.out.println("SearchEnv.getTPT: TPT initialized to " + tpt);	
 					
 					checked_tpt = true;
 				}
@@ -156,7 +156,7 @@ public class SearchEnv {
 					
 					evalCache = shared.getAndRemoveEvalCache();
 					
-					System.out.println("SearchEnv.getEvalCache: evalCache initialized to " + evalCache);
+					//System.out.println("SearchEnv.getEvalCache: evalCache initialized to " + evalCache);
 					
 					checked_evalCache = true;
 				}
@@ -177,7 +177,7 @@ public class SearchEnv {
 					
 					syzygyDTZCache = shared.getSyzygyDTZCache();
 					
-					System.out.println("SearchEnv.getSyzygyDTZCache: checked_syzygyDTZCache initialized to " + checked_syzygyDTZCache);
+					//System.out.println("SearchEnv.getSyzygyDTZCache: checked_syzygyDTZCache initialized to " + checked_syzygyDTZCache);
 					
 					checked_syzygyDTZCache = true;
 				}
