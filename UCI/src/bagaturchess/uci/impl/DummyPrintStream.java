@@ -15,7 +15,7 @@ public class DummyPrintStream extends PrintStream {
 	}
 
 	
-	private static class DummyOS extends OutputStream {
+	public static class DummyOS extends OutputStream {
 		@Override
 		public void write(int b) throws IOException {
 			//Do nothing
