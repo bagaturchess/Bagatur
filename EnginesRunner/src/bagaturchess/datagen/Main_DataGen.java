@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IGameStatus;
@@ -29,6 +31,7 @@ import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.alg.SearchUtils;
+import bagaturchess.search.impl.env.MemoryConsumers;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
 import bagaturchess.search.impl.uci_adaptor.UCISearchMediatorImpl_NormalSearch;
@@ -42,12 +45,17 @@ import bagaturchess.uci.impl.DummyPrintStream;
 import bagaturchess.uci.impl.commands.Go;
 
 
-public class Main_DataGen {
+public class Main_DataGen implements Runnable {
 	
 	
-	private static final String OUTPUT_FILE_PREFIX = "C:/DATA/NNUE/plain/Bagatur_5.1c";
+	private static final int THREADS_COUNT 			= 10;
+	private static final Object WRITE_SYNC 			= new Object();
+	private static final int MAX_EVAL 				= 32000;
 	
-	private static int positions = 0;
+	private static final String OUTPUT_FILE_PREFIX 	= "C:/DATA/NNUE/plain/dataset";
+	
+	private static volatile int games 				= 0;
+	private static volatile int positions 			= 0;
 	
 	
 	private static OpeningBook ob;
@@ -85,6 +93,8 @@ public class Main_DataGen {
     public static void main(String[] args) throws IOException {
     	
 
+    	MemoryConsumers.set_MEMORY_USAGE_PERCENT(1 / (double) (2 * THREADS_COUNT));
+    	MemoryConsumers.set_STATIC_JVM_MEMORY(0);
 		
 		ChannelManager.setChannel(
 				new Channel_Console(
@@ -95,9 +105,27 @@ public class Main_DataGen {
 				);		
 
     	
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
+		ExecutorService executor = Executors.newFixedThreadPool(THREADS_COUNT);
 		
-		int games = 0;
+		
+		List<Main_DataGen> generators = new ArrayList<Main_DataGen>();
+		
+		for (int i = 0; i < THREADS_COUNT; i++) {
+			
+			generators.add(new Main_DataGen());
+		}
+		
+		for (int i = 0; i < THREADS_COUNT; i++) {
+			
+			executor.execute(generators.get(i));
+		}	
+    }
+    
+    
+	@Override
+	public void run() {
+		
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
 		
 		while (true) {
 			
@@ -180,31 +208,15 @@ public class Main_DataGen {
 				
 				games++;
 				
-				float result = getGameTerminationScore(bitboard.getStatus());
-							
-				//Revert moves
-				for (int i = moves.size() - 1; i >=0; i--) {
+				try {
 					
-					bitboard.makeMoveBackward(moves.get(i));
+					writeResult(bitboard, moves, evals);
+				
+				} catch(Exception e) {
+					
+					throw new RuntimeException(e);
 				}
 				
-				for (int i = 0; i < moves.size(); i++) {
-					
-					int move = moves.get(i);
-					int eval = evals.get(i);
-					
-					if (!bitboard.getMoveOps().isCaptureOrPromotion(move)
-							&& Math.abs(eval) < IEvaluator.MAX_EVAL) {
-						
-						addPosition(bitboard.toEPD(), eval, result);
-					}
-					
-					bitboard.makeMoveForward(move);
-				}
-				
-				
-				System.out.println("games = " + games + ", status = " + bitboard.getStatus() + ", result = " + result + ", positions=" + positions);
-
 			} else {
 				
 				//System.out.println("error game");
@@ -226,27 +238,54 @@ public class Main_DataGen {
 			
 			search.shutDown();
 		}
-    }
-    
-    
-	private static void addPosition(String fen, int eval, float result) throws IOException {
+	}
+
+
+	private void writeResult(IBitBoard bitboard, List<Integer> moves, List<Integer> evals) throws IOException {
 		
-		positions++;
+		float result = getGameTerminationScore(bitboard.getStatus());
+					
+		//Revert moves
+		for (int i = moves.size() - 1; i >=0; i--) {
+			
+			bitboard.makeMoveBackward(moves.get(i));
+		}
 		
-		BufferedWriter bw = new BufferedWriter(
-				new FileWriter(
-						OUTPUT_FILE_PREFIX + "_"
-						+ (0 + (positions / 100000)) + ".plain",
-					true),
-				16 * 1024);
+		synchronized (WRITE_SYNC) {
+			
+			BufferedWriter bw = new BufferedWriter(
+					new FileWriter(
+							OUTPUT_FILE_PREFIX + "_"
+							+ (0 + (positions / 100000)) + ".plain",
+						true),
+					16 * 1024);
+			
+			for (int i = 0; i < moves.size(); i++) {
+				
+				int move = moves.get(i);
+				int eval = evals.get(i);
+				
+				if (!bitboard.getMoveOps().isCaptureOrPromotion(move)
+						&& Math.abs(eval) < MAX_EVAL) {
+					
+					positions++;
+					
+					String line = bitboard.toEPD() + " | " + eval + " | " + result;
+					
+					bw.write(line);
+					bw.newLine();
+					
+					bw.flush();
+				}
+				
+				bitboard.makeMoveForward(move);
+			}
+			
+			bw.close();
+		}
 		
-		String line = fen + " | " + eval + " | " + result;
 		
-		bw.write(line);
-		bw.newLine();
-		
-		bw.flush();
-		bw.close();
+		System.out.println("games = " + games + ", status = " + bitboard.getStatus() + ", result = " + result + ", positions=" + positions);
 	}
 
 
