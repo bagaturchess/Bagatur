@@ -10,7 +10,7 @@ import java.io.PrintStream;
 public class DummyPrintStream extends PrintStream {
 
 	
-	public DummyPrintStream() throws FileNotFoundException {
+	public DummyPrintStream() {
 		super(new DummyOS());
 	}
 

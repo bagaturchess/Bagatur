@@ -38,8 +38,26 @@ import bagaturchess.uci.impl.commands.Go;
 
 public class Main_DataGen implements Runnable {
 	
-	private static final int POSITIONS_PER_FILE 	= 1000000;
+	
 	private static final int THREADS_COUNT 			= 10;
+	
+	
+	static {
+		
+    	MemoryConsumers.set_MEMORY_USAGE_PERCENT(1 / (double) (2 * THREADS_COUNT));
+    	MemoryConsumers.set_STATIC_JVM_MEMORY(0);
+		
+		ChannelManager.setChannel(
+				new Channel_Console(
+						new ByteArrayInputStream(new byte[64]),
+						new DummyPrintStream.DummyOS(),
+						new DummyPrintStream()
+					)
+				);	
+	}
+	
+	
+	private static final int POSITIONS_PER_FILE 	= 1000000;
 	private static final Object WRITE_SYNC 			= new Object();
 	private static final int MAX_EVAL 				= 32000;
 	
@@ -47,6 +65,8 @@ public class Main_DataGen implements Runnable {
 	
 	private static volatile int games 				= 0;
 	private static volatile int positions 			= 0;
+	
+	private static final Go GO_COMMAND 				= new Go(ChannelManager.getChannel(), "go nodes 5000");
 	
 	
 	private static OpeningBook ob;
@@ -64,9 +84,6 @@ public class Main_DataGen implements Runnable {
 	}
 	
 	
-	private static final Go go = new Go(ChannelManager.getChannel(), "go nodes 5000");
-	
-	
 	private static final IRootSearchConfig cfg = new RootSearchConfig_BaseImpl_1Core(
 			//new RootSearchConfig_BaseImpl_SMP_Threads(
 				new String[] {
@@ -81,19 +98,7 @@ public class Main_DataGen implements Runnable {
 				);
 	
 	
-    public static void main(String[] args) throws IOException {
-    	
-
-    	MemoryConsumers.set_MEMORY_USAGE_PERCENT(1 / (double) (2 * THREADS_COUNT));
-    	MemoryConsumers.set_STATIC_JVM_MEMORY(0);
-		
-		ChannelManager.setChannel(
-				new Channel_Console(
-						new ByteArrayInputStream(new byte[64]),
-						new DummyPrintStream.DummyOS(),
-						new DummyPrintStream()
-					)
-				);		
+    public static void main(String[] args) throws IOException {	
 
     	
 		ExecutorService executor = Executors.newFixedThreadPool(THREADS_COUNT);
@@ -139,10 +144,10 @@ public class Main_DataGen implements Runnable {
 				
 				final Object sync = new Object();
 	    		
-	    		ITimeController timeController = TimeControllerFactory.createTimeController(new TimeConfigImpl(), bitboard.getColourToMove(), go);
+	    		ITimeController timeController = TimeControllerFactory.createTimeController(new TimeConfigImpl(), bitboard.getColourToMove(), GO_COMMAND);
 	    		
 	    		final SearchMediator mediator = new SearchMediator(ChannelManager.getChannel(),
-	    				    				go,
+	    									GO_COMMAND,
 	    				    				timeController,
 	    				    				bitboard.getColourToMove(),
 	    				    				new BestMoveSender() {
@@ -163,7 +168,7 @@ public class Main_DataGen implements Runnable {
 	    									search, false);
 	    		
 	    		
-	    		search.negamax(bitboard, mediator, timeController, go);
+	    		search.negamax(bitboard, mediator, timeController, GO_COMMAND);
 	    		
 	    		synchronized (sync) {
 					
