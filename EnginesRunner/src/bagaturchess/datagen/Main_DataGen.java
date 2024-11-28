@@ -46,6 +46,7 @@ public class Main_DataGen {
 	
 	
 	private static final String OUTPUT_FILE_PREFIX = "C:/DATA/NNUE/plain/Bagatur_5.1c";
+	
 	private static int positions = 0;
 	
 	
@@ -232,7 +233,12 @@ public class Main_DataGen {
 		
 		positions++;
 		
-		BufferedWriter bw = new BufferedWriter(new FileWriter(OUTPUT_FILE_PREFIX + "_" + (positions / 100000) + ".plain", true), 16 * 1024);
+		BufferedWriter bw = new BufferedWriter(
+				new FileWriter(
+						OUTPUT_FILE_PREFIX + "_"
+						+ (0 + (positions / 100000)) + ".plain",
+					true),
+				16 * 1024);
 		
 		String line = fen + " | " + eval + " | " + result;
 		
