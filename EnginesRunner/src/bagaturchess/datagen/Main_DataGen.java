@@ -1,15 +1,10 @@
 package bagaturchess.datagen;
 
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -20,17 +15,13 @@ import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_1Core;
-import bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP_Threads;
 import bagaturchess.engines.cfg.base.TimeConfigImpl;
 import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.opening.api.OpeningBookFactory;
-import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchInfo;
-import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.env.MemoryConsumers;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
@@ -210,7 +201,7 @@ public class Main_DataGen implements Runnable {
 				
 				try {
 					
-					writeResult(bitboard, moves, evals);
+					writeGame(bitboard, moves, evals);
 				
 				} catch(Exception e) {
 					
@@ -241,7 +232,7 @@ public class Main_DataGen implements Runnable {
 	}
 
 
-	private void writeResult(IBitBoard bitboard, List<Integer> moves, List<Integer> evals) throws IOException {
+	private void writeGame(IBitBoard bitboard, List<Integer> moves, List<Integer> evals) throws IOException {
 		
 		float result = getGameTerminationScore(bitboard.getStatus());
 					
