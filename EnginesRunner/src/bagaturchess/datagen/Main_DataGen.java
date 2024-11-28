@@ -202,8 +202,6 @@ public class Main_DataGen implements Runnable {
 			
 			if (!error_in_the_game) {
 				
-				games++;
-				
 				try {
 					
 					writeGame(bitboard, moves, evals);
@@ -248,6 +246,8 @@ public class Main_DataGen implements Runnable {
 		}
 		
 		synchronized (WRITE_SYNC) {
+			
+			games++;
 			
 			BufferedWriter bw = new BufferedWriter(
 					new FileWriter(
