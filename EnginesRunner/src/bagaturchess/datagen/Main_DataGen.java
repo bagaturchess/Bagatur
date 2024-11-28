@@ -38,7 +38,7 @@ import bagaturchess.uci.impl.commands.Go;
 
 public class Main_DataGen implements Runnable {
 	
-	private static final int GAMES_PER_FILE 		= 1000000;
+	private static final int POSITIONS_PER_FILE 	= 1000000;
 	private static final int THREADS_COUNT 			= 10;
 	private static final Object WRITE_SYNC 			= new Object();
 	private static final int MAX_EVAL 				= 32000;
@@ -247,7 +247,7 @@ public class Main_DataGen implements Runnable {
 			BufferedWriter bw = new BufferedWriter(
 					new FileWriter(
 							OUTPUT_FILE_PREFIX + "_"
-							+ (0 + (positions / GAMES_PER_FILE)) + ".plain",
+							+ (0 + (positions / POSITIONS_PER_FILE)) + ".plain",
 						true),
 					16 * 1024);
 			
