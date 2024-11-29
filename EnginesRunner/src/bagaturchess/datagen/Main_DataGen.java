@@ -63,10 +63,13 @@ public class Main_DataGen implements Runnable {
 	
 	private static final String OUTPUT_FILE_PREFIX 	= "C:/DATA/NNUE/plain/dataset";
 	
+	private static final int POSITIONS_PER_MOVE 	= 5000;
+	
+	private static final Go GO_COMMAND 				= new Go(ChannelManager.getChannel(), "go nodes " + POSITIONS_PER_MOVE);
+	
+	
 	private static volatile int games 				= 0;
 	private static volatile int positions 			= 0;
-	
-	private static final Go GO_COMMAND 				= new Go(ChannelManager.getChannel(), "go nodes 5000");
 	
 	
 	private static OpeningBook ob;
@@ -261,8 +264,8 @@ public class Main_DataGen implements Runnable {
 				int move = moves.get(i);
 				int eval = evals.get(i);
 				
-				if (!bitboard.getMoveOps().isCaptureOrPromotion(move)
-						&& Math.abs(eval) < MAX_EVAL) {
+				if (/*!bitboard.getMoveOps().isCaptureOrPromotion(move)
+						&&*/ Math.abs(eval) < MAX_EVAL) {
 					
 					positions++;
 					
