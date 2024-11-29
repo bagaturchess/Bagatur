@@ -399,8 +399,11 @@ public class Main_DataGen implements Runnable {
 			
 			super.changedMajor(info);
 			
-			best_move = info.getBestMove();
-			best_eval = info.getEval();
+			if (!info.isUpperBound()) {
+				
+				best_move = info.getBestMove();
+				best_eval = info.getEval();
+			}
 		}
 		
 		
