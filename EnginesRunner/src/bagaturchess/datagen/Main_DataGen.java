@@ -63,7 +63,7 @@ public class Main_DataGen implements Runnable {
 	
 	private static final String OUTPUT_FILE_PREFIX 	= "C:/DATA/NNUE/plain/dataset";
 	
-	private static final int POSITIONS_PER_MOVE 	= 5555;
+	private static final int POSITIONS_PER_MOVE 	= 7777;
 	
 	private static final Go GO_COMMAND 				= new Go(ChannelManager.getChannel(), "go nodes " + POSITIONS_PER_MOVE);
 	
