@@ -56,7 +56,7 @@ public class Main_DataGen implements Runnable {
 				);	
 	}
 	
-	private static final int START_FILE_INDEX 		= 1;
+	private static final int START_FILE_INDEX 		= 0;
 	private static final int POSITIONS_PER_FILE 	= 1000000;
 	private static final Object WRITE_SYNC 			= new Object();
 	private static final int MAX_EVAL 				= 32000;
@@ -126,15 +126,14 @@ public class Main_DataGen implements Runnable {
 		
 		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
 		
+		final SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
+		
+		final IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
+		
 		while (true) {
 			
 			
 			List<Integer> opening_moves = playRandomOpening(bitboard);
-			
-			
-			final SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
-			
-			final IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
 			
 			search.createBoard(bitboard);
 			
@@ -231,10 +230,10 @@ public class Main_DataGen implements Runnable {
 				
 				bitboard.makeMoveBackward(opening_moves.get(i));
 			}
-			
-			
-			search.shutDown();
 		}
+		
+		
+		//search.shutDown();
 	}
 
 

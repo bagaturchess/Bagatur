@@ -200,6 +200,12 @@ public class SearchEnv {
 	}
 	
 	
+	public void setBitboard(IBitBoard _bitboard) {
+		
+		bitboard = _bitboard;
+	}
+	
+	
 	public IEvaluator getEval() {
 		
 		if (eval == null) {

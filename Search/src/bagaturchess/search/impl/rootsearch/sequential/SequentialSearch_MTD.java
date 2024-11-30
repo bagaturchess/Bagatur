@@ -35,6 +35,8 @@ import bagaturchess.search.api.internal.CompositeStopper;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.api.internal.ISearchStopper;
+import bagaturchess.search.impl.alg.impl1.Search_PVS_NWS;
+import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.rootsearch.RootSearch_BaseImpl;
 import bagaturchess.search.impl.rootsearch.multipv.MultiPVMediator;
@@ -97,12 +99,30 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 		
 		String searchClassName =  getRootSearchConfig().getSearchClassName();
 		
-		searcher = (ISearch) ReflectionUtils.createObjectByClassName_ObjectsConstructor(
+		if (searcher != null) {
+			
+			SearchEnv env = searcher.getEnv();
+			
+			env.setBitboard(getBitboardForSetup());
+			
+			try {
 				
-						searchClassName,
-						
-						new Object[] {getBitboardForSetup(),  getRootSearchConfig(), getSharedData()}
-					);
+				searcher = new Search_PVS_NWS(env);
+				
+			} catch (Exception e) {
+				
+				e.printStackTrace();
+			}
+			
+		} else {
+		
+			searcher = (ISearch) ReflectionUtils.createObjectByClassName_ObjectsConstructor(
+					
+					searchClassName,
+					
+					new Object[] {getBitboardForSetup(),  getRootSearchConfig(), getSharedData()}
+				);
+		}
 		
 		searcher.setRootSearchFirstMoveIndex(root_search_first_move_index);
 	}
