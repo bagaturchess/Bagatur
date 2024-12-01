@@ -283,7 +283,11 @@ public class Main_DataGen implements Runnable {
 		}
 		
 		
-		System.out.println("games = " + games + ", positions=" + positions + ", result = " + result + ", status = " + bitboard.getStatus());
+		System.out.println("games = " + games
+							+ ", positions=" + positions
+							+ ", result = " + result
+							+ ", status = " + bitboard.getStatus()
+							+ ", moves = " + bitboard.getPlayedMovesCount());
 	}
 
 
