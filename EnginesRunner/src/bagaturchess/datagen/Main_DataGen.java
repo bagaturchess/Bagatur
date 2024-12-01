@@ -63,10 +63,8 @@ public class Main_DataGen implements Runnable {
 	
 	private static final String OUTPUT_FILE_PREFIX 	= "C:/DATA/NNUE/plain/dataset";
 	
-	private static final int POSITIONS_PER_MOVE 	= 1111;
-	
-	private static final Go GO_COMMAND 				= new Go(ChannelManager.getChannel(), "go nodes " + POSITIONS_PER_MOVE);
-	
+	private static final int POSITIONS_PER_MOVE_MIN = 1111;
+	private static final int POSITIONS_PER_MOVE_MAX = 7777;	
 	
 	private static volatile int games 				= 0;
 	private static volatile int positions 			= 0;
@@ -137,6 +135,9 @@ public class Main_DataGen implements Runnable {
 			
 			search.createBoard(bitboard);
 			
+			int nodes = (int) (POSITIONS_PER_MOVE_MIN + Math.random() * (POSITIONS_PER_MOVE_MAX - POSITIONS_PER_MOVE_MIN));
+			Go go = new Go(ChannelManager.getChannel(), "go nodes " + nodes);
+
 			
 			List<Integer> moves = new ArrayList<Integer>();
 			List<Integer> evals = new ArrayList<Integer>();
@@ -146,10 +147,10 @@ public class Main_DataGen implements Runnable {
 				
 				final Object sync = new Object();
 	    		
-	    		ITimeController timeController = TimeControllerFactory.createTimeController(new TimeConfigImpl(), bitboard.getColourToMove(), GO_COMMAND);
+	    		ITimeController timeController = TimeControllerFactory.createTimeController(new TimeConfigImpl(), bitboard.getColourToMove(), go);
 	    		
 	    		final SearchMediator mediator = new SearchMediator(ChannelManager.getChannel(),
-	    									GO_COMMAND,
+	    									go,
 	    				    				timeController,
 	    				    				bitboard.getColourToMove(),
 	    				    				new BestMoveSender() {
@@ -170,7 +171,7 @@ public class Main_DataGen implements Runnable {
 	    									search, false);
 	    		
 	    		
-	    		search.negamax(bitboard, mediator, timeController, GO_COMMAND);
+	    		search.negamax(bitboard, mediator, timeController, go);
 	    		
 	    		synchronized (sync) {
 					
