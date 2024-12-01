@@ -63,7 +63,7 @@ public class Main_DataGen implements Runnable {
 	
 	private static final String OUTPUT_FILE_PREFIX 	= "C:/DATA/NNUE/plain/dataset";
 	
-	private static final int POSITIONS_PER_MOVE 	= 7777;
+	private static final int POSITIONS_PER_MOVE 	= 3333;
 	
 	private static final Go GO_COMMAND 				= new Go(ChannelManager.getChannel(), "go nodes " + POSITIONS_PER_MOVE);
 	
@@ -126,12 +126,12 @@ public class Main_DataGen implements Runnable {
 		
 		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD);
 		
-		final SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
-		
-		final IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
-		
 		while (true) {
 			
+			
+			final SharedData sharedData = new SharedData(ChannelManager.getChannel(), cfg);
+			
+			final IRootSearch search = new SequentialSearch_MTD(new Object[] {cfg, sharedData});
 			
 			List<Integer> opening_moves = playRandomOpening(bitboard);
 			
@@ -200,6 +200,9 @@ public class Main_DataGen implements Runnable {
 	    		evals.add(found_best_eval);
 	    		//System.out.println(found_best_eval);
 			}
+
+
+			search.shutDown();
 			
 			
 			if (!error_in_the_game) {
@@ -231,9 +234,6 @@ public class Main_DataGen implements Runnable {
 				bitboard.makeMoveBackward(opening_moves.get(i));
 			}
 		}
-		
-		
-		//search.shutDown();
 	}
 
 

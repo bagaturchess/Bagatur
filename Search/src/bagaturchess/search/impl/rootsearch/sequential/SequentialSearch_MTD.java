@@ -99,30 +99,12 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 		
 		String searchClassName =  getRootSearchConfig().getSearchClassName();
 		
-		if (searcher != null) {
-			
-			SearchEnv env = searcher.getEnv();
-			
-			env.setBitboard(getBitboardForSetup());
-			
-			try {
+		searcher = (ISearch) ReflectionUtils.createObjectByClassName_ObjectsConstructor(
 				
-				searcher = new Search_PVS_NWS(env);
+				searchClassName,
 				
-			} catch (Exception e) {
-				
-				e.printStackTrace();
-			}
-			
-		} else {
-		
-			searcher = (ISearch) ReflectionUtils.createObjectByClassName_ObjectsConstructor(
-					
-					searchClassName,
-					
-					new Object[] {getBitboardForSetup(),  getRootSearchConfig(), getSharedData()}
-				);
-		}
+				new Object[] {getBitboardForSetup(),  getRootSearchConfig(), getSharedData()}
+			);
 		
 		searcher.setRootSearchFirstMoveIndex(root_search_first_move_index);
 	}
