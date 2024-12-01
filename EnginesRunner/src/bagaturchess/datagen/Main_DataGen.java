@@ -63,7 +63,7 @@ public class Main_DataGen implements Runnable {
 	
 	private static final String OUTPUT_FILE_PREFIX 	= "C:/DATA/NNUE/plain/dataset";
 	
-	private static final int POSITIONS_PER_MOVE 	= 3333;
+	private static final int POSITIONS_PER_MOVE 	= 1111;
 	
 	private static final Go GO_COMMAND 				= new Go(ChannelManager.getChannel(), "go nodes " + POSITIONS_PER_MOVE);
 	
@@ -283,7 +283,7 @@ public class Main_DataGen implements Runnable {
 		}
 		
 		
-		System.out.println("games = " + games + ", status = " + bitboard.getStatus() + ", result = " + result + ", positions=" + positions);
+		System.out.println("games = " + games + ", positions=" + positions + ", result = " + result + ", status = " + bitboard.getStatus());
 	}
 
 
