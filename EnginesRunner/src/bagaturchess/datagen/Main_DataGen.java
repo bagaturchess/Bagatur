@@ -261,14 +261,14 @@ public class Main_DataGen implements Runnable {
 			
 			for (int i = 0; i < moves.size(); i++) {
 				
-				int move = moves.get(i);
+				int best_move = moves.get(i);
 				int eval = evals.get(i);
 				
-				bitboard.makeMoveForward(move);
+				bitboard.makeMoveForward(best_move);
 				boolean isCheckMove = bitboard.isInCheck();
-				bitboard.makeMoveBackward(move);
+				bitboard.makeMoveBackward(best_move);
 				
-				if (!bitboard.getMoveOps().isCaptureOrPromotion(move)
+				if (!bitboard.getMoveOps().isCaptureOrPromotion(best_move)
 						&& !isCheckMove
 						&& Math.abs(eval) < MAX_EVAL) {
 					
@@ -282,7 +282,7 @@ public class Main_DataGen implements Runnable {
 					bw.flush();
 				}
 				
-				bitboard.makeMoveForward(move);
+				bitboard.makeMoveForward(best_move);
 			}
 			
 			bw.close();
