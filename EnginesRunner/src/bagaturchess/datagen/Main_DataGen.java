@@ -63,8 +63,8 @@ public class Main_DataGen implements Runnable {
 	
 	private static final String OUTPUT_FILE_PREFIX 	= "C:/DATA/NNUE/plain/dataset";
 	
-	private static final int POSITIONS_PER_MOVE_MIN = 3333;
-	private static final int POSITIONS_PER_MOVE_MAX = 9999;	
+	private static final int POSITIONS_PER_MOVE_MIN = 5555;
+	private static final int POSITIONS_PER_MOVE_MAX = 7777;	
 	
 	private static volatile int games 				= 0;
 	private static volatile int positions 			= 0;
@@ -264,8 +264,13 @@ public class Main_DataGen implements Runnable {
 				int move = moves.get(i);
 				int eval = evals.get(i);
 				
-				if (/*!bitboard.getMoveOps().isCaptureOrPromotion(move)
-						&&*/ Math.abs(eval) < MAX_EVAL) {
+				bitboard.makeMoveForward(move);
+				boolean isCheckMove = bitboard.isInCheck();
+				bitboard.makeMoveBackward(move);
+				
+				if (!bitboard.getMoveOps().isCaptureOrPromotion(move)
+						&& !isCheckMove
+						&& Math.abs(eval) < MAX_EVAL) {
 					
 					positions++;
 					
