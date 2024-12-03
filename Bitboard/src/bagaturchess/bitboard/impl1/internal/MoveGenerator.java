@@ -10,6 +10,7 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.QUEEN;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import bagaturchess.bitboard.common.Properties;
@@ -930,6 +931,9 @@ public final class MoveGenerator {
 		
 		private BetaCutoffMoves_Counts() {
 			
+			moves_piece_to = new int[7][64];
+			counts = new long[7][64];
+			
 			clear();
 		}
 		
@@ -966,12 +970,12 @@ public final class MoveGenerator {
 		@Override
 		public void clear() {
 			
-			//Allow GC to free up the used memory
-			moves_piece_to = null;
-			counts = null;
-			
-			moves_piece_to 	= new int[7][64];
-			counts 			= new long[7][64];
+			for (int i = 0; i < 7; i++) {
+			    for (int j = 0; j < 64; j++) {
+			        moves_piece_to[i][j] = 0;
+			        counts[i][j] = 0L;
+			    }
+			}
 			
 			best_move1 = 0;
 			best_move2 = 0;
