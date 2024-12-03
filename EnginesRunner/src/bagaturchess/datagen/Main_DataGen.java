@@ -44,7 +44,7 @@ public class Main_DataGen implements Runnable {
 	
 	static {
 		
-    	MemoryConsumers.set_MEMORY_USAGE_PERCENT(1 / (double) (2 * THREADS_COUNT));
+    	MemoryConsumers.set_MEMORY_USAGE_PERCENT(1 / (double) (32 * THREADS_COUNT));
     	MemoryConsumers.set_STATIC_JVM_MEMORY(0);
 		
 		ChannelManager.setChannel(
@@ -205,6 +205,8 @@ public class Main_DataGen implements Runnable {
 
 			search.shutDown();
 			
+			sharedData.clear();
+			
 			
 			if (!error_in_the_game) {
 				
@@ -219,7 +221,7 @@ public class Main_DataGen implements Runnable {
 				
 			} else {
 				
-				//System.out.println("error game");
+				//System.out.println("error game with missing best move");
 			}
 			
 			
