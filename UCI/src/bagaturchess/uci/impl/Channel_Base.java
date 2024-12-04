@@ -224,7 +224,11 @@ public class Channel_Base implements IChannel {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {}
 					} else {
+						
+						//System.out.println("size=" + channel.dumps.size());
+						
 						Object cur = channel.dumps.poll();
+						
 						if (cur != null) {
 							if (cur instanceof Throwable) {
 								
