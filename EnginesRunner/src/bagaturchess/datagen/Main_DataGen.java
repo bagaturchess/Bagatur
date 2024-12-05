@@ -276,7 +276,15 @@ public class Main_DataGen implements Runnable {
 					
 					positions++;
 					
-					String line = bitboard.toEPD() + " | " + eval + " | " + result;
+					StringBuilder sb = new StringBuilder(20 + bitboard.toEPD().length());
+					
+					sb.append(bitboard.toEPD())
+					  .append(" | ")
+					  .append(eval)
+					  .append(" | ")
+					  .append(result);
+					
+					String line = sb.toString();
 					
 					bw.write(line);
 					bw.newLine();
