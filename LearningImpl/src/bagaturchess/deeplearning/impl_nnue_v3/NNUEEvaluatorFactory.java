@@ -2,6 +2,7 @@ package bagaturchess.deeplearning.impl_nnue_v3;
 
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.nnue_v2.NNUE;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IEvaluatorFactory;
@@ -9,6 +10,12 @@ import bagaturchess.search.impl.eval.cache.IEvalCache;
 
 
 public class NNUEEvaluatorFactory implements IEvaluatorFactory {
+	
+	static {
+		
+		//Force class loading and network initialization
+		NNUE.chooseOutputBucket(32);
+	}
 	
 	public NNUEEvaluatorFactory() {
 	}
