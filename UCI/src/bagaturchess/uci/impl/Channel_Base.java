@@ -263,7 +263,7 @@ public class Channel_Base implements IChannel {
 			
 			msg = msg.trim();
 			
-			List<String> lines = new ArrayList<String>();  
+			List<String> lines = new ArrayList<String>();
 			StringTokenizer st = new StringTokenizer(msg, "\r\n");
 			while (st.hasMoreTokens()) {
 				lines.add(st.nextToken());
@@ -274,8 +274,17 @@ public class Channel_Base implements IChannel {
 		
 		
 		private void sendLines(List<String> lines) throws IOException {
+			
 			for (int i=0; i <lines.size(); i++) {
-				String line = "info string " + lines.get(i) + "\r\n";
+				
+				StringBuilder sb = new StringBuilder(20 + lines.get(i).length());
+				
+				sb.append("info string ")
+				  .append(lines.get(i))
+				  .append("\r\n");
+				
+				String line = sb.toString();
+				
 				channel.dump.write(line.getBytes());
 			}
 		}

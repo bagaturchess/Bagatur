@@ -34,22 +34,34 @@ public class SearchInfoUtils {
 		StringBuilder message = new StringBuilder(128);
 		
 		message.append(prefix);
-		message.append(" depth " + info.getDepth());
-		message.append(" seldepth " + info.getSelDepth());
-		message.append(" time " + time);
-		message.append(" nodes " + nodes);
+		message.append(" depth ");
+		message.append(info.getDepth());
+		
+		message.append(" seldepth ");
+		message.append(info.getSelDepth());
+		
+		message.append(" time ");
+		message.append(time);
+		
+		message.append(" nodes ");
+		message.append(nodes);
+		
 		long nps = 1000 * nodes / time;
 		if (nps > 1) {
-			message.append(" nps " + nps);
+			message.append(" nps ");
+			message.append(nps);
 		}
 		if (info.getTBhits() > 0) {
-			message.append(" tbhits " + info.getTBhits());
+			message.append(" tbhits ");
+			message.append(info.getTBhits());
 		}
 		long eval = (int)info.getEval();
 		if (info.isMateScore()) {
-			message.append(" score mate " + info.getMateScore());
+			message.append(" score mate ");
+			message.append(info.getMateScore());
 		} else {
-			message.append(" score cp " + eval);
+			message.append(" score cp ");
+			message.append(eval);
 		}
 		
 		if (info.isLowerBound()) {
@@ -58,7 +70,11 @@ public class SearchInfoUtils {
 			message.append(" upperbound");
 		}
 		
-		if (tptusage != -1) message.append(" hashfull " + (10 * tptusage));
+		if (tptusage != -1) {
+			
+			message.append(" hashfull ");
+			message.append(10 * tptusage);
+		}
 		
 		if (!info.isUpperBound()) {
 			
