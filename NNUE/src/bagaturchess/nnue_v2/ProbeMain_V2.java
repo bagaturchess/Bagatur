@@ -78,7 +78,7 @@ public class ProbeMain_V2 {
 		
 		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen);
 		
-		NNUE network = new NNUE(new FileInputStream("./network_bagatur.nnue"), bitboard);
+		NNUE network = new NNUE(bitboard);
 		
 		int eval = network.evaluate();
 		

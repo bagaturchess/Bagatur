@@ -2,6 +2,7 @@ package bagaturchess.nnue_v2;
 
 
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -49,20 +50,46 @@ public class NNUE
 	private static final int QA = 255;
 	private static final int QB = 64;
 
-	private final short[][] L1Weights;
-	private final short[] L1Biases;
-	private final short[][] L2Weights;
-	private final short outputBiases[];
+	private static short[][] L1Weights;
+	private static short[] L1Biases;
+	private static short[][] L2Weights;
+	private static short outputBiases[];
+	
+	static {
+		
+		try {
+			
+			InputStream is = null;
+			
+			File file = new File("./network_bagatur.nnue");
+			
+			if (file.exists()) {
+				
+				is = new FileInputStream(file);
+				
+			} else {
+				
+				is = NNUE.class.getResourceAsStream("/network_bagatur.nnue");
+			}
+			
+			DataInputStream networkData = new DataInputStream(
+					new BufferedInputStream(
+							is, 16 * 4096
+					)
+			);
+			
+			loadNetwork(networkData);
+		
+			networkData.close();
+			
+		} catch (IOException e) {
+			
+			throw new RuntimeException(e);
+		}
+	}
+	
 	
 	private final static int screlu[] = new int[Short.MAX_VALUE - Short.MIN_VALUE + 1];
-	
-	
-	private IncrementalUpdates incremental_updates;
-	private DirtyPieces dirtyPieces;
-	private Accumulators accumulators;
-	private NNUEProbeUtils.Input input;
-	private IBitBoard bitboard;
-	
 	
 	static
 	{
@@ -77,12 +104,33 @@ public class NNUE
 		return v * v;
 	}
 	
-	public NNUE(InputStream is, IBitBoard _bitboard) throws IOException {
-		DataInputStream networkData = new DataInputStream(
-				new BufferedInputStream(
-						is, 16 * 4096
-				)
-		);
+	
+	private IncrementalUpdates incremental_updates;
+	private DirtyPieces dirtyPieces;
+	private Accumulators accumulators;
+	private NNUEProbeUtils.Input input;
+	private IBitBoard bitboard;
+	
+	
+	public NNUE(IBitBoard _bitboard) {
+		
+		bitboard = _bitboard;
+		
+		accumulators = new Accumulators(this);
+		
+		input = new NNUEProbeUtils.Input();
+		
+		if (DO_INCREMENTAL_UPDATES) {
+			
+			dirtyPieces = new DirtyPieces();
+			
+			incremental_updates = new IncrementalUpdates(bitboard);
+			bitboard.addMoveListener(incremental_updates);
+		}
+	}
+
+	
+	private static void loadNetwork(DataInputStream networkData) throws IOException {
 		
 		L1Weights = new short[FEATURE_SIZE * INPUT_BUCKET_SIZE][HIDDEN_SIZE];
 
@@ -124,20 +172,6 @@ public class NNUE
 		}*/
 		
 		networkData.close();
-		
-		bitboard = _bitboard;
-		
-		accumulators = new Accumulators(this);
-		
-		input = new NNUEProbeUtils.Input();
-		
-		if (DO_INCREMENTAL_UPDATES) {
-			
-			dirtyPieces = new DirtyPieces();
-			
-			incremental_updates = new IncrementalUpdates(bitboard);
-			bitboard.addMoveListener(incremental_updates);
-		}
 	}
 
 	
