@@ -163,8 +163,19 @@ public class Channel_Base implements IChannel {
 	 */
 	@Override
 	public void sendCommandToGUI_no_newline(String command) throws IOException {
+		
 		out.write(command);
-		dump("TO_GUI{" + new Date() + "}>" + command + NEW_LINE);
+		
+		StringBuilder sb = new StringBuilder(command.length() + 50);
+		
+		sb.append("TO_GUI{")
+		  .append(new Date())
+		  .append("}>")
+		  .append(command)
+		  .append(NEW_LINE);
+
+		dump(sb.toString());
+		
 		out.flush();
 	}
 	
@@ -242,8 +253,8 @@ public class Channel_Base implements IChannel {
 									throw new IllegalStateException("!(cur instanceof String): cur=" + cur);
 								}
 								
-								sendLines(getLines((String)cur));
-								//channel.dump.write((((String)cur).trim() + NEW_LINE).getBytes());
+								//sendLines(getLines((String)cur));
+								channel.dump.write((((String)cur).trim() + NEW_LINE).getBytes());
 								channel.dump.flush();
 							}
 						} else {
