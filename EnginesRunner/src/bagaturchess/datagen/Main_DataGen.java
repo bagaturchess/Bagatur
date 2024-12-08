@@ -56,7 +56,7 @@ public class Main_DataGen implements Runnable {
 				);	
 	}
 	
-	private static final int START_FILE_INDEX 		= 18;
+	private static final int START_FILE_INDEX 		= 0;
 	private static final int MAX_FILES 				= 19;
 	private static final int POSITIONS_PER_FILE 	= 1000000;
 	private static final Object WRITE_SYNC 			= new Object();
