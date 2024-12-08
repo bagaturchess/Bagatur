@@ -22,6 +22,7 @@ import bagaturchess.opening.api.OpeningBookFactory;
 import bagaturchess.search.api.IRootSearch;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.internal.ISearchInfo;
+import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.env.MemoryConsumers;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.rootsearch.sequential.SequentialSearch_MTD;
@@ -192,6 +193,13 @@ public class Main_DataGen implements Runnable {
 	    			break;
 	    		}
 	    		int found_best_eval = mediator.getBestEval();
+	    		if (SearchUtils.isMateVal(found_best_eval)) {
+	    			if (found_best_eval > 0) {
+	    				found_best_eval = MAX_EVAL;
+	    			} else {
+	    				found_best_eval = -MAX_EVAL;
+	    			}
+	    		}
 	    		if (bitboard.getColourToMove() == Constants.COLOUR_BLACK) {
 	    			found_best_eval = -found_best_eval;
 	    		}
@@ -271,9 +279,10 @@ public class Main_DataGen implements Runnable {
 				boolean isCheckMove = bitboard.isInCheck();
 				bitboard.makeMoveBackward(best_move);
 				
-				if (!bitboard.getMoveOps().isCaptureOrPromotion(best_move)
-						&& !isCheckMove
-						&& Math.abs(eval) < MAX_EVAL) {
+				if (Math.abs(eval) <= MAX_EVAL
+						//&& !bitboard.getMoveOps().isCaptureOrPromotion(best_move)
+						//&& !isCheckMove
+						) {
 					
 					positions++;
 					
@@ -289,13 +298,12 @@ public class Main_DataGen implements Runnable {
 					
 					bw.write(line);
 					bw.newLine();
-					
-					bw.flush();
 				}
 				
 				bitboard.makeMoveForward(best_move);
 			}
 			
+			bw.flush();
 			bw.close();
 		}
 		
