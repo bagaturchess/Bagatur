@@ -280,8 +280,8 @@ public class Main_DataGen implements Runnable {
 				bitboard.makeMoveBackward(best_move);
 				
 				if (Math.abs(eval) <= MAX_EVAL
-						//&& !bitboard.getMoveOps().isCaptureOrPromotion(best_move)
-						//&& !isCheckMove
+						&& !bitboard.getMoveOps().isCaptureOrPromotion(best_move)
+						&& !isCheckMove
 						) {
 					
 					positions++;
