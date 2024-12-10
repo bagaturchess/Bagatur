@@ -283,6 +283,8 @@ public class Main_DataGen implements Runnable {
 								+ ".plain",
 							true),
 						2 * 80 * 150);
+				
+				current_file_id = new_file_id;
 			}
 			
 			
