@@ -68,8 +68,11 @@ public class Main_DataGen implements Runnable {
 	private static final int POSITIONS_PER_MOVE_MIN = 5555;
 	private static final int POSITIONS_PER_MOVE_MAX = 7777;	
 	
-	private static volatile int games 				= 0;
-	private static volatile int positions 			= 0;
+	private static int games 				= 0;
+	private static int positions 			= 0;
+	
+	private static int current_file_id 	= -1;
+	private static BufferedWriter output;
 	
 	
 	private static OpeningBook ob;
@@ -263,12 +266,25 @@ public class Main_DataGen implements Runnable {
 			
 			games++;
 			
-			BufferedWriter bw = new BufferedWriter(
-					new FileWriter(
-							OUTPUT_FILE_PREFIX + "_"
-							+ ((START_FILE_INDEX + (positions / POSITIONS_PER_FILE)) % MAX_FILES) + ".plain",
-						true),
-					16 * 1024);
+			int new_file_id = getFileID();
+			
+			if (current_file_id != new_file_id) {
+				
+				if (output != null) {
+					
+					output.close();
+				}
+				
+				output = new BufferedWriter(
+						new FileWriter(
+								OUTPUT_FILE_PREFIX
+								+ "_"
+								+ new_file_id
+								+ ".plain",
+							true),
+						2 * 80 * 150);
+			}
+			
 			
 			for (int i = 0; i < moves.size(); i++) {
 				
@@ -296,15 +312,14 @@ public class Main_DataGen implements Runnable {
 					
 					String line = sb.toString();
 					
-					bw.write(line);
-					bw.newLine();
+					output.write(line);
+					output.newLine();
 				}
 				
 				bitboard.makeMoveForward(best_move);
 			}
 			
-			bw.flush();
-			bw.close();
+			output.flush();
 		}
 		
 		
@@ -313,6 +328,11 @@ public class Main_DataGen implements Runnable {
 							+ ", result = " + result
 							+ ", status = " + bitboard.getStatus()
 							+ ", moves = " + bitboard.getPlayedMovesCount());
+	}
+
+
+	private int getFileID() {
+		return (START_FILE_INDEX + (positions / POSITIONS_PER_FILE)) % MAX_FILES;
 	}
 
 
