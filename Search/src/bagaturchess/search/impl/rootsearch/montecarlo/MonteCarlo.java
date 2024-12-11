@@ -20,7 +20,9 @@
 package bagaturchess.search.impl.rootsearch.montecarlo;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import bagaturchess.bitboard.api.IBitBoard;
@@ -29,6 +31,9 @@ import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
+import bagaturchess.bitboard.impl1.BoardImpl;
+import bagaturchess.bitboard.impl1.internal.ChessBoard;
+import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearchStopper;
 import bagaturchess.search.impl.alg.SearchUtils;
@@ -130,25 +135,29 @@ public class MonteCarlo {
 			
 			if (stopper != null) stopper.stopIfNecessary(10, bitboard.getColourToMove(), Integer.MIN_VALUE, Integer.MAX_VALUE);
 			
-			bitboard.mark();
+			List<Integer> moves = new ArrayList<Integer>();
 			
 			while (gameIsOk(bitboard.getStatus())) {
 				int move = selectMove();
 				//System.out.println(MoveInt.moveToString(move));
 				bitboard.makeMoveForward(move);
+				moves.add(move);
 			}
 			
 			addResultForWhite(bitboard.getStatus(), gamesResult);
 			
-			bitboard.reset();
-			
-			if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
-				int wins = gamesResult.wins;
-				int loses = gamesResult.loses;
-				gamesResult.loses = wins;
-				gamesResult.wins = loses;
+			for (int j = moves.size() - 1; j >= 0; j--) {
+				bitboard.makeMoveBackward(moves.get(j));
 			}
+			
 			//System.out.println(gamesResult);
+		}
+		
+		if (bitboard.getColourToMove() == Figures.COLOUR_BLACK) {
+			int wins = gamesResult.wins;
+			int loses = gamesResult.loses;
+			gamesResult.loses = wins;
+			gamesResult.wins = loses;
 		}
 		
 		//System.out.println(bitboard);
@@ -174,8 +183,10 @@ public class MonteCarlo {
 		int cur_move = 0;
 		while ((cur_move = movesBuffer.next()) != 0) {
 			
-			int seeMove = bitboard.getSee().evalExchange(cur_move);
-			int seeField = -bitboard.getSee().seeField(bitboard.getMoveOps().getFromFieldID(cur_move));
+			ChessBoard cb = ((BoardImpl)bitboard).getChessBoard();
+			
+			int seeMove = SEEUtil.getSeeCaptureScore(cb, cur_move);
+			int seeField = -SEEUtil.getSeeFieldScore(cb, bitboard.getMoveOps().getFromFieldID(cur_move));
 			
 			/*if (seeField != 0) {
 				System.out.println(MoveInt.moveToString(cur_move));

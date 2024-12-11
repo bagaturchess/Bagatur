@@ -42,16 +42,15 @@ public class MonteCarloMain {
 		
 		
 		String fen = Constants.INITIAL_BOARD;
-		//String fen = "5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - bm Qxf7+ Rxf7+; id WAC.235";
+		//String fen = "5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - 0 1"; //bm Qxf7+ Rxf7+; id WAC.235
 		//String fen = "8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - bm Rxb2";
 		//String fen = "2r1n2r/1q4k1/2p1pn2/ppR4p/4PNbP/P1BBQ3/1P4P1/R5K1 b - - 1 32";
 		
 		IBoardConfig boardConfig = new bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl();
-		String pawnsCacheFactoryClassName = bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.BagaturPawnsEvalFactory.class.getName();
-		final IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen, pawnsCacheFactoryClassName, boardConfig, 10000);
+		final IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen, boardConfig);
 		
 		IEvalCache evalCache = new EvalCache_Impl2(64);
-		IEvaluatorFactory evalFactory = new bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.eval.BagaturEvaluatorFactory();
+		IEvaluatorFactory evalFactory = new bagaturchess.deeplearning.impl_nnue_v3.NNUEEvaluatorFactory();
 		IEvaluator evaluator = evalFactory.create(bitboard, evalCache);
 		
 		
