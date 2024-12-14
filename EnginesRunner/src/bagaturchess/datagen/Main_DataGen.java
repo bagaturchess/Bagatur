@@ -147,7 +147,7 @@ public class Main_DataGen implements Runnable {
 			List<Integer> moves = new ArrayList<Integer>();
 			List<Integer> evals = new ArrayList<Integer>();
 			
-			boolean error_in_the_game = false;
+			boolean no_best_move = false;
 			while (bitboard.getStatus().equals(IGameStatus.NONE)) {
 				
 				final Object sync = new Object();
@@ -192,7 +192,7 @@ public class Main_DataGen implements Runnable {
 
 	    		int found_best_move = mediator.getBestMove();
 	    		if (found_best_move == 0) {
-	    			error_in_the_game = true;
+	    			no_best_move = true;
 	    			break;
 	    		}
 	    		int found_best_eval = mediator.getBestEval();
@@ -220,7 +220,7 @@ public class Main_DataGen implements Runnable {
 			sharedData.clear();
 			
 			
-			if (!error_in_the_game) {
+			if (!no_best_move) {
 				
 				try {
 					
