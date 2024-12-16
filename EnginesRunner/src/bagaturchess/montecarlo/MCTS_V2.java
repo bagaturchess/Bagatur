@@ -15,6 +15,7 @@ import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.deeplearning.impl_nnue_v3.NNUEEvaluatorFactory;
 import bagaturchess.search.api.IEvaluator;
+import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
 
 
 public class MCTS_V2 {
@@ -22,9 +23,9 @@ public class MCTS_V2 {
 	
     public static void main(String[] args) {
     	
-		//String fen = Constants.INITIAL_BOARD;
+		String fen = Constants.INITIAL_BOARD;
 		//String fen = "rnbqk1nr/pppp1pp1/1p2p2p/8/8/1P1P2PP/P1PbPPB1/RNBQK1NR w KQkq - 0 6";
-		String fen = "5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - 0 1"; //bm Qxf7+ Rxf7+; id WAC.235
+		//String fen = "5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - 0 1"; //bm Qxf7+ Rxf7+; id WAC.235
 		//String fen = "8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - 0 1"; //bm Rxb2
 		//String fen = "2r1n2r/1q4k1/2p1pn2/ppR4p/4PNbP/P1BBQ3/1P4P1/R5K1 b - - 1 32";
 		
@@ -42,7 +43,7 @@ public class MCTS_V2 {
         }*/
         
         NNUEEvaluatorFactory evaluator_factory = new NNUEEvaluatorFactory();
-        IEvaluator evaluator = evaluator_factory.create(bitboard, null);
+        IEvaluator evaluator = evaluator_factory.create(bitboard, new EvalCache_Impl2(1000000));
         		
         List<Integer> best_line = mcts.findBestMove(bitboard, evaluator, 1000);
         
@@ -385,7 +386,8 @@ public class MCTS_V2 {
 
 	        while (currentNode != null) {
 	            currentNode.visits++;
-	            currentNode.value += (currentNode.colour_to_move == Constants.COLOUR_WHITE ? result : -result);
+	            //currentNode.value += (currentNode.colour_to_move == Constants.COLOUR_BLACK ? result : -result);
+	            currentNode.value += result;
 	            currentNode = currentNode.parent;
 	        }
 	    }
