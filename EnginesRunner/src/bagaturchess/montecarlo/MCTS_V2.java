@@ -64,14 +64,15 @@ public class MCTS_V2 {
 	    IGameStatus status;
 	    List<Integer> legal_moves;
 	    int originating_move;
-	    int colour_to_move;
+	    int color_to_move;
+	    int root_color;
 	    
 	    int visits;
 	    double value;
 
 	    
 	    //Creates the root node
-	    public MCTSNode(IGameStatus status, List<Integer> legal_moves, int colour_to_move) {
+	    public MCTSNode(IGameStatus status, List<Integer> legal_moves, int colour_to_move, int root_color) {
 	    	
 	    	if (status != IGameStatus.NONE) {
 	    		
@@ -82,12 +83,14 @@ public class MCTS_V2 {
 	    	
 	    	this.status = status;
 	    	this.legal_moves = legal_moves;
-	    	this.colour_to_move = colour_to_move;
+	    	this.color_to_move = colour_to_move;
+	    	this.root_color = root_color;
 	    }
 	    
 	    
 	    //Creates any node
-	    public MCTSNode(MCTSNode parent, int originating_move, IGameStatus status, List<Integer> legal_moves, int colour_to_move) {
+	    public MCTSNode(MCTSNode parent, int originating_move, IGameStatus status,
+	    		List<Integer> legal_moves, int colour_to_move, int root_color) {
 	        
 	    	this.parent = parent;
 	        this.children = new ArrayList<MCTSNode>();
@@ -95,7 +98,8 @@ public class MCTS_V2 {
 	        this.status = status;
 	        this.legal_moves = legal_moves;
 	        this.originating_move = originating_move;
-	        this.colour_to_move = colour_to_move;
+	        this.color_to_move = colour_to_move;
+	        this.root_color = root_color;
 	        
 	        this.visits = 0;
 	        this.value = 0.0;
@@ -127,7 +131,7 @@ public class MCTS_V2 {
 	    public List<Integer> findBestMove(IBitBoard bitboard, IEvaluator evaluator, int iterations) {
 	    
 	        MCTSNode rootNode = new MCTSNode(bitboard.getStatus(),
-	        		genAllLegalMoves(bitboard), bitboard.getColourToMove());
+	        		genAllLegalMoves(bitboard), bitboard.getColourToMove(), bitboard.getColourToMove());
 
 	        for (int i = 0; i < iterations; i++) {
 	        	
@@ -253,7 +257,7 @@ public class MCTS_V2 {
 	            	bitboard.makeMoveForward(move);
 	                
 	                MCTSNode childNode = new MCTSNode(node, move, bitboard.getStatus(),
-	                		genAllLegalMoves(bitboard), bitboard.getColourToMove());
+	                		genAllLegalMoves(bitboard), bitboard.getColourToMove(), node.root_color);
 	                
 	                node.children.add(childNode);
 	                
@@ -386,7 +390,7 @@ public class MCTS_V2 {
 
 	        while (currentNode != null) {
 	            currentNode.visits++;
-	            //currentNode.value += (currentNode.colour_to_move == Constants.COLOUR_BLACK ? result : -result);
+	            //currentNode.value += (currentNode.color_to_move != currentNode.root_color ? result : -result);
 	            currentNode.value += result;
 	            currentNode = currentNode.parent;
 	        }
