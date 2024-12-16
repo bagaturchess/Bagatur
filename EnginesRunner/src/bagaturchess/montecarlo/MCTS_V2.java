@@ -22,9 +22,9 @@ public class MCTS_V2 {
 	
     public static void main(String[] args) {
     	
-		String fen = Constants.INITIAL_BOARD;
+		//String fen = Constants.INITIAL_BOARD;
 		//String fen = "rnbqk1nr/pppp1pp1/1p2p2p/8/8/1P1P2PP/P1PbPPB1/RNBQK1NR w KQkq - 0 6";
-		//String fen = "5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - 0 1"; //bm Qxf7+ Rxf7+; id WAC.235
+		String fen = "5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - 0 1"; //bm Qxf7+ Rxf7+; id WAC.235
 		//String fen = "8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - 0 1"; //bm Rxb2
 		//String fen = "2r1n2r/1q4k1/2p1pn2/ppR4p/4PNbP/P1BBQ3/1P4P1/R5K1 b - - 1 32";
 		
@@ -115,8 +115,6 @@ public class MCTS_V2 {
 		
 	    private static final double EXPLORATION_FACTOR = Math.sqrt(2);
 	    
-	    //private Random random = new Random();
-	    
 	    private IMoveList movesBuffer = new BaseMoveList(333);
 	    
 	    
@@ -163,6 +161,17 @@ public class MCTS_V2 {
 	            backpropagate(expandedNode, simulationResult);
 	        }
 
+	        
+	        for (MCTSNode node: rootNode.children) {
+	        	System.out.println(
+	        			bitboard.getMoveOps().moveToString(node.originating_move)
+	        			+ " " + node.value
+	        			+ " " + node.visits
+	        			+ " " + node.value / node.visits
+	        			);
+	        }
+	        
+	        
 	        return getMostVisitedChildrenMoves(rootNode);
 	    }
 	    
@@ -376,7 +385,7 @@ public class MCTS_V2 {
 
 	        while (currentNode != null) {
 	            currentNode.visits++;
-	            currentNode.value += result;
+	            currentNode.value += (currentNode.colour_to_move == Constants.COLOUR_WHITE ? result : -result);
 	            currentNode = currentNode.parent;
 	        }
 	    }
@@ -404,8 +413,8 @@ public class MCTS_V2 {
 	    
 	    private double getUCTValue(MCTSNode node, double explorationFactor) {
 	        if (node.visits == 0) return Double.MAX_VALUE;
-	        //double exploitation = node.value / node.visits;
-	        double exploitation = (node.colour_to_move == Constants.COLOUR_WHITE ? node.value : -node.value) / node.visits;
+	        double exploitation = node.value / node.visits;
+	        //double exploitation = (node.colour_to_move == Constants.COLOUR_WHITE ? node.value : -node.value) / node.visits;
 	        double exploration = explorationFactor * Math.sqrt(Math.log(node.parent.visits) / node.visits);
 	        return exploitation + exploration;
 	    }
@@ -432,10 +441,10 @@ public class MCTS_V2 {
 	    
 	    private MCTSNode getBestValuedChild(MCTSNode node) {
 	        MCTSNode bestChild = null;
-	        double best_eval = Double.NEGATIVE_INFINITY; // Fixed comparison value
+	        double best_eval = Double.NEGATIVE_INFINITY;
 
 	        for (MCTSNode child : node.children) {
-	            double score = (child.colour_to_move == Constants.COLOUR_WHITE ? child.value : -child.value) / child.visits; // Adjusted value
+	            double score = child.value / child.visits;
 	            if (score > best_eval) {
 	                best_eval = score;
 	                bestChild = child;
