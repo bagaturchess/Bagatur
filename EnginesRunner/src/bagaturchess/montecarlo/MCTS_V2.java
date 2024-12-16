@@ -12,7 +12,6 @@ import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
-import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.deeplearning.impl_nnue_v3.NNUEEvaluatorFactory;
 import bagaturchess.search.api.IEvaluator;
@@ -114,7 +113,7 @@ public class MCTS_V2 {
 	private static class MCTS {
 		
 		
-	    private static final double EXPLORATION_FACTOR = 0; //1; //Math.sqrt(2);
+	    private static final double EXPLORATION_FACTOR = Math.sqrt(2);
 	    
 	    //private Random random = new Random();
 	    
@@ -271,9 +270,6 @@ public class MCTS_V2 {
 	            List<Integer> legalMoves = genAllLegalMoves(bitboard);
 	            
 	            int selected_move = getBestMove(legalMoves, bitboard, evaluator);
-	            
-	            //System.out.println(bitboard.toEPD());
-	            //System.out.println("checkingPieces=" + ((BoardImpl)bitboard).getChessBoard().checkingPieces);
 	            
 	            bitboard.makeMoveForward(selected_move);
 	            
