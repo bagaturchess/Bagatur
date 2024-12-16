@@ -434,12 +434,29 @@ public class MCTS_V2 {
 	    }
 	    
 	    
+	    private MCTSNode getBestValuedChild(MCTSNode node) {
+	        MCTSNode bestChild = null;
+	        double best_eval = Double.NEGATIVE_INFINITY; // Fixed comparison value
+
+	        for (MCTSNode child : node.children) {
+	            double score = (child.colour_to_move == Constants.COLOUR_WHITE ? child.value : -child.value) / child.visits; // Adjusted value
+	            if (score > best_eval) {
+	                best_eval = score;
+	                bestChild = child;
+	            }
+	        }
+
+	        return bestChild;
+	    }
+	    
+	    
 	    private List<Integer> getMostVisitedChildrenMoves(MCTSNode node) {
 	    	
 	    	List<Integer> moves = new ArrayList<Integer>();
 	    	
 	    	while (node != null) {
-	    		node = getMostVisitedChild(node);
+	    		//node = getMostVisitedChild(node);
+	    		node = getBestValuedChild(node);
 	    		if (node != null) moves.add(node.originating_move);
 	    	}
 	    	
