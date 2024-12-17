@@ -23,10 +23,10 @@ public class MCTS_V2 {
 	
     public static void main(String[] args) {
     	
-		String fen = Constants.INITIAL_BOARD;
+		//String fen = Constants.INITIAL_BOARD;
 		//String fen = "rnbqk1nr/pppp1pp1/1p2p2p/8/8/1P1P2PP/P1PbPPB1/RNBQK1NR w KQkq - 0 6";
 		//String fen = "5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - 0 1"; //bm Qxf7+ Rxf7+; id WAC.235
-		//String fen = "8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - 0 1"; //bm Rxb2
+		String fen = "8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - 0 1"; //bm Rxb2
 		//String fen = "2r1n2r/1q4k1/2p1pn2/ppR4p/4PNbP/P1BBQ3/1P4P1/R5K1 b - - 1 32";
 		
 		
@@ -118,9 +118,11 @@ public class MCTS_V2 {
 	private static class MCTS {
 		
 		
-	    private static final double EXPLORATION_FACTOR = Math.sqrt(2);
+	    private static final double EXPLORATION_FACTOR 	= Math.sqrt(2);
 	    
-	    private IMoveList movesBuffer = new BaseMoveList(333);
+	    private static final int MAX_EVAL_DIFF 			= 100000;
+	    
+	    private IMoveList movesBuffer 					= new BaseMoveList(333);
 	    
 	    
 	    private MCTS() {
@@ -272,7 +274,9 @@ public class MCTS_V2 {
 	    
 	    
 	    private double simulate(MCTSNode node, IBitBoard bitboard, IEvaluator evaluator) {
-
+	    	
+	    	double result = 0;
+	    	
 	    	List<Integer> moves = new ArrayList<Integer>();
 	    	
 	        while (bitboard.getStatus() == IGameStatus.NONE) {
@@ -283,15 +287,48 @@ public class MCTS_V2 {
 	        	
 	            List<Integer> legalMoves = genAllLegalMoves(bitboard);
 	            
-	            int selected_move = getBestMove(legalMoves, bitboard, evaluator);
+	            int[] info = getBestMove(legalMoves, bitboard, evaluator);
+	            int selected_move = info[0];
+	            int selected_move_eval = info[1];
+	            
+	            //Stop the game early if possible
+	            if (Math.abs(selected_move_eval) >= MAX_EVAL_DIFF) {
+	            	
+	            	if (bitboard.getColourToMove() == Constants.COLOUR_WHITE) {
+	            		
+	            		if (selected_move_eval > 0) {
+	            			
+	            			result = 1;
+	            			
+	            		} else {
+	            			
+	            			result = -1;
+	            		}
+	            		
+	            	} else {
+	            		
+	            		if (selected_move_eval > 0) {
+	            			
+	            			result = -1;
+	            			
+	            		} else {
+	            			
+	            			result = 1;
+	            		}
+	            	}
+	            	
+	            	break;
+	            }
 	            
 	            bitboard.makeMoveForward(selected_move);
 	            
 	            moves.add(selected_move);
 	        }
-
-	        double result = bitboard.getPlayedMovesCount() >= EngineConstants.MAX_MOVES - 2 ?
-	        		0 : evaluateResult(bitboard.getStatus());
+	        
+	        if (result == 0) {
+	        	result = bitboard.getPlayedMovesCount() >= EngineConstants.MAX_MOVES - 2 ?
+	        				0 : evaluateResult(bitboard.getStatus());
+	        }
 	        
 			//Revert moves
 			for (int i = moves.size() - 1; i >=0; i--) {
@@ -303,7 +340,7 @@ public class MCTS_V2 {
 	    }
 
 
-		private int getBestMove(List<Integer> legalMoves, IBitBoard bitboard, IEvaluator evaluator) {
+		private int[] getBestMove(List<Integer> legalMoves, IBitBoard bitboard, IEvaluator evaluator) {
 			
 			if (legalMoves.size() == 0) {
 				
@@ -331,7 +368,7 @@ public class MCTS_V2 {
 			
 			//int selected_move = legal_moves.get(random.nextInt(legal_moves.size()));
 			
-			return selected_move;
+			return new int[] {selected_move, selected_move_eval};
 		}
 	    
 	    
@@ -386,12 +423,13 @@ public class MCTS_V2 {
 	    
 	    
 	    private void backpropagate(MCTSNode node, double result) {
-	        MCTSNode currentNode = node;
+	        
+	    	MCTSNode currentNode = node;
 
 	        while (currentNode != null) {
 	            currentNode.visits++;
-	            //currentNode.value += (currentNode.color_to_move != currentNode.root_color ? result : -result);
-	            currentNode.value += result;
+	            currentNode.value += (currentNode.color_to_move == Constants.COLOUR_WHITE ? result : -result);
+	            //currentNode.value += result;
 	            currentNode = currentNode.parent;
 	        }
 	    }
