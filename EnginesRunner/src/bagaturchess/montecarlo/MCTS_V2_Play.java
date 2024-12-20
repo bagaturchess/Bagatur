@@ -9,6 +9,7 @@ import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.montecarlo.MCTS_V2.MCTS;
+import bagaturchess.montecarlo.MCTS_V2.MCTSNode;
 import bagaturchess.search.api.IEvaluator;
 
 
@@ -24,7 +25,7 @@ public class MCTS_V2_Play extends MCTS {
 	}
 	
 	
-    protected double simulate(IBitBoard bitboard, IEvaluator evaluator) {
+    protected double simulate(MCTSNode node, IBitBoard bitboard, IEvaluator evaluator) {
     	
     	double result = 0;
     	

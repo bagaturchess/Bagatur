@@ -24,17 +24,18 @@ public class MCTS_V2 {
 	
     public static void main(String[] args) {
     	
-		String fen = Constants.INITIAL_BOARD;
+		//String fen = Constants.INITIAL_BOARD;
 		//String fen = "rnbqk1nr/pppp1pp1/1p2p2p/8/8/1P1P2PP/P1PbPPB1/RNBQK1NR w KQkq - 0 6";
 		//String fen = "5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - 0 1"; //bm Qxf7+ Rxf7+; id WAC.235
-		//String fen = "8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - 0 1"; //bm Rxb2
+		String fen = "8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - 0 1"; //bm Rxb2
 		//String fen = "2r1n2r/1q4k1/2p1pn2/ppR4p/4PNbP/P1BBQ3/1P4P1/R5K1 b - - 1 32";
 		
 		
 		IBoardConfig boardConfig = new bagaturchess.learning.goldmiddle.pesto.cfg.BoardConfigImpl_PeSTO();
 		final IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen, boardConfig);
         
-        MCTS mcts = new MCTS_V2_Play();
+        //MCTS mcts = new MCTS_V2_Play();
+        MCTS mcts = new MCTS_V2_Eval();
         
         /*List<Integer> moves = mcts.genAllLegalMoves(bitboard);
         System.out.println(bitboard.isInCheck());
@@ -56,7 +57,7 @@ public class MCTS_V2 {
     }
     
     
-	private static class MCTSNode {
+	static class MCTSNode {
 		
 	    MCTSNode parent;
 	    List<MCTSNode> children;
@@ -152,7 +153,7 @@ public class MCTS_V2 {
 	            	bitboard.makeMoveForward(expandedNode.originating_move);
 	            }
 	            
-	            double simulationResult = simulate(bitboard, evaluator);
+	            double simulationResult = simulate(expandedNode, bitboard, evaluator);
 	            
 	            if (expandedNode != selectedNode) {
 	            	
@@ -184,7 +185,7 @@ public class MCTS_V2 {
 	    }
 	    
 	    
-	    protected abstract double simulate(IBitBoard bitboard, IEvaluator evaluator);
+	    protected abstract double simulate(MCTSNode node, IBitBoard bitboard, IEvaluator evaluator);
 
 
 		private List<Integer> getPathToNode(MCTSNode node) {
