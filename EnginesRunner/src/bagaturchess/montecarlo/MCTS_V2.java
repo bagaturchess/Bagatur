@@ -13,6 +13,7 @@ import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
+import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.deeplearning.impl_nnue_v3.NNUEEvaluatorFactory;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.impl.eval.cache.EvalCache_Impl2;
@@ -23,15 +24,14 @@ public class MCTS_V2 {
 	
     public static void main(String[] args) {
     	
-		//String fen = Constants.INITIAL_BOARD;
+		String fen = Constants.INITIAL_BOARD;
 		//String fen = "rnbqk1nr/pppp1pp1/1p2p2p/8/8/1P1P2PP/P1PbPPB1/RNBQK1NR w KQkq - 0 6";
 		//String fen = "5r2/1p1RRrk1/4Qq1p/1PP3p1/8/4B3/1b3P1P/6K1 w - - 0 1"; //bm Qxf7+ Rxf7+; id WAC.235
-		String fen = "8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - 0 1"; //bm Rxb2
+		//String fen = "8/7p/5k2/5p2/p1p2P2/Pr1pPK2/1P1R3P/8 b - - 0 1"; //bm Rxb2
 		//String fen = "2r1n2r/1q4k1/2p1pn2/ppR4p/4PNbP/P1BBQ3/1P4P1/R5K1 b - - 1 32";
 		
 		
-		
-		IBoardConfig boardConfig = new bagaturchess.learning.goldmiddle.impl.cfg.bagatur_allfeatures.filler.Bagatur_ALL_BoardConfigImpl();
+		IBoardConfig boardConfig = new bagaturchess.learning.goldmiddle.pesto.cfg.BoardConfigImpl_PeSTO();
 		final IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen, boardConfig);
         
         MCTS mcts = new MCTS();
@@ -64,7 +64,7 @@ public class MCTS_V2 {
 	    IGameStatus status;
 	    List<Integer> legal_moves;
 	    int originating_move;
-	    int color_to_move;
+	    int originating_color;
 	    int root_color;
 	    
 	    int visits;
@@ -83,7 +83,7 @@ public class MCTS_V2 {
 	    	
 	    	this.status = status;
 	    	this.legal_moves = legal_moves;
-	    	this.color_to_move = colour_to_move;
+	    	this.originating_color = colour_to_move;
 	    	this.root_color = root_color;
 	    }
 	    
@@ -98,7 +98,7 @@ public class MCTS_V2 {
 	        this.status = status;
 	        this.legal_moves = legal_moves;
 	        this.originating_move = originating_move;
-	        this.color_to_move = colour_to_move;
+	        this.originating_color = colour_to_move;
 	        this.root_color = root_color;
 	        
 	        this.visits = 0;
@@ -133,7 +133,7 @@ public class MCTS_V2 {
 	    public List<Integer> findBestMove(IBitBoard bitboard, IEvaluator evaluator, int iterations) {
 	    
 	        MCTSNode rootNode = new MCTSNode(bitboard.getStatus(),
-	        		genAllLegalMoves(bitboard), bitboard.getColourToMove(), bitboard.getColourToMove());
+	        		genAllLegalMoves(bitboard), 1 - bitboard.getColourToMove(), bitboard.getColourToMove());
 
 	        for (int i = 0; i < iterations; i++) {
 	        	
@@ -177,7 +177,10 @@ public class MCTS_V2 {
 	        			+ " " + node.value / node.visits
 	        			);
 	        }
-	        
+	        System.out.println("ROOT:"
+	        		+ " " + rootNode.value
+        			+ " " + rootNode.visits
+        			+ " " + rootNode.value / rootNode.visits);
 	        
 	        return getMostVisitedChildrenMoves(rootNode);
 	    }
@@ -259,7 +262,7 @@ public class MCTS_V2 {
 	            	bitboard.makeMoveForward(move);
 	                
 	                MCTSNode childNode = new MCTSNode(node, move, bitboard.getStatus(),
-	                		genAllLegalMoves(bitboard), bitboard.getColourToMove(), node.root_color);
+	                		genAllLegalMoves(bitboard), 1 - bitboard.getColourToMove(), node.root_color);
 	                
 	                node.children.add(childNode);
 	                
@@ -349,13 +352,21 @@ public class MCTS_V2 {
 			
 			int selected_move = 0;
 			int selected_move_eval = Integer.MIN_VALUE;
+			
 			for (int i = 0; i < legalMoves.size(); i++) {
 				
 				int cur_move = legalMoves.get(i);
 				
+				int seeMove = bitboard.getSEEScore(cur_move);
+				//int seeField = -bitboard.getSEEFieldScore(bitboard.getMoveOps().getFromFieldID(cur_move));
+				
 				bitboard.makeMoveForward(cur_move);
 				
-				int cur_eval = -evaluator.fullEval(-1, -1, -1, -1);
+				int cur_eval = (int) (-evaluator.fullEval(-1, -1, -1, -1) + (Math.random() * 10 - 5));
+				if (seeMove < 0) {
+					//cur_eval += seeMove;
+				}
+				//cur_eval += seeField / 10;
 				
 				bitboard.makeMoveBackward(cur_move);
 				
@@ -423,13 +434,13 @@ public class MCTS_V2 {
 	    
 	    
 	    private void backpropagate(MCTSNode node, double result) {
-	        
+	    	
 	    	MCTSNode currentNode = node;
 
 	        while (currentNode != null) {
 	            currentNode.visits++;
-	            currentNode.value += (currentNode.color_to_move == Constants.COLOUR_WHITE ? result : -result);
 	            //currentNode.value += result;
+	            currentNode.value += (node.originating_color == Constants.COLOUR_WHITE ? result : -result);
 	            currentNode = currentNode.parent;
 	        }
 	    }
@@ -458,7 +469,7 @@ public class MCTS_V2 {
 	    private double getUCTValue(MCTSNode node, double explorationFactor) {
 	        if (node.visits == 0) return Double.MAX_VALUE;
 	        double exploitation = node.value / node.visits;
-	        //double exploitation = (node.colour_to_move == Constants.COLOUR_WHITE ? node.value : -node.value) / node.visits;
+	        //double exploitation = (node.root_color == Constants.COLOUR_BLACK ? node.value : -node.value) / node.visits;
 	        double exploration = explorationFactor * Math.sqrt(Math.log(node.parent.visits) / node.visits);
 	        return exploitation + exploration;
 	    }
@@ -489,6 +500,7 @@ public class MCTS_V2 {
 
 	        for (MCTSNode child : node.children) {
 	            double score = child.value / child.visits;
+	            //double score = (child.color_to_move == node.root_color ? child.value : -child.value) / child.visits;
 	            if (score > best_eval) {
 	                best_eval = score;
 	                bestChild = child;
@@ -504,8 +516,8 @@ public class MCTS_V2 {
 	    	List<Integer> moves = new ArrayList<Integer>();
 	    	
 	    	while (node != null) {
-	    		//node = getMostVisitedChild(node);
-	    		node = getBestValuedChild(node);
+	    		node = getMostVisitedChild(node);
+	    		//node = getBestValuedChild(node);
 	    		if (node != null) moves.add(node.originating_move);
 	    	}
 	    	
