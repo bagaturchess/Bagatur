@@ -196,13 +196,13 @@ public class Main_DataGen implements Runnable {
 	    			break;
 	    		}
 	    		int found_best_eval = mediator.getBestEval();
-	    		/*if (SearchUtils.isMateVal(found_best_eval)) {
+	    		if (SearchUtils.isMateVal(found_best_eval)) {
 	    			if (found_best_eval > 0) {
 	    				found_best_eval = MAX_EVAL;
 	    			} else {
 	    				found_best_eval = -MAX_EVAL;
 	    			}
-	    		}*/
+	    		}
 	    		if (bitboard.getColourToMove() == Constants.COLOUR_BLACK) {
 	    			found_best_eval = -found_best_eval;
 	    		}
