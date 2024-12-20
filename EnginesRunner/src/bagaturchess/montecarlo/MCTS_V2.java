@@ -34,7 +34,7 @@ public class MCTS_V2 {
 		IBoardConfig boardConfig = new bagaturchess.learning.goldmiddle.pesto.cfg.BoardConfigImpl_PeSTO();
 		final IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen, boardConfig);
         
-        MCTS mcts = new MCTS();
+        MCTS mcts = new MCTS_V2_Play();
         
         /*List<Integer> moves = mcts.genAllLegalMoves(bitboard);
         System.out.println(bitboard.isInCheck());
@@ -115,17 +115,15 @@ public class MCTS_V2 {
 	}
 	
 	
-	private static class MCTS {
+	static abstract class MCTS {
 		
-		
-	    private static final double EXPLORATION_FACTOR 	= Math.sqrt(2);
 	    
-	    private static final int MAX_EVAL_DIFF 			= 100000;
+	    private static final double EXPLORATION_FACTOR 	= Math.sqrt(2);
 	    
 	    private IMoveList movesBuffer 					= new BaseMoveList(333);
 	    
 	    
-	    private MCTS() {
+	    MCTS() {
 	    	
 	    }
 	    
@@ -154,7 +152,7 @@ public class MCTS_V2 {
 	            	bitboard.makeMoveForward(expandedNode.originating_move);
 	            }
 	            
-	            double simulationResult = simulate(expandedNode, bitboard, evaluator);
+	            double simulationResult = simulate(bitboard, evaluator);
 	            
 	            if (expandedNode != selectedNode) {
 	            	
@@ -186,7 +184,10 @@ public class MCTS_V2 {
 	    }
 	    
 	    
-	    private List<Integer> getPathToNode(MCTSNode node) {
+	    protected abstract double simulate(IBitBoard bitboard, IEvaluator evaluator);
+
+
+		private List<Integer> getPathToNode(MCTSNode node) {
 	    	
 	    	List<Integer> path = new ArrayList<Integer>();
 	    	
@@ -202,7 +203,7 @@ public class MCTS_V2 {
 	    }
 	    
 	    
-	    private List<Integer> genAllLegalMoves(IBitBoard bitboard) {
+	    protected List<Integer> genAllLegalMoves(IBitBoard bitboard) {
 
 			movesBuffer.clear();
 			
@@ -273,163 +274,6 @@ public class MCTS_V2 {
 	        }
 	        
 	        return null;
-	    }
-	    
-	    
-	    private double simulate(MCTSNode node, IBitBoard bitboard, IEvaluator evaluator) {
-	    	
-	    	double result = 0;
-	    	
-	    	List<Integer> moves = new ArrayList<Integer>();
-	    	
-	        while (bitboard.getStatus() == IGameStatus.NONE) {
-	        	
-	        	if (bitboard.getPlayedMovesCount() >= EngineConstants.MAX_MOVES - 2) {
-	        		break;
-	        	}
-	        	
-	            List<Integer> legalMoves = genAllLegalMoves(bitboard);
-	            
-	            int[] info = getBestMove(legalMoves, bitboard, evaluator);
-	            int selected_move = info[0];
-	            int selected_move_eval = info[1];
-	            
-	            //Stop the game early if possible
-	            if (Math.abs(selected_move_eval) >= MAX_EVAL_DIFF) {
-	            	
-	            	if (bitboard.getColourToMove() == Constants.COLOUR_WHITE) {
-	            		
-	            		if (selected_move_eval > 0) {
-	            			
-	            			result = 1;
-	            			
-	            		} else {
-	            			
-	            			result = -1;
-	            		}
-	            		
-	            	} else {
-	            		
-	            		if (selected_move_eval > 0) {
-	            			
-	            			result = -1;
-	            			
-	            		} else {
-	            			
-	            			result = 1;
-	            		}
-	            	}
-	            	
-	            	break;
-	            }
-	            
-	            bitboard.makeMoveForward(selected_move);
-	            
-	            moves.add(selected_move);
-	        }
-	        
-	        if (result == 0) {
-	        	result = bitboard.getPlayedMovesCount() >= EngineConstants.MAX_MOVES - 2 ?
-	        				0 : evaluateResult(bitboard.getStatus());
-	        }
-	        
-			//Revert moves
-			for (int i = moves.size() - 1; i >=0; i--) {
-				
-				bitboard.makeMoveBackward(moves.get(i));
-			}
-			
-	        return result;
-	    }
-
-
-		private int[] getBestMove(List<Integer> legalMoves, IBitBoard bitboard, IEvaluator evaluator) {
-			
-			if (legalMoves.size() == 0) {
-				
-				throw new IllegalStateException();
-			}
-			
-			int selected_move = 0;
-			int selected_move_eval = Integer.MIN_VALUE;
-			
-			for (int i = 0; i < legalMoves.size(); i++) {
-				
-				int cur_move = legalMoves.get(i);
-				
-				int seeMove = bitboard.getSEEScore(cur_move);
-				//int seeField = -bitboard.getSEEFieldScore(bitboard.getMoveOps().getFromFieldID(cur_move));
-				
-				bitboard.makeMoveForward(cur_move);
-				
-				int cur_eval = (int) (-evaluator.fullEval(-1, -1, -1, -1) + (Math.random() * 10 - 5));
-				if (seeMove < 0) {
-					//cur_eval += seeMove;
-				}
-				//cur_eval += seeField / 10;
-				
-				bitboard.makeMoveBackward(cur_move);
-				
-				if (cur_eval >= selected_move_eval) {
-					
-					selected_move_eval = cur_eval;
-					selected_move = cur_move;
-				}
-			}
-			
-			//int selected_move = legal_moves.get(random.nextInt(legal_moves.size()));
-			
-			return new int[] {selected_move, selected_move_eval};
-		}
-	    
-	    
-	    private double evaluateResult(IGameStatus status) {
-			
-			switch (status) {
-			
-				case NONE:
-					throw new IllegalStateException("status=" + status);
-					
-				case DRAW_3_STATES_REPETITION:
-					return 0;
-					
-				case MATE_WHITE_WIN:
-					return 1;
-					
-				case MATE_BLACK_WIN:
-					return -1;
-					
-				case UNDEFINED:
-					throw new IllegalStateException("status=" + status);
-					
-				case STALEMATE_WHITE_NO_MOVES:
-					return 0;
-					
-				case STALEMATE_BLACK_NO_MOVES:
-					return 0;
-					
-				case DRAW_50_MOVES_RULE:
-					return 0;
-					
-				case NO_SUFFICIENT_MATERIAL:
-					return 0;
-					
-				case PASSER_WHITE:
-					throw new IllegalStateException("status=" + status);
-					
-				case PASSER_BLACK:
-					throw new IllegalStateException("status=" + status);
-					
-				case NO_SUFFICIENT_WHITE_MATERIAL:
-					throw new IllegalStateException("status=" + status);
-					
-				case NO_SUFFICIENT_BLACK_MATERIAL:
-					throw new IllegalStateException("status=" + status);
-					
-				default:
-					throw new IllegalStateException("status=" + status);
-					
-			}
 	    }
 	    
 	    
@@ -523,5 +367,45 @@ public class MCTS_V2 {
 	    	
 	    	return moves;
 	    }
+	    
+	    
+		protected int[] getBestMove(List<Integer> legalMoves, IBitBoard bitboard, IEvaluator evaluator) {
+			
+			if (legalMoves.size() == 0) {
+				
+				throw new IllegalStateException();
+			}
+			
+			int selected_move = 0;
+			int selected_move_eval = Integer.MIN_VALUE;
+			
+			for (int i = 0; i < legalMoves.size(); i++) {
+				
+				int cur_move = legalMoves.get(i);
+				
+				int seeMove = bitboard.getSEEScore(cur_move);
+				//int seeField = -bitboard.getSEEFieldScore(bitboard.getMoveOps().getFromFieldID(cur_move));
+				
+				bitboard.makeMoveForward(cur_move);
+				
+				int cur_eval = (int) (-evaluator.fullEval(-1, -1, -1, -1) + (Math.random() * 10 - 5));
+				if (seeMove < 0) {
+					//cur_eval += seeMove;
+				}
+				//cur_eval += seeField / 10;
+				
+				bitboard.makeMoveBackward(cur_move);
+				
+				if (cur_eval >= selected_move_eval) {
+					
+					selected_move_eval = cur_eval;
+					selected_move = cur_move;
+				}
+			}
+			
+			//int selected_move = legal_moves.get(random.nextInt(legal_moves.size()));
+			
+			return new int[] {selected_move, selected_move_eval};
+		}
 	}
 }
