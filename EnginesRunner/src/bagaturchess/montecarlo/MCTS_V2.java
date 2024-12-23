@@ -34,8 +34,8 @@ public class MCTS_V2 {
 		IBoardConfig boardConfig = new bagaturchess.learning.goldmiddle.pesto.cfg.BoardConfigImpl_PeSTO();
 		final IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen, boardConfig);
         
-        //MCTS mcts = new MCTS_V2_Play();
-        MCTS mcts = new MCTS_V2_Eval();
+        MCTS mcts = new MCTS_V2_Play();
+        //MCTS mcts = new MCTS_V2_Eval();
         
         /*List<Integer> moves = mcts.genAllLegalMoves(bitboard);
         System.out.println(bitboard.isInCheck());
