@@ -66,7 +66,7 @@ public class Main_DataGen implements Runnable {
 	private static final String OUTPUT_FILE_PREFIX 	= "C:/DATA/NNUE/plain/dataset";
 	
 	private static final int POSITIONS_PER_MOVE_MIN = 5555;
-	private static final int POSITIONS_PER_MOVE_MAX = 7777;	
+	private static final int POSITIONS_PER_MOVE_MAX = 11111;	
 	
 	private static int games 				= 0;
 	private static int positions 			= 0;
