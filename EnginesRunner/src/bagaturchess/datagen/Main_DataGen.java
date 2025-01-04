@@ -57,13 +57,11 @@ public class Main_DataGen implements Runnable {
 				);	
 	}
 	
-	private static final int START_FILE_INDEX 		= 0;
-	private static final int MAX_FILES 				= 19;
-	private static final int POSITIONS_PER_FILE 	= 1000000;
+	
 	private static final Object WRITE_SYNC 			= new Object();
 	private static final int MAX_EVAL 				= 32000;
 	
-	private static final String OUTPUT_FILE_PREFIX 	= "C:/DATA/NNUE/plain/dataset";
+	private static final String OUTPUT_FILE			= "C:/DATA/NNUE/plain/dataset.plain";
 	
 	private static final int POSITIONS_PER_MOVE_MIN = 5555;
 	private static final int POSITIONS_PER_MOVE_MAX = 11111;	
@@ -71,7 +69,6 @@ public class Main_DataGen implements Runnable {
 	private static int games 				= 0;
 	private static int positions 			= 0;
 	
-	private static int current_file_id 	= -1;
 	private static BufferedWriter output;
 	
 	
@@ -266,25 +263,13 @@ public class Main_DataGen implements Runnable {
 			
 			games++;
 			
-			int new_file_id = getFileID();
-			
-			if (current_file_id != new_file_id) {
-				
-				if (output != null) {
-					
-					output.close();
-				}
+			if (output == null) {
 				
 				output = new BufferedWriter(
 						new FileWriter(
-								OUTPUT_FILE_PREFIX
-								+ "_"
-								+ new_file_id
-								+ ".plain",
+								OUTPUT_FILE,
 							true),
 						2 * 80 * 150);
-				
-				current_file_id = new_file_id;
 			}
 			
 			
@@ -331,11 +316,6 @@ public class Main_DataGen implements Runnable {
 							+ ", result = " + result
 							+ ", status = " + bitboard.getStatus()
 							+ ", moves = " + bitboard.getPlayedMovesCount());
-	}
-
-
-	private int getFileID() {
-		return (START_FILE_INDEX + (positions / POSITIONS_PER_FILE)) % MAX_FILES;
 	}
 
 
