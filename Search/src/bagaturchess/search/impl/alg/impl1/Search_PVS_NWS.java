@@ -40,7 +40,6 @@ import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.IEvaluator;
-import bagaturchess.search.api.IEvaluatorFactory;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
@@ -83,15 +82,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 	}
 	
-	private static final int LMR_MIN_MOVES_PV						= 2;
-	private static final int LMR_MIN_MOVES_NonPV					= 2;
 	
-	private static final int FUTILITY_MARGIN_BASE 					= 25;
-	private static final int STATIC_NULL_MOVE_BASE 					= 15;
-	private static final int RAZORING_MARGIN_BASE 					= 30;
-		
-	private static final int TEMPO_O 								= 35;
-	private static final int TEMPO_E 								= 35; //15
+	private static final int FUTILITY_MARGIN 						= 80;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -104,37 +96,14 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private BacktrackingInfo[] search_info 							= new BacktrackingInfo[MAX_DEPTH + 1];
 	
-	private IEvaluator evaluator_PeSTO;
 	
-	private VarStatistic LAZY_EVAL_MARGIN;
-	
-	
-	private static final int getLMRMinMoves(boolean isPv) {
-		
-		if (isPv) {
-			
-			return LMR_MIN_MOVES_PV;
-			
-		} else {
-			
-			return LMR_MIN_MOVES_NonPV;
-		}
-	}
-	
-	
-	private int getTEMPO() {
-		
-		return getEnv().getBitboard().getMaterialFactor().interpolateByFactor(TEMPO_O, TEMPO_E);
-	}
-	
-	
-	public Search_PVS_NWS(Object[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+	public Search_PVS_NWS(Object[] args) {
 		
 		this(new SearchEnv((IBitBoard) args[0], getOrCreateSearchEnv(args)));
 	}
 	
 	
-	public Search_PVS_NWS(SearchEnv _env) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+	public Search_PVS_NWS(SearchEnv _env) {
 		
 		
 		super(_env);
@@ -149,10 +118,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			search_info[i] = new BacktrackingInfo(); 
 		}
-		
-		IEvaluatorFactory pesto_factory = (IEvaluatorFactory) getClass().getClassLoader().loadClass("bagaturchess.learning.goldmiddle.pesto.eval.BagaturEvaluatorFactory_PeSTO").newInstance();
-		
-		evaluator_PeSTO = pesto_factory.create(env.getBitboard(), null);
 	}
 	
 	
@@ -183,8 +148,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (env.getSyzygyDTZCache() != null) ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Syzygy DTZ cache hitrate=" + env.getSyzygyDTZCache().getHitRate() + ", usage=" + env.getSyzygyDTZCache().getUsage());
 		}
-		
-		LAZY_EVAL_MARGIN = new VarStatistic();
 	}
 	
 	
@@ -315,7 +278,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			boolean doLMR = depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet > getLMRMinMoves(isPv)
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& MoveUtil.isQuiet(move);
 			
 			int reduction = 1;
@@ -461,20 +424,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (info.getSelDepth() < ply) {
 			
 			info.setSelDepth(ply);
-		}
-		
-		if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
-			
-			long timestamp = System.currentTimeMillis();
-			
-			if (timestamp >= lastSentMinorInfo_timestamp + 1000)  {//Send info each second
-			
-				mediator.changedMinor(info);
-				
-				lastSentMinorInfo_timestamp = timestamp;
-			}
-			
-			lastSentMinorInfo_nodesCount = info.getSearchedNodes();
 		}
 		
 		
@@ -800,13 +749,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (eval >= beta + getTEMPO()
-					&& MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
+			if (eval >= beta) {
 				
 				
 				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < 10) {
 					
-					if (eval - STATIC_NULL_MOVE_BASE - 2 * depth * getTEMPO() >= beta) {
+					if (eval - depth * 60 >= beta) {
 						
 						node.bestmove = 0;
 						node.eval = eval;
@@ -818,22 +766,25 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				if (EngineConstants.ENABLE_NULL_MOVE && depth >= 3) {
-						
-					cb.doNullMove();
 					
-					final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 2 * getTEMPO(), 3);
-					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
-							: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, initialMaxDepth);
-					
-					cb.undoNullMove();
-					
-					if (score >= beta) {
+					if (MaterialUtil.hasNonPawnPieces(cb.materialKey, cb.colorToMove)) {
 						
-						node.bestmove = 0;
-						node.eval = score;
-						node.leaf = true;
+						cb.doNullMove();
 						
-						return node.eval;
+						final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
+						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
+								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, initialMaxDepth);
+						
+						cb.undoNullMove();
+						
+						if (score >= beta) {
+							
+							node.bestmove = 0;
+							node.eval = score;
+							node.leaf = true;
+							
+							return node.eval;
+						}
 					}
 				}
 				
@@ -842,7 +793,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (EngineConstants.ENABLE_RAZORING && depth < 5) {
 					
-					int razoringMargin = RAZORING_MARGIN_BASE + 6 * depth * getTEMPO();
+					int razoringMargin = 240 * depth;
 					
 					if (eval + razoringMargin < alpha) {
 						
@@ -895,10 +846,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//Still no tt move, so help the search to find the tt move/score faster
-		/*if (isPv && ttFlag == -1 && depth >= 3) {
+		if (isPv && ttFlag == -1 && depth >= 3) {
 			
 			depth -= 2;
-		}*/
+		}
 		
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
@@ -1041,6 +992,21 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
+					
+					long timestamp = System.currentTimeMillis();
+					
+					if (timestamp >= lastSentMinorInfo_timestamp + 1000)  {//Send info each second
+					
+						mediator.changedMinor(info);
+						
+						lastSentMinorInfo_timestamp = timestamp;
+					}
+					
+					lastSentMinorInfo_nodesCount = info.getSearchedNodes();
+				}
+				
+				
 				if (MoveUtil.isQuiet(move)) {
 					movesPerformed_quiet++;
 				} else {
@@ -1070,7 +1036,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								if (eval + FUTILITY_MARGIN_BASE + 2 * depth * getTEMPO() <= alpha) {
+								if (eval + depth * FUTILITY_MARGIN <= alpha) {
 									
 									continue;
 								}
@@ -1087,10 +1053,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				int new_depth = (move == ttMove && extend_tt_move) ? (isPv ? depth : depth + 1) : depth - 1;
+				int new_depth = (move == ttMove && extend_tt_move) ?(isPv ? depth : depth + 1) : depth - 1;
 				
 				boolean doLMR = new_depth >= 2
-						&& movesPerformed_attacks + movesPerformed_quiet > getLMRMinMoves(isPv)
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& MoveUtil.isQuiet(move);
 				
 				int reduction = 1;
@@ -1245,8 +1211,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		return node.eval;
 	}
-
-
+	
+	
 	private int singular_move_search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb,
 			MoveGenerator moveGen, final int ply, int depth, int alpha,
@@ -1469,7 +1435,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								if (eval + FUTILITY_MARGIN_BASE + 2 * depth * getTEMPO() <= alpha) {
+								if (eval + depth * FUTILITY_MARGIN <= alpha) {
 									
 									continue;
 								}
@@ -1489,8 +1455,41 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(move);
 				
 				
-				int score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
+				boolean doLMR = depth >= 2
+						&& all_moves > 1
+						&& MoveUtil.isQuiet(move);
 				
+				int reduction = 1;
+				
+				if (doLMR) {
+					
+					reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(all_moves, 63)];
+					
+					if (!isPv) {
+						
+						reduction += 1;
+					}
+					
+					reduction = Math.min(depth - 1, Math.max(reduction, 1));
+					
+				}
+				
+				int score = alpha + 1;
+				
+				if (EngineConstants.ENABLE_LMR && reduction != 1) {
+											
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
+				}
+				
+				if (EngineConstants.ENABLE_PVS && score > alpha && all_moves > 1) {
+					
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+				}
+				
+				if (score > alpha) {
+					
+					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
+				}
 				
 				env.getBitboard().makeMoveBackward(move);
 				
@@ -1607,8 +1606,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (cb.checkingPieces != 0) {
 			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
 			return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 1, alpha, beta, isPv, 1);
-			//node.eval = alpha;
-			//return node.eval;
+			//return alpha;
 		}
 		
 		
@@ -1788,20 +1786,13 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	private static long evals = 0;
-	private static long evals_full = 0;
-	
 	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv) {
 		
-		/*evals++;
+		/*int eval = evaluator.roughEval(ply,  -1);
 		
-		int eval = evaluator_PeSTO.fullEval(ply, alpha, beta, -1);
+		int error_window = (int) (LAZY_EVAL_MARGIN.getEntropy() + 3 * LAZY_EVAL_MARGIN.getDisperse());
 		
-		int error_window = (int) (1 * LAZY_EVAL_MARGIN.getEntropy() + 1 * LAZY_EVAL_MARGIN.getDisperse());
-		
-		if (isPv || (eval >= alpha - error_window && eval <= beta + error_window)) {
-			
-			evals_full++;
+		if (eval >= alpha - error_window && eval <= beta + error_window) {
 			
 			int rough_eval = eval;
 			
@@ -1810,12 +1801,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			int diff = Math.abs(eval - rough_eval);
 			
 			LAZY_EVAL_MARGIN.addValue(diff);
-		}
-		
-		if (evals_full % 137 == 0) {
-			
-			System.out.println("Ratio: " + (100 * evals_full) / evals);
 		}*/
+		
 		
 		int eval = evaluator.fullEval(ply, alpha, beta, -1);
 		
