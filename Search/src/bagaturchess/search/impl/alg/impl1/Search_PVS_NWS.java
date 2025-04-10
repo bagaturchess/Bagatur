@@ -91,6 +91,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private static final boolean USE_DTZ_CACHE 						= true;
 	
+	private static final double PRUNING_AGGRESSIVENESS 				= 1;
 	
 	private IEvalEntry temp_cache_entry;
 	
@@ -754,7 +755,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < 10) {
 					
-					if (eval - depth * 60 >= beta) {
+					if (eval - depth * 60 / PRUNING_AGGRESSIVENESS >= beta) {
 						
 						node.bestmove = 0;
 						node.eval = eval;
@@ -793,7 +794,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (EngineConstants.ENABLE_RAZORING && depth < 5) {
 					
-					int razoringMargin = 240 * depth;
+					int razoringMargin = (int) (240 * depth / PRUNING_AGGRESSIVENESS);
 					
 					if (eval + razoringMargin < alpha) {
 						
@@ -1026,7 +1027,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (phase == PHASE_QUIET) {
 						
 						if (EngineConstants.ENABLE_LMP
-								&& movesPerformed_attacks + movesPerformed_quiet >= 3 + depth * depth
+								&& movesPerformed_attacks + movesPerformed_quiet >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS
 							) {
 							
 							continue;
@@ -1036,7 +1037,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								if (eval + depth * FUTILITY_MARGIN <= alpha) {
+								if (eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
 									
 									continue;
 								}
@@ -1045,7 +1046,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& phase == PHASE_ATTACKING_BAD
-							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth
+							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS
 						) {
 						
 						continue;
@@ -1053,7 +1054,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				int new_depth = (move == ttMove && extend_tt_move) ?(isPv ? depth : depth + 1) : depth - 1;
+				int new_depth = (move == ttMove && extend_tt_move) ? (isPv ? depth : depth + 1) : depth - 1;
 				
 				boolean doLMR = new_depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
@@ -1425,7 +1426,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (phase == PHASE_QUIET) {
 						
 						if (EngineConstants.ENABLE_LMP
-								&& all_moves >= 3 + depth * depth
+								&& all_moves >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS
 							) {
 							
 							continue;
@@ -1435,7 +1436,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								if (eval + depth * FUTILITY_MARGIN <= alpha) {
+								if (eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
 									
 									continue;
 								}
@@ -1444,7 +1445,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 					} else if (EngineConstants.ENABLE_SEE_PRUNING
 							&& phase == PHASE_ATTACKING_BAD
-							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth
+							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS
 						) {
 						
 						continue;
