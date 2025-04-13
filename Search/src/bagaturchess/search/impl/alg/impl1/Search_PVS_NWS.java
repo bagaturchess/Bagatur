@@ -82,8 +82,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 	}
 	
-	
+
+	private static final int FUTILITY_MAXDEPTH 						= 7;
 	private static final int FUTILITY_MARGIN 						= 80;
+	
+	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= 9;
+	private static final int STATIC_NULL_MOVE_MARGIN 				= 60;
+	
+	private static final int RAZORING_MAXDEPTH 						= 4;
+	private static final int RAZORING_MARGIN 						= 240;
+	
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -753,9 +761,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (eval >= beta) {
 				
 				
-				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth < 10) {
+				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth <= STATIC_NULL_MOVE_MAXDEPTH) {
 					
-					if (eval - depth * 60 / PRUNING_AGGRESSIVENESS >= beta) {
+					if (eval - depth * STATIC_NULL_MOVE_MARGIN / PRUNING_AGGRESSIVENESS >= beta) {
 						
 						node.bestmove = 0;
 						node.eval = eval;
@@ -792,9 +800,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			} else if (eval <= alpha) {
 				
 				
-				if (EngineConstants.ENABLE_RAZORING && depth < 5) {
+				if (EngineConstants.ENABLE_RAZORING && depth <= RAZORING_MAXDEPTH) {
 					
-					int razoringMargin = (int) (240 * depth / PRUNING_AGGRESSIVENESS);
+					int razoringMargin = (int) (RAZORING_MARGIN * depth / PRUNING_AGGRESSIVENESS);
 					
 					if (eval + razoringMargin < alpha) {
 						
@@ -1037,7 +1045,8 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								if (eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
+								if (depth <= FUTILITY_MAXDEPTH
+										&& eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
 									
 									continue;
 								}
@@ -1436,7 +1445,8 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
 								
-								if (eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
+								if (depth <= FUTILITY_MAXDEPTH
+										&& eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
 									
 									continue;
 								}
