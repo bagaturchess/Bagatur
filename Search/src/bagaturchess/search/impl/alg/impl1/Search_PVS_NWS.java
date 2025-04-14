@@ -83,6 +83,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 
+	private static final double PRUNING_AGGRESSIVENESS 				= 1;
+	
 	private static final int FUTILITY_MAXDEPTH 						= 7;
 	private static final int FUTILITY_MARGIN 						= 80;
 	
@@ -99,7 +101,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private static final boolean USE_DTZ_CACHE 						= true;
 	
-	private static final double PRUNING_AGGRESSIVENESS 				= 1;
 	
 	private IEvalEntry temp_cache_entry;
 	
