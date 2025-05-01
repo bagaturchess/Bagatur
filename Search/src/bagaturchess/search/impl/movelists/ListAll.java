@@ -303,27 +303,7 @@ public class ListAll implements ISearchMoveList {
 		
 		
 		if (move == tptMove) {
-			ordval += ORD_VAL_TPT_MOVE * orderingStatistics.getOrdVal_TPT();
-		}
-		
-		
-		if (move == prevPvMove) {
-			ordval += ORD_VAL_PREVPV_MOVE * orderingStatistics.getOrdVal_PREVPV();
-		}
-		
-		
-		if (move == prevBestMove) {
-			ordval += ORD_VAL_PREV_BEST_MOVE * orderingStatistics.getOrdVal_PREVBEST();
-		}
-		
-		
-		if (move == mateMove) {
-			ordval += ORD_VAL_MATE_MOVE * orderingStatistics.getOrdVal_MATEMOVE();
-		}
-		
-		
-		if (env.getBitboard().getMoveOps().isCastling(move)) {
-			ordval += ORD_VAL_CASTLING * orderingStatistics.getOrdVal_CASTLING();
+			ordval += 100000;
 		}
 		
 		
@@ -332,21 +312,31 @@ public class ListAll implements ISearchMoveList {
 			int see = env.getBitboard().getSEEScore(move);
 			
 			if (see > 0) {
-				ordval += ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
+				ordval += 95000 + see;
 			} else if (see == 0) {
-				ordval += ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();
+				ordval += 90000;
 			} else {
-				ordval += ORD_VAL_LOSE_CAP * orderingStatistics.getOrdVal_LOSECAP() + see / 100;
+				ordval += 90000 - see;
 			}
 		}
 		
+		
 		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
-			ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
+			ordval += 90100;
 		}
 		
-		ordval += env.getHistory_All().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
 		
-		//ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
+		if (move == prevPvMove) {
+			ordval += 80000;
+		}
+		
+		
+		if (move == prevBestMove) {
+			ordval += 70000;
+		}
+		
+		
+		ordval += env.getHistory_All().getScores(move) * 1000;
 		
 		
 		return ordval;
