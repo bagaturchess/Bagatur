@@ -23,13 +23,10 @@
 package bagaturchess.search.impl.alg.impl0;
 
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.bitboard.impl1.internal.EngineConstants;
-import bagaturchess.bitboard.impl1.internal.MaterialUtil;
-import bagaturchess.bitboard.impl1.internal.SEEUtil;
+import bagaturchess.egtb.syzygy.SyzygyConstants;
+import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
@@ -40,6 +37,8 @@ import bagaturchess.search.impl.alg.BacktrackingInfo;
 import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.env.SearchEnv;
+import bagaturchess.search.impl.eval.cache.EvalEntry_BaseImpl;
+import bagaturchess.search.impl.eval.cache.IEvalEntry;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.tpt.ITTEntry;
@@ -69,10 +68,14 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int RAZORING_MARGIN 						= 240;
 	
 	
-	private BacktrackingInfo[] backtracking 			= new BacktrackingInfo[MAX_DEPTH + 1];
+	private BacktrackingInfo[] backtracking 						= new BacktrackingInfo[MAX_DEPTH + 1];
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
+	
+	
+	private static final boolean USE_DTZ_CACHE 						= true;
+	private IEvalEntry temp_cache_entry;
 	
 	
 	public Search_PVS_NWS(Object[] args) {
@@ -81,7 +84,14 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	public Search_PVS_NWS(SearchEnv _env) {
+		
 		super(_env);
+		
+		if (USE_DTZ_CACHE) {
+	    	
+	    	temp_cache_entry = new EvalEntry_BaseImpl();
+		}
+		
 		for (int i=0; i<backtracking.length; i++) {
 			backtracking[i] = new BacktrackingInfo(); 
 		}
@@ -170,9 +180,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			node.eval = getDrawScores(-1);
 			return node.eval;
 		}
-		
-		
-		boolean inCheck = env.getBitboard().isInCheck();
     	
     	
 		if (depth <= 0) {
@@ -226,6 +233,180 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		boolean inCheck = env.getBitboard().isInCheck();
+		
+		
+		int egtb_eval = ISearch.MIN;
+		
+		if (SyzygyTBProbing.getSingleton() != null
+    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
+    			){
+			
+			/*
+			SYZYGY DOWNLOADS:
+			http://tablebase.lichess.ovh/tables/standard/7/
+
+			SYZYGY ONLINE:
+			https://github.com/niklasf/lila-tablebase#http-api
+			https://syzygy-tables.info/
+			https://lichess.org/blog/W3WeMyQAACQAdfAL/7-piece-syzygy-tablebases-are-complete
+
+
+			INFO SOURCE:
+			https://www.chessprogramming.org/Syzygy_Bases
+
+			Winner is minimizing DTZ and the loser is maximizing DTZ
+
+			File Types
+			Syzygy Bases consist of two sets of files,
+			WDL files (extension .rtbw) storing win/draw/loss information considering the fifty-move rule for access during search,
+			and DTZ files (extension .rtbz) with distance-to-zero information for access at the root.
+			WDL has full data for two sides but DTZ50 omitted data of one side to save space. Each endgame has a pair of those types.
+
+			Search
+			During the Search:
+			With the WDL tables stored on SSD [12] , it is possible to probe the tables at all depths without much slowdown.
+			They have been tested in Ronald de Man's engine Sjaak (playing on FICS as TrojanKnight(C)) a couple of months quite successfully,
+			don't probing in quiescence search.
+			At the Root:
+			Since pure DTZ50-optimal play (i.e. minimaxing the number of moves to the next capture or pawn move by either side) can be very unnatural,
+			it might be desirable to let the engine search on the winning moves until it becomes clear that insufficient progress is being made
+			and only then switch to DTZ-optimal play (e.g. by detecting repetitions and monitoring the halfmove clock) [13].
+
+
+			Ronald de Man in a reply to Nguyen Pham, April 15, 2020 [28] :
+			Syzygy WDL is double sided, DTZ is single sided.
+			WDL:
+			So to know whether a 7-piece position is winning, losing or drawn (or cursed),
+			the engine needs to do only a single probe of a 7-piece WDL table.
+			(It may in addition have to do some probes of 6-piece WDL tables if any direct captures are available.)
+			DTZ:
+			If the engine needs to know the DTZ value (which is only necessary when a TB root position has been reached),
+			the probing code may have to do a 1-ply search to get to the "right" side of the DTZ table.
+			For 6-piece TBs, DTZ is 81.9GB when storing only the smaller side of each table. Storing both sides might require perhaps 240GB.
+			*/
+			
+			
+			int probe_result = probeWDL_WithCache();
+			
+			if (probe_result != -1) {
+				
+				info.setTBhits(info.getTBhits() + 1);
+							
+				int wdl = (probe_result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+				
+				//Winner is minimizing DTZ and the loser is maximizing DTZ
+		        switch (wdl) {
+		        
+	            	case SyzygyConstants.TB_WIN:
+	            		
+	    				//int dtz = (probe_result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
+	            		int dtz = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+	            		
+	    				if (dtz < 0) {
+	    					
+	    					/**
+	    					 * In this not mate position "8/6P1/8/2kB2K1/8/8/8/4r3 w - - 1 19", DTZ is -1 and WDL is 2 (WIN).
+	    					 */
+	    					break;
+	    					//throw new IllegalStateException("dtz=" + dtz + ", env.getBitboard()=" + env.getBitboard());
+	    				}
+	    				
+						int distanceToDraw_50MoveRule = 99 - env.getBitboard().getDraw50movesRule();
+						//Although we specify the rule50 parameter when calling SyzygyJNIBridge.probeSyzygyDTZ(...)
+						//Syzygy TBs report winning score/move
+						//but the +mate or +promotion moves line is longer
+						//than the moves we have until draw with 50 move rule
+						//! Without this check, the EGTB probing doesn't work correctly and the Bagatur version has smaller ELO rating (-35 ELO)
+						if (distanceToDraw_50MoveRule >= dtz) {
+							
+							/*int op_factor = cb.colorToMoveInverse == Constants.COLOUR_WHITE ? env.getBitboard().getMaterialFactor().getWhiteFactor() : env.getBitboard().getMaterialFactor().getBlackFactor();
+							
+							//Opponent has only king so DTZ is DTM
+							if (op_factor == 0 && !env.getBitboard().hasSufficientMatingMaterial(cb.colorToMoveInverse)) {
+								
+			    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
+			    				egtb_eval = SearchUtils.getMateVal(ply + dtz);
+								
+							} else {
+								
+								egtb_eval = IEvaluator.MAX_EVAL / (ply + dtz);
+							}*/
+							
+							//TODO: the eval is too less in order to be more attractive for search than maybe rook and 1+ passed pawns?
+							egtb_eval = MAX_MATERIAL_INTERVAL / (ply + dtz + 1); //+1 in order to be less than a mate in max_depth plies.
+							
+						} /*else {
+							
+							egtb_eval = getDrawScores(-1);
+						}*/
+	            		
+						break;
+						
+		            case SyzygyConstants.TB_LOSS:
+		            	
+	    				/*
+	    				This code doesn't work correctly
+	    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
+	    				egtb_eval = -SearchUtils.getMateVal(ply + dtz);
+	    				*/
+		            	break;
+		            
+		            case SyzygyConstants.TB_DRAW:
+		            	
+						egtb_eval = getDrawScores(-1);
+		                
+						break;
+						
+		            case SyzygyConstants.TB_BLESSED_LOSS:
+		            	
+		            	egtb_eval = getDrawScores(-1);
+		                
+						break;
+						
+		            case SyzygyConstants.TB_CURSED_WIN:
+		            	
+		            	egtb_eval = getDrawScores(-1);
+		                
+						break;
+						
+		            default:
+		            	
+		            	throw new IllegalStateException("wdl=" + wdl);
+		        }
+			}
+        }
+		
+		
+		if (egtb_eval != ISearch.MIN) {
+			
+			if (inCheck) {
+				
+				if (!env.getBitboard().hasMoveInCheck()) {
+					
+					egtb_eval = -SearchUtils.getMateVal(ply);
+				}
+				
+			} else {
+				
+				if (!env.getBitboard().hasMoveInNonCheck()) {
+					
+					egtb_eval = getDrawScores(-1);
+				}
+			}
+			
+			if (ply > 7) {
+			
+				node.bestmove = 0;
+				node.eval = egtb_eval;
+				node.leaf = true;
+				
+				return node.eval;
+			}
+		}
+
+		
+		
 		if (!isPv
 				&& !env.getBitboard().isInCheck()
 				&& !SearchUtils.isMateVal(alpha_org)
@@ -237,7 +418,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (tt_value != IEvaluator.MIN_EVAL) {
 				
-				if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
+				if (getSearchConfig().isOther_UseTPTScores()) {
 					
 					if (tt_flag == ITTEntry.FLAG_EXACT
 							|| (tt_flag == ITTEntry.FLAG_UPPER && tt_value < eval)
@@ -259,7 +440,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (eval >= beta) {
 				
 				
-				if (EngineConstants.ENABLE_STATIC_NULL_MOVE && depth <= STATIC_NULL_MOVE_MAXDEPTH) {
+				if (depth <= STATIC_NULL_MOVE_MAXDEPTH) {
 					
 					if (eval - depth * STATIC_NULL_MOVE_MARGIN / PRUNING_AGGRESSIVENESS >= beta) {
 						
@@ -272,7 +453,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				if (EngineConstants.ENABLE_NULL_MOVE && depth >= 3) {
+				if (depth >= 3) {
 					
 					env.getBitboard().makeNullMoveForward();
 					
@@ -296,7 +477,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			} else if (eval <= alpha_org) {
 				
 				
-				if (EngineConstants.ENABLE_RAZORING && depth <= RAZORING_MAXDEPTH) {
+				if (depth <= RAZORING_MAXDEPTH) {
 					
 					int razoringMargin = (int) (RAZORING_MARGIN * depth / PRUNING_AGGRESSIVENESS);
 					
@@ -381,27 +562,21 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (!isCapOrProm) {
 						
-						if (EngineConstants.ENABLE_LMP
-								&& searchedCount >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS
-							) {
+						if (searchedCount >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS) {
 							
 							continue;
 						}
 						
 						if (backtrackingInfo.static_eval != ISearch.MIN) { //eval is set
 							
-							if (EngineConstants.ENABLE_FUTILITY_PRUNING) {
+							if (depth <= FUTILITY_MAXDEPTH
+									&& backtrackingInfo.static_eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
 								
-								if (depth <= FUTILITY_MAXDEPTH
-										&& backtrackingInfo.static_eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
-									
-									continue;
-								}
+								continue;
 							}
 						}
 						
-					} else if (EngineConstants.ENABLE_SEE_PRUNING
-							&& isCapOrProm
+					} else if (isCapOrProm
 							&& env.getBitboard().getSEEScore(cur_move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS
 						) {
 						
@@ -491,7 +666,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (best_move != 0 && (best_eval == MIN || best_eval == MAX)) {
-			throw new IllegalStateException();
+			throw new IllegalStateException("EXC1: best_move=" + best_move + ", best_eval=" + best_eval);
 		}
 		
 		
@@ -503,7 +678,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.leaf = true;
 					return node.eval;
 				} else {
-					throw new IllegalStateException();
+					throw new IllegalStateException("best_move == 0, inCheck, searchedCount=" + searchedCount);
 				}
 			} else {
 				if (searchedCount == 0) {
@@ -512,14 +687,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.leaf = true;
 					return node.eval;
 				} else {
-					throw new IllegalStateException();
+					throw new IllegalStateException("best_move == 0, !inCheck, searchedCount=" + searchedCount);
 				}
 			}
 		}
 		
 		
 		if (best_move == 0 || best_eval == MIN || best_eval == MAX) {
-			throw new IllegalStateException();
+			throw new IllegalStateException("EXC2: best_move=" + best_move + ", best_eval=" + best_eval);
 		}
 		
 		
@@ -609,7 +784,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (tt_value != IEvaluator.MIN_EVAL) {
 			
-			if (EngineConstants.USE_TT_SCORE_AS_EVAL && getSearchConfig().isOther_UseTPTScores()) {
+			if (getSearchConfig().isOther_UseTPTScores()) {
 				
 				if (tt_flag == ITTEntry.FLAG_EXACT
 						|| (tt_flag == ITTEntry.FLAG_UPPER && tt_value < staticEval)
@@ -796,5 +971,43 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		return draw;
+	}
+	
+	
+	private int probeWDL_WithCache() {
+	    
+	    if (USE_DTZ_CACHE) {
+	    	
+	    	long hash50movesRule = 128 + env.getBitboard().getDraw50movesRule();
+		    hash50movesRule += hash50movesRule << 8;
+		    hash50movesRule += hash50movesRule << 16;
+		    hash50movesRule += hash50movesRule << 32;
+		    
+		    long hashkey = hash50movesRule ^ env.getBitboard().getHashKey();
+		    
+	    	env.getSyzygyDTZCache().get(hashkey, temp_cache_entry);
+			
+			if (!temp_cache_entry.isEmpty()) {
+				
+				int probe_result = temp_cache_entry.getEval();
+		        
+				return probe_result;
+				
+			} else {
+		    
+		        int probe_result = SyzygyTBProbing.getSingleton().probeWDL(env.getBitboard());
+		        
+		        env.getSyzygyDTZCache().put(hashkey, 5, probe_result);
+		        
+		        return probe_result;
+			}
+			
+	    } else {
+	    	
+	    	int probe_result = SyzygyTBProbing.getSingleton().probeWDL(env.getBitboard());
+	        
+	        return probe_result;
+	    }
+
 	}
 }
