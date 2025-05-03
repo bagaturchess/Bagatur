@@ -522,7 +522,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(cur_move);
 				
 				
-				boolean givesCheck = env.getBitboard().isInCheck();
+				//boolean givesCheck = env.getBitboard().isInCheck();
 				
 				
 				int cur_eval;
@@ -532,14 +532,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 				} else {
 					
-					int lmrReduction = 0;
-					if (!inCheck) {
-						int rate = LMR_REDUCTIONS[Math.min(63, searchedCount)][Math.min(63, depth)];
-						if (!isCapOrProm && !givesCheck) {
-							rate += 1;
-						}
-						lmrReduction = rate;
-					}					
+					int lmrReduction = LMR_REDUCTIONS[Math.min(63, searchedCount)][Math.min(63, depth)];
+					if (!isPv) {
+						lmrReduction++;
+					}
 					
 					cur_eval = -search(mediator, pvman, info, initial_maxdepth, ply + 1, depth - lmrReduction, -alpha - 1, -alpha, false);
 					
