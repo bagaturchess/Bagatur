@@ -1030,7 +1030,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				if (!isPv
-						&& depth <= 7
+						//&& depth <= 7
 						&& !wasInCheck
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& !SearchUtils.isMateVal(alpha)
