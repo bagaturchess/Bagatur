@@ -81,6 +81,12 @@ public class CombinedHistory {
 	}
 	
 	
+	public void addValue_Bad(final int color, final int move, final int depth) {
+		HH_MOVES1[color][MoveUtil.getFromToIndex(move)] -= depth * depth;
+		HH_MOVES2[color][MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] -= depth * depth;
+	}
+	
+	
 	public void addValue_All(final int color, final int move, final int depth) {
 		BF_MOVES1[color][MoveUtil.getFromToIndex(move)] += depth * depth;
 		BF_MOVES2[color][MoveUtil.getSourcePieceIndex(move)][MoveUtil.getToIndex(move)] += depth * depth;

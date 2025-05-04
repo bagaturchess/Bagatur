@@ -110,13 +110,19 @@ public final class MoveGenerator {
 	}
 	
 	
-	public void addHHValue(final int inCheck, final int color, final int move, final int parentMove, final int depth) {
+	public void addValue_Good(final int inCheck, final int color, final int move, final int parentMove, final int depth) {
 		
 		history.addValue_Good(color, move, depth);		
 	}
 	
 	
-	public void addBFValue(final int inCheck, final int color, final int move, final int parentMove, final int depth) {
+	public void addValue_Bad(final int color, final int move, final int depth) {
+		
+		history.addValue_Bad(color, move, depth);		
+	}
+	
+	
+	public void addValue_All(final int inCheck, final int color, final int move, final int parentMove, final int depth) {
 		
 		history.addValue_All(color, move, depth);		
 	}
@@ -296,10 +302,10 @@ public final class MoveGenerator {
 			
 			long score = getHHScore(inCheck, colorToMove, move, parentMove);
 						
-			if (score < 0) {
+			/*if (score < 0) {
 				
 				throw new IllegalStateException("score < 0");
-			}
+			}*/
 			
 			moveScores[j] = score;
 		}

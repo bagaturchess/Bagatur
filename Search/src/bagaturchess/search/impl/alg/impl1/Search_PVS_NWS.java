@@ -82,16 +82,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 	}
 	
-
+	
 	private static final double PRUNING_AGGRESSIVENESS 				= 1;
 	
-	private static final int FUTILITY_MAXDEPTH 						= 7;
+	private static final int FUTILITY_MAXDEPTH 						= MAX_DEPTH;
 	private static final int FUTILITY_MARGIN 						= 80;
 	
-	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= 9;
+	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= MAX_DEPTH;
 	private static final int STATIC_NULL_MOVE_MARGIN 				= 60;
 	
-	private static final int RAZORING_MAXDEPTH 						= 4;
+	private static final int RAZORING_MAXDEPTH 						= MAX_DEPTH;
 	private static final int RAZORING_MARGIN 						= 240;
 	
 	
@@ -330,7 +330,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (MoveUtil.isQuiet(move)) {
 				
-				moveGen.addBFValue(cb.checkingPieces == 0 ? 0 : 1, cb.colorToMove, move, parentMove, depth);
+				moveGen.addValue_All(cb.checkingPieces == 0 ? 0 : 1, cb.colorToMove, move, parentMove, depth);
+				
+				if (score < beta) {
+					
+					moveGen.addValue_Bad(cb.colorToMove, move, depth);
+				}
 			}
 			
 			
@@ -354,7 +359,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (MoveUtil.isQuiet(bestMove)) {
 						moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
 						moveGen.addKillerMove(cb.colorToMove, bestMove, ply);
-						moveGen.addHHValue(cb.checkingPieces == 0 ? 0 : 1, cb.colorToMove, bestMove, parentMove, depth);
+						moveGen.addValue_Good(cb.checkingPieces == 0 ? 0 : 1, cb.colorToMove, bestMove, parentMove, depth);
 					}
 					
 					break;
@@ -1131,7 +1136,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (MoveUtil.isQuiet(move)) {
 					
-					moveGen.addBFValue(wasInCheck ? 1 : 0, cb.colorToMove, move, parentMove, depth);
+					moveGen.addValue_All(wasInCheck ? 1 : 0, cb.colorToMove, move, parentMove, depth);
+					
+					if (score < beta) {
+						
+						moveGen.addValue_Bad(cb.colorToMove, move, depth);
+					}
 				}
 				
 				
@@ -1155,7 +1165,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (MoveUtil.isQuiet(bestMove)) {
 							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
 							moveGen.addKillerMove(cb.colorToMove, bestMove, ply);
-							moveGen.addHHValue(wasInCheck ? 1 : 0, cb.colorToMove, bestMove, parentMove, depth);
+							moveGen.addValue_Good(wasInCheck ? 1 : 0, cb.colorToMove, bestMove, parentMove, depth);
 						}
 						
 						phase += 379;
