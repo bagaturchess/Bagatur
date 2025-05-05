@@ -20,8 +20,10 @@ public class Main_Rescore {
 	
     public static void main(String[] args) {
     	
+    	long start_time = System.currentTimeMillis();
+    	
         String inputFilePath = "C:/DATA/NNUE/plain/dataset.plain";
-        String outputFilePath = "C:/DATA/NNUE/plain/filtered_rescored.plain";
+        String outputFilePath = "C:/DATA/NNUE/plain/rescored_dataset.plain";
         
         try {
         	
@@ -37,7 +39,7 @@ public class Main_Rescore {
                 
                 if (totalLines % 100000 == 0) {
                 	
-                	System.out.println("totalLines=" + totalLines);
+                	System.out.println("totalLines=" + totalLines + " in " + (System.currentTimeMillis() - start_time) / 1000 + " seconds");
                 }
                 
                 String[] parts = line.split(" \\| ");
@@ -86,8 +88,8 @@ public class Main_Rescore {
 	    		
 	    		//System.out.println("evaluation=" + evaluation + ", evaluation_rescore=" + evaluation_rescore);
         		
-	    		//50 moves rule is considered by the rescore, but will not be considered in the trained net.
-	    		//So skip the draw scores and leave only evals close to 0 for the training.
+	    		//50 moves rule is considered by the re-score logic, but will not be considered in the trained net.
+	    		//So skip all draw scores and leave only evaluations close to 0 for the training as an indicators of equal position.
 	    		if (evaluation_rescore != 0) {
 	    			
 					StringBuilder sb = new StringBuilder(100);
