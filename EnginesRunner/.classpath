@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="/NNExperiments/lib/neuroph-core-2.94.jar"/>
 	<classpathentry kind="lib" path="/NNExperiments/lib/slf4j-api-1.7.5.jar"/>
 	<classpathentry kind="lib" path="/NNExperiments/lib/slf4j-nop-1.7.6.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NNUE"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
