@@ -3,9 +3,18 @@ package bagaturchess.datagen;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
@@ -18,6 +27,9 @@ import bagaturchess.nnue_v5.NNUEProbeUtils.Input;
 public class Main_Rescore {
 	
 	
+	private final static String SEQUENCE_FILE = "C:/DATA/NNUE/plain/sequence.txt";
+	
+	
     public static void main(String[] args) {
     	
     	long start_time = System.currentTimeMillis();
@@ -28,18 +40,27 @@ public class Main_Rescore {
         try {
         	
             BufferedReader reader = new BufferedReader(new FileReader(inputFilePath), 10000);
-            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath), 10000);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath, true), 10000);
             
             String line;
-            int totalLines = 0;
+            int total_lines = 0;
             
+        	long skip_lines_count = readSequence();
+        	
+        	System.out.println("Value from sequence file is: " + skip_lines_count);
+        	
             while ((line = reader.readLine()) != null) {
             	
-                totalLines++;
+                total_lines++;
                 
-                if (totalLines % 100000 == 0) {
+                if (total_lines % 100000 == 0) {
                 	
-                	System.out.println("totalLines=" + totalLines + " in " + (System.currentTimeMillis() - start_time) / 1000 + " seconds");
+                	System.out.println("totalLines=" + total_lines + " in " + (System.currentTimeMillis() - start_time) / 1000 + " seconds");
+                }
+                
+                if (total_lines < skip_lines_count) {
+                	
+                	continue;
                 }
                 
                 String[] parts = line.split(" \\| ");
@@ -104,18 +125,56 @@ public class Main_Rescore {
 	                
 	                writer.write(line_rescore);
 	                writer.newLine();
+	                writer.flush();
 	    		}
+	    		
+	    		
+                writeSequence(total_lines);
             }
             
             reader.close();
             writer.close();
             
-            System.out.println("Total lines processed: " + totalLines);
+            System.out.println("Total lines processed: " + total_lines);
             System.out.println("Rescored dataset saved to: " + outputFilePath);
             
         } catch (IOException e) {
         	
             e.printStackTrace();
+        }
+    }
+    
+	
+    public static void writeSequence(long number) throws IOException {
+    	
+    	Files.write(Paths.get((new File(SEQUENCE_FILE)).toURI()), ("" + number).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+    }
+
+    
+    public static long readSequence() throws IOException {
+    	
+    	
+    	if (!(new File(SEQUENCE_FILE)).exists()) {
+    		
+    		return 0;
+    	}
+
+    	
+    	BufferedReader reader = new BufferedReader(new FileReader(new File(SEQUENCE_FILE)));
+    	
+        String line = reader.readLine();
+        
+        reader.close();
+        
+        if (line != null) {
+        	
+            long number = Long.parseLong(line.trim());
+            
+            return number;
+            
+        } else {
+        	
+            return 0;
         }
     }
 }
