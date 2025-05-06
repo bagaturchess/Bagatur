@@ -294,7 +294,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int reduction = 1;
 			if (doLMR) {
 				
-				reduction = 2;//LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
+				reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
 				
 				reduction = Math.min(depth - 1, Math.max(reduction, 1));
 			}
