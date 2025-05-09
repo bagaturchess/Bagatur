@@ -238,7 +238,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		final int parentMove = moveGen.previous();
+		final int parentMove = env.getBitboard().getLastMove();
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
 		
@@ -869,7 +869,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
 		
-		final int parentMove = moveGen.previous();
+		final int parentMove = env.getBitboard().getLastMove();
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
 		
@@ -1286,7 +1286,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		final boolean wasInCheck = cb.checkingPieces != 0;
 		
-		final int parentMove = moveGen.previous();
+		final int parentMove = env.getBitboard().getLastMove();
 		
 		int killer1Move = 0;
 		int killer2Move = 0;
