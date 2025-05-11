@@ -787,8 +787,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						cb.doNullMove();
 						
 						final int reduction = depth / 4 + 3 + Math.min((eval - beta) / 80, 3);
-						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, isPv)
-								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, isPv, initialMaxDepth);
+						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, false)
+								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth);
 						
 						cb.undoNullMove();
 						
@@ -812,7 +812,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (eval + razoringMargin < alpha) {
 						
-						int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha - razoringMargin - 1, alpha - razoringMargin, ply, isPv);
+						int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha - razoringMargin - 1, alpha - razoringMargin, ply, false);
 						
 						if (score < alpha - razoringMargin) {
 							
