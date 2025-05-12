@@ -1010,6 +1010,12 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (phase == PHASE_QUIET) {
 						
+						/*if (depth <= 3
+								&& moveGen.getScore() <= -(1300 + 200 * depth)) {
+							
+							continue;
+						}*/
+						
 						if (movesPerformed_attacks + movesPerformed_quiet >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS) {
 							
 							continue;
@@ -1394,6 +1400,12 @@ public class Search_PVS_NWS extends SearchImpl {
 					) {
 					
 					if (phase == PHASE_QUIET) {
+						
+						/*if (depth <= 3
+								&& moveGen.getScore() <= -(1300 + 200 * depth)) {
+							
+							continue;
+						}*/
 						
 						if (all_moves >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS) {
 							
