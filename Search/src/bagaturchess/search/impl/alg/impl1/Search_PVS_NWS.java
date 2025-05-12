@@ -1001,7 +1001,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				if (!isPv
-						//&& depth <= 7
 						&& !wasInCheck
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& !SearchUtils.isMateVal(alpha)
@@ -1011,8 +1010,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (phase == PHASE_QUIET) {
 						
-						if (movesPerformed_attacks + movesPerformed_quiet >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS
-							) {
+						if (movesPerformed_attacks + movesPerformed_quiet >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS) {
 							
 							continue;
 						}
@@ -1027,8 +1025,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 						
 					} else if (phase == PHASE_ATTACKING_BAD
-							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS
-						) {
+							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
 						
 						continue;
 					}
@@ -1390,7 +1387,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				if (!isPv
-						//&& depth <= 7
 						&& !wasInCheck
 						&& all_moves > 1
 						&& !SearchUtils.isMateVal(alpha)
@@ -1399,8 +1395,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (phase == PHASE_QUIET) {
 						
-						if (all_moves >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS
-							) {
+						if (all_moves >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS) {
 							
 							continue;
 						}
@@ -1415,8 +1410,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 						
 					} else if (phase == PHASE_ATTACKING_BAD
-							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS
-						) {
+							&& SEEUtil.getSeeCaptureScore(cb, move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
 						
 						continue;
 					}
