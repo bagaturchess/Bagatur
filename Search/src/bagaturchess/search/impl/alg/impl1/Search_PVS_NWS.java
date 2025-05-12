@@ -351,19 +351,19 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (ply + 1 < ISearch.MAX_DEPTH) {
 					pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 				}
+			}
+			
+			alpha = Math.max(alpha, score);
+			
+			if (alpha >= beta) {
 				
-				alpha = Math.max(alpha, score);
-				
-				if (alpha >= beta) {
-					
-					if (MoveUtil.isQuiet(bestMove)) {
-						moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
-						moveGen.addKillerMove(cb.colorToMove, bestMove, ply);
-						moveGen.addValue_Good(cb.checkingPieces == 0 ? 0 : 1, cb.colorToMove, bestMove, parentMove, depth);
-					}
-					
-					break;
+				if (MoveUtil.isQuiet(bestMove)) {
+					moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
+					moveGen.addKillerMove(cb.colorToMove, bestMove, ply);
+					moveGen.addValue_Good(cb.checkingPieces == 0 ? 0 : 1, cb.colorToMove, bestMove, parentMove, depth);
 				}
+				
+				break;
 			}
 		}
 		
@@ -1157,21 +1157,21 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (ply + 1 < ISearch.MAX_DEPTH) {
 						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 					}
+				}
+				
+				alpha = Math.max(alpha, score);
+				
+				if (alpha >= beta) {
 					
-					alpha = Math.max(alpha, score);
-					
-					if (alpha >= beta) {
-						
-						if (MoveUtil.isQuiet(bestMove)) {
-							moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
-							moveGen.addKillerMove(cb.colorToMove, bestMove, ply);
-							moveGen.addValue_Good(wasInCheck ? 1 : 0, cb.colorToMove, bestMove, parentMove, depth);
-						}
-						
-						phase += 379;
-						
-						break;
+					if (MoveUtil.isQuiet(bestMove)) {
+						moveGen.addCounterMove(cb.colorToMove, parentMove, bestMove);
+						moveGen.addKillerMove(cb.colorToMove, bestMove, ply);
+						moveGen.addValue_Good(wasInCheck ? 1 : 0, cb.colorToMove, bestMove, parentMove, depth);
 					}
+					
+					phase += 379;
+					
+					break;
 				}
 			}
 			
@@ -1520,15 +1520,15 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					bestScore = score;
 					bestMove = move;
+				}
+				
+				alpha = Math.max(alpha, score);
+				
+				if (alpha >= beta) {
 					
-					alpha = Math.max(alpha, score);
+					phase += 379;
 					
-					if (alpha >= beta) {
-						
-						phase += 379;
-						
-						break;
-					}
+					break;
 				}
 			}
 			
