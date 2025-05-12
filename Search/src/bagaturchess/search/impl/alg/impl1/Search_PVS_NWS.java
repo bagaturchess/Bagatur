@@ -1783,6 +1783,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 		}*/
 		
+		//int material = env.getBitboard().getMaterialFactor().getTotalFactor(); //In [0-62]
+		
+		//eval = eval * (194 + material) / 256;
+		
+		eval = Math.min(Math.max(IEvaluator.MIN_EVAL, eval), IEvaluator.MAX_EVAL);
 		
 		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
 			
