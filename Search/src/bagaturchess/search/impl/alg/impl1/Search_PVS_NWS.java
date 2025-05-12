@@ -1011,7 +1011,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (phase == PHASE_QUIET) {
 						
 						/*if (depth <= 3
-								&& moveGen.getScore() <= -(1300 + 200 * depth)) {
+								&& moveGen.getScore() <= 27 / depth) {
 							
 							continue;
 						}*/
@@ -1402,7 +1402,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (phase == PHASE_QUIET) {
 						
 						/*if (depth <= 3
-								&& moveGen.getScore() <= -(1300 + 200 * depth)) {
+								&& moveGen.getScore() <= 27 / depth) {
 							
 							continue;
 						}*/
