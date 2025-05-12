@@ -1509,6 +1509,9 @@ public class Search_PVS_NWS extends SearchImpl {
 	public int qsearch(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen,
 			int alpha, final int beta, final int ply, final boolean isPv) {
 		
+		
+		info.setSearchedNodes(info.getSearchedNodes() + 1);
+		
 		if (info.getSelDepth() < ply) {
 			
 			info.setSelDepth(ply);
