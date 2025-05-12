@@ -302,10 +302,10 @@ public final class MoveGenerator {
 			
 			long score = getHHScore(inCheck, colorToMove, move, parentMove);
 						
-			/*if (score < 0) {
+			if (score < 0) {
 				
 				throw new IllegalStateException("score < 0");
-			}*/
+			}
 			
 			moveScores[j] = score;
 		}

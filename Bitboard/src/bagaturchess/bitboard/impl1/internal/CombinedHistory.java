@@ -102,6 +102,6 @@ public class CombinedHistory {
 		int value1 = (int) (scale * HH_MOVES1[color][fromToIndex] / BF_MOVES1[color][fromToIndex]);
 		int value2 = (int) (scale * HH_MOVES2[color][pieceType][toIndex] / BF_MOVES2[color][pieceType][toIndex]);
 
-		return value1 + value2;
+		return scale + (value1 + value2) / 2;
 	}
 }
