@@ -1709,13 +1709,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (getSearchConfig().isOther_UseAlphaOptimizationInQSearch()) {
 			
-			if (alpha > node.eval) {
+			if (alphaOrig > node.eval) {
 				
 				node.bestmove = 0;
 				node.leaf = true;
-				node.eval = alpha;
+				node.eval = alphaOrig;
 				
-				bestScore = alpha;
+				bestScore = alphaOrig;
 				bestMove = 0;
 			}
 		}
