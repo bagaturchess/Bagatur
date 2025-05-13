@@ -256,12 +256,6 @@ public class ListAll implements ISearchMoveList {
 		
 		}
 		
-		if (prevBestMove == move) {
-			
-			ordval += 5000 * 100;
-		
-		}
-		
 		if (killer1Move == move) {
 			
 			ordval += 5000 * 100;
@@ -283,6 +277,12 @@ public class ListAll implements ISearchMoveList {
 			
 			ordval += 2000 * 100;
 			
+		}
+		
+		if (prevBestMove == move) {
+			
+			ordval += 1000 * 100;
+		
 		}
 		
 		if (!env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {

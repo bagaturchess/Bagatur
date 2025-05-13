@@ -159,7 +159,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		BacktrackingInfo backtrackingInfo = backtracking[ply];
 		backtrackingInfo.hash_key = env.getBitboard().getHashKey();
-		backtrackingInfo.static_eval = fullEval(ply, alpha_org, beta, -1);
+		backtrackingInfo.static_eval = eval(env.getEval(), ply, alpha_org, beta);
 		
 		if (ply >= MAX_DEPTH) {
 			return backtrackingInfo.static_eval;
@@ -357,7 +357,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							|| (tt_flag == ITTEntry.FLAG_LOWER && tt_value > eval)
 						) {
 						
-						eval = tt_value;
+						eval = backtrackingInfo.static_eval = tt_value;
 					}
 				}
 			}
@@ -573,7 +573,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (cur_eval > best_eval) {
 					
 					best_eval = cur_eval;
-					
 					best_move = cur_move;
 					
 					backtrackingInfo.best_move = best_move;
@@ -656,7 +655,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (ply >= MAX_DEPTH) {
-			return fullEval(ply, alpha_org, beta, -1);
+			return eval(env.getEval(), ply, alpha_org, beta);
 		}
 		
 		
@@ -720,7 +719,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		int staticEval = fullEval(ply, alpha_org, beta, -1);
+		int staticEval = eval(env.getEval(), ply, alpha_org, beta);
 		
 		
 		if (tt_value != IEvaluator.MIN_EVAL) {
@@ -829,6 +828,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				best_eval = alpha_org;
 				best_move = 0;
 			}
+			
 		} else {
 			
 			if (best_move == 0) {
@@ -843,10 +843,26 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (best_move != 0) {
+			
 			env.getTPT().put(hashkey, 0, best_eval, alpha_org, beta, best_move);
 		}
 		
 		return best_eval;
+	}
+	
+	
+	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta) {
+		
+		int eval = evaluator.fullEval(ply, alpha, beta, -1);
+		
+		eval = Math.min(Math.max(IEvaluator.MIN_EVAL, eval), IEvaluator.MAX_EVAL);
+		
+		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
+			
+			eval = Math.min(getDrawScores(-1), eval);
+		}
+		
+		return eval;
 	}
 	
 	
