@@ -1666,15 +1666,15 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (ply + 1 < ISearch.MAX_DEPTH) {
 						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 					}
+				}
+				
+				alpha = Math.max(alpha, bestScore);
+				
+				if (alpha >= beta) {
 					
-					alpha = Math.max(alpha, bestScore);
+					phase += 379;
 					
-					if (alpha >= beta) {
-						
-						phase += 379;
-						
-						break;
-					}
+					break;
 				}
 			}
 			
