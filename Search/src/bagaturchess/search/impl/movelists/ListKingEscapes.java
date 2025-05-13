@@ -85,7 +85,7 @@ public class ListKingEscapes implements ISearchMoveList {
 		
 		if (cur < escapes_size) {
 			if (cur == 1) {
-				if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(escapes, 1, escapes_size);
+				//if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(escapes, 1, escapes_size);
 				if (env.getSearchConfig().sortMoveLists()) Utils.bubbleSort(1, escapes_size, escapes);
 			}
 			return (int) escapes[cur++];
@@ -150,7 +150,7 @@ public class ListKingEscapes implements ISearchMoveList {
 			
 		}
 		
-		if (MoveUtil.isQuiet(move)) {
+		if (!env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 			
 			ordval += env.getHistory_All().getScores(env.getBitboard().getColourToMove(), move);
 			

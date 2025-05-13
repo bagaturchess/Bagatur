@@ -141,7 +141,7 @@ public class ListAll implements ISearchMoveList {
 			if (cur == 0) {
 				//Already sorted in reserved_add
 			} else if (cur == SORT_INDEX) {
-				if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(moves, cur, size);
+				//if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(moves, cur, size);
 				if (env.getSearchConfig().sortMoveLists()) Utils.bubbleSort(cur, size, moves);
 			} else if (cur < SORT_INDEX) {
 				for (int i = cur; i < size; i++) {					
@@ -285,7 +285,7 @@ public class ListAll implements ISearchMoveList {
 			
 		}
 		
-		if (MoveUtil.isQuiet(move)) {
+		if (!env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 			
 			ordval += env.getHistory_All().getScores(env.getBitboard().getColourToMove(), move);
 			

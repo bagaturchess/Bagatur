@@ -97,7 +97,7 @@ public class ListCapsProm implements ISearchMoveList {
 		
 		if (cur < caps_size) {
 			if (cur == 1) {
-				if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(caps, 1, caps_size);
+				//if (env.getSearchConfig().randomizeMoveLists()) Utils.randomize(caps, 1, caps_size);
 				if (env.getSearchConfig().sortMoveLists()) Utils.bubbleSort(1, caps_size, caps);
 			}
 			return (int) caps[cur++];
@@ -105,55 +105,41 @@ public class ListCapsProm implements ISearchMoveList {
 			return 0;
 		}
 	}
-
+	
 	public int size() {
 		return caps_size;
 	}
 	
 	public void reserved_add(int move) {
-		//if (MoveInt.isCaptureOrPromotion(move)) {
 			
-			if (!env.getSearchConfig().sortMoveLists()) {
-				add(move);
+		long ordval = 100000 * 100;
+		
+		if (move == tptMove) {
+			if (tptPlied) {
+				return;
 			}
+			ordval += 1000;
+		}
+		
+		if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 			
-			long ordval = 100000 * 100;
-			
-			if (move == tptMove) {
-				if (tptPlied) {
-					return;
-				}
-				ordval += 1000;
-			}
-			
-			if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
+			if (env.getBitboard().getSEEScore(move) >= 0) {
 				
-				if (env.getBitboard().getSEEScore(move) >= 0) {
-					
-					ordval += 7000 * 100 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
-					
-				} else {
-					
-					ordval += -5000 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
-				}
+				ordval += 7000 * 100 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
 				
 			} else {
 				
-				throw new IllegalStateException();
+				ordval += -5000 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
 			}
 			
-			//ordval += env.getHistory_All().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
+		} else {
 			
-			//ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
-			
-			
-			long move_ord = MoveInt.addOrderingValue(move, ordval);
-			
-			add(move_ord);
-			
-		//} else {
-		//	throw new IllegalStateException();
-		//}
+			throw new IllegalStateException();
+		}
+		
+		long move_ord = MoveInt.addOrderingValue(move, ordval);
+		
+		add(move_ord);
 	}
 
 	private void add(long move) {

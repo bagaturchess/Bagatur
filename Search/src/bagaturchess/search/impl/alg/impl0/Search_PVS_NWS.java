@@ -519,7 +519,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				//boolean givesCheck = env.getBitboard().isInCheck();
 				
 				
-				int cur_eval;
+				int cur_eval = alpha + 1;
+				
 				if (searchedCount == 0) {
 					
 					cur_eval = -search(mediator, pvman, info, initial_maxdepth, ply + 1, depth - 1, -beta, -alpha, isPv);
@@ -533,7 +534,12 @@ public class Search_PVS_NWS extends SearchImpl {
 						lmrReduction++;
 					}
 					
-					cur_eval = -search(mediator, pvman, info, initial_maxdepth, ply + 1, depth - lmrReduction, -alpha - 1, -alpha, false);
+					lmrReduction = Math.min(depth - 1, Math.max(lmrReduction, 1));
+					
+					if (lmrReduction > 1) {
+						
+						cur_eval = -search(mediator, pvman, info, initial_maxdepth, ply + 1, depth - lmrReduction, -alpha - 1, -alpha, false);
+					}
 					
 					if (cur_eval > alpha) {
 						
@@ -732,21 +738,21 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		boolean inCheck = env.getBitboard().isInCheck();
+		
+		
 		//Beta cutoff
-		if (staticEval >= beta) {
+		if (!inCheck && staticEval >= beta) {
 			node.eval = staticEval;
 			return node.eval;
 		}
-		
-		
-		boolean inCheck = env.getBitboard().isInCheck();
 		
 		ISearchMoveList list = inCheck ? lists_escapes[ply] : lists_capsproms[ply];
 		list.clear();
 		list.setTptMove(tt_move);
 		
 		
-		int alpha = Math.max(alpha_org, staticEval);
+		int alpha = inCheck ? alpha_org : Math.max(alpha_org, staticEval);
 		
 		int best_eval = ISearch.MIN;
 		int best_move = 0;
@@ -755,19 +761,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (cur_move != 0) 
 		do {
 			
-			/*if (cur_move == tt_move && !env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move)) {
-				if (env.getBitboard().isCheckMove(cur_move)
-						&& env.getBitboard().getMoveOps().getFigureType(cur_move) == Constants.TYPE_QUEEN
-					) {
-					continue;
-				}
-			}*/
-			
 			
 			//Skip bad captures
-			int moveSee = env.getBitboard().getSEEScore(cur_move);
-			if (moveSee < 0) {
-				continue;
+			if (!inCheck) {
+				
+				int moveSee = env.getBitboard().getSEEScore(cur_move);
+				
+				if (moveSee < 0) {
+					
+					continue;
+				}
 			}
 			
 			
@@ -805,24 +808,37 @@ public class Search_PVS_NWS extends SearchImpl {
 		} while ((cur_move = list.next()) != 0);
 		
 		
-		if (staticEval >= best_eval) {
-			
-			node.bestmove = 0;
-			node.leaf = true;
-			node.eval = staticEval;
-			
-			best_eval = staticEval;
-			best_move = 0;
-		}
+		if (!inCheck) {
 		
-		if (alpha_org > node.eval) {
+			if (staticEval >= best_eval) {
+				
+				node.bestmove = 0;
+				node.leaf = true;
+				node.eval = staticEval;
+				
+				best_eval = staticEval;
+				best_move = 0;
+			}
 			
-			node.bestmove = 0;
-			node.leaf = true;
-			node.eval = alpha_org;
+			if (alpha_org > node.eval) {
+				
+				node.bestmove = 0;
+				node.leaf = true;
+				node.eval = alpha_org;
+				
+				best_eval = alpha_org;
+				best_move = 0;
+			}
+		} else {
 			
-			best_eval = alpha_org;
-			best_move = 0;
+			if (best_move == 0) {
+				
+				node.bestmove = 0;
+				node.eval = -SearchUtils.getMateVal(ply);
+				node.leaf = true;
+				
+				best_eval = node.eval;
+			}
 		}
 		
 		
