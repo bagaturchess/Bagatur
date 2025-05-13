@@ -59,13 +59,13 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private static final double PRUNING_AGGRESSIVENESS 				= 1;
 	
-	private static final int FUTILITY_MAXDEPTH 						= 7;
+	private static final int FUTILITY_MAXDEPTH 						= MAX_DEPTH;
 	private static final int FUTILITY_MARGIN 						= 80;
 	
-	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= 9;
+	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= MAX_DEPTH;
 	private static final int STATIC_NULL_MOVE_MARGIN 				= 60;
 	
-	private static final int RAZORING_MAXDEPTH 						= 4;
+	private static final int RAZORING_MAXDEPTH 						= MAX_DEPTH;
 	private static final int RAZORING_MARGIN 						= 240;
 	
 	
@@ -451,15 +451,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		int best_move = 0;
 		
 		
-		int cur_move = (tt_move != 0) ? tt_move : list.next();
+		int cur_move = list.next();
 		if (cur_move != 0) {
 			do {
-				
-				
-				
-				if (searchedCount > 0 && cur_move == tt_move) {
-					continue;
-				}
 				
 				
 				//Build and sent minor info
@@ -488,7 +482,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				if (!isPv
-						&& depth <= 7
 						&& !inCheck
 						&& searchedCount > 0
 						&& !SearchUtils.isMateVal(alpha)
@@ -758,7 +751,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int best_eval = ISearch.MIN;
 		int best_move = 0;
 		
-		int cur_move = (tt_move != 0) ? tt_move : list.next();
+		int cur_move = list.next();
 		if (cur_move != 0) 
 		do {
 			

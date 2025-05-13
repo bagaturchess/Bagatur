@@ -25,9 +25,7 @@ package bagaturchess.search.impl.movelists;
 
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
-import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
-import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.internal.ISearchMoveList;
@@ -36,51 +34,7 @@ import bagaturchess.search.impl.env.SearchEnv;
 
 public class ListAll implements ISearchMoveList {
 	
-	
-	private final int ORD_VAL_TPT_MOVE;
-	private final int ORD_VAL_MATE_MOVE;
-	private final int ORD_VAL_WIN_CAP;
-	private final int ORD_VAL_EQ_CAP;
-	private final int ORD_VAL_COUNTER;
-	private final int ORD_VAL_PREV_BEST_MOVE;
-	private final int ORD_VAL_CASTLING;
-	private final int ORD_VAL_MATE_KILLER;
-	private final int ORD_VAL_PASSER_PUSH;
-	private final int ORD_VAL_KILLER;
-	private final int ORD_VAL_PREVPV_MOVE;
-	private final int ORD_VAL_LOSE_CAP;
-	
-	
-	/*private static final int ORD_VAL_TPT_MOVE        = 10000;
-	private static final int ORD_VAL_WIN_CAP         =  7000;
-	private static final int ORD_VAL_EQ_CAP          =  6000;
-	private static final int ORD_VAL_PREV_BEST_MOVE  =  5000;
-	private static final int ORD_VAL_PASSER_PUSH 	 =  4000;
-	private static final int ORD_VAL_KILLER          =  3000;
-	private static final int ORD_VAL_PREVPV_MOVE     =  2000;
-	private static final int ORD_VAL_CASTLING 	 	 =  1000;
-	private static final int ORD_VAL_MATE_KILLER     =  0;
-	private static final int ORD_VAL_COUNTER         =  0;
-	private static final int ORD_VAL_LOSE_CAP        =  -2000;*/
-	
-	
-	/* results after EPD with 300
-	TPT        :	3401018	3399999	0.9997003838262544
-	WINCAP     :	12984646	7094787	0.5463981844402998
-	EQCAP      :	1968000	787004	0.39990040650406505
-	COUNTER    :	5433269	4278731	0.7875058275229885
-	MATEKILLER :	3307481	1110691	0.3358117552300376
-	PREVBEST   :	3224678	1307687	0.40552483069627415
-	MATEMOVE   :	396442	374522	0.9447081792544685
-	KILLER     :	27081099	2727510	0.10071637048407821
-	PASSER     :	6821955	1089638	0.15972518141793665
-	PREVPV     :	2362549	492377	0.20840922241189494
-	CASTLING   :	266115	46222	0.17369182496289198
-	LOSECAP    :	10593708	847645	0.9199859954607018
-	HISTORY    :	14665489	3057408	0.20847639972392426
-	PST        :	14665489	2241164	0.15281896839549955
-	*/
-	
+	private int ply;
 	
 	private long[] moves; 
 	private int size;
@@ -99,28 +53,13 @@ public class ListAll implements ISearchMoveList {
 	
 	private SearchEnv env;
 	
-	private OrderingStatistics orderingStatistics;
-	
 	private boolean reuse_moves = false;
 	
 	
-	public ListAll(SearchEnv _env, OrderingStatistics _orderingStatistics) { 
+	public ListAll(SearchEnv _env, int _ply) { 
 		env = _env;
 		moves = new long[256];
-		orderingStatistics = _orderingStatistics;
-		
-		ORD_VAL_TPT_MOVE        = env.getSearchConfig().getOrderingWeight_TPT_MOVE();
-		ORD_VAL_MATE_MOVE       = env.getSearchConfig().getOrderingWeight_MATE_MOVE();
-		ORD_VAL_WIN_CAP         = env.getSearchConfig().getOrderingWeight_WIN_CAP();
-		ORD_VAL_EQ_CAP          = env.getSearchConfig().getOrderingWeight_EQ_CAP();
-		ORD_VAL_COUNTER         = env.getSearchConfig().getOrderingWeight_COUNTER();
-		ORD_VAL_PREV_BEST_MOVE  = env.getSearchConfig().getOrderingWeight_PREV_BEST_MOVE();
-		ORD_VAL_CASTLING 	 	= env.getSearchConfig().getOrderingWeight_CASTLING();
-		ORD_VAL_MATE_KILLER     = env.getSearchConfig().getOrderingWeight_MATE_KILLER();
-		ORD_VAL_PASSER_PUSH 	= env.getSearchConfig().getOrderingWeight_PASSER_PUSH();
-		ORD_VAL_KILLER          = env.getSearchConfig().getOrderingWeight_KILLER();
-		ORD_VAL_PREVPV_MOVE     = env.getSearchConfig().getOrderingWeight_PREVPV_MOVE();
-		ORD_VAL_LOSE_CAP        = env.getSearchConfig().getOrderingWeight_LOSE_CAP();
+		ply = _ply;
 	}
 	
 	public void clear() {
@@ -143,7 +82,7 @@ public class ListAll implements ISearchMoveList {
 	public String toString() {
 		String msg = "";
 		
-		msg += orderingStatistics.toString();
+		//msg += orderingStatistics.toString();
 		
 		return msg;
 	}
@@ -303,8 +242,8 @@ public class ListAll implements ISearchMoveList {
 		}
 		
 		
-		int killer1Move = env.getHistory_All().getKiller1(env.getBitboard().getColourToMove(), 1);
-		int killer2Move = env.getHistory_All().getKiller2(env.getBitboard().getColourToMove(), 1);
+		int killer1Move = env.getHistory_All().getKiller1(env.getBitboard().getColourToMove(), ply);
+		int killer2Move = env.getHistory_All().getKiller2(env.getBitboard().getColourToMove(), ply);
 		int counterMove1 = env.getHistory_All().getCounter1(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
 		int counterMove2 = env.getHistory_All().getCounter2(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
 		
@@ -366,105 +305,6 @@ public class ListAll implements ISearchMoveList {
 		return ordval;
 	}
 	
-	
-	public void countTotal(int move) {
-		
-		if (move == tptMove) {
-			orderingStatistics.tpt_count++;
-		}
-		
-		if (move == prevPvMove) {
-			orderingStatistics.prevpv_count++;
-		}
-		
-		if (move == prevBestMove) {
-			orderingStatistics.prevbest_count++;
-		}
-		
-		if (move == mateMove) {
-			orderingStatistics.matemove_count++;
-		}
-		
-		/*if (env.getBitboard().isPasserPush(move)) {
-			orderingStatistics.passer_count++;
-		}*/
-		
-		if (env.getBitboard().getMoveOps().isCastling(move)) {
-			orderingStatistics.castling_count++;
-		}
-		
-		if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
-			
-			int see = env.getBitboard().getSEEScore(move);
-			
-			if (see > 0) {
-				orderingStatistics.wincap_count++;
-			} else if (see == 0) {
-				orderingStatistics.eqcap_count++;
-			} else {
-				orderingStatistics.losecap_count++;
-			}
-		}
-		
-		/*if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
-			orderingStatistics.counter_count++;
-		}*/
-	}
-	
-	
-	public void countSuccess(int bestmove) {
-		if (bestmove == 0) {
-			return;
-		}
-		
-		if (bestmove == tptMove) {
-			orderingStatistics.tpt_best++;
-		}
-		
-		if (bestmove == prevPvMove) {
-			orderingStatistics.prevpv_best++;
-		}
-		
-		if (bestmove == prevBestMove) {
-			orderingStatistics.prevbest_best++;
-		}
-		
-		if (bestmove == mateMove) {
-			orderingStatistics.matemove_best++;
-		}
-		
-		/*if (env.getBitboard().isPasserPush(bestmove)) {
-			orderingStatistics.passer_best++;
-		}*/
-		
-		if (env.getBitboard().getMoveOps().isCastling(bestmove)) {
-			orderingStatistics.castling_best++;
-		}
-		
-		if (env.getBitboard().getMoveOps().isCaptureOrPromotion(bestmove)) {
-			
-			int see = env.getBitboard().getSEEScore(bestmove);
-			
-			if (see > 0) {
-				orderingStatistics.wincap_best++;
-			} else if (see == 0) {
-				orderingStatistics.eqcap_best++;
-			} else {
-				orderingStatistics.losecap_best++;
-			}
-		}
-		
-		/*if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), bestmove)) {
-			orderingStatistics.counter_best++;
-		}
-		
-		orderingStatistics.history_best += env.getHistory_All().getScores(bestmove);
-		orderingStatistics.history_count += 1;
-		*/
-		
-		//orderingStatistics.pst_best += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(bestmove);
-		//orderingStatistics.pst_count += 1;
-	}
 	
 	private void add(long move) {	
 		if (size == 0) {
@@ -566,5 +406,17 @@ public class ListAll implements ISearchMoveList {
 		} else {
 			clear();
 		}
+	}
+
+	@Override
+	public void countSuccess(int bestmove) {
+		
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void countTotal(int move) {
+		
+		throw new UnsupportedOperationException();
 	}
 }

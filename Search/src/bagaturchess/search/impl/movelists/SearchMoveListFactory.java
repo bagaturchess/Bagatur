@@ -14,14 +14,14 @@ public class SearchMoveListFactory implements ISearchMoveListFactory {
 	
 	
 	@Override
-	public ISearchMoveList createListAll(SearchEnv env) {
-		return new ListAll(env, env.getOrderingStatistics());
+	public ISearchMoveList createListAll(SearchEnv env, int ply) {
+		return new ListAll(env, ply);
 	}
 
 
 	@Override
-	public ISearchMoveList createListAll_Root(SearchEnv env) {
-		return new ListAll(env, env.getOrderingStatistics());
+	public ISearchMoveList createListAll_Root(SearchEnv env, int ply) {
+		return new ListAll(env, ply);
 	}
 	
 	
@@ -32,8 +32,8 @@ public class SearchMoveListFactory implements ISearchMoveListFactory {
 
 
 	@Override
-	public ISearchMoveList createListAll_inCheck(SearchEnv env) {
-		return new ListKingEscapes(env, env.getOrderingStatistics());
+	public ISearchMoveList createListAll_inCheck(SearchEnv env, int ply) {
+		return new ListKingEscapes(env, ply);
 	}
 	
 	

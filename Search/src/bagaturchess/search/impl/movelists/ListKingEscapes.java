@@ -32,6 +32,7 @@ import bagaturchess.search.impl.env.SearchEnv;
 
 public class ListKingEscapes implements ISearchMoveList {
 	
+	private int ply;
 	
 	private long[] escapes; 
 	private int escapes_size; 
@@ -47,9 +48,11 @@ public class ListKingEscapes implements ISearchMoveList {
 	private SearchEnv env;
 	
 	
-	public ListKingEscapes(SearchEnv _env, OrderingStatistics _orderingStatistics) { 
+	public ListKingEscapes(SearchEnv _env, int _ply) { 
 		env = _env;
 		escapes = new long[62];
+		
+		ply = _ply;
 	}
 	
 	public void clear() {
@@ -103,8 +106,8 @@ public class ListKingEscapes implements ISearchMoveList {
 			}
 		}
 		
-		int killer1Move = env.getHistory_All().getKiller1(env.getBitboard().getColourToMove(), 1);
-		int killer2Move = env.getHistory_All().getKiller2(env.getBitboard().getColourToMove(), 1);
+		int killer1Move = env.getHistory_All().getKiller1(env.getBitboard().getColourToMove(), ply);
+		int killer2Move = env.getHistory_All().getKiller2(env.getBitboard().getColourToMove(), ply);
 		int counterMove1 = env.getHistory_All().getCounter1(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
 		int counterMove2 = env.getHistory_All().getCounter2(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
 		

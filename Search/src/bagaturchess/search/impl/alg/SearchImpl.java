@@ -88,17 +88,17 @@ public abstract class SearchImpl implements ISearch {
 
 		lists_all = new ISearchMoveList[MAX_DEPTH];
 		for (int i=0; i<lists_all.length; i++) {
-			lists_all[i] = env.getMoveListFactory().createListAll(env);
+			lists_all[i] = env.getMoveListFactory().createListAll(env, i);
 		}
 		
 		lists_all_root = new ISearchMoveList[MAX_DEPTH];
 		for (int i=0; i<lists_all_root.length; i++) {
-			lists_all_root[i] = env.getMoveListFactory().createListAll_Root(env);
+			lists_all_root[i] = env.getMoveListFactory().createListAll_Root(env, i);
 		}
 		
 		lists_escapes = new ISearchMoveList[MAX_DEPTH];
 		for (int i=0; i<lists_escapes.length; i++) {
-			lists_escapes[i] = 	env.getMoveListFactory().createListAll_inCheck(env);
+			lists_escapes[i] = 	env.getMoveListFactory().createListAll_inCheck(env, i);
 		}
 		
 		lists_capsproms = new ISearchMoveList[MAX_DEPTH];
