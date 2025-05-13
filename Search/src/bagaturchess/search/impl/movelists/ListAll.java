@@ -228,9 +228,9 @@ public class ListAll implements ISearchMoveList {
 	
 	public void genMoves() {
 		
-		if (env.getBitboard().isInCheck()) {
+		/*if (env.getBitboard().isInCheck()) {
 			throw new IllegalStateException();
-		}
+		}*/
 		
 		boolean gen = true;
 		
@@ -309,7 +309,7 @@ public class ListAll implements ISearchMoveList {
 		int counterMove2 = env.getHistory_All().getCounter2(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
 		
 		
-		long ordval = 0;
+		long ordval = 100000 * 100;
 		
 		if (tptMove == move) {
 			
@@ -338,7 +338,6 @@ public class ListAll implements ISearchMoveList {
 		if (counterMove1 == move) {
 			
 			ordval += 3000 * 100;
-			
 		}
 		
 		if (counterMove2 == move) {
@@ -353,7 +352,7 @@ public class ListAll implements ISearchMoveList {
 			
 		} else {
 			
-			if (SEEUtil.getSeeCaptureScore(((BoardImpl) env.getBitboard()).getChessBoard(), move) >= 0) {
+			if (env.getBitboard().getSEEScore(move) >= 0) {
 			
 				ordval += 7000 * 100 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
 				

@@ -25,6 +25,7 @@ package bagaturchess.search.impl.movelists;
 
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
+import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
 
@@ -116,27 +117,28 @@ public class ListCapsProm implements ISearchMoveList {
 				add(move);
 			}
 			
-			long ordval = 0;
+			long ordval = 100000 * 100;
 			
 			if (move == tptMove) {
 				if (tptPlied) {
 					return;
 				}
-				ordval += ORD_VAL_TPT_MOVE * orderingStatistics.getOrdVal_TPT();
+				ordval += 1000;
 			}
 			
 			if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 				
-				int see = env.getBitboard().getSEEScore(move);
-				
-				if (see > 0) {
-					ordval += ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
-				} else if (see == 0) {
-					ordval += ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();
+				if (env.getBitboard().getSEEScore(move) >= 0) {
+					
+					ordval += 7000 * 100 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
+					
 				} else {
-					ordval += ORD_VAL_LOSE_CAP * orderingStatistics.getOrdVal_LOSECAP() + see / 100;
+					
+					ordval += -5000 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
 				}
+				
 			} else {
+				
 				throw new IllegalStateException();
 			}
 			

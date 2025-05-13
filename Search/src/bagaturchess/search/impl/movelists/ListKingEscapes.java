@@ -25,18 +25,13 @@ package bagaturchess.search.impl.movelists;
 
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
+import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
 
 
 public class ListKingEscapes implements ISearchMoveList {
-
-	private int ORD_VAL_TPT_MOVE;
-	private int ORD_VAL_WIN_CAP;
-	private int ORD_VAL_EQ_CAP;
-	private int ORD_VAL_COUNTER;
-	private int ORD_VAL_PREV_BEST_MOVE;
-	private int ORD_VAL_LOSE_CAP;
+	
 	
 	private long[] escapes; 
 	private int escapes_size; 
@@ -51,20 +46,10 @@ public class ListKingEscapes implements ISearchMoveList {
 	
 	private SearchEnv env;
 	
-	private OrderingStatistics orderingStatistics;
-	
 	
 	public ListKingEscapes(SearchEnv _env, OrderingStatistics _orderingStatistics) { 
 		env = _env;
 		escapes = new long[62];
-		orderingStatistics = _orderingStatistics;
-		
-		ORD_VAL_TPT_MOVE        = env.getSearchConfig().getOrderingWeight_TPT_MOVE();
-		ORD_VAL_WIN_CAP         = env.getSearchConfig().getOrderingWeight_WIN_CAP();
-		ORD_VAL_EQ_CAP          = env.getSearchConfig().getOrderingWeight_EQ_CAP();
-		ORD_VAL_COUNTER         = env.getSearchConfig().getOrderingWeight_COUNTER();
-		ORD_VAL_PREV_BEST_MOVE  = env.getSearchConfig().getOrderingWeight_PREV_BEST_MOVE();
-		ORD_VAL_LOSE_CAP        = env.getSearchConfig().getOrderingWeight_LOSE_CAP();
 	}
 	
 	public void clear() {
@@ -88,9 +73,9 @@ public class ListKingEscapes implements ISearchMoveList {
 		}
 		
 		if (!generated) {
-			if (!env.getBitboard().isInCheck()) {
+			/*if (!env.getBitboard().isInCheck()) {
 				throw new IllegalStateException();
-			}
+			}*/
 			env.getBitboard().genKingEscapes(this);
 			generated = true;							
 		}
@@ -112,40 +97,71 @@ public class ListKingEscapes implements ISearchMoveList {
 	
 	public void reserved_add(int move) {
 		
-		int ordval = 0;
-		
 		if (move == tptMove) {
 			if (tptPlied) {
 				return;
 			}
-			ordval += ORD_VAL_TPT_MOVE * orderingStatistics.getOrdVal_TPT();
 		}
 		
-		if (move == prevBestMove) {
-			ordval += ORD_VAL_PREV_BEST_MOVE * orderingStatistics.getOrdVal_PREVBEST();
+		int killer1Move = env.getHistory_All().getKiller1(env.getBitboard().getColourToMove(), 1);
+		int killer2Move = env.getHistory_All().getKiller2(env.getBitboard().getColourToMove(), 1);
+		int counterMove1 = env.getHistory_All().getCounter1(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
+		int counterMove2 = env.getHistory_All().getCounter2(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
+		
+		
+		long ordval = 100000 * 100;
+		
+		if (tptMove == move) {
+			
+			ordval += 20000 * 100;
+		
 		}
 		
-		if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
+		if (prevBestMove == move) {
 			
-			int see = env.getBitboard().getSEEScore(move);
+			ordval += 5000 * 100;
+		
+		}
+		
+		if (killer1Move == move) {
 			
-			if (see > 0) {
-				ordval += ORD_VAL_WIN_CAP * orderingStatistics.getOrdVal_WINCAP() + see;
-			} else if (see == 0) {
-				ordval += ORD_VAL_EQ_CAP * orderingStatistics.getOrdVal_EQCAP();
+			ordval += 5000 * 100;
+			
+		}
+		
+		if (killer2Move == move) {
+			
+			ordval += 4000 * 100;
+			
+		}
+		
+		if (counterMove1 == move) {
+			
+			ordval += 3000 * 100;
+			
+		}
+		
+		if (counterMove2 == move) {
+			
+			ordval += 2000 * 100;
+			
+		}
+		
+		if (MoveUtil.isQuiet(move)) {
+			
+			ordval += env.getHistory_All().getScores(env.getBitboard().getColourToMove(), move);
+			
+		} else {
+			
+			if (env.getBitboard().getSEEScore(move) >= 0) {
+			
+				ordval += 7000 * 100 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
+				
 			} else {
-				ordval += ORD_VAL_LOSE_CAP * orderingStatistics.getOrdVal_LOSECAP() + see / 100;
+				
+				ordval += -5000 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
 			}
 		}
-		
-		/*if (env.getHistory_InCheck().isCounterMove(env.getBitboard().getLastMove(), move)) {
-			ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
-		}
-		
-		ordval += env.getHistory_InCheck().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
-		*/
-		
-		//ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
 		
 		
 		long move_ord = MoveInt.addOrderingValue(move, ordval);

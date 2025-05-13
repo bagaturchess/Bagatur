@@ -534,7 +534,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				} else {
 					
 					int lmrReduction = LMR_REDUCTIONS[Math.min(63, searchedCount)][Math.min(63, depth)];
+					
 					if (!isPv) {
+						
 						lmrReduction++;
 					}
 					
@@ -760,13 +762,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (cur_move != 0) 
 		do {
 			
-			if (cur_move == tt_move && !env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move)) {
+			/*if (cur_move == tt_move && !env.getBitboard().getMoveOps().isCaptureOrPromotion(cur_move)) {
 				if (env.getBitboard().isCheckMove(cur_move)
 						&& env.getBitboard().getMoveOps().getFigureType(cur_move) == Constants.TYPE_QUEEN
 					) {
 					continue;
 				}
-			}
+			}*/
 			
 			
 			//Skip bad captures
@@ -798,25 +800,35 @@ public class Search_PVS_NWS extends SearchImpl {
 					pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 				}
 				
-				if (best_eval >= beta) {						
-					break;
-				}
-				
 				if (best_eval > alpha) {
 					alpha = best_eval;
+				}
+				
+				if (alpha >= beta) {						
+					break;
 				}
 			}
 			
 		} while ((cur_move = list.next()) != 0);
 		
 		
-		if (alpha > node.eval) {
+		if (staticEval >= best_eval) {
 			
 			node.bestmove = 0;
 			node.leaf = true;
-			node.eval = alpha;
+			node.eval = staticEval;
 			
-			best_eval = alpha;
+			best_eval = staticEval;
+			best_move = 0;
+		}
+		
+		if (alpha_org > node.eval) {
+			
+			node.bestmove = 0;
+			node.leaf = true;
+			node.eval = alpha_org;
+			
+			best_eval = alpha_org;
 			best_move = 0;
 		}
 		
