@@ -32,7 +32,7 @@ import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.ISearchMoveListFactory;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
-import bagaturchess.search.impl.history.HistoryTable_PieceTo;
+import bagaturchess.search.impl.history.CombinedHistory;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.movelists.OrderingStatistics;
 import bagaturchess.search.impl.movelists.SearchMoveListFactory;
@@ -80,8 +80,8 @@ public class SearchEnv {
 		tactics 				= new Tactics(bitboard);
 		
 		//history 				= new HistoryTable_FromTo(new BinarySemaphore_Dummy());
-		history_all 			= new HistoryTable_PieceTo(bitboard);
-		history_incheck 		= new HistoryTable_PieceTo(bitboard);
+		history_all 			= new CombinedHistory();
+		history_incheck 		= null; //new CombinedHistory();
 		
 		moveListFactory 		= new SearchMoveListFactory();
 		

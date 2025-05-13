@@ -25,6 +25,9 @@ package bagaturchess.search.impl.movelists;
 
 import bagaturchess.bitboard.common.Utils;
 import bagaturchess.bitboard.impl.movegen.MoveInt;
+import bagaturchess.bitboard.impl1.BoardImpl;
+import bagaturchess.bitboard.impl1.internal.MoveUtil;
+import bagaturchess.bitboard.impl1.internal.SEEUtil;
 import bagaturchess.opening.api.IOpeningEntry;
 import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.internal.ISearchMoveList;
@@ -299,44 +302,66 @@ public class ListAll implements ISearchMoveList {
 			//System.out.println(orderingStatistics);
 		}
 		
-		long ordval = 10000;
+		
+		int killer1Move = env.getHistory_All().getKiller1(env.getBitboard().getColourToMove(), 1);
+		int killer2Move = env.getHistory_All().getKiller2(env.getBitboard().getColourToMove(), 1);
+		int counterMove1 = env.getHistory_All().getCounter1(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
+		int counterMove2 = env.getHistory_All().getCounter2(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
 		
 		
-		if (move == tptMove) {
-			ordval += 100000;
+		long ordval = 0;
+		
+		if (tptMove == move) {
+			
+			ordval += 20000 * 100;
+		
 		}
 		
+		if (prevBestMove == move) {
+			
+			ordval += 5000 * 100;
 		
-		if (env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
+		}
+		
+		if (killer1Move == move) {
 			
-			int see = env.getBitboard().getSEEScore(move);
+			ordval += 5000 * 100;
 			
-			if (see > 0) {
-				ordval += 95000 + see;
-			} else if (see == 0) {
-				ordval += 90000;
+		}
+		
+		if (killer2Move == move) {
+			
+			ordval += 4000 * 100;
+			
+		}
+		
+		if (counterMove1 == move) {
+			
+			ordval += 3000 * 100;
+			
+		}
+		
+		if (counterMove2 == move) {
+			
+			ordval += 2000 * 100;
+			
+		}
+		
+		if (MoveUtil.isQuiet(move)) {
+			
+			ordval += env.getHistory_All().getScores(env.getBitboard().getColourToMove(), move);
+			
+		} else {
+			
+			if (SEEUtil.getSeeCaptureScore(((BoardImpl) env.getBitboard()).getChessBoard(), move) >= 0) {
+			
+				ordval += 7000 * 100 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
+				
 			} else {
-				ordval += 90000 - see;
+				
+				ordval += -5000 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
 			}
 		}
-		
-		
-		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
-			ordval += 90100;
-		}
-		
-		
-		if (move == prevPvMove) {
-			ordval += 80000;
-		}
-		
-		
-		if (move == prevBestMove) {
-			ordval += 70000;
-		}
-		
-		
-		ordval += env.getHistory_All().getScores(move) * 1000;
 		
 		
 		return ordval;
@@ -382,9 +407,9 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 		
-		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
+		/*if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
 			orderingStatistics.counter_count++;
-		}
+		}*/
 	}
 	
 	
@@ -430,12 +455,13 @@ public class ListAll implements ISearchMoveList {
 			}
 		}
 		
-		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), bestmove)) {
+		/*if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), bestmove)) {
 			orderingStatistics.counter_best++;
 		}
 		
 		orderingStatistics.history_best += env.getHistory_All().getScores(bestmove);
 		orderingStatistics.history_count += 1;
+		*/
 		
 		//orderingStatistics.pst_best += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(bestmove);
 		//orderingStatistics.pst_count += 1;
@@ -474,13 +500,13 @@ public class ListAll implements ISearchMoveList {
 			return true;
 		}
 		
-		if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
+		/*if (env.getHistory_All().isCounterMove(env.getBitboard().getLastMove(), move)) {
 			return true;
 		}
 		
 		if( env.getHistory_All().getScores(move) >= 0.5 ) {
 			return true;
-		}
+		}*/
 		
 		return false;
 	}

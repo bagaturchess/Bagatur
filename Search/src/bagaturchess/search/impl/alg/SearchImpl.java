@@ -148,8 +148,8 @@ public abstract class SearchImpl implements ISearch {
 	
 	public void newSearch() {
 		
-		env.getHistory_All().newSearch();
-		env.getHistory_InCheck().newSearch();
+		env.getHistory_All().clear();
+		//env.getHistory_InCheck().clear();
 		
 		env.getMoveListFactory().newSearch();
 		

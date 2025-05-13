@@ -25,6 +25,7 @@ package bagaturchess.search.impl.alg.impl0;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.IEvaluator;
@@ -557,15 +558,16 @@ public class Search_PVS_NWS extends SearchImpl {
 				searchedCount++;
 				
 				
-				//Add history records for the current move
-				list.countTotal(cur_move);
-				if (cur_eval < beta) {
-					getHistory(inCheck).countFailure(cur_move, depth);
-				} else {
-					list.countSuccess(cur_move);//Should be before addCounterMove call
-					getHistory(inCheck).countSuccess(cur_move, depth);
-					getHistory(inCheck).addCounterMove(env.getBitboard().getLastMove(), cur_move);
+				if (!isCapOrProm) {
+					
+					env.getHistory_All().registerAll(env.getBitboard().getColourToMove(), cur_move, depth);
+					
+					if (cur_eval < beta) {
+						
+						env.getHistory_All().registerBad(env.getBitboard().getColourToMove(), cur_move, depth);
+					}
 				}
+				
 				
 				if (cur_eval > best_eval) {
 					
@@ -583,12 +585,20 @@ public class Search_PVS_NWS extends SearchImpl {
 						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 					}
 					
-					if (best_eval >= beta) {
-						break;
-					}
-					
 					if (best_eval > alpha) {
 						alpha = best_eval; 
+					}
+					
+					if (alpha >= beta) {
+						
+						if (!isCapOrProm) {
+							
+							env.getHistory_All().addCounterMove(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove(), cur_move);
+							env.getHistory_All().addKillerMove(env.getBitboard().getColourToMove(), cur_move, ply);
+							env.getHistory_All().registerGood(env.getBitboard().getColourToMove(), cur_move, depth);
+						}
+						
+						break;
 					}
 				}
 			} while ((cur_move = list.next()) != 0);

@@ -138,11 +138,12 @@ public class ListKingEscapes implements ISearchMoveList {
 			}
 		}
 		
-		if (env.getHistory_InCheck().isCounterMove(env.getBitboard().getLastMove(), move)) {
+		/*if (env.getHistory_InCheck().isCounterMove(env.getBitboard().getLastMove(), move)) {
 			ordval += ORD_VAL_COUNTER * orderingStatistics.getOrdVal_COUNTER();
 		}
 		
 		ordval += env.getHistory_InCheck().getScores(move) * orderingStatistics.getOrdVal_HISTORY();
+		*/
 		
 		//ordval += env.getBitboard().getBaseEvaluation().getPSTMoveGoodPercent(move) * orderingStatistics.getOrdVal_PST();
 		
