@@ -285,7 +285,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			try {
 				
-				if (reduction != 1) {
+				if (reduction > 1) {
 										
 					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
@@ -1046,7 +1046,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
-					
 				}
 				
 				
@@ -1061,7 +1060,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				try {
 					
-					if (reduction != 1) {
+					if (reduction > 1) {
 												
 						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
@@ -1434,7 +1433,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int score = alpha + 1;
 				
-				if (reduction != 1) {
+				if (reduction > 1) {
 											
 					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
@@ -1647,6 +1646,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					continue;
 				}
 				
+				/*if (see == 0 && eval + 200 < alpha) {
+					
+					continue;
+				}*/
 				
 				env.getBitboard().makeMoveForward(move);
 				
