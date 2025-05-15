@@ -806,7 +806,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			) {
 			
 			//TODO: Adjust beta margin and depth
-			int singular_beta = ttValue - 2 * depth;
+			int singular_margin = 2 * depth;
+			int singular_beta = ttValue - singular_margin;
 			int singular_depth = depth / 2;
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, cb, moveGen, ply,
