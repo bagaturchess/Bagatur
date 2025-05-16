@@ -473,7 +473,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		long hashkey = env.getBitboard().getHashKey();
+		long hashkey = getHashkeyTPT(cb);
 		
 		
 		int ttMove 									= 0;
@@ -504,7 +504,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (ttFlag == ITTEntry.FLAG_EXACT) {
 							
-							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
+							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv, cb);
 							
 							return node.eval;
 							
@@ -512,14 +512,14 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
 								
-								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
+								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv, cb);
 								
 								return node.eval;
 							}
 							
 							if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
 								
-								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
+								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv, cb);
 								
 								return node.eval;
 							}
@@ -581,7 +581,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			*/
 			
 			
-			int probe_result = probeWDL_WithCache();
+			int probe_result = probeWDL_WithCache(cb);
 			
 			if (probe_result != -1) {
 				
@@ -1185,7 +1185,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int beta, boolean isPv, int initialMaxDepth, int ttMove1, int eval) {
 		
 		
-		long hashkey = env.getBitboard().getHashKey() ^ ttMove1;
+		long hashkey = getHashkeyTPT(cb) ^ ttMove1;
 		
 		int ttMove2 = 0; 
 				
@@ -1537,7 +1537,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (ttFlag == ITTEntry.FLAG_EXACT) {
 						
-				    	extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
+				    	extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv, cb);
 				    	
 				    	return node.eval;
 				    	
@@ -1545,14 +1545,14 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
 							
-							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
+							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv, cb);
 							
 					    	return node.eval;
 						}
 						
 						if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
 							
-							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
+							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv, cb);
 							
 					    	return node.eval;
 						}
@@ -1791,7 +1791,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	private boolean extractFromTT(int ply, PVNode result, ITTEntry entry, ISearchInfo info, boolean isPv) {
+	private boolean extractFromTT(int ply, PVNode result, ITTEntry entry, ISearchInfo info, boolean isPv, ChessBoard cb) {
 		
 		if (entry.isEmpty()) {
 			
@@ -1844,13 +1844,13 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						env.getBitboard().makeMoveForward(result.bestmove);
 						
-						env.getTPT().get(env.getBitboard().getHashKey(), tt_entries_per_ply[ply]);
+						env.getTPT().get(getHashkeyTPT(cb), tt_entries_per_ply[ply]);
 						
 						if (!tt_entries_per_ply[ply].isEmpty()) {
 							
 							result.leaf = false;
 							
-							draw = extractFromTT(ply, result.child, tt_entries_per_ply[ply], info, isPv);
+							draw = extractFromTT(ply, result.child, tt_entries_per_ply[ply], info, isPv, cb);
 							
 							
 							if (draw) {
@@ -1879,7 +1879,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private Stack<Integer> stack = new Stack<Integer>();
 	
 	
-	private void validatePV(PVNode node, IEvaluator evaluator, int eval, int ply, int expectedDepth, boolean isPv, boolean qsearch) {
+	private void validatePV(PVNode node, IEvaluator evaluator, int eval, int ply, int expectedDepth, boolean isPv, boolean qsearch, ChessBoard cb) {
 		
 		
 		if (!qsearch) {
@@ -1893,7 +1893,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 			
-			env.getTPT().get(getEnv().getBitboard().getHashKey(), tt_entries_per_ply[ply]);
+			env.getTPT().get(getHashkeyTPT(cb), tt_entries_per_ply[ply]);
 			
 			if (!tt_entries_per_ply[ply].isEmpty()) {
 				
@@ -2013,7 +2013,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	private int probeWDL_WithCache() {
+	private int probeWDL_WithCache(ChessBoard cb) {
 	    
 	    if (USE_DTZ_CACHE) {
 	    	
@@ -2022,7 +2022,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		    hash50movesRule += hash50movesRule << 16;
 		    hash50movesRule += hash50movesRule << 32;
 		    
-		    long hashkey = hash50movesRule ^ env.getBitboard().getHashKey();
+		    long hashkey = hash50movesRule ^ getHashkeyTPT(cb);
 		    
 	    	env.getSyzygyDTZCache().get(hashkey, temp_cache_entry);
 			
