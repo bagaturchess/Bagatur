@@ -1645,7 +1645,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					continue;
 				}
 				
-				/*if (see == 0 && eval + 200 < alpha) {
+				/*if (eval + 100 + 2 * see < alpha) {
 					
 					continue;
 				}*/
