@@ -700,7 +700,22 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		int eval = ISearch.MIN;
+		int eval = eval(evaluator, ply, alpha, beta, isPv);
+		
+		if (ttValue != IEvaluator.MIN_EVAL) {
+			
+			if (getSearchConfig().isOther_UseTPTScores()) {
+				
+				if (ttFlag == ITTEntry.FLAG_EXACT
+						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
+						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
+					) {
+					
+					eval = ttValue;
+				}
+			}
+		}
+		
 		
 		if (!isPv
 				&& cb.checkingPieces == 0
@@ -708,23 +723,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				&& !SearchUtils.isMateVal(beta)
 				&& egtb_eval == ISearch.MIN
 			) {
-			
-			
-			eval = eval(evaluator, ply, alpha, beta, isPv);
-			
-			if (ttValue != IEvaluator.MIN_EVAL) {
-				
-				if (getSearchConfig().isOther_UseTPTScores()) {
-					
-					if (ttFlag == ITTEntry.FLAG_EXACT
-							|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
-							|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
-						) {
-						
-						eval = ttValue;
-					}
-				}
-			}
 			
 			
 			if (depth >= 2 && ttFlag == -1) {
