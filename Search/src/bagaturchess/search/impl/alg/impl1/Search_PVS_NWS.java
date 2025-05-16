@@ -1595,9 +1595,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		/*int material_queen = (int) Math.max(getEnv().getBitboard().getBoardConfig().getMaterial_QUEEN_O(), getEnv().getBitboard().getBoardConfig().getMaterial_QUEEN_E());
-		
-		if (eval + FUTILITY_MARGIN_Q_SEARCH_ATTACKS + material_queen < alpha) {
+		/*if (eval + 100 + 2 * 900 < alpha) {
 			
 	    	node.eval = eval;
 			
