@@ -193,6 +193,8 @@ public class NNUE
 			accumulators.fullAccumulatorUpdate(input.white_king_sq, input.black_king_sq, input.white_pieces, input.white_squares, input.black_pieces, input.black_squares);
 		}
 		
+    	incremental_updates.reset();
+    	
 		int pieces_count = bitboard.getMaterialState().getPiecesCount();
 		
 		int eval = bitboard.getColourToMove() == NNUE.WHITE ?
@@ -233,8 +235,6 @@ public class NNUE
 				accumulators.getBlackAccumulator().add(getIndex(index_to_add, piece_color, piece, BLACK));
 			}
 		}
-		
-    	incremental_updates.reset();
     }
     
     
@@ -365,9 +365,9 @@ public class NNUE
     	void reset() {
     		all++;
     		if (must_refresh) refreshes++;
-    		//if (all % 100000 == 0) {
-    			System.out.println("refreshes=" + (refreshes / (double) all));
-    		//}
+    		if (all % 100000 == 0) {
+    			//System.out.println("refreshes=" + (refreshes / (double) all));
+    		}
     		
     		
     		must_refresh = false;
@@ -528,7 +528,7 @@ public class NNUE
     			
     			if (dirty_pieces.c[index] != color) {
     				
-    				throw new IllegalStateException();
+    				throw new IllegalStateException("dirty_pieces.c[index]=" + dirty_pieces.c[index] + ", color=" + color);
     			}
     			
     			if (dirty_pieces.to[index] != square_remove) {
