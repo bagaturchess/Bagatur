@@ -191,8 +191,11 @@ public class NNUE {
 			accumulators.fullAccumulatorUpdate(input.white_king_sq, input.black_king_sq, input.white_pieces, input.white_squares, input.black_pieces, input.black_squares);
 		}
 		
-    	incremental_updates.reset();
-    	
+		if (DO_INCREMENTAL_UPDATES) {
+			
+			incremental_updates.reset();
+		}
+		
 		int pieces_count = bitboard.getMaterialState().getPiecesCount();
 		
 		int eval = bitboard.getColourToMove() == NNUE.WHITE ?
