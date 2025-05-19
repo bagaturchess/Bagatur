@@ -16,8 +16,7 @@ import bagaturchess.bitboard.impl.Constants;
 /**
  * Experiment by probing via Bullet NNUE with 1 layers
  */
-public class NNUE
-{
+public class NNUE {
 	
 	public static final boolean DO_INCREMENTAL_UPDATES = false;
 	
@@ -33,8 +32,7 @@ public class NNUE
 	private static final int DIVISOR = (32 + OUTPUT_BUCKETS - 1) / OUTPUT_BUCKETS;
 	private static final int INPUT_BUCKET_SIZE = 7;
 	// @formatter:off
-	private static final int[] INPUT_BUCKETS = new int[]
-	{
+	private static final int[] INPUT_BUCKETS = new int[] {
 			0, 0, 1, 1, 2, 2, 3, 3,
 			4, 4, 4, 4, 5, 5, 5, 5,
 			6, 6, 6, 6, 6, 6, 6, 6,
@@ -91,10 +89,10 @@ public class NNUE
 	
 	private final static int screlu[] = new int[Short.MAX_VALUE - Short.MIN_VALUE + 1];
 	
-	static
-	{
-		for(int i = Short.MIN_VALUE; i <= Short.MAX_VALUE;i ++)
-		{
+	static {
+		
+		for(int i = Short.MIN_VALUE; i <= Short.MAX_VALUE;i ++) {
+			
 			screlu[i - (int) Short.MIN_VALUE] = screlu((short)(i));
 		}
 	}
@@ -134,35 +132,35 @@ public class NNUE
 		
 		L1Weights = new short[FEATURE_SIZE * INPUT_BUCKET_SIZE][HIDDEN_SIZE];
 
-		for (int i = 0; i < FEATURE_SIZE * INPUT_BUCKET_SIZE; i++)
-		{
-			for (int j = 0; j < HIDDEN_SIZE; j++)
-			{
+		for (int i = 0; i < FEATURE_SIZE * INPUT_BUCKET_SIZE; i++) {
+			
+			for (int j = 0; j < HIDDEN_SIZE; j++) {
+				
 				L1Weights[i][j] = toLittleEndian(networkData.readShort());
 			}
 		}
 
 		L1Biases = new short[HIDDEN_SIZE];
 
-		for (int i = 0; i < HIDDEN_SIZE; i++)
-		{
+		for (int i = 0; i < HIDDEN_SIZE; i++) {
+			
 			L1Biases[i] = toLittleEndian(networkData.readShort());
 		}
 
 		L2Weights = new short[OUTPUT_BUCKETS][HIDDEN_SIZE * 2];
 
-		for (int i = 0; i < HIDDEN_SIZE * 2; i++)
-		{
-			for (int j = 0; j < OUTPUT_BUCKETS; j++)
-			{
+		for (int i = 0; i < HIDDEN_SIZE * 2; i++) {
+			
+			for (int j = 0; j < OUTPUT_BUCKETS; j++) {
+				
 				L2Weights[j][i] = toLittleEndian(networkData.readShort());
 			}
 		}
 
 		outputBiases = new short[OUTPUT_BUCKETS];
 
-		for (int i = 0; i < OUTPUT_BUCKETS; i++)
-		{
+		for (int i = 0; i < OUTPUT_BUCKETS; i++) {
+			
 			outputBiases[i] = toLittleEndian(networkData.readShort());
 		}
 		
@@ -246,8 +244,8 @@ public class NNUE
 		
 		int eval = 0;
 		
-		for (int i = 0; i < HIDDEN_SIZE; i++)
-		{
+		for (int i = 0; i < HIDDEN_SIZE; i++) {
+			
 			eval += screlu[UsValues[i] - Short.MIN_VALUE] * L2Weights[i]
 					+ screlu[ThemValues[i] - Short.MIN_VALUE] * L2Weights[i + HIDDEN_SIZE];
 		}
@@ -267,8 +265,8 @@ public class NNUE
 		
 		int eval = 0;
 		
-		for (int i = 0; i < HIDDEN_SIZE; i++)
-		{
+		for (int i = 0; i < HIDDEN_SIZE; i++) {
+		
 			int us_value = Math.max(0, Math.min(UsValues[i], QA));
 			int them_value = Math.max(0, Math.min(ThemValues[i], QA));
 			
@@ -310,8 +308,8 @@ public class NNUE
 			System.arraycopy(NNUE.L1Biases, 0, values, 0, HIDDEN_SIZE);
 		}
 
-		public void reset()
-		{
+		public void reset() {
+			
 			System.arraycopy(NNUE.L1Biases, 0, values, 0, HIDDEN_SIZE);
 		}
 
@@ -320,22 +318,25 @@ public class NNUE
 		}
 
 		public void add(int featureIndex) {
-			for (int i = 0; i < HIDDEN_SIZE; i++)
-			{
+			
+			for (int i = 0; i < HIDDEN_SIZE; i++) {
+				
 				values[i] += NNUE.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE][i];
 			}
 		}
 		
 		public void sub(int featureIndex) {
-			for (int i = 0; i < HIDDEN_SIZE; i++)
-			{
+			
+			for (int i = 0; i < HIDDEN_SIZE; i++) {
+				
 				values[i] -= NNUE.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE][i];
 			}
 		}
 
 		public void addsub(int featureIndexToAdd, int featureIndexToSubtract) {
-			for (int i = 0; i < HIDDEN_SIZE; i++)
-			{
+			
+			for (int i = 0; i < HIDDEN_SIZE; i++) {
+				
 				values[i] += NNUE.L1Weights[featureIndexToAdd + bucketIndex * FEATURE_SIZE][i]
 						- NNUE.L1Weights[featureIndexToSubtract + bucketIndex * FEATURE_SIZE][i];
 			}
