@@ -434,8 +434,9 @@ public class NNUE
                 	int piece_promoted = bitboard.getMoveOps().getPromotionFigureType(move);
                 	piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
                 	
-                	addDurtyPiece(color, piece_promoted, promotion_marker++, square_to);
-                	addDurtyPiece(color, piece, square_to, promotion_marker++);
+                	addDurtyPiece(color, piece_promoted, promotion_marker, square_to);
+                	addDurtyPiece(color, piece, square_to, promotion_marker);
+                	promotion_marker++;
     			}
     		}
     	}
@@ -497,8 +498,9 @@ public class NNUE
                 	int piece_promoted = bitboard.getMoveOps().getPromotionFigureType(move);
                 	piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
                 	
-                	addDurtyPiece(color, piece_promoted, square_to, promotion_marker++);
-                	addDurtyPiece(color, piece, promotion_marker++, square_to);
+                	addDurtyPiece(color, piece_promoted, square_to, promotion_marker);
+                	addDurtyPiece(color, piece, promotion_marker, square_to);
+                	promotion_marker++;
     			}
     		}
     	}
@@ -512,7 +514,7 @@ public class NNUE
     		if (square_remove < 64 && square_add < 64) {
     			
         		for (int i = 0; i < dirty_pieces.dirtyNum; i++) {
-        			if (piece == dirty_pieces.pc[i]) {
+        			if (piece == dirty_pieces.pc[i] && color == dirty_pieces.c[i]) {
         				if (square_remove == dirty_pieces.to[i]) {
         					break;
         				}
