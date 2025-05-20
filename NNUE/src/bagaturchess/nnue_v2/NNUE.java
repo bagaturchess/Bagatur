@@ -18,7 +18,7 @@ import bagaturchess.bitboard.impl.Constants;
  */
 public class NNUE {
 	
-	public static final boolean DO_INCREMENTAL_UPDATES = false;
+	public static final boolean DO_INCREMENTAL_UPDATES = true;
 	
 	public static final int WHITE = 0;
 	public static final int BLACK = 1;
