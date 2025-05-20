@@ -31,7 +31,7 @@ public class Protocol {
 	
 	
 	public static final String COMMAND_TO_GUI_ID_NAME = "Bagatur";
-	public static final String COMMAND_TO_GUI_ID_VERSION_STR = "5.1c";
+	public static final String COMMAND_TO_GUI_ID_VERSION_STR = "5.2";
 	//public static final String COMMAND_TO_GUI_ID_NAME = "JFish";
 	//public static final String COMMAND_TO_GUI_ID_VERSION_STR = "1.0";
 	

@@ -1,4 +1,7 @@
- Version 5.1c (30 August 2024)
+ Version 5.2 (20 May 2025)
+ * Incremental updates for NNUE evaluation implemented (~30 Elo more)
+ 
+  Version 5.1c (30 August 2024)
  * Fix *.sh scripts and make them working
  * Revise how the distribution looks like:
  * Pack all java classes and NNUE data file into a single jar file
