@@ -924,7 +924,7 @@ public class ChessBoard {
 	}
 	
 	
-	public boolean isDiscoveredMove(final int fromIndex) {
+	private boolean isDiscoveredMove(final int fromIndex) {
 		return (discovered_pieces & (1L << fromIndex)) != 0;
 	}
 	
@@ -1067,8 +1067,8 @@ public class ChessBoard {
 		} else {
 			b_all ^= fromToMask;
 		}
-		xorPieces(color_to_move - 1, ChessConstants.PAWN, ChessConstants.POWER_LOOKUP[ep_index + ChessConstants.COLOR_FACTOR_8[color_to_move - 1]]);
-		all_pieces = w_all | b_all ^ ChessConstants.POWER_LOOKUP[ep_index + ChessConstants.COLOR_FACTOR_8[color_to_move - 1]];
+		xorPieces(1 - color_to_move, ChessConstants.PAWN, ChessConstants.POWER_LOOKUP[ep_index + ChessConstants.COLOR_FACTOR_8[1 - color_to_move]]);
+		all_pieces = w_all | b_all ^ ChessConstants.POWER_LOOKUP[ep_index + ChessConstants.COLOR_FACTOR_8[1 - color_to_move]];
 
 		/* Check if is in check */
 		final boolean isInCheck = CheckUtil.getCheckingPieces(this) != 0;
@@ -1079,7 +1079,7 @@ public class ChessBoard {
 		} else {
 			b_all ^= fromToMask;
 		}
-		xorPieces(color_to_move - 1, ChessConstants.PAWN, ChessConstants.POWER_LOOKUP[ep_index + ChessConstants.COLOR_FACTOR_8[color_to_move - 1]]);
+		xorPieces(1 - color_to_move, ChessConstants.PAWN, ChessConstants.POWER_LOOKUP[ep_index + ChessConstants.COLOR_FACTOR_8[1 - color_to_move]]);
 		all_pieces = w_all | b_all;
 
 		return !isInCheck;
