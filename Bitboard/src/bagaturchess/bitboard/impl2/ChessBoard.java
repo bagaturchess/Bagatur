@@ -17,8 +17,13 @@ import bagaturchess.bitboard.api.IPlayerAttacks;
 import bagaturchess.bitboard.api.ISEE;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.common.MoveListener;
+import bagaturchess.bitboard.common.Utils;
+import bagaturchess.bitboard.impl.Fields;
+import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.datastructs.StackLongInt;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
+import bagaturchess.bitboard.impl.movelist.BaseMoveList;
+import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl1.internal.CastlingConfig;
 import bagaturchess.bitboard.impl1.internal.Zobrist;
 
@@ -74,7 +79,11 @@ public class ChessBoard implements IBitBoard {
 	
 	private BoardState[] states = new BoardState[2048];
 	
+	private int[] played_moves = new int[2048];
+	
 	private int[] buff_castling_rook_from_to = new int[2];
+	
+	private IMoveList hasMovesList = new BaseMoveList(333);
 	
 	
 	public ChessBoard() {
@@ -372,6 +381,7 @@ public class ChessBoard implements IBitBoard {
 		state_backup.castling_rights = castling_rights;
 		state_backup.last_capture_or_pawn_move_before = last_capture_or_pawn_move_before;
 		state_backup.zobrist_key = zobrist_key;
+		played_moves[played_moves_count] = move;
 		
 		played_moves_count++;
 		
@@ -541,6 +551,7 @@ public class ChessBoard implements IBitBoard {
 		state_backup.castling_rights = castling_rights;
 		state_backup.last_capture_or_pawn_move_before = last_capture_or_pawn_move_before;
 		state_backup.zobrist_key = zobrist_key;
+		played_moves[played_moves_count] = move;
 		
 		played_moves_count++;
 		
@@ -1253,38 +1264,37 @@ public class ChessBoard implements IBitBoard {
 
 	@Override
 	public int genAllMoves(IInternalMoveList list) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		MoveGeneration.generateMoves(this, list);
+		MoveGeneration.generateAttacks(this, list);
+		
+		return list.reserved_getCurrentSize();
 	}
 
 	@Override
 	public int genKingEscapes(IInternalMoveList list) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return genAllMoves(list);
 	}
 
 	@Override
 	public int genCapturePromotionMoves(IInternalMoveList list) {
-		// TODO Auto-generated method stub
-		return 0;
+
+		MoveGeneration.generateAttacks(this, list);
+		
+		return list.reserved_getCurrentSize();
 	}
 	
 	@Override
 	public void makeMoveForward(int move) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void makeMoveForward(String ucimove) {
-		// TODO Auto-generated method stub
-		
+		doMove(move);
 	}
 
 	@Override
 	public void makeMoveBackward(int move) {
-		// TODO Auto-generated method stub
-		
+
+		undoMove(move);
 	}
 
 	@Override
@@ -1301,20 +1311,20 @@ public class ChessBoard implements IBitBoard {
 
 	@Override
 	public long getHashKey() {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return zobrist_key;
 	}
 	
 	@Override
 	public int getStateRepetition() {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return getRepetition();
 	}
 	
 	@Override
 	public String toEPD() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return ChessBoardBuilder.toString(this, true);
 	}
 	
 	@Override
@@ -1325,90 +1335,170 @@ public class ChessBoard implements IBitBoard {
 	
 	@Override
 	public int getPlayedMovesCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return played_moves_count;
 	}
 
 	@Override
 	public int[] getPlayedMoves() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return played_moves;
 	}
 
 	@Override
 	public int getLastMove() {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		if (played_moves_count == 0) {
+			
+			return 0;
+		}
+		
+		return played_moves[played_moves_count - 1];
 	}
 	
 	@Override
 	public boolean isDraw50movesRule() {
-		// TODO Auto-generated method stub
-		return false;
+		
+		return last_capture_or_pawn_move_before >= 100;
 	}
-
+	
 	@Override
 	public int getDraw50movesRule() {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return last_capture_or_pawn_move_before;
 	}
 
 	@Override
 	public boolean hasSufficientMatingMaterial() {
-		// TODO Auto-generated method stub
-		return false;
+
+		return hasSufficientMatingMaterial(Figures.COLOUR_WHITE) || hasSufficientMatingMaterial(Figures.COLOUR_BLACK);
 	}
 
 	@Override
 	public boolean hasSufficientMatingMaterial(int color) {
-		// TODO Auto-generated method stub
+
+		
+		
+		/**
+		 * If has pawn = true
+		 */
+		long pawns = getPieces(color, ChessConstants.PAWN);
+		if (pawns != 0L) {
+			return true;
+		}
+		
+		
+		/**
+		 * If has queen = true
+		 */
+		long queens = getPieces(color, ChessConstants.QUEEN);
+		if (queens != 0L) {
+			return true;
+		}
+		
+		
+		/**
+		 * If has rook = true
+		 */
+		long rooks = getPieces(color, ChessConstants.ROOK);
+		if (rooks != 0L) {
+			return true;
+		}
+		
+		
+		long bishops = getPieces(color, ChessConstants.BISHOP);
+		long knights = getPieces(color, ChessConstants.KNIGHT);
+		
+		
+		/**
+		 * If has 3 or more bishops and knights = true
+		 */
+		if (Utils.countBits(bishops) + Utils.countBits(knights) >= 3) {
+			
+			return true;
+		}
+		
+		
+		/**
+		 * If has 2 different colors bishop = true
+		 */
+		if (bishops != 0L) {
+			
+			if ((bishops & Fields.ALL_WHITE_FIELDS) != 0 && (bishops & Fields.ALL_BLACK_FIELDS) != 0) {
+				
+				return true;
+			}
+		}
+		
+		
+		/**
+		 * If has 1 bishop and 1 knight = true
+		 */
+		if (Utils.countBits(bishops) == 1 && Utils.countBits(knights) == 1) {
+			
+			return true;
+		}
+		
+		
+		/**
+		 * In all other cases = false
+		 */
 		return false;
 	}
 
 	@Override
 	public boolean isInCheck() {
-		// TODO Auto-generated method stub
-		return false;
+
+		return checking_pieces != 0;
 	}
 
 	@Override
 	public boolean isInCheck(int colour) {
-		// TODO Auto-generated method stub
-		return false;
+
+		return CheckUtil.isInCheck(this, colour);
 	}
 
 	@Override
 	public boolean hasMoveInCheck() {
-		// TODO Auto-generated method stub
-		return false;
+		hasMovesList.clear();
+		genKingEscapes(hasMovesList);
+		return hasMovesList.reserved_getCurrentSize() > 0;
 	}
-
+	
+	
 	@Override
 	public boolean hasMoveInNonCheck() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isCheckMove(int move) {
-		// TODO Auto-generated method stub
-		return false;
+		hasMovesList.clear();
+		genAllMoves(hasMovesList);
+		return hasMovesList.reserved_getCurrentSize() > 0;
 	}
 
 	@Override
 	public boolean isPossible(int move) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean hasSingleMove() {
-		// TODO Auto-generated method stub
-		return false;
+		
+		return isValidMove(move);
 	}
 	
 	@Override
 	public CastlingConfig getCastlingConfig() {
+		
+		return castling_config;
+	}
+	
+	@Override
+	public void makeMoveForward(String ucimove) {
+
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public boolean isCheckMove(int move) {
+
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public boolean hasSingleMove() {
 		
 		throw new UnsupportedOperationException();
 	}
