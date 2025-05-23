@@ -59,6 +59,9 @@ public class ChessBoard {
 	
 	private BoardState[] states = new BoardState[2048];
 	
+	private int[] buff_castling_rook_from_to = new int[2];
+	
+	
 	public ChessBoard() {
 		
 		piece_indexes = new int[64];
@@ -340,7 +343,7 @@ public class ChessBoard {
 
 		if (MoveUtil.isCastlingMove(move)) {
 			
-			//doCastling960(move);
+			doCastling960(move);
 			
 			return;
 		}
@@ -512,14 +515,26 @@ public class ChessBoard {
 	}
 
 	
-	/*private void doCastling960(int move) {
+	private void doCastling960(int move) {
+		
+		
+		BoardState state_backup = states[played_moves_count];
+		state_backup.pinned_pieces = pinned_pieces;
+		state_backup.discovered_pieces = discovered_pieces;
+		state_backup.checking_pieces = checking_pieces;
+		state_backup.ep_index = ep_index;
+		state_backup.castling_rights = castling_rights;
+		state_backup.last_capture_or_pawn_move_before = last_capture_or_pawn_move_before;
+		state_backup.zobrist_key = zobrist_key;
+		
+		played_moves_count++;
 		
 		
 		final int fromIndex_king 	= MoveUtil.getFromIndex(move);
 		final int toIndex_king 		= MoveUtil.getToIndex(move);
 		final int sourcePieceIndex 	= MoveUtil.getSourcePieceIndex(move);
 		
-		if (sourcePieceIndex != KING || !MoveUtil.isCastlingMove(move)) {
+		if (sourcePieceIndex != ChessConstants.KING || !MoveUtil.isCastlingMove(move)) {
 			
 			throw new IllegalStateException("sourcePieceIndex != KING || !MoveUtil.isCastlingMove(move)");
 		}
@@ -531,136 +546,142 @@ public class ChessBoard {
 		
 		if (fromIndex_king == toIndex_king) {
 			
-			long bb 						= Util.POWER_LOOKUP[fromIndex_rook] | Util.POWER_LOOKUP[toIndex_rook];
+			long bb 						= ChessConstants.POWER_LOOKUP[fromIndex_rook] | ChessConstants.POWER_LOOKUP[toIndex_rook];
 			
-			pieces[colorToMove][ROOK] 		^= bb;
-			friendlyPieces[colorToMove] 	^= bb;
+			if (color_to_move == ChessConstants.WHITE) {
+				w_all ^= bb;
+			} else {
+				b_all ^= bb;
+			}
+			xorPieces(color_to_move, ChessConstants.ROOK, bb);
 			
-			pieceIndexes[fromIndex_rook] 	= EMPTY;
-			pieceIndexes[toIndex_rook] 		= ROOK;
+			piece_indexes[fromIndex_rook] 	= ChessConstants.EMPTY;
+			piece_indexes[toIndex_rook] 	= ChessConstants.ROOK;
 			
 		} else if (fromIndex_rook == toIndex_rook) {
 			
-			long bb 						= Util.POWER_LOOKUP[fromIndex_king] | Util.POWER_LOOKUP[toIndex_king];
+			long bb 						= ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_king];
 			
-			pieces[colorToMove][KING] 		^= bb;
-			friendlyPieces[colorToMove] 	^= bb;
+			if (color_to_move == ChessConstants.WHITE) {
+				w_all ^= bb;
+			} else {
+				b_all ^= bb;
+			}
+			xorPieces(color_to_move, ChessConstants.KING, bb);
 			
-			pieceIndexes[fromIndex_king] 	= EMPTY;
-			pieceIndexes[toIndex_king] 		= KING;
+			piece_indexes[fromIndex_king] 	= ChessConstants.EMPTY;
+			piece_indexes[toIndex_king] 	= ChessConstants.KING;
 			
 		} else if (fromIndex_rook == toIndex_king && toIndex_rook == fromIndex_king) {
 		
-			long bb_king					= Util.POWER_LOOKUP[fromIndex_king] | Util.POWER_LOOKUP[toIndex_king];
-			pieces[colorToMove][KING] 		^= bb_king;
+			long bb_king					= ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_king];
+			xorPieces(color_to_move, ChessConstants.KING, bb_king);
 			
-			long bb_rook					= Util.POWER_LOOKUP[fromIndex_rook] | Util.POWER_LOOKUP[toIndex_rook];
-			pieces[colorToMove][ROOK] 		^= bb_rook;
+			long bb_rook					= ChessConstants.POWER_LOOKUP[fromIndex_rook] | ChessConstants.POWER_LOOKUP[toIndex_rook];
+			xorPieces(color_to_move, ChessConstants.ROOK, bb_rook);
 			
-			pieceIndexes[toIndex_rook] 		= ROOK;
-			pieceIndexes[toIndex_king] 		= KING;
+			piece_indexes[toIndex_rook] 	= ChessConstants.ROOK;
+			piece_indexes[toIndex_king] 	= ChessConstants.KING;
 			
 		} else if (fromIndex_rook == toIndex_king) {
 			
-			long bb_king					= Util.POWER_LOOKUP[fromIndex_king] | Util.POWER_LOOKUP[toIndex_king];
-			pieces[colorToMove][KING] 		^= bb_king;
+			long bb_king					= ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_king];
+			xorPieces(color_to_move, ChessConstants.KING, bb_king);
 			
-			long bb_rook					= Util.POWER_LOOKUP[fromIndex_rook] | Util.POWER_LOOKUP[toIndex_rook];
-			pieces[colorToMove][ROOK] 		^= bb_rook;
+			long bb_rook					= ChessConstants.POWER_LOOKUP[fromIndex_rook] | ChessConstants.POWER_LOOKUP[toIndex_rook];
+			xorPieces(color_to_move, ChessConstants.ROOK, bb_rook);
 			
-			friendlyPieces[colorToMove] 	^= (Util.POWER_LOOKUP[fromIndex_king] | Util.POWER_LOOKUP[toIndex_rook]);
+			if (color_to_move == ChessConstants.WHITE) {
+				w_all ^= (ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_rook]);
+			} else {
+				b_all ^= (ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_rook]);
+			}
 			
-			pieceIndexes[toIndex_rook] 		= ROOK;
-			pieceIndexes[toIndex_king] 		= KING;
-			pieceIndexes[fromIndex_king] 	= EMPTY;
+			piece_indexes[toIndex_rook] 	= ChessConstants.ROOK;
+			piece_indexes[toIndex_king] 	= ChessConstants.KING;
+			piece_indexes[fromIndex_king] 	= ChessConstants.EMPTY;
 
 			
 		} else if (toIndex_rook == fromIndex_king) {
 			
-			long bb_king					= Util.POWER_LOOKUP[fromIndex_king] | Util.POWER_LOOKUP[toIndex_king];
-			pieces[colorToMove][KING] 		^= bb_king;
+			long bb_king					= ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_king];
+			xorPieces(color_to_move, ChessConstants.KING, bb_king);
 			
-			long bb_rook					= Util.POWER_LOOKUP[fromIndex_rook] | Util.POWER_LOOKUP[toIndex_rook];
-			pieces[colorToMove][ROOK] 		^= bb_rook;
+			long bb_rook					= ChessConstants.POWER_LOOKUP[fromIndex_rook] | ChessConstants.POWER_LOOKUP[toIndex_rook];
+			xorPieces(color_to_move, ChessConstants.ROOK, bb_rook);
 			
-			friendlyPieces[colorToMove] 	^= (Util.POWER_LOOKUP[toIndex_king] | Util.POWER_LOOKUP[fromIndex_rook]);
+			if (color_to_move == ChessConstants.WHITE) {
+				w_all ^= (ChessConstants.POWER_LOOKUP[toIndex_king] | ChessConstants.POWER_LOOKUP[fromIndex_rook]);
+			} else {
+				b_all ^= (ChessConstants.POWER_LOOKUP[toIndex_king] | ChessConstants.POWER_LOOKUP[fromIndex_rook]);
+			}
 			
-			pieceIndexes[toIndex_rook] 		= ROOK;
-			pieceIndexes[toIndex_king] 		= KING;
-			pieceIndexes[fromIndex_rook] 	= EMPTY;
+			piece_indexes[toIndex_rook] 	= ChessConstants.ROOK;
+			piece_indexes[toIndex_king] 	= ChessConstants.KING;
+			piece_indexes[fromIndex_rook] 	= ChessConstants.EMPTY;
 			
 		} else {
 			
-			long bb_king					= Util.POWER_LOOKUP[fromIndex_king] | Util.POWER_LOOKUP[toIndex_king];
-			pieces[colorToMove][KING] 		^= bb_king;
-			friendlyPieces[colorToMove] 	^= bb_king;
+			long bb_king					= ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_king];
+			xorPieces(color_to_move, ChessConstants.KING, bb_king);
+			if (color_to_move == ChessConstants.WHITE) {
+				w_all ^= bb_king;
+			} else {
+				b_all ^= bb_king;
+			}
 			
-			long bb_rook					= Util.POWER_LOOKUP[fromIndex_rook] | Util.POWER_LOOKUP[toIndex_rook];
-			pieces[colorToMove][ROOK] 		^= bb_rook;
-			friendlyPieces[colorToMove] 	^= bb_rook;
+			long bb_rook					= ChessConstants.POWER_LOOKUP[fromIndex_rook] | ChessConstants.POWER_LOOKUP[toIndex_rook];
+			xorPieces(color_to_move, ChessConstants.ROOK, bb_rook);
+			if (color_to_move == ChessConstants.WHITE) {
+				w_all ^= bb_rook;
+			} else {
+				b_all ^= bb_rook;
+			}
 			
-			pieceIndexes[fromIndex_rook] 	= EMPTY;
-			pieceIndexes[fromIndex_king] 	= EMPTY;
-			pieceIndexes[toIndex_rook] 		= ROOK;
-			pieceIndexes[toIndex_king] 		= KING;
+			piece_indexes[fromIndex_rook] 	= ChessConstants.EMPTY;
+			piece_indexes[fromIndex_king] 	= ChessConstants.EMPTY;
+			piece_indexes[toIndex_rook] 	= ChessConstants.ROOK;
+			piece_indexes[toIndex_king] 	= ChessConstants.KING;
 			
 		}
 		
 		
-		updateKingValues(colorToMove, toIndex_king);
+		zobrist_key ^= Zobrist.piece[fromIndex_king][color_to_move][ChessConstants.KING] ^ Zobrist.piece[toIndex_king][color_to_move][ChessConstants.KING];
+		zobrist_key ^= Zobrist.piece[fromIndex_rook][color_to_move][ChessConstants.ROOK] ^ Zobrist.piece[toIndex_rook][color_to_move][ChessConstants.ROOK];
 		
-		zobristKey 						^= Zobrist.piece[fromIndex_king][colorToMove][KING] ^ Zobrist.piece[toIndex_king][colorToMove][KING];
-		zobristKey 						^= Zobrist.piece[fromIndex_rook][colorToMove][ROOK] ^ Zobrist.piece[toIndex_rook][colorToMove][ROOK];
-		
-		if (epIndex != 0) {
-			zobristKey ^= Zobrist.epIndex[epIndex];
-			epIndex = 0;
+		if (ep_index != 0) {
+			zobrist_key ^= Zobrist.epIndex[ep_index];
+			ep_index = 0;
 		}
 		
-		zobristKey ^= Zobrist.sideToMove;
+		zobrist_key ^= Zobrist.sideToMove;
 		
 		
-		if (castlingRights != 0) {
+		if (castling_rights != 0) {
 			
-			zobristKey ^= Zobrist.castling[castlingRights];
+			zobrist_key ^= Zobrist.castling[castling_rights];
 			
-			if (Properties.DUMP_CASTLING) System.out.println("ChessBoard.doMove/KING: castlingRights=" + castlingRights);
+			castling_rights = CastlingUtil.getKingMovedCastlingRights(castling_rights, color_to_move, castling_config);
 			
-			castlingRights = CastlingUtil.getKingMovedCastlingRights(castlingRights, colorToMove, castlingConfig);
-			
-			if (Properties.DUMP_CASTLING) System.out.println("ChessBoard.doMove/KING: NEW castlingRights=" + castlingRights);
-			
-			zobristKey ^= Zobrist.castling[castlingRights];
+			zobrist_key ^= Zobrist.castling[castling_rights];
 		}
 		
 		
-		psqtScore_mg					+= EvalConstants.PSQT_MG[KING][colorToMove][toIndex_king] - EvalConstants.PSQT_MG[KING][colorToMove][fromIndex_king];
-		psqtScore_eg 					+= EvalConstants.PSQT_EG[KING][colorToMove][toIndex_king] - EvalConstants.PSQT_EG[KING][colorToMove][fromIndex_king];
+		all_pieces = w_all | b_all;
 		
-		psqtScore_mg					+= EvalConstants.PSQT_MG[ROOK][colorToMove][toIndex_rook] - EvalConstants.PSQT_MG[ROOK][colorToMove][fromIndex_rook];
-		psqtScore_eg 					+= EvalConstants.PSQT_EG[ROOK][colorToMove][toIndex_rook] - EvalConstants.PSQT_EG[ROOK][colorToMove][fromIndex_rook];
+		empty_spaces = ~all_pieces;
 		
-		
-		allPieces = friendlyPieces[colorToMove] | friendlyPieces[colorToMoveInverse];
-		
-		emptySpaces = ~allPieces;
-		
-		changeSideToMove();
+		color_to_move = 1 - color_to_move;
 
 		// update checking pieces
-		checkingPieces = CheckUtil.getCheckingPieces(this);
+		checking_pieces = CheckUtil.getCheckingPieces(this);
 		
-		// TODO can this be done incrementally?
+		
 		setPinnedAndDiscoPieces();
-
-		if (EngineConstants.ASSERT) {
-			
-			ChessBoardTestUtil.testValues(this);
-		}
 		
 		
-		playedBoardStates.inc(zobristKey);
-	}*/
+		played_board_states.inc(zobrist_key);
+	}
 	
 
 	public void undoMove(int move) {
@@ -668,7 +689,7 @@ public class ChessBoard {
 		
 		if (MoveUtil.isCastlingMove(move)) {
 			
-			//undoCastling960(move);
+			undoCastling960(move);
 			
 			return;
 		}
@@ -771,17 +792,29 @@ public class ChessBoard {
 	}
 	
 	
-	/*public void undoCastling960(int move) {
+	public void undoCastling960(int move) {
 		
 		
 		played_board_states.dec(zobrist_key);
+		
+		
+		played_moves_count--;
+		
+		BoardState state_backup = states[played_moves_count];
+		pinned_pieces = state_backup.pinned_pieces;
+		discovered_pieces = state_backup.discovered_pieces;
+		checking_pieces = state_backup.checking_pieces;
+		ep_index = state_backup.ep_index;
+		castling_rights = state_backup.castling_rights;
+		last_capture_or_pawn_move_before = state_backup.last_capture_or_pawn_move_before;
+		zobrist_key = state_backup.zobrist_key;
 		
 		
 		final int fromIndex_king 	= MoveUtil.getFromIndex(move);
 		final int toIndex_king 		= MoveUtil.getToIndex(move);
 		final int sourcePieceIndex 	= MoveUtil.getSourcePieceIndex(move);
 		
-		if (sourcePieceIndex != KING || !MoveUtil.isCastlingMove(move)) {
+		if (sourcePieceIndex != ChessConstants.KING || !MoveUtil.isCastlingMove(move)) {
 			
 			throw new IllegalStateException("sourcePieceIndex != KING || !MoveUtil.isCastlingMove(move)");
 		}
@@ -793,103 +826,114 @@ public class ChessBoard {
 		
 		if (fromIndex_king == toIndex_king) {
 			
-			long bb 							= Util.POWER_LOOKUP[fromIndex_rook] | Util.POWER_LOOKUP[toIndex_rook];
+			long bb 							= ChessConstants.POWER_LOOKUP[fromIndex_rook] | ChessConstants.POWER_LOOKUP[toIndex_rook];
 			
-			pieces[colorToMoveInverse][ROOK] 	^= bb;
-			friendlyPieces[colorToMoveInverse] 	^= bb;
+			xorPieces(1 - color_to_move, ChessConstants.ROOK, bb);
+			if (1 - color_to_move == ChessConstants.WHITE) {
+				w_all ^= bb;
+			} else {
+				b_all ^= bb;
+			}
 			
-			pieceIndexes[fromIndex_rook] 		= ROOK;
-			pieceIndexes[toIndex_rook] 			= EMPTY;
+			piece_indexes[fromIndex_rook] 		= ChessConstants.ROOK;
+			piece_indexes[toIndex_rook] 		= ChessConstants.EMPTY;
 			
 		} else if (fromIndex_rook == toIndex_rook) {
 			
-			long bb 							= Util.POWER_LOOKUP[fromIndex_king] | Util.POWER_LOOKUP[toIndex_king];
+			long bb 							= ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_king];
 			
-			pieces[colorToMoveInverse][KING] 	^= bb;
-			friendlyPieces[colorToMoveInverse] 	^= bb;
+			xorPieces(1 - color_to_move, ChessConstants.KING, bb);
+			if (1 - color_to_move == ChessConstants.WHITE) {
+				w_all ^= bb;
+			} else {
+				b_all ^= bb;
+			}
 			
-			pieceIndexes[fromIndex_king] 		= KING;
-			pieceIndexes[toIndex_king] 			= EMPTY;
+			piece_indexes[fromIndex_king] 		= ChessConstants.KING;
+			piece_indexes[toIndex_king] 		= ChessConstants.EMPTY;
 			
 		} else if (fromIndex_rook == toIndex_king && toIndex_rook == fromIndex_king) {
 		
-			long bb_king						= Util.POWER_LOOKUP[fromIndex_king] | Util.POWER_LOOKUP[toIndex_king];
-			pieces[colorToMoveInverse][KING] 	^= bb_king;
+			long bb_king						= ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_king];
+			xorPieces(1 - color_to_move, ChessConstants.KING, bb_king);
 			
-			long bb_rook						= Util.POWER_LOOKUP[fromIndex_rook] | Util.POWER_LOOKUP[toIndex_rook];
-			pieces[colorToMoveInverse][ROOK] 	^= bb_rook;
+			long bb_rook						= ChessConstants.POWER_LOOKUP[fromIndex_rook] | ChessConstants.POWER_LOOKUP[toIndex_rook];
+			xorPieces(1 - color_to_move, ChessConstants.ROOK, bb_rook);
 			
-			pieceIndexes[toIndex_rook] 			= KING;
-			pieceIndexes[toIndex_king] 			= ROOK;
+			piece_indexes[toIndex_rook] 		= ChessConstants.KING;
+			piece_indexes[toIndex_king] 		= ChessConstants.ROOK;
 			
 		} else if (fromIndex_rook == toIndex_king) {
 			
-			long bb_king						= Util.POWER_LOOKUP[fromIndex_king] | Util.POWER_LOOKUP[toIndex_king];
-			pieces[colorToMoveInverse][KING] 	^= bb_king;
+			long bb_king						= ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_king];
+			xorPieces(1 - color_to_move, ChessConstants.KING, bb_king);
 			
-			long bb_rook						= Util.POWER_LOOKUP[fromIndex_rook] | Util.POWER_LOOKUP[toIndex_rook];
-			pieces[colorToMoveInverse][ROOK] 	^= bb_rook;
+			long bb_rook						= ChessConstants.POWER_LOOKUP[fromIndex_rook] | ChessConstants.POWER_LOOKUP[toIndex_rook];
+			xorPieces(1 - color_to_move, ChessConstants.ROOK, bb_rook);
 			
-			friendlyPieces[colorToMoveInverse] 	^= (Util.POWER_LOOKUP[fromIndex_king] | Util.POWER_LOOKUP[toIndex_rook]);
+			if (1 - color_to_move == ChessConstants.WHITE) {
+				w_all ^= (ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_rook]);
+			} else {
+				b_all ^= (ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_rook]);
+			}
 			
-			pieceIndexes[toIndex_rook] 			= EMPTY;
-			pieceIndexes[toIndex_king] 			= ROOK;
-			pieceIndexes[fromIndex_king] 		= KING;
+			piece_indexes[toIndex_rook] 		= ChessConstants.EMPTY;
+			piece_indexes[toIndex_king] 		= ChessConstants.ROOK;
+			piece_indexes[fromIndex_king] 		= ChessConstants.KING;
 
 			
 		} else if (toIndex_rook == fromIndex_king) {
 			
-			long bb_king						= Util.POWER_LOOKUP[fromIndex_king] | Util.POWER_LOOKUP[toIndex_king];
-			pieces[colorToMoveInverse][KING] 	^= bb_king;
+			long bb_king						= ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_king];
+			xorPieces(1 - color_to_move, ChessConstants.KING, bb_king);
 			
-			long bb_rook						= Util.POWER_LOOKUP[fromIndex_rook] | Util.POWER_LOOKUP[toIndex_rook];
-			pieces[colorToMoveInverse][ROOK] 	^= bb_rook;
+			long bb_rook						= ChessConstants.POWER_LOOKUP[fromIndex_rook] | ChessConstants.POWER_LOOKUP[toIndex_rook];
+			xorPieces(1 - color_to_move, ChessConstants.ROOK, bb_rook);
 			
-			friendlyPieces[colorToMoveInverse] 	^= (Util.POWER_LOOKUP[toIndex_king] | Util.POWER_LOOKUP[fromIndex_rook]);
+			if (1 - color_to_move == ChessConstants.WHITE) {
+				w_all ^= (ChessConstants.POWER_LOOKUP[toIndex_king] | ChessConstants.POWER_LOOKUP[fromIndex_rook]);
+			} else {
+				b_all ^= (ChessConstants.POWER_LOOKUP[toIndex_king] | ChessConstants.POWER_LOOKUP[fromIndex_rook]);
+			}
 			
-			pieceIndexes[toIndex_rook] 			= KING;
-			pieceIndexes[toIndex_king] 			= EMPTY;
-			pieceIndexes[fromIndex_rook] 		= ROOK;
+			piece_indexes[toIndex_rook] 		= ChessConstants.KING;
+			piece_indexes[toIndex_king] 		= ChessConstants.EMPTY;
+			piece_indexes[fromIndex_rook] 		= ChessConstants.ROOK;
 			
 		} else {
 			
-			long bb_king						= Util.POWER_LOOKUP[fromIndex_king] | Util.POWER_LOOKUP[toIndex_king];
-			pieces[colorToMoveInverse][KING] 	^= bb_king;
-			friendlyPieces[colorToMoveInverse] 	^= bb_king;
+			long bb_king						= ChessConstants.POWER_LOOKUP[fromIndex_king] | ChessConstants.POWER_LOOKUP[toIndex_king];
+			xorPieces(1 - color_to_move, ChessConstants.KING, bb_king);
 			
-			long bb_rook						= Util.POWER_LOOKUP[fromIndex_rook] | Util.POWER_LOOKUP[toIndex_rook];
-			pieces[colorToMoveInverse][ROOK] 	^= bb_rook;
-			friendlyPieces[colorToMoveInverse] 	^= bb_rook;
+			if (1 - color_to_move == ChessConstants.WHITE) {
+				w_all ^= bb_king;
+			} else {
+				b_all ^= bb_king;
+			}
 			
-			pieceIndexes[fromIndex_rook] 		= ROOK;
-			pieceIndexes[fromIndex_king] 		= KING;
-			pieceIndexes[toIndex_rook] 			= EMPTY;
-			pieceIndexes[toIndex_king] 			= EMPTY;
-			
-		}
-		
-		
-		updateKingValues(colorToMoveInverse, fromIndex_king);
-		
-				
-		psqtScore_mg					+= EvalConstants.PSQT_MG[KING][colorToMoveInverse][fromIndex_king] - EvalConstants.PSQT_MG[KING][colorToMoveInverse][toIndex_king];
-		psqtScore_eg 					+= EvalConstants.PSQT_EG[KING][colorToMoveInverse][fromIndex_king] - EvalConstants.PSQT_EG[KING][colorToMoveInverse][toIndex_king];
-		
-		psqtScore_mg					+= EvalConstants.PSQT_MG[ROOK][colorToMoveInverse][fromIndex_rook] - EvalConstants.PSQT_MG[ROOK][colorToMoveInverse][toIndex_rook];
-		psqtScore_eg 					+= EvalConstants.PSQT_EG[ROOK][colorToMoveInverse][fromIndex_rook] - EvalConstants.PSQT_EG[ROOK][colorToMoveInverse][toIndex_rook];
-		
-		
-		allPieces = friendlyPieces[colorToMove] | friendlyPieces[colorToMoveInverse];
-		
-		emptySpaces = ~allPieces;
-		
-		changeSideToMove();
+			long bb_rook						= ChessConstants.POWER_LOOKUP[fromIndex_rook] | ChessConstants.POWER_LOOKUP[toIndex_rook];
+			xorPieces(1 - color_to_move, ChessConstants.ROOK, bb_rook);
 
-		if (EngineConstants.ASSERT) {
+			if (1 - color_to_move == ChessConstants.WHITE) {
+				w_all ^= bb_rook;
+			} else {
+				b_all ^= bb_rook;
+			}
 			
-			ChessBoardTestUtil.testValues(this);
+			piece_indexes[fromIndex_rook] 		= ChessConstants.ROOK;
+			piece_indexes[fromIndex_king] 		= ChessConstants.KING;
+			piece_indexes[toIndex_rook] 		= ChessConstants.EMPTY;
+			piece_indexes[toIndex_king] 		= ChessConstants.EMPTY;
+			
 		}
-	}*/
+		
+		
+		all_pieces = w_all | b_all;
+		
+		empty_spaces = ~all_pieces;
+		
+		color_to_move = 1 - color_to_move;
+	}
 	
 	
 	public void setPinnedAndDiscoPieces() {
@@ -1135,7 +1179,7 @@ public class ChessBoard {
     @Override
     public ChessBoard clone() {
     	
-        ChessBoard clone = new ChessBoard(); //(ChessBoard) super.clone();
+        ChessBoard clone = new ChessBoard();
 
         clone.w_king = this.w_king;
         clone.w_queens = this.w_queens;
@@ -1170,7 +1214,7 @@ public class ChessBoard {
         
         return clone;
     }
-
+    
     
     private static class BoardState {
     	

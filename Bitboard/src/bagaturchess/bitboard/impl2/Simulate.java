@@ -26,6 +26,7 @@ package bagaturchess.bitboard.impl2;
 import bagaturchess.bitboard.api.IInternalMoveList;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
+import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 
 /**
 After 1 ply: ~20 moves
@@ -72,51 +73,17 @@ public class Simulate {
 		System.out.println("Leafs: " + info.leafs);
 		if (System.currentTimeMillis() - start_time > 1000) {
 			
-			System.out.println(info.nodes / ((System.currentTimeMillis() - start_time) / 1000) + " NPS");
+			System.out.println(info.moves / ((System.currentTimeMillis() - start_time) / 1000) + " NPS");
 		}
 		
 		if (!board.equals(board_copy)) {
 			
 			throw new IllegalStateException();
 		}
-		
-		/*IInternalMoveList list = new BaseMoveList();
-		
-		long start_time = System.currentTimeMillis();
-		
-		int counter = 0;
-		while (true) {
-			
-			list.reserved_clear();
-			MoveGeneration.generateMoves(board, list);
-			MoveGeneration.generateAttacks(board, list);
-			
-			for (int i = 0; i < list.reserved_getCurrentSize(); i++){
-				
-				int move = list.reserved_getMovesBuffer()[i];
-				
-				board.doMove(move);
-				board.undoMove(move);
-				counter++;
-				
-				System.out.println(counter);
-				
-				if (!board.equals(board_copy)) {
-					
-					throw new IllegalStateException();
-				}
-			}
-			
-			if (counter % 10000000 == 0 && System.currentTimeMillis() - start_time > 1000) {
-				System.out.println(counter / ((System.currentTimeMillis() - start_time) / 1000));
-			}
-		}*/
 	}
 	
 	
 	private static final void simulate(ChessBoard board, int depth, IInternalMoveList[] lists, SearchInfo info) {
-	
-		info.nodes++;
 		
 		if (depth == 0) {
 		
@@ -124,6 +91,8 @@ public class Simulate {
 			
 			return;
 		}
+		
+		info.moves++;
 		
 		IInternalMoveList list = lists[depth];
 				
@@ -143,13 +112,21 @@ public class Simulate {
 			
 			int color_to_move = board.color_to_move;
 			
+			if (!board.isValidMove(move)) {
+				
+				//throw new IllegalStateException(ChessBoardBuilder.toString(board, true) + "	" + (new MoveWrapper(move, true, board.castling_config)).toString());
+				continue;
+			}
+			
 			board.doMove(move);
 			
 			if (CheckUtil.isInCheck(board, color_to_move)) {
 				
-				board.undoMove(move);
+				throw new IllegalStateException(ChessBoardBuilder.toString(board, true) + "	" + (new MoveWrapper(move, true, board.castling_config)).toString());
 				
-				continue;
+				//board.undoMove(move);
+				
+				//continue;
 			}
 			
 			simulate(board, depth - 1, lists, info);
@@ -159,29 +136,8 @@ public class Simulate {
 	}
 	
 	
-	public static void bubbleSort(int from, int to, int[] moves) {
-		
-		for (int i = from; i < to; i++) {
-			boolean change = false;
-			for (int j= i + 1; j < to; j++) {
-				int i_move = moves[i];
-				int j_move = moves[j];
-				if (j_move > i_move) {
-					moves[i] = j_move;
-					moves[j] = i_move;
-					change = true;
-				}
-			}
-			if (!change) {
-				return;
-			}
-		}
-		
-		//check(from, to, moves);
-	}
-	
 	static class SearchInfo {
 		public long leafs;
-		public long nodes;
+		public long moves;
 	}
 }

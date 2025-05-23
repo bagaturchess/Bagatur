@@ -2,7 +2,8 @@ package bagaturchess.bitboard.impl2;
 
 
 public final class CheckUtil {
-
+	
+	
 	public static boolean isInCheck(final ChessBoard cb, int color) {
 		final int kingIndex = cb.getKingIndex(color);
 		return (cb.getPieces(1 - color, ChessConstants.KNIGHT) & ChessConstants.KNIGHT_MOVES[kingIndex]
@@ -11,6 +12,7 @@ public final class CheckUtil {
 				| cb.getPieces(1 - color, ChessConstants.PAWN) & ChessConstants.PAWN_ATTACKS[color][kingIndex]
 			) != 0L;
 	}
+	
 	
 	public static long getCheckingPieces(final ChessBoard cb) {
 		final int kingIndex = cb.getKingIndexOfSideToMove();
@@ -22,6 +24,7 @@ public final class CheckUtil {
 				| cb.getPiecesOfSideNotToMove(ChessConstants.PAWN) & ChessConstants.PAWN_ATTACKS[cb.color_to_move][kingIndex]
 			);
 	}
+	
 	
 	public static long getCheckingPieces(final ChessBoard cb, final int sourcePieceIndex) {
 		
@@ -41,7 +44,8 @@ public final class CheckUtil {
 				return 0;	
 		}
 	}
-
+	
+	
 	public static boolean isInCheck(final ChessBoard cb, final int kingIndex, final int colorToMove, final long allPieces) {
 	
 		// put 'super-piece' in kings position
@@ -51,15 +55,9 @@ public final class CheckUtil {
 				| cb.getPiecesOfSideNotToMove(ChessConstants.PAWN) & ChessConstants.PAWN_ATTACKS[colorToMove][kingIndex]
 			) != 0;
 	}
-
+	
+	
 	/*public static boolean isInCheckIncludingKing(final int kingIndex, final int colorToMove, final long[] enemyPieces, final long allPieces, final int enemyMajorPieces) {
-
-		//TODO
-		if(enemyMajorPieces==0) {
-			return (enemyPieces[PAWN] & StaticMoves.PAWN_ATTACKS[colorToMove][kingIndex]
-					| enemyPieces[KING] & StaticMoves.KING_MOVES[kingIndex]
-				) != 0;
-		}
 		
 		// put 'super-piece' in kings position
 		return (enemyPieces[NIGHT] & StaticMoves.KNIGHT_MOVES[kingIndex]
@@ -69,6 +67,7 @@ public final class CheckUtil {
 				| enemyPieces[KING] & StaticMoves.KING_MOVES[kingIndex]
 			) != 0;
 	}*/
+	
 	
 	public static boolean isInCheckIncludingKing(final ChessBoard cb, final int kingIndex, final int colorToMove, final long allPieces) {
 		
