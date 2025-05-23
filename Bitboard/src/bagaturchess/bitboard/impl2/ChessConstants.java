@@ -1,8 +1,5 @@
 package bagaturchess.bitboard.impl2;
 
-import bagaturchess.bitboard.impl1.internal.StaticMoves;
-import bagaturchess.bitboard.impl1.internal.Util;
-
 
 public class ChessConstants {
 
@@ -121,7 +118,7 @@ public class ChessConstants {
 				if (from / 8 == to / 8) {
 					i = to - 1;
 					while (i > from) {
-						IN_BETWEEN[from][to] |= Util.POWER_LOOKUP[i];
+						IN_BETWEEN[from][to] |= POWER_LOOKUP[i];
 						i--;
 					}
 				}
@@ -130,7 +127,7 @@ public class ChessConstants {
 				if (from % 8 == to % 8) {
 					i = to - 8;
 					while (i > from) {
-						IN_BETWEEN[from][to] |= Util.POWER_LOOKUP[i];
+						IN_BETWEEN[from][to] |= POWER_LOOKUP[i];
 						i -= 8;
 					}
 				}
@@ -156,7 +153,7 @@ public class ChessConstants {
 				if ((to - from) % 9 == 0 && to % 8 > from % 8) {
 					i = to - 9;
 					while (i > from) {
-						IN_BETWEEN[from][to] |= Util.POWER_LOOKUP[i];
+						IN_BETWEEN[from][to] |= POWER_LOOKUP[i];
 						i -= 9;
 					}
 				}
@@ -165,7 +162,7 @@ public class ChessConstants {
 				if ((to - from) % 7 == 0 && to % 8 < from % 8) {
 					i = to - 7;
 					while (i > from) {
-						IN_BETWEEN[from][to] |= Util.POWER_LOOKUP[i];
+						IN_BETWEEN[from][to] |= POWER_LOOKUP[i];
 						i -= 7;
 					}
 				}
@@ -223,7 +220,7 @@ public class ChessConstants {
 								break;
 							}
 						}
-						PINNED_MOVEMENT[pinnedPieceIndex][kingIndex] |= Util.POWER_LOOKUP[xray];
+						PINNED_MOVEMENT[pinnedPieceIndex][kingIndex] |= POWER_LOOKUP[xray];
 						xray += correctDirection;
 					}
 				}
@@ -241,15 +238,15 @@ public class ChessConstants {
 		//
 		for (int i = 0; i < 64; i++) {
 			// NEXT
-			KING_AREA[WHITE][i] |= StaticMoves.KING_MOVES[i] | Util.POWER_LOOKUP[i];
-			KING_AREA[BLACK][i] |= StaticMoves.KING_MOVES[i] | Util.POWER_LOOKUP[i];
+			KING_AREA[WHITE][i] |= KING_MOVES[i] | POWER_LOOKUP[i];
+			KING_AREA[BLACK][i] |= KING_MOVES[i] | POWER_LOOKUP[i];
 
 			if (i > 15) {
-				KING_AREA[BLACK][i] |= StaticMoves.KING_MOVES[i] >>> 8;
+				KING_AREA[BLACK][i] |= KING_MOVES[i] >>> 8;
 			}
 
 			if (i < 48) {
-				KING_AREA[WHITE][i] |= StaticMoves.KING_MOVES[i] << 8;
+				KING_AREA[WHITE][i] |= KING_MOVES[i] << 8;
 			}
 		}
 
@@ -289,6 +286,17 @@ public class ChessConstants {
 		}
 	}
 	
-	public static final int[] COLOR_FACTOR = { 1, -1 };
-	public static final int[] COLOR_FACTOR_8 = { 8, -8 };
+	public static final int[] COLOR_FACTOR 		= { 1, -1 };
+	public static final int[] COLOR_FACTOR_8 	= { 8, -8 };
+	
+	public static final int[] MATERIAL_SEE		= {0, 100, 300, 300, 500, 900, 3000};
+	
+	public static final int[] PROMOTION_SCORE_SEE = {
+		0,
+		0,
+		MATERIAL_SEE[ChessConstants.KNIGHT] 	- MATERIAL_SEE[ChessConstants.PAWN],
+		MATERIAL_SEE[ChessConstants.BISHOP] - MATERIAL_SEE[ChessConstants.PAWN],
+		MATERIAL_SEE[ChessConstants.ROOK] 	- MATERIAL_SEE[ChessConstants.PAWN],
+		MATERIAL_SEE[ChessConstants.QUEEN] 	- MATERIAL_SEE[ChessConstants.PAWN],
+};
 }

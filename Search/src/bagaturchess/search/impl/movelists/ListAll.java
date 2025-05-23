@@ -360,7 +360,8 @@ public class ListAll implements ISearchMoveList {
 	}
 	
 	public int reserved_getCurrentSize() {
-		throw new IllegalStateException();
+
+		return size;
 	}
 	
 	public int[] reserved_getMovesBuffer() {

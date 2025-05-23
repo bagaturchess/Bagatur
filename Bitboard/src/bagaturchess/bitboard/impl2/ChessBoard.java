@@ -96,6 +96,8 @@ public class ChessBoard implements IBitBoard {
 	
 	private MoveListener[] move_listeners = new MoveListener[0];
 	
+	private IMaterialState material_state = new MaterialStateImpl();
+	
 	private boolean isFRC = true;
 	
 	
@@ -1617,6 +1619,18 @@ public class ChessBoard implements IBitBoard {
 	}
 	
 	@Override
+	public IMaterialState getMaterialState() {
+
+		return material_state;
+	}
+	
+	@Override
+	public int getSEEScore(int move) {
+
+		return SEEUtil.getSeeCaptureScore(this, move);
+	}
+	
+	@Override
 	public void makeMoveForward(String ucimove) {
 
 		throw new UnsupportedOperationException();
@@ -1720,12 +1734,6 @@ public class ChessBoard implements IBitBoard {
 	}
 
 	@Override
-	public int getSEEScore(int move) {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public int getSEEFieldScore(int squareID) {
 
 		throw new UnsupportedOperationException();
@@ -1739,12 +1747,6 @@ public class ChessBoard implements IBitBoard {
 
 	@Override
 	public void reset() {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public IMaterialState getMaterialState() {
 
 		throw new UnsupportedOperationException();
 	}
@@ -1813,6 +1815,12 @@ public class ChessBoard implements IBitBoard {
 	}
 
 	@Override
+	public long getFiguresBitboardByColourAndType(int color, int type) {
+
+		return getPieces(color, type);
+	}
+	
+	@Override
 	public long getFreeBitboard() {
 
 		throw new UnsupportedOperationException();
@@ -1820,12 +1828,6 @@ public class ChessBoard implements IBitBoard {
 
 	@Override
 	public long getFiguresBitboardByPID(int pid) {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public long getFiguresBitboardByColourAndType(int colour, int type) {
 
 		throw new UnsupportedOperationException();
 	}
@@ -2176,5 +2178,22 @@ private class MoveOpsImpl implements IMoveOps {
 		public void move(int pid, int fromFieldID, int toFieldID) {
 			throw new UnsupportedOperationException();
 		}
+	}
+	
+	
+	private class MaterialStateImpl implements IMaterialState {
+		
+		
+		@Override
+		public int getPiecesCount() {
+			return Long.bitCount(all_pieces);
+		}
+		
+		
+		@Override
+		public int[] getPIDsCounts() {
+			throw new UnsupportedOperationException();
+		}
+		
 	}
 }

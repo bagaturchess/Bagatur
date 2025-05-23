@@ -455,6 +455,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (cur_move != 0) {
 			do {
 				
+				if (!env.getBitboard().isPossible(cur_move)) {
+					
+					continue;
+				}
 				
 				//Build and sent minor info
 				if (ply == 0) {
@@ -760,6 +764,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (cur_move != 0) 
 		do {
 			
+			if (!env.getBitboard().isPossible(cur_move)) {
+				
+				continue;
+			}
+					
 			
 			//Skip bad captures
 			if (!inCheck) {

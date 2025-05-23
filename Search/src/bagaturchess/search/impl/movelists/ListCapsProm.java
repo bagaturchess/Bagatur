@@ -165,7 +165,8 @@ public class ListCapsProm implements ISearchMoveList {
 	}
 	
 	public int reserved_getCurrentSize() {
-		throw new IllegalStateException();
+
+		return caps_size;
 	}
 
 	public int[] reserved_getMovesBuffer() {

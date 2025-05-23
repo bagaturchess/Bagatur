@@ -194,7 +194,8 @@ public class ListKingEscapes implements ISearchMoveList {
 	}
 	
 	public int reserved_getCurrentSize() {
-		throw new IllegalStateException();
+
+		return escapes_size;
 	}
 
 	public int[] reserved_getMovesBuffer() {
