@@ -3,17 +3,14 @@ package bagaturchess.bitboard.impl2;
 
 public final class CheckUtil {
 
-	//@formatter:off
-
-	/*public static boolean isInCheck(final ChessBoard cb, int color) {
-		final int kingIndex = cb.kingIndex[color];
-		int colorInverse = 1 - color;
-		return (cb.pieces[colorInverse][NIGHT] & StaticMoves.KNIGHT_MOVES[kingIndex]
-				| (cb.pieces[colorInverse][ROOK]|cb.pieces[colorInverse][QUEEN]) & MagicUtil.getRookMoves(kingIndex, cb.allPieces)
-				| (cb.pieces[colorInverse][BISHOP]|cb.pieces[colorInverse][QUEEN]) & MagicUtil.getBishopMoves(kingIndex, cb.allPieces) 
-				| cb.pieces[colorInverse][PAWN] & StaticMoves.PAWN_ATTACKS[color][kingIndex]
+	public static boolean isInCheck(final ChessBoard cb, int color) {
+		final int kingIndex = cb.getKingIndex(color);
+		return (cb.getPieces(1 - color, ChessConstants.KNIGHT) & ChessConstants.KNIGHT_MOVES[kingIndex]
+				| (cb.getPieces(1 - color, ChessConstants.ROOK) | cb.getPieces(1 - color, ChessConstants.QUEEN)) & MagicUtil.getRookMoves(kingIndex, cb.all_pieces)
+				| (cb.getPieces(1 - color, ChessConstants.BISHOP) | cb.getPieces(1 - color, ChessConstants.QUEEN)) & MagicUtil.getBishopMoves(kingIndex, cb.all_pieces) 
+				| cb.getPieces(1 - color, ChessConstants.PAWN) & ChessConstants.PAWN_ATTACKS[color][kingIndex]
 			) != 0L;
-	}*/
+	}
 	
 	public static long getCheckingPieces(final ChessBoard cb) {
 		final int kingIndex = cb.getKingIndexOfSideToMove();
@@ -45,17 +42,17 @@ public final class CheckUtil {
 		}
 	}
 
-	/*public static boolean isInCheck(final int kingIndex, final int colorToMove, final long[] enemyPieces, final long allPieces) {
+	public static boolean isInCheck(final ChessBoard cb, final int kingIndex, final int colorToMove, final long allPieces) {
 	
 		// put 'super-piece' in kings position
-		return (enemyPieces[NIGHT] & StaticMoves.KNIGHT_MOVES[kingIndex]
-				| (enemyPieces[ROOK] | enemyPieces[QUEEN]) & MagicUtil.getRookMoves(kingIndex, allPieces)
-				| (enemyPieces[BISHOP] | enemyPieces[QUEEN]) & MagicUtil.getBishopMoves(kingIndex, allPieces) 
-				| enemyPieces[PAWN] & StaticMoves.PAWN_ATTACKS[colorToMove][kingIndex]
+		return (cb.getPiecesOfSideToMove(ChessConstants.KNIGHT) & ChessConstants.KNIGHT_MOVES[kingIndex]
+				| (cb.getPiecesOfSideToMove(ChessConstants.ROOK) | cb.getPiecesOfSideToMove(ChessConstants.QUEEN)) & MagicUtil.getRookMoves(kingIndex, allPieces)
+				| (cb.getPiecesOfSideToMove(ChessConstants.BISHOP) | cb.getPiecesOfSideToMove(ChessConstants.QUEEN)) & MagicUtil.getBishopMoves(kingIndex, allPieces) 
+				| cb.getPiecesOfSideToMove(ChessConstants.PAWN) & ChessConstants.PAWN_ATTACKS[colorToMove][kingIndex]
 			) != 0;
 	}
 
-	public static boolean isInCheckIncludingKing(final int kingIndex, final int colorToMove, final long[] enemyPieces, final long allPieces, final int enemyMajorPieces) {
+	/*public static boolean isInCheckIncludingKing(final int kingIndex, final int colorToMove, final long[] enemyPieces, final long allPieces, final int enemyMajorPieces) {
 
 		//TODO
 		if(enemyMajorPieces==0) {
@@ -71,16 +68,16 @@ public final class CheckUtil {
 				| enemyPieces[PAWN] & StaticMoves.PAWN_ATTACKS[colorToMove][kingIndex]
 				| enemyPieces[KING] & StaticMoves.KING_MOVES[kingIndex]
 			) != 0;
-	}
+	}*/
 	
-	public static boolean isInCheckIncludingKing(final int kingIndex, final int colorToMove, final long[] enemyPieces, final long allPieces) {
+	public static boolean isInCheckIncludingKing(final ChessBoard cb, final int kingIndex, final int colorToMove, final long allPieces) {
 		
 		// put 'super-piece' in kings position
-		return (enemyPieces[NIGHT] & StaticMoves.KNIGHT_MOVES[kingIndex]
-				| (enemyPieces[ROOK] | enemyPieces[QUEEN]) & MagicUtil.getRookMoves(kingIndex, allPieces)
-				| (enemyPieces[BISHOP] | enemyPieces[QUEEN]) & MagicUtil.getBishopMoves(kingIndex, allPieces) 
-				| enemyPieces[PAWN] & StaticMoves.PAWN_ATTACKS[colorToMove][kingIndex]
-				| enemyPieces[KING] & StaticMoves.KING_MOVES[kingIndex]
+		return (cb.getPiecesOfSideToMove(ChessConstants.KNIGHT) & ChessConstants.KNIGHT_MOVES[kingIndex]
+				| (cb.getPiecesOfSideToMove(ChessConstants.ROOK) | cb.getPiecesOfSideToMove(ChessConstants.QUEEN)) & MagicUtil.getRookMoves(kingIndex, allPieces)
+				| (cb.getPiecesOfSideToMove(ChessConstants.BISHOP) | cb.getPiecesOfSideToMove(ChessConstants.QUEEN)) & MagicUtil.getBishopMoves(kingIndex, allPieces) 
+				| cb.getPiecesOfSideToMove(ChessConstants.PAWN) & ChessConstants.PAWN_ATTACKS[colorToMove][kingIndex]
+				| cb.getPiecesOfSideToMove(ChessConstants.KING) & ChessConstants.KING_MOVES[kingIndex]
 			) != 0;
-	}*/
+	}
 }

@@ -317,7 +317,7 @@ public class ChessBoard {
 		
 		if (index == 64) {
 			
-			throw new IllegalStateException();
+			throw new IllegalStateException("No king: color=" + color);
 		}
 		
 		return index;
@@ -926,6 +926,164 @@ public class ChessBoard {
 	
 	public boolean isDiscoveredMove(final int fromIndex) {
 		return (discovered_pieces & (1L << fromIndex)) != 0;
+	}
+	
+	
+	public boolean isValidMove(final int move) {
+		
+		// check piece at from square
+		final int fromIndex = MoveUtil.getFromIndex(move);
+		final long fromSquare = ChessConstants.POWER_LOOKUP[fromIndex];
+		if ((getPiecesOfSideToMove(MoveUtil.getSourcePieceIndex(move)) & fromSquare) == 0) {
+			return false;
+		}
+
+		// check piece at to square
+		final int toIndex = MoveUtil.getToIndex(move);
+		final long toSquare = ChessConstants.POWER_LOOKUP[toIndex];
+		final int attackedPieceIndex = MoveUtil.getAttackedPieceIndex(move);
+		if (attackedPieceIndex == 0) {
+			if (MoveUtil.isCastlingMove(move)) {
+				//The rook or king can be on the to_square
+				if (piece_indexes[toIndex] != ChessConstants.EMPTY && piece_indexes[toIndex] != ChessConstants.ROOK && piece_indexes[toIndex] != ChessConstants.KING) {
+					return false;
+				}
+			} else {
+				if (piece_indexes[toIndex] != ChessConstants.EMPTY) {
+					return false;
+				}
+			}
+		} else {
+			if ((getPiecesOfSideNotToMove(attackedPieceIndex) & toSquare) == 0 && !MoveUtil.isEPMove(move)) {
+				return false;
+			}
+		}
+
+
+		// check if move is possible
+		switch (MoveUtil.getSourcePieceIndex(move)) {
+		case ChessConstants.PAWN:
+			if (MoveUtil.isEPMove(move)) {
+				if (toIndex != ep_index) {
+					return false;
+				}
+				return isLegalEPMove(fromIndex);
+			} else {
+				if (color_to_move == ChessConstants.WHITE) {
+					if (fromIndex > toIndex) {
+						return false;
+					}
+					// 2-move
+					if (toIndex - fromIndex == 16 && (all_pieces & ChessConstants.POWER_LOOKUP[fromIndex + 8]) != 0) {
+						return false;
+					}
+				} else {
+					if (fromIndex < toIndex) {
+						return false;
+					}
+					// 2-move
+					if (fromIndex - toIndex == 16 && (all_pieces & ChessConstants.POWER_LOOKUP[fromIndex - 8]) != 0) {
+						return false;
+					}
+				}
+			}
+			break;
+		case ChessConstants.KNIGHT:
+			break;
+		case ChessConstants.BISHOP:
+			// fall-through
+		case ChessConstants.ROOK:
+			// fall-through
+		case ChessConstants.QUEEN:
+			if ((ChessConstants.IN_BETWEEN[fromIndex][toIndex] & all_pieces) != 0) {
+				return false;
+			}
+			break;
+			
+		case ChessConstants.KING:
+			
+			if (MoveUtil.isCastlingMove(move)) {
+				
+				long castlingIndexes = CastlingUtil.getCastlingIndexes(color_to_move, castling_rights, castling_config);
+				
+				while (castlingIndexes != 0) {
+					
+					if (toIndex == Long.numberOfTrailingZeros(castlingIndexes)) {
+						
+						return CastlingUtil.isValidCastlingMove(this, fromIndex, toIndex);
+					}
+					
+					castlingIndexes &= castlingIndexes - 1;
+				}
+				
+				return false;
+			}
+			
+			return isLegalKingMove(move);
+		}
+
+		if ((fromSquare & pinned_pieces) != 0) {
+			if ((ChessConstants.PINNED_MOVEMENT[fromIndex][getKingIndexOfSideToMove()] & toSquare) == 0) {
+				return false;
+			}
+		}
+
+		if (checking_pieces != 0) {
+			if (attackedPieceIndex == 0) {
+				return isLegalNonKingMove(move);
+			} else {
+				if (Long.bitCount(checking_pieces) >= 2) {
+					return false;
+				}
+				return (toSquare & checking_pieces) != 0;
+			}
+		}
+
+		return true;
+	}
+	
+	
+	private boolean isLegalKingMove(final int move) {
+		return !CheckUtil.isInCheckIncludingKing(this, MoveUtil.getToIndex(move), color_to_move,
+				all_pieces ^ ChessConstants.POWER_LOOKUP[MoveUtil.getFromIndex(move)]);
+	}
+	
+	
+	private boolean isLegalNonKingMove(final int move) {
+		return !CheckUtil.isInCheck(this, getKingIndexOfSideToMove(), color_to_move,
+				all_pieces ^ ChessConstants.POWER_LOOKUP[MoveUtil.getFromIndex(move)] ^ ChessConstants.POWER_LOOKUP[MoveUtil.getToIndex(move)]);
+	}
+	
+	
+	private boolean isLegalEPMove(final int fromIndex) {
+
+		// do move, check if in check, undo move. slow but also not called very often
+
+		final long fromToMask = ChessConstants.POWER_LOOKUP[fromIndex] ^ ChessConstants.POWER_LOOKUP[ep_index];
+
+		// do-move and hit
+		if (color_to_move == ChessConstants.WHITE) {
+			w_all ^= fromToMask;
+		} else {
+			b_all ^= fromToMask;
+		}
+		xorPieces(color_to_move - 1, ChessConstants.PAWN, ChessConstants.POWER_LOOKUP[ep_index + ChessConstants.COLOR_FACTOR_8[color_to_move - 1]]);
+		all_pieces = w_all | b_all ^ ChessConstants.POWER_LOOKUP[ep_index + ChessConstants.COLOR_FACTOR_8[color_to_move - 1]];
+
+		/* Check if is in check */
+		final boolean isInCheck = CheckUtil.getCheckingPieces(this) != 0;
+
+		// undo-move and hit
+		if (color_to_move == ChessConstants.WHITE) {
+			w_all ^= fromToMask;
+		} else {
+			b_all ^= fromToMask;
+		}
+		xorPieces(color_to_move - 1, ChessConstants.PAWN, ChessConstants.POWER_LOOKUP[ep_index + ChessConstants.COLOR_FACTOR_8[color_to_move - 1]]);
+		all_pieces = w_all | b_all;
+
+		return !isInCheck;
+
 	}
 	
 	

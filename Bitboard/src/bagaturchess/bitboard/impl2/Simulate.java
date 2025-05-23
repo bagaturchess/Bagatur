@@ -22,12 +22,10 @@
  */
 package bagaturchess.bitboard.impl2;
 
+
 import bagaturchess.bitboard.api.IInternalMoveList;
-import bagaturchess.bitboard.common.GlobalConstants;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
-import bagaturchess.bitboard.impl1.internal.ChessBoardUtil;
-
 
 /**
 After 1 ply: ~20 moves
@@ -69,7 +67,7 @@ public class Simulate {
 		
 		long start_time = System.currentTimeMillis();
 		
-		simulate(board, 7, lists, info);
+		simulate(board, 8, lists, info);
 		
 		System.out.println("Leafs: " + info.leafs);
 		if (System.currentTimeMillis() - start_time > 1000) {
@@ -137,13 +135,22 @@ public class Simulate {
 			
 			int move = list.reserved_getMovesBuffer()[i];
 			
-			int attacked_type = MoveUtil.getAttackedPieceIndex(move);
+			/*int attacked_type = MoveUtil.getAttackedPieceIndex(move);
 			if (attacked_type == ChessConstants.KING) {
 				
 				continue;
-			}
+			}*/
+			
+			int color_to_move = board.color_to_move;
 			
 			board.doMove(move);
+			
+			if (CheckUtil.isInCheck(board, color_to_move)) {
+				
+				board.undoMove(move);
+				
+				continue;
+			}
 			
 			simulate(board, depth - 1, lists, info);
 			
