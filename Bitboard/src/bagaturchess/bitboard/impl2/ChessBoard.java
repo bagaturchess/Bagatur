@@ -18,13 +18,14 @@ import bagaturchess.bitboard.api.ISEE;
 import bagaturchess.bitboard.api.PawnsEvalCache;
 import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.common.Utils;
+import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.Fields;
-import bagaturchess.bitboard.impl.Figures;
 import bagaturchess.bitboard.impl.datastructs.StackLongInt;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl1.internal.CastlingConfig;
+import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 import bagaturchess.bitboard.impl1.internal.Zobrist;
 
 
@@ -84,6 +85,10 @@ public class ChessBoard implements IBitBoard {
 	private int[] buff_castling_rook_from_to = new int[2];
 	
 	private IMoveList hasMovesList = new BaseMoveList(333);
+	
+	private IMoveOps moveOps = new MoveOpsImpl();
+	
+	private boolean isFRC = true;
 	
 	
 	public ChessBoard() {
@@ -962,6 +967,51 @@ public class ChessBoard implements IBitBoard {
 	}
 	
 	
+	public void doNullMove() {
+
+		BoardState state_backup = states[played_moves_count];
+		state_backup.pinned_pieces = pinned_pieces;
+		state_backup.discovered_pieces = discovered_pieces;
+		state_backup.checking_pieces = checking_pieces;
+		state_backup.ep_index = ep_index;
+		state_backup.castling_rights = castling_rights;
+		state_backup.last_capture_or_pawn_move_before = last_capture_or_pawn_move_before;
+		state_backup.zobrist_key = zobrist_key;
+		played_moves[played_moves_count] = 0;
+		
+		played_moves_count++;
+
+		zobrist_key ^= Zobrist.sideToMove;
+		if (ep_index != 0) {
+			zobrist_key ^= Zobrist.epIndex[ep_index];
+			ep_index = 0;
+		}
+		
+		color_to_move = 1 - color_to_move;
+		
+		played_board_states.inc(zobrist_key);
+	}
+	
+	
+	public void undoNullMove() {
+		
+		played_board_states.dec(zobrist_key);
+		
+		played_moves_count--;
+		
+		BoardState state_backup = states[played_moves_count];
+		pinned_pieces = state_backup.pinned_pieces;
+		discovered_pieces = state_backup.discovered_pieces;
+		checking_pieces = state_backup.checking_pieces;
+		ep_index = state_backup.ep_index;
+		castling_rights = state_backup.castling_rights;
+		last_capture_or_pawn_move_before = state_backup.last_capture_or_pawn_move_before;
+		zobrist_key = state_backup.zobrist_key;
+
+		color_to_move = 1 - color_to_move;
+	}
+	
+	
 	public void setPinnedAndDiscoPieces() {
 
 		pinned_pieces = 0;
@@ -1299,14 +1349,14 @@ public class ChessBoard implements IBitBoard {
 
 	@Override
 	public void makeNullMoveForward() {
-		// TODO Auto-generated method stub
-		
+
+		doNullMove();
 	}
 
 	@Override
 	public void makeNullMoveBackward() {
-		// TODO Auto-generated method stub
-		
+
+		undoNullMove();
 	}
 
 	@Override
@@ -1329,8 +1379,8 @@ public class ChessBoard implements IBitBoard {
 	
 	@Override
 	public IMoveOps getMoveOps() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return moveOps;
 	}
 	
 	@Override
@@ -1371,7 +1421,7 @@ public class ChessBoard implements IBitBoard {
 	@Override
 	public boolean hasSufficientMatingMaterial() {
 
-		return hasSufficientMatingMaterial(Figures.COLOUR_WHITE) || hasSufficientMatingMaterial(Figures.COLOUR_BLACK);
+		return hasSufficientMatingMaterial(ChessConstants.WHITE) || hasSufficientMatingMaterial(ChessConstants.BLACK);
 	}
 
 	@Override
@@ -1751,5 +1801,173 @@ public class ChessBoard implements IBitBoard {
 	public IFieldsAttacks getFieldsAttacks() {
 
 		throw new UnsupportedOperationException();
+	}
+	
+	
+private class MoveOpsImpl implements IMoveOps {
+		
+		
+		private final int FILES[] = { 7, 6, 5, 4, 3, 2, 1, 0 };
+		private final int RANKS[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+		
+		
+		@Override
+		public final int getFigureType(int move) {
+			return MoveUtil.getSourcePieceIndex(move);
+		}
+		
+		
+		@Override
+		public final int getToFieldID(int move) {
+			return MoveUtil.getToIndex(move);
+		}
+		
+		@Override
+		public final boolean isCapture(int move) {
+			return MoveUtil.getAttackedPieceIndex(move) != 0;
+		}
+		
+		
+		@Override
+		public final boolean isPromotion(int move) {
+			return MoveUtil.isPromotion(move);
+		}
+		
+		
+		@Override
+		public final boolean isCaptureOrPromotion(int move) {
+			return isCapture(move) || isPromotion(move);
+		}
+
+		
+		@Override
+		public final boolean isEnpassant(int move) {
+			return MoveUtil.isEPMove(move);
+		}
+
+		
+		@Override
+		public final boolean isCastling(int move) {
+			return MoveUtil.isCastlingMove(move);
+		}
+		
+		
+		@Override
+		public final int getFigurePID(int move) {
+			
+			int pieceType = MoveUtil.getSourcePieceIndex(move);
+			int colour = color_to_move;
+			
+			if (colour == ChessConstants.WHITE) {
+				switch(pieceType) {
+					case ChessConstants.PAWN: return Constants.PID_W_PAWN;
+					case ChessConstants.KNIGHT: return Constants.PID_W_KNIGHT;
+					case ChessConstants.BISHOP: return Constants.PID_W_BISHOP;
+					case ChessConstants.ROOK: return Constants.PID_W_ROOK;
+					case ChessConstants.QUEEN: return Constants.PID_W_QUEEN;
+					case ChessConstants.KING: return Constants.PID_W_KING;
+				}
+			} else {
+				switch(pieceType) {
+					case ChessConstants.PAWN: return Constants.PID_B_PAWN;
+					case ChessConstants.KNIGHT: return Constants.PID_B_KNIGHT;
+					case ChessConstants.BISHOP: return Constants.PID_B_BISHOP;
+					case ChessConstants.ROOK: return Constants.PID_B_ROOK;
+					case ChessConstants.QUEEN: return Constants.PID_B_QUEEN;
+					case ChessConstants.KING: return Constants.PID_B_KING;
+				}
+			}
+			
+			throw new IllegalStateException("pieceType=" + pieceType);
+		}
+		
+		
+		@Override
+		public final boolean isCastlingKingSide(int move) {
+			if (isCastling(move)) {
+				int index = MoveUtil.getToIndex(move);
+				return index == CastlingConfig.G1 || index == CastlingConfig.G8;
+			}
+			
+			return false;
+		}
+		
+		
+		@Override
+		public final boolean isCastlingQueenSide(int move) {
+			
+			if (isCastling(move)) {
+				int index = MoveUtil.getToIndex(move);
+				return index == CastlingConfig.C1 || index == CastlingConfig.C8; 
+			}
+			
+			return false;
+		}
+		
+		
+		@Override
+		public final int getFromFieldID(int move) {
+			return MoveUtil.getFromIndex(move);
+		}
+		
+		
+		@Override
+		public final int getPromotionFigureType(int move) {
+			if (!isPromotion(move)) {
+				return 0;
+			}
+			return MoveUtil.getMoveType(move);
+		}
+		
+		
+		@Override
+		public final int getCapturedFigureType(int cur_move) {
+			return MoveUtil.getAttackedPieceIndex(cur_move);
+		}
+		
+		
+		@Override
+		public final String moveToString(int move) {
+			return (new MoveWrapper(move, isFRC, castling_config)).toString();
+		}
+		
+		
+		@Override
+		public final void moveToString(int move, StringBuilder text_buffer) {
+			(new MoveWrapper(move, isFRC, castling_config)).toString(text_buffer);
+		}
+		
+		
+		@Override
+		public final int stringToMove(String move) {
+			
+			throw new UnsupportedOperationException();
+			//MoveWrapper moveObj = new MoveWrapper(move, ChessBoard.this, isFRC);
+			//return moveObj.move;
+		}
+		
+		
+		@Override
+		public final int getToField_File(int move) {
+			return FILES[getToFieldID(move) & 7];
+		}
+		
+		
+		@Override
+		public final int getToField_Rank(int move) {
+			return RANKS[getToFieldID(move) >>> 3];
+		}
+		
+		
+		@Override
+		public final int getFromField_File(int move) {
+			return FILES[getFromFieldID(move) & 7];
+		}
+		
+		
+		@Override
+		public final int getFromField_Rank(int move) {
+			return RANKS[getFromFieldID(move) >>> 3];
+		}
 	}
 }
