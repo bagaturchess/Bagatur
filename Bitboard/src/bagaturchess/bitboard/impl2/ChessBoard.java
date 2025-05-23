@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import bagaturchess.bitboard.api.IBaseEval;
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.api.IBoard;
 import bagaturchess.bitboard.api.IBoardConfig;
 import bagaturchess.bitboard.api.IFieldsAttacks;
 import bagaturchess.bitboard.api.IGameStatus;
@@ -24,6 +25,7 @@ import bagaturchess.bitboard.impl.datastructs.StackLongInt;
 import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
+import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl1.internal.CastlingConfig;
 import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 import bagaturchess.bitboard.impl1.internal.Zobrist;
@@ -87,6 +89,12 @@ public class ChessBoard implements IBitBoard {
 	private IMoveList hasMovesList = new BaseMoveList(333);
 	
 	private IMoveOps moveOps = new MoveOpsImpl();
+	
+	private IMaterialFactor materialFactor = new MaterialFactorImpl();
+	
+	private IPiecesLists pieces = new PiecesListsImpl(this);
+	
+	private MoveListener[] move_listeners = new MoveListener[0];
 	
 	private boolean isFRC = true;
 	
@@ -1338,13 +1346,50 @@ public class ChessBoard implements IBitBoard {
 	@Override
 	public void makeMoveForward(int move) {
 
+		if (move == 0) {
+			
+			return;
+		}
+		
+		if (move_listeners.length > 0) {
+			
+			for (int i=0; i<move_listeners.length; i++) {
+				
+				move_listeners[i].preForwardMove(color_to_move, move);
+			}
+		}
+		
 		doMove(move);
+		
+		if (move_listeners.length > 0) {
+			
+			for (int i=0; i<move_listeners.length; i++) {
+				
+				move_listeners[i].postForwardMove(1 - color_to_move, move);
+			}
+		}
 	}
 
 	@Override
 	public void makeMoveBackward(int move) {
 
+		if (move_listeners.length > 0) {
+			
+			for (int i=0; i<move_listeners.length; i++) {
+				
+				move_listeners[i].preBackwardMove(1 - color_to_move, move);
+			}
+		}
+		
 		undoMove(move);
+		
+		if (move_listeners.length > 0) {
+			
+			for (int i=0; i<move_listeners.length; i++) {
+				
+				move_listeners[i].postBackwardMove(color_to_move, move);
+			}
+		}
 	}
 
 	@Override
@@ -1536,6 +1581,42 @@ public class ChessBoard implements IBitBoard {
 	}
 	
 	@Override
+	public void revert() {
+		
+		for(int i = played_moves_count - 1; i >= 0; i--) {
+			
+			int move = played_moves[i];
+			
+			if (move == 0) {
+				
+				makeNullMoveBackward();
+				
+			} else {
+				
+				makeMoveBackward(move);
+			}
+		}
+	}
+	
+	@Override
+	public IMaterialFactor getMaterialFactor() {
+
+		return materialFactor;
+	}
+	
+	@Override
+	public IBaseEval getBaseEvaluation() {
+
+		return null;
+	}
+	
+	@Override
+	public IPiecesLists getPiecesLists() {
+
+		return pieces;
+	}
+	
+	@Override
 	public void makeMoveForward(String ucimove) {
 
 		throw new UnsupportedOperationException();
@@ -1584,12 +1665,6 @@ public class ChessBoard implements IBitBoard {
 	}
 
 	@Override
-	public IPiecesLists getPiecesLists() {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public int genNonCaptureNonPromotionMoves(IInternalMoveList list) {
 
 		throw new UnsupportedOperationException();
@@ -1607,8 +1682,6 @@ public class ChessBoard implements IBitBoard {
 
 		throw new UnsupportedOperationException();
 	}
-
-
 
 	@Override
 	public long getHashKeyAfterMove(int move) {
@@ -1671,25 +1744,7 @@ public class ChessBoard implements IBitBoard {
 	}
 
 	@Override
-	public void revert() {
-		
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public IMaterialState getMaterialState() {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public IMaterialFactor getMaterialFactor() {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public IBaseEval getBaseEvaluation() {
 
 		throw new UnsupportedOperationException();
 	}
@@ -1744,8 +1799,17 @@ public class ChessBoard implements IBitBoard {
 
 	@Override
 	public void addMoveListener(MoveListener listener) {
-
-		throw new UnsupportedOperationException();
+		MoveListener[] oldMoveListeners = move_listeners;
+		MoveListener[] newMoveListeners = new MoveListener[move_listeners.length + 1];
+		if (oldMoveListeners.length > 0) {
+			for (int i=0; i<oldMoveListeners.length; i++) {
+				newMoveListeners[i] = oldMoveListeners[i];
+			}
+		}
+		
+		newMoveListeners[oldMoveListeners.length] = listener;
+		
+		move_listeners = newMoveListeners;
 	}
 
 	@Override
@@ -1788,7 +1852,7 @@ public class ChessBoard implements IBitBoard {
 	public void setAttacksSupport(boolean attacksSupport,
 			boolean fieldsStateSupport) {
 		
-		throw new UnsupportedOperationException();
+		//throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -1968,6 +2032,149 @@ private class MoveOpsImpl implements IMoveOps {
 		@Override
 		public final int getFromField_Rank(int move) {
 			return RANKS[getFromFieldID(move) >>> 3];
+		}
+	}
+
+
+	private static class MaterialFactorImpl implements IMaterialFactor {
+		
+		
+		private static final int TOTAL_FACTOR_MAX = 2 * 9 + 4 * 5 + 4 * 3 + 4 * 3; 
+		//public static final int[] PHASE 					= {0, 0, 3, 3, 5, 9};
+		
+		
+		public MaterialFactorImpl() {
+		}
+		
+		
+		@Override
+		public int getBlackFactor() {
+			return 31;
+		}
+		
+		
+		@Override
+		public int getWhiteFactor() {
+			return 31;
+		}
+		
+		
+		@Override
+		public int getTotalFactor() {
+			
+			return getWhiteFactor() + getBlackFactor();
+		}
+		
+		
+		@Override
+		public double getOpenningPart() {
+			if (getTotalFactor() < 0) {
+				throw new IllegalStateException();
+			}
+			return Math.min(1, getTotalFactor() / (double) TOTAL_FACTOR_MAX);
+		}
+		
+		
+		@Override
+		public int interpolateByFactor(int val_o, int val_e) {
+			double openningPart = getOpenningPart();
+			int result = (int) (val_o * openningPart + (val_e * (1 - openningPart)));
+			return result;
+		}
+		
+		
+		@Override
+		public int interpolateByFactor(double val_o, double val_e) {
+			double openningPart = getOpenningPart();
+			double result = (val_o * openningPart + (val_e * (1 - openningPart)));
+			return (int) result;
+		}
+	
+	
+		@Override
+		public void addPiece_Special(int pid, int fieldID) {
+			// TODO Auto-generated method stub
+			
+		}
+	
+	
+		@Override
+		public void preForwardMove(int color, int move) {
+			// TODO Auto-generated method stub
+			
+		}
+	
+	
+		@Override
+		public void postForwardMove(int color, int move) {
+			// TODO Auto-generated method stub
+			
+		}
+	
+	
+		@Override
+		public void preBackwardMove(int color, int move) {
+			// TODO Auto-generated method stub
+			
+		}
+	
+	
+		@Override
+		public void postBackwardMove(int color, int move) {
+			// TODO Auto-generated method stub
+			
+		}
+	
+	
+		@Override
+		public void initially_addPiece(int color, int type, long bb_pieces) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+	
+	
+	private static class PiecesListsImpl implements IPiecesLists {
+		
+		
+		private PiecesList list;
+		
+		
+		PiecesListsImpl(IBoard board) {
+			list = new PiecesList(board, 8);
+			list.add(16);
+			list.add(32);
+		}
+		
+		
+		@Override
+		public PiecesList getPieces(int pid) {
+			return list;
+		}
+		
+		
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IPiecesLists#rem(int, int)
+		 */
+		@Override
+		public void rem(int pid, int fieldID) {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IPiecesLists#add(int, int)
+		 */
+		@Override
+		public void add(int pid, int fieldID) {
+			throw new UnsupportedOperationException();
+		}
+
+		/* (non-Javadoc)
+		 * @see bagaturchess.bitboard.api.IPiecesLists#move(int, int, int)
+		 */
+		@Override
+		public void move(int pid, int fromFieldID, int toFieldID) {
+			throw new UnsupportedOperationException();
 		}
 	}
 }
