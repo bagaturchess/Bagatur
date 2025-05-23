@@ -3,12 +3,27 @@ package bagaturchess.bitboard.impl2;
 
 import java.util.Arrays;
 
+import bagaturchess.bitboard.api.IBaseEval;
+import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.api.IBoardConfig;
+import bagaturchess.bitboard.api.IFieldsAttacks;
+import bagaturchess.bitboard.api.IGameStatus;
+import bagaturchess.bitboard.api.IInternalMoveList;
+import bagaturchess.bitboard.api.IMaterialFactor;
+import bagaturchess.bitboard.api.IMaterialState;
+import bagaturchess.bitboard.api.IMoveOps;
+import bagaturchess.bitboard.api.IPiecesLists;
+import bagaturchess.bitboard.api.IPlayerAttacks;
+import bagaturchess.bitboard.api.ISEE;
+import bagaturchess.bitboard.api.PawnsEvalCache;
+import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.impl.datastructs.StackLongInt;
+import bagaturchess.bitboard.impl.eval.pawns.model.PawnsModelEval;
 import bagaturchess.bitboard.impl1.internal.CastlingConfig;
 import bagaturchess.bitboard.impl1.internal.Zobrist;
 
 
-public class ChessBoard {
+public class ChessBoard implements IBitBoard {
 
 	/**
 	 * Bitboards
@@ -1228,4 +1243,423 @@ public class ChessBoard {
     	
     	public long zobrist_key;
     }
+    
+    
+	@Override
+	public int getColourToMove() {
+		
+		return color_to_move;
+	}
+
+	@Override
+	public int genAllMoves(IInternalMoveList list) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int genKingEscapes(IInternalMoveList list) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int genCapturePromotionMoves(IInternalMoveList list) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
+	public void makeMoveForward(int move) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void makeMoveForward(String ucimove) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void makeMoveBackward(int move) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void makeNullMoveForward() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void makeNullMoveBackward() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public long getHashKey() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
+	public int getStateRepetition() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
+	public String toEPD() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public IMoveOps getMoveOps() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public int getPlayedMovesCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int[] getPlayedMoves() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLastMove() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
+	public boolean isDraw50movesRule() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public int getDraw50movesRule() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean hasSufficientMatingMaterial() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean hasSufficientMatingMaterial(int color) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isInCheck() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isInCheck(int colour) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean hasMoveInCheck() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean hasMoveInNonCheck() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isCheckMove(int move) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isPossible(int move) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean hasSingleMove() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public CastlingConfig getCastlingConfig() {
+		
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public int[] getMatrix() {
+		
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public PawnsEvalCache getPawnsCache() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setPawnsCache(PawnsEvalCache pawnsCache) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public PawnsModelEval getPawnsStructure() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public IBoardConfig getBoardConfig() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public IPiecesLists getPiecesLists() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int genNonCaptureNonPromotionMoves(IInternalMoveList list) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int genAllMoves_ByFigureID(int fieldID, long excludedToFields,
+			IInternalMoveList list) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getEnpassantSquareID() {
+
+		throw new UnsupportedOperationException();
+	}
+
+
+
+	@Override
+	public long getHashKeyAfterMove(int move) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public long getPawnsHashKey() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getFigureID(int fieldID) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getFigureType(int fieldID) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getFigureColour(int fieldID) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public ISEE getSee() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getSEEScore(int move) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getSEEFieldScore(int squareID) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void mark() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void reset() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void revert() {
+		
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public IMaterialState getMaterialState() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public IMaterialFactor getMaterialFactor() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public IBaseEval getBaseEvaluation() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean isPasserPush(int move) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getUnstoppablePasser() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public CastlingType getCastlingType(int colour) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public CastlingPair getCastlingPair() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean hasRightsToKingCastle(int colour) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean hasRightsToQueenCastle(int colour) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public IGameStatus getStatus() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Object getNNUEInputs() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void addMoveListener(MoveListener listener) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public long getFreeBitboard() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public long getFiguresBitboardByPID(int pid) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public long getFiguresBitboardByColourAndType(int colour, int type) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public long getFiguresBitboardByColour(int colour) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean getAttacksSupport() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean getFieldsStateSupport() {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setAttacksSupport(boolean attacksSupport,
+			boolean fieldsStateSupport) {
+		
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public IPlayerAttacks getPlayerAttacks(int colour) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public IFieldsAttacks getFieldsAttacks() {
+
+		throw new UnsupportedOperationException();
+	}
 }
