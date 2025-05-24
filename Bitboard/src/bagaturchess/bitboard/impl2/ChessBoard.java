@@ -1354,6 +1354,14 @@ public class ChessBoard implements IBitBoard {
 	}
 	
 	@Override
+	public int genNonCaptureNonPromotionMoves(IInternalMoveList list) {
+
+		MoveGeneration.generateMoves(this, list);
+		
+		return list.reserved_getCurrentSize();
+	}
+	
+	@Override
 	public void makeMoveForward(int move) {
 		
 		if (move_listeners.length > 0) {
@@ -1718,12 +1726,6 @@ public class ChessBoard implements IBitBoard {
 
 	@Override
 	public IBoardConfig getBoardConfig() {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int genNonCaptureNonPromotionMoves(IInternalMoveList list) {
 
 		throw new UnsupportedOperationException();
 	}
