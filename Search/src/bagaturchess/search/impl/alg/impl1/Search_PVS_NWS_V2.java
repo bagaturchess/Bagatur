@@ -98,6 +98,9 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 	
 	private BacktrackingInfo[] search_info 							= new BacktrackingInfo[MAX_DEPTH + 1];
 	
+	private IMoveList[] lists_moves 								= new IMoveList[MAX_DEPTH + 1];
+	private IMoveList[] lists_attacks 								= new IMoveList[MAX_DEPTH + 1];
+	
 	
 	public Search_PVS_NWS_V2(Object[] args) {
 		
@@ -119,6 +122,16 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 		for (int i=0; i<search_info.length; i++) {
 			
 			search_info[i] = new BacktrackingInfo(); 
+		}
+		
+		for (int i = 0; i < lists_moves.length; i++) {
+			
+			lists_moves[i] = new SortedMoveList_History(333, env);
+		}
+	
+		for (int i = 0; i < lists_attacks.length; i++) {
+			
+			lists_attacks[i] = new SortedMoveList_MVVLVA(333, env);
 		}
 	}
 	
@@ -832,8 +845,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 		int movesPerformed_attacks = 0;
 		int movesPerformed_quiet = 0;
 		
-		IMoveList list1 = new SortedMoveList_History(333, env);
-		IMoveList list2 = new SortedMoveList_MVVLVA(333, env);
+		IMoveList list1 = lists_moves[ply];
+		IMoveList list2 = lists_attacks[ply];
 		IMoveList list = null;
 		
 		int phase = PHASE_TT;
@@ -1237,8 +1250,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 		
 		int all_moves = 0;
 		
-		IMoveList list1 = new SortedMoveList_History(333, env);
-		IMoveList list2 = new SortedMoveList_MVVLVA(333, env);
+		IMoveList list1 = lists_moves[ply];
+		IMoveList list2 = lists_attacks[ply];
 		IMoveList list = null;
 		
 		int phase = PHASE_TT;
@@ -1615,7 +1628,7 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
 		
-		IMoveList list = new SortedMoveList_MVVLVA(333, env);
+		IMoveList list = lists_attacks[ply];
 		
 		int phase = PHASE_ATTACKING_GOOD;
 		
