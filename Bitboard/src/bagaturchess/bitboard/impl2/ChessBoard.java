@@ -78,6 +78,7 @@ public class ChessBoard implements IBitBoard {
 	public long zobrist_key;
 	
 	public int played_moves_count;
+	public int moves_count;
 	
 	private BoardState[] states = new BoardState[2048];
 	
@@ -97,7 +98,7 @@ public class ChessBoard implements IBitBoard {
 	
 	private IMaterialState material_state = new MaterialStateImpl();
 	
-	private boolean isFRC = true;
+	private boolean isFRC = false;
 	
 	
 	public ChessBoard() {
@@ -387,7 +388,7 @@ public class ChessBoard implements IBitBoard {
 		}
 		
 		
-		BoardState state_backup = states[played_moves_count];
+		BoardState state_backup = states[moves_count];
 		state_backup.pinned_pieces = pinned_pieces;
 		state_backup.discovered_pieces = discovered_pieces;
 		state_backup.checking_pieces = checking_pieces;
@@ -395,8 +396,9 @@ public class ChessBoard implements IBitBoard {
 		state_backup.castling_rights = castling_rights;
 		state_backup.last_capture_or_pawn_move_before = last_capture_or_pawn_move_before;
 		state_backup.zobrist_key = zobrist_key;
-		played_moves[played_moves_count] = move;
+		played_moves[moves_count] = move;
 		
+		moves_count++;
 		played_moves_count++;
 		
 		
@@ -557,7 +559,7 @@ public class ChessBoard implements IBitBoard {
 	private void doCastling960(int move) {
 		
 		
-		BoardState state_backup = states[played_moves_count];
+		BoardState state_backup = states[moves_count];
 		state_backup.pinned_pieces = pinned_pieces;
 		state_backup.discovered_pieces = discovered_pieces;
 		state_backup.checking_pieces = checking_pieces;
@@ -565,8 +567,9 @@ public class ChessBoard implements IBitBoard {
 		state_backup.castling_rights = castling_rights;
 		state_backup.last_capture_or_pawn_move_before = last_capture_or_pawn_move_before;
 		state_backup.zobrist_key = zobrist_key;
-		played_moves[played_moves_count] = move;
+		played_moves[moves_count] = move;
 		
+		moves_count++;
 		played_moves_count++;
 		
 		
@@ -739,8 +742,9 @@ public class ChessBoard implements IBitBoard {
 		
 		
 		played_moves_count--;
+		moves_count--;
 		
-		BoardState state_backup = states[played_moves_count];
+		BoardState state_backup = states[moves_count];
 		pinned_pieces = state_backup.pinned_pieces;
 		discovered_pieces = state_backup.discovered_pieces;
 		checking_pieces = state_backup.checking_pieces;
@@ -839,8 +843,9 @@ public class ChessBoard implements IBitBoard {
 		
 		
 		played_moves_count--;
+		moves_count--;
 		
-		BoardState state_backup = states[played_moves_count];
+		BoardState state_backup = states[moves_count];
 		pinned_pieces = state_backup.pinned_pieces;
 		discovered_pieces = state_backup.discovered_pieces;
 		checking_pieces = state_backup.checking_pieces;
@@ -978,7 +983,7 @@ public class ChessBoard implements IBitBoard {
 	
 	public void doNullMove() {
 
-		BoardState state_backup = states[played_moves_count];
+		BoardState state_backup = states[moves_count];
 		state_backup.pinned_pieces = pinned_pieces;
 		state_backup.discovered_pieces = discovered_pieces;
 		state_backup.checking_pieces = checking_pieces;
@@ -986,8 +991,9 @@ public class ChessBoard implements IBitBoard {
 		state_backup.castling_rights = castling_rights;
 		state_backup.last_capture_or_pawn_move_before = last_capture_or_pawn_move_before;
 		state_backup.zobrist_key = zobrist_key;
-		played_moves[played_moves_count] = 0;
+		played_moves[moves_count] = 0;
 		
+		moves_count++;
 		played_moves_count++;
 
 		zobrist_key ^= Zobrist.sideToMove;
@@ -1007,8 +1013,9 @@ public class ChessBoard implements IBitBoard {
 		played_board_states.dec(zobrist_key);
 		
 		played_moves_count--;
+		moves_count--;
 		
-		BoardState state_backup = states[played_moves_count];
+		BoardState state_backup = states[moves_count];
 		pinned_pieces = state_backup.pinned_pieces;
 		discovered_pieces = state_backup.discovered_pieces;
 		checking_pieces = state_backup.checking_pieces;
@@ -1255,6 +1262,7 @@ public class ChessBoard implements IBitBoard {
                 castling_rights == that.castling_rights &&
                 last_capture_or_pawn_move_before == that.last_capture_or_pawn_move_before &&
                 played_moves_count == that.played_moves_count &&
+                moves_count == that.moves_count &&
                 zobrist_key == that.zobrist_key &&
                 Arrays.equals(piece_indexes, that.piece_indexes)
                 ;
@@ -1293,6 +1301,7 @@ public class ChessBoard implements IBitBoard {
         clone.castling_rights = this.castling_rights;
         clone.last_capture_or_pawn_move_before = this.last_capture_or_pawn_move_before;
         clone.played_moves_count = this.played_moves_count;
+        clone.moves_count = this.moves_count;
         clone.zobrist_key = this.zobrist_key;
 
         clone.piece_indexes = this.piece_indexes.clone();
@@ -1346,11 +1355,6 @@ public class ChessBoard implements IBitBoard {
 	
 	@Override
 	public void makeMoveForward(int move) {
-
-		if (move == 0) {
-			
-			return;
-		}
 		
 		if (move_listeners.length > 0) {
 			
@@ -1373,11 +1377,6 @@ public class ChessBoard implements IBitBoard {
 
 	@Override
 	public void makeMoveBackward(int move) {
-
-		if (move == 0) {
-			
-			return;
-		}
 		
 		if (move_listeners.length > 0) {
 			
@@ -1437,7 +1436,7 @@ public class ChessBoard implements IBitBoard {
 	@Override
 	public int getPlayedMovesCount() {
 		
-		return played_moves_count;
+		return moves_count;
 	}
 
 	@Override
@@ -1449,12 +1448,12 @@ public class ChessBoard implements IBitBoard {
 	@Override
 	public int getLastMove() {
 		
-		if (played_moves_count == 0) {
+		if (moves_count == 0) {
 			
 			return 0;
 		}
 		
-		return played_moves[played_moves_count - 1];
+		return played_moves[moves_count - 1];
 	}
 	
 	@Override
@@ -1589,7 +1588,7 @@ public class ChessBoard implements IBitBoard {
 	@Override
 	public void revert() {
 		
-		for(int i = played_moves_count - 1; i >= 0; i--) {
+		for(int i = moves_count - 1; i >= 0; i--) {
 			
 			int move = played_moves[i];
 			
@@ -1662,7 +1661,7 @@ public class ChessBoard implements IBitBoard {
 		
 		String moves_str = "";
 		int[] moves = played_moves;
-		for (int i = 0; i < played_moves_count; i++) {
+		for (int i = 0; i < moves_count; i++) {
 			moves_str += moveOps.moveToString(moves[i]) + " ";
 		}
 		
@@ -1848,6 +1847,12 @@ public class ChessBoard implements IBitBoard {
 	}
 	
 	@Override
+	public long getFiguresBitboardByColour(int color) {
+
+		return color == ChessConstants.WHITE ? w_all : b_all;
+	}
+	
+	@Override
 	public long getFreeBitboard() {
 
 		throw new UnsupportedOperationException();
@@ -1855,12 +1860,6 @@ public class ChessBoard implements IBitBoard {
 
 	@Override
 	public long getFiguresBitboardByPID(int pid) {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public long getFiguresBitboardByColour(int colour) {
 
 		throw new UnsupportedOperationException();
 	}

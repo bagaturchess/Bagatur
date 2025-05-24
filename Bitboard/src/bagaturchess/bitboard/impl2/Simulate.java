@@ -53,7 +53,9 @@ public class Simulate {
 	
 	public static void main(String[] args) {
 
-		ChessBoard board = ChessBoardBuilder.getNewCB(Constants.INITIAL_BOARD);
+		//ChessBoard board = ChessBoardBuilder.getNewCB(Constants.INITIAL_BOARD);
+		//ChessBoard board = ChessBoardBuilder.getNewCB("r1b1kb1r/pp1n1pp1/1qn1p2p/2ppP3/3P1P2/2N1BN2/PPPQ2PP/R3KB1R w - - 2 9");
+		ChessBoard board = ChessBoardBuilder.getNewCB("rnq1k2r/2ppbppp/2b1p3/p7/3Pn3/PPN2NP1/1B2PPBP/R2QR1K1 b kq - 6 12");
 		
 		ChessBoard board_copy = board.clone();
 		
@@ -68,7 +70,7 @@ public class Simulate {
 		
 		long start_time = System.currentTimeMillis();
 		
-		simulate(board, 8, lists, info);
+		simulate(board, 1, lists, info);
 		
 		System.out.println("Leafs: " + info.leafs);
 		if (System.currentTimeMillis() - start_time > 1000) {
@@ -110,13 +112,23 @@ public class Simulate {
 				continue;
 			}*/
 			
+			if (board.getMoveOps().moveToString(move).equals("e8h8")) {
+				board.getMoveOps().moveToString(move);
+				System.out.println("e8h8");
+			}
+					
+			
 			int color_to_move = board.color_to_move;
 			
 			if (!board.isValidMove(move)) {
 				
+				//System.out.println(board.getMoveOps().moveToString(move));
+				
 				//throw new IllegalStateException(ChessBoardBuilder.toString(board, true) + "	" + (new MoveWrapper(move, true, board.castling_config)).toString());
 				continue;
 			}
+			
+			//System.out.println(board.getMoveOps().moveToString(move));
 			
 			board.doMove(move);
 			
