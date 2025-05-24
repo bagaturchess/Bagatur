@@ -1637,6 +1637,7 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 			
 				case PHASE_ATTACKING_GOOD:
 					
+					list.clear();
 					cb.genCapturePromotionMoves(list);
 					
 					break;

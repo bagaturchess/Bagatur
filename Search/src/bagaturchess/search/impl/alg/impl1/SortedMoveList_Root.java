@@ -131,20 +131,23 @@ public class SortedMoveList_Root implements IMoveList {
 		return ordval;
 	}
 	
-    private int findInsertIndex(long value) {
-        int low = 0, high = count;
+	private int findInsertIndex(long value) {
+	    int low = 0, high = count;
+	    long orderValue = value >>> 32;
 
-        while (low < high) {
-            int mid = (low + high) >>> 1;
-            if (moves[mid] > value) {
-                low = mid + 1;
-            } else {
-                high = mid;
-            }
-        }
+	    while (low < high) {
+	        int mid = (low + high) >>> 1;
+	        long midOrderValue = moves[mid] >>> 32;
 
-        return low;
-    }
+	        if (midOrderValue > orderValue) {
+	            low = mid + 1;
+	        } else {
+	            high = mid;
+	        }
+	    }
+
+	    return low;
+	}
     
 	public final void reserved_removeLast() {
 		count--;
@@ -177,6 +180,7 @@ public class SortedMoveList_Root implements IMoveList {
 	}
 	
 	private static long addOrderingValue(int move, long ord_val) {
+		
 		return (ord_val << 32) | move;
 	}
 }
