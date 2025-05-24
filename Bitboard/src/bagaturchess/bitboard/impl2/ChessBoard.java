@@ -2064,7 +2064,7 @@ private class MoveOpsImpl implements IMoveOps {
 	}
 
 
-	private static class MaterialFactorImpl implements IMaterialFactor {
+	private class MaterialFactorImpl implements IMaterialFactor {
 		
 		
 		private static final int TOTAL_FACTOR_MAX = 2 * 9 + 4 * 5 + 4 * 3 + 4 * 3; 
@@ -2077,20 +2077,26 @@ private class MoveOpsImpl implements IMoveOps {
 		
 		@Override
 		public int getBlackFactor() {
-			return 31;
+			
+			return 9 * Long.bitCount(b_queens)
+					+ 5 * Long.bitCount(b_rooks)
+					+ 3 * Long.bitCount(b_knights | b_bishops);
 		}
 		
 		
 		@Override
 		public int getWhiteFactor() {
-			return 31;
+
+			return 9 * Long.bitCount(w_queens)
+					+ 5 * Long.bitCount(w_rooks)
+					+ 3 * Long.bitCount(w_knights | w_bishops);
 		}
 		
 		
 		@Override
 		public int getTotalFactor() {
 			
-			return getWhiteFactor() + getBlackFactor();
+			return Math.min(TOTAL_FACTOR_MAX, getWhiteFactor() + getBlackFactor());
 		}
 		
 		
