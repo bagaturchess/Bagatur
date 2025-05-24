@@ -242,6 +242,11 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 		int move;
 		while ((move = list.next()) != 0) {
 			
+			if (!env.getBitboard().isPossible(move)) {
+				
+				continue;
+			}
+			
 			//Build and sent minor info
 			info.setCurrentMove(move);
 			info.setCurrentMoveNumber((movesPerformed_attacks + movesPerformed_quiet + 1));
@@ -947,6 +952,11 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 			int move;
 			while (list != null && (move = list.next()) != 0) {
 				
+				if (!env.getBitboard().isPossible(move)) {
+					
+					continue;
+				}
+				
 				if (phase == PHASE_ATTACKING_GOOD) {
 					if (env.getBitboard().getSEEScore(move) < 0) {
 						continue;
@@ -1358,6 +1368,11 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 					continue;
 				}
 				
+				if (!env.getBitboard().isPossible(move)) {
+					
+					continue;
+				}
+				
 				if (phase == PHASE_ATTACKING_GOOD) {
 					if (env.getBitboard().getSEEScore(move) < 0) {
 						continue;
@@ -1646,6 +1661,11 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 			
 			int move;
 			while ((move = list.next()) != 0) {
+				
+				if (!env.getBitboard().isPossible(move)) {
+					
+					continue;
+				}
 				
 				int see = env.getBitboard().getSEEScore(move);
 				
