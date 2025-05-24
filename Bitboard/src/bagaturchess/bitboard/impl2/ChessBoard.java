@@ -27,7 +27,6 @@ import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.state.PiecesList;
 import bagaturchess.bitboard.impl1.internal.CastlingConfig;
-import bagaturchess.bitboard.impl1.internal.MoveWrapper;
 import bagaturchess.bitboard.impl1.internal.Zobrist;
 
 
@@ -1067,7 +1066,7 @@ public class ChessBoard implements IBitBoard {
 		if ((getPiecesOfSideToMove(MoveUtil.getSourcePieceIndex(move)) & fromSquare) == 0) {
 			return false;
 		}
-
+		
 		// check piece at to square
 		final int toIndex = MoveUtil.getToIndex(move);
 		final long toSquare = ChessConstants.POWER_LOOKUP[toIndex];
@@ -1375,6 +1374,11 @@ public class ChessBoard implements IBitBoard {
 	@Override
 	public void makeMoveBackward(int move) {
 
+		if (move == 0) {
+			
+			return;
+		}
+		
 		if (move_listeners.length > 0) {
 			
 			for (int i=0; i<move_listeners.length; i++) {
@@ -1625,6 +1629,47 @@ public class ChessBoard implements IBitBoard {
 	}
 	
 	@Override
+	public boolean hasSingleMove() {
+		
+		hasMovesList.clear();
+		
+		genAllMoves(hasMovesList);
+		
+		return hasMovesList.reserved_getCurrentSize() == 1;
+	}
+	
+	@Override
+	public boolean hasRightsToKingCastle(int colour) {
+		if (colour == WHITE) {
+			return (castling_rights & 8) != 0;
+		} else {
+			return (castling_rights & 2) != 0;
+		}
+	}
+	
+	
+	@Override
+	public boolean hasRightsToQueenCastle(int colour) {
+		if (colour == WHITE) {
+			return (castling_rights & 4) != 0;
+		} else {
+			return (castling_rights & 1) != 0;
+		}
+	}
+	
+	@Override
+	public String toString() {
+		
+		String moves_str = "";
+		int[] moves = played_moves;
+		for (int i = 0; i < played_moves_count; i++) {
+			moves_str += moveOps.moveToString(moves[i]) + " ";
+		}
+		
+		return ChessBoardBuilder.toString(this, true) + " moves " + moves_str;
+	}
+	
+	@Override
 	public int getSEEScore(int move) {
 
 		return SEEUtil.getSeeCaptureScore(this, move);
@@ -1632,19 +1677,19 @@ public class ChessBoard implements IBitBoard {
 	
 	@Override
 	public void makeMoveForward(String ucimove) {
+		MoveWrapper move = new MoveWrapper(ucimove, this, isFRC);
+		makeMoveForward(move.move);
+	}
+	
+	@Override
+	public int getEnpassantSquareID() {
 
-		throw new UnsupportedOperationException();
+		return ep_index;
 	}
 	
 	@Override
 	public boolean isCheckMove(int move) {
 
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public boolean hasSingleMove() {
-		
 		throw new UnsupportedOperationException();
 	}
 	
@@ -1687,12 +1732,6 @@ public class ChessBoard implements IBitBoard {
 	@Override
 	public int genAllMoves_ByFigureID(int fieldID, long excludedToFields,
 			IInternalMoveList list) {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getEnpassantSquareID() {
 
 		throw new UnsupportedOperationException();
 	}
@@ -1771,18 +1810,6 @@ public class ChessBoard implements IBitBoard {
 
 	@Override
 	public CastlingPair getCastlingPair() {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean hasRightsToKingCastle(int colour) {
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean hasRightsToQueenCastle(int colour) {
 
 		throw new UnsupportedOperationException();
 	}
