@@ -229,16 +229,6 @@ public class BoardImpl implements IBitBoard {
 			if (!isPossible(cur_move)) {
 				continue;
 			}
-			/*int type = getMoveOps().getCapturedFigureType(cur_move);
-			if (type == Figures.TYPE_KING) {
-				continue;
-			}
-			makeMoveForward(cur_move);
-			if (isInCheck(chessBoard.colorToMoveInverse)) {
-				makeMoveBackward(cur_move);
-				continue;
-			}
-			makeMoveBackward(cur_move);*/
 			list.reserved_add(cur_move);
 			counter++;
 		}
@@ -257,9 +247,33 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int genCapturePromotionMoves(IInternalMoveList list) {
+		
 		generator.startPly();
 		
 		generator.generateAttacks(chessBoard);
+		
+		int counter = 0;
+		while (generator.hasNext()) {
+			int cur_move = generator.next();
+			if (!isPossible(cur_move)) {
+				continue;
+			}
+			list.reserved_add(cur_move);
+			counter++;
+		}
+		
+		generator.endPly();
+		
+		return counter;
+	}
+	
+	
+	@Override
+	public int genNonCaptureNonPromotionMoves(IInternalMoveList list) {
+		
+		generator.startPly();
+		
+		generator.generateMoves(chessBoard);
 		
 		int counter = 0;
 		while (generator.hasNext()) {
@@ -872,14 +886,6 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public PawnsModelEval getPawnsStructure() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see bagaturchess.bitboard.api.IBoard#genNonCaptureNonPromotionMoves(bagaturchess.bitboard.api.IInternalMoveList)
-	 */
-	@Override
-	public int genNonCaptureNonPromotionMoves(IInternalMoveList list) {
 		throw new UnsupportedOperationException();
 	}
 

@@ -58,7 +58,7 @@ public class MoveWrapper {
 				
 				isCastling = true;
 				
-				if (isFRC) {
+				/*if (isFRC) {
 					
 					if (toIndex == CastlingConfig.G1) {
 						
@@ -85,7 +85,7 @@ public class MoveWrapper {
 					toRank = toIndex / 8 + 1;
 					
 					this.move = MoveUtil.createCastlingMove(fromIndex, toIndex);
-				}
+				}*/
 				
 				break;
 				
