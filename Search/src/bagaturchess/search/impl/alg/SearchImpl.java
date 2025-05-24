@@ -25,7 +25,6 @@ package bagaturchess.search.impl.alg;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
-import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.IRootWindow;
@@ -227,18 +226,17 @@ public abstract class SearchImpl implements ISearch {
 	}
 	
 	
-	protected long getHashkeyTPT(ChessBoard cb) {
+	protected long getHashkeyTPT() {
 		
 		long hashkey;
 		
 		if (useTPTKeyWithMoveCounter()) {
 			
-			//hashkey = cb.zobristKey ^ getEnv().getBitboard().getPlayedMovesCount();
-			hashkey = cb.zobristKey ^ ((long) getEnv().getBitboard().getPlayedMovesCount());
+			hashkey = env.getBitboard().getHashKey() ^ ((long) getEnv().getBitboard().getPlayedMovesCount());
 			
 		} else {
 			
-			hashkey = cb.zobristKey;
+			hashkey = env.getBitboard().getHashKey();
 		}
 		
 		return hashkey;

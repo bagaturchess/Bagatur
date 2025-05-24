@@ -27,6 +27,7 @@ import java.util.EmptyStackException;
 import java.util.Stack;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl1.BoardImpl;
 import bagaturchess.bitboard.impl1.internal.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.MaterialUtil;
@@ -165,12 +166,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
-		MoveGenerator moveGen = ((BoardImpl) env.getBitboard()).getMoveGenerator();
-		
-		moveGen.setRootSearchFirstMoveIndex(root_search_first_move_index);
-		
 		return root_search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				moveGen, 0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true, SearchUtils.normDepth(initial_maxdepth));
+				0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true, SearchUtils.normDepth(initial_maxdepth));
 	}
 	
 	
@@ -181,17 +178,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
 		
-		MoveGenerator moveGen = ((BoardImpl) env.getBitboard()).getMoveGenerator();
-		
-		moveGen.setRootSearchFirstMoveIndex(root_search_first_move_index);
-		
 		return root_search(mediator, info, pvman, env.getEval(), ((BoardImpl) env.getBitboard()).getChessBoard(),
-				moveGen, 0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, SearchUtils.normDepth(initial_maxdepth));		
+				0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, SearchUtils.normDepth(initial_maxdepth));		
 	}
 	
 	
 	private int root_search(ISearchMediator mediator, ISearchInfo info,
-			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
+			PVManager pvman, IEvaluator evaluator, ChessBoard cb,
 			final int ply, int depth, int alpha, int beta, boolean isPv, int initialMaxDepth) {
 		
 		
@@ -211,7 +204,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.leaf = true;
 		
 		
-		long hashkey = getHashkeyTPT(cb);
+		long hashkey = getHashkeyTPT();
 		
 		
 		int ttMove = 0;
@@ -235,23 +228,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		int movesPerformed_quiet = 0;
 		
 		
-		moveGen.startPly();
+		SortedMoveList_Root list = new SortedMoveList_Root(333, env);
+		list.clear();
+		list.setTTMove(ttMove);
+		env.getBitboard().genAllMoves(list);
+			
 		
-		
-		moveGen.generateMoves(cb);
-		moveGen.generateAttacks(cb);
-		moveGen.setRootScores(cb, parentMove, ttMove, ply, env.getHistory_All());
-		moveGen.sort();
-			
-			
-		while (moveGen.hasNext()) {
-			
-			final int move = moveGen.next();
-			
-			if (!cb.isLegal(move)) {
-				
-				continue;
-			}
+		int move;
+		while ((move = list.next()) != 0) {
 			
 			//Build and sent minor info
 			info.setCurrentMove(move);
@@ -287,22 +271,20 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (reduction > 1) {
 										
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
+					score = -search(mediator, info, pvman, evaluator, cb, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
 				if (score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
 					
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+					score = -search(mediator, info, pvman, evaluator, cb, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
 				if (score > alpha) {
 						
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
+					score = -search(mediator, info, pvman, evaluator, cb, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
 				}
 				
 			} catch(SearchInterruptedException sie) {
-				
-				moveGen.endPly();
 				
 				throw sie;
 			}
@@ -351,9 +333,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		moveGen.endPly();
-		
-		
 		if (movesPerformed_attacks + movesPerformed_quiet == 0) {
 			
 			if (cb.checkingPieces == 0) {
@@ -397,7 +376,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private int search(ISearchMediator mediator, ISearchInfo info,
-			PVManager pvman, IEvaluator evaluator, ChessBoard cb, MoveGenerator moveGen,
+			PVManager pvman, IEvaluator evaluator, ChessBoard cb,
 			final int ply, int depth, int alpha, int beta, boolean isPv, int initialMaxDepth) {
 		
 		
@@ -462,7 +441,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (depth <= 0) {
 			
-			int qeval = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha, beta, ply, isPv);
+			int qeval = qsearch(mediator, pvman, evaluator, info, cb, alpha, beta, ply, isPv);
 			
 			if (node.eval != qeval) {
 				
@@ -473,7 +452,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		long hashkey = getHashkeyTPT(cb);
+		long hashkey = getHashkeyTPT();
 		
 		
 		int ttMove 									= 0;
@@ -504,7 +483,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (ttFlag == ITTEntry.FLAG_EXACT) {
 							
-							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv, cb);
+							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 							
 							return node.eval;
 							
@@ -512,14 +491,14 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
 								
-								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv, cb);
+								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 								
 								return node.eval;
 							}
 							
 							if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
 								
-								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv, cb);
+								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 								
 								return node.eval;
 							}
@@ -755,8 +734,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						final int reduction = depth / 4 + 3 + Math.min((Math.max(0, eval - beta)) / 80, 3);
 						
-						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -beta + 1, ply + 1, false)
-								: -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth);
+						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, cb, -beta, -beta + 1, ply + 1, false)
+								: -search(mediator, info, pvman, evaluator, cb, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth);
 						
 						cb.undoNullMove();
 						
@@ -780,7 +759,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (eval + razoringMargin < alpha) {
 						
-						int score = qsearch(mediator, pvman, evaluator, info, cb, moveGen, alpha - razoringMargin - 1, alpha - razoringMargin, ply, false);
+						int score = qsearch(mediator, pvman, evaluator, info, cb, alpha - razoringMargin - 1, alpha - razoringMargin, ply, false);
 						
 						if (score < alpha - razoringMargin) {
 							
@@ -809,7 +788,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int singular_beta = ttValue - singular_margin;
 			int singular_depth = depth / 2;
 			
-			int singular_value = singular_move_search(mediator, info, pvman, evaluator, cb, moveGen, ply,
+			int singular_value = singular_move_search(mediator, info, pvman, evaluator, cb, ply,
 					singular_depth, singular_beta - 1, singular_beta, false, initialMaxDepth, ttMove, eval);
 			
 			if (singular_value < singular_beta) {
@@ -849,7 +828,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		int movesPerformed_attacks = 0;
 		int movesPerformed_quiet = 0;
 		
-		moveGen.startPly();
+		IMoveList list1 = new SortedMoveList_History(333, env);
+		IMoveList list2 = new SortedMoveList_MVVLVA(333, env);
+		IMoveList list = null;
+		
 		int phase = PHASE_TT;
 		while (phase <= PHASE_QUIET) {
 			
@@ -857,18 +839,20 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			case PHASE_TT:
 				
-				if (ttMove != 0 && cb.isValidMove(ttMove)) {
+				if (ttMove != 0 && env.getBitboard().isPossible(ttMove)) {
 					
-					moveGen.addMove(ttMove);
+					list = list1;
+					list.clear();
+					list.reserved_add(ttMove);
 				}
 				
 				break;
 				
 			case PHASE_ATTACKING_GOOD:
 				
-				moveGen.generateAttacks(cb);
-				moveGen.setMVVLVAScores(cb);
-				moveGen.sort();
+				list = list2;
+				list.clear();
+				env.getBitboard().genCapturePromotionMoves(list);
 				
 				break;
 				
@@ -876,9 +860,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				killer1Move = env.getHistory_All().getKiller1(cb.colorToMove, ply);
 				
-				if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move)) {
+				if (killer1Move != 0 && killer1Move != ttMove && env.getBitboard().isPossible(killer1Move)) {
 					
-					moveGen.addMove(killer1Move);
+					list = list1;
+					list.clear();
+					list.reserved_add(killer1Move);
 				}
 				
 				break;
@@ -887,9 +873,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				killer2Move = env.getHistory_All().getKiller2(cb.colorToMove, ply);
 				
-				if (killer2Move != 0 && killer2Move != ttMove && killer2Move != killer1Move && cb.isValidMove(killer2Move)) {
+				if (killer2Move != 0 && killer2Move != ttMove && killer2Move != killer1Move && env.getBitboard().isPossible(killer2Move)) {
 					
-					moveGen.addMove(killer2Move);
+					list = list1;
+					list.clear();
+					list.reserved_add(killer2Move);
 				}
 				
 				break;
@@ -898,9 +886,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				counterMove1 = env.getHistory_All().getCounter1(cb.colorToMove, parentMove);
 				
-				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
+				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && env.getBitboard().isPossible(counterMove1)) {
 					
-					moveGen.addMove(counterMove1);
+					list = list1;
+					list.clear();
+					list.reserved_add(counterMove1);
 				}
 				
 				break;
@@ -909,9 +899,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				counterMove2 = env.getHistory_All().getCounter2(cb.colorToMove, parentMove);
 				
-				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
+				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && env.getBitboard().isPossible(counterMove2)) {
 					
-					moveGen.addMove(counterMove2);
+					list = list1;
+					list.clear();
+					list.reserved_add(counterMove2);
 				}
 				
 				break;
@@ -919,30 +911,24 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			case PHASE_ATTACKING_BAD:
 				
-				moveGen.generateAttacks(cb);
-				moveGen.setMVVLVAScores(cb);
-				moveGen.sort();
+				list = list2;
+				list.clear();
+				env.getBitboard().genCapturePromotionMoves(list);
 				
 				break;
 				
 			case PHASE_QUIET:
 				
-				moveGen.generateMoves(cb);
-				moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove, env.getHistory_All());
-				moveGen.sort();
+				list = list1;
+				list.clear();
+				env.getBitboard().genNonCaptureNonPromotionMoves(list);
 				
 				break;
 			}
 			
 			
-			while (moveGen.hasNext()) {
-				
-				final int move = moveGen.next();
-				
-				if (!cb.isLegal(move)) {
-					
-					continue;
-				}
+			int move;
+			while (list != null && (move = list.next()) != 0) {
 				
 				if (phase == PHASE_ATTACKING_GOOD) {
 					if (SEEUtil.getSeeCaptureScore(cb, move) < 0) {
@@ -1061,22 +1047,20 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (reduction > 1) {
 												
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
+						score = -search(mediator, info, pvman, evaluator, cb, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
 					
 					if (score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
 						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
+						score = -search(mediator, info, pvman, evaluator, cb, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
 					
 					if (score > alpha) {
 						
-						score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, new_depth, -beta, -alpha, isPv, initialMaxDepth);
+						score = -search(mediator, info, pvman, evaluator, cb, ply + 1, new_depth, -beta, -alpha, isPv, initialMaxDepth);
 					}
 					
 				} catch(SearchInterruptedException sie) {
-					
-					moveGen.endPly();
 					
 					throw sie;
 				}
@@ -1129,8 +1113,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			phase++;
 		}
 		
-		moveGen.endPly();
-		
 		
 		if (movesPerformed_attacks + movesPerformed_quiet == 0) {
 			
@@ -1181,11 +1163,11 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private int singular_move_search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator, ChessBoard cb,
-			MoveGenerator moveGen, final int ply, int depth, int alpha,
+			final int ply, int depth, int alpha,
 			int beta, boolean isPv, int initialMaxDepth, int ttMove1, int eval) {
 		
 		
-		long hashkey = getHashkeyTPT(cb) ^ ttMove1;
+		long hashkey = getHashkeyTPT() ^ ttMove1;
 		
 		int ttMove2 = 0; 
 				
@@ -1243,7 +1225,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int all_moves = 0;
 		
-		moveGen.startPly();
+		IMoveList list1 = new SortedMoveList_History(333, env);
+		IMoveList list2 = new SortedMoveList_MVVLVA(333, env);
+		IMoveList list = null;
 		
 		int phase = PHASE_TT;
 		while (phase <= PHASE_QUIET) {
@@ -1252,18 +1236,20 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			case PHASE_TT:
 				
-				if (ttMove2 != 0 && cb.isValidMove(ttMove2)) {
+				if (ttMove2 != 0 && env.getBitboard().isPossible(ttMove2)) {
 					
-					moveGen.addMove(ttMove2);
+					list = list1;
+					list.clear();
+					list.reserved_add(ttMove2);
 				}
 				
 				break;
 				
 			case PHASE_ATTACKING_GOOD:
 				
-				moveGen.generateAttacks(cb);
-				moveGen.setMVVLVAScores(cb);
-				moveGen.sort();
+				list = list2;
+				list.clear();
+				env.getBitboard().genCapturePromotionMoves(list);
 				
 				break;
 				
@@ -1271,9 +1257,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				killer1Move = env.getHistory_All().getKiller1(cb.colorToMove, ply);
 				
-				if (killer1Move != 0 && killer1Move != ttMove2 && cb.isValidMove(killer1Move)) {
+				if (killer1Move != 0 && killer1Move != ttMove2 && env.getBitboard().isPossible(killer1Move)) {
 					
-					moveGen.addMove(killer1Move);
+					list = list1;
+					list.clear();
+					list.reserved_add(killer1Move);
 				}
 				
 				break;
@@ -1282,9 +1270,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				killer2Move = env.getHistory_All().getKiller2(cb.colorToMove, ply);
 				
-				if (killer2Move != 0 && killer2Move != killer1Move && killer2Move != ttMove2 && cb.isValidMove(killer2Move)) {
+				if (killer2Move != 0 && killer2Move != ttMove2 && killer2Move != killer1Move && env.getBitboard().isPossible(killer2Move)) {
 					
-					moveGen.addMove(killer2Move);
+					list = list1;
+					list.clear();
+					list.reserved_add(killer2Move);
 				}
 				
 				break;
@@ -1293,9 +1283,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				counterMove1 = env.getHistory_All().getCounter1(cb.colorToMove, parentMove);
 				
-				if (counterMove1 != 0 && counterMove1 != ttMove2 && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
+				if (counterMove1 != 0 && counterMove1 != ttMove2 && counterMove1 != killer1Move && counterMove1 != killer2Move && env.getBitboard().isPossible(counterMove1)) {
 					
-					moveGen.addMove(counterMove1);
+					list = list1;
+					list.clear();
+					list.reserved_add(counterMove1);
 				}
 				
 				break;
@@ -1304,9 +1296,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				counterMove2 = env.getHistory_All().getCounter2(cb.colorToMove, parentMove);
 				
-				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove2 && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
+				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove2 && counterMove2 != killer1Move && counterMove2 != killer2Move && env.getBitboard().isPossible(counterMove2)) {
 					
-					moveGen.addMove(counterMove2);
+					list = list1;
+					list.clear();
+					list.reserved_add(counterMove2);
 				}
 				
 				break;
@@ -1314,30 +1308,24 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			case PHASE_ATTACKING_BAD:
 				
-				moveGen.generateAttacks(cb);
-				moveGen.setMVVLVAScores(cb);
-				moveGen.sort();
+				list = list2;
+				list.clear();
+				env.getBitboard().genCapturePromotionMoves(list);
 				
 				break;
 				
 			case PHASE_QUIET:
 				
-				moveGen.generateMoves(cb);
-				moveGen.setHHScores(wasInCheck ? 1 : 0, cb.colorToMove, parentMove, env.getHistory_All());
-				moveGen.sort();
+				list = list1;
+				list.clear();
+				env.getBitboard().genNonCaptureNonPromotionMoves(list);
 				
 				break;
 			}
 			
 			
-			while (moveGen.hasNext()) {
-				
-				final int move = moveGen.next();
-				
-				if (!cb.isLegal(move)) {
-					
-					continue;
-				}
+			int move;
+			while (list != null && (move = list.next()) != 0) {
 				
 				//Skip tt move
 				if (move == ttMove1) {
@@ -1434,17 +1422,17 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (reduction > 1) {
 											
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
+					score = -search(mediator, info, pvman, evaluator, cb, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
 				if (score > alpha && all_moves > 1) {
 					
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+					score = -search(mediator, info, pvman, evaluator, cb, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
 				if (score > alpha) {
 					
-					score = -search(mediator, info, pvman, evaluator, cb, moveGen, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
+					score = -search(mediator, info, pvman, evaluator, cb, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
 				}
 				
 				env.getBitboard().makeMoveBackward(move);
@@ -1469,8 +1457,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			phase++;
 		}
 		
-		moveGen.endPly();
-		
 		if (bestScore == ISearch.MIN) {
 			
 			//Extend tt move, because it is the only move in this position.
@@ -1491,7 +1477,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	public int qsearch(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb, final MoveGenerator moveGen,
+	public int qsearch(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info, final ChessBoard cb,
 			int alpha, final int beta, final int ply, final boolean isPv) {
 		
 		
@@ -1519,7 +1505,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	    	return node.eval;
 	    }
 		
-		long hashkey = getHashkeyTPT(cb);
+		long hashkey = getHashkeyTPT();
 		
 	    int ttFlag 		= -1;
 	    int ttValue 	= IEvaluator.MIN_EVAL;
@@ -1537,7 +1523,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (ttFlag == ITTEntry.FLAG_EXACT) {
 						
-				    	extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv, cb);
+				    	extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 				    	
 				    	return node.eval;
 				    	
@@ -1545,14 +1531,14 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
 							
-							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv, cb);
+							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 							
 					    	return node.eval;
 						}
 						
 						if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
 							
-							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv, cb);
+							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 							
 					    	return node.eval;
 						}
@@ -1564,7 +1550,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (cb.checkingPieces != 0) {
 			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
-			return search(mediator, info, pvman, evaluator, cb, moveGen, ply, 1, alpha, beta, isPv, 1);
+			return search(mediator, info, pvman, evaluator, cb, ply, 1, alpha, beta, isPv, 1);
 			//return alpha;
 		}
 		
@@ -1609,7 +1595,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
 		
-		moveGen.startPly();
+		IMoveList list = new SortedMoveList_MVVLVA(333, env);
 		
 		int phase = PHASE_ATTACKING_GOOD;
 		
@@ -1617,24 +1603,16 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			switch (phase) {
 			
-				case PHASE_ATTACKING_GOOD:
-					
-					moveGen.generateAttacks(cb);
-					moveGen.setMVVLVAScores(cb);
-					moveGen.sort();
-					
-					break;
+			case PHASE_ATTACKING_GOOD:
+				
+				list.clear();
+				env.getBitboard().genCapturePromotionMoves(list);
+				
+				break;
 			}
 			
-			
-			while (moveGen.hasNext()) {
-				
-				final int move = moveGen.next();
-				
-				if (!cb.isLegal(move)) {
-					
-					continue;
-				}
+			int move;
+			while ((move = list.next()) != 0) {
 				
 				int see = SEEUtil.getSeeCaptureScore(cb, move);
 				
@@ -1650,7 +1628,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				env.getBitboard().makeMoveForward(move);
 				
-				final int score = -qsearch(mediator, pvman, evaluator, info, cb, moveGen, -beta, -alpha, ply + 1, isPv);
+				final int score = -qsearch(mediator, pvman, evaluator, info, cb, -beta, -alpha, ply + 1, isPv);
 				
 				env.getBitboard().makeMoveBackward(move);
 				
@@ -1681,8 +1659,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			phase++;
 		}
-		
-		moveGen.endPly();
 		
 		
 		if (bestScore > eval) {
@@ -1789,7 +1765,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
-	private boolean extractFromTT(int ply, PVNode result, ITTEntry entry, ISearchInfo info, boolean isPv, ChessBoard cb) {
+	private boolean extractFromTT(int ply, PVNode result, ITTEntry entry, ISearchInfo info, boolean isPv) {
 		
 		if (entry.isEmpty()) {
 			
@@ -1842,13 +1818,13 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						env.getBitboard().makeMoveForward(result.bestmove);
 						
-						env.getTPT().get(getHashkeyTPT(cb), tt_entries_per_ply[ply]);
+						env.getTPT().get(getHashkeyTPT(), tt_entries_per_ply[ply]);
 						
 						if (!tt_entries_per_ply[ply].isEmpty()) {
 							
 							result.leaf = false;
 							
-							draw = extractFromTT(ply, result.child, tt_entries_per_ply[ply], info, isPv, cb);
+							draw = extractFromTT(ply, result.child, tt_entries_per_ply[ply], info, isPv);
 							
 							
 							if (draw) {
@@ -1891,7 +1867,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 			
-			env.getTPT().get(getHashkeyTPT(cb), tt_entries_per_ply[ply]);
+			env.getTPT().get(getHashkeyTPT(), tt_entries_per_ply[ply]);
 			
 			if (!tt_entries_per_ply[ply].isEmpty()) {
 				
@@ -2020,7 +1996,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		    hash50movesRule += hash50movesRule << 16;
 		    hash50movesRule += hash50movesRule << 32;
 		    
-		    long hashkey = hash50movesRule ^ getHashkeyTPT(cb);
+		    long hashkey = hash50movesRule ^ getHashkeyTPT();
 		    
 	    	env.getSyzygyDTZCache().get(hashkey, temp_cache_entry);
 			
