@@ -1640,7 +1640,7 @@ public class ChessBoard implements IBitBoard {
 	
 	@Override
 	public boolean hasRightsToKingCastle(int colour) {
-		if (colour == WHITE) {
+		if (colour == ChessConstants.WHITE) {
 			return (castling_rights & 8) != 0;
 		} else {
 			return (castling_rights & 2) != 0;
@@ -1650,7 +1650,7 @@ public class ChessBoard implements IBitBoard {
 	
 	@Override
 	public boolean hasRightsToQueenCastle(int colour) {
-		if (colour == WHITE) {
+		if (colour == ChessConstants.WHITE) {
 			return (castling_rights & 4) != 0;
 		} else {
 			return (castling_rights & 1) != 0;
