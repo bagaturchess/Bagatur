@@ -28,9 +28,9 @@ import java.util.Stack;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IInternalMoveList;
-import bagaturchess.bitboard.impl.movelist.BaseMoveList;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl1.BoardImpl;
+import bagaturchess.bitboard.impl2.CheckUtil;
 import bagaturchess.bitboard.impl2.ChessBoard;
 import bagaturchess.bitboard.impl1.internal.MaterialUtil;
 import bagaturchess.bitboard.impl1.internal.MoveGenerator;
@@ -230,14 +230,16 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 		int movesPerformed_quiet = 0;
 		
 		
-		IMoveList list = new BaseMoveList(333);
+		SortedMoveList_Root list = new SortedMoveList_Root(333, env);
+		list.clear();
+		list.setTTMove(ttMove);
 		cb.genAllMoves(list);
 			
 		int move;
 		while ((move = list.next()) != 0) {
 			
 			
-			if (!cb.isPossible(move)) {
+			if (!cb.isValidMove(move)) {
 				
 				continue;
 			}
@@ -249,6 +251,12 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 			
 			env.getBitboard().makeMoveForward(move);
 							
+			if (CheckUtil.isInCheck(cb, 1 - cb.color_to_move)) {
+				
+				env.getBitboard().makeMoveBackward(move);
+				
+				continue;
+			}
 			
 			if (MoveUtil.isQuiet(move)) {
 				movesPerformed_quiet++;
@@ -833,8 +841,10 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 		int movesPerformed_attacks = 0;
 		int movesPerformed_quiet = 0;
 		
-		IMoveList list = new BaseMoveList(333);
-		
+		IMoveList list1 = new SortedMoveList_History(333, env);
+		IMoveList list2 = new SortedMoveList_MVVLVA(333, env);
+		IMoveList list = null;
+				
 		int phase = PHASE_TT;
 		while (phase <= PHASE_QUIET) {
 			
@@ -843,7 +853,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 			case PHASE_TT:
 				
 				if (ttMove != 0 && cb.isValidMove(ttMove)) {
-					
+					list = list1;
+					list.clear();
 					list.reserved_add(ttMove);
 				}
 				
@@ -851,6 +862,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 			case PHASE_ATTACKING_GOOD:
 				
+				list = list2;
+				list.clear();
 				cb.genCapturePromotionMoves(list);
 				
 				break;
@@ -861,6 +874,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 				if (killer1Move != 0 && killer1Move != ttMove && cb.isValidMove(killer1Move)) {
 					
+					list = list1;
+					list.clear();
 					list.reserved_add(killer1Move);
 				}
 				
@@ -872,6 +887,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 				if (killer2Move != 0 && killer2Move != ttMove && killer2Move != killer1Move && cb.isValidMove(killer2Move)) {
 					
+					list = list1;
+					list.clear();
 					list.reserved_add(killer2Move);
 				}
 				
@@ -883,6 +900,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
 					
+					list = list1;
+					list.clear();
 					list.reserved_add(counterMove1);
 				}
 				
@@ -894,6 +913,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
 					
+					list = list1;
+					list.clear();
 					list.reserved_add(counterMove2);
 				}
 				
@@ -902,19 +923,23 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 			
 			case PHASE_ATTACKING_BAD:
 				
+				list = list2;
+				list.clear();
 				cb.genCapturePromotionMoves(list);
 				
 				break;
 				
 			case PHASE_QUIET:
 				
+				list = list1;
+				list.clear();
 				cb.genAllMoves(list);
 				
 				break;
 			}
 			
 			int move;
-			while ((move = list.next()) != 0) {
+			while (list != null && (move = list.next()) != 0) {
 				
 				if (!cb.isValidMove(move)) {
 					
@@ -1030,6 +1055,12 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 				env.getBitboard().makeMoveForward(move);
 				
+				if (CheckUtil.isInCheck(cb, 1 - cb.color_to_move)) {
+					
+					env.getBitboard().makeMoveBackward(move);
+					
+					continue;
+				}
 				
 				int score = alpha + 1;
 				
@@ -1216,7 +1247,9 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 		
 		int all_moves = 0;
 		
-		IMoveList list = new BaseMoveList(333);
+		IMoveList list1 = new SortedMoveList_History(333, env);
+		IMoveList list2 = new SortedMoveList_MVVLVA(333, env);
+		IMoveList list = null;
 		
 		int phase = PHASE_TT;
 		while (phase <= PHASE_QUIET) {
@@ -1227,6 +1260,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 				if (ttMove2 != 0 && cb.isValidMove(ttMove2)) {
 					
+					list = list1;
+					list.clear();
 					list.reserved_add(ttMove2);
 				}
 				
@@ -1234,6 +1269,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 			case PHASE_ATTACKING_GOOD:
 				
+				list = list2;
+				list.clear();
 				cb.genCapturePromotionMoves(list);
 				
 				break;
@@ -1244,6 +1281,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 				if (killer1Move != 0 && killer1Move != ttMove2 && cb.isValidMove(killer1Move)) {
 					
+					list = list1;
+					list.clear();
 					list.reserved_add(killer1Move);
 				}
 				
@@ -1255,6 +1294,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 				if (killer2Move != 0 && killer2Move != killer1Move && killer2Move != ttMove2 && cb.isValidMove(killer2Move)) {
 					
+					list = list1;
+					list.clear();
 					list.reserved_add(killer2Move);
 				}
 				
@@ -1266,6 +1307,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 				if (counterMove1 != 0 && counterMove1 != ttMove2 && counterMove1 != killer1Move && counterMove1 != killer2Move && cb.isValidMove(counterMove1)) {
 					
+					list = list1;
+					list.clear();
 					list.reserved_add(counterMove1);
 				}
 				
@@ -1277,6 +1320,8 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove2 && counterMove2 != killer1Move && counterMove2 != killer2Move && cb.isValidMove(counterMove2)) {
 					
+					list = list1;
+					list.clear();
 					list.reserved_add(counterMove2);
 				}
 				
@@ -1285,19 +1330,23 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 			
 			case PHASE_ATTACKING_BAD:
 				
+				list = list2;
+				list.clear();
 				cb.genCapturePromotionMoves(list);
 				
 				break;
 				
 			case PHASE_QUIET:
 				
+				list = list1;
+				list.clear();
 				cb.genAllMoves(list);
 				
 				break;
 			}
 			
 			int move;
-			while ((move = list.next()) != 0) {
+			while (list != null && (move = list.next()) != 0) {
 				
 				if (!cb.isValidMove(move)) {
 					
@@ -1375,7 +1424,13 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				
 				env.getBitboard().makeMoveForward(move);
 				
-				
+				if (CheckUtil.isInCheck(cb, 1 - cb.color_to_move)) {
+					
+					env.getBitboard().makeMoveBackward(move);
+					
+					continue;
+				}
+						
 				boolean doLMR = depth >= 2
 						&& all_moves > 1
 						&& MoveUtil.isQuiet(move);
@@ -1572,7 +1627,7 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 		int bestMove = 0;
 		int bestScore = ISearch.MIN;
 		
-		IMoveList list = new BaseMoveList(333);
+		IMoveList list = new SortedMoveList_MVVLVA(333, env);
 		
 		int phase = PHASE_ATTACKING_GOOD;
 		
@@ -1608,6 +1663,13 @@ public class Search_PVS_NWS_V2 extends SearchImpl {
 				}*/
 				
 				env.getBitboard().makeMoveForward(move);
+				
+				if (CheckUtil.isInCheck(cb, 1 - cb.color_to_move)) {
+					
+					env.getBitboard().makeMoveBackward(move);
+					
+					continue;
+				}
 				
 				final int score = -qsearch(mediator, pvman, evaluator, info, cb, -beta, -alpha, ply + 1, isPv);
 				
