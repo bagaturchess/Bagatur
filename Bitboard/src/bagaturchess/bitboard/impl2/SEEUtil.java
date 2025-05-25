@@ -4,56 +4,58 @@ package bagaturchess.bitboard.impl2;
 public class SEEUtil {
 
 	private static int getSmallestAttackSeeMove(final ChessBoard cb, final int colorToMove, final int toIndex, final long allPieces, final long slidingMask) {
-		
+
+		// TODO stop when bad-capture
+
 		// put 'super-piece' in see position
 		long attackMove;
 
 		// pawn non-promotion attacks
-		attackMove = ChessConstants.PAWN_ATTACKS[1 - colorToMove][toIndex] & cb.getPiecesOfSideNotToMove(ChessConstants.PAWN) & allPieces & Bitboard.RANK_NON_PROMOTION[colorToMove];
+		attackMove = ChessConstants.PAWN_ATTACKS[1 - colorToMove][toIndex] & cb.getPieces(colorToMove, ChessConstants.PAWN) & allPieces & Bitboard.RANK_NON_PROMOTION[colorToMove];
 		if (attackMove != 0) {
 			return MoveUtil.createSeeAttackMove(attackMove, ChessConstants.PAWN);
 		}
 
 		// knight attacks
-		attackMove = cb.getPiecesOfSideNotToMove(ChessConstants.KNIGHT) & ChessConstants.KNIGHT_MOVES[toIndex] & allPieces;
+		attackMove = cb.getPieces(colorToMove, ChessConstants.KNIGHT) & ChessConstants.KNIGHT_MOVES[toIndex] & allPieces;
 		if (attackMove != 0) {
 			return MoveUtil.createSeeAttackMove(attackMove, ChessConstants.KNIGHT);
 		}
 
 		// bishop attacks
-		if ((cb.getPiecesOfSideNotToMove(ChessConstants.BISHOP) & slidingMask) != 0) {
-			attackMove = cb.getPiecesOfSideNotToMove(ChessConstants.BISHOP) & MagicUtil.getBishopMoves(toIndex, allPieces) & allPieces;
+		if ((cb.getPieces(colorToMove, ChessConstants.BISHOP) & slidingMask) != 0) {
+			attackMove = cb.getPieces(colorToMove, ChessConstants.BISHOP) & MagicUtil.getBishopMoves(toIndex, allPieces) & allPieces;
 			if (attackMove != 0) {
 				return MoveUtil.createSeeAttackMove(attackMove, ChessConstants.BISHOP);
 			}
 		}
 
 		// rook attacks
-		if ((cb.getPiecesOfSideNotToMove(ChessConstants.ROOK) & slidingMask) != 0) {
-			attackMove = cb.getPiecesOfSideNotToMove(ChessConstants.ROOK) & MagicUtil.getRookMoves(toIndex, allPieces) & allPieces;
+		if ((cb.getPieces(colorToMove, ChessConstants.ROOK) & slidingMask) != 0) {
+			attackMove = cb.getPieces(colorToMove, ChessConstants.ROOK) & MagicUtil.getRookMoves(toIndex, allPieces) & allPieces;
 			if (attackMove != 0) {
 				return MoveUtil.createSeeAttackMove(attackMove, ChessConstants.ROOK);
 			}
 		}
 
 		// queen attacks
-		if ((cb.getPiecesOfSideNotToMove(ChessConstants.QUEEN) & slidingMask) != 0) {
-			attackMove = cb.getPiecesOfSideNotToMove(ChessConstants.QUEEN) & MagicUtil.getQueenMoves(toIndex, allPieces) & allPieces;
+		if ((cb.getPieces(colorToMove, ChessConstants.QUEEN) & slidingMask) != 0) {
+			attackMove = cb.getPieces(colorToMove, ChessConstants.QUEEN) & MagicUtil.getQueenMoves(toIndex, allPieces) & allPieces;
 			if (attackMove != 0) {
 				return MoveUtil.createSeeAttackMove(attackMove, ChessConstants.QUEEN);
 			}
 		}
 
 		// pawn promotion attacks
-		if ((cb.getPiecesOfSideNotToMove(ChessConstants.PAWN) & Bitboard.RANK_PROMOTION[colorToMove]) != 0) {
-			attackMove = ChessConstants.PAWN_ATTACKS[1 - colorToMove][toIndex] & cb.getPiecesOfSideNotToMove(ChessConstants.PAWN) & allPieces & Bitboard.RANK_PROMOTION[colorToMove];
+		if ((cb.getPieces(colorToMove, ChessConstants.PAWN) & Bitboard.RANK_PROMOTION[colorToMove]) != 0) {
+			attackMove = ChessConstants.PAWN_ATTACKS[1 - colorToMove][toIndex] & cb.getPieces(colorToMove, ChessConstants.PAWN) & allPieces & Bitboard.RANK_PROMOTION[colorToMove];
 			if (attackMove != 0) {
 				return MoveUtil.createPromotionAttack(MoveUtil.TYPE_PROMOTION_Q, Long.numberOfTrailingZeros(attackMove), toIndex, 0);
 			}
 		}
 
 		// king attacks
-		attackMove = cb.getPiecesOfSideNotToMove(ChessConstants.KING) & ChessConstants.KING_MOVES[toIndex];
+		attackMove = cb.getPieces(colorToMove, ChessConstants.KING) & ChessConstants.KING_MOVES[toIndex];
 		if (attackMove != 0) {
 			return MoveUtil.createSeeAttackMove(attackMove, ChessConstants.KING);
 		}

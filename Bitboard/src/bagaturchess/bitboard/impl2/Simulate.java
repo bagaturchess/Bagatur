@@ -23,6 +23,8 @@
 package bagaturchess.bitboard.impl2;
 
 
+import bagaturchess.bitboard.api.BoardUtils;
+import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IInternalMoveList;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movelist.BaseMoveList;
@@ -53,9 +55,11 @@ public class Simulate {
 	
 	public static void main(String[] args) {
 
-		//ChessBoard board = ChessBoardBuilder.getNewCB(Constants.INITIAL_BOARD);
+		IBitBoard board_test = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD); 
+		
+		ChessBoard board = ChessBoardBuilder.getNewCB(Constants.INITIAL_BOARD);
 		//ChessBoard board = ChessBoardBuilder.getNewCB("r1b1kb1r/pp1n1pp1/1qn1p2p/2ppP3/3P1P2/2N1BN2/PPPQ2PP/R3KB1R w - - 2 9");
-		ChessBoard board = ChessBoardBuilder.getNewCB("rnq1k2r/2ppbppp/2b1p3/p7/3Pn3/PPN2NP1/1B2PPBP/R2QR1K1 b kq - 6 12");
+		//ChessBoard board = ChessBoardBuilder.getNewCB("rnq1k2r/2ppbppp/2b1p3/p7/3Pn3/PPN2NP1/1B2PPBP/R2QR1K1 b kq - 6 12");
 		
 		ChessBoard board_copy = board.clone();
 		
@@ -70,7 +74,7 @@ public class Simulate {
 		
 		long start_time = System.currentTimeMillis();
 		
-		simulate(board, 1, lists, info);
+		simulate(board, board_test, 6, lists, info);
 		
 		System.out.println("Leafs: " + info.leafs);
 		if (System.currentTimeMillis() - start_time > 1000) {
@@ -85,7 +89,7 @@ public class Simulate {
 	}
 	
 	
-	private static final void simulate(ChessBoard board, int depth, IInternalMoveList[] lists, SearchInfo info) {
+	private static final void simulate(ChessBoard board, IBitBoard board_test, int depth, IInternalMoveList[] lists, SearchInfo info) {
 		
 		if (depth == 0) {
 		
@@ -112,11 +116,21 @@ public class Simulate {
 				continue;
 			}*/
 			
-			if (board.getMoveOps().moveToString(move).equals("e8h8")) {
+			/*if (board.getMoveOps().moveToString(move).equals("e8h8")) {
 				board.getMoveOps().moveToString(move);
 				System.out.println("e8h8");
-			}
+			}*/
+			
+			if (board.getMoveOps().isCapture(move)) {
 					
+				int see1 = board.getSEEScore(move);
+				int see2 = board_test.getSEEScore(move);
+				
+				if (see1 != see2) {
+					
+					throw new IllegalStateException("see1=" + see1 + ", see2=" + see2);
+				}
+			}
 			
 			int color_to_move = board.color_to_move;
 			
@@ -131,6 +145,7 @@ public class Simulate {
 			//System.out.println(board.getMoveOps().moveToString(move));
 			
 			board.doMove(move);
+			board_test.makeMoveForward(move);
 			
 			if (CheckUtil.isInCheck(board, color_to_move)) {
 				
@@ -141,9 +156,10 @@ public class Simulate {
 				//continue;
 			}
 			
-			simulate(board, depth - 1, lists, info);
+			simulate(board, board_test, depth - 1, lists, info);
 			
 			board.undoMove(move);
+			board_test.makeMoveBackward(move);
 		}
 	}
 	
