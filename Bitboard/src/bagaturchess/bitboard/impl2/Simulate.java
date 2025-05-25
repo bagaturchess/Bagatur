@@ -121,7 +121,7 @@ public class Simulate {
 				System.out.println("e8h8");
 			}*/
 			
-			if (board.getMoveOps().isCapture(move)) {
+			/*if (board.getMoveOps().isCapture(move)) {
 					
 				int see1 = board.getSEEScore(move);
 				int see2 = board_test.getSEEScore(move);
@@ -130,7 +130,7 @@ public class Simulate {
 					
 					throw new IllegalStateException("see1=" + see1 + ", see2=" + see2);
 				}
-			}
+			}*/
 			
 			int color_to_move = board.color_to_move;
 			
@@ -145,7 +145,7 @@ public class Simulate {
 			//System.out.println(board.getMoveOps().moveToString(move));
 			
 			board.doMove(move);
-			board_test.makeMoveForward(move);
+			//board_test.makeMoveForward(move);
 			
 			if (CheckUtil.isInCheck(board, color_to_move)) {
 				
@@ -159,7 +159,7 @@ public class Simulate {
 			simulate(board, board_test, depth - 1, lists, info);
 			
 			board.undoMove(move);
-			board_test.makeMoveBackward(move);
+			//board_test.makeMoveBackward(move);
 		}
 	}
 	
