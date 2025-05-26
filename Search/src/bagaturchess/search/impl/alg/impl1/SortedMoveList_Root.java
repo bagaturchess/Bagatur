@@ -23,53 +23,29 @@
 package bagaturchess.search.impl.alg.impl1;
 
 
-import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.search.impl.env.SearchEnv;
 
 
-public class SortedMoveList_Root implements IMoveList {
+public class SortedMoveList_Root extends SortedMoveList_BaseImpl {
 	
-	private SearchEnv env;
-	
-	private long[] moves;
-	private int count;
-	private int cur = 0;
 	
 	private int tt_move;
 	
 	
 	public SortedMoveList_Root(int max, SearchEnv _env) {
-		moves = new long[max];
-		env = _env;
+		super(max, _env);
 	}
+	
 	
 	public void setTTMove(int _tt_move) {
 		
 		tt_move = _tt_move;
 	}
 	
-	
-	public void reserved_clear() {
-		count = 0;
-	}
-	
-	public final void reserved_add(int move) {
-		
-		long move_val = addOrderingValue(move, getOrderingValue(move));
-		
-        int insert_index = findInsertIndex(move_val);
 
-        // Shift elements to the right
-        for (int i = count; i > insert_index; i--) {
-        	moves[i] = moves[i - 1];
-        }
-
-        moves[insert_index] = move_val;
-        count++;
-	}
-
-	private long getOrderingValue(int move) {
+	@Override
+	protected int getOrderingValue(int move) {
 		
 		//TODO: ply
 		int ply = 0;
@@ -80,7 +56,7 @@ public class SortedMoveList_Root implements IMoveList {
 		int counterMove2 = env.getHistory_All().getCounter2(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
 		
 		
-		long ordval = 100000 * 100;
+		int ordval = 100000 * 100;
 		
 		if (tt_move == move) {
 			
@@ -128,59 +104,12 @@ public class SortedMoveList_Root implements IMoveList {
 		}
 		
 		
-		return ordval;
-	}
-	
-	private int findInsertIndex(long value) {
-	    int low = 0, high = count;
-	    long orderValue = value >>> 32;
-
-	    while (low < high) {
-	        int mid = (low + high) >>> 1;
-	        long midOrderValue = moves[mid] >>> 32;
-
-	        if (midOrderValue > orderValue) {
-	            low = mid + 1;
-	        } else {
-	            high = mid;
-	        }
-	    }
-
-	    return low;
-	}
-    
-	public final void reserved_removeLast() {
-		count--;
-	}
-	
-	public final int reserved_getCurrentSize() {
-		return count;
-	}
-	
-	public final int[] reserved_getMovesBuffer() {
-
-		throw new UnsupportedOperationException();
-	}
-
-	public void clear() {
-		reserved_clear();
-		cur = 0;
-	}
-
-	public int next() {
-		if (cur < count) {
-			return (int) moves[cur++];
-		} else {
-			return 0;
+		if (ordval < 0) {
+			
+		    throw new ArithmeticException("Ordering value overflowed!");
 		}
-	}
-
-	public int size() {
-		return count;
-	}
-	
-	private static long addOrderingValue(int move, long ord_val) {
 		
-		return (ord_val << 32) | move;
+		
+		return ordval;
 	}
 }
