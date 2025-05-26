@@ -23,14 +23,13 @@
 package bagaturchess.search.impl.alg.impl1;
 
 
-import bagaturchess.bitboard.impl2.MoveUtil;
 import bagaturchess.search.impl.env.SearchEnv;
 
 
-public class SortedMoveList_MVVLVA extends SortedMoveList_BaseImpl {
+public class SortedMoveList_SEE extends SortedMoveList_BaseImpl {
 	
 	
-	public SortedMoveList_MVVLVA(int max, SearchEnv _env) {
+	public SortedMoveList_SEE(int max, SearchEnv _env) {
 		super(max, _env);
 	}
 	
@@ -38,18 +37,6 @@ public class SortedMoveList_MVVLVA extends SortedMoveList_BaseImpl {
 	@Override
 	protected int getOrderingValue(int move) {
 		
-		//getAttackedPieceIndex and getSourcePieceIndex returns value in [1, 6]
-		int score = (10 * MoveUtil.getAttackedPieceIndex(move) - 1 * MoveUtil.getSourcePieceIndex(move));
-		
-		if (MoveUtil.isPromotion(move)) {
-			
-			//MoveUtil.getMoveType(move) returns value in [2, 5] when the move is promotion
-			score += 1 * MoveUtil.getMoveType(move);
-			
-		}
-		
-		score = 100 * score;
-		
-		return score;
+		return env.getBitboard().getSEEScore(move);
 	}
 }
