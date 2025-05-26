@@ -53,14 +53,13 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
         int insert_index = findInsertIndex(move_val);
 
         // Shift elements to the right
-        for (int i = count; i > insert_index; i--) {
-        	moves[i] = moves[i - 1];
-        }
+        System.arraycopy(moves, insert_index, moves, insert_index + 1, count - insert_index);
 
         moves[insert_index] = move_val;
         count++;
 	}
 
+	
 	protected abstract int getOrderingValue(int move);
 	
 	
@@ -82,24 +81,29 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 	    return low;
 	}
     
+	
 	public final void reserved_removeLast() {
 		count--;
 	}
 	
+	
 	public final int reserved_getCurrentSize() {
 		return count;
 	}
+	
 	
 	public final int[] reserved_getMovesBuffer() {
 
 		throw new UnsupportedOperationException();
 	}
 
+	
 	public void clear() {
 		reserved_clear();
 		cur = 0;
 	}
 
+	
 	public int next() {
 		if (cur < count) {
 			return (int) moves[cur++];
@@ -108,12 +112,13 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 		}
 	}
 
+	
 	public int size() {
 		return count;
 	}
 	
-	private static long addOrderingValue(int move, long ord_val) {
-		
-		return (ord_val << 32) | move;
-	}
+	
+    private static long addOrderingValue(int move, int ord_val) {
+        return (((long) ord_val) << 32) | (move & 0xFFFFFFFFL);
+    }
 }
