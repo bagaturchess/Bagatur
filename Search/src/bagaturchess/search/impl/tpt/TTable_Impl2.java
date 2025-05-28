@@ -151,14 +151,14 @@ public class TTable_Impl2 implements ITTable {
 	                return; // No need to update identical entry
 	            }
 
-	            //int stored_flag = getFlag(stored_value);
-	            //int stored_score = getScore(stored_value);
+	            int stored_flag = getFlag(stored_value);
+	            int stored_score = getScore(stored_value);
 
-	            if (new_depth >= stored_depth) {
+	            if (new_depth > stored_depth) {
 	                replaced_index = i;
 	                break;
 
-	            } /*else if (new_depth == stored_depth) {
+	            } else if (new_depth == stored_depth) {
 	                if (isStrongerFlag(new_flag, stored_flag)) {
 	                    replaced_index = i;
 	                    break;
@@ -174,12 +174,11 @@ public class TTable_Impl2 implements ITTable {
 	                    return; // Same depth, weaker flag
 	                }
 	          	
-	            }*/ else {
+	            } else {
 	                return; // New entry is shallower, skip
 	            }
 	        }
-
-	        // Keep track of weakest entry to possibly overwrite
+	        
 	        if (stored_depth < replaced_min_depth) {
 	            replaced_min_depth = stored_depth;
 	            replaced_index = i;
@@ -195,7 +194,6 @@ public class TTable_Impl2 implements ITTable {
 	}
 
 	private static boolean isStrongerFlag(int newFlag, int oldFlag) {
-	    // Lower value = stronger: EXACT (0) > LOWER (1) > UPPER (2)
 	    return newFlag < oldFlag;
 	}
 
@@ -203,11 +201,11 @@ public class TTable_Impl2 implements ITTable {
 	    switch (flag) {
 	        case ITTEntry.FLAG_EXACT:
 	        case ITTEntry.FLAG_LOWER:
-	            return newEval > oldEval;  // For maximizing player, higher is better
+	            return newEval > oldEval;
 	        case ITTEntry.FLAG_UPPER:
-	            return newEval < oldEval;  // For minimizing player, lower is better
+	            return newEval < oldEval;
 	        default:
-	            return false;
+	           throw new IllegalStateException();
 	    }
 	}
 
