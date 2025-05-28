@@ -152,18 +152,24 @@ public class TTable_Impl2 implements ITTable {
 	            
 	        	// No need to update identical entry
 	        	if (new_value == stored_value) {
+	        		
 	                return;
 	        	}
 	            
 	            if (new_depth > stored_depth) {
+	            	
 	                replaced_index = i;
 	                break;
 
 	            } else if (new_depth == stored_depth) {
 	            	
-		            int stored_flag = getFlag(stored_value);
+	                replaced_index = i;
+	                break;
+	                
+		            /*int stored_flag = getFlag(stored_value);
 		            
 	                if (isStrongerFlag(new_flag, stored_flag)) {
+	                
 	                    replaced_index = i;
 	                    break;
 
@@ -172,27 +178,34 @@ public class TTable_Impl2 implements ITTable {
 	                	int stored_score = getScore(stored_value);
 	                	
 	                    if (isBetterEval(new_score, stored_score, new_flag)) {
+	                    
 	                        replaced_index = i;
 	                        break;
+	                        
 	                    } else {
+	                    
 	                        return; // Same depth, same flag, worse eval
 	                    }
 	                } else {
+	                
 	                    return; // Same depth, weaker flag
-	                }
+	                }*/
 	          	
 	            } else {
+	            	
 	                return; // New entry is shallower, skip
 	            }
 	        }
 	        
 	        if (stored_depth < replaced_min_depth) {
+	        	
 	            replaced_min_depth = stored_depth;
 	            replaced_index = i;
 	        }
 	    }
 
 	    if (replaced_index == -1) {
+	    	
 	        throw new IllegalStateException("No available entry to replace.");
 	    }
 
@@ -201,10 +214,12 @@ public class TTable_Impl2 implements ITTable {
 	}
 
 	private static boolean isStrongerFlag(int newFlag, int oldFlag) {
+		
 	    return newFlag < oldFlag;
 	}
 
 	private static boolean isBetterEval(int newEval, int oldEval, int flag) {
+		
 	    switch (flag) {
 	        case ITTEntry.FLAG_EXACT:
 	        case ITTEntry.FLAG_LOWER:
