@@ -32,18 +32,20 @@ import bagaturchess.uci.api.ChannelManager;
 
 public class TTable_Impl2 implements ITTable {
 
+	
 	private static final int FLAG_SHIFT = 9;
 	private static final int MOVE_SHIFT = 11;
 	private static final int SCORE_SHIFT = 45;
 
+	
+	private final int maxEntries;
+	
 	private final ByteBuffer keys;
 	private final ByteBuffer values;
 
 	private long counter_usage;
 	private long counter_tries;
 	private long counter_hits;
-
-	private final int maxEntries;
 	
 	
 	public TTable_Impl2(long sizeInBytes) {
@@ -133,8 +135,9 @@ public class TTable_Impl2 implements ITTable {
 
 	        long stored_key = keys.getLong(i * 8);
 
+	        // Empty slot found
 	        if (stored_key == 0) {
-	            // Empty slot found
+	            
 	            replaced_index = i;
 	            replaced_min_depth = 0;
 	            counter_usage++;
@@ -144,26 +147,30 @@ public class TTable_Impl2 implements ITTable {
 	        long stored_value = values.getLong(i * 8);
 	        int stored_depth = getDepth(stored_value);
 	        
+	        // Same key
 	        if ((stored_key ^ stored_value) == new_key) {
-	            // Same key
 	            
+	        	// No need to update identical entry
 	        	if (new_value == stored_value) {
-	                return; // No need to update identical entry
-	            }
-
-	            int stored_flag = getFlag(stored_value);
-	            int stored_score = getScore(stored_value);
-
+	                return;
+	        	}
+	            
 	            if (new_depth > stored_depth) {
 	                replaced_index = i;
 	                break;
 
 	            } else if (new_depth == stored_depth) {
+	            	
+		            int stored_flag = getFlag(stored_value);
+		            
 	                if (isStrongerFlag(new_flag, stored_flag)) {
 	                    replaced_index = i;
 	                    break;
 
 	                } else if (new_flag == stored_flag) {
+	                	
+	                	int stored_score = getScore(stored_value);
+	                	
 	                    if (isBetterEval(new_score, stored_score, new_flag)) {
 	                        replaced_index = i;
 	                        break;
