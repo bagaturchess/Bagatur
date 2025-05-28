@@ -24,8 +24,8 @@ public interface ITTEntry {
 	
 	
 	public static final int FLAG_EXACT = 0;
-	public static final int FLAG_UPPER = 1;
-	public static final int FLAG_LOWER = 2;
+	public static final int FLAG_LOWER = 1;
+	public static final int FLAG_UPPER = 2;
 	
 	
 	public boolean isEmpty();

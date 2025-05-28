@@ -105,34 +105,110 @@ public class TTable_Impl2 implements ITTable {
 	}
 
 	@Override
-	public void put(long hashKey, int depth, int eval, int alpha, int beta, int bestMove) {
-		int flag = eval >= beta ? ITTEntry.FLAG_LOWER : eval <= alpha ? ITTEntry.FLAG_UPPER : ITTEntry.FLAG_EXACT;
-		long newValue = createValue(eval, bestMove, flag, depth);
-		int index = getIndex(hashKey);
-
-		int replaceIndex = index;
-		int minDepth = Integer.MAX_VALUE;
-
-		for (int i = 0; i < 4; i++) {
-			int currIdx = index + i;
-			long storedKey = keys.getLong(currIdx * 8);
-			long storedValue = values.getLong(currIdx * 8);
+	public final void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove) {
+		
+		int flag = ITTEntry.FLAG_EXACT;
+		
+		if (eval >= beta) {
 			
-			if (storedKey == 0 || (storedKey ^ storedValue) == hashKey) {
-				replaceIndex = currIdx;
-				break;
-			}
-
-			int storedDepth = getDepth(storedValue);
-			if (storedDepth < minDepth) {
-				minDepth = storedDepth;
-				replaceIndex = currIdx;
-			}
+			flag = ITTEntry.FLAG_LOWER;
+			
+		} else if (eval <= alpha) {
+			
+			flag = ITTEntry.FLAG_UPPER;
 		}
+		
+		addValue(hashkey, eval, depth, flag, bestmove);
+	}
+	
+	private final void addValue(final long new_key, int new_score, final int new_depth, final int new_flag, final int new_move) {
 
-		keys.putLong(replaceIndex * 8, hashKey ^ newValue);
-		values.putLong(replaceIndex * 8, newValue);
-		counter_usage++;
+	    final long new_value = createValue(new_score, new_move, new_flag, new_depth);
+	    final int start_index_entry = getIndex(new_key);
+
+	    int replaced_min_depth = Integer.MAX_VALUE;
+	    int replaced_index = -1;
+
+	    for (int i = start_index_entry; i < start_index_entry + 4; i++) {
+
+	        long stored_key = keys.getLong(i * 8);
+
+	        if (stored_key == 0) {
+	            // Empty slot found
+	            replaced_index = i;
+	            replaced_min_depth = 0;
+	            counter_usage++;
+	            break;
+	        }
+	        
+	        long stored_value = values.getLong(i * 8);
+	        int stored_depth = getDepth(stored_value);
+	        
+	        if ((stored_key ^ stored_value) == new_key) {
+	            // Same key
+	            
+	        	if (new_value == stored_value) {
+	                return; // No need to update identical entry
+	            }
+
+	            //int stored_flag = getFlag(stored_value);
+	            //int stored_score = getScore(stored_value);
+
+	            if (new_depth >= stored_depth) {
+	                replaced_index = i;
+	                break;
+
+	            } /*else if (new_depth == stored_depth) {
+	                if (isStrongerFlag(new_flag, stored_flag)) {
+	                    replaced_index = i;
+	                    break;
+
+	                } else if (new_flag == stored_flag) {
+	                    if (isBetterEval(new_score, stored_score, new_flag)) {
+	                        replaced_index = i;
+	                        break;
+	                    } else {
+	                        return; // Same depth, same flag, worse eval
+	                    }
+	                } else {
+	                    return; // Same depth, weaker flag
+	                }
+	          	
+	            }*/ else {
+	                return; // New entry is shallower, skip
+	            }
+	        }
+
+	        // Keep track of weakest entry to possibly overwrite
+	        if (stored_depth < replaced_min_depth) {
+	            replaced_min_depth = stored_depth;
+	            replaced_index = i;
+	        }
+	    }
+
+	    if (replaced_index == -1) {
+	        throw new IllegalStateException("No available entry to replace.");
+	    }
+
+	    keys.putLong(replaced_index * 8, new_key ^ new_value);
+	    values.putLong(replaced_index * 8, new_value);
+	}
+
+	private static boolean isStrongerFlag(int newFlag, int oldFlag) {
+	    // Lower value = stronger: EXACT (0) > LOWER (1) > UPPER (2)
+	    return newFlag < oldFlag;
+	}
+
+	private static boolean isBetterEval(int newEval, int oldEval, int flag) {
+	    switch (flag) {
+	        case ITTEntry.FLAG_EXACT:
+	        case ITTEntry.FLAG_LOWER:
+	            return newEval > oldEval;  // For maximizing player, higher is better
+	        case ITTEntry.FLAG_UPPER:
+	            return newEval < oldEval;  // For minimizing player, lower is better
+	        default:
+	            return false;
+	    }
 	}
 
 	private int getIndex(long key) {
