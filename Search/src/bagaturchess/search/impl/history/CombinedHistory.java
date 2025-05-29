@@ -39,6 +39,36 @@ public class CombinedHistory implements IHistoryTable {
 		
 		scale = MOVE_SCORE_SCALE;
 		
+		for (int i = 0; i < KILLER_MOVES.length; i++) {
+			
+			for (int j = 0; j < KILLER_MOVES[i].length; j++) {
+				
+				KILLER_MOVES[i][j] = new BetaCutoffMoves_LastIn();
+			}
+		}
+		
+		for (int i = 0; i < COUNTER_MOVES_LASTIN.length; i++) {
+			
+			for (int j = 0; j < COUNTER_MOVES_LASTIN[i].length; j++) {
+				
+				for (int k = 0; k < COUNTER_MOVES_LASTIN[i][j].length; k++) {
+					
+					COUNTER_MOVES_LASTIN[i][j][k] = new BetaCutoffMoves_LastIn();
+				}
+			}
+		}
+
+		for (int i = 0; i < COUNTER_MOVES_COUNTS.length; i++) {
+
+			for (int j = 0; j < COUNTER_MOVES_COUNTS[i].length; j++) {
+
+				for (int k = 0; k < COUNTER_MOVES_COUNTS[i][j].length; k++) {
+
+					COUNTER_MOVES_COUNTS[i][j][k] = new BetaCutoffMoves_Counts();
+				}
+			}
+		}
+		
 		clear();
 	}
 	
@@ -87,7 +117,7 @@ public class CombinedHistory implements IHistoryTable {
 			
 			for (int j = 0; j < KILLER_MOVES[i].length; j++) {
 				
-				KILLER_MOVES[i][j] = new BetaCutoffMoves_LastIn();
+				KILLER_MOVES[i][j].clear();
 			}
 		}
 		
@@ -97,7 +127,7 @@ public class CombinedHistory implements IHistoryTable {
 				
 				for (int k = 0; k < COUNTER_MOVES_LASTIN[i][j].length; k++) {
 					
-					COUNTER_MOVES_LASTIN[i][j][k] = new BetaCutoffMoves_LastIn();
+					COUNTER_MOVES_LASTIN[i][j][k].clear();
 				}
 			}
 		}
@@ -108,7 +138,7 @@ public class CombinedHistory implements IHistoryTable {
 
 				for (int k = 0; k < COUNTER_MOVES_COUNTS[i][j].length; k++) {
 
-					COUNTER_MOVES_COUNTS[i][j][k] = new BetaCutoffMoves_Counts();
+					COUNTER_MOVES_COUNTS[i][j][k].clear();
 				}
 			}
 		}
