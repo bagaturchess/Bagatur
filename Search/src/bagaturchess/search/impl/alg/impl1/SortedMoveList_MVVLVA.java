@@ -39,12 +39,12 @@ public class SortedMoveList_MVVLVA extends SortedMoveList_BaseImpl {
 	protected int getOrderingValue(int move) {
 		
 		//getAttackedPieceIndex and getSourcePieceIndex returns value in [1, 6]
-		int score = (10 * MoveUtil.getAttackedPieceIndex(move) - 1 * MoveUtil.getSourcePieceIndex(move));
+		int score = (6 * MoveUtil.getAttackedPieceIndex(move) - MoveUtil.getSourcePieceIndex(move));
 		
 		if (MoveUtil.isPromotion(move)) {
 			
 			//MoveUtil.getMoveType(move) returns value in [2, 5] when the move is promotion
-			score += 1 * MoveUtil.getMoveType(move);
+			score += MoveUtil.getMoveType(move);
 			
 		}
 		
