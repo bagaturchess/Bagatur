@@ -27,7 +27,7 @@ package bagaturchess.search.api;
 public interface IEvaluator {
 	
 	
-	public static final int MAX_EVAL = 128000; //100000;
+	public static final int MAX_EVAL = 260000;
 	
 	public static final int MIN_EVAL = -MAX_EVAL;
 	
