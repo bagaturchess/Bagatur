@@ -33,7 +33,7 @@ import bagaturchess.uci.api.ChannelManager;
 public class TTable_Impl2 implements ITTable {
 
 	
-	private static final int ALWAYS_REPLACE_DEPTH = 15;
+	private static final int ALWAYS_REPLACE_DEPTH = -1;
 	
 	
 	private static final int FLAG_SHIFT = 9;
