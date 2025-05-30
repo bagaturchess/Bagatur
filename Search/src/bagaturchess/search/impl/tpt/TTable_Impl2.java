@@ -33,6 +33,9 @@ import bagaturchess.uci.api.ChannelManager;
 public class TTable_Impl2 implements ITTable {
 
 	
+	private static final int ALWAYS_REPLACE_DEPTH = 15;
+	
+	
 	private static final int FLAG_SHIFT = 9;
 	private static final int MOVE_SHIFT = 11;
 	private static final int SCORE_SHIFT = 45;
@@ -109,6 +112,12 @@ public class TTable_Impl2 implements ITTable {
 	@Override
 	public final void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove) {
 		
+		if (eval > 262143 || eval < -262144) {
+			
+			return;
+			//throw new IllegalStateException("TT score overflow: eval=" + eval);
+		}
+		
 		int flag = ITTEntry.FLAG_EXACT;
 		
 		if (eval >= beta) {
@@ -156,17 +165,21 @@ public class TTable_Impl2 implements ITTable {
 	                return;
 	        	}
 	            
+	        	//Always replace for depth lower than ALWAYS_REPLACE_DEPTH
+	        	if (stored_depth <= ALWAYS_REPLACE_DEPTH) {
+	        		
+	                replaced_index = i;
+	                break;
+	        	}
+	        	
 	            if (new_depth > stored_depth) {
 	            	
 	                replaced_index = i;
 	                break;
 
 	            } else if (new_depth == stored_depth) {
-	            	
-	                replaced_index = i;
-	                break;
 	                
-		            /*int stored_flag = getFlag(stored_value);
+		            int stored_flag = getFlag(stored_value);
 		            
 	                if (isStrongerFlag(new_flag, stored_flag)) {
 	                
@@ -175,7 +188,10 @@ public class TTable_Impl2 implements ITTable {
 
 	                } else if (new_flag == stored_flag) {
 	                	
-	                	int stored_score = getScore(stored_value);
+	                    replaced_index = i;
+	                    break;
+	                    
+	                	/*int stored_score = getScore(stored_value);
 	                	
 	                    if (isBetterEval(new_score, stored_score, new_flag)) {
 	                    
@@ -185,14 +201,15 @@ public class TTable_Impl2 implements ITTable {
 	                    } else {
 	                    
 	                        return; // Same depth, same flag, worse eval
-	                    }
+	                    }*/
+	                    
 	                } else {
 	                
 	                    return; // Same depth, weaker flag
-	                }*/
+	                }
 	          	
 	            } else {
-	            	
+	                
 	                return; // New entry is shallower, skip
 	            }
 	        }
