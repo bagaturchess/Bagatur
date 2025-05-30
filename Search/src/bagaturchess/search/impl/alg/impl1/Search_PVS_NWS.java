@@ -77,13 +77,13 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private static final double PRUNING_AGGRESSIVENESS 				= 1;
 	
-	private static final int FUTILITY_MAXDEPTH 						= MAX_DEPTH; //7
+	private static final int FUTILITY_MAXDEPTH 						= 7; //MAX_DEPTH;
 	private static final int FUTILITY_MARGIN 						= 80;
 	
-	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= MAX_DEPTH; //9
+	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= 9; //MAX_DEPTH;
 	private static final int STATIC_NULL_MOVE_MARGIN 				= 60;
 	
-	private static final int RAZORING_MAXDEPTH 						= MAX_DEPTH; //4
+	private static final int RAZORING_MAXDEPTH 						= 4; //MAX_DEPTH;
 	private static final int RAZORING_MARGIN 						= 240;
 	
 	
