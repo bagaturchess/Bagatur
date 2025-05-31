@@ -327,9 +327,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (alpha >= beta) {
 				
-				if (!env.getBitboard().getMoveOps().isCapture(bestMove)) {
-					env.getHistory_All().addCounterMove(env.getBitboard().getColourToMove(), parentMove, bestMove);
-					env.getHistory_All().addKillerMove(env.getBitboard().getColourToMove(), bestMove, ply);
+				if (!env.getBitboard().getMoveOps().isCapture(move)) {
+					env.getHistory_All().addCounterMove(env.getBitboard().getColourToMove(), parentMove, move);
+					env.getHistory_All().addKillerMove(env.getBitboard().getColourToMove(), move, ply);
 					env.getHistory_All().registerGood(env.getBitboard().getColourToMove(), move, depth);
 				}
 				
@@ -1107,9 +1107,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (alpha >= beta) {
 					
-					if (!env.getBitboard().getMoveOps().isCapture(bestMove)) {
-						env.getHistory_All().addCounterMove(colourToMove, parentMove, bestMove);
-						env.getHistory_All().addKillerMove(colourToMove, bestMove, ply);
+					if (!env.getBitboard().getMoveOps().isCapture(move)) {
+						env.getHistory_All().addCounterMove(colourToMove, parentMove, move);
+						env.getHistory_All().addKillerMove(colourToMove, move, ply);
 						env.getHistory_All().registerGood(colourToMove, move, depth);
 					}
 					
