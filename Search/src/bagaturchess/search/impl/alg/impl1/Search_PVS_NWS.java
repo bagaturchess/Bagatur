@@ -257,8 +257,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			int score = alpha + 1;
-			
 			boolean doLMR = depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& !env.getBitboard().getMoveOps().isCapture(move);
@@ -272,26 +270,25 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			try {
+			int score = ISearch.MIN;
+			
+			if (reduction > 1) {
+									
+				score = -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 				
-				if (reduction > 1) {
-										
-					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
-				}
-				
-				if (score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
+				if (score > alpha) {
 					
 					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
-				if (score > alpha) {
-						
-					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
-				}
+			} else if (!isPv || movesPerformed_attacks + movesPerformed_quiet > 1) {
 				
-			} catch(SearchInterruptedException sie) {
-				
-				throw sie;
+				score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+			}
+			
+			if (isPv && (score > alpha || movesPerformed_attacks + movesPerformed_quiet == 1)) {
+					
+				score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
 			}
 			
 			
@@ -1049,29 +1046,25 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(move);
 				
 				
-				int score = alpha + 1;
+				int score = ISearch.MIN;
 				
-				
-				try {
+				if (reduction > 1) {
+											
+					score = -search(mediator, info, pvman, evaluator, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 					
-					if (reduction > 1) {
-												
-						score = -search(mediator, info, pvman, evaluator, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
-					}
-					
-					if (score > alpha && movesPerformed_attacks + movesPerformed_quiet > 1) {
+					if (score > alpha) {
 						
 						score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
 					
-					if (score > alpha) {
-						
-						score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -beta, -alpha, isPv, initialMaxDepth);
-					}
+				} else if (!isPv || movesPerformed_attacks + movesPerformed_quiet > 1) {
 					
-				} catch(SearchInterruptedException sie) {
+					score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
+				}
+				
+				if (isPv && (score > alpha || movesPerformed_attacks + movesPerformed_quiet == 1)) {
 					
-					throw sie;
+					score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -beta, -alpha, isPv, initialMaxDepth);
 				}
 				
 				
@@ -1428,19 +1421,24 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 				}
 				
-				int score = alpha + 1;
+				
+				int score = ISearch.MIN;
 				
 				if (reduction > 1) {
-											
+					
 					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
-				}
-				
-				if (score > alpha && all_moves > 1) {
+					
+					if (score > alpha) {
+						
+						score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+					}
+					
+				} else if (!isPv || all_moves > 1) {
 					
 					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
-				if (score > alpha) {
+				if (isPv && (score > alpha || all_moves == 1)) {
 					
 					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
 				}
