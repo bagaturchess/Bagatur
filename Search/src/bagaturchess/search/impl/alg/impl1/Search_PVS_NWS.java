@@ -261,7 +261,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			boolean doLMR = depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move);
+						&& !env.getBitboard().getMoveOps().isCapture(move);
 			
 			int reduction = 1;
 			if (doLMR) {
@@ -1026,7 +1026,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean doLMR = new_depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move);
+						&& !env.getBitboard().getMoveOps().isCapture(move);
 				
 				int reduction = 1;
 				
@@ -1411,7 +1411,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean doLMR = depth >= 2
 						&& all_moves > 1
-						&& !env.getBitboard().getMoveOps().isCaptureOrPromotion(move);
+						&& !env.getBitboard().getMoveOps().isCapture(move);
 				
 				int reduction = 1;
 				
