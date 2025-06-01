@@ -789,6 +789,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				&& depth < 2 * initialMaxDepth
 				&& isTTLowerBoundOrExact
 				&& isTTDepthEnoughForSingularExtension
+				&& env.getBitboard().isPossible(ttMove)
 			) {
 			
 			//TODO: Adjust beta margin and depth
@@ -1462,12 +1463,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			phase++;
-		}
-		
-		if (bestScore == ISearch.MIN) {
-			
-			//Extend tt move, because it is the only move in this position.
-			bestScore = alpha;
 		}
 		
 		
