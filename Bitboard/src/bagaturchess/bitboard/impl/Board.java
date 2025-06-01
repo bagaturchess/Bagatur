@@ -5459,6 +5459,6 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 	@Override
 	public CastlingConfig getCastlingConfig() {
 		
-		throw new UnsupportedOperationException();
+		return CastlingConfig.CLASSIC_CHESS;
 	}
 }
