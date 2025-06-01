@@ -35,7 +35,6 @@ import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.api.internal.SearchInterruptedException;
 
 import bagaturchess.search.impl.alg.BacktrackingInfo;
 import bagaturchess.search.impl.alg.SearchImpl;
