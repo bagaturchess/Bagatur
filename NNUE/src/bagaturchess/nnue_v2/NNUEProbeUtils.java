@@ -25,20 +25,19 @@ public class NNUEProbeUtils {
 	
 	public static final void fillInput(IBitBoard bitboard, Input input) {
 		
-		ChessBoard cb = ((BoardImpl)bitboard).getChessBoard();
-		
-		long bb_w_king 		= cb.pieces[ChessConstants.WHITE][ChessConstants.KING];
-		long bb_b_king 		= cb.pieces[ChessConstants.BLACK][ChessConstants.KING];
-		long bb_w_queens 	= cb.pieces[ChessConstants.WHITE][ChessConstants.QUEEN];
-		long bb_b_queens 	= cb.pieces[ChessConstants.BLACK][ChessConstants.QUEEN];
-		long bb_w_rooks 	= cb.pieces[ChessConstants.WHITE][ChessConstants.ROOK];
-		long bb_b_rooks 	= cb.pieces[ChessConstants.BLACK][ChessConstants.ROOK];
-		long bb_w_bishops 	= cb.pieces[ChessConstants.WHITE][ChessConstants.BISHOP];
-		long bb_b_bishops 	= cb.pieces[ChessConstants.BLACK][ChessConstants.BISHOP];
-		long bb_w_knights 	= cb.pieces[ChessConstants.WHITE][ChessConstants.NIGHT];
-		long bb_b_knights 	= cb.pieces[ChessConstants.BLACK][ChessConstants.NIGHT];
-		long bb_w_pawns 	= cb.pieces[ChessConstants.WHITE][ChessConstants.PAWN];
-		long bb_b_pawns 	= cb.pieces[ChessConstants.BLACK][ChessConstants.PAWN];
+		long bb_w_king 		= bitboard.getFiguresBitboardByColourAndType(ChessConstants.WHITE, ChessConstants.KING);
+		long bb_b_king 		= bitboard.getFiguresBitboardByColourAndType(ChessConstants.BLACK, ChessConstants.KING);
+		long bb_w_queens 	= bitboard.getFiguresBitboardByColourAndType(ChessConstants.WHITE, ChessConstants.QUEEN);
+		long bb_b_queens 	= bitboard.getFiguresBitboardByColourAndType(ChessConstants.BLACK, ChessConstants.QUEEN);
+		long bb_w_rooks 	= bitboard.getFiguresBitboardByColourAndType(ChessConstants.WHITE, ChessConstants.ROOK);
+		long bb_b_rooks 	= bitboard.getFiguresBitboardByColourAndType(ChessConstants.BLACK, ChessConstants.ROOK);
+		long bb_w_bishops 	= bitboard.getFiguresBitboardByColourAndType(ChessConstants.WHITE, ChessConstants.BISHOP);
+		long bb_b_bishops 	= bitboard.getFiguresBitboardByColourAndType(ChessConstants.BLACK, ChessConstants.BISHOP);
+		long bb_w_knights 	= bitboard.getFiguresBitboardByColourAndType(ChessConstants.WHITE, ChessConstants.NIGHT);
+		long bb_b_knights 	= bitboard.getFiguresBitboardByColourAndType(ChessConstants.BLACK, ChessConstants.NIGHT);
+		long bb_w_pawns 	= bitboard.getFiguresBitboardByColourAndType(ChessConstants.WHITE, ChessConstants.PAWN);
+		long bb_b_pawns 	= bitboard.getFiguresBitboardByColourAndType(ChessConstants.BLACK, ChessConstants.PAWN);
+
 		
 		int index_white 	= 0;
 		int index_black 	= 0;
