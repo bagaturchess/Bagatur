@@ -1011,6 +1011,11 @@ public class Search_PVS_NWS extends SearchImpl {
 							}
 						}
 						
+						if (env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
+							
+							continue;
+						}
+						
 					} else if (phase == PHASE_ATTACKING_BAD
 							&& env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
 						
@@ -1389,6 +1394,11 @@ public class Search_PVS_NWS extends SearchImpl {
 								
 								continue;
 							}
+						}
+						
+						if (env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
+							
+							continue;
 						}
 						
 					} else if (phase == PHASE_ATTACKING_BAD
