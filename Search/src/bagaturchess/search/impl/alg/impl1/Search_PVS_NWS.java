@@ -437,9 +437,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		//depth += extensions(cb, moveGen, ply);
-		
-		
 		if (depth <= 0) {
 			
 			int qeval = qsearch(mediator, pvman, evaluator, info, alpha, beta, ply, isPv);
@@ -699,6 +696,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
+		boolean mateThreat  = false;
 		
 		if (!isPv
 				&& !env.getBitboard().isInCheck()
@@ -754,6 +752,11 @@ public class Search_PVS_NWS extends SearchImpl {
 							node.leaf = true;
 							
 							return node.eval;
+						}
+						
+						if (score < 0 && SearchUtils.isMateVal(score)) {
+							
+							//mateThreat = true;
 						}
 					}
 				}
@@ -1024,7 +1027,25 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				int new_depth = (move == ttMove && extend_tt_move) ? (isPv ? depth : depth + 1) : depth - 1;
+				int new_depth;
+				
+				if (move == ttMove && extend_tt_move) {
+					
+					new_depth = isPv ? depth : depth + 1;
+					
+				} /*else if (wasInCheck) {
+					
+					new_depth = depth;
+					
+				}*/ else if (mateThreat) {
+					
+					new_depth = depth;
+					
+				} else {
+					
+					new_depth = depth - 1;
+				}
+				
 				
 				boolean doLMR = new_depth >= 2
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
@@ -1721,17 +1742,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		//validatePV(node, evaluator, node.eval, ply, 0, isPv, true);
 		
     	return node.eval;
-	}
-	
-	
-	private int extensions(final int ply) {
-		
-		if (env.getBitboard().isInCheck()) {
-			
-			return 1;
-		}
-		
-		return 0;
 	}
 	
 	
