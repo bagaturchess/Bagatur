@@ -170,6 +170,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			int totalLMReduction, int materialGain, boolean inNullMove,
 			int mateMove, boolean useMateDistancePrunning) {
 		
+		if (Math.abs(beta) >= 3 * ISearch.MAX_MATERIAL_INTERVAL / 2 && !SearchUtils.isMateVal(beta)) {
+			
+			beta = (beta / ISearch.MAX_MATERIAL_INTERVAL) * ISearch.MAX_MATERIAL_INTERVAL;
+			alpha_org = beta - 1;
+		}
+		
 		return root_search(mediator, info, pvman, env.getEval(),
 				0, SearchUtils.normDepth(maxdepth), alpha_org, beta, true, SearchUtils.normDepth(initial_maxdepth));
 	}
@@ -181,6 +187,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean prevNullMove, int prevbest, int prevprevbest, int[] prevPV,
 			int rootColour, int totalLMReduction, int materialGain,
 			boolean inNullMove, int mateMove, boolean useMateDistancePrunning) {
+		
+		if (Math.abs(beta) >= 3 * ISearch.MAX_MATERIAL_INTERVAL / 2 && !SearchUtils.isMateVal(beta)) {
+			
+			beta = (beta / ISearch.MAX_MATERIAL_INTERVAL) * ISearch.MAX_MATERIAL_INTERVAL;
+		}
 		
 		return root_search(mediator, info, pvman, env.getEval(),
 				0, SearchUtils.normDepth(maxdepth), beta - 1, beta, false, SearchUtils.normDepth(initial_maxdepth));		
@@ -357,10 +368,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 			
-			if (!SearchUtils.isMateVal(bestScore)) {
-				
-				env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
-			}
+			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
 		}
 		
 		
@@ -1177,10 +1185,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 				
-			if (!SearchUtils.isMateVal(node.eval)) {
-				
-				env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
-			}
+			env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
 		}
 		
 		//validatePV(node, evaluator, node.eval, ply, depth, isPv, false);
@@ -1499,7 +1504,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 			
-			if (!SearchUtils.isMateVal(bestScore) && bestMove != 0) {
+			if (bestMove != 0) {
 				
 				env.getTPT().put(hashkey, depth, bestScore, alpha_org, beta, bestMove);
 			}
@@ -1733,10 +1738,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 		if (env.getTPT() != null) {
 			
-			if (!SearchUtils.isMateVal(bestScore) && bestMove != 0) {
-				
-				env.getTPT().put(hashkey, 0, bestScore, alphaOrig, beta, bestMove);
-			}
+			env.getTPT().put(hashkey, 0, bestScore, alphaOrig, beta, bestMove);
 		}
 		
 		//validatePV(node, evaluator, node.eval, ply, 0, isPv, true);

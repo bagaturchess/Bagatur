@@ -195,8 +195,8 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("k7/8/4Kp2/5P2/8/6b1/8/8 b - - 0 1", cfg.getBoardConfig());
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/p6p/1pk3p1/2n2p2/P1n5/2NN1K1P/5PP1/8 w - - 4 4", cfg.getBoardConfig());
 		
-		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig()); //8/5n2/8/8/6kp/4K3/8/8 b - - 0 1
-		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/8/8/3K4/5k2/1BN5/8/8 w - - 0 1", cfg.getBoardConfig());
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig()); //8/5n2/8/8/6kp/4K3/8/8 b - - 0 1
+		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("k7/8/8/8/8/1r6/r7/7K b - - 0 1", cfg.getBoardConfig());
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5n2/3n3p/7K/5k2/8/5P1N/8 w - - 0 1", cfg.getBoardConfig());//Cannot make mate with 2 N
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5n2/8/8/6kp/4K3/8/8 b - - 0 1", cfg.getBoardConfig()); //promote rook pawn - g4g3
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("8/5q2/1p1K3p/7P/2k3P1/8/8/8 b - - 0 48", cfg.getBoardConfig()); //Mate in 5
@@ -225,9 +225,6 @@ public class MTDSchedulerMain {
 		
 		//IBitBoard bitboard  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/4R3/3K4 w - -");//White win
 		//IBitBoard bitboard  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/3P4/3K4 w - -");//White win
-		SyzygyTBProbing.getSingleton().load(System.getenv("SYZYGY_HOME"));
-		
-		System.out.println(bitboard);
 		
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("bqnrnkrb/pppppppp/8/8/8/8/PPPPPPPP/BQNRNKRB b KQkq - 1 1", cfg.getBoardConfig());
 		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache("bqk3rb/pppppppp/3n1n2/8/8/1P1N2P1/P1PPPP1P/BQ1RNKRB b KQ - 0 4", cfg.getBoardConfig());
@@ -255,7 +252,7 @@ public class MTDSchedulerMain {
 		}
 		*/
 		
-		//IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
+		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 		//IBitBoard bitboard = new Board("4r3/4rk2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB draw
 		//IBitBoard bitboard = new Board("4r3/5k2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB white win
 		//IBitBoard bitboard = new Board("4k3/3r1p2/8/8/8/8/8/4KQ2 w - - 0 1", null, cfg.getBoardConfig());//EGTB white win
@@ -547,6 +544,8 @@ public class MTDSchedulerMain {
 		//IBitBoard bitboard  = new Board("2kr3r/ppp1np1p/3p1p2/5b2/8/3P1N2/PPP2PPP/R3KB1R w KQ - 6 13"); 
 		//IBitBoard bitboard  = new Board("4r1k1/pp3p1p/2q3p1/1R1p1b2/3Pn3/PP1BB3/5PPP/1Q4K1 w - - 5 25"); 
 		//IBitBoard bitboard  = new Board("r1bq1rk1/ppp2pbp/n5p1/4p1B1/2P1P1n1/2N2N2/PP2BPPP/R2Q1RK1 b - - 3 10");
+		
+		SyzygyTBProbing.getSingleton().load(System.getenv("SYZYGY_HOME"));
 		
 		//D: 8	SD: 18 Time: 4.427 s	Eval: -545	NPS: 85689	PV: Bf1-d3, Ne4xd2, Ke1xd2, Nc6-d4, e3xd4, Bb4xc3, b2xc3, e5xd4, Nf3xd4
 		//D: 8	SD: 18 Time: 4.827 s	Eval: -319	NPS: 89718	PV: a3xb4, Qa5xa1, Qd2-d1, Qa1xd1, Ke1xd1, f7-f5, Nc3xe4, f5xe4, Nf3-g5, Nc6xb4, Bg3xe5

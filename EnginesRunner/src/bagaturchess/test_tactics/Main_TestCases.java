@@ -52,8 +52,9 @@ public class Main_TestCases {
     	int all_tests_count = 0;
     	int passed_tests_count = 0;
     	
-   		Go go = new Go(ChannelManager.getChannel(), "go nodes 10000");
-		
+   		//Go go = new Go(ChannelManager.getChannel(), "go nodes 10000");
+   		Go go = new Go(ChannelManager.getChannel(), "go movetime 1000");
+   		
     	for (ChessPuzzle puzzle: puzzles) {
     		
     		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(puzzle.getFen());

@@ -37,8 +37,8 @@ public class TTable_Impl2 implements ITTable {
 	
 	
 	private static final int FLAG_SHIFT = 9;
-	private static final int MOVE_SHIFT = 11;
-	private static final int SCORE_SHIFT = 45;
+	private static final int MOVE_SHIFT = 11; //Move is 22 bits
+	private static final int SCORE_SHIFT = 34;
 
 	
 	private final int maxEntries;
@@ -112,7 +112,7 @@ public class TTable_Impl2 implements ITTable {
 	@Override
 	public final void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove) {
 		
-		if (eval > 262143 || eval < -262144) {
+		if (eval > 536870911 || eval < -536870912) {
 			
 			return;
 			//throw new IllegalStateException("TT score overflow: eval=" + eval);
