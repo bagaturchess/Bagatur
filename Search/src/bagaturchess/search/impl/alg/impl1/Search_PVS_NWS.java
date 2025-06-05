@@ -762,9 +762,10 @@ public class Search_PVS_NWS extends SearchImpl {
 							return node.eval;
 						}
 						
-						if (score < 0 && SearchUtils.isMateVal(score)) {
+						//If the score is negative mate score
+						if (score < -ISearch.MAX_MATERIAL_INTERVAL) {
 							
-							//mateThreat = true;
+							mateThreat = true;
 						}
 					}
 				}
