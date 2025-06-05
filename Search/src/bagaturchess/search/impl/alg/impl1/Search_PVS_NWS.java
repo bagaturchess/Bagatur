@@ -235,12 +235,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		final int parentMove = env.getBitboard().getLastMove();
-		int bestMove = 0;
-		int bestScore = ISearch.MIN;
+		final boolean wasInCheck 	= env.getBitboard().isInCheck();
+		final int parentMove 		= env.getBitboard().getLastMove();
+		int bestMove 				= 0;
+		int bestScore 				= ISearch.MIN;
 		
-		int movesPerformed_attacks = 0;
-		int movesPerformed_quiet = 0;
+		int movesPerformed_attacks 	= 0;
+		int movesPerformed_quiet 	= 0;
 		
 		
 		SortedMoveList_Root list = new SortedMoveList_Root(333, env);
@@ -257,6 +258,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			info.setCurrentMoveNumber((movesPerformed_attacks + movesPerformed_quiet + 1));
 			
 			
+			boolean isCheckMove = env.getBitboard().isCheckMove(move);
+			
+			
 			env.getBitboard().makeMoveForward(move);
 							
 			
@@ -268,6 +272,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			boolean doLMR = depth >= 2
+						&& !wasInCheck
+						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& !env.getBitboard().getMoveOps().isCapture(move);
 			
@@ -986,6 +992,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				boolean isCheckMove = env.getBitboard().isCheckMove(move);
+				
+				
 				if (!env.getBitboard().getMoveOps().isCapture(move)) {
 					movesPerformed_quiet++;
 				} else {
@@ -995,6 +1004,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (!isPv
 						&& !wasInCheck
+						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& !SearchUtils.isMateVal(alpha)
 						&& !SearchUtils.isMateVal(beta)
@@ -1058,6 +1068,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean doLMR = new_depth >= 2
 						&& !wasInCheck
+						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& !env.getBitboard().getMoveOps().isCapture(move);
 				
@@ -1392,11 +1403,15 @@ public class Search_PVS_NWS extends SearchImpl {
 				}	
 				
 				
+				boolean isCheckMove = env.getBitboard().isCheckMove(move);
+				
+				
 				all_moves++;
 				
 				
 				if (!isPv
 						&& !wasInCheck
+						&& !isCheckMove
 						&& all_moves > 1
 						&& !SearchUtils.isMateVal(alpha)
 						&& !SearchUtils.isMateVal(beta)
@@ -1442,6 +1457,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean doLMR = depth >= 2
 						&& !wasInCheck
+						&& !isCheckMove
 						&& all_moves > 1
 						&& !env.getBitboard().getMoveOps().isCapture(move);
 				
