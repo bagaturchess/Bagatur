@@ -20,7 +20,7 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.search.impl.alg.impl1;
+package bagaturchess.search.impl.movelists;
 
 
 import bagaturchess.bitboard.impl1.internal.MoveUtil;

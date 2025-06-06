@@ -20,21 +20,36 @@
  *  along with BagaturChess. If not, see <http://www.eclipse.org/legal/epl-v10.html/>.
  *
  */
-package bagaturchess.search.impl.alg.impl1;
+package bagaturchess.search.impl.movelists;
 
 
+import bagaturchess.bitboard.impl2.MoveUtil;
 import bagaturchess.search.impl.env.SearchEnv;
 
 
-public class SortedMoveList_History extends SortedMoveList_BaseImpl {
+public class SortedMoveList_MVVLVA extends SortedMoveList_BaseImpl {
 	
 	
-	public SortedMoveList_History(int max, SearchEnv _env) {
+	public SortedMoveList_MVVLVA(int max, SearchEnv _env) {
 		super(max, _env);
 	}
-
+	
+	
 	@Override
 	protected int getOrderingValue(int move) {
-		return env.getHistory_All().getScores(env.getBitboard().getColourToMove(), move);
+		
+		//getAttackedPieceIndex and getSourcePieceIndex returns value in [1, 6]
+		int score = (6 * MoveUtil.getAttackedPieceIndex(move) - MoveUtil.getSourcePieceIndex(move));
+		
+		if (MoveUtil.isPromotion(move)) {
+			
+			//MoveUtil.getMoveType(move) returns value in [2, 5] when the move is promotion
+			score += MoveUtil.getMoveType(move);
+			
+		}
+		
+		score = 100 * score;
+		
+		return score;
 	}
 }

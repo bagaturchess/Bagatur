@@ -47,6 +47,9 @@ import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.search.impl.eval.cache.EvalEntry_BaseImpl;
 import bagaturchess.search.impl.eval.cache.IEvalEntry;
+import bagaturchess.search.impl.movelists.SortedMoveList_History;
+import bagaturchess.search.impl.movelists.SortedMoveList_MVVLVA;
+import bagaturchess.search.impl.movelists.SortedMoveList_Root;
 
 
 public class Search_PVS_NWS_V2 extends SearchImpl {
