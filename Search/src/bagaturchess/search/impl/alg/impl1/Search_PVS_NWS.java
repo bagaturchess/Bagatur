@@ -306,10 +306,13 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (!env.getBitboard().getMoveOps().isCapture(move)) {
 				
 				history.registerAll(env.getBitboard().getColourToMove(), move, depth);
+				env.getHistoryPerPly()[ply].registerAll(env.getBitboard().getColourToMove(), move, depth);
+				
 				
 				if (score < beta) {
 					
 					history.registerBad(env.getBitboard().getColourToMove(), move, depth);
+					env.getHistoryPerPly()[ply].registerBad(env.getBitboard().getColourToMove(), move, depth);
 				}
 			}
 			
@@ -338,6 +341,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					env.getKillersAndCounters().addKillerMove(env.getBitboard().getColourToMove(), move, ply);
 					
 					history.registerGood(env.getBitboard().getColourToMove(), move, depth);
+					env.getHistoryPerPly()[ply].registerGood(env.getBitboard().getColourToMove(), move, depth);
 				}
 				
 				break;
@@ -1119,10 +1123,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (!env.getBitboard().getMoveOps().isCapture(move)) {
 					
 					history.registerAll(colourToMove, move, depth);
+					env.getHistoryPerPly()[ply].registerAll(colourToMove, move, depth);
 					
 					if (score < beta) {
 						
 						history.registerBad(colourToMove, move, depth);
+						env.getHistoryPerPly()[ply].registerBad(colourToMove, move, depth);
 					}
 				}
 				
@@ -1151,6 +1157,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						env.getKillersAndCounters().addKillerMove(colourToMove, move, ply);
 						
 						history.registerGood(colourToMove, move, depth);
+						env.getHistoryPerPly()[ply].registerGood(colourToMove, move, depth);
 					}
 					
 					phase += 379;

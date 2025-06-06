@@ -48,7 +48,7 @@ public class SortedMoveList_Root extends SortedMoveList_BaseImpl {
 	@Override
 	protected int getOrderingValue(int move) {
 		
-		//TODO: ply
+		//For root node only -> ply = 0
 		int ply = 0;
 		
 		int killer1Move = env.getKillersAndCounters().getKiller1(env.getBitboard().getColourToMove(), ply);

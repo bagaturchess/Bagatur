@@ -21,7 +21,7 @@ public class SearchMoveListFactory implements ISearchMoveListFactory {
 	
 	@Override
 	public IMoveList createListHistory(SearchEnv env, int ply, boolean onTheFlySorting) {
-		return new SortedMoveList_History(333, env, onTheFlySorting);
+		return new SortedMoveList_History(333, env, ply, onTheFlySorting);
 	}
 	
 	

@@ -30,6 +30,7 @@ import bagaturchess.opening.api.OpeningBook;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
+import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMoveListFactory;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.history.HistoryTable;
@@ -69,6 +70,8 @@ public class SearchEnv {
 	
 	private IKillersAndCounters killersAndCounters;
 	
+	private IHistoryTable[] histories_per_ply;
+	
 	private ISearchMoveListFactory moveListFactory;
 	
 
@@ -79,6 +82,11 @@ public class SearchEnv {
 		bitboard 				= _bitboard;
 		
 		tactics 				= new Tactics(bitboard);
+		
+		histories_per_ply = new IHistoryTable[ISearch.MAX_DEPTH];
+		for (int i=0; i < histories_per_ply.length; i++) {
+			histories_per_ply[i] = new HistoryTable();
+		}
 		
 		history_all 			= new HistoryTable();
 		history_incheck 		= new HistoryTable();
@@ -119,6 +127,12 @@ public class SearchEnv {
 	public IKillersAndCounters getKillersAndCounters() {
 		
 		return killersAndCounters;
+	}
+	
+	
+	public IHistoryTable[] getHistoryPerPly() {
+		
+		return histories_per_ply;
 	}
 	
 	
