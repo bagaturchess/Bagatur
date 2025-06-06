@@ -25,6 +25,7 @@ package bagaturchess.search.impl.movelists;
 
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.search.impl.env.SearchEnv;
+import bagaturchess.search.impl.history.IHistoryTable;
 
 
 public class SortedMoveList_Root extends SortedMoveList_BaseImpl {
@@ -50,10 +51,10 @@ public class SortedMoveList_Root extends SortedMoveList_BaseImpl {
 		//TODO: ply
 		int ply = 0;
 		
-		int killer1Move = env.getHistory_All().getKiller1(env.getBitboard().getColourToMove(), ply);
-		int killer2Move = env.getHistory_All().getKiller2(env.getBitboard().getColourToMove(), ply);
-		int counterMove1 = env.getHistory_All().getCounter1(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
-		int counterMove2 = env.getHistory_All().getCounter2(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
+		int killer1Move = env.getKillersAndCounters().getKiller1(env.getBitboard().getColourToMove(), ply);
+		int killer2Move = env.getKillersAndCounters().getKiller2(env.getBitboard().getColourToMove(), ply);
+		int counterMove1 = env.getKillersAndCounters().getCounter1(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
+		int counterMove2 = env.getKillersAndCounters().getCounter2(env.getBitboard().getColourToMove(), env.getBitboard().getLastMove());
 		
 		
 		int ordval = 100000 * 100;
@@ -89,7 +90,9 @@ public class SortedMoveList_Root extends SortedMoveList_BaseImpl {
 		
 		if (!env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 			
-			ordval += env.getHistory_All().getScores(env.getBitboard().getColourToMove(), move);
+			IHistoryTable history = env.getBitboard().isInCheck() ? env.getHistory_InCheck() : env.getHistory_All();
+			
+			ordval += history.getScores(env.getBitboard().getColourToMove(), move);
 			
 		} else {
 			

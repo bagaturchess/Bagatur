@@ -32,8 +32,10 @@ import bagaturchess.search.api.IRootSearchConfig;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.ISearchMoveListFactory;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
-import bagaturchess.search.impl.history.CombinedHistory;
+import bagaturchess.search.impl.history.HistoryTable;
 import bagaturchess.search.impl.history.IHistoryTable;
+import bagaturchess.search.impl.history.IKillersAndCounters;
+import bagaturchess.search.impl.history.KillersAndCounters;
 import bagaturchess.search.impl.movelists.SearchMoveListFactory;
 import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.utils.Tactics;
@@ -65,6 +67,8 @@ public class SearchEnv {
 	private IHistoryTable history_all;
 	private IHistoryTable history_incheck;
 	
+	private IKillersAndCounters killersAndCounters;
+	
 	private ISearchMoveListFactory moveListFactory;
 	
 
@@ -76,10 +80,10 @@ public class SearchEnv {
 		
 		tactics 				= new Tactics(bitboard);
 		
-		//history 				= new HistoryTable_FromTo(new BinarySemaphore_Dummy());
-		history_all 			= new CombinedHistory();
-		history_incheck 		= null; //new CombinedHistory();
+		history_all 			= new HistoryTable();
+		history_incheck 		= new HistoryTable();
 		
+		killersAndCounters 		= new KillersAndCounters();
 		moveListFactory 		= new SearchMoveListFactory();
 		
 		checked_tpt 			= false;
@@ -109,6 +113,12 @@ public class SearchEnv {
 	public IHistoryTable getHistory_InCheck() {
 		
 		return history_incheck;
+	}
+	
+	
+	public IKillersAndCounters getKillersAndCounters() {
+		
+		return killersAndCounters;
 	}
 	
 	

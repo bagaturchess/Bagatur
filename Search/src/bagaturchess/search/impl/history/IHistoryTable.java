@@ -20,10 +20,7 @@
 package bagaturchess.search.impl.history;
 
 
-import bagaturchess.bitboard.api.IHistoryProvider;
-
-
-public interface IHistoryTable extends IHistoryProvider {
+public interface IHistoryTable {
 	
 	
 	//Cleanup and/or normalization
@@ -34,18 +31,6 @@ public interface IHistoryTable extends IHistoryProvider {
 	public void registerAll(int color, int move, int depth);
 	public void registerBad(int color, int move, int depth);
 	public void registerGood(int color, int move, int depth);
+	
 	public int getScores(int color, int move);
-	
-	
-	//Counter moves
-	public void addCounterMove(int color, int last_move, int counter_move);
-	public int getCounter1(int color, int parentMove);
-	public int getCounter2(int color, int parentMove);
-	
-	
-	//Killer moves
-	public void addKillerMove(int color, int move, int ply);
-	public int getKiller1(int color, int ply);
-	public int getKiller2(int color, int ply);
-	
 }

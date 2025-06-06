@@ -24,6 +24,7 @@ package bagaturchess.search.impl.movelists;
 
 
 import bagaturchess.search.impl.env.SearchEnv;
+import bagaturchess.search.impl.history.IHistoryTable;
 
 
 public class SortedMoveList_History extends SortedMoveList_BaseImpl {
@@ -32,9 +33,13 @@ public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 	public SortedMoveList_History(int max, SearchEnv _env, boolean onTheFlySorting) {
 		super(max, _env, onTheFlySorting);
 	}
-
+	
+	
 	@Override
 	protected int getOrderingValue(int move) {
-		return env.getHistory_All().getScores(env.getBitboard().getColourToMove(), move);
+		
+		IHistoryTable history = env.getBitboard().isInCheck() ? env.getHistory_InCheck() : env.getHistory_All();
+		
+		return history.getScores(env.getBitboard().getColourToMove(), move);
 	}
 }

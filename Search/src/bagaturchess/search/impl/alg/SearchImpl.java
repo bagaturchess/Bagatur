@@ -34,6 +34,8 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
+import bagaturchess.search.impl.history.KillersAndCounters;
+import bagaturchess.search.impl.history.HistoryTable;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.search.impl.tpt.TTEntry_BaseImpl;
@@ -49,6 +51,8 @@ public abstract class SearchImpl implements ISearch {
 	protected IMoveList[] lists_history;
 	protected IMoveList[] lists_root;
 	protected IMoveList[] lists_attacks;
+	
+	protected IHistoryTable[] histories;
 	
 	protected int[] buff_tpt_depthtracking 		= new int[1];
 	
@@ -101,6 +105,11 @@ public abstract class SearchImpl implements ISearch {
 			lists_attacks[i] = env.getMoveListFactory().createListCaptures(env, onTheFlySorting);
 		}
 		
+		histories = new IHistoryTable[MAX_DEPTH];
+		for (int i=0; i<histories.length; i++) {
+			//histories[i] = new HistoryTable();
+		}
+		
 		for (int i=0; i<tt_entries_per_ply.length; i++) {
 			tt_entries_per_ply[i] = new TTEntry_BaseImpl();
 		}
@@ -144,7 +153,7 @@ public abstract class SearchImpl implements ISearch {
 	public void newSearch() {
 		
 		env.getHistory_All().clear();
-		//env.getHistory_InCheck().clear();
+		env.getHistory_InCheck().clear();
 		
 		getEnv().getEval().beforeSearch();
 	}
