@@ -1,17 +1,6 @@
 package bagaturchess.search.impl.history;
 
 
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.BISHOP;
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.KING;
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.NIGHT;
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.PAWN;
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.QUEEN;
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
-import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
-
-import java.util.Arrays;
-
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 
@@ -24,11 +13,11 @@ public class CombinedHistory implements IHistoryTable {
 	
 	private int scale;
 	
-	private final long[][] HH_MOVES1 	= new long[2][64 * 64];
-	private final long[][] BF_MOVES1 	= new long[2][64 * 64];
+	private final long[][] HH_MOVES1 							= new long[2][64 * 64];
+	private final long[][] BF_MOVES1 							= new long[2][64 * 64];
 	
-	private final long[][][] HH_MOVES2 	= new long[2][7][64];
-	private final long[][][] BF_MOVES2 	= new long[2][7][64];
+	private final long[][][] HH_MOVES2 							= new long[2][7][64];
+	private final long[][][] BF_MOVES2 							= new long[2][7][64];
 	
 	private final IBetaCutoffMoves[][] KILLER_MOVES 			= new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
 	private final IBetaCutoffMoves[][][] COUNTER_MOVES_LASTIN	= new IBetaCutoffMoves[2][7][64];
@@ -74,44 +63,20 @@ public class CombinedHistory implements IHistoryTable {
 	
 	
 	public void clear() {
-		
-		Arrays.fill(HH_MOVES1[WHITE], 0);
-		Arrays.fill(HH_MOVES1[BLACK], 0);
-		
-		Arrays.fill(BF_MOVES1[WHITE], 1);
-		Arrays.fill(BF_MOVES1[BLACK], 1);
-		
-		Arrays.fill(HH_MOVES2[WHITE][0], 0);
-		Arrays.fill(HH_MOVES2[WHITE][PAWN], 0);
-		Arrays.fill(HH_MOVES2[WHITE][NIGHT], 0);
-		Arrays.fill(HH_MOVES2[WHITE][BISHOP], 0);
-		Arrays.fill(HH_MOVES2[WHITE][ROOK], 0);
-		Arrays.fill(HH_MOVES2[WHITE][QUEEN], 0);
-		Arrays.fill(HH_MOVES2[WHITE][KING], 0);
-		
-		Arrays.fill(HH_MOVES2[BLACK][0], 0);
-		Arrays.fill(HH_MOVES2[BLACK][PAWN], 0);
-		Arrays.fill(HH_MOVES2[BLACK][NIGHT], 0);
-		Arrays.fill(HH_MOVES2[BLACK][BISHOP], 0);
-		Arrays.fill(HH_MOVES2[BLACK][ROOK], 0);
-		Arrays.fill(HH_MOVES2[BLACK][QUEEN], 0);
-		Arrays.fill(HH_MOVES2[BLACK][KING], 0);
-		
-		Arrays.fill(BF_MOVES2[WHITE][0], 1);
-		Arrays.fill(BF_MOVES2[WHITE][PAWN], 1);
-		Arrays.fill(BF_MOVES2[WHITE][NIGHT], 1);
-		Arrays.fill(BF_MOVES2[WHITE][BISHOP], 1);
-		Arrays.fill(BF_MOVES2[WHITE][ROOK], 1);
-		Arrays.fill(BF_MOVES2[WHITE][QUEEN], 1);
-		Arrays.fill(BF_MOVES2[WHITE][KING], 1);
-		
-		Arrays.fill(BF_MOVES2[BLACK][0], 1);
-		Arrays.fill(BF_MOVES2[BLACK][PAWN], 1);
-		Arrays.fill(BF_MOVES2[BLACK][NIGHT], 1);
-		Arrays.fill(BF_MOVES2[BLACK][BISHOP], 1);
-		Arrays.fill(BF_MOVES2[BLACK][ROOK], 1);
-		Arrays.fill(BF_MOVES2[BLACK][QUEEN], 1);
-		Arrays.fill(BF_MOVES2[BLACK][KING], 1);
+
+	    for (int color = 0; color <= 1; color++) {
+	        for (int i = 0; i < 64 * 64; i++) {
+	            HH_MOVES1[color][i] =  HH_MOVES1[color][i] / 2;
+	            BF_MOVES1[color][i] = Math.max(1, (long)(BF_MOVES1[color][i] / 2));
+	        }
+
+	        for (int piece = 0; piece <= 6; piece++) {
+	            for (int to = 0; to < 64; to++) {
+	                HH_MOVES2[color][piece][to] = HH_MOVES2[color][piece][to] / 2;
+	                BF_MOVES2[color][piece][to] = Math.max(1, (long)(BF_MOVES2[color][piece][to] / 2));
+	            }
+	        }
+	    }
 		
 		for (int i = 0; i < KILLER_MOVES.length; i++) {
 			
@@ -280,16 +245,21 @@ public class CombinedHistory implements IHistoryTable {
 		@Override
 		public void clear() {
 			
-			for (int i = 0; i < 7; i++) {
-			    for (int j = 0; j < 64; j++) {
-			        moves_piece_to[i][j] = 0;
-			        counts[i][j] = 0L;
-			    }
-			}
-			
-			best_move1 = 0;
-			best_move2 = 0;
-			max_count = 0;
+		    max_count = 0;
+		    best_move1 = 0;
+		    best_move2 = 0;
+
+		    for (int piece = 0; piece < 7; piece++) {
+		        for (int to = 0; to < 64; to++) {
+		            counts[piece][to] /= 2;
+
+		            if (counts[piece][to] > max_count) {
+		                max_count = counts[piece][to];
+		                best_move2 = best_move1;
+		                best_move1 = moves_piece_to[piece][to];
+		            }
+		        }
+		    }
 		}
 	}
 
@@ -332,8 +302,7 @@ public class CombinedHistory implements IHistoryTable {
 		@Override
 		public void clear() {
 			
-			best_move1 = 0;
-			best_move2 = 0;
+			//Keep moves
 		}
 	}
 }

@@ -84,7 +84,7 @@ public abstract class SearchImpl implements ISearch {
 		
 		env = _env;
 
-		boolean onTheFlySorting = true;
+		boolean onTheFlySorting = false;
 		
 		lists_history = new IMoveList[MAX_DEPTH];
 		for (int i=0; i<lists_history.length; i++) {
