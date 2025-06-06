@@ -33,8 +33,8 @@ public class SortedMoveList_Root extends SortedMoveList_BaseImpl {
 	private int tt_move;
 	
 	
-	public SortedMoveList_Root(int max, SearchEnv _env) {
-		super(max, _env);
+	public SortedMoveList_Root(int max, SearchEnv _env, boolean onTheFlySorting) {
+		super(max, _env, onTheFlySorting);
 	}
 	
 	

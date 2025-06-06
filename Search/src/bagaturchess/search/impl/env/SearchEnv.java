@@ -34,7 +34,6 @@ import bagaturchess.search.api.internal.ISearchMoveListFactory;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.history.CombinedHistory;
 import bagaturchess.search.impl.history.IHistoryTable;
-import bagaturchess.search.impl.movelists.OrderingStatistics;
 import bagaturchess.search.impl.movelists.SearchMoveListFactory;
 import bagaturchess.search.impl.tpt.ITTable;
 import bagaturchess.search.impl.utils.Tactics;
@@ -68,8 +67,6 @@ public class SearchEnv {
 	
 	private ISearchMoveListFactory moveListFactory;
 	
-	protected OrderingStatistics orderingStatistics;
-
 
 	public SearchEnv(IBitBoard _bitboard, SharedData _shared) {
 		
@@ -85,17 +82,9 @@ public class SearchEnv {
 		
 		moveListFactory 		= new SearchMoveListFactory();
 		
-		orderingStatistics 		= new OrderingStatistics();
-		
 		checked_tpt 			= false;
 		checked_evalCache 		= false;
 		checked_syzygyDTZCache 	= false;
-	}
-	
-	
-	public OrderingStatistics getOrderingStatistics() {
-		
-		return orderingStatistics;
 	}
 	
 	

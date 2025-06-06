@@ -32,31 +32,44 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 	
 	protected SearchEnv env;
 	
+	boolean onTheFlySorting;
+	
 	private long[] moves;
 	private int count;
 	private int cur = 0;
 	
 	
-	public SortedMoveList_BaseImpl(int max, SearchEnv _env) {
+	public SortedMoveList_BaseImpl(int max, SearchEnv _env, boolean _onTheFlySorting) {
 		moves = new long[max];
 		env = _env;
+		onTheFlySorting = _onTheFlySorting;
 	}
+	
 	
 	public void reserved_clear() {
 		count = 0;
 	}
 	
+	
 	public final void reserved_add(int move) {
 		
 		long move_val = addOrderingValue(move, getOrderingValue(move));
 		
-        int insert_index = findInsertIndex(move_val);
-
-        // Shift elements to the right
-        System.arraycopy(moves, insert_index, moves, insert_index + 1, count - insert_index);
-
-        moves[insert_index] = move_val;
-        count++;
+		if (onTheFlySorting) {
+			
+	        // Just encode the score but do NOT sort yet
+	        moves[count++] = move_val;
+			
+		} else {
+			
+	        int insert_index = findInsertIndex(move_val);
+	
+	        // Shift elements to the right
+	        System.arraycopy(moves, insert_index, moves, insert_index + 1, count - insert_index);
+	
+	        moves[insert_index] = move_val;
+	        count++;
+		}
 	}
 
 	
@@ -105,11 +118,32 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 
 	
 	public int next() {
-		if (cur < count) {
-			return (int) moves[cur++];
-		} else {
-			return 0;
+		
+        if (cur >= count) return 0;
+        
+		if (onTheFlySorting) {
+
+	        // Selection of best remaining move
+	        int bestIndex = cur;
+	        long bestValue = moves[cur];
+
+	        for (int i = cur + 1; i < count; i++) {
+	            if ((moves[i] >>> 32) > (bestValue >>> 32)) {
+	                bestValue = moves[i];
+	                bestIndex = i;
+	            }
+	        }
+
+	        // Swap best with cur
+	        if (bestIndex != cur) {
+	            long tmp = moves[cur];
+	            moves[cur] = moves[bestIndex];
+	            moves[bestIndex] = tmp;
+	        }
 		}
+		
+        // Return current move
+        return (int) moves[cur++];
 	}
 
 	

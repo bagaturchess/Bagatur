@@ -1,7 +1,7 @@
 package bagaturchess.search.impl.movelists;
 
 
-import bagaturchess.search.api.internal.ISearchMoveList;
+import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.search.api.internal.ISearchMoveListFactory;
 import bagaturchess.search.impl.env.SearchEnv;
 
@@ -14,30 +14,19 @@ public class SearchMoveListFactory implements ISearchMoveListFactory {
 	
 	
 	@Override
-	public ISearchMoveList createListAll(SearchEnv env, int ply) {
-		return new ListAll(env, ply);
-	}
-
-
-	@Override
-	public ISearchMoveList createListAll_Root(SearchEnv env, int ply) {
-		return new ListAll(env, ply);
+	public IMoveList createListAll_Root(SearchEnv env, int ply, boolean onTheFlySorting) {
+		return new SortedMoveList_Root(333, env, onTheFlySorting);
 	}
 	
 	
 	@Override
-	public ISearchMoveList createListCaptures(SearchEnv env) {
-		return new ListCapsProm(env, env.getOrderingStatistics());
-	}
-
-
-	@Override
-	public ISearchMoveList createListAll_inCheck(SearchEnv env, int ply) {
-		return new ListKingEscapes(env, ply);
+	public IMoveList createListHistory(SearchEnv env, int ply, boolean onTheFlySorting) {
+		return new SortedMoveList_History(333, env, onTheFlySorting);
 	}
 	
 	
 	@Override
-	public void newSearch() {
+	public IMoveList createListCaptures(SearchEnv env, boolean onTheFlySorting) {
+		return new SortedMoveList_MVVLVA(333, env, onTheFlySorting);
 	}
 }

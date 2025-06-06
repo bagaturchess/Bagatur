@@ -25,13 +25,13 @@ package bagaturchess.search.impl.alg;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IGameStatus;
+import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
-import bagaturchess.search.api.internal.ISearchMoveList;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
 import bagaturchess.search.impl.history.IHistoryTable;
@@ -46,10 +46,9 @@ public abstract class SearchImpl implements ISearch {
 	
 	protected SearchEnv env;
 	
-	protected ISearchMoveList[] lists_all;
-	protected ISearchMoveList[] lists_all_root;
-	protected ISearchMoveList[] lists_escapes;
-	protected ISearchMoveList[] lists_capsproms;
+	protected IMoveList[] lists_history;
+	protected IMoveList[] lists_root;
+	protected IMoveList[] lists_attacks;
 	
 	protected int[] buff_tpt_depthtracking 		= new int[1];
 	
@@ -85,24 +84,21 @@ public abstract class SearchImpl implements ISearch {
 		
 		env = _env;
 
-		lists_all = new ISearchMoveList[MAX_DEPTH];
-		for (int i=0; i<lists_all.length; i++) {
-			lists_all[i] = env.getMoveListFactory().createListAll(env, i);
+		boolean onTheFlySorting = true;
+		
+		lists_history = new IMoveList[MAX_DEPTH];
+		for (int i=0; i<lists_history.length; i++) {
+			lists_history[i] = env.getMoveListFactory().createListHistory(env, i, onTheFlySorting);
 		}
 		
-		lists_all_root = new ISearchMoveList[MAX_DEPTH];
-		for (int i=0; i<lists_all_root.length; i++) {
-			lists_all_root[i] = env.getMoveListFactory().createListAll_Root(env, i);
+		lists_root = new IMoveList[MAX_DEPTH];
+		for (int i=0; i<lists_root.length; i++) {
+			lists_root[i] = env.getMoveListFactory().createListAll_Root(env, i, onTheFlySorting);
 		}
 		
-		lists_escapes = new ISearchMoveList[MAX_DEPTH];
-		for (int i=0; i<lists_escapes.length; i++) {
-			lists_escapes[i] = 	env.getMoveListFactory().createListAll_inCheck(env, i);
-		}
-		
-		lists_capsproms = new ISearchMoveList[MAX_DEPTH];
-		for (int i=0; i<lists_capsproms.length; i++) {
-			lists_capsproms[i] = env.getMoveListFactory().createListCaptures(env);
+		lists_attacks = new IMoveList[MAX_DEPTH];
+		for (int i=0; i<lists_attacks.length; i++) {
+			lists_attacks[i] = env.getMoveListFactory().createListCaptures(env, onTheFlySorting);
 		}
 		
 		for (int i=0; i<tt_entries_per_ply.length; i++) {
@@ -149,15 +145,6 @@ public abstract class SearchImpl implements ISearch {
 		
 		env.getHistory_All().clear();
 		//env.getHistory_InCheck().clear();
-		
-		env.getMoveListFactory().newSearch();
-		
-		env.getOrderingStatistics().normalize();
-		
-		for (int i=0; i<lists_all.length; i++) {
-			
-			lists_all[i].newSearch();
-		}
 		
 		getEnv().getEval().beforeSearch();
 	}

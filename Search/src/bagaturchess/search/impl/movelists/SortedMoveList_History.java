@@ -29,8 +29,8 @@ import bagaturchess.search.impl.env.SearchEnv;
 public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 	
 	
-	public SortedMoveList_History(int max, SearchEnv _env) {
-		super(max, _env);
+	public SortedMoveList_History(int max, SearchEnv _env, boolean onTheFlySorting) {
+		super(max, _env, onTheFlySorting);
 	}
 
 	@Override
