@@ -46,6 +46,7 @@ import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.search.impl.eval.cache.EvalEntry_BaseImpl;
 import bagaturchess.search.impl.eval.cache.IEvalEntry;
+import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.movelists.SortedMoveList_Root;
 
 
@@ -231,8 +232,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		int movesPerformed_attacks 	= 0;
 		int movesPerformed_quiet 	= 0;
 		
+		IHistoryTable history 		= env.getHistory_All();
 		
-		SortedMoveList_Root list = (SortedMoveList_Root) lists_root[ply];
+		SortedMoveList_Root list 	= (SortedMoveList_Root) lists_root[ply];
+		
 		list.clear();
 		list.setTTMove(ttMove);
 		env.getBitboard().genAllMoves(list);
@@ -302,11 +305,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!env.getBitboard().getMoveOps().isCapture(move)) {
 				
-				env.getHistory_All().registerAll(env.getBitboard().getColourToMove(), move, depth);
+				history.registerAll(env.getBitboard().getColourToMove(), move, depth);
 				
 				if (score < beta) {
 					
-					env.getHistory_All().registerBad(env.getBitboard().getColourToMove(), move, depth);
+					history.registerBad(env.getBitboard().getColourToMove(), move, depth);
 				}
 			}
 			
@@ -330,9 +333,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (alpha >= beta) {
 				
 				if (!env.getBitboard().getMoveOps().isCapture(move)) {
-					env.getHistory_All().addCounterMove(env.getBitboard().getColourToMove(), parentMove, move);
-					env.getHistory_All().addKillerMove(env.getBitboard().getColourToMove(), move, ply);
-					env.getHistory_All().registerGood(env.getBitboard().getColourToMove(), move, depth);
+					
+					history.addCounterMove(env.getBitboard().getColourToMove(), parentMove, move);
+					history.addKillerMove(env.getBitboard().getColourToMove(), move, ply);
+					history.registerGood(env.getBitboard().getColourToMove(), move, depth);
 				}
 				
 				break;
@@ -831,19 +835,21 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		int bestMove = 0;
-		int bestScore = ISearch.MIN;
+		int bestMove 				= 0;
+		int bestScore 				= ISearch.MIN;
 		
-		int killer1Move = 0;
-		int killer2Move = 0;
-		int counterMove1 = 0;
-		int counterMove2 = 0;
-		int movesPerformed_attacks = 0;
-		int movesPerformed_quiet = 0;
+		int killer1Move 			= 0;
+		int killer2Move 			= 0;
+		int counterMove1 			= 0;
+		int counterMove2 			= 0;
+		int movesPerformed_attacks 	= 0;
+		int movesPerformed_quiet 	= 0;
 		
-		IMoveList list1 = lists_history[ply];
-		IMoveList list2 = lists_attacks[ply];
-		IMoveList list = null;
+		IHistoryTable history 		= env.getHistory_All();
+		
+		IMoveList list1 			= lists_history[ply];
+		IMoveList list2 			= lists_attacks[ply];
+		IMoveList list 				= null;
 		
 		int phase = PHASE_TT;
 		while (phase <= PHASE_QUIET) {
@@ -871,7 +877,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_KILLER_1:
 				
-				killer1Move = env.getHistory_All().getKiller1(colourToMove, ply);
+				killer1Move = history.getKiller1(colourToMove, ply);
 				
 				if (killer1Move != 0 && killer1Move != ttMove && env.getBitboard().isPossible(killer1Move)) {
 					
@@ -884,7 +890,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_KILLER_2:
 				
-				killer2Move = env.getHistory_All().getKiller2(colourToMove, ply);
+				killer2Move = history.getKiller2(colourToMove, ply);
 				
 				if (killer2Move != 0 && killer2Move != ttMove && killer2Move != killer1Move && env.getBitboard().isPossible(killer2Move)) {
 					
@@ -897,7 +903,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			case PHASE_COUNTER_1:
 				
-				counterMove1 = env.getHistory_All().getCounter1(colourToMove, parentMove);
+				counterMove1 = history.getCounter1(colourToMove, parentMove);
 				
 				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && env.getBitboard().isPossible(counterMove1)) {
 					
@@ -910,7 +916,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_COUNTER_2:
 				
-				counterMove2 = env.getHistory_All().getCounter2(colourToMove, parentMove);
+				counterMove2 = history.getCounter2(colourToMove, parentMove);
 				
 				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && env.getBitboard().isPossible(counterMove2)) {
 					
@@ -1111,11 +1117,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (!env.getBitboard().getMoveOps().isCapture(move)) {
 					
-					env.getHistory_All().registerAll(colourToMove, move, depth);
+					history.registerAll(colourToMove, move, depth);
 					
 					if (score < beta) {
 						
-						env.getHistory_All().registerBad(colourToMove, move, depth);
+						history.registerBad(colourToMove, move, depth);
 					}
 				}
 				
@@ -1139,9 +1145,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (alpha >= beta) {
 					
 					if (!env.getBitboard().getMoveOps().isCapture(move)) {
-						env.getHistory_All().addCounterMove(colourToMove, parentMove, move);
-						env.getHistory_All().addKillerMove(colourToMove, move, ply);
-						env.getHistory_All().registerGood(colourToMove, move, depth);
+						
+						history.addCounterMove(colourToMove, parentMove, move);
+						history.addKillerMove(colourToMove, move, ply);
+						history.registerGood(colourToMove, move, depth);
 					}
 					
 					phase += 379;
@@ -1251,21 +1258,23 @@ public class Search_PVS_NWS extends SearchImpl {
 		final int colourToMove 		= env.getBitboard().getColourToMove();
 		
 		
-		final int alpha_org = alpha;
+		final int alpha_org 		= alpha;
 		
-		int killer1Move = 0;
-		int killer2Move = 0;
-		int counterMove1 = 0;
-		int counterMove2 = 0;
+		int killer1Move 			= 0;
+		int killer2Move 			= 0;
+		int counterMove1 			= 0;
+		int counterMove2 			= 0;
 		
-		int bestScore = ISearch.MIN;
-		int bestMove = 0;
+		int bestScore 				= ISearch.MIN;
+		int bestMove 				= 0;
 		
-		int all_moves = 0;
+		int all_moves 				= 0;
 		
-		IMoveList list1 = lists_history[ply];
-		IMoveList list2 = lists_attacks[ply];
-		IMoveList list = null;
+		IHistoryTable history 		= env.getHistory_All();
+		
+		IMoveList list1 			= lists_history[ply];
+		IMoveList list2 			= lists_attacks[ply];
+		IMoveList list 				= null;
 		
 		int phase = PHASE_TT;
 		while (phase <= PHASE_QUIET) {
@@ -1293,7 +1302,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_KILLER_1:
 				
-				killer1Move = env.getHistory_All().getKiller1(colourToMove, ply);
+				killer1Move = history.getKiller1(colourToMove, ply);
 				
 				if (killer1Move != 0 && killer1Move != ttMove2 && env.getBitboard().isPossible(killer1Move)) {
 					
@@ -1306,7 +1315,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_KILLER_2:
 				
-				killer2Move = env.getHistory_All().getKiller2(colourToMove, ply);
+				killer2Move = history.getKiller2(colourToMove, ply);
 				
 				if (killer2Move != 0 && killer2Move != ttMove2 && killer2Move != killer1Move && env.getBitboard().isPossible(killer2Move)) {
 					
@@ -1319,7 +1328,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			case PHASE_COUNTER_1:
 				
-				counterMove1 = env.getHistory_All().getCounter1(colourToMove, parentMove);
+				counterMove1 = history.getCounter1(colourToMove, parentMove);
 				
 				if (counterMove1 != 0 && counterMove1 != ttMove2 && counterMove1 != killer1Move && counterMove1 != killer2Move && env.getBitboard().isPossible(counterMove1)) {
 					
@@ -1332,7 +1341,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_COUNTER_2:
 				
-				counterMove2 = env.getHistory_All().getCounter2(colourToMove, parentMove);
+				counterMove2 = history.getCounter2(colourToMove, parentMove);
 				
 				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove2 && counterMove2 != killer1Move && counterMove2 != killer2Move && env.getBitboard().isPossible(counterMove2)) {
 					
