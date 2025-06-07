@@ -87,6 +87,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int RAZORING_MAXDEPTH 						= 4; //MAX_DEPTH;
 	private static final int RAZORING_MARGIN 						= 240;
 	
+	private static final boolean USE_LMR_ON_BAD_CAPTURES 			= false;
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -261,7 +262,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				movesPerformed_attacks++;
 			}
 			
-			boolean isQuietOrBadCapture = !env.getBitboard().getMoveOps().isCapture(move) || (env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) < 0);
+			boolean isQuietOrBadCapture = !env.getBitboard().getMoveOps().isCapture(move)
+					|| (USE_LMR_ON_BAD_CAPTURES && env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) < 0);
 			
 			boolean doLMR = depth >= 2
 						&& !wasInCheck
@@ -1066,7 +1068,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				boolean isQuietOrBadCapture = !env.getBitboard().getMoveOps().isCapture(move) || (env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) < 0);
+				boolean isQuietOrBadCapture = !env.getBitboard().getMoveOps().isCapture(move)
+						|| (USE_LMR_ON_BAD_CAPTURES && env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) < 0);
 				
 				boolean doLMR = new_depth >= 2
 						&& !wasInCheck
@@ -1462,7 +1465,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(move);
 				
 				
-				boolean isQuietOrBadCapture = !env.getBitboard().getMoveOps().isCapture(move) || (env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) < 0);
+				boolean isQuietOrBadCapture = !env.getBitboard().getMoveOps().isCapture(move)
+						|| (USE_LMR_ON_BAD_CAPTURES && env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) < 0);
 				
 				boolean doLMR = depth >= 2
 						&& !wasInCheck
