@@ -123,7 +123,8 @@ public abstract class SearchImpl implements ISearch {
 	
 	protected IHistoryTable getHistory(boolean inCheck) {
 		
-		return inCheck ? env.getHistory_InCheck() : env.getHistory_All();
+		return env.getHistory_All(); //Use common history
+		//return inCheck ? env.getHistory_InCheck() : env.getHistory_All();
 	}
 	
 	
@@ -148,11 +149,14 @@ public abstract class SearchImpl implements ISearch {
 		
 		env.getKillersAndCounters().clear();
 		
-		for (int i = 0; i < env.getHistoryPerPly().length; i++) {
+		if (SearchEnv.USE_HISTORIES_PER_PLY) {
 			
-			env.getHistoryPerPly()[i].clear();
+			for (int i = 0; i < env.getHistoryPerPly().length; i++) {
+				
+				env.getHistoryPerPly()[i].clear();
+			}
 		}
-		
+	
 		getEnv().getEval().beforeSearch();
 	}
 	

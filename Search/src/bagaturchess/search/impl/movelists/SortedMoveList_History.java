@@ -48,25 +48,28 @@ public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 		
 		IHistoryTable history = env.getBitboard().isInCheck() ? env.getHistory_InCheck() : env.getHistory_All();
 		
-		int value = 5 * history.getScores(color, move);
+		int value = history.getScores(color, move);
 		
-		value += env.getHistoryPerPly()[ply].getScores(color, move);
-		
-		if (ply - 1 >= 0) {
+		if (SearchEnv.USE_HISTORIES_PER_PLY) {
 			
-			value += env.getHistoryPerPly()[ply - 1].getScores(color, move);
+			value += env.getHistoryPerPly()[ply].getScores(color, move);
 			
-			if (ply - 2 >= 0) {
+			if (ply - 1 >= 0) {
 				
-				value += env.getHistoryPerPly()[ply - 2].getScores(color, move);
+				value += env.getHistoryPerPly()[ply - 1].getScores(color, move);
 				
-				if (ply - 4 >= 0) {
+				if (ply - 2 >= 0) {
 					
-					value += env.getHistoryPerPly()[ply - 4].getScores(color, move);
+					value += env.getHistoryPerPly()[ply - 2].getScores(color, move);
 					
-					if (ply - 6 >= 0) {
+					if (ply - 4 >= 0) {
 						
-						value += env.getHistoryPerPly()[ply - 6].getScores(color, move);
+						value += env.getHistoryPerPly()[ply - 4].getScores(color, move);
+						
+						if (ply - 6 >= 0) {
+							
+							value += env.getHistoryPerPly()[ply - 6].getScores(color, move);
+						}
 					}
 				}
 			}

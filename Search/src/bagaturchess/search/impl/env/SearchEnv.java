@@ -44,6 +44,7 @@ import bagaturchess.search.impl.utils.Tactics;
 
 public class SearchEnv {
 	
+	public static final boolean USE_HISTORIES_PER_PLY = false;
 	
 	private SharedData shared;
 	
@@ -83,9 +84,14 @@ public class SearchEnv {
 		
 		tactics 				= new Tactics(bitboard);
 		
-		histories_per_ply = new IHistoryTable[ISearch.MAX_DEPTH];
-		for (int i=0; i < histories_per_ply.length; i++) {
-			histories_per_ply[i] = new HistoryTable();
+		if (USE_HISTORIES_PER_PLY) {
+			
+			histories_per_ply = new IHistoryTable[ISearch.MAX_DEPTH];
+			
+			for (int i=0; i < histories_per_ply.length; i++) {
+				
+				histories_per_ply[i] = new HistoryTable();
+			}
 		}
 		
 		history_all 			= new HistoryTable();
