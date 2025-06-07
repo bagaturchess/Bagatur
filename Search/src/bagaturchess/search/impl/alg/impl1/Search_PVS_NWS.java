@@ -89,12 +89,11 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private static final boolean USE_LMR_ON_BAD_CAPTURES 			= false;
 	
-	private long lastSentMinorInfo_timestamp;
-	private long lastSentMinorInfo_nodesCount;
-	
-	
 	private static final boolean USE_DTZ_CACHE 						= true;
 	
+	
+	private long lastSentMinorInfo_timestamp;
+	private long lastSentMinorInfo_nodesCount;
 	
 	private IEvalEntry temp_cache_entry;
 	
