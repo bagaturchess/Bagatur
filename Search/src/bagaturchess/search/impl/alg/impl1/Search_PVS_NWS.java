@@ -1070,7 +1070,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					new_depth = depth;
 					
-				} else {
+				} /*else if (env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) > 0) {
+					
+					new_depth = depth;
+					
+				}*/ else {
 					
 					new_depth = depth - 1;
 				}
