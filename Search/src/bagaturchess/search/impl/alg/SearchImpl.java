@@ -121,13 +121,6 @@ public abstract class SearchImpl implements ISearch {
 	}
 	
 	
-	protected IHistoryTable getHistory(boolean inCheck) {
-		
-		return env.getHistory_All(); //Use common history
-		//return inCheck ? env.getHistory_InCheck() : env.getHistory_All();
-	}
-	
-	
 	protected static SharedData getOrCreateSearchEnv(Object[] args) {
 		
 		if (args[2] == null) {
@@ -144,8 +137,7 @@ public abstract class SearchImpl implements ISearch {
 	
 	public void newSearch() {
 		
-		env.getHistory_All().clear();
-		env.getHistory_InCheck().clear();
+		env.getHistory().clear();
 		
 		env.getKillersAndCounters().clear();
 		

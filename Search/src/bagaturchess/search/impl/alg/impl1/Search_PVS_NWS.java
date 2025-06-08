@@ -232,7 +232,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int movesPerformed_attacks 	= 0;
 		int movesPerformed_quiet 	= 0;
 		
-		IHistoryTable history 		= getHistory(wasInCheck);
+		IHistoryTable history 		= env.getHistory();
 		
 		SortedMoveList_Root list 	= (SortedMoveList_Root) lists_root[ply];
 		
@@ -851,7 +851,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int movesPerformed_attacks 	= 0;
 		int movesPerformed_quiet 	= 0;
 		
-		IHistoryTable history 		= getHistory(wasInCheck);
+		IHistoryTable history 		= env.getHistory();
 		
 		IMoveList list1 			= lists_history[ply];
 		IMoveList list2 			= lists_attacks[ply];

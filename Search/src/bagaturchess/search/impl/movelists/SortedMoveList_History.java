@@ -71,7 +71,7 @@ public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 			}
 		} else {
 			
-			IHistoryTable history = env.getHistory_All();
+			IHistoryTable history = env.getHistory();
 			
 			value += history.getScores(color, move);
 		}

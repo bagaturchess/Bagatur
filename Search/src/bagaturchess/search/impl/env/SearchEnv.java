@@ -66,8 +66,7 @@ public class SearchEnv {
 	private boolean checked_syzygyDTZCache;
 	
 	
-	private IHistoryTable history_all;
-	private IHistoryTable history_incheck;
+	private IHistoryTable history;
 	
 	private IKillersAndCounters killersAndCounters;
 	
@@ -94,8 +93,7 @@ public class SearchEnv {
 			}
 		}
 		
-		history_all 			= new HistoryTable();
-		history_incheck 		= new HistoryTable();
+		history 				= new HistoryTable();
 		
 		killersAndCounters 		= new KillersAndCounters();
 		moveListFactory 		= new SearchMoveListFactory();
@@ -118,15 +116,9 @@ public class SearchEnv {
 	}
 
 	
-	public IHistoryTable getHistory_All() {
+	public IHistoryTable getHistory() {
 		
-		return history_all;
-	}
-
-	
-	public IHistoryTable getHistory_InCheck() {
-		
-		return history_incheck;
+		return history;
 	}
 	
 	
