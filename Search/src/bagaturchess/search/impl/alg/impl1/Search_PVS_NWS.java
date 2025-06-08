@@ -358,7 +358,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.eval = getDrawScores(-1);
 				node.leaf = true;
 				
-				return node.eval;
+				bestScore = node.eval;
+				bestMove = 0;
 				
 			} else {
 				
@@ -366,8 +367,21 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.eval = -SearchUtils.getMateVal(ply, getEnv().getBitboard());
 				node.leaf = true;
 				
-				return node.eval;
+				bestScore = node.eval;
+				bestMove = 0;
 			}
+		}
+		
+		
+		if (bestScore != node.eval) {
+			
+			throw new IllegalStateException("bestScore != node.eval");
+		}
+		
+		
+		if (bestMove != node.bestmove) {
+			
+			throw new IllegalStateException("bestMove != node.bestmove");
 		}
 		
 		
@@ -376,11 +390,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
 		}
 		
-		
-		if (bestScore != node.eval) {
-			
-			throw new IllegalStateException("bestScore != node.eval");
-		}
 		
 		//validatePV(node, evaluator, node.eval, ply, depth, isPv, false);
 		
@@ -1180,7 +1189,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.eval = getDrawScores(-1);
 				node.leaf = true;
 				
-				return node.eval;
+				bestScore = node.eval;
+				bestMove = 0;
 				
 			} else {
 				
@@ -1188,7 +1198,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.eval = -SearchUtils.getMateVal(ply);
 				node.leaf = true;
 				
-				return node.eval;
+				bestScore = node.eval;
+				bestMove = 0;
 			}
 		}
 		
@@ -1210,7 +1221,9 @@ public class Search_PVS_NWS extends SearchImpl {
 			env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
 		}
 		
+		
 		//validatePV(node, evaluator, node.eval, ply, depth, isPv, false);
+		
 		
 		return node.eval;
 	}
