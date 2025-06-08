@@ -777,7 +777,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 						
 						//If the score is negative mate score
-						if (score < -ISearch.MAX_MATERIAL_INTERVAL) {
+						if (score < -ISearch.MAX_MATERIAL_INTERVAL
+								&& ply < 2 * initialMaxDepth) {
 							
 							mateThreat = true;
 						}
@@ -812,7 +813,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean extend_tt_move = false;
 		
 		if (depth >= 4
-				&& depth < 2 * initialMaxDepth
+				&& ply < 2 * initialMaxDepth
 				&& isTTLowerBoundOrExact
 				&& isTTDepthEnoughForSingularExtension
 				&& env.getBitboard().isPossible(ttMove)
