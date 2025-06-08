@@ -46,13 +46,9 @@ public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 		
 		int color = env.getBitboard().getColourToMove();
 		
-		IHistoryTable history = env.getBitboard().isInCheck() ? env.getHistory_InCheck() : env.getHistory_All();
-		
-		int value = history.getScores(color, move);
+		int value = 0;
 		
 		if (SearchEnv.USE_HISTORIES_PER_PLY) {
-			
-			value += env.getHistoryPerPly()[ply].getScores(color, move);
 			
 			if (ply - 1 >= 0) {
 				
@@ -73,6 +69,11 @@ public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 					}
 				}
 			}
+		} else {
+			
+			IHistoryTable history = env.getHistory_All();
+			
+			value += history.getScores(color, move);
 		}
 		
 		return value;
