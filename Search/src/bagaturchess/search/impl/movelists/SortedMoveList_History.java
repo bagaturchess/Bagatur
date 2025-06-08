@@ -30,6 +30,9 @@ import bagaturchess.search.impl.history.IHistoryTable;
 public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 	
 	
+	private static final boolean ORDER_CHECKS_FIRST = false;
+	
+	
 	private int ply;
 	
 	
@@ -46,7 +49,7 @@ public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 		
 		int color = env.getBitboard().getColourToMove();
 		
-		int value = 0;
+		int value = ORDER_CHECKS_FIRST && env.getBitboard().isCheckMove(move) ? 10000 : 0;
 		
 		if (SearchEnv.USE_HISTORIES_PER_PLY) {
 			
