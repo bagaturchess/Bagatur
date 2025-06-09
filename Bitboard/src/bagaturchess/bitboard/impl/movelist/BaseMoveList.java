@@ -87,4 +87,11 @@ public class BaseMoveList implements IMoveList {
 	public int size() {
 		return count;
 	}
+
+
+	@Override
+	public int getScore() {
+
+		throw new UnsupportedOperationException();
+	}
 }

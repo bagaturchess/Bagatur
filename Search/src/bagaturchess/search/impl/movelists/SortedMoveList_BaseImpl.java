@@ -147,6 +147,12 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 	}
 
 	
+	public int getScore() {
+		
+		return (int) (moves[cur] >>> 32);
+	}
+	
+	
 	public int size() {
 		return count;
 	}
