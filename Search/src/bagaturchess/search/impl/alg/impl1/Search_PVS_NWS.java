@@ -1675,16 +1675,16 @@ public class Search_PVS_NWS extends SearchImpl {
 	    	return node.eval;
 		}*/
 		
-		int alphaOrig = alpha;
+		int alphaOrig 	= alpha;
 		
-		alpha = Math.max(alpha, eval);
+		alpha 			= Math.max(alpha, eval);
 		
-		int bestMove = 0;
-		int bestScore = ISearch.MIN;
+		int bestMove 	= 0;
+		int bestScore 	= ISearch.MIN;
 		
-		IMoveList list = lists_attacks[ply];
+		IMoveList list 	= lists_attacks[ply];
 		
-		int phase = PHASE_ATTACKING_GOOD;
+		int phase 		= PHASE_ATTACKING_GOOD;
 		
 		while (phase <= PHASE_ATTACKING_GOOD) {
 			
