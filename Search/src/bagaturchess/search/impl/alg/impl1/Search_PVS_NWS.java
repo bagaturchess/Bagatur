@@ -306,14 +306,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!env.getBitboard().getMoveOps().isCapture(move)) {
 				
-				history.registerAll(env.getBitboard().getColourToMove(), move, depth);
-				if (SearchEnv.USE_HISTORIES_PER_PLY) env.getHistoryPerPly()[ply].registerAll(env.getBitboard().getColourToMove(), move, depth);
-				
+				history.registerAll(parentMove, move, depth);				
 				
 				if (score < beta) {
 					
-					history.registerBad(env.getBitboard().getColourToMove(), move, depth);
-					if (SearchEnv.USE_HISTORIES_PER_PLY) env.getHistoryPerPly()[ply].registerBad(env.getBitboard().getColourToMove(), move, depth);
+					history.registerBad(parentMove, move, depth);
 				}
 			}
 			
@@ -341,8 +338,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					env.getKillersAndCounters().addCounterMove(env.getBitboard().getColourToMove(), parentMove, move);
 					env.getKillersAndCounters().addKillerMove(env.getBitboard().getColourToMove(), move, ply);
 					
-					history.registerGood(env.getBitboard().getColourToMove(), move, depth);
-					if (SearchEnv.USE_HISTORIES_PER_PLY) env.getHistoryPerPly()[ply].registerGood(env.getBitboard().getColourToMove(), move, depth);
+					history.registerGood(parentMove, move, depth);
 				}
 				
 				break;
@@ -1138,13 +1134,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (!env.getBitboard().getMoveOps().isCapture(move)) {
 					
-					history.registerAll(colourToMove, move, depth);
-					if (SearchEnv.USE_HISTORIES_PER_PLY) env.getHistoryPerPly()[ply].registerAll(colourToMove, move, depth);
+					history.registerAll(parentMove, move, depth);
 					
 					if (score < beta) {
 						
-						history.registerBad(colourToMove, move, depth);
-						if (SearchEnv.USE_HISTORIES_PER_PLY) env.getHistoryPerPly()[ply].registerBad(colourToMove, move, depth);
+						history.registerBad(parentMove, move, depth);
 					}
 				}
 				
@@ -1172,8 +1166,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						env.getKillersAndCounters().addCounterMove(colourToMove, parentMove, move);
 						env.getKillersAndCounters().addKillerMove(colourToMove, move, ply);
 						
-						history.registerGood(colourToMove, move, depth);
-						if (SearchEnv.USE_HISTORIES_PER_PLY) env.getHistoryPerPly()[ply].registerGood(colourToMove, move, depth);
+						history.registerGood(parentMove, move, depth);
 					}
 					
 					phase += 379;

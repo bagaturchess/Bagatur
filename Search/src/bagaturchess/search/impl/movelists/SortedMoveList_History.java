@@ -47,37 +47,11 @@ public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 	@Override
 	protected int getOrderingValue(int move) {
 		
-		int color = env.getBitboard().getColourToMove();
-		
 		int value = ORDER_CHECKS_FIRST && env.getBitboard().isCheckMove(move) ? 10000 : 0;
 		
-		if (SearchEnv.USE_HISTORIES_PER_PLY) {
-			
-			if (ply - 1 >= 0) {
-				
-				value += env.getHistoryPerPly()[ply - 1].getScores(color, move);
-				
-				if (ply - 2 >= 0) {
-					
-					value += env.getHistoryPerPly()[ply - 2].getScores(color, move);
-					
-					if (ply - 4 >= 0) {
-						
-						value += env.getHistoryPerPly()[ply - 4].getScores(color, move);
-						
-						if (ply - 6 >= 0) {
-							
-							value += env.getHistoryPerPly()[ply - 6].getScores(color, move);
-						}
-					}
-				}
-			}
-		} else {
-			
-			IHistoryTable history = env.getHistory();
-			
-			value += history.getScores(color, move);
-		}
+		IHistoryTable history = env.getHistory();
+		
+		value += history.getScores(env.getBitboard().getLastMove(), move);
 		
 		return value;
 	}

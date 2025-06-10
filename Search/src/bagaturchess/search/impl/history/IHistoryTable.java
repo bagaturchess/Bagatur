@@ -28,9 +28,9 @@ public interface IHistoryTable {
 	
 	
 	//Moves history
-	public void registerAll(int color, int move, int depth);
-	public void registerBad(int color, int move, int depth);
-	public void registerGood(int color, int move, int depth);
+	public void registerAll(int prevmove, int move, int depth);
+	public void registerBad(int prevmove, int move, int depth);
+	public void registerGood(int prevmove, int move, int depth);
 	
-	public int getScores(int color, int move);
+	public int getScores(int prevmove, int move);
 }

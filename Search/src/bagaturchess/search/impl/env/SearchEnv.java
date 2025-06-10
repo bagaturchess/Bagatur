@@ -33,6 +33,7 @@ import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMoveListFactory;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
+import bagaturchess.search.impl.history.ContinuationHistory;
 import bagaturchess.search.impl.history.HistoryTable;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.history.IKillersAndCounters;
@@ -43,8 +44,6 @@ import bagaturchess.search.impl.utils.Tactics;
 
 
 public class SearchEnv {
-	
-	public static final boolean USE_HISTORIES_PER_PLY = false;
 	
 	private SharedData shared;
 	
@@ -83,17 +82,7 @@ public class SearchEnv {
 		
 		tactics 				= new Tactics(bitboard);
 		
-		if (USE_HISTORIES_PER_PLY) {
-			
-			histories_per_ply = new IHistoryTable[ISearch.MAX_DEPTH];
-			
-			for (int i=0; i < histories_per_ply.length; i++) {
-				
-				histories_per_ply[i] = new HistoryTable();
-			}
-		}
-		
-		history 				= new HistoryTable();
+		history 				= new ContinuationHistory();
 		
 		killersAndCounters 		= new KillersAndCounters();
 		moveListFactory 		= new SearchMoveListFactory();
