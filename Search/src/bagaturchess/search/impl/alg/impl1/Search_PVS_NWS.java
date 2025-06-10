@@ -253,7 +253,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			env.getBitboard().makeMoveForward(move);
-							
+			
 			
 			if (!env.getBitboard().getMoveOps().isCapture(move)) {
 				movesPerformed_quiet++;
@@ -267,10 +267,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean doLMR = depth >= 2
 						&& !wasInCheck
 						&& !isCheckMove
-						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& movesPerformed_attacks + movesPerformed_quiet > 2
 						&& isQuietOrBadCapture;
 			
 			int reduction = 1;
+			
 			if (doLMR) {
 				
 				reduction = LMR_TABLE[Math.min(depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
@@ -282,7 +283,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int score = ISearch.MIN;
 			
 			if (reduction > 1) {
-									
+				
 				score = -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 				
 				if (score > alpha) {
@@ -296,7 +297,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			if (isPv && (score > alpha || movesPerformed_attacks + movesPerformed_quiet == 1)) {
-					
+				
 				score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
 			}
 			
