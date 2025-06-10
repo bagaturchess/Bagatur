@@ -774,6 +774,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						//If the score is negative mate score
 						if (score < -ISearch.MAX_MATERIAL_INTERVAL
+								&& depth >= 2
 								&& ply < 2 * initialMaxDepth) {
 							
 							mateThreat = true;
