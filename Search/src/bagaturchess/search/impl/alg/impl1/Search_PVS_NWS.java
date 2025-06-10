@@ -60,8 +60,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_KILLER_2 						= 3;
 	private static final int PHASE_COUNTER_1 						= 4;
 	private static final int PHASE_COUNTER_2 						= 5;
-	private static final int PHASE_ATTACKING_BAD 					= 6;
-	private static final int PHASE_QUIET 							= 7;
+	private static final int PHASE_QUIET 							= 6;
+	private static final int PHASE_ATTACKING_BAD 					= 7;
 	
 	private static final int[][] LMR_TABLE 							= new int[64][64];
 	
@@ -871,7 +871,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		IMoveList list 				= null;
 		
 		int phase = PHASE_TT;
-		while (phase <= PHASE_QUIET) {
+		while (phase <= PHASE_ATTACKING_BAD) {
 			
 			switch (phase) {
 			
@@ -1308,7 +1308,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		IMoveList list 				= null;
 		
 		int phase = PHASE_TT;
-		while (phase <= PHASE_QUIET) {
+		while (phase <= PHASE_ATTACKING_BAD) {
 			
 			switch (phase) {
 			
