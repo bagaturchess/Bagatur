@@ -29,6 +29,7 @@ import java.util.Stack;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.IEvaluator;
@@ -99,6 +100,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private BacktrackingInfo[] search_info 							= new BacktrackingInfo[MAX_DEPTH + 1];
 	
+	private VarStatistic stats 										= new VarStatistic();
+	
 	
 	public Search_PVS_NWS(Object[] args) {
 		
@@ -148,6 +151,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (env.getSyzygyDTZCache() != null) ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Syzygy DTZ cache hitrate=" + env.getSyzygyDTZCache().getHitRate() + ", usage=" + env.getSyzygyDTZCache().getUsage());
 		}
+		
+		stats.clear();
 	}
 	
 	
@@ -1001,6 +1006,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				if (!env.getBitboard().getMoveOps().isCapture(move)) {
+					
+					stats.addValue(list.getScore());
+				}
+				
 				boolean isCheckMove = env.getBitboard().isCheckMove(move);
 				
 				
@@ -1022,8 +1032,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (phase == PHASE_QUIET) {
 						
-						/*if (depth <= 3
-								&& moveGen.getScore() <= 27 / depth) {
+						/*if (list.getScore() <= stats.getEntropy() / depth) {
 							
 							continue;
 						}*/
