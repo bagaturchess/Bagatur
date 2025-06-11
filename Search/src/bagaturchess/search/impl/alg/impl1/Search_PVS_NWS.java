@@ -88,6 +88,9 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int RAZORING_MAXDEPTH 						= 4; //MAX_DEPTH;
 	private static final int RAZORING_MARGIN 						= 240;
 	
+	private static final int SEE_MAXDEPTH 							= 8; //MAX_DEPTH;
+	private static final int SEE_MARGIN 							= 65;
+	
 	private static final boolean USE_LMR_ON_BAD_CAPTURES 			= false;
 	
 	private static final boolean USE_DTZ_CACHE 						= true;
@@ -1062,16 +1065,17 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 						
 						if (movesPerformed_attacks + movesPerformed_quiet > 3
-								&& depth <= 8
+								&& depth <= SEE_MAXDEPTH
 								&& hasAtLeastOnePiece
-								&& env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
+								&& env.getBitboard().getSEEScore(move) < -SEE_MARGIN * depth / PRUNING_AGGRESSIVENESS) {
 							
 							continue;
 						}
 						
 					} else if (phase == PHASE_ATTACKING_BAD
+							&& depth <= SEE_MAXDEPTH
 							&& hasAtLeastOnePiece
-							&& env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
+							&& env.getBitboard().getSEEScore(move) < -SEE_MARGIN * depth / PRUNING_AGGRESSIVENESS) {
 						
 						continue;
 					}
@@ -1493,16 +1497,17 @@ public class Search_PVS_NWS extends SearchImpl {
 						}
 						
 						if (all_moves > 3
-								&& depth <= 8
+								&& depth <= SEE_MAXDEPTH
 								&& hasAtLeastOnePiece
-								&& env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
+								&& env.getBitboard().getSEEScore(move) < -SEE_MARGIN * depth / PRUNING_AGGRESSIVENESS) {
 							
 							continue;
 						}
 						
 					} else if (phase == PHASE_ATTACKING_BAD
+							&& depth <= SEE_MAXDEPTH
 							&& hasAtLeastOnePiece
-							&& env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
+							&& env.getBitboard().getSEEScore(move) < -SEE_MARGIN * depth / PRUNING_AGGRESSIVENESS) {
 						
 						continue;
 					}
