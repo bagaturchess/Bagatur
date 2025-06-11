@@ -63,6 +63,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_QUIET 							= 6;
 	private static final int PHASE_ATTACKING_BAD 					= 7;
 	
+	private static final double REDUCTION_AGGRESSIVENESS 			= 1;
+	
 	private static final int[][] LMR_TABLE 							= new int[64][64];
 	
 	static {
@@ -72,6 +74,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			for (int move_number = 1; move_number < 64; move_number++) {
 				
 				LMR_TABLE[depth][move_number] = (int) Math.ceil(Math.max(1, Math.log(move_number) * Math.log(depth) / (double) 2));
+				LMR_TABLE[depth][move_number] = (int) (LMR_TABLE[depth][move_number] * REDUCTION_AGGRESSIVENESS);
 			}
 		}
 	}
@@ -769,7 +772,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						env.getBitboard().makeNullMoveForward();
 						
-						final int reduction = depth / 4 + 3 + Math.min((Math.max(0, eval - beta)) / 80, 3);
+						int reduction = depth / 4 + 3 + Math.min((Math.max(0, eval - beta)) / 80, 3);
+						reduction = (int) (reduction * REDUCTION_AGGRESSIVENESS);
 						
 						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, -beta, -beta + 1, ply + 1, false)
 								: -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth);
@@ -833,6 +837,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int singular_margin = 2 * depth;
 			int singular_beta = ttValue - singular_margin;
 			int singular_depth = depth / 2;
+			singular_depth = (int) Math.max(1 , singular_depth / REDUCTION_AGGRESSIVENESS);
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, ply,
 					singular_depth, singular_beta - 1, singular_beta, false, initialMaxDepth, ttMove, eval);
