@@ -49,10 +49,9 @@ public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 		
 		int value = ORDER_CHECKS_FIRST && env.getBitboard().isCheckMove(move) ? 10000 : 0;
 		
-		IHistoryTable history = env.getHistory();
-		
-		value += history.getScores(env.getBitboard().getLastMove(), move);
-		
+		value += env.getHistory().getScores(-1, move);
+		value += env.getContinuationHistory().getScores(env.getBitboard().getLastMove(), move);
+				
 		return value;
 	}
 }

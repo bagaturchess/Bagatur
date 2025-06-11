@@ -139,6 +139,8 @@ public abstract class SearchImpl implements ISearch {
 		
 		env.getHistory().clear();
 		
+		env.getContinuationHistory().clear();
+		
 		env.getKillersAndCounters().clear();
 	
 		getEnv().getEval().beforeSearch();

@@ -90,9 +90,8 @@ public class SortedMoveList_Root extends SortedMoveList_BaseImpl {
 		
 		if (!env.getBitboard().getMoveOps().isCaptureOrPromotion(move)) {
 			
-			IHistoryTable history = env.getHistory();
-			
-			ordval += history.getScores(env.getBitboard().getColourToMove(), move);
+			ordval += env.getHistory().getScores(-1, move);
+			ordval += env.getContinuationHistory().getScores(env.getBitboard().getLastMove(), move);
 			
 		} else {
 			

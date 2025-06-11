@@ -238,6 +238,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int movesPerformed_quiet 	= 0;
 		
 		IHistoryTable history 		= env.getHistory();
+		IHistoryTable conthist 		= env.getContinuationHistory();
 		
 		SortedMoveList_Root list 	= (SortedMoveList_Root) lists_root[ply];
 		
@@ -313,10 +314,12 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (!env.getBitboard().getMoveOps().isCapture(move)) {
 				
 				history.registerAll(parentMove, move, depth);				
+				conthist.registerAll(parentMove, move, depth);
 				
 				if (score < beta) {
 					
 					history.registerBad(parentMove, move, depth);
+					conthist.registerBad(parentMove, move, depth);
 				}
 			}
 			
@@ -345,6 +348,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					env.getKillersAndCounters().addKillerMove(env.getBitboard().getColourToMove(), move, ply);
 					
 					history.registerGood(parentMove, move, depth);
+					conthist.registerGood(parentMove, move, depth);
 				}
 				
 				break;
@@ -865,6 +869,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int movesPerformed_quiet 	= 0;
 		
 		IHistoryTable history 		= env.getHistory();
+		IHistoryTable conthist 		= env.getContinuationHistory();
 		
 		IMoveList list1 			= lists_history[ply];
 		IMoveList list2 			= lists_attacks[ply];
@@ -1146,10 +1151,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (!env.getBitboard().getMoveOps().isCapture(move)) {
 					
 					history.registerAll(parentMove, move, depth);
+					conthist.registerAll(parentMove, move, depth);
 					
 					if (score < beta) {
 						
 						history.registerBad(parentMove, move, depth);
+						conthist.registerBad(parentMove, move, depth);
 					}
 				}
 				
@@ -1178,6 +1185,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						env.getKillersAndCounters().addKillerMove(colourToMove, move, ply);
 						
 						history.registerGood(parentMove, move, depth);
+						conthist.registerGood(parentMove, move, depth);
 					}
 					
 					phase += 379;

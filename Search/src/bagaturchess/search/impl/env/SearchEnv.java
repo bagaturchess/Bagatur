@@ -66,6 +66,7 @@ public class SearchEnv {
 	
 	
 	private IHistoryTable history;
+	private IHistoryTable continuation_history;
 	
 	private IKillersAndCounters killersAndCounters;
 	
@@ -82,7 +83,8 @@ public class SearchEnv {
 		
 		tactics 				= new Tactics(bitboard);
 		
-		history 				= new ContinuationHistory();
+		continuation_history 	= new ContinuationHistory();
+		history 				= new HistoryTable();
 		
 		killersAndCounters 		= new KillersAndCounters();
 		moveListFactory 		= new SearchMoveListFactory();
@@ -108,6 +110,12 @@ public class SearchEnv {
 	public IHistoryTable getHistory() {
 		
 		return history;
+	}
+	
+	
+	public IHistoryTable getContinuationHistory() {
+		
+		return continuation_history;
 	}
 	
 	
