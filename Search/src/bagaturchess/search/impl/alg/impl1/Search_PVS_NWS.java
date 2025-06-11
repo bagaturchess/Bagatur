@@ -63,8 +63,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_QUIET 							= 6;
 	private static final int PHASE_ATTACKING_BAD 					= 7;
 	
-	private static final double REDUCTION_AGGRESSIVENESS 			= 1; //1.25;
-	private static final double PRUNING_AGGRESSIVENESS 				= 1; //1.25;
+	private static final double REDUCTION_AGGRESSIVENESS 			= 1.25;
+	private static final double PRUNING_AGGRESSIVENESS 				= 1.25;
 	
 	private static final int[][] LMR_TABLE 							= new int[64][64];
 	
