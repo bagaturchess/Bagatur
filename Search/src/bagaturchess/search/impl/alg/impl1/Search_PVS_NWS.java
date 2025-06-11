@@ -1117,23 +1117,16 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (move == ttMove && tt_move_extension != 0) {
 					
-					new_depth = depth - 1 + tt_move_extension; //isPv ? depth : depth + 1;
+					new_depth = depth - 1 + tt_move_extension;
 					
+					//Extend TT move to end up with search (not qsearch).
 					//new_depth = Math.max(1, new_depth);
 					
-				} /*else if (wasInCheck) {
+				} else if (mateThreat) {
 					
 					new_depth = depth;
 					
-				}*/ else if (mateThreat) {
-					
-					new_depth = depth;
-					
-				} /*else if (env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) > 0) {
-					
-					new_depth = depth;
-					
-				}*/ else {
+				} else {
 					
 					new_depth = depth - 1;
 				}
