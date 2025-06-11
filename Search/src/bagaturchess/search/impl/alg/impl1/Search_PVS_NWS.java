@@ -63,7 +63,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_QUIET 							= 6;
 	private static final int PHASE_ATTACKING_BAD 					= 7;
 	
-	private static final double REDUCTION_AGGRESSIVENESS 			= 1;
+	private static final double REDUCTION_AGGRESSIVENESS 			= 1; //1.25;
+	private static final double PRUNING_AGGRESSIVENESS 				= 1; //1.25;
 	
 	private static final int[][] LMR_TABLE 							= new int[64][64];
 	
@@ -78,9 +79,6 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 	}
-	
-	
-	private static final double PRUNING_AGGRESSIVENESS 				= 1;
 	
 	private static final int FUTILITY_MAXDEPTH 						= 7; //MAX_DEPTH;
 	private static final int FUTILITY_MARGIN 						= 80;
@@ -824,7 +822,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		boolean extend_tt_move = false;
+		int tt_move_extension = 0;
 		
 		if (depth >= 4
 				&& ply < 2 * initialMaxDepth
@@ -844,17 +842,45 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (singular_value < singular_beta) {
 				
-				//Singular extension - only ttMove has good score
-				extend_tt_move = true;
+				//Singular extension - only ttMove has score above beta
+				tt_move_extension = 1;
 				
-			} else if (!isPv && singular_value > beta) {
+				if (!isPv) {
+					
+					if (singular_value < singular_beta - singular_margin) {
+						
+						tt_move_extension++;
+						
+						if (singular_value < singular_beta - 2 * singular_margin) {
+							
+							tt_move_extension++;
+						}
+					}
+				}
 				
-				//Multicut pruning - 2 moves above beta
-				node.bestmove = 0;
-				node.eval = singular_value;
-				node.leaf = true;
+			} else if (!isPv) {
 				
-				return node.eval;
+				if (singular_value > beta) {
+				
+					if (!SearchUtils.isMateVal(alpha)
+						&& !SearchUtils.isMateVal(beta)) {
+						
+						//Multi-cut pruning - 2 moves above beta
+						node.bestmove = 0;
+						node.eval = singular_value;
+						node.leaf = true;
+						
+						return node.eval;
+					}
+				
+				} else if (ttValue > beta) {
+					
+					tt_move_extension = -3;
+					
+				} else {
+				
+					tt_move_extension = -2;
+				}
 			}
 		}
 		
@@ -1089,9 +1115,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int new_depth;
 				
-				if (move == ttMove && extend_tt_move) {
+				if (move == ttMove && tt_move_extension != 0) {
 					
-					new_depth = isPv ? depth : depth + 1;
+					new_depth = depth - 1 + tt_move_extension; //isPv ? depth : depth + 1;
+					
+					//new_depth = Math.max(1, new_depth);
 					
 				} /*else if (wasInCheck) {
 					
