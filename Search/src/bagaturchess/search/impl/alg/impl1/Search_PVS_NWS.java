@@ -1035,6 +1035,10 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& egtb_eval == ISearch.MIN
 					) {
 					
+					boolean hasAtLeastOnePiece = (colourToMove == Constants.COLOUR_WHITE) ?
+							env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
+							env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
+							
 					if (phase == PHASE_QUIET) {
 						
 						/*if (list.getScore() <= stats.getEntropy() / depth) {
@@ -1050,18 +1054,23 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (eval != ISearch.MIN) { //eval is set
 							
 							if (depth <= FUTILITY_MAXDEPTH
+									&& hasAtLeastOnePiece
 									&& eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
 								
 								continue;
 							}
 						}
 						
-						if (env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
+						if (movesPerformed_attacks + movesPerformed_quiet > 3
+								&& depth <= 8
+								&& hasAtLeastOnePiece
+								&& env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
 							
 							continue;
 						}
 						
 					} else if (phase == PHASE_ATTACKING_BAD
+							&& hasAtLeastOnePiece
 							&& env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
 						
 						continue;
@@ -1456,6 +1465,10 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !SearchUtils.isMateVal(beta)
 					) {
 					
+					boolean hasAtLeastOnePiece = (colourToMove == Constants.COLOUR_WHITE) ?
+							env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
+							env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
+							
 					if (phase == PHASE_QUIET) {
 						
 						/*if (depth <= 3
@@ -1472,18 +1485,23 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (eval != ISearch.MIN) { //eval is set
 							
 							if (depth <= FUTILITY_MAXDEPTH
+									&& hasAtLeastOnePiece
 									&& eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
 								
 								continue;
 							}
 						}
 						
-						if (env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
+						if (all_moves > 3
+								&& depth <= 8
+								&& hasAtLeastOnePiece
+								&& env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
 							
 							continue;
 						}
 						
 					} else if (phase == PHASE_ATTACKING_BAD
+							&& hasAtLeastOnePiece
 							&& env.getBitboard().getSEEScore(move) < -20 * depth * depth / PRUNING_AGGRESSIVENESS) {
 						
 						continue;
