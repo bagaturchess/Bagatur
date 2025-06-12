@@ -1120,7 +1120,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					new_depth = depth - 1 + tt_move_extension;
 					
 					//Extend TT move to end up with search (not qsearch).
-					//new_depth = Math.max(1, new_depth);
+					new_depth = Math.max(1, new_depth);
 					
 				} else if (mateThreat) {
 					
