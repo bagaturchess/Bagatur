@@ -8,12 +8,10 @@ import bagaturchess.bitboard.impl1.internal.MoveUtil;
 public class Killers implements IKillers {
 	
 	
-	private final IBetaCutoffMoves[][] KILLER_MOVES 			= new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
+	private final IBetaCutoffMoves[][] KILLER_MOVES = new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
 	
 	
 	public Killers() {
-		
-		super();
 		
 		for (int i = 0; i < KILLER_MOVES.length; i++) {
 			
@@ -234,7 +232,7 @@ public class Killers implements IKillers {
 		@Override
 		public void clear() {
 			
-			//Keep moves
+			//Keep the moves
 		}
 	}
 }
