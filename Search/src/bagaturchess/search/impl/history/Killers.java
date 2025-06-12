@@ -59,6 +59,20 @@ public class Killers implements IKillers {
 	}
 	
 	
+	@Override
+	public int getKiller3(final int color, final int ply) {
+		
+		return KILLER_MOVES[color][ply].getBest3();
+	}
+
+
+	@Override
+	public int getKiller4(final int color, final int ply) {
+		
+		return KILLER_MOVES[color][ply].getBest4();
+	}
+	
+	
 	static interface IBetaCutoffMoves {
 		
 		void addMove(int move);
@@ -66,6 +80,10 @@ public class Killers implements IKillers {
 		int getBest1();
 		
 		int getBest2();
+		
+		int getBest3();
+		
+		int getBest4();
 		
 		void clear();
 	}
@@ -139,6 +157,20 @@ public class Killers implements IKillers {
 		        }
 		    }
 		}
+
+
+		@Override
+		public int getBest3() {
+
+			throw new UnsupportedOperationException(); 
+		}
+
+
+		@Override
+		public int getBest4() {
+
+			throw new UnsupportedOperationException(); 
+		}
 	}
 
 	
@@ -147,6 +179,8 @@ public class Killers implements IKillers {
 		
 		private int best_move1;
 		private int best_move2;
+		private int best_move3;
+		private int best_move4;
 		
 		
 		private BetaCutoffMoves_LastIn() {
@@ -154,10 +188,14 @@ public class Killers implements IKillers {
 		}
 		
 		
+		@Override
 		public void addMove(int move) {
 			
 			if (best_move1 != move) {
 				
+				//Shift moves
+				best_move4 = best_move3;
+				best_move3 = best_move2;
 				best_move2 = best_move1;
 				
 				best_move1 = move;
@@ -165,15 +203,31 @@ public class Killers implements IKillers {
 		}
 		
 		
+		@Override
 		public int getBest1() {
 			
 			return best_move1;
 		}
 		
 		
+		@Override
 		public int getBest2() {
 			
 			return best_move2;
+		}
+		
+		
+		@Override
+		public int getBest3() {
+			
+			return best_move3;
+		}
+
+
+		@Override
+		public int getBest4() {
+			
+			return best_move4;
 		}
 		
 		
