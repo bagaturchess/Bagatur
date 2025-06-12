@@ -24,23 +24,17 @@ package bagaturchess.search.impl.movelists;
 
 
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.history.IHistoryTable;
 
 
 public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 	
 	
-	private static final boolean ORDER_CHECKS_FIRST = false;
-	
-	
-	private int ply;
+	private static final boolean ORDER_CHECKS_FIRST = true;
 	
 	
 	public SortedMoveList_History(int max, SearchEnv _env, int _ply, boolean onTheFlySorting) {
 		
 		super(max, _env, onTheFlySorting);
-		
-		ply = _ply;
 	}
 	
 	

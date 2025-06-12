@@ -25,7 +25,6 @@ package bagaturchess.search.impl.movelists;
 
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.search.impl.env.SearchEnv;
-import bagaturchess.search.impl.history.IHistoryTable;
 
 
 public class SortedMoveList_Root extends SortedMoveList_BaseImpl {
