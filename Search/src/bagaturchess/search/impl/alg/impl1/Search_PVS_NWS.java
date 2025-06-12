@@ -58,8 +58,10 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_ATTACKING_GOOD 					= 1;
 	private static final int PHASE_KILLER_1 						= 2;
 	private static final int PHASE_KILLER_2 						= 3;
-	private static final int PHASE_QUIET 							= 4;
-	private static final int PHASE_ATTACKING_BAD 					= 5;
+	private static final int PHASE_KILLER_3 						= 4;
+	private static final int PHASE_KILLER_4 						= 5;
+	private static final int PHASE_QUIET 							= 6;
+	private static final int PHASE_ATTACKING_BAD 					= 7;
 	
 	private static final double REDUCTION_AGGRESSIVENESS 			= 1.25;
 	private static final double PRUNING_AGGRESSIVENESS 				= 1.25;
@@ -895,6 +897,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int killer1Move 			= 0;
 		int killer2Move 			= 0;
+		int killer3Move 			= 0;
+		int killer4Move 			= 0;
+		
 		int movesPerformed_attacks 	= 0;
 		int movesPerformed_quiet 	= 0;
 		
@@ -912,7 +917,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			case PHASE_TT:
 				
-				if (ttMove != 0 && env.getBitboard().isPossible(ttMove)) {
+				if (ttMove != 0
+						&& env.getBitboard().isPossible(ttMove)) {
 					
 					list = list1;
 					list.clear();
@@ -933,7 +939,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				killer1Move = env.getKillers().getKiller1(colourToMove, ply);
 				
-				if (killer1Move != 0 && killer1Move != ttMove && env.getBitboard().isPossible(killer1Move)) {
+				if (killer1Move != 0
+						&& killer1Move != ttMove
+						&& env.getBitboard().isPossible(killer1Move)) {
 					
 					list = list1;
 					list.clear();
@@ -946,7 +954,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				killer2Move = env.getKillers().getKiller2(colourToMove, ply);
 				
-				if (killer2Move != 0 && killer2Move != ttMove && killer2Move != killer1Move && env.getBitboard().isPossible(killer2Move)) {
+				if (killer2Move != 0
+						&& killer2Move != ttMove
+						&& killer2Move != killer1Move
+						&& env.getBitboard().isPossible(killer2Move)) {
 					
 					list = list1;
 					list.clear();
@@ -955,6 +966,41 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				break;
 			
+			case PHASE_KILLER_3:
+				
+				killer3Move = env.getKillers().getKiller3(colourToMove, ply);
+				
+				if (killer3Move != 0
+						&& killer3Move != ttMove
+						&& killer3Move != killer1Move
+						&& killer3Move != killer2Move
+						&& env.getBitboard().isPossible(killer3Move)) {
+					
+					list = list1;
+					list.clear();
+					list.reserved_add(killer3Move);
+				}
+				
+				break;
+			
+			case PHASE_KILLER_4:
+				
+				killer4Move = env.getKillers().getKiller4(colourToMove, ply);
+				
+				if (killer4Move != 0
+						&& killer4Move != ttMove
+						&& killer4Move != killer1Move
+						&& killer4Move != killer2Move
+						&& killer4Move != killer3Move
+						&& env.getBitboard().isPossible(killer4Move)) {
+					
+					list = list1;
+					list.clear();
+					list.reserved_add(killer4Move);
+				}
+				
+				break;
+				
 			case PHASE_ATTACKING_BAD:
 				
 				list = list2;
@@ -1310,6 +1356,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int killer1Move 			= 0;
 		int killer2Move 			= 0;
+		int killer3Move 			= 0;
+		int killer4Move 			= 0;
 		
 		int bestScore 				= ISearch.MIN;
 		int bestMove 				= 0;
@@ -1327,7 +1375,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			case PHASE_TT:
 				
-				if (ttMove2 != 0 && env.getBitboard().isPossible(ttMove2)) {
+				if (ttMove2 != 0
+						&& env.getBitboard().isPossible(ttMove2)) {
 					
 					list = list1;
 					list.clear();
@@ -1348,7 +1397,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				killer1Move = env.getKillers().getKiller1(colourToMove, ply);
 				
-				if (killer1Move != 0 && killer1Move != ttMove2 && env.getBitboard().isPossible(killer1Move)) {
+				if (killer1Move != 0
+						&& killer1Move != ttMove2
+						&& env.getBitboard().isPossible(killer1Move)) {
 					
 					list = list1;
 					list.clear();
@@ -1361,7 +1412,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				killer2Move = env.getKillers().getKiller2(colourToMove, ply);
 				
-				if (killer2Move != 0 && killer2Move != ttMove2 && killer2Move != killer1Move && env.getBitboard().isPossible(killer2Move)) {
+				if (killer2Move != 0
+						&& killer2Move != ttMove2
+						&& killer2Move != killer1Move
+						&& env.getBitboard().isPossible(killer2Move)) {
 					
 					list = list1;
 					list.clear();
@@ -1370,6 +1424,41 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				break;
 			
+			case PHASE_KILLER_3:
+				
+				killer3Move = env.getKillers().getKiller3(colourToMove, ply);
+				
+				if (killer3Move != 0
+						&& killer3Move != ttMove2
+						&& killer3Move != killer1Move
+						&& killer3Move != killer2Move
+						&& env.getBitboard().isPossible(killer3Move)) {
+					
+					list = list1;
+					list.clear();
+					list.reserved_add(killer3Move);
+				}
+				
+				break;
+			
+			case PHASE_KILLER_4:
+				
+				killer4Move = env.getKillers().getKiller4(colourToMove, ply);
+				
+				if (killer4Move != 0
+						&& killer4Move != ttMove2
+						&& killer4Move != killer1Move
+						&& killer4Move != killer2Move
+						&& killer4Move != killer3Move
+						&& env.getBitboard().isPossible(killer4Move)) {
+					
+					list = list1;
+					list.clear();
+					list.reserved_add(killer4Move);
+				}
+				
+				break;
+				
 			case PHASE_ATTACKING_BAD:
 				
 				list = list2;
