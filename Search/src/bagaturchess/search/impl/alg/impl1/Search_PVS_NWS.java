@@ -819,6 +819,46 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 			}
+			
+			
+			//ProbeCut
+			/*int prob_cut_margin = 200;
+			int prob_cut_beta = beta + prob_cut_margin;
+			
+			if (depth >= 3
+					&& (ttFlag == -1 || ttValue >= prob_cut_beta)) {
+				
+				IMoveList list = lists_attacks[ply];
+				list.clear();
+				env.getBitboard().genCapturePromotionMoves(list);
+				
+				int prob_cut_depth = Math.max(0, depth - 5);
+				
+				int move;
+				while ((move = list.next()) != 0)  {
+					
+					env.getBitboard().makeMoveForward(move);
+					
+					int score = -qsearch(mediator, pvman, evaluator, info, -prob_cut_beta, -prob_cut_beta + 1, ply + 1, isPv);
+					
+					if (score >= prob_cut_beta && prob_cut_depth > 0) {
+						
+						score = -search(mediator, info, pvman, evaluator, ply + 1, prob_cut_depth, -prob_cut_beta, -prob_cut_beta + 1, isPv, initialMaxDepth);
+					}
+					
+					env.getBitboard().makeMoveBackward(move);
+					
+					
+					if (score >= prob_cut_beta) {
+						
+						node.bestmove = 0;
+						node.eval = score - prob_cut_margin;
+						node.leaf = true;
+						
+						return node.eval;
+					}
+				}
+			}*/
 		}
 		
 		
@@ -1065,6 +1105,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					stats.addValue(list.getScore());
 				}
 				
+				
 				boolean isCheckMove = env.getBitboard().isCheckMove(move);
 				
 				
@@ -1088,12 +1129,8 @@ public class Search_PVS_NWS extends SearchImpl {
 							env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 							env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
 							
-					if (phase == PHASE_QUIET) {
-						
-						/*if (list.getScore() <= stats.getEntropy() / depth) {
-							
-							continue;
-						}*/
+					if (phase == PHASE_QUIET
+							&& list.getScore() <= stats.getEntropy()) {
 						
 						if (movesPerformed_attacks + movesPerformed_quiet >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS) {
 							
@@ -1154,6 +1191,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !wasInCheck
 						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						//&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
 						&& isQuietOrBadCapture;
 				
 				int reduction = 1;
@@ -1166,6 +1204,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						reduction += 1;
 					}
+					
+					//reduction += list.getScore() <= stats.getEntropy() ? 1 : -1;
 					
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 				}
@@ -1526,14 +1566,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					boolean hasAtLeastOnePiece = (colourToMove == Constants.COLOUR_WHITE) ?
 							env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 							env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
-							
-					if (phase == PHASE_QUIET) {
-						
-						/*if (depth <= 3
-								&& moveGen.getScore() <= 27 / depth) {
-							
-							continue;
-						}*/
+					
+					if (phase == PHASE_QUIET
+							&& list.getScore() <= stats.getEntropy()) {
 						
 						if (all_moves >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS) {
 							
@@ -1578,6 +1613,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !wasInCheck
 						&& !isCheckMove
 						&& all_moves > 1
+						//&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
 						&& isQuietOrBadCapture;
 				
 				int reduction = 1;
@@ -1590,6 +1626,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						reduction += 1;
 					}
+					
+					//reduction += list.getScore() <= stats.getEntropy() ? 1 : -1;
 					
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
 					
