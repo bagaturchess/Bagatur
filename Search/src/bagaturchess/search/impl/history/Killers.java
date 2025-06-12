@@ -5,15 +5,13 @@ import bagaturchess.bitboard.impl1.internal.EngineConstants;
 import bagaturchess.bitboard.impl1.internal.MoveUtil;
 
 
-public class KillersAndCounters implements IKillersAndCounters {
+public class Killers implements IKillers {
 	
 	
 	private final IBetaCutoffMoves[][] KILLER_MOVES 			= new IBetaCutoffMoves[2][EngineConstants.MAX_PLIES];
-	private final IBetaCutoffMoves[][][] COUNTER_MOVES_LASTIN	= new IBetaCutoffMoves[2][7][64];
-	private final IBetaCutoffMoves[][][] COUNTER_MOVES_COUNTS	= new IBetaCutoffMoves[2][7][64];
 	
 	
-	public KillersAndCounters() {
+	public Killers() {
 		
 		super();
 		
@@ -24,30 +22,6 @@ public class KillersAndCounters implements IKillersAndCounters {
 				KILLER_MOVES[i][j] = new BetaCutoffMoves_LastIn();
 			}
 		}
-		
-		for (int i = 0; i < COUNTER_MOVES_LASTIN.length; i++) {
-			
-			for (int j = 0; j < COUNTER_MOVES_LASTIN[i].length; j++) {
-				
-				for (int k = 0; k < COUNTER_MOVES_LASTIN[i][j].length; k++) {
-					
-					COUNTER_MOVES_LASTIN[i][j][k] = new BetaCutoffMoves_LastIn();
-				}
-			}
-		}
-
-		for (int i = 0; i < COUNTER_MOVES_COUNTS.length; i++) {
-
-			for (int j = 0; j < COUNTER_MOVES_COUNTS[i].length; j++) {
-
-				for (int k = 0; k < COUNTER_MOVES_COUNTS[i][j].length; k++) {
-
-					COUNTER_MOVES_COUNTS[i][j][k] = new BetaCutoffMoves_Counts();
-				}
-			}
-		}
-		
-		clear();
 	}
 	
 	
@@ -61,28 +35,6 @@ public class KillersAndCounters implements IKillersAndCounters {
 				KILLER_MOVES[i][j].clear();
 			}
 		}
-		
-		for (int i = 0; i < COUNTER_MOVES_LASTIN.length; i++) {
-			
-			for (int j = 0; j < COUNTER_MOVES_LASTIN[i].length; j++) {
-				
-				for (int k = 0; k < COUNTER_MOVES_LASTIN[i][j].length; k++) {
-					
-					COUNTER_MOVES_LASTIN[i][j][k].clear();
-				}
-			}
-		}
-
-		for (int i = 0; i < COUNTER_MOVES_COUNTS.length; i++) {
-
-			for (int j = 0; j < COUNTER_MOVES_COUNTS[i].length; j++) {
-
-				for (int k = 0; k < COUNTER_MOVES_COUNTS[i][j].length; k++) {
-
-					COUNTER_MOVES_COUNTS[i][j][k].clear();
-				}
-			}
-		}
 	}
 	
 	
@@ -90,31 +42,6 @@ public class KillersAndCounters implements IKillersAndCounters {
 	public void addKillerMove(final int color, final int move, final int ply) {
 		
 		KILLER_MOVES[color][ply].addMove(move);
-	}
-	
-	
-	@Override
-	public void addCounterMove(final int color, final int parentMove, final int counterMove) {
-		
-		COUNTER_MOVES_LASTIN[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
-
-		COUNTER_MOVES_COUNTS[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].addMove(counterMove);
-	}
-	
-
-	@Override
-	public int getCounter1(final int color, final int parentMove) {
-		
-		return COUNTER_MOVES_LASTIN[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
-		//return COUNTER_MOVES_COUNTS[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
-	}
-	
-	
-	@Override
-	public int getCounter2(final int color, final int parentMove) {
-		
-		return COUNTER_MOVES_COUNTS[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
-		//return COUNTER_MOVES_LASTIN[color][MoveUtil.getSourcePieceIndex(parentMove)][MoveUtil.getToIndex(parentMove)].getBest1();
 	}
 	
 	

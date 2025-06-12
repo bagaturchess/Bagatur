@@ -58,10 +58,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_ATTACKING_GOOD 					= 1;
 	private static final int PHASE_KILLER_1 						= 2;
 	private static final int PHASE_KILLER_2 						= 3;
-	private static final int PHASE_COUNTER_1 						= 4;
-	private static final int PHASE_COUNTER_2 						= 5;
-	private static final int PHASE_QUIET 							= 6;
-	private static final int PHASE_ATTACKING_BAD 					= 7;
+	private static final int PHASE_QUIET 							= 4;
+	private static final int PHASE_ATTACKING_BAD 					= 5;
 	
 	private static final double REDUCTION_AGGRESSIVENESS 			= 1.25;
 	private static final double PRUNING_AGGRESSIVENESS 				= 1.25;
@@ -348,8 +346,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (!env.getBitboard().getMoveOps().isCapture(move)) {
 					
-					env.getKillersAndCounters().addCounterMove(env.getBitboard().getColourToMove(), parentMove, move);
-					env.getKillersAndCounters().addKillerMove(env.getBitboard().getColourToMove(), move, ply);
+					env.getKillers().addKillerMove(env.getBitboard().getColourToMove(), move, ply);
 					
 					history.registerGood(parentMove, move, depth);
 					conthist.registerGood(parentMove, move, depth);
@@ -423,6 +420,26 @@ public class Search_PVS_NWS extends SearchImpl {
 			throw new IllegalStateException("ply < 1 => use root_search");
 		}
 		
+		
+		PVNode node = pvman.load(ply);
+		node.bestmove = 0;
+		node.eval = ISearch.MIN;
+		node.leaf = true;
+		
+		
+		if (depth <= 0) {
+			
+			int qeval = qsearch(mediator, pvman, evaluator, info, alpha, beta, ply, isPv);
+			
+			if (node.eval != qeval) {
+				
+				throw new IllegalStateException("node.eval != qeval");
+			}
+			
+			return node.eval;
+		}
+		
+		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
 		
 		if (info.getSelDepth() < ply) {
@@ -438,12 +455,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		final int alpha_org = alpha;
-		
-		
-		PVNode node = pvman.load(ply);
-		node.bestmove = 0;
-		node.eval = ISearch.MIN;
-		node.leaf = true;
 		
 		
 	    if (isDraw(isPv)) {
@@ -466,19 +477,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				return node.eval;
 			}
-		}
-		
-		
-		if (depth <= 0) {
-			
-			int qeval = qsearch(mediator, pvman, evaluator, info, alpha, beta, ply, isPv);
-			
-			if (node.eval != qeval) {
-				
-				throw new IllegalStateException("node.eval != qeval");
-			}
-			
-			return node.eval;
 		}
 		
 		
@@ -897,8 +895,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int killer1Move 			= 0;
 		int killer2Move 			= 0;
-		int counterMove1 			= 0;
-		int counterMove2 			= 0;
 		int movesPerformed_attacks 	= 0;
 		int movesPerformed_quiet 	= 0;
 		
@@ -935,7 +931,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_KILLER_1:
 				
-				killer1Move = env.getKillersAndCounters().getKiller1(colourToMove, ply);
+				killer1Move = env.getKillers().getKiller1(colourToMove, ply);
 				
 				if (killer1Move != 0 && killer1Move != ttMove && env.getBitboard().isPossible(killer1Move)) {
 					
@@ -948,7 +944,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_KILLER_2:
 				
-				killer2Move = env.getKillersAndCounters().getKiller2(colourToMove, ply);
+				killer2Move = env.getKillers().getKiller2(colourToMove, ply);
 				
 				if (killer2Move != 0 && killer2Move != ttMove && killer2Move != killer1Move && env.getBitboard().isPossible(killer2Move)) {
 					
@@ -958,33 +954,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				break;
-			
-			case PHASE_COUNTER_1:
-				
-				counterMove1 = env.getKillersAndCounters().getCounter1(colourToMove, parentMove);
-				
-				if (counterMove1 != 0 && counterMove1 != ttMove && counterMove1 != killer1Move && counterMove1 != killer2Move && env.getBitboard().isPossible(counterMove1)) {
-					
-					list = list1;
-					list.clear();
-					list.reserved_add(counterMove1);
-				}
-				
-				break;
-				
-			case PHASE_COUNTER_2:
-				
-				counterMove2 = env.getKillersAndCounters().getCounter2(colourToMove, parentMove);
-				
-				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove && counterMove2 != killer1Move && counterMove2 != killer2Move && env.getBitboard().isPossible(counterMove2)) {
-					
-					list = list1;
-					list.clear();
-					list.reserved_add(counterMove2);
-				}
-				
-				break;
-			
 			
 			case PHASE_ATTACKING_BAD:
 				
@@ -1020,7 +989,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				if (phase == PHASE_QUIET) {
-					if (move == ttMove || move == killer1Move || move == killer2Move || move == counterMove1 || move == counterMove2) {
+					if (move == ttMove || move == killer1Move || move == killer2Move) {
 						continue;
 					}
 				} else if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
@@ -1220,8 +1189,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (!env.getBitboard().getMoveOps().isCapture(move)) {
 						
-						env.getKillersAndCounters().addCounterMove(colourToMove, parentMove, move);
-						env.getKillersAndCounters().addKillerMove(colourToMove, move, ply);
+						env.getKillers().addKillerMove(colourToMove, move, ply);
 						
 						history.registerGood(parentMove, move, depth);
 						conthist.registerGood(parentMove, move, depth);
@@ -1342,8 +1310,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int killer1Move 			= 0;
 		int killer2Move 			= 0;
-		int counterMove1 			= 0;
-		int counterMove2 			= 0;
 		
 		int bestScore 				= ISearch.MIN;
 		int bestMove 				= 0;
@@ -1380,7 +1346,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_KILLER_1:
 				
-				killer1Move = env.getKillersAndCounters().getKiller1(colourToMove, ply);
+				killer1Move = env.getKillers().getKiller1(colourToMove, ply);
 				
 				if (killer1Move != 0 && killer1Move != ttMove2 && env.getBitboard().isPossible(killer1Move)) {
 					
@@ -1393,7 +1359,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PHASE_KILLER_2:
 				
-				killer2Move = env.getKillersAndCounters().getKiller2(colourToMove, ply);
+				killer2Move = env.getKillers().getKiller2(colourToMove, ply);
 				
 				if (killer2Move != 0 && killer2Move != ttMove2 && killer2Move != killer1Move && env.getBitboard().isPossible(killer2Move)) {
 					
@@ -1403,33 +1369,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				break;
-			
-			case PHASE_COUNTER_1:
-				
-				counterMove1 = env.getKillersAndCounters().getCounter1(colourToMove, parentMove);
-				
-				if (counterMove1 != 0 && counterMove1 != ttMove2 && counterMove1 != killer1Move && counterMove1 != killer2Move && env.getBitboard().isPossible(counterMove1)) {
-					
-					list = list1;
-					list.clear();
-					list.reserved_add(counterMove1);
-				}
-				
-				break;
-				
-			case PHASE_COUNTER_2:
-				
-				counterMove2 = env.getKillersAndCounters().getCounter2(colourToMove, parentMove);
-				
-				if (counterMove2 != 0 && counterMove2 != counterMove1 && counterMove2 != ttMove2 && counterMove2 != killer1Move && counterMove2 != killer2Move && env.getBitboard().isPossible(counterMove2)) {
-					
-					list = list1;
-					list.clear();
-					list.reserved_add(counterMove2);
-				}
-				
-				break;
-			
 			
 			case PHASE_ATTACKING_BAD:
 				
@@ -1471,7 +1410,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				if (phase == PHASE_QUIET) {
-					if (move == ttMove2 || move == killer1Move || move == killer2Move || move == counterMove1 || move == counterMove2) {
+					if (move == ttMove2 || move == killer1Move || move == killer2Move) {
 						continue;
 					}
 				} else if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
