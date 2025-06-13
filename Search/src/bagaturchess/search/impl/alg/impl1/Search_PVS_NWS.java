@@ -215,6 +215,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.bestmove = 0;
 		node.eval = ISearch.MIN;
 		node.leaf = true;
+		node.type = PVNode.TYPE_NORMAL_SEARCH;
+		
 		
 		SearchStackInfo ssi = ssis[ply];
 		ssi.hash_key = getHashkeyTPT();
@@ -371,6 +373,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.bestmove = 0;
 				node.eval = getDrawScores(-1);
 				node.leaf = true;
+				node.type = PVNode.TYPE_DRAW;
 				
 				bestScore = node.eval;
 				bestMove = 0;
@@ -380,6 +383,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.bestmove = 0;
 				node.eval = -SearchUtils.getMateVal(ply, getEnv().getBitboard());
 				node.leaf = true;
+				node.type = PVNode.TYPE_MATE;
 				
 				bestScore = node.eval;
 				bestMove = 0;
@@ -432,6 +436,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.bestmove = 0;
 		node.eval = ISearch.MIN;
 		node.leaf = true;
+		node.type = PVNode.TYPE_NORMAL_SEARCH;
 		
 		
 		if (depth <= 0) {
@@ -464,6 +469,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (ply >= ISearch.MAX_DEPTH) {
 			
+			node.eval = ssi.static_eval;
+			node.type = PVNode.TYPE_MAXDEPTH;
+			
 			return ssi.static_eval;
 		}
 		
@@ -474,7 +482,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	    if (isDraw(isPv)) {
 	    	
 	    	node.eval = getDrawScores(-1);
-	    			
+	    	node.type = PVNode.TYPE_DRAW;
+	    	
 	    	return node.eval;
 	    }
 		
@@ -488,6 +497,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (alpha >= beta) {
 				
 				node.eval = alpha;
+				node.type = PVNode.TYPE_MATE_DISTANCE_PRUNING;
 				
 				return node.eval;
 			}
@@ -718,6 +728,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.bestmove = 0;
 				node.eval = egtb_eval;
 				node.leaf = true;
+				node.type = PVNode.TYPE_TB;
 				
 				return node.eval;
 			}
@@ -764,7 +775,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						node.bestmove = 0;
 						node.eval = ssi.static_eval;
 						node.leaf = true;
-							
+						node.type = PVNode.TYPE_STATIC_NULL_MOVE;
+								
 						return node.eval;
 					}
 				}
@@ -793,6 +805,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							node.bestmove = 0;
 							node.eval = score;
 							node.leaf = true;
+							node.type = PVNode.TYPE_NULL_MOVE;
 							
 							return node.eval;
 						}
@@ -823,6 +836,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							node.bestmove = 0;
 							node.eval = score;
 							node.leaf = true;
+							node.type = PVNode.TYPE_RAZORING;
 							
 							return node.eval;
 						}
@@ -864,6 +878,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						node.bestmove = 0;
 						node.eval = score;
 						node.leaf = true;
+						node.type = PVNode.TYPE_PROBECUT;
 						
 						return node.eval;
 					}
@@ -919,6 +934,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						node.bestmove = 0;
 						node.eval = singular_value;
 						node.leaf = true;
+						node.type = PVNode.TYPE_MULTICUT;
 						
 						return node.eval;
 					}
@@ -1301,6 +1317,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.bestmove = 0;
 				node.eval = getDrawScores(-1);
 				node.leaf = true;
+				node.type = PVNode.TYPE_DRAW;
 				
 				bestScore = node.eval;
 				bestMove = 0;
@@ -1310,6 +1327,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.bestmove = 0;
 				node.eval = -SearchUtils.getMateVal(ply);
 				node.leaf = true;
+				node.type = PVNode.TYPE_DRAW;
 				
 				bestScore = node.eval;
 				bestMove = 0;
@@ -1711,10 +1729,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.bestmove = 0;
 		node.eval = ISearch.MIN;
 		node.leaf = true;
+		node.type = PVNode.TYPE_NORMAL_QSEARCH;
+		
 		
 		if (isDraw(isPv)) {
 	    	
 	    	node.eval = getDrawScores(-1);
+	    	node.type = PVNode.TYPE_DRAW;
 	    	
 	    	return node.eval;
 	    }
@@ -1790,7 +1811,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (eval >= beta) {
 			
 	    	node.eval = eval;
-			
+	    	node.type = PVNode.TYPE_BETA_CUTOFF_QSEARCH;
+	    	
 	    	return node.eval;
 		}
 		
@@ -1892,6 +1914,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			node.bestmove = 0;
 			node.leaf = true;
 			node.eval = eval;
+			node.type = PVNode.TYPE_NORMAL_QSEARCH;
 			
 			bestScore = eval;
 			bestMove = 0;
@@ -1905,6 +1928,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.bestmove = 0;
 				node.leaf = true;
 				node.eval = alphaOrig;
+				node.type = PVNode.TYPE_ALPHA_RESTORE_QSEARCH;
 				
 				bestScore = alphaOrig;
 				bestMove = 0;
@@ -1980,6 +2004,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		result.leaf = true;
+		result.type = PVNode.TYPE_TT;
 		
 		if (ply > 0
 				&& isDraw(isPv)) {

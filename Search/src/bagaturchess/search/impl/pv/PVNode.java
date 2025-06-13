@@ -28,12 +28,22 @@ import java.util.List;
 
 public class PVNode {
 	
-	public static final int TYPE_NORMAL = 1;
-	/*public static final int TYPE_NORMAL = 1;
-	public static final int TYPE_NORMAL = 1;
-	public static final int TYPE_NORMAL = 1;
-	public static final int TYPE_NORMAL = 1;
-	public static final int TYPE_NORMAL = 1;*/
+	public static final int TYPE_NORMAL_SEARCH			= 1;
+	public static final int TYPE_NORMAL_QSEARCH 		= 2;
+	public static final int TYPE_DRAW 					= 3;
+	public static final int TYPE_MATE 					= 4;
+	public static final int TYPE_MAXDEPTH				= 5;
+	public static final int TYPE_MATE_DISTANCE_PRUNING 	= 6;
+	public static final int TYPE_TT 					= 7;
+	public static final int TYPE_TB 					= 8;
+	public static final int TYPE_STATIC_NULL_MOVE 		= 9;
+	public static final int TYPE_NULL_MOVE 				= 10;
+	public static final int TYPE_RAZORING 				= 11;
+	public static final int TYPE_PROBECUT 				= 12;
+	public static final int TYPE_MULTICUT 				= 13;
+	public static final int TYPE_BETA_CUTOFF_QSEARCH 	= 14;
+	public static final int TYPE_ALPHA_RESTORE_QSEARCH 	= 15;
+	
 	
 	public PVNode parent;
 	public PVNode child;
