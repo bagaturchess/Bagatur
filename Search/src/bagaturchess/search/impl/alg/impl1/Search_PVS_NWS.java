@@ -409,7 +409,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		validatePV(node, evaluator, ply, depth, isPv, false);
+		validatePV(node, evaluator, ply, depth, isPv);
 		
 		
 		return bestScore;
@@ -1353,7 +1353,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		validatePV(node, evaluator, ply, depth, isPv, false);
+		validatePV(node, evaluator, ply, depth, isPv);
 		
 		
 		return node.eval;
@@ -1947,7 +1947,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		validatePV(node, evaluator, ply, 0, isPv, true);
+		validatePV(node, evaluator, ply, 0, isPv);
 		
 		
     	return node.eval;
@@ -2085,7 +2085,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private Stack<Integer> stack = new Stack<Integer>();
 	
 	
-	private void validatePV(PVNode node, IEvaluator evaluator, int ply, int expectedDepth, boolean isPv, boolean qsearch) {
+	private void validatePV(PVNode node, IEvaluator evaluator, int ply, int expectedDepth, boolean isPv) {
 				
 		
 		if (true) {
