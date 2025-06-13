@@ -900,12 +900,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			} else if (!isPv) {
 				
+				//Multi-cut pruning - 2 moves above beta
 				if (singular_value > beta) {
 				
 					if (!SearchUtils.isMateVal(alpha)
 						&& !SearchUtils.isMateVal(beta)) {
 						
-						//Multi-cut pruning - 2 moves above beta
 						node.bestmove = 0;
 						node.eval = singular_value;
 						node.leaf = true;
@@ -917,9 +917,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					tt_move_extension = -3;
 					
-				} else {
-					
-					//tt_move_extension = -2;
 				}
 			}
 		}
