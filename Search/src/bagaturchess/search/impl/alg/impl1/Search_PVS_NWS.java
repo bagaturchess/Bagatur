@@ -852,7 +852,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (score >= prob_cut_beta) {
 						
 						node.bestmove = 0;
-						node.eval = score - prob_cut_margin;
+						node.eval = score; // - prob_cut_margin;
 						node.leaf = true;
 						
 						return node.eval;
@@ -916,7 +916,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				} else if (ttValue > beta) {
 					
 					tt_move_extension = -3;
-					
 				}
 			}
 		}
