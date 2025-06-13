@@ -306,7 +306,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				score = -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
 				
-				if (score > bestScore) {
+				if (score > alpha) {
 					
 					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
@@ -1249,7 +1249,7 @@ public class Search_PVS_NWS extends SearchImpl {
 											
 					score = -search(mediator, info, pvman, evaluator, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 					
-					if (score > bestScore) {
+					if (score > alpha) {
 						
 						score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
