@@ -913,19 +913,19 @@ public class Search_PVS_NWS extends SearchImpl {
 						return node.eval;
 					}
 				
-				} else if (ttValue > beta) {
+				} else {
 					
-					tt_move_extension = -3;
+					tt_move_extension = -1;
 				}
 			}
 		}
 		
 		
 		//Still no tt move, so help the search to find the tt move/score faster
-		if (isPv && ttFlag == -1 && depth >= 3) {
+		/*if (isPv && ttFlag == -1 && depth >= 3) {
 			
 			depth -= 2;
-		}
+		}*/
 		
 		
 		int bestMove 				= 0;
