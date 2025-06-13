@@ -919,7 +919,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 				} else {
 					
-					tt_move_extension = -2;
+					//tt_move_extension = -2;
 				}
 			}
 		}
