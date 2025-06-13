@@ -29,7 +29,7 @@ import bagaturchess.search.impl.env.SearchEnv;
 public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 	
 	
-	private static final boolean ORDER_CHECKS_FIRST = true;
+	private static final boolean ORDER_CHECKS_FIRST = false;
 	
 	
 	public SortedMoveList_History(int max, SearchEnv _env, int _ply, boolean onTheFlySorting) {
