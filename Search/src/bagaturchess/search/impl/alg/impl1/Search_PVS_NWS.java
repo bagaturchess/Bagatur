@@ -96,6 +96,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private static final boolean USE_DTZ_CACHE 						= true;
 	
+	private static final boolean VALIDATE_PV 						= false;
+	
 	
 	private long lastSentMinorInfo_timestamp;
 	private long lastSentMinorInfo_nodesCount;
@@ -105,6 +107,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private SearchStackInfo[] ssis 									= new SearchStackInfo[MAX_DEPTH + 1];
 	
 	private VarStatistic stats 										= new VarStatistic();
+	
+	private long[] search_types_stats 								= new long[16];
 	
 	
 	public Search_PVS_NWS(Object[] args) {
@@ -347,6 +351,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.eval = bestScore;
 				node.leaf = false;
 				
+				if (node.eval != -pvman.load(ply + 1).eval) {
+					
+					throw new IllegalStateException();
+				}
+				
 				if (ply + 1 < ISearch.MAX_DEPTH) {
 					pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 				}
@@ -412,7 +421,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		//validatePV(node, evaluator, ply, depth, isPv);
+		if (VALIDATE_PV) validatePV(node, evaluator, ply, depth, isPv, alphaOrig, beta);
 		
 		
 		return bestScore;
@@ -741,7 +750,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (ttValue != IEvaluator.MIN_EVAL) {
+		if (!VALIDATE_PV && ttValue != IEvaluator.MIN_EVAL) {
 			
 			if (getSearchConfig().isOther_UseTPTScores()) {
 				
@@ -1289,6 +1298,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.eval = bestScore;
 					node.leaf = false;
 					
+					if (node.eval != -pvman.load(ply + 1).eval) {
+						
+						throw new IllegalStateException();
+					}
+					
 					if (ply + 1 < ISearch.MAX_DEPTH) {
 						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 					}
@@ -1359,7 +1373,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		//validatePV(node, evaluator, ply, depth, isPv);
+		if (VALIDATE_PV) validatePV(node, evaluator, ply, depth, isPv, alpha_org, beta);
 		
 		
 		return node.eval;
@@ -1804,7 +1818,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		
 		
-		if (ttValue != IEvaluator.MIN_EVAL) {
+		if (!VALIDATE_PV && ttValue != IEvaluator.MIN_EVAL) {
 			
 			if (getSearchConfig().isOther_UseTPTScores()) {
 				
@@ -1889,6 +1903,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.eval = bestScore;
 					node.leaf = false;
 					
+					if (node.eval != -pvman.load(ply + 1).eval) {
+						
+						throw new IllegalStateException();
+					}
+					
 					if (ply + 1 < ISearch.MAX_DEPTH) {
 						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 					}
@@ -1953,7 +1972,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		//validatePV(node, evaluator, ply, 0, isPv);
+		if (VALIDATE_PV) validatePV(node, evaluator, ply, 0, isPv, alphaOrig, beta);
 		
 		
     	return node.eval;
@@ -2091,13 +2110,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private Stack<Integer> stack = new Stack<Integer>();
 	
 	
-	private void validatePV(PVNode node, IEvaluator evaluator, int ply, int expectedDepth, boolean isPv) {
-		
-		
-		if (true) {
-			
-			return;
-		}
+	private void validatePV(PVNode node, IEvaluator evaluator, int ply, int expectedDepth, boolean isPv, int alpha, int beta) {
 		
 		
 		if (node.leaf || node.bestmove == 0) {
@@ -2118,7 +2131,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//Check for static evaluation corrected with TT scores
-		int ttFlag 									= -1;
+		/*int ttFlag 									= -1;
 		int ttValue 								= IEvaluator.MIN_EVAL;
 		
 		if (env.getTPT() != null) {
@@ -2135,21 +2148,37 @@ public class Search_PVS_NWS extends SearchImpl {
 					return;
 				}
 			}
-		}
+		}*/
 		
 		
 		//First replay the moves
 		int eval_sign = 1;
+		int alpha_corrected = alpha;
+		int beta_corrected = beta;
 		
 		int actualDepth = 0;
 		
 		PVNode cur = node;
+		
+		boolean tt_reached = false;
 		
 		while(cur != null && !cur.leaf) {
 			
 			if (cur.bestmove == 0) {
 				
 				throw new IllegalStateException("cur.bestmove == 0");
+			}
+			
+			if (!tt_reached && node.eval != eval_sign * cur.eval) {
+				
+				//System.out.println("Not equal score in PV sequence. EVALDIFF=" + (node.eval - eval_sign * cur.eval));
+				throw new IllegalStateException("node.eval != eval_sign * cur.eval");
+			}
+			
+			//Only the first TT node has correct value as it is with expected depth
+			if (cur.type == PVNode.TYPE_TT) {
+				
+				tt_reached = true;
 			}
 			
 			actualDepth++;
@@ -2170,6 +2199,15 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			eval_sign *= -1;
+			if (eval_sign == -1) {
+				alpha_corrected = -beta;
+				beta_corrected = -alpha;
+			} else {
+				alpha_corrected = alpha;
+				beta_corrected = beta;
+			}
+					
+			
 			
 			if (env.getBitboard().isInCheck(colorToMove)) {
 				
@@ -2195,6 +2233,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		//Do checks
 		
+		search_types_stats[cur.type]++;
+		if (search_types_stats[cur.type] % 100000 == 0) {
+		    for (int i = 0; i < search_types_stats.length; i++) {
+		        System.out.print(i + "=" + search_types_stats[i] + " ");
+		    }
+		    System.out.println();
+		}
+		
 		int static_eval = eval_sign * eval(evaluator, 0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, isPv);
 		
 		/*if (ttFlag == ITTEntry.FLAG_EXACT
@@ -2211,7 +2257,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (node.eval != static_eval) {
 					
-					System.out.println("NODETYPE: " + cur.type + ", EVALDIFF=" + (node.eval - static_eval) + ", score=" + node.eval + ", static_eval=" + static_eval);
+					throw new IllegalStateException("eval=" + node.eval + ", static_eval=" + static_eval);
 				}
 				
 				/*if (actualDepth < expectedDepth) {
@@ -2225,13 +2271,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (node.eval != static_eval) {
 					
-					System.out.println("NODETYPE: " + cur.type + ", EVALDIFF=" + (node.eval - static_eval) + ", score=" + node.eval + ", static_eval=" + static_eval);
+					throw new IllegalStateException("eval=" + node.eval + ", static_eval=" + static_eval);
 				}
 				
-				/*if (actualDepth < expectedDepth) {
+				if (actualDepth < expectedDepth) {
 					
 					throw new IllegalStateException("actualDepth=" + actualDepth + ", expectedDepth=" + expectedDepth);
-				}*/
+				}
 				
 				break;
 				
@@ -2241,6 +2287,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					throw new IllegalStateException("!isDraw(isPv)");
 				}
+				
 				break;
 				
 			case PVNode.TYPE_MATE:
@@ -2256,14 +2303,16 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					throw new IllegalStateException("!env.getBitboard().isInCheck()");
 				}
+				
 				break;
 				
 			case PVNode.TYPE_MAXDEPTH:
 				
 				if (node.eval != static_eval) {
 					
-					System.out.println("NODETYPE: " + cur.type + ", EVALDIFF=" + (node.eval - static_eval) + ", score=" + node.eval + ", static_eval=" + static_eval);
+					throw new IllegalStateException("eval=" + node.eval + ", static_eval=" + static_eval);
 				}
+				
 				break;
 				
 			case PVNode.TYPE_MATE_DISTANCE_PRUNING:
@@ -2277,6 +2326,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			case PVNode.TYPE_TT:
 				
+				//TODO: Not working because TT score is changed meanwhile
 				/*if (env.getTPT() != null) {
 					
 					env.getTPT().get(getHashkeyTPT(), tt_entries_per_ply[ply]);
@@ -2292,7 +2342,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 						} else {
 							
-							System.out.println("OK");
+							//System.out.println("OK");
 						}
 						
 					} else {
@@ -2300,47 +2350,58 @@ public class Search_PVS_NWS extends SearchImpl {
 						throw new IllegalStateException("tt_entries_per_ply[ply].isEmpty()");
 					}
 				}*/
+				
 				break;
 				
 			case PVNode.TYPE_TB:
+				
 				break;
 				
 			case PVNode.TYPE_STATIC_NULL_MOVE:
 				
 				if (node.eval != static_eval) {
 					
-					System.out.println("NODETYPE: " + cur.type + ", EVALDIFF=" + (node.eval - static_eval) + ", score=" + node.eval + ", static_eval=" + static_eval);
-					//throw new IllegalStateException("eval=" + eval + ", static_eval=" + static_eval);
+					//throw new IllegalStateException("eval=" + node.eval + ", static_eval=" + static_eval);
 				}
 				
 				break;
 				
 			case PVNode.TYPE_NULL_MOVE:
+				
 				break;
 				
 			case PVNode.TYPE_RAZORING:
+				
 				break;
 				
 			case PVNode.TYPE_PROBECUT:
+				
 				break;
 				
 			case PVNode.TYPE_MULTICUT:
+				
 				break;
 				
 			case PVNode.TYPE_BETA_CUTOFF_QSEARCH:
 				
 				if (node.eval != static_eval) {
 					
-					System.out.println("NODETYPE: " + cur.type + ", EVALDIFF=" + (node.eval - static_eval) + ", score=" + node.eval + ", static_eval=" + static_eval);
-					//throw new IllegalStateException("eval=" + eval + ", static_eval=" + static_eval);
+					throw new IllegalStateException("eval=" + node.eval + ", static_eval=" + static_eval);
 				}
 				
 				break;
 				
 			case PVNode.TYPE_ALPHA_RESTORE_QSEARCH:
+				
+				if (cur.eval != alpha_corrected) {
+					
+					throw new IllegalStateException("DIFF alpha_corrected=" + alpha_corrected + ", beta_corrected=" + beta_corrected + ", cur.eval=" + cur.eval);
+				}
+				
 				break;
 				
 			default:
+				
 				throw new IllegalStateException();
 		}
 		
