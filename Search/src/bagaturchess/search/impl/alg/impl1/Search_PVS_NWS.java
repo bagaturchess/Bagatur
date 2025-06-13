@@ -348,11 +348,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				node.eval = bestScore;
 				node.leaf = false;
 				
-				if (node.eval != -pvman.load(ply + 1).eval) {
-					
-					throw new IllegalStateException();
-				}
-				
 				if (ply + 1 < ISearch.MAX_DEPTH) {
 					pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 				}
@@ -1292,11 +1287,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.eval = bestScore;
 					node.leaf = false;
 					
-					if (node.eval != -pvman.load(ply + 1).eval) {
-						
-						throw new IllegalStateException();
-					}
-					
 					if (ply + 1 < ISearch.MAX_DEPTH) {
 						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
 					}
@@ -1896,11 +1886,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					node.bestmove = bestMove;
 					node.eval = bestScore;
 					node.leaf = false;
-					
-					if (node.eval != -pvman.load(ply + 1).eval) {
-						
-						throw new IllegalStateException();
-					}
 					
 					if (ply + 1 < ISearch.MAX_DEPTH) {
 						pvman.store(ply + 1, node, pvman.load(ply + 1), true);
