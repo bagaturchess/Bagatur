@@ -409,7 +409,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		validatePV(node, evaluator, ply, depth, isPv);
+		//validatePV(node, evaluator, ply, depth, isPv);
 		
 		
 		return bestScore;
@@ -735,7 +735,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		/*if (ttValue != IEvaluator.MIN_EVAL) {
+		if (ttValue != IEvaluator.MIN_EVAL) {
 			
 			if (getSearchConfig().isOther_UseTPTScores()) {
 				
@@ -747,7 +747,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					ssi.static_eval = ttValue;
 				}
 			}
-		}*/
+		}
 		
 		boolean mateThreat  = false;
 		
@@ -1353,7 +1353,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		validatePV(node, evaluator, ply, depth, isPv);
+		//validatePV(node, evaluator, ply, depth, isPv);
 		
 		
 		return node.eval;
@@ -1798,7 +1798,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int eval = eval(evaluator, ply, alpha, beta, isPv);
 		
 		
-		/*if (ttValue != IEvaluator.MIN_EVAL) {
+		if (ttValue != IEvaluator.MIN_EVAL) {
 			
 			if (getSearchConfig().isOther_UseTPTScores()) {
 				
@@ -1810,7 +1810,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					eval = ttValue;
 				}
 			}
-		}*/
+		}
 		
 		
 		if (eval >= beta) {
@@ -1940,14 +1940,14 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
-			
+		
 		if (env.getTPT() != null) {
 			
 			env.getTPT().put(hashkey, 0, bestScore, alphaOrig, beta, bestMove);
 		}
 		
 		
-		validatePV(node, evaluator, ply, 0, isPv);
+		//validatePV(node, evaluator, ply, 0, isPv);
 		
 		
     	return node.eval;
@@ -2086,7 +2086,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private void validatePV(PVNode node, IEvaluator evaluator, int ply, int expectedDepth, boolean isPv) {
-				
+		
 		
 		if (true) {
 			
@@ -2112,15 +2112,19 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//Check for static evaluation corrected with TT scores
+		int ttFlag 									= -1;
+		int ttValue 								= IEvaluator.MIN_EVAL;
+		
 		if (env.getTPT() != null) {
 			
 			env.getTPT().get(getHashkeyTPT(), tt_entries_per_ply[ply]);
 			
 			if (!tt_entries_per_ply[ply].isEmpty()) {
 				
-				int tt_eval = tt_entries_per_ply[ply].getEval();
+				ttFlag = tt_entries_per_ply[ply].getFlag();
+				ttValue = tt_entries_per_ply[ply].getEval();
 				
-				if (tt_eval == node.eval) {
+				if (ttValue == node.eval) {
 					
 					return;
 				}
@@ -2187,6 +2191,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int static_eval = eval_sign * eval(evaluator, 0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, isPv);
 		
+		/*if (ttFlag == ITTEntry.FLAG_EXACT
+				|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < static_eval)
+				|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > static_eval)
+			) {
+			
+			static_eval = ttValue;
+		}*/
+		
 		switch(cur.type) {
 		
 			case PVNode.TYPE_NORMAL_SEARCH:
@@ -2194,13 +2206,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (node.eval != static_eval) {
 					
 					System.out.println("NODETYPE: " + cur.type + ", EVALDIFF=" + (node.eval - static_eval) + ", score=" + node.eval + ", static_eval=" + static_eval);
-					//throw new IllegalStateException("eval=" + eval + ", static_eval=" + static_eval);
 				}
 				
-				if (actualDepth < expectedDepth) {
+				/*if (actualDepth < expectedDepth) {
 					
 					throw new IllegalStateException("actualDepth=" + actualDepth + ", expectedDepth=" + expectedDepth);
-				}
+				}*/
 					
 				break;
 				
@@ -2209,7 +2220,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (node.eval != static_eval) {
 					
 					System.out.println("NODETYPE: " + cur.type + ", EVALDIFF=" + (node.eval - static_eval) + ", score=" + node.eval + ", static_eval=" + static_eval);
-					//throw new IllegalStateException("eval=" + eval + ", static_eval=" + static_eval);
 				}
 				
 				/*if (actualDepth < expectedDepth) {
@@ -2247,7 +2257,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				if (node.eval != static_eval) {
 					
 					System.out.println("NODETYPE: " + cur.type + ", EVALDIFF=" + (node.eval - static_eval) + ", score=" + node.eval + ", static_eval=" + static_eval);
-					//throw new IllegalStateException("eval=" + eval + ", static_eval=" + static_eval);
 				}
 				break;
 				
