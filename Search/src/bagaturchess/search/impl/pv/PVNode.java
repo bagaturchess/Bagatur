@@ -28,6 +28,12 @@ import java.util.List;
 
 public class PVNode {
 	
+	public static final int TYPE_NORMAL = 1;
+	/*public static final int TYPE_NORMAL = 1;
+	public static final int TYPE_NORMAL = 1;
+	public static final int TYPE_NORMAL = 1;
+	public static final int TYPE_NORMAL = 1;
+	public static final int TYPE_NORMAL = 1;*/
 	
 	public PVNode parent;
 	public PVNode child;
@@ -35,6 +41,7 @@ public class PVNode {
 	public int eval;
 	public int bestmove;
 	public boolean leaf;
+	public int type;
 	
 	
 	public PVNode() {
