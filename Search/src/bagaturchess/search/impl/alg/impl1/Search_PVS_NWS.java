@@ -822,7 +822,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			//ProbeCut
-			/*int prob_cut_margin = 200;
+			int prob_cut_margin = 200;
 			int prob_cut_beta = beta + prob_cut_margin;
 			
 			if (depth >= 3
@@ -858,7 +858,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						return node.eval;
 					}
 				}
-			}*/
+			}
 		}
 		
 		
@@ -918,7 +918,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					tt_move_extension = -3;
 					
 				} else {
-				
+					
 					tt_move_extension = -2;
 				}
 			}
