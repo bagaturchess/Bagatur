@@ -1130,7 +1130,8 @@ public class Search_PVS_NWS extends SearchImpl {
 							env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
 							
 					if (phase == PHASE_QUIET
-							&& list.getScore() <= stats.getEntropy()) {
+							&& list.getScore() <= stats.getEntropy()
+							) {
 						
 						if (movesPerformed_attacks + movesPerformed_quiet >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS) {
 							
@@ -1191,7 +1192,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !wasInCheck
 						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						//&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
+						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
 						&& isQuietOrBadCapture;
 				
 				int reduction = 1;
@@ -1568,7 +1569,8 @@ public class Search_PVS_NWS extends SearchImpl {
 							env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
 					
 					if (phase == PHASE_QUIET
-							&& list.getScore() <= stats.getEntropy()) {
+							&& list.getScore() <= stats.getEntropy()
+							) {
 						
 						if (all_moves >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS) {
 							
@@ -1613,7 +1615,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !wasInCheck
 						&& !isCheckMove
 						&& all_moves > 1
-						//&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
+						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
 						&& isQuietOrBadCapture;
 				
 				int reduction = 1;
