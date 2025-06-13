@@ -219,10 +219,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		SearchStackInfo ssi = ssis[ply];
-		ssi.hash_key = getHashkeyTPT();
-		ssi.in_check = env.getBitboard().isInCheck();
-		ssi.tt_hit = false;
-		ssi.static_eval = eval(evaluator, ply, alphaOrig, beta, isPv);
+		if (ssi.hash_key != getHashkeyTPT()) {
+			
+			ssi.hash_key = getHashkeyTPT();
+			ssi.in_check = env.getBitboard().isInCheck();
+			ssi.tt_hit = false;
+			ssi.static_eval = eval(evaluator, ply, alphaOrig, beta, isPv);
+		}
 		
 		
 		int ttMove = 0;
@@ -461,10 +464,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		SearchStackInfo ssi = ssis[ply];
-		ssi.hash_key = getHashkeyTPT();
-		ssi.in_check = env.getBitboard().isInCheck();
-		ssi.tt_hit = false;
-		ssi.static_eval = eval(evaluator, ply, alpha, beta, isPv);
+		if (ssi.hash_key != getHashkeyTPT()) {
+			
+			ssi.hash_key = getHashkeyTPT();
+			ssi.in_check = env.getBitboard().isInCheck();
+			ssi.tt_hit = false;
+			ssi.static_eval = eval(evaluator, ply, alpha, beta, isPv);
+		}
 		
 		
 		if (ply >= ISearch.MAX_DEPTH) {
