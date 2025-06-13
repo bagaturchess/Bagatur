@@ -1201,7 +1201,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					new_depth = depth - 1 + tt_move_extension;
 					
 					//Extend TT move to end up with search (not qsearch).
-					new_depth = Math.max(1, new_depth);
+					//new_depth = Math.max(1, new_depth);
 					
 				} else if (mateThreat) {
 					
@@ -1262,7 +1262,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
-				if (isPv && (score > bestScore || movesPerformed_attacks + movesPerformed_quiet == 1)) {
+				if (isPv && (score >  (VALIDATE_PV ? bestScore : alpha) || movesPerformed_attacks + movesPerformed_quiet == 1)) {
 					
 					score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -beta, -alpha, isPv, initialMaxDepth);
 				}
