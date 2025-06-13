@@ -1,9 +1,9 @@
 package bagaturchess.search.impl.alg;
 
 
-public class BacktrackingInfo {
+public class SearchStackInfo {
 	public long hash_key;
+	public boolean in_check;
+	public boolean tt_hit;
 	public int static_eval;
-	public int best_move;
-	public int excluded_move;
 }

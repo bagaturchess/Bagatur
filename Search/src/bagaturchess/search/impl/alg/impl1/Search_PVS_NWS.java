@@ -37,7 +37,7 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 
-import bagaturchess.search.impl.alg.BacktrackingInfo;
+import bagaturchess.search.impl.alg.SearchStackInfo;
 import bagaturchess.search.impl.alg.SearchImpl;
 import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.env.SearchEnv;
@@ -102,7 +102,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private IEvalEntry temp_cache_entry;
 	
-	private BacktrackingInfo[] search_info 							= new BacktrackingInfo[MAX_DEPTH + 1];
+	private SearchStackInfo[] ssis 									= new SearchStackInfo[MAX_DEPTH + 1];
 	
 	private VarStatistic stats 										= new VarStatistic();
 	
@@ -124,9 +124,9 @@ public class Search_PVS_NWS extends SearchImpl {
 	    	temp_cache_entry = new EvalEntry_BaseImpl();
 		}
 		
-		for (int i=0; i<search_info.length; i++) {
+		for (int i=0; i<ssis.length; i++) {
 			
-			search_info[i] = new BacktrackingInfo(); 
+			ssis[i] = new SearchStackInfo(); 
 		}
 	}
 	
@@ -216,17 +216,22 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.eval = ISearch.MIN;
 		node.leaf = true;
 		
-		
-		long hashkey = getHashkeyTPT();
+		SearchStackInfo ssi = ssis[ply];
+		ssi.hash_key = getHashkeyTPT();
+		ssi.in_check = env.getBitboard().isInCheck();
+		ssi.tt_hit = false;
+		ssi.static_eval = eval(evaluator, ply, alphaOrig, beta, isPv);
 		
 		
 		int ttMove = 0;
 		
 		if (env.getTPT() != null) {
 			
-			env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
+			env.getTPT().get(ssi.hash_key, tt_entries_per_ply[ply]);
 			
 			if (!tt_entries_per_ply[ply].isEmpty()) {
+				
+				ssi.tt_hit = true;
 				
 				ttMove = tt_entries_per_ply[ply].getBestMove();
 			}
@@ -396,7 +401,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 			
-			env.getTPT().put(hashkey, depth, bestScore, alphaOrig, beta, bestMove);
+			env.getTPT().put(ssi.hash_key, depth, bestScore, alphaOrig, beta, bestMove);
 		}
 		
 		
@@ -450,9 +455,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		SearchStackInfo ssi = ssis[ply];
+		ssi.hash_key = getHashkeyTPT();
+		ssi.in_check = env.getBitboard().isInCheck();
+		ssi.tt_hit = false;
+		ssi.static_eval = eval(evaluator, ply, alpha, beta, isPv);
+		
+		
 		if (ply >= ISearch.MAX_DEPTH) {
 			
-			return eval(evaluator, ply, alpha, beta, isPv);
+			return ssi.static_eval;
 		}
 		
 		
@@ -482,8 +494,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		final long hashkey 			= getHashkeyTPT();
-		final boolean wasInCheck 	= env.getBitboard().isInCheck();
 		final int parentMove 		= env.getBitboard().getLastMove();
 		final int colourToMove 		= env.getBitboard().getColourToMove();
 		
@@ -497,9 +507,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 			
-			env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
+			env.getTPT().get(ssi.hash_key, tt_entries_per_ply[ply]);
 			
 			if (!tt_entries_per_ply[ply].isEmpty()) {
+				
+				ssi.tt_hit = true;
 				
 				ttMove = tt_entries_per_ply[ply].getBestMove();
 				ttFlag = tt_entries_per_ply[ply].getFlag();
@@ -712,18 +724,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		int eval = eval(evaluator, ply, alpha, beta, isPv);
-		
 		if (ttValue != IEvaluator.MIN_EVAL) {
 			
 			if (getSearchConfig().isOther_UseTPTScores()) {
 				
 				if (ttFlag == ITTEntry.FLAG_EXACT
-						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < eval)
-						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > eval)
+						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < ssi.static_eval)
+						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > ssi.static_eval)
 					) {
 					
-					eval = ttValue;
+					ssi.static_eval = ttValue;
 				}
 			}
 		}
@@ -744,15 +754,15 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			if (eval >= beta) {
+			if (ssi.static_eval >= beta) {
 				
 				
 				if (depth <= STATIC_NULL_MOVE_MAXDEPTH) {
 					
-					if (eval - depth * STATIC_NULL_MOVE_MARGIN / PRUNING_AGGRESSIVENESS >= beta) {
+					if (ssi.static_eval - depth * STATIC_NULL_MOVE_MARGIN / PRUNING_AGGRESSIVENESS >= beta) {
 						
 						node.bestmove = 0;
-						node.eval = eval;
+						node.eval = ssi.static_eval;
 						node.leaf = true;
 							
 						return node.eval;
@@ -770,7 +780,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						env.getBitboard().makeNullMoveForward();
 						
-						int reduction = depth / 4 + 3 + Math.min((Math.max(0, eval - beta)) / 80, 3);
+						int reduction = depth / 4 + 3 + Math.min((Math.max(0, ssi.static_eval - beta)) / 80, 3);
 						reduction = (int) (reduction * REDUCTION_AGGRESSIVENESS);
 						
 						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, -beta, -beta + 1, ply + 1, false)
@@ -797,14 +807,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
-			} else if (eval <= alpha) {
+			} else if (ssi.static_eval <= alpha) {
 				
 				
 				if (depth <= RAZORING_MAXDEPTH) {
 					
 					int razoringMargin = (int) (RAZORING_MARGIN * depth / PRUNING_AGGRESSIVENESS);
 					
-					if (eval + razoringMargin < alpha) {
+					if (ssi.static_eval + razoringMargin < alpha) {
 						
 						int score = qsearch(mediator, pvman, evaluator, info, alpha - razoringMargin - 1, alpha - razoringMargin, ply, false);
 						
@@ -878,7 +888,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			singular_depth = (int) Math.max(1 , singular_depth / REDUCTION_AGGRESSIVENESS);
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, ply,
-					singular_depth, singular_beta - 1, singular_beta, false, initialMaxDepth, ttMove, eval);
+					singular_depth, singular_beta - 1, singular_beta, false, initialMaxDepth, ttMove, ssi.static_eval);
 			
 			if (singular_value < singular_beta) {
 				
@@ -1113,7 +1123,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				if (!isPv
-						&& !wasInCheck
+						&& !ssi.in_check
 						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& !SearchUtils.isMateVal(alpha)
@@ -1134,14 +1144,11 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
-						if (eval != ISearch.MIN) { //eval is set
+						if (depth <= FUTILITY_MAXDEPTH
+								&& hasAtLeastOnePiece
+								&& ssi.static_eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
 							
-							if (depth <= FUTILITY_MAXDEPTH
-									&& hasAtLeastOnePiece
-									&& eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
-								
-								continue;
-							}
+							continue;
 						}
 						
 						if (movesPerformed_attacks + movesPerformed_quiet > 3
@@ -1185,7 +1192,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						|| (USE_LMR_ON_BAD_CAPTURES && env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) < 0);
 				
 				boolean doLMR = new_depth >= 2
-						&& !wasInCheck
+						&& !ssi.in_check
 						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
@@ -1325,7 +1332,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getTPT() != null) {
 				
-			env.getTPT().put(hashkey, depth, node.eval, alpha_org, beta, node.bestmove);
+			env.getTPT().put(ssi.hash_key, depth, node.eval, alpha_org, beta, node.bestmove);
 		}
 		
 		
@@ -1573,14 +1580,11 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
-						if (eval != ISearch.MIN) { //eval is set
+						if (depth <= FUTILITY_MAXDEPTH
+								&& hasAtLeastOnePiece
+								&& eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
 							
-							if (depth <= FUTILITY_MAXDEPTH
-									&& hasAtLeastOnePiece
-									&& eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
-								
-								continue;
-							}
+							continue;
 						}
 						
 						if (all_moves > 3
