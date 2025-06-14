@@ -306,7 +306,7 @@ public class SyzygyTBProbing {
 				//wdl = (wdl & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
 				
 				int dtz = probeDTZ(board);
-				int dtm = wdl == 2 ? probeDTM(board) : -1;
+				int dtm =-1; //wdl == 2 ? probeDTM(board) : -1;
 				
 				System.out.println(board.getMoveOps().moveToString(cur_move) + ", dtz=" + dtz + ", wdl=" + wdl + ", dtm=" + dtm + ", probe_result=" + probe_result);
 				

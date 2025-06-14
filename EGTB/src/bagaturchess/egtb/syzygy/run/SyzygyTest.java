@@ -21,11 +21,11 @@ public class SyzygyTest {
 			
 			//Initialization of the board representation by given FEN
 			
-			//IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/3P4/3K4 w - -");//White win
-			//IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/4R3/3K4 w - -");//White win
-			IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("8/8/8/8/8/7k/5Kp1/8 b - - 0 1");//Black win
+			//IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/3P4/3K4 w - - 0 1");//White win
+			//IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("3k4/8/8/8/8/8/4R3/3K4 w - - 0 1");//White win
+			//IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("8/8/8/8/8/7k/5Kp1/8 b - - 0 1");//Black win
 			//IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("8/8/8/8/8/7k/5Kp1/8 w - - 0 1");//Draw
-			//IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("8/6P1/8/2kB2K1/8/8/8/4r3 w - - 1 19"); //TDZ is -1
+			IBitBoard board  = BoardUtils.createBoard_WithPawnsCache("8/6P1/8/2kB2K1/8/8/8/4r3 w - - 1 19"); //WDL is -1
 			
 			System.out.println(board);
 			
@@ -45,7 +45,7 @@ public class SyzygyTest {
 				long[] out = new long[2];
 				SyzygyTBProbing.getSingleton().probeMove(board, out);
 				MoveWrapper best_move = new MoveWrapper((int) out[1], false, board.getCastlingConfig());
-				System.out.println("best_move=" + best_move);
+				System.out.println("best_move=" + best_move + ", dtz=" + out[0]);
 				
 				
 				/*int probing_result = SyzygyTBProbing.getSingleton().probeWDL(board);

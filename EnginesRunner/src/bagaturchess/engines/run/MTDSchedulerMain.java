@@ -255,6 +255,7 @@ public class MTDSchedulerMain {
 		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(Constants.INITIAL_BOARD, cfg.getBoardConfig());
 		//IBitBoard bitboard = new Board("4r3/4rk2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB draw
 		//IBitBoard bitboard = new Board("4r3/5k2/8/8/8/8/3Q4/2K5 w - - 0 1", null, cfg.getBoardConfig());//EGTB white win
+		//IBitBoard bitboard = new Board("8/6P1/8/2kB2K1/8/8/8/4r3 w - - 1 19", null, cfg.getBoardConfig());// EGTB with DTZ=-1
 		//IBitBoard bitboard = new Board("4k3/3r1p2/8/8/8/8/8/4KQ2 w - - 0 1", null, cfg.getBoardConfig());//EGTB white win
 		//IBitBoard bitboard = new Board("4k3/8/8/4KR2/8/8/8/8 w - - 0 1", null, cfg.getBoardConfig());//Mate in 2 with e5d6
 		//IBitBoard bitboard = new Board("4k3/8/8/5R2/4K3/8/8/8 w - - 0 1", null, cfg.getBoardConfig());//Mate in 16 with e4d5
