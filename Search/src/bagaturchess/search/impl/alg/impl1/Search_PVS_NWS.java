@@ -568,56 +568,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		//TB probing
 		int egtb_eval = ISearch.MIN;
 		
 		if (SyzygyTBProbing.getSingleton() != null
-    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())
-    			){
-			
-			/*
-			SYZYGY DOWNLOADS:
-			http://tablebase.lichess.ovh/tables/standard/7/
-
-			SYZYGY ONLINE:
-			https://github.com/niklasf/lila-tablebase#http-api
-			https://syzygy-tables.info/
-			https://lichess.org/blog/W3WeMyQAACQAdfAL/7-piece-syzygy-tablebases-are-complete
-
-
-			INFO SOURCE:
-			https://www.chessprogramming.org/Syzygy_Bases
-
-			Winner is minimizing DTZ and the loser is maximizing DTZ
-
-			File Types
-			Syzygy Bases consist of two sets of files,
-			WDL files (extension .rtbw) storing win/draw/loss information considering the fifty-move rule for access during search,
-			and DTZ files (extension .rtbz) with distance-to-zero information for access at the root.
-			WDL has full data for two sides but DTZ50 omitted data of one side to save space. Each endgame has a pair of those types.
-
-			Search
-			During the Search:
-			With the WDL tables stored on SSD [12] , it is possible to probe the tables at all depths without much slowdown.
-			They have been tested in Ronald de Man's engine Sjaak (playing on FICS as TrojanKnight(C)) a couple of months quite successfully,
-			don't probing in quiescence search.
-			At the Root:
-			Since pure DTZ50-optimal play (i.e. minimaxing the number of moves to the next capture or pawn move by either side) can be very unnatural,
-			it might be desirable to let the engine search on the winning moves until it becomes clear that insufficient progress is being made
-			and only then switch to DTZ-optimal play (e.g. by detecting repetitions and monitoring the halfmove clock) [13].
-
-
-			Ronald de Man in a reply to Nguyen Pham, April 15, 2020 [28] :
-			Syzygy WDL is double sided, DTZ is single sided.
-			WDL:
-			So to know whether a 7-piece position is winning, losing or drawn (or cursed),
-			the engine needs to do only a single probe of a 7-piece WDL table.
-			(It may in addition have to do some probes of 6-piece WDL tables if any direct captures are available.)
-			DTZ:
-			If the engine needs to know the DTZ value (which is only necessary when a TB root position has been reached),
-			the probing code may have to do a 1-ply search to get to the "right" side of the DTZ table.
-			For 6-piece TBs, DTZ is 81.9GB when storing only the smaller side of each table. Storing both sides might require perhaps 240GB.
-			*/
-			
+    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())){
 			
 			int probe_result = probeWDL_WithCache();
 			
@@ -632,16 +587,14 @@ public class Search_PVS_NWS extends SearchImpl {
 		        
 	            	case SyzygyConstants.TB_WIN:
 	            		
-	    				//int dtz = (probe_result & SyzygyConstants.TB_RESULT_DTZ_MASK) >> SyzygyConstants.TB_RESULT_DTZ_SHIFT;
 	            		int dtz = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
 	            		
 	    				if (dtz < 0) {
 	    					
-	    					/**
+	     					/**
 	    					 * In this not mate position "8/6P1/8/2kB2K1/8/8/8/4r3 w - - 1 19", DTZ is -1 and WDL is 2 (WIN).
 	    					 */
 	    					break;
-	    					//throw new IllegalStateException("dtz=" + dtz + ", env.getBitboard()=" + env.getBitboard());
 	    				}
 	    				
 						int distanceToDraw_50MoveRule = 99 - env.getBitboard().getDraw50movesRule();
@@ -649,39 +602,17 @@ public class Search_PVS_NWS extends SearchImpl {
 						//Syzygy TBs report winning score/move
 						//but the +mate or +promotion moves line is longer
 						//than the moves we have until draw with 50 move rule
-						//! Without this check, the EGTB probing doesn't work correctly and the Bagatur version has smaller ELO rating (-35 ELO)
 						if (distanceToDraw_50MoveRule >= dtz) {
-							
-							/*int op_factor = cb.colorToMoveInverse == Constants.COLOUR_WHITE ? env.getBitboard().getMaterialFactor().getWhiteFactor() : env.getBitboard().getMaterialFactor().getBlackFactor();
-							
-							//Opponent has only king so DTZ is DTM
-							if (op_factor == 0 && !env.getBitboard().hasSufficientMatingMaterial(cb.colorToMoveInverse)) {
-								
-			    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
-			    				egtb_eval = SearchUtils.getMateVal(ply + dtz);
-								
-							} else {
-								
-								egtb_eval = IEvaluator.MAX_EVAL / (ply + dtz);
-							}*/
 							
 							//TODO: the eval is too less in order to be more attractive for search than maybe rook and 1+ passed pawns?
 							egtb_eval = MAX_MATERIAL_INTERVAL / (ply + dtz + 1); //+1 in order to be less than a mate in max_depth plies.
 							
-						} /*else {
-							
-							egtb_eval = getDrawScores(-1);
-						}*/
-	            		
+						}
+						
 						break;
 						
 		            case SyzygyConstants.TB_LOSS:
 		            	
-	    				/*
-	    				This code doesn't work correctly
-	    				//getMateVal with parameter set to 1 achieves max and with ISearch.MAX_DEPTH achieves min
-	    				egtb_eval = -SearchUtils.getMateVal(ply + dtz);
-	    				*/
 		            	break;
 		            
 		            case SyzygyConstants.TB_DRAW:
@@ -707,36 +638,36 @@ public class Search_PVS_NWS extends SearchImpl {
 		            	throw new IllegalStateException("wdl=" + wdl);
 		        }
 			}
+			
+			
+			if (egtb_eval != ISearch.MIN) {
+				
+				if (env.getBitboard().isInCheck()) {
+					
+					if (!env.getBitboard().hasMoveInCheck()) {
+						
+						egtb_eval = -SearchUtils.getMateVal(ply);
+					}
+					
+				} else {
+					
+					if (!env.getBitboard().hasMoveInNonCheck()) {
+						
+						egtb_eval = getDrawScores(-1);
+					}
+				}
+				
+				if (ply > 7) {
+					
+					node.bestmove = 0;
+					node.eval = egtb_eval;
+					node.leaf = true;
+					node.type = PVNode.TYPE_TB;
+					
+					return node.eval;
+				}
+			}
         }
-		
-		
-		if (egtb_eval != ISearch.MIN) {
-			
-			if (env.getBitboard().isInCheck()) {
-				
-				if (!env.getBitboard().hasMoveInCheck()) {
-					
-					egtb_eval = -SearchUtils.getMateVal(ply);
-				}
-				
-			} else {
-				
-				if (!env.getBitboard().hasMoveInNonCheck()) {
-					
-					egtb_eval = getDrawScores(-1);
-				}
-			}
-			
-			if (ply > 7) {
-			
-				node.bestmove = 0;
-				node.eval = egtb_eval;
-				node.leaf = true;
-				node.type = PVNode.TYPE_TB;
-				
-				return node.eval;
-			}
-		}
 		
 		
 		if (!VALIDATE_PV && ttValue != IEvaluator.MIN_EVAL) {
