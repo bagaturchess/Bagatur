@@ -110,6 +110,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private long[] search_types_stats 								= new long[16];
 	
+	private long[] phases_stats 									= new long[8];
+			
 	
 	public Search_PVS_NWS(Object[] args) {
 		
@@ -1303,6 +1305,14 @@ public class Search_PVS_NWS extends SearchImpl {
 						history.registerGood(parentMove, move, depth);
 						conthist.registerGood(parentMove, move, depth);
 					}
+					
+					phases_stats[phase]++;
+					/*if (phases_stats[phase] % 10000 == 0) {
+					    for (int i = 0; i < phases_stats.length; i++) {
+					        System.out.print(i + "=" + phases_stats[i] + " ");
+					    }
+					    System.out.println();
+					}*/
 					
 					phase += 379;
 					
