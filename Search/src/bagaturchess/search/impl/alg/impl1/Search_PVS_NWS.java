@@ -623,13 +623,15 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 		            case SyzygyConstants.TB_BLESSED_LOSS:
 		            	
-		            	egtb_eval = getDrawScores(-1);
+		            	//Too risky
+		            	//egtb_eval = getDrawScores(-1);
 		                
 						break;
 						
 		            case SyzygyConstants.TB_CURSED_WIN:
 		            	
-		            	egtb_eval = getDrawScores(-1);
+		            	//Too risky
+		            	//egtb_eval = getDrawScores(-1);
 		                
 						break;
 						
