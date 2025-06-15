@@ -52,6 +52,8 @@ public class SortedMoveList_Root extends SortedMoveList_BaseImpl {
 		
 		int killer1Move = env.getKillers().getKiller1(env.getBitboard().getColourToMove(), ply);
 		int killer2Move = env.getKillers().getKiller2(env.getBitboard().getColourToMove(), ply);		
+		int killer3Move = env.getKillers().getKiller3(env.getBitboard().getColourToMove(), ply);
+		int killer4Move = env.getKillers().getKiller4(env.getBitboard().getColourToMove(), ply);		
 		
 		int ordval = 100000 * 100;
 		
@@ -70,6 +72,18 @@ public class SortedMoveList_Root extends SortedMoveList_BaseImpl {
 		if (killer2Move == move) {
 			
 			ordval += 4000 * 100;
+			
+		}
+		
+		if (killer3Move == move) {
+			
+			ordval += 3000 * 100;
+			
+		}
+		
+		if (killer4Move == move) {
+			
+			ordval += 2000 * 100;
 			
 		}
 		
