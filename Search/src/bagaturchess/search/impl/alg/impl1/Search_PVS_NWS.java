@@ -616,8 +616,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		            
 		            case SyzygyConstants.TB_DRAW:
 		            	
-						egtb_eval = getDrawScores(-1);
-		                
+	            		dtz = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+	            		
+	    				if (dtz < 0) {
+
+	    					break;
+	    				}
+	    				
+						//egtb_eval = getDrawScores(-1);
+	    				egtb_eval = -(ply + dtz); //Force engine to finish the game faster when it is a draw
+	    				
 						break;
 						
 		            case SyzygyConstants.TB_BLESSED_LOSS:
