@@ -24,6 +24,7 @@ package bagaturchess.search.impl.rootsearch.parallel;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -760,7 +761,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 			//root_stopper = _parent.getStopper();
 			
 			allInfos 	= ConcurrentHashMap.newKeySet();
-			majorInfos = new ArrayList<ISearchInfo>();
+			majorInfos 	= Collections.synchronizedList(new ArrayList<>());
 			
 			
 			
