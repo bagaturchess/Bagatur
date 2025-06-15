@@ -316,7 +316,7 @@ public class SearchersInfo {
 				
 				searcherDepthInfo = new SearcherDepthInfo();
 				
-				depthsInfo.put(info.getDepth(), searcherDepthInfo);
+				depthsInfo.put(info_depth, searcherDepthInfo);
 			}
 			
 			searcherDepthInfo.update(info);
