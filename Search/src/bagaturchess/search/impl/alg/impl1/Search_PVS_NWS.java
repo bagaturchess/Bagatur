@@ -246,7 +246,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		final boolean wasInCheck 	= env.getBitboard().isInCheck();
 		final int parentMove 		= env.getBitboard().getLastMove();
 		int bestMove 				= 0;
 		int bestScore 				= ISearch.MIN;
@@ -288,7 +287,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					|| (USE_LMR_ON_BAD_CAPTURES && env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) < 0);
 			
 			boolean doLMR = depth >= 2
-						&& !wasInCheck
+						&& !ssi.in_check
 						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 2
 						&& isQuietOrBadCapture;
@@ -644,7 +643,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (egtb_eval != ISearch.MIN) {
 				
-				if (env.getBitboard().isInCheck()) {
+				if (ssi.in_check) {
 					
 					if (!env.getBitboard().hasMoveInCheck()) {
 						
@@ -689,7 +688,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean mateThreat  = false;
 		
 		if (!isPv
-				&& !env.getBitboard().isInCheck()
+				&& !ssi.in_check
 				&& !SearchUtils.isMateVal(alpha)
 				&& !SearchUtils.isMateVal(beta)
 				&& egtb_eval == ISearch.MIN
@@ -1259,7 +1258,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (movesPerformed_attacks + movesPerformed_quiet == 0) {
 			
-			if (!env.getBitboard().isInCheck()) {
+			if (!ssi.in_check) {
 				
 				node.bestmove = 0;
 				node.eval = getDrawScores(-1);
