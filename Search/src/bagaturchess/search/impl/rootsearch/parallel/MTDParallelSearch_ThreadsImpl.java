@@ -113,10 +113,11 @@ public class MTDParallelSearch_ThreadsImpl extends MTDParallelSearch_BaseImpl {
 		//3. The small amount of TTs is used, the more help each thread receives (although the NPS degradation on some OS/Java versions), the bigger depth each one thread will reach faster.
 		//4. We use at min 2 threads and max MAX_THREADS - 2, in order to stay away from both extremes.
 		//2. Just note: The more aggressive static and forward pruning in the single core version of the search is, the more need of validation of the move in the new depth is necessary.
-		double at_least_2_threads = 2 * 1 / (double) getRootSearchConfig().getThreadsCount();
+		//double at_least_2_threads = 2 * 1 / (double) getRootSearchConfig().getThreadsCount();
+		double at_least_1_thread = 1 * 1 / (double) getRootSearchConfig().getThreadsCount();
 		//double max_threads_minus_2 = Math.min(1, 1 / (double) getRootSearchConfig().getTPTsCount()) - at_least_2_threads;
 		//return new SearchersInfo(startIteration, Math.max(at_least_2_threads, max_threads_minus_2));
-		return new SearchersInfo(startIteration, at_least_2_threads);
+		return new SearchersInfo(startIteration, at_least_1_thread);
 	}
 	
 	
