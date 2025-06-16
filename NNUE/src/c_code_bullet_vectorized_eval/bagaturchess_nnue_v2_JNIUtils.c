@@ -11,9 +11,9 @@ static int initialized = 0;
 
 JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_evaluateVectorized
   (JNIEnv *env, jclass clazz, jshortArray L2Weights, jshortArray UsValues, jshortArray ThemValues) {
-    jshort *l2_weights = (*env)->GetShortArrayElements(env, L2Weights, NULL);
-    jshort *us_values = (*env)->GetShortArrayElements(env, UsValues, NULL);
-    jshort *them_values = (*env)->GetShortArrayElements(env, ThemValues, NULL);
+    jshort *l2_weights = (*env)->GetPrimitiveArrayCritical(env, L2Weights, JNI_FALSE);
+    jshort *us_values = (*env)->GetPrimitiveArrayCritical(env, UsValues, JNI_FALSE);
+    jshort *them_values = (*env)->GetPrimitiveArrayCritical(env, ThemValues, JNI_FALSE);
 
     if (!initialized) {
         qa_vec = _mm512_set1_epi16(QA);
@@ -59,9 +59,9 @@ JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_evaluateVectorized
     // Sum all elements in eval_vec using _mm512_reduce_add_epi32
     int eval = _mm512_reduce_add_epi32(eval_vec);
 
-    (*env)->ReleaseShortArrayElements(env, L2Weights, l2_weights, 0);
-    (*env)->ReleaseShortArrayElements(env, UsValues, us_values, 0);
-    (*env)->ReleaseShortArrayElements(env, ThemValues, them_values, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, L2Weights, l2_weights, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, UsValues, us_values, JNI_ABORT);
+    (*env)->ReleasePrimitiveArrayCritical(env, ThemValues, them_values, JNI_ABORT);
 
     return eval;
 }
