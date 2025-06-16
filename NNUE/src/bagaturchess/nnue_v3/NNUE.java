@@ -22,10 +22,10 @@ public class NNUE {
 	
     // Net arch: (768 -> L1_SIZE) x 2 -> (L2_SIZE -> L3_SIZE -> 1) x OUTPUT_BUCKETS
     private static final int NUM_INPUTS = 768;
-    private static final int L1_SIZE = 512;
-    private static final int L2_SIZE = 2;
+    private static final int L1_SIZE = 3072;
+    private static final int L2_SIZE = 15;
     private static final int L3_SIZE = 32;
-    private static final int OUTPUT_BUCKETS = 8;
+    private static final int OUTPUT_BUCKETS = 1;
     
     private static final short FT_QUANT = 255;
     private static final short FT_SHIFT = 1;
@@ -57,9 +57,9 @@ public class NNUE {
 	}
 	
     public static class Network {
-        public short[] FTWeights = new short[NUM_INPUTS * L1_SIZE];
-        public short[] FTBiases = new short[L1_SIZE];
-        public short[][] L1Weights = new short[OUTPUT_BUCKETS][2 * L1_SIZE * L2_SIZE];
+        public int[] FTWeights = new int[NUM_INPUTS * L1_SIZE];
+        public int[] FTBiases = new int[L1_SIZE];
+        public int[][] L1Weights = new int[OUTPUT_BUCKETS][2 * L1_SIZE * L2_SIZE];
         public float[][] L1Biases = new float[OUTPUT_BUCKETS][L2_SIZE];
         public float[][] L2Weights = new float[OUTPUT_BUCKETS][L2_SIZE * L3_SIZE];
         public float[][] L2Biases = new float[OUTPUT_BUCKETS][L3_SIZE];
@@ -81,7 +81,7 @@ public class NNUE {
     public static Network net = new Network();
 
     public static class Accumulator {
-        public short[][] values = new short[2][L1_SIZE];
+        public int[][] values = new int[2][L1_SIZE];
     }
     
     int[] sumsL2 = new int[L2_SIZE];
@@ -218,34 +218,53 @@ public class NNUE {
             }
         }
     }
+    
+    
+    public void activateFTAndPropagateL1(int[] us, int[] them, int[] weights, float[] biases, float[] output) {
+        final int[] accInt = new int[L1_SIZE];
+        final int[][] accs = { us, them };
+        final int totalStride = L1_SIZE * L2_SIZE;
+        Arrays.fill(sumsL2, 0);
 
-    public void activateFTAndPropagateL1(short[] us, short[] them, short[] weights, float[] biases, float[] output) {
-        
-    	Arrays.fill(sumsL2, 0);
-    	
         int weightOffset = 0;
-        short[][] accs = { us, them };
-        
-        for (short[] acc : accs) {
+
+        for (int p = 0; p < 2; p++) {
+            final int[] acc = accs[p];
+
+            // Inline square clipped ReLU into a linear array
             for (int i = 0; i < L1_SIZE; i++) {
-                short clipped = (short) Math.max(0, Math.min(acc[i], FT_QUANT));
-                //short squared = (short) ((clipped * clipped) >> FT_SHIFT);
-                int squared = screlu[clipped - (int) Short.MIN_VALUE] >> FT_SHIFT;
-            	//int squared = screlu[clipped - (int) Short.MIN_VALUE];
-				
-                for (int out = 0; out < L2_SIZE; out++) {
-                	sumsL2[out] += squared * weights[weightOffset + out * L1_SIZE + i];
-                }
+                int x = acc[i];
+                if (x < 0) x = 0;
+                else if (x > FT_QUANT) x = FT_QUANT;
+
+                accInt[i] = (x * x) >> FT_SHIFT;
             }
-            weightOffset += L1_SIZE * L2_SIZE;
+
+            // Multiply-accumulate: for each output neuron in L2
+            for (int out = 0; out < L2_SIZE; out++) {
+                int sum = 0;
+                final int wOff = weightOffset + out * L1_SIZE;
+
+                for (int i = 0; i < L1_SIZE; i++) {
+                    sum += accInt[i] * weights[wOff + i];
+                }
+
+                sumsL2[out] += sum;
+            }
+
+            weightOffset += totalStride;
         }
-        
-        float sumDiv = (float) (FT_QUANT * FT_QUANT * L1_QUANT >> FT_SHIFT);
+
+        // Normalize and apply activation (clipped square ReLU)
+        final float scale = (float) (FT_QUANT * FT_QUANT * L1_QUANT >> FT_SHIFT);
         for (int i = 0; i < L2_SIZE; i++) {
-            float clipped = Math.max(0.0f, Math.min((sumsL2[i] / sumDiv) + biases[i], CLIPPED_MAX));
-            output[i] = clipped * clipped;
+            float x = (sumsL2[i] / scale) + biases[i];
+            if (x < 0f) x = 0f;
+            else if (x > CLIPPED_MAX) x = CLIPPED_MAX;
+            output[i] = x * x;
         }
     }
+    
     
     public void propagateL2(float[] inputs, float[] weights, float[] biases, float[] output) {
         
@@ -282,8 +301,8 @@ public class NNUE {
     	Arrays.fill(L2Outputs, 0);
     	Arrays.fill(L3Output, 0);
 
-        short[] us = boardAccumulator.values[sideToMove];
-        short[] them = boardAccumulator.values[1 - sideToMove];
+    	int[] us = boardAccumulator.values[sideToMove];
+    	int[] them = boardAccumulator.values[1 - sideToMove];
         activateFTAndPropagateL1(us, them, net.L1Weights[outputBucket], net.L1Biases[outputBucket], L1Outputs);
 
         propagateL2(L1Outputs, net.L2Weights[outputBucket], net.L2Biases[outputBucket], L2Outputs);
