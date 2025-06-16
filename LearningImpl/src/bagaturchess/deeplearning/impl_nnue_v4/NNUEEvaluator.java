@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.nnue_v2.NNUEProbeUtils;
-import bagaturchess.nnue_v3.NNUE;
+import bagaturchess.nnue_v3.NNUE_SIMD_AVX2;
 import bagaturchess.nnue_v3.NNUE.Accumulator;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
@@ -19,7 +19,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 	
 	private IBitBoard bitboard;
 	
-    private static NNUE nnue = new NNUE();
+    private static NNUE_SIMD_AVX2 nnue = new NNUE_SIMD_AVX2();
     private static final NNUEProbeUtils.Input input = new NNUEProbeUtils.Input();
     private static final Accumulator accumulators = new Accumulator();
 	
@@ -62,11 +62,14 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		NNUEProbeUtils.fillInput(bitboard, input);
 		
-		nnue.accumulate(accumulators, input.white_pieces, input.white_squares, input.black_pieces, input.black_squares);
+		nnue.accumulate(nnue.accumulators[0], nnue.accumulators[1],
+				NNUE_SIMD_AVX2.net.FTBiases, NNUE_SIMD_AVX2.net.FTWeights,
+				input.white_pieces, input.white_squares, input.black_pieces, input.black_squares);
 		
 		//int actualWhitePlayerEval = nnue.output(accumulators, bitboard.getColourToMove(), (bitboard.getMaterialState().getPiecesCount() - 2) / 4);
-		int actualWhitePlayerEval = nnue.output(accumulators, bitboard.getColourToMove(), 0);
-
+		//int actualWhitePlayerEval = (int) (1000 * Math.random());
+		int actualWhitePlayerEval = nnue.output(nnue.accumulators, bitboard.getColourToMove(), 0);
+				
 		if (bitboard.getColourToMove() == BLACK) {
 			
 			actualWhitePlayerEval = -actualWhitePlayerEval;
