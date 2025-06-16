@@ -437,6 +437,19 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		SearchStackInfo ssi = ssis[ply];
+		ssi.hash_key = getHashkeyTPT();
+		ssi.in_check = env.getBitboard().isInCheck();
+		ssi.tt_hit = false;
+		ssi.static_eval = eval(evaluator, ply, alpha, beta, isPv);
+		
+		
+		if (ply >= ISearch.MAX_DEPTH) {
+			
+			return ssi.static_eval;
+		}
+		
+		
 		PVNode node = pvman.load(ply);
 		node.bestmove = 0;
 		node.eval = ISearch.MIN;
@@ -462,22 +475,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (info.getSelDepth() < ply) {
 			
 			info.setSelDepth(ply);
-		}
-		
-		
-		SearchStackInfo ssi = ssis[ply];
-		ssi.hash_key = getHashkeyTPT();
-		ssi.in_check = env.getBitboard().isInCheck();
-		ssi.tt_hit = false;
-		ssi.static_eval = eval(evaluator, ply, alpha, beta, isPv);
-		
-		
-		if (ply >= ISearch.MAX_DEPTH) {
-			
-			node.eval = ssi.static_eval;
-			node.type = PVNode.TYPE_MAXDEPTH;
-			
-			return ssi.static_eval;
 		}
 		
 		
@@ -1675,20 +1672,17 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		if (ply >= ISearch.MAX_DEPTH) {
+	    	
+			return eval(evaluator, ply, alpha, beta, isPv);
+		}
+		
+		
 		PVNode node = pvman.load(ply);
 		node.bestmove = 0;
 		node.eval = ISearch.MIN;
 		node.leaf = true;
 		node.type = PVNode.TYPE_NORMAL_QSEARCH;
-		
-		
-		if (ply >= ISearch.MAX_DEPTH) {
-			
-	    	node.eval = eval(evaluator, ply, alpha, beta, isPv);
-	    	node.type = PVNode.TYPE_MAXDEPTH;
-	    	
-			return node.eval;
-		}
 		
 		
 		if (isDraw(isPv)) {
