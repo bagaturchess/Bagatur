@@ -11,7 +11,7 @@ public class HalfKPFeatureExtractor {
     private static final int WHITE = 0;
     private static final int BLACK = 1;
     
-	public static final int DIM = 3072;  // 2 sides × 3 major piece types × 64 squares × 8 half-KP positions
+	public static final int DIM = 3072;
 
 
 	/*public static void extract(IBitBoard board, byte[] output) {
