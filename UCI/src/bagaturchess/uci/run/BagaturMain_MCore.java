@@ -14,9 +14,11 @@ public class BagaturMain_MCore {
 			"bagaturchess.engines.cfg.base.RootSearchConfig_BaseImpl_SMP_Threads",
 			"bagaturchess.search.impl.alg.impl1.Search_PVS_NWS",
 			"bagaturchess.engines.cfg.base.SearchConfigImpl_AB",
+			//"bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20",
+			//"bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20",
 			"bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20",
-			"bagaturchess.deeplearning.impl_nnue_v3.EvaluationConfig"
-			//"bagaturchess.deeplearning.impl_nnue_v2b.EvaluationConfig"
+			"bagaturchess.deeplearning.impl_nnue_v3.EvaluationConfig" //Bagatur
+			//"bagaturchess.deeplearning.impl_nnue_v2b.EvaluationConfig" //JFish
 		};
 		
 		Boot.main(args);

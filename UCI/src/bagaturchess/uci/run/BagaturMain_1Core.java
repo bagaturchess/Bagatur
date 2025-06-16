@@ -17,8 +17,8 @@ public class BagaturMain_1Core {
 			//"bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20",
 			//"bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20",
 			"bagaturchess.learning.goldmiddle.pesto.cfg.BoardConfigImpl_PeSTO",
-			"bagaturchess.deeplearning.impl_nnue_v3.EvaluationConfig"
-			//"bagaturchess.deeplearning.impl_nnue_v2b.EvaluationConfig"
+			"bagaturchess.deeplearning.impl_nnue_v3.EvaluationConfig" //Bagatur
+			//"bagaturchess.deeplearning.impl_nnue_v2b.EvaluationConfig" //JFish
 		};
 		
 		Boot.main(args);
