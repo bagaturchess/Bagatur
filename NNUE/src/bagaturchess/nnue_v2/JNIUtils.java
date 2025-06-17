@@ -22,9 +22,28 @@ public class JNIUtils {
 	}
 	
 	
-	public static native int evaluateVectorized(short[] L2Weights, short[] UsValues, short[] ThemValues);
-
+	// Bitmask: 1 = AVX2, 2 = AVX512F
+    public static native int detectSIMD();
 	
+    
+    public static native int evaluateVectorized_avx2(short[] L2Weights, short[] UsValues, short[] ThemValues);
+	
+    
+    public static native int evaluateVectorized_avx512(short[] L2Weights, short[] UsValues, short[] ThemValues);
+	
+	
+    public static boolean isAVX2Supported() {
+    	
+        return (detectSIMD() & 1) != 0;
+    }
+
+    
+    public static boolean isAVX512Supported() {
+    	
+        return (detectSIMD() & 2) != 0;
+    }
+    
+    
 	public static void loadLib() {
 		
 		try {

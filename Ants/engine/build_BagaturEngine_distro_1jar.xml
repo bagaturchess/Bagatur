@@ -58,14 +58,12 @@
   	
   	<javac debug="true" debuglevel="lines" compiler="javac1.7"
   		srcdir="${engines_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
-  	
-  	
+	
   	<copy todir="${temp_dir}">
   		<fileset dir="${resources_dir}/bin/engine/nnue">
   			<include name="network_bagatur.nnue"/>
   		</fileset>
   	</copy>
-  	
   	
   	<jar jarfile="${work_dir}/BagaturEngine.jar" basedir="${temp_dir}">
         <manifest>
@@ -75,12 +73,9 @@
         </manifest>
   	</jar>
   	
-  	
   	<delete dir="${temp_dir}" />
   	
-  	
   	<ant antfile="${ants_dir}/engine/build_BagaturEngine_src.xml" dir="${ants_dir}/engine"/>
-  	
   	
 	<copy todir="${temp_dir}/bin">
 	    <fileset dir="${work_dir}/">
@@ -91,6 +86,12 @@
 	<copy todir="${temp_dir}/bin">
 	    <fileset dir="${resources_dir}/bin/engine/egtb/bin/">
 		  <include name="*"/>
+	    </fileset>
+	</copy>
+	
+	<copy todir="${temp_dir}/bin" failonerror="true">
+	    <fileset dir="${resources_dir}/bin/engine/nnue/bin">
+		  <include name="VectorEval.dll"/>
 	    </fileset>
 	</copy>
 	

@@ -9,10 +9,26 @@ extern "C" {
 #endif
 /*
  * Class:     bagaturchess_nnue_v2_JNIUtils
- * Method:    evaluateVectorized
+ * Method:    detectSIMD
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_detectSIMD
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     bagaturchess_nnue_v2_JNIUtils
+ * Method:    evaluateVectorized_avx2
  * Signature: ([S[S[S)I
  */
-JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_evaluateVectorized
+JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_evaluateVectorized_1avx2
+  (JNIEnv *, jclass, jshortArray, jshortArray, jshortArray);
+
+/*
+ * Class:     bagaturchess_nnue_v2_JNIUtils
+ * Method:    evaluateVectorized_avx512
+ * Signature: ([S[S[S)I
+ */
+JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_evaluateVectorized_1avx512
   (JNIEnv *, jclass, jshortArray, jshortArray, jshortArray);
 
 #ifdef __cplusplus

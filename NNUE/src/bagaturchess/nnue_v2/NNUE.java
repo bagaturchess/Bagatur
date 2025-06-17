@@ -53,7 +53,21 @@ public class NNUE {
 	private static short[][] L2Weights;
 	private static short outputBiases[];
 	
+	private static boolean AVX512_SUPPORT;
+	private static boolean AVX2_SUPPORT;
+	
 	static {
+		
+		try {
+			
+			AVX512_SUPPORT 	= JNIUtils.isAVX512Supported();
+			AVX2_SUPPORT 	= JNIUtils.isAVX2Supported();
+			
+		} catch (UnsatisfiedLinkError e) {
+			
+			//The vectorized lib is not available
+		}
+		
 		
 		try {
 			
@@ -247,13 +261,22 @@ public class NNUE {
 		
 		int eval = 0;
 		
-		for (int i = 0; i < HIDDEN_SIZE; i++) {
+		if (AVX512_SUPPORT) {
 			
-			eval += screlu[UsValues[i] - Short.MIN_VALUE] * L2Weights[i]
-					+ screlu[ThemValues[i] - Short.MIN_VALUE] * L2Weights[i + HIDDEN_SIZE];
+			eval = JNIUtils.evaluateVectorized_avx512(L2Weights, UsValues, ThemValues);
+			
+		} else if (AVX2_SUPPORT) {
+			
+			eval = JNIUtils.evaluateVectorized_avx2(L2Weights, UsValues, ThemValues);
+			
+		} else {
+			
+			for (int i = 0; i < HIDDEN_SIZE; i++) {
+				
+				eval += screlu[UsValues[i] - Short.MIN_VALUE] * L2Weights[i]
+						+ screlu[ThemValues[i] - Short.MIN_VALUE] * L2Weights[i + HIDDEN_SIZE];
+			}
 		}
-		
-		//int eval = JNIUtils.evaluateVectorized(L2Weights, UsValues, ThemValues);
 		
 		eval /= QA;
 		eval += NNUE.outputBiases[chooseOutputBucket(pieces_count)];
@@ -264,32 +287,18 @@ public class NNUE {
 		return eval;
 	}
 	
-	/*private static int evaluateVectorized(short[] L2Weights, short[] UsValues, short[] ThemValues) {
-		
-		int eval = 0;
-		
-		for (int i = 0; i < HIDDEN_SIZE; i++) {
-		
-			int us_value = Math.max(0, Math.min(UsValues[i], QA));
-			int them_value = Math.max(0, Math.min(ThemValues[i], QA));
-			
-			eval += us_value * us_value * L2Weights[i]
-					+ them_value * them_value * L2Weights[i + HIDDEN_SIZE];
-		}
-		
-		return eval;
-	}*/
-	
 	
 	public static int chooseOutputBucket(int pieces_count) {
 		return (pieces_count - 2) / DIVISOR;
 	}
-
+	
+	
 	public static int chooseInputBucket(int king_sq, int side) {
 		return side == WHITE ? INPUT_BUCKETS[king_sq]
 				: INPUT_BUCKETS[king_sq ^ 0b111000];
 	}
-
+	
+	
 	public static int getIndex(int square, int piece_side, int piece_type, int perspective) {
 		//System.out.println("square=" + square + ", piece_side=" + piece_side + ", piece_type=" + piece_type + ", perspective=" + perspective);
 		return perspective == WHITE
@@ -299,8 +308,9 @@ public class NNUE {
 						+ (square ^ 0b111000);
 	}
 	
-	public static class NNUEAccumulator
-	{
+	
+	public static class NNUEAccumulator {
+		
 		private short[] values = new short[HIDDEN_SIZE];
 		private int bucketIndex;
 		NNUE network;
