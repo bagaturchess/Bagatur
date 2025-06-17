@@ -26,6 +26,12 @@ public class JNIUtils {
     public static native int detectSIMD();
 	
     
+    public static native void accumulateVectorized_avx2(short[] accumulator, short[] L1Weights, boolean add);
+    
+    
+    public static native void accumulateVectorized_avx512(short[] accumulator, short[] L1Weights, boolean add);
+    
+    
     public static native int evaluateVectorized_avx2(short[] L2Weights, short[] UsValues, short[] ThemValues);
 	
     

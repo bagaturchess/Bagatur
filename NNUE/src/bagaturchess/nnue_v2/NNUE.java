@@ -332,27 +332,46 @@ public class NNUE {
 
 		public void add(int featureIndex) {
 			
-			for (int i = 0; i < HIDDEN_SIZE; i++) {
+			final short[] weights = NNUE.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE];
+			
+			//Slower with AVX support
+			/*if (AVX512_SUPPORT) {
 				
-				values[i] += NNUE.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE][i];
-			}
+				JNIUtils.accumulateVectorized_avx512(values, weights, true);
+				
+			} else if (AVX2_SUPPORT) {
+				
+				JNIUtils.accumulateVectorized_avx2(values, weights, true);
+				
+			} else {*/
+			
+				for (int i = 0; i < HIDDEN_SIZE; i++) {
+					
+					values[i] += weights[i];
+				}
+			//}
 		}
 		
 		public void sub(int featureIndex) {
 			
-			for (int i = 0; i < HIDDEN_SIZE; i++) {
-				
-				values[i] -= NNUE.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE][i];
-			}
-		}
-
-		public void addsub(int featureIndexToAdd, int featureIndexToSubtract) {
+			final short[] weights = NNUE.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE];
 			
-			for (int i = 0; i < HIDDEN_SIZE; i++) {
+			//Slower with AVX support
+			/*if (AVX512_SUPPORT) {
 				
-				values[i] += NNUE.L1Weights[featureIndexToAdd + bucketIndex * FEATURE_SIZE][i]
-						- NNUE.L1Weights[featureIndexToSubtract + bucketIndex * FEATURE_SIZE][i];
-			}
+				JNIUtils.accumulateVectorized_avx512(values, weights, false);
+				
+			} else if (AVX2_SUPPORT) {
+				
+				JNIUtils.accumulateVectorized_avx2(values, weights, false);
+				
+			} else {*/
+				
+				for (int i = 0; i < HIDDEN_SIZE; i++) {
+					
+					values[i] -= weights[i];
+				}
+			//}
 		}
 	}
 	

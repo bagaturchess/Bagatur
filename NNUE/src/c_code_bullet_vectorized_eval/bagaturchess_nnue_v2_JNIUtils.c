@@ -150,3 +150,53 @@ JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_evaluateVectorized_1a
 
     return eval;
 }
+
+
+JNIEXPORT void JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_accumulateVectorized_1avx2
+  (JNIEnv *env, jclass clazz, jshortArray acc, jshortArray weights, jboolean add) {
+
+    jshort *acc_ptr = (*env)->GetPrimitiveArrayCritical(env, acc, JNI_FALSE);
+    jshort *weights_ptr = (*env)->GetPrimitiveArrayCritical(env, weights, JNI_FALSE);
+
+    for (int i = 0; i < HIDDEN_SIZE; i += 16) {
+        __m256i w = _mm256_loadu_si256((__m256i*)&weights_ptr[i]);
+        __m256i a = _mm256_loadu_si256((__m256i*)&acc_ptr[i]);
+        __m256i res;
+
+        if (add) {
+            res = _mm256_add_epi16(a, w);
+        } else {
+            res = _mm256_sub_epi16(a, w);
+        }
+
+        _mm256_storeu_si256((__m256i*)&acc_ptr[i], res);
+    }
+
+    (*env)->ReleasePrimitiveArrayCritical(env, acc, acc_ptr, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, weights, weights_ptr, JNI_ABORT);
+}
+
+
+JNIEXPORT void JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_accumulateVectorized_1avx512
+  (JNIEnv *env, jclass clazz, jshortArray acc, jshortArray weights, jboolean add) {
+
+    jshort *acc_ptr = (*env)->GetPrimitiveArrayCritical(env, acc, JNI_FALSE);
+    jshort *weights_ptr = (*env)->GetPrimitiveArrayCritical(env, weights, JNI_FALSE);
+
+    for (int i = 0; i < HIDDEN_SIZE; i += 32) {
+        __m512i w = _mm512_loadu_si512((__m512i*)&weights_ptr[i]);
+        __m512i a = _mm512_loadu_si512((__m512i*)&acc_ptr[i]);
+        __m512i res;
+
+        if (add) {
+            res = _mm512_add_epi16(a, w);
+        } else {
+            res = _mm512_sub_epi16(a, w);
+        }
+
+        _mm512_storeu_si512((__m512i*)&acc_ptr[i], res);
+    }
+
+    (*env)->ReleasePrimitiveArrayCritical(env, acc, acc_ptr, 0);
+    (*env)->ReleasePrimitiveArrayCritical(env, weights, weights_ptr, JNI_ABORT);
+}

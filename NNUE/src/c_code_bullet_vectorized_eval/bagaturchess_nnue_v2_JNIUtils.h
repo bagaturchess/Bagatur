@@ -17,6 +17,22 @@ JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_detectSIMD
 
 /*
  * Class:     bagaturchess_nnue_v2_JNIUtils
+ * Method:    accumulateVectorized_avx2
+ * Signature: ([S[SZ)V
+ */
+JNIEXPORT void JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_accumulateVectorized_1avx2
+  (JNIEnv *, jclass, jshortArray, jshortArray, jboolean);
+
+/*
+ * Class:     bagaturchess_nnue_v2_JNIUtils
+ * Method:    accumulateVectorized_avx512
+ * Signature: ([S[SZ)V
+ */
+JNIEXPORT void JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_accumulateVectorized_1avx512
+  (JNIEnv *, jclass, jshortArray, jshortArray, jboolean);
+
+/*
+ * Class:     bagaturchess_nnue_v2_JNIUtils
  * Method:    evaluateVectorized_avx2
  * Signature: ([S[S[S)I
  */
