@@ -57,8 +57,6 @@ public class Boot {
 	public static void runStateManager(String[] args, final IChannel communicationChanel) {
 		
 		try {
-			
-			setHighPriority();
 		    
 			//ChannelManager.setChannel(new Channel_Console(System.in, System.out, System.out));
 			
@@ -80,6 +78,8 @@ public class Boot {
 			
 			final StateManager manager = new StateManager(engineBootCfg);
 			manager.setChannel(communicationChanel);
+			
+			setHighPriority();
 			
 			syncInitStateManager(manager, communicationChanel, engineBootCfg);
 			
@@ -148,7 +148,7 @@ public class Boot {
                 String cmd = "cmd /c wmic process where processid=" + pid + " CALL setpriority 256";
                 Runtime.getRuntime().exec(cmd);
                 
-                System.out.println("Java process high priority set successfully under windows.");
+                ChannelManager.getChannel().sendLogToGUI("Java process high priority set successfully under windows.");
                 
             } else if (os.contains("linux")) {
             	
@@ -156,18 +156,18 @@ public class Boot {
                 String[] cmd = { "bash", "-c", "renice -n -20 -p " + pid };
                 Runtime.getRuntime().exec(cmd);
                 
-                System.out.println("Java process high priority set successfully under linux.");
+                ChannelManager.getChannel().sendLogToGUI("Java process high priority set successfully under linux.");
                 
             } else {
             	
-            	System.out.println("Java process high priority CANNOT be set: OS is neither win nor linux.");
+            	ChannelManager.getChannel().sendLogToGUI("Java process high priority CANNOT be set: OS is neither win nor linux.");
             }
             
             
             
         } catch (Exception e) {
         	
-        	System.out.println("Java process high priority CANNOT be set: error is " + e.getMessage());
+        	ChannelManager.getChannel().sendLogToGUI("Java process high priority CANNOT be set: error is " + e.getMessage());
         }
     }
     
