@@ -11,6 +11,7 @@ import java.io.InputStream;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.impl.Constants;
+import bagaturchess.uci.api.ChannelManager;
 
 
 /**
@@ -68,6 +69,7 @@ public class NNUE {
 			//The vectorized lib is not available
 		}
 		
+		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("AVX512_SUPPORT=" + AVX512_SUPPORT + ", AVX2_SUPPORT=" + AVX2_SUPPORT);
 		
 		try {
 			
