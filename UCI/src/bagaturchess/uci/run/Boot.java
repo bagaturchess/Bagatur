@@ -141,20 +141,24 @@ public class Boot {
         	
             String os = System.getProperty("os.name").toLowerCase();
             long pid = getCurrentPid();
-
+            
             if (os.contains("win")) {
                 // Windows: HIGH_PRIORITY_CLASS = 128
                 String cmd = "cmd /c wmic process where processid=" + pid + " CALL setpriority 256";
                 Runtime.getRuntime().exec(cmd);
+                
+                System.out.println("Java process high priority set successfully under windows.");
                 
             } else if (os.contains("linux")) {
             	
                 // Linux: -20 is highest priority, requires root for -20
                 String[] cmd = { "bash", "-c", "renice -n -20 -p " + pid };
                 Runtime.getRuntime().exec(cmd);
+                
+                System.out.println("Java process high priority set successfully under linux.");
             }
             
-            System.out.println("Process high priority set successfully.");
+            
             
         } catch (Exception e) {
             e.printStackTrace();
