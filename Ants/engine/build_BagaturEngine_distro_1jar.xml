@@ -95,6 +95,12 @@
 	    </fileset>
 	</copy>
 	
+	<copy todir="${temp_dir}/bin" failonerror="true">
+	    <fileset dir="${resources_dir}/bin/engine/nnue/bin">
+		  <include name="libVectorEval.so"/>
+	    </fileset>
+	</copy>
+	    	
 	<copy tofile="${temp_dir}/data/w.ob">
 	    <fileset dir="${resources_dir}/bin/engine/ob">
 		  <include name="w.ob"/>
