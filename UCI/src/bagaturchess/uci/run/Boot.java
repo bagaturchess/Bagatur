@@ -143,7 +143,8 @@ public class Boot {
             long pid = getCurrentPid();
             
             if (os.contains("win")) {
-                // Windows: HIGH_PRIORITY_CLASS = 128
+            	
+                // Windows: HIGH_PRIORITY_CLASS = 128, and 256 is realtime
                 String cmd = "cmd /c wmic process where processid=" + pid + " CALL setpriority 256";
                 Runtime.getRuntime().exec(cmd);
                 
