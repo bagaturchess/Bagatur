@@ -112,7 +112,7 @@ JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_evaluateVectorized_1a
 
     __m256i eval_vec = _mm256_setzero_si256(); // Initialize eval_vec to zero
 
-    for (int i = 0; i < HIDDEN_SIZE; i += 16) { // 16 × 16-bit per 256-bit register
+    for (int i = 0; i < HIDDEN_SIZE; i += 16) { // 16 x 16-bit per 256-bit register
 
         _mm_prefetch((char*)&us_values[i + 16], _MM_HINT_T0);
         _mm_prefetch((char*)&them_values[i + 16], _MM_HINT_T0);
