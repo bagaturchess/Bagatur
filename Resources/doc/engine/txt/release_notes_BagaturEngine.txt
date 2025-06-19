@@ -1,3 +1,9 @@
+ Version 5.2b (19 June 2025)
+ * Provide JNI native libraries for vectorized NNUE evaluation using SIMD (AVX2 and AVX512) under both Linux and Windows
+ * Set process and thread priority to high as otherwise NPS drops
+ * Search optimizations and cleanup, verifying PV line
+ * Parallel search - minor fixes and optimizations
+ 
  Version 5.2a (1 June 2025)
  * Disable "always replace" strategy in TT as it was accidentally enabled and affects the strength on longer time controls
  * Adding SEE pruning for quiet moves
