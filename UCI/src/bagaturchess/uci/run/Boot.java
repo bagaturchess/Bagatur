@@ -23,6 +23,7 @@
 package bagaturchess.uci.run;
 
 
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,8 @@ public class Boot {
 		
 		try {
 			
+			setHighPriority();
+		    
 			//ChannelManager.setChannel(new Channel_Console(System.in, System.out, System.out));
 			
 			if (args == null || args.length < 1) {
@@ -130,4 +133,37 @@ public class Boot {
 		//		)
 		//).start();
 	}
+	
+	
+    public static void setHighPriority() {
+    	
+        try {
+        	
+            String os = System.getProperty("os.name").toLowerCase();
+            long pid = getCurrentPid();
+
+            if (os.contains("win")) {
+                // Windows: HIGH_PRIORITY_CLASS = 128
+                String cmd = "cmd /c wmic process where processid=" + pid + " CALL setpriority 256";
+                Runtime.getRuntime().exec(cmd);
+                
+            } else if (os.contains("linux")) {
+            	
+                // Linux: -20 is highest priority, requires root for -20
+                String[] cmd = { "bash", "-c", "renice -n -20 -p " + pid };
+                Runtime.getRuntime().exec(cmd);
+            }
+            
+            System.out.println("Process high priority set successfully.");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
+    static long getCurrentPid() {
+        String name = ManagementFactory.getRuntimeMXBean().getName();
+        return Long.parseLong(name.split("@")[0]);
+    }
 }

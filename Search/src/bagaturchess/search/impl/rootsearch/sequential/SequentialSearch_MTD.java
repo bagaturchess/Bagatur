@@ -121,6 +121,8 @@ public class SequentialSearch_MTD extends RootSearch_BaseImpl {
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, ITimeController timeController,
 			final IFinishCallback multiPVCallback, final Go go, boolean dont_wrap_mediator) {
 		
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+		
 		if (stopper != null) {
 			
 			throw new IllegalStateException("MTDSequentialSearch started whithout beeing stopped");

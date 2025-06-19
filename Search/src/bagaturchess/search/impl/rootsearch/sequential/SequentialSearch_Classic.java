@@ -97,9 +97,12 @@ public class SequentialSearch_Classic extends RootSearch_BaseImpl {
 	public void negamax(IBitBoard _bitboardForSetup, ISearchMediator mediator, ITimeController timeController,
 			final IFinishCallback multiPVCallback, final Go go, boolean dont_wrap_mediator) {
 		
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+		
 		if (stopper != null) {
 			throw new IllegalStateException("SequentialSearch_Classic started whithout beeing stopped");
 		}
+		
 		stopper = new Stopper();
 		
 		
