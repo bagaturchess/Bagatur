@@ -156,12 +156,17 @@ public class Boot {
                 Runtime.getRuntime().exec(cmd);
                 
                 System.out.println("Java process high priority set successfully under linux.");
+                
+            } else {
+            	
+            	System.out.println("Java process high priority CANNOT be set: OS is neither win nor linux.");
             }
             
             
             
         } catch (Exception e) {
-            e.printStackTrace();
+        	
+        	System.out.println("Java process high priority CANNOT be set: error is " + e.getMessage());
         }
     }
     
