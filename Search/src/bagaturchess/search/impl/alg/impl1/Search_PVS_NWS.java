@@ -850,6 +850,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (singular_value < singular_beta) {
 				
 				if (!VALIDATE_PV) {
+					
 					tt_move_extension = 1;
 					
 					if (!isPv) {
@@ -884,7 +885,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				} else {
 					
-					if (!VALIDATE_PV) tt_move_extension = -1;
+					if (!VALIDATE_PV) {
+						
+						tt_move_extension = -1;
+					}
 				}
 			}
 		}
