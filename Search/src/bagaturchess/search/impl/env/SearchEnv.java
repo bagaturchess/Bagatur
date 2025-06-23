@@ -67,6 +67,7 @@ public class SearchEnv {
 	
 	private IHistoryTable history;
 	private IHistoryTable continuation_history;
+	private IHistoryTable capture_history;
 	
 	private IKillers killersAndCounters;
 	
@@ -85,6 +86,7 @@ public class SearchEnv {
 		
 		continuation_history 	= new ContinuationHistory();
 		history 				= new HistoryTable();
+		capture_history 		= new HistoryTable();
 		
 		killersAndCounters 		= new Killers();
 		moveListFactory 		= new SearchMoveListFactory();
@@ -116,6 +118,12 @@ public class SearchEnv {
 	public IHistoryTable getContinuationHistory() {
 		
 		return continuation_history;
+	}
+	
+	
+	public IHistoryTable getCaptureHistory() {
+		
+		return capture_history;
 	}
 	
 	

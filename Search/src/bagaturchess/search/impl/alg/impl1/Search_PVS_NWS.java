@@ -255,6 +255,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		IHistoryTable history 		= env.getHistory();
 		IHistoryTable conthist 		= env.getContinuationHistory();
+		IHistoryTable caphist 		= env.getCaptureHistory();
 		
 		SortedMoveList_Root list 	= (SortedMoveList_Root) lists_root[ply];
 		
@@ -337,6 +338,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					history.registerBad(parentMove, move, depth);
 					conthist.registerBad(parentMove, move, depth);
 				}
+			} else {
+				
+				caphist.registerAll(parentMove, move, depth);
+				
+				if (score < beta) {
+					
+					caphist.registerBad(parentMove, move, depth);
+				}
 			}
 			
 			
@@ -364,6 +373,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					history.registerGood(parentMove, move, depth);
 					conthist.registerGood(parentMove, move, depth);
+					
+				} else {
+					
+					caphist.registerGood(parentMove, move, depth);
 				}
 				
 				break;
@@ -914,6 +927,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		IHistoryTable history 		= env.getHistory();
 		IHistoryTable conthist 		= env.getContinuationHistory();
+		IHistoryTable caphist 		= env.getCaptureHistory();
 		
 		IMoveList list1 			= lists_history[ply];
 		IMoveList list2 			= lists_attacks[ply];
@@ -1218,6 +1232,15 @@ public class Search_PVS_NWS extends SearchImpl {
 						history.registerBad(parentMove, move, depth);
 						conthist.registerBad(parentMove, move, depth);
 					}
+					
+				} else {
+					
+					caphist.registerAll(parentMove, move, depth);
+					
+					if (score < beta) {
+						
+						caphist.registerBad(parentMove, move, depth);
+					}
 				}
 				
 				
@@ -1245,6 +1268,10 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						history.registerGood(parentMove, move, depth);
 						conthist.registerGood(parentMove, move, depth);
+						
+					} else {
+						
+						caphist.registerGood(parentMove, move, depth);
 					}
 					
 					phases_stats[phase]++;
