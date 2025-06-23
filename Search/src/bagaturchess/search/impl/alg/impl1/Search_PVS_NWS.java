@@ -373,7 +373,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (movesPerformed_attacks + movesPerformed_quiet == 0) {
 			
-			if (!env.getBitboard().isInCheck()) {
+			if (!ssi.in_check) {
 				
 				node.bestmove = 0;
 				node.eval = getDrawScores(-1);
