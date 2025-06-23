@@ -46,8 +46,9 @@ public abstract class SearchImpl implements ISearch {
 	
 	protected SearchEnv env;
 	
-	protected IMoveList[] lists_history;
 	protected IMoveList[] lists_root;
+	protected IMoveList[] lists_history;
+	protected IMoveList[] lists_static_eval;
 	protected IMoveList[] lists_attacks;
 	
 	protected int[] buff_tpt_depthtracking 		= new int[1];
@@ -86,14 +87,19 @@ public abstract class SearchImpl implements ISearch {
 		
 		boolean onTheFlySorting = false;
 		
+		lists_root = new IMoveList[MAX_DEPTH];
+		for (int i=0; i<lists_root.length; i++) {
+			lists_root[i] = env.getMoveListFactory().createListAll_Root(env, i, onTheFlySorting);
+		}
+		
 		lists_history = new IMoveList[MAX_DEPTH];
 		for (int i=0; i<lists_history.length; i++) {
 			lists_history[i] = env.getMoveListFactory().createListHistory(env, i, onTheFlySorting);
 		}
 		
-		lists_root = new IMoveList[MAX_DEPTH];
-		for (int i=0; i<lists_root.length; i++) {
-			lists_root[i] = env.getMoveListFactory().createListAll_Root(env, i, onTheFlySorting);
+		lists_static_eval = new IMoveList[MAX_DEPTH];
+		for (int i=0; i<lists_static_eval.length; i++) {
+			lists_static_eval[i] = env.getMoveListFactory().createListStaticEval(env, i, onTheFlySorting);
 		}
 		
 		lists_attacks = new IMoveList[MAX_DEPTH];

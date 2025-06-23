@@ -22,7 +22,12 @@ public class SearchMoveListFactory implements ISearchMoveListFactory {
 	@Override
 	public IMoveList createListHistory(SearchEnv env, int ply, boolean onTheFlySorting) {
 		return new SortedMoveList_History(333, env, ply, onTheFlySorting);
-		//return new SortedMoveList_StaticEval(333, env, ply, onTheFlySorting);
+	}
+	
+	
+	@Override
+	public IMoveList createListStaticEval(SearchEnv env, int ply, boolean onTheFlySorting) {
+		return new SortedMoveList_StaticEval(333, env, ply, onTheFlySorting);
 	}
 	
 	
