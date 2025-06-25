@@ -80,16 +80,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 	}
 	
-	private static final int FUTILITY_MAXDEPTH 						= 7; //MAX_DEPTH;
+	private static final int FUTILITY_MAXDEPTH 						= MAX_DEPTH; //7;
 	private static final int FUTILITY_MARGIN 						= 80;
 	
-	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= 9; //MAX_DEPTH;
+	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= MAX_DEPTH; //9;
 	private static final int STATIC_NULL_MOVE_MARGIN 				= 60;
 	
-	private static final int RAZORING_MAXDEPTH 						= 4; //MAX_DEPTH;
+	private static final int RAZORING_MAXDEPTH 						= MAX_DEPTH; //4;
 	private static final int RAZORING_MARGIN 						= 240;
 	
-	private static final int SEE_MAXDEPTH 							= 8; //MAX_DEPTH;
+	private static final int SEE_MAXDEPTH 							= MAX_DEPTH; //8;
 	private static final int SEE_MARGIN 							= 65;
 	
 	private static final boolean USE_LMR_ON_BAD_CAPTURES 			= false;
@@ -756,16 +756,30 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (score >= beta) {
 							
-							node.bestmove = 0;
-							node.eval = score;
-							node.leaf = true;
-							node.type = PVNode.TYPE_NULL_MOVE;
+							int verify_score = depth - reduction <= 0 ? qsearch(mediator, pvman, evaluator, info, beta - 1, beta, ply, false)
+									: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth);
 							
-							return node.eval;
+							if (verify_score >= beta) {
+								
+								node.bestmove = 0;
+								node.eval = verify_score;
+								node.leaf = true;
+								node.type = PVNode.TYPE_NULL_MOVE;
+								
+								return node.eval;
+							}
+							
+							//If the verify_score is negative mate score
+							if ((verify_score < -ISearch.MAX_MATERIAL_INTERVAL)
+									&& depth >= 2
+									&& ply < 2 * initialMaxDepth) {
+								
+								mateThreat = true;
+							}
 						}
 						
 						//If the score is negative mate score
-						if (score < -ISearch.MAX_MATERIAL_INTERVAL
+						if ((score < -ISearch.MAX_MATERIAL_INTERVAL)
 								&& depth >= 2
 								&& ply < 2 * initialMaxDepth) {
 							
@@ -900,7 +914,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (!VALIDATE_PV) {
 						
-						tt_move_extension = -1;
+						//Expected fail-high
+						tt_move_extension = -2;
 					}
 				}
 			}
@@ -908,10 +923,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//Still no tt move, so help the search to find the tt move/score faster
-		/*if (isPv && ttFlag == -1 && depth >= 3) {
+		if (!VALIDATE_PV && isPv && ttFlag == -1 && depth >= 3) {
 			
 			depth -= 2;
-		}*/
+		}
 		
 		
 		int bestMove 				= 0;
@@ -1214,7 +1229,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
-				if (isPv && (score >  (VALIDATE_PV ? bestScore : alpha) || movesPerformed_attacks + movesPerformed_quiet == 1)) {
+				if (isPv && (score > (VALIDATE_PV ? bestScore : alpha) || movesPerformed_attacks + movesPerformed_quiet == 1)) {
 					
 					score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -beta, -alpha, isPv, initialMaxDepth);
 				}
