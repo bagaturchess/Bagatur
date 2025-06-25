@@ -1229,7 +1229,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
-				if (isPv && (score > (VALIDATE_PV ? bestScore : alpha) || movesPerformed_attacks + movesPerformed_quiet == 1)) {
+				if (isPv && (score > bestScore || movesPerformed_attacks + movesPerformed_quiet == 1)) {
 					
 					score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -beta, -alpha, isPv, initialMaxDepth);
 				}
