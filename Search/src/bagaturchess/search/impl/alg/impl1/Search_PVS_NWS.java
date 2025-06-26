@@ -463,6 +463,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		boolean improving = ply - 2 >= 0 ? (ssi.static_eval - ssis[ply - 2].static_eval > 0) : false;
+		
 		PVNode node = pvman.load(ply);
 		node.bestmove = 0;
 		node.eval = ISearch.MIN;
@@ -1131,7 +1133,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							&& list.getScore() <= stats.getEntropy()
 							) {
 						
-						if (movesPerformed_attacks + movesPerformed_quiet >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS) {
+						if (movesPerformed_attacks + movesPerformed_quiet >= (3 + depth * depth / (improving ? 1 : 2)) / PRUNING_AGGRESSIVENESS) {
 							
 							continue;
 						}
