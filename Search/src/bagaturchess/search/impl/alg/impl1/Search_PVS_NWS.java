@@ -111,7 +111,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long[] search_types_stats 								= new long[16];
 	
 	private long[] phases_stats 									= new long[8];
-			
+	
 	
 	public Search_PVS_NWS(Object[] args) {
 		
@@ -2080,44 +2080,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private void validatePV(PVNode node, IEvaluator evaluator, int ply, int expectedDepth, boolean isPv, int alpha, int beta) {
-		
-		
-		if (node.leaf || node.bestmove == 0) {
-				
-			if (node.type == PVNode.TYPE_MATE
-					|| node.type == PVNode.TYPE_DRAW
-					|| node.type == PVNode.TYPE_ALPHA_RESTORE_QSEARCH
-					|| node.type == PVNode.TYPE_BETA_CUTOFF_QSEARCH
-					|| node.type == PVNode.TYPE_NORMAL_QSEARCH) {
-				
-				//OK
-				
-			} else {
-				
-				throw new IllegalStateException("node.leaf || node.bestmove == 0, node.type=" + node.type);
-			}
-		}
-		
-		
-		//Check for static evaluation corrected with TT scores
-		/*int ttFlag 									= -1;
-		int ttValue 								= IEvaluator.MIN_EVAL;
-		
-		if (env.getTPT() != null) {
-			
-			env.getTPT().get(getHashkeyTPT(), tt_entries_per_ply[ply]);
-			
-			if (!tt_entries_per_ply[ply].isEmpty()) {
-				
-				ttFlag = tt_entries_per_ply[ply].getFlag();
-				ttValue = tt_entries_per_ply[ply].getEval();
-				
-				if (ttValue == node.eval) {
-					
-					return;
-				}
-			}
-		}*/
 		
 		
 		//First replay the moves
