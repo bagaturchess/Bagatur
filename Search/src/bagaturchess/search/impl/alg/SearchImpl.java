@@ -23,18 +23,17 @@
 package bagaturchess.search.impl.alg;
 
 
+import java.util.Stack;
+
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.bitboard.api.IGameStatus;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.ISearchConfig_AB;
-import bagaturchess.search.api.internal.IRootWindow;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
-import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.search.impl.tpt.TTEntry_BaseImpl;
 
@@ -58,8 +57,14 @@ public abstract class SearchImpl implements ISearch {
 	protected int[] gtb_probe_result 			= new int[2];
 	
 	//Used for Lazy SMP
-	protected int root_search_first_move_index = 0;
+	protected int root_search_first_move_index 	= 0;
 
+	public long[] search_types_stats 			= new long[16];
+	
+	protected long[] phases_stats 				= new long[8];
+	
+	public Stack<Integer> validation_stack 		= new Stack<Integer>();
+	
 	
 	public void setup(IBitBoard bitboardForSetup) {
 		
@@ -163,7 +168,7 @@ public abstract class SearchImpl implements ISearch {
 	}
 	
 	
-	protected boolean isDraw(boolean isPV) {
+	public boolean isDraw(boolean isPV) {
 		
 		if (!isPV && env.getBitboard().getStateRepetition() >= 2) {
 			
@@ -192,9 +197,45 @@ public abstract class SearchImpl implements ISearch {
 	}
 	
 	
-	protected int fullEval(int depth, int alpha, int beta, int rootColour) {
+	public int eval(final int ply, final int alpha, final int beta, final boolean isPv) {
 		
-		return (int) env.getEval().fullEval(depth, alpha, beta, rootColour);
+		/*int eval = evaluator.roughEval(ply,  -1);
+		
+		int error_window = (int) (LAZY_EVAL_MARGIN.getEntropy() + 3 * LAZY_EVAL_MARGIN.getDisperse());
+		
+		if (eval >= alpha - error_window && eval <= beta + error_window) {
+			
+			int rough_eval = eval;
+			
+			eval = evaluator.fullEval(ply, alpha, beta, -1);
+			
+			int diff = Math.abs(eval - rough_eval);
+			
+			LAZY_EVAL_MARGIN.addValue(diff);
+		}*/
+		
+		
+		int eval = env.getEval().fullEval(ply, alpha, beta, -1);
+		
+		/*if (isPv || (eval >= alpha - 7 && eval <= beta + 7)) {
+			
+			eval = getEnv().getEval_NNUE().fullEval(ply, alpha, beta, -1);
+			
+		}*/
+		
+		//int material = env.getBitboard().getMaterialFactor().getTotalFactor(); //In [0-62]
+		
+		//eval = eval * (194 + material) / 256;
+		
+		eval = Math.min(Math.max(IEvaluator.MIN_EVAL, eval), IEvaluator.MAX_EVAL);
+		
+		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
+			
+			eval = Math.min(getDrawScores(-1), eval);
+		}
+		
+		
+		return eval;
 	}
 	
 	
@@ -236,44 +277,5 @@ public abstract class SearchImpl implements ISearch {
 	protected boolean useTPTKeyWithMoveCounter() {
 		
 		return false;
-	}
-	
-	
-	protected void testPV(ISearchInfo info) {
-		
-		//if (!env.getEngineConfiguration().verifyPVAfterSearch()) return;
-		
-		int rootColour = env.getBitboard().getColourToMove();
-		
-		int sign = 1;
-		
-		int[] moves = info.getPV();
-		
-		for (int i=0; i<moves.length; i++) {
-			env.getBitboard().makeMoveForward(moves[i]);
-			sign *= -1;
-		}
-		
-		IEvaluator evaluator = env.getEval();
-		int curEval = (int) (sign * evaluator.fullEval(0, ISearch.MIN, ISearch.MAX, rootColour));
-		
-		if (curEval != info.getEval()) {
-			IGameStatus status = env.getBitboard().getStatus();
-			if (status == IGameStatus.NONE) {
-				System.out.println("SearchImpl> diff evals: curEval=" + curEval + ",	eval=" + info.getEval());
-			}
-		}
-		
-		for (int i=moves.length - 1; i >= 0; i--) {
-			env.getBitboard().makeMoveBackward(moves[i]);
-		}
-	}
-	
-	public static final class RootWindowImpl implements IRootWindow {
-		
-		public boolean isInside(int eval, int colour) {
-			
-			return true;
-		}
 	}
 }

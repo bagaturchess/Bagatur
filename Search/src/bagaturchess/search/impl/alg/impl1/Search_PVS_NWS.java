@@ -23,9 +23,6 @@
 package bagaturchess.search.impl.alg.impl1;
 
 
-import java.util.EmptyStackException;
-import java.util.Stack;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
@@ -43,6 +40,7 @@ import bagaturchess.search.impl.alg.SearchUtils;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.pv.PVManager;
 import bagaturchess.search.impl.pv.PVNode;
+import bagaturchess.search.impl.pv.PVValidation;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.uci.api.ChannelManager;
 import bagaturchess.search.impl.eval.cache.EvalEntry_BaseImpl;
@@ -107,10 +105,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private SearchStackInfo[] ssis 									= new SearchStackInfo[MAX_DEPTH + 1];
 	
 	private VarStatistic stats 										= new VarStatistic();
-	
-	private long[] search_types_stats 								= new long[16];
-	
-	private long[] phases_stats 									= new long[8];
 	
 	
 	public Search_PVS_NWS(Object[] args) {
@@ -228,7 +222,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		ssi.hash_key = getHashkeyTPT();
 		ssi.in_check = env.getBitboard().isInCheck();
 		ssi.tt_hit = false;
-		ssi.static_eval = eval(evaluator, ply, alphaOrig, beta, isPv);
+		ssi.static_eval = eval(ply, alphaOrig, beta, isPv);
 		
 		
 		int ttMove = 0;
@@ -427,7 +421,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (VALIDATE_PV) validatePV(node, evaluator, ply, depth, isPv, alphaOrig, beta);
+		if (VALIDATE_PV) PVValidation.validatePV(this, env, node, ply, depth, isPv, alphaOrig, beta, validation_stack);
 		
 		
 		return bestScore;
@@ -454,7 +448,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		ssi.hash_key = getHashkeyTPT();
 		ssi.in_check = env.getBitboard().isInCheck();
 		ssi.tt_hit = false;
-		ssi.static_eval = eval(evaluator, ply, alpha, beta, isPv);
+		ssi.static_eval = eval(ply, alpha, beta, isPv);
 		
 		
 		if (ply >= ISearch.MAX_DEPTH) {
@@ -1352,7 +1346,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (VALIDATE_PV) validatePV(node, evaluator, ply, depth, isPv, alpha_org, beta);
+		if (VALIDATE_PV) PVValidation.validatePV(this, env, node, ply, depth, isPv, alpha_org, beta, validation_stack);
 		
 		
 		return node.eval;
@@ -1722,7 +1716,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (ply >= ISearch.MAX_DEPTH) {
 	    	
-			return eval(evaluator, ply, alpha, beta, isPv);
+			return eval(ply, alpha, beta, isPv);
 		}
 		
 		
@@ -1791,7 +1785,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		int eval = eval(evaluator, ply, alpha, beta, isPv);
+		int eval = eval(ply, alpha, beta, isPv);
 		
 		
 		if (!VALIDATE_PV && ttValue != IEvaluator.MIN_EVAL) {
@@ -1943,52 +1937,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		if (VALIDATE_PV) validatePV(node, evaluator, ply, 0, isPv, alphaOrig, beta);
+		if (VALIDATE_PV) PVValidation.validatePV(this, env, node, ply, 0, isPv, alphaOrig, beta, validation_stack);
 		
 		
     	return node.eval;
-	}
-	
-	
-	private int eval(IEvaluator evaluator, final int ply, final int alpha, final int beta, final boolean isPv) {
-		
-		/*int eval = evaluator.roughEval(ply,  -1);
-		
-		int error_window = (int) (LAZY_EVAL_MARGIN.getEntropy() + 3 * LAZY_EVAL_MARGIN.getDisperse());
-		
-		if (eval >= alpha - error_window && eval <= beta + error_window) {
-			
-			int rough_eval = eval;
-			
-			eval = evaluator.fullEval(ply, alpha, beta, -1);
-			
-			int diff = Math.abs(eval - rough_eval);
-			
-			LAZY_EVAL_MARGIN.addValue(diff);
-		}*/
-		
-		
-		int eval = evaluator.fullEval(ply, alpha, beta, -1);
-		
-		/*if (isPv || (eval >= alpha - 7 && eval <= beta + 7)) {
-			
-			eval = getEnv().getEval_NNUE().fullEval(ply, alpha, beta, -1);
-			
-		}*/
-		
-		//int material = env.getBitboard().getMaterialFactor().getTotalFactor(); //In [0-62]
-		
-		//eval = eval * (194 + material) / 256;
-		
-		eval = Math.min(Math.max(IEvaluator.MIN_EVAL, eval), IEvaluator.MAX_EVAL);
-		
-		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
-			
-			eval = Math.min(getDrawScores(-1), eval);
-		}
-		
-		
-		return eval;
 	}
 	
 	
@@ -2075,296 +2027,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		return draw;
-	}
-	
-	
-	private Stack<Integer> stack = new Stack<Integer>();
-	
-	
-	private void validatePV(PVNode node, IEvaluator evaluator, int ply, int expectedDepth, boolean isPv, int alpha, int beta) {
-		
-		
-		//First replay the moves
-		int eval_sign = 1;
-		int alpha_corrected = alpha;
-		int beta_corrected = beta;
-		
-		int actualDepth = 0;
-		
-		PVNode cur = node;
-		
-		boolean tt_reached = false;
-		
-		while(cur != null && !cur.leaf) {
-			
-			if (cur.bestmove == 0) {
-				
-				throw new IllegalStateException("cur.bestmove == 0");
-			}
-			
-			if (!tt_reached && node.eval != eval_sign * cur.eval) {
-				
-				//System.out.println("Not equal score in PV sequence. EVALDIFF=" + (node.eval - eval_sign * cur.eval));
-				throw new IllegalStateException("node.eval != eval_sign * cur.eval");
-			}
-			
-			//Only the first TT node has correct value as it is with expected depth
-			if (cur.type == PVNode.TYPE_TT) {
-				
-				tt_reached = true;
-			}
-			
-			actualDepth++;
-			
-			int colorToMove = env.getBitboard().getColourToMove();
-			
-			boolean isCheckMove = env.getBitboard().isCheckMove(cur.bestmove);
-			
-			if (env.getBitboard().isPossible(cur.bestmove)) {
-				
-				env.getBitboard().makeMoveForward(cur.bestmove);
-				
-				stack.push(cur.bestmove);
-				
-			} else {
-				
-				throw new IllegalStateException("not valid move " + env.getBitboard().getMoveOps().moveToString(cur.bestmove));
-			}
-			
-			eval_sign *= -1;
-			if (eval_sign == -1) {
-				alpha_corrected = -beta;
-				beta_corrected = -alpha;
-			} else {
-				alpha_corrected = alpha;
-				beta_corrected = beta;
-			}
-					
-			
-			
-			if (env.getBitboard().isInCheck(colorToMove)) {
-				
-				throw new IllegalStateException("In check after move");
-			}
-			
-			if (isCheckMove) {
-				
-				if (!env.getBitboard().isInCheck()) {
-					
-					throw new IllegalStateException("Not in check after check move");
-				}
-			}
-			
-			if (cur.leaf) {
-				
-				break;
-			}
-			
-			cur = cur.child;
-		}
-		
-		
-		//Do checks and dump statistics
-		search_types_stats[cur.type]++;
-		if (search_types_stats[cur.type] % 100000 == 0) {
-		    for (int i = 0; i < search_types_stats.length; i++) {
-		        System.out.print(i + "=" + search_types_stats[i] + " ");
-		    }
-		    System.out.println();
-		}
-		
-		int static_eval = eval_sign * eval(evaluator, 0, IEvaluator.MIN_EVAL, IEvaluator.MAX_EVAL, isPv);
-		
-		
-		switch(cur.type) {
-		
-			case PVNode.TYPE_NORMAL_SEARCH:
-				
-				if (node.eval != static_eval) {
-					
-					throw new IllegalStateException("eval=" + node.eval + ", static_eval=" + static_eval);
-				}
-				
-				if (actualDepth < expectedDepth) {
-					
-					throw new IllegalStateException("actualDepth=" + actualDepth + ", expectedDepth=" + expectedDepth);
-				}
-					
-				break;
-				
-			case PVNode.TYPE_NORMAL_QSEARCH:
-				
-				if (node.eval != static_eval) {
-					
-					throw new IllegalStateException("eval=" + node.eval + ", static_eval=" + static_eval);
-				}
-				
-				if (actualDepth < expectedDepth) {
-					
-					throw new IllegalStateException("actualDepth=" + actualDepth + ", expectedDepth=" + expectedDepth);
-				}
-				
-				break;
-				
-			case PVNode.TYPE_DRAW:
-				
-				if (!isDraw(false)) {
-					
-					if (!env.getBitboard().isInCheck() && !env.getBitboard().hasMoveInNonCheck()) {
-						
-					} else {
-						
-						throw new IllegalStateException("!isDraw(isPv)");
-					}
-				}
-				
-				break;
-				
-			case PVNode.TYPE_MATE:
-				
-				if (env.getBitboard().isInCheck()) {
-					
-					if (env.getBitboard().hasMoveInCheck()) {
-						
-						throw new IllegalStateException("env.getBitboard().hasMoveInCheck()");
-					}
-					
-				} else {
-					
-					throw new IllegalStateException("!env.getBitboard().isInCheck()");
-				}
-				
-				break;
-				
-			case PVNode.TYPE_MAXDEPTH:
-				
-				if (node.eval != static_eval) {
-					
-					throw new IllegalStateException("eval=" + node.eval + ", static_eval=" + static_eval);
-				}
-				
-				if (actualDepth < expectedDepth) {
-					
-					throw new IllegalStateException("actualDepth=" + actualDepth + ", expectedDepth=" + expectedDepth);
-				}
-				
-				break;
-				
-			case PVNode.TYPE_MATE_DISTANCE_PRUNING:
-				
-				if (!SearchUtils.isMateVal(node.eval)) {
-					
-					throw new IllegalStateException("!SearchUtils.isMateVal(node.eval), node.eval=" + node.eval);
-				}
-				
-				break;
-				
-			case PVNode.TYPE_TT:
-				
-				//TODO: Not working because TT score is changed meanwhile
-				/*if (env.getTPT() != null) {
-					
-					env.getTPT().get(getHashkeyTPT(), tt_entries_per_ply[ply]);
-					
-					if (!tt_entries_per_ply[ply].isEmpty()) {
-						
-						int tt_eval = tt_entries_per_ply[ply].getEval();
-						
-						if (eval_sign * tt_eval != node.eval) {
-							
-							System.out.println("NODETYPE: " + cur.type + ", EVALDIFF=" + (node.eval - eval_sign * tt_eval) + ", score=" + node.eval + ", eval_sign * tt_eval=" + eval_sign * tt_eval);
-							//throw new IllegalStateException("tt_eval != node.eval");
-							
-						} else {
-							
-							//System.out.println("OK");
-						}
-						
-					} else {
-						
-						throw new IllegalStateException("tt_entries_per_ply[ply].isEmpty()");
-					}
-				}*/
-				
-				break;
-				
-			case PVNode.TYPE_TB:
-				
-				break;
-				
-			case PVNode.TYPE_STATIC_NULL_MOVE:
-				
-				if (node.eval != static_eval) {
-					
-					throw new IllegalStateException("eval=" + node.eval + ", static_eval=" + static_eval);
-				}
-				
-				break;
-				
-			case PVNode.TYPE_NULL_MOVE:
-				
-				break;
-				
-			case PVNode.TYPE_RAZORING:
-				
-				break;
-				
-			case PVNode.TYPE_PROBECUT:
-				
-				break;
-				
-			case PVNode.TYPE_MULTICUT:
-				
-				break;
-				
-			case PVNode.TYPE_BETA_CUTOFF_QSEARCH:
-				
-				if (node.eval != static_eval) {
-					
-					throw new IllegalStateException("eval=" + node.eval + ", static_eval=" + static_eval);
-				}
-				
-				if (actualDepth < expectedDepth) {
-					
-					throw new IllegalStateException("actualDepth=" + actualDepth + ", expectedDepth=" + expectedDepth);
-				}
-				
-				break;
-				
-			case PVNode.TYPE_ALPHA_RESTORE_QSEARCH:
-				
-				if (cur.eval != alpha_corrected) {
-					
-					throw new IllegalStateException("DIFF alpha_corrected=" + alpha_corrected + ", beta_corrected=" + beta_corrected + ", cur.eval=" + cur.eval);
-				}
-				
-				if (actualDepth < expectedDepth) {
-					
-					throw new IllegalStateException("actualDepth=" + actualDepth + ", expectedDepth=" + expectedDepth);
-				}
-				
-				break;
-				
-			default:
-				
-				throw new IllegalStateException();
-		}
-		
-		
-		//Last, revert the moves
-		try {
-			
-			Integer move;
-			
-			while ((move = stack.pop()) != null) {
-				
-				env.getBitboard().makeMoveBackward(move);
-			}
-			
-		} catch (EmptyStackException ese) {
-			
-			//Do nothing
-		}
 	}
 	
 	
