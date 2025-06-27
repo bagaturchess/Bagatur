@@ -450,6 +450,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		node.type = PVNode.TYPE_NORMAL_SEARCH;
 		
 		
+		//Go in qsearch if depth is <= 0
 		if (depth <= 0) {
 			
 			int qeval = qsearch(mediator, pvman, evaluator, info, alpha, beta, ply, isPv);
@@ -474,6 +475,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		final int alpha_org = alpha;
 		
 		
+		//Check for draw
 	    if (isDraw(isPv)) {
 	    	
 	    	node.eval = getDrawScores(-1);
@@ -497,6 +499,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		//TT probing
 		final int parentMove 		= env.getBitboard().getLastMove();
 		final int colourToMove 		= env.getBitboard().getColourToMove();
 		
@@ -603,6 +606,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 		}
 		
+		
+		//Pruning and reductions in non-check and non-PV nodes
 		boolean mateThreat  = false;
 		
 		if (!isPv
@@ -613,15 +618,18 @@ public class Search_PVS_NWS extends SearchImpl {
 			) {
 			
 			
+			//Reduce depth if TT value is not presented
 			if (!VALIDATE_PV && depth >= 2 && ttFlag == -1) {
 				
 				depth -= 1;
 			}
 			
 			
+			//Faild-high pruning
 			if (ssi.static_eval >= beta) {
 				
 				
+				//Static null move pruning
 				if (depth <= STATIC_NULL_MOVE_MAXDEPTH) {
 					
 					if (ssi.static_eval - depth * STATIC_NULL_MOVE_MARGIN / PRUNING_AGGRESSIVENESS >= beta) {
@@ -636,6 +644,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				//Verified null move pruning
 				if (depth >= 3) {
 					
 					boolean hasAtLeastOnePiece = (colourToMove == Constants.COLOUR_WHITE) ?
@@ -688,9 +697,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 				}
 				
-			} else if (ssi.static_eval <= alpha) {
+			} else if (ssi.static_eval <= alpha) { //Fail-low pruning
 				
 				
+				//Razoring
 				if (depth <= RAZORING_MAXDEPTH) {
 					
 					int razoringMargin = (int) (RAZORING_MARGIN * depth / PRUNING_AGGRESSIVENESS);
@@ -755,6 +765,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		//Singular move extension
 		int tt_move_extension = 0;
 		
 		if (depth >= 4
@@ -796,7 +807,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 			} else if (!isPv) {
 				
-				//Multi-cut pruning - 2 moves above beta
+				//Multi-cut pruning - at lest 2 moves above beta
 				if (singular_value > beta) {
 				
 					if (!SearchUtils.isMateVal(alpha)
@@ -829,6 +840,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		//Main moves loop
 		int bestMove 				= 0;
 		int bestScore 				= ISearch.MIN;
 		
@@ -1014,6 +1026,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				//Fail-low pruning for non-PV nodes
 				if (!isPv
 						&& !ssi.in_check
 						&& !isCheckMove
@@ -1031,11 +1044,13 @@ public class Search_PVS_NWS extends SearchImpl {
 							&& list.getScore() <= stats.getEntropy()
 							) {
 						
+						//Late move pruning
 						if (movesPerformed_attacks + movesPerformed_quiet >= (3 + depth * depth / (improving ? 1 : 2)) / PRUNING_AGGRESSIVENESS) {
 							
 							continue;
 						}
 						
+						//Futility pruning
 						if (depth <= FUTILITY_MAXDEPTH
 								&& hasAtLeastOnePiece
 								&& ssi.static_eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
@@ -1043,6 +1058,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
+						//SEE pruning for non-captures
 						if (movesPerformed_attacks + movesPerformed_quiet > 3
 								&& depth <= SEE_MAXDEPTH
 								&& hasAtLeastOnePiece
@@ -1051,7 +1067,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							continue;
 						}
 						
-					} else if (phase == PHASE_ATTACKING_BAD
+					} else if (phase == PHASE_ATTACKING_BAD //SEE pruning for captures
 							&& depth <= SEE_MAXDEPTH
 							&& hasAtLeastOnePiece
 							&& env.getBitboard().getSEEScore(move) < -SEE_MARGIN * depth / PRUNING_AGGRESSIVENESS) {
@@ -1061,6 +1077,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				//Extensions
 				int new_depth;
 				
 				if (move == ttMove && tt_move_extension != 0) {
@@ -1080,6 +1097,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				//Late move reduction
 				boolean isQuiet = !env.getBitboard().getMoveOps().isCaptureOrPromotion(move);
 				
 				boolean doLMR = new_depth >= 2
