@@ -1123,7 +1123,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				int lmr_depth = new_depth - reduction;
+				int lmr_depth = Math.max(0, new_depth - reduction);
 				
 				
 				env.getBitboard().makeMoveForward(move);
