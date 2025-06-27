@@ -775,7 +775,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				&& env.getBitboard().isPossible(ttMove)
 			) {
 			
-			//TODO: Adjust beta margin and depth
 			int singular_margin = 2 * depth;
 			int singular_beta = ttValue - singular_margin;
 			int singular_depth = depth / 2;
