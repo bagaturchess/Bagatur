@@ -27,6 +27,8 @@ import java.util.Stack;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
+import bagaturchess.egtb.syzygy.SyzygyConstants;
+import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.ISearchConfig_AB;
 import bagaturchess.search.api.internal.ISearch;
@@ -34,6 +36,8 @@ import bagaturchess.search.api.internal.ISearchInfo;
 import bagaturchess.search.api.internal.ISearchMediator;
 import bagaturchess.search.impl.env.SearchEnv;
 import bagaturchess.search.impl.env.SharedData;
+import bagaturchess.search.impl.eval.cache.EvalEntry_BaseImpl;
+import bagaturchess.search.impl.eval.cache.IEvalEntry;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.search.impl.tpt.TTEntry_BaseImpl;
 
@@ -59,6 +63,10 @@ public abstract class SearchImpl implements ISearch {
 	//Used for Lazy SMP
 	protected int root_search_first_move_index 	= 0;
 
+	private static final boolean USE_DTZ_CACHE 	= true;
+	
+	private IEvalEntry temp_cache_entry;
+	
 	public long[] search_types_stats 			= new long[16];
 	
 	protected long[] phases_stats 				= new long[8];
@@ -117,6 +125,11 @@ public abstract class SearchImpl implements ISearch {
 		}
 		
 		initParams(env.getSearchConfig());
+		
+		if (USE_DTZ_CACHE) {
+	    	
+	    	temp_cache_entry = new EvalEntry_BaseImpl();
+		}
 	}
 	
 	
@@ -277,5 +290,133 @@ public abstract class SearchImpl implements ISearch {
 	protected boolean useTPTKeyWithMoveCounter() {
 		
 		return false;
+	}
+	
+	
+	protected int probeTB(ISearchInfo info, int ply) {
+		
+		
+		int egtb_eval = ISearch.MIN;
+		
+		
+		if (SyzygyTBProbing.getSingleton() != null
+    			&& SyzygyTBProbing.getSingleton().isAvailable(env.getBitboard().getMaterialState().getPiecesCount())){
+			
+			int probe_result = probeWDL_WithCache();
+			
+			if (probe_result != -1) {
+				
+				info.setTBhits(info.getTBhits() + 1);
+							
+				int wdl = (probe_result & SyzygyConstants.TB_RESULT_WDL_MASK) >> SyzygyConstants.TB_RESULT_WDL_SHIFT;
+				
+				//Winner is minimizing DTZ and the loser is maximizing DTZ
+		        switch (wdl) {
+		        
+	            	case SyzygyConstants.TB_WIN:
+	            		
+	            		int dtz = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+	            		
+	    				if (dtz < 0) {
+	    					
+	     					/**
+	    					 * In this not mate position "8/6P1/8/2kB2K1/8/8/8/4r3 w - - 1 19", DTZ is -1 and WDL is 2 (WIN).
+	    					 */
+	    					break;
+	    				}
+	    				
+						int distanceToDraw_50MoveRule = 99 - env.getBitboard().getDraw50movesRule();
+						//Although we specify the rule50 parameter when calling SyzygyJNIBridge.probeSyzygyDTZ(...)
+						//Syzygy TBs report winning score/move
+						//but the +mate or +promotion moves line is longer
+						//than the moves we have until draw with 50 move rule
+						if (distanceToDraw_50MoveRule >= dtz) {
+							
+							//TODO: the eval is too less in order to be more attractive for search than maybe rook and 1+ passed pawns?
+							egtb_eval = MAX_MATERIAL_INTERVAL / (ply + dtz + 1); //+1 in order to be less than a mate in max_depth plies.
+							
+						}
+						
+						break;
+						
+		            case SyzygyConstants.TB_LOSS:
+		            	
+		            	break;
+		            
+		            case SyzygyConstants.TB_DRAW:
+		            	
+	            		dtz = SyzygyTBProbing.getSingleton().probeDTZ(env.getBitboard());
+	            		
+	    				if (dtz < 0) {
+
+	    					break;
+	    				}
+	    				
+						//egtb_eval = getDrawScores(-1);
+	    				egtb_eval = -(ply + dtz); //Force engine to finish the game faster when it is a draw
+	    				
+						break;
+						
+		            case SyzygyConstants.TB_BLESSED_LOSS:
+		            	
+		            	//Too risky
+		            	//egtb_eval = getDrawScores(-1);
+		                
+						break;
+						
+		            case SyzygyConstants.TB_CURSED_WIN:
+		            	
+		            	//Too risky
+		            	//egtb_eval = getDrawScores(-1);
+		                
+						break;
+						
+		            default:
+		            	
+		            	throw new IllegalStateException("wdl=" + wdl);
+		        }
+			}	
+		}
+		
+		
+		return egtb_eval;
+	}
+	
+	
+	private int probeWDL_WithCache() {
+	    
+	    if (USE_DTZ_CACHE) {
+	    	
+	    	long hash50movesRule = 128 + env.getBitboard().getDraw50movesRule();
+		    hash50movesRule += hash50movesRule << 8;
+		    hash50movesRule += hash50movesRule << 16;
+		    hash50movesRule += hash50movesRule << 32;
+		    
+		    long hashkey = hash50movesRule ^ getHashkeyTPT();
+		    
+	    	env.getSyzygyDTZCache().get(hashkey, temp_cache_entry);
+			
+			if (!temp_cache_entry.isEmpty()) {
+				
+				int probe_result = temp_cache_entry.getEval();
+		        
+				return probe_result;
+				
+			} else {
+		    
+		        int probe_result = SyzygyTBProbing.getSingleton().probeWDL(env.getBitboard());
+		        
+		        env.getSyzygyDTZCache().put(hashkey, 5, probe_result);
+		        
+		        return probe_result;
+			}
+			
+	    } else {
+	    	
+	    	int probe_result = SyzygyTBProbing.getSingleton().probeWDL(env.getBitboard());
+	        
+	        return probe_result;
+	    }
+
 	}
 }
