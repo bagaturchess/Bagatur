@@ -27,8 +27,6 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
 import bagaturchess.bitboard.impl.utils.VarStatistic;
-import bagaturchess.egtb.syzygy.SyzygyConstants;
-import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.IEvaluator;
 import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchInfo;
@@ -43,8 +41,6 @@ import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.pv.PVValidation;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.uci.api.ChannelManager;
-import bagaturchess.search.impl.eval.cache.EvalEntry_BaseImpl;
-import bagaturchess.search.impl.eval.cache.IEvalEntry;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.movelists.SortedMoveList_Root;
 
