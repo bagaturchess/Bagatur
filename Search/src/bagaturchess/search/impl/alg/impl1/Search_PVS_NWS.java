@@ -90,8 +90,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int SEE_MAXDEPTH 							= MAX_DEPTH; //8;
 	private static final int SEE_MARGIN 							= 65;
 	
-	private static final boolean USE_LMR_ON_BAD_CAPTURES 			= false;
-	
 	private static final boolean USE_DTZ_CACHE 						= true;
 	
 	private static final boolean VALIDATE_PV 						= false;
@@ -278,14 +276,13 @@ public class Search_PVS_NWS extends SearchImpl {
 				movesPerformed_attacks++;
 			}
 			
-			boolean isQuietOrBadCapture = !env.getBitboard().getMoveOps().isCapture(move)
-					|| (USE_LMR_ON_BAD_CAPTURES && env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) < 0);
+			boolean isQuiet = !env.getBitboard().getMoveOps().isCaptureOrPromotion(move);
 			
 			boolean doLMR = depth >= 2
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 2
-						&& isQuietOrBadCapture;
+						&& isQuiet;
 			
 			int reduction = 1;
 			
@@ -1176,15 +1173,14 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				boolean isQuietOrBadCapture = !env.getBitboard().getMoveOps().isCapture(move)
-						|| (USE_LMR_ON_BAD_CAPTURES && env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) < 0);
+				boolean isQuiet = !env.getBitboard().getMoveOps().isCaptureOrPromotion(move);
 				
 				boolean doLMR = new_depth >= 2
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
-						&& isQuietOrBadCapture;
+						&& isQuiet;
 				
 				int reduction = 1;
 				
@@ -1617,15 +1613,14 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(move);
 				
 				
-				boolean isQuietOrBadCapture = !env.getBitboard().getMoveOps().isCapture(move)
-						|| (USE_LMR_ON_BAD_CAPTURES && env.getBitboard().getMoveOps().isCapture(move) && env.getBitboard().getSEEScore(move) < 0);
+				boolean isQuiet = !env.getBitboard().getMoveOps().isCaptureOrPromotion(move);
 				
 				boolean doLMR = depth >= 2
 						&& !wasInCheck
 						&& !isCheckMove
 						&& all_moves > 1
 						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
-						&& isQuietOrBadCapture;
+						&& isQuiet;
 				
 				int reduction = 1;
 				
