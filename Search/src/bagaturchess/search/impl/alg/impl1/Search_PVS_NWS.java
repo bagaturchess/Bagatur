@@ -728,7 +728,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int prob_cut_beta = beta + prob_cut_margin;
 			
 			if (depth >= 3
-					&& (ttFlag == -1 || ttValue >= prob_cut_beta)) {
+					&& ttValue >= prob_cut_beta) {
 				
 				IMoveList list = lists_attacks[ply];
 				list.clear();
