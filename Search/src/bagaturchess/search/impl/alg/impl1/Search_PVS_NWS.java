@@ -985,7 +985,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				if (phase == PHASE_QUIET) {
-					if (move == ttMove || move == killer1Move || move == killer2Move) {
+					if (move == ttMove || move == killer1Move || move == killer2Move || move == killer3Move || move == killer4Move) {
 						continue;
 					}
 				} else if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
@@ -1473,7 +1473,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				if (phase == PHASE_QUIET) {
-					if (move == ttMove2 || move == killer1Move || move == killer2Move) {
+					if (move == ttMove2 || move == killer1Move || move == killer2Move || move == killer3Move || move == killer4Move) {
 						continue;
 					}
 				} else if (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD) {
