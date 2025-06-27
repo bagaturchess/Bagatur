@@ -741,11 +741,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					env.getBitboard().makeMoveForward(move);
 					
-					int score = -qsearch(mediator, pvman, evaluator, info, -prob_cut_beta, -prob_cut_beta + 1, ply + 1, isPv);
+					int score = -qsearch(mediator, pvman, evaluator, info, -prob_cut_beta, -prob_cut_beta + 1, ply + 1, false);
 					
 					if (score >= prob_cut_beta && prob_cut_depth > 0) {
 						
-						score = -search(mediator, info, pvman, evaluator, ply + 1, prob_cut_depth, -prob_cut_beta, -prob_cut_beta + 1, isPv, initialMaxDepth);
+						score = -search(mediator, info, pvman, evaluator, ply + 1, prob_cut_depth, -prob_cut_beta, -prob_cut_beta + 1, false, initialMaxDepth);
 					}
 					
 					env.getBitboard().makeMoveBackward(move);
