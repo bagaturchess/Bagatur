@@ -443,6 +443,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		boolean improving = ply - 2 >= 0 ? (ssi.static_eval - ssis[ply - 2].static_eval > 0) : false;
 		
+		
 		PVNode node = pvman.load(ply);
 		node.bestmove = 0;
 		node.eval = ISearch.MIN;
@@ -1127,6 +1128,20 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				env.getBitboard().makeMoveForward(move);
+				
+				
+				//Under some conditions, reduce the depth with 1 ply
+				//if the move made is not improving the static evaluation.
+				/*if (!isPv
+						&& !ssi.in_check
+						&& !isCheckMove
+						&& isQuiet
+						&& new_depth == depth - 1 //No extensions
+						&& new_depth >= 2
+						&& ssi.static_eval > -eval(ply, -beta, -alpha, isPv)) {
+					
+					new_depth--;
+				}*/
 				
 				
 				int score = ISearch.MIN;
