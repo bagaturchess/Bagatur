@@ -1127,6 +1127,20 @@ public class Search_PVS_NWS extends SearchImpl {
 				int lmr_depth = Math.max(0, new_depth - reduction);
 				
 				
+				if (!isPv
+						&& !ssi.in_check
+						&& !isCheckMove
+						&& isQuiet
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& new_depth == depth - 1 //No extensions
+						&& lmr_depth <= 8
+						&& list.getScore() <= stats.getEntropy()
+						&& ssi.static_eval + lmr_depth * 150 + 150 <= alpha) {
+					
+					continue;
+				}
+				
+				
 				env.getBitboard().makeMoveForward(move);
 				
 				
