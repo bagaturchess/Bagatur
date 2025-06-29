@@ -1146,7 +1146,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				//Under some conditions, reduce the depth with 1 ply
 				//if the move made is not improving the static evaluation.
-				/*if (!isPv
+				if (!isPv
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& isQuiet
@@ -1155,7 +1155,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& ssi.static_eval > -eval(ply, -beta, -alpha, isPv)) {
 					
 					new_depth--;
-				}*/
+				}
 				
 				
 				int score = ISearch.MIN;
