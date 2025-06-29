@@ -74,16 +74,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 	}
 	
-	private static final int FUTILITY_MAXDEPTH 						= MAX_DEPTH; //7;
+	private static final int FUTILITY_MAXDEPTH 						= 7; //MAX_DEPTH; //7;
 	private static final int FUTILITY_MARGIN 						= 80;
 	
-	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= MAX_DEPTH; //9;
+	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= 9; //MAX_DEPTH; //9;
 	private static final int STATIC_NULL_MOVE_MARGIN 				= 60;
 	
-	private static final int RAZORING_MAXDEPTH 						= MAX_DEPTH; //4;
+	private static final int RAZORING_MAXDEPTH 						= 4; //MAX_DEPTH; //4;
 	private static final int RAZORING_MARGIN 						= 240;
 	
-	private static final int SEE_MAXDEPTH 							= MAX_DEPTH; //8;
+	private static final int SEE_MAXDEPTH 							= 8; //MAX_DEPTH; //8;
 	private static final int SEE_MARGIN 							= 65;
 	
 	private static final boolean VALIDATE_PV 						= false;
