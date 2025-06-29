@@ -1146,7 +1146,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				//Under some conditions, reduce the depth with 1 ply
 				//if the move made is not improving the static evaluation.
-				if (!isPv
+				if (!VALIDATE_PV
+						&& !isPv
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& isQuiet
