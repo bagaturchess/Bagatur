@@ -33,7 +33,7 @@ public class Protocol {
 	public static final String COMMAND_TO_GUI_ID_NAME = "Bagatur";
 	public static final String COMMAND_TO_GUI_ID_VERSION_STR = "5.2b";
 	//public static final String COMMAND_TO_GUI_ID_NAME = "JFish";
-	//public static final String COMMAND_TO_GUI_ID_VERSION_STR = "1.0";
+	//public static final String COMMAND_TO_GUI_ID_VERSION_STR = "1.1";
 	
 	public static final String COMMAND_TO_ENGINE_UCI_STR = "uci";
 	public static final String COMMAND_TO_ENGINE_ISREADY_STR = "isready";
