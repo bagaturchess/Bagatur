@@ -43,6 +43,7 @@ public class PVNode {
 	public static final int TYPE_MULTICUT 				= 13;
 	public static final int TYPE_BETA_CUTOFF_QSEARCH 	= 14;
 	public static final int TYPE_ALPHA_RESTORE_QSEARCH 	= 15;
+	public static final int TYPE_ALPHA_CUTOFF_QSEARCH 	= 16;
 	
 	
 	public PVNode parent;

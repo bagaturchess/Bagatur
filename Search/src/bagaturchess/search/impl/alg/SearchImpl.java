@@ -67,7 +67,7 @@ public abstract class SearchImpl implements ISearch {
 	
 	private IEvalEntry temp_cache_entry;
 	
-	public long[] search_types_stats 			= new long[16];
+	public long[] search_types_stats 			= new long[17];
 	
 	protected long[] phases_stats 				= new long[8];
 	

@@ -276,6 +276,10 @@ public class PVValidation {
 				}
 				
 				break;
+			
+			case PVNode.TYPE_ALPHA_CUTOFF_QSEARCH:
+				
+				break;
 				
 			default:
 				
