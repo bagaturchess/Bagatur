@@ -15,9 +15,10 @@ public class BagaturMain_MCore {
 			"bagaturchess.search.impl.alg.impl1.Search_PVS_NWS",
 			"bagaturchess.engines.cfg.base.SearchConfigImpl_AB",
 			"bagaturchess.learning.goldmiddle.pesto.cfg.BoardConfigImpl_PeSTO",
-			//"bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20", //HCE
-			"bagaturchess.deeplearning.impl_nnue_v3.EvaluationConfig" //Bagatur
-			//"bagaturchess.deeplearning.impl_nnue_v2b.EvaluationConfig" //JFish
+			//"bagaturchess.learning.goldmiddle.impl4.cfg.BoardConfigImpl_V20", //Bagatur HCE Board
+			//"bagaturchess.learning.goldmiddle.impl4.cfg.EvaluationConfig_V20", //Bagatur HCE
+			"bagaturchess.deeplearning.impl_nnue_v3.EvaluationConfig" //Bagatur NNUE
+			//"bagaturchess.deeplearning.impl_nnue_v2b.EvaluationConfig" //JFish NNUE
 		};
 		
 		Boot.main(args);
