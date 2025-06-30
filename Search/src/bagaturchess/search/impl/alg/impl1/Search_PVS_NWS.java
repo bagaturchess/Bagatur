@@ -241,7 +241,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		list.clear();
 		list.setTTMove(ttMove);
 		env.getBitboard().genAllMoves(list);
-			
+		
 		
 		int move;
 		while ((move = list.next()) != 0) {
@@ -825,7 +825,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (!VALIDATE_PV) {
 						
-						//Expected fail-high
 						tt_move_extension = -2;
 					}
 				}
