@@ -57,8 +57,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_QUIET 							= 6;
 	private static final int PHASE_ATTACKING_BAD 					= 7;
 	
-	private static final double REDUCTION_AGGRESSIVENESS 			= 1.25;
-	private static final double PRUNING_AGGRESSIVENESS 				= 1.25;
+	private static final double REDUCTION_AGGRESSIVENESS 			= 1.333;
+	private static final double PRUNING_AGGRESSIVENESS 				= 1;
 	
 	private static final int[][] LMR_TABLE 							= new int[64][64];
 	
@@ -77,14 +77,19 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int FUTILITY_MAXDEPTH 						= 7; //MAX_DEPTH; //7;
 	private static final int FUTILITY_MARGIN 						= 80;
 	
-	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= 9; //MAX_DEPTH; //9;
-	private static final int STATIC_NULL_MOVE_MARGIN 				= 60;
+	private static final int FUTILITY_LMR_MAXDEPTH 					= 7; //MAX_DEPTH; //7;
+	private static final int FUTILITY_LMR_MARGIN 					= 160;
 	
-	private static final int RAZORING_MAXDEPTH 						= 4; //MAX_DEPTH; //4;
-	private static final int RAZORING_MARGIN 						= 240;
+	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= 7; //MAX_DEPTH; //9;
+	private static final int STATIC_NULL_MOVE_MARGIN 				= 80;
 	
-	private static final int SEE_MAXDEPTH 							= 8; //MAX_DEPTH; //8;
-	private static final int SEE_MARGIN 							= 65;
+	private static final int RAZORING_MAXDEPTH 						= 7; //MAX_DEPTH; //4;
+	private static final int RAZORING_MARGIN 						= 260;
+	
+	private static final int SEE_MAXDEPTH 							= 7; //MAX_DEPTH; //8;
+	private static final int SEE_MARGIN 							= 80;
+	
+	private static final int PROBCUT_MARGIN 						= 200;
 	
 	private static final boolean VALIDATE_PV 						= false;
 	
@@ -501,10 +506,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//TT probing
-		final int parentMove 		= env.getBitboard().getLastMove();
-		final int colourToMove 		= env.getBitboard().getColourToMove();
-		
-		
 		int ttMove 									= 0;
 		int ttFlag 									= -1;
 		int ttValue 								= IEvaluator.MIN_EVAL;
@@ -608,14 +609,21 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
+		final int parentMove 		= env.getBitboard().getLastMove();
+		final int colourToMove 		= env.getBitboard().getColourToMove();
+		boolean hasAtLeastOnePiece 	= (colourToMove == Constants.COLOUR_WHITE) ?
+										env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
+										env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
+				
+				
 		//Pruning and reductions in non-check and non-PV nodes
 		boolean mateThreat  = false;
 		
 		if (!isPv
 				&& !ssi.in_check
+				&& hasAtLeastOnePiece
 				&& !SearchUtils.isMateVal(alpha)
 				&& !SearchUtils.isMateVal(beta)
-				&& egtb_eval == ISearch.MIN
 			) {
 			
 			
@@ -624,16 +632,16 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				depth -= 1;
 			}
-			
-			
+					
+					
 			//Faild-high pruning
-			if (ssi.static_eval >= beta) {
+			if (ssi.static_eval >= beta + 35) {
 				
 				
 				//Static null move pruning
 				if (depth <= STATIC_NULL_MOVE_MAXDEPTH) {
 					
-					if (ssi.static_eval - depth * STATIC_NULL_MOVE_MARGIN / PRUNING_AGGRESSIVENESS >= beta) {
+					if (ssi.static_eval - (depth * STATIC_NULL_MOVE_MARGIN - (improving ? 70 : 0)) / PRUNING_AGGRESSIVENESS >= beta) {
 						
 						node.bestmove = 0;
 						node.eval = ssi.static_eval;
@@ -647,58 +655,55 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				//Verified null move pruning
 				if (depth >= 3) {
+						
+					env.getBitboard().makeNullMoveForward();
 					
-					boolean hasAtLeastOnePiece = (colourToMove == Constants.COLOUR_WHITE) ?
-								env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
-								env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
+					int reduction = depth / 4 + 3 + Math.min((Math.max(0, ssi.static_eval - beta)) / 80, 3);
+					reduction = (int) (reduction * REDUCTION_AGGRESSIVENESS);
+					
+					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, -beta, -beta + 1, ply + 1, false)
+							: -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth);
+					
+					env.getBitboard().makeNullMoveBackward();
+					
+					if (score >= beta) {
 						
-					if (hasAtLeastOnePiece) {
+						int verify_score = depth - reduction <= 0 ? qsearch(mediator, pvman, evaluator, info, beta - 1, beta, ply, false)
+								: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth);
 						
-						env.getBitboard().makeNullMoveForward();
-						
-						int reduction = depth / 4 + 3 + Math.min((Math.max(0, ssi.static_eval - beta)) / 80, 3);
-						reduction = (int) (reduction * REDUCTION_AGGRESSIVENESS);
-						
-						int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, -beta, -beta + 1, ply + 1, false)
-								: -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth);
-						
-						env.getBitboard().makeNullMoveBackward();
-						
-						if (score >= beta) {
+						if (verify_score >= beta) {
 							
-							int verify_score = depth - reduction <= 0 ? qsearch(mediator, pvman, evaluator, info, beta - 1, beta, ply, false)
-									: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth);
+							node.bestmove = 0;
+							node.eval = verify_score;
+							node.leaf = true;
+							node.type = PVNode.TYPE_NULL_MOVE;
 							
-							if (verify_score >= beta) {
-								
-								node.bestmove = 0;
-								node.eval = verify_score;
-								node.leaf = true;
-								node.type = PVNode.TYPE_NULL_MOVE;
-								
-								return node.eval;
-							}
-							
-							//If the verify_score is negative mate score
-							if ((verify_score < -ISearch.MAX_MATERIAL_INTERVAL)
-									&& depth >= 2
-									&& ply < 2 * initialMaxDepth) {
-								
-								mateThreat = true;
-							}
+							return node.eval;
 						}
 						
-						//If the score is negative mate score
-						if ((score < -ISearch.MAX_MATERIAL_INTERVAL)
+						//If the verify_score is negative mate score
+						if ((verify_score < -ISearch.MAX_MATERIAL_INTERVAL)
 								&& depth >= 2
 								&& ply < 2 * initialMaxDepth) {
 							
 							mateThreat = true;
 						}
 					}
+					
+					//If the score is negative mate score
+					if ((score < -ISearch.MAX_MATERIAL_INTERVAL)
+							&& depth >= 2
+							&& ply < 2 * initialMaxDepth) {
+						
+						mateThreat = true;
+					}
 				}
 				
-			} else if (ssi.static_eval <= alpha) { //Fail-low pruning
+			}
+			
+			
+			//Fail-low pruning
+			if (ssi.static_eval <= alpha) {
 				
 				
 				//Razoring
@@ -708,9 +713,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (ssi.static_eval + razoringMargin < alpha) {
 						
-						int score = qsearch(mediator, pvman, evaluator, info, alpha - razoringMargin - 1, alpha - razoringMargin, ply, false);
+						int score = qsearch(mediator, pvman, evaluator, info, alpha, alpha + 1, ply, false);
 						
-						if (score < alpha - razoringMargin) {
+						if (score <= alpha) {
 							
 							node.bestmove = 0;
 							node.eval = score;
@@ -725,8 +730,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			//ProbeCut
-			int prob_cut_margin = 200;
-			int prob_cut_beta = beta + prob_cut_margin;
+			int prob_cut_beta = beta + PROBCUT_MARGIN;
 			
 			if (depth >= 3
 					&& ttValue >= prob_cut_beta) {
@@ -1030,15 +1034,12 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& hasAtLeastOnePiece
 						&& !SearchUtils.isMateVal(alpha)
 						&& !SearchUtils.isMateVal(beta)
-						&& egtb_eval == ISearch.MIN
 					) {
 					
-					boolean hasAtLeastOnePiece = (colourToMove == Constants.COLOUR_WHITE) ?
-							env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
-							env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
-							
+					
 					if (phase == PHASE_QUIET
 							&& list.getScore() <= stats.getEntropy()
 							) {
@@ -1051,7 +1052,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						//Futility pruning
 						if (depth <= FUTILITY_MAXDEPTH
-								&& hasAtLeastOnePiece
 								&& ssi.static_eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
 							
 							continue;
@@ -1060,7 +1060,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						//SEE pruning for non-captures
 						if (movesPerformed_attacks + movesPerformed_quiet > 3
 								&& depth <= SEE_MAXDEPTH
-								&& hasAtLeastOnePiece
 								&& env.getBitboard().getSEEScore(move) < -SEE_MARGIN * depth / PRUNING_AGGRESSIVENESS) {
 							
 							continue;
@@ -1068,7 +1067,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 					} else if (phase == PHASE_ATTACKING_BAD //SEE pruning for captures
 							&& depth <= SEE_MAXDEPTH
-							&& hasAtLeastOnePiece
 							&& env.getBitboard().getSEEScore(move) < -SEE_MARGIN * depth / PRUNING_AGGRESSIVENESS) {
 						
 						continue;
@@ -1132,9 +1130,9 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& isQuiet
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& new_depth == depth - 1 //No extensions
-						&& lmr_depth <= 8
+						&& lmr_depth <= FUTILITY_LMR_MAXDEPTH
 						&& list.getScore() <= stats.getEntropy()
-						&& ssi.static_eval + lmr_depth * 150 + 150 <= alpha) {
+						&& ssi.static_eval + (lmr_depth + 1) * FUTILITY_LMR_MARGIN <= alpha) {
 					
 					continue;
 				}
