@@ -98,7 +98,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private long lastSentMinorInfo_nodesCount;
 	
 	
-	
 	private SearchStackInfo[] ssis 									= new SearchStackInfo[MAX_DEPTH + 1];
 	
 	private VarStatistic stats 										= new VarStatistic();
@@ -273,6 +272,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean doLMR = depth >= 2
 						&& !ssi.in_check
 						&& !isCheckMove
+						&& list.getScore() <= stats.getEntropy()
 						&& movesPerformed_attacks + movesPerformed_quiet > 2
 						&& isQuiet;
 			
@@ -1013,7 +1013,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				if (!env.getBitboard().getMoveOps().isCapture(move)) {
+				if (phase == PHASE_QUIET) {
 					
 					stats.addValue(list.getScore());
 				}
@@ -1074,6 +1074,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				boolean isQuiet = !env.getBitboard().getMoveOps().isCaptureOrPromotion(move);
+				
+				
 				//Extensions
 				double new_depth;
 				
@@ -1088,20 +1091,22 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					new_depth = depth;
 					
-				} else {
+				} /*else if (isQuiet) {
+					
+					new_depth = depth - 1 + list.getScore() / 2000;
+					
+				}*/ else {
 					
 					new_depth = depth - 1;
 				}
 				
 				
 				//Late move reduction
-				boolean isQuiet = !env.getBitboard().getMoveOps().isCaptureOrPromotion(move);
-				
 				boolean doLMR = new_depth >= 2
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
+						&& list.getScore() <= stats.getEntropy()
 						&& isQuiet;
 				
 				double reduction = 1;
@@ -1115,8 +1120,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						reduction += 1;
 					}
 					
-					//reduction *= (1 - list.getScore() / 2000);
-					
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 				}
 				
@@ -1129,7 +1132,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !isCheckMove
 						&& isQuiet
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& new_depth == depth - 1 //No extensions
 						&& lmr_depth <= FUTILITY_LMR_MAXDEPTH
 						&& list.getScore() <= stats.getEntropy()
 						&& ssi.static_eval + (lmr_depth + 1) * FUTILITY_LMR_MARGIN <= alpha) {
@@ -1148,7 +1150,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& isQuiet
-						&& new_depth == depth - 1 //No extensions
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& new_depth >= 2
 						&& ssi.static_eval > -eval(ply, -beta, -alpha, isPv)) {
 					
@@ -1570,7 +1572,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !wasInCheck
 						&& !isCheckMove
 						&& all_moves > 1
-						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
+						&& list.getScore() <= stats.getEntropy()
 						&& isQuiet;
 				
 				double reduction = 1;
@@ -1583,8 +1585,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						reduction += 1;
 					}
-					
-					//reduction += list.getScore() <= stats.getEntropy() ? 1 : -1;
 					
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
 					
