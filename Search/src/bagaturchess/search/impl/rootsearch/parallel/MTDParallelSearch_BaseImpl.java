@@ -628,7 +628,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 					//Add major infos
 					for (int i_major = cur_mediator.lastSendMajorIndex + 1; i_major < cur_mediator.majorInfos.size() ; i_major++) {							
 						
-						ISearchInfo cur_info = cur_mediator.majorInfos.get(i_major);
+						ISearchInfo cur_info = (ISearchInfo) cur_mediator.majorInfos.get(i_major);
 						
 						if (cur_info == null) { //Because of multi threaded access to arraylist
 							
@@ -747,7 +747,7 @@ public abstract class MTDParallelSearch_BaseImpl extends RootSearch_BaseImpl {
 		
 		protected int lastSendMajorIndex = -1;
 		protected Set<ISearchInfo> allInfos;
-		protected List<ISearchInfo> majorInfos;
+		protected List<Object> majorInfos;
 		
 		private ISearchStopper stopper;
 		//private ISearchStopper root_stopper;

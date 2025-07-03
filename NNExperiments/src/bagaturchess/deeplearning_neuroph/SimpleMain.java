@@ -117,9 +117,7 @@ public class SimpleMain implements LearningEventListener {
     }
 
     
-
     @Override
-
     public void handleLearningEvent(LearningEvent event) {
 
         BackPropagation bp = (BackPropagation)event.getSource();
