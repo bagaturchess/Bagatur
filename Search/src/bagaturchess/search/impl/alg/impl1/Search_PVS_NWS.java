@@ -58,21 +58,9 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_ATTACKING_BAD 					= 7;
 	
 	private static final double REDUCTION_AGGRESSIVENESS 			= 1.333;
-	private static final double PRUNING_AGGRESSIVENESS 				= 1;
+	private static final double PRUNING_AGGRESSIVENESS 				= 1.333;
 	
-	private static final double[][] LMR_TABLE 							= new double[64][64];
-	
-	static {
-		
-		for (int depth = 1; depth < 64; depth++) {
-			
-			for (int move_number = 1; move_number < 64; move_number++) {
-				
-				LMR_TABLE[depth][move_number] = Math.max(1, Math.log(move_number) * Math.log(depth) / (double) 2);
-				LMR_TABLE[depth][move_number] = LMR_TABLE[depth][move_number] * REDUCTION_AGGRESSIVENESS;
-			}
-		}
-	}
+	private static final double[][] LMR_TABLE 						= new double[64][64];
 	
 	private static final int FUTILITY_MAXDEPTH 						= 7; //MAX_DEPTH; //7;
 	private static final int FUTILITY_MARGIN 						= 80;
@@ -92,6 +80,19 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PROBCUT_MARGIN 						= 200;
 	
 	private static final boolean VALIDATE_PV 						= false;
+	
+	
+	static {
+		
+		for (int depth = 1; depth < 64; depth++) {
+			
+			for (int move_number = 1; move_number < 64; move_number++) {
+				
+				LMR_TABLE[depth][move_number] = Math.max(1, Math.log(move_number) * Math.log(depth) / (double) 2);
+				LMR_TABLE[depth][move_number] = LMR_TABLE[depth][move_number] * REDUCTION_AGGRESSIVENESS;
+			}
+		}
+	}
 	
 	
 	private long lastSentMinorInfo_timestamp;
@@ -272,7 +273,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean doLMR = depth >= 2
 						&& !ssi.in_check
 						&& !isCheckMove
-						&& list.getScore() <= stats.getEntropy()
+						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
 						&& movesPerformed_attacks + movesPerformed_quiet > 2
 						&& isQuiet;
 			
@@ -683,8 +684,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						//If the verify_score is negative mate score
 						if ((verify_score < -ISearch.MAX_MATERIAL_INTERVAL)
-								&& depth >= 2
-								&& ply < 2 * initialMaxDepth) {
+								&& depth >= 2) {
 							
 							mateThreat = true;
 						}
@@ -692,8 +692,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					//If the score is negative mate score
 					if ((score < -ISearch.MAX_MATERIAL_INTERVAL)
-							&& depth >= 2
-							&& ply < 2 * initialMaxDepth) {
+							&& depth >= 2) {
 						
 						mateThreat = true;
 					}
@@ -1080,22 +1079,29 @@ public class Search_PVS_NWS extends SearchImpl {
 				//Extensions
 				double new_depth;
 				
-				if (move == ttMove && tt_move_extension != 0) {
+				if (ply < 2 * initialMaxDepth) {
 					
-					new_depth = depth - 1 + tt_move_extension;
+					if (move == ttMove) {
+						
+						new_depth = depth - 1 + tt_move_extension;
+						
+						//Extend TT move to end up with search (not qsearch).
+						//new_depth = Math.max(1, new_depth);
+						
+					} else if (mateThreat) {
+						
+						new_depth = depth;
+						
+					} /*else if (isQuiet) {
+						
+						new_depth = depth - 1 + Math.max(-1, Math.min(1, list.getScore() / 1000));
+						
+					}*/ else {
+						
+						new_depth = depth - 1;
+					}
 					
-					//Extend TT move to end up with search (not qsearch).
-					//new_depth = Math.max(1, new_depth);
-					
-				} else if (mateThreat) {
-					
-					new_depth = depth;
-					
-				} /*else if (isQuiet) {
-					
-					new_depth = depth - 1 + list.getScore() / 2000;
-					
-				}*/ else {
+				} else {
 					
 					new_depth = depth - 1;
 				}
@@ -1106,7 +1112,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& list.getScore() <= stats.getEntropy()
+						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
 						&& isQuiet;
 				
 				double reduction = 1;
@@ -1145,17 +1151,18 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				//Under some conditions, reduce the depth with 1 ply
 				//if the move made is not improving the static evaluation.
-				if (!VALIDATE_PV
+				/*if (!VALIDATE_PV
 						&& !isPv
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& isQuiet
-						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						//&& movesPerformed_attacks + movesPerformed_quiet > 1
+						//&& list.getScore() <= stats.getEntropy()
 						&& new_depth >= 2
 						&& ssi.static_eval > -eval(ply, -beta, -alpha, isPv)) {
 					
 					new_depth--;
-				}
+				}*/
 				
 				
 				int score = ISearch.MIN;
@@ -1572,7 +1579,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !wasInCheck
 						&& !isCheckMove
 						&& all_moves > 1
-						&& list.getScore() <= stats.getEntropy()
+						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
 						&& isQuiet;
 				
 				double reduction = 1;
