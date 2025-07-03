@@ -1,3 +1,6 @@
+ Version 5.2c (03 July 2025)
+ * Java 8 compatible distribution
+ 
  Version 5.2b (19 June 2025)
  * Provide JNI native libraries for vectorized NNUE evaluation using SIMD (AVX2 and AVX512) under both Linux and Windows
  * Set process and thread priority to high as otherwise NPS drops
