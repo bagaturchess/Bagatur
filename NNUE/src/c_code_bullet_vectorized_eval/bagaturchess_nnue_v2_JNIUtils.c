@@ -1,9 +1,29 @@
 #include <jni.h>
-#include <immintrin.h>
-#include <stdint.h>
-#include <cpuid.h>
-#include <x86intrin.h>
 #include "bagaturchess_nnue_v2_JNIUtils.h"
+#include <stdint.h>
+#include <stdio.h>
+
+#ifdef _MSC_VER
+#include <intrin.h>
+#else
+#include <cpuid.h>
+#endif
+
+#if defined(__GNUC__) || defined(__clang__)
+#include <immintrin.h>
+static inline uint64_t xgetbv(uint32_t index) {
+    uint32_t eax, edx;
+    __asm__ volatile (
+        ".byte 0x0f, 0x01, 0xd0" // xgetbv
+        : "=a"(eax), "=d"(edx)
+        : "c"(index)
+    );
+    return ((uint64_t)edx << 32) | eax;
+}
+#elif defined(_MSC_VER)
+#include <immintrin.h>
+#define xgetbv _xgetbv
+#endif
 
 
 #define HIDDEN_SIZE 1024
@@ -19,20 +39,41 @@ static __m512i zero_vec_avx512;
 static int initialized_avx512 = 0;
 
 
-// Returns bitmask: bit 0 = AVX2, bit 1 = AVX512F
+// Bit 0 = AVX2, Bit 1 = AVX512F
 JNIEXPORT jint JNICALL Java_bagaturchess_nnue_1v2_JNIUtils_detectSIMD(JNIEnv *env, jclass clazz) {
     uint32_t eax, ebx, ecx, edx;
     jint result = 0;
 
-    // CPUID(1): base check for AVX and OSXSAVE
-    __cpuid_count(1, 0, eax, ebx, ecx, edx);
-    if (!(ecx & (1 << 28))) return 0; // AVX not supported
+    // --- Step 1: CPUID(1) --- Check AVX and OSXSAVE support
+#ifdef _MSC_VER
+    int cpuInfo[4];
+    __cpuid(cpuInfo, 1);
+    ecx = cpuInfo[2];
+#else
+    __cpuid(1, eax, ebx, ecx, edx);
+#endif
+    int hasAVX     = ecx & (1 << 28); // AVX
+    int hasOSXSAVE = ecx & (1 << 27); // OSXSAVE
 
-    // CPUID(7,0): check AVX2 and AVX512F features
+    if (!hasAVX || !hasOSXSAVE)
+        return 0;
+
+    // --- Step 2: XGETBV --- Ensure OS enables AVX/YMM
+    uint64_t xcr0 = xgetbv(0);
+    if ((xcr0 & 0x6) != 0x6)
+        return 0;
+
+    // --- Step 3: CPUID(7,0) --- Check AVX2 and AVX512F
+#ifdef _MSC_VER
+    __cpuidex(cpuInfo, 7, 0);
+    ebx = cpuInfo[1];
+#else
     __cpuid_count(7, 0, eax, ebx, ecx, edx);
+#endif
 
-    if (ebx & (1 << 5))    result |= 1; // AVX2
-    if (ebx & (1 << 16))   result |= 2; // AVX512F
+    if (ebx & (1 << 5))     result |= 1; // AVX2
+    if ((xcr0 & 0xe0) == 0xe0 && (ebx & (1 << 16)))
+        result |= 2; // AVX512F, only if OS enabled ZMM state
 
     return result;
 }
