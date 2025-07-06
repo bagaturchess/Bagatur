@@ -146,7 +146,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			if (env.getSyzygyDTZCache() != null) ChannelManager.getChannel().dump("Search_PVS_NWS.newSearch: Syzygy DTZ cache hitrate=" + env.getSyzygyDTZCache().getHitRate() + ", usage=" + env.getSyzygyDTZCache().getUsage());
 		}
 		
-		stats.clear();
+		stats = new VarStatistic();
 	}
 	
 	
@@ -273,7 +273,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			boolean doLMR = depth >= 2
 						&& !ssi.in_check
 						&& !isCheckMove
-						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
+						&& list.getScore() <= stats.getEntropy()
 						&& movesPerformed_attacks + movesPerformed_quiet > 2
 						&& isQuiet;
 			
@@ -1012,12 +1012,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				if (phase == PHASE_QUIET) {
-					
-					stats.addValue(list.getScore());
-				}
-				
-				
 				boolean isCheckMove = env.getBitboard().isCheckMove(move);
 				
 				
@@ -1112,7 +1106,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
+						&& list.getScore() <= stats.getEntropy()
 						&& isQuiet;
 				
 				double reduction = 1;
@@ -1157,7 +1151,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !isCheckMove
 						&& isQuiet
 						//&& movesPerformed_attacks + movesPerformed_quiet > 1
-						//&& list.getScore() <= stats.getEntropy()
+						&& list.getScore() <= stats.getEntropy()
 						&& new_depth >= 2
 						&& ssi.static_eval > -eval(ply, -beta, -alpha, isPv)) {
 					
@@ -1187,6 +1181,12 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				env.getBitboard().makeMoveBackward(move);
+				
+				
+				if (score >= beta && phase == PHASE_QUIET) {
+					
+					stats.addValue(list.getScore());
+				}
 				
 				
 				if (!env.getBitboard().getMoveOps().isCapture(move)) {
@@ -1579,7 +1579,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !wasInCheck
 						&& !isCheckMove
 						&& all_moves > 1
-						&& list.getScore() <= stats.getEntropy() + stats.getDisperse()
+						&& list.getScore() <= stats.getEntropy()
 						&& isQuiet;
 				
 				double reduction = 1;
