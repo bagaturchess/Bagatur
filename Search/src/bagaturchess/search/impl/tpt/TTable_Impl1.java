@@ -45,13 +45,13 @@ public class TTable_Impl1 extends LRUMapLongObject<TTable_Impl1.TPTEntry> implem
 	@Override
 	public void correctAllDepths(final int reduction) {
 		
-		IValuesVisitor_HashMapLongObject<TPTEntry> visitor = new IValuesVisitor_HashMapLongObject<TPTEntry>() {
+		/*IValuesVisitor_HashMapLongObject<TPTEntry> visitor = new IValuesVisitor_HashMapLongObject<TPTEntry>() {
 			@Override
 			public void visit(TPTEntry entry) {
 				entry.depth = (byte) Math.max(1, entry.depth - reduction);
 			}
 		};
-		visitValues(visitor);
+		visitValues(visitor);*/
 	}
 	
 	
@@ -93,23 +93,23 @@ public class TTable_Impl1 extends LRUMapLongObject<TTable_Impl1.TPTEntry> implem
 	@Override
 	public void put(long hashkey, int _depth, int _eval, int _alpha, int _beta, int _bestmove) {
 		
-		if (_bestmove == 0) {
+		/*if (_bestmove == 0) {
 			throw new IllegalStateException();
-		}
+		}*/
 		
 		if (_eval == ISearch.MAX || _eval == ISearch.MIN) {
 			throw new IllegalStateException("_eval=" + _eval);
 		}
 
-		if (_eval >= ISearch.MAX_MATERIAL_INTERVAL || _eval <= -ISearch.MAX_MATERIAL_INTERVAL) {
+		/*if (_eval >= ISearch.MAX_MATERIAL_INTERVAL || _eval <= -ISearch.MAX_MATERIAL_INTERVAL) {
 			if (!SearchUtils.isMateVal(_eval)) {
 				throw new IllegalStateException("not mate val _eval=" + _eval);
 			}
-		}
+		}*/
 		
-		if (SearchUtils.isMateVal(_eval)) {
+		/*if (SearchUtils.isMateVal(_eval)) {
 			return;
-		}
+		}*/
 		
 		TPTEntry entry = super.getAndUpdateLRU(hashkey);
 		if (entry != null) {
