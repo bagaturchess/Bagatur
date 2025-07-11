@@ -54,7 +54,7 @@ public class NNUE_SIMD_AVX2 {
 		
 		try {
         	
-            String libName = System.mapLibraryName("SIMD_AVX2");
+            String libName = System.mapLibraryName("SIMD");
             Path jarfile = Paths.get(NNUEJNIBridge.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             File libFile = jarfile.getParent().resolve(libName).toFile();
             if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Looking for " + libName + " at location " + libFile);
@@ -70,7 +70,7 @@ public class NNUE_SIMD_AVX2 {
                     if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Loaded " + libName + " located in the resources directory");
                 } else {
                 	if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Looking for " + libName + " at java.library.path: " + System.getProperty("java.library.path"));
-                    System.loadLibrary("SIMD_AVX2");
+                    System.loadLibrary("SIMD");
                     if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("Loaded " + libName + " located in the java library path");
                 }
             }

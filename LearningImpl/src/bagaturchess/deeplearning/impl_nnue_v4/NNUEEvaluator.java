@@ -8,7 +8,6 @@ import java.io.IOException;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.nnue_v2.NNUEProbeUtils;
 import bagaturchess.nnue_v3.NNUE_SIMD_AVX2;
-import bagaturchess.nnue_v3.NNUE.Accumulator;
 import bagaturchess.search.api.IEvalConfig;
 import bagaturchess.search.impl.eval.BaseEvaluator;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
@@ -21,7 +20,6 @@ public class NNUEEvaluator extends BaseEvaluator {
 	
     private static NNUE_SIMD_AVX2 nnue = new NNUE_SIMD_AVX2();
     private static final NNUEProbeUtils.Input input = new NNUEProbeUtils.Input();
-    private static final Accumulator accumulators = new Accumulator();
 	
 	static {
     	
