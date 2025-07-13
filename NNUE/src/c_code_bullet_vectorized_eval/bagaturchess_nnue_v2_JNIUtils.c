@@ -26,7 +26,7 @@ static inline uint64_t xgetbv(uint32_t index) {
 #endif
 
 
-#define HIDDEN_SIZE 1024
+#define HIDDEN_SIZE 1536
 #define QA 255
 
 

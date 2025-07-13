@@ -1,3 +1,8 @@
+ Version 5.3 (13 July 2025)
+ * Fix crash issue with SIMD lib (AVX2 and AVX512) when AVX is supported but not enabled on OS level
+ * If the crash issue still persists you could delete /bin/VectorEval.dll for windows or /bin/libVectorEval.so for linux
+ * New NNUE file based on training over custom self play data of Bagatur with 1B positions
+ 
  Version 5.2c (03 July 2025)
  * Java 8 compatible distribution
  
