@@ -61,7 +61,7 @@ fn main() {
 }
 ...
 ```
-So the network looks like (768x7 -> 1536)x2 -> 8, having 7 king buckets on the input layer, one hidden layer with size 1024 and 8 output buckets.
+So the network looks like (768x7 -> 1536)x2 -> 8, having 7 king buckets on the input layer, one hidden layer with size 1536 and 8 output buckets.
 
 ## Training (supervised learning)
 
