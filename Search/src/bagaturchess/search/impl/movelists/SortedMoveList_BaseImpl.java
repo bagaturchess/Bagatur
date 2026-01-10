@@ -37,6 +37,7 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 	private long[] moves;
 	private int count;
 	private int cur = 0;
+	private int lastScore;
 	
 	
 	public SortedMoveList_BaseImpl(int max, SearchEnv _env, boolean _onTheFlySorting) {
@@ -143,13 +144,15 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 		}
 		
         // Return current move
-        return (int) moves[cur++];
+		long v = moves[cur++];
+        lastScore = (int) (v >>> 32);
+        return (int) v;
 	}
 
 	
 	public int getScore() {
 		
-		return (int) (moves[cur] >>> 32);
+		return lastScore;
 	}
 	
 	
