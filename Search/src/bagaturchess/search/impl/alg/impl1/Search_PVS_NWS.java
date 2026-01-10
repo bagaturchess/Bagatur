@@ -774,6 +774,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (depth >= 4
 				&& ply < 2 * initialMaxDepth
+				&& ttValue >= beta
 				&& isTTLowerBoundOrExact
 				&& isTTDepthEnoughForSingularExtension
 				&& env.getBitboard().isPossible(ttMove)
