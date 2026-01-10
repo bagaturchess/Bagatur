@@ -274,7 +274,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& list.getScore() <= stats.getEntropy()
-						&& movesPerformed_attacks + movesPerformed_quiet > 2
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& isQuiet;
 			
 			double reduction = 1;
@@ -1615,7 +1615,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
-				if (isPv && (score > alpha || all_moves == 1)) {
+				if (isPv && (score > bestScore || all_moves == 1)) {
 					
 					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
 				}
