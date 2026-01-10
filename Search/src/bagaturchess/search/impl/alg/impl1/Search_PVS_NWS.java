@@ -60,8 +60,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final double REDUCTION_AGGRESSIVENESS 			= 1.333;
 	private static final double PRUNING_AGGRESSIVENESS 				= 1.333;
 	
-	private static final double[][] LMR_TABLE 						= new double[64][64];
-	
 	private static final int FUTILITY_MAXDEPTH 						= 7; //MAX_DEPTH; //7;
 	private static final int FUTILITY_MARGIN 						= 80;
 	
@@ -81,6 +79,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private static final boolean VALIDATE_PV 						= false;
 	
+	
+	private static final double[][] LMR_TABLE 						= new double[64][64];
 	
 	static {
 		
