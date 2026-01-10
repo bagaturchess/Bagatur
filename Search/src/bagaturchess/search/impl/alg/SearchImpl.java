@@ -185,11 +185,6 @@ public abstract class SearchImpl implements ISearch {
 	
 	public boolean isDraw(boolean isPV) {
 		
-		if (!isPV && env.getBitboard().getStateRepetition() >= 2) {
-			
-			return true;
-		}
-		
 		if (env.getBitboard().getStateRepetition() >= 3
 				|| env.getBitboard().isDraw50movesRule()) {
 			
