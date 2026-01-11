@@ -47,6 +47,7 @@ public class UCISearchMediatorImpl_NormalSearch extends UCISearchMediatorImpl_Ba
 	
 	
 	public void startIteration(int iteration) {
+		super.startIteration(iteration);
 		timeController.newIteration();
 	}
 	
