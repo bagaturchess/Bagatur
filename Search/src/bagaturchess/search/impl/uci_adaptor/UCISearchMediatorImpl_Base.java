@@ -111,11 +111,12 @@ public abstract class UCISearchMediatorImpl_Base implements ISearchMediator {
 	public void changedMajor(ISearchInfo info) {
 		
 		if (!info.isUpperBound()) {
+			
 			lastinfo = info;
+			
+			String message = SearchInfoUtils.buildMajorInfoCommand(lastinfo, getStartTime(), rootSearch.getTPTUsagePercent(), 0, rootSearch.getBitboardForSetup());
+			send(message);
 		}
-		
-		String message = SearchInfoUtils.buildMajorInfoCommand(info, getStartTime(), rootSearch.getTPTUsagePercent(), 0, rootSearch.getBitboardForSetup());
-		send(message);
 		
 		//stopIfMateIsFound();
 	}
