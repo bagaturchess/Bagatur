@@ -460,7 +460,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Go in qsearch if depth is < 1
 		if (depth < 1) {
 			
-			int qeval = qsearch(mediator, pvman, evaluator, info, alpha, beta, ply, isPv);
+			int qeval = qsearch(mediator, pvman, evaluator, info, alpha, beta, ply, isPv, initialMaxDepth);
 			
 			if (node.eval != qeval) {
 				
@@ -662,14 +662,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					double reduction = depth / 4 + 3 + Math.min((Math.max(0, ssi.static_eval - beta)) / 80, 3);
 					reduction = reduction * REDUCTION_AGGRESSIVENESS;
 					
-					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, -beta, -beta + 1, ply + 1, false)
+					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, -beta, -beta + 1, ply + 1, false, initialMaxDepth)
 							: -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth);
 					
 					env.getBitboard().makeNullMoveBackward();
 					
 					if (score >= beta) {
 						
-						int verify_score = depth - reduction <= 0 ? qsearch(mediator, pvman, evaluator, info, beta - 1, beta, ply, false)
+						int verify_score = depth - reduction <= 0 ? qsearch(mediator, pvman, evaluator, info, beta - 1, beta, ply, false, initialMaxDepth)
 								: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth);
 						
 						if (verify_score >= beta) {
@@ -712,7 +712,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (ssi.static_eval + razoringMargin < alpha) {
 						
-						int score = qsearch(mediator, pvman, evaluator, info, alpha, alpha + 1, ply, false);
+						int score = qsearch(mediator, pvman, evaluator, info, alpha, alpha + 1, ply, false, initialMaxDepth);
 						
 						if (score <= alpha) {
 							
@@ -745,7 +745,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					env.getBitboard().makeMoveForward(move);
 					
-					int score = -qsearch(mediator, pvman, evaluator, info, -prob_cut_beta, -prob_cut_beta + 1, ply + 1, false);
+					int score = -qsearch(mediator, pvman, evaluator, info, -prob_cut_beta, -prob_cut_beta + 1, ply + 1, false, initialMaxDepth);
 					
 					if (score >= prob_cut_beta && prob_cut_depth > 0) {
 						
@@ -1657,7 +1657,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	public int qsearch(ISearchMediator mediator, PVManager pvman, IEvaluator evaluator, ISearchInfo info,
-			int alpha, final int beta, final int ply, final boolean isPv) {
+			int alpha, final int beta, final int ply, final boolean isPv, int initialMaxDepth) {
 		
 		
 		info.setSearchedNodes(info.getSearchedNodes() + 1);
@@ -1734,7 +1734,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getBitboard().isInCheck()) {
 			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
-			return search(mediator, info, pvman, evaluator, ply, 1, alpha, beta, false, 1);
+			return search(mediator, info, pvman, evaluator, ply, 1, alpha, beta, false, initialMaxDepth);
 			//return alpha;
 		}
 		
@@ -1813,7 +1813,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				env.getBitboard().makeMoveForward(move);
 				
-				final int score = -qsearch(mediator, pvman, evaluator, info, -beta, -alpha, ply + 1, isPv);
+				final int score = -qsearch(mediator, pvman, evaluator, info, -beta, -alpha, ply + 1, isPv, initialMaxDepth);
 				
 				env.getBitboard().makeMoveBackward(move);
 				
