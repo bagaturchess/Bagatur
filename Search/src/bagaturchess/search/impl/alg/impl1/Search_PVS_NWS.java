@@ -778,9 +778,10 @@ public class Search_PVS_NWS extends SearchImpl {
 				&& isTTLowerBoundOrExact
 				&& isTTDepthEnoughForSingularExtension
 				&& env.getBitboard().isPossible(ttMove)
+				&& depth >= 2
 			) {
 			
-			int singular_margin = (int) (2 * depth);
+			int singular_margin = 16 + (int) (2 * depth);
 			int singular_beta = ttValue - singular_margin;
 			double singular_depth = depth / 2;
 			singular_depth = Math.max(1 , singular_depth / REDUCTION_AGGRESSIVENESS);
@@ -1316,7 +1317,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int beta, boolean isPv, int initialMaxDepth, int ttMove1, int eval) {
 		
 		
-		final long hashkey = getHashkeyTPT() ^ ttMove1;
+		final long hashkey = getHashkeyTPT() ^ Long.rotateLeft(((long) ttMove1) * 0x9E3779B97F4A7C15L, 32);
 		
 		int ttMove2 = 0; 
 				
