@@ -635,7 +635,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 					
 					
-			//Faild-high pruning
+			//Fail high pruning
 			if (ssi.static_eval >= beta + 35) {
 				
 				
@@ -701,7 +701,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
-			//Fail-low pruning
+			//Fail low pruning
 			if (ssi.static_eval <= alpha) {
 				
 				
