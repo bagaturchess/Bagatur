@@ -38,8 +38,8 @@ public class SortedMoveList_MVVLVASEECaptureHistory extends SortedMoveList_BaseI
 	@Override
 	protected int getOrderingValue(int move) {
 		
-		int score = 10000 * MoveUtil.getAttackedPieceIndex(move)
-			      - 1000  * MoveUtil.getSourcePieceIndex(move)
+		int score = 100000 * MoveUtil.getAttackedPieceIndex(move)
+			      - 10000  * MoveUtil.getSourcePieceIndex(move)
 			      + 10    * env.getBitboard().getSEEScore(move)
 			      + env.getCaptureHistory().getScores(-1, move);
 		
