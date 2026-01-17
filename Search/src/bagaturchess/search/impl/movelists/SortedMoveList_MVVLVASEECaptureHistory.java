@@ -40,7 +40,7 @@ public class SortedMoveList_MVVLVASEECaptureHistory extends SortedMoveList_BaseI
 		
 		int score = 10000 * MoveUtil.getAttackedPieceIndex(move)
 			      - 1000  * MoveUtil.getSourcePieceIndex(move)
-			      + 4     * env.getBitboard().getSEEScore(move)
+			      + 10    * env.getBitboard().getSEEScore(move)
 			      + env.getCaptureHistory().getScores(-1, move);
 		
 		return score;
