@@ -77,6 +77,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private static final int PROBCUT_MARGIN 						= 200;
 	
+	
 	private static final boolean VALIDATE_PV 						= false;
 	
 	
@@ -862,6 +863,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		IMoveList list1 			= lists_history[ply];
 		IMoveList list2 			= lists_attacks[ply];
+		list1.clear();
+		list2.clear();
+		
 		IMoveList list 				= null;
 		
 		int phase = PHASE_TT;
@@ -1377,6 +1381,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		IMoveList list1 			= lists_history[ply];
 		IMoveList list2 			= lists_attacks[ply];
+		list1.clear();
+		list2.clear();
+		
 		IMoveList list 				= null;
 		
 		int phase = PHASE_TT;
@@ -1690,11 +1697,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	    	return node.eval;
 	    }
 		
-		long hashkey = getHashkeyTPT();
+		long hashkey 	= getHashkeyTPT();
 		
 	    int ttFlag 		= -1;
 	    int ttValue 	= IEvaluator.MIN_EVAL;
-
+	    int ttMove 		= 0;
+	    
 		if (env.getTPT() != null) {
 			
 			env.getTPT().get(hashkey, tt_entries_per_ply[ply]);
@@ -1703,6 +1711,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				ttValue = tt_entries_per_ply[ply].getEval();
 				ttFlag = tt_entries_per_ply[ply].getFlag();
+				ttMove = tt_entries_per_ply[ply].getBestMove();
 				
 				if (!isPv && getSearchConfig().isOther_UseTPTScores()) {
 					
@@ -1767,13 +1776,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		/*if (eval + 100 + 2 * 900 < alpha) {
-			
-	    	node.eval = eval;
-			
-	    	return node.eval;
-		}*/
-		
 		int alphaOrig 	= alpha;
 		
 		alpha 			= Math.max(alpha, eval);
@@ -1782,23 +1784,45 @@ public class Search_PVS_NWS extends SearchImpl {
 		int bestScore 	= ISearch.MIN;
 		
 		IMoveList list 	= lists_attacks[ply];
+		list.clear();
 		
-		int phase 		= PHASE_ATTACKING_GOOD;
+		int phase 		= PHASE_TT;
 		
 		while (phase <= PHASE_ATTACKING_GOOD) {
 			
 			switch (phase) {
-			
-			case PHASE_ATTACKING_GOOD:
 				
-				list.clear();
-				env.getBitboard().genCapturePromotionMoves(list);
-				
-				break;
+				case PHASE_TT:
+					
+					if (ttMove != 0
+						&& env.getBitboard().isPossible(ttMove)
+						&& env.getBitboard().getMoveOps().isCaptureOrPromotion(ttMove)
+						) {
+						
+						list.clear();
+						list.reserved_add(ttMove);
+					}
+					
+					break;
+					
+				case PHASE_ATTACKING_GOOD:
+					
+					list.clear();
+					env.getBitboard().genCapturePromotionMoves(list);
+					
+					break;
 			}
 			
 			int move;
 			while ((move = list.next()) != 0) {
+				
+				
+				if (phase == PHASE_ATTACKING_GOOD
+						&& move == ttMove) {
+					
+					continue;
+				}
+				
 				
 				int see = env.getBitboard().getSEEScore(move);
 				
@@ -1807,10 +1831,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					continue;
 				}
 				
-				/*if (eval + 100 + 2 * see < alpha) {
-					
-					continue;
-				}*/
 				
 				env.getBitboard().makeMoveForward(move);
 				
