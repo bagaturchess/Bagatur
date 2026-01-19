@@ -788,7 +788,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			singular_depth = Math.max(1 , singular_depth / REDUCTION_AGGRESSIVENESS);
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, ply,
-					singular_depth, singular_beta - 1, singular_beta, false, initialMaxDepth, ttMove, ssi.static_eval);
+					singular_depth, singular_beta - 1, singular_beta, isPv, initialMaxDepth, ttMove, ssi.static_eval);
 			
 			//Singular extension - only ttMove has score above beta
 			if (singular_value < singular_beta) {
