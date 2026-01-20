@@ -1079,7 +1079,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				//Extensions
 				double new_depth;
 				
-				if (ply < 2 * initialMaxDepth) {
+				if (ply < 2 * initialMaxDepth && depth >= 2) {
 					
 					if (move == ttMove) {
 						
