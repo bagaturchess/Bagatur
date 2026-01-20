@@ -1189,7 +1189,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveBackward(move);
 				
 				
-				if (score >= beta && phase == PHASE_QUIET) {
+				if (bestScore != ISearch.MIN && score > bestScore && phase == PHASE_QUIET) {
 					
 					stats.addValue(list.getScore());
 				}
