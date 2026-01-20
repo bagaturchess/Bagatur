@@ -797,7 +797,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					tt_move_extension = 1;
 					
-					if (!isPv) {
+					/*if (!isPv) {
 						
 						if (singular_value < singular_beta - singular_margin) {
 							
@@ -808,7 +808,7 @@ public class Search_PVS_NWS extends SearchImpl {
 								tt_move_extension++;
 							}
 						}
-					}
+					}*/
 				}
 				
 			} else if (!isPv) {
@@ -1088,11 +1088,11 @@ public class Search_PVS_NWS extends SearchImpl {
 						//Extend TT move to end up with search (not qsearch).
 						//new_depth = Math.max(1, new_depth);
 						
-					} else if (mateThreat) {
+					} /*else if (mateThreat) {
 						
 						new_depth = depth;
 						
-					} /*else if (isQuiet) {
+					}*/ /*else if (isQuiet) {
 						
 						new_depth = depth - 1 + Math.max(-1, Math.min(1, list.getScore() / 1000));
 						
