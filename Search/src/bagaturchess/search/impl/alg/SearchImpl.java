@@ -254,6 +254,21 @@ public abstract class SearchImpl implements ISearch {
 	}
 	
 	
+	public boolean isRecaptureSameSquare(int move) {
+		
+		int lastMove = env.getBitboard().getLastMove();
+		
+		if (lastMove == 0) return false;
+	    
+		if (!env.getBitboard().getMoveOps().isCapture(lastMove)) return false;
+
+		if (!env.getBitboard().getMoveOps().isCapture(move)) return false;
+	    
+		return env.getBitboard().getMoveOps().getToFieldID(move)
+	    		== env.getBitboard().getMoveOps().getToFieldID(lastMove);
+	}
+	
+	
 	protected int roughEval(int depth, int rootColour) {
 		
 		throw new UnsupportedOperationException();
