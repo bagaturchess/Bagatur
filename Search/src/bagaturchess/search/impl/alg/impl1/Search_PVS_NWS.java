@@ -255,7 +255,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			//Build and sent minor info
 			info.setCurrentMove(move);
 			info.setCurrentMoveNumber((movesPerformed_attacks + movesPerformed_quiet + 1));
-			
+			mediator.changedMinor(info);
 			
 			boolean isCheckMove = env.getBitboard().isCheckMove(move);
 			
