@@ -255,7 +255,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			//Build and sent minor info
 			info.setCurrentMove(move);
 			info.setCurrentMoveNumber((movesPerformed_attacks + movesPerformed_quiet + 1));
-			mediator.changedMinor(info);
+			//mediator.changedMinor(info);
 			
 			boolean isCheckMove = env.getBitboard().isCheckMove(move);
 			
@@ -1783,7 +1783,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int bestMove 	= 0;
 		int bestScore 	= ISearch.MIN;
 		
-		IMoveList list 	= lists_attacks[ply];
+		IMoveList list 	= lists_attacks_qsearch[ply];
 		list.clear();
 		
 		int phase 		= PHASE_TT;

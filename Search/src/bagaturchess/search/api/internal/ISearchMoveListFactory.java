@@ -10,4 +10,5 @@ public interface ISearchMoveListFactory {
 	public IMoveList createListHistory(SearchEnv env, int ply, boolean onTheFlySorting);
 	public IMoveList createListStaticEval(SearchEnv env, int ply, boolean onTheFlySorting);
 	public IMoveList createListCaptures(SearchEnv env, boolean onTheFlySorting);
+	public IMoveList createListCapturesQSearch(SearchEnv env, boolean onTheFlySorting);
 }

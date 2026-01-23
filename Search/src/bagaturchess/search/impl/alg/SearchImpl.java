@@ -53,6 +53,7 @@ public abstract class SearchImpl implements ISearch {
 	protected IMoveList[] lists_history;
 	protected IMoveList[] lists_static_eval;
 	protected IMoveList[] lists_attacks;
+	protected IMoveList[] lists_attacks_qsearch;
 	
 	protected int[] buff_tpt_depthtracking 		= new int[1];
 	
@@ -118,6 +119,11 @@ public abstract class SearchImpl implements ISearch {
 		lists_attacks = new IMoveList[MAX_DEPTH];
 		for (int i=0; i<lists_attacks.length; i++) {
 			lists_attacks[i] = env.getMoveListFactory().createListCaptures(env, onTheFlySorting);
+		}
+		
+		lists_attacks_qsearch = new IMoveList[MAX_DEPTH];
+		for (int i=0; i<lists_attacks_qsearch.length; i++) {
+			lists_attacks_qsearch[i] = env.getMoveListFactory().createListCapturesQSearch(env, onTheFlySorting);
 		}
 		
 		for (int i=0; i<tt_entries_per_ply.length; i++) {
