@@ -1126,6 +1126,8 @@ public class Search_PVS_NWS extends SearchImpl {
 						reduction += 1;
 					}
 					
+					reduction *= (1 - Math.min(1, list.getScore() / stats.getEntropy()));
+					
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 				}
 				
@@ -1603,7 +1605,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 					
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
-					
 				}
 				
 				
