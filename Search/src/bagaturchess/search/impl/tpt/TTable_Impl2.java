@@ -27,13 +27,14 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
+import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.uci.api.ChannelManager;
 
 
 public class TTable_Impl2 implements ITTable {
 
 	
-	private static final int ALWAYS_REPLACE_DEPTH = -1;
+	private static final int ALWAYS_REPLACE_DEPTH = ISearch.MAX_DEPTH;
 	
 	
 	private static final int FLAG_SHIFT = 9;
