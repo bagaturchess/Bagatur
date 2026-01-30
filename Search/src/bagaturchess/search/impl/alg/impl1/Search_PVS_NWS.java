@@ -57,7 +57,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int PHASE_QUIET 							= 6;
 	private static final int PHASE_ATTACKING_BAD 					= 7;
 	
-	private static final double REDUCTION_AGGRESSIVENESS 			= 1.333;
+	private static final double REDUCTION_AGGRESSIVENESS 			= 1.555;
 	private static final double PRUNING_AGGRESSIVENESS 				= 1.333;
 	
 	private static final int FUTILITY_MAXDEPTH 						= 7; //MAX_DEPTH; //7;
