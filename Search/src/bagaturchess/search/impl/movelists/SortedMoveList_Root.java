@@ -100,7 +100,7 @@ public class SortedMoveList_Root extends SortedMoveList_BaseImpl {
 				
 			} else {
 				
-				ordval += -5000 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
+				ordval += -5000 * 100 + 100 * (MoveUtil.getAttackedPieceIndex(move) * 6 - MoveUtil.getSourcePieceIndex(move));
 			}
 		}
 		
