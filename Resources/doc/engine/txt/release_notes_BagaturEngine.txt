@@ -1,3 +1,9 @@
+ Version 5.4 (2 February 2026)
+ * Search adjustments:
+ * Use always replace strategy in Transposition Table
+ * Use quiet moves history scores for determining LMR depth
+ * Use capture history scores for sorting attacking moves during search
+
  Version 5.3 (13 July 2025)
  * Fix crash issue with SIMD lib (AVX2 and AVX512) when AVX is supported but not enabled on OS level
  * If the crash issue still persists you could delete /bin/VectorEval.dll for windows or /bin/libVectorEval.so for linux
