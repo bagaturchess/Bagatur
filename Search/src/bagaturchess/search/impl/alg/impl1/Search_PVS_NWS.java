@@ -787,7 +787,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			singular_depth = Math.max(1 , singular_depth / REDUCTION_AGGRESSIVENESS);
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, ply,
-					singular_depth, singular_beta - 1, singular_beta, isPv, initialMaxDepth, ttMove, ssi.static_eval);
+					singular_depth, singular_beta - 1, singular_beta, initialMaxDepth, ttMove, ssi.static_eval);
 			
 			//Singular extension - only ttMove has score above beta
 			if (singular_value < singular_beta) {
@@ -1319,7 +1319,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private int singular_move_search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator,
 			final int ply, double depth, int alpha,
-			int beta, boolean isPv, int initialMaxDepth, int ttMove1, int eval) {
+			int beta, int initialMaxDepth, int ttMove1, int eval) {
 		
 		
 		final long hashkey = getHashkeyTPT() ^ Long.rotateLeft(((long) ttMove1) * 0x9E3779B97F4A7C15L, 32);
@@ -1340,7 +1340,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (getSearchConfig().isOther_UseTPTScores()) {
 					
-					if (!isPv && tpt_depth >= depth) {
+					if (tpt_depth >= depth) {
 						
 						if (ttFlag == ITTEntry.FLAG_EXACT) {
 							
@@ -1379,6 +1379,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int bestMove 				= 0;
 		
 		int all_moves 				= 0;
+		int quiet_moves 			= 0;
 		
 		IMoveList list1 			= lists_history[ply];
 		IMoveList list2 			= lists_attacks[ply];
@@ -1533,9 +1534,14 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				all_moves++;
 				
+				if (phase == PHASE_QUIET) {
+					
+					quiet_moves++;
+				}
+						
 				
 				//Try only the first a few quiet moves in SME verification search
-				if (phase == PHASE_QUIET && all_moves > 8) {
+				if (phase == PHASE_QUIET && quiet_moves > 1 + depth / 2) {
 					
 					phase += 379;
 					
@@ -1543,8 +1549,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				if (!isPv
-						&& !wasInCheck
+				if (!wasInCheck
 						&& !isCheckMove
 						&& all_moves > 1
 						&& !SearchUtils.isMateVal(alpha)
@@ -1607,10 +1612,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					reduction = LMR_TABLE[(int) Math.min(depth, 63)][Math.min(all_moves, 63)];
 					
-					if (!isPv) {
-						
-						reduction += 1;
-					}
+					reduction += 1; // Not PV
 					
 					reduction = Math.min(depth - 1, Math.max(reduction, 1));
 				}
@@ -1627,15 +1629,11 @@ public class Search_PVS_NWS extends SearchImpl {
 						score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 					}
 					
-				} else if (!isPv || all_moves > 1) {
+				} else {
 					
 					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 				}
 				
-				if (isPv && (score > bestScore || all_moves == 1)) {
-					
-					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
-				}
 				
 				env.getBitboard().makeMoveBackward(move);
 				
