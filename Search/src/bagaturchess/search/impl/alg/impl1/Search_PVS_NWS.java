@@ -1534,6 +1534,15 @@ public class Search_PVS_NWS extends SearchImpl {
 				all_moves++;
 				
 				
+				//Try only the first a few quiet moves in SME verification search
+				if (phase == PHASE_QUIET && all_moves > 8) {
+					
+					phase += 379;
+					
+					break;
+				}
+				
+				
 				if (!isPv
 						&& !wasInCheck
 						&& !isCheckMove
