@@ -1379,7 +1379,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int bestMove 				= 0;
 		
 		int all_moves 				= 0;
-		int quiet_moves 			= 0;
+		int quiet_noncheck_moves 	= 0;
 		
 		IMoveList list1 			= lists_history[ply];
 		IMoveList list2 			= lists_attacks[ply];
@@ -1533,106 +1533,27 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				all_moves++;
-				
-				if (phase == PHASE_QUIET) {
-					
-					quiet_moves++;
-				}
 						
 				
 				//Try only the first a few quiet moves in SME verification search
-				if (phase == PHASE_QUIET && quiet_moves > 1 + depth / 2) {
-					
-					phase += 379;
-					
-					break;
-				}
+				//Don't skip moves giving check too.
+				final int quiet_limit = 1 + ((int) depth) / 2;
 				
-				
-				if (!wasInCheck
-						&& !isCheckMove
-						&& all_moves > 1
-						&& !SearchUtils.isMateVal(alpha)
-						&& !SearchUtils.isMateVal(beta)
-					) {
+				if (phase == PHASE_QUIET && !isCheckMove) {
 					
-					boolean hasAtLeastOnePiece = (colourToMove == Constants.COLOUR_WHITE) ?
-							env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
-							env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
-					
-					if (phase == PHASE_QUIET
-							&& list.getScore() <= stats.getEntropy()
-							) {
-						
-						if (all_moves >= (3 + depth * depth) / PRUNING_AGGRESSIVENESS) {
-							
-							continue;
-						}
-						
-						if (depth <= FUTILITY_MAXDEPTH
-								&& hasAtLeastOnePiece
-								&& eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
-							
-							continue;
-						}
-						
-						if (all_moves > 3
-								&& depth <= SEE_MAXDEPTH
-								&& hasAtLeastOnePiece
-								&& env.getBitboard().getSEEScore(move) < -SEE_MARGIN * depth / PRUNING_AGGRESSIVENESS) {
-							
-							continue;
-						}
-						
-					} else if (phase == PHASE_ATTACKING_BAD
-							&& depth <= SEE_MAXDEPTH
-							&& hasAtLeastOnePiece
-							&& env.getBitboard().getSEEScore(move) < -SEE_MARGIN * depth / PRUNING_AGGRESSIVENESS) {
-						
-						continue;
-					}
+					quiet_noncheck_moves++;
+				    
+				    if (quiet_noncheck_moves > quiet_limit) {
+				    	
+				        continue;
+				    }
 				}
 				
 				
 				env.getBitboard().makeMoveForward(move);
 				
 				
-				boolean isQuiet = !env.getBitboard().getMoveOps().isCaptureOrPromotion(move);
-				
-				boolean doLMR = depth >= 2
-						&& !wasInCheck
-						&& !isCheckMove
-						&& all_moves > 1
-						&& list.getScore() <= stats.getEntropy()
-						&& isQuiet;
-				
-				double reduction = 1;
-				
-				if (doLMR) {
-					
-					reduction = LMR_TABLE[(int) Math.min(depth, 63)][Math.min(all_moves, 63)];
-					
-					reduction += 1; // Not PV
-					
-					reduction = Math.min(depth - 1, Math.max(reduction, 1));
-				}
-				
-				
-				int score = ISearch.MIN;
-				
-				if (reduction > 1) {
-					
-					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
-					
-					if (score > alpha) {
-						
-						score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
-					}
-					
-				} else {
-					
-					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
-				}
+				int score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 				
 				
 				env.getBitboard().makeMoveBackward(move);
