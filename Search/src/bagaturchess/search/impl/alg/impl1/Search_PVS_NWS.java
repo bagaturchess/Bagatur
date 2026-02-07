@@ -799,16 +799,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (!isPv) {
 						
 						tt_move_extension += 1;
-						
-						/*if (singular_value < singular_beta - singular_margin) {
-							
-							tt_move_extension++;
-							
-							if (singular_value < singular_beta - 2 * singular_margin) {
-								
-								tt_move_extension++;
-							}
-						}*/
 					}
 				}
 				
