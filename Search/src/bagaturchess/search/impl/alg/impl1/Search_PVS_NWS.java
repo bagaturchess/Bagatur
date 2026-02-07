@@ -796,9 +796,11 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					tt_move_extension = 1;
 					
-					/*if (!isPv) {
+					if (!isPv) {
 						
-						if (singular_value < singular_beta - singular_margin) {
+						tt_move_extension += 1;
+						
+						/*if (singular_value < singular_beta - singular_margin) {
 							
 							tt_move_extension++;
 							
@@ -806,8 +808,8 @@ public class Search_PVS_NWS extends SearchImpl {
 								
 								tt_move_extension++;
 							}
-						}
-					}*/
+						}*/
+					}
 				}
 				
 			} else if (!isPv) {
