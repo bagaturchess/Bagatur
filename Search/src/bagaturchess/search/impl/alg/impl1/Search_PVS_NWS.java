@@ -787,7 +787,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			singular_depth = Math.max(1 , singular_depth / REDUCTION_AGGRESSIVENESS);
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, ply,
-					singular_depth, singular_beta - 1, singular_beta, initialMaxDepth, ttMove, ssi.static_eval);
+					singular_depth, singular_beta - 1, singular_beta, initialMaxDepth, ttMove);
 			
 			//Singular extension - only ttMove has score above beta
 			if (singular_value < singular_beta) {
@@ -1311,7 +1311,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private int singular_move_search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator,
 			final int ply, double depth, int alpha,
-			int beta, int initialMaxDepth, int ttMove1, int eval) {
+			int beta, int initialMaxDepth, int ttMove1) {
 		
 		
 		final long hashkey = getHashkeyTPT() ^ Long.rotateLeft(((long) ttMove1) * 0x9E3779B97F4A7C15L, 32);
@@ -1356,7 +1356,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		final boolean wasInCheck 	= env.getBitboard().isInCheck();
 		final int colourToMove 		= env.getBitboard().getColourToMove();
 		
 		
@@ -1370,7 +1369,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		int bestScore 				= ISearch.MIN;
 		int bestMove 				= 0;
 		
-		int all_moves 				= 0;
 		int quiet_noncheck_moves 	= 0;
 		
 		IMoveList list1 			= lists_history[ply];
@@ -1523,9 +1521,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				boolean isCheckMove = env.getBitboard().isCheckMove(move);
 				
-				
-				all_moves++;
-						
 				
 				//Try only the first a few quiet moves in SME verification search
 				//Don't skip moves giving check too.
