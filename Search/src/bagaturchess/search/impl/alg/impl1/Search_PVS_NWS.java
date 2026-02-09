@@ -1378,6 +1378,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		IMoveList list 				= null;
 		
+		final int quiet_limit 		= 1 + ((int) depth) / 2;
+		
+		
 		int phase = PHASE_TT;
 		while (phase <= PHASE_ATTACKING_BAD) {
 			
@@ -1523,9 +1526,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				//Try only the first a few quiet moves in SME verification search
-				//Don't skip moves giving check too.
-				final int quiet_limit = 1 + ((int) depth) / 2;
-				
+				//Don't skip moves giving check too.				
 				if (phase == PHASE_QUIET && !isCheckMove) {
 					
 					quiet_noncheck_moves++;
