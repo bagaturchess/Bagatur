@@ -733,6 +733,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			int prob_cut_beta = beta + PROBCUT_MARGIN;
 			
 			if (depth >= 3
+					&& isTTLowerBoundOrExact
 					&& ttValue >= prob_cut_beta) {
 				
 				IMoveList list = lists_attacks[ply];
@@ -743,6 +744,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				int move;
 				while ((move = list.next()) != 0)  {
+					
+					if (env.getBitboard().getSEEScore(move) < 0) {
+						
+						continue;
+					}
 					
 					env.getBitboard().makeMoveForward(move);
 					
@@ -758,7 +764,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (score >= prob_cut_beta) {
 						
-						node.bestmove = 0;
+						node.bestmove = move;
 						node.eval = score;
 						node.leaf = true;
 						node.type = PVNode.TYPE_PROBECUT;
