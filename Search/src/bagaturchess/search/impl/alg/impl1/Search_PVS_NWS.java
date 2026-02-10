@@ -660,7 +660,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 					env.getBitboard().makeNullMoveForward();
 					
-					double reduction = depth / 4 + 3 + Math.min((Math.max(0, ssi.static_eval - beta)) / 80, 3);
+					double reduction = depth / 3 + 3 + Math.min((Math.max(0, ssi.static_eval - beta)) / 80, 3);
 					reduction = reduction * REDUCTION_AGGRESSIVENESS;
 					
 					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, -beta, -beta + 1, ply + 1, false, initialMaxDepth)
