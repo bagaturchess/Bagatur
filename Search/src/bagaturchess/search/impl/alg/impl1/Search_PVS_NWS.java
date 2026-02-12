@@ -75,7 +75,8 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int SEE_MAXDEPTH 							= 7; //MAX_DEPTH; //8;
 	private static final int SEE_MARGIN 							= 80;
 	
-	private static final int PROBCUT_MARGIN 						= 200;
+	private static final int PROBCUT_MARGIN_BASE 					= 70;
+	private static final int PROBCUT_MARGIN_INCREMENT 				= 30;
 	
 	
 	private static final boolean VALIDATE_PV 						= false;
@@ -730,7 +731,8 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			//ProbeCut
-			int prob_cut_beta = beta + PROBCUT_MARGIN;
+			int prob_cut_margin = (int) Math.min(500, PROBCUT_MARGIN_BASE + depth * PROBCUT_MARGIN_INCREMENT);
+			int prob_cut_beta = beta + prob_cut_margin;
 			
 			if (depth >= 3
 					&& isTTLowerBoundOrExact
