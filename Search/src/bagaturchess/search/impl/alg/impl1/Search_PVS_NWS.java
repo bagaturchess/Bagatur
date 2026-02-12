@@ -742,7 +742,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				list.clear();
 				env.getBitboard().genCapturePromotionMoves(list);
 				
-				double prob_cut_depth = Math.max(0, depth - 5);
+				double prob_cut_depth = Math.max(1, depth / 2);
 				
 				int move;
 				while ((move = list.next()) != 0)  {
@@ -754,12 +754,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					env.getBitboard().makeMoveForward(move);
 					
-					int score = -qsearch(mediator, pvman, evaluator, info, -prob_cut_beta, -prob_cut_beta + 1, ply + 1, false, initialMaxDepth);
-					
-					if (score >= prob_cut_beta && prob_cut_depth > 0) {
-						
-						score = -search(mediator, info, pvman, evaluator, ply + 1, prob_cut_depth, -prob_cut_beta, -prob_cut_beta + 1, false, initialMaxDepth);
-					}
+					int score = -search(mediator, info, pvman, evaluator, ply + 1, prob_cut_depth, -prob_cut_beta, -prob_cut_beta + 1, false, initialMaxDepth);
 					
 					env.getBitboard().makeMoveBackward(move);
 					
