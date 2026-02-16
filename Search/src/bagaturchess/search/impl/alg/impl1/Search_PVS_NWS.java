@@ -785,7 +785,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			int singular_margin = 16 + (int) (2 * depth);
 			int singular_beta = ttValue - singular_margin;
-			double singular_depth = getSMEDepth(depth);
+			double singular_depth = depth / 2;
 			singular_depth = Math.max(1 , singular_depth / REDUCTION_AGGRESSIVENESS);
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, ply,
@@ -1920,11 +1920,5 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		return draw;
-	}
-	
-	
-	private int getSMEDepth(double depth) {
-		
-		return (int) (depth / 2);
 	}
 }
