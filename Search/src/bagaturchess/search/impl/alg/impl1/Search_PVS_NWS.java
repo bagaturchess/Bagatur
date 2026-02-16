@@ -531,7 +531,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				int tpt_depth = tt_entries_per_ply[ply].getDepth();
 				
 				isTTLowerBoundOrExact = ttFlag == ITTEntry.FLAG_LOWER || ttFlag == ITTEntry.FLAG_EXACT;
-				isTTDepthEnoughForSingularExtension = tpt_depth >= getSMEDepth(depth);
+				isTTDepthEnoughForSingularExtension = tpt_depth >= depth - 3;
 				
 				if (getSearchConfig().isOther_UseTPTScores()) {
 					
@@ -731,7 +731,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			//ProbeCut
-			int prob_cut_margin = (int) Math.min(500, PROBCUT_MARGIN_BASE + depth * PROBCUT_MARGIN_INCREMENT);
+			/*int prob_cut_margin = (int) Math.min(500, PROBCUT_MARGIN_BASE + depth * PROBCUT_MARGIN_INCREMENT);
 			int prob_cut_beta = beta + prob_cut_margin;
 			
 			if (depth >= 3
@@ -769,7 +769,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						return node.eval;
 					}
 				}
-			}
+			}*/
 		}
 		
 		
