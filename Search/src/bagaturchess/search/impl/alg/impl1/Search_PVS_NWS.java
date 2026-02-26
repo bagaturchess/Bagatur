@@ -1543,7 +1543,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(move);
 				
 				
-				int score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+				int score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, false, initialMaxDepth);
 				
 				
 				env.getBitboard().makeMoveBackward(move);
