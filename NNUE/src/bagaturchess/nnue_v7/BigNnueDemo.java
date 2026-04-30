@@ -23,11 +23,7 @@ public final class BigNnueDemo {
 		
         BigNnueNetwork net = new BigNnueNetwork(bitboard);
 		
-		NNUEProbeUtils.Input input = new NNUEProbeUtils.Input();
-		
-		NNUEProbeUtils.fillInput(bitboard, input);
-		
-        int eval = net.evaluateAdjusted(input);
+        int eval = net.evaluateAdjustedFast();
 
         System.out.println("description=" + net.description());
         System.out.println("fen=" + fen2);

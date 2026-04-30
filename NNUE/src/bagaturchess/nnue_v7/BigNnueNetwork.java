@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.nnue_v7.NNUEProbeUtils;
 
 public final class BigNnueNetwork {
 
@@ -41,12 +42,14 @@ public final class BigNnueNetwork {
     
     private IBitBoard bitboard;
     private Workspace workspace;
-    
+	private NNUEProbeUtils.Input input;
+	
     
     public BigNnueNetwork(IBitBoard _bitboard) {
     	
     	bitboard = _bitboard;
     	workspace = new Workspace();
+    	input = new NNUEProbeUtils.Input();
     }
     
     
@@ -54,23 +57,11 @@ public final class BigNnueNetwork {
         return DESCRIPTION;
     }
 
-    public int evaluate(NNUEProbeUtils.Input input) {
-        validateInput(input);
-        return evaluateInto(input, workspace, layerStackBucket(input), 0);
-    }
-
-    public int evaluateFast(NNUEProbeUtils.Input input, int pieceCount) {
-        return evaluateInto(input, workspace, bucketForPieceCount(pieceCount), 0);
-    }
-
-    public int evaluateAdjusted(NNUEProbeUtils.Input input) {
-        validateInput(input);
-        return evaluateInto(input, workspace, layerStackBucket(input), 1);
-    }
-
-    public int evaluateAdjustedFast(NNUEProbeUtils.Input input) {
+    public int evaluateAdjustedFast() {
     	
     	int pieceCount = bitboard.getMaterialState().getPiecesCount();
+    	
+    	NNUEProbeUtils.fillInput(bitboard, input);
     	
         return evaluateInto(input, workspace, bucketForPieceCount(pieceCount), 1);
     }

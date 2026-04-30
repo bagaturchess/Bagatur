@@ -16,8 +16,6 @@ public class NNUEEvaluator extends BaseEvaluator {
 	
 	private IBitBoard bitboard;
 	
-	private NNUEProbeUtils.Input input;
-	
 	private BigNnueNetwork nnue;
 	
 	
@@ -26,8 +24,6 @@ public class NNUEEvaluator extends BaseEvaluator {
 		super(_bitboard, _evalCache, _evalConfig);
 		
 		bitboard = _bitboard;
-		
-		input = new NNUEProbeUtils.Input();
 			
 		nnue = new BigNnueNetwork(bitboard);
 	}
@@ -43,9 +39,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 	@Override
 	protected int phase1() {
 		
-		NNUEProbeUtils.fillInput(bitboard, input);
-		
-		int eval = nnue.evaluateAdjustedFast(input);
+		int eval = nnue.evaluateAdjustedFast();
 		
 		int actualWhitePlayerEval = eval;
 		
