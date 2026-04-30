@@ -1,55 +1,13 @@
 package bagaturchess.nnue_v7;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
 
-/**
- * Java 8, scalar, no-incremental BIG NNUE port based on the uploaded older Stockfish code.
- *
- * Further optimized variant:
- * - evaluate()/evaluateAdjusted() do NOT allocate EvalTrace
- * - optional explicit Workspace API to avoid ThreadLocal.get() in hot path
- * - only selected PSQT bucket is accumulated
- * - precomputed feature index table
- * - specialized hot loops for FC0 (16 outputs) and FC2 (32 inputs)
- */
 public final class BigNnueNetwork {
 	
-
-    public static final class EvalTrace {
-        public final int bucket;
-        public final int psqtInternal;
-        public final int positionalInternal;
-        public final int rawInternal;
-        public final int value;
-        public final int adjustedValue;
-        public final int complexity;
-
-        EvalTrace(int bucket, int psqtInternal, int positionalInternal, int rawInternal, int value, int adjustedValue, int complexity) {
-            this.bucket = bucket;
-            this.psqtInternal = psqtInternal;
-            this.positionalInternal = positionalInternal;
-            this.rawInternal = rawInternal;
-            this.value = value;
-            this.adjustedValue = adjustedValue;
-            this.complexity = complexity;
-        }
-
-        @Override
-        public String toString() {
-            return "EvalTrace{" +
-                    "bucket=" + bucket +
-                    ", psqtInternal=" + psqtInternal +
-                    ", positionalInternal=" + positionalInternal +
-                    ", rawInternal=" + rawInternal +
-                    ", value=" + value +
-                    ", adjustedValue=" + adjustedValue +
-                    ", complexity=" + complexity +
-                    '}';
-        }
-    }
 
     private static final int VERSION = 0x7AF32F20;
     private static final int OUTPUT_SCALE = 16;
@@ -66,12 +24,14 @@ public final class BigNnueNetwork {
 
     private final FeatureTransformer featureTransformer = new FeatureTransformer(TRANSFORMED_DIMS);
     private final Architecture[] stacks = new Architecture[LAYER_STACKS];
+    
     private final ThreadLocal<Workspace> workspaces = new ThreadLocal<Workspace>() {
         @Override
         protected Workspace initialValue() {
             return new Workspace();
         }
     };
+    
     private String description;
 
     private BigNnueNetwork() {
@@ -131,20 +91,6 @@ public final class BigNnueNetwork {
     /** Unsafe hottest path: no validation, no trace allocation, caller provides pieceCount. */
     public int evaluateAdjustedFast(NNUEProbeUtils.Input input, int pieceCount, Workspace ws) {
         return evaluateInto(input, ws, bucketForPieceCount(pieceCount), 1);
-    }
-
-    public EvalTrace trace(NNUEProbeUtils.Input input) {
-        validateInput(input);
-        Workspace ws = workspaces.get();
-        int bucket = layerStackBucket(input);
-        int psqtInternal = featureTransformer.transformFromScratch(input, ws.transformed, bucket, ws);
-        int positionalInternal = stacks[bucket].propagate(ws.transformed, ws);
-        int rawInternal = psqtInternal + positionalInternal;
-        int complexity = Math.abs(psqtInternal - positionalInternal) / OUTPUT_SCALE;
-        int value = rawInternal / OUTPUT_SCALE;
-        int adjustedValue = ((1024 - DELTA) * psqtInternal + (1024 + DELTA) * positionalInternal)
-                / (1024 * OUTPUT_SCALE);
-        return new EvalTrace(bucket, psqtInternal, positionalInternal, rawInternal, value, adjustedValue, complexity);
     }
 
     private int evaluateInto(NNUEProbeUtils.Input input, Workspace ws, int bucket, int mode) {

@@ -1,8 +1,6 @@
 package bagaturchess.nnue_v7;
 
-/**
- * Exact HalfKAv2_hm feature indexing from the uploaded older Stockfish-based code.
- */
+
 final class HalfKAv2FeatureSet {
     static final int HASH_VALUE = 0x7f234cb8;
 
