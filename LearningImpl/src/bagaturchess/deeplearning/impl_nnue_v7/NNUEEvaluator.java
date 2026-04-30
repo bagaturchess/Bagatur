@@ -39,7 +39,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 	@Override
 	protected int phase1() {
 		
-		int eval = nnue.evaluateAdjustedFast();
+		int eval = nnue.evaluate();
 		
 		int actualWhitePlayerEval = eval;
 		

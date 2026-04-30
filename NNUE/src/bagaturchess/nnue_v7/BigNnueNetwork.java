@@ -3,11 +3,15 @@ package bagaturchess.nnue_v7;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import bagaturchess.bitboard.api.IBitBoard;
-import bagaturchess.nnue_v7.NNUEProbeUtils;
+import bagaturchess.bitboard.common.MoveListener;
+import bagaturchess.bitboard.impl.Constants;
 
 public final class BigNnueNetwork {
+
+    private static final boolean DO_INCREMENTAL_UPDATES = true;
 
     private static final int VERSION = 0x7AF32F20;
     private static final int OUTPUT_SCALE = 16;
@@ -38,36 +42,64 @@ public final class BigNnueNetwork {
             throw new ExceptionInInitializerError(e);
         }
     }
-    
-    
-    private IBitBoard bitboard;
-    private Workspace workspace;
-	private NNUEProbeUtils.Input input;
-	
-    
+
+    private final IBitBoard bitboard;
+    private final Workspace workspace;
+    private final NNUEProbeUtils.Input input;
+
+    private IncrementalUpdates incremental_updates;
+    private DirtyPieces dirtyPieces;
+
     public BigNnueNetwork(IBitBoard _bitboard) {
-    	
-    	bitboard = _bitboard;
-    	workspace = new Workspace();
-    	input = new NNUEProbeUtils.Input();
+        bitboard = _bitboard;
+        workspace = new Workspace();
+        input = new NNUEProbeUtils.Input();
+
+        if (DO_INCREMENTAL_UPDATES) {
+            dirtyPieces = new DirtyPieces();
+            incremental_updates = new IncrementalUpdates(bitboard);
+            bitboard.addMoveListener(incremental_updates);
+        }
     }
-    
-    
+
     public String description() {
         return DESCRIPTION;
     }
 
-    public int evaluateAdjustedFast() {
-    	
-    	int pieceCount = bitboard.getMaterialState().getPiecesCount();
-    	
-    	NNUEProbeUtils.fillInput(bitboard, input);
-    	
-        return evaluateInto(input, workspace, bucketForPieceCount(pieceCount), 1);
-    }
+    /** Incremental path with full-refresh fallback. */
+    public int evaluate() {
+        int pieceCount = bitboard.getMaterialState().getPiecesCount();
+        int bucket = bucketForPieceCount(pieceCount);
 
-    private static int evaluateInto(NNUEProbeUtils.Input input, Workspace ws, int bucket, int mode) {
-        int psqtInternal = FEATURE_TRANSFORMER.transformFromScratch(input, ws.transformed, bucket, ws);
+        if (!DO_INCREMENTAL_UPDATES) {
+            NNUEProbeUtils.fillInput(bitboard, input);
+            //validateInput(input);
+
+            FEATURE_TRANSFORMER.refreshFromScratch(input, workspace);
+            workspace.accumulatorsValid = true;
+            return evaluateFromAccumulators(input.color, workspace, bucket, 1);
+        }
+
+        if (incremental_updates.must_refresh || !workspace.accumulatorsValid) {
+            NNUEProbeUtils.fillInput(bitboard, input);
+            //validateInput(input);
+
+            FEATURE_TRANSFORMER.refreshFromScratch(input, workspace);
+            workspace.accumulatorsValid = true;
+        } else {
+            input.color = NNUEProbeUtils.convertColor(bitboard.getColourToMove());
+            FEATURE_TRANSFORMER.updateAccumulatorsFromDirty(dirtyPieces, workspace);
+        }
+
+        int eval = evaluateFromAccumulators(input.color, workspace, bucket, 1);
+        
+        incremental_updates.reset();
+        
+        return eval;
+    }
+    
+    private static int evaluateFromAccumulators(int stm, Workspace ws, int bucket, int mode) {
+        int psqtInternal = FEATURE_TRANSFORMER.transformFromAccumulators(stm, ws.transformed, bucket, ws);
         int positionalInternal = STACKS[bucket].propagate(ws.transformed, ws);
 
         if (mode == 0) {
@@ -229,8 +261,17 @@ public final class BigNnueNetwork {
 
     public static final class Workspace {
         final byte[] transformed = new byte[TRANSFORMED_DIMS];
+
         final short[] accWhite = new short[TRANSFORMED_DIMS];
         final short[] accBlack = new short[TRANSFORMED_DIMS];
+
+        final int[] psqtWhite = new int[PSQT_BUCKETS];
+        final int[] psqtBlack = new int[PSQT_BUCKETS];
+
+        int whiteKingSquare = -1;
+        int blackKingSquare = -1;
+        boolean accumulatorsValid;
+
         final int[] fc0Out = new int[L2 + 1];
         final byte[] sqr0 = new byte[L2];
         final byte[] relu0 = new byte[L2];
@@ -272,24 +313,25 @@ public final class BigNnueNetwork {
             System.arraycopy(p, 0, psqtWeights, 0, p.length);
         }
 
-        int transformFromScratch(NNUEProbeUtils.Input input, byte[] output, int bucket, Workspace ws) {
+        void refreshFromScratch(NNUEProbeUtils.Input input, Workspace ws) {
             System.arraycopy(biases, 0, ws.accWhite, 0, transformedDims);
             System.arraycopy(biases, 0, ws.accBlack, 0, transformedDims);
+            Arrays.fill(ws.psqtWhite, 0);
+            Arrays.fill(ws.psqtBlack, 0);
 
-            final int whiteKingSquare = input.squares[0];
-            final int blackKingSquare = input.squares[1];
+            ws.whiteKingSquare = input.squares[0];
+            ws.blackKingSquare = input.squares[1];
+
             final int[] pieces = input.pieces;
             final int[] squares = input.squares;
+
             final short[] accW = ws.accWhite;
             final short[] accB = ws.accBlack;
             final short[] localWeights = weights;
             final int[] localPsqtWeights = psqtWeights;
 
-            int psqtW = 0;
-            int psqtB = 0;
-
-            final int[] lutW = HalfKAv2FeatureSet.FEATURE_INDEX[0][whiteKingSquare];
-            final int[] lutB = HalfKAv2FeatureSet.FEATURE_INDEX[1][blackKingSquare];
+            final int[] lutW = HalfKAv2FeatureSet.FEATURE_INDEX[0][ws.whiteKingSquare];
+            final int[] lutB = HalfKAv2FeatureSet.FEATURE_INDEX[1][ws.blackKingSquare];
 
             for (int i = 0; i < pieces.length; i++) {
                 final int piece = pieces[i];
@@ -301,21 +343,46 @@ public final class BigNnueNetwork {
                 final int pieceSquare = (piece << 6) | square;
 
                 final int indexW = lutW[pieceSquare];
-                final int offsetW = weightOffsets[indexW];
-                addFeature(localWeights, offsetW, accW, transformedDims);
-                psqtW += localPsqtWeights[indexW * PSQT_BUCKETS + bucket];
-
                 final int indexB = lutB[pieceSquare];
-                final int offsetB = weightOffsets[indexB];
-                addFeature(localWeights, offsetB, accB, transformedDims);
-                psqtB += localPsqtWeights[indexB * PSQT_BUCKETS + bucket];
+
+                addFeature(localWeights, weightOffsets[indexW], accW, transformedDims);
+                addFeature(localWeights, weightOffsets[indexB], accB, transformedDims);
+
+                final int psqtBaseW = indexW * PSQT_BUCKETS;
+                final int psqtBaseB = indexB * PSQT_BUCKETS;
+
+                for (int b = 0; b < PSQT_BUCKETS; b++) {
+                    ws.psqtWhite[b] += localPsqtWeights[psqtBaseW + b];
+                    ws.psqtBlack[b] += localPsqtWeights[psqtBaseB + b];
+                }
             }
+        }
 
-            final int stm = input.color;
-            final int psqt = ((stm == 0 ? psqtW - psqtB : psqtB - psqtW)) / 2;
+        void updateAccumulatorsFromDirty(DirtyPieces dirty, Workspace ws) {
+            final int[] lutW = HalfKAv2FeatureSet.FEATURE_INDEX[0][ws.whiteKingSquare];
+            final int[] lutB = HalfKAv2FeatureSet.FEATURE_INDEX[1][ws.blackKingSquare];
 
-            final short[] first = (stm == 0 ? accW : accB);
-            final short[] second = (stm == 0 ? accB : accW);
+            for (int i = 0; i < dirty.dirtyNum; i++) {
+                final int piece = dirty.pc[i];
+
+                final int from = dirty.from[i];
+                if (from < 64) {
+                    applyDelta(piece, from, -1, lutW, lutB, ws);
+                }
+
+                final int to = dirty.to[i];
+                if (to < 64) {
+                    applyDelta(piece, to, +1, lutW, lutB, ws);
+                }
+            }
+        }
+
+        int transformFromAccumulators(int stm, byte[] output, int bucket, Workspace ws) {
+            final int psqt = ((stm == 0 ? ws.psqtWhite[bucket] - ws.psqtBlack[bucket]
+                                        : ws.psqtBlack[bucket] - ws.psqtWhite[bucket])) / 2;
+
+            final short[] first = (stm == 0 ? ws.accWhite : ws.accBlack);
+            final short[] second = (stm == 0 ? ws.accBlack : ws.accWhite);
 
             for (int j = 0; j < HALF_DIMS; j++) {
                 int sum0 = clamp(first[j], 0, 127);
@@ -332,6 +399,39 @@ public final class BigNnueNetwork {
             return psqt;
         }
 
+        private void applyDelta(int piece, int square, int sign, int[] lutW, int[] lutB, Workspace ws) {
+            final int pieceSquare = (piece << 6) | square;
+
+            final int indexW = lutW[pieceSquare];
+            final int indexB = lutB[pieceSquare];
+
+            final int offsetW = weightOffsets[indexW];
+            final int offsetB = weightOffsets[indexB];
+
+            if (sign > 0) {
+                addFeature(weights, offsetW, ws.accWhite, transformedDims);
+                addFeature(weights, offsetB, ws.accBlack, transformedDims);
+            } else {
+                subFeature(weights, offsetW, ws.accWhite, transformedDims);
+                subFeature(weights, offsetB, ws.accBlack, transformedDims);
+            }
+
+            final int psqtBaseW = indexW * PSQT_BUCKETS;
+            final int psqtBaseB = indexB * PSQT_BUCKETS;
+
+            if (sign > 0) {
+                for (int b = 0; b < PSQT_BUCKETS; b++) {
+                    ws.psqtWhite[b] += psqtWeights[psqtBaseW + b];
+                    ws.psqtBlack[b] += psqtWeights[psqtBaseB + b];
+                }
+            } else {
+                for (int b = 0; b < PSQT_BUCKETS; b++) {
+                    ws.psqtWhite[b] -= psqtWeights[psqtBaseW + b];
+                    ws.psqtBlack[b] -= psqtWeights[psqtBaseB + b];
+                }
+            }
+        }
+
         private static void addFeature(short[] w, int offset, short[] acc, int len) {
             int j = 0;
             for (; j + 7 < len; j += 8) {
@@ -346,6 +446,23 @@ public final class BigNnueNetwork {
             }
             for (; j < len; j++) {
                 acc[j] = (short) (acc[j] + w[offset + j]);
+            }
+        }
+
+        private static void subFeature(short[] w, int offset, short[] acc, int len) {
+            int j = 0;
+            for (; j + 7 < len; j += 8) {
+                acc[j    ] = (short) (acc[j    ] - w[offset + j    ]);
+                acc[j + 1] = (short) (acc[j + 1] - w[offset + j + 1]);
+                acc[j + 2] = (short) (acc[j + 2] - w[offset + j + 2]);
+                acc[j + 3] = (short) (acc[j + 3] - w[offset + j + 3]);
+                acc[j + 4] = (short) (acc[j + 4] - w[offset + j + 4]);
+                acc[j + 5] = (short) (acc[j + 5] - w[offset + j + 5]);
+                acc[j + 6] = (short) (acc[j + 6] - w[offset + j + 6]);
+                acc[j + 7] = (short) (acc[j + 7] - w[offset + j + 7]);
+            }
+            for (; j < len; j++) {
+                acc[j] = (short) (acc[j] - w[offset + j]);
             }
         }
     }
@@ -558,5 +675,183 @@ public final class BigNnueNetwork {
 
     private static int ceil(int n, int base) {
         return ((n + base - 1) / base) * base;
+    }
+
+    private final class IncrementalUpdates implements MoveListener {
+
+        private final IBitBoard bitboard;
+        private boolean must_refresh;
+        private int capture_marker;
+        private int promotion_marker;
+
+        IncrementalUpdates(IBitBoard _bitboard) {
+            bitboard = _bitboard;
+            must_refresh = true;
+            capture_marker = 64;
+            promotion_marker = 128;
+        }
+
+        int all;
+        int refreshes;
+
+        void reset() {
+            all++;
+            if (must_refresh) {
+                refreshes++;
+            }
+
+            must_refresh = false;
+            dirtyPieces.dirtyNum = 0;
+            capture_marker = 64;
+            promotion_marker = 128;
+        }
+
+        public final void preForwardMove(int color, int move) {
+        }
+
+        public final void postForwardMove(int color, int move) {
+            if (2 * dirtyPieces.dirtyNum >= bitboard.getMaterialState().getPiecesCount()) {
+                must_refresh = true;
+            }
+
+            if (must_refresh) {
+                return;
+            }
+
+            int pieceType = bitboard.getMoveOps().getFigureType(move);
+            int fromFieldID = bitboard.getMoveOps().getFromFieldID(move);
+            int toFieldID = bitboard.getMoveOps().getToFieldID(move);
+
+            if (pieceType == Constants.TYPE_KING
+                    || bitboard.getMoveOps().isCastling(move)
+                    || bitboard.getMoveOps().isEnpassant(move)) {
+
+                must_refresh = true;
+
+            } else {
+                color = NNUEProbeUtils.convertColor(color);
+                int piece = NNUEProbeUtils.convertPiece(pieceType, color);
+                int square_from = NNUEProbeUtils.convertSquare(fromFieldID);
+                int square_to = NNUEProbeUtils.convertSquare(toFieldID);
+
+                addDirtyPiece(color, piece, square_from, square_to);
+
+                if (bitboard.getMoveOps().isCapture(move)) {
+                    int color_op = 1 - color;
+                    int piece_captured = bitboard.getMoveOps().getCapturedFigureType(move);
+                    piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color_op);
+                    addDirtyPiece(color_op, piece_captured, square_to, capture_marker++);
+                }
+
+                if (bitboard.getMoveOps().isPromotion(move)) {
+                    int piece_promoted = bitboard.getMoveOps().getPromotionFigureType(move);
+                    piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
+
+                    addDirtyPiece(color, piece_promoted, promotion_marker, square_to);
+                    addDirtyPiece(color, piece, square_to, promotion_marker);
+                    promotion_marker++;
+                }
+            }
+        }
+
+        public final void preBackwardMove(int color, int move) {
+        }
+
+        public final void postBackwardMove(int color, int move) {
+            if (2 * dirtyPieces.dirtyNum >= bitboard.getMaterialState().getPiecesCount()) {
+                must_refresh = true;
+            }
+
+            if (must_refresh) {
+                return;
+            }
+
+            int pieceType = bitboard.getMoveOps().getFigureType(move);
+            int fromFieldID = bitboard.getMoveOps().getFromFieldID(move);
+            int toFieldID = bitboard.getMoveOps().getToFieldID(move);
+
+            if (pieceType == Constants.TYPE_KING
+                    || bitboard.getMoveOps().isCastling(move)
+                    || bitboard.getMoveOps().isEnpassant(move)) {
+
+                must_refresh = true;
+
+            } else {
+                color = NNUEProbeUtils.convertColor(color);
+                int piece = NNUEProbeUtils.convertPiece(pieceType, color);
+                int square_from = NNUEProbeUtils.convertSquare(fromFieldID);
+                int square_to = NNUEProbeUtils.convertSquare(toFieldID);
+
+                addDirtyPiece(color, piece, square_to, square_from);
+
+                if (bitboard.getMoveOps().isCapture(move)) {
+                    int op_color = 1 - color;
+                    int piece_captured = bitboard.getMoveOps().getCapturedFigureType(move);
+                    piece_captured = NNUEProbeUtils.convertPiece(piece_captured, op_color);
+                    addDirtyPiece(op_color, piece_captured, capture_marker++, square_to);
+                }
+
+                if (bitboard.getMoveOps().isPromotion(move)) {
+                    int piece_promoted = bitboard.getMoveOps().getPromotionFigureType(move);
+                    piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
+
+                    addDirtyPiece(color, piece_promoted, square_to, promotion_marker);
+                    addDirtyPiece(color, piece, promotion_marker, square_to);
+                    promotion_marker++;
+                }
+            }
+        }
+
+        private void addDirtyPiece(int color, int piece, int square_remove, int square_add) {
+            DirtyPieces dirty_pieces = dirtyPieces;
+
+            int index = 0;
+            if (square_remove < 64 && square_add < 64) {
+                for (int i = 0; i < dirty_pieces.dirtyNum; i++) {
+                    if (piece == dirty_pieces.pc[i] && color == dirty_pieces.c[i]) {
+                        if (square_remove == dirty_pieces.to[i]) {
+                            break;
+                        }
+                    }
+                    index++;
+                }
+            } else {
+                index = dirty_pieces.dirtyNum;
+            }
+
+            if (index < dirty_pieces.dirtyNum) {
+                if (dirty_pieces.c[index] != color) {
+                    throw new IllegalStateException("dirty_pieces.c[index]=" + dirty_pieces.c[index] + ", color=" + color);
+                }
+
+                if (dirty_pieces.to[index] != square_remove) {
+                    throw new IllegalStateException("dirty_pieces.to[index]=" + dirty_pieces.to[index]
+                            + ", square_from=" + square_remove + ", piece=" + piece);
+                }
+
+                dirty_pieces.to[index] = square_add;
+
+            } else {
+                dirty_pieces.dirtyNum++;
+                dirty_pieces.c[index] = color;
+                dirty_pieces.pc[index] = piece;
+                dirty_pieces.from[index] = square_remove;
+                dirty_pieces.to[index] = square_add;
+            }
+        }
+
+        public final void addPiece_Special(int color, int type) {
+        }
+
+        public final void initially_addPiece(int color, int type, long bb_pieces) {
+        }
+    }
+
+    private static final class DirtyPieces {
+        int dirtyNum;
+        int[] c = new int[300];
+        int[] pc = new int[300];
+        int[] from = new int[300];
+        int[] to = new int[300];
     }
 }

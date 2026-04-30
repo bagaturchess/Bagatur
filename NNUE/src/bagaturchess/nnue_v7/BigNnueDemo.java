@@ -1,11 +1,13 @@
 package bagaturchess.nnue_v7;
 
-import java.io.File;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.api.IBitBoard;
 
+
 public final class BigNnueDemo {
+	
+	
     public static void main(String[] args) throws Exception {
 
 		String fen0 = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -23,9 +25,8 @@ public final class BigNnueDemo {
 		
         BigNnueNetwork net = new BigNnueNetwork(bitboard);
 		
-        int eval = net.evaluateAdjustedFast();
+        int eval = net.evaluate();
 
-        System.out.println("description=" + net.description());
         System.out.println("fen=" + fen2);
         System.out.println(eval);
     }
