@@ -19,9 +19,9 @@ public final class BigNnueDemo {
 		String fen8 = "4kr2/8/8/8/8/8/8/3K4 w - - 0 1";
 		String fen9 = "4k3/8/8/8/8/8/3Q4/4K3 w - - 0 1";
 		
-        BigNnueNetwork net = BigNnueNetwork.load(new File("./nn-b1a57edbea57.nnue"));
-        
 		IBitBoard bitboard = BoardUtils.createBoard_WithPawnsCache(fen0);
+		
+        BigNnueNetwork net = new BigNnueNetwork(bitboard);
 		
 		NNUEProbeUtils.Input input = new NNUEProbeUtils.Input();
 		

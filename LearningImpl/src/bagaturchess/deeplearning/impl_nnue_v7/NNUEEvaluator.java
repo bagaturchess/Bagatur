@@ -3,9 +3,6 @@ package bagaturchess.deeplearning.impl_nnue_v7;
 
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 
-import java.io.File;
-import java.io.IOException;
-
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.nnue_v7.BigNnueNetwork;
 import bagaturchess.nnue_v7.NNUEProbeUtils;
@@ -23,8 +20,6 @@ public class NNUEEvaluator extends BaseEvaluator {
 	
 	private BigNnueNetwork nnue;
 	
-	private BigNnueNetwork.Workspace ws;
-	
 	
 	NNUEEvaluator(IBitBoard _bitboard, IEvalCache _evalCache, IEvalConfig _evalConfig) {
 		
@@ -33,17 +28,8 @@ public class NNUEEvaluator extends BaseEvaluator {
 		bitboard = _bitboard;
 		
 		input = new NNUEProbeUtils.Input();
-		
-		try {
 			
-			nnue = BigNnueNetwork.load(new File("./nn-b1a57edbea57.nnue"));
-		
-			ws = nnue.newWorkspace();
-			
-		} catch (IOException e) {
-			
-			throw new RuntimeException(e);
-		}
+		nnue = new BigNnueNetwork(bitboard);
 	}
 	
 	
@@ -59,9 +45,7 @@ public class NNUEEvaluator extends BaseEvaluator {
 		
 		NNUEProbeUtils.fillInput(bitboard, input);
 		
-		int pieceCount = bitboard.getMaterialState().getPiecesCount();
-		
-		int eval = nnue.evaluateAdjustedFast(input, pieceCount, ws);
+		int eval = nnue.evaluateAdjustedFast(input);
 		
 		int actualWhitePlayerEval = eval;
 		
