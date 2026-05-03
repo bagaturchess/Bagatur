@@ -1,3 +1,6 @@
+ Version 5.5 (3 May 2026)
+ * Upgrade to Java 17, because of Vector API usage for NNUE inference code
+ 
  Version 5.4 (2 February 2026)
  * Search adjustments:
  * Use always replace strategy in Transposition Table

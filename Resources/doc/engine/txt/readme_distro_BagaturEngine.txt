@@ -5,7 +5,7 @@ As a chess player, I want to play chess against a computer program (chess engine
 How-to:
 1. Download an arbitrary UCI user interface. For example the most popular one is Arena - http://www.playwitharena.com/, https://cutechess.com/
 2. Install the UCI user interface on your computer.
-3. Ensure that the Java Runtime Environment (JRE) 1.8 or later is installed on your computer (it should be the case nowadays but if not, have in mind that JRE is required, only JDK doesn't work). It could be downloaded from java.com.
+3. Ensure that the Java Runtime Environment (JRE) 17 or later is installed on your computer (it should be the case nowadays but if not, have in mind that JRE is required, only JDK doesn't work with the exe runner). It could be downloaded from java.com.
 4. Download and unpack this Bagatur's distribution somewhere (Arena has a sub-folder called 'engines', you can extract it there).
 6. Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway). There is still win32 version, but migrating to and using win64 is recommended.
 7. Enjoy the match(s) :-)
