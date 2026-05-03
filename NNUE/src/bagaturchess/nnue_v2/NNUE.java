@@ -8,6 +8,11 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import jdk.incubator.vector.IntVector;
+import jdk.incubator.vector.ShortVector;
+import jdk.incubator.vector.VectorOperators;
+import jdk.incubator.vector.VectorSpecies;
+
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.impl.Constants;
@@ -49,27 +54,15 @@ public class NNUE {
 	private static final int QA = 255;
 	private static final int QB = 64;
 
+	private static final VectorSpecies<Short> SHORT_SPECIES = ShortVector.SPECIES_PREFERRED;
+	private static final VectorSpecies<Integer> INT_SPECIES = SHORT_SPECIES.withLanes(int.class);
+
 	private static short[][] L1Weights;
 	private static short[] L1Biases;
 	private static short[][] L2Weights;
 	private static short outputBiases[];
 	
-	private static boolean AVX512_SUPPORT;
-	private static boolean AVX2_SUPPORT;
-	
 	static {
-		
-		try {
-			
-			AVX512_SUPPORT 	= JNIUtils.isAVX512Supported();
-			AVX2_SUPPORT 	= JNIUtils.isAVX2Supported();
-			
-		} catch (UnsatisfiedLinkError e) {
-			
-			//The vectorized lib is not available
-		}
-		
-		if (ChannelManager.getChannel() != null) ChannelManager.getChannel().dump("AVX512_SUPPORT=" + AVX512_SUPPORT + ", AVX2_SUPPORT=" + AVX2_SUPPORT);
 		
 		try {
 			
@@ -238,18 +231,33 @@ public class NNUE {
 			
 			int index_to_remove = dirtyPieces.from[i];
 			
-			if (dirtyPieces.from[i] < 64) {//>=64 marks no entry e.g. during capture or promotion
-				
-				accumulators.getWhiteAccumulator().sub(getIndex(index_to_remove, piece_color, piece, WHITE));
-				accumulators.getBlackAccumulator().sub(getIndex(index_to_remove, piece_color, piece, BLACK));
-			}
-			
 			int index_to_add = dirtyPieces.to[i];
 			
-			if (dirtyPieces.to[i] < 64) {
+			if (index_to_remove < 64 && index_to_add < 64) {
 				
-				accumulators.getWhiteAccumulator().add(getIndex(index_to_add, piece_color, piece, WHITE));
-				accumulators.getBlackAccumulator().add(getIndex(index_to_add, piece_color, piece, BLACK));
+				accumulators.getWhiteAccumulator().addSub(
+						getIndex(index_to_add, piece_color, piece, WHITE),
+						getIndex(index_to_remove, piece_color, piece, WHITE)
+				);
+				
+				accumulators.getBlackAccumulator().addSub(
+						getIndex(index_to_add, piece_color, piece, BLACK),
+						getIndex(index_to_remove, piece_color, piece, BLACK)
+				);
+				
+			} else {
+				
+				if (dirtyPieces.from[i] < 64) {//>=64 marks no entry e.g. during capture or promotion
+					
+					accumulators.getWhiteAccumulator().sub(getIndex(index_to_remove, piece_color, piece, WHITE));
+					accumulators.getBlackAccumulator().sub(getIndex(index_to_remove, piece_color, piece, BLACK));
+				}
+				
+				if (dirtyPieces.to[i] < 64) {
+					
+					accumulators.getWhiteAccumulator().add(getIndex(index_to_add, piece_color, piece, WHITE));
+					accumulators.getBlackAccumulator().add(getIndex(index_to_add, piece_color, piece, BLACK));
+				}
 			}
 		}
     }
@@ -257,36 +265,201 @@ public class NNUE {
     
 	public static int evaluate(NNUE network, NNUEAccumulator us, NNUEAccumulator them, int pieces_count) {
 		
-		short[] L2Weights = NNUE.L2Weights[chooseOutputBucket(pieces_count)];
+		int outputBucket = chooseOutputBucket(pieces_count);
+		
+		short[] L2Weights = NNUE.L2Weights[outputBucket];
 		short[] UsValues = us.values;
 		short[] ThemValues = them.values;
 		
-		int eval = 0;
-		
-		if (AVX512_SUPPORT) {
-			
-			eval = JNIUtils.evaluateVectorized_avx512(L2Weights, UsValues, ThemValues);
-			
-		} else if (AVX2_SUPPORT) {
-			
-			eval = JNIUtils.evaluateVectorized_avx2(L2Weights, UsValues, ThemValues);
-			
-		} else {
-			
-			for (int i = 0; i < HIDDEN_SIZE; i++) {
-				
-				eval += screlu[UsValues[i] - Short.MIN_VALUE] * L2Weights[i]
-						+ screlu[ThemValues[i] - Short.MIN_VALUE] * L2Weights[i + HIDDEN_SIZE];
-			}
-		}
+		int eval = evaluateVectorized(UsValues, ThemValues, L2Weights);
 		
 		eval /= QA;
-		eval += NNUE.outputBiases[chooseOutputBucket(pieces_count)];
+		eval += NNUE.outputBiases[outputBucket];
 		
 		eval *= SCALE;
 		eval /= QA * QB;
 		
 		return eval;
+	}
+	
+	
+	private static int evaluateVectorized(short[] UsValues, short[] ThemValues, short[] L2Weights) {
+		
+		IntVector acc0 = IntVector.zero(INT_SPECIES);
+		IntVector acc1 = IntVector.zero(INT_SPECIES);
+		IntVector acc2 = IntVector.zero(INT_SPECIES);
+		IntVector acc3 = IntVector.zero(INT_SPECIES);
+		
+		final int shortStep = SHORT_SPECIES.length();
+		final int unrolledStep = shortStep * 2;
+		
+		int i = 0;
+		int unrolledBound = HIDDEN_SIZE - unrolledStep + 1;
+		
+		for (; i < unrolledBound; i += unrolledStep) {
+			
+			ShortVector usA = ShortVector.fromArray(SHORT_SPECIES, UsValues, i)
+					.max((short) 0)
+					.min((short) QA);
+			
+			ShortVector themA = ShortVector.fromArray(SHORT_SPECIES, ThemValues, i)
+					.max((short) 0)
+					.min((short) QA);
+			
+			ShortVector usWeightsA = ShortVector.fromArray(SHORT_SPECIES, L2Weights, i);
+			ShortVector themWeightsA = ShortVector.fromArray(SHORT_SPECIES, L2Weights, i + HIDDEN_SIZE);
+			
+			IntVector usA0 = (IntVector) usA.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
+			IntVector usA1 = (IntVector) usA.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
+			IntVector themA0 = (IntVector) themA.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
+			IntVector themA1 = (IntVector) themA.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
+			
+			IntVector usWeightsA0 = (IntVector) usWeightsA.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
+			IntVector usWeightsA1 = (IntVector) usWeightsA.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
+			IntVector themWeightsA0 = (IntVector) themWeightsA.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
+			IntVector themWeightsA1 = (IntVector) themWeightsA.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
+			
+			acc0 = acc0.add(usA0.mul(usA0).mul(usWeightsA0)
+					.add(themA0.mul(themA0).mul(themWeightsA0)));
+			
+			acc1 = acc1.add(usA1.mul(usA1).mul(usWeightsA1)
+					.add(themA1.mul(themA1).mul(themWeightsA1)));
+			
+			
+			int j = i + shortStep;
+			
+			ShortVector usB = ShortVector.fromArray(SHORT_SPECIES, UsValues, j)
+					.max((short) 0)
+					.min((short) QA);
+			
+			ShortVector themB = ShortVector.fromArray(SHORT_SPECIES, ThemValues, j)
+					.max((short) 0)
+					.min((short) QA);
+			
+			ShortVector usWeightsB = ShortVector.fromArray(SHORT_SPECIES, L2Weights, j);
+			ShortVector themWeightsB = ShortVector.fromArray(SHORT_SPECIES, L2Weights, j + HIDDEN_SIZE);
+			
+			IntVector usB0 = (IntVector) usB.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
+			IntVector usB1 = (IntVector) usB.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
+			IntVector themB0 = (IntVector) themB.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
+			IntVector themB1 = (IntVector) themB.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
+			
+			IntVector usWeightsB0 = (IntVector) usWeightsB.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
+			IntVector usWeightsB1 = (IntVector) usWeightsB.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
+			IntVector themWeightsB0 = (IntVector) themWeightsB.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
+			IntVector themWeightsB1 = (IntVector) themWeightsB.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
+			
+			acc2 = acc2.add(usB0.mul(usB0).mul(usWeightsB0)
+					.add(themB0.mul(themB0).mul(themWeightsB0)));
+			
+			acc3 = acc3.add(usB1.mul(usB1).mul(usWeightsB1)
+					.add(themB1.mul(themB1).mul(themWeightsB1)));
+		}
+		
+		IntVector acc = acc0.add(acc1).add(acc2).add(acc3);
+		
+		int upperBound = SHORT_SPECIES.loopBound(HIDDEN_SIZE);
+		
+		for (; i < upperBound; i += SHORT_SPECIES.length()) {
+			
+			ShortVector us = ShortVector.fromArray(SHORT_SPECIES, UsValues, i)
+					.max((short) 0)
+					.min((short) QA);
+			
+			ShortVector them = ShortVector.fromArray(SHORT_SPECIES, ThemValues, i)
+					.max((short) 0)
+					.min((short) QA);
+			
+			ShortVector usWeights = ShortVector.fromArray(SHORT_SPECIES, L2Weights, i);
+			ShortVector themWeights = ShortVector.fromArray(SHORT_SPECIES, L2Weights, i + HIDDEN_SIZE);
+			
+			IntVector us0 = (IntVector) us.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
+			IntVector us1 = (IntVector) us.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
+			IntVector them0 = (IntVector) them.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
+			IntVector them1 = (IntVector) them.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
+			
+			IntVector usWeights0 = (IntVector) usWeights.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
+			IntVector usWeights1 = (IntVector) usWeights.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
+			IntVector themWeights0 = (IntVector) themWeights.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
+			IntVector themWeights1 = (IntVector) themWeights.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
+			
+			acc = acc.add(us0.mul(us0).mul(usWeights0)
+					.add(them0.mul(them0).mul(themWeights0)));
+			
+			acc = acc.add(us1.mul(us1).mul(usWeights1)
+					.add(them1.mul(them1).mul(themWeights1)));
+		}
+		
+		int eval = acc.reduceLanes(VectorOperators.ADD);
+		
+		for (; i < HIDDEN_SIZE; i++) {
+			
+			eval += screlu[UsValues[i] - Short.MIN_VALUE] * L2Weights[i]
+					+ screlu[ThemValues[i] - Short.MIN_VALUE] * L2Weights[i + HIDDEN_SIZE];
+		}
+		
+		return eval;
+	}
+	
+	
+	private static void addWeights(short[] values, short[] weights) {
+		
+		int i = 0;
+		int upperBound = SHORT_SPECIES.loopBound(HIDDEN_SIZE);
+		
+		for (; i < upperBound; i += SHORT_SPECIES.length()) {
+			
+			ShortVector valuesVector = ShortVector.fromArray(SHORT_SPECIES, values, i);
+			ShortVector weightsVector = ShortVector.fromArray(SHORT_SPECIES, weights, i);
+			
+			valuesVector.add(weightsVector).intoArray(values, i);
+		}
+		
+		for (; i < HIDDEN_SIZE; i++) {
+			
+			values[i] += weights[i];
+		}
+	}
+	
+	
+	private static void subWeights(short[] values, short[] weights) {
+		
+		int i = 0;
+		int upperBound = SHORT_SPECIES.loopBound(HIDDEN_SIZE);
+		
+		for (; i < upperBound; i += SHORT_SPECIES.length()) {
+			
+			ShortVector valuesVector = ShortVector.fromArray(SHORT_SPECIES, values, i);
+			ShortVector weightsVector = ShortVector.fromArray(SHORT_SPECIES, weights, i);
+			
+			valuesVector.sub(weightsVector).intoArray(values, i);
+		}
+		
+		for (; i < HIDDEN_SIZE; i++) {
+			
+			values[i] -= weights[i];
+		}
+	}
+	
+	
+	private static void addSubWeights(short[] values, short[] weightsToAdd, short[] weightsToSub) {
+		
+		int i = 0;
+		int upperBound = SHORT_SPECIES.loopBound(HIDDEN_SIZE);
+		
+		for (; i < upperBound; i += SHORT_SPECIES.length()) {
+			
+			ShortVector valuesVector = ShortVector.fromArray(SHORT_SPECIES, values, i);
+			ShortVector addVector = ShortVector.fromArray(SHORT_SPECIES, weightsToAdd, i);
+			ShortVector subVector = ShortVector.fromArray(SHORT_SPECIES, weightsToSub, i);
+			
+			valuesVector.add(addVector).sub(subVector).intoArray(values, i);
+		}
+		
+		for (; i < HIDDEN_SIZE; i++) {
+			
+			values[i] += weightsToAdd[i] - weightsToSub[i];
+		}
 	}
 	
 	
@@ -336,44 +509,22 @@ public class NNUE {
 			
 			final short[] weights = NNUE.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE];
 			
-			//Slower with AVX support
-			/*if (AVX512_SUPPORT) {
-				
-				JNIUtils.accumulateVectorized_avx512(values, weights, true);
-				
-			} else if (AVX2_SUPPORT) {
-				
-				JNIUtils.accumulateVectorized_avx2(values, weights, true);
-				
-			} else {*/
-			
-				for (int i = 0; i < HIDDEN_SIZE; i++) {
-					
-					values[i] += weights[i];
-				}
-			//}
+			addWeights(values, weights);
 		}
 		
 		public void sub(int featureIndex) {
 			
 			final short[] weights = NNUE.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE];
 			
-			//Slower with AVX support
-			/*if (AVX512_SUPPORT) {
-				
-				JNIUtils.accumulateVectorized_avx512(values, weights, false);
-				
-			} else if (AVX2_SUPPORT) {
-				
-				JNIUtils.accumulateVectorized_avx2(values, weights, false);
-				
-			} else {*/
-				
-				for (int i = 0; i < HIDDEN_SIZE; i++) {
-					
-					values[i] -= weights[i];
-				}
-			//}
+			subWeights(values, weights);
+		}
+		
+		public void addSub(int featureIndexToAdd, int featureIndexToSub) {
+			
+			final short[] weightsToAdd = NNUE.L1Weights[featureIndexToAdd + bucketIndex * FEATURE_SIZE];
+			final short[] weightsToSub = NNUE.L1Weights[featureIndexToSub + bucketIndex * FEATURE_SIZE];
+			
+			addSubWeights(values, weightsToAdd, weightsToSub);
 		}
 	}
 	

@@ -8,6 +8,10 @@ import java.util.Arrays;
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.impl.Constants;
+import jdk.incubator.vector.IntVector;
+import jdk.incubator.vector.ShortVector;
+import jdk.incubator.vector.VectorOperators;
+import jdk.incubator.vector.VectorSpecies;
 
 public final class BigNnueNetwork {
 
@@ -27,6 +31,9 @@ public final class BigNnueNetwork {
     private static final int DELTA = 24;
 
     private static final String DEFAULT_NET_FILE = "./nn-b1a57edbea57.nnue";
+
+    private static final VectorSpecies<Short> SHORT_SPECIES = ShortVector.SPECIES_PREFERRED;
+    private static final VectorSpecies<Integer> INT_SPECIES = IntVector.SPECIES_PREFERRED;
 
     private static final FeatureTransformer FEATURE_TRANSFORMER;
     private static final Architecture[] STACKS;
@@ -73,8 +80,6 @@ public final class BigNnueNetwork {
 
         if (!DO_INCREMENTAL_UPDATES) {
             NNUEProbeUtils.fillInput(bitboard, input);
-            //validateInput(input);
-
             FEATURE_TRANSFORMER.refreshFromScratch(input, workspace);
             workspace.accumulatorsValid = true;
             return evaluateFromAccumulators(input.color, workspace, bucket, 1);
@@ -82,8 +87,6 @@ public final class BigNnueNetwork {
 
         if (incremental_updates.must_refresh || !workspace.accumulatorsValid) {
             NNUEProbeUtils.fillInput(bitboard, input);
-            //validateInput(input);
-
             FEATURE_TRANSFORMER.refreshFromScratch(input, workspace);
             workspace.accumulatorsValid = true;
         } else {
@@ -92,12 +95,12 @@ public final class BigNnueNetwork {
         }
 
         int eval = evaluateFromAccumulators(input.color, workspace, bucket, 1);
-        
+
         incremental_updates.reset();
-        
+
         return eval;
     }
-    
+
     private static int evaluateFromAccumulators(int stm, Workspace ws, int bucket, int mode) {
         int psqtInternal = FEATURE_TRANSFORMER.transformFromAccumulators(stm, ws.transformed, bucket, ws);
         int positionalInternal = STACKS[bucket].propagate(ws.transformed, ws);
@@ -232,6 +235,7 @@ public final class BigNnueNetwork {
         return h;
     }
 
+    @SuppressWarnings("unused")
     private static void validateInput(NNUEProbeUtils.Input input) {
         if (input == null) {
             throw new IllegalArgumentException("input == null");
@@ -277,6 +281,10 @@ public final class BigNnueNetwork {
         final byte[] relu0 = new byte[L2];
         final int[] fc1Out = new int[L3];
         final byte[] fc2In = new byte[L3];
+
+        final int[] fc1In0Int = new int[L2];
+        final int[] fc1In1Int = new int[L2];
+        final int[] fc2InInt = new int[L3];
     }
 
     private static final class FeatureTransformer {
@@ -433,36 +441,32 @@ public final class BigNnueNetwork {
         }
 
         private static void addFeature(short[] w, int offset, short[] acc, int len) {
-            int j = 0;
-            for (; j + 7 < len; j += 8) {
-                acc[j    ] = (short) (acc[j    ] + w[offset + j    ]);
-                acc[j + 1] = (short) (acc[j + 1] + w[offset + j + 1]);
-                acc[j + 2] = (short) (acc[j + 2] + w[offset + j + 2]);
-                acc[j + 3] = (short) (acc[j + 3] + w[offset + j + 3]);
-                acc[j + 4] = (short) (acc[j + 4] + w[offset + j + 4]);
-                acc[j + 5] = (short) (acc[j + 5] + w[offset + j + 5]);
-                acc[j + 6] = (short) (acc[j + 6] + w[offset + j + 6]);
-                acc[j + 7] = (short) (acc[j + 7] + w[offset + j + 7]);
+            int i = 0;
+            int upper = SHORT_SPECIES.loopBound(len);
+
+            for (; i < upper; i += SHORT_SPECIES.length()) {
+                ShortVector.fromArray(SHORT_SPECIES, acc, i)
+                        .add(ShortVector.fromArray(SHORT_SPECIES, w, offset + i))
+                        .intoArray(acc, i);
             }
-            for (; j < len; j++) {
-                acc[j] = (short) (acc[j] + w[offset + j]);
+
+            for (; i < len; i++) {
+                acc[i] = (short) (acc[i] + w[offset + i]);
             }
         }
 
         private static void subFeature(short[] w, int offset, short[] acc, int len) {
-            int j = 0;
-            for (; j + 7 < len; j += 8) {
-                acc[j    ] = (short) (acc[j    ] - w[offset + j    ]);
-                acc[j + 1] = (short) (acc[j + 1] - w[offset + j + 1]);
-                acc[j + 2] = (short) (acc[j + 2] - w[offset + j + 2]);
-                acc[j + 3] = (short) (acc[j + 3] - w[offset + j + 3]);
-                acc[j + 4] = (short) (acc[j + 4] - w[offset + j + 4]);
-                acc[j + 5] = (short) (acc[j + 5] - w[offset + j + 5]);
-                acc[j + 6] = (short) (acc[j + 6] - w[offset + j + 6]);
-                acc[j + 7] = (short) (acc[j + 7] - w[offset + j + 7]);
+            int i = 0;
+            int upper = SHORT_SPECIES.loopBound(len);
+
+            for (; i < upper; i += SHORT_SPECIES.length()) {
+                ShortVector.fromArray(SHORT_SPECIES, acc, i)
+                        .sub(ShortVector.fromArray(SHORT_SPECIES, w, offset + i))
+                        .intoArray(acc, i);
             }
-            for (; j < len; j++) {
-                acc[j] = (short) (acc[j] - w[offset + j]);
+
+            for (; i < len; i++) {
+                acc[i] = (short) (acc[i] - w[offset + i]);
             }
         }
     }
@@ -492,9 +496,16 @@ public final class BigNnueNetwork {
             fc0.propagate16(transformedFeatures, ws.fc0Out);
             sqrClippedRelu(ws.fc0Out, l2, ws.sqr0);
             clippedRelu(ws.fc0Out, l2, ws.relu0);
-            fc1.propagatePair(ws.sqr0, ws.relu0, ws.fc1Out);
+
+            toUnsignedInts(ws.sqr0, l2, ws.fc1In0Int);
+            toUnsignedInts(ws.relu0, l2, ws.fc1In1Int);
+
+            fc1.propagatePair(ws.fc1In0Int, ws.fc1In1Int, ws.fc1Out);
+
             clippedRelu(ws.fc1Out, l3, ws.fc2In);
-            int out = fc2.propagateScalar32(ws.fc2In);
+            toUnsignedInts(ws.fc2In, l3, ws.fc2InInt);
+
+            int out = fc2.propagateScalar32(ws.fc2InInt);
             int fwdOut = ws.fc0Out[l2] * (600 * OUTPUT_SCALE) / (127 * (1 << WEIGHT_SCALE_BITS));
             return out + fwdOut;
         }
@@ -505,14 +516,14 @@ public final class BigNnueNetwork {
         private final int outputs;
         private final int paddedInputs;
         private final int[] biases;
-        private final byte[] weightsByInput;
+        private final int[] weightsByInput;
 
         AffineSparse(int inputs, int outputs) {
             this.inputs = inputs;
             this.outputs = outputs;
             this.paddedInputs = ceil(inputs, MAX_SIMD_WIDTH);
             this.biases = new int[outputs];
-            this.weightsByInput = new byte[paddedInputs * outputs];
+            this.weightsByInput = new int[paddedInputs * outputs];
         }
 
         void read(LittleEndianDataInput in) throws IOException {
@@ -536,24 +547,8 @@ public final class BigNnueNetwork {
         void propagate16(byte[] input, int[] out) {
             System.arraycopy(biases, 0, out, 0, outputs);
 
-            final byte[] w = weightsByInput;
-            int o0, o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12, o13, o14, o15;
-            o0 = out[0];
-            o1 = out[1];
-            o2 = out[2];
-            o3 = out[3];
-            o4 = out[4];
-            o5 = out[5];
-            o6 = out[6];
-            o7 = out[7];
-            o8 = out[8];
-            o9 = out[9];
-            o10 = out[10];
-            o11 = out[11];
-            o12 = out[12];
-            o13 = out[13];
-            o14 = out[14];
-            o15 = out[15];
+            final int[] w = weightsByInput;
+            final int upperOut = INT_SPECIES.loopBound(outputs);
 
             for (int i = 0; i < inputs; i++) {
                 int v = input[i] & 0xff;
@@ -561,41 +556,20 @@ public final class BigNnueNetwork {
                     continue;
                 }
 
-                int base = i << 4;
-                o0  += w[base] * v;
-                o1  += w[base + 1] * v;
-                o2  += w[base + 2] * v;
-                o3  += w[base + 3] * v;
-                o4  += w[base + 4] * v;
-                o5  += w[base + 5] * v;
-                o6  += w[base + 6] * v;
-                o7  += w[base + 7] * v;
-                o8  += w[base + 8] * v;
-                o9  += w[base + 9] * v;
-                o10 += w[base + 10] * v;
-                o11 += w[base + 11] * v;
-                o12 += w[base + 12] * v;
-                o13 += w[base + 13] * v;
-                o14 += w[base + 14] * v;
-                o15 += w[base + 15] * v;
-            }
+                int base = i * outputs;
+                IntVector vv = IntVector.broadcast(INT_SPECIES, v);
 
-            out[0] = o0;
-            out[1] = o1;
-            out[2] = o2;
-            out[3] = o3;
-            out[4] = o4;
-            out[5] = o5;
-            out[6] = o6;
-            out[7] = o7;
-            out[8] = o8;
-            out[9] = o9;
-            out[10] = o10;
-            out[11] = o11;
-            out[12] = o12;
-            out[13] = o13;
-            out[14] = o14;
-            out[15] = o15;
+                int o = 0;
+                for (; o < upperOut; o += INT_SPECIES.length()) {
+                    IntVector.fromArray(INT_SPECIES, out, o)
+                            .add(IntVector.fromArray(INT_SPECIES, w, base + o).mul(vv))
+                            .intoArray(out, o);
+                }
+
+                for (; o < outputs; o++) {
+                    out[o] += w[base + o] * v;
+                }
+            }
         }
     }
 
@@ -604,14 +578,14 @@ public final class BigNnueNetwork {
         private final int outputs;
         private final int paddedInputs;
         private final int[] biases;
-        private final byte[] weights;
+        private final int[] weights;
 
         Affine(int inputs, int outputs) {
             this.inputs = inputs;
             this.outputs = outputs;
             this.paddedInputs = ceil(inputs, MAX_SIMD_WIDTH);
             this.biases = new int[outputs];
-            this.weights = new byte[outputs * paddedInputs];
+            this.weights = new int[outputs * paddedInputs];
         }
 
         void read(LittleEndianDataInput in) throws IOException {
@@ -623,35 +597,66 @@ public final class BigNnueNetwork {
             }
         }
 
-        void propagatePair(byte[] input0, byte[] input1, int[] out) {
+        void propagatePair(int[] input0, int[] input1, int[] out) {
             System.arraycopy(biases, 0, out, 0, outputs);
 
-            final byte[] w = weights;
+            final int[] w = weights;
             final int split = inputs >>> 1;
+            final int upper = INT_SPECIES.loopBound(split);
 
             for (int o = 0; o < outputs; o++) {
                 int sum = out[o];
                 int base = o * paddedInputs;
 
-                for (int i = 0; i < split; i++) {
-                    sum += w[base + i] * (input0[i] & 0xff);
+                IntVector acc0 = IntVector.zero(INT_SPECIES);
+                int i = 0;
+                for (; i < upper; i += INT_SPECIES.length()) {
+                    acc0 = acc0.add(
+                            IntVector.fromArray(INT_SPECIES, w, base + i)
+                                    .mul(IntVector.fromArray(INT_SPECIES, input0, i)));
+                }
+                sum += acc0.reduceLanes(VectorOperators.ADD);
+                for (; i < split; i++) {
+                    sum += w[base + i] * input0[i];
                 }
 
                 int base2 = base + split;
-                for (int i = 0; i < split; i++) {
-                    sum += w[base2 + i] * (input1[i] & 0xff);
+                IntVector acc1 = IntVector.zero(INT_SPECIES);
+                i = 0;
+                for (; i < upper; i += INT_SPECIES.length()) {
+                    acc1 = acc1.add(
+                            IntVector.fromArray(INT_SPECIES, w, base2 + i)
+                                    .mul(IntVector.fromArray(INT_SPECIES, input1, i)));
+                }
+                sum += acc1.reduceLanes(VectorOperators.ADD);
+                for (; i < split; i++) {
+                    sum += w[base2 + i] * input1[i];
                 }
 
                 out[o] = sum;
             }
         }
 
-        int propagateScalar32(byte[] input) {
+        int propagateScalar32(int[] input) {
             int sum = biases[0];
-            final byte[] w = weights;
-            for (int i = 0; i < inputs; i++) {
-                sum += w[i] * (input[i] & 0xff);
+            final int[] w = weights;
+
+            IntVector acc = IntVector.zero(INT_SPECIES);
+            int i = 0;
+            int upper = INT_SPECIES.loopBound(inputs);
+
+            for (; i < upper; i += INT_SPECIES.length()) {
+                acc = acc.add(
+                        IntVector.fromArray(INT_SPECIES, w, i)
+                                .mul(IntVector.fromArray(INT_SPECIES, input, i)));
             }
+
+            sum += acc.reduceLanes(VectorOperators.ADD);
+
+            for (; i < inputs; i++) {
+                sum += w[i] * input[i];
+            }
+
             return sum;
         }
     }
@@ -666,6 +671,12 @@ public final class BigNnueNetwork {
         for (int i = 0; i < len; i++) {
             long v = input[i];
             out[i] = (byte) Math.min(127L, (v * v) >> (2 * WEIGHT_SCALE_BITS + 7));
+        }
+    }
+
+    private static void toUnsignedInts(byte[] input, int len, int[] out) {
+        for (int i = 0; i < len; i++) {
+            out[i] = input[i] & 0xff;
         }
     }
 

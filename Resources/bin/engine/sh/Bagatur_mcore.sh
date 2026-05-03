@@ -10,5 +10,5 @@ export JARS_PATH=".:${BIN_PATH}BagaturEngine.jar:"
 # Only one part of this memory (up to 50%) will be used for Transposition Table.
 export PROCESS_MEMORY=64G
 
-exec java -Xmx${PROCESS_MEMORY} -Djava.library.path=${BIN_PATH} -cp "${JARS_PATH}" bagaturchess.uci.run.BagaturMain_MCore
+exec java --add-modules jdk.incubator.vector -Xmx${PROCESS_MEMORY} -Djava.library.path=${BIN_PATH} -cp "${JARS_PATH}" bagaturchess.uci.run.BagaturMain_MCore
 

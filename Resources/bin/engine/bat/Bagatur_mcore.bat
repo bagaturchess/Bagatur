@@ -13,5 +13,5 @@ set PROCESS_MEMORY=16G
 
 echo on
 
-java.exe -Xmx%PROCESS_MEMORY% -Djava.library.path=%BIN_PATH% -cp %JARS_PATH% bagaturchess.uci.run.BagaturMain_MCore
+java.exe --add-modules jdk.incubator.vector -Xmx%PROCESS_MEMORY% -Djava.library.path=%BIN_PATH% -cp %JARS_PATH% bagaturchess.uci.run.BagaturMain_MCore
 

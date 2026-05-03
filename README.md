@@ -22,11 +22,11 @@ The program runs under all Operating Systems, which support Java platform:
 * **Windows**, there are *.exe files for direct run. Here are the steps necessary to run the engine:
   * Download an arbitrary UCI user interface. For example the most popular one is <a href="http://www.playwitharena.com/">Arena Chess GUI</a>.
   * Install the UCI user interface on your computer.
-  * Ensure that the Java Runtime Environment (JRE) 1.8 or later is installed on your computer (it should be the case nowadays but if not, have in mind that JRE is required, only JDK doesn't work). It could be downloaded from <a href="https://java.com/">java.com</a>
+  * Ensure that the Java Runtime Environment (JRE) 17 or later is installed on your computer (it should be the case nowadays but if not, have in mind that JRE is required, only JDK doesn't work with the exe runner). It could be downloaded from <a href="https://java.com/">java.com</a>
   * Unpack this distribution somewhere (Arena has a sub-folder called 'engines', you can extract it there).
   * Open the UCI user interface and register the engine inside (You should become familiar with the installed UCI user interface anyway).
   * E2-E4 and enjoy :-)
-* **Linux**, in the root directory there are *.sh files for running
+* **Linux**, in the root directory there are *.sh files for running, just use Java 17 or later.
 
 # UCI Options
 
