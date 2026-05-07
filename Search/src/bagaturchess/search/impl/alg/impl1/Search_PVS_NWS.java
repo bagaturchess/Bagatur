@@ -1833,7 +1833,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (VALIDATE_PV) PVValidation.validatePV(this, env, node, ply, 0, isPv, alphaOrig, beta, validation_stack);
 		
 		
-    	return node.eval;
+		return node.eval;
 	}
 	
 	
