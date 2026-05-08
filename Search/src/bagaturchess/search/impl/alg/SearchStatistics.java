@@ -37,7 +37,7 @@ public class SearchStatistics {
 	
 	public void register(int type, double depth) {
 		
-		counts[type] += Math.pow(2, depth);
+		counts[type] += Math.pow(1.5, depth);
 	}
 	
 	

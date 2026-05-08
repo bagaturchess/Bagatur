@@ -82,6 +82,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private static final boolean VALIDATE_PV 						= false;
 	
+	private static final boolean PRINT_SEARCH_STATS 					= false;
 	
 	private static final double[][] LMR_TABLE 						= new double[64][64];
 	
@@ -107,8 +108,6 @@ public class Search_PVS_NWS extends SearchImpl {
 	private VarStatistic stats 										= new VarStatistic();
 	
 	private SearchStatistics searchStats 							= new SearchStatistics();
-	
-	private static final boolean PRINT_SEARCH_STATS 					= false;
 	
 	
 	public Search_PVS_NWS(Object[] args) {
