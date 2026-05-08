@@ -205,9 +205,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		searchStats.register(SearchStatistics.TYPE_NODES_ALL);
-		searchStats.register(SearchStatistics.TYPE_NODES_SEARCH);
-		searchStats.register(SearchStatistics.TYPE_NODES_PV);
+		searchStats.register(SearchStatistics.TYPE_NODES_ALL, depth);
+		searchStats.register(SearchStatistics.TYPE_NODES_SEARCH, depth);
+		searchStats.register(SearchStatistics.TYPE_NODES_PV, depth);
 		
 		
 		final int alphaOrig = alpha;
@@ -235,7 +235,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!tt_entries_per_ply[ply].isEmpty()) {
 				
-				searchStats.register(SearchStatistics.TYPE_TT_HIT);
+				searchStats.register(SearchStatistics.TYPE_TT_HIT, depth);
 				
 				ssi.tt_hit = true;
 				
@@ -264,6 +264,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int move;
 		while ((move = list.next()) != 0) {
+			
+			
+			searchStats.register(SearchStatistics.TYPE_MOVES_ALL, depth);
+			
 			
 			//Build and sent minor info
 			info.setCurrentMove(move);
@@ -448,9 +452,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		searchStats.register(SearchStatistics.TYPE_NODES_ALL);
-		searchStats.register(SearchStatistics.TYPE_NODES_SEARCH);
-		searchStats.register(isPv ? SearchStatistics.TYPE_NODES_PV : SearchStatistics.TYPE_NODES_NONPV);
+		searchStats.register(SearchStatistics.TYPE_NODES_ALL, depth);
+		searchStats.register(SearchStatistics.TYPE_NODES_SEARCH, depth);
+		searchStats.register(isPv ? SearchStatistics.TYPE_NODES_PV : SearchStatistics.TYPE_NODES_NONPV, depth);
 		
 		if (PRINT_SEARCH_STATS && info.getSearchedNodes() % 100000 == 0) {
 			
@@ -544,7 +548,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!tt_entries_per_ply[ply].isEmpty()) {
 				
-				searchStats.register(SearchStatistics.TYPE_TT_HIT);
+				searchStats.register(SearchStatistics.TYPE_TT_HIT, depth);
 				
 				ssi.tt_hit = true;
 				
@@ -563,7 +567,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (ttFlag == ITTEntry.FLAG_EXACT) {
 							
-							searchStats.register(SearchStatistics.TYPE_TT_CUTOFF);
+							searchStats.register(SearchStatistics.TYPE_TT_CUTOFF, depth);
 							
 							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 							
@@ -573,7 +577,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
 								
-								searchStats.register(SearchStatistics.TYPE_TT_CUTOFF);
+								searchStats.register(SearchStatistics.TYPE_TT_CUTOFF, depth);
 								
 								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 								
@@ -582,7 +586,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
 								
-								searchStats.register(SearchStatistics.TYPE_TT_CUTOFF);
+								searchStats.register(SearchStatistics.TYPE_TT_CUTOFF, depth);
 								
 								extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 								
@@ -674,11 +678,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				//Static null move pruning
 				if (depth <= STATIC_NULL_MOVE_MAXDEPTH) {
 					
-					searchStats.register(SearchStatistics.TYPE_STATIC_NULL_MOVE_TRIES);
+					searchStats.register(SearchStatistics.TYPE_STATIC_NULL_MOVE_TRIES, depth);
 					
 					if (ssi.static_eval - (depth * STATIC_NULL_MOVE_MARGIN - (improving ? 70 : 0)) / PRUNING_AGGRESSIVENESS >= beta) {
 						
-						searchStats.register(SearchStatistics.TYPE_STATIC_NULL_MOVE_OK);
+						searchStats.register(SearchStatistics.TYPE_STATIC_NULL_MOVE_OK, depth);
 						
 						node.bestmove = 0;
 						node.eval = ssi.static_eval;
@@ -693,7 +697,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				//Verified null move pruning
 				if (depth >= 3) {
 					
-					searchStats.register(SearchStatistics.TYPE_NULL_MOVE_TRIES);
+					searchStats.register(SearchStatistics.TYPE_NULL_MOVE_TRIES, depth);
 					
 					env.getBitboard().makeNullMoveForward();
 					
@@ -712,7 +716,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (verify_score >= beta) {
 							
-							searchStats.register(SearchStatistics.TYPE_NULL_MOVE_OK);
+							searchStats.register(SearchStatistics.TYPE_NULL_MOVE_OK, depth);
 							
 							node.bestmove = 0;
 							node.eval = verify_score;
@@ -748,7 +752,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				//Razoring
 				if (depth <= RAZORING_MAXDEPTH) {
 					
-					searchStats.register(SearchStatistics.TYPE_RAZORING_TRIES);
+					searchStats.register(SearchStatistics.TYPE_RAZORING_TRIES, depth);
 					
 					double razoringMargin = RAZORING_MARGIN * depth / PRUNING_AGGRESSIVENESS;
 					
@@ -758,7 +762,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (score <= alpha) {
 							
-							searchStats.register(SearchStatistics.TYPE_RAZORING_OK);
+							searchStats.register(SearchStatistics.TYPE_RAZORING_OK, depth);
 							
 							node.bestmove = 0;
 							node.eval = score;
@@ -825,7 +829,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				&& env.getBitboard().isPossible(ttMove)
 			) {
 			
-			searchStats.register(SearchStatistics.TYPE_SME_TRIES);
+			searchStats.register(SearchStatistics.TYPE_SME_TRIES, depth);
 			
 			int singular_margin = 16 + (int) (2 * depth);
 			int singular_beta = ttValue - singular_margin;
@@ -840,7 +844,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (!VALIDATE_PV) {
 					
-					searchStats.register(SearchStatistics.TYPE_SME_OK);
+					searchStats.register(SearchStatistics.TYPE_SME_OK, depth);
 					
 					tt_move_extension = 1;
 					
@@ -1042,6 +1046,9 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				searchStats.register(SearchStatistics.TYPE_MOVES_ALL, depth);
+				
+				
 				if (info.getSearchedNodes() >= lastSentMinorInfo_nodesCount + 50000 ) { //Check time on each 50 000 nodes
 					
 					long timestamp = System.currentTimeMillis();
@@ -1085,7 +1092,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						//Late move pruning
 						if (movesPerformed_attacks + movesPerformed_quiet >= (3 + depth * depth / (improving ? 1 : 2)) / PRUNING_AGGRESSIVENESS) {
 							
-							searchStats.register(SearchStatistics.TYPE_LMP_OK);
+							searchStats.register(SearchStatistics.TYPE_LMP_OK, depth);
 							
 							continue;
 						}
@@ -1094,7 +1101,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						if (depth <= FUTILITY_MAXDEPTH
 								&& ssi.static_eval + depth * FUTILITY_MARGIN / PRUNING_AGGRESSIVENESS <= alpha) {
 							
-							searchStats.register(SearchStatistics.TYPE_FUTILITY_SEARCH_OK);
+							searchStats.register(SearchStatistics.TYPE_FUTILITY_SEARCH_OK, depth);
 							
 							continue;
 						}
@@ -1104,7 +1111,7 @@ public class Search_PVS_NWS extends SearchImpl {
 								&& depth <= SEE_MAXDEPTH
 								&& env.getBitboard().getSEEScore(move) < -SEE_MARGIN * depth / PRUNING_AGGRESSIVENESS) {
 							
-							searchStats.register(SearchStatistics.TYPE_SEE_SEARCH_NONATTACKS_OK);
+							searchStats.register(SearchStatistics.TYPE_SEE_SEARCH_NONATTACKS_OK, depth);
 							
 							continue;
 						}
@@ -1113,7 +1120,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							&& depth <= SEE_MAXDEPTH
 							&& env.getBitboard().getSEEScore(move) < -SEE_MARGIN * depth / PRUNING_AGGRESSIVENESS) {
 						
-						searchStats.register(SearchStatistics.TYPE_SEE_SEARCH_ATTACKS_OK);
+						searchStats.register(SearchStatistics.TYPE_SEE_SEARCH_ATTACKS_OK, depth);
 						
 						continue;
 					}
@@ -1654,9 +1661,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		searchStats.register(SearchStatistics.TYPE_NODES_ALL);
-		searchStats.register(SearchStatistics.TYPE_NODES_QSEARCH);
-		searchStats.register(isPv ? SearchStatistics.TYPE_NODES_PV : SearchStatistics.TYPE_NODES_NONPV);
+		searchStats.register(SearchStatistics.TYPE_NODES_ALL, 1);
+		searchStats.register(SearchStatistics.TYPE_NODES_QSEARCH, 1);
+		searchStats.register(isPv ? SearchStatistics.TYPE_NODES_PV : SearchStatistics.TYPE_NODES_NONPV, 1);
 		
 		
 		PVNode node = pvman.load(ply);
@@ -1686,7 +1693,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			if (!tt_entries_per_ply[ply].isEmpty()) {
 				
-				searchStats.register(SearchStatistics.TYPE_TT_HIT);
+				searchStats.register(SearchStatistics.TYPE_TT_HIT, 1);
 				
 				ttValue = tt_entries_per_ply[ply].getEval();
 				ttFlag = tt_entries_per_ply[ply].getFlag();
@@ -1696,7 +1703,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					if (ttFlag == ITTEntry.FLAG_EXACT) {
 						
-						searchStats.register(SearchStatistics.TYPE_TT_CUTOFF);
+						searchStats.register(SearchStatistics.TYPE_TT_CUTOFF, 1);
 						
 				    		extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 				    	
@@ -1706,7 +1713,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (ttFlag == ITTEntry.FLAG_LOWER && ttValue >= beta) {
 							
-							searchStats.register(SearchStatistics.TYPE_TT_CUTOFF);
+							searchStats.register(SearchStatistics.TYPE_TT_CUTOFF, 1);
 							
 							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 							
@@ -1715,7 +1722,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						if (ttFlag == ITTEntry.FLAG_UPPER && ttValue <= alpha) {
 							
-							searchStats.register(SearchStatistics.TYPE_TT_CUTOFF);
+							searchStats.register(SearchStatistics.TYPE_TT_CUTOFF, 1);
 							
 							extractFromTT(ply, node, tt_entries_per_ply[ply], info, isPv);
 							
