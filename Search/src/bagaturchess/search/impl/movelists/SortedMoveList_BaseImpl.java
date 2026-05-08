@@ -41,6 +41,7 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 	
 	
 	public SortedMoveList_BaseImpl(int max, SearchEnv _env, boolean _onTheFlySorting) {
+		
 		moves = new long[max];
 		env = _env;
 		onTheFlySorting = _onTheFlySorting;
@@ -48,6 +49,7 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 	
 	
 	public void reserved_clear() {
+		
 		count = 0;
 	}
 	
@@ -78,16 +80,30 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 	
 	
 	private int findInsertIndex(long value) {
-	    int low = 0, high = count;
-	    long orderValue = value >>> 32;
+		
+	    int low = 0;
+	    int high = count;
+	    int orderValue = getOrderingValueFromEncodedMove(value);
 
 	    while (low < high) {
+	    	
 	        int mid = (low + high) >>> 1;
-	        long midOrderValue = moves[mid] >>> 32;
+	        int midOrderValue = getOrderingValueFromEncodedMove(moves[mid]);
 
+	        /*
+	         * Sort descending by signed ordering value.
+	         *
+	         * Important:
+	         * The ordering value may be negative. Do NOT use >>> 32 here,
+	         * because that interprets negative int scores as huge unsigned
+	         * positive values and moves them before good positive scores.
+	         */
 	        if (midOrderValue > orderValue) {
+	        	
 	            low = mid + 1;
+	            
 	        } else {
+	        	
 	            high = mid;
 	        }
 	    }
@@ -97,11 +113,13 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
     
 	
 	public final void reserved_removeLast() {
+		
 		count--;
 	}
 	
 	
 	public final int reserved_getCurrentSize() {
+		
 		return count;
 	}
 	
@@ -113,6 +131,7 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 
 	
 	public void clear() {
+		
 		reserved_clear();
 		cur = 0;
 	}
@@ -120,23 +139,33 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 	
 	public int next() {
 		
-        if (cur >= count) return 0;
+        if (cur >= count) {
+        	
+        	return 0;
+        }
         
 		if (onTheFlySorting) {
 
-	        // Selection of best remaining move
+	        // Selection of best remaining move by signed ordering value
 	        int bestIndex = cur;
 	        long bestValue = moves[cur];
+	        int bestOrderValue = getOrderingValueFromEncodedMove(bestValue);
 
 	        for (int i = cur + 1; i < count; i++) {
-	            if ((moves[i] >>> 32) > (bestValue >>> 32)) {
+	        	
+	        	int orderValue = getOrderingValueFromEncodedMove(moves[i]);
+	        	
+	            if (orderValue > bestOrderValue) {
+	            	
 	                bestValue = moves[i];
+	                bestOrderValue = orderValue;
 	                bestIndex = i;
 	            }
 	        }
 
 	        // Swap best with cur
 	        if (bestIndex != cur) {
+	        	
 	            long tmp = moves[cur];
 	            moves[cur] = moves[bestIndex];
 	            moves[bestIndex] = tmp;
@@ -145,7 +174,8 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 		
         // Return current move
 		long v = moves[cur++];
-        lastScore = (int) (v >>> 32);
+        lastScore = getOrderingValueFromEncodedMove(v);
+        
         return (int) v;
 	}
 
@@ -157,11 +187,19 @@ public abstract class SortedMoveList_BaseImpl implements IMoveList {
 	
 	
 	public int size() {
+		
 		return count;
 	}
 	
 	
     private static long addOrderingValue(int move, int ord_val) {
+    	
         return (((long) ord_val) << 32) | (move & 0xFFFFFFFFL);
+    }
+    
+    
+    private static int getOrderingValueFromEncodedMove(long encodedMove) {
+    	
+    	return (int) (encodedMove >> 32);
     }
 }
