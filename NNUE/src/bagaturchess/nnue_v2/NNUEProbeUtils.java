@@ -12,7 +12,7 @@ import bagaturchess.bitboard.api.IBitBoard;
 public class NNUEProbeUtils {
 	
 	//Necessary to convert squares IDs encoded by H1A8 to encoded by A1H8
-	private static int[] SQUARE_MAPPING = new int[] {
+	/*private static int[] SQUARE_MAPPING = new int[] {
 		7, 6, 5, 4, 3, 2, 1, 0,
 		15, 14, 13, 12, 11, 10, 9, 8,
 		23, 22, 21, 20, 19, 18, 17, 16,
@@ -21,7 +21,7 @@ public class NNUEProbeUtils {
 		47, 46, 45, 44, 43, 42, 41, 40,
 		55, 54, 53, 52, 51, 50, 49, 48,
 		63, 62, 61, 60, 59, 58, 57, 56,
-	};
+	};*/
 	
 	public static final void fillInput(IBitBoard bitboard, Input input) {
 		
@@ -142,11 +142,13 @@ public class NNUEProbeUtils {
 	
 	private static int getSquareID(long bitboard) {
 		
-		int result =  Long.numberOfTrailingZeros(bitboard);
+		/*int result =  Long.numberOfTrailingZeros(bitboard);
 		
 		result = SQUARE_MAPPING[result];
 		
-		return result;
+		return result;*/
+		
+		return Long.numberOfTrailingZeros(bitboard) ^ 7;
 	}
 	
 	public static int convertColor(int color) {
@@ -154,7 +156,7 @@ public class NNUEProbeUtils {
 	}
 	
 	public static int convertPiece(int pieceType, int color) {
-		switch(pieceType) {
+		/*switch(pieceType) {
 			case Constants.TYPE_PAWN: return color == ChessConstants.WHITE ? 0 : 0;
 			case Constants.TYPE_KNIGHT: return color == ChessConstants.WHITE ? 1 : 1;
 			case Constants.TYPE_BISHOP: return color == ChessConstants.WHITE ? 2 : 2;
@@ -162,11 +164,14 @@ public class NNUEProbeUtils {
 			case Constants.TYPE_QUEEN: return color == ChessConstants.WHITE ? 4 : 4;
 			case Constants.TYPE_KING: return color == ChessConstants.WHITE ? 5 : 5;
 			default: throw new IllegalStateException();
-		}
+		}*/
+		
+		return pieceType - 1;
 	}
 	
 	public static int convertSquare(int squareID) {
-		return getSquareID(Util.POWER_LOOKUP[squareID]);
+		//return getSquareID(Util.POWER_LOOKUP[squareID]);
+		return squareID ^ 7;
 	}
 	
 	public static class Input {
