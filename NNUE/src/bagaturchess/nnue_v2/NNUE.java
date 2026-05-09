@@ -57,7 +57,7 @@ public class NNUE {
 	private static final VectorSpecies<Short> SHORT_SPECIES = ShortVector.SPECIES_PREFERRED;
 	private static final VectorSpecies<Integer> INT_SPECIES = SHORT_SPECIES.withLanes(int.class);
 
-	private static short[][] L1Weights;
+	private static short[] L1Weights;
 	private static short[] L1Biases;
 	private static short[][] L2Weights;
 	private static short outputBiases[];
@@ -139,13 +139,15 @@ public class NNUE {
 	
 	private static void loadNetwork(DataInputStream networkData) throws IOException {
 		
-		L1Weights = new short[FEATURE_SIZE * INPUT_BUCKET_SIZE][HIDDEN_SIZE];
+		L1Weights = new short[FEATURE_SIZE * INPUT_BUCKET_SIZE * HIDDEN_SIZE];
 
 		for (int i = 0; i < FEATURE_SIZE * INPUT_BUCKET_SIZE; i++) {
 			
+			final int offset = i * HIDDEN_SIZE;
+			
 			for (int j = 0; j < HIDDEN_SIZE; j++) {
 				
-				L1Weights[i][j] = toLittleEndian(networkData.readShort());
+				L1Weights[offset + j] = toLittleEndian(networkData.readShort());
 			}
 		}
 
@@ -402,64 +404,72 @@ public class NNUE {
 	}
 	
 	
-	private static void addWeights(short[] values, short[] weights) {
+	private static void addWeights(short[] values, int weightsOffset) {
 		
+		final short[] weights = L1Weights;
 		int i = 0;
 		int upperBound = SHORT_SPECIES.loopBound(HIDDEN_SIZE);
 		
 		for (; i < upperBound; i += SHORT_SPECIES.length()) {
 			
 			ShortVector valuesVector = ShortVector.fromArray(SHORT_SPECIES, values, i);
-			ShortVector weightsVector = ShortVector.fromArray(SHORT_SPECIES, weights, i);
+			ShortVector weightsVector = ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i);
 			
 			valuesVector.add(weightsVector).intoArray(values, i);
 		}
 		
 		for (; i < HIDDEN_SIZE; i++) {
 			
-			values[i] += weights[i];
+			values[i] += weights[weightsOffset + i];
 		}
 	}
 	
 	
-	private static void subWeights(short[] values, short[] weights) {
+	private static void subWeights(short[] values, int weightsOffset) {
 		
+		final short[] weights = L1Weights;
 		int i = 0;
 		int upperBound = SHORT_SPECIES.loopBound(HIDDEN_SIZE);
 		
 		for (; i < upperBound; i += SHORT_SPECIES.length()) {
 			
 			ShortVector valuesVector = ShortVector.fromArray(SHORT_SPECIES, values, i);
-			ShortVector weightsVector = ShortVector.fromArray(SHORT_SPECIES, weights, i);
+			ShortVector weightsVector = ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i);
 			
 			valuesVector.sub(weightsVector).intoArray(values, i);
 		}
 		
 		for (; i < HIDDEN_SIZE; i++) {
 			
-			values[i] -= weights[i];
+			values[i] -= weights[weightsOffset + i];
 		}
 	}
 	
 	
-	private static void addSubWeights(short[] values, short[] weightsToAdd, short[] weightsToSub) {
+	private static void addSubWeights(short[] values, int weightsToAddOffset, int weightsToSubOffset) {
 		
+		final short[] weights = L1Weights;
 		int i = 0;
 		int upperBound = SHORT_SPECIES.loopBound(HIDDEN_SIZE);
 		
 		for (; i < upperBound; i += SHORT_SPECIES.length()) {
 			
 			ShortVector valuesVector = ShortVector.fromArray(SHORT_SPECIES, values, i);
-			ShortVector addVector = ShortVector.fromArray(SHORT_SPECIES, weightsToAdd, i);
-			ShortVector subVector = ShortVector.fromArray(SHORT_SPECIES, weightsToSub, i);
+			ShortVector addVector = ShortVector.fromArray(SHORT_SPECIES, weights, weightsToAddOffset + i);
+			ShortVector subVector = ShortVector.fromArray(SHORT_SPECIES, weights, weightsToSubOffset + i);
 			
 			valuesVector.add(addVector).sub(subVector).intoArray(values, i);
 		}
 		
 		for (; i < HIDDEN_SIZE; i++) {
 			
-			values[i] += weightsToAdd[i] - weightsToSub[i];
+			values[i] += weights[weightsToAddOffset + i] - weights[weightsToSubOffset + i];
 		}
+	}
+	
+	
+	private static int getL1WeightOffset(int featureIndex, int bucketIndex) {
+		return (featureIndex + bucketIndex * FEATURE_SIZE) * HIDDEN_SIZE;
 	}
 	
 	
@@ -507,24 +517,19 @@ public class NNUE {
 
 		public void add(int featureIndex) {
 			
-			final short[] weights = NNUE.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE];
-			
-			addWeights(values, weights);
+			addWeights(values, getL1WeightOffset(featureIndex, bucketIndex));
 		}
 		
 		public void sub(int featureIndex) {
 			
-			final short[] weights = NNUE.L1Weights[featureIndex + bucketIndex * FEATURE_SIZE];
-			
-			subWeights(values, weights);
+			subWeights(values, getL1WeightOffset(featureIndex, bucketIndex));
 		}
 		
 		public void addSub(int featureIndexToAdd, int featureIndexToSub) {
 			
-			final short[] weightsToAdd = NNUE.L1Weights[featureIndexToAdd + bucketIndex * FEATURE_SIZE];
-			final short[] weightsToSub = NNUE.L1Weights[featureIndexToSub + bucketIndex * FEATURE_SIZE];
-			
-			addSubWeights(values, weightsToAdd, weightsToSub);
+			addSubWeights(values,
+					getL1WeightOffset(featureIndexToAdd, bucketIndex),
+					getL1WeightOffset(featureIndexToSub, bucketIndex));
 		}
 	}
 	
