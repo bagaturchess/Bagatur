@@ -182,6 +182,7 @@ public final class ChessBoard {
 		int toIndex = MoveUtil.getToIndex(move);
 		long toMask = 1L << toIndex;
 		final long fromToMask = (1L << fromIndex) ^ toMask;
+		long changedSquares = fromToMask;
 		final int sourcePieceIndex = MoveUtil.getSourcePieceIndex(move);
 		final int attackedPieceIndex = MoveUtil.getAttackedPieceIndex(move);
 
@@ -300,6 +301,7 @@ public final class ChessBoard {
 			if (MoveUtil.isEPMove(move)) {
 				toIndex += ChessConstants.COLOR_FACTOR_8[colorToMoveInverse];
 				toMask = Util.POWER_LOOKUP[toIndex];
+				changedSquares |= toMask;
 				pieceIndexes[toIndex] = EMPTY;
 			}
 			pawnZobristKey ^= Zobrist.piece[toIndex][colorToMoveInverse][PAWN];
@@ -356,8 +358,7 @@ public final class ChessBoard {
 			}
 		}
 
-		// TODO can this be done incrementally?
-		setPinnedAndDiscoPieces();
+		updatePinnedAndDiscoPiecesAfterMove(sourcePieceIndex, changedSquares);
 
 		if (EngineConstants.ASSERT) {
 			ChessBoardTestUtil.testValues(this);
@@ -518,7 +519,7 @@ public final class ChessBoard {
 		}
 		*/
 		
-		// TODO can this be done incrementally?
+		// Castling always moves the king and rook, so the king rays change.
 		setPinnedAndDiscoPieces();
 
 		if (EngineConstants.ASSERT) {
@@ -771,6 +772,22 @@ public final class ChessBoard {
 	}
 	
 	
+	private void updatePinnedAndDiscoPiecesAfterMove(final int sourcePieceIndex, final long changedSquares) {
+
+		if (sourcePieceIndex == KING) {
+			setPinnedAndDiscoPieces();
+			return;
+		}
+
+		final long affectedKingRays = MagicUtil.getQueenMovesEmptyBoard(kingIndex[ChessConstants.WHITE])
+				| MagicUtil.getQueenMovesEmptyBoard(kingIndex[ChessConstants.BLACK]);
+
+		if ((changedSquares & affectedKingRays) != 0) {
+			setPinnedAndDiscoPieces();
+		}
+	}
+
+
 	public void setPinnedAndDiscoPieces() {
 
 		long pinned = 0;
@@ -843,7 +860,7 @@ public final class ChessBoard {
 		return true;
 	}
 
-	private boolean isLegalEPMove(final int fromIndex) {
+	boolean isLegalEPMove(final int fromIndex) {
 
 		// do move, check if in check, undo move. slow but also not called very often
 

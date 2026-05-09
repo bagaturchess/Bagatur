@@ -90,6 +90,16 @@ public final class MoveGenerator {
 		return nextToGenerate[currentPly] != nextToMove[currentPly];
 	}
 
+	public int collectMoves(final bagaturchess.bitboard.api.IInternalMoveList list) {
+		final int start = nextToMove[currentPly];
+		final int end = nextToGenerate[currentPly];
+		for (int i = start; i < end; i++) {
+			list.reserved_add(moves[i]);
+		}
+		nextToMove[currentPly] = end;
+		return end - start;
+	}
+
 	public void addMove(final int move) {
 		moves[nextToGenerate[currentPly]++] = move;
 	}
@@ -517,9 +527,21 @@ public final class MoveGenerator {
 	}
 
 	private void generateOutOfCheckAttacks(final ChessBoard cb) {
-		// attack attacker
+		// Capture the checking piece. Quiet promotions are legal here only when they
+		// block a single sliding check; otherwise they were filtered later by
+		// ChessBoard.isLegal(move), which is no longer in the hot generation path.
 		addEpAttacks(cb);
-		addPawnAttacksAndPromotions(cb.pieces[cb.colorToMove][PAWN] & ~cb.pinnedPieces, cb, cb.checkingPieces, cb.emptySpaces);
+		long promotionPushTargets = 0;
+		if ((cb.checkingPieces & (cb.checkingPieces - 1)) == 0) {
+			final int checkerIndex = Long.numberOfTrailingZeros(cb.checkingPieces);
+			switch (cb.pieceIndexes[checkerIndex]) {
+			case BISHOP:
+			case ROOK:
+			case QUEEN:
+				promotionPushTargets = cb.emptySpaces & ChessConstants.IN_BETWEEN[cb.kingIndex[cb.colorToMove]][checkerIndex];
+			}
+		}
+		addPawnAttacksAndPromotions(cb.pieces[cb.colorToMove][PAWN] & ~cb.pinnedPieces, cb, cb.checkingPieces, promotionPushTargets);
 		addNightAttacks(cb.pieces[cb.colorToMove][NIGHT] & ~cb.pinnedPieces, cb.pieceIndexes, cb.checkingPieces);
 		addBishopAttacks(cb.pieces[cb.colorToMove][BISHOP] & ~cb.pinnedPieces, cb, cb.checkingPieces);
 		addRookAttacks(cb.pieces[cb.colorToMove][ROOK] & ~cb.pinnedPieces, cb, cb.checkingPieces);
@@ -728,13 +750,17 @@ public final class MoveGenerator {
 		if (Properties.DUMP_CASTLING) System.out.println("MoveGenerator.addKingMoves");
 		
 		final int fromIndex = cb.kingIndex[cb.colorToMove];
+		final long occupiedWithoutKing = cb.allPieces ^ Util.POWER_LOOKUP[fromIndex];
+		final long[] enemyPieces = cb.pieces[cb.colorToMoveInverse];
+		final int enemyMajorPieces = MaterialUtil.getMajorPieces(cb.materialKey, cb.colorToMoveInverse);
 		
 		long moves = StaticMoves.KING_MOVES[fromIndex] & cb.emptySpaces;
 		
 		while (moves != 0) {
-			
-			addMove(MoveUtil.createMove(fromIndex, Long.numberOfTrailingZeros(moves), KING));
-			
+			final int toIndex = Long.numberOfTrailingZeros(moves);
+			if (!CheckUtil.isInCheckIncludingKing(toIndex, cb.colorToMove, enemyPieces, occupiedWithoutKing, enemyMajorPieces)) {
+				addMove(MoveUtil.createMove(fromIndex, toIndex, KING));
+			}
 			moves &= moves - 1;
 		}
 
@@ -754,7 +780,7 @@ public final class MoveGenerator {
 				
 				if (Properties.DUMP_CASTLING) System.out.println("MoveGenerator.addKingMoves: toIndex_king=" + toIndex_king);
 				
-				// no piece in between?
+				// no piece in between and king does not pass through check?
 				if (CastlingUtil.isValidCastlingMove(cb, fromIndex, toIndex_king)) {
 					
 					addMove(MoveUtil.createCastlingMove(fromIndex, toIndex_king));
@@ -767,10 +793,15 @@ public final class MoveGenerator {
 
 	private void addKingAttacks(final ChessBoard cb) {
 		final int fromIndex = cb.kingIndex[cb.colorToMove];
+		final long occupiedWithoutKing = cb.allPieces ^ Util.POWER_LOOKUP[fromIndex];
+		final long[] enemyPieces = cb.pieces[cb.colorToMoveInverse];
+		final int enemyMajorPieces = MaterialUtil.getMajorPieces(cb.materialKey, cb.colorToMoveInverse);
 		long moves = StaticMoves.KING_MOVES[fromIndex] & cb.friendlyPieces[cb.colorToMoveInverse];
 		while (moves != 0) {
 			final int toIndex = Long.numberOfTrailingZeros(moves);
-			addMove(MoveUtil.createAttackMove(fromIndex, toIndex, KING, cb.pieceIndexes[toIndex]));
+			if (!CheckUtil.isInCheckIncludingKing(toIndex, cb.colorToMove, enemyPieces, occupiedWithoutKing, enemyMajorPieces)) {
+				addMove(MoveUtil.createAttackMove(fromIndex, toIndex, KING, cb.pieceIndexes[toIndex]));
+			}
 			moves &= moves - 1;
 		}
 	}
@@ -794,7 +825,10 @@ public final class MoveGenerator {
 		}
 		long piece = cb.pieces[cb.colorToMove][PAWN] & StaticMoves.PAWN_ATTACKS[cb.colorToMoveInverse][cb.epIndex];
 		while (piece != 0) {
-			addMove(MoveUtil.createEPMove(Long.numberOfTrailingZeros(piece), cb.epIndex));
+			final int fromIndex = Long.numberOfTrailingZeros(piece);
+			if (cb.isLegalEPMove(fromIndex)) {
+				addMove(MoveUtil.createEPMove(fromIndex, cb.epIndex));
+			}
 			piece &= piece - 1;
 		}
 	}

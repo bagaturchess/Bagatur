@@ -223,15 +223,7 @@ public class BoardImpl implements IBitBoard {
 		
 		generator.generateAll(chessBoard);
 		
-		int counter = 0;
-		while (generator.hasNext()) {
-			int cur_move = generator.next();
-			if (!isGeneratedMoveLegal(cur_move)) {
-				continue;
-			}
-			list.reserved_add(cur_move);
-			counter++;
-		}
+		int counter = generator.collectMoves(list);
 		
 		generator.endPly();
 		
@@ -252,15 +244,7 @@ public class BoardImpl implements IBitBoard {
 		
 		generator.generateAttacks(chessBoard);
 		
-		int counter = 0;
-		while (generator.hasNext()) {
-			int cur_move = generator.next();
-			if (!isGeneratedMoveLegal(cur_move)) {
-				continue;
-			}
-			list.reserved_add(cur_move);
-			counter++;
-		}
+		int counter = generator.collectMoves(list);
 		
 		generator.endPly();
 		
@@ -275,24 +259,11 @@ public class BoardImpl implements IBitBoard {
 		
 		generator.generateMoves(chessBoard);
 		
-		int counter = 0;
-		while (generator.hasNext()) {
-			int cur_move = generator.next();
-			if (!isGeneratedMoveLegal(cur_move)) {
-				continue;
-			}
-			list.reserved_add(cur_move);
-			counter++;
-		}
+		int counter = generator.collectMoves(list);
 		
 		generator.endPly();
 		
 		return counter;
-	}
-	
-	
-	private boolean isGeneratedMoveLegal(final int move) {
-		return chessBoard.isLegal(move);
 	}
 	
 	
