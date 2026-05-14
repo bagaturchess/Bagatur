@@ -14,6 +14,7 @@ import jdk.incubator.vector.VectorOperators;
 import jdk.incubator.vector.VectorSpecies;
 
 import bagaturchess.bitboard.api.IBitBoard;
+import bagaturchess.bitboard.api.IMoveOps;
 import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.impl.Constants;
 import bagaturchess.uci.api.ChannelManager;
@@ -210,9 +211,9 @@ public class NNUE {
 		int pieces_count = bitboard.getMaterialState().getPiecesCount();
 		
 		int eval = bitboard.getColourToMove() == NNUE.WHITE ?
-		        evaluate(this, accumulators.getWhiteAccumulator(), accumulators.getBlackAccumulator(), pieces_count)
+		        evaluate(accumulators.getWhiteAccumulator(), accumulators.getBlackAccumulator(), pieces_count)
 		        :
-		        evaluate(this, accumulators.getBlackAccumulator(), accumulators.getWhiteAccumulator(), pieces_count);
+		        evaluate(accumulators.getBlackAccumulator(), accumulators.getWhiteAccumulator(), pieces_count);
 		        
 		return eval;
 	}
@@ -265,7 +266,7 @@ public class NNUE {
     }
     
     
-	public static int evaluate(NNUE network, NNUEAccumulator us, NNUEAccumulator them, int pieces_count) {
+	public static int evaluate(NNUEAccumulator us, NNUEAccumulator them, int pieces_count) {
 		
 		int outputBucket = chooseOutputBucket(pieces_count);
 		
@@ -538,6 +539,7 @@ public class NNUE {
     	
     	
     	private IBitBoard bitboard;
+    	private IMoveOps moveOps;
     	private boolean must_refresh; 
     	private int capture_marker; //Necessary because we cannot identify correctly the captured piece in addDurtyPiece
     	private int promotion_marker; //Necessary because we cannot identify correctly the captured piece in addDurtyPiece
@@ -545,6 +547,7 @@ public class NNUE {
     	IncrementalUpdates(IBitBoard _bitboard) {
     		
     		bitboard = _bitboard;
+    		moveOps = bitboard.getMoveOps();
     		must_refresh = true;
     		capture_marker = 64;
     		promotion_marker = 128;
@@ -588,13 +591,13 @@ public class NNUE {
     			return;
     		}
     		
-       		int pieceType = bitboard.getMoveOps().getFigureType(move);
-    		int fromFieldID = bitboard.getMoveOps().getFromFieldID(move);
-    		int toFieldID = bitboard.getMoveOps().getToFieldID(move);   		
+       		int pieceType = moveOps.getFigureType(move);
+    		int fromFieldID = moveOps.getFromFieldID(move);
+    		int toFieldID = moveOps.getToFieldID(move);   		
     		
     		if (pieceType == Constants.TYPE_KING
-    				|| bitboard.getMoveOps().isCastling(move)
-    				|| bitboard.getMoveOps().isEnpassant(move)
+    				|| moveOps.isCastling(move)
+    				|| moveOps.isEnpassant(move)
     				//|| bitboard.getMoveOps().isCapture(move)
     				//|| bitboard.getMoveOps().isPromotion(move)
     				) {
@@ -610,19 +613,19 @@ public class NNUE {
     			
     			addDurtyPiece(color, piece, square_from, square_to);
     			
-    			if (bitboard.getMoveOps().isCapture(move)) {
+    			if (moveOps.isCapture(move)) {
     				
     				int color_op = 1 - color;
         	        
-                	int piece_captured = bitboard.getMoveOps().getCapturedFigureType(move);
+                	int piece_captured = moveOps.getCapturedFigureType(move);
                 	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color_op);
                 	
                 	addDurtyPiece(color_op, piece_captured, square_to, capture_marker++);
     			}
     			
-    			if (bitboard.getMoveOps().isPromotion(move)) {
+    			if (moveOps.isPromotion(move)) {
         	        
-                	int piece_promoted = bitboard.getMoveOps().getPromotionFigureType(move);
+                	int piece_promoted = moveOps.getPromotionFigureType(move);
                 	piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
                 	
                 	addDurtyPiece(color, piece_promoted, promotion_marker, square_to);
@@ -650,13 +653,13 @@ public class NNUE {
     			return;
     		}
     		
-       		int pieceType = bitboard.getMoveOps().getFigureType(move);
-    		int fromFieldID = bitboard.getMoveOps().getFromFieldID(move);
-    		int toFieldID = bitboard.getMoveOps().getToFieldID(move);   		
+       		int pieceType = moveOps.getFigureType(move);
+    		int fromFieldID = moveOps.getFromFieldID(move);
+    		int toFieldID = moveOps.getToFieldID(move);   		
     		
     		if (pieceType == Constants.TYPE_KING
-    				|| bitboard.getMoveOps().isCastling(move)
-    				|| bitboard.getMoveOps().isEnpassant(move)
+    				|| moveOps.isCastling(move)
+    				|| moveOps.isEnpassant(move)
     				//|| bitboard.getMoveOps().isCapture(move)
     				//|| bitboard.getMoveOps().isPromotion(move)
     				) {
@@ -672,11 +675,11 @@ public class NNUE {
     			
     			addDurtyPiece(color, piece, square_to, square_from);
     			
-    			if (bitboard.getMoveOps().isCapture(move)) {
+    			if (moveOps.isCapture(move)) {
     				
     				int op_color = 1 - color;
         	        
-                	int piece_captured = bitboard.getMoveOps().getCapturedFigureType(move);
+                	int piece_captured = moveOps.getCapturedFigureType(move);
                 	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, op_color);
                 	
                 	addDurtyPiece(op_color, piece_captured, capture_marker++, square_to);
@@ -684,9 +687,9 @@ public class NNUE {
                 	//System.out.println("capture_marker=" + capture_marker);
     			}
     			
-    			if (bitboard.getMoveOps().isPromotion(move)) {
+    			if (moveOps.isPromotion(move)) {
         	        
-                	int piece_promoted = bitboard.getMoveOps().getPromotionFigureType(move);
+                	int piece_promoted = moveOps.getPromotionFigureType(move);
                 	piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
                 	
                 	addDurtyPiece(color, piece_promoted, square_to, promotion_marker);
