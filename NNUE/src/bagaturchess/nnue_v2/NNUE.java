@@ -17,7 +17,6 @@ import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.api.IMoveOps;
 import bagaturchess.bitboard.common.MoveListener;
 import bagaturchess.bitboard.impl.Constants;
-import bagaturchess.uci.api.ChannelManager;
 
 
 /**
@@ -591,47 +590,46 @@ public class NNUE {
     			return;
     		}
     		
-       		int pieceType = moveOps.getFigureType(move);
+    		int pieceType = moveOps.getFigureType(move);
     		int fromFieldID = moveOps.getFromFieldID(move);
-    		int toFieldID = moveOps.getToFieldID(move);   		
+    		int toFieldID = moveOps.getToFieldID(move);
+    		
+    		if (moveOps.isCastling(move) || moveOps.isEnpassant(move)) {
+    			must_refresh = true;
+    			return;
+    		}
+    		
+    		color = NNUEProbeUtils.convertColor(color);
+    		int piece = NNUEProbeUtils.convertPiece(pieceType, color);
+    		int square_from = NNUEProbeUtils.convertSquare(fromFieldID);
+    		int square_to = NNUEProbeUtils.convertSquare(toFieldID);
     		
     		if (pieceType == Constants.TYPE_KING
-    				|| moveOps.isCastling(move)
-    				|| moveOps.isEnpassant(move)
-    				//|| bitboard.getMoveOps().isCapture(move)
-    				//|| bitboard.getMoveOps().isPromotion(move)
-    				) {
-    			
+    				&& chooseInputBucket(square_from, color) != chooseInputBucket(square_to, color)) {
     			must_refresh = true;
+    			return;
+    		}
+    		
+    		addDurtyPiece(color, piece, square_from, square_to);
+    		
+    		if (moveOps.isCapture(move)) {
     			
-    		} else {
-    			
-    			color = NNUEProbeUtils.convertColor(color);
-    			int piece = NNUEProbeUtils.convertPiece(pieceType, color);
-    			int square_from = NNUEProbeUtils.convertSquare(fromFieldID);
-    			int square_to = NNUEProbeUtils.convertSquare(toFieldID);
-    			
-    			addDurtyPiece(color, piece, square_from, square_to);
-    			
-    			if (moveOps.isCapture(move)) {
-    				
-    				int color_op = 1 - color;
+    			int color_op = 1 - color;
         	        
-                	int piece_captured = moveOps.getCapturedFigureType(move);
-                	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color_op);
-                	
-                	addDurtyPiece(color_op, piece_captured, square_to, capture_marker++);
-    			}
-    			
-    			if (moveOps.isPromotion(move)) {
+            	int piece_captured = moveOps.getCapturedFigureType(move);
+            	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, color_op);
+            	
+            	addDurtyPiece(color_op, piece_captured, square_to, capture_marker++);
+    		}
+    		
+    		if (moveOps.isPromotion(move)) {
         	        
-                	int piece_promoted = moveOps.getPromotionFigureType(move);
-                	piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
-                	
-                	addDurtyPiece(color, piece_promoted, promotion_marker, square_to);
-                	addDurtyPiece(color, piece, square_to, promotion_marker);
-                	promotion_marker++;
-    			}
+            	int piece_promoted = moveOps.getPromotionFigureType(move);
+            	piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
+            	
+            	addDurtyPiece(color, piece_promoted, promotion_marker, square_to);
+            	addDurtyPiece(color, piece, square_to, promotion_marker);
+            	promotion_marker++;
     		}
     	}
 
@@ -653,49 +651,49 @@ public class NNUE {
     			return;
     		}
     		
-       		int pieceType = moveOps.getFigureType(move);
+    		
+    		int pieceType = moveOps.getFigureType(move);
     		int fromFieldID = moveOps.getFromFieldID(move);
-    		int toFieldID = moveOps.getToFieldID(move);   		
+    		int toFieldID = moveOps.getToFieldID(move);
+    		
+    		if (moveOps.isCastling(move) || moveOps.isEnpassant(move)) {
+    			must_refresh = true;
+    			return;
+    		}
+    		
+    		color = NNUEProbeUtils.convertColor(color);
+    		int piece = NNUEProbeUtils.convertPiece(pieceType, color);
+    		int square_from = NNUEProbeUtils.convertSquare(fromFieldID);
+    		int square_to = NNUEProbeUtils.convertSquare(toFieldID);
     		
     		if (pieceType == Constants.TYPE_KING
-    				|| moveOps.isCastling(move)
-    				|| moveOps.isEnpassant(move)
-    				//|| bitboard.getMoveOps().isCapture(move)
-    				//|| bitboard.getMoveOps().isPromotion(move)
-    				) {
-    			
+    				&& chooseInputBucket(square_from, color) != chooseInputBucket(square_to, color)) {
     			must_refresh = true;
+    			return;
+    		}
+    		
+    		addDurtyPiece(color, piece, square_to, square_from);
+    		
+    		if (moveOps.isCapture(move)) {
     			
-    		} else {
-    			
-    			color = NNUEProbeUtils.convertColor(color);
-    			int piece = NNUEProbeUtils.convertPiece(pieceType, color);
-    			int square_from = NNUEProbeUtils.convertSquare(fromFieldID);
-    			int square_to = NNUEProbeUtils.convertSquare(toFieldID);
-    			
-    			addDurtyPiece(color, piece, square_to, square_from);
-    			
-    			if (moveOps.isCapture(move)) {
-    				
-    				int op_color = 1 - color;
+    			int op_color = 1 - color;
         	        
-                	int piece_captured = moveOps.getCapturedFigureType(move);
-                	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, op_color);
-                	
-                	addDurtyPiece(op_color, piece_captured, capture_marker++, square_to);
-                	
-                	//System.out.println("capture_marker=" + capture_marker);
-    			}
-    			
-    			if (moveOps.isPromotion(move)) {
+            	int piece_captured = moveOps.getCapturedFigureType(move);
+            	piece_captured = NNUEProbeUtils.convertPiece(piece_captured, op_color);
+            	
+            	addDurtyPiece(op_color, piece_captured, capture_marker++, square_to);
+            	
+            	//System.out.println("capture_marker=" + capture_marker);
+    		}
+    		
+    		if (moveOps.isPromotion(move)) {
         	        
-                	int piece_promoted = moveOps.getPromotionFigureType(move);
-                	piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
-                	
-                	addDurtyPiece(color, piece_promoted, square_to, promotion_marker);
-                	addDurtyPiece(color, piece, promotion_marker, square_to);
-                	promotion_marker++;
-    			}
+            	int piece_promoted = moveOps.getPromotionFigureType(move);
+            	piece_promoted = NNUEProbeUtils.convertPiece(piece_promoted, color);
+            	
+            	addDurtyPiece(color, piece_promoted, square_to, promotion_marker);
+            	addDurtyPiece(color, piece, promotion_marker, square_to);
+            	promotion_marker++;
     		}
     	}
     	
