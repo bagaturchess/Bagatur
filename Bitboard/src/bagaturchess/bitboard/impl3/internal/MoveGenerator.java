@@ -10,8 +10,6 @@ import static bagaturchess.bitboard.impl3.internal.ChessConstants.QUEEN;
 import static bagaturchess.bitboard.impl3.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl3.internal.ChessConstants.WHITE;
 
-import java.util.Random;
-
 import bagaturchess.bitboard.api.IHistoryProvider;
 import bagaturchess.bitboard.common.Properties;
 
@@ -25,10 +23,6 @@ public final class MoveGenerator {
 	private final int[] nextToMove 								= new int[EngineConstants.MAX_PLIES * 2];
 	private int currentPly;
 
-	private long counter_sorting;
-	
-	private Random randomizer = new Random();
-	
 	private int root_search_first_move_index;
 	
 	
@@ -277,18 +271,17 @@ public final class MoveGenerator {
 	
 	
 	public void sort() {
-		
-		
+
 		final int start_index = nextToMove[currentPly];
 		final int end_index = nextToGenerate[currentPly] - 1;
-		
-		//In order to increase the effect of nondeterminism, ensure first ordering is randomized.
-		if (counter_sorting == 0 || counter_sorting % 10 == 0) {
-				
-			randomize(moveScores, moves, start_index, end_index);
+
+		if (end_index <= start_index) {
+			return;
 		}
-		
-		
+
+		// Keep sorting deterministic and allocation-free in the search hot path.
+		// The previous periodic Random-based shuffle improved nondeterminism, but it
+		// costs NPS every time move ordering is scored and sorted.
 		for (int i = start_index, j = i; i < end_index; j = ++i) {
 			final long score = moveScores[i + 1];
 			final int move = moves[i + 1];
@@ -302,52 +295,6 @@ public final class MoveGenerator {
 			moveScores[j + 1] = score;
 			moves[j + 1] = move;
 		}
-		
-		
-		//The ELO is smaller with this code enabled. It looks like it is better when all threads start searching the TT move.
-		//My explanation is that, they do enough randomization (in this method: randomize(...) before sorting) of the moves with the same scores, so they work in different sub-trees anyway and 
-		//as the TT move is most probably the best one, the SMP version goes a few moves deeper for the same time.
-		if (false && currentPly == 1) {
-		
-			//Lazy SMP logic
-			//currentPly == 1 (not 0), because first we make currentPly++ and then call sort method
-			
-			int current_moves_count = (end_index - start_index + 1);
-			
-			if (current_moves_count >= 2) {
-				
-				int index_to_swap = root_search_first_move_index % current_moves_count;
-				
-				long score 									= moveScores[start_index + index_to_swap];
-				int move 									= moves[start_index + index_to_swap];
-				
-				moveScores[start_index + index_to_swap] 	= moveScores[start_index];
-				moves[start_index + index_to_swap] 			= moves[start_index];
-				
-				moveScores[start_index] 					= score;
-				moves[start_index] 							= move;
-			}
-		}
-		
-		
-		counter_sorting++;
-	}
-	
-	
-	private void randomize(long[] arr1, int[] arr2, int start, int end) {
-		
-	    for (int i = end; i > start + 1; i--) {
-	    	
-	    	int rnd_index = start + randomizer.nextInt(i - start);	    
-	    	
-	    	long tmp1 = arr1[i-1];
-	    	arr1[i-1] = arr1[rnd_index];
-	    	arr1[rnd_index] = tmp1;
-	    	
-	    	int tmp2 = arr2[i-1];
-	    	arr2[i-1] = arr2[rnd_index];
-	    	arr2[rnd_index] = tmp2;
-	    }
 	}
 	
 

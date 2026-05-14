@@ -62,7 +62,6 @@ import bagaturchess.bitboard.impl3.internal.MoveGenerator;
 import bagaturchess.bitboard.impl3.internal.MoveUtil;
 import bagaturchess.bitboard.impl3.internal.MoveWrapper;
 import bagaturchess.bitboard.impl3.internal.SEEUtil;
-import bagaturchess.bitboard.impl3.internal.Util;
 
 
 public class BoardImpl implements IBitBoard {
@@ -269,40 +268,25 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public void makeMoveForward(int move) {
-		
-		
-		try {
-			
-			
-			if (moveOps.isCastling(move)) {
-				
-				castledByColour[getColourToMove()] = moveOps.isCastlingKingSide(move) ? IBoard.CastlingType.KINGSIDE : IBoard.CastlingType.QUEENSIDE;
-			}
-			
-			
-			if (moveListeners.length > 0) {
-				
-				for (int i=0; i<moveListeners.length; i++) {
-					
-					moveListeners[i].preForwardMove(chessBoard.colorToMove, move);
-				}
-			}
-			
 
-		
-			chessBoard.doMove(move);
-			
-			
-			if (moveListeners.length > 0) {
-				
-				for (int i=0; i<moveListeners.length; i++) {
-					
-					moveListeners[i].postForwardMove(chessBoard.colorToMoveInverse, move);
-				}
+		try {
+
+			if (moveOps.isCastling(move)) {
+				castledByColour[chessBoard.colorToMove] = moveOps.isCastlingKingSide(move) ? IBoard.CastlingType.KINGSIDE : IBoard.CastlingType.QUEENSIDE;
 			}
-		
+
+			final MoveListener[] listeners = moveListeners;
+			for (int i = 0, len = listeners.length; i < len; i++) {
+				listeners[i].preForwardMove(chessBoard.colorToMove, move);
+			}
+
+			chessBoard.doMove(move);
+
+			for (int i = 0, len = listeners.length; i < len; i++) {
+				listeners[i].postForwardMove(chessBoard.colorToMoveInverse, move);
+			}
+
 		} catch(Exception cause) {
-			
 			throw new IllegalStateException(this.toString(), cause);
 		}
 	}
@@ -310,35 +294,25 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public void makeMoveBackward(int move) {
-		
-		
+
 		try {
-			
-			
-			if (moveListeners.length > 0) {
-				for (int i=0; i<moveListeners.length; i++) {
-					moveListeners[i].preBackwardMove(chessBoard.colorToMoveInverse, move);
-				}
+
+			final MoveListener[] listeners = moveListeners;
+			for (int i = 0, len = listeners.length; i < len; i++) {
+				listeners[i].preBackwardMove(chessBoard.colorToMoveInverse, move);
 			}
-		
-		
+
 			chessBoard.undoMove(move);
-			
-			
+
 			if (moveOps.isCastling(move)) {
-				
-				castledByColour[getColourToMove()] = IBoard.CastlingType.NONE;
+				castledByColour[chessBoard.colorToMove] = IBoard.CastlingType.NONE;
 			}
-			
-			
-			if (moveListeners.length > 0) {
-				for (int i=0; i<moveListeners.length; i++) {
-					moveListeners[i].postBackwardMove(getColourToMove(), move);
-				}
+
+			for (int i = 0, len = listeners.length; i < len; i++) {
+				listeners[i].postBackwardMove(chessBoard.colorToMove, move);
 			}
-		
+
 		} catch(Exception cause) {
-			
 			throw new IllegalStateException(this.toString(), cause);
 		}
 	}
@@ -573,7 +547,7 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int getFigureColour(int squareID) {
-		return ((Util.POWER_LOOKUP[squareID] & chessBoard.friendlyPieces[Constants.COLOUR_WHITE]) != 0)
+		return (((1L << squareID) & chessBoard.friendlyPieces[Constants.COLOUR_WHITE]) != 0)
 				? Constants.COLOUR_WHITE
 				: Constants.COLOUR_BLACK;
 	}

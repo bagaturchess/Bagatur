@@ -66,6 +66,9 @@ public final class ChessBoard {
 	public final int[] pieceIndexes = new int[64];
 	public final int[] kingIndex = new int[2];
 	public final long[] kingArea = new long[2];
+	public final long[] kingBishopRays = new long[2];
+	public final long[] kingRookRays = new long[2];
+	public final long[] kingQueenRays = new long[2];
 
 	public int moveCounter = 0;
 	public final int[] castlingHistory = new int[EngineConstants.MAX_MOVES];
@@ -107,8 +110,8 @@ public final class ChessBoard {
 	}
 	
 	public void changeSideToMove() {
-		colorToMove = colorToMoveInverse;
-		colorToMoveInverse = 1 - colorToMove;
+		colorToMove ^= 1;
+		colorToMoveInverse ^= 1;
 	}
 	
 	public boolean isDiscoveredMove(final int fromIndex) {
@@ -779,8 +782,7 @@ public final class ChessBoard {
 			return;
 		}
 
-		final long affectedKingRays = MagicUtil.getQueenMovesEmptyBoard(kingIndex[ChessConstants.WHITE])
-				| MagicUtil.getQueenMovesEmptyBoard(kingIndex[ChessConstants.BLACK]);
+		final long affectedKingRays = kingQueenRays[ChessConstants.WHITE] | kingQueenRays[ChessConstants.BLACK];
 
 		if ((changedSquares & affectedKingRays) != 0) {
 			setPinnedAndDiscoPieces();
@@ -805,8 +807,8 @@ public final class ChessBoard {
 
 			final int kingSq = kingIndex[kingColor];
 			final long enemyQueens = boardPieces[enemyColor][QUEEN];
-			long enemyPiece = ((boardPieces[enemyColor][BISHOP] | enemyQueens) & MagicUtil.getBishopMovesEmptyBoard(kingSq))
-					| ((boardPieces[enemyColor][ROOK] | enemyQueens) & MagicUtil.getRookMovesEmptyBoard(kingSq));
+			long enemyPiece = ((boardPieces[enemyColor][BISHOP] | enemyQueens) & kingBishopRays[kingColor])
+					| ((boardPieces[enemyColor][ROOK] | enemyQueens) & kingRookRays[kingColor]);
 			final long friendly = friendlyPieces[kingColor];
 			final long enemy = friendlyPieces[enemyColor];
 
@@ -829,10 +831,16 @@ public final class ChessBoard {
 	
 	public void updateKingValues(final int kingColor, final int index) {
 		if (index == 64) {//If there is no king return
+			kingBishopRays[kingColor] = 0;
+			kingRookRays[kingColor] = 0;
+			kingQueenRays[kingColor] = 0;
 			return;
 		}
 		kingIndex[kingColor] = index;
 		kingArea[kingColor] = ChessConstants.KING_AREA[kingColor][index];
+		kingBishopRays[kingColor] = MagicUtil.getBishopMovesEmptyBoard(index);
+		kingRookRays[kingColor] = MagicUtil.getRookMovesEmptyBoard(index);
+		kingQueenRays[kingColor] = kingBishopRays[kingColor] | kingRookRays[kingColor];
 	}
 	
 	public boolean isLegal(final int move) {
