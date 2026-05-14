@@ -23,19 +23,17 @@
 package bagaturchess.search.impl.tpt;
 
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import bagaturchess.bitboard.impl1.internal.Assert;
 import bagaturchess.bitboard.impl1.internal.EngineConstants;
-import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.uci.api.ChannelManager;
 
 
 public class TTable_Impl2 implements ITTable {
 
 	
-	private static final int ALWAYS_REPLACE_DEPTH = ISearch.MAX_DEPTH;
-	
+	private static final int CLUSTER_SIZE = 4;
+	private static final int ENTRY_LONGS = 2;
+	private static final long VALID_MASK = 1L << 8; // bit 8 is unused: depth uses 0..7, flag starts at 9
 	
 	private static final int FLAG_SHIFT = 9;
 	private static final int MOVE_SHIFT = 11; //Move is 22 bits
@@ -44,8 +42,9 @@ public class TTable_Impl2 implements ITTable {
 	
 	private final int maxEntries;
 	
-	private final ByteBuffer keys;
-	private final ByteBuffer values;
+	// Interleaved layout: [mixedKey0, value0, mixedKey1, value1, ...]
+	// mixedKey is hashKey ^ value, so a torn/inconsistent read is very unlikely to pass the key check.
+	private final long[] table;
 
 	private long counter_usage;
 	private long counter_tries;
@@ -53,21 +52,18 @@ public class TTable_Impl2 implements ITTable {
 	
 	
 	public TTable_Impl2(long sizeInBytes) {
-	    long maxEntriesLong = Long.highestOneBit(sizeInBytes / 16);
-	    if (maxEntriesLong < 4) {
+	    long maxEntriesLong = Long.highestOneBit(sizeInBytes / (ENTRY_LONGS * Long.BYTES));
+	    if (maxEntriesLong < CLUSTER_SIZE) {
 	        throw new IllegalArgumentException("Insufficient memory allocated.");
 	    }
 
-	    long byteSize = maxEntriesLong * 8;
-	    if (byteSize > Integer.MAX_VALUE) {
-	        maxEntriesLong = Integer.MAX_VALUE / 8;
-	        byteSize = maxEntriesLong * 8L;
+	    final long maxArrayEntries = Long.highestOneBit(Integer.MAX_VALUE / ENTRY_LONGS);
+	    if (maxEntriesLong > maxArrayEntries) {
+	        maxEntriesLong = maxArrayEntries;
 	    }
 
 	    this.maxEntries = (int) maxEntriesLong;
-
-	    keys = ByteBuffer.allocateDirect((int) byteSize).order(ByteOrder.nativeOrder());
-	    values = ByteBuffer.allocateDirect((int) byteSize).order(ByteOrder.nativeOrder());
+	    this.table = new long[maxEntries * ENTRY_LONGS];
 
 	    if (ChannelManager.getChannel() != null) {
 	        ChannelManager.getChannel().dump("TTable_Impl2 initialized with " + maxEntries + " entries.");
@@ -94,10 +90,14 @@ public class TTable_Impl2 implements ITTable {
 		counter_tries++;
 		entry.setIsEmpty(true);
 
-		int index = getIndex(key);
-		for (int i = 0; i < 4; i++) {
-			long storedKey = keys.getLong((index + i) * 8);
-			long storedValue = values.getLong((index + i) * 8);
+		final long[] localTable = table;
+		int pos = getIndex(key) * ENTRY_LONGS;
+		for (int i = 0; i < CLUSTER_SIZE; i++, pos += ENTRY_LONGS) {
+			long storedValue = localTable[pos + 1];
+			if (storedValue == 0) {
+				continue;
+			}
+			long storedKey = localTable[pos];
 			if ((storedKey ^ storedValue) == key) {
 				counter_hits++;
 				entry.setIsEmpty(false);
@@ -136,78 +136,71 @@ public class TTable_Impl2 implements ITTable {
 	private final void addValue(final long new_key, int new_score, final int new_depth, final int new_flag, final int new_move) {
 
 	    final long new_value = createValue(new_score, new_move, new_flag, new_depth);
-	    final int start_index_entry = getIndex(new_key);
+	    final long[] localTable = table;
+	    final int start_pos = getIndex(new_key) * ENTRY_LONGS;
 
-	    int replaced_min_depth = Integer.MAX_VALUE;
-	    int replaced_index = -1;
+	    int replace_pos = -1;
+	    int replace_depth = Integer.MAX_VALUE;
+	    int replace_flag = Integer.MAX_VALUE;
 
-	    for (int i = start_index_entry; i < start_index_entry + 4; i++) {
+	    for (int i = 0, pos = start_pos; i < CLUSTER_SIZE; i++, pos += ENTRY_LONGS) {
 
-	        long stored_key = keys.getLong(i * 8);
+	        long stored_value = localTable[pos + 1];
 
 	        // Empty slot found
-	        if (stored_key == 0) {
-	            
-	            replaced_index = i;
-	            replaced_min_depth = 0;
+	        if (stored_value == 0) {
+	            replace_pos = pos;
 	            counter_usage++;
 	            break;
 	        }
 	        
-	        long stored_value = values.getLong(i * 8);
+	        long stored_key = localTable[pos];
 	        int stored_depth = getDepth(stored_value);
 	        
-	        // Same key
+	        // Same key: never replace deeper information with shallower information.
 	        if ((stored_key ^ stored_value) == new_key) {
 	            
-	        	// No need to update identical entry
-	        	if (new_value == stored_value) {
-	        		
-	                return;
-	        	}
+		        	// No need to update identical entry
+		        	if (new_value == stored_value) {
+		        		
+		                return;
+		        	}
 	            
-	        	//Always replace for depth lower than ALWAYS_REPLACE_DEPTH
-	        	if (stored_depth <= ALWAYS_REPLACE_DEPTH) {
-	        		
-	                replaced_index = i;
-	                break;
-	        	}
-	        	
 	            if (new_depth > stored_depth) {
 	            	
-	                replaced_index = i;
+	                replace_pos = pos;
 	                break;
 
 	            } else if (new_depth == stored_depth) {
 	                
-		            int stored_flag = getFlag(stored_value);
-		            
+	                replace_pos = pos;
+	                break;
+	                
+	            		/*int stored_flag = getFlag(stored_value);
+	            	
 	                if (isStrongerFlag(new_flag, stored_flag)) {
 	                
-	                    replaced_index = i;
+	                    replace_pos = pos;
 	                    break;
 
 	                } else if (new_flag == stored_flag) {
 	                	
-	                    replaced_index = i;
-	                    break;
-	                    
-	                	/*int stored_score = getScore(stored_value);
+	                		int stored_score = getScore(stored_value);
 	                	
-	                    if (isBetterEval(new_score, stored_score, new_flag)) {
+	                    if (isBetterEval(new_score, stored_score, new_flag)
+	                    		|| (new_move != 0 && getMove(stored_value) == 0)
+	                    		|| new_move == getMove(stored_value)) {
+	                    	
+		                    	replace_pos = pos;
+		                    	break;
+	                    }
 	                    
-	                        replaced_index = i;
-	                        break;
-	                        
-	                    } else {
-	                    
-	                        return; // Same depth, same flag, worse eval
-	                    }*/
+	                    return;
 	                    
 	                } else {
 	                
 	                    return; // Same depth, weaker flag
-	                }
+	                }*/
 	          	
 	            } else {
 	                
@@ -215,20 +208,25 @@ public class TTable_Impl2 implements ITTable {
 	            }
 	        }
 	        
-	        if (stored_depth < replaced_min_depth) {
+	        // Replacement candidate for a different key: prefer the shallowest entry,
+	        // and for equal depth prefer the weakest bound information.
+	        int stored_flag = getFlag(stored_value);
+	        if (stored_depth < replace_depth
+	        		|| (stored_depth == replace_depth && stored_flag > replace_flag)) {
 	        	
-	            replaced_min_depth = stored_depth;
-	            replaced_index = i;
+	            replace_depth = stored_depth;
+	            replace_flag = stored_flag;
+	            replace_pos = pos;
 	        }
 	    }
 
-	    if (replaced_index == -1) {
+	    if (replace_pos == -1) {
 	    	
 	        throw new IllegalStateException("No available entry to replace.");
 	    }
 
-	    keys.putLong(replaced_index * 8, new_key ^ new_value);
-	    values.putLong(replaced_index * 8, new_value);
+	    localTable[replace_pos] = new_key ^ new_value;
+	    localTable[replace_pos + 1] = new_value;
 	}
 
 	private static boolean isStrongerFlag(int newFlag, int oldFlag) {
@@ -250,7 +248,7 @@ public class TTable_Impl2 implements ITTable {
 	}
 
 	private int getIndex(long key) {
-		return ((int) (key ^ (key >>> 32)) & (maxEntries - 4));
+		return ((int) (key ^ (key >>> 32)) & (maxEntries - CLUSTER_SIZE));
 	}
 
 	private static int getScore(long value) {
@@ -273,6 +271,6 @@ public class TTable_Impl2 implements ITTable {
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(depth >= 0 && depth <= 255);
 		}
-		return ((long) score << SCORE_SHIFT) | ((long) move << MOVE_SHIFT) | ((long) flag << FLAG_SHIFT) | depth;
+		return VALID_MASK | ((long) score << SCORE_SHIFT) | ((long) move << MOVE_SHIFT) | ((long) flag << FLAG_SHIFT) | depth;
 	}
 }
