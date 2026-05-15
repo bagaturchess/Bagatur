@@ -226,9 +226,11 @@ public class PVValidation {
 				
 			case PVNode.TYPE_STATIC_NULL_MOVE:
 				
-				if (node.eval != static_eval) {
+				int beta_adjusted = eval_sign > 0 ? beta : alpha;
+				
+				if (node.eval != ((2 * beta_adjusted + static_eval) / 3)) {
 					
-					throw new IllegalStateException("eval=" + node.eval + ", static_eval=" + static_eval);
+					throw new IllegalStateException("eval=" + node.eval + ", (2 * beta_adjusted + static_eval) / 3 =" + (2 * beta_adjusted + static_eval) / 3);
 				}
 				
 				break;
