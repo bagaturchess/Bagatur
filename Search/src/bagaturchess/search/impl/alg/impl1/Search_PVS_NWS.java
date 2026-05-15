@@ -684,7 +684,9 @@ public class Search_PVS_NWS extends SearchImpl {
 						searchStats.register(SearchStatistics.TYPE_STATIC_NULL_MOVE_OK, depth);
 						
 						node.bestmove = 0;
-						node.eval = ssi.static_eval;
+						// Return a soft lower bound instead of the raw static eval.
+						// This keeps the cutoff but avoids storing/reporting an over-optimistic bound.
+						node.eval = (2 * beta + ssi.static_eval) / 3;
 						node.leaf = true;
 						node.type = PVNode.TYPE_STATIC_NULL_MOVE;
 								
@@ -708,12 +710,12 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					env.getBitboard().makeNullMoveBackward();
 					
-					if (score >= beta) {
+					if (score >= beta && !SearchUtils.isMateVal(score)) {
 						
 						int verify_score = depth - reduction <= 0 ? qsearch(mediator, pvman, evaluator, info, beta - 1, beta, ply, false, initialMaxDepth)
 								: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth);
 						
-						if (verify_score >= beta) {
+						if (verify_score >= beta && !SearchUtils.isMateVal(verify_score)) {
 							
 							searchStats.register(SearchStatistics.TYPE_NULL_MOVE_OK, depth);
 							
