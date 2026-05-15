@@ -157,7 +157,6 @@ public class TTable_Impl2 implements ITTable {
 	        long stored_key = localTable[pos];
 	        int stored_depth = getDepth(stored_value);
 	        
-	        // Same key: never replace deeper information with shallower information.
 	        if ((stored_key ^ stored_value) == new_key) {
 	            
 		        	// No need to update identical entry
@@ -166,6 +165,12 @@ public class TTable_Impl2 implements ITTable {
 		                return;
 		        	}
 	            
+		        	if (true) { //Always replace strategy
+		        		
+		        		replace_pos = pos;
+		        		break;
+		        	}
+		        	
 	            if (new_depth > stored_depth) {
 	            	
 	                replace_pos = pos;
