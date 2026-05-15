@@ -664,7 +664,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			//Reduce depth if TT value is not presented
-			if (!VALIDATE_PV && depth >= 2 && ttFlag == -1) {
+			if (!VALIDATE_PV && depth >= 6 && ttMove == 0) {
 				
 				depth -= 1;
 			}
@@ -883,9 +883,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//Still no tt move, so help the search to find the tt move/score faster
-		if (!VALIDATE_PV && isPv && ttFlag == -1 && depth >= 3) {
+		if (!VALIDATE_PV && isPv && ttMove == 0 && depth >= 6) {
 			
-			depth -= 2;
+			depth -= 1;
 		}
 		
 		
@@ -1204,22 +1204,6 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				env.getBitboard().makeMoveForward(move);
-				
-				
-				//Under some conditions, reduce the depth with 1 ply
-				//if the move made is not improving the static evaluation.
-				if (!VALIDATE_PV
-						&& !isPv
-						&& !ssi.in_check
-						&& !isCheckMove
-						&& isQuiet
-						//&& movesPerformed_attacks + movesPerformed_quiet > 1
-						&& list.getScore() <= stats.getEntropy()
-						&& new_depth >= 2
-						&& ssi.static_eval > -eval(ply, -beta, -alpha, isPv)) {
-					
-					new_depth--;
-				}
 				
 				
 				int score = ISearch.MIN;
