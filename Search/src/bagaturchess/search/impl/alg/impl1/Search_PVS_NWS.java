@@ -1206,26 +1206,28 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(move);
 				
 				
+				int moveNumber = movesPerformed_attacks + movesPerformed_quiet;
 				int score = ISearch.MIN;
-				
+
 				if (reduction > 1) {
-											
-					score = -search(mediator, info, pvman, evaluator, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
-					
-					if (score > (VALIDATE_PV ? bestScore : alpha)) {
-						
-						score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
-					}
-					
-				} else if (!isPv || movesPerformed_attacks + movesPerformed_quiet > 1) {
-					
-					score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
+				    
+				    score = -search(mediator, info, pvman, evaluator, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
+				    
+				    if (score > (VALIDATE_PV ? bestScore : alpha)) {
+				        
+				        score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
+				    }
+				    
+				} else if (!isPv || moveNumber > 1) {
+				    
+				    score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
+				}
+
+				if (isPv && (moveNumber == 1 || (score > (VALIDATE_PV ? bestScore : alpha) && score < beta))) {
+				    
+				    score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -beta, -alpha, true, initialMaxDepth);
 				}
 				
-				if (isPv && (score > bestScore || movesPerformed_attacks + movesPerformed_quiet == 1)) {
-					
-					score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -beta, -alpha, isPv, initialMaxDepth);
-				}
 				
 				env.getBitboard().makeMoveBackward(move);
 				
