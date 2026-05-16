@@ -335,7 +335,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				history.registerAll(parentMove, move, depth);				
 				conthist.registerAll(parentMove, move, depth);
 				
-				if (score < beta) {
+				if (score <= alpha) {
 					
 					history.registerBad(parentMove, move, depth);
 					conthist.registerBad(parentMove, move, depth);
@@ -344,7 +344,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				caphist.registerAll(parentMove, move, depth);
 				
-				if (score < beta) {
+				if (score <= alpha) {
 					
 					caphist.registerBad(parentMove, move, depth);
 				}
@@ -1251,7 +1251,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					history.registerAll(parentMove, move, (int) depth);
 					conthist.registerAll(parentMove, move, (int) depth);
 					
-					if (score < beta) {
+					if (score <= alpha) {
 						
 						history.registerBad(parentMove, move, (int) depth);
 						conthist.registerBad(parentMove, move, (int) depth);
@@ -1261,7 +1261,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					caphist.registerAll(parentMove, move, (int) depth);
 					
-					if (score < beta) {
+					if (score <= alpha) {
 						
 						caphist.registerBad(parentMove, move, (int) depth);
 					}
