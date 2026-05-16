@@ -1075,6 +1075,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				//Fail-low pruning for non-PV nodes
 				if (!isPv
+						&& !mateThreat
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
@@ -1165,6 +1166,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				//Late move reduction
 				boolean doLMR = isLateQuiet
+						&& !mateThreat
 						&& new_depth >= 2
 						&& !ssi.in_check
 						&& !isCheckMove
@@ -1196,6 +1198,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				if (!isPv
+						&& !mateThreat
 						&& !ssi.in_check
 						&& !isCheckMove
 						&& isLateQuiet
