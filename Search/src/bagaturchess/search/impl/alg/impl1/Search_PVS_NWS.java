@@ -70,7 +70,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private static final int STATIC_NULL_MOVE_MAXDEPTH 				= 7; //MAX_DEPTH; //9;
 	private static final int STATIC_NULL_MOVE_MARGIN 				= 80;
 	
-	private static final int RAZORING_MAXDEPTH 						= 7; //MAX_DEPTH; //4;
+	private static final int RAZORING_MAXDEPTH 						= 4; //MAX_DEPTH; //4;
 	private static final int RAZORING_MARGIN 						= 260;
 	
 	private static final int SEE_MAXDEPTH 							= 7; //MAX_DEPTH; //8;
@@ -1818,8 +1818,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				int see = env.getBitboard().getSEEScore(move);
 				
 				if (see < 0) {
-					
-					continue;
+				    
+				    continue;
 				}
 				
 				
