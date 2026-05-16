@@ -306,21 +306,21 @@ public class Search_PVS_NWS extends SearchImpl {
 
 			if (reduction > 1) {
 			    
-			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
+			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth, true);
 			    
 			    if (score > (VALIDATE_PV ? bestScore : alpha)) {
 			        
-			        score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+			        score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth, true);
 			    }
 			    
 			} else if (!isPv || moveNumber > 1) {
 			    
-			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth, true);
 			}
 
 			if (isPv && (moveNumber == 1 || score > bestScore)) {
 			    
-			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, true, initialMaxDepth);
+			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, true, initialMaxDepth, true);
 			}
 			
 			
@@ -444,7 +444,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private int search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator,
-			final int ply, double depth, int alpha, int beta, boolean isPv, int initialMaxDepth) {
+			final int ply, double depth, int alpha, int beta, boolean isPv, int initialMaxDepth, boolean useSME) {
 		
 		
 		if (mediator != null && mediator.getStopper() != null) {
@@ -711,14 +711,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					reduction = reduction * REDUCTION_AGGRESSIVENESS;
 					
 					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, -beta, -beta + 1, ply + 1, false, initialMaxDepth)
-							: -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth);
+							: -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth, useSME);
 					
 					env.getBitboard().makeNullMoveBackward();
 					
 					if (score >= beta && !SearchUtils.isMateVal(score)) {
 						
 						int verify_score = depth - reduction <= 0 ? qsearch(mediator, pvman, evaluator, info, beta - 1, beta, ply, false, initialMaxDepth)
-								: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth);
+								: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth, useSME);
 						
 						if (verify_score >= beta && !SearchUtils.isMateVal(verify_score)) {
 							
@@ -807,7 +807,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			    	
 			    		searchStats.register(SearchStatistics.TYPE_PROBECUT_OK, depth);
 			    	
-			        node.bestmove = ttMove;
+			        node.bestmove = env.getBitboard().isPossible(ttMove) ? ttMove : 0;
 			        node.eval = probCutBeta;
 			        node.leaf = true;
 			        node.type = PVNode.TYPE_PROBECUT;
@@ -849,13 +849,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			        env.getBitboard().makeMoveForward(move);
 			        
 			        
-			        int score = -qsearch(mediator, pvman, evaluator, info,
-			                -prob_cut_beta, -prob_cut_beta + 1, ply + 1, false, initialMaxDepth);
+			        int score = -qsearch(mediator, pvman, evaluator, info, -prob_cut_beta, -prob_cut_beta + 1, ply + 1, false, initialMaxDepth);
 			        
 			        if (score >= prob_cut_beta) {
 			            
-			            score = -search(mediator, info, pvman, evaluator, ply + 1,
-			                    prob_cut_depth, -prob_cut_beta, -prob_cut_beta + 1, false, initialMaxDepth);
+			            score = -search(mediator, info, pvman, evaluator, ply + 1, prob_cut_depth, -prob_cut_beta, -prob_cut_beta + 1, false, initialMaxDepth, useSME);
 			        }
 			        
 			        
@@ -883,7 +881,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int tt_move_extension = 0;
 		
-		if (depth >= 6
+		if (useSME
+				&& depth >= 6
 				&& ply < 2 * initialMaxDepth
 				&& isTTLowerBoundOrExact
 				&& isTTDepthEnoughForSingularExtension
@@ -1278,21 +1277,21 @@ public class Search_PVS_NWS extends SearchImpl {
 
 				if (reduction > 1) {
 				    
-				    score = -search(mediator, info, pvman, evaluator, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth);
+				    score = -search(mediator, info, pvman, evaluator, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth, useSME);
 				    
 				    if (score > (VALIDATE_PV ? bestScore : alpha)) {
 				        
-				        score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
+				        score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth, useSME);
 				    }
 				    
 				} else if (!isPv || moveNumber > 1) {
 				    
-				    score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth);
+				    score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth, useSME);
 				}
 
 				if (isPv && (moveNumber == 1 || score > bestScore)) {
 				    
-				    score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -beta, -alpha, true, initialMaxDepth);
+				    score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -beta, -alpha, true, initialMaxDepth, useSME);
 				}
 				
 				
@@ -1660,7 +1659,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(move);
 				
 				
-				int score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, false, initialMaxDepth);
+				int score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, false, initialMaxDepth, false);
 				
 				
 				env.getBitboard().makeMoveBackward(move);
@@ -1792,7 +1791,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getBitboard().isInCheck()) {
 			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
-			return search(mediator, info, pvman, evaluator, ply, 1, alpha, beta, isPv, initialMaxDepth);
+			return search(mediator, info, pvman, evaluator, ply, 1, alpha, beta, isPv, initialMaxDepth, false);
 			//return alpha;
 		}
 		
