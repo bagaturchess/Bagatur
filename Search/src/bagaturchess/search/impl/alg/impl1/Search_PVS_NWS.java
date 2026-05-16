@@ -1760,6 +1760,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		int bestMove 	= 0;
 		int bestScore 	= ISearch.MIN;
 		
+		int searchedMoves = 0;
+		
 		IMoveList list 	= lists_attacks_qsearch[ply];
 		list.clear();
 		
@@ -1809,9 +1811,26 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
+				searchedMoves++;
+				
+				
 				env.getBitboard().makeMoveForward(move);
 				
-				final int score = -qsearch(mediator, pvman, evaluator, info, -beta, -alpha, ply + 1, isPv, initialMaxDepth);
+				int score;
+
+				if (isPv && searchedMoves == 1) {
+				    
+				    score = -qsearch(mediator, pvman, evaluator, info, -beta, -alpha, ply + 1, true, initialMaxDepth);
+				    
+				} else {
+				    
+				    score = -qsearch(mediator, pvman, evaluator, info, -alpha - 1, -alpha, ply + 1, false, initialMaxDepth);
+				    
+				    if (isPv && score > (VALIDATE_PV ? bestScore : alpha) && score < beta) {
+				        
+				        score = -qsearch(mediator, pvman, evaluator, info, -beta, -alpha, ply + 1, true, initialMaxDepth);
+				    }
+				}
 				
 				env.getBitboard().makeMoveBackward(move);
 				
