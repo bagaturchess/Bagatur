@@ -304,25 +304,26 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
+			int moveNumber = movesPerformed_attacks + movesPerformed_quiet;
 			int score = ISearch.MIN;
-			
+
 			if (reduction > 1) {
-				
-				score = -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
-				
-				if (score > (VALIDATE_PV ? bestScore : alpha)) {
-					
-					score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
-				}
-				
-			} else if (!isPv || movesPerformed_attacks + movesPerformed_quiet > 1) {
-				
-				score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+			    
+			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth);
+			    
+			    if (score > (VALIDATE_PV ? bestScore : alpha)) {
+			        
+			        score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
+			    }
+			    
+			} else if (!isPv || moveNumber > 1) {
+			    
+			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth);
 			}
-			
-			if (isPv && (score > bestScore || movesPerformed_attacks + movesPerformed_quiet == 1)) {
-				
-				score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, isPv, initialMaxDepth);
+
+			if (isPv && (moveNumber == 1 || (score > (VALIDATE_PV ? bestScore : alpha) && score < beta))) {
+			    
+			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, true, initialMaxDepth);
 			}
 			
 			
@@ -1180,8 +1181,6 @@ public class Search_PVS_NWS extends SearchImpl {
 						
 						reduction += 1;
 					}
-					
-					reduction *= (1 - Math.min(1, list.getScore() / stats.getEntropy()));
 					
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 				}
