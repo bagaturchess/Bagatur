@@ -824,7 +824,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Singular move extension
 		int tt_move_extension = 0;
 		
-		if (depth >= 4
+		if (depth >= 6
 				&& ply < 2 * initialMaxDepth
 				&& isTTLowerBoundOrExact
 				&& isTTDepthEnoughForSingularExtension
@@ -849,11 +849,6 @@ public class Search_PVS_NWS extends SearchImpl {
 					searchStats.register(SearchStatistics.TYPE_SME_OK, depth);
 					
 					tt_move_extension = 1;
-					
-					if (!isPv) {
-						
-						tt_move_extension += 1;
-					}
 				}
 				
 			} else if (!isPv) {
@@ -915,6 +910,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int phase = PHASE_TT;
 		while (phase <= PHASE_ATTACKING_BAD) {
+			
+			list = null;
 			
 			switch (phase) {
 			
@@ -1092,7 +1089,7 @@ public class Search_PVS_NWS extends SearchImpl {
 							) {
 						
 						//Late move pruning
-						if (movesPerformed_attacks + movesPerformed_quiet >= (3 + depth * depth / (improving ? 1 : 2)) / PRUNING_AGGRESSIVENESS) {
+						if (movesPerformed_attacks + movesPerformed_quiet >= (3 + depth * depth / (improving ? 1 : 2))) {
 							
 							searchStats.register(SearchStatistics.TYPE_LMP_OK, depth);
 							
@@ -1432,6 +1429,8 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		int phase = PHASE_TT;
 		while (phase <= PHASE_ATTACKING_BAD) {
+			
+			list = null;
 			
 			switch (phase) {
 			
