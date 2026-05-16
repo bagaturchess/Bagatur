@@ -81,9 +81,12 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	
 	private static final boolean VALIDATE_PV 						= false;
-	
+
 	private static final boolean PRINT_SEARCH_STATS 					= false;
-	
+
+	// Indexed by Constants.TYPE_* (0=unused, 1=PAWN, 2=KNIGHT, 3=BISHOP, 4=ROOK, 5=QUEEN, 6=KING)
+	private static final int[] CAPTURE_FUTILITY_PIECE_VALUES 			= new int[]{0, 100, 300, 300, 500, 900, 20000};
+
 	private static final double[][] LMR_TABLE 						= new double[64][64];
 	
 	static {
@@ -818,7 +821,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			// ProbCut
-			if (depth >= 3
+			/*if (depth >= 3
 			        && ssi.static_eval + 300 >= beta) {
 			    
 				
@@ -874,7 +877,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			            return node.eval;
 			        }
 			    }
-			}
+			}*/
 		}
 		
 		
@@ -1264,11 +1267,38 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& lmr_depth <= FUTILITY_LMR_MAXDEPTH
 						&& list.getScore() <= stats.getEntropy()
 						&& ssi.static_eval + (lmr_depth + 1) * FUTILITY_LMR_MARGIN <= alpha) {
-					
+
 					continue;
 				}
-				
-				
+
+
+				// Futility pruning for captures
+				if (!isPv
+						&& !mateThreat
+						&& !ssi.in_check
+						&& !isCheckMove
+						&& (phase == PHASE_ATTACKING_GOOD || phase == PHASE_ATTACKING_BAD)
+						&& !env.getBitboard().getMoveOps().isPromotion(move)
+						&& movesPerformed_attacks + movesPerformed_quiet > 1
+						&& hasAtLeastOnePiece
+						&& !SearchUtils.isMateVal(alpha)
+						&& (int) lmr_depth < 7) {
+
+					int capturedFigureType = env.getBitboard().getMoveOps().getCapturedFigureType(move);
+					int capturedPieceValue = CAPTURE_FUTILITY_PIECE_VALUES[capturedFigureType];
+					int captHistScore = caphist.getScores(parentMove, move);
+
+					int futilityValue = ssi.static_eval + 218 + 223 * (int) lmr_depth + capturedPieceValue + captHistScore / 8;
+
+					if (futilityValue <= alpha) {
+
+						searchStats.register(SearchStatistics.TYPE_FUTILITY_SEARCH_OK, depth);
+
+						continue;
+					}
+				}
+
+
 				env.getBitboard().makeMoveForward(move);
 				
 				
