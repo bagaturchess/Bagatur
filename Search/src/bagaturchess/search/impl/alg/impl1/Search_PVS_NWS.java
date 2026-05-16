@@ -213,10 +213,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		PVNode node = pvman.load(ply);
-		node.bestmove = 0;
-		node.eval = ISearch.MIN;
-		node.leaf = true;
-		node.type = PVNode.TYPE_NORMAL_SEARCH;
+		resetNodeForSearch(node);
 		
 		
 		SearchStackInfo ssi = ssis[ply];
@@ -436,6 +433,15 @@ public class Search_PVS_NWS extends SearchImpl {
 	}
 	
 	
+	private static void resetNodeForSearch(PVNode node) {
+	    
+	    node.bestmove = 0;
+	    node.eval = ISearch.MIN;
+	    node.leaf = true;
+	    node.type = PVNode.TYPE_NORMAL_SEARCH;
+	}
+	
+	
 	private int search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator,
 			final int ply, double depth, int alpha, int beta, boolean isPv, int initialMaxDepth) {
@@ -479,10 +485,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		PVNode node = pvman.load(ply);
-		node.bestmove = 0;
-		node.eval = ISearch.MIN;
-		node.leaf = true;
-		node.type = PVNode.TYPE_NORMAL_SEARCH;
+		resetNodeForSearch(node);
 		
 		
 		//Go in qsearch if depth is < 1
@@ -728,6 +731,10 @@ public class Search_PVS_NWS extends SearchImpl {
 							return node.eval;
 						}
 						
+						
+						resetNodeForSearch(node);
+						
+						
 						//If the verify_score is negative mate score
 						if ((verify_score < -ISearch.MAX_MATERIAL_INTERVAL)
 								&& depth >= 2) {
@@ -773,51 +780,66 @@ public class Search_PVS_NWS extends SearchImpl {
 							
 							return node.eval;
 						}
+						
+						
+						resetNodeForSearch(node);
 					}
 				}
 			}
 			
 			
-			//ProbeCut
-			/*int prob_cut_margin = (int) Math.min(500, PROBCUT_MARGIN_BASE + depth * PROBCUT_MARGIN_INCREMENT);
-			int prob_cut_beta = beta + prob_cut_margin;
-			
-			if (depth >= 3
-					&& isTTLowerBoundOrExact
-					&& ttValue >= prob_cut_beta) {
-				
-				IMoveList list = lists_attacks[ply];
-				list.clear();
-				env.getBitboard().genCapturePromotionMoves(list);
-				
-				double prob_cut_depth = Math.max(1, depth / 2);
-				
-				int move;
-				while ((move = list.next()) != 0)  {
-					
-					if (env.getBitboard().getSEEScore(move) < 0) {
-						
-						continue;
-					}
-					
-					env.getBitboard().makeMoveForward(move);
-					
-					int score = -search(mediator, info, pvman, evaluator, ply + 1, prob_cut_depth, -prob_cut_beta, -prob_cut_beta + 1, false, initialMaxDepth);
-					
-					env.getBitboard().makeMoveBackward(move);
-					
-					
-					if (score >= prob_cut_beta) {
-						
-						node.bestmove = move;
-						node.eval = score;
-						node.leaf = true;
-						node.type = PVNode.TYPE_PROBECUT;
-						
-						return node.eval;
-					}
-				}
-			}*/
+			// ProbCut
+			if (depth >= 5
+			        && ssi.static_eval + 300 >= beta) {
+			    
+			    int prob_cut_margin = (int) Math.min(500, PROBCUT_MARGIN_BASE + depth * PROBCUT_MARGIN_INCREMENT);
+			    int prob_cut_beta = beta + prob_cut_margin;
+			    
+			    IMoveList list = lists_attacks[ply];
+			    list.clear();
+			    env.getBitboard().genCapturePromotionMoves(list);
+			    
+			    double prob_cut_depth = Math.max(1, depth - 4);
+			    
+			    int move;
+			    while ((move = list.next()) != 0) {
+			        
+			    		
+			        // SEE is only a rough guard here. Do not require SEE >= 0,
+			        // because NNUE may like material-looking-bad captures.
+			        if (env.getBitboard().getSEEScore(move) < -200) {
+			            
+			            continue;
+			        }
+			        
+			        
+			        env.getBitboard().makeMoveForward(move);
+			        
+			        
+			        int score = -qsearch(mediator, pvman, evaluator, info,
+			                -prob_cut_beta, -prob_cut_beta + 1, ply + 1, false, initialMaxDepth);
+			        
+			        if (score >= prob_cut_beta) {
+			            
+			            score = -search(mediator, info, pvman, evaluator, ply + 1,
+			                    prob_cut_depth, -prob_cut_beta, -prob_cut_beta + 1, false, initialMaxDepth);
+			        }
+			        
+			        
+			        env.getBitboard().makeMoveBackward(move);
+			        
+			        
+			        if (score >= prob_cut_beta) {
+			            
+			            node.bestmove = move;
+			            node.eval = score;
+			            node.leaf = true;
+			            node.type = PVNode.TYPE_PROBECUT;
+			            
+			            return node.eval;
+			        }
+			    }
+			}
 		}
 		
 		
