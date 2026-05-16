@@ -24,6 +24,8 @@ public class SearchStatistics {
 	public static int TYPE_FUTILITY_SEARCH_OK 		= 17;
 	public static int TYPE_SEE_SEARCH_ATTACKS_OK 	= 18;
 	public static int TYPE_SEE_SEARCH_NONATTACKS_OK 	= 19;
+	public static int TYPE_PROBECUT_TRIES 			= 20;
+	public static int TYPE_PROBECUT_OK 				= 21;
 	
 	
 	private double[] counts;
@@ -64,6 +66,8 @@ public class SearchStatistics {
 		result += ", RAZORING_OK = " + toPercentByAllNodes(counts[TYPE_RAZORING_OK]);
 		result += "\r\nSME_TRIES = " + toPercentByAllNodes(counts[TYPE_SME_TRIES]);
 		result += ", SME_OK = " + toPercentByAllNodes(counts[TYPE_SME_OK]);
+		result += "\r\nPROBECUT_TRIES = " + toPercentByAllNodes(counts[TYPE_PROBECUT_TRIES]);
+		result += ", PROBECUT_OK = " + toPercentByAllNodes(counts[TYPE_PROBECUT_OK]);
 		result += "\r\nLMP_OK = " + toPercentByAllMoves(counts[TYPE_LMP_OK]);
 		result += ", FUTILITY_SEARCH_OK = " + toPercentByAllMoves(counts[TYPE_FUTILITY_SEARCH_OK]);
 		result += ", SEE_SEARCH_ATTACKS_OK = " + toPercentByAllMoves(counts[TYPE_SEE_SEARCH_ATTACKS_OK]);

@@ -540,10 +540,11 @@ public class Search_PVS_NWS extends SearchImpl {
 		//TT probing
 		int ttMove 									= 0;
 		int ttFlag 									= -1;
-		int ttValue 								= IEvaluator.MIN_EVAL;
+		int ttValue 									= IEvaluator.MIN_EVAL;
+		int tpt_depth 								= -1;
 		
 		boolean isTTLowerBoundOrExact				= false;
-		boolean isTTDepthEnoughForSingularExtension = false;
+		boolean isTTDepthEnoughForSingularExtension 	= false;
 		
 		if (env.getTPT() != null) {
 			
@@ -559,7 +560,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				ttFlag = tt_entries_per_ply[ply].getFlag();
 				ttValue = tt_entries_per_ply[ply].getEval();
 				
-				int tpt_depth = tt_entries_per_ply[ply].getDepth();
+				tpt_depth = tt_entries_per_ply[ply].getDepth();
 				
 				isTTLowerBoundOrExact = ttFlag == ITTEntry.FLAG_LOWER || ttFlag == ITTEntry.FLAG_EXACT;
 				isTTDepthEnoughForSingularExtension = tpt_depth >= depth - 3;
@@ -788,12 +789,44 @@ public class Search_PVS_NWS extends SearchImpl {
 			}
 			
 			
+			// TT ProbCut
+			// If TT says this node was already much above beta at nearly enough depth,
+			// return a soft lower bound without searching the move loop.
+			if (depth >= 3
+			        && ttFlag == ITTEntry.FLAG_LOWER
+			        && tpt_depth >= depth - 4) {
+			    
+				
+				searchStats.register(SearchStatistics.TYPE_PROBECUT_TRIES, depth);
+				
+				
+			    int probCutBeta = beta + 428;
+			    
+			    if (ttValue >= probCutBeta) {
+			        
+			    	
+			    		searchStats.register(SearchStatistics.TYPE_PROBECUT_OK, depth);
+			    	
+			        node.bestmove = ttMove;
+			        node.eval = probCutBeta;
+			        node.leaf = true;
+			        node.type = PVNode.TYPE_PROBECUT;
+			        
+			        return node.eval;
+			    }
+			}
+			
+			
 			// ProbCut
-			if (depth >= 5
+			if (depth >= 3
 			        && ssi.static_eval + 300 >= beta) {
 			    
-			    int prob_cut_margin = (int) Math.min(500, PROBCUT_MARGIN_BASE + depth * PROBCUT_MARGIN_INCREMENT);
-			    int prob_cut_beta = beta + prob_cut_margin;
+				
+				searchStats.register(SearchStatistics.TYPE_PROBECUT_TRIES, depth);
+				
+				
+				int prob_cut_margin = improving ? 155 : 214;
+				int prob_cut_beta = beta + prob_cut_margin;
 			    
 			    IMoveList list = lists_attacks[ply];
 			    list.clear();
@@ -831,6 +864,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			        
 			        if (score >= prob_cut_beta) {
 			            
+			        	
+			        		searchStats.register(SearchStatistics.TYPE_PROBECUT_OK, depth);
+			        	
+			        	
 			            node.bestmove = move;
 			            node.eval = score;
 			            node.leaf = true;
