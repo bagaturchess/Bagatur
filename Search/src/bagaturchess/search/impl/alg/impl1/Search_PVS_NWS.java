@@ -885,6 +885,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		int tt_move_extension = 0;
 		
 		if (useSME
+				&& !ssi.in_check
 				&& depth >= 6
 				&& ply < 2 * initialMaxDepth
 				&& isTTLowerBoundOrExact
@@ -894,10 +895,10 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			searchStats.register(SearchStatistics.TYPE_SME_TRIES, depth);
 			
-			int singular_margin = 16 + (int) (2 * depth);
+			int singular_margin = (int) (isPv ? (depth * depth / 12) : (126 * depth / 55));
 			int singular_beta = ttValue - singular_margin;
-			double singular_depth = depth / 2;
-			singular_depth = Math.max(1 , singular_depth / REDUCTION_AGGRESSIVENESS);
+			double singular_depth = Math.max(1, (depth - 1) / 2.0);
+			//singular_depth = Math.max(1 , singular_depth / REDUCTION_AGGRESSIVENESS);
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, ply,
 					singular_depth, singular_beta - 1, singular_beta, initialMaxDepth, ttMove);
