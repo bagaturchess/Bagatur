@@ -23,7 +23,7 @@
 package bagaturchess.search.impl.movelists;
 
 
-import bagaturchess.bitboard.impl2.MoveUtil;
+import bagaturchess.bitboard.impl1.internal.MoveUtil;
 import bagaturchess.search.impl.env.SearchEnv;
 
 
@@ -41,7 +41,7 @@ public class SortedMoveList_MVVLVASEECaptureHistory extends SortedMoveList_BaseI
 		int score = 100000 * MoveUtil.getAttackedPieceIndex(move)
 			      - 10000  * MoveUtil.getSourcePieceIndex(move)
 			      + 10    * env.getBitboard().getSEEScore(move)
-			      + env.getCaptureHistory().getScores(-1, move);
+			      + 64 * env.getCaptureHistory().getScores(-1, move);
 		
 		return score;
 	}

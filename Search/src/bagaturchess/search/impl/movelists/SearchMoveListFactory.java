@@ -37,7 +37,7 @@ public class SearchMoveListFactory implements ISearchMoveListFactory {
 	@Override
 	public IMoveList createListCaptures(SearchEnv env, boolean onTheFlySorting) {
 		
-		return new SortedMoveList_CaptureHistory(333, env, onTheFlySorting);
+		return new SortedMoveList_MVVLVASEECaptureHistory(333, env, onTheFlySorting);
 	}
 
 
