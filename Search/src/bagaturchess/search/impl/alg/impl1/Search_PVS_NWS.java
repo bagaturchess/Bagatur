@@ -821,7 +821,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			// ProbCut
-			/*if (depth >= 3
+			if (depth >= 3
 			        && ssi.static_eval + 300 >= beta) {
 			    
 				
@@ -877,7 +877,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			            return node.eval;
 			        }
 			    }
-			}*/
+			}
 		}
 		
 		
