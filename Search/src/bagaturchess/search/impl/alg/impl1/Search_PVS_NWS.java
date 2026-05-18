@@ -672,7 +672,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			
 			//Reduce depth if TT value is not presented
-			if (!VALIDATE_PV && depth >= 6 && ttMove == 0) {
+			if (!VALIDATE_PV && depth >= 2 && ttMove == 0) {
 				
 				depth -= 1;
 			}
@@ -937,7 +937,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		//Still no tt move, so help the search to find the tt move/score faster
-		if (!VALIDATE_PV && isPv && ttMove == 0 && depth >= 6) {
+		if (!VALIDATE_PV && isPv && ttMove == 0 && depth >= 2) {
 			
 			depth -= 1;
 		}
