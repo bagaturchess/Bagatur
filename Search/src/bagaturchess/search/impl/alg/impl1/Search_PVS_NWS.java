@@ -703,7 +703,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				//Null move pruning
+				//Verified null move pruning
 				if (depth >= 3) {
 					
 					searchStats.register(SearchStatistics.TYPE_NULL_MOVE_TRIES, depth);
@@ -718,16 +718,27 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					env.getBitboard().makeNullMoveBackward();
 					
-					if (score >= beta && !SearchUtils.isMateVal(score)) {
+					if (score >= beta) {
 						
-						searchStats.register(SearchStatistics.TYPE_NULL_MOVE_OK, depth);
+						int verify_score = depth - reduction <= 0 ? qsearch(mediator, pvman, evaluator, info, beta - 1, beta, ply, false, initialMaxDepth)
+								: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth, useSME);
 						
-						node.bestmove = 0;
-						node.eval = score;
-						node.leaf = true;
-						node.type = PVNode.TYPE_NULL_MOVE;
+						if (verify_score >= beta) {
+							
+							node.bestmove = 0;
+							node.eval = verify_score;
+							node.leaf = true;
+							node.type = PVNode.TYPE_NULL_MOVE;
+							
+							return node.eval;
+						}
 						
-						return node.eval;
+						//If the verify_score is negative mate score
+						if ((verify_score < -ISearch.MAX_MATERIAL_INTERVAL)
+								&& depth >= 2) {
+							
+							mateThreat = true;
+						}
 					}
 					
 					//If the score is negative mate score
