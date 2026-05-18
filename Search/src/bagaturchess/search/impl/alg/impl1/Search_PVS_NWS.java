@@ -733,6 +733,8 @@ public class Search_PVS_NWS extends SearchImpl {
 							return node.eval;
 						}
 						
+						resetNodeForSearch(node);
+						
 						//If the verify_score is negative mate score
 						if ((verify_score < -ISearch.MAX_MATERIAL_INTERVAL)
 								&& depth >= 2) {
