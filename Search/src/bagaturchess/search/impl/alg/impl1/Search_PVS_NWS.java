@@ -308,22 +308,22 @@ public class Search_PVS_NWS extends SearchImpl {
 			int score = ISearch.MIN;
 
 			if (reduction > 1) {
-			    
-			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth, true);
-			    
+
+			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -alpha - 1, -alpha, false, initialMaxDepth, true, true);
+
 			    if (score > (VALIDATE_PV ? bestScore : alpha)) {
-			        
-			        score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth, true);
+
+			        score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth, true, false);
 			    }
-			    
+
 			} else if (!isPv || moveNumber > 1) {
-			    
-			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth, true);
+
+			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -alpha - 1, -alpha, false, initialMaxDepth, true, true);
 			}
 
 			if (isPv && (moveNumber == 1 || score > bestScore)) {
-			    
-			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, true, initialMaxDepth, true);
+
+			    score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, true, initialMaxDepth, true, false);
 			}
 			
 			
@@ -447,7 +447,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	
 	private int search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator,
-			final int ply, double depth, int alpha, int beta, boolean isPv, int initialMaxDepth, boolean useSME) {
+			final int ply, double depth, int alpha, int beta, boolean isPv, int initialMaxDepth, boolean useSME, boolean cutNode) {
 		
 		
 		if (mediator != null && mediator.getStopper() != null) {
@@ -714,14 +714,14 @@ public class Search_PVS_NWS extends SearchImpl {
 					reduction = reduction * REDUCTION_AGGRESSIVENESS;
 					
 					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, -beta, -beta + 1, ply + 1, false, initialMaxDepth)
-							: -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth, useSME);
-					
+							: -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth, useSME, false);
+
 					env.getBitboard().makeNullMoveBackward();
-					
+
 					if (score >= beta) {
-						
+
 						int verify_score = depth - reduction <= 0 ? qsearch(mediator, pvman, evaluator, info, beta - 1, beta, ply, false, initialMaxDepth)
-								: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth, useSME);
+								: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth, useSME, false);
 						
 						if (verify_score >= beta) {
 							
@@ -852,7 +852,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			        
 			        if (score >= prob_cut_beta) {
 			            
-			            score = -search(mediator, info, pvman, evaluator, ply + 1, prob_cut_depth, -prob_cut_beta, -prob_cut_beta + 1, false, initialMaxDepth, useSME);
+			            score = -search(mediator, info, pvman, evaluator, ply + 1, prob_cut_depth, -prob_cut_beta, -prob_cut_beta + 1, false, initialMaxDepth, useSME, !cutNode);
 			        }
 			        
 			        
@@ -897,7 +897,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			//singular_depth = Math.max(1 , singular_depth / REDUCTION_AGGRESSIVENESS);
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, ply,
-					singular_depth, singular_beta - 1, singular_beta, initialMaxDepth, ttMove);
+					singular_depth, singular_beta - 1, singular_beta, initialMaxDepth, ttMove, !cutNode);
 			
 			//Singular extension - only ttMove has score above beta
 			if (singular_value < singular_beta) {
@@ -1239,15 +1239,20 @@ public class Search_PVS_NWS extends SearchImpl {
 					reduction = LMR_TABLE[(int) Math.min(new_depth, 63)][Math.min(movesPerformed_attacks + movesPerformed_quiet, 63)];
 					
 					if (!isPv) {
-						
+
 						reduction += 1;
 					}
-					
+
+					if (cutNode) {
+
+						reduction += 1;
+					}
+
 					if (improving) {
-						
+
 						reduction -= 1;
 					}
-					
+
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 				}
 				
@@ -1303,22 +1308,22 @@ public class Search_PVS_NWS extends SearchImpl {
 				int score = ISearch.MIN;
 
 				if (reduction > 1) {
-				    
-				    score = -search(mediator, info, pvman, evaluator, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth, useSME);
-				    
+
+				    score = -search(mediator, info, pvman, evaluator, ply + 1, lmr_depth, -alpha - 1, -alpha, false, initialMaxDepth, useSME, true);
+
 				    if (score > (VALIDATE_PV ? bestScore : alpha)) {
-				        
-				        score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth, useSME);
+
+				        score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth, useSME, !cutNode);
 				    }
-				    
+
 				} else if (!isPv || moveNumber > 1) {
-				    
-				    score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth, useSME);
+
+				    score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -alpha - 1, -alpha, false, initialMaxDepth, useSME, !cutNode);
 				}
 
 				if (isPv && (moveNumber == 1 || score > bestScore)) {
-				    
-				    score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -beta, -alpha, true, initialMaxDepth, useSME);
+
+				    score = -search(mediator, info, pvman, evaluator, ply + 1, new_depth, -beta, -alpha, true, initialMaxDepth, useSME, false);
 				}
 				
 				
@@ -1454,7 +1459,7 @@ public class Search_PVS_NWS extends SearchImpl {
 	private int singular_move_search(ISearchMediator mediator, ISearchInfo info,
 			PVManager pvman, IEvaluator evaluator,
 			final int ply, double depth, int alpha,
-			int beta, int initialMaxDepth, int ttMove1) {
+			int beta, int initialMaxDepth, int ttMove1, boolean cutNode) {
 		
 		
 		final long hashkey = getHashkeyTPT() ^ Long.rotateLeft(((long) ttMove1) * 0x9E3779B97F4A7C15L, 32);
@@ -1686,7 +1691,7 @@ public class Search_PVS_NWS extends SearchImpl {
 				env.getBitboard().makeMoveForward(move);
 				
 				
-				int score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, false, initialMaxDepth, false);
+				int score = -search(mediator, info, pvman, evaluator, ply + 1, depth - 1, -beta, -alpha, false, initialMaxDepth, false, cutNode);
 				
 				
 				env.getBitboard().makeMoveBackward(move);
@@ -1818,7 +1823,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getBitboard().isInCheck()) {
 			//With queens on the board, this extension goes out of control if qsearch plays TT moves which are not attacks only.
-			return search(mediator, info, pvman, evaluator, ply, 1, alpha, beta, isPv, initialMaxDepth, false);
+			return search(mediator, info, pvman, evaluator, ply, 1, alpha, beta, isPv, initialMaxDepth, false, false);
 			//return alpha;
 		}
 		
