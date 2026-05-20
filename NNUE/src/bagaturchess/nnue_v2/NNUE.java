@@ -60,6 +60,7 @@ public class NNUE {
 	private static short[] L1Weights;
 	private static short[] L1Biases;
 	private static short[][] L2Weights;
+	private static int[][] L2Weights_int;
 	private static short outputBiases[];
 	
 	static {
@@ -171,10 +172,17 @@ public class NNUE {
 		outputBiases = new short[OUTPUT_BUCKETS];
 
 		for (int i = 0; i < OUTPUT_BUCKETS; i++) {
-			
+
 			outputBiases[i] = toLittleEndian(networkData.readShort());
 		}
-		
+
+		L2Weights_int = new int[OUTPUT_BUCKETS][HIDDEN_SIZE * 2];
+		for (int b = 0; b < OUTPUT_BUCKETS; b++) {
+			for (int i = 0; i < HIDDEN_SIZE * 2; i++) {
+				L2Weights_int[b][i] = L2Weights[b][i];
+			}
+		}
+
 		//24 non zero shorts left at the end of the file
 		/*for (int i = 0; i < 24; i++) {
 			System.out.println(toLittleEndian(networkData.readShort()));
@@ -268,11 +276,11 @@ public class NNUE {
 	public static int evaluate(NNUEAccumulator us, NNUEAccumulator them, int pieces_count) {
 		
 		int outputBucket = chooseOutputBucket(pieces_count);
-		
-		short[] L2Weights = NNUE.L2Weights[outputBucket];
+
+		int[] L2Weights = NNUE.L2Weights_int[outputBucket];
 		short[] UsValues = us.values;
 		short[] ThemValues = them.values;
-		
+
 		int eval = evaluateVectorized(UsValues, ThemValues, L2Weights);
 		
 		eval /= QA;
@@ -285,184 +293,197 @@ public class NNUE {
 	}
 	
 	
-	private static int evaluateVectorized(short[] UsValues, short[] ThemValues, short[] L2Weights) {
-		
+	private static int evaluateVectorized(short[] UsValues, short[] ThemValues, int[] L2Weights) {
+
 		IntVector acc0 = IntVector.zero(INT_SPECIES);
 		IntVector acc1 = IntVector.zero(INT_SPECIES);
 		IntVector acc2 = IntVector.zero(INT_SPECIES);
 		IntVector acc3 = IntVector.zero(INT_SPECIES);
-		
+
 		final int shortStep = SHORT_SPECIES.length();
+		final int intStep = INT_SPECIES.length();
 		final int unrolledStep = shortStep * 2;
-		
+
 		int i = 0;
-		int unrolledBound = HIDDEN_SIZE - unrolledStep + 1;
-		
+		final int unrolledBound = HIDDEN_SIZE - unrolledStep + 1;
+
 		for (; i < unrolledBound; i += unrolledStep) {
-			
+
 			ShortVector usA = ShortVector.fromArray(SHORT_SPECIES, UsValues, i)
-					.max((short) 0)
-					.min((short) QA);
-			
+					.max((short) 0).min((short) QA);
 			ShortVector themA = ShortVector.fromArray(SHORT_SPECIES, ThemValues, i)
-					.max((short) 0)
-					.min((short) QA);
-			
-			ShortVector usWeightsA = ShortVector.fromArray(SHORT_SPECIES, L2Weights, i);
-			ShortVector themWeightsA = ShortVector.fromArray(SHORT_SPECIES, L2Weights, i + HIDDEN_SIZE);
-			
+					.max((short) 0).min((short) QA);
+
 			IntVector usA0 = (IntVector) usA.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
 			IntVector usA1 = (IntVector) usA.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
 			IntVector themA0 = (IntVector) themA.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
 			IntVector themA1 = (IntVector) themA.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
-			
-			IntVector usWeightsA0 = (IntVector) usWeightsA.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
-			IntVector usWeightsA1 = (IntVector) usWeightsA.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
-			IntVector themWeightsA0 = (IntVector) themWeightsA.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
-			IntVector themWeightsA1 = (IntVector) themWeightsA.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
-			
+
+			IntVector usWeightsA0 = IntVector.fromArray(INT_SPECIES, L2Weights, i);
+			IntVector usWeightsA1 = IntVector.fromArray(INT_SPECIES, L2Weights, i + intStep);
+			IntVector themWeightsA0 = IntVector.fromArray(INT_SPECIES, L2Weights, i + HIDDEN_SIZE);
+			IntVector themWeightsA1 = IntVector.fromArray(INT_SPECIES, L2Weights, i + HIDDEN_SIZE + intStep);
+
 			acc0 = acc0.add(usA0.mul(usA0).mul(usWeightsA0)
 					.add(themA0.mul(themA0).mul(themWeightsA0)));
-			
 			acc1 = acc1.add(usA1.mul(usA1).mul(usWeightsA1)
 					.add(themA1.mul(themA1).mul(themWeightsA1)));
-			
-			
-			int j = i + shortStep;
-			
+
+			final int j = i + shortStep;
+
 			ShortVector usB = ShortVector.fromArray(SHORT_SPECIES, UsValues, j)
-					.max((short) 0)
-					.min((short) QA);
-			
+					.max((short) 0).min((short) QA);
 			ShortVector themB = ShortVector.fromArray(SHORT_SPECIES, ThemValues, j)
-					.max((short) 0)
-					.min((short) QA);
-			
-			ShortVector usWeightsB = ShortVector.fromArray(SHORT_SPECIES, L2Weights, j);
-			ShortVector themWeightsB = ShortVector.fromArray(SHORT_SPECIES, L2Weights, j + HIDDEN_SIZE);
-			
+					.max((short) 0).min((short) QA);
+
 			IntVector usB0 = (IntVector) usB.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
 			IntVector usB1 = (IntVector) usB.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
 			IntVector themB0 = (IntVector) themB.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
 			IntVector themB1 = (IntVector) themB.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
-			
-			IntVector usWeightsB0 = (IntVector) usWeightsB.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
-			IntVector usWeightsB1 = (IntVector) usWeightsB.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
-			IntVector themWeightsB0 = (IntVector) themWeightsB.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
-			IntVector themWeightsB1 = (IntVector) themWeightsB.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
-			
+
+			IntVector usWeightsB0 = IntVector.fromArray(INT_SPECIES, L2Weights, j);
+			IntVector usWeightsB1 = IntVector.fromArray(INT_SPECIES, L2Weights, j + intStep);
+			IntVector themWeightsB0 = IntVector.fromArray(INT_SPECIES, L2Weights, j + HIDDEN_SIZE);
+			IntVector themWeightsB1 = IntVector.fromArray(INT_SPECIES, L2Weights, j + HIDDEN_SIZE + intStep);
+
 			acc2 = acc2.add(usB0.mul(usB0).mul(usWeightsB0)
 					.add(themB0.mul(themB0).mul(themWeightsB0)));
-			
 			acc3 = acc3.add(usB1.mul(usB1).mul(usWeightsB1)
 					.add(themB1.mul(themB1).mul(themWeightsB1)));
 		}
-		
+
 		IntVector acc = acc0.add(acc1).add(acc2).add(acc3);
-		
-		int upperBound = SHORT_SPECIES.loopBound(HIDDEN_SIZE);
-		
-		for (; i < upperBound; i += SHORT_SPECIES.length()) {
-			
+
+		final int upperBound = SHORT_SPECIES.loopBound(HIDDEN_SIZE);
+
+		for (; i < upperBound; i += shortStep) {
+
 			ShortVector us = ShortVector.fromArray(SHORT_SPECIES, UsValues, i)
-					.max((short) 0)
-					.min((short) QA);
-			
+					.max((short) 0).min((short) QA);
 			ShortVector them = ShortVector.fromArray(SHORT_SPECIES, ThemValues, i)
-					.max((short) 0)
-					.min((short) QA);
-			
-			ShortVector usWeights = ShortVector.fromArray(SHORT_SPECIES, L2Weights, i);
-			ShortVector themWeights = ShortVector.fromArray(SHORT_SPECIES, L2Weights, i + HIDDEN_SIZE);
-			
+					.max((short) 0).min((short) QA);
+
 			IntVector us0 = (IntVector) us.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
 			IntVector us1 = (IntVector) us.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
 			IntVector them0 = (IntVector) them.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
 			IntVector them1 = (IntVector) them.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
-			
-			IntVector usWeights0 = (IntVector) usWeights.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
-			IntVector usWeights1 = (IntVector) usWeights.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
-			IntVector themWeights0 = (IntVector) themWeights.convertShape(VectorOperators.S2I, INT_SPECIES, 0);
-			IntVector themWeights1 = (IntVector) themWeights.convertShape(VectorOperators.S2I, INT_SPECIES, 1);
-			
-			acc = acc.add(us0.mul(us0).mul(usWeights0)
-					.add(them0.mul(them0).mul(themWeights0)));
-			
-			acc = acc.add(us1.mul(us1).mul(usWeights1)
-					.add(them1.mul(them1).mul(themWeights1)));
+
+			IntVector usWeights0 = IntVector.fromArray(INT_SPECIES, L2Weights, i);
+			IntVector usWeights1 = IntVector.fromArray(INT_SPECIES, L2Weights, i + intStep);
+			IntVector themWeights0 = IntVector.fromArray(INT_SPECIES, L2Weights, i + HIDDEN_SIZE);
+			IntVector themWeights1 = IntVector.fromArray(INT_SPECIES, L2Weights, i + HIDDEN_SIZE + intStep);
+
+			acc = acc.add(us0.mul(us0).mul(usWeights0).add(them0.mul(them0).mul(themWeights0)));
+			acc = acc.add(us1.mul(us1).mul(usWeights1).add(them1.mul(them1).mul(themWeights1)));
 		}
-		
+
 		int eval = acc.reduceLanes(VectorOperators.ADD);
-		
+
 		for (; i < HIDDEN_SIZE; i++) {
-			
 			eval += screlu[UsValues[i] - Short.MIN_VALUE] * L2Weights[i]
 					+ screlu[ThemValues[i] - Short.MIN_VALUE] * L2Weights[i + HIDDEN_SIZE];
 		}
-		
+
 		return eval;
 	}
 	
 	
 	private static void addWeights(short[] values, int weightsOffset) {
-		
+
 		final short[] weights = L1Weights;
+		final int step = SHORT_SPECIES.length();
+		final int step4 = step * 4;
 		int i = 0;
-		int upperBound = SHORT_SPECIES.loopBound(HIDDEN_SIZE);
-		
-		for (; i < upperBound; i += SHORT_SPECIES.length()) {
-			
-			ShortVector valuesVector = ShortVector.fromArray(SHORT_SPECIES, values, i);
-			ShortVector weightsVector = ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i);
-			
-			valuesVector.add(weightsVector).intoArray(values, i);
+
+		for (; i <= HIDDEN_SIZE - step4; i += step4) {
+			ShortVector.fromArray(SHORT_SPECIES, values, i)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i))
+					.intoArray(values, i);
+			ShortVector.fromArray(SHORT_SPECIES, values, i + step)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i + step))
+					.intoArray(values, i + step);
+			ShortVector.fromArray(SHORT_SPECIES, values, i + step * 2)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i + step * 2))
+					.intoArray(values, i + step * 2);
+			ShortVector.fromArray(SHORT_SPECIES, values, i + step * 3)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i + step * 3))
+					.intoArray(values, i + step * 3);
 		}
-		
+		for (; i < SHORT_SPECIES.loopBound(HIDDEN_SIZE); i += step) {
+			ShortVector.fromArray(SHORT_SPECIES, values, i)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i))
+					.intoArray(values, i);
+		}
 		for (; i < HIDDEN_SIZE; i++) {
-			
 			values[i] += weights[weightsOffset + i];
 		}
 	}
 	
 	
 	private static void subWeights(short[] values, int weightsOffset) {
-		
+
 		final short[] weights = L1Weights;
+		final int step = SHORT_SPECIES.length();
+		final int step4 = step * 4;
 		int i = 0;
-		int upperBound = SHORT_SPECIES.loopBound(HIDDEN_SIZE);
-		
-		for (; i < upperBound; i += SHORT_SPECIES.length()) {
-			
-			ShortVector valuesVector = ShortVector.fromArray(SHORT_SPECIES, values, i);
-			ShortVector weightsVector = ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i);
-			
-			valuesVector.sub(weightsVector).intoArray(values, i);
+
+		for (; i <= HIDDEN_SIZE - step4; i += step4) {
+			ShortVector.fromArray(SHORT_SPECIES, values, i)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i))
+					.intoArray(values, i);
+			ShortVector.fromArray(SHORT_SPECIES, values, i + step)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i + step))
+					.intoArray(values, i + step);
+			ShortVector.fromArray(SHORT_SPECIES, values, i + step * 2)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i + step * 2))
+					.intoArray(values, i + step * 2);
+			ShortVector.fromArray(SHORT_SPECIES, values, i + step * 3)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i + step * 3))
+					.intoArray(values, i + step * 3);
 		}
-		
+		for (; i < SHORT_SPECIES.loopBound(HIDDEN_SIZE); i += step) {
+			ShortVector.fromArray(SHORT_SPECIES, values, i)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, weightsOffset + i))
+					.intoArray(values, i);
+		}
 		for (; i < HIDDEN_SIZE; i++) {
-			
 			values[i] -= weights[weightsOffset + i];
 		}
 	}
 	
 	
 	private static void addSubWeights(short[] values, int weightsToAddOffset, int weightsToSubOffset) {
-		
+
 		final short[] weights = L1Weights;
+		final int step = SHORT_SPECIES.length();
+		final int step4 = step * 4;
 		int i = 0;
-		int upperBound = SHORT_SPECIES.loopBound(HIDDEN_SIZE);
-		
-		for (; i < upperBound; i += SHORT_SPECIES.length()) {
-			
-			ShortVector valuesVector = ShortVector.fromArray(SHORT_SPECIES, values, i);
-			ShortVector addVector = ShortVector.fromArray(SHORT_SPECIES, weights, weightsToAddOffset + i);
-			ShortVector subVector = ShortVector.fromArray(SHORT_SPECIES, weights, weightsToSubOffset + i);
-			
-			valuesVector.add(addVector).sub(subVector).intoArray(values, i);
+
+		for (; i <= HIDDEN_SIZE - step4; i += step4) {
+			ShortVector.fromArray(SHORT_SPECIES, values, i)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, weightsToAddOffset + i))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, weightsToSubOffset + i))
+					.intoArray(values, i);
+			ShortVector.fromArray(SHORT_SPECIES, values, i + step)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, weightsToAddOffset + i + step))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, weightsToSubOffset + i + step))
+					.intoArray(values, i + step);
+			ShortVector.fromArray(SHORT_SPECIES, values, i + step * 2)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, weightsToAddOffset + i + step * 2))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, weightsToSubOffset + i + step * 2))
+					.intoArray(values, i + step * 2);
+			ShortVector.fromArray(SHORT_SPECIES, values, i + step * 3)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, weightsToAddOffset + i + step * 3))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, weightsToSubOffset + i + step * 3))
+					.intoArray(values, i + step * 3);
 		}
-		
+		for (; i < SHORT_SPECIES.loopBound(HIDDEN_SIZE); i += step) {
+			ShortVector.fromArray(SHORT_SPECIES, values, i)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, weightsToAddOffset + i))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, weightsToSubOffset + i))
+					.intoArray(values, i);
+		}
 		for (; i < HIDDEN_SIZE; i++) {
-			
 			values[i] += weights[weightsToAddOffset + i] - weights[weightsToSubOffset + i];
 		}
 	}
