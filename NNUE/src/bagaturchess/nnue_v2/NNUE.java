@@ -227,46 +227,44 @@ public class NNUE {
 	
 	
     private void incremental_update_accumulators() {
-		
+		final NNUEAccumulator whiteAcc = accumulators.getWhiteAccumulator();
+		final NNUEAccumulator blackAcc = accumulators.getBlackAccumulator();
+
 		for (int i = 0; i < dirtyPieces.dirtyNum; i++) {
-			
-			if (dirtyPieces.from[i] == dirtyPieces.to[i]) {
-				
-				continue;
-			}
-			
-			int piece_color = dirtyPieces.c[i];
-			
-			int piece = dirtyPieces.pc[i];
-			
-			int index_to_remove = dirtyPieces.from[i];
-			
-			int index_to_add = dirtyPieces.to[i];
-			
+
+			if (dirtyPieces.from[i] == dirtyPieces.to[i]) continue;
+
+			final int piece_color = dirtyPieces.c[i];
+			final int piece = dirtyPieces.pc[i];
+			final int index_to_remove = dirtyPieces.from[i];
+			final int index_to_add = dirtyPieces.to[i];
+
 			if (index_to_remove < 64 && index_to_add < 64) {
-				
-				accumulators.getWhiteAccumulator().addSub(
-						getIndex(index_to_add, piece_color, piece, WHITE),
-						getIndex(index_to_remove, piece_color, piece, WHITE)
-				);
-				
-				accumulators.getBlackAccumulator().addSub(
-						getIndex(index_to_add, piece_color, piece, BLACK),
-						getIndex(index_to_remove, piece_color, piece, BLACK)
-				);
-				
+
+				addSubWeights_both(
+						whiteAcc.values,
+						getL1WeightOffset(getIndex(index_to_add, piece_color, piece, WHITE), whiteAcc.bucketIndex),
+						getL1WeightOffset(getIndex(index_to_remove, piece_color, piece, WHITE), whiteAcc.bucketIndex),
+						blackAcc.values,
+						getL1WeightOffset(getIndex(index_to_add, piece_color, piece, BLACK), blackAcc.bucketIndex),
+						getL1WeightOffset(getIndex(index_to_remove, piece_color, piece, BLACK), blackAcc.bucketIndex));
+
 			} else {
-				
-				if (dirtyPieces.from[i] < 64) {//>=64 marks no entry e.g. during capture or promotion
-					
-					accumulators.getWhiteAccumulator().sub(getIndex(index_to_remove, piece_color, piece, WHITE));
-					accumulators.getBlackAccumulator().sub(getIndex(index_to_remove, piece_color, piece, BLACK));
+
+				if (index_to_remove < 64) {
+					subWeights_both(
+							whiteAcc.values,
+							getL1WeightOffset(getIndex(index_to_remove, piece_color, piece, WHITE), whiteAcc.bucketIndex),
+							blackAcc.values,
+							getL1WeightOffset(getIndex(index_to_remove, piece_color, piece, BLACK), blackAcc.bucketIndex));
 				}
-				
-				if (dirtyPieces.to[i] < 64) {
-					
-					accumulators.getWhiteAccumulator().add(getIndex(index_to_add, piece_color, piece, WHITE));
-					accumulators.getBlackAccumulator().add(getIndex(index_to_add, piece_color, piece, BLACK));
+
+				if (index_to_add < 64) {
+					addWeights_both(
+							whiteAcc.values,
+							getL1WeightOffset(getIndex(index_to_add, piece_color, piece, WHITE), whiteAcc.bucketIndex),
+							blackAcc.values,
+							getL1WeightOffset(getIndex(index_to_add, piece_color, piece, BLACK), blackAcc.bucketIndex));
 				}
 			}
 		}
@@ -489,6 +487,160 @@ public class NNUE {
 	}
 	
 	
+	private static void addSubWeights_both(
+			short[] wValues, int wAddOffset, int wSubOffset,
+			short[] bValues, int bAddOffset, int bSubOffset) {
+		final short[] weights = L1Weights;
+		final int step = SHORT_SPECIES.length();
+		final int step4 = step * 4;
+		int i = 0;
+		for (; i <= HIDDEN_SIZE - step4; i += step4) {
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, wAddOffset + i))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, wSubOffset + i))
+					.intoArray(wValues, i);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, bAddOffset + i))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, bSubOffset + i))
+					.intoArray(bValues, i);
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i + step)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, wAddOffset + i + step))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, wSubOffset + i + step))
+					.intoArray(wValues, i + step);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i + step)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, bAddOffset + i + step))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, bSubOffset + i + step))
+					.intoArray(bValues, i + step);
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i + step * 2)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, wAddOffset + i + step * 2))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, wSubOffset + i + step * 2))
+					.intoArray(wValues, i + step * 2);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i + step * 2)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, bAddOffset + i + step * 2))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, bSubOffset + i + step * 2))
+					.intoArray(bValues, i + step * 2);
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i + step * 3)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, wAddOffset + i + step * 3))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, wSubOffset + i + step * 3))
+					.intoArray(wValues, i + step * 3);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i + step * 3)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, bAddOffset + i + step * 3))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, bSubOffset + i + step * 3))
+					.intoArray(bValues, i + step * 3);
+		}
+		for (; i < SHORT_SPECIES.loopBound(HIDDEN_SIZE); i += step) {
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, wAddOffset + i))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, wSubOffset + i))
+					.intoArray(wValues, i);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, bAddOffset + i))
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, bSubOffset + i))
+					.intoArray(bValues, i);
+		}
+		for (; i < HIDDEN_SIZE; i++) {
+			wValues[i] += weights[wAddOffset + i] - weights[wSubOffset + i];
+			bValues[i] += weights[bAddOffset + i] - weights[bSubOffset + i];
+		}
+	}
+
+
+	private static void addWeights_both(
+			short[] wValues, int wOffset,
+			short[] bValues, int bOffset) {
+		final short[] weights = L1Weights;
+		final int step = SHORT_SPECIES.length();
+		final int step4 = step * 4;
+		int i = 0;
+		for (; i <= HIDDEN_SIZE - step4; i += step4) {
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, wOffset + i))
+					.intoArray(wValues, i);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, bOffset + i))
+					.intoArray(bValues, i);
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i + step)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, wOffset + i + step))
+					.intoArray(wValues, i + step);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i + step)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, bOffset + i + step))
+					.intoArray(bValues, i + step);
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i + step * 2)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, wOffset + i + step * 2))
+					.intoArray(wValues, i + step * 2);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i + step * 2)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, bOffset + i + step * 2))
+					.intoArray(bValues, i + step * 2);
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i + step * 3)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, wOffset + i + step * 3))
+					.intoArray(wValues, i + step * 3);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i + step * 3)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, bOffset + i + step * 3))
+					.intoArray(bValues, i + step * 3);
+		}
+		for (; i < SHORT_SPECIES.loopBound(HIDDEN_SIZE); i += step) {
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, wOffset + i))
+					.intoArray(wValues, i);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i)
+					.add(ShortVector.fromArray(SHORT_SPECIES, weights, bOffset + i))
+					.intoArray(bValues, i);
+		}
+		for (; i < HIDDEN_SIZE; i++) {
+			wValues[i] += weights[wOffset + i];
+			bValues[i] += weights[bOffset + i];
+		}
+	}
+
+
+	private static void subWeights_both(
+			short[] wValues, int wOffset,
+			short[] bValues, int bOffset) {
+		final short[] weights = L1Weights;
+		final int step = SHORT_SPECIES.length();
+		final int step4 = step * 4;
+		int i = 0;
+		for (; i <= HIDDEN_SIZE - step4; i += step4) {
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, wOffset + i))
+					.intoArray(wValues, i);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, bOffset + i))
+					.intoArray(bValues, i);
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i + step)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, wOffset + i + step))
+					.intoArray(wValues, i + step);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i + step)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, bOffset + i + step))
+					.intoArray(bValues, i + step);
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i + step * 2)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, wOffset + i + step * 2))
+					.intoArray(wValues, i + step * 2);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i + step * 2)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, bOffset + i + step * 2))
+					.intoArray(bValues, i + step * 2);
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i + step * 3)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, wOffset + i + step * 3))
+					.intoArray(wValues, i + step * 3);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i + step * 3)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, bOffset + i + step * 3))
+					.intoArray(bValues, i + step * 3);
+		}
+		for (; i < SHORT_SPECIES.loopBound(HIDDEN_SIZE); i += step) {
+			ShortVector.fromArray(SHORT_SPECIES, wValues, i)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, wOffset + i))
+					.intoArray(wValues, i);
+			ShortVector.fromArray(SHORT_SPECIES, bValues, i)
+					.sub(ShortVector.fromArray(SHORT_SPECIES, weights, bOffset + i))
+					.intoArray(bValues, i);
+		}
+		for (; i < HIDDEN_SIZE; i++) {
+			wValues[i] -= weights[wOffset + i];
+			bValues[i] -= weights[bOffset + i];
+		}
+	}
+
+
 	private static int getL1WeightOffset(int featureIndex, int bucketIndex) {
 		return (featureIndex + bucketIndex * FEATURE_SIZE) * HIDDEN_SIZE;
 	}
