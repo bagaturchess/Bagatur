@@ -42,6 +42,7 @@ import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.pv.PVValidation;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.uci.api.ChannelManager;
+import bagaturchess.search.impl.history.HistoryTable;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.movelists.SortedMoveList_Root;
 
@@ -1229,12 +1230,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				boolean isLateQuiet = phase == PHASE_QUIET && isQuiet;
-				
-				
 				//Late move reduction
-				boolean doLMR = isLateQuiet
-						&& !mateThreat
+				boolean doLMR = !mateThreat
 						&& new_depth >= 2
 						&& !ssi.in_check
 						&& !isCheckMove
@@ -1263,6 +1260,10 @@ public class Search_PVS_NWS extends SearchImpl {
 						reduction -= 1;
 					}
 
+					int histScore = env.getHistory().getScores(parentMove, move)
+					              + env.getContinuationHistory().getScores(parentMove, move);
+					reduction -= (histScore - 2 * HistoryTable.MOVE_SCORE_SCALE) / 1024.0;
+
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 				}
 				
@@ -1274,7 +1275,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& !mateThreat
 						&& !ssi.in_check
 						&& !isCheckMove
-						&& isLateQuiet
+						&& isQuiet
 						&& movesPerformed_attacks + movesPerformed_quiet > 1
 						&& lmr_depth <= FUTILITY_LMR_MAXDEPTH
 						&& list.getScore() <= stats.getEntropy()
