@@ -185,7 +185,8 @@ public abstract class SearchImpl implements ISearch {
 	
 	
 	public void newGame() {
-		env.getCorrectionHistory().reset();
+		env.getPawnsCorrectionHistory().reset();
+		env.getMaterialCorrectionHistory().reset();
 		env.clear();
 	}
 	

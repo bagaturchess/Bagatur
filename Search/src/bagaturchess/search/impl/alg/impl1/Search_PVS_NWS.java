@@ -485,11 +485,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 
 
-		// Pawn correction history: adjust static_eval to correct systematic evaluator bias
+		// Correction history: adjust static_eval to correct systematic evaluator bias
 		final int rawStaticEval = ssi.static_eval;
-		final long pawnHash = env.getBitboard().getPawnsHashKey();
+		final long pawnHash     = env.getBitboard().getPawnsHashKey();
+		final long materialHash = env.getBitboard().getMaterialHashKey();
 		if (!ssi.in_check) {
-			ssi.static_eval += env.getCorrectionHistory().get(colourToMove, pawnHash);
+			ssi.static_eval += env.getPawnsCorrectionHistory().get(colourToMove, pawnHash)
+							 + env.getMaterialCorrectionHistory().get(colourToMove, materialHash);
 		}
 
 
@@ -1457,12 +1459,13 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 
 
-		// Update pawn correction history: learn the bias between raw static eval and actual search score
+		// Update correction history: learn the bias between raw static eval and actual search score
 		if (!ssi.in_check
 				&& bestScore != ISearch.MIN
 				&& !SearchUtils.isMateVal(bestScore)
 				&& (int) depth >= 1) {
-			env.getCorrectionHistory().update(colourToMove, pawnHash, rawStaticEval, bestScore, (int) depth);
+			env.getPawnsCorrectionHistory().update(colourToMove, pawnHash, rawStaticEval, bestScore, (int) depth);
+			env.getMaterialCorrectionHistory().update(colourToMove, materialHash, rawStaticEval, bestScore, (int) depth);
 		}
 
 
@@ -1847,7 +1850,9 @@ public class Search_PVS_NWS extends SearchImpl {
 
 		int eval = eval(ply, alpha, beta, isPv);
 		// Apply correction history to stand-pat (not in check - guaranteed by the redirect above)
-		eval += env.getCorrectionHistory().get(env.getBitboard().getColourToMove(), env.getBitboard().getPawnsHashKey());
+		final int colourToMoveQ   = env.getBitboard().getColourToMove();
+		eval += env.getPawnsCorrectionHistory().get(colourToMoveQ, env.getBitboard().getPawnsHashKey())
+			  + env.getMaterialCorrectionHistory().get(colourToMoveQ, env.getBitboard().getMaterialHashKey());
 		
 		
 		if (!VALIDATE_PV && ttValue != IEvaluator.MIN_EVAL) {

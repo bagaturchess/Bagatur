@@ -28,13 +28,13 @@ public class CorrectionHistory {
 
 
 	// Returns correction in centipawns to add to static eval
-	public int get(int color, long pawnHash) {
-		return table[color][(int) (pawnHash & MASK)] / GRAIN;
+	public int get(int color, long hashKey) {
+		return table[color][(int) (hashKey & MASK)] / GRAIN;
 	}
 
 
-	public void update(int color, long pawnHash, int rawStaticEval, int bestScore, int depth) {
-		int idx    = (int) (pawnHash & MASK);
+	public void update(int color, long hashKey, int rawStaticEval, int bestScore, int depth) {
+		int idx    = (int) (hashKey & MASK);
 		int weight = Math.min(depth + 1, 16);
 		// Scale diff by depth: deeper searches are more reliable ground truth.
 		// Clamp to +-MAX_VAL/GRAIN so no single node can push entry to maximum.

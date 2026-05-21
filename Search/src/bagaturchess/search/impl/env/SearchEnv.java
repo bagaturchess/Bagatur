@@ -69,7 +69,8 @@ public class SearchEnv {
 	private IHistoryTable history;
 	private IHistoryTable continuation_history;
 	private IHistoryTable capture_history;
-	private CorrectionHistory correction_history;
+	private CorrectionHistory pawns_correction_history;
+	private CorrectionHistory material_correction_history;
 	
 	private IKillers killersAndCounters;
 	
@@ -80,23 +81,24 @@ public class SearchEnv {
 
 	public SearchEnv(IBitBoard _bitboard, SharedData _shared) {
 		
-		shared 					= _shared;
+		shared 						= _shared;
 		
-		bitboard 				= _bitboard;
+		bitboard 					= _bitboard;
 		
-		tactics 				= new Tactics(bitboard);
+		tactics 						= new Tactics(bitboard);
 		
-		continuation_history 	= new ContinuationHistory();
-		history 				= new HistoryTable();
-		capture_history 		= new HistoryTable();
-		correction_history		= new CorrectionHistory();
+		continuation_history 		= new ContinuationHistory();
+		history 						= new HistoryTable();
+		capture_history 				= new HistoryTable();
+		pawns_correction_history			= new CorrectionHistory();
+		material_correction_history	= new CorrectionHistory();
 		
-		killersAndCounters 		= new Killers();
-		moveListFactory 		= new SearchMoveListFactory();
+		killersAndCounters 			= new Killers();
+		moveListFactory 				= new SearchMoveListFactory();
 		
-		checked_tpt 			= false;
-		checked_evalCache 		= false;
-		checked_syzygyDTZCache 	= false;
+		checked_tpt 					= false;
+		checked_evalCache 			= false;
+		checked_syzygyDTZCache 		= false;
 	}
 	
 	
@@ -130,9 +132,15 @@ public class SearchEnv {
 	}
 
 
-	public CorrectionHistory getCorrectionHistory() {
+	public CorrectionHistory getPawnsCorrectionHistory() {
 
-		return correction_history;
+		return pawns_correction_history;
+	}
+
+
+	public CorrectionHistory getMaterialCorrectionHistory() {
+
+		return material_correction_history;
 	}
 	
 	
