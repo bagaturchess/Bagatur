@@ -34,6 +34,7 @@ import bagaturchess.search.api.internal.ISearch;
 import bagaturchess.search.api.internal.ISearchMoveListFactory;
 import bagaturchess.search.impl.eval.cache.IEvalCache;
 import bagaturchess.search.impl.history.ContinuationHistory;
+import bagaturchess.search.impl.history.CorrectionHistory;
 import bagaturchess.search.impl.history.HistoryTable;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.history.IKillers;
@@ -68,6 +69,7 @@ public class SearchEnv {
 	private IHistoryTable history;
 	private IHistoryTable continuation_history;
 	private IHistoryTable capture_history;
+	private CorrectionHistory correction_history;
 	
 	private IKillers killersAndCounters;
 	
@@ -87,6 +89,7 @@ public class SearchEnv {
 		continuation_history 	= new ContinuationHistory();
 		history 				= new HistoryTable();
 		capture_history 		= new HistoryTable();
+		correction_history		= new CorrectionHistory();
 		
 		killersAndCounters 		= new Killers();
 		moveListFactory 		= new SearchMoveListFactory();
@@ -122,8 +125,14 @@ public class SearchEnv {
 	
 	
 	public IHistoryTable getCaptureHistory() {
-		
+
 		return capture_history;
+	}
+
+
+	public CorrectionHistory getCorrectionHistory() {
+
+		return correction_history;
 	}
 	
 	

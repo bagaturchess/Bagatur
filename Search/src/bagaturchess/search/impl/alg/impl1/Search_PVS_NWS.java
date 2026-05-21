@@ -475,15 +475,24 @@ public class Search_PVS_NWS extends SearchImpl {
 		ssi.hash_key = getHashkeyTPT();
 		ssi.in_check = env.getBitboard().isInCheck();
 		ssi.tt_hit = false;
+		final int colourToMove = env.getBitboard().getColourToMove();
 		ssi.static_eval = eval(ply, alpha, beta, isPv);
-		
-		
+
+
 		if (ply >= ISearch.MAX_DEPTH) {
-			
+
 			return ssi.static_eval;
 		}
-		
-		
+
+
+		// Pawn correction history: adjust static_eval to correct systematic evaluator bias
+		final int rawStaticEval = ssi.static_eval;
+		final long pawnHash = env.getBitboard().getPawnsHashKey();
+		if (!ssi.in_check) {
+			ssi.static_eval += env.getCorrectionHistory().get(colourToMove, pawnHash);
+		}
+
+
 		boolean improving = ply - 2 >= 0 ? (ssi.static_eval - ssis[ply - 2].static_eval > 0) : false;
 		
 		
@@ -654,7 +663,6 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		final int parentMove 		= env.getBitboard().getLastMove();
-		final int colourToMove 		= env.getBitboard().getColourToMove();
 		boolean hasAtLeastOnePiece 	= (colourToMove == Constants.COLOUR_WHITE) ?
 										env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 										env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
@@ -1444,11 +1452,20 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		
 		if (env.getTPT() != null) {
-				
+
 			env.getTPT().put(ssi.hash_key, (int) depth, node.eval, alpha_org, beta, node.bestmove);
 		}
-		
-		
+
+
+		// Update pawn correction history: learn the bias between raw static eval and actual search score
+		if (!ssi.in_check
+				&& bestScore != ISearch.MIN
+				&& !SearchUtils.isMateVal(bestScore)
+				&& (int) depth >= 1) {
+			env.getCorrectionHistory().update(colourToMove, pawnHash, rawStaticEval, bestScore, (int) depth);
+		}
+
+
 		if (VALIDATE_PV) PVValidation.validatePV(this, env, node, ply, (int) depth, isPv, alpha_org, beta, validation_stack);
 		
 		
@@ -1826,9 +1843,11 @@ public class Search_PVS_NWS extends SearchImpl {
 			return search(mediator, info, pvman, evaluator, ply, 1, alpha, beta, isPv, initialMaxDepth, false, false);
 			//return alpha;
 		}
-		
-		
+
+
 		int eval = eval(ply, alpha, beta, isPv);
+		// Apply correction history to stand-pat (not in check - guaranteed by the redirect above)
+		eval += env.getCorrectionHistory().get(env.getBitboard().getColourToMove(), env.getBitboard().getPawnsHashKey());
 		
 		
 		if (!VALIDATE_PV && ttValue != IEvaluator.MIN_EVAL) {

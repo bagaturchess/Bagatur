@@ -788,4 +788,12 @@ public class DummyBoard implements IBitBoard {
 		
 		throw new UnsupportedOperationException();
 	}
+
+	
+	static long materialshash = 0;
+	@Override
+	public long getMaterialHashKey() {
+		
+		return materialshash++;
+	}
 }

@@ -38,6 +38,7 @@ public interface IBoard {
 	public long getHashKey();
 	public long getHashKeyAfterMove(final int move);
 	public long getPawnsHashKey();
+	public long getMaterialHashKey();
 	public int getStateRepetition();
 	
 	public int getFigureID(int fieldID);

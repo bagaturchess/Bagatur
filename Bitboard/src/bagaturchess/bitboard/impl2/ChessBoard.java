@@ -2230,4 +2230,11 @@ private class MoveOpsImpl implements IMoveOps {
 		}
 		
 	}
+
+
+	@Override
+	public long getMaterialHashKey() {
+
+		throw new UnsupportedOperationException();
+	}
 }

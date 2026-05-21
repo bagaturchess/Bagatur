@@ -5461,4 +5461,11 @@ public class Board extends Fields implements IBitBoard, Cloneable {
 		
 		return CastlingConfig.CLASSIC_CHESS;
 	}
+	
+	
+	@Override
+	public long getMaterialHashKey() {
+
+		throw new UnsupportedOperationException();
+	}
 }

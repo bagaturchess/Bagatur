@@ -610,4 +610,11 @@ public class BoardProxy_ReversedBBs implements IBitBoard {
 
 		bitboard.addMoveListener(listener);
 	}
+
+
+	@Override
+	public long getMaterialHashKey() {
+
+		return bitboard.getMaterialHashKey();
+	}
 }

@@ -903,9 +903,18 @@ public class BoardImpl implements IBitBoard {
 	 */
 	@Override
 	public long getPawnsHashKey() {
-		throw new UnsupportedOperationException();
+		
+		return chessBoard.pawnZobristKey;
 	}
 
+	
+	@Override
+	public long getMaterialHashKey() {
+		
+		return chessBoard.materialKey;
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see bagaturchess.bitboard.api.IBoard#getSee()
 	 */

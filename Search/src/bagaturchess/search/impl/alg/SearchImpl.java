@@ -168,11 +168,11 @@ public abstract class SearchImpl implements ISearch {
 	public void newSearch() {
 		
 		env.getHistory().clear();
-		
+
 		env.getCaptureHistory().clear();
-		
+
 		env.getContinuationHistory().clear();
-		
+
 		env.getKillers().clear();
 	
 		getEnv().getEval().beforeSearch();
@@ -185,6 +185,7 @@ public abstract class SearchImpl implements ISearch {
 	
 	
 	public void newGame() {
+		env.getCorrectionHistory().reset();
 		env.clear();
 	}
 	
