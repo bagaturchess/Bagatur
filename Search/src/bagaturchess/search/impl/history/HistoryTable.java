@@ -7,9 +7,6 @@ import bagaturchess.bitboard.impl1.internal.MoveUtil;
 public class HistoryTable implements IHistoryTable {
 	
 	
-	public static final int MOVE_SCORE_SCALE 	= 1000;
-	
-	
 	private int scale;
 	
 	private final long[][] BONUS 	= new long[7][64];

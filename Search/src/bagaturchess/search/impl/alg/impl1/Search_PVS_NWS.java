@@ -42,7 +42,6 @@ import bagaturchess.search.impl.pv.PVNode;
 import bagaturchess.search.impl.pv.PVValidation;
 import bagaturchess.search.impl.tpt.ITTEntry;
 import bagaturchess.uci.api.ChannelManager;
-import bagaturchess.search.impl.history.HistoryTable;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.movelists.SortedMoveList_Root;
 
@@ -1262,7 +1261,7 @@ public class Search_PVS_NWS extends SearchImpl {
 
 					int histScore = env.getHistory().getScores(parentMove, move)
 					              + env.getContinuationHistory().getScores(parentMove, move);
-					reduction -= (histScore - 2 * HistoryTable.MOVE_SCORE_SCALE) / 1024.0;
+					reduction -= (histScore - 2 * IHistoryTable.MOVE_SCORE_SCALE) / 1024.0;
 
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 				}

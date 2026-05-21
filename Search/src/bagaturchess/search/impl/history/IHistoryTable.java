@@ -23,6 +23,9 @@ package bagaturchess.search.impl.history;
 public interface IHistoryTable {
 	
 	
+	public static final int MOVE_SCORE_SCALE 	= 1000;
+	
+	
 	//Cleanup and/or normalization
 	public void clear();
 	
