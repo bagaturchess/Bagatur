@@ -90,8 +90,10 @@ public final class ChessBoard {
 	public CastlingConfig castlingConfig;
 	
 	private int[] buff_castling_rook_from_to = new int[2];
-	
-	
+
+	boolean pinnedPiecesDirty = false;
+
+
 	@Override
 	public String toString() {
 		return ChessBoardUtil.toString(this, true);
@@ -115,6 +117,10 @@ public final class ChessBoard {
 	}
 	
 	public boolean isDiscoveredMove(final int fromIndex) {
+		if (pinnedPiecesDirty) {
+			setPinnedAndDiscoPieces();
+			pinnedPiecesDirty = false;
+		}
 		return (discoveredPieces & (1L << fromIndex)) != 0;
 	}
 	
@@ -144,6 +150,10 @@ public final class ChessBoard {
 	}
 	
 	public void doNullMove() {
+		if (pinnedPiecesDirty) {
+			setPinnedAndDiscoPieces();
+			pinnedPiecesDirty = false;
+		}
 		pushHistoryValues(0);
 
 		zobristKey ^= Zobrist.sideToMove;
@@ -161,10 +171,11 @@ public final class ChessBoard {
 	}
 	
 	public void undoNullMove() {
-		
+
 		playedBoardStates.dec(zobristKey);
-		
+
 		popHistoryValues();
+		pinnedPiecesDirty = false;
 		changeSideToMove();
 
 		if (EngineConstants.ASSERT) {
@@ -173,6 +184,10 @@ public final class ChessBoard {
 	}
 	
 	public void doMove(int move) {
+		if (pinnedPiecesDirty) {
+			setPinnedAndDiscoPieces();
+			pinnedPiecesDirty = false;
+		}
 
 		if (MoveUtil.isCastlingMove(move)) {
 			
@@ -523,10 +538,10 @@ public final class ChessBoard {
 		*/
 		
 		// Castling always moves the king and rook, so the king rays change.
-		setPinnedAndDiscoPieces();
+		pinnedPiecesDirty = true;
 
 		if (EngineConstants.ASSERT) {
-			
+
 			ChessBoardTestUtil.testValues(this);
 		}
 		
@@ -566,6 +581,7 @@ public final class ChessBoard {
 		}
 		
 		popHistoryValues();
+		pinnedPiecesDirty = false;
 
 		// undo move
 		friendlyPieces[colorToMoveInverse] ^= fromToMask;
@@ -658,8 +674,9 @@ public final class ChessBoard {
 		
 		
 		popHistoryValues();
-		
-		
+		pinnedPiecesDirty = false;
+
+
 		final int fromIndex_king 	= MoveUtil.getFromIndex(move);
 		final int toIndex_king 		= MoveUtil.getToIndex(move);
 		final int sourcePieceIndex 	= MoveUtil.getSourcePieceIndex(move);
@@ -778,14 +795,14 @@ public final class ChessBoard {
 	private void updatePinnedAndDiscoPiecesAfterMove(final int sourcePieceIndex, final long changedSquares) {
 
 		if (sourcePieceIndex == KING) {
-			setPinnedAndDiscoPieces();
+			pinnedPiecesDirty = true;
 			return;
 		}
 
 		final long affectedKingRays = kingQueenRays[ChessConstants.WHITE] | kingQueenRays[ChessConstants.BLACK];
 
 		if ((changedSquares & affectedKingRays) != 0) {
-			setPinnedAndDiscoPieces();
+			pinnedPiecesDirty = true;
 		}
 	}
 
@@ -894,7 +911,11 @@ public final class ChessBoard {
 	
 	
 	public boolean isValidMove(final int move) {
-		
+		if (pinnedPiecesDirty) {
+			setPinnedAndDiscoPieces();
+			pinnedPiecesDirty = false;
+		}
+
 		// check piece at from square
 		final int fromIndex = MoveUtil.getFromIndex(move);
 		final long fromSquare = Util.POWER_LOOKUP[fromIndex];

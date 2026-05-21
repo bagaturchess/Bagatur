@@ -316,6 +316,7 @@ public final class MoveGenerator {
 	
 	
 	public void generateMoves(final ChessBoard cb) {
+		if (cb.pinnedPiecesDirty) { cb.setPinnedAndDiscoPieces(); cb.pinnedPiecesDirty = false; }
 
 		final long checkingPieces = cb.checkingPieces;
 		if (checkingPieces == 0) {
@@ -340,6 +341,7 @@ public final class MoveGenerator {
 	}
 
 	public void generateAttacks(final ChessBoard cb) {
+		if (cb.pinnedPiecesDirty) { cb.setPinnedAndDiscoPieces(); cb.pinnedPiecesDirty = false; }
 
 		final long checkingPieces = cb.checkingPieces;
 		if (checkingPieces == 0) {
@@ -357,6 +359,7 @@ public final class MoveGenerator {
 	}
 
 	public void generateAll(final ChessBoard cb) {
+		if (cb.pinnedPiecesDirty) { cb.setPinnedAndDiscoPieces(); cb.pinnedPiecesDirty = false; }
 
 		final long checkingPieces = cb.checkingPieces;
 		if (checkingPieces == 0) {
