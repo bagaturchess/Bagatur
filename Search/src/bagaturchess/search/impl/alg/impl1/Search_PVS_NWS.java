@@ -697,7 +697,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					searchStats.register(SearchStatistics.TYPE_STATIC_NULL_MOVE_TRIES, depth);
 					
-					if (ssi.static_eval - (depth * STATIC_NULL_MOVE_MARGIN - (improving ? 70 : 0)) / PRUNING_AGGRESSIVENESS >= beta) {
+					int snmMargin = STATIC_NULL_MOVE_MARGIN + env.getVolatilityHistory().get(colourToMove, pawnHash) / 2;
+					if (ssi.static_eval - (depth * snmMargin - (improving ? 70 : 0)) / PRUNING_AGGRESSIVENESS >= beta) {
 						
 						searchStats.register(SearchStatistics.TYPE_STATIC_NULL_MOVE_OK, depth);
 						
@@ -720,8 +721,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					env.getBitboard().makeNullMoveForward();
 					
-					double reduction = depth / 3 + 3 + Math.min((Math.max(0, ssi.static_eval - beta)) / 80, 3);
-					reduction = reduction * REDUCTION_AGGRESSIVENESS;
+					double reduction = depth / 3 + 3 + Math.min((Math.max(0, ssi.static_eval - beta)) / 80, 3)
+					                 - env.getVolatilityHistory().get(colourToMove, pawnHash) / 20.0;
+					reduction = Math.max(1.5, reduction) * REDUCTION_AGGRESSIVENESS;
 					
 					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, -beta, -beta + 1, ply + 1, false, initialMaxDepth)
 							: -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth, useSME, false);
@@ -1263,6 +1265,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					              + env.getContinuationHistory().getScores(parentMove, move);
 					reduction -= (histScore - 2 * IHistoryTable.MOVE_SCORE_SCALE) / 1024.0;
 
+					// Volatile position types get less LMR: search is unreliable at shallow depth
+					reduction -= env.getVolatilityHistory().get(colourToMove, pawnHash) / 16.0;
+
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 				}
 				
@@ -1456,6 +1461,17 @@ public class Search_PVS_NWS extends SearchImpl {
 		if (env.getTPT() != null) {
 
 			env.getTPT().put(ssi.hash_key, (int) depth, node.eval, alpha_org, beta, node.bestmove);
+		}
+
+
+		// Update volatility history: measure score drift between consecutive iterations
+		if (ttValue != IEvaluator.MIN_EVAL
+				&& tpt_depth == (int) depth - 1
+				&& !ssi.in_check
+				&& bestScore != ISearch.MIN
+				&& !SearchUtils.isMateVal(bestScore)) {
+			int drift = Math.abs(bestScore - ttValue);
+			env.getVolatilityHistory().update(colourToMove, pawnHash, drift, (int) depth);
 		}
 
 
