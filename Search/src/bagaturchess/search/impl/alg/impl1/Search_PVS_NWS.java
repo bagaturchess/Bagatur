@@ -1205,7 +1205,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (ply < 2 * initialMaxDepth && depth >= 2) {
 					
-					if (move == ttMove) {
+					if (isCheckMove) {
+						
+						new_depth = depth - 1 + 1; //Extend checks with 1 ply
+						
+					} else if (move == ttMove) {
 						
 						new_depth = depth - 1 + tt_move_extension;
 						
@@ -1261,10 +1265,11 @@ public class Search_PVS_NWS extends SearchImpl {
 						reduction -= 1;
 					}
 
-					int histScore = env.getHistory().getScores(parentMove, move)
+					/*int histScore = env.getHistory().getScores(parentMove, move)
 					              + env.getContinuationHistory().getScores(parentMove, move);
 					reduction -= (histScore - 2 * IHistoryTable.MOVE_SCORE_SCALE) / 1024.0;
-
+					*/
+					
 					// Volatile position types get less LMR: search is unreliable at shallow depth
 					reduction -= env.getVolatilityHistory().get(colourToMove, pawnHash) / 16.0;
 
