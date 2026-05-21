@@ -43,10 +43,13 @@ public final class CheckUtil {
 			case NIGHT:
 				return cb.pieces[cb.colorToMoveInverse][NIGHT] & StaticMoves.KNIGHT_MOVES[cb.kingIndex[cb.colorToMove]];
 			case BISHOP:
+				if ((cb.pieces[cb.colorToMoveInverse][BISHOP] & cb.kingBishopRays[cb.colorToMove]) == 0) return 0;
 				return cb.pieces[cb.colorToMoveInverse][BISHOP] & MagicUtil.getBishopMoves(cb.kingIndex[cb.colorToMove], cb.allPieces);
 			case ROOK:
+				if ((cb.pieces[cb.colorToMoveInverse][ROOK] & cb.kingRookRays[cb.colorToMove]) == 0) return 0;
 				return cb.pieces[cb.colorToMoveInverse][ROOK] & MagicUtil.getRookMoves(cb.kingIndex[cb.colorToMove], cb.allPieces);
 			case QUEEN:
+				if ((cb.pieces[cb.colorToMoveInverse][QUEEN] & cb.kingQueenRays[cb.colorToMove]) == 0) return 0;
 				return cb.pieces[cb.colorToMoveInverse][QUEEN] & MagicUtil.getQueenMoves(cb.kingIndex[cb.colorToMove], cb.allPieces);
 			default:
 				//king can never set the other king in check
