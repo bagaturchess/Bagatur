@@ -1322,11 +1322,11 @@ public class Search_PVS_NWS extends SearchImpl {
 						reduction -= Math.max(-1.0, Math.min(1.0, (divergence - 37.5) / 37.5));
 					}
 
-					// CHCR: small correction → NNUE reliable for this structure → reduce more
+					// CHCR: small correction - NNUE reliable for this structure - reduce more
 					int pawnCorr = env.getPawnsCorrectionHistory().get(colourToMove, pawnHash);
 					int matCorr  = env.getMaterialCorrectionHistory().get(colourToMove, materialHash);
 					int totalAbsCorr = Math.abs(pawnCorr) + Math.abs(matCorr); // [0, 64]
-					reduction -= 0.5 * Math.max(-1.0, Math.min(1.0, (totalAbsCorr - 32.0) / 32.0));
+					reduction -= 1 * Math.max(-1.0, Math.min(1.0, (totalAbsCorr - 32.0) / 32.0));
 
 					// CNIR: position deteriorating for two consecutive same-colour ply pairs
 					boolean notImprovingTwice = !improving
