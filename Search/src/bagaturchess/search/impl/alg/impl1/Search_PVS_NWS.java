@@ -691,7 +691,7 @@ public class Search_PVS_NWS extends SearchImpl {
 
 
 			// Eval-Search Divergence Reduction: when eval and TT score agree closely,
-			// the position is structurally decided — static eval captures everything the search finds.
+			// the position is structurally decided - static eval captures everything the search finds.
 			if (!VALIDATE_PV
 					&& depth >= 3
 					&& ttValue != IEvaluator.MIN_EVAL
@@ -1319,9 +1319,22 @@ public class Search_PVS_NWS extends SearchImpl {
 					// Eval-Search Divergence: stable positions get more LMR, dynamic ones get less
 					if (ttValue != IEvaluator.MIN_EVAL && tpt_depth >= (int) depth - 2) {
 						int divergence = Math.abs(ttValue - rawStaticEval);
-						if (divergence < 15)      reduction += 1;
-						else if (divergence > 60) reduction -= 1;
+						reduction -= Math.max(-1.0, Math.min(1.0, (divergence - 37.5) / 37.5));
 					}
+
+					// CHCR: small correction → NNUE reliable for this structure → reduce more
+					int pawnCorr = env.getPawnsCorrectionHistory().get(colourToMove, pawnHash);
+					int matCorr  = env.getMaterialCorrectionHistory().get(colourToMove, materialHash);
+					int totalAbsCorr = Math.abs(pawnCorr) + Math.abs(matCorr); // [0, 64]
+					reduction -= 0.5 * Math.max(-1.0, Math.min(1.0, (totalAbsCorr - 32.0) / 32.0));
+
+					// CNIR: position deteriorating for two consecutive same-colour ply pairs
+					boolean notImprovingTwice = !improving
+						&& ply >= 4
+						&& ssis[ply - 2].static_eval != IEvaluator.MIN_EVAL
+						&& ssis[ply - 4].static_eval != IEvaluator.MIN_EVAL
+						&& ssis[ply - 2].static_eval <= ssis[ply - 4].static_eval;
+					if (notImprovingTwice) reduction += 1;
 
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 				}
