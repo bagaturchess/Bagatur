@@ -931,7 +931,15 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					searchStats.register(SearchStatistics.TYPE_SME_OK, depth);
 					
-					tt_move_extension = 1;
+					// Double extension when alternatives fail by more than 2x the singular margin
+					if (singular_value < singular_beta - singular_margin) {
+						
+						tt_move_extension = 2;
+						
+					} else {
+						
+						tt_move_extension = 1;
+					}
 				}
 				
 			} else if (!isPv) {
