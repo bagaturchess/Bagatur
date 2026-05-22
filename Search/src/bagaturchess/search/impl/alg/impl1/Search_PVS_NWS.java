@@ -1306,11 +1306,12 @@ public class Search_PVS_NWS extends SearchImpl {
 						reduction -= 1;
 					}
 
-					/*int histScore = env.getHistory().getScores(parentMove, move)
+					int histScore = env.getHistory().getScores(parentMove, move)
 					              + env.getContinuationHistory().getScores(parentMove, move)
-					              + grandparentMove == 0 ? 0 : env.getContinuationHistory2().getScores(grandparentMove, move);
-					reduction -= (histScore - 3 * IHistoryTable.MOVE_SCORE_SCALE) / (double) (3 * IHistoryTable.MOVE_SCORE_SCALE);
-					*/
+					              + (grandparentMove == 0 ? 0 : env.getContinuationHistory2().getScores(grandparentMove, move));
+					int histTables  = grandparentMove == 0 ? 2 : 3;
+					int histNeutral = histTables * IHistoryTable.MOVE_SCORE_SCALE;
+					reduction -= 0.5 * (histScore - histNeutral) / (double) histNeutral;
 					
 					// Volatile position types get less LMR: search is unreliable at shallow depth
 					reduction -= env.getVolatilityHistory().get(colourToMove, pawnHash) / 16.0;
