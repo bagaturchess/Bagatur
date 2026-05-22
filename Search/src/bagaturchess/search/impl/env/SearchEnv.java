@@ -69,6 +69,7 @@ public class SearchEnv {
 	
 	private IHistoryTable history;
 	private IHistoryTable continuation_history;
+	private IHistoryTable continuation_history2;
 	private IHistoryTable capture_history;
 	private CorrectionHistory pawns_correction_history;
 	private CorrectionHistory material_correction_history;
@@ -90,6 +91,7 @@ public class SearchEnv {
 		tactics 						= new Tactics(bitboard);
 		
 		continuation_history 		= new ContinuationHistory();
+		continuation_history2		= new ContinuationHistory();
 		history 						= new HistoryTable();
 		capture_history 				= new HistoryTable();
 		pawns_correction_history		= new CorrectionHistory();
@@ -124,8 +126,14 @@ public class SearchEnv {
 	
 	
 	public IHistoryTable getContinuationHistory() {
-		
+
 		return continuation_history;
+	}
+
+
+	public IHistoryTable getContinuationHistory2() {
+
+		return continuation_history2;
 	}
 	
 	

@@ -664,7 +664,9 @@ public class Search_PVS_NWS extends SearchImpl {
 		}
 		
 		
-		final int parentMove 		= env.getBitboard().getLastMove();
+		final int parentMove        = env.getBitboard().getLastMove();
+		final int grandparentMove   = env.getBitboard().getPlayedMovesCount() >= 2
+				? env.getBitboard().getPlayedMoves()[env.getBitboard().getPlayedMovesCount() - 2] : 0;
 		boolean hasAtLeastOnePiece 	= (colourToMove == Constants.COLOUR_WHITE) ?
 										env.getBitboard().getMaterialFactor().getWhiteFactor() >= 3 :
 										env.getBitboard().getMaterialFactor().getBlackFactor() >= 3;
@@ -984,14 +986,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		int killer2Move 			= 0;
 		int killer3Move 			= 0;
 		int killer4Move 			= 0;
-		
+
 		int movesPerformed_attacks 	= 0;
 		int movesPerformed_quiet 	= 0;
-		
+
 		IHistoryTable history 		= env.getHistory();
 		IHistoryTable conthist 		= env.getContinuationHistory();
+		IHistoryTable conthist2		= env.getContinuationHistory2();
 		IHistoryTable caphist 		= env.getCaptureHistory();
-		
+
 		IMoveList list1 			= lists_history[ply];
 		IMoveList list2 			= lists_attacks[ply];
 		list1.clear();
@@ -1287,8 +1290,9 @@ public class Search_PVS_NWS extends SearchImpl {
 					}
 
 					/*int histScore = env.getHistory().getScores(parentMove, move)
-					              + env.getContinuationHistory().getScores(parentMove, move);
-					reduction -= (histScore - 2 * IHistoryTable.MOVE_SCORE_SCALE) / 1024.0;
+					              + env.getContinuationHistory().getScores(parentMove, move)
+					              + grandparentMove == 0 ? 0 : env.getContinuationHistory2().getScores(grandparentMove, move);
+					reduction -= (histScore - 3 * IHistoryTable.MOVE_SCORE_SCALE) / (double) (3 * IHistoryTable.MOVE_SCORE_SCALE);
 					*/
 					
 					// Volatile position types get less LMR: search is unreliable at shallow depth
@@ -1385,27 +1389,29 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				
 				if (!env.getBitboard().getMoveOps().isCapture(move)) {
-					
+
 					history.registerAll(parentMove, move, (int) depth);
 					conthist.registerAll(parentMove, move, (int) depth);
-					
+					if (grandparentMove != 0) conthist2.registerAll(grandparentMove, move, (int) depth);
+
 					if (score <= alpha) {
-						
+
 						history.registerBad(parentMove, move, (int) depth);
 						conthist.registerBad(parentMove, move, (int) depth);
+						if (grandparentMove != 0) conthist2.registerBad(grandparentMove, move, (int) depth);
 					}
-					
+
 				} else {
-					
+
 					caphist.registerAll(parentMove, move, (int) depth);
-					
+
 					if (score <= alpha) {
-						
+
 						caphist.registerBad(parentMove, move, (int) depth);
 					}
 				}
-				
-				
+
+
 				if (score > bestScore) {
 					
 					bestScore = score;
@@ -1427,9 +1433,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					if (!env.getBitboard().getMoveOps().isCapture(move)) {
 						
 						env.getKillers().addKillerMove(colourToMove, move, ply);
-						
+
 						history.registerGood(parentMove, move, (int) depth);
 						conthist.registerGood(parentMove, move, (int) depth);
+						if (grandparentMove != 0) conthist2.registerGood(grandparentMove, move, (int) depth);
 						
 					} else {
 						

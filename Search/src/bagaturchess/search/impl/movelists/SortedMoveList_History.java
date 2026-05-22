@@ -40,12 +40,20 @@ public class SortedMoveList_History extends SortedMoveList_BaseImpl {
 	
 	@Override
 	protected int getOrderingValue(int move) {
-		
+
 		int value = ORDER_CHECKS_FIRST && env.getBitboard().isCheckMove(move) ? 10000 : 0;
-		
+
 		value += env.getHistory().getScores(-1, move);
 		value += env.getContinuationHistory().getScores(env.getBitboard().getLastMove(), move);
-				
+
+		int playedCount = env.getBitboard().getPlayedMovesCount();
+		if (playedCount >= 2) {
+			int grandparentMove = env.getBitboard().getPlayedMoves()[playedCount - 2];
+			if (grandparentMove != 0) {
+				value += env.getContinuationHistory2().getScores(grandparentMove, move);
+			}
+		}
+
 		return value;
 	}
 }
