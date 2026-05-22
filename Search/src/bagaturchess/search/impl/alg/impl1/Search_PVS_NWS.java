@@ -683,11 +683,24 @@ public class Search_PVS_NWS extends SearchImpl {
 			
 			//Reduce depth if TT value is not presented
 			if (!VALIDATE_PV && depth >= 2 && ttMove == 0) {
-				
+
 				depth -= 1;
 			}
-					
-					
+
+
+			// Eval-Search Divergence Reduction: when eval and TT score agree closely,
+			// the position is structurally decided — static eval captures everything the search finds.
+			if (!VALIDATE_PV
+					&& depth >= 3
+					&& ttValue != IEvaluator.MIN_EVAL
+					&& tpt_depth >= (int) depth - 1
+					&& !SearchUtils.isMateVal(ttValue)
+					&& Math.abs(ttValue - rawStaticEval) <= 15) {
+
+				depth -= 1;
+			}
+
+
 			//Fail high pruning
 			if (ssi.static_eval >= beta + 35) {
 				
@@ -1272,6 +1285,13 @@ public class Search_PVS_NWS extends SearchImpl {
 					
 					// Volatile position types get less LMR: search is unreliable at shallow depth
 					reduction -= env.getVolatilityHistory().get(colourToMove, pawnHash) / 16.0;
+
+					// Eval-Search Divergence: stable positions get more LMR, dynamic ones get less
+					if (ttValue != IEvaluator.MIN_EVAL && tpt_depth >= (int) depth - 2) {
+						int divergence = Math.abs(ttValue - rawStaticEval);
+						if (divergence < 15)      reduction += 1;
+						else if (divergence > 60) reduction -= 1;
+					}
 
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 				}
