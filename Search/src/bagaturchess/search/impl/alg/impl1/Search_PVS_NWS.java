@@ -999,6 +999,19 @@ public class Search_PVS_NWS extends SearchImpl {
 		IMoveList list2 			= lists_attacks[ply];
 		list1.clear();
 		list2.clear();
+
+		
+		int oneReplyExtension = 0;
+		
+		if (ssi.in_check && ply < 2 * initialMaxDepth) {
+			
+			env.getBitboard().genAllMoves(list1);
+			
+			if (list1.size() == 1) oneReplyExtension = 1;
+			
+			list1.clear();
+		}
+
 		
 		IMoveList list 				= null;
 		
@@ -1229,7 +1242,11 @@ public class Search_PVS_NWS extends SearchImpl {
 				
 				if (ply < 2 * initialMaxDepth && depth >= 2) {
 					
-					if (isCheckMove) {
+					if (oneReplyExtension == 1) {
+						
+						new_depth = depth - 1 + 1; //Extend one reply positions with 1 ply
+						
+					} else if (isCheckMove) {
 						
 						new_depth = depth - 1 + 1; //Extend checks with 1 ply
 						
@@ -1241,15 +1258,15 @@ public class Search_PVS_NWS extends SearchImpl {
 						//new_depth = Math.max(1, new_depth);
 						
 					} /*else if (mateThreat) {
-						
+
 						new_depth = depth;
-						
+
 					}*/ /*else if (isQuiet) {
-						
+
 						new_depth = depth - 1 + Math.max(-1, Math.min(1, list.getScore() / 1000));
-						
+
 					}*/ else {
-						
+
 						new_depth = depth - 1;
 					}
 					
