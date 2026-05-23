@@ -475,27 +475,16 @@ public class Search_PVS_NWS extends SearchImpl {
 		ssi.hash_key = getHashkeyTPT();
 		ssi.in_check = env.getBitboard().isInCheck();
 		ssi.tt_hit = false;
+		ssi.static_eval = IEvaluator.MIN_EVAL;
+		
+		
 		final int colourToMove = env.getBitboard().getColourToMove();
-		ssi.static_eval = eval(ply, alpha, beta, isPv);
 
 
 		if (ply >= ISearch.MAX_DEPTH) {
 
-			return ssi.static_eval;
+			return eval(ply, alpha, beta, isPv);
 		}
-
-
-		// Correction history: adjust static_eval to correct systematic evaluator bias
-		final int rawStaticEval = ssi.static_eval;
-		final long pawnHash     = env.getBitboard().getPawnsHashKey();
-		final long materialHash = env.getBitboard().getMaterialHashKey();
-		if (!ssi.in_check) {
-			ssi.static_eval += env.getPawnsCorrectionHistory().get(colourToMove, pawnHash)
-							 + env.getMaterialCorrectionHistory().get(colourToMove, materialHash);
-		}
-
-
-		boolean improving = ply - 2 >= 0 ? (ssi.static_eval - ssis[ply - 2].static_eval > 0) : false;
 		
 		
 		PVNode node = pvman.load(ply);
@@ -530,10 +519,10 @@ public class Search_PVS_NWS extends SearchImpl {
 		//Check for draw
 	    if (isDraw(isPv)) {
 	    	
-	    	node.eval = getDrawScores(-1);
-	    	node.type = PVNode.TYPE_DRAW;
-	    	
-	    	return node.eval;
+		    	node.eval = getDrawScores(-1);
+		    	node.type = PVNode.TYPE_DRAW;
+		    	
+		    	return node.eval;
 	    }
 		
 		
@@ -647,6 +636,21 @@ public class Search_PVS_NWS extends SearchImpl {
 				return node.eval;
 			}
 		}
+		
+		
+		ssi.static_eval = eval(ply, alpha, beta, isPv);
+		
+		// Correction history: adjust static_eval to correct systematic evaluator bias
+		final int rawStaticEval = ssi.static_eval;
+		final long pawnHash     = env.getBitboard().getPawnsHashKey();
+		final long materialHash = env.getBitboard().getMaterialHashKey();
+		if (!ssi.in_check) {
+			ssi.static_eval += env.getPawnsCorrectionHistory().get(colourToMove, pawnHash)
+							 + env.getMaterialCorrectionHistory().get(colourToMove, materialHash);
+		}
+
+		
+		boolean improving = ply - 2 >= 0 ? (ssi.static_eval - ssis[ply - 2].static_eval > 0) : false;
 		
 		
 		if (!VALIDATE_PV && ttValue != IEvaluator.MIN_EVAL) {
