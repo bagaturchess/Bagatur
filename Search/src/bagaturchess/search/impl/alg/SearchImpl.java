@@ -234,7 +234,8 @@ public abstract class SearchImpl implements ISearch {
 		
 		/*int eval = getEnv().getEval_Fast().fullEval(ply, alpha, beta, -1);
 		
-		int error_window = (int) (LAZY_EVAL_MARGIN.getEntropy() + 3 * LAZY_EVAL_MARGIN.getDisperse());
+		//int error_window = (int) (LAZY_EVAL_MARGIN.getEntropy() + 3 * LAZY_EVAL_MARGIN.getDisperse());
+		int error_window = 300;//(int) (LAZY_EVAL_MARGIN.getEntropy());
 		
 		if (eval >= alpha - error_window && eval <= beta + error_window) {
 			
