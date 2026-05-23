@@ -53,7 +53,7 @@ public class SearchEnv {
 	
 	private IEvaluator eval;
 	
-	private IEvaluator eval_NNUE;
+	private IEvaluator eval_Fast;
 	
 	private Tactics tactics;
 	
@@ -267,20 +267,20 @@ public class SearchEnv {
 	}
 	
 	
-	public IEvaluator getEval_NNUE() {
+	public IEvaluator getEval_Fast() {
 		
-		if (eval_NNUE == null) {
+		if (eval_Fast == null) {
 			
 			recreateEvaluator();
 		}
 		
-		return eval_NNUE;
+		return eval_Fast;
 	}
 	
 	
 	public void recreateEvaluator() {
 		eval = shared.getEvaluatorFactory().create(bitboard, getEvalCache(), shared.getEngineConfiguration().getEvalConfig());
-		//eval_NNUE = shared.getEvaluatorFactory_NNUE().create(bitboard, getEvalCache(), shared.getEngineConfiguration().getEvalConfig());
+		eval_Fast = shared.getEvaluatorFactory_FastEval().create(bitboard, null, shared.getEngineConfiguration().getEvalConfig());
 	}
 	
 	

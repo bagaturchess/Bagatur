@@ -27,6 +27,7 @@ import java.util.Stack;
 
 import bagaturchess.bitboard.api.IBitBoard;
 import bagaturchess.bitboard.impl.movelist.IMoveList;
+import bagaturchess.bitboard.impl.utils.VarStatistic;
 import bagaturchess.egtb.syzygy.SyzygyConstants;
 import bagaturchess.egtb.syzygy.SyzygyTBProbing;
 import bagaturchess.search.api.IEvaluator;
@@ -73,6 +74,8 @@ public abstract class SearchImpl implements ISearch {
 	protected long[] phases_stats 				= new long[8];
 	
 	public Stack<Integer> validation_stack 		= new Stack<Integer>();
+	
+	private VarStatistic LAZY_EVAL_MARGIN 		= new VarStatistic();
 	
 	
 	public void setup(IBitBoard bitboardForSetup) {
@@ -178,6 +181,10 @@ public abstract class SearchImpl implements ISearch {
 		env.getKillers().clear();
 	
 		getEnv().getEval().beforeSearch();
+		
+		getEnv().getEval_Fast().beforeSearch();
+		
+		LAZY_EVAL_MARGIN.clear();
 	}
 	
 	
@@ -225,7 +232,7 @@ public abstract class SearchImpl implements ISearch {
 	
 	public int eval(final int ply, final int alpha, final int beta, final boolean isPv) {
 		
-		/*int eval = evaluator.roughEval(ply,  -1);
+		/*int eval = getEnv().getEval_Fast().fullEval(ply, alpha, beta, -1);
 		
 		int error_window = (int) (LAZY_EVAL_MARGIN.getEntropy() + 3 * LAZY_EVAL_MARGIN.getDisperse());
 		
@@ -233,7 +240,7 @@ public abstract class SearchImpl implements ISearch {
 			
 			int rough_eval = eval;
 			
-			eval = evaluator.fullEval(ply, alpha, beta, -1);
+			eval = getEnv().getEval().fullEval(ply, alpha, beta, -1);
 			
 			int diff = Math.abs(eval - rough_eval);
 			

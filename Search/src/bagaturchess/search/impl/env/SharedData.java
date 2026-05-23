@@ -36,7 +36,7 @@ public class SharedData {
 	
 	
 	private IEvaluatorFactory evaluatorFactory;
-	private IEvaluatorFactory evaluatorFactory_NNUE;
+	private IEvaluatorFactory evaluatorFactory_FastEval;
 	private IRootSearchConfig engineConfiguration;
 	private ISearchConfig_AB searchConfig;
 	private MemoryConsumers memoryConsumers;
@@ -67,9 +67,9 @@ public class SharedData {
 			
 			evaluatorFactory = (IEvaluatorFactory) SharedData.class.getClassLoader().loadClass(className).newInstance();
 			
-			String className_NNUE = "bagaturchess.deeplearning.impl_nnue_v2.jni_eval.NNUEEvaluatorFactory";
+			String className_Fast = "bagaturchess.learning.goldmiddle.impl4.eval.BagaturEvaluatorFactory";
 			
-			evaluatorFactory_NNUE = (IEvaluatorFactory) SharedData.class.getClassLoader().loadClass(className_NNUE).newInstance();
+			evaluatorFactory_FastEval = (IEvaluatorFactory) SharedData.class.getClassLoader().loadClass(className_Fast).newInstance();
 			
 		} catch (Exception e) {
 			
@@ -90,8 +90,8 @@ public class SharedData {
 	}
 	
 	
-	public IEvaluatorFactory getEvaluatorFactory_NNUE() {
-		return evaluatorFactory_NNUE;
+	public IEvaluatorFactory getEvaluatorFactory_FastEval() {
+		return evaluatorFactory_FastEval;
 	}
 	
 	
