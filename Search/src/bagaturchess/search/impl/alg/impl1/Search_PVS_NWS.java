@@ -1321,10 +1321,10 @@ public class Search_PVS_NWS extends SearchImpl {
 					reduction -= env.getVolatilityHistory().get(colourToMove, pawnHash) / 50.0;
 
 					// Eval-Search Divergence: stable positions get more LMR, dynamic ones get less
-					if (ttValue != IEvaluator.MIN_EVAL && tpt_depth >= (int) depth - 2) {
+					/*if (ttValue != IEvaluator.MIN_EVAL && tpt_depth >= (int) depth - 2) {
 						int divergence = Math.abs(ttValue - rawStaticEval);
 						reduction -= Math.max(-1.0, Math.min(1.0, (divergence - 37.5) / 37.5));
-					}
+					}*/
 
 					/*
 					// CHCR: small correction - NNUE reliable for this structure - reduce more
