@@ -39,6 +39,7 @@ import bagaturchess.search.impl.history.HistoryTable;
 import bagaturchess.search.impl.history.IHistoryTable;
 import bagaturchess.search.impl.history.IKillers;
 import bagaturchess.search.impl.history.Killers;
+import bagaturchess.search.impl.history.LazyMarginHistory;
 import bagaturchess.search.impl.history.VolatilityHistory;
 import bagaturchess.search.impl.movelists.SearchMoveListFactory;
 import bagaturchess.search.impl.tpt.ITTable;
@@ -74,6 +75,7 @@ public class SearchEnv {
 	private CorrectionHistory pawns_correction_history;
 	private CorrectionHistory material_correction_history;
 	private VolatilityHistory volatility_history;
+	private LazyMarginHistory lazy_margin_history;
 	
 	private IKillers killersAndCounters;
 	
@@ -97,6 +99,7 @@ public class SearchEnv {
 		pawns_correction_history		= new CorrectionHistory();
 		material_correction_history		= new CorrectionHistory();
 		volatility_history				= new VolatilityHistory();
+		lazy_margin_history				= new LazyMarginHistory();
 		
 		killersAndCounters 			= new Killers();
 		moveListFactory 				= new SearchMoveListFactory();
@@ -158,6 +161,12 @@ public class SearchEnv {
 	public VolatilityHistory getVolatilityHistory() {
 
 		return volatility_history;
+	}
+
+
+	public LazyMarginHistory getLazyMarginHistory() {
+
+		return lazy_margin_history;
 	}
 	
 	
