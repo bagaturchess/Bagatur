@@ -197,6 +197,7 @@ public abstract class SearchImpl implements ISearch {
 		env.getPawnsCorrectionHistory().reset();
 		env.getMaterialCorrectionHistory().reset();
 		env.getVolatilityHistory().reset();
+		env.getLazyMarginHistory().reset();
 		env.clear();
 	}
 	
@@ -231,44 +232,33 @@ public abstract class SearchImpl implements ISearch {
 	
 	
 	public int eval(final int ply, final int alpha, final int beta, final boolean isPv) {
-		
-		/*int eval = getEnv().getEval_Fast().fullEval(ply, alpha, beta, -1);
-		
-		//int error_window = (int) (LAZY_EVAL_MARGIN.getEntropy() + 3 * LAZY_EVAL_MARGIN.getDisperse());
-		int error_window = 300;//(int) (LAZY_EVAL_MARGIN.getEntropy());
-		
-		if (eval >= alpha - error_window && eval <= beta + error_window) {
-			
-			int rough_eval = eval;
-			
-			eval = getEnv().getEval().fullEval(ply, alpha, beta, -1);
-			
-			int diff = Math.abs(eval - rough_eval);
-			
-			LAZY_EVAL_MARGIN.addValue(diff);
+
+		/*int colour   = env.getBitboard().getColourToMove();
+		long pawnHash = env.getBitboard().getPawnsHashKey();
+
+		int roughEval = getEnv().getEval_Fast().fullEval(ply, alpha, beta, -1);
+		roughEval = Math.min(Math.max(IEvaluator.MIN_EVAL, roughEval), IEvaluator.MAX_EVAL);
+
+		int lazyMargin = env.getLazyMarginHistory().get(colour, pawnHash) * 3;
+
+		int eval;
+		if (roughEval + lazyMargin < alpha || roughEval - lazyMargin > beta) {
+			eval = roughEval;
+		} else {
+			eval = env.getEval().fullEval(ply, alpha, beta, -1);
+			eval = Math.min(Math.max(IEvaluator.MIN_EVAL, eval), IEvaluator.MAX_EVAL);
+			env.getLazyMarginHistory().update(colour, pawnHash, Math.abs(roughEval - eval));
 		}*/
-		
+
 		
 		int eval = env.getEval().fullEval(ply, alpha, beta, -1);
-		
-		/*if (isPv || (eval >= alpha - 7 && eval <= beta + 7)) {
-			
-			eval = getEnv().getEval_NNUE().fullEval(ply, alpha, beta, -1);
-			
-		}*/
-		
-		//int material = env.getBitboard().getMaterialFactor().getTotalFactor(); //In [0-62]
-		
-		//eval = eval * (194 + material) / 256;
-		
 		eval = Math.min(Math.max(IEvaluator.MIN_EVAL, eval), IEvaluator.MAX_EVAL);
 		
+		
 		if (!env.getBitboard().hasSufficientMatingMaterial(env.getBitboard().getColourToMove())) {
-			
 			eval = Math.min(getDrawScores(-1), eval);
 		}
-		
-		
+
 		return eval;
 	}
 	
