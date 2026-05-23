@@ -67,7 +67,8 @@ public class SharedData {
 			
 			evaluatorFactory = (IEvaluatorFactory) SharedData.class.getClassLoader().loadClass(className).newInstance();
 			
-			String className_Fast = "bagaturchess.learning.goldmiddle.impl4.eval.BagaturEvaluatorFactory";
+			//String className_Fast = "bagaturchess.learning.goldmiddle.impl4.eval.BagaturEvaluatorFactory";
+			String className_Fast = "bagaturchess.learning.goldmiddle.pesto.eval.BagaturEvaluatorFactory_PeSTO";
 			
 			evaluatorFactory_FastEval = (IEvaluatorFactory) SharedData.class.getClassLoader().loadClass(className_Fast).newInstance();
 			
