@@ -1,3 +1,11 @@
+ Version 5.5a (25 May 2026)
+ * Check Extension: Added +1 extension for every move that gives check to the opponent - forced check sequences are now searched deeper.
+ * One-Reply Extension: Added +1 extension when the side to move is in check with exactly one legal reply - the position is practically forced and benefits from deeper search.
+ * 2-ply Continuation History: Added a second continuation history table (continuation_history2) for quiet moves, indexed by the grandparent move - move ordering and LMR now use a three-table combined history (butterfly + 1-ply + 2-ply).
+ * TT Aging (correctAllDepths): Implemented missing aging logic in TTable_Impl2 - reduces the depth of all TT entries between moves so that deep entries from previous searches no longer block new ones.
+ * CNIR (Consecutive Non-Improvement Reduction): New LMR adjustment of +1 when the current side's position has deteriorated across two consecutive same-colour plies - a signal that the position is structurally poor and quiet moves are unlikely to help.
+ * Add experimental techniques like CorrectionHistory and VolatilityHistory based on Exponential Moving Average (EMA) history.
+
  Version 5.5 (3 May 2026)
  * Upgrade to Java 17, because of Vector API usage for NNUE inference code
  
