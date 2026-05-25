@@ -82,7 +82,17 @@ public class TTable_Impl2 implements ITTable {
 
 	@Override
 	public void correctAllDepths(int reduction) {
-		// No implementation needed
+		for (int pos = 0; pos < table.length; pos += ENTRY_LONGS) {
+			long value = table[pos + 1];
+			if (value == 0) continue;
+			int depth = getDepth(value);
+			int newDepth = Math.max(0, depth - reduction);
+			if (newDepth == depth) continue;
+			long newValue = (value & ~0xFFL) | newDepth;
+			long hashKey  = table[pos] ^ value;
+			table[pos]     = hashKey ^ newValue;
+			table[pos + 1] = newValue;
+		}
 	}
 
 	@Override
