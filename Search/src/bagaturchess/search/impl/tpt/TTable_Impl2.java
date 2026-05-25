@@ -164,12 +164,6 @@ public class TTable_Impl2 implements ITTable {
 		        		
 		                return;
 		        	}
-	            
-		        	if (true) { //Always replace strategy
-		        		
-		        		replace_pos = pos;
-		        		break;
-		        	}
 		        	
 	            if (new_depth > stored_depth) {
 	            	
@@ -178,10 +172,7 @@ public class TTable_Impl2 implements ITTable {
 
 	            } else if (new_depth == stored_depth) {
 	                
-	                replace_pos = pos;
-	                break;
-	                
-	            		/*int stored_flag = getFlag(stored_value);
+	            		int stored_flag = getFlag(stored_value);
 	            	
 	                if (isStrongerFlag(new_flag, stored_flag)) {
 	                
@@ -205,7 +196,7 @@ public class TTable_Impl2 implements ITTable {
 	                } else {
 	                
 	                    return; // Same depth, weaker flag
-	                }*/
+	                }
 	          	
 	            } else {
 	                
