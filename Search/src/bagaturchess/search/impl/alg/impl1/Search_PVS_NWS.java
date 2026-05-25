@@ -1341,7 +1341,32 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& ssis[ply - 4].static_eval != IEvaluator.MIN_EVAL
 						&& ssis[ply - 2].static_eval <= ssis[ply - 4].static_eval;
 					if (notImprovingTwice) reduction += 1;
-					
+
+					// WNSLMR: within-node score feedback
+					// bestScore >> static_eval: found a strong move, remaining moves unlikely to top it -> reduce more
+					// bestScore << static_eval: all moves underperform static eval, hidden tactics likely -> reduce less
+					// WNSLMR: found a move exceeding static eval -> remaining moves less likely to top it
+					/*if (bestScore != ISearch.MIN) {
+						int gain = bestScore - ssi.static_eval;
+						reduction += Math.max(0.0, Math.min(1.0, gain / 100.0));
+					}
+
+					// SEDR: winning position -> marginal quiet moves matter less
+					if (ssi.static_eval > alpha + 200) {
+						reduction += Math.min(1.0, (ssi.static_eval - alpha - 200) / 200.0);
+					}
+
+					// TDER: deep TT entry is very reliable -> non-TT moves matter less
+					if (ttValue != IEvaluator.MIN_EVAL && tpt_depth >= (int) depth + 2) {
+						reduction += Math.min(1.0, (tpt_depth - depth - 2) / 2.0);
+					}
+
+					// HMCDS: deep into all-node territory -> remaining moves almost certainly bad
+					int totalMoves = movesPerformed_attacks + movesPerformed_quiet;
+					if (totalMoves > 12) {
+						reduction += Math.min(1.0, (totalMoves - 12) / 8.0);
+					}*/
+
 					reduction = Math.min(new_depth - 1, Math.max(reduction, 1));
 				}
 				
