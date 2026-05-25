@@ -938,7 +938,8 @@ public class Search_PVS_NWS extends SearchImpl {
 					searchStats.register(SearchStatistics.TYPE_SME_OK, depth);
 					
 					// Double extension when alternatives fail by more than 2x the singular margin
-					if (singular_value < singular_beta - singular_margin) {
+					if (ply < initialMaxDepth
+							&& singular_value < singular_beta - singular_margin) {
 						
 						tt_move_extension = 2;
 						
