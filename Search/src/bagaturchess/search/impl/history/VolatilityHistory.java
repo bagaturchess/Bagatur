@@ -1,20 +1,16 @@
 package bagaturchess.search.impl.history;
 
 
-public class VolatilityHistory extends EMAHistory {
+public class VolatilityHistory extends StatHistory {
 
 	public VolatilityHistory() {
-		super(64, 64 * 50);
+		super(50, 16);
 	}
 
 
-	// Returns estimated score drift in centipawns: [0, 50]
+	// Updates volatility history with observed score drift in centipawns.
 	public void update(int color, long pawnHash, int drift, int depth) {
-		int idx    = (int) (pawnHash & MASK);
-		int target = Math.min(drift * grain, maxVal);
-		int weight = Math.min(depth, 8);
-		int entry  = table[color][idx];
-		entry += (target - entry) * weight / 128;
-		table[color][idx] = Math.max(0, Math.min(maxVal, entry));
+		int clamped = Math.max(0, Math.min(maxVal, drift));
+		addCapped(color, pawnHash, clamped);
 	}
 }
