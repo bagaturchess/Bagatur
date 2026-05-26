@@ -41,8 +41,11 @@
   	<javac debug="true" debuglevel="lines" compiler="javac1.7"
   		srcdir="${egtb_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
   	
-  	<javac debug="true" debuglevel="lines" compiler="javac1.7"
-  		srcdir="${nnue_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
+  	<javac debug="true" debuglevel="lines"
+  		srcdir="${nnue_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}">
+  	    <compilerarg value="--add-modules"/>
+  	    <compilerarg value="jdk.incubator.vector"/>
+  	</javac>
   	
   	<javac debug="true" debuglevel="lines" compiler="javac1.7"
   		srcdir="${search_dir}/src" destdir="${temp_dir}" classpath="${temp_dir}"/>
