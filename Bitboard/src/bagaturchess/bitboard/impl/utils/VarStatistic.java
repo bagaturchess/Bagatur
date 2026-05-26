@@ -161,24 +161,13 @@ public class VarStatistic implements Serializable {
 		
 		
 		count++;
-		
-		
-		/*entropy = entropy + (nv - entropy) / (double) count;
-		
-		if (count == 1) {
-			
-			variance = ((nv - entropy) * (nv - entropy)) / (double) count;
-			
-		} else {
-			
-			variance = ((count - 2) / (double) (count - 1)) * variance * variance + ((nv - entropy) * (nv - entropy)) / (double) count;
-		}
-		 */
 
-		
-		entropy = (count * entropy + nv) / (count + 1);
-		
-		variance = (1 / count) * (	(count - 1) * variance	 + 	(nv - entropy) * (nv - entropy)	);
+		// Welford's online algorithm for mean and variance
+		double delta  = nv - entropy;
+		entropy      += delta / count;
+		double delta2 = nv - entropy;
+
+		variance = ((count - 1) * variance + delta * delta2) / count;
 		
 		
 		//path += Math.sqrt(0.01 + Math.pow(nv - old_val, 2));
