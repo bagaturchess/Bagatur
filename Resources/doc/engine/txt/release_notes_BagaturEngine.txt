@@ -1,3 +1,6 @@
+ Version 5.5b (26 May 2026)
+ * Transposition Table: Replaced O(n) depth-reduction iteration with an O(1) generation counter. Stale entries are evicted first via quality score, same-key entries are preserved unless the new search is significantly shallower.
+ 
  Version 5.5a (25 May 2026)
  * Check Extension: Added +1 extension for every move that gives check to the opponent - forced check sequences are now searched deeper.
  * One-Reply Extension: Added +1 extension when the side to move is in check with exactly one legal reply - the position is practically forced and benefits from deeper search.

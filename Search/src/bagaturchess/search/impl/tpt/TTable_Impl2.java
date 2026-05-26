@@ -1,12 +1,12 @@
 /*
  *  BagaturChess (UCI chess engine and tools)
  *  Copyright (C) 2005 Krasimir I. Topchiyski (k_topchiyski@yahoo.com)
- *  
+ *
  *  Open Source project location: http://sourceforge.net/projects/bagaturchess/develop
  *  SVN repository https://bagaturchess.svn.sourceforge.net/svnroot/bagaturchess
  *
  *  This file is part of BagaturChess program.
- * 
+ *
  *  BagaturChess is open software: you can redistribute it and/or modify
  *  it under the terms of the Eclipse Public License version 1.0 as published by
  *  the Eclipse Foundation.
@@ -30,27 +30,31 @@ import bagaturchess.uci.api.ChannelManager;
 
 public class TTable_Impl2 implements ITTable {
 
-	
-	private static final int CLUSTER_SIZE = 4;
-	private static final int ENTRY_LONGS = 2;
-	private static final long VALID_MASK = 1L << 8; // bit 8 is unused: depth uses 0..7, flag starts at 9
-	
-	private static final int FLAG_SHIFT = 9;
-	private static final int MOVE_SHIFT = 11; //Move is 22 bits
-	private static final int SCORE_SHIFT = 34;
 
-	
+	private static final int CLUSTER_SIZE = 4;
+	private static final int ENTRY_LONGS  = 2;
+	private static final long VALID_MASK  = 1L << 8;
+
+	private static final int FLAG_SHIFT   = 9;
+	private static final int MOVE_SHIFT   = 11; // Move is 22 bits (bits 11-32)
+	private static final int GEN_SHIFT    = 34; // Generation is 8 bits (bits 34-41)
+	private static final int SCORE_SHIFT  = 42; // Score is 22 bits (bits 42-63)
+
+
 	private final int maxEntries;
-	
+
 	// Interleaved layout: [mixedKey0, value0, mixedKey1, value1, ...]
 	// mixedKey is hashKey ^ value, so a torn/inconsistent read is very unlikely to pass the key check.
 	private final long[] table;
 
+	// Incremented by correctAllDepths(); 8-bit wrap-around acts as generation counter.
+	private byte generation = 0;
+
 	private long counter_usage;
 	private long counter_tries;
 	private long counter_hits;
-	
-	
+
+
 	public TTable_Impl2(long sizeInBytes) {
 	    long maxEntriesLong = Long.highestOneBit(sizeInBytes / (ENTRY_LONGS * Long.BYTES));
 	    if (maxEntriesLong < CLUSTER_SIZE) {
@@ -80,19 +84,11 @@ public class TTable_Impl2 implements ITTable {
 		return counter_tries == 0 ? 0 : (int) (counter_hits * 100 / counter_tries);
 	}
 
+	// O(1): bump the generation counter instead of iterating the whole table.
+	// Entries from previous generations have lower effective quality and are replaced first.
 	@Override
 	public void correctAllDepths(int reduction) {
-		for (int pos = 0; pos < table.length; pos += ENTRY_LONGS) {
-			long value = table[pos + 1];
-			if (value == 0) continue;
-			int depth = getDepth(value);
-			int newDepth = Math.max(0, depth - reduction);
-			if (newDepth == depth) continue;
-			long newValue = (value & ~0xFFL) | newDepth;
-			long hashKey  = table[pos] ^ value;
-			table[pos]     = hashKey ^ newValue;
-			table[pos + 1] = newValue;
-		}
+		generation += (byte) reduction;
 	}
 
 	@Override
@@ -122,135 +118,84 @@ public class TTable_Impl2 implements ITTable {
 
 	@Override
 	public final void put(long hashkey, int depth, int eval, int alpha, int beta, int bestmove) {
-		
-		if (eval > 536870911 || eval < -536870912) {
-			
+
+		// 22-bit signed score range: [-2097152, 2097151]
+		if (eval > 2097151 || eval < -2097152) {
+
 			return;
-			//throw new IllegalStateException("TT score overflow: eval=" + eval);
 		}
-		
+
 		int flag = ITTEntry.FLAG_EXACT;
-		
+
 		if (eval >= beta) {
-			
+
 			flag = ITTEntry.FLAG_LOWER;
-			
+
 		} else if (eval <= alpha) {
-			
+
 			flag = ITTEntry.FLAG_UPPER;
 		}
-		
+
 		addValue(hashkey, eval, depth, flag, bestmove);
 	}
-	
-	private final void addValue(final long new_key, int new_score, final int new_depth, final int new_flag, final int new_move) {
 
-	    final long new_value = createValue(new_score, new_move, new_flag, new_depth);
+	private final void addValue(final long new_key, final int new_score, final int new_depth, final int new_flag, final int new_move) {
+
 	    final long[] localTable = table;
 	    final int start_pos = getIndex(new_key) * ENTRY_LONGS;
 
-	    int replace_pos = -1;
-	    int replace_depth = Integer.MAX_VALUE;
-	    int replace_flag = Integer.MAX_VALUE;
+	    int replace_pos     = -1;
+	    int replace_quality = Integer.MAX_VALUE;
 
 	    for (int i = 0, pos = start_pos; i < CLUSTER_SIZE; i++, pos += ENTRY_LONGS) {
 
 	        long stored_value = localTable[pos + 1];
 
-	        // Empty slot found
 	        if (stored_value == 0) {
 	            replace_pos = pos;
 	            counter_usage++;
 	            break;
 	        }
-	        
+
 	        long stored_key = localTable[pos];
-	        int stored_depth = getDepth(stored_value);
-	        
+
 	        if ((stored_key ^ stored_value) == new_key) {
-	            
-		        	// No need to update identical entry
-		        	if (new_value == stored_value) {
-		        		
-		                return;
-		        	}
-		        	
-	            if (new_depth > stored_depth) {
-	            	
+	            // Same key: replace if new entry is not much shallower, or is an exact bound.
+	            int stored_depth = getDepth(stored_value);
+	            if (new_depth >= stored_depth - 4 || new_flag == ITTEntry.FLAG_EXACT) {
 	                replace_pos = pos;
-	                break;
-
-	            } else if (new_depth == stored_depth) {
-	                
-	            		int stored_flag = getFlag(stored_value);
-	            	
-	                if (isStrongerFlag(new_flag, stored_flag)) {
-	                
-	                    replace_pos = pos;
-	                    break;
-
-	                } else if (new_flag == stored_flag) {
-	                	
-	                		int stored_score = getScore(stored_value);
-	                	
-	                    if (isBetterEval(new_score, stored_score, new_flag)
-	                    		|| (new_move != 0 && getMove(stored_value) == 0)
-	                    		|| new_move == getMove(stored_value)) {
-	                    	
-		                    	replace_pos = pos;
-		                    	break;
-	                    }
-	                    
-	                    return;
-	                    
-	                } else {
-	                
-	                    return; // Same depth, weaker flag
-	                }
-	          	
 	            } else {
-	                
-	                return; // New entry is shallower, skip
+	                return; // Existing same-key entry is deeper and more precise - keep it.
 	            }
+	            break;
 	        }
-	        
-	        // Replacement candidate for a different key: prefer the shallowest entry,
-	        // and for equal depth prefer the weakest bound information.
-	        int stored_flag = getFlag(stored_value);
-	        if (stored_depth < replace_depth
-	        		|| (stored_depth == replace_depth && stored_flag > replace_flag)) {
-	        	
-	            replace_depth = stored_depth;
-	            replace_flag = stored_flag;
+
+	        // Different key: track the lowest-quality candidate for eviction.
+	        // Quality = depth minus a penalty for how many generations old the entry is.
+	        int gen_diff = (generation - getGeneration(stored_value)) & 0xFF;
+	        int quality  = getDepth(stored_value) - 4 * gen_diff;
+	        if (replace_pos == -1 || quality < replace_quality) {
+	            replace_quality = quality;
 	            replace_pos = pos;
 	        }
 	    }
 
 	    if (replace_pos == -1) {
-	    	
-	        throw new IllegalStateException("No available entry to replace.");
+	        return;
 	    }
 
-	    localTable[replace_pos] = new_key ^ new_value;
+	    // Preserve the best move from the displaced same-key entry when the new entry has none.
+	    int best_move = new_move;
+	    if (best_move == 0) {
+	        long stored_value = localTable[replace_pos + 1];
+	        if (stored_value != 0 && (localTable[replace_pos] ^ stored_value) == new_key) {
+	            best_move = getMove(stored_value);
+	        }
+	    }
+
+	    final long new_value = createValue(new_score, best_move, new_flag, new_depth, generation);
+	    localTable[replace_pos]     = new_key ^ new_value;
 	    localTable[replace_pos + 1] = new_value;
-	}
-
-	private static boolean isStrongerFlag(int newFlag, int oldFlag) {
-		
-	    return newFlag < oldFlag;
-	}
-
-	private static boolean isBetterEval(int newEval, int oldEval, int flag) {
-		
-	    switch (flag) {
-	        case ITTEntry.FLAG_EXACT:
-	        case ITTEntry.FLAG_LOWER:
-	            return newEval > oldEval;
-	        case ITTEntry.FLAG_UPPER:
-	            return newEval < oldEval;
-	        default:
-	           throw new IllegalStateException();
-	    }
 	}
 
 	private int getIndex(long key) {
@@ -273,10 +218,19 @@ public class TTable_Impl2 implements ITTable {
 		return (int) ((value >>> MOVE_SHIFT) & 0x3FFFFF);
 	}
 
-	private static long createValue(int score, int move, int flag, int depth) {
+	private static int getGeneration(long value) {
+		return (int) ((value >>> GEN_SHIFT) & 0xFF);
+	}
+
+	private static long createValue(int score, int move, int flag, int depth, byte gen) {
 		if (EngineConstants.ASSERT) {
 			Assert.isTrue(depth >= 0 && depth <= 255);
 		}
-		return VALID_MASK | ((long) score << SCORE_SHIFT) | ((long) move << MOVE_SHIFT) | ((long) flag << FLAG_SHIFT) | depth;
+		return VALID_MASK
+		    | ((long) score << SCORE_SHIFT)
+		    | ((long) (gen & 0xFF) << GEN_SHIFT)
+		    | ((long) move << MOVE_SHIFT)
+		    | ((long) flag << FLAG_SHIFT)
+		    | depth;
 	}
 }
