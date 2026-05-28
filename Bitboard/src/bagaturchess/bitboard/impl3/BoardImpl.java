@@ -58,10 +58,12 @@ import bagaturchess.bitboard.impl3.internal.ChessBoard;
 import bagaturchess.bitboard.impl3.internal.ChessBoardUtil;
 import bagaturchess.bitboard.impl3.internal.ChessConstants;
 import bagaturchess.bitboard.impl3.internal.EvalConstants;
+import bagaturchess.bitboard.impl3.internal.MagicUtil;
 import bagaturchess.bitboard.impl3.internal.MoveGenerator;
 import bagaturchess.bitboard.impl3.internal.MoveUtil;
 import bagaturchess.bitboard.impl3.internal.MoveWrapper;
 import bagaturchess.bitboard.impl3.internal.SEEUtil;
+import bagaturchess.bitboard.impl3.internal.StaticMoves;
 
 
 public class BoardImpl implements IBitBoard {
@@ -670,14 +672,69 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public boolean isCheckMove(int move) {
-		
-		boolean inCheck = false;
-		
-		chessBoard.doMove(move);
-		inCheck = chessBoard.checkingPieces != 0;
-		chessBoard.undoMove(move);
-		
-		return inCheck;
+
+		// Castling and EP have non-trivial occupancy changes (rook re-position; captured pawn on a
+		// different square). Fall back to make/unmake for correctness - both move types are rare.
+		if (MoveUtil.isCastlingMove(move) || MoveUtil.isEPMove(move)) {
+
+			chessBoard.doMove(move);
+			boolean inCheck = chessBoard.checkingPieces != 0;
+			chessBoard.undoMove(move);
+
+			return inCheck;
+		}
+
+		final int fromIndex          = MoveUtil.getFromIndex(move);
+		final int toIndex            = MoveUtil.getToIndex(move);
+		final int sourcePieceIndex   = MoveUtil.getSourcePieceIndex(move);
+		final int ourColor           = chessBoard.colorToMove;
+		final int enemyColor         = chessBoard.colorToMoveInverse;
+		final int enemyKingIndex     = chessBoard.kingIndex[enemyColor];
+
+		final long fromMask          = 1L << fromIndex;
+		final long toMask            = 1L << toIndex;
+
+		// Occupancy after the move: clear fromIndex, set toIndex (captures don't change toIndex bit).
+		final long allPiecesAfter    = (chessBoard.allPieces ^ fromMask) | toMask;
+
+		// Our piece bitboards as they would look after the move.
+		final long[] ourPieces       = chessBoard.pieces[ourColor];
+		long ourPawns                = ourPieces[PAWN];
+		long ourNights               = ourPieces[NIGHT];
+		long ourBishops              = ourPieces[BISHOP];
+		long ourRooks                = ourPieces[ROOK];
+		long ourQueens               = ourPieces[QUEEN];
+
+		// Remove the source piece from fromIndex.
+		switch (sourcePieceIndex) {
+			case PAWN:   ourPawns   ^= fromMask; break;
+			case NIGHT:  ourNights  ^= fromMask; break;
+			case BISHOP: ourBishops ^= fromMask; break;
+			case ROOK:   ourRooks   ^= fromMask; break;
+			case QUEEN:  ourQueens  ^= fromMask; break;
+			// KING: not tracked here - kings cannot directly check, discovered checks handled by occupancy.
+		}
+
+		// Add the final piece at toIndex (promotion changes the piece type).
+		final int finalPieceType = MoveUtil.isPromotion(move) ? MoveUtil.getMoveType(move) : sourcePieceIndex;
+		switch (finalPieceType) {
+			case PAWN:   ourPawns   |= toMask; break;
+			case NIGHT:  ourNights  |= toMask; break;
+			case BISHOP: ourBishops |= toMask; break;
+			case ROOK:   ourRooks   |= toMask; break;
+			case QUEEN:  ourQueens  |= toMask; break;
+			// KING: same as above
+		}
+
+		final long bishopsQueens = ourBishops | ourQueens;
+		final long rooksQueens   = ourRooks   | ourQueens;
+
+		// Enemy king is in check iff any of our pieces attacks its square in the post-move position.
+		// PAWN_ATTACKS[enemyColor][enemyKingSquare] = squares from which our pawns attack the enemy king.
+		return (ourPawns      & StaticMoves.PAWN_ATTACKS[enemyColor][enemyKingIndex])           != 0
+			|| (ourNights     & StaticMoves.KNIGHT_MOVES[enemyKingIndex])                       != 0
+			|| (bishopsQueens & MagicUtil.getBishopMoves(enemyKingIndex, allPiecesAfter))       != 0
+			|| (rooksQueens   & MagicUtil.getRookMoves(enemyKingIndex, allPiecesAfter))         != 0;
 	}
 	
 	
