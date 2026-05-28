@@ -399,12 +399,14 @@ public class Search_PVS_NWS extends SearchImpl {
 				bestMove = 0;
 				
 			} else {
-				
+
 				node.bestmove = 0;
-				node.eval = -SearchUtils.getMateVal(ply, getEnv().getBitboard());
+				// getMateVal requires depth >= 1; at root ply == 0 means already mated,
+				// use depth 1 so the score is a valid mate value (deepest-mate magnitude).
+				node.eval = -SearchUtils.getMateVal(Math.max(1, ply), getEnv().getBitboard());
 				node.leaf = true;
 				node.type = PVNode.TYPE_MATE;
-				
+
 				bestScore = node.eval;
 				bestMove = 0;
 			}
@@ -644,7 +646,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		final int rawStaticEval = ssi.static_eval;
 		final long pawnHash     = env.getBitboard().getPawnsHashKey();
 		final long materialHash = env.getBitboard().getMaterialHashKey();
-		if (!ssi.in_check) {
+		if (!VALIDATE_PV && !ssi.in_check) {
 			ssi.static_eval += env.getPawnsCorrectionHistory().get(colourToMove, pawnHash)
 							 + env.getMaterialCorrectionHistory().get(colourToMove, materialHash);
 		}
@@ -653,15 +655,17 @@ public class Search_PVS_NWS extends SearchImpl {
 		boolean improving = ply - 2 >= 0 ? (ssi.static_eval - ssis[ply - 2].static_eval > 0) : false;
 		
 		
-		if (!VALIDATE_PV && ttValue != IEvaluator.MIN_EVAL) {
-			
+		// Override static_eval with TT value only when TT depth is comparable -
+		// shallow TT entries may give wrong-direction static_eval that misleads pruning.
+		if (!VALIDATE_PV && ttValue != IEvaluator.MIN_EVAL && tpt_depth >= depth - 3) {
+
 			if (getSearchConfig().isOther_UseTPTScores()) {
-				
+
 				if (ttFlag == ITTEntry.FLAG_EXACT
 						|| (ttFlag == ITTEntry.FLAG_UPPER && ttValue < ssi.static_eval)
 						|| (ttFlag == ITTEntry.FLAG_LOWER && ttValue > ssi.static_eval)
 					) {
-					
+
 					ssi.static_eval = ttValue;
 				}
 			}
@@ -1987,10 +1991,13 @@ public class Search_PVS_NWS extends SearchImpl {
 
 
 		int eval = eval(ply, alpha, beta, isPv);
+		
 		// Apply correction history to stand-pat (not in check - guaranteed by the redirect above)
-		final int colourToMoveQ   = env.getBitboard().getColourToMove();
-		eval += env.getPawnsCorrectionHistory().get(colourToMoveQ, env.getBitboard().getPawnsHashKey())
-			  + env.getMaterialCorrectionHistory().get(colourToMoveQ, env.getBitboard().getMaterialHashKey());
+		if (!VALIDATE_PV) {
+			final int colourToMove   = env.getBitboard().getColourToMove();
+			eval += env.getPawnsCorrectionHistory().get(colourToMove, env.getBitboard().getPawnsHashKey())
+				+ env.getMaterialCorrectionHistory().get(colourToMove, env.getBitboard().getMaterialHashKey());
+		}
 		
 		
 		if (!VALIDATE_PV && ttValue != IEvaluator.MIN_EVAL) {
