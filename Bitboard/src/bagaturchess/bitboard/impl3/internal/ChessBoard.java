@@ -261,10 +261,12 @@ public final class ChessBoard {
 			} else {
 				pawnZobristKey ^= Zobrist.piece[toIndex][colorToMove][PAWN];
 				// 2-move
-				if (ChessConstants.IN_BETWEEN[fromIndex][toIndex] != 0) {
-					if ((StaticMoves.PAWN_ATTACKS[colorToMove][Long.numberOfTrailingZeros(ChessConstants.IN_BETWEEN[fromIndex][toIndex])]
+				final long inBetween = ChessConstants.IN_BETWEEN[fromIndex][toIndex];
+				if (inBetween != 0) {
+					final int epSquare = Long.numberOfTrailingZeros(inBetween);
+					if ((StaticMoves.PAWN_ATTACKS[colorToMove][epSquare]
 							& pieces[colorToMoveInverse][PAWN]) != 0) {
-						epIndex = Long.numberOfTrailingZeros(ChessConstants.IN_BETWEEN[fromIndex][toIndex]);
+						epIndex = epSquare;
 						zobristKey ^= Zobrist.epIndex[epIndex];
 					}
 				}
