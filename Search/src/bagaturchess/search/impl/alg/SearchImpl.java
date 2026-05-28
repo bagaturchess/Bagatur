@@ -182,7 +182,7 @@ public abstract class SearchImpl implements ISearch {
 	
 		getEnv().getEval().beforeSearch();
 		
-		getEnv().getEval_Fast().beforeSearch();
+		if (getEnv().getEval_Fast() != null) getEnv().getEval_Fast().beforeSearch();
 		
 		LAZY_EVAL_MARGIN.clear();
 	}

@@ -289,7 +289,7 @@ public class SearchEnv {
 	
 	public void recreateEvaluator() {
 		eval = shared.getEvaluatorFactory().create(bitboard, getEvalCache(), shared.getEngineConfiguration().getEvalConfig());
-		eval_Fast = shared.getEvaluatorFactory_FastEval().create(bitboard, null, shared.getEngineConfiguration().getEvalConfig());
+		//eval_Fast = shared.getEvaluatorFactory_FastEval().create(bitboard, null, shared.getEngineConfiguration().getEvalConfig());
 	}
 	
 	
