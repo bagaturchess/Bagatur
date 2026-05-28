@@ -480,15 +480,15 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		final int colourToMove = env.getBitboard().getColourToMove();
 
-
-		if (ply >= ISearch.MAX_DEPTH) {
-
-			return eval(ply, alpha, beta, isPv);
-		}
-		
 		
 		PVNode node = pvman.load(ply);
 		resetNodeForSearch(node);
+		
+
+		if (ply >= ISearch.MAX_DEPTH) {
+			
+			return eval(ply, alpha, beta, isPv);
+		}
 		
 		
 		//Go in qsearch if depth is < 1
@@ -733,8 +733,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				//Verified null move pruning
-				if (depth >= 3) {
+				//Verified null move pruning - guard against back-to-back null moves
+				if (depth >= 3 && env.getBitboard().getLastMove() != 0) {
 					
 					searchStats.register(SearchStatistics.TYPE_NULL_MOVE_TRIES, depth);
 					
@@ -751,9 +751,21 @@ public class Search_PVS_NWS extends SearchImpl {
 
 					if (score >= beta) {
 
+						// Save state before same-ply verify recursion - the recursive call shares ssis[ply] and
+						// will reset static_eval to MIN_EVAL, then leave it MIN_EVAL on any early-return path.
+						int    saved_static_eval = ssi.static_eval;
+						long   saved_hash_key    = ssi.hash_key;
+						boolean saved_in_check   = ssi.in_check;
+						boolean saved_tt_hit     = ssi.tt_hit;
+
 						int verify_score = depth - reduction <= 0 ? qsearch(mediator, pvman, evaluator, info, beta - 1, beta, ply, false, initialMaxDepth)
 								: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth, useSME, false);
-						
+
+						ssi.static_eval = saved_static_eval;
+						ssi.hash_key    = saved_hash_key;
+						ssi.in_check    = saved_in_check;
+						ssi.tt_hit      = saved_tt_hit;
+
 						if (verify_score >= beta) {
 							
 							node.bestmove = 0;
