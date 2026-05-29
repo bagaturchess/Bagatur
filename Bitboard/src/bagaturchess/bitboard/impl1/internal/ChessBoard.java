@@ -9,6 +9,7 @@ import static bagaturchess.bitboard.impl1.internal.ChessConstants.PAWN;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.QUEEN;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.ROOK;
 import static bagaturchess.bitboard.impl1.internal.ChessConstants.WHITE;
+import static bagaturchess.bitboard.impl1.internal.ChessConstants.BLACK;
 
 import bagaturchess.bitboard.api.BoardUtils;
 import bagaturchess.bitboard.common.Properties;
@@ -66,6 +67,9 @@ public final class ChessBoard {
 	public final int[] pieceIndexes = new int[64];
 	public final int[] kingIndex = new int[2];
 	public final long[] kingArea = new long[2];
+	public final long[] kingBishopRays = new long[2];
+	public final long[] kingRookRays = new long[2];
+	public final long[] kingQueenRays = new long[2];
 
 	public int moveCounter = 0;
 	public final int[] castlingHistory = new int[EngineConstants.MAX_MOVES];
@@ -85,10 +89,12 @@ public final class ChessBoard {
 	public StackLongInt playedBoardStates = new StackLongInt(9631);//MUST BE PRIME NUMBER
 	
 	public CastlingConfig castlingConfig;
-	
+
 	private int[] buff_castling_rook_from_to = new int[2];
-	
-	
+
+	boolean pinnedPiecesDirty = false;
+
+
 	@Override
 	public String toString() {
 		return ChessBoardUtil.toString(this, true);
@@ -112,6 +118,10 @@ public final class ChessBoard {
 	}
 	
 	public boolean isDiscoveredMove(final int fromIndex) {
+		if (pinnedPiecesDirty) {
+			setPinnedAndDiscoPieces();
+			pinnedPiecesDirty = false;
+		}
 		return (discoveredPieces & (1L << fromIndex)) != 0;
 	}
 	
@@ -141,6 +151,10 @@ public final class ChessBoard {
 	}
 	
 	public void doNullMove() {
+		if (pinnedPiecesDirty) {
+			setPinnedAndDiscoPieces();
+			pinnedPiecesDirty = false;
+		}
 		pushHistoryValues(0);
 
 		zobristKey ^= Zobrist.sideToMove;
@@ -153,15 +167,16 @@ public final class ChessBoard {
 		if (EngineConstants.ASSERT) {
 			ChessBoardTestUtil.testValues(this);
 		}
-		
+
 		playedBoardStates.inc(zobristKey);
 	}
 	
 	public void undoNullMove() {
-		
+
 		playedBoardStates.dec(zobristKey);
-		
+
 		popHistoryValues();
+		pinnedPiecesDirty = false;
 		changeSideToMove();
 
 		if (EngineConstants.ASSERT) {
@@ -171,17 +186,23 @@ public final class ChessBoard {
 	
 	public void doMove(int move) {
 
+		if (pinnedPiecesDirty) {
+			setPinnedAndDiscoPieces();
+			pinnedPiecesDirty = false;
+		}
+
 		if (MoveUtil.isCastlingMove(move)) {
-			
+
 			doCastling960(move);
-			
+
 			return;
 		}
-		
+
 		final int fromIndex = MoveUtil.getFromIndex(move);
 		int toIndex = MoveUtil.getToIndex(move);
 		long toMask = 1L << toIndex;
 		final long fromToMask = (1L << fromIndex) ^ toMask;
+		long changedSquares = fromToMask;
 		final int sourcePieceIndex = MoveUtil.getSourcePieceIndex(move);
 		final int attackedPieceIndex = MoveUtil.getAttackedPieceIndex(move);
 
@@ -242,10 +263,12 @@ public final class ChessBoard {
 			} else {
 				pawnZobristKey ^= Zobrist.piece[toIndex][colorToMove][PAWN];
 				// 2-move
-				if (ChessConstants.IN_BETWEEN[fromIndex][toIndex] != 0) {
-					if ((StaticMoves.PAWN_ATTACKS[colorToMove][Long.numberOfTrailingZeros(ChessConstants.IN_BETWEEN[fromIndex][toIndex])]
+				final long inBetween = ChessConstants.IN_BETWEEN[fromIndex][toIndex];
+				if (inBetween != 0) {
+					final int epSquare = Long.numberOfTrailingZeros(inBetween);
+					if ((StaticMoves.PAWN_ATTACKS[colorToMove][epSquare]
 							& pieces[colorToMoveInverse][PAWN]) != 0) {
-						epIndex = Long.numberOfTrailingZeros(ChessConstants.IN_BETWEEN[fromIndex][toIndex]);
+						epIndex = epSquare;
 						zobristKey ^= Zobrist.epIndex[epIndex];
 					}
 				}
@@ -300,6 +323,7 @@ public final class ChessBoard {
 			if (MoveUtil.isEPMove(move)) {
 				toIndex += ChessConstants.COLOR_FACTOR_8[colorToMoveInverse];
 				toMask = Util.POWER_LOOKUP[toIndex];
+				changedSquares |= toMask;
 				pieceIndexes[toIndex] = EMPTY;
 			}
 			pawnZobristKey ^= Zobrist.piece[toIndex][colorToMoveInverse][PAWN];
@@ -356,13 +380,12 @@ public final class ChessBoard {
 			}
 		}
 
-		// TODO can this be done incrementally?
-		setPinnedAndDiscoPieces();
+		updatePinnedAndDiscoPiecesAfterMove(sourcePieceIndex, changedSquares);
 
 		if (EngineConstants.ASSERT) {
 			ChessBoardTestUtil.testValues(this);
 		}
-		
+
 		playedBoardStates.inc(zobristKey);
 	}
 
@@ -517,19 +540,19 @@ public final class ChessBoard {
 			}
 		}
 		*/
-		
-		// TODO can this be done incrementally?
-		setPinnedAndDiscoPieces();
+
+		// Castling always moves the king and rook, so the king rays change.
+		pinnedPiecesDirty = true;
 
 		if (EngineConstants.ASSERT) {
-			
+
 			ChessBoardTestUtil.testValues(this);
 		}
-		
-		
+
+
 		playedBoardStates.inc(zobristKey);
 	}
-	
+
 
 	public void undoMove(int move) {
 		
@@ -560,8 +583,9 @@ public final class ChessBoard {
 			Assert.isTrue(attackedPieceIndex != KING, "attackedPieceIndex != KING");
 			Assert.isTrue(attackedPieceIndex == 0 || (Util.POWER_LOOKUP[fromIndex] & friendlyPieces[colorToMove]) == 0, "attackedPieceIndex == 0 || (Util.POWER_LOOKUP[fromIndex] & friendlyPieces[colorToMove]) == 0");
 		}
-		
+
 		popHistoryValues();
+		pinnedPiecesDirty = false;
 
 		// undo move
 		friendlyPieces[colorToMoveInverse] ^= fromToMask;
@@ -648,14 +672,15 @@ public final class ChessBoard {
 	
 	
 	public void undoCastling960(int move) {
-		
-		
+
+
 		playedBoardStates.dec(zobristKey);
-		
-		
+
+
 		popHistoryValues();
-		
-		
+		pinnedPiecesDirty = false;
+
+
 		final int fromIndex_king 	= MoveUtil.getFromIndex(move);
 		final int toIndex_king 		= MoveUtil.getToIndex(move);
 		final int sourcePieceIndex 	= MoveUtil.getSourcePieceIndex(move);
@@ -771,6 +796,22 @@ public final class ChessBoard {
 	}
 	
 	
+	private void updatePinnedAndDiscoPiecesAfterMove(final int sourcePieceIndex, final long changedSquares) {
+
+		if (sourcePieceIndex == KING) {
+			pinnedPiecesDirty = true;
+			return;
+		}
+
+		// Pinned pieces can only change when a square along a king's queen ray was modified.
+		final long affectedKingRays = kingQueenRays[WHITE] | kingQueenRays[BLACK];
+
+		if ((changedSquares & affectedKingRays) != 0) {
+			pinnedPiecesDirty = true;
+		}
+	}
+
+
 	public void setPinnedAndDiscoPieces() {
 
 		pinnedPieces = 0;
@@ -784,8 +825,8 @@ public final class ChessBoard {
 				continue;
 			}
 
-			long enemyPiece = (pieces[enemyColor][BISHOP] | pieces[enemyColor][QUEEN]) & MagicUtil.getBishopMovesEmptyBoard(kingIndex[kingColor])
-					| (pieces[enemyColor][ROOK] | pieces[enemyColor][QUEEN]) & MagicUtil.getRookMovesEmptyBoard(kingIndex[kingColor]);
+			long enemyPiece = (pieces[enemyColor][BISHOP] | pieces[enemyColor][QUEEN]) & kingBishopRays[kingColor]
+					| (pieces[enemyColor][ROOK] | pieces[enemyColor][QUEEN]) & kingRookRays[kingColor];
 			while (enemyPiece != 0) {
 				final long checkedPiece = ChessConstants.IN_BETWEEN[kingIndex[kingColor]][Long.numberOfTrailingZeros(enemyPiece)] & allPieces;
 				if (Long.bitCount(checkedPiece) == 1) {
@@ -801,10 +842,16 @@ public final class ChessBoard {
 	
 	public void updateKingValues(final int kingColor, final int index) {
 		if (index == 64) {//If there is no king return
+			kingBishopRays[kingColor] = 0;
+			kingRookRays[kingColor] = 0;
+			kingQueenRays[kingColor] = 0;
 			return;
 		}
 		kingIndex[kingColor] = index;
 		kingArea[kingColor] = ChessConstants.KING_AREA[kingColor][index];
+		kingBishopRays[kingColor] = MagicUtil.getBishopMovesEmptyBoard(index);
+		kingRookRays[kingColor] = MagicUtil.getRookMovesEmptyBoard(index);
+		kingQueenRays[kingColor] = kingBishopRays[kingColor] | kingRookRays[kingColor];
 	}
 	
 	public boolean isLegal(final int move) {
@@ -829,7 +876,7 @@ public final class ChessBoard {
 		return true;
 	}
 
-	private boolean isLegalEPMove(final int fromIndex) {
+	boolean isLegalEPMove(final int fromIndex) {
 
 		// do move, check if in check, undo move. slow but also not called very often
 
@@ -855,7 +902,12 @@ public final class ChessBoard {
 	
 	
 	public boolean isValidMove(final int move) {
-		
+
+		if (pinnedPiecesDirty) {
+			setPinnedAndDiscoPieces();
+			pinnedPiecesDirty = false;
+		}
+
 		// check piece at from square
 		final int fromIndex = MoveUtil.getFromIndex(move);
 		final long fromSquare = Util.POWER_LOOKUP[fromIndex];

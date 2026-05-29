@@ -218,76 +218,64 @@ public class BoardImpl implements IBitBoard {
 	
 	@Override
 	public int genAllMoves(IInternalMoveList list) {
-		
+
 		generator.startPly();
-		
+
 		generator.generateAttacks(chessBoard);
 		generator.generateMoves(chessBoard);
-		
+
 		int counter = 0;
 		while (generator.hasNext()) {
-			int cur_move = generator.next();
-			if (!isPossible(cur_move)) {
-				continue;
-			}
-			list.reserved_add(cur_move);
+			list.reserved_add(generator.next());
 			counter++;
 		}
-		
+
 		generator.endPly();
-		
+
 		return counter;
 	}
-	
-	
+
+
 	@Override
 	public int genKingEscapes(IInternalMoveList list) {
 		return genAllMoves(list);
 	}
-	
-	
+
+
 	@Override
 	public int genCapturePromotionMoves(IInternalMoveList list) {
-		
+
 		generator.startPly();
-		
+
 		generator.generateAttacks(chessBoard);
-		
+
 		int counter = 0;
 		while (generator.hasNext()) {
-			int cur_move = generator.next();
-			if (!isPossible(cur_move)) {
-				continue;
-			}
-			list.reserved_add(cur_move);
+			list.reserved_add(generator.next());
 			counter++;
 		}
-		
+
 		generator.endPly();
-		
+
 		return counter;
 	}
-	
-	
+
+
 	@Override
 	public int genNonCaptureNonPromotionMoves(IInternalMoveList list) {
-		
+
 		generator.startPly();
-		
+
 		generator.generateMoves(chessBoard);
-		
+
 		int counter = 0;
 		while (generator.hasNext()) {
-			int cur_move = generator.next();
-			if (!isPossible(cur_move)) {
-				continue;
-			}
-			list.reserved_add(cur_move);
+			list.reserved_add(generator.next());
 			counter++;
 		}
-		
+
 		generator.endPly();
-		
+
 		return counter;
 	}
 	

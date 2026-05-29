@@ -360,6 +360,8 @@ public final class MoveGenerator {
 	
 	public void generateMoves(final ChessBoard cb) {
 
+		if (cb.pinnedPiecesDirty) { cb.setPinnedAndDiscoPieces(); cb.pinnedPiecesDirty = false; }
+
 		switch (Long.bitCount(cb.checkingPieces)) {
 		case 0:
 			// not in-check
@@ -385,6 +387,8 @@ public final class MoveGenerator {
 	}
 
 	public void generateAttacks(final ChessBoard cb) {
+
+		if (cb.pinnedPiecesDirty) { cb.setPinnedAndDiscoPieces(); cb.pinnedPiecesDirty = false; }
 
 		switch (Long.bitCount(cb.checkingPieces)) {
 		case 0:
@@ -493,7 +497,19 @@ public final class MoveGenerator {
 	private void generateOutOfCheckAttacks(final ChessBoard cb) {
 		// attack attacker
 		addEpAttacks(cb);
-		addPawnAttacksAndPromotions(cb.pieces[cb.colorToMove][PAWN] & ~cb.pinnedPieces, cb, cb.checkingPieces, cb.emptySpaces);
+		// Promotion pushes are legal only when they block a single sliding check.
+		// Restrict the push targets accordingly; for pawn/knight checkers no push can block.
+		long promotionPushTargets = 0;
+		if ((cb.checkingPieces & (cb.checkingPieces - 1)) == 0) {
+			final int checkerIndex = Long.numberOfTrailingZeros(cb.checkingPieces);
+			switch (cb.pieceIndexes[checkerIndex]) {
+			case BISHOP:
+			case ROOK:
+			case QUEEN:
+				promotionPushTargets = cb.emptySpaces & ChessConstants.IN_BETWEEN[cb.kingIndex[cb.colorToMove]][checkerIndex];
+			}
+		}
+		addPawnAttacksAndPromotions(cb.pieces[cb.colorToMove][PAWN] & ~cb.pinnedPieces, cb, cb.checkingPieces, promotionPushTargets);
 		addNightAttacks(cb.pieces[cb.colorToMove][NIGHT] & ~cb.pinnedPieces, cb.pieceIndexes, cb.checkingPieces);
 		addBishopAttacks(cb.pieces[cb.colorToMove][BISHOP] & ~cb.pinnedPieces, cb, cb.checkingPieces);
 		addRookAttacks(cb.pieces[cb.colorToMove][ROOK] & ~cb.pinnedPieces, cb, cb.checkingPieces);
@@ -698,17 +714,21 @@ public final class MoveGenerator {
 	}
 
 	private void addKingMoves(final ChessBoard cb) {
-		
+
 		if (Properties.DUMP_CASTLING) System.out.println("MoveGenerator.addKingMoves");
-		
+
 		final int fromIndex = cb.kingIndex[cb.colorToMove];
-		
+		final long occupiedWithoutKing = cb.allPieces ^ Util.POWER_LOOKUP[fromIndex];
+		final long[] enemyPieces = cb.pieces[cb.colorToMoveInverse];
+		final int enemyMajorPieces = MaterialUtil.getMajorPieces(cb.materialKey, cb.colorToMoveInverse);
+
 		long moves = StaticMoves.KING_MOVES[fromIndex] & cb.emptySpaces;
-		
+
 		while (moves != 0) {
-			
-			addMove(MoveUtil.createMove(fromIndex, Long.numberOfTrailingZeros(moves), KING));
-			
+			final int toIndex = Long.numberOfTrailingZeros(moves);
+			if (!CheckUtil.isInCheckIncludingKing(toIndex, cb.colorToMove, enemyPieces, occupiedWithoutKing, enemyMajorPieces)) {
+				addMove(MoveUtil.createMove(fromIndex, toIndex, KING));
+			}
 			moves &= moves - 1;
 		}
 
@@ -741,10 +761,15 @@ public final class MoveGenerator {
 
 	private void addKingAttacks(final ChessBoard cb) {
 		final int fromIndex = cb.kingIndex[cb.colorToMove];
+		final long occupiedWithoutKing = cb.allPieces ^ Util.POWER_LOOKUP[fromIndex];
+		final long[] enemyPieces = cb.pieces[cb.colorToMoveInverse];
+		final int enemyMajorPieces = MaterialUtil.getMajorPieces(cb.materialKey, cb.colorToMoveInverse);
 		long moves = StaticMoves.KING_MOVES[fromIndex] & cb.friendlyPieces[cb.colorToMoveInverse];
 		while (moves != 0) {
 			final int toIndex = Long.numberOfTrailingZeros(moves);
-			addMove(MoveUtil.createAttackMove(fromIndex, toIndex, KING, cb.pieceIndexes[toIndex]));
+			if (!CheckUtil.isInCheckIncludingKing(toIndex, cb.colorToMove, enemyPieces, occupiedWithoutKing, enemyMajorPieces)) {
+				addMove(MoveUtil.createAttackMove(fromIndex, toIndex, KING, cb.pieceIndexes[toIndex]));
+			}
 			moves &= moves - 1;
 		}
 	}
@@ -768,7 +793,10 @@ public final class MoveGenerator {
 		}
 		long piece = cb.pieces[cb.colorToMove][PAWN] & StaticMoves.PAWN_ATTACKS[cb.colorToMoveInverse][cb.epIndex];
 		while (piece != 0) {
-			addMove(MoveUtil.createEPMove(Long.numberOfTrailingZeros(piece), cb.epIndex));
+			final int fromIndex = Long.numberOfTrailingZeros(piece);
+			if (cb.isLegalEPMove(fromIndex)) {
+				addMove(MoveUtil.createEPMove(fromIndex, cb.epIndex));
+			}
 			piece &= piece - 1;
 		}
 	}
