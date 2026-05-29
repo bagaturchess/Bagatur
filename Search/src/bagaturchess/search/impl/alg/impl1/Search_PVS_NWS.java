@@ -737,8 +737,8 @@ public class Search_PVS_NWS extends SearchImpl {
 				}
 				
 				
-				//Verified null move pruning - guard against back-to-back null moves
-				if (depth >= 3 && env.getBitboard().getLastMove() != 0) {
+				//Verified null move pruning
+				if (depth >= 3) {
 					
 					searchStats.register(SearchStatistics.TYPE_NULL_MOVE_TRIES, depth);
 					
