@@ -17,6 +17,12 @@ public class ChessBoardTestUtil {
 	
 	public static void testValues(ChessBoard cb) {
 
+		// Force lazy pinned/discovered recompute so the captured values are not stale.
+		if (cb.pinnedPiecesDirty) {
+			cb.setPinnedAndDiscoPieces();
+			cb.pinnedPiecesDirty = false;
+		}
+
 		int castlingRights = cb.castlingRights;
 		long iterativeZK = cb.zobristKey;
 		long iterativeZKPawn = cb.pawnZobristKey;

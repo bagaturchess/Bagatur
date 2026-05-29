@@ -391,11 +391,13 @@ public final class ChessBoard {
 
 	
 	private void doCastling960(int move) {
-		
-		
+
+
 		pushHistoryValues(move);
-		
-		
+
+		// Castling is neither a capture nor a pawn move, so the 50-move clock advances.
+		lastCaptureOrPawnMoveBefore++;
+
 		final int fromIndex_king 	= MoveUtil.getFromIndex(move);
 		final int toIndex_king 		= MoveUtil.getToIndex(move);
 		final int sourcePieceIndex 	= MoveUtil.getSourcePieceIndex(move);

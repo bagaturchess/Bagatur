@@ -373,12 +373,12 @@ public class ChessBoardUtil {
 		long bb_king_b = cb.pieces[BLACK][KING];
 		
 		if (bb_king_w == 0) {
-			
+
 			throw new IllegalStateException("No white king");
 		}
-		
-		if (bb_king_w == 0) {
-			
+
+		if (bb_king_b == 0) {
+
 			throw new IllegalStateException("No black king");
 		}
 		
