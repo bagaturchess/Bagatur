@@ -1,3 +1,10 @@
+ Version 5.5c (31 May 2026)
+ * Board optimizations for better NPS (~+10%):
+ * Removed isPossible post-filter from move generation
+ * Lazy pinned/discovered pieces tracking
+ * Precomputed king-ray fields
+ * Some minor bugfixes in Board implementation
+
  Version 5.5b (26 May 2026)
  * Transposition Table: Replaced O(n) depth-reduction iteration with an O(1) generation counter. Stale entries are evicted first via quality score, same-key entries are preserved unless the new search is significantly shallower.
  
