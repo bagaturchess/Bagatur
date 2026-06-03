@@ -1978,7 +1978,7 @@ public class Search_PVS_NWS extends SearchImpl {
 		
 		if (env.getBitboard().isInCheck()) {
 			
-		    if (ply >= 2 * initialMaxDepth) {
+		    if (!VALIDATE_PV && ply >= 2 * initialMaxDepth) {
 		    	
 		    		node.eval = alpha;
 		    	
