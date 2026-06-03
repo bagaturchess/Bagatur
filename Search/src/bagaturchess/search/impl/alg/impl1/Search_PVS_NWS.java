@@ -1400,7 +1400,9 @@ public class Search_PVS_NWS extends SearchImpl {
 						&& lmr_depth <= FUTILITY_LMR_MAXDEPTH
 						&& list.getScore() <= stats.getEntropy()
 						&& ssi.static_eval + (lmr_depth + 1) * FUTILITY_LMR_MARGIN <= alpha) {
-
+					
+					searchStats.register(SearchStatistics.TYPE_FUTILITY_SEARCH_OK, depth);
+					
 					continue;
 				}
 
@@ -1424,7 +1426,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					int futilityValue = ssi.static_eval + 218 + 223 * (int) lmr_depth + capturedPieceValue + captHistScore / 8;
 
 					if (futilityValue <= alpha) {
-
+						
 						searchStats.register(SearchStatistics.TYPE_FUTILITY_SEARCH_OK, depth);
 
 						continue;
