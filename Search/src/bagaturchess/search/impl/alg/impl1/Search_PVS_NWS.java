@@ -749,7 +749,7 @@ public class Search_PVS_NWS extends SearchImpl {
 					reduction = Math.max(1.5, reduction) * REDUCTION_AGGRESSIVENESS;
 					
 					int score = depth - reduction <= 0 ? -qsearch(mediator, pvman, evaluator, info, -beta, -beta + 1, ply + 1, false, initialMaxDepth)
-							: -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth, useSME, false);
+							: -search(mediator, info, pvman, evaluator, ply + 1, depth - reduction, -beta, -beta + 1, false, initialMaxDepth, useSME, !cutNode);
 
 					env.getBitboard().makeNullMoveBackward();
 
@@ -763,7 +763,7 @@ public class Search_PVS_NWS extends SearchImpl {
 						boolean saved_tt_hit     = ssi.tt_hit;
 
 						int verify_score = depth - reduction <= 0 ? qsearch(mediator, pvman, evaluator, info, beta - 1, beta, ply, false, initialMaxDepth)
-								: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth, useSME, false);
+								: search(mediator, info, pvman, evaluator, ply, depth - reduction, beta - 1, beta, false, initialMaxDepth, useSME, true);
 
 						ssi.static_eval = saved_static_eval;
 						ssi.hash_key    = saved_hash_key;
@@ -944,7 +944,7 @@ public class Search_PVS_NWS extends SearchImpl {
 			//singular_depth = Math.max(1 , singular_depth / REDUCTION_AGGRESSIVENESS);
 			
 			int singular_value = singular_move_search(mediator, info, pvman, evaluator, ply,
-					singular_depth, singular_beta - 1, singular_beta, initialMaxDepth, ttMove, !cutNode);
+					singular_depth, singular_beta - 1, singular_beta, initialMaxDepth, ttMove, cutNode);
 			
 			//Singular extension - only ttMove has score above beta
 			if (singular_value < singular_beta) {
