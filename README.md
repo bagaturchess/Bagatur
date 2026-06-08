@@ -66,13 +66,13 @@ Special Thanks to <a href="https://www.chessprogramming.org/Graham_Banks">Graham
 Latest official Elo rating of Bagatur is ~3400 Elo.
 
 # More readings with technical details and explanations for each sub-component of Bagatur
-- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Bitboard/readme.txt>Bitboard</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Bitboard/README.md>Bitboard</a>
 - <a href=https://github.com/bagaturchess/Bagatur/blob/master/EGTB/readme.txt>Endgame Tablebases</a>
 - <a href=https://github.com/bagaturchess/Bagatur/tree/master/LearningImpl>Machine Learning</a>
 - <a href=https://github.com/bagaturchess/Bagatur/edit/master/Opening/readme.txt>Opening API</a>
 - <a href=https://github.com/bagaturchess/Bagatur/edit/master/OpeningGenerator/readme.txt>Opening Generator</a>
 - <a href=https://github.com/bagaturchess/Bagatur/blob/master/PGNProcessor/readme.txt>PGNProcessor</a>
-- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Search/readme.txt>Search Algorithm</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Search/readme.md>Search Algorithm</a>
 - <a href=https://github.com/bagaturchess/Bagatur/tree/master/UCITracker>UCITracker</a>
 - <a href=https://github.com/bagaturchess/Bagatur/tree/master/NNUE>NNUE</a>
 
