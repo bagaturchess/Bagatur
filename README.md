@@ -69,11 +69,11 @@ Latest official Elo rating of Bagatur is ~3400 Elo.
 - <a href=https://github.com/bagaturchess/Bagatur/blob/master/Bitboard/README.md>Bitboard</a>
 - <a href=https://github.com/bagaturchess/Bagatur/tree/master/NNUE>NNUE</a>
 - <a href=https://github.com/bagaturchess/Bagatur/blob/master/Search/readme.md>Search Algorithm</a>
-- <a href=https://github.com/bagaturchess/Bagatur/blob/master/EGTB/readme.txt>Endgame Tablebases</a>
-- <a href=https://github.com/bagaturchess/Bagatur/tree/master/LearningImpl>Machine Learning</a>
-- <a href=https://github.com/bagaturchess/Bagatur/edit/master/Opening/readme.txt>Opening API</a>
-- <a href=https://github.com/bagaturchess/Bagatur/edit/master/OpeningGenerator/readme.txt>Opening Generator</a>
-- <a href=https://github.com/bagaturchess/Bagatur/blob/master/PGNProcessor/readme.txt>PGNProcessor</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/EGTB/README.md>Endgame Tablebases</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/LearningImpl/README.md>Machine Learning</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/Opening/README.md>Opening API</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/OpeningGenerator/README.md>Opening Generator</a>
+- <a href=https://github.com/bagaturchess/Bagatur/blob/master/PGNProcessor/README.md>PGNProcessor</a>
 - <a href=https://github.com/bagaturchess/Bagatur/tree/master/UCITracker>UCITracker</a>
 
 
